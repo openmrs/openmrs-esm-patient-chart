@@ -1,0 +1,9 @@
+{
+  "transform": {
+    "^.+\\.tsx?$": "babel-jest"
+  },
+  "moduleNameMapper": {
+    "\\.(css)$": "identity-obj-proxy",
+    "@openmrs/esm-api": "<rootDir>/__mocks__/openmrs-esm-api.mock.tsx"
+  }
+}

@@ -1,0 +1,6 @@
+{
+    "extends": [
+      "ts-react-important-stuff",
+      "plugin:prettier/recommended"
+    ]
+  }
