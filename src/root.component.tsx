@@ -6,12 +6,7 @@ import PatientChartSummary from "./summary/patient-chart-summary.component";
 
 function Root(props) {
   return (
-    <BrowserRouter
-      basename={
-        // @ts-ignore
-        window.getOpenmrsSpaBase()
-      }
-    >
+    <BrowserRouter>
       <Route to="/patient/:patientUuid/chart" component={PatientChartSummary} />
     </BrowserRouter>
   );
