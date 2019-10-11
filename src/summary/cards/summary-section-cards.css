@@ -1,0 +1,4 @@
+.sectionCards {
+  display: flex;
+  flex-direction: column;
+}
