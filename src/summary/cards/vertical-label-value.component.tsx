@@ -7,7 +7,7 @@ export default function VerticalLabelValue(props: VerticalLabelValueProps) {
       <label className={`omrs-type-body-small ${styles.label}`}>
         {props.label}
       </label>
-      <div style={props.valueStyles}>
+      <div style={props.valueStyles} title={props.label}>
         {/* em-dash is shown if no value is passed in */}
         {props.value || "\u2014"}
       </div>
