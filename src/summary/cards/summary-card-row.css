@@ -1,0 +1,12 @@
+a.row:global(.omrs-unstyled) {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: none;
+  padding: 0.625rem 0.25rem 0.625rem 1rem;
+  border-radius: 0;
+}
+
+a.row:not(:last-child) {
+  border-bottom: 1px solid var(--omrs-color-bg-low-contrast);
+}

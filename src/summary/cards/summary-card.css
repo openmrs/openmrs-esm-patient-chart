@@ -1,0 +1,13 @@
+.card {
+  width: 21.75rem;
+}
+
+.header {
+  background-color: var(--omrs-color-bg-medium-contrast);
+  height: 3rem;
+  padding: 0 0.25rem 0 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--omrs-color-bg-low-contrast);
+}
