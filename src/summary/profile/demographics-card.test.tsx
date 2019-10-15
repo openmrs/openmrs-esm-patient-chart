@@ -80,7 +80,7 @@ describe("<DemographicsCard>", () => {
         <DemographicsCard match={match} />
       </BrowserRouter>
     );
-    expect(getByTitle("Age").textContent).toBe("55yr");
+    expect(getByTitle("Age").textContent).toBe("55 yr");
   });
 
   it("renders the correct age for a 55 year old who had their birthday recently", () => {
@@ -91,7 +91,7 @@ describe("<DemographicsCard>", () => {
         <DemographicsCard match={match} />
       </BrowserRouter>
     );
-    expect(getByTitle("Age").textContent).toBe("55yr");
+    expect(getByTitle("Age").textContent).toBe("55 yr");
   });
 
   it("renders the correct age for a 18 year old", () => {
@@ -102,7 +102,7 @@ describe("<DemographicsCard>", () => {
         <DemographicsCard match={match} />
       </BrowserRouter>
     );
-    expect(getByTitle("Age").textContent).toBe("18yr");
+    expect(getByTitle("Age").textContent).toBe("18 yr");
   });
 
   it("renders the correct age for a 17 year old who had their birthday three months ago", () => {
@@ -113,7 +113,7 @@ describe("<DemographicsCard>", () => {
         <DemographicsCard match={match} />
       </BrowserRouter>
     );
-    expect(getByTitle("Age").textContent).toBe("17yr 3mo");
+    expect(getByTitle("Age").textContent).toBe("17 yr 3 mo");
   });
 
   it("renders the correct age for a 17 year old who had their birthday three months and one day ago", () => {
@@ -124,7 +124,7 @@ describe("<DemographicsCard>", () => {
         <DemographicsCard match={match} />
       </BrowserRouter>
     );
-    expect(getByTitle("Age").textContent).toBe("17yr 3mo");
+    expect(getByTitle("Age").textContent).toBe("17 yr 3 mo");
   });
 
   it("renders the correct age for a 17 year old who had their birthday almost three months ago", () => {
@@ -135,7 +135,7 @@ describe("<DemographicsCard>", () => {
         <DemographicsCard match={match} />
       </BrowserRouter>
     );
-    expect(getByTitle("Age").textContent).toBe("17yr 2mo");
+    expect(getByTitle("Age").textContent).toBe("17 yr 2 mo");
   });
 
   it("renders the correct age for a 16 week old baby", () => {
@@ -146,7 +146,7 @@ describe("<DemographicsCard>", () => {
         <DemographicsCard match={match} />
       </BrowserRouter>
     );
-    expect(getByTitle("Age").textContent).toBe("16w");
+    expect(getByTitle("Age").textContent).toBe("16 weeks");
   });
 
   it("renders the correct age for a 16 week and 1 day old baby", () => {
@@ -157,7 +157,7 @@ describe("<DemographicsCard>", () => {
         <DemographicsCard match={match} />
       </BrowserRouter>
     );
-    expect(getByTitle("Age").textContent).toBe("16w 1d");
+    expect(getByTitle("Age").textContent).toBe("16 weeks 1 d");
   });
 
   it("renders the correct age for a baby born in the last month", () => {
