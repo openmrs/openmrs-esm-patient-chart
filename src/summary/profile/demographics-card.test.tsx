@@ -146,7 +146,7 @@ describe("<DemographicsCard>", () => {
         <DemographicsCard match={match} />
       </BrowserRouter>
     );
-    expect(getByTitle("Age").textContent).toBe("16 weeks");
+    expect(getByTitle("Age").textContent).toBe("16 week");
   });
 
   it("renders the correct age for a 16 week and 1 day old baby", () => {
@@ -157,7 +157,7 @@ describe("<DemographicsCard>", () => {
         <DemographicsCard match={match} />
       </BrowserRouter>
     );
-    expect(getByTitle("Age").textContent).toBe("16 weeks 1 d");
+    expect(getByTitle("Age").textContent).toBe("16 wk 1 d");
   });
 
   it("renders the correct age for a baby born in the last month", () => {
@@ -168,7 +168,7 @@ describe("<DemographicsCard>", () => {
         <DemographicsCard match={match} />
       </BrowserRouter>
     );
-    expect(getByTitle("Age").textContent).toBe("15d");
+    expect(getByTitle("Age").textContent).toBe("15 day");
   });
 
   it("renders the correct age for a baby born today", () => {
@@ -180,6 +180,17 @@ describe("<DemographicsCard>", () => {
       </BrowserRouter>
     );
     expect(getByTitle("Age").textContent).toBe("Today");
+  });
+
+  it("renders the correct age for a baby born two days ago", () => {
+    patient.birthDate = createBirthdayWeeksAgo(0, 2);
+    getPatientMock.mockReturnValue(of(patient));
+    const { getByTitle } = render(
+      <BrowserRouter>
+        <DemographicsCard match={match} />
+      </BrowserRouter>
+    );
+    expect(getByTitle("Age").textContent).toBe("2 day");
   });
 });
 

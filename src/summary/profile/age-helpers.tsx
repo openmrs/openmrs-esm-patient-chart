@@ -33,11 +33,13 @@ export function age(dateString: string): string {
     if (isSameDay(today, birthDate)) {
       return `Today`;
     } else if (weeksAgo < 4) {
-      return `${totalDaysAgo}d`;
+      return `${totalDaysAgo} day`;
+    } else if (weeksAgo === 0) {
+      return `${totalDaysAgo} day`;
+    } else if (remainderDaysInWeek > 0) {
+      return `${weeksAgo} wk ${remainderDaysInWeek} d`;
     } else {
-      return `${weeksAgo} week${weeksAgo > 1 ? "s" : ""} ${
-        remainderDaysInWeek > 0 ? `${remainderDaysInWeek} d` : ""
-      }`.trim();
+      return `${weeksAgo} week`;
     }
   } else if (age < 2) {
     return `${monthsAgoStr} ${age} yr`.trim();
