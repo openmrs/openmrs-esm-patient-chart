@@ -1,21 +1,11 @@
 import React from "react";
-import { getCurrentPatient } from "@openmrs/esm-api";
 import SummaryCard from "../cards/summary-card.component";
 import SummaryCardRow from "../cards/summary-card-row.component";
 import SummaryCardRowContent from "../cards/summary-card-row-content.component";
 import HorizontalLabelValue from "../cards/horizontal-label-value.component";
+import { match } from "react-router";
 
-export default function IdentifiersCard(props: any) {
-  const [currentPatient, setCurrentPatient] = React.useState(null);
-
-  React.useEffect(() => {
-    const subscription = getCurrentPatient().subscribe(patient => {
-      setCurrentPatient(patient);
-    });
-
-    return () => subscription.unsubscribe();
-  });
-
+export default function IdentifiersCard(props: IdentifiersCardProps) {
   const labelStyles = {
     color: "var(--omrs-color-ink-medium-contrast)"
   };
@@ -27,9 +17,9 @@ export default function IdentifiersCard(props: any) {
 
   return (
     <SummaryCard name="Identifiers" match={props.match}>
-      {currentPatient &&
-        currentPatient.identifier.map(id => (
-          <SummaryCardRow linkTo="/">
+      {props.currentPatient &&
+        props.currentPatient.identifier.map(id => (
+          <SummaryCardRow linkTo="/" key={id.system}>
             <SummaryCardRowContent>
               <HorizontalLabelValue
                 label={id.system}
@@ -49,3 +39,8 @@ export default function IdentifiersCard(props: any) {
     </SummaryCard>
   );
 }
+
+type IdentifiersCardProps = {
+  currentPatient: fhir.Patient;
+  match: match;
+};
