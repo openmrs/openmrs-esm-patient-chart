@@ -1,12 +1,16 @@
-.card {
-  width: 21.75rem;
-  margin: 1rem 1rem 0 0;
+
+:global(.omrs-breakpoint-lt-tablet) .card {
+  width: 100%;
+  margin: 1rem 0;
 }
 
+:global(.omrs-breakpoint-gt-phone) .card {
+  width: 21.75rem;
+  margin: 0.5rem 1.5rem;
+}
 .header {
   background-color: var(--omrs-color-bg-medium-contrast);
-  height: 3rem;
-  padding: 0 0.25rem 0 1rem;
+  padding: 1rem 0.25rem 1rem 1rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
