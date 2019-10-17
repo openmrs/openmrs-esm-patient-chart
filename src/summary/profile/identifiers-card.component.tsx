@@ -36,7 +36,7 @@ export default function IdentifiersCard(props: IdentifiersCardProps) {
                   value={id.value}
                   labelStyles={labelStyles}
                   valueStyles={valueStyles}
-                  specialKey={id.use === "usual"}
+                  specialKey={isPreferred(id)}
                 ></HorizontalLabelValue>
               </SummaryCardRowContent>
             </SummaryCardRow>

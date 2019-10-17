@@ -40,5 +40,6 @@ describe("<IdentifiersCard/>", () => {
     );
     const idsRendered = wrapper.getAllByTestId("horizontalLabelValue");
     expect(idsRendered[0].textContent).toContain("OpenMRS ID");
+    expect(idsRendered[0].textContent).toContain("*");
   });
 });
