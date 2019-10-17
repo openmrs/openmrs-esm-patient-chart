@@ -16,6 +16,12 @@ export const mockPatient = {
   identifier: [
     {
       id: "1f0ad7a1-430f-4397-b571-59ea654a52db",
+      use: "secondary",
+      system: "Old Identification Number",
+      value: "100732HE"
+    },
+    {
+      id: "1f0ad7a1-430f-4397-b571-59ea654a52db",
       use: "usual",
       system: "OpenMRS ID",
       value: "100GEJ"

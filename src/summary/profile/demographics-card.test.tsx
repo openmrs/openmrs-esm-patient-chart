@@ -18,7 +18,7 @@ describe("<DemographicsCard>", () => {
     patient.birthDate = createBirthdayYearsAgo(55);
     const { getByTitle } = render(
       <BrowserRouter>
-        <DemographicsCard match={match} currentPatient={patient} />
+        <DemographicsCard match={match} patient={patient} />
       </BrowserRouter>
     );
     expect(getByTitle("Age").textContent).toBe("55 yr");
@@ -28,7 +28,7 @@ describe("<DemographicsCard>", () => {
     patient.birthDate = createBirthdayYearsAgo(55, 4);
     const { getByTitle } = render(
       <BrowserRouter>
-        <DemographicsCard match={match} currentPatient={patient} />
+        <DemographicsCard match={match} patient={patient} />
       </BrowserRouter>
     );
     expect(getByTitle("Age").textContent).toBe("55 yr");
@@ -38,7 +38,7 @@ describe("<DemographicsCard>", () => {
     patient.birthDate = createBirthdayYearsAgo(18);
     const { getByTitle } = render(
       <BrowserRouter>
-        <DemographicsCard match={match} currentPatient={patient} />
+        <DemographicsCard match={match} patient={patient} />
       </BrowserRouter>
     );
     expect(getByTitle("Age").textContent).toBe("18 yr");
@@ -48,7 +48,7 @@ describe("<DemographicsCard>", () => {
     patient.birthDate = createBirthdayYearsAgo(17, 3);
     const { getByTitle } = render(
       <BrowserRouter>
-        <DemographicsCard match={match} currentPatient={patient} />
+        <DemographicsCard match={match} patient={patient} />
       </BrowserRouter>
     );
     expect(getByTitle("Age").textContent).toBe("17 yr 3 mo");
@@ -58,7 +58,7 @@ describe("<DemographicsCard>", () => {
     patient.birthDate = createBirthdayYearsAgo(17, 3, 1);
     const { getByTitle } = render(
       <BrowserRouter>
-        <DemographicsCard match={match} currentPatient={patient} />
+        <DemographicsCard match={match} patient={patient} />
       </BrowserRouter>
     );
     expect(getByTitle("Age").textContent).toBe("17 yr 3 mo");
@@ -68,7 +68,7 @@ describe("<DemographicsCard>", () => {
     patient.birthDate = createBirthdayYearsAgo(17, 2, 27);
     const { getByTitle } = render(
       <BrowserRouter>
-        <DemographicsCard match={match} currentPatient={patient} />
+        <DemographicsCard match={match} patient={patient} />
       </BrowserRouter>
     );
     expect(getByTitle("Age").textContent).toBe("17 yr 2 mo");
@@ -78,7 +78,7 @@ describe("<DemographicsCard>", () => {
     patient.birthDate = createBirthdayWeeksAgo(16);
     const { getByTitle } = render(
       <BrowserRouter>
-        <DemographicsCard match={match} currentPatient={patient} />
+        <DemographicsCard match={match} patient={patient} />
       </BrowserRouter>
     );
     expect(getByTitle("Age").textContent).toBe("16 week");
@@ -88,7 +88,7 @@ describe("<DemographicsCard>", () => {
     patient.birthDate = createBirthdayWeeksAgo(16, 1);
     const { getByTitle } = render(
       <BrowserRouter>
-        <DemographicsCard match={match} currentPatient={patient} />
+        <DemographicsCard match={match} patient={patient} />
       </BrowserRouter>
     );
     expect(getByTitle("Age").textContent).toBe("16 wk 1 d");
@@ -98,7 +98,7 @@ describe("<DemographicsCard>", () => {
     patient.birthDate = createBirthdayWeeksAgo(0, 15);
     const { getByTitle } = render(
       <BrowserRouter>
-        <DemographicsCard match={match} currentPatient={patient} />
+        <DemographicsCard match={match} patient={patient} />
       </BrowserRouter>
     );
     expect(getByTitle("Age").textContent).toBe("15 day");
@@ -108,7 +108,7 @@ describe("<DemographicsCard>", () => {
     patient.birthDate = createBirthdayWeeksAgo(0, 0);
     const { getByTitle } = render(
       <BrowserRouter>
-        <DemographicsCard match={match} currentPatient={patient} />
+        <DemographicsCard match={match} patient={patient} />
       </BrowserRouter>
     );
     expect(getByTitle("Age").textContent).toBe("Today");
@@ -118,7 +118,7 @@ describe("<DemographicsCard>", () => {
     patient.birthDate = createBirthdayWeeksAgo(0, 2);
     const { getByTitle } = render(
       <BrowserRouter>
-        <DemographicsCard match={match} currentPatient={patient} />
+        <DemographicsCard match={match} patient={patient} />
       </BrowserRouter>
     );
     expect(getByTitle("Age").textContent).toBe("2 day");

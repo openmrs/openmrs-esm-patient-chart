@@ -14,19 +14,14 @@ export default function DemographicsCard(props: DemographicsCardProps) {
         <SummaryCardRowContent>
           <VerticalLabelValue
             label="Family"
-            value={
-              props.currentPatient && props.currentPatient.name[0].family + ","
-            }
+            value={props.patient && props.patient.name[0].family + ","}
             valueStyles={{
               textTransform: "uppercase"
             }}
           />
           <VerticalLabelValue
             label="Given"
-            value={
-              props.currentPatient &&
-              props.currentPatient.name[0].given.join(" ")
-            }
+            value={props.patient && props.patient.name[0].given.join(" ")}
           />
         </SummaryCardRowContent>
       </SummaryCardRow>
@@ -35,17 +30,17 @@ export default function DemographicsCard(props: DemographicsCardProps) {
           <VerticalLabelValue
             label="Birth Date"
             value={
-              props.currentPatient &&
-              dayjs(props.currentPatient.birthDate).format("DD-MMM-YYYY")
+              props.patient &&
+              dayjs(props.patient.birthDate).format("DD-MMM-YYYY")
             }
           />
           <VerticalLabelValue
             label="Age"
-            value={props.currentPatient && age(props.currentPatient.birthDate)}
+            value={props.patient && age(props.patient.birthDate)}
           />
           <VerticalLabelValue
             label="Gender"
-            value={props.currentPatient && props.currentPatient.gender}
+            value={props.patient && props.patient.gender}
             valueStyles={{ textTransform: "capitalize" }}
           />
         </SummaryCardRowContent>
@@ -56,5 +51,5 @@ export default function DemographicsCard(props: DemographicsCardProps) {
 
 type DemographicsCardProps = {
   match: match;
-  currentPatient: fhir.Patient;
+  patient: fhir.Patient;
 };

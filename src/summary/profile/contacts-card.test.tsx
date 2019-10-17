@@ -17,7 +17,7 @@ describe("<ContactsCard/>", () => {
   it("renders successfully", () => {
     render(
       <BrowserRouter>
-        <ContactsCard currentPatient={patient} match={match}></ContactsCard>
+        <ContactsCard patient={patient} match={match}></ContactsCard>
       </BrowserRouter>
     );
   });
@@ -25,7 +25,7 @@ describe("<ContactsCard/>", () => {
   it("displays contacts correctly", () => {
     const wrapper = render(
       <BrowserRouter>
-        <ContactsCard currentPatient={patient} match={match}></ContactsCard>
+        <ContactsCard patient={patient} match={match}></ContactsCard>
       </BrowserRouter>
     );
     expect(wrapper.queryByText(/Mobile/i)).not.toBeNull();

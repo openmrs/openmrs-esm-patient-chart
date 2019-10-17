@@ -8,9 +8,9 @@ import { match } from "react-router";
 export default function ContactsCard(props: ContactsCardProps) {
   return (
     <SummaryCard name="Contact & Address" match={props.match}>
-      {props.currentPatient &&
-        props.currentPatient.telecom &&
-        props.currentPatient.telecom.map(contact => (
+      {props.patient &&
+        props.patient.telecom &&
+        props.patient.telecom.map(contact => (
           <SummaryCardRow linkTo="/" key={contact.system}>
             <SummaryCardRowContent>
               <VerticalLabelValue
@@ -26,5 +26,5 @@ export default function ContactsCard(props: ContactsCardProps) {
 
 type ContactsCardProps = {
   match: match;
-  currentPatient: fhir.Patient;
+  patient: fhir.Patient;
 };

@@ -17,10 +17,7 @@ describe("<IdentifiersCard/>", () => {
   it("renders successfully", () => {
     render(
       <BrowserRouter>
-        <IdentifiersCard
-          currentPatient={patient}
-          match={match}
-        ></IdentifiersCard>
+        <IdentifiersCard patient={patient} match={match}></IdentifiersCard>
       </BrowserRouter>
     );
   });
@@ -28,13 +25,20 @@ describe("<IdentifiersCard/>", () => {
   it("displays identifiers correctly", () => {
     const wrapper = render(
       <BrowserRouter>
-        <IdentifiersCard
-          currentPatient={patient}
-          match={match}
-        ></IdentifiersCard>
+        <IdentifiersCard patient={patient} match={match}></IdentifiersCard>
       </BrowserRouter>
     );
     expect(wrapper.queryByText(/OpenMRS ID/i)).not.toBeNull();
     expect(wrapper.queryByText("100GEJ")).not.toBeNull();
+  });
+
+  it("displays preferred identifier first", () => {
+    const wrapper = render(
+      <BrowserRouter>
+        <IdentifiersCard patient={patient} match={match}></IdentifiersCard>
+      </BrowserRouter>
+    );
+    const idsRendered = wrapper.getAllByTestId("horizontalLabelValue");
+    expect(idsRendered[0].textContent).toContain("OpenMRS ID");
   });
 });

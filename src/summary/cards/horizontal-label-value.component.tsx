@@ -3,7 +3,7 @@ import styles from "./horizontal-label-value.css";
 
 export default function HorizontalLabelValue(props) {
   return (
-    <div className={styles.root}>
+    <div className={styles.root} data-testid="horizontalLabelValue">
       <label className="omrs-type-body-regular" style={props.labelStyles}>
         {props.label}
         {props.specialKey && <sup>{"\u002A"}</sup>}

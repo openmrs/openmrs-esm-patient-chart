@@ -15,22 +15,32 @@ export default function IdentifiersCard(props: IdentifiersCardProps) {
     fontWeight: 500
   };
 
+  function isPreferred(identifier) {
+    return identifier.use === "usual";
+  }
+
+  function preferredIdFirst(identifier1, identifier2) {
+    return isPreferred(identifier1) ? -1 : isPreferred(identifier2) ? 1 : 0;
+  }
+
   return (
     <SummaryCard name="Identifiers" match={props.match}>
-      {props.currentPatient &&
-        props.currentPatient.identifier.map(id => (
-          <SummaryCardRow linkTo="/" key={id.system}>
-            <SummaryCardRowContent>
-              <HorizontalLabelValue
-                label={id.system}
-                value={id.value}
-                labelStyles={labelStyles}
-                valueStyles={valueStyles}
-                specialKey={id.use === "usual"}
-              ></HorizontalLabelValue>
-            </SummaryCardRowContent>
-          </SummaryCardRow>
-        ))}
+      {props.patient &&
+        props.patient.identifier
+          .sort((id_a, id_b) => preferredIdFirst(id_a, id_b))
+          .map(id => (
+            <SummaryCardRow linkTo="/" key={id.system}>
+              <SummaryCardRowContent>
+                <HorizontalLabelValue
+                  label={id.system}
+                  value={id.value}
+                  labelStyles={labelStyles}
+                  valueStyles={valueStyles}
+                  specialKey={id.use === "usual"}
+                ></HorizontalLabelValue>
+              </SummaryCardRowContent>
+            </SummaryCardRow>
+          ))}
       <div className="omrs-padding-left-16">
         <span className="omrs-type-body-small" style={labelStyles}>
           * Preferred ID
@@ -41,6 +51,6 @@ export default function IdentifiersCard(props: IdentifiersCardProps) {
 }
 
 type IdentifiersCardProps = {
-  currentPatient: fhir.Patient;
+  patient: fhir.Patient;
   match: match;
 };
