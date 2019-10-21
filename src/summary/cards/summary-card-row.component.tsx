@@ -6,9 +6,11 @@ export default function SummaryCardRow(props: SummaryCardRowProps) {
   return (
     <Link to={props.linkTo} className={`omrs-unstyled ${styles.row}`}>
       {props.children}
-      <svg className="omrs-icon" fill="var(--omrs-color-ink-low-contrast)">
-        <use xlinkHref="#omrs-icon-chevron-right" />
-      </svg>
+      {props.linkTo && (
+        <svg className="omrs-icon" fill="var(--omrs-color-ink-low-contrast)">
+          <use xlinkHref="#omrs-icon-chevron-right" />
+        </svg>
+      )}
     </Link>
   );
 }
