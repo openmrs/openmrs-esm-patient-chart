@@ -3,12 +3,12 @@ import ReactDOM from "react-dom";
 import { render, cleanup, wait } from "@testing-library/react";
 import AllergyCard from "./allergy-card.component";
 import { BrowserRouter } from "react-router-dom";
-import { performPatientAllergySearch } from "./history.resource";
+import { performPatientAllergySearch } from "./allergy-intolerance.resource";
 import { act } from "react-dom/test-utils";
 
 const mockPerformPatientAllergySearch = performPatientAllergySearch as jest.Mock;
 
-jest.mock("./history.resource", () => ({
+jest.mock("./allergy-intolerance.resource", () => ({
   performPatientAllergySearch: jest.fn().mockResolvedValue({
     data: {
       results: []
@@ -183,23 +183,6 @@ describe("<AllergyCard/>", () => {
     });
   });
 
-  it("should display the Allergy header ", async () => {
-    act(() => {
-      mockPerformPatientAllergySearch.mockResolvedValue(
-        mockPatientAllergyResult
-      );
-      wrapper = render(
-        <BrowserRouter>
-          <AllergyCard match={match} currentPatient={patient} />
-        </BrowserRouter>
-      );
-    });
-
-    await wait(() => {
-      expect(wrapper.container.querySelector("h2").textContent).toBe("Allergy");
-    });
-  });
-
   it("should display the patient allergy reaction and manifestation", async () => {
     act(() => {
       mockPerformPatientAllergySearch.mockResolvedValue(
@@ -212,12 +195,8 @@ describe("<AllergyCard/>", () => {
       );
     });
     await wait(() => {
-      expect(wrapper.container.querySelectorAll(".left")[0].textContent).toBe(
-        "ACE inhibitors"
-      );
-      expect(wrapper.container.querySelectorAll(".right")[0].textContent).toBe(
-        "AMOEBIASIS (—)"
-      );
+      expect(wrapper.getByText("ACE inhibitors")).toBeTruthy();
+      expect(wrapper.getByText("AMOEBIASIS (—)")).toBeTruthy();
     });
   });
 });

@@ -1,4 +1,5 @@
 .allergyReaction {
+  flex: 1;
   color: var(--omrs-color-ink-medium-contrast);
   text-transform: lowercase;
 }
@@ -8,9 +9,5 @@
 }
 
 .left {
-  flex: 1;
-}
-
-.right {
   flex: 1;
 }
