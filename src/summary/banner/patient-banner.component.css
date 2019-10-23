@@ -1,0 +1,77 @@
+.patientBanner {
+  display: flex;
+  justify-content: space-between;
+  height: 2.75rem;
+}
+.demographics {
+  display: flex;
+  flex-wrap: wrap;
+  overflow: hidden;
+  flex-grow: 1;
+  padding-left: 1.5rem;
+}
+
+:global(.omrs-breakpoint-lt-tablet) .demographics {
+  padding-left: 1rem;
+}
+
+:global(.omrs-breakpoint-gt-tablet) .otherDemographics {
+  margin: 0 1.25rem;
+}
+:global(.omrs-breakpoint-lt-desktop) .otherDemographics {
+  margin: 0 1.875rem;
+}
+
+:global(.omrs-breakpoint-lt-desktop) .desktopLabel {
+  display: none;
+}
+
+:global(.omrs-type-body-regular).demographic {
+  color: var(--omrs-color-ink-medium-contrast);
+  font-weight: 500;
+}
+
+:global(.omrs-breakpoint-lt-tablet) .otherDemographics {
+  display: none;
+}
+
+.patientName,
+:global(.omrs-breakpoint-lt-desktop.omrs-breakpoint-gt-phone)
+  .otherDemographics {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+:global(.omrs-breakpoint-gt-tablet) .otherDemographics {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+:global(.omrs-breakpoint-gt-tablet) .desktopLabel {
+  margin-right: 0.5rem;
+  color: var(--omrs-color-ink-medium-contrast);
+}
+
+.collapseBtn,
+.moreBtn {
+  color: var(--omrs-color-ink-medium-contrast);
+  cursor: pointer;
+}
+
+.collapseBtnWrapper {
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+.profileWrapper {
+  padding: 0.5rem;
+  background-color: var(--omrs-color-bg-lowest-contrast);
+}
+
+.collapseBtn {
+  background-color: var(--omrs-color-bg-high-contrast);
+  color: var(--omrs-color-ink-medium-contrast);
+  cursor: pointer;
+}

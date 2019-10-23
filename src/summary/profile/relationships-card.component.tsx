@@ -12,4 +12,5 @@ export default function RelationshipsCard(props: RelationshipsCardProps) {
 
 type RelationshipsCardProps = {
   match: match;
+  patient: fhir.Patient;
 };

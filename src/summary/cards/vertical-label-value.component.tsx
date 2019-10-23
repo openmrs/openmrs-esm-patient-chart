@@ -7,7 +7,11 @@ export default function VerticalLabelValue(props: VerticalLabelValueProps) {
       <label className={`omrs-type-body-small ${styles.label}`}>
         {props.label}
       </label>
-      <div style={props.valueStyles} title={props.label}>
+      <div
+        className={props.valueGlobalCssClasses.join(" ")}
+        style={props.valueStyles}
+        title={props.label}
+      >
         {/* em-dash is shown if no value is passed in */}
         {props.value || "\u2014"}
       </div>
@@ -16,11 +20,13 @@ export default function VerticalLabelValue(props: VerticalLabelValueProps) {
 }
 
 VerticalLabelValue.defaultProps = {
-  valueStyles: {}
+  valueStyles: {},
+  valueGlobalCssClasses: []
 };
 
 type VerticalLabelValueProps = {
   label: string;
   value: React.ReactNode;
   valueStyles?: React.CSSProperties;
+  valueGlobalCssClasses?: string[];
 };

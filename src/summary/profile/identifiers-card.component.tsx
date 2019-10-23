@@ -4,6 +4,7 @@ import SummaryCardRow from "../cards/summary-card-row.component";
 import SummaryCardRowContent from "../cards/summary-card-row-content.component";
 import HorizontalLabelValue from "../cards/horizontal-label-value.component";
 import { match } from "react-router";
+import VerticalLabelValue from "../cards/vertical-label-value.component";
 
 export default function IdentifiersCard(props: IdentifiersCardProps) {
   const labelStyles = {
@@ -29,23 +30,24 @@ export default function IdentifiersCard(props: IdentifiersCardProps) {
         props.patient.identifier
           .sort((id_a, id_b) => preferredIdFirst(id_a, id_b))
           .map(id => (
-            <SummaryCardRow linkTo="/" key={id.system}>
-              <SummaryCardRowContent>
-                <HorizontalLabelValue
+            <SummaryCardRow key={id.system}>
+              <SummaryCardRowContent justifyContent="space-between">
+                <VerticalLabelValue
                   label={id.system}
                   value={id.value}
-                  labelStyles={labelStyles}
                   valueStyles={valueStyles}
-                  specialKey={isPreferred(id)}
-                ></HorizontalLabelValue>
+                ></VerticalLabelValue>
+                {isPreferred(id) && (
+                  <span
+                    style={{ color: "var(--omrs-color-ink-medium-contrast)" }}
+                    className="omrs-type-body-regular"
+                  >
+                    Preferred ID
+                  </span>
+                )}
               </SummaryCardRowContent>
             </SummaryCardRow>
           ))}
-      <div className="omrs-padding-left-16">
-        <span className="omrs-type-body-small" style={labelStyles}>
-          * Preferred ID
-        </span>
-      </div>
     </SummaryCard>
   );
 }

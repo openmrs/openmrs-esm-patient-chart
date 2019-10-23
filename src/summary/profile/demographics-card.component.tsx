@@ -9,8 +9,12 @@ import { age } from "./age-helpers";
 
 export default function DemographicsCard(props: DemographicsCardProps) {
   return (
-    <SummaryCard name="Demographics" match={props.match}>
-      <SummaryCardRow linkTo="/">
+    <SummaryCard
+      name="Demographics"
+      match={props.match}
+      styles={props.cardStyles}
+    >
+      <SummaryCardRow>
         <SummaryCardRowContent>
           <VerticalLabelValue
             label="Family"
@@ -18,14 +22,17 @@ export default function DemographicsCard(props: DemographicsCardProps) {
             valueStyles={{
               textTransform: "uppercase"
             }}
+            valueGlobalCssClasses={["omrs-type-title-1"]}
           />
           <VerticalLabelValue
             label="Given"
             value={props.patient && props.patient.name[0].given.join(" ")}
+            valueGlobalCssClasses={["omrs-type-title-1"]}
+            valueStyles={{ whiteSpace: "nowrap" }}
           />
         </SummaryCardRowContent>
       </SummaryCardRow>
-      <SummaryCardRow linkTo="/">
+      <SummaryCardRow>
         <SummaryCardRowContent justifyContent="space-between">
           <VerticalLabelValue
             label="Birth Date"
@@ -52,4 +59,5 @@ export default function DemographicsCard(props: DemographicsCardProps) {
 type DemographicsCardProps = {
   match: match;
   patient: fhir.Patient;
+  cardStyles?: React.CSSProperties;
 };

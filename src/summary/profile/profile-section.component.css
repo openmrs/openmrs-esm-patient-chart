@@ -1,0 +1,19 @@
+:global(.omrs-breakpoint-gt-phone) .profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+:global(.omrs-breakpoint-gt-phone) .demographicCard {
+  display: flex;
+}
+
+:global(.omrs-breakpoint-gt-phone) .otherProfileCards {
+  display: flex;
+  justify-content: space-between;
+}
+
+:global(.omrs-breakpoint-gt-phone) .contactsAndRelationshipsCard {
+  display: flex;
+  flex-direction: column;
+}

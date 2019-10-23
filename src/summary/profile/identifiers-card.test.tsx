@@ -38,8 +38,7 @@ describe("<IdentifiersCard/>", () => {
         <IdentifiersCard patient={patient} match={match}></IdentifiersCard>
       </BrowserRouter>
     );
-    const idsRendered = wrapper.getAllByTestId("horizontalLabelValue");
-    expect(idsRendered[0].textContent).toContain("OpenMRS ID");
-    expect(idsRendered[0].textContent).toContain("*");
+    const labels = wrapper.container.querySelectorAll(".label");
+    expect(labels[0].textContent).toContain("OpenMRS ID");
   });
 });

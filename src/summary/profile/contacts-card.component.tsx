@@ -6,12 +6,31 @@ import VerticalLabelValue from "../cards/vertical-label-value.component";
 import { match } from "react-router";
 
 export default function ContactsCard(props: ContactsCardProps) {
+  function getAddress(address: fhir.Address) {
+    return `${address.city}, ${address.country} \n `;
+  }
+
   return (
     <SummaryCard name="Contact & Address" match={props.match}>
-      {props.patient &&
-        props.patient.telecom &&
+      {props.patient && props.patient.address ? (
+        props.patient.address.map(address => (
+          <SummaryCardRow key={address.id}>
+            <SummaryCardRowContent>
+              <VerticalLabelValue
+                label={address.use}
+                value={getAddress(address)}
+              />
+            </SummaryCardRowContent>
+          </SummaryCardRow>
+        ))
+      ) : (
+        <SummaryCardRow>
+          <SummaryCardRowContent>None</SummaryCardRowContent>
+        </SummaryCardRow>
+      )}
+      {props.patient && props.patient.telecom ? (
         props.patient.telecom.map(contact => (
-          <SummaryCardRow linkTo="/" key={contact.system}>
+          <SummaryCardRow key={contact.system}>
             <SummaryCardRowContent>
               <VerticalLabelValue
                 label={contact.system}
@@ -19,7 +38,12 @@ export default function ContactsCard(props: ContactsCardProps) {
               />
             </SummaryCardRowContent>
           </SummaryCardRow>
-        ))}
+        ))
+      ) : (
+        <SummaryCardRow>
+          <SummaryCardRowContent>None</SummaryCardRowContent>
+        </SummaryCardRow>
+      )}
     </SummaryCard>
   );
 }
