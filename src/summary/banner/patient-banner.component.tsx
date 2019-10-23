@@ -9,7 +9,7 @@ export default function PatientBanner(props: PatientBannerProps) {
 
   function getPatientNames() {
     return `${props.patient.name[0].family.toUpperCase()}, 
-             ${props.patient.name[0].given.join(" ")}`;
+             ${props.patient.name[0].given[1]}`;
   }
 
   function getPreferredIdentifier() {
