@@ -1,4 +1,4 @@
-a.row:global(.omrs-unstyled) {
+.row:global(.omrs-unstyled) {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -7,6 +7,6 @@ a.row:global(.omrs-unstyled) {
   border-radius: 0;
 }
 
-a.row:not(:last-child) {
+.row:not(:last-child) {
   border-bottom: 1px solid var(--omrs-color-bg-low-contrast);
 }

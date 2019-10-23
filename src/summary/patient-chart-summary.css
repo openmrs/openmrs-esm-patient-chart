@@ -11,5 +11,5 @@ body {
 }
 .patientSummary {
   background-color: var(--omrs-color-bg-lowest-contrast);
-  min-height: 100%;
+  min-height: 90vh;
 }
