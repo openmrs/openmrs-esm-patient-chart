@@ -175,6 +175,9 @@ describe("<ConditionsCard />", () => {
 
   it("should render without dying", async () => {
     act(() => {
+      mockPerformPatientConditionsSearch.mockResolvedValue(
+        mockPatientConditions
+      );
       wrapper = render(
         <BrowserRouter>
           <ConditionsCard match={match} currentPatient={patient} />
@@ -182,7 +185,7 @@ describe("<ConditionsCard />", () => {
       );
     });
     await wait(() => {
-      expect(wrapper).toBeDefined();
+      expect(wrapper).toBeTruthy();
     });
   });
 

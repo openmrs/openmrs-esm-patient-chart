@@ -6,6 +6,7 @@ import SummaryCardRow from "../cards/summary-card-row.component";
 import SummaryCardRowContent from "../cards/summary-card-row-content.component";
 import { match } from "react-router";
 import { performPatientConditionSearch } from "./conditions.resource";
+import { createErrorHandler } from "@openmrs/esm-error-handling";
 
 export default function ConditionsCard(props: ConditionsCardProps) {
   const [patientConditions, setPatientConditions] = React.useState(null);
@@ -17,9 +18,9 @@ export default function ConditionsCard(props: ConditionsCardProps) {
       abortController
     )
       .then(condition => setPatientConditions(condition))
-      .catch(error => {
-        throw error;
-      });
+      .catch(createErrorHandler());
+
+    return () => abortController.abort();
   });
 
   return (
@@ -29,7 +30,6 @@ export default function ConditionsCard(props: ConditionsCardProps) {
         <div>Since</div>
       </div>
       {patientConditions &&
-        patientConditions.total > 0 &&
         patientConditions.entry.map(condition => {
           return (
             <SummaryCardRow key={condition.resource.id} linkTo="/">
