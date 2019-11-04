@@ -54,24 +54,34 @@
   color: var(--omrs-color-ink-medium-contrast);
 }
 
-.collapseBtn,
 .moreBtn {
   color: var(--omrs-color-ink-medium-contrast);
   cursor: pointer;
-}
-
-.collapseBtnWrapper {
   display: flex;
-  flex-direction: row-reverse;
+  align-items: center;
 }
 
 .profileWrapper {
   padding: 0.5rem;
-  background-color: var(--omrs-color-bg-lowest-contrast);
+  width: 100%;
 }
 
 .collapseBtn {
   background-color: var(--omrs-color-bg-high-contrast);
   color: var(--omrs-color-ink-medium-contrast);
   cursor: pointer;
+}
+
+.icon {
+  vertical-align: middle;
+}
+
+.patientBanner {
+  width: 100%;
+  position: fixed;
+}
+
+.patientProfile {
+  margin-top: var(--omrs-topnav-height);
+  width: 100%;
 }

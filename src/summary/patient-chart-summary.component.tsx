@@ -7,6 +7,7 @@ import PatientBanner from "./banner/patient-banner.component";
 
 export default function PatientChartSummary(props: PatientChartSummaryProps) {
   const [currentPatient, setCurrentPatient] = React.useState(null);
+  const [showPatientSummary, setShowPatientSummary] = React.useState(true);
 
   React.useEffect(() => {
     const subscription = getCurrentPatient().subscribe(patient => {
@@ -21,10 +22,13 @@ export default function PatientChartSummary(props: PatientChartSummaryProps) {
       <PatientBanner
         match={props.match}
         patient={currentPatient}
+        showPatientSummary={setShowPatientSummary}
       ></PatientBanner>
-      <div className={styles.patientSummary}>
-        <HistorySection match={props.match} />
-      </div>
+      {showPatientSummary && (
+        <div className={styles.patientSummary}>
+          <HistorySection match={props.match} />
+        </div>
+      )}
     </main>
   );
 }
