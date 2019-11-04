@@ -4,6 +4,7 @@ import { getCurrentPatient } from "@openmrs/esm-api";
 import styles from "./patient-chart-summary.css";
 import HistorySection from "./history/history-section.component";
 import PatientBanner from "./banner/patient-banner.component";
+import { createErrorHandler } from "@openmrs/esm-error-handling";
 
 export default function PatientChartSummary(props: PatientChartSummaryProps) {
   const [currentPatient, setCurrentPatient] = React.useState(null);
@@ -12,6 +13,7 @@ export default function PatientChartSummary(props: PatientChartSummaryProps) {
   React.useEffect(() => {
     const subscription = getCurrentPatient().subscribe(patient => {
       setCurrentPatient(patient);
+      createErrorHandler();
     });
 
     return () => subscription.unsubscribe();

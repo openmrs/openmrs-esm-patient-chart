@@ -8,7 +8,7 @@ export default function VerticalLabelValue(props: VerticalLabelValueProps) {
         {props.label}
       </label>
       <div
-        className={props.valueGlobalCssClasses.join(" ")}
+        className={props.className}
         style={props.valueStyles}
         title={props.label}
       >
@@ -21,12 +21,12 @@ export default function VerticalLabelValue(props: VerticalLabelValueProps) {
 
 VerticalLabelValue.defaultProps = {
   valueStyles: {},
-  valueGlobalCssClasses: []
+  className: ""
 };
 
 type VerticalLabelValueProps = {
   label: string;
   value: React.ReactNode;
   valueStyles?: React.CSSProperties;
-  valueGlobalCssClasses?: string[];
+  className: string;
 };

@@ -22,12 +22,12 @@ export default function DemographicsCard(props: DemographicsCardProps) {
             valueStyles={{
               textTransform: "uppercase"
             }}
-            valueGlobalCssClasses={["omrs-type-title-1"]}
+            className="omrs-type-title-1"
           />
           <VerticalLabelValue
             label="Given"
             value={props.patient && props.patient.name[0].given.join(" ")}
-            valueGlobalCssClasses={["omrs-type-title-1"]}
+            className="omrs-type-title-1"
             valueStyles={{ whiteSpace: "nowrap" }}
           />
         </SummaryCardRowContent>

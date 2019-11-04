@@ -7,7 +7,15 @@ import { match } from "react-router";
 
 export default function ContactsCard(props: ContactsCardProps) {
   function getAddress(address: fhir.Address) {
-    return `${address.city}, ${address.country} \n `;
+    return (
+      <div>
+        <div>{address.line}</div>
+        <div>
+          {address.city}, {address.state}
+        </div>
+        <div>{address.country}</div>
+      </div>
+    );
   }
 
   return (
@@ -25,7 +33,7 @@ export default function ContactsCard(props: ContactsCardProps) {
         ))
       ) : (
         <SummaryCardRow>
-          <SummaryCardRowContent>None</SummaryCardRowContent>
+          <SummaryCardRowContent>{"\u2014"}</SummaryCardRowContent>
         </SummaryCardRow>
       )}
       {props.patient && props.patient.telecom ? (
@@ -41,7 +49,7 @@ export default function ContactsCard(props: ContactsCardProps) {
         ))
       ) : (
         <SummaryCardRow>
-          <SummaryCardRowContent>None</SummaryCardRowContent>
+          <SummaryCardRowContent>{"\u2014"}</SummaryCardRowContent>
         </SummaryCardRow>
       )}
     </SummaryCard>
