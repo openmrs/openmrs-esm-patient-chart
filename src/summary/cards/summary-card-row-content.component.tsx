@@ -9,7 +9,8 @@ export default function SummaryCardRowContent(
     alignItems: "center",
     justifyContent: props.justifyContent,
     width: "100%",
-    paddingRight: "1rem"
+    paddingRight: "1rem",
+    flexWrap: "wrap"
   };
 
   return <div style={styles}>{props.children}</div>;
