@@ -1,14 +1,3 @@
-.conditionHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border: none;
-  padding: 0.625rem 2.625rem 0.625rem 1rem;
-  border-radius: 0;
-  color: var(--omrs-color-ink-medium-contrast);
-  border-bottom: 1px solid var(--omrs-color-bg-low-contrast);
-}
-
 .conditionMore {
   display: flex;
   align-items: center;
@@ -21,26 +10,4 @@
 
 .conditionMore p {
   margin: 0;
-}
-
-.conditionsRow {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-}
-
-.conditionsRow p {
-  margin: 0rem;
-}
-
-.conditionName {
-  flex: 1;
-}
-
-.conditionDate {
-  flex: 1;
-  justify-content: flex-end;
-  display: flex;
-  color: var(--omrs-color-ink-medium-contrast);
 }

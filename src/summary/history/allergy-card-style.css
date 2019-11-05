@@ -1,13 +1,8 @@
 .allergyReaction {
-  flex: 1;
   color: var(--omrs-color-ink-medium-contrast);
   text-transform: lowercase;
 }
 
 .allergyReaction::first-letter {
   text-transform: capitalize;
-}
-
-.left {
-  flex: 1;
 }

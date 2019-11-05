@@ -1,16 +1,19 @@
 import React from "react";
 import styles from "./horizontal-label-value.css";
 
-export default function HorizontalLabelValue(props) {
+export default function HorizontalLabelValue(props: HorizontalLabelValueProps) {
   return (
     <div className={styles.root}>
-      <label className="omrs-type-body-regular" style={props.labelStyles}>
+      <label
+        className={props.labelClassName || "omrs-type-body-regular"}
+        style={props.labelStyles}
+      >
         {props.label}
         {props.specialKey && <sup>{"\u002A"}</sup>}
       </label>
       <div
         title={props.label}
-        className="omrs-type-body-regular"
+        className={props.valueClassName || "omrs-type-body-regular"}
         style={props.valueStyles}
       >
         {props.value || "\u2014"}
@@ -21,7 +24,8 @@ export default function HorizontalLabelValue(props) {
 
 HorizontalLabelValue.defaultProps = {
   labelStyles: {},
-  valueStyles: {}
+  valueStyles: {},
+  specialKey: false
 };
 
 type HorizontalLabelValueProps = {
@@ -30,4 +34,6 @@ type HorizontalLabelValueProps = {
   valueStyles?: React.CSSProperties;
   labelStyles?: React.CSSProperties;
   specialKey: boolean;
+  labelClassName?: string;
+  valueClassName?: string;
 };
