@@ -7,9 +7,9 @@ export default function ShowMoreCard(props: ShowMoreCardProps) {
     message === "More" ? setMessage("Less") : setMessage("More");
   };
   return (
-    <div className={styles.moreBtn}>
-      <button onClick={() => clickHandler()}>{message}</button>
-    </div>
+    <button className={styles.moreBtn} onClick={() => clickHandler()}>
+      {message}
+    </button>
   );
 }
 

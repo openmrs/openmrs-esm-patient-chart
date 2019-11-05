@@ -1,5 +1,4 @@
 import React from "react";
-import { getCurrentPatient } from "@openmrs/esm-api";
 import SummaryCard from "../cards/summary-card.component";
 import { match } from "react-router";
 import SummaryCardRow from "../cards/summary-card-row.component";
@@ -9,49 +8,46 @@ import dayjs from "dayjs";
 import { age } from "./age-helpers";
 
 export default function DemographicsCard(props: DemographicsCardProps) {
-  const [currentPatient, setCurrentPatient] = React.useState(null);
-
-  React.useEffect(() => {
-    const subscription = getCurrentPatient().subscribe(patient =>
-      setCurrentPatient(patient)
-    );
-
-    return () => subscription.unsubscribe();
-  });
-
   return (
-    <SummaryCard name="Demographics" match={props.match}>
-      <SummaryCardRow linkTo="/">
+    <SummaryCard
+      name="Demographics"
+      match={props.match}
+      styles={props.cardStyles}
+    >
+      <SummaryCardRow>
         <SummaryCardRowContent>
           <VerticalLabelValue
             label="Family"
-            value={currentPatient && currentPatient.name[0].family + ","}
+            value={props.patient && props.patient.name[0].family + ","}
             valueStyles={{
               textTransform: "uppercase"
             }}
+            className="omrs-type-title-1"
           />
           <VerticalLabelValue
             label="Given"
-            value={currentPatient && currentPatient.name[0].given.join(" ")}
+            value={props.patient && props.patient.name[0].given.join(" ")}
+            className="omrs-type-title-1"
+            valueStyles={{ whiteSpace: "nowrap" }}
           />
         </SummaryCardRowContent>
       </SummaryCardRow>
-      <SummaryCardRow linkTo="/">
+      <SummaryCardRow>
         <SummaryCardRowContent justifyContent="space-between">
           <VerticalLabelValue
             label="Birth Date"
             value={
-              currentPatient &&
-              dayjs(currentPatient.birthDate).format("DD-MMM-YYYY")
+              props.patient &&
+              dayjs(props.patient.birthDate).format("DD-MMM-YYYY")
             }
           />
           <VerticalLabelValue
             label="Age"
-            value={currentPatient && age(currentPatient.birthDate)}
+            value={props.patient && age(props.patient.birthDate)}
           />
           <VerticalLabelValue
             label="Gender"
-            value={currentPatient && currentPatient.gender}
+            value={props.patient && props.patient.gender}
             valueStyles={{ textTransform: "capitalize" }}
           />
         </SummaryCardRowContent>
@@ -62,4 +58,6 @@ export default function DemographicsCard(props: DemographicsCardProps) {
 
 type DemographicsCardProps = {
   match: match;
+  patient: fhir.Patient;
+  cardStyles?: React.CSSProperties;
 };

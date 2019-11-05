@@ -9,7 +9,7 @@ import HorizontalSectionCard from "./horizontal-section-card.component";
 import DimensionsSectionCard from "./dimensions-card-row.component";
 import { ageConvert } from "./date-helper";
 import ShowMoreCard from "./show-more-card.component";
-
+import style from "./dimensions-card.css";
 export default function DimensionsCard(props: DimensionsCardProps) {
   const [dimensions, setDimensions] = React.useState([]);
   const [showElements, setShowElements] = React.useState(3);
@@ -44,23 +44,23 @@ export default function DimensionsCard(props: DimensionsCardProps) {
     return () => abortController.abort();
   }, [props.currentPatient.identifier[0].value]);
   return (
-    <SummaryCard name="Dimensions" match={props.match} cardSize="40rem">
+    <SummaryCard name="Height & Weight" match={props.match} cardSize="40rem">
       <SummaryCardRow linkTo="/">
         <SummaryCardRowContent>
           <HorizontalSectionCard>
-            <VerticalLabelValue label=" " value="" />
-            <VerticalLabelValue label="" value="Weight" />
-            <VerticalLabelValue label="" value="Height" />
-            <VerticalLabelValue label="" value="BMI" />
+            <div />
+            <div className={style.heightText}>Weight</div>
+            <div className={style.heightText}>Height</div>
+            <div className={style.heightText}>BMI</div>
           </HorizontalSectionCard>
         </SummaryCardRowContent>
       </SummaryCardRow>
       {dimensions &&
-        dimensions.slice(0, showElements).map(el => {
+        dimensions.slice(0, showElements).map((el, index) => {
           return (
             <SummaryCardRow linkTo="/">
               <SummaryCardRowContent>
-                <DimensionsSectionCard content={el} />
+                <DimensionsSectionCard content={el} index={index} />
               </SummaryCardRowContent>
             </SummaryCardRow>
           );

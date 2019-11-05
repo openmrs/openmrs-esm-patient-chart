@@ -3,3 +3,11 @@
   grid-template-columns: 16rem 8rem 8rem 8rem;
   padding: 10px;
 }
+.text {
+  display: inline;
+  font-family: Work Sans;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 17px;
+  color: #121212;
+}

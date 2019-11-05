@@ -11,7 +11,7 @@ export default function SummaryCard(props: SummaryCardProps) {
     <div style={stylesCard} className={`omrs-card`}>
       <div className={styles.header}>
         <h2 className={`omrs-margin-0`}>{props.name}</h2>
-        <svg className="omrs-icon" fill="var(--omrs-color-inactive-grey)">
+        <svg className="omrs-icon" fill="rgba(0, 0, 0, 0.54)">
           <use xlinkHref="#omrs-icon-chevron-right" />
         </svg>
       </div>
@@ -20,11 +20,13 @@ export default function SummaryCard(props: SummaryCardProps) {
   );
 }
 SummaryCard.defaultProps = { cardSize: "21.75rem" };
+
 type SummaryCardProps = {
   name: string;
   match: match;
   children: React.ReactNode;
   cardSize: String;
+  styles?: React.CSSProperties;
 };
 
 type Styles = {};

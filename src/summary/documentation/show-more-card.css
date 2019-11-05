@@ -1,8 +1,9 @@
 .moreBtn {
-  height: 3rem;
-  padding: 0 0.25rem 0 1rem;
-  display: flex;
+  margin: 10px;
   color: grey;
-  border-bottom: 1px solid var(--omrs-color-bg-low-contrast);
   cursor: pointer;
+  background-color: Transparent;
+  border: none;
+  overflow: hidden;
+  outline: none;
 }
