@@ -5,6 +5,7 @@ import SummaryCardRow from "../cards/summary-card-row.component";
 import SummaryCardRowContent from "../cards/summary-card-row-content.component";
 import { performPatientAllergySearch } from "./allergy-intolerance.resource";
 import style from "./allergy-card-style.css";
+import HorizontalLabelValue from "../cards/horizontal-label-value.component";
 
 export default function AllergyCard(props: AllergyCardProps) {
   const [patientAllergy, setPatientAllergy] = React.useState(null);
@@ -33,18 +34,20 @@ export default function AllergyCard(props: AllergyCardProps) {
         patientAllergy.entry.map(allergy => {
           return (
             <SummaryCardRow key={allergy.resource.id} linkTo="/">
-              <SummaryCardRowContent justifyContent="space-between">
-                <span className={`omrs-bold ${style.left}`}>
-                  {allergy.resource.code.text}
-                </span>
-                <span className={`${style.allergyReaction}`}>
-                  {`${allergy.resource.reaction[0].manifestation[0].text} (${
-                    allergy.resource.criticality === "?"
-                      ? "\u2014"
-                      : allergy.resource.criticality
-                  })`}
-                </span>
-              </SummaryCardRowContent>
+              <HorizontalLabelValue
+                label={allergy.resource.code.text}
+                labelClassName="omrs-bold"
+                labelStyles={{ flex: "1" }}
+                value={`${
+                  allergy.resource.reaction[0].manifestation[0].text
+                } (${
+                  allergy.resource.criticality === "?"
+                    ? "\u2014"
+                    : allergy.resource.criticality
+                })`}
+                valueStyles={{ flex: "1", paddingLeft: "1rem" }}
+                valueClassName={style.allergyReaction}
+              />
             </SummaryCardRow>
           );
         })}

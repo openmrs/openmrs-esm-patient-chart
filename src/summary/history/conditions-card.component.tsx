@@ -7,6 +7,7 @@ import SummaryCardRowContent from "../cards/summary-card-row-content.component";
 import { match } from "react-router";
 import { performPatientConditionSearch } from "./conditions.resource";
 import { createErrorHandler } from "@openmrs/esm-error-handling";
+import HorizontalLabelValue from "../cards/horizontal-label-value.component";
 
 export default function ConditionsCard(props: ConditionsCardProps) {
   const [patientConditions, setPatientConditions] = React.useState(null);
@@ -25,24 +26,27 @@ export default function ConditionsCard(props: ConditionsCardProps) {
 
   return (
     <SummaryCard name="Conditions" match={props.match}>
-      <div className={style.conditionHeader}>
-        <div>Active Conditions</div>
-        <div>Since</div>
-      </div>
+      <SummaryCardRow>
+        <SummaryCardRowContent>
+          <HorizontalLabelValue
+            label="Active Conditions"
+            labelStyles={{ color: "var(--omrs-color-ink-medium-contrast)" }}
+            value="Since"
+            valueStyles={{ color: "var(--omrs-color-ink-medium-contrast)" }}
+          />
+        </SummaryCardRowContent>
+      </SummaryCardRow>
       {patientConditions &&
         patientConditions.entry.map(condition => {
           return (
             <SummaryCardRow key={condition.resource.id} linkTo="/">
-              <SummaryCardRowContent>
-                <div className={style.conditionsRow}>
-                  <p className={`omrs-bold ${style.conditionName}`}>
-                    {condition.resource.code.text}
-                  </p>
-                  <p className={`${style.conditionDate}`}>
-                    {dayjs(condition.resource.onsetDateTime).format("MMM-YYYY")}
-                  </p>
-                </div>
-              </SummaryCardRowContent>
+              <HorizontalLabelValue
+                label={condition.resource.code.text}
+                labelClassName="omrs-bold"
+                value={dayjs(condition.resource.onsetDateTime).format(
+                  "MMM-YYYY"
+                )}
+              />
             </SummaryCardRow>
           );
         })}
