@@ -3,7 +3,6 @@ import styles from "./dimensions-card-row.css";
 export default function DimensionsSectionCard(
   props: DimensionsSectionCardProps
 ) {
-  console.log(props);
   return (
     <div className={styles.gridContainer}>
       <div>{props.content.date}</div>
