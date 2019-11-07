@@ -10,7 +10,7 @@ import DimensionsSectionCard from "./dimensions-card-row.component";
 import * as timeago from "timeago.js";
 import ShowMoreCard from "./show-more-card.component";
 import style from "./dimensions-card.css";
-// import  from "@openmrs/esm-error-handlling"
+import { createErrorHandler } from "@openmrs/esm-error-handling";
 
 export default function DimensionsCard(props: DimensionsCardProps) {
   const [dimensions, setDimensions] = React.useState([]);
@@ -21,27 +21,29 @@ export default function DimensionsCard(props: DimensionsCardProps) {
     getPatientDimensions(
       props.currentPatient.identifier[0].value,
       abortController
-    ).then(response => {
-      const entries = response.data.entry
-        .filter(
-          el =>
-            el.resource.valueQuantity &&
-            (el.resource.valueQuantity.unit === "cm" ||
-              el.resource.valueQuantity.unit === "kg" ||
-              el.resource.valueQuantity.unit === undefined)
-        )
-        .map(m => m.resource);
-      const res = [];
-      for (let i = 0; i < entries.length; i += 3) {
-        res.push({
-          date: timeago.format(new Date(entries[i].effectiveDateTime)),
-          cm: entries[i].valueQuantity.value,
-          kg: entries[i + 1].valueQuantity.value,
-          bmi: entries[i + 2].valueQuantity.value
-        });
-      }
-      setDimensions(res);
-    });
+    )
+      .then(response => {
+        const entries = response.data.entry
+          .filter(
+            el =>
+              el.resource.valueQuantity &&
+              (el.resource.valueQuantity.unit === "cm" ||
+                el.resource.valueQuantity.unit === "kg" ||
+                el.resource.valueQuantity.unit === undefined)
+          )
+          .map(m => m.resource);
+        const res = [];
+        for (let i = 0; i < entries.length; i += 3) {
+          res.push({
+            date: timeago.format(new Date(entries[i].effectiveDateTime)),
+            cm: entries[i].valueQuantity.value,
+            kg: entries[i + 1].valueQuantity.value,
+            bmi: entries[i + 2].valueQuantity.value
+          });
+        }
+        setDimensions(res);
+      })
+      .catch(createErrorHandler());
 
     return () => abortController.abort();
   }, [props.currentPatient.identifier[0].value]);
