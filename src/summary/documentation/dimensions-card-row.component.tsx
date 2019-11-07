@@ -8,23 +8,29 @@ export default function DimensionsSectionCard(
     <div className={styles.gridContainer}>
       <div>{props.content.date}</div>
       <div className={styles.text}>
-        {props.content.cm}
-        {props.key === 0 && <p>cm</p>}
+        <span>
+          {props.content.kg + " "}
+          <span className={styles.unit}>{props.index === 0 && "kg"}</span>
+        </span>
       </div>
       <div className={styles.text}>
-        {props.content.kg}
-        {props.key === 0 && <p>kg</p>}
+        <span>
+          {props.content.cm + " "}
+          <span className={styles.unit}>{props.index === 0 && "cm"}</span>
+        </span>
       </div>
       <div className={styles.text}>
-        {props.content.bmi}
-        {props.key === 0 && <p>kg/m</p>}
+        <span>
+          {props.content.bmi + " "}
+          <span className={styles.unit}>{props.index === 0 && "kg/m"}</span>
+        </span>
       </div>
     </div>
   );
 }
 
 type DimensionsSectionCardProps = {
-  key: number;
+  index: number;
   content: {
     date: string;
     cm: string;

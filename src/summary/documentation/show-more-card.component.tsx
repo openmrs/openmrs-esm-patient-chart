@@ -2,15 +2,32 @@ import React, { useState } from "react";
 import styles from "./show-more-card.css";
 
 export default function ShowMoreCard(props: ShowMoreCardProps) {
-  const [message, setMessage] = React.useState("More");
+  const [more, setMore] = React.useState(true);
   const clickHandler = () => {
     props.func();
-    message === "More" ? setMessage("Less") : setMessage("More");
+    setMore(!more);
   };
   return (
-    <button className={styles.moreBtn} onClick={clickHandler}>
-      {message}
-    </button>
+    <div>
+      {(more && (
+        <svg
+          className={`omrs-icon ${styles.icon}`}
+          fill="var(--omrs-color-ink-low-contrast)"
+        >
+          <use xlinkHref="#omrs-icon-chevron-down" />
+        </svg>
+      )) || (
+        <svg
+          className={`omrs-icon ${styles.icon}`}
+          fill="var(--omrs-color-ink-low-contrast)"
+        >
+          <use xlinkHref="#omrs-icon-chevron-up" />
+        </svg>
+      )}
+      <button className={styles.moreBtn} onClick={clickHandler}>
+        {more ? "More" : "Less"}
+      </button>
+    </div>
   );
 }
 

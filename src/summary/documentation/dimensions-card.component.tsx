@@ -53,7 +53,7 @@ export default function DimensionsCard(props: DimensionsCardProps) {
       match={props.match}
       styles={{ width: "40rem" }}
     >
-      <SummaryCardRow linkTo="/">
+      <SummaryCardRow>
         <SummaryCardRowContent>
           <HorizontalSectionCard>
             <div />
@@ -70,18 +70,20 @@ export default function DimensionsCard(props: DimensionsCardProps) {
             return (
               <SummaryCardRow linkTo="/" key={index}>
                 <SummaryCardRowContent>
-                  <DimensionsSectionCard content={el} key={index} />
+                  <DimensionsSectionCard content={el} index={index} />
                 </SummaryCardRowContent>
               </SummaryCardRow>
             );
           })}
-      <SummaryCardRowContent>
-        <ShowMoreCard
-          func={() => {
-            setShowMore(!showMore);
-          }}
-        />
-      </SummaryCardRowContent>
+      <SummaryCardRow linkTo="">
+        <SummaryCardRowContent>
+          <ShowMoreCard
+            func={() => {
+              setShowMore(!showMore);
+            }}
+          />
+        </SummaryCardRowContent>
+      </SummaryCardRow>
     </SummaryCard>
   );
 }

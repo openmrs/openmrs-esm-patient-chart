@@ -7,3 +7,6 @@
   font-size: 17px;
   color: var(--omrs-color-ink-high-contrast);
 }
+.unit {
+  color: var(--omrs-color-ink-medium-contrast);
+}

@@ -4,6 +4,9 @@
   cursor: pointer;
   background-color: transparent;
   border: none;
-  overflow: hidden;
-  outline: none;
+  font-weight: 500;
+  font-size: 17px;
+}
+.icon {
+  top: 30px;
 }
