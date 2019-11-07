@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import styles from "./show-more-card.css";
+
 export default function ShowMoreCard(props: ShowMoreCardProps) {
   const [message, setMessage] = React.useState("More");
   const clickHandler = () => {

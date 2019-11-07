@@ -1,13 +1,10 @@
 .gridContainer {
   display: grid;
   grid-template-columns: 16rem 8rem 8rem 8rem;
-  padding: 10px;
+  padding: 0.625rem;
 }
 .text {
   display: inline;
-  font-family: Roboto;
-  font-style: normal;
-  font-weight: 300;
   font-size: 17px;
-  color: #121212;
+  color: var(--omrs-color-ink-high-contrast);
 }

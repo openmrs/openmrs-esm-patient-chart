@@ -4,6 +4,7 @@ import { getCurrentPatient } from "@openmrs/esm-api";
 import SummarySectionHeader from "../summary-section-header.component";
 import SummarySectionCards from "../cards/summary-section-cards.component";
 import DimensionsCard from "./dimensions-card.component";
+
 export default function DocumentationSection(props: DocumentationSectionProps) {
   const [currentPatient, setCurrentPatient] = React.useState(null);
 

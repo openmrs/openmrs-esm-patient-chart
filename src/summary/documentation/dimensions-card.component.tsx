@@ -1,18 +1,20 @@
 import React from "react";
 import SummaryCard from "../cards/summary-card.component";
 import { match } from "react-router";
-import { getPatientDimensions } from "./dimensions.resource";
+import { getPatientDimensions } from "./observation.resource";
 import SummaryCardRow from "../cards/summary-card-row.component";
 import VerticalLabelValue from "../cards/vertical-label-value.component";
 import SummaryCardRowContent from "../cards/summary-card-row-content.component";
-import HorizontalSectionCard from "./horizontal-section-card.component";
+import HorizontalSectionCard from "../cards/horizontal-section-card.component";
 import DimensionsSectionCard from "./dimensions-card-row.component";
-import { ageConvert } from "./date-helper";
+import * as timeago from "timeago.js";
 import ShowMoreCard from "./show-more-card.component";
 import style from "./dimensions-card.css";
+// import  from "@openmrs/esm-error-handlling"
+
 export default function DimensionsCard(props: DimensionsCardProps) {
   const [dimensions, setDimensions] = React.useState([]);
-  const [showElements, setShowElements] = React.useState(3);
+  const [showMore, setShowMore] = React.useState(false);
 
   React.useEffect(() => {
     const abortController = new AbortController();
@@ -20,22 +22,22 @@ export default function DimensionsCard(props: DimensionsCardProps) {
       props.currentPatient.identifier[0].value,
       abortController
     ).then(response => {
-      const ar = response.data.entry
+      const entries = response.data.entry
         .filter(
           el =>
-            el.resource.valueQuantity !== undefined &&
+            el.resource.valueQuantity &&
             (el.resource.valueQuantity.unit === "cm" ||
               el.resource.valueQuantity.unit === "kg" ||
               el.resource.valueQuantity.unit === undefined)
         )
         .map(m => m.resource);
       const res = [];
-      for (let i = 0; i < ar.length; i += 3) {
+      for (let i = 0; i < entries.length; i += 3) {
         res.push({
-          date: ageConvert(ar[i].effectiveDateTime),
-          cm: ar[i].valueQuantity.value,
-          kg: ar[i + 1].valueQuantity.value,
-          bmi: ar[i + 2].valueQuantity.value
+          date: timeago.format(new Date(entries[i].effectiveDateTime)),
+          cm: entries[i].valueQuantity.value,
+          kg: entries[i + 1].valueQuantity.value,
+          bmi: entries[i + 2].valueQuantity.value
         });
       }
       setDimensions(res);
@@ -44,7 +46,11 @@ export default function DimensionsCard(props: DimensionsCardProps) {
     return () => abortController.abort();
   }, [props.currentPatient.identifier[0].value]);
   return (
-    <SummaryCard name="Height & Weight" match={props.match} cardSize="40rem">
+    <SummaryCard
+      name="Height & Weight"
+      match={props.match}
+      styles={{ width: "40rem" }}
+    >
       <SummaryCardRow linkTo="/">
         <SummaryCardRowContent>
           <HorizontalSectionCard>
@@ -56,19 +62,21 @@ export default function DimensionsCard(props: DimensionsCardProps) {
         </SummaryCardRowContent>
       </SummaryCardRow>
       {dimensions &&
-        dimensions.slice(0, showElements).map((el, index) => {
-          return (
-            <SummaryCardRow linkTo="/">
-              <SummaryCardRowContent>
-                <DimensionsSectionCard content={el} index={index} />
-              </SummaryCardRowContent>
-            </SummaryCardRow>
-          );
-        })}
+        dimensions
+          .slice(0, showMore ? dimensions.length : 3)
+          .map((el, index) => {
+            return (
+              <SummaryCardRow linkTo="/" key={index}>
+                <SummaryCardRowContent>
+                  <DimensionsSectionCard content={el} key={index} />
+                </SummaryCardRowContent>
+              </SummaryCardRow>
+            );
+          })}
       <SummaryCardRowContent>
         <ShowMoreCard
           func={() => {
-            setShowElements(dimensions.length + 3 - showElements);
+            setShowMore(!showMore);
           }}
         />
       </SummaryCardRowContent>

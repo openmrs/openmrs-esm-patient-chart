@@ -1,7 +1,7 @@
 .container {
   display: grid;
   grid-template-columns: 16rem 8rem 8rem 8rem;
-  padding: 10px;
+  padding: 0.625rem;
 }
 
 .dateHeader {

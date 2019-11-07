@@ -7,8 +7,6 @@ export default function HorizontalSectionCard(
   return <div className={styles.container}>{props.children}</div>;
 }
 
-HorizontalSectionCard.defaultProps = {};
-
 type HorizontalSectionCardProps = {
   children: React.ReactNode;
 };

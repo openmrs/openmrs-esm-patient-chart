@@ -1,8 +1,8 @@
 .moreBtn {
-  margin: 10px;
-  color: grey;
+  margin: 0.625rem;
+  color: var(--omrs-color-ink-medium-contrast);
   cursor: pointer;
-  background-color: Transparent;
+  background-color: transparent;
   border: none;
   overflow: hidden;
   outline: none;

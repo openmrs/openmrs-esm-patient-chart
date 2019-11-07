@@ -1,4 +1,4 @@
-import { openmrsFetch } from "@openmrs/esm-api";
+import { openmrsFetch, fhir } from "@openmrs/esm-api";
 
 export function getPatientDimensions(
   patientIdentifer: string,
