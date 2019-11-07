@@ -4,7 +4,6 @@
   padding: 0.625rem;
 }
 .text {
-  display: inline;
   font-size: 17px;
   color: var(--omrs-color-ink-high-contrast);
 }
