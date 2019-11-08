@@ -11,6 +11,7 @@
 :global(.omrs-breakpoint-gt-phone) .otherProfileCards {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
 }
 
 :global(.omrs-breakpoint-gt-phone) .contactsAndRelationshipsCard {
