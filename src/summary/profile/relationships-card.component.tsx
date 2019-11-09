@@ -1,7 +1,7 @@
 import React from "react";
 import { match } from "react-router";
-import { openmrsFetch } from "@openmrs/esm-api";
 import { createErrorHandler } from "@openmrs/esm-error-handling";
+import { fetchPatientRelationships } from "./relationships.resource";
 import SummaryCard from "../cards/summary-card.component";
 import SummaryCardRow from "../cards/summary-card-row.component";
 import SummaryCardRowContent from "../cards/summary-card-row-content.component";
@@ -10,20 +10,18 @@ import VerticalLabelValue from "../cards/vertical-label-value.component";
 export default function RelationshipsCard(props: RelationshipsCardProps) {
   const [relationships, setRelationships] = React.useState(null);
   React.useEffect(() => {
-    openmrsFetch(
-      `/ws/fhir/RelatedPerson?patient.identifier=${props.patient.identifier[0].value}`
-    )
+    fetchPatientRelationships(props.patient.identifier[0].value)
       .then(({ data }) => {
         if (data.total > 0) {
           setRelationships(getRelationships(data.entry));
         }
       })
-      .catch(error => createErrorHandler());
+      .catch(createErrorHandler());
   }, []);
 
   return (
     <SummaryCard name="Relationships" match={props.match}>
-      {relationships ? (
+      {relationships && relationships.length ? (
         relationships.map((relation: fhir.RelatedPerson) => (
           <SummaryCardRow key={relation.id}>
             <SummaryCardRowContent>

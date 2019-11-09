@@ -4,11 +4,11 @@ import { render, cleanup, wait } from "@testing-library/react";
 import RelationshipsCard from "./relationships-card.component";
 import { mockRelationships } from "../../../__mocks__/relationships.mock";
 import { mockPatient } from "../../../__mocks__/patient.mock";
-import { openmrsFetch } from "@openmrs/esm-api";
-const mockOmrsFetch = openmrsFetch as jest.Mock;
+import { fetchPatientRelationships } from "./relationships.resource";
+const mockFetchPatientRelationships = fetchPatientRelationships as jest.Mock;
 
-jest.mock("@openmrs/esm-api", () => ({
-  openmrsFetch: jest.fn().mockResolvedValue({
+jest.mock("./relationships.resource", () => ({
+  fetchPatientRelationships: jest.fn().mockResolvedValue({
     data: []
   })
 }));
@@ -41,7 +41,7 @@ describe("<RelationshipsCard/>", () => {
   });
 
   it("renders relationships correctly", async () => {
-    mockOmrsFetch.mockResolvedValueOnce(mockRelationships);
+    mockFetchPatientRelationships.mockResolvedValueOnce(mockRelationships);
     const wrapper = render(
       <BrowserRouter>
         <RelationshipsCard patient={patient} match={match}></RelationshipsCard>
