@@ -21,11 +21,6 @@ export default function PatientChartSummary(props: PatientChartSummaryProps) {
 
   return (
     <main className="omrs-main-content">
-      <PatientBanner
-        match={props.match}
-        patient={currentPatient}
-        showPatientSummary={setShowPatientSummary}
-      ></PatientBanner>
       {showPatientSummary && (
         <div className={styles.patientSummary}>
           <HistorySection match={props.match} />

@@ -33,7 +33,7 @@ export default function AllergyCard(props: AllergyCardProps) {
         patientAllergy.total > 0 &&
         patientAllergy.entry.map(allergy => {
           return (
-            <SummaryCardRow key={allergy.resource.id} linkTo="/">
+            <SummaryCardRow key={allergy.resource.id} linkTo={`/allergy`}>
               <HorizontalLabelValue
                 label={allergy.resource.code.text}
                 labelClassName="omrs-bold"
