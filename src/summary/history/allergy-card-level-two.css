@@ -1,153 +1,99 @@
-/* Allergy Header styles */
-.allergyHeader {
-  display: flex;
-  justify-content: space-between;
-  padding: 0.625rem 1.25rem 0.625rem 1rem;
-  border-bottom: 1px solid var(--omrs-color-bg-low-contrast);
-  align-items: center;
-}
-
-.allergyHeader p {
-  margin: 0;
-  color: var(--omrs-color-ink-medium-contrast);
-}
-
-.allergyHeader p:nth-child(1) {
-  flex: 25%;
-}
-
-.allergyHeader p:nth-child(2) {
-  display: flex;
-  flex: 25%;
-  text-align: left;
-  align-items: center;
-}
-
-.allergyHeader p:nth-child(3) {
-  flex: 25%;
-  text-align: right;
-}
-
-.allergyHeader p:nth-child(4) {
-  flex: 25%;
-  text-align: right;
-  padding-right: 2.625rem;
-}
-/* End Allergy header styles */
-
-/* Allergy Row styles */
-.allergyRow {
-  display: flex;
-  justify-content: space-between;
-  padding: 0.625rem 1.25rem 0rem 1rem;
-}
-.allergyRow p {
-  margin: 0;
-}
-
-.allergyRow p:nth-child(1) {
-  flex: 25%;
-}
-
-.allergyRow p:nth-child(2) {
-  flex: 25%;
-  text-align: left;
-  text-transform: capitalize;
-  display: flex;
-  align-items: center;
-  margin-left: 1rem;
-}
-
-.allergyRow p:nth-child(2) span {
-  display: flex;
-  align-items: center;
-}
-
-.allergyRow p:nth-child(2) div {
-  display: flex;
-  flex-direction: column;
-}
-
-.allergyRow p:nth-child(2) svg {
-  margin: 0;
-}
-
-.allergyRow p:nth-child(3) {
-  flex: 25%;
-  text-align: right;
-}
-
-.allergyRow p:nth-child(4) {
-  flex: 25%;
-  text-align: right;
-}
-
-.allergyRow p:nth-child(6) {
-  flex-direction: column;
-  text-align: right;
-}
-
-.allergyRow svg {
-  margin-left: 1rem;
-}
-
-.allergyRowManifestation {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-}
-
-.allergyRowManifestation span {
-  align-self: flex-start;
-}
-
-/* End allergy row styles */
-
-.allergyContent {
-  display: flex;
-  flex-direction: column;
-  border-bottom: 1px solid var(--omrs-color-bg-low-contrast);
-}
-
-.allergyContent div:nth-child(n + 1) {
-  border-left: 2px solid var(--omrs-color-danger);
-}
-
-.allergyComment {
-  display: flex;
-  padding: 0rem 1.25rem 0rem 1rem;
-  margin: 0rem;
-}
-
-.allergyComment p:nth-child(1) {
-  flex: 25%;
-}
-.allergyComment p:nth-child(2) {
-  flex: 75%;
-  color: var(--omrs-color-ink-medium-contrast);
-}
-
-.allergyCommentText {
-  display: flex;
-  flex-direction: row;
-}
-
-.allergyCommentText p:nth-child(1) {
-  flex: 90%;
-  color: var(--omrs-color-ink-medium-contrast);
-}
-
-.allergyCommentText p:nth-child(2) {
-  flex: 10%;
-  align-self: flex-end;
-}
-
-.allergyMargin {
-  margin: 0.5rem 1rem;
-}
-
 :global(.omrs-breakpoint-gt-phone) .allergySummary {
   display: flex;
   justify-content: center;
   padding-top: 3.25rem;
+}
+
+:global(.omrs-breakpoint-lt-tablet) .allergySummary {
+  padding: 3.25rem 0.5rem 0 0.5rem;
+}
+
+.allergyTable {
+  width: 100%;
+}
+
+.allergyTable thead {
+  color: var(--omrs-color-ink-medium-contrast);
+  border-bottom: 1px solid var(--omrs-color-bg-low-contrast);
+}
+
+.allergyTable thead td {
+  padding: 1rem 0.25rem 1rem 1rem;
+}
+
+.allergyTable thead td:nth-child(3) {
+  text-align: right;
+}
+
+.allergyTable thead td:nth-child(4) {
+  text-align: right;
+  padding-right: 2.925rem;
+}
+
+.allergyTable tbody td:nth-child(3) {
+  text-align: right;
+}
+
+.allergyTable tbody td:nth-child(4) {
+  text-align: right;
+}
+
+.allergyTable tbody tr:nth-child(-n + 3) {
+  border-left: 3px solid var(--omrs-color-danger);
+}
+
+.allergyTable tbody tr:nth-child(3n) {
+  border-bottom: 1px solid var(--omrs-color-bg-low-contrast);
+}
+
+.allergyTable tbody {
+  padding: 2rem;
+  border-bottom: 1px solid var(--omrs-color-bg-low-contrast);
+}
+
+.allergyTable td {
+  width: 25%;
+  padding: 0.5rem 0.25rem 0rem 1rem;
+}
+
+.centerItems {
+  display: flex;
+  align-items: center;
+}
+
+.alignRight {
+  justify-content: flex-end;
+}
+
+.alignRight span {
+  margin-right: 1rem;
+}
+
+.allergyComment {
+  display: flex;
+  justify-content: space-between;
+  overflow: hidden;
+  color: var(--omrs-color-ink-medium-contrast);
+  padding: 0rem 2.925rem 1rem 0rem;
+}
+
+.allergyComment p {
+  margin: 0rem;
+}
+
+.allergyComment p:nth-child(1) {
+  flex: 90%;
+}
+
+.allergyComment p:nth-child(2) {
+  flex: 10%;
+  align-items: flex-end;
+}
+
+.allergyFooter {
+  text-align: center;
+}
+
+.allergyLink {
+  color: var(--omrs-color-interaction-plus-one);
 }
