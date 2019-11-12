@@ -1,0 +1,9 @@
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: none;
+  padding: 0.625rem 0.25rem 0.625rem 1rem;
+  border-radius: 0;
+  background: var(--omrs-color-ink-medium-contrast);
+}
