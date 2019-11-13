@@ -6,6 +6,7 @@ import SummaryCardRowContent from "../cards/summary-card-row-content.component";
 import { performPatientAllergySearch } from "./allergy-intolerance.resource";
 import style from "./allergy-card-style.css";
 import HorizontalLabelValue from "../cards/horizontal-label-value.component";
+import { createErrorHandler } from "@openmrs/esm-error-handling";
 
 export default function AllergyCard(props: AllergyCardProps) {
   const [patientAllergy, setPatientAllergy] = React.useState(null);
@@ -18,11 +19,7 @@ export default function AllergyCard(props: AllergyCardProps) {
       abortController
     )
       .then(allergy => setPatientAllergy(allergy.data))
-      .catch(error => {
-        setTimeout(() => {
-          throw error;
-        });
-      });
+      .catch(createErrorHandler());
 
     return () => abortController.abort();
   }, [props.currentPatient.identifier[0].value]);
@@ -33,7 +30,10 @@ export default function AllergyCard(props: AllergyCardProps) {
         patientAllergy.total > 0 &&
         patientAllergy.entry.map(allergy => {
           return (
-            <SummaryCardRow key={allergy.resource.id} linkTo="/">
+            <SummaryCardRow
+              key={allergy.resource.id}
+              linkTo={`/patient/${props.currentPatient.id}/chart/allergy`}
+            >
               <HorizontalLabelValue
                 label={allergy.resource.code.text}
                 labelClassName="omrs-bold"
