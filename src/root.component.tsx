@@ -5,7 +5,7 @@ import openmrsRootDecorator from "@openmrs/react-root-decorator";
 import PatientChartSummary from "./summary/patient-chart-summary.component";
 import PatientBanner from "./summary/banner/patient-banner.component";
 import { getCurrentPatient } from "@openmrs/esm-api";
-import { LevelTwoRoutes } from "./summary/level-two-routes";
+import { LevelTwoRoutes } from "./summary/level-two-routes.component";
 
 function Root(props) {
   const [currentPatient, setCurrentPatient] = React.useState(null);
@@ -32,12 +32,10 @@ function Root(props) {
         exact
         component={PatientChartSummary}
       />
-      {currentPatient && (
-        <Route
-          path="/patient/:patientUuid/chart"
-          render={routeProps => <LevelTwoRoutes match={props.match} />}
-        />
-      )}
+      <Route
+        path="/patient/:patientUuid/chart"
+        render={routeProps => <LevelTwoRoutes match={props.match} />}
+      />
     </BrowserRouter>
   );
 }
