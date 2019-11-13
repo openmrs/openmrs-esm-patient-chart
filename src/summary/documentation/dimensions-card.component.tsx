@@ -1,7 +1,7 @@
 import React from "react";
 import SummaryCard from "../cards/summary-card.component";
 import { match } from "react-router";
-import { getPatientDimensions } from "./observation.resource";
+import { getHeight, getWeight } from "./dimension.resource";
 import SummaryCardRow from "../cards/summary-card-row.component";
 import VerticalLabelValue from "../cards/vertical-label-value.component";
 import SummaryCardRowContent from "../cards/summary-card-row-content.component";
@@ -9,72 +9,80 @@ import HorizontalSectionCard from "../cards/horizontal-section-card.component";
 import DimensionsSectionCard from "./dimensions-card-row.component";
 import * as timeago from "timeago.js";
 import ShowMoreCard from "./show-more-card.component";
-import style from "./dimensions-card.css";
 import { createErrorHandler } from "@openmrs/esm-error-handling";
-
+import styles from "./dimensions-card-level-one.css";
 export default function DimensionsCard(props: DimensionsCardProps) {
   const [dimensions, setDimensions] = React.useState([]);
   const [showMore, setShowMore] = React.useState(false);
+  const [heights, setHeights] = React.useState([]);
+  const [weights, setWeights] = React.useState([]);
+  const [bmis, setBmis] = React.useState([]);
 
   React.useEffect(() => {
     const abortController = new AbortController();
-    getPatientDimensions(
-      props.currentPatient.identifier[0].value,
-      abortController
-    )
-      .then(response => {
-        const entries = response.data.entry
-          .filter(
-            el =>
-              el.resource.valueQuantity &&
-              (el.resource.valueQuantity.unit === "cm" ||
-                el.resource.valueQuantity.unit === "kg" ||
-                el.resource.valueQuantity.unit === undefined)
-          )
-          .map(m => m.resource);
-        const res = [];
-        for (let i = 0; i < entries.length; i += 3) {
-          res.push({
-            date: timeago.format(new Date(entries[i].effectiveDateTime)),
-            cm: entries[i].valueQuantity.value,
-            kg: entries[i + 1].valueQuantity.value,
-            bmi: entries[i + 2].valueQuantity.value
-          });
-        }
-        setDimensions(res);
+    getHeight(props.currentPatient.id)
+      .then(({ data }) => {
+        getWeight(props.currentPatient.id)
+          .then(({ data }) => {})
+          .catch(createErrorHandler());
       })
       .catch(createErrorHandler());
 
     return () => abortController.abort();
-  }, [props.currentPatient.identifier[0].value]);
+  }, [props.currentPatient.id]);
   return (
     <SummaryCard
       name="Height & Weight"
       match={props.match}
-      styles={{ width: "40rem" }}
+      styles={{ flex: 1, margin: ".5rem", maxWidth: "46rem" }}
     >
       <SummaryCardRow>
         <SummaryCardRowContent>
-          <HorizontalSectionCard>
-            <div />
-            <div className={style.heightText}>Weight</div>
-            <div className={style.heightText}>Height</div>
-            <div className={style.heightText}>BMI</div>
-          </HorizontalSectionCard>
+          <table className={styles.table}>
+            <thead>
+              <tr className={styles.tableRow}>
+                <th
+                  className={`${styles.tableHeader} ${styles.tableDates}`}
+                  style={{ textAlign: "start" }}
+                ></th>
+                <th className={styles.tableHeader}>Weight</th>
+                <th className={styles.tableHeader}>Height</th>
+                <th className={styles.tableHeader}>BMI</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {dimensions.map((dimension, index) => (
+                <tr key={dimension.id} className={styles.tableRow}>
+                  <td
+                    className={styles.tableData}
+                    style={{ textAlign: "start" }}
+                  >
+                    {dimension.date}
+                  </td>
+                  <td className={styles.tableData}>
+                    {dimension.weight || "\u2014"}
+                  </td>
+                  <td className={styles.tableData}>
+                    {dimension.height || "\u2014"}
+                  </td>
+                  <td className={styles.tableData}>
+                    {dimension.bmi || "\u2014"}
+                  </td>
+                  <td style={{ textAlign: "end" }}>
+                    <svg
+                      className="omrs-icon"
+                      fill="var(--omrs-color-ink-low-contrast)"
+                    >
+                      <use xlinkHref="#omrs-icon-chevron-right" />
+                    </svg>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </SummaryCardRowContent>
       </SummaryCardRow>
-      {dimensions &&
-        dimensions
-          .slice(0, showMore ? dimensions.length : 3)
-          .map((el, index) => {
-            return (
-              <SummaryCardRow linkTo="/" key={index}>
-                <SummaryCardRowContent>
-                  <DimensionsSectionCard content={el} index={index} />
-                </SummaryCardRowContent>
-              </SummaryCardRow>
-            );
-          })}
       <SummaryCardRow linkTo="">
         <SummaryCardRowContent>
           <ShowMoreCard

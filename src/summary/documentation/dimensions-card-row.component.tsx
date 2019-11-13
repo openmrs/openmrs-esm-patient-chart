@@ -7,19 +7,19 @@ export default function DimensionsSectionCard(
   return (
     <div className={styles.gridContainer}>
       <div>{props.content.date}</div>
-      <div className={styles.text}>
+      <div className="omrs-type-body-regular">
         <span>
           {props.content.kg + " "}
           <span className={styles.unit}>{props.index === 0 && "kg"}</span>
         </span>
       </div>
-      <div className={styles.text}>
+      <div className="omrs-type-body-regular">
         <span>
           {props.content.cm + " "}
           <span className={styles.unit}>{props.index === 0 && "cm"}</span>
         </span>
       </div>
-      <div className={styles.text}>
+      <div className="omrs-type-body-regular">
         <span>
           {props.content.bmi + " "}
           <span className={styles.unit}>{props.index === 0 && "kg/m"}</span>

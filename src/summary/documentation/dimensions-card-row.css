@@ -3,10 +3,6 @@
   grid-template-columns: 16rem 8rem 8rem 8rem;
   padding: 0.625rem;
 }
-.text {
-  font-size: 17px;
-  color: var(--omrs-color-ink-high-contrast);
-}
 .unit {
   color: var(--omrs-color-ink-medium-contrast);
 }
