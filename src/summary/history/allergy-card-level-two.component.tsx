@@ -3,11 +3,11 @@ import { match } from "react-router";
 import { performPatientAllergySearch } from "./allergy-intolerance.resource";
 import { createErrorHandler } from "@openmrs/esm-error-handling";
 import styles from "./allergy-card-level-two.css";
-import SummaryCard from "../cards/summary-card.component";
-import dayjs from "dayjs";
+import HorizontalLabelValue from "../cards/horizontal-label-value.component";
 import SummaryCardRow from "../cards/summary-card-row.component";
 import SummaryCardRowContent from "../cards/summary-card-row-content.component";
-import HorizontalLabelValue from "../cards/horizontal-label-value.component";
+import SummaryCard from "../cards/summary-card.component";
+import dayjs from "dayjs";
 
 export function AllergyCardLevelTwo(props: AllergyCardLevelTwoProps) {
   const [patientAllergy, setPatientAllergy] = React.useState(null);
@@ -28,8 +28,8 @@ export function AllergyCardLevelTwo(props: AllergyCardLevelTwoProps) {
   function displayAllergy() {
     return (
       <SummaryCard
-        match={props.match}
         name="Allergy"
+        match={props.match}
         styles={{ width: "100%" }}
       >
         <table className={styles.allergyTable}>
@@ -53,13 +53,23 @@ export function AllergyCardLevelTwo(props: AllergyCardLevelTwoProps) {
               patientAllergy.entry.map(allergy => {
                 return (
                   <React.Fragment key={allergy.resource.id}>
-                    <tr>
+                    <tr
+                      className={`${
+                        allergy.resource.criticality === "high"
+                          ? `${styles.high}`
+                          : `${styles.low}`
+                      }`}
+                    >
                       <td className={"omrs-bold"}>
                         {allergy.resource.code.text}
                       </td>
                       <td>
                         <div
-                          className={`${styles.centerItems} omrs-bold`}
+                          className={`${styles.centerItems} ${
+                            allergy.resource.criticality === "high"
+                              ? `omrs-bold`
+                              : ``
+                          }`}
                           style={{ textTransform: "uppercase" }}
                         >
                           {allergy.resource.criticality === "high" && (
@@ -97,17 +107,17 @@ export function AllergyCardLevelTwo(props: AllergyCardLevelTwoProps) {
                     <tr>
                       <td></td>
                       <td colSpan={3}>
-                        {allergy.resource.reaction[0].manifestation.map(
-                          manifestation => `${manifestation.text} `
-                        )}
+                        {Object.values(
+                          allergy.resource.reaction[0].manifestation.map(
+                            manifestation => manifestation.text
+                          )
+                        ).join(", ")}
                       </td>
                     </tr>
                     <tr>
                       <td></td>
                       <td colSpan={3}>
-                        <span
-                          className={`${styles.allergyComment} omrs-type-body-large`}
-                        >
+                        <span className={`${styles.allergyComment}`}>
                           <span>
                             {allergy.resource.note &&
                               allergy.resource.note[0].text}
@@ -173,15 +183,12 @@ export function AllergyCardLevelTwo(props: AllergyCardLevelTwoProps) {
         match={props.match}
         styles={{ width: "100%" }}
       >
-        <div style={{ margin: "1rem" }}>
+        <div className={styles.allergyMargin}>
           <p className="omrs-bold">
             The patient's allergy history is not documented.
           </p>
           <p className="omrs-bold">
-            Please{" "}
-            <span className={`${styles.allergyLink} omrs-underline`}>
-              add allergy history
-            </span>
+            Please <a href="/">add allergy history</a>.
           </p>
         </div>
       </SummaryCard>

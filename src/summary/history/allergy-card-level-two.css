@@ -10,6 +10,7 @@
 
 .allergyTable {
   width: 100%;
+  font-family: "Work Sans";
 }
 
 .allergyTable thead {
@@ -20,6 +21,9 @@
 .allergyTable thead td {
   padding: 1rem 0.25rem 1rem 1rem;
 }
+:global(.omrs-breakpoint-lt-tablet) .allergyTable thead td {
+  padding: 0.25rem 0.125rem 0.5rem 0.5rem;
+}
 
 .allergyTable thead td:nth-child(3) {
   text-align: right;
@@ -29,6 +33,9 @@
   text-align: right;
   padding-right: 2.925rem;
 }
+:global(.omrs-breakpoint-lt-tablet) .allergyTable thead td:nth-child(4) {
+  padding-right: 1.45125rem;
+}
 
 .allergyTable tbody td:nth-child(3) {
   text-align: right;
@@ -36,10 +43,6 @@
 
 .allergyTable tbody td:nth-child(4) {
   text-align: right;
-}
-
-.allergyTable tbody tr:nth-child(-n + 3) {
-  border-left: 3px solid var(--omrs-color-danger);
 }
 
 .allergyTable tbody tr:nth-child(3n) {
@@ -51,6 +54,9 @@
   border-bottom: 1px solid var(--omrs-color-bg-low-contrast);
 }
 
+:global(.omrs-breakpoint-lt-tablet) .allergyTable tbody {
+  padding: 1rem;
+}
 .allergyTable td {
   width: 25%;
   padding: 0.5rem 0.25rem 0rem 1rem;
@@ -94,6 +100,14 @@
   text-align: center;
 }
 
-.allergyLink {
-  color: var(--omrs-color-interaction-plus-one);
+tr.high {
+  border-left: 3px solid var(--omrs-color-danger);
+}
+
+tr.high + tr {
+  border-left: 3px solid var(--omrs-color-danger);
+}
+
+tr.high + tr + tr {
+  border-left: 3px solid var(--omrs-color-danger);
 }
