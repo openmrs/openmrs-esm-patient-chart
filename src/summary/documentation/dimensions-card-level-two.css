@@ -1,0 +1,30 @@
+.table {
+  width: 100%;
+}
+
+.tableRow {
+  border-bottom: 1px solid var(--omrs-color-bg-low-contrast);
+}
+
+.tableHeader,
+.tableData {
+  padding: 0.625rem;
+  font-family: "Work Sans";
+}
+
+.tableHeader {
+  color: var(--omrs-color-ink-medium-contrast);
+  font-size: 0.9375rem;
+  text-transform: uppercase;
+  font-weight: normal;
+  letter-spacing: 0.0275rem;
+}
+
+.tableData {
+  font-size: 1.0625rem;
+  text-align: center;
+}
+
+:global(.omrs-breakpoint-lt-tablet) .tableDates {
+  width: 70%;
+}

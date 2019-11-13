@@ -1,6 +1,5 @@
 import React from "react";
-import { Route } from "react-router";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, Route } from "react-router-dom";
 import openmrsRootDecorator from "@openmrs/react-root-decorator";
 import PatientChartSummary from "./summary/patient-chart-summary.component";
 import PatientBanner from "./summary/banner/patient-banner.component";
