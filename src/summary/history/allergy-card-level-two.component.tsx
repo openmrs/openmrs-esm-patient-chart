@@ -39,6 +39,7 @@ export function AllergyCardLevelTwo(props: AllergyCardLevelTwoProps) {
           <p className="omrs-type-body-regular">UPDATED</p>
         </div>
         {patientAllergy &&
+          patientAllergy.total > 0 &&
           patientAllergy.entry.map(allergy => {
             return (
               <>
@@ -151,10 +152,7 @@ export function AllergyCardLevelTwo(props: AllergyCardLevelTwoProps) {
               The patient's allergy history is not documented.
             </p>
             <p className="omrs-bold">
-              Please{" "}
-              <span className={`${styles.allergyLink} omrs-underline`}>
-                add allergy history
-              </span>
+              Please <a href="/">add allergy history</a>.
             </p>
           </div>
         </SummaryCard>

@@ -141,9 +141,6 @@
   flex: 10%;
   align-self: flex-end;
 }
-.allergyLink {
-  color: var(--omrs-color-interaction-plus-one);
-}
 
 .allergyMargin {
   margin: 0.5rem 1rem;
