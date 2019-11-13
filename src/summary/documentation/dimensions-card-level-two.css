@@ -28,3 +28,7 @@
 :global(.omrs-breakpoint-lt-tablet) .tableDates {
   width: 70%;
 }
+
+table.table .tableDates {
+  text-align: start;
+}

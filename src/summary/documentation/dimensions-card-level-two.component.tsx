@@ -24,10 +24,7 @@ function DimensionsCardLevelTwo(props: DimensionsCardLevelTwoProps) {
         <table className={styles.table}>
           <thead>
             <tr className={styles.tableRow}>
-              <th
-                className={`${styles.tableHeader} ${styles.tableDates}`}
-                style={{ textAlign: "start" }}
-              ></th>
+              <th className={`${styles.tableHeader} ${styles.tableDates}`}></th>
               <th className={styles.tableHeader}>Weight (kg)</th>
               <th className={styles.tableHeader}>Height (cm)</th>
               <th className={styles.tableHeader}>
