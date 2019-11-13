@@ -32,12 +32,10 @@ function Root(props) {
         exact
         component={PatientChartSummary}
       />
-      {currentPatient && (
-        <Route
-          path="/patient/:patientUuid/chart"
-          render={routeProps => <LevelTwoRoutes match={props.match} />}
-        />
-      )}
+      <Route
+        path="/patient/:patientUuid/chart"
+        render={routeProps => <LevelTwoRoutes match={props.match} />}
+      />
     </BrowserRouter>
   );
 }
