@@ -46,7 +46,7 @@ describe("<DimensionsCardLevelTwo/>", () => {
       const firstTableRow = el.children[0];
       const secondTableRow = el.children[1];
       expect(tableRows.length).toBe(2);
-      expect(firstTableRow.children[0].textContent).toBe("Today 06:49 AM");
+      expect(firstTableRow.children[0].textContent).toBe("13-Nov 06:49 AM");
       expect(secondTableRow.children[0].textContent).toBe("2016 18-Dec");
       expect(secondTableRow.children[1].textContent).toBe("173");
       expect(secondTableRow.children[2].textContent).toBe("173");
@@ -71,7 +71,9 @@ it("renders dates according to designs", () => {
   );
   expect(formatDate(sometimeThisYear)).toBe(`26-Apr 06:49 AM`);
   expect(formatDate(today.toString())).toBe(
-    `Today ${get12Hour(today.getHours())}:${zeroBase(today.getMinutes())} PM`
+    `Today ${get12Hour(today.getHours())}:${zeroBase(today.getMinutes())} ${
+      today.getHours() > 12 ? "PM" : "AM"
+    }`
   );
 
   function zeroBase(num) {
