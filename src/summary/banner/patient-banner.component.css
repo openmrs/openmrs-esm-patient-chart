@@ -79,6 +79,7 @@
 .patientBanner {
   width: 100%;
   position: fixed;
+  background-color: var(--omrs-color-bg-high-contrast);
 }
 
 .patientProfile {

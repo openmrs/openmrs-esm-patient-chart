@@ -15,7 +15,7 @@ export function LevelTwoRoutes(props: LevelTwoRoutesProps) {
   });
 
   return (
-    <main className="omrs-main-content">
+    <>
       {currentPatient && (
         <Switch>
           <Route
@@ -40,7 +40,7 @@ export function LevelTwoRoutes(props: LevelTwoRoutesProps) {
           />
         </Switch>
       )}
-    </main>
+    </>
   );
 }
 

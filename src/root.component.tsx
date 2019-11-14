@@ -26,15 +26,21 @@ function Root(props) {
           showPatientSummary={setShowPatientSummary}
         />
       </Route>
-      <Route
-        path="/patient/:patientUuid/chart"
-        exact
-        component={PatientChartSummary}
-      />
-      <Route
-        path="/patient/:patientUuid/chart"
-        render={routeProps => <LevelTwoRoutes match={props.match} />}
-      />
+      <main className="omrs-main-content">
+        {showPatientSummary && (
+          <Route
+            path="/patient/:patientUuid/chart"
+            exact
+            component={PatientChartSummary}
+          />
+        )}
+        {showPatientSummary && (
+          <Route
+            path="/patient/:patientUuid/chart"
+            render={routeProps => <LevelTwoRoutes match={props.match} />}
+          />
+        )}
+      </main>
     </BrowserRouter>
   );
 }

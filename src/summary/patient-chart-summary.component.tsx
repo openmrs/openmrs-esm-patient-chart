@@ -5,11 +5,9 @@ import HistorySection from "./history/history-section.component";
 
 export default function PatientChartSummary(props: PatientChartSummaryProps) {
   return (
-    <main className="omrs-main-content">
-      <div className={styles.patientSummary}>
-        <HistorySection match={props.match} />
-      </div>
-    </main>
+    <div className={styles.patientSummary}>
+      <HistorySection match={props.match} />
+    </div>
   );
 }
 
