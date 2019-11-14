@@ -1,13 +1,38 @@
-.moreNotes {
-  display: flex;
-  align-items: center;
-  border: none;
-  padding: 0.625rem 1.625rem 0.625rem 1rem;
-  background-color: var(--omrs-color-bg-medium-contrast);
-  color: var(--omrs-color-ink-medium-contrast);
-  cursor: pointer;
+.table {
+  width: 100%;
 }
 
-.moreNotes p {
-  margin: 0;
+.tableRow {
+  border-bottom: 1px solid var(--omrs-color-bg-low-contrast);
+}
+
+.tableData:nth-child(1) {
+  font-family: "Work Sans";
+}
+
+.tableHeader,
+.tableData {
+  padding: 0.625rem;
+}
+
+.tableHeader {
+  color: var(--omrs-color-ink-medium-contrast);
+  font-size: 0.9375rem;
+  text-transform: uppercase;
+  font-weight: normal;
+  letter-spacing: 0.0275rem;
+  font-family: "Work Sans";
+}
+
+.tableData {
+  font-size: 1.0625rem;
+  text-align: center;
+}
+
+:global(.omrs-breakpoint-lt-tablet) .tableDates {
+  width: 70%;
+}
+
+table.table .tableDates {
+  text-align: start;
 }

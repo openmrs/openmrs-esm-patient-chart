@@ -1,11 +1,10 @@
 import { openmrsFetch } from "@openmrs/esm-api";
 
-export function encounterResource(
+export function getEncounters(
   patientIdentifer: string,
   abortController: AbortController
 ) {
-  return openmrsFetch(
-    `/ws/fhir/Encounter?patient.identifier=${patientIdentifer}`,
-    { signal: abortController.signal }
-  );
+  return openmrsFetch(`/ws/fhir/Encounter?identifier=${patientIdentifer}`, {
+    signal: abortController.signal
+  });
 }
