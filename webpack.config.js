@@ -7,7 +7,8 @@ module.exports = {
   output: {
     filename: "openmrs-esm-patient-chart.js",
     libraryTarget: "system",
-    path: path.resolve(__dirname, "dist")
+    path: path.resolve(__dirname, "dist"),
+    jsonpFunction: "webpackJsonp_openmrs_esm_patient_chart"
   },
   module: {
     rules: [

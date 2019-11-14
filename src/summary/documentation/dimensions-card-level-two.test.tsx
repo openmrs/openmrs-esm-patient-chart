@@ -71,7 +71,9 @@ it("renders dates according to designs", () => {
   );
   expect(formatDate(sometimeThisYear)).toBe(`26-Apr 06:49 AM`);
   expect(formatDate(today.toString())).toBe(
-    `Today ${get12Hour(today.getHours())}:${zeroBase(today.getMinutes())} PM`
+    `Today ${get12Hour(today.getHours())}:${zeroBase(today.getMinutes())} ${
+      today.getHours() < 12 ? "A" : "P"
+    }M`
   );
 
   function zeroBase(num) {

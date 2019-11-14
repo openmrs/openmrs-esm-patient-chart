@@ -1,3 +1,7 @@
+import dayjs from "dayjs";
+
+const todaysDate = dayjs().format("YYYY-MM-DD");
+
 export const mockDimensionResponse = {
   headers: null,
   ok: true,
@@ -19,7 +23,7 @@ export const mockDimensionResponse = {
     resourceType: "Bundle",
     id: "f3714150-5ff8-4356-8dd5-0c5edc195d2a",
     meta: {
-      lastUpdated: "2019-11-13T09:32:14.334+00:00"
+      lastUpdated: `${todaysDate}T09:32:14.334+00:00`
     },
     type: "searchset",
     total: 7,
@@ -34,7 +38,7 @@ export const mockDimensionResponse = {
             {
               url:
                 "http://fhir-es.transcendinsights.com/stu3/StructureDefinition/resource-date-created",
-              valueDateTime: "2019-11-13T06:49:00"
+              valueDateTime: `${todaysDate}T06:49:00`
             },
             {
               url: "locationUuid",
@@ -86,8 +90,8 @@ export const mockDimensionResponse = {
           context: {
             reference: "Encounter/509992ff-6b9a-47b2-a946-b42791fdd98f"
           },
-          effectiveDateTime: "2019-11-13T06:49:00",
-          issued: "2019-11-13T06:49:00",
+          effectiveDateTime: `${todaysDate}T06:49:00`,
+          issued: `${todaysDate}T06:49:00`,
           performer: [
             {
               reference: "Practitioner/f4308d92-5043-4b49-af89-170953f4748a",
@@ -185,8 +189,8 @@ export const mockDimensionResponse = {
           context: {
             reference: "Encounter/1a82fdc6-3d14-44c4-ab45-d65baa0062ae"
           },
-          effectiveDateTime: "2016-12-18T06:48:20+00:00",
-          issued: "2016-12-18T06:48:20.000+00:00",
+          effectiveDateTime: "2016-12-18T06:48:20",
+          issued: "2016-12-18T06:48:20.000",
           valueQuantity: {
             value: 173.0,
             unit: "cm",
