@@ -4,7 +4,7 @@ export const mockPatientEncounters = {
     id: "857a8f14-5a4a-48a6-8427-a73b4756e6fa",
     status: null,
     meta: {
-      lastUpdated: "2019-11-07T12:04:14.742+00:00"
+      lastUpdated: "2019-11-07T12:04:14.742"
     },
     type: "searchset",
     total: 1,
@@ -26,7 +26,7 @@ export const mockPatientEncounters = {
             {
               url:
                 "http://fhir-es.transcendinsights.com/stu3/StructureDefinition/resource-date-created",
-              valueDateTime: "2017-01-18T08:59:07+00:00"
+              valueDateTime: "2017-01-18T08:59:07"
             },
             {
               url:
@@ -35,7 +35,7 @@ export const mockPatientEncounters = {
             },
             {
               url: "dateChanged",
-              valueDateTime: "2017-01-18T08:59:08+00:00"
+              valueDateTime: "2017-01-18T08:59:08"
             },
             {
               url: "changedBy",
@@ -63,8 +63,8 @@ export const mockPatientEncounters = {
             display: "Paul Walker(Identifier:10000X)"
           },
           period: {
-            start: "2015-04-17T06:16:07+00:00",
-            end: "2015-04-17T06:16:07+00:00"
+            start: "2015-04-17T06:16:07",
+            end: "2015-04-17T06:16:07"
           },
           location: [
             {
@@ -73,8 +73,8 @@ export const mockPatientEncounters = {
                 display: "Outpatient Clinic"
               },
               period: {
-                start: "2015-04-17T06:16:07+00:00",
-                end: "2019-11-09T06:16:07+00:00"
+                start: "2015-04-17T06:16:07",
+                end: "2019-11-09T06:16:07"
               }
             }
           ],
@@ -94,7 +94,7 @@ export const mockPatientEncounters = {
             {
               url:
                 "http://fhir-es.transcendinsights.com/stu3/StructureDefinition/resource-date-created",
-              valueDateTime: "2017-01-18T08:59:07+00:00"
+              valueDateTime: "2017-01-18T08:59:07"
             },
             {
               url:
@@ -103,7 +103,7 @@ export const mockPatientEncounters = {
             },
             {
               url: "dateChanged",
-              valueDateTime: "2017-01-18T08:59:08+00:00"
+              valueDateTime: "2017-01-18T08:59:08"
             },
             {
               url: "changedBy",
@@ -131,8 +131,8 @@ export const mockPatientEncounters = {
             display: "Paul Walker(Identifier:10000X)"
           },
           period: {
-            start: "2015-04-17T06:16:07+00:00",
-            end: "2015-04-17T06:16:07+00:00"
+            start: "2015-04-17T06:16:07",
+            end: "2015-04-17T06:16:07"
           },
           location: [
             {
@@ -141,8 +141,8 @@ export const mockPatientEncounters = {
                 display: "Outpatient Clinic"
               },
               period: {
-                start: "2015-04-17T06:16:07+00:00",
-                end: "2019-04-17T06:16:07+00:00"
+                start: "2015-04-17T06:16:07",
+                end: "2019-04-17T06:16:07"
               }
             }
           ],
@@ -162,7 +162,7 @@ export const mockPatientEncounters = {
             {
               url:
                 "http://fhir-es.transcendinsights.com/stu3/StructureDefinition/resource-date-created",
-              valueDateTime: "2017-01-18T08:59:07+00:00"
+              valueDateTime: "2017-01-18T08:59:07"
             },
             {
               url:
@@ -171,7 +171,7 @@ export const mockPatientEncounters = {
             },
             {
               url: "dateChanged",
-              valueDateTime: "2017-01-18T08:59:08+00:00"
+              valueDateTime: "2017-01-18T08:59:08"
             },
             {
               url: "changedBy",
@@ -199,8 +199,8 @@ export const mockPatientEncounters = {
             display: "Paul Walker(Identifier:10000X)"
           },
           period: {
-            start: "2015-04-17T06:16:07+00:00",
-            end: "2015-04-17T06:16:07+00:00"
+            start: "2015-04-17T06:16:07",
+            end: "2015-04-17T06:16:07"
           },
           location: [
             {
@@ -209,8 +209,8 @@ export const mockPatientEncounters = {
                 display: "Outpatient Clinic"
               },
               period: {
-                start: "2015-04-17T06:16:07+00:00",
-                end: "2015-04-17T06:16:07+00:00"
+                start: "2015-04-17T06:16:07",
+                end: "2015-04-17T06:16:07"
               }
             }
           ],

@@ -6,19 +6,16 @@
   border-bottom: 1px solid var(--omrs-color-bg-low-contrast);
 }
 
-.tableData:nth-child(1) {
-  font-family: "Work Sans";
-}
-
 .tableHeader,
-.tableData {
+.tableData,
+.tableDate {
   padding: 0.625rem;
 }
 
 .tableHeader {
   color: var(--omrs-color-ink-medium-contrast);
   font-size: 0.9375rem;
-  text-transform: uppercase;
+  text-transform: capitalize;
   font-weight: normal;
   letter-spacing: 0.0275rem;
   font-family: "Work Sans";
@@ -33,6 +30,12 @@
   width: 70%;
 }
 
-table.table .tableDates {
-  text-align: start;
+table.table .tableDate {
+  font-family: "Work Sans";
+  font-weight: 500;
+}
+
+.location {
+  color: var(--omrs-color-ink-medium-contrast);
+  font-family: "Work Sans";
 }

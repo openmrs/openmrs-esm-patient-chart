@@ -51,7 +51,7 @@ describe("<NotesCard/>", () => {
     const tbody = wrapper.container.querySelector("tbody");
     await wait(() => {
       const firstRow = tbody.children[0];
-      expect(firstRow.children[0].textContent).toBe("09-Nov 09:16 AM");
+      expect(firstRow.children[0].textContent).toBe("09-Nov 06:16 AM");
       expect(firstRow.children[1].textContent).toContain("Vitals");
       expect(firstRow.children[1].children[0].textContent).toBe(
         "Outpatient Clinic"

@@ -41,14 +41,12 @@ export default function NotesCard(props: NotesCardProps) {
           {patientNotes &&
             patientNotes.slice(0, 5).map(note => (
               <tr key={note.id} className={styles.tableRow}>
-                <td className={styles.tableDate} style={{ textAlign: "start" }}>
+                <td className={styles.tableDate}>
                   {formatDate(note.location[0].period.end)}
                 </td>
                 <td className={styles.tableData}>
                   {note.type[0].coding[0].display || "\u2014"}
-                  <div
-                    style={{ color: "var(--omrs-color-ink-medium-contrast)" }}
-                  >
+                  <div className={styles.location}>
                     {note.location[0].location.display || "\u2014"}
                   </div>
                 </td>
