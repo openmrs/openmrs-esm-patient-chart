@@ -9,7 +9,7 @@
 .tableHeader,
 .tableData {
   padding: 0.625rem;
-  font-family: "Roboto";
+  font-family: "Work Sans";
 }
 
 .tableHeader {
@@ -18,26 +18,17 @@
   text-transform: uppercase;
   font-weight: normal;
   letter-spacing: 0.0275rem;
-  text-align: left;
 }
 
 .tableData {
   font-size: 1.0625rem;
-  text-align: left;
+  text-align: center;
 }
 
 :global(.omrs-breakpoint-lt-tablet) .tableDates {
   width: 70%;
 }
 
-:global(.omrs-breakpoint-gt-phone) .card {
-  width: 21.75rem;
-  margin: 0.5rem 1rem;
-}
-.card {
-  width: 40rem;
-  margin: 0.5rem 1rem;
-}
-.unit {
-  color: var(--omrs-color-ink-medium-contrast);
+table.table .tableDates {
+  text-align: start;
 }

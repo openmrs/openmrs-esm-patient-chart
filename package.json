@@ -25,7 +25,7 @@
   ],
   "husky": {
     "hooks": {
-      "pre-commit": "pretty-quick --staged && concurrently -n eslint,test,typescript 'npm run lint' 'npm test' 'npm run typescript'"
+      "pre-commit": "pretty-quick --staged && concurrently npm:test npm:lint npm:typescript"
     }
   },
   "types": "src/openmrs-esm-patient-chart.tsx",

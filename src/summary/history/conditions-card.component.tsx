@@ -30,9 +30,15 @@ export default function ConditionsCard(props: ConditionsCardProps) {
         <SummaryCardRowContent>
           <HorizontalLabelValue
             label="Active Conditions"
-            labelStyles={{ color: "var(--omrs-color-ink-medium-contrast)" }}
+            labelStyles={{
+              color: "var(--omrs-color-ink-medium-contrast)",
+              fontFamily: "Work Sans"
+            }}
             value="Since"
-            valueStyles={{ color: "var(--omrs-color-ink-medium-contrast)" }}
+            valueStyles={{
+              color: "var(--omrs-color-ink-medium-contrast)",
+              fontFamily: "Work Sans"
+            }}
           />
         </SummaryCardRowContent>
       </SummaryCardRow>
@@ -42,10 +48,11 @@ export default function ConditionsCard(props: ConditionsCardProps) {
             <SummaryCardRow key={condition.resource.id} linkTo="/">
               <HorizontalLabelValue
                 label={condition.resource.code.text}
-                labelClassName="omrs-bold"
+                labelStyles={{ fontWeight: 500 }}
                 value={dayjs(condition.resource.onsetDateTime).format(
                   "MMM-YYYY"
                 )}
+                valueStyles={{ fontFamily: "Work Sans" }}
               />
             </SummaryCardRow>
           );
