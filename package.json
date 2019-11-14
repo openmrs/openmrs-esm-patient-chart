@@ -78,7 +78,7 @@
     "react-dom": "^16.9.0"
   },
   "author": "",
-  "license": "MIT",
+  "license": "MPL-2.0",
   "bugs": {
     "url": "https://github.com/openmrs/openmrs-esm-patient-chart/issues"
   },
