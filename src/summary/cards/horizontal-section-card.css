@@ -1,9 +1,0 @@
-.container {
-  display: grid;
-  grid-template-columns: 16rem 8rem 8rem 8rem;
-  padding: 0.625rem;
-}
-
-.dateHeader {
-  color: var(--omrs-color-ink-medium-contrast);
-}

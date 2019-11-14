@@ -75,8 +75,7 @@
     "@openmrs/esm-api": "^1.0.8",
     "@types/react-router": "^5.0.3",
     "react": "^16.9.0",
-    "react-dom": "^16.9.0",
-    "timeago.js": "^4.0.1"
+    "react-dom": "^16.9.0"
   },
   "author": "",
   "license": "MIT",
