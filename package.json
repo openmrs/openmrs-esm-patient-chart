@@ -11,7 +11,8 @@
     "prettier": "prettier",
     "typescript": "tsc",
     "prepublishOnly": "npm run build",
-    "test": "jest --config jest.config.json"
+    "test": "jest --config jest.config.json",
+    "coverage": "npm test -- --coverage"
   },
   "repository": {
     "type": "git",
@@ -25,7 +26,7 @@
   ],
   "husky": {
     "hooks": {
-      "pre-commit": "pretty-quick --staged && concurrently npm:test npm:lint npm:typescript"
+      "pre-commit": "pretty-quick --staged && concurrently npm:test npm:lint npm:typescript npm:coverage"
     }
   },
   "types": "src/openmrs-esm-patient-chart.tsx",

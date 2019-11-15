@@ -143,39 +143,6 @@ export function AllergyCardLevelTwo(props: AllergyCardLevelTwoProps) {
     );
   }
 
-  function displayNoDrugAllergy() {
-    return (
-      <SummaryCard
-        name="Allergy"
-        match={props.match}
-        styles={{ width: "100%" }}
-      >
-        <SummaryCardRow>
-          <SummaryCardRowContent>
-            <HorizontalLabelValue
-              label="ALLERGEN"
-              labelStyles={{ color: "var(--omrs-color-ink-medium-contrast)" }}
-              value="UPDATED"
-              valueStyles={{ color: "var(--omrs-color-ink-medium-contrast)" }}
-            />
-          </SummaryCardRowContent>
-        </SummaryCardRow>
-
-        <SummaryCardRow>
-          <HorizontalLabelValue
-            label="Patient does not have known allergies"
-            labelClassName="omrs-bold"
-            value="June 2019"
-            valueStyles={{
-              color: "var(--omrs-color-ink-medium-contrast)",
-              marginRight: "1.625rem"
-            }}
-          />
-        </SummaryCardRow>
-      </SummaryCard>
-    );
-  }
-
   function displayNoAllergenHistory() {
     return (
       <SummaryCard

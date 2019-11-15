@@ -6,5 +6,13 @@
     "\\.(css)$": "identity-obj-proxy",
     "@openmrs/esm-api": "<rootDir>/__mocks__/openmrs-esm-api.mock.tsx",
     "@openmrs/esm-error-handling": "<rootDir>/__mocks__/openmrs-esm-error-handling.mock.tsx"
+  },
+  "coverageThreshold": {
+    "global": {
+      "statements": 95,
+      "branches": 84,
+      "functions": 100,
+      "lines": 95
+    }
   }
 }

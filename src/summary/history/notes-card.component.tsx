@@ -79,15 +79,6 @@ function getAuthorName(extension: any): string {
   const author = extension.find(ext => ext.url === "changedBy");
   return author ? author.valueString.toUpperCase() : "";
 }
-function convertDate(date: string): string {
-  const unprocessedDate = dayjs(date);
-  if (unprocessedDate.format("DD-MMM-YYYY") === dayjs().format("DD-MMM-YYYY")) {
-    return "Today   ".concat(unprocessedDate.format("h:mm a"));
-  } else if (unprocessedDate.format("YYYY") === dayjs().format("YYYY")) {
-    return unprocessedDate.format("DD-MMM h:mm a");
-  }
-  return unprocessedDate.format("DD-MMM-YYYY h:mm a");
-}
 
 type NotesCardProps = {
   match: match;

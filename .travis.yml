@@ -4,6 +4,7 @@ node_js:
 script:
   - npm run lint
   - npm test
+  - npm coverage
   - npm run typescript
   - npm run build
   - echo "Folder name in Digital Ocean Spaces - $TRAVIS_COMMIT"
