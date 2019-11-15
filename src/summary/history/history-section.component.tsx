@@ -20,11 +20,18 @@ export default function HistorySection(props: HistorySectionProps) {
   return (
     <>
       {currentPatient && (
-        <SummarySectionCards match={props.match}>
-          <ConditionsCard match={props.match} currentPatient={currentPatient} />
-          <AllergyCard match={props.match} currentPatient={currentPatient} />
-          <NotesCard match={props.match} currentPatient={currentPatient} />
-        </SummarySectionCards>
+        <div>
+          <SummarySectionCards match={props.match}>
+            <ConditionsCard
+              match={props.match}
+              currentPatient={currentPatient}
+            />
+            <AllergyCard match={props.match} currentPatient={currentPatient} />
+          </SummarySectionCards>
+          <SummarySectionCards match={props.match}>
+            <NotesCard match={props.match} currentPatient={currentPatient} />
+          </SummarySectionCards>
+        </div>
       )}
     </>
   );

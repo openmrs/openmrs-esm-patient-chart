@@ -1,13 +1,41 @@
-.moreNotes {
-  display: flex;
-  align-items: center;
-  border: none;
-  padding: 0.625rem 1.625rem 0.625rem 1rem;
-  background-color: var(--omrs-color-bg-medium-contrast);
-  color: var(--omrs-color-ink-medium-contrast);
-  cursor: pointer;
+.table {
+  width: 100%;
 }
 
-.moreNotes p {
-  margin: 0;
+.tableRow {
+  border-bottom: 1px solid var(--omrs-color-bg-low-contrast);
+}
+
+.tableHeader,
+.tableData,
+.tableDate {
+  padding: 0.625rem;
+}
+
+.tableHeader {
+  color: var(--omrs-color-ink-medium-contrast);
+  font-size: 0.9375rem;
+  text-transform: capitalize;
+  font-weight: normal;
+  letter-spacing: 0.0275rem;
+  font-family: "Work Sans";
+}
+
+.tableData {
+  font-size: 1.0625rem;
+  text-align: center;
+}
+
+:global(.omrs-breakpoint-lt-tablet) .tableDates {
+  width: 70%;
+}
+
+table.table .tableDate {
+  font-family: "Work Sans";
+  font-weight: 500;
+}
+
+.location {
+  color: var(--omrs-color-ink-medium-contrast);
+  font-family: "Work Sans";
 }
