@@ -1,0 +1,50 @@
+.vitalsTable {
+  width: 100%;
+}
+.vitalsTable thead td {
+  padding: 1rem 0.25rem 1rem 1rem;
+}
+
+.vitalsTable thead {
+  border-bottom: 1px solid var(--omrs-color-bg-low-contrast);
+}
+
+.vitalsTable thead td span {
+  font-weight: normal;
+  color: var(--omrs-color-ink-medium-contrast);
+}
+
+.vitalsTable tbody td {
+  padding: 0.5rem 0.25rem 0.5rem 1rem;
+}
+
+.vitalsTable tbody td span {
+  color: var(--omrs-color-ink-medium-contrast);
+}
+
+.vitalsTable tbody tr {
+  border-bottom: 1px solid var(--omrs-color-bg-low-contrast);
+}
+
+.vitalsFooter {
+  display: flex;
+  align-items: center;
+  padding: 1rem 0.25rem 1rem 1rem;
+  text-decoration: none;
+  color: var(--omrs-color-ink-medium-contrast);
+}
+
+.vitalsFooter svg {
+  margin-right: 0.5rem;
+}
+
+.centerItems {
+  display: flex;
+  align-items: center;
+  text-align: center;
+}
+
+.alignRight {
+  justify-content: space-between;
+  margin-right: 1rem;
+}
