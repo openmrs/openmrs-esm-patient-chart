@@ -4,7 +4,7 @@ import { match } from "react-router";
 
 export default function SummaryCard(props: SummaryCardProps) {
   return (
-    <div className={`omrs-card ${styles.card}`} style={props.styles}>
+    <div style={props.styles} className={`omrs-card ${styles.card}`}>
       <div className={styles.header}>
         <div className={styles.title}>
           <h2 className={`omrs-margin-0`}>{props.name}</h2>
@@ -19,13 +19,11 @@ export default function SummaryCard(props: SummaryCardProps) {
   );
 }
 
-SummaryCard.defaultProps = {
-  styles: {}
-};
-
 type SummaryCardProps = {
   name: string;
   match: match;
   children: React.ReactNode;
   styles?: React.CSSProperties;
 };
+
+type Styles = {};

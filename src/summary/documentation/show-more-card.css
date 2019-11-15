@@ -1,0 +1,25 @@
+.moreBtn {
+  margin: 0.625rem;
+  color: var(--omrs-color-ink-medium-contrast);
+  cursor: pointer;
+  background-color: transparent;
+  border: none;
+  font-weight: 500;
+  font-size: 17px;
+}
+.icon {
+  top: 30px;
+}
+.conditionMore {
+  display: flex;
+  align-items: center;
+  border: none;
+  padding: 0.625rem 1.625rem 0.625rem 1rem;
+  background-color: var(--omrs-color-bg-medium-contrast);
+  color: var(--omrs-color-ink-medium-contrast);
+  cursor: pointer;
+}
+
+.conditionMore p {
+  margin: 0;
+}
