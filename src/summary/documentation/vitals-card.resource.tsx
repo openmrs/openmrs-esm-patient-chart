@@ -1,44 +1,54 @@
 import { openmrsObservableFetch } from "@openmrs/esm-api";
-import { forkJoin } from "rxjs";
+import { Observable } from "rxjs";
 import { map, take } from "rxjs/operators";
 
-const SYSTOLIC_BLOOD_PRESSURE_CONCEPT = "5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-const DIASTOLIC_BLOOD_PRESSURE_CONCEPT = "5086AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-const PULSE_CONCEPT = "5087AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-const TEMPERATURE_CONCEPT = "5088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
-const OXYGENATION_CONCEPT = "5092AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+const SYSTOLIC_BLOOD_PRESSURE_CONCEPT: string =
+  "5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+const DIASTOLIC_BLOOD_PRESSURE_CONCEPT: string =
+  "5086AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+const PULSE_CONCEPT: string = "5087AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+const TEMPERATURE_CONCEPT: string = "5088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+const OXYGENATION_CONCEPT: string = "5092AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 
-export function performPatientsVitalsSearch(patientId: string) {
-  return forkJoin({
-    systoliBloodPressure: getVitals(patientId, SYSTOLIC_BLOOD_PRESSURE_CONCEPT),
-    diastolicBloodPressure: getVitals(
-      patientId,
-      DIASTOLIC_BLOOD_PRESSURE_CONCEPT
-    ),
-    pulse: getVitals(patientId, PULSE_CONCEPT),
-    temperature: getVitals(patientId, TEMPERATURE_CONCEPT),
-    oxygenation: getVitals(patientId, OXYGENATION_CONCEPT)
-  }).pipe(
+type PatientVitals = {
+  id: Number;
+  date: Date;
+  systolic: String;
+  diastolic: String;
+  pulse: String;
+  temperature: String;
+  oxygenation: String;
+};
+
+export function performPatientsVitalsSearch(
+  patientID: string
+): Observable<PatientVitals[]> {
+  return openmrsObservableFetch(
+    `/ws/fhir/Observation?subject:Patient=${patientID}&code=${SYSTOLIC_BLOOD_PRESSURE_CONCEPT},${DIASTOLIC_BLOOD_PRESSURE_CONCEPT},${PULSE_CONCEPT},${TEMPERATURE_CONCEPT},${OXYGENATION_CONCEPT}`
+  ).pipe(
+    map(({ data }) => data["entry"]),
+    map(entries => entries.map(entry => entry.resource)),
     map(data =>
       formatVitals(
-        data.systoliBloodPressure,
-        data.diastolicBloodPressure,
-        data.pulse,
-        data.temperature,
-        data.oxygenation
+        getVitalsByConcept(data, SYSTOLIC_BLOOD_PRESSURE_CONCEPT),
+        getVitalsByConcept(data, DIASTOLIC_BLOOD_PRESSURE_CONCEPT),
+        getVitalsByConcept(data, PULSE_CONCEPT),
+        getVitalsByConcept(data, TEMPERATURE_CONCEPT),
+        getVitalsByConcept(data, OXYGENATION_CONCEPT)
       )
     ),
     take(3)
   );
 }
 
-function getVitals(patientId: string, concept) {
-  return openmrsObservableFetch(
-    `/ws/fhir/Observation?subject:Patient=${patientId}&code=${concept}`
-  ).pipe(
-    map(({ data }) => data["entry"]),
-    map(entries => entries.map(entry => entry.resource))
+function getVitalsByConcept(vitals: any[], concept: string) {
+  const vitalArray: any[] = [];
+  vitals.map(vital =>
+    vital.code.coding.map(
+      coding => coding.code === concept && vitalArray.push(vital)
+    )
   );
+  return vitalArray;
 }
 
 function formatVitals(
@@ -47,7 +57,8 @@ function formatVitals(
   pulseData,
   temperatureData,
   oxygenationData
-) {
+): PatientVitals[] {
+  let patientVitals: PatientVitals;
   const systolicDates = getDatesIssued(systolicBloodPressure);
   const diastolicDates = getDatesIssued(systolicBloodPressure);
 
@@ -70,15 +81,15 @@ function formatVitals(
       oxygenation => oxygenation.issued === date
     );
 
-    return {
+    return (patientVitals = {
       id: new Date(date).getTime(),
-      date: systolic ? systolic.issued : systolic,
-      systolic: systolic ? systolic.valueQuantity.value : systolic,
-      diastolic: diastolic ? diastolic.valueQuantity.value : diastolic,
-      pulse: pulse ? pulse.valueQuantity.value : pulse,
-      temperature: temperature ? temperature.valueQuantity.value : temperature,
-      oxygenation: oxygenation ? oxygenation.valueQuantity.value : oxygenation
-    };
+      date: systolic && systolic.issued,
+      systolic: systolic && systolic.valueQuantity.value,
+      diastolic: diastolic && diastolic.valueQuantity.value,
+      pulse: pulse && pulse.valueQuantity.value,
+      temperature: temperature && temperature.valueQuantity.value,
+      oxygenation: oxygenation && oxygenation.valueQuantity.value
+    });
   });
 }
 

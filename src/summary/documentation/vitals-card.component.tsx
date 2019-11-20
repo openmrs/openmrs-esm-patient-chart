@@ -4,6 +4,7 @@ import SummaryCard from "../cards/summary-card.component";
 import { performPatientsVitalsSearch } from "./vitals-card.resource";
 import styles from "./vitals-card.css";
 import { formatDate } from "./dimension-helpers";
+import { createErrorHandler } from "@openmrs/esm-error-handling";
 
 export default function VitalsCard(props: VitalsCardProps) {
   const [patientVitals, setPatientVitals] = React.useState(null);
@@ -11,10 +12,10 @@ export default function VitalsCard(props: VitalsCardProps) {
   React.useEffect(() => {
     const subscription = performPatientsVitalsSearch(
       props.patient.id
-    ).subscribe(vitals => setPatientVitals(vitals));
+    ).subscribe(vitals => setPatientVitals(vitals), createErrorHandler());
 
     return () => subscription.unsubscribe();
-  }, [props.patient.identifier[0].id]);
+  }, [props.patient.id]);
 
   return (
     <SummaryCard
@@ -29,7 +30,7 @@ export default function VitalsCard(props: VitalsCardProps) {
             <td>BP</td>
             <td>Rate</td>
             <td>Oxygen</td>
-            <td>Temp</td>
+            <td colSpan={2}>Temp</td>
           </tr>
         </thead>
         <tbody>
@@ -49,13 +50,11 @@ export default function VitalsCard(props: VitalsCardProps) {
                     <td>
                       {vitals.oxygenation} {index === 0 && <span>%</span>}
                     </td>
-                    <td
-                      className={`${styles.centerItems} ${styles.alignRight}`}
-                    >
-                      <div>
-                        {vitals.temperature}
-                        {index === 0 && <span> &#8451;</span>}
-                      </div>
+                    <td>
+                      {vitals.temperature}
+                      {index === 0 && <span> &#8451;</span>}
+                    </td>
+                    <td>
                       <svg className="omrs-icon" fill="rgba(0, 0, 0, 0.54)">
                         <use xlinkHref="#omrs-icon-chevron-right" />
                       </svg>

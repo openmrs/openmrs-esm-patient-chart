@@ -37,14 +37,3 @@
 .vitalsFooter svg {
   margin-right: 0.5rem;
 }
-
-.centerItems {
-  display: flex;
-  align-items: center;
-  text-align: center;
-}
-
-.alignRight {
-  justify-content: space-between;
-  margin-right: 1rem;
-}

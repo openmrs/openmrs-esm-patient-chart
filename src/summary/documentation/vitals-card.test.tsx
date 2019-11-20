@@ -4,32 +4,14 @@ import { cleanup, render, wait } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import VitalsCard from "./vitals-card.component";
 import { of } from "rxjs/internal/observable/of";
-import * as openmrsApi from "./vitals-card.resource";
+import * as openmrsApi from "@openmrs/esm-api";
+import { mockVitalsResponse } from "../../../__mocks__/vitals.mock";
 
 describe("<VitalsCard/>", () => {
   let patient: fhir.Patient, match;
-  const mockVitalsResponse = [
-    {
-      id: 1463379216000,
-      date: "2016-05-16T06:13:36.000+00:00",
-      systolic: 161,
-      diastolic: 72,
-      pulse: 22,
-      temperature: 37,
-      oxygenation: 30
-    },
-    {
-      id: 144048423500012,
-      date: "2015-08-25T06:30:35.000+00:00",
-      systolic: 156,
-      diastolic: 64,
-      pulse: 173,
-      temperature: 37,
-      oxygenation: 41
-    }
-  ];
+
   afterEach(() => {
-    cleanup;
+    cleanup();
   });
 
   beforeEach(() => {
@@ -43,17 +25,11 @@ describe("<VitalsCard/>", () => {
         <VitalsCard match={match} patient={patient} />
       </BrowserRouter>
     );
-    expect(wrapper).toBeDefined();
   });
 
   it("should display the patients vitals correctly", async () => {
-    const spy = jest
-      .spyOn(openmrsApi, "performPatientsVitalsSearch")
-      .mockImplementation(
-        (openmrsApi["openmrsObservableFetch"] = jest
-          .fn()
-          .mockReturnValue(of(mockVitalsResponse)))
-      );
+    const spy = jest.spyOn(openmrsApi, "openmrsObservableFetch");
+    spy.mockReturnValue(of(mockVitalsResponse));
 
     const wrapper = render(
       <BrowserRouter>
@@ -74,17 +50,14 @@ describe("<VitalsCard/>", () => {
       expect(secondTableRow.children[2].textContent).toBe("173 ");
       expect(secondTableRow.children[3].textContent).toBe("41 ");
       expect(secondTableRow.children[4].textContent).toBe("37");
+
+      spy.mockRestore();
     });
   });
 
   it("should not display the patients vitals when vitals are absent", async () => {
-    const spy = jest
-      .spyOn(openmrsApi, "performPatientsVitalsSearch")
-      .mockImplementation(
-        (openmrsApi["openmrsObservableFetch"] = jest
-          .fn()
-          .mockReturnValue(of([])))
-      );
+    const spy = jest.spyOn(openmrsApi, "openmrsObservableFetch");
+    spy.mockReturnValue(of());
 
     const wrapper = render(
       <BrowserRouter>
@@ -94,6 +67,8 @@ describe("<VitalsCard/>", () => {
     await wait(() => {
       const tableBody = wrapper.container.querySelector("tbody");
       expect(tableBody.children.length).toBe(0);
+
+      spy.mockRestore();
     });
   });
 });
