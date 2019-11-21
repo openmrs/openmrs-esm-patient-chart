@@ -39,4 +39,7 @@ function Root(props) {
   );
 }
 
-export default openmrsRootDecorator({ featureName: "patient-chart" })(Root);
+export default openmrsRootDecorator({
+  featureName: "patient-chart",
+  moduleName: "@openmrs/esm-patient-chart"
+})(Root);
