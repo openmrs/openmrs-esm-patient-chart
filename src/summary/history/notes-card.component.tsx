@@ -1,28 +1,36 @@
 import React from "react";
 import { match } from "react-router";
-import dayjs from "dayjs";
 import { createErrorHandler } from "@openmrs/esm-error-handling";
 import SummaryCard from "../cards/summary-card.component";
 import { getEncounters } from "./encounter.resource";
 import styles from "./notes-card-style.css";
 import SummaryCardFooter from "../cards/summary-card-footer.component";
 import { formatDate } from "../documentation/dimension-helpers";
+import { useCurrentPatient } from "@openmrs/esm-api";
 
 export default function NotesCard(props: NotesCardProps) {
   const [patientNotes, setPatientNotes] = React.useState(null);
+  const [
+    isLoadingPatient,
+    patient,
+    patientUuid,
+    patientErr
+  ] = useCurrentPatient();
 
   React.useEffect(() => {
-    const abortController = new AbortController();
+    if (patient) {
+      const abortController = new AbortController();
 
-    getEncounters(props.currentPatient.identifier[0].value, abortController)
-      .then(({ data }) => {
-        if (data.total > 0) {
-          setPatientNotes(getNotes(data.entry));
-        }
-      })
-      .catch(createErrorHandler());
-    return () => abortController.abort();
-  }, [props.currentPatient.identifier[0].value]);
+      getEncounters(patient.identifier[0].value, abortController)
+        .then(({ data }) => {
+          if (data.total > 0) {
+            setPatientNotes(getNotes(data.entry));
+          }
+        })
+        .catch(createErrorHandler());
+      return () => abortController.abort();
+    }
+  }, [patient]);
 
   return (
     <SummaryCard name="Notes" match={props.match} styles={{ width: "45.5rem" }}>
@@ -82,5 +90,4 @@ function getAuthorName(extension: any): string {
 
 type NotesCardProps = {
   match: match;
-  currentPatient: fhir.Patient;
 };

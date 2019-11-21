@@ -4,15 +4,17 @@ import { BrowserRouter } from "react-router-dom";
 import { act } from "react-dom/test-utils";
 import { performPatientConditionSearch } from "./conditions.resource";
 import ConditionsCard from "./conditions-card.component";
+import { useCurrentPatient } from "@openmrs/esm-api";
 
+const mockUseCurrentPatient = useCurrentPatient as jest.MockedFunction<any>;
 const mockPerformPatientConditionsSearch = performPatientConditionSearch as jest.Mock;
 
+jest.mock("@openmrs/esm-api", () => ({
+  useCurrentPatient: jest.fn()
+}));
+
 jest.mock("./conditions.resource", () => ({
-  performPatientConditionSearch: jest.fn().mockResolvedValue({
-    data: {
-      results: []
-    }
-  })
+  performPatientConditionSearch: jest.fn()
 }));
 
 const match = { params: {}, isExact: false, path: "/", url: "/" };
@@ -173,33 +175,35 @@ describe("<ConditionsCard />", () => {
     cleanup;
   });
 
+  beforeEach(mockUseCurrentPatient.mockReset);
+
   it("should render without dying", async () => {
-    act(() => {
-      mockPerformPatientConditionsSearch.mockResolvedValue(
-        mockPatientConditions
-      );
-      wrapper = render(
-        <BrowserRouter>
-          <ConditionsCard match={match} currentPatient={patient} />
-        </BrowserRouter>
-      );
-    });
+    mockUseCurrentPatient.mockReturnValue([false, patient, patient.id, null]);
+
+    mockPerformPatientConditionsSearch.mockResolvedValue(mockPatientConditions);
+
+    wrapper = render(
+      <BrowserRouter>
+        <ConditionsCard match={match} />
+      </BrowserRouter>
+    );
     await wait(() => {
       expect(wrapper).toBeTruthy();
     });
   });
 
   it("should display the patient conditions correctly", async () => {
-    act(() => {
-      mockPerformPatientConditionsSearch.mockResolvedValue(
-        mockPatientConditions
-      );
-      wrapper = render(
-        <BrowserRouter>
-          <ConditionsCard match={match} currentPatient={patient} />
-        </BrowserRouter>
-      );
-    });
+    mockUseCurrentPatient.mockReturnValue([false, patient, patient.id, null]);
+    mockPerformPatientConditionsSearch.mockReturnValue(
+      Promise.resolve(mockPatientConditions)
+    );
+
+    wrapper = render(
+      <BrowserRouter>
+        <ConditionsCard match={match} />
+      </BrowserRouter>
+    );
+
     await wait(() => {
       expect(wrapper.getByText("Hypothyroidism")).toBeTruthy();
       expect(wrapper.getByText("Hypertension")).toBeTruthy();

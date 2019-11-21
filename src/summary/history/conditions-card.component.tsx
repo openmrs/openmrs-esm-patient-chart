@@ -8,21 +8,30 @@ import { match } from "react-router";
 import { performPatientConditionSearch } from "./conditions.resource";
 import { createErrorHandler } from "@openmrs/esm-error-handling";
 import HorizontalLabelValue from "../cards/horizontal-label-value.component";
+import { useCurrentPatient } from "@openmrs/esm-api";
 
 export default function ConditionsCard(props: ConditionsCardProps) {
   const [patientConditions, setPatientConditions] = React.useState(null);
+  const [
+    isLoadingPatient,
+    patient,
+    patientUuid,
+    patientErr
+  ] = useCurrentPatient();
 
   React.useEffect(() => {
-    const abortController = new AbortController();
-    performPatientConditionSearch(
-      props.currentPatient.identifier[0].value,
-      abortController
-    )
-      .then(condition => setPatientConditions(condition))
-      .catch(createErrorHandler());
+    if (patient) {
+      const abortController = new AbortController();
+      performPatientConditionSearch(
+        patient.identifier[0].value,
+        abortController
+      )
+        .then(condition => setPatientConditions(condition))
+        .catch(createErrorHandler());
 
-    return () => abortController.abort();
-  });
+      return () => abortController.abort();
+    }
+  }, [patient]);
 
   return (
     <SummaryCard name="Conditions" match={props.match}>
@@ -72,5 +81,4 @@ export default function ConditionsCard(props: ConditionsCardProps) {
 
 type ConditionsCardProps = {
   match: match;
-  currentPatient: any;
 };

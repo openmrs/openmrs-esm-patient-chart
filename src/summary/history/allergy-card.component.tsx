@@ -2,27 +2,32 @@ import React from "react";
 import { match } from "react-router";
 import SummaryCard from "../cards/summary-card.component";
 import SummaryCardRow from "../cards/summary-card-row.component";
-import SummaryCardRowContent from "../cards/summary-card-row-content.component";
 import { performPatientAllergySearch } from "./allergy-intolerance.resource";
 import style from "./allergy-card-style.css";
 import HorizontalLabelValue from "../cards/horizontal-label-value.component";
 import { createErrorHandler } from "@openmrs/esm-error-handling";
+import { useCurrentPatient } from "@openmrs/esm-api";
 
 export default function AllergyCard(props: AllergyCardProps) {
   const [patientAllergy, setPatientAllergy] = React.useState(null);
+  const [
+    isLoadingPatient,
+    patient,
+    patientUuid,
+    patientErr
+  ] = useCurrentPatient();
 
   React.useEffect(() => {
-    const abortController = new AbortController();
+    if (patient) {
+      const abortController = new AbortController();
 
-    performPatientAllergySearch(
-      props.currentPatient.identifier[0].value,
-      abortController
-    )
-      .then(allergy => setPatientAllergy(allergy.data))
-      .catch(createErrorHandler());
+      performPatientAllergySearch(patient.identifier[0].value, abortController)
+        .then(allergy => setPatientAllergy(allergy.data))
+        .catch(createErrorHandler());
 
-    return () => abortController.abort();
-  }, [props.currentPatient.identifier[0].value]);
+      return () => abortController.abort();
+    }
+  }, [patient]);
 
   return (
     <SummaryCard name="Allergy" match={props.match}>
@@ -32,7 +37,7 @@ export default function AllergyCard(props: AllergyCardProps) {
           return (
             <SummaryCardRow
               key={allergy.resource.id}
-              linkTo={`/patient/${props.currentPatient.id}/chart/allergy`}
+              linkTo={`/patient/${patientUuid}/chart/allergy`}
             >
               <HorizontalLabelValue
                 label={allergy.resource.code.text}
@@ -57,5 +62,4 @@ export default function AllergyCard(props: AllergyCardProps) {
 
 type AllergyCardProps = {
   match: match;
-  currentPatient: any;
 };

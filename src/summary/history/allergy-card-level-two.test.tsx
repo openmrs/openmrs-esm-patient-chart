@@ -4,16 +4,17 @@ import { render, cleanup, wait } from "@testing-library/react";
 import { act } from "react-dom/test-utils";
 import { BrowserRouter, match } from "react-router-dom";
 import { AllergyCardLevelTwo } from "./allergy-card-level-two.component";
-import { async } from "rxjs/internal/scheduler/async";
+import { useCurrentPatient } from "../../../__mocks__/openmrs-esm-api.mock";
 
 const mockPerformPatientAllergySearch = performPatientAllergySearch as jest.Mock;
+const mockUseCurrentPatient = useCurrentPatient as jest.Mock;
 
 jest.mock("./allergy-intolerance.resource", () => ({
-  performPatientAllergySearch: jest.fn().mockResolvedValue({
-    data: {
-      results: []
-    }
-  })
+  performPatientAllergySearch: jest.fn()
+}));
+
+jest.mock("@openmrs/esm-api", () => ({
+  useCurrentPatient: jest.fn()
 }));
 
 const mockPatientAllergyResult = {
@@ -281,20 +282,19 @@ describe("AlleryCardLevelTwo />", () => {
   let wrapper: any;
 
   afterEach(cleanup);
-
-  beforeEach(() => {});
+  beforeEach(mockPerformPatientAllergySearch.mockReset);
+  beforeEach(mockUseCurrentPatient.mockReset);
 
   it("render without dying", async () => {
-    act(() => {
-      mockPerformPatientAllergySearch.mockResolvedValue(
-        mockPatientAllergyResult
-      );
-      wrapper = render(
-        <BrowserRouter>
-          <AllergyCardLevelTwo match={match} currentPatient={patient} />
-        </BrowserRouter>
-      );
-    });
+    mockUseCurrentPatient.mockReturnValue([false, patient, patient.id, null]);
+    mockPerformPatientAllergySearch.mockReturnValue(
+      Promise.resolve(mockPatientAllergyResult)
+    );
+    wrapper = render(
+      <BrowserRouter>
+        <AllergyCardLevelTwo match={match} />
+      </BrowserRouter>
+    );
 
     await wait(() => {
       expect(wrapper).toBeDefined();
@@ -302,16 +302,15 @@ describe("AlleryCardLevelTwo />", () => {
   });
 
   it("should display the patients allergy correctly", async () => {
-    act(() => {
-      mockPerformPatientAllergySearch.mockResolvedValue(
-        mockPatientAllergyResult
-      );
-      wrapper = render(
-        <BrowserRouter>
-          <AllergyCardLevelTwo match={match} currentPatient={patient} />
-        </BrowserRouter>
-      );
-    });
+    mockUseCurrentPatient.mockReturnValue([false, patient, patient.id, null]);
+    mockPerformPatientAllergySearch.mockReturnValue(
+      Promise.resolve(mockPatientAllergyResult)
+    );
+    wrapper = render(
+      <BrowserRouter>
+        <AllergyCardLevelTwo match={match} />
+      </BrowserRouter>
+    );
 
     await wait(() => {
       expect(wrapper.getByText("ACE inhibitors").textContent).toBeTruthy();
@@ -320,14 +319,13 @@ describe("AlleryCardLevelTwo />", () => {
   });
 
   it("should not display the patients allergy when no allergy is returned", async () => {
-    act(() => {
-      mockPerformPatientAllergySearch.mockResolvedValue({});
-      wrapper = render(
-        <BrowserRouter>
-          <AllergyCardLevelTwo match={match} currentPatient={patient} />
-        </BrowserRouter>
-      );
-    });
+    mockUseCurrentPatient.mockReturnValue([false, patient, patient.id, null]);
+    mockPerformPatientAllergySearch.mockReturnValue(Promise.resolve({}));
+    wrapper = render(
+      <BrowserRouter>
+        <AllergyCardLevelTwo match={match} />
+      </BrowserRouter>
+    );
 
     await wait(() => {
       expect(
