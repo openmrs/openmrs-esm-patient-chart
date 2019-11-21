@@ -1,0 +1,75 @@
+.vitalsTable {
+  width: 100%;
+}
+.vitalsTable thead td {
+  padding: 1rem 0.25rem 1rem 1rem;
+}
+
+.vitalsTable thead {
+  border-bottom: 1px solid var(--omrs-color-bg-low-contrast);
+}
+
+.vitalsTable thead td span {
+  font-weight: normal;
+  color: var(--omrs-color-ink-medium-contrast);
+}
+
+.vitalsTable tbody td {
+  padding: 0.5rem 0.25rem 0.5rem 1rem;
+}
+
+.vitalsTable tbody td span {
+  color: var(--omrs-color-ink-medium-contrast);
+}
+
+.vitalsTable tbody tr {
+  border-bottom: 1px solid var(--omrs-color-bg-low-contrast);
+}
+
+.vitalsFooter {
+  display: flex;
+  align-items: center;
+  padding: 1rem 0.25rem 1rem 1rem;
+  text-decoration: none;
+  color: var(--omrs-color-ink-medium-contrast);
+}
+.vitalsFooter p {
+  margin: 0;
+  text-align: center;
+}
+.vitalsFooter svg {
+  margin-right: 0.5rem;
+}
+
+:global(.omrs-breakpoint-gt-phone) .vitalsSummary {
+  display: flex;
+  justify-content: center;
+  padding-top: 3.25rem;
+}
+
+:global(.omrs-breakpoint-lt-tablet) .vitalsSummary {
+  padding: 3.25rem 0.5rem 0 0.5rem;
+}
+
+.pagination {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 1rem 0.25rem 1rem 1rem;
+  background-color: var(--omrs-color-bg-medium-contrast);
+  color: var(--omrs-color-ink-medium-contrast);
+}
+
+.navButton {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.vitalsAbsent {
+  margin: 1rem 0.25rem 1rem 1rem;
+}
+
+.vitalsAbsent a {
+  color: var(--omrs-color-interaction-plus-one);
+}
