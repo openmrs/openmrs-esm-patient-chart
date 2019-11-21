@@ -2,16 +2,25 @@ import React from "react";
 import { BrowserRouter } from "react-router-dom";
 import { render, cleanup, wait } from "@testing-library/react";
 import { of } from "rxjs";
-import * as openmrsApi from "@openmrs/esm-api";
 import DimensionsCardLevelTwo from "./dimensions-card-level-two.component";
 import { calculateBMI, formatDate } from "./dimension-helpers";
 import { mockPatient } from "../../../__mocks__/patient.mock";
 import { mockDimensionResponse } from "../../../__mocks__/dimensions.mock";
+import { useCurrentPatient, openmrsObservableFetch } from "@openmrs/esm-api";
+
+const mockUseCurrentPatient = useCurrentPatient as jest.Mock;
+const mockOpenmrsObservableFetch = openmrsObservableFetch as jest.Mock;
+
+jest.mock("@openmrs/esm-api", () => ({
+  useCurrentPatient: jest.fn(),
+  openmrsObservableFetch: jest.fn()
+}));
 
 describe("<DimensionsCardLevelTwo/>", () => {
   let patient: fhir.Patient, match;
 
   afterEach(cleanup);
+  beforeEach(mockUseCurrentPatient.mockReset);
 
   beforeEach(() => {
     patient = mockPatient;
@@ -19,25 +28,21 @@ describe("<DimensionsCardLevelTwo/>", () => {
   });
 
   it("renders successfully", () => {
+    mockUseCurrentPatient.mockReturnValue([false, patient, patient.id, null]);
+    mockOpenmrsObservableFetch.mockReturnValue(of(mockDimensionResponse));
     render(
       <BrowserRouter>
-        <DimensionsCardLevelTwo
-          currentPatient={patient}
-          match={match}
-        ></DimensionsCardLevelTwo>
+        <DimensionsCardLevelTwo match={match}></DimensionsCardLevelTwo>
       </BrowserRouter>
     );
   });
 
   it("renders dimensions correctly", async () => {
-    const spy = jest.spyOn(openmrsApi, "openmrsObservableFetch");
-    spy.mockReturnValue(of(mockDimensionResponse));
+    mockUseCurrentPatient.mockReturnValue([false, patient, patient.id, null]);
+    mockOpenmrsObservableFetch.mockReturnValue(of(mockDimensionResponse));
     const wrapper = render(
       <BrowserRouter>
-        <DimensionsCardLevelTwo
-          currentPatient={patient}
-          match={match}
-        ></DimensionsCardLevelTwo>
+        <DimensionsCardLevelTwo match={match}></DimensionsCardLevelTwo>
       </BrowserRouter>
     );
     await wait(() => {

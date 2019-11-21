@@ -5,17 +5,25 @@ import { performPatientsVitalsSearch } from "./vitals-card.resource";
 import styles from "./vitals-card.css";
 import { formatDate } from "./dimension-helpers";
 import { createErrorHandler } from "@openmrs/esm-error-handling";
+import { useCurrentPatient } from "@openmrs/esm-api";
 
 export default function VitalsCard(props: VitalsCardProps) {
   const [patientVitals, setPatientVitals] = React.useState(null);
+  const [
+    isLoadingPatient,
+    patient,
+    patientUuid,
+    patientErr
+  ] = useCurrentPatient();
 
   React.useEffect(() => {
-    const subscription = performPatientsVitalsSearch(
-      props.patient.id
-    ).subscribe(vitals => setPatientVitals(vitals), createErrorHandler());
+    const subscription = performPatientsVitalsSearch(patientUuid).subscribe(
+      vitals => setPatientVitals(vitals),
+      createErrorHandler()
+    );
 
     return () => subscription.unsubscribe();
-  }, [props.patient.id]);
+  }, [patientUuid]);
 
   return (
     <SummaryCard
@@ -77,5 +85,4 @@ export default function VitalsCard(props: VitalsCardProps) {
 
 type VitalsCardProps = {
   match: match;
-  patient: fhir.Patient;
 };

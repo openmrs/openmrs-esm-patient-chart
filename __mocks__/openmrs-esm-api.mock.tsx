@@ -1,4 +1,5 @@
 import { never, of } from "rxjs";
+import { mockPatient } from "./patient.mock";
 
 export function openmrsFetch() {
   return new Promise(() => {});
@@ -13,4 +14,8 @@ export function UserHasAccessReact(props: any) {
 
 export function getCurrentPatient() {
   return jest.fn().mockReturnValue(never());
+}
+
+export function useCurrentPatient() {
+  return [false, mockPatient, mockPatient.id, null];
 }

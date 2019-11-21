@@ -6,17 +6,26 @@ import SummaryCardRow from "../cards/summary-card-row.component";
 import SummaryCardRowContent from "../cards/summary-card-row-content.component";
 import ShowMoreCard from "./show-more-card.component";
 import styles from "./dimensions-card-level-one.css";
+import { useCurrentPatient } from "@openmrs/esm-api";
+
 export default function DimensionsCard(props: DimensionsCardProps) {
   const [dimensions, setDimensions] = React.useState([]);
   const [showMore, setShowMore] = React.useState(false);
+  const [
+    isLoadingPatient,
+    patient,
+    patientUuid,
+    patientErr
+  ] = useCurrentPatient();
 
   React.useEffect(() => {
-    const sub = getDimensions(props.currentPatient.id).subscribe(dimensions => {
+    const sub = getDimensions(patientUuid).subscribe(dimensions => {
       setDimensions(dimensions);
     });
 
     return () => sub.unsubscribe();
-  }, []);
+  }, [patientUuid]);
+
   return (
     <SummaryCard
       name="Height & Weight"
@@ -84,5 +93,4 @@ export default function DimensionsCard(props: DimensionsCardProps) {
 
 type DimensionsCardProps = {
   match: match;
-  currentPatient: fhir.Patient;
 };

@@ -3,27 +3,30 @@ import { match } from "react-router";
 import { performPatientAllergySearch } from "./allergy-intolerance.resource";
 import { createErrorHandler } from "@openmrs/esm-error-handling";
 import styles from "./allergy-card-level-two.css";
-import HorizontalLabelValue from "../cards/horizontal-label-value.component";
-import SummaryCardRow from "../cards/summary-card-row.component";
-import SummaryCardRowContent from "../cards/summary-card-row-content.component";
 import SummaryCard from "../cards/summary-card.component";
 import dayjs from "dayjs";
+import { useCurrentPatient } from "@openmrs/esm-api";
 
 export function AllergyCardLevelTwo(props: AllergyCardLevelTwoProps) {
   const [patientAllergy, setPatientAllergy] = React.useState(null);
+  const [
+    isLoadingPatient,
+    patient,
+    patientUuid,
+    patientErr
+  ] = useCurrentPatient();
 
   React.useEffect(() => {
-    const abortController = new AbortController();
+    if (!isLoadingPatient && patient) {
+      const abortController = new AbortController();
 
-    performPatientAllergySearch(
-      props.currentPatient.identifier[0].value,
-      abortController
-    )
-      .then(allergy => setPatientAllergy(allergy.data))
-      .catch(createErrorHandler());
+      performPatientAllergySearch(patient.identifier[0].value, abortController)
+        .then(allergy => setPatientAllergy(allergy.data))
+        .catch(createErrorHandler());
 
-    return () => abortController.abort();
-  }, [props.currentPatient.identifier[0].value]);
+      return () => abortController.abort();
+    }
+  }, [patient.identifier[0].value]);
 
   function displayAllergy() {
     return (
@@ -170,6 +173,5 @@ export function AllergyCardLevelTwo(props: AllergyCardLevelTwoProps) {
 }
 
 type AllergyCardLevelTwoProps = {
-  currentPatient: fhir.Patient;
   match: match;
 };

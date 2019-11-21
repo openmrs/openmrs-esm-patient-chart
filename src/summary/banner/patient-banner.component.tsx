@@ -3,13 +3,20 @@ import styles from "./patient-banner.component.css";
 import { age } from "../profile/age-helpers";
 import dayjs from "dayjs";
 import ProfileSection from "../profile/profile-section.component";
+import { useCurrentPatient } from "@openmrs/esm-api";
 
 export default function PatientBanner(props: PatientBannerProps) {
   const [showingDemographics, setShowDemographics] = React.useState(false);
+  const [
+    isLoadingPatient,
+    patient,
+    patientUuid,
+    patientErr
+  ] = useCurrentPatient();
 
   return (
     <aside className={styles.patientBanner}>
-      {props.patient && (
+      {!isLoadingPatient && !patientErr && (
         <div className={styles.patientBanner}>
           <div className={styles.demographics}>
             <div className={`${styles.patientName} omrs-type-title-5`}>
@@ -17,7 +24,7 @@ export default function PatientBanner(props: PatientBannerProps) {
             </div>
             <div className={`${styles.otherDemographics}`}>
               <span className={`${styles.demographic} omrs-type-body-regular`}>
-                {age(props.patient.birthDate)}
+                {age(patient.birthDate)}
               </span>
             </div>
             <div className={`${styles.otherDemographics}`}>
@@ -25,7 +32,7 @@ export default function PatientBanner(props: PatientBannerProps) {
                 Born
               </span>
               <span className={`${styles.demographic} omrs-type-body-regular`}>
-                {dayjs(props.patient.birthDate).format("DD-MMM-YYYY")}
+                {dayjs(patient.birthDate).format("DD-MMM-YYYY")}
               </span>
             </div>
             <div className={`${styles.otherDemographics}`}>
@@ -33,7 +40,7 @@ export default function PatientBanner(props: PatientBannerProps) {
                 Gender
               </span>
               <span className={`${styles.demographic} omrs-type-body-regular`}>
-                {props.patient.gender}
+                {patient.gender}
               </span>
             </div>
             <div className={`${styles.otherDemographics}`}>
@@ -69,33 +76,30 @@ export default function PatientBanner(props: PatientBannerProps) {
       )}
       {showingDemographics && (
         <div className={styles.patientProfile}>
-          <ProfileSection patient={props.patient} match={props.match} />
+          <ProfileSection patient={patient} match={props.match} />
         </div>
       )}
     </aside>
   );
 
   function getPatientNames() {
-    return `${props.patient.name[0].family.toUpperCase()}, ${props.patient.name[0].given.join(
+    return `${patient.name[0].family.toUpperCase()}, ${patient.name[0].given.join(
       " "
     )}`;
   }
 
   function toggleDemographics() {
     setShowDemographics(!showingDemographics);
-    props.showPatientSummary(showingDemographics);
   }
 
   function getPreferredIdentifier() {
     return (
-      props.patient.identifier.find(id => id.use === "usual").value ||
-      props.patient.identifier[0].value
+      patient.identifier.find(id => id.use === "usual").value ||
+      patient.identifier[0].value
     );
   }
 }
 
 type PatientBannerProps = {
   match: any;
-  patient: fhir.Patient;
-  showPatientSummary: Function;
 };

@@ -3,16 +3,25 @@ import styles from "./dimensions-card-level-two.css";
 import SummaryCard from "../cards/summary-card.component";
 import { getDimensions } from "./dimensions-card.resource";
 import { match } from "react-router";
+import { useCurrentPatient } from "@openmrs/esm-api";
 
 function DimensionsCardLevelTwo(props: DimensionsCardLevelTwoProps) {
   const [dimensions, setDimensions] = React.useState([]);
+  const [
+    isLoadingPatient,
+    patient,
+    patientUuid,
+    patientErr
+  ] = useCurrentPatient();
 
   React.useEffect(() => {
-    const sub = getDimensions(props.currentPatient.id).subscribe(dimensions =>
-      setDimensions(dimensions)
-    );
-    return () => sub.unsubscribe();
-  }, []);
+    if (patientUuid) {
+      const sub = getDimensions(patientUuid).subscribe(dimensions =>
+        setDimensions(dimensions)
+      );
+      return () => sub.unsubscribe();
+    }
+  }, [patientUuid]);
 
   return (
     <div style={{ display: "flex" }}>
@@ -72,7 +81,6 @@ function DimensionsCardLevelTwo(props: DimensionsCardLevelTwoProps) {
 }
 
 type DimensionsCardLevelTwoProps = {
-  currentPatient: fhir.Patient;
   match: match;
 };
 
