@@ -37,7 +37,7 @@
     "@babel/preset-react": "^7.7.0",
     "@babel/preset-typescript": "^7.7.2",
     "@openmrs/esm-error-handling": "^1.1.0",
-    "@openmrs/react-root-decorator": "^3.0.0",
+    "@openmrs/react-root-decorator": "^3.1.0",
     "@testing-library/react": "^9.3.2",
     "@types/jest": "^24.0.23",
     "@types/react": "^16.9.11",
