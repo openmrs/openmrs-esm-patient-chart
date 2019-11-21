@@ -1,4 +1,4 @@
 export const backendDependencies = {
-  "webservices.rest": "^2.24.0",
-  fhir: "^1.18.0"
+  "webservices.rest": "^2.2.0",
+  fhir: "^1.4.2"
 };
