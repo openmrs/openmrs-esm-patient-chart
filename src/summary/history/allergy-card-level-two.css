@@ -10,7 +10,6 @@
 
 .allergyTable {
   width: 100%;
-  font-family: "Work Sans";
 }
 
 .allergyTable thead {
@@ -39,10 +38,12 @@
 
 .allergyTable tbody td:nth-child(3) {
   text-align: right;
+  font-family: "Work Sans";
 }
 
 .allergyTable tbody td:nth-child(4) {
   text-align: right;
+  font-family: "Work Sans";
 }
 
 .allergyTable tbody tr:nth-child(3n) {
