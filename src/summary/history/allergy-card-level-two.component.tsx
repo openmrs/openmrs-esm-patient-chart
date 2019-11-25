@@ -26,7 +26,7 @@ export function AllergyCardLevelTwo(props: AllergyCardLevelTwoProps) {
 
       return () => abortController.abort();
     }
-  }, [patient.identifier[0].value]);
+  }, [isLoadingPatient, patient]);
 
   function displayAllergy() {
     return (
