@@ -17,7 +17,7 @@ export default function RelationshipsCard(props: RelationshipsCardProps) {
         }
       })
       .catch(createErrorHandler());
-  }, []);
+  }, [props.patient.identifier]);
 
   return (
     <SummaryCard name="Relationships" match={props.match}>
