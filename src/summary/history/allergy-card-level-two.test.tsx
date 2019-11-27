@@ -320,7 +320,9 @@ describe("AlleryCardLevelTwo />", () => {
 
   it("should not display the patients allergy when no allergy is returned", async () => {
     mockUseCurrentPatient.mockReturnValue([false, patient, patient.id, null]);
-    mockPerformPatientAllergySearch.mockReturnValue(Promise.resolve({}));
+    mockPerformPatientAllergySearch.mockReturnValue(
+      Promise.resolve({ data: { total: 0 } })
+    );
     wrapper = render(
       <BrowserRouter>
         <AllergyCardLevelTwo match={match} />

@@ -166,9 +166,17 @@ export function AllergyCardLevelTwo(props: AllergyCardLevelTwoProps) {
   }
 
   return (
-    <div className={styles.allergySummary}>
-      {patientAllergy ? displayAllergy() : displayNoAllergenHistory()}
-    </div>
+    <>
+      (
+      {patientAllergy && (
+        <div className={styles.allergySummary}>
+          {patientAllergy.total > 0
+            ? displayAllergy()
+            : displayNoAllergenHistory()}
+        </div>
+      )}
+      )
+    </>
   );
 }
 
