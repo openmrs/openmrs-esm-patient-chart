@@ -1,12 +1,16 @@
 :global(.omrs-breakpoint-lt-tablet) .card {
   width: 100%;
   margin: 1rem 0;
+  box-shadow: 0rem 0.125rem 0.25rem rgba(0, 0, 0, 0.08),
+    0rem 0.0625rem 0.25rem rgba(0, 0, 0, 0.04);
 }
 
 :global(.omrs-breakpoint-gt-phone) .card {
   width: 21.75rem;
   margin: 0.5rem 1rem;
   margin: 1.25rem;
+  box-shadow: 0rem 0.125rem 0.25rem rgba(0, 0, 0, 0.08),
+    0rem 0.0625rem 0.25rem rgba(0, 0, 0, 0.04);
 }
 .header {
   background-color: var(--omrs-color-bg-medium-contrast);
