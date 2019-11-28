@@ -6,6 +6,7 @@
 :global(.omrs-breakpoint-gt-phone) .card {
   width: 21.75rem;
   margin: 0.5rem 1rem;
+  margin: 1.25rem;
 }
 .header {
   background-color: var(--omrs-color-bg-medium-contrast);
