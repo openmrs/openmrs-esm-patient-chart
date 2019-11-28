@@ -74,9 +74,7 @@ export default function NotesCard(props: NotesCardProps) {
         </tbody>
       </table>
 
-      <SummaryCardFooter linkTo="/notes">
-        <p>See all</p>
-      </SummaryCardFooter>
+      <SummaryCardFooter linkTo={`/patient/${patientUuid}/chart/notes`} />
     </SummaryCard>
   );
 }

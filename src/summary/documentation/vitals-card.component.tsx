@@ -6,6 +6,7 @@ import styles from "./vitals-card.css";
 import { formatDate } from "./dimension-helpers";
 import { createErrorHandler } from "@openmrs/esm-error-handling";
 import { useCurrentPatient } from "@openmrs/esm-api";
+import SummaryCardFooter from "../cards/summary-card-footer.component";
 
 export default function VitalsCard(props: VitalsCardProps) {
   const [patientVitals, setPatientVitals] = React.useState(null);
@@ -73,12 +74,7 @@ export default function VitalsCard(props: VitalsCardProps) {
             })}
         </tbody>
       </table>
-      <a className={`${styles.vitalsFooter} omrs-bold`} href="/">
-        <svg className="omrs-icon" fill="rgba(0, 0, 0, 0.54)">
-          <use xlinkHref="#omrs-icon-chevron-right" />
-        </svg>
-        See all
-      </a>
+      <SummaryCardFooter linkTo={`/patient/${patientUuid}/chart/vitals`} />
     </SummaryCard>
   );
 }

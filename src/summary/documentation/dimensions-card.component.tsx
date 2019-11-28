@@ -7,6 +7,7 @@ import SummaryCardRowContent from "../cards/summary-card-row-content.component";
 import ShowMoreCard from "./show-more-card.component";
 import styles from "./dimensions-card-level-one.css";
 import { useCurrentPatient } from "@openmrs/esm-api";
+import SummaryCardFooter from "../cards/summary-card-footer.component";
 
 export default function DimensionsCard(props: DimensionsCardProps) {
   const [dimensions, setDimensions] = React.useState([]);
@@ -86,7 +87,7 @@ export default function DimensionsCard(props: DimensionsCardProps) {
           </table>
         </SummaryCardRowContent>
       </SummaryCardRow>
-      <ShowMoreCard func={() => setShowMore(true)} />
+      <SummaryCardFooter linkTo={`/patient/${patientUuid}/chart/dimensions`} />
     </SummaryCard>
   );
 }
