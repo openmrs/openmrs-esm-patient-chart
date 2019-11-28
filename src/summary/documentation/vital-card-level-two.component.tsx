@@ -15,7 +15,7 @@ export default function VitalsLevelTwo(props: VitalsLevelTwoProps) {
   const [currentPage, setCurrentPage] = React.useState(1);
   const [showNextButton, setShowNextButton] = React.useState(false);
   const [showPreviousButton, setShowPreviousButton] = React.useState(false);
-  const [pagedResults, setPagedResults] = React.useState([]);
+  const [currentPageResults, setCurrentPageResults] = React.useState([]);
   const [
     isLoadingPatient,
     patient,
@@ -29,7 +29,7 @@ export default function VitalsLevelTwo(props: VitalsLevelTwoProps) {
         vitals => {
           setPatientVitals(vitals);
           setTotalPages(Math.ceil(vitals.length / resultsPerPage));
-          setPagedResults(vitals.slice(0, resultsPerPage));
+          setCurrentPageResults(vitals.slice(0, resultsPerPage));
         },
         createErrorHandler()
       );
@@ -47,7 +47,7 @@ export default function VitalsLevelTwo(props: VitalsLevelTwoProps) {
         ? setShowPreviousButton(true)
         : setShowPreviousButton(false);
     }
-  }, [pagedResults, currentPage, patientVitals]);
+  }, [currentPageResults, currentPage, patientVitals]);
 
   const nextPage = () => {
     let upperBound = currentPage * resultsPerPage + resultsPerPage;
@@ -56,15 +56,15 @@ export default function VitalsLevelTwo(props: VitalsLevelTwoProps) {
       upperBound = patientVitals.length;
     }
     const pageResults = patientVitals.slice(lowerBound, upperBound);
-    setPagedResults(pageResults);
+    setCurrentPageResults(pageResults);
     setCurrentPage(currentPage + 1);
   };
 
   const previousPage = () => {
-    const lowerBound = currentPage * resultsPerPage - resultsPerPage * 2;
-    const upperBound = currentPage * resultsPerPage - resultsPerPage;
+    const lowerBound = resultsPerPage * (currentPage - 2);
+    const upperBound = resultsPerPage * (currentPage - 1);
     const pageResults = patientVitals.slice(lowerBound, upperBound);
-    setPagedResults(pageResults);
+    setCurrentPageResults(pageResults);
     setCurrentPage(currentPage - 1);
   };
 
@@ -82,15 +82,15 @@ export default function VitalsLevelTwo(props: VitalsLevelTwoProps) {
             </tr>
           </thead>
           <tbody>
-            {pagedResults &&
-              pagedResults.map((vitals, index) => {
+            {currentPageResults &&
+              currentPageResults.map((vitals, index) => {
                 return (
                   <React.Fragment key={vitals.id}>
                     <tr>
                       <td>{formatDate(vitals.date)}</td>
                       <td>
                         {`${vitals.systolic} / ${vitals.diastolic}`}
-                        {index === 0 && <span> mmHg</span>}
+                        {index === 0 && <span> mmHg </span>}
                       </td>
                       <td>
                         {vitals.pulse} {index === 0 && <span>bpm</span>}
@@ -100,7 +100,7 @@ export default function VitalsLevelTwo(props: VitalsLevelTwoProps) {
                       </td>
                       <td>
                         {vitals.temperature}
-                        {index === 0 && <span> &#8451;</span>}
+                        {index === 0 && <span> &#8451; </span>}
                       </td>
                       <td>
                         <svg className="omrs-icon" fill="rgba(0, 0, 0, 0.54)">

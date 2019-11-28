@@ -60,6 +60,17 @@
   color: var(--omrs-color-ink-medium-contrast);
 }
 
+.pagination button {
+  outline: none;
+  border: none;
+}
+
+.pagination button:active,
+button:focus {
+  outline: none;
+  border: none;
+}
+
 .navButton {
   display: flex;
   align-items: center;

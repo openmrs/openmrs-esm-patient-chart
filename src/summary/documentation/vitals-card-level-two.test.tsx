@@ -58,10 +58,10 @@ describe("<VitalsLevelTwo/>", () => {
       const firstTableRow = tableBody.children[0];
       const secondTableRow = tableBody.children[1];
       expect(firstTableRow.children[0].textContent).toBe("2016 16-May");
-      expect(firstTableRow.children[1].textContent).toBe("161 / 72 mmHg");
+      expect(firstTableRow.children[1].textContent).toBe("161 / 72 mmHg ");
       expect(firstTableRow.children[2].textContent).toBe("22 bpm");
       expect(firstTableRow.children[3].textContent).toBe("30 %");
-      expect(firstTableRow.children[4].textContent).toBe("37 ℃");
+      expect(firstTableRow.children[4].textContent).toBe("37 ℃ ");
       expect(secondTableRow.children[0].textContent).toBe("2015 25-Aug");
       expect(secondTableRow.children[1].textContent).toBe("156 / 64");
       expect(secondTableRow.children[2].textContent).toBe("173 ");
