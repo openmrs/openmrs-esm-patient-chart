@@ -17,7 +17,12 @@ export default function PatientBanner(props: PatientBannerProps) {
   return (
     <aside className={styles.patientBanner}>
       {!isLoadingPatient && !patientErr && (
-        <div className={styles.patientBanner}>
+        <div
+          className={styles.patientBanner}
+          role="button"
+          onClick={toggleDemographics}
+          tabIndex={0}
+        >
           <div className={styles.demographics}>
             <div className={`${styles.patientName} omrs-type-title-5`}>
               {getPatientNames()}
