@@ -31,7 +31,7 @@ export default function DimensionsCard(props: DimensionsCardProps) {
     <SummaryCard
       name="Height & Weight"
       match={props.match}
-      styles={{ flex: 1, margin: ".5rem", maxWidth: "46rem" }}
+      styles={{ margin: ".5rem", width: "45.5rem", maxWidth: "46rem" }}
     >
       <SummaryCardRow>
         <SummaryCardRowContent>
