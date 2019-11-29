@@ -29,7 +29,7 @@ export default function VitalsCard(props: VitalsCardProps) {
     <SummaryCard
       name="Vitals"
       match={props.match}
-      styles={{ flex: 1, margin: ".5rem", maxWidth: "46rem" }}
+      styles={{ flex: 1, margin: ".5rem", width: "45.5rem", maxWidth: "46rem" }}
     >
       <table className={styles.vitalsTable}>
         <thead>
@@ -63,7 +63,10 @@ export default function VitalsCard(props: VitalsCardProps) {
                       {index === 0 && <span> &#8451;</span>}
                     </td>
                     <td>
-                      <svg className="omrs-icon" fill="rgba(0, 0, 0, 0.54)">
+                      <svg
+                        className="omrs-icon"
+                        fill="var(--omrs-color-ink-low-contrast)"
+                      >
                         <use xlinkHref="#omrs-icon-chevron-right" />
                       </svg>
                     </td>
