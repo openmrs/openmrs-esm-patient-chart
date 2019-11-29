@@ -6,6 +6,7 @@ import VitalsCard from "./vitals-card.component";
 import { of } from "rxjs/internal/observable/of";
 import * as openmrsApi from "@openmrs/esm-api";
 import { mockVitalsResponse } from "../../../__mocks__/vitals.mock";
+import dayjs from "dayjs";
 
 describe("<VitalsCard/>", () => {
   let patient: fhir.Patient, match;
@@ -40,12 +41,22 @@ describe("<VitalsCard/>", () => {
       const tableBody = wrapper.container.querySelector("tbody");
       const firstTableRow = tableBody.children[0];
       const secondTableRow = tableBody.children[1];
-      expect(firstTableRow.children[0].textContent).toBe("2016 16-May");
+
+      const testDate = dayjs("2016-05-16T06:13:36.000+00:00");
+      const testDate2 = dayjs("2015-08-25T06:30:35.000+00:00");
+
+      expect(firstTableRow.children[0].textContent).toBe(
+        testDate.format("YYYY DD-MMM")
+      );
+
       expect(firstTableRow.children[1].textContent).toBe("161 / 72 mmHg");
       expect(firstTableRow.children[2].textContent).toBe("22 bpm");
       expect(firstTableRow.children[3].textContent).toBe("30 %");
       expect(firstTableRow.children[4].textContent).toBe("37 ℃");
-      expect(secondTableRow.children[0].textContent).toBe("2015 25-Aug");
+
+      expect(secondTableRow.children[0].textContent).toBe(
+        testDate2.format("YYYY DD-MMM")
+      );
       expect(secondTableRow.children[1].textContent).toBe("156 / 64");
       expect(secondTableRow.children[2].textContent).toBe("173 ");
       expect(secondTableRow.children[3].textContent).toBe("41 ");

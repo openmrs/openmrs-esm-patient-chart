@@ -7,6 +7,7 @@ import { calculateBMI, formatDate } from "./dimension-helpers";
 import { mockPatient } from "../../../__mocks__/patient.mock";
 import { mockDimensionResponse } from "../../../__mocks__/dimensions.mock";
 import { useCurrentPatient, openmrsObservableFetch } from "@openmrs/esm-api";
+import dayjs from "dayjs";
 
 const mockUseCurrentPatient = useCurrentPatient as jest.Mock;
 const mockOpenmrsObservableFetch = openmrsObservableFetch as jest.Mock;
@@ -51,7 +52,10 @@ describe("<DimensionsCardLevelTwo/>", () => {
       const firstTableRow = el.children[0];
       const secondTableRow = el.children[1];
       expect(tableRows.length).toBe(2);
-      expect(firstTableRow.children[0].textContent).toBe("Today 06:49 AM");
+
+      const d1 = dayjs();
+
+      expect(firstTableRow.children[0].textContent).toBe(`Today 06:49 AM`);
       expect(secondTableRow.children[0].textContent).toBe("2016 18-Dec");
       expect(secondTableRow.children[1].textContent).toBe("173");
       expect(secondTableRow.children[2].textContent).toBe("173");
