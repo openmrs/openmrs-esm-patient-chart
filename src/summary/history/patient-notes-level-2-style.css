@@ -1,0 +1,83 @@
+:global(.omrs-breakpoint-gt-tablet) .tableNotesLevel2 {
+  width: 100%;
+}
+:global(.omrs-breakpoint-gt-phone) .tableNotesLevel2 {
+  width: 100%;
+}
+
+.tableNotesLevel2Row {
+  border-bottom: 1px solid var(--omrs-color-bg-low-contrast);
+}
+
+.tableNotesLevel2Header,
+.tableNotesLevel2Data {
+  padding: 0.625rem;
+  font-family: "Roboto";
+}
+.tableNotesLevel2Date {
+  padding: 0.625rem;
+  font-family: "Work Sans";
+  font-size: 1.0625rem;
+}
+
+.tableNotesLevel2Header {
+  color: var(--omrs-color-ink-medium-contrast);
+  font-size: 0.9375rem;
+  text-transform: uppercase;
+  font-weight: normal;
+  letter-spacing: 0.0275rem;
+  text-align: left;
+}
+.tableNotesLevel2Header,
+.tableNotesLevel2Data,
+.tableNotesLevel2Date {
+  padding: 0.625rem;
+}
+.location {
+  color: var(--omrs-color-ink-medium-contrast);
+  font-family: "Roboto";
+}
+.centerItems {
+  display: inline-flex;
+  align-items: center;
+  border: none;
+  background-color: var(--omrs-color-ink-white);
+  color: var(--omrs-color-ink-medium-contrast);
+  text-decoration: none;
+}
+.notesSummary {
+  display: flex;
+  justify-content: center;
+  padding-top: 3.25rem;
+}
+:global(.omrs-breakpoint-gt-phone) .tableNotesLevel2Row {
+  display: table-row;
+}
+
+:global(.omrs-breakpoint-lt-tablet) .tableNotesLevel2Data,
+.tableNotesLevel2Row {
+  display: block;
+}
+:global(.omrs-breakpoint-lt-tablet) .tableNotesLevel2Date {
+  font-family: "Work Sans";
+  padding: 0rem;
+}
+:global(.omrs-breakpoint-lt-tablet) .tableNotesLevel2 {
+  width: 100%;
+}
+:global(.omrs-breakpoint-lt-tablet) .tableNotesLevel2Data {
+  font-family: "Roboto";
+  padding: 0rem;
+  text-align: left;
+  font-weight: 500;
+  font-size: 1.0625rem;
+}
+:global(.omrs-breakpoint-lt-tablet) .tableNotesLevel2Author {
+  color: var(--omrs-color-ink-medium-contrast);
+  text-align: left;
+  font-family: "Roboto";
+}
+:global(.omrs-breakpoint-lt-tablet) .tableNotesLevel2Header,
+.tdLowerSvg {
+  display: none;
+}

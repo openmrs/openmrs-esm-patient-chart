@@ -1,12 +1,12 @@
 import React from "react";
 import { BrowserRouter } from "react-router-dom";
-import { render, cleanup, wait } from "@testing-library/react";
+import { render, cleanup, wait, act } from "@testing-library/react";
 import { mockPatient } from "../../../__mocks__/patient.mock";
 import { mockPatientEncounters } from "../../../__mocks__/encounters.mock";
 import { getEncounters } from "./encounter.resource";
-import NotesCard from "./notes-card.component";
-import { useCurrentPatient } from "@openmrs/esm-api";
+import PatientNotesCardLevel2 from "./patient-notes-card-level-2.component";
 import { formatNotesDate, getAuthorName } from "./notes-helper";
+import { useCurrentPatient } from "@openmrs/esm-api";
 
 const mockFetchPatientEncounters = getEncounters as jest.Mock;
 const mockUseCurrentPatient = useCurrentPatient as jest.Mock;
@@ -14,13 +14,13 @@ const mockUseCurrentPatient = useCurrentPatient as jest.Mock;
 jest.mock("./encounter.resource", () => ({
   getEncounters: jest.fn()
 }));
-
 jest.mock("@openmrs/esm-api", () => ({
   useCurrentPatient: jest.fn()
 }));
 
 describe("<NotesCard/>", () => {
   let match;
+  let secondRow;
   afterEach(cleanup);
 
   beforeEach(() => {
@@ -31,21 +31,6 @@ describe("<NotesCard/>", () => {
   beforeEach(mockUseCurrentPatient.mockReset);
 
   it("renders successfully", () => {
-    mockFetchPatientEncounters.mockReturnValue(Promise.resolve({}));
-    mockUseCurrentPatient.mockReturnValue([
-      false,
-      mockPatient,
-      mockPatient.id,
-      null
-    ]);
-    render(
-      <BrowserRouter>
-        <NotesCard match={match} />
-      </BrowserRouter>
-    );
-  });
-
-  it("displays see more on the footer", async () => {
     mockFetchPatientEncounters.mockReturnValue(
       Promise.resolve(mockPatientEncounters)
     );
@@ -55,17 +40,30 @@ describe("<NotesCard/>", () => {
       mockPatient.id,
       null
     ]);
-
-    const wrapper = render(
+    render(
       <BrowserRouter>
-        <NotesCard match={match} />
+        <PatientNotesCardLevel2 match={match} />
       </BrowserRouter>
     );
+  });
+  it("should not display notes when Notes are empty", async () => {
+    mockFetchPatientEncounters.mockReturnValue(Promise.resolve([]));
+    mockUseCurrentPatient.mockReturnValue([
+      false,
+      mockPatient,
+      mockPatient.id,
+      null
+    ]);
+    const wrapper = render(
+      <BrowserRouter>
+        <PatientNotesCardLevel2 match={match} />
+      </BrowserRouter>
+    );
+    const tbody = wrapper.container.querySelector("tbody");
     await wait(() => {
-      expect(wrapper.getByText("See all")).not.toBeNull();
+      expect(tbody.children.length).toBe(0);
     });
   });
-
   it("displays notes correctly", async () => {
     mockFetchPatientEncounters.mockReturnValue(
       Promise.resolve(mockPatientEncounters)
@@ -78,19 +76,38 @@ describe("<NotesCard/>", () => {
     ]);
     const wrapper = render(
       <BrowserRouter>
-        <NotesCard match={match}></NotesCard>
+        <PatientNotesCardLevel2 match={match} />
       </BrowserRouter>
     );
     const tbody = wrapper.container.querySelector("tbody");
     await wait(() => {
       const firstRow = tbody.children[0];
-      const secondRow = tbody.children[2];
       expect(firstRow.children[0].textContent).toBe("09-Nov 06:16 AM");
       expect(firstRow.children[1].textContent).toContain("Vitals");
       expect(firstRow.children[1].children[0].textContent).toBe(
         "Outpatient Clinic"
       );
       expect(firstRow.children[2].textContent).toBe("DAEMON");
+    });
+  });
+  it("displays notes correctly if Encounter hasn't been changed", async () => {
+    mockFetchPatientEncounters.mockReturnValue(
+      Promise.resolve(mockPatientEncounters)
+    );
+    mockUseCurrentPatient.mockReturnValue([
+      false,
+      mockPatient,
+      mockPatient.id,
+      null
+    ]);
+    const wrapper = render(
+      <BrowserRouter>
+        <PatientNotesCardLevel2 match={match} />
+      </BrowserRouter>
+    );
+    const tbody = wrapper.container.querySelector("tbody");
+    await wait(() => {
+      secondRow = tbody.children[2];
       expect(secondRow.children[2].textContent).toBe(
         "SUPER USER(IDENTIFIER:ADMIN)"
       );

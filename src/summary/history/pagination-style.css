@@ -1,0 +1,32 @@
+.navigationButton {
+  display: flex;
+  align-items: center;
+  border: 0;
+  padding: 0.625rem 1.625rem 0.625rem 1rem;
+  background-color: var(--omrs-color-bg-medium-contrast);
+  color: var(--omrs-color-ink-medium-contrast);
+  cursor: pointer;
+}
+.paginationRow {
+  background-color: var(--omrs-color-bg-medium-contrast);
+  color: var(--omrs-color-ink-medium-contrast);
+  padding: 0.625rem 1.625rem 0.625rem 1rem;
+  display: flex;
+}
+.paginationLeftColumn,
+paginationCentreColumn,
+paginationRightColumn {
+  width: 33.33%;
+  background-color: var(--omrs-color-bg-medium-contrast);
+  color: var(--omrs-color-ink-medium-contrast);
+  padding: 10px;
+}
+.paginationLeftColumn {
+  float: left;
+}
+.paginationCentreColumn {
+  float: centre;
+}
+.paginationRightColumn {
+  float: right;
+}

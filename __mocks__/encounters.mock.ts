@@ -158,28 +158,12 @@ export const mockPatientEncounters = {
         resource: {
           resourceType: "Encounter",
           id: "24638591-9586-4b2b-a511-17bc1b79d1ba",
-          extension: [
+          participant: [
             {
-              url:
-                "http://fhir-es.transcendinsights.com/stu3/StructureDefinition/resource-date-created",
-              valueDateTime: "2017-01-18T08:59:07"
-            },
-            {
-              url:
-                "https://purl.org/elab/fhir/StructureDefinition/Creator-crew-version1",
-              valueString: "daemon"
-            },
-            {
-              url: "dateChanged",
-              valueDateTime: "2017-01-18T08:59:08"
-            },
-            {
-              url: "changedBy",
-              valueString: "daemon"
-            },
-            {
-              url: "formUuid",
-              valueString: "a000cb34-9ec1-4344-a1c8-f692232f6edd"
+              individual: {
+                reference: "Practitioner/bf218490-1691-11df-97a5-7038c432aabf",
+                display: "Super User(Identifier:admin)"
+              }
             }
           ],
           status: "finished",
