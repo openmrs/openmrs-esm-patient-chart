@@ -1,9 +1,9 @@
-.row {
+.footer {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  border: none;
-  padding: 0.625rem 0.25rem 0.625rem 1rem;
-  border-radius: 0;
-  background: var(--omrs-color-ink-medium-contrast);
+  justify-content: flex-start;
+  padding: 0rem 0rem 0rem 0.5rem;
+  background-color: var(--omrs-color-bg-medium-contrast);
+  margin: 0rem;
+  color: var(--omrs-color-ink-medium-contrast);
 }

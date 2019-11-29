@@ -9,6 +9,7 @@ import { performPatientConditionSearch } from "./conditions.resource";
 import { createErrorHandler } from "@openmrs/esm-error-handling";
 import HorizontalLabelValue from "../cards/horizontal-label-value.component";
 import { useCurrentPatient } from "@openmrs/esm-api";
+import SummaryCardFooter from "../cards/summary-card-footer.component";
 
 export default function ConditionsCard(props: ConditionsCardProps) {
   const [patientConditions, setPatientConditions] = React.useState(null);
@@ -66,15 +67,7 @@ export default function ConditionsCard(props: ConditionsCardProps) {
             </SummaryCardRow>
           );
         })}
-      <div className={style.conditionMore}>
-        <svg className="omrs-icon">
-          <use
-            xlinkHref="#omrs-icon-chevron-down"
-            fill="var(--omrs-color-ink-low-contrast)"
-          ></use>
-        </svg>
-        <p>more</p>
-      </div>
+      <SummaryCardFooter linkTo={`/patient/${patientUuid}/chart/conditions`} />
     </SummaryCard>
   );
 }
