@@ -19,8 +19,8 @@ describe("<MedicationsLevelOne/>", () => {
     match = { params: {}, isExact: false, path: "/", url: "/" };
   });
 
-  jest.mock("./allergy-intolerance.resource", () => ({
-    performPatientAllergySearch: jest.fn().mockResolvedValue({
+  jest.mock("./medications.resource", () => ({
+    performPatientMedicationsSearch: jest.fn().mockResolvedValue({
       data: {
         results: []
       }
