@@ -51,7 +51,7 @@ export default function Programs(props: ProgramsCardProps) {
       {patientPrograms &&
         patientPrograms.map(program => {
           return (
-            <SummaryCardRow key={program.uuid} linkTo="/">
+            <SummaryCardRow key={program.uuid} linkTo="">
               <HorizontalLabelValue
                 label={program.display}
                 labelStyles={{ fontWeight: 500 }}
