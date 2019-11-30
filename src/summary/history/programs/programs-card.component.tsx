@@ -1,0 +1,73 @@
+import React from "react";
+import style from "./conditions-card-style.css";
+import dayjs from "dayjs";
+import SummaryCard from "../../cards/summary-card.component";
+import SummaryCardRow from "../../cards/summary-card-row.component";
+import SummaryCardRowContent from "../../cards/summary-card-row-content.component";
+import { match } from "react-router";
+import { performPatientProgramsSearch } from "./programs.resource";
+import { createErrorHandler } from "@openmrs/esm-error-handling";
+import HorizontalLabelValue from "../../cards/horizontal-label-value.component";
+import { useCurrentPatient } from "@openmrs/esm-api";
+import SummaryCardFooter from "../../cards/summary-card-footer.component";
+
+export default function Programs(props: ProgramsCardProps) {
+  const [patientPrograms, setPatientPrograms] = React.useState(null);
+  const [
+    isLoadingPatient,
+    patient,
+    patientUuid,
+    patientErr
+  ] = useCurrentPatient();
+
+  React.useEffect(() => {
+    const subscription = performPatientProgramsSearch(patientUuid).subscribe(
+      programs => setPatientPrograms(programs),
+      createErrorHandler()
+    );
+
+    return () => subscription.unsubscribe();
+  }, [patientUuid]);
+
+
+  return (
+    <SummaryCard name="Care Programs" match={props.match}>
+      <SummaryCardRow>
+        <SummaryCardRowContent>
+          <HorizontalLabelValue
+            label="Active Programs"
+            labelStyles={{
+              color: "var(--omrs-color-ink-medium-contrast)",
+              fontFamily: "Work Sans"
+            }}
+            value="Since"
+            valueStyles={{
+              color: "var(--omrs-color-ink-medium-contrast)",
+              fontFamily: "Work Sans"
+            }}
+          />
+        </SummaryCardRowContent>
+      </SummaryCardRow>
+      {patientPrograms &&
+        patientPrograms.map(program => {
+          return (
+            <SummaryCardRow key={program.uuid} linkTo="/">
+              <HorizontalLabelValue
+                label={program.display}
+                labelStyles={{ fontWeight: 500 }}
+                value={dayjs(program.dateEnrolled).format(
+                  "MMM-YYYY"
+                )}
+                valueStyles={{ fontFamily: "Work Sans" }}
+              />
+            </SummaryCardRow>
+          );
+        })}
+      <SummaryCardFooter linkTo={`/patient/${patientUuid}/chart/programs`} />
+    </SummaryCard>
+  );
+}
+
+type ProgramsCardProps = {
+  match: match;
+};
