@@ -6,12 +6,15 @@ import VitalsCard from "./vitals-card.component";
 
 export default function DocumentationSection(props: DocumentationSectionProps) {
   return (
-    <>
+    <div>
       <SummarySectionCards match={props.match}>
         <VitalsCard match={props.match} />
+      </SummarySectionCards>
+
+      <SummarySectionCards match={props.match}>
         <DimensionsCard match={props.match} />
       </SummarySectionCards>
-    </>
+    </div>
   );
 }
 

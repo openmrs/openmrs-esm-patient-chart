@@ -10,7 +10,9 @@ export default function PatientChartSummary(props: PatientChartSummaryProps) {
       <div className={styles.patientSummary}>
         <HistorySection match={props.match} />
       </div>
-      <DocumentationSection match={props.match} />
+      <div className={styles.patientSummary}>
+        <DocumentationSection match={props.match} />
+      </div>
     </main>
   );
 }
