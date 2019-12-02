@@ -29,7 +29,6 @@ export default function Programs(props: ProgramsCardProps) {
     return () => subscription.unsubscribe();
   }, [patientUuid]);
 
-
   return (
     <SummaryCard name="Care Programs" match={props.match}>
       <SummaryCardRow>
@@ -55,9 +54,7 @@ export default function Programs(props: ProgramsCardProps) {
               <HorizontalLabelValue
                 label={program.display}
                 labelStyles={{ fontWeight: 500 }}
-                value={dayjs(program.dateEnrolled).format(
-                  "MMM-YYYY"
-                )}
+                value={dayjs(program.dateEnrolled).format("MMM-YYYY")}
                 valueStyles={{ fontFamily: "Work Sans" }}
               />
             </SummaryCardRow>

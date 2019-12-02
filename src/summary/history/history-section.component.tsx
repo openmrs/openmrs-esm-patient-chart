@@ -11,7 +11,7 @@ export default function HistorySection(props: HistorySectionProps) {
     <div>
       <SummarySectionCards match={props.match}>
         <ConditionsCard match={props.match} />
-        <ProgramsCard match={props.match}/>
+        <ProgramsCard match={props.match} />
       </SummarySectionCards>
       <SummarySectionCards>
         <AllergyCard match={props.match} />

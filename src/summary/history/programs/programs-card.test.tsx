@@ -6,18 +6,15 @@ import { performPatientProgramsSearch } from "./programs.resource";
 import ProgramsCard from "./programs-card.component";
 import { useCurrentPatient } from "@openmrs/esm-api";
 
-
 jest.mock("@openmrs/esm-api", () => ({
-  useCurrentPatient: jest.fn()
+  useCurrentPatient: jest.fn
 }));
 
 jest.mock("./programs.resource", () => ({
   performPatientProgramsSearch: jest.fn()
 }));
 
-
 let wrapper;
-
 
 describe("<ProgramsCard />", () => {
   let match, wrapper: any;

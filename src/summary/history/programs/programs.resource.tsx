@@ -2,7 +2,6 @@ import { openmrsObservableFetch } from "@openmrs/esm-api";
 import { Observable } from "rxjs";
 import { map, take } from "rxjs/operators";
 
-
 export function performPatientProgramsSearch(
   patientID: string
 ): Observable<PatientPrograms[]> {
@@ -14,5 +13,4 @@ export function performPatientProgramsSearch(
   );
 }
 
-type PatientPrograms = {
-};
+type PatientPrograms = {};
