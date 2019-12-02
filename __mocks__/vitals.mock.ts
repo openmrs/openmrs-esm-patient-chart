@@ -784,3 +784,328 @@ export const mockVitalsResponse = {
     ]
   }
 };
+
+export const mockEmptyVitalsResponse = {
+  headers: null,
+  ok: true,
+  redirected: true,
+  status: 200,
+  statusText: "ok",
+  trailer: null,
+  type: null,
+  url: "",
+  clone: null,
+  body: null,
+  bodyUsed: null,
+  arrayBuffer: null,
+  blob: null,
+  formData: null,
+  json: null,
+  text: null,
+  data: {
+    resourceType: "Bundle",
+    id: "63378630-e9a5-468b-baec-439d8ed55d09",
+    meta: { lastUpdated: "2019-11-20T11:16:11.030+00:00" },
+    type: "searchset",
+    total: 10,
+    link: [
+      {
+        relation: "self",
+        url:
+          "http://localhost:8080/openmrs/ws/fhir/Observation?code=5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA%2C5086AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA%2C5087AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA%2C5088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA%2C5092AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA&subject%3APatient=90f7f0b4-06a8-4a97-9678-e7a977f4b518"
+      }
+    ],
+    entry: []
+  }
+};
+
+export const mockVitalData = [
+  {
+    id: 1463379216000,
+    date: "2016-05-16T06:13:36.000+00:00",
+    systolic: 161,
+    diastolic: 72,
+    pulse: 22,
+    temperature: 37,
+    oxygenation: 30
+  },
+  {
+    id: 1440484235000,
+    date: "2015-08-25T06:30:35.000+00:00",
+    systolic: 156,
+    diastolic: 64,
+    pulse: 173,
+    temperature: 37,
+    oxygenation: 41
+  },
+  {
+    id: 1440484235001,
+    date: "2015-08-25T06:30:35.000+00:00",
+    systolic: 156,
+    diastolic: 64,
+    pulse: 173,
+    temperature: 37,
+    oxygenation: 41
+  },
+  {
+    id: 1440484235002,
+    date: "2015-08-25T06:30:35.000+00:00",
+    systolic: 156,
+    diastolic: 64,
+    pulse: 173,
+    temperature: 37,
+    oxygenation: 41
+  },
+  {
+    id: 1463379216003,
+    date: "2016-05-16T06:13:36.000+00:00",
+    systolic: 161,
+    diastolic: 72,
+    pulse: 22,
+    temperature: 37,
+    oxygenation: 30
+  },
+  {
+    id: 14404842350004,
+    date: "2015-08-25T06:30:35.000+00:00",
+    systolic: 156,
+    diastolic: 64,
+    pulse: 173,
+    temperature: 37,
+    oxygenation: 41
+  },
+  {
+    id: 14404842350015,
+    date: "2015-08-25T06:30:35.000+00:00",
+    systolic: 156,
+    diastolic: 64,
+    pulse: 173,
+    temperature: 37,
+    oxygenation: 41
+  },
+  {
+    id: 14404842350026,
+    date: "2015-08-25T06:30:35.000+00:00",
+    systolic: 156,
+    diastolic: 64,
+    pulse: 173,
+    temperature: 37,
+    oxygenation: 41
+  },
+  {
+    id: 14633792160007,
+    date: "2016-05-16T06:13:36.000+00:00",
+    systolic: 161,
+    diastolic: 72,
+    pulse: 22,
+    temperature: 37,
+    oxygenation: 30
+  },
+  {
+    id: 14404842350008,
+    date: "2015-08-25T06:30:35.000+00:00",
+    systolic: 156,
+    diastolic: 64,
+    pulse: 173,
+    temperature: 37,
+    oxygenation: 41
+  },
+  {
+    id: 14404842350019,
+    date: "2015-08-25T06:30:35.000+00:00",
+    systolic: 156,
+    diastolic: 64,
+    pulse: 173,
+    temperature: 37,
+    oxygenation: 41
+  },
+  {
+    id: 144048423500210,
+    date: "2015-08-25T06:30:35.000+00:00",
+    systolic: 156,
+    diastolic: 64,
+    pulse: 173,
+    temperature: 37,
+    oxygenation: 41
+  },
+  {
+    id: 14633792160011,
+    date: "2016-05-16T06:13:36.000+00:00",
+    systolic: 161,
+    diastolic: 72,
+    pulse: 22,
+    temperature: 37,
+    oxygenation: 30
+  },
+  {
+    id: 144048423500012,
+    date: "2015-08-25T06:30:35.000+00:00",
+    systolic: 156,
+    diastolic: 64,
+    pulse: 173,
+    temperature: 37,
+    oxygenation: 41
+  },
+  {
+    id: 1440484235001513,
+    date: "2015-08-25T06:30:35.000+00:00",
+    systolic: 156,
+    diastolic: 64,
+    pulse: 173,
+    temperature: 37,
+    oxygenation: 41
+  },
+  {
+    id: 1440484235002614,
+    date: "2015-08-25T06:30:35.000+00:00",
+    systolic: 156,
+    diastolic: 64,
+    pulse: 173,
+    temperature: 37,
+    oxygenation: 41
+  },
+  {
+    id: 146337921600015,
+    date: "2016-05-16T06:13:36.000+00:00",
+    systolic: 161,
+    diastolic: 72,
+    pulse: 22,
+    temperature: 37,
+    oxygenation: 30
+  },
+  {
+    id: 144048423500016,
+    date: "2015-08-25T06:30:35.000+00:00",
+    systolic: 156,
+    diastolic: 64,
+    pulse: 173,
+    temperature: 37,
+    oxygenation: 41
+  },
+  {
+    id: 144048423500117,
+    date: "2015-08-25T06:30:35.000+00:00",
+    systolic: 156,
+    diastolic: 64,
+    pulse: 173,
+    temperature: 37,
+    oxygenation: 41
+  },
+  {
+    id: 144048423500218,
+    date: "2015-08-25T06:30:35.000+00:00",
+    systolic: 156,
+    diastolic: 64,
+    pulse: 173,
+    temperature: 37,
+    oxygenation: 41
+  },
+  {
+    id: 146337921600319,
+    date: "2016-05-16T06:13:36.000+00:00",
+    systolic: 161,
+    diastolic: 72,
+    pulse: 22,
+    temperature: 37,
+    oxygenation: 30
+  },
+  {
+    id: 1440484235000420,
+    date: "2015-08-25T06:30:35.000+00:00",
+    systolic: 156,
+    diastolic: 64,
+    pulse: 173,
+    temperature: 37,
+    oxygenation: 41
+  },
+  {
+    id: 1440484235001521,
+    date: "2015-08-25T06:30:35.000+00:00",
+    systolic: 156,
+    diastolic: 64,
+    pulse: 173,
+    temperature: 37,
+    oxygenation: 41
+  },
+  {
+    id: 1440484235002622,
+    date: "2015-08-25T06:30:35.000+00:00",
+    systolic: 156,
+    diastolic: 64,
+    pulse: 173,
+    temperature: 37,
+    oxygenation: 41
+  },
+  {
+    id: 146337921600023,
+    date: "2016-05-16T06:13:36.000+00:00",
+    systolic: 161,
+    diastolic: 72,
+    pulse: 22,
+    temperature: 37,
+    oxygenation: 30
+  },
+  {
+    id: 144048423500024,
+    date: "2015-08-25T06:30:35.000+00:00",
+    systolic: 156,
+    diastolic: 64,
+    pulse: 173,
+    temperature: 37,
+    oxygenation: 41
+  },
+  {
+    id: 144048423500125,
+    date: "2015-08-25T06:30:35.000+00:00",
+    systolic: 156,
+    diastolic: 64,
+    pulse: 173,
+    temperature: 37,
+    oxygenation: 41
+  },
+  {
+    id: 144048423500226,
+    date: "2015-08-25T06:30:35.000+00:00",
+    systolic: 156,
+    diastolic: 64,
+    pulse: 173,
+    temperature: 37,
+    oxygenation: 41
+  },
+  {
+    id: 146337921600327,
+    date: "2016-05-16T06:13:36.000+00:00",
+    systolic: 161,
+    diastolic: 72,
+    pulse: 22,
+    temperature: 37,
+    oxygenation: 30
+  },
+  {
+    id: 1440484235000428,
+    date: "2015-08-25T06:30:35.000+00:00",
+    systolic: 156,
+    diastolic: 64,
+    pulse: 173,
+    temperature: 37,
+    oxygenation: 41
+  },
+  {
+    id: 1440484235001529,
+    date: "2015-08-25T06:30:35.000+00:00",
+    systolic: 156,
+    diastolic: 64,
+    pulse: 173,
+    temperature: 37,
+    oxygenation: 41
+  },
+  {
+    id: 1440484235002630,
+    date: "2015-08-25T06:30:35.000+00:00",
+    systolic: 156,
+    diastolic: 64,
+    pulse: 173,
+    temperature: 37,
+    oxygenation: 41
+  }
+];
