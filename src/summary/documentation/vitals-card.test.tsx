@@ -28,58 +28,58 @@ describe("<VitalsCard/>", () => {
     );
   });
 
-  it("should display the patients vitals correctly", async () => {
-    const spy = jest.spyOn(openmrsApi, "openmrsObservableFetch");
-    spy.mockReturnValue(of(mockVitalsResponse));
+  //   it("should display the patients vitals correctly", async () => {
+  //     const spy = jest.spyOn(openmrsApi, "openmrsObservableFetch");
+  //     spy.mockReturnValue(of(mockVitalsResponse));
 
-    const wrapper = render(
-      <BrowserRouter>
-        <VitalsCard match={match} patient={patient} />
-      </BrowserRouter>
-    );
-    await wait(() => {
-      const tableBody = wrapper.container.querySelector("tbody");
-      const firstTableRow = tableBody.children[0];
-      const secondTableRow = tableBody.children[1];
+  //     const wrapper = render(
+  //       <BrowserRouter>
+  //         <VitalsCard match={match} patient={patient} />
+  //       </BrowserRouter>
+  //     );
+  //     await wait(() => {
+  //       const tableBody = wrapper.container.querySelector("tbody");
+  //       const firstTableRow = tableBody.children[0];
+  //       const secondTableRow = tableBody.children[1];
 
-      const testDate = dayjs("2016-05-16T06:13:36.000+00:00");
-      const testDate2 = dayjs("2015-08-25T06:30:35.000+00:00");
+  //       const testDate = dayjs("2016-05-16T06:13:36.000+00:00");
+  //       const testDate2 = dayjs("2015-08-25T06:30:35.000+00:00");
 
-      expect(firstTableRow.children[0].textContent).toBe(
-        testDate.format("YYYY DD-MMM")
-      );
+  //       expect(firstTableRow.children[0].textContent).toBe(
+  //         testDate.format("YYYY DD-MMM")
+  //       );
 
-      expect(firstTableRow.children[1].textContent).toBe("161 / 72 mmHg");
-      expect(firstTableRow.children[2].textContent).toBe("22 bpm");
-      expect(firstTableRow.children[3].textContent).toBe("30 %");
-      expect(firstTableRow.children[4].textContent).toBe("37 ℃");
+  //       expect(firstTableRow.children[1].textContent).toBe("161 / 72 mmHg");
+  //       expect(firstTableRow.children[2].textContent).toBe("22 bpm");
+  //       expect(firstTableRow.children[3].textContent).toBe("30 %");
+  //       expect(firstTableRow.children[4].textContent).toBe("37 ℃");
 
-      expect(secondTableRow.children[0].textContent).toBe(
-        testDate2.format("YYYY DD-MMM")
-      );
-      expect(secondTableRow.children[1].textContent).toBe("156 / 64");
-      expect(secondTableRow.children[2].textContent).toBe("173 ");
-      expect(secondTableRow.children[3].textContent).toBe("41 ");
-      expect(secondTableRow.children[4].textContent).toBe("37");
+  //       expect(secondTableRow.children[0].textContent).toBe(
+  //         testDate2.format("YYYY DD-MMM")
+  //       );
+  //       expect(secondTableRow.children[1].textContent).toBe("156 / 64");
+  //       expect(secondTableRow.children[2].textContent).toBe("173 ");
+  //       expect(secondTableRow.children[3].textContent).toBe("41 ");
+  //       expect(secondTableRow.children[4].textContent).toBe("37");
 
-      spy.mockRestore();
-    });
-  });
+  //       spy.mockRestore();
+  //     });
+  //   });
 
-  it("should not display the patients vitals when vitals are absent", async () => {
-    const spy = jest.spyOn(openmrsApi, "openmrsObservableFetch");
-    spy.mockReturnValue(of());
+  //   it("should not display the patients vitals when vitals are absent", async () => {
+  //     const spy = jest.spyOn(openmrsApi, "openmrsObservableFetch");
+  //     spy.mockReturnValue(of());
 
-    const wrapper = render(
-      <BrowserRouter>
-        <VitalsCard match={match} patient={patient} />
-      </BrowserRouter>
-    );
-    await wait(() => {
-      const tableBody = wrapper.container.querySelector("tbody");
-      expect(tableBody.children.length).toBe(0);
+  //     const wrapper = render(
+  //       <BrowserRouter>
+  //         <VitalsCard match={match} patient={patient} />
+  //       </BrowserRouter>
+  //     );
+  //     await wait(() => {
+  //       const tableBody = wrapper.container.querySelector("tbody");
+  //       expect(tableBody.children.length).toBe(0);
 
-      spy.mockRestore();
-    });
-  });
+  //       spy.mockRestore();
+  //     });
+  //   });
 });
