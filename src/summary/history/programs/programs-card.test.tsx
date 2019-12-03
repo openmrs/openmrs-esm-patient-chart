@@ -39,7 +39,7 @@ describe("<ProgramsCard />", () => {
       </BrowserRouter>
     );
     await wait(() => {
-      console.log(wrapper);
+      expect(wrapper.getByTitle("HIV Care and Treatment")).toBeDefined();
       spy.mockRestore();
     });
   });
