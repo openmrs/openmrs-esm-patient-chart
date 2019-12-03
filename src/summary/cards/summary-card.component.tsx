@@ -1,8 +1,10 @@
 import React, { ReactChildren } from "react";
 import styles from "./summary-card.css";
 import { match } from "react-router";
+import { Trans, useTranslation } from "react-i18next";
 
 export default function SummaryCard(props: SummaryCardProps) {
+  const { t } = useTranslation();
   return (
     <div style={props.styles} className={`omrs-card ${styles.card}`}>
       <div className={styles.header}>

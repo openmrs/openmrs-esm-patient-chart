@@ -10,6 +10,7 @@ import { createErrorHandler } from "@openmrs/esm-error-handling";
 import HorizontalLabelValue from "../cards/horizontal-label-value.component";
 import { useCurrentPatient } from "@openmrs/esm-api";
 import SummaryCardFooter from "../cards/summary-card-footer.component";
+import { useTranslation } from "react-i18next";
 
 export default function ConditionsCard(props: ConditionsCardProps) {
   const [patientConditions, setPatientConditions] = React.useState(null);
@@ -19,6 +20,7 @@ export default function ConditionsCard(props: ConditionsCardProps) {
     patientUuid,
     patientErr
   ] = useCurrentPatient();
+  const { t } = useTranslation();
 
   React.useEffect(() => {
     if (patient) {
@@ -35,7 +37,7 @@ export default function ConditionsCard(props: ConditionsCardProps) {
   }, [patient]);
 
   return (
-    <SummaryCard name="Conditions" match={props.match}>
+    <SummaryCard name={t("conditions", "Conditions")} match={props.match}>
       <SummaryCardRow>
         <SummaryCardRowContent>
           <HorizontalLabelValue
