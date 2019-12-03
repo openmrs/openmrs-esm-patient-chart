@@ -39,6 +39,7 @@ describe("<ProgramsCard />", () => {
       </BrowserRouter>
     );
     await wait(() => {
+      console.log(wrapper);
       spy.mockRestore();
     });
   });
