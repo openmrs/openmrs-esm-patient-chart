@@ -13,4 +13,11 @@ export function performPatientProgramsSearch(
   );
 }
 
-type PatientPrograms = {};
+type PatientPrograms = {
+  uuid: String;
+  program: {};
+  display: String;
+  dateEnrolled: Date;
+  dateCompleted: Date;
+  links: [];
+};
