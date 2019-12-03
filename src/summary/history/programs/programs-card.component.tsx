@@ -10,6 +10,7 @@ import { createErrorHandler } from "@openmrs/esm-error-handling";
 import HorizontalLabelValue from "../../cards/horizontal-label-value.component";
 import { useCurrentPatient } from "@openmrs/esm-api";
 import SummaryCardFooter from "../../cards/summary-card-footer.component";
+import { Trans, useTranslation } from "react-i18next";
 
 export default function Programs(props: ProgramsCardProps) {
   const [patientPrograms, setPatientPrograms] = React.useState(null);
@@ -19,6 +20,7 @@ export default function Programs(props: ProgramsCardProps) {
     patientUuid,
     patientErr
   ] = useCurrentPatient();
+  const { t } = useTranslation();
 
   React.useEffect(() => {
     const subscription = performPatientProgramsSearch(patientUuid).subscribe(
@@ -30,16 +32,16 @@ export default function Programs(props: ProgramsCardProps) {
   }, [patientUuid]);
 
   return (
-    <SummaryCard name="Care Programs" match={props.match}>
+    <SummaryCard name={t("care programs", "Care Programs")} match={props.match}>
       <SummaryCardRow>
         <SummaryCardRowContent>
           <HorizontalLabelValue
-            label="Active Programs"
+            label={t("Active Programs", "Active Programs")}
             labelStyles={{
               color: "var(--omrs-color-ink-medium-contrast)",
               fontFamily: "Work Sans"
             }}
-            value="Since"
+            value={t("Since", "Since")}
             valueStyles={{
               color: "var(--omrs-color-ink-medium-contrast)",
               fontFamily: "Work Sans"
