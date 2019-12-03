@@ -2,7 +2,7 @@ import { openmrsObservableFetch } from "@openmrs/esm-api";
 import { Observable } from "rxjs";
 import { map, take } from "rxjs/operators";
 
-export function performPatientProgramsSearch(
+export function fetchPatientPrograms(
   patientID: string
 ): Observable<PatientPrograms[]> {
   return openmrsObservableFetch(
