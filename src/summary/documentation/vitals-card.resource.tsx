@@ -1,5 +1,5 @@
 import { openmrsObservableFetch } from "@openmrs/esm-api";
-import { Observable } from "rxjs";
+import { Observable, of } from "rxjs";
 import { map, take } from "rxjs/operators";
 
 const SYSTOLIC_BLOOD_PRESSURE_CONCEPT: string =
@@ -23,22 +23,23 @@ type PatientVitals = {
 export function performPatientsVitalsSearch(
   patientID: string
 ): Observable<PatientVitals[]> {
-  return openmrsObservableFetch(
-    `/ws/fhir/Observation?subject:Patient=${patientID}&code=${SYSTOLIC_BLOOD_PRESSURE_CONCEPT},${DIASTOLIC_BLOOD_PRESSURE_CONCEPT},${PULSE_CONCEPT},${TEMPERATURE_CONCEPT},${OXYGENATION_CONCEPT}`
-  ).pipe(
-    map(({ data }) => data["entry"]),
-    map(entries => entries.map(entry => entry.resource)),
-    map(data =>
-      formatVitals(
-        getVitalsByConcept(data, SYSTOLIC_BLOOD_PRESSURE_CONCEPT),
-        getVitalsByConcept(data, DIASTOLIC_BLOOD_PRESSURE_CONCEPT),
-        getVitalsByConcept(data, PULSE_CONCEPT),
-        getVitalsByConcept(data, TEMPERATURE_CONCEPT),
-        getVitalsByConcept(data, OXYGENATION_CONCEPT)
-      )
-    ),
-    take(3)
-  );
+  // return openmrsObservableFetch(
+  //   `/ws/fhir/Observation?subject:Patient=${patientID}&code=${SYSTOLIC_BLOOD_PRESSURE_CONCEPT},${DIASTOLIC_BLOOD_PRESSURE_CONCEPT},${PULSE_CONCEPT},${TEMPERATURE_CONCEPT},${OXYGENATION_CONCEPT}`
+  // ).pipe(
+  //   map(({ data }) => data["entry"]),
+  //   map(entries => entries.map(entry => entry.resource)),
+  //   map(data =>
+  //     formatVitals(
+  //       getVitalsByConcept(data, SYSTOLIC_BLOOD_PRESSURE_CONCEPT),
+  //       getVitalsByConcept(data, DIASTOLIC_BLOOD_PRESSURE_CONCEPT),
+  //       getVitalsByConcept(data, PULSE_CONCEPT),
+  //       getVitalsByConcept(data, TEMPERATURE_CONCEPT),
+  //       getVitalsByConcept(data, OXYGENATION_CONCEPT)
+  //     )
+  //   ),
+  //   take(3)
+  // );
+  return of([]);
 }
 
 function getVitalsByConcept(vitals: any[], concept: string) {
