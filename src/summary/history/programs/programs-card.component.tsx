@@ -5,7 +5,7 @@ import SummaryCard from "../../cards/summary-card.component";
 import SummaryCardRow from "../../cards/summary-card-row.component";
 import SummaryCardRowContent from "../../cards/summary-card-row-content.component";
 import { match } from "react-router";
-import { performPatientProgramsSearch } from "./programs.resource";
+import { fetchPatientPrograms } from "./programs.resource";
 import { createErrorHandler } from "@openmrs/esm-error-handling";
 import HorizontalLabelValue from "../../cards/horizontal-label-value.component";
 import { useCurrentPatient } from "@openmrs/esm-api";
@@ -23,7 +23,7 @@ export default function Programs(props: ProgramsCardProps) {
   const { t } = useTranslation();
 
   React.useEffect(() => {
-    const subscription = performPatientProgramsSearch(patientUuid).subscribe(
+    const subscription = fetchPatientPrograms(patientUuid).subscribe(
       programs => setPatientPrograms(programs),
       createErrorHandler()
     );
