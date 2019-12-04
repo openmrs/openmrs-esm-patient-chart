@@ -1,5 +1,4 @@
 import { openmrsObservableFetch } from "@openmrs/esm-api";
-import { forkJoin } from "rxjs";
 import { map } from "rxjs/operators";
 import { formatDate, calculateBMI } from "./dimension-helpers";
 
@@ -7,22 +6,27 @@ const HEIGHT_CONCEPT = "5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 const WEIGHT_CONCEPT = "5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 
 export function getDimensions(patientId: string) {
-  return forkJoin({
-    weights: getDimensionObservations(patientId, "weight"),
-    heights: getDimensionObservations(patientId, "height")
-  }).pipe(map(data => formatDimensions(data.weights, data.heights)));
+  return getDimensionsObservations(patientId).pipe(
+    map(data => formatDimensions(data.weights, data.heights))
+  );
 }
 
-function getDimensionObservations(
-  patientId: string,
-  type: "weight" | "height"
-) {
-  const concept = type === "weight" ? WEIGHT_CONCEPT : HEIGHT_CONCEPT;
+function getDimensionsObservations(patientId: string) {
   return openmrsObservableFetch(
-    `/ws/fhir/Observation?subject:Patient=${patientId}&code=${concept}`
+    `/ws/fhir/Observation?subject:Patient=${patientId}&code=${WEIGHT_CONCEPT},${HEIGHT_CONCEPT}`
   ).pipe(
     map(({ data }) => data["entry"]),
-    map(entries => entries.map(entry => entry.resource))
+    map(entries => {
+      const dimensions = entries.map(entry => entry.resource);
+      return {
+        heights: dimensions.filter(dimension =>
+          dimension.code.coding.some(sys => sys.code === HEIGHT_CONCEPT)
+        ),
+        weights: dimensions.filter(dimension =>
+          dimension.code.coding.some(sys => sys.code === WEIGHT_CONCEPT)
+        )
+      };
+    })
   );
 }
 

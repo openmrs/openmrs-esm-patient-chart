@@ -57,9 +57,9 @@ describe("<DimensionsCardLevelTwo/>", () => {
 
       expect(firstTableRow.children[0].textContent).toBe(`Today 06:49 AM`);
       expect(secondTableRow.children[0].textContent).toBe("2016 18-Dec");
-      expect(secondTableRow.children[1].textContent).toBe("173");
+      expect(secondTableRow.children[1].textContent).toBe("\u2014");
       expect(secondTableRow.children[2].textContent).toBe("173");
-      expect(secondTableRow.children[3].textContent).toBe("57.8");
+      expect(secondTableRow.children[3].textContent).toBe("\u2014");
     });
   });
 });

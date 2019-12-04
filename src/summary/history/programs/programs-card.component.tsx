@@ -23,12 +23,14 @@ export default function Programs(props: ProgramsCardProps) {
   const { t } = useTranslation();
 
   React.useEffect(() => {
-    const subscription = fetchPatientPrograms(patientUuid).subscribe(
-      programs => setPatientPrograms(programs),
-      createErrorHandler()
-    );
+    if (patientUuid) {
+      const subscription = fetchPatientPrograms(patientUuid).subscribe(
+        programs => setPatientPrograms(programs),
+        createErrorHandler()
+      );
 
-    return () => subscription.unsubscribe();
+      return () => subscription.unsubscribe();
+    }
   }, [patientUuid]);
 
   return (
