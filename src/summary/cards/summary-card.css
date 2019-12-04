@@ -12,20 +12,40 @@
   box-shadow: 0rem 0.125rem 0.25rem rgba(0, 0, 0, 0.08),
     0rem 0.0625rem 0.25rem rgba(0, 0, 0, 0.04);
 }
-.header {
-  background-color: var(--omrs-color-bg-medium-contrast);
-  padding: 1rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid var(--omrs-color-bg-low-contrast);
-  border-radius: 0.25rem 0.25rem 0 0;
-}
-.title {
-  display: flex;
-  align-items: center;
-}
+
 :global(.omrs-card) button.addBtn {
   color: var(--omrs-color-ink-medium-contrast);
   letter-spacing: 0.0125rem;
+}
+
+button.addBtn:hover {
+  color: var(--omrs-color-interaction-plus-one);
+}
+
+.header {
+  display: grid;
+  grid-template-columns: [one] 1fr [two] 68px;
+  grid-template-rows: [rowone] 3rem;
+  grid-template-areas: "a b";
+  background-color: var(--omrs-color-bg-medium-contrast);
+  align-items: center;
+  border-bottom: 0.0625rem solid var(--omrs-color-bg-low-contrast);
+  border-radius: 0.25rem 0.25rem 0 0;
+  justify-content: space-between;
+}
+
+.item_a {
+  grid-area: a;
+}
+
+.item_b {
+  grid-area: b;
+  justify-self: center;
+}
+
+.title {
+  padding: 0 0 0 1rem;
+  display: flex;
+  align-items: center;
+  height: 3rem;
 }

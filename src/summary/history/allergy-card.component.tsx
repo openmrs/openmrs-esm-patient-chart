@@ -30,7 +30,11 @@ export default function AllergyCard(props: AllergyCardProps) {
   }, [patient]);
 
   return (
-    <SummaryCard name="Allergy" match={props.match}>
+    <SummaryCard
+      name="Allergy"
+      match={props.match}
+      styles={{ margin: "1.25rem, 1.5rem" }}
+    >
       {patientAllergy &&
         patientAllergy.total > 0 &&
         patientAllergy.entry.map(allergy => {
