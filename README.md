@@ -6,7 +6,7 @@
 ## Overview
 This module allows developers to quickly and easily put together a 'chart' or 'flowsheet' style user interface for a patient, as opposed to an encounter-form-based UI.
 
-The flowsheet can have a bunch of tabs (representing physical pages) each having a different table. For example, there is a history, physical condition, allergy, reactions and summary table.
+The flowsheet can have a bunch of tabs (representing physical pages) each having a different table. For example, there can be a history, physical condition, allergy, reactions and summary table.
 
 ## Screenshots
 The chart looks something like this:
