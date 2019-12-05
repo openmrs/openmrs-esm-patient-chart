@@ -62,3 +62,69 @@ export function savePatientAllergy(
     signal: abortController.signal
   });
 }
+
+export function getPatientAllergyByPatientUuid(
+  patientUuid: string,
+  allegyUuid: any,
+  abortController: AbortController
+) {
+  return openmrsFetch(
+    `/ws/rest/v1/patient/${patientUuid}/allergy/${allegyUuid.allergyUuid}?v=full`,
+    {
+      signal: abortController.signal
+    }
+  );
+}
+
+export function updatePatientAllergy(
+  patientAllergy: any,
+  patientUuid: string,
+  allergyUuid: any,
+  abortController: AbortController
+) {
+  const reactions = patientAllergy.reactionsUuid.map((reaction: any) => {
+    return {
+      reaction: {
+        uuid: reaction.uuid
+      }
+    };
+  });
+
+  return openmrsFetch(
+    `/ws/rest/v1/patient/${patientUuid}/allergy/${allergyUuid.allergyUuid}`,
+    {
+      headers: {
+        "Content-Type": "application/json"
+      },
+      method: "POST",
+      body: {
+        allergen: {
+          allergenType: patientAllergy.allergenType,
+          codedAllergen: {
+            uuid: patientAllergy.codedAllergenUuid
+          }
+        },
+        severity: {
+          uuid: patientAllergy.severityUuid
+        },
+        comment: patientAllergy.comment,
+        reactions: reactions
+      },
+      signal: abortController.signal
+    }
+  );
+}
+
+export function deletePatientAllergy(
+  patientUuid: string,
+  allergyUuid: any,
+  abortController: AbortController
+) {
+  return openmrsFetch(
+    `/ws/rest/v1/patient/${patientUuid}/allergy/${allergyUuid.allergyUuid}`,
+    {
+      method: "DELETE",
+      signal: abortController.signal
+    }
+  );
+}

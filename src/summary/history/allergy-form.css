@@ -1,5 +1,32 @@
+:global(.omrs-breakpoint-gt-phone) .allergyForm {
+  display: flex;
+  justify-content: center;
+}
+
+:global(.omrs-breakpoint-lt-tablet) .allergyForm {
+  padding: 0.25rem 0.5rem 0 0.5rem;
+}
+
 .allergyHeader {
   margin: 0rem 0rem 0.25rem 1rem;
+  color: var(--omrs-color-ink-medium-contrast);
+}
+
+.allergyEditHeader {
+  margin: 1rem 0rem 0rem 1rem;
+}
+
+.allergyEditHeader h3,
+h4 {
+  margin: 0rem 0rem 0.25rem 0rem;
+  padding: 0rem;
+}
+
+.allergyEditHeader h3 span {
+  font-weight: normal;
+}
+
+.allergyEditHeader h4 {
   color: var(--omrs-color-ink-medium-contrast);
 }
 
@@ -14,6 +41,10 @@
   padding: 1rem;
   max-height: 250px;
   flex-wrap: wrap;
+}
+
+.inputMargin span {
+  margin-left: 0.9325rem;
 }
 
 .container div {
@@ -42,12 +73,10 @@
   background: var(--omrs-color-ink-white);
   bottom: 0;
   justify-content: center;
-
-  width: 100%;
+  margin-top: 1rem;
 }
 
 .buttonStyles button {
-  width: 50%;
   margin: 0.5rem 1rem;
   cursor: pointer;
 }
