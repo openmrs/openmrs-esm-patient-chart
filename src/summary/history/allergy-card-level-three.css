@@ -1,0 +1,18 @@
+.allergyHeader {
+  margin: 1rem 0rem 0.25rem 1rem;
+  color: var(--omrs-color-ink-medium-contrast);
+}
+
+.container {
+  display: flex;
+  background: var(--omrs-color-ink-white);
+  padding-left: 1rem;
+  flex-direction: column;
+  border: 0.0625rem solid var(--omrs-color-ink-low-contrast);
+  margin: 0rem 1rem 1rem 1rem;
+  padding: 1rem;
+}
+
+.container div {
+  margin-bottom: 1rem;
+}
