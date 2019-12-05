@@ -3,6 +3,24 @@
   color: var(--omrs-color-ink-medium-contrast);
 }
 
+.allergyEditHeader {
+  margin: 1rem 0rem 0rem 1rem;
+}
+
+.allergyEditHeader h3,
+h4 {
+  margin: 0rem 0rem 0.25rem 0rem;
+  padding: 0rem;
+}
+
+.allergyEditHeader h3 span {
+  font-weight: normal;
+}
+
+.allergyEditHeader h4 {
+  color: var(--omrs-color-ink-medium-contrast);
+}
+
 .container {
   justify-content: center;
   display: flex;
@@ -42,12 +60,10 @@
   background: var(--omrs-color-ink-white);
   bottom: 0;
   justify-content: center;
-
-  width: 100%;
+  margin-top: 1rem;
 }
 
 .buttonStyles button {
-  width: 50%;
   margin: 0.5rem 1rem;
   cursor: pointer;
 }

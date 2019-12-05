@@ -7,6 +7,7 @@ import { Breadcrumbs } from "./breadcrumbs/breadcrumbs.component";
 import ProgramsLevelTwo from "./history/programs/programs-level-two.component";
 import MedicationsDetailedSummary from "./history/medications/medications-detailedSummary.component";
 import { AllergyCreateForm } from "./history/allergy-create-form.component";
+import { AllergyEditForm } from "./history/allergy-edit-form.component";
 
 const levelTwoRoutes = [
   {
@@ -32,6 +33,10 @@ const levelTwoRoutes = [
   {
     url: "/patient/:patientUuid/chart/allergy/add",
     component: AllergyCreateForm
+  },
+  {
+    url: "/patient/:patientUuid/chart/allergy/edit/:allergyUuid",
+    component: AllergyEditForm
   }
 ];
 

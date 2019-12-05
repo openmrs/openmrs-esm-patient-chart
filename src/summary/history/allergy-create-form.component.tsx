@@ -134,7 +134,7 @@ export function AllergyCreateForm(props: AllergyCreateFormProps) {
       name="Add Allergy"
       match={props.match}
       styles={{
-        width: "100%",
+        width: "95%",
         background: "var(--omrs-color-bg-medium-contrast)"
       }}
     >
@@ -315,6 +315,7 @@ export function AllergyCreateForm(props: AllergyCreateFormProps) {
             type="button"
             className="omrs-btn omrs-outlined-neutral omrs-rounded"
             onClick={handleCancelChanges}
+            style={{ width: "50%" }}
           >
             Cancel
           </button>
@@ -326,6 +327,7 @@ export function AllergyCreateForm(props: AllergyCreateFormProps) {
                 : "omrs-btn omrs-filled-action omrs-rounded"
             }
             disabled={enableButtons}
+            style={{ width: "50%" }}
           >
             Sign & Save
           </button>
