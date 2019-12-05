@@ -31,7 +31,8 @@ export default function DimensionsCard(props: DimensionsCardProps) {
     <SummaryCard
       name="Height & Weight"
       match={props.match}
-      styles={{ margin: ".5rem", width: "45.5rem", maxWidth: "46rem" }}
+      styles={{ width: "100%", maxWidth: "45rem" }}
+      link={`/patient/${patientUuid}/chart/dimensions`}
     >
       <SummaryCardRow>
         <SummaryCardRowContent>

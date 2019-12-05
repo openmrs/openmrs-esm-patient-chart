@@ -1,17 +1,49 @@
 import React from "react";
 import { RouteComponentProps } from "react-router";
 import styles from "./patient-chart-summary.css";
-import HistorySection from "./history/history-section.component";
-import DocumentationSection from "./documentation/documentation-section.component";
+import DimensionsCard from "./documentation/dimensions-card.component";
+import VitalsCard from "./documentation/vitals-card.component";
+import ConditionsCard from "./history/conditions-card.component";
+import AllergyCard from "./history/allergy-card.component";
+import NotesCard from "./history/notes-card.component";
+import ProgramsCard from "./history/programs/programs-card.component";
 
 export default function PatientChartSummary(props: PatientChartSummaryProps) {
+  const config = [
+    "conditions",
+    "programs",
+    "allergies",
+    "notes",
+    "vitals",
+    {
+      module: DimensionsCard
+    }
+  ];
+
+  const coreComponents = {
+    conditions: ConditionsCard,
+    programs: ProgramsCard,
+    allergies: AllergyCard,
+    notes: NotesCard,
+    vitals: VitalsCard,
+    heightAndWeight: DimensionsCard
+  };
+
   return (
     <main className="omrs-main-content">
-      <div className={styles.patientSummary}>
-        <HistorySection match={props.match} />
-      </div>
-      <div className={styles.patientSummary}>
-        <DocumentationSection match={props.match} />
+      <div className={styles.h}>
+        <div className={styles.patientChartCards}>
+          {config.map(widget => {
+            let Component;
+            if (typeof widget === "string") {
+              Component = coreComponents[widget];
+            } else {
+              Component = widget["module"];
+            }
+
+            return <Component props={props.match} />;
+          })}
+        </div>
       </div>
     </main>
   );

@@ -7,3 +7,18 @@
   justify-content: center;
   padding-top: 3.25rem;
 }
+
+.patientChartCards {
+  padding: 3.25rem 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  width: 800px;
+  justify-content: flex-start;
+}
+
+.h {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
