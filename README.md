@@ -8,6 +8,44 @@ This module allows developers to quickly and easily put together a 'chart' or 'f
 
 The flowsheet can have a bunch of tabs (representing physical pages) each having a different table. For example, there can be a history, physical condition, allergy, reactions and summary table.
 
-## Screenshots
-The chart looks something like this:
-![Patient Chart](https://wiki.openmrs.org/download/attachments/229442375/patient%20chart%201.3.0%20add%20allergy.gif?version=1&modificationDate=1570802394000&api=v2)
+## Documentation
+
+### Instructions
+- This module depends on the HTML Form Entry Module
+- To use this module properly you need to create your own module that depends on this one, and put your own custom configuration in your `moduleApplicationContext.xml` in a controller bean that extends the PatientChartController provided by this module.
+- For each "page" (or tab) you want in your "chart", you need to create an HTML form. Preferably a short one.
+- Instantiate a controller bean, like below
+- Map the bean in your module's urlMapping
+
+Here is an example of how to configure a chart with 2 tabs. The first is labeled "Vitals", shows encounter type 1 and uses form 18 for entry. The second is labeled "Labs", shows encounter type 2 and uses form 19 for entry.
+```
+<bean id="testPatientChartController">
+ <property name="configuration">
+     <bean>
+         <property name="tabs">
+             <list>
+                 <bean>
+                     <property name="title"><value>Vitals</value></property>
+                     <property name="tabType"><value>encounterChart</value></property>
+                     <property name="encounterTypeId"><value>1</value></property>
+                     <property name="formId"><value>18</value></property>
+                 </bean>
+                 <bean>
+                     <property name="title"><value>Labs</value></property>
+                     <property name="tabType"><value>encounterChart</value></property>
+                     <property name="encounterTypeId"><value>2</value></property>
+                     <property name="formId"><value>19</value></property>
+                 </bean>
+             </list>
+         </property>
+     </bean>
+ </property>
+</bean>
+```
+
+Link to Full [Wiki Page](https://wiki.openmrs.org/display/docs/Patient+Chart+Widgets+Module)
+License: CC BY 4.0
+[![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
+
+
+
