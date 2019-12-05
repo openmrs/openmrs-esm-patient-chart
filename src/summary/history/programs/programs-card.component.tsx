@@ -1,5 +1,4 @@
 import React from "react";
-import style from "./conditions-card-style.css";
 import dayjs from "dayjs";
 import SummaryCard from "../../cards/summary-card.component";
 import SummaryCardRow from "../../cards/summary-card-row.component";
@@ -34,7 +33,12 @@ export default function Programs(props: ProgramsCardProps) {
   }, [patientUuid]);
 
   return (
-    <SummaryCard name={t("care programs", "Care Programs")} match={props.match}>
+    <SummaryCard
+      name={t("care programs", "Care Programs")}
+      match={props.match}
+      link={`/patient/${patientUuid}/chart/programs`}
+      styles={{ margin: "1.25rem, 1.5rem" }}
+    >
       <SummaryCardRow>
         <SummaryCardRowContent>
           <HorizontalLabelValue

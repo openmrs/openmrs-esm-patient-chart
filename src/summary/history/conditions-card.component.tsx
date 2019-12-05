@@ -37,7 +37,11 @@ export default function ConditionsCard(props: ConditionsCardProps) {
   }, [patient]);
 
   return (
-    <SummaryCard name={t("conditions", "Conditions")} match={props.match}>
+    <SummaryCard
+      name={t("conditions", "Conditions")}
+      match={props.match}
+      styles={{ margin: "1.25rem, 1.5rem" }}
+    >
       <SummaryCardRow>
         <SummaryCardRowContent>
           <HorizontalLabelValue
