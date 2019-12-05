@@ -34,11 +34,11 @@ button.addBtn:hover {
   justify-content: space-between;
 }
 
-.item_a {
+.headerTitle {
   grid-area: a;
 }
 
-.item_b {
+.headerAdd {
   grid-area: b;
   justify-self: center;
 }

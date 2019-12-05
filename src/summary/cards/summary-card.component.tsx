@@ -8,8 +8,8 @@ export default function SummaryCard(props: SummaryCardProps) {
   const { t } = useTranslation();
   return (
     <div style={props.styles} className={`omrs-card ${styles.card}`}>
-      <div className={`${styles.header}`}>
-        <div className={styles.item_a}>
+      <div className={styles.header}>
+        <div className={styles.headerTitle}>
           {props.link ? (
             <Link to={props.link} className={`omrs-unstyled`}>
               {contents()}
@@ -18,7 +18,7 @@ export default function SummaryCard(props: SummaryCardProps) {
             <>{contents()}</>
           )}
         </div>
-        <div className={styles.item_b}>
+        <div className={styles.headerAdd}>
           <button className={`omrs-unstyled ${styles.addBtn}`}>Add</button>
         </div>
       </div>
