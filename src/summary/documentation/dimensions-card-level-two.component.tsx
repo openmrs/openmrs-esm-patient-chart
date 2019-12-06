@@ -24,7 +24,13 @@ function DimensionsCardLevelTwo(props: DimensionsCardLevelTwoProps) {
   }, [patientUuid]);
 
   return (
-    <div style={{ display: "flex" }}>
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "center",
+        paddingTop: "3.25rem"
+      }}
+    >
       <SummaryCard
         name="Height & Weight"
         match={props.match}
