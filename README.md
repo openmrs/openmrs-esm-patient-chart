@@ -44,8 +44,9 @@ Here is an example of how to configure a chart with 2 tabs. The first is labeled
 ```
 
 ## Wiki Documentation
-[OpenMRS Wiki](https://wiki.openmrs.org/display/docs/Patient+Chart+Widgets+Module)
-
+- [OpenMRS Wiki - Patient Chart](https://wiki.openmrs.org/display/docs/Patient+Chart+Widgets+Module)
+- [OpenMRS Wiki - Patients](https://wiki.openmrs.org/display/docs/Patients)
+- [OpenMRS Wiki - Patient History](https://wiki.openmrs.org/display/docs/Patient+History)
 
 ## License
 [![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
