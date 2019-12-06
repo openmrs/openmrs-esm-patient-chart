@@ -43,8 +43,11 @@ Here is an example of how to configure a chart with 2 tabs. The first is labeled
 </bean>
 ```
 
-Link to Full [Wiki Page](https://wiki.openmrs.org/display/docs/Patient+Chart+Widgets+Module)
-License: CC BY 4.0
+## Wiki Documentation
+[OpenMRS Wiki](https://wiki.openmrs.org/display/docs/Patient+Chart+Widgets+Module)
+
+
+## License
 [![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
 
 
