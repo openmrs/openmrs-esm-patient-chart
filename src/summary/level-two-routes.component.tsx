@@ -2,6 +2,8 @@ import React from "react";
 import { match, Switch, Route } from "react-router";
 import { AllergyCardLevelTwo } from "./history/allergy-card-level-two.component";
 import DimensionsCardLevelTwo from "./documentation/dimensions-card-level-two.component";
+import VitalsLevelTwo from "./documentation/vital-card-level-two.component";
+import ProgramsLevelTwo from "./history/programs/programs-level-two.component";
 
 export function LevelTwoRoutes(props: LevelTwoRoutesProps) {
   return (
@@ -10,12 +12,23 @@ export function LevelTwoRoutes(props: LevelTwoRoutesProps) {
         <Route
           exact
           path={`/patient/:patientUuid/chart/allergy`}
-          render={routeProps => <AllergyCardLevelTwo match={props.match} />}
+          component={AllergyCardLevelTwo}
         />
         <Route
           exact
           path={`/patient/:patientUuid/chart/dimensions`}
-          render={routeProps => <DimensionsCardLevelTwo match={props.match} />}
+          component={DimensionsCardLevelTwo}
+        />
+        <Route
+          exact
+          path={`/patient/:patientUuid/chart/vitals`}
+          component={VitalsLevelTwo}
+        />
+
+        <Route
+          exact
+          path={`/patient/:patientUuid/chart/programs`}
+          component={ProgramsLevelTwo}
         />
       </Switch>
     </main>

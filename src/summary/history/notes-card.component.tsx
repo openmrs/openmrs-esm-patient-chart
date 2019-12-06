@@ -33,7 +33,11 @@ export default function NotesCard(props: NotesCardProps) {
   }, [patient]);
 
   return (
-    <SummaryCard name="Notes" match={props.match} styles={{ width: "45.5rem" }}>
+    <SummaryCard
+      name="Notes"
+      match={props.match}
+      styles={{ margin: "1.25rem, 1.5rem", width: "45.5rem" }}
+    >
       <table className={styles.table}>
         <thead>
           <tr className={styles.tableRow}>
