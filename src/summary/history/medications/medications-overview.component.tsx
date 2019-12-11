@@ -7,6 +7,7 @@ import { formatDate } from "../../documentation/dimension-helpers";
 import { createErrorHandler } from "@openmrs/esm-error-handling";
 import { useCurrentPatient } from "@openmrs/esm-api";
 import SummaryCardFooter from "../../cards/summary-card-footer.component";
+import { useTranslation } from "react-i18next";
 
 export default function MedicationsOverview(props: MedicationsOverviewProps) {
   const [patientMedications, setPatientMedications] = React.useState(null);
@@ -16,6 +17,8 @@ export default function MedicationsOverview(props: MedicationsOverviewProps) {
     patientUuid,
     patientErr
   ] = useCurrentPatient();
+
+  const { t } = useTranslation();
 
   React.useEffect(() => {
     const subscription = fetchPatientMedications(patientUuid).subscribe(
@@ -28,7 +31,7 @@ export default function MedicationsOverview(props: MedicationsOverviewProps) {
 
   return (
     <SummaryCard
-      name="Active Medications"
+      name={t("Active Medications", "Active Medications")}
       match={props.match}
       styles={{ width: "100%", maxWidth: "45rem" }}
       link={`/patient/${patientUuid}/chart/medications`}
