@@ -8,7 +8,7 @@ import { useCurrentPatient } from "@openmrs/esm-api";
 import SummaryCardFooter from "../../cards/summary-card-footer.component";
 import MedicationsOverview from "./medications-overview.component";
 
-export default function MedicationsPrimary(props: MedicationsPrimary) {
+export default function MedicationsPrimary(props: MedicationsPrimaryProps) {
   const [patientMedications, setPatientMedications] = React.useState(null);
   const [
     isLoadingPatient,
@@ -28,11 +28,11 @@ export default function MedicationsPrimary(props: MedicationsPrimary) {
 
   return (
     <div className={styles.medicationsLevelTwo}>
-      <MedicationsOverview props={props.match} />
+      <MedicationsOverview match={props.match} />
     </div>
   );
 }
 
-type MedicationsPrimary = {
+type MedicationsPrimaryProps = {
   match: match;
 };

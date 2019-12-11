@@ -3,13 +3,7 @@ import { Observable } from "rxjs";
 import { map, take, filter } from "rxjs/operators";
 
 type PatientMedications = {
-  id: Number;
-  date: Date;
-  systolic: String;
-  diastolic: String;
-  pulse: String;
-  temperature: String;
-  oxygenation: String;
+  uuid: Number;
 };
 
 export function performPatientMedicationsSearch(
@@ -32,12 +26,11 @@ export function fetchPatientMedications(
   ).pipe(
     map(({ data }) => {
       const meds = [];
-      data.results.map(result => {
+      data["results"].map(result => {
         if (result.type === "drugorder") {
           meds.push(result);
         }
       });
-      console.log(meds);
       return meds;
     })
   );
