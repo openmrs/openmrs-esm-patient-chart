@@ -2,12 +2,12 @@ import React from "react";
 import { mockPatient } from "../../../../__mocks__/patient.mock";
 import { cleanup, render, wait } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
-import MedicationsLevelOne from "./medications-level-one.component";
+import MedicationsOverview from "./medications-overview.component";
 import { of } from "rxjs/internal/observable/of";
 import * as openmrsApi from "@openmrs/esm-api";
 import { performPatientMedicationsSearch } from "./medications.resource";
 
-describe("<MedicationsLevelOne/>", () => {
+describe("<MedicationsOverview/>", () => {
   let patient: fhir.Patient, match;
 
   afterEach(() => {
@@ -34,7 +34,7 @@ describe("<MedicationsLevelOne/>", () => {
   it("renders without dying", () => {
     const wrapper = render(
       <BrowserRouter>
-        <MedicationsLevelOne match={match} />
+        <MedicationsOverview match={match} />
       </BrowserRouter>
     );
   });
@@ -45,7 +45,7 @@ describe("<MedicationsLevelOne/>", () => {
 
     const wrapper = render(
       <BrowserRouter>
-        <MedicationsLevelOne match={match} />
+        <MedicationsOverview match={match} />
       </BrowserRouter>
     );
     expect(true).toBe(true);
@@ -58,7 +58,7 @@ describe("<MedicationsLevelOne/>", () => {
 
     const wrapper = render(
       <BrowserRouter>
-        <MedicationsLevelOne match={match} />
+        <MedicationsOverview match={match} />
       </BrowserRouter>
     );
     await wait(() => {

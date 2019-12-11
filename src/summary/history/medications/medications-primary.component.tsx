@@ -1,14 +1,14 @@
 import React from "react";
 import { match } from "react-router";
 import SummaryCard from "../../cards/summary-card.component";
-import { performPatientMedicationsSearch } from "./medications.resource";
-import styles from "./medications-card-level-two.css";
+import { fetchPatientMedications } from "./medications.resource";
+import styles from "./medications-primary.css";
 import { createErrorHandler } from "@openmrs/esm-error-handling";
 import { useCurrentPatient } from "@openmrs/esm-api";
 import SummaryCardFooter from "../../cards/summary-card-footer.component";
-import MedicationsLevelOne from "./medications-level-one.component";
+import MedicationsOverview from "./medications-overview.component";
 
-export default function MedicationsLevelTwo(props: MedicationsLevelTwoProps) {
+export default function MedicationsPrimary(props: MedicationsPrimary) {
   const [patientMedications, setPatientMedications] = React.useState(null);
   const [
     isLoadingPatient,
@@ -18,7 +18,7 @@ export default function MedicationsLevelTwo(props: MedicationsLevelTwoProps) {
   ] = useCurrentPatient();
 
   React.useEffect(() => {
-    const subscription = performPatientMedicationsSearch(patientUuid).subscribe(
+    const subscription = fetchPatientMedications(patientUuid).subscribe(
       Medications => setPatientMedications(Medications),
       createErrorHandler()
     );
@@ -28,11 +28,11 @@ export default function MedicationsLevelTwo(props: MedicationsLevelTwoProps) {
 
   return (
     <div className={styles.medicationsLevelTwo}>
-      <MedicationsLevelOne props={props.match} />
+      <MedicationsOverview props={props.match} />
     </div>
   );
 }
 
-type MedicationsLevelTwoProps = {
+type MedicationsPrimary = {
   match: match;
 };

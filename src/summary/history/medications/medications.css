@@ -19,7 +19,7 @@
 }
 
 .medicationsTable tbody td span {
-  color: var(--omrs-color-ink-medium-contrast);
+  color: var(--omrs-color-ink-high-contrast);
 }
 
 .medicationsTable tbody tr {
@@ -36,4 +36,8 @@
 
 .medicationsFooter svg {
   margin-right: 0.5rem;
+}
+
+.medicationStatement {
+  text-transform: lowercase;
 }

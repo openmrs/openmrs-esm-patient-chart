@@ -4,7 +4,7 @@ import { AllergyCardLevelTwo } from "./history/allergy-card-level-two.component"
 import DimensionsCardLevelTwo from "./documentation/dimensions-card-level-two.component";
 import VitalsLevelTwo from "./documentation/vital-card-level-two.component";
 import ProgramsLevelTwo from "./history/programs/programs-level-two.component";
-import MedicationsLevelTwo from "./history/medications/medications-level-two.component";
+import MedicationsPrimary from "./history/medications/medications-primary.component";
 
 export function LevelTwoRoutes(props: LevelTwoRoutesProps) {
   return (
@@ -35,7 +35,7 @@ export function LevelTwoRoutes(props: LevelTwoRoutesProps) {
         <Route
           exact
           path={`/patient/:patientUuid/chart/medications`}
-          component={MedicationsLevelTwo}
+          component={MedicationsPrimary}
         />
       </Switch>
     </main>
