@@ -28,9 +28,10 @@ export default function MedicationsLevelOne(props: MedicationsLevelOneProps) {
 
   return (
     <SummaryCard
-      name="Medications"
+      name="Active Medications"
       match={props.match}
-      styles={{ flex: 1, margin: ".5rem", width: "45rem", maxWidth: "46rem" }}
+      styles={{ width: "100%", maxWidth: "45rem" }}
+      link={`/patient/${patientUuid}/chart/medications`}
     >
       <table className={styles.medicationsTable}>
         <tbody>
@@ -41,15 +42,30 @@ export default function MedicationsLevelOne(props: MedicationsLevelOneProps) {
                   {medication.status === "active" && (
                     <tr>
                       <td>
-                        <span className="omrs-bold">
+                        <span
+                          style={{
+                            fontWeight: 500,
+                            color: "var(--omrs-color-ink-high-contrast)"
+                          }}
+                        >
                           {medication.medicationReference.display}
-                        </span>{" "}
-                        - {medication.dosageInstruction[0].route.text} -{" "}
-                        {medication.dosageInstruction[0].doseQuantity.unit} -
-                        DOSE{" "}
-                        {medication.dosageInstruction[0].doseQuantity.value}{" "}
+                        </span>
+                        {" \u2014 "}{" "}
+                        {medication.dosageInstruction[0].route.text}{" "}
+                        {" \u2014 "}
                         {medication.dosageInstruction[0].doseQuantity.unit}{" "}
-                        {medication.dosageInstruction[0].timing.code.text}
+                        {" \u2014 "}
+                        DOSE{" "}
+                        <span
+                          style={{
+                            fontWeight: 500,
+                            color: "var(--omrs-color-ink-high-contrast)"
+                          }}
+                        >
+                          {medication.dosageInstruction[0].doseQuantity.value}{" "}
+                          {medication.dosageInstruction[0].doseQuantity.unit}{" "}
+                          {medication.dosageInstruction[0].timing.code.text}
+                        </span>
                       </td>
                       <td style={{ textAlign: "end" }}>
                         <svg className="omrs-icon" fill="rgba(0, 0, 0, 0.54)">
@@ -63,7 +79,7 @@ export default function MedicationsLevelOne(props: MedicationsLevelOneProps) {
             })}
         </tbody>
       </table>
-      <SummaryCardFooter linkTo={`/patient/${patientUuid}/chart/Medications`} />
+      <SummaryCardFooter linkTo={`/patient/${patientUuid}/chart/medications`} />
     </SummaryCard>
   );
 }

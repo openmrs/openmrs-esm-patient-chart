@@ -7,11 +7,13 @@ import ConditionsCard from "./history/conditions-card.component";
 import AllergyCard from "./history/allergy-card.component";
 import NotesCard from "./history/notes-card.component";
 import ProgramsCard from "./history/programs/programs-card.component";
+import MedicationsLevelOne from "./history/medications/medications-level-one.component";
 
 export default function PatientChartSummary(props: PatientChartSummaryProps) {
   const config = [
     "conditions",
     "programs",
+    "medications",
     "allergies",
     "notes",
     "vitals",
@@ -26,7 +28,8 @@ export default function PatientChartSummary(props: PatientChartSummaryProps) {
     allergies: AllergyCard,
     notes: NotesCard,
     vitals: VitalsCard,
-    heightAndWeight: DimensionsCard
+    heightAndWeight: DimensionsCard,
+    medications: MedicationsLevelOne
   };
 
   return (
