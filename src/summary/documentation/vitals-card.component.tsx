@@ -7,7 +7,6 @@ import { formatDate } from "./dimension-helpers";
 import { createErrorHandler } from "@openmrs/esm-error-handling";
 import { useCurrentPatient } from "@openmrs/esm-api";
 import SummaryCardFooter from "../cards/summary-card-footer.component";
-import { link } from "fs";
 
 export default function VitalsCard(props: VitalsCardProps) {
   const [patientVitals, setPatientVitals] = React.useState(null);

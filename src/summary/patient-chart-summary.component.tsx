@@ -31,7 +31,7 @@ export default function PatientChartSummary(props: PatientChartSummaryProps) {
 
   return (
     <main className="omrs-main-content">
-      <div className={styles.h}>
+      <div className={styles.patientChartCardsContainer}>
         <div className={styles.patientChartCards}>
           {config.map((widget, index) => {
             let Component;

@@ -8,17 +8,17 @@
   padding-top: 3.25rem;
 }
 
+.patientChartCardsContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .patientChartCards {
   padding: 3.25rem 0;
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
-  width: 800px;
+  width: 50rem;
   justify-content: flex-start;
-}
-
-.h {
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
