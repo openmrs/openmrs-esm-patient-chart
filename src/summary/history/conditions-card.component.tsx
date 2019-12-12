@@ -41,6 +41,7 @@ export default function ConditionsCard(props: ConditionsCardProps) {
       name={t("conditions", "Conditions")}
       match={props.match}
       styles={{ margin: "1.25rem, 1.5rem" }}
+      link={`/patient/${patientUuid}/chart/conditions`}
     >
       <SummaryCardRow>
         <SummaryCardRowContent>

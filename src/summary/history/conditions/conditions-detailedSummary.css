@@ -1,0 +1,74 @@
+:global(.omrs-breakpoint-gt-phone) .conditionsPrimary {
+  display: flex;
+  padding-top: 3.25rem;
+  width: 100%;
+  max-width: 50rem;
+  display: flex;
+  margin: 0 auto;
+}
+
+:global(.omrs-breakpoint-lt-tablet) .conditionsPrimary {
+  padding: 3.25rem 0.5rem 0 0.5rem;
+}
+
+.conditionsTable {
+  width: 100%;
+}
+
+.conditionsTable td {
+  width: 25%;
+  padding: 0.5rem 0.25rem 0rem 1rem;
+}
+
+.conditionsTable td:nth-child(1) {
+  text-align: left;
+}
+
+.conditionsTable td:nth-child(2) {
+  text-align: right;
+}
+
+.conditionsTable td:nth-child(3) {
+  text-align: left;
+}
+
+.conditionsTable thead {
+  color: var(--omrs-color-ink-medium-contrast);
+  border-bottom: 1px solid var(--omrs-color-bg-low-contrast);
+  font-family: "Roboto";
+}
+
+.conditionsTable thead td {
+  padding: 1rem 0.25rem 1rem 1rem;
+}
+
+.conditionsTable tbody {
+  border-bottom: 1px solid var(--omrs-color-bg-low-contrast);
+}
+
+.conditionsTable tbody tr {
+  padding: 3rem;
+  border-bottom: 1px solid var(--omrs-color-bg-low-contrast);
+  height: 3rem;
+}
+
+.conditionsTable tbody td:nth-child(1) {
+  font-weight: var(omrs-bold);
+}
+
+.conditionsTable tbody td:nth-child(2) {
+  font-family: "Work Sans";
+}
+
+.conditionsTable tbody td:nth-child(3) {
+  font-family: "Work Sans";
+}
+
+.conditionsTable tbody td:nth-child(4) {
+  text-align: right;
+}
+
+tr.resolved {
+  background-color: var(--omrs-color-bg-medium-contrast);
+  color: var(--omrs-color-ink-medium-contrast);
+}
