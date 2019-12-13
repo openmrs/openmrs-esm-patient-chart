@@ -1,0 +1,25 @@
+.wrapper {
+  display: flex;
+  padding: 0.5rem;
+  align-items: center;
+  margin-bottom: 2.5rem;
+  border-bottom: 1px solid var(--omrs-color-ink-lowest-contrast);
+}
+
+.active,
+.inactive {
+  text-transform: capitalize;
+}
+.active {
+  color: var(--omrs-color-ink-high-contrast);
+  font-weight: bold;
+}
+
+.inactive {
+  color: var(--omrs-color-ink-medium-contrast);
+}
+
+.route {
+  display: flex;
+  align-items: center;
+}
