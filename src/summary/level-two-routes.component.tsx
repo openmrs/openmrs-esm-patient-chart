@@ -24,27 +24,23 @@ const levelTwoRoutes = [
     url: "/patient/:patientUuid/chart/programs",
     component: ProgramsLevelTwo
   },
-  { url: "/patient/:patientUuid/chart/medications",
+  {
+    url: "/patient/:patientUuid/chart/medications",
     component: MedicationsDetailedSummary
   }
-  
 ];
 
 export function LevelTwoRoutes(props: LevelTwoRoutesProps) {
   return (
+    <main className="omrs-main-content" style={{ paddingTop: "2.75rem" }}>
       <Route path="*" render={routeProps => <Breadcrumbs {...routeProps} />} />
       {levelTwoRoutes.map(route => {
         const Component = route.component;
         return (
-          <Route
-            exact
-            key={route.url}
-            path={route.url}
-            component={Component}
-          />
+          <Route exact key={route.url} path={route.url} component={Component} />
         );
       })}
-      ;
+    </main>
   );
 }
 
