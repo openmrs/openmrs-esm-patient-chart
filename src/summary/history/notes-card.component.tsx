@@ -4,9 +4,10 @@ import { createErrorHandler } from "@openmrs/esm-error-handling";
 import SummaryCard from "../cards/summary-card.component";
 import { getEncounters } from "./encounter.resource";
 import styles from "./notes-card-style.css";
-import SummaryCardFooter from "../cards/summary-card-footer.component";
-import { formatDate } from "../documentation/dimension-helpers";
 import { useCurrentPatient } from "@openmrs/esm-api";
+import { Link } from "react-router-dom";
+import { getNotes, formatNotesDate, getAuthorName } from "./notes-helper";
+import SummaryCardFooter from "../cards/summary-card-footer.component";
 
 export default function NotesCard(props: NotesCardProps) {
   const [patientNotes, setPatientNotes] = React.useState(null);
@@ -23,9 +24,7 @@ export default function NotesCard(props: NotesCardProps) {
 
       getEncounters(patient.identifier[0].value, abortController)
         .then(({ data }) => {
-          if (data.total > 0) {
-            setPatientNotes(getNotes(data.entry));
-          }
+          setPatientNotes(getNotes(data.entry));
         })
         .catch(createErrorHandler());
       return () => abortController.abort();
@@ -38,34 +37,36 @@ export default function NotesCard(props: NotesCardProps) {
       match={props.match}
       styles={{ margin: "1.25rem, 1.5rem", width: "45.5rem" }}
     >
-      <table className={styles.table}>
+      <table className={styles.tableNotes}>
         <thead>
-          <tr className={styles.tableRow}>
-            <th className={`${styles.tableHeader} ${styles.tableDates}`}>
+          <tr className={styles.tableNotesRow}>
+            <th className={`${styles.tableNotesHeader} ${styles.tableDates}`}>
               Date
             </th>
-            <th className={styles.tableHeader}>Encounter type, Location</th>
-            <th className={styles.tableHeader}>Author</th>
+            <th className={styles.tableNotesHeader}>
+              Encounter type, Location
+            </th>
+            <th className={styles.tableNotesHeader}>Author</th>
             <th></th>
           </tr>
         </thead>
         <tbody>
           {patientNotes &&
             patientNotes.slice(0, 5).map(note => (
-              <tr key={note.id} className={styles.tableRow}>
-                <td className={styles.tableDate}>
-                  {formatDate(note.location[0].period.end)}
+              <tr key={note.id} className={styles.tableNotesRow}>
+                <td className={styles.tableNotesDate}>
+                  {formatNotesDate(note.location[0].period.end)}
                 </td>
-                <td className={styles.tableData}>
+                <td className={styles.tableNotesData}>
                   {note.type[0].coding[0].display || "\u2014"}
                   <div className={styles.location}>
                     {note.location[0].location.display || "\u2014"}
                   </div>
                 </td>
-                <td className={styles.tableData}>
-                  {getAuthorName(note.extension) || "\u2014"}
+                <td className={styles.tableNotesAuthor}>
+                  {getAuthorName(note) || "\u2014"}
                 </td>
-                <td style={{ textAlign: "end" }}>
+                <td className={styles.tdLowerSvg} style={{ textAlign: "end" }}>
                   <svg
                     className="omrs-icon"
                     fill="var(--omrs-color-ink-low-contrast)"
@@ -81,13 +82,6 @@ export default function NotesCard(props: NotesCardProps) {
       <SummaryCardFooter linkTo={`/patient/${patientUuid}/chart/notes`} />
     </SummaryCard>
   );
-}
-function getNotes(notes) {
-  return notes.map(note => note.resource);
-}
-function getAuthorName(extension: any): string {
-  const author = extension.find(ext => ext.url === "changedBy");
-  return author ? author.valueString.toUpperCase() : "";
 }
 
 type NotesCardProps = {
