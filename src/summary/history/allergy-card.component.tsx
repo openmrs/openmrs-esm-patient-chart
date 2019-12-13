@@ -34,6 +34,7 @@ export default function AllergyCard(props: AllergyCardProps) {
       name="Allergy"
       match={props.match}
       styles={{ margin: "1.25rem, 1.5rem" }}
+      link={`/patient/${patientUuid}/chart/allergy`}
     >
       {patientAllergy &&
         patientAllergy.total > 0 &&

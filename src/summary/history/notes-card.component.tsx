@@ -35,7 +35,7 @@ export default function NotesCard(props: NotesCardProps) {
     <SummaryCard
       name="Notes"
       match={props.match}
-      styles={{ margin: "1.25rem, 1.5rem", width: "45.5rem" }}
+      styles={{ margin: "1.25rem, 1.5rem", width: "100%", maxWidth: "45rem" }}
     >
       <table className={styles.tableNotes}>
         <thead>

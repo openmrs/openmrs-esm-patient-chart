@@ -5,6 +5,7 @@ import AllergyCard from "./allergy-card.component";
 import ConditionsCard from "./conditions-card.component";
 import NotesCard from "./notes-card.component";
 import ProgramsCard from "./programs/programs-card.component";
+import MedicationsSummary from "./medications/medications-summary.component";
 
 export default function HistorySection(props: HistorySectionProps) {
   return (
@@ -15,6 +16,9 @@ export default function HistorySection(props: HistorySectionProps) {
       </SummarySectionCards>
       <SummarySectionCards>
         <AllergyCard match={props.match} />
+      </SummarySectionCards>
+      <SummarySectionCards match={props.match}>
+        <MedicationsSummary match={props.match} />
       </SummarySectionCards>
       <SummarySectionCards match={props.match}>
         <NotesCard match={props.match} />

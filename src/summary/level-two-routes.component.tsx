@@ -5,6 +5,7 @@ import DimensionsCardLevelTwo from "./documentation/dimensions-card-level-two.co
 import VitalsLevelTwo from "./documentation/vital-card-level-two.component";
 import { Breadcrumbs } from "./breadcrumbs/breadcrumbs.component";
 import ProgramsLevelTwo from "./history/programs/programs-level-two.component";
+import MedicationsDetailedSummary from "./history/medications/medications-detailedSummary.component";
 
 const levelTwoRoutes = [
   {
@@ -22,6 +23,10 @@ const levelTwoRoutes = [
   {
     url: "/patient/:patientUuid/chart/programs",
     component: ProgramsLevelTwo
+  },
+  {
+    url: "/patient/:patientUuid/chart/medications",
+    component: MedicationsDetailedSummary
   }
 ];
 
@@ -32,15 +37,9 @@ export function LevelTwoRoutes(props: LevelTwoRoutesProps) {
       {levelTwoRoutes.map(route => {
         const Component = route.component;
         return (
-          <Route
-            exact
-            key={route.url}
-            path={route.url}
-            component={Component}
-          />
+          <Route exact key={route.url} path={route.url} component={Component} />
         );
       })}
-      ;
     </main>
   );
 }

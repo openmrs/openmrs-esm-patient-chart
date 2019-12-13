@@ -38,8 +38,8 @@ export default function ProgramsLevelTwo(props: ProgramsCardProps) {
         match={props.match}
         styles={{
           flex: 1,
-          margin: ".5rem",
-          width: "45.5rem",
+          padding: ".5rem",
+          width: "100%",
           maxWidth: "46rem"
         }}
       >

@@ -30,7 +30,8 @@ export default function VitalsCard(props: VitalsCardProps) {
     <SummaryCard
       name="Vitals"
       match={props.match}
-      styles={{ flex: 1, margin: ".5rem", width: "45.5rem", maxWidth: "46rem" }}
+      styles={{ width: "100%", maxWidth: "45rem" }}
+      link={`/patient/${patientUuid}/chart/vitals`}
     >
       <table className={styles.vitalsTable}>
         <thead>
