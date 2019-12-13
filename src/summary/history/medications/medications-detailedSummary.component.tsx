@@ -2,13 +2,15 @@ import React from "react";
 import { match } from "react-router";
 import SummaryCard from "../../cards/summary-card.component";
 import { fetchPatientMedications } from "./medications.resource";
-import styles from "./medications-primary.css";
+import styles from "./medications-detailedSummary.css";
 import { createErrorHandler } from "@openmrs/esm-error-handling";
 import { useCurrentPatient } from "@openmrs/esm-api";
 import SummaryCardFooter from "../../cards/summary-card-footer.component";
-import MedicationsOverview from "./medications-overview.component";
+import MedicationsSummary from "./medications-summary.component";
 
-export default function MedicationsPrimary(props: MedicationsPrimaryProps) {
+export default function MedicationsDetailedSummary(
+  props: MedicationsPrimaryProps
+) {
   const [patientMedications, setPatientMedications] = React.useState(null);
   const [
     isLoadingPatient,
@@ -28,7 +30,7 @@ export default function MedicationsPrimary(props: MedicationsPrimaryProps) {
 
   return (
     <div className={styles.medicationsLevelTwo}>
-      <MedicationsOverview match={props.match} />
+      <MedicationsSummary match={props.match} />
     </div>
   );
 }

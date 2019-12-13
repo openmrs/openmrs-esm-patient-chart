@@ -9,7 +9,7 @@ import { useCurrentPatient } from "@openmrs/esm-api";
 import SummaryCardFooter from "../../cards/summary-card-footer.component";
 import { useTranslation } from "react-i18next";
 
-export default function MedicationsOverview(props: MedicationsOverviewProps) {
+export default function MedicationsSummary(props: MedicationsOverviewProps) {
   const [patientMedications, setPatientMedications] = React.useState(null);
   const [
     isLoadingPatient,
