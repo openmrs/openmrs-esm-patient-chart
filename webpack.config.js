@@ -1,8 +1,9 @@
 const path = require("path");
 const CleanWebpackPlugin = require("clean-webpack-plugin").CleanWebpackPlugin;
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
+const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
 
-module.exports = {
+module.exports = env => ({
   entry: path.resolve(__dirname, "src/openmrs-esm-patient-chart.tsx"),
   output: {
     filename: "openmrs-esm-patient-chart.js",
@@ -55,8 +56,14 @@ module.exports = {
     "i18next",
     "react-i18next"
   ],
-  plugins: [new ForkTsCheckerWebpackPlugin(), new CleanWebpackPlugin()],
+  plugins: [
+    new ForkTsCheckerWebpackPlugin(),
+    new CleanWebpackPlugin(),
+    new BundleAnalyzerPlugin({
+      analyzerMode: env && env.analyze ? "server" : "disabled"
+    })
+  ],
   resolve: {
     extensions: [".tsx", ".ts", ".jsx", ".js"]
   }
-};
+});

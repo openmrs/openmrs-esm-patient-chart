@@ -7,6 +7,7 @@
     "start": "webpack-dev-server",
     "start-https": "webpack-dev-server --https",
     "build": "webpack --mode production",
+    "analyze": "webpack --mode=production --env.analyze=true",
     "lint": "eslint src --ext tsx",
     "prettier": "prettier",
     "typescript": "tsc",
@@ -71,6 +72,7 @@
     "systemjs-webpack-interop": "^1.1.2",
     "typescript": "^3.7.2",
     "webpack": "^4.41.2",
+    "webpack-bundle-analyzer": "^3.6.0",
     "webpack-cli": "^3.3.10",
     "webpack-dev-server": "^3.9.0"
   },

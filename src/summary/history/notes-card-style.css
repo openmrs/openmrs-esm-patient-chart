@@ -1,18 +1,32 @@
-.table {
-  width: 100%;
+.moreNotes {
+  display: flex;
+  align-items: center;
+  border: none;
+  padding: 0.625rem 1.625rem 0.625rem 1rem;
+  background-color: var(--omrs-color-bg-medium-contrast);
+  color: var(--omrs-color-ink-medium-contrast);
+  cursor: pointer;
+  text-decoration: none;
 }
 
-.tableRow {
+.tableNotesRow {
   border-bottom: 1px solid var(--omrs-color-bg-low-contrast);
 }
-
-.tableHeader,
-.tableData,
-.tableDate {
-  padding: 0.625rem;
+.svgUpper {
+  display: none;
 }
 
 .tableHeader {
+  padding: 0.625rem;
+}
+:global(.omrs-breakpoint-gt-phone) .card {
+  width: 21.75rem;
+  margin: 0.5rem 1rem;
+}
+.tableNotes {
+  width: 100%;
+}
+.tableNotesHeader {
   color: var(--omrs-color-ink-medium-contrast);
   font-size: 0.9375rem;
   text-transform: capitalize;
@@ -21,21 +35,53 @@
   font-family: "Work Sans";
 }
 
-.tableData {
+.tableNotesData,
+.tableNotesAuthor {
   font-size: 1.0625rem;
   text-align: center;
+  width: 33.3%;
 }
 
-:global(.omrs-breakpoint-lt-tablet) .tableDates {
-  width: 70%;
-}
-
-table.table .tableDate {
+.tableNotesDate {
   font-family: "Work Sans";
   font-weight: 500;
+  width: 33.3%;
+  padding: 0.625rem 1.625rem 0.625rem 1rem;
 }
 
 .location {
   color: var(--omrs-color-ink-medium-contrast);
+  font-family: "Roboto";
+}
+:global(.omrs-breakpoint-gt-phone) .tableNotesRow {
+  display: table-row;
+}
+
+:global(.omrs-breakpoint-lt-tablet) .tableNotesData,
+.tableNotesAuthor,
+.tableNotesRow {
+  display: block;
+}
+:global(.omrs-breakpoint-lt-tablet) .tableNotesAuthor {
+  color: var(--omrs-color-ink-medium-contrast);
+  text-align: left;
+  font-family: "Roboto";
+}
+:global(.omrs-breakpoint-lt-tablet) .tableNotesData {
+  text-align: left;
+  font-family: "Roboto";
+  font-weight: 500;
+  font-size: 1.0625rem;
+}
+:global(.omrs-breakpoint-lt-tablet) .tableNotesDate {
   font-family: "Work Sans";
+  text-align: left;
+  padding: 0;
+}
+:global(.omrs-breakpoint-lt-tablet) .tableNotes {
+  width: 100%;
+}
+:global(.omrs-breakpoint-lt-tablet) .tableNotesHeader,
+.tdLowerSvg {
+  display: none;
 }
