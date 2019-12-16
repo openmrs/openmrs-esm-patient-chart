@@ -7,7 +7,7 @@ const WEIGHT_CONCEPT = "5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 
 export function getDimensions(patientId: string) {
   return getDimensionsObservations(patientId).pipe(
-    map(data => formatDimensions(data.weights, data.heights))
+    map(data => (data ? formatDimensions(data.weights, data.heights) : []))
   );
 }
 
@@ -17,15 +17,17 @@ function getDimensionsObservations(patientId: string) {
   ).pipe(
     map(({ data }) => data["entry"]),
     map(entries => {
-      const dimensions = entries.map(entry => entry.resource);
-      return {
-        heights: dimensions.filter(dimension =>
-          dimension.code.coding.some(sys => sys.code === HEIGHT_CONCEPT)
-        ),
-        weights: dimensions.filter(dimension =>
-          dimension.code.coding.some(sys => sys.code === WEIGHT_CONCEPT)
-        )
-      };
+      if (entries) {
+        const dimensions = entries.map(entry => entry.resource);
+        return {
+          heights: dimensions.filter(dimension =>
+            dimension.code.coding.some(sys => sys.code === HEIGHT_CONCEPT)
+          ),
+          weights: dimensions.filter(dimension =>
+            dimension.code.coding.some(sys => sys.code === WEIGHT_CONCEPT)
+          )
+        };
+      }
     })
   );
 }
