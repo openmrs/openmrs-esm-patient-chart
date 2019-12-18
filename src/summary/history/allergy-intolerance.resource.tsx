@@ -1,6 +1,6 @@
 import { openmrsFetch, openmrsObservableFetch } from "@openmrs/esm-api";
 import { Observable } from "rxjs";
-import { map, take } from "rxjs/operators";
+import { map } from "rxjs/operators";
 
 const ALLERGYREACTIONCONCEPT: string = "162555AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 
