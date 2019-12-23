@@ -5,6 +5,6 @@ Openmrs ESM Patient Chart
 
 Patient dashboard microfrontend for the OpenMRS SPA
 
-More info on the [wiki][] (yet to be created)
+More info on the [wiki][]
 
-[wiki]: https://wiki.openmrs.org
+[wiki]: https://wiki.openmrs.org/display/projects/openmrs-esm-patient-chart
