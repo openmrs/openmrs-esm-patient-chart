@@ -1,11 +1,10 @@
 :global(.omrs-breakpoint-gt-phone) .allergySummary {
   display: flex;
   justify-content: center;
-  padding-top: 3.25rem;
 }
 
 :global(.omrs-breakpoint-lt-tablet) .allergySummary {
-  padding: 3.25rem 0.5rem 0 0.5rem;
+  padding: 0.25rem 0.5rem 0 0.5rem;
 }
 
 .allergyTable {
