@@ -4,12 +4,9 @@ export function getEncounters(
   patientIdentifer: string,
   abortController: AbortController
 ) {
-  return openmrsFetch(
-    `/ws/fhir/Encounter?patient.identifier=${patientIdentifer}`,
-    {
-      signal: abortController.signal
-    }
-  );
+  return openmrsFetch(`/ws/fhir/Encounter?identifier=${patientIdentifer}`, {
+    signal: abortController.signal
+  });
 }
 export function getEncounterById(encounterId: string) {
   return openmrsFetch(`/ws/fhir/Encounter?${encounterId}`);

@@ -38,7 +38,7 @@ const levelTwoRoutes = [
 export function LevelTwoRoutes(props: LevelTwoRoutesProps) {
   return (
     <main className="omrs-main-content" style={{ paddingTop: "2.75rem" }}>
-      <Route path="*" render={routeProps => <Breadcrumbs {...routeProps} />} />
+      <Route path="/" render={routeProps => <Breadcrumbs {...routeProps} />} />
       {levelTwoRoutes.map(route => {
         const Component = route.component;
         return (
