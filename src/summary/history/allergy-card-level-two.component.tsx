@@ -121,7 +121,7 @@ export function AllergyCardLevelTwo(props: AllergyCardLevelTwoProps) {
                       <td></td>
                       <td colSpan={3}>
                         <span className={`${styles.allergyComment}`}>
-                          <span>
+                          <span style={{ whiteSpace: "pre-line" }}>
                             {allergy.resource.note &&
                               allergy.resource.note[0].text}
                           </span>
@@ -167,7 +167,6 @@ export function AllergyCardLevelTwo(props: AllergyCardLevelTwoProps) {
 
   return (
     <>
-      (
       {patientAllergy && (
         <div className={styles.allergySummary}>
           {patientAllergy.total > 0
@@ -175,7 +174,6 @@ export function AllergyCardLevelTwo(props: AllergyCardLevelTwoProps) {
             : displayNoAllergenHistory()}
         </div>
       )}
-      )
     </>
   );
 }

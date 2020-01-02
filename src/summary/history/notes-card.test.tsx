@@ -85,7 +85,7 @@ describe("<NotesCard/>", () => {
     await wait(() => {
       const firstRow = tbody.children[0];
       const secondRow = tbody.children[2];
-      expect(firstRow.children[0].textContent).toBe("09-Nov 06:16 AM");
+      expect(firstRow.children[0].textContent).toBe("09-Nov-2019 06:16 AM");
       expect(firstRow.children[1].textContent).toContain("Vitals");
       expect(firstRow.children[1].children[0].textContent).toBe(
         "Outpatient Clinic"
