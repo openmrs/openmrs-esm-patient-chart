@@ -30,6 +30,29 @@ export default function PatientChartSummary(props: PatientChartSummaryProps) {
     medications: MedicationsSummary
   };
 
+  const [widgets, setWidgets] = React.useState([]);
+  React.useEffect(() => {
+    System.import("https://localhost:8082/jj-widgets.js").then(m => {
+      setWidgets(m.widgets);
+    });
+  }, []);
+
+  return (
+    <main className="omrs-main-content">
+      <div className={styles.patientChartCardsContainer}>
+        <div className={styles.patientChartCards}>
+          {widgets.length > 0 &&
+            widgets[0].components.map((x, index) => {
+              console.log(x);
+              let Component = x;
+              return <Component key={index} />;
+            })}
+        </div>
+      </div>
+    </main>
+  );
+
+  /*
   return (
     <main className="omrs-main-content">
       <div className={styles.patientChartCardsContainer}>
@@ -48,6 +71,7 @@ export default function PatientChartSummary(props: PatientChartSummaryProps) {
       </div>
     </main>
   );
+  */
 }
 
 type PatientChartSummaryProps = RouteComponentProps & {};
