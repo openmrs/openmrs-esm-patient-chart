@@ -32,7 +32,8 @@ export default function PatientChartSummary(props: PatientChartSummaryProps) {
 
   const [widgets, setWidgets] = React.useState([]);
   React.useEffect(() => {
-    System.import("https://localhost:8082/jj-widgets.js").then(m => {
+    System.import("@jj-widgets").then(m => {
+      console.log(m);
       setWidgets(m.widgets);
     });
   }, []);
