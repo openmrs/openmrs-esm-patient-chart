@@ -33,7 +33,7 @@ export default function PatientChartSummary(props: PatientChartSummaryProps) {
   const [widgets, setWidgets] = React.useState([]);
   React.useEffect(() => {
     System.import("@jj-widgets").then(m => {
-      console.log(m);
+      console.log(m.widgets);
       setWidgets(m.widgets);
     });
   }, []);
@@ -43,10 +43,8 @@ export default function PatientChartSummary(props: PatientChartSummaryProps) {
       <div className={styles.patientChartCardsContainer}>
         <div className={styles.patientChartCards}>
           {widgets.length > 0 &&
-            widgets[0].components.map((x, index) => {
-              console.log(x);
-              let Component = x;
-              return <Component key={index} />;
+            widgets.map((r, key) => {
+              return <r.root />;
             })}
         </div>
       </div>
