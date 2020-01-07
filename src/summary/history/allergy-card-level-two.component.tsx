@@ -34,6 +34,7 @@ export function AllergyCardLevelTwo(props: AllergyCardLevelTwoProps) {
         name="Allergy"
         match={props.match}
         styles={{ width: "100%" }}
+        addBtnUrl={`/patient/${patientUuid}/chart/allergy/add`}
       >
         <table className={styles.allergyTable}>
           <thead>
