@@ -104,28 +104,26 @@ describe("<VitalsLevelTwo/>", () => {
           .fn()
           .mockReturnValue(of(mockVitalData)))
       );
-    const container = render(
+    const wrapper = render(
       <BrowserRouter>
         <VitalsLevelTwo match={match} />
       </BrowserRouter>
     );
-    const nextButton = container.container.getElementsByClassName(
-      "navButton"
-    )[0];
+    const nextButton = wrapper.getByText("Next");
 
     act(() => {
-      fireEvent.click(nextButton, {});
+      fireEvent.click(nextButton);
     });
 
     jest.advanceTimersByTime(1000);
-    expect(container.getByText("Page 2 of 3")).toBeDefined();
+    expect(wrapper.getByText("Page 2 of 3")).toBeDefined();
 
-    const prevButton = container.container.querySelectorAll("button")[1];
+    const prevButton = wrapper.getByText("Previous");
     act(() => {
-      fireEvent.click(prevButton, {});
+      fireEvent.click(prevButton);
     });
 
-    expect(container.getByText("Page 1 of 3")).toBeDefined();
+    expect(wrapper.getByText("Page 1 of 3")).toBeDefined();
 
     jest.clearAllMocks();
     jest.clearAllTimers();
