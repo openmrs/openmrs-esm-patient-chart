@@ -1,42 +1,50 @@
 import React, { useState } from "react";
-import { match, useLocation } from "react-router";
+import { useLocation } from "react-router";
 import styles from "./breadcrumbs.component.css";
 import { Link } from "react-router-dom";
-import { levelTwoRoutes } from "../level-two-routes.component";
 import { getCurrentPatientUuid } from "@openmrs/esm-api";
+import { PatientChartRoute } from "../level-two-routes.component";
 
-export function Breadcrumbs(props: any) {
+export function Breadcrumbs(props: BreadcrumbsProps) {
   const { pathname } = useLocation();
   const [breadcrumbs, setBreadcrumbs] = useState([]);
   const [currentPatientUuid, setCurrentPatientUuid] = useState(null);
-  const rootChartUrlObject = {
-    url: `/patient/${currentPatientUuid}/chart`,
-    name: "Chart"
-  };
 
   React.useEffect(() => {
     getCurrentPatientUuid().subscribe(uuid => {
       setCurrentPatientUuid(uuid);
-      const builtBreadcrumbs = [rootChartUrlObject];
-      const pathArray = getRouteArray(pathname);
-      levelTwoRoutes.forEach(route => {
-        const routeArray = getRouteArray(route);
-        if (routeArray.every(r => pathArray.includes(r))) {
-          route.url = route.url.replace(":patientUuid", currentPatientUuid);
-          builtBreadcrumbs.push(route);
+      const firstPath = insertPatientUuid(props.rootUrl);
+      const builtBreadcrumbs = [firstPath];
+      const locationPathnames = getPathArray(pathname);
+      props.routes.forEach(route => {
+        const paths = getPathArray(route.url);
+        if (isSubset(paths, locationPathnames)) {
+          const path = insertPatientUuid(route);
+          builtBreadcrumbs.push(path);
         }
       });
       setBreadcrumbs(builtBreadcrumbs);
     });
-  }, [pathname, currentPatientUuid]);
+
+    function insertPatientUuid(route) {
+      route.url = currentPatientUuid
+        ? route.url.replace(":patientUuid", currentPatientUuid)
+        : route.url;
+      return route;
+    }
+  }, [pathname, currentPatientUuid, props.rootUrl, props.routes]);
 
   function isActiveRoute(index) {
     return index === breadcrumbs.length - 1;
   }
 
-  function getRouteArray(route) {
+  function isSubset(arr, target) {
+    return arr.every(r => (r.startsWith(":") ? true : target.includes(r)));
+  }
+
+  function getPathArray(route) {
     return route
-      .substr(pathname.indexOf("/chart"))
+      .substr(route.indexOf("/chart"))
       .split("/")
       .filter(path => path.length > 0);
   }
@@ -73,6 +81,6 @@ export function Breadcrumbs(props: any) {
 }
 
 type BreadcrumbsProps = {
-  location: any;
-  match: match;
+  rootUrl: { name: string; url: string };
+  routes: PatientChartRoute[];
 };

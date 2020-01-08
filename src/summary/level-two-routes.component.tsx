@@ -1,4 +1,4 @@
-import React from "react";
+import React, { FunctionComponent } from "react";
 import { match, Route } from "react-router";
 import { AllergyCardLevelTwo } from "./history/allergy-card-level-two.component";
 import DimensionsCardLevelTwo from "./documentation/dimensions-card-level-two.component";
@@ -8,7 +8,7 @@ import ProgramsLevelTwo from "./history/programs/programs-level-two.component";
 import MedicationsDetailedSummary from "./history/medications/medications-detailedSummary.component";
 import { AllergyCreateForm } from "./history/allergy-create-form.component";
 
-export const levelTwoRoutes = [
+export const levelTwoRoutes: PatientChartRoute[] = [
   {
     url: "/patient/:patientUuid/chart/allergy",
     component: AllergyCardLevelTwo,
@@ -41,10 +41,17 @@ export const levelTwoRoutes = [
   }
 ];
 
+function getPatientChartRootUrl(): PatientChartRoute {
+  return {
+    url: "/patient/:patientUuid/chart/",
+    name: "Chart"
+  };
+}
+
 export default function LevelTwoRoutes(props: LevelTwoRoutesProps) {
   return (
     <div className="omrs-main-content" style={{ paddingTop: "2.75rem" }}>
-      <Breadcrumbs />
+      <Breadcrumbs rootUrl={getPatientChartRootUrl()} routes={levelTwoRoutes} />
       {levelTwoRoutes.map(route => {
         const Component = route.component;
         return (
@@ -57,4 +64,10 @@ export default function LevelTwoRoutes(props: LevelTwoRoutesProps) {
 
 type LevelTwoRoutesProps = {
   match: match;
+};
+
+export type PatientChartRoute = {
+  name: string;
+  url: string;
+  component?: any;
 };
