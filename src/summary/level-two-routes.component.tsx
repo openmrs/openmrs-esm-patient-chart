@@ -6,7 +6,7 @@ import VitalsLevelTwo from "./documentation/vital-card-level-two.component";
 import { Breadcrumbs } from "./breadcrumbs/breadcrumbs.component";
 import ProgramsLevelTwo from "./history/programs/programs-level-two.component";
 import MedicationsDetailedSummary from "./history/medications/medications-detailedSummary.component";
-import { AllergyCreateForm } from "./history/allergy-create-form.component";
+import { AllergyForm } from "./history/allergy-form.component";
 
 export const levelTwoRoutes: PatientChartRoute[] = [
   {
@@ -35,9 +35,9 @@ export const levelTwoRoutes: PatientChartRoute[] = [
     name: "Medications"
   },
   {
-    url: "/patient/:patientUuid/chart/allergy/add/",
-    component: AllergyCreateForm,
-    name: "Add"
+    url: "/patient/:patientUuid/chart/allergy/form/:allergyUuid?",
+    component: AllergyForm,
+    name: "Allergy Form"
   }
 ];
 
