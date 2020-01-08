@@ -20,6 +20,15 @@ export default function PatientChartSummary(props: PatientChartSummaryProps) {
     "heightAndWeight"
   ];
 
+  const config2 = [
+    { name: "medications" },
+    {
+      name: "Programs",
+      esModule: "@jj-widgets",
+      exportName: "programsWidget"
+    }
+  ];
+
   const coreComponents = {
     conditions: ConditionsCard,
     programs: ProgramsCard,
@@ -31,10 +40,32 @@ export default function PatientChartSummary(props: PatientChartSummaryProps) {
   };
 
   const [widgets, setWidgets] = React.useState([]);
+
   React.useEffect(() => {
-    System.import("@jj-widgets").then(m => {
-      console.log(m.widgets);
-      setWidgets(m.widgets);
+    const modulePromises = [];
+
+    const widgets = [];
+    config2.map(c => {
+      if (c["esModule"]) {
+        modulePromises.push(System.import(c.esModule));
+      }
+    });
+
+    Promise.allSettled(modulePromises).then(modules => {
+      const importedWidgets = [];
+      let moduleWidgets = {};
+      modules.map(m => {
+        if (m.status === "fulfilled") {
+          moduleWidgets = Object.assign(moduleWidgets, m.value.widgets);
+        }
+      });
+
+      config2.map(c => {
+        c["esModule"]
+          ? widgets.push(moduleWidgets[c.exportName].root)
+          : widgets.push(coreComponents[c.name]);
+      });
+      setWidgets(widgets);
     });
   }, []);
 
@@ -43,34 +74,13 @@ export default function PatientChartSummary(props: PatientChartSummaryProps) {
       <div className={styles.patientChartCardsContainer}>
         <div className={styles.patientChartCards}>
           {widgets.length > 0 &&
-            widgets.map((r, key) => {
-              return <r.root />;
+            widgets.map((R, key) => {
+              return <R key={key} />;
             })}
         </div>
       </div>
     </main>
   );
-
-  /*
-  return (
-    <main className="omrs-main-content">
-      <div className={styles.patientChartCardsContainer}>
-        <div className={styles.patientChartCards}>
-          {config.map((widget, index) => {
-            let Component;
-            if (typeof widget === "string") {
-              Component = coreComponents[widget];
-            } else {
-              Component = widget["module"];
-            }
-
-            return <Component props={props.match} key={index} />;
-          })}
-        </div>
-      </div>
-    </main>
-  );
-  */
 }
 
 type PatientChartSummaryProps = RouteComponentProps & {};

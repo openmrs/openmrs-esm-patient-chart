@@ -6,13 +6,38 @@ import PatientBanner from "./banner/patient-banner.component";
 import LevelTwoRoutes from "./summary/level-two-routes.component";
 
 function Root(props) {
-  const [widgets, setWidgets] = React.useState([]);
-  const [routes, setRoutes] = React.useState([]);
+  const [widgetRoutes, setWidgetRoutes] = React.useState([]);
+
+  const config2 = [
+    { name: "medications" },
+    {
+      name: "Programs",
+      esModule: "@jj-widgets",
+      exportName: "programsWidget"
+    }
+  ];
 
   React.useEffect(() => {
-    System.import("@jj-widgets").then(m => {
-      setWidgets(m.widgets);
-      setRoutes(m.widgets[0].routes);
+    const modulePromises = [];
+
+    const widgets = [];
+    config2.map(c => {
+      if (c["esModule"]) {
+        modulePromises.push(System.import(c.esModule));
+      }
+    });
+
+    Promise.allSettled(modulePromises).then(modules => {
+      const importedWidgets = [];
+      let widgetRoutes = [];
+      modules.map(m => {
+        if (m.status === "fulfilled") {
+          for (let [exportName, widget] of Object.entries(m.value.widgets)) {
+            widgetRoutes.push(widget.routes);
+          }
+        }
+      });
+      setWidgetRoutes(widgetRoutes);
     });
   }, []);
 
@@ -27,8 +52,16 @@ function Root(props) {
         component={PatientChartSummary}
       />
       <Route path="/patient/:patientUuid/chart" component={LevelTwoRoutes} />
-
-      {routes && routes}
+      {widgetRoutes.length > 0 &&
+        widgetRoutes.map((routes, key) => {
+          return (
+            <Route
+              key={key}
+              path="/patient/:patientUuid/chart"
+              component={routes}
+            />
+          );
+        })}
     </BrowserRouter>
   );
 }
