@@ -5,7 +5,7 @@
   "main": "dist/openmrs-esm-patient-chart.js",
   "scripts": {
     "start": "webpack-dev-server",
-    "start-https": "webpack-dev-server --https",
+    "start-https": "webpack-dev-server --https --port=8081",
     "build": "webpack --mode production",
     "analyze": "webpack --mode=production --env.analyze=true",
     "lint": "eslint src --ext tsx",

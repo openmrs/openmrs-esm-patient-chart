@@ -3,9 +3,11 @@ import { BrowserRouter, Route } from "react-router-dom";
 import openmrsRootDecorator from "@openmrs/react-root-decorator";
 import PatientChartSummary from "./summary/patient-chart-summary.component";
 import PatientBanner from "./summary/banner/patient-banner.component";
-import LevelTwoRoutes from "./summary/level-two-routes.component";
+import { LevelTwoRoutes } from "./summary/level-two-routes.component";
+import FormEntry from "./summary/forms/form-entry.component";
 
 function Root(props) {
+  console.log("root props", props);
   return (
     <BrowserRouter basename={window["getOpenmrsSpaBase"]()}>
       <Route path="/patient/:patientUuid/chart">
@@ -17,6 +19,10 @@ function Root(props) {
         component={PatientChartSummary}
       />
       <Route path="/patient/:patientUuid/chart" component={LevelTwoRoutes} />
+      <Route
+        path="/patient/:patientUuid/chart/forms/:formUuid"
+        render={() => <FormEntry {...props} />}
+      />
     </BrowserRouter>
   );
 }

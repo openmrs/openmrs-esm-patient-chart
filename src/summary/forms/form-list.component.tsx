@@ -29,10 +29,7 @@ export default function FormList(props: FormListProps) {
       {forms &&
         forms.map(form => {
           return (
-            <SummaryCardRow
-              key={form.uuid}
-              linkTo={`chart/formentry/${form.uuid}`}
-            >
+            <SummaryCardRow key={form.uuid} linkTo={`chart/forms/${form.uuid}`}>
               {form.name}
             </SummaryCardRow>
           );
