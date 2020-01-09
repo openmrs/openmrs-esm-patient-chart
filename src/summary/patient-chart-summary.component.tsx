@@ -11,22 +11,18 @@ import MedicationsSummary from "../widgets/medications/medications-summary.compo
 
 export default function PatientChartSummary(props: PatientChartSummaryProps) {
   const config = [
-    "conditions",
-    "programs",
-    "medications",
-    "allergies",
-    "notes",
-    "vitals",
-    "heightAndWeight"
-  ];
-
-  const config2 = [
-    { name: "medications" },
+    { name: "conditions" },
     {
       name: "Programs",
       esModule: "@jj-widgets",
-      exportName: "programsWidget"
-    }
+      exportName: "programsWidget",
+      isParcel: true
+    },
+    { name: "medications" },
+    { name: "allergies" },
+    { name: "notes" },
+    { name: "vitals" },
+    { name: "heightAndWeight" }
   ];
 
   const coreComponents = {
@@ -45,7 +41,7 @@ export default function PatientChartSummary(props: PatientChartSummaryProps) {
     const modulePromises = [];
 
     const widgets = [];
-    config2.map(c => {
+    config.map(c => {
       if (c["esModule"]) {
         modulePromises.push(System.import(c.esModule));
       }
@@ -60,7 +56,7 @@ export default function PatientChartSummary(props: PatientChartSummaryProps) {
         }
       });
 
-      config2.map(c => {
+      config.map(c => {
         c["esModule"]
           ? widgets.push(moduleWidgets[c.exportName].root)
           : widgets.push(coreComponents[c.name]);

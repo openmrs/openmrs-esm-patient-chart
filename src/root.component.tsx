@@ -8,7 +8,7 @@ import LevelTwoRoutes from "./summary/level-two-routes.component";
 function Root(props) {
   const [widgetRoutes, setWidgetRoutes] = React.useState([]);
 
-  const config2 = [
+  const config = [
     { name: "medications" },
     {
       name: "Programs",
@@ -21,19 +21,22 @@ function Root(props) {
     const modulePromises = [];
 
     const widgets = [];
-    config2.map(c => {
+    config.map(c => {
       if (c["esModule"]) {
         modulePromises.push(System.import(c.esModule));
       }
     });
 
+    //@ts-ignore
     Promise.allSettled(modulePromises).then(modules => {
       const importedWidgets = [];
       let widgetRoutes = [];
       modules.map(m => {
         if (m.status === "fulfilled") {
           for (let [exportName, widget] of Object.entries(m.value.widgets)) {
-            widgetRoutes.push(widget.routes);
+            if (widget.hasOwnProperty("routes")) {
+              widgetRoutes.push(widget["routes"]);
+            }
           }
         }
       });
