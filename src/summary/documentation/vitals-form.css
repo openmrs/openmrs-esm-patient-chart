@@ -1,0 +1,97 @@
+:global(.omrs-breakpoint-gt-phone) .vitalsForm {
+  display: flex;
+  justify-content: center;
+}
+
+:global(.omrs-breakpoint-lt-tablet) .vitalsForm {
+  padding: 0.25rem 0.5rem 0 0.5rem;
+}
+
+.vitalsContainer {
+  display: flex;
+  flex-direction: row;
+}
+
+.vitalInputContainer {
+  display: flex;
+  flex-direction: column;
+  margin: 0.625rem;
+}
+
+.vitalsForm * input {
+  height: 2.5rem;
+  font-size: 1rem;
+  width: 100%;
+  margin: 0rem;
+  font-weight: bold;
+}
+
+.vitalsForm * input:valid {
+  color: var(--omrs-color-interaction);
+}
+
+.vitalInputContainer label {
+  font-weight: bold;
+  color: var(--omrs-color-ink-medium-contrast);
+  margin: 0rem 0rem 0.35rem 1rem;
+}
+
+.vitalInputContainer div {
+  position: relative;
+}
+
+.vitalInputContainer div input:invalid + span {
+  opacity: 0;
+}
+
+.vitalInputContainer div input:valid + span {
+  position: absolute;
+  margin-top: 0.625rem;
+  margin-left: 2.5rem;
+  left: 0;
+  color: var(--omrs-color-ink-medium-contrast);
+  font-weight: bold;
+}
+
+.vitalInputControl {
+  padding: 0.5rem;
+  margin-left: 0.5rem;
+  outline: none;
+  width: 100%;
+  border: 0.0625rem solid var(--omrs-color-ink-low-contrast);
+}
+
+.vitalInputControl + svg {
+  padding-right: 0.125rem;
+}
+
+.buttonStyles {
+  display: flex;
+  background: var(--omrs-color-ink-white);
+  bottom: 0;
+  justify-content: center;
+
+  width: 100%;
+}
+
+.buttonStyles button {
+  width: 50%;
+  margin: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+.buttonStyles button:disabled {
+  background: var(--omrs-color-ink-lowest-contrast);
+}
+
+.buttonStylesBorder {
+  border-top: 0.125rem solid var(--omrs-color-interaction);
+}
+
+.forwardSlash {
+  font-size: 2.5rem;
+  line-height: 3rem;
+  margin-top: 1.25rem;
+  font-weight: 100;
+  color: var(--omrs-color-ink-medium-contrast);
+}

@@ -7,6 +7,7 @@ import { Breadcrumbs } from "./breadcrumbs/breadcrumbs.component";
 import ProgramsLevelTwo from "../widgets/programs/programs-level-two.component";
 import MedicationsDetailedSummary from "../widgets/medications/medications-detailedSummary.component";
 import { AllergyForm } from "../widgets/allergies/allergy-form.component";
+import { VitalsForm } from "./documentation/vitals-form.component";
 
 export const levelTwoRoutes: PatientChartRoute[] = [
   {
@@ -23,6 +24,11 @@ export const levelTwoRoutes: PatientChartRoute[] = [
     url: "/patient/:patientUuid/chart/vitals",
     component: VitalsLevelTwo,
     name: "Vitals"
+  },
+  {
+    url: "/patient/:patientUuid/chart/vitals/form/:vitalsUuid?",
+    component: VitalsForm,
+    name: "Vitals Form"
   },
   {
     url: "/patient/:patientUuid/chart/programs",
