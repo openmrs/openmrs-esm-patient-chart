@@ -10,7 +10,7 @@ import ProgramsCard from "../widgets/programs/programs-card.component";
 import MedicationsSummary from "../widgets/medications/medications-summary.component";
 
 export default function PatientChartSummary(props: PatientChartSummaryProps) {
-  const config = [
+  const exampleConfig: configType[] = [
     { name: "conditions" },
     {
       name: "Programs",
@@ -23,6 +23,16 @@ export default function PatientChartSummary(props: PatientChartSummaryProps) {
     { name: "notes" },
     { name: "vitals" },
     { name: "heightAndWeight" }
+  ];
+
+  const config: configType[] = [
+    { name: "conditions" },
+    { name: "medications" },
+    { name: "allergies" },
+    { name: "notes" },
+    { name: "vitals" },
+    { name: "heightAndWeight" },
+    { name: "programs" }
   ];
 
   const [widgets, setWidgets] = React.useState([]);
@@ -40,12 +50,13 @@ export default function PatientChartSummary(props: PatientChartSummaryProps) {
 
     const modulePromises = [];
 
-    const widgets = [];
     config.map(c => {
       if (c["esModule"]) {
         modulePromises.push(System.import(c.esModule));
       }
     });
+
+    console.log(modulePromises);
 
     //@ts-ignore
     Promise.allSettled(modulePromises).then(modules => {
@@ -57,6 +68,8 @@ export default function PatientChartSummary(props: PatientChartSummaryProps) {
         }
       });
 
+      console.log(moduleWidgets);
+
       config.map(c => {
         c["esModule"]
           ? widgets.push(moduleWidgets[c.exportName].root)
@@ -64,7 +77,7 @@ export default function PatientChartSummary(props: PatientChartSummaryProps) {
       });
       setWidgets(widgets);
     });
-  }, [config]);
+  }, []);
 
   return (
     <main className="omrs-main-content">
