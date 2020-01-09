@@ -56,8 +56,6 @@ export default function PatientChartSummary(props: PatientChartSummaryProps) {
       }
     });
 
-    console.log(modulePromises);
-
     //@ts-ignore
     Promise.allSettled(modulePromises).then(modules => {
       const importedWidgets = [];
@@ -67,8 +65,6 @@ export default function PatientChartSummary(props: PatientChartSummaryProps) {
           moduleWidgets = Object.assign(moduleWidgets, m.value.widgets);
         }
       });
-
-      console.log(moduleWidgets);
 
       config.map(c => {
         c["esModule"]
