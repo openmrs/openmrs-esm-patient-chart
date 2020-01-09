@@ -47,6 +47,7 @@ export default function PatientChartSummary(props: PatientChartSummaryProps) {
       }
     });
 
+    //@ts-ignore
     Promise.allSettled(modulePromises).then(modules => {
       const importedWidgets = [];
       let moduleWidgets = {};
