@@ -25,19 +25,19 @@ export default function PatientChartSummary(props: PatientChartSummaryProps) {
     { name: "heightAndWeight" }
   ];
 
-  const coreComponents = {
-    conditions: ConditionsCard,
-    programs: ProgramsCard,
-    allergies: AllergyCard,
-    notes: NotesCard,
-    vitals: VitalsCard,
-    heightAndWeight: DimensionsCard,
-    medications: MedicationsSummary
-  };
-
   const [widgets, setWidgets] = React.useState([]);
 
   React.useEffect(() => {
+    const coreComponents = {
+      conditions: ConditionsCard,
+      programs: ProgramsCard,
+      allergies: AllergyCard,
+      notes: NotesCard,
+      vitals: VitalsCard,
+      heightAndWeight: DimensionsCard,
+      medications: MedicationsSummary
+    };
+
     const modulePromises = [];
 
     const widgets = [];
