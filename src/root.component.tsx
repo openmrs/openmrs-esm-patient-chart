@@ -8,8 +8,6 @@ import LevelTwoRoutes from "./summary/level-two-routes.component";
 function Root(props) {
   const [widgetRoutes, setWidgetRoutes] = React.useState([]);
 
-  
-
   React.useEffect(() => {
     const exampleConfig = [
       {
@@ -18,7 +16,7 @@ function Root(props) {
         exportName: "programsWidget"
       }
     ];
-  
+
     //placeholder while config mdoule is completed
     const config = [];
 

@@ -10,12 +10,9 @@ import ProgramsCard from "../widgets/programs/programs-card.component";
 import MedicationsSummary from "../widgets/medications/medications-summary.component";
 
 export default function PatientChartSummary(props: PatientChartSummaryProps) {
-  
-
   const [widgets, setWidgets] = React.useState([]);
 
   React.useEffect(() => {
-
     //an example config as we await for config module to be completed
     const exampleConfig: configType[] = [
       { name: "conditions" },
@@ -30,7 +27,7 @@ export default function PatientChartSummary(props: PatientChartSummaryProps) {
       { name: "vitals" },
       { name: "heightAndWeight" }
     ];
-    
+
     //an example config as we await for config module to be completed
     const config: configType[] = [
       { name: "conditions" },
