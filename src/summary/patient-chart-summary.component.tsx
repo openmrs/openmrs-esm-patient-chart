@@ -30,13 +30,13 @@ export default function PatientChartSummary(props: PatientChartSummaryProps) {
 
     //an example config as we await for config module to be completed
     const config: configType[] = [
+      { name: "programs" },
       { name: "conditions" },
       { name: "medications" },
       { name: "allergies" },
       { name: "notes" },
       { name: "vitals" },
-      { name: "heightAndWeight" },
-      { name: "programs" }
+      { name: "heightAndWeight" }
     ];
 
     const coreComponents = {
