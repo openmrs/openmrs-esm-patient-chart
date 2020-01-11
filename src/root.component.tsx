@@ -8,16 +8,20 @@ import LevelTwoRoutes from "./summary/level-two-routes.component";
 function Root(props) {
   const [widgetRoutes, setWidgetRoutes] = React.useState([]);
 
-  const config = [
-    { name: "medications" },
-    {
-      name: "Programs",
-      esModule: "@jj-widgets",
-      exportName: "programsWidget"
-    }
-  ];
+  
 
   React.useEffect(() => {
+    const exampleConfig = [
+      {
+        name: "Programs",
+        esModule: "@jj-widgets",
+        exportName: "programsWidget"
+      }
+    ];
+  
+    //placeholder while config mdoule is completed
+    const config = [];
+
     const modulePromises = [];
 
     config.map(c => {

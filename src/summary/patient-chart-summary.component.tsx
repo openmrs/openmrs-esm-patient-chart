@@ -10,34 +10,38 @@ import ProgramsCard from "../widgets/programs/programs-card.component";
 import MedicationsSummary from "../widgets/medications/medications-summary.component";
 
 export default function PatientChartSummary(props: PatientChartSummaryProps) {
-  const exampleConfig: configType[] = [
-    { name: "conditions" },
-    {
-      name: "Programs",
-      esModule: "@jj-widgets",
-      exportName: "programsWidget",
-      isParcel: true
-    },
-    { name: "medications" },
-    { name: "allergies" },
-    { name: "notes" },
-    { name: "vitals" },
-    { name: "heightAndWeight" }
-  ];
-
-  const config: configType[] = [
-    { name: "conditions" },
-    { name: "medications" },
-    { name: "allergies" },
-    { name: "notes" },
-    { name: "vitals" },
-    { name: "heightAndWeight" },
-    { name: "programs" }
-  ];
+  
 
   const [widgets, setWidgets] = React.useState([]);
 
   React.useEffect(() => {
+
+    //an example config as we await for config module to be completed
+    const exampleConfig: configType[] = [
+      { name: "conditions" },
+      {
+        name: "Programs",
+        esModule: "@jj-widgets",
+        exportName: "programsWidget"
+      },
+      { name: "medications" },
+      { name: "allergies" },
+      { name: "notes" },
+      { name: "vitals" },
+      { name: "heightAndWeight" }
+    ];
+    
+    //an example config as we await for config module to be completed
+    const config: configType[] = [
+      { name: "conditions" },
+      { name: "medications" },
+      { name: "allergies" },
+      { name: "notes" },
+      { name: "vitals" },
+      { name: "heightAndWeight" },
+      { name: "programs" }
+    ];
+
     const coreComponents = {
       conditions: ConditionsCard,
       programs: ProgramsCard,
