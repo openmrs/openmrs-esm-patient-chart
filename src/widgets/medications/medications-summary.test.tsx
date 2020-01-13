@@ -1,5 +1,5 @@
 import React from "react";
-import { mockPatient } from "../../../../__mocks__/patient.mock";
+import { mockPatient } from "../../../__mocks__/patient.mock";
 import { cleanup, render, wait } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import MedicationsSummary from "./medications-summary.component";

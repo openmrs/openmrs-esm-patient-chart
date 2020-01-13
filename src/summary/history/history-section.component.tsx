@@ -1,11 +1,11 @@
 import React from "react";
 import { match } from "react-router";
-import SummarySectionCards from "../cards/summary-section-cards.component";
-import AllergyCard from "./allergy-card.component";
-import ConditionsCard from "./conditions-card.component";
-import NotesCard from "./notes-card.component";
-import ProgramsCard from "./programs/programs-card.component";
-import MedicationsSummary from "./medications/medications-summary.component";
+import SummarySectionCards from "../../widgets/cards/summary-section-cards.component";
+import AllergyCard from "../../widgets/allergies/allergy-card.component";
+import ConditionsCard from "../../widgets/conditions/conditions-card.component";
+import NotesCard from "../../widgets/notes/notes-card.component";
+import ProgramsCard from "../../widgets/programs/programs-card.component";
+import MedicationsSummary from "../../widgets/medications/medications-summary.component";
 
 export default function HistorySection(props: HistorySectionProps) {
   return (

@@ -1,12 +1,12 @@
 import React from "react";
 import { match } from "react-router";
-import SummaryCard from "../cards/summary-card.component";
+import SummaryCard from "../../widgets/cards/summary-card.component";
 import { performPatientsVitalsSearch } from "./vitals-card.resource";
 import styles from "./vitals-card.css";
 import { formatDate } from "./dimension-helpers";
 import { createErrorHandler } from "@openmrs/esm-error-handling";
 import { useCurrentPatient } from "@openmrs/esm-api";
-import SummaryCardFooter from "../cards/summary-card-footer.component";
+import SummaryCardFooter from "../../widgets/cards/summary-card-footer.component";
 
 export default function VitalsCard(props: VitalsCardProps) {
   const [patientVitals, setPatientVitals] = React.useState(null);

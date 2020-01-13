@@ -1,6 +1,6 @@
 import React from "react";
 import styles from "./dimensions-card-level-two.css";
-import SummaryCard from "../cards/summary-card.component";
+import SummaryCard from "../../widgets/cards/summary-card.component";
 import { getDimensions } from "./dimensions-card.resource";
 import { match } from "react-router";
 import { useCurrentPatient } from "@openmrs/esm-api";

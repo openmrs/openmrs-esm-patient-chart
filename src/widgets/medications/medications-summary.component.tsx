@@ -1,12 +1,12 @@
 import React from "react";
 import { match } from "react-router";
-import SummaryCard from "../../cards/summary-card.component";
+import SummaryCard from "../cards/summary-card.component";
 import { fetchPatientMedications } from "./medications.resource";
 import styles from "./medications.css";
-import { formatDate } from "../../documentation/dimension-helpers";
+import { formatDate } from "../../summary/documentation/dimension-helpers";
 import { createErrorHandler } from "@openmrs/esm-error-handling";
 import { useCurrentPatient } from "@openmrs/esm-api";
-import SummaryCardFooter from "../../cards/summary-card-footer.component";
+import SummaryCardFooter from "../cards/summary-card-footer.component";
 import { useTranslation } from "react-i18next";
 
 export default function MedicationsSummary(props: MedicationsOverviewProps) {
