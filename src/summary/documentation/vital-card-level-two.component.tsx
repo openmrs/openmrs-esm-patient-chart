@@ -4,7 +4,7 @@ import { performPatientsVitalsSearch } from "./vitals-card.resource";
 import { createErrorHandler } from "@openmrs/esm-error-handling";
 import { formatDate } from "./dimension-helpers";
 import styles from "./vital-card-level-two.css";
-import SummaryCard from "../cards/summary-card.component";
+import SummaryCard from "../../widgets/cards/summary-card.component";
 import { useCurrentPatient } from "@openmrs/esm-api";
 
 export default function VitalsLevelTwo(props: VitalsLevelTwoProps) {

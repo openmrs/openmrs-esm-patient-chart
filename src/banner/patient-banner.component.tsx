@@ -1,8 +1,8 @@
 import React from "react";
 import styles from "./patient-banner.component.css";
-import { age } from "../profile/age-helpers";
+import { age } from "../widgets/profile/age-helpers";
 import dayjs from "dayjs";
-import ProfileSection from "../profile/profile-section.component";
+import ProfileSection from "../widgets/profile/profile-section.component";
 import { useCurrentPatient } from "@openmrs/esm-api";
 
 export default function PatientBanner(props: PatientBannerProps) {

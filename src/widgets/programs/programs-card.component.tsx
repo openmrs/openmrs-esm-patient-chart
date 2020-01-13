@@ -1,14 +1,14 @@
 import React from "react";
 import dayjs from "dayjs";
-import SummaryCard from "../../cards/summary-card.component";
-import SummaryCardRow from "../../cards/summary-card-row.component";
-import SummaryCardRowContent from "../../cards/summary-card-row-content.component";
+import SummaryCard from "../cards/summary-card.component";
+import SummaryCardRow from "../cards/summary-card-row.component";
+import SummaryCardRowContent from "../cards/summary-card-row-content.component";
 import { match } from "react-router";
 import { fetchPatientPrograms } from "./programs.resource";
 import { createErrorHandler } from "@openmrs/esm-error-handling";
-import HorizontalLabelValue from "../../cards/horizontal-label-value.component";
+import HorizontalLabelValue from "../cards/horizontal-label-value.component";
 import { useCurrentPatient } from "@openmrs/esm-api";
-import SummaryCardFooter from "../../cards/summary-card-footer.component";
+import SummaryCardFooter from "../cards/summary-card-footer.component";
 import { Trans, useTranslation } from "react-i18next";
 
 export default function Programs(props: ProgramsCardProps) {

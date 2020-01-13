@@ -3,8 +3,8 @@ import { cleanup, render, wait } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import { fetchPatientPrograms } from "./programs.resource";
 import ProgramsCard from "./programs-card.component";
-import { mockPatient } from "../../../../__mocks__/patient.mock";
-import { mockProgramsResponse } from "../../../../__mocks__/programs.mocks";
+import { mockPatient } from "../../../__mocks__/patient.mock";
+import { mockProgramsResponse } from "../../../__mocks__/programs.mocks";
 import * as openmrsApi from "@openmrs/esm-api";
 import { of } from "rxjs/internal/observable/of";
 
