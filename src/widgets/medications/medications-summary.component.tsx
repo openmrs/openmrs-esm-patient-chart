@@ -3,7 +3,7 @@ import { match } from "react-router";
 import SummaryCard from "../cards/summary-card.component";
 import { fetchPatientMedications } from "./medications.resource";
 import styles from "./medications.css";
-import { formatDate } from "../../summary/documentation/dimension-helpers";
+import { formatDate } from "../heightandweight/heightandweight-helper";
 import { createErrorHandler } from "@openmrs/esm-error-handling";
 import { useCurrentPatient } from "@openmrs/esm-api";
 import SummaryCardFooter from "../cards/summary-card-footer.component";

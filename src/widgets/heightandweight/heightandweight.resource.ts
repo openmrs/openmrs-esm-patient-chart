@@ -1,6 +1,6 @@
 import { openmrsObservableFetch } from "@openmrs/esm-api";
 import { map } from "rxjs/operators";
-import { formatDate, calculateBMI } from "./dimension-helpers";
+import { formatDate, calculateBMI } from "./heightandweight-helper";
 
 const HEIGHT_CONCEPT = "5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 const WEIGHT_CONCEPT = "5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";

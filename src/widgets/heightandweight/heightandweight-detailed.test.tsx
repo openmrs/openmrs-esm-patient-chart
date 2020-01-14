@@ -2,8 +2,8 @@ import React from "react";
 import { BrowserRouter } from "react-router-dom";
 import { render, cleanup, wait } from "@testing-library/react";
 import { of } from "rxjs";
-import DimensionsCardLevelTwo from "./dimensions-card-level-two.component";
-import { calculateBMI, formatDate } from "./dimension-helpers";
+import HeightAndWeightDetailed from "./heightandweight-detailed.component";
+import { calculateBMI, formatDate } from "./heightandweight-helper";
 import { mockPatient } from "../../../__mocks__/patient.mock";
 import { mockDimensionResponse } from "../../../__mocks__/dimensions.mock";
 import { useCurrentPatient, openmrsObservableFetch } from "@openmrs/esm-api";
@@ -17,7 +17,7 @@ jest.mock("@openmrs/esm-api", () => ({
   openmrsObservableFetch: jest.fn()
 }));
 
-describe("<DimensionsCardLevelTwo/>", () => {
+describe("<HeightAndWeightDetailed/>", () => {
   let patient: fhir.Patient, match;
 
   afterEach(cleanup);
@@ -33,7 +33,7 @@ describe("<DimensionsCardLevelTwo/>", () => {
     mockOpenmrsObservableFetch.mockReturnValue(of(mockDimensionResponse));
     render(
       <BrowserRouter>
-        <DimensionsCardLevelTwo match={match}></DimensionsCardLevelTwo>
+        <HeightAndWeightDetailed match={match}></HeightAndWeightDetailed>
       </BrowserRouter>
     );
   });
@@ -43,7 +43,7 @@ describe("<DimensionsCardLevelTwo/>", () => {
     mockOpenmrsObservableFetch.mockReturnValue(of(mockDimensionResponse));
     const wrapper = render(
       <BrowserRouter>
-        <DimensionsCardLevelTwo match={match}></DimensionsCardLevelTwo>
+        <HeightAndWeightDetailed match={match}></HeightAndWeightDetailed>
       </BrowserRouter>
     );
     await wait(() => {

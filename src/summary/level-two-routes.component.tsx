@@ -1,13 +1,13 @@
 import React, { FunctionComponent } from "react";
 import { match, Route } from "react-router";
 import { AllergyCardLevelTwo } from "../widgets/allergies/allergy-card-level-two.component";
-import DimensionsCardLevelTwo from "./documentation/dimensions-card-level-two.component";
-import VitalsLevelTwo from "./documentation/vital-card-level-two.component";
+import HeightAndWeightDetailed from "../widgets/heightandweight/heightandweight-detailed.component";
+import VitalsDetailedSummary from "../widgets/vitals/vitals-detailed-summary.component";
 import { Breadcrumbs } from "./breadcrumbs/breadcrumbs.component";
 import ProgramsLevelTwo from "../widgets/programs/programs-level-two.component";
 import MedicationsDetailedSummary from "../widgets/medications/medications-detailedSummary.component";
 import { AllergyForm } from "../widgets/allergies/allergy-form.component";
-import { VitalsForm } from "./documentation/vitals-form.component";
+import { VitalsForm } from "../widgets/vitals/vitals-form.component";
 
 export const levelTwoRoutes: PatientChartRoute[] = [
   {
@@ -17,12 +17,12 @@ export const levelTwoRoutes: PatientChartRoute[] = [
   },
   {
     url: "/patient/:patientUuid/chart/dimensions",
-    component: DimensionsCardLevelTwo,
+    component: HeightAndWeightDetailed,
     name: "Dimensions"
   },
   {
     url: "/patient/:patientUuid/chart/vitals",
-    component: VitalsLevelTwo,
+    component: VitalsDetailedSummary,
     name: "Vitals"
   },
   {

@@ -2,7 +2,7 @@ import React from "react";
 import { cleanup, render, wait, fireEvent } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import { mockPatient } from "../../../__mocks__/patient.mock";
-import VitalsLevelTwo from "./vital-card-level-two.component";
+import VitalsDetailedSummary from "./vitals-detailed-summary.component";
 import { of } from "rxjs";
 import {
   mockVitalsResponse,
@@ -40,7 +40,7 @@ describe("<VitalsLevelTwo/>", () => {
     mockOpenmrsObservableFetch.mockReturnValue(of(mockVitalsResponse));
     const wrapper = render(
       <BrowserRouter>
-        <VitalsLevelTwo match={match} />
+        <VitalsDetailedSummary match={match} />
       </BrowserRouter>
     );
   });
@@ -86,7 +86,7 @@ describe("<VitalsLevelTwo/>", () => {
 
     const wrapper = render(
       <BrowserRouter>
-        <VitalsLevelTwo match={match} />
+        <VitalsDetailedSummary match={match} />
       </BrowserRouter>
     );
     await wait(() => {
@@ -106,7 +106,7 @@ describe("<VitalsLevelTwo/>", () => {
       );
     const wrapper = render(
       <BrowserRouter>
-        <VitalsLevelTwo match={match} />
+        <VitalsDetailedSummary match={match} />
       </BrowserRouter>
     );
     const nextButton = wrapper.getByText("Next");

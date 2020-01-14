@@ -1,11 +1,11 @@
 import React from "react";
-import styles from "./dimensions-card-level-two.css";
-import SummaryCard from "../../widgets/cards/summary-card.component";
-import { getDimensions } from "./dimensions-card.resource";
+import styles from "./heightandweight-detailed.css";
+import SummaryCard from "../cards/summary-card.component";
+import { getDimensions } from "./heightandweight.resource";
 import { match } from "react-router";
 import { useCurrentPatient } from "@openmrs/esm-api";
 
-function DimensionsCardLevelTwo(props: DimensionsCardLevelTwoProps) {
+function HeightAndWeightDetailed(props: HeightAndWeightDetailedProps) {
   const [dimensions, setDimensions] = React.useState([]);
   const [
     isLoadingPatient,
@@ -86,8 +86,8 @@ function DimensionsCardLevelTwo(props: DimensionsCardLevelTwoProps) {
   );
 }
 
-type DimensionsCardLevelTwoProps = {
+type HeightAndWeightDetailedProps = {
   match: match;
 };
 
-export default DimensionsCardLevelTwo;
+export default HeightAndWeightDetailed;
