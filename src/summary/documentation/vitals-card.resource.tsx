@@ -1,6 +1,7 @@
-import { openmrsObservableFetch } from "@openmrs/esm-api";
+import { openmrsObservableFetch, openmrsFetch } from "@openmrs/esm-api";
 import { Observable, of } from "rxjs";
 import { map, take } from "rxjs/operators";
+import { Vitals } from "./vitals-form.component";
 
 const SYSTOLIC_BLOOD_PRESSURE_CONCEPT: string =
   "5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
@@ -9,6 +10,8 @@ const DIASTOLIC_BLOOD_PRESSURE_CONCEPT: string =
 const PULSE_CONCEPT: string = "5087AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 const TEMPERATURE_CONCEPT: string = "5088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 const OXYGENATION_CONCEPT: string = "5092AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+const HEIGHT_CONCEPT: string = "5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+const WEIGHT_CONCEPT: string = "5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 
 type PatientVitals = {
   id: Number;
@@ -100,4 +103,111 @@ function getDatesIssued(vitalsArray): string[] {
 
 function latestFirst(a, b) {
   return new Date(b).getTime() - new Date(a).getTime();
+}
+
+export function getPatientsLatestVitals(
+  patientUuuid: string,
+  abortController: AbortController
+) {
+  return openmrsFetch(
+    `/ws/rest/v1/encounter?patient=${patientUuuid}&v=custom:(uuid,encounterDatetime,obs:(uuid,value))`,
+    { signal: abortController.signal }
+  );
+}
+
+export function savePatientVitals(
+  patientUuid: string,
+  vitals: Vitals,
+  encounterDatetime: Date,
+  abortController: AbortController,
+  encounterProvider: string
+) {
+  return openmrsFetch(`/ws/rest/v1/encounter`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    signal: abortController.signal,
+    body: {
+      encounterDatetime: encounterDatetime,
+      encounterProviders: [
+        {
+          provider: "f9badd80-ab76-11e2-9e96-0800200c9a66",
+          encounterRole: "240b26f9-dd88-4172-823d-4a8bfeb7841f"
+        }
+      ],
+      location: "b1a8b05e-3542-4037-bbd3-998ee9c40574",
+      patient: patientUuid,
+      encounterType: "67a71486-1a54-468f-ac3e-7091a9a79584",
+      form: "a000cb34-9ec1-4344-a1c8-f692232f6edd",
+      obs: [
+        {
+          concept: SYSTOLIC_BLOOD_PRESSURE_CONCEPT,
+          value: vitals.systolicBloodPressure
+        },
+        {
+          concept: DIASTOLIC_BLOOD_PRESSURE_CONCEPT,
+          value: vitals.diastolicBloodPressure
+        },
+        {
+          concept: PULSE_CONCEPT,
+          value: vitals.heartRate
+        },
+        {
+          concept: OXYGENATION_CONCEPT,
+          value: vitals.oxygenSaturation
+        },
+        {
+          concept: TEMPERATURE_CONCEPT,
+          value: vitals.temperature
+        },
+        {
+          concept: WEIGHT_CONCEPT,
+          value: vitals.weight
+        },
+        {
+          concept: HEIGHT_CONCEPT,
+          value: vitals.height
+        }
+      ],
+      orders: []
+    }
+  });
+}
+
+export function editPatientVitals(
+  patientUuid: string,
+  vitals: Vitals,
+  encounterDatetime: Date,
+  abortController: AbortController,
+  encounterUuid: string,
+  encounterProvider: string
+) {
+  return openmrsFetch(`/ws/rest/v1/encounter/${encounterUuid}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    signal: abortController.signal,
+    body: {
+      encounterDatetime: encounterDatetime,
+      encounterProviders: [
+        {
+          provider: encounterProvider,
+          encounterRole: "240b26f9-dd88-4172-823d-4a8bfeb7841f"
+        }
+      ],
+      location: "b1a8b05e-3542-4037-bbd3-998ee9c40574",
+      patient: patientUuid,
+      encounterType: "67a71486-1a54-468f-ac3e-7091a9a79584",
+      form: "a000cb34-9ec1-4344-a1c8-f692232f6edd",
+      uuid: encounterUuid,
+      obs: vitals,
+      orders: []
+    }
+  });
+}
+
+export function getSession() {
+  return openmrsFetch(`/ws/rest/v1/appui/session`);
 }

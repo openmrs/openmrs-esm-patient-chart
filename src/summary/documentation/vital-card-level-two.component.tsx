@@ -152,7 +152,11 @@ export default function VitalsLevelTwo(props: VitalsLevelTwoProps) {
       <SummaryCard name="Vitals" match={props.match} styles={{ width: "100%" }}>
         <div className={`${styles.vitalsAbsent} omrs-bold`}>
           <p>No Vitals are documentated</p>
-          Please <a href="/"> add patient vitals</a>
+          Please{" "}
+          <a href={`/openmrs/spa/patient/${patientUuid}/chart/vitals/form`}>
+            {" "}
+            add patient vitals
+          </a>
         </div>
       </SummaryCard>
     );
