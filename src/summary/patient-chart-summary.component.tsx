@@ -3,11 +3,11 @@ import { RouteComponentProps } from "react-router";
 import styles from "./patient-chart-summary.css";
 import DimensionsCard from "./documentation/dimensions-card.component";
 import VitalsCard from "./documentation/vitals-card.component";
-import ConditionsCard from "./history/conditions-card.component";
-import AllergyCard from "./history/allergy-card.component";
-import NotesCard from "./history/notes-card.component";
-import ProgramsCard from "./history/programs/programs-card.component";
-import MedicationsSummary from "./history/medications/medications-summary.component";
+import ConditionsCard from "../widgets/conditions/conditions-card.component";
+import AllergyCard from "../widgets/allergies/allergy-card.component";
+import NotesCard from "../widgets/notes/notes-card.component";
+import ProgramsCard from "../widgets/programs/programs-card.component";
+import MedicationsSummary from "../widgets//medications/medications-summary.component";
 import { showToast } from "@openmrs/esm-styleguide";
 
 export default function PatientChartSummary(props: PatientChartSummaryProps) {
