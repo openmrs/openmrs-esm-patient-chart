@@ -28,8 +28,15 @@ function Root(props) {
       }
     });
 
-    //@ts-ignore
-    Promise.allSettled(modulePromises).then(modules => {
+    //Promise.allSettled(promises) is not supported within zone.js and so we are using the following reflect to achieve the same
+    const reflect = p =>
+      p.then(
+        value => ({ value, status: "fulfilled" }),
+        e => ({ e, status: "rejected" })
+      );
+
+    //Will need to add error handling but for now, given uncertainty of this feature, holding off.
+    Promise.all(modulePromises.map(reflect)).then(modules => {
       const importedWidgets = [];
       let widgetRoutes = [];
       modules.map(m => {
