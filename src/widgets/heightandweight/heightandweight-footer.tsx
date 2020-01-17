@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import styles from "./show-more-card.css";
 
-export default function ShowMoreCard(props: ShowMoreCardProps) {
+export default function HeightAndWeightFooter(
+  props: HeightAndWeightFooterProps
+) {
   const [more, setMore] = React.useState(true);
   const clickHandler = () => {
     props.func();
@@ -31,6 +33,6 @@ export default function ShowMoreCard(props: ShowMoreCardProps) {
   );
 }
 
-type ShowMoreCardProps = {
+type HeightAndWeightFooterProps = {
   func: Function;
 };

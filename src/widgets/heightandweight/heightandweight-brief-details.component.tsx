@@ -1,15 +1,16 @@
 import React from "react";
-import SummaryCard from "../../widgets/cards/summary-card.component";
+import SummaryCard from "../cards/summary-card.component";
 import { match } from "react-router";
-import { getDimensions } from "./dimensions-card.resource";
-import SummaryCardRow from "../../widgets/cards/summary-card-row.component";
-import SummaryCardRowContent from "../../widgets/cards/summary-card-row-content.component";
-import ShowMoreCard from "./show-more-card.component";
-import styles from "./dimensions-card-level-one.css";
+import { getDimensions } from "./heightandweight.resource";
+import SummaryCardRow from "../cards/summary-card-row.component";
+import SummaryCardRowContent from "../cards/summary-card-row-content.component";
+import styles from "./heightandweight-brief-details.css";
 import { useCurrentPatient } from "@openmrs/esm-api";
-import SummaryCardFooter from "../../widgets/cards/summary-card-footer.component";
+import SummaryCardFooter from "../cards/summary-card-footer.component";
 
-export default function DimensionsCard(props: DimensionsCardProps) {
+export default function HeightAndWeightBriefDetails(
+  props: HeightAndWeightBriefDetailsProps
+) {
   const [dimensions, setDimensions] = React.useState([]);
   const [showMore, setShowMore] = React.useState(false);
   const [
@@ -93,6 +94,6 @@ export default function DimensionsCard(props: DimensionsCardProps) {
   );
 }
 
-type DimensionsCardProps = {
+type HeightAndWeightBriefDetailsProps = {
   match: match;
 };
