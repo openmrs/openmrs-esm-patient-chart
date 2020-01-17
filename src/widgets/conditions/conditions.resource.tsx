@@ -89,6 +89,25 @@ const mockPatientConditionSearchResponse = {
         },
         onsetDateTime: "2011-08-05"
       }
+    },
+    {
+      resource: {
+        resourceType: "Condition",
+        id: "27EFFA98F55D48B38687B3920285BE15",
+        subject: {
+          reference: "Patient/D1A903924D4443A7A388778D77D86155"
+        },
+        clinicalStatus: "inactive",
+        code: {
+          coding: {
+            system: "http://snomed.info/sct",
+            code: "59621000",
+            display: "Essential hypertension (disorder)"
+          },
+          text: "Shortness of breath"
+        },
+        onsetDateTime: "2011-08-05"
+      }
     }
   ]
 };

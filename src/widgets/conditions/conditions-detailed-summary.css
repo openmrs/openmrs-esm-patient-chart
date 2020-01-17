@@ -1,0 +1,108 @@
+:global(.omrs-breakpoint-gt-phone) .conditionSummary {
+  display: flex;
+  justify-content: center;
+}
+
+:global(.omrs-breakpoint-lt-tablet) .conditionSummary {
+  padding: 0.25rem 0.5rem 0 0.5rem;
+}
+
+.conditionTable {
+  width: 100%;
+}
+
+.conditionTable thead {
+  color: var(--omrs-color-ink-medium-contrast);
+  border-bottom: 1px solid var(--omrs-color-bg-low-contrast);
+}
+
+.conditionTable thead td {
+  padding: 1rem 0.25rem 1rem 1rem;
+}
+
+:global(.omrs-breakpoint-lt-tablet) .conditionTable thead td {
+  padding: 0.25rem 0.125rem 0.5rem 0.5rem;
+}
+
+.conditionTable thead td:nth-child(2) {
+  text-align: right;
+  padding-right: 0rem;
+  background: "lightgray";
+}
+
+.conditionTable thead td:nth-child(3) {
+  text-align: left;
+  padding-right: 2.925rem;
+}
+
+.conditionTable tbody td:nth-child(1) {
+  width: 15%;
+}
+
+.conditionTable tbody td:nth-child(2) {
+  width: 19%;
+  text-align: right;
+  font-family: "Work Sans";
+}
+
+.conditionTable tbody td:nth-child(3) {
+  width: 15%;
+  text-align: right;
+  font-family: "Work Sans";
+}
+
+.conditionTable tbody td:nth-child(4) {
+  width: 15%;
+  padding-right: 18px;
+  color: var(--omrs-color-bg-low-contrast);
+  text-align: right;
+  font-family: "Work Sans";
+}
+
+.conditionTable tbody tr:nth-child(3n) {
+  border-bottom: 1px solid var(--omrs-color-bg-low-contrast);
+}
+
+.conditionTable tbody {
+  padding: 2rem;
+  border-bottom: 1px solid var(--omrs-color-bg-low-contrast);
+}
+
+:global(.omrs-breakpoint-lt-tablet) .conditionTable tbody {
+  padding: 1rem;
+}
+
+.conditionTable tr {
+  padding: 13px 0 16px 13px;
+  border-bottom: 1px solid var(--omrs-color-bg-low-contrast);
+}
+
+.conditionTable td {
+  padding: 12px 0 12px 16px;
+}
+
+.centerItems {
+  display: flex;
+  align-items: center;
+}
+
+.alignRight {
+  justify-content: flex-end;
+}
+
+.alignLeft {
+  justify-content: flex-start;
+}
+
+.alignRight span {
+  margin-right: 1rem;
+}
+
+.conditionFooter {
+  text-align: center;
+  font-family: "Work Sans";
+}
+
+.conditionMargin {
+  margin: 16px 16px;
+}
