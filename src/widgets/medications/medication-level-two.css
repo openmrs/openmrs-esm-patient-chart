@@ -1,0 +1,54 @@
+:global(.omrs-breakpoint-gt-phone) .medicationsLevelTwo {
+  display: flex;
+  justify-content: center;
+  padding-top: 3.25rem;
+}
+
+:global(.omrs-breakpoint-lt-tablet) .medicationsLevelTwo {
+  padding: 3.25rem 0.5rem 0 0.5rem;
+}
+
+.medicationsTable {
+  width: 100%;
+}
+.medicationsTable thead td {
+  padding: 1rem 0.25rem 1rem 1rem;
+}
+
+.medicationsTable thead {
+  color: var(--omrs-color-ink-medium-contrast);
+  border-bottom: 1px solid var(--omrs-color-bg-low-contrast);
+}
+
+.medicationsTable thead td span {
+  font-weight: normal;
+  color: var(--omrs-color-ink-medium-contrast);
+}
+
+.medicationsTable tbody td {
+  padding: 0.5rem 0.25rem 0.5rem 1rem;
+}
+
+.medicationsTable tbody td span {
+  color: var(--omrs-color-ink-high-contrast);
+}
+
+.medicationsTable tbody tr {
+  border-bottom: 1px solid var(--omrs-color-bg-low-contrast);
+}
+
+.medicationsFooter {
+  display: flex;
+  align-items: center;
+  padding: 1rem 0.25rem 1rem 1rem;
+  text-decoration: none;
+  color: var(--omrs-color-ink-medium-contrast);
+}
+
+.medicationsFooter svg {
+  margin-right: 0.5rem;
+}
+
+.medicationStatement {
+  text-transform: lowercase;
+}
