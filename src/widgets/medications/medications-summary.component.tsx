@@ -34,12 +34,14 @@ export default function MedicationsSummary(props: MedicationsOverviewProps) {
       name={t("Active Medications", "Active Medications")}
       match={props.match}
       styles={{ width: "100%", maxWidth: "45rem" }}
-      link={`/patient/${patientUuid}/chart/medications`}
+      link={`/patient/${patientUuid}/chart/medicationsleveltwo`}
     >
       <table className={styles.medicationsTable}>
         <tbody>{patientMedications && parseRestWsMeds()}</tbody>
       </table>
-      <SummaryCardFooter linkTo={`/patient/${patientUuid}/chart/medications`} />
+      <SummaryCardFooter
+        linkTo={`/patient/${patientUuid}/chart/medicationsleveltwo`}
+      />
     </SummaryCard>
   );
 
