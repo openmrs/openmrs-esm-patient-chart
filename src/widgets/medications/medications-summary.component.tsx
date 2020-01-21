@@ -25,7 +25,6 @@ export default function MedicationsSummary(props: MedicationsOverviewProps) {
       Medications => setPatientMedications(Medications),
       createErrorHandler()
     );
-
     return () => subscription.unsubscribe();
   }, [patientUuid]);
 
@@ -97,7 +96,7 @@ export default function MedicationsSummary(props: MedicationsOverviewProps) {
                   color: "var(--omrs-color-ink-high-contrast)"
                 }}
               >
-                {medication.drug.name} {medication.drug.strength}
+                {medication.drug.name}
               </span>
               {" \u2014 "}{" "}
               <span className={styles.medicationStatement}>
@@ -116,7 +115,7 @@ export default function MedicationsSummary(props: MedicationsOverviewProps) {
                 }}
                 className={styles.medicationStatement}
               >
-                {medication.dose} {medication.doseUnits.display}{" "}
+                {getDosage(medication.drug.strength, medication.dose)}{" "}
                 {medication.frequency.display}
               </span>
             </td>
@@ -130,6 +129,38 @@ export default function MedicationsSummary(props: MedicationsOverviewProps) {
       );
     });
   }
+}
+
+function getDosage(strength, doseNumber) {
+  const i = strength.search(/\D/);
+  const strengthQuantity = strength.substring(0, i);
+
+  const concentrationStartIndex = strength.search(/\//);
+
+  let strengthUnits = strength.substring(i);
+  let dosage;
+
+  if (concentrationStartIndex >= 0) {
+    strengthUnits = strength.substring(i, concentrationStartIndex);
+    const j = strength.substring(concentrationStartIndex + 1).search(/\D/);
+    const concentrationQuantity = strength.substr(
+      concentrationStartIndex + 1,
+      j
+    );
+    const concentrationUnits = strength.substring(
+      concentrationStartIndex + 1 + j
+    );
+    dosage =
+      doseNumber +
+      strengthUnits +
+      " (" +
+      (doseNumber / strengthQuantity) * concentrationQuantity +
+      concentrationUnits +
+      ")";
+  } else {
+    dosage = strengthQuantity * doseNumber + strengthUnits;
+  }
+  return dosage;
 }
 
 type MedicationsOverviewProps = {
