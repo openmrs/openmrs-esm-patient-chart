@@ -8,6 +8,8 @@ import { createErrorHandler } from "@openmrs/esm-error-handling";
 import { useCurrentPatient } from "@openmrs/esm-api";
 import SummaryCardFooter from "../cards/summary-card-footer.component";
 import { useTranslation } from "react-i18next";
+import dayjs from "dayjs";
+import { getDosage } from "./medication-orders-utils";
 
 export default function MedicationLevelTwo(props: MedicationsOverviewProps) {
   const [patientMedications, setPatientMedications] = React.useState(null);
@@ -29,13 +31,13 @@ export default function MedicationLevelTwo(props: MedicationsOverviewProps) {
     return () => subscription.unsubscribe();
   }, [patientUuid]);
 
-  function displayMedication() {
+  function displayCurrentMedication() {
     return (
       <React.Fragment>
         <SummaryCard
-          name={t("Medications - Current", "Medications - Current")}
+          name={t("Medications -current", "Medications -current")}
           match={props.match}
-          styles={{ width: "100%", maxWidth: "45rem" }}
+          styles={{ width: "90%" }}
           addBtnUrl={`/patient/${patientUuid}/chart/add`}
         >
           <table className={styles.medicationsTable}>
@@ -48,34 +50,41 @@ export default function MedicationLevelTwo(props: MedicationsOverviewProps) {
                 <td>Start Date</td>
               </tr>
             </thead>
-            <tbody>{patientMedications}</tbody>
+            <tbody>{patientMedications && parseMedication()}</tbody>
           </table>
-          <SummaryCardFooter linkTo={`/patient/${patientUuid}/chart/add`} />
-        </SummaryCard>
-        <SummaryCard
-          name={t("Medications - Previous", "Medications - Previous")}
-          match={props.match}
-          styles={{ width: "100%", maxWidth: "45rem" }}
-          addBtnUrl={`/patient/${patientUuid}/chart/add`}
-        >
-          <table className={styles.medicationsTable}>
-            <thead>
-              <tr>
-                <td>Name</td>
-                <td>
-                  <div className={styles.centerItems}>Status</div>
-                </td>
-                <td>Start Date</td>
-              </tr>
-            </thead>
-            <tbody>{patientMedications}</tbody>
-          </table>
-          {/* <SummaryCardFooter
-            linkTo={`/patient/${patientUuid}/chart/medicationsleveltwo`}
-          /> */}
         </SummaryCard>
       </React.Fragment>
     );
+  }
+
+  function displayPreviousMedication() {
+    <SummaryCard
+      name={t("Medications-previous", "Medications-previous")}
+      match={props.match}
+      styles={{ width: "90%" }}
+      addBtnUrl={`/patient/${patientUuid}/chart/add`}
+    >
+      <table className={styles.medicationsTable}>
+        <thead>
+          <tr>
+            <td>Name</td>
+            <td>
+              <div className={styles.centerItems}>Status</div>
+            </td>
+            <td>Start Date</td>
+          </tr>
+        </thead>
+        <tbody>{patientMedications && parseMedication()}</tbody>
+      </table>
+      <div className={styles.medicationFooter}>
+        <p
+          style={{ color: "var(--omrs-color-ink-medium-contrast)" }}
+          className={"omrs-type-body-large"}
+        >
+          No more medication available
+        </p>
+      </div>
+    </SummaryCard>;
   }
 
   function displayNoMedicationHistory() {
@@ -83,7 +92,7 @@ export default function MedicationLevelTwo(props: MedicationsOverviewProps) {
       <SummaryCard
         name="Medication"
         match={props.match}
-        styles={{ width: "100%" }}
+        styles={{ width: "90%" }}
       >
         <div className={styles.medicationMargin}>
           <p className="omrs-bold">
@@ -97,15 +106,55 @@ export default function MedicationLevelTwo(props: MedicationsOverviewProps) {
     );
   }
 
+  function parseMedication() {
+    return patientMedications.map((medication, index) => {
+      return (
+        <React.Fragment key={medication.uuid}>
+          <tr>
+            <td>
+              <span
+                style={{
+                  fontWeight: 500,
+                  color: "var(--omrs-color-ink-high-contrast)"
+                }}
+              >
+                {medication.drug.name}
+              </span>
+              {" \u2014 "} {medication.doseUnits.display} {" \u2014 "}
+              {medication.dose} {" \u2014 "}
+              DOSE{" "}
+              <span
+                style={{
+                  fontWeight: 500,
+                  color: "var(--omrs-color-ink-high-contrast)"
+                }}
+              >
+                {getDosage(medication.drug.strength, medication.dose)}{" "}
+                {medication.frequency.display}
+              </span>
+            </td>
+            <td>{medication.action}</td>
+            <td>{dayjs(medication.dateActivated).format("DD-MMM-YYYY")}</td>
+          </tr>
+          <div className={styles.medicationFooter}>
+            <p
+              style={{ color: "var(--omrs-color-ink-medium-contrast)" }}
+              className={"omrs-type-body-large"}
+            >
+              No more medication available
+            </p>
+          </div>
+        </React.Fragment>
+      );
+    });
+  }
+
   return (
     <>
-      {patientMedications && (
-        <div className={styles.medicationsLevelTwo}>
-          {patientMedications.total > 0
-            ? displayMedication()
-            : displayNoMedicationHistory()}
-        </div>
-      )}
+      {patientMedications &&
+        (patientMedications.length > 0
+          ? displayCurrentMedication()
+          : displayNoMedicationHistory())}
     </>
   );
 }
