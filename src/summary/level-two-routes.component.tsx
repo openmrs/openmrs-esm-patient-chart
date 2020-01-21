@@ -53,24 +53,16 @@ export const levelTwoRoutes: PatientChartRoute[] = [
   }
 ];
 
-function getPatientChartRootUrl(): PatientChartRoute {
-  return {
-    url: "/patient/:patientUuid/chart/",
-    name: "Chart"
-  };
-}
-
 export default function LevelTwoRoutes(props: LevelTwoRoutesProps) {
   return (
-    <div className="omrs-main-content" style={{ paddingTop: "2.75rem" }}>
-      <Breadcrumbs rootUrl={getPatientChartRootUrl()} routes={levelTwoRoutes} />
+    <>
       {levelTwoRoutes.map(route => {
         const Component = route.component;
         return (
           <Route exact key={route.url} path={route.url} component={Component} />
         );
       })}
-    </div>
+    </>
   );
 }
 

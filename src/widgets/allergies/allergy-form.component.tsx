@@ -13,6 +13,7 @@ import {
 import { createErrorHandler } from "@openmrs/esm-error-handling";
 import { useCurrentPatient } from "@openmrs/esm-api";
 import dayjs from "dayjs";
+import { WorkspaceItemProps } from "../../workspace/workspace.resource";
 
 const DRUG_ALLERGEN_CONCEPT: string = "162552AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 const ENVIROMENTAL_ALLERGEN_CONCEPT: string =
@@ -241,7 +242,11 @@ export function AllergyForm(props: AllergyFormProps) {
           background: "var(--omrs-color-bg-medium-contrast)"
         }}
       >
-        <form onSubmit={handleCreateFormSubmit} ref={formRef}>
+        <form
+          onSubmit={handleCreateFormSubmit}
+          onChange={() => props.state.workBegan(props.state.workspaceIndex)}
+          ref={formRef}
+        >
           <h4 className={`${style.allergyHeader} omrs-bold`}>
             Category of reaction
           </h4>
@@ -650,7 +655,7 @@ export function AllergyForm(props: AllergyFormProps) {
   );
 }
 
-type AllergyFormProps = {
+type AllergyFormProps = WorkspaceItemProps & {
   match: match;
 };
 

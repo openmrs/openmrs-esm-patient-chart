@@ -51,7 +51,7 @@ export function Breadcrumbs(props: BreadcrumbsProps) {
 
   return (
     <div className={styles.wrapper}>
-      {breadcrumbs.length > 1 &&
+      {breadcrumbs &&
         breadcrumbs.map((route, index) => {
           return (
             <li className={styles.route} key={index}>

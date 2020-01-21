@@ -1,0 +1,22 @@
+.workspace {
+}
+
+.invisible {
+  display: none;
+}
+
+.visible {
+  display: block;
+  animation: fade_in_show 0.3s;
+}
+
+@keyframes fade_in_show {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
