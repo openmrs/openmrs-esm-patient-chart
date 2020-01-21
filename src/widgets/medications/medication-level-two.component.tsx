@@ -8,6 +8,8 @@ import { createErrorHandler } from "@openmrs/esm-error-handling";
 import { useCurrentPatient } from "@openmrs/esm-api";
 import SummaryCardFooter from "../cards/summary-card-footer.component";
 import { useTranslation } from "react-i18next";
+import dayjs from "dayjs";
+import { getDosage } from "./medication-orders-utils";
 
 export default function MedicationLevelTwo(props: MedicationsOverviewProps) {
   const [patientMedications, setPatientMedications] = React.useState(null);
@@ -17,7 +19,8 @@ export default function MedicationLevelTwo(props: MedicationsOverviewProps) {
     patientUuid,
     patientErr
   ] = useCurrentPatient();
-  const pastMedication = false;
+  let pastMedication = false;
+  let currentMedication = false;
 
   const { t } = useTranslation();
 
@@ -29,13 +32,13 @@ export default function MedicationLevelTwo(props: MedicationsOverviewProps) {
     return () => subscription.unsubscribe();
   }, [patientUuid]);
 
-  function displayMedication() {
+  function displayCurrentMedications() {
     return (
       <React.Fragment>
         <SummaryCard
-          name={t("Medications - Current", "Medications - Current")}
+          name={t("Medications - current", "Medications - current")}
           match={props.match}
-          styles={{ width: "100%", maxWidth: "45rem" }}
+          styles={{ width: "90%" }}
           addBtnUrl={`/patient/${patientUuid}/chart/add`}
         >
           <table className={styles.medicationsTable}>
@@ -48,14 +51,72 @@ export default function MedicationLevelTwo(props: MedicationsOverviewProps) {
                 <td>Start Date</td>
               </tr>
             </thead>
-            <tbody>{patientMedications}</tbody>
+            <tbody>
+              {patientMedications &&
+                patientMedications
+                  .filter(med => med.action === "NEW")
+                  .map(medication => {
+                    return (
+                      <React.Fragment key={medication.uuid}>
+                        <tr>
+                          <td>
+                            <span
+                              style={{
+                                fontWeight: 500,
+                                color: "var(--omrs-color-ink-high-contrast)"
+                              }}
+                            >
+                              {medication.drug.name}
+                            </span>
+                            {" \u2014 "} {medication.doseUnits.display}{" "}
+                            {" \u2014 "}
+                            {medication.route.display} {" \u2014 "}
+                            DOSE{" "}
+                            <span
+                              style={{
+                                fontWeight: 500,
+                                color: "var(--omrs-color-ink-high-contrast)"
+                              }}
+                            >
+                              {getDosage(
+                                medication.drug.strength,
+                                medication.dose
+                              )}{" "}
+                              {medication.frequency.display}
+                            </span>
+                          </td>
+                          <td>{medication.action}</td>
+                          <td>
+                            {dayjs(medication.dateActivated).format(
+                              "DD-MMM-YYYY"
+                            )}
+                          </td>
+                        </tr>
+                      </React.Fragment>
+                    );
+                  })}
+            </tbody>
           </table>
-          <SummaryCardFooter linkTo={`/patient/${patientUuid}/chart/add`} />
+          <div className={styles.medicationFooter}>
+            <p
+              style={{ color: "var(--omrs-color-ink-medium-contrast)" }}
+              className={"omrs-type-body-large"}
+            >
+              No more medications available.
+            </p>
+          </div>
         </SummaryCard>
+      </React.Fragment>
+    );
+  }
+
+  function displayPastMedications() {
+    return (
+      <React.Fragment>
         <SummaryCard
-          name={t("Medications - Previous", "Medications - Previous")}
+          name={t("Medications - past", "Medications - past")}
           match={props.match}
-          styles={{ width: "100%", maxWidth: "45rem" }}
+          styles={{ width: "90%" }}
           addBtnUrl={`/patient/${patientUuid}/chart/add`}
         >
           <table className={styles.medicationsTable}>
@@ -68,11 +129,60 @@ export default function MedicationLevelTwo(props: MedicationsOverviewProps) {
                 <td>Start Date</td>
               </tr>
             </thead>
-            <tbody>{patientMedications}</tbody>
+            <tbody>
+              {patientMedications &&
+                patientMedications
+                  .filter(med => med.action !== "NEW")
+                  .map(medication => {
+                    return (
+                      <React.Fragment key={medication.uuid}>
+                        <tr>
+                          <td>
+                            <span
+                              style={{
+                                fontWeight: 500,
+                                color: "var(--omrs-color-ink-high-contrast)"
+                              }}
+                            >
+                              {medication.drug.display}
+                            </span>
+                            {" \u2014 "} {medication.doseUnits.display}{" "}
+                            {" \u2014 "}
+                            {medication.route.display} {" \u2014 "}
+                            DOSE{" "}
+                            <span
+                              style={{
+                                fontWeight: 500,
+                                color: "var(--omrs-color-ink-high-contrast)"
+                              }}
+                            >
+                              {getDosage(
+                                medication.drug.strength,
+                                medication.dose
+                              )}{" "}
+                              {medication.frequency.display}
+                            </span>
+                          </td>
+                          <td>{medication.action}</td>
+                          <td>
+                            {dayjs(medication.dateActivated).format(
+                              "DD-MMM-YYYY"
+                            )}
+                          </td>
+                        </tr>
+                      </React.Fragment>
+                    );
+                  })}
+            </tbody>
           </table>
-          {/* <SummaryCardFooter
-            linkTo={`/patient/${patientUuid}/chart/medicationsleveltwo`}
-          /> */}
+          <div className={styles.medicationFooter}>
+            <p
+              style={{ color: "var(--omrs-color-ink-medium-contrast)" }}
+              className={"omrs-type-body-large"}
+            >
+              No more medications available.
+            </p>
+          </div>
         </SummaryCard>
       </React.Fragment>
     );
@@ -83,7 +193,7 @@ export default function MedicationLevelTwo(props: MedicationsOverviewProps) {
       <SummaryCard
         name="Medication"
         match={props.match}
-        styles={{ width: "100%" }}
+        styles={{ width: "90%" }}
       >
         <div className={styles.medicationMargin}>
           <p className="omrs-bold">
@@ -97,15 +207,20 @@ export default function MedicationLevelTwo(props: MedicationsOverviewProps) {
     );
   }
 
+  function displayMedications() {
+    return (
+      <>
+        <div>{displayCurrentMedications()}</div>
+        <div>{displayPastMedications()}</div>
+      </>
+    );
+  }
+
   return (
     <>
-      {patientMedications && (
-        <div className={styles.medicationsLevelTwo}>
-          {patientMedications.total > 0
-            ? displayMedication()
-            : displayNoMedicationHistory()}
-        </div>
-      )}
+      {patientMedications && patientMedications.length > 0
+        ? displayMedications()
+        : displayNoMedicationHistory()}
     </>
   );
 }

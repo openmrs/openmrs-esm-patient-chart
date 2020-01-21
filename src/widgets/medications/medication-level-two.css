@@ -52,3 +52,7 @@
 .medicationStatement {
   text-transform: lowercase;
 }
+
+.medicationFooter {
+  text-align: center;
+}
