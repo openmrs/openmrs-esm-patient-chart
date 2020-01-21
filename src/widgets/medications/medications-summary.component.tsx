@@ -8,6 +8,7 @@ import { createErrorHandler } from "@openmrs/esm-error-handling";
 import { useCurrentPatient } from "@openmrs/esm-api";
 import SummaryCardFooter from "../cards/summary-card-footer.component";
 import { useTranslation } from "react-i18next";
+import { getDosage } from "./medication-orders-utils";
 
 export default function MedicationsSummary(props: MedicationsOverviewProps) {
   const [patientMedications, setPatientMedications] = React.useState(null);
@@ -25,7 +26,6 @@ export default function MedicationsSummary(props: MedicationsOverviewProps) {
       Medications => setPatientMedications(Medications),
       createErrorHandler()
     );
-
     return () => subscription.unsubscribe();
   }, [patientUuid]);
 
@@ -99,7 +99,7 @@ export default function MedicationsSummary(props: MedicationsOverviewProps) {
                   color: "var(--omrs-color-ink-high-contrast)"
                 }}
               >
-                {medication.drug.display}
+                {medication.drug.name}
               </span>
               {" \u2014 "}{" "}
               <span className={styles.medicationStatement}>
@@ -118,7 +118,7 @@ export default function MedicationsSummary(props: MedicationsOverviewProps) {
                 }}
                 className={styles.medicationStatement}
               >
-                {medication.dose} {medication.doseUnits.display}{" "}
+                {getDosage(medication.drug.strength, medication.dose)}{" "}
                 {medication.frequency.display}
               </span>
             </td>
