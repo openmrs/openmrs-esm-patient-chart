@@ -1,6 +1,5 @@
 import { Subject, Observable } from "rxjs";
 import { AllergyForm } from "../widgets/allergies/allergy-form.component";
-import VitalsCard from "../summary/documentation/vitals-card.component";
 import Parcel from "single-spa-react/parcel";
 import React from "react";
 
@@ -20,12 +19,6 @@ export const coreWorkspaceItems = {
     name: "Allergy",
     props: { match: { params: {} } },
     validations: [],
-    inProgress: false
-  },
-  vitals: {
-    component: VitalsCard,
-    name: "Vitals",
-    props: { match: { params: {} } },
     inProgress: false
   },
   forms: {

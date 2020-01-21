@@ -5,7 +5,7 @@ import { newWorkspaceItem } from "../workspace/workspace.resource";
 export default function Sidebar(props: any) {
   const sidebarItems = [
     { name: "A", onclick: () => newWorkspaceItem("allergy") },
-    { name: "V", onclick: () => newWorkspaceItem("vitals") },
+    { name: "O", onclick: () => newWorkspaceItem("orders") },
     { name: "F", onclick: () => newWorkspaceItem("forms") }
   ];
   return (
