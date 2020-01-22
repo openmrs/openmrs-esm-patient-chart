@@ -1,0 +1,18 @@
+.nav {
+  list-style-type: none;
+  padding: 0;
+}
+ul.nav > li.navItem {
+  margin: 0;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+ul.nav > li.navItem:hover {
+  background: var(--omrs-color-ink-lowest-contrast);
+  color: var(--omrs-color-interaction);
+}
+
+.sidebar {
+  background-color: white;
+}

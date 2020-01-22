@@ -31,22 +31,20 @@ export default function PatientChartSummary(props: PatientChartSummaryProps) {
   };
 
   return (
-    <main className="omrs-main-content">
-      <div className={styles.patientChartCardsContainer}>
-        <div className={styles.patientChartCards}>
-          {config.map((widget, index) => {
-            let Component;
-            if (typeof widget === "string") {
-              Component = coreComponents[widget];
-            } else {
-              Component = widget["module"];
-            }
+    <div className={styles.patientChartCardsContainer}>
+      <div className={styles.patientChartCards}>
+        {config.map((widget, index) => {
+          let Component;
+          if (typeof widget === "string") {
+            Component = coreComponents[widget];
+          } else {
+            Component = widget["module"];
+          }
 
-            return <Component props={props.match} key={index} />;
-          })}
-        </div>
+          return <Component props={props.match} key={index} />;
+        })}
       </div>
-    </main>
+    </div>
   );
 }
 

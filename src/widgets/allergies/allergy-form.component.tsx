@@ -13,6 +13,7 @@ import {
 import { createErrorHandler } from "@openmrs/esm-error-handling";
 import { useCurrentPatient } from "@openmrs/esm-api";
 import dayjs from "dayjs";
+import { DataCaptureComponentProps } from "../../utils/data-capture-props";
 
 const DRUG_ALLERGEN_CONCEPT: string = "162552AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 const ENVIROMENTAL_ALLERGEN_CONCEPT: string =
@@ -138,14 +139,17 @@ export function AllergyForm(props: AllergyFormProps) {
 
   React.useEffect(() => {
     if (selectedAllergyCategory) {
-      getAllergyAllergenByConceptUuid(selectedAllergyCategory).subscribe(
-        data => setAllergensArray(data),
-        createErrorHandler
-      );
-      getAllergyReaction().subscribe(
+      const sub1 = getAllergyAllergenByConceptUuid(
+        selectedAllergyCategory
+      ).subscribe(data => setAllergensArray(data), createErrorHandler);
+      const sub2 = getAllergyReaction().subscribe(
         data => setAllergyReaction(data),
         createErrorHandler
       );
+      return () => {
+        sub1.unsubscribe();
+        sub2.unsubscribe();
+      };
     }
   }, [selectedAllergyCategory]);
 
@@ -181,7 +185,7 @@ export function AllergyForm(props: AllergyFormProps) {
       props.match.params,
       abortController
     ).then(response => {
-      response.status == 200 && navigate();
+      response.status == 200 && props.entrySubmitted();
     }, createErrorHandler);
     return () => abortController.abort();
   };
@@ -198,7 +202,7 @@ export function AllergyForm(props: AllergyFormProps) {
     const abortController = new AbortController();
     savePatientAllergy(patientAllergy, patientUuid, abortController)
       .then(response => {
-        response.status == 201 && navigate();
+        response.status == 201 && props.entrySubmitted();
       })
       .catch(createErrorHandler());
     return () => abortController.abort();
@@ -206,6 +210,7 @@ export function AllergyForm(props: AllergyFormProps) {
 
   const handleCancelChanges = () => {
     formRef.current.reset();
+    props.entryCancelled();
   };
 
   function navigate() {
@@ -241,7 +246,11 @@ export function AllergyForm(props: AllergyFormProps) {
           background: "var(--omrs-color-bg-medium-contrast)"
         }}
       >
-        <form onSubmit={handleCreateFormSubmit} ref={formRef}>
+        <form
+          onSubmit={handleCreateFormSubmit}
+          onChange={() => props.entryStarted()}
+          ref={formRef}
+        >
           <h4 className={`${style.allergyHeader} omrs-bold`}>
             Category of reaction
           </h4>
@@ -650,7 +659,13 @@ export function AllergyForm(props: AllergyFormProps) {
   );
 }
 
-type AllergyFormProps = {
+AllergyForm.defaultProps = {
+  entryStarted: () => {},
+  entryCancelled: () => {},
+  entrySubmitted: () => {}
+};
+
+type AllergyFormProps = DataCaptureComponentProps & {
   match: match;
 };
 
