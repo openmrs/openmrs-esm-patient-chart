@@ -13,7 +13,7 @@
   -webkit-margin-end: 0px;
   -webkit-padding-start: 0px;
 }
-.tabs > button {
+.tabs > div.tab {
   display: inline-block;
   margin-left: 0;
   padding: 10px;
@@ -24,13 +24,14 @@
   color: #aaa;
   flex: 1;
   text-align: center;
+  width: 100%;
 }
 
-.tabs > button {
+.tabs > div.tab {
   transition: background-color 0.2s linear;
 }
 
-.tabs > button.selected {
+.tabs > div.tab.selected {
   border-bottom: 0.125rem solid var(--omrs-color-interaction);
   color: var(--omrs-color-ink-high-contrast);
   background-color: var(--omrs-color-interaction-minus-two);

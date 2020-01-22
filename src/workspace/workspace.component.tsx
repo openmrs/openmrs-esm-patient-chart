@@ -73,11 +73,9 @@ export default function Workspace(props: any) {
             >
               <tab.component
                 {...tab.props}
-                state={{
-                  workspaceIndex: i,
-                  workBegan: setWorkBegan,
-                  workEnded: setWorkEnded
-                }}
+                entryStarted={() => setWorkBegan(i)}
+                entrySubmitted={() => setWorkEnded(i)}
+                entryCancelled={() => setWorkEnded(i)}
               />
             </Panel>
           ))}

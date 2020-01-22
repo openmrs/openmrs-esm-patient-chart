@@ -12,13 +12,16 @@ export function Tabs(props) {
         {Array.isArray(props.children) ? (
           props.children.map((elem, index) => {
             return (
-              <button
-                className={`omrs-unstyled ${
-                  index == props.selected ? styles.selected : ""
-                }`}
+              <div
                 key={index}
-                onClick={() => props.setSelected(index)}
+                className={`${styles.tab}
+              ${index == props.selected ? styles.selected : ""}
+            `}
               >
+                <button
+                  className="omrs-unstyled"
+                  onClick={() => props.setSelected(index)}
+                />
                 {elem.props.title}
                 <button
                   onClick={$event => removeTab($event, index)}
@@ -28,7 +31,7 @@ export function Tabs(props) {
                     <use xlinkHref="#omrs-icon-close"></use>
                   </svg>
                 </button>
-              </button>
+              </div>
             );
           })
         ) : (

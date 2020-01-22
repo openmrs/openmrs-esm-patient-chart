@@ -36,6 +36,12 @@ function Root(props) {
             component={LevelTwoRoutes}
           />
         </div>
+        <div
+          style={{
+            width: ".1rem",
+            border: ".5px solid var(--omrs-color-ink-lowest-contrast)"
+          }}
+        ></div>
         <Route
           path="/patient/:patientUuid/chart"
           render={routeProps => (
