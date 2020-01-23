@@ -5,10 +5,10 @@ import HeightAndWeightDetailed from "../widgets/heightandweight/heightandweight-
 import VitalsDetailedSummary from "../widgets/vitals/vitals-detailed-summary.component";
 import { Breadcrumbs } from "./breadcrumbs/breadcrumbs.component";
 import ProgramsLevelTwo from "../widgets/programs/programs-level-two.component";
-import MedicationsDetailedSummary from "../widgets/medications/medications-detailedSummary.component";
 import { AllergyForm } from "../widgets/allergies/allergy-form.component";
 import { VitalsForm } from "../widgets/vitals/vitals-form.component";
 import ConditionsBriefSummary from "../widgets/conditions/conditions-brief-summary.component";
+import MedicationLevelTwo from "../widgets/medications/medication-level-two.component";
 
 export const levelTwoRoutes: PatientChartRoute[] = [
   {
@@ -38,7 +38,7 @@ export const levelTwoRoutes: PatientChartRoute[] = [
   },
   {
     url: "/patient/:patientUuid/chart/medications",
-    component: MedicationsDetailedSummary,
+    component: MedicationLevelTwo,
     name: "Medications"
   },
   {
