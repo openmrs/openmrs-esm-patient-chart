@@ -11,6 +11,10 @@
     0rem 0.0625rem 0.25rem rgba(0, 0, 0, 0.04);
 }
 
+:global(.omrs-breakpoint-lt-desktop) .card {
+  margin: 1rem 1rem;
+}
+
 :global(.omrs-card) button.addBtn {
   color: var(--omrs-color-ink-medium-contrast);
   letter-spacing: 0.0125rem;
