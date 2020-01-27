@@ -27,6 +27,15 @@ export default function SummaryCard(props: SummaryCardProps) {
             </button>
           </div>
         )}
+        {props.editBtnUrl && (
+          <div className={styles.headerAdd}>
+            <button className={`omrs-unstyled ${styles.addBtn}`}>
+              <Link className="omrs-unstyled" to={props.editBtnUrl}>
+                Edit
+              </Link>
+            </button>
+          </div>
+        )}
       </div>
       {props.children}
     </div>
@@ -51,6 +60,7 @@ type SummaryCardProps = {
   styles?: React.CSSProperties;
   link?: string;
   addBtnUrl?: string;
+  editBtnUrl?: string;
 };
 
 type Styles = {};

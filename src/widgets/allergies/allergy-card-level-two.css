@@ -98,6 +98,9 @@
 
 .allergyFooter {
   text-align: center;
+  color: var(--omrs-color-ink-medium-contrast);
+  font-family: "Work sans";
+  font-size: 17px;
 }
 
 tr.high {

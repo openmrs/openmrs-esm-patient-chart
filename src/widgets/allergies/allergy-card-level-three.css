@@ -1,0 +1,59 @@
+:global(.omrs-breakpoint-gt-phone) .allergySummary {
+  display: flex;
+}
+
+:global(.omrs-breakpoint-lt-tablet) .allergySummary {
+  padding: 0.25rem 0.5rem 0 0.5rem;
+}
+
+.allergyCard {
+  margin: 0rem 1rem;
+  font-size: 1.063rem;
+}
+
+.allergyName {
+  font-size: 1.688rem;
+  font-weight: bold;
+  letter-spacing: 0.05rem;
+  padding: 1rem 0rem;
+}
+
+.allergyTable {
+  width: 100%;
+  margin-top: 1rem;
+  margin-bottom: 0.625rem;
+}
+
+.allergyTable thead th {
+  color: var(--omrs-color-ink-medium-contrast);
+  font-size: 1.063rem;
+  font-weight: normal;
+  text-align: left;
+}
+
+.allergyTable tbody td:nth-child(3) {
+  font-family: "Work Sans";
+}
+
+.allergyDetails tbody td:nth-child(1) {
+  font-family: "Work Sans";
+}
+
+.allergyFooter {
+  padding: 0.625rem;
+}
+
+.centerItems {
+  display: flex;
+  align-items: center;
+}
+
+.highSeverity {
+  border-left: 0.188rem solid var(--omrs-color-danger);
+  margin: 0rem;
+  padding-left: 1rem;
+}
+
+.lowSeverity {
+  border-left: none;
+}
