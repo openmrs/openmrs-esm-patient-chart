@@ -13,36 +13,48 @@
   -webkit-margin-end: 0px;
   -webkit-padding-start: 0px;
 }
-.tabs > div.tab {
-  display: inline-block;
+
+.tab {
   margin-left: 0;
-  padding: 10px;
-  border-bottom: 1px solid var(--omrs-color-ink-lowest-contrast);
-  transition: all 0.5s;
   font-weight: 300;
   cursor: pointer;
   color: #aaa;
-  flex: 1;
   text-align: center;
   width: 100%;
 }
 
-.tabs > div.tab {
+.tab {
   transition: background-color 0.2s linear;
 }
 
-.tabs > div.tab.selected {
+.selected {
   border-bottom: 0.125rem solid var(--omrs-color-interaction);
-  color: var(--omrs-color-ink-high-contrast);
   background-color: var(--omrs-color-interaction-minus-two);
+}
+
+.selected button {
+  color: var(--omrs-color-ink-high-contrast);
 }
 
 .closeIcon {
   float: right;
-  margin-bottom: 0.1rem;
   cursor: pointer;
 }
 
 .closeIcon:hover {
   background-color: var(--omrs-color-interaction-minus-two);
+}
+
+.tab > button {
+  width: 100%;
+  height: 3rem;
+}
+
+.tab > button:focus,
+.tab > button:active {
+  outline: 0 !important;
+}
+
+.unselected {
+  border-bottom: 0.0625rem solid var(--omrs-color-ink-lowest-contrast);
 }

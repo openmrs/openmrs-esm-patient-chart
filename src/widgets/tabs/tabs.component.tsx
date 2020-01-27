@@ -13,16 +13,23 @@ export function Tabs(props) {
           props.children.map((elem, index) => {
             return (
               <div
-                key={index}
-                className={`${styles.tab}
-              ${index == props.selected ? styles.selected : ""}
-            `}
+                className={`${
+                  index == props.selected ? styles.selected : styles.unselected
+                }`}
+                style={{
+                  display: "flex",
+                  width: "100%",
+                  justifyContent: "space-between"
+                }}
               >
-                <button
-                  className="omrs-unstyled"
-                  onClick={() => props.setSelected(index)}
-                />
-                {elem.props.title}
+                <div key={index} className={styles.tab}>
+                  <button
+                    className="omrs-unstyled"
+                    onClick={() => props.setSelected(index)}
+                  >
+                    {elem.props.title}
+                  </button>
+                </div>
                 <button
                   onClick={$event => removeTab($event, index)}
                   className={`${styles.closeIcon} omrs-unstyled omrs-btn-icon-small`}
