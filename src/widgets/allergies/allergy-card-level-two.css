@@ -13,7 +13,7 @@
 
 .allergyTable thead {
   color: var(--omrs-color-ink-medium-contrast);
-  border-bottom: 1px solid var(--omrs-color-bg-low-contrast);
+  border-bottom: 0.063rem solid var(--omrs-color-bg-low-contrast);
 }
 
 .allergyTable thead td {
@@ -46,12 +46,12 @@
 }
 
 .allergyTable tbody tr:nth-child(3n) {
-  border-bottom: 1px solid var(--omrs-color-bg-low-contrast);
+  border-bottom: 0.063rem solid var(--omrs-color-bg-low-contrast);
 }
 
 .allergyTable tbody {
   padding: 2rem;
-  border-bottom: 1px solid var(--omrs-color-bg-low-contrast);
+  border-bottom: 0.063rem solid var(--omrs-color-bg-low-contrast);
 }
 
 :global(.omrs-breakpoint-lt-tablet) .allergyTable tbody {
@@ -100,17 +100,17 @@
   text-align: center;
   color: var(--omrs-color-ink-medium-contrast);
   font-family: "Work sans";
-  font-size: 17px;
+  font-size: 1.063rem;
 }
 
 tr.high {
-  border-left: 3px solid var(--omrs-color-danger);
+  border-left: 0.188rem solid var(--omrs-color-danger);
 }
 
 tr.high + tr {
-  border-left: 3px solid var(--omrs-color-danger);
+  border-left: 0.188rem solid var(--omrs-color-danger);
 }
 
 tr.high + tr + tr {
-  border-left: 3px solid var(--omrs-color-danger);
+  border-left: 0.188rem solid var(--omrs-color-danger);
 }
