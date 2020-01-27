@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter, Route } from "react-router-dom";
 import openmrsRootDecorator from "@openmrs/react-root-decorator";
-import PatientChartSummary from "./summaries/overview/patient-chart-summary.component";
+import PatientChartOverview from "./summaries/overview/patient-chart-overview.component";
 import PatientBanner from "./banner/patient-banner.component";
 import LevelTwoRoutes, {
   levelTwoRoutes
@@ -29,7 +29,7 @@ function Root(props) {
           <Route
             path="/patient/:patientUuid/chart"
             exact
-            component={PatientChartSummary}
+            component={PatientChartOverview}
           />
           <Route
             path="/patient/:patientUuid/chart"

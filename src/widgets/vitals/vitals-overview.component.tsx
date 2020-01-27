@@ -2,13 +2,13 @@ import React from "react";
 import { match } from "react-router";
 import SummaryCard from "../cards/summary-card.component";
 import { performPatientsVitalsSearch } from "./vitals-card.resource";
-import styles from "./vitals-brief-summary.css";
+import styles from "./vitals-overview.css";
 import { formatDate } from "../heightandweight/heightandweight-helper";
 import { createErrorHandler } from "@openmrs/esm-error-handling";
 import { useCurrentPatient } from "@openmrs/esm-api";
 import SummaryCardFooter from "../cards/summary-card-footer.component";
 
-export default function VitalsBriefSummary(props: VitalsBriefSummaryProps) {
+export default function VitalsOverview(props: VitalsOverviewProps) {
   const [patientVitals, setPatientVitals] = React.useState(null);
   const [
     isLoadingPatient,
@@ -83,6 +83,6 @@ export default function VitalsBriefSummary(props: VitalsBriefSummaryProps) {
   );
 }
 
-type VitalsBriefSummaryProps = {
+type VitalsOverviewProps = {
   match: match;
 };

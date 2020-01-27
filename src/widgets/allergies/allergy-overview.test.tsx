@@ -1,6 +1,6 @@
 import React from "react";
 import { render, cleanup, wait } from "@testing-library/react";
-import AllergyCard from "./allergy-card.component";
+import AllergyOverview from "./allergy-overview.component";
 import { BrowserRouter } from "react-router-dom";
 import { performPatientAllergySearch } from "./allergy-intolerance.resource";
 import { act } from "react-dom/test-utils";
@@ -162,7 +162,7 @@ const patient: fhir.Patient = {
   ]
 };
 
-describe("<AllergyCard/>", () => {
+describe("<AllergyOverview/>", () => {
   let match, wrapper: any;
 
   afterEach(cleanup);
@@ -174,14 +174,14 @@ describe("<AllergyCard/>", () => {
   beforeEach(mockPerformPatientAllergySearch.mockReset);
   beforeEach(mockUseCurrentPatient.mockReset);
 
-  it("render AllergyCard without dying", async () => {
+  it("render AllergyOverview without dying", async () => {
     mockUseCurrentPatient.mockReturnValue([false, patient, patient.id, null]);
     mockPerformPatientAllergySearch.mockReturnValue(
       Promise.resolve(mockPatientAllergyResult)
     );
     wrapper = render(
       <BrowserRouter>
-        <AllergyCard match={match} />
+        <AllergyOverview match={match} />
       </BrowserRouter>
     );
 
@@ -197,7 +197,7 @@ describe("<AllergyCard/>", () => {
     );
     wrapper = render(
       <BrowserRouter>
-        <AllergyCard match={match} />
+        <AllergyOverview match={match} />
       </BrowserRouter>
     );
     await wait(() => {

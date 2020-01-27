@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from "react";
 import { match, Route } from "react-router";
-import { AllergyCardLevelTwo } from "../widgets/allergies/allergy-card-level-two.component";
+import { AllergyOverviewLevelTwo } from "../widgets/allergies/allergy-card-level-two.component";
 import HeightAndWeightDetailed from "../widgets/heightandweight/heightandweight-detailed.component";
 import VitalsDetailedSummary from "../widgets/vitals/vitals-detailed-summary.component";
 import { Breadcrumbs } from "../breadcrumbs/breadcrumbs.component";
@@ -13,7 +13,7 @@ import MedicationLevelTwo from "../widgets/medications/medication-level-two.comp
 export const levelTwoRoutes: PatientChartRoute[] = [
   {
     url: "/patient/:patientUuid/chart/allergy",
-    component: AllergyCardLevelTwo,
+    component: AllergyOverviewLevelTwo,
     name: "Allergy"
   },
   {

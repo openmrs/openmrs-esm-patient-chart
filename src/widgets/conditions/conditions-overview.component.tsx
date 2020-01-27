@@ -1,18 +1,19 @@
 import React from "react";
+import style from "./conditions-card-style.css";
 import dayjs from "dayjs";
 import SummaryCard from "../cards/summary-card.component";
 import SummaryCardRow from "../cards/summary-card-row.component";
 import SummaryCardRowContent from "../cards/summary-card-row-content.component";
 import { match } from "react-router";
-import { fetchPatientPrograms } from "./programs.resource";
+import { performPatientConditionSearch } from "./conditions.resource";
 import { createErrorHandler } from "@openmrs/esm-error-handling";
 import HorizontalLabelValue from "../cards/horizontal-label-value.component";
 import { useCurrentPatient } from "@openmrs/esm-api";
 import SummaryCardFooter from "../cards/summary-card-footer.component";
-import { Trans, useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next";
 
-export default function Programs(props: ProgramsCardProps) {
-  const [patientPrograms, setPatientPrograms] = React.useState(null);
+export default function ConditionsOverview(props: ConditionsOverviewProps) {
+  const [patientConditions, setPatientConditions] = React.useState(null);
   const [
     isLoadingPatient,
     patient,
@@ -22,32 +23,34 @@ export default function Programs(props: ProgramsCardProps) {
   const { t } = useTranslation();
 
   React.useEffect(() => {
-    if (patientUuid) {
-      const subscription = fetchPatientPrograms(patientUuid).subscribe(
-        programs => setPatientPrograms(programs),
-        createErrorHandler()
-      );
+    if (patient) {
+      const abortController = new AbortController();
+      performPatientConditionSearch(
+        patient.identifier[0].value,
+        abortController
+      )
+        .then(condition => setPatientConditions(condition))
+        .catch(createErrorHandler());
 
-      return () => subscription.unsubscribe();
+      return () => abortController.abort();
     }
-  }, [patientUuid]);
+  }, [patient]);
 
   return (
     <SummaryCard
-      name={t("care programs", "Care Programs")}
+      name={t("conditions", "Conditions")}
       match={props.match}
-      link={`/patient/${patientUuid}/chart/programs`}
       styles={{ margin: "1.25rem, 1.5rem" }}
     >
       <SummaryCardRow>
         <SummaryCardRowContent>
           <HorizontalLabelValue
-            label={t("Active Programs", "Active Programs")}
+            label="Active Conditions"
             labelStyles={{
               color: "var(--omrs-color-ink-medium-contrast)",
               fontFamily: "Work Sans"
             }}
-            value={t("Since", "Since")}
+            value="Since"
             valueStyles={{
               color: "var(--omrs-color-ink-medium-contrast)",
               fontFamily: "Work Sans"
@@ -55,24 +58,26 @@ export default function Programs(props: ProgramsCardProps) {
           />
         </SummaryCardRowContent>
       </SummaryCardRow>
-      {patientPrograms &&
-        patientPrograms.map(program => {
+      {patientConditions &&
+        patientConditions.entry.map(condition => {
           return (
-            <SummaryCardRow key={program.uuid} linkTo="">
+            <SummaryCardRow key={condition.resource.id} linkTo="/">
               <HorizontalLabelValue
-                label={program.display}
+                label={condition.resource.code.text}
                 labelStyles={{ fontWeight: 500 }}
-                value={dayjs(program.dateEnrolled).format("MMM-YYYY")}
+                value={dayjs(condition.resource.onsetDateTime).format(
+                  "MMM-YYYY"
+                )}
                 valueStyles={{ fontFamily: "Work Sans" }}
               />
             </SummaryCardRow>
           );
         })}
-      <SummaryCardFooter linkTo={`/patient/${patientUuid}/chart/programs`} />
+      <SummaryCardFooter linkTo={`/patient/${patientUuid}/chart/conditions`} />
     </SummaryCard>
   );
 }
 
-type ProgramsCardProps = {
+type ConditionsOverviewProps = {
   match: match;
 };

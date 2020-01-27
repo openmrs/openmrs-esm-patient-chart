@@ -2,7 +2,7 @@ import React from "react";
 import { mockPatient } from "../../../__mocks__/patient.mock";
 import { cleanup, render, wait } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
-import MedicationsSummary from "./medications-summary.component";
+import MedicationsOverview from "./medications-overview.component";
 import { of } from "rxjs/internal/observable/of";
 import * as openmrsApi from "@openmrs/esm-api";
 import { performPatientMedicationsSearch } from "./medications.resource";
@@ -34,7 +34,7 @@ describe("<MedicationsOverview/>", () => {
   it("renders without dying", () => {
     const wrapper = render(
       <BrowserRouter>
-        <MedicationsSummary match={match} />
+        <MedicationsOverview match={match} />
       </BrowserRouter>
     );
   });
@@ -45,7 +45,7 @@ describe("<MedicationsOverview/>", () => {
 
     const wrapper = render(
       <BrowserRouter>
-        <MedicationsSummary match={match} />
+        <MedicationsOverview match={match} />
       </BrowserRouter>
     );
     expect(true).toBe(true);
@@ -58,7 +58,7 @@ describe("<MedicationsOverview/>", () => {
 
     const wrapper = render(
       <BrowserRouter>
-        <MedicationsSummary match={match} />
+        <MedicationsOverview match={match} />
       </BrowserRouter>
     );
     await wait(() => {

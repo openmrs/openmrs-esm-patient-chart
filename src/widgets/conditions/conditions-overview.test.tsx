@@ -3,7 +3,7 @@ import { cleanup, render, wait } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import { act } from "react-dom/test-utils";
 import { performPatientConditionSearch } from "./conditions.resource";
-import ConditionsCard from "./conditions-card.component";
+import ConditionsOverview from "./conditions-overview.component";
 import { useCurrentPatient } from "@openmrs/esm-api";
 
 const mockUseCurrentPatient = useCurrentPatient as jest.MockedFunction<any>;
@@ -170,7 +170,7 @@ const mockPatientConditions = {
   ]
 };
 
-describe("<ConditionsCard />", () => {
+describe("<ConditionsOverview />", () => {
   afterEach(() => {
     cleanup;
   });
@@ -184,7 +184,7 @@ describe("<ConditionsCard />", () => {
 
     wrapper = render(
       <BrowserRouter>
-        <ConditionsCard match={match} />
+        <ConditionsOverview match={match} />
       </BrowserRouter>
     );
     await wait(() => {
@@ -200,7 +200,7 @@ describe("<ConditionsCard />", () => {
 
     wrapper = render(
       <BrowserRouter>
-        <ConditionsCard match={match} />
+        <ConditionsOverview match={match} />
       </BrowserRouter>
     );
 
