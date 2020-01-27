@@ -25,7 +25,7 @@ export function AllergyCardLevelThree(props: AllergyCardLevelThreeProps) {
 
       return () => abortController.abort();
     }
-  }, [isLoadingPatient, patient]);
+  }, [isLoadingPatient, patient, patientUuid, props.match.params]);
 
   function displayAllergy() {
     return (
