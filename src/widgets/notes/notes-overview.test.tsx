@@ -4,7 +4,7 @@ import { render, cleanup, wait } from "@testing-library/react";
 import { mockPatient } from "../../../__mocks__/patient.mock";
 import { mockPatientEncounters } from "../../../__mocks__/encounters.mock";
 import { getEncounters } from "./encounter.resource";
-import NotesCard from "./notes-card.component";
+import NotesOverview from "./notes-overview.component";
 import { useCurrentPatient } from "@openmrs/esm-api";
 import { formatNotesDate, getAuthorName } from "./notes-helper";
 
@@ -19,7 +19,7 @@ jest.mock("@openmrs/esm-api", () => ({
   useCurrentPatient: jest.fn()
 }));
 
-describe("<NotesCard/>", () => {
+describe("<NotesOverview/>", () => {
   let match;
   afterEach(cleanup);
 
@@ -40,7 +40,7 @@ describe("<NotesCard/>", () => {
     ]);
     render(
       <BrowserRouter>
-        <NotesCard match={match} />
+        <NotesOverview match={match} />
       </BrowserRouter>
     );
   });
@@ -58,7 +58,7 @@ describe("<NotesCard/>", () => {
 
     const wrapper = render(
       <BrowserRouter>
-        <NotesCard match={match} />
+        <NotesOverview match={match} />
       </BrowserRouter>
     );
     await wait(() => {
@@ -78,7 +78,7 @@ describe("<NotesCard/>", () => {
     ]);
     const wrapper = render(
       <BrowserRouter>
-        <NotesCard match={match}></NotesCard>
+        <NotesOverview match={match}></NotesOverview>
       </BrowserRouter>
     );
     const tbody = wrapper.container.querySelector("tbody");

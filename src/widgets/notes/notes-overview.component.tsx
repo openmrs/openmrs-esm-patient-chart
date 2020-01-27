@@ -3,13 +3,13 @@ import { match } from "react-router";
 import { createErrorHandler } from "@openmrs/esm-error-handling";
 import SummaryCard from "../cards/summary-card.component";
 import { getEncounters } from "./encounter.resource";
-import styles from "./notes-card-style.css";
+import styles from "./notes-overview.css";
 import { useCurrentPatient } from "@openmrs/esm-api";
 import { Link } from "react-router-dom";
 import { getNotes, formatNotesDate, getAuthorName } from "./notes-helper";
 import SummaryCardFooter from "../cards/summary-card-footer.component";
 
-export default function NotesCard(props: NotesCardProps) {
+export default function NotesOverview(props: NotesOverviewProps) {
   const [patientNotes, setPatientNotes] = React.useState(null);
   const [
     isLoadingPatient,
@@ -84,6 +84,6 @@ export default function NotesCard(props: NotesCardProps) {
   );
 }
 
-type NotesCardProps = {
+type NotesOverviewProps = {
   match: match;
 };

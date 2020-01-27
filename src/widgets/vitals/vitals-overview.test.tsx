@@ -2,13 +2,13 @@ import React from "react";
 import { mockPatient } from "../../../__mocks__/patient.mock";
 import { cleanup, render, wait } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
-import VitalsBriefSummary from "./vitals-brief-summary.component";
+import VitalsOverview from "./vitals-overview.component";
 import { of } from "rxjs/internal/observable/of";
 import * as openmrsApi from "@openmrs/esm-api";
 import { mockVitalsResponse } from "../../../__mocks__/vitals.mock";
 import dayjs from "dayjs";
 
-describe("<VitalsBriefSummary/>", () => {
+describe("<VitalsOverview/>", () => {
   let patient: fhir.Patient, match;
 
   afterEach(() => {
@@ -23,7 +23,7 @@ describe("<VitalsBriefSummary/>", () => {
   it("renders without dying", () => {
     const wrapper = render(
       <BrowserRouter>
-        <VitalsBriefSummary match={match} />
+        <VitalsOverview match={match} />
       </BrowserRouter>
     );
   });

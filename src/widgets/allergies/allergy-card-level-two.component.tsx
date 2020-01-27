@@ -7,7 +7,7 @@ import SummaryCard from "../cards/summary-card.component";
 import dayjs from "dayjs";
 import { useCurrentPatient } from "@openmrs/esm-api";
 
-export function AllergyCardLevelTwo(props: AllergyCardLevelTwoProps) {
+export function AllergyOverviewLevelTwo(props: AllergyOverviewLevelTwoProps) {
   const [patientAllergy, setPatientAllergy] = React.useState(null);
   const [
     isLoadingPatient,
@@ -179,6 +179,6 @@ export function AllergyCardLevelTwo(props: AllergyCardLevelTwoProps) {
   );
 }
 
-type AllergyCardLevelTwoProps = {
+type AllergyOverviewLevelTwoProps = {
   match: match;
 };

@@ -2,7 +2,7 @@ import React from "react";
 import { match } from "react-router";
 import SummaryCard from "../cards/summary-card.component";
 import { fetchPatientMedications } from "./medications.resource";
-import styles from "./medications.css";
+import styles from "./medications-overview.css";
 import { formatDate } from "../heightandweight/heightandweight-helper";
 import { createErrorHandler } from "@openmrs/esm-error-handling";
 import { useCurrentPatient } from "@openmrs/esm-api";
@@ -10,7 +10,7 @@ import SummaryCardFooter from "../cards/summary-card-footer.component";
 import { useTranslation } from "react-i18next";
 import { getDosage } from "./medication-orders-utils";
 
-export default function MedicationsSummary(props: MedicationsOverviewProps) {
+export default function MedicationsOverview(props: MedicationsOverviewProps) {
   const [patientMedications, setPatientMedications] = React.useState(null);
   const [
     isLoadingPatient,

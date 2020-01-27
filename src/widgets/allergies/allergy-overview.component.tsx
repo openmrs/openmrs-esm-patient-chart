@@ -3,12 +3,12 @@ import { match } from "react-router";
 import SummaryCard from "../cards/summary-card.component";
 import SummaryCardRow from "../cards/summary-card-row.component";
 import { performPatientAllergySearch } from "./allergy-intolerance.resource";
-import style from "./allergy-card-style.css";
+import style from "./allergy-overview.css";
 import HorizontalLabelValue from "../cards/horizontal-label-value.component";
 import { createErrorHandler } from "@openmrs/esm-error-handling";
 import { useCurrentPatient } from "@openmrs/esm-api";
 
-export default function AllergyCard(props: AllergyCardProps) {
+export default function AllergyOverview(props: AllergyOverviewProps) {
   const [patientAllergy, setPatientAllergy] = React.useState(null);
   const [
     isLoadingPatient,
@@ -65,6 +65,6 @@ export default function AllergyCard(props: AllergyCardProps) {
   );
 }
 
-type AllergyCardProps = {
+type AllergyOverviewProps = {
   match: match;
 };

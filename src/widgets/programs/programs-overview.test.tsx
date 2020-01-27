@@ -2,13 +2,13 @@ import React from "react";
 import { cleanup, render, wait } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import { fetchPatientPrograms } from "./programs.resource";
-import ProgramsCard from "./programs-card.component";
+import ProgramsOverview from "./programs-overview.component";
 import { mockPatient } from "../../../__mocks__/patient.mock";
 import { mockProgramsResponse } from "../../../__mocks__/programs.mocks";
 import * as openmrsApi from "@openmrs/esm-api";
 import { of } from "rxjs/internal/observable/of";
 
-describe("<ProgramsCard />", () => {
+describe("<ProgramsOverview />", () => {
   let match, wrapper: any, patient: fhir.Patient, programs: any;
 
   afterEach(cleanup);
@@ -21,7 +21,7 @@ describe("<ProgramsCard />", () => {
   it("should render without dying", async () => {
     wrapper = render(
       <BrowserRouter>
-        <ProgramsCard match={match} patient={patient} />
+        <ProgramsOverview match={match} patient={patient} />
       </BrowserRouter>
     );
     await wait(() => {
@@ -35,7 +35,7 @@ describe("<ProgramsCard />", () => {
 
     const wrapper = render(
       <BrowserRouter>
-        <ProgramsCard match={match} patient={patient} />
+        <ProgramsOverview match={match} patient={patient} />
       </BrowserRouter>
     );
     await wait(() => {

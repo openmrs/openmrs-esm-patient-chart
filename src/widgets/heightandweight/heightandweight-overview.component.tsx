@@ -4,12 +4,12 @@ import { match } from "react-router";
 import { getDimensions } from "./heightandweight.resource";
 import SummaryCardRow from "../cards/summary-card-row.component";
 import SummaryCardRowContent from "../cards/summary-card-row-content.component";
-import styles from "./heightandweight-brief-details.css";
+import styles from "./heightandweight-overview.css";
 import { useCurrentPatient } from "@openmrs/esm-api";
 import SummaryCardFooter from "../cards/summary-card-footer.component";
 
-export default function HeightAndWeightBriefDetails(
-  props: HeightAndWeightBriefDetailsProps
+export default function HeightAndWeightOverview(
+  props: HeightAndWeightOverviewProps
 ) {
   const [dimensions, setDimensions] = React.useState([]);
   const [showMore, setShowMore] = React.useState(false);
@@ -94,6 +94,6 @@ export default function HeightAndWeightBriefDetails(
   );
 }
 
-type HeightAndWeightBriefDetailsProps = {
+type HeightAndWeightOverviewProps = {
   match: match;
 };
