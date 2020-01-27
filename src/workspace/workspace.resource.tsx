@@ -14,6 +14,6 @@ export type WorkspaceTab = {
   component: any;
   name: string;
   props: any;
-  validations?: Function[];
+  validations?: Function;
   inProgress: boolean;
 };

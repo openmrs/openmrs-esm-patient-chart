@@ -4,7 +4,7 @@
   "description": "Patient dashboard microfrontend for the OpenMRS SPA",
   "main": "dist/openmrs-esm-patient-chart.js",
   "scripts": {
-    "start": "webpack-dev-server",
+    "start": "webpack-dev-server --host 0.0.0.0",
     "start-https": "webpack-dev-server --https",
     "build": "webpack --mode production",
     "analyze": "webpack --mode=production --env.analyze=true",

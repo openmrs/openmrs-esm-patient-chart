@@ -31,20 +31,12 @@ h4 {
 }
 
 .container {
-  justify-content: center;
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   background: var(--omrs-color-ink-white);
-  padding-left: 1rem;
-  flex-direction: column;
   border: 0.0625rem solid var(--omrs-color-ink-low-contrast);
   margin: 0rem 1rem 0.5rem 1rem;
-  padding: 1rem;
-  max-height: 250px;
-  flex-wrap: wrap;
-}
-
-.inputMargin span {
-  margin-left: 0.9325rem;
+  padding: 1rem 0.5rem;
 }
 
 .container div {
