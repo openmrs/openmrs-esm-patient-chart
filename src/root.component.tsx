@@ -18,7 +18,11 @@ function Root(props) {
       </Route>
       <main
         className="omrs-main-content"
-        style={{ display: "flex", paddingTop: "2.8rem" }}
+        style={{
+          display: "flex",
+          paddingTop: "2.8rem",
+          alignItems: "flex-start"
+        }}
       >
         <Sidebar></Sidebar>
         <div style={{ flex: 1 }}>
@@ -39,7 +43,7 @@ function Root(props) {
         <div
           style={{
             width: ".1rem",
-            border: ".5px solid var(--omrs-color-ink-lowest-contrast)"
+            border: ".5px solid var(--omrs-color-ink-low-contrast)"
           }}
         ></div>
         <Route

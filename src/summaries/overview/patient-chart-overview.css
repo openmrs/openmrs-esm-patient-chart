@@ -19,6 +19,5 @@
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
-  width: 50rem;
   justify-content: flex-start;
 }

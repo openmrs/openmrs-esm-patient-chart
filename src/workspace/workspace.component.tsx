@@ -8,9 +8,20 @@ export default function Workspace(props: any) {
 
   React.useEffect(() => {
     const sub = getNewWorkspaceItem().subscribe(item => {
-      const updatedOpenTabs = [...openTabs, item];
-      setOpenTabs(updatedOpenTabs);
-      setSelectedTab(updatedOpenTabs.length - 1);
+      if (item.validations) {
+        const validation = item.validations(openTabs);
+        if (validation > -1) {
+          setSelectedTab(validation);
+        } else {
+          const updatedOpenTabs = [...openTabs, item];
+          setOpenTabs(updatedOpenTabs);
+          setSelectedTab(updatedOpenTabs.length - 1);
+        }
+      } else {
+        const updatedOpenTabs = [...openTabs, item];
+        setOpenTabs(updatedOpenTabs);
+        setSelectedTab(updatedOpenTabs.length - 1);
+      }
     });
     return () => sub.unsubscribe();
   });

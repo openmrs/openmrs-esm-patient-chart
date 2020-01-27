@@ -430,7 +430,6 @@ export function VitalsForm(props: vitalsFormProp) {
               ? styles.buttonStyles
               : `${styles.buttonStyles} ${styles.buttonStylesBorder}`
           }
-          style={{ position: "absolute", bottom: 0 }}
         >
           <button
             type="button"
@@ -749,7 +748,6 @@ export function VitalsForm(props: vitalsFormProp) {
               ? styles.buttonStyles
               : `${styles.buttonStyles} ${styles.buttonStylesBorder}`
           }
-          style={{ position: "absolute", bottom: 0 }}
         >
           <button
             type="button"

@@ -3,6 +3,7 @@ import styles from "./sidebar.component.css";
 import { newWorkspaceItem } from "../workspace/workspace.resource";
 import { AllergyForm } from "../widgets/allergies/allergy-form.component";
 import Parcel from "single-spa-react";
+import { VitalsForm } from "../widgets/vitals/vitals-form.component";
 
 export default function Sidebar(props: any) {
   const sidebarItems = [
@@ -12,6 +13,18 @@ export default function Sidebar(props: any) {
         newWorkspaceItem({
           component: AllergyForm,
           name: "Allergy",
+          props: { match: { params: {} } },
+          inProgress: false,
+          validations: (workspaceTabs: any[]) =>
+            workspaceTabs.findIndex(tab => tab.component === AllergyForm)
+        })
+    },
+    {
+      name: "V",
+      onclick: () =>
+        newWorkspaceItem({
+          component: VitalsForm,
+          name: "Vitals",
           props: { match: { params: {} } },
           inProgress: false
         })
