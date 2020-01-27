@@ -3,7 +3,7 @@ import { match, Route } from "react-router";
 import { AllergyCardLevelTwo } from "../widgets/allergies/allergy-card-level-two.component";
 import HeightAndWeightDetailed from "../widgets/heightandweight/heightandweight-detailed.component";
 import VitalsDetailedSummary from "../widgets/vitals/vitals-detailed-summary.component";
-import { Breadcrumbs } from "./breadcrumbs/breadcrumbs.component";
+import { Breadcrumbs } from "../breadcrumbs/breadcrumbs.component";
 import ProgramsLevelTwo from "../widgets/programs/programs-level-two.component";
 import { AllergyForm } from "../widgets/allergies/allergy-form.component";
 import { VitalsForm } from "../widgets/vitals/vitals-form.component";

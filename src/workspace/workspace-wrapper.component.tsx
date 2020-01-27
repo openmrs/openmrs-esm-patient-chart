@@ -1,6 +1,6 @@
 import React from "react";
 import Workspace from "./workspace.component";
-import { Breadcrumbs } from "../summary/breadcrumbs/breadcrumbs.component";
+import { Breadcrumbs } from "../breadcrumbs/breadcrumbs.component";
 import styles from "./workspace-wrapper.component.css";
 
 export default function WorkspaceWrapper(props: any) {
