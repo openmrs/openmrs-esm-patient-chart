@@ -16,7 +16,16 @@
   letter-spacing: 0.0125rem;
 }
 
+:global(.omrs-card) button.editBtn {
+  color: var(--omrs-color-ink-medium-contrast);
+  letter-spacing: 0.0125rem;
+}
+
 button.addBtn:hover {
+  color: var(--omrs-color-interaction-plus-one);
+}
+
+button.editBtn:hover {
   color: var(--omrs-color-interaction-plus-one);
 }
 
@@ -37,6 +46,11 @@ button.addBtn:hover {
 }
 
 .headerAdd {
+  grid-area: b;
+  justify-self: center;
+}
+
+.headerEdit {
   grid-area: b;
   justify-self: center;
 }

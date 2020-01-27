@@ -5,7 +5,7 @@ import SummaryCard from "../cards/summary-card.component";
 import SummaryCardRow from "../cards/summary-card-row.component";
 import SummaryCardRowContent from "../cards/summary-card-row-content.component";
 import { match } from "react-router";
-import { performPatientConditionSearch } from "./conditions.resource";
+import { performPatientConditionsSearch } from "./conditions.resource";
 import { createErrorHandler } from "@openmrs/esm-error-handling";
 import HorizontalLabelValue from "../cards/horizontal-label-value.component";
 import { useCurrentPatient } from "@openmrs/esm-api";
@@ -25,7 +25,7 @@ export default function ConditionsOverview(props: ConditionsOverviewProps) {
   React.useEffect(() => {
     if (patient) {
       const abortController = new AbortController();
-      performPatientConditionSearch(
+      performPatientConditionsSearch(
         patient.identifier[0].value,
         abortController
       )
@@ -61,7 +61,10 @@ export default function ConditionsOverview(props: ConditionsOverviewProps) {
       {patientConditions &&
         patientConditions.entry.map(condition => {
           return (
-            <SummaryCardRow key={condition.resource.id} linkTo="/">
+            <SummaryCardRow
+              key={condition.resource.id}
+              linkTo={`/patient/${patientUuid}/chart/conditions`}
+            >
               <HorizontalLabelValue
                 label={condition.resource.code.text}
                 labelStyles={{ fontWeight: 500 }}

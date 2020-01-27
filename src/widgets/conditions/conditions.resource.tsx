@@ -1,14 +1,44 @@
 import { openmrsFetch } from "@openmrs/esm-api";
 import { of } from "rxjs";
 
-export function performPatientConditionSearch(
+export function performPatientConditionsSearch(
   patientIdentifier: string,
+  abortController: AbortController
+) {
+  return Promise.resolve(mockPatientConditionsSearchResponse);
+}
+
+export function getConditionByUuid(
+  conditionUuid: string,
   abortController: AbortController
 ) {
   return Promise.resolve(mockPatientConditionSearchResponse);
 }
 
 const mockPatientConditionSearchResponse = {
+  resource: {
+    resourceType: "Condition",
+    id: "92A45BE7A93A4E14A49CB9A51E19C3A4",
+    subject: {
+      reference: "Patient/D1A903924D4443A7A388778D77D86155"
+    },
+    clinicalStatus: "active",
+    code: {
+      coding: {
+        system: "http://snomed.info/sct",
+        code: "236578006",
+        display: "Chronic rejection of renal transplant (disorder)"
+      },
+      text: "Renal rejection"
+    },
+    onsetDateTime: "2011-07-30",
+    lastUpdated: "2011-08-01",
+    lastUpdatedBy: "Dr. Katherine Mwangi",
+    lastUpdatedLocation: "Busia, Clinic"
+  }
+};
+
+const mockPatientConditionsSearchResponse = {
   resourceType: "Bundle",
   id: "fc7b3b324b4f43e4b5d068774ff6ec0b",
   type: "searchset",

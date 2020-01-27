@@ -9,6 +9,7 @@
 
 .conditionTable {
   width: 100%;
+  font-size: 1.063rem;
 }
 
 .conditionTable thead {
@@ -100,6 +101,8 @@
 .conditionFooter {
   text-align: center;
   font-family: "Work Sans";
+  color: var(--omrs-color-ink-medium-contrast);
+  font-size: 1.063rem;
 }
 
 .conditionMargin {
@@ -112,6 +115,7 @@
 
 tr.inactive {
   background: var(--omrs-color-bg-medium-contrast);
+  color: var(--omrs-color-ink-medium-contrast);
 }
 
 tr.active {

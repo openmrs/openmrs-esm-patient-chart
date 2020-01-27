@@ -2,19 +2,19 @@ import React from "react";
 import { cleanup, render, wait } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import { act } from "react-dom/test-utils";
-import { performPatientConditionSearch } from "./conditions.resource";
+import { performPatientConditionsSearch } from "./conditions.resource";
 import ConditionsOverview from "./conditions-overview.component";
 import { useCurrentPatient } from "@openmrs/esm-api";
 
 const mockUseCurrentPatient = useCurrentPatient as jest.MockedFunction<any>;
-const mockPerformPatientConditionsSearch = performPatientConditionSearch as jest.Mock;
+const mockPerformPatientConditionsSearch = performPatientConditionsSearch as jest.Mock;
 
 jest.mock("@openmrs/esm-api", () => ({
   useCurrentPatient: jest.fn()
 }));
 
 jest.mock("./conditions.resource", () => ({
-  performPatientConditionSearch: jest.fn()
+  performPatientConditionsSearch: jest.fn()
 }));
 
 const match = { params: {}, isExact: false, path: "/", url: "/" };

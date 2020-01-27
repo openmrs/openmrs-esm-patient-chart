@@ -10,6 +10,7 @@ import { VitalsForm } from "../widgets/vitals/vitals-form.component";
 import ConditionsBriefSummary from "../widgets/conditions/conditions-brief-summary.component";
 import MedicationLevelTwo from "../widgets/medications/medication-level-two.component";
 import { AllergyCardLevelThree } from "../widgets/allergies/allergy-card-level-three.component";
+import ConditionsDetailedSummary from "../widgets/conditions/conditions-detailed-summary.component";
 
 export const levelTwoRoutes: PatientChartRoute[] = [
   {
@@ -56,6 +57,11 @@ export const levelTwoRoutes: PatientChartRoute[] = [
     url: "/patient/:patientUuid/chart/conditions",
     component: ConditionsBriefSummary,
     name: "Conditions"
+  },
+  {
+    url: "/patient/:patientUuid/chart/conditions/:conditionUuid",
+    component: ConditionsDetailedSummary,
+    name: "Condition"
   }
 ];
 
