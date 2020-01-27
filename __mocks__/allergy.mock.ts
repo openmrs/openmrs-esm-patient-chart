@@ -1,3 +1,51 @@
+export const patient: fhir.Patient = {
+  resourceType: "Patient",
+  id: "8673ee4f-e2ab-4077-ba55-4980f408773e",
+  extension: [
+    {
+      url:
+        "http://fhir-es.transcendinsights.com/stu3/StructureDefinition/resource-date-created",
+      valueDateTime: "2017-01-18T09:42:40+00:00"
+    },
+    {
+      url:
+        "https://purl.org/elab/fhir/StructureDefinition/Creator-crew-version1",
+      valueString: "daemon"
+    }
+  ],
+  identifier: [
+    {
+      id: "1f0ad7a1-430f-4397-b571-59ea654a52db",
+      use: "usual",
+      system: "OpenMRS ID",
+      value: "10010W"
+    }
+  ],
+  active: true,
+  name: [
+    {
+      id: "efdb246f-4142-4c12-a27a-9be60b9592e9",
+      use: "usual",
+      family: "Wilson",
+      given: ["John"]
+    }
+  ],
+  gender: "male",
+  birthDate: "1972-04-04",
+  deceasedBoolean: false,
+  address: [
+    {
+      id: "0c244eae-85c8-4cc9-b168-96b51f864e77",
+      use: "home",
+      line: ["Address10351"],
+      city: "City0351",
+      state: "State0351tested",
+      postalCode: "60351",
+      country: "Country0351"
+    }
+  ]
+};
+
 export const mockAllegenResponse = {
   setMembers: [
     {
@@ -1457,5 +1505,56 @@ export const mockPatientAllergy = {
       }
     ],
     resourceVersion: "1.8"
+  }
+};
+
+export const mockAllergyResult = {
+  data: {
+    display: "ARBs (angiotensin II receptor blockers)",
+    uuid: "90c17541-833d-419e-b5d3-bc06828bf95f",
+    allergen: {
+      allergenType: "DRUG",
+      nonCodedAllergen: null
+    },
+    severity: {
+      uuid: "1498AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      display: "Mild",
+      name: {
+        display: "Mild",
+        uuid: "1738BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+        name: "Mild",
+        locale: "en",
+        localePreferred: true,
+        conceptNameType: "FULLY_SPECIFIED"
+      }
+    },
+    comment: "The patient is showing a mild reaction to the above allergens",
+    reactions: [
+      {
+        reaction: {
+          uuid: "121677AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+          display: "Mental status change",
+          name: {
+            display: "Mental status change",
+            uuid: "127084BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            name: "Mental status change",
+            locale: "en",
+            localePreferred: true,
+            conceptNameType: null
+          }
+        }
+      }
+    ],
+    patient: {
+      uuid: "90f7f0b4-06a8-4a97-9678-e7a977f4b518",
+      display: "10010W - John Taylor"
+    },
+    auditInfo: {
+      creator: {
+        uuid: "285f67ce-3d8b-4733-96e5-1e2235e8e804",
+        display: "doc"
+      },
+      dateChanged: "2020-01-03T07:05:12.000+0000"
+    }
   }
 };

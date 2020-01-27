@@ -1,5 +1,6 @@
 import React from "react";
 import { match } from "react-router";
+import { Link } from "react-router-dom";
 import { performPatientAllergySearch } from "./allergy-intolerance.resource";
 import { createErrorHandler } from "@openmrs/esm-error-handling";
 import styles from "./allergy-card-level-two.css";
@@ -102,9 +103,17 @@ export function AllergyOverviewLevelTwo(props: AllergyOverviewLevelTwoProps) {
                               "DD-MMM-YYYY"
                             )}
                           </span>
-                          <svg className="omrs-icon" fill="rgba(0, 0, 0, 0.54)">
-                            <use xlinkHref="#omrs-icon-chevron-right" />
-                          </svg>
+
+                          <Link
+                            to={`/patient/${patientUuid}/chart/allergy/${allergy.resource.id}`}
+                          >
+                            <svg
+                              className="omrs-icon"
+                              fill="rgba(0, 0, 0, 0.54)"
+                            >
+                              <use xlinkHref="#omrs-icon-chevron-right" />
+                            </svg>
+                          </Link>
                         </div>
                       </td>
                     </tr>
@@ -136,12 +145,7 @@ export function AllergyOverviewLevelTwo(props: AllergyOverviewLevelTwoProps) {
           </tbody>
         </table>
         <div className={styles.allergyFooter}>
-          <p
-            style={{ color: "var(--omrs-color-ink-medium-contrast)" }}
-            className={"omrs-type-body-large"}
-          >
-            No more allergies available
-          </p>
+          <p>No more allergies available</p>
         </div>
       </SummaryCard>
     );

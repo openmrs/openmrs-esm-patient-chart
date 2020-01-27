@@ -15,10 +15,10 @@ export function performPatientAllergySearch(
 }
 
 export function getAllergyAllergenByConceptUuid(
-  allegyUuid: string
+  allergyUuid: string
 ): Observable<any> {
   return openmrsObservableFetch(
-    `/ws/rest/v1/concept/${allegyUuid}?v=full`
+    `/ws/rest/v1/concept/${allergyUuid}?v=full`
   ).pipe(map(({ data }) => data["setMembers"]));
 }
 
@@ -65,11 +65,11 @@ export function savePatientAllergy(
 
 export function getPatientAllergyByPatientUuid(
   patientUuid: string,
-  allegyUuid: any,
+  allergyUuid: any,
   abortController: AbortController
 ) {
   return openmrsFetch(
-    `/ws/rest/v1/patient/${patientUuid}/allergy/${allegyUuid.allergyUuid}?v=full`,
+    `/ws/rest/v1/patient/${patientUuid}/allergy/${allergyUuid.allergyUuid}?v=full`,
     {
       signal: abortController.signal
     }
