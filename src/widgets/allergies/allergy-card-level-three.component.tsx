@@ -33,7 +33,7 @@ export function AllergyCardLevelThree(props: AllergyCardLevelThreeProps) {
         name="Allergy"
         match={props.match}
         styles={{ width: "100%" }}
-        editBtnUrl={`/patient/${patientUuid}/chart/allergy/${props.match.params["allergyUuid"]}/edit`}
+        editBtnUrl={`/patient/${patientUuid}/chart/allergies/add/${props.match.params["allergyUuid"]}`}
       >
         <div
           className={`${styles.allergyCard} ${

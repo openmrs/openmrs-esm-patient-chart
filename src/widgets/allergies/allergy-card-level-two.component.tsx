@@ -32,10 +32,10 @@ export function AllergyOverviewLevelTwo(props: AllergyOverviewLevelTwoProps) {
   function displayAllergy() {
     return (
       <SummaryCard
-        name="Allergy"
+        name="Allergies"
         match={props.match}
         styles={{ width: "100%" }}
-        addBtnUrl={`/patient/${patientUuid}/chart/allergy/add`}
+        addBtnUrl={`/patient/${patientUuid}/chart/allergies/add`}
       >
         <table className={styles.allergyTable}>
           <thead>
@@ -105,7 +105,7 @@ export function AllergyOverviewLevelTwo(props: AllergyOverviewLevelTwoProps) {
                           </span>
 
                           <Link
-                            to={`/patient/${patientUuid}/chart/allergy/${allergy.resource.id}`}
+                            to={`/patient/${patientUuid}/chart/allergies/${allergy.resource.id}`}
                           >
                             <svg
                               className="omrs-icon"
@@ -154,7 +154,7 @@ export function AllergyOverviewLevelTwo(props: AllergyOverviewLevelTwoProps) {
   function displayNoAllergenHistory() {
     return (
       <SummaryCard
-        name="Allergy"
+        name="Allergies"
         match={props.match}
         styles={{ width: "100%" }}
       >
