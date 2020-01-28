@@ -61,7 +61,7 @@ export const levelTwoRoutes: PatientChartRoute[] = [
   {
     url: "/patient/:patientUuid/chart/conditions/:conditionUuid",
     component: ConditionsDetailedSummary,
-    name: "Condition"
+    name: "Conditions"
   }
 ];
 

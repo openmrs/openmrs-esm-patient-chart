@@ -31,7 +31,7 @@ button.editBtn:hover {
 
 .header {
   display: grid;
-  grid-template-columns: [one] 1fr [two] 68px;
+  grid-template-columns: [one] 1fr [two] 4.25rem;
   grid-template-rows: [rowone] 3rem;
   grid-template-areas: "a b";
   background-color: var(--omrs-color-bg-medium-contrast);
