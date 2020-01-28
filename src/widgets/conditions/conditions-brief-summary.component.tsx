@@ -1,6 +1,7 @@
 import React from "react";
 import { match } from "react-router";
-import { performPatientConditionSearch } from "./conditions.resource";
+import { Link } from "react-router-dom";
+import { performPatientConditionsSearch } from "./conditions.resource";
 import { createErrorHandler } from "@openmrs/esm-error-handling";
 import dayjs from "dayjs";
 import styles from "./conditions-brief-summary.css";
@@ -10,18 +11,18 @@ import { useCurrentPatient } from "@openmrs/esm-api";
 export default function ConditionsBriefSummary(
   props: ConditionsBriefSummaryProps
 ) {
-  const [patientCondition, setPatientCondition] = React.useState(null);
+  const [patientConditions, setPatientConditions] = React.useState(null);
   const [isLoadingPatient, patient, patientUuid] = useCurrentPatient();
 
   React.useEffect(() => {
     if (!isLoadingPatient && patient) {
       const abortController = new AbortController();
 
-      performPatientConditionSearch(
+      performPatientConditionsSearch(
         patient.identifier[0].value,
         abortController
       )
-        .then(condition => setPatientCondition(condition))
+        .then(conditions => setPatientConditions(conditions))
         .catch(createErrorHandler());
 
       return () => abortController.abort();
@@ -46,8 +47,8 @@ export default function ConditionsBriefSummary(
             </tr>
           </thead>
           <tbody>
-            {patientCondition &&
-              patientCondition.entry
+            {patientConditions &&
+              patientConditions.entry
                 .sort((a, b) =>
                   a.resource.clinicalStatus > b.resource.clinicalStatus ? 1 : -1
                 )
@@ -61,7 +62,7 @@ export default function ConditionsBriefSummary(
                             : `${styles.inactive}`
                         }`}
                       >
-                        <td className={"omrs-bold"}>
+                        <td className="omrs-medium">
                           {condition.resource.code.text}
                         </td>
                         <td>
@@ -81,12 +82,18 @@ export default function ConditionsBriefSummary(
                           </div>
                         </td>
                         <td>
-                          <svg
-                            className="omrs-icon"
-                            fill="var(--omrs-color-ink-low-contrast)"
-                          >
-                            <use xlinkHref="#omrs-icon-chevron-right" />
-                          </svg>
+                          {
+                            <Link
+                              to={`/patient/${patientUuid}/chart/conditions/${condition.resource.id}`}
+                            >
+                              <svg
+                                className="omrs-icon"
+                                fill="var(--omrs-color-ink-low-contrast)"
+                              >
+                                <use xlinkHref="#omrs-icon-chevron-right" />
+                              </svg>
+                            </Link>
+                          }
                         </td>
                       </tr>
                     </React.Fragment>
@@ -95,12 +102,7 @@ export default function ConditionsBriefSummary(
           </tbody>
         </table>
         <div className={styles.conditionFooter}>
-          <p
-            style={{ color: "var(--omrs-color-ink-lowest-contrast)" }}
-            className={"omrs-type-body-large"}
-          >
-            No more conditions available
-          </p>
+          <p>No more conditions available</p>
         </div>
       </SummaryCard>
     );
@@ -120,8 +122,8 @@ export default function ConditionsBriefSummary(
         addBtnUrl={`/patient/${patientUuid}/chart/conditions/add`}
       >
         <div className={styles.conditionMargin}>
-          <p className="omrs-bold">No Conditions are documented.</p>
-          <p className="omrs-bold">
+          <p className="omrs-medium">No Conditions are documented.</p>
+          <p className="omrs-medium">
             Please <a href="/">add patient condition.</a>
           </p>
         </div>
@@ -131,9 +133,9 @@ export default function ConditionsBriefSummary(
 
   return (
     <>
-      {patientCondition && (
+      {patientConditions && (
         <div className={styles.conditionSummary}>
-          {patientCondition.total > 0
+          {patientConditions.total > 0
             ? displayConditions()
             : displayNoConditions()}
         </div>

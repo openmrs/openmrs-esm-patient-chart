@@ -28,8 +28,8 @@ export default function SummaryCard(props: SummaryCardProps) {
           </div>
         )}
         {props.editBtnUrl && (
-          <div className={styles.headerAdd}>
-            <button className={`omrs-unstyled ${styles.addBtn}`}>
+          <div className={styles.headerEdit}>
+            <button className={`omrs-unstyled ${styles.editBtn}`}>
               <Link className="omrs-unstyled" to={props.editBtnUrl}>
                 Edit
               </Link>
