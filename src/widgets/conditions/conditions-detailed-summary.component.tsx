@@ -34,9 +34,9 @@ export default function ConditionsDetailedSummary(
           styles={{ width: "100%" }}
           editBtnUrl={`/patient/${patientUuid}/chart/conditions/edit`}
         >
-          <div className={styles.conditionCard}>
+          <div className={`omrs-type-body-regular ${styles.conditionCard}`}>
             <div>
-              <p className={styles.conditionName} data-testid="condition-name">
+              <p className="omrs-type-title-3" data-testid="condition-name">
                 {patientCondition.resource.code.text}
               </p>
             </div>
@@ -76,7 +76,7 @@ export default function ConditionsDetailedSummary(
           backgroundColor: "var(--omrs-color-bg-medium-contrast)"
         }}
       >
-        <div className={styles.conditionCard}>
+        <div className={`omrs-type-body-regular ${styles.conditionCard}`}>
           <table className={styles.conditionTable}>
             <thead>
               <tr>

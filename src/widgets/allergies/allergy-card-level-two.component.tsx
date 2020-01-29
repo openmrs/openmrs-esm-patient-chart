@@ -144,7 +144,7 @@ export function AllergyOverviewLevelTwo(props: AllergyOverviewLevelTwoProps) {
               })}
           </tbody>
         </table>
-        <div className={styles.allergyFooter}>
+        <div className={`allergyFooter ${styles.allergyFooter}`}>
           <p>No more allergies available</p>
         </div>
       </SummaryCard>

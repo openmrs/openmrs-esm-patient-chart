@@ -37,7 +37,7 @@ export default function ConditionsBriefSummary(
         styles={{ width: "100%" }}
         addBtnUrl={`/patient/${patientUuid}/chart/conditions/add`}
       >
-        <table className={styles.conditionTable}>
+        <table className={`omrs-type-body-regular ${styles.conditionTable}`}>
           <thead>
             <tr>
               <td>CONDITION</td>
@@ -101,7 +101,7 @@ export default function ConditionsBriefSummary(
                 })}
           </tbody>
         </table>
-        <div className={styles.conditionFooter}>
+        <div className={`omrs-type-body-regular ${styles.conditionFooter}`}>
           <p>No more conditions available</p>
         </div>
       </SummaryCard>

@@ -8,12 +8,9 @@
 
 .allergyCard {
   margin: 0rem 1rem;
-  font-size: 1.063rem;
 }
 
 .allergyName {
-  font-size: 1.688rem;
-  font-weight: bold;
   letter-spacing: 0.05rem;
   padding: 1rem 0rem;
 }
@@ -26,7 +23,6 @@
 
 .allergyTable thead th {
   color: var(--omrs-color-ink-medium-contrast);
-  font-size: 1.063rem;
   font-weight: normal;
   text-align: left;
 }

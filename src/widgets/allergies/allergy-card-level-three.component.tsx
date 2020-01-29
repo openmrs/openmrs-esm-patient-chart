@@ -36,17 +36,17 @@ export function AllergyCardLevelThree(props: AllergyCardLevelThreeProps) {
         editBtnUrl={`/patient/${patientUuid}/chart/allergies/form/${props.match.params["allergyUuid"]}`}
       >
         <div
-          className={`${styles.allergyCard} ${
+          className={`omrs-type-body-regular ${styles.allergyCard} ${
             allergy.severity.display === "Severe"
               ? `${styles.highSeverity}`
               : `${styles.lowSeverity}`
           }`}
         >
-          <div className={styles.allergyName}>
+          <div className={`omrs-type-title-3 ${styles.allergyName}`}>
             <span data-testid="allergy-name">{allergy.display}</span>
           </div>
           <table className={styles.allergyTable}>
-            <thead>
+            <thead className="omrs-type-body-regular">
               <tr>
                 <th>Severity</th>
                 <th>Reaction</th>
@@ -91,7 +91,7 @@ export function AllergyCardLevelThree(props: AllergyCardLevelThreeProps) {
           </table>
           {allergy.comment && (
             <table className={styles.allergyTable}>
-              <thead>
+              <thead className="omrs-type-body-regular">
                 <tr>
                   <th>Comments</th>
                 </tr>
@@ -121,7 +121,7 @@ export function AllergyCardLevelThree(props: AllergyCardLevelThreeProps) {
       >
         <div className={styles.allergyCard}>
           <table className={`${styles.allergyTable} ${styles.allergyDetails}`}>
-            <thead>
+            <thead className="omrs-type-body-regular">
               <tr>
                 <th>Last updated</th>
                 <th>Last updated by</th>
