@@ -97,7 +97,7 @@ export default function MedicationsSummary(props: MedicationsOverviewProps) {
                   color: "var(--omrs-color-ink-high-contrast)"
                 }}
               >
-                {medication.drug.name}
+                {medication.drug.display}
               </span>
               {" \u2014 "}{" "}
               <span className={styles.medicationStatement}>
@@ -116,7 +116,7 @@ export default function MedicationsSummary(props: MedicationsOverviewProps) {
                 }}
                 className={styles.medicationStatement}
               >
-                {getDosage(medication.drug.strength, medication.dose)}{" "}
+                {getDosage(medication.drug.display, medication.dose)}{" "}
                 {medication.frequency.display}
               </span>
             </td>
