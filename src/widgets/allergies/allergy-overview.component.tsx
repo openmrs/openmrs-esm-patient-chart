@@ -31,10 +31,10 @@ export default function AllergyOverview(props: AllergyOverviewProps) {
 
   return (
     <SummaryCard
-      name="Allergy"
+      name="Allergies"
       match={props.match}
       styles={{ margin: "1.25rem, 1.5rem" }}
-      link={`/patient/${patientUuid}/chart/allergy`}
+      link={`/patient/${patientUuid}/chart/allergies`}
     >
       {patientAllergy &&
         patientAllergy.total > 0 &&
@@ -42,7 +42,7 @@ export default function AllergyOverview(props: AllergyOverviewProps) {
           return (
             <SummaryCardRow
               key={allergy.resource.id}
-              linkTo={`/patient/${patientUuid}/chart/allergy`}
+              linkTo={`/patient/${patientUuid}/chart/allergies`}
             >
               <HorizontalLabelValue
                 label={allergy.resource.code.text}

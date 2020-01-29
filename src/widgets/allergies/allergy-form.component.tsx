@@ -214,7 +214,7 @@ export function AllergyForm(props: AllergyFormProps) {
   };
 
   function navigate() {
-    window.location.href = `https://openmrs-spa.org/openmrs/spa/patient/${patientUuid}/chart/allergy`;
+    window.location.href = `https://openmrs-spa.org/openmrs/spa/patient/${patientUuid}/chart/allergies`;
   }
 
   const setCheckedValue = uuid => {

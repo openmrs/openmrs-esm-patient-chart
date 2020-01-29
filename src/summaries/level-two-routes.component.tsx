@@ -14,17 +14,17 @@ import ConditionsDetailedSummary from "../widgets/conditions/conditions-detailed
 
 export const levelTwoRoutes: PatientChartRoute[] = [
   {
-    url: "/patient/:patientUuid/chart/allergy",
+    url: "/patient/:patientUuid/chart/allergies",
     component: AllergyOverviewLevelTwo,
-    name: "Allergy"
+    name: "Allergies"
   },
   {
-    url: "/patient/:patientUuid/chart/allergy/form/:allergyUuid?",
+    url: "/patient/:patientUuid/chart/allergies/form/:allergyUuid?",
     component: AllergyForm,
     name: "Allergy Form"
   },
   {
-    url: "/patient/:patientUuid/chart/allergy/:allergyUuid",
+    url: "/patient/:patientUuid/chart/allergies/:allergyUuid",
     component: AllergyCardLevelThree,
     name: "Allergy"
   },
