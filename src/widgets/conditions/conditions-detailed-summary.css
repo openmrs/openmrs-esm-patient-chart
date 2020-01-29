@@ -8,7 +8,6 @@
 
 .conditionCard {
   margin: 0rem 1rem;
-  font-size: 1.063rem;
 }
 
 .conditionTable {
@@ -19,18 +18,11 @@
 
 .conditionTable thead th {
   color: var(--omrs-color-ink-medium-contrast);
-  font-size: 1.063rem;
-  font-weight: normal;
   text-align: left;
 }
 
 .conditionTable thead {
   color: var(--omrs-color-ink-medium-contrast);
-  font-size: 1.063rem;
-}
-
-.conditionTable tbody {
-  font-size: 1.063rem;
 }
 
 .conditionTable tbody td:nth-child(1) {
@@ -43,9 +35,4 @@
 
 .conditionTable thead td:nth-child(1) {
   width: 25%;
-}
-
-.conditionName {
-  font-size: 1.688rem;
-  font-weight: 700;
 }
