@@ -11,6 +11,8 @@ import ConditionsBriefSummary from "../widgets/conditions/conditions-brief-summa
 import MedicationLevelTwo from "../widgets/medications/medication-level-two.component";
 import { AllergyCardLevelThree } from "../widgets/allergies/allergy-card-level-three.component";
 import ConditionsDetailedSummary from "../widgets/conditions/conditions-detailed-summary.component";
+import { MedicationOrderBasket } from "../widgets/medications/medication-order-basket.component";
+import { MedicationOrder } from "../widgets/medications/medication-order.component";
 
 export const levelTwoRoutes: PatientChartRoute[] = [
   {
@@ -52,6 +54,22 @@ export const levelTwoRoutes: PatientChartRoute[] = [
     url: "/patient/:patientUuid/chart/medications",
     component: MedicationLevelTwo,
     name: "Medications"
+  },
+  {
+    url:
+      "/patient/:patientUuid/chart/medications/order/:orderUuid?/:drugUuid?/:action?",
+    component: MedicationOrderBasket,
+    name: "Order Medications"
+  },
+  {
+    url: "/patient/:patientUuid/chart/medications/orderTest",
+    component: MedicationOrder,
+    name: "Order Medications"
+  },
+  {
+    url: "/patient/:patientUuid/chart/allergy/form/:allergyUuid?",
+    component: AllergyForm,
+    name: "Allergy Form"
   },
   {
     url: "/patient/:patientUuid/chart/conditions",

@@ -9,6 +9,9 @@ import { useCurrentPatient } from "@openmrs/esm-api";
 import SummaryCardFooter from "../cards/summary-card-footer.component";
 import { useTranslation } from "react-i18next";
 import { getDosage } from "./medication-orders-utils";
+import { Link } from "react-router-dom";
+import { newWorkspaceItem } from "../../workspace/workspace.resource";
+import { MedicationOrderBasket } from "./medication-order-basket.component";
 
 export default function MedicationsOverview(props: MedicationsOverviewProps) {
   const [patientMedications, setPatientMedications] = React.useState(null);
@@ -34,7 +37,8 @@ export default function MedicationsOverview(props: MedicationsOverviewProps) {
       name={t("Active Medications", "Active Medications")}
       match={props.match}
       styles={{ width: "100%", maxWidth: "45rem" }}
-      link={`/patient/${patientUuid}/chart/Medications`}
+      link={`/patient/${patientUuid}/chart/medications`}
+      addBtnUrl={`/patient/${patientUuid}/chart/medications/order`}
     >
       <table className={styles.medicationsTable}>
         <tbody>{patientMedications && parseRestWsMeds()}</tbody>
@@ -119,6 +123,33 @@ export default function MedicationsOverview(props: MedicationsOverviewProps) {
                 {getDosage(medication.drug.strength, medication.dose)}{" "}
                 {medication.frequency.display}
               </span>
+            </td>
+            <td>
+              <Link
+                to={`/patient/${patientUuid}/chart/medications/order/${medication.uuid}/${medication.drug.name}/REVISE`}
+              >
+                REVISE
+              </Link>
+              <button
+                onClick={() =>
+                  newWorkspaceItem({
+                    component: MedicationOrderBasket,
+                    name: "Medication Order Basket",
+                    props: {
+                      match: {
+                        params: {
+                          orderUuid: medication.uuid,
+                          drugUuid: medication.drug.name,
+                          action: "REVISE"
+                        }
+                      }
+                    },
+                    inProgress: true
+                  })
+                }
+              >
+                Revise
+              </button>
             </td>
             <td style={{ textAlign: "end" }}>
               <svg className="omrs-icon" fill="rgba(0, 0, 0, 0.54)">

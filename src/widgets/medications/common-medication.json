@@ -1,0 +1,100 @@
+[
+  {
+    "name": "aspirin",
+    "uuid": "18f43c99-2329-426e-97b5-c3356e6afe54",
+    "strength": "81mg",
+    "dosageUnits": [
+      {
+        "uuid": "1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "name": "Tablet",
+        "selected": true
+      },
+      {
+        "uuid": "1608AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "name": "Capsule"
+      }
+    ],
+    "route": [
+      {
+        "name": "Oral",
+        "conceptUuid": "160240AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "selected": true
+      }
+    ],
+    "commonFrequencies": [
+      {
+        "name": "Once daily",
+        "conceptUuid": "160862AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "selected": true
+      },
+      {
+        "name": "Twice daily",
+        "conceptUuid": "160858AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      }
+    ],
+    "commonDosages": [
+      {
+        "dosage": "81 mg",
+        "numberOfPills": 1
+      },
+      {
+        "dosage": "162 mg",
+        "numberOfPills": 2
+      },
+      {
+        "dosage": "243 mg",
+        "numberOfPills": 3,
+        "selected": true
+      }
+    ]
+  },
+  {
+    "name": "Sulfadoxine",
+    "uuid": "fc92c351-8a85-41b9-95bf-a7dfea46c9cd",
+    "strength": "500mg",
+    "dosageUnits": [
+      {
+        "uuid": "1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "name": "Tablet",
+        "selected": true
+      },
+      {
+        "uuid": "1608AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "name": "Capsule"
+      }
+    ],
+    "route": [
+      {
+        "name": "Oral",
+        "conceptUuid": "160240AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "selected": true
+      }
+    ],
+    "commonFrequencies": [
+      {
+        "name": "Once daily",
+        "conceptUuid": "160862AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "selected": true
+      },
+      {
+        "name": "Twice daily",
+        "conceptUuid": "160858AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      }
+    ],
+    "commonDosages": [
+      {
+        "dosage": "500 mg",
+        "numberOfPills": 1
+      },
+      {
+        "dosage": "1000 mg",
+        "numberOfPills": 2
+      },
+      {
+        "dosage": "1500 mg",
+        "numberOfPills": 3,
+        "selected": true
+      }
+    ]
+  }
+]

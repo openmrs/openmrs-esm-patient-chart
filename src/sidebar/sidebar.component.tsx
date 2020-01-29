@@ -4,6 +4,7 @@ import { newWorkspaceItem } from "../workspace/workspace.resource";
 import { AllergyForm } from "../widgets/allergies/allergy-form.component";
 import Parcel from "single-spa-react";
 import { VitalsForm } from "../widgets/vitals/vitals-form.component";
+import { MedicationOrderBasket } from "../widgets/medications/medication-order-basket.component";
 
 export default function Sidebar(props: any) {
   const sidebarItems = [
@@ -37,6 +38,16 @@ export default function Sidebar(props: any) {
             <Parcel config={System.import("@ampath/esm-angular-form-entry")} />
           ),
           name: "Forms",
+          props: { match: { params: {} } },
+          inProgress: false
+        })
+    },
+    {
+      name: "O",
+      onclick: () =>
+        newWorkspaceItem({
+          component: MedicationOrderBasket,
+          name: "Medication Order Basket",
           props: { match: { params: {} } },
           inProgress: false
         })

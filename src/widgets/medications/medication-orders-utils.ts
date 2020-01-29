@@ -29,3 +29,37 @@ export function getDosage(strength, doseNumber) {
   }
   return dosage;
 }
+
+export function setDefaultValues(commonDrugOrders) {
+  let drugUnits, frequencyConcept, routeConcept, routeName, Dose: string;
+  if (commonDrugOrders) {
+    commonDrugOrders[0].commonFrequencies.map(frequency => {
+      if (frequency.selected === true) {
+        frequencyConcept = frequency.conceptUuid;
+      }
+    });
+
+    commonDrugOrders[0].commonDosages.map(dose => {
+      if (dose.selected === true) {
+        Dose = dose.numberOfPills;
+      }
+    });
+  }
+
+  commonDrugOrders[0].route.map(route => {
+    if (route.selected === true) {
+      routeConcept = route.conceptUuid;
+      routeName = route.name;
+    }
+  });
+
+  return [
+    {
+      drugUnits: drugUnits,
+      frequencyConcept: frequencyConcept,
+      routeConcept: routeConcept,
+      dose: Dose,
+      routeName: routeName
+    }
+  ];
+}
