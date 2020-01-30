@@ -37,8 +37,7 @@ export default function MedicationsOverview(props: MedicationsOverviewProps) {
       name={t("Active Medications", "Active Medications")}
       match={props.match}
       styles={{ width: "100%", maxWidth: "45rem" }}
-      link={`/patient/${patientUuid}/chart/medications`}
-      addBtnUrl={`/patient/${patientUuid}/chart/medications/order`}
+      link={`/patient/${patientUuid}/chart/Medications`}
     >
       <table className={styles.medicationsTable}>
         <tbody>{patientMedications && parseRestWsMeds()}</tbody>
