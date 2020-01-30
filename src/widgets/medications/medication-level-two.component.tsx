@@ -39,16 +39,16 @@ export default function MedicationLevelTwo(props: MedicationsOverviewProps) {
           name={t("Medications - current", "Medications - current")}
           match={props.match}
           styles={{ width: "90%" }}
-          addBtnUrl={`/patient/${patientUuid}/chart/add`}
+          addBtnUrl={``}
         >
           <table className={styles.medicationsTable}>
             <thead>
               <tr>
-                <td>Name</td>
+                <td>NAME</td>
                 <td>
-                  <div className={styles.centerItems}>Status</div>
+                  <div className={styles.centerItems}>STATUS</div>
                 </td>
-                <td>Start Date</td>
+                <td>START DATE</td>
               </tr>
             </thead>
             <tbody>
@@ -68,10 +68,10 @@ export default function MedicationLevelTwo(props: MedicationsOverviewProps) {
                             >
                               {medication.drug.name}
                             </span>
-                            {" \u2014 "} {medication.doseUnits.display}{" "}
+                            {" \u2014 "} {medication.doseUnits.display}&nbsp;
                             {" \u2014 "}
                             {medication.route.display} {" \u2014 "}
-                            DOSE{" "}
+                            DOSE &nbsp;
                             <span
                               style={{
                                 fontWeight: 500,
@@ -81,7 +81,8 @@ export default function MedicationLevelTwo(props: MedicationsOverviewProps) {
                               {getDosage(
                                 medication.drug.strength,
                                 medication.dose
-                              )}{" "}
+                              )}
+                              &nbsp;
                               {medication.frequency.display}
                             </span>
                           </td>
@@ -117,16 +118,16 @@ export default function MedicationLevelTwo(props: MedicationsOverviewProps) {
           name={t("Medications - past", "Medications - past")}
           match={props.match}
           styles={{ width: "90%" }}
-          addBtnUrl={`/patient/${patientUuid}/chart/add`}
+          addBtnUrl={``}
         >
           <table className={styles.medicationsTable}>
             <thead>
               <tr>
-                <td>Name</td>
                 <td>
-                  <div className={styles.centerItems}>Status</div>
+                  <div className={styles.centerItems}>STATUS</div>
                 </td>
-                <td>Start Date</td>
+                <td>NAME</td>
+                <td>END DATE</td>
               </tr>
             </thead>
             <tbody>
@@ -137,6 +138,9 @@ export default function MedicationLevelTwo(props: MedicationsOverviewProps) {
                     return (
                       <React.Fragment key={medication.uuid}>
                         <tr>
+                          <td className={styles.medicationStatus}>
+                            {medication.action}
+                          </td>
                           <td>
                             <span
                               style={{
@@ -144,12 +148,12 @@ export default function MedicationLevelTwo(props: MedicationsOverviewProps) {
                                 color: "var(--omrs-color-ink-high-contrast)"
                               }}
                             >
-                              {medication.drug.display}
+                              {medication.drug.name}
                             </span>
-                            {" \u2014 "} {medication.doseUnits.display}{" "}
+                            {" \u2014 "} {medication.doseUnits.display}&nbsp;
                             {" \u2014 "}
                             {medication.route.display} {" \u2014 "}
-                            DOSE{" "}
+                            DOSE &nbsp;
                             <span
                               style={{
                                 fontWeight: 500,
@@ -159,11 +163,11 @@ export default function MedicationLevelTwo(props: MedicationsOverviewProps) {
                               {getDosage(
                                 medication.drug.strength,
                                 medication.dose
-                              )}{" "}
+                              )}
+                              &nbsp;
                               {medication.frequency.display}
                             </span>
                           </td>
-                          <td>{medication.action}</td>
                           <td>
                             {dayjs(medication.dateActivated).format(
                               "DD-MMM-YYYY"

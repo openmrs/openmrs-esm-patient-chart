@@ -56,3 +56,7 @@
 .medicationFooter {
   text-align: center;
 }
+
+.medicationStatus {
+  position: absolute;
+}
