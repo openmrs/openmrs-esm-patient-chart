@@ -1,0 +1,63 @@
+:global(.omrs-breakpoint-gt-phone) .conditionForm {
+  display: flex;
+  justify-content: center;
+}
+
+:global(.omrs-breakpoint-lt-tablet) .conditionForm {
+  padding: 0.25rem 0.5rem 0 0.5rem;
+}
+
+.conditionHeader {
+  margin: 0rem 0rem 0.25rem 1rem;
+  color: var(--omrs-color-ink-medium-contrast);
+}
+
+.conditionEditHeader {
+  margin: 1rem 0rem 0rem 1rem;
+}
+
+.container {
+  display: grid;
+  background: var(--omrs-color-ink-white);
+  border: 0.0625rem solid var(--omrs-color-ink-low-contrast);
+  margin: 0rem 1rem 0rem 0rem;
+  padding: 1rem 0.5rem;
+}
+
+.container div {
+  margin-bottom: 1rem;
+}
+
+.container div:last-child {
+  margin-bottom: 0rem;
+}
+
+.container input[type="radio"] + span {
+  padding-left: 10px;
+}
+
+.buttonStyles {
+  display: flex;
+  background: var(--omrs-color-ink-white);
+  bottom: 0;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.buttonStyles button {
+  margin: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+.buttonStyles button:disabled {
+  background: var(--omrs-color-ink-lowest-contrast);
+}
+
+.buttonStylesBorder {
+  border-top: 0.125rem solid var(--omrs-color-interaction);
+}
+
+.container input[type="date"] {
+  font-family: "Roboto";
+  font-size: 1rem;
+}

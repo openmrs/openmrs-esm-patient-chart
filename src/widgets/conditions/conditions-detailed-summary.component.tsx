@@ -23,7 +23,7 @@ export default function ConditionsDetailedSummary(
 
       return () => abortController.abort();
     }
-  }, [isLoadingPatient, patient, props.match.params]);
+  }, [isLoadingPatient, patient, props]);
 
   function displayCondition() {
     return (
@@ -32,7 +32,7 @@ export default function ConditionsDetailedSummary(
           name="Condition"
           match={props.match}
           styles={{ width: "100%" }}
-          editBtnUrl={`/patient/${patientUuid}/chart/conditions/edit`}
+          editBtnUrl={`/patient/${patientUuid}/chart/conditions/form/${props.match.params["conditionUuid"]}`}
         >
           <div className={`omrs-type-body-regular ${styles.conditionCard}`}>
             <div>
