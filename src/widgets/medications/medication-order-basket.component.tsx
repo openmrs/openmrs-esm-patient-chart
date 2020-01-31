@@ -10,6 +10,7 @@ import { useCurrentPatient } from "@openmrs/esm-api";
 import SummaryCardRow from "../cards/summary-card-row.component";
 import SummaryCardRowContent from "../cards/summary-card-row-content.component";
 import { getDosage } from "./medication-orders-utils";
+import { useHistory } from "react-router-dom";
 
 export function MedicationOrderBasket(props: MedicationOrderBasketProps) {
   const searchTimeOut = 300;
@@ -26,6 +27,7 @@ export function MedicationOrderBasket(props: MedicationOrderBasketProps) {
     patientUuid,
     patientErr
   ] = useCurrentPatient();
+  let history = useHistory();
 
   const handleDrugSelected = $event => {
     setDrugName(searchTerm);
@@ -60,16 +62,16 @@ export function MedicationOrderBasket(props: MedicationOrderBasketProps) {
 
   useEffect(() => {
     let params: any = props.match.params;
-    if (params.drugUuid) {
+    if (params.drugName) {
       setShowOrderMedication(true);
       setEditProperty([
         {
-          DrugName: params.drugUuid,
+          DrugName: params.drugName,
           Action: params.action,
           OrderUuid: params.orderUuid
         }
       ]);
-      setDrugName(params.drugUuid);
+      setDrugName(params.drugName);
     }
   }, [props.match.params]);
 
@@ -96,7 +98,7 @@ export function MedicationOrderBasket(props: MedicationOrderBasketProps) {
   };
 
   function navigate() {
-    window.location.href = `https://openmrs-spa.org/openmrs/spa/patient/${patientUuid}/chart/medications`;
+    history.push(`/patient/${patientUuid}/chart/medications`);
   }
 
   return (
@@ -167,24 +169,35 @@ export function MedicationOrderBasket(props: MedicationOrderBasketProps) {
           height: "fit-content",
           width: "100%",
           margin: "1.25rem",
-          padding: "1.25rem"
+          padding: "1.25rem",
+          position: "absolute",
+          bottom: 0,
+          marginBottom: "10%"
         }}
       >
-        {orderBasket &&
-          orderBasket.map(order => {
+        {orderBasket.length > 0 &&
+          orderBasket.map((order, index) => {
             return (
-              <SummaryCardRow>
-                <SummaryCardRowContent>
-                  <span>
-                    <b>{order.drugName}</b>
-                    {" \u2014 "} {String(order.dosageForm).toLocaleLowerCase()}
-                    {" \u2014 "} {String(order.routeName).toLocaleLowerCase()}
-                    {" \u2014 "}{" "}
-                    {`DOSE ${getDosage(order.drugStrength, order.dose)}`}{" "}
-                    <b>{String(order.frequencyName).toLocaleLowerCase()}</b>
-                  </span>
-                </SummaryCardRowContent>
-              </SummaryCardRow>
+              <div
+                className={`${styles.basketStyles} ${
+                  order.action === "NEW" ? styles.newOrder : styles.reviseOrder
+                }`}
+                key={index}
+              >
+                <SummaryCardRow>
+                  <SummaryCardRowContent justifyContent="space-between">
+                    <span>
+                      <b>{order.drugName}</b>
+                      {" \u2014 "}{" "}
+                      {String(order.dosageForm).toLocaleLowerCase()}
+                      {" \u2014 "} {String(order.routeName).toLocaleLowerCase()}
+                      {" \u2014 "}{" "}
+                      {`DOSE ${getDosage(order.drugStrength, order.dose)}`}{" "}
+                      <b>{String(order.frequencyName).toLocaleLowerCase()}</b>
+                    </span>
+                  </SummaryCardRowContent>
+                </SummaryCardRow>
+              </div>
             );
           })}
       </div>
@@ -194,7 +207,7 @@ export function MedicationOrderBasket(props: MedicationOrderBasketProps) {
           <div className={styles.modalContent}>
             <MedicationOrder
               match={props.match}
-              drugUuid={drugName}
+              drugName={drugName}
               setOrderBasket={setOrderBasket}
               orderBasket={orderBasket}
               hideModal={hideModal}
@@ -209,6 +222,7 @@ export function MedicationOrderBasket(props: MedicationOrderBasketProps) {
         <button
           className="omrs-btn omrs-outlined-neutral"
           style={{ width: "50%" }}
+          onClick={$event => setOrderBasket([])}
         >
           Cancel
         </button>
