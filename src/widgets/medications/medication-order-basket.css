@@ -136,3 +136,25 @@ th {
   right: 5%;
   flex-direction: column;
 }
+
+.basketStyles {
+  border-radius: 0.625rem;
+  box-shadow: 0rem 0.125rem 0.25rem rgba(0, 0, 0, 0.08),
+    0rem 0.0625rem 0.25rem rgba(0, 0, 0, 0.04);
+  margin: 0.25rem 0rem;
+}
+
+.basketStyles:hover {
+  opacity: 0.9;
+  cursor: pointer;
+}
+
+.newOrder {
+  background-color: var(--omrs-color-success);
+  color: var(--omrs-color-ink-white);
+}
+
+.reviseOrder {
+  background-color: var(--omrs-color-brand-orange);
+  color: var(--omrs-color-ink-white);
+}

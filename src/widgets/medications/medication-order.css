@@ -165,3 +165,22 @@
   margin: 0.5rem 1rem;
   cursor: pointer;
 }
+
+.omrsSelectOptions {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  justify-content: center;
+  width: 100%;
+}
+
+.omrsSelectOptions select {
+  color: var(--omrs-color-interaction);
+  font-weight: 700;
+  text-align: center;
+  padding: 0.625rem;
+  border: 0.0625rem solid var(--omrs-color-ink-lowest-contrast);
+  background-color: var(--omrs-color-ink-white);
+  border-radius: 4.5rem;
+  min-width: 50%;
+}

@@ -23,7 +23,7 @@ export default function ConditionsDetailedSummary(
 
       return () => abortController.abort();
     }
-  }, [isLoadingPatient, patient]);
+  }, [isLoadingPatient, patient, props.match.params]);
 
   function displayCondition() {
     return (
