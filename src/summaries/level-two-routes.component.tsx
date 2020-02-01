@@ -68,7 +68,7 @@ export const levelTwoRoutes: PatientChartRoute[] = [
     name: "Order Medications"
   },
   {
-    url: "/patient/:patientUuid/chart/allergy/form/:allergyUuid?",
+    url: "/patient/:patientUuid/chart/allergies/form/:allergyUuid?",
     component: AllergyForm,
     name: "Allergy Form"
   },

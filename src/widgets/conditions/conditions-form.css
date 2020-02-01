@@ -16,6 +16,10 @@
   margin: 1rem 0rem 0rem 1rem;
 }
 
+.conditionCreateHeader {
+  margin: 1rem 1rem 0rem 1rem;
+}
+
 .container {
   display: grid;
   background: var(--omrs-color-ink-white);

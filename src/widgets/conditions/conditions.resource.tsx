@@ -15,6 +15,14 @@ export function getConditionByUuid(
   return Promise.resolve(mockPatientConditionSearchResponse);
 }
 
+export function savePatientCondition(
+  patientCondition,
+  patientUuid,
+  abortController
+) {
+  return Promise.resolve({ status: 201, body: "Condition created" });
+}
+
 const mockPatientConditionSearchResponse = {
   resource: {
     resourceType: "Condition",
