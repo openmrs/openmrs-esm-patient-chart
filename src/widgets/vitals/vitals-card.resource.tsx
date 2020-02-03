@@ -1,6 +1,6 @@
 import { openmrsObservableFetch, openmrsFetch } from "@openmrs/esm-api";
 import { Observable, of } from "rxjs";
-import { map, take } from "rxjs/operators";
+import { map, take, single } from "rxjs/operators";
 import { Vitals } from "./vitals-form.component";
 
 const SYSTOLIC_BLOOD_PRESSURE_CONCEPT: string =
@@ -208,6 +208,8 @@ export function editPatientVitals(
   });
 }
 
-export function getSession() {
-  return openmrsFetch(`/ws/rest/v1/appui/session`);
+export function getSession(abortController: AbortController) {
+  return openmrsFetch(`/ws/rest/v1/appui/session`, {
+    signal: abortController.signal
+  });
 }
