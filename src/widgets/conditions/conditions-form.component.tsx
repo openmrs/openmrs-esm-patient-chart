@@ -23,7 +23,7 @@ export function ConditionsForm(props: ConditionsFormProps) {
   const [enableEditButtons, setEnableEditButtons] = React.useState(true);
   const [viewEditForm, setViewEditForm] = React.useState(true);
   const [patientCondition, setPatientCondition] = React.useState(null);
-  const [patientUuid] = useCurrentPatient();
+  const [isLoadingPatient, patient, patientUuid] = useCurrentPatient();
   const formRef = React.useRef<HTMLFormElement>(null);
 
   const handleStatusChange = event => {
@@ -48,15 +48,15 @@ export function ConditionsForm(props: ConditionsFormProps) {
   }, [conditionClinicalStatus]);
 
   React.useEffect(() => {
-    const abortController = new AbortController();
     if (patientUuid && props.match.params) {
-      getConditionByUuid(
-        props.match.params["conditionUuid"],
-        abortController
-      ).then(condition => setPatientCondition(condition), createErrorHandler);
+      const abortController = new AbortController();
+      getConditionByUuid(props.match.params["conditionUuid"], abortController)
+        .then(condition => setPatientCondition(condition))
+        .catch(createErrorHandler());
+
+      return () => abortController.abort();
     }
-  }),
-    [patientUuid, props.match.params];
+  }, [patientUuid, props.match.params]);
 
   React.useEffect(() => {
     const params: any = props.match.params;
@@ -335,19 +335,26 @@ export function ConditionsForm(props: ConditionsFormProps) {
               <button
                 type="button"
                 className="omrs-btn omrs-outlined-neutral omrs-rounded"
-                onClick={handleCancelChanges}
-                style={{ width: "50%" }}
+                style={{ width: "20%" }}
               >
-                Cancel
+                Delete
+              </button>
+              <button
+                type="button"
+                className="omrs-btn omrs-outlined-neutral omrs-rounded"
+                onClick={handleCancelChanges}
+                style={{ width: "30%" }}
+              >
+                Cancel changes
               </button>
               <button
                 type="submit"
                 className={
-                  enableCreateButtons
+                  enableEditButtons
                     ? "omrs-btn omrs-outlined omrs-rounded"
                     : "omrs-btn omrs-filled-action omrs-rounded"
                 }
-                disabled={enableCreateButtons}
+                disabled={enableEditButtons}
                 style={{ width: "50%" }}
               >
                 Sign & Save
