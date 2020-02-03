@@ -389,16 +389,20 @@ export function MedicationOrder(props: MedicationOrderProps) {
                   </select>
                 </label>
               </div>
-              <div style={{ flex: 1 }}>
+              <div style={{ flex: 1, display: "flex", alignItems: "flex-end" }}>
                 <div className="omrs-increment-buttons">
                   <div>
                     <button
                       type="button"
                       className="omrs-btn-icon-medium"
-                      onClick={$event => setDuration(duration + 1)}
+                      onClick={$event => {
+                        if (duration > 0) {
+                          setDuration(duration - 1);
+                        }
+                      }}
                     >
                       <svg>
-                        <use xlinkHref="#omrs-icon-add"></use>
+                        <use xlinkHref="#omrs-icon-remove"></use>
                       </svg>
                     </button>
                   </div>
@@ -415,14 +419,10 @@ export function MedicationOrder(props: MedicationOrderProps) {
                     <button
                       type="button"
                       className="omrs-btn-icon-medium"
-                      onClick={$event => {
-                        if (duration > 0) {
-                          setDuration(duration - 1);
-                        }
-                      }}
+                      onClick={$event => setDuration(duration + 1)}
                     >
                       <svg>
-                        <use xlinkHref="#omrs-icon-remove"></use>
+                        <use xlinkHref="#omrs-icon-add"></use>
                       </svg>
                     </button>
                   </div>
@@ -454,27 +454,35 @@ export function MedicationOrder(props: MedicationOrderProps) {
             ></div>
             <div
               className={styles.medicationOrderInput}
-              style={{ width: "40%" }}
+              style={{ width: "80%" }}
             >
               <label htmlFor="refills">Refills</label>
               <div id="refills" className="omrs-increment-buttons">
                 <div>
                   <svg
                     className="omrs-icon"
-                    onClick={handleIncreaseRefillClick}
+                    onClick={handleDecreaseRefillClick}
                   >
-                    <use xlinkHref="#omrs-icon-add"></use>
+                    <use xlinkHref="#omrs-icon-remove"></use>
                   </svg>
                 </div>
                 <div>
-                  <span>{numRefills}</span>
+                  <span>
+                    <input
+                      type="number"
+                      value={numRefills}
+                      onChange={$event =>
+                        setNumRefills(Number($event.target.value))
+                      }
+                    />
+                  </span>
                 </div>
                 <div>
                   <svg
                     className="omrs-icon"
-                    onClick={handleDecreaseRefillClick}
+                    onClick={handleIncreaseRefillClick}
                   >
-                    <use xlinkHref="#omrs-icon-remove"></use>
+                    <use xlinkHref="#omrs-icon-add"></use>
                   </svg>
                 </div>
               </div>
