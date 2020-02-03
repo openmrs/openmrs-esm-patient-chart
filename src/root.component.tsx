@@ -6,52 +6,57 @@ import PatientBanner from "./banner/patient-banner.component";
 import LevelTwoRoutes, {
   levelTwoRoutes
 } from "./summaries/level-two-routes.component";
-import { Breadcrumbs } from "./breadcrumbs/breadcrumbs.component";
 import Sidebar from "./sidebar/sidebar.component";
 import WorkspaceWrapper from "./workspace/workspace-wrapper.component";
+import TopNav from "./top-nav/top-nav.component";
+import { blockStatement } from "@babel/types";
 
 function Root(props) {
   return (
     <BrowserRouter basename={window["getOpenmrsSpaBase"]()}>
-      <Route path="/patient/:patientUuid/chart">
-        <PatientBanner match={props.match} />
-      </Route>
       <main
         className="omrs-main-content"
         style={{
           display: "flex",
-          paddingTop: "2.8rem",
-          alignItems: "flex-start"
+          alignItems: "flex-start",
+          flexDirection: "column"
         }}
       >
-        <Sidebar></Sidebar>
-        <div style={{ flex: 1 }}>
-          <Breadcrumbs
-            rootUrl={getPatientChartRootUrl()}
-            routes={levelTwoRoutes}
-          />
-          <Route
-            path="/patient/:patientUuid/chart"
-            exact
-            component={PatientChartOverview}
-          />
-          <Route
-            path="/patient/:patientUuid/chart"
-            component={LevelTwoRoutes}
-          />
-        </div>
+        <Route path="/patient/:patientUuid/chart">
+          <PatientBanner match={props.match} />
+        </Route>
+
         <div
           style={{
-            width: ".1rem",
-            border: ".5px solid var(--omrs-color-ink-low-contrast)"
+            display: "flex",
+            alignItems: "left",
+            flexDirection: "row",
+            justifyContent: "left"
           }}
-        ></div>
-        <Route
-          path="/patient/:patientUuid/chart"
-          render={routeProps => (
-            <WorkspaceWrapper {...routeProps} style={{ flex: 1 }} />
-          )}
-        />
+        >
+          <Route path="/patient/:patientUuid/chart">
+            <TopNav />
+          </Route>
+          <Route
+            path="/patient/:patientUuid/chart"
+            render={routeProps => (
+              <WorkspaceWrapper {...routeProps} style={{ flex: 1 }} />
+            )}
+          />
+
+          <div
+            style={{
+              marginTop: "5.5rem"
+            }}
+          >
+            <Route
+              path="/patient/:patientUuid/chart"
+              component={LevelTwoRoutes}
+            />
+
+            <Sidebar></Sidebar>
+          </div>
+        </div>
       </main>
     </BrowserRouter>
   );
