@@ -7,7 +7,7 @@ import { Breadcrumbs } from "../breadcrumbs/breadcrumbs.component";
 import ProgramsLevelTwo from "../widgets/programs/programs-level-two.component";
 import { AllergyForm } from "../widgets/allergies/allergy-form.component";
 import { VitalsForm } from "../widgets/vitals/vitals-form.component";
-import ConditionsBriefSummary from "../widgets/conditions/conditions-brief-summary.component";
+import ConditionsSummary from "../widgets/conditions/conditions-summary.component";
 import MedicationLevelTwo from "../widgets/medications/medication-level-two.component";
 import { AllergyCardLevelThree } from "../widgets/allergies/allergy-card-level-three.component";
 import ConditionsDetailedSummary from "../widgets/conditions/conditions-detailed-summary.component";
@@ -28,7 +28,22 @@ export const levelTwoRoutes: PatientChartRoute[] = [
   {
     url: "/patient/:patientUuid/chart/allergies/:allergyUuid",
     component: AllergyCardLevelThree,
-    name: "Allergy"
+    name: "Allergies"
+  },
+  {
+    url: "/patient/:patientUuid/chart/allergies/form/:allergyUuid?",
+    component: AllergyForm,
+    name: "Allergy Form"
+  },
+  {
+    url: "/patient/:patientUuid/chart/conditions",
+    component: ConditionsSummary,
+    name: "Conditions"
+  },
+  {
+    url: "/patient/:patientUuid/chart/conditions/:conditionUuid",
+    component: ConditionsDetailedSummary,
+    name: "Conditions"
   },
   {
     url: "/patient/:patientUuid/chart/dimensions",
@@ -65,21 +80,6 @@ export const levelTwoRoutes: PatientChartRoute[] = [
     url: "/patient/:patientUuid/chart/medications/orderTest",
     component: MedicationOrder,
     name: "Order Medications"
-  },
-  {
-    url: "/patient/:patientUuid/chart/allergy/form/:allergyUuid?",
-    component: AllergyForm,
-    name: "Allergy Form"
-  },
-  {
-    url: "/patient/:patientUuid/chart/conditions",
-    component: ConditionsBriefSummary,
-    name: "Conditions"
-  },
-  {
-    url: "/patient/:patientUuid/chart/conditions/:conditionUuid",
-    component: ConditionsDetailedSummary,
-    name: "Conditions"
   }
 ];
 
