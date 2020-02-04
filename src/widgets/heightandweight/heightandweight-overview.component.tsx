@@ -1,7 +1,7 @@
 import React from "react";
 import SummaryCard from "../cards/summary-card.component";
 import { match } from "react-router";
-import { getDimensions } from "./heightandweight.resource";
+import { getDimenionsObservationsRestAPI } from "./heightandweight.resource";
 import SummaryCardRow from "../cards/summary-card-row.component";
 import SummaryCardRowContent from "../cards/summary-card-row-content.component";
 import styles from "./heightandweight-overview.css";
@@ -21,11 +21,15 @@ export default function HeightAndWeightOverview(
   ] = useCurrentPatient();
 
   React.useEffect(() => {
-    const sub = getDimensions(patientUuid).subscribe(dimensions => {
-      setDimensions(dimensions);
-    });
+    if (patientUuid) {
+      const sub = getDimenionsObservationsRestAPI(patientUuid).subscribe(
+        dimensions => {
+          setDimensions(dimensions);
+        }
+      );
 
-    return () => sub.unsubscribe();
+      return () => sub.unsubscribe();
+    }
   }, [patientUuid]);
 
   return (

@@ -25,11 +25,13 @@ export default function MedicationsOverview(props: MedicationsOverviewProps) {
   const { t } = useTranslation();
 
   React.useEffect(() => {
-    const subscription = fetchPatientMedications(patientUuid).subscribe(
-      Medications => setPatientMedications(Medications),
-      createErrorHandler()
-    );
-    return () => subscription.unsubscribe();
+    if (patientUuid) {
+      const subscription = fetchPatientMedications(patientUuid).subscribe(
+        Medications => setPatientMedications(Medications),
+        createErrorHandler()
+      );
+      return () => subscription.unsubscribe();
+    }
   }, [patientUuid]);
 
   return (
