@@ -10,6 +10,7 @@ import Sidebar from "./sidebar/sidebar.component";
 import WorkspaceWrapper from "./workspace/workspace-wrapper.component";
 import TopNav from "./top-nav/top-nav.component";
 import { blockStatement } from "@babel/types";
+import styles from "./root.css";
 
 function Root(props) {
   return (
@@ -22,40 +23,32 @@ function Root(props) {
           flexDirection: "column"
         }}
       >
-        <Route path="/patient/:patientUuid/chart">
-          <PatientBanner match={props.match} />
-        </Route>
-
-        <div
-          style={{
-            display: "flex",
-            alignItems: "left",
-            flexDirection: "row",
-            justifyContent: "left"
-          }}
-        >
+        <div style={{ height: "2.75rem" }}>
           <Route path="/patient/:patientUuid/chart">
-            <TopNav />
+            <PatientBanner match={props.match} />
           </Route>
-          <Route
-            path="/patient/:patientUuid/chart"
-            render={routeProps => (
-              <WorkspaceWrapper {...routeProps} style={{ flex: 1 }} />
-            )}
-          />
-
-          <div
-            style={{
-              marginTop: "5.5rem"
-            }}
-          >
+        </div>
+        <div className={styles.grid}>
+          <div className={styles.chart}>
+            <Route path="/patient/:patientUuid/chart">
+              <TopNav />
+            </Route>
+          </div>
+          <div className={styles.workspace}>
             <Route
               path="/patient/:patientUuid/chart"
-              component={LevelTwoRoutes}
+              render={routeProps => <WorkspaceWrapper {...routeProps} />}
             />
-
+          </div>
+          <div className={styles.sidebar}>
             <Sidebar></Sidebar>
           </div>
+        </div>
+        <div>
+          <Route
+            path="/patient/:patientUuid/chart"
+            component={LevelTwoRoutes}
+          />
         </div>
       </main>
     </BrowserRouter>
@@ -73,3 +66,30 @@ export default openmrsRootDecorator({
   featureName: "patient-chart",
   moduleName: "@openmrs/esm-patient-chart"
 })(Root);
+
+/*
+        <div className={styles.banner}>
+            <Route path="/patient/:patientUuid/chart">
+              <PatientBanner match={props.match} />
+            </Route>
+          </div>
+
+          <div className={styles.chart}>
+
+            <Route path="/patient/:patientUuid/chart">
+              <TopNav/>
+            </Route>
+          </div>
+          <div className={styles.workspace}>
+          <Route
+          path="/patient/:patientUuid/chart"
+          render={routeProps => (
+            <WorkspaceWrapper {...routeProps} />
+          )}
+        />
+          </div>
+
+          <div className={styles.sidebar}>
+        <Sidebar></Sidebar>
+        </div>
+*/

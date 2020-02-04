@@ -1,6 +1,7 @@
 .summariesnav {
   display: flex;
-  position: fixed;
+  position: sticky;
+  top: 3rem;
   flex-direction: row;
   align-items: left;
   justify-content: flex-start;

@@ -89,11 +89,7 @@ export default function TopNav(props: any) {
         </ul>
       </nav>
 
-      <div
-        style={{
-          marginTop: "5.5rem"
-        }}
-      >
+      <div>
         <Route path="/patient/:patientUuid/chart/summaries">
           <SummariesNav setLastRoute={setLastRoute} paths={paths} />
         </Route>

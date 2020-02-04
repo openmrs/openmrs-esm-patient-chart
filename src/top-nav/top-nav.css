@@ -1,12 +1,12 @@
 .topnav {
   display: flex;
-  position: fixed;
+  position: sticky;
+  top: 0;
   flex-direction: row;
   align-items: left;
   justify-content: flex-start;
   width: 100%;
   background-color: var(--omrs-color-bg-lowest-contrast);
-  margin-top: 2.75rem;
   height: 3rem;
   flex-wrap: nowrap;
   overflow-x: auto;

@@ -1,0 +1,28 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 1fr);
+  grid-template-rows: 1fr;
+  height: 90vh;
+  width: 100%;
+}
+
+.chart {
+  grid-row: 1;
+  grid-column: 1;
+  align-self: start;
+  overflow: auto;
+  height: 99%;
+}
+
+.workspace {
+  grid-row: 1;
+  grid-column: 2;
+  align-self: start;
+  overflow: auto;
+  height: 99%;
+}
+
+.sidebar {
+  grid-row: 1;
+  grid-column: 3;
+}
