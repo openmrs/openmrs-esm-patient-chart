@@ -5,10 +5,10 @@ import PatientChartOverview from "./summaries/overview/patient-chart-overview.co
 import PatientBanner from "./banner/patient-banner.component";
 import LevelTwoRoutes, {
   levelTwoRoutes
-} from "./summaries/level-two-routes.component";
+} from "./chart-review/level-two-routes.component";
 import Sidebar from "./sidebar/sidebar.component";
 import WorkspaceWrapper from "./workspace/workspace-wrapper.component";
-import TopNav from "./top-nav/top-nav.component";
+import ChartReview from "./chart-review/chart-review.component";
 import { blockStatement } from "@babel/types";
 import styles from "./root.css";
 
@@ -29,9 +29,9 @@ function Root(props) {
           </Route>
         </div>
         <div className={styles.grid}>
-          <div className={styles.chart}>
+          <div className={styles.chartreview}>
             <Route path="/patient/:patientUuid/chart">
-              <TopNav />
+              <ChartReview />
             </Route>
           </div>
           <div className={styles.workspace}>
@@ -40,15 +40,9 @@ function Root(props) {
               render={routeProps => <WorkspaceWrapper {...routeProps} />}
             />
           </div>
-          <div className={styles.sidebar}>
-            <Sidebar></Sidebar>
-          </div>
         </div>
-        <div>
-          <Route
-            path="/patient/:patientUuid/chart"
-            component={LevelTwoRoutes}
-          />
+        <div className={styles.sidebar}>
+          <Sidebar></Sidebar>
         </div>
       </main>
     </BrowserRouter>
@@ -66,30 +60,3 @@ export default openmrsRootDecorator({
   featureName: "patient-chart",
   moduleName: "@openmrs/esm-patient-chart"
 })(Root);
-
-/*
-        <div className={styles.banner}>
-            <Route path="/patient/:patientUuid/chart">
-              <PatientBanner match={props.match} />
-            </Route>
-          </div>
-
-          <div className={styles.chart}>
-
-            <Route path="/patient/:patientUuid/chart">
-              <TopNav/>
-            </Route>
-          </div>
-          <div className={styles.workspace}>
-          <Route
-          path="/patient/:patientUuid/chart"
-          render={routeProps => (
-            <WorkspaceWrapper {...routeProps} />
-          )}
-        />
-          </div>
-
-          <div className={styles.sidebar}>
-        <Sidebar></Sidebar>
-        </div>
-*/

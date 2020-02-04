@@ -1,9 +1,10 @@
 import React from "react";
 import { Route, Link, useHistory, useParams } from "react-router-dom";
 import SummariesNav from "../summaries/summaries-nav.component";
-import styles from "./top-nav.css";
+import LevelTwoRoutes from "./level-two-routes.component";
+import styles from "./chart-review.css";
 
-export default function TopNav(props: any) {
+export default function ChartReview(props: any) {
   const [selected, setSelected] = React.useState();
   let history = useHistory();
   const [lastRoute, setLastRoute] = React.useState(history.location.pathname);
@@ -61,7 +62,7 @@ export default function TopNav(props: any) {
 
   return (
     <>
-      <nav className={styles.topnav}>
+      <nav className={styles.topnav} style={{ marginTop: "0" }}>
         <ul>
           {navItems.map((item, index) => {
             return (
@@ -89,11 +90,10 @@ export default function TopNav(props: any) {
         </ul>
       </nav>
 
-      <div>
-        <Route path="/patient/:patientUuid/chart/summaries">
-          <SummariesNav setLastRoute={setLastRoute} paths={paths} />
-        </Route>
-      </div>
+      <Route path="/patient/:patientUuid/chart/summaries">
+        <SummariesNav setLastRoute={setLastRoute} paths={paths} />
+      </Route>
+      <Route path="/patient/:patientUuid/chart" component={LevelTwoRoutes} />
     </>
   );
 }

@@ -1,17 +1,19 @@
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, 1fr);
+  grid-template-columns: 1fr min-content;
   grid-template-rows: 1fr;
   height: 90vh;
-  width: 100%;
+  align-items: stretch;
+  width: 100vw;
 }
 
-.chart {
+.chartreview {
   grid-row: 1;
   grid-column: 1;
   align-self: start;
   overflow: auto;
   height: 99%;
+  width: 100%;
 }
 
 .workspace {
@@ -20,9 +22,11 @@
   align-self: start;
   overflow: auto;
   height: 99%;
+  width: 100%;
 }
 
 .sidebar {
   grid-row: 1;
   grid-column: 3;
+  align-self: start;
 }
