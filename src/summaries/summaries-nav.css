@@ -47,6 +47,7 @@
   color: var(--omrs-color-ink-high-contrast);
   background-color: var(--omrs-color-bg-low-contrast);
   border-bottom: medium solid var(--omrs-color-ink-high-contrast);
+
   border-radius: 1.5px 1.5px 0px 0px;
   font-weight: 500;
 }
