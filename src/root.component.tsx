@@ -5,53 +5,44 @@ import PatientChartOverview from "./summaries/overview/patient-chart-overview.co
 import PatientBanner from "./banner/patient-banner.component";
 import LevelTwoRoutes, {
   levelTwoRoutes
-} from "./summaries/level-two-routes.component";
-import { Breadcrumbs } from "./breadcrumbs/breadcrumbs.component";
+} from "./chart-review/level-two-routes.component";
 import Sidebar from "./sidebar/sidebar.component";
 import WorkspaceWrapper from "./workspace/workspace-wrapper.component";
+import ChartReview from "./chart-review/chart-review.component";
+import styles from "./root.css";
 
 function Root(props) {
   return (
     <BrowserRouter basename={window["getOpenmrsSpaBase"]()}>
-      <Route path="/patient/:patientUuid/chart">
-        <PatientBanner match={props.match} />
-      </Route>
       <main
         className="omrs-main-content"
         style={{
           display: "flex",
-          paddingTop: "2.8rem",
-          alignItems: "flex-start"
+          alignItems: "flex-start",
+          flexDirection: "column"
         }}
       >
-        <Sidebar></Sidebar>
-        <div style={{ flex: 1 }}>
-          <Breadcrumbs
-            rootUrl={getPatientChartRootUrl()}
-            routes={levelTwoRoutes}
-          />
-          <Route
-            path="/patient/:patientUuid/chart"
-            exact
-            component={PatientChartOverview}
-          />
-          <Route
-            path="/patient/:patientUuid/chart"
-            component={LevelTwoRoutes}
-          />
+        <aside style={{ height: "2.75rem" }}>
+          <Route path="/patient/:patientUuid/chart">
+            <PatientBanner match={props.match} />
+          </Route>
+        </aside>
+        <div className={styles.grid}>
+          <div className={styles.chartreview}>
+            <Route path="/patient/:patientUuid/chart">
+              <ChartReview />
+            </Route>
+          </div>
+          <div className={styles.workspace}>
+            <Route
+              path="/patient/:patientUuid/chart"
+              render={routeProps => <WorkspaceWrapper {...routeProps} />}
+            />
+          </div>
         </div>
-        <div
-          style={{
-            width: ".1rem",
-            border: ".5px solid var(--omrs-color-ink-low-contrast)"
-          }}
-        ></div>
-        <Route
-          path="/patient/:patientUuid/chart"
-          render={routeProps => (
-            <WorkspaceWrapper {...routeProps} style={{ flex: 1 }} />
-          )}
-        />
+        <div className={styles.sidebar}>
+          <Sidebar></Sidebar>
+        </div>
       </main>
     </BrowserRouter>
   );

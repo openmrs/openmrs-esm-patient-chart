@@ -28,7 +28,7 @@ export default function NotesOverview(props: NotesOverviewProps) {
       ).subscribe((response: any) => setPatientNotes(response.results));
       return () => sub.unsubscribe();
     }
-  }, [patient]);
+  }, [patient, patientUuid]);
 
   function fhirNotesOverview() {
     return (
