@@ -207,3 +207,108 @@ export const mockPatientEncounters = {
     ]
   }
 };
+
+export const mockPatientEncountersRESTAPI = {
+  results: [
+    {
+      uuid: "0926163e-8a28-43c2-a2cf-9851dc72f39d",
+      display: "Vitals 14/01/2020",
+      encounterDatetime: "2019-11-09T06:16:07",
+      location: {
+        uuid: "b1a8b05e-3542-4037-bbd3-998ee9c40574",
+        display: "Outpatient Clinic",
+        name: "Outpatient Clinic"
+      },
+      encounterType: {
+        name: "Vitals",
+        uuid: "67a71486-1a54-468f-ac3e-7091a9a79584"
+      },
+      auditInfo: {
+        creator: {
+          uuid: "285f67ce-3d8b-4733-96e5-1e2235e8e804",
+          display: "daemon",
+          links: [
+            {
+              rel: "self",
+              uri:
+                "http://localhost:8090/openmrs/ws/rest/v1/user/285f67ce-3d8b-4733-96e5-1e2235e8e804"
+            }
+          ]
+        },
+        dateCreated: "2020-01-13T21:40:38.000+0000",
+        changedBy: {
+          uuid: "285f67ce-3d8b-4733-96e5-1e2235e8e804",
+          display: "daemon",
+          links: [
+            {
+              rel: "self",
+              uri:
+                "http://localhost:8090/openmrs/ws/rest/v1/user/285f67ce-3d8b-4733-96e5-1e2235e8e804"
+            }
+          ]
+        },
+        dateChanged: "2020-01-14T01:10:35.000+0000"
+      }
+    },
+    {
+      uuid: "d4765d6f-f0e9-4be9-ab23-294708d4e076",
+      display: "Vitals 14/01/2020",
+      encounterDatetime: "2020-01-14T00:20:00.000+0000",
+      location: {
+        uuid: "b1a8b05e-3542-4037-bbd3-998ee9c40574",
+        display: "Inpatient Ward",
+        name: "Inpatient Ward"
+      },
+      encounterType: {
+        name: "Vitals",
+        uuid: "67a71486-1a54-468f-ac3e-7091a9a79584"
+      },
+      auditInfo: {
+        creator: {
+          uuid: "45ce6c2e-dd5a-11e6-9d9c-0242ac150002",
+          display: "admin",
+          links: [
+            {
+              rel: "self",
+              uri:
+                "http://localhost:8090/openmrs/ws/rest/v1/user/45ce6c2e-dd5a-11e6-9d9c-0242ac150002"
+            }
+          ]
+        },
+        dateCreated: "2020-02-03T09:10:32.000+0000",
+        changedBy: null,
+        dateChanged: null
+      }
+    },
+    {
+      uuid: "d4765d6f-f0e9-4be9-ab23-294708d4e0767",
+      display: "Vitals 14/01/2020",
+      encounterDatetime: "2020-01-14T00:20:00.000+0000",
+      location: {
+        uuid: "b1a8b05e-3542-4037-bbd3-998ee9c40574",
+        display: "Inpatient Ward",
+        name: "Inpatient Ward"
+      },
+      encounterType: {
+        name: "Vitals",
+        uuid: "67a71486-1a54-468f-ac3e-7091a9a79584"
+      },
+      auditInfo: {
+        creator: {
+          uuid: "45ce6c2e-dd5a-11e6-9d9c-0242ac150002",
+          display: "SUPER USER(IDENTIFIER:ADMIN)",
+          links: [
+            {
+              rel: "self",
+              uri:
+                "http://localhost:8090/openmrs/ws/rest/v1/user/45ce6c2e-dd5a-11e6-9d9c-0242ac150002"
+            }
+          ]
+        },
+        dateCreated: "2020-02-03T09:10:32.000+0000",
+        changedBy: null,
+        dateChanged: null
+      }
+    }
+  ]
+};
