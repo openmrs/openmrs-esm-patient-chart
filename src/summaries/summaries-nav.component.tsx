@@ -22,15 +22,16 @@ export default function SummariesNav(props: any) {
     }
   ];
 
-  let i = 0;
-  navItems.forEach((item, index) => {
-    if (item.path === history.location.pathname) {
-      i = index;
-    }
-  });
+  const hasPath = item =>
+    item.path === history.location.pathname ||
+    item.path === props.paths.summaries;
 
-  const hasPath = item => item.path.includes(history.location.pathname);
-  const [selected, setSelected] = React.useState(navItems.findIndex(hasPath));
+  function getInitialSelected() {
+    const i = navItems.findIndex(hasPath);
+    return i === -1 ? 0 : i;
+  }
+
+  const [selected, setSelected] = React.useState(getInitialSelected());
 
   function Hiv(props: any) {
     return <div>Hi</div>;
@@ -39,12 +40,6 @@ export default function SummariesNav(props: any) {
   function handleClick(index, path) {
     setSelected(index);
     props.setLastRoute(path);
-  }
-
-  function isSelected(index, path) {
-    const isSelected = index === selected || path === props.paths.summaries;
-
-    return isSelected;
   }
 
   return (
@@ -56,9 +51,7 @@ export default function SummariesNav(props: any) {
               <li key={index}>
                 <div
                   className={`${
-                    isSelected(index, item.path)
-                      ? styles.selected
-                      : styles.unselected
+                    index === selected ? styles.selected : styles.unselected
                   }`}
                 >
                   <Link to={item.path}>
@@ -77,7 +70,8 @@ export default function SummariesNav(props: any) {
       </nav>
 
       <Route exact path="/patient/:patientUuid/chart/summaries">
-        {props.paths.summaries === "" ? (
+        {props.paths.summaries === "" ||
+        props.paths.summaries === `/patient/${patientUuid}/chart/summaries` ? (
           <Redirect to={`/patient/${patientUuid}/chart/summaries/overview`} />
         ) : (
           <Redirect to={props.paths.summaries} />
