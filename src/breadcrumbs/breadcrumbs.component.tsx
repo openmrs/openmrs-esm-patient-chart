@@ -3,7 +3,7 @@ import { useLocation } from "react-router";
 import styles from "./breadcrumbs.component.css";
 import { Link } from "react-router-dom";
 import { getCurrentPatientUuid } from "@openmrs/esm-api";
-import { PatientChartRoute } from "../summaries/level-two-routes.component";
+import { PatientChartRoute } from "../chart-review/level-two-routes.component";
 
 export function Breadcrumbs(props: BreadcrumbsProps) {
   const { pathname } = useLocation();

@@ -8,6 +8,7 @@
 .visible {
   display: block;
   animation: fade_in_show 0.3s;
+  min-width: 50vw;
 }
 
 @keyframes fade_in_show {

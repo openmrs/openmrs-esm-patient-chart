@@ -15,7 +15,7 @@ export default function PatientBanner(props: PatientBannerProps) {
   ] = useCurrentPatient();
 
   return (
-    <aside className={styles.patientBanner}>
+    <div className={styles.patientBanner}>
       {!isLoadingPatient && !patientErr && (
         <div
           className={styles.patientBanner}
@@ -84,7 +84,7 @@ export default function PatientBanner(props: PatientBannerProps) {
           <ProfileSection patient={patient} match={props.match} />
         </div>
       )}
-    </aside>
+    </div>
   );
 
   function getPatientNames() {
