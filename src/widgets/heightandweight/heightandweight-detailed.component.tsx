@@ -1,7 +1,7 @@
 import React from "react";
 import styles from "./heightandweight-detailed.css";
 import SummaryCard from "../cards/summary-card.component";
-import { getDimensions } from "./heightandweight.resource";
+import { getDimenionsObservationsRestAPI } from "./heightandweight.resource";
 import { match } from "react-router";
 import { useCurrentPatient } from "@openmrs/esm-api";
 
@@ -16,9 +16,9 @@ function HeightAndWeightDetailed(props: HeightAndWeightDetailedProps) {
 
   React.useEffect(() => {
     if (patientUuid) {
-      const sub = getDimensions(patientUuid).subscribe(dimensions =>
-        setDimensions(dimensions)
-      );
+      const sub = getDimenionsObservationsRestAPI(
+        patientUuid
+      ).subscribe(dimensions => setDimensions(dimensions));
       return () => sub.unsubscribe();
     }
   }, [patientUuid]);
