@@ -5,7 +5,7 @@ import { of } from "rxjs";
 import HeightAndWeightDetailed from "./heightandweight-detailed.component";
 import { calculateBMI, formatDate } from "./heightandweight-helper";
 import { mockPatient } from "../../../__mocks__/patient.mock";
-import { mockDimensionResponse } from "../../../__mocks__/dimensions.mock";
+import { mockDimensionResponseRESTAPI } from "../../../__mocks__/dimensions.mock";
 import { useCurrentPatient, openmrsObservableFetch } from "@openmrs/esm-api";
 import dayjs from "dayjs";
 
@@ -30,7 +30,9 @@ describe("<HeightAndWeightDetailed/>", () => {
 
   it("renders successfully", () => {
     mockUseCurrentPatient.mockReturnValue([false, patient, patient.id, null]);
-    mockOpenmrsObservableFetch.mockReturnValue(of(mockDimensionResponse));
+    mockOpenmrsObservableFetch.mockReturnValue(
+      of(mockDimensionResponseRESTAPI)
+    );
     render(
       <BrowserRouter>
         <HeightAndWeightDetailed match={match}></HeightAndWeightDetailed>
@@ -40,7 +42,9 @@ describe("<HeightAndWeightDetailed/>", () => {
 
   it("renders dimensions correctly", async () => {
     mockUseCurrentPatient.mockReturnValue([false, patient, patient.id, null]);
-    mockOpenmrsObservableFetch.mockReturnValue(of(mockDimensionResponse));
+    mockOpenmrsObservableFetch.mockReturnValue(
+      of(mockDimensionResponseRESTAPI)
+    );
     const wrapper = render(
       <BrowserRouter>
         <HeightAndWeightDetailed match={match}></HeightAndWeightDetailed>

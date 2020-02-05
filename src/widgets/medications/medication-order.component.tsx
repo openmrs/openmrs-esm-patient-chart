@@ -59,7 +59,7 @@ export function MedicationOrder(props: MedicationOrderProps) {
   useEffect(() => {
     const abortcontroller = new AbortController();
     if (patientUuid) {
-      getDrugByName(props.drugUuid, abortcontroller).then(response => {
+      getDrugByName(props.drugName, abortcontroller).then(response => {
         setCommonMedication(getDrugMedication(response.data.results[0].uuid));
         setDrugName(response.data.results[0].name);
         setDrugUuid(response.data.results[0].uuid);
@@ -77,7 +77,7 @@ export function MedicationOrder(props: MedicationOrderProps) {
       }, createErrorHandler());
     }
     return () => abortcontroller.abort();
-  }, [props.drugUuid, patientUuid]);
+  }, [props.drugName, patientUuid]);
 
   useEffect(() => {
     if (startDate.length > 0 && durationUnitsArray) {
@@ -85,8 +85,10 @@ export function MedicationOrder(props: MedicationOrderProps) {
         return duration.uuid === durationUnit;
       });
       if (durationPeriod.length > 0) {
-        let period: any = durationPeriod[0].display;
-        let durationName: any = period.substring(0, period.lastIndexOf("s"));
+        let durationName: any = durationPeriod[0].display.substring(
+          0,
+          durationPeriod[0].display.lastIndexOf("s")
+        );
         setEndDate(
           dayjs(startDate)
             .add(duration, durationName)
@@ -116,7 +118,7 @@ export function MedicationOrder(props: MedicationOrderProps) {
     }
   }, [commonMedication, props.editProperty.length]);
 
-  //Edit default settings
+  //Edit default values
 
   useEffect(() => {
     const ac = new AbortController();
@@ -246,6 +248,10 @@ export function MedicationOrder(props: MedicationOrderProps) {
     props.hideModal();
   };
 
+  const handleDuractionChange = $event => {
+    setDuration(Number($event));
+  };
+
   return (
     <form onSubmit={handleSubmit} className={styles.medicationOrderWrapper}>
       <SummaryCard
@@ -362,11 +368,7 @@ export function MedicationOrder(props: MedicationOrderProps) {
             >
               <div style={{ flex: 1 }} className={styles.omrsSelectOptions}>
                 <label htmlFor="duration">Duration</label>
-                <label
-                  htmlFor="option"
-                  className="omrs-select-wrapper"
-                  style={{ width: "50%" }}
-                >
+                <label htmlFor="option">
                   <select
                     id="option"
                     onChange={$event => setDurationUnit($event.target.value)}
@@ -387,33 +389,42 @@ export function MedicationOrder(props: MedicationOrderProps) {
                   </select>
                 </label>
               </div>
-              <div style={{ flex: 1 }}>
-                <div
-                  className="omrs-increment-buttons"
-                  style={{ width: "60%", height: "fit-content" }}
-                >
+              <div style={{ flex: 1, display: "flex", alignItems: "flex-end" }}>
+                <div className="omrs-increment-buttons">
                   <div>
-                    <svg
-                      className="omrs-icon"
-                      onClick={$event => setDuration(duration + 1)}
-                    >
-                      <use xlinkHref="#omrs-icon-add"></use>
-                    </svg>
-                  </div>
-                  <div>
-                    <span>{duration}</span>
-                  </div>
-                  <div>
-                    <svg
-                      className="omrs-icon"
+                    <button
+                      type="button"
+                      className="omrs-btn-icon-medium"
                       onClick={$event => {
                         if (duration > 0) {
                           setDuration(duration - 1);
                         }
                       }}
                     >
-                      <use xlinkHref="#omrs-icon-remove"></use>
-                    </svg>
+                      <svg>
+                        <use xlinkHref="#omrs-icon-remove"></use>
+                      </svg>
+                    </button>
+                  </div>
+                  <div>
+                    <input
+                      type="number"
+                      value={duration}
+                      onChange={$event =>
+                        handleDuractionChange($event.target.value)
+                      }
+                    />
+                  </div>
+                  <div>
+                    <button
+                      type="button"
+                      className="omrs-btn-icon-medium"
+                      onClick={$event => setDuration(duration + 1)}
+                    >
+                      <svg>
+                        <use xlinkHref="#omrs-icon-add"></use>
+                      </svg>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -443,27 +454,35 @@ export function MedicationOrder(props: MedicationOrderProps) {
             ></div>
             <div
               className={styles.medicationOrderInput}
-              style={{ width: "40%" }}
+              style={{ width: "80%" }}
             >
               <label htmlFor="refills">Refills</label>
               <div id="refills" className="omrs-increment-buttons">
                 <div>
                   <svg
                     className="omrs-icon"
-                    onClick={handleIncreaseRefillClick}
+                    onClick={handleDecreaseRefillClick}
                   >
-                    <use xlinkHref="#omrs-icon-add"></use>
+                    <use xlinkHref="#omrs-icon-remove"></use>
                   </svg>
                 </div>
                 <div>
-                  <span>{numRefills}</span>
+                  <span>
+                    <input
+                      type="number"
+                      value={numRefills}
+                      onChange={$event =>
+                        setNumRefills(Number($event.target.value))
+                      }
+                    />
+                  </span>
                 </div>
                 <div>
                   <svg
                     className="omrs-icon"
-                    onClick={handleDecreaseRefillClick}
+                    onClick={handleIncreaseRefillClick}
                   >
-                    <use xlinkHref="#omrs-icon-remove"></use>
+                    <use xlinkHref="#omrs-icon-add"></use>
                   </svg>
                 </div>
               </div>
@@ -498,7 +517,7 @@ export function MedicationOrder(props: MedicationOrderProps) {
 
 type MedicationOrderProps = {
   match: match;
-  drugUuid: string;
+  drugName: string;
   orderBasket?: any[];
   setOrderBasket?: any;
   hideModal?: any;

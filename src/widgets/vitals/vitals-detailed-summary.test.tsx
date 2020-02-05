@@ -90,7 +90,7 @@ describe("<VitalsLevelTwo/>", () => {
       </BrowserRouter>
     );
     await wait(() => {
-      expect(wrapper.getByText("No Vitals are documentated")).toBeTruthy();
+      expect(wrapper.getByText("No Vitals are documented")).toBeTruthy();
     });
   });
 

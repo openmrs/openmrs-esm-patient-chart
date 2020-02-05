@@ -25,11 +25,13 @@ export default function MedicationsOverview(props: MedicationsOverviewProps) {
   const { t } = useTranslation();
 
   React.useEffect(() => {
-    const subscription = fetchPatientMedications(patientUuid).subscribe(
-      Medications => setPatientMedications(Medications),
-      createErrorHandler()
-    );
-    return () => subscription.unsubscribe();
+    if (patientUuid) {
+      const subscription = fetchPatientMedications(patientUuid).subscribe(
+        Medications => setPatientMedications(Medications),
+        createErrorHandler()
+      );
+      return () => subscription.unsubscribe();
+    }
   }, [patientUuid]);
 
   return (
@@ -126,12 +128,8 @@ export default function MedicationsOverview(props: MedicationsOverviewProps) {
               </span>
             </td>
             <td>
-              <Link
-                to={`/patient/${patientUuid}/chart/medications/order/${medication.uuid}/${medication.drug.name}/REVISE`}
-              >
-                REVISE
-              </Link>
               <button
+                className="omrs-btn omrs-text-neutral"
                 onClick={() =>
                   newWorkspaceItem({
                     component: MedicationOrderBasket,
@@ -140,7 +138,7 @@ export default function MedicationsOverview(props: MedicationsOverviewProps) {
                       match: {
                         params: {
                           orderUuid: medication.uuid,
-                          drugUuid: medication.drug.name,
+                          drugName: medication.drug.name,
                           action: "REVISE"
                         }
                       }

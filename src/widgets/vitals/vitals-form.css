@@ -1,18 +1,29 @@
 :global(.omrs-breakpoint-gt-phone) .vitalsForm {
   display: flex;
   justify-content: center;
-  flex-direction: column;
-  width: 100%;
+  flex-wrap: wrap;
 }
 
 :global(.omrs-breakpoint-lt-tablet) .vitalsForm {
   padding: 0.25rem 0.5rem 0 0.5rem;
+  flex-direction: row;
+}
+
+.vitalsContainerWrapper {
+  display: flex;
+  margin: 0rem 0rem 0.25rem 0rem;
+  flex-wrap: wrap;
+}
+
+:global(.omrs-breakpoint-lt-tablet) .vitalsContainerWrapper {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
 }
 
 .vitalsContainer {
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+  margin: 0rem 0rem 0.25rem 0rem;
 }
 
 .vitalInputContainer {
@@ -60,6 +71,8 @@
   margin-left: 0.5rem;
   outline: none;
   border: 0.0625rem solid var(--omrs-color-ink-low-contrast);
+  border-radius: 0.125rem;
+  width: 100%;
 }
 
 .vitalInputControl + svg {
@@ -71,6 +84,7 @@
   background: var(--omrs-color-ink-white);
   bottom: 0;
   justify-content: center;
+  width: 100%;
 }
 
 .buttonStyles button {
