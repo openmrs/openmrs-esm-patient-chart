@@ -21,11 +21,6 @@ export const levelTwoRoutes: PatientChartRoute[] = [
     name: "Allergies"
   },
   {
-    url: "/patient/:patientUuid/chart/allergies/form/:allergyUuid?",
-    component: AllergyForm,
-    name: "Allergy Form"
-  },
-  {
     url: "/patient/:patientUuid/chart/allergies/:allergyUuid",
     component: AllergyCardLevelThree,
     name: "Allergies"
