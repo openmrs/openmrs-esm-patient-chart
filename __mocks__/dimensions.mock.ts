@@ -218,3 +218,58 @@ export const mockDimensionResponse = {
     ]
   }
 };
+
+export const mockDimensionResponseRESTAPI = {
+  data: {
+    results: [
+      {
+        uuid: "775b8698-3f5f-4457-a364-066e2d14f3da",
+        display: "Height (cm): 165.0",
+        obsDatetime: `${todaysDate}T06:49:00`,
+        encounter: {
+          encounterDatetime: "2020-01-14T00:20:00.000+0000"
+        },
+        value: 165.0,
+        concept: {
+          uuid: "5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+        }
+      },
+      {
+        uuid: "bbd27a2f-442a-418a-9952-f2bb0e54df97",
+        display: "Weight (kg): 65.0",
+        obsDatetime: `${todaysDate}T06:49:00`,
+        encounter: {
+          encounterDatetime: "2020-01-14T00:20:00.000+0000"
+        },
+        value: 65.0,
+        concept: {
+          uuid: "5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+        }
+      },
+      {
+        uuid: "9dbadd59-72f0-4e67-8ee8-9341418f6cbe",
+        display: "Weight (kg): 14.0",
+        obsDatetime: "2016-12-18T06:48:20.000",
+        encounter: {
+          encounterDatetime: "2020-01-14T00:20:00.000+0000"
+        },
+        value: null,
+        concept: {
+          uuid: "5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+        }
+      },
+      {
+        uuid: "86fa8f6c-270e-445b-a0bc-1acc82696763",
+        display: "Height (cm): 156.0",
+        obsDatetime: "2016-12-18T06:48:20.000",
+        encounter: {
+          encounterDatetime: "2020-01-14T00:20:00.000+0000"
+        },
+        value: 173,
+        concept: {
+          uuid: "5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+        }
+      }
+    ]
+  }
+};
