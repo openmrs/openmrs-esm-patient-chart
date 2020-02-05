@@ -18,10 +18,9 @@ export default function ChartReview(props: any) {
   let { patientUuid } = useParams();
 
   React.useEffect(() => {
-    const p = paths;
-    if (lastRoute.indexOf("/summaries") > -1) {
-      p["summaries"] = lastRoute;
-      setPaths(p);
+    if (lastRoute.includes("/summaries")) {
+      paths["summaries"] = lastRoute;
+      setPaths(paths);
     }
   }, [lastRoute, paths]);
 

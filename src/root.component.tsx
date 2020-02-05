@@ -9,7 +9,6 @@ import LevelTwoRoutes, {
 import Sidebar from "./sidebar/sidebar.component";
 import WorkspaceWrapper from "./workspace/workspace-wrapper.component";
 import ChartReview from "./chart-review/chart-review.component";
-import { blockStatement } from "@babel/types";
 import styles from "./root.css";
 
 function Root(props) {
@@ -23,11 +22,11 @@ function Root(props) {
           flexDirection: "column"
         }}
       >
-        <div style={{ height: "2.75rem" }}>
+        <aside style={{ height: "2.75rem" }}>
           <Route path="/patient/:patientUuid/chart">
             <PatientBanner match={props.match} />
           </Route>
-        </div>
+        </aside>
         <div className={styles.grid}>
           <div className={styles.chartreview}>
             <Route path="/patient/:patientUuid/chart">

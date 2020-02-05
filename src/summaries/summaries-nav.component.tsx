@@ -29,22 +29,12 @@ export default function SummariesNav(props: any) {
     }
   });
 
-  const hasPath = item => item.path.indexOf(history.location.pathname) > -1;
+  const hasPath = item => item.path.includes(history.location.pathname);
   const [selected, setSelected] = React.useState(navItems.findIndex(hasPath));
 
   function Hiv(props: any) {
     return <div>Hi</div>;
   }
-
-  /*
-  React.useEffect(() => {
-    navItems.map((item, index) => {
-      if (item.path === history.location.pathname) {
-        setSelected(index);
-      }
-    });
-  }, []);
-  */
 
   function handleClick(index, path) {
     setSelected(index);
