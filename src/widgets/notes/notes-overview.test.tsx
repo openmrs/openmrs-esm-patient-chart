@@ -2,17 +2,26 @@ import React from "react";
 import { BrowserRouter } from "react-router-dom";
 import { render, cleanup, wait } from "@testing-library/react";
 import { mockPatient } from "../../../__mocks__/patient.mock";
-import { mockPatientEncounters } from "../../../__mocks__/encounters.mock";
-import { getEncounters } from "./encounter.resource";
+import {
+  mockPatientEncounters,
+  mockPatientEncountersRESTAPI
+} from "../../../__mocks__/encounters.mock";
+import {
+  getEncounters,
+  getEncounterObservableRESTAPI
+} from "./encounter.resource";
 import NotesOverview from "./notes-overview.component";
 import { useCurrentPatient } from "@openmrs/esm-api";
 import { formatNotesDate, getAuthorName } from "./notes-helper";
+import { of } from "rxjs";
 
 const mockFetchPatientEncounters = getEncounters as jest.Mock;
 const mockUseCurrentPatient = useCurrentPatient as jest.Mock;
+const mockGetEncounterObservableRESTAPI = getEncounterObservableRESTAPI as jest.Mock;
 
 jest.mock("./encounter.resource", () => ({
-  getEncounters: jest.fn()
+  getEncounters: jest.fn(),
+  getEncounterObservableRESTAPI: jest.fn()
 }));
 
 jest.mock("@openmrs/esm-api", () => ({
@@ -27,11 +36,13 @@ describe("<NotesOverview/>", () => {
     match = { params: {}, isExact: false, path: "/", url: "/" };
   });
 
-  beforeEach(mockFetchPatientEncounters.mockReset);
+  beforeEach(mockGetEncounterObservableRESTAPI.mockReset);
   beforeEach(mockUseCurrentPatient.mockReset);
 
   it("renders successfully", () => {
-    mockFetchPatientEncounters.mockReturnValue(Promise.resolve({}));
+    mockGetEncounterObservableRESTAPI.mockReturnValue(
+      of(mockPatientEncountersRESTAPI)
+    );
     mockUseCurrentPatient.mockReturnValue([
       false,
       mockPatient,
@@ -46,8 +57,8 @@ describe("<NotesOverview/>", () => {
   });
 
   it("displays see more on the footer", async () => {
-    mockFetchPatientEncounters.mockReturnValue(
-      Promise.resolve(mockPatientEncounters)
+    mockGetEncounterObservableRESTAPI.mockReturnValue(
+      of(mockPatientEncountersRESTAPI)
     );
     mockUseCurrentPatient.mockReturnValue([
       false,
@@ -67,8 +78,8 @@ describe("<NotesOverview/>", () => {
   });
 
   it("displays notes correctly", async () => {
-    mockFetchPatientEncounters.mockReturnValue(
-      Promise.resolve(mockPatientEncounters)
+    mockGetEncounterObservableRESTAPI.mockReturnValue(
+      of(mockPatientEncountersRESTAPI)
     );
     mockUseCurrentPatient.mockReturnValue([
       false,
@@ -81,8 +92,9 @@ describe("<NotesOverview/>", () => {
         <NotesOverview match={match}></NotesOverview>
       </BrowserRouter>
     );
-    const tbody = wrapper.container.querySelector("tbody");
+
     await wait(() => {
+      const tbody = wrapper.container.querySelector("tbody");
       const firstRow = tbody.children[0];
       const secondRow = tbody.children[2];
       expect(firstRow.children[0].textContent).toBe("09-Nov-2019 06:16 AM");

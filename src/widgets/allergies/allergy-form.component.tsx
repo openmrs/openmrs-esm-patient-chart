@@ -14,6 +14,7 @@ import { createErrorHandler } from "@openmrs/esm-error-handling";
 import { useCurrentPatient } from "@openmrs/esm-api";
 import dayjs from "dayjs";
 import { DataCaptureComponentProps } from "../../utils/data-capture-props";
+import { useHistory } from "react-router-dom";
 
 const DRUG_ALLERGEN_CONCEPT: string = "162552AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 const ENVIROMENTAL_ALLERGEN_CONCEPT: string =
@@ -56,6 +57,8 @@ export function AllergyForm(props: AllergyFormProps) {
     setAllergenType(getAllergenType(event.target.value));
     setSelectedAllergyCategory(event.target.value);
   };
+
+  let history = useHistory();
 
   function getAllergenType(allergenConcept: string): string {
     switch (allergenConcept) {
@@ -214,7 +217,7 @@ export function AllergyForm(props: AllergyFormProps) {
   };
 
   function navigate() {
-    window.location.href = `https://openmrs-spa.org/openmrs/spa/patient/${patientUuid}/chart/allergies`;
+    history.push(`/patient/${patientUuid}/chart/allergies`);
   }
 
   const setCheckedValue = uuid => {

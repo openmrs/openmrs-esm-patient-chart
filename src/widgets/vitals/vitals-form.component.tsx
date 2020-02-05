@@ -12,6 +12,7 @@ import {
 import dayjs from "dayjs";
 import { createErrorHandler } from "@openmrs/esm-error-handling";
 import { difference } from "lodash-es";
+import { useHistory } from "react-router-dom";
 
 export function VitalsForm(props: vitalsFormProp) {
   const [enableButtons, setEnableButtons] = useState(false);
@@ -36,6 +37,8 @@ export function VitalsForm(props: vitalsFormProp) {
     patientUuid,
     patientErr
   ] = useCurrentPatient();
+  const [currentSession, setCurrentSession] = useState();
+  let history = useHistory();
 
   React.useEffect(() => {
     if (patientUuid) {
@@ -50,8 +53,9 @@ export function VitalsForm(props: vitalsFormProp) {
         }
       }, createErrorHandler());
 
-      getSession().then(response => {
+      getSession(abortController).then(response => {
         setEncounterProvider(response.data.currentProvider.uuid);
+        setCurrentSession(response.data);
       }, createErrorHandler());
 
       return () => abortController.signal;
@@ -66,12 +70,12 @@ export function VitalsForm(props: vitalsFormProp) {
   React.useEffect(() => {
     if (!formView) {
       if (
-        systolicBloodPressure &&
-        diastolicBloodPressure &&
-        heartRate &&
-        oxygenSaturation &&
-        temperature &&
-        weight &&
+        systolicBloodPressure ||
+        diastolicBloodPressure ||
+        heartRate ||
+        oxygenSaturation ||
+        temperature ||
+        weight ||
         height
       ) {
         setEnableButtons(false);
@@ -123,7 +127,7 @@ export function VitalsForm(props: vitalsFormProp) {
     savePatientVitals(
       patientUuid,
       Vitals,
-      new Date(`${dateRecorded} ${timeRecorded}`),
+      new Date(`${dateRecorded}`),
       abortController,
       encounterProvider
     ).then(response => {
@@ -133,7 +137,7 @@ export function VitalsForm(props: vitalsFormProp) {
   };
 
   function navigate() {
-    window.location.href = `https://openmrs-spa.org/openmrs/spa/patient/${patientUuid}/chart/vitals`;
+    history.push(`/patient/${patientUuid}/chart/vitals`);
   }
 
   const handleEditFormSubmit = event => {
@@ -153,7 +157,7 @@ export function VitalsForm(props: vitalsFormProp) {
     editPatientVitals(
       patientUuid,
       editedVitals,
-      new Date(`${dateRecorded} ${timeRecorded}`),
+      new Date(`${dateRecorded}`),
       abortController,
       encounterUuid,
       encounterProvider
@@ -182,7 +186,7 @@ export function VitalsForm(props: vitalsFormProp) {
             height: "auto"
           }}
         >
-          <div className={styles.vitalsContainer}>
+          <div className={styles.vitalsContainerWrapper}>
             <div style={{ flex: 1, margin: "0rem 0.5rem" }}>
               <div className={styles.vitalInputContainer}>
                 <label htmlFor="dateRecorded">Date recorded</label>
@@ -215,13 +219,14 @@ export function VitalsForm(props: vitalsFormProp) {
                   <label htmlFor="systolic">Systolic</label>
                   <div>
                     <input
-                      type="text"
+                      type="number"
                       name="systolicBloodPressure"
                       id="d4d45a89-acef-4811-a3bb-989351d3fa90"
                       className={styles.vitalInputControl}
                       onChange={evt =>
                         setSytolicBloodPressure(evt.target.value)
                       }
+                      autoComplete="off"
                     />
                   </div>
                 </div>
@@ -234,13 +239,14 @@ export function VitalsForm(props: vitalsFormProp) {
                   <label htmlFor="systolic">Diastolic</label>
                   <div>
                     <input
-                      type="text"
+                      type="number"
                       name="diastolicBloodPressure"
                       id="b5a56b03-412d-4c5d-83d4-af7bfed69059"
                       className={styles.vitalInputControl}
                       onChange={evt =>
                         setDiastolicBloodPressure(evt.target.value)
                       }
+                      autoComplete="off"
                     />
                   </div>
                 </div>
@@ -250,11 +256,12 @@ export function VitalsForm(props: vitalsFormProp) {
                 <label htmlFor="heartRate">Heart Rate</label>
                 <div>
                   <input
-                    type="text"
+                    type="number"
                     name="heartRate"
                     id="heartRate"
                     className={styles.vitalInputControl}
                     onChange={evt => setHeartRate(evt.target.value)}
+                    autoComplete="off"
                   />
                 </div>
               </div>
@@ -263,25 +270,27 @@ export function VitalsForm(props: vitalsFormProp) {
                 <label htmlFor="oxygenSaturation">Oxygen saturation</label>
                 <div>
                   <input
-                    type="text"
+                    type="number"
                     name="oxygensaturation"
                     id="oxygensaturation"
                     className={styles.vitalInputControl}
                     onChange={evt => setOxygenSaturation(evt.target.value)}
+                    autoComplete="off"
                   />
                 </div>
               </div>
 
               <div className={styles.vitalsContainer}>
-                <div className={styles.vitalInputContainer}>
+                <div className={styles.vitalInputContainer} style={{ flex: 1 }}>
                   <label htmlFor="systolic">Temperature</label>
                   <div>
                     <input
-                      type="text"
+                      type="number"
                       name="temperature"
                       id="tempurature"
                       className={styles.vitalInputControl}
                       onChange={evt => setTemperature(evt.target.value)}
+                      autoComplete="off"
                     />
                   </div>
                 </div>
@@ -292,7 +301,8 @@ export function VitalsForm(props: vitalsFormProp) {
                     alignItems: "center",
                     width: "100%",
                     marginTop: "1rem",
-                    marginLeft: "1rem"
+                    marginLeft: "1rem",
+                    flex: 1
                   }}
                 >
                   <div className="toggleSwitch">
@@ -339,15 +349,16 @@ export function VitalsForm(props: vitalsFormProp) {
                 className={styles.vitalsContainer}
                 style={{ marginTop: "2.8rem" }}
               >
-                <div className={styles.vitalInputContainer}>
+                <div className={styles.vitalInputContainer} style={{ flex: 1 }}>
                   <label htmlFor="weight">Weight</label>
                   <div>
                     <input
-                      type="text"
+                      type="number"
                       name="weight"
                       id="weight"
                       className={styles.vitalInputControl}
                       onChange={evt => setWeight(evt.target.value)}
+                      autoComplete="off"
                     />
                   </div>
                 </div>
@@ -358,7 +369,8 @@ export function VitalsForm(props: vitalsFormProp) {
                     alignItems: "center",
                     width: "100%",
                     marginTop: "1rem",
-                    marginLeft: "1rem"
+                    marginLeft: "1rem",
+                    flex: 1
                   }}
                 >
                   <div className="toggleSwitch">
@@ -381,7 +393,7 @@ export function VitalsForm(props: vitalsFormProp) {
               </div>
 
               <div className={styles.vitalsContainer}>
-                <div className={styles.vitalInputContainer}>
+                <div className={styles.vitalInputContainer} style={{ flex: 1 }}>
                   <label htmlFor="height">Height</label>
                   <div>
                     <input
@@ -390,6 +402,7 @@ export function VitalsForm(props: vitalsFormProp) {
                       id="height"
                       className={styles.vitalInputControl}
                       onChange={evt => setHeight(evt.target.value)}
+                      autoComplete="off"
                     />
                   </div>
                 </div>
@@ -400,7 +413,8 @@ export function VitalsForm(props: vitalsFormProp) {
                     alignItems: "center",
                     width: "100%",
                     marginTop: "1rem",
-                    marginLeft: "1rem"
+                    marginLeft: "1rem",
+                    flex: 1
                   }}
                 >
                   <div className="toggleSwitch">
@@ -434,13 +448,14 @@ export function VitalsForm(props: vitalsFormProp) {
           <button
             type="button"
             className="omrs-btn omrs-outlined-neutral omrs-rounded"
-            style={{ width: "30%" }}
+            style={{ width: "50%" }}
             onClick={resetForm}
           >
             Cancel
           </button>
           <button
             type="submit"
+            style={{ width: "50%" }}
             className={
               enableButtons
                 ? "omrs-btn omrs-outlined omrs-rounded"
@@ -472,7 +487,7 @@ export function VitalsForm(props: vitalsFormProp) {
           }}
         >
           {patientVitals && (
-            <div className={styles.vitalsContainer}>
+            <div className={styles.vitalsContainerWrapper}>
               <div style={{ flex: 1, margin: "0rem 0.5rem" }}>
                 <div className={styles.vitalInputContainer}>
                   <label htmlFor="dateRecorded">Date recorded</label>
@@ -504,7 +519,7 @@ export function VitalsForm(props: vitalsFormProp) {
                     <label htmlFor="systolic">Systolic</label>
                     <div>
                       <input
-                        type="text"
+                        type="number"
                         name="systolicBloodPressure"
                         id={patientVitals[6].uuid}
                         className={styles.vitalInputControl}
@@ -526,7 +541,7 @@ export function VitalsForm(props: vitalsFormProp) {
                     <label htmlFor="diastolic">Diastolic</label>
                     <div>
                       <input
-                        type="text"
+                        type="number"
                         name="diastolicBloodPressure"
                         id={patientVitals[5].uuid}
                         className={styles.vitalInputControl}
@@ -545,7 +560,7 @@ export function VitalsForm(props: vitalsFormProp) {
                   <label htmlFor="heartRate">Heart Rate</label>
                   <div>
                     <input
-                      type="text"
+                      type="number"
                       name="heartRate"
                       id={patientVitals[4].uuid}
                       className={styles.vitalInputControl}
@@ -563,7 +578,7 @@ export function VitalsForm(props: vitalsFormProp) {
                   <label htmlFor="oxygenSaturation">Oxygen saturation</label>
                   <div>
                     <input
-                      type="text"
+                      type="number"
                       name="oxygensaturation"
                       id={patientVitals[1].uuid}
                       className={styles.vitalInputControl}
@@ -582,7 +597,7 @@ export function VitalsForm(props: vitalsFormProp) {
                     <label htmlFor="temperature">Temperature</label>
                     <div>
                       <input
-                        type="text"
+                        type="number"
                         name="temperature"
                         id={patientVitals[2].uuid}
                         className={styles.vitalInputControl}
@@ -650,7 +665,7 @@ export function VitalsForm(props: vitalsFormProp) {
                     <label htmlFor="weight">Weight</label>
                     <div>
                       <input
-                        type="text"
+                        type="number"
                         name="weight"
                         id={patientVitals[0].uuid}
                         className={styles.vitalInputControl}
@@ -697,7 +712,7 @@ export function VitalsForm(props: vitalsFormProp) {
                     <label htmlFor="systolic">Height</label>
                     <div>
                       <input
-                        type="text"
+                        type="number"
                         name="height"
                         id={patientVitals[3].uuid}
                         className={styles.vitalInputControl}
@@ -773,6 +788,7 @@ export function VitalsForm(props: vitalsFormProp) {
                 : "omrs-btn omrs-filled-action omrs-rounded"
             }
             disabled={enableButtons}
+            style={{ width: "50%" }}
           >
             Sign & Save
           </button>

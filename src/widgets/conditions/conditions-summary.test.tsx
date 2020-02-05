@@ -2,8 +2,8 @@ import React from "react";
 import { performPatientConditionsSearch } from "./conditions.resource";
 import { render, cleanup, wait } from "@testing-library/react";
 import { BrowserRouter, match } from "react-router-dom";
-import ConditionsBriefSummary from "./conditions-brief-summary.component";
 import { useCurrentPatient } from "../../../__mocks__/openmrs-esm-api.mock";
+import ConditionsSummary from "./conditions-summary.component";
 import {
   patient,
   mockPatientConditionsResult
@@ -20,7 +20,7 @@ jest.mock("@openmrs/esm-api", () => ({
   useCurrentPatient: jest.fn()
 }));
 
-describe("<ConditionsBriefSummary />", () => {
+describe("<ConditionsSummary />", () => {
   let match: match = { params: {}, isExact: false, path: "/", url: "/" };
   let wrapper: any;
 
@@ -35,7 +35,7 @@ describe("<ConditionsBriefSummary />", () => {
     );
     wrapper = render(
       <BrowserRouter>
-        <ConditionsBriefSummary match={match} />
+        <ConditionsSummary match={match} />
       </BrowserRouter>
     );
 
@@ -51,7 +51,7 @@ describe("<ConditionsBriefSummary />", () => {
     );
     wrapper = render(
       <BrowserRouter>
-        <ConditionsBriefSummary match={match} />
+        <ConditionsSummary match={match} />
       </BrowserRouter>
     );
 
@@ -71,7 +71,7 @@ describe("<ConditionsBriefSummary />", () => {
     );
     wrapper = render(
       <BrowserRouter>
-        <ConditionsBriefSummary match={match} />
+        <ConditionsSummary match={match} />
       </BrowserRouter>
     );
 

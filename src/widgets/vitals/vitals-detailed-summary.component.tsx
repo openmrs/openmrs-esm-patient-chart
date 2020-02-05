@@ -6,6 +6,7 @@ import { formatDate } from "../heightandweight/heightandweight-helper";
 import styles from "./vitals-detailed-summary.css";
 import SummaryCard from "../cards/summary-card.component";
 import { useCurrentPatient } from "@openmrs/esm-api";
+import { Link } from "react-router-dom";
 
 export default function VitalsDetailedSummary(
   props: VitalsDetailedSummaryProps
@@ -151,14 +152,23 @@ export default function VitalsDetailedSummary(
   }
   function displayNoPatientsVitals() {
     return (
-      <SummaryCard name="Vitals" match={props.match} styles={{ width: "100%" }}>
+      <SummaryCard
+        name="Vitals"
+        match={props.match}
+        styles={{
+          width: "100%",
+          backgroundColor: "var(--omrs-color-bg-low-contrast)",
+          boxShadow: "none",
+          border: "none"
+        }}
+      >
         <div className={`${styles.vitalsAbsent} omrs-bold`}>
-          <p>No Vitals are documentated</p>
+          <p>No Vitals are documented</p>
           Please{" "}
-          <a href={`/openmrs/spa/patient/${patientUuid}/chart/vitals/form`}>
+          <Link to={`/patient/${patientUuid}/chart/vitals/form`}>
             {" "}
-            add patient vitals
-          </a>
+            add patient vitals{" "}
+          </Link>
         </div>
       </SummaryCard>
     );
