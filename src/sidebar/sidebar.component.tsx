@@ -5,6 +5,7 @@ import { AllergyForm } from "../widgets/allergies/allergy-form.component";
 import Parcel from "single-spa-react";
 import { VitalsForm } from "../widgets/vitals/vitals-form.component";
 import { MedicationOrderBasket } from "../widgets/medications/medication-order-basket.component";
+import { mountRootParcel } from "single-spa";
 
 export default function Sidebar(props: any) {
   const sidebarItems = [
@@ -27,7 +28,9 @@ export default function Sidebar(props: any) {
           component: VitalsForm,
           name: "Vitals",
           props: { match: { params: {} } },
-          inProgress: false
+          inProgress: false,
+          validations: (workspaceTabs: any[]) =>
+            workspaceTabs.findIndex(tab => tab.component === VitalsForm)
         })
     },
     {
@@ -35,7 +38,10 @@ export default function Sidebar(props: any) {
       onclick: () =>
         newWorkspaceItem({
           component: (
-            <Parcel config={System.import("@ampath/esm-angular-form-entry")} />
+            <Parcel
+              config={System.import("@ampath/esm-angular-form-entry")}
+              mountParcel={mountRootParcel}
+            />
           ),
           name: "Forms",
           props: { match: { params: {} } },
@@ -49,7 +55,11 @@ export default function Sidebar(props: any) {
           component: MedicationOrderBasket,
           name: "Medication Order Basket",
           props: { match: { params: {} } },
-          inProgress: false
+          inProgress: false,
+          validations: (workspaceTabs: any[]) =>
+            workspaceTabs.findIndex(
+              tab => tab.component === MedicationOrderBasket
+            )
         })
     }
   ];
