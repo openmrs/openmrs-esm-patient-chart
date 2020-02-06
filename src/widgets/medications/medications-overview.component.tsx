@@ -39,8 +39,7 @@ export default function MedicationsOverview(props: MedicationsOverviewProps) {
       name={t("Active Medications", "Active Medications")}
       match={props.match}
       styles={{ width: "100%", maxWidth: "45rem" }}
-      link={`/patient/${patientUuid}/chart/medications`}
-      addBtnUrl={`/patient/${patientUuid}/chart/medications/order`}
+      link={`/patient/${patientUuid}/chart/Medications`}
     >
       <table className={styles.medicationsTable}>
         <tbody>{patientMedications && parseRestWsMeds()}</tbody>
@@ -80,9 +79,11 @@ export default function MedicationsOverview(props: MedicationsOverviewProps) {
                 </span>
               </td>
               <td style={{ textAlign: "end" }}>
-                <svg className="omrs-icon" fill="rgba(0, 0, 0, 0.54)">
-                  <use xlinkHref="#omrs-icon-chevron-right" />
-                </svg>
+                <Link to={`/patient/${patientUuid}/chart/medications`}>
+                  <svg className="omrs-icon" fill="rgba(0, 0, 0, 0.54)">
+                    <use xlinkHref="#omrs-icon-chevron-right" />
+                  </svg>
+                </Link>
               </td>
             </tr>
           )}
@@ -105,16 +106,16 @@ export default function MedicationsOverview(props: MedicationsOverviewProps) {
               >
                 {medication.drug.name}
               </span>
-              {" \u2014 "}{" "}
+              {" \u2014 "}&nbsp;
               <span className={styles.medicationStatement}>
                 {medication.doseUnits.display}
-              </span>{" "}
+              </span>
+              &nbsp;
               {" \u2014 "}
               <span className={styles.medicationStatement}>
-                {medication.route.display}{" "}
+                {medication.route.display}&nbsp;
               </span>
-              {" \u2014 "}
-              DOSE{" "}
+              &nbsp; DOSE&nbsp;
               <span
                 style={{
                   fontWeight: 500,
@@ -122,7 +123,7 @@ export default function MedicationsOverview(props: MedicationsOverviewProps) {
                 }}
                 className={styles.medicationStatement}
               >
-                {getDosage(medication.drug.strength, medication.dose)}{" "}
+                {getDosage(medication.drug.strength, medication.dose)}&nbsp;
                 {medication.frequency.display}
               </span>
             </td>
@@ -150,9 +151,11 @@ export default function MedicationsOverview(props: MedicationsOverviewProps) {
               </button>
             </td>
             <td style={{ textAlign: "end" }}>
-              <svg className="omrs-icon" fill="rgba(0, 0, 0, 0.54)">
-                <use xlinkHref="#omrs-icon-chevron-right" />
-              </svg>
+              <Link to={`/patient/${patientUuid}/chart/medications`}>
+                <svg className="omrs-icon" fill="rgba(0, 0, 0, 0.54)">
+                  <use xlinkHref="#omrs-icon-chevron-right" />
+                </svg>
+              </Link>
             </td>
           </tr>
         </React.Fragment>
