@@ -115,7 +115,11 @@ export default function MedicationsOverview(props: MedicationsOverviewProps) {
               <span className={styles.medicationStatement}>
                 {medication.route.display}&nbsp;
               </span>
-              &nbsp; DOSE&nbsp;
+              <span style={{ color: "var(--omrs-color-ink-medium-contrast)" }}>
+                {" "}
+                DOSE
+              </span>
+              &nbsp;&nbsp;&nbsp;
               <span
                 style={{
                   fontWeight: 500,
@@ -123,7 +127,15 @@ export default function MedicationsOverview(props: MedicationsOverviewProps) {
                 }}
                 className={styles.medicationStatement}
               >
-                {getDosage(medication.drug.strength, medication.dose)}&nbsp;
+                {getDosage(medication.drug.strength, medication.dose)}
+              </span>
+              <span
+                style={{
+                  fontWeight: 400,
+                  color: "var(--omrs-color-ink-high-contrast)"
+                }}
+              >
+                {" \u2014 "}
                 {medication.frequency.display}
               </span>
             </td>
