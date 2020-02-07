@@ -1,6 +1,7 @@
 import { openmrsObservableFetch, openmrsFetch } from "@openmrs/esm-api";
 import { Observable } from "rxjs";
 import { map, take, filter } from "rxjs/operators";
+import { OrderMedication } from "./medication-orders-utils";
 
 type PatientMedications = {
   uuid: Number;
@@ -60,7 +61,7 @@ export function getPatientEncounterID(
 
 export function saveNewDrugOrder(
   abortContoller: AbortController,
-  drugOrder: any
+  drugOrder: OrderMedication
 ) {
   if (drugOrder.previousOrder === null) {
     return openmrsFetch(`/ws/rest/v1/order`, {

@@ -9,7 +9,7 @@ import { MedicationOrder } from "./medication-order.component";
 import { useCurrentPatient } from "@openmrs/esm-api";
 import SummaryCardRow from "../cards/summary-card-row.component";
 import SummaryCardRowContent from "../cards/summary-card-row-content.component";
-import { getDosage } from "./medication-orders-utils";
+import { getDosage, OrderMedication } from "./medication-orders-utils";
 import { useHistory } from "react-router-dom";
 
 export function MedicationOrderBasket(props: MedicationOrderBasketProps) {
@@ -28,7 +28,10 @@ export function MedicationOrderBasket(props: MedicationOrderBasketProps) {
     patientErr
   ] = useCurrentPatient();
   let history = useHistory();
-
+  const [editOrderItem, setEditOrderItem] = React.useState<{
+    orderEdit: Boolean;
+    order?: OrderMedication;
+  }>({ orderEdit: false, order: null });
   const handleDrugSelected = $event => {
     setDrugName(searchTerm);
     setShowOrderMedication(true);
@@ -91,6 +94,7 @@ export function MedicationOrderBasket(props: MedicationOrderBasketProps) {
   const hideModal = () => {
     setShowOrderMedication(false);
     setEditProperty([]);
+    setEditOrderItem({ orderEdit: false, order: null });
   };
 
   const resetParams = () => {
@@ -100,6 +104,21 @@ export function MedicationOrderBasket(props: MedicationOrderBasketProps) {
   function navigate() {
     history.push(`/patient/${patientUuid}/chart/medications`);
   }
+
+  const handleRemoveOrderItem = (indexNum: any) => {
+    setOrderBasket(
+      orderBasket.filter((order: OrderMedication, index) => index !== indexNum)
+    );
+  };
+
+  const handleOrderItemEdit = (orderItem: OrderMedication, indexNum: any) => {
+    setEditOrderItem({ orderEdit: true, order: orderItem });
+    setShowOrderMedication(true);
+    setEditProperty([]);
+    setOrderBasket(
+      orderBasket.filter((order: OrderMedication, index) => index !== indexNum)
+    );
+  };
 
   return (
     <div className={styles.medicationOrderBasketContainer}>
@@ -116,7 +135,7 @@ export function MedicationOrderBasket(props: MedicationOrderBasketProps) {
           <SummaryCard
             name="Order Medication"
             match={props.match}
-            styles={{ width: "100%", maxHeight: "2.5rem" }}
+            styles={{ width: "100%" }}
           >
             <div className={styles.medicationSearchTerm}>
               <input
@@ -164,17 +183,7 @@ export function MedicationOrderBasket(props: MedicationOrderBasketProps) {
         </div>
       </div>
 
-      <div
-        style={{
-          height: "fit-content",
-          width: "100%",
-          margin: "1.25rem",
-          padding: "1.25rem",
-          position: "absolute",
-          bottom: 0,
-          marginBottom: "10%"
-        }}
-      >
+      <div style={{ width: "70%" }}>
         {orderBasket.length > 0 &&
           orderBasket.map((order, index) => {
             return (
@@ -195,6 +204,30 @@ export function MedicationOrderBasket(props: MedicationOrderBasketProps) {
                       {`DOSE ${getDosage(order.drugStrength, order.dose)}`}{" "}
                       <b>{String(order.frequencyName).toLocaleLowerCase()}</b>
                     </span>
+                    <span>
+                      <button
+                        className="omrs-btn-icon-medium"
+                        onClick={$event => handleRemoveOrderItem(index)}
+                      >
+                        <svg>
+                          <use
+                            fill={"var(--omrs-color-ink-white)"}
+                            xlinkHref="#omrs-icon-close"
+                          ></use>
+                        </svg>
+                      </button>
+                      <button
+                        className="omrs-btn-icon-medium"
+                        onClick={$event => handleOrderItemEdit(order, index)}
+                      >
+                        <svg>
+                          <use
+                            fill={"var(--omrs-color-ink-white)"}
+                            xlinkHref="#omrs-icon-menu"
+                          ></use>
+                        </svg>
+                      </button>
+                    </span>
                   </SummaryCardRowContent>
                 </SummaryCardRow>
               </div>
@@ -213,6 +246,7 @@ export function MedicationOrderBasket(props: MedicationOrderBasketProps) {
               hideModal={hideModal}
               editProperty={editProperty}
               resetParams={resetParams}
+              orderEdit={editOrderItem}
             />
           </div>
         </div>
