@@ -12,7 +12,7 @@ import {
 import dayjs from "dayjs";
 import { useCurrentPatient } from "@openmrs/esm-api";
 import { createErrorHandler } from "@openmrs/esm-error-handling";
-import { setDefaultValues } from "./medication-orders-utils";
+import { setDefaultValues, OrderMedication } from "./medication-orders-utils";
 
 const CARE_SETTINGS: string = "6f0c9a92-6f24-11e3-af88-005056821db0";
 const ORDERER: string = "e89cae4a-3cb3-40a2-b964-8b20dda2c985";
@@ -106,7 +106,11 @@ export function MedicationOrder(props: MedicationOrderProps) {
 
   useEffect(() => {
     let defaults: any;
-    if (commonMedication.length > 0 && props.editProperty.length === 0) {
+    if (
+      commonMedication.length > 0 &&
+      props.editProperty.length === 0 &&
+      props.orderEdit.orderEdit === false
+    ) {
       defaults = setDefaultValues(commonMedication);
       setDoseUnits(defaults[0].drugUnits);
       setFrequencyUuid(defaults[0].frequencyConcept);
@@ -116,7 +120,7 @@ export function MedicationOrder(props: MedicationOrderProps) {
     }
     if (props.editProperty.length > 0) {
     }
-  }, [commonMedication, props.editProperty.length]);
+  }, [commonMedication, props.editProperty.length, props.orderEdit.orderEdit]);
 
   //Edit default values
 
@@ -164,6 +168,28 @@ export function MedicationOrder(props: MedicationOrderProps) {
       );
     }
   }, [commonMedication, frequencyUuid, props.editProperty.length]);
+
+  useEffect(() => {
+    if (props.orderEdit.orderEdit) {
+      const order = props.orderEdit.order;
+      setEncounterUuid(order.encounterUuid);
+      setStartDate(dayjs(new Date()).format("DD-MMM-YYYY"));
+      setDosingInstructions(order.dosingInstructions);
+      setDoseUnits(order.doseUnitsConcept);
+      setDosageForm(order.dosageForm);
+      setRouteUuid(order.route);
+      setRouteName(order.routeName);
+      setDose(Number(order.dose));
+      setDuration(Number(order.duration));
+      setFrequencyName(order.frequencyName);
+      setFrequencyUuid(order.frequencyUuid);
+      setAction(order.action);
+      setNumRefills(Number(order.numRefills));
+      setPreviousOrder(order.previousOrder);
+    }
+  }, [props.orderEdit]);
+
+  useEffect(() => {}, [props.orderEdit]);
 
   const getDrugMedication = drugUuid => {
     return commonMedicationJson.filter(
@@ -518,11 +544,12 @@ export function MedicationOrder(props: MedicationOrderProps) {
 type MedicationOrderProps = {
   match: match;
   drugName: string;
-  orderBasket?: any[];
+  orderBasket?: OrderMedication[];
   setOrderBasket?: any;
   hideModal?: any;
   action?: any;
   orderUuid?: any;
   editProperty?: any[];
   resetParams?: any;
+  orderEdit?: { orderEdit: Boolean; order?: OrderMedication };
 };
