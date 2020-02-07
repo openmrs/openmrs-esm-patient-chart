@@ -1,11 +1,7 @@
 import React from "react";
 import { BrowserRouter, Route } from "react-router-dom";
 import openmrsRootDecorator from "@openmrs/react-root-decorator";
-import PatientChartOverview from "./summaries/overview/patient-chart-overview.component";
 import PatientBanner from "./banner/patient-banner.component";
-import LevelTwoRoutes, {
-  levelTwoRoutes
-} from "./chart-review/level-two-routes.component";
 import Sidebar from "./sidebar/sidebar.component";
 import WorkspaceWrapper from "./workspace/workspace-wrapper.component";
 import ChartReview from "./chart-review/chart-review.component";

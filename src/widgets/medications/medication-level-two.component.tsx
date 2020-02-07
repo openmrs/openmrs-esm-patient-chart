@@ -141,7 +141,7 @@ export default function MedicationLevelTwo(props: MedicationsOverviewProps) {
               style={{ color: "var(--omrs-color-ink-medium-contrast)" }}
               className={"omrs-type-body-large"}
             >
-              No more medication available
+              No more medications available
             </p>
           </div>
         </React.Fragment>

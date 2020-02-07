@@ -7,6 +7,8 @@ import styles from "./vitals-detailed-summary.css";
 import SummaryCard from "../cards/summary-card.component";
 import { useCurrentPatient } from "@openmrs/esm-api";
 import { Link } from "react-router-dom";
+import { newWorkspaceItem } from "../../workspace/workspace.resource";
+import { VitalsForm } from "./vitals-form.component";
 
 export default function VitalsDetailedSummary(
   props: VitalsDetailedSummaryProps
@@ -70,6 +72,15 @@ export default function VitalsDetailedSummary(
     setCurrentPageResults(pageResults);
     setCurrentPage(currentPage - 1);
   };
+
+  function openVitalsWorkspaceTab() {
+    newWorkspaceItem({
+      component: VitalsForm,
+      name: "Vitals",
+      props: { match: { params: {} } },
+      inProgress: false
+    });
+  }
 
   function displayPatientsVitals() {
     return (
@@ -164,11 +175,10 @@ export default function VitalsDetailedSummary(
       >
         <div className={`${styles.vitalsAbsent} omrs-bold`}>
           <p>No Vitals are documented</p>
-          Please{" "}
-          <Link to={`/patient/${patientUuid}/chart/vitals/form`}>
-            {" "}
-            add patient vitals{" "}
-          </Link>
+          <button className="omrs-unstyled" onClick={openVitalsWorkspaceTab}>
+            Add
+          </button>
+          {` `} new set of vitals.
         </div>
       </SummaryCard>
     );

@@ -3,29 +3,52 @@ import { Route, Link, useHistory, useParams } from "react-router-dom";
 import SummariesNav from "../summaries/summaries-nav.component";
 import LevelTwoRoutes from "./level-two-routes.component";
 import styles from "./chart-review.css";
+import { newWorkspaceItem } from "../workspace/workspace.resource";
+import { MedicationOrderBasket } from "../widgets/medications/medication-order-basket.component";
+import Medications from "../widgets/medications/medications.component";
+import Vitals from "../widgets/vitals/vitals.component";
 
 export default function ChartReview(props: any) {
   const [selected, setSelected] = React.useState();
   let history = useHistory();
   const [lastRoute, setLastRoute] = React.useState(history.location.pathname);
   const [paths, setPaths] = React.useState({
-    summaries:
-      history.location.pathname.indexOf("summaries/") > -1
-        ? history.location.pathname
-        : ""
+    summaries: history.location.pathname.includes("summaries/")
+      ? history.location.pathname
+      : "",
+    medications: history.location.pathname.includes("medications/")
+      ? history.location.pathname
+      : "",
+    vitals: history.location.pathname.includes("vitals/")
+      ? history.location.pathname
+      : ""
   });
 
   let { patientUuid } = useParams();
 
   React.useEffect(() => {
-    if (lastRoute.includes("/summaries")) {
-      paths["summaries"] = lastRoute;
-      setPaths(paths);
+    switch (true) {
+      case lastRoute.includes("/summaries"):
+        paths["summaries"] = lastRoute;
+        break;
+      case lastRoute.includes("/medications"):
+        paths["medications"] = lastRoute;
+        break;
     }
+    setPaths(paths);
   }, [lastRoute, paths]);
 
   function handleClick() {
     setLastRoute(history.location.pathname);
+  }
+
+  function showOrders() {
+    newWorkspaceItem({
+      component: MedicationOrderBasket,
+      name: "Medication Order Basket",
+      props: { match: { params: {} } },
+      inProgress: false
+    });
   }
 
   const navItems = [
@@ -56,6 +79,14 @@ export default function ChartReview(props: any) {
     {
       name: "Orders",
       path: `/patient/${patientUuid}/chart/orders`
+    },
+    {
+      name: "Conditions",
+      path: `/patient/${patientUuid}/chart/conditions`
+    },
+    {
+      name: "Programs",
+      path: `/patient/${patientUuid}/chart/programs`
     }
   ];
 
@@ -93,6 +124,25 @@ export default function ChartReview(props: any) {
         <SummariesNav setLastRoute={setLastRoute} paths={paths} />
       </Route>
       <Route path="/patient/:patientUuid/chart" component={LevelTwoRoutes} />
+      <Route path="/patient/:patientUuid/chart/medications">
+        <Medications setLastRoute={setLastRoute} paths={paths} />
+      </Route>
+
+      <Route path="/patient/:patientUuid/chart/vitals">
+        <Vitals setLastRoute={setLastRoute} paths={paths} />
+      </Route>
+
+      <Route path="/patient/:patientUuid/chart/orders">
+        <div>
+          <button
+            className="omrs-unstyled"
+            onClick={showOrders}
+            style={{ padding: "1rem", width: "100%" }}
+          >
+            Create Orders
+          </button>
+        </div>
+      </Route>
     </>
   );
 }
