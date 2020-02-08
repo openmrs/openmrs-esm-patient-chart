@@ -95,7 +95,6 @@ export default function MedicationLevelTwo(props: MedicationsOverviewProps) {
                               {" \u2014 "} {medication.frequency.display}
                               {" \u2014 "}
                               {medication.duration}
-                              {" \u2014 "}
                               {medication.durationUnits.display}
                               {" \u2014 "}
                             </span>
@@ -199,7 +198,6 @@ export default function MedicationLevelTwo(props: MedicationsOverviewProps) {
                               {" \u2014 "} {medication.frequency.display}
                               {" \u2014 "}
                               {medication.duration}
-                              {" \u2014 "}
                               {medication.durationUnits.display}
                               {" \u2014 "}
                             </span>
