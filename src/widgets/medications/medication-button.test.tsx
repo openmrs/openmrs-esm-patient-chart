@@ -1,3 +1,4 @@
+import React from "react";
 import { MedicationButton } from "./medication-button.component";
 import { render, fireEvent, cleanup } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
