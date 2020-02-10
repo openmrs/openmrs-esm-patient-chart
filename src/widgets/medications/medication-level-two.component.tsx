@@ -10,6 +10,8 @@ import SummaryCardFooter from "../cards/summary-card-footer.component";
 import { useTranslation } from "react-i18next";
 import dayjs from "dayjs";
 import { getDosage } from "./medication-orders-utils";
+import { MedicationButton } from "./medication-button.component";
+import { MedicationOrderBasket } from "./medication-order-basket.component";
 
 export default function MedicationLevelTwo(props: MedicationsOverviewProps) {
   const [patientMedications, setPatientMedications] = React.useState(null);
@@ -91,6 +93,28 @@ export default function MedicationLevelTwo(props: MedicationsOverviewProps) {
                             {dayjs(medication.dateActivated).format(
                               "DD-MMM-YYYY"
                             )}
+                          </td>
+                          <td>
+                            <MedicationButton
+                              component={MedicationOrderBasket}
+                              name={"Medication Order Basket"}
+                              label={"REVISE"}
+                              orderUuid={medication.uuid}
+                              drugName={medication.drug.name}
+                              action={"REVISE"}
+                              inProgress={true}
+                            />
+                            <td>
+                              <MedicationButton
+                                component={MedicationOrderBasket}
+                                name={"Medication Order Basket"}
+                                label={"DISCONTINUE"}
+                                orderUuid={medication.uuid}
+                                drugName={medication.drug.name}
+                                action={"DISCONTINUE"}
+                                inProgress={true}
+                              />
+                            </td>
                           </td>
                         </tr>
                       </React.Fragment>
