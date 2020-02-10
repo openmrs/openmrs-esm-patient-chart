@@ -12,6 +12,7 @@ import { getDosage } from "./medication-orders-utils";
 import { Link } from "react-router-dom";
 import { newWorkspaceItem } from "../../workspace/workspace.resource";
 import { MedicationOrderBasket } from "./medication-order-basket.component";
+import { MedicationButton } from "./medication-button.component";
 
 export default function MedicationsOverview(props: MedicationsOverviewProps) {
   const [patientMedications, setPatientMedications] = React.useState(null);
@@ -128,27 +129,15 @@ export default function MedicationsOverview(props: MedicationsOverviewProps) {
               </span>
             </td>
             <td>
-              <button
-                className="omrs-btn omrs-text-neutral"
-                onClick={() =>
-                  newWorkspaceItem({
-                    component: MedicationOrderBasket,
-                    name: "Medication Order Basket",
-                    props: {
-                      match: {
-                        params: {
-                          orderUuid: medication.uuid,
-                          drugName: medication.drug.name,
-                          action: "REVISE"
-                        }
-                      }
-                    },
-                    inProgress: true
-                  })
-                }
-              >
-                Revise
-              </button>
+              <MedicationButton
+                component={MedicationOrderBasket}
+                name={"Medication Order Basket"}
+                label={"REVISE"}
+                orderUuid={medication.uuid}
+                drugName={medication.drug.name}
+                action={"REVISE"}
+                inProgress={true}
+              />
             </td>
             <td style={{ textAlign: "end" }}>
               <Link to={`/patient/${patientUuid}/chart/medications`}>
