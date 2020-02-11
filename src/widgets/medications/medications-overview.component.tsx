@@ -141,47 +141,24 @@ export default function MedicationsOverview(props: MedicationsOverviewProps) {
               </span>
             </td>
             <td>
-              <button
-                className="omrs-btn omrs-text-neutral"
-                onClick={() =>
-                  newWorkspaceItem({
-                    component: MedicationOrderBasket,
-                    name: "Medication Order Basket",
-                    props: {
-                      match: {
-                        params: {
-                          orderUuid: medication.uuid,
-                          drugName: medication.drug.name,
-                          action: "REVISE"
-                        }
-                      }
-                    },
-                    inProgress: true
-                  })
-                }
-              >
-                Revise
-              </button>
-              <button
-                className="omrs-btn omrs-text-neutral"
-                onClick={() =>
-                  newWorkspaceItem({
-                    component: MedicationOrderBasket,
-                    name: "Medication Order Basket",
-                    props: {
-                      match: {
-                        params: {
-                          orderUuid: medication.uuid,
-                          action: "DISCONTINUE"
-                        }
-                      }
-                    },
-                    inProgress: true
-                  })
-                }
-              >
-                Discontinue
-              </button>
+              <MedicationButton
+                component={MedicationOrderBasket}
+                name={"Medication Order Basket"}
+                label={"REVISE"}
+                orderUuid={medication.uuid}
+                drugName={medication.drug.name}
+                action={"REVISE"}
+                inProgress={true}
+              />
+              <MedicationButton
+                component={MedicationOrderBasket}
+                name={"Medication Order Basket"}
+                label={"DISCONTINUE"}
+                orderUuid={medication.uuid}
+                drugName={medication.drug.name}
+                action={"DISCONTINUE"}
+                inProgress={true}
+              />
             </td>
             <td style={{ textAlign: "end" }}>
               <Link to={`/patient/${patientUuid}/chart/medications`}>
