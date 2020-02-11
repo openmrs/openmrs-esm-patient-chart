@@ -68,10 +68,17 @@ export default function MedicationLevelTwo(props: MedicationsOverviewProps) {
                             >
                               {medication.drug.name}
                             </span>
-                            {" \u2014 "} {medication.doseUnits.display}&nbsp;
+                            {" \u2014 "} {medication.route.display}&nbsp;
                             {" \u2014 "}
-                            {medication.route.display} {" \u2014 "}
-                            DOSE &nbsp;
+                            {medication.doseUnits.display} {" \u2014 "}
+                            <span
+                              style={{
+                                color: "var(--omrs-color-ink-medium-contrast)"
+                              }}
+                            >
+                              DOSE
+                            </span>
+                            &nbsp;&nbsp;&nbsp;
                             <span
                               style={{
                                 fontWeight: 500,
@@ -82,9 +89,25 @@ export default function MedicationLevelTwo(props: MedicationsOverviewProps) {
                                 medication.drug.strength,
                                 medication.dose
                               )}
-                              &nbsp;
-                              {medication.frequency.display}
                             </span>
+                            <span>
+                              {" "}
+                              {" \u2014 "} {medication.frequency.display}
+                              {" \u2014 "}
+                              {medication.duration}
+                              {medication.durationUnits.display}
+                              {" \u2014 "}
+                            </span>
+                            &nbsp;&nbsp;
+                            <span
+                              style={{
+                                color: "var(--omrs-color-ink-medium-contrast)"
+                              }}
+                            >
+                              REFILLS
+                            </span>
+                            &nbsp;&nbsp;&nbsp;
+                            <span>{medication.numRefills}</span>{" "}
                           </td>
                           <td>{medication.action}</td>
                           <td>
@@ -124,7 +147,7 @@ export default function MedicationLevelTwo(props: MedicationsOverviewProps) {
             <thead>
               <tr>
                 <td>
-                  <div className={styles.centerItems}>STATUS</div>
+                  <div>STATUS</div>
                 </td>
                 <td>NAME</td>
                 <td>END DATE</td>
@@ -138,9 +161,7 @@ export default function MedicationLevelTwo(props: MedicationsOverviewProps) {
                     return (
                       <React.Fragment key={medication.uuid}>
                         <tr>
-                          <td className={styles.medicationStatus}>
-                            {medication.action}
-                          </td>
+                          <td>{medication.action}</td>
                           <td>
                             <span
                               style={{
@@ -153,7 +174,14 @@ export default function MedicationLevelTwo(props: MedicationsOverviewProps) {
                             {" \u2014 "} {medication.doseUnits.display}&nbsp;
                             {" \u2014 "}
                             {medication.route.display} {" \u2014 "}
-                            DOSE &nbsp;
+                            <span
+                              style={{
+                                color: "var(--omrs-color-ink-medium-contrast)"
+                              }}
+                            >
+                              DOSE
+                            </span>
+                            &nbsp;&nbsp;&nbsp;
                             <span
                               style={{
                                 fontWeight: 500,
@@ -164,9 +192,25 @@ export default function MedicationLevelTwo(props: MedicationsOverviewProps) {
                                 medication.drug.strength,
                                 medication.dose
                               )}
-                              &nbsp;
-                              {medication.frequency.display}
                             </span>
+                            <span>
+                              {" "}
+                              {" \u2014 "} {medication.frequency.display}
+                              {" \u2014 "}
+                              {medication.duration}
+                              {medication.durationUnits.display}
+                              {" \u2014 "}
+                            </span>
+                            &nbsp;&nbsp;&nbsp;
+                            <span
+                              style={{
+                                color: "var(--omrs-color-ink-medium-contrast)"
+                              }}
+                            >
+                              REFILLS
+                            </span>
+                            &nbsp;&nbsp;&nbsp;
+                            <span>{medication.numRefills}</span>
                           </td>
                           <td>
                             {dayjs(medication.dateActivated).format(
