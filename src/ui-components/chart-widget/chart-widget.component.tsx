@@ -53,8 +53,6 @@ export default function ChartWidget(props: any) {
         exact
         path={`/patient/${patientUuid}/chart/${props.widgetConfig.name}`}
       >
-        {console.log(props)}
-
         {props.paths[props.widgetConfig.name] === "" ||
         props.paths[props.widgetConfig.name] ===
           `/patient/${patientUuid}/chart/${props.widgetConfig.name}` ? (

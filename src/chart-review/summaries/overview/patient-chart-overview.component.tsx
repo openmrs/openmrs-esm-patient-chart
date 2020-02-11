@@ -1,13 +1,13 @@
 import React from "react";
 import { RouteComponentProps } from "react-router";
 import styles from "./patient-chart-overview.css";
-import HeightAndWeightOverview from "../../widgets/heightandweight/heightandweight-overview.component";
-import VitalsOverview from "../../widgets/vitals/vitals-overview.component";
-import ConditionsOverview from "../../widgets/conditions/conditions-overview.component";
-import AllergyOverview from "../../widgets/allergies/allergy-overview.component";
-import NotesOverview from "../../widgets/notes/notes-overview.component";
-import ProgramsOverview from "../../widgets/programs/programs-overview.component";
-import MedicationsOverview from "../../widgets/medications/medications-overview.component";
+import HeightAndWeightOverview from "../../../widgets/heightandweight/heightandweight-overview.component";
+import VitalsOverview from "../../../widgets/vitals/vitals-overview.component";
+import ConditionsOverview from "../../../widgets/conditions/conditions-overview.component";
+import AllergyOverview from "../../../widgets/allergies/allergy-overview.component";
+import NotesOverview from "../../../widgets/notes/notes-overview.component";
+import ProgramsOverview from "../../../widgets/programs/programs-overview.component";
+import MedicationsOverview from "../../../widgets/medications/medications-overview.component";
 
 export default function PatientChartOverview(props: PatientChartOverviewProps) {
   const config = [

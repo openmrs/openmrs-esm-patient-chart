@@ -1,6 +1,5 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import VitalsChartOverview from "./results-chart-overview.component";
 import VitalsDetailedSummary from "../../widgets/vitals/vitals-detailed-summary.component";
 import HeightAndWeightDetailed from "../../widgets/heightandweight/heightandweight-detailed.component";
 import ChartWidget from "../../ui-components/chart-widget/chart-widget.component";

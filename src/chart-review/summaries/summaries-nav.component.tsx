@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
-import PatientChartOverview from "../summaries/overview/patient-chart-overview.component";
-import { levelTwoRoutes } from "../chart-review/level-two-routes.component";
-import { Breadcrumbs } from "../breadcrumbs/breadcrumbs.component";
+import PatientChartOverview from "./overview/patient-chart-overview.component";
+import { levelTwoRoutes } from "../level-two-routes.component";
+import { Breadcrumbs } from "../../breadcrumbs/breadcrumbs.component";
 import { Route, Link, Redirect, useHistory, useParams } from "react-router-dom";
 import styles from "./summaries-nav.css";
 import { RouteComponentProps } from "react-router";

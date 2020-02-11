@@ -1,7 +1,7 @@
 import React from "react";
 import { Route, Link, useHistory, useParams } from "react-router-dom";
 import styles from "./chart-review.css";
-import Summaries from "../summaries/summaries.component";
+import Summaries from "./summaries/summaries.component";
 import Results from "./results/results.component";
 import History from "./history/history.component";
 import Orders from "./orders/orders.component";

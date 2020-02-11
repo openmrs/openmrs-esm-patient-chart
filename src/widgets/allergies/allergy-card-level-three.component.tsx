@@ -15,7 +15,6 @@ export function AllergyCardLevelThree(props: AllergyCardLevelThreeProps) {
     path: "/patient/:patientUuid/chart/medications/allergies/:allergyUuid"
   });
 
-
   React.useEffect(() => {
     if (!isLoadingPatient && patient) {
       const abortController = new AbortController();
