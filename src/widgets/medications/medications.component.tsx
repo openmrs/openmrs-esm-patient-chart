@@ -38,7 +38,5 @@ export default function Medications(props: any) {
     ]
   };
 
-  return (
-    <ChartWidget {...props} widgetConfig={widgetConfig} />;
-  );
+  return <ChartWidget {...props} widgetConfig={widgetConfig} />;
 }

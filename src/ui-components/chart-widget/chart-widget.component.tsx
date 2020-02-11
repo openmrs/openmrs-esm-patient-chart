@@ -53,6 +53,8 @@ export default function ChartWidget(props: any) {
         exact
         path={`/patient/${patientUuid}/chart/${props.widgetConfig.name}`}
       >
+        {console.log(props)}
+
         {props.paths[props.widgetConfig.name] === "" ||
         props.paths[props.widgetConfig.name] ===
           `/patient/${patientUuid}/chart/${props.widgetConfig.name}` ? (
@@ -63,21 +65,19 @@ export default function ChartWidget(props: any) {
           <Redirect to={props.paths[props.widgetConfig.name]} />
         )}
       </Route>
-      
-      {props.widgetConfig.routes.map((item, index) => {
-          return (
-            <Route
-              key={index}
-              exact
-              path={item.path}
-              component={item.component}
-            />
-          );
-        })}
 
+      {props.widgetConfig.routes.map((item, index) => {
+        return (
+          <Route
+            key={index}
+            exact
+            path={item.path}
+            component={item.component}
+          />
+        );
+      })}
     </>
   );
 }
 
 type WidgetProps = {};
-

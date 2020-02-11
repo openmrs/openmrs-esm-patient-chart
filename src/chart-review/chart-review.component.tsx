@@ -1,11 +1,10 @@
 import React from "react";
 import { Route, Link, useHistory, useParams } from "react-router-dom";
 import styles from "./chart-review.css";
-import { newWorkspaceItem } from "../workspace/workspace.resource";
-import { MedicationOrderBasket } from "../widgets/medications/medication-order-basket.component";
-import Medications from "../widgets/medications/medications.component";
-import Vitals from "../widgets/vitals/vitals.component";
 import Summaries from "../summaries/summaries.component";
+import Results from "./results/results.component";
+import History from "./history/history.component";
+import Orders from "./orders/orders.component";
 
 export default function ChartReview(props: any) {
   const [selected, setSelected] = React.useState();
@@ -15,10 +14,13 @@ export default function ChartReview(props: any) {
     summaries: history.location.pathname.includes("summaries/")
       ? history.location.pathname
       : "",
-    medications: history.location.pathname.includes("medications/")
+    history: history.location.pathname.includes("history/")
       ? history.location.pathname
       : "",
-    vitals: history.location.pathname.includes("vitals/")
+    results: history.location.pathname.includes("results/")
+      ? history.location.pathname
+      : "",
+    orders: history.location.pathname.includes("orders/")
       ? history.location.pathname
       : ""
   });
@@ -30,47 +32,21 @@ export default function ChartReview(props: any) {
       case lastRoute.includes("/summaries"):
         paths["summaries"] = lastRoute;
         break;
-      case lastRoute.includes("/medications"):
-        paths["medications"] = lastRoute;
+      case lastRoute.includes("/history"):
+        paths["history"] = lastRoute;
         break;
-      case lastRoute.includes("/vitals"):
-        paths["vitals"] = lastRoute;
+      case lastRoute.includes("/results"):
+        paths["results"] = lastRoute;
         break;
-
+      case lastRoute.includes("/orders"):
+        paths["orders"] = lastRoute;
+        break;
     }
     setPaths(paths);
   }, [lastRoute, paths]);
-
-
-  React.useEffect(() => {
-    switch (true) {
-      case lastRoute.includes("/summaries"):
-        paths["summaries"] = lastRoute;
-        break;
-      case lastRoute.includes("/medications"):
-        paths["medications"] = lastRoute;
-        break;
-      case lastRoute.includes("/vitals"):
-        paths["vitals"] = lastRoute;
-        break;
-
-    }
-    setPaths(paths);
-  }, [lastRoute, paths]);
-
-
 
   function handleClick() {
     setLastRoute(history.location.pathname);
-  }
-
-  function showOrders() {
-    newWorkspaceItem({
-      component: MedicationOrderBasket,
-      name: "Medication Order Basket",
-      props: { match: { params: {} } },
-      inProgress: false
-    });
   }
 
   const navItems = [
@@ -79,39 +55,27 @@ export default function ChartReview(props: any) {
       path: `/patient/${patientUuid}/chart/summaries`
     },
     {
-      name: "Appointments",
-      path: `/patient/${patientUuid}/chart/appointments`
+      name: "Clinical Hx",
+      path: `/patient/${patientUuid}/chart/history`
     },
-    {
-      name: "Vitals",
-      path: `/patient/${patientUuid}/chart/vitals`
-    },
+
     {
       name: "Results",
       path: `/patient/${patientUuid}/chart/results`
-    },
-    {
-      name: "Medications",
-      path: `/patient/${patientUuid}/chart/medications`
-    },
-    {
-      name: "Notes",
-      path: `/patient/${patientUuid}/chart/notes`
     },
     {
       name: "Orders",
       path: `/patient/${patientUuid}/chart/orders`
     },
     {
-      name: "Conditions",
-      path: `/patient/${patientUuid}/chart/conditions`
+      name: "Notes",
+      path: `/patient/${patientUuid}/chart/notes`
     },
     {
-      name: "Programs",
-      path: `/patient/${patientUuid}/chart/programs`
+      name: "Appointments",
+      path: `/patient/${patientUuid}/chart/appointments`
     }
   ];
-
 
   return (
     <>
@@ -147,25 +111,19 @@ export default function ChartReview(props: any) {
         <Summaries setLastRoute={setLastRoute} paths={paths} />
       </Route>
 
-      <Route path="/patient/:patientUuid/chart/medications">
-        <Medications setLastRoute={setLastRoute} paths={paths} />
-      </Route>
-
-      <Route path="/patient/:patientUuid/chart/vitals">
-        <Vitals setLastRoute={setLastRoute} paths={paths} />
+      <Route path="/patient/:patientUuid/chart/history">
+        <History setLastRoute={setLastRoute} paths={paths} />
       </Route>
 
       <Route path="/patient/:patientUuid/chart/orders">
-        <div>
-          <button
-            className="omrs-unstyled"
-            onClick={showOrders}
-            style={{ padding: "1rem", width: "100%" }}
-          >
-            Create Orders
-          </button>
-        </div>
+        <Orders setLastRoute={setLastRoute} paths={paths} />
       </Route>
+
+      <Route path="/patient/:patientUuid/chart/results">
+        <Results setLastRoute={setLastRoute} paths={paths} />
+      </Route>
+
+      <Route path="/patient/:patientUuid/chart/orders"></Route>
     </>
   );
 }
