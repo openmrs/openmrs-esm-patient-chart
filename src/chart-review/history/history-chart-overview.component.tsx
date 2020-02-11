@@ -1,5 +1,5 @@
 import React from "react";
-import styles from "../../summaries/overview/patient-chart-overview.css";
+import styles from "../summaries/overview/patient-chart-overview.css";
 import ConditionsOverview from "../../widgets/conditions/conditions-overview.component";
 import AllergyOverview from "../../widgets/allergies/allergy-overview.component";
 import ProgramsOverview from "../../widgets/programs/programs-overview.component";

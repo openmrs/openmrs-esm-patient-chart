@@ -1,5 +1,5 @@
 import React from "react";
-import styles from "../../summaries/overview/patient-chart-overview.css";
+import styles from "../summaries/overview/patient-chart-overview.css";
 import VitalsOverview from "../../widgets/vitals/vitals-overview.component";
 import HeightAndWeightOverview from "../../widgets/heightandweight/heightandweight-overview.component";
 export default function ResultsChartOverview(props: ResultsChartOverviewProps) {

@@ -2,9 +2,9 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import { newWorkspaceItem } from "../../workspace/workspace.resource";
 import ChartWidget from "../../ui-components/chart-widget/chart-widget.component";
-import OrdersChartOverview from "./orders-chart-overview.component";
 import MedicationsLevelTwo from "../../widgets/medications/medication-level-two.component";
 import { MedicationOrderBasket } from "../../widgets/medications/medication-order-basket.component";
+import OrdersChartOverview from "./orders-chart-overview.component";
 
 export default function Orders(props: any) {
   let { patientUuid } = useParams();
@@ -16,6 +16,10 @@ export default function Orders(props: any) {
       props: { match: { params: {} } },
       inProgress: false
     });
+  }
+
+  function Foo(props) {
+    return <div>hello</div>;
   }
 
   const widgetConfig = {
