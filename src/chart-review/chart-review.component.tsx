@@ -1,12 +1,11 @@
 import React from "react";
 import { Route, Link, useHistory, useParams } from "react-router-dom";
-import SummariesNav from "../summaries/summaries-nav.component";
-import LevelTwoRoutes from "./level-two-routes.component";
 import styles from "./chart-review.css";
 import { newWorkspaceItem } from "../workspace/workspace.resource";
 import { MedicationOrderBasket } from "../widgets/medications/medication-order-basket.component";
 import Medications from "../widgets/medications/medications.component";
 import Vitals from "../widgets/vitals/vitals.component";
+import Summaries from "../summaries/summaries.component";
 
 export default function ChartReview(props: any) {
   const [selected, setSelected] = React.useState();
@@ -34,9 +33,32 @@ export default function ChartReview(props: any) {
       case lastRoute.includes("/medications"):
         paths["medications"] = lastRoute;
         break;
+      case lastRoute.includes("/vitals"):
+        paths["vitals"] = lastRoute;
+        break;
+
     }
     setPaths(paths);
   }, [lastRoute, paths]);
+
+
+  React.useEffect(() => {
+    switch (true) {
+      case lastRoute.includes("/summaries"):
+        paths["summaries"] = lastRoute;
+        break;
+      case lastRoute.includes("/medications"):
+        paths["medications"] = lastRoute;
+        break;
+      case lastRoute.includes("/vitals"):
+        paths["vitals"] = lastRoute;
+        break;
+
+    }
+    setPaths(paths);
+  }, [lastRoute, paths]);
+
+
 
   function handleClick() {
     setLastRoute(history.location.pathname);
@@ -90,6 +112,7 @@ export default function ChartReview(props: any) {
     }
   ];
 
+
   return (
     <>
       <nav className={styles.topnav} style={{ marginTop: "0" }}>
@@ -121,9 +144,9 @@ export default function ChartReview(props: any) {
       </nav>
 
       <Route path="/patient/:patientUuid/chart/summaries">
-        <SummariesNav setLastRoute={setLastRoute} paths={paths} />
+        <Summaries setLastRoute={setLastRoute} paths={paths} />
       </Route>
-      <Route path="/patient/:patientUuid/chart" component={LevelTwoRoutes} />
+
       <Route path="/patient/:patientUuid/chart/medications">
         <Medications setLastRoute={setLastRoute} paths={paths} />
       </Route>

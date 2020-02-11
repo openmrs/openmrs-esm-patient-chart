@@ -3,16 +3,16 @@ import { Route, Link, Redirect, useHistory, useParams } from "react-router-dom";
 
 import styles from "./chart-widget.css";
 
-export default function Widget(props: any) {
+export default function ChartWidget(props: any) {
   let { patientUuid } = useParams();
   const history = useHistory();
 
   const hasPath = item =>
     item.link === history.location.pathname ||
-    item.link === props.paths.medications;
+    item.link === props.paths[props.widgetConfig.name];
 
   function getInitialSelected() {
-    const i = props.widgetConfig.routes.findIndex(hasPath);
+    const i = props.widgetConfig.routes.findIndex(item => hasPath);
     return i === -1 ? 0 : i;
   }
 
@@ -63,19 +63,21 @@ export default function Widget(props: any) {
           <Redirect to={props.paths[props.widgetConfig.name]} />
         )}
       </Route>
-
+      
       {props.widgetConfig.routes.map((item, index) => {
-        return (
-          <Route
-            key={index}
-            exact
-            path={item.path}
-            component={item.component}
-          />
-        );
-      })}
+          return (
+            <Route
+              key={index}
+              exact
+              path={item.path}
+              component={item.component}
+            />
+          );
+        })}
+
     </>
   );
 }
 
 type WidgetProps = {};
+

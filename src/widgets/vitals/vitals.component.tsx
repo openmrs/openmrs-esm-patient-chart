@@ -1,6 +1,5 @@
 import React from "react";
-import { Route, Link, Redirect, useHistory, useParams } from "react-router-dom";
-import styles from "../../summaries/summaries-nav.css";
+import { useParams } from "react-router-dom";
 import VitalsChartOverview from "./vitals-chart-overview.component";
 import VitalsDetailedSummary from "./vitals-detailed-summary.component";
 import HeightAndWeightDetailed from "../heightandweight/heightandweight-detailed.component";

@@ -2,6 +2,7 @@ import React from "react";
 import { Route, Link, Redirect, useHistory, useParams } from "react-router-dom";
 import { AllergyOverviewLevelTwo } from "../allergies/allergy-card-level-two.component";
 import MedicationLevelTwo from "./medication-level-two.component";
+import { AllergyCardLevelThree } from "../allergies/allergy-card-level-three.component";
 
 import styles from "../../summaries/summaries-nav.css";
 import MedicationsChartOverview from "./medication-chart-overview.component";
@@ -37,5 +38,7 @@ export default function Medications(props: any) {
     ]
   };
 
-  return <ChartWidget {...props} widgetConfig={widgetConfig} />;
+  return (
+    <ChartWidget {...props} widgetConfig={widgetConfig} />;
+  );
 }
