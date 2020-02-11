@@ -63,3 +63,33 @@ export function setDefaultValues(commonDrugOrders) {
     }
   ];
 }
+
+export type OrderMedication = {
+  patientUuid: string;
+  careSetting: string;
+  orderer: string;
+  encounterUuid: string;
+  drugUuid?: string;
+  drugName?: string;
+  drugStrength?: string;
+  dose?: Number;
+  doseUnitsConcept?: string;
+  dosageForm?: string;
+  dosingInstructions?: string;
+  route?: string;
+  routeName?: string;
+  frequencyUuid?: string;
+  frequencyName?: string;
+  asNeeded?: string;
+  numRefills?: string;
+  action?: string | null;
+  quantity?: Number;
+  quantityUnits?: string;
+  type: string;
+  previousOrder?: string | null;
+  duration?: Number;
+  durationUnits?: string;
+  concept?: string;
+  orderReasonNonCoded?: string;
+  orderUuid: string;
+};

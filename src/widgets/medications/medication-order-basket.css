@@ -2,8 +2,6 @@
   display: flex;
   flex-wrap: wrap;
   position: relative;
-  min-height: fit-content;
-  min-height: 84vh;
 }
 
 :global(.omrs-breakpoint-gt-phone) .medicationOrderBasketContainer {
@@ -80,7 +78,7 @@ th {
   display: flex;
   background-color: var(--omrs-color-ink-white);
   width: 100%;
-  position: absolute;
+  position: sticky;
   bottom: 0;
 }
 
@@ -130,9 +128,6 @@ th {
 
 .basketContainer {
   display: flex;
-  position: absolute;
-  bottom: 0;
-  margin-bottom: 10%;
   right: 5%;
   flex-direction: column;
 }

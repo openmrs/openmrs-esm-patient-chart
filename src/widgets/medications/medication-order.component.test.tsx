@@ -65,7 +65,12 @@ describe("MedicationOrder", () => {
     );
     const wrapper = render(
       <BrowserRouter>
-        <MedicationOrder match={match} drugUuid={"aspirin"} editProperty={[]} />
+        <MedicationOrder
+          match={match}
+          drugName={""}
+          editProperty={[]}
+          orderEdit={{ orderEdit: false, order: null }}
+        />
       </BrowserRouter>
     );
 

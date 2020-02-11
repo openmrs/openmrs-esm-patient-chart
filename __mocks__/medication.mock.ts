@@ -8,6 +8,9 @@ export const mockDrugSearchResults = {
         dosageForm: {
           display: "Tablet",
           uuid: "1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+        },
+        concept: {
+          uuid: "1074AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
         }
       }
     ]

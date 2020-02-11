@@ -1,6 +1,7 @@
 import { openmrsObservableFetch, openmrsFetch } from "@openmrs/esm-api";
 import { Observable } from "rxjs";
 import { map, take, filter } from "rxjs/operators";
+import { OrderMedication } from "./medication-orders-utils";
 
 type PatientMedications = {
   uuid: Number;
@@ -22,7 +23,7 @@ export function fetchPatientMedications(
   patientID: string
 ): Observable<PatientMedications[]> {
   return openmrsObservableFetch(
-    `/ws/rest/v1/order?patient=${patientID}&v=custom:(uuid,orderNumber,accessionNumber,patient:ref,action,careSetting:ref,previousOrder:ref,dateActivated,scheduledDate,dateStopped,autoExpireDate,orderType:ref,encounter:ref,orderer:ref,orderReason,orderType,urgency,instructions,commentToFulfiller,drug:(name,strength),dose,doseUnits:ref,frequency:ref,asNeeded,asNeededCondition,quantity,quantityUnits:ref,numRefills,dosingInstructions,duration,durationUnits:ref,route:ref,brandName,dispenseAsWritten)`
+    `/ws/rest/v1/order?patient=${patientID}&careSetting=6f0c9a92-6f24-11e3-af88-005056821db0&status=any&v=custom:(uuid,orderNumber,accessionNumber,patient:ref,action,careSetting:ref,previousOrder:ref,dateActivated,scheduledDate,dateStopped,autoExpireDate,orderType:ref,encounter:ref,orderer:ref,orderReason,orderType,urgency,instructions,commentToFulfiller,drug:(name,strength,concept),dose,doseUnits:ref,frequency:ref,asNeeded,asNeededCondition,quantity,quantityUnits:ref,numRefills,dosingInstructions,duration,durationUnits:ref,route:ref,brandName,dispenseAsWritten)`
   ).pipe(
     map(({ data }) => {
       const meds = [];
@@ -41,7 +42,7 @@ export function getDrugByName(
   abortController: AbortController
 ) {
   return openmrsFetch(
-    `/ws/rest/v1/drug?q=${drugName}&v=custom:(uuid,name,strength,dosageForm:(display,uuid))`,
+    `/ws/rest/v1/drug?q=${drugName}&v=custom:(uuid,name,strength,dosageForm:(display,uuid),concept)`,
     {
       signal: abortController.signal
     }
@@ -60,9 +61,9 @@ export function getPatientEncounterID(
 
 export function saveNewDrugOrder(
   abortContoller: AbortController,
-  drugOrder: any
+  drugOrder: OrderMedication
 ) {
-  if (drugOrder.previousOrder === null) {
+  if (drugOrder.action === "NEW") {
     return openmrsFetch(`/ws/rest/v1/order`, {
       method: "POST",
       signal: abortContoller.signal,
@@ -87,10 +88,11 @@ export function saveNewDrugOrder(
         type: drugOrder.type,
         duration: drugOrder.duration,
         durationUnits: drugOrder.durationUnits,
-        dosingInstructions: drugOrder.dosingInstructions
+        dosingInstructions: drugOrder.dosingInstructions,
+        concept: drugOrder.concept
       }
     });
-  } else {
+  } else if (drugOrder.action === "REVISE") {
     return openmrsFetch(`/ws/rest/v1/order`, {
       method: "POST",
       signal: abortContoller.signal,
@@ -119,6 +121,26 @@ export function saveNewDrugOrder(
         dosingInstructions: drugOrder.dosingInstructions
       }
     });
+  } else {
+    return openmrsFetch(`/ws/rest/v1/order`, {
+      signal: abortContoller.signal,
+      method: "POST",
+      headers: {
+        "Content-type": "application/json"
+      },
+      body: {
+        type: drugOrder.type,
+        action: drugOrder.action,
+        previousOrder: drugOrder.previousOrder,
+        patient: drugOrder.patientUuid,
+        careSetting: drugOrder.careSetting,
+        encounter: drugOrder.encounterUuid,
+        orderReasonNonCoded: drugOrder.orderReasonNonCoded,
+        orderer: drugOrder.orderer,
+        concept: drugOrder.concept,
+        drug: drugOrder.drugUuid
+      }
+    });
   }
 }
 
@@ -127,7 +149,7 @@ export function getPatientDrugOrderDetails(
   orderUuid: string
 ) {
   return openmrsFetch(
-    `/ws/rest/v1/order/${orderUuid}?v=custom:(uuid,orderNumber,patient:(uuid),action,careSetting:(uuid),previousOrder:(uuid),dateActivated,encounter:(uuid),frequency,asNeeded,quantity,quantityUnits:(uuid,display),numRefills,dosingInstructions,duration,durationUnits:(uuid,display),route:(uuid,display),dose,doseUnits:(uuid,display))`,
+    `/ws/rest/v1/order/${orderUuid}?v=custom:(uuid,orderNumber,patient:(uuid),action,careSetting:(uuid),previousOrder:(uuid),dateActivated,encounter:(uuid),frequency,asNeeded,quantity,quantityUnits:(uuid,display),numRefills,dosingInstructions,duration,durationUnits:(uuid,display),route:(uuid,display),dose,doseUnits:(uuid,display),drug:(name,strength,uuid,concept:(uuid)),orderer:(uuid),concept)`,
     {
       signal: abortController.signal
     }
