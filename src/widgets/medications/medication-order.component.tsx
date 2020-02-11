@@ -55,6 +55,7 @@ export function MedicationOrder(props: MedicationOrderProps) {
     patientErr
   ] = useCurrentPatient();
   const [previousOrder, setPreviousOrder] = useState();
+  const [concept, setConcept] = useState();
 
   useEffect(() => {
     const abortcontroller = new AbortController();
@@ -66,6 +67,7 @@ export function MedicationOrder(props: MedicationOrderProps) {
         setDoseUnits(response.data.results[0].dosageForm.uuid);
         setDosageForm(response.data.results[0].dosageForm.display);
         setDrugStrength(response.data.results[0].strength);
+        setConcept(response.data.results[0].concept.uuid);
       }, createErrorHandler);
 
       getPatientEncounterID(patientUuid, abortcontroller).then(
@@ -237,7 +239,8 @@ export function MedicationOrder(props: MedicationOrderProps) {
           frequencyName: frequencyName,
           drugStrength: drugStrength,
           dosingInstructions: dosingInstructions,
-          dateStopped: endDate
+          dateStopped: endDate,
+          concept: concept
         }
       ]);
     } else {

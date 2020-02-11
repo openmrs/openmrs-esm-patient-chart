@@ -3,7 +3,11 @@ import { match } from "react-router";
 import styles from "./medication-order-basket.css";
 import SummaryCard from "../cards/summary-card.component";
 import { isEmpty, debounce } from "lodash";
-import { getDrugByName, saveNewDrugOrder } from "./medications.resource";
+import {
+  getDrugByName,
+  saveNewDrugOrder,
+  getPatientDrugOrderDetails
+} from "./medications.resource";
 import { createErrorHandler } from "@openmrs/esm-error-handling";
 import { MedicationOrder } from "./medication-order.component";
 import { useCurrentPatient } from "@openmrs/esm-api";
@@ -76,6 +80,43 @@ export function MedicationOrderBasket(props: MedicationOrderBasketProps) {
       ]);
       setDrugName(params.drugName);
     }
+  }, [props.match.params]);
+
+  useEffect(() => {
+    let params: any = props.match.params;
+    if (params.action != undefined && params.action === "DISCONTINUE") {
+      const abortController = new AbortController();
+      getPatientDrugOrderDetails(abortController, params.orderUuid).then(
+        response => {
+          setOrderBasket([
+            ...orderBasket,
+            {
+              orderUuid: response.data.uuid,
+              encounterUuid: response.data.encounter.uuid,
+              patientUuid: response.data.patient.uuid,
+              type: "drugorder",
+              orderer: response.data.orderer.uuid,
+              careSetting: response.data.careSetting.uuid,
+              dose: response.data.dose,
+              drugStrength: response.data.drug.strength,
+              drugName: response.data.drug.name,
+              frequencyName: response.data.frequency.display,
+              dosageForm: response.data.doseUnits.display,
+              routeName: response.data.route.display,
+              action: "DISCONTINUE",
+              concept: response.data.concept.uuid,
+              doseUnitsConcept: response.data.doseUnits.uuid,
+              previousOrder: response.data.previousOrder
+                ? response.data.previousOrder
+                : response.data.uuid,
+              drugUuid: response.data.drug.uuid
+            }
+          ]);
+        }
+      );
+      return () => abortController.abort();
+    }
+    //eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.match.params]);
 
   const handleSaveOrders = () => {
@@ -219,6 +260,7 @@ export function MedicationOrderBasket(props: MedicationOrderBasketProps) {
                       <button
                         className="omrs-btn-icon-medium"
                         onClick={$event => handleOrderItemEdit(order, index)}
+                        disabled={order.action === "DISCONTINUE" ? true : false}
                       >
                         <svg>
                           <use

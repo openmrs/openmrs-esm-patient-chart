@@ -141,15 +141,47 @@ export default function MedicationsOverview(props: MedicationsOverviewProps) {
               </span>
             </td>
             <td>
-              <MedicationButton
-                component={MedicationOrderBasket}
-                name={"Medication Order Basket"}
-                label={"REVISE"}
-                orderUuid={medication.uuid}
-                drugName={medication.drug.name}
-                action={"REVISE"}
-                inProgress={true}
-              />
+              <button
+                className="omrs-btn omrs-text-neutral"
+                onClick={() =>
+                  newWorkspaceItem({
+                    component: MedicationOrderBasket,
+                    name: "Medication Order Basket",
+                    props: {
+                      match: {
+                        params: {
+                          orderUuid: medication.uuid,
+                          drugName: medication.drug.name,
+                          action: "REVISE"
+                        }
+                      }
+                    },
+                    inProgress: true
+                  })
+                }
+              >
+                Revise
+              </button>
+              <button
+                className="omrs-btn omrs-text-neutral"
+                onClick={() =>
+                  newWorkspaceItem({
+                    component: MedicationOrderBasket,
+                    name: "Medication Order Basket",
+                    props: {
+                      match: {
+                        params: {
+                          orderUuid: medication.uuid,
+                          action: "DISCONTINUE"
+                        }
+                      }
+                    },
+                    inProgress: true
+                  })
+                }
+              >
+                Discontinue
+              </button>
             </td>
             <td style={{ textAlign: "end" }}>
               <Link to={`/patient/${patientUuid}/chart/medications`}>
