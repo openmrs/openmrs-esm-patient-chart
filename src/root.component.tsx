@@ -25,7 +25,7 @@ function Root(props) {
         </aside>
         <div className={styles.grid}>
           <div className={styles.chartreview}>
-            <Route path="/patient/:patientUuid/chart">
+            <Route path="/patient/:patientUuid/chart/:widget?">
               <ChartReview />
             </Route>
           </div>
@@ -35,9 +35,6 @@ function Root(props) {
               render={routeProps => <WorkspaceWrapper {...routeProps} />}
             />
           </div>
-        </div>
-        <div className={styles.sidebar}>
-          <Sidebar></Sidebar>
         </div>
       </main>
     </BrowserRouter>
@@ -55,3 +52,9 @@ export default openmrsRootDecorator({
   featureName: "patient-chart",
   moduleName: "@openmrs/esm-patient-chart"
 })(Root);
+
+/*
+        <div className={styles.sidebar}>
+          <Sidebar></Sidebar>
+        </div>
+*/

@@ -5,16 +5,16 @@ import PatientChartOverview from "./overview/patient-chart-overview.component";
 
 export default function Summaries(props: any) {
   let { patientUuid } = useParams();
+
   const widgetConfig = {
     name: "summaries",
-    path: "/summaries",
-    defaultRoute: "overview",
-    routes: [
+    defaultTabIndex: 0,
+    tabs: [
       {
         name: "Overview",
-        path: "/patient/:patientUuid/chart/summaries/overview",
-        link: `/patient/${patientUuid}/chart/summaries/overview`,
-        component: PatientChartOverview
+        component: () => {
+          return <PatientChartOverview />;
+        }
       }
     ]
   };

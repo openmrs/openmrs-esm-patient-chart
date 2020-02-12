@@ -10,26 +10,25 @@ export default function Results(props: any) {
 
   const widgetConfig = {
     name: "results",
-    path: "/results",
-    defaultRoute: "overview",
-    routes: [
+    defaultTabIndex: 0,
+    tabs: [
       {
         name: "Overview",
-        path: "/patient/:patientUuid/chart/results/overview",
-        link: `/patient/${patientUuid}/chart/results/overview`,
-        component: ResultsChartOverview
+        component: () => {
+          return <ResultsChartOverview />;
+        }
       },
       {
         name: "Vitals",
-        path: "/patient/:patientUuid/chart/results/vitals",
-        link: `/patient/${patientUuid}/chart/results/vitals`,
-        component: VitalsDetailedSummary
+        component: () => {
+          return <VitalsDetailedSummary />;
+        }
       },
       {
-        name: "Height and weight",
-        path: "/patient/:patientUuid/chart/results/height-and-weight/",
-        link: `/patient/${patientUuid}/chart/results/height-and-weight`,
-        component: HeightAndWeightDetailed
+        name: "Height and Weight",
+        component: () => {
+          return <HeightAndWeightDetailed />;
+        }
       }
     ]
   };

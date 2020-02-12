@@ -18,32 +18,28 @@ export default function Orders(props: any) {
     });
   }
 
-  function Foo(props) {
-    return <div>hello</div>;
-  }
-
   const widgetConfig = {
     name: "orders",
-    path: "/orders",
-    defaultRoute: "overview",
-    routes: [
+    defaultTabIndex: 0,
+    tabs: [
       {
         name: "Overview",
-        path: "/patient/:patientUuid/chart/orders/overview",
-        link: `/patient/${patientUuid}/chart/orders/overview`,
-        component: OrdersChartOverview
+        component: () => {
+          return <OrdersChartOverview />;
+        }
       },
       {
         name: "Medications",
-        path: "/patient/:patientUuid/chart/orders/medications",
-        link: `/patient/${patientUuid}/chart/orders/medications`,
-        component: MedicationsLevelTwo
+        component: () => {
+          return <MedicationsLevelTwo />;
+        }
       }
     ]
   };
 
   return (
     <>
+      <ChartWidget {...props} widgetConfig={widgetConfig} />;
       <div>
         <button
           className="omrs-unstyled"
@@ -53,8 +49,6 @@ export default function Orders(props: any) {
           Create Orders
         </button>
       </div>
-      {props.children}
-      <ChartWidget {...props} widgetConfig={widgetConfig} />;
     </>
   );
 }

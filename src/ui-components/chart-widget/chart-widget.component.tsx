@@ -1,33 +1,55 @@
 import React from "react";
-import { Route, Link, Redirect, useHistory, useParams } from "react-router-dom";
+import {
+  Route,
+  Link,
+  Redirect,
+  useHistory,
+  useParams,
+  useLocation
+} from "react-router-dom";
 
 import styles from "./chart-widget.css";
+
+function useQuery() {
+  return new URLSearchParams(useLocation().search);
+}
 
 export default function ChartWidget(props: any) {
   let { patientUuid } = useParams();
   const history = useHistory();
 
-  const hasPath = item =>
-    item.link === history.location.pathname ||
-    item.link === props.paths[props.widgetConfig.name];
+  let queryParams = useQuery();
 
-  function getInitialSelected() {
-    const i = props.widgetConfig.routes.findIndex(item => hasPath);
-    return i === -1 ? 0 : i;
+  function getInitialTab() {
+    const tab = queryParams.get("tab");
+    return tab == null
+      ? props.widgetConfig.defaultTabIndex
+      : props.widgetConfig.tabs.findIndex(element => element.name === tab);
   }
 
-  const [selected, setSelected] = React.useState(getInitialSelected());
+  const [selected, setSelected] = React.useState(getInitialTab());
 
-  function handleClick(index, path) {
-    setSelected(index);
-    props.setLastRoute(path);
-  }
+  /*
+  const exampleConfig =  {
+    name: "orders",
+    defaultTabIndex: 0,
+    tabs: [
+      {
+        name: "Overview",
+        component: () => { return (<Foo/>) }
+      },
+      {
+        name: "Medications",
+        component: () => { return (<Bar/>) }
+      }
+    ]
+  };*/
 
   return (
     <>
       <nav className={styles.summariesnav} style={{ marginTop: "0" }}>
         <ul>
-          {props.widgetConfig.routes.map((item, index) => {
+          {props.widgetConfig.tabs.map((item, index) => {
             return (
               <li key={index}>
                 <div
@@ -35,10 +57,10 @@ export default function ChartWidget(props: any) {
                     index === selected ? styles.selected : styles.unselected
                   }`}
                 >
-                  <Link to={item.link}>
+                  <Link to={`${props.widgetConfig.name}?tab=${item.name}`}>
                     <button
                       className="omrs-unstyled"
-                      onClick={() => handleClick(index, item.link)}
+                      onClick={() => setSelected(index)}
                     >
                       {item.name}
                     </button>
@@ -49,31 +71,7 @@ export default function ChartWidget(props: any) {
           })}
         </ul>
       </nav>
-      <Route
-        exact
-        path={`/patient/${patientUuid}/chart/${props.widgetConfig.name}`}
-      >
-        {props.paths[props.widgetConfig.name] === "" ||
-        props.paths[props.widgetConfig.name] ===
-          `/patient/${patientUuid}/chart/${props.widgetConfig.name}` ? (
-          <Redirect
-            to={`/patient/${patientUuid}/chart/${props.widgetConfig.name}/${props.widgetConfig.defaultRoute}`}
-          />
-        ) : (
-          <Redirect to={props.paths[props.widgetConfig.name]} />
-        )}
-      </Route>
-
-      {props.widgetConfig.routes.map((item, index) => {
-        return (
-          <Route
-            key={index}
-            exact
-            path={item.path}
-            component={item.component}
-          />
-        );
-      })}
+      {props.widgetConfig.tabs[selected].component()}
     </>
   );
 }
