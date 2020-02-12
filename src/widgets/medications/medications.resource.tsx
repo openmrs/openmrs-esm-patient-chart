@@ -3,6 +3,11 @@ import { Observable } from "rxjs";
 import { map, take, filter } from "rxjs/operators";
 import { OrderMedication } from "./medication-orders-utils";
 
+const CARE_SETTING: string = "6f0c9a92-6f24-11e3-af88-005056821db0";
+const DURATION_UNITS_CONCEPT: string = "1732AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+const NEW_MEDICATION_ACTION: string = "NEW";
+const REVISE_MEDICATION_ACTION: string = "REVISE";
+const DISCONTINUE_MEDICATION_ACTION: string = "DISCONTINUE";
 type PatientMedications = {
   uuid: Number;
 };
@@ -23,7 +28,7 @@ export function fetchPatientMedications(
   patientID: string
 ): Observable<PatientMedications[]> {
   return openmrsObservableFetch(
-    `/ws/rest/v1/order?patient=${patientID}&careSetting=6f0c9a92-6f24-11e3-af88-005056821db0&status=any&v=custom:(uuid,orderNumber,accessionNumber,patient:ref,action,careSetting:ref,previousOrder:ref,dateActivated,scheduledDate,dateStopped,autoExpireDate,orderType:ref,encounter:ref,orderer:ref,orderReason,orderType,urgency,instructions,commentToFulfiller,drug:(name,strength,concept),dose,doseUnits:ref,frequency:ref,asNeeded,asNeededCondition,quantity,quantityUnits:ref,numRefills,dosingInstructions,duration,durationUnits:ref,route:ref,brandName,dispenseAsWritten)`
+    `/ws/rest/v1/order?patient=${patientID}&careSetting=${CARE_SETTING}&status=any&v=custom:(uuid,orderNumber,accessionNumber,patient:ref,action,careSetting:ref,previousOrder:ref,dateActivated,scheduledDate,dateStopped,autoExpireDate,orderType:ref,encounter:ref,orderer:ref,orderReason,orderType,urgency,instructions,commentToFulfiller,drug:(name,strength,concept),dose,doseUnits:ref,frequency:ref,asNeeded,asNeededCondition,quantity,quantityUnits:ref,numRefills,dosingInstructions,duration,durationUnits:ref,route:ref,brandName,dispenseAsWritten)`
   ).pipe(
     map(({ data }) => {
       const meds = [];
@@ -63,7 +68,7 @@ export function saveNewDrugOrder(
   abortContoller: AbortController,
   drugOrder: OrderMedication
 ) {
-  if (drugOrder.action === "NEW") {
+  if (drugOrder.action === NEW_MEDICATION_ACTION) {
     return openmrsFetch(`/ws/rest/v1/order`, {
       method: "POST",
       signal: abortContoller.signal,
@@ -92,7 +97,7 @@ export function saveNewDrugOrder(
         concept: drugOrder.concept
       }
     });
-  } else if (drugOrder.action === "REVISE") {
+  } else if (drugOrder.action === REVISE_MEDICATION_ACTION) {
     return openmrsFetch(`/ws/rest/v1/order`, {
       method: "POST",
       signal: abortContoller.signal,
@@ -121,7 +126,7 @@ export function saveNewDrugOrder(
         dosingInstructions: drugOrder.dosingInstructions
       }
     });
-  } else {
+  } else if (drugOrder.action === DISCONTINUE_MEDICATION_ACTION) {
     return openmrsFetch(`/ws/rest/v1/order`, {
       signal: abortContoller.signal,
       method: "POST",
@@ -158,7 +163,7 @@ export function getPatientDrugOrderDetails(
 
 export function getDurationUnits(abortController: AbortController) {
   return openmrsFetch(
-    `/ws/rest/v1/concept/1732AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA?v=custom:(answers:(uuid,display))`,
+    `/ws/rest/v1/concept/${DURATION_UNITS_CONCEPT}?v=custom:(answers:(uuid,display))`,
     abortController
   );
 }

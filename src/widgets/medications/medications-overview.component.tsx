@@ -155,7 +155,7 @@ export default function MedicationsOverview(props: MedicationsOverviewProps) {
                 name={"Medication Order Basket"}
                 label={"DISCONTINUE"}
                 orderUuid={medication.uuid}
-                drugName={medication.drug.name}
+                drugName={null}
                 action={"DISCONTINUE"}
                 inProgress={true}
               />

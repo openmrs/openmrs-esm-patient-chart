@@ -60,22 +60,22 @@ export function MedicationOrder(props: MedicationOrderProps) {
   useEffect(() => {
     const abortcontroller = new AbortController();
     if (patientUuid) {
-      getDrugByName(props.drugName, abortcontroller).then(response => {
-        setCommonMedication(getDrugMedication(response.data.results[0].uuid));
-        setDrugName(response.data.results[0].name);
-        setDrugUuid(response.data.results[0].uuid);
-        setDoseUnits(response.data.results[0].dosageForm.uuid);
-        setDosageForm(response.data.results[0].dosageForm.display);
-        setDrugStrength(response.data.results[0].strength);
-        setConcept(response.data.results[0].concept.uuid);
+      getDrugByName(props.drugName, abortcontroller).then(({ data }) => {
+        setCommonMedication(getDrugMedication(data.results[0].uuid));
+        setDrugName(data.results[0].name);
+        setDrugUuid(data.results[0].uuid);
+        setDoseUnits(data.results[0].dosageForm.uuid);
+        setDosageForm(data.results[0].dosageForm.display);
+        setDrugStrength(data.results[0].strength);
+        setConcept(data.results[0].concept.uuid);
       }, createErrorHandler);
 
       getPatientEncounterID(patientUuid, abortcontroller).then(
-        response => setEncounterUuid(response.data.results[0].uuid),
+        ({ data }) => setEncounterUuid(data.results[0].uuid),
         createErrorHandler()
       );
-      getDurationUnits(abortcontroller).then(response => {
-        setDurationUnitArray(response.data.answers);
+      getDurationUnits(abortcontroller).then(({ data }) => {
+        setDurationUnitArray(data.answers);
       }, createErrorHandler());
     }
     return () => abortcontroller.abort();
@@ -130,26 +130,24 @@ export function MedicationOrder(props: MedicationOrderProps) {
     const ac = new AbortController();
     if (props.editProperty.length > 0) {
       getPatientDrugOrderDetails(ac, props.editProperty[0].OrderUuid).then(
-        response => {
-          setEncounterUuid(response.data.encounter.uuid);
-          setStartDate(
-            dayjs(response.data.dateActivated).format("DD-MMM-YYYY")
-          );
-          setDosingInstructions(response.data.dosingInstructions);
-          setDoseUnits(response.data.doseUnits.uuid);
-          setDosageForm(response.data.doseUnits.display);
-          setRouteUuid(response.data.route.uuid);
-          setRouteName(response.data.route.display);
-          setDose(response.data.dose);
-          setDuration(response.data.duration);
-          setFrequencyName(response.data.frequency.display);
-          setFrequencyUuid(response.data.frequency.concept.uuid);
+        ({ data }) => {
+          setEncounterUuid(data.encounter.uuid);
+          setStartDate(dayjs(data.dateActivated).format("DD-MMM-YYYY"));
+          setDosingInstructions(data.dosingInstructions);
+          setDoseUnits(data.doseUnits.uuid);
+          setDosageForm(data.doseUnits.display);
+          setRouteUuid(data.route.uuid);
+          setRouteName(data.route.display);
+          setDose(data.dose);
+          setDuration(data.duration);
+          setFrequencyName(data.frequency.display);
+          setFrequencyUuid(data.frequency.concept.uuid);
           setAction("REVISE");
-          setNumRefills(response.data.numRefills);
-          if (response.data.previousOrder === null) {
-            setPreviousOrder(response.data.uuid);
+          setNumRefills(data.numRefills);
+          if (data.previousOrder === null) {
+            setPreviousOrder(data.uuid);
           } else {
-            setPreviousOrder(response.data.previousOrder.uuid);
+            setPreviousOrder(data.previousOrder.uuid);
           }
         }
       );
