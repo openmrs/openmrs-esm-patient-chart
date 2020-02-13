@@ -162,3 +162,15 @@ export function getDurationUnits(abortController: AbortController) {
     abortController
   );
 }
+
+export function getMedicationByUuid(
+  abortController: AbortController,
+  orderUuid: string
+) {
+  return openmrsFetch(
+    `/ws/rest/v1/order/${orderUuid}?v=custom:(uuid,route:(uuid,display),action,urgency,display,drug:(display,strength),frequency:(display),dose,doseUnits:(display),orderer,dateStopped,dateActivated,previousOrder,numRefills,duration,durationUnits:(display))`,
+    {
+      signal: abortController.signal
+    }
+  );
+}

@@ -10,6 +10,7 @@ import SummaryCardFooter from "../cards/summary-card-footer.component";
 import { useTranslation } from "react-i18next";
 import dayjs from "dayjs";
 import { getDosage } from "./medication-orders-utils";
+import { Link } from "react-router-dom";
 import { MedicationButton } from "./medication-button.component";
 import { MedicationOrderBasket } from "./medication-order-basket.component";
 
@@ -137,6 +138,18 @@ export default function MedicationLevelTwo(props: MedicationsOverviewProps) {
                                 action={"DISCONTINUE"}
                                 inProgress={true}
                               />
+                            </td>
+                            <td style={{ textAlign: "end" }}>
+                              <Link
+                                to={`/patient/${patientUuid}/chart/medications/${medication.uuid}`}
+                              >
+                                <svg
+                                  className="omrs-icon"
+                                  fill="rgba(0, 0, 0, 0.54)"
+                                >
+                                  <use xlinkHref="#omrs-icon-chevron-right" />
+                                </svg>
+                              </Link>
                             </td>
                           </td>
                         </tr>
