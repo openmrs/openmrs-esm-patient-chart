@@ -13,7 +13,7 @@ export default function History(props: any) {
       {
         name: "Overview",
         component: () => {
-          return <HistoryChartOverview />;
+          return <div>Placeholder</div>;
         }
       },
       {
@@ -31,7 +31,7 @@ export default function History(props: any) {
       {
         name: "Allergies",
         component: () => {
-          return <AllergyOverviewLevelTwo />;
+          return <div>Placeholder</div>;
         }
       }
     ]

@@ -1,12 +1,5 @@
 import React from "react";
-import {
-  Route,
-  Link,
-  useHistory,
-  useParams,
-  useRouteMatch,
-  useLocation
-} from "react-router-dom";
+import { Link, useParams, useRouteMatch, useLocation } from "react-router-dom";
 import styles from "./chart-review.css";
 import Summaries from "./summaries/summaries.component";
 import Results from "./results/results.component";
@@ -15,76 +8,77 @@ import Orders from "./orders/orders.component";
 import Encounters from "./encounters/encounters.component";
 
 export default function ChartReview(props: any) {
-  let history = useHistory();
-  const [lastRoute, setLastRoute] = React.useState(history.location.pathname);
   let match = useRouteMatch();
   let location = useLocation();
 
   let { patientUuid } = useParams();
   let { widget } = useParams();
 
-  const navItems = [
-    {
-      name: "Summaries",
-      path: `/patient/${patientUuid}/chart/summaries`
-    },
-    {
-      name: "Clinical Hx",
-      path: `/patient/${patientUuid}/chart/history`
-    },
+  const config = {
+    defaultPath: `/patient/${patientUuid}/chart/`,
+    defaultTabIndex: 0,
+    widgets: [
+      {
+        name: "Summaries",
+        path: `summaries`,
+        component: () => {
+          return <Summaries />;
+        }
+      },
+      {
+        name: "Clinical Hx",
+        path: "history",
+        component: () => {
+          return <History />;
+        }
+      },
 
-    {
-      name: "Results",
-      path: `/patient/${patientUuid}/chart/results`
-    },
-    {
-      name: "Orders",
-      path: `/patient/${patientUuid}/chart/orders`
-    },
-    {
-      name: "Encounters",
-      path: `/patient/${patientUuid}/chart/encounters`
-    }
-  ];
+      {
+        name: "Results",
+        path: `results`,
+        component: () => {
+          return <Results />;
+        }
+      },
+      {
+        name: "Orders",
+        path: `orders`,
+        component: () => {
+          return <Orders />;
+        }
+      },
+      {
+        name: "Encounters",
+        path: `encounters`,
+        component: () => {
+          return <Encounters />;
+        }
+      }
+    ]
+  };
 
   const [selected, setSelected] = React.useState(getInitialTab());
 
   function getInitialTab() {
     return widget == undefined
-      ? 0
-      : navItems.findIndex(element => element.name.toLowerCase() === widget);
+      ? config.defaultTabIndex
+      : config.widgets.findIndex(
+          element => element.path.toLowerCase() === widget
+        );
   }
 
-  const [paths, setPaths] = React.useState({});
+  const [tabHistory, setTabHistory] = React.useState({});
 
   React.useEffect(() => {
-    paths[match.params["widget"]] = location.search;
-    setPaths(paths);
+    tabHistory[match.params["widget"]] = location.search;
+    setTabHistory(tabHistory);
   }, [match, location]);
-
-  const widgets = {
-    summaries: () => {
-      return <Summaries paths={paths} setLastRoute={setLastRoute} />;
-    },
-    history: () => {
-      return <History paths={paths} setLastRoute={setLastRoute} />;
-    },
-    results: () => {
-      return <Results paths={paths} setLastRoute={setLastRoute} />;
-    },
-    orders: () => {
-      return <Orders paths={paths} setLastRoute={setLastRoute} />;
-    },
-    encounters: () => {
-      return <Encounters />;
-    }
-  };
 
   return (
     <>
       <nav className={styles.topnav} style={{ marginTop: "0" }}>
         <ul>
-          {navItems.map((item, index) => {
+          {config.widgets.map((item, index) => {
             return (
               <li key={index}>
                 <div
@@ -92,7 +86,13 @@ export default function ChartReview(props: any) {
                     index === selected ? styles.selected : styles.unselected
                   }`}
                 >
-                  <Link to={item.path + (paths[item.name.toLowerCase()] || "")}>
+                  <Link
+                    to={
+                      config.defaultPath +
+                      item.path +
+                      (tabHistory[item.path.toLowerCase()] || "")
+                    }
+                  >
                     <button
                       className="omrs-unstyled"
                       onClick={() => setSelected(index)}
@@ -106,8 +106,7 @@ export default function ChartReview(props: any) {
           })}
         </ul>
       </nav>
-
-      {widget == undefined ? widgets.summaries() : widgets[widget]()}
+      {config.widgets[selected].component()}
     </>
   );
 }
