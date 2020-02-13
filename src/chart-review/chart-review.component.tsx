@@ -63,7 +63,7 @@ export default function ChartReview(props: any) {
     return widget == undefined
       ? config.defaultTabIndex
       : config.widgets.findIndex(
-          element => element.path.toLowerCase() === widget
+          element => element.path === widget
         );
   }
 
@@ -90,7 +90,7 @@ export default function ChartReview(props: any) {
                     to={
                       config.defaultPath +
                       item.path +
-                      (tabHistory[item.path.toLowerCase()] || "")
+                      (tabHistory[item.path] || "")
                     }
                   >
                     <button
