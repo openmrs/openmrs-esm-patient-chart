@@ -16,6 +16,9 @@ import SummaryCardRowContent from "../cards/summary-card-row-content.component";
 import { getDosage, OrderMedication } from "./medication-orders-utils";
 import { useHistory } from "react-router-dom";
 
+const NEW_MEDICATION_ACTION: string = "NEW";
+const DISCONTINUE_MEDICATION_ACTION: string = "DISCONTINUE";
+
 export function MedicationOrderBasket(props: MedicationOrderBasketProps) {
   const searchTimeOut = 300;
   const [searchResults, setSearchResults] = useState([]);
@@ -84,32 +87,33 @@ export function MedicationOrderBasket(props: MedicationOrderBasketProps) {
 
   useEffect(() => {
     let params: any = props.match.params;
-    if (params.action != undefined && params.action === "DISCONTINUE") {
+    const DISCONTINUE = "DISCONTINUE";
+    if (params.action != undefined && params.action === DISCONTINUE) {
       const abortController = new AbortController();
       getPatientDrugOrderDetails(abortController, params.orderUuid).then(
-        response => {
+        ({ data }) => {
           setOrderBasket([
             ...orderBasket,
             {
-              orderUuid: response.data.uuid,
-              encounterUuid: response.data.encounter.uuid,
-              patientUuid: response.data.patient.uuid,
+              orderUuid: data.uuid,
+              encounterUuid: data.encounter.uuid,
+              patientUuid: data.patient.uuid,
               type: "drugorder",
-              orderer: response.data.orderer.uuid,
-              careSetting: response.data.careSetting.uuid,
-              dose: response.data.dose,
-              drugStrength: response.data.drug.strength,
-              drugName: response.data.drug.name,
-              frequencyName: response.data.frequency.display,
-              dosageForm: response.data.doseUnits.display,
-              routeName: response.data.route.display,
-              action: "DISCONTINUE",
-              concept: response.data.concept.uuid,
-              doseUnitsConcept: response.data.doseUnits.uuid,
-              previousOrder: response.data.previousOrder
-                ? response.data.previousOrder
-                : response.data.uuid,
-              drugUuid: response.data.drug.uuid
+              orderer: data.orderer.uuid,
+              careSetting: data.careSetting.uuid,
+              dose: data.dose,
+              drugStrength: data.drug.strength,
+              drugName: data.drug.name,
+              frequencyName: data.frequency.display,
+              dosageForm: data.doseUnits.display,
+              routeName: data.route.display,
+              action: DISCONTINUE_MEDICATION_ACTION,
+              concept: data.concept.uuid,
+              doseUnitsConcept: data.doseUnits.uuid,
+              previousOrder: data.previousOrder
+                ? data.previousOrder
+                : data.uuid,
+              drugUuid: data.drug.uuid
             }
           ]);
         }
@@ -230,7 +234,9 @@ export function MedicationOrderBasket(props: MedicationOrderBasketProps) {
             return (
               <div
                 className={`${styles.basketStyles} ${
-                  order.action === "NEW" ? styles.newOrder : styles.reviseOrder
+                  order.action === NEW_MEDICATION_ACTION
+                    ? styles.newOrder
+                    : styles.reviseOrder
                 }`}
                 key={index}
               >
@@ -260,7 +266,11 @@ export function MedicationOrderBasket(props: MedicationOrderBasketProps) {
                       <button
                         className="omrs-btn-icon-medium"
                         onClick={$event => handleOrderItemEdit(order, index)}
-                        disabled={order.action === "DISCONTINUE" ? true : false}
+                        disabled={
+                          order.action === DISCONTINUE_MEDICATION_ACTION
+                            ? true
+                            : false
+                        }
                       >
                         <svg>
                           <use
