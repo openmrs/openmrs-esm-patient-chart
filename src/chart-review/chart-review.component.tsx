@@ -3,9 +3,11 @@ import { Link, useParams, useRouteMatch, useLocation } from "react-router-dom";
 import styles from "./chart-review.css";
 import Summaries from "./summaries/summaries.component";
 import Results from "./results/results.component";
-import History from "./history/history.component";
 import Orders from "./orders/orders.component";
 import Encounters from "./encounters/encounters.component";
+import Allergies from "./allergies/allergies.component";
+import Conditions from "./conditions/conditions.component";
+import Programs from "./programs/programs.component";
 
 export default function ChartReview(props: any) {
   const match = useRouteMatch();
@@ -26,14 +28,6 @@ export default function ChartReview(props: any) {
         }
       },
       {
-        name: "Clinical Hx",
-        path: "history",
-        component: () => {
-          return <History />;
-        }
-      },
-
-      {
         name: "Results",
         path: `results`,
         component: () => {
@@ -52,6 +46,27 @@ export default function ChartReview(props: any) {
         path: `encounters`,
         component: () => {
           return <Encounters />;
+        }
+      },
+      {
+        name: "Conditions",
+        path: `conditions`,
+        component: () => {
+          return <Conditions />;
+        }
+      },
+      {
+        name: "Allergies",
+        path: `allergies`,
+        component: () => {
+          return <Allergies />;
+        }
+      },
+      {
+        name: "Programs",
+        path: `programs`,
+        component: () => {
+          return <Programs />;
         }
       }
     ]
