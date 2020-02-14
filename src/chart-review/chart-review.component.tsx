@@ -1,80 +1,98 @@
 import React from "react";
-import { Route, Link, useHistory, useParams } from "react-router-dom";
-import SummariesNav from "../summaries/summaries-nav.component";
-import LevelTwoRoutes from "./level-two-routes.component";
+import { Link, useParams, useRouteMatch, useLocation } from "react-router-dom";
 import styles from "./chart-review.css";
+import Summaries from "./summaries/summaries.component";
+import Results from "./results/results.component";
+import History from "./history/history.component";
+import Orders from "./orders/orders.component";
+import Encounters from "./encounters/encounters.component";
 
 export default function ChartReview(props: any) {
-  const [selected, setSelected] = React.useState();
-  let history = useHistory();
-  const [lastRoute, setLastRoute] = React.useState(history.location.pathname);
-  const [paths, setPaths] = React.useState({
-    summaries:
-      history.location.pathname.indexOf("summaries/") > -1
-        ? history.location.pathname
-        : ""
-  });
+  const match = useRouteMatch();
+  const location = useLocation();
 
-  let { patientUuid } = useParams();
+  const { patientUuid } = useParams();
+  const { widget } = useParams();
 
-  React.useEffect(() => {
-    if (lastRoute.includes("/summaries")) {
-      paths["summaries"] = lastRoute;
-      setPaths(paths);
-    }
-  }, [lastRoute, paths]);
+  const config = {
+    defaultPath: `/patient/${patientUuid}/chart/`,
+    defaultTabIndex: 0,
+    widgets: [
+      {
+        name: "Summaries",
+        path: `summaries`,
+        component: () => {
+          return <Summaries />;
+        }
+      },
+      {
+        name: "Clinical Hx",
+        path: "history",
+        component: () => {
+          return <History />;
+        }
+      },
 
-  function handleClick() {
-    setLastRoute(history.location.pathname);
+      {
+        name: "Results",
+        path: `results`,
+        component: () => {
+          return <Results />;
+        }
+      },
+      {
+        name: "Orders",
+        path: `orders`,
+        component: () => {
+          return <Orders />;
+        }
+      },
+      {
+        name: "Encounters",
+        path: `encounters`,
+        component: () => {
+          return <Encounters />;
+        }
+      }
+    ]
+  };
+
+  const [selected, setSelected] = React.useState(getInitialTab());
+
+  function getInitialTab() {
+    return widget == undefined
+      ? config.defaultTabIndex
+      : config.widgets.findIndex(element => element.path === widget);
   }
 
-  const navItems = [
-    {
-      name: "Summaries",
-      path: `/patient/${patientUuid}/chart/summaries`
-    },
-    {
-      name: "Appointments",
-      path: `/patient/${patientUuid}/chart/appointments`
-    },
-    {
-      name: "Vitals",
-      path: `/patient/${patientUuid}/chart/vitals`
-    },
-    {
-      name: "Results",
-      path: `/patient/${patientUuid}/chart/results`
-    },
-    {
-      name: "Medications",
-      path: `/patient/${patientUuid}/chart/medications`
-    },
-    {
-      name: "Notes",
-      path: `/patient/${patientUuid}/chart/notes`
-    },
-    {
-      name: "Orders",
-      path: `/patient/${patientUuid}/chart/orders`
-    }
-  ];
+  const [tabHistory, setTabHistory] = React.useState({});
+
+  React.useEffect(() => {
+    setTabHistory(t => {
+      t[match.params["widget"]] = location.search;
+      return t;
+    });
+  }, [match, location]);
 
   return (
     <>
       <nav className={styles.topnav} style={{ marginTop: "0" }}>
         <ul>
-          {navItems.map((item, index) => {
+          {config.widgets.map((item, index) => {
             return (
               <li key={index}>
                 <div
                   className={`${
-                    index === selected ||
-                    history.location.pathname.indexOf(item.path) > -1
-                      ? styles.selected
-                      : styles.unselected
+                    index === selected ? styles.selected : styles.unselected
                   }`}
                 >
-                  <Link to={item.path}>
+                  <Link
+                    to={
+                      config.defaultPath +
+                      item.path +
+                      (tabHistory[item.path] || "")
+                    }
+                  >
                     <button
                       className="omrs-unstyled"
                       onClick={() => setSelected(index)}
@@ -88,11 +106,7 @@ export default function ChartReview(props: any) {
           })}
         </ul>
       </nav>
-
-      <Route path="/patient/:patientUuid/chart/summaries">
-        <SummariesNav setLastRoute={setLastRoute} paths={paths} />
-      </Route>
-      <Route path="/patient/:patientUuid/chart" component={LevelTwoRoutes} />
+      {config.widgets[selected].component()}
     </>
   );
 }

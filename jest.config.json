@@ -5,13 +5,14 @@
   "moduleNameMapper": {
     "\\.(css)$": "identity-obj-proxy",
     "@openmrs/esm-api": "<rootDir>/__mocks__/openmrs-esm-api.mock.tsx",
-    "@openmrs/esm-error-handling": "<rootDir>/__mocks__/openmrs-esm-error-handling.mock.tsx"
+    "@openmrs/esm-error-handling": "<rootDir>/__mocks__/openmrs-esm-error-handling.mock.tsx",
+    "lodash-es": "lodash"
   },
   "coverageThreshold": {
     "global": {
       "statements": 50,
       "branches": 50,
-      "functions": 50,
+      "functions": 45,
       "lines": 50
     }
   }

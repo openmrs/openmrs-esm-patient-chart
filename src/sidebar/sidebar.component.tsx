@@ -47,20 +47,6 @@ export default function Sidebar(props: any) {
           props: { match: { params: {} } },
           inProgress: false
         })
-    },
-    {
-      name: "O",
-      onclick: () =>
-        newWorkspaceItem({
-          component: MedicationOrderBasket,
-          name: "Medication Order Basket",
-          props: { match: { params: {} } },
-          inProgress: false,
-          validations: (workspaceTabs: any[]) =>
-            workspaceTabs.findIndex(
-              tab => tab.component === MedicationOrderBasket
-            )
-        })
     }
   ];
   return (

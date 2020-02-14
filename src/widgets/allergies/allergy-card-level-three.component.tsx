@@ -1,5 +1,5 @@
 import React from "react";
-import { match } from "react-router";
+import { match, useRouteMatch } from "react-router";
 import { createErrorHandler } from "@openmrs/esm-error-handling";
 import { getPatientAllergyByPatientUuid } from "./allergy-intolerance.resource";
 import { useCurrentPatient } from "@openmrs/esm-api";
@@ -11,13 +11,17 @@ export function AllergyCardLevelThree(props: AllergyCardLevelThreeProps) {
   const [allergy, setAllergy] = React.useState(null);
   const [isLoadingPatient, patient, patientUuid] = useCurrentPatient();
 
+  let match = useRouteMatch({
+    path: "/patient/:patientUuid/chart/medications/allergies/:allergyUuid"
+  });
+
   React.useEffect(() => {
     if (!isLoadingPatient && patient) {
       const abortController = new AbortController();
 
       getPatientAllergyByPatientUuid(
         patientUuid,
-        { allergyUuid: props.match.params["allergyUuid"] },
+        { allergyUuid: match.params["allergyUuid"] },
         abortController
       )
         .then(allergy => setAllergy(allergy.data))
@@ -25,15 +29,15 @@ export function AllergyCardLevelThree(props: AllergyCardLevelThreeProps) {
 
       return () => abortController.abort();
     }
-  }, [isLoadingPatient, patient, patientUuid, props.match.params]);
+  }, [isLoadingPatient, patient, patientUuid, match.params]);
 
   function displayAllergy() {
     return (
       <SummaryCard
         name="Allergy"
-        match={props.match}
+        match={match}
         styles={{ width: "100%" }}
-        editBtnUrl={`/patient/${patientUuid}/chart/allergies/form/${props.match.params["allergyUuid"]}`}
+        editBtnUrl={`/patient/${patientUuid}/chart/allergies/form/${match.params["allergyUuid"]}`}
       >
         <div
           className={`omrs-type-body-regular ${styles.allergyCard} ${
@@ -113,7 +117,7 @@ export function AllergyCardLevelThree(props: AllergyCardLevelThreeProps) {
     return (
       <SummaryCard
         name="Details"
-        match={props.match}
+        match={match}
         styles={{
           width: "100%",
           background: "var(--omrs-color-bg-medium-contrast)"
