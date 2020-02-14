@@ -1,12 +1,12 @@
 import React from "react";
-import { useParams } from "react-router-dom";
+import { useRouteMatch } from "react-router-dom";
 import VitalsDetailedSummary from "../../widgets/vitals/vitals-detailed-summary.component";
 import HeightAndWeightDetailed from "../../widgets/heightandweight/heightandweight-detailed.component";
 import ChartWidget from "../../ui-components/chart-widget/chart-widget.component";
 import ResultsChartOverview from "./results-chart-overview.component";
 
 export default function Results(props: any) {
-  let { patientUuid } = useParams();
+  const match = useRouteMatch();
 
   const widgetConfig = {
     name: "results",
@@ -21,13 +21,13 @@ export default function Results(props: any) {
       {
         name: "Vitals",
         component: () => {
-          return <VitalsDetailedSummary />;
+          return <VitalsDetailedSummary match={match} />;
         }
       },
       {
         name: "Height and Weight",
         component: () => {
-          return <HeightAndWeightDetailed />;
+          return <HeightAndWeightDetailed match={match} />;
         }
       }
     ]

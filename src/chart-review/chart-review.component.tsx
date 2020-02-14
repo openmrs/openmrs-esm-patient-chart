@@ -8,11 +8,11 @@ import Orders from "./orders/orders.component";
 import Encounters from "./encounters/encounters.component";
 
 export default function ChartReview(props: any) {
-  let match = useRouteMatch();
-  let location = useLocation();
+  const match = useRouteMatch();
+  const location = useLocation();
 
-  let { patientUuid } = useParams();
-  let { widget } = useParams();
+  const { patientUuid } = useParams();
+  const { widget } = useParams();
 
   const config = {
     defaultPath: `/patient/${patientUuid}/chart/`,
@@ -62,16 +62,16 @@ export default function ChartReview(props: any) {
   function getInitialTab() {
     return widget == undefined
       ? config.defaultTabIndex
-      : config.widgets.findIndex(
-          element => element.path === widget
-        );
+      : config.widgets.findIndex(element => element.path === widget);
   }
 
   const [tabHistory, setTabHistory] = React.useState({});
 
   React.useEffect(() => {
-    tabHistory[match.params["widget"]] = location.search;
-    setTabHistory(tabHistory);
+    setTabHistory(t => {
+      t[match.params["widget"]] = location.search;
+      return t;
+    });
   }, [match, location]);
 
   return (

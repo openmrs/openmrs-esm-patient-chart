@@ -1,5 +1,5 @@
 import React from "react";
-import { useParams } from "react-router-dom";
+import { useRouteMatch } from "react-router-dom";
 import { newWorkspaceItem } from "../../workspace/workspace.resource";
 import ChartWidget from "../../ui-components/chart-widget/chart-widget.component";
 import MedicationsLevelTwo from "../../widgets/medications/medication-level-two.component";
@@ -7,7 +7,7 @@ import { MedicationOrderBasket } from "../../widgets/medications/medication-orde
 import OrdersChartOverview from "./orders-chart-overview.component";
 
 export default function Orders(props: any) {
-  let { patientUuid } = useParams();
+  const match = useRouteMatch();
 
   function showOrders() {
     newWorkspaceItem({
@@ -31,7 +31,7 @@ export default function Orders(props: any) {
       {
         name: "Medications",
         component: () => {
-          return <MedicationsLevelTwo />;
+          return <MedicationsLevelTwo match={match} />;
         }
       }
     ]

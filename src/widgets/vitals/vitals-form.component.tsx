@@ -156,6 +156,7 @@ export function VitalsForm(props: vitalsFormProp) {
     const editedVitals = difference(updatedPatientVitals, patientVitals);
     editPatientVitals(
       patientUuid,
+      //@ts-ignore
       editedVitals,
       new Date(`${dateRecorded}`),
       abortController,

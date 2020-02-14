@@ -48,4 +48,6 @@ export default function PatientChartOverview(props: PatientChartOverviewProps) {
   );
 }
 
-type PatientChartOverviewProps = RouteComponentProps & {};
+type PatientChartOverviewProps = {
+  match: {};
+};

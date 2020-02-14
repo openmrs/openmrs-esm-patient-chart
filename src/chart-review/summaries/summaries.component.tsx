@@ -1,10 +1,10 @@
 import React from "react";
-import { useParams } from "react-router-dom";
+import { useRouteMatch } from "react-router-dom";
 import ChartWidget from "../../ui-components/chart-widget/chart-widget.component";
 import PatientChartOverview from "./overview/patient-chart-overview.component";
 
 export default function Summaries(props: any) {
-  let { patientUuid } = useParams();
+  const match = useRouteMatch();
 
   const widgetConfig = {
     name: "summaries",
@@ -13,7 +13,7 @@ export default function Summaries(props: any) {
       {
         name: "Overview",
         component: () => {
-          return <PatientChartOverview />;
+          return <PatientChartOverview match={match} />;
         }
       }
     ]
