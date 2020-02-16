@@ -9,6 +9,10 @@ import { useCurrentPatient } from "../../../__mocks__/openmrs-esm-api.mock";
 const mockPerformPatientAllergySearch = performPatientAllergySearch as jest.Mock;
 const mockUseCurrentPatient = useCurrentPatient as jest.Mock;
 
+jest.mock("react-i18next", () => ({
+  useTranslation: () => ({ t: key => key })
+}));
+
 jest.mock("./allergy-intolerance.resource", () => ({
   performPatientAllergySearch: jest.fn()
 }));

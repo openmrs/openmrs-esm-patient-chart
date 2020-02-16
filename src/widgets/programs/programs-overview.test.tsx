@@ -8,6 +8,10 @@ import { mockProgramsResponse } from "../../../__mocks__/programs.mocks";
 import * as openmrsApi from "@openmrs/esm-api";
 import { of } from "rxjs/internal/observable/of";
 
+jest.mock("react-i18next", () => ({
+  useTranslation: () => ({ t: key => key })
+}));
+
 describe("<ProgramsOverview />", () => {
   let match, wrapper: any, patient: fhir.Patient, programs: any;
 
@@ -21,7 +25,7 @@ describe("<ProgramsOverview />", () => {
   it("should render without dying", async () => {
     wrapper = render(
       <BrowserRouter>
-        <ProgramsOverview match={match} patient={patient} />
+        <ProgramsOverview match={match} />
       </BrowserRouter>
     );
     await wait(() => {
@@ -35,7 +39,7 @@ describe("<ProgramsOverview />", () => {
 
     const wrapper = render(
       <BrowserRouter>
-        <ProgramsOverview match={match} patient={patient} />
+        <ProgramsOverview match={match} />
       </BrowserRouter>
     );
     await wait(() => {

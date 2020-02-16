@@ -28,6 +28,10 @@ const mockgetPatientEncounterID = getPatientEncounterID as jest.Mock;
 const mockgetPatientDrugOrderDetails = getPatientDrugOrderDetails as jest.Mock;
 const mockgetDurationUnits = getDurationUnits as jest.Mock;
 
+jest.mock("react-i18next", () => ({
+  useTranslation: () => ({ t: key => key })
+}));
+
 jest.mock("./medications.resource", () => ({
   getDrugByName: jest.fn(),
   getPatientEncounterID: jest.fn(),

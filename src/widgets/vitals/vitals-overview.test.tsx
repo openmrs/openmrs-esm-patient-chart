@@ -8,6 +8,10 @@ import * as openmrsApi from "@openmrs/esm-api";
 import { mockVitalsResponse } from "../../../__mocks__/vitals.mock";
 import dayjs from "dayjs";
 
+jest.mock("react-i18next", () => ({
+  useTranslation: () => ({ t: key => key })
+}));
+
 describe("<VitalsOverview/>", () => {
   let patient: fhir.Patient, match;
 

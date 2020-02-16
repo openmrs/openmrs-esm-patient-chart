@@ -11,6 +11,10 @@ const mockGetPatientAllergyByPatientUuid = getPatientAllergyByPatientUuid as jes
 const mockUseCurrentPatient = useCurrentPatient as jest.Mock;
 const mockUseRouteMatch = useRouteMatch as jest.Mock;
 
+jest.mock("react-i18next", () => ({
+  useTranslation: () => ({ t: key => key })
+}));
+
 jest.mock("./allergy-intolerance.resource", () => ({
   getPatientAllergyByPatientUuid: jest.fn()
 }));
