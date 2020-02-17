@@ -239,7 +239,7 @@ export const mockDimensionResponseRESTAPI = {
         display: "Weight (kg): 65.0",
         obsDatetime: `${todaysDate}T06:49:00`,
         encounter: {
-          encounterDatetime: "2020-01-14T00:20:00.000+0000"
+          encounterDatetime: "2020-02-14 06:49:00"
         },
         value: 65.0,
         concept: {
@@ -263,7 +263,7 @@ export const mockDimensionResponseRESTAPI = {
         display: "Height (cm): 156.0",
         obsDatetime: "2016-12-18T06:48:20.000",
         encounter: {
-          encounterDatetime: "2020-01-14T00:20:00.000+0000"
+          encounterDatetime: "2020-02-14 06:49:00"
         },
         value: 173,
         concept: {

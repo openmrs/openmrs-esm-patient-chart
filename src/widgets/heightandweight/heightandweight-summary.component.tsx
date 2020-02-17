@@ -1,11 +1,12 @@
 import React from "react";
-import styles from "./heightandweight-detailed.css";
+import styles from "./heightandweight-summary.css";
 import SummaryCard from "../cards/summary-card.component";
 import { getDimenionsObservationsRestAPI } from "./heightandweight.resource";
 import { match } from "react-router";
 import { useCurrentPatient } from "@openmrs/esm-api";
+import { Link } from "react-router-dom";
 
-function HeightAndWeightDetailed(props: HeightAndWeightDetailedProps) {
+function HeightAndWeightSummary(props: HeightAndWeightSummaryProps) {
   const [dimensions, setDimensions] = React.useState([]);
   const [
     isLoadingPatient,
@@ -70,12 +71,16 @@ function HeightAndWeightDetailed(props: HeightAndWeightDetailedProps) {
                   {dimension.bmi || "\u2014"}
                 </td>
                 <td style={{ textAlign: "end" }}>
-                  <svg
-                    className="omrs-icon"
-                    fill="var(--omrs-color-ink-low-contrast)"
+                  <Link
+                    to={`/patient/${patientUuid}/chart/results?tab=Height%20and%20Weight&uuid=${dimension.obsData.weight.uuid}`}
                   >
-                    <use xlinkHref="#omrs-icon-chevron-right" />
-                  </svg>
+                    <svg
+                      className="omrs-icon"
+                      fill="var(--omrs-color-ink-low-contrast)"
+                    >
+                      <use xlinkHref="#omrs-icon-chevron-right" />
+                    </svg>
+                  </Link>
                 </td>
               </tr>
             ))}
@@ -86,8 +91,8 @@ function HeightAndWeightDetailed(props: HeightAndWeightDetailedProps) {
   );
 }
 
-type HeightAndWeightDetailedProps = {
+type HeightAndWeightSummaryProps = {
   match: match;
 };
 
-export default HeightAndWeightDetailed;
+export default HeightAndWeightSummary;

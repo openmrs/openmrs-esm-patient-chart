@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from "react";
 import { match, Route } from "react-router";
 import { AllergyOverviewLevelTwo } from "../widgets/allergies/allergy-card-level-two.component";
-import HeightAndWeightDetailed from "../widgets/heightandweight/heightandweight-detailed.component";
+import HeightAndWeightSummary from "../widgets/heightandweight/heightandweight-summary.component";
 import VitalsDetailedSummary from "../widgets/vitals/vitals-detailed-summary.component";
 import { Breadcrumbs } from "../breadcrumbs/breadcrumbs.component";
 import ProgramsLevelTwo from "../widgets/programs/programs-level-two.component";
@@ -13,6 +13,7 @@ import { AllergyCardLevelThree } from "../widgets/allergies/allergy-card-level-t
 import ConditionsDetailedSummary from "../widgets/conditions/conditions-detailed-summary.component";
 import { MedicationOrderBasket } from "../widgets/medications/medication-order-basket.component";
 import { MedicationOrder } from "../widgets/medications/medication-order.component";
+import { HeightAndWeightDetailedSummary } from "../widgets/heightandweight/heightandweight-detailed-summary.component";
 
 export const levelTwoRoutes: PatientChartRoute[] = [
   {
@@ -42,8 +43,13 @@ export const levelTwoRoutes: PatientChartRoute[] = [
   },
   {
     url: "/patient/:patientUuid/chart/dimensions",
-    component: HeightAndWeightDetailed,
+    component: HeightAndWeightSummary,
     name: "Dimensions"
+  },
+  {
+    url: "/patient/:patientUuid/chart/dimensions/details/:uuid?",
+    component: HeightAndWeightDetailedSummary,
+    name: "Detailed Dimensions"
   },
   {
     url: "/patient/:patientUuid/chart/vitals",

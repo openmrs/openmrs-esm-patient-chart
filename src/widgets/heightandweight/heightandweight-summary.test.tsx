@@ -2,7 +2,7 @@ import React from "react";
 import { BrowserRouter } from "react-router-dom";
 import { render, cleanup, wait } from "@testing-library/react";
 import { of } from "rxjs";
-import HeightAndWeightDetailed from "./heightandweight-detailed.component";
+import HeightAndWeightSummary from "./heightandweight-summary.component";
 import { calculateBMI, formatDate } from "./heightandweight-helper";
 import { mockPatient } from "../../../__mocks__/patient.mock";
 import { mockDimensionResponseRESTAPI } from "../../../__mocks__/dimensions.mock";
@@ -17,7 +17,7 @@ jest.mock("@openmrs/esm-api", () => ({
   openmrsObservableFetch: jest.fn()
 }));
 
-describe("<HeightAndWeightDetailed/>", () => {
+describe("<HeightAndWeightSummary/>", () => {
   let patient: fhir.Patient, match;
 
   afterEach(cleanup);
@@ -35,7 +35,7 @@ describe("<HeightAndWeightDetailed/>", () => {
     );
     render(
       <BrowserRouter>
-        <HeightAndWeightDetailed match={match}></HeightAndWeightDetailed>
+        <HeightAndWeightSummary match={match}></HeightAndWeightSummary>
       </BrowserRouter>
     );
   });
@@ -47,7 +47,7 @@ describe("<HeightAndWeightDetailed/>", () => {
     );
     const wrapper = render(
       <BrowserRouter>
-        <HeightAndWeightDetailed match={match}></HeightAndWeightDetailed>
+        <HeightAndWeightSummary match={match}></HeightAndWeightSummary>
       </BrowserRouter>
     );
     await wait(() => {
