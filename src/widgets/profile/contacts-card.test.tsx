@@ -4,10 +4,6 @@ import { render, cleanup } from "@testing-library/react";
 import ContactsCard from "./contacts-card.component";
 import { mockPatient } from "../../../__mocks__/patient.mock";
 
-jest.mock("react-i18next", () => ({
-  useTranslation: () => ({ t: key => key })
-}));
-
 describe("<ContactsCard/>", () => {
   let patient: fhir.Patient, match;
 

@@ -7,10 +7,6 @@ import { mockPatient } from "../../../__mocks__/patient.mock";
 import { fetchPatientRelationships } from "./relationships.resource";
 const mockFetchPatientRelationships = fetchPatientRelationships as jest.Mock;
 
-jest.mock("react-i18next", () => ({
-  useTranslation: () => ({ t: key => key })
-}));
-
 jest.mock("./relationships.resource", () => ({
   fetchPatientRelationships: jest.fn().mockResolvedValue({
     data: []

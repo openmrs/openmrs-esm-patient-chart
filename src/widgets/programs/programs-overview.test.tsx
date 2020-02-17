@@ -8,10 +8,6 @@ import { mockProgramsResponse } from "../../../__mocks__/programs.mocks";
 import * as openmrsApi from "@openmrs/esm-api";
 import { of } from "rxjs/internal/observable/of";
 
-jest.mock("react-i18next", () => ({
-  useTranslation: () => ({ t: key => key })
-}));
-
 describe("<ProgramsOverview />", () => {
   let match, wrapper: any, patient: fhir.Patient, programs: any;
 

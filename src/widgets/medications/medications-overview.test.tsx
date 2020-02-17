@@ -7,10 +7,6 @@ import { of } from "rxjs/internal/observable/of";
 import * as openmrsApi from "@openmrs/esm-api";
 import { performPatientMedicationsSearch } from "./medications.resource";
 
-jest.mock("react-i18next", () => ({
-  useTranslation: () => ({ t: key => key })
-}));
-
 describe("<MedicationsOverview/>", () => {
   let patient: fhir.Patient, match;
 

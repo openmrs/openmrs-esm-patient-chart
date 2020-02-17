@@ -17,10 +17,6 @@ import dayjs from "dayjs";
 const mockUseCurrentPatient = useCurrentPatient as jest.Mock;
 const mockOpenmrsObservableFetch = openmrsObservableFetch as jest.Mock;
 
-jest.mock("react-i18next", () => ({
-  useTranslation: () => ({ t: key => key })
-}));
-
 jest.mock("@openmrs/esm-api", () => ({
   useCurrentPatient: jest.fn(),
   openmrsObservableFetch: jest.fn()

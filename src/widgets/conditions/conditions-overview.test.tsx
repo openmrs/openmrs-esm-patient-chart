@@ -12,10 +12,6 @@ import {
 const mockUseCurrentPatient = useCurrentPatient as jest.MockedFunction<any>;
 const mockPerformPatientConditionsSearch = performPatientConditionsSearch as jest.Mock;
 
-jest.mock("react-i18next", () => ({
-  useTranslation: () => ({ t: key => key })
-}));
-
 jest.mock("@openmrs/esm-api", () => ({
   useCurrentPatient: jest.fn()
 }));

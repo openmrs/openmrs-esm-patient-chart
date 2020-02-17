@@ -19,10 +19,6 @@ const mockFetchPatientEncounters = getEncounters as jest.Mock;
 const mockUseCurrentPatient = useCurrentPatient as jest.Mock;
 const mockGetEncounterObservableRESTAPI = getEncounterObservableRESTAPI as jest.Mock;
 
-jest.mock("react-i18next", () => ({
-  useTranslation: () => ({ t: key => key })
-}));
-
 jest.mock("./encounter.resource", () => ({
   getEncounters: jest.fn(),
   getEncounterObservableRESTAPI: jest.fn()

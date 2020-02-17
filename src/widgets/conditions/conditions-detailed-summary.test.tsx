@@ -12,10 +12,6 @@ import {
 const mockPerformPatientConditionSearch = getConditionByUuid as jest.Mock;
 const mockUseCurrentPatient = useCurrentPatient as jest.Mock;
 
-jest.mock("react-i18next", () => ({
-  useTranslation: () => ({ t: key => key })
-}));
-
 jest.mock("./conditions.resource", () => ({
   getConditionByUuid: jest.fn()
 }));

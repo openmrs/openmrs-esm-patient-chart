@@ -4,10 +4,6 @@ import { render, cleanup } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import { mockPatient } from "../../../__mocks__/patient.mock";
 
-jest.mock("react-i18next", () => ({
-  useTranslation: () => ({ t: key => key })
-}));
-
 describe("<DemographicsCard>", () => {
   let patient: fhir.Patient, match;
 
