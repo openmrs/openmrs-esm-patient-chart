@@ -7,6 +7,7 @@ import styles from "./allergy-card-level-two.css";
 import SummaryCard from "../cards/summary-card.component";
 import dayjs from "dayjs";
 import { useCurrentPatient } from "@openmrs/esm-api";
+import { AllergyForm } from "./allergy-form.component";
 
 export function AllergyOverviewLevelTwo(props: AllergyOverviewLevelTwoProps) {
   const [patientAllergy, setPatientAllergy] = React.useState(null);
@@ -35,7 +36,7 @@ export function AllergyOverviewLevelTwo(props: AllergyOverviewLevelTwoProps) {
         name="Allergies"
         match={props.match}
         styles={{ width: "100%" }}
-        addBtnUrl={`/patient/${patientUuid}/chart/allergies/form/`}
+        addComponent={AllergyForm}
       >
         <table className={styles.allergyTable}>
           <thead>

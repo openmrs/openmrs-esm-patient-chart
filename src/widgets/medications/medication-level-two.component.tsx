@@ -41,7 +41,7 @@ export default function MedicationLevelTwo(props: MedicationsOverviewProps) {
           name={t("Medications - current", "Medications - current")}
           match={props.match}
           styles={{ width: "90%" }}
-          addBtnUrl={``}
+          addComponent={MedicationOrderBasket}
         >
           <table className={styles.medicationsTable}>
             <thead>
@@ -165,7 +165,7 @@ export default function MedicationLevelTwo(props: MedicationsOverviewProps) {
           name={t("Medications - past", "Medications - past")}
           match={props.match}
           styles={{ width: "90%" }}
-          addBtnUrl={``}
+          addComponent={MedicationOrderBasket}
         >
           <table className={styles.medicationsTable}>
             <thead>

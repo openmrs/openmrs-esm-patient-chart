@@ -33,7 +33,7 @@ export default function ConditionsSummary(props: ConditionsSummaryProps) {
         name="Conditions"
         match={props.match}
         styles={{ width: "100%" }}
-        addBtnUrl={`/patient/${patientUuid}/chart/conditions/form/`}
+        addComponent={null}
       >
         <table className={`omrs-type-body-regular ${styles.conditionTable}`}>
           <thead>
@@ -117,7 +117,7 @@ export default function ConditionsSummary(props: ConditionsSummaryProps) {
           border: "none",
           boxShadow: "none"
         }}
-        addBtnUrl={`/patient/${patientUuid}/chart/conditions/form/`}
+        addComponent={null}
       >
         <div className={styles.conditionMargin}>
           <p className="omrs-medium">No Conditions are documented.</p>

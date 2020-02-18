@@ -172,6 +172,7 @@ export default function VitalsDetailedSummary(
           boxShadow: "none",
           border: "none"
         }}
+        addComponent={VitalsForm}
       >
         <div className={`${styles.vitalsAbsent} omrs-bold`}>
           <p>No Vitals are documented</p>
