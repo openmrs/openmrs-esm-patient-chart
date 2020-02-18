@@ -1,6 +1,6 @@
 .wrapper {
   display: flex;
-  padding: 0.5rem;
+  padding: 0.88rem;
   align-items: center;
   border-bottom: 1px solid var(--omrs-color-ink-lowest-contrast);
 }
