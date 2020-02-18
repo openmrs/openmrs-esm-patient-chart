@@ -36,7 +36,22 @@
 .medicationTable thead td:nth-child(1) {
   width: 25%;
 }
+.gridContainer {
+  display: grid;
+  justify-items: start;
+  grid-template-columns: auto auto auto;
+  grid-gap: 10px;
+  padding: 10px;
+}
 
-.medicationTop {
-  color: var(--omrs-color-ink-high-contrast);
+.gridContainer > div {
+  text-align: left;
+  padding: 20px 20px 20px 20px;
+}
+.medicationDisplay {
+  display: block;
+}
+
+.medicationTextColor {
+  text-decoration-color: "var(--omrs-color-ink-low-contrast)";
 }

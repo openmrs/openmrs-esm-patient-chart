@@ -72,94 +72,62 @@ export default function MedicationCardLevelThree(
             </span>
           </SummaryCardRowContent>
           <br />
-          <SummaryCardRowContent justifyContent="space-between">
-            <div
-              style={{
-                float: "left"
-              }}
-            >
+          <div className={styles.gridContainer}>
+            <div className="item1">
               <span style={{ color: "var(--omrs-color-ink-low-contrast)" }}>
-                {" "}
                 Start date
               </span>
               <br />
-              <span style={{ display: "block" }}>
-                {" "}
+              <span className={styles.medicationDisplay}>
                 {dayjs(patientMedication.dateActivated).format("DD-MMM-YYYY")}
               </span>
             </div>
-            <div
-              style={{
-                float: "right"
-              }}
-            >
+            <div className="item2">
               <span style={{ color: "var(--omrs-color-ink-low-contrast)" }}>
                 Substitutions permitted
               </span>
-              <span style={{ display: "block" }}>NO </span>
+              <span className={styles.medicationDisplay}>NO </span>
             </div>
-          </SummaryCardRowContent>
-          <SummaryCardRowContent justifyContent="space-between">
-            <div style={{ float: "left" }}>
+            <div className="item3"></div>
+            <div className="item4">
               <span style={{ color: "var(--omrs-color-ink-low-contrast)" }}>
-                {" "}
                 End date
               </span>
-              <span style={{ display: "block" }}>
-                {" "}
-                {dayjs(patientMedication.dateStopped).format(
-                  "DD-MMM-YYYY"
-                )}{" "}
+              <span className={styles.medicationDisplay}>
+                {dayjs(patientMedication.dateStopped).format("DD-MMM-YYYY")}
               </span>
             </div>
-            <div
-              style={{
-                float: "right"
-              }}
-            >
+            <div className="item5">
               <span style={{ color: "var(--omrs-color-ink-low-contrast)" }}>
                 Dosing Instructions
               </span>
-              <span style={{ display: "block" }}>
+              <span className={styles.medicationDisplay}>
                 {patientMedication.drug.strength}
                 {" \u2014 "}
-                {patientMedication.frequency.display}{" "}
+                {patientMedication.frequency.display}
               </span>
             </div>
-          </SummaryCardRowContent>
-          <SummaryCardRowContent justifyContent="space-between">
-            <div style={{ float: "left" }}>
+            <div className="item6"></div>
+            <div className="item7">
               <span style={{ color: "var(--omrs-color-ink-low-contrast)" }}>
-                {" "}
                 Duration
               </span>
-              <span
-                style={{
-                  display: "block"
-                }}
-              >
-                {" "}
+              <span className={styles.medicationDisplay}>
                 {patientMedication.duration}
-                {patientMedication.durationUnits.display}{" "}
+                {patientMedication.durationUnits.display}
               </span>
             </div>
-          </SummaryCardRowContent>
-          <SummaryCardRowContent justifyContent="space-between">
-            <div style={{ float: "left" }}>
+            <div className="item8"></div>
+            <div className="item10"></div>
+            <div className="item11">
               <span style={{ color: "var(--omrs-color-ink-low-contrast)" }}>
-                {" "}
                 Total number of refills
               </span>
-              <span
-                style={{
-                  display: "block"
-                }}
-              >
-                {" "}
-                {patientMedication.numRefills}{" "}
+              <span className={styles.medicationDisplay}>
+                {patientMedication.numRefills}
               </span>
             </div>
-          </SummaryCardRowContent>
+          </div>
         </SummaryCard>
       </>
     );
@@ -185,13 +153,11 @@ export default function MedicationCardLevelThree(
             </thead>
             <tbody>
               <tr>
-                <td data-testid="last-updated">
+                <td>
                   {dayjs(patientMedication.dateActivated).format("DD-MMM-YYYY")}
                 </td>
-                <td data-testid="updated-by">
-                  {patientMedication.orderer.person.display}
-                </td>
-                <td data-testid="update-location">{`Location Test`}</td>
+                <td>{patientMedication.orderer.person.display}</td>
+                <td>{`Location Test`}</td>
               </tr>
             </tbody>
           </table>
