@@ -22,14 +22,7 @@ export function getPatientProgramByUuid(
 }
 
 function mapToPatientProgram(data: any): PatientProgram {
-  return {
-    uuid: data.uuid,
-    program: data.program,
-    display: data.display,
-    dateEnrolled: data.dateEnrolled,
-    dateCompleted: data.dateCompleted,
-    links: data.links
-  };
+  return { ...data };
 }
 
 type PatientProgram = {
