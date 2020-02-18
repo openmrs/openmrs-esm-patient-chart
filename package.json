@@ -80,6 +80,7 @@
   },
   "dependencies": {
     "@openmrs/esm-api": "^1.2.1",
+    "@openmrs/esm-module-config": "^1.2.0",
     "@types/lodash-es": "^4.17.3",
     "@types/react-router": "^5.1.3",
     "i18next": "^19.0.1",
