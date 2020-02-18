@@ -14,7 +14,15 @@ function Root(props) {
       default: 0
     },
     widgets: {
-      default: ["summaries", "results"],
+      default: [
+        "summaries",
+        "results",
+        "orders",
+        "encounters",
+        "conditions",
+        "programs",
+        "allergies"
+      ],
       arrayElements: { validators: [validators.isString] }
     },
     widgetDefinitions: {
