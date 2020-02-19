@@ -4,7 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import { fetchPatientPrograms } from "./programs.resource";
 import ProgramsOverview from "./programs-overview.component";
 import { mockPatient } from "../../../__mocks__/patient.mock";
-import { mockProgramsResponse } from "../../../__mocks__/programs.mocks";
+import { mockProgramsResponse } from "../../../__mocks__/programs.mock";
 import * as openmrsApi from "@openmrs/esm-api";
 import { of } from "rxjs/internal/observable/of";
 

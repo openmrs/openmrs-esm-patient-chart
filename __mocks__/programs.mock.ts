@@ -1,3 +1,24 @@
+export const mockProgramResponse = {
+  uuid: "8ba6c08f-66d9-4a18-a233-5f658b1755bf",
+  patient: {
+    uuid: "90f7f0b4-06a8-4a97-9678-e7a977f4b518",
+    display: "10010W - John Taylor"
+  },
+  program: {
+    uuid: "64f950e6-1b07-4ac0-8e7e-f3e148f3463f",
+    name: "HIV Care and Treatment",
+    allWorkflows: []
+  },
+  display: "HIV Care and Treatment",
+  dateEnrolled: "2019-11-01T15:00:00.000+0000",
+  dateCompleted: null,
+  location: null,
+  voided: false,
+  outcome: null,
+  states: [],
+  resourceVersion: "1.8"
+};
+
 export const mockProgramsResponse = {
   headers: null,
   ok: true,
