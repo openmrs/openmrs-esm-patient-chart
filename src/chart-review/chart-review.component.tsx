@@ -26,7 +26,7 @@ export default function ChartReview(props: any) {
   ] ;
 */
 
-  const [selected, setSelected] = React.useState();
+  const [selected, setSelected] = React.useState(getInitialTab());
 
   React.useEffect(() => {
     const externalWidgets = {};
@@ -67,17 +67,19 @@ export default function ChartReview(props: any) {
       });
 
       setWidgets(w);
-
-      widget == undefined
-        ? setSelected(config.defaultTabIndex)
-        : setSelected(w.findIndex(element => element.path === "/" + widget));
     });
   }, [config, setWidgets]);
 
   function getInitialTab() {
-    return widget == undefined || widgets == undefined
-      ? config.defaultTabIndex
-      : widgets.findIndex(element => element.path === "/" + widget);
+    let i;
+    if (config == undefined || widgets.length === 0) {
+      i = 0;
+    } else if (widget == undefined) {
+      i = config.defaultTabIndex;
+    } else {
+      i = widgets.findIndex(element => element.path === "/" + widget);
+    }
+    return i;
   }
 
   const [tabHistory, setTabHistory] = React.useState({});
