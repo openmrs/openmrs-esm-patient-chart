@@ -16,15 +16,14 @@ export default function ProfileSection(props: ProfileSectionProps) {
         <div className={styles.demographicCard}>
           <DemographicsCard
             patient={props.patient}
-            match={props.match}
             cardStyles={demographicCardStyles}
           />
         </div>
         <div className={styles.otherProfileCards}>
-          <IdentifiersCard patient={props.patient} match={props.match} />
+          <IdentifiersCard patient={props.patient} />
           <div className={styles.contactsAndRelationshipsCard}>
-            <ContactsCard patient={props.patient} match={props.match} />
-            <RelationshipsCard patient={props.patient} match={props.match} />
+            <ContactsCard patient={props.patient} />
+            <RelationshipsCard patient={props.patient} />
           </div>
         </div>
       </div>

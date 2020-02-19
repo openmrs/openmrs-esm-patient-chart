@@ -4,7 +4,6 @@ import dayjs from "dayjs";
 import SummaryCard from "../cards/summary-card.component";
 import SummaryCardRow from "../cards/summary-card-row.component";
 import SummaryCardRowContent from "../cards/summary-card-row-content.component";
-import { match } from "react-router";
 import { performPatientConditionsSearch } from "./conditions.resource";
 import { createErrorHandler } from "@openmrs/esm-error-handling";
 import HorizontalLabelValue from "../cards/horizontal-label-value.component";
@@ -39,7 +38,6 @@ export default function ConditionsOverview(props: ConditionsOverviewProps) {
   return (
     <SummaryCard
       name={t("conditions", "Conditions")}
-      match={props.match}
       styles={{ margin: "1.25rem, 1.5rem" }}
     >
       <SummaryCardRow>
@@ -81,6 +79,4 @@ export default function ConditionsOverview(props: ConditionsOverviewProps) {
   );
 }
 
-type ConditionsOverviewProps = {
-  match: match;
-};
+type ConditionsOverviewProps = {};

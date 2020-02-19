@@ -24,7 +24,6 @@ jest.mock("@openmrs/esm-api", () => ({
 
 describe("<VitalsLevelTwo/>", () => {
   let patient: fhir.Patient;
-  let match: any;
 
   afterEach(() => {
     cleanup();
@@ -32,7 +31,6 @@ describe("<VitalsLevelTwo/>", () => {
 
   beforeEach(() => {
     patient = mockPatient;
-    match = { params: {}, isExact: false, path: "/", url: "/" };
   });
 
   it("renders without dying", () => {
@@ -40,7 +38,7 @@ describe("<VitalsLevelTwo/>", () => {
     mockOpenmrsObservableFetch.mockReturnValue(of(mockVitalsResponse));
     const wrapper = render(
       <BrowserRouter>
-        <VitalsDetailedSummary match={match} />
+        <VitalsDetailedSummary />
       </BrowserRouter>
     );
   });
@@ -86,7 +84,7 @@ describe("<VitalsLevelTwo/>", () => {
 
     const wrapper = render(
       <BrowserRouter>
-        <VitalsDetailedSummary match={match} />
+        <VitalsDetailedSummary />
       </BrowserRouter>
     );
     await wait(() => {
@@ -106,7 +104,7 @@ describe("<VitalsLevelTwo/>", () => {
       );
     const wrapper = render(
       <BrowserRouter>
-        <VitalsDetailedSummary match={match} />
+        <VitalsDetailedSummary />
       </BrowserRouter>
     );
     const nextButton = wrapper.getByText("Next");

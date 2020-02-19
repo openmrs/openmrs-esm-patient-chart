@@ -29,7 +29,6 @@ export default function VitalsOverview(props: VitalsOverviewProps) {
   return (
     <SummaryCard
       name="Vitals"
-      match={props.match}
       styles={{ width: "100%", maxWidth: "45rem" }}
       link={`/patient/${patientUuid}/chart/vitals`}
     >

@@ -19,7 +19,7 @@ export default function ContactsCard(props: ContactsCardProps) {
   }
 
   return (
-    <SummaryCard name="Contact & Address" match={props.match}>
+    <SummaryCard name="Contact & Address">
       {props.patient && props.patient.address ? (
         props.patient.address.map(address => (
           <SummaryCardRow key={address.id}>
@@ -57,6 +57,5 @@ export default function ContactsCard(props: ContactsCardProps) {
 }
 
 type ContactsCardProps = {
-  match: match;
   patient: fhir.Patient;
 };

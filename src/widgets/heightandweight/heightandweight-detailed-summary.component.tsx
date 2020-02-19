@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { match, useParams } from "react-router";
 import SummaryCard from "../cards/summary-card.component";
 import styles from "./heightandweight-detailed-summary.css";
 import dayjs from "dayjs";
@@ -34,11 +33,7 @@ export function HeightAndWeightDetailedSummary(
 
   function displayNoHeightAndWeight() {
     return (
-      <SummaryCard
-        name="Height & Weight"
-        match={props.match}
-        styles={{ width: "100%" }}
-      >
+      <SummaryCard name="Height & Weight" styles={{ width: "100%" }}>
         <div className={styles.heightAndWeightDetailedSummary}>
           <p className="omrs-bold">
             The patient's Height and Weight is not documented.
@@ -56,7 +51,6 @@ export function HeightAndWeightDetailedSummary(
       <div className={styles.heightAndWeightDetailedSummary}>
         <SummaryCard
           name="Height & Weight"
-          match={props.match}
           editBtnUrl={`/patient/dimensions`}
           styles={{ width: "100%" }}
         >
@@ -112,7 +106,6 @@ export function HeightAndWeightDetailedSummary(
 
         <SummaryCard
           name="Details"
-          match={props.match}
           styles={{
             width: "100%",
             backgroundColor: "var(--omrs-color-bg-medium-contrast)"
@@ -147,6 +140,5 @@ export function HeightAndWeightDetailedSummary(
 }
 
 type HeightAndWeightDetailedSummaryProps = {
-  match: match;
   uuid: any;
 };

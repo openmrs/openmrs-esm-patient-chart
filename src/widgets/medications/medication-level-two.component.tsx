@@ -39,9 +39,8 @@ export default function MedicationLevelTwo(props: MedicationsOverviewProps) {
       <React.Fragment>
         <SummaryCard
           name={t("Medications - current", "Medications - current")}
-          match={props.match}
           styles={{ width: "90%" }}
-          addBtnUrl={``}
+          addComponent={MedicationOrderBasket}
         >
           <table className={styles.medicationsTable}>
             <thead>
@@ -163,9 +162,8 @@ export default function MedicationLevelTwo(props: MedicationsOverviewProps) {
       <React.Fragment>
         <SummaryCard
           name={t("Medications - past", "Medications - past")}
-          match={props.match}
           styles={{ width: "90%" }}
-          addBtnUrl={``}
+          addComponent={MedicationOrderBasket}
         >
           <table className={styles.medicationsTable}>
             <thead>
@@ -261,11 +259,7 @@ export default function MedicationLevelTwo(props: MedicationsOverviewProps) {
   }
   function displayNoMedicationHistory() {
     return (
-      <SummaryCard
-        name="Medication"
-        match={props.match}
-        styles={{ width: "90%" }}
-      >
+      <SummaryCard name="Medication" styles={{ width: "90%" }}>
         <div className={styles.medicationMargin}>
           <p className="omrs-bold">
             The patient's medication history is not documented.

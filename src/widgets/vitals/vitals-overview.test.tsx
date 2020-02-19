@@ -17,7 +17,6 @@ describe("<VitalsOverview/>", () => {
 
   beforeEach(() => {
     patient = mockPatient;
-    match = { params: {}, isExact: false, path: "/", url: "/" };
   });
 
   it("renders without dying", () => {

@@ -1,5 +1,5 @@
 import React from "react";
-import { match, useRouteMatch } from "react-router";
+import { useRouteMatch } from "react-router-dom";
 import { createErrorHandler } from "@openmrs/esm-error-handling";
 import { getPatientAllergyByPatientUuid } from "./allergy-intolerance.resource";
 import { useCurrentPatient } from "@openmrs/esm-api";
@@ -35,7 +35,6 @@ export function AllergyCardLevelThree(props: AllergyCardLevelThreeProps) {
     return (
       <SummaryCard
         name="Allergy"
-        match={match}
         styles={{ width: "100%" }}
         editBtnUrl={`/patient/${patientUuid}/chart/allergies/form/${match.params["allergyUuid"]}`}
       >
@@ -117,7 +116,6 @@ export function AllergyCardLevelThree(props: AllergyCardLevelThreeProps) {
     return (
       <SummaryCard
         name="Details"
-        match={match}
         styles={{
           width: "100%",
           background: "var(--omrs-color-bg-medium-contrast)"
@@ -163,6 +161,4 @@ export function AllergyCardLevelThree(props: AllergyCardLevelThreeProps) {
   );
 }
 
-type AllergyCardLevelThreeProps = {
-  match: match;
-};
+type AllergyCardLevelThreeProps = {};

@@ -35,7 +35,6 @@ export default function Programs(props: ProgramsOverviewProps) {
   return (
     <SummaryCard
       name={t("care programs", "Care Programs")}
-      match={props.match}
       link={`/patient/${patientUuid}/chart/programs`}
       styles={{ margin: "1.25rem, 1.5rem" }}
     >

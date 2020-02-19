@@ -181,7 +181,7 @@ describe("<AllergyOverview/>", () => {
     );
     wrapper = render(
       <BrowserRouter>
-        <AllergyOverview match={match} />
+        <AllergyOverview />
       </BrowserRouter>
     );
 
@@ -197,7 +197,7 @@ describe("<AllergyOverview/>", () => {
     );
     wrapper = render(
       <BrowserRouter>
-        <AllergyOverview match={match} />
+        <AllergyOverview />
       </BrowserRouter>
     );
     await wait(() => {

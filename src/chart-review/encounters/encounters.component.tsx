@@ -27,7 +27,7 @@ export default function Encounters(props: any) {
       {
         name: "Notes",
         component: () => {
-          return <NotesOverview match={match} />;
+          return <NotesOverview />;
         }
       }
     ]
