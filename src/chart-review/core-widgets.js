@@ -9,50 +9,57 @@ import Programs from "./programs/programs.component";
 
 export const coreWidgets = {
   summaries: {
-    name: "Summaries",
-    path: `summaries`,
+    name: "summaries",
+    label: "Summaries",
+    path: `/summaries`,
     component: () => {
       return <Summaries />;
     }
   },
   results: {
-    name: "Results",
-    path: `results`,
+    name: "results",
+    label: "Results",
+    path: `/results`,
     component: () => {
       return <Results />;
     }
   },
   orders: {
-    name: "Orders",
-    path: `orders`,
+    name: "orders",
+    label: "Orders",
+    path: `/orders`,
     component: () => {
       return <Orders />;
     }
   },
   encounters: {
-    name: "Encounters",
-    path: `encounters`,
+    name: "encounters",
+    label: "Encounters",
+    path: `/encounters`,
     component: () => {
       return <Encounters />;
     }
   },
   conditions: {
-    name: "Conditions",
-    path: `conditions`,
+    name: "conditions",
+    label: "Conditions",
+    path: `/conditions`,
     component: () => {
       return <Conditions />;
     }
   },
   allergies: {
-    name: "Allergies",
-    path: `allergies`,
+    name: "allergies",
+    label: "Allergies",
+    path: `/allergies`,
     component: () => {
       return <Allergies />;
     }
   },
   programs: {
-    name: "Programs",
-    path: `programs`,
+    name: "programs",
+    label: "Programs",
+    path: `/programs`,
     component: () => {
       return <Programs />;
     }

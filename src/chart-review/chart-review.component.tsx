@@ -10,70 +10,72 @@ export default function ChartReview(props: any) {
 
   const { patientUuid } = useParams();
   const { widget } = useParams();
-  const config = useConfig();  
+  const config = useConfig();
 
-  const defaultPath = `/patient/${patientUuid}/chart/`;
+  const defaultPath = `/patient/${patientUuid}/chart`;
   const [widgets, setWidgets] = React.useState();
 
   const promises = [];
   const moduleMap = {};
-  const externalWidgets = {};
 
-  const testDef = 
-  {
-    name: "Hello",
-    esModule: "@jj-widgets",
-    path: "hello"
-  };
-
-
-  config.widgetDefinitions.push(testDef);
-
-  config.widgetDefinitions.map((def) => {
-    externalWidgets[def.path] = def;
-    if(moduleMap[def.esModule]) {
-      console.log("doing nothing");
+  /*
+  const widgetDefinitions = [
+    {
+      name: "widget",
+      label: "Hello", //will be displayed on the nav bar
+      esModule: "@jj-widgets", //this module must be in the import map
+      path: "/widget" //this will be the path to the widget and will be appended to /patient/:patientUuid/chart
     }
-    else {
-      promises.push(System.import(def.esModule))        
-    }
-  });
+  ] ;
+*/
 
-  Promise.all(promises).then(modules => {
-      modules.map((m,i) => {
-        moduleMap[m.name] = m;        
-      });
+  React.useEffect(() => {
+    const externalWidgets = {};
 
+    config.widgetDefinitions.map(def => {
+      externalWidgets[def.name] = def;
+
+      //only import modules once
+      if (moduleMap[def.esModule] === undefined) {
+        let p = System.import(def.esModule);
+        promises.push(p);
+        moduleMap[def.esModule] = p;
+      }
+    });
+
+    Promise.all(promises).then(modules => {
       const w = [];
+      //config.widgets is an array of widget names
       config.widgets.map(widgetName => {
-        if(coreWidgets[widgetName]) { 
-          w.push(coreWidgets[widgetName]) 
-        }
-        else {
+        //First see if name exists in coreWidgets
+        if (coreWidgets[widgetName]) {
+          w.push(coreWidgets[widgetName]);
+        } else {
           const def = externalWidgets[widgetName];
-          const m = moduleMap[externalWidgets[widgetName].esModule];
-          let Component = m[def.name];
-          externalWidgets[widgetName].component = () => {
-            return <Component/>
-          }
-          w.push(externalWidgets[widgetName])
+
+          moduleMap[externalWidgets[widgetName].esModule].then(m => {
+            let Component = m.widgets[def.name];
+            externalWidgets[widgetName].component = () => {
+              return <Component />;
+            };
+          });
+
+          w.push(externalWidgets[widgetName]);
         }
       });
-
       setWidgets(w);
-  })
-
+    });
+  }, [config]);
 
   const [selected, setSelected] = React.useState(getInitialTab());
 
   function getInitialTab() {
-    return widget == undefined
+    return widget == undefined || widgets == undefined
       ? config.defaultTabIndex
-      : widgets.findIndex(element => element.path === widget);
+      : widgets.findIndex(element => element.path === "/" + widget);
   }
 
   const [tabHistory, setTabHistory] = React.useState({});
-
 
   React.useEffect(() => {
     setTabHistory(t => {
@@ -86,28 +88,31 @@ export default function ChartReview(props: any) {
     <>
       <nav className={styles.topnav} style={{ marginTop: "0" }}>
         <ul>
-          {widgets && widgets.map((item, index) => {
-            return (
-              <li key={index}>
-                <div
-                  className={`${
-                    index === selected ? styles.selected : styles.unselected
-                  }`}
-                >
-                  <Link
-                    to={defaultPath + item.path + (tabHistory[item.path] || "")}
+          {widgets &&
+            widgets.map((item, index) => {
+              return (
+                <li key={index}>
+                  <div
+                    className={`${
+                      index === selected ? styles.selected : styles.unselected
+                    }`}
                   >
-                    <button
-                      className="omrs-unstyled"
-                      onClick={() => setSelected(index)}
+                    <Link
+                      to={
+                        defaultPath + item.path + (tabHistory[item.path] || "")
+                      }
                     >
-                      {item.name}
-                    </button>
-                  </Link>
-                </div>
-              </li>
-            );
-          })}
+                      <button
+                        className="omrs-unstyled"
+                        onClick={() => setSelected(index)}
+                      >
+                        {item.label}
+                      </button>
+                    </Link>
+                  </div>
+                </li>
+              );
+            })}
         </ul>
       </nav>
       {widgets && widgets[selected].component()}

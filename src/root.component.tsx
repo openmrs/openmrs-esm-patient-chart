@@ -28,7 +28,9 @@ function Root(props) {
     widgetDefinitions: {
       arrayElements: {
         name: { validators: [validators.isString] },
-        esModule: { validators: [validators.isString] }
+        esModule: { validators: [validators.isString] },
+        label: { validators: [validators.isString] },
+        path: { validators: [validators.isString] }
       },
       default: []
     }
