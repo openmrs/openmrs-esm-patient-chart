@@ -13,7 +13,7 @@ export default function ChartReview(props: any) {
   const config = useConfig();
 
   const defaultPath = `/patient/${patientUuid}/chart`;
-  const [widgets, setWidgets] = React.useState();
+  const [widgets, setWidgets] = React.useState([]);
 
   /*
   const widgetDefinitions = [
@@ -25,6 +25,8 @@ export default function ChartReview(props: any) {
     }
   ] ;
 */
+
+  const [selected, setSelected] = React.useState();
 
   React.useEffect(() => {
     const externalWidgets = {};
@@ -44,6 +46,11 @@ export default function ChartReview(props: any) {
 
     Promise.all(promises).then(modules => {
       const w = [];
+
+      modules.map(mod => {
+        moduleMap[mod.name] = mod;
+      });
+
       //config.widgets is an array of widget names
       config.widgets.map(widgetName => {
         //First see if name exists in coreWidgets
@@ -52,21 +59,20 @@ export default function ChartReview(props: any) {
         } else {
           const def = externalWidgets[widgetName];
 
-          moduleMap[externalWidgets[widgetName].esModule].then(m => {
-            let Component = m.widgets[def.name];
-            externalWidgets[widgetName].component = () => {
-              return <Component />;
-            };
-          });
+          let Component = moduleMap[def.esModule].widgets[def.name];
+          externalWidgets[widgetName].component = () => <Component />;
 
           w.push(externalWidgets[widgetName]);
         }
       });
+
       setWidgets(w);
+
+      widget == undefined
+        ? setSelected(config.defaultTabIndex)
+        : setSelected(w.findIndex(element => element.path === "/" + widget));
     });
   }, [config, setWidgets]);
-
-  const [selected, setSelected] = React.useState(getInitialTab());
 
   function getInitialTab() {
     return widget == undefined || widgets == undefined
@@ -114,7 +120,9 @@ export default function ChartReview(props: any) {
             })}
         </ul>
       </nav>
-      {widgets && widgets[selected].component()}
+      {widgets.length > 0 &&
+        selected !== undefined &&
+        widgets[selected].component()}
     </>
   );
 }
