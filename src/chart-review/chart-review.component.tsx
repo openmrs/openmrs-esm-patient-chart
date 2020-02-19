@@ -1,13 +1,7 @@
 import React from "react";
 import { Link, useParams, useRouteMatch, useLocation } from "react-router-dom";
 import styles from "./chart-review.css";
-import Summaries from "./summaries/summaries.component";
-import Results from "./results/results.component";
-import Orders from "./orders/orders.component";
-import Encounters from "./encounters/encounters.component";
-import Allergies from "./allergies/allergies.component";
-import Conditions from "./conditions/conditions.component";
-import Programs from "./programs/programs.component";
+import { coreWidgets } from "./core-widgets.js";
 import { useConfig } from "@openmrs/esm-module-config";
 
 export default function ChartReview(props: any) {
@@ -16,71 +10,59 @@ export default function ChartReview(props: any) {
 
   const { patientUuid } = useParams();
   const { widget } = useParams();
-  const config = useConfig();
+  const config = useConfig();  
 
   const defaultPath = `/patient/${patientUuid}/chart/`;
+  const [widgets, setWidgets] = React.useState();
 
-  function getConfigWidgets() {
-    const w = [];
-    config.widgets.map(widgetName => {
-      w.push(coreWidgets[widgetName]);
-    });
-    return w;
-  }
+  const promises = [];
+  const moduleMap = {};
+  const externalWidgets = {};
 
-  const coreWidgets = {
-    summaries: {
-      name: "Summaries",
-      path: `summaries`,
-      component: () => {
-        return <Summaries />;
-      }
-    },
-    results: {
-      name: "Results",
-      path: `results`,
-      component: () => {
-        return <Results />;
-      }
-    },
-    orders: {
-      name: "Orders",
-      path: `orders`,
-      component: () => {
-        return <Orders />;
-      }
-    },
-    encounters: {
-      name: "Encounters",
-      path: `encounters`,
-      component: () => {
-        return <Encounters />;
-      }
-    },
-    conditions: {
-      name: "Conditions",
-      path: `conditions`,
-      component: () => {
-        return <Conditions />;
-      }
-    },
-    allergies: {
-      name: "Allergies",
-      path: `allergies`,
-      component: () => {
-        return <Allergies />;
-      }
-    },
-    programs: {
-      name: "Programs",
-      path: `programs`,
-      component: () => {
-        return <Programs />;
-      }
-    }
+  const testDef = 
+  {
+    name: "Hello",
+    esModule: "@jj-widgets",
+    path: "hello"
   };
 
-  const [widgets, setWidgets] = React.useState(getConfigWidgets());
+
+  config.widgetDefinitions.push(testDef);
+
+  config.widgetDefinitions.map((def) => {
+    externalWidgets[def.path] = def;
+    if(moduleMap[def.esModule]) {
+      console.log("doing nothing");
+    }
+    else {
+      promises.push(System.import(def.esModule))        
+    }
+  });
+
+  Promise.all(promises).then(modules => {
+      modules.map((m,i) => {
+        moduleMap[m.name] = m;        
+      });
+
+      const w = [];
+      config.widgets.map(widgetName => {
+        if(coreWidgets[widgetName]) { 
+          w.push(coreWidgets[widgetName]) 
+        }
+        else {
+          const def = externalWidgets[widgetName];
+          const m = moduleMap[externalWidgets[widgetName].esModule];
+          let Component = m[def.name];
+          externalWidgets[widgetName].component = () => {
+            return <Component/>
+          }
+          w.push(externalWidgets[widgetName])
+        }
+      });
+
+      setWidgets(w);
+  })
+
 
   const [selected, setSelected] = React.useState(getInitialTab());
 
@@ -91,6 +73,7 @@ export default function ChartReview(props: any) {
   }
 
   const [tabHistory, setTabHistory] = React.useState({});
+
 
   React.useEffect(() => {
     setTabHistory(t => {
@@ -103,7 +86,7 @@ export default function ChartReview(props: any) {
     <>
       <nav className={styles.topnav} style={{ marginTop: "0" }}>
         <ul>
-          {widgets.map((item, index) => {
+          {widgets && widgets.map((item, index) => {
             return (
               <li key={index}>
                 <div
@@ -127,7 +110,7 @@ export default function ChartReview(props: any) {
           })}
         </ul>
       </nav>
-      {widgets[selected].component()}
+      {widgets && widgets[selected].component()}
     </>
   );
 }
