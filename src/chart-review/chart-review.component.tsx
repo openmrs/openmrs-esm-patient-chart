@@ -15,9 +15,6 @@ export default function ChartReview(props: any) {
   const defaultPath = `/patient/${patientUuid}/chart`;
   const [widgets, setWidgets] = React.useState();
 
-  const promises = [];
-  const moduleMap = {};
-
   /*
   const widgetDefinitions = [
     {
@@ -31,6 +28,8 @@ export default function ChartReview(props: any) {
 
   React.useEffect(() => {
     const externalWidgets = {};
+    const promises = [];
+    const moduleMap = {};
 
     config.widgetDefinitions.map(def => {
       externalWidgets[def.name] = def;
@@ -65,7 +64,7 @@ export default function ChartReview(props: any) {
       });
       setWidgets(w);
     });
-  }, [config]);
+  }, [config, setWidgets]);
 
   const [selected, setSelected] = React.useState(getInitialTab());
 
