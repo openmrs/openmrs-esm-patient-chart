@@ -6,8 +6,34 @@ import Sidebar from "./sidebar/sidebar.component";
 import WorkspaceWrapper from "./workspace/workspace-wrapper.component";
 import ChartReview from "./chart-review/chart-review.component";
 import styles from "./root.css";
+import { defineConfigSchema, validators } from "@openmrs/esm-module-config";
 
 function Root(props) {
+  defineConfigSchema("@openmrs/esm-patient-chart", {
+    defaultTabIndex: {
+      default: 0
+    },
+    widgets: {
+      default: [
+        "summaries",
+        "results",
+        "orders",
+        "encounters",
+        "conditions",
+        "programs",
+        "allergies"
+      ],
+      arrayElements: { validators: [validators.isString] }
+    },
+    widgetDefinitions: {
+      arrayElements: {
+        name: { validators: [validators.isString] },
+        esModule: { validators: [validators.isString] }
+      },
+      default: []
+    }
+  });
+
   return (
     <BrowserRouter basename={window["getOpenmrsSpaBase"]()}>
       <main

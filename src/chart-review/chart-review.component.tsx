@@ -8,6 +8,7 @@ import Encounters from "./encounters/encounters.component";
 import Allergies from "./allergies/allergies.component";
 import Conditions from "./conditions/conditions.component";
 import Programs from "./programs/programs.component";
+import { useConfig } from "@openmrs/esm-module-config";
 
 export default function ChartReview(props: any) {
   const match = useRouteMatch();
@@ -15,69 +16,75 @@ export default function ChartReview(props: any) {
 
   const { patientUuid } = useParams();
   const { widget } = useParams();
+  const config = useConfig();
 
-  const config = {
-    defaultPath: `/patient/${patientUuid}/chart/`,
-    defaultTabIndex: 0,
-    widgets: [
-      {
-        name: "Summaries",
-        path: `summaries`,
-        component: () => {
-          return <Summaries />;
-        }
-      },
-      {
-        name: "Results",
-        path: `results`,
-        component: () => {
-          return <Results />;
-        }
-      },
-      {
-        name: "Orders",
-        path: `orders`,
-        component: () => {
-          return <Orders />;
-        }
-      },
-      {
-        name: "Encounters",
-        path: `encounters`,
-        component: () => {
-          return <Encounters />;
-        }
-      },
-      {
-        name: "Conditions",
-        path: `conditions`,
-        component: () => {
-          return <Conditions />;
-        }
-      },
-      {
-        name: "Allergies",
-        path: `allergies`,
-        component: () => {
-          return <Allergies />;
-        }
-      },
-      {
-        name: "Programs",
-        path: `programs`,
-        component: () => {
-          return <Programs />;
-        }
+  const defaultPath = `/patient/${patientUuid}/chart/`;
+
+  function getConfigWidgets() {
+    const w = [];
+    return config.widgets.map(widgetName => coreWidgets[widgetName]);
+  }
+
+  const coreWidgets = {
+    summaries: {
+      name: "Summaries",
+      path: `summaries`,
+      component: () => {
+        return <Summaries />;
       }
-    ]
+    },
+    results: {
+      name: "Results",
+      path: `results`,
+      component: () => {
+        return <Results />;
+      }
+    },
+    orders: {
+      name: "Orders",
+      path: `orders`,
+      component: () => {
+        return <Orders />;
+      }
+    },
+    encounters: {
+      name: "Encounters",
+      path: `encounters`,
+      component: () => {
+        return <Encounters />;
+      }
+    },
+    conditions: {
+      name: "Conditions",
+      path: `conditions`,
+      component: () => {
+        return <Conditions />;
+      }
+    },
+    allergies: {
+      name: "Allergies",
+      path: `allergies`,
+      component: () => {
+        return <Allergies />;
+      }
+    },
+    programs: {
+      name: "Programs",
+      path: `programs`,
+      component: () => {
+        return <Programs />;
+      }
+    }
   };
+
+  const [widgets, setWidgets] = React.useState(getConfigWidgets());
 
   const [selected, setSelected] = React.useState(getInitialTab());
 
   function getInitialTab() {
     return widget == undefined
       ? config.defaultTabIndex
-      : config.widgets.findIndex(element => element.path === widget);
+      : widgets.findIndex(element => element.path === widget);
   }
 
   const [tabHistory, setTabHistory] = React.useState({});
@@ -93,7 +100,7 @@ export default function ChartReview(props: any) {
     <>
       <nav className={styles.topnav} style={{ marginTop: "0" }}>
         <ul>
-          {config.widgets.map((item, index) => {
+          {widgets.map((item, index) => {
             return (
               <li key={index}>
                 <div
@@ -102,11 +109,7 @@ export default function ChartReview(props: any) {
                   }`}
                 >
                   <Link
-                    to={
-                      config.defaultPath +
-                      item.path +
-                      (tabHistory[item.path] || "")
-                    }
+                    to={defaultPath + item.path + (tabHistory[item.path] || "")}
                   >
                     <button
                       className="omrs-unstyled"
@@ -121,7 +124,7 @@ export default function ChartReview(props: any) {
           })}
         </ul>
       </nav>
-      {config.widgets[selected].component()}
+      {widgets[selected].component()}
     </>
   );
 }
