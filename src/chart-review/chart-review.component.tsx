@@ -22,10 +22,7 @@ export default function ChartReview(props: any) {
 
   function getConfigWidgets() {
     const w = [];
-    config.widgets.map(widgetName => {
-      w.push(coreWidgets[widgetName]);
-    });
-    return w;
+    return config.widgets.map(widgetName => coreWidgets[widgetName]);
   }
 
   const coreWidgets = {
