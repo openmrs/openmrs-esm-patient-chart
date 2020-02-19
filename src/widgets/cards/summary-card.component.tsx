@@ -1,7 +1,7 @@
 import React, { ReactChildren } from "react";
 import styles from "./summary-card.css";
-import { match, Link } from "react-router-dom";
-
+import { Link } from "react-router-dom";
+import { newWorkspaceItem } from "../../workspace/workspace.resource";
 import { Trans, useTranslation } from "react-i18next";
 
 export default function SummaryCard(props: SummaryCardProps) {
@@ -18,12 +18,13 @@ export default function SummaryCard(props: SummaryCardProps) {
             <>{contents()}</>
           )}
         </div>
-        {props.addBtnUrl && (
+        {props.addComponent && (
           <div className={styles.headerAdd}>
-            <button className={`omrs-unstyled ${styles.addBtn}`}>
-              <Link className="omrs-unstyled" to={props.addBtnUrl}>
-                Add
-              </Link>
+            <button
+              className={`omrs-unstyled ${styles.addBtn}`}
+              onClick={() => showComponent(props.addComponent, props.name)}
+            >
+              Add
             </button>
           </div>
         )}
@@ -53,13 +54,21 @@ export default function SummaryCard(props: SummaryCardProps) {
   }
 }
 
+function showComponent(component, name): void {
+  newWorkspaceItem({
+    component: component,
+    name: name,
+    props: { match: { params: {} } },
+    inProgress: false
+  });
+}
+
 type SummaryCardProps = {
   name: string;
-  match: match;
   children: React.ReactNode;
   styles?: React.CSSProperties;
   link?: string;
-  addBtnUrl?: string;
+  addComponent?: string | any;
   editBtnUrl?: string;
 };
 

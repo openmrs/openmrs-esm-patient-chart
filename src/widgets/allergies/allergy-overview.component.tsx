@@ -1,5 +1,4 @@
 import React from "react";
-import { match } from "react-router";
 import SummaryCard from "../cards/summary-card.component";
 import SummaryCardRow from "../cards/summary-card-row.component";
 import { performPatientAllergySearch } from "./allergy-intolerance.resource";
@@ -32,7 +31,6 @@ export default function AllergyOverview(props: AllergyOverviewProps) {
   return (
     <SummaryCard
       name="Allergies"
-      match={props.match}
       styles={{ margin: "1.25rem, 1.5rem" }}
       link={`/patient/${patientUuid}/chart/allergies`}
     >
@@ -65,6 +63,4 @@ export default function AllergyOverview(props: AllergyOverviewProps) {
   );
 }
 
-type AllergyOverviewProps = {
-  match: match;
-};
+type AllergyOverviewProps = {};

@@ -21,7 +21,6 @@ jest.mock("@openmrs/esm-api", () => ({
 }));
 
 describe("<ConditionsDetailedSummary />", () => {
-  let match: match = { params: {}, isExact: false, path: "/", url: "/" };
   let wrapper: any;
 
   afterEach(cleanup);
@@ -35,7 +34,7 @@ describe("<ConditionsDetailedSummary />", () => {
     );
     wrapper = render(
       <BrowserRouter>
-        <ConditionsDetailedSummary match={match} />
+        <ConditionsDetailedSummary />
       </BrowserRouter>
     );
 
@@ -51,7 +50,7 @@ describe("<ConditionsDetailedSummary />", () => {
     );
     wrapper = render(
       <BrowserRouter>
-        <ConditionsDetailedSummary match={match} />
+        <ConditionsDetailedSummary />
       </BrowserRouter>
     );
 

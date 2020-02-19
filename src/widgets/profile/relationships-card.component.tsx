@@ -20,7 +20,7 @@ export default function RelationshipsCard(props: RelationshipsCardProps) {
   }, [props.patient.identifier]);
 
   return (
-    <SummaryCard name="Relationships" match={props.match}>
+    <SummaryCard name="Relationships">
       {relationships && relationships.length ? (
         relationships.map((relation: fhir.RelatedPerson) => (
           <SummaryCardRow key={relation.id}>
@@ -49,6 +49,5 @@ function getRelativeName(name) {
   return `${name[0].given.join(" ")} ${name[0].family}`;
 }
 type RelationshipsCardProps = {
-  match: match;
   patient: fhir.Patient;
 };

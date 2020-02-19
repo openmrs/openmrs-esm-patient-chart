@@ -1,7 +1,7 @@
 import React from "react";
 import { useParams, useLocation, Link, useRouteMatch } from "react-router-dom";
 import ChartWidget from "../../ui-components/chart-widget/chart-widget.component";
-import ProgramsLevelTwo from "../../widgets/programs/programs-level-two.component";
+import ProgramsSummary from "../../widgets/programs/programs-summary.component";
 import ConditionsDetailedSummary from "../../widgets/conditions/conditions-detailed-summary.component";
 import { AllergyOverviewLevelTwo } from "../../widgets/allergies/allergy-card-level-two.component";
 import styles from "../../ui-components/chart-widget/chart-widget.css";
@@ -27,7 +27,7 @@ export default function Encounters(props: any) {
       {
         name: "Notes",
         component: () => {
-          return <NotesOverview match={match} />;
+          return <NotesOverview />;
         }
       }
     ]

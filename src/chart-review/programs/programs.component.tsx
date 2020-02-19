@@ -1,7 +1,7 @@
 import React from "react";
 import { useRouteMatch } from "react-router-dom";
 import ChartWidget from "../../ui-components/chart-widget/chart-widget.component";
-import ProgramsLevelTwo from "../../widgets/programs/programs-level-two.component";
+import ProgramsSummary from "../../widgets/programs/programs-summary.component";
 
 export default function Programs(props: any) {
   const match = useRouteMatch();
@@ -19,7 +19,7 @@ export default function Programs(props: any) {
       {
         name: "Programs",
         component: () => {
-          return <ProgramsLevelTwo match={match} />;
+          return <ProgramsSummary />;
         }
       }
     ]

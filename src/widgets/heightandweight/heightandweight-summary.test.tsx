@@ -18,14 +18,13 @@ jest.mock("@openmrs/esm-api", () => ({
 }));
 
 describe("<HeightAndWeightSummary/>", () => {
-  let patient: fhir.Patient, match;
+  let patient: fhir.Patient;
 
   afterEach(cleanup);
   beforeEach(mockUseCurrentPatient.mockReset);
 
   beforeEach(() => {
     patient = mockPatient;
-    match = { params: {}, isExact: false, path: "/", url: "/" };
   });
 
   it("renders successfully", () => {
@@ -35,7 +34,7 @@ describe("<HeightAndWeightSummary/>", () => {
     );
     render(
       <BrowserRouter>
-        <HeightAndWeightSummary match={match}></HeightAndWeightSummary>
+        <HeightAndWeightSummary />
       </BrowserRouter>
     );
   });
@@ -47,7 +46,7 @@ describe("<HeightAndWeightSummary/>", () => {
     );
     const wrapper = render(
       <BrowserRouter>
-        <HeightAndWeightSummary match={match}></HeightAndWeightSummary>
+        <HeightAndWeightSummary />
       </BrowserRouter>
     );
     await wait(() => {

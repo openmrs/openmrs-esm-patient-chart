@@ -34,7 +34,6 @@ export default function ProgramsLevelTwo(props: ProgramsOverviewProps) {
     <div className={styles.programsLevelTwo}>
       <SummaryCard
         name="Care Programs"
-        match={props.match}
         styles={{
           flex: 1,
           padding: ".5rem",

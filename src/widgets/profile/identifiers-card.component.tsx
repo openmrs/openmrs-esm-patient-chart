@@ -2,8 +2,6 @@ import React from "react";
 import SummaryCard from "../cards/summary-card.component";
 import SummaryCardRow from "../cards/summary-card-row.component";
 import SummaryCardRowContent from "../cards/summary-card-row-content.component";
-import HorizontalLabelValue from "../cards/horizontal-label-value.component";
-import { match } from "react-router";
 import VerticalLabelValue from "../cards/vertical-label-value.component";
 
 export default function IdentifiersCard(props: IdentifiersCardProps) {
@@ -13,7 +11,7 @@ export default function IdentifiersCard(props: IdentifiersCardProps) {
   };
 
   return (
-    <SummaryCard name="Identifiers" match={props.match}>
+    <SummaryCard name="Identifiers">
       {props.patient &&
         props.patient.identifier.sort(preferredIdFirst).map(id => (
           <SummaryCardRow key={id.system}>
@@ -54,5 +52,4 @@ export default function IdentifiersCard(props: IdentifiersCardProps) {
 
 type IdentifiersCardProps = {
   patient: fhir.Patient;
-  match: match;
 };

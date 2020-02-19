@@ -1,5 +1,5 @@
 import React from "react";
-import { match } from "react-router";
+import { useRouteMatch } from "react-router";
 import { getConditionByUuid } from "./conditions.resource";
 import { createErrorHandler } from "@openmrs/esm-error-handling";
 import dayjs from "dayjs";
@@ -13,24 +13,25 @@ export default function ConditionsDetailedSummary(
   const [patientCondition, setPatientCondition] = React.useState(null);
   const [isLoadingPatient, patient, patientUuid] = useCurrentPatient();
 
+  const match = useRouteMatch();
+
   React.useEffect(() => {
     if (!isLoadingPatient && patient) {
       const abortController = new AbortController();
 
-      getConditionByUuid(props.match.params["conditionUuid"], abortController)
+      getConditionByUuid(match.params["conditionUuid"], abortController)
         .then(condition => setPatientCondition(condition))
         .catch(createErrorHandler());
 
       return () => abortController.abort();
     }
-  }, [isLoadingPatient, patient, props.match.params]);
+  }, [isLoadingPatient, patient, match.params]);
 
   function displayCondition() {
     return (
       <>
         <SummaryCard
           name="Condition"
-          match={props.match}
           styles={{ width: "100%" }}
           editBtnUrl={`/patient/${patientUuid}/chart/conditions/edit`}
         >
@@ -70,7 +71,6 @@ export default function ConditionsDetailedSummary(
     return (
       <SummaryCard
         name="Details"
-        match={props.match}
         styles={{
           width: "100%",
           backgroundColor: "var(--omrs-color-bg-medium-contrast)"
@@ -123,6 +123,4 @@ const capitalize = s => {
   return s.charAt(0).toUpperCase() + s.slice(1);
 };
 
-type ConditionsDetailedSummaryProps = {
-  match: match;
-};
+type ConditionsDetailedSummaryProps = {};

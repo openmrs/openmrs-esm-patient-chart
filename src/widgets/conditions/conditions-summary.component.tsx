@@ -1,5 +1,4 @@
 import React from "react";
-import { match } from "react-router";
 import { Link } from "react-router-dom";
 import { performPatientConditionsSearch } from "./conditions.resource";
 import { createErrorHandler } from "@openmrs/esm-error-handling";
@@ -29,12 +28,7 @@ export default function ConditionsSummary(props: ConditionsSummaryProps) {
 
   function displayConditions() {
     return (
-      <SummaryCard
-        name="Conditions"
-        match={props.match}
-        styles={{ width: "100%" }}
-        addBtnUrl={`/patient/${patientUuid}/chart/conditions/form/`}
-      >
+      <SummaryCard name="Conditions" styles={{ width: "100%" }}>
         <table className={`omrs-type-body-regular ${styles.conditionTable}`}>
           <thead>
             <tr>
@@ -110,14 +104,12 @@ export default function ConditionsSummary(props: ConditionsSummaryProps) {
     return (
       <SummaryCard
         name="Conditions"
-        match={props.match}
         styles={{
           width: "100%",
           background: "var(--omrs-color-bg-low-contrast)",
           border: "none",
           boxShadow: "none"
         }}
-        addBtnUrl={`/patient/${patientUuid}/chart/conditions/form/`}
       >
         <div className={styles.conditionMargin}>
           <p className="omrs-medium">No Conditions are documented.</p>
@@ -147,6 +139,4 @@ const capitalize = s => {
   return s.charAt(0).toUpperCase() + s.slice(1);
 };
 
-type ConditionsSummaryProps = {
-  match: match;
-};
+type ConditionsSummaryProps = {};

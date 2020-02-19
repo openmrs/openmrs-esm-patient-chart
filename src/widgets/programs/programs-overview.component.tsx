@@ -35,7 +35,6 @@ export default function Programs(props: ProgramsOverviewProps) {
   return (
     <SummaryCard
       name={t("care programs", "Care Programs")}
-      match={props.match}
       link={`/patient/${patientUuid}/chart/programs`}
       styles={{ margin: "1.25rem, 1.5rem" }}
     >
@@ -58,7 +57,10 @@ export default function Programs(props: ProgramsOverviewProps) {
       {patientPrograms &&
         patientPrograms.map(program => {
           return (
-            <SummaryCardRow key={program.uuid} linkTo="">
+            <SummaryCardRow
+              key={program.uuid}
+              linkTo={`/patient/${patientUuid}/chart/programs`}
+            >
               <HorizontalLabelValue
                 label={program.display}
                 labelStyles={{ fontWeight: 500 }}

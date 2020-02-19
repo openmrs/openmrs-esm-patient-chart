@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { match } from "react-router";
 import styles from "./medication-order-basket.css";
 import SummaryCard from "../cards/summary-card.component";
 import { isEmpty, debounce } from "lodash";
@@ -14,7 +13,7 @@ import { useCurrentPatient } from "@openmrs/esm-api";
 import SummaryCardRow from "../cards/summary-card-row.component";
 import SummaryCardRowContent from "../cards/summary-card-row-content.component";
 import { getDosage, OrderMedication } from "./medication-orders-utils";
-import { useHistory } from "react-router-dom";
+import { useHistory, useRouteMatch } from "react-router-dom";
 
 const NEW_MEDICATION_ACTION: string = "NEW";
 const DISCONTINUE_MEDICATION_ACTION: string = "DISCONTINUE";
@@ -39,6 +38,7 @@ export function MedicationOrderBasket(props: MedicationOrderBasketProps) {
     orderEdit: Boolean;
     order?: OrderMedication;
   }>({ orderEdit: false, order: null });
+  const match = useRouteMatch();
   const handleDrugSelected = $event => {
     setDrugName(searchTerm);
     setShowOrderMedication(true);
@@ -71,7 +71,7 @@ export function MedicationOrderBasket(props: MedicationOrderBasketProps) {
   }, [orderBasket]);
 
   useEffect(() => {
-    let params: any = props.match.params;
+    let params: any = match.params;
     if (params.drugName) {
       setShowOrderMedication(true);
       setEditProperty([
@@ -83,10 +83,10 @@ export function MedicationOrderBasket(props: MedicationOrderBasketProps) {
       ]);
       setDrugName(params.drugName);
     }
-  }, [props.match.params]);
+  }, [match.params]);
 
   useEffect(() => {
-    let params: any = props.match.params;
+    let params: any = match.params;
     const DISCONTINUE = "DISCONTINUE";
     if (params.action != undefined && params.action === DISCONTINUE) {
       const abortController = new AbortController();
@@ -121,7 +121,7 @@ export function MedicationOrderBasket(props: MedicationOrderBasketProps) {
       return () => abortController.abort();
     }
     //eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.match.params]);
+  }, [match.params]);
 
   const handleSaveOrders = () => {
     const abortController = new AbortController();
@@ -143,7 +143,7 @@ export function MedicationOrderBasket(props: MedicationOrderBasketProps) {
   };
 
   const resetParams = () => {
-    props.match.params = {};
+    match.params = {};
   };
 
   function navigate() {
@@ -177,11 +177,7 @@ export function MedicationOrderBasket(props: MedicationOrderBasketProps) {
             !isEmpty(searchResults) ? styles.modalContent : ""
           }`}
         >
-          <SummaryCard
-            name="Order Medication"
-            match={props.match}
-            styles={{ width: "100%" }}
-          >
+          <SummaryCard name="Order Medication" styles={{ width: "100%" }}>
             <div className={styles.medicationSearchTerm}>
               <input
                 type="text"
@@ -291,7 +287,6 @@ export function MedicationOrderBasket(props: MedicationOrderBasketProps) {
         <div className={styles.modal}>
           <div className={styles.modalContent}>
             <MedicationOrder
-              match={props.match}
               drugName={drugName}
               setOrderBasket={setOrderBasket}
               orderBasket={orderBasket}
@@ -329,6 +324,4 @@ export function MedicationOrderBasket(props: MedicationOrderBasketProps) {
   );
 }
 
-type MedicationOrderBasketProps = {
-  match: match;
-};
+type MedicationOrderBasketProps = {};

@@ -4,11 +4,13 @@ import { AllergyOverviewLevelTwo } from "../widgets/allergies/allergy-card-level
 import HeightAndWeightSummary from "../widgets/heightandweight/heightandweight-summary.component";
 import VitalsDetailedSummary from "../widgets/vitals/vitals-detailed-summary.component";
 import { Breadcrumbs } from "../breadcrumbs/breadcrumbs.component";
-import ProgramsLevelTwo from "../widgets/programs/programs-level-two.component";
+import ProgramsSummary from "../widgets/programs/programs-summary.component";
+import ProgramsDetailedSummary from "../widgets/programs/programs-detailed-summary.component";
 import { AllergyForm } from "../widgets/allergies/allergy-form.component";
 import { VitalsForm } from "../widgets/vitals/vitals-form.component";
 import ConditionsSummary from "../widgets/conditions/conditions-summary.component";
 import MedicationLevelTwo from "../widgets/medications/medication-level-two.component";
+import MedicationCardLevelThree from "./../widgets/medications/medication-level-three/medication-level-three.component";
 import { AllergyCardLevelThree } from "../widgets/allergies/allergy-card-level-three.component";
 import ConditionsDetailedSummary from "../widgets/conditions/conditions-detailed-summary.component";
 import { MedicationOrderBasket } from "../widgets/medications/medication-order-basket.component";
@@ -63,13 +65,23 @@ export const levelTwoRoutes: PatientChartRoute[] = [
   },
   {
     url: "/patient/:patientUuid/chart/programs",
-    component: ProgramsLevelTwo,
+    component: ProgramsSummary,
     name: "Programs"
+  },
+  {
+    url: "/patient/:patientUuid/chart/programs/:programUuid",
+    component: ProgramsDetailedSummary,
+    name: "Program"
   },
   {
     url: "/patient/:patientUuid/chart/medications",
     component: MedicationLevelTwo,
     name: "Medications"
+  },
+  {
+    url: "/patient/:patientUuid/chart/medications/:medicationUuid",
+    component: MedicationCardLevelThree,
+    name: "medication"
   },
   {
     url:

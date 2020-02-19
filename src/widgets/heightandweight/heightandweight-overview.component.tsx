@@ -1,6 +1,5 @@
 import React from "react";
 import SummaryCard from "../cards/summary-card.component";
-import { match } from "react-router";
 import { getDimenionsObservationsRestAPI } from "./heightandweight.resource";
 import SummaryCardRow from "../cards/summary-card-row.component";
 import SummaryCardRowContent from "../cards/summary-card-row-content.component";
@@ -35,7 +34,6 @@ export default function HeightAndWeightOverview(
   return (
     <SummaryCard
       name="Height & Weight"
-      match={props.match}
       styles={{ width: "100%", maxWidth: "45rem" }}
       link={`/patient/${patientUuid}/chart/dimensions`}
     >
@@ -98,6 +96,4 @@ export default function HeightAndWeightOverview(
   );
 }
 
-type HeightAndWeightOverviewProps = {
-  match: match;
-};
+type HeightAndWeightOverviewProps = {};

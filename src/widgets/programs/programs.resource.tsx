@@ -4,7 +4,7 @@ import { map, take } from "rxjs/operators";
 
 export function fetchPatientPrograms(
   patientID: string
-): Observable<PatientPrograms[]> {
+): Observable<PatientProgram[]> {
   return openmrsObservableFetch(
     `/ws/rest/v1/programenrollment?patient=${patientID}`
   ).pipe(
@@ -13,7 +13,19 @@ export function fetchPatientPrograms(
   );
 }
 
-type PatientPrograms = {
+export function getPatientProgramByUuid(
+  programUuid: string
+): Observable<PatientProgram> {
+  return openmrsObservableFetch(
+    `/ws/rest/v1/programenrollment/${programUuid}`
+  ).pipe(map(({ data }) => mapToPatientProgram(data)));
+}
+
+function mapToPatientProgram(data: any): PatientProgram {
+  return { ...data };
+}
+
+type PatientProgram = {
   uuid: String;
   program: {};
   display: String;

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { match } from "react-router";
 import styles from "./medication-order.css";
 import SummaryCard from "../cards/summary-card.component";
 import commonMedicationJson from "./common-medication.json";
@@ -281,11 +280,7 @@ export function MedicationOrder(props: MedicationOrderProps) {
 
   return (
     <form onSubmit={handleSubmit} className={styles.medicationOrderWrapper}>
-      <SummaryCard
-        name="Order Medication"
-        match={props.match}
-        styles={{ width: "100%" }}
-      >
+      <SummaryCard name="Order Medication" styles={{ width: "100%" }}>
         <div className={styles.medicationHeaderSummary}>
           <table>
             <tbody>
@@ -543,7 +538,6 @@ export function MedicationOrder(props: MedicationOrderProps) {
 }
 
 type MedicationOrderProps = {
-  match: match;
   drugName: string;
   orderBasket?: OrderMedication[];
   setOrderBasket?: any;
