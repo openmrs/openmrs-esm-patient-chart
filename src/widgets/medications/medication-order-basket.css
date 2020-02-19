@@ -144,12 +144,7 @@ th {
   cursor: pointer;
 }
 
-.newOrder {
-  background-color: var(--omrs-color-success);
-  color: var(--omrs-color-ink-white);
-}
-
-.reviseOrder {
-  background-color: var(--omrs-color-brand-orange);
-  color: var(--omrs-color-ink-white);
+.OrderStyle {
+  background-color: var(--omrs-color-success-two);
+  color: var(--omrs-color-brand-black);
 }
