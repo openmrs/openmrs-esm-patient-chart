@@ -1,7 +1,6 @@
 import React from "react";
 import dayjs from "dayjs";
 import SummaryCard from "../cards/summary-card.component";
-import { match } from "react-router";
 import { fetchPatientPrograms } from "./programs.resource";
 import { createErrorHandler } from "@openmrs/esm-error-handling";
 import { useCurrentPatient } from "@openmrs/esm-api";
@@ -32,7 +31,6 @@ export default function ProgramsSummary(props: ProgramsSummaryProps) {
     return (
       <SummaryCard
         name="Care Programs"
-        match={props.match}
         styles={{
           width: "100%"
         }}
@@ -95,14 +93,12 @@ export default function ProgramsSummary(props: ProgramsSummaryProps) {
     return (
       <SummaryCard
         name="Care Programs"
-        match={props.match}
         styles={{
           width: "100%",
           background: "var(--omrs-color-bg-low-contrast)",
           border: "none",
           boxShadow: "none"
         }}
-        addBtnUrl={`/patient/${patientUuid}/chart/programs/form/`}
       >
         <div className={styles.programMargin}>
           <p className="omrs-medium" data-testid="no-programs">
@@ -128,6 +124,4 @@ export default function ProgramsSummary(props: ProgramsSummaryProps) {
   );
 }
 
-type ProgramsSummaryProps = {
-  match: match;
-};
+type ProgramsSummaryProps = {};

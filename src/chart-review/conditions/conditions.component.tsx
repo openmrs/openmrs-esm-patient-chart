@@ -19,7 +19,7 @@ export default function Conditions(props: any) {
       {
         name: "Conditions",
         component: () => {
-          return <ConditionsDetailedSummary match={match} />;
+          return <ConditionsDetailedSummary />;
         }
       }
     ]

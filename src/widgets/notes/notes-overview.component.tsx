@@ -34,7 +34,6 @@ export default function NotesOverview(props: NotesOverviewProps) {
     return (
       <SummaryCard
         name="Notes"
-        match={props.match}
         styles={{ margin: "1.25rem, 1.5rem", width: "100%", maxWidth: "45rem" }}
       >
         <table className={styles.tableNotes}>
@@ -91,7 +90,6 @@ export default function NotesOverview(props: NotesOverviewProps) {
     return (
       <SummaryCard
         name="Notes"
-        match={props.match}
         styles={{ margin: "1.25rem, 1.5rem", width: "100%", maxWidth: "45rem" }}
       >
         <table className={styles.tableNotes}>
@@ -147,6 +145,4 @@ export default function NotesOverview(props: NotesOverviewProps) {
   return restAPINotesOverview();
 }
 
-type NotesOverviewProps = {
-  match: match;
-};
+type NotesOverviewProps = {};

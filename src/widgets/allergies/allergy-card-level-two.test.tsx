@@ -292,7 +292,7 @@ describe("AlleryCardLevelTwo />", () => {
     );
     wrapper = render(
       <BrowserRouter>
-        <AllergyOverviewLevelTwo match={match} />
+        <AllergyOverviewLevelTwo />
       </BrowserRouter>
     );
 
@@ -308,7 +308,7 @@ describe("AlleryCardLevelTwo />", () => {
     );
     wrapper = render(
       <BrowserRouter>
-        <AllergyOverviewLevelTwo match={match} />
+        <AllergyOverviewLevelTwo />
       </BrowserRouter>
     );
 
@@ -325,7 +325,7 @@ describe("AlleryCardLevelTwo />", () => {
     );
     wrapper = render(
       <BrowserRouter>
-        <AllergyOverviewLevelTwo match={match} />
+        <AllergyOverviewLevelTwo />
       </BrowserRouter>
     );
 

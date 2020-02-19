@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { match } from "react-router";
+import { match, useRouteMatch } from "react-router";
 import styles from "./vitals-form.css";
 import SummaryCard from "../cards/summary-card.component";
 import { useCurrentPatient } from "@openmrs/esm-api";
@@ -39,6 +39,7 @@ export function VitalsForm(props: vitalsFormProp) {
   ] = useCurrentPatient();
   const [currentSession, setCurrentSession] = useState();
   let history = useHistory();
+  let match = useRouteMatch();
 
   React.useEffect(() => {
     if (patientUuid) {
@@ -63,9 +64,9 @@ export function VitalsForm(props: vitalsFormProp) {
   }, [patientUuid]);
 
   React.useEffect(() => {
-    const params: any = props.match.params;
+    const params: any = match.params;
     params.vitalsUuid ? setFormView(true) : setFormView(false);
-  }, [props.match.params]);
+  }, [match.params]);
 
   React.useEffect(() => {
     if (!formView) {
@@ -180,7 +181,6 @@ export function VitalsForm(props: vitalsFormProp) {
       >
         <SummaryCard
           name="Add vitals, weight and height"
-          match={props.match}
           styles={{
             width: "100%",
             backgroundColor: "var(--omrs-color-bg-medium-contrast)",
@@ -480,7 +480,6 @@ export function VitalsForm(props: vitalsFormProp) {
       >
         <SummaryCard
           name="Edit Vitals"
-          match={props.match}
           styles={{
             width: "100%",
             backgroundColor: "var(--omrs-color-bg-medium-contrast)",
@@ -801,9 +800,7 @@ export function VitalsForm(props: vitalsFormProp) {
   return <div>{formView ? editVitals() : createVitals()}</div>;
 }
 
-type vitalsFormProp = {
-  match: match;
-};
+type vitalsFormProp = {};
 
 export type Vitals = {
   height: number;

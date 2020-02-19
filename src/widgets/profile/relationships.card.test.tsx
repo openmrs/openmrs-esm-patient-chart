@@ -14,19 +14,18 @@ jest.mock("./relationships.resource", () => ({
 }));
 
 describe("<RelationshipsCard/>", () => {
-  let patient: fhir.Patient, match;
+  let patient: fhir.Patient;
 
   afterEach(cleanup);
 
   beforeEach(() => {
     patient = mockPatient;
-    match = { params: {}, isExact: false, path: "/", url: "/" };
   });
 
   it("renders successfully", () => {
     render(
       <BrowserRouter>
-        <RelationshipsCard patient={patient} match={match}></RelationshipsCard>
+        <RelationshipsCard patient={patient} />
       </BrowserRouter>
     );
   });
@@ -34,7 +33,7 @@ describe("<RelationshipsCard/>", () => {
   it("displays em-dash if there are no relationships", () => {
     const wrapper = render(
       <BrowserRouter>
-        <RelationshipsCard patient={patient} match={match}></RelationshipsCard>
+        <RelationshipsCard patient={patient} />
       </BrowserRouter>
     );
     expect(wrapper.getByText("\u2014")).not.toBeNull();
@@ -44,7 +43,7 @@ describe("<RelationshipsCard/>", () => {
     mockFetchPatientRelationships.mockResolvedValueOnce(mockRelationships);
     const wrapper = render(
       <BrowserRouter>
-        <RelationshipsCard patient={patient} match={match}></RelationshipsCard>
+        <RelationshipsCard patient={patient} />
       </BrowserRouter>
     );
     await wait(() => {

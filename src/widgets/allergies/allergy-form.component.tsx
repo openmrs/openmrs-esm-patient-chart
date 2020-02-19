@@ -1,5 +1,5 @@
 import React, { DetailedHTMLProps } from "react";
-import { match } from "react-router";
+import { useRouteMatch, useHistory } from "react-router-dom";
 import SummaryCard from "../cards/summary-card.component";
 import style from "./allergy-form.css";
 import {
@@ -14,7 +14,6 @@ import { createErrorHandler } from "@openmrs/esm-error-handling";
 import { useCurrentPatient } from "@openmrs/esm-api";
 import dayjs from "dayjs";
 import { DataCaptureComponentProps } from "../../utils/data-capture-props";
-import { useHistory } from "react-router-dom";
 
 const DRUG_ALLERGEN_CONCEPT: string = "162552AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 const ENVIROMENTAL_ALLERGEN_CONCEPT: string =
@@ -51,6 +50,7 @@ export function AllergyForm(props: AllergyFormProps) {
   ] = useCurrentPatient();
   const formRef = React.useRef<HTMLFormElement>(null);
   const [viewForm, setViewForm] = React.useState(true);
+  let match = useRouteMatch();
 
   const handleAllergenChange = event => {
     setAllergensArray(null);
@@ -126,10 +126,10 @@ export function AllergyForm(props: AllergyFormProps) {
 
   React.useEffect(() => {
     const abortController = new AbortController();
-    if (patientUuid && props.match.params) {
+    if (patientUuid && match.params) {
       getPatientAllergyByPatientUuid(
         patientUuid,
-        props.match.params,
+        match.params,
         abortController
       ).then(response => setPatientAllergy(response.data), createErrorHandler);
     }
@@ -138,7 +138,7 @@ export function AllergyForm(props: AllergyFormProps) {
       data => setAllergyReaction(data),
       createErrorHandler
     );
-  }, [patientUuid, props.match.params]);
+  }, [patientUuid, match.params]);
 
   React.useEffect(() => {
     if (selectedAllergyCategory) {
@@ -185,7 +185,7 @@ export function AllergyForm(props: AllergyFormProps) {
     updatePatientAllergy(
       allergy,
       patientUuid,
-      props.match.params,
+      match.params,
       abortController
     ).then(response => {
       response.status == 200 && props.entrySubmitted();
@@ -228,7 +228,7 @@ export function AllergyForm(props: AllergyFormProps) {
 
   const handleDeletePatientAllergy = () => {
     const abortController = new AbortController();
-    deletePatientAllergy(patientUuid, props.match.params, abortController).then(
+    deletePatientAllergy(patientUuid, match.params, abortController).then(
       response => {
         response.status == 204 && navigate();
       }
@@ -243,7 +243,6 @@ export function AllergyForm(props: AllergyFormProps) {
     return (
       <SummaryCard
         name="Add Allergy"
-        match={props.match}
         styles={{
           width: "100%",
           background: "var(--omrs-color-bg-medium-contrast)"
@@ -468,7 +467,6 @@ export function AllergyForm(props: AllergyFormProps) {
     return (
       <SummaryCard
         name="Edit Allergy"
-        match={props.match}
         styles={{
           width: "100%",
           background: "var(--omrs-color-bg-medium-contrast)"
@@ -648,13 +646,13 @@ export function AllergyForm(props: AllergyFormProps) {
   }
 
   React.useEffect(() => {
-    const params: any = props.match.params;
+    const params: any = match.params;
     if (params.allergyUuid) {
       setViewForm(true);
     } else {
       setViewForm(false);
     }
-  }, [props.match.params]);
+  }, [match.params]);
   return (
     <div className={style.allergyForm}>
       {viewForm ? editForm() : createForm()}
@@ -668,9 +666,7 @@ AllergyForm.defaultProps = {
   entrySubmitted: () => {}
 };
 
-type AllergyFormProps = DataCaptureComponentProps & {
-  match: match;
-};
+type AllergyFormProps = DataCaptureComponentProps & {};
 
 type Allergy = {
   allergenType: string;

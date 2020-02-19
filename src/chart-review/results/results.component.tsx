@@ -23,13 +23,13 @@ export default function Results(props: any) {
       {
         name: "Vitals",
         component: () => {
-          return <VitalsDetailedSummary match={match} />;
+          return <VitalsDetailedSummary />;
         }
       },
       {
         name: "Height and Weight",
         component: () => {
-          return <HeightAndWeightSummary match={match} />;
+          return <HeightAndWeightSummary />;
         }
       }
     ]
@@ -45,10 +45,7 @@ export default function Results(props: any) {
           name: "Height and Weight",
           component: () => {
             return (
-              <HeightAndWeightDetailedSummary
-                match={match}
-                uuid={queryParams.get("uuid")}
-              />
+              <HeightAndWeightDetailedSummary uuid={queryParams.get("uuid")} />
             );
           }
         });

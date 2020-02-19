@@ -34,7 +34,6 @@ export function AllergyOverviewLevelTwo(props: AllergyOverviewLevelTwoProps) {
     return (
       <SummaryCard
         name="Allergies"
-        match={props.match}
         styles={{ width: "100%" }}
         addComponent={AllergyForm}
       >
@@ -156,8 +155,8 @@ export function AllergyOverviewLevelTwo(props: AllergyOverviewLevelTwoProps) {
     return (
       <SummaryCard
         name="Allergies"
-        match={props.match}
         styles={{ width: "100%" }}
+        addComponent={AllergyForm}
       >
         <div className={styles.allergyMargin}>
           <p className="omrs-bold">
@@ -184,6 +183,4 @@ export function AllergyOverviewLevelTwo(props: AllergyOverviewLevelTwoProps) {
   );
 }
 
-type AllergyOverviewLevelTwoProps = {
-  match: match;
-};
+type AllergyOverviewLevelTwoProps = {};

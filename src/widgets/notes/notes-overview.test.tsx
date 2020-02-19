@@ -29,12 +29,7 @@ jest.mock("@openmrs/esm-api", () => ({
 }));
 
 describe("<NotesOverview/>", () => {
-  let match;
   afterEach(cleanup);
-
-  beforeEach(() => {
-    match = { params: {}, isExact: false, path: "/", url: "/" };
-  });
 
   beforeEach(mockGetEncounterObservableRESTAPI.mockReset);
   beforeEach(mockUseCurrentPatient.mockReset);
@@ -51,7 +46,7 @@ describe("<NotesOverview/>", () => {
     ]);
     render(
       <BrowserRouter>
-        <NotesOverview match={match} />
+        <NotesOverview />
       </BrowserRouter>
     );
   });
@@ -69,7 +64,7 @@ describe("<NotesOverview/>", () => {
 
     const wrapper = render(
       <BrowserRouter>
-        <NotesOverview match={match} />
+        <NotesOverview />
       </BrowserRouter>
     );
     await wait(() => {
@@ -89,7 +84,7 @@ describe("<NotesOverview/>", () => {
     ]);
     const wrapper = render(
       <BrowserRouter>
-        <NotesOverview match={match}></NotesOverview>
+        <NotesOverview />
       </BrowserRouter>
     );
 

@@ -19,7 +19,7 @@ export default function Programs(props: any) {
       {
         name: "Programs",
         component: () => {
-          return <ProgramsSummary match={match} />;
+          return <ProgramsSummary />;
         }
       }
     ]

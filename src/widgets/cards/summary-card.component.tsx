@@ -1,6 +1,6 @@
 import React, { ReactChildren } from "react";
 import styles from "./summary-card.css";
-import { match, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { newWorkspaceItem } from "../../workspace/workspace.resource";
 import { Trans, useTranslation } from "react-i18next";
 
@@ -65,7 +65,6 @@ function showComponent(component, name): void {
 
 type SummaryCardProps = {
   name: string;
-  match: match;
   children: React.ReactNode;
   styles?: React.CSSProperties;
   link?: string;

@@ -1,5 +1,5 @@
 import React from "react";
-import { match } from "react-router";
+import { match, useRouteMatch } from "react-router";
 import { useCurrentPatient } from "@openmrs/esm-api";
 import { getPatientProgramByUuid } from "./programs.resource";
 import { createErrorHandler } from "@openmrs/esm-error-handling";
@@ -12,16 +12,17 @@ export default function ProgramsDetailedSummary(
 ) {
   const [patientProgram, setPatientProgram] = React.useState(null);
   const [isLoadingPatient, patient, patientUuid] = useCurrentPatient();
+  const match = useRouteMatch();
 
   React.useEffect(() => {
     if (!isLoadingPatient && patient && patientUuid) {
       const subscription = getPatientProgramByUuid(
-        props.match.params["programUuid"]
+        match.params["programUuid"]
       ).subscribe(program => setPatientProgram(program), createErrorHandler());
 
       return () => subscription.unsubscribe();
     }
-  }, [isLoadingPatient, patient, patientUuid, props.match.params]);
+  }, [isLoadingPatient, patient, patientUuid, match.params]);
 
   return (
     <>
@@ -29,11 +30,7 @@ export default function ProgramsDetailedSummary(
         <div className={styles.programSummary}>
           {
             <>
-              <SummaryCard
-                name="Program"
-                match={props.match}
-                styles={{ width: "100%" }}
-              >
+              <SummaryCard name="Program" styles={{ width: "100%" }}>
                 <div className={`omrs-type-body-regular ${styles.programCard}`}>
                   <div>
                     <p className="omrs-type-title-3" data-testid="program-name">
@@ -80,6 +77,4 @@ export default function ProgramsDetailedSummary(
   );
 }
 
-type ProgramsDetailedSummaryProps = {
-  match: match;
-};
+type ProgramsDetailedSummaryProps = {};

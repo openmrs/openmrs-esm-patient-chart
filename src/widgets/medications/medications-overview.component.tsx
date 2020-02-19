@@ -38,7 +38,6 @@ export default function MedicationsOverview(props: MedicationsOverviewProps) {
   return (
     <SummaryCard
       name={t("Active Medications", "Active Medications")}
-      match={props.match}
       styles={{ width: "100%", maxWidth: "45rem" }}
       link={`/patient/${patientUuid}/chart/Medications`}
     >

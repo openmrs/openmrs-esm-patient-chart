@@ -1,7 +1,7 @@
 import React from "react";
 import { performPatientConditionsSearch } from "./conditions.resource";
 import { render, cleanup, wait } from "@testing-library/react";
-import { BrowserRouter, match } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 import { useCurrentPatient } from "../../../__mocks__/openmrs-esm-api.mock";
 import ConditionsSummary from "./conditions-summary.component";
 import {
@@ -21,7 +21,6 @@ jest.mock("@openmrs/esm-api", () => ({
 }));
 
 describe("<ConditionsSummary />", () => {
-  let match: match = { params: {}, isExact: false, path: "/", url: "/" };
   let wrapper: any;
 
   afterEach(cleanup);
@@ -35,7 +34,7 @@ describe("<ConditionsSummary />", () => {
     );
     wrapper = render(
       <BrowserRouter>
-        <ConditionsSummary match={match} />
+        <ConditionsSummary />
       </BrowserRouter>
     );
 
@@ -51,7 +50,7 @@ describe("<ConditionsSummary />", () => {
     );
     wrapper = render(
       <BrowserRouter>
-        <ConditionsSummary match={match} />
+        <ConditionsSummary />
       </BrowserRouter>
     );
 
@@ -71,7 +70,7 @@ describe("<ConditionsSummary />", () => {
     );
     wrapper = render(
       <BrowserRouter>
-        <ConditionsSummary match={match} />
+        <ConditionsSummary />
       </BrowserRouter>
     );
 

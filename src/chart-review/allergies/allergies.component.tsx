@@ -26,13 +26,13 @@ export default function History(props: any) {
       {
         name: "Programs",
         component: () => {
-          return <ProgramsSummary match={match} />;
+          return <ProgramsSummary />;
         }
       },
       {
         name: "Allergies",
         component: () => {
-          return <AllergyOverviewLevelTwo match={match} />;
+          return <AllergyOverviewLevelTwo />;
         }
       }
     ]

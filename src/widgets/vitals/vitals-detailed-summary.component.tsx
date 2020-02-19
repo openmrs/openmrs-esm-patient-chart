@@ -84,7 +84,7 @@ export default function VitalsDetailedSummary(
 
   function displayPatientsVitals() {
     return (
-      <SummaryCard name="Vitals" match={props.match} styles={{ width: "100%" }}>
+      <SummaryCard name="Vitals" styles={{ width: "100%" }}>
         <table className={styles.vitalsTable}>
           <thead>
             <tr className="omrs-bold">
@@ -165,7 +165,6 @@ export default function VitalsDetailedSummary(
     return (
       <SummaryCard
         name="Vitals"
-        match={props.match}
         styles={{
           width: "100%",
           backgroundColor: "var(--omrs-color-bg-low-contrast)",
@@ -197,6 +196,4 @@ export default function VitalsDetailedSummary(
   );
 }
 
-type VitalsDetailedSummaryProps = {
-  match: match;
-};
+type VitalsDetailedSummaryProps = {};

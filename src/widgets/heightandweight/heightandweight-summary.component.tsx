@@ -2,7 +2,6 @@ import React from "react";
 import styles from "./heightandweight-summary.css";
 import SummaryCard from "../cards/summary-card.component";
 import { getDimenionsObservationsRestAPI } from "./heightandweight.resource";
-import { match } from "react-router";
 import { useCurrentPatient } from "@openmrs/esm-api";
 import { Link } from "react-router-dom";
 import { VitalsForm } from "../vitals/vitals-form.component";
@@ -35,7 +34,6 @@ function HeightAndWeightSummary(props: HeightAndWeightSummaryProps) {
     >
       <SummaryCard
         name="Height & Weight"
-        match={props.match}
         styles={{ flex: 1, margin: ".5rem" }}
         addComponent={VitalsForm}
       >
@@ -93,8 +91,6 @@ function HeightAndWeightSummary(props: HeightAndWeightSummaryProps) {
   );
 }
 
-type HeightAndWeightSummaryProps = {
-  match: match;
-};
+type HeightAndWeightSummaryProps = {};
 
 export default HeightAndWeightSummary;

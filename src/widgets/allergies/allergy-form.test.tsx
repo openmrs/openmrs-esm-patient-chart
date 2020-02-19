@@ -48,7 +48,7 @@ describe("<AllergyForm />", () => {
         of(mockAllergyReactions.setMembers)
       );
       <BrowserRouter>
-        <AllergyForm match={match} />
+        <AllergyForm />
       </BrowserRouter>;
     });
   });

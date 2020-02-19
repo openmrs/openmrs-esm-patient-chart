@@ -46,7 +46,7 @@ describe("<AllergyCardLevelThree />", () => {
     mockUseRouteMatch.mockReturnValue(match);
     wrapper = render(
       <BrowserRouter>
-        <AllergyCardLevelThree match={match} />
+        <AllergyCardLevelThree />
       </BrowserRouter>
     );
 
@@ -63,7 +63,7 @@ describe("<AllergyCardLevelThree />", () => {
     mockUseRouteMatch.mockReturnValue(match);
     wrapper = render(
       <BrowserRouter>
-        <AllergyCardLevelThree match={match} />
+        <AllergyCardLevelThree />
       </BrowserRouter>
     );
 

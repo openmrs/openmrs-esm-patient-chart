@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, match } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 import { HeightAndWeightDetailedSummary } from "./heightandweight-detailed-summary.component";
 import { useCurrentPatient, openmrsObservableFetch } from "@openmrs/esm-api";
 import { mockDimensionResponseRESTAPI } from "../../../__mocks__/dimensions.mock";
@@ -21,7 +21,6 @@ jest.mock("react-router", () => ({
 }));
 
 describe("<HeightAndWeightDetailedSummary/>", () => {
-  let match: match = { params: {}, url: "/", isExact: false, path: "/" };
   let patient: fhir.Patient = mockPatient;
   beforeEach(() => {
     mockOpenmrsObservableFetch.mockReset();
@@ -36,10 +35,7 @@ describe("<HeightAndWeightDetailedSummary/>", () => {
     );
     mockUseCurrentPatient.mockReturnValue([false, patient, patient.id, null]);
     <BrowserRouter>
-      <HeightAndWeightDetailedSummary
-        match={match}
-        uuid="bbd27a2f-442a-418a-9952-f2bb0e54df97"
-      ></HeightAndWeightDetailedSummary>
+      <HeightAndWeightDetailedSummary uuid="bbd27a2f-442a-418a-9952-f2bb0e54df97"></HeightAndWeightDetailedSummary>
     </BrowserRouter>;
   });
 
@@ -50,10 +46,7 @@ describe("<HeightAndWeightDetailedSummary/>", () => {
     mockUseCurrentPatient.mockReturnValue([false, patient, patient.id, null]);
     const wrapper = render(
       <BrowserRouter>
-        <HeightAndWeightDetailedSummary
-          match={match}
-          uuid="bbd27a2f-442a-418a-9952-f2bb0e54df97"
-        ></HeightAndWeightDetailedSummary>
+        <HeightAndWeightDetailedSummary uuid="bbd27a2f-442a-418a-9952-f2bb0e54df97"></HeightAndWeightDetailedSummary>
       </BrowserRouter>
     );
     await wait(() => {
@@ -80,10 +73,7 @@ describe("<HeightAndWeightDetailedSummary/>", () => {
     mockUseCurrentPatient.mockReturnValue([false, patient, patient.id, null]);
     const wrapper = render(
       <BrowserRouter>
-        <HeightAndWeightDetailedSummary
-          match={match}
-          uuid="bbd27a2f-442a-418a-9952-f2bb0e54df65"
-        ></HeightAndWeightDetailedSummary>
+        <HeightAndWeightDetailedSummary uuid="bbd27a2f-442a-418a-9952-f2bb0e54df65"></HeightAndWeightDetailedSummary>
       </BrowserRouter>
     );
 
