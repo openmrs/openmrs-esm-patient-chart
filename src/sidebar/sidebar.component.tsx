@@ -2,7 +2,7 @@ import React from "react";
 import styles from "./sidebar.component.css";
 import { newWorkspaceItem } from "../workspace/workspace.resource";
 import { AllergyForm } from "../widgets/allergies/allergy-form.component";
-import Parcel from "single-spa-react";
+import Parcel from "single-spa-react/parcel";
 import { VitalsForm } from "../widgets/vitals/vitals-form.component";
 import { MedicationOrderBasket } from "../widgets/medications/medication-order-basket.component";
 import { mountRootParcel } from "single-spa";
@@ -37,11 +37,8 @@ export default function Sidebar(props: any) {
       name: "F",
       onclick: () =>
         newWorkspaceItem({
-          component: (
-            <Parcel
-              config={System.import("@ampath/esm-angular-form-entry")}
-              mountParcel={mountRootParcel}
-            />
+          component: () => (
+            <Parcel config={System.import("@ampath/esm-angular-form-entry")} />
           ),
           name: "Forms",
           props: { match: { params: {} } },
