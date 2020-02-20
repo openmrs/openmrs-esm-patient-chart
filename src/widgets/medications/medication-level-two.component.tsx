@@ -127,29 +127,27 @@ export default function MedicationLevelTwo(props: MedicationsOverviewProps) {
                               action={"REVISE"}
                               inProgress={true}
                             />
-                            <td>
-                              <MedicationButton
-                                component={MedicationOrderBasket}
-                                name={"Medication Order Basket"}
-                                label={"DISCONTINUE"}
-                                orderUuid={medication.uuid}
-                                drugName={medication.drug.name}
-                                action={"DISCONTINUE"}
-                                inProgress={true}
-                              />
-                            </td>
-                            <td style={{ textAlign: "end" }}>
-                              <Link
-                                to={`/patient/${patientUuid}/chart/medications/${medication.uuid}`}
+                            <MedicationButton
+                              component={MedicationOrderBasket}
+                              name={"Medication Order Basket"}
+                              label={"DISCONTINUE"}
+                              orderUuid={medication.uuid}
+                              drugName={null}
+                              action={"DISCONTINUE"}
+                              inProgress={true}
+                            />
+                          </td>
+                          <td style={{ textAlign: "end" }}>
+                            <Link
+                              to={`/patient/${patientUuid}/chart/medications/${medication.uuid}`}
+                            >
+                              <svg
+                                className="omrs-icon"
+                                fill="rgba(0, 0, 0, 0.54)"
                               >
-                                <svg
-                                  className="omrs-icon"
-                                  fill="rgba(0, 0, 0, 0.54)"
-                                >
-                                  <use xlinkHref="#omrs-icon-chevron-right" />
-                                </svg>
-                              </Link>
-                            </td>
+                                <use xlinkHref="#omrs-icon-chevron-right" />
+                              </svg>
+                            </Link>
                           </td>
                         </tr>
                       </React.Fragment>
