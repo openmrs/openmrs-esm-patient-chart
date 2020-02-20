@@ -137,6 +137,18 @@ export default function MedicationLevelTwo(props: MedicationsOverviewProps) {
                               inProgress={true}
                             />
                           </td>
+                          <td style={{ textAlign: "end" }}>
+                            <Link
+                              to={`/patient/${patientUuid}/chart/medications/${medication.uuid}`}
+                            >
+                              <svg
+                                className="omrs-icon"
+                                fill="rgba(0, 0, 0, 0.54)"
+                              >
+                                <use xlinkHref="#omrs-icon-chevron-right" />
+                              </svg>
+                            </Link>
+                          </td>
                         </tr>
                       </React.Fragment>
                     );
