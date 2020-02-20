@@ -9,6 +9,7 @@ import Allergies from "./allergies/allergies.component";
 import Conditions from "./conditions/conditions.component";
 import Programs from "./programs/programs.component";
 import { useConfig } from "@openmrs/esm-module-config";
+import Appointment from "./appointments/appointments.component";
 
 export default function ChartReview(props: any) {
   const match = useRouteMatch();
@@ -73,6 +74,13 @@ export default function ChartReview(props: any) {
       path: `programs`,
       component: () => {
         return <Programs />;
+      }
+    },
+    appointments: {
+      name: "Appointments",
+      path: `appointments`,
+      component: () => {
+        return <Appointment />;
       }
     }
   };

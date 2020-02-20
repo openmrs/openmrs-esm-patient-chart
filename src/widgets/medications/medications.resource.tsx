@@ -65,13 +65,13 @@ export function getPatientEncounterID(
 }
 
 export function saveNewDrugOrder(
-  abortContoller: AbortController,
+  abortController: AbortController,
   drugOrder: OrderMedication
 ) {
   if (drugOrder.action === NEW_MEDICATION_ACTION) {
     return openmrsFetch(`/ws/rest/v1/order`, {
       method: "POST",
-      signal: abortContoller.signal,
+      signal: abortController.signal,
       headers: {
         "Content-Type": "application/json"
       },
@@ -100,7 +100,7 @@ export function saveNewDrugOrder(
   } else if (drugOrder.action === REVISE_MEDICATION_ACTION) {
     return openmrsFetch(`/ws/rest/v1/order`, {
       method: "POST",
-      signal: abortContoller.signal,
+      signal: abortController.signal,
       headers: {
         "Content-Type": "application/json"
       },
@@ -128,7 +128,7 @@ export function saveNewDrugOrder(
     });
   } else if (drugOrder.action === DISCONTINUE_MEDICATION_ACTION) {
     return openmrsFetch(`/ws/rest/v1/order`, {
-      signal: abortContoller.signal,
+      signal: abortController.signal,
       method: "POST",
       headers: {
         "Content-type": "application/json"

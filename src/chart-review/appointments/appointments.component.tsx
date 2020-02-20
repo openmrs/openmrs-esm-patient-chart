@@ -1,20 +1,19 @@
-import React from "react";
 import { useRouteMatch } from "react-router-dom";
 import ChartWidget from "../../ui-components/chart-widget/chart-widget.component";
-import PatientChartOverview from "./overview/patient-chart-overview.component";
+import React from "react";
 import AppointmentsOverview from "../../widgets/appointments/appointments-overview.component";
 
-export default function Summaries(props: any) {
+export default function Appointment(props: any) {
   const match = useRouteMatch();
 
   const widgetConfig = {
-    name: "summaries",
+    name: "appointments",
     defaultTabIndex: 0,
     tabs: [
       {
         name: "Overview",
         component: () => {
-          return <PatientChartOverview match={match} />;
+          return <AppointmentsOverview match={match} />;
         }
       }
     ]

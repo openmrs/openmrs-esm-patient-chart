@@ -35,7 +35,6 @@ export default function MedicationCardLevelThree(
       <>
         <SummaryCard
           name="Medication"
-          match={props.match}
           styles={{ width: "90%" }}
           editBtnUrl={`/patient/${patientUuid}/chart/medication/edit`}
         >
@@ -136,7 +135,6 @@ export default function MedicationCardLevelThree(
     return (
       <SummaryCard
         name="Details"
-        match={props.match}
         styles={{
           width: "90%",
           backgroundColor: "var(--omrs-color-bg-medium-contrast)"
