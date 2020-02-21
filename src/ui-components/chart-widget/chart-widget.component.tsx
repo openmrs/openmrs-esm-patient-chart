@@ -71,7 +71,9 @@ export default function ChartWidget(props: any) {
           })}
         </ul>
       </nav>
-      {props.widgetConfig.tabs[selected].component()}
+      <div style={{ margin: "21px" }}>
+        {props.widgetConfig.tabs[selected].component()}
+      </div>
     </>
   );
 }

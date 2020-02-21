@@ -14,30 +14,43 @@ import Dashboard, {
 export default function PatientChartOverview(props: PatientChartOverviewProps) {
   const dashboardConfig: DashboardConfigType = {
     layout: {
-      columns: 3
+      columns: 4
     },
     widgets: [
-      { name: "conditions-overview", component: ConditionsOverview },
-      { name: "programs-overview", component: ProgramsOverview },
-      { name: "allergey-overview", component: AllergyOverview },
+      {
+        name: "conditions-overview",
+        component: ConditionsOverview,
+        layout: { columns: 2 }
+      },
+      {
+        name: "programs-overview",
+        component: ProgramsOverview,
+        layout: { columns: 2 }
+      },
       {
         name: "notes-overview",
         component: NotesOverview,
-        layout: { columns: 2 }
+        layout: { columns: 4 }
       },
       {
         name: "vitals-overview",
         component: VitalsOverview,
-        layout: { columns: 1 }
+        layout: { columns: 2 }
       },
       {
         name: "height-and-weight-overview",
-        component: HeightAndWeightOverview
+        component: HeightAndWeightOverview,
+        layout: { columns: 2 }
       },
       {
         name: "medications-overview",
         component: MedicationsOverview,
-        layout: { columns: 2 }
+        layout: { columns: 3 }
+      },
+      {
+        name: "allergy-overview",
+        component: AllergyOverview,
+        layout: { columns: 1 }
       }
     ]
   };
