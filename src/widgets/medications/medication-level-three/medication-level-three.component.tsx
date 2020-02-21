@@ -1,5 +1,5 @@
 import React from "react";
-import { useRouteMatch } from "react-router";
+import { useRouteMatch } from "react-router-dom";
 import dayjs from "dayjs";
 import { createErrorHandler } from "@openmrs/esm-error-handling";
 import { useCurrentPatient } from "@openmrs/esm-api";
@@ -16,8 +16,9 @@ export default function MedicationCardLevelThree(
 ) {
   const [patientMedication, setMedication] = React.useState(null);
   const [isLoadingPatient, patient, patientUuid] = useCurrentPatient();
-
-  const match = useRouteMatch();
+  const match = useRouteMatch({
+    path: "/patient/:patientUuid/chart/medications/:medicationUuid"
+  });
 
   React.useEffect(() => {
     if (!isLoadingPatient && patient) {
@@ -25,7 +26,8 @@ export default function MedicationCardLevelThree(
       getMedicationByUuid(abortController, match.params["medicationUuid"]).then(
         response => {
           setMedication(response.data);
-        }
+        },
+        createErrorHandler()
       );
       return () => abortController.abort();
     }

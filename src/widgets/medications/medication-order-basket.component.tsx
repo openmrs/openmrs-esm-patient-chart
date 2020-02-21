@@ -13,7 +13,7 @@ import { useCurrentPatient } from "@openmrs/esm-api";
 import SummaryCardRow from "../cards/summary-card-row.component";
 import SummaryCardRowContent from "../cards/summary-card-row-content.component";
 import { getDosage, OrderMedication } from "./medication-orders-utils";
-import { useHistory, useRouteMatch } from "react-router-dom";
+import { useHistory, match } from "react-router-dom";
 
 const NEW_MEDICATION_ACTION: string = "NEW";
 const DISCONTINUE_MEDICATION_ACTION: string = "DISCONTINUE";
@@ -38,7 +38,7 @@ export function MedicationOrderBasket(props: MedicationOrderBasketProps) {
     orderEdit: Boolean;
     order?: OrderMedication;
   }>({ orderEdit: false, order: null });
-  const match = useRouteMatch();
+
   const handleDrugSelected = $event => {
     setDrugName(searchTerm);
     setShowOrderMedication(true);
@@ -71,7 +71,7 @@ export function MedicationOrderBasket(props: MedicationOrderBasketProps) {
   }, [orderBasket]);
 
   useEffect(() => {
-    let params: any = match.params;
+    let params: any = props.match.params;
     if (params.drugName) {
       setShowOrderMedication(true);
       setEditProperty([
@@ -83,10 +83,10 @@ export function MedicationOrderBasket(props: MedicationOrderBasketProps) {
       ]);
       setDrugName(params.drugName);
     }
-  }, [match.params]);
+  }, [props.match.params]);
 
   useEffect(() => {
-    let params: any = match.params;
+    let params: any = props.match.params;
     const DISCONTINUE = "DISCONTINUE";
     if (params.action != undefined && params.action === DISCONTINUE) {
       const abortController = new AbortController();
@@ -121,7 +121,7 @@ export function MedicationOrderBasket(props: MedicationOrderBasketProps) {
       return () => abortController.abort();
     }
     //eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [match.params]);
+  }, [props.match.params]);
 
   const handleSaveOrders = () => {
     const abortController = new AbortController();
@@ -143,7 +143,7 @@ export function MedicationOrderBasket(props: MedicationOrderBasketProps) {
   };
 
   const resetParams = () => {
-    match.params = {};
+    props.match.params = {};
   };
 
   function navigate() {
@@ -224,27 +224,23 @@ export function MedicationOrderBasket(props: MedicationOrderBasketProps) {
         </div>
       </div>
 
-      <div style={{ width: "70%" }}>
+      <div style={{ width: "90%" }}>
         {orderBasket.length > 0 &&
           orderBasket.map((order, index) => {
             return (
               <div
-                className={`${styles.basketStyles} ${
-                  order.action === NEW_MEDICATION_ACTION
-                    ? styles.newOrder
-                    : styles.reviseOrder
-                }`}
+                className={`${styles.basketStyles} ${styles.OrderStyle}`}
                 key={index}
               >
                 <SummaryCardRow>
                   <SummaryCardRowContent justifyContent="space-between">
                     <span>
-                      <b>{order.drugName}</b>
+                      {order.action} <b>{order.drugName}</b>
                       {" \u2014 "}{" "}
                       {String(order.dosageForm).toLocaleLowerCase()}
                       {" \u2014 "} {String(order.routeName).toLocaleLowerCase()}
-                      {" \u2014 "}{" "}
-                      {`DOSE ${getDosage(order.drugStrength, order.dose)}`}{" "}
+                      {" \u2014 "} DOSE{" "}
+                      <b>{`${getDosage(order.drugStrength, order.dose)}`} </b>
                       <b>{String(order.frequencyName).toLocaleLowerCase()}</b>
                     </span>
                     <span>
@@ -254,7 +250,7 @@ export function MedicationOrderBasket(props: MedicationOrderBasketProps) {
                       >
                         <svg>
                           <use
-                            fill={"var(--omrs-color-ink-white)"}
+                            fill={"var(--omrs-color-brand-black)"}
                             xlinkHref="#omrs-icon-close"
                           ></use>
                         </svg>
@@ -270,7 +266,7 @@ export function MedicationOrderBasket(props: MedicationOrderBasketProps) {
                       >
                         <svg>
                           <use
-                            fill={"var(--omrs-color-ink-white)"}
+                            fill={"var(--omrs-color-brand-black)"}
                             xlinkHref="#omrs-icon-menu"
                           ></use>
                         </svg>
@@ -324,4 +320,6 @@ export function MedicationOrderBasket(props: MedicationOrderBasketProps) {
   );
 }
 
-type MedicationOrderBasketProps = {};
+type MedicationOrderBasketProps = {
+  match: match;
+};
