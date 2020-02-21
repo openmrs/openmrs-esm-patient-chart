@@ -7,6 +7,7 @@ import WorkspaceWrapper from "./workspace/workspace-wrapper.component";
 import ChartReview from "./chart-review/chart-review.component";
 import styles from "./root.css";
 import { defineConfigSchema, validators } from "@openmrs/esm-module-config";
+import { AppPropsContext } from "./app-props-context";
 
 function Root(props) {
   defineConfigSchema("@openmrs/esm-patient-chart", {
@@ -35,35 +36,37 @@ function Root(props) {
   });
 
   return (
-    <BrowserRouter basename={window["getOpenmrsSpaBase"]()}>
-      <main
-        className="omrs-main-content"
-        style={{
-          display: "flex",
-          alignItems: "flex-start",
-          flexDirection: "column"
-        }}
-      >
-        <aside style={{ height: "2.75rem" }}>
-          <Route path="/patient/:patientUuid/chart">
-            <PatientBanner match={props.match} />
-          </Route>
-        </aside>
-        <div className={styles.grid}>
-          <div className={styles.chartreview}>
-            <Route path="/patient/:patientUuid/chart/:widget?">
-              <ChartReview />
+    <AppPropsContext.Provider value={{ appProps: props }}>
+      <BrowserRouter basename={window["getOpenmrsSpaBase"]()}>
+        <main
+          className="omrs-main-content"
+          style={{
+            display: "flex",
+            alignItems: "flex-start",
+            flexDirection: "column"
+          }}
+        >
+          <aside style={{ height: "2.75rem" }}>
+            <Route path="/patient/:patientUuid/chart">
+              <PatientBanner match={props.match} />
             </Route>
+          </aside>
+          <div className={styles.grid}>
+            <div className={styles.chartreview}>
+              <Route path="/patient/:patientUuid/chart/:widget?">
+                <ChartReview />
+              </Route>
+            </div>
+            <div className={styles.workspace}>
+              <Route
+                path="/patient/:patientUuid/chart"
+                render={routeProps => <WorkspaceWrapper {...routeProps} />}
+              />
+            </div>
           </div>
-          <div className={styles.workspace}>
-            <Route
-              path="/patient/:patientUuid/chart"
-              render={routeProps => <WorkspaceWrapper {...routeProps} />}
-            />
-          </div>
-        </div>
-      </main>
-    </BrowserRouter>
+        </main>
+      </BrowserRouter>
+    </AppPropsContext.Provider>
   );
 }
 
