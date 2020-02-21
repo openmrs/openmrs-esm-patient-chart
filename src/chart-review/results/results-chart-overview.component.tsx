@@ -2,30 +2,20 @@ import React from "react";
 import styles from "../summaries/overview/patient-chart-overview.css";
 import VitalsOverview from "../../widgets/vitals/vitals-overview.component";
 import HeightAndWeightOverview from "../../widgets/heightandweight/heightandweight-overview.component";
-export default function ResultsChartOverview(props: ResultsChartOverviewProps) {
-  const config = ["vitals", "heightAndWeight"];
+import Dashboard, {
+  DashboardConfig
+} from "../../ui-components/dashboard/dashboard.component";
 
-  const coreComponents = {
-    vitals: VitalsOverview,
-    heightAndWeight: HeightAndWeightOverview
+export default function ResultsChartOverview(props: ResultsChartOverviewProps) {
+  const config: DashboardConfig = {
+    layout: { columns: 1 },
+    widgets: [
+      { name: "Vitals", component: VitalsOverview },
+      { name: "Height and Weight", component: HeightAndWeightOverview }
+    ]
   };
 
-  return (
-    <div className={styles.patientChartCardsContainer}>
-      <div className={styles.patientChartCards}>
-        {config.map((widget, index) => {
-          let Component;
-          if (typeof widget === "string") {
-            Component = coreComponents[widget];
-          } else {
-            Component = widget["module"];
-          }
-
-          return <Component key={index} />;
-        })}
-      </div>
-    </div>
-  );
+  return <Dashboard dashboardConfig={config} />;
 }
 
 type ResultsChartOverviewProps = {};

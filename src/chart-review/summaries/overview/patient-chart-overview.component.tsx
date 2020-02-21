@@ -1,4 +1,4 @@
-import React from "react";
+import React, { FunctionComponent } from "react";
 import { RouteComponentProps } from "react-router";
 import styles from "./patient-chart-overview.css";
 import HeightAndWeightOverview from "../../../widgets/heightandweight/heightandweight-overview.component";
@@ -8,17 +8,32 @@ import AllergyOverview from "../../../widgets/allergies/allergy-overview.compone
 import NotesOverview from "../../../widgets/notes/notes-overview.component";
 import ProgramsOverview from "../../../widgets/programs/programs-overview.component";
 import MedicationsOverview from "../../../widgets/medications/medications-overview.component";
+import Dashboard, {
+  DashboardConfig
+} from "../../../ui-components/dashboard/dashboard.component";
 
 export default function PatientChartOverview(props: PatientChartOverviewProps) {
-  const config = [
-    "conditions",
-    "programs",
-    "medications",
-    "allergies",
-    "notes",
-    "vitals",
-    "heightAndWeight"
-  ];
+  const dashboardConfig: DashboardConfig = {
+    layout: {
+      columns: 2
+    },
+    widgets: [
+      { name: "conditions-overview", component: ConditionsOverview },
+      { name: "programs-overview", component: ProgramsOverview },
+      { name: "allergey-overview", component: AllergyOverview },
+      { name: "notes-overview", component: NotesOverview, columns: 2 },
+      { name: "vitals-overview", component: VitalsOverview, columns: 1 },
+      {
+        name: "height-and-weight-overview",
+        component: HeightAndWeightOverview
+      },
+      {
+        name: "medications-overview",
+        component: MedicationsOverview,
+        columns: 2
+      }
+    ]
+  };
 
   const coreComponents = {
     conditions: ConditionsOverview,
@@ -30,22 +45,7 @@ export default function PatientChartOverview(props: PatientChartOverviewProps) {
     medications: MedicationsOverview
   };
 
-  return (
-    <div className={styles.patientChartCardsContainer}>
-      <div className={styles.patientChartCards}>
-        {config.map((widget, index) => {
-          let Component;
-          if (typeof widget === "string") {
-            Component = coreComponents[widget];
-          } else {
-            Component = widget["module"];
-          }
-
-          return <Component props={props.match} key={index} />;
-        })}
-      </div>
-    </div>
-  );
+  return <Dashboard dashboardConfig={dashboardConfig} />;
 }
 
 type PatientChartOverviewProps = {

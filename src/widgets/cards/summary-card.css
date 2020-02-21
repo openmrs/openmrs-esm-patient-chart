@@ -1,18 +1,16 @@
 :global(.omrs-breakpoint-lt-desktop) .card {
   width: 100%;
-  margin: 1rem 0;
   box-shadow: 0rem 0.125rem 0.25rem rgba(0, 0, 0, 0.08),
     0rem 0.0625rem 0.25rem rgba(0, 0, 0, 0.04);
 }
 
 :global(.omrs-breakpoint-gt-tablet) .card {
-  margin: 1.25rem;
   box-shadow: 0rem 0.125rem 0.25rem rgba(0, 0, 0, 0.08),
     0rem 0.0625rem 0.25rem rgba(0, 0, 0, 0.04);
 }
 
 :global(.omrs-breakpoint-lt-desktop) .card {
-  margin: 1rem 1rem;
+  margin: 0rem 0rem;
 }
 
 :global(.omrs-card) button.addBtn {

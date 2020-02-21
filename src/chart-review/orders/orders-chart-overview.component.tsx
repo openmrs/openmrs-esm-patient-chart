@@ -1,12 +1,17 @@
 import React from "react";
 import styles from "../summaries/overview/patient-chart-overview.css";
-import Overview from "../../ui-components/overview-widget/overview.component";
+import Dashboard, {
+  DashboardConfig
+} from "../../ui-components/dashboard/dashboard.component";
 import MedicationsOverview from "../../widgets/medications/medications-overview.component";
 
 export default function OrdersChartOverview(props: OrdersChartOverviewProps) {
-  const config = [MedicationsOverview];
+  const config: DashboardConfig = {
+    layout: { columns: 1 },
+    widgets: [{ name: "medications-overview", component: MedicationsOverview }]
+  };
 
-  return <Overview config={config} />;
+  return <Dashboard dashboardConfig={config} />;
 }
 
 type OrdersChartOverviewProps = {};

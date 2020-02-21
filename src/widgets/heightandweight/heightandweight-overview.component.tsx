@@ -34,7 +34,6 @@ export default function HeightAndWeightOverview(
   return (
     <SummaryCard
       name="Height & Weight"
-      styles={{ width: "100%", maxWidth: "45rem" }}
       link={`/patient/${patientUuid}/chart/dimensions`}
     >
       <SummaryCardRow>

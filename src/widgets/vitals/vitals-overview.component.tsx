@@ -1,5 +1,4 @@
 import React from "react";
-import { match } from "react-router";
 import SummaryCard from "../cards/summary-card.component";
 import { performPatientsVitalsSearch } from "./vitals-card.resource";
 import styles from "./vitals-overview.css";
@@ -29,7 +28,7 @@ export default function VitalsOverview(props: VitalsOverviewProps) {
   return (
     <SummaryCard
       name="Vitals"
-      styles={{ width: "100%", maxWidth: "45rem" }}
+      styles={{ width: "100%" }}
       link={`/patient/${patientUuid}/chart/vitals`}
     >
       <table className={styles.vitalsTable}>
@@ -82,6 +81,4 @@ export default function VitalsOverview(props: VitalsOverviewProps) {
   );
 }
 
-type VitalsOverviewProps = {
-  match: match;
-};
+type VitalsOverviewProps = {};
