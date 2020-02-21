@@ -72,15 +72,13 @@ export default function ChartReview(props: any) {
   }, [config, setWidgets]);
 
   function getInitialTab() {
-    let i;
     if (config == undefined || widgets.length === 0) {
-      i = 0;
+      return 0;
     } else if (widgetPath == undefined) {
-      i = config.defaultTabIndex;
+      return config.defaultTabIndex;
     } else {
-      i = widgets.findIndex(element => element.path === "/" + widgetPath);
+      return widgets.findIndex(element => element.path === "/" + widgetPath);
     }
-    return i;
   }
 
   const [tabHistory, setTabHistory] = React.useState({});
