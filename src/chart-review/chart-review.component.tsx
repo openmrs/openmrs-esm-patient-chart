@@ -1,15 +1,16 @@
-import React from "react";
+import React, { FunctionComponent } from "react";
 import { Link, useParams, useRouteMatch, useLocation } from "react-router-dom";
 import styles from "./chart-review.css";
 import { coreWidgets } from "./core-widgets.js";
 import { useConfig } from "@openmrs/esm-module-config";
+import { string } from "prop-types";
 
 export default function ChartReview(props: any) {
   const match = useRouteMatch();
   const location = useLocation();
 
   const { patientUuid } = useParams();
-  const { widget } = useParams();
+  const { widgetPath } = useParams();
   const config = useConfig();
 
   const defaultPath = `/patient/${patientUuid}/chart`;
@@ -29,24 +30,24 @@ export default function ChartReview(props: any) {
   const [selected, setSelected] = React.useState(getInitialTab());
 
   React.useEffect(() => {
-    const externalWidgets = {};
+    const externalWidgets: externalWidgetsType = {};
     const promises = [];
     const moduleMap = {};
 
-    config.widgetDefinitions.map(def => {
+    config.widgetDefinitions.forEach(def => {
       externalWidgets[def.name] = def;
-
       //only import modules once
       if (moduleMap[def.esModule] === undefined) {
-        let p = System.import(def.esModule);
-        promises.push(p);
-        moduleMap[def.esModule] = p;
+        promises.push(System.import(def.esModule));
       }
     });
 
     Promise.all(promises).then(modules => {
-      const w = [];
+      //widgets is an array of objects, see type below
+      const widgets: widgetType[] = [];
 
+      //Promise.all returns an array of resolved modules.
+      // Place into an object with key = module name to make it easier to access in the below widget loadinng loop
       modules.map(mod => {
         moduleMap[mod.name] = mod;
       });
@@ -55,18 +56,18 @@ export default function ChartReview(props: any) {
       config.widgets.map(widgetName => {
         //First see if name exists in coreWidgets
         if (coreWidgets[widgetName]) {
-          w.push(coreWidgets[widgetName]);
+          widgets.push(coreWidgets[widgetName]);
         } else {
-          const def = externalWidgets[widgetName];
+          const widget = externalWidgets[widgetName];
+          let Component: FunctionComponent =
+            moduleMap[widget.esModule].widgets[widget.name];
+          widget.component = () => <Component />;
 
-          let Component = moduleMap[def.esModule].widgets[def.name];
-          externalWidgets[widgetName].component = () => <Component />;
-
-          w.push(externalWidgets[widgetName]);
+          widgets.push(widget);
         }
       });
 
-      setWidgets(w);
+      setWidgets(widgets);
     });
   }, [config, setWidgets]);
 
@@ -74,10 +75,10 @@ export default function ChartReview(props: any) {
     let i;
     if (config == undefined || widgets.length === 0) {
       i = 0;
-    } else if (widget == undefined) {
+    } else if (widgetPath == undefined) {
       i = config.defaultTabIndex;
     } else {
-      i = widgets.findIndex(element => element.path === "/" + widget);
+      i = widgets.findIndex(element => element.path === "/" + widgetPath);
     }
     return i;
   }
@@ -128,3 +129,14 @@ export default function ChartReview(props: any) {
     </>
   );
 }
+
+type widgetType = {
+  name: string;
+  path: string;
+  esModule?: string;
+  component?: Function;
+};
+
+type externalWidgetsType = {
+  [key: string]: widgetType;
+};

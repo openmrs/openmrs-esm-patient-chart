@@ -7,6 +7,7 @@ import WorkspaceWrapper from "./workspace/workspace-wrapper.component";
 import ChartReview from "./chart-review/chart-review.component";
 import styles from "./root.css";
 import { defineConfigSchema, validators } from "@openmrs/esm-module-config";
+import { strict } from "assert";
 
 function Root(props) {
   defineConfigSchema("@openmrs/esm-patient-chart", {
