@@ -3,11 +3,11 @@ import styles from "../summaries/overview/patient-chart-overview.css";
 import VitalsOverview from "../../widgets/vitals/vitals-overview.component";
 import HeightAndWeightOverview from "../../widgets/heightandweight/heightandweight-overview.component";
 import Dashboard, {
-  DashboardConfig
+  DashboardConfigType
 } from "../../ui-components/dashboard/dashboard.component";
 
 export default function ResultsChartOverview(props: ResultsChartOverviewProps) {
-  const config: DashboardConfig = {
+  const config: DashboardConfigType = {
     layout: { columns: 1 },
     widgets: [
       { name: "Vitals", component: VitalsOverview },

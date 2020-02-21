@@ -13,7 +13,7 @@ export default function Dashboard(props: DashboardProps) {
       .trimRight();
   }
 
-  const getWidgetSizeStyle = (rows, columns): GridSize => ({
+  const getWidgetSizeStyle = (rows, columns): GridSizeType => ({
     gridRow: `span ${rows}`,
     gridColumn: `span ${columns}`
   });
@@ -26,8 +26,8 @@ export default function Dashboard(props: DashboardProps) {
       >
         {props.dashboardConfig.widgets.map((widget, index) => {
           let Component = widget.component;
-          let rows = widget.rows || 1;
-          let columns = widget.columns || 1;
+          let rows = widget.layout && (widget.layout.rows || 1);
+          let columns = widget.layout && (widget.layout.columns || 1);
           return (
             <div
               key={index}
@@ -47,24 +47,26 @@ export default function Dashboard(props: DashboardProps) {
 }
 
 export type DashboardProps = {
-  dashboardConfig: DashboardConfig;
+  dashboardConfig: DashboardConfigType;
 };
 
-type GridSize = {
+type GridSizeType = {
   gridRow: string;
   gridColumn: string;
 };
 
-export type DashboardConfig = {
+export type DashboardConfigType = {
   layout: {
     columns: number;
   };
-  widgets: WidgetConfig[];
+  widgets: WidgetConfigType[];
 };
 
-export type WidgetConfig = {
+export type WidgetConfigType = {
   name: string;
-  rows?: number;
-  columns?: number;
+  layout?: {
+    rows?: number;
+    columns?: number;
+  };
   component: FunctionComponent;
 };

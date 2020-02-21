@@ -39,7 +39,7 @@ export default function Orders(props: any) {
 
   return (
     <>
-      <ChartWidget {...props} widgetConfig={widgetConfig} />;
+      <ChartWidget {...props} widgetConfig={widgetConfig} />
       <div>
         <button
           className="omrs-unstyled"

@@ -40,7 +40,6 @@ export default function MedicationLevelTwo(props: MedicationsOverviewProps) {
       <React.Fragment>
         <SummaryCard
           name={t("Medications - current", "Medications - current")}
-          styles={{ width: "90%" }}
           addComponent={MedicationOrderBasket}
         >
           <table className={styles.medicationsTable}>
@@ -173,7 +172,6 @@ export default function MedicationLevelTwo(props: MedicationsOverviewProps) {
       <React.Fragment>
         <SummaryCard
           name={t("Medications - past", "Medications - past")}
-          styles={{ width: "90%" }}
           addComponent={MedicationOrderBasket}
         >
           <table className={styles.medicationsTable}>

@@ -1,6 +1,5 @@
 import React, { FunctionComponent } from "react";
 import { RouteComponentProps } from "react-router";
-import styles from "./patient-chart-overview.css";
 import HeightAndWeightOverview from "../../../widgets/heightandweight/heightandweight-overview.component";
 import VitalsOverview from "../../../widgets/vitals/vitals-overview.component";
 import ConditionsOverview from "../../../widgets/conditions/conditions-overview.component";
@@ -9,20 +8,28 @@ import NotesOverview from "../../../widgets/notes/notes-overview.component";
 import ProgramsOverview from "../../../widgets/programs/programs-overview.component";
 import MedicationsOverview from "../../../widgets/medications/medications-overview.component";
 import Dashboard, {
-  DashboardConfig
+  DashboardConfigType
 } from "../../../ui-components/dashboard/dashboard.component";
 
 export default function PatientChartOverview(props: PatientChartOverviewProps) {
-  const dashboardConfig: DashboardConfig = {
+  const dashboardConfig: DashboardConfigType = {
     layout: {
-      columns: 2
+      columns: 3
     },
     widgets: [
       { name: "conditions-overview", component: ConditionsOverview },
       { name: "programs-overview", component: ProgramsOverview },
       { name: "allergey-overview", component: AllergyOverview },
-      { name: "notes-overview", component: NotesOverview, columns: 2 },
-      { name: "vitals-overview", component: VitalsOverview, columns: 1 },
+      {
+        name: "notes-overview",
+        component: NotesOverview,
+        layout: { columns: 2 }
+      },
+      {
+        name: "vitals-overview",
+        component: VitalsOverview,
+        layout: { columns: 1 }
+      },
       {
         name: "height-and-weight-overview",
         component: HeightAndWeightOverview
@@ -30,7 +37,7 @@ export default function PatientChartOverview(props: PatientChartOverviewProps) {
       {
         name: "medications-overview",
         component: MedicationsOverview,
-        columns: 2
+        layout: { columns: 2 }
       }
     ]
   };

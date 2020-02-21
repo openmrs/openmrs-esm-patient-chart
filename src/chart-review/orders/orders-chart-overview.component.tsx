@@ -1,12 +1,11 @@
 import React from "react";
-import styles from "../summaries/overview/patient-chart-overview.css";
 import Dashboard, {
-  DashboardConfig
+  DashboardConfigType
 } from "../../ui-components/dashboard/dashboard.component";
 import MedicationsOverview from "../../widgets/medications/medications-overview.component";
 
 export default function OrdersChartOverview(props: OrdersChartOverviewProps) {
-  const config: DashboardConfig = {
+  const config: DashboardConfigType = {
     layout: { columns: 1 },
     widgets: [{ name: "medications-overview", component: MedicationsOverview }]
   };
