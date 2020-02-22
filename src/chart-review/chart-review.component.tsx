@@ -30,37 +30,6 @@ export default function ChartReview(props: any) {
   const [selected, setSelected] = React.useState(getInitialTab());
   const [tabHistory, setTabHistory] = React.useState({});
 
-  /*
-  const widgetDefinitions = [
-    {
-      name: "widget",
-      label: "Hello", //will be displayed on the nav bar
-      esModule: "@jj-widgets", //this module must be in the import map
-      path: "/widget" //this will be the path to the widget and will be appended to /patient/:patientUuid/chart
-    }
-  ] ;
-
-  "name": "pih-diabetes-dashboard-1",
-                "title": "PIH Diabetes Dashboard 1",
-                "layout": {
-                    "columnSpan":3
-                },
-                "widgets": [
-                    {
-                        "esModule":"@pih-widgets",
-                        "name": "diabetes-overview",
-                        "layout": {
-                            "rowSpan": 1,
-                            "columnSpan": 2
-                        }
-                    },
-                    {
-                        "esModule":"@pih-widgets",
-                        "name":"diabetes-lab-results-summary"
-                    }
-                ]
-*/
-
   function getInitialTab() {
     if (config == undefined || navbarItems.length === 0) {
       return 0;
@@ -74,14 +43,13 @@ export default function ChartReview(props: any) {
     }
   }
 
-  const hello = "hello";
-
   React.useEffect(() => {
     const views = [];
     config.primaryNavBar.forEach(item => {
       if (coreWidgets[item.component]) {
         views.push(coreWidgets[item.component]);
       }
+      // TO DO: Need to handle case where item.component is not a coreWidget
       setNavbarItems(config.primaryNavBar);
       setViews(views);
     });
@@ -141,7 +109,3 @@ export default function ChartReview(props: any) {
     </>
   );
 }
-
-type ExternalWidgetsType = {
-  [key: string]: WidgetConfigType;
-};
