@@ -7,7 +7,13 @@ import Encounters from "../chart-review/encounters/encounters.component";
 import Allergies from "../chart-review/allergies/allergies.component";
 import Conditions from "../chart-review/conditions/conditions.component";
 import Programs from "../chart-review/programs/programs.component";
+import HeightAndWeightOverview from "./heightandweight/heightandweight-overview.component";
+import VitalsOverview from "./vitals/vitals-overview.component";
+import ConditionsOverview from "./conditions/conditions-overview.component";
+import AllergyOverview from "./allergies/allergy-overview.component";
+import NotesOverview from "./notes/notes-overview.component";
 import ProgramsOverview from "./programs/programs-overview.component";
+import MedicationsOverview from "./medications/medications-overview.component";
 
 export const coreWidgets: CoreWidgetsType = {
   summariesDashboard: {
@@ -71,6 +77,54 @@ export const coreWidgets: CoreWidgetsType = {
     label: "Programs Overview",
     component: () => {
       return <ProgramsOverview />;
+    }
+  },
+
+  medicationsOverview: {
+    name: "medicationsOverview",
+    label: "Medications Overview",
+    component: () => {
+      return <MedicationsOverview />;
+    }
+  },
+
+  heightAndWeightOverview: {
+    name: "heightAndWeightOverview",
+    label: "Height and Weight Overview",
+    component: () => {
+      return <HeightAndWeightOverview />;
+    }
+  },
+
+  vitalsOverview: {
+    name: "vitalsOverview",
+    label: "Vitals Overview",
+    component: () => {
+      return <VitalsOverview />;
+    }
+  },
+
+  conditionsOverview: {
+    name: "conditionsOverview",
+    label: "Conditions Overview",
+    component: () => {
+      return <ConditionsOverview />;
+    }
+  },
+
+  allergyOverview: {
+    name: "allergyOverview",
+    label: "Allergy Overview",
+    component: () => {
+      return <AllergyOverview />;
+    }
+  },
+
+  notesOverview: {
+    name: "notesOverview",
+    label: "Notes Overview",
+    component: () => {
+      return <NotesOverview />;
     }
   }
 };

@@ -1,11 +1,4 @@
 import React from "react";
-import HeightAndWeightOverview from "../../../widgets/heightandweight/heightandweight-overview.component";
-import VitalsOverview from "../../../widgets/vitals/vitals-overview.component";
-import ConditionsOverview from "../../../widgets/conditions/conditions-overview.component";
-import AllergyOverview from "../../../widgets/allergies/allergy-overview.component";
-import NotesOverview from "../../../widgets/notes/notes-overview.component";
-import ProgramsOverview from "../../../widgets/programs/programs-overview.component";
-import MedicationsOverview from "../../../widgets/medications/medications-overview.component";
 import Dashboard, {
   DashboardConfigType
 } from "../../../ui-components/dashboard/dashboard.component";
@@ -19,56 +12,37 @@ export default function PatientChartOverview(props: PatientChartOverviewProps) {
     },
     widgets: [
       {
-        name: "conditions-overview",
-        component: ConditionsOverview,
+        name: "conditionsOverview",
         layout: { columnSpan: 2 }
       },
       {
-        name: "programs-overview",
-        component: ProgramsOverview,
+        name: "programsOverview",
         layout: { columnSpan: 2 }
       },
       {
-        name: "notes-overview",
-        component: NotesOverview,
+        name: "notesOverview",
         layout: { columnSpan: 4 }
       },
       {
-        name: "vitals-overview",
-        component: VitalsOverview,
+        name: "vitalsOverview",
         layout: { columnSpan: 2 }
       },
       {
-        name: "height-and-weight-overview",
-        component: HeightAndWeightOverview,
+        name: "heightAndWeightOverview",
         layout: { columnSpan: 2 }
       },
       {
-        name: "medications-overview",
-        component: MedicationsOverview,
+        name: "medicationsOverview",
         layout: { columnSpan: 3 }
       },
       {
-        name: "allergy-overview",
-        component: AllergyOverview,
+        name: "allergyOverview",
         layout: { columnSpan: 1 }
       }
     ]
   };
 
-  const coreComponents = {
-    conditions: ConditionsOverview,
-    programs: ProgramsOverview,
-    allergies: AllergyOverview,
-    notes: NotesOverview,
-    vitals: VitalsOverview,
-    heightAndWeight: HeightAndWeightOverview,
-    medications: MedicationsOverview
-  };
-
   return <Dashboard dashboardConfig={dashboardConfig} />;
 }
 
-type PatientChartOverviewProps = {
-  match: {};
-};
+type PatientChartOverviewProps = {};

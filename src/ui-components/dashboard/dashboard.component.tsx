@@ -3,7 +3,7 @@ import styles from "./dashboard.css";
 import { coreWidgets } from "../../widgets/core-widgets";
 
 export default function Dashboard(props: DashboardProps) {
-  const [dashboard, setDashboard] = React.useState();
+  const [widgets, setWidgets] = React.useState([]);
 
   React.useEffect(() => {
     loadDashboardFromConfig(props.dashboardConfig);
@@ -27,6 +27,7 @@ export default function Dashboard(props: DashboardProps) {
 
   function loadDashboardFromConfig(dashboardConfig: DashboardConfigType) {
     const promises = [];
+    const widgets = [];
     dashboardConfig.widgets.forEach(widget => {
       widget.esModule && promises.push(System.import(widget.esModule));
     });
@@ -40,9 +41,9 @@ export default function Dashboard(props: DashboardProps) {
           widget.component = coreWidgets[widget.name].component;
         }
 
-        dashboardConfig.widgets[i] = widget;
+        widgets[i] = widget;
       });
-      setDashboard(<Dashboard dashboardConfig={dashboardConfig} />);
+      setWidgets(widgets);
     });
   }
 
@@ -52,7 +53,7 @@ export default function Dashboard(props: DashboardProps) {
         className={styles.dashboard}
         style={{ gridTemplateColumns: getColumnsLayoutStyle() }}
       >
-        {props.dashboardConfig.widgets.map((widget, index) => {
+        {widgets.map((widget, index) => {
           let Component = widget.component;
           let rows = widget.layout && (widget.layout.rowSpan || 1);
           let columns = widget.layout && (widget.layout.columnSpan || 1);
@@ -86,6 +87,7 @@ type GridSizeType = {
 export type DashboardConfigType = {
   name: string;
   title: string;
+  path?: string;
   layout: {
     columns: number;
   };

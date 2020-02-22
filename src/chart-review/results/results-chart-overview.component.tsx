@@ -8,11 +8,10 @@ import Dashboard, {
 
 export default function ResultsChartOverview(props: ResultsChartOverviewProps) {
   const config: DashboardConfigType = {
+    name: "resultsOverview",
+    title: "Results Overview",
     layout: { columns: 1 },
-    widgets: [
-      { name: "Vitals", component: VitalsOverview },
-      { name: "Height and Weight", component: HeightAndWeightOverview }
-    ]
+    widgets: [{ name: "vitals" }, { name: "heightAndWeight" }]
   };
 
   return <Dashboard dashboardConfig={config} />;
