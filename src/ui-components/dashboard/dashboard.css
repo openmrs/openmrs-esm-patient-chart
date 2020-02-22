@@ -1,10 +1,10 @@
 .container {
   margin: 21px;
   display: flex;
-  justify-content: center;
 }
 
 .dashboard {
+  flex-basis: 100%;
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-auto-rows: auto;
