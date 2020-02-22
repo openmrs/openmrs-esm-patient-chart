@@ -1,7 +1,14 @@
 import React, { FunctionComponent } from "react";
 import styles from "./dashboard.css";
+import { coreWidgets } from "../../widgets/core-widgets";
 
 export default function Dashboard(props: DashboardProps) {
+  const [dashboard, setDashboard] = React.useState();
+
+  React.useEffect(() => {
+    loadDashboardFromConfig(props.dashboardConfig);
+  }, [props.dashboardConfig]);
+
   function getColumnsLayoutStyle(): string {
     const numberOfColumns =
       props.dashboardConfig.layout && props.dashboardConfig.layout.columns
@@ -18,6 +25,27 @@ export default function Dashboard(props: DashboardProps) {
     gridColumn: `span ${columns}`
   });
 
+  function loadDashboardFromConfig(dashboardConfig: DashboardConfigType) {
+    const promises = [];
+    dashboardConfig.widgets.forEach(widget => {
+      widget.esModule && promises.push(System.import(widget.esModule));
+    });
+    Promise.all(promises).then(modules => {
+      dashboardConfig.widgets.forEach((widget, i) => {
+        let Component: FunctionComponent;
+        if (widget.esModule) {
+          Component = modules[i].widgets[widget.name];
+          widget.component = () => <Component />;
+        } else {
+          widget.component = coreWidgets[widget.name].component;
+        }
+
+        dashboardConfig.widgets[i] = widget;
+      });
+      setDashboard(<Dashboard dashboardConfig={dashboardConfig} />);
+    });
+  }
+
   return (
     <div className={styles.container}>
       <div
@@ -26,8 +54,8 @@ export default function Dashboard(props: DashboardProps) {
       >
         {props.dashboardConfig.widgets.map((widget, index) => {
           let Component = widget.component;
-          let rows = widget.layout && (widget.layout.rows || 1);
-          let columns = widget.layout && (widget.layout.columns || 1);
+          let rows = widget.layout && (widget.layout.rowSpan || 1);
+          let columns = widget.layout && (widget.layout.columnSpan || 1);
           return (
             <div
               key={index}
@@ -56,6 +84,8 @@ type GridSizeType = {
 };
 
 export type DashboardConfigType = {
+  name: string;
+  title: string;
   layout: {
     columns: number;
   };
@@ -64,9 +94,11 @@ export type DashboardConfigType = {
 
 export type WidgetConfigType = {
   name: string;
+  path?: string;
+  esModule?: string;
   layout?: {
-    rows?: number;
-    columns?: number;
+    rowSpan?: number;
+    columnSpan?: number;
   };
-  component: FunctionComponent;
+  component?: Function;
 };

@@ -1,15 +1,17 @@
 import React from "react";
-import Summaries from "./summaries/summaries.component";
-import Results from "./results/results.component";
-import Orders from "./orders/orders.component";
-import Encounters from "./encounters/encounters.component";
-import Allergies from "./allergies/allergies.component";
-import Conditions from "./conditions/conditions.component";
-import Programs from "./programs/programs.component";
 
-export const coreWidgets = {
-  summaries: {
-    name: "summaries",
+import Summaries from "../chart-review/summaries/summaries.component";
+import Results from "../chart-review/results/results.component";
+import Orders from "../chart-review/orders/orders.component";
+import Encounters from "../chart-review/encounters/encounters.component";
+import Allergies from "../chart-review/allergies/allergies.component";
+import Conditions from "../chart-review/conditions/conditions.component";
+import Programs from "../chart-review/programs/programs.component";
+import ProgramsOverview from "./programs/programs-overview.component";
+
+export const coreWidgets: CoreWidgetsType = {
+  summariesDashboard: {
+    name: "summariesDashboard",
     label: "Summaries",
     path: `/summaries`,
     component: () => {
@@ -63,5 +65,23 @@ export const coreWidgets = {
     component: () => {
       return <Programs />;
     }
+  },
+  programsOverview: {
+    name: "programsOverview",
+    label: "Programs Overview",
+    component: () => {
+      return <ProgramsOverview />;
+    }
   }
+};
+
+type CoreWidgetsType = {
+  [key: string]: CoreWidgetType;
+};
+
+type CoreWidgetType = {
+  name: string;
+  label: string;
+  path?: string;
+  component: Function;
 };

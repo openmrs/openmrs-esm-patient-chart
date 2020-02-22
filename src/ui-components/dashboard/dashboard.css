@@ -24,18 +24,8 @@
 }
 
 .widgetContainer {
-  background: #eee;
   text-align: center;
   display: flex;
   flex-flow: column;
-  width: 100%;
-}
-
-.widgetContainer :global(.omrs-breakpoint-lt-tablet) {
-  background: #eee;
-  text-align: center;
-  display: flex;
-  flex-flow: column;
-  position: relative;
   width: 100%;
 }

@@ -16,7 +16,7 @@ function Root(props) {
     },
     widgets: {
       default: [
-        "summaries",
+        "summariesDashboard",
         "results",
         "orders",
         "encounters",

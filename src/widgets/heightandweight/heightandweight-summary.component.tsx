@@ -72,7 +72,7 @@ function HeightAndWeightSummary(props: HeightAndWeightSummaryProps) {
                 </td>
                 <td style={{ textAlign: "end" }}>
                   <Link
-                    to={`/patient/${patientUuid}/chart/results?tab=Height%20and%20Weight&uuid=${dimension.obsData.weight.uuid}`}
+                    to={`?tab=Height%20and%20Weight&uuid=${dimension.obsData.weight.uuid}`}
                   >
                     <svg
                       className="omrs-icon"

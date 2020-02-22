@@ -1,20 +1,33 @@
 import React, { FunctionComponent } from "react";
-import { Link, useParams, useRouteMatch, useLocation } from "react-router-dom";
+import {
+  Link,
+  useParams,
+  useRouteMatch,
+  useLocation,
+  Switch,
+  Route
+} from "react-router-dom";
 import styles from "./chart-review.css";
-import { coreWidgets } from "./core-widgets.js";
 import { useConfig } from "@openmrs/esm-module-config";
-import { string } from "prop-types";
+import Dashboard, {
+  DashboardConfigType,
+  WidgetConfigType
+} from "../ui-components/dashboard/dashboard.component";
+import { coreWidgets } from "../widgets/core-widgets";
 
 export default function ChartReview(props: any) {
   const match = useRouteMatch();
   const location = useLocation();
 
   const { patientUuid } = useParams();
-  const { widgetPath } = useParams();
+  const { widget: widgetPath } = useParams();
   const config = useConfig();
 
   const defaultPath = `/patient/${patientUuid}/chart`;
   const [widgets, setWidgets] = React.useState([]);
+
+  const [selected, setSelected] = React.useState(getInitialTab());
+  const [tabHistory, setTabHistory] = React.useState({});
 
   /*
   const widgetDefinitions = [
@@ -25,12 +38,78 @@ export default function ChartReview(props: any) {
       path: "/widget" //this will be the path to the widget and will be appended to /patient/:patientUuid/chart
     }
   ] ;
+
+  "name": "pih-diabetes-dashboard-1",
+                "title": "PIH Diabetes Dashboard 1",
+                "layout": {
+                    "columnSpan":3
+                },
+                "widgets": [
+                    {
+                        "esModule":"@pih-widgets",
+                        "name": "diabetes-overview",
+                        "layout": {
+                            "rowSpan": 1,
+                            "columnSpan": 2
+                        }
+                    },
+                    {
+                        "esModule":"@pih-widgets",
+                        "name":"diabetes-lab-results-summary"
+                    }
+                ]
 */
 
-  const [selected, setSelected] = React.useState(getInitialTab());
+  function getInitialTab() {
+    if (config == undefined || widgets.length === 0) {
+      return 0;
+    } else if (widgetPath == undefined) {
+      return config.defaultTabIndex;
+    } else {
+      return widgets.findIndex(element => element.path === "/" + widgetPath);
+    }
+  }
+
+  const testDD: DashboardConfigType = {
+    title: "Test",
+    name: "test",
+    layout: {
+      columns: 3
+    },
+    widgets: [
+      {
+        name: "conditions-overview",
+        layout: { columnSpan: 2 }
+      },
+      {
+        name: "programs-overview",
+        layout: { columnSpan: 2 }
+      },
+      {
+        name: "notes-overview",
+        layout: { columnSpan: 4 }
+      },
+      {
+        name: "vitals-overview",
+        layout: { columnSpan: 2 }
+      },
+      {
+        name: "height-and-weight-overview",
+        layout: { columnSpan: 2 }
+      },
+      {
+        name: "medications-overview",
+        layout: { columnSpan: 3 }
+      },
+      {
+        name: "allergy-overview",
+        layout: { columnSpan: 1 }
+      }
+    ]
+  };
 
   React.useEffect(() => {
-    const externalWidgets: externalWidgetsType = {};
+    const externalWidgets: ExternalWidgetsType = {};
     const promises = [];
     const moduleMap = {};
 
@@ -44,7 +123,7 @@ export default function ChartReview(props: any) {
 
     Promise.all(promises).then(modules => {
       //widgets is an array of objects, see type below
-      const widgets: widgetType[] = [];
+      const widgets: WidgetConfigType[] = [];
 
       //Promise.all returns an array of resolved modules.
       // Place into an object with key = module name to make it easier to access in the below widget loadinng loop
@@ -71,24 +150,18 @@ export default function ChartReview(props: any) {
     });
   }, [config, setWidgets]);
 
-  function getInitialTab() {
-    if (config == undefined || widgets.length === 0) {
-      return 0;
-    } else if (widgetPath == undefined) {
-      return config.defaultTabIndex;
-    } else {
-      return widgets.findIndex(element => element.path === "/" + widgetPath);
-    }
-  }
-
-  const [tabHistory, setTabHistory] = React.useState({});
-
   React.useEffect(() => {
     setTabHistory(t => {
       t[match.params["widget"]] = location.search;
       return t;
     });
   }, [match, location]);
+
+  React.useEffect(() => {
+    setSelected(
+      widgets.findIndex(element => element.path === "/" + widgetPath)
+    );
+  }, [widgets, widgetPath]);
 
   return (
     <>
@@ -121,20 +194,24 @@ export default function ChartReview(props: any) {
             })}
         </ul>
       </nav>
-      {widgets.length > 0 &&
-        selected !== undefined &&
-        widgets[selected].component()}
+      <Switch>
+        {widgets.map(widget => {
+          return (
+            <Route key={widget.name} path={defaultPath + widget.path}>
+              {widget.component()}
+            </Route>
+          );
+        })}
+      </Switch>
     </>
   );
 }
 
-type widgetType = {
-  name: string;
-  path: string;
-  esModule?: string;
-  component?: Function;
+type ExternalWidgetsType = {
+  [key: string]: WidgetConfigType;
 };
-
-type externalWidgetsType = {
-  [key: string]: widgetType;
-};
+/*
+      {widgets.length > 0 &&
+        selected !== undefined &&
+        widgets[selected].component()}
+*/

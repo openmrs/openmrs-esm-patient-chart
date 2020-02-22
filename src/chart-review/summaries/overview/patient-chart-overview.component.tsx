@@ -1,5 +1,4 @@
-import React, { FunctionComponent } from "react";
-import { RouteComponentProps } from "react-router";
+import React from "react";
 import HeightAndWeightOverview from "../../../widgets/heightandweight/heightandweight-overview.component";
 import VitalsOverview from "../../../widgets/vitals/vitals-overview.component";
 import ConditionsOverview from "../../../widgets/conditions/conditions-overview.component";
@@ -13,6 +12,8 @@ import Dashboard, {
 
 export default function PatientChartOverview(props: PatientChartOverviewProps) {
   const dashboardConfig: DashboardConfigType = {
+    name: "overview",
+    title: "Overview",
     layout: {
       columns: 4
     },
@@ -20,37 +21,37 @@ export default function PatientChartOverview(props: PatientChartOverviewProps) {
       {
         name: "conditions-overview",
         component: ConditionsOverview,
-        layout: { columns: 2 }
+        layout: { columnSpan: 2 }
       },
       {
         name: "programs-overview",
         component: ProgramsOverview,
-        layout: { columns: 2 }
+        layout: { columnSpan: 2 }
       },
       {
         name: "notes-overview",
         component: NotesOverview,
-        layout: { columns: 4 }
+        layout: { columnSpan: 4 }
       },
       {
         name: "vitals-overview",
         component: VitalsOverview,
-        layout: { columns: 2 }
+        layout: { columnSpan: 2 }
       },
       {
         name: "height-and-weight-overview",
         component: HeightAndWeightOverview,
-        layout: { columns: 2 }
+        layout: { columnSpan: 2 }
       },
       {
         name: "medications-overview",
         component: MedicationsOverview,
-        layout: { columns: 3 }
+        layout: { columnSpan: 3 }
       },
       {
         name: "allergy-overview",
         component: AllergyOverview,
-        layout: { columns: 1 }
+        layout: { columnSpan: 1 }
       }
     ]
   };
