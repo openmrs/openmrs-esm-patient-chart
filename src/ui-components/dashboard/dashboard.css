@@ -1,5 +1,7 @@
 .container {
   margin: 21px;
+  display: flex;
+  justify-content: center;
 }
 
 .dashboard {
