@@ -13,7 +13,7 @@ export default function Summaries(props: any) {
       {
         name: "Overview",
         component: () => {
-          return <PatientChartOverview match={match} />;
+          return <PatientChartOverview />;
         }
       }
     ]
