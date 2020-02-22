@@ -2,7 +2,6 @@ import React from "react";
 import { BrowserRouter, Route } from "react-router-dom";
 import openmrsRootDecorator from "@openmrs/react-root-decorator";
 import PatientBanner from "./banner/patient-banner.component";
-import Sidebar from "./sidebar/sidebar.component";
 import WorkspaceWrapper from "./workspace/workspace-wrapper.component";
 import ChartReview from "./chart-review/chart-review.component";
 import styles from "./root.css";
@@ -11,21 +10,70 @@ import { AppPropsContext } from "./app-props-context";
 
 function Root(props) {
   defineConfigSchema("@openmrs/esm-patient-chart", {
-    defaultTabIndex: {
-      default: 0
-    },
-    widgets: {
+    primaryNavBar: {
+      arrayElements: {
+        label: { validators: [validators.isString] },
+        path: { validators: [validators.isString] },
+        component: { validators: [validators.isString] }
+      },
       default: [
-        "summariesDashboard",
-        "results",
-        "orders",
-        "encounters",
-        "conditions",
-        "programs",
-        "allergies"
-      ],
-      arrayElements: { validators: [validators.isString] }
+        {
+          label: "Summaries",
+          path: "/summaries",
+          component: "summariesDashboard"
+        },
+        {
+          label: "Results",
+          path: "/results",
+          component: "results"
+        },
+        {
+          label: "Orders",
+          path: "/orders",
+          component: "orders"
+        },
+        {
+          label: "Encounters",
+          path: "/encounters",
+          component: "encounters"
+        },
+        {
+          label: "Conditions",
+          path: "/conditions",
+          component: "conditions"
+        },
+        {
+          label: "Programs",
+          path: "/programs",
+          component: "programs"
+        },
+        {
+          label: "Allergies",
+          path: "/allergies",
+          component: "allergies"
+        }
+      ]
     },
+
+    dashboardDefinitions: {
+      arrayElements: {
+        name: { validators: [validators.isString] },
+        title: { validators: [validators.isString] },
+        layout: {
+          columns: { validators: [validators.isString] }
+        },
+        widgets: {
+          arrayElements: {
+            name: { validators: [validators.isString] },
+            esModule: { validators: [validators.isString] },
+            label: { validators: [validators.isString] },
+            path: { validators: [validators.isString] }
+          }
+        }
+      },
+      default: []
+    },
+
     widgetDefinitions: {
       arrayElements: {
         name: { validators: [validators.isString] },

@@ -11,7 +11,7 @@ export default function ResultsChartOverview(props: ResultsChartOverviewProps) {
     name: "resultsOverview",
     title: "Results Overview",
     layout: { columns: 1 },
-    widgets: [{ name: "vitals" }, { name: "heightAndWeight" }]
+    widgets: [{ name: "vitalsOverview" }, { name: "heightAndWeightOverview" }]
   };
 
   return <Dashboard dashboardConfig={config} />;
