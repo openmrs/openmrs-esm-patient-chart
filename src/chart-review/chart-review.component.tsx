@@ -210,8 +210,3 @@ export default function ChartReview(props: any) {
 type ExternalWidgetsType = {
   [key: string]: WidgetConfigType;
 };
-/*
-      {widgets.length > 0 &&
-        selected !== undefined &&
-        widgets[selected].component()}
-*/
