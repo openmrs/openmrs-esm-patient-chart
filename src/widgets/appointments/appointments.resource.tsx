@@ -1,5 +1,4 @@
 import { openmrsFetch } from "@openmrs/esm-api";
-import { map } from "rxjs/operators";
 
 export function getAppointments(
   patientUuid: string,

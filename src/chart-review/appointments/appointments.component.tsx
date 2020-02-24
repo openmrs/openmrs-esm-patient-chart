@@ -4,8 +4,6 @@ import React from "react";
 import AppointmentsOverview from "../../widgets/appointments/appointments-overview.component";
 
 export default function Appointment(props: any) {
-  const match = useRouteMatch();
-
   const widgetConfig = {
     name: "appointments",
     defaultTabIndex: 0,
@@ -13,7 +11,7 @@ export default function Appointment(props: any) {
       {
         name: "Overview",
         component: () => {
-          return <AppointmentsOverview match={match} />;
+          return <AppointmentsOverview />;
         }
       }
     ]

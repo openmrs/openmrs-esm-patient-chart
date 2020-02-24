@@ -5,10 +5,10 @@ import dayjs from "dayjs";
 import SummaryCard from "../cards/summary-card.component";
 import SummaryCardFooter from "../cards/summary-card-footer.component";
 import styles from "./appointments-overview.css";
-export default function AppointmentsOverview(props: AppointmentsOverviewProps) {
+export default function AppointmentsOverview() {
   const [patientAppointments, setPatientAppointments] = React.useState(null);
   const [
-    sLoadingPatient,
+    isLoadingPatient,
     patient,
     patientUuid,
     patientErr
@@ -51,7 +51,9 @@ export default function AppointmentsOverview(props: AppointmentsOverviewProps) {
                   key={appointment.uuid}
                   className={styles.tableAppointmentsRow}
                 >
-                  <td>{dayjs(appointment.startDateTime).format("YY:MM:DD")}</td>
+                  <td test-id="startDate">
+                    {dayjs(appointment.startDateTime).format("YY:MM:DD")}
+                  </td>
                   <td>
                     {appointment.service.name}
                     <div className={styles.status}>{appointment.status}</div>
@@ -81,5 +83,3 @@ export default function AppointmentsOverview(props: AppointmentsOverviewProps) {
 
   return restAPIAppointmentsOverview();
 }
-
-type AppointmentsOverviewProps = { match: {} };
