@@ -6,6 +6,7 @@ import Encounters from "./encounters/encounters.component";
 import Allergies from "./allergies/allergies.component";
 import Conditions from "./conditions/conditions.component";
 import Programs from "./programs/programs.component";
+import Appointment from "./appointments/appointments.component";
 
 export const coreWidgets = {
   summaries: {
@@ -62,6 +63,14 @@ export const coreWidgets = {
     path: `/programs`,
     component: () => {
       return <Programs />;
+    }
+  },
+  appointments: {
+    name: "appointments",
+    label: "Appointments",
+    path: `/appointments`,
+    component: () => {
+      return <Appointment />;
     }
   }
 };

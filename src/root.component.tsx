@@ -22,7 +22,8 @@ function Root(props) {
         "encounters",
         "conditions",
         "programs",
-        "allergies"
+        "allergies",
+        "appointments"
       ],
       arrayElements: { validators: [validators.isString] }
     },
