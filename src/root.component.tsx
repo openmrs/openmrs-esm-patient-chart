@@ -60,14 +60,18 @@ function Root(props) {
         name: { validators: [validators.isString] },
         title: { validators: [validators.isString] },
         layout: {
-          columns: { validators: [validators.isString] }
+          columns: {}
         },
         widgets: {
           arrayElements: {
             name: { validators: [validators.isString] },
             esModule: { validators: [validators.isString] },
             label: { validators: [validators.isString] },
-            path: { validators: [validators.isString] }
+            path: { validators: [validators.isString] },
+            layout: {
+              rowSpan: {},
+              columnSpan: {}
+            }
           }
         }
       },

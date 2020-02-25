@@ -45,16 +45,16 @@ export default function ChartReview(props: any) {
   }
 
   function getCoreView(name: string): ViewType {
-    let view: ViewType;
     if (coreWidgets[name]) {
       return coreWidgets[name];
     }
     if (coreDashboards[name]) {
-      view = {
+      return {
         ...coreDashboards[name],
-        component: () => <Dashboard dashboardConfig={coreDashboards[name]} />
+        component: () => (
+          <Dashboard key={name} dashboardConfig={coreDashboards[name]} />
+        )
       };
-      return view;
     }
     return;
     //TODO: if(coreMultiDashboards[view])
@@ -68,7 +68,9 @@ export default function ChartReview(props: any) {
         <Widget widgetConfig={config.widgetDefinitions[i]} />
       );
     }
-    i = config.dashboardDefinitions.findIndex(item => item.name === view);
+    i = config.dashboardDefinitions.findIndex(
+      dashboardDefinition => dashboardDefinition.name === name
+    );
 
     if (i !== -1) {
       view.component = () => (
