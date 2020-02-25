@@ -14,43 +14,43 @@ function Root(props) {
       arrayElements: {
         label: { validators: [validators.isString] },
         path: { validators: [validators.isString] },
-        component: { validators: [validators.isString] }
+        view: { validators: [validators.isString] }
       },
       default: [
         {
-          label: "Summaries",
-          path: "/summaries",
-          component: "summariesDashboard"
+          label: "Summary",
+          path: "/summary",
+          view: "summaryDashboard"
         },
         {
           label: "Results",
           path: "/results",
-          component: "results"
+          view: "resultsOverviewDashboard"
         },
         {
           label: "Orders",
           path: "/orders",
-          component: "orders"
+          view: "ordersOverviewDashboard"
         },
         {
           label: "Encounters",
           path: "/encounters",
-          component: "encounters"
+          view: "encountersOverviewDashboard"
         },
         {
           label: "Conditions",
           path: "/conditions",
-          component: "conditions"
+          view: "conditionsOverviewDashboard"
         },
         {
           label: "Programs",
           path: "/programs",
-          component: "programs"
+          view: "programsOverviewDashboard"
         },
         {
           label: "Allergies",
           path: "/allergies",
-          component: "allergies"
+          view: "allergiesOverviewDashboard"
         }
       ]
     },

@@ -1,10 +1,9 @@
 import React from "react";
 import { useRouteMatch } from "react-router-dom";
 import { newWorkspaceItem } from "../../workspace/workspace.resource";
-import ChartWidget from "../../ui-components/chart-widget/chart-widget.component";
+import ChartWidget from "../../ui-components/multi-dashboard/chart-widget.component";
 import MedicationsLevelTwo from "../../widgets/medications/medication-level-two.component";
 import { MedicationOrderBasket } from "../../widgets/medications/medication-order-basket.component";
-import OrdersChartOverview from "./orders-chart-overview.component";
 
 export default function Orders(props: any) {
   const match = useRouteMatch();
@@ -25,7 +24,7 @@ export default function Orders(props: any) {
       {
         name: "Overview",
         component: () => {
-          return <OrdersChartOverview />;
+          return <div>placeholder</div>;
         }
       },
       {

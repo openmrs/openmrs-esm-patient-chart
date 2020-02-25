@@ -1,17 +1,28 @@
 import React, { FunctionComponent } from "react";
 import styles from "./dashboard.css";
-import { coreWidgets } from "../../widgets/core-widgets";
+import Widget from "../widget/widget.component";
 
 export default function Dashboard(props: DashboardProps) {
   const [widgets, setWidgets] = React.useState([]);
 
   React.useEffect(() => {
-    loadDashboardFromConfig(props.dashboardConfig);
+    //loadDashboardFromConfig(props.dashboardConfig);
+
+    const widgets = [];
+    let widget;
+    props.dashboardConfig.widgets.forEach((widgetConfig, index) => {
+      widget = <Widget widgetConfig={widgetConfig} />;
+      widgetConfig.component = () => <Widget widgetConfig={widgetConfig} />;
+      widgets.push(widgetConfig);
+    });
+    setWidgets(widgets);
   }, [props.dashboardConfig]);
 
   function getColumnsLayoutStyle(): string {
     const numberOfColumns =
-      props.dashboardConfig.layout && props.dashboardConfig.layout.columns
+      props.dashboardConfig &&
+      props.dashboardConfig.layout &&
+      props.dashboardConfig.layout.columns
         ? props.dashboardConfig.layout.columns
         : 2;
 
@@ -20,41 +31,14 @@ export default function Dashboard(props: DashboardProps) {
       .trimRight();
   }
 
-  const getWidgetSizeStyle = (rows, columns): GridSizeType => ({
-    gridRow: `span ${rows}`,
-    gridColumn: `span ${columns}`
-  });
-
-  function loadDashboardFromConfig(dashboardConfig: DashboardConfigType) {
-    const promises = [];
-    const widgets = [];
-    dashboardConfig.widgets.forEach(widget => {
-      widget.esModule && promises.push(System.import(widget.esModule));
-    });
-    Promise.all(promises).then(modules => {
-      dashboardConfig.widgets.forEach((widget, i) => {
-        let Component: FunctionComponent;
-        if (widget.esModule) {
-          Component = modules[i].widgets[widget.name];
-          widget.component = () => <Component />;
-        } else {
-          widget.component = coreWidgets[widget.name].component;
-        }
-
-        widgets[i] = widget;
-      });
-      setWidgets(widgets);
-    });
-  }
-
   return (
     <div className={styles.container}>
       <div
         className={styles.dashboard}
-        style={{ gridTemplateColumns: getColumnsLayoutStyle() }}
+        style={{ gridTemplateColumns: getColumnsLayoutStyle() || 2 }}
       >
         {widgets.map((widget, index) => {
-          let Component = widget.component;
+          let W = widget;
           let rows = widget.layout && (widget.layout.rowSpan || 1);
           let columns = widget.layout && (widget.layout.columnSpan || 1);
           return (
@@ -66,7 +50,7 @@ export default function Dashboard(props: DashboardProps) {
                 gridColumn: `span ${columns}`
               }}
             >
-              <Component key={index} />
+              {widget.component && widget.component()}
             </div>
           );
         })}
@@ -86,9 +70,8 @@ type GridSizeType = {
 
 export type DashboardConfigType = {
   name: string;
-  title: string;
-  path?: string;
-  layout: {
+  title?: string;
+  layout?: {
     columns: number;
   };
   widgets: WidgetConfigType[];

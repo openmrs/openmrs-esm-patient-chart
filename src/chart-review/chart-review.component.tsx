@@ -13,7 +13,8 @@ import Dashboard, {
   DashboardConfigType,
   WidgetConfigType
 } from "../ui-components/dashboard/dashboard.component";
-import { coreWidgets } from "../widgets/core-widgets";
+import { coreWidgets, coreDashboards } from "../ui-components/core-views";
+import Widget from "../ui-components/widget/widget.component";
 
 export default function ChartReview(props: any) {
   const match = useRouteMatch();
@@ -24,7 +25,7 @@ export default function ChartReview(props: any) {
   const config = useConfig();
 
   const defaultPath = `/patient/${patientUuid}/chart`;
-  const [views, setViews] = React.useState([]);
+  const [routes, setRoutes] = React.useState([]);
   const [navbarItems, setNavbarItems] = React.useState([]);
 
   const [selected, setSelected] = React.useState(getInitialTab());
@@ -43,17 +44,55 @@ export default function ChartReview(props: any) {
     }
   }
 
+  function getCoreView(name: string): ViewType {
+    let view: ViewType;
+    if (coreWidgets[name]) {
+      return coreWidgets[name];
+    }
+    if (coreDashboards[name]) {
+      view = {
+        ...coreDashboards[name],
+        component: () => <Dashboard dashboardConfig={coreDashboards[name]} />
+      };
+      return view;
+    }
+    return;
+    //TODO: if(coreMultiDashboards[view])
+  }
+
+  function getExternalView(config, name: string): ViewType {
+    let i = config.widgetDefinitions.findIndex(item => item.name === name);
+    let view: ViewType = { name: name, component: null };
+    if (i !== -1) {
+      view.component = () => (
+        <Widget widgetConfig={config.widgetDefinitions[i]} />
+      );
+    }
+    i = config.dashboardDefinitions.findIndex(item => item.name === view);
+
+    if (i !== -1) {
+      view.component = () => (
+        <Dashboard dashboardConfig={config.dashboardDefinitions[i]} />
+      );
+    }
+    return view;
+  }
+
   React.useEffect(() => {
-    const views = [];
-    config.primaryNavBar.forEach(item => {
-      if (coreWidgets[item.component]) {
-        views.push(coreWidgets[item.component]);
+    const routes: ViewType[] = config.primaryNavBar.map(item => {
+      let view = getCoreView(item.view);
+
+      if (view === undefined) {
+        view = getExternalView(config, item.view);
       }
-      // TO DO: Need to handle case where item.component is not a coreWidget
-      setNavbarItems(config.primaryNavBar);
-      setViews(views);
+      item.component = view.component;
+      return item;
     });
-  }, [config, setViews]);
+
+    // TO DO: Need to handle case where item.component is not a coreWidget
+    setNavbarItems(config.primaryNavBar);
+    setRoutes(routes);
+  }, [config, setRoutes]);
 
   React.useEffect(() => {
     setTabHistory(t => {
@@ -63,8 +102,8 @@ export default function ChartReview(props: any) {
   }, [match, location]);
 
   React.useEffect(() => {
-    setSelected(views.findIndex(element => element.path === "/" + widgetPath));
-  }, [views, widgetPath]);
+    setSelected(routes.findIndex(element => element.path === "/" + widgetPath));
+  }, [routes, widgetPath]);
 
   return (
     <>
@@ -98,10 +137,10 @@ export default function ChartReview(props: any) {
         </ul>
       </nav>
       <Switch>
-        {views.map(view => {
+        {routes.map(route => {
           return (
-            <Route key={view.name} path={defaultPath + view.path}>
-              {view.component()}
+            <Route key={route.name} path={defaultPath + route.path}>
+              {route.component && route.component()}
             </Route>
           );
         })}
@@ -109,3 +148,14 @@ export default function ChartReview(props: any) {
     </>
   );
 }
+
+type RouteType = {
+  name: string;
+  path: string;
+  component: Function;
+};
+
+type ViewType = {
+  name: string;
+  component: Function;
+};
