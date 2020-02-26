@@ -51,6 +51,11 @@ function Root(props) {
           label: "Allergies",
           path: "/allergies",
           view: "allergiesOverviewDashboard"
+        },
+        {
+          label: "Appointments",
+          path: "/appointments",
+          view: "appointmentsOverviewDashboard"
         }
       ]
     },

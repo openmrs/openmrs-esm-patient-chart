@@ -7,6 +7,7 @@ import AllergyOverview from "../widgets/allergies/allergy-overview.component";
 import NotesOverview from "../widgets/notes/notes-overview.component";
 import ProgramsOverview from "../widgets/programs/programs-overview.component";
 import MedicationsOverview from "../widgets/medications/medications-overview.component";
+import AppointmentsOverview from "../widgets/appointments/appointments-overview.component";
 import { DashboardConfigType } from "./dashboard/dashboard.component";
 
 const coreMultiDashboards = {};
@@ -45,6 +46,10 @@ export const coreDashboards: CoreDashboardsType = {
       {
         name: "allergyOverview",
         layout: { columnSpan: 1 }
+      },
+      {
+        name: "appointmentsOverview",
+        layout: { columnSpan: 4 }
       }
     ]
   },
@@ -80,6 +85,11 @@ export const coreDashboards: CoreDashboardsType = {
   programsOverviewDashboard: {
     name: "programsOverviewDashboard",
     widgets: [{ name: "programsOverview" }]
+  },
+
+  appointmentsOverviewDashboard: {
+    name: "appointmentsOverviewDashboard",
+    widgets: [{ name: "appointmentsOverview" }]
   }
 };
 
@@ -130,6 +140,13 @@ export const coreWidgets: CoreWidgetsType = {
     name: "notesOverview",
     component: () => {
       return <NotesOverview />;
+    }
+  },
+
+  appointmentsOverview: {
+    name: "appointmentsOverview",
+    component: () => {
+      return <AppointmentsOverview />;
     }
   }
 };

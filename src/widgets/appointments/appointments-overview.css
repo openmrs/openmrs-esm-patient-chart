@@ -1,0 +1,58 @@
+.tableAppointmentsRow {
+  border-bottom: 1px solid var(--omrs-color-bg-low-contrast);
+}
+.svgUpper {
+  display: none;
+}
+
+.tableHeader {
+  padding: 0.625rem;
+}
+:global(.omrs-breakpoint-gt-phone) .card {
+  width: 21.75rem;
+  margin: 0.5rem 1rem;
+}
+.tableAppointments {
+  width: 100%;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+table.table .tableDates {
+  text-align: start;
+}
+
+.tableAppointmentsHeader {
+  color: var(--omrs-color-ink-medium-contrast);
+  font-size: 0.9375rem;
+  text-transform: capitalize;
+  font-weight: normal;
+  letter-spacing: 0.0275rem;
+  font-family: "Work Sans";
+}
+
+.status {
+  color: var(--omrs-color-ink-medium-contrast);
+  font-family: "Roboto";
+}
+.tableAppointments thead th {
+  color: var(--omrs-color-ink-medium-contrast);
+  text-align: left;
+}
+
+.tableAppointments thead {
+  color: var(--omrs-color-ink-medium-contrast);
+}
+
+.tableAppointments tbody td:nth-child(1) {
+  font-family: "Work Sans";
+  padding: 1rem;
+}
+
+.tableAppointments thead td {
+  margin-top: 0.625rem;
+  padding: 0.25rem 0.5rem 0 0.5rem;
+}
+
+.tableAppointments thead td:nth-child(1) {
+  width: 25%;
+}
