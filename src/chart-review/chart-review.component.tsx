@@ -62,23 +62,23 @@ export default function ChartReview(props: any) {
   }
 
   function getExternalView(config, name: string): ViewType {
-    let i = config.widgetDefinitions.findIndex(item => item.name === name);
-    let view: ViewType = { name: name, component: null };
-    if (i !== -1) {
-      view.component = () => (
-        <Widget widgetConfig={config.widgetDefinitions[i]} />
-      );
-    }
-    i = config.dashboardDefinitions.findIndex(
-      dashboardDefinition => dashboardDefinition.name === name
+    const widget = config.widgetDefinitions.findIndex(
+      widget => widget.name === name
+    );
+    const dashboard = config.dashboardDefinitions.find(
+      dashboard => dashboard.name === name
     );
 
-    if (i !== -1) {
-      view.component = () => (
-        <Dashboard dashboardConfig={config.dashboardDefinitions[i]} />
-      );
+    if (widget) {
+      return { name, component: () => <Widget widgetConfig={widget} /> };
+    } else if (dashboard) {
+      return {
+        name,
+        component: () => <Dashboard dashboardConfig={dashboard} />
+      };
+    } else {
+      return { name, component: null };
     }
-    return view;
   }
 
   React.useEffect(() => {
