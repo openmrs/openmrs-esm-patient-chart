@@ -1,11 +1,9 @@
 import React from "react";
-import { useParams, useLocation, Link, useRouteMatch } from "react-router-dom";
+import { useLocation, useRouteMatch } from "react-router-dom";
 import ChartWidget from "../../ui-components/multi-dashboard/chart-widget.component";
-import ProgramsSummary from "../../widgets/programs/programs-summary.component";
-import ConditionsDetailedSummary from "../../widgets/conditions/conditions-detailed-summary.component";
-import { AllergyOverviewLevelTwo } from "../../widgets/allergies/allergy-card-level-two.component";
 import styles from "../../ui-components/chart-widget/chart-widget.css";
 import NotesOverview from "../../widgets/notes/notes-overview.component";
+import NotesSummary from "../../widgets/notes/notes-summary.component";
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
@@ -21,13 +19,13 @@ export default function Encounters(props: any) {
       {
         name: "Overview",
         component: () => {
-          return <div>placeholder</div>;
+          return <NotesOverview />;
         }
       },
       {
         name: "Notes",
         component: () => {
-          return <NotesOverview />;
+          return <NotesSummary />;
         }
       }
     ]
