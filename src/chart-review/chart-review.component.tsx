@@ -5,7 +5,8 @@ import {
   useRouteMatch,
   useLocation,
   Switch,
-  Route
+  Route,
+  Redirect
 } from "react-router-dom";
 import styles from "./chart-review.css";
 import { useConfig } from "@openmrs/esm-module-config";
@@ -138,6 +139,13 @@ export default function ChartReview(props: any) {
             })}
         </ul>
       </nav>
+
+      {routes.length > 0 && (
+        <Route exact path={defaultPath}>
+          <Redirect to={defaultPath + routes[0].path} />
+        </Route>
+      )}
+
       <Switch>
         {routes.map(route => {
           return (
