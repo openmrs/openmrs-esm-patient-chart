@@ -62,7 +62,7 @@ export default function ChartReview(props: any) {
   }
 
   function getExternalView(config, name: string): ViewType {
-    const widget = config.widgetDefinitions.findIndex(
+    const widget = config.widgetDefinitions.find(
       widget => widget.name === name
     );
     const dashboard = config.dashboardDefinitions.find(

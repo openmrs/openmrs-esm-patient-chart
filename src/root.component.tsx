@@ -40,7 +40,7 @@ function Root(props) {
         {
           label: "Conditions",
           path: "/conditions",
-          view: "conditionsOverviewDashboard"
+          view: "conditionsOverview"
         },
         {
           label: "Programs",
