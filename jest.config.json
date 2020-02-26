@@ -15,5 +15,6 @@
       "functions": 45,
       "lines": 50
     }
-  }
+  },
+  "modulePathIgnorePatterns": ["cypress/"]
 }
