@@ -9,8 +9,35 @@ import ProgramsOverview from "../widgets/programs/programs-overview.component";
 import MedicationsOverview from "../widgets/medications/medications-overview.component";
 import AppointmentsOverview from "../widgets/appointments/appointments-overview.component";
 import { DashboardConfigType } from "./dashboard/dashboard.component";
+import VitalsDetailedSummary from "../widgets/vitals/vitals-detailed-summary.component";
+import { HeightAndWeightDetailedSummary } from "../widgets/heightandweight/heightandweight-detailed-summary.component";
+import HeightAndWeightSummary from "../widgets/heightandweight/heightandweight-summary.component";
 
-const coreMultiDashboards = {};
+export const coreMultiDashboards = {
+  resultsMultiDashboard: {
+    name: "resultsMultiDashboard",
+    title: "Results",
+
+    navbar: [
+      {
+        label: "Overview",
+        path: "/overview",
+        view: "resultsOverviewDashboard"
+      },
+      {
+        label: "Vitals",
+        path: "/vitals",
+        view: "vitalsDetailedSummary"
+      },
+      {
+        label: "Height and Weight",
+        path: "/heightAndWeight",
+        view: "heightAndWeightDetailedSummary"
+      }
+    ]
+  }
+};
+
 export const coreDashboards: CoreDashboardsType = {
   summaryDashboard: {
     name: "summaryDashboard",
@@ -115,10 +142,24 @@ export const coreWidgets: CoreWidgetsType = {
     }
   },
 
+  heightAndWeightDetailedSummary: {
+    name: "heightAndWeightDetailedSummary",
+    component: () => {
+      return <HeightAndWeightSummary />;
+    }
+  },
+
   vitalsOverview: {
     name: "vitalsOverview",
     component: () => {
       return <VitalsOverview />;
+    }
+  },
+
+  vitalsDetailedSummary: {
+    name: "vitalsDetailedSummary",
+    component: () => {
+      return <VitalsDetailedSummary />;
     }
   },
 

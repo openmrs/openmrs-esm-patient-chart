@@ -7,7 +7,7 @@ import { AllergyCardLevelThree } from "../allergies/allergy-card-level-three.com
 import styles from "../../summaries/summaries-nav.css";
 import MedicationsChartOverview from "./medication-chart-overview.component";
 
-import ChartWidget from "../../ui-components/multi-dashboard/chart-widget.component";
+import ChartWidget from "../../view-components/multi-dashboard/multi-dashboard.component";
 
 export default function Medications(props: any) {
   let { patientUuid } = useParams();

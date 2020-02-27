@@ -1,7 +1,7 @@
 import React from "react";
 import { useRouteMatch } from "react-router-dom";
 import { newWorkspaceItem } from "../../workspace/workspace.resource";
-import ChartWidget from "../../ui-components/multi-dashboard/chart-widget.component";
+import ChartWidget from "../../view-components/multi-dashboard/multi-dashboard.component";
 import MedicationsLevelTwo from "../../widgets/medications/medication-level-two.component";
 import { MedicationOrderBasket } from "../../widgets/medications/medication-order-basket.component";
 

@@ -1,6 +1,6 @@
 import React from "react";
 import { useRouteMatch } from "react-router-dom";
-import ChartWidget from "../../ui-components/multi-dashboard/chart-widget.component";
+import ChartWidget from "../../view-components/multi-dashboard/multi-dashboard.component";
 import ProgramsSummary from "../../widgets/programs/programs-summary.component";
 
 export default function Programs(props: any) {

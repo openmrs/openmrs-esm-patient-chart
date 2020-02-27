@@ -10,7 +10,7 @@ import { AppPropsContext } from "./app-props-context";
 
 function Root(props) {
   defineConfigSchema("@openmrs/esm-patient-chart", {
-    primaryNavBar: {
+    primaryNavbar: {
       arrayElements: {
         label: { validators: [validators.isString] },
         path: { validators: [validators.isString] },
@@ -25,7 +25,7 @@ function Root(props) {
         {
           label: "Results",
           path: "/results",
-          view: "resultsOverviewDashboard"
+          view: "resultsMultiDashboard"
         },
         {
           label: "Orders",
@@ -91,6 +91,21 @@ function Root(props) {
         path: { validators: [validators.isString] }
       },
       default: []
+    },
+
+    multiDashboardDefinitions: {
+      arrayElements: {
+        name: { validators: [validators.isString] },
+        title: { validators: [validators.isString] },
+        navbar: {
+          arrayElements: {
+            label: { validators: [validators.isString] },
+            path: { validators: [validators.isString] },
+            view: { validators: [validators.isString] }
+          }
+        }
+      },
+      default: []
     }
   });
 
@@ -112,7 +127,7 @@ function Root(props) {
           </aside>
           <div className={styles.grid}>
             <div className={styles.chartreview}>
-              <Route path="/patient/:patientUuid/chart/:widget?">
+              <Route path="/patient/:patientUuid/chart/:view?/:subview?">
                 <ChartReview />
               </Route>
             </div>

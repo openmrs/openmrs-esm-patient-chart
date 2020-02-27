@@ -4,7 +4,7 @@ import VitalsOverview from "../../widgets/vitals/vitals-overview.component";
 import HeightAndWeightOverview from "../../widgets/heightandweight/heightandweight-overview.component";
 import Dashboard, {
   DashboardConfigType
-} from "../../ui-components/dashboard/dashboard.component";
+} from "../../view-components/dashboard/dashboard.component";
 
 export default function ResultsChartOverview(props: ResultsChartOverviewProps) {
   const config: DashboardConfigType = {
