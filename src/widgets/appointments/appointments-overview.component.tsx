@@ -23,7 +23,7 @@ export default function AppointmentsOverview() {
         abortController
       ).then((response: any) => setPatientAppointments(response.data));
     }
-  }, [patientUuid]);
+  }, [patientUuid, startDate]);
   function restAPIAppointmentsOverview() {
     return (
       <SummaryCard

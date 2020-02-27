@@ -28,12 +28,22 @@ export default function MedicationsOverview(props: MedicationsOverviewProps) {
   React.useEffect(() => {
     if (patientUuid) {
       const subscription = fetchPatientMedications(patientUuid).subscribe(
-        Medications => setPatientMedications(Medications),
+        Medications => {
+          setPatientMedications(filterActiveMedicationOrders(Medications));
+        },
         createErrorHandler()
       );
       return () => subscription.unsubscribe();
     }
   }, [patientUuid]);
+
+  function filterActiveMedicationOrders(medicationOrders: any) {
+    return medicationOrders.filter(
+      medication =>
+        new Date(medication.autoExpireDate) > new Date() ||
+        new Date(medication.dateStopped) > new Date()
+    );
+  }
 
   return (
     <SummaryCard

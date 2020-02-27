@@ -92,4 +92,6 @@ export type OrderMedication = {
   concept?: string;
   orderReasonNonCoded?: string;
   orderUuid: string;
+  autoExpireDate?: Date;
+  startDate?: string;
 };

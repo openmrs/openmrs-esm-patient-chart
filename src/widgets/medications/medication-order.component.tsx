@@ -143,6 +143,7 @@ export function MedicationOrder(props: MedicationOrderProps) {
           setFrequencyUuid(data.frequency.concept.uuid);
           setAction("REVISE");
           setNumRefills(data.numRefills);
+          setDurationUnit(data.durationUnits.uuid);
           if (data.previousOrder === null) {
             setPreviousOrder(data.uuid);
           } else {
@@ -172,7 +173,7 @@ export function MedicationOrder(props: MedicationOrderProps) {
     if (props.orderEdit.orderEdit) {
       const order = props.orderEdit.order;
       setEncounterUuid(order.encounterUuid);
-      setStartDate(dayjs(new Date()).format("DD-MMM-YYYY"));
+      setStartDate(dayjs(order.startDate).format("DD-MMM-YYYY"));
       setDosingInstructions(order.dosingInstructions);
       setDoseUnits(order.doseUnitsConcept);
       setDosageForm(order.dosageForm);
@@ -185,6 +186,7 @@ export function MedicationOrder(props: MedicationOrderProps) {
       setAction(order.action);
       setNumRefills(Number(order.numRefills));
       setPreviousOrder(order.previousOrder);
+      setDurationUnit(order.durationUnits);
     }
   }, [props.orderEdit]);
 
@@ -237,7 +239,9 @@ export function MedicationOrder(props: MedicationOrderProps) {
           drugStrength: drugStrength,
           dosingInstructions: dosingInstructions,
           dateStopped: endDate,
-          concept: concept
+          concept: concept,
+          autoExpireDate: dayjs(endDate).format("YYYY-MM-DD"),
+          startDate: dayjs(startDate).format("YYYY-MM-DD")
         }
       ]);
     } else {
@@ -267,7 +271,9 @@ export function MedicationOrder(props: MedicationOrderProps) {
           dosageForm: dosageForm,
           frequencyName: frequencyName,
           drugStrength: drugStrength,
-          dosingInstructions: dosingInstructions
+          dosingInstructions: dosingInstructions,
+          autoExpireDate: dayjs(endDate).format("YYYY-MM-DD"),
+          startDate: dayjs(startDate).format("YYYY-MM-DD")
         }
       ]);
     }
@@ -381,7 +387,8 @@ export function MedicationOrder(props: MedicationOrderProps) {
                 placeholder="Day-Month-Year"
                 autoComplete="off"
                 required
-                defaultValue={startDate}
+                value={startDate}
+                onChange={$evt => setStartDate($evt.target.value)}
               />
             </div>
             <div

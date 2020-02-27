@@ -94,7 +94,8 @@ export function saveNewDrugOrder(
         duration: drugOrder.duration,
         durationUnits: drugOrder.durationUnits,
         dosingInstructions: drugOrder.dosingInstructions,
-        concept: drugOrder.concept
+        concept: drugOrder.concept,
+        autoExpireDate: drugOrder.autoExpireDate
       }
     });
   } else if (drugOrder.action === REVISE_MEDICATION_ACTION) {
@@ -123,7 +124,8 @@ export function saveNewDrugOrder(
         duration: drugOrder.duration,
         durationUnits: drugOrder.durationUnits,
         previousOrder: drugOrder.previousOrder,
-        dosingInstructions: drugOrder.dosingInstructions
+        dosingInstructions: drugOrder.dosingInstructions,
+        autoExpireDate: drugOrder.autoExpireDate
       }
     });
   } else if (drugOrder.action === DISCONTINUE_MEDICATION_ACTION) {
