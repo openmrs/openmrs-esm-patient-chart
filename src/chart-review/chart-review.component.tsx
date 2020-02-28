@@ -49,7 +49,7 @@ export default function ChartReview(props: any) {
     // TO DO: Need to handle case where item.component is not a coreWidget
     setNavbarItems(config.primaryNavbar);
     setRoutes(routes);
-  }, [config, setRoutes]);
+  }, [config, setRoutes, defaultPath]);
 
   React.useEffect(() => {
     setTabHistory(t => {
@@ -116,12 +116,6 @@ export default function ChartReview(props: any) {
     </>
   );
 }
-
-type RouteType = {
-  name: string;
-  path: string;
-  component: Function;
-};
 
 type ViewType = {
   name: string;
