@@ -25,12 +25,12 @@ function Root(props) {
         {
           label: "Results",
           path: "/results",
-          view: "resultsMultiDashboard"
+          view: "resultsTabbedView"
         },
         {
           label: "Orders",
           path: "/orders",
-          view: "ordersOverviewDashboard"
+          view: "ordersTabbedView"
         },
         {
           label: "Encounters",
@@ -93,7 +93,7 @@ function Root(props) {
       default: []
     },
 
-    multiDashboardDefinitions: {
+    tabbedViewDefinitions: {
       arrayElements: {
         name: { validators: [validators.isString] },
         title: { validators: [validators.isString] },

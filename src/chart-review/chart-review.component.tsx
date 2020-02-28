@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from "react";
+import React from "react";
 import {
   Link,
   useParams,
@@ -10,24 +10,8 @@ import {
 } from "react-router-dom";
 import styles from "./chart-review.css";
 import { useConfig } from "@openmrs/esm-module-config";
-import Dashboard, {
-  DashboardConfigType,
-  WidgetConfigType
-} from "../view-components/dashboard/dashboard.component";
 
-import MultiDashboard from "../view-components/multi-dashboard/multi-dashboard.component";
-
-import {
-  coreWidgets,
-  coreDashboards,
-  coreMultiDashboards
-} from "../view-components/core-views";
-import Widget from "../view-components/widget/widget.component";
-import {
-  getCoreView,
-  getExternalView,
-  getView
-} from "../view-components/view-utils";
+import { getView } from "../view-components/view-utils";
 
 export default function ChartReview(props: any) {
   const match = useRouteMatch();
@@ -120,7 +104,10 @@ export default function ChartReview(props: any) {
       <Switch>
         {routes.map(route => {
           return (
-            <Route key={route.label} path={defaultPath + route.path}>
+            <Route
+              key={route.label}
+              path={defaultPath + route.path + "/:subview?"}
+            >
               {route.component && route.component()}
             </Route>
           );

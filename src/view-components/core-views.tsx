@@ -12,10 +12,11 @@ import { DashboardConfigType } from "./dashboard/dashboard.component";
 import VitalsDetailedSummary from "../widgets/vitals/vitals-detailed-summary.component";
 import { HeightAndWeightDetailedSummary } from "../widgets/heightandweight/heightandweight-detailed-summary.component";
 import HeightAndWeightSummary from "../widgets/heightandweight/heightandweight-summary.component";
+import MedicationsDetailedSummary from "../widgets/medications/medication-level-two.component";
 
-export const coreMultiDashboards = {
-  resultsMultiDashboard: {
-    name: "resultsMultiDashboard",
+export const coreTabbedViews = {
+  resultsTabbedView: {
+    name: "resultsTabbedView",
     title: "Results",
 
     navbar: [
@@ -33,6 +34,24 @@ export const coreMultiDashboards = {
         label: "Height and Weight",
         path: "/heightAndWeight",
         view: "heightAndWeightDetailedSummary"
+      }
+    ]
+  },
+
+  ordersTabbedView: {
+    name: "ordersTabbedView",
+    title: "Orders",
+
+    navbar: [
+      {
+        label: "Overview",
+        path: "/overview",
+        view: "ordersOverviewDashboard"
+      },
+      {
+        label: "Medication Orders",
+        path: "/medication-orders",
+        view: "medicationsDetailedSummary"
       }
     ]
   }
@@ -132,6 +151,13 @@ export const coreWidgets: CoreWidgetsType = {
     name: "medicationsOverview",
     component: () => {
       return <MedicationsOverview />;
+    }
+  },
+
+  medicationsDetailedSummary: {
+    name: "medicationsDetailedSummary",
+    component: () => {
+      return <MedicationsDetailedSummary />;
     }
   },
 

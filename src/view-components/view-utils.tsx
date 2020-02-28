@@ -1,9 +1,9 @@
 import React from "react";
 
 import Dashboard from "./dashboard/dashboard.component";
-import MultiDashboard from "./multi-dashboard/multi-dashboard.component";
+import MultiDashboard from "./tabbed-view/tabbed-view.component";
 
-import { coreWidgets, coreDashboards, coreMultiDashboards } from "./core-views";
+import { coreWidgets, coreDashboards, coreTabbedViews } from "./core-views";
 import Widget from "./widget/widget.component";
 
 export function getView(name: string, config: any, defaultPath: any): ViewType {
@@ -22,13 +22,13 @@ export function getCoreView(name: string, defaultPath: string): ViewType {
       )
     };
   }
-  if (coreMultiDashboards[name]) {
+  if (coreTabbedViews[name]) {
     return {
-      ...coreMultiDashboards[name],
+      ...coreTabbedViews[name],
       component: () => (
         <MultiDashboard
           key={name}
-          config={coreMultiDashboards[name]}
+          config={coreTabbedViews[name]}
           defaultPath={defaultPath}
         />
       )
