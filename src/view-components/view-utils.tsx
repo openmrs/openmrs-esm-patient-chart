@@ -1,7 +1,7 @@
 import React from "react";
 
 import Dashboard from "./dashboard/dashboard.component";
-import MultiDashboard from "./tabbed-view/tabbed-view.component";
+import TabbedView from "./tabbed-view/tabbed-view.component";
 
 import { coreWidgets, coreDashboards, coreTabbedViews } from "./core-views";
 import Widget from "./widget/widget.component";
@@ -26,7 +26,7 @@ export function getCoreView(name: string, defaultPath: string): ViewType {
     return {
       ...coreTabbedViews[name],
       component: () => (
-        <MultiDashboard
+        <TabbedView
           key={name}
           config={coreTabbedViews[name]}
           defaultPath={defaultPath}
@@ -57,7 +57,7 @@ export function getExternalView(config: any, name: string): ViewType {
   } else if (multiDashboard) {
     return {
       ...multiDashboard,
-      component: () => <MultiDashboard config={multiDashboard} />
+      component: () => <TabbedView config={multiDashboard} />
     };
   } else {
     return { name, component: null };
