@@ -6,7 +6,8 @@ import {
   useHistory,
   useParams,
   useLocation,
-  Switch
+  Switch,
+  useRouteMatch
 } from "react-router-dom";
 
 import styles from "./multi-dashboard.css";
@@ -19,15 +20,16 @@ function useQuery() {
 export default function MultiDashboard(props: any) {
   let { patientUuid } = useParams();
   const [routes, setRoutes] = useState([]);
-  const { view: viewPath } = useParams();
-  const { subView: tabPath } = useParams();
+  const match = useRouteMatch();
 
   const [selected, setSelected] = React.useState(getInitialTab());
 
   function getInitialTab() {
+    const viewPath = match.url.substr(match.url.lastIndexOf("/"));
     const navItem = props.config.navbar.findIndex(
-      element => element.name === tabPath
+      element => element.path === viewPath
     );
+    console.log(match);
     return navItem === -1 ? 0 : navItem;
   }
 

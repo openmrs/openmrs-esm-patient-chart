@@ -69,7 +69,6 @@ export default function ChartReview(props: any) {
 
   React.useEffect(() => {
     setTabHistory(t => {
-      console.log(match.params["view"]);
       t[match.params["view"]] = location.pathname;
       return t;
     });
@@ -92,7 +91,12 @@ export default function ChartReview(props: any) {
                       index === selected ? styles.selected : styles.unselected
                     }`}
                   >
-                    <Link to={tabHistory[item.path] || defaultPath + item.path}>
+                    <Link
+                      to={
+                        tabHistory[item.path.substr(1)] ||
+                        defaultPath + item.path
+                      }
+                    >
                       <button
                         className="omrs-unstyled"
                         onClick={() => setSelected(index)}
