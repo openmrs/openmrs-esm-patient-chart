@@ -2,7 +2,6 @@ import React from "react";
 import { BrowserRouter, Route } from "react-router-dom";
 import openmrsRootDecorator from "@openmrs/react-root-decorator";
 import PatientBanner from "./banner/patient-banner.component";
-import Sidebar from "./sidebar/sidebar.component";
 import WorkspaceWrapper from "./workspace/workspace-wrapper.component";
 import ChartReview from "./chart-review/chart-review.component";
 import styles from "./root.css";
@@ -11,22 +10,79 @@ import { AppPropsContext } from "./app-props-context";
 
 function Root(props) {
   defineConfigSchema("@openmrs/esm-patient-chart", {
-    defaultTabIndex: {
-      default: 0
-    },
-    widgets: {
+    primaryNavBar: {
+      arrayElements: {
+        label: { validators: [validators.isString] },
+        path: { validators: [validators.isString] },
+        view: { validators: [validators.isString] }
+      },
       default: [
-        "summaries",
-        "results",
-        "orders",
-        "encounters",
-        "conditions",
-        "programs",
-        "allergies",
-        "appointments"
-      ],
-      arrayElements: { validators: [validators.isString] }
+        {
+          label: "Summary",
+          path: "/summary",
+          view: "summaryDashboard"
+        },
+        {
+          label: "Results",
+          path: "/results",
+          view: "resultsOverviewDashboard"
+        },
+        {
+          label: "Orders",
+          path: "/orders",
+          view: "ordersOverviewDashboard"
+        },
+        {
+          label: "Encounters",
+          path: "/encounters",
+          view: "encountersOverviewDashboard"
+        },
+        {
+          label: "Conditions",
+          path: "/conditions",
+          view: "conditionsOverview"
+        },
+        {
+          label: "Programs",
+          path: "/programs",
+          view: "programsOverviewDashboard"
+        },
+        {
+          label: "Allergies",
+          path: "/allergies",
+          view: "allergiesOverviewDashboard"
+        },
+        {
+          label: "Appointments",
+          path: "/appointments",
+          view: "appointmentsOverviewDashboard"
+        }
+      ]
     },
+
+    dashboardDefinitions: {
+      arrayElements: {
+        name: { validators: [validators.isString] },
+        title: { validators: [validators.isString] },
+        layout: {
+          columns: {}
+        },
+        widgets: {
+          arrayElements: {
+            name: { validators: [validators.isString] },
+            esModule: { validators: [validators.isString] },
+            label: { validators: [validators.isString] },
+            path: { validators: [validators.isString] },
+            layout: {
+              rowSpan: {},
+              columnSpan: {}
+            }
+          }
+        }
+      },
+      default: []
+    },
+
     widgetDefinitions: {
       arrayElements: {
         name: { validators: [validators.isString] },

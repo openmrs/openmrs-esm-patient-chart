@@ -1,5 +1,4 @@
 import React from "react";
-import { match } from "react-router";
 import SummaryCard from "../cards/summary-card.component";
 import { fetchPatientMedications } from "./medications.resource";
 import styles from "./medications-overview.css";
@@ -38,7 +37,7 @@ export default function MedicationsOverview(props: MedicationsOverviewProps) {
   return (
     <SummaryCard
       name={t("Active Medications", "Active Medications")}
-      styles={{ width: "100%", maxWidth: "45rem" }}
+      styles={{ width: "100%" }}
       link={`/patient/${patientUuid}/chart/Medications`}
     >
       <table className={styles.medicationsTable}>
@@ -173,6 +172,4 @@ export default function MedicationsOverview(props: MedicationsOverviewProps) {
   }
 }
 
-type MedicationsOverviewProps = {
-  match: match;
-};
+type MedicationsOverviewProps = {};

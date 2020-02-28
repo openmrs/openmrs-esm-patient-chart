@@ -1,87 +1,101 @@
 import React, { FunctionComponent } from "react";
-import { Link, useParams, useRouteMatch, useLocation } from "react-router-dom";
+import {
+  Link,
+  useParams,
+  useRouteMatch,
+  useLocation,
+  Switch,
+  Route,
+  Redirect
+} from "react-router-dom";
 import styles from "./chart-review.css";
-import { coreWidgets } from "./core-widgets.js";
 import { useConfig } from "@openmrs/esm-module-config";
-import { string } from "prop-types";
+import Dashboard, {
+  DashboardConfigType,
+  WidgetConfigType
+} from "../ui-components/dashboard/dashboard.component";
+import { coreWidgets, coreDashboards } from "../ui-components/core-views";
+import Widget from "../ui-components/widget/widget.component";
 
 export default function ChartReview(props: any) {
   const match = useRouteMatch();
   const location = useLocation();
 
   const { patientUuid } = useParams();
-  const { widgetPath } = useParams();
+  const { widget: widgetPath } = useParams();
   const config = useConfig();
 
   const defaultPath = `/patient/${patientUuid}/chart`;
-  const [widgets, setWidgets] = React.useState([]);
-
-  /*
-  const widgetDefinitions = [
-    {
-      name: "widget",
-      label: "Hello", //will be displayed on the nav bar
-      esModule: "@jj-widgets", //this module must be in the import map
-      path: "/widget" //this will be the path to the widget and will be appended to /patient/:patientUuid/chart
-    }
-  ] ;
-*/
+  const [routes, setRoutes] = React.useState([]);
+  const [navbarItems, setNavbarItems] = React.useState([]);
 
   const [selected, setSelected] = React.useState(getInitialTab());
-
-  React.useEffect(() => {
-    const externalWidgets: externalWidgetsType = {};
-    const promises = [];
-    const moduleMap = {};
-
-    config.widgetDefinitions.forEach(def => {
-      externalWidgets[def.name] = def;
-      //only import modules once
-      if (moduleMap[def.esModule] === undefined) {
-        promises.push(System.import(def.esModule));
-      }
-    });
-
-    Promise.all(promises).then(modules => {
-      //widgets is an array of objects, see type below
-      const widgets: widgetType[] = [];
-
-      //Promise.all returns an array of resolved modules.
-      // Place into an object with key = module name to make it easier to access in the below widget loadinng loop
-      modules.map(mod => {
-        moduleMap[mod.name] = mod;
-      });
-
-      //config.widgets is an array of widget names
-      config.widgets.map(widgetName => {
-        //First see if name exists in coreWidgets
-        if (coreWidgets[widgetName]) {
-          widgets.push(coreWidgets[widgetName]);
-        } else {
-          const widget = externalWidgets[widgetName];
-          let Component: FunctionComponent =
-            moduleMap[widget.esModule].widgets[widget.name];
-          widget.component = () => <Component />;
-
-          widgets.push(widget);
-        }
-      });
-
-      setWidgets(widgets);
-    });
-  }, [config, setWidgets]);
+  const [tabHistory, setTabHistory] = React.useState({});
 
   function getInitialTab() {
-    if (config == undefined || widgets.length === 0) {
+    if (config == undefined || navbarItems.length === 0) {
       return 0;
+      //need to rename from widget to something else
     } else if (widgetPath == undefined) {
       return config.defaultTabIndex;
     } else {
-      return widgets.findIndex(element => element.path === "/" + widgetPath);
+      return navbarItems.findIndex(
+        element => element.path === "/" + widgetPath
+      );
     }
   }
 
-  const [tabHistory, setTabHistory] = React.useState({});
+  function getCoreView(name: string): ViewType {
+    if (coreWidgets[name]) {
+      return coreWidgets[name];
+    }
+    if (coreDashboards[name]) {
+      return {
+        ...coreDashboards[name],
+        component: () => (
+          <Dashboard key={name} dashboardConfig={coreDashboards[name]} />
+        )
+      };
+    }
+    return;
+    //TODO: if(coreMultiDashboards[view])
+  }
+
+  function getExternalView(config, name: string): ViewType {
+    const widget = config.widgetDefinitions.find(
+      widget => widget.name === name
+    );
+    const dashboard = config.dashboardDefinitions.find(
+      dashboard => dashboard.name === name
+    );
+
+    if (widget) {
+      return { name, component: () => <Widget widgetConfig={widget} /> };
+    } else if (dashboard) {
+      return {
+        name,
+        component: () => <Dashboard dashboardConfig={dashboard} />
+      };
+    } else {
+      return { name, component: null };
+    }
+  }
+
+  React.useEffect(() => {
+    const routes: ViewType[] = config.primaryNavBar.map(item => {
+      let view = getCoreView(item.view);
+
+      if (view === undefined) {
+        view = getExternalView(config, item.view);
+      }
+      item.component = view.component;
+      return item;
+    });
+
+    // TO DO: Need to handle case where item.component is not a coreWidget
+    setNavbarItems(config.primaryNavBar);
+    setRoutes(routes);
+  }, [config, setRoutes]);
 
   React.useEffect(() => {
     setTabHistory(t => {
@@ -90,12 +104,16 @@ export default function ChartReview(props: any) {
     });
   }, [match, location]);
 
+  React.useEffect(() => {
+    setSelected(routes.findIndex(element => element.path === "/" + widgetPath));
+  }, [routes, widgetPath]);
+
   return (
     <>
       <nav className={styles.topnav} style={{ marginTop: "0" }}>
         <ul>
-          {widgets &&
-            widgets.map((item, index) => {
+          {navbarItems &&
+            navbarItems.map((item, index) => {
               return (
                 <li key={index}>
                   <div
@@ -121,20 +139,33 @@ export default function ChartReview(props: any) {
             })}
         </ul>
       </nav>
-      {widgets.length > 0 &&
-        selected !== undefined &&
-        widgets[selected].component()}
+
+      {routes.length > 0 && (
+        <Route exact path={defaultPath}>
+          <Redirect to={defaultPath + routes[0].path} />
+        </Route>
+      )}
+
+      <Switch>
+        {routes.map(route => {
+          return (
+            <Route key={route.name} path={defaultPath + route.path}>
+              {route.component && route.component()}
+            </Route>
+          );
+        })}
+      </Switch>
     </>
   );
 }
 
-type widgetType = {
+type RouteType = {
   name: string;
   path: string;
-  esModule?: string;
-  component?: Function;
+  component: Function;
 };
 
-type externalWidgetsType = {
-  [key: string]: widgetType;
+type ViewType = {
+  name: string;
+  component: Function;
 };

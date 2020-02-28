@@ -20,7 +20,6 @@
   padding: 0.625rem;
 }
 :global(.omrs-breakpoint-gt-phone) .card {
-  width: 21.75rem;
   margin: 0.5rem 1rem;
 }
 .tableNotes {

@@ -32,10 +32,7 @@ export default function NotesOverview(props: NotesOverviewProps) {
 
   function fhirNotesOverview() {
     return (
-      <SummaryCard
-        name="Notes"
-        styles={{ margin: "1.25rem, 1.5rem", width: "100%", maxWidth: "45rem" }}
-      >
+      <SummaryCard name="Notes">
         <table className={styles.tableNotes}>
           <thead>
             <tr className={styles.tableNotesRow}>
@@ -88,10 +85,7 @@ export default function NotesOverview(props: NotesOverviewProps) {
 
   function restAPINotesOverview() {
     return (
-      <SummaryCard
-        name="Notes"
-        styles={{ margin: "1.25rem, 1.5rem", width: "100%", maxWidth: "45rem" }}
-      >
+      <SummaryCard name="Notes">
         <table className={styles.tableNotes}>
           <thead>
             <tr className={styles.tableNotesRow}>

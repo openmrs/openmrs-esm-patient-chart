@@ -29,22 +29,6 @@ export default function ChartWidget(props: any) {
 
   const [selected, setSelected] = React.useState(getInitialTab());
 
-  /*
-  const exampleConfig =  {
-    name: "orders",
-    defaultTabIndex: 0,
-    tabs: [
-      {
-        name: "Overview",
-        component: () => { return (<Foo/>) }
-      },
-      {
-        name: "Medications",
-        component: () => { return (<Bar/>) }
-      }
-    ]
-  };*/
-
   return (
     <>
       <nav className={styles.summariesnav} style={{ marginTop: "0" }}>
@@ -71,7 +55,9 @@ export default function ChartWidget(props: any) {
           })}
         </ul>
       </nav>
-      {props.widgetConfig.tabs[selected].component()}
+      <div style={{ margin: "21px" }}>
+        {props.widgetConfig.tabs[selected].component()}
+      </div>
     </>
   );
 }

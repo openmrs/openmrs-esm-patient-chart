@@ -1,7 +1,7 @@
 import React from "react";
 import { useRouteMatch, useLocation } from "react-router-dom";
 import VitalsDetailedSummary from "../../widgets/vitals/vitals-detailed-summary.component";
-import ChartWidget from "../../ui-components/chart-widget/chart-widget.component";
+import ChartWidget from "../../ui-components/multi-dashboard/chart-widget.component";
 import ResultsChartOverview from "./results-chart-overview.component";
 import HeightAndWeightSummary from "../../widgets/heightandweight/heightandweight-summary.component";
 import { HeightAndWeightDetailedSummary } from "../../widgets/heightandweight/heightandweight-detailed-summary.component";

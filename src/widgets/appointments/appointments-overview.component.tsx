@@ -5,6 +5,7 @@ import dayjs from "dayjs";
 import SummaryCard from "../cards/summary-card.component";
 import SummaryCardFooter from "../cards/summary-card-footer.component";
 import styles from "./appointments-overview.css";
+
 export default function AppointmentsOverview() {
   const [patientAppointments, setPatientAppointments] = React.useState(null);
   const [
@@ -23,12 +24,12 @@ export default function AppointmentsOverview() {
         abortController
       ).then((response: any) => setPatientAppointments(response.data));
     }
-  }, [patientUuid]);
+  }, [patientUuid, startDate]);
   function restAPIAppointmentsOverview() {
     return (
       <SummaryCard
         name="Appointments"
-        styles={{ margin: "1.25rem, 1.5rem", width: "100%", maxWidth: "45rem" }}
+        styles={{ margin: "1.25rem, 1.5rem", width: "100%" }}
       >
         <table className={styles.tableAppointments}>
           <thead>

@@ -75,6 +75,4 @@ export default function Programs(props: ProgramsOverviewProps) {
   );
 }
 
-type ProgramsOverviewProps = {
-  match: match;
-};
+type ProgramsOverviewProps = {};
