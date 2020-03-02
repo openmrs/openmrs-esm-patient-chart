@@ -20,3 +20,7 @@ export const importTranslation = require.context(
   /.json$/,
   "lazy"
 );
+export {
+  newWorkspaceItem,
+  getNewWorkspaceItem
+} from "./workspace/workspace.resource";
