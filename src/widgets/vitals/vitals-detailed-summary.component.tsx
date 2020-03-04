@@ -5,9 +5,8 @@ import { createErrorHandler } from "@openmrs/esm-error-handling";
 import { formatDate } from "../heightandweight/heightandweight-helper";
 import styles from "./vitals-detailed-summary.css";
 import SummaryCard from "../cards/summary-card.component";
-import { useCurrentPatient } from "@openmrs/esm-api";
+import { useCurrentPatient, newWorkspaceItem } from "@openmrs/esm-api";
 import { Link } from "react-router-dom";
-import { newWorkspaceItem } from "../../workspace/workspace.resource";
 import { VitalsForm } from "./vitals-form.component";
 
 export default function VitalsDetailedSummary(

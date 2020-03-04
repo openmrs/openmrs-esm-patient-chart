@@ -1,5 +1,5 @@
 import React from "react";
-import { newWorkspaceItem } from "../../workspace/workspace.resource";
+import { newWorkspaceItem } from "@openmrs/esm-api";
 import { styles } from "./medication-button.css";
 import { MedicationOrderBasket } from "./medication-order-basket.component";
 
