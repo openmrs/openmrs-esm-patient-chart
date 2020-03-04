@@ -1,14 +1,5 @@
 import React from "react";
-/*
-import HeightAndWeightOverview from "../widgets/heightandweight/heightandweight-overview.component";
-import VitalsOverview from "../widgets/vitals/vitals-overview.component";
-import ConditionsOverview from "../widgets/conditions/conditions-overview.component";
-import AllergyOverview from "../widgets/allergies/allergy-overview.component";
-import NotesOverview from "../widgets/notes/notes-overview.component";
-import ProgramsOverview from "../widgets/programs/programs-overview.component";
-import MedicationsOverview from "../widgets/medications/medications-overview.component";
-import AppointmentsOverview from "../widgets/appointments/appointments-overview.component";
-*/
+
 import {
   HeightAndWeightOverview,
   HeightAndWeightSummary,

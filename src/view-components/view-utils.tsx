@@ -5,7 +5,6 @@ import TabbedView from "./tabbed-view/tabbed-view.component";
 
 import { coreWidgets, coreDashboards, coreTabbedViews } from "./core-views";
 import Widget from "./widget/widget.component";
-import { NavbarType } from "../root.component";
 
 export function getView(
   name: string,
@@ -72,18 +71,6 @@ export function getExternalView(config: any, name: string): ViewType {
   }
 }
 
-/*
-export type RouteType = {
-  name: string;
-  path: string;
-  component: Function;
-};
-
-export type ViewType = {
-  name: string;
-  component: Function;
-};
-*/
 export type ViewType = {
   label?: string;
   path?: string;
