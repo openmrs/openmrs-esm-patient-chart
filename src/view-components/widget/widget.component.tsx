@@ -12,16 +12,28 @@ export default function Widget(props) {
     let Component: FunctionComponent;
     let widget: WidgetConfigType = widgetConfig;
     if (widgetConfig.esModule) {
-      System.import(widgetConfig.esModule).then(module => {
-        if (module[widgetConfig.name]) {
-          Component = module[widgetConfig.name];
-          widget.component = () => <Component />;
+      System.import(widgetConfig.esModule)
+        .then(module => {
+          if (module[widgetConfig.name]) {
+            Component = module[widgetConfig.name];
+            widget.component = () => <Component />;
+          } else {
+            widget.component = () => (
+              <div>
+                {widgetConfig.name} does not exist in module{" "}
+                {widgetConfig.esModule}
+              </div>
+            );
+          }
+        })
+        .catch(error => {
+          widget.component = () => <div>{widget.esModule} failed to load</div>;
+        })
+        .finally(() => {
           setWidget(widget);
-        }
-      });
+        });
     } else {
       widget.component = coreWidgets[widget.name].component;
-
       setWidget(widget);
     }
   }
