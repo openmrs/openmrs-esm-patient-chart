@@ -33,8 +33,8 @@ describe(`<Widget />`, () => {
   it(`should render widget dynamically using config`, done => {
     const { queryByText } = render(<Widget widgetConfig={testWidgetConfig} />);
 
-    waitForElement(() => queryByText("Test Widget")).then(() => {
-      expect(queryByText("Test Widget")).not.toBeNull();
+    waitForElement(() => queryByText("Test Widget")).then(element => {
+      expect(element).not.toBeNull();
       done();
     });
   });
@@ -45,8 +45,8 @@ describe(`<Widget />`, () => {
     );
 
     waitForElement(() => queryByText(" failed to load", { exact: false })).then(
-      () => {
-        expect(queryByText("failed to load", { exact: false })).not.toBeNull();
+      element => {
+        expect(element).not.toBeNull();
         done();
       }
     );
@@ -63,8 +63,8 @@ describe(`<Widget />`, () => {
     );
 
     waitForElement(() => queryByText(" does not exist", { exact: false })).then(
-      () => {
-        expect(queryByText("does not exist", { exact: false })).not.toBeNull();
+      element => {
+        expect(element).not.toBeNull();
         done();
       }
     );
