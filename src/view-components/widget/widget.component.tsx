@@ -2,7 +2,7 @@ import React, { FunctionComponent } from "react";
 import { coreWidgets } from "../core-views";
 
 export default function Widget(props) {
-  const [widget, setWidget] = React.useState();
+  const [widget, setWidget] = React.useState(null);
 
   React.useEffect(() => {
     loadWidgetFromConfig(props.widgetConfig);
@@ -10,12 +10,14 @@ export default function Widget(props) {
 
   function loadWidgetFromConfig(widgetConfig: WidgetConfigType) {
     let Component: FunctionComponent;
-    let widget = widgetConfig;
+    let widget: WidgetConfigType = widgetConfig;
     if (widgetConfig.esModule) {
       System.import(widgetConfig.esModule).then(module => {
-        Component = module[widgetConfig.name];
-        widget.component = () => <Component />;
-        setWidget(widget);
+        if (module[widgetConfig.name]) {
+          Component = module[widgetConfig.name];
+          widget.component = () => <Component />;
+          setWidget(widget);
+        }
       });
     } else {
       widget.component = coreWidgets[widget.name].component;

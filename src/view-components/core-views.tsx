@@ -1,5 +1,5 @@
 import React from "react";
-
+/*
 import HeightAndWeightOverview from "../widgets/heightandweight/heightandweight-overview.component";
 import VitalsOverview from "../widgets/vitals/vitals-overview.component";
 import ConditionsOverview from "../widgets/conditions/conditions-overview.component";
@@ -8,11 +8,22 @@ import NotesOverview from "../widgets/notes/notes-overview.component";
 import ProgramsOverview from "../widgets/programs/programs-overview.component";
 import MedicationsOverview from "../widgets/medications/medications-overview.component";
 import AppointmentsOverview from "../widgets/appointments/appointments-overview.component";
+*/
+import {
+  HeightAndWeightOverview,
+  HeightAndWeightSummary,
+  VitalsOverview,
+  VitalsSummary,
+  ConditionsOverview,
+  AllergiesOverview,
+  NotesOverview,
+  ProgramsOverview,
+  MedicationsOverview,
+  MedicationsSummary,
+  AppointmentsOverview
+} from "@openmrs/esm-patient-chart-widgets";
+
 import { DashboardConfigType } from "./dashboard/dashboard.component";
-import VitalsDetailedSummary from "../widgets/vitals/vitals-detailed-summary.component";
-import { HeightAndWeightDetailedSummary } from "../widgets/heightandweight/heightandweight-detailed-summary.component";
-import HeightAndWeightSummary from "../widgets/heightandweight/heightandweight-summary.component";
-import MedicationsDetailedSummary from "../widgets/medications/medication-level-two.component";
 
 export const coreTabbedViews = {
   resultsTabbedView: {
@@ -90,7 +101,7 @@ export const coreDashboards: CoreDashboardsType = {
         layout: { columnSpan: 3 }
       },
       {
-        name: "allergyOverview",
+        name: "allergiesOverview",
         layout: { columnSpan: 1 }
       },
       {
@@ -125,7 +136,7 @@ export const coreDashboards: CoreDashboardsType = {
 
   allergiesOverviewDashboard: {
     name: "allergiesOverviewDashboard",
-    widgets: [{ name: "allergyOverview" }]
+    widgets: [{ name: "allergiesOverview" }]
   },
 
   programsOverviewDashboard: {
@@ -157,7 +168,7 @@ export const coreWidgets: CoreWidgetsType = {
   medicationsDetailedSummary: {
     name: "medicationsDetailedSummary",
     component: () => {
-      return <MedicationsDetailedSummary />;
+      return <MedicationsSummary />;
     }
   },
 
@@ -185,7 +196,7 @@ export const coreWidgets: CoreWidgetsType = {
   vitalsDetailedSummary: {
     name: "vitalsDetailedSummary",
     component: () => {
-      return <VitalsDetailedSummary />;
+      return <VitalsSummary />;
     }
   },
 
@@ -196,10 +207,10 @@ export const coreWidgets: CoreWidgetsType = {
     }
   },
 
-  allergyOverview: {
-    name: "allergyOverview",
+  allergiesOverview: {
+    name: "allergiesOverview",
     component: () => {
-      return <AllergyOverview />;
+      return <AllergiesOverview />;
     }
   },
 
