@@ -140,5 +140,5 @@ export function HeightAndWeightDetailedSummary(
 }
 
 type HeightAndWeightDetailedSummaryProps = {
-  uuid: any;
+  uuid: string;
 };

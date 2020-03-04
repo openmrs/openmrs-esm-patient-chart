@@ -299,6 +299,4 @@ export default function MedicationLevelTwo(props: MedicationsOverviewProps) {
   );
 }
 
-type MedicationsOverviewProps = {
-  match: match;
-};
+type MedicationsOverviewProps = {};
