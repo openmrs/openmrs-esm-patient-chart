@@ -68,6 +68,14 @@ export default function Workspace(props: any) {
     setOpenTabs(updatedTabs);
   }
 
+  function onCloseTabRequest(index, tab) {
+    setWorkEnded(index);
+    removeTab(index);
+    if (tab.componentClosed) {
+      tab.componentClosed();
+    }
+  }
+
   return (
     <>
       {openTabs.length && (
@@ -76,20 +84,23 @@ export default function Workspace(props: any) {
           setSelected={setSelectedTab}
           removeTab={removeTab}
         >
-          {openTabs.map((tab, i) => (
-            <Panel
-              key={i}
-              title={tab.name}
-              style={selectedTab === i ? {} : { display: "none" }}
-            >
-              <tab.component
-                {...tab.props}
-                entryStarted={() => setWorkBegan(i)}
-                entrySubmitted={() => setWorkEnded(i)}
-                entryCancelled={() => setWorkEnded(i)}
-              />
-            </Panel>
-          ))}
+          {openTabs.map((tab, i) => {
+            return (
+              <Panel
+                key={i}
+                title={tab.name}
+                style={selectedTab === i ? {} : { display: "none" }}
+              >
+                <tab.component
+                  {...tab.props}
+                  entryStarted={() => setWorkBegan(i)}
+                  entrySubmitted={() => setWorkEnded(i)}
+                  entryCancelled={() => setWorkEnded(i)}
+                  closeComponent={() => onCloseTabRequest(i, tab)}
+                />
+              </Panel>
+            );
+          })}
         </Tabs>
       )}
     </>
