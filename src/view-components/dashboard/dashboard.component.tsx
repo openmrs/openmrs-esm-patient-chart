@@ -3,7 +3,7 @@ import styles from "./dashboard.css";
 import Widget from "../widget/widget.component";
 
 export default function Dashboard(props: DashboardProps) {
-  const [widgets, setWidgets] = React.useState([]);
+  const [widgets, setWidgets] = React.useState<WidgetConfigType[]>([]);
 
   React.useEffect(() => {
     setWidgets(

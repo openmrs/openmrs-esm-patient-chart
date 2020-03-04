@@ -11,7 +11,8 @@ import {
 import styles from "./chart-review.css";
 import { useConfig } from "@openmrs/esm-module-config";
 
-import { getView } from "../view-components/view-utils";
+import { getView, ViewType } from "../view-components/view-utils";
+import { ChartConfigType, NavbarType } from "../root.component";
 
 export default function ChartReview(props: any) {
   const match = useRouteMatch();
@@ -19,37 +20,38 @@ export default function ChartReview(props: any) {
 
   const { patientUuid } = useParams();
   const { view: viewPath } = useParams();
-  const config = useConfig();
+  const config = useConfig<ChartConfigType>();
 
   const defaultPath = `/patient/${patientUuid}/chart`;
-  const [routes, setRoutes] = React.useState([]);
-  const [navbarItems, setNavbarItems] = React.useState([]);
+  const [views, setViews] = React.useState<ViewType[]>([]);
+  const [navbarItems, setNavbarItems] = React.useState<NavbarType[]>([]);
 
   const [selected, setSelected] = React.useState(getInitialTab());
   const [tabHistory, setTabHistory] = React.useState({});
 
   function getInitialTab() {
-    if (config == undefined || navbarItems.length === 0) {
+    if (
+      config === undefined ||
+      navbarItems.length === 0 ||
+      viewPath === undefined
+    ) {
       return 0;
-      //need to rename from widget to something else
-    } else if (viewPath == undefined) {
-      return config.defaultTabIndex;
     } else {
       return navbarItems.findIndex(element => element.path === "/" + viewPath);
     }
   }
 
   React.useEffect(() => {
-    const routes: ViewType[] = config.primaryNavbar.map(item => {
+    const views: ViewType[] = config.primaryNavbar.map(item => {
       let view = getView(item.view, config, defaultPath + item.path);
-      item.component = view.component;
+      if (view && view.component) item.component = view.component;
       return item;
     });
 
     // TO DO: Need to handle case where item.component is not a coreWidget
     setNavbarItems(config.primaryNavbar);
-    setRoutes(routes);
-  }, [config, setRoutes, defaultPath]);
+    setViews(views);
+  }, [config, setViews, defaultPath]);
 
   React.useEffect(() => {
     setTabHistory(t => {
@@ -59,8 +61,8 @@ export default function ChartReview(props: any) {
   }, [match, location]);
 
   React.useEffect(() => {
-    setSelected(routes.findIndex(element => element.path === "/" + viewPath));
-  }, [routes, viewPath]);
+    setSelected(views.findIndex(element => element.path === "/" + viewPath));
+  }, [views, viewPath]);
 
   return (
     <>
@@ -95,14 +97,14 @@ export default function ChartReview(props: any) {
         </ul>
       </nav>
 
-      {routes.length > 0 && (
+      {views.length > 0 && (
         <Route exact path={defaultPath}>
-          <Redirect to={defaultPath + routes[0].path} />
+          <Redirect to={defaultPath + views[0].path} />
         </Route>
       )}
 
       <Switch>
-        {routes.map(route => {
+        {views.map(route => {
           return (
             <Route
               key={route.label}
@@ -116,8 +118,3 @@ export default function ChartReview(props: any) {
     </>
   );
 }
-
-type ViewType = {
-  name: string;
-  component: Function;
-};

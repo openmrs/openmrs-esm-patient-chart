@@ -161,3 +161,37 @@ export default openmrsRootDecorator({
           <Sidebar></Sidebar>
         </div>
 */
+
+export type ChartConfigType = {
+  primaryNavbar: NavbarType[];
+  widgetDefinitions: {
+    name: string;
+    esModule?: string;
+    label?: string;
+    path?: string;
+  };
+
+  dashboardDefinitions: {
+    name: string;
+    title: string;
+    layout: { columns: number };
+    widgets: {
+      name: string;
+      esModule: string;
+      label: string;
+      path: string;
+      layout: {
+        rowSpan: number;
+        columnSpan: number;
+      };
+    }[];
+  };
+
+  tabbedDashboardDefinitions: {
+    name: string;
+    title: string;
+    navbar: NavbarType;
+  }[];
+};
+
+export type NavbarType = { label: string; path: string; view: string };

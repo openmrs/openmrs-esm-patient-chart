@@ -12,6 +12,7 @@ import {
 
 import styles from "./tabbed-view.css";
 import { getView, ViewType } from "../view-utils";
+import { NavbarType } from "../../root.component";
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
@@ -19,7 +20,7 @@ function useQuery() {
 
 export default function TabbedView(props: any) {
   let { patientUuid } = useParams();
-  const [routes, setRoutes] = useState([]);
+  const [views, setViews] = useState<ViewType[]>([]);
   const match = useRouteMatch();
 
   const [selected, setSelected] = React.useState(getInitialTab());
@@ -34,10 +35,10 @@ export default function TabbedView(props: any) {
   }
 
   React.useEffect(() => {
-    setRoutes(
+    setViews(
       props.config.navbar.map(item => {
         let view = getView(item.view, props.config, props.defaultPath);
-        item.component = view.component;
+        if (view && view.component) item.component = view.component;
         return item;
       })
     );
@@ -69,14 +70,14 @@ export default function TabbedView(props: any) {
         </ul>
       </nav>
       <div style={{ margin: "21px" }}>
-        {routes.length > 0 && (
+        {views.length > 0 && (
           <Route exact path={props.defaultPath}>
-            <Redirect to={props.defaultPath + routes[0].path} />
+            <Redirect to={props.defaultPath + views[0].path} />
           </Route>
         )}
 
         <Switch>
-          {routes.map((route, index) => {
+          {views.map((route, index) => {
             return (
               <Route
                 key={route.label}
@@ -92,3 +93,12 @@ export default function TabbedView(props: any) {
     </>
   );
 }
+
+type TabbedViewProps = {
+  config: {
+    name: string;
+    title: string;
+    navbar: NavbarType[];
+  };
+  defaultPath?: string;
+};

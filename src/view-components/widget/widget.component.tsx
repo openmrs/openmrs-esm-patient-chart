@@ -2,7 +2,7 @@ import React, { FunctionComponent } from "react";
 import { coreWidgets } from "../core-views";
 
 export default function Widget(props) {
-  const [widget, setWidget] = React.useState(null);
+  const [widget, setWidget] = React.useState<WidgetConfigType | null>(null);
 
   React.useEffect(() => {
     loadWidgetFromConfig(props.widgetConfig);
@@ -26,7 +26,13 @@ export default function Widget(props) {
     }
   }
 
-  return <>{widget !== undefined && widget.component()}</>;
+  return (
+    <>
+      {widget != undefined &&
+        widget.component != undefined &&
+        widget.component()}
+    </>
+  );
 }
 
 export type WidgetProps = {

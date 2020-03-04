@@ -4,7 +4,7 @@ import { getNewWorkspaceItem, WorkspaceTab } from "./workspace.resource";
 
 export default function Workspace(props: any) {
   const [openTabs, setOpenTabs] = React.useState<WorkspaceTab[]>([]);
-  const [selectedTab, setSelectedTab] = React.useState(null);
+  const [selectedTab, setSelectedTab] = React.useState<number | null>(null);
 
   React.useEffect(() => {
     const sub = getNewWorkspaceItem().subscribe(item => {
