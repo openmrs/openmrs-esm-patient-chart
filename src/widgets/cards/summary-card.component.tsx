@@ -1,7 +1,7 @@
 import React, { ReactChildren } from "react";
 import styles from "./summary-card.css";
 import { Link } from "react-router-dom";
-import { newWorkspaceItem } from "../../workspace/workspace.resource";
+import { newWorkspaceItem } from "@openmrs/esm-api";
 import { Trans, useTranslation } from "react-i18next";
 
 export default function SummaryCard(props: SummaryCardProps) {

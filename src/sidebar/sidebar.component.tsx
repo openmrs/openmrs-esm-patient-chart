@@ -1,11 +1,10 @@
 import React from "react";
 import styles from "./sidebar.component.css";
-import { newWorkspaceItem } from "../workspace/workspace.resource";
+import { newWorkspaceItem } from "@openmrs/esm-api";
 import { AllergyForm } from "../widgets/allergies/allergy-form.component";
 import Parcel from "single-spa-react/parcel";
 import { VitalsForm } from "../widgets/vitals/vitals-form.component";
 import { MedicationOrderBasket } from "../widgets/medications/medication-order-basket.component";
-import { mountRootParcel } from "single-spa";
 
 export default function Sidebar(props: any) {
   const sidebarItems = [
