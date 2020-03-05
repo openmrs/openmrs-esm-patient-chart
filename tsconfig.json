@@ -5,7 +5,6 @@
     "allowSyntheticDefaultImports": true,
     "jsx": "react",
     "moduleResolution": "node",
-    "skipLibCheck": true,
     "lib": [
       "dom",
       "es5",
