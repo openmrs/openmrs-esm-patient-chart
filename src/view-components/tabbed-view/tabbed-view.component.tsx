@@ -43,7 +43,7 @@ export default function TabbedView(props: any) {
         return item;
       })
     );
-  }, [config, props.defaultPath]);
+  }, [config, props.config, props.defaultPath]);
   return (
     <>
       <nav className={styles.summariesnav} style={{ marginTop: "0" }}>
