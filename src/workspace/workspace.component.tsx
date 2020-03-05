@@ -1,9 +1,9 @@
 import React from "react";
 import { Tabs, Panel } from "../widgets/tabs/tabs.component";
-import { getNewWorkspaceItem, WorkspaceTab } from "@openmrs/esm-api";
+import { getNewWorkspaceItem, WorkspaceItem } from "@openmrs/esm-api";
 
 export default function Workspace(props: any) {
-  const [openTabs, setOpenTabs] = React.useState<WorkspaceTab[]>([]);
+  const [openTabs, setOpenTabs] = React.useState<WorkspaceItem[]>([]);
   const [selectedTab, setSelectedTab] = React.useState();
 
   React.useEffect(() => {
