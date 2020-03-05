@@ -13,7 +13,7 @@
     "typescript": "tsc",
     "prepublishOnly": "npm run build",
     "test": "jest --config jest.config.json --verbose false",
-    "test:watch": "jest --watch",
+    "test-watch": "jest --watch --config jest.config.json",
     "coverage": "npm test -- --coverage"
   },
   "repository": {

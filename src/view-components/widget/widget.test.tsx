@@ -30,29 +30,27 @@ describe(`<Widget />`, () => {
     cleanup();
   });
 
-  it(`should render widget dynamically using config`, done => {
+  it(`should render widget dynamically using config`, async done => {
     const { queryByText } = render(<Widget widgetConfig={testWidgetConfig} />);
 
-    waitForElement(() => queryByText("Test Widget")).then(element => {
-      expect(element).not.toBeNull();
-      done();
-    });
+    const element = await waitForElement(() => queryByText("Test Widget"));
+    expect(element).not.toBeNull();
+    done();
   });
 
-  it(`should render "Module failed to load" if the module is not found`, done => {
+  it(`should render "Module failed to load" if the module is not found`, async done => {
     const { queryByText } = render(
       <Widget widgetConfig={{ name: "test", esModule: "does-not-exist" }} />
     );
 
-    waitForElement(() => queryByText(" failed to load", { exact: false })).then(
-      element => {
-        expect(element).not.toBeNull();
-        done();
-      }
+    const element = await waitForElement(() =>
+      queryByText(" failed to load", { exact: false })
     );
+    expect(element).not.toBeNull();
+    done();
   });
 
-  it(`should render "[Widget] does not exist" if the widget is not found`, done => {
+  it(`should render "[Widget] does not exist" if the widget is not found`, async done => {
     const { queryByText } = render(
       <Widget
         widgetConfig={{
@@ -62,11 +60,10 @@ describe(`<Widget />`, () => {
       />
     );
 
-    waitForElement(() => queryByText(" does not exist", { exact: false })).then(
-      element => {
-        expect(element).not.toBeNull();
-        done();
-      }
+    const element = await waitForElement(() =>
+      queryByText(" does not exist", { exact: false })
     );
+    expect(element).not.toBeNull();
+    done();
   });
 });
