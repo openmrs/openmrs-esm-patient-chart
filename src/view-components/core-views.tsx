@@ -1,19 +1,4 @@
 import React from "react";
-
-import {
-  HeightAndWeightOverview,
-  HeightAndWeightSummary,
-  VitalsOverview,
-  VitalsSummary,
-  ConditionsOverview,
-  AllergiesOverview,
-  NotesOverview,
-  ProgramsOverview,
-  MedicationsOverview,
-  MedicationsSummary,
-  AppointmentsOverview
-} from "@openmrs/esm-patient-chart-widgets";
-
 import { DashboardConfigType } from "./dashboard/dashboard.component";
 
 export const coreTabbedViews = {
@@ -144,79 +129,57 @@ export const coreDashboards: CoreDashboardsType = {
 export const coreWidgets: CoreWidgetsType = {
   programsOverview: {
     name: "programsOverview",
-    component: () => {
-      return <ProgramsOverview />;
-    }
+    esModule: "@openmrs/esm-patient-chart-widgets"
   },
 
   medicationsOverview: {
     name: "medicationsOverview",
-    component: () => {
-      return <MedicationsOverview />;
-    }
+    esModule: "@openmrs/esm-patient-chart-widgets"
   },
 
   medicationsDetailedSummary: {
     name: "medicationsDetailedSummary",
-    component: () => {
-      return <MedicationsSummary />;
-    }
+    esModule: "@openmrs/esm-patient-chart-widgets"
   },
 
   heightAndWeightOverview: {
     name: "heightAndWeightOverview",
-    component: () => {
-      return <HeightAndWeightOverview />;
-    }
+    esModule: "@openmrs/esm-patient-chart-widgets"
   },
 
   heightAndWeightDetailedSummary: {
     name: "heightAndWeightDetailedSummary",
-    component: () => {
-      return <HeightAndWeightSummary />;
-    }
+    esModule: "@openmrs/esm-patient-chart-widgets"
   },
 
   vitalsOverview: {
     name: "vitalsOverview",
-    component: () => {
-      return <VitalsOverview />;
-    }
+    esModule: "@openmrs/esm-patient-chart-widgets"
   },
 
   vitalsDetailedSummary: {
     name: "vitalsDetailedSummary",
-    component: () => {
-      return <VitalsSummary />;
-    }
+    esModule: "@openmrs/esm-patient-chart-widgets"
   },
 
   conditionsOverview: {
     name: "conditionsOverview",
-    component: () => {
-      return <ConditionsOverview />;
-    }
+    esModule: "@openmrs/esm-patient-chart-widgets"
   },
 
   allergiesOverview: {
     name: "allergiesOverview",
-    component: () => {
-      return <AllergiesOverview />;
-    }
+    esModule: "@openmrs/esm-patient-chart-widgets"
   },
 
   notesOverview: {
     name: "notesOverview",
-    component: () => {
-      return <NotesOverview />;
-    }
+    esModule: "@openmrs/esm-patient-chart-widgets"
   },
 
   appointmentsOverview: {
     name: "appointmentsOverview",
-    component: () => {
-      return <AppointmentsOverview />;
-    }
+    esModule: "@openmrs/esm-patient-chart-widgets"
   }
 };
 
@@ -226,8 +189,8 @@ type CoreWidgetsType = {
 
 type CoreWidgetType = {
   name: string;
+  esModule: string;
   params?: {};
-  component: Function;
 };
 
 type CoreDashboardsType = {

@@ -7,8 +7,11 @@ import ChartReview from "./chart-review/chart-review.component";
 import styles from "./root.css";
 import { defineConfigSchema, validators } from "@openmrs/esm-module-config";
 import { AppPropsContext } from "./app-props-context";
+import { esmPatientChartConfig } from "./chart-config";
 
 function Root(props) {
+  defineConfigSchema("@openmrs/esm-patient-chart", esmPatientChartConfig);
+  /*
   defineConfigSchema("@openmrs/esm-patient-chart", {
     primaryNavbar: {
       arrayElements: {
@@ -108,6 +111,7 @@ function Root(props) {
       default: []
     }
   });
+  */
 
   return (
     <AppPropsContext.Provider value={{ appProps: props }}>

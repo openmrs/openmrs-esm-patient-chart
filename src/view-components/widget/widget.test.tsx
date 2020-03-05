@@ -66,4 +66,20 @@ describe(`<Widget />`, () => {
     expect(element).not.toBeNull();
     done();
   });
+
+  it(`should render "no module provided" if the no esModule property is present`, async done => {
+    const { queryByText } = render(
+      <Widget
+        widgetConfig={{
+          name: "non-existing-widget"
+        }}
+      />
+    );
+
+    const element = await waitForElement(() =>
+      queryByText("no module provided", { exact: false })
+    );
+    expect(element).not.toBeNull();
+    done();
+  });
 });

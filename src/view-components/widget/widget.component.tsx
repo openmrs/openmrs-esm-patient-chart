@@ -33,7 +33,9 @@ export default function Widget(props) {
           setWidget(widget);
         });
     } else {
-      widget.component = coreWidgets[widget.name].component;
+      widget.component = () => (
+        <div>No module provided in config from which to load widget</div>
+      );
       setWidget(widget);
     }
   }

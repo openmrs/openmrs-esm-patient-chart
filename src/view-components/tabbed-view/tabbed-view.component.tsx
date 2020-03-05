@@ -13,7 +13,7 @@ import {
 import styles from "./tabbed-view.css";
 import { getView, ViewType } from "../view-utils";
 import { NavbarType } from "../../root.component";
-
+import { useConfig } from "@openmrs/esm-module-config";
 function useQuery() {
   return new URLSearchParams(useLocation().search);
 }
@@ -22,6 +22,7 @@ export default function TabbedView(props: any) {
   let { patientUuid } = useParams();
   const [views, setViews] = useState<ViewType[]>([]);
   const match = useRouteMatch();
+  const config = useConfig();
 
   const [selected, setSelected] = React.useState(getInitialTab());
 
@@ -37,7 +38,7 @@ export default function TabbedView(props: any) {
   React.useEffect(() => {
     setViews(
       props.config.navbar.map(item => {
-        let view = getView(item.view, props.config, props.defaultPath);
+        let view = getView(item.view, config, props.defaultPath);
         if (view && view.component) item.component = view.component;
         return item;
       })

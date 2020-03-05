@@ -3,7 +3,6 @@ import React from "react";
 import Dashboard from "./dashboard/dashboard.component";
 import TabbedView from "./tabbed-view/tabbed-view.component";
 
-import { coreWidgets, coreDashboards, coreTabbedViews } from "./core-views";
 import Widget from "./widget/widget.component";
 
 export function getView(
@@ -11,47 +10,14 @@ export function getView(
   config: any,
   defaultPath: any
 ): ViewType | null {
-  return getCoreView(name, defaultPath) || getExternalView(config, name);
-}
-
-export function getCoreView(
-  name: string,
-  defaultPath: string
-): ViewType | null {
-  if (coreWidgets[name]) {
-    return coreWidgets[name];
-  }
-  if (coreDashboards[name]) {
-    return {
-      ...coreDashboards[name],
-      component: () => (
-        <Dashboard key={name} dashboardConfig={coreDashboards[name]} />
-      )
-    };
-  }
-  if (coreTabbedViews[name]) {
-    return {
-      ...coreTabbedViews[name],
-      component: () => (
-        <TabbedView
-          key={name}
-          config={coreTabbedViews[name]}
-          defaultPath={defaultPath}
-        />
-      )
-    };
-  }
-  return null;
-}
-
-export function getExternalView(config: any, name: string): ViewType {
   const widget = config.widgetDefinitions.find(widget => widget.name === name);
+
   const dashboard = config.dashboardDefinitions.find(
     dashboard => dashboard.name === name
   );
 
-  const multiDashboard = config.multiDashboardDefinitions.find(
-    multiDashboard => multiDashboard.name === name
+  const tabbedView = config.tabbedViewDefinitions.find(
+    tabbedView => tabbedView.name === name
   );
 
   if (widget) {
@@ -61,10 +27,12 @@ export function getExternalView(config: any, name: string): ViewType {
       ...dashboard,
       component: () => <Dashboard dashboardConfig={dashboard} />
     };
-  } else if (multiDashboard) {
+  } else if (tabbedView) {
     return {
-      ...multiDashboard,
-      component: () => <TabbedView config={multiDashboard} />
+      ...tabbedView,
+      component: () => (
+        <TabbedView config={tabbedView} defaultPath={defaultPath} />
+      )
     };
   } else {
     return { name, component: null };

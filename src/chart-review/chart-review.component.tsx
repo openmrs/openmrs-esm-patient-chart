@@ -21,7 +21,6 @@ export default function ChartReview(props: any) {
   const { patientUuid } = useParams();
   const { view: viewPath } = useParams();
   const config = useConfig<ChartConfigType>();
-
   const defaultPath = `/patient/${patientUuid}/chart`;
   const [views, setViews] = React.useState<ViewType[]>([]);
   const [navbarItems, setNavbarItems] = React.useState<NavbarType[]>([]);
