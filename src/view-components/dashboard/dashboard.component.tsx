@@ -3,7 +3,7 @@ import styles from "./dashboard.css";
 import Widget from "../widget/widget.component";
 
 export default function Dashboard(props: DashboardProps) {
-  const [widgets, setWidgets] = React.useState<WidgetConfigType[]>([]);
+  const [widgets, setWidgets] = React.useState<WidgetConfig[]>([]);
 
   React.useEffect(() => {
     setWidgets(
@@ -59,19 +59,19 @@ export default function Dashboard(props: DashboardProps) {
 }
 
 export type DashboardProps = {
-  dashboardConfig: DashboardConfigType;
+  dashboardConfig: DashboardConfig;
 };
 
-export type DashboardConfigType = {
+export type DashboardConfig = {
   name: string;
   title?: string;
   layout?: {
     columns: number;
   };
-  widgets: WidgetConfigType[];
+  widgets: WidgetConfig[];
 };
 
-export type WidgetConfigType = {
+export type WidgetConfig = {
   name: string;
   path?: string;
   esModule?: string;

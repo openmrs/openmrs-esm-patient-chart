@@ -1,15 +1,16 @@
 import React, { FunctionComponent } from "react";
+import { widgetDefinitions as coreWidgetDefinitions } from "../core-views";
 
 export default function Widget(props) {
-  const [widget, setWidget] = React.useState<WidgetConfigType | null>(null);
+  const [widget, setWidget] = React.useState(null);
 
   React.useEffect(() => {
     loadWidgetFromConfig(props.widgetConfig);
   }, [props.widgetConfig]);
 
-  function loadWidgetFromConfig(widgetConfig: WidgetConfigType) {
+  function loadWidgetFromConfig(widgetConfig: WidgetConfig) {
     let Component: FunctionComponent;
-    let widget: WidgetConfigType = widgetConfig;
+    let widget: WidgetConfig = widgetConfig;
     if (widgetConfig.esModule) {
       System.import(widgetConfig.esModule)
         .then(module => {
@@ -33,7 +34,7 @@ export default function Widget(props) {
         });
     } else {
       widget.component = () => (
-        <div>No module provided in config from which to load widget</div>
+        <div>No module provided in the config for widget: {widget.name}></div>
       );
       setWidget(widget);
     }
@@ -49,15 +50,15 @@ export default function Widget(props) {
 }
 
 export type WidgetProps = {
-  widgetConfig: WidgetConfigType;
+  widgetConfig: WidgetConfig;
 };
 
-type GridSizeType = {
+type GridSize = {
   gridRow: string;
   gridColumn: string;
 };
 
-export type WidgetConfigType = {
+export type WidgetConfig = {
   name: string;
   esModule?: string;
   layout?: {
@@ -65,4 +66,8 @@ export type WidgetConfigType = {
     columnSpan?: number;
   };
   component?: Function;
+};
+
+type ComponentProps = {
+  props: any;
 };

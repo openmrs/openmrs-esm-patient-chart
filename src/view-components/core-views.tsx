@@ -1,5 +1,5 @@
 import React from "react";
-import { DashboardConfigType } from "./dashboard/dashboard.component";
+import { DashboardConfig } from "./dashboard/dashboard.component";
 
 export const widgetDefinitions = [
   {
@@ -230,16 +230,16 @@ export const tabbedViewDefinitions = [
   }
 ];
 
-type CoreWidgetsType = {
-  [key: string]: CoreWidgetType;
+type CoreWidgets = {
+  [key: string]: CoreWidget;
 };
 
-type CoreWidgetType = {
+type CoreWidget = {
   name: string;
   esModule: string;
   params?: {};
 };
 
-type CoreDashboardsType = {
-  [key: string]: DashboardConfigType;
+type CoreDashboards = {
+  [key: string]: DashboardConfig;
 };

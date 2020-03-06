@@ -14,7 +14,7 @@ export function getView(
   name: string,
   config: any,
   defaultPath: any
-): ViewType | null {
+): View | null {
   const widget =
     config.widgetDefinitions.find(widget => widget.name === name) ||
     coreWidgetDefinitions.find(widget => widget.name === name);
@@ -50,7 +50,7 @@ export function getView(
   return { name, component: () => <div>View "{name}" does not exist.</div> };
 }
 
-export type ViewType = {
+export type View = {
   label?: string;
   path?: string;
   name: string;

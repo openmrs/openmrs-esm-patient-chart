@@ -11,15 +11,15 @@ import {
 } from "react-router-dom";
 
 import styles from "./tabbed-view.css";
-import { getView, ViewType } from "../view-utils";
-import { NavbarType } from "../../root.component";
+import { getView, View } from "../view-utils";
+import { Navbar } from "../../root.component";
 import { useConfig } from "@openmrs/esm-module-config";
 function useQuery() {
   return new URLSearchParams(useLocation().search);
 }
 
 export default function TabbedView(props: any) {
-  const [views, setViews] = useState<ViewType[]>([]);
+  const [views, setViews] = useState<View[]>([]);
   const match = useRouteMatch();
   const config = useConfig();
 
@@ -98,7 +98,7 @@ type TabbedViewProps = {
   config: {
     name: string;
     title: string;
-    navbar: NavbarType[];
+    navbar: Navbar[];
   };
   defaultPath?: string;
 };

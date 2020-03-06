@@ -52,8 +52,8 @@ export default openmrsRootDecorator({
   moduleName: "@openmrs/esm-patient-chart"
 })(Root);
 
-export type ChartConfigType = {
-  primaryNavbar: NavbarType[];
+export type ChartConfig = {
+  primaryNavbar: Navbar[];
   widgetDefinitions: {
     name: string;
     esModule?: string;
@@ -80,8 +80,8 @@ export type ChartConfigType = {
   tabbedDashboardDefinitions: {
     name: string;
     title: string;
-    navbar: NavbarType;
+    navbar: Navbar;
   }[];
 };
 
-export type NavbarType = { label: string; path: string; view: string };
+export type Navbar = { label: string; path: string; view: string };

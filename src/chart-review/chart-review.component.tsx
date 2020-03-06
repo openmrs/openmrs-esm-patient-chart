@@ -11,8 +11,8 @@ import {
 import styles from "./chart-review.css";
 import { useConfig } from "@openmrs/esm-module-config";
 
-import { getView, ViewType } from "../view-components/view-utils";
-import { ChartConfigType, NavbarType } from "../root.component";
+import { getView, View } from "../view-components/view-utils";
+import { ChartConfig, Navbar } from "../root.component";
 
 export default function ChartReview(props: any) {
   const match = useRouteMatch();
@@ -20,10 +20,10 @@ export default function ChartReview(props: any) {
 
   const { patientUuid } = useParams();
   const { view: viewPath } = useParams();
-  const config = useConfig<ChartConfigType>();
+  const config = useConfig<ChartConfig>();
   const defaultPath = `/patient/${patientUuid}/chart`;
-  const [views, setViews] = React.useState<ViewType[]>([]);
-  const [navbarItems, setNavbarItems] = React.useState<NavbarType[]>([]);
+  const [views, setViews] = React.useState<View[]>([]);
+  const [navbarItems, setNavbarItems] = React.useState<Navbar[]>([]);
 
   const [selected, setSelected] = React.useState(getInitialTab());
   const [tabHistory, setTabHistory] = React.useState({});
@@ -41,7 +41,7 @@ export default function ChartReview(props: any) {
   }
 
   React.useEffect(() => {
-    const views: ViewType[] = config.primaryNavbar.map(item => {
+    const views: View[] = config.primaryNavbar.map(item => {
       let view = getView(item.view, config, defaultPath + item.path);
       if (view && view.component) item.component = view.component;
       return item;
