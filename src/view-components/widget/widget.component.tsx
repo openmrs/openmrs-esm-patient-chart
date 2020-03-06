@@ -68,3 +68,7 @@ export type WidgetConfigType = {
   };
   component?: Function;
 };
+
+type ComponentProps = {
+  props: any;
+};
