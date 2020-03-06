@@ -12,11 +12,15 @@ export default function WorkspaceWrapper(props: any) {
         showWorkspace ? styles.visible : styles.invisible
       }`}
     >
-      <Breadcrumbs
-        rootUrl={{ name: "Workspace", url: "/patient/:patientUuid/chart" }}
-        routes={[]}
-      />
-      <Workspace showWorkspace={setShowWorkspace} />
+      <div id={`${styles.optionsBar}`}>
+        <Breadcrumbs
+          rootUrl={{ name: "Workspace", url: "/patient/:patientUuid/chart" }}
+          routes={[]}
+        />
+      </div>
+      <div id={`${styles.cardBody}`}>
+        <Workspace showWorkspace={setShowWorkspace} />
+      </div>
     </div>
   );
 }
