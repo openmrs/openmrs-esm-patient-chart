@@ -33,9 +33,7 @@ export default function Widget(props) {
           setWidget(widget);
         });
     } else {
-      widget.component = () => (
-        <div>No module provided for this widget ({widget.name}</div>
-      );
+      widget.component = coreWidgetDefinitions[widget.name].component;
       setWidget(widget);
     }
   }
