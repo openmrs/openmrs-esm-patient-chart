@@ -6,14 +6,23 @@
     "\\.(css)$": "identity-obj-proxy",
     "@openmrs/esm-api": "<rootDir>/__mocks__/openmrs-esm-api.mock.tsx",
     "@openmrs/esm-error-handling": "<rootDir>/__mocks__/openmrs-esm-error-handling.mock.tsx",
+    "@openmrs/esm-patient-chart-widgets": "<rootDir>/__mocks__/openmrs-esm-patient-chart-widgets.mock.tsx",
     "lodash-es": "lodash"
   },
+  "collectCoverageFrom": [
+    "**/src/**/*.tsx",
+    "!**/node_modules/**",
+    "!**/vendor/**",
+    "!**/src/**/*.test.*",
+    "!**/src/declarations.d.tsx"
+  ],
+  "setupFiles": ["<rootDir>/src/setup-tests.js"],
   "coverageThreshold": {
     "global": {
-      "statements": 50,
-      "branches": 50,
-      "functions": 45,
-      "lines": 50
+      "statements": 9,
+      "branches": 5,
+      "functions": 7,
+      "lines": 9
     }
   }
 }

@@ -6,11 +6,18 @@ import TabbedView from "./tabbed-view/tabbed-view.component";
 import { coreWidgets, coreDashboards, coreTabbedViews } from "./core-views";
 import Widget from "./widget/widget.component";
 
-export function getView(name: string, config: any, defaultPath: any): ViewType {
+export function getView(
+  name: string,
+  config: any,
+  defaultPath: any
+): ViewType | null {
   return getCoreView(name, defaultPath) || getExternalView(config, name);
 }
 
-export function getCoreView(name: string, defaultPath: string): ViewType {
+export function getCoreView(
+  name: string,
+  defaultPath: string
+): ViewType | null {
   if (coreWidgets[name]) {
     return coreWidgets[name];
   }
@@ -34,7 +41,7 @@ export function getCoreView(name: string, defaultPath: string): ViewType {
       )
     };
   }
-  return;
+  return null;
 }
 
 export function getExternalView(config: any, name: string): ViewType {
@@ -64,13 +71,9 @@ export function getExternalView(config: any, name: string): ViewType {
   }
 }
 
-export type RouteType = {
-  name: string;
-  path: string;
-  component: Function;
-};
-
 export type ViewType = {
+  label?: string;
+  path?: string;
   name: string;
-  component: Function;
+  component: Function | null;
 };

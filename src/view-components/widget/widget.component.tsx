@@ -1,32 +1,50 @@
-import React, { FunctionComponent, useContext } from "react";
-import { coreWidgets } from "../core-views";
-import { AppPropsContext } from "../../app-props-context";
+import React, { FunctionComponent } from "react";
+import { coreWidgets as coreWidgetDefinitions } from "../core-views";
 
 export default function Widget(props) {
-  const [widget, setWidget] = React.useState();
-  const app = useContext(AppPropsContext);
+  const [widget, setWidget] = React.useState(null);
 
   React.useEffect(() => {
     loadWidgetFromConfig(props.widgetConfig);
   }, [props.widgetConfig]);
 
   function loadWidgetFromConfig(widgetConfig: WidgetConfigType) {
-    let Component: FunctionComponent<ComponentProps>;
-    let widget = widgetConfig;
+    let Component: FunctionComponent;
+    let widget: WidgetConfigType = widgetConfig;
     if (widgetConfig.esModule) {
-      System.import(widgetConfig.esModule).then(module => {
-        Component = module[widgetConfig.name];
-        widget.component = () => <Component props={app.appProps} />;
-        setWidget(widget);
-      });
+      System.import(widgetConfig.esModule)
+        .then(module => {
+          if (module[widgetConfig.name]) {
+            Component = module[widgetConfig.name];
+            widget.component = () => <Component />;
+          } else {
+            widget.component = () => (
+              <div>
+                {widgetConfig.name} does not exist in module{" "}
+                {widgetConfig.esModule}
+              </div>
+            );
+          }
+        })
+        .catch(error => {
+          widget.component = () => <div>{widget.esModule} failed to load</div>;
+        })
+        .finally(() => {
+          setWidget(widget);
+        });
     } else {
-      widget.component = coreWidgets[widget.name].component;
-
+      widget.component = coreWidgetDefinitions[widget.name].component;
       setWidget(widget);
     }
   }
 
-  return <>{widget !== undefined && widget.component()}</>;
+  return (
+    <>
+      {widget != undefined &&
+        widget.component != undefined &&
+        widget.component()}
+    </>
+  );
 }
 
 export type WidgetProps = {

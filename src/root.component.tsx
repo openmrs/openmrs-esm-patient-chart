@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter, Route } from "react-router-dom";
 import openmrsRootDecorator from "@openmrs/react-root-decorator";
-import PatientBanner from "./banner/patient-banner.component";
+import { PatientBanner } from "@openmrs/esm-patient-chart-widgets";
 import WorkspaceWrapper from "./workspace/workspace-wrapper.component";
 import ChartReview from "./chart-review/chart-review.component";
 import styles from "./root.css";
@@ -161,3 +161,37 @@ export default openmrsRootDecorator({
           <Sidebar></Sidebar>
         </div>
 */
+
+export type ChartConfigType = {
+  primaryNavbar: NavbarType[];
+  widgetDefinitions: {
+    name: string;
+    esModule?: string;
+    label?: string;
+    path?: string;
+  };
+
+  dashboardDefinitions: {
+    name: string;
+    title: string;
+    layout: { columns: number };
+    widgets: {
+      name: string;
+      esModule: string;
+      label: string;
+      path: string;
+      layout: {
+        rowSpan: number;
+        columnSpan: number;
+      };
+    }[];
+  };
+
+  tabbedDashboardDefinitions: {
+    name: string;
+    title: string;
+    navbar: NavbarType;
+  }[];
+};
+
+export type NavbarType = { label: string; path: string; view: string };

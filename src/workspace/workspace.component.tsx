@@ -1,10 +1,10 @@
 import React from "react";
-import { Tabs, Panel } from "../widgets/tabs/tabs.component";
+import { Tabs, Panel } from "@openmrs/esm-patient-chart-widgets";
 import { getNewWorkspaceItem, WorkspaceItem } from "@openmrs/esm-api";
 
 export default function Workspace(props: any) {
   const [openTabs, setOpenTabs] = React.useState<WorkspaceItem[]>([]);
-  const [selectedTab, setSelectedTab] = React.useState();
+  const [selectedTab, setSelectedTab] = React.useState(null);
 
   React.useEffect(() => {
     const sub = getNewWorkspaceItem().subscribe(item => {
