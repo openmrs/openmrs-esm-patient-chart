@@ -1,8 +1,8 @@
 import React, { FunctionComponent } from "react";
-import { coreWidgets } from "../core-views";
+import { coreWidgets as coreWidgetDefinitions } from "../core-views";
 
 export default function Widget(props) {
-  const [widget, setWidget] = React.useState<WidgetConfigType | null>(null);
+  const [widget, setWidget] = React.useState(null);
 
   React.useEffect(() => {
     loadWidgetFromConfig(props.widgetConfig);
@@ -33,7 +33,9 @@ export default function Widget(props) {
           setWidget(widget);
         });
     } else {
-      widget.component = coreWidgets[widget.name].component;
+      widget.component = () => (
+        <div>No module provided for this widget ({widget.name}</div>
+      );
       setWidget(widget);
     }
   }
