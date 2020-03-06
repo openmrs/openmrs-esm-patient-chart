@@ -1,5 +1,4 @@
 import React, { FunctionComponent } from "react";
-import { coreWidgets } from "../core-views";
 
 export default function Widget(props) {
   const [widget, setWidget] = React.useState<WidgetConfigType | null>(null);
@@ -60,7 +59,6 @@ type GridSizeType = {
 
 export type WidgetConfigType = {
   name: string;
-  path?: string;
   esModule?: string;
   layout?: {
     rowSpan?: number;

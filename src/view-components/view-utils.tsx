@@ -4,39 +4,50 @@ import Dashboard from "./dashboard/dashboard.component";
 import TabbedView from "./tabbed-view/tabbed-view.component";
 
 import Widget from "./widget/widget.component";
+import {
+  widgetDefinitions as coreWidgetDefinitions,
+  dashboardDefinitions as coreDashboardDefinitions,
+  tabbedViewDefinitions as coreTabbedViewDefinitions
+} from "./core-views";
 
 export function getView(
   name: string,
   config: any,
   defaultPath: any
 ): ViewType | null {
-  const widget = config.widgetDefinitions.find(widget => widget.name === name);
-
-  const dashboard = config.dashboardDefinitions.find(
-    dashboard => dashboard.name === name
-  );
-
-  const tabbedView = config.tabbedViewDefinitions.find(
-    tabbedView => tabbedView.name === name
-  );
+  const widget =
+    config.widgetDefinitions.find(widget => widget.name === name) ||
+    coreWidgetDefinitions.find(widget => widget.name === name);
 
   if (widget) {
     return { name, component: () => <Widget widgetConfig={widget} /> };
-  } else if (dashboard) {
+  }
+
+  const dashboard =
+    config.dashboardDefinitions.find(dashboard => dashboard.name === name) ||
+    coreDashboardDefinitions.find(dashboard => dashboard.name === name);
+
+  if (dashboard) {
     return {
       ...dashboard,
       component: () => <Dashboard dashboardConfig={dashboard} />
     };
-  } else if (tabbedView) {
+  }
+
+  const tabbedView =
+    config.tabbedViewDefinitions.find(tabbedView => tabbedView.name === name) ||
+    coreTabbedViewDefinitions.find(tabbedView => tabbedView.name === name);
+
+  if (tabbedView) {
     return {
       ...tabbedView,
       component: () => (
         <TabbedView config={tabbedView} defaultPath={defaultPath} />
       )
     };
-  } else {
-    return { name, component: null };
   }
+
+  return { name, component: () => <div>View "{name}" does not exist.</div> };
 }
 
 export type ViewType = {

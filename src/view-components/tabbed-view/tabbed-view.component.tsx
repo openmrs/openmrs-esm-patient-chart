@@ -19,7 +19,6 @@ function useQuery() {
 }
 
 export default function TabbedView(props: any) {
-  let { patientUuid } = useParams();
   const [views, setViews] = useState<ViewType[]>([]);
   const match = useRouteMatch();
   const config = useConfig();
