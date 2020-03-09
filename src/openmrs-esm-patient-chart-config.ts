@@ -1,8 +1,8 @@
 import { defineConfigSchema, validators } from "@openmrs/esm-module-config";
 import {
-  widgetDefinitions,
-  dashboardDefinitions,
-  tabbedViewDefinitions
+  coreWidgetDefinitions,
+  coreDashboardDefinitions,
+  coreTabbedViewDefinitions
 } from "./view-components/core-views";
 
 export const esmPatientChartConfig = {
@@ -60,7 +60,7 @@ export const esmPatientChartConfig = {
       name: { validators: [validators.isString] },
       esModule: { validators: [validators.isString] }
     },
-    default: widgetDefinitions
+    default: coreWidgetDefinitions
   },
 
   dashboardDefinitions: {
@@ -81,7 +81,7 @@ export const esmPatientChartConfig = {
         }
       }
     },
-    default: dashboardDefinitions
+    default: coreDashboardDefinitions
   },
 
   tabbedViewDefinitions: {
@@ -96,6 +96,6 @@ export const esmPatientChartConfig = {
         }
       }
     },
-    default: tabbedViewDefinitions
+    default: coreTabbedViewDefinitions
   }
 };

@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from "react";
-import { widgetDefinitions as coreWidgetDefinitions } from "../core-views";
+import { coreWidgetDefinitions } from "../core-views";
 
 export default function Widget(props) {
   const [widget, setWidget] = React.useState(null);

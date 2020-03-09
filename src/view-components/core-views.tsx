@@ -1,7 +1,7 @@
 import React from "react";
 import { DashboardConfig } from "./dashboard/dashboard.component";
 
-export const widgetDefinitions = [
+export const coreWidgetDefinitions = [
   {
     name: "ProgramsOverview",
     esModule: "@openmrs/esm-patient-chart-widgets"
@@ -58,7 +58,7 @@ export const widgetDefinitions = [
   }
 ];
 
-export const dashboardDefinitions = [
+export const coreDashboardDefinitions = [
   {
     name: "summaryDashboard",
     title: "Overview",
@@ -187,7 +187,7 @@ export const dashboardDefinitions = [
   }
 ];
 
-export const tabbedViewDefinitions = [
+export const coreTabbedViewDefinitions = [
   {
     name: "resultsTabbedView",
     title: "Results",

@@ -4,9 +4,9 @@ import "@testing-library/jest-dom/extend-expect";
 
 import { getView } from "./view-utils";
 import {
-  widgetDefinitions as coreWidgetDefinitions,
-  dashboardDefinitions as coreDashboardDefinitions,
-  tabbedViewDefinitions as coreTabbedViewDefinitions
+  coreWidgetDefinitions,
+  coreDashboardDefinitions,
+  coreTabbedViewDefinitions
 } from "./core-views";
 
 declare var System;

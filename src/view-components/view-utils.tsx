@@ -5,9 +5,9 @@ import TabbedView from "./tabbed-view/tabbed-view.component";
 
 import Widget from "./widget/widget.component";
 import {
-  widgetDefinitions as coreWidgetDefinitions,
-  dashboardDefinitions as coreDashboardDefinitions,
-  tabbedViewDefinitions as coreTabbedViewDefinitions
+  coreWidgetDefinitions,
+  coreDashboardDefinitions,
+  coreTabbedViewDefinitions
 } from "./core-views";
 
 export function getView(

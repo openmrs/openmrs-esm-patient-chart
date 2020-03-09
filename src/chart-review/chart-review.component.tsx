@@ -43,7 +43,9 @@ export default function ChartReview(props: any) {
   React.useEffect(() => {
     const views: View[] = config.primaryNavbar.map(item => {
       let view = getView(item.view, config, defaultPath + item.path);
-      if (view && view.component) item.component = view.component;
+      if (view && view.component) {
+        item.component = view.component;
+      }
       return item;
     });
 

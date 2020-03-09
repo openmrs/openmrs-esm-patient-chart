@@ -4,8 +4,6 @@ import "@testing-library/jest-dom/extend-expect";
 
 import Widget from "./widget.component";
 
-declare var System;
-
 describe(`<Widget />`, () => {
   const originalError = console.error;
 
