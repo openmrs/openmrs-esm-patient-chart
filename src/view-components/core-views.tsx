@@ -1,23 +1,194 @@
 import React from "react";
+import { DashboardConfig } from "./dashboard/dashboard.component";
 
-import {
-  HeightAndWeightOverview,
-  HeightAndWeightSummary,
-  VitalsOverview,
-  VitalsSummary,
-  ConditionsOverview,
-  AllergiesOverview,
-  NotesOverview,
-  ProgramsOverview,
-  MedicationsOverview,
-  MedicationsSummary,
-  AppointmentsOverview
-} from "@openmrs/esm-patient-chart-widgets";
+export const coreWidgetDefinitions = [
+  {
+    name: "ProgramsOverview",
+    esModule: "@openmrs/esm-patient-chart-widgets"
+  },
 
-import { DashboardConfigType } from "./dashboard/dashboard.component";
+  {
+    name: "MedicationsOverview",
+    esModule: "@openmrs/esm-patient-chart-widgets"
+  },
 
-export const coreTabbedViews = {
-  resultsTabbedView: {
+  {
+    name: "MedicationsSummary",
+    esModule: "@openmrs/esm-patient-chart-widgets"
+  },
+
+  {
+    name: "HeightAndWeightOverview",
+    esModule: "@openmrs/esm-patient-chart-widgets"
+  },
+
+  {
+    name: "HeightAndWeightSummary",
+    esModule: "@openmrs/esm-patient-chart-widgets"
+  },
+
+  {
+    name: "VitalsOverview",
+    esModule: "@openmrs/esm-patient-chart-widgets"
+  },
+
+  {
+    name: "VitalsSummary",
+    esModule: "@openmrs/esm-patient-chart-widgets"
+  },
+
+  {
+    name: "ConditionsOverview",
+    esModule: "@openmrs/esm-patient-chart-widgets"
+  },
+
+  {
+    name: "AllergiesOverview",
+    esModule: "@openmrs/esm-patient-chart-widgets"
+  },
+
+  {
+    name: "NotesOverview",
+    esModule: "@openmrs/esm-patient-chart-widgets"
+  },
+
+  {
+    name: "AppointmentsOverview",
+    esModule: "@openmrs/esm-patient-chart-widgets"
+  }
+];
+
+export const coreDashboardDefinitions = [
+  {
+    name: "summaryDashboard",
+    title: "Overview",
+    layout: {
+      columns: 4
+    },
+    widgets: [
+      {
+        name: "ConditionsOverview",
+        esModule: "@openmrs/esm-patient-chart-widgets",
+        layout: { columnSpan: 2 }
+      },
+      {
+        name: "ProgramsOverview",
+        esModule: "@openmrs/esm-patient-chart-widgets",
+        layout: { columnSpan: 2 }
+      },
+      {
+        name: "NotesOverview",
+        esModule: "@openmrs/esm-patient-chart-widgets",
+        layout: { columnSpan: 4 }
+      },
+      {
+        name: "VitalsOverview",
+        esModule: "@openmrs/esm-patient-chart-widgets",
+        layout: { columnSpan: 2 }
+      },
+      {
+        name: "HeightAndWeightOverview",
+        esModule: "@openmrs/esm-patient-chart-widgets",
+        layout: { columnSpan: 2 }
+      },
+      {
+        name: "MedicationsOverview",
+        esModule: "@openmrs/esm-patient-chart-widgets",
+        layout: { columnSpan: 3 }
+      },
+      {
+        name: "AllergiesOverview",
+        esModule: "@openmrs/esm-patient-chart-widgets",
+        layout: { columnSpan: 1 }
+      },
+      {
+        name: "AppointmentsOverview",
+        esModule: "@openmrs/esm-patient-chart-widgets",
+        layout: { columnSpan: 4 }
+      }
+    ]
+  },
+
+  {
+    name: "resultsOverviewDashboard",
+    layout: { columns: 1 },
+    widgets: [
+      {
+        name: "VitalsOverview",
+        esModule: "@openmrs/esm-patient-chart-widgets"
+      },
+      {
+        name: "HeightAndWeightOverview",
+        esModule: "@openmrs/esm-patient-chart-widgets"
+      }
+    ]
+  },
+
+  {
+    name: "ordersOverviewDashboard",
+    title: "Orders Overview",
+    layout: { columns: 1 },
+    widgets: [
+      {
+        name: "MedicationsOverview",
+        esModule: "@openmrs/esm-patient-chart-widgets"
+      }
+    ]
+  },
+
+  {
+    name: "encountersOverviewDashboard",
+    widgets: [
+      {
+        name: "NotesOverview",
+        esModule: "@openmrs/esm-patient-chart-widgets"
+      }
+    ]
+  },
+
+  {
+    name: "conditionsOverviewDashboard",
+    widgets: [
+      {
+        name: "ConditionsOverview",
+        esModule: "@openmrs/esm-patient-chart-widgets"
+      }
+    ]
+  },
+
+  {
+    name: "allergiesOverviewDashboard",
+    widgets: [
+      {
+        name: "AllergiesOverview",
+        esModule: "@openmrs/esm-patient-chart-widgets"
+      }
+    ]
+  },
+
+  {
+    name: "programsOverviewDashboard",
+    widgets: [
+      {
+        name: "ProgramsOverview",
+        esModule: "@openmrs/esm-patient-chart-widgets"
+      }
+    ]
+  },
+
+  {
+    name: "appointmentsOverviewDashboard",
+    widgets: [
+      {
+        name: "AppointmentsOverview",
+        esModule: "@openmrs/esm-patient-chart-widgets"
+      }
+    ]
+  }
+];
+
+export const coreTabbedViewDefinitions = [
+  {
     name: "resultsTabbedView",
     title: "Results",
 
@@ -30,17 +201,17 @@ export const coreTabbedViews = {
       {
         label: "Vitals",
         path: "/vitals",
-        view: "vitalsDetailedSummary"
+        view: "VitalsSummary"
       },
       {
         label: "Height and Weight",
         path: "/heightAndWeight",
-        view: "heightAndWeightDetailedSummary"
+        view: "HeightAndWeightSummary"
       }
     ]
   },
 
-  ordersTabbedView: {
+  {
     name: "ordersTabbedView",
     title: "Orders",
 
@@ -53,183 +224,22 @@ export const coreTabbedViews = {
       {
         label: "Medication Orders",
         path: "/medication-orders",
-        view: "medicationsDetailedSummary"
+        view: "MedicationsSummary"
       }
     ]
   }
+];
+
+type CoreWidgets = {
+  [key: string]: CoreWidget;
 };
 
-export const coreDashboards: CoreDashboardsType = {
-  summaryDashboard: {
-    name: "summaryDashboard",
-    title: "Overview",
-    layout: {
-      columns: 4
-    },
-    widgets: [
-      {
-        name: "conditionsOverview",
-        layout: { columnSpan: 2 }
-      },
-      {
-        name: "programsOverview",
-        layout: { columnSpan: 2 }
-      },
-      {
-        name: "notesOverview",
-        layout: { columnSpan: 4 }
-      },
-      {
-        name: "vitalsOverview",
-        layout: { columnSpan: 2 }
-      },
-      {
-        name: "heightAndWeightOverview",
-        layout: { columnSpan: 2 }
-      },
-      {
-        name: "medicationsOverview",
-        layout: { columnSpan: 3 }
-      },
-      {
-        name: "allergiesOverview",
-        layout: { columnSpan: 1 }
-      },
-      {
-        name: "appointmentsOverview",
-        layout: { columnSpan: 4 }
-      }
-    ]
-  },
-
-  resultsOverviewDashboard: {
-    name: "resultsOverviewDashboard",
-    layout: { columns: 1 },
-    widgets: [{ name: "vitalsOverview" }, { name: "heightAndWeightOverview" }]
-  },
-
-  ordersOverviewDashboard: {
-    name: "ordersOverviewDashboard",
-    title: "Orders Overview",
-    layout: { columns: 1 },
-    widgets: [{ name: "medicationsOverview" }]
-  },
-
-  encountersOverviewDashboard: {
-    name: "encountersOverviewDashboard",
-    widgets: [{ name: "notesOverview" }]
-  },
-
-  conditionsOverviewDashboard: {
-    name: "conditionsOverviewDashboard",
-    widgets: [{ name: "conditionsOverview" }]
-  },
-
-  allergiesOverviewDashboard: {
-    name: "allergiesOverviewDashboard",
-    widgets: [{ name: "allergiesOverview" }]
-  },
-
-  programsOverviewDashboard: {
-    name: "programsOverviewDashboard",
-    widgets: [{ name: "programsOverview" }]
-  },
-
-  appointmentsOverviewDashboard: {
-    name: "appointmentsOverviewDashboard",
-    widgets: [{ name: "appointmentsOverview" }]
-  }
-};
-
-export const coreWidgets: CoreWidgetsType = {
-  programsOverview: {
-    name: "programsOverview",
-    component: () => {
-      return <ProgramsOverview />;
-    }
-  },
-
-  medicationsOverview: {
-    name: "medicationsOverview",
-    component: () => {
-      return <MedicationsOverview />;
-    }
-  },
-
-  medicationsDetailedSummary: {
-    name: "medicationsDetailedSummary",
-    component: () => {
-      return <MedicationsSummary />;
-    }
-  },
-
-  heightAndWeightOverview: {
-    name: "heightAndWeightOverview",
-    component: () => {
-      return <HeightAndWeightOverview />;
-    }
-  },
-
-  heightAndWeightDetailedSummary: {
-    name: "heightAndWeightDetailedSummary",
-    component: () => {
-      return <HeightAndWeightSummary />;
-    }
-  },
-
-  vitalsOverview: {
-    name: "vitalsOverview",
-    component: () => {
-      return <VitalsOverview />;
-    }
-  },
-
-  vitalsDetailedSummary: {
-    name: "vitalsDetailedSummary",
-    component: () => {
-      return <VitalsSummary />;
-    }
-  },
-
-  conditionsOverview: {
-    name: "conditionsOverview",
-    component: () => {
-      return <ConditionsOverview />;
-    }
-  },
-
-  allergiesOverview: {
-    name: "allergiesOverview",
-    component: () => {
-      return <AllergiesOverview />;
-    }
-  },
-
-  notesOverview: {
-    name: "notesOverview",
-    component: () => {
-      return <NotesOverview />;
-    }
-  },
-
-  appointmentsOverview: {
-    name: "appointmentsOverview",
-    component: () => {
-      return <AppointmentsOverview />;
-    }
-  }
-};
-
-type CoreWidgetsType = {
-  [key: string]: CoreWidgetType;
-};
-
-type CoreWidgetType = {
+type CoreWidget = {
   name: string;
+  esModule: string;
   params?: {};
-  component: Function;
 };
 
-type CoreDashboardsType = {
-  [key: string]: DashboardConfigType;
+type CoreDashboards = {
+  [key: string]: DashboardConfig;
 };

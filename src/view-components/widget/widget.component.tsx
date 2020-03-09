@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from "react";
-import { coreWidgets as coreWidgetDefinitions } from "../core-views";
+import { coreWidgetDefinitions } from "../core-views";
 
 export default function Widget(props) {
   const [widget, setWidget] = React.useState(null);
@@ -8,9 +8,9 @@ export default function Widget(props) {
     loadWidgetFromConfig(props.widgetConfig);
   }, [props.widgetConfig]);
 
-  function loadWidgetFromConfig(widgetConfig: WidgetConfigType) {
+  function loadWidgetFromConfig(widgetConfig: WidgetConfig) {
     let Component: FunctionComponent;
-    let widget: WidgetConfigType = widgetConfig;
+    let widget: WidgetConfig = widgetConfig;
     if (widgetConfig.esModule) {
       System.import(widgetConfig.esModule)
         .then(module => {
@@ -33,7 +33,9 @@ export default function Widget(props) {
           setWidget(widget);
         });
     } else {
-      widget.component = coreWidgetDefinitions[widget.name].component;
+      widget.component = () => (
+        <div>No module provided in the config for widget: {widget.name}></div>
+      );
       setWidget(widget);
     }
   }
@@ -48,17 +50,16 @@ export default function Widget(props) {
 }
 
 export type WidgetProps = {
-  widgetConfig: WidgetConfigType;
+  widgetConfig: WidgetConfig;
 };
 
-type GridSizeType = {
+type GridSize = {
   gridRow: string;
   gridColumn: string;
 };
 
-export type WidgetConfigType = {
+export type WidgetConfig = {
   name: string;
-  path?: string;
   esModule?: string;
   layout?: {
     rowSpan?: number;

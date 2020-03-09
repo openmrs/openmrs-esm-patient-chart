@@ -1,3 +1,4 @@
 window.System = {
-  register: jest.fn()
+  register: jest.fn(),
+  import: jest.fn()
 };

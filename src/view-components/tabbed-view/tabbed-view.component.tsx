@@ -11,17 +11,17 @@ import {
 } from "react-router-dom";
 
 import styles from "./tabbed-view.css";
-import { getView, ViewType } from "../view-utils";
-import { NavbarType } from "../../root.component";
-
+import { getView, View } from "../view-utils";
+import { Navbar } from "../../root.component";
+import { useConfig } from "@openmrs/esm-module-config";
 function useQuery() {
   return new URLSearchParams(useLocation().search);
 }
 
 export default function TabbedView(props: any) {
-  let { patientUuid } = useParams();
-  const [views, setViews] = useState<ViewType[]>([]);
+  const [views, setViews] = useState<View[]>([]);
   const match = useRouteMatch();
+  const config = useConfig();
 
   const [selected, setSelected] = React.useState(getInitialTab());
 
@@ -37,12 +37,12 @@ export default function TabbedView(props: any) {
   React.useEffect(() => {
     setViews(
       props.config.navbar.map(item => {
-        let view = getView(item.view, props.config, props.defaultPath);
+        let view = getView(item.view, config, props.defaultPath);
         if (view && view.component) item.component = view.component;
         return item;
       })
     );
-  }, [props.config, props.defaultPath]);
+  }, [config, props.config, props.defaultPath]);
   return (
     <>
       <nav className={styles.summariesnav} style={{ marginTop: "0" }}>
@@ -98,7 +98,7 @@ type TabbedViewProps = {
   config: {
     name: string;
     title: string;
-    navbar: NavbarType[];
+    navbar: Navbar[];
   };
   defaultPath?: string;
 };

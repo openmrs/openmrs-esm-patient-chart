@@ -4,8 +4,6 @@ import "@testing-library/jest-dom/extend-expect";
 
 import Widget from "./widget.component";
 
-declare var System;
-
 describe(`<Widget />`, () => {
   const originalError = console.error;
 
@@ -62,6 +60,22 @@ describe(`<Widget />`, () => {
 
     const element = await waitForElement(() =>
       queryByText(" does not exist", { exact: false })
+    );
+    expect(element).not.toBeNull();
+    done();
+  });
+
+  it(`should render "no module provided" if the no esModule property is present`, async done => {
+    const { queryByText } = render(
+      <Widget
+        widgetConfig={{
+          name: "non-existing-widget"
+        }}
+      />
+    );
+
+    const element = await waitForElement(() =>
+      queryByText("no module provided", { exact: false })
     );
     expect(element).not.toBeNull();
     done();
