@@ -19,10 +19,10 @@
   "setupFiles": ["<rootDir>/src/setup-tests.js"],
   "coverageThreshold": {
     "global": {
-      "statements": 9,
+      "statements": 8,
       "branches": 5,
       "functions": 7,
-      "lines": 9
+      "lines": 8
     }
   }
 }

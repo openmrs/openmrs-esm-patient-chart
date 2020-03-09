@@ -43,6 +43,7 @@ export default function Workspace(props: any) {
       updatedOpenTabs.splice(index, 1);
       setOpenTabs(updatedOpenTabs);
       setSelectedTab(getSelectedTabAfterRemove(index, selectedTab));
+      props.openTabs(updatedOpenTabs);
     }
   }
 

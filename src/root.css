@@ -34,3 +34,11 @@
 .sidebar {
   z-index: 1;
 }
+
+.invisible {
+  display: none;
+}
+
+.visible {
+  display: grid;
+}
