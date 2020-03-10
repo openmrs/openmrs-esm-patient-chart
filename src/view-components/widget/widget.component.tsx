@@ -1,22 +1,23 @@
-import React, { FunctionComponent } from "react";
-import { coreWidgetDefinitions } from "../core-views";
+import React, { FunctionComponent, useContext } from "react";
+import { AppPropsContext } from "../../app-props-context";
 
 export default function Widget(props) {
   const [widget, setWidget] = React.useState(null);
+  const app = useContext(AppPropsContext);
 
   React.useEffect(() => {
     loadWidgetFromConfig(props.widgetConfig);
   }, [props.widgetConfig]);
 
   function loadWidgetFromConfig(widgetConfig: WidgetConfig) {
-    let Component: FunctionComponent;
+    let Component: FunctionComponent<ComponentProps>;
     let widget: WidgetConfig = widgetConfig;
     if (widgetConfig.esModule) {
       System.import(widgetConfig.esModule)
         .then(module => {
           if (module[widgetConfig.name]) {
             Component = module[widgetConfig.name];
-            widget.component = () => <Component />;
+            widget.component = () => <Component props={app.appProps} />;
           } else {
             widget.component = () => (
               <div>
