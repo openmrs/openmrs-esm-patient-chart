@@ -33,13 +33,13 @@
   width: 100%;
   background-color: var(--omrs-color-bg-lowest-contrast);
   position: fixed;
-  border-left: 2px solid #d3d3d3;
+  border-left: 1px solid #d3d3d3;
   /* z-index: 2; */
 }
 
-.cardBody {
+/* .cardBody {
   border-left: 1px solid #d3d3d3;
-}
+} */
 :global(.omrs-breakpoint-gt-phone) .cardBody {
   margin-top: 7vh;
 }
