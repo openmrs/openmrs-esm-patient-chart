@@ -81,8 +81,7 @@ export default function TabbedView(props: any) {
             return (
               <Route
                 key={route.label}
-                exact
-                path={props.defaultPath + route.path}
+                path={`${props.defaultPath + route.path}`}
               >
                 {route.component && route.component()}
               </Route>
