@@ -9,8 +9,12 @@
   display: block;
   animation: fade_in_show 0.3s;
   width: 50vw;
-  height: 80%;
+  height: 90%;
   overflow-y: scroll;
+}
+
+.visible::-webkit-scrollbar {
+  display: none;
 }
 
 @keyframes fade_in_show {
@@ -25,21 +29,29 @@
   }
 }
 
-#optionsBar {
-  width: 100% !important;
-  background-color: #eff1f2;
+.optionsBar {
+  width: 100%;
+  background-color: var(--omrs-color-bg-lowest-contrast);
   position: fixed;
-  z-index: 2;
+  border-left: 2px solid #d3d3d3;
+  /* z-index: 2; */
 }
 
-@media only screen and (min-width: 769px) {
-  #cardBody {
-    margin-top: 5vh;
-  }
+.cardBody {
+  border-left: 1px solid #d3d3d3;
+}
+:global(.omrs-breakpoint-gt-phone) .cardBody {
+  margin-top: 7vh;
 }
 
-@media only screen and (max-width: 768px) {
-  #cardBody {
-    margin-top: 7vh;
-  }
+:global(.omrs-breakpoint-lt-tablet) .some-div {
+  margin-top: 7vh;
+}
+
+:global(.omrs-breakpoint-lt-desktop) .cardBody {
+  margin-top: 5vh;
+}
+
+:global(.omrs-breakpoint-gt-tablet) .cardBody {
+  margin-top: 5vh;
 }

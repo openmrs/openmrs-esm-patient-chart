@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { match, useRouteMatch } from "react-router";
+import { useHistory, match, useRouteMatch } from "react-router-dom";
 import styles from "./vitals-form.css";
 import SummaryCard from "../cards/summary-card.component";
 import { useCurrentPatient } from "@openmrs/esm-api";
@@ -12,7 +12,6 @@ import {
 import dayjs from "dayjs";
 import { createErrorHandler } from "@openmrs/esm-error-handling";
 import { difference } from "lodash-es";
-import { useHistory } from "react-router-dom";
 
 export function VitalsForm(props: vitalsFormProp) {
   const [enableButtons, setEnableButtons] = useState(false);

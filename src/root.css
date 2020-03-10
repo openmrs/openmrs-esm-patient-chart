@@ -10,6 +10,10 @@
   overflow-y: scroll;
 }
 
+.grid::-webkit-scrollbar {
+  display: none;
+}
+
 .chartreview {
   grid-row: 1;
   grid-column: 1;
@@ -18,6 +22,24 @@
   overflow-x: hidden;
   height: 90%;
   padding-bottom: 10px;
+}
+
+.chartreview::-webkit-scrollbar {
+  width: 10px;
+}
+
+.chartreview::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px grey;
+  border-radius: 10px;
+}
+
+.chartreview::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 10px;
+}
+
+.chartreview::-webkit-scrollbar-thumb:hover {
+  background: var(--omrs-color-bg-lowest-contrast);
 }
 
 .workspace {
@@ -31,6 +53,10 @@
   padding-bottom: 10px;
 }
 
+.workspace::-webkit-scrollbar {
+  display: none;
+}
+
 .sidebar {
-  z-index: 1;
+  /* z-index: 1; */
 }
