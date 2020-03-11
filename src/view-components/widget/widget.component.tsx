@@ -1,57 +1,62 @@
-import React, { FunctionComponent, useContext } from "react";
-import { AppPropsContext } from "../../app-props-context";
-import singleSpa, { SingleSpaContext } from "single-spa-react";
+import React, { FunctionComponent } from "react";
+//@ts-ignore The present types for single-spa-react are not updated yet for 2.9 which has SingleSpaContext
+import { SingleSpaContext } from "single-spa-react";
 
 export default function Widget(props) {
   const [widget, setWidget] = React.useState(null);
 
   React.useEffect(() => {
-    loadWidgetFromConfig(props.widgetConfig);
-  }, [props.widgetConfig]);
-
-  function loadWidgetFromConfig(widgetConfig: WidgetConfig) {
-    let Component: FunctionComponent<ComponentProps>;
-    let widget: WidgetConfig = widgetConfig;
-    if (widgetConfig.esModule) {
-      System.import(widgetConfig.esModule)
-        .then(module => {
-          if (module[widgetConfig.name]) {
-            Component = module[widgetConfig.name];
-            if (widgetConfig.usesSingleSpaContext) {
-              <SingleSpaContext.Consumer>
-                {context => {
-                  widget.component = () => (
-                    <Component {...props.widgetConfig.params} {...context} />
-                  );
-                }}
-              </SingleSpaContext.Consumer>;
+    //This function is moved inside of the effect to avoid change on every render
+    const loadWidgetFromConfig = (widgetConfig: WidgetConfig) => {
+      let Component: FunctionComponent<ComponentProps>;
+      let widget: WidgetConfig = widgetConfig;
+      if (widgetConfig.esModule) {
+        System.import(widgetConfig.esModule)
+          .then(module => {
+            if (module[widgetConfig.name]) {
+              Component = module[widgetConfig.name];
+              if (widgetConfig.usesSingleSpaContext) {
+                <SingleSpaContext.Consumer>
+                  {context => {
+                    widget.component = () => (
+                      <Component
+                        {...props.widgetConfig.params}
+                        singleSpaContext={context}
+                      />
+                    );
+                  }}
+                </SingleSpaContext.Consumer>;
+              } else {
+                widget.component = () => (
+                  <Component {...props.widgetConfig.params} />
+                );
+              }
             } else {
               widget.component = () => (
-                <Component {...props.widgetConfig.params} />
+                <div>
+                  {widgetConfig.name} does not exist in module{" "}
+                  {widgetConfig.esModule}
+                </div>
               );
             }
-          } else {
+          })
+          .catch(error => {
             widget.component = () => (
-              <div>
-                {widgetConfig.name} does not exist in module{" "}
-                {widgetConfig.esModule}
-              </div>
+              <div>{widget.esModule} failed to load</div>
             );
-          }
-        })
-        .catch(error => {
-          widget.component = () => <div>{widget.esModule} failed to load</div>;
-        })
-        .finally(() => {
-          setWidget(widget);
-        });
-    } else {
-      widget.component = () => (
-        <div>No module provided in the config for widget: {widget.name}></div>
-      );
-      setWidget(widget);
-    }
-  }
+          })
+          .finally(() => {
+            setWidget(widget);
+          });
+      } else {
+        widget.component = () => (
+          <div>No module provided in the config for widget: {widget.name}></div>
+        );
+        setWidget(widget);
+      }
+    };
+    loadWidgetFromConfig(props.widgetConfig);
+  }, [props.widgetConfig]);
 
   return (
     <>
