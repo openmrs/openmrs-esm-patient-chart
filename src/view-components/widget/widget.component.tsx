@@ -21,13 +21,14 @@ export default function Widget(props) {
             if (widgetConfig.createParcel) {
               <SingleSpaContext.Consumer>
                 {context => {
-                  //create and mount the parcel
+                  widget.component = () => {}; //create and mount the parcel
                 }}
               </SingleSpaContext.Consumer>;
+            } else {
+              widget.component = () => (
+                <Component {...props.widgetConfig.params} {...app.appProps} />
+              );
             }
-            widget.component = () => (
-              <Component {...props.widgetConfig.params} {...app.appProps} />
-            );
           } else {
             widget.component = () => (
               <div>
