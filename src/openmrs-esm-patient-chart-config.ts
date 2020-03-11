@@ -75,6 +75,7 @@ export const esmPatientChartConfig = {
         arrayElements: {
           name: { validators: [validators.isString] },
           esModule: { validators: [validators.isString] },
+          usesSingleSpaContext: { validators: [validators.isBoolean] },
           layout: {
             rowSpan: {},
             columnSpan: {}
