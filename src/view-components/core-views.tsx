@@ -94,7 +94,10 @@ export const coreDashboardDefinitions = [
       {
         name: "MedicationsOverview",
         esModule: "@openmrs/esm-patient-chart-widgets",
-        layout: { columnSpan: 3 }
+        layout: { columnSpan: 3 },
+        params: {
+          basePath: "orders/medication-orders"
+        }
       },
       {
         name: "AllergiesOverview",
@@ -131,7 +134,10 @@ export const coreDashboardDefinitions = [
     widgets: [
       {
         name: "MedicationsOverview",
-        esModule: "@openmrs/esm-patient-chart-widgets"
+        esModule: "@openmrs/esm-patient-chart-widgets",
+        params: {
+          basePath: "orders/medication-orders"
+        }
       }
     ]
   },
