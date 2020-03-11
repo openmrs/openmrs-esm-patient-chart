@@ -8,7 +8,7 @@ export default function Widget(props) {
 
   React.useEffect(() => {
     loadWidgetFromConfig(props.widgetConfig);
-  }, [props.widgetConfig, loadWidgetFromConfig]);
+  }, [props.widgetConfig]);
 
   function loadWidgetFromConfig(widgetConfig: WidgetConfig) {
     let Component: FunctionComponent<ComponentProps>;
