@@ -4,7 +4,6 @@ import singleSpa, { SingleSpaContext } from "single-spa-react";
 
 export default function Widget(props) {
   const [widget, setWidget] = React.useState(null);
-  const app = useContext(AppPropsContext);
 
   React.useEffect(() => {
     loadWidgetFromConfig(props.widgetConfig);
@@ -18,15 +17,17 @@ export default function Widget(props) {
         .then(module => {
           if (module[widgetConfig.name]) {
             Component = module[widgetConfig.name];
-            if (widgetConfig.createParcel) {
+            if (widgetConfig.usesSingleSpaContext) {
               <SingleSpaContext.Consumer>
                 {context => {
-                  widget.component = () => {}; //create and mount the parcel
+                  widget.component = () => (
+                    <Component {...props.widgetConfig.params} {...context} />
+                  );
                 }}
               </SingleSpaContext.Consumer>;
             } else {
               widget.component = () => (
-                <Component {...props.widgetConfig.params} {...app.appProps} />
+                <Component {...props.widgetConfig.params} />
               );
             }
           } else {
@@ -73,7 +74,7 @@ type GridSize = {
 export type WidgetConfig = {
   name: string;
   esModule?: string;
-  createParcel?: boolean;
+  usesSingleSpaContext?: boolean;
   layout?: {
     rowSpan?: number;
     columnSpan?: number;
