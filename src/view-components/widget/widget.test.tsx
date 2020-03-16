@@ -102,7 +102,6 @@ describe(`<Widget />`, () => {
     );
 
     const element = await waitForElement(() => queryByText("Test Widget"));
-    debug();
     expect(element).not.toBeNull();
 
     done();

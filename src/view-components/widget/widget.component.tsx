@@ -54,7 +54,7 @@ export default function Widget(props) {
       }
     };
     loadWidgetFromConfig(props.widgetConfig);
-  }, [props.widgetConfig]);
+  }, [props.widgetConfig, mountParcel]);
 
   return (
     <>
