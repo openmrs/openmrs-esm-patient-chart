@@ -1,6 +1,15 @@
+//jest.mock("single-spa-react");
+
 import React from "react";
-import { render, waitForElement, cleanup } from "@testing-library/react";
+import {
+  render,
+  waitForElement,
+  cleanup,
+  queryByText
+} from "@testing-library/react";
 import "@testing-library/jest-dom/extend-expect";
+//@ts-ignore
+import ssr, { SingleSpaContext } from "single-spa-react";
 
 import Widget from "./widget.component";
 
@@ -78,6 +87,24 @@ describe(`<Widget />`, () => {
       queryByText("no module provided", { exact: false })
     );
     expect(element).not.toBeNull();
+    done();
+  });
+
+  it(`should get the SingleSpaContext`, async done => {
+    const { queryByText, debug } = render(
+      <Widget
+        widgetConfig={{
+          name: "test",
+          esModule: "@openmrs/esm-patient-chart-widgets",
+          usesSingleSpaContext: true
+        }}
+      />
+    );
+
+    const element = await waitForElement(() => queryByText("Test Widget"));
+    debug();
+    expect(element).not.toBeNull();
+
     done();
   });
 });

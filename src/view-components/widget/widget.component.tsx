@@ -1,9 +1,11 @@
-import React, { FunctionComponent } from "react";
+import React, { FunctionComponent, useContext } from "react";
 //@ts-ignore The present types for single-spa-react are not updated yet for 2.9 which has SingleSpaContext
-import { SingleSpaContext } from "single-spa-react";
+import s, { SingleSpaContext } from "single-spa-react";
 
 export default function Widget(props) {
   const [widget, setWidget] = React.useState(null);
+
+  const { mountParcel } = useContext(SingleSpaContext);
 
   React.useEffect(() => {
     //This function is moved inside of the effect to avoid change on every render
@@ -16,16 +18,12 @@ export default function Widget(props) {
             if (module[widgetConfig.name]) {
               Component = module[widgetConfig.name];
               if (widgetConfig.usesSingleSpaContext) {
-                <SingleSpaContext.Consumer>
-                  {context => {
-                    widget.component = () => (
-                      <Component
-                        {...props.widgetConfig.params}
-                        singleSpaContext={context}
-                      />
-                    );
-                  }}
-                </SingleSpaContext.Consumer>;
+                widget.component = () => (
+                  <Component
+                    {...props.widgetConfig.params}
+                    singleSpaContext={{ mountParcel: mountParcel }}
+                  />
+                );
               } else {
                 widget.component = () => (
                   <Component {...props.widgetConfig.params} />

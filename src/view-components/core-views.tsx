@@ -1,4 +1,3 @@
-import React from "react";
 import { DashboardConfig } from "./dashboard/dashboard.component";
 
 export const coreWidgetDefinitions = [
@@ -96,7 +95,7 @@ export const coreDashboardDefinitions = [
         esModule: "@openmrs/esm-patient-chart-widgets",
         layout: { columnSpan: 3 },
         params: {
-          basePath: "orders/medication-orders"
+          basePath: "orders/medications-orders"
         }
       },
       {
@@ -138,6 +137,10 @@ export const coreDashboardDefinitions = [
         params: {
           basePath: "orders/medication-orders"
         }
+      },
+      {
+        name: "MedicationsSummary",
+        esModule: "@openmrs/esm-patient-chart-widgets"
       }
     ]
   },
