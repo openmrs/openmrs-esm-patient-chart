@@ -95,7 +95,7 @@ export const coreDashboardDefinitions = [
         esModule: "@openmrs/esm-patient-chart-widgets",
         layout: { columnSpan: 3 },
         params: {
-          basePath: "orders/medications-orders"
+          basePath: "orders/medication-orders"
         }
       },
       {
