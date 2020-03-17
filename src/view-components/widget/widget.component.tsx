@@ -1,6 +1,6 @@
 import React, { FunctionComponent, useContext } from "react";
 //@ts-ignore The present types for single-spa-react are not updated yet for 2.9 which has SingleSpaContext
-import s, { SingleSpaContext } from "single-spa-react";
+import { SingleSpaContext } from "single-spa-react";
 
 export default function Widget(props) {
   const [widget, setWidget] = React.useState(null);
