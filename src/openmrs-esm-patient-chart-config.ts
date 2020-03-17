@@ -58,7 +58,8 @@ export const esmPatientChartConfig = {
   widgetDefinitions: {
     arrayElements: {
       name: { validators: [validators.isString] },
-      esModule: { validators: [validators.isString] }
+      esModule: { validators: [validators.isString] },
+      usesSingleSpaContext: { validators: [validators.isBoolean] }
     },
     default: coreWidgetDefinitions
   },
@@ -74,6 +75,7 @@ export const esmPatientChartConfig = {
         arrayElements: {
           name: { validators: [validators.isString] },
           esModule: { validators: [validators.isString] },
+          usesSingleSpaContext: { validators: [validators.isBoolean] },
           layout: {
             rowSpan: {},
             columnSpan: {}
