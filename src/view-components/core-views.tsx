@@ -54,6 +54,11 @@ export const coreWidgetDefinitions = [
   {
     name: "AppointmentsOverview",
     esModule: "@openmrs/esm-patient-chart-widgets"
+  },
+
+  {
+    name: "AppointmentsSummary",
+    esModule: "@openmrs/esm-patient-chart-widgets"
   }
 ];
 
@@ -187,10 +192,14 @@ export const coreDashboardDefinitions = [
 
   {
     name: "appointmentsOverviewDashboard",
+    layout: { columns: 1 },
     widgets: [
       {
         name: "AppointmentsOverview",
-        esModule: "@openmrs/esm-patient-chart-widgets"
+        esModule: "@openmrs/esm-patient-chart-widgets",
+        params: {
+          basePath: "appointments/details"
+        }
       }
     ]
   }
@@ -234,6 +243,24 @@ export const coreTabbedViewDefinitions = [
         label: "Medication Orders",
         path: "/medication-orders",
         view: "MedicationsSummary"
+      }
+    ]
+  },
+
+  {
+    name: "appointmentsTabbedView",
+    title: "Orders",
+
+    navbar: [
+      {
+        label: "Overview",
+        path: "/overview",
+        view: "appointmentsOverviewDashboard"
+      },
+      {
+        label: "Appointments",
+        path: "/details",
+        view: "AppointmentsSummary"
       }
     ]
   }

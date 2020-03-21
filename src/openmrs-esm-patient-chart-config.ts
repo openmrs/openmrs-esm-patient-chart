@@ -51,7 +51,7 @@ export const esmPatientChartConfig = {
       {
         label: "Appointments",
         path: "/appointments",
-        view: "appointmentsOverviewDashboard"
+        view: "appointmentsTabbedView"
       }
     ]
   },
