@@ -40,6 +40,10 @@ export const coreWidgetDefinitions = [
     name: "ConditionsOverview",
     esModule: "@openmrs/esm-patient-chart-widgets"
   },
+  {
+    name: "ConditionsSummary",
+    esModule: "@openmrs/esm-patient-chart-widgets"
+  },
 
   {
     name: "AllergiesOverview",
@@ -68,7 +72,10 @@ export const coreDashboardDefinitions = [
       {
         name: "ConditionsOverview",
         esModule: "@openmrs/esm-patient-chart-widgets",
-        layout: { columnSpan: 2 }
+        layout: { columnSpan: 2 },
+        params: {
+          basePath: "conditions/summary"
+        }
       },
       {
         name: "ProgramsOverview",
@@ -110,7 +117,6 @@ export const coreDashboardDefinitions = [
       }
     ]
   },
-
   {
     name: "resultsOverviewDashboard",
     layout: { columns: 1 },
@@ -125,7 +131,6 @@ export const coreDashboardDefinitions = [
       }
     ]
   },
-
   {
     name: "ordersOverviewDashboard",
     title: "Orders Overview",
@@ -144,7 +149,6 @@ export const coreDashboardDefinitions = [
       }
     ]
   },
-
   {
     name: "encountersOverviewDashboard",
     widgets: [
@@ -154,12 +158,18 @@ export const coreDashboardDefinitions = [
       }
     ]
   },
-
   {
     name: "conditionsOverviewDashboard",
     widgets: [
       {
         name: "ConditionsOverview",
+        esModule: "@openmrs/esm-patient-chart-widgets",
+        params: {
+          basePath: "conditions/summary"
+        }
+      },
+      {
+        name: "ConditionsSummary",
         esModule: "@openmrs/esm-patient-chart-widgets"
       }
     ]

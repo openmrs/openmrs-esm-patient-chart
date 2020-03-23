@@ -36,7 +36,7 @@ export const esmPatientChartConfig = {
       {
         label: "Conditions",
         path: "/conditions",
-        view: "ConditionsOverview"
+        view: "conditionsOverviewDashboard"
       },
       {
         label: "Programs",
