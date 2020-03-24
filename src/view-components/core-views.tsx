@@ -137,10 +137,6 @@ export const coreDashboardDefinitions = [
         params: {
           basePath: "orders/medication-orders"
         }
-      },
-      {
-        name: "MedicationsSummary",
-        esModule: "@openmrs/esm-patient-chart-widgets"
       }
     ]
   },
