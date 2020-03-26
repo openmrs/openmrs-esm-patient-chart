@@ -31,27 +31,27 @@ export const esmPatientChartSchema = {
       {
         label: "Encounters",
         path: "/encounters",
-        view: "encountersOverviewDashboard"
+        view: "encountersTabbedView"
       },
       {
         label: "Conditions",
         path: "/conditions",
-        view: "ConditionsOverview"
+        view: "conditionsDashboard"
       },
       {
         label: "Programs",
         path: "/programs",
-        view: "programsOverviewDashboard"
+        view: "programsDashboard"
       },
       {
         label: "Allergies",
         path: "/allergies",
-        view: "allergiesOverviewDashboard"
+        view: "allergiesDashboard"
       },
       {
         label: "Appointments",
         path: "/appointments",
-        view: "appointmentsOverviewDashboard"
+        view: "appointmentsDashboard"
       }
     ]
   },
