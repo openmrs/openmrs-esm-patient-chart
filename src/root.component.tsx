@@ -7,10 +7,10 @@ import ChartReview from "./chart-review/chart-review.component";
 import styles from "./root.css";
 import { defineConfigSchema, validators } from "@openmrs/esm-module-config";
 import { AppPropsContext } from "./app-props-context";
-import { esmPatientChartConfig } from "./openmrs-esm-patient-chart-config";
+import { esmPatientChartSchema } from "./openmrs-esm-patient-chart-schema";
 
 function Root(props) {
-  defineConfigSchema("@openmrs/esm-patient-chart", esmPatientChartConfig);
+  defineConfigSchema("@openmrs/esm-patient-chart", esmPatientChartSchema);
 
   return (
     <AppPropsContext.Provider value={{ appProps: props }}>

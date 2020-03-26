@@ -1,11 +1,11 @@
-import { defineConfigSchema, validators } from "@openmrs/esm-module-config";
+import { validators } from "@openmrs/esm-module-config";
 import {
   coreWidgetDefinitions,
   coreDashboardDefinitions,
   coreTabbedViewDefinitions
 } from "./view-components/core-views";
 
-export const esmPatientChartConfig = {
+export const esmPatientChartSchema = {
   primaryNavbar: {
     arrayElements: {
       label: { validators: [validators.isString] },
@@ -31,27 +31,27 @@ export const esmPatientChartConfig = {
       {
         label: "Encounters",
         path: "/encounters",
-        view: "encountersOverviewDashboard"
+        view: "encountersTabbedView"
       },
       {
         label: "Conditions",
         path: "/conditions",
-        view: "ConditionsOverview"
+        view: "conditionsDashboard"
       },
       {
         label: "Programs",
         path: "/programs",
-        view: "programsOverviewDashboard"
+        view: "programsDashboard"
       },
       {
         label: "Allergies",
         path: "/allergies",
-        view: "allergiesOverviewDashboard"
+        view: "allergiesDashboard"
       },
       {
         label: "Appointments",
         path: "/appointments",
-        view: "appointmentsOverviewDashboard"
+        view: "appointmentsDashboard"
       }
     ]
   },

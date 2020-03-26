@@ -5,6 +5,15 @@ export const coreWidgetDefinitions = [
     name: "ProgramsOverview",
     esModule: "@openmrs/esm-patient-chart-widgets"
   },
+  {
+    name: "ProgramsSummary",
+    esModule: "@openmrs/esm-patient-chart-widgets"
+  },
+
+  {
+    name: "Conditions",
+    esModule: "@openmrs/esm-patient-chart-widgets"
+  },
 
   {
     name: "MedicationsOverview",
@@ -47,12 +56,26 @@ export const coreWidgetDefinitions = [
   },
 
   {
+    name: "AllergiesSummary",
+    esModule: "@openmrs/esm-patient-chart-widgets"
+  },
+
+  {
     name: "NotesOverview",
     esModule: "@openmrs/esm-patient-chart-widgets"
   },
 
   {
+    name: "Notes",
+    esModule: "@openmrs/esm-patient-chart-widgets"
+  },
+
+  {
     name: "AppointmentsOverview",
+    esModule: "@openmrs/esm-patient-chart-widgets"
+  },
+  {
+    name: "AppointmentsSummary",
     esModule: "@openmrs/esm-patient-chart-widgets"
   }
 ];
@@ -78,17 +101,26 @@ export const coreDashboardDefinitions = [
       {
         name: "NotesOverview",
         esModule: "@openmrs/esm-patient-chart-widgets",
-        layout: { columnSpan: 4 }
+        layout: { columnSpan: 4 },
+        params: {
+          basePath: "encounters/notes"
+        }
       },
       {
         name: "VitalsOverview",
         esModule: "@openmrs/esm-patient-chart-widgets",
-        layout: { columnSpan: 2 }
+        layout: { columnSpan: 2 },
+        params: {
+          basePath: "results/vitals"
+        }
       },
       {
         name: "HeightAndWeightOverview",
         esModule: "@openmrs/esm-patient-chart-widgets",
-        layout: { columnSpan: 2 }
+        layout: { columnSpan: 2 },
+        params: {
+          basePath: "results/heightAndWeight"
+        }
       },
       {
         name: "MedicationsOverview",
@@ -106,7 +138,10 @@ export const coreDashboardDefinitions = [
       {
         name: "AppointmentsOverview",
         esModule: "@openmrs/esm-patient-chart-widgets",
-        layout: { columnSpan: 4 }
+        layout: { columnSpan: 4 },
+        params: {
+          basePath: "appointments"
+        }
       }
     ]
   },
@@ -137,59 +172,60 @@ export const coreDashboardDefinitions = [
         params: {
           basePath: "orders/medication-orders"
         }
-      },
+      }
+    ]
+  },
+
+  {
+    name: "notesDashboard",
+    layout: { columns: 1 },
+    widgets: [
       {
-        name: "MedicationsSummary",
+        name: "Notes",
         esModule: "@openmrs/esm-patient-chart-widgets"
       }
     ]
   },
 
   {
-    name: "encountersOverviewDashboard",
+    name: "conditionsDashboard",
+    layout: { columns: 1 },
     widgets: [
       {
-        name: "NotesOverview",
+        name: "Conditions",
         esModule: "@openmrs/esm-patient-chart-widgets"
       }
     ]
   },
 
   {
-    name: "conditionsOverviewDashboard",
+    name: "allergiesDashboard",
+    layout: { columns: 1 },
     widgets: [
       {
-        name: "ConditionsOverview",
+        name: "AllergiesSummary",
         esModule: "@openmrs/esm-patient-chart-widgets"
       }
     ]
   },
 
   {
-    name: "allergiesOverviewDashboard",
+    name: "programsDashboard",
+    layout: { columns: 1 },
     widgets: [
       {
-        name: "AllergiesOverview",
+        name: "ProgramsSummary",
         esModule: "@openmrs/esm-patient-chart-widgets"
       }
     ]
   },
 
   {
-    name: "programsOverviewDashboard",
+    name: "appointmentsDashboard",
+    layout: { columns: 1 },
     widgets: [
       {
-        name: "ProgramsOverview",
-        esModule: "@openmrs/esm-patient-chart-widgets"
-      }
-    ]
-  },
-
-  {
-    name: "appointmentsOverviewDashboard",
-    widgets: [
-      {
-        name: "AppointmentsOverview",
+        name: "AppointmentsSummary",
         esModule: "@openmrs/esm-patient-chart-widgets"
       }
     ]
@@ -234,6 +270,19 @@ export const coreTabbedViewDefinitions = [
         label: "Medication Orders",
         path: "/medication-orders",
         view: "MedicationsSummary"
+      }
+    ]
+  },
+
+  {
+    name: "encountersTabbedView",
+    title: "Encounters",
+
+    navbar: [
+      {
+        label: "Notes",
+        path: "/notes",
+        view: "notesDashboard"
       }
     ]
   }
