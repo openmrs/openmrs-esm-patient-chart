@@ -133,7 +133,10 @@ export const coreDashboardDefinitions = [
       {
         name: "AllergiesOverview",
         esModule: "@openmrs/esm-patient-chart-widgets",
-        layout: { columnSpan: 1 }
+        layout: { columnSpan: 1 },
+        params: {
+          basePath: "allergies"
+        }
       },
       {
         name: "AppointmentsOverview",
