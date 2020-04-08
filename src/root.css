@@ -1,6 +1,6 @@
 .grid {
-  position: fixed;
-  top: 6.25rem;
+  position: relative;
+  top: 2.75rem;
   display: grid;
   grid-template-columns: 1fr min-content;
   grid-template-rows: 1fr;
@@ -8,6 +8,11 @@
   width: 100vw;
   height: 100vh;
   overflow-y: scroll;
+}
+
+.patientBanner {
+  position: relative;
+  z-index: 1;
 }
 
 .chartreview {

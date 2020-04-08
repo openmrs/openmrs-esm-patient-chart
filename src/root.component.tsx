@@ -23,7 +23,7 @@ function Root(props) {
             flexDirection: "column"
           }}
         >
-          <aside style={{ height: "2.75rem" }}>
+          <aside className={styles.patientBanner}>
             <Route path="/patient/:patientUuid/chart">
               <PatientBanner match={props.match} />
             </Route>
