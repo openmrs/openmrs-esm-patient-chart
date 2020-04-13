@@ -88,6 +88,10 @@ export const coreWidgetDefinitions: WidgetConfig[] = [
   {
     name: "AppointmentsSummary",
     esModule: "@openmrs/esm-patient-chart-widgets"
+  },
+  {
+    name: "AttachmentsOverview",
+    esModule: "@openmrs/esm-patient-chart-widgets"
   }
 ];
 
@@ -271,6 +275,11 @@ export const coreDashboardDefinitions: DashboardConfig[] = [
         esModule: "@openmrs/esm-patient-chart-widgets"
       }
     ]
+  },
+  {
+    name: "AttachmentsOverview",
+    esModule: "@openmrs/esm-patient-chart-widgets",
+    layout: { columnSpan: 1 }
   }
 ];
 

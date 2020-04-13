@@ -19,6 +19,11 @@ export const esmPatientChartSchema = {
         view: "summaryDashboard"
       },
       {
+        label: "Attachments",
+        path: "/attachments",
+        view: "AttachmentsOverview"
+      },
+      {
         label: "Results",
         path: "/results",
         view: "resultsTabbedView"
