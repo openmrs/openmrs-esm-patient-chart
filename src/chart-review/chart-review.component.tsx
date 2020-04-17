@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import {
   Link,
   useParams,
@@ -26,6 +26,9 @@ export default function ChartReview(props: any) {
   const [navbarItems, setNavbarItems] = React.useState<Navbar[]>([]);
 
   const [selected, setSelected] = React.useState(getInitialTab());
+  const [overflowed, setOverflowed] = React.useState(false);
+  const [leftPagerVisible, setLeftPagerVisible] = React.useState(false);
+  const [rightPagerVisible, setRightPagerVisible] = React.useState(true);
   const [tabHistory, setTabHistory] = React.useState({});
 
   function getInitialTab() {
@@ -65,14 +68,104 @@ export default function ChartReview(props: any) {
     setSelected(views.findIndex(element => element.path === "/" + viewPath));
   }, [views, viewPath]);
 
+  const listenScrollEvent = () => {
+    //console.log("Scroll event detected!");
+    if (navRef.current.scrollLeft === 0) {
+      setLeftPagerVisible(false);
+    } else {
+      setLeftPagerVisible(true);
+    }
+    if (
+      navRef.current.scrollLeft + navRef.current.clientWidth >=
+      navRef.current.scrollWidth
+    ) {
+      setRightPagerVisible(false);
+    } else {
+      setRightPagerVisible(true);
+    }
+  };
+  const navRef = useRef(null);
+  const refs = navbarItems.reduce((acc, value) => {
+    acc[navbarItems.indexOf(value)] = React.createRef();
+    return acc;
+  }, {});
+  const scrollToItem = id => {
+    if (refs[id]) {
+      refs[id].current.scrollIntoView({
+        behavior: "smooth",
+        block: "end"
+      });
+    }
+  };
+  React.useEffect(() => {
+    scrollToItem(selected);
+  }, [selected]);
+
+  if (
+    navRef &&
+    navRef.current &&
+    navRef.current.scrollWidth - navRef.current.clientWidth > 0
+  ) {
+    // console.log('Overflow detected', navRef.current.scrollWidth, navRef.current.clientWidth, event);
+    // console.log('NAV',navRef)
+    if (!overflowed) setOverflowed(true);
+  } else {
+    if (overflowed) setOverflowed(false);
+  }
+  const nextPage = () => {
+    // window.scrollBy(0,navRef.current.scrollWidth/navRef.current.clientWidth);
+    // console.log(
+    //   "Overflow detected",
+    //   navRef.current.scrollWidth,
+    //   navRef.current.clientWidth,
+    //   navRef.current.scrollLeft
+    // );
+    navRef.current.scrollLeft =
+      navRef.current.scrollLeft + navRef.current.clientWidth;
+  };
+
+  const previousPage = () => {
+    // console.log(
+    //   "Overflow detected",
+    //   navRef.current.scrollWidth,
+    //   navRef.current.clientWidth,
+    //   navRef.current.scrollLeft
+    // );
+    const before = navRef.current.scrollLeft;
+    navRef.current.scrollLeft =
+      navRef.current.scrollLeft - navRef.current.clientWidth;
+  };
+
   return (
     <>
-      <nav className={styles.topnav} style={{ marginTop: "0" }}>
-        <ul>
+      {overflowed && leftPagerVisible && (
+        <button onClick={previousPage}>{"<"}</button>
+      )}
+      <nav
+        onScroll={listenScrollEvent}
+        ref={navRef}
+        className={styles.topnav}
+        style={{
+          marginTop: "0",
+          //border: "1px solid red",
+          overflowX: "scroll",
+          scrollbarWidth: "none" // Firefox
+          // '&::-webkit-scrollbar': {
+          //   display: 'none', // Safari + Chrome
+          // }
+        }}
+      >
+        <ul
+          style={
+            {
+              //border: "1px solid blue",
+            }
+          }
+        >
           {navbarItems &&
             navbarItems.map((item, index) => {
               return (
-                <li key={index}>
+                <li key={index} ref={refs[index]}>
                   <div
                     className={`${
                       index === selected ? styles.selected : styles.unselected
@@ -86,6 +179,7 @@ export default function ChartReview(props: any) {
                     >
                       <button
                         className="omrs-unstyled"
+                        id={"nav_item" + index}
                         onClick={() => setSelected(index)}
                       >
                         {item.label}
@@ -97,7 +191,9 @@ export default function ChartReview(props: any) {
             })}
         </ul>
       </nav>
-
+      {overflowed && rightPagerVisible && (
+        <button onClick={nextPage}>{">"}</button>
+      )}
       {views.length > 0 && (
         <Route exact path={defaultPath}>
           <Redirect to={defaultPath + views[0].path} />
