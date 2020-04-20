@@ -26,10 +26,21 @@ export default function ChartReview(props: any) {
   const [navbarItems, setNavbarItems] = React.useState<Navbar[]>([]);
 
   const [selected, setSelected] = React.useState(getInitialTab());
-  const [overflowed, setOverflowed] = React.useState(false);
-  const [leftPagerVisible, setLeftPagerVisible] = React.useState(false);
-  const [rightPagerVisible, setRightPagerVisible] = React.useState(true);
   const [tabHistory, setTabHistory] = React.useState({});
+
+  // NAV HEADER
+  const [navHeaderOverflowed, setNavHeaderOverflowed] = React.useState(false);
+  const [leftHeaderPagerVisible, setLeftHeaderPagerVisible] = React.useState(
+    false
+  );
+  const [rightHeaderPagerVisible, setRightHeaderPagerVisible] = React.useState(
+    true
+  );
+  const navRef = useRef(null);
+  const navItemsRefs = navbarItems.reduce((acc, value) => {
+    acc[navbarItems.indexOf(value)] = React.createRef();
+    return acc;
+  }, {});
 
   function getInitialTab() {
     if (
@@ -68,132 +79,120 @@ export default function ChartReview(props: any) {
     setSelected(views.findIndex(element => element.path === "/" + viewPath));
   }, [views, viewPath]);
 
-  const listenScrollEvent = () => {
-    //console.log("Scroll event detected!");
+  const onNavHeaderScrolled = () => {
     if (navRef.current.scrollLeft === 0) {
-      setLeftPagerVisible(false);
+      setLeftHeaderPagerVisible(false);
     } else {
-      setLeftPagerVisible(true);
+      setLeftHeaderPagerVisible(true);
     }
+
     if (
-      navRef.current.scrollLeft + navRef.current.clientWidth >=
+      navRef.current.scrollLeft + navRef.current.clientWidth + 50 >=
       navRef.current.scrollWidth
     ) {
-      setRightPagerVisible(false);
+      setRightHeaderPagerVisible(false);
     } else {
-      setRightPagerVisible(true);
+      setRightHeaderPagerVisible(true);
     }
   };
-  const navRef = useRef(null);
-  const refs = navbarItems.reduce((acc, value) => {
-    acc[navbarItems.indexOf(value)] = React.createRef();
-    return acc;
-  }, {});
+
   const scrollToItem = id => {
-    if (refs[id]) {
-      refs[id].current.scrollIntoView({
+    if (navItemsRefs[id]) {
+      navItemsRefs[id].current.scrollIntoView({
         behavior: "smooth",
         block: "end"
       });
     }
   };
+
   React.useEffect(() => {
     scrollToItem(selected);
   }, [selected]);
 
-  if (
-    navRef &&
-    navRef.current &&
-    navRef.current.scrollWidth - navRef.current.clientWidth > 0
-  ) {
-    // console.log('Overflow detected', navRef.current.scrollWidth, navRef.current.clientWidth, event);
-    // console.log('NAV',navRef)
-    if (!overflowed) setOverflowed(true);
-  } else {
-    if (overflowed) setOverflowed(false);
-  }
   const nextPage = () => {
-    // window.scrollBy(0,navRef.current.scrollWidth/navRef.current.clientWidth);
-    // console.log(
-    //   "Overflow detected",
-    //   navRef.current.scrollWidth,
-    //   navRef.current.clientWidth,
-    //   navRef.current.scrollLeft
-    // );
     navRef.current.scrollLeft =
       navRef.current.scrollLeft + navRef.current.clientWidth;
   };
 
   const previousPage = () => {
-    // console.log(
-    //   "Overflow detected",
-    //   navRef.current.scrollWidth,
-    //   navRef.current.clientWidth,
-    //   navRef.current.scrollLeft
-    // );
-    const before = navRef.current.scrollLeft;
     navRef.current.scrollLeft =
       navRef.current.scrollLeft - navRef.current.clientWidth;
   };
 
+  const checkForOverflow = () => {
+    if (
+      navRef &&
+      navRef.current &&
+      navRef.current.scrollWidth - navRef.current.clientWidth > 0
+    ) {
+      if (!navHeaderOverflowed) setNavHeaderOverflowed(true);
+    } else {
+      if (navHeaderOverflowed) setNavHeaderOverflowed(false);
+    }
+  };
+  checkForOverflow();
   return (
     <>
-      {overflowed && leftPagerVisible && (
-        <button onClick={previousPage}>{"<"}</button>
-      )}
-      <nav
-        onScroll={listenScrollEvent}
-        ref={navRef}
-        className={styles.topnav}
-        style={{
-          marginTop: "0",
-          //border: "1px solid red",
-          overflowX: "scroll",
-          scrollbarWidth: "none" // Firefox
-          // '&::-webkit-scrollbar': {
-          //   display: 'none', // Safari + Chrome
-          // }
-        }}
-      >
-        <ul
-          style={
-            {
-              //border: "1px solid blue",
-            }
-          }
+      <div className={styles.navContainer}>
+        {navHeaderOverflowed && leftHeaderPagerVisible && (
+          <button
+            className={styles.leftHeaderPagination}
+            onClick={previousPage}
+          >
+            <svg
+              className="omrs-icon omrs-type-body-regular"
+              fill="var(--omrs-color-ink-medium-contrast)"
+            >
+              <use xlinkHref="#omrs-icon-arrow-back"></use>
+            </svg>
+          </button>
+        )}
+        <nav
+          onScroll={onNavHeaderScrolled}
+          ref={navRef}
+          className={styles.topnav}
         >
-          {navbarItems &&
-            navbarItems.map((item, index) => {
-              return (
-                <li key={index} ref={refs[index]}>
-                  <div
-                    className={`${
-                      index === selected ? styles.selected : styles.unselected
-                    }`}
-                  >
-                    <Link
-                      to={
-                        tabHistory[item.path.substr(1)] ||
-                        defaultPath + item.path
-                      }
+          <ul>
+            {navbarItems &&
+              navbarItems.map((item, index) => {
+                return (
+                  <li key={index} ref={navItemsRefs[index]}>
+                    <div
+                      className={`${
+                        index === selected ? styles.selected : styles.unselected
+                      }`}
                     >
-                      <button
-                        className="omrs-unstyled"
-                        id={"nav_item" + index}
-                        onClick={() => setSelected(index)}
+                      <Link
+                        to={
+                          tabHistory[item.path.substr(1)] ||
+                          defaultPath + item.path
+                        }
                       >
-                        {item.label}
-                      </button>
-                    </Link>
-                  </div>
-                </li>
-              );
-            })}
-        </ul>
-      </nav>
-      {overflowed && rightPagerVisible && (
-        <button onClick={nextPage}>{">"}</button>
-      )}
+                        <button
+                          className="omrs-unstyled"
+                          id={"nav_item" + index}
+                          onClick={() => setSelected(index)}
+                        >
+                          {item.label}
+                        </button>
+                      </Link>
+                    </div>
+                  </li>
+                );
+              })}
+          </ul>
+        </nav>
+        {navHeaderOverflowed && rightHeaderPagerVisible && (
+          <button className={styles.rightHeaderPagination} onClick={nextPage}>
+            <svg
+              className="omrs-icon omrs-type-body-regular"
+              fill="var(--omrs-color-ink-medium-contrast)"
+            >
+              <use xlinkHref="#omrs-icon-arrow-forward"></use>
+            </svg>
+          </button>
+        )}
+      </div>
       {views.length > 0 && (
         <Route exact path={defaultPath}>
           <Redirect to={defaultPath + views[0].path} />
