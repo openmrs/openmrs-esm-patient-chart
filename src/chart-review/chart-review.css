@@ -65,18 +65,18 @@
   color: inherit;
 }
 
-.leftHeaderPagination {
-  padding: 0;
+.leftHeaderPagination,
+.rightHeaderPagination {
+  padding: 0 6px;
   background-color: white;
   cursor: pointer;
   border: 0;
+}
+
+.leftHeaderPagination {
   border-right: 1px solid grey !important;
 }
 
 .rightHeaderPagination {
-  background-color: white;
-  cursor: pointer;
-  border: 0;
-  padding: 0;
   border-left: 1px solid grey !important;
 }

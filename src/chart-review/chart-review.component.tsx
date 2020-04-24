@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useReducer } from "react";
 import {
   Link,
   useParams,
@@ -30,12 +30,16 @@ export default function ChartReview(props: any) {
 
   // NAV HEADER
   const [navHeaderOverflowed, setNavHeaderOverflowed] = React.useState(false);
-  const [leftHeaderPagerVisible, setLeftHeaderPagerVisible] = React.useState(
-    false
-  );
-  const [rightHeaderPagerVisible, setRightHeaderPagerVisible] = React.useState(
-    true
-  );
+  enum PagerVisibility {
+    NONE,
+    LEFT,
+    RIGHT,
+    BOTH
+  }
+  const initialHeaderPagerVisibility = {
+    pagerVisibility: PagerVisibility.NONE
+  };
+
   const navRef = useRef(null);
   const navItemsRefs = navbarItems.reduce((acc, value) => {
     acc[navbarItems.indexOf(value)] = React.createRef();
@@ -79,21 +83,31 @@ export default function ChartReview(props: any) {
     setSelected(views.findIndex(element => element.path === "/" + viewPath));
   }, [views, viewPath]);
 
-  const onNavHeaderScrolled = () => {
+  const headerPagerVisibilityReducer = (state, action) => {
+    if (!navHeaderOverflowed) {
+      return { pagerVisibility: PagerVisibility.NONE };
+    }
     if (navRef.current.scrollLeft === 0) {
-      setLeftHeaderPagerVisible(false);
-    } else {
-      setLeftHeaderPagerVisible(true);
+      return { pagerVisibility: PagerVisibility.RIGHT };
     }
 
-    if (
+    let scrolledToRightEnd =
       navRef.current.scrollLeft + navRef.current.clientWidth + 50 >=
-      navRef.current.scrollWidth
-    ) {
-      setRightHeaderPagerVisible(false);
-    } else {
-      setRightHeaderPagerVisible(true);
+      navRef.current.scrollWidth;
+
+    if (scrolledToRightEnd) {
+      return { pagerVisibility: PagerVisibility.LEFT };
     }
+    return { pagerVisibility: PagerVisibility.BOTH };
+  };
+
+  const [headerPagerState, dispatch] = useReducer(
+    headerPagerVisibilityReducer,
+    initialHeaderPagerVisibility
+  );
+
+  const onNavHeaderScrolled = () => {
+    dispatch("scrolled");
   };
 
   const scrollToItem = id => {
@@ -125,16 +139,23 @@ export default function ChartReview(props: any) {
       navRef.current &&
       navRef.current.scrollWidth - navRef.current.clientWidth > 0
     ) {
-      if (!navHeaderOverflowed) setNavHeaderOverflowed(true);
+      if (!navHeaderOverflowed) {
+        setNavHeaderOverflowed(true);
+        dispatch("overflowed-changed");
+      }
     } else {
-      if (navHeaderOverflowed) setNavHeaderOverflowed(false);
+      if (navHeaderOverflowed) {
+        setNavHeaderOverflowed(false);
+        dispatch("overflowed-changed");
+      }
     }
   };
   checkForOverflow();
   return (
     <>
       <div className={styles.navContainer}>
-        {navHeaderOverflowed && leftHeaderPagerVisible && (
+        {(headerPagerState.pagerVisibility === PagerVisibility.LEFT ||
+          headerPagerState.pagerVisibility === PagerVisibility.BOTH) && (
           <button
             className={styles.leftHeaderPagination}
             onClick={previousPage}
@@ -182,7 +203,8 @@ export default function ChartReview(props: any) {
               })}
           </ul>
         </nav>
-        {navHeaderOverflowed && rightHeaderPagerVisible && (
+        {(headerPagerState.pagerVisibility === PagerVisibility.RIGHT ||
+          headerPagerState.pagerVisibility === PagerVisibility.BOTH) && (
           <button className={styles.rightHeaderPagination} onClick={nextPage}>
             <svg
               className="omrs-icon omrs-type-body-regular"
