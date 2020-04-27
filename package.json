@@ -38,6 +38,7 @@
     "@babel/preset-env": "^7.8.7",
     "@babel/preset-react": "^7.8.3",
     "@babel/preset-typescript": "^7.8.3",
+    "@babel/compat-data": "~7.9.0",
     "@openmrs/esm-error-handling": "^1.1.0",
     "@openmrs/react-root-decorator": "^3.2.0",
     "@testing-library/jest-dom": "^5.1.1",

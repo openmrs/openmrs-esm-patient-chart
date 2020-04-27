@@ -1,7 +1,14 @@
-.topnav {
-  display: flex;
+.navContainer {
   position: sticky;
   top: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: left;
+  justify-content: flex-start;
+}
+
+.topnav {
+  display: flex;
   flex-direction: row;
   align-items: left;
   justify-content: flex-start;
@@ -9,8 +16,10 @@
   background-color: var(--omrs-color-bg-lowest-contrast);
   height: 3rem;
   flex-wrap: nowrap;
-  overflow-x: auto;
+  overflow-x: scroll;
   -webkit-overflow-scrolling: touch;
+  margin-top: 0;
+  scrollbar-width: none;
 }
 
 .topnav::-webkit-scrollbar {
@@ -54,4 +63,20 @@
 
 .topnav a {
   color: inherit;
+}
+
+.leftHeaderPagination,
+.rightHeaderPagination {
+  padding: 0 6px;
+  background-color: white;
+  cursor: pointer;
+  border: 0;
+}
+
+.leftHeaderPagination {
+  border-right: 1px solid grey !important;
+}
+
+.rightHeaderPagination {
+  border-left: 1px solid grey !important;
 }
