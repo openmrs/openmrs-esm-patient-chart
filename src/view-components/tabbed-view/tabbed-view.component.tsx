@@ -69,7 +69,7 @@ export default function TabbedView(props: any) {
           })}
         </ul>
       </nav>
-      <div style={{ margin: "21px" }}>
+      <div className={styles.routesContainer}>
         {views.length > 0 && (
           <Route exact path={props.defaultPath}>
             <Redirect to={props.defaultPath + views[0].path} />

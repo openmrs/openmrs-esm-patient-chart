@@ -59,3 +59,11 @@
 .summariesnav a {
   color: inherit;
 }
+
+.routesContainer {
+  margin: 1.3125rem;
+}
+
+:global(.omrs-breakpoint-lt-tablet) .routesContainer {
+  margin: 0.625rem;
+}
