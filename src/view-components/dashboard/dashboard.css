@@ -17,6 +17,21 @@
   grid-template-columns: 1fr;
 }
 
+:global(.omrs-breakpoint-lt-tablet) .container {
+  margin: 5px;
+  overflow-x: auto;
+  justify-content: center;
+}
+
+:global(.omrs-breakpoint-lt-tablet) .dashboard {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+:global(.omrs-breakpoint-lt-tablet) .dashboard > div {
+  margin: 2px 0px;
+}
+
 .error {
   color: red;
 }
