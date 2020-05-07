@@ -10,9 +10,8 @@ patient's information, such as vitals, demographic and relationships.
 
 ## How do I install this?
 
-Requirements: Java 8, Latest NodeJS & NPM, Latest Git, Latest OpenMRS 
-Platform with the Latest [SPA Module](https://github.com/openmrs/openmrs-module-spa) 
-installed
+Requirements: Node, Git, and OpenMRS with the
+[SPA Module](https://github.com/openmrs/openmrs-module-spa) installed
 
 Currently, there are no compiled releases for openmrs-esm-patient-chart. 
 To obtain this module, use the following steps:
@@ -24,7 +23,7 @@ npm install
 npm run build
 ```
 
-Serve the built dist/openmrs-esm-patient-chart.js and configure it in your SPA Module's root-config
+Serve the built `dist/openmrs-esm-patient-chart.js` and configure it in your SPA Module's root config.
 
 Then, have a look at the
 [Frontend Implementer Documentation](https://wiki.openmrs.org/display/projects/Frontend+Implementer+Documentation)
