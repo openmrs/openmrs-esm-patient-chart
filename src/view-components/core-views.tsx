@@ -91,7 +91,10 @@ export const coreDashboardDefinitions = [
       {
         name: "ConditionsOverview",
         esModule: "@openmrs/esm-patient-chart-widgets",
-        layout: { columnSpan: 2 }
+        layout: { columnSpan: 2 },
+        params: {
+          basePath: "conditions"
+        }
       },
       {
         name: "ProgramsOverview",
