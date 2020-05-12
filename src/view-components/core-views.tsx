@@ -155,11 +155,17 @@ export const coreDashboardDefinitions = [
     widgets: [
       {
         name: "VitalsOverview",
-        esModule: "@openmrs/esm-patient-chart-widgets"
+        esModule: "@openmrs/esm-patient-chart-widgets",
+        params: {
+          basePath: "results/vitals"
+        }
       },
       {
         name: "HeightAndWeightOverview",
-        esModule: "@openmrs/esm-patient-chart-widgets"
+        esModule: "@openmrs/esm-patient-chart-widgets",
+        params: {
+          basePath: "results/heightAndWeight"
+        }
       }
     ]
   },
