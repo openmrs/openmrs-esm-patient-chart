@@ -85,7 +85,7 @@
   "dependencies": {
     "@openmrs/esm-api": "^1.3.0",
     "@openmrs/esm-module-config": "^1.2.0",
-    "@openmrs/esm-patient-chart-widgets": "^1.0.1",
+    "@openmrs/esm-patient-chart-widgets": "^1.0.2",
     "@types/lodash-es": "^4.17.3",
     "@types/react-router": "^5.1.4",
     "i18next": "^19.3.2",

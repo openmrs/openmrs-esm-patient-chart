@@ -13,6 +13,7 @@ import { useConfig } from "@openmrs/esm-module-config";
 
 import { getView, View } from "../view-components/view-utils";
 import { ChartConfig, Navbar } from "../root.component";
+import { VisitButton } from "@openmrs/esm-patient-chart-widgets";
 
 export default function ChartReview(props: any) {
   const match = useRouteMatch();
@@ -202,6 +203,7 @@ export default function ChartReview(props: any) {
                 );
               })}
           </ul>
+          <VisitButton />
         </nav>
         {(headerPagerState.pagerVisibility === PagerVisibility.RIGHT ||
           headerPagerState.pagerVisibility === PagerVisibility.BOTH) && (
@@ -215,24 +217,26 @@ export default function ChartReview(props: any) {
           </button>
         )}
       </div>
-      {views.length > 0 && (
-        <Route exact path={defaultPath}>
-          <Redirect to={defaultPath + views[0].path} />
-        </Route>
-      )}
+      <div className={styles.chartSection}>
+        {views.length > 0 && (
+          <Route exact path={defaultPath}>
+            <Redirect to={defaultPath + views[0].path} />
+          </Route>
+        )}
 
-      <Switch>
-        {views.map(route => {
-          return (
-            <Route
-              key={route.label}
-              path={defaultPath + route.path + "/:subview?"}
-            >
-              {route.component && route.component()}
-            </Route>
-          );
-        })}
-      </Switch>
+        <Switch>
+          {views.map(route => {
+            return (
+              <Route
+                key={route.label}
+                path={defaultPath + route.path + "/:subview?"}
+              >
+                {route.component && route.component()}
+              </Route>
+            );
+          })}
+        </Switch>
+      </div>
     </>
   );
 }

@@ -1,7 +1,7 @@
 import React from "react";
 import { BrowserRouter, Route } from "react-router-dom";
 import openmrsRootDecorator from "@openmrs/react-root-decorator";
-import { PatientBanner } from "@openmrs/esm-patient-chart-widgets";
+import { PatientBanner, VisitDialog } from "@openmrs/esm-patient-chart-widgets";
 import WorkspaceWrapper from "./workspace/workspace-wrapper.component";
 import ChartReview from "./chart-review/chart-review.component";
 import styles from "./root.css";
@@ -33,6 +33,10 @@ function Root(props) {
               <Route path="/patient/:patientUuid/chart/:view?/:subview?">
                 <ChartReview />
               </Route>
+              <Route
+                path="/patient/:patientUuid/chart"
+                render={routeProps => <VisitDialog {...routeProps} />}
+              />
             </div>
             <div className={styles.workspace}>
               <Route
