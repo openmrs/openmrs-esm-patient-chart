@@ -69,3 +69,19 @@
 .chartSection {
   margin-top: 3.25rem;
 }
+
+.leftHeaderPagination,
+.rightHeaderPagination {
+  padding: 0 6px;
+  background-color: white;
+  cursor: pointer;
+  border: 0;
+}
+
+.leftHeaderPagination {
+  border-right: 1px solid grey !important;
+}
+
+.rightHeaderPagination {
+  border-left: 1px solid grey !important;
+}

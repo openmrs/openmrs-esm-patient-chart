@@ -205,6 +205,17 @@ export default function ChartReview(props: any) {
           </ul>
           <VisitButton />
         </nav>
+        {(headerPagerState.pagerVisibility === PagerVisibility.RIGHT ||
+          headerPagerState.pagerVisibility === PagerVisibility.BOTH) && (
+          <button className={styles.rightHeaderPagination} onClick={nextPage}>
+            <svg
+              className="omrs-icon omrs-type-body-regular"
+              fill="var(--omrs-color-ink-medium-contrast)"
+            >
+              <use xlinkHref="#omrs-icon-arrow-forward"></use>
+            </svg>
+          </button>
+        )}
       </div>
       <div className={styles.chartSection}>
         {views.length > 0 && (
