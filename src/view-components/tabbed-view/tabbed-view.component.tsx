@@ -12,8 +12,8 @@ import {
 
 import styles from "./tabbed-view.css";
 import { getView, View } from "../view-utils";
-import { Navbar } from "../../root.component";
 import { useConfig } from "@openmrs/esm-module-config";
+import { Navbar } from "../../config-schemas/openmrs-esm-patient-chart-schema";
 function useQuery() {
   return new URLSearchParams(useLocation().search);
 }

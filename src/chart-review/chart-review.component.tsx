@@ -12,8 +12,11 @@ import styles from "./chart-review.css";
 import { useConfig } from "@openmrs/esm-module-config";
 
 import { getView, View } from "../view-components/view-utils";
-import { ChartConfig, Navbar } from "../root.component";
 import { VisitButton } from "@openmrs/esm-patient-chart-widgets";
+import {
+  ChartConfig,
+  Navbar
+} from "../config-schemas/openmrs-esm-patient-chart-schema";
 
 export default function ChartReview(props: any) {
   const match = useRouteMatch();
@@ -22,6 +25,7 @@ export default function ChartReview(props: any) {
   const { patientUuid } = useParams();
   const { view: viewPath } = useParams();
   const config = useConfig<ChartConfig>();
+
   const defaultPath = `/patient/${patientUuid}/chart`;
   const [views, setViews] = React.useState<View[]>([]);
   const [navbarItems, setNavbarItems] = React.useState<Navbar[]>([]);
