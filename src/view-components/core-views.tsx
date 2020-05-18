@@ -1,6 +1,7 @@
+import { WidgetConfig } from "./widget/widget.component";
 import { DashboardConfig } from "./dashboard/dashboard.component";
 
-export const coreWidgetDefinitions = [
+export const coreWidgetDefinitions: WidgetConfig[] = [
   {
     name: "ProgramsOverview",
     esModule: "@openmrs/esm-patient-chart-widgets"
@@ -80,7 +81,7 @@ export const coreWidgetDefinitions = [
   }
 ];
 
-export const coreDashboardDefinitions = [
+export const coreDashboardDefinitions: DashboardConfig[] = [
   {
     name: "summaryDashboard",
     title: "Overview",
@@ -92,7 +93,7 @@ export const coreDashboardDefinitions = [
         name: "ConditionsOverview",
         esModule: "@openmrs/esm-patient-chart-widgets",
         layout: { columnSpan: 2 },
-        params: {
+        props: {
           basePath: "conditions"
         }
       },
@@ -105,7 +106,7 @@ export const coreDashboardDefinitions = [
         name: "NotesOverview",
         esModule: "@openmrs/esm-patient-chart-widgets",
         layout: { columnSpan: 4 },
-        params: {
+        props: {
           basePath: "encounters/notes"
         }
       },
@@ -113,7 +114,7 @@ export const coreDashboardDefinitions = [
         name: "VitalsOverview",
         esModule: "@openmrs/esm-patient-chart-widgets",
         layout: { columnSpan: 2 },
-        params: {
+        props: {
           basePath: "results/vitals"
         }
       },
@@ -121,7 +122,7 @@ export const coreDashboardDefinitions = [
         name: "HeightAndWeightOverview",
         esModule: "@openmrs/esm-patient-chart-widgets",
         layout: { columnSpan: 2 },
-        params: {
+        props: {
           basePath: "results/heightAndWeight"
         }
       },
@@ -129,7 +130,7 @@ export const coreDashboardDefinitions = [
         name: "MedicationsOverview",
         esModule: "@openmrs/esm-patient-chart-widgets",
         layout: { columnSpan: 3 },
-        params: {
+        props: {
           basePath: "orders/medication-orders"
         }
       },
@@ -137,7 +138,7 @@ export const coreDashboardDefinitions = [
         name: "AllergiesOverview",
         esModule: "@openmrs/esm-patient-chart-widgets",
         layout: { columnSpan: 1 },
-        params: {
+        props: {
           basePath: "allergies"
         }
       },
@@ -145,7 +146,7 @@ export const coreDashboardDefinitions = [
         name: "AppointmentsOverview",
         esModule: "@openmrs/esm-patient-chart-widgets",
         layout: { columnSpan: 4 },
-        params: {
+        props: {
           basePath: "appointments"
         }
       }
@@ -159,14 +160,14 @@ export const coreDashboardDefinitions = [
       {
         name: "VitalsOverview",
         esModule: "@openmrs/esm-patient-chart-widgets",
-        params: {
+        props: {
           basePath: "results/vitals"
         }
       },
       {
         name: "HeightAndWeightOverview",
         esModule: "@openmrs/esm-patient-chart-widgets",
-        params: {
+        props: {
           basePath: "results/heightAndWeight"
         }
       }
@@ -181,7 +182,7 @@ export const coreDashboardDefinitions = [
       {
         name: "MedicationsOverview",
         esModule: "@openmrs/esm-patient-chart-widgets",
-        params: {
+        props: {
           basePath: "orders/medication-orders"
         }
       }
@@ -299,17 +300,3 @@ export const coreTabbedViewDefinitions = [
     ]
   }
 ];
-
-type CoreWidgets = {
-  [key: string]: CoreWidget;
-};
-
-type CoreWidget = {
-  name: string;
-  esModule: string;
-  params?: {};
-};
-
-type CoreDashboards = {
-  [key: string]: DashboardConfig;
-};

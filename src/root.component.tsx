@@ -5,9 +5,9 @@ import { PatientBanner, VisitDialog } from "@openmrs/esm-patient-chart-widgets";
 import WorkspaceWrapper from "./workspace/workspace-wrapper.component";
 import ChartReview from "./chart-review/chart-review.component";
 import styles from "./root.css";
-import { defineConfigSchema, validators } from "@openmrs/esm-module-config";
+import { defineConfigSchema } from "@openmrs/esm-module-config";
 import { AppPropsContext } from "./app-props-context";
-import { esmPatientChartSchema } from "./openmrs-esm-patient-chart-schema";
+import { esmPatientChartSchema } from "./config-schemas/openmrs-esm-patient-chart-schema";
 
 function Root(props) {
   defineConfigSchema("@openmrs/esm-patient-chart-app", esmPatientChartSchema);
@@ -55,37 +55,3 @@ export default openmrsRootDecorator({
   featureName: "patient-chart",
   moduleName: "@openmrs/esm-patient-chart-app"
 })(Root);
-
-export type ChartConfig = {
-  primaryNavbar: Navbar[];
-  widgetDefinitions: {
-    name: string;
-    esModule?: string;
-    label?: string;
-    path?: string;
-  };
-
-  dashboardDefinitions: {
-    name: string;
-    title: string;
-    layout: { columns: number };
-    widgets: {
-      name: string;
-      esModule: string;
-      label: string;
-      path: string;
-      layout: {
-        rowSpan: number;
-        columnSpan: number;
-      };
-    }[];
-  };
-
-  tabbedDashboardDefinitions: {
-    name: string;
-    title: string;
-    navbar: Navbar;
-  }[];
-};
-
-export type Navbar = { label: string; path: string; view: string };
