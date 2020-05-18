@@ -1,5 +1,3 @@
-//jest.mock("single-spa-react");
-
 import React from "react";
 import {
   render,
@@ -8,8 +6,6 @@ import {
   queryByText
 } from "@testing-library/react";
 import "@testing-library/jest-dom/extend-expect";
-//@ts-ignore
-import ssr, { SingleSpaContext } from "single-spa-react";
 
 import Widget from "./widget.component";
 

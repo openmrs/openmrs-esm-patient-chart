@@ -3,7 +3,7 @@ import {
   coreWidgetDefinitions,
   coreDashboardDefinitions,
   coreTabbedViewDefinitions
-} from "./view-components/core-views";
+} from "../view-components/core-views";
 
 export const esmPatientChartSchema = {
   primaryNavbar: {
@@ -101,3 +101,37 @@ export const esmPatientChartSchema = {
     default: coreTabbedViewDefinitions
   }
 };
+
+export type ChartConfig = {
+  primaryNavbar: Navbar[];
+  widgetDefinitions: {
+    name: string;
+    esModule?: string;
+    label?: string;
+    path?: string;
+  };
+
+  dashboardDefinitions: {
+    name: string;
+    title: string;
+    layout: { columns: number };
+    widgets: {
+      name: string;
+      esModule: string;
+      label: string;
+      path: string;
+      layout: {
+        rowSpan: number;
+        columnSpan: number;
+      };
+    }[];
+  };
+
+  tabbedDashboardDefinitions: {
+    name: string;
+    title: string;
+    navbar: Navbar;
+  }[];
+};
+
+export type Navbar = { label: string; path: string; view: string };

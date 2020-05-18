@@ -1,9 +1,10 @@
 import React, { FunctionComponent, useContext } from "react";
 //@ts-ignore The present types for single-spa-react are not updated yet for 2.9 which has SingleSpaContext
 import { SingleSpaContext } from "single-spa-react";
+import { reportError } from "@openmrs/esm-error-handling";
 
-export default function Widget(props) {
-  const [widget, setWidget] = React.useState(null);
+export default function Widget(props: WidgetProps) {
+  const [component, setComponent] = React.useState<JSX.Element>(null);
 
   const { mountParcel } = useContext(SingleSpaContext);
 
@@ -11,67 +12,46 @@ export default function Widget(props) {
     //This function is moved inside of the effect to avoid change on every render
     const loadWidgetFromConfig = (widgetConfig: WidgetConfig) => {
       let Component: FunctionComponent<ComponentProps>;
-      let widget: WidgetConfig = widgetConfig;
       if (widgetConfig.esModule) {
+        // config schema should be fixed so that this is caught in validation
         System.import(widgetConfig.esModule)
           .then(module => {
             if (module[widgetConfig.name]) {
               Component = module[widgetConfig.name];
-              if (widgetConfig.usesSingleSpaContext) {
-                widget.component = () => (
-                  <Component
-                    {...props.widgetConfig.params}
-                    singleSpaContext={{ mountParcel: mountParcel }}
-                  />
-                );
-              } else {
-                widget.component = () => (
-                  <Component {...props.widgetConfig.params} />
-                );
+              const widgetProps = { ...props.widgetConfig.props };
+              if (props.widgetConfig.config) {
+                widgetProps["config"] = props.widgetConfig.config;
               }
+              if (props.widgetConfig.usesSingleSpaContext) {
+                widgetProps["mountParcel"] = mountParcel;
+              }
+              setComponent(() => <Component props={widgetProps} />);
             } else {
-              widget.component = () => (
-                <div>
-                  {widgetConfig.name} does not exist in module{" "}
-                  {widgetConfig.esModule}
-                </div>
-              );
+              const message = `${widgetConfig.name} does not exist in module ${widgetConfig.esModule}`;
+              reportError(message);
+              setComponent(() => <div>${message}</div>);
             }
           })
           .catch(error => {
-            widget.component = () => (
-              <div>{widget.esModule} failed to load</div>
-            );
-          })
-          .finally(() => {
-            setWidget(widget);
+            const message = `${widgetConfig.esModule} failed to load`;
+            reportError(`${message}:\n` + error);
+            setComponent(() => <div>${message}</div>);
           });
       } else {
-        widget.component = () => (
-          <div>No module provided in the config for widget: {widget.name}></div>
+        reportError(
+          `No esModule provided in the config for widget: ${widgetConfig.name}`
         );
-        setWidget(widget);
+        setComponent(() => <div>No module provided</div>);
       }
     };
     loadWidgetFromConfig(props.widgetConfig);
   }, [props.widgetConfig, mountParcel]);
 
-  return (
-    <>
-      {widget != undefined &&
-        widget.component != undefined &&
-        widget.component()}
-    </>
-  );
+  return <>{component || <div>Loading</div>}</>;
 }
 
 export type WidgetProps = {
   widgetConfig: WidgetConfig;
-};
-
-type GridSize = {
-  gridRow: string;
-  gridColumn: string;
 };
 
 export type WidgetConfig = {
@@ -82,7 +62,8 @@ export type WidgetConfig = {
     rowSpan?: number;
     columnSpan?: number;
   };
-  component?: Function;
+  props?: object;
+  config?: object;
 };
 
 type ComponentProps = {
