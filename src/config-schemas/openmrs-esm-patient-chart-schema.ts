@@ -5,10 +5,7 @@ import {
   coreTabbedViewDefinitions
 } from "../view-components/core-views";
 
-import {
-  ChartWidgetsConfig,
-  chartWidgetsConfigSchemas
-} from "@openmrs/esm-patient-chart-widgets";
+import { ChartWidgetsConfig } from "@openmrs/esm-patient-chart-widgets";
 
 export const esmPatientChartSchema = {
   primaryNavbar: {
@@ -105,10 +102,14 @@ export const esmPatientChartSchema = {
     },
     default: coreTabbedViewDefinitions
   },
-  ...chartWidgetsConfigSchemas
+  widgetsConfigs: {
+    dictionaryElements: {
+      skipValidations: true
+    }
+  }
 };
 
-export type ChartConfig = ChartWidgetsConfig & {
+export type ChartConfig = {
   primaryNavbar: Navbar[];
   widgetDefinitions: {
     name: string;
@@ -138,6 +139,7 @@ export type ChartConfig = ChartWidgetsConfig & {
     title: string;
     navbar: Navbar;
   }[];
+  widgetsConfigs: ChartWidgetsConfig;
 };
 
 export type Navbar = { label: string; path: string; view: string };
