@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Patient dashboard microfrontend for the OpenMRS SPA",
   "main": "dist/openmrs-esm-patient-chart.js",
+  "types": "src/index.ts",
+  "license": "MPL-2.0",
+  "homepage": "https://github.com/openmrs/openmrs-esm-patient-chart#readme",
   "scripts": {
     "start": "webpack-dev-server --host 0.0.0.0",
     "start-https": "webpack-dev-server --https",
@@ -31,7 +34,6 @@
       "pre-commit": "pretty-quick --staged && concurrently npm:lint npm:typescript npm:coverage"
     }
   },
-  "types": "src/openmrs-esm-patient-chart.tsx",
   "devDependencies": {
     "@babel/compat-data": "~7.9.0",
     "@babel/core": "^7.8.7",
@@ -50,6 +52,8 @@
     "@types/single-spa-react": "^2.8.3",
     "@types/systemjs": "^6.1.0",
     "@types/webpack-env": "^1.15.1",
+    "@types/lodash-es": "^4.17.3",
+    "@types/react-router": "^5.1.4",
     "babel-eslint": "^10.1.0",
     "babel-jest": "^26.0.1",
     "babel-loader": "^8.0.6",
@@ -86,18 +90,11 @@
     "@openmrs/esm-api": "^1.3.0",
     "@openmrs/esm-module-config": "^1.2.0",
     "@openmrs/esm-patient-chart-widgets": "^1.0.2",
-    "@types/lodash-es": "^4.17.3",
-    "@types/react-router": "^5.1.4",
+    "@openmrs/esm-root-config": "^1.2.0",
     "i18next": "^19.3.2",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
     "react-i18next": "^11.3.3",
     "rxjs": "^6.5.4"
-  },
-  "author": "",
-  "license": "MPL-2.0",
-  "bugs": {
-    "url": "https://github.com/openmrs/openmrs-esm-patient-chart/issues"
-  },
-  "homepage": "https://github.com/openmrs/openmrs-esm-patient-chart#readme"
+  }
 }
