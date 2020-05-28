@@ -1,5 +1,5 @@
 {
-  "name": "openmrs-esm-patient-chart",
+  "name": "openmrs-esm-patient-chart-app",
   "version": "1.0.0",
   "description": "Patient dashboard microfrontend for the OpenMRS SPA",
   "main": "dist/openmrs-esm-patient-chart.js",
@@ -7,7 +7,7 @@
   "license": "MPL-2.0",
   "homepage": "https://github.com/openmrs/openmrs-esm-patient-chart#readme",
   "scripts": {
-    "start": "webpack-dev-server --host 0.0.0.0",
+    "start": "webpack-dev-server",
     "start-https": "webpack-dev-server --https",
     "build": "webpack --mode production",
     "analyze": "webpack --mode=production --env.analyze=true",
