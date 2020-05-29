@@ -1,6 +1,6 @@
 .grid {
-  position: relative;
-  top: 2.75rem;
+  position: fixed;
+  top: 6.25rem;
   display: grid;
   grid-template-columns: 1fr min-content;
   grid-template-rows: 1fr;
