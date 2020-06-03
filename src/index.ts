@@ -12,7 +12,7 @@ const importTranslation = require.context(
 function setupOpenMRS() {
   return {
     lifecycle: () => import("./openmrs-esm-patient-chart"),
-    activate: location => routeRegex(/^patient\/.+\/chart/, location)
+    activate: ["patient-chart", "patient_chart"]
   };
 }
 
