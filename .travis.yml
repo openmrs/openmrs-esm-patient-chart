@@ -7,8 +7,8 @@ script:
   - npm run typescript
   - npm run build
   - echo "Folder name in Digital Ocean Spaces - $TRAVIS_COMMIT"
-  - mkdir -p dist/@openmrs/esm-patient-chart/$TRAVIS_COMMIT
-  - mv dist/*.* dist/@openmrs/esm-patient-chart/$TRAVIS_COMMIT/
+  - mkdir -p dist/@openmrs/esm-patient-chart-app/$TRAVIS_COMMIT
+  - mv dist/*.* dist/@openmrs/esm-patient-chart-app/$TRAVIS_COMMIT/
 deploy:
   provider: s3
   access_key_id: "$DIGITAL_OCEAN_SPACES_KEY_ID"
@@ -22,7 +22,7 @@ deploy:
   on:
     branch: master
 after_deploy:
-  - echo "Updating import map to point to new version of @openmrs/esm-patient-chart"
-  - statuscode=$(curl --output /dev/null --write-out %{http_code} -u $DEPLOYER_USERNAME:$DEPLOYER_PASSWORD -d '{ "service":"@openmrs/esm-patient-chart","url":"https://spa-modules.nyc3.digitaloceanspaces.com/@openmrs/esm-patient-chart/'$TRAVIS_COMMIT'/openmrs-esm-patient-chart.js" }' -X PATCH $DEPLOYER_HOST/services\?env=prod -H "Accept:application/json" -H "Content-Type:application/json")
+  - echo "Updating import map to point to new version of @openmrs/esm-patient-chart-app"
+  - statuscode=$(curl --output /dev/null --write-out %{http_code} -u $DEPLOYER_USERNAME:$DEPLOYER_PASSWORD -d '{ "service":"@openmrs/esm-patient-chart-app","url":"https://spa-modules.nyc3.digitaloceanspaces.com/@openmrs/esm-patient-chart-app/'$TRAVIS_COMMIT'/openmrs-esm-patient-chart.js" }' -X PATCH $DEPLOYER_HOST/services\?env=prod -H "Accept:application/json" -H "Content-Type:application/json")
   - echo "Deployment Status Code --> ${statuscode}"
   - if [ "$statuscode" -ne 200 ]; then travis_terminate "$statuscode"; fi
