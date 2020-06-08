@@ -53,7 +53,7 @@ function Root(props) {
 
 export default openmrsRootDecorator({
   featureName: "patient-chart",
-  moduleName: "@openmrs/esm-patient-chart"
+  moduleName: "@openmrs/esm-patient-chart-app"
 })(Root);
 
 export type ChartConfig = {
