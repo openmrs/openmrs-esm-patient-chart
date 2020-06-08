@@ -10,7 +10,7 @@ import { AppPropsContext } from "./app-props-context";
 import { esmPatientChartSchema } from "./openmrs-esm-patient-chart-schema";
 
 function Root(props) {
-  defineConfigSchema("@openmrs/esm-patient-chart", esmPatientChartSchema);
+  defineConfigSchema("@openmrs/esm-patient-chart-app", esmPatientChartSchema);
 
   return (
     <AppPropsContext.Provider value={{ appProps: props }}>
