@@ -10,7 +10,7 @@ import { AppPropsContext } from "./app-props-context";
 import { esmPatientChartSchema } from "./openmrs-esm-patient-chart-schema";
 
 function Root(props) {
-  defineConfigSchema("@openmrs/esm-patient-chart", esmPatientChartSchema);
+  defineConfigSchema("@openmrs/esm-patient-chart-app", esmPatientChartSchema);
 
   return (
     <AppPropsContext.Provider value={{ appProps: props }}>
@@ -53,7 +53,7 @@ function Root(props) {
 
 export default openmrsRootDecorator({
   featureName: "patient-chart",
-  moduleName: "@openmrs/esm-patient-chart"
+  moduleName: "@openmrs/esm-patient-chart-app"
 })(Root);
 
 export type ChartConfig = {
