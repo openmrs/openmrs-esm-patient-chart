@@ -1,22 +1,9 @@
 import React, { useState } from "react";
-import {
-  Route,
-  Link,
-  Redirect,
-  useHistory,
-  useParams,
-  useLocation,
-  Switch,
-  useRouteMatch
-} from "react-router-dom";
+import { Route, Link, Redirect, Switch, useRouteMatch } from "react-router-dom";
 
 import styles from "./tabbed-view.css";
 import { getView, View } from "../view-utils";
-import { Navbar } from "../../root.component";
 import { useConfig } from "@openmrs/esm-module-config";
-function useQuery() {
-  return new URLSearchParams(useLocation().search);
-}
 
 export default function TabbedView(props: any) {
   const [views, setViews] = useState<View[]>([]);
@@ -25,14 +12,23 @@ export default function TabbedView(props: any) {
 
   const [selected, setSelected] = React.useState(getInitialTab());
 
-  function getInitialTab() {
+  function getInitialTab(): number {
+    let navItemIndex = getNavItemIndex();
+    return navItemIndex === -1 ? 0 : navItemIndex;
+  }
+
+  function getNavItemIndex(): number {
     const viewPath = match.url.substr(match.url.lastIndexOf("/"));
     const navItemIndex = props.config.navbar.findIndex(
       element => element.path === viewPath
     );
-
-    return navItemIndex === -1 ? 0 : navItemIndex;
+    return navItemIndex;
   }
+
+  React.useEffect(() => {
+    if (getNavItemIndex() === -1) setSelected(0);
+    setSelected(getNavItemIndex());
+  }, [match.url]);
 
   React.useEffect(() => {
     setViews(
@@ -92,12 +88,3 @@ export default function TabbedView(props: any) {
     </>
   );
 }
-
-type TabbedViewProps = {
-  config: {
-    name: string;
-    title: string;
-    navbar: Navbar[];
-  };
-  defaultPath?: string;
-};
