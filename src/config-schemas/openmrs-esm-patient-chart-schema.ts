@@ -101,9 +101,6 @@ export const esmPatientChartSchema = {
     },
     default: coreTabbedViewDefinitions
   },
-  externalPatientChartConfigs: {
-    skipValidations: true
-  },
   widgetCommonConfig: {
     ...widgetCommonConfigSchema
   }
