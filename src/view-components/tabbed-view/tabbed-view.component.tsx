@@ -12,12 +12,12 @@ export default function TabbedView(props: any) {
 
   const [selected, setSelected] = React.useState(getInitialTab());
 
-  function getInitialTab(): number {
-    let navItemIndex = getNavItemIndex();
+  function getInitialTab() {
+    const navItemIndex = getNavItemIndex();
     return navItemIndex === -1 ? 0 : navItemIndex;
   }
 
-  function getNavItemIndex(): number {
+  function getNavItemIndex() {
     const viewPath = match.url.substr(match.url.lastIndexOf("/"));
     const navItemIndex = props.config.navbar.findIndex(
       element => element.path === viewPath
