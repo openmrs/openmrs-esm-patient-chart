@@ -17,6 +17,11 @@ export const coreWidgetDefinitions: WidgetConfig[] = [
   },
 
   {
+    name: "Immunizations",
+    esModule: "@openmrs/esm-patient-chart-widgets"
+  },
+
+  {
     name: "MedicationsOverview",
     esModule: "@openmrs/esm-patient-chart-widgets"
   },
@@ -48,6 +53,11 @@ export const coreWidgetDefinitions: WidgetConfig[] = [
 
   {
     name: "ConditionsOverview",
+    esModule: "@openmrs/esm-patient-chart-widgets"
+  },
+
+  {
+    name: "ImmunizationsOverview",
     esModule: "@openmrs/esm-patient-chart-widgets"
   },
 
@@ -95,6 +105,14 @@ export const coreDashboardDefinitions: DashboardConfig[] = [
         layout: { columnSpan: 2 },
         props: {
           basePath: "conditions"
+        }
+      },
+      {
+        name: "ImmunizationsOverview",
+        esModule: "@openmrs/esm-patient-chart-widgets",
+        layout: { columnSpan: 2 },
+        params: {
+          basePath: "immunizations"
         }
       },
       {
@@ -206,6 +224,17 @@ export const coreDashboardDefinitions: DashboardConfig[] = [
     widgets: [
       {
         name: "Conditions",
+        esModule: "@openmrs/esm-patient-chart-widgets"
+      }
+    ]
+  },
+
+  {
+    name: "immunizationsDashboard",
+    layout: { columns: 1 },
+    widgets: [
+      {
+        name: "Immunizations",
         esModule: "@openmrs/esm-patient-chart-widgets"
       }
     ]

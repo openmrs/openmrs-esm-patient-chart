@@ -39,6 +39,11 @@ export const esmPatientChartSchema = {
         view: "conditionsDashboard"
       },
       {
+        label: "Immunizations",
+        path: "/immunizations",
+        view: "immunizationsDashboard"
+      },
+      {
         label: "Programs",
         path: "/programs",
         view: "programsDashboard"
