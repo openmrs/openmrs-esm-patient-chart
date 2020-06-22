@@ -5,11 +5,11 @@
   "Medications - past": "Medications - past",
   "Since": "Since",
   "care programs": "Care Programs",
-  "immunizations": "Immunizations",
-  "vaccine": "VACCINE",
-  "recent vaccination": "RECENT VACCINATION",
-  "vaccination date": "VACCINATION DATE",
-  "expiration date": "EXPIRATION DATE",
-  "series": "SERIES",
-  "addButton": "Add"
+  "immunizations": "Vaccinations",
+  "vaccine": "VACCIN",
+  "recent vaccination": "VACCINATION RÉCENTE",
+  "vaccination date": "DATE DE VACCINATION",
+  "expiration date": "DATE D'EXPIRATION",
+  "series": "SÉRIES",
+  "addButton": "Ajouter"
 }
