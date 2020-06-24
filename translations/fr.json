@@ -8,8 +8,14 @@
   "immunizations": "Vaccinations",
   "vaccine": "VACCIN",
   "recent vaccination": "VACCINATION RÉCENTE",
-  "vaccination date": "DATE DE VACCINATION",
-  "expiration date": "DATE D'EXPIRATION",
-  "series": "SÉRIES",
-  "addButton": "Ajouter"
+  "addButton": "Ajouter",
+  "vaccination date": "Date de vaccination",
+  "expiration date": "Date d'expiration",
+  "series": "Séries",
+  "add vaccine" : "Ajouter un vaccin",
+  "please select" : "Veuillez sélectionner",
+  "lot number" : "Numéro de lot",
+  "manufacturer" : "Fabricant",
+  "cancel" : "Annuler",
+  "edit vaccine" : "Modifier le vaccin"
 }
