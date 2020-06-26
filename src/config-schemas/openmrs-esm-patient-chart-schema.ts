@@ -107,19 +107,19 @@ export const esmPatientChartSchema = {
 };
 
 export type ChartConfig = {
-  primaryNavbar: Navbar[];
-  widgetDefinitions: {
+  primaryNavbar: Array<Navbar>;
+  widgetDefinitions: Array<{
     name: string;
     esModule?: string;
     label?: string;
     path?: string;
-  };
+  }>;
 
-  dashboardDefinitions: {
+  dashboardDefinitions: Array<{
     name: string;
     title: string;
     layout: { columns: number };
-    widgets: {
+    widgets: Array<{
       name: string;
       esModule: string;
       label: string;
@@ -128,14 +128,14 @@ export type ChartConfig = {
         rowSpan: number;
         columnSpan: number;
       };
-    }[];
-  };
+    }>;
+  }>;
 
-  tabbedDashboardDefinitions: {
+  tabbedDashboardDefinitions: Array<{
     name: string;
     title: string;
     navbar: Navbar;
-  }[];
+  }>;
 };
 
 export type Navbar = { label: string; path: string; view: string };
