@@ -3,7 +3,7 @@ import {
   coreWidgetDefinitions,
   coreDashboardDefinitions,
   coreTabbedViewDefinitions
-} from "./view-components/core-views";
+} from "../view-components/core-views";
 
 export const esmPatientChartSchema = {
   primaryNavbar: {
@@ -59,7 +59,9 @@ export const esmPatientChartSchema = {
     arrayElements: {
       name: { validators: [validators.isString] },
       esModule: { validators: [validators.isString] },
-      usesSingleSpaContext: { validators: [validators.isBoolean] }
+      usesSingleSpaContext: { validators: [validators.isBoolean] },
+      props: { default: {}, validators: [validators.isObject] },
+      config: { default: {}, validators: [validators.isObject] }
     },
     default: coreWidgetDefinitions
   },
@@ -76,6 +78,8 @@ export const esmPatientChartSchema = {
           name: { validators: [validators.isString] },
           esModule: { validators: [validators.isString] },
           usesSingleSpaContext: { validators: [validators.isBoolean] },
+          props: { default: {}, validators: [validators.isObject] },
+          config: { default: {}, validators: [validators.isObject] },
           layout: {
             rowSpan: {},
             columnSpan: {}
@@ -101,3 +105,37 @@ export const esmPatientChartSchema = {
     default: coreTabbedViewDefinitions
   }
 };
+
+export type ChartConfig = {
+  primaryNavbar: Array<Navbar>;
+  widgetDefinitions: Array<{
+    name: string;
+    esModule?: string;
+    label?: string;
+    path?: string;
+  }>;
+
+  dashboardDefinitions: Array<{
+    name: string;
+    title: string;
+    layout: { columns: number };
+    widgets: Array<{
+      name: string;
+      esModule: string;
+      label: string;
+      path: string;
+      layout: {
+        rowSpan: number;
+        columnSpan: number;
+      };
+    }>;
+  }>;
+
+  tabbedDashboardDefinitions: Array<{
+    name: string;
+    title: string;
+    navbar: Navbar;
+  }>;
+};
+
+export type Navbar = { label: string; path: string; view: string };
