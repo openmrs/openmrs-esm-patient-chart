@@ -17,10 +17,12 @@ import {
   ChartConfig,
   Navbar
 } from "../config-schemas/openmrs-esm-patient-chart-schema";
+import { useTranslation } from "react-i18next";
 
 export default function ChartReview(props: any) {
   const match = useRouteMatch();
   const location = useLocation();
+  const { t } = useTranslation();
 
   const { patientUuid } = useParams();
   const { view: viewPath } = useParams();
@@ -199,7 +201,7 @@ export default function ChartReview(props: any) {
                           id={"nav_item" + index}
                           onClick={() => setSelected(index)}
                         >
-                          {item.label}
+                          {t(item.label, item.label)}
                         </button>
                       </Link>
                     </div>
