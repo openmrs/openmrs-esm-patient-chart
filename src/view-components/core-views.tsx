@@ -111,7 +111,7 @@ export const coreDashboardDefinitions: DashboardConfig[] = [
         name: "ImmunizationsOverview",
         esModule: "@openmrs/esm-patient-chart-widgets",
         layout: { columnSpan: 2 },
-        params: {
+        props: {
           basePath: "immunizations"
         }
       },
