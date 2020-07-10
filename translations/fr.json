@@ -65,5 +65,7 @@
   "Dose-5": "Dose-5",
   "Booster-1": "Booster-1",
   "Booster-2": "Booster-2",
-  "close form confirm message": "Des travaux sont en cours, êtes-vous sûr de vouloir fermer cet onglet?"
+  "close form confirm message": "Des travaux sont en cours, êtes-vous sûr de vouloir fermer cet onglet?",
+  "no immunization configured": "Aucune immunisation n'est configurée.",
+  "please configure immunization": "Veuillez configurer les vaccinations."
 }
