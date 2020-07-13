@@ -278,8 +278,13 @@ export const coreDashboardDefinitions: DashboardConfig[] = [
   },
   {
     name: "AttachmentsOverview",
-    esModule: "@openmrs/esm-patient-chart-widgets",
-    layout: { columnSpan: 1 }
+    layout: { columns: 1 },
+    widgets: [
+      {
+        name: "AttachmentsOverview",
+        esModule: "@openmrs/esm-patient-chart-widgets"
+      }
+    ]
   }
 ];
 
