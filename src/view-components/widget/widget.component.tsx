@@ -24,7 +24,12 @@ export default function Widget(props: WidgetProps) {
               if (props.widgetConfig.usesSingleSpaContext) {
                 widgetProps["mountParcel"] = mountParcel;
               }
-              setComponent(() => <Component props={widgetProps} />);
+              setComponent(() => (
+                <Component
+                  props={widgetProps}
+                  basePath={widgetConfig.basePath}
+                />
+              ));
             } else {
               const message = `${widgetConfig.name} does not exist in module ${widgetConfig.esModule}`;
               reportError(message);
@@ -64,8 +69,10 @@ export type WidgetConfig = {
   };
   props?: object;
   config?: object;
+  basePath?: string;
 };
 
 type ComponentProps = {
   props: any;
+  basePath?: string;
 };
