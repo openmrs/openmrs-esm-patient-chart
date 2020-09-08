@@ -107,70 +107,55 @@ export const coreDashboardDefinitions: DashboardConfig[] = [
         name: "ConditionsOverview",
         esModule: "@openmrs/esm-patient-chart-widgets",
         layout: { columnSpan: 2 },
-        props: {
-          basePath: "conditions"
-        }
+        basePath: "conditions"
       },
       {
         name: "ImmunizationsOverview",
         esModule: "@openmrs/esm-patient-chart-widgets",
         layout: { columnSpan: 2 },
-        props: {
-          basePath: "immunizations"
-        }
+        basePath: "immunizations"
       },
       {
         name: "ProgramsOverview",
         esModule: "@openmrs/esm-patient-chart-widgets",
-        layout: { columnSpan: 2 }
+        layout: { columnSpan: 2 },
+        basePath: "programs"
       },
       {
         name: "NotesOverview",
         esModule: "@openmrs/esm-patient-chart-widgets",
         layout: { columnSpan: 4 },
-        props: {
-          basePath: "encounters/notes"
-        }
+        basePath: "encounters/notes"
       },
       {
         name: "VitalsOverview",
         esModule: "@openmrs/esm-patient-chart-widgets",
         layout: { columnSpan: 2 },
-        props: {
-          basePath: "results/vitals"
-        }
+        basePath: "results/vitals"
       },
       {
         name: "HeightAndWeightOverview",
         esModule: "@openmrs/esm-patient-chart-widgets",
         layout: { columnSpan: 2 },
-        props: {
-          basePath: "results/heightAndWeight"
-        }
+        basePath: "results/heightAndWeight"
       },
       {
         name: "MedicationsOverview",
         esModule: "@openmrs/esm-patient-chart-widgets",
         layout: { columnSpan: 3 },
-        props: {
-          basePath: "orders/medication-orders"
-        }
+        basePath: "orders/medication-orders"
       },
       {
         name: "AllergiesOverview",
         esModule: "@openmrs/esm-patient-chart-widgets",
         layout: { columnSpan: 1 },
-        props: {
-          basePath: "allergies"
-        }
+        basePath: "allergies"
       },
       {
         name: "AppointmentsOverview",
         esModule: "@openmrs/esm-patient-chart-widgets",
         layout: { columnSpan: 4 },
-        props: {
-          basePath: "appointments"
-        }
+        basePath: "appointments"
       }
     ]
   },
@@ -182,16 +167,12 @@ export const coreDashboardDefinitions: DashboardConfig[] = [
       {
         name: "VitalsOverview",
         esModule: "@openmrs/esm-patient-chart-widgets",
-        props: {
-          basePath: "results/vitals"
-        }
+        basePath: "results/vitals"
       },
       {
         name: "HeightAndWeightOverview",
         esModule: "@openmrs/esm-patient-chart-widgets",
-        props: {
-          basePath: "results/heightAndWeight"
-        }
+        basePath: "results/heightAndWeight"
       }
     ]
   },
@@ -204,9 +185,7 @@ export const coreDashboardDefinitions: DashboardConfig[] = [
       {
         name: "MedicationsOverview",
         esModule: "@openmrs/esm-patient-chart-widgets",
-        props: {
-          basePath: "orders/medication-orders"
-        }
+        basePath: "orders/medication-orders"
       }
     ]
   },
