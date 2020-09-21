@@ -19,13 +19,18 @@ import {
 } from "../config-schemas/openmrs-esm-patient-chart-schema";
 import { useTranslation } from "react-i18next";
 
+interface IParams {
+  patientUuid: string;
+  subview: string | undefined;
+  view: string;
+}
+
 export default function ChartReview(props: any) {
   const match = useRouteMatch();
   const location = useLocation();
   const { t } = useTranslation();
 
-  const { patientUuid } = useParams();
-  const { view: viewPath } = useParams();
+  const { patientUuid, view: viewPath } = useParams<IParams>();
   const config = useConfig<ChartConfig>();
 
   const defaultPath = `/patient/${patientUuid}/chart`;
