@@ -87,6 +87,7 @@
   },
   "dependencies": {
     "@openmrs/esm-api": "^3.0.0",
+    "@openmrs/esm-extension-manager": "^0.1.1",
     "@openmrs/esm-module-config": "^2.2.0",
     "@openmrs/esm-patient-chart-widgets": "^1.0.3",
     "i18next": "^19.7.0",

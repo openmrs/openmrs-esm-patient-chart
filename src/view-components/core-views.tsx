@@ -23,12 +23,12 @@ export const coreWidgetDefinitions: WidgetConfig[] = [
 
   {
     name: "MedicationsOverview",
-    esModule: "@openmrs/esm-patient-chart-widgets"
+    extensionSlotName: "patient-chart-dashboard-medications"
   },
 
   {
     name: "MedicationsSummary",
-    esModule: "@openmrs/esm-patient-chart-widgets"
+    extensionSlotName: "patient-chart-dashboard-medications"
   },
 
   {
@@ -141,9 +141,9 @@ export const coreDashboardDefinitions: DashboardConfig[] = [
       },
       {
         name: "MedicationsOverview",
-        esModule: "@openmrs/esm-patient-chart-widgets",
         layout: { columnSpan: 3 },
-        basePath: "orders/medication-orders"
+        basePath: "orders/medication-orders",
+        extensionSlotName: "patient-chart-dashboard-summary"
       },
       {
         name: "AllergiesOverview",
@@ -184,8 +184,8 @@ export const coreDashboardDefinitions: DashboardConfig[] = [
     widgets: [
       {
         name: "MedicationsOverview",
-        esModule: "@openmrs/esm-patient-chart-widgets",
-        basePath: "orders/medication-orders"
+        basePath: "orders/medication-orders",
+        extensionSlotName: "patient-chart-dashboard-medications"
       }
     ]
   },
