@@ -2,6 +2,7 @@ import React, { FunctionComponent, useContext } from "react";
 //@ts-ignore The present types for single-spa-react are not updated yet for 2.9 which has SingleSpaContext
 import { SingleSpaContext } from "single-spa-react";
 import { reportError } from "@openmrs/esm-error-handling";
+import { ExtensionSlotReact } from "@openmrs/esm-extension-manager";
 
 export default function Widget(props: WidgetProps) {
   const [component, setComponent] = React.useState<JSX.Element>(null);
@@ -41,6 +42,12 @@ export default function Widget(props: WidgetProps) {
             reportError(`${message}:\n` + error);
             setComponent(() => <div>${message}</div>);
           });
+      } else if (widgetConfig.extensionSlotName) {
+        setComponent(() => (
+          <ExtensionSlotReact
+            extensionSlotName={widgetConfig.extensionSlotName}
+          />
+        ));
       } else {
         // config schema should be fixed so that this is caught in validation
         reportError(
@@ -62,6 +69,7 @@ export type WidgetProps = {
 export type WidgetConfig = {
   name: string;
   esModule?: string;
+  extensionSlotName?: string;
   usesSingleSpaContext?: boolean;
   layout?: {
     rowSpan?: number;

@@ -68,7 +68,11 @@ export const esmPatientChartSchema = {
   widgetDefinitions: {
     arrayElements: {
       name: { validators: [validators.isString] },
-      esModule: { validators: [validators.isString] },
+      esModule: { default: undefined, validators: [validators.isString] },
+      extensionSlotName: {
+        default: undefined,
+        validators: [validators.isString]
+      },
       usesSingleSpaContext: { validators: [validators.isBoolean] },
       props: { default: {}, validators: [validators.isObject] },
       config: { default: {}, validators: [validators.isObject] }
