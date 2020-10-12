@@ -2,7 +2,7 @@ import React, { FunctionComponent, useContext } from "react";
 //@ts-ignore The present types for single-spa-react are not updated yet for 2.9 which has SingleSpaContext
 import { SingleSpaContext } from "single-spa-react";
 import { reportError } from "@openmrs/esm-error-handling";
-import { ExtensionSlotReact } from "@openmrs/esm-extension-manager";
+import { ExtensionSlotReact } from "@openmrs/esm-extensions";
 
 export default function Widget(props: WidgetProps) {
   const [component, setComponent] = React.useState<JSX.Element>(null);

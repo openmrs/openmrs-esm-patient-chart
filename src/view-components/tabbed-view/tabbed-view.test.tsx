@@ -10,7 +10,7 @@ import {
   findAllByRole,
   getAllByRole
 } from "@testing-library/react";
-import { useConfig } from "@openmrs/esm-module-config";
+import { useConfig } from "@openmrs/esm-config";
 import {
   mockedTabbedViewConfig,
   mockConfig,
@@ -28,7 +28,7 @@ const mockMatch: match = {
   url: "/patient/0b1b7481-704b-440f-a50f-3b7d0abac8c1/chart/results/overview"
 };
 
-jest.mock("@openmrs/esm-module-config", () => ({
+jest.mock("@openmrs/esm-config", () => ({
   useConfig: jest.fn()
 }));
 

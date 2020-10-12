@@ -9,7 +9,7 @@ import {
   Redirect
 } from "react-router-dom";
 import styles from "./chart-review.css";
-import { useConfig } from "@openmrs/esm-module-config";
+import { useConfig } from "@openmrs/esm-config";
 
 import { getView, View } from "../view-components/view-utils";
 import { VisitButton } from "@openmrs/esm-patient-chart-widgets";

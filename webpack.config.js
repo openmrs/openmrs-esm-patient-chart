@@ -3,8 +3,13 @@ const CleanWebpackPlugin = require("clean-webpack-plugin").CleanWebpackPlugin;
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
 
+const { peerDependencies } = require("./package.json");
+
 module.exports = (env) => ({
-  entry: path.resolve(__dirname, "src/index.ts"),
+  entry: [
+    path.resolve(__dirname, "src/set-public-path.ts"),
+    path.resolve(__dirname, "src/index.ts"),
+  ],
   output: {
     filename: "openmrs-esm-patient-chart.js",
     libraryTarget: "system",
@@ -49,15 +54,7 @@ module.exports = (env) => ({
     },
     disableHostCheck: true,
   },
-  externals: [
-    /^@openmrs\/esm.*/,
-    "i18next",
-    "single-spa",
-    "react",
-    "react-dom",
-    "react-i18next",
-    "react-router-dom",
-  ],
+  externals: Object.keys(peerDependencies),
   plugins: [
     new ForkTsCheckerWebpackPlugin(),
     new CleanWebpackPlugin(),

@@ -5,7 +5,7 @@ import { PatientBanner, VisitDialog } from "@openmrs/esm-patient-chart-widgets";
 import WorkspaceWrapper from "./workspace/workspace-wrapper.component";
 import ChartReview from "./chart-review/chart-review.component";
 import styles from "./root.css";
-import { defineConfigSchema } from "@openmrs/esm-module-config";
+import { defineConfigSchema } from "@openmrs/esm-config";
 import { AppPropsContext } from "./app-props-context";
 import { esmPatientChartSchema } from "./config-schemas/openmrs-esm-patient-chart-schema";
 
