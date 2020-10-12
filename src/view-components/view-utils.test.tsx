@@ -1,5 +1,5 @@
 import React from "react";
-import { render, waitForElement, cleanup } from "@testing-library/react";
+import { render, cleanup } from "@testing-library/react";
 import "@testing-library/jest-dom/extend-expect";
 
 import { getView } from "./view-utils";

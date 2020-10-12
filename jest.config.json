@@ -2,6 +2,7 @@
   "transform": {
     "^.+\\.tsx?$": "babel-jest"
   },
+  "transformIgnorePatterns": ["/node_modules/(?!@openmrs)"],
   "moduleNameMapper": {
     "\\.(css)$": "identity-obj-proxy",
     "@openmrs/esm-api": "<rootDir>/__mocks__/openmrs-esm-api.mock.tsx",

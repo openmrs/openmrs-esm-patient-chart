@@ -67,7 +67,7 @@
     "@openmrs/esm-error-handling": "^3.0.0",
     "@openmrs/esm-extensions": "^3.0.0",
     "@openmrs/esm-patient-chart-widgets": "^1.0.3",
-    "@openmrs/react-root-decorator": "^3.3.0",
+    "@openmrs/react-root-decorator": "^3.3.1",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^9.5.0",
     "@types/jest": "^25.2.3",

@@ -78,14 +78,14 @@ export default function ChartReview(props: any) {
           name: item.view,
           label: item.label,
           path: item.path,
-          component: view.component,
+          component: view.component
         };
       }
 
       return {
         name: item.view,
         label: item.label,
-        path: item.path,
+        path: item.path
       };
     });
 
