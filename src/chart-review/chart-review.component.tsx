@@ -10,7 +10,6 @@ import {
 } from "react-router-dom";
 import styles from "./chart-review.css";
 import { useConfig } from "@openmrs/esm-config";
-
 import { getView, View } from "../view-components/view-utils";
 import { VisitButton } from "@openmrs/esm-patient-chart-widgets";
 import {
@@ -31,7 +30,7 @@ export default function ChartReview(props: any) {
   const { t } = useTranslation();
 
   const { patientUuid, view: viewPath } = useParams<IParams>();
-  const config = useConfig<ChartConfig>();
+  const config: ChartConfig = useConfig();
 
   const defaultPath = `/patient/${patientUuid}/chart`;
   const [views, setViews] = React.useState<View[]>([]);
@@ -71,18 +70,29 @@ export default function ChartReview(props: any) {
   }
 
   React.useEffect(() => {
-    const views: View[] = config.primaryNavbar.map(item => {
+    const views = config.primaryNavbar.map<View>(item => {
       let view = getView(item.view, config, defaultPath + item.path);
+
       if (view && view.component) {
-        item.component = view.component;
+        return {
+          name: item.view,
+          label: item.label,
+          path: item.path,
+          component: view.component,
+        };
       }
-      return item;
+
+      return {
+        name: item.view,
+        label: item.label,
+        path: item.path,
+      };
     });
 
     // TO DO: Need to handle case where item.component is not a coreWidget
     setNavbarItems(config.primaryNavbar);
     setViews(views);
-  }, [config, setViews, defaultPath]);
+  }, [config, defaultPath]);
 
   React.useEffect(() => {
     setTabHistory(t => {
