@@ -1,4 +1,4 @@
-import { validators } from "@openmrs/esm-module-config";
+import { validators } from "@openmrs/esm-config";
 import {
   coreWidgetDefinitions,
   coreDashboardDefinitions,

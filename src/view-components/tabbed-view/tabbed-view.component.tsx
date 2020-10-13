@@ -3,7 +3,7 @@ import { Route, Link, Redirect, Switch, useRouteMatch } from "react-router-dom";
 
 import styles from "./tabbed-view.css";
 import { getView, View } from "../view-utils";
-import { useConfig } from "@openmrs/esm-module-config";
+import { useConfig } from "@openmrs/esm-config";
 
 export default function TabbedView(props: any) {
   const [views, setViews] = useState<View[]>([]);

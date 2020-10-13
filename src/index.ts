@@ -1,4 +1,3 @@
-import "./set-public-path";
 import { backendDependencies } from "./openmrs-backend-dependencies";
 
 const importTranslation = require.context(

@@ -54,5 +54,5 @@ export type View = {
   label?: string;
   path?: string;
   name: string;
-  component: Function | null;
+  component?: Function | null;
 };
