@@ -290,25 +290,6 @@ export const coreTabbedViewDefinitions = [
       }
     ]
   },
-
-  {
-    name: "ordersTabbedView",
-    title: "Orders",
-
-    navbar: [
-      {
-        label: "Overview",
-        path: "/overview",
-        view: "ordersOverviewDashboard"
-      },
-      {
-        label: "Medication Orders",
-        path: "/medication-orders",
-        view: "MedicationsSummary"
-      }
-    ]
-  },
-
   {
     name: "encountersTabbedView",
     title: "Encounters",

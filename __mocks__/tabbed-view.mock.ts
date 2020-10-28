@@ -2,7 +2,7 @@ export const mockedTabbedViewConfig = {
   primaryNavbar: [
     { label: "Summary", path: "/summary", view: "summaryDashboard" },
     { label: "Results", path: "/results", view: "resultsTabbedView" },
-    { label: "Orders", path: "/orders", view: "ordersTabbedView" },
+    { label: "Orders", path: "/orders", view: "MedicationsOverview" },
     { label: "Encounters", path: "/encounters", view: "encountersTabbedView" },
     { label: "Conditions", path: "/conditions", view: "conditionsDashboard" },
     { label: "Programs", path: "/programs", view: "programsDashboard" },
@@ -244,22 +244,6 @@ export const mockedTabbedViewConfig = {
           label: "Height and Weight",
           path: "/heightAndWeight",
           view: "HeightAndWeightSummary"
-        }
-      ]
-    },
-    {
-      name: "ordersTabbedView",
-      title: "Orders",
-      navbar: [
-        {
-          label: "Overview",
-          path: "/overview",
-          view: "ordersOverviewDashboard"
-        },
-        {
-          label: "Medication Orders",
-          path: "/medication-orders",
-          view: "MedicationsSummary"
         }
       ]
     },
