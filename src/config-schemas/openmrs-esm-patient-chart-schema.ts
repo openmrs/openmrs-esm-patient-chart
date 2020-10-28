@@ -31,7 +31,7 @@ export const esmPatientChartSchema = {
       {
         label: "Orders",
         path: "/orders",
-        view: "ordersTabbedView"
+        view: "MedicationsOverview"
       },
       {
         label: "Encounters",
