@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { BrowserRouter, Route } from "react-router-dom";
 import openmrsRootDecorator from "@openmrs/react-root-decorator";
 import { PatientBanner, VisitDialog } from "@openmrs/esm-patient-chart-widgets";
@@ -8,9 +8,32 @@ import styles from "./root.css";
 import { defineConfigSchema } from "@openmrs/esm-config";
 import { AppPropsContext } from "./app-props-context";
 import { esmPatientChartSchema } from "./config-schemas/openmrs-esm-patient-chart-schema";
+import {
+  useNavigationContext,
+  ExtensionSlotReact,
+  ExtensionSlotReactProps,
+  switchTo,
+  attach
+} from "@openmrs/esm-extensions";
+import ContextWorkspace from "./workspace/context-workspace.component";
 
 function Root(props) {
   defineConfigSchema("@openmrs/esm-patient-chart-app", esmPatientChartSchema);
+
+  const [
+    currentWorkspaceExtensionSlot,
+    setCurrentWorkspaceExtensionSlot
+  ] = useState<React.FC<ExtensionSlotReactProps>>();
+
+  useNavigationContext({
+    type: "workspace",
+    handler(link, state) {
+      setCurrentWorkspaceExtensionSlot(() => (
+        <ExtensionSlotReact extensionSlotName={link} state={state} />
+      ));
+      return true;
+    }
+  });
 
   return (
     <AppPropsContext.Provider value={{ appProps: props }}>
@@ -45,7 +68,34 @@ function Root(props) {
               />
             </div>
           </div>
+          <button
+            style={{
+              position: "fixed",
+              right: "20px",
+              bottom: "150px"
+            }}
+            onClick={() => {
+              const url = "/contexttest/123/fakebasket";
+
+              // TODO: This is a temporary hack!
+              // Without this, the extension slot doesn't render anything.
+              // Should prob. be changed in esm-core (inside the `getExtensionIdsForExtensionSlot` function).
+              //
+              // On that note:
+              // It's currently possible to attach the same extension <> extensionSlot pair multiple times.
+              // That could potentially be prohibited as well.
+              attach(url, "/contexttest/:patientUuid/fakebasket");
+
+              switchTo("workspace", url);
+            }}
+          >
+            Go to basket
+          </button>
         </main>
+        <ContextWorkspace
+          extensionSlot={currentWorkspaceExtensionSlot}
+          clearExtensionSlot={() => setCurrentWorkspaceExtensionSlot(undefined)}
+        />
       </BrowserRouter>
     </AppPropsContext.Provider>
   );
