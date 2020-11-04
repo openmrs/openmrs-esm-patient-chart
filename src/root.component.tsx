@@ -24,13 +24,15 @@ function Root(props) {
     currentWorkspaceExtensionSlot,
     setCurrentWorkspaceExtensionSlot
   ] = useState<React.FC<ExtensionSlotReactProps>>();
+  const [workspaceTitle, setWorkspaceTitle] = useState("");
 
   useNavigationContext({
     type: "workspace",
-    handler(link, state) {
+    handler: (link, state: { title?: string }) => {
       setCurrentWorkspaceExtensionSlot(() => (
         <ExtensionSlotReact extensionSlotName={link} state={state} />
       ));
+      setWorkspaceTitle(state.title ?? "");
       return true;
     }
   });
@@ -70,8 +72,12 @@ function Root(props) {
           </div>
         </main>
         <ContextWorkspace
+          title={workspaceTitle}
           extensionSlot={currentWorkspaceExtensionSlot}
-          clearExtensionSlot={() => setCurrentWorkspaceExtensionSlot(undefined)}
+          clearExtensionSlot={() => {
+            setCurrentWorkspaceExtensionSlot(undefined);
+            setWorkspaceTitle("");
+          }}
         />
       </BrowserRouter>
     </AppPropsContext.Provider>

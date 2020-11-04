@@ -11,11 +11,13 @@ import { ExtensionSlotReactProps } from "@openmrs/esm-extensions/src/extension-s
 import styles from "./context-workspace.css";
 
 export interface ContextWorkspaceProps {
+  title: string;
   extensionSlot?: React.FC<ExtensionSlotReactProps>;
   clearExtensionSlot: () => void;
 }
 
 export default function ContextWorkspace({
+  title,
   extensionSlot,
   clearExtensionSlot
 }: ContextWorkspaceProps) {
@@ -27,11 +29,7 @@ export default function ContextWorkspace({
         aria-label={t("orderBasket", "Order Basket")}
         style={{ position: "sticky" }}
       >
-        <HeaderName prefix="">
-          <>
-            {/* TODO: Here, the header string should be inserted. This ideally comes from the extension itself. */}
-          </>
-        </HeaderName>
+        <HeaderName prefix="">{title}</HeaderName>
         <HeaderGlobalBar>
           <HeaderGlobalAction
             aria-label={t("close", "Close")}
