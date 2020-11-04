@@ -68,29 +68,6 @@ function Root(props) {
               />
             </div>
           </div>
-          <button
-            style={{
-              position: "fixed",
-              right: "20px",
-              bottom: "150px"
-            }}
-            onClick={() => {
-              const url = "/contexttest/123/fakebasket";
-
-              // TODO: This is a temporary hack!
-              // Without this, the extension slot doesn't render anything.
-              // Should prob. be changed in esm-core (inside the `getExtensionIdsForExtensionSlot` function).
-              //
-              // On that note:
-              // It's currently possible to attach the same extension <> extensionSlot pair multiple times.
-              // That could potentially be prohibited as well.
-              attach(url, "/contexttest/:patientUuid/fakebasket");
-
-              switchTo("workspace", url);
-            }}
-          >
-            Go to basket
-          </button>
         </main>
         <ContextWorkspace
           extensionSlot={currentWorkspaceExtensionSlot}
