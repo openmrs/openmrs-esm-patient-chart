@@ -3,9 +3,11 @@ import React, { FunctionComponent, useContext } from "react";
 import { SingleSpaContext } from "single-spa-react";
 import { reportError } from "@openmrs/esm-error-handling";
 import { ExtensionSlotReact } from "@openmrs/esm-extensions";
+import { useCurrentPatient } from "@openmrs/esm-api";
 
 export default function Widget(props: WidgetProps) {
   const [component, setComponent] = React.useState<JSX.Element>(null);
+  const [, , patientUuid] = useCurrentPatient();
 
   const { mountParcel } = useContext(SingleSpaContext);
 
@@ -46,6 +48,7 @@ export default function Widget(props: WidgetProps) {
         setComponent(() => (
           <ExtensionSlotReact
             extensionSlotName={widgetConfig.extensionSlotName}
+            state={{ patientUuid }}
           />
         ));
       } else {

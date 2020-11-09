@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useState } from "react";
 import { BrowserRouter, Route } from "react-router-dom";
 import openmrsRootDecorator from "@openmrs/react-root-decorator";
 import { PatientBanner, VisitDialog } from "@openmrs/esm-patient-chart-widgets";
@@ -8,9 +8,37 @@ import styles from "./root.css";
 import { defineConfigSchema } from "@openmrs/esm-config";
 import { AppPropsContext } from "./app-props-context";
 import { esmPatientChartSchema } from "./config-schemas/openmrs-esm-patient-chart-schema";
+import {
+  useNavigationContext,
+  ExtensionSlotReact,
+  ExtensionSlotReactProps
+} from "@openmrs/esm-extensions";
+import ContextWorkspace from "./workspace/context-workspace.component";
 
 function Root(props) {
   defineConfigSchema("@openmrs/esm-patient-chart-app", esmPatientChartSchema);
+
+  const [
+    currentWorkspaceExtensionSlot,
+    setCurrentWorkspaceExtensionSlot
+  ] = useState<React.FC<ExtensionSlotReactProps>>();
+  const [workspaceTitle, setWorkspaceTitle] = useState("");
+
+  const clearCurrentWorkspaceContext = useCallback(() => {
+    setCurrentWorkspaceExtensionSlot(undefined);
+    setWorkspaceTitle("");
+  }, []);
+
+  useNavigationContext({
+    type: "workspace",
+    handler: (link, state: { title?: string }) => {
+      setCurrentWorkspaceExtensionSlot(() => (
+        <ExtensionSlotReact extensionSlotName={link} state={state} />
+      ));
+      setWorkspaceTitle(state.title ?? "");
+      return true;
+    }
+  });
 
   return (
     <AppPropsContext.Provider value={{ appProps: props }}>
@@ -46,6 +74,11 @@ function Root(props) {
             </div>
           </div>
         </main>
+        <ContextWorkspace
+          title={workspaceTitle}
+          extensionSlot={currentWorkspaceExtensionSlot}
+          clearExtensionSlot={clearCurrentWorkspaceContext}
+        />
       </BrowserRouter>
     </AppPropsContext.Provider>
   );
