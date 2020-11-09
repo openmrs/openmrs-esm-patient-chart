@@ -7,7 +7,8 @@
   "license": "MPL-2.0",
   "homepage": "https://github.com/openmrs/openmrs-esm-patient-chart#readme",
   "scripts": {
-    "start": "openmrs debug --importmap @",
+    "start": "openmrs debug --run-project",
+    "debug": "webpack-dev-server",
     "build": "webpack --mode production",
     "analyze": "webpack --mode=production --env.analyze=true",
     "lint": "eslint src --ext tsx",
