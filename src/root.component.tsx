@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { BrowserRouter, Route } from "react-router-dom";
 import openmrsRootDecorator from "@openmrs/react-root-decorator";
 import { PatientBanner, VisitDialog } from "@openmrs/esm-patient-chart-widgets";
@@ -23,6 +23,11 @@ function Root(props) {
     setCurrentWorkspaceExtensionSlot
   ] = useState<React.FC<ExtensionSlotReactProps>>();
   const [workspaceTitle, setWorkspaceTitle] = useState("");
+
+  const clearCurrentWorkspaceContext = useCallback(() => {
+    setCurrentWorkspaceExtensionSlot(undefined);
+    setWorkspaceTitle("");
+  }, []);
 
   useNavigationContext({
     type: "workspace",
@@ -72,10 +77,7 @@ function Root(props) {
         <ContextWorkspace
           title={workspaceTitle}
           extensionSlot={currentWorkspaceExtensionSlot}
-          clearExtensionSlot={() => {
-            setCurrentWorkspaceExtensionSlot(undefined);
-            setWorkspaceTitle("");
-          }}
+          clearExtensionSlot={clearCurrentWorkspaceContext}
         />
       </BrowserRouter>
     </AppPropsContext.Provider>
