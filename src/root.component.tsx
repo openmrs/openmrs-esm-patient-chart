@@ -33,7 +33,10 @@ function Root(props) {
     type: "workspace",
     handler: (link, state: { title?: string }) => {
       setCurrentWorkspaceExtensionSlot(() => (
-        <ExtensionSlotReact extensionSlotName={link} state={state} />
+        <ExtensionSlotReact
+          extensionSlotName={link}
+          state={{ closeWorkspace: clearCurrentWorkspaceContext, ...state }}
+        />
       ));
       setWorkspaceTitle(state.title ?? "");
       return true;
