@@ -11,9 +11,7 @@ import { esmPatientChartSchema } from "./config-schemas/openmrs-esm-patient-char
 import {
   useNavigationContext,
   ExtensionSlotReact,
-  ExtensionSlotReactProps,
-  switchTo,
-  attach
+  ExtensionSlotReactProps
 } from "@openmrs/esm-extensions";
 import ContextWorkspace from "./workspace/context-workspace.component";
 
