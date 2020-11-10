@@ -122,6 +122,12 @@ export const coreDashboardDefinitions: DashboardConfig[] = [
         basePath: "programs"
       },
       {
+        name: "AllergiesOverview",
+        esModule: "@openmrs/esm-patient-chart-widgets",
+        layout: { columnSpan: 2 },
+        basePath: "allergies"
+      },
+      {
         name: "NotesOverview",
         esModule: "@openmrs/esm-patient-chart-widgets",
         layout: { columnSpan: 4 },
@@ -144,12 +150,6 @@ export const coreDashboardDefinitions: DashboardConfig[] = [
         layout: { columnSpan: 3 },
         basePath: "orders/medication-orders",
         extensionSlotName: "patient-chart-dashboard-summary"
-      },
-      {
-        name: "AllergiesOverview",
-        esModule: "@openmrs/esm-patient-chart-widgets",
-        layout: { columnSpan: 1 },
-        basePath: "allergies"
       },
       {
         name: "AppointmentsOverview",
