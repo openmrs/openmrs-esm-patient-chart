@@ -60,7 +60,7 @@ export default function Widget(props: WidgetProps) {
       }
     };
     loadWidgetFromConfig(props.widgetConfig);
-  }, [props.widgetConfig, mountParcel]);
+  }, [patientUuid, props.widgetConfig, mountParcel]);
 
   return <>{component || <div>Loading</div>}</>;
 }
