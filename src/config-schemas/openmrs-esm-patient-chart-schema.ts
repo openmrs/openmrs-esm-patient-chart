@@ -1,4 +1,4 @@
-import { validators } from "@openmrs/esm-config";
+import { validators, Type } from "@openmrs/esm-config";
 import {
   coreWidgetDefinitions,
   coreDashboardDefinitions,
@@ -7,12 +7,13 @@ import {
 
 export const esmPatientChartSchema = {
   primaryNavbar: {
-    arrayElements: {
-      label: { validators: [validators.isString] },
-      path: { validators: [validators.isString] },
-      view: { validators: [validators.isString] }
+    _type: Type.Array,
+    _elements: {
+      label: { _type: Type.String },
+      path: { _type: Type.String },
+      view: { _type: Type.String }
     },
-    default: [
+    _default: [
       {
         label: "Summary",
         path: "/summary",
@@ -66,34 +67,37 @@ export const esmPatientChartSchema = {
     ]
   },
   widgetDefinitions: {
-    arrayElements: {
-      name: { validators: [validators.isString] },
-      esModule: { default: undefined, validators: [validators.isString] },
+    _type: Type.Array,
+    _elements: {
+      name: { _type: Type.String },
+      usesSingleSpaContext: { _type: Type.Boolean },
+      esModule: { _default: undefined, _type: Type.String },
       extensionSlotName: {
-        default: undefined,
-        validators: [validators.isString]
+        _default: undefined,
+        _type: Type.String
       },
-      usesSingleSpaContext: { validators: [validators.isBoolean] },
-      props: { default: {}, validators: [validators.isObject] },
-      config: { default: {}, validators: [validators.isObject] }
+      props: { _default: {}, _type: Type.Object },
+      config: { _default: {}, _type: Type.Object }
     },
-    default: coreWidgetDefinitions
+    _default: coreWidgetDefinitions
   },
 
   dashboardDefinitions: {
-    arrayElements: {
-      name: { validators: [validators.isString] },
-      title: { validators: [validators.isString] },
+    _type: Type.Array,
+    _elements: {
+      name: { _type: Type.String },
+      title: { _type: Type.String },
       layout: {
         columns: {}
       },
       widgets: {
-        arrayElements: {
-          name: { validators: [validators.isString] },
-          esModule: { validators: [validators.isString] },
-          usesSingleSpaContext: { validators: [validators.isBoolean] },
-          props: { default: {}, validators: [validators.isObject] },
-          config: { default: {}, validators: [validators.isObject] },
+        _type: Type.Array,
+        _elements: {
+          name: { _type: Type.String },
+          esModule: { _type: Type.String },
+          usesSingleSpaContext: { _type: Type.Boolean },
+          props: { _default: {}, _type: Type.Object },
+          config: { _default: {}, _type: Type.Object },
           layout: {
             rowSpan: {},
             columnSpan: {}
@@ -101,22 +105,24 @@ export const esmPatientChartSchema = {
         }
       }
     },
-    default: coreDashboardDefinitions
+    _default: coreDashboardDefinitions
   },
 
   tabbedViewDefinitions: {
-    arrayElements: {
-      name: { validators: [validators.isString] },
-      title: { validators: [validators.isString] },
+    _type: Type.Array,
+    _elements: {
+      name: { _type: Type.String },
+      title: { _type: Type.String },
       navbar: {
-        arrayElements: {
-          label: { validators: [validators.isString] },
-          path: { validators: [validators.isString] },
-          view: { validators: [validators.isString] }
+        _type: Type.Array,
+        _elements: {
+          label: { _type: Type.String },
+          path: { _type: Type.String },
+          view: { _type: Type.String }
         }
       }
     },
-    default: coreTabbedViewDefinitions
+    _default: coreTabbedViewDefinitions
   }
 };
 
