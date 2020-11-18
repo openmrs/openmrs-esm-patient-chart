@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { BrowserRouter, Route } from "react-router-dom";
-import openmrsRootDecorator from "@openmrs/react-root-decorator";
+import { openmrsRootDecorator } from "@openmrs/esm-context";
 import { PatientBanner, VisitDialog } from "@openmrs/esm-patient-chart-widgets";
 import WorkspaceWrapper from "./workspace/workspace-wrapper.component";
 import ChartReview from "./chart-review/chart-review.component";
