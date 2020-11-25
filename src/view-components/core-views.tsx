@@ -33,22 +33,22 @@ export const coreWidgetDefinitions: WidgetConfig[] = [
 
   {
     name: "HeightAndWeightOverview",
-    esModule: "@openmrs/esm-patient-chart-widgets"
+    extensionSlotName: "patient-chart-vitals"
   },
 
   {
     name: "HeightAndWeightSummary",
-    esModule: "@openmrs/esm-patient-chart-widgets"
+    extensionSlotName: "biometric-widget"
   },
 
   {
     name: "VitalsOverview",
-    esModule: "@openmrs/esm-patient-chart-widgets"
+    extensionSlotName: "vitals-widget"
   },
 
   {
     name: "VitalsSummary",
-    esModule: "@openmrs/esm-patient-chart-widgets"
+    extensionSlotName: "vitals-widget"
   },
 
   {
@@ -135,13 +135,13 @@ export const coreDashboardDefinitions: DashboardConfig[] = [
       },
       {
         name: "VitalsOverview",
-        esModule: "@openmrs/esm-patient-chart-widgets",
+        extensionSlotName: "vitals-widget",
         layout: { columnSpan: 2 },
         basePath: "results/vitals"
       },
       {
         name: "HeightAndWeightOverview",
-        esModule: "@openmrs/esm-patient-chart-widgets",
+        extensionSlotName: "biometric-widget",
         layout: { columnSpan: 2 },
         basePath: "results/heightAndWeight"
       },
@@ -166,13 +166,13 @@ export const coreDashboardDefinitions: DashboardConfig[] = [
     widgets: [
       {
         name: "VitalsOverview",
-        esModule: "@openmrs/esm-patient-chart-widgets",
-        basePath: "results/vitals"
+        basePath: "results/vitals",
+        extensionSlotName: "vitals-widget"
       },
       {
         name: "HeightAndWeightOverview",
-        esModule: "@openmrs/esm-patient-chart-widgets",
-        basePath: "results/heightAndWeight"
+        basePath: "results/heightAndWeight",
+        extensionSlotName: "biometric-widget"
       }
     ]
   },
@@ -274,17 +274,12 @@ export const coreTabbedViewDefinitions = [
 
     navbar: [
       {
-        label: "Overview",
-        path: "/overview",
-        view: "resultsOverviewDashboard"
-      },
-      {
         label: "Vitals",
         path: "/vitals",
         view: "VitalsSummary"
       },
       {
-        label: "Height and Weight",
+        label: "Biometrics",
         path: "/heightAndWeight",
         view: "HeightAndWeightSummary"
       }
