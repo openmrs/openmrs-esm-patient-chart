@@ -1,4 +1,4 @@
-import { validators, Type } from "@openmrs/esm-config";
+import { Type } from "@openmrs/esm-config";
 import {
   coreWidgetDefinitions,
   coreDashboardDefinitions,
@@ -126,7 +126,7 @@ export const esmPatientChartSchema = {
   }
 };
 
-export type ChartConfig = {
+export interface ChartConfig {
   primaryNavbar: Array<Navbar>;
   widgetDefinitions: Array<{
     name: string;
@@ -156,6 +156,10 @@ export type ChartConfig = {
     title: string;
     navbar: Navbar;
   }>;
-};
+}
 
-export type Navbar = { label: string; path: string; view: string };
+export interface Navbar {
+  label: string;
+  path: string;
+  view: string;
+}

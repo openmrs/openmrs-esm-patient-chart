@@ -1,14 +1,10 @@
-import React, { FunctionComponent, useContext } from "react";
-//@ts-ignore The present types for single-spa-react are not updated yet for 2.9 which has SingleSpaContext
-import { SingleSpaContext } from "single-spa-react";
+import React, { FunctionComponent } from "react";
 import { reportError } from "@openmrs/esm-error-handling";
 import { ExtensionSlot, useCurrentPatient } from "@openmrs/esm-react-utils";
 
 export default function Widget(props: WidgetProps) {
   const [component, setComponent] = React.useState<JSX.Element>(null);
   const [, , patientUuid] = useCurrentPatient();
-
-  const { mountParcel } = useContext(SingleSpaContext);
 
   React.useEffect(() => {
     //This function is moved inside of the effect to avoid change on every render
@@ -20,12 +16,11 @@ export default function Widget(props: WidgetProps) {
             if (module[widgetConfig.name]) {
               Component = module[widgetConfig.name];
               const widgetProps = { ...props.widgetConfig.props };
+
               if (props.widgetConfig.config) {
                 widgetProps["config"] = props.widgetConfig.config;
               }
-              if (props.widgetConfig.usesSingleSpaContext) {
-                widgetProps["mountParcel"] = mountParcel;
-              }
+
               setComponent(() => (
                 <Component
                   props={widgetProps}
@@ -59,7 +54,7 @@ export default function Widget(props: WidgetProps) {
       }
     };
     loadWidgetFromConfig(props.widgetConfig);
-  }, [patientUuid, props.widgetConfig, mountParcel]);
+  }, [patientUuid, props.widgetConfig]);
 
   return <>{component || <div>Loading</div>}</>;
 }

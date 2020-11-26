@@ -173,6 +173,7 @@ export default function ChartReview(props: any) {
     }
   };
   checkForOverflow();
+
   return (
     <>
       <div className={styles.navContainer}>
