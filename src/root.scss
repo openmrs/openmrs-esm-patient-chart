@@ -1,0 +1,21 @@
+$feature-flags: (
+  grid-columns-16: true
+);
+
+@import "carbon-components/scss/globals/scss/typography.scss";
+
+.landingPage {
+  background-color: $ui-01;
+  margin: 3rem 0 0;
+  width: 100% !important;
+}
+
+// override default column padding
+.bx--col {
+  padding: 0;
+}
+
+.heading {
+  @include carbon--type-style("productive-heading-03");
+  margin: 1rem 0;
+}
