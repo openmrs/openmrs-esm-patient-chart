@@ -41,8 +41,9 @@
     "url": "https://github.com/openmrs/openmrs-esm-patient-chart/issues"
   },
   "dependencies": {
-    "@carbon/icons-react": "^10.18.0",
-    "carbon-components-react": "^7.19.0",
+    "@carbon/icons-react": "^10.21.0",
+    "carbon-components": "^10.24.0",
+    "carbon-components-react": "^7.24.0",
     "dayjs": "^1.8.36",
     "lodash-es": "^4.17.15",
     "systemjs-webpack-interop": "^1.2.1"
@@ -113,6 +114,8 @@
     "react-i18next": "^11.7.2",
     "react-router-dom": "^5.2.0",
     "rxjs": "^6.6.3",
+    "sass": "^1.29.0",
+    "sass-loader": "^10.1.0",
     "style-loader": "^1.2.1",
     "typescript": "^4.0.3",
     "webpack": "^4.44.2",

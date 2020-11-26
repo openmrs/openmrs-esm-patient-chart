@@ -5,64 +5,66 @@ const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
 
 const { peerDependencies } = require("./package.json");
 
-module.exports = (env) => ({
+const cssLoader = {
+  loader: "css-loader",
+  options: {
+    modules: {
+      localIdentName: "esm-patient-chart__[name]__[local]___[hash:base64:5]"
+    }
+  }
+};
+
+module.exports = env => ({
   entry: [
     path.resolve(__dirname, "src/set-public-path.ts"),
-    path.resolve(__dirname, "src/index.ts"),
+    path.resolve(__dirname, "src/index.ts")
   ],
   output: {
     filename: "openmrs-esm-patient-chart.js",
     libraryTarget: "system",
     path: path.resolve(__dirname, "dist"),
-    jsonpFunction: "webpackJsonp_openmrs_esm_patient_chart",
+    jsonpFunction: "webpackJsonp_openmrs_esm_patient_chart"
   },
   module: {
     rules: [
       {
         parser: {
-          system: false,
-        },
+          system: false
+        }
       },
       {
         test: /\.m?(js|ts|tsx)$/,
         exclude: /(node_modules|bower_components)/,
         use: {
-          loader: "babel-loader",
-        },
+          loader: "babel-loader"
+        }
       },
       {
         test: /\.css$/,
-        use: [
-          { loader: "style-loader" },
-          {
-            loader: "css-loader",
-            options: {
-              modules: {
-                localIdentName:
-                  "esm-patient-chart__[name]__[local]___[hash:base64:5]",
-              },
-            },
-          },
-        ],
+        use: ["style-loader", cssLoader]
       },
-    ],
+      {
+        test: /\.s[ac]ss$/i,
+        use: ["style-loader", cssLoader, "sass-loader"]
+      }
+    ]
   },
   devtool: "sourcemap",
   devServer: {
     headers: {
-      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Origin": "*"
     },
-    disableHostCheck: true,
+    disableHostCheck: true
   },
   externals: Object.keys(peerDependencies),
   plugins: [
     new ForkTsCheckerWebpackPlugin(),
     new CleanWebpackPlugin(),
     new BundleAnalyzerPlugin({
-      analyzerMode: env && env.analyze ? "server" : "disabled",
-    }),
+      analyzerMode: env && env.analyze ? "server" : "disabled"
+    })
   ],
   resolve: {
-    extensions: [".tsx", ".ts", ".jsx", ".js"],
-  },
+    extensions: [".tsx", ".ts", ".jsx", ".js"]
+  }
 });
