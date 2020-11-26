@@ -1,6 +1,5 @@
 import React, { useCallback, useState } from "react";
 import { BrowserRouter, Route } from "react-router-dom";
-import { openmrsRootDecorator } from "@openmrs/esm-context";
 import { PatientBanner, VisitDialog } from "@openmrs/esm-patient-chart-widgets";
 import WorkspaceWrapper from "./workspace/workspace-wrapper.component";
 import ChartReview from "./chart-review/chart-review.component";
@@ -10,18 +9,18 @@ import { AppPropsContext } from "./app-props-context";
 import { esmPatientChartSchema } from "./config-schemas/openmrs-esm-patient-chart-schema";
 import {
   useNavigationContext,
-  ExtensionSlotReact,
-  ExtensionSlotReactProps
-} from "@openmrs/esm-extensions";
+  ExtensionSlot,
+  ExtensionSlotProps
+} from "@openmrs/esm-react-utils";
 import ContextWorkspace from "./workspace/context-workspace.component";
 
-function Root(props) {
+export default function Root(props) {
   defineConfigSchema("@openmrs/esm-patient-chart-app", esmPatientChartSchema);
 
   const [
     currentWorkspaceExtensionSlot,
     setCurrentWorkspaceExtensionSlot
-  ] = useState<React.FC<ExtensionSlotReactProps>>();
+  ] = useState<React.FC<ExtensionSlotProps>>();
   const [workspaceTitle, setWorkspaceTitle] = useState("");
 
   const clearCurrentWorkspaceContext = useCallback(() => {
@@ -33,7 +32,7 @@ function Root(props) {
     type: "workspace",
     handler: (link, state: { title?: string }) => {
       setCurrentWorkspaceExtensionSlot(() => (
-        <ExtensionSlotReact
+        <ExtensionSlot
           extensionSlotName={link}
           state={{ closeWorkspace: clearCurrentWorkspaceContext, ...state }}
         />
@@ -86,8 +85,3 @@ function Root(props) {
     </AppPropsContext.Provider>
   );
 }
-
-export default openmrsRootDecorator({
-  featureName: "patient-chart",
-  moduleName: "@openmrs/esm-patient-chart-app"
-})(Root);

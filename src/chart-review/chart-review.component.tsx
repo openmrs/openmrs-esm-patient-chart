@@ -8,15 +8,15 @@ import {
   Route,
   Redirect
 } from "react-router-dom";
-import styles from "./chart-review.css";
-import { useConfig } from "@openmrs/esm-config";
-import { getView, View } from "../view-components/view-utils";
+import { useConfig } from "@openmrs/esm-react-utils";
 import { VisitButton } from "@openmrs/esm-patient-chart-widgets";
+import { useTranslation } from "react-i18next";
+import styles from "./chart-review.css";
+import { getView, View } from "../view-components/view-utils";
 import {
   ChartConfig,
   Navbar
 } from "../config-schemas/openmrs-esm-patient-chart-schema";
-import { useTranslation } from "react-i18next";
 
 interface IParams {
   patientUuid: string;

@@ -7,12 +7,12 @@ import {
   HeaderName
 } from "carbon-components-react";
 import { Close32 } from "@carbon/icons-react";
-import { ExtensionSlotReactProps } from "@openmrs/esm-extensions/src/extension-slot-react.component";
+import { ExtensionSlotProps } from "@openmrs/esm-react-utils";
 import styles from "./context-workspace.css";
 
 export interface ContextWorkspaceProps {
   title: string;
-  extensionSlot?: React.FC<ExtensionSlotReactProps>;
+  extensionSlot?: React.FC<ExtensionSlotProps>;
   clearExtensionSlot: () => void;
 }
 

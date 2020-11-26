@@ -1,16 +1,8 @@
 import React from "react";
 import { BrowserRouter, match, useRouteMatch } from "react-router-dom";
 import TabbedView from "./tabbed-view.component";
-import {
-  render,
-  screen,
-  getByText,
-  fireEvent,
-  wait,
-  findAllByRole,
-  getAllByRole
-} from "@testing-library/react";
-import { useConfig } from "@openmrs/esm-config";
+import { render, screen, fireEvent } from "@testing-library/react";
+import { useConfig } from "@openmrs/esm-react-utils";
 import {
   mockedTabbedViewConfig,
   mockConfig,
@@ -27,10 +19,6 @@ const mockMatch: match = {
   path: "/patient/0b1b7481-704b-440f-a50f-3b7d0abac8c1/chart/results/:subview?",
   url: "/patient/0b1b7481-704b-440f-a50f-3b7d0abac8c1/chart/results/overview"
 };
-
-jest.mock("@openmrs/esm-config", () => ({
-  useConfig: jest.fn()
-}));
 
 jest.mock("react-router-dom", () => ({
   ...jest.requireActual("react-router-dom"),

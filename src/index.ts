@@ -1,3 +1,4 @@
+import { getAsyncLifecycle } from "@openmrs/esm-react-utils";
 import { backendDependencies } from "./openmrs-backend-dependencies";
 
 const importTranslation = require.context(
@@ -9,7 +10,10 @@ const importTranslation = require.context(
 
 function setupOpenMRS() {
   return {
-    lifecycle: () => import("./openmrs-esm-patient-chart"),
+    lifecycle: getAsyncLifecycle(() => import("./root.component"), {
+      featureName: "patient-chart",
+      moduleName: "@openmrs/esm-patient-chart-app"
+    }),
     activate: /^patient\/.+\/chart/
   };
 }

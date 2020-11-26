@@ -2,8 +2,7 @@ import React, { FunctionComponent, useContext } from "react";
 //@ts-ignore The present types for single-spa-react are not updated yet for 2.9 which has SingleSpaContext
 import { SingleSpaContext } from "single-spa-react";
 import { reportError } from "@openmrs/esm-error-handling";
-import { ExtensionSlotReact } from "@openmrs/esm-extensions";
-import { useCurrentPatient } from "@openmrs/esm-api";
+import { ExtensionSlot, useCurrentPatient } from "@openmrs/esm-react-utils";
 
 export default function Widget(props: WidgetProps) {
   const [component, setComponent] = React.useState<JSX.Element>(null);
@@ -46,7 +45,7 @@ export default function Widget(props: WidgetProps) {
           });
       } else if (widgetConfig.extensionSlotName) {
         setComponent(() => (
-          <ExtensionSlotReact
+          <ExtensionSlot
             extensionSlotName={widgetConfig.extensionSlotName}
             state={{ patientUuid }}
           />
