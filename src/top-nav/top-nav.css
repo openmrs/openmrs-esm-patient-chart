@@ -1,25 +1,13 @@
 .topnav {
   display: flex;
-  position: absolute;
+  flex-flow: row nowrap;
   top: 0;
-  display: flex;
-  flex-direction: row;
+  height: 3rem;
   align-items: left;
-  justify-content: flex-start;
-}
-
-.topnav {
-  display: flex;
-  flex-direction: row;
-  align-items: left;
-  justify-content: space-between;
   width: 100%;
   background-color: var(--omrs-color-bg-lowest-contrast);
-  height: 3rem;
-  flex-wrap: nowrap;
   overflow-x: scroll;
   -webkit-overflow-scrolling: touch;
-  margin-top: 0;
   scrollbar-width: none;
 }
 
@@ -64,24 +52,4 @@
 
 .topnav a {
   color: inherit;
-}
-
-.chartSection {
-  margin-top: 3.25rem;
-}
-
-.leftHeaderPagination,
-.rightHeaderPagination {
-  padding: 0 6px;
-  background-color: white;
-  cursor: pointer;
-  border: 0;
-}
-
-.leftHeaderPagination {
-  border-right: 1px solid grey !important;
-}
-
-.rightHeaderPagination {
-  border-left: 1px solid grey !important;
 }
