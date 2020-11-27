@@ -9,6 +9,7 @@ import { AppPropsContext } from "./app-props-context";
 import { esmPatientChartSchema } from "./config-schemas/openmrs-esm-patient-chart-schema";
 import {
   useNavigationContext,
+  Extension,
   ExtensionSlot,
   ExtensionSlotProps
 } from "@openmrs/esm-react-utils";
@@ -53,12 +54,14 @@ export default function Root(props) {
             flexDirection: "column"
           }}
         >
-          <aside className={styles.patientBanner}>
+          <aside className={styles.patientBanner} style={{ width: "100%" }}>
             <Route path="/patient/:patientUuid/chart">
-              <PatientBanner match={props.match} />
+              <ExtensionSlot extensionSlotName="patient-banner">
+                <Extension />
+              </ExtensionSlot>
             </Route>
           </aside>
-          <div className={styles.grid}>
+          <div className={styles.grid} style={{ marginTop: "4.9rem" }}>
             <div className={styles.chartreview}>
               <Route path="/patient/:patientUuid/chart/:view?/:subview?">
                 <ChartReview />
