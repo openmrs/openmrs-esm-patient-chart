@@ -1,7 +1,7 @@
 import React from "react";
 
 import { Link, useParams, useRouteMatch, useLocation } from "react-router-dom";
-import { useConfig } from "@openmrs/esm-config";
+import { useConfig } from "@openmrs/esm-react-utils";
 import { VisitButton } from "@openmrs/esm-patient-chart-widgets";
 
 import {

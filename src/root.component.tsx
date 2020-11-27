@@ -1,10 +1,10 @@
 import React from "react";
 
 import { BrowserRouter, Route } from "react-router-dom";
-";
 
 import {
   useNavigationContext,
+  Extension,
   ExtensionSlot,
   ExtensionSlotProps
 } from "@openmrs/esm-react-utils";
@@ -55,7 +55,9 @@ export default function Root(props) {
             <div className="bx--row">
               <aside className="bx--col">
                 <Route path="/patient/:patientUuid/chart">
-                  <PatientBanner match={props.match} />
+                  <ExtensionSlot extensionSlotName="patient-banner">
+                    <Extension />
+                  </ExtensionSlot>
                 </Route>
               </aside>
             </div>
