@@ -4,9 +4,7 @@ import { PatientBanner, VisitDialog } from "@openmrs/esm-patient-chart-widgets";
 import WorkspaceWrapper from "./workspace/workspace-wrapper.component";
 import ChartReview from "./chart-review/chart-review.component";
 import styles from "./root.css";
-import { defineConfigSchema } from "@openmrs/esm-config";
 import { AppPropsContext } from "./app-props-context";
-import { esmPatientChartSchema } from "./config-schemas/openmrs-esm-patient-chart-schema";
 import {
   useNavigationContext,
   ExtensionSlot,
@@ -15,8 +13,6 @@ import {
 import ContextWorkspace from "./workspace/context-workspace.component";
 
 export default function Root(props) {
-  defineConfigSchema("@openmrs/esm-patient-chart-app", esmPatientChartSchema);
-
   const [
     currentWorkspaceExtensionSlot,
     setCurrentWorkspaceExtensionSlot
