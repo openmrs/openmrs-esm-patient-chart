@@ -22,7 +22,13 @@ function setupOpenMRS() {
 
   return {
     lifecycle: getAsyncLifecycle(() => import("./root.component"), options),
-    activate: /^patient\/.+\/chart/
+    activate: /^patient\/.+\/chart/,
+    extensions: [
+      {
+        id: "patient-chart-nav-items",
+        load: getAsyncLifecycle(() => import("./nav.component"), options)
+      }
+    ]
   };
 }
 
