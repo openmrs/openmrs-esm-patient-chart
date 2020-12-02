@@ -2,17 +2,18 @@ import React, { useCallback, useEffect, useState } from "react";
 import { BrowserRouter, Route } from "react-router-dom";
 import { VisitDialog } from "@openmrs/esm-patient-chart-widgets";
 import { attach, detach } from "@openmrs/esm-extensions";
-import WorkspaceWrapper from "./workspace/workspace-wrapper.component";
-import ChartReview from "./chart-review/chart-review.component";
-import styles from "./root.css";
-import { AppPropsContext } from "./app-props-context";
 import {
   useNavigationContext,
   Extension,
   ExtensionSlot,
   ExtensionSlotProps
 } from "@openmrs/esm-react-utils";
+import WorkspaceWrapper from "./workspace/workspace-wrapper.component";
+import ChartReview from "./chart-review/chart-review.component";
+import styles from "./root.css";
+import { AppPropsContext } from "./app-props-context";
 import ContextWorkspace from "./workspace/context-workspace.component";
+import { basePath } from "./constants";
 
 export default function Root(props) {
   const [
@@ -57,7 +58,7 @@ export default function Root(props) {
           }}
         >
           <aside className={styles.patientBanner} style={{ width: "100%" }}>
-            <Route path="/patient/:patientUuid/chart">
+            <Route path={basePath}>
               <ExtensionSlot extensionSlotName="patient-banner">
                 <Extension />
               </ExtensionSlot>
@@ -65,17 +66,17 @@ export default function Root(props) {
           </aside>
           <div className={styles.grid} style={{ marginTop: "4.9rem" }}>
             <div className={styles.chartreview}>
-              <Route path="/patient/:patientUuid/chart/:view?/:subview?">
+              <Route path={`${basePath}/:view?/:subview?`}>
                 <ChartReview />
               </Route>
               <Route
-                path="/patient/:patientUuid/chart"
+                path={basePath}
                 render={routeProps => <VisitDialog {...routeProps} />}
               />
             </div>
             <div className={styles.workspace}>
               <Route
-                path="/patient/:patientUuid/chart"
+                path={basePath}
                 render={routeProps => <WorkspaceWrapper {...routeProps} />}
               />
             </div>
