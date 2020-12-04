@@ -2,7 +2,7 @@
   "name": "@openmrs/esm-patient-chart-app",
   "version": "0.2.0",
   "description": "Patient dashboard microfrontend for the OpenMRS SPA",
-  "main": "dist/openmrs-esm-patient-chart.js",
+  "main": "dist/openmrs-esm-patient-chart-app.js",
   "types": "src/index.ts",
   "license": "MPL-2.0",
   "homepage": "https://github.com/openmrs/openmrs-esm-patient-chart#readme",
