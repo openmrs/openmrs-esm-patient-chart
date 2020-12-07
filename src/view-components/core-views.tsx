@@ -38,7 +38,7 @@ export const coreWidgetDefinitions: WidgetConfig[] = [
 
   {
     name: "HeightAndWeightSummary",
-    extensionSlotName: "biometric-widget"
+    extensionSlotName: "biometrics-widget"
   },
 
   {
@@ -141,7 +141,7 @@ export const coreDashboardDefinitions: DashboardConfig[] = [
       },
       {
         name: "HeightAndWeightOverview",
-        extensionSlotName: "biometric-widget",
+        extensionSlotName: "biometrics-widget",
         layout: { columnSpan: 2 },
         basePath: "results/heightAndWeight"
       },
@@ -172,7 +172,7 @@ export const coreDashboardDefinitions: DashboardConfig[] = [
       {
         name: "HeightAndWeightOverview",
         basePath: "results/heightAndWeight",
-        extensionSlotName: "biometric-widget"
+        extensionSlotName: "biometrics-widget"
       }
     ]
   },
