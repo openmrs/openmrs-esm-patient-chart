@@ -79,6 +79,8 @@
   "enrolledOn": "Enrolled on",
   "enrollmentLocation": "Enrollment location",
   "environmental": "Environmental",
+  "error": "Error",
+  "errorCopy": "Sorry, there was a problem displaying this information. You can try to reload this page, or contact the site administrator and quote the error code above.",
   "expirationDate": "Expiration Date",
   "fahrenheit": "Fahrenheit",
   "family": "Family",
