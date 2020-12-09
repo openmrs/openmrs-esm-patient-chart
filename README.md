@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/openmrs/openmrs-esm-patient-chart.svg?branch=master)](https://travis-ci.org/openmrs/openmrs-esm-patient-chart)
+![Node.js CI](https://github.com/openmrs/openmrs-esm-patient-chart/workflows/Node.js%20CI/badge.svg)
 
 # OpenMRS ESM Patient Chart
 
@@ -23,20 +23,11 @@ npm install
 npm run build
 ```
 
-Serve the built `dist/openmrs-esm-patient-chart.js` and configure it in your SPA Module's root config.
+Serve the built `dist/openmrs-esm-patient-chart-app.js` and configure it in your SPA Module's root config.
 
 Then, have a look at the
 [Frontend Implementer Documentation](https://wiki.openmrs.org/display/projects/Frontend+Implementer+Documentation)
 for installing microfrontends for the SPA Module.
-
-## How do I use this?
-
-openmrs-esm-patient-chart is registered as a
-[core application](https://github.com/openmrs/openmrs-esm-root-config/blob/master/src/single-spa-applications/core-applications.js)
-inside of openmrs-esm-root-config. This means that it will automatically
-activate whenever you are on one of the frontend routes that it controls.
-The openmrs-esm-patient-chart module serves the route
-`<spa root>/patient/:uuid/chart`.
 
 ## What is the layout of patient chart?
 
