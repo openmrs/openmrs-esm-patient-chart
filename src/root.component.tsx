@@ -64,7 +64,7 @@ export default function Root(props) {
               </ExtensionSlot>
             </Route>
           </aside>
-          <div className={styles.grid} style={{ marginTop: "4.9rem" }}>
+          <div className={styles.grid} style={{ marginTop: "4.5rem" }}>
             <div className={styles.chartreview}>
               <Route path={`${basePath}/:view?/:subview?`}>
                 <ChartReview />
