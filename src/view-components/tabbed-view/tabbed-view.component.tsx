@@ -4,40 +4,45 @@ import { useConfig } from "@openmrs/esm-react-utils";
 import styles from "./tabbed-view.css";
 import { getView, View } from "../view-utils";
 
+function getInitialTab(url: string, props: any) {
+  const navItemIndex = getNavItemIndex(url, props);
+  return navItemIndex === -1 ? 0 : navItemIndex;
+}
+
+function getNavItemIndex(url: string, props: any) {
+  const viewPath = url.substr(url.lastIndexOf("/"));
+  const navItemIndex = props.config.navbar.findIndex(
+    element => element.path === viewPath
+  );
+  return navItemIndex;
+}
+
 export default function TabbedView(props: any) {
-  const [views, setViews] = useState<View[]>([]);
+  const [views, setViews] = useState<Array<View>>([]);
   const match = useRouteMatch();
   const config = useConfig();
-
-  const [selected, setSelected] = React.useState(getInitialTab());
-
-  function getInitialTab() {
-    const navItemIndex = getNavItemIndex();
-    return navItemIndex === -1 ? 0 : navItemIndex;
-  }
-
-  function getNavItemIndex() {
-    const viewPath = match.url.substr(match.url.lastIndexOf("/"));
-    const navItemIndex = props.config.navbar.findIndex(
-      element => element.path === viewPath
-    );
-    return navItemIndex;
-  }
+  const [selected, setSelected] = React.useState(() =>
+    getInitialTab(match.url, props)
+  );
 
   React.useEffect(() => {
-    if (getNavItemIndex() === -1) setSelected(0);
-    setSelected(getNavItemIndex());
+    setSelected(getInitialTab(match.url, props));
   }, [match.url]);
 
   React.useEffect(() => {
     setViews(
       props.config.navbar.map(item => {
-        let view = getView(item.view, config, props.defaultPath);
-        if (view && view.component) item.component = view.component;
+        const view = getView(item.view, config, props.defaultPath);
+
+        if (view && view.component) {
+          item.component = view.component;
+        }
+
         return item;
       })
     );
   }, [config, props.config, props.defaultPath]);
+
   return (
     <>
       <nav className={styles.summariesnav} style={{ marginTop: "0" }}>
@@ -66,9 +71,11 @@ export default function TabbedView(props: any) {
       </nav>
       <div className={styles.routesContainer}>
         {views.length > 0 && (
-          <Route exact path={props.defaultPath}>
-            <Redirect to={props.defaultPath + views[0].path} />
-          </Route>
+          <Redirect
+            exact
+            from={props.defaultPath}
+            to={props.defaultPath + views[0].path}
+          />
         )}
 
         <Switch>

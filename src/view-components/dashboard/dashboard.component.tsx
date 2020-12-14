@@ -1,10 +1,39 @@
 import React from "react";
+import { ExtensionSlot } from "@openmrs/esm-react-utils";
 import styles from "./dashboard.css";
 import Widget, { WidgetConfig } from "../widget/widget.component";
-import { ExtensionSlot } from "@openmrs/esm-react-utils";
+import { useUrlData } from "../../useUrlData";
+
+function getColumnsLayoutStyle(props: DashboardProps) {
+  const numberOfColumns = props.dashboardConfig?.layout?.columns ?? 2;
+  return "1fr ".repeat(numberOfColumns).trimRight();
+}
+
+function sanitize(name: string) {
+  return name.toLowerCase().replace(/\s/, "-");
+}
+
+export interface DashboardProps {
+  dashboardConfig: DashboardConfig;
+}
+
+export interface DashboardConfig {
+  name: string;
+  title?: string;
+  layout?: {
+    columns: number;
+  };
+  widgets: Array<WidgetConfig>;
+}
+
+interface RouteParams {
+  patientUuid: string;
+}
 
 export default function Dashboard(props: DashboardProps) {
-  const [widgets, setWidgets] = React.useState<JSX.Element[]>([]);
+  const [widgets, setWidgets] = React.useState<Array<JSX.Element>>([]);
+  const urlData = useUrlData();
+  const dashboardName = sanitize(props.dashboardConfig.name);
 
   React.useEffect(() => {
     setWidgets(
@@ -14,34 +43,20 @@ export default function Dashboard(props: DashboardProps) {
     );
   }, [props.dashboardConfig]);
 
-  function getColumnsLayoutStyle(): string {
-    const numberOfColumns =
-      props.dashboardConfig &&
-      props.dashboardConfig.layout &&
-      props.dashboardConfig.layout.columns
-        ? props.dashboardConfig.layout.columns
-        : 2;
-
-    return String("1fr ")
-      .repeat(numberOfColumns)
-      .trimRight();
-  }
-
   return (
     <>
       <div className={styles.container}>
         <div className={styles.dashboard} style={{ gridTemplateColumns: 1 }}>
           <ExtensionSlot
-            extensionSlotName={`patient-chart-${sanitize(
-              props.dashboardConfig.name
-            )}`}
+            extensionSlotName={`patient-chart-${dashboardName}`}
+            state={urlData}
           />
         </div>
       </div>
       <div className={styles.container}>
         <div
           className={styles.dashboard}
-          style={{ gridTemplateColumns: getColumnsLayoutStyle() || 2 }}
+          style={{ gridTemplateColumns: getColumnsLayoutStyle(props) || 2 }}
         >
           {widgets.map((widget, index) => {
             const widgetConfig = props.dashboardConfig.widgets[index];
@@ -67,20 +82,3 @@ export default function Dashboard(props: DashboardProps) {
     </>
   );
 }
-
-function sanitize(name: string) {
-  return name.toLowerCase().replace(/\s/, "-");
-}
-
-export type DashboardProps = {
-  dashboardConfig: DashboardConfig;
-};
-
-export type DashboardConfig = {
-  name: string;
-  title?: string;
-  layout?: {
-    columns: number;
-  };
-  widgets: WidgetConfig[];
-};

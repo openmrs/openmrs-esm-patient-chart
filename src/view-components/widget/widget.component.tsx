@@ -1,15 +1,40 @@
 import React, { FunctionComponent } from "react";
 import { reportError } from "@openmrs/esm-error-handling";
-import { ExtensionSlot, useCurrentPatient } from "@openmrs/esm-react-utils";
+import { ExtensionSlot } from "@openmrs/esm-react-utils";
+import { useUrlData } from "../../useUrlData";
+
+export interface WidgetProps {
+  widgetConfig: WidgetConfig;
+}
+
+export interface WidgetConfig {
+  name: string;
+  esModule?: string;
+  extensionSlotName?: string;
+  usesSingleSpaContext?: boolean;
+  layout?: {
+    rowSpan?: number;
+    columnSpan?: number;
+  };
+  props?: object;
+  config?: object;
+  basePath?: string;
+}
+
+interface ComponentProps {
+  props: any;
+  basePath?: string;
+}
 
 export default function Widget(props: WidgetProps) {
   const [component, setComponent] = React.useState<JSX.Element>(null);
-  const [, , patientUuid] = useCurrentPatient();
+  const { patientUuid } = useUrlData();
 
   React.useEffect(() => {
     //This function is moved inside of the effect to avoid change on every render
     const loadWidgetFromConfig = (widgetConfig: WidgetConfig) => {
       let Component: FunctionComponent<ComponentProps>;
+
       if (widgetConfig.esModule) {
         System.import(widgetConfig.esModule)
           .then(module => {
@@ -42,7 +67,7 @@ export default function Widget(props: WidgetProps) {
         setComponent(() => (
           <ExtensionSlot
             extensionSlotName={widgetConfig.extensionSlotName}
-            state={{ patientUuid }}
+            state={{ ...widgetConfig, patientUuid }}
           />
         ));
       } else {
@@ -58,26 +83,3 @@ export default function Widget(props: WidgetProps) {
 
   return <>{component || <div>Loading</div>}</>;
 }
-
-export type WidgetProps = {
-  widgetConfig: WidgetConfig;
-};
-
-export type WidgetConfig = {
-  name: string;
-  esModule?: string;
-  extensionSlotName?: string;
-  usesSingleSpaContext?: boolean;
-  layout?: {
-    rowSpan?: number;
-    columnSpan?: number;
-  };
-  props?: object;
-  config?: object;
-  basePath?: string;
-};
-
-type ComponentProps = {
-  props: any;
-  basePath?: string;
-};

@@ -1,10 +1,9 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { BrowserRouter, Route } from "react-router-dom";
+import { BrowserRouter, Route, RouteComponentProps } from "react-router-dom";
 import { VisitDialog } from "@openmrs/esm-patient-chart-widgets";
 import { attach, detach } from "@openmrs/esm-extensions";
 import {
   useNavigationContext,
-  Extension,
   ExtensionSlot,
   ExtensionSlotProps
 } from "@openmrs/esm-react-utils";
@@ -14,6 +13,21 @@ import styles from "./root.css";
 import { AppPropsContext } from "./app-props-context";
 import ContextWorkspace from "./workspace/context-workspace.component";
 import { basePath } from "./constants";
+
+interface RouteParams {
+  patientUuid: string;
+}
+
+const PatientInfo: React.FC<RouteComponentProps<RouteParams>> = props => {
+  const patientUuid = props.match.params.patientUuid;
+  const basePath = props.location.pathname;
+  return (
+    <ExtensionSlot
+      extensionSlotName="patient-banner"
+      state={{ basePath, patientUuid }}
+    />
+  );
+};
 
 export default function Root(props) {
   const [
@@ -58,11 +72,7 @@ export default function Root(props) {
           }}
         >
           <aside className={styles.patientBanner} style={{ width: "100%" }}>
-            <Route path={basePath}>
-              <ExtensionSlot extensionSlotName="patient-banner">
-                <Extension />
-              </ExtensionSlot>
-            </Route>
+            <Route path={basePath} component={PatientInfo} />
           </aside>
           <div className={styles.grid} style={{ marginTop: "4.5rem" }}>
             <div className={styles.chartreview}>
