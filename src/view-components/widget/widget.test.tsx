@@ -8,6 +8,7 @@ import {
 import "@testing-library/jest-dom/extend-expect";
 
 import Widget from "./widget.component";
+import { BrowserRouter } from "react-router-dom";
 
 describe(`<Widget />`, () => {
   const originalError = console.error;
@@ -34,7 +35,11 @@ describe(`<Widget />`, () => {
   });
 
   it(`should render widget dynamically using config`, async done => {
-    const { queryByText } = render(<Widget widgetConfig={testWidgetConfig} />);
+    const { queryByText } = render(
+      <BrowserRouter>
+        <Widget widgetConfig={testWidgetConfig} />
+      </BrowserRouter>
+    );
 
     const element = await waitForElement(() => queryByText("Test Widget"));
     expect(element).not.toBeNull();
@@ -43,7 +48,9 @@ describe(`<Widget />`, () => {
 
   it(`should render "Module failed to load" if the module is not found`, async done => {
     const { queryByText } = render(
-      <Widget widgetConfig={{ name: "test", esModule: "does-not-exist" }} />
+      <BrowserRouter>
+        <Widget widgetConfig={{ name: "test", esModule: "does-not-exist" }} />
+      </BrowserRouter>
     );
 
     const element = await waitForElement(() =>
@@ -55,12 +62,14 @@ describe(`<Widget />`, () => {
 
   it(`should render "[Widget] does not exist" if the widget is not found`, async done => {
     const { queryByText } = render(
-      <Widget
-        widgetConfig={{
-          name: "non-existing-widget",
-          esModule: "@openmrs/esm-patient-chart-widgets"
-        }}
-      />
+      <BrowserRouter>
+        <Widget
+          widgetConfig={{
+            name: "non-existing-widget",
+            esModule: "@openmrs/esm-patient-chart-widgets"
+          }}
+        />
+      </BrowserRouter>
     );
 
     const element = await waitForElement(() =>
@@ -72,11 +81,13 @@ describe(`<Widget />`, () => {
 
   it(`should render "no module provided" if the no esModule property is present`, async done => {
     const { queryByText } = render(
-      <Widget
-        widgetConfig={{
-          name: "non-existing-widget"
-        }}
-      />
+      <BrowserRouter>
+        <Widget
+          widgetConfig={{
+            name: "non-existing-widget"
+          }}
+        />
+      </BrowserRouter>
     );
 
     const element = await waitForElement(() =>
@@ -88,13 +99,15 @@ describe(`<Widget />`, () => {
 
   it(`should get the SingleSpaContext`, async done => {
     const { queryByText, debug } = render(
-      <Widget
-        widgetConfig={{
-          name: "test",
-          esModule: "@openmrs/esm-patient-chart-widgets",
-          usesSingleSpaContext: true
-        }}
-      />
+      <BrowserRouter>
+        <Widget
+          widgetConfig={{
+            name: "test",
+            esModule: "@openmrs/esm-patient-chart-widgets",
+            usesSingleSpaContext: true
+          }}
+        />
+      </BrowserRouter>
     );
 
     const element = await waitForElement(() => queryByText("Test Widget"));

@@ -8,6 +8,13 @@ interface RouteParams {
 export function useUrlData() {
   const match = useRouteMatch<RouteParams>(basePath);
 
+  if (!match) {
+    return {
+      basePath: "/",
+      patientUuid: undefined
+    };
+  }
+
   return {
     basePath: match.url,
     patientUuid: match.params.patientUuid
