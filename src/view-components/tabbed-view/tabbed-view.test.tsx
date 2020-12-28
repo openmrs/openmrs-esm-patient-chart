@@ -13,6 +13,13 @@ import "@testing-library/jest-dom";
 const mockUseConfig = useConfig as jest.Mock;
 const mockUseRouteMatch = useRouteMatch as jest.Mock;
 
+const renderTabbedView = () =>
+  render(
+    <BrowserRouter>
+      <TabbedView config={mockConfig} defaultPath={mockDefaultPath} />
+    </BrowserRouter>
+  );
+
 const mockMatch: match = {
   isExact: true,
   params: { subview: "overview" },
@@ -44,20 +51,17 @@ describe("TabbedView", () => {
     mockUseRouteMatch.mockReset();
   });
 
-  it("should render the tabs", () => {
-    render(
-      <BrowserRouter>
-        <TabbedView config={mockConfig} defaultPath={mockDefaultPath} />
-      </BrowserRouter>
-    );
+  it("should render the tabs", async () => {
+    renderTabbedView();
+
+    await screen.findByText("Vitals");
   });
 
   it("should select the overview tab by default", async () => {
-    render(
-      <BrowserRouter>
-        <TabbedView config={mockConfig} defaultPath={mockDefaultPath} />
-      </BrowserRouter>
-    );
+    renderTabbedView();
+
+    await screen.findAllByRole("listitem");
+
     const listItemArray = screen.getAllByRole("listitem");
     expect(listItemArray[0].firstChild).toHaveClass("selected");
     expect(listItemArray[1].firstChild).toHaveClass("unselected");
@@ -65,13 +69,11 @@ describe("TabbedView", () => {
   });
 
   it("should select the correct tab when tab label is clicked", async () => {
-    render(
-      <BrowserRouter>
-        <TabbedView config={mockConfig} defaultPath={mockDefaultPath} />
-      </BrowserRouter>
-    );
+    renderTabbedView();
 
-    const vitalsButton = screen.getByText(/Vitals/);
+    await screen.findByText("Overview");
+
+    const vitalsButton = screen.getByText(/^Vitals$/);
     expect(screen.getAllByRole("listitem")[0].firstChild).toHaveClass(
       "selected"
     );
