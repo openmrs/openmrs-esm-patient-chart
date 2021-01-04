@@ -22,7 +22,7 @@
   "appointmentsForm": "Appointments form",
   "endVisitPrompt": "Are you sure you wish to end this visit?",
   "attachmentCaptionInstruction": "Enter a caption for the image",
-  "attachmentUpload": "Attach files by dragging &amp; dropping, selecting or pasting them.",
+  "attachmentUploadText": "Attach files by dragging & dropping, selecting or pasting them.",
   "author": "Author",
   "birthDate": "Birth date",
   "bloodPressure": "Blood pressure",
