@@ -55,6 +55,8 @@ export default function Root(props) {
     }
   });
 
+  attach("patient-banner", "patient-vital-header-ext");
+
   useEffect(() => {
     attach("nav-menu", "patient-chart-nav-items");
     return () => detach("nav-menu", "patient-chart-nav-items");
