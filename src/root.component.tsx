@@ -22,10 +22,13 @@ const PatientInfo: React.FC<RouteComponentProps<RouteParams>> = props => {
   const patientUuid = props.match.params.patientUuid;
   const basePath = props.location.pathname;
   return (
-    <ExtensionSlot
-      extensionSlotName="patient-banner"
-      state={{ basePath, patientUuid }}
-    />
+    <>
+      <ExtensionSlot
+        extensionSlotName="patient-chart-header"
+        state={{ basePath, patientUuid }}
+      />
+      <ExtensionSlot extensionSlotName="patient-vital-status" />
+    </>
   );
 };
 
@@ -54,8 +57,6 @@ export default function Root(props) {
       return true;
     }
   });
-
-  attach("patient-banner", "patient-vital-header-ext");
 
   useEffect(() => {
     attach("nav-menu", "patient-chart-nav-items");
