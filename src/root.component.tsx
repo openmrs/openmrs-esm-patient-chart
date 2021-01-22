@@ -22,10 +22,13 @@ const PatientInfo: React.FC<RouteComponentProps<RouteParams>> = props => {
   const patientUuid = props.match.params.patientUuid;
   const basePath = props.location.pathname;
   return (
-    <ExtensionSlot
-      extensionSlotName="patient-banner"
-      state={{ basePath, patientUuid }}
-    />
+    <>
+      <ExtensionSlot
+        extensionSlotName="patient-chart-header"
+        state={{ basePath, patientUuid }}
+      />
+      <ExtensionSlot extensionSlotName="patient-vital-status" />
+    </>
   );
 };
 
