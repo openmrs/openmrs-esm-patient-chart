@@ -74,6 +74,7 @@ export default function Root(props) {
             flexDirection: "column"
           }}
         >
+          <ExtensionSlot extensionSlotName="breadcrumbs" />
           <aside className={styles.patientBanner} style={{ width: "100%" }}>
             <Route path={basePath} component={PatientInfo} />
           </aside>

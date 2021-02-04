@@ -1,5 +1,9 @@
-import { getAsyncLifecycle } from "@openmrs/esm-react-utils";
+import { registerBreadcrumbs } from "@openmrs/esm-api";
 import { defineConfigSchema } from "@openmrs/esm-config";
+import {
+  getAsyncLifecycle,
+  getAsyncExtensionLifecycle
+} from "@openmrs/esm-react-utils";
 import { esmPatientChartSchema } from "./config-schemas/openmrs-esm-patient-chart-schema";
 import { backendDependencies } from "./openmrs-backend-dependencies";
 
@@ -20,13 +24,24 @@ function setupOpenMRS() {
 
   defineConfigSchema(moduleName, esmPatientChartSchema);
 
+  registerBreadcrumbs([
+    {
+      path: `${window.spaBase}/patient/:patient/chart`,
+      title: "Patient",
+      parent: `${window.spaBase}/home`
+    }
+  ]);
+
   return {
     lifecycle: getAsyncLifecycle(() => import("./root.component"), options),
     activate: /^patient\/.+\/chart/,
     extensions: [
       {
         id: "patient-chart-nav-items",
-        load: getAsyncLifecycle(() => import("./nav.component"), options)
+        load: getAsyncExtensionLifecycle(
+          () => import("./nav.component"),
+          options
+        )
       }
     ]
   };
