@@ -81,6 +81,18 @@ export const coreDashboardDefinitions: Array<DashboardConfig> = [
     },
     widgets: [
       {
+        name: "VitalsOverview",
+        extensionSlotName: "vitals-widget",
+        layout: { columnSpan: 2 },
+        basePath: "results/vitals"
+      },
+      {
+        name: "BiometricsOverview",
+        extensionSlotName: "biometrics-widget",
+        layout: { columnSpan: 2 },
+        basePath: "results/biometrics"
+      },
+      {
         name: "ConditionsOverview",
         extensionSlotName: "conditions-overview-widget-ext",
         layout: { columnSpan: 2 },
@@ -115,18 +127,6 @@ export const coreDashboardDefinitions: Array<DashboardConfig> = [
         extensionSlotName: "notes-overview-widget-ext",
         layout: { columnSpan: 4 },
         basePath: "encounters/notes"
-      },
-      {
-        name: "VitalsOverview",
-        extensionSlotName: "vitals-widget",
-        layout: { columnSpan: 2 },
-        basePath: "results/vitals"
-      },
-      {
-        name: "BiometricsOverview",
-        extensionSlotName: "biometrics-widget",
-        layout: { columnSpan: 2 },
-        basePath: "results/biometrics"
       },
       {
         name: "MedicationsOverview",
