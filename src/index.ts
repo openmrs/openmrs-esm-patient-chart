@@ -1,9 +1,6 @@
 import { registerBreadcrumbs } from "@openmrs/esm-api";
 import { defineConfigSchema } from "@openmrs/esm-config";
-import {
-  getAsyncLifecycle,
-  getAsyncExtensionLifecycle
-} from "@openmrs/esm-react-utils";
+import { getAsyncLifecycle } from "@openmrs/esm-react-utils";
 import { esmPatientChartSchema } from "./config-schemas/openmrs-esm-patient-chart-schema";
 import { backendDependencies } from "./openmrs-backend-dependencies";
 
@@ -38,10 +35,7 @@ function setupOpenMRS() {
     extensions: [
       {
         id: "patient-chart-nav-items",
-        load: getAsyncExtensionLifecycle(
-          () => import("./nav.component"),
-          options
-        )
+        load: getAsyncLifecycle(() => import("./nav.component"), options)
       }
     ]
   };

@@ -1,14 +1,14 @@
 import React from "react";
+import Close32 from "@carbon/icons-react/es/close/32";
+import styles from "./context-workspace.css";
 import { useTranslation } from "react-i18next";
 import {
   Header,
   HeaderGlobalAction,
   HeaderGlobalBar,
   HeaderName
-} from "carbon-components-react";
-import { Close32 } from "@carbon/icons-react";
+} from "carbon-components-react/es/components/UIShell";
 import { ExtensionSlotProps } from "@openmrs/esm-react-utils";
-import styles from "./context-workspace.css";
 
 export interface ContextWorkspaceProps {
   title: string;
