@@ -1,6 +1,5 @@
 import React, { FunctionComponent } from "react";
-import { reportError } from "@openmrs/esm-error-handling";
-import { ExtensionSlot } from "@openmrs/esm-react-utils";
+import { reportError, ExtensionSlot } from "@openmrs/esm-framework";
 import { useUrlData } from "../../useUrlData";
 
 export interface WidgetProps {

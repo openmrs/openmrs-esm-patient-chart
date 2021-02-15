@@ -1,7 +1,7 @@
 import React from "react";
-import { ExtensionSlot } from "@openmrs/esm-react-utils";
 import styles from "./dashboard.css";
 import Widget, { WidgetConfig } from "../widget/widget.component";
+import { ExtensionSlot } from "@openmrs/esm-framework";
 import { useUrlData } from "../../useUrlData";
 
 function getColumnsLayoutStyle(props: DashboardProps) {

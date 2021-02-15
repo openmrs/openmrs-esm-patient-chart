@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Route, Link, Redirect, Switch, useRouteMatch } from "react-router-dom";
-import { useConfig } from "@openmrs/esm-react-utils";
+import { useConfig } from "@openmrs/esm-framework";
 import styles from "./tabbed-view.css";
 import { getView, View } from "../view-utils";
 

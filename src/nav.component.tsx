@@ -1,5 +1,5 @@
 import React from "react";
-import { ExtensionSlot } from "@openmrs/esm-react-utils";
+import { ExtensionSlot } from "@openmrs/esm-framework";
 import { spaBasePath } from "./constants";
 
 function getPatientUuidFromUrl() {

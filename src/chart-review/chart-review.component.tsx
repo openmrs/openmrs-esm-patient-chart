@@ -1,7 +1,7 @@
 import React from "react";
-import { useParams, Switch, Route, Redirect } from "react-router-dom";
-import { useConfig } from "@openmrs/esm-react-utils";
 import styles from "./chart-review.css";
+import { useParams, Switch, Route, Redirect } from "react-router-dom";
+import { useConfig } from "@openmrs/esm-framework";
 import { getView, View } from "../view-components/view-utils";
 import { ChartConfig } from "../config-schemas/openmrs-esm-patient-chart-schema";
 

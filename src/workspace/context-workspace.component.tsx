@@ -8,7 +8,7 @@ import {
   HeaderGlobalBar,
   HeaderName
 } from "carbon-components-react/es/components/UIShell";
-import { ExtensionSlotProps } from "@openmrs/esm-react-utils";
+import { ExtensionSlotProps } from "@openmrs/esm-framework";
 
 export interface ContextWorkspaceProps {
   title: string;
