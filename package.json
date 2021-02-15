@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-chart-app",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Patient dashboard microfrontend for the OpenMRS SPA",
   "main": "dist/openmrs-esm-patient-chart-app.js",
   "types": "src/index.ts",
