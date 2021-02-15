@@ -26,10 +26,6 @@ export interface DashboardConfig {
   widgets: Array<WidgetConfig>;
 }
 
-interface RouteParams {
-  patientUuid: string;
-}
-
 export default function Dashboard(props: DashboardProps) {
   const [widgets, setWidgets] = React.useState<Array<JSX.Element>>([]);
   const urlData = useUrlData();

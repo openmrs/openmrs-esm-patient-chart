@@ -1,0 +1,44 @@
+.visitModal {
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  overflow: auto;
+  background-color: var(--omrs-color-bg-medium-contrast);
+  transition: 0.3s ease all;
+}
+
+.visitModalContent {
+  background-color: var(--omrs-color-ink-white);
+  box-shadow: 0rem 0.125rem 0.25rem rgba(0, 0, 0, 0.08),
+    0rem 0.0625rem 0.25rem rgba(0, 0, 0, 0.04);
+  border-radius: 0.5rem;
+  background-color: var(--omrs-color-bg-medium-contrast);
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 50%;
+}
+
+:global(.omrs-breakpoint-gt-phone) .visitModalContent {
+  width: 70%;
+}
+
+:global(.omrs-breakpoint-lt-tablet) .visitModalContent {
+  width: 90%;
+}
+
+.closeButtonContainer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.closeButtonContainer svg {
+  cursor: pointer;
+}
+
+.hideModal {
+  display: none;
+}

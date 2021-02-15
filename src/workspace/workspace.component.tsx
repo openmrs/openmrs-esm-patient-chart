@@ -1,5 +1,4 @@
 import React from "react";
-import { Tabs, Panel } from "@openmrs/esm-patient-chart-widgets";
 import { getNewWorkspaceItem, WorkspaceItem } from "@openmrs/esm-framework";
 
 export default function Workspace(props: any) {

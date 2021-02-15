@@ -3,8 +3,8 @@ import WorkspaceWrapper from "./workspace/workspace-wrapper.component";
 import ChartReview from "./chart-review/chart-review.component";
 import styles from "./root.css";
 import ContextWorkspace from "./workspace/context-workspace.component";
+import VisitDialog from "./visit/visit-dialog.component";
 import { BrowserRouter, Route, RouteComponentProps } from "react-router-dom";
-import { VisitDialog } from "@openmrs/esm-patient-chart-widgets";
 import {
   attach,
   detach,

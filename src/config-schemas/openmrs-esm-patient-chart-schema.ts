@@ -70,8 +70,6 @@ export const esmPatientChartSchema = {
     _type: Type.Array,
     _elements: {
       name: { _type: Type.String },
-      usesSingleSpaContext: { _type: Type.Boolean },
-      esModule: { _default: undefined, _type: Type.String },
       extensionSlotName: {
         _default: undefined,
         _type: Type.String
@@ -94,8 +92,10 @@ export const esmPatientChartSchema = {
         _type: Type.Array,
         _elements: {
           name: { _type: Type.String },
-          esModule: { _type: Type.String },
-          usesSingleSpaContext: { _type: Type.Boolean },
+          extensionSlotName: {
+            _default: undefined,
+            _type: Type.String
+          },
           props: { _default: {}, _type: Type.Object },
           config: { _default: {}, _type: Type.Object },
           layout: {
@@ -128,11 +128,12 @@ export const esmPatientChartSchema = {
 
 export interface ChartConfig {
   primaryNavbar: Array<Navbar>;
+
   widgetDefinitions: Array<{
     name: string;
-    esModule?: string;
-    label?: string;
-    path?: string;
+    extensionSlotName: string;
+    props?: any;
+    config?: any;
   }>;
 
   dashboardDefinitions: Array<{
@@ -141,9 +142,9 @@ export interface ChartConfig {
     layout: { columns: number };
     widgets: Array<{
       name: string;
-      esModule: string;
-      label: string;
-      path: string;
+      extensionSlotName: string;
+      props?: any;
+      config?: any;
       layout: {
         rowSpan: number;
         columnSpan: number;

@@ -1,8 +1,6 @@
 import React from "react";
-
 import Dashboard from "./dashboard/dashboard.component";
 import TabbedView from "./tabbed-view/tabbed-view.component";
-
 import Widget from "./widget/widget.component";
 import {
   coreWidgetDefinitions,
@@ -54,5 +52,5 @@ export type View = {
   label?: string;
   path?: string;
   name: string;
-  component?: Function | null;
+  component?: React.FC | null;
 };
