@@ -13,7 +13,7 @@ interface IParams {
 
 export default function ChartReview() {
   const { patientUuid } = useParams<IParams>();
-  const config: ChartConfig = useConfig();
+  const config = useConfig() as ChartConfig;
 
   const defaultPath = `/patient/${patientUuid}/chart`;
   const [views, setViews] = React.useState<View[]>([]);
@@ -58,7 +58,7 @@ export default function ChartReview() {
                 key={route.label}
                 path={defaultPath + route.path + "/:subview?"}
               >
-                {route.component && route.component()}
+                {route.component && <route.component />}
               </Route>
             );
           })}
