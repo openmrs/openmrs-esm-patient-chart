@@ -110,6 +110,12 @@ export const coreDashboardDefinitions: DashboardConfig[] = [
         basePath: "conditions"
       },
       {
+        name: "forms",
+        extensionSlotName: "forms",
+        layout: { columnSpan: 2 },
+        basePath: "forms"
+      },
+      {
         name: "ImmunizationsOverview",
         esModule: "@openmrs/esm-patient-chart-widgets",
         layout: { columnSpan: 2 },
