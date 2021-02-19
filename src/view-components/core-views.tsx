@@ -90,6 +90,12 @@ export const coreDashboardDefinitions: Array<DashboardConfig> = [
         basePath: "conditions"
       },
       {
+        name: "forms",
+        extensionSlotName: "forms",
+        layout: { columnSpan: 2 },
+        basePath: "forms"
+      },
+      {
         name: "ImmunizationsOverview",
         layout: { columnSpan: 2 },
         basePath: "immunizations"
