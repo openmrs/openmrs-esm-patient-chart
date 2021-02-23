@@ -14,6 +14,7 @@ import {
 } from "@openmrs/esm-framework";
 import { AppPropsContext } from "./app-props-context";
 import { basePath } from "./constants";
+import { ModalItem, newModalItem } from "./visit/visit-dialog.resource";
 
 interface RouteParams {
   patientUuid: string;
@@ -56,6 +57,18 @@ export default function Root(props) {
       ));
       setWorkspaceTitle(state.title ?? "");
       return true;
+    }
+  });
+
+  useNavigationContext({
+    type: "dialog",
+    handler: (link: string, state: any) => {
+      if (link === "/start-visit") {
+        newModalItem(state);
+        return true;
+      }
+
+      return false;
     }
   });
 
