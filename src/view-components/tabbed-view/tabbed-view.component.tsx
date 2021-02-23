@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { Route, Link, Redirect, Switch, useRouteMatch } from "react-router-dom";
-import { useConfig } from "@openmrs/esm-react-utils";
 import styles from "./tabbed-view.css";
+import { Route, Link, Redirect, Switch, useRouteMatch } from "react-router-dom";
+import { useConfig } from "@openmrs/esm-framework";
 import { getView, View } from "../view-utils";
 
 function getInitialTab(url: string, props: any) {
@@ -79,13 +79,13 @@ export default function TabbedView(props: any) {
         )}
 
         <Switch>
-          {views.map((route, index) => {
+          {views.map(route => {
             return (
               <Route
                 key={route.label}
                 path={`${props.defaultPath + route.path}`}
               >
-                {route.component && route.component()}
+                {route.component && <route.component />}
               </Route>
             );
           })}

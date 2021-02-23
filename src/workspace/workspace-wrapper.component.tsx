@@ -1,8 +1,7 @@
 import React from "react";
 import Workspace from "./workspace.component";
-//import { Breadcrumbs } from "@openmrs/esm-patient-chart-widgets";
 import styles from "./workspace-wrapper.component.css";
-import { WorkspaceItem, getNewWorkspaceItem } from "@openmrs/esm-api";
+import { WorkspaceItem, getNewWorkspaceItem } from "@openmrs/esm-framework";
 
 export default function WorkspaceWrapper(props: any) {
   const [showWorkspace, setShowWorkspace] = React.useState(false);
@@ -98,10 +97,3 @@ export default function WorkspaceWrapper(props: any) {
     </div>
   );
 }
-
-/*
-      <Breadcrumbs
-        rootUrl={{ name: "Workspace", url: "/patient/:patientUuid/chart" }}
-        routes={[]}
-      />
-*/

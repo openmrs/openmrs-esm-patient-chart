@@ -1,7 +1,7 @@
 import React from "react";
-import { useParams, Switch, Route, Redirect } from "react-router-dom";
-import { useConfig } from "@openmrs/esm-react-utils";
 import styles from "./chart-review.css";
+import { useParams, Switch, Route, Redirect } from "react-router-dom";
+import { useConfig } from "@openmrs/esm-framework";
 import { getView, View } from "../view-components/view-utils";
 import { ChartConfig } from "../config-schemas/openmrs-esm-patient-chart-schema";
 
@@ -13,7 +13,7 @@ interface IParams {
 
 export default function ChartReview() {
   const { patientUuid } = useParams<IParams>();
-  const config: ChartConfig = useConfig();
+  const config = useConfig() as ChartConfig;
 
   const defaultPath = `/patient/${patientUuid}/chart`;
   const [views, setViews] = React.useState<View[]>([]);
@@ -58,7 +58,7 @@ export default function ChartReview() {
                 key={route.label}
                 path={defaultPath + route.path + "/:subview?"}
               >
-                {route.component && route.component()}
+                {route.component && <route.component />}
               </Route>
             );
           })}

@@ -1,101 +1,82 @@
 import { WidgetConfig } from "./widget/widget.component";
 import { DashboardConfig } from "./dashboard/dashboard.component";
 
-export const coreWidgetDefinitions: WidgetConfig[] = [
+export const coreWidgetDefinitions: Array<WidgetConfig> = [
   {
     name: "ProgramsOverview",
-    esModule: "@openmrs/esm-patient-chart-widgets"
+    extensionSlotName: "programs-overview-widget-ext"
   },
   {
     name: "ProgramsSummary",
-    esModule: "@openmrs/esm-patient-chart-widgets"
+    extensionSlotName: "programs-summary-widget-ext"
   },
-
   {
     name: "Conditions",
-    esModule: "@openmrs/esm-patient-chart-widgets"
+    extensionSlotName: "conditions-widget-ext"
   },
-
   {
     name: "Immunizations",
-    esModule: "@openmrs/esm-patient-chart-widgets"
+    extensionSlotName: "immunizations-widget-ext"
   },
-
   {
     name: "MedicationsOverview",
     extensionSlotName: "patient-chart-dashboard-medications"
   },
-
   {
     name: "MedicationsSummary",
-    extensionSlotName: "patient-chart-dashboard-medications"
+    extensionSlotName: "patient-chart-dashboard-summary"
   },
-
   {
     name: "HeightAndWeightOverview",
     extensionSlotName: "patient-chart-vitals"
   },
-
   {
     name: "HeightAndWeightSummary",
     extensionSlotName: "biometrics-widget"
   },
-
   {
     name: "VitalsOverview",
     extensionSlotName: "vitals-widget"
   },
-
   {
     name: "VitalsSummary",
     extensionSlotName: "vitals-widget"
   },
-
-  {
-    name: "ConditionsOverview",
-    esModule: "@openmrs/esm-patient-chart-widgets"
-  },
-
   {
     name: "ImmunizationsOverview",
-    esModule: "@openmrs/esm-patient-chart-widgets"
+    extensionSlotName: "immunizations-overview-widget-ext"
   },
-
   {
     name: "AllergiesOverview",
-    esModule: "@openmrs/esm-patient-chart-widgets"
+    extensionSlotName: "allergies-overview-widget-ext"
   },
-
   {
     name: "AllergiesSummary",
-    esModule: "@openmrs/esm-patient-chart-widgets"
+    extensionSlotName: "allergies-summary-widget-ext"
   },
-
   {
     name: "NotesOverview",
-    esModule: "@openmrs/esm-patient-chart-widgets"
+    extensionSlotName: "notes-overview-widget-ext"
   },
-
   {
     name: "Notes",
-    esModule: "@openmrs/esm-patient-chart-widgets"
+    extensionSlotName: "notes-overview-ext"
   },
-
   {
     name: "AppointmentsOverview",
-    esModule: "@openmrs/esm-patient-chart-widgets"
+    extensionSlotName: "appointments-overview-widget-ext"
   },
   {
     name: "AppointmentsSummary",
-    esModule: "@openmrs/esm-patient-chart-widgets"
+    extensionSlotName: "appointments-summary-widget-ext"
   },
   {
     name: "AttachmentsOverview",
-    esModule: "@openmrs/esm-patient-chart-widgets"
+    extensionSlotName: "attachments-overview-widget-ext"
   }
 ];
 
-export const coreDashboardDefinitions: DashboardConfig[] = [
+export const coreDashboardDefinitions: Array<DashboardConfig> = [
   {
     name: "summaryDashboard",
     title: "Overview",
@@ -105,7 +86,6 @@ export const coreDashboardDefinitions: DashboardConfig[] = [
     widgets: [
       {
         name: "ConditionsOverview",
-        esModule: "@openmrs/esm-patient-chart-widgets",
         layout: { columnSpan: 2 },
         basePath: "conditions"
       },
@@ -117,72 +97,60 @@ export const coreDashboardDefinitions: DashboardConfig[] = [
       },
       {
         name: "ImmunizationsOverview",
-        esModule: "@openmrs/esm-patient-chart-widgets",
         layout: { columnSpan: 2 },
         basePath: "immunizations"
       },
       {
         name: "ProgramsOverview",
-        esModule: "@openmrs/esm-patient-chart-widgets",
         layout: { columnSpan: 2 },
         basePath: "programs"
       },
       {
         name: "AllergiesOverview",
-        esModule: "@openmrs/esm-patient-chart-widgets",
         layout: { columnSpan: 2 },
         basePath: "allergies"
       },
       {
         name: "NotesOverview",
-        esModule: "@openmrs/esm-patient-chart-widgets",
         layout: { columnSpan: 4 },
         basePath: "encounters/notes"
       },
       {
         name: "VitalsOverview",
-        extensionSlotName: "vitals-widget",
         layout: { columnSpan: 2 },
         basePath: "results/vitals"
       },
       {
         name: "HeightAndWeightOverview",
-        extensionSlotName: "biometrics-widget",
         layout: { columnSpan: 2 },
         basePath: "results/heightAndWeight"
       },
       {
         name: "MedicationsOverview",
         layout: { columnSpan: 3 },
-        basePath: "orders/medication-orders",
-        extensionSlotName: "patient-chart-dashboard-summary"
+        basePath: "orders/medication-orders"
       },
       {
         name: "AppointmentsOverview",
-        esModule: "@openmrs/esm-patient-chart-widgets",
         layout: { columnSpan: 4 },
         basePath: "appointments"
       }
     ]
   },
-
   {
     name: "resultsOverviewDashboard",
     layout: { columns: 1 },
     widgets: [
       {
         name: "VitalsOverview",
-        basePath: "results/vitals",
-        extensionSlotName: "vitals-widget"
+        basePath: "results/vitals"
       },
       {
         name: "HeightAndWeightOverview",
-        basePath: "results/heightAndWeight",
-        extensionSlotName: "biometrics-widget"
+        basePath: "results/heightAndWeight"
       }
     ]
   },
-
   {
     name: "ordersOverviewDashboard",
     title: "Orders Overview",
@@ -190,74 +158,61 @@ export const coreDashboardDefinitions: DashboardConfig[] = [
     widgets: [
       {
         name: "MedicationsOverview",
-        basePath: "orders/medication-orders",
-        extensionSlotName: "patient-chart-dashboard-medications"
+        basePath: "orders/medication-orders"
       }
     ]
   },
-
   {
     name: "notesDashboard",
     layout: { columns: 1 },
     widgets: [
       {
-        name: "Notes",
-        esModule: "@openmrs/esm-patient-chart-widgets"
+        name: "Notes"
       }
     ]
   },
-
   {
     name: "conditionsDashboard",
     layout: { columns: 1 },
     widgets: [
       {
-        name: "Conditions",
-        esModule: "@openmrs/esm-patient-chart-widgets"
+        name: "Conditions"
       }
     ]
   },
-
   {
     name: "immunizationsDashboard",
     layout: { columns: 1 },
     widgets: [
       {
-        name: "Immunizations",
-        esModule: "@openmrs/esm-patient-chart-widgets"
+        name: "Immunizations"
       }
     ]
   },
-
   {
     name: "allergiesDashboard",
     layout: { columns: 1 },
     widgets: [
       {
-        name: "AllergiesSummary",
-        esModule: "@openmrs/esm-patient-chart-widgets"
+        name: "AllergiesSummary"
       }
     ]
   },
-
   {
     name: "programsDashboard",
     layout: { columns: 1 },
     widgets: [
       {
-        name: "ProgramsSummary",
-        esModule: "@openmrs/esm-patient-chart-widgets"
+        name: "ProgramsSummary"
       }
     ]
   },
-
   {
     name: "appointmentsDashboard",
     layout: { columns: 1 },
     widgets: [
       {
-        name: "AppointmentsSummary",
-        esModule: "@openmrs/esm-patient-chart-widgets"
+        name: "AppointmentsSummary"
       }
     ]
   },
@@ -266,8 +221,7 @@ export const coreDashboardDefinitions: DashboardConfig[] = [
     layout: { columns: 1 },
     widgets: [
       {
-        name: "AttachmentsOverview",
-        esModule: "@openmrs/esm-patient-chart-widgets"
+        name: "AttachmentsOverview"
       }
     ]
   }
@@ -294,7 +248,6 @@ export const coreTabbedViewDefinitions = [
   {
     name: "encountersTabbedView",
     title: "Encounters",
-
     navbar: [
       {
         label: "Notes",

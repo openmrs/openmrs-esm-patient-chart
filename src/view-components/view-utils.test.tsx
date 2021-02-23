@@ -16,7 +16,6 @@ describe(`view-utils`, () => {
 
   const testWidgetDefinitions = [
     {
-      esModule: "@openmrs/esm-patient-chart-widgets",
       name: "widget1"
     }
   ];
@@ -27,12 +26,10 @@ describe(`view-utils`, () => {
       layout: { columns: 1 },
       widgets: [
         {
-          name: "widget2",
-          esModule: "@openmrs/esm-patient-chart-widgets"
+          name: "widget2"
         },
         {
-          name: "widget3",
-          esModule: "@openmrs/esm-patient-chart-widgets"
+          name: "widget3"
         }
       ]
     }
@@ -69,15 +66,6 @@ describe(`view-utils`, () => {
     widget2: () => <div>Test Widget 2</div>,
     widget3: () => <div>Test Widget 3</div>
   };
-
-  beforeAll(() => {
-    System.import = jest.fn().mockImplementation(esModule => {
-      console.log(esModule);
-      return esModule === "@openmrs/esm-patient-chart-widgets"
-        ? Promise.resolve(mockedModule)
-        : Promise.reject({ reason: "module failed to load" });
-    });
-  });
 
   afterAll(() => {
     console.error = originalError;

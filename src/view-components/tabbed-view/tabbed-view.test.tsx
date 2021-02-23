@@ -2,7 +2,7 @@ import React from "react";
 import { BrowserRouter, match, useRouteMatch } from "react-router-dom";
 import TabbedView from "./tabbed-view.component";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { useConfig } from "@openmrs/esm-react-utils";
+import { useConfig } from "@openmrs/esm-framework";
 import {
   mockedTabbedViewConfig,
   mockConfig,
