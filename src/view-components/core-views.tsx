@@ -11,10 +11,6 @@ export const coreWidgetDefinitions: Array<WidgetConfig> = [
     extensionSlotName: "programs-summary-widget-ext"
   },
   {
-    name: "Conditions",
-    extensionSlotName: "conditions-widget-ext"
-  },
-  {
     name: "Immunizations",
     extensionSlotName: "immunizations-widget-ext"
   },
@@ -86,6 +82,7 @@ export const coreDashboardDefinitions: Array<DashboardConfig> = [
     widgets: [
       {
         name: "ConditionsOverview",
+        extensionSlotName: "conditions-overview-widget-ext",
         layout: { columnSpan: 2 },
         basePath: "conditions"
       },
@@ -97,41 +94,49 @@ export const coreDashboardDefinitions: Array<DashboardConfig> = [
       },
       {
         name: "ImmunizationsOverview",
+        extensionSlotName: "immunizations-overview-widget-ext",
         layout: { columnSpan: 2 },
         basePath: "immunizations"
       },
       {
         name: "ProgramsOverview",
+        extensionSlotName: "programs-overview-widget-ext",
         layout: { columnSpan: 2 },
         basePath: "programs"
       },
       {
         name: "AllergiesOverview",
+        extensionSlotName: "allergies-overview-widget-ext",
         layout: { columnSpan: 2 },
         basePath: "allergies"
       },
       {
         name: "NotesOverview",
+        extensionSlotName: "notes-overview-widget-ext",
         layout: { columnSpan: 4 },
         basePath: "encounters/notes"
       },
       {
         name: "VitalsOverview",
+        extensionSlotName: "vitals-widget",
         layout: { columnSpan: 2 },
         basePath: "results/vitals"
       },
       {
         name: "HeightAndWeightOverview",
+        extensionSlotName: "patient-chart-vitals",
         layout: { columnSpan: 2 },
         basePath: "results/heightAndWeight"
       },
       {
         name: "MedicationsOverview",
+        extensionSlotName: "patient-chart-dashboard-medications",
         layout: { columnSpan: 3 },
         basePath: "orders/medication-orders"
       },
       {
         name: "AppointmentsOverview",
+        extensionSlotName: "appointments-overview-widget-ext",
         layout: { columnSpan: 4 },
         basePath: "appointments"
       }
@@ -143,10 +148,12 @@ export const coreDashboardDefinitions: Array<DashboardConfig> = [
     widgets: [
       {
         name: "VitalsOverview",
+        extensionSlotName: "vitals-widget",
         basePath: "results/vitals"
       },
       {
         name: "HeightAndWeightOverview",
+        extensionSlotName: "patient-chart-vitals",
         basePath: "results/heightAndWeight"
       }
     ]
@@ -158,6 +165,7 @@ export const coreDashboardDefinitions: Array<DashboardConfig> = [
     widgets: [
       {
         name: "MedicationsOverview",
+        extensionSlotName: "patient-chart-dashboard-medications",
         basePath: "orders/medication-orders"
       }
     ]
@@ -167,7 +175,8 @@ export const coreDashboardDefinitions: Array<DashboardConfig> = [
     layout: { columns: 1 },
     widgets: [
       {
-        name: "Notes"
+        name: "Notes",
+        extensionSlotName: "notes-overview-ext"
       }
     ]
   },
@@ -176,7 +185,8 @@ export const coreDashboardDefinitions: Array<DashboardConfig> = [
     layout: { columns: 1 },
     widgets: [
       {
-        name: "Conditions"
+        name: "Conditions",
+        extensionSlotName: "conditions-widget-ext"
       }
     ]
   },
@@ -185,7 +195,8 @@ export const coreDashboardDefinitions: Array<DashboardConfig> = [
     layout: { columns: 1 },
     widgets: [
       {
-        name: "Immunizations"
+        name: "Immunizations",
+        extensionSlotName: "immunizations-widget-ext"
       }
     ]
   },
@@ -194,7 +205,8 @@ export const coreDashboardDefinitions: Array<DashboardConfig> = [
     layout: { columns: 1 },
     widgets: [
       {
-        name: "AllergiesSummary"
+        name: "AllergiesSummary",
+        extensionSlotName: "allergies-summary-widget-ext"
       }
     ]
   },
@@ -203,7 +215,8 @@ export const coreDashboardDefinitions: Array<DashboardConfig> = [
     layout: { columns: 1 },
     widgets: [
       {
-        name: "ProgramsSummary"
+        name: "ProgramsSummary",
+        extensionSlotName: "programs-summary-widget-ext"
       }
     ]
   },
@@ -212,7 +225,8 @@ export const coreDashboardDefinitions: Array<DashboardConfig> = [
     layout: { columns: 1 },
     widgets: [
       {
-        name: "AppointmentsSummary"
+        name: "AppointmentsSummary",
+        extensionSlotName: "appointments-summary-widget-ext"
       }
     ]
   },
@@ -221,7 +235,8 @@ export const coreDashboardDefinitions: Array<DashboardConfig> = [
     layout: { columns: 1 },
     widgets: [
       {
-        name: "AttachmentsOverview"
+        name: "AttachmentsOverview",
+        extensionSlotName: "attachments-overview-widget-ext"
       }
     ]
   }
