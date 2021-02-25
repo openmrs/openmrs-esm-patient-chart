@@ -23,11 +23,11 @@ export const coreWidgetDefinitions: Array<WidgetConfig> = [
     extensionSlotName: "patient-chart-dashboard-summary"
   },
   {
-    name: "HeightAndWeightOverview",
-    extensionSlotName: "patient-chart-vitals"
+    name: "BiometricsOverview",
+    extensionSlotName: "biometrics-widget"
   },
   {
-    name: "HeightAndWeightSummary",
+    name: "BiometricsSummary",
     extensionSlotName: "biometrics-widget"
   },
   {
@@ -123,10 +123,10 @@ export const coreDashboardDefinitions: Array<DashboardConfig> = [
         basePath: "results/vitals"
       },
       {
-        name: "HeightAndWeightOverview",
-        extensionSlotName: "patient-chart-vitals",
+        name: "BiometricsOverview",
+        extensionSlotName: "biometrics-widget",
         layout: { columnSpan: 2 },
-        basePath: "results/heightAndWeight"
+        basePath: "results/biometrics"
       },
       {
         name: "MedicationsOverview",
@@ -152,9 +152,9 @@ export const coreDashboardDefinitions: Array<DashboardConfig> = [
         basePath: "results/vitals"
       },
       {
-        name: "HeightAndWeightOverview",
-        extensionSlotName: "patient-chart-vitals",
-        basePath: "results/heightAndWeight"
+        name: "BiometricsOverview",
+        extensionSlotName: "biometrics-widget",
+        basePath: "results/biometrics"
       }
     ]
   },
