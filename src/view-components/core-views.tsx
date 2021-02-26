@@ -255,8 +255,8 @@ export const coreTabbedViewDefinitions = [
       },
       {
         label: "Biometrics",
-        path: "/heightAndWeight",
-        view: "HeightAndWeightSummary"
+        path: "/biometrics",
+        view: "BiometricsSummary"
       }
     ]
   },
