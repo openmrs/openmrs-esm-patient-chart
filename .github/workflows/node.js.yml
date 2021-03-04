@@ -9,10 +9,6 @@ on:
     types:
       - created
 
-env:
-  ESM_NAME: "@openmrs/esm-patient-chart-app"
-  JS_NAME: "openmrs-esm-patient-chart-app.js"
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -23,20 +19,25 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: "14.x"
-      - run: npm install
-      - run: npm run lint
-      - run: npm run coverage
-      - run: npm run typescript
-      - run: npm run build --if-present
+      - run: npx lerna bootstrap
+      - run: npx lerna run lint
+      - run: npx lerna run typescript
+      - run: npx lerna run test
+      - run: npx lerna run build
       - name: Upload Artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: dist
+          name: packages
           path: |
-            dist
+            packages/**/dist
 
-  deploy:
+  deploy_patient_chart_app:
     runs-on: ubuntu-latest
+
+    env:
+      DIR_NAME: "esm-patient-chart-app"
+      ESM_NAME: "@openmrs/esm-patient-chart-app"
+      JS_NAME: "openmrs-esm-patient-chart-app.js"
 
     needs: build
 
@@ -51,7 +52,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p dist/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}
-          mv dist/*.* dist/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/
+          mv packages/${{ env.DIR_NAME }}/dist/*.* dist/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/
       - name: Publish to Digital Ocean
         uses: jakejarvis/s3-sync-action@master
         with:
@@ -81,16 +82,17 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Download Artifacts
-        uses: actions/download-artifact@v2
       - name: Use Node.js
         uses: actions/setup-node@v1
         with:
           node-version: "14.x"
           registry-url: "https://registry.npmjs.org"
-      - run: npm install
-      - run: sed -i -e "s/\(\"version\":\\s\+\"\([0-9]\+\.\?\)\+\)/\1-pre.${{ github.run_number }}/" 'package.json'
-      - run: npm publish --access public --tag next
+      - run: npx lerna bootstrap
+      - run: npx lerna run build
+      - run: npx lerna version "$(node -e "console.log(require('./lerna.json').version)")-pre.${{ github.run_number }}" --no-git-tag-version --yes
+      - run: git config user.email "info@openmrs.org" && git config user.name "OpenMRS CI"
+      - run: git add . && git commit -m "Prerelease version" --no-verify
+      - run: npm run ci:prepublish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
@@ -103,14 +105,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Download Artifacts
-        uses: actions/download-artifact@v2
       - name: Use Node.js
         uses: actions/setup-node@v1
         with:
           node-version: "14.x"
-          registry-url: 'https://registry.npmjs.org'
-      - run: npm install
-      - run: npm publish --access public
+          registry-url: "https://registry.npmjs.org"
+      - run: npx lerna bootstrap
+      - run: npx lerna run build
+      - run: npm run ci:publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
