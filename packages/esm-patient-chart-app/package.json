@@ -3,7 +3,7 @@
   "version": "3.0.0",
   "license": "MPL-2.0",
   "description": "Patient dashboard microfrontend for the OpenMRS SPA",
-  "browser": "dist/openmrs-esm-implementer-tools-app.js",
+  "browser": "dist/openmrs-esm-patient-chart-app.js",
   "main": "src/index.ts",
   "source": true,
   "scripts": {
@@ -27,11 +27,6 @@
   "homepage": "https://github.com/openmrs/openmrs-esm-patient-chart#readme",
   "publishConfig": {
     "access": "public"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "pretty-quick --staged && concurrently npm:lint npm:typescript npm:coverage"
-    }
   },
   "repository": {
     "type": "git",
