@@ -87,6 +87,12 @@ export const coreDashboardDefinitions: Array<DashboardConfig> = [
         basePath: "conditions"
       },
       {
+        name: "TestResultsOverview",
+        extensionSlotName: "test-results-widget",
+        layout: { columnSpan: 2 },
+        basePath: "test-results"
+      },
+      {
         name: "forms",
         extensionSlotName: "forms",
         layout: { columnSpan: 2 },
