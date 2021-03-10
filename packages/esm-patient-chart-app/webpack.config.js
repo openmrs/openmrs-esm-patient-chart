@@ -5,30 +5,31 @@ const { BundleAnalyzerPlugin } = require("webpack-bundle-analyzer");
 
 const { peerDependencies } = require("./package.json");
 
-module.exports = env => ({
+module.exports = (env, argv = {}) => ({
   entry: [
     resolve(__dirname, "src/set-public-path.ts"),
-    resolve(__dirname, "src/index.ts")
+    resolve(__dirname, "src/index.ts"),
   ],
+  mode: argv.mode || "development",
   output: {
     filename: "openmrs-esm-patient-chart-app.js",
     libraryTarget: "system",
     path: resolve(__dirname, "dist"),
-    jsonpFunction: "webpackJsonp_openmrs_esm_patient_chart_app"
+    jsonpFunction: "webpackJsonp_openmrs_esm_patient_chart_app",
   },
   module: {
     rules: [
       {
         parser: {
-          system: false
-        }
+          system: false,
+        },
       },
       {
         test: /\.m?(js|ts|tsx)$/,
         exclude: /(node_modules|bower_components)/,
         use: {
-          loader: "babel-loader"
-        }
+          loader: "babel-loader",
+        },
       },
       {
         test: /\.css$/,
@@ -39,30 +40,30 @@ module.exports = env => ({
             options: {
               modules: {
                 localIdentName:
-                  "esm-patient-chart__[name]__[local]___[hash:base64:5]"
-              }
-            }
-          }
-        ]
-      }
-    ]
+                  "esm-patient-chart__[name]__[local]___[hash:base64:5]",
+              },
+            },
+          },
+        ],
+      },
+    ],
   },
   devtool: "sourcemap",
   devServer: {
     headers: {
-      "Access-Control-Allow-Origin": "*"
+      "Access-Control-Allow-Origin": "*",
     },
-    disableHostCheck: true
+    disableHostCheck: true,
   },
   externals: Object.keys(peerDependencies),
   plugins: [
     new ForkTsCheckerWebpackPlugin(),
     new CleanWebpackPlugin(),
     new BundleAnalyzerPlugin({
-      analyzerMode: env && env.analyze ? "server" : "disabled"
-    })
+      analyzerMode: env && env.analyze ? "server" : "disabled",
+    }),
   ],
   resolve: {
-    extensions: [".tsx", ".ts", ".jsx", ".js"]
-  }
+    extensions: [".tsx", ".ts", ".jsx", ".js"],
+  },
 });

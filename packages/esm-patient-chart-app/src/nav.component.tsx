@@ -10,6 +10,7 @@ function getPatientUuidFromUrl() {
 export default function PatientChartNavMenu() {
   const patientUuid = getPatientUuidFromUrl();
   const basePath = spaBasePath.replace(":patientUuid", patientUuid);
+
   return (
     <ExtensionSlot
       extensionSlotName="patient-chart-nav-menu"

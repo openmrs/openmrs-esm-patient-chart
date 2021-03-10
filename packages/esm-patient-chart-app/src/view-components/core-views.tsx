@@ -1,274 +1,63 @@
-import { WidgetConfig } from "./widget/widget.component";
-import { DashboardConfig } from "./dashboard/dashboard.component";
+export interface DashboardConfig {
+  name: string;
+  title?: string;
+  extensionSlotName: string;
+  layout: {
+    columns: number;
+  };
+}
 
-export const coreWidgetDefinitions: Array<WidgetConfig> = [
-  {
-    name: "ProgramsOverview",
-    extensionSlotName: "programs-overview-widget-ext"
-  },
-  {
-    name: "ProgramsSummary",
-    extensionSlotName: "programs-summary-widget-ext"
-  },
-  {
-    name: "Immunizations",
-    extensionSlotName: "immunizations-widget-ext"
-  },
-  {
-    name: "MedicationsOverview",
-    extensionSlotName: "patient-chart-dashboard-medications"
-  },
-  {
-    name: "MedicationsSummary",
-    extensionSlotName: "patient-chart-dashboard-summary"
-  },
-  {
-    name: "BiometricsOverview",
-    extensionSlotName: "biometrics-widget"
-  },
-  {
-    name: "BiometricsSummary",
-    extensionSlotName: "biometrics-widget"
-  },
-  {
-    name: "VitalsOverview",
-    extensionSlotName: "vitals-widget"
-  },
-  {
-    name: "VitalsSummary",
-    extensionSlotName: "vitals-widget"
-  },
-  {
-    name: "ImmunizationsOverview",
-    extensionSlotName: "immunizations-overview-widget-ext"
-  },
-  {
-    name: "AllergiesOverview",
-    extensionSlotName: "allergies-overview-widget-ext"
-  },
-  {
-    name: "AllergiesSummary",
-    extensionSlotName: "allergies-summary-widget-ext"
-  },
-  {
-    name: "NotesOverview",
-    extensionSlotName: "notes-overview-widget-ext"
-  },
-  {
-    name: "Notes",
-    extensionSlotName: "notes-overview-ext"
-  },
-  {
-    name: "AppointmentsOverview",
-    extensionSlotName: "appointments-overview-widget-ext"
-  },
-  {
-    name: "AppointmentsSummary",
-    extensionSlotName: "appointments-summary-widget-ext"
-  },
-  {
-    name: "AttachmentsOverview",
-    extensionSlotName: "attachments-overview-widget-ext"
-  }
-];
-
-export const coreDashboardDefinitions: Array<DashboardConfig> = [
+export const defaultDashboardDefinitions: Array<DashboardConfig> = [
   {
     name: "summaryDashboard",
     title: "Overview",
-    layout: {
-      columns: 4
-    },
-    widgets: [
-      {
-        name: "ConditionsOverview",
-        extensionSlotName: "conditions-overview-widget-ext",
-        layout: { columnSpan: 2 },
-        basePath: "conditions"
-      },
-      {
-        name: "forms",
-        extensionSlotName: "forms",
-        layout: { columnSpan: 2 },
-        basePath: "forms"
-      },
-      {
-        name: "ImmunizationsOverview",
-        extensionSlotName: "immunizations-overview-widget-ext",
-        layout: { columnSpan: 2 },
-        basePath: "immunizations"
-      },
-      {
-        name: "ProgramsOverview",
-        extensionSlotName: "programs-overview-widget-ext",
-        layout: { columnSpan: 2 },
-        basePath: "programs"
-      },
-      {
-        name: "AllergiesOverview",
-        extensionSlotName: "allergies-overview-widget-ext",
-        layout: { columnSpan: 2 },
-        basePath: "allergies"
-      },
-      {
-        name: "NotesOverview",
-        extensionSlotName: "notes-overview-widget-ext",
-        layout: { columnSpan: 4 },
-        basePath: "encounters/notes"
-      },
-      {
-        name: "VitalsOverview",
-        extensionSlotName: "vitals-widget",
-        layout: { columnSpan: 2 },
-        basePath: "results/vitals"
-      },
-      {
-        name: "BiometricsOverview",
-        extensionSlotName: "biometrics-widget",
-        layout: { columnSpan: 2 },
-        basePath: "results/biometrics"
-      },
-      {
-        name: "MedicationsOverview",
-        extensionSlotName: "patient-chart-dashboard-medications",
-        layout: { columnSpan: 3 },
-        basePath: "orders/medication-orders"
-      },
-      {
-        name: "AppointmentsOverview",
-        extensionSlotName: "appointments-overview-widget-ext",
-        layout: { columnSpan: 4 },
-        basePath: "appointments"
-      }
-    ]
+    extensionSlotName: "patient-chart-summary-dashboard-slot",
+    layout: { columns: 4 }
   },
   {
     name: "resultsOverviewDashboard",
-    layout: { columns: 1 },
-    widgets: [
-      {
-        name: "VitalsOverview",
-        extensionSlotName: "vitals-widget",
-        basePath: "results/vitals"
-      },
-      {
-        name: "BiometricsOverview",
-        extensionSlotName: "biometrics-widget",
-        basePath: "results/biometrics"
-      }
-    ]
+    extensionSlotName: "patient-chart-results-dashboard-slot",
+    layout: { columns: 1 }
   },
   {
     name: "ordersOverviewDashboard",
     title: "Orders Overview",
-    layout: { columns: 1 },
-    widgets: [
-      {
-        name: "MedicationsOverview",
-        extensionSlotName: "patient-chart-dashboard-medications",
-        basePath: "orders/medication-orders"
-      }
-    ]
+    extensionSlotName: "patient-chart-orders-dashboard-slot",
+    layout: { columns: 1 }
   },
   {
     name: "notesDashboard",
-    layout: { columns: 1 },
-    widgets: [
-      {
-        name: "Notes",
-        extensionSlotName: "notes-overview-ext"
-      }
-    ]
+    extensionSlotName: "patient-chart-notes-dashboard-slot",
+    layout: { columns: 1 }
   },
   {
     name: "conditionsDashboard",
-    layout: { columns: 1 },
-    widgets: [
-      {
-        name: "Conditions",
-        extensionSlotName: "conditions-widget-ext"
-      }
-    ]
+    extensionSlotName: "patient-chart-conditions-dashboard-slot",
+    layout: { columns: 1 }
   },
   {
     name: "immunizationsDashboard",
-    layout: { columns: 1 },
-    widgets: [
-      {
-        name: "Immunizations",
-        extensionSlotName: "immunizations-widget-ext"
-      }
-    ]
+    extensionSlotName: "patient-chart-immunization-dashboard-slot",
+    layout: { columns: 1 }
   },
   {
     name: "allergiesDashboard",
-    layout: { columns: 1 },
-    widgets: [
-      {
-        name: "AllergiesSummary",
-        extensionSlotName: "allergies-summary-widget-ext"
-      }
-    ]
+    extensionSlotName: "patient-chart-allergies-dashboard-slot",
+    layout: { columns: 1 }
   },
   {
     name: "programsDashboard",
-    layout: { columns: 1 },
-    widgets: [
-      {
-        name: "ProgramsSummary",
-        extensionSlotName: "programs-summary-widget-ext"
-      }
-    ]
+    extensionSlotName: "patient-chart-programs-dashboard-slot",
+    layout: { columns: 1 }
   },
   {
     name: "appointmentsDashboard",
-    layout: { columns: 1 },
-    widgets: [
-      {
-        name: "AppointmentsSummary",
-        extensionSlotName: "appointments-summary-widget-ext"
-      }
-    ]
+    extensionSlotName: "patient-chart-appointments-dashboard-slot",
+    layout: { columns: 1 }
   },
   {
-    name: "AttachmentsOverview",
-    layout: { columns: 1 },
-    widgets: [
-      {
-        name: "AttachmentsOverview",
-        extensionSlotName: "attachments-overview-widget-ext"
-      }
-    ]
-  }
-];
-
-export const coreTabbedViewDefinitions = [
-  {
-    name: "resultsTabbedView",
-    title: "Results",
-
-    navbar: [
-      {
-        label: "Vitals",
-        path: "/vitals",
-        view: "VitalsSummary"
-      },
-      {
-        label: "Biometrics",
-        path: "/biometrics",
-        view: "BiometricsSummary"
-      }
-    ]
-  },
-  {
-    name: "encountersTabbedView",
-    title: "Encounters",
-    navbar: [
-      {
-        label: "Notes",
-        path: "/notes",
-        view: "notesDashboard"
-      }
-    ]
+    name: "attachmentsOverview",
+    extensionSlotName: "patient-chart-attachments-dashboard-slot",
+    layout: { columns: 1 }
   }
 ];
