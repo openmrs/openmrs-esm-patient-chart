@@ -1,8 +1,5 @@
 import { Type } from "@openmrs/esm-framework";
-import {
-  defaultDashboardDefinitions,
-  DashboardConfig
-} from "../view-components/core-views";
+import { defaultDashboardDefinitions, DashboardConfig } from "./core-views";
 
 export const esmPatientChartSchema = {
   dashboardDefinitions: {

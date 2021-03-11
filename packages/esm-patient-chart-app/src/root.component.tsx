@@ -13,8 +13,8 @@ import {
   ExtensionSlotProps
 } from "@openmrs/esm-framework";
 import { AppPropsContext } from "./app-props-context";
-import { basePath } from "./constants";
-import { ModalItem, newModalItem } from "./visit/visit-dialog.resource";
+import { basePath, dashboardPath, spaRoot } from "./constants";
+import { newModalItem } from "./visit/visit-dialog.resource";
 
 interface RouteParams {
   patientUuid: string;
@@ -79,7 +79,7 @@ export default function Root(props) {
 
   return (
     <AppPropsContext.Provider value={{ appProps: props }}>
-      <BrowserRouter basename={window["getOpenmrsSpaBase"]()}>
+      <BrowserRouter basename={spaRoot}>
         <main
           className="omrs-main-content"
           style={{
@@ -94,19 +94,11 @@ export default function Root(props) {
           </aside>
           <div className={styles.grid} style={{ marginTop: "4.5rem" }}>
             <div className={styles.chartreview}>
-              <Route path={`${basePath}/:view?/:subview?`}>
-                <ChartReview />
-              </Route>
-              <Route
-                path={basePath}
-                render={routeProps => <VisitDialog {...routeProps} />}
-              />
+              <Route path={dashboardPath} component={ChartReview} />
+              <Route path={basePath} component={VisitDialog} />
             </div>
             <div className={styles.workspace}>
-              <Route
-                path={basePath}
-                render={routeProps => <WorkspaceWrapper {...routeProps} />}
-              />
+              <Route path={basePath} component={WorkspaceWrapper} />
             </div>
           </div>
         </main>
