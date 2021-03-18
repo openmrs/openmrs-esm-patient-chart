@@ -23,26 +23,25 @@ export default function ContextWorkspace({
 }: ContextWorkspaceProps) {
   const { t } = useTranslation();
 
-  return extensionSlot ? (
-    <aside className={styles.contextWorkspaceContainer}>
-      <Header
-        aria-label={t("orderBasket", "Order Basket")}
-        style={{ position: "sticky" }}
-      >
-        <HeaderName prefix="">{title}</HeaderName>
-        <HeaderGlobalBar>
-          <HeaderGlobalAction
-            aria-label={t("close", "Close")}
-            title={t("close", "Close")}
-            onClick={clearExtensionSlot}
-          >
-            <Close32 />
-          </HeaderGlobalAction>
-        </HeaderGlobalBar>
-      </Header>
-      {extensionSlot}
-    </aside>
-  ) : (
-    <></>
+  return (
+    <>
+      {extensionSlot && (
+        <aside className={styles.contextWorkspaceContainer}>
+          <Header aria-label={title} style={{ position: "sticky" }}>
+            <HeaderName prefix="">{title}</HeaderName>
+            <HeaderGlobalBar>
+              <HeaderGlobalAction
+                aria-label={t("close", "Close")}
+                title={t("close", "Close")}
+                onClick={clearExtensionSlot}
+              >
+                <Close32 />
+              </HeaderGlobalAction>
+            </HeaderGlobalBar>
+          </Header>
+          {extensionSlot}
+        </aside>
+      )}
+    </>
   );
 }
