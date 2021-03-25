@@ -1,0 +1,25 @@
+@import "~@openmrs/esm-styleguide/src/vars";
+@import "~carbon-components/src/globals/scss/vars";
+@import "~carbon-components/src/globals/scss/mixins";
+
+.vitalsHeaderStateDetailsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  margin: 0.5rem 1.438rem 1rem $spacing-05;
+  width: $layout-07;
+}
+
+.vitalsDetailsBodyShort01 {
+  @extend .bodyShort01;
+  color: $color-gray-70;
+}
+
+.bodyShort02 {
+  @include carbon--type-style("body-short-02");
+}
+
+.label01 {
+  @include carbon--type-style("label-01");
+  margin: 0 1.375rem 0.25rem 0;
+}

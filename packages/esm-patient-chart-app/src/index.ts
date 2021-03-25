@@ -1,7 +1,7 @@
 import {
   registerBreadcrumbs,
   defineConfigSchema,
-  getAsyncLifecycle
+  getAsyncLifecycle,
 } from "@openmrs/esm-framework";
 import { esmPatientChartSchema } from "./config-schemas/openmrs-esm-patient-chart-schema";
 import { spaBasePath } from "./constants";
@@ -19,7 +19,7 @@ function setupOpenMRS() {
 
   const options = {
     featureName: "patient-chart",
-    moduleName
+    moduleName,
   };
 
   defineConfigSchema(moduleName, esmPatientChartSchema);
@@ -28,8 +28,8 @@ function setupOpenMRS() {
     {
       path: spaBasePath,
       title: "Patient",
-      parent: `${window.spaBase}/home`
-    }
+      parent: `${window.spaBase}/home`,
+    },
   ]);
 
   return {
@@ -38,9 +38,9 @@ function setupOpenMRS() {
     extensions: [
       {
         id: "patient-chart-nav-items",
-        load: getAsyncLifecycle(() => import("./nav.component"), options)
-      }
-    ]
+        load: getAsyncLifecycle(() => import("./nav.component"), options),
+      },
+    ],
   };
 }
 

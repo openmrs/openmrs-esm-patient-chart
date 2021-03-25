@@ -1,0 +1,64 @@
+@import "~@openmrs/esm-styleguide/src/vars";
+@import "~carbon-components/src/globals/scss/vars";
+@import "~carbon-components/src/globals/scss/mixins";
+
+.inputContainer {
+  width: 8.125rem;
+  border-bottom: 0.063rem solid $ui-04;
+  margin-bottom: $spacing-05;
+}
+
+.vitalsBiometricInputLabel01 {
+  @extend .label01;
+  color: $text-02;
+  margin-bottom: $spacing-03;
+}
+
+.textInput {
+  border: none;
+  background-color: white;
+  @extend .productiveHeading04;
+  text-align: center;
+  padding: 0;
+  color: $ui-05;
+}
+
+.textInputContainer {
+  @extend .productiveHeading04;
+  background-color: #ffffff;
+  height: 4.875rem;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  padding: $spacing-03;
+  color: $text-02;
+}
+
+.textArea {
+  border: none;
+  background-color: white;
+  @extend .bodyLong01;
+  text-align: left;
+}
+
+.centerDiv {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}
+
+.unitName {
+  margin-bottom: $spacing-03;
+}
+
+.disableInput {
+  background-color: $ui-01;
+}
+
+.danger {
+  color: $danger;
+}

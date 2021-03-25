@@ -10,10 +10,10 @@ const importTranslation = require.context(
 );
 
 function setupOpenMRS() {
-  const moduleName = "@openmrs/esm-patient-biometrics-app";
+  const moduleName = "@openmrs/esm-patient-vitals-app";
 
   const options = {
-    featureName: "patient-biometrics",
+    featureName: "patient-vitals",
     moduleName,
   };
 
@@ -22,15 +22,15 @@ function setupOpenMRS() {
   return {
     extensions: [
       {
-        id: "biometrics-widget",
+        id: "vitals-widget",
         slot: "patient-chart-results-dashboard-slot",
         load: getAsyncLifecycle(
-          () => import("./biometrics/biometrics-overview.component"),
+          () => import("./vitals/vitals-overview.component"),
           options
         ),
         meta: {
-          view: "biometrics",
-          title: "Biometrics",
+          view: "vitals",
+          title: "Vitals",
         },
       },
     ],

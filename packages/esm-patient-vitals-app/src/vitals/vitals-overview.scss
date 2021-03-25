@@ -2,20 +2,18 @@
 @import "~carbon-components/src/globals/scss/vars";
 @import "~carbon-components/src/globals/scss/mixins";
 
-.biometricsWidgetContainer {
+.vitalsWidgetContainer {
   background-color: $ui-background;
-  position: relative;
 }
 
-.biometricsHeaderContainer {
+.vitalsHeaderContainer {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: $spacing-04 0 $spacing-04 $spacing-05;
-  background-color: $ui-background;
 }
 
-.biometricsHeaderContainer > h4:after {
+.vitalsHeaderContainer > h4:after {
   content: "";
   display: block;
   width: 2rem;
@@ -34,4 +32,9 @@
 
 .toggle:last-of-type {
   border-radius: 0 $spacing-02 $spacing-02 0;
+}
+
+.vitalsWidgetContainer {
+  background-color: $ui-background;
+  position: relative;
 }
