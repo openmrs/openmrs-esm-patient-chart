@@ -24,20 +24,34 @@ function makePath(
   return parts.join("/");
 }
 
-export default function ChartReview(props: RouteComponentProps) {
+interface ChartReviewProps
+  extends RouteComponentProps<{ patientUuid: string }> {}
+
+const ChartReview: React.FC<ChartReviewProps> = ({ match }) => {
   const config = useConfig() as ChartConfig;
+  const { patientUuid } = match.params;
 
   const dashboards = useMemo(() => {
     return config.dashboardDefinitions.map((dashboard) => (
       <Route key={dashboard.name} exact path={makePath(dashboard)}>
         {dashboard.config.type === "grid" ? (
-          <GridView slot={dashboard.slot} layout={dashboard.config} name={dashboard.name} />
+          <GridView
+            slot={dashboard.slot}
+            layout={dashboard.config}
+            name={dashboard.name}
+            patientUuid={patientUuid}
+          />
         ) : (
-          <TabbedView slot={dashboard.slot} layout={dashboard.config} name={dashboard.name} />
+          <TabbedView
+            slot={dashboard.slot}
+            layout={dashboard.config}
+            name={dashboard.name}
+            patientUuid={patientUuid}
+          />
         )}
       </Route>
     ));
-  }, [config.dashboardDefinitions]);
+  }, [config.dashboardDefinitions, patientUuid]);
 
   return (
     <div className={styles.chartSection}>
@@ -47,7 +61,7 @@ export default function ChartReview(props: RouteComponentProps) {
             <Route exact path={basePath}>
               <Redirect
                 to={makePath(config.dashboardDefinitions[0], {
-                  ...props.match.params,
+                  ...match.params,
                   subview: "",
                 })}
               />
@@ -58,4 +72,6 @@ export default function ChartReview(props: RouteComponentProps) {
       </div>
     </div>
   );
-}
+};
+
+export default ChartReview;

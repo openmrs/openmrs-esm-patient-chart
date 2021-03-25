@@ -38,13 +38,14 @@ export interface PatientBiometrics {
   bmi: number;
 }
 
-interface BiometricsOverviewProps {}
+interface BiometricsOverviewProps {
+  patientUuid: string;
+}
 
-const BiometricsOverview: React.FC<BiometricsOverviewProps> = () => {
+const BiometricsOverview: React.FC<BiometricsOverviewProps> = ({ patientUuid }) => {
   const config = useConfig() as ConfigObject;
   const biometricsToShowCount = 5;
   const { t } = useTranslation();
-  const [, , patientUuid] = useCurrentPatient();
   const { conceptsUnits } = useVitalsSignsConceptMetaData();
   const [biometrics, setBiometrics] = React.useState<Array<any>>();
   const [error, setError] = React.useState(null);
@@ -233,15 +234,4 @@ const BiometricsOverview: React.FC<BiometricsOverviewProps> = () => {
   );
 };
 
-export default ({ view, fullPath }) => {
-  const defaultView = "biometrics";
-
-  if (!view) {
-    const prefix = "${openmrsSpaBase}";
-    navigate({
-      to: `${prefix}${fullPath}/${defaultView}`,
-    });
-  }
-
-  return <>{view === defaultView && <BiometricsOverview />}</>;
-};
+export default BiometricsOverview;

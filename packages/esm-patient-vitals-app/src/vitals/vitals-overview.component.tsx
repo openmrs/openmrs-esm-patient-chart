@@ -20,7 +20,6 @@ import EmptyState from "./empty-state/empty-state.component";
 import ErrorState from "./error-state/error-state.component";
 import { useTranslation } from "react-i18next";
 import {
-  useCurrentPatient,
   useConfig,
   createErrorHandler,
   switchTo
@@ -31,9 +30,11 @@ import {
   PatientVitals
 } from "./vitals-biometrics.resource";
 
-interface VitalsOverviewProps {}
+interface VitalsOverviewProps {
+  patientUuid: string;
+}
 
-const VitalsOverview: React.FC<VitalsOverviewProps> = () => {
+const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid }) => {
   const config = useConfig();
   const vitalsToShowCount = 5;
   const { t } = useTranslation();
@@ -51,7 +52,6 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = () => {
     respiratoryRateUnit
   ] = conceptsUnits;
 
-  const [isLoadingPatient, , patientUuid] = useCurrentPatient();
   const [chartView, setChartView] = React.useState<boolean>();
   const [vitals, setVitals] = React.useState<Array<PatientVitals>>(null);
   const [error, setError] = React.useState(null);

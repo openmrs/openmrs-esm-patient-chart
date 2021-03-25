@@ -30,6 +30,11 @@ function setupOpenMRS() {
       title: "Patient",
       parent: `${window.spaBase}/home`,
     },
+    {
+      path: `${spaBasePath}/:view/:subview?`,
+      title: "Dashboard",
+      parent: spaBasePath,
+    },
   ]);
 
   return {

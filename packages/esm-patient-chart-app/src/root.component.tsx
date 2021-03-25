@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import WorkspaceWrapper from "./workspace/workspace-wrapper.component";
 import ChartReview from "./chart-review/chart-review.component";
 import styles from "./root.css";
@@ -10,7 +10,7 @@ import {
   detach,
   useNavigationContext,
   ExtensionSlot,
-  ExtensionSlotProps
+  ExtensionSlotProps,
 } from "@openmrs/esm-framework";
 import { AppPropsContext } from "./app-props-context";
 import { basePath, dashboardPath, spaRoot } from "./constants";
@@ -20,16 +20,24 @@ interface RouteParams {
   patientUuid: string;
 }
 
-const PatientInfo: React.FC<RouteComponentProps<RouteParams>> = props => {
+const PatientInfo: React.FC<RouteComponentProps<RouteParams>> = (props) => {
   const patientUuid = props.match.params.patientUuid;
   const basePath = props.location.pathname;
+
+  const state = useMemo(
+    () => ({
+      patientUuid,
+
+      basePath,
+    }),
+
+    [basePath, patientUuid]
+  );
+
   return (
     <>
-      <ExtensionSlot
-        extensionSlotName="patient-chart-header"
-        state={{ basePath, patientUuid }}
-      />
-      <ExtensionSlot extensionSlotName="patient-vital-status" />
+      <ExtensionSlot extensionSlotName="patient-header-slot" state={state} />
+      <ExtensionSlot extensionSlotName="patient-info-slot" state={state} />
     </>
   );
 };
@@ -37,7 +45,7 @@ const PatientInfo: React.FC<RouteComponentProps<RouteParams>> = props => {
 export default function Root(props) {
   const [
     currentWorkspaceExtensionSlot,
-    setCurrentWorkspaceExtensionSlot
+    setCurrentWorkspaceExtensionSlot,
   ] = useState<React.FC<ExtensionSlotProps>>();
   const [workspaceTitle, setWorkspaceTitle] = useState("");
 
@@ -57,7 +65,7 @@ export default function Root(props) {
       ));
       setWorkspaceTitle(state.title ?? "");
       return true;
-    }
+    },
   });
 
   useNavigationContext({
@@ -69,12 +77,12 @@ export default function Root(props) {
       }
 
       return false;
-    }
+    },
   });
 
   useEffect(() => {
-    attach("nav-menu", "patient-chart-nav-items");
-    return () => detach("nav-menu", "patient-chart-nav-items");
+    attach("nav-menu-slot", "patient-chart-nav-items");
+    return () => detach("nav-menu-slot", "patient-chart-nav-items");
   }, []);
 
   return (
@@ -85,10 +93,10 @@ export default function Root(props) {
           style={{
             display: "flex",
             alignItems: "flex-start",
-            flexDirection: "column"
+            flexDirection: "column",
           }}
         >
-          <ExtensionSlot extensionSlotName="breadcrumbs" />
+          <ExtensionSlot extensionSlotName="breadcrumbs-slot" />
           <aside className={styles.patientBanner} style={{ width: "100%" }}>
             <Route path={basePath} component={PatientInfo} />
           </aside>

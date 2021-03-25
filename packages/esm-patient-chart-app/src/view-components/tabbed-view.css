@@ -9,7 +9,6 @@
   background-color: var(--omrs-color-bg-low-contrast);
   height: 3.125rem;
   flex-wrap: nowrap;
-  overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   border-bottom: 1px solid var(--omrs-color-bg-lowest-contrast);
 }

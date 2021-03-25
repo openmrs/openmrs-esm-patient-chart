@@ -12,18 +12,27 @@ function getColumnsLayoutStyle(layout: DashbardGridConfig) {
 export interface GridViewProps {
   name: string;
   slot: string;
+  patientUuid: string;
   layout: DashbardGridConfig;
 }
 
-export default function GridView({ slot, layout }: GridViewProps) {
+export default function GridView({
+  slot,
+  layout,
+  patientUuid,
+}: GridViewProps) {
   const urlData = useUrlData();
+  const state = {
+    ...urlData,
+    patientUuid,
+  };
 
   return (
     <div
       className={styles.dashboard}
       style={{ gridTemplateColumns: getColumnsLayoutStyle(layout) || 2 }}
     >
-      <ExtensionSlot extensionSlotName={slot} state={urlData} />
+      <ExtensionSlot extensionSlotName={slot} state={state} />
     </div>
   );
 }

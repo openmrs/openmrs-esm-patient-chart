@@ -7,7 +7,6 @@
   align-items: stretch;
   width: 100vw;
   height: 100vh;
-  overflow-y: scroll;
 }
 
 .patientBanner {
@@ -19,8 +18,6 @@
   grid-row: 1;
   grid-column: 1;
   align-self: start;
-  overflow-y: scroll;
-  overflow-x: hidden;
   height: 90%;
   padding-bottom: 10px;
 }
@@ -29,8 +26,6 @@
   grid-row: 1;
   grid-column: 2;
   align-self: start;
-  overflow-y: scroll;
-  overflow-x: hidden;
   height: 90%;
   border-left: 0.5px solid lightgray;
   padding-bottom: 10px;
