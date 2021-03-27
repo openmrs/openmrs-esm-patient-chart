@@ -2,7 +2,7 @@ import capitalize from "lodash-es/capitalize";
 import {
   registerBreadcrumbs,
   defineConfigSchema,
-  getAsyncLifecycle
+  getAsyncLifecycle,
 } from "@openmrs/esm-framework";
 import { esmPatientChartSchema } from "./config-schemas/openmrs-esm-patient-chart-schema";
 import { spaBasePath } from "./constants";
@@ -18,38 +18,40 @@ const importTranslation = require.context(
 function setupOpenMRS() {
   const moduleName = "@openmrs/esm-patient-chart-app";
 
-  const options = {
-    featureName: "patient-chart",
-    moduleName
-  };
-
   defineConfigSchema(moduleName, esmPatientChartSchema);
 
   registerBreadcrumbs([
     {
       path: spaBasePath,
       title: "Patient",
-      parent: `${window.spaBase}/home`
+      parent: `${window.spaBase}/home`,
     },
     {
       path: `${spaBasePath}/:view/:subview?`,
       title: ([_, key]) => `${capitalize(key)} Dashboard`,
-      parent: spaBasePath
-    }
+      parent: spaBasePath,
+    },
   ]);
 
   return {
-    lifecycle: getAsyncLifecycle(() => import("./root.component"), options),
-    activate: /^patient\/.+\/chart/,
+    pages: [
+      {
+        route: /^patient\/.+\/chart/,
+        load: getAsyncLifecycle(() => import("./root.component"), {
+          featureName: "patient-chart",
+          moduleName,
+        }),
+      },
+    ],
     extensions: [
       {
         id: "patient-chart-nav-items",
-        load: getAsyncLifecycle(
-          () => import("./ui-components/nav.component"),
-          options
-        )
-      }
-    ]
+        load: getAsyncLifecycle(() => import("./ui-components/nav.component"), {
+          featureName: "nav-items",
+          moduleName,
+        }),
+      },
+    ],
   };
 }
 

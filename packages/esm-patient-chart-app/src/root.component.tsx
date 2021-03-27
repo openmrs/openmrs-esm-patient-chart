@@ -1,6 +1,6 @@
 import React from "react";
 import ContextWorkspace from "./workspace/context-workspace.component";
-import PatientChart from "./ui-components/patient-chart.component";
+import PatientChart from "./ui-components/patient-chart/patient-chart.component";
 import { BrowserRouter, Route } from "react-router-dom";
 import { dashboardPath, spaRoot } from "./constants";
 import { useWorkspace } from "./hooks/useWorkspace";

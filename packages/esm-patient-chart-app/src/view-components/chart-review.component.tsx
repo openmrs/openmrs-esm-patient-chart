@@ -1,6 +1,6 @@
 import React from "react";
-import GridView from "../view-components/grid-view.component";
-import TabbedView from "../view-components/tabbed-view.component";
+import GridView from "./grid-view.component";
+import TabbedView from "./tabbed-view.component";
 import { Redirect } from "react-router-dom";
 import { useConfig } from "@openmrs/esm-framework";
 import { ChartConfig, DashboardConfig } from "../config-schemas";
