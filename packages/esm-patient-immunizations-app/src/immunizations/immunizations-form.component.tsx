@@ -1,12 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
 import SummaryCard from "../cards/summary-card.component";
 import styles from "./immunizations-form.css";
-import { createErrorHandler, getStartedVisit } from "@openmrs/esm-framework";
+import { createErrorHandler, getStartedVisit, useSessionUser } from "@openmrs/esm-framework";
 import { useTranslation } from "react-i18next";
 import { savePatientImmunization } from "./immunizations.resource";
 import { mapToFHIRImmunizationResource } from "./immunization-mapper";
 import { useHistory } from "react-router-dom";
-import useSessionUser from "./use-session-user";
 import {
   ImmunizationFormData,
   ImmunizationSequence,

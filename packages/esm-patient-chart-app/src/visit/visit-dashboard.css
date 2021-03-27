@@ -1,0 +1,47 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  border-radius: 0rem 0rem 0.625rem 0.625rem;
+  padding: 0.625rem;
+}
+
+:global(.omrs-breakpoint-lt-desktop) .card {
+  width: 100%;
+  box-shadow: 0rem 0.125rem 0.25rem rgba(0, 0, 0, 0.08),
+    0rem 0.0625rem 0.25rem rgba(0, 0, 0, 0.04);
+}
+
+:global(.omrs-breakpoint-gt-tablet) .card {
+  box-shadow: 0rem 0.125rem 0.25rem rgba(0, 0, 0, 0.08),
+    0rem 0.0625rem 0.25rem rgba(0, 0, 0, 0.04);
+}
+
+:global(.omrs-breakpoint-lt-desktop) .card {
+  margin: 0rem 0rem;
+}
+
+.visitContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  width: 100%;
+  position: relative;
+}
+
+.visitContainer button {
+  margin: 0.25rem;
+  border-radius: 0.25rem;
+  text-align: left;
+  padding: 0.25rem 0.625rem;
+  cursor: pointer;
+}
+
+.visitContainer button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.visitContainer button svg {
+  fill: var(--omrs-color-interaction);
+}

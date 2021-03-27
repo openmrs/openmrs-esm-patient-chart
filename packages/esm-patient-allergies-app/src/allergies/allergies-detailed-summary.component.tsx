@@ -6,10 +6,10 @@ import AllergyForm from "./allergy-form.component";
 import styles from "./allergies-detailed-summary.css";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useCurrentPatient, createErrorHandler } from "@openmrs/esm-framework";
+import { createErrorHandler } from "@openmrs/esm-framework";
 import {
   performPatientAllergySearch,
-  Allergy
+  Allergy,
 } from "./allergy-intolerance.resource";
 
 function openWorkspaceTab(_1: any, _2: any, _3: any) {
@@ -21,7 +21,7 @@ interface AllergiesDetailedSummaryProps {
 }
 
 export default function AllergiesDetailedSummary({
-  patient
+  patient,
 }: AllergiesDetailedSummaryProps) {
   const [patientAllergies, setPatientAllergies] = useState<Array<Allergy>>([]);
   const { t } = useTranslation();
@@ -30,7 +30,7 @@ export default function AllergiesDetailedSummary({
     if (patient) {
       const sub = performPatientAllergySearch(
         patient.identifier[0].value
-      ).subscribe(allergies => {
+      ).subscribe((allergies) => {
         setPatientAllergies(allergies);
       }, createErrorHandler());
 
@@ -52,7 +52,7 @@ export default function AllergiesDetailedSummary({
               {
                 allergyUuid: null,
                 setAllergies: setPatientAllergies,
-                allergies: patientAllergies
+                allergies: patientAllergies,
               }
             )
           }
@@ -74,7 +74,7 @@ export default function AllergiesDetailedSummary({
               </tr>
             </thead>
             <tbody>
-              {patientAllergies.map(allergy => {
+              {patientAllergies.map((allergy) => {
                 return (
                   <React.Fragment key={allergy?.id}>
                     <tr
@@ -160,7 +160,7 @@ export default function AllergiesDetailedSummary({
               {
                 allergyUuid: null,
                 setAllergies: setPatientAllergies,
-                allergies: patientAllergies
+                allergies: patientAllergies,
               }
             )
           }
