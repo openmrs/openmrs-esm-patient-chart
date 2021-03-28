@@ -12,19 +12,16 @@ import DataTable, {
   TableHeader,
   TableRow
 } from "carbon-components-react/es/components/DataTable";
+import AllergyForm from "./allergy-form.component";
+import EmptyState from "./empty-state/empty-state.component";
+import ErrorState from "./error-state/error-state.component";
+import styles from "./allergies-overview.scss";
 import { useTranslation } from "react-i18next";
 import {
   performPatientAllergySearch,
   Allergy
 } from "./allergy-intolerance.resource";
-import AllergyForm from "./allergy-form.component";
-import EmptyState from "./empty-state/empty-state.component";
-import ErrorState from "./error-state/error-state.component";
-import styles from "./allergies-overview.scss";
-
-function openWorkspaceTab(_1: any, _2: any) {
-  //TODO
-}
+import { openWorkspaceTab } from "./openWorkspaceTab";
 
 interface AllergiesOverviewProps {
   basePath: string;

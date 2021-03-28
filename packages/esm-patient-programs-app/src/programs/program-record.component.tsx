@@ -8,10 +8,7 @@ import { useTranslation, Trans } from "react-i18next";
 import { createErrorHandler } from "@openmrs/esm-framework";
 import { getPatientProgramByUuid } from "./programs.resource";
 import { useProgramsContext } from "./programs.context";
-
-function openWorkspaceTab(_1: any, _2: any, _3: any) {
-  //TODO
-}
+import { openWorkspaceTab } from "./openWorkspaceTab";
 
 interface ProgramRecordProps
   extends RouteComponentProps<{ programUuid: string }> {}
@@ -25,7 +22,7 @@ const ProgramRecord: React.FC<ProgramRecordProps> = ({ match }) => {
   useEffect(() => {
     if (patient && patientUuid) {
       const subscription = getPatientProgramByUuid(programUuid).subscribe(
-        (program) => {
+        program => {
           setPatientProgram(program), createErrorHandler();
         }
       );
@@ -51,7 +48,7 @@ const ProgramRecord: React.FC<ProgramRecordProps> = ({ match }) => {
                   programUuid: patientProgram?.uuid,
                   enrollmentDate: patientProgram?.dateEnrolled,
                   completionDate: patientProgram?.dateCompleted,
-                  locationUuid: patientProgram?.location?.uuid,
+                  locationUuid: patientProgram?.location?.uuid
                 }
               )
             }

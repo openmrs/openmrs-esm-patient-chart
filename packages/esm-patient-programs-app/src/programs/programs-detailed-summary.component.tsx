@@ -9,11 +9,8 @@ import { RouteComponentProps, Link } from "react-router-dom";
 import { createErrorHandler } from "@openmrs/esm-framework";
 import { fetchEnrolledPrograms } from "./programs.resource";
 import { useProgramsContext } from "./programs.context";
+import { openWorkspaceTab } from "./openWorkspaceTab";
 import { PatientProgram } from "../types";
-
-function openWorkspaceTab(_1: any, _2: any, _3?: any) {
-  //TODO
-}
 
 interface ProgramsDetailedSummaryProps extends RouteComponentProps<{}> {}
 
@@ -27,7 +24,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = () => {
   useEffect(() => {
     if (patientUuid) {
       const subscription = fetchEnrolledPrograms(patientUuid).subscribe(
-        (enrolledPrograms) => setEnrolledPrograms(enrolledPrograms),
+        enrolledPrograms => setEnrolledPrograms(enrolledPrograms),
         createErrorHandler()
       );
       return () => subscription.unsubscribe();
@@ -41,7 +38,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = () => {
           <SummaryCard
             name={t("carePrograms", "Care Programs")}
             styles={{
-              width: "100%",
+              width: "100%"
             }}
             addComponent={ProgramsForm}
             showComponent={() =>
@@ -50,7 +47,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = () => {
                 `${t("programsForm", "Programs Form")}`,
                 {
                   setEnrolledPrograms: setEnrolledPrograms,
-                  enrolledPrograms: enrolledPrograms,
+                  enrolledPrograms: enrolledPrograms
                 }
               )
             }
@@ -71,7 +68,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = () => {
                 </tr>
               </thead>
               <tbody>
-                {enrolledPrograms?.map((program) => {
+                {enrolledPrograms?.map(program => {
                   return (
                     <React.Fragment key={program.uuid}>
                       <tr
@@ -127,7 +124,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = () => {
               `${t("programsForm", "Programs Form")}`,
               {
                 setEnrolledPrograms: setEnrolledPrograms,
-                enrolledPrograms: enrolledPrograms,
+                enrolledPrograms: enrolledPrograms
               }
             )
           }

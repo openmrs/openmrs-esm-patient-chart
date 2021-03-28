@@ -6,10 +6,7 @@ import vaccinationRowStyles from "./vaccination-row.css";
 import { Link } from "react-router-dom";
 import { useTranslation, Trans } from "react-i18next";
 import { ImmunizationData } from "./immunization-domain";
-
-function openWorkspaceTab(_1: any, _2: any, _3: any) {
-  //TODO
-}
+import { openWorkspaceTab } from "./openWorkspaceTab";
 
 export default function VaccinationRow(params: ImmunizationProps) {
   const [patientImmunization, setPatientImmunization] = useState(null);
