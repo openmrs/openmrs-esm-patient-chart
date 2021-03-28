@@ -16,7 +16,7 @@ import DataTable, {
   TableHeader,
   TableRow,
   TableToolbar,
-  TableToolbarContent,
+  TableToolbarContent
 } from "carbon-components-react/es/components/DataTable";
 import { getDosage } from "../utils/get-dosage";
 import { useTranslation } from "react-i18next";
@@ -26,7 +26,7 @@ import { connect } from "unistore/react";
 import {
   OrderBasketStore,
   OrderBasketStoreActions,
-  orderBasketStoreActions,
+  orderBasketStoreActions
 } from "../medications/order-basket-store";
 import { Order } from "../types/order";
 import { OrderBasketItem } from "../types/order-basket-item";
@@ -57,7 +57,7 @@ const MedicationsDetailsTable = connect<
     showReorderButton,
     showAddNewButton,
     items,
-    setItems,
+    setItems
   }: ActiveMedicationsProps & OrderBasketStore & OrderBasketStoreActions) => {
     const { t } = useTranslation();
     const [page, setPage] = useState(1);
@@ -69,14 +69,14 @@ const MedicationsDetailsTable = connect<
         key: "startDate",
         header: t("startDate", "Start date"),
         isSortable: true,
-        isVisible: true,
+        isVisible: true
       },
       {
         key: "details",
         header: t("details", "Details"),
         isSortable: true,
-        isVisible: true,
-      },
+        isVisible: true
+      }
     ];
 
     const tableRows = currentMedicationPage.map((medication, id) => ({
@@ -105,7 +105,7 @@ const MedicationsDetailsTable = connect<
                   "for {duration} {durationUnit}",
                   {
                     duration: medication.duration,
-                    durationUnit: medication.durationUnits?.display,
+                    durationUnit: medication.durationUnits?.display
                   }
                 )}
             <br />
@@ -114,12 +114,12 @@ const MedicationsDetailsTable = connect<
             </span>{" "}
             {medication.numRefills}
           </p>
-        ),
+        )
       },
       startDate: {
         sortKey: dayjs(medication.dateActivated).toDate(),
-        content: dayjs(medication.dateActivated).format("DD-MMM-YYYY"),
-      },
+        content: dayjs(medication.dateActivated).format("DD-MMM-YYYY")
+      }
     }));
 
     const sortRow = (cellA, cellB, { sortDirection, sortStates }) => {
@@ -150,11 +150,11 @@ const MedicationsDetailsTable = connect<
             <Table {...getTableProps()}>
               <TableHead>
                 <TableRow>
-                  {headers.map((header) => (
+                  {headers.map(header => (
                     <TableHeader
                       {...getHeaderProps({
                         header,
-                        isSortable: header.isSortable,
+                        isSortable: header.isSortable
                       })}
                     >
                       {header.header}
@@ -166,7 +166,7 @@ const MedicationsDetailsTable = connect<
               <TableBody>
                 {rows.map((row, rowIndex) => (
                   <TableRow {...getRowProps({ row })}>
-                    {row.cells.map((cell) => (
+                    {row.cells.map(cell => (
                       <TableCell key={cell.id}>
                         {cell.value?.content ?? cell.value}
                       </TableCell>
@@ -208,7 +208,7 @@ function OrderBasketItemActions({
   showReorderButton,
   medication,
   items,
-  setItems,
+  setItems
 }: {
   showDiscontinueButton: boolean;
   showModifyButton: boolean;
@@ -218,7 +218,7 @@ function OrderBasketItemActions({
   setItems: (items: Array<OrderBasketItem>) => void;
 }) {
   const { t } = useTranslation();
-  const alreadyInBasket = items.some((x) => x.uuid === medication.uuid);
+  const alreadyInBasket = items.some(x => x.uuid === medication.uuid);
 
   const handleDiscontinueClick = useCallback(() => {
     setItems([
@@ -230,19 +230,19 @@ function OrderBasketItemActions({
         drug: medication.drug,
         dosage: {
           dosage: getDosage(medication.drug.strength, medication.dose),
-          numberOfPills: medication.dose,
+          numberOfPills: medication.dose
         },
         dosageUnit: {
           uuid: medication.doseUnits.uuid,
-          name: medication.doseUnits.display,
+          name: medication.doseUnits.display
         },
         frequency: {
           conceptUuid: medication.frequency.uuid,
-          name: medication.frequency.display,
+          name: medication.frequency.display
         },
         route: {
           conceptUuid: medication.route.uuid,
-          name: medication.route.display,
+          name: medication.route.display
         },
         encounterUuid: medication.encounter.uuid,
         commonMedicationName: medication.drug.name,
@@ -262,12 +262,12 @@ function OrderBasketItemActions({
         duration: medication.duration,
         durationUnit: {
           uuid: medication.durationUnits.uuid,
-          display: medication.durationUnits.display,
+          display: medication.durationUnits.display
         },
         pillsDispensed: medication.quantity,
         numRefills: medication.numRefills,
-        indication: medication.orderReasonNonCoded,
-      },
+        indication: medication.orderReasonNonCoded
+      }
     ]);
   }, [items, setItems, medication]);
 
@@ -282,19 +282,19 @@ function OrderBasketItemActions({
         drug: medication.drug,
         dosage: {
           dosage: getDosage(medication.drug.strength, medication.dose),
-          numberOfPills: medication.dose,
+          numberOfPills: medication.dose
         },
         dosageUnit: {
           uuid: medication.doseUnits.uuid,
-          name: medication.doseUnits.display,
+          name: medication.doseUnits.display
         },
         frequency: {
           conceptUuid: medication.frequency.uuid,
-          name: medication.frequency.display,
+          name: medication.frequency.display
         },
         route: {
           conceptUuid: medication.route.uuid,
-          name: medication.route.display,
+          name: medication.route.display
         },
         encounterUuid: medication.encounter.uuid,
         commonMedicationName: medication.drug.name,
@@ -313,12 +313,12 @@ function OrderBasketItemActions({
         duration: medication.duration,
         durationUnit: {
           uuid: medication.durationUnits.uuid,
-          display: medication.durationUnits.display,
+          display: medication.durationUnits.display
         },
         pillsDispensed: medication.quantity,
         numRefills: medication.numRefills,
-        indication: medication.orderReasonNonCoded,
-      },
+        indication: medication.orderReasonNonCoded
+      }
     ]);
   }, [items, setItems, medication]);
 
@@ -333,19 +333,19 @@ function OrderBasketItemActions({
         drug: medication.drug,
         dosage: {
           dosage: getDosage(medication.drug.strength, medication.dose),
-          numberOfPills: medication.dose,
+          numberOfPills: medication.dose
         },
         dosageUnit: {
           uuid: medication.doseUnits.uuid,
-          name: medication.doseUnits.display,
+          name: medication.doseUnits.display
         },
         frequency: {
           conceptUuid: medication.frequency.uuid,
-          name: medication.frequency.display,
+          name: medication.frequency.display
         },
         route: {
           conceptUuid: medication.route.uuid,
-          name: medication.route.display,
+          name: medication.route.display
         },
         encounterUuid: medication.encounter.uuid,
         commonMedicationName: medication.drug.name,
@@ -364,12 +364,12 @@ function OrderBasketItemActions({
         duration: medication.duration,
         durationUnit: {
           uuid: medication.durationUnits.uuid,
-          display: medication.durationUnits.display,
+          display: medication.durationUnits.display
         },
         pillsDispensed: medication.quantity,
         numRefills: medication.numRefills,
-        indication: medication.orderReasonNonCoded,
-      },
+        indication: medication.orderReasonNonCoded
+      }
     ]);
   }, [items, setItems, medication]);
 

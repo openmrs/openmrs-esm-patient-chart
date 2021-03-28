@@ -24,7 +24,7 @@ describe("<ProgramsOverview />", () => {
 
   it("should display the patient's program enrollments", async () => {
     const mockOpenWorkspaceTab = jest.fn();
-    
+
     mockFetchActiveEnrollments.mockReturnValue(
       of(mockEnrolledProgramsResponse)
     );

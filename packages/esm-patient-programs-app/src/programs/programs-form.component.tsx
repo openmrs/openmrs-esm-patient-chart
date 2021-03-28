@@ -15,7 +15,7 @@ import {
   fetchLocations,
   getPatientProgramByUuid,
   getSession,
-  updateProgramEnrollment,
+  updateProgramEnrollment
 } from "./programs.resource";
 import { DataCaptureComponentProps } from "../types";
 
@@ -46,7 +46,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
   patientUuid,
   closeComponent = () => {},
   entryCancelled = () => {},
-  entryStarted = () => {},
+  entryStarted = () => {}
 }) => {
   const formRef = useRef<HTMLFormElement>(null);
   const enrollmentDateRef = useRef<HTMLInputElement>(null);
@@ -74,7 +74,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
       programUuid,
       enrollmentDate,
       completionDate,
-      locationUuid,
+      locationUuid
     } = match.params;
 
     if (program && enrollmentDate) {
@@ -100,18 +100,18 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
 
   useEffect(() => {
     if (patientUuid) {
-      const sub1 = fetchLocations().subscribe((locations) => {
+      const sub1 = fetchLocations().subscribe(locations => {
         return setLocations(locations);
       }, createErrorHandler());
       const sub2 = fetchPrograms().subscribe(
-        (programs) => setAllPrograms(programs),
+        programs => setAllPrograms(programs),
         createErrorHandler()
       );
       const sub3 = fetchEnrolledPrograms(patientUuid).subscribe(
-        (enrolledPrograms) =>
+        enrolledPrograms =>
           setEnrolledPrograms(
             enrolledPrograms.filter(
-              (enrolledProgram) => !enrolledProgram.dateCompleted
+              enrolledProgram => !enrolledProgram.dateCompleted
             )
           ),
         createErrorHandler()
@@ -129,10 +129,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
     if (viewEditForm && patientUuid && match.params) {
       const subscription = getPatientProgramByUuid(
         match.params["programUuid"]
-      ).subscribe(
-        (program) => setPatientProgram(program),
-        createErrorHandler()
-      );
+      ).subscribe(program => setPatientProgram(program), createErrorHandler());
 
       return () => subscription.unsubscribe();
     }
@@ -141,7 +138,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
   useEffect(() => {
     if (allPrograms && enrolledPrograms) {
       setEligiblePrograms(
-        filter(allPrograms, (program) => {
+        filter(allPrograms, program => {
           return !includes(map(enrolledPrograms, "program.uuid"), program.uuid);
         })
       );
@@ -168,22 +165,22 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
     }
   }, [viewEditForm, formChanged]);
 
-  const handleCreateSubmit = ($event) => {
+  const handleCreateSubmit = $event => {
     $event.preventDefault();
     const enrollmentPayload: ProgramEnrollment = {
       program: program,
       patient: patientUuid,
       dateEnrolled: enrollmentDate,
       dateCompleted: completionDate,
-      location: location,
+      location: location
     };
     const abortController = new AbortController();
     createProgramEnrollment(enrollmentPayload, abortController).subscribe(
-      (response) => {
+      response => {
         if (response.ok) {
           match.params["setEnrolledPrograms"]([
             ...match.params["enrolledPrograms"],
-            response.data,
+            response.data
           ]);
           navigate();
         }
@@ -192,18 +189,18 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
     return () => abortController.abort();
   };
 
-  const handleEditSubmit = ($event) => {
+  const handleEditSubmit = $event => {
     $event.preventDefault();
     if (completionDate || enrollmentDate || location) {
       const updatePayload: ProgramEnrollment = {
         program: program,
         dateCompleted: completionDate,
         dateEnrolled: enrollmentDate,
-        location: location,
+        location: location
       };
       const abortController = new AbortController();
       updateProgramEnrollment(updatePayload, abortController).subscribe(
-        (response) => response.status === 200 && navigate()
+        response => response.status === 200 && navigate()
       );
       return () => abortController.abort();
     }
@@ -214,7 +211,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
     closeComponent();
   };
 
-  const closeForm = ($event) => {
+  const closeForm = $event => {
     let userConfirmed: boolean = false;
     if (formChanged) {
       userConfirmed = confirm(
@@ -247,7 +244,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
           styles={{
             width: "100%",
             backgroundColor: "var(--omrs-color-bg-medium-contrast)",
-            height: "auto",
+            height: "auto"
           }}
         >
           <div className={styles.programsContainerWrapper}>
@@ -260,12 +257,12 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
                   id="program"
                   name="programs"
                   value={program}
-                  onChange={(evt) => setProgram(evt.target.value)}
+                  onChange={evt => setProgram(evt.target.value)}
                   required
                 >
                   <option>{t("chooseProgram", "Choose a program")}:</option>
                   {eligiblePrograms &&
-                    eligiblePrograms.map((program) => (
+                    eligiblePrograms.map(program => (
                       <option value={program.uuid} key={program.uuid}>
                         {program.display}
                       </option>
@@ -284,7 +281,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
                     name="enrollmentDate"
                     max={dayjs(new Date().toUTCString()).format("YYYY-MM-DD")}
                     required
-                    onChange={(evt) => {
+                    onChange={evt => {
                       setEnrollmentDate(evt.target.value);
                     }}
                     defaultValue={dayjs(new Date()).format("YYYY-MM-DD")}
@@ -316,7 +313,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
                     id="completionDate"
                     type="date"
                     name="completionDate"
-                    onChange={(evt) => setCompletionDate(evt.target.value)}
+                    onChange={evt => setCompletionDate(evt.target.value)}
                   />
                   <svg className="omrs-icon" role="img">
                     <use xlinkHref="#omrs-icon-calendar"></use>
@@ -333,13 +330,13 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
                   id="location"
                   name="locations"
                   value={location}
-                  onChange={(evt) => {
+                  onChange={evt => {
                     setLocation(evt.target.value);
                   }}
                 >
                   <option>{t("chooseLocation", "Choose a location")}:</option>
                   {locations &&
-                    locations.map((location) => (
+                    locations.map(location => (
                       <option value={location.uuid} key={location.uuid}>
                         {location.display}
                       </option>
@@ -399,7 +396,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
               styles={{
                 width: "100%",
                 backgroundColor: "var(--omrs-color-bg-medium-contrast)",
-                height: "auto",
+                height: "auto"
               }}
             >
               <div className={styles.programsContainerWrapper}>
@@ -422,7 +419,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
                         type="date"
                         name="enrollmentDate"
                         required
-                        onChange={(evt) => setEnrollmentDate(evt.target.value)}
+                        onChange={evt => setEnrollmentDate(evt.target.value)}
                         defaultValue={dayjs(enrollmentDate).format(
                           "YYYY-MM-DD"
                         )}
@@ -441,7 +438,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
                         id="completionDate"
                         type="date"
                         name="completionDate"
-                        onChange={(evt) => setCompletionDate(evt.target.value)}
+                        onChange={evt => setCompletionDate(evt.target.value)}
                         defaultValue={
                           completionDate
                             ? dayjs(completionDate).format("YYYY-MM-DD")
@@ -463,10 +460,10 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
                       id="location"
                       name="locations"
                       value={location}
-                      onChange={(evt) => setLocation(evt.target.value)}
+                      onChange={evt => setLocation(evt.target.value)}
                     >
                       {locations &&
-                        locations.map((location) => (
+                        locations.map(location => (
                           <option value={location.uuid} key={location.uuid}>
                             {location.display}
                           </option>

@@ -12,7 +12,7 @@ const WorkspaceWrapper: React.FC = () => {
   const [selectedTab, setSelectedTab] = React.useState(null);
 
   React.useEffect(() => {
-    const sub = getNewWorkspaceItem().subscribe((item) => {
+    const sub = getNewWorkspaceItem().subscribe(item => {
       if (item.validations) {
         const validation = item.validations(openTabs);
         if (validation > -1) {
@@ -62,7 +62,7 @@ const WorkspaceWrapper: React.FC = () => {
           </button>
         )}
         {toggleMobileTableView &&
-          openTabs.map((tab) => {
+          openTabs.map(tab => {
             return (
               <button
                 key={tab.name}

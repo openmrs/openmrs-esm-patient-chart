@@ -7,7 +7,7 @@ export interface ConditionsContextShape {
 
 export const ConditionsContext = createContext<ConditionsContextShape>({
   patientUuid: undefined,
-  patient: undefined,
+  patient: undefined
 });
 
 export function useConditionsContext() {

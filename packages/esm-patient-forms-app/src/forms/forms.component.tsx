@@ -16,7 +16,7 @@ import { Encounter, Form } from "../types";
 enum FormViewState {
   recommended = 0,
   completed,
-  all,
+  all
 }
 
 interface FormsProps {
@@ -37,7 +37,7 @@ const Forms: React.FC<FormsProps> = ({ patientUuid }) => {
   const [filledForms, setFilledForms] = React.useState<Array<Form>>([]);
 
   React.useEffect(() => {
-    fetchAllForms().subscribe((forms) => setForms(forms), setError);
+    fetchAllForms().subscribe(forms => setForms(forms), setError);
   }, []);
 
   React.useEffect(() => {
@@ -47,12 +47,12 @@ const Forms: React.FC<FormsProps> = ({ patientUuid }) => {
       patientUuid,
       fromDate.toDate(),
       toDate.toDate()
-    ).subscribe((encounters) => setEncounters(encounters), setError);
+    ).subscribe(encounters => setEncounters(encounters), setError);
   }, [patientUuid]);
 
   React.useEffect(() => {
     const availableForms = filterAvailableAndCompletedForms(forms, encounters);
-    const completedForms = availableForms.completed.map((encounters) => {
+    const completedForms = availableForms.completed.map(encounters => {
       encounters.form.complete = true;
       return encounters.form;
     });
@@ -60,8 +60,8 @@ const Forms: React.FC<FormsProps> = ({ patientUuid }) => {
   }, [forms, encounters]);
 
   React.useEffect(() => {
-    const filledForms = forms.map((form) => {
-      completedForms.map((completeForm) => {
+    const filledForms = forms.map(form => {
+      completedForms.map(completeForm => {
         if (completeForm.uuid === form.uuid) {
           form.complete = true;
         }
@@ -81,7 +81,7 @@ const Forms: React.FC<FormsProps> = ({ patientUuid }) => {
           <div className={styles.contextSwitcherContainer}>
             <ContentSwitcher
               className={styles.contextSwitcherWidth}
-              onChange={(event) => setSelectedFormView(event.name as any)}
+              onChange={event => setSelectedFormView(event.name as any)}
               selectedIndex={selectedFormView}
             >
               <Switch name={FormViewState.recommended} text="Recommended" />

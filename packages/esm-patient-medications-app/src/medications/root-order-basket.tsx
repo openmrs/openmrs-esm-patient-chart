@@ -12,7 +12,7 @@ export interface RootOrderBasketProps {
 
 export default function RootOrderBasket({
   patientUuid,
-  closeWorkspace,
+  closeWorkspace
 }: RootOrderBasketProps) {
   closeWorkspace = closeWorkspace ?? (() => switchTo("link", ""));
 

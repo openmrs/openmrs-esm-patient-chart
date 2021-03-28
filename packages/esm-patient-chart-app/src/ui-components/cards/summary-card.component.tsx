@@ -23,7 +23,7 @@ const SummaryCardContent: React.FC = ({ children }) => (
   </div>
 );
 
-const SummaryCard: React.FC<SummaryCardProps> = (props) => (
+const SummaryCard: React.FC<SummaryCardProps> = props => (
   <div
     style={props.styles}
     className={`omrs-card ${styles.card} ${props.className || ""}`}
