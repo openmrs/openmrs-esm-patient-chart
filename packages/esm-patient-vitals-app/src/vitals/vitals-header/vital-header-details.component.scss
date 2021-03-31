@@ -2,6 +2,10 @@
 @import "~carbon-components/src/globals/scss/vars";
 @import "~carbon-components/src/globals/scss/mixins";
 
+.bodyShort01 {
+  @include carbon--type-style("body-short-01");
+}
+
 .vitalsHeaderStateDetailsContainer {
   display: flex;
   flex-wrap: wrap;

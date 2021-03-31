@@ -1,5 +1,4 @@
 import React, { useMemo } from "react";
-import styles from "./chart-review.css";
 import GridView from "../view-components/grid-view.component";
 import TabbedView from "../view-components/tabbed-view.component";
 import { Switch, Route, Redirect, RouteComponentProps } from "react-router-dom";
@@ -54,23 +53,19 @@ const ChartReview: React.FC<ChartReviewProps> = ({ match }) => {
   }, [config.dashboardDefinitions, patientUuid]);
 
   return (
-    <div className={styles.chartSection}>
-      <div className={styles.container}>
-        <Switch>
-          {dashboards.length > 0 && (
-            <Route exact path={basePath}>
-              <Redirect
-                to={makePath(config.dashboardDefinitions[0], {
-                  ...match.params,
-                  subview: "",
-                })}
-              />
-            </Route>
-          )}
-          {dashboards}
-        </Switch>
-      </div>
-    </div>
+    <Switch>
+      {dashboards.length > 0 && (
+        <Route exact path={basePath}>
+          <Redirect
+            to={makePath(config.dashboardDefinitions[0], {
+              ...match.params,
+              subview: "",
+            })}
+          />
+        </Route>
+      )}
+      {dashboards}
+    </Switch>
   );
 };
 

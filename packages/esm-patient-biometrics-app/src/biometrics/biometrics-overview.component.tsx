@@ -20,11 +20,9 @@ import DataTable, {
 } from "carbon-components-react/es/components/DataTable";
 import { useTranslation } from "react-i18next";
 import {
-  useCurrentPatient,
   createErrorHandler,
   switchTo,
   useConfig,
-  navigate,
 } from "@openmrs/esm-framework";
 import { getPatientBiometrics } from "./biometric.resource";
 import { useVitalsSignsConceptMetaData } from "./use-vitalsigns";
@@ -42,7 +40,9 @@ interface BiometricsOverviewProps {
   patientUuid: string;
 }
 
-const BiometricsOverview: React.FC<BiometricsOverviewProps> = ({ patientUuid }) => {
+const BiometricsOverview: React.FC<BiometricsOverviewProps> = ({
+  patientUuid,
+}) => {
   const config = useConfig() as ConfigObject;
   const biometricsToShowCount = 5;
   const { t } = useTranslation();

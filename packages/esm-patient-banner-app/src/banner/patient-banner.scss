@@ -1,0 +1,61 @@
+@import "carbon-components/scss/globals/scss/typography.scss";
+
+.container {
+  border-bottom: 0.063rem solid $ui-03;
+  background-color: $ui-01;
+}
+
+.patientBanner {
+  display: flex;
+}
+
+.patientName {
+  @include carbon--type-style("productive-heading-03");
+  margin-right: 0.25rem;
+}
+
+.patientAvatar {
+  width: 5rem;
+  height: 5rem;
+  margin: 1rem;
+  border-radius: 1px;
+}
+
+.patientInfo {
+  width: 100%;
+}
+
+.demographics {
+  @include carbon--type-style("body-short-02");
+  color: $text-02;
+  margin-top: 0.5rem;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: -0.125rem;
+}
+
+.nameRow {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.625rem;
+}
+
+.identifiers {
+  @include carbon--type-style("body-short-02");
+  color: $ui-04;
+}
+
+.tooltipPadding {
+  padding: 0.25em;
+}
+
+.tooltipSmalltext {
+  font-size: 80%;
+}

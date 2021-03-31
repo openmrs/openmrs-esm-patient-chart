@@ -1,7 +1,7 @@
 import React from "react";
 import { ConfigurableLink, useConfig } from "@openmrs/esm-framework";
-import { spaBasePath } from "./constants";
-import { ChartConfig } from "./config-schemas";
+import { spaBasePath } from "../constants";
+import { ChartConfig } from "../config-schemas";
 
 function getPatientUuidFromUrl() {
   const match = /\/patient\/([a-zA-Z0-9\-]+)\/?/.exec(location.pathname);
@@ -21,7 +21,7 @@ const PatientChartNavMenu: React.FC = () => {
             to={`${basePath}/${db.name}`}
             className="bx--side-nav__link"
           >
-            {db.name}
+            {db.title}
           </ConfigurableLink>
         </div>
       ))}
@@ -29,4 +29,4 @@ const PatientChartNavMenu: React.FC = () => {
   );
 };
 
-export default PatientChartNavMenu
+export default PatientChartNavMenu;

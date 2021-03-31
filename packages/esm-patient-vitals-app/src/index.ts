@@ -33,6 +33,14 @@ function setupOpenMRS() {
           title: "Vitals",
         },
       },
+      {
+        id: "patient-vitals-info",
+        slot: "patient-info-slot",
+        load: getAsyncLifecycle(
+          () => import("./vitals/vitals-header/vital-header-state.component"),
+          options
+        ),
+      },
     ],
   };
 }

@@ -10,7 +10,7 @@ const cssLoader = {
   options: {
     modules: {
       localIdentName:
-        "esm-patient-chart__[name]__[local]___[hash:base64:5]"
+        "esm-patient-banner__[name]__[local]___[hash:base64:5]"
     }
   }
 };
@@ -18,63 +18,63 @@ const cssLoader = {
 module.exports = (env, argv = {}) => ({
   entry: [
     resolve(__dirname, "src/set-public-path.ts"),
-    resolve(__dirname, "src/index.ts"),
+    resolve(__dirname, "src/index.ts")
   ],
   mode: argv.mode || "development",
   output: {
-    filename: "openmrs-esm-patient-chart-app.js",
+    filename: "openmrs-esm-patient-banner-app.js",
     libraryTarget: "system",
     path: resolve(__dirname, "dist"),
-    jsonpFunction: "webpackJsonp_openmrs_esm_patient_chart_app",
+    jsonpFunction: "webpackJsonp_openmrs_esm_patient_banner_app"
   },
   module: {
     rules: [
       {
         parser: {
-          system: false,
-        },
+          system: false
+        }
       },
       {
         test: /\.m?(js|ts|tsx)$/,
         exclude: /(node_modules|bower_components)/,
         use: {
-          loader: "babel-loader",
-        },
+          loader: "babel-loader"
+        }
       },
       {
         test: /\.css$/,
-        use: ["style-loader", cssLoader],
+        use: ["style-loader", cssLoader]
       },
       {
         test: /\.s[ac]ss$/i,
-        use: ["style-loader", cssLoader, "sass-loader"],
+        use: ["style-loader", cssLoader, "sass-loader"]
       },
       {
         test: /\.(png|jpe?g|gif)$/i,
         use: [
           {
-            loader: "file-loader",
-          },
-        ],
-      },
-    ],
+            loader: "file-loader"
+          }
+        ]
+      }
+    ]
   },
   devtool: "sourcemap",
   devServer: {
     headers: {
-      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Origin": "*"
     },
-    disableHostCheck: true,
+    disableHostCheck: true
   },
   externals: Object.keys(peerDependencies),
   plugins: [
     new ForkTsCheckerWebpackPlugin(),
     new CleanWebpackPlugin(),
     new BundleAnalyzerPlugin({
-      analyzerMode: env && env.analyze ? "server" : "disabled",
-    }),
+      analyzerMode: env && env.analyze ? "server" : "disabled"
+    })
   ],
   resolve: {
-    extensions: [".tsx", ".ts", ".jsx", ".js"],
-  },
+    extensions: [".tsx", ".ts", ".jsx", ".js"]
+  }
 });

@@ -1,3 +1,4 @@
+import capitalize from "lodash-es/capitalize";
 import {
   registerBreadcrumbs,
   defineConfigSchema,
@@ -32,7 +33,7 @@ function setupOpenMRS() {
     },
     {
       path: `${spaBasePath}/:view/:subview?`,
-      title: "Dashboard",
+      title: ([_, key]) => `${capitalize(key)} Dashboard`,
       parent: spaBasePath,
     },
   ]);
@@ -43,7 +44,10 @@ function setupOpenMRS() {
     extensions: [
       {
         id: "patient-chart-nav-items",
-        load: getAsyncLifecycle(() => import("./nav.component"), options),
+        load: getAsyncLifecycle(
+          () => import("./ui-components/nav.component"),
+          options
+        ),
       },
     ],
   };

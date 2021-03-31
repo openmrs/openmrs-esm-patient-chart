@@ -7,7 +7,6 @@ import { BrowserRouter } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   useConfig,
-  useCurrentPatient,
   createErrorHandler,
   switchTo,
 } from "@openmrs/esm-framework";
@@ -17,6 +16,7 @@ import { savePatientVitals } from "../vitals-biometrics.resource";
 import { useVitalsSignsConceptMetaData } from "./use-vitalsigns";
 
 interface VitalsAndBiometricFormProps {
+  patientUuid: string;
   closeWorkspace?: () => void;
 }
 
@@ -34,6 +34,7 @@ export interface PatientVitalAndBiometric {
 }
 
 const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({
+  patientUuid,
   closeWorkspace,
 }) => {
   const session = useSessionUser();
@@ -44,7 +45,6 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({
     conceptsUnits,
   } = useVitalsSignsConceptMetaData();
   const biometricsUnitsSymbols = config.biometrics;
-  const [, , patientUuid] = useCurrentPatient();
   const [patientVitalAndBiometrics, setPatientVitalAndBiometrics] = useState<
     PatientVitalAndBiometric
   >();

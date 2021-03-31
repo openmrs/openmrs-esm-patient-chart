@@ -1,17 +1,15 @@
 .grid {
-  position: fixed;
-  top: 6.25rem;
   display: grid;
   grid-template-columns: 1fr min-content;
   grid-template-rows: 1fr;
   align-items: stretch;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
 }
 
 .patientBanner {
   position: relative;
   z-index: 1;
+  width: 100%;
 }
 
 .chartreview {
@@ -29,16 +27,4 @@
   height: 90%;
   border-left: 0.5px solid lightgray;
   padding-bottom: 10px;
-}
-
-.sidebar {
-  z-index: 1;
-}
-
-.invisible {
-  display: none;
-}
-
-.visible {
-  display: grid;
 }

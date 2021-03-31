@@ -28,15 +28,13 @@ function getTitle(ext: ExtensionInfo) {
   return ext.name;
 }
 
-function ShowTabs({
-  slot,
-  view,
-  fullPath,
-}: {
+interface ShowTabsProps {
   slot: string;
   view: string;
   fullPath: string;
-}) {
+}
+
+const ShowTabs: React.FC<ShowTabsProps> = ({ slot, view, fullPath }) => {
   const store = useExtensionStore();
   const extensions = React.useMemo(() => {
     const ids = store.slots[slot]?.attachedIds ?? [];
@@ -70,7 +68,7 @@ function ShowTabs({
         ))}
     </ul>
   );
-}
+};
 
 export interface TabbedViewProps {
   name: string;
@@ -83,7 +81,7 @@ interface RouteParams {
   subview: string;
 }
 
-export default function TabbedView({ name, slot, patientUuid }: TabbedViewProps) {
+const TabbedView: React.FC<TabbedViewProps> = ({ name, slot, patientUuid }) => {
   const urlData = useUrlData();
   const { params } = useRouteMatch<RouteParams>();
   const fullPath = `${window.spaBase}${urlData.basePath}/${name}`;
@@ -97,7 +95,7 @@ export default function TabbedView({ name, slot, patientUuid }: TabbedViewProps)
 
   return (
     <>
-      <nav className={styles.summariesnav} style={{ marginTop: "0" }}>
+      <nav className={styles.summariesnav}>
         <ShowTabs slot={slot} view={view} fullPath={fullPath} />
       </nav>
       <div className={styles.routesContainer}>
@@ -113,4 +111,6 @@ export default function TabbedView({ name, slot, patientUuid }: TabbedViewProps)
       </div>
     </>
   );
-}
+};
+
+export default TabbedView;

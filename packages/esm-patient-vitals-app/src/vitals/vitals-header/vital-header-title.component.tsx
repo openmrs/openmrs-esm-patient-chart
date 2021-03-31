@@ -7,12 +7,13 @@ import dayjs from "dayjs";
 import Button from "carbon-components-react/es/components/Button";
 import isEmpty from "lodash-es/isEmpty";
 import { useTranslation } from "react-i18next";
-import { useCurrentPatient, switchTo } from "@openmrs/esm-framework";
+import { switchTo } from "@openmrs/esm-framework";
 import { PatientVitals } from "../vitals-biometrics.resource";
 
 interface VitalsHeaderStateTitleProps {
   view: string;
   vitals: PatientVitals;
+  patientUuid: string;
   toggleView(): void;
   showDetails: boolean;
 }
@@ -21,10 +22,10 @@ const VitalsHeaderStateTitle: React.FC<VitalsHeaderStateTitleProps> = ({
   view,
   vitals,
   toggleView,
-  showDetails
+  showDetails,
+  patientUuid,
 }) => {
   const { t } = useTranslation();
-  const [isLoadingPatient, , patientUuid] = useCurrentPatient();
   const launchVitalsBiometricsForm = () => {
     const url = `/patient/${patientUuid}/vitalsbiometrics/form`;
     switchTo("workspace", url, {

@@ -1,0 +1,9 @@
+@import "~@openmrs/esm-styleguide/src/vars";
+@import "~carbon-components/src/globals/scss/vars";
+
+.loading {
+  display: flex;
+  background-color: $openmrs-background-grey;
+  justify-content: center;
+  min-height: $spacing-09;
+}
