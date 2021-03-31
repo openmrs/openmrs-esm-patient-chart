@@ -1,16 +1,10 @@
-.container {
-  margin: 21px;
-  display: flex;
-}
-
 .dashboard {
-  flex-basis: 100%;
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-auto-rows: auto;
   grid-auto-columns: auto;
   grid-gap: 25px;
-  height: 100%;
+  margin: 1.3125rem;
 }
 
 :global(.omrs-breakpoint-lt-desktop) .dashboard {
@@ -30,19 +24,4 @@
 
 :global(.omrs-breakpoint-lt-tablet) .dashboard > div {
   margin: 2px 0px;
-}
-
-.error {
-  color: red;
-}
-
-.loading {
-  font-weight: bold;
-}
-
-.widgetContainer {
-  text-align: center;
-  display: flex;
-  flex-flow: column;
-  width: 100%;
 }
