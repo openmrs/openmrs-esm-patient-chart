@@ -1,6 +1,11 @@
 import React from "react";
 import styles from "./grid-view.css";
-import { ExtensionSlot } from "@openmrs/esm-framework";
+import {
+  Extension,
+  ExtensionData,
+  ExtensionSlot,
+  useExtensionStore,
+} from "@openmrs/esm-framework";
 import { DashbardGridConfig } from "../config-schemas";
 import { useUrlData } from "../useUrlData";
 
@@ -16,23 +21,33 @@ export interface GridViewProps {
   layout: DashbardGridConfig;
 }
 
-export default function GridView({
-  slot,
-  layout,
-  patientUuid,
-}: GridViewProps) {
-  const urlData = useUrlData();
-  const state = {
-    ...urlData,
-    patientUuid,
-  };
+export default function GridView({ slot, layout, patientUuid }: GridViewProps) {
+  const store = useExtensionStore();
+  const { basePath } = useUrlData();
+
+  const state = React.useMemo(
+    () => ({
+      basePath,
+      patientUuid,
+    }),
+    [basePath, patientUuid]
+  );
+
+  const wrapItem = React.useCallback(
+    (slot: React.ReactNode, extension: ExtensionData) => {
+      const { columnSpan = 4 } = store.extensions[extension.extensionId].meta;
+      return <div style={{ columnSpan }}>{slot}</div>;
+    },
+    [store.extensions]
+  );
+
+  const gridTemplateColumns = getColumnsLayoutStyle(layout);
 
   return (
-    <div
-      className={styles.dashboard}
-      style={{ gridTemplateColumns: getColumnsLayoutStyle(layout) || 2 }}
-    >
-      <ExtensionSlot extensionSlotName={slot} state={state} />
+    <div className={styles.dashboard} style={{ gridTemplateColumns }}>
+      <ExtensionSlot extensionSlotName={slot}>
+        <Extension state={state} wrap={wrapItem} />
+      </ExtensionSlot>
     </div>
   );
 }
