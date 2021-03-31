@@ -8,11 +8,11 @@ export function calculateBMI(weight: number, height: number): number {
   }
 }
 
-export const isInNormalRange = (
+export function isInNormalRange(
   conceptsMetaData: Array<ConceptMetaData>,
   conceptUuid: string,
   value: string | number
-) => {
+) {
   if (value === undefined || value === "") {
     return true;
   }
@@ -25,4 +25,4 @@ export const isInNormalRange = (
         Number(concept.hiNormal)
       )
     : true;
-};
+}

@@ -10,18 +10,24 @@ import capitalize from "lodash-es/capitalize";
 import ContactDetails from "../contact-details/contact-details.component";
 import CustomOverflowMenuComponent from "../ui-components/overflow-menu.component";
 import styles from "./patient-banner.scss";
-import { ExtensionSlot } from "@openmrs/esm-framework";
+import {
+  ExtensionSlot,
+  age,
+  useVisit,
+  getStartedVisit,
+  VisitItem,
+} from "@openmrs/esm-framework";
 import { useTranslation } from "react-i18next";
-import { age } from "../utils/age-helpers";
-import { useVisit } from "../visit/use-visit";
-import { getStartedVisit, VisitItem } from "../visit/visit-utils";
 
 interface PatientBannerProps {
   patient: fhir.Patient;
   patientUuid: string;
 }
 
-const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid }) => {
+const PatientBanner: React.FC<PatientBannerProps> = ({
+  patient,
+  patientUuid,
+}) => {
   const { currentVisit } = useVisit(patientUuid);
   const [showContactDetails, setShowContactDetails] = useState(false);
   const [hasActiveVisit, setActiveVisit] = useState(false);

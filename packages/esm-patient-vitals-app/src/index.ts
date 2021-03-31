@@ -23,7 +23,10 @@ function setupOpenMRS() {
     extensions: [
       {
         id: "vitals-widget",
-        slot: "patient-chart-results-dashboard-slot",
+        slots: [
+          "patient-chart-summary-dashboard-slot",
+          "patient-chart-results-dashboard-slot",
+        ],
         load: getAsyncLifecycle(
           () => import("./vitals/vitals-overview.component"),
           options
@@ -31,6 +34,7 @@ function setupOpenMRS() {
         meta: {
           view: "vitals",
           title: "Vitals",
+          columnSpan: 2,
         },
       },
       {

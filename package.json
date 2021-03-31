@@ -27,6 +27,7 @@
     "@babel/runtime": "^7.12.13",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^9.5.0",
+    "@testing-library/user-event": "^13.1.1",
     "@types/jest": "^25.2.3",
     "babel-eslint": "^10.1.0",
     "babel-jest": "^26.3.0",

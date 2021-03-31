@@ -1,0 +1,103 @@
+@import "~@openmrs/esm-styleguide/src/vars";
+@import "~carbon-components/src/globals/scss/vars";
+@import "~carbon-components/src/globals/scss/mixins";
+
+.productiveHeading01 {
+  @include carbon--type-style("productive-heading-01");
+}
+
+.bodyShort01 {
+  @include carbon--type-style("body-short-01");
+}
+
+.bodyLong01 {
+  @include carbon--type-style("body-long-01");
+}
+
+.formContainer {
+  display: flex;
+  flex-direction: column;
+  height: 16rem;
+  width: 100%;
+}
+
+.formContainer input[type="text"] {
+  background-color: $ui-background;
+}
+.formCheckBoxContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+  overflow: scroll;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  min-width: 26.25rem;
+}
+
+.formCheckBoxContainer::-webkit-scrollbar {
+  display: none;
+}
+
+.formResultsLabel {
+  text-align: left;
+  color: $color-gray-70;
+  @extend .bodyShort01;
+  padding: 1rem 0 0 1rem;
+}
+
+.formTile {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  min-height: 15.25rem;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.content {
+  @extend .productiveHeading01;
+  color: $color-gray-70;
+  width: 13.438rem;
+  margin: 1rem 0.938rem 0.313rem 0.875rem;
+}
+
+.action {
+  @extend .bodyLong01;
+  color: $color-gray-70;
+  width: 15.25rem;
+  margin: 0.313rem 0 0;
+}
+
+.customCheckBoxContainer {
+  height: 3rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  min-width: 16.25rem;
+  max-width: 16.25rem;
+  padding: 1rem 1rem 1rem 0.938rem;
+  cursor: pointer;
+  margin: 0.125rem 0.125rem 0.125rem 0rem;
+  @extend .bodyShort01;
+}
+
+.customCheckBoxContainer > svg {
+  flex: 1;
+  margin: 0;
+  fill: $color-blue-60-2;
+}
+
+.label {
+  flex: 9;
+  padding-left: 0.5rem;
+  display: flex;
+  align-items: center;
+  height: 3rem;
+  text-align: left;
+  color: $color-blue-60-2;
+  @extend .bodyLong01;
+}

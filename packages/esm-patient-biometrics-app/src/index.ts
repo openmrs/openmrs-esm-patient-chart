@@ -23,7 +23,10 @@ function setupOpenMRS() {
     extensions: [
       {
         id: "biometrics-widget",
-        slot: "patient-chart-results-dashboard-slot",
+        slots: [
+          "patient-chart-summary-dashboard-slot",
+          "patient-chart-results-dashboard-slot",
+        ],
         load: getAsyncLifecycle(
           () => import("./biometrics/biometrics-overview.component"),
           options
@@ -31,6 +34,7 @@ function setupOpenMRS() {
         meta: {
           view: "biometrics",
           title: "Biometrics",
+          columnSpan: 2,
         },
       },
     ],

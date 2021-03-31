@@ -1,0 +1,157 @@
+.visitNoteFormContainer {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  width: 100%;
+  position: relative;
+  min-height: 100%;
+}
+
+.visitNotesContainer {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 100%;
+  padding: 0.625rem;
+}
+
+.visitNotesInputContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  margin: 0.25rem;
+}
+
+.visitNotesInputContainer label {
+  color: var(--omrs-color-ink-medium-contrast);
+  font-weight: 500;
+  padding: 0.25rem 0rem;
+}
+
+.visitNotesInputContainer select,
+.visitNotesInputContainer textarea,
+.visitNotesInputContainer input {
+  padding: 0.625rem;
+  border-radius: 0.0625rem;
+  border: 0.0625rem solid var(--omrs-color-bg-low-contrast);
+  outline: none;
+  background-color: var(--omrs-color-ink-white);
+  font-size: 1rem;
+}
+
+.visitNotesInputContainer select option {
+  font-size: 1rem;
+  padding: 0.125rem;
+}
+
+.diagnosisContainer {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 0rem 0rem 0rem 1.625rem;
+}
+
+.diagnosisContainer hr {
+  width: 80%;
+  margin: 0.325rem 0rem 0.325rem 0rem;
+}
+
+.searchResults {
+  position: absolute;
+  width: fit-content;
+  z-index: 100;
+  list-style: none;
+  padding: 0.625rem;
+  margin: 0;
+  border: 0.0625rem solid var(--omrs-color-bg-low-contrast);
+  background-color: var(--omrs-color-ink-white);
+}
+
+.searchResults div {
+  margin: 0.0625rem;
+  padding: 0.325rem;
+}
+
+.searchResults div:hover {
+  background-color: var(--omrs-color-bg-medium-contrast);
+  cursor: default;
+  border: 0.0625rem solid var(--omrs-color-bg-low-contrast);
+}
+
+.inVisible {
+  display: none;
+}
+
+.primaryDiagnosisContainer {
+  display: flex;
+  flex-direction: row;
+  border-left: 0.5rem solid #a6e100;
+  border-radius: 0.25rem;
+  color: var(--omrs-color-ink-white);
+  margin-bottom: 1.625rem;
+}
+
+.primaryDiagnosis {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  background-color: var(--omrs-color-brand-violet);
+  padding: 0.625rem;
+}
+
+.diagnosisHeader {
+  display: flex;
+  justify-content: space-between;
+  padding: 0rem 0rem 0.25rem 0rem;
+}
+
+.diagnosisCheckBoxContainer {
+  display: flex;
+  justify-content: flex-end;
+  color: var(--omrs-color-ink-white);
+}
+
+.diagnosisCheckBoxContainer div {
+  margin: 0.25rem;
+}
+
+.diagnosisCheckBoxContainer input[type="checkbox"] {
+  transform: scale(1.5);
+  margin: 0rem 0.325rem 0rem 0rem;
+}
+
+.diagnosisCheckBoxContainer label {
+  font-size: 0.9rem;
+}
+
+.closeButton {
+  background-color: var(--omrs-color-ink-white);
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  padding: 0.625rem 0rem;
+}
+
+.closeButton svg {
+  fill: var(--omrs-color-ink-medium-contrast);
+}
+
+.closeButton svg:hover {
+  fill: var(--omrs-color-danger);
+  cursor: pointer;
+  height: "1.5rem";
+  width: "1.5rem";
+}
+
+.visitNoteButtonContainer {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  border-top: 0.0625rem solid var(--omrs-color-bg-medium-contrast);
+  padding: 0.625rem 0.625rem;
+  background-color: var(--omrs-color-bg-medium-contrast);
+  box-shadow: 0rem 0.125rem 0.25rem rgba(0, 0, 0, 0.08),
+    0rem 0.0625rem 0.25rem rgba(0, 0, 0, 0.04);
+}

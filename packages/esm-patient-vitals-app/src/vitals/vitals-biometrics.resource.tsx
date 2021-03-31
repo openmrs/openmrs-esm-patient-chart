@@ -1,16 +1,16 @@
 import {
   openmrsObservableFetch,
   openmrsFetch,
-  fhirBaseUrl
+  fhirBaseUrl,
+  FHIRResource
 } from "@openmrs/esm-framework";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
-import { FHIRResource } from "../types";
-import { ConfigObject } from "../config-schema";
 import { PatientVitalAndBiometric } from "./vitals-biometrics-form/vitals-biometrics-form.component";
 import { calculateBMI } from "./vitals-biometrics-form/vitals-biometrics-form.utils";
+import { ConfigObject } from "../config-schema";
 
-export type PatientVitals = {
+export interface PatientVitals {
   id: string;
   date: Date;
   systolic?: string;
@@ -22,7 +22,7 @@ export type PatientVitals = {
   weight?: string;
   bmi?: any;
   respiratoryRate?: string;
-};
+}
 
 export function performPatientsVitalsSearch(
   concepts: ConfigObject["concepts"],

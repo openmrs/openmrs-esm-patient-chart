@@ -1,6 +1,3 @@
-export * from "./fhir-resource";
-export * from "./openmrs-resource";
-
 export interface Location {
   uuid: string;
   display?: string;

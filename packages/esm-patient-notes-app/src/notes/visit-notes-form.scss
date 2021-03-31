@@ -1,0 +1,41 @@
+@import "~@openmrs/esm-styleguide/src/vars";
+@import "~carbon-components/src/globals/scss/vars";
+@import "~carbon-components/src/globals/scss/mixins";
+
+.heading {
+  @include carbon--type-style("productive-heading-03");
+  color: $text-01;
+  margin: 1rem;
+}
+
+.columnLabel {
+  @include carbon--type-style("productive-heading-02");
+  color: $text-02;
+}
+
+.diagnosis {
+  padding: 0.875rem;
+}
+
+.diagnosisList {
+  background-color: $ui-02;
+}
+
+.diagnosisList li:hover {
+  background-color: $ui-03;
+}
+
+.diagnosesText {
+  @include carbon--type-style("body-short-01");
+  color: $text-02;
+}
+
+.emptyResultsText {
+  @include carbon--type-style("body-short-01");
+  color: $text-02;
+}
+
+.imgUploadHelperText {
+  @include carbon--type-style("body-short-01");
+  color: $text-02;
+}
