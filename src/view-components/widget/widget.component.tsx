@@ -4,6 +4,7 @@ import { useUrlData } from "../../useUrlData";
 
 export interface WidgetProps {
   widgetConfig: WidgetConfig;
+  patientUuid: string;
 }
 
 export interface WidgetConfig {
@@ -18,8 +19,18 @@ export interface WidgetConfig {
   basePath?: string;
 }
 
-export default function Widget({ widgetConfig }: WidgetProps) {
-  const { patientUuid } = useUrlData();
+const withPatientUuid = <T extends Record<string, any>>(
+  WrappedComponent: React.FC<T>
+): React.FC<Omit<T, "patientUuid">> => {
+  const PureWrappedComponent = React.memo(WrappedComponent);
+  PureWrappedComponent.displayName = WrappedComponent.displayName;
+  return (props: T) => {
+    const { patientUuid } = useUrlData();
+    return <PureWrappedComponent {...props} patientUuid={patientUuid} />;
+  };
+};
+
+function Widget({ widgetConfig, patientUuid }: WidgetProps) {
   const { name, extensionSlotName, props = {}, ...rest } = widgetConfig;
 
   if (!extensionSlotName) {
@@ -34,3 +45,5 @@ export default function Widget({ widgetConfig }: WidgetProps) {
     />
   );
 }
+
+export default withPatientUuid(Widget);
