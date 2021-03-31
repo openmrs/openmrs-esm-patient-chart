@@ -26,10 +26,10 @@ const PatientInfo: React.FC<RouteComponentProps<RouteParams>> = props => {
   return (
     <>
       <ExtensionSlot
-        extensionSlotName="patient-chart-header"
+        extensionSlotName="patient-chart-header-slot"
         state={{ basePath, patientUuid }}
       />
-      <ExtensionSlot extensionSlotName="patient-vital-status" />
+      <ExtensionSlot extensionSlotName="patient-vital-status-slot" />
     </>
   );
 };
@@ -73,8 +73,8 @@ export default function Root(props) {
   });
 
   useEffect(() => {
-    attach("nav-menu", "patient-chart-nav-items");
-    return () => detach("nav-menu", "patient-chart-nav-items");
+    attach("nav-menu-slot", "patient-chart-nav-items");
+    return () => detach("nav-menu-slot", "patient-chart-nav-items");
   }, []);
 
   return (

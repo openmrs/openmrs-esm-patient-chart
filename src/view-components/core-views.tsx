@@ -4,71 +4,71 @@ import { DashboardConfig } from "./dashboard/dashboard.component";
 export const coreWidgetDefinitions: Array<WidgetConfig> = [
   {
     name: "ProgramsOverview",
-    extensionSlotName: "programs-overview-widget-ext"
+    extensionSlotName: "programs-overview-widget-slot"
   },
   {
     name: "ProgramsSummary",
-    extensionSlotName: "programs-summary-widget-ext"
+    extensionSlotName: "programs-summary-widget-slot"
   },
   {
     name: "Immunizations",
-    extensionSlotName: "immunizations-widget-ext"
+    extensionSlotName: "immunizations-widget-slot"
   },
   {
     name: "MedicationsOverview",
-    extensionSlotName: "patient-chart-dashboard-medications"
+    extensionSlotName: "patient-chart-dashboard-medications-slot"
   },
   {
     name: "MedicationsSummary",
-    extensionSlotName: "patient-chart-dashboard-summary"
+    extensionSlotName: "patient-chart-dashboard-summary-slot"
   },
   {
     name: "BiometricsOverview",
-    extensionSlotName: "biometrics-widget"
+    extensionSlotName: "biometrics-widget-slot"
   },
   {
     name: "BiometricsSummary",
-    extensionSlotName: "biometrics-widget"
+    extensionSlotName: "biometrics-widget-slot"
   },
   {
     name: "VitalsOverview",
-    extensionSlotName: "vitals-widget"
+    extensionSlotName: "vitals-widget-slot"
   },
   {
     name: "VitalsSummary",
-    extensionSlotName: "vitals-widget"
+    extensionSlotName: "vitals-widget-slot"
   },
   {
     name: "ImmunizationsOverview",
-    extensionSlotName: "immunizations-overview-widget-ext"
+    extensionSlotName: "immunizations-overview-widget-slot"
   },
   {
     name: "AllergiesOverview",
-    extensionSlotName: "allergies-overview-widget-ext"
+    extensionSlotName: "allergies-overview-widget-slot"
   },
   {
     name: "AllergiesSummary",
-    extensionSlotName: "allergies-summary-widget-ext"
+    extensionSlotName: "allergies-summary-widget-slot"
   },
   {
     name: "NotesOverview",
-    extensionSlotName: "notes-overview-widget-ext"
+    extensionSlotName: "notes-overview-widget-slot"
   },
   {
     name: "Notes",
-    extensionSlotName: "notes-overview-ext"
+    extensionSlotName: "notes-overview-slot"
   },
   {
     name: "AppointmentsOverview",
-    extensionSlotName: "appointments-overview-widget-ext"
+    extensionSlotName: "appointments-overview-widget-slot"
   },
   {
     name: "AppointmentsSummary",
-    extensionSlotName: "appointments-summary-widget-ext"
+    extensionSlotName: "appointments-summary-widget-slot"
   },
   {
     name: "AttachmentsOverview",
-    extensionSlotName: "attachments-overview-widget-ext"
+    extensionSlotName: "attachments-overview-widget-slot"
   }
 ];
 
@@ -82,61 +82,61 @@ export const coreDashboardDefinitions: Array<DashboardConfig> = [
     widgets: [
       {
         name: "ConditionsOverview",
-        extensionSlotName: "conditions-overview-widget-ext",
+        extensionSlotName: "conditions-overview-widget-slot",
         layout: { columnSpan: 2 },
         basePath: "conditions"
       },
       {
         name: "forms",
-        extensionSlotName: "forms",
+        extensionSlotName: "forms-slot",
         layout: { columnSpan: 2 },
         basePath: "forms"
       },
       {
         name: "ImmunizationsOverview",
-        extensionSlotName: "immunizations-overview-widget-ext",
+        extensionSlotName: "immunizations-overview-widget-slot",
         layout: { columnSpan: 2 },
         basePath: "immunizations"
       },
       {
         name: "ProgramsOverview",
-        extensionSlotName: "programs-overview-widget-ext",
+        extensionSlotName: "programs-overview-widget-slot",
         layout: { columnSpan: 2 },
         basePath: "programs"
       },
       {
         name: "AllergiesOverview",
-        extensionSlotName: "allergies-overview-widget-ext",
+        extensionSlotName: "allergies-overview-widget-slot",
         layout: { columnSpan: 2 },
         basePath: "allergies"
       },
       {
         name: "NotesOverview",
-        extensionSlotName: "notes-overview-widget-ext",
+        extensionSlotName: "notes-overview-widget-slot",
         layout: { columnSpan: 4 },
         basePath: "encounters/notes"
       },
       {
         name: "VitalsOverview",
-        extensionSlotName: "vitals-widget",
+        extensionSlotName: "vitals-widget-slot",
         layout: { columnSpan: 2 },
         basePath: "results/vitals"
       },
       {
         name: "BiometricsOverview",
-        extensionSlotName: "biometrics-widget",
+        extensionSlotName: "biometrics-widget-slot",
         layout: { columnSpan: 2 },
         basePath: "results/biometrics"
       },
       {
         name: "MedicationsOverview",
-        extensionSlotName: "patient-chart-dashboard-medications",
+        extensionSlotName: "patient-chart-dashboard-medications-slot",
         layout: { columnSpan: 3 },
         basePath: "orders/medication-orders"
       },
       {
         name: "AppointmentsOverview",
-        extensionSlotName: "appointments-overview-widget-ext",
+        extensionSlotName: "appointments-overview-widget-slot",
         layout: { columnSpan: 4 },
         basePath: "appointments"
       }
@@ -148,12 +148,12 @@ export const coreDashboardDefinitions: Array<DashboardConfig> = [
     widgets: [
       {
         name: "VitalsOverview",
-        extensionSlotName: "vitals-widget",
+        extensionSlotName: "vitals-widget-slot",
         basePath: "results/vitals"
       },
       {
         name: "BiometricsOverview",
-        extensionSlotName: "biometrics-widget",
+        extensionSlotName: "biometrics-widget-slot",
         basePath: "results/biometrics"
       }
     ]
@@ -165,7 +165,7 @@ export const coreDashboardDefinitions: Array<DashboardConfig> = [
     widgets: [
       {
         name: "MedicationsOverview",
-        extensionSlotName: "patient-chart-dashboard-medications",
+        extensionSlotName: "patient-chart-dashboard-medications-slot",
         basePath: "orders/medication-orders"
       }
     ]
@@ -176,7 +176,7 @@ export const coreDashboardDefinitions: Array<DashboardConfig> = [
     widgets: [
       {
         name: "Notes",
-        extensionSlotName: "notes-overview-ext"
+        extensionSlotName: "notes-overview-slot"
       }
     ]
   },
@@ -186,7 +186,7 @@ export const coreDashboardDefinitions: Array<DashboardConfig> = [
     widgets: [
       {
         name: "Conditions",
-        extensionSlotName: "conditions-widget-ext"
+        extensionSlotName: "conditions-widget-slot"
       }
     ]
   },
@@ -196,7 +196,7 @@ export const coreDashboardDefinitions: Array<DashboardConfig> = [
     widgets: [
       {
         name: "Immunizations",
-        extensionSlotName: "immunizations-widget-ext"
+        extensionSlotName: "immunizations-widget-slot"
       }
     ]
   },
@@ -206,7 +206,7 @@ export const coreDashboardDefinitions: Array<DashboardConfig> = [
     widgets: [
       {
         name: "AllergiesSummary",
-        extensionSlotName: "allergies-summary-widget-ext"
+        extensionSlotName: "allergies-summary-widget-slot"
       }
     ]
   },
@@ -216,7 +216,7 @@ export const coreDashboardDefinitions: Array<DashboardConfig> = [
     widgets: [
       {
         name: "ProgramsSummary",
-        extensionSlotName: "programs-summary-widget-ext"
+        extensionSlotName: "programs-summary-widget-slot"
       }
     ]
   },
@@ -226,7 +226,7 @@ export const coreDashboardDefinitions: Array<DashboardConfig> = [
     widgets: [
       {
         name: "AppointmentsSummary",
-        extensionSlotName: "appointments-summary-widget-ext"
+        extensionSlotName: "appointments-summary-widget-slot"
       }
     ]
   },
@@ -236,7 +236,7 @@ export const coreDashboardDefinitions: Array<DashboardConfig> = [
     widgets: [
       {
         name: "AttachmentsOverview",
-        extensionSlotName: "attachments-overview-widget-ext"
+        extensionSlotName: "attachments-overview-widget-slot"
       }
     ]
   }

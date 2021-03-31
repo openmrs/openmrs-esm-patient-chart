@@ -12,7 +12,7 @@ export default function PatientChartNavMenu() {
   const basePath = spaBasePath.replace(":patientUuid", patientUuid);
   return (
     <ExtensionSlot
-      extensionSlotName="patient-chart-nav-menu"
+      extensionSlotName="patient-chart-nav-menu-slot"
       state={{ basePath, patientUuid }}
     />
   );
