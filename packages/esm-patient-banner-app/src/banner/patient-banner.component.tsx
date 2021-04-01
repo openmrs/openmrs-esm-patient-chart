@@ -127,7 +127,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
           </div>
           <div className={styles.row}>
             <span className={styles.identifiers}>
-              {patient.identifier.map((i) => i.value)}
+              {patient.identifier.map((i) => i.value).join(", ")}
             </span>
             <Button
               kind="ghost"
