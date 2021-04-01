@@ -1,0 +1,95 @@
+:global(.omrs-breakpoint-gt-phone) .programsForm {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+:global(.omrs-breakpoint-lt-tablet) .programsForm {
+  padding: 0.25rem 0.5rem 0 0.5rem;
+  flex-direction: row;
+}
+
+:global(.omrs-breakpoint-lt-tablet) .programsContainerWrapper {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+}
+
+.programsContainerWrapper {
+  display: flex;
+  margin: 0rem 0rem 0.25rem 0rem;
+  flex-wrap: wrap;
+}
+
+.programsContainer {
+  display: flex;
+  margin: 0rem 0rem 0.25rem 0rem;
+}
+
+.programsInputContainer {
+  display: flex;
+  flex-direction: column;
+  margin: 0.625rem;
+}
+
+.programsInputControl + svg {
+  padding-right: 0.125rem;
+}
+
+.programsInputContainer select {
+  font-size: 1rem;
+  height: 2.625rem;
+  color: var(--omrs-color-interaction);
+  padding: 0.5rem;
+  border: 0.0625rem solid var(--omrs-color-ink-lowest-contrast);
+  background-color: var(--omrs-color-ink-white);
+  min-width: 50%;
+  width: 100%;
+}
+
+.programsInputContainer label {
+  margin: 0.375rem 0rem;
+}
+
+.buttonStyles {
+  display: flex;
+  background: var(--omrs-color-ink-white);
+  bottom: 0;
+  justify-content: center;
+  width: 100%;
+}
+
+.buttonStyles button {
+  margin: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+.buttonStyles button:disabled {
+  background: var(--omrs-color-ink-lowest-contrast);
+}
+
+.buttonStylesBorder {
+  border-top: 0.125rem solid var(--omrs-color-interaction);
+}
+
+.dateError {
+  flex-direction: row;
+  box-sizing: border-box;
+  display: flex;
+  padding-top: 0.5rem;
+}
+
+.dateError span {
+  color: var(--omrs-color-danger);
+  line-height: 1.25rem;
+  font-size: 0.875rem;
+  white-space: normal;
+  display: inline;
+}
+
+.dateError svg {
+  fill: var(--omrs-color-danger);
+  height: 0.8rem;
+  width: 1.5rem;
+  padding-right: 0.25rem;
+}

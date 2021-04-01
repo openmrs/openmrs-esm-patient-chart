@@ -1,0 +1,53 @@
+.caption {
+    position: absolute;
+    top: 141px;
+    right: 73px;
+    text-align: center;
+    backdrop-filter: blur(20px);
+}
+
+.captionText {
+    color: #2e2eef;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.actionButtons {
+    width: 20%;
+    position: absolute;
+    right: 0;
+}
+
+.actionButtons span {
+    margin: 5px;
+}
+
+.infoIcon {
+    visibility: hidden;
+    position: absolute;
+    right: 4px;
+    top: 4px;
+    cursor: pointer;
+}
+
+.thumbnail:hover .infoIcon {
+    visibility: visible;
+}
+
+.infoIcon .infoText {
+    visibility: hidden;
+    width: 170px;
+    background-color: black;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    position: absolute;
+    z-index: 1;
+    top: -46px;
+    right: -166px;
+}
+
+.infoIcon:hover .infoText {
+    visibility: visible;
+}

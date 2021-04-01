@@ -1,0 +1,9 @@
+.upload input[type="file"] {
+  display: none;
+}
+
+.uploadLabel {
+  display: inline-block;
+  padding: 6px 12px;
+  cursor: pointer;
+}
