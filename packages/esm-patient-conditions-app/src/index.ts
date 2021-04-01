@@ -13,7 +13,7 @@ function setupOpenMRS() {
 
   const options = {
     featureName: "patient-vitals",
-    moduleName,
+    moduleName
   };
 
   defineConfigSchema(moduleName, {});
@@ -28,8 +28,8 @@ function setupOpenMRS() {
           options
         ),
         meta: {
-          columnSpan: 2,
-        },
+          columnSpan: 2
+        }
       },
       {
         id: "conditions-details-widget",
@@ -39,10 +39,10 @@ function setupOpenMRS() {
           options
         ),
         meta: {
-          columnSpan: 4,
-        },
-      },
-    ],
+          columnSpan: 4
+        }
+      }
+    ]
   };
 }
 

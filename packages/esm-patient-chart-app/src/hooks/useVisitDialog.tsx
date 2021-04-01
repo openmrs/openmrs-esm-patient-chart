@@ -11,6 +11,6 @@ export function useVisitDialog() {
       }
 
       return false;
-    },
+    }
   });
 }

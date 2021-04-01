@@ -23,7 +23,7 @@ const VitalsHeaderStateTitle: React.FC<VitalsHeaderStateTitleProps> = ({
   vitals,
   toggleView,
   showDetails,
-  patientUuid,
+  patientUuid
 }) => {
   const { t } = useTranslation();
   const launchVitalsBiometricsForm = () => {

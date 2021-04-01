@@ -1,0 +1,71 @@
+@import "~carbon-components/scss/globals/scss/vendor/@carbon/elements/scss/type/styles";
+@import "~carbon-components/src/globals/scss/vendor/@carbon/layout/scss/generated/spacing";
+
+$ui-01: #f4f4f4;
+$carbon--red-50: #fa4d56;
+$support-02: #24a148;
+$interactive-01: #0f62fe;
+$text-02: #525252;
+$danger: #da1e28;
+
+.resetPatientChartWidgetContainer {
+  /* The patient chart's .widgetContainer centers text. We don't want that with Carbon. */
+  text-align: initial;
+  margin: 0 $spacing-05 $spacing-05 $spacing-05;
+}
+
+.productiveHeading01 {
+  @include carbon--type-style("productive-heading-01");
+  margin-bottom: $spacing-03;
+}
+
+.productiveHeading02 {
+  @include carbon--type-style("productive-heading-02");
+  margin-bottom: $spacing-05;
+}
+
+.productiveHeading03 {
+  @include carbon--type-style("productive-heading-03");
+  margin-bottom: $spacing-05;
+}
+
+.productiveHeading04 {
+  @include carbon--type-style("productive-heading-04");
+  margin-bottom: $spacing-05;
+}
+
+.productiveHeading05 {
+  @include carbon--type-style("productive-heading-05");
+  margin-bottom: $spacing-05;
+}
+
+.productiveHeading06 {
+  @include carbon--type-style("productive-heading-06");
+  margin-bottom: $spacing-06;
+}
+
+.bodyShort01 {
+  @include carbon--type-style("body-short-01");
+}
+
+.bodyShort02 {
+  @include carbon--type-style("body-short-02");
+}
+
+.bodyLong01 {
+  @include carbon--type-style("body-long-01");
+}
+
+.bodyLong02 {
+  @include carbon--type-style("body-long-02");
+}
+
+.label01 {
+  @include carbon--type-style("label-01");
+}
+
+.clipTextWithEllipsis {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}

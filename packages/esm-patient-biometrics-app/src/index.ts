@@ -14,7 +14,7 @@ function setupOpenMRS() {
 
   const options = {
     featureName: "patient-biometrics",
-    moduleName,
+    moduleName
   };
 
   defineConfigSchema(moduleName, configSchema);
@@ -22,22 +22,29 @@ function setupOpenMRS() {
   return {
     extensions: [
       {
-        id: "biometrics-widget",
-        slots: [
-          "patient-chart-summary-dashboard-slot",
-          "patient-chart-results-dashboard-slot",
-        ],
+        id: "biometrics-overview-widget",
+        slot: "patient-chart-summary-dashboard-slot",
+        load: getAsyncLifecycle(
+          () => import("./biometrics/biometrics-overview.component"),
+          options
+        ),
+        meta: {
+          columnSpan: 2
+        }
+      },
+      {
+        id: "biometrics-details-widget",
+        slot: "patient-chart-results-dashboard-slot",
         load: getAsyncLifecycle(
           () => import("./biometrics/biometrics-overview.component"),
           options
         ),
         meta: {
           view: "biometrics",
-          title: "Biometrics",
-          columnSpan: 2,
-        },
-      },
-    ],
+          title: "Biometrics"
+        }
+      }
+    ]
   };
 }
 

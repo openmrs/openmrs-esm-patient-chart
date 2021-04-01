@@ -16,13 +16,13 @@ import DataTable, {
   TableBody,
   TableHead,
   TableHeader,
-  TableRow,
+  TableRow
 } from "carbon-components-react/es/components/DataTable";
 import { useTranslation } from "react-i18next";
 import {
   createErrorHandler,
   switchTo,
-  useConfig,
+  useConfig
 } from "@openmrs/esm-framework";
 import { getPatientBiometrics } from "./biometric.resource";
 import { useVitalsSignsConceptMetaData } from "./use-vitalsigns";
@@ -41,7 +41,7 @@ interface BiometricsOverviewProps {
 }
 
 const BiometricsOverview: React.FC<BiometricsOverviewProps> = ({
-  patientUuid,
+  patientUuid
 }) => {
   const config = useConfig() as ConfigObject;
   const biometricsToShowCount = 5;
@@ -63,8 +63,8 @@ const BiometricsOverview: React.FC<BiometricsOverviewProps> = ({
         config.concepts.heightUuid,
         patientUuid
       ).subscribe(
-        (biometrics) => setBiometrics(biometrics),
-        (error) => {
+        biometrics => setBiometrics(biometrics),
+        error => {
           setError(error);
           createErrorHandler();
         }
@@ -77,7 +77,7 @@ const BiometricsOverview: React.FC<BiometricsOverviewProps> = ({
     { key: "date", header: "Date" },
     { key: "weight", header: `Weight (${weightUnit})` },
     { key: "height", header: `Height (${heightUnit})` },
-    { key: "bmi", header: `BMI (${bmiUnit})` },
+    { key: "bmi", header: `BMI (${bmiUnit})` }
   ];
 
   const tableRows = biometrics
@@ -88,7 +88,7 @@ const BiometricsOverview: React.FC<BiometricsOverviewProps> = ({
         date: dayjs(biometric.date).format(`DD - MMM - YYYY`),
         weight: biometric.weight,
         height: biometric.height,
-        bmi: biometric.bmi,
+        bmi: biometric.bmi
       };
     });
 
@@ -99,7 +99,7 @@ const BiometricsOverview: React.FC<BiometricsOverviewProps> = ({
   const launchBiometricsForm = () => {
     const url = `/patient/${patientUuid}/vitalsbiometrics/form`;
     switchTo("workspace", url, {
-      title: t("recordVitalsAndBiometrics", "Record Vitals and Biometrics"),
+      title: t("recordVitalsAndBiometrics", "Record Vitals and Biometrics")
     });
   };
 
@@ -157,12 +157,12 @@ const BiometricsOverview: React.FC<BiometricsOverviewProps> = ({
                   <Table {...getTableProps()}>
                     <TableHead>
                       <TableRow>
-                        {headers.map((header) => (
+                        {headers.map(header => (
                           <TableHeader
                             className={`${styles.productiveHeading01} ${styles.text02}`}
                             {...getHeaderProps({
                               header,
-                              isSortable: header.isSortable,
+                              isSortable: header.isSortable
                             })}
                           >
                             {header.header?.content ?? header.header}
@@ -171,9 +171,9 @@ const BiometricsOverview: React.FC<BiometricsOverviewProps> = ({
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {rows.map((row) => (
+                      {rows.map(row => (
                         <TableRow key={row.id}>
-                          {row.cells.map((cell) => (
+                          {row.cells.map(cell => (
                             <TableCell key={cell.id}>
                               {cell.value?.content ?? cell.value}
                             </TableCell>
@@ -187,7 +187,7 @@ const BiometricsOverview: React.FC<BiometricsOverviewProps> = ({
                               <span
                                 style={{
                                   display: "inline-block",
-                                  margin: "0.45rem 0rem",
+                                  margin: "0.45rem 0rem"
                                 }}
                               >
                                 {`${biometricsToShowCount} / ${biometrics.length}`}{" "}

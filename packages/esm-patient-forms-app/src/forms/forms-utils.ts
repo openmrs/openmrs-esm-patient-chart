@@ -9,11 +9,11 @@ export function filterAvailableAndCompletedForms(
 } {
   const availability = {
     available: [],
-    completed: [],
+    completed: []
   };
 
-  forms.forEach((form) => {
-    const completedEncounters = encounters.filter((encounter) => {
+  forms.forEach(form => {
+    const completedEncounters = encounters.filter(encounter => {
       return areFormsEqual(encounter.form, form);
     });
     if (completedEncounters.length > 0) {

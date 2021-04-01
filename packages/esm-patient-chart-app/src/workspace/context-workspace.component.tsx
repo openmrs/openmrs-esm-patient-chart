@@ -6,7 +6,7 @@ import {
   Header,
   HeaderGlobalAction,
   HeaderGlobalBar,
-  HeaderName,
+  HeaderName
 } from "carbon-components-react/es/components/UIShell";
 import { ExtensionSlotProps } from "@openmrs/esm-framework";
 
@@ -19,7 +19,7 @@ export interface ContextWorkspaceProps {
 export default function ContextWorkspace({
   title,
   extensionSlot,
-  clearExtensionSlot,
+  clearExtensionSlot
 }: ContextWorkspaceProps) {
   const { t } = useTranslation();
 

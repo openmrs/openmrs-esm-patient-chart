@@ -1,0 +1,27 @@
+@import "../root";
+
+.orderActionNewLabel {
+  @extend .label01;
+  color: $support-02;
+}
+
+.orderActionRenewLabel {
+  @extend .label01;
+  color: $support-02;
+}
+
+.orderActionRevisedLabel {
+  @extend .label01;
+  color: $text-02;
+}
+
+.orderActionDiscontinueLabel {
+  @extend .label01;
+  color: $text-02;
+}
+
+.orderErrorText {
+  color: $danger;
+  display: flex;
+  align-items: center;
+}

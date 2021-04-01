@@ -1,0 +1,29 @@
+@import "../root";
+
+.floatingOrderBasketButton {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  height: 56px;
+  font-weight: bold;
+  padding-right: 15px !important;
+
+  .elementContainer {
+    display: flex;
+  }
+
+  svg {
+    margin: auto 10px auto 20px;
+  }
+
+  .countTag {
+    position: absolute;
+    top: 0px;
+    right: 7px;
+    transform: scale(0.8);
+    min-width: initial;
+    min-height: initial;
+    background-color: $carbon--red-50;
+    color: white;
+  }
+}

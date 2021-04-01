@@ -1,0 +1,44 @@
+@import "../root";
+
+.medicationDetailsHeader {
+  position: sticky;
+  background-color: $interactive-01;
+  border: 0;
+  top: 3rem;
+}
+
+.orderForm {
+  margin: $spacing-05;
+}
+
+.pullColumnContentRight > div {
+  float: right;
+}
+
+.fullWidthDatePickerContainer {
+  :global .bx--date-picker {
+    width: 100%;
+
+    :global .bx--date-picker-container {
+      width: 100%;
+
+      :global .bx--date-picker-input__wrapper {
+        width: 100%;
+
+        :global .bx--date-picker__input {
+          width: 100%;
+        }
+      }
+    }
+  }
+}
+
+.fullHeightTextAreaContainer {
+  :global .bx--form-item {
+    height: 100%;
+
+    :global .bx--text-area__wrapper {
+      height: 100%;
+    }
+  }
+}

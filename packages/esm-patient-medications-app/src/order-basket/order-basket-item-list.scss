@@ -1,0 +1,7 @@
+@import "../root";
+
+.orderCategoryHeading {
+  @extend .productiveHeading01;
+  color: $text-02;
+  margin: $spacing-05 0;
+}

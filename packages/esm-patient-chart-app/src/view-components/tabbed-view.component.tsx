@@ -6,7 +6,7 @@ import {
   ExtensionSlot,
   navigate,
   translateFrom,
-  useExtensionStore,
+  useExtensionStore
 } from "@openmrs/esm-framework";
 import { useRouteMatch } from "react-router-dom";
 import { DashboardTabConfig } from "../config-schemas";
@@ -38,14 +38,14 @@ const ShowTabs: React.FC<ShowTabsProps> = ({ slot, view, fullPath }) => {
   const store = useExtensionStore();
   const extensions = React.useMemo(() => {
     const ids = store.slots[slot]?.attachedIds ?? [];
-    return ids.map((id) => store.extensions[id]);
+    return ids.map(id => store.extensions[id]);
   }, [store]);
   const defaultExtension = extensions[0];
 
   useEffect(() => {
     if (!view && defaultExtension) {
       navigate({
-        to: `${fullPath}/${defaultExtension.meta.view}`,
+        to: `${fullPath}/${defaultExtension.meta.view}`
       });
     }
   }, [view, defaultExtension]);
@@ -53,7 +53,7 @@ const ShowTabs: React.FC<ShowTabsProps> = ({ slot, view, fullPath }) => {
   return (
     <ul>
       {view &&
-        extensions.map((ext) => (
+        extensions.map(ext => (
           <li key={ext.name}>
             <div
               className={`${
@@ -90,7 +90,7 @@ const TabbedView: React.FC<TabbedViewProps> = ({ name, slot, patientUuid }) => {
     ...urlData,
     fullPath,
     patientUuid,
-    view,
+    view
   };
 
   return (
@@ -103,8 +103,8 @@ const TabbedView: React.FC<TabbedViewProps> = ({ name, slot, patientUuid }) => {
           <ExtensionSlot
             extensionSlotName={slot}
             state={state}
-            select={(extensions) =>
-              extensions.filter((ext) => ext.meta.view === view)
+            select={extensions =>
+              extensions.filter(ext => ext.meta.view === view)
             }
           />
         )}

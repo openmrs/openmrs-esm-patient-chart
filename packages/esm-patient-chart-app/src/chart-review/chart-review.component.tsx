@@ -12,7 +12,7 @@ function makePath(
 ) {
   const parts = `${basePath}/${target.name}/:subview?`.split("/");
 
-  Object.keys(params).forEach((key) => {
+  Object.keys(params).forEach(key => {
     for (let i = 0; i < parts.length; i++) {
       if (parts[i][0] === ":" && parts[i].indexOf(key) === 1) {
         parts[i] = params[key];
@@ -31,7 +31,7 @@ const ChartReview: React.FC<ChartReviewProps> = ({ match }) => {
   const { patientUuid } = match.params;
 
   const dashboards = useMemo(() => {
-    return config.dashboardDefinitions.map((dashboard) => (
+    return config.dashboardDefinitions.map(dashboard => (
       <Route key={dashboard.name} exact path={makePath(dashboard)}>
         {dashboard.config.type === "grid" ? (
           <GridView
@@ -59,7 +59,7 @@ const ChartReview: React.FC<ChartReviewProps> = ({ match }) => {
           <Redirect
             to={makePath(config.dashboardDefinitions[0], {
               ...match.params,
-              subview: "",
+              subview: ""
             })}
           />
         </Route>

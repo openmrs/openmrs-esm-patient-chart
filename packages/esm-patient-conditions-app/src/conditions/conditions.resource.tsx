@@ -7,9 +7,9 @@ export function performPatientConditionsSearch(patientIdentifier: string) {
     `${fhirBaseUrl}/Condition?patient.identifier=${patientIdentifier}`
   ).pipe(
     map(({ data }) => data["entry"]),
-    map((entries) => entries?.map((entry) => entry.resource) ?? []),
-    map((data) => formatConditions(data)),
-    map((data) =>
+    map(entries => entries?.map(entry => entry.resource) ?? []),
+    map(data => formatConditions(data)),
+    map(data =>
       data.sort((a, b) => (b?.onsetDateTime > a?.onsetDateTime ? 1 : -1))
     )
   );
@@ -35,7 +35,7 @@ function mapConditionProperties(condition: FHIRCondition): Condition {
     display: condition?.code?.coding[0]?.display,
     onsetDateTime: condition?.onsetDateTime,
     recordedDate: condition?.recordedDate,
-    id: condition?.id,
+    id: condition?.id
   };
 }
 

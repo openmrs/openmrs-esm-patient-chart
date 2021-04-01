@@ -1,4 +1,8 @@
-import { openmrsObservableFetch, fhirBaseUrl, FHIRResource } from "@openmrs/esm-framework";
+import {
+  openmrsObservableFetch,
+  fhirBaseUrl,
+  FHIRResource
+} from "@openmrs/esm-framework";
 import { map } from "rxjs/operators";
 import { calculateBMI } from "./biometric.helper";
 

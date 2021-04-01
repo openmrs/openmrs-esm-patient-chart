@@ -1,9 +1,9 @@
 import notesConfigSchema, {
-  VisitNoteConfigObject,
+  VisitNoteConfigObject
 } from "./notes/visit-note-config-schema";
 
 export const configSchema = {
-  visitNoteConfig: notesConfigSchema,
+  visitNoteConfig: notesConfigSchema
 };
 
 export interface ConfigObject {

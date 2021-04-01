@@ -13,7 +13,7 @@ function setupOpenMRS() {
 
   const options = {
     featureName: "patient-forms",
-    moduleName,
+    moduleName
   };
 
   defineConfigSchema(moduleName, {});
@@ -28,10 +28,10 @@ function setupOpenMRS() {
           options
         ),
         meta: {
-          columnSpan: 2,
-        },
-      },
-    ],
+          columnSpan: 2
+        }
+      }
+    ]
   };
 }
 

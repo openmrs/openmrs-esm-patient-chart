@@ -1,7 +1,7 @@
 import {
   ExtensionSlot,
   ExtensionSlotProps,
-  useNavigationContext,
+  useNavigationContext
 } from "@openmrs/esm-framework";
 import React, { useCallback, useState } from "react";
 
@@ -14,7 +14,7 @@ export interface WorkspaceState {
 export function useWorkspace(): WorkspaceState {
   const [
     currentWorkspaceExtensionSlot,
-    setCurrentWorkspaceExtensionSlot,
+    setCurrentWorkspaceExtensionSlot
   ] = useState<React.FC<ExtensionSlotProps>>();
   const [workspaceTitle, setWorkspaceTitle] = useState("");
 
@@ -34,12 +34,12 @@ export function useWorkspace(): WorkspaceState {
       ));
       setWorkspaceTitle(state.title ?? "");
       return true;
-    },
+    }
   });
 
   return {
     title: workspaceTitle,
     extensionSlot: currentWorkspaceExtensionSlot,
-    clearExtensionSlot: clearCurrentWorkspaceContext,
+    clearExtensionSlot: clearCurrentWorkspaceContext
   };
 }

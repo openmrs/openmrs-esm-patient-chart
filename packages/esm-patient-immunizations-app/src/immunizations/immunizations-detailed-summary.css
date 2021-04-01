@@ -1,0 +1,135 @@
+:root {
+  --omrs-bg-immunization-sequence-odd-row: rgba(73, 133, 224, 0.12);
+  --omrs-bg-immunization-sequence-even-row: #bed4e6;
+  --omrs-bg-immunization-odd-row: #ffffff;
+  --omrs-bg-immunization-even-row: #eff1f2;
+  --omrs-bg-immunization-header: rgba(47, 60, 85, 0.18);
+}
+
+.immunizationDetailedSummaryCard {
+  width: 100%;
+  background: var(--omrs-color-bg-low-contrast);
+  border: none;
+  boxshadow: none;
+}
+
+:global(.omrs-breakpoint-gt-tablet) .immunizationSummary {
+  width: 45.5vw;
+}
+
+:global(.omrs-breakpoint-gt-phone) .immunizationSummary {
+  display: flex;
+  justify-content: center;
+}
+
+:global(.omrs-breakpoint-lt-tablet) .immunizationSummary {
+  padding: 0.25rem 0.5rem 0 0.5rem;
+}
+
+:global(.omrs-breakpoint-lt-tablet) .immunizationTable thead td {
+  padding: 0.25rem 0.125rem 0.5rem 0.5rem;
+}
+
+.headerAdd {
+  grid-area: b;
+  justify-self: center;
+  padding-right: 1em;
+}
+
+.immunizationTable thead {
+  text-transform: uppercase;
+}
+
+.immunizationTable td:nth-child(1) {
+  width: 25%;
+  text-align: left;
+}
+
+.immunizationTable thead td:nth-child(1) {
+  padding-left: 5%;
+}
+
+.immunizationTable td:nth-child(2) {
+  text-align: right;
+  width: 25%;
+}
+.immunizationTable td:nth-child(3) {
+  width: 15%;
+  text-align: right;
+}
+
+.immunizationTable {
+  width: 100%;
+  border-spacing: 0;
+}
+
+.immunizationTable tbody {
+  padding: 2rem;
+}
+
+:global(.omrs-breakpoint-lt-tablet) .immunizationTable tbody {
+  padding: 1rem;
+}
+
+.immunizationTable td {
+  padding: 0.75rem 0 0.75rem 1rem;
+}
+
+.immunizationTable .expandSequence {
+  float: left;
+  width: 10%;
+}
+
+.immunizationTable .expandSequence .expandButton {
+  cursor: pointer;
+}
+
+.centerItems {
+  display: flex;
+  align-items: center;
+}
+
+.alignRight {
+  justify-content: flex-end;
+}
+
+.alignLeft {
+  justify-content: flex-start;
+}
+
+.alignRight span {
+  margin-right: 1rem;
+}
+
+.immunizationMargin {
+  margin: 1rem 1rem;
+}
+
+.immunizationMargin p {
+  padding-bottom: 1rem;
+}
+
+.immunizationTable tbody tr:nth-child(odd) {
+  background: var(--omrs-bg-immunization-odd-row);
+}
+
+.immunizationTable tbody tr:nth-child(even) {
+  background: var(--omrs-bg-immunization-even-row);
+}
+
+.immunizationTable thead tr {
+  background: var(--omrs-bg-immunization-header) !important;
+}
+
+.hideSequence {
+  display: none;
+}
+
+.addButton {
+  padding: 8px 20px;
+  background-color: #ddd;
+  border-radius: 3px;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  font-size: 100%;
+}

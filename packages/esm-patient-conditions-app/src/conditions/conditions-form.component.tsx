@@ -7,7 +7,7 @@ import { useTranslation, Trans } from "react-i18next";
 import { useCurrentPatient, createErrorHandler } from "@openmrs/esm-framework";
 import {
   createPatientCondition,
-  updatePatientCondition,
+  updatePatientCondition
 } from "./conditions.resource";
 import { DataCaptureComponentProps } from "../types";
 
@@ -61,7 +61,7 @@ export function ConditionsForm(props: ConditionsFormProps) {
         conditionUuid,
         conditionName,
         clinicalStatus,
-        onsetDateTime,
+        onsetDateTime
       }: Condition = props.match.params;
       if (conditionName && clinicalStatus && onsetDateTime) {
         setViewEditForm(true);
@@ -74,17 +74,17 @@ export function ConditionsForm(props: ConditionsFormProps) {
     }
   }, [props.match.params]);
 
-  const handleCreateFormSubmit = (event) => {
+  const handleCreateFormSubmit = event => {
     event.preventDefault();
 
     const condition: Condition = {
       conditionName: conditionName,
       clinicalStatus: clinicalStatus,
-      onsetDateTime: onsetDateTime,
+      onsetDateTime: onsetDateTime
     };
     const abortController = new AbortController();
     createPatientCondition(condition, patientUuid, abortController)
-      .then((response) => response.status == 201 && navigate())
+      .then(response => response.status == 201 && navigate())
       .catch(createErrorHandler());
   };
 
@@ -107,7 +107,7 @@ export function ConditionsForm(props: ConditionsFormProps) {
           styles={{
             width: "100%",
             background: "var(--omrs-color-bg-medium-contrast)",
-            height: "auto",
+            height: "auto"
           }}
         >
           <div className={styles.conditionsContainerWrapper}>
@@ -123,7 +123,7 @@ export function ConditionsForm(props: ConditionsFormProps) {
                     id="conditionName"
                     className="omrs-input-outlined"
                     type="text"
-                    onChange={(event) => setConditionName(event.target.value)}
+                    onChange={event => setConditionName(event.target.value)}
                     required
                     style={{ height: "2.75rem" }}
                   />
@@ -138,7 +138,7 @@ export function ConditionsForm(props: ConditionsFormProps) {
                     id="onsetDate"
                     type="date"
                     name="onsetDate"
-                    onChange={(event) => setOnsetDateTime(event.target.value)}
+                    onChange={event => setOnsetDateTime(event.target.value)}
                   />
                   <svg className="omrs-icon" role="img">
                     <use xlinkHref="#omrs-icon-calendar"></use>
@@ -156,7 +156,7 @@ export function ConditionsForm(props: ConditionsFormProps) {
                         id="active"
                         type="radio"
                         value="active"
-                        onChange={(event) => {
+                        onChange={event => {
                           setClinicalStatus(event.target.value);
                           setInactiveStatus(false);
                         }}
@@ -172,7 +172,7 @@ export function ConditionsForm(props: ConditionsFormProps) {
                         id="inactive"
                         type="radio"
                         value="inactive"
-                        onChange={(event) => {
+                        onChange={event => {
                           setClinicalStatus(event.target.value);
                           setInactiveStatus(true);
                         }}
@@ -188,7 +188,7 @@ export function ConditionsForm(props: ConditionsFormProps) {
                         id="historyOf"
                         type="radio"
                         value="historyOf"
-                        onChange={(event) => {
+                        onChange={event => {
                           setClinicalStatus(event.target.value);
                           setInactiveStatus(true);
                         }}
@@ -211,9 +211,7 @@ export function ConditionsForm(props: ConditionsFormProps) {
                       id="dateOfInactivity"
                       name="dateOfInactivity"
                       defaultValue={inactivityDate}
-                      onChange={(event) =>
-                        setInactivityDate(event.target.value)
-                      }
+                      onChange={event => setInactivityDate(event.target.value)}
                     />
                     <svg className="omrs-icon" role="img">
                       <use xlinkHref="#omrs-icon-calendar"></use>
@@ -247,7 +245,7 @@ export function ConditionsForm(props: ConditionsFormProps) {
                 ? "omrs-btn omrs-filled-action omrs-rounded"
                 : "omrs-btn omrs-outlined omrs-rounded"
             }
-            onClick={(event) => handleCreateFormSubmit(event)}
+            onClick={event => handleCreateFormSubmit(event)}
             disabled={!enableCreateFormButtons}
           >
             <Trans i18nKey="signAndSave">Sign & Save</Trans>
@@ -257,7 +255,7 @@ export function ConditionsForm(props: ConditionsFormProps) {
     );
   }
 
-  const closeForm = (event) => {
+  const closeForm = event => {
     let userConfirmed: boolean = false;
     if (formChanged) {
       userConfirmed = confirm(
@@ -274,7 +272,7 @@ export function ConditionsForm(props: ConditionsFormProps) {
     }
   };
 
-  const handleEditSubmit = (event) => {
+  const handleEditSubmit = event => {
     event.preventDefault();
 
     const condition: Condition = {
@@ -282,11 +280,11 @@ export function ConditionsForm(props: ConditionsFormProps) {
       conditionName: conditionName,
       clinicalStatus: clinicalStatus,
       onsetDateTime: onsetDateTime,
-      inactivityDate: inactivityDate,
+      inactivityDate: inactivityDate
     };
     const abortController = new AbortController();
     updatePatientCondition(condition, patientUuid, abortController)
-      .then((response) => response.status == 200 && navigate())
+      .then(response => response.status == 200 && navigate())
       .catch(createErrorHandler());
   };
 
@@ -308,7 +306,7 @@ export function ConditionsForm(props: ConditionsFormProps) {
               styles={{
                 width: "100%",
                 backgroundColor: "var(--omrs-color-bg-medium-contrast)",
-                height: "auto",
+                height: "auto"
               }}
             >
               <div className={styles.conditionsContainerWrapper}>
@@ -350,7 +348,7 @@ export function ConditionsForm(props: ConditionsFormProps) {
                             name="currentStatus"
                             value="active"
                             defaultChecked={clinicalStatus === "active"}
-                            onChange={(event) => {
+                            onChange={event => {
                               setClinicalStatus(event.target.value);
                               setInactiveStatus(false);
                             }}
@@ -368,7 +366,7 @@ export function ConditionsForm(props: ConditionsFormProps) {
                             name="currentStatus"
                             value="inactive"
                             defaultChecked={clinicalStatus === "inactive"}
-                            onChange={(event) => {
+                            onChange={event => {
                               setClinicalStatus(event.target.value);
                               setInactiveStatus(true);
                             }}
@@ -386,7 +384,7 @@ export function ConditionsForm(props: ConditionsFormProps) {
                             name="currentStatus"
                             value="historyOf"
                             defaultChecked={clinicalStatus === "historyOf"}
-                            onChange={(event) => {
+                            onChange={event => {
                               setClinicalStatus(event.target.value);
                               setInactiveStatus(true);
                             }}
@@ -411,7 +409,7 @@ export function ConditionsForm(props: ConditionsFormProps) {
                           id="dateOfInactivity"
                           name="dateOfInactivity"
                           defaultValue={inactivityDate}
-                          onChange={(event) =>
+                          onChange={event =>
                             setInactivityDate(event.target.value)
                           }
                         />
@@ -453,7 +451,7 @@ export function ConditionsForm(props: ConditionsFormProps) {
                     ? "omrs-btn omrs-filled-action omrs-rounded"
                     : "omrs-btn omrs-outlined omrs-rounded"
                 }
-                onClick={(event) => handleEditSubmit(event)}
+                onClick={event => handleEditSubmit(event)}
                 disabled={!enableEditFormButtons}
                 style={{ width: "50%" }}
               >
@@ -473,5 +471,5 @@ ConditionsForm.defaultProps = {
   entryStarted: () => {},
   entryCancelled: () => {},
   entrySubmitted: () => {},
-  closeComponent: () => {},
+  closeComponent: () => {}
 };

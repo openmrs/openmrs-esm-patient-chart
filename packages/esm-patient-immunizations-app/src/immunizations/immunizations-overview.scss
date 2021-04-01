@@ -1,0 +1,29 @@
+@import "~@openmrs/esm-styleguide/src/vars";
+@import "~carbon-components/src/globals/scss/vars";
+@import "~carbon-components/src/globals/scss/mixins";
+
+.immunizationsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-04 0 $spacing-04 $spacing-05;
+  background-color: $ui-background;
+}
+
+.immunizationOverviewSummaryCard {
+  margin: 1.25rem 1.5rem;
+}
+
+.immunizationMore {
+  display: flex;
+  align-items: center;
+  border: none;
+  padding: 0.625rem 1.625rem 0.625rem 1rem;
+  background-color: var(--omrs-color-bg-medium-contrast);
+  color: var(--omrs-color-ink-medium-contrast);
+  cursor: pointer;
+}
+
+.immunizationMore p {
+  margin: 0;
+}

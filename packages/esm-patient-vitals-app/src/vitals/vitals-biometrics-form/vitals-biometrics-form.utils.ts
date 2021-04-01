@@ -17,7 +17,7 @@ export function isInNormalRange(
     return true;
   }
 
-  const concept = conceptsMetaData.find((c) => c.uuid === conceptUuid);
+  const concept = conceptsMetaData.find(c => c.uuid === conceptUuid);
   return isNumber(concept.lowNormal) && isNumber(concept.hiNormal)
     ? inRange(
         Number(value),

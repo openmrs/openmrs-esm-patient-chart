@@ -4,11 +4,9 @@ import { BrowserRouter } from "react-router-dom";
 import VitalsOverview from "./vitals-overview.component";
 import { of } from "rxjs/internal/observable/of";
 
-import { mockVitalData } from "../../../__mocks__/vitals.mock";
-import { openWorkspaceTab } from "../shared-utils";
+import { mockVitalData } from "../../__mocks__/vitals.mock";
 import { performPatientsVitalsSearch } from "./vitals-biometrics.resource";
 
-const mockOpenWorkspaceTab = openWorkspaceTab as jest.Mock;
 const mockPerformPatientVitalsSearch = performPatientsVitalsSearch as jest.Mock;
 const mockVitalsConfig = {
   vitals: {
@@ -36,7 +34,6 @@ jest.mock("../shared-utils", () => ({
 // TO DO Write test for carbon intergration
 describe("<VitalsOverview />", () => {
   beforeEach(() => {
-    mockOpenWorkspaceTab.mockReset;
     mockPerformPatientVitalsSearch.mockReset;
   });
 

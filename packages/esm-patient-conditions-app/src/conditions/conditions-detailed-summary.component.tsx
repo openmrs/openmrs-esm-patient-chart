@@ -9,7 +9,7 @@ import { useTranslation, Trans } from "react-i18next";
 import { useCurrentPatient, createErrorHandler } from "@openmrs/esm-framework";
 import {
   Condition,
-  performPatientConditionsSearch,
+  performPatientConditionsSearch
 } from "./conditions.resource";
 import { ConditionsForm } from "./conditions-form.component";
 
@@ -32,7 +32,7 @@ export default function ConditionsDetailedSummary(
     if (!isLoadingPatient && patient) {
       const sub = performPatientConditionsSearch(
         patient.identifier[0].value
-      ).subscribe((conditions) => {
+      ).subscribe(conditions => {
         setPatientConditions(conditions);
       }, createErrorHandler());
 
@@ -70,7 +70,7 @@ export default function ConditionsDetailedSummary(
               </tr>
             </thead>
             <tbody>
-              {patientConditions.map((condition) => {
+              {patientConditions.map(condition => {
                 return (
                   <React.Fragment key={condition.id}>
                     <tr

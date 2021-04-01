@@ -11,7 +11,7 @@ import { useTranslation } from "react-i18next";
 import {
   createErrorHandler,
   navigate,
-  useCurrentPatient,
+  useCurrentPatient
 } from "@openmrs/esm-framework";
 import { fetchAllForms, fetchPatientEncounters } from "./forms.resource";
 import { filterAvailableAndCompletedForms } from "./forms-utils";
@@ -20,7 +20,7 @@ import { Encounter, Form } from "../types";
 enum formView {
   recommended = 0,
   completed,
-  all,
+  all
 }
 
 const Forms: React.FC = () => {
@@ -39,8 +39,8 @@ const Forms: React.FC = () => {
 
   React.useEffect(() => {
     fetchAllForms().subscribe(
-      (forms) => setForms(forms),
-      (error) => {
+      forms => setForms(forms),
+      error => {
         createErrorHandler();
         setError(error);
       }
@@ -55,8 +55,8 @@ const Forms: React.FC = () => {
       fromDate.toDate(),
       toDate.toDate()
     ).subscribe(
-      (encounters) => setEncounters(encounters),
-      (error) => {
+      encounters => setEncounters(encounters),
+      error => {
         createErrorHandler(), setError(error);
       }
     );
@@ -64,7 +64,7 @@ const Forms: React.FC = () => {
 
   React.useEffect(() => {
     const availableForms = filterAvailableAndCompletedForms(forms, encounters);
-    const completedForms = availableForms.completed.map((encounters) => {
+    const completedForms = availableForms.completed.map(encounters => {
       encounters.form.complete = true;
       return encounters.form;
     });
@@ -72,8 +72,8 @@ const Forms: React.FC = () => {
   }, [forms, encounters]);
 
   React.useEffect(() => {
-    const filledForms = forms.map((form) => {
-      completedForms.map((completeForm) => {
+    const filledForms = forms.map(form => {
+      completedForms.map(completeForm => {
         if (completeForm.uuid === form.uuid) {
           form.complete = true;
         }
@@ -93,7 +93,7 @@ const Forms: React.FC = () => {
           <div className={styles.contextSwitcherContainer}>
             <ContentSwitcher
               className={styles.contextSwitcherWidth}
-              onChange={(event) => setSelectedFormView(event.name as any)}
+              onChange={event => setSelectedFormView(event.name as any)}
               selectedIndex={selectedFormView}
             >
               <Switch name={formView.recommended} text="Recommended" />

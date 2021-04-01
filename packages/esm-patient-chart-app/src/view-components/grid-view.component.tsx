@@ -4,7 +4,7 @@ import {
   Extension,
   ExtensionData,
   ExtensionSlot,
-  useExtensionStore,
+  useExtensionStore
 } from "@openmrs/esm-framework";
 import { DashbardGridConfig } from "../config-schemas";
 import { useUrlData } from "../useUrlData";
@@ -28,7 +28,7 @@ export default function GridView({ slot, layout, patientUuid }: GridViewProps) {
   const state = React.useMemo(
     () => ({
       basePath,
-      patientUuid,
+      patientUuid
     }),
     [basePath, patientUuid]
   );

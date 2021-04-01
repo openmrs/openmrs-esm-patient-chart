@@ -14,7 +14,7 @@ function setupOpenMRS() {
 
   const options = {
     featureName: "patient-vitals",
-    moduleName,
+    moduleName
   };
 
   defineConfigSchema(moduleName, configSchema);
@@ -22,20 +22,27 @@ function setupOpenMRS() {
   return {
     extensions: [
       {
-        id: "vitals-widget",
-        slots: [
-          "patient-chart-summary-dashboard-slot",
-          "patient-chart-results-dashboard-slot",
-        ],
+        id: "vitals-overview-widget",
+        slot: "patient-chart-summary-dashboard-slot",
+        load: getAsyncLifecycle(
+          () => import("./vitals/vitals-overview.component"),
+          options
+        ),
+        meta: {
+          columnSpan: 2
+        }
+      },
+      {
+        id: "vitals-details-widget",
+        slot: "patient-chart-results-dashboard-slot",
         load: getAsyncLifecycle(
           () => import("./vitals/vitals-overview.component"),
           options
         ),
         meta: {
           view: "vitals",
-          title: "Vitals",
-          columnSpan: 2,
-        },
+          title: "Vitals"
+        }
       },
       {
         id: "patient-vitals-info",
@@ -43,9 +50,9 @@ function setupOpenMRS() {
         load: getAsyncLifecycle(
           () => import("./vitals/vitals-header/vital-header-state.component"),
           options
-        ),
-      },
-    ],
+        )
+      }
+    ]
   };
 }
 

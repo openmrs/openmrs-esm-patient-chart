@@ -13,7 +13,7 @@ interface PatientChartParams {
 }
 
 const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({
-  match,
+  match
 }) => {
   const patientUuid = match.params.patientUuid;
   const [loading, patient] = useCurrentPatient(patientUuid);
@@ -27,7 +27,7 @@ const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({
       style={{
         display: "flex",
         alignItems: "flex-start",
-        flexDirection: "column",
+        flexDirection: "column"
       }}
     >
       {loading ? (

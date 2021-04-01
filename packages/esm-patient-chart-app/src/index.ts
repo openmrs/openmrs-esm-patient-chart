@@ -2,7 +2,7 @@ import capitalize from "lodash-es/capitalize";
 import {
   registerBreadcrumbs,
   defineConfigSchema,
-  getAsyncLifecycle,
+  getAsyncLifecycle
 } from "@openmrs/esm-framework";
 import { esmPatientChartSchema } from "./config-schemas/openmrs-esm-patient-chart-schema";
 import { spaBasePath } from "./constants";
@@ -20,7 +20,7 @@ function setupOpenMRS() {
 
   const options = {
     featureName: "patient-chart",
-    moduleName,
+    moduleName
   };
 
   defineConfigSchema(moduleName, esmPatientChartSchema);
@@ -29,13 +29,13 @@ function setupOpenMRS() {
     {
       path: spaBasePath,
       title: "Patient",
-      parent: `${window.spaBase}/home`,
+      parent: `${window.spaBase}/home`
     },
     {
       path: `${spaBasePath}/:view/:subview?`,
       title: ([_, key]) => `${capitalize(key)} Dashboard`,
-      parent: spaBasePath,
-    },
+      parent: spaBasePath
+    }
   ]);
 
   return {
@@ -47,9 +47,9 @@ function setupOpenMRS() {
         load: getAsyncLifecycle(
           () => import("./ui-components/nav.component"),
           options
-        ),
-      },
-    ],
+        )
+      }
+    ]
   };
 }
 

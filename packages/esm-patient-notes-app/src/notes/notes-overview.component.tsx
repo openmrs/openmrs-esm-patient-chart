@@ -8,7 +8,7 @@ import DataTable, {
   TableBody,
   TableHead,
   TableHeader,
-  TableRow,
+  TableRow
 } from "carbon-components-react/es/components/DataTable";
 import Add16 from "@carbon/icons-react/es/add/16";
 import EmptyState from "./empty-state/empty-state.component";
@@ -18,11 +18,11 @@ import { useTranslation } from "react-i18next";
 import {
   createErrorHandler,
   useCurrentPatient,
-  switchTo,
+  switchTo
 } from "@openmrs/esm-framework";
 import {
   getEncounterObservableRESTAPI,
-  PatientNote,
+  PatientNote
 } from "./encounter.resource";
 import { formatNotesDate } from "./notes-helper";
 
@@ -39,8 +39,8 @@ const NotesOverview: React.FC<NotesOverviewProps> = () => {
   React.useEffect(() => {
     if (patient && patientUuid) {
       const sub = getEncounterObservableRESTAPI(patientUuid).subscribe(
-        (notes) => setNotes(notes),
-        (error) => {
+        notes => setNotes(notes),
+        error => {
           setError(error);
           createErrorHandler();
         }
@@ -56,36 +56,36 @@ const NotesOverview: React.FC<NotesOverviewProps> = () => {
   const launchVisitNoteForm = () => {
     const url = `/patient/${patientUuid}/visitnotes/form`;
     switchTo("workspace", url, {
-      title: t("visitNote", "Visit Note"),
+      title: t("visitNote", "Visit Note")
     });
   };
 
   const headers = [
     {
       key: "encounterDate",
-      header: t("date", "Date"),
+      header: t("date", "Date")
     },
     {
       key: "encounterType",
-      header: t("encounterType", "Encounter type"),
+      header: t("encounterType", "Encounter type")
     },
     {
       key: "encounterLocation",
-      header: t("location", "Location"),
+      header: t("location", "Location")
     },
     {
       key: "encounterAuthor",
-      header: t("author", "Author"),
-    },
+      header: t("author", "Author")
+    }
   ];
 
   const getRowItems = (rows: Array<PatientNote>) => {
     return rows
       ?.slice(0, showAllNotes ? rows.length : notesToShowCount)
-      .map((row) => ({
+      .map(row => ({
         ...row,
         encounterDate: formatNotesDate(row.encounterDate),
-        author: row.encounterAuthor ? row.encounterAuthor : "\u2014",
+        author: row.encounterAuthor ? row.encounterAuthor : "\u2014"
       }));
   };
 
@@ -118,12 +118,12 @@ const NotesOverview: React.FC<NotesOverviewProps> = () => {
                 <Table {...getTableProps()}>
                   <TableHead>
                     <TableRow>
-                      {headers.map((header) => (
+                      {headers.map(header => (
                         <TableHeader
                           className={`${styles.productiveHeading01} ${styles.text02}`}
                           {...getHeaderProps({
                             header,
-                            isSortable: header.isSortable,
+                            isSortable: header.isSortable
                           })}
                         >
                           {header.header?.content ?? header.header}
@@ -132,9 +132,9 @@ const NotesOverview: React.FC<NotesOverviewProps> = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {rows.map((row) => (
+                    {rows.map(row => (
                       <TableRow key={row.id}>
-                        {row.cells.map((cell) => (
+                        {row.cells.map(cell => (
                           <TableCell key={cell.id}>
                             {cell.value?.content ?? cell.value}
                           </TableCell>
@@ -147,7 +147,7 @@ const NotesOverview: React.FC<NotesOverviewProps> = () => {
                           <span
                             style={{
                               display: "inline-block",
-                              margin: "0.45rem 0rem",
+                              margin: "0.45rem 0rem"
                             }}
                           >
                             {`${notesToShowCount} / ${notes.length}`}{" "}

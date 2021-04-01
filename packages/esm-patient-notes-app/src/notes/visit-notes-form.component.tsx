@@ -17,20 +17,20 @@ import {
   switchTo,
   createErrorHandler,
   useCurrentPatient,
-  useConfig,
+  useConfig
 } from "@openmrs/esm-framework";
 import {
   convertToObsPayLoad,
   obs,
   Diagnosis,
-  VisitNotePayload,
+  VisitNotePayload
 } from "./visit-note.util";
 import {
   fetchCurrentSessionData,
   fetchDiagnosisByName,
   fetchLocationByUuid,
   fetchProviderByUuid,
-  saveVisitNote,
+  saveVisitNote
 } from "./visit-notes.resource";
 import { ConfigObject } from "../config-schema";
 
@@ -45,7 +45,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ closeWorkspace }) => {
     clinicianEncounterRole,
     encounterNoteConceptUuid,
     encounterTypeUuid,
-    formConceptUuid,
+    formConceptUuid
   } = config.visitNoteConfig;
   const { t } = useTranslation();
   const [, , patientUuid] = useCurrentPatient();
@@ -54,11 +54,11 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ closeWorkspace }) => {
   const [error, setError] = React.useState(null);
   const [
     currentSessionProviderUuid,
-    setCurrentSessionProviderUuid,
+    setCurrentSessionProviderUuid
   ] = React.useState<string | null>("");
   const [
     currentSessionLocationUuid,
-    setCurrentSessionLocationUuid,
+    setCurrentSessionLocationUuid
   ] = React.useState("");
   const [locationUuid, setLocationUuid] = React.useState<string | null>(null);
   const [providerUuid, setProviderUuid] = React.useState<string | null>(null);
@@ -77,8 +77,8 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ closeWorkspace }) => {
   React.useEffect(() => {
     if (searchTerm) {
       const sub = fetchDiagnosisByName(searchTerm).subscribe(
-        (results) => setSearchResults(results),
-        (error) => {
+        results => setSearchResults(results),
+        error => {
           setError(error);
           createErrorHandler();
         }
@@ -125,7 +125,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ closeWorkspace }) => {
     closeWorkspace();
   };
 
-  const handleSearchTermChange = debounce((searchTerm) => {
+  const handleSearchTermChange = debounce(searchTerm => {
     setSearchTerm(searchTerm);
   }, searchTimeoutInMs);
 
@@ -136,21 +136,21 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ closeWorkspace }) => {
 
   const handleAddDiagnosis = (diagnosisToAdd: Diagnosis) => {
     resetSearch();
-    setSelectedDiagnoses((selectedDiagnoses) => [
+    setSelectedDiagnoses(selectedDiagnoses => [
       ...selectedDiagnoses,
-      diagnosisToAdd,
+      diagnosisToAdd
     ]);
   };
 
   const handleRemoveDiagnosis = (diagnosisToRemove: Diagnosis) => {
     setSelectedDiagnoses(
       selectedDiagnoses.filter(
-        (diagnosis) => diagnosis.concept.id !== diagnosisToRemove.concept.id
+        diagnosis => diagnosis.concept.id !== diagnosisToRemove.concept.id
       )
     );
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = event => {
     event.preventDefault();
     let obs: Array<obs> = [];
     obs = convertToObsPayLoad(selectedDiagnoses);
@@ -158,9 +158,9 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ closeWorkspace }) => {
       obs = [
         {
           concept: encounterNoteConceptUuid,
-          value: clinicalNote,
+          value: clinicalNote
         },
-        ...obs,
+        ...obs
       ];
     }
 
@@ -171,15 +171,15 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ closeWorkspace }) => {
       encounterProviders: [
         {
           encounterRole: clinicianEncounterRole,
-          provider: providerUuid,
-        },
+          provider: providerUuid
+        }
       ],
       encounterType: encounterTypeUuid,
       form: formConceptUuid,
-      obs: obs,
+      obs: obs
     };
     const ac = new AbortController();
-    saveVisitNote(ac, visitNotePayload).then((response) => {
+    saveVisitNote(ac, visitNotePayload).then(response => {
       response.status === 201 && closeWorkspace();
       response.status !== 201 && createErrorHandler();
     });
@@ -256,7 +256,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ closeWorkspace }) => {
                   "diagnosisInputPlaceholder",
                   "Choose primary diagnosis first, then secondary diagnoses"
                 )}
-                onChange={(e) =>
+                onChange={e =>
                   handleSearchTermChange(e.currentTarget.value ?? "")
                 }
                 ref={searchInputRef}
@@ -305,7 +305,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ closeWorkspace }) => {
                 "clinicalNotePlaceholder",
                 "Write any additional points here"
               )}
-              onChange={(e) => setClinicalNote(e.currentTarget.value)}
+              onChange={e => setClinicalNote(e.currentTarget.value)}
             />
           </Column>
         </Row>
