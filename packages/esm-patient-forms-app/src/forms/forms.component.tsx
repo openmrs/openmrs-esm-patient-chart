@@ -8,22 +8,22 @@ import ErrorState from "./error-state/error-state.component";
 import FormView from "./form-view.component";
 import styles from "./forms.component.scss";
 import { useTranslation } from "react-i18next";
-import {
-  createErrorHandler,
-  navigate,
-  useCurrentPatient
-} from "@openmrs/esm-framework";
+import { navigate } from "@openmrs/esm-framework";
 import { fetchAllForms, fetchPatientEncounters } from "./forms.resource";
 import { filterAvailableAndCompletedForms } from "./forms-utils";
 import { Encounter, Form } from "../types";
 
-enum formView {
+enum FormViewState {
   recommended = 0,
   completed,
-  all
+  all,
 }
 
-const Forms: React.FC = () => {
+interface FormsProps {
+  patientUuid: string;
+}
+
+const Forms: React.FC<FormsProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const displayText = t("forms", "Forms");
   const headerTitle = t("forms", "Forms");
@@ -31,20 +31,13 @@ const Forms: React.FC = () => {
   const [forms, setForms] = React.useState<Array<Form>>([]);
   const [encounters, setEncounters] = React.useState<Array<Encounter>>([]);
   const [completedForms, setCompletedForms] = React.useState<Array<Form>>([]);
-  const [selectedFormView, setSelectedFormView] = React.useState<formView>(
-    formView.all
+  const [selectedFormView, setSelectedFormView] = React.useState<FormViewState>(
+    FormViewState.all
   );
   const [filledForms, setFilledForms] = React.useState<Array<Form>>([]);
-  const [, , patientUuid] = useCurrentPatient();
 
   React.useEffect(() => {
-    fetchAllForms().subscribe(
-      forms => setForms(forms),
-      error => {
-        createErrorHandler();
-        setError(error);
-      }
-    );
+    fetchAllForms().subscribe((forms) => setForms(forms), setError);
   }, []);
 
   React.useEffect(() => {
@@ -54,17 +47,12 @@ const Forms: React.FC = () => {
       patientUuid,
       fromDate.toDate(),
       toDate.toDate()
-    ).subscribe(
-      encounters => setEncounters(encounters),
-      error => {
-        createErrorHandler(), setError(error);
-      }
-    );
+    ).subscribe((encounters) => setEncounters(encounters), setError);
   }, [patientUuid]);
 
   React.useEffect(() => {
     const availableForms = filterAvailableAndCompletedForms(forms, encounters);
-    const completedForms = availableForms.completed.map(encounters => {
+    const completedForms = availableForms.completed.map((encounters) => {
       encounters.form.complete = true;
       return encounters.form;
     });
@@ -72,8 +60,8 @@ const Forms: React.FC = () => {
   }, [forms, encounters]);
 
   React.useEffect(() => {
-    const filledForms = forms.map(form => {
-      completedForms.map(completeForm => {
+    const filledForms = forms.map((form) => {
+      completedForms.map((completeForm) => {
         if (completeForm.uuid === form.uuid) {
           form.complete = true;
         }
@@ -93,24 +81,24 @@ const Forms: React.FC = () => {
           <div className={styles.contextSwitcherContainer}>
             <ContentSwitcher
               className={styles.contextSwitcherWidth}
-              onChange={event => setSelectedFormView(event.name as any)}
+              onChange={(event) => setSelectedFormView(event.name as any)}
               selectedIndex={selectedFormView}
             >
-              <Switch name={formView.recommended} text="Recommended" />
-              <Switch name={formView.completed} text="Completed" />
-              <Switch name={formView.all} text="All" />
+              <Switch name={FormViewState.recommended} text="Recommended" />
+              <Switch name={FormViewState.completed} text="Completed" />
+              <Switch name={FormViewState.all} text="All" />
             </ContentSwitcher>
           </div>
         </div>
         <div style={{ width: "100%" }}>
-          {selectedFormView === formView.completed && (
+          {selectedFormView === FormViewState.completed && (
             <FormView
               forms={completedForms}
               patientUuid={patientUuid}
               encounterUuid={first<Encounter>(encounters)?.uuid}
             />
           )}
-          {selectedFormView === formView.all && (
+          {selectedFormView === FormViewState.all && (
             <FormView
               forms={filledForms}
               patientUuid={patientUuid}

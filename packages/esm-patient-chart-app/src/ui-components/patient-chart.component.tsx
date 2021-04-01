@@ -1,21 +1,22 @@
 import React, { useMemo } from "react";
 import WorkspaceWrapper from "../workspace/workspace-wrapper.component";
-import ChartReview from "../chart-review/chart-review.component";
+import ChartReview from "./chart-review.component";
 import styles from "./patient-chart.component.scss";
 import VisitDialog from "../visit/visit-dialog.component";
 import Loader from "./loader.component";
-import { Route, RouteComponentProps } from "react-router-dom";
+import { RouteComponentProps } from "react-router-dom";
 import { ExtensionSlot, useCurrentPatient } from "@openmrs/esm-framework";
-import { dashboardPath } from "../constants";
 
 interface PatientChartParams {
   patientUuid: string;
+  view: string;
+  subview: string;
 }
 
 const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({
   match
 }) => {
-  const patientUuid = match.params.patientUuid;
+  const { patientUuid, view, subview } = match.params;
   const [loading, patient] = useCurrentPatient(patientUuid);
   const state = useMemo(() => {
     return { patient, patientUuid };
@@ -47,11 +48,11 @@ const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({
           </aside>
           <div className={styles.grid}>
             <div className={styles.chartreview}>
-              <Route path={dashboardPath} component={ChartReview} />
-              <Route path={dashboardPath} component={VisitDialog} />
+              <ChartReview {...state} view={view} subview={subview} />
+              <VisitDialog />
             </div>
             <div className={styles.workspace}>
-              <Route path={dashboardPath} component={WorkspaceWrapper} />
+              <WorkspaceWrapper />
             </div>
           </div>
         </>

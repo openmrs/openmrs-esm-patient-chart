@@ -7,7 +7,7 @@ import styles from "./programs-form.css";
 import SummaryCard from "../cards/summary-card.component";
 import { match, useHistory } from "react-router-dom";
 import { useTranslation, Trans } from "react-i18next";
-import { useCurrentPatient, createErrorHandler } from "@openmrs/esm-framework";
+import { createErrorHandler } from "@openmrs/esm-framework";
 import {
   createProgramEnrollment,
   fetchPrograms,
@@ -19,7 +19,35 @@ import {
 } from "./programs.resource";
 import { DataCaptureComponentProps } from "../types";
 
-export default function ProgramsForm(props: ProgramsFormProps) {
+export type ProgramsFormProps = DataCaptureComponentProps & {
+  match: match<ProgramMatchProps>;
+  patientUuid: string;
+};
+
+// exported so we can use this for tests
+export interface ProgramMatchProps {
+  program?: string;
+  programUuid?: string;
+  enrollmentDate?: string;
+  completionDate?: string;
+  locationUuid?: string;
+}
+
+export interface ProgramEnrollment {
+  program: string;
+  patient?: string;
+  dateEnrolled?: string;
+  dateCompleted?: string;
+  location?: string;
+}
+
+const ProgramsForm: React.FC<ProgramsFormProps> = ({
+  match,
+  patientUuid,
+  closeComponent = () => {},
+  entryCancelled = () => {},
+  entryStarted = () => {},
+}) => {
   const formRef = useRef<HTMLFormElement>(null);
   const enrollmentDateRef = useRef<HTMLInputElement>(null);
   const [viewEditForm, setViewEditForm] = useState(false);
@@ -37,12 +65,6 @@ export default function ProgramsForm(props: ProgramsFormProps) {
   const [completionDate, setCompletionDate] = useState(null);
   const [locations, setLocations] = useState(null);
   const [formChanged, setFormChanged] = useState<Boolean>(false);
-  const [
-    isLoadingPatient,
-    patient,
-    patientUuid,
-    patientErr,
-  ] = useCurrentPatient();
   const history = useHistory();
   const { t } = useTranslation();
 
@@ -53,7 +75,7 @@ export default function ProgramsForm(props: ProgramsFormProps) {
       enrollmentDate,
       completionDate,
       locationUuid,
-    } = props.match.params;
+    } = match.params;
 
     if (program && enrollmentDate) {
       setViewEditForm(true);
@@ -62,7 +84,7 @@ export default function ProgramsForm(props: ProgramsFormProps) {
       setCompletionDate(completionDate);
       setEnrollmentDate(enrollmentDate);
     }
-  }, [props.match.params]);
+  }, [match.params]);
 
   useEffect(() => {
     if (patientUuid && !viewEditForm) {
@@ -104,9 +126,9 @@ export default function ProgramsForm(props: ProgramsFormProps) {
   }, [patientUuid]);
 
   useEffect(() => {
-    if (viewEditForm && patientUuid && props.match.params) {
+    if (viewEditForm && patientUuid && match.params) {
       const subscription = getPatientProgramByUuid(
-        props.match.params["programUuid"]
+        match.params["programUuid"]
       ).subscribe(
         (program) => setPatientProgram(program),
         createErrorHandler()
@@ -114,7 +136,7 @@ export default function ProgramsForm(props: ProgramsFormProps) {
 
       return () => subscription.unsubscribe();
     }
-  }, [viewEditForm, patientUuid, props.match.params]);
+  }, [viewEditForm, patientUuid, match.params]);
 
   useEffect(() => {
     if (allPrograms && enrolledPrograms) {
@@ -159,8 +181,8 @@ export default function ProgramsForm(props: ProgramsFormProps) {
     createProgramEnrollment(enrollmentPayload, abortController).subscribe(
       (response) => {
         if (response.ok) {
-          props.match.params["setEnrolledPrograms"]([
-            ...props.match.params["enrolledPrograms"],
+          match.params["setEnrolledPrograms"]([
+            ...match.params["enrolledPrograms"],
             response.data,
           ]);
           navigate();
@@ -189,7 +211,7 @@ export default function ProgramsForm(props: ProgramsFormProps) {
 
   const navigate = () => {
     history.push(`/patient/${patientUuid}/chart/programs/care-programs`);
-    props.closeComponent();
+    closeComponent();
   };
 
   const closeForm = ($event) => {
@@ -201,11 +223,11 @@ export default function ProgramsForm(props: ProgramsFormProps) {
     }
 
     if (userConfirmed && formChanged) {
-      props.entryCancelled();
-      props.closeComponent();
+      entryCancelled();
+      closeComponent();
     } else if (!formChanged) {
-      props.entryCancelled();
-      props.closeComponent();
+      entryCancelled();
+      closeComponent();
     }
   };
 
@@ -214,7 +236,7 @@ export default function ProgramsForm(props: ProgramsFormProps) {
       <form
         onChange={() => {
           setFormChanged(true);
-          return props.entryStarted();
+          return entryStarted();
         }}
         onSubmit={handleCreateSubmit}
         className={styles.programsForm}
@@ -366,7 +388,7 @@ export default function ProgramsForm(props: ProgramsFormProps) {
           <form
             onChange={() => {
               setFormChanged(true);
-              return props.entryStarted();
+              return entryStarted();
             }}
             onSubmit={handleEditSubmit}
             className={styles.programsForm}
@@ -489,32 +511,6 @@ export default function ProgramsForm(props: ProgramsFormProps) {
   }
 
   return <div>{viewEditForm ? editProgramForm() : createProgramForm()}</div>;
-}
-
-ProgramsForm.defaultProps = {
-  entryStarted: () => {},
-  entryCancelled: () => {},
-  entrySubmitted: () => {},
-  closeComponent: () => {},
 };
 
-type ProgramsFormProps = DataCaptureComponentProps & {
-  match: match<ProgramMatchProps>;
-};
-
-// exported so we can use this for tests
-export type ProgramMatchProps = {
-  program?: string;
-  programUuid?: string;
-  enrollmentDate?: string;
-  completionDate?: string;
-  locationUuid?: string;
-};
-
-type ProgramEnrollment = {
-  program: string;
-  patient?: string;
-  dateEnrolled?: string;
-  dateCompleted?: string;
-  location?: string;
-};
+export default ProgramsForm;

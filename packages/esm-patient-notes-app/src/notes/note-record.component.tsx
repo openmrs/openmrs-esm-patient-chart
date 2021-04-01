@@ -5,29 +5,30 @@ import RecordDetails from "../cards/record-details-card.component";
 import styles from "./note-record.css";
 import { RouteComponentProps } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useCurrentPatient, createErrorHandler } from "@openmrs/esm-framework";
+import { createErrorHandler } from "@openmrs/esm-framework";
 import { fetchEncounterByUuid } from "./encounter.resource";
+import { useProgramsContext } from "./notes.context";
 
 interface NoteRecordProps
   extends RouteComponentProps<{
     encounterUuid: string;
   }> {}
 
-export default function NoteRecord(props: NoteRecordProps) {
+export default function NoteRecord({ match }: NoteRecordProps) {
   const [note, setNote] = useState(null);
-  const [isLoadingPatient, patient] = useCurrentPatient();
-  const { encounterUuid } = props.match.params;
+  const { patient } = useProgramsContext();
+  const { encounterUuid } = match.params;
   const { t } = useTranslation();
 
   useEffect(() => {
-    if (!isLoadingPatient && patient && encounterUuid) {
+    if (patient && encounterUuid) {
       const sub = fetchEncounterByUuid(encounterUuid).subscribe(
-        note => setNote(note),
+        (note) => setNote(note),
         createErrorHandler()
       );
       return () => sub.unsubscribe();
     }
-  }, [isLoadingPatient, patient, encounterUuid]);
+  }, [patient, encounterUuid]);
 
   return (
     <>
@@ -60,7 +61,7 @@ export default function NoteRecord(props: NoteRecordProps) {
           </SummaryCard>
           {note.obs && note.obs.length && (
             <RecordDetails>
-              {note.obs.map(ob => {
+              {note.obs.map((ob) => {
                 return (
                   <Fragment key={ob.uuid}>
                     <p>{ob.display}</p>

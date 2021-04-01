@@ -6,11 +6,11 @@ import {
   ExtensionSlot,
   navigate,
   translateFrom,
-  useExtensionStore
+  useExtensionStore,
 } from "@openmrs/esm-framework";
 import { useRouteMatch } from "react-router-dom";
 import { DashboardTabConfig } from "../config-schemas";
-import { useUrlData } from "../useUrlData";
+import { basePath } from "../constants";
 
 function getTitle(ext: ExtensionInfo) {
   const title = ext.meta.title;
@@ -38,14 +38,14 @@ const ShowTabs: React.FC<ShowTabsProps> = ({ slot, view, fullPath }) => {
   const store = useExtensionStore();
   const extensions = React.useMemo(() => {
     const ids = store.slots[slot]?.attachedIds ?? [];
-    return ids.map(id => store.extensions[id]);
+    return ids.map((id) => store.extensions[id]);
   }, [store]);
   const defaultExtension = extensions[0];
 
   useEffect(() => {
     if (!view && defaultExtension) {
       navigate({
-        to: `${fullPath}/${defaultExtension.meta.view}`
+        to: `${fullPath}/${defaultExtension.meta.view}`,
       });
     }
   }, [view, defaultExtension]);
@@ -53,7 +53,7 @@ const ShowTabs: React.FC<ShowTabsProps> = ({ slot, view, fullPath }) => {
   return (
     <ul>
       {view &&
-        extensions.map(ext => (
+        extensions.map((ext) => (
           <li key={ext.name}>
             <div
               className={`${
@@ -74,41 +74,42 @@ export interface TabbedViewProps {
   name: string;
   slot: string;
   patientUuid: string;
+  patient: fhir.Patient;
+  tab: string;
   layout: DashboardTabConfig;
 }
 
-interface RouteParams {
-  subview: string;
-}
-
-const TabbedView: React.FC<TabbedViewProps> = ({ name, slot, patientUuid }) => {
-  const urlData = useUrlData();
-  const { params } = useRouteMatch<RouteParams>();
-  const fullPath = `${window.spaBase}${urlData.basePath}/${name}`;
-  const view = params.subview;
-  const state = {
-    ...urlData,
-    fullPath,
-    patientUuid,
-    view
-  };
+const TabbedView: React.FC<TabbedViewProps> = ({
+  name,
+  slot,
+  patientUuid,
+  tab,
+}) => {
+  const { url } = useRouteMatch(basePath);
+  const fullPath = `${window.spaBase}${url}/${name}`;
+  const state = React.useMemo(
+    () => ({
+      basePath: url,
+      fullPath,
+      patientUuid,
+      view: tab,
+    }),
+    [patientUuid, tab, fullPath, url]
+  );
 
   return (
     <>
       <nav className={styles.summariesnav}>
-        <ShowTabs slot={slot} view={view} fullPath={fullPath} />
+        <ShowTabs slot={slot} view={tab} fullPath={fullPath} />
       </nav>
-      <div className={styles.routesContainer}>
-        {view && (
-          <ExtensionSlot
-            extensionSlotName={slot}
-            state={state}
-            select={extensions =>
-              extensions.filter(ext => ext.meta.view === view)
-            }
-          />
-        )}
-      </div>
+      <ExtensionSlot
+        className={styles.routesContainer}
+        extensionSlotName={slot}
+        state={state}
+        select={(extensions) =>
+          extensions.filter((ext) => ext.meta.view === tab)
+        }
+      />
     </>
   );
 };

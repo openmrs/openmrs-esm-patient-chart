@@ -6,8 +6,9 @@ import SummaryCard from "../cards/summary-card.component";
 import styles from "./programs-detailed-summary.css";
 import { useTranslation, Trans } from "react-i18next";
 import { RouteComponentProps, Link } from "react-router-dom";
-import { createErrorHandler, useCurrentPatient } from "@openmrs/esm-framework";
+import { createErrorHandler } from "@openmrs/esm-framework";
 import { fetchEnrolledPrograms } from "./programs.resource";
+import { useProgramsContext } from "./programs.context";
 import { PatientProgram } from "../types";
 
 function openWorkspaceTab(_1: any, _2: any, _3?: any) {
@@ -16,24 +17,22 @@ function openWorkspaceTab(_1: any, _2: any, _3?: any) {
 
 interface ProgramsDetailedSummaryProps extends RouteComponentProps<{}> {}
 
-export default function ProgramsDetailedSummary(
-  props: ProgramsDetailedSummaryProps
-) {
+const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = () => {
   const [enrolledPrograms, setEnrolledPrograms] = useState<
     Array<PatientProgram>
   >([]);
-  const [isLoadingPatient, , patientUuid] = useCurrentPatient();
+  const { patientUuid } = useProgramsContext();
   const { t } = useTranslation();
 
   useEffect(() => {
-    if (patientUuid && !isLoadingPatient) {
+    if (patientUuid) {
       const subscription = fetchEnrolledPrograms(patientUuid).subscribe(
         (enrolledPrograms) => setEnrolledPrograms(enrolledPrograms),
         createErrorHandler()
       );
       return () => subscription.unsubscribe();
     }
-  }, [patientUuid, isLoadingPatient]);
+  }, [patientUuid]);
 
   return (
     <>
@@ -136,4 +135,6 @@ export default function ProgramsDetailedSummary(
       )}
     </>
   );
-}
+};
+
+export default ProgramsDetailedSummary;

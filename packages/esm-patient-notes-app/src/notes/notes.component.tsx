@@ -1,20 +1,24 @@
 import React from "react";
-import { Switch, Route, BrowserRouter } from "react-router-dom";
 import NotesDetailedSummary from "./notes-detailed-summary.component";
 import NoteRecord from "./note-record.component";
+import { Switch, Route, BrowserRouter } from "react-router-dom";
+import { NotesContext } from "./notes.context";
 
 interface NotesProps {
   basePath: string;
+  patient: fhir.Patient;
+  patientUuid: string;
 }
 
-export default function Notes({ basePath }: NotesProps) {
-  const root = `${basePath}/encounters/notes`;
+export default function Notes({ basePath, patient, patientUuid }: NotesProps) {
   return (
-    <BrowserRouter basename={root}>
-      <Switch>
-        <Route exact path="/" component={NotesDetailedSummary} />
-        <Route exact path="/:encounterUuid" component={NoteRecord} />
-      </Switch>
-    </BrowserRouter>
+    <NotesContext.Provider value={{ patient, patientUuid }}>
+      <BrowserRouter basename={`${basePath}/encounters/notes`}>
+        <Switch>
+          <Route exact path="/" component={NotesDetailedSummary} />
+          <Route exact path="/:encounterUuid" component={NoteRecord} />
+        </Switch>
+      </BrowserRouter>
+    </NotesContext.Provider>
   );
 }

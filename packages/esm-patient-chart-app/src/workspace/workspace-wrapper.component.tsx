@@ -3,7 +3,7 @@ import Workspace from "./workspace.component";
 import styles from "./workspace-wrapper.component.css";
 import { WorkspaceItem, getNewWorkspaceItem } from "@openmrs/esm-framework";
 
-export default function WorkspaceWrapper(props: any) {
+const WorkspaceWrapper: React.FC = () => {
   const [showWorkspace, setShowWorkspace] = React.useState(false);
   const [toggleMobileTableView, setToggleMobileTabletView] = React.useState<
     Boolean
@@ -12,7 +12,7 @@ export default function WorkspaceWrapper(props: any) {
   const [selectedTab, setSelectedTab] = React.useState(null);
 
   React.useEffect(() => {
-    const sub = getNewWorkspaceItem().subscribe(item => {
+    const sub = getNewWorkspaceItem().subscribe((item) => {
       if (item.validations) {
         const validation = item.validations(openTabs);
         if (validation > -1) {
@@ -62,7 +62,7 @@ export default function WorkspaceWrapper(props: any) {
           </button>
         )}
         {toggleMobileTableView &&
-          openTabs.map(tab => {
+          openTabs.map((tab) => {
             return (
               <button
                 key={tab.name}
@@ -85,7 +85,6 @@ export default function WorkspaceWrapper(props: any) {
 
   return (
     <div
-      style={{ ...props.style }}
       className={`${styles.workspace} ${
         showWorkspace ? styles.visible : styles.invisible
       } ${toggleMobileTableView ? styles.halfWidth : styles.fullWidth}`}
@@ -96,4 +95,6 @@ export default function WorkspaceWrapper(props: any) {
       </div>
     </div>
   );
-}
+};
+
+export default WorkspaceWrapper;

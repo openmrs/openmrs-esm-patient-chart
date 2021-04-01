@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import dayjs from "dayjs";
+import ImmunizationsForm from "./immunizations-form.component";
 import styles from "./immunizations-detailed-summary.css";
 import vaccinationRowStyles from "./vaccination-row.css";
 import { Link } from "react-router-dom";
-import { ImmunizationsForm } from "./immunizations-form.component";
 import { useTranslation, Trans } from "react-i18next";
 import { ImmunizationData } from "./immunization-domain";
 

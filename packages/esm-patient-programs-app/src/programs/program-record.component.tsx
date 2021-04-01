@@ -5,8 +5,9 @@ import ProgramsForm from "./programs-form.component";
 import styles from "./program-record.css";
 import { RouteComponentProps } from "react-router-dom";
 import { useTranslation, Trans } from "react-i18next";
-import { createErrorHandler, useCurrentPatient } from "@openmrs/esm-framework";
+import { createErrorHandler } from "@openmrs/esm-framework";
 import { getPatientProgramByUuid } from "./programs.resource";
+import { useProgramsContext } from "./programs.context";
 
 function openWorkspaceTab(_1: any, _2: any, _3: any) {
   //TODO
@@ -15,14 +16,14 @@ function openWorkspaceTab(_1: any, _2: any, _3: any) {
 interface ProgramRecordProps
   extends RouteComponentProps<{ programUuid: string }> {}
 
-export default function ProgramRecord(props: ProgramRecordProps) {
+const ProgramRecord: React.FC<ProgramRecordProps> = ({ match }) => {
   const [patientProgram, setPatientProgram] = useState(null);
-  const [isLoadingPatient, patient, patientUuid] = useCurrentPatient();
   const { t } = useTranslation();
-  const { programUuid } = props.match.params;
+  const { patient, patientUuid } = useProgramsContext();
+  const { programUuid } = match.params;
 
   useEffect(() => {
-    if (!isLoadingPatient && patient && patientUuid) {
+    if (patient && patientUuid) {
       const subscription = getPatientProgramByUuid(programUuid).subscribe(
         (program) => {
           setPatientProgram(program), createErrorHandler();
@@ -31,7 +32,7 @@ export default function ProgramRecord(props: ProgramRecordProps) {
 
       return () => subscription.unsubscribe();
     }
-  }, [isLoadingPatient, patient, patientUuid, programUuid]);
+  }, [patient, patientUuid, programUuid]);
 
   return (
     <>
@@ -108,4 +109,6 @@ export default function ProgramRecord(props: ProgramRecordProps) {
       )}
     </>
   );
-}
+};
+
+export default ProgramRecord;

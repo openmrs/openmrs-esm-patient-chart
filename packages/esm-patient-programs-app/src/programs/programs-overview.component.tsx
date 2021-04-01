@@ -17,7 +17,7 @@ import DataTable, {
   TableRow,
 } from "carbon-components-react/es/components/DataTable";
 import { useTranslation } from "react-i18next";
-import { createErrorHandler, useCurrentPatient } from "@openmrs/esm-framework";
+import { createErrorHandler } from "@openmrs/esm-framework";
 import { fetchActiveEnrollments } from "./programs.resource";
 import { PatientProgram } from "../types";
 import styles from "./programs-overview.scss";
@@ -28,12 +28,12 @@ function openWorkspaceTab(_1: any, _2: any) {
 
 interface ProgramsOverviewProps {
   basePath: string;
+  patientUuid: string;
 }
 
-const ProgramsOverview: React.FC<ProgramsOverviewProps> = () => {
+const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ patientUuid }) => {
   const programsToShowCount = 5;
   const { t } = useTranslation();
-  const [, , patientUuid] = useCurrentPatient();
   const [programs, setPrograms] = React.useState<Array<PatientProgram>>(null);
   const [error, setError] = React.useState(null);
   const [firstRowIndex, setFirstRowIndex] = React.useState(0);

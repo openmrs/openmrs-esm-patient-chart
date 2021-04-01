@@ -3,7 +3,7 @@ import styles from "./visit-dialog.css";
 import isEmpty from "lodash-es/isEmpty";
 import { ModalItem, getModalItem } from "./visit-dialog.resource";
 
-export default function VisitDialog(props: any) {
+const VisitDialog: React.FC = () => {
   const [child, setChild] = useState<React.ReactNode>(null);
   const [childProps, setChildProps] = useState<any>(null);
 
@@ -34,8 +34,6 @@ export default function VisitDialog(props: any) {
       </div>
     </div>
   );
-}
-
-VisitDialog.defaults = {
-  closeComponent: () => {}
 };
+
+export default VisitDialog;

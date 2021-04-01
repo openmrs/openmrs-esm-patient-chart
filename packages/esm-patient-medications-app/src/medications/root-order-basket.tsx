@@ -1,7 +1,7 @@
 import React from "react";
 import OrderBasket from "../order-basket/order-basket.component";
 import { BrowserRouter } from "react-router-dom";
-import { switchTo, useCurrentPatient } from "@openmrs/esm-framework";
+import { switchTo } from "@openmrs/esm-framework";
 import { Provider } from "unistore/react";
 import { orderBasketStore } from "./order-basket-store";
 
@@ -12,10 +12,8 @@ export interface RootOrderBasketProps {
 
 export default function RootOrderBasket({
   patientUuid,
-  closeWorkspace: closeWorkspace
+  closeWorkspace,
 }: RootOrderBasketProps) {
-  const [, , fallbackPatientUuid] = useCurrentPatient();
-  patientUuid = patientUuid ?? fallbackPatientUuid;
   closeWorkspace = closeWorkspace ?? (() => switchTo("link", ""));
 
   return (
