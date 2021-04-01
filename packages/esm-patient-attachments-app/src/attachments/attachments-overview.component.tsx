@@ -4,25 +4,43 @@ import dayjs from "dayjs";
 import Gallery from "react-grid-gallery";
 import styles from "./attachments-overview.css";
 import CameraUpload from "./camera-upload.component";
-import { useCurrentPatient, UserHasAccess } from "@openmrs/esm-framework";
+import { UserHasAccess } from "@openmrs/esm-framework";
 import {
   getAttachments,
   createAttachment,
-  deleteAttachment
+  deleteAttachment,
 } from "./attachments.resource";
 import { Trans } from "react-i18next";
 
-export default function AttachmentsOverview() {
+export interface Attachment {
+  id: string;
+  src: string;
+  thumbnail: string;
+  thumbnailWidth: number;
+  thumbnailHeight: number;
+  caption: string;
+  isSelected: boolean;
+  dateTime?: string;
+  bytesMimeType?: string;
+  bytesContentFamily?: string;
+}
+
+interface AttachmentsOverviewProps {
+  patientUuid: string;
+}
+
+const AttachmentsOverview: React.FC<AttachmentsOverviewProps> = ({
+  patientUuid,
+}) => {
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);
   const [currentImage, setCurrentImage] = useState(0);
-  const [, , patientUuid] = useCurrentPatient();
 
   useEffect(() => {
     if (patientUuid) {
       const abortController = new AbortController();
       getAttachments(patientUuid, true, abortController).then(
         (response: any) => {
-          const listItems = response.data.results.map(attachment => ({
+          const listItems = response.data.results.map((attachment) => ({
             id: `${attachment.uuid}`,
             src: `/openmrs/ws/rest/v1/attachment/${attachment.uuid}/bytes`,
             thumbnail: `/openmrs/ws/rest/v1/attachment/${attachment.uuid}/bytes`,
@@ -32,7 +50,7 @@ export default function AttachmentsOverview() {
             isSelected: false,
             dateTime: dayjs(attachment.dateTime).format("YYYY-MM-DD HH:mm:ss"),
             bytesMimeType: attachment.bytesMimeType,
-            bytesContentFamily: attachment.bytesContentFamily
+            bytesContentFamily: attachment.bytesContentFamily,
           }));
           setAttachments(listItems);
         }
@@ -47,7 +65,7 @@ export default function AttachmentsOverview() {
     if (files) {
       const attachments_tmp = attachments.slice();
       const result = Promise.all(
-        Array.prototype.map.call(files, file =>
+        Array.prototype.map.call(files, (file) =>
           createAttachment(patientUuid, file, file.name, abortController).then(
             (response: any) => {
               const new_attachment = {
@@ -62,7 +80,7 @@ export default function AttachmentsOverview() {
                   "YYYY-MM-DD HH:mm:ss"
                 ),
                 bytesMimeType: response.data.bytesMimeType,
-                bytesContentFamily: response.data.bytesContentFamily
+                bytesContentFamily: response.data.bytesContentFamily,
               };
               attachments_tmp.push(new_attachment);
             }
@@ -104,13 +122,13 @@ export default function AttachmentsOverview() {
   }
 
   function deleteSelected() {
-    setAttachments(attachments =>
-      attachments.filter(att => att.isSelected !== true)
+    setAttachments((attachments) =>
+      attachments.filter((att) => att.isSelected !== true)
     );
-    const selected = attachments.filter(att => att.isSelected === true);
+    const selected = attachments.filter((att) => att.isSelected === true);
     const abortController = new AbortController();
     const result = Promise.all(
-      selected.map(att =>
+      selected.map((att) =>
         deleteAttachment(att.id, abortController).then((response: any) => {})
       )
     );
@@ -122,7 +140,7 @@ export default function AttachmentsOverview() {
       const abortController = new AbortController();
       const id = attachments[currentImage].id;
       deleteAttachment(id, abortController).then((response: any) => {
-        const attachments_tmp = attachments.filter(att => att.id != id);
+        const attachments_tmp = attachments.filter((att) => att.id != id);
         setAttachments(attachments_tmp);
       });
     }
@@ -138,8 +156,8 @@ export default function AttachmentsOverview() {
     <UserHasAccess privilege="View Attachments">
       <div
         className={styles.overview}
-        onPaste={e => handleUpload(e, e.clipboardData.files)}
-        onDrop={e => handleUpload(e, e.dataTransfer.files)}
+        onPaste={(e) => handleUpload(e, e.clipboardData.files)}
+        onDrop={(e) => handleUpload(e, e.dataTransfer.files)}
         onDragOver={handleDragOver}
       >
         <div className={styles.upload}>
@@ -151,7 +169,7 @@ export default function AttachmentsOverview() {
               type="file"
               id="fileUpload"
               multiple
-              onChange={e => handleUpload(e, e.target.files)}
+              onChange={(e) => handleUpload(e, e.target.files)}
             />
           </form>
           <CameraUpload onNewAttachment={handleNewAttachment} />
@@ -174,7 +192,7 @@ export default function AttachmentsOverview() {
           customControls={[
             <button key="deleteAttachment" onClick={handleDelete}>
               <Trans i18nKey="delete">Delete</Trans>
-            </button>
+            </button>,
           ]}
           onSelectImage={handleImageSelect}
           thumbnailImageComponent={AttachmentThumbnail}
@@ -182,17 +200,6 @@ export default function AttachmentsOverview() {
       </div>
     </UserHasAccess>
   );
-}
-
-export type Attachment = {
-  id: string;
-  src: string;
-  thumbnail: string;
-  thumbnailWidth: number;
-  thumbnailHeight: number;
-  caption: string;
-  isSelected: boolean;
-  dateTime?: string;
-  bytesMimeType?: string;
-  bytesContentFamily?: string;
 };
+
+export default AttachmentsOverview;

@@ -43,8 +43,8 @@ export default function GridView({
 
   const wrapItem = React.useCallback(
     (slot: React.ReactNode, extension: ExtensionData) => {
-      const { columnSpan = 4 } = store.extensions[extension.extensionId].meta;
-      return <div style={{ columnSpan }}>{slot}</div>;
+      const { columnSpan = 1 } = store.extensions[extension.extensionId].meta;
+      return <div style={{ gridColumn: `span ${columnSpan}` }}>{slot}</div>;
     },
     [store.extensions]
   );

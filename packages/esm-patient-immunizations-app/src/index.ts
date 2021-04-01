@@ -34,7 +34,7 @@ function setupOpenMRS() {
       },
       {
         id: "immunization-details-widget",
-        slot: "patient-chart-immunization-dashboard-slot",
+        slot: "patient-chart-immunizations-dashboard-slot",
         load: getAsyncLifecycle(
           () =>
             import("./immunizations/immunizations-detailed-summary.component"),

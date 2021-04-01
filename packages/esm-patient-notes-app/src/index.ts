@@ -14,7 +14,7 @@ function setupOpenMRS() {
 
   const options = {
     featureName: "patient-notes",
-    moduleName
+    moduleName,
   };
 
   defineConfigSchema(moduleName, configSchema);
@@ -29,22 +29,22 @@ function setupOpenMRS() {
           options
         ),
         meta: {
-          columnSpan: 4
-        }
+          columnSpan: 4,
+        },
       },
       {
         id: "notes-details-widget",
-        slot: "patient-chart-notes-dashboard-slot",
+        slot: "patient-chart-encounters-dashboard-slot",
         load: getAsyncLifecycle(
           () => import("./notes/notes.component"),
           options
         ),
         meta: {
           title: "Notes",
-          view: "notes"
-        }
-      }
-    ]
+          view: "notes",
+        },
+      },
+    ],
   };
 }
 
