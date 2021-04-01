@@ -1,3 +1,4 @@
+/* the sidebar is 16 rem width, so subtracting that value when sidebar exists*/
 .grid {
   position: fixed;
   top: 6.25rem;
@@ -5,8 +6,8 @@
   grid-template-columns: 1fr min-content;
   grid-template-rows: 1fr;
   align-items: stretch;
-  width: 100vw;
   height: 100vh;
+  width: inherit;
   overflow-y: scroll;
 }
 

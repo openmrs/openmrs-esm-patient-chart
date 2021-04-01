@@ -10,11 +10,14 @@ import {
   detach,
   useNavigationContext,
   ExtensionSlot,
-  ExtensionSlotProps
+  ExtensionSlotProps,
+  useLayoutType
 } from "@openmrs/esm-framework";
 import { AppPropsContext } from "./app-props-context";
 import { basePath } from "./constants";
-import { ModalItem, newModalItem } from "./visit/visit-dialog.resource";
+import { newModalItem } from "./visit/visit-dialog.resource";
+import SideMenu from "./view-components/side-menu/side-menu.component";
+import { getPageWidth } from "./utils/sidebar-utils";
 
 interface RouteParams {
   patientUuid: string;
@@ -40,6 +43,7 @@ export default function Root(props) {
     setCurrentWorkspaceExtensionSlot
   ] = useState<React.FC<ExtensionSlotProps>>();
   const [workspaceTitle, setWorkspaceTitle] = useState("");
+  const layout = useLayoutType();
 
   const clearCurrentWorkspaceContext = useCallback(() => {
     setCurrentWorkspaceExtensionSlot(undefined);
@@ -80,6 +84,7 @@ export default function Root(props) {
   return (
     <AppPropsContext.Provider value={{ appProps: props }}>
       <BrowserRouter basename={window["getOpenmrsSpaBase"]()}>
+        <SideMenu />
         <main
           className="omrs-main-content"
           style={{
@@ -88,25 +93,32 @@ export default function Root(props) {
             flexDirection: "column"
           }}
         >
-          <ExtensionSlot extensionSlotName="breadcrumbs" />
-          <aside className={styles.patientBanner} style={{ width: "100%" }}>
-            <Route path={basePath} component={PatientInfo} />
-          </aside>
-          <div className={styles.grid} style={{ marginTop: "4.5rem" }}>
-            <div className={styles.chartreview}>
-              <Route path={`${basePath}/:view?/:subview?`}>
-                <ChartReview />
-              </Route>
-              <Route
-                path={basePath}
-                render={routeProps => <VisitDialog {...routeProps} />}
-              />
-            </div>
-            <div className={styles.workspace}>
-              <Route
-                path={basePath}
-                render={routeProps => <WorkspaceWrapper {...routeProps} />}
-              />
+          <div style={{ width: getPageWidth(layout) }}>
+            <ExtensionSlot extensionSlotName="breadcrumbs" />
+            <aside className={styles.patientBanner}>
+              <Route path={basePath} component={PatientInfo} />
+            </aside>
+            <div
+              className={styles.grid}
+              style={{
+                marginTop: "4.5rem"
+              }}
+            >
+              <div className={styles.chartreview}>
+                <Route path={`${basePath}/:view?/:subview?`}>
+                  <ChartReview />
+                </Route>
+                <Route
+                  path={basePath}
+                  render={routeProps => <VisitDialog {...routeProps} />}
+                />
+              </div>
+              <div className={styles.workspace}>
+                <Route
+                  path={basePath}
+                  render={routeProps => <WorkspaceWrapper {...routeProps} />}
+                />
+              </div>
             </div>
           </div>
         </main>
