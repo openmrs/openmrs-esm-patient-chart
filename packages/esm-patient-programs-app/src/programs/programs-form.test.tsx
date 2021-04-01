@@ -1,4 +1,5 @@
 import React from "react";
+import dayjs from "dayjs";
 import "@testing-library/jest-dom/extend-expect";
 import { render, screen, fireEvent } from "@testing-library/react";
 import {
@@ -8,7 +9,6 @@ import {
   BrowserRouter
 } from "react-router-dom";
 import { of } from "rxjs/internal/observable/of";
-
 import {
   createProgramEnrollment,
   fetchPrograms,
@@ -19,15 +19,13 @@ import {
   updateProgramEnrollment
 } from "./programs.resource";
 import ProgramsForm, { ProgramMatchProps } from "./programs-form.component";
-
 import {
   mockCareProgramsResponse,
   mockEnrolledProgramsResponse,
   mockLocationsResponse,
   mockOncProgramResponse
-} from "../../../__mocks__/programs.mock";
-import { mockSessionDataResponse } from "../../../__mocks__/session.mock";
-import dayjs from "dayjs";
+} from "../../__mocks__/programs.mock";
+import { mockSessionDataResponse } from "../../__mocks__/session.mock";
 
 const mockCreateProgramEnrollment = createProgramEnrollment as jest.Mock;
 const mockFetchLocations = fetchLocations as jest.Mock;

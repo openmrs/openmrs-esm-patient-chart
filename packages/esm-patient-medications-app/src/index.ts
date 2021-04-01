@@ -1,5 +1,4 @@
 import { defineConfigSchema, getAsyncLifecycle } from "@openmrs/esm-framework";
-import { configSchema } from "./config-schema";
 import { backendDependencies } from "./openmrs-backend-dependencies";
 
 const importTranslation = require.context(
@@ -17,7 +16,7 @@ function setupOpenMRS() {
     moduleName
   };
 
-  defineConfigSchema(moduleName, configSchema);
+  defineConfigSchema(moduleName, {});
 
   return {
     pages: [

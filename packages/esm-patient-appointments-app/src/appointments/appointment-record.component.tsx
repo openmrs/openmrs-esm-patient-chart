@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from "react";
-import SummaryCard from "../../ui-components/cards/summary-card.component";
+import SummaryCard from "../cards/summary-card.component";
 import AppointmentsForm from "./appointments-form.component";
 import dayjs from "dayjs";
-import VerticalLabelValue from "../../ui-components/cards/vertical-label-value.component";
+import VerticalLabelValue from "../cards/vertical-label-value.component";
 import styles from "./appointment-record.css";
-import RecordDetails from "../../ui-components/cards/record-details-card.component";
+import RecordDetails from "../cards/record-details-card.component";
 import { useCurrentPatient, createErrorHandler } from "@openmrs/esm-framework";
 import { RouteComponentProps } from "react-router-dom";
 import { useTranslation, Trans } from "react-i18next";
 import { getAppointmentsByUuid } from "./appointments.resource";
-import { openWorkspaceTab } from "../shared-utils";
+
+function openWorkspaceTab(_1: any, _2: any) {
+  //TODO
+}
 
 export interface AppointmentRecordProps
   extends RouteComponentProps<{ appointmentUuid: string }> {}

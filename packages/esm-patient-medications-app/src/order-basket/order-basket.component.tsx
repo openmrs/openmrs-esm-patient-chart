@@ -18,8 +18,8 @@ import { connect } from "unistore/react";
 import {
   OrderBasketStore,
   OrderBasketStoreActions,
-  orderBasketStoreActions
-} from "../order-basket-store";
+  orderBasketStoreActions,
+} from "../medications/order-basket-store";
 import { usePatientOrders } from "../utils/use-current-patient-orders.hook";
 
 export interface OrderBasketProps {
@@ -40,7 +40,7 @@ const OrderBasket = connect<
     patientUuid,
     items,
     closeWorkspace,
-    setItems
+    setItems,
   }: OrderBasketProps & OrderBasketStore & OrderBasketStoreActions) => {
     const { t } = useTranslation();
     const [durationUnits, setDurationUnits] = useState<Array<OpenmrsResource>>(
@@ -50,15 +50,15 @@ const OrderBasket = connect<
     const [isLoading, setIsLoading] = useState(true);
     const [
       medicationOrderFormItem,
-      setMedicationOrderFormItem
+      setMedicationOrderFormItem,
     ] = useState<OrderBasketItem | null>(null);
     const [
       isMedicationOrderFormVisible,
-      setIsMedicationOrderFormVisible
+      setIsMedicationOrderFormVisible,
     ] = useState(false);
     const [
       onMedicationOrderFormSigned,
-      setOnMedicationOrderFormSign
+      setOnMedicationOrderFormSign,
     ] = useState<(finalizedOrderBasketItem: OrderBasketItem) => void | null>(
       null
     );
@@ -70,7 +70,7 @@ const OrderBasket = connect<
     useEffect(() => {
       const abortController = new AbortController();
       const durationUnitsRequest = getDurationUnits(abortController).then(
-        res => setDurationUnits(res.data.answers),
+        (res) => setDurationUnits(res.data.answers),
         createErrorHandler
       );
       const patientEncounterRequest = getPatientEncounterId(
@@ -103,7 +103,7 @@ const OrderBasket = connect<
       onSigned: (finalizedOrder: OrderBasketItem) => void
     ) => {
       setMedicationOrderFormItem(item);
-      setOnMedicationOrderFormSign(_ => finalizedOrder => {
+      setOnMedicationOrderFormSign((_) => (finalizedOrder) => {
         setIsMedicationOrderFormVisible(false);
         setMedicationOrderFormItem(null);
         onSigned(finalizedOrder);
@@ -113,7 +113,7 @@ const OrderBasket = connect<
 
     const handleSaveClicked = () => {
       const abortController = new AbortController();
-      orderDrugs(items, patientUuid, abortController).then(erroredItems => {
+      orderDrugs(items, patientUuid, abortController).then((erroredItems) => {
         setItems(erroredItems);
         fetchActivePatientOrders();
 
@@ -132,7 +132,7 @@ const OrderBasket = connect<
     const openMedicationOrderFormForAddingNewOrder = (
       newOrderBasketItem: OrderBasketItem
     ) => {
-      openMedicationOrderForm(newOrderBasketItem, finalizedOrder =>
+      openMedicationOrderForm(newOrderBasketItem, (finalizedOrder) =>
         setItems([...items, finalizedOrder])
       );
     };
@@ -141,7 +141,7 @@ const OrderBasket = connect<
       existingOrderIndex: number
     ) => {
       const order = items[existingOrderIndex];
-      openMedicationOrderForm(order, finalizedOrder =>
+      openMedicationOrderForm(order, (finalizedOrder) =>
         setItems(() => {
           const newOrders = [...items];
           newOrders[existingOrderIndex] = finalizedOrder;
@@ -170,12 +170,12 @@ const OrderBasket = connect<
             <div className={styles.orderBasketContainer}>
               <OrderBasketItemList
                 orderBasketItems={items}
-                onItemClicked={order =>
+                onItemClicked={(order) =>
                   openMedicationOrderFormForUpdatingExistingOrder(
                     items.indexOf(order)
                   )
                 }
-                onItemRemoveClicked={order => {
+                onItemRemoveClicked={(order) => {
                   const newOrders = [...items];
                   newOrders.splice(items.indexOf(order), 1);
                   setItems(newOrders);

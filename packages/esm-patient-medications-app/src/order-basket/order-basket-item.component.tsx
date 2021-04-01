@@ -1,11 +1,12 @@
 import React, { useRef } from "react";
-import styles from "./order-basket-item.scss";
 import Button from "carbon-components-react/es/components/Button";
+import TrashCan16 from "@carbon/icons-react/es/trash-can/16";
+import Warning16 from "@carbon/icons-react/es/warning/16";
+import styles from "./order-basket-item.scss";
 import {
   ClickableTile,
   Tile
 } from "carbon-components-react/es/components/Tile";
-import { TrashCan16, Warning16 } from "@carbon/icons-react";
 import { useTranslation } from "react-i18next";
 import { OrderBasketItem } from "../types/order-basket-item";
 

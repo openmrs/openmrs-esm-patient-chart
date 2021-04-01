@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from "react";
 import dayjs from "dayjs";
-import SummaryCard from "../../ui-components/cards/summary-card.component";
+import SummaryCard from "../cards/summary-card.component";
 import styles from "./appointments-detailed-summary.css";
 import AppointmentsForm from "./appointments-form.component";
-import EmptyState from "../../ui-components/empty-state/empty-state.component";
+import EmptyState from "./empty-state/empty-state.component";
 import { useCurrentPatient, createErrorHandler } from "@openmrs/esm-framework";
 import { getAppointments } from "./appointments.resource";
 import { Link } from "react-router-dom";
-import { openWorkspaceTab } from "../shared-utils";
 import { useTranslation, Trans } from "react-i18next";
+
+function openWorkspaceTab(_1: any, _2: any) {
+  //TODO
+}
 
 export default function AppointmentsDetailedSummary(
   props: AppointmentsDetailedSummaryProps

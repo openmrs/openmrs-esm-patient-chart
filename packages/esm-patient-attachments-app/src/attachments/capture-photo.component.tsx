@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import placeholder from "../../assets/placeholder.png";
-import CameraUpload from "./camera-upload.component";
 import Button from "carbon-components-react/lib/components/Button";
+import CameraUpload from "./camera-upload.component";
+import placeholder from "../assets/placeholder.png";
 import { toOmrsIsoString } from "@openmrs/esm-framework";
 
 export default function CapturePhoto(props: CapturePhotoProps) {
@@ -47,7 +47,7 @@ export default function CapturePhoto(props: CapturePhotoProps) {
         />
       </div>
       <div>
-        <Button kind="ghost" onClick={e => showCamera()}>
+        <Button kind="ghost" onClick={(e) => showCamera()}>
           Change
         </Button>
         <CameraUpload

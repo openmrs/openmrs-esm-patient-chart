@@ -4,11 +4,9 @@ import ProgramsOverview from "./programs-overview.component";
 import { of } from "rxjs/internal/observable/of";
 import { BrowserRouter } from "react-router-dom";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { mockEnrolledProgramsResponse } from "../../../__mocks__/programs.mock";
+import { mockEnrolledProgramsResponse } from "../../__mocks__/programs.mock";
 import { fetchActiveEnrollments } from "./programs.resource";
-import { openWorkspaceTab } from "../shared-utils";
 
-const mockOpenWorkspaceTab = openWorkspaceTab as jest.Mock;
 const mockFetchActiveEnrollments = fetchActiveEnrollments as jest.Mock;
 
 jest.mock("./programs.resource", () => ({
@@ -21,11 +19,12 @@ jest.mock("../shared-utils", () => ({
 
 describe("<ProgramsOverview />", () => {
   beforeEach(() => {
-    mockOpenWorkspaceTab.mockReset;
     mockFetchActiveEnrollments.mockReset;
   });
 
   it("should display the patient's program enrollments", async () => {
+    const mockOpenWorkspaceTab = jest.fn();
+    
     mockFetchActiveEnrollments.mockReturnValue(
       of(mockEnrolledProgramsResponse)
     );

@@ -1,9 +1,9 @@
 {
-  "name": "@openmrs/esm-patient-immunizations-app",
+  "name": "@openmrs/esm-patient-medications-app",
   "version": "3.0.0",
   "license": "MPL-2.0",
-  "description": "Patient immunizations microfrontend for the OpenMRS SPA",
-  "browser": "dist/openmrs-esm-patient-immunizations-app.js",
+  "description": "Patient medications microfrontend for the OpenMRS SPA",
+  "browser": "dist/openmrs-esm-patient-medications-app.js",
   "main": "src/index.ts",
   "source": true,
   "scripts": {

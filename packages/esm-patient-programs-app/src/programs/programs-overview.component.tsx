@@ -1,8 +1,8 @@
 import React from "react";
 import dayjs from "dayjs";
 import ProgramsForm from "./programs-form.component";
-import EmptyState from "../../ui-components/empty-state/empty-state.component";
-import ErrorState from "../../ui-components/error-state/error-state.component";
+import EmptyState from "./empty-state/empty-state.component";
+import ErrorState from "./error-state/error-state.component";
 import Add16 from "@carbon/icons-react/es/add/16";
 import Button from "carbon-components-react/es/components/Button";
 import Pagination from "carbon-components-react/es/components/Pagination";
@@ -14,14 +14,17 @@ import DataTable, {
   TableBody,
   TableHead,
   TableHeader,
-  TableRow
+  TableRow,
 } from "carbon-components-react/es/components/DataTable";
 import { useTranslation } from "react-i18next";
 import { createErrorHandler, useCurrentPatient } from "@openmrs/esm-framework";
 import { fetchActiveEnrollments } from "./programs.resource";
-import { openWorkspaceTab } from "../shared-utils";
 import { PatientProgram } from "../types";
 import styles from "./programs-overview.scss";
+
+function openWorkspaceTab(_1: any, _2: any) {
+  //TODO
+}
 
 interface ProgramsOverviewProps {
   basePath: string;
@@ -45,8 +48,8 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = () => {
   React.useEffect(() => {
     if (patientUuid) {
       const sub = fetchActiveEnrollments(patientUuid).subscribe(
-        programs => setPrograms(programs),
-        error => {
+        (programs) => setPrograms(programs),
+        (error) => {
           setError(error);
           createErrorHandler();
         }
@@ -63,21 +66,21 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = () => {
   const headers = [
     {
       key: "display",
-      header: t("activePrograms", "Active programs")
+      header: t("activePrograms", "Active programs"),
     },
     {
       key: "dateEnrolled",
-      header: t("dateEnrolled", "Date enrolled")
-    }
+      header: t("dateEnrolled", "Date enrolled"),
+    },
   ];
 
   const getRowItems = (rows: Array<PatientProgram>) => {
     return rows
       .slice(firstRowIndex, firstRowIndex + currentPageSize)
-      .map(row => ({
+      .map((row) => ({
         id: row.uuid,
         display: row.display,
-        dateEnrolled: dayjs(row.dateEnrolled).format("MMM-YYYY")
+        dateEnrolled: dayjs(row.dateEnrolled).format("MMM-YYYY"),
       }));
   };
 
@@ -110,12 +113,12 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = () => {
                 <Table {...getTableProps()}>
                   <TableHead>
                     <TableRow>
-                      {headers.map(header => (
+                      {headers.map((header) => (
                         <TableHeader
                           className={`${styles.productiveHeading01} ${styles.text02}`}
                           {...getHeaderProps({
                             header,
-                            isSortable: header.isSortable
+                            isSortable: header.isSortable,
                           })}
                         >
                           {header.header?.content ?? header.header}
@@ -124,9 +127,9 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {rows.map(row => (
+                    {rows.map((row) => (
                       <TableRow key={row.id}>
-                        {row.cells.map(cell => (
+                        {row.cells.map((cell) => (
                           <TableCell key={cell.id}>
                             {cell.value?.content ?? cell.value}
                           </TableCell>

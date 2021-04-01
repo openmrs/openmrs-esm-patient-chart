@@ -1,19 +1,11 @@
 import React, { useState } from "react";
 import styles from "./attachment-thumbnail.css";
-import { useCurrentPatient } from "@openmrs/esm-framework";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 
 export default function AttachmentThumbnail(props: AttachmentThumbnailProps) {
   const [editingCaption, setEditingCaption] = useState(false);
   const [caption, setCaption] = useState(props.imageProps.title);
-
-  const [
-    isLoadingPatient,
-    patient,
-    patientUuid,
-    patientErr
-  ] = useCurrentPatient();
 
   function showEditCaptionForm(e: React.SyntheticEvent) {
     e.preventDefault();

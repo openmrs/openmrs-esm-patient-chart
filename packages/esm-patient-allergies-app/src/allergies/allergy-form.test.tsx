@@ -8,7 +8,7 @@ import {
   mockEnvironmentalAllergens,
   mockSaveAllergyResponse,
   mockUpdatedAllergyResult
-} from "../../../__mocks__/allergies.mock";
+} from "../../__mocks__/allergies.mock";
 import {
   deletePatientAllergy,
   getAllergicReactions,
@@ -18,7 +18,7 @@ import {
   updatePatientAllergy
 } from "./allergy-intolerance.resource";
 import AllergyForm from "./allergy-form.component";
-import { mockPatient } from "../../../__mocks__/patient.mock";
+import { mockPatient } from "../../__mocks__/patient.mock";
 
 let testMatch: match = { params: {}, isExact: false, path: "/", url: "/" };
 const mockDeletePatientAllergy = deletePatientAllergy as jest.Mock;

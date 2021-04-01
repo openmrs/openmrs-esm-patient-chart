@@ -4,7 +4,7 @@ import filter from "lodash-es/filter";
 import includes from "lodash-es/includes";
 import map from "lodash-es/map";
 import styles from "./programs-form.css";
-import SummaryCard from "../../ui-components/cards/summary-card.component";
+import SummaryCard from "../cards/summary-card.component";
 import { match, useHistory } from "react-router-dom";
 import { useTranslation, Trans } from "react-i18next";
 import { useCurrentPatient, createErrorHandler } from "@openmrs/esm-framework";
@@ -15,9 +15,9 @@ import {
   fetchLocations,
   getPatientProgramByUuid,
   getSession,
-  updateProgramEnrollment
+  updateProgramEnrollment,
 } from "./programs.resource";
-import { DataCaptureComponentProps } from "../shared-utils";
+import { DataCaptureComponentProps } from "../types";
 
 export default function ProgramsForm(props: ProgramsFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
@@ -41,7 +41,7 @@ export default function ProgramsForm(props: ProgramsFormProps) {
     isLoadingPatient,
     patient,
     patientUuid,
-    patientErr
+    patientErr,
   ] = useCurrentPatient();
   const history = useHistory();
   const { t } = useTranslation();
@@ -52,7 +52,7 @@ export default function ProgramsForm(props: ProgramsFormProps) {
       programUuid,
       enrollmentDate,
       completionDate,
-      locationUuid
+      locationUuid,
     } = props.match.params;
 
     if (program && enrollmentDate) {
@@ -78,18 +78,18 @@ export default function ProgramsForm(props: ProgramsFormProps) {
 
   useEffect(() => {
     if (patientUuid) {
-      const sub1 = fetchLocations().subscribe(locations => {
+      const sub1 = fetchLocations().subscribe((locations) => {
         return setLocations(locations);
       }, createErrorHandler());
       const sub2 = fetchPrograms().subscribe(
-        programs => setAllPrograms(programs),
+        (programs) => setAllPrograms(programs),
         createErrorHandler()
       );
       const sub3 = fetchEnrolledPrograms(patientUuid).subscribe(
-        enrolledPrograms =>
+        (enrolledPrograms) =>
           setEnrolledPrograms(
             enrolledPrograms.filter(
-              enrolledProgram => !enrolledProgram.dateCompleted
+              (enrolledProgram) => !enrolledProgram.dateCompleted
             )
           ),
         createErrorHandler()
@@ -107,7 +107,10 @@ export default function ProgramsForm(props: ProgramsFormProps) {
     if (viewEditForm && patientUuid && props.match.params) {
       const subscription = getPatientProgramByUuid(
         props.match.params["programUuid"]
-      ).subscribe(program => setPatientProgram(program), createErrorHandler());
+      ).subscribe(
+        (program) => setPatientProgram(program),
+        createErrorHandler()
+      );
 
       return () => subscription.unsubscribe();
     }
@@ -116,7 +119,7 @@ export default function ProgramsForm(props: ProgramsFormProps) {
   useEffect(() => {
     if (allPrograms && enrolledPrograms) {
       setEligiblePrograms(
-        filter(allPrograms, program => {
+        filter(allPrograms, (program) => {
           return !includes(map(enrolledPrograms, "program.uuid"), program.uuid);
         })
       );
@@ -143,22 +146,22 @@ export default function ProgramsForm(props: ProgramsFormProps) {
     }
   }, [viewEditForm, formChanged]);
 
-  const handleCreateSubmit = $event => {
+  const handleCreateSubmit = ($event) => {
     $event.preventDefault();
     const enrollmentPayload: ProgramEnrollment = {
       program: program,
       patient: patientUuid,
       dateEnrolled: enrollmentDate,
       dateCompleted: completionDate,
-      location: location
+      location: location,
     };
     const abortController = new AbortController();
     createProgramEnrollment(enrollmentPayload, abortController).subscribe(
-      response => {
+      (response) => {
         if (response.ok) {
           props.match.params["setEnrolledPrograms"]([
             ...props.match.params["enrolledPrograms"],
-            response.data
+            response.data,
           ]);
           navigate();
         }
@@ -167,18 +170,18 @@ export default function ProgramsForm(props: ProgramsFormProps) {
     return () => abortController.abort();
   };
 
-  const handleEditSubmit = $event => {
+  const handleEditSubmit = ($event) => {
     $event.preventDefault();
     if (completionDate || enrollmentDate || location) {
       const updatePayload: ProgramEnrollment = {
         program: program,
         dateCompleted: completionDate,
         dateEnrolled: enrollmentDate,
-        location: location
+        location: location,
       };
       const abortController = new AbortController();
       updateProgramEnrollment(updatePayload, abortController).subscribe(
-        response => response.status === 200 && navigate()
+        (response) => response.status === 200 && navigate()
       );
       return () => abortController.abort();
     }
@@ -189,7 +192,7 @@ export default function ProgramsForm(props: ProgramsFormProps) {
     props.closeComponent();
   };
 
-  const closeForm = $event => {
+  const closeForm = ($event) => {
     let userConfirmed: boolean = false;
     if (formChanged) {
       userConfirmed = confirm(
@@ -222,7 +225,7 @@ export default function ProgramsForm(props: ProgramsFormProps) {
           styles={{
             width: "100%",
             backgroundColor: "var(--omrs-color-bg-medium-contrast)",
-            height: "auto"
+            height: "auto",
           }}
         >
           <div className={styles.programsContainerWrapper}>
@@ -235,12 +238,12 @@ export default function ProgramsForm(props: ProgramsFormProps) {
                   id="program"
                   name="programs"
                   value={program}
-                  onChange={evt => setProgram(evt.target.value)}
+                  onChange={(evt) => setProgram(evt.target.value)}
                   required
                 >
                   <option>{t("chooseProgram", "Choose a program")}:</option>
                   {eligiblePrograms &&
-                    eligiblePrograms.map(program => (
+                    eligiblePrograms.map((program) => (
                       <option value={program.uuid} key={program.uuid}>
                         {program.display}
                       </option>
@@ -259,7 +262,7 @@ export default function ProgramsForm(props: ProgramsFormProps) {
                     name="enrollmentDate"
                     max={dayjs(new Date().toUTCString()).format("YYYY-MM-DD")}
                     required
-                    onChange={evt => {
+                    onChange={(evt) => {
                       setEnrollmentDate(evt.target.value);
                     }}
                     defaultValue={dayjs(new Date()).format("YYYY-MM-DD")}
@@ -291,7 +294,7 @@ export default function ProgramsForm(props: ProgramsFormProps) {
                     id="completionDate"
                     type="date"
                     name="completionDate"
-                    onChange={evt => setCompletionDate(evt.target.value)}
+                    onChange={(evt) => setCompletionDate(evt.target.value)}
                   />
                   <svg className="omrs-icon" role="img">
                     <use xlinkHref="#omrs-icon-calendar"></use>
@@ -308,13 +311,13 @@ export default function ProgramsForm(props: ProgramsFormProps) {
                   id="location"
                   name="locations"
                   value={location}
-                  onChange={evt => {
+                  onChange={(evt) => {
                     setLocation(evt.target.value);
                   }}
                 >
                   <option>{t("chooseLocation", "Choose a location")}:</option>
                   {locations &&
-                    locations.map(location => (
+                    locations.map((location) => (
                       <option value={location.uuid} key={location.uuid}>
                         {location.display}
                       </option>
@@ -374,7 +377,7 @@ export default function ProgramsForm(props: ProgramsFormProps) {
               styles={{
                 width: "100%",
                 backgroundColor: "var(--omrs-color-bg-medium-contrast)",
-                height: "auto"
+                height: "auto",
               }}
             >
               <div className={styles.programsContainerWrapper}>
@@ -397,7 +400,7 @@ export default function ProgramsForm(props: ProgramsFormProps) {
                         type="date"
                         name="enrollmentDate"
                         required
-                        onChange={evt => setEnrollmentDate(evt.target.value)}
+                        onChange={(evt) => setEnrollmentDate(evt.target.value)}
                         defaultValue={dayjs(enrollmentDate).format(
                           "YYYY-MM-DD"
                         )}
@@ -416,7 +419,7 @@ export default function ProgramsForm(props: ProgramsFormProps) {
                         id="completionDate"
                         type="date"
                         name="completionDate"
-                        onChange={evt => setCompletionDate(evt.target.value)}
+                        onChange={(evt) => setCompletionDate(evt.target.value)}
                         defaultValue={
                           completionDate
                             ? dayjs(completionDate).format("YYYY-MM-DD")
@@ -438,10 +441,10 @@ export default function ProgramsForm(props: ProgramsFormProps) {
                       id="location"
                       name="locations"
                       value={location}
-                      onChange={evt => setLocation(evt.target.value)}
+                      onChange={(evt) => setLocation(evt.target.value)}
                     >
                       {locations &&
-                        locations.map(location => (
+                        locations.map((location) => (
                           <option value={location.uuid} key={location.uuid}>
                             {location.display}
                           </option>
@@ -492,7 +495,7 @@ ProgramsForm.defaultProps = {
   entryStarted: () => {},
   entryCancelled: () => {},
   entrySubmitted: () => {},
-  closeComponent: () => {}
+  closeComponent: () => {},
 };
 
 type ProgramsFormProps = DataCaptureComponentProps & {

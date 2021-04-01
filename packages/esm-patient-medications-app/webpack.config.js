@@ -10,7 +10,7 @@ const cssLoader = {
   options: {
     modules: {
       localIdentName:
-        "esm-patient-immunizations__[name]__[local]___[hash:base64:5]"
+        "esm-patient-medications__[name]__[local]___[hash:base64:5]"
     }
   }
 };
@@ -22,10 +22,10 @@ module.exports = (env, argv = {}) => ({
   ],
   mode: argv.mode || "development",
   output: {
-    filename: "openmrs-esm-patient-immunizations-app.js",
+    filename: "openmrs-esm-patient-medications-app.js",
     libraryTarget: "system",
     path: resolve(__dirname, "dist"),
-    jsonpFunction: "webpackJsonp_openmrs_esm_patient_immunizations_app"
+    jsonpFunction: "webpackJsonp_openmrs_esm_patient_medications_app"
   },
   module: {
     rules: [

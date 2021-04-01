@@ -1,19 +1,18 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { useHistory, BrowserRouter } from "react-router-dom";
-
 import {
   mockAppointmentsServiceResponse,
   mockAppointmentsServiceFullResponse
-} from "../../../__mocks__/appointments.mock";
-import { mockSessionDataResponse } from "../../../__mocks__/session.mock";
+} from "../../__mocks__/appointments.mock";
+import { mockSessionDataResponse } from "../../__mocks__/session.mock";
 import AppointmentsForm from "./appointments-form.component";
 import {
   createAppointment,
+  getSession,
   getAppointmentService,
   getAppointmentServiceAll
 } from "./appointments.resource";
-import { getSession } from "../vitals/vitals-biometrics.resource";
 
 const mockUseHistory = useHistory as jest.Mock;
 const mockCreateAppointment = createAppointment as jest.Mock;

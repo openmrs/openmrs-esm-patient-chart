@@ -10,19 +10,22 @@ import DataTable, {
   TableBody,
   TableHead,
   TableHeader,
-  TableRow
+  TableRow,
 } from "carbon-components-react/es/components/DataTable";
 import { useTranslation } from "react-i18next";
 import { createErrorHandler, useCurrentPatient } from "@openmrs/esm-framework";
 import {
   performPatientAllergySearch,
-  Allergy
+  Allergy,
 } from "./allergy-intolerance.resource";
-import { openWorkspaceTab } from "../shared-utils";
 import AllergyForm from "./allergy-form.component";
-import EmptyState from "../../ui-components/empty-state/empty-state.component";
-import ErrorState from "../../ui-components/error-state/error-state.component";
+import EmptyState from "./empty-state/empty-state.component";
+import ErrorState from "./error-state/error-state.component";
 import styles from "./allergies-overview.scss";
+
+function openWorkspaceTab(_1: any, _2: any) {
+  //TODO
+}
 
 const AllergiesOverview: React.FC<AllergiesOverviewProps> = () => {
   const allergiesToShowCount = 5;
@@ -39,10 +42,10 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = () => {
       const sub = performPatientAllergySearch(
         patient.identifier[0].value
       ).subscribe(
-        allergies => {
+        (allergies) => {
           setAllergies(allergies);
         },
-        error => {
+        (error) => {
           setError(error);
           createErrorHandler();
         }
@@ -55,12 +58,12 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = () => {
   const headers = [
     {
       key: "display",
-      header: t("name", "Name")
+      header: t("name", "Name"),
     },
     {
       key: "reactions",
-      header: t("reactions", "Reactions")
-    }
+      header: t("reactions", "Reactions"),
+    },
   ];
 
   const toggleShowAllAllergies = () => {
@@ -74,11 +77,11 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = () => {
   const getRowItems = (rows: Array<Allergy>) => {
     return rows
       .slice(0, showAllAllergies ? rows.length : allergiesToShowCount)
-      .map(row => ({
+      .map((row) => ({
         ...row,
         reactions: `${row.reactionManifestations?.join(", ") || ""} ${
           row.reactionSeverity ? `(${capitalize(row.reactionSeverity)})` : ""
-        }`
+        }`,
       }));
   };
 
@@ -111,12 +114,12 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = () => {
                 <Table {...getTableProps()}>
                   <TableHead>
                     <TableRow>
-                      {headers.map(header => (
+                      {headers.map((header) => (
                         <TableHeader
                           className={`${styles.productiveHeading01} ${styles.text02}`}
                           {...getHeaderProps({
                             header,
-                            isSortable: header.isSortable
+                            isSortable: header.isSortable,
                           })}
                         >
                           {header.header?.content ?? header.header}
@@ -125,9 +128,9 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {rows.map(row => (
+                    {rows.map((row) => (
                       <TableRow key={row.id}>
-                        {row.cells.map(cell => (
+                        {row.cells.map((cell) => (
                           <TableCell key={cell.id}>
                             {cell.value?.content ?? cell.value}
                           </TableCell>
@@ -141,7 +144,7 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = () => {
                             <span
                               style={{
                                 display: "inline-block",
-                                margin: "0.45rem 0rem"
+                                margin: "0.45rem 0rem",
                               }}
                             >
                               {`${allergiesToShowCount} / ${allergies.length}`}{" "}

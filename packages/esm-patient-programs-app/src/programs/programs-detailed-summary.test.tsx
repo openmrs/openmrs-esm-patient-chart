@@ -1,17 +1,12 @@
 import React from "react";
-import { fireEvent, render, screen } from "@testing-library/react";
+import ProgramsDetailedSummary from "./programs-detailed-summary.component";
+import { render, screen } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import { of } from "rxjs/internal/observable/of";
-
-import { mockEnrolledProgramsResponse } from "../../../__mocks__/programs.mock";
-
-import { fetchEnrolledPrograms } from "./programs.resource";
-import { openWorkspaceTab } from "../shared-utils";
-import ProgramsForm from "./programs-form.component";
-import ProgramsDetailedSummary from "./programs-detailed-summary.component";
+import { mockEnrolledProgramsResponse } from "../../__mocks__/programs.mock";
+import { fetchEnrolledPrograms } from "./programs.resource"
 
 const mockFetchEnrolledPrograms = fetchEnrolledPrograms as jest.Mock;
-const mockOpenWorkspaceTab = openWorkspaceTab as jest.Mock;
 
 const renderProgramsDetailedSummary = () =>
   render(
@@ -31,7 +26,6 @@ jest.mock("../shared-utils", () => ({
 describe("<ProgramsDetailedSummary />", () => {
   beforeEach(() => {
     mockFetchEnrolledPrograms.mockReset;
-    mockOpenWorkspaceTab.mockReset;
   });
 
   it("displays a detailed summary of the patient's program enrollments", async () => {

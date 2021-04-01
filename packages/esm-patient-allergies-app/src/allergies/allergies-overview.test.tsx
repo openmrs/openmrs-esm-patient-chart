@@ -1,15 +1,12 @@
 import React from "react";
 import { BrowserRouter } from "react-router-dom";
-import { render, screen, fireEvent } from "@testing-library/react";
-
+import { render, screen } from "@testing-library/react";
 import { of } from "rxjs/internal/observable/of";
 import AllergiesOverview from "./allergies-overview.component";
 import { performPatientAllergySearch } from "./allergy-intolerance.resource";
-import { mockPatientAllergies } from "../../../__mocks__/allergies.mock";
-import { openWorkspaceTab } from "../shared-utils";
+import { mockPatientAllergies } from "../../__mocks__/allergies.mock";
 
 const mockPerformPatientAllergySearch = performPatientAllergySearch as jest.Mock;
-const mockOpenWorkspaceTab = openWorkspaceTab as jest.Mock;
 
 const renderAllergiesOverview = () => {
   render(
@@ -32,7 +29,6 @@ jest.mock("../shared-utils", () => ({
 
 describe("<AllergiesOverview />", () => {
   beforeEach(() => {
-    mockOpenWorkspaceTab.mockReset;
     mockPerformPatientAllergySearch.mockReset;
   });
 

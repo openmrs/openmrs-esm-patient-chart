@@ -38,11 +38,16 @@
   "dependencies": {
     "@carbon/charts-react": "^0.41.14",
     "@carbon/icons-react": "^10.18.0",
+    "@fortawesome/fontawesome-svg-core": "^1.2.29",
+    "@fortawesome/free-solid-svg-icons": "^5.13.1",
+    "@fortawesome/react-fontawesome": "^0.1.11",
     "@typescript-eslint/eslint-plugin": "^4.15.1",
     "@typescript-eslint/parser": "^4.15.1",
     "carbon-components-react": "^7.25.0",
     "d3": "^5.16.0",
     "lodash-es": "^4.17.15",
+    "react-grid-gallery": "^0.5.5",
+    "react-html5-camera-photo": "^1.5.4",
     "systemjs-webpack-interop": "^1.2.1"
   },
   "peerDependencies": {

@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
 import dayjs from "dayjs";
-import SummaryCard from "../../ui-components/cards/summary-card.component";
+import SummaryCard from "../cards/summary-card.component";
 import ProgramsForm from "./programs-form.component";
 import styles from "./program-record.css";
 import { RouteComponentProps } from "react-router-dom";
 import { useTranslation, Trans } from "react-i18next";
 import { createErrorHandler, useCurrentPatient } from "@openmrs/esm-framework";
 import { getPatientProgramByUuid } from "./programs.resource";
-import { openWorkspaceTab } from "../shared-utils";
+
+function openWorkspaceTab(_1: any, _2: any, _3: any) {
+  //TODO
+}
 
 interface ProgramRecordProps
   extends RouteComponentProps<{ programUuid: string }> {}
@@ -21,7 +24,7 @@ export default function ProgramRecord(props: ProgramRecordProps) {
   useEffect(() => {
     if (!isLoadingPatient && patient && patientUuid) {
       const subscription = getPatientProgramByUuid(programUuid).subscribe(
-        program => {
+        (program) => {
           setPatientProgram(program), createErrorHandler();
         }
       );
@@ -47,7 +50,7 @@ export default function ProgramRecord(props: ProgramRecordProps) {
                   programUuid: patientProgram?.uuid,
                   enrollmentDate: patientProgram?.dateEnrolled,
                   completionDate: patientProgram?.dateCompleted,
-                  locationUuid: patientProgram?.location?.uuid
+                  locationUuid: patientProgram?.location?.uuid,
                 }
               )
             }

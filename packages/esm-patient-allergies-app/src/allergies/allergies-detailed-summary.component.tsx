@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from "react";
 import dayjs from "dayjs";
-import EmptyState from "../../ui-components/empty-state/empty-state.component";
-import SummaryCard from "../../ui-components/cards/summary-card.component";
+import EmptyState from "./empty-state/empty-state.component";
+import SummaryCard from "../cards/summary-card.component";
 import AllergyForm from "./allergy-form.component";
 import styles from "./allergies-detailed-summary.css";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useCurrentPatient, createErrorHandler } from "@openmrs/esm-framework";
-import { openWorkspaceTab } from "../shared-utils";
 import {
   performPatientAllergySearch,
-  Allergy
+  Allergy,
 } from "./allergy-intolerance.resource";
+
+function openWorkspaceTab(_1: any, _2: any, _3: any) {
+  //TODO
+}
 
 export default function AllergiesDetailedSummary(
   props: AllergiesDetailedSummaryProps
@@ -24,7 +27,7 @@ export default function AllergiesDetailedSummary(
     if (!isLoadingPatient && patient) {
       const sub = performPatientAllergySearch(
         patient.identifier[0].value
-      ).subscribe(allergies => {
+      ).subscribe((allergies) => {
         setPatientAllergies(allergies);
       }, createErrorHandler());
 
@@ -46,7 +49,7 @@ export default function AllergiesDetailedSummary(
               {
                 allergyUuid: null,
                 setAllergies: setPatientAllergies,
-                allergies: patientAllergies
+                allergies: patientAllergies,
               }
             )
           }
@@ -68,7 +71,7 @@ export default function AllergiesDetailedSummary(
               </tr>
             </thead>
             <tbody>
-              {patientAllergies.map(allergy => {
+              {patientAllergies.map((allergy) => {
                 return (
                   <React.Fragment key={allergy?.id}>
                     <tr
@@ -154,7 +157,7 @@ export default function AllergiesDetailedSummary(
               {
                 allergyUuid: null,
                 setAllergies: setPatientAllergies,
-                allergies: patientAllergies
+                allergies: patientAllergies,
               }
             )
           }

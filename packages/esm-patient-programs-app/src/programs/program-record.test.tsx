@@ -3,13 +3,11 @@ import ProgramRecord from "./program-record.component";
 import ProgramsForm from "./programs-form.component";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
-import { mockProgramResponse } from "../../../__mocks__/programs.mock";
+import { mockProgramResponse } from "../../__mocks__/programs.mock";
 import { getPatientProgramByUuid } from "./programs.resource";
-import { openWorkspaceTab } from "../shared-utils";
 import { of } from "rxjs/internal/observable/of";
 
 const mockFetchPatientProgram = getPatientProgramByUuid as jest.Mock;
-const mockOpenWorkspaceTab = openWorkspaceTab as jest.Mock;
 
 jest.mock("./programs.resource", () => ({
   getPatientProgramByUuid: jest.fn()
@@ -22,14 +20,14 @@ jest.mock("../shared-utils", () => ({
 describe("<ProgramRecord />", () => {
   beforeEach(() => {
     mockFetchPatientProgram.mockReset;
-    mockOpenWorkspaceTab.mockReset;
-
     mockFetchPatientProgram.mockReturnValue(of(mockProgramResponse));
   });
 
   afterEach(() => jest.restoreAllMocks());
 
   it("displays a detailed summary of the selected care program", async () => {
+    const mockOpenWorkspaceTab = jest.fn();
+
     render(
       <BrowserRouter>
         <ProgramRecord match={{ params: { programUuid: "" } }} />

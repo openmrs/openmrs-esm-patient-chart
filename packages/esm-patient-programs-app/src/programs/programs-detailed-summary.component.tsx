@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import ProgramsForm from "./programs-form.component";
-import EmptyState from "../../ui-components/empty-state/empty-state.component";
-import SummaryCard from "../../ui-components/cards/summary-card.component";
+import EmptyState from "./empty-state/empty-state.component";
+import SummaryCard from "../cards/summary-card.component";
 import styles from "./programs-detailed-summary.css";
 import { useTranslation, Trans } from "react-i18next";
 import { RouteComponentProps, Link } from "react-router-dom";
 import { createErrorHandler, useCurrentPatient } from "@openmrs/esm-framework";
 import { fetchEnrolledPrograms } from "./programs.resource";
-import { openWorkspaceTab } from "../shared-utils";
 import { PatientProgram } from "../types";
+
+function openWorkspaceTab(_1: any, _2: any, _3?: any) {
+  //TODO
+}
 
 interface ProgramsDetailedSummaryProps extends RouteComponentProps<{}> {}
 
@@ -25,7 +28,7 @@ export default function ProgramsDetailedSummary(
   useEffect(() => {
     if (patientUuid && !isLoadingPatient) {
       const subscription = fetchEnrolledPrograms(patientUuid).subscribe(
-        enrolledPrograms => setEnrolledPrograms(enrolledPrograms),
+        (enrolledPrograms) => setEnrolledPrograms(enrolledPrograms),
         createErrorHandler()
       );
       return () => subscription.unsubscribe();
@@ -39,7 +42,7 @@ export default function ProgramsDetailedSummary(
           <SummaryCard
             name={t("carePrograms", "Care Programs")}
             styles={{
-              width: "100%"
+              width: "100%",
             }}
             addComponent={ProgramsForm}
             showComponent={() =>
@@ -48,7 +51,7 @@ export default function ProgramsDetailedSummary(
                 `${t("programsForm", "Programs Form")}`,
                 {
                   setEnrolledPrograms: setEnrolledPrograms,
-                  enrolledPrograms: enrolledPrograms
+                  enrolledPrograms: enrolledPrograms,
                 }
               )
             }
@@ -69,7 +72,7 @@ export default function ProgramsDetailedSummary(
                 </tr>
               </thead>
               <tbody>
-                {enrolledPrograms?.map(program => {
+                {enrolledPrograms?.map((program) => {
                   return (
                     <React.Fragment key={program.uuid}>
                       <tr
@@ -125,7 +128,7 @@ export default function ProgramsDetailedSummary(
               `${t("programsForm", "Programs Form")}`,
               {
                 setEnrolledPrograms: setEnrolledPrograms,
-                enrolledPrograms: enrolledPrograms
+                enrolledPrograms: enrolledPrograms,
               }
             )
           }

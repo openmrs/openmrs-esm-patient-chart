@@ -4,12 +4,10 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { render, screen } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
-import { mockAppointmentsResponse } from "../../../__mocks__/appointments.mock";
+import { mockAppointmentsResponse } from "../../__mocks__/appointments.mock";
 import { getAppointments } from "./appointments.resource";
-import { openWorkspaceTab } from "../shared-utils";
 
 const mockGetAppointments = getAppointments as jest.Mock;
-const mockOpenWorkspaceTab = openWorkspaceTab as jest.Mock;
 const mockPatientAppointments = getAppointments as jest.Mock;
 
 dayjs.extend(utc);
@@ -32,7 +30,6 @@ jest.mock("../shared-utils", () => ({
 
 describe("<AppointmentsOverview />", () => {
   beforeEach(() => {
-    mockOpenWorkspaceTab.mockReset;
     mockPatientAppointments.mockReset;
     mockGetAppointments.mockReset;
   });

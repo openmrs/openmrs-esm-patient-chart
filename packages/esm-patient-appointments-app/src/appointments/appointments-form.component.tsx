@@ -1,16 +1,16 @@
 import React, { useEffect, useRef, useState, SyntheticEvent } from "react";
 import styles from "./appointments-form.css";
-import SummaryCard from "../../ui-components/cards/summary-card.component";
+import SummaryCard from "../cards/summary-card.component";
 import { useCurrentPatient, createErrorHandler } from "@openmrs/esm-framework";
-import { getSession } from "../vitals/vitals-biometrics.resource";
 import {
+  getSession,
   createAppointment,
   getAppointmentService,
   getAppointmentServiceAll
 } from "./appointments.resource";
 import { useHistory } from "react-router-dom";
 import { Trans, useTranslation } from "react-i18next";
-import { DataCaptureComponentProps } from "../shared-utils";
+import { DataCaptureComponentProps } from "../types";
 
 export default function AppointmentsForm(props: AppointmentsFormProps) {
   const formRef = useRef<HTMLFormElement>(null);

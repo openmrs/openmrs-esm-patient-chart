@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
+import AttachmentThumbnail from "./attachment-thumbnail.component";
+import dayjs from "dayjs";
+import Gallery from "react-grid-gallery";
+import styles from "./attachments-overview.css";
+import CameraUpload from "./camera-upload.component";
 import { useCurrentPatient, UserHasAccess } from "@openmrs/esm-framework";
 import {
   getAttachments,
   createAttachment,
   deleteAttachment
 } from "./attachments.resource";
-import Gallery from "react-grid-gallery";
-import styles from "./attachments-overview.css";
-import CameraUpload from "./camera-upload.component";
 import { Trans } from "react-i18next";
-import AttachmentThumbnail from "./attachment-thumbnail.component";
-import dayjs from "dayjs";
 
 export default function AttachmentsOverview() {
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);

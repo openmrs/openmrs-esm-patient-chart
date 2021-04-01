@@ -3,12 +3,12 @@ import CameraFrame from "./camera-frame.component";
 import ImagePreview from "./image-preview.component";
 import styles from "./camera-upload.css";
 import Camera from "react-html5-camera-photo";
-require("react-html5-camera-photo/build/css/index.css");
-require("./styles.css");
 import { createAttachment } from "./attachments.resource";
 import { useCurrentPatient } from "@openmrs/esm-framework";
 import { useTranslation } from "react-i18next";
 import { Attachment } from "./attachments-overview.component";
+import "react-html5-camera-photo/build/css/index.css";
+import "./styles.css";
 
 export default function CameraUpload(props: CameraUploadProps) {
   const [cameraIsOpen, setCameraIsOpen] = useState(props.openCameraOnRender);
@@ -20,7 +20,7 @@ export default function CameraUpload(props: CameraUploadProps) {
     isLoadingPatient,
     patient,
     patientUuid,
-    patientErr
+    patientErr,
   ] = useCurrentPatient();
 
   function openCamera() {
@@ -55,7 +55,7 @@ export default function CameraUpload(props: CameraUploadProps) {
   function handleSaveImage(dataUri: string, caption: string) {
     const abortController = new AbortController();
     createAttachment(patientUuid, null, caption, abortController, dataUri).then(
-      res => {
+      (res) => {
         const att = {
           id: `${res.data.uuid}`,
           src: `/openmrs/ws/rest/v1/attachment/${res.data.uuid}/bytes`,
@@ -63,7 +63,7 @@ export default function CameraUpload(props: CameraUploadProps) {
           thumbnailWidth: 320,
           thumbnailHeight: 212,
           caption: res.data.comment,
-          isSelected: false
+          isSelected: false,
         };
         if (props.onNewAttachment) {
           props.onNewAttachment(att);
