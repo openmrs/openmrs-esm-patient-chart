@@ -6,8 +6,9 @@ import AllergyForm from "./allergy-form.component";
 import styles from "./allergy-record.css";
 import { RouteComponentProps } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useCurrentPatient, createErrorHandler } from "@openmrs/esm-framework";
+import { createErrorHandler } from "@openmrs/esm-framework";
 import { Allergy, fetchAllergyByUuid } from "./allergy-intolerance.resource";
+import { useAllergiesContext } from "./allergies.context";
 
 function openWorkspaceTab(_1: any, _2: any, _3: any) {
   //TODO
@@ -19,25 +20,25 @@ interface AllergyRecordProps
 enum Severity {
   Severe = "Severe",
   Mild = "Mild",
-  Moderate = "Moderate",
+  Moderate = "Moderate"
 }
 
 export default function AllergyRecord(props: AllergyRecordProps) {
   const [allergy, setAllergy] = useState<Allergy>(null);
-  const [isLoadingPatient, patient, patientUuid] = useCurrentPatient();
+  const { patient } = useAllergiesContext();
   const { t } = useTranslation();
   const { allergyUuid } = props.match.params;
 
   useEffect(() => {
-    if (!isLoadingPatient && patient && allergyUuid) {
+    if (patient && allergyUuid) {
       const sub = fetchAllergyByUuid(allergyUuid).subscribe(
-        (allergy) => setAllergy(allergy),
+        allergy => setAllergy(allergy),
         createErrorHandler()
       );
 
       return () => sub.unsubscribe();
     }
-  }, [isLoadingPatient, patient, allergyUuid]);
+  }, [patient, allergyUuid]);
 
   return (
     <>
@@ -52,7 +53,7 @@ export default function AllergyRecord(props: AllergyRecordProps) {
                 AllergyForm,
                 `${t("Edit Allergy", "Edit Allergy")}`,
                 {
-                  allergyUuid: allergy.id,
+                  allergyUuid: allergy.id
                 }
               )
             }

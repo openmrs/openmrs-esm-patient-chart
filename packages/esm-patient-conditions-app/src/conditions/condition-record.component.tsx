@@ -3,12 +3,13 @@ import dayjs from "dayjs";
 import capitalize from "lodash-es/capitalize";
 import SummaryCard from "../cards/summary-card.component";
 import RecordDetails from "../cards/record-details-card.component";
+import ConditionsForm from "./conditions-form.component";
 import styles from "./condition-record.css";
 import { RouteComponentProps } from "react-router-dom";
 import { useTranslation, Trans } from "react-i18next";
-import { useCurrentPatient, createErrorHandler } from "@openmrs/esm-framework";
-import { ConditionsForm } from "./conditions-form.component";
+import { createErrorHandler } from "@openmrs/esm-framework";
 import { getConditionByUuid } from "./conditions.resource";
+import { useConditionsContext } from "./conditions.context";
 
 function openWorkspaceTab(_1: any, _2: any, _3: any) {
   //TODO
@@ -19,19 +20,19 @@ interface ConditionRecordProps
 
 export default function ConditionRecord(props: ConditionRecordProps) {
   const [patientCondition, setPatientCondition] = useState(null);
-  const [isLoadingPatient, patient] = useCurrentPatient();
+  const { patient } = useConditionsContext();
   const { t } = useTranslation();
   const { conditionUuid } = props.match.params;
 
   useEffect(() => {
-    if (!isLoadingPatient && patient) {
+    if (patient) {
       const sub = getConditionByUuid(conditionUuid).subscribe(
-        condition => setPatientCondition(condition),
+        (condition) => setPatientCondition(condition),
         createErrorHandler()
       );
       return () => sub.unsubscribe();
     }
-  }, [isLoadingPatient, patient, conditionUuid]);
+  }, [patient, conditionUuid]);
 
   return (
     <>
@@ -49,7 +50,7 @@ export default function ConditionRecord(props: ConditionRecordProps) {
                   conditionUuid: patientCondition?.id,
                   conditionName: patientCondition?.display,
                   clinicalStatus: patientCondition?.clinicalStatus,
-                  onsetDateTime: patientCondition?.onsetDateTime
+                  onsetDateTime: patientCondition?.onsetDateTime,
                 }
               );
             }}

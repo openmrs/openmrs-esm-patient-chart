@@ -9,31 +9,34 @@ import { useTranslation } from "react-i18next";
 import { useCurrentPatient, createErrorHandler } from "@openmrs/esm-framework";
 import {
   performPatientAllergySearch,
-  Allergy,
+  Allergy
 } from "./allergy-intolerance.resource";
 
 function openWorkspaceTab(_1: any, _2: any, _3: any) {
   //TODO
 }
 
-export default function AllergiesDetailedSummary(
-  props: AllergiesDetailedSummaryProps
-) {
+interface AllergiesDetailedSummaryProps {
+  patient: fhir.Patient;
+}
+
+export default function AllergiesDetailedSummary({
+  patient
+}: AllergiesDetailedSummaryProps) {
   const [patientAllergies, setPatientAllergies] = useState<Array<Allergy>>([]);
-  const [isLoadingPatient, patient] = useCurrentPatient();
   const { t } = useTranslation();
 
   useEffect(() => {
-    if (!isLoadingPatient && patient) {
+    if (patient) {
       const sub = performPatientAllergySearch(
         patient.identifier[0].value
-      ).subscribe((allergies) => {
+      ).subscribe(allergies => {
         setPatientAllergies(allergies);
       }, createErrorHandler());
 
       return () => sub.unsubscribe();
     }
-  }, [isLoadingPatient, patient]);
+  }, [patient]);
 
   return (
     <>
@@ -49,7 +52,7 @@ export default function AllergiesDetailedSummary(
               {
                 allergyUuid: null,
                 setAllergies: setPatientAllergies,
-                allergies: patientAllergies,
+                allergies: patientAllergies
               }
             )
           }
@@ -71,7 +74,7 @@ export default function AllergiesDetailedSummary(
               </tr>
             </thead>
             <tbody>
-              {patientAllergies.map((allergy) => {
+              {patientAllergies.map(allergy => {
                 return (
                   <React.Fragment key={allergy?.id}>
                     <tr
@@ -157,7 +160,7 @@ export default function AllergiesDetailedSummary(
               {
                 allergyUuid: null,
                 setAllergies: setPatientAllergies,
-                allergies: patientAllergies,
+                allergies: patientAllergies
               }
             )
           }
@@ -166,5 +169,3 @@ export default function AllergiesDetailedSummary(
     </>
   );
 }
-
-type AllergiesDetailedSummaryProps = {};

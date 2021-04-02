@@ -17,7 +17,6 @@ import DataTable, {
   TableRow,
 } from "carbon-components-react/es/components/DataTable";
 import { useTranslation } from "react-i18next";
-import { createErrorHandler, useCurrentPatient } from "@openmrs/esm-framework";
 import { mapFromFHIRImmunizationBundle } from "./immunization-mapper";
 import { performPatientImmunizationsSearch } from "./immunizations.resource";
 
@@ -25,12 +24,20 @@ function openWorkspaceTab(_1: any, _2: any) {
   //TODO
 }
 
-const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = () => {
+export interface ImmunizationsOverviewProps {
+  basePath: string;
+  patient: fhir.Patient;
+  patientUuid: string;
+}
+
+const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = ({
+  patient,
+  patientUuid,
+}) => {
   const immunizationsToShowCount = 5;
   const { t } = useTranslation();
   const [immunizations, setImmunizations] = React.useState(null);
   const [error, setError] = React.useState(null);
-  const [, patient, patientUuid] = useCurrentPatient();
   const displayText = t("immunizations", "immunizations");
   const headerTitle = t("immunizations", "Immunizations");
 
@@ -46,10 +53,7 @@ const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = () => {
           let allImmunizations = mapFromFHIRImmunizationBundle(searchResult);
           setImmunizations(allImmunizations);
         })
-        .catch((error) => {
-          setError(error);
-          createErrorHandler();
-        });
+        .catch(setError);
 
       return () => abortController.abort();
     }
@@ -160,7 +164,3 @@ function getRowItems(rows) {
 }
 
 export default ImmunizationsOverview;
-
-type ImmunizationsOverviewProps = {
-  basePath: string;
-};

@@ -172,7 +172,10 @@ const AttachmentsOverview: React.FC<AttachmentsOverviewProps> = ({
               onChange={(e) => handleUpload(e, e.target.files)}
             />
           </form>
-          <CameraUpload onNewAttachment={handleNewAttachment} />
+          <CameraUpload
+            patientUuid={patientUuid}
+            onNewAttachment={handleNewAttachment}
+          />
         </div>
         {getSelectedImages().length !== 0 && (
           <UserHasAccess privilege="Delete Attachment">

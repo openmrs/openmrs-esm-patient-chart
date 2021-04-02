@@ -1,25 +1,41 @@
 import React, { useEffect, useRef, useState, SyntheticEvent } from "react";
 import styles from "./appointments-form.css";
 import SummaryCard from "../cards/summary-card.component";
-import { useCurrentPatient, createErrorHandler } from "@openmrs/esm-framework";
+import { createErrorHandler } from "@openmrs/esm-framework";
 import {
   getSession,
   createAppointment,
   getAppointmentService,
-  getAppointmentServiceAll
+  getAppointmentServiceAll,
 } from "./appointments.resource";
 import { useHistory } from "react-router-dom";
 import { Trans, useTranslation } from "react-i18next";
 import { DataCaptureComponentProps } from "../types";
 
-export default function AppointmentsForm(props: AppointmentsFormProps) {
+interface AppointmentsFormProps extends DataCaptureComponentProps {
+  patientUuid: string;
+}
+
+export type Appointment = {
+  serviceUuid: string;
+  serviceTypeUuid?: string;
+  startDateTime: Date;
+  endDateTime: Date;
+  appointmentKind: string;
+  comments: string;
+  locationUuid?: string;
+  providerUuid?: string;
+  status?: string;
+  patientUuid: string;
+};
+
+const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
+  patientUuid,
+  entryStarted = () => {},
+  entryCancelled = () => {},
+  closeComponent = () => {},
+}) => {
   const formRef = useRef<HTMLFormElement>(null);
-  const [
-    isLoadingPatient,
-    patient,
-    patientUuid,
-    patientErr
-  ] = useCurrentPatient();
   const [currentSession, setCurrentSession] = useState(null);
   const [appointmentService, setAppointmentService] = useState(null);
   const [appointmentServiceType, setAppointmentServiceType] = useState(null);
@@ -48,18 +64,18 @@ export default function AppointmentsForm(props: AppointmentsFormProps) {
   useEffect(() => {
     const abortController = new AbortController();
 
-    if (patientUuid && !isLoadingPatient) {
+    if (patientUuid) {
       getAppointmentServiceAll(abortController).then(({ data }) => {
         setAppointmentService(data);
       }, createErrorHandler());
-      getSession(abortController).then(response => {
+      getSession(abortController).then((response) => {
         setCurrentSession(response?.data);
         setLocation(response?.data?.sessionLocation?.uuid);
       }, createErrorHandler());
     }
 
     return () => abortController.abort();
-  }, [patientUuid, isLoadingPatient]);
+  }, [patientUuid]);
 
   useEffect(() => {
     const abortController = new AbortController();
@@ -84,11 +100,11 @@ export default function AppointmentsForm(props: AppointmentsFormProps) {
     }
 
     if (userConfirmed && formChanged) {
-      props.entryCancelled();
-      props.closeComponent();
+      entryCancelled();
+      closeComponent();
     } else if (!formChanged) {
-      props.entryCancelled();
-      props.closeComponent();
+      entryCancelled();
+      closeComponent();
     }
   };
 
@@ -107,10 +123,10 @@ export default function AppointmentsForm(props: AppointmentsFormProps) {
       locationUuid: location,
       patientUuid: patientUuid,
       status: null,
-      providerUuid: currentSession.currentProvider.uuid
+      providerUuid: currentSession.currentProvider.uuid,
     };
     const abortController = new AbortController();
-    createAppointment(appointment, abortController).then(response => {
+    createAppointment(appointment, abortController).then((response) => {
       response.status === 200 && navigate();
     }, createErrorHandler());
   };
@@ -125,7 +141,7 @@ export default function AppointmentsForm(props: AppointmentsFormProps) {
         onSubmit={handleCreateFormSubmit}
         onChange={() => {
           setFormChanged(true);
-          return props.entryStarted();
+          return entryStarted();
         }}
         className={styles.appointmentContainer}
       >
@@ -138,13 +154,13 @@ export default function AppointmentsForm(props: AppointmentsFormProps) {
             name="select-service"
             value={serviceUuid}
             defaultChecked={true}
-            onChange={event => setServiceUuid(event.target.value)}
+            onChange={(event) => setServiceUuid(event.target.value)}
           >
             <option key={0} value={"default"}>
               {t("selectService", "Select service")}
             </option>
             {appointmentService &&
-              appointmentService.map(service => (
+              appointmentService.map((service) => (
                 <option value={service.uuid} key={service.uuid}>
                   {service.name}
                 </option>
@@ -158,11 +174,11 @@ export default function AppointmentsForm(props: AppointmentsFormProps) {
           <select
             name="serviceType"
             id="serviceType"
-            onChange={event => setServiceTypeUuid(event.target.value)}
+            onChange={(event) => setServiceTypeUuid(event.target.value)}
             defaultValue={serviceTypeUuid}
           >
             {appointmentServiceType &&
-              appointmentServiceType.map(serviceType => {
+              appointmentServiceType.map((serviceType) => {
                 return (
                   <option key={serviceType.uuid} value={serviceType.uuid}>
                     {serviceType.name}
@@ -181,7 +197,7 @@ export default function AppointmentsForm(props: AppointmentsFormProps) {
                 id="date"
                 type="date"
                 name="datepicker"
-                onChange={event => setAppointmentDate(event.target.value)}
+                onChange={(event) => setAppointmentDate(event.target.value)}
                 required
               />
               <svg className="omrs-icon" role="img">
@@ -198,7 +214,9 @@ export default function AppointmentsForm(props: AppointmentsFormProps) {
                 id="startTime"
                 type="time"
                 name="datepicker"
-                onChange={event => setAppointmentStartTime(event.target.value)}
+                onChange={(event) =>
+                  setAppointmentStartTime(event.target.value)
+                }
                 required
               />
               <svg className="omrs-icon" role="img">
@@ -215,7 +233,7 @@ export default function AppointmentsForm(props: AppointmentsFormProps) {
                 id="endTime"
                 type="time"
                 name="datepicker"
-                onChange={event => setAppointmentEndTime(event.target.value)}
+                onChange={(event) => setAppointmentEndTime(event.target.value)}
                 required
               />
               <svg className="omrs-icon" role="img">
@@ -230,7 +248,7 @@ export default function AppointmentsForm(props: AppointmentsFormProps) {
               <input
                 type="checkbox"
                 name="omrs-checkbox"
-                onChange={event => setAppointmentKind(event.target.value)}
+                onChange={(event) => setAppointmentKind(event.target.value)}
                 style={{ marginRight: "0.5rem" }}
                 value="WalkIn"
               />
@@ -248,7 +266,7 @@ export default function AppointmentsForm(props: AppointmentsFormProps) {
             name="notes"
             id="notes"
             rows={5}
-            onChange={event => setComment(event.target.value)}
+            onChange={(event) => setComment(event.target.value)}
           />
         </div>
         <div
@@ -282,26 +300,6 @@ export default function AppointmentsForm(props: AppointmentsFormProps) {
       </form>
     </SummaryCard>
   );
-}
-
-AppointmentsForm.defaultProps = {
-  entryStarted: () => {},
-  entryCancelled: () => {},
-  entrySubmitted: () => {},
-  closeComponent: () => {}
 };
 
-type AppointmentsFormProps = DataCaptureComponentProps;
-
-export type Appointment = {
-  serviceUuid: string;
-  serviceTypeUuid?: string;
-  startDateTime: Date;
-  endDateTime: Date;
-  appointmentKind: string;
-  comments: string;
-  locationUuid?: string;
-  providerUuid?: string;
-  status?: string;
-  patientUuid: string;
-};
+export default AppointmentsForm;

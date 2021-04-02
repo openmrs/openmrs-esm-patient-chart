@@ -14,10 +14,9 @@ import DataTable, {
   TableBody,
   TableHead,
   TableHeader,
-  TableRow
+  TableRow,
 } from "carbon-components-react/es/components/DataTable";
 import { useTranslation } from "react-i18next";
-import { createErrorHandler, useCurrentPatient } from "@openmrs/esm-framework";
 import { getAppointments } from "./appointments.resource";
 
 function openWorkspaceTab(_1: any, _2: any) {
@@ -26,12 +25,14 @@ function openWorkspaceTab(_1: any, _2: any) {
 
 interface AppointmentOverviewProps {
   basePath: string;
+  patientUuid: string;
 }
 
-const AppointmentsOverview: React.FC<AppointmentOverviewProps> = () => {
+const AppointmentsOverview: React.FC<AppointmentOverviewProps> = ({
+  patientUuid,
+}) => {
   const { t } = useTranslation();
   const appointmentsToShowCount = 5;
-  const [isLoadingPatient, , patientUuid] = useCurrentPatient();
   const [appointments, setAppointments] = React.useState(null);
   const [error, setError] = React.useState(null);
   const startDate = dayjs().format();
@@ -39,19 +40,16 @@ const AppointmentsOverview: React.FC<AppointmentOverviewProps> = () => {
   const headerTitle = t("appointments", "Appointments");
 
   React.useEffect(() => {
-    if (!isLoadingPatient && patientUuid) {
+    if (patientUuid) {
       const abortController = new AbortController();
 
       getAppointments(patientUuid, startDate, abortController)
         .then(({ data }) => setAppointments(data))
-        .catch(error => {
-          setError(error);
-          createErrorHandler();
-        });
+        .catch(setError);
 
       return () => abortController.abort();
     }
-  }, [isLoadingPatient, patientUuid, startDate]);
+  }, [patientUuid, startDate]);
 
   const launchAppointmentsForm = () => {
     openWorkspaceTab(
@@ -63,24 +61,24 @@ const AppointmentsOverview: React.FC<AppointmentOverviewProps> = () => {
   const headers = [
     {
       key: "name",
-      header: t("serviceType", "Service Type")
+      header: t("serviceType", "Service Type"),
     },
     {
       key: "startDateTime",
-      header: t("date", "Date")
+      header: t("date", "Date"),
     },
     {
       key: "status",
-      header: t("status", "Status")
-    }
+      header: t("status", "Status"),
+    },
   ];
 
-  const getRowItems = rows =>
-    rows.map(row => ({
+  const getRowItems = (rows) =>
+    rows.map((row) => ({
       id: row.uuid,
       name: row.service?.name,
       startDateTime: dayjs.utc(row.startDateTime).format("DD-MMM-YYYY"),
-      status: row.status
+      status: row.status,
     }));
 
   const RenderAppointments: React.FC = () => {
@@ -112,12 +110,12 @@ const AppointmentsOverview: React.FC<AppointmentOverviewProps> = () => {
                 <Table {...getTableProps()}>
                   <TableHead>
                     <TableRow>
-                      {headers.map(header => (
+                      {headers.map((header) => (
                         <TableHeader
                           className={`${styles.productiveHeading01} ${styles.text02}`}
                           {...getHeaderProps({
                             header,
-                            isSortable: header.isSortable
+                            isSortable: header.isSortable,
                           })}
                         >
                           {header.header?.content ?? header.header}
@@ -126,9 +124,9 @@ const AppointmentsOverview: React.FC<AppointmentOverviewProps> = () => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {rows.map(row => (
+                    {rows.map((row) => (
                       <TableRow key={row.id}>
-                        {row.cells.map(cell => (
+                        {row.cells.map((cell) => (
                           <TableCell key={cell.id}>
                             {cell.value?.content ?? cell.value}
                           </TableCell>

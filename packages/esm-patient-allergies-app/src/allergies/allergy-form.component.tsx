@@ -12,12 +12,9 @@ import {
   getPatientAllergyByPatientUuid,
   updatePatientAllergy,
   fetchAllergyByUuid,
+  Allergy
 } from "./allergy-intolerance.resource";
-import {
-  useCurrentPatient,
-  createErrorHandler,
-  showToast,
-} from "@openmrs/esm-framework";
+import { createErrorHandler, showToast } from "@openmrs/esm-framework";
 import Button from "carbon-components-react/es/components/Button";
 import Checkbox from "carbon-components-react/es/components/Checkbox";
 import DatePicker from "carbon-components-react/es/components/DatePicker";
@@ -29,11 +26,63 @@ import {
   AllergyData,
   AllergicReaction,
   Allergen,
-  DataCaptureComponentProps,
+  DataCaptureComponentProps
 } from "../types";
 import styles from "./allergy-form.css";
 
-export default function AllergyForm(props: AllergyFormProps) {
+enum AllergyConcept {
+  DRUG_ALLERGEN = "162552AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+  ENVIRONMENTAL_ALLERGEN = "162554AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+  FOOD_ALLERGEN = "162553AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+  MILD_REACTION_SEVERITY = "1498AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+  MODERATE_REACTION_SEVERITY = "1499AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+  SEVERE_REACTION_SEVERITY = "1500AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+}
+
+function getAllergyType(allergyConcept: string): string {
+  switch (allergyConcept) {
+    case AllergyConcept.DRUG_ALLERGEN:
+      return "DRUG";
+    case AllergyConcept.FOOD_ALLERGEN:
+      return "FOOD";
+    case AllergyConcept.ENVIRONMENTAL_ALLERGEN:
+      return "ENVIRONMENT";
+    default:
+      "NO ALLERGEN";
+  }
+}
+
+interface AllergyFormProps extends DataCaptureComponentProps {
+  match: {
+    params: {
+      allergyUuid: string;
+      setAllergies(allergies: Array<Allergy>): void;
+      allergies: Array<Allergy>;
+    };
+  };
+  patientUuid: string;
+}
+
+interface PatientAllergy {
+  allergenType: string;
+  codedAllergenUuid: string;
+  severityUuid: string;
+  comment: string;
+  reactionUuids: Array<SelectedAllergicReaction>;
+}
+
+interface SelectedAllergicReaction {
+  display?: string;
+  uuid: string;
+}
+
+const AllergyForm: React.FC<AllergyFormProps> = ({
+  match,
+  patientUuid,
+  entryStarted = () => {},
+  entryCancelled = () => {},
+  closeComponent = () => {}
+}) => {
   const formRef = useRef<HTMLFormElement>(null);
   const createFormOnsetDateRef = useRef<HTMLInputElement>(null);
   const editFormOnsetDateRef = useRef<HTMLInputElement>(null);
@@ -60,31 +109,26 @@ export default function AllergyForm(props: AllergyFormProps) {
   );
   const [allergyComment, setAllergyComment] = useState<string>(null);
   const [updatedOnsetDate, setUpdatedOnsetDate] = useState<string>(null);
-  const [isLoadingPatient, , patientUuid] = useCurrentPatient();
   const [formChanged, setFormChanged] = useState(false);
   const history = useHistory();
   const { t } = useTranslation();
 
   useEffect(() => {
-    if (props.match.params["allergyUuid"]) {
+    if (match.params.allergyUuid) {
       setIsEditFormActive(true);
     }
-  }, [props.match.params]);
+  }, [match.params]);
 
   useEffect(() => {
     const abortController = new AbortController();
-    if (patientUuid && !isLoadingPatient && isEditFormActive) {
-      getPatientAllergyByPatientUuid(
-        patientUuid,
-        props.match.params,
-        abortController
-      )
-        .then((response) => setPatientAllergy(response.data))
+    if (patientUuid && isEditFormActive) {
+      getPatientAllergyByPatientUuid(patientUuid, match.params, abortController)
+        .then(response => setPatientAllergy(response.data))
         .catch(createErrorHandler());
 
       return () => abortController.abort();
     }
-  }, [patientUuid, isLoadingPatient, isEditFormActive, props.match.params]);
+  }, [patientUuid, isEditFormActive, match.params]);
 
   useEffect(() => {
     if (isEditFormActive && patientAllergy) {
@@ -92,10 +136,10 @@ export default function AllergyForm(props: AllergyFormProps) {
       setReactionSeverityUuid(patientAllergy.severity.uuid);
       setUpdatedOnsetDate(patientAllergy.auditInfo.dateCreated);
       setSelectedAllergicReactions(
-        patientAllergy.reactions?.map((reaction) => {
+        patientAllergy.reactions?.map(reaction => {
           return {
             display: reaction.reaction.display,
-            uuid: reaction.reaction.uuid,
+            uuid: reaction.reaction.uuid
           };
         })
       );
@@ -152,9 +196,9 @@ export default function AllergyForm(props: AllergyFormProps) {
     if (selectedAllergyCategory && !isEditFormActive) {
       const getAllergensSub = getAllergyAllergenByConceptUuid(
         selectedAllergyCategory
-      ).subscribe((data) => setAllergensArray(data), createErrorHandler());
+      ).subscribe(data => setAllergensArray(data), createErrorHandler());
       const getAllergicReactionsSub = getAllergicReactions().subscribe(
-        (data) => setAllergicReactions(data),
+        data => setAllergicReactions(data),
         createErrorHandler()
       );
       return () => {
@@ -177,7 +221,7 @@ export default function AllergyForm(props: AllergyFormProps) {
           return reactions;
         } else {
           return reactions.filter(
-            (reaction) => reaction.uuid !== eventTarget.value
+            reaction => reaction.uuid !== eventTarget.value
           );
         }
       }
@@ -191,23 +235,20 @@ export default function AllergyForm(props: AllergyFormProps) {
       codedAllergenUuid: codedAllergenUuid,
       severityUuid: reactionSeverityUuid,
       comment: comment,
-      reactionUuids: selectedAllergicReactions,
+      reactionUuids: selectedAllergicReactions
     };
     const abortController = new AbortController();
     savePatientAllergy(patientAllergy, patientUuid, abortController)
-      .then((response) => {
+      .then(response => {
         if (response.status === 201) {
           showToast({
             description: t(
               "allergySuccessfullyAdded",
               "Allergy has been added successfully"
-            ),
+            )
           });
-          fetchAllergyByUuid(response.data.uuid).subscribe((allergy) => {
-            props.match.params["setAllergies"]([
-              ...props.match.params["allergies"],
-              allergy,
-            ]);
+          fetchAllergyByUuid(response.data.uuid).subscribe(allergy => {
+            match.params.setAllergies([...match.params.allergies, allergy]);
             navigate();
           }, createErrorHandler());
         }
@@ -223,15 +264,15 @@ export default function AllergyForm(props: AllergyFormProps) {
       codedAllergenUuid: patientAllergy?.allergen?.codedAllergen?.uuid,
       severityUuid: reactionSeverityUuid,
       comment: allergyComment,
-      reactionUuids: selectedAllergicReactions,
+      reactionUuids: selectedAllergicReactions
     };
     const abortController = new AbortController();
     updatePatientAllergy(
       allergy,
       patientUuid,
-      props.match.params,
+      match.params,
       abortController
-    ).then((response) => {
+    ).then(response => {
       response.status === 200 && navigate();
     }, createErrorHandler);
     return () => abortController.abort();
@@ -239,44 +280,31 @@ export default function AllergyForm(props: AllergyFormProps) {
 
   function navigate() {
     history.push(`/patient/${patientUuid}/chart/allergies`);
-    props.closeComponent();
+    closeComponent();
   }
 
-  const allergyHasReaction = (uuid) => {
+  const allergyHasReaction = (uuid: string) => {
     return patientAllergy?.reactions?.some(
-      (reaction) => reaction?.reaction?.uuid === uuid
+      reaction => reaction?.reaction?.uuid === uuid
     );
   };
 
   const handleDeletePatientAllergy = () => {
     const abortController = new AbortController();
-    deletePatientAllergy(patientUuid, props.match.params, abortController).then(
-      (response) => {
+    deletePatientAllergy(patientUuid, match.params, abortController).then(
+      response => {
         response.status === 204 && navigate();
       }
     );
   };
 
-  const getAllergyType = (allergyConcept: string): string => {
-    switch (allergyConcept) {
-      case AllergyConcept.DRUG_ALLERGEN:
-        return "DRUG";
-      case AllergyConcept.FOOD_ALLERGEN:
-        return "FOOD";
-      case AllergyConcept.ENVIRONMENTAL_ALLERGEN:
-        return "ENVIRONMENT";
-      default:
-        "NO ALLERGEN";
-    }
-  };
-
-  const handleAllergenChange = (event) => {
+  const handleAllergenChange = event => {
     setAllergensArray(null);
     setAllergenType(getAllergyType(event));
     setSelectedAllergyCategory(event);
   };
 
-  const closeForm = (event: SyntheticEvent<HTMLButtonElement, MouseEvent>) => {
+  const closeForm = () => {
     formRef.current.reset();
     let userConfirmed: boolean = false;
     if (formChanged) {
@@ -286,11 +314,11 @@ export default function AllergyForm(props: AllergyFormProps) {
     }
 
     if (userConfirmed && formChanged) {
-      props.entryCancelled();
-      props.closeComponent();
+      entryCancelled();
+      closeComponent();
     } else if (!formChanged) {
-      props.entryCancelled();
-      props.closeComponent();
+      entryCancelled();
+      closeComponent();
     }
   };
 
@@ -300,7 +328,7 @@ export default function AllergyForm(props: AllergyFormProps) {
         name={t("Record a new allergy", "Record a new allergy")}
         styles={{
           width: "100%",
-          background: "var(--omrs-color-bg-medium-contrast)",
+          background: "var(--omrs-color-bg-medium-contrast)"
         }}
       >
         <form
@@ -308,7 +336,7 @@ export default function AllergyForm(props: AllergyFormProps) {
           onSubmit={handleCreateFormSubmit}
           onChange={() => {
             setFormChanged(true);
-            return props.entryStarted();
+            return entryStarted();
           }}
         >
           <h4 className={`${styles.allergyHeader}`}>
@@ -356,7 +384,7 @@ export default function AllergyForm(props: AllergyFormProps) {
                   labelPosition="right"
                   orientation="vertical"
                   name="allergen"
-                  onChange={(evt) => setCodedAllergenUuid(evt.toString())}
+                  onChange={evt => setCodedAllergenUuid(evt.toString())}
                 >
                   {allergensArray.map((allergen, index) => (
                     <RadioButton
@@ -401,7 +429,7 @@ export default function AllergyForm(props: AllergyFormProps) {
                   labelPosition="right"
                   orientation="vertical"
                   name="reactionSeverity"
-                  onChange={(evt) => setReactionSeverityUuid(evt.toString())}
+                  onChange={evt => setReactionSeverityUuid(evt.toString())}
                 >
                   <RadioButton
                     id="mild"
@@ -436,7 +464,7 @@ export default function AllergyForm(props: AllergyFormProps) {
                     placeholder="mm/dd/yyyy"
                     type="text"
                     labelText=""
-                    onChange={(evt) => setFirstOnsetDate(evt.target.value)}
+                    onChange={evt => setFirstOnsetDate(evt.target.value)}
                   />
                 </DatePicker>
               </div>
@@ -449,7 +477,7 @@ export default function AllergyForm(props: AllergyFormProps) {
                   invalidText="A valid value is required"
                   labelText=""
                   rows={6}
-                  onChange={(evt) => setComment(evt.target.value)}
+                  onChange={evt => setComment(evt.target.value)}
                 />
               </div>
             </div>
@@ -484,7 +512,7 @@ export default function AllergyForm(props: AllergyFormProps) {
         name={t("Edit existing allergy", "Edit existing allergy")}
         styles={{
           width: "100%",
-          background: "var(--omrs-color-bg-medium-contrast)",
+          background: "var(--omrs-color-bg-medium-contrast)"
         }}
       >
         {patientAllergy && allergicReactions?.length && (
@@ -493,7 +521,7 @@ export default function AllergyForm(props: AllergyFormProps) {
             onSubmit={handleEditFormSubmit}
             onChange={() => {
               setFormChanged(true);
-              return props.entryStarted();
+              return entryStarted();
             }}
           >
             <div>
@@ -540,7 +568,7 @@ export default function AllergyForm(props: AllergyFormProps) {
                     labelPosition="right"
                     orientation="vertical"
                     name="reactionSeverity"
-                    onChange={(evt) => setReactionSeverityUuid(evt.toString())}
+                    onChange={evt => setReactionSeverityUuid(evt.toString())}
                     valueSelected={patientAllergy?.severity?.uuid}
                   >
                     <RadioButton
@@ -576,7 +604,7 @@ export default function AllergyForm(props: AllergyFormProps) {
                       ).format("MM/DD/YYYY")}
                       labelText="Date of first onset"
                       hideLabel={true}
-                      onChange={(evt) => setUpdatedOnsetDate(evt.target.value)}
+                      onChange={evt => setUpdatedOnsetDate(evt.target.value)}
                       max={new Date().toUTCString()}
                     />
                   </DatePicker>
@@ -592,7 +620,7 @@ export default function AllergyForm(props: AllergyFormProps) {
                     defaultValue={patientAllergy?.comment}
                     rows={6}
                     name="comments"
-                    onChange={(evt) => setAllergyComment(evt.target.value)}
+                    onChange={evt => setAllergyComment(evt.target.value)}
                   />
                 </div>
               </div>
@@ -638,35 +666,6 @@ export default function AllergyForm(props: AllergyFormProps) {
       {isEditFormActive ? editAllergy() : createAllergy()}
     </div>
   );
-}
-
-AllergyForm.defaultProps = {
-  entryStarted: () => {},
-  entryCancelled: () => {},
-  entrySubmitted: () => {},
-  closeComponent: () => {},
 };
 
-enum AllergyConcept {
-  DRUG_ALLERGEN = "162552AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-  ENVIRONMENTAL_ALLERGEN = "162554AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-  FOOD_ALLERGEN = "162553AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-  MILD_REACTION_SEVERITY = "1498AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-  MODERATE_REACTION_SEVERITY = "1499AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-  SEVERE_REACTION_SEVERITY = "1500AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-}
-
-type AllergyFormProps = DataCaptureComponentProps & { match: match };
-
-type PatientAllergy = {
-  allergenType: string;
-  codedAllergenUuid: string;
-  severityUuid: string;
-  comment: string;
-  reactionUuids: Array<SelectedAllergicReaction>;
-};
-
-type SelectedAllergicReaction = {
-  display?: string;
-  uuid: string;
-};
+export default AllergyForm;

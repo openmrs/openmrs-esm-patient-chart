@@ -1,94 +1,110 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import CameraFrame from "./camera-frame.component";
 import ImagePreview from "./image-preview.component";
 import styles from "./camera-upload.css";
 import Camera from "react-html5-camera-photo";
 import { createAttachment } from "./attachments.resource";
-import { useCurrentPatient } from "@openmrs/esm-framework";
 import { useTranslation } from "react-i18next";
 import { Attachment } from "./attachments-overview.component";
 import "react-html5-camera-photo/build/css/index.css";
 import "./styles.css";
 
-export default function CameraUpload(props: CameraUploadProps) {
-  const [cameraIsOpen, setCameraIsOpen] = useState(props.openCameraOnRender);
+export interface CameraUploadProps {
+  openCameraOnRender?: boolean;
+  collectCaption?: boolean;
+  shouldNotRenderButton?: boolean;
+  patientUuid: string;
+  closeCamera?(): void;
+  onTakePhoto?(dataUri: string): void;
+  delegateSaveImage?(
+    dataUri: string,
+    selectedFile: File,
+    caption: string
+  ): void;
+  selectedFile?: File;
+  onNewAttachment?(att: Attachment): void;
+}
+
+const CameraUpload: React.FC<CameraUploadProps> = ({
+  openCameraOnRender,
+  onNewAttachment,
+  delegateSaveImage,
+  closeCamera,
+  onTakePhoto,
+  patientUuid,
+  shouldNotRenderButton,
+  collectCaption = true,
+}) => {
+  const [cameraIsOpen, setCameraIsOpen] = useState(openCameraOnRender);
   const [dataUri, setDataUri] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
   const { t } = useTranslation();
 
-  const [
-    isLoadingPatient,
-    patient,
-    patientUuid,
-    patientErr,
-  ] = useCurrentPatient();
-
-  function openCamera() {
+  const openCamera = useCallback(() => {
     setCameraIsOpen(true);
-  }
+  }, []);
 
-  function handleCloseCamera() {
+  const handleCloseCamera = useCallback(() => {
     setCameraIsOpen(false);
-    props.openCameraOnRender = false;
-    if (props.closeCamera) {
-      props.closeCamera();
-    }
+    openCameraOnRender = false;
+    closeCamera?.();
     clearCamera();
-  }
+  }, []);
 
-  function handleTakePhoto(dataUri: string) {
+  const handleTakePhoto = useCallback((dataUri: string) => {
     setDataUri(dataUri);
-    if (props.onTakePhoto) {
-      props.onTakePhoto(dataUri);
-    }
-  }
+    onTakePhoto?.(dataUri);
+  }, []);
 
-  function handleCancelCapture() {
-    clearCamera();
-  }
-
-  function clearCamera() {
+  const clearCamera = useCallback(() => {
     setDataUri("");
     setSelectedFile(null);
-  }
+  }, []);
 
-  function handleSaveImage(dataUri: string, caption: string) {
-    const abortController = new AbortController();
-    createAttachment(patientUuid, null, caption, abortController, dataUri).then(
-      (res) => {
-        const att = {
+  const handleSaveImage = useCallback(
+    (dataUri: string, caption: string) => {
+      const abortController = new AbortController();
+      createAttachment(
+        patientUuid,
+        null,
+        caption,
+        abortController,
+        dataUri
+      ).then((res) => {
+        onNewAttachment?.({
           id: `${res.data.uuid}`,
-          src: `/openmrs/ws/rest/v1/attachment/${res.data.uuid}/bytes`,
-          thumbnail: `/openmrs/ws/rest/v1/attachment/${res.data.uuid}/bytes`,
+          src: `${window.openmrsBase}/ws/rest/v1/attachment/${res.data.uuid}/bytes`,
+          thumbnail: `${window.openmrsBase}/ws/rest/v1/attachment/${res.data.uuid}/bytes`,
           thumbnailWidth: 320,
           thumbnailHeight: 212,
           caption: res.data.comment,
           isSelected: false,
-        };
-        if (props.onNewAttachment) {
-          props.onNewAttachment(att);
-        }
-      }
-    );
-  }
+        });
+      });
+    },
+    [patientUuid]
+  );
 
-  function willSaveImage(dataUri: string, selectedFile: File, caption: string) {
-    if (props.delegateSaveImage) {
-      props.delegateSaveImage(dataUri, selectedFile, caption);
-    } else {
-      // fallback to default implementation
-      handleSaveImage(dataUri, caption);
-    }
-    clearCamera();
-  }
+  const willSaveImage = useCallback(
+    (dataUri: string, selectedFile: File, caption: string) => {
+      if (delegateSaveImage) {
+        delegateSaveImage(dataUri, selectedFile, caption);
+      } else {
+        // fallback to default implementation
+        handleSaveImage(dataUri, caption);
+      }
+      clearCamera();
+    },
+    []
+  );
 
   useEffect(() => {
-    setCameraIsOpen(props.openCameraOnRender);
-  }, [props.openCameraOnRender]);
+    setCameraIsOpen(openCameraOnRender);
+  }, [openCameraOnRender]);
 
   return (
     <div className={styles.cameraSection}>
-      {!props.shouldNotRenderButton && (
+      {!shouldNotRenderButton && (
         <button className="cameraButton" onClick={openCamera}>
           {t("camera", "Camera")}
         </button>
@@ -103,9 +119,9 @@ export default function CameraUpload(props: CameraUploadProps) {
             <ImagePreview
               dataUri={dataUri}
               selectedFile={selectedFile}
-              onCancelCapture={handleCancelCapture}
+              onCancelCapture={clearCamera}
               onSaveImage={willSaveImage}
-              collectCaption={props.collectCaption ?? true}
+              collectCaption={collectCaption}
             />
           ) : (
             <div id="camera-inner-wrapper">
@@ -116,19 +132,6 @@ export default function CameraUpload(props: CameraUploadProps) {
       )}
     </div>
   );
-}
-
-type CameraUploadProps = {
-  openCameraOnRender?: boolean;
-  collectCaption?: boolean;
-  shouldNotRenderButton?: boolean;
-  closeCamera?(): void;
-  onTakePhoto?(dataUri: string): void;
-  delegateSaveImage?(
-    dataUri: string,
-    selectedFile: File,
-    caption: string
-  ): void;
-  selectedFile?: File;
-  onNewAttachment?(att: Attachment): void;
 };
+
+export default CameraUpload;

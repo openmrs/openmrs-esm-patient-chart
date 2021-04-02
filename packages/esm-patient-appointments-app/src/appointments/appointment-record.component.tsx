@@ -5,10 +5,11 @@ import dayjs from "dayjs";
 import VerticalLabelValue from "../cards/vertical-label-value.component";
 import styles from "./appointment-record.css";
 import RecordDetails from "../cards/record-details-card.component";
-import { useCurrentPatient, createErrorHandler } from "@openmrs/esm-framework";
+import { createErrorHandler } from "@openmrs/esm-framework";
 import { RouteComponentProps } from "react-router-dom";
 import { useTranslation, Trans } from "react-i18next";
 import { getAppointmentsByUuid } from "./appointments.resource";
+import { useAppointmentsContext } from "./appointments.context";
 
 function openWorkspaceTab(_1: any, _2: any) {
   //TODO
@@ -19,13 +20,7 @@ export interface AppointmentRecordProps
 
 export default function AppointmentRecord(props: AppointmentRecordProps) {
   const [patientAppointment, setPatientAppointment] = useState(null);
-  const [
-    isLoadingPatient,
-    patient,
-    patientUuid,
-    patientErr
-  ] = useCurrentPatient();
-  const [startDate, setStartDate] = useState(dayjs().format());
+  const { patientUuid } = useAppointmentsContext();
   const { t } = useTranslation();
   const { appointmentUuid } = props.match.params;
 
@@ -38,7 +33,7 @@ export default function AppointmentRecord(props: AppointmentRecordProps) {
 
       return () => abortController.abort();
     }
-  }, [patientUuid, appointmentUuid, startDate]);
+  }, [patientUuid, appointmentUuid]);
 
   return (
     <>

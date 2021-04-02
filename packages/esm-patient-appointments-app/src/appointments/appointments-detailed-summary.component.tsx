@@ -4,7 +4,7 @@ import SummaryCard from "../cards/summary-card.component";
 import styles from "./appointments-detailed-summary.css";
 import AppointmentsForm from "./appointments-form.component";
 import EmptyState from "./empty-state/empty-state.component";
-import { useCurrentPatient, createErrorHandler } from "@openmrs/esm-framework";
+import { createErrorHandler } from "@openmrs/esm-framework";
 import { getAppointments } from "./appointments.resource";
 import { Link } from "react-router-dom";
 import { useTranslation, Trans } from "react-i18next";
@@ -13,19 +13,16 @@ function openWorkspaceTab(_1: any, _2: any) {
   //TODO
 }
 
-export default function AppointmentsDetailedSummary(
-  props: AppointmentsDetailedSummaryProps
-) {
-  const [patientAppointments, setPatientAppointments] = useState([]);
-  const [
-    isLoadingPatient,
-    patient,
-    patientUuid,
-    patientErr
-  ] = useCurrentPatient();
-  const { t } = useTranslation();
+interface AppointmentsDetailedSummaryProps {
+  patientUuid: string;
+}
 
-  const [startDate, setStartDate] = useState(dayjs().format());
+export default function AppointmentsDetailedSummary({
+  patientUuid
+}: AppointmentsDetailedSummaryProps) {
+  const [patientAppointments, setPatientAppointments] = useState([]);
+  const { t } = useTranslation();
+  const [startDate] = useState(dayjs().format());
 
   useEffect(() => {
     if (patientUuid) {
@@ -123,5 +120,3 @@ export default function AppointmentsDetailedSummary(
     </>
   );
 }
-
-type AppointmentsDetailedSummaryProps = {};

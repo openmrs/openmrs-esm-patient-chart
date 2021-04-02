@@ -1,35 +1,52 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Button from "carbon-components-react/lib/components/Button";
 import CameraUpload from "./camera-upload.component";
 import placeholder from "../assets/placeholder.png";
 import { toOmrsIsoString } from "@openmrs/esm-framework";
 
-export default function CapturePhoto(props: CapturePhotoProps) {
+export interface CapturePhotoProps {
+  patientUuid?: string;
+  onCapturePhoto(
+    dataUri: string,
+    selectedFile: File,
+    photoDateTime: string
+  ): void;
+  initialState?: string;
+}
+
+const CapturePhoto: React.FC<CapturePhotoProps> = ({
+  patientUuid,
+  initialState,
+  onCapturePhoto,
+}) => {
   const [openCamera, setOpenCamera] = useState(false);
   const [dataUri, setDataUri] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [currentPhoto, setCurrentPhoto] = useState(placeholder);
   const altText = "Photo preview";
-  const showCamera = () => {
+  const showCamera = useCallback(() => {
     setOpenCamera(true);
-  };
-
-  const closeCamera = () => {
-    setOpenCamera(false);
-  };
-
-  useEffect(() => {
-    if (props.initialState) {
-      setCurrentPhoto(props.initialState);
-    }
   }, []);
 
-  const processCapturedImage = (dataUri: string, selectedFile: File) => {
-    closeCamera();
-    setDataUri(dataUri);
-    setSelectedFile(selectedFile);
-    props.onCapturePhoto(dataUri, selectedFile, toOmrsIsoString(new Date()));
-  };
+  const closeCamera = useCallback(() => {
+    setOpenCamera(false);
+  }, []);
+
+  const processCapturedImage = useCallback(
+    (dataUri: string, selectedFile: File) => {
+      closeCamera();
+      setDataUri(dataUri);
+      setSelectedFile(selectedFile);
+      onCapturePhoto(dataUri, selectedFile, toOmrsIsoString(new Date()));
+    },
+    [onCapturePhoto]
+  );
+
+  useEffect(() => {
+    if (initialState) {
+      setCurrentPhoto(initialState);
+    }
+  }, []);
 
   return (
     <div style={{ display: "flex" }}>
@@ -47,12 +64,13 @@ export default function CapturePhoto(props: CapturePhotoProps) {
         />
       </div>
       <div>
-        <Button kind="ghost" onClick={(e) => showCamera()}>
+        <Button kind="ghost" onClick={showCamera}>
           Change
         </Button>
         <CameraUpload
+          patientUuid={patientUuid}
           openCameraOnRender={openCamera}
-          shouldNotRenderButton={true}
+          shouldNotRenderButton
           closeCamera={closeCamera}
           delegateSaveImage={processCapturedImage}
           collectCaption={false}
@@ -60,13 +78,6 @@ export default function CapturePhoto(props: CapturePhotoProps) {
       </div>
     </div>
   );
-}
+};
 
-interface CapturePhotoProps {
-  onCapturePhoto(
-    dataUri: string,
-    selectedFile: File,
-    photoDateTime: string
-  ): void;
-  initialState?: string;
-}
+export default CapturePhoto;
