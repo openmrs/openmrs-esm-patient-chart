@@ -5,13 +5,13 @@ import WorkspaceWrapper from "../../workspace/workspace-wrapper.component";
 import ChartReview from "../../view-components/chart-review.component";
 import VisitDialog from "../../visit/visit-dialog.component";
 import { RouteComponentProps } from "react-router-dom";
-import SideMenu from "../view-components/side-menu.component";
+import SideMenu from "../../view-components/side-menu.component";
 import {
   ExtensionSlot,
   useCurrentPatient,
   useLayoutType
 } from "@openmrs/esm-framework";
-import { getPageWidth } from "../utils";
+import { getPageWidth } from "../../utils";
 
 interface PatientChartParams {
   patientUuid: string;
