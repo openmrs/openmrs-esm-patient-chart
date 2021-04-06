@@ -13,7 +13,7 @@ function setupOpenMRS() {
 
   const options = {
     featureName: "patient-allergies",
-    moduleName,
+    moduleName
   };
 
   defineConfigSchema(moduleName, {});
@@ -28,8 +28,8 @@ function setupOpenMRS() {
           options
         ),
         meta: {
-          columnSpan: 2,
-        },
+          columnSpan: 2
+        }
       },
       {
         id: "allergies-details-widget",
@@ -39,10 +39,10 @@ function setupOpenMRS() {
           options
         ),
         meta: {
-          columnSpan: 1,
-        },
-      },
-    ],
+          columnSpan: 1
+        }
+      }
+    ]
   };
 }
 

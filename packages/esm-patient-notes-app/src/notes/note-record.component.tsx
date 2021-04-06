@@ -23,7 +23,7 @@ export default function NoteRecord({ match }: NoteRecordProps) {
   useEffect(() => {
     if (patient && encounterUuid) {
       const sub = fetchEncounterByUuid(encounterUuid).subscribe(
-        (note) => setNote(note),
+        note => setNote(note),
         createErrorHandler()
       );
       return () => sub.unsubscribe();
@@ -61,7 +61,7 @@ export default function NoteRecord({ match }: NoteRecordProps) {
           </SummaryCard>
           {note.obs && note.obs.length && (
             <RecordDetails>
-              {note.obs.map((ob) => {
+              {note.obs.map(ob => {
                 return (
                   <Fragment key={ob.uuid}>
                     <p>{ob.display}</p>

@@ -10,10 +10,7 @@ import { RouteComponentProps } from "react-router-dom";
 import { useTranslation, Trans } from "react-i18next";
 import { getAppointmentsByUuid } from "./appointments.resource";
 import { useAppointmentsContext } from "./appointments.context";
-
-function openWorkspaceTab(_1: any, _2: any) {
-  //TODO
-}
+import { openWorkspaceTab } from "./openWorkspaceTab";
 
 export interface AppointmentRecordProps
   extends RouteComponentProps<{ appointmentUuid: string }> {}

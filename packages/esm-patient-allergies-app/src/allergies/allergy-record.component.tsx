@@ -9,10 +9,7 @@ import { useTranslation } from "react-i18next";
 import { createErrorHandler } from "@openmrs/esm-framework";
 import { Allergy, fetchAllergyByUuid } from "./allergy-intolerance.resource";
 import { useAllergiesContext } from "./allergies.context";
-
-function openWorkspaceTab(_1: any, _2: any, _3: any) {
-  //TODO
-}
+import { openWorkspaceTab } from "./openWorkspaceTab";
 
 interface AllergyRecordProps
   extends RouteComponentProps<{ allergyUuid: string }> {}

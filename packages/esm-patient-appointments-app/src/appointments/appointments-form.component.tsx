@@ -6,7 +6,7 @@ import {
   getSession,
   createAppointment,
   getAppointmentService,
-  getAppointmentServiceAll,
+  getAppointmentServiceAll
 } from "./appointments.resource";
 import { useHistory } from "react-router-dom";
 import { Trans, useTranslation } from "react-i18next";
@@ -33,7 +33,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
   patientUuid,
   entryStarted = () => {},
   entryCancelled = () => {},
-  closeComponent = () => {},
+  closeComponent = () => {}
 }) => {
   const formRef = useRef<HTMLFormElement>(null);
   const [currentSession, setCurrentSession] = useState(null);
@@ -68,7 +68,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
       getAppointmentServiceAll(abortController).then(({ data }) => {
         setAppointmentService(data);
       }, createErrorHandler());
-      getSession(abortController).then((response) => {
+      getSession(abortController).then(response => {
         setCurrentSession(response?.data);
         setLocation(response?.data?.sessionLocation?.uuid);
       }, createErrorHandler());
@@ -123,10 +123,10 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
       locationUuid: location,
       patientUuid: patientUuid,
       status: null,
-      providerUuid: currentSession.currentProvider.uuid,
+      providerUuid: currentSession.currentProvider.uuid
     };
     const abortController = new AbortController();
-    createAppointment(appointment, abortController).then((response) => {
+    createAppointment(appointment, abortController).then(response => {
       response.status === 200 && navigate();
     }, createErrorHandler());
   };
@@ -154,13 +154,13 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
             name="select-service"
             value={serviceUuid}
             defaultChecked={true}
-            onChange={(event) => setServiceUuid(event.target.value)}
+            onChange={event => setServiceUuid(event.target.value)}
           >
             <option key={0} value={"default"}>
               {t("selectService", "Select service")}
             </option>
             {appointmentService &&
-              appointmentService.map((service) => (
+              appointmentService.map(service => (
                 <option value={service.uuid} key={service.uuid}>
                   {service.name}
                 </option>
@@ -174,11 +174,11 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
           <select
             name="serviceType"
             id="serviceType"
-            onChange={(event) => setServiceTypeUuid(event.target.value)}
+            onChange={event => setServiceTypeUuid(event.target.value)}
             defaultValue={serviceTypeUuid}
           >
             {appointmentServiceType &&
-              appointmentServiceType.map((serviceType) => {
+              appointmentServiceType.map(serviceType => {
                 return (
                   <option key={serviceType.uuid} value={serviceType.uuid}>
                     {serviceType.name}
@@ -197,7 +197,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                 id="date"
                 type="date"
                 name="datepicker"
-                onChange={(event) => setAppointmentDate(event.target.value)}
+                onChange={event => setAppointmentDate(event.target.value)}
                 required
               />
               <svg className="omrs-icon" role="img">
@@ -214,9 +214,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                 id="startTime"
                 type="time"
                 name="datepicker"
-                onChange={(event) =>
-                  setAppointmentStartTime(event.target.value)
-                }
+                onChange={event => setAppointmentStartTime(event.target.value)}
                 required
               />
               <svg className="omrs-icon" role="img">
@@ -233,7 +231,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                 id="endTime"
                 type="time"
                 name="datepicker"
-                onChange={(event) => setAppointmentEndTime(event.target.value)}
+                onChange={event => setAppointmentEndTime(event.target.value)}
                 required
               />
               <svg className="omrs-icon" role="img">
@@ -248,7 +246,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
               <input
                 type="checkbox"
                 name="omrs-checkbox"
-                onChange={(event) => setAppointmentKind(event.target.value)}
+                onChange={event => setAppointmentKind(event.target.value)}
                 style={{ marginRight: "0.5rem" }}
                 value="WalkIn"
               />
@@ -266,7 +264,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
             name="notes"
             id="notes"
             rows={5}
-            onChange={(event) => setComment(event.target.value)}
+            onChange={event => setComment(event.target.value)}
           />
         </div>
         <div

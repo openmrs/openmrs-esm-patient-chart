@@ -1,7 +1,7 @@
 import {
   openmrsFetch,
   openmrsObservableFetch,
-  fhirBaseUrl,
+  fhirBaseUrl
 } from "@openmrs/esm-framework";
 import { map } from "rxjs/operators";
 import { AllergyData, AllergicReaction, FHIRAllergy } from "../types";
@@ -13,9 +13,9 @@ export function performPatientAllergySearch(patientIdentifier: string) {
     `${fhirBaseUrl}/AllergyIntolerance?patient.identifier=${patientIdentifier}`
   ).pipe(
     map(({ data }) => data["entry"]),
-    map((entries) => entries?.map((entry) => entry?.resource) ?? []),
-    map((data) => formatAllergies(data)),
-    map((data) => data.sort((a, b) => (b.lastUpdated > a.lastUpdated ? 1 : -1)))
+    map(entries => entries?.map(entry => entry?.resource) ?? []),
+    map(data => formatAllergies(data)),
+    map(data => data.sort((a, b) => (b.lastUpdated > a.lastUpdated ? 1 : -1)))
   );
 }
 
@@ -30,7 +30,7 @@ export function fetchAllergyByUuid(allergyUuid: string) {
 
 function mapAllergyProperties(allergy: FHIRAllergy): Allergy {
   let manifestations: Array<string> = [];
-  allergy?.reaction[0]?.manifestation?.map((coding) =>
+  allergy?.reaction[0]?.manifestation?.map(coding =>
     manifestations.push(coding.coding[0]?.display)
   );
   const formattedAllergy: Allergy = {
@@ -45,7 +45,7 @@ function mapAllergyProperties(allergy: FHIRAllergy): Allergy {
     reactionToSubstance: allergy?.reaction[0]?.substance?.coding[1]?.display,
     reactionManifestations: manifestations,
     reactionSeverity: allergy?.reaction[0]?.severity,
-    lastUpdated: allergy?.meta?.lastUpdated,
+    lastUpdated: allergy?.meta?.lastUpdated
   };
   return formattedAllergy;
 }
@@ -62,7 +62,7 @@ export function getPatientAllergyByPatientUuid(
   return openmrsFetch<AllergyData>(
     `/ws/rest/v1/patient/${patientUuid}/allergy/${allergyUuid.allergyUuid}?v=full`,
     {
-      signal: abortController.signal,
+      signal: abortController.signal
     }
   );
 }
@@ -87,30 +87,30 @@ export function savePatientAllergy(
   const reactions = patientAllergy.reactionUuids.map((reaction: any) => {
     return {
       reaction: {
-        uuid: reaction.uuid,
-      },
+        uuid: reaction.uuid
+      }
     };
   });
 
   return openmrsFetch(`/ws/rest/v1/patient/${patientUuid}/allergy`, {
     headers: {
-      "Content-Type": "application/json",
+      "Content-Type": "application/json"
     },
     method: "POST",
     body: {
       allergen: {
         allergenType: patientAllergy?.allergenType,
         codedAllergen: {
-          uuid: patientAllergy?.codedAllergenUuid,
-        },
+          uuid: patientAllergy?.codedAllergenUuid
+        }
       },
       severity: {
-        uuid: patientAllergy?.severityUuid,
+        uuid: patientAllergy?.severityUuid
       },
       comment: patientAllergy?.comment,
-      reactions: reactions,
+      reactions: reactions
     },
-    signal: abortController.signal,
+    signal: abortController.signal
   });
 }
 
@@ -123,8 +123,8 @@ export function updatePatientAllergy(
   const reactions = patientAllergy.reactionUuids.map((reaction: any) => {
     return {
       reaction: {
-        uuid: reaction.uuid,
-      },
+        uuid: reaction.uuid
+      }
     };
   });
 
@@ -132,23 +132,23 @@ export function updatePatientAllergy(
     `/ws/rest/v1/patient/${patientUuid}/allergy/${allergyUuid.allergyUuid}`,
     {
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/json"
       },
       method: "POST",
       body: {
         allergen: {
           allergenType: patientAllergy.allergenType,
           codedAllergen: {
-            uuid: patientAllergy.codedAllergenUuid,
-          },
+            uuid: patientAllergy.codedAllergenUuid
+          }
         },
         severity: {
-          uuid: patientAllergy.severityUuid,
+          uuid: patientAllergy.severityUuid
         },
         comment: patientAllergy.comment,
-        reactions: reactions,
+        reactions: reactions
       },
-      signal: abortController.signal,
+      signal: abortController.signal
     }
   );
 }
@@ -162,7 +162,7 @@ export function deletePatientAllergy(
     `/ws/rest/v1/patient/${patientUuid}/allergy/${allergyUuid.allergyUuid}`,
     {
       method: "DELETE",
-      signal: abortController.signal,
+      signal: abortController.signal
     }
   );
 }

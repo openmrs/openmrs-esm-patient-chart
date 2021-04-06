@@ -13,7 +13,7 @@ interface ProgramsProps {
 export default function Programs({
   basePath,
   patient,
-  patientUuid,
+  patientUuid
 }: ProgramsProps) {
   return (
     <ProgramsContext.Provider value={{ patientUuid, patient }}>

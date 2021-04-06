@@ -8,7 +8,7 @@ import {
   VisitStatus,
   VisitMode,
   getVisitsForPatient,
-  Visit,
+  Visit
 } from "@openmrs/esm-framework";
 
 interface EditVisitProps {
@@ -22,7 +22,7 @@ const EditVisit: React.FC<EditVisitProps> = ({
   onVisitStarted,
   closeComponent,
   onCanceled,
-  patientUuid,
+  patientUuid
 }) => {
   const [patientVisits, setPatientVisits] = useState<Array<Visit>>([]);
   const { t } = useTranslation();
@@ -56,7 +56,7 @@ const EditVisit: React.FC<EditVisitProps> = ({
         </thead>
         <tbody>
           {patientVisits &&
-            patientVisits.map((visit) => {
+            patientVisits.map(visit => {
               return (
                 <tr key={visit.uuid}>
                   <td>{formatVisitDate(visit.startDatetime)}</td>
@@ -76,7 +76,7 @@ const EditVisit: React.FC<EditVisitProps> = ({
                         getStartedVisit.next({
                           mode: VisitMode.EDITVISIT,
                           visitData: visit,
-                          status: VisitStatus.ONGOING,
+                          status: VisitStatus.ONGOING
                         });
                       }}
                     >
@@ -91,7 +91,7 @@ const EditVisit: React.FC<EditVisitProps> = ({
                         getStartedVisit.next({
                           mode: VisitMode.LOADING,
                           visitData: visit,
-                          status: VisitStatus.ONGOING,
+                          status: VisitStatus.ONGOING
                         });
                         closeComponent();
                       }}
@@ -109,7 +109,7 @@ const EditVisit: React.FC<EditVisitProps> = ({
           style={{
             cursor: "pointer",
             width: "25%",
-            borderRadius: "1.5rem",
+            borderRadius: "1.5rem"
           }}
           className={`omrs-btn omrs-outlined-action`}
           onClick={onCanceled}

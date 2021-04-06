@@ -13,7 +13,7 @@ interface ConditionsProps {
 export default function Conditions({
   basePath,
   patientUuid,
-  patient,
+  patient
 }: ConditionsProps) {
   return (
     <ConditionsContext.Provider value={{ patientUuid, patient }}>

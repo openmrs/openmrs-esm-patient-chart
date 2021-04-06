@@ -8,10 +8,7 @@ import { createErrorHandler } from "@openmrs/esm-framework";
 import { getAppointments } from "./appointments.resource";
 import { Link } from "react-router-dom";
 import { useTranslation, Trans } from "react-i18next";
-
-function openWorkspaceTab(_1: any, _2: any) {
-  //TODO
-}
+import { openWorkspaceTab } from "./openWorkspaceTab";
 
 interface AppointmentsDetailedSummaryProps {
   patientUuid: string;

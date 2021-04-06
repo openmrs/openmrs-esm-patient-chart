@@ -14,12 +14,12 @@ export function useVisitDialog() {
         newModalItem({
           component: <StartVisitConfirmation newModalItem={newModalItem} />,
           name: "Prompt start Visit",
-          props: { closeComponent: () => state.onPromptClosed?.() },
+          props: { closeComponent: () => state.onPromptClosed?.() }
         });
         return true;
       }
 
       return false;
-    },
+    }
   });
 }

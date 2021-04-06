@@ -13,7 +13,7 @@ interface AppointmentsProps {
 export default function Appointments({
   basePath,
   patient,
-  patientUuid,
+  patientUuid
 }: AppointmentsProps) {
   return (
     <AppointmentsContext.Provider value={{ patientUuid, patient }}>

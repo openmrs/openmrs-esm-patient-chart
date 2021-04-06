@@ -7,7 +7,7 @@ export interface NotesContextShape {
 
 export const NotesContext = createContext<NotesContextShape>({
   patientUuid: undefined,
-  patient: undefined,
+  patient: undefined
 });
 
 export function useProgramsContext() {

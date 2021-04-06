@@ -10,10 +10,7 @@ import { useTranslation, Trans } from "react-i18next";
 import { createErrorHandler } from "@openmrs/esm-framework";
 import { getConditionByUuid } from "./conditions.resource";
 import { useConditionsContext } from "./conditions.context";
-
-function openWorkspaceTab(_1: any, _2: any, _3: any) {
-  //TODO
-}
+import { openWorkspaceTab } from "./openWorkspaceTab";
 
 interface ConditionRecordProps
   extends RouteComponentProps<{ conditionUuid: string }> {}
@@ -27,7 +24,7 @@ export default function ConditionRecord(props: ConditionRecordProps) {
   useEffect(() => {
     if (patient) {
       const sub = getConditionByUuid(conditionUuid).subscribe(
-        (condition) => setPatientCondition(condition),
+        condition => setPatientCondition(condition),
         createErrorHandler()
       );
       return () => sub.unsubscribe();
@@ -50,7 +47,7 @@ export default function ConditionRecord(props: ConditionRecordProps) {
                   conditionUuid: patientCondition?.id,
                   conditionName: patientCondition?.display,
                   clinicalStatus: patientCondition?.clinicalStatus,
-                  onsetDateTime: patientCondition?.onsetDateTime,
+                  onsetDateTime: patientCondition?.onsetDateTime
                 }
               );
             }}

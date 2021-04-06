@@ -17,7 +17,7 @@ export interface CapturePhotoProps {
 const CapturePhoto: React.FC<CapturePhotoProps> = ({
   patientUuid,
   initialState,
-  onCapturePhoto,
+  onCapturePhoto
 }) => {
   const [openCamera, setOpenCamera] = useState(false);
   const [dataUri, setDataUri] = useState(null);

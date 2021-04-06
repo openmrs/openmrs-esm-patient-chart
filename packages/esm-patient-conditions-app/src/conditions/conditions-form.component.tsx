@@ -7,7 +7,7 @@ import { useTranslation, Trans } from "react-i18next";
 import { createErrorHandler } from "@openmrs/esm-framework";
 import {
   createPatientCondition,
-  updatePatientCondition,
+  updatePatientCondition
 } from "./conditions.resource";
 import { DataCaptureComponentProps } from "../types";
 
@@ -29,7 +29,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({
   patientUuid,
   entryStarted = () => {},
   entryCancelled = () => {},
-  closeComponent = () => {},
+  closeComponent = () => {}
 }) => {
   const formRef = useRef<HTMLFormElement>(null);
   const [conditionName, setConditionName] = useState("");
@@ -67,7 +67,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({
         conditionUuid,
         conditionName,
         clinicalStatus,
-        onsetDateTime,
+        onsetDateTime
       }: Condition = match.params;
       if (conditionName && clinicalStatus && onsetDateTime) {
         setViewEditForm(true);
@@ -80,17 +80,17 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({
     }
   }, [match.params]);
 
-  const handleCreateFormSubmit = (event) => {
+  const handleCreateFormSubmit = event => {
     event.preventDefault();
 
     const condition: Condition = {
       conditionName: conditionName,
       clinicalStatus: clinicalStatus,
-      onsetDateTime: onsetDateTime,
+      onsetDateTime: onsetDateTime
     };
     const abortController = new AbortController();
     createPatientCondition(condition, patientUuid, abortController)
-      .then((response) => response.status == 201 && navigate())
+      .then(response => response.status == 201 && navigate())
       .catch(createErrorHandler());
   };
 
@@ -113,7 +113,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({
           styles={{
             width: "100%",
             background: "var(--omrs-color-bg-medium-contrast)",
-            height: "auto",
+            height: "auto"
           }}
         >
           <div className={styles.conditionsContainerWrapper}>
@@ -129,7 +129,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({
                     id="conditionName"
                     className="omrs-input-outlined"
                     type="text"
-                    onChange={(event) => setConditionName(event.target.value)}
+                    onChange={event => setConditionName(event.target.value)}
                     required
                     style={{ height: "2.75rem" }}
                   />
@@ -144,7 +144,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({
                     id="onsetDate"
                     type="date"
                     name="onsetDate"
-                    onChange={(event) => setOnsetDateTime(event.target.value)}
+                    onChange={event => setOnsetDateTime(event.target.value)}
                   />
                   <svg className="omrs-icon" role="img">
                     <use xlinkHref="#omrs-icon-calendar"></use>
@@ -162,7 +162,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({
                         id="active"
                         type="radio"
                         value="active"
-                        onChange={(event) => {
+                        onChange={event => {
                           setClinicalStatus(event.target.value);
                           setInactiveStatus(false);
                         }}
@@ -178,7 +178,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({
                         id="inactive"
                         type="radio"
                         value="inactive"
-                        onChange={(event) => {
+                        onChange={event => {
                           setClinicalStatus(event.target.value);
                           setInactiveStatus(true);
                         }}
@@ -194,7 +194,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({
                         id="historyOf"
                         type="radio"
                         value="historyOf"
-                        onChange={(event) => {
+                        onChange={event => {
                           setClinicalStatus(event.target.value);
                           setInactiveStatus(true);
                         }}
@@ -217,9 +217,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({
                       id="dateOfInactivity"
                       name="dateOfInactivity"
                       defaultValue={inactivityDate}
-                      onChange={(event) =>
-                        setInactivityDate(event.target.value)
-                      }
+                      onChange={event => setInactivityDate(event.target.value)}
                     />
                     <svg className="omrs-icon" role="img">
                       <use xlinkHref="#omrs-icon-calendar"></use>
@@ -253,7 +251,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({
                 ? "omrs-btn omrs-filled-action omrs-rounded"
                 : "omrs-btn omrs-outlined omrs-rounded"
             }
-            onClick={(event) => handleCreateFormSubmit(event)}
+            onClick={event => handleCreateFormSubmit(event)}
             disabled={!enableCreateFormButtons}
           >
             <Trans i18nKey="signAndSave">Sign & Save</Trans>
@@ -263,7 +261,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({
     );
   }
 
-  const closeForm = (event) => {
+  const closeForm = event => {
     let userConfirmed: boolean = false;
     if (formChanged) {
       userConfirmed = confirm(
@@ -280,7 +278,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({
     }
   };
 
-  const handleEditSubmit = (event) => {
+  const handleEditSubmit = event => {
     event.preventDefault();
 
     const condition: Condition = {
@@ -288,11 +286,11 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({
       conditionName: conditionName,
       clinicalStatus: clinicalStatus,
       onsetDateTime: onsetDateTime,
-      inactivityDate: inactivityDate,
+      inactivityDate: inactivityDate
     };
     const abortController = new AbortController();
     updatePatientCondition(condition, patientUuid, abortController)
-      .then((response) => response.status == 200 && navigate())
+      .then(response => response.status == 200 && navigate())
       .catch(createErrorHandler());
   };
 
@@ -314,7 +312,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({
               styles={{
                 width: "100%",
                 backgroundColor: "var(--omrs-color-bg-medium-contrast)",
-                height: "auto",
+                height: "auto"
               }}
             >
               <div className={styles.conditionsContainerWrapper}>
@@ -356,7 +354,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({
                             name="currentStatus"
                             value="active"
                             defaultChecked={clinicalStatus === "active"}
-                            onChange={(event) => {
+                            onChange={event => {
                               setClinicalStatus(event.target.value);
                               setInactiveStatus(false);
                             }}
@@ -374,7 +372,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({
                             name="currentStatus"
                             value="inactive"
                             defaultChecked={clinicalStatus === "inactive"}
-                            onChange={(event) => {
+                            onChange={event => {
                               setClinicalStatus(event.target.value);
                               setInactiveStatus(true);
                             }}
@@ -392,7 +390,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({
                             name="currentStatus"
                             value="historyOf"
                             defaultChecked={clinicalStatus === "historyOf"}
-                            onChange={(event) => {
+                            onChange={event => {
                               setClinicalStatus(event.target.value);
                               setInactiveStatus(true);
                             }}
@@ -417,7 +415,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({
                           id="dateOfInactivity"
                           name="dateOfInactivity"
                           defaultValue={inactivityDate}
-                          onChange={(event) =>
+                          onChange={event =>
                             setInactivityDate(event.target.value)
                           }
                         />
@@ -459,7 +457,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({
                     ? "omrs-btn omrs-filled-action omrs-rounded"
                     : "omrs-btn omrs-outlined omrs-rounded"
                 }
-                onClick={(event) => handleEditSubmit(event)}
+                onClick={event => handleEditSubmit(event)}
                 disabled={!enableEditFormButtons}
                 style={{ width: "50%" }}
               >

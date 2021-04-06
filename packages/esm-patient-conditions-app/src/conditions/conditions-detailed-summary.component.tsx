@@ -1,21 +1,18 @@
 import React, { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import capitalize from "lodash-es/capitalize";
-import SummaryCard from "../cards/summary-card.component";
 import EmptyState from "./empty-state/empty-state.component";
 import ConditionsForm from "./conditions-form.component";
 import styles from "./conditions-detailed-summary.css";
+import SummaryCard from "../cards/summary-card.component";
 import { Link } from "react-router-dom";
 import { useTranslation, Trans } from "react-i18next";
 import { createErrorHandler } from "@openmrs/esm-framework";
 import {
   Condition,
-  performPatientConditionsSearch,
+  performPatientConditionsSearch
 } from "./conditions.resource";
-
-function openWorkspaceTab(_1: any, _2: any) {
-  //TODO
-}
+import { openWorkspaceTab } from "./openWorkspaceTab";
 
 interface ConditionsDetailedSummaryProps {
   basePath: string;
@@ -24,7 +21,7 @@ interface ConditionsDetailedSummaryProps {
 
 const ConditionsDetailedSummary: React.FC<ConditionsDetailedSummaryProps> = ({
   patient,
-  basePath,
+  basePath
 }) => {
   const [patientConditions, setPatientConditions] = useState<Array<Condition>>(
     null
@@ -36,7 +33,7 @@ const ConditionsDetailedSummary: React.FC<ConditionsDetailedSummaryProps> = ({
     if (patient) {
       const sub = performPatientConditionsSearch(
         patient.identifier[0].value
-      ).subscribe((conditions) => {
+      ).subscribe(conditions => {
         setPatientConditions(conditions);
       }, createErrorHandler());
 
@@ -74,7 +71,7 @@ const ConditionsDetailedSummary: React.FC<ConditionsDetailedSummaryProps> = ({
               </tr>
             </thead>
             <tbody>
-              {patientConditions.map((condition) => {
+              {patientConditions.map(condition => {
                 return (
                   <React.Fragment key={condition.id}>
                     <tr
