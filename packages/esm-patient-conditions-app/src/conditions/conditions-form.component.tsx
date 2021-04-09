@@ -144,6 +144,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({
                     id="onsetDate"
                     type="date"
                     name="onsetDate"
+                    max={dayjs(new Date().toUTCString()).format("YYYY-MM-DD")}
                     onChange={event => setOnsetDateTime(event.target.value)}
                   />
                   <svg className="omrs-icon" role="img">
