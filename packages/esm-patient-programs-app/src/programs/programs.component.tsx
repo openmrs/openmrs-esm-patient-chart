@@ -17,7 +17,7 @@ export default function Programs({
 }: ProgramsProps) {
   return (
     <ProgramsContext.Provider value={{ patientUuid, patient }}>
-      <BrowserRouter basename={`${basePath}/programs/details`}>
+      <BrowserRouter basename={`${window.spaBase}${basePath}/programs`}>
         <Switch>
           <Route exact path="/" component={ProgramsDetailedSummary} />
           <Route exact path="/:programUuid" component={ProgramRecord} />

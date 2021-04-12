@@ -53,6 +53,7 @@ export default function GridView({
 
   return (
     <ExtensionSlot
+      key={slot}
       extensionSlotName={slot}
       className={styles.dashboard}
       style={{ gridTemplateColumns }}

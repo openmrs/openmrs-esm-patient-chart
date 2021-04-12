@@ -82,6 +82,7 @@ export interface TabbedViewProps {
 const TabbedView: React.FC<TabbedViewProps> = ({
   name,
   slot,
+  patient,
   patientUuid,
   tab
 }) => {
@@ -92,9 +93,10 @@ const TabbedView: React.FC<TabbedViewProps> = ({
       basePath: url,
       fullPath,
       patientUuid,
+      patient,
       view: tab
     }),
-    [patientUuid, tab, fullPath, url]
+    [patientUuid, patient, tab, fullPath, url]
   );
 
   return (

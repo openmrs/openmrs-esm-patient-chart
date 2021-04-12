@@ -17,7 +17,7 @@ export default function Appointments({
 }: AppointmentsProps) {
   return (
     <AppointmentsContext.Provider value={{ patientUuid, patient }}>
-      <BrowserRouter basename={`${basePath}/appointments`}>
+      <BrowserRouter basename={`${window.spaBase}${basePath}/appointments`}>
         <Switch>
           <Route exact path="/" component={AppointmentsDetailedSummary} />
           <Route exact path="/:appointmentUuid" component={AppointmentRecord} />

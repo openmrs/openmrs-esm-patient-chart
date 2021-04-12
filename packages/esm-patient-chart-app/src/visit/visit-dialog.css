@@ -1,11 +1,10 @@
 .visitModal {
-  position: absolute;
-  z-index: 1;
+  position: fixed;
+  z-index: 9000;
   left: 0;
   top: 0;
-  width: 100%;
-  height: 100vh;
-  overflow: auto;
+  right: 0;
+  bottom: 0;
   background-color: var(--omrs-color-bg-medium-contrast);
   transition: 0.3s ease all;
 }

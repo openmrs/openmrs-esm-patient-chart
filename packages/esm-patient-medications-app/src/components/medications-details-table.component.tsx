@@ -64,6 +64,10 @@ const MedicationsDetailsTable = connect<
     const [pageSize, setPageSize] = useState(10);
     const [currentMedicationPage] = paginate(medications, page, pageSize);
 
+    const openOrderBasket = React.useCallback(() => {
+      //TODO
+    }, []);
+
     const tableHeaders = [
       {
         key: "startDate",
@@ -140,8 +144,7 @@ const MedicationsDetailsTable = connect<
             {showAddNewButton && (
               <TableToolbar>
                 <TableToolbarContent>
-                  <Button renderIcon={() => <Add16 />}>
-                    {/* TODO: Navigate to order basket form once workspace providers are added. */}
+                  <Button renderIcon={Add16} onClick={openOrderBasket}>
                     {t("add", "Add")}
                   </Button>
                 </TableToolbarContent>

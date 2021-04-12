@@ -6,7 +6,7 @@ interface CustomOverflowMenuComponentProps {
 
 const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = ({
   menuTitle,
-  children
+  children,
 }) => {
   const [showMenu, toggleShowMenu] = useState(false);
   const wrapperRef = useRef(null);
@@ -35,7 +35,7 @@ const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = 
       className="bx--overflow-menu"
       style={{
         width: "auto",
-        height: "auto"
+        height: "auto",
       }}
       ref={wrapperRef}
     >
@@ -52,7 +52,7 @@ const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = 
           height: "auto",
           padding: "1em",
           color: "#0f62fe",
-          boxShadow: showMenu ? "0 2px 6px 0 rgb(0 0 0 / 30%)" : "none"
+          boxShadow: showMenu ? "0 2px 6px 0 rgb(0 0 0 / 30%)" : "none",
         }}
       >
         {menuTitle}
@@ -65,13 +65,15 @@ const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = 
         aria-labelledby="custom-actions-overflow-menu-trigger"
         id="custom-actions-overflow-menu"
         style={{
-          minWidth: "15rem",
           display: showMenu ? "block" : "none",
-          top: "3.75em"
+          top: "3.75em",
+          minWidth: "initial",
+          left: "auto",
+          right: "0",
         }}
       >
         <ul className="bx--overflow-menu-options__content">{children}</ul>
-        <span></span>
+        <span />
       </div>
     </div>
   );

@@ -2,6 +2,18 @@
 @import "~carbon-components/src/globals/scss/vars";
 @import "~carbon-components/src/globals/scss/mixins";
 
+.label01 {
+  @include carbon--type-style("label-01");
+}
+
+.bodyLong01 {
+  @include carbon--type-style("body-long-01");
+}
+
+.productiveHeading04 {
+  @include carbon--type-style("productive-heading-04");
+}
+
 .inputContainer {
   width: 8.125rem;
   border-bottom: 0.063rem solid $ui-04;

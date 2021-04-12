@@ -2,6 +2,10 @@
 @import "~carbon-components/src/globals/scss/vars";
 @import "~carbon-components/src/globals/scss/mixins";
 
+.productiveHeading03 {
+  @include carbon--type-style("productive-heading-03");
+}
+
 .vitalsBiometricContainer {
   background-color: $ui-01;
   margin-left: $spacing-05;

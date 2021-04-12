@@ -17,7 +17,7 @@ export default function Conditions({
 }: ConditionsProps) {
   return (
     <ConditionsContext.Provider value={{ patientUuid, patient }}>
-      <BrowserRouter basename={`${basePath}/conditions`}>
+      <BrowserRouter basename={`${window.spaBase}${basePath}/conditions`}>
         <Switch>
           <Route exact path="/" component={ConditionsDetailedSummary} />
           <Route exact path="/:conditionUuid" component={ConditionRecord} />

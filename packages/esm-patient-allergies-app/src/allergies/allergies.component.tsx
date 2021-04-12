@@ -17,7 +17,7 @@ export default function Allergies({
 }: AllergiesProps) {
   return (
     <AllergiesContext.Provider value={{ patientUuid, patient }}>
-      <BrowserRouter basename={`${basePath}/allergies`}>
+      <BrowserRouter basename={`${window.spaBase}${basePath}/allergies`}>
         <Switch>
           <Route exact path="/" component={AllergyDetailedSummary} />
           <Route exact path="/details/:allergyUuid" component={AllergyRecord} />

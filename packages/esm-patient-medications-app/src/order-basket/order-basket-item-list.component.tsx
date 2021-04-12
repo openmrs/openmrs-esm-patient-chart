@@ -1,8 +1,8 @@
-import OrderBasketItemTile from "./order-basket-item.component";
 import React from "react";
+import OrderBasketItemTile from "./order-basket-item.component";
+import styles from "./order-basket-item-list.scss";
 import { useTranslation } from "react-i18next";
 import { OrderBasketItem } from "../types/order-basket-item";
-import styles from "./order-basket-item-list.scss";
 
 export interface OrderBasketItemListProps {
   orderBasketItems: Array<OrderBasketItem>;
