@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import dayjs from "dayjs";
 import Button from "carbon-components-react/es/components/Button";
 import Tag from "carbon-components-react/es/components/Tag";
@@ -16,7 +16,7 @@ import {
   useVisit,
   getStartedVisit,
   VisitItem,
-  Extension
+  Extension,
 } from "@openmrs/esm-framework";
 import { useTranslation } from "react-i18next";
 
@@ -27,15 +27,17 @@ interface PatientBannerProps {
 
 const PatientBanner: React.FC<PatientBannerProps> = ({
   patient,
-  patientUuid
+  patientUuid,
 }) => {
+  const { t } = useTranslation();
   const { currentVisit } = useVisit(patientUuid);
   const [showContactDetails, setShowContactDetails] = useState(false);
   const [hasActiveVisit, setActiveVisit] = useState(false);
-  const { t } = useTranslation();
-  const toggleContactDetails = () => {
-    setShowContactDetails(!showContactDetails);
-  };
+  const state = useMemo(() => ({ patientUuid }), [patientUuid]);
+  const toggleContactDetails = useCallback(
+    () => setShowContactDetails((value) => !value),
+    []
+  );
 
   useEffect(() => {
     if (currentVisit) {
@@ -53,10 +55,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
     <div className={styles.container}>
       <div className={styles.patientBanner}>
         <div className={styles.patientAvatar}>
-          <ExtensionSlot
-            extensionSlotName="patient-photo"
-            state={{ patientUuid: patient.id }}
-          />
+          <ExtensionSlot extensionSlotName="patient-photo" state={state} />
         </div>
         <div className={styles.patientInfo}>
           <div className={(styles.row, styles.nameRow)}>
@@ -102,17 +101,9 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
                 <ExtensionSlot
                   extensionSlotName="patient-actions-slot"
                   key="patient-actions-slot"
-                >
-                  <li
-                    className={`bx--overflow-menu-options__option ${styles.overflowMenuItemList}`}
-                  >
-                    <Extension
-                      state={{
-                        patientUuid: patientUuid
-                      }}
-                    />
-                  </li>
-                </ExtensionSlot>
+                  className={styles.overflowMenuItemList}
+                  state={state}
+                />
               </CustomOverflowMenuComponent>
             </div>
           </div>
@@ -125,7 +116,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
           </div>
           <div className={styles.row}>
             <span className={styles.identifiers}>
-              {patient.identifier.map(i => i.value).join(", ")}
+              {patient.identifier.map((i) => i.value).join(", ")}
             </span>
             <Button
               kind="ghost"

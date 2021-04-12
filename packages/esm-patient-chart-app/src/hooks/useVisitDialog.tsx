@@ -1,7 +1,10 @@
 import React from "react";
 import { pushNavigationContext } from "@openmrs/esm-framework";
 import { newModalItem } from "../visit/visit-dialog.resource";
-import { StartVisitConfirmation } from "../visit/visit-button.component";
+import {
+  EndVisitConfirmation,
+  StartVisitConfirmation,
+} from "../visit/visit-button.component";
 
 export function useVisitDialog(patientUuid: string) {
   React.useEffect(
@@ -21,13 +24,26 @@ export function useVisitDialog(patientUuid: string) {
                 />
               ),
               name: "Prompt start Visit",
-              props: { closeComponent: () => state.onPromptClosed?.() }
+              props: { closeComponent: () => state.onPromptClosed?.() },
+            });
+            return true;
+          } else if (link === "/end-visit/prompt") {
+            newModalItem({
+              component: (
+                <EndVisitConfirmation
+                  patientUuid={patientUuid}
+                  visitData={state.visitData}
+                  newModalItem={newModalItem}
+                />
+              ),
+              name: "Prompt end Visit",
+              props: { closeComponent: () => state.onPromptClosed?.() },
             });
             return true;
           }
 
           return false;
-        }
+        },
       }),
     [patientUuid]
   );

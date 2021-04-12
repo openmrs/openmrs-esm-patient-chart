@@ -2,27 +2,28 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { switchTo, useVisit } from "@openmrs/esm-framework";
 
-interface StartVisitOverflowMenuItemProps {
+interface StopVisitOverflowMenuItemProps {
   patientUuid: string;
 }
 
-const StartVisitOverflowMenuItem: React.FC<StartVisitOverflowMenuItemProps> = ({
+const StopVisitOverflowMenuItem: React.FC<StopVisitOverflowMenuItemProps> = ({
   patientUuid,
 }) => {
   const { t } = useTranslation();
   const { currentVisit } = useVisit(patientUuid);
   const handleClick = React.useCallback(
-    () => switchTo("dialog", "/start-visit/prompt", {}),
-    []
+    () =>
+      switchTo("dialog", "/end-visit/prompt", { visitData: currentVisit }),
+    [currentVisit]
   );
 
   return (
-    !currentVisit && (
+    currentVisit && (
       <li className="bx--overflow-menu-options__option">
         <button
           className="bx--overflow-menu-options__btn"
           role="menuitem"
-          title={t("Start Visit", "Start Visit")}
+          title={t("End Visit", "End Visit")}
           data-floating-menu-primary-focus
           onClick={handleClick}
           style={{
@@ -30,7 +31,7 @@ const StartVisitOverflowMenuItem: React.FC<StartVisitOverflowMenuItemProps> = ({
           }}
         >
           <span className="bx--overflow-menu-options__option-content">
-            {t("Start Visit", "Start Visit")}
+            {t("End Visit", "End Visit")}
           </span>
         </button>
       </li>
@@ -38,4 +39,4 @@ const StartVisitOverflowMenuItem: React.FC<StartVisitOverflowMenuItemProps> = ({
   );
 };
 
-export default StartVisitOverflowMenuItem;
+export default StopVisitOverflowMenuItem;

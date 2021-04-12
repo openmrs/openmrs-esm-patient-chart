@@ -14,9 +14,10 @@ import {
   updateVisit,
   UpdateVisitPayload,
   getVisitsForPatient,
+  Visit,
 } from "@openmrs/esm-framework";
 
-function openVisitDashboard(componentName: string) {
+export function openVisitDashboard(componentName: string) {
   newWorkspaceItem({
     component: VisitDashboard,
     name: componentName,
@@ -108,9 +109,9 @@ const VisitButton: React.FC<VisitProps> = ({ newModalItem, patientUuid }) => {
               onClick={() => {
                 newModalItem({
                   component: (
-                    <EndVisit
+                    <EndVisitConfirmation
                       patientUuid={patientUuid}
-                      currentVisit={selectedVisit}
+                      visitData={selectedVisit.visitData}
                       newModalItem={newModalItem}
                     />
                   ),
@@ -130,7 +131,7 @@ const VisitButton: React.FC<VisitProps> = ({ newModalItem, patientUuid }) => {
                   <CloseActiveVisitConfirmation
                     patientUuid={patientUuid}
                     newModalItem={newModalItem}
-                    currentVisit={getStartedVisit.value}
+                    visitData={getStartedVisit.value.visitData}
                   />
                 ),
                 name: "Cancel Visit",
@@ -197,7 +198,7 @@ export const StartVisitConfirmation: React.FC<VisitProps> = ({
 };
 
 export const CloseActiveVisitConfirmation: React.FC<EndVisitProps> = ({
-  currentVisit,
+  visitData,
   newModalItem,
 }) => {
   const { t } = useTranslation();
@@ -205,11 +206,10 @@ export const CloseActiveVisitConfirmation: React.FC<EndVisitProps> = ({
     <div className={styles.visitPromptContainer}>
       <h2>{t("endVisitPrompt", "Are you sure you want to end this visit?")}</h2>
       <p>
-        {t("visitType", "Visit Type")}:{" "}
-        {currentVisit.visitData.visitType.display} {t("location", "Location")}:{" "}
-        {currentVisit.visitData?.location?.display}{" "}
+        {t("visitType", "Visit Type")}: {visitData.visitType.display}{" "}
+        {t("location", "Location")}: {visitData?.location?.display}{" "}
         {t("startDate", "Start Date")}:{" "}
-        {dayjs(currentVisit.visitData.startDatetime).format("DD-MMM-YYYY")}
+        {dayjs(visitData.startDatetime).format("DD-MMM-YYYY")}
       </p>
       <div className={styles.visitPromptButtonsContainer}>
         <button
@@ -233,26 +233,25 @@ export const CloseActiveVisitConfirmation: React.FC<EndVisitProps> = ({
 };
 
 interface EndVisitProps extends VisitProps {
-  currentVisit: VisitItem;
+  visitData: Visit;
 }
 
-const EndVisit: React.FC<EndVisitProps> = ({ currentVisit, newModalItem }) => {
+export const EndVisitConfirmation: React.FC<EndVisitProps> = ({ visitData, newModalItem }) => {
   const { t } = useTranslation();
   return (
     <div className={styles.visitPromptContainer}>
       <h2>{t("endVisitPrompt", "Are you sure you wish to end this visit?")}</h2>
       <p>
-        {t("visitType", "Visit Type")}:{" "}
-        {currentVisit.visitData.visitType.display} {t("location", "Location")}:{" "}
-        {currentVisit.visitData?.location?.display}{" "}
+        {t("visitType", "Visit Type")}: {visitData.visitType.display}{" "}
+        {t("location", "Location")}: {visitData?.location?.display}{" "}
         {t("startDate", "Start Date")}:{" "}
-        {dayjs(currentVisit.visitData.startDatetime).format("DD-MMM-YYYY")}
+        {dayjs(visitData.startDatetime).format("DD-MMM-YYYY")}
       </p>
       <div className={styles.visitPromptButtonsContainer}>
         <button
           className={`omrs-btn omrs-outlined-action`}
           onClick={() => {
-            visitUpdate(currentVisit);
+            visitUpdate(visitData);
             hideModal(newModalItem);
           }}
         >
@@ -269,15 +268,16 @@ const EndVisit: React.FC<EndVisitProps> = ({ currentVisit, newModalItem }) => {
   );
 };
 
-const visitUpdate = (currentVisit: VisitItem) => {
-  const visitData = currentVisit.visitData;
+function visitUpdate(visitData: Visit) {
   const abortController = new AbortController();
+
   let payload: UpdateVisitPayload = {
     location: visitData.location.uuid,
     startDatetime: visitData.startDatetime,
     visitType: visitData.visitType.uuid,
     stopDatetime: new Date(),
   };
+
   const sub = updateVisit(visitData.uuid, payload, abortController).subscribe(
     (response: FetchResponse) => {
       response.status === 200 && getStartedVisit.next(null);
@@ -285,6 +285,6 @@ const visitUpdate = (currentVisit: VisitItem) => {
   );
 
   return () => sub && sub.unsubscribe();
-};
+}
 
 export default VisitButton;
