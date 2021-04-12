@@ -6,7 +6,7 @@ import { Trans } from "react-i18next";
 
 export interface VisitDashboardProps {
   patientUuid: string;
-  closeComponent?: () => void;
+  closeComponent(): void;
 }
 
 interface VisitDashboardPropsDefaultState {

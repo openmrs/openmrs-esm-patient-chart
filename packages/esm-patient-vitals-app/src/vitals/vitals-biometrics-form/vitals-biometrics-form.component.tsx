@@ -6,7 +6,6 @@ import { useTranslation } from "react-i18next";
 import {
   useConfig,
   createErrorHandler,
-  switchTo,
   useSessionUser,
 } from "@openmrs/esm-framework";
 import { Column, Grid, Row } from "carbon-components-react/es/components/Grid";

@@ -7,13 +7,12 @@ import dayjs from "dayjs";
 import Button from "carbon-components-react/es/components/Button";
 import isEmpty from "lodash-es/isEmpty";
 import { useTranslation } from "react-i18next";
-import { switchTo } from "@openmrs/esm-framework";
+import { attach } from "@openmrs/esm-framework";
 import { PatientVitals } from "../vitals-biometrics.resource";
 
 interface VitalsHeaderStateTitleProps {
   view: string;
   vitals: PatientVitals;
-  patientUuid: string;
   toggleView(): void;
   showDetails: boolean;
 }
@@ -23,15 +22,15 @@ const VitalsHeaderStateTitle: React.FC<VitalsHeaderStateTitleProps> = ({
   vitals,
   toggleView,
   showDetails,
-  patientUuid
 }) => {
   const { t } = useTranslation();
-  const launchVitalsBiometricsForm = () => {
-    const url = `/patient/${patientUuid}/vitalsbiometrics/form`;
-    switchTo("workspace", url, {
-      title: t("recordVitalsAndBiometrics", "Record Vitals and Biometrics")
-    });
-  };
+  const launchVitalsBiometricsForm = React.useCallback(() => {
+    attach(
+      "patient-chart-workspace-slot",
+      "patient-vitals-biometrics-form-workspace"
+    );
+  }, []);
+
   return (
     <>
       {!isEmpty(vitals) ? (
@@ -72,7 +71,7 @@ const VitalsHeaderStateTitle: React.FC<VitalsHeaderStateTitleProps> = ({
               <ChevronUp20
                 className={styles.expandButton}
                 title={"ChevronUp"}
-                onClick={e => {
+                onClick={(e) => {
                   e.stopPropagation();
                   toggleView();
                 }}
@@ -81,7 +80,7 @@ const VitalsHeaderStateTitle: React.FC<VitalsHeaderStateTitleProps> = ({
               <ChevronDown20
                 className={styles.expandButton}
                 title={"ChevronDown"}
-                onClick={e => {
+                onClick={(e) => {
                   e.stopPropagation();
                   toggleView();
                 }}

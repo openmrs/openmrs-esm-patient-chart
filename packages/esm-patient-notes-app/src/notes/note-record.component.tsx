@@ -7,7 +7,7 @@ import { RouteComponentProps } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { createErrorHandler } from "@openmrs/esm-framework";
 import { fetchEncounterByUuid } from "./encounter.resource";
-import { useProgramsContext } from "./notes.context";
+import { useNotesContext } from "./notes.context";
 
 interface NoteRecordProps
   extends RouteComponentProps<{
@@ -16,14 +16,14 @@ interface NoteRecordProps
 
 export default function NoteRecord({ match }: NoteRecordProps) {
   const [note, setNote] = useState(null);
-  const { patient } = useProgramsContext();
+  const { patient } = useNotesContext();
   const { encounterUuid } = match.params;
   const { t } = useTranslation();
 
   useEffect(() => {
     if (patient && encounterUuid) {
       const sub = fetchEncounterByUuid(encounterUuid).subscribe(
-        note => setNote(note),
+        setNote,
         createErrorHandler()
       );
       return () => sub.unsubscribe();
@@ -32,7 +32,7 @@ export default function NoteRecord({ match }: NoteRecordProps) {
 
   return (
     <>
-      {!!(note && Object.entries(note).length) && (
+      {Object.keys(note || {}).length > 0 && (
         <div className={styles.noteContainer}>
           <SummaryCard name={t("note", "Note")} styles={{ width: "100%" }}>
             <div className={`omrs-type-body-regular ${styles.noteCard}`}>
@@ -59,15 +59,13 @@ export default function NoteRecord({ match }: NoteRecordProps) {
               </table>
             </div>
           </SummaryCard>
-          {note.obs && note.obs.length && (
+          {note.obs && note.obs.length > 0 && (
             <RecordDetails>
-              {note.obs.map(ob => {
-                return (
-                  <Fragment key={ob.uuid}>
-                    <p>{ob.display}</p>
-                  </Fragment>
-                );
-              })}
+              {note.obs.map((ob) => (
+                <Fragment key={ob.uuid}>
+                  <p>{ob.display}</p>
+                </Fragment>
+              ))}
             </RecordDetails>
           )}
         </div>

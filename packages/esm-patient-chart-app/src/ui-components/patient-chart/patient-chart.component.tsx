@@ -4,8 +4,9 @@ import Loader from "../loader/loader.component";
 import WorkspaceWrapper from "../../workspace/workspace-wrapper.component";
 import ChartReview from "../../view-components/chart-review.component";
 import VisitDialog from "../../visit/visit-dialog.component";
-import { RouteComponentProps } from "react-router-dom";
 import SideMenu from "../../view-components/side-menu.component";
+import { useVisitDialog } from "../../hooks/useVisitDialog";
+import { RouteComponentProps } from "react-router-dom";
 import { ExtensionSlot, useCurrentPatient } from "@openmrs/esm-framework";
 
 interface PatientChartParams {
@@ -22,6 +23,8 @@ const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({
   const state = useMemo(() => {
     return { patient, patientUuid };
   }, [patient, patientUuid]);
+
+  useVisitDialog(patientUuid);
 
   return (
     <>
@@ -48,7 +51,7 @@ const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({
                 <VisitDialog />
               </div>
               <div className={styles.workspace}>
-                <WorkspaceWrapper />
+                <WorkspaceWrapper {...state} />
               </div>
             </div>
           </div>

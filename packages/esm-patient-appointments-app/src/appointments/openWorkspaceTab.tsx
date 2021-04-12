@@ -31,7 +31,7 @@ export function openWorkspaceTab<
         match: { params: params ? params : {} }
       },
       inProgress: false,
-      validations: (workspaceTabs: Array<{ component: React.FC }>) =>
+      validations: workspaceTabs =>
         workspaceTabs.findIndex(tab => tab.component === componentToAdd)
     });
   }

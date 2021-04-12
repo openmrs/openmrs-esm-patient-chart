@@ -19,27 +19,7 @@ function setupOpenMRS() {
   defineConfigSchema(moduleName, {});
 
   return {
-    pages: [
-      {
-        load: getAsyncLifecycle(
-          () => import("./medications/root-order-basket"),
-          options
-        ),
-        route: /^patient\/.+\/drugorder\/basket/
-      }
-    ],
     extensions: [
-      {
-        id: "medications-overview-widget",
-        slot: "patient-chart-summary-dashboard-slot",
-        load: getAsyncLifecycle(
-          () => import("./medications/root-medication-summary"),
-          options
-        ),
-        meta: {
-          columnSpan: 3
-        }
-      },
       {
         id: "medications-details-widget",
         slot: "patient-chart-orders-dashboard-slot",
@@ -53,11 +33,13 @@ function setupOpenMRS() {
       },
       {
         id: "order-basket-workspace",
-        slot: "/patient/:patientUuid/drugorder/basket",
         load: getAsyncLifecycle(
           () => import("./medications/root-order-basket"),
           options
-        )
+        ),
+        meta: {
+          title: 'Order Basket', // t("orderBasket", "Order Basket")
+        },
       }
     ]
   };

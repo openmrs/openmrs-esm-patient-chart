@@ -3,7 +3,12 @@ import Workspace from "./workspace.component";
 import styles from "./workspace-wrapper.component.css";
 import { WorkspaceItem, getNewWorkspaceItem } from "@openmrs/esm-framework";
 
-const WorkspaceWrapper: React.FC = () => {
+interface WorkspaceWrapperProps {
+  patientUuid: string;
+  patient: fhir.Patient;
+}
+
+const WorkspaceWrapper: React.FC<WorkspaceWrapperProps> = (props) => {
   const [showWorkspace, setShowWorkspace] = React.useState(false);
   const [toggleMobileTableView, setToggleMobileTabletView] = React.useState<
     Boolean
@@ -12,7 +17,7 @@ const WorkspaceWrapper: React.FC = () => {
   const [selectedTab, setSelectedTab] = React.useState(null);
 
   React.useEffect(() => {
-    const sub = getNewWorkspaceItem().subscribe(item => {
+    const sub = getNewWorkspaceItem().subscribe((item) => {
       if (item.validations) {
         const validation = item.validations(openTabs);
         if (validation > -1) {
@@ -62,23 +67,21 @@ const WorkspaceWrapper: React.FC = () => {
           </button>
         )}
         {toggleMobileTableView &&
-          openTabs.map(tab => {
-            return (
-              <button
-                key={tab.name}
-                className="omrs-btn-icon-medium"
-                onClick={() => {
-                  if (openTabs.length) {
-                    setToggleMobileTabletView(!toggleMobileTableView);
-                  } else {
-                    setToggleMobileTabletView(toggleMobileTableView);
-                  }
-                }}
-              >
-                {tab.name.charAt(0)}
-              </button>
-            );
-          })}
+          openTabs.map((tab) => (
+            <button
+              key={tab.name}
+              className="omrs-btn-icon-medium"
+              onClick={() => {
+                if (openTabs.length) {
+                  setToggleMobileTabletView(!toggleMobileTableView);
+                } else {
+                  setToggleMobileTabletView(toggleMobileTableView);
+                }
+              }}
+            >
+              {tab.name.charAt(0)}
+            </button>
+          ))}
       </div>
     );
   }
@@ -91,7 +94,11 @@ const WorkspaceWrapper: React.FC = () => {
     >
       {toggleMobileAndTabletNavBar()}
       <div className={toggleMobileTableView ? styles.hide : styles.fullWidth}>
-        <Workspace showWorkspace={setShowWorkspace} openTabs={setOpenTabs} />
+        <Workspace
+          {...props}
+          showWorkspace={setShowWorkspace}
+          openTabs={setOpenTabs}
+        />
       </div>
     </div>
   );

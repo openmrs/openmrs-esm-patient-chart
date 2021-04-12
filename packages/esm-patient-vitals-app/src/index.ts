@@ -54,7 +54,6 @@ function setupOpenMRS() {
       },
       {
         id: "patient-vitals-biometrics-form-workspace",
-        slot: "/patient/:patientUuid/vitalsbiometrics/form",
         load: getAsyncLifecycle(
           () =>
             import(
@@ -62,6 +61,9 @@ function setupOpenMRS() {
             ),
           options
         ),
+        meta: {
+          title: "Record Vitals and Biometrics", //t("recordVitalsAndBiometrics", "Record Vitals and Biometrics")
+        },
       },
     ],
   };

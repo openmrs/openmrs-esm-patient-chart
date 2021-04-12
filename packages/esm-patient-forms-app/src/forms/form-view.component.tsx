@@ -15,6 +15,14 @@ function startVisitPrompt() {
   switchTo("dialog", "/start-visit/prompt", {});
 }
 
+function launchFormEntry(activeVisit: VisitItem, _: Form) {
+  if (activeVisit) {
+    //TODO launch into patient-chart-workspace-slot using formUuid: form.uuid, encounterUuid: encounterUuid;
+  } else {
+    startVisitPrompt();
+  }
+}
+
 interface FormViewProps {
   forms: Array<Form>;
   patientUuid: string;
@@ -28,48 +36,33 @@ interface checkBoxProps {
 
 const filterFormsByName = (formName: string, forms: Array<Form>) => {
   return forms.filter(
-    form => form.name.toLowerCase().search(formName.toLowerCase()) !== -1
+    (form) => form.name.toLowerCase().search(formName.toLowerCase()) !== -1
   );
 };
 
 const FormView: React.FC<FormViewProps> = ({
   forms,
   patientUuid,
-  encounterUuid
+  encounterUuid,
 }) => {
   const { t } = useTranslation();
   const [activeVisit, setActiveVisit] = React.useState<VisitItem>();
   const [searchTerm, setSearchTerm] = React.useState<string>(null);
   const [allForms, setAllForms] = React.useState<Array<Form>>(forms);
 
-  const handleSearch = debounce(searchTerm => {
-    setSearchTerm(searchTerm);
-  }, 300);
+  const handleSearch = React.useMemo(
+    () => debounce((searchTerm) => setSearchTerm(searchTerm), 300),
+    []
+  );
 
   React.useEffect(() => {
-    const updatedForms = !isEmpty(searchTerm)
-      ? filterFormsByName(searchTerm, forms)
-      : forms;
-    setAllForms(updatedForms);
+    setAllForms(
+      !isEmpty(searchTerm) ? filterFormsByName(searchTerm, forms) : forms
+    );
   }, [searchTerm, forms]);
 
-  const launchFormEntry = form => {
-    if (activeVisit) {
-      const url = `/patient/${patientUuid}/formentry`;
-      switchTo("workspace", url, {
-        title: t("formEntry", `${form.name}`),
-        formUuid: form.uuid,
-        encounterUuid: encounterUuid
-      });
-    } else {
-      startVisitPrompt();
-    }
-  };
-
   React.useEffect(() => {
-    const sub = getStartedVisit.subscribe(visit => {
-      setActiveVisit(visit);
-    });
+    const sub = getStartedVisit.subscribe((visit) => setActiveVisit(visit));
     return () => sub.unsubscribe();
   }, []);
 
@@ -78,7 +71,7 @@ const FormView: React.FC<FormViewProps> = ({
       <div
         tabIndex={0}
         role="button"
-        onClick={() => launchFormEntry(form)}
+        onClick={() => launchFormEntry(activeVisit, form)}
         className={styles.customCheckBoxContainer}
       >
         {form.complete ? <CheckmarkFilled16 /> : <RadioButton16 />}
@@ -94,7 +87,7 @@ const FormView: React.FC<FormViewProps> = ({
         labelText=""
         className={styles.formSearchInput}
         placeholder={t("searchForForm", "Search for a form")}
-        onChange={evnt => handleSearch(evnt.target.value)}
+        onChange={(evnt) => handleSearch(evnt.target.value)}
       />
       <>
         {!isEmpty(searchTerm) && !isEmpty(allForms) && (

@@ -46,19 +46,6 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
 
       return () => sub.unsubscribe();
     }
-
-    // FISHY CODE BELOW!!
-    // NEVER (!) ADD A LISTENER IN AN USEFFECT W/O DISPOSING IT!
-    // THERE HAS TO BE A BETTER MECHANISM
-    // ---
-    // window.addEventListener("single-spa:routing-event", (evt: any) => {
-    //   const patientChartRegex = `${window.spaBase}/patient/:patient/chart`;
-    //   const newRegex = new RegExp(patientChartRegex);
-
-    //   if (!newRegex.test(evt.target.location.pathname)) {
-    //     getStartedVisit.next(null);
-    //   }
-    // });
   }, [currentVisit]);
 
   return (

@@ -1,31 +1,35 @@
 import React from "react";
 import Close32 from "@carbon/icons-react/es/close/32";
 import styles from "./context-workspace.css";
+import { ExtensionSlot } from "@openmrs/esm-framework";
+import { RouteComponentProps } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   Header,
   HeaderGlobalAction,
   HeaderGlobalBar,
-  HeaderName
+  HeaderName,
 } from "carbon-components-react/es/components/UIShell";
-import { ExtensionSlotProps } from "@openmrs/esm-framework";
+import { useWorkspace } from "../hooks/useWorkspace";
 
-export interface ContextWorkspaceProps {
-  title: string;
-  extensionSlot?: React.FC<ExtensionSlotProps>;
-  clearExtensionSlot: () => void;
+interface ContextWorkspaceParams {
+  patientUuid: string;
 }
 
-export default function ContextWorkspace({
-  title,
-  extensionSlot,
-  clearExtensionSlot
-}: ContextWorkspaceProps) {
+const ContextWorkspace: React.FC<RouteComponentProps<
+  ContextWorkspaceParams
+>> = ({ match }) => {
+  const { patientUuid } = match.params;
+  const { extensionSlot, title, clearExtensionSlot } = useWorkspace();
   const { t } = useTranslation();
+  const props = React.useMemo(
+    () => ({ closeWorkspace: clearExtensionSlot, patientUuid }),
+    [clearExtensionSlot, patientUuid]
+  );
 
   return (
     <>
-      {extensionSlot && (
+      {extensionSlot !== undefined && (
         <aside className={styles.contextWorkspaceContainer}>
           <Header aria-label={title} style={{ position: "sticky" }}>
             <HeaderName prefix="">{title}</HeaderName>
@@ -39,9 +43,11 @@ export default function ContextWorkspace({
               </HeaderGlobalAction>
             </HeaderGlobalBar>
           </Header>
-          {extensionSlot}
+          <ExtensionSlot extensionSlotName={extensionSlot} state={props} />
         </aside>
       )}
     </>
   );
-}
+};
+
+export default ContextWorkspace;

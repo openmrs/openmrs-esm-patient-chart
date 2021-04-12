@@ -68,7 +68,6 @@ const VitalHeader: React.FC<VitalHeaderProps> = ({ patientUuid }) => {
             toggleView={toggleView}
             showDetails={showDetails}
             view={displayState.view}
-            patientUuid={patientUuid}
             vitals={vital}
           />
           {showDetails && (

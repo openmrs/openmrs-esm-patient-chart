@@ -2,12 +2,19 @@ import React from "react";
 import { getNewWorkspaceItem, WorkspaceItem } from "@openmrs/esm-framework";
 import { Panel, Tabs } from "./tabs.component";
 
-export default function Workspace(props: any) {
+interface WorkspaceProps {
+  patientUuid: string;
+  patient: fhir.Patient;
+  openTabs(items: Array<WorkspaceItem>): void;
+  showWorkspace(value: boolean): void;
+}
+
+const Workspace: React.FC<WorkspaceProps> = (props) => {
   const [openTabs, setOpenTabs] = React.useState<WorkspaceItem[]>([]);
   const [selectedTab, setSelectedTab] = React.useState(null);
 
   React.useEffect(() => {
-    const sub = getNewWorkspaceItem().subscribe(item => {
+    const sub = getNewWorkspaceItem().subscribe((item) => {
       if (item.validations) {
         const validation = item.validations(openTabs);
         if (validation > -1) {
@@ -30,14 +37,16 @@ export default function Workspace(props: any) {
     openTabs.length ? props.showWorkspace(true) : props.showWorkspace(false);
   }, [openTabs, props]);
 
-  function removeTab(index) {
+  function removeTab(index: number) {
     const tab = openTabs[index];
     let userConfirmed = false;
+
     if (tab.inProgress) {
       userConfirmed = confirm(
         "There is ongoing work, are you sure you want to close this tab?"
       );
     }
+
     if (userConfirmed || !tab.inProgress) {
       const updatedOpenTabs = openTabs.slice();
       updatedOpenTabs.splice(index, 1);
@@ -47,33 +56,37 @@ export default function Workspace(props: any) {
     }
   }
 
-  function getSelectedTabAfterRemove(removedItemIndex, currentTab) {
+  function setWorkBegan(index: number) {
+    const updatedTabs = openTabs.slice();
+    updatedTabs[index].inProgress = true;
+    setOpenTabs(updatedTabs);
+  }
+
+  function setWorkEnded(index: number) {
+    const updatedTabs = openTabs.slice();
+    updatedTabs[index].inProgress = false;
+    setOpenTabs(updatedTabs);
+  }
+
+  function onCloseTabRequest(index: number, tab: WorkspaceItem) {
+    setWorkEnded(index);
+    removeTab(index);
+
+    if (tab.componentClosed) {
+      tab.componentClosed();
+    }
+  }
+
+  function getSelectedTabAfterRemove(
+    removedItemIndex: number,
+    currentTab: number
+  ) {
     if (removedItemIndex === currentTab) {
       return removedItemIndex > 0 ? removedItemIndex - 1 : null;
     } else if (removedItemIndex < currentTab) {
       return currentTab - 1;
     } else {
       return selectedTab;
-    }
-  }
-
-  function setWorkBegan(index) {
-    const updatedTabs = openTabs.slice();
-    updatedTabs[index].inProgress = true;
-    setOpenTabs(updatedTabs);
-  }
-
-  function setWorkEnded(index) {
-    const updatedTabs = openTabs.slice();
-    updatedTabs[index].inProgress = false;
-    setOpenTabs(updatedTabs);
-  }
-
-  function onCloseTabRequest(index, tab) {
-    setWorkEnded(index);
-    removeTab(index);
-    if (tab.componentClosed) {
-      tab.componentClosed();
     }
   }
 
@@ -94,6 +107,8 @@ export default function Workspace(props: any) {
               >
                 <tab.component
                   {...tab.props}
+                  patientUuid={props.patientUuid}
+                  patient={props.patient}
                   entryStarted={() => setWorkBegan(i)}
                   entrySubmitted={() => setWorkEnded(i)}
                   entryCancelled={() => setWorkEnded(i)}
@@ -106,4 +121,6 @@ export default function Workspace(props: any) {
       )}
     </>
   );
-}
+};
+
+export default Workspace;

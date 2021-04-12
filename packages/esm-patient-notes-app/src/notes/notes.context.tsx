@@ -10,6 +10,6 @@ export const NotesContext = createContext<NotesContextShape>({
   patient: undefined
 });
 
-export function useProgramsContext() {
+export function useNotesContext() {
   return useContext(NotesContext);
 }
