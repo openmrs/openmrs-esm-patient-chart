@@ -15,7 +15,8 @@ import {
   age,
   useVisit,
   getStartedVisit,
-  VisitItem
+  VisitItem,
+  Extension
 } from "@openmrs/esm-framework";
 import { useTranslation } from "react-i18next";
 
@@ -101,7 +102,17 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
                 <ExtensionSlot
                   extensionSlotName="patient-actions-slot"
                   key="patient-actions-slot"
-                />
+                >
+                  <li
+                    className={`bx--overflow-menu-options__option ${styles.overflowMenuItemList}`}
+                  >
+                    <Extension
+                      state={{
+                        patientUuid: patientUuid
+                      }}
+                    />
+                  </li>
+                </ExtensionSlot>
               </CustomOverflowMenuComponent>
             </div>
           </div>
