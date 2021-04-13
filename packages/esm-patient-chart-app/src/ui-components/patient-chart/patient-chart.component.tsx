@@ -11,7 +11,6 @@ import {
   useCurrentPatient,
   useLayoutType
 } from "@openmrs/esm-framework";
-import { getPageWidth } from "../../utils";
 
 interface PatientChartParams {
   patientUuid: string;
@@ -32,18 +31,11 @@ const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({
   return (
     <>
       <SideMenu />
-      <main
-        className="omrs-main-content"
-        style={{
-          display: "flex",
-          alignItems: "flex-start",
-          flexDirection: "column"
-        }}
-      >
+      <main className={`omrs-main-content ${styles.chartContainer}`}>
         {loading ? (
           <Loader />
         ) : (
-          <div style={{ width: getPageWidth(layout) }}>
+          <div className={styles.innerChartContainer}>
             <ExtensionSlot extensionSlotName="breadcrumbs-slot" />
             <aside className={styles.patientBanner}>
               <ExtensionSlot
