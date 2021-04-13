@@ -3,7 +3,7 @@
   grid-template-columns: 1fr min-content;
   grid-template-rows: 1fr;
   align-items: stretch;
-  width: 100%;
+  width: inherit;
 }
 
 .patientBanner {
@@ -27,4 +27,18 @@
   height: 90%;
   border-left: 0.5px solid lightgray;
   padding-bottom: 10px;
+}
+
+.chartContainer {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+:global(.omrs-breakpoint-gt-tablet) .chartContainer {
+  margin-left: var(--omrs-sidenav-width);
+}
+
+.innerChartContainer {
+  width: 100%;
 }

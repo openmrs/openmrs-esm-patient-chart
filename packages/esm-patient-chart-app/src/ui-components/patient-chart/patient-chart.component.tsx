@@ -5,6 +5,7 @@ import WorkspaceWrapper from "../../workspace/workspace-wrapper.component";
 import ChartReview from "../../view-components/chart-review.component";
 import VisitDialog from "../../visit/visit-dialog.component";
 import { RouteComponentProps } from "react-router-dom";
+import SideMenu from "../../view-components/side-menu.component";
 import { ExtensionSlot, useCurrentPatient } from "@openmrs/esm-framework";
 
 interface PatientChartParams {
@@ -23,41 +24,37 @@ const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({
   }, [patient, patientUuid]);
 
   return (
-    <main
-      className="omrs-main-content"
-      style={{
-        display: "flex",
-        alignItems: "flex-start",
-        flexDirection: "column"
-      }}
-    >
-      {loading ? (
-        <Loader />
-      ) : (
-        <>
-          <ExtensionSlot extensionSlotName="breadcrumbs-slot" />
-          <aside className={styles.patientBanner}>
-            <ExtensionSlot
-              extensionSlotName="patient-header-slot"
-              state={state}
-            />
-            <ExtensionSlot
-              extensionSlotName="patient-info-slot"
-              state={state}
-            />
-          </aside>
-          <div className={styles.grid}>
-            <div className={styles.chartreview}>
-              <ChartReview {...state} view={view} subview={subview} />
-              <VisitDialog />
-            </div>
-            <div className={styles.workspace}>
-              <WorkspaceWrapper />
+    <>
+      <SideMenu />
+      <main className={`omrs-main-content ${styles.chartContainer}`}>
+        {loading ? (
+          <Loader />
+        ) : (
+          <div className={styles.innerChartContainer}>
+            <ExtensionSlot extensionSlotName="breadcrumbs-slot" />
+            <aside className={styles.patientBanner}>
+              <ExtensionSlot
+                extensionSlotName="patient-header-slot"
+                state={state}
+              />
+              <ExtensionSlot
+                extensionSlotName="patient-info-slot"
+                state={state}
+              />
+            </aside>
+            <div className={styles.grid}>
+              <div className={styles.chartreview}>
+                <ChartReview {...state} view={view} subview={subview} />
+                <VisitDialog />
+              </div>
+              <div className={styles.workspace}>
+                <WorkspaceWrapper />
+              </div>
             </div>
           </div>
-        </>
-      )}
-    </main>
+        )}
+      </main>
+    </>
   );
 };
 
