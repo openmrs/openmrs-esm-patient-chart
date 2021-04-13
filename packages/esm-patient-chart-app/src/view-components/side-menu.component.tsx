@@ -1,6 +1,8 @@
-import React, { useEffect } from "react";
-import { SideNav } from "carbon-components-react/es/components/UIShell";
-import { SideNavProps } from "carbon-components-react";
+import React from "react";
+import {
+  SideNav,
+  SideNavProps
+} from "carbon-components-react/es/components/UIShell";
 import { ExtensionSlot, useLayoutType } from "@openmrs/esm-framework";
 import styles from "./side-menu.component.scss";
 import { isDesktop } from "../utils";
