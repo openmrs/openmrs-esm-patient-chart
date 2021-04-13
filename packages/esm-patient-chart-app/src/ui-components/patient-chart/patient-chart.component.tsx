@@ -6,11 +6,7 @@ import ChartReview from "../../view-components/chart-review.component";
 import VisitDialog from "../../visit/visit-dialog.component";
 import { RouteComponentProps } from "react-router-dom";
 import SideMenu from "../../view-components/side-menu.component";
-import {
-  ExtensionSlot,
-  useCurrentPatient,
-  useLayoutType
-} from "@openmrs/esm-framework";
+import { ExtensionSlot, useCurrentPatient } from "@openmrs/esm-framework";
 
 interface PatientChartParams {
   patientUuid: string;
@@ -21,7 +17,6 @@ interface PatientChartParams {
 const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({
   match
 }) => {
-  const layout = useLayoutType();
   const { patientUuid, view, subview } = match.params;
   const [loading, patient] = useCurrentPatient(patientUuid);
   const state = useMemo(() => {

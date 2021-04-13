@@ -1,24 +1,13 @@
-import { getPageWidth, isTablet } from "./utils";
+import { isDesktop } from "./utils";
 
-describe("isTablet", () => {
+describe("isDesktop", () => {
   it("is true when layout = tablet", () => {
-    expect(isTablet("tablet")).toBeTruthy();
+    expect(isDesktop("tablet")).toBeFalsy();
   });
   it("is true when layout = phone", () => {
-    expect(isTablet("phone")).toBeTruthy();
+    expect(isDesktop("phone")).toBeFalsy();
   });
   it("is false is desktop", () => {
-    expect(isTablet("desktop")).toBeFalsy();
-  });
-});
-
-describe("getPageWidth", () => {
-  it("returns full width if tablet or below", () => {
-    expect(getPageWidth("tablet")).toEqual("100vw");
-  });
-  it("returns full width w/o sidebar if desktop", () => {
-    expect(getPageWidth("desktop")).toEqual(
-      "calc(100vw - var(--omrs-sidenav-width))"
-    );
+    expect(isDesktop("desktop")).toBeTruthy();
   });
 });
