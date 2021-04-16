@@ -50,6 +50,28 @@ function setupOpenMRS() {
           featureName: "nav-items",
           moduleName
         })
+      },
+      {
+        id: "start-visit-patient-actions-slot",
+        slot: "patient-actions-slot",
+        load: getAsyncLifecycle(
+          () => import("./actions-buttons/start-visit.component"),
+          {
+            featureName: "patient-actions-slot",
+            moduleName
+          }
+        )
+      },
+      {
+        id: "add-past-visit-patient-actions-slot",
+        slot: "patient-actions-slot",
+        load: getAsyncLifecycle(
+          () => import("./actions-buttons/add-past-visit.component"),
+          {
+            featureName: "patient-actions-slot",
+            moduleName
+          }
+        )
       }
     ]
   };
