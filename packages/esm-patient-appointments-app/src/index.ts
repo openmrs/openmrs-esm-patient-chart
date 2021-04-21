@@ -13,7 +13,7 @@ function setupOpenMRS() {
 
   const options = {
     featureName: "patient-appointments",
-    moduleName
+    moduleName,
   };
 
   defineConfigSchema(moduleName, {});
@@ -28,8 +28,8 @@ function setupOpenMRS() {
           options
         ),
         meta: {
-          columnSpan: 4
-        }
+          columnSpan: 4,
+        },
       },
       {
         id: "appointments-details-widget",
@@ -39,10 +39,10 @@ function setupOpenMRS() {
           options
         ),
         meta: {
-          columnSpan: 1
-        }
-      }
-    ]
+          columnSpan: 1,
+        },
+      },
+    ],
   };
 }
 

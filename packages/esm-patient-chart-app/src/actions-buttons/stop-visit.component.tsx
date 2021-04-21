@@ -1,6 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { switchTo, useVisit } from "@openmrs/esm-framework";
+import { useVisit } from "@openmrs/esm-framework";
 
 interface StopVisitOverflowMenuItemProps {
   patientUuid: string;
@@ -12,7 +12,15 @@ const StopVisitOverflowMenuItem: React.FC<StopVisitOverflowMenuItemProps> = ({
   const { t } = useTranslation();
   const { currentVisit } = useVisit(patientUuid);
   const handleClick = React.useCallback(
-    () => switchTo("dialog", "/end-visit/prompt", { visitData: currentVisit }),
+    () =>
+      window.dispatchEvent(
+        new CustomEvent("visit-dialog", {
+          detail: {
+            type: "end",
+            state: { visitData: currentVisit },
+          },
+        })
+      ),
     [currentVisit]
   );
 

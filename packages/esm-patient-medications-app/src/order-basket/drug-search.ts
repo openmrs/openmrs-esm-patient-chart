@@ -28,8 +28,8 @@ export async function searchMedications(
 ) {
   const allSearchTerms = searchTerm.match(/\S+/g);
   const drugs = await searchDrugsInBackend(allSearchTerms, abortController);
-  const explodedSearchResults = drugs.flatMap(drug => [
-    ...explodeDrugResultWithCommonMedicationData(drug, encounterUuid)
+  const explodedSearchResults = drugs.flatMap((drug) => [
+    ...explodeDrugResultWithCommonMedicationData(drug, encounterUuid),
   ]);
   return filterExplodedResultsBySearchTerm(
     allSearchTerms,
@@ -42,12 +42,12 @@ async function searchDrugsInBackend(
   abortController: AbortController
 ) {
   const resultsPerSearchTerm = await Promise.all(
-    allSearchTerms.map(async searchTerm => {
+    allSearchTerms.map(async (searchTerm) => {
       const res = await getDrugByName(searchTerm, abortController);
       return res.data.results;
     })
   );
-  const results = resultsPerSearchTerm.flatMap(x => x);
+  const results = resultsPerSearchTerm.flatMap((x) => x);
   return uniqBy(results, "uuid");
 }
 
@@ -87,7 +87,7 @@ function* explodeDrugResultWithCommonMedicationData(
             pillsDispensed: 0,
             numRefills: 0,
             freeTextDosage: "",
-            indication: ""
+            indication: "",
           };
         }
       }
@@ -99,9 +99,9 @@ function filterExplodedResultsBySearchTerm(
   allSearchTerms: Array<string>,
   results: Array<OrderBasketItem>
 ) {
-  return results.filter(result =>
+  return results.filter((result) =>
     allSearchTerms.every(
-      searchTerm =>
+      (searchTerm) =>
         includesIgnoreCase(result.drug.name, searchTerm) ||
         includesIgnoreCase(result.dosageUnit.name, searchTerm) ||
         includesIgnoreCase(result.dosage.dosage, searchTerm) ||

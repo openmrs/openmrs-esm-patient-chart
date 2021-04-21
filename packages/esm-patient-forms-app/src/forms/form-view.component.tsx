@@ -6,13 +6,19 @@ import debounce from "lodash-es/debounce";
 import isEmpty from "lodash-es/isEmpty";
 import EmptyDataIllustration from "./empty-state/empty-data-illustration.component";
 import styles from "./form-view.component.scss";
-import { switchTo, getStartedVisit, VisitItem } from "@openmrs/esm-framework";
+import { getStartedVisit, VisitItem } from "@openmrs/esm-framework";
 import { useTranslation } from "react-i18next";
 import { Form } from "../types";
 import { Tile } from "carbon-components-react/es/components/Tile";
 
 function startVisitPrompt() {
-  switchTo("dialog", "/start-visit/prompt", {});
+  window.dispatchEvent(
+    new CustomEvent("visit-dialog", {
+      detail: {
+        type: "prompt",
+      },
+    })
+  );
 }
 
 function launchFormEntry(activeVisit: VisitItem, _: Form) {

@@ -1,8 +1,4 @@
-import {
-  getStartedVisit,
-  newWorkspaceItem,
-  switchTo,
-} from "@openmrs/esm-framework";
+import { getStartedVisit, newWorkspaceItem } from "@openmrs/esm-framework";
 import isEmpty from "lodash-es/isEmpty";
 
 export interface DataCaptureComponentProps {
@@ -22,7 +18,13 @@ export function openWorkspaceTab<
   requiresVisit = true
 ): void {
   if (isEmpty(getStartedVisit.value) && requiresVisit) {
-    switchTo("dialog", "/start-visit/prompt", {});
+    window.dispatchEvent(
+      new CustomEvent("visit-dialog", {
+        detail: {
+          type: "prompt",
+        },
+      })
+    );
   } else {
     newWorkspaceItem({
       component: componentToAdd,

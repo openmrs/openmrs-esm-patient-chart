@@ -10,7 +10,7 @@ import {
 } from "@openmrs/esm-framework";
 import { useRouteMatch } from "react-router-dom";
 import { DashboardTabConfig } from "../config-schemas";
-import { basePath } from "../constants";
+import { basePath, moduleName } from "../constants";
 
 function getTitle(ext: ExtensionInfo) {
   const title = ext.meta.title;
@@ -37,9 +37,9 @@ interface ShowTabsProps {
 const ShowTabs: React.FC<ShowTabsProps> = ({ slot, view, fullPath }) => {
   const store = useExtensionStore();
   const extensions = React.useMemo(() => {
-    const ids = store.slots[slot]?.attachedIds ?? [];
+    const ids = store.slots[slot]?.instances[moduleName]?.assignedIds ?? [];
     return ids.map((id) => store.extensions[id]);
-  }, [store, slot]);
+  }, [store]);
   const defaultExtension = extensions[0];
 
   useEffect(() => {
