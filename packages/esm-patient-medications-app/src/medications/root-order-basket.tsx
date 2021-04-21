@@ -10,7 +10,7 @@ export interface RootOrderBasketProps {
 
 export default function RootOrderBasket({
   patientUuid,
-  closeWorkspace,
+  closeWorkspace
 }: RootOrderBasketProps) {
   return (
     <Provider store={orderBasketStore}>

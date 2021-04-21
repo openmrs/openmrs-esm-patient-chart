@@ -11,7 +11,7 @@ export interface MedicationsSummaryProps {
 }
 
 export default function MedicationsSummary({
-  patientUuid,
+  patientUuid
 }: MedicationsSummaryProps) {
   const { t } = useTranslation();
   const [activePatientOrders] = usePatientOrders(patientUuid, "ACTIVE");

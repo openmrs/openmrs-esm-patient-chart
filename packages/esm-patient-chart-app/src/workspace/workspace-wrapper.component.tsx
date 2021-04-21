@@ -8,7 +8,7 @@ interface WorkspaceWrapperProps {
   patient: fhir.Patient;
 }
 
-const WorkspaceWrapper: React.FC<WorkspaceWrapperProps> = (props) => {
+const WorkspaceWrapper: React.FC<WorkspaceWrapperProps> = props => {
   const [showWorkspace, setShowWorkspace] = React.useState(false);
   const [toggleMobileTableView, setToggleMobileTabletView] = React.useState<
     Boolean
@@ -17,7 +17,7 @@ const WorkspaceWrapper: React.FC<WorkspaceWrapperProps> = (props) => {
   const [selectedTab, setSelectedTab] = React.useState(null);
 
   React.useEffect(() => {
-    const sub = getNewWorkspaceItem().subscribe((item) => {
+    const sub = getNewWorkspaceItem().subscribe(item => {
       if (item.validations) {
         const validation = item.validations(openTabs);
         if (validation > -1) {
@@ -67,7 +67,7 @@ const WorkspaceWrapper: React.FC<WorkspaceWrapperProps> = (props) => {
           </button>
         )}
         {toggleMobileTableView &&
-          openTabs.map((tab) => (
+          openTabs.map(tab => (
             <button
               key={tab.name}
               className="omrs-btn-icon-medium"

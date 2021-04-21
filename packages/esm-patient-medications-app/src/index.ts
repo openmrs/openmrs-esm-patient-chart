@@ -38,8 +38,8 @@ function setupOpenMRS() {
           options
         ),
         meta: {
-          title: 'Order Basket', // t("orderBasket", "Order Basket")
-        },
+          title: "Order Basket" // t("orderBasket", "Order Basket")
+        }
       }
     ]
   };

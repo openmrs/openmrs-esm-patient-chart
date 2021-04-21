@@ -8,7 +8,7 @@ import {
   Header,
   HeaderGlobalAction,
   HeaderGlobalBar,
-  HeaderName,
+  HeaderName
 } from "carbon-components-react/es/components/UIShell";
 import { useWorkspace } from "../hooks/useWorkspace";
 

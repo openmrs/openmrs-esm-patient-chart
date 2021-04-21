@@ -7,13 +7,12 @@ interface StopVisitOverflowMenuItemProps {
 }
 
 const StopVisitOverflowMenuItem: React.FC<StopVisitOverflowMenuItemProps> = ({
-  patientUuid,
+  patientUuid
 }) => {
   const { t } = useTranslation();
   const { currentVisit } = useVisit(patientUuid);
   const handleClick = React.useCallback(
-    () =>
-      switchTo("dialog", "/end-visit/prompt", { visitData: currentVisit }),
+    () => switchTo("dialog", "/end-visit/prompt", { visitData: currentVisit }),
     [currentVisit]
   );
 
@@ -27,7 +26,7 @@ const StopVisitOverflowMenuItem: React.FC<StopVisitOverflowMenuItemProps> = ({
           data-floating-menu-primary-focus
           onClick={handleClick}
           style={{
-            maxWidth: "100vw",
+            maxWidth: "100vw"
           }}
         >
           <span className="bx--overflow-menu-options__option-content">

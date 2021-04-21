@@ -14,7 +14,7 @@ function setupOpenMRS() {
 
   const options = {
     featureName: "patient-vitals",
-    moduleName,
+    moduleName
   };
 
   defineConfigSchema(moduleName, configSchema);
@@ -29,8 +29,8 @@ function setupOpenMRS() {
           options
         ),
         meta: {
-          columnSpan: 2,
-        },
+          columnSpan: 2
+        }
       },
       {
         id: "vitals-details-widget",
@@ -41,8 +41,8 @@ function setupOpenMRS() {
         ),
         meta: {
           view: "vitals",
-          title: "Vitals",
-        },
+          title: "Vitals"
+        }
       },
       {
         id: "patient-vitals-info",
@@ -50,7 +50,7 @@ function setupOpenMRS() {
         load: getAsyncLifecycle(
           () => import("./vitals/vitals-header/vital-header-state.component"),
           options
-        ),
+        )
       },
       {
         id: "patient-vitals-biometrics-form-workspace",
@@ -62,10 +62,10 @@ function setupOpenMRS() {
           options
         ),
         meta: {
-          title: "Record Vitals and Biometrics", //t("recordVitalsAndBiometrics", "Record Vitals and Biometrics")
-        },
-      },
-    ],
+          title: "Record Vitals and Biometrics" //t("recordVitalsAndBiometrics", "Record Vitals and Biometrics")
+        }
+      }
+    ]
   };
 }
 

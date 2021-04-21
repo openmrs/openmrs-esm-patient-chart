@@ -9,12 +9,12 @@ interface WorkspaceProps {
   showWorkspace(value: boolean): void;
 }
 
-const Workspace: React.FC<WorkspaceProps> = (props) => {
+const Workspace: React.FC<WorkspaceProps> = props => {
   const [openTabs, setOpenTabs] = React.useState<WorkspaceItem[]>([]);
   const [selectedTab, setSelectedTab] = React.useState(null);
 
   React.useEffect(() => {
-    const sub = getNewWorkspaceItem().subscribe((item) => {
+    const sub = getNewWorkspaceItem().subscribe(item => {
       if (item.validations) {
         const validation = item.validations(openTabs);
         if (validation > -1) {

@@ -15,7 +15,7 @@ import {
   getStartedVisit,
   VisitMode,
   VisitStatus,
-  useSessionUser,
+  useSessionUser
 } from "@openmrs/esm-framework";
 
 export interface NewVisitProps {
@@ -31,7 +31,7 @@ const NewVisit: React.FC<NewVisitProps> = ({
   onVisitStarted,
   onCanceled,
   closeComponent,
-  viewMode,
+  viewMode
 }) => {
   const currentUser = useSessionUser();
   const { t } = useTranslation();
@@ -59,7 +59,7 @@ const NewVisit: React.FC<NewVisitProps> = ({
       patient: patientUuid,
       startDatetime: new Date(`${visitStartDate} ${visitStartTime}:00`),
       visitType: visitTypeUuid,
-      location: locationUuid,
+      location: locationUuid
     };
     saveVisit(visitPayload, new AbortController()).subscribe(
       (response: FetchResponse<any>) => {
@@ -67,11 +67,11 @@ const NewVisit: React.FC<NewVisitProps> = ({
         getStartedVisit.next({
           mode: VisitMode.NEWVISIT,
           visitData: response.data,
-          status: VisitStatus.ONGOING,
+          status: VisitStatus.ONGOING
         });
         closeComponent();
       },
-      (error) => {
+      error => {
         console.error("Error saving visit: ", error);
       }
     );
@@ -83,7 +83,7 @@ const NewVisit: React.FC<NewVisitProps> = ({
     const updateVisitPayload: UpdateVisitPayload = {
       startDatetime: new Date(`${visitStartDate} ${visitStartTime}:00`),
       visitType: visitTypeUuid,
-      location: locationUuid,
+      location: locationUuid
     };
 
     if (!isEmpty(stopDatetime)) {
@@ -96,21 +96,21 @@ const NewVisit: React.FC<NewVisitProps> = ({
       getStartedVisit.next({
         mode: VisitMode.EDITVISIT,
         visitData: data,
-        status: VisitStatus.ONGOING,
+        status: VisitStatus.ONGOING
       });
       closeComponent();
     });
   };
 
-  const onStartDateChanged = (event) => setVisitStartDate(event.target.value);
-  const onStartTimeChanged = (event) => setVisitStartTime(event.target.value);
-  const onVisitStopDateChanged = (event) => setVisitEndDate(event.target.value);
-  const onVisitStopTimeChanged = (event) => setVisitEndTime(event.target.value);
+  const onStartDateChanged = event => setVisitStartDate(event.target.value);
+  const onStartTimeChanged = event => setVisitStartTime(event.target.value);
+  const onVisitStopDateChanged = event => setVisitEndDate(event.target.value);
+  const onVisitStopTimeChanged = event => setVisitEndTime(event.target.value);
   const onLocationChanged = setLocationUuid;
   const onVisitTypeChanged = setVisitTypeUuid;
 
   useEffect(() => {
-    const sub = getStartedVisit.subscribe((visit) => {
+    const sub = getStartedVisit.subscribe(visit => {
       if (visit) {
         setVisitUuid(visit.visitData.uuid);
         setLocationUuid(visit.visitData.location.uuid);
@@ -147,7 +147,7 @@ const NewVisit: React.FC<NewVisitProps> = ({
                 {t("typeOfVisit", "Type of visit")}
               </label>
               <VisitTypeSelect
-                onVisitTypeChanged={(visitType) =>
+                onVisitTypeChanged={visitType =>
                   onVisitTypeChanged(visitType.uuid)
                 }
                 id="visitType"
@@ -158,7 +158,7 @@ const NewVisit: React.FC<NewVisitProps> = ({
               style={{
                 display: "flex",
                 flexFlow: "row wrap",
-                justifyContent: "space-between",
+                justifyContent: "space-between"
               }}
             >
               <div
@@ -209,9 +209,7 @@ const NewVisit: React.FC<NewVisitProps> = ({
               <label htmlFor="location">{t("location", "Location")}</label>
               <LocationSelect
                 currentLocationUuid={locationUuid}
-                onLocationChanged={(location) =>
-                  onLocationChanged(location.uuid)
-                }
+                onLocationChanged={location => onLocationChanged(location.uuid)}
                 id={"location"}
               />
             </div>
@@ -244,7 +242,7 @@ const NewVisit: React.FC<NewVisitProps> = ({
                 {t("typeOfVisit", "Type of visit")}
               </label>
               <VisitTypeSelect
-                onVisitTypeChanged={(visitType) =>
+                onVisitTypeChanged={visitType =>
                   onVisitTypeChanged(visitType.uuid)
                 }
                 id={"visitType"}
@@ -255,7 +253,7 @@ const NewVisit: React.FC<NewVisitProps> = ({
               style={{
                 display: "flex",
                 flexFlow: "row wrap",
-                justifyContent: "space-between",
+                justifyContent: "space-between"
               }}
             >
               <div
@@ -304,7 +302,7 @@ const NewVisit: React.FC<NewVisitProps> = ({
               style={{
                 display: "flex",
                 flexFlow: "row wrap",
-                justifyContent: "space-between",
+                justifyContent: "space-between"
               }}
             >
               <div
@@ -352,9 +350,7 @@ const NewVisit: React.FC<NewVisitProps> = ({
               <label htmlFor="location">{t("location", "Location")}</label>
               <LocationSelect
                 currentLocationUuid={locationUuid}
-                onLocationChanged={(location) =>
-                  onLocationChanged(location.uuid)
-                }
+                onLocationChanged={location => onLocationChanged(location.uuid)}
                 id={"location"}
               />
             </div>

@@ -27,37 +27,34 @@ const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({
   useVisitDialog(patientUuid);
 
   return (
-    <>
-      <SideMenu />
-      <main className={`omrs-main-content ${styles.chartContainer}`}>
-        {loading ? (
-          <Loader />
-        ) : (
-          <div className={styles.innerChartContainer}>
-            <ExtensionSlot extensionSlotName="breadcrumbs-slot" />
-            <aside className={styles.patientBanner}>
-              <ExtensionSlot
-                extensionSlotName="patient-header-slot"
-                state={state}
-              />
-              <ExtensionSlot
-                extensionSlotName="patient-info-slot"
-                state={state}
-              />
-            </aside>
-            <div className={styles.grid}>
-              <div className={styles.chartreview}>
-                <ChartReview {...state} view={view} subview={subview} />
-                <VisitDialog />
-              </div>
-              <div className={styles.workspace}>
-                <WorkspaceWrapper {...state} />
-              </div>
+    <main className={`omrs-main-content ${styles.chartContainer}`}>
+      {loading ? (
+        <Loader />
+      ) : (
+        <div className={styles.innerChartContainer}>
+          <ExtensionSlot extensionSlotName="breadcrumbs-slot" />
+          <aside className={styles.patientBanner}>
+            <ExtensionSlot
+              extensionSlotName="patient-header-slot"
+              state={state}
+            />
+            <ExtensionSlot
+              extensionSlotName="patient-info-slot"
+              state={state}
+            />
+          </aside>
+          <div className={styles.grid}>
+            <div className={styles.chartreview}>
+              <ChartReview {...state} view={view} subview={subview} />
+              <VisitDialog />
+            </div>
+            <div className={styles.workspace}>
+              <WorkspaceWrapper {...state} />
             </div>
           </div>
-        )}
-      </main>
-    </>
+        </div>
+      )}
+    </main>
   );
 };
 

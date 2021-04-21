@@ -7,7 +7,7 @@ interface StartVisitOverflowMenuItemProps {
 }
 
 const StartVisitOverflowMenuItem: React.FC<StartVisitOverflowMenuItemProps> = ({
-  patientUuid,
+  patientUuid
 }) => {
   const { t } = useTranslation();
   const { currentVisit } = useVisit(patientUuid);
@@ -26,7 +26,7 @@ const StartVisitOverflowMenuItem: React.FC<StartVisitOverflowMenuItemProps> = ({
           data-floating-menu-primary-focus
           onClick={handleClick}
           style={{
-            maxWidth: "100vw",
+            maxWidth: "100vw"
           }}
         >
           <span className="bx--overflow-menu-options__option-content">
