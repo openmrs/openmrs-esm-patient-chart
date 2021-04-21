@@ -3,20 +3,13 @@ import ConditionRecord from "./condition-record.component";
 import { of } from "rxjs/internal/observable/of";
 import { BrowserRouter } from "react-router-dom";
 import { fireEvent, render, screen } from "@testing-library/react";
-import { mockPatientConditionResult } from "../../../__mocks__/conditions.mock";
-import { openWorkspaceTab } from "../shared-utils";
+import { mockPatientConditionResult } from "../../__mocks__/conditions.mock";
 import { getConditionByUuid } from "./conditions.resource";
-import { ConditionsForm } from "./conditions-form.component";
 
 const mockGetConditionByUuid = getConditionByUuid as jest.Mock;
-const mockOpenWorkspaceTab = openWorkspaceTab as jest.Mock;
 
 jest.mock("./conditions.resource", () => ({
   getConditionByUuid: jest.fn(),
-}));
-
-jest.mock("../shared-utils", () => ({
-  openWorkspaceTab: jest.fn(),
 }));
 
 describe("<ConditionRecord />", () => {
@@ -31,7 +24,6 @@ describe("<ConditionRecord />", () => {
   };
 
   beforeEach(() => {
-    mockOpenWorkspaceTab.mockReset;
     mockGetConditionByUuid.mockReset;
   });
 
@@ -60,16 +52,4 @@ describe("<ConditionRecord />", () => {
 
     // Clicking "Edit" launches edit form in workspace tab
     fireEvent.click(editBtn);
-    expect(mockOpenWorkspaceTab).toHaveBeenCalled();
-    expect(mockOpenWorkspaceTab).toHaveBeenCalledWith(
-      ConditionsForm,
-      "Edit Condition",
-      {
-        conditionUuid,
-        clinicalStatus: "active",
-        conditionName: "Malaria, confirmed",
-        onsetDateTime: "2019-11-04T00:00:00+00:00",
-      }
-    );
-  });
 });

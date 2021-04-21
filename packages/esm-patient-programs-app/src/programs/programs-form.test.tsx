@@ -1,6 +1,7 @@
+import "@testing-library/jest-dom/extend-expect";
 import React from "react";
 import dayjs from "dayjs";
-import "@testing-library/jest-dom/extend-expect";
+import ProgramsForm, { ProgramMatchProps } from "./programs-form.component";
 import { render, screen, fireEvent } from "@testing-library/react";
 import {
   match,
@@ -18,7 +19,6 @@ import {
   getSession,
   updateProgramEnrollment,
 } from "./programs.resource";
-import ProgramsForm, { ProgramMatchProps } from "./programs-form.component";
 import {
   mockCareProgramsResponse,
   mockEnrolledProgramsResponse,

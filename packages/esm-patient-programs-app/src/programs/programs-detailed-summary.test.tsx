@@ -19,10 +19,6 @@ jest.mock("./programs.resource", () => ({
   fetchEnrolledPrograms: jest.fn(),
 }));
 
-jest.mock("../shared-utils", () => ({
-  openWorkspaceTab: jest.fn(),
-}));
-
 describe("<ProgramsDetailedSummary />", () => {
   beforeEach(() => {
     mockFetchEnrolledPrograms.mockReset;

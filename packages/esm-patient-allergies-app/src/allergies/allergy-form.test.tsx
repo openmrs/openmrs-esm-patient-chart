@@ -1,4 +1,5 @@
 import React from "react";
+import AllergyForm from "./allergy-form.component";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { match, useRouteMatch, BrowserRouter } from "react-router-dom";
 import { of } from "rxjs/internal/observable/of";
@@ -17,7 +18,6 @@ import {
   savePatientAllergy,
   updatePatientAllergy,
 } from "./allergy-intolerance.resource";
-import AllergyForm from "./allergy-form.component";
 import { mockPatient } from "../../__mocks__/patient.mock";
 
 let testMatch: match = { params: {}, isExact: false, path: "/", url: "/" };
