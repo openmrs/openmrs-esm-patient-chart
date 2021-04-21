@@ -35,10 +35,6 @@
   flex-direction: column;
 }
 
-:global(.omrs-breakpoint-gt-tablet) .chartContainer {
-  margin-left: var(--omrs-sidenav-width);
-}
-
 .innerChartContainer {
   width: 100%;
 }
