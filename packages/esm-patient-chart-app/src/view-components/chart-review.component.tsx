@@ -2,7 +2,7 @@ import React from "react";
 import GridView from "./grid-view.component";
 import TabbedView from "./tabbed-view.component";
 import { Redirect } from "react-router-dom";
-import { useConfig } from "@openmrs/esm-framework";
+import { useConfig, useExtensionSlotMeta } from "@openmrs/esm-framework";
 import { ChartConfig, DashboardConfig } from "../config-schemas";
 import { basePath } from "../constants";
 
@@ -37,7 +37,11 @@ const ChartReview: React.FC<ChartReviewProps> = ({
   subview,
 }) => {
   const config = useConfig() as ChartConfig;
-  const [dashboard] = config.dashboardDefinitions
+  const meta = useExtensionSlotMeta("patient-chart-dashboard-slot");
+  const [dashboard] = [
+    ...config.dashboardDefinitions,
+    ...(Object.values(meta) as Array<DashboardConfig>),
+  ]
     .filter((dashboard) => dashboard.name === view)
     .map((dashboard) =>
       dashboard.config.type === "grid" ? (

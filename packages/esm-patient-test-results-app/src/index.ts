@@ -2,12 +2,6 @@ import { defineConfigSchema, getAsyncLifecycle } from "@openmrs/esm-framework";
 import { configSchema } from "./config-schema";
 import { backendDependencies } from "./openmrs-backend-dependencies";
 
-const realConsole = console;
-globalThis.console = new Proxy({} as typeof realConsole, {
-  get: () => () => {},
-  set: () => false
-});
-
 const importTranslation = require.context(
   "../translations",
   false,
@@ -20,7 +14,7 @@ function setupOpenMRS() {
 
   const options = {
     featureName: "patient-test-results",
-    moduleName
+    moduleName,
   };
 
   defineConfigSchema(moduleName, configSchema);
@@ -32,10 +26,21 @@ function setupOpenMRS() {
         slot: "patient-chart-summary-dashboard-slot",
         load: getAsyncLifecycle(() => import("./test"), options),
         meta: {
-          columnSpan: 4
-        }
-      }
-    ]
+          columnSpan: 4,
+        },
+      },
+      {
+        id: "test-results-summary-dashboard",
+        slot: "patient-chart-dashboard-slot",
+        load: getAsyncLifecycle((() => {}) as any, options),
+        meta: {
+          name: "test-results",
+          slot: "patient-chart-test-results-dashboard-slot",
+          config: { columns: 1, type: "grid" },
+          title: "Test Results",
+        },
+      },
+    ],
   };
 }
 
