@@ -28,7 +28,6 @@ import {
   toOmrsTimeString24,
   toOmrsYearlessDateFormat,
 } from "@openmrs/esm-framework";
-import { LineChart } from "@carbon/charts-react";
 
 const useTrendlineData = ({
   patientUuid,
@@ -237,7 +236,7 @@ const Trendline: React.FC<{
     <>
       <TrendlineHeader openTimeline={openTimeline} title={dataset} />
       <TrendLineBackground>
-        <LineChart data={data} options={options} />
+        <AreaChart data={data} options={options} />
       </TrendLineBackground>
 
       <DrawTable {...{ tableData, tableHeaderData }} />

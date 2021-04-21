@@ -24,7 +24,7 @@ const withCurrentPatient = (WrappedComponent) => {
   };
 };
 
-const LabResults: React.FC<LabResultsProps> = ({ patientUuid, ...rest }) => {
+const LabResults: React.FC<LabResultsProps> = ({ patientUuid }) => {
   const { overviewData, loaded, error } = useOverviewData(patientUuid);
 
   return (
