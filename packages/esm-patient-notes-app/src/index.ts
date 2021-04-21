@@ -51,7 +51,10 @@ function setupOpenMRS() {
           options
         ),
         meta: {
-          title: "Visit Note", //t("visitNote", "Visit Note")
+          title: {
+            key: "visitNote",
+            default: "Visit Note",
+          },
         },
       },
     ],

@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from "react";
-import { detach, useExtensionStore } from "@openmrs/esm-framework";
+import { detach, useAssignedExtensionIds } from "@openmrs/esm-framework";
 import { moduleName, patientChartWorkspaceSlot } from "../constants";
+import { getTitle } from "../utils";
 
 export interface WorkspaceState {
   title: string;
@@ -12,19 +13,16 @@ export interface WorkspaceDetails extends WorkspaceState {
 }
 
 export function useWorkspace(): WorkspaceDetails {
-  const store = useExtensionStore();
-  const extensions = useMemo(() => {
-    const ids =
-      store.slots[patientChartWorkspaceSlot]?.instances[moduleName]
-        ?.assignedIds ?? [];
-    return ids.map((id) => store.extensions[id]);
-  }, [store]);
+  const extensions = useAssignedExtensionIds(
+    moduleName,
+    patientChartWorkspaceSlot
+  );
 
   const title = useMemo(() => {
     if (extensions.length === 0) {
       return "";
     } else if (extensions.length === 1) {
-      return extensions[0].meta.title ?? "";
+      return getTitle(extensions[0]);
     } else {
       return `Workspaces (${extensions.length})`;
     }

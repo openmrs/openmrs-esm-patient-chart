@@ -38,7 +38,10 @@ function setupOpenMRS() {
           options
         ),
         meta: {
-          title: "Order Basket", // t("orderBasket", "Order Basket")
+          title: {
+            key: "orderBasket",
+            default: "Order Basket",
+          },
         },
       },
     ],
