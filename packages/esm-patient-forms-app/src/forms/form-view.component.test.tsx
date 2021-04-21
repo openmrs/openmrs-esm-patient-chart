@@ -4,10 +4,8 @@ import userEvent from "@testing-library/user-event";
 import { screen, render } from "@testing-library/react";
 import { mockForms } from "../../__mocks__/forms.mock";
 import { mockPatient } from "../../__mocks__/patient.mock";
-import { switchTo, getStartedVisit } from "@openmrs/esm-framework";
+import { getStartedVisit } from "@openmrs/esm-framework";
 import { mockCurrentVisit } from "../../__mocks__/visits.mock";
-
-const mockSwitchTo = switchTo as jest.Mock;
 
 jest.mock("lodash-es/debounce", () => jest.fn(fn => fn));
 
@@ -41,19 +39,5 @@ describe("<FormViewComponent/>", () => {
     expect(
       screen.getByText(/Sorry, no forms have been found/)
     ).toBeInTheDocument();
-  });
-
-  it("should open form-entry extension form when a form is clicked", () => {
-    const pocVitals = screen.getByText(/POC Vitals/i);
-    userEvent.click(pocVitals);
-    expect(mockSwitchTo).toHaveBeenCalledWith(
-      "workspace",
-      "/patient/8673ee4f-e2ab-4077-ba55-4980f408773e/formentry",
-      {
-        encounterUuid: "5859f098-45d6-4c4e-9447-53dd4032d7d7",
-        formUuid: "c51b0cbe-32d8-4ea5-81d2-8f3ade30c2de",
-        title: "POC Vitals v1.0"
-      }
-    );
   });
 });

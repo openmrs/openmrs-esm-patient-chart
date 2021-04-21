@@ -4,7 +4,6 @@ import VisitNotesForm from "./visit-notes-form.component";
 import { BrowserRouter } from "react-router-dom";
 import { screen, render } from "@testing-library/react";
 import { of } from "rxjs/internal/observable/of";
-import { switchTo } from "@openmrs/esm-framework";
 import { ConfigMock } from "../../../__mocks__/chart-widgets-config.mock";
 import {
   fetchCurrentSessionData,
@@ -26,7 +25,6 @@ const mockFetchDiagnosisByName = fetchDiagnosisByName as jest.Mock;
 const mockFetchLocationByUuid = fetchLocationByUuid as jest.Mock;
 const mockFetchProviderByUuid = fetchProviderByUuid as jest.Mock;
 const mockSaveVisitNote = saveVisitNote as jest.Mock;
-const mockSwitchTo = switchTo as jest.Mock;
 
 jest.mock("./visit-notes.resource", () => ({
   fetchCurrentSessionData: jest.fn(),
@@ -115,15 +113,6 @@ describe("Visit notes form", () => {
       "No matching diagnoses have been found"
     );
     expect(spanElement).toBeInTheDocument();
-  });
-
-  it("clicking 'Cancel' closes the form", async () => {
-    renderVisitNotesForm();
-
-    const cancelBtn = await screen.findByRole("button", { name: "Cancel" });
-    userEvent.click(cancelBtn);
-    expect(mockSwitchTo).toHaveBeenCalledTimes(1);
-    expect(mockSwitchTo).toHaveBeenCalledWith("workspace", "");
   });
 
   it("clicking 'Save & Close' submits the form ", async () => {
