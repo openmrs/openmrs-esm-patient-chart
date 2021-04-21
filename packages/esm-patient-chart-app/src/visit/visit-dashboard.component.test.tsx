@@ -5,12 +5,12 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import {
   getCurrentPatientUuid,
   openmrsObservableFetch,
-  openmrsFetch
+  openmrsFetch,
 } from "@openmrs/esm-framework";
 import { of } from "rxjs/internal/observable/of";
 import {
   mockVisitTypesDataResponse,
-  mockVisits
+  mockVisits,
 } from "../../../__mocks__/visits.mock";
 import { mockLocationsDataResponse } from "../../../__mocks__/location.mock";
 import { mockSessionDataResponse } from "../../../__mocks__/session.mock";
@@ -75,7 +75,7 @@ describe("VisitDashboard", () => {
 
   it("should open and close new visit component", async () => {
     const newVisitButton = await screen.findByRole("button", {
-      name: /New Visit/i
+      name: /New Visit/i,
     });
     fireEvent.click(newVisitButton);
     expect(await screen.findByText(/start new visit/i)).toBeInTheDocument();
@@ -89,7 +89,7 @@ describe("VisitDashboard", () => {
 
   it("should open and close edit visit component", async () => {
     const editButton = await screen.findByRole("button", {
-      name: /Edit Visit/i
+      name: /Edit Visit/i,
     });
     fireEvent.click(editButton);
     expect(await screen.findByText(/28-Jul.2020/)).toBeTruthy();
@@ -111,22 +111,22 @@ describe("VisitDashboard", () => {
 
   it("should load selected visit", async () => {
     const editButton = await screen.findByRole("button", {
-      name: /Edit Visit/i
+      name: /Edit Visit/i,
     });
     fireEvent.click(editButton);
     const loadVisitButton = await screen.findByRole("button", {
-      name: /load/i
+      name: /load/i,
     });
     fireEvent.click(loadVisitButton);
   });
 
   it("should display the edit mode of visit dashboard", async () => {
     const editButton = await screen.findByRole("button", {
-      name: /Edit Visit/i
+      name: /Edit Visit/i,
     });
     fireEvent.click(editButton);
     const editVisitButton = await screen.findByRole("button", {
-      name: /edit/i
+      name: /edit/i,
     });
     fireEvent.click(editVisitButton);
     expect(await screen.findByText(/location/i)).toBeInTheDocument();

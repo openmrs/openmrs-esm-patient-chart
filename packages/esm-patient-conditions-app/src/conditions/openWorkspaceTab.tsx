@@ -1,7 +1,7 @@
 import {
   getStartedVisit,
   newWorkspaceItem,
-  switchTo
+  switchTo,
 } from "@openmrs/esm-framework";
 import isEmpty from "lodash-es/isEmpty";
 
@@ -28,11 +28,11 @@ export function openWorkspaceTab<
       component: componentToAdd,
       name: componentName,
       props: {
-        match: { params: params ? params : {} }
+        match: { params: params ? params : {} },
       },
       inProgress: false,
       validations: (workspaceTabs) =>
-        workspaceTabs.findIndex(tab => tab.component === componentToAdd)
+        workspaceTabs.findIndex((tab) => tab.component === componentToAdd),
     });
   }
 }

@@ -7,7 +7,7 @@ import ContactDetails from "./contact-details.component";
 const mockFetchPatientRelationships = fetchPatientRelationships as jest.Mock;
 
 jest.mock("./relationships.resource", () => ({
-  fetchPatientRelationships: jest.fn()
+  fetchPatientRelationships: jest.fn(),
 }));
 
 const testProps = {
@@ -18,11 +18,11 @@ const testProps = {
       id: "0000",
       postalCode: "00100",
       state: "Quux",
-      use: "home"
-    }
+      use: "home",
+    },
   ],
   telecom: [{ value: "+0123456789" }],
-  patientId: "1111"
+  patientId: "1111",
 };
 
 function renderContactDetails() {
@@ -38,12 +38,12 @@ it("displays the patient's contact details", async () => {
             uuid: 2222,
             personA: {
               person: { display: "Amanda Testerson", age: 30 },
-              uuid: 2222
+              uuid: 2222,
             },
-            relationshipType: { aIsToB: "Cousin" }
-          }
-        ]
-      }
+            relationshipType: { aIsToB: "Cousin" },
+          },
+        ],
+      },
     })
   );
 

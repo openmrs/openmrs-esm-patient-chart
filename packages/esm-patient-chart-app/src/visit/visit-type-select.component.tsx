@@ -10,13 +10,14 @@ export interface VisitTypeSelectProps {
 
 export default function VisitTypeSelect(props: VisitTypeSelectProps) {
   const visitTypes = useVisitTypes();
+  const onVisitTypeChanged = props.onVisitTypeChanged;
   const onVisitTypesChanged = React.useCallback(
     (event: React.ChangeEvent<HTMLSelectElement>) => {
-      props.onVisitTypeChanged(
+      onVisitTypeChanged(
         visitTypes.find((loc) => loc.uuid === event.target.value)
       );
     },
-    [visitTypes, props.onVisitTypeChanged]
+    [visitTypes, onVisitTypeChanged]
   );
 
   return (

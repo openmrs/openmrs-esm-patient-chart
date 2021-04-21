@@ -5,7 +5,7 @@ import Warning16 from "@carbon/icons-react/es/warning/16";
 import styles from "./order-basket-item.scss";
 import {
   ClickableTile,
-  Tile
+  Tile,
 } from "carbon-components-react/es/components/Tile";
 import { useTranslation } from "react-i18next";
 import { OrderBasketItem } from "../types/order-basket-item";
@@ -19,7 +19,7 @@ export interface OrderBasketItemTileProps {
 export default function OrderBasketItemTile({
   orderBasketItem,
   onClick,
-  onRemoveClick
+  onRemoveClick,
 }: OrderBasketItemTileProps) {
   const { t } = useTranslation();
 
@@ -36,7 +36,7 @@ export default function OrderBasketItemTile({
       style={{
         display: "flex",
         justifyContent: "space-between",
-        alignItems: "center"
+        alignItems: "center",
       }}
     >
       <p className={styles.clipTextWithEllipsis}>
@@ -114,7 +114,7 @@ export default function OrderBasketItemTile({
 }
 
 function OrderActionLabel({
-  orderBasketItem
+  orderBasketItem,
 }: {
   orderBasketItem: OrderBasketItem;
 }) {

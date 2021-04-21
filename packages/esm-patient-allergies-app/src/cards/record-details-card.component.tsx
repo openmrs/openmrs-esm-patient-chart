@@ -11,7 +11,7 @@ export default function RecordDetails(props: DetailsProps) {
       name={t("details", "Details")}
       styles={{
         width: "100%",
-        backgroundColor: "var(--omrs-color-bg-medium-contrast)"
+        backgroundColor: "var(--omrs-color-bg-medium-contrast)",
       }}
     >
       <div

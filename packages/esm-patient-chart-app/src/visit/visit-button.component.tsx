@@ -236,7 +236,10 @@ interface EndVisitProps extends VisitProps {
   visitData: Visit;
 }
 
-export const EndVisitConfirmation: React.FC<EndVisitProps> = ({ visitData, newModalItem }) => {
+export const EndVisitConfirmation: React.FC<EndVisitProps> = ({
+  visitData,
+  newModalItem,
+}) => {
   const { t } = useTranslation();
   return (
     <div className={styles.visitPromptContainer}>

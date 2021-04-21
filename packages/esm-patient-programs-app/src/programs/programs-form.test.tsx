@@ -6,7 +6,7 @@ import {
   match,
   useHistory,
   useRouteMatch,
-  BrowserRouter
+  BrowserRouter,
 } from "react-router-dom";
 import { of } from "rxjs/internal/observable/of";
 import {
@@ -16,14 +16,14 @@ import {
   fetchLocations,
   getPatientProgramByUuid,
   getSession,
-  updateProgramEnrollment
+  updateProgramEnrollment,
 } from "./programs.resource";
 import ProgramsForm, { ProgramMatchProps } from "./programs-form.component";
 import {
   mockCareProgramsResponse,
   mockEnrolledProgramsResponse,
   mockLocationsResponse,
-  mockOncProgramResponse
+  mockOncProgramResponse,
 } from "../../__mocks__/programs.mock";
 import { mockSessionDataResponse } from "../../__mocks__/session.mock";
 
@@ -53,13 +53,13 @@ jest.mock("./programs.resource", () => ({
   getPatientProgramByUuid: jest.fn(),
   getSession: jest.fn(),
   saveProgramEnrollment: jest.fn(),
-  updateProgramEnrollment: jest.fn()
+  updateProgramEnrollment: jest.fn(),
 }));
 
 jest.mock("react-router-dom", () => ({
   ...jest.requireActual("react-router-dom"),
   useHistory: jest.fn(),
-  useRouteMatch: jest.fn()
+  useRouteMatch: jest.fn(),
 }));
 
 const renderDate = (time: string) => dayjs(time).format("YYYY-MM-DD");
@@ -91,7 +91,7 @@ describe("<ProgramsForm />", () => {
       of({ status: 201, statusText: "Created" })
     );
     mockUseHistory.mockReturnValue({
-      push: jest.fn()
+      push: jest.fn(),
     });
 
     renderProgramsForm();
@@ -135,7 +135,7 @@ describe("<ProgramsForm />", () => {
     const oncologyScreeningProgramUuid = "11b129ca-a5e7-4025-84bf-b92a173e20de";
     const chooseProgramInput = screen.getAllByRole("combobox", { name: "" })[0];
     fireEvent.change(chooseProgramInput, {
-      target: { value: oncologyScreeningProgramUuid }
+      target: { value: oncologyScreeningProgramUuid },
     });
     await screen.findByDisplayValue("Oncology Screening and Diagnosis");
 
@@ -147,10 +147,10 @@ describe("<ProgramsForm />", () => {
     // Select enrollment location
     const inpatientWardUuid = "b1a8b05e-3542-4037-bbd3-998ee9c40574";
     const chooseLocationInput = screen.getAllByRole("combobox", {
-      name: ""
+      name: "",
     })[1];
     fireEvent.change(chooseLocationInput, {
-      target: { value: inpatientWardUuid }
+      target: { value: inpatientWardUuid },
     });
     await screen.findByDisplayValue("Inpatient Ward");
 
@@ -163,7 +163,7 @@ describe("<ProgramsForm />", () => {
         dateEnrolled: "2020-05-05",
         location: "b1a8b05e-3542-4037-bbd3-998ee9c40574",
         patient: "8673ee4f-e2ab-4077-ba55-4980f408773e",
-        program: "11b129ca-a5e7-4025-84bf-b92a173e20de"
+        program: "11b129ca-a5e7-4025-84bf-b92a173e20de",
       },
       new AbortController()
     );
@@ -191,11 +191,11 @@ describe("<ProgramsForm />", () => {
         programUuid: "46bd14b8-2357-42a2-8e16-262e8f0057d7",
         enrollmentDate: "2020-01-25T00:00:00.000+0000",
         completionDate: "2020-04-14T00:00:00.000+0000",
-        locationUuid: "58c57d25-8d39-41ab-8422-108a0c277d98"
+        locationUuid: "58c57d25-8d39-41ab-8422-108a0c277d98",
       },
       isExact: false,
       path: "/",
-      url: "/"
+      url: "/",
     };
     mockUseRouteMatch.mockReturnValue(testMatch);
     mockUpdateProgramEnrollment.mockReturnValue(
@@ -240,7 +240,7 @@ describe("<ProgramsForm />", () => {
         dateCompleted: "2020-06-01",
         dateEnrolled: "2020-01-25T00:00:00.000+0000",
         location: "b1a8b05e-3542-4037-bbd3-998ee9c40574",
-        program: "46bd14b8-2357-42a2-8e16-262e8f0057d7"
+        program: "46bd14b8-2357-42a2-8e16-262e8f0057d7",
       },
       new AbortController()
     );

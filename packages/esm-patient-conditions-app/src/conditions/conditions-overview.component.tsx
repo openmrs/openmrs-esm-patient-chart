@@ -10,7 +10,7 @@ import DataTable, {
   TableBody,
   TableHead,
   TableHeader,
-  TableRow
+  TableRow,
 } from "carbon-components-react/es/components/DataTable";
 import Add16 from "@carbon/icons-react/es/add/16";
 import EmptyState from "./empty-state/empty-state.component";
@@ -20,7 +20,7 @@ import styles from "./conditions-overview.scss";
 import { useTranslation } from "react-i18next";
 import {
   Condition,
-  performPatientConditionsSearch
+  performPatientConditionsSearch,
 } from "./conditions.resource";
 import { openWorkspaceTab } from "./openWorkspaceTab";
 
@@ -47,7 +47,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient }) => {
     if (patient) {
       const sub = performPatientConditionsSearch(
         patient.identifier[0].value
-      ).subscribe(conditions => {
+      ).subscribe((conditions) => {
         setConditions(conditions);
       }, setError);
 
@@ -62,20 +62,20 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient }) => {
   const headers = [
     {
       key: "display",
-      header: t("activeConditions", "Active Conditions")
+      header: t("activeConditions", "Active Conditions"),
     },
     {
       key: "onsetDateTime",
-      header: t("since", "Since")
-    }
+      header: t("since", "Since"),
+    },
   ];
 
   const getRowItems = (rows: Array<Condition>) => {
     return rows
       .slice(firstRowIndex, firstRowIndex + currentPageSize)
-      .map(row => ({
+      .map((row) => ({
         ...row,
-        onsetDateTime: dayjs(row.onsetDateTime).format("MMM-YYYY")
+        onsetDateTime: dayjs(row.onsetDateTime).format("MMM-YYYY"),
       }));
   };
 
@@ -109,12 +109,12 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient }) => {
                 <Table {...getTableProps()}>
                   <TableHead>
                     <TableRow>
-                      {headers.map(header => (
+                      {headers.map((header) => (
                         <TableHeader
                           className={`${styles.productiveHeading01} ${styles.text02}`}
                           {...getHeaderProps({
                             header,
-                            isSortable: header.isSortable
+                            isSortable: header.isSortable,
                           })}
                         >
                           {header.header?.content ?? header.header}
@@ -123,9 +123,9 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient }) => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {rows.map(row => (
+                    {rows.map((row) => (
                       <TableRow key={row.id}>
-                        {row.cells.map(cell => (
+                        {row.cells.map((cell) => (
                           <TableCell key={cell.id}>
                             {cell.value?.content ?? cell.value}
                           </TableCell>

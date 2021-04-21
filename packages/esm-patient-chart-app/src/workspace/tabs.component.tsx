@@ -20,7 +20,7 @@ export function Tabs(props) {
                 style={{
                   display: "flex",
                   width: "100%",
-                  justifyContent: "space-between"
+                  justifyContent: "space-between",
                 }}
               >
                 <div key={index} className={styles.tab}>
@@ -32,7 +32,7 @@ export function Tabs(props) {
                   </button>
                 </div>
                 <button
-                  onClick={$event => removeTab($event, index)}
+                  onClick={($event) => removeTab($event, index)}
                   className={`${styles.closeIcon} omrs-unstyled omrs-btn-icon-small`}
                 >
                   <svg className="omrs-icon">

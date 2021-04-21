@@ -18,11 +18,11 @@ const renderConditionsOverview = () => {
 };
 
 jest.mock("./conditions.resource", () => ({
-  performPatientConditionsSearch: jest.fn()
+  performPatientConditionsSearch: jest.fn(),
 }));
 
 jest.mock("../shared-utils", () => ({
-  openWorkspaceTab: jest.fn()
+  openWorkspaceTab: jest.fn(),
 }));
 
 const renderDateDisplay = (time: string) => dayjs(time).format("MMM-YYYY");

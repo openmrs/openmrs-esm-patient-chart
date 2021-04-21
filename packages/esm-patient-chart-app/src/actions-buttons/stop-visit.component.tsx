@@ -12,8 +12,7 @@ const StopVisitOverflowMenuItem: React.FC<StopVisitOverflowMenuItemProps> = ({
   const { t } = useTranslation();
   const { currentVisit } = useVisit(patientUuid);
   const handleClick = React.useCallback(
-    () =>
-      switchTo("dialog", "/end-visit/prompt", { visitData: currentVisit }),
+    () => switchTo("dialog", "/end-visit/prompt", { visitData: currentVisit }),
     [currentVisit]
   );
 

@@ -4,7 +4,7 @@ import split from "lodash-es/split";
 import {
   FHIRImmunizationBundle,
   FHIRImmunizationResource,
-  OpenmrsConcept
+  OpenmrsConcept,
 } from "./immunization-domain";
 
 function getImmunizationsConceptSetByUuid(
@@ -14,9 +14,9 @@ function getImmunizationsConceptSetByUuid(
   return openmrsFetch(
     `/ws/rest/v1/concept/${immunizationsConceptSetSearchText}?v=full`,
     {
-      signal: abortController.signal
+      signal: abortController.signal,
     }
-  ).then(response => response.data);
+  ).then((response) => response.data);
 }
 
 function isConceptMapping(searchText: string) {
@@ -31,9 +31,9 @@ function searchImmunizationsConceptSetByMapping(
   return openmrsFetch(
     `/ws/rest/v1/concept?source=${source}&code=${code}&v=full`,
     {
-      signal: abortController.signal
+      signal: abortController.signal,
     }
-  ).then(response => response.data.results[0]);
+  ).then((response) => response.data.results[0]);
 }
 
 export function getImmunizationsConceptSet(
@@ -61,9 +61,9 @@ export function performPatientImmunizationsSearch(
   return openmrsFetch(
     `${fhirBaseUrl}/Immunization?patient.identifier=${patientIdentifier}`,
     {
-      signal: abortController.signal
+      signal: abortController.signal,
     }
-  ).then(response => response.data);
+  ).then((response) => response.data);
 }
 
 export function savePatientImmunization(
@@ -78,10 +78,10 @@ export function savePatientImmunization(
   }
   return openmrsFetch(immunizationEndpoint, {
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
     method: "POST",
     body: patientImmunization,
-    signal: abortController.signal
+    signal: abortController.signal,
   });
 }

@@ -7,7 +7,7 @@ export interface AppointmentsContextShape {
 
 export const AppointmentsContext = createContext<AppointmentsContextShape>({
   patientUuid: undefined,
-  patient: undefined
+  patient: undefined,
 });
 
 export function useAppointmentsContext() {

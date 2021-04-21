@@ -6,7 +6,7 @@ import { of } from "rxjs/internal/observable/of";
 import { fetchEncounterByUuid } from "./encounter.resource";
 import {
   mockEncounterResponse,
-  mockAlternativeEncounterResponse
+  mockAlternativeEncounterResponse,
 } from "../../__mocks__/encounters.mock";
 
 const mockFetchPatientEncounter = fetchEncounterByUuid as jest.Mock;
@@ -19,7 +19,7 @@ const renderNoteRecord = () =>
   );
 
 jest.mock("./encounter.resource", () => ({
-  fetchEncounterByUuid: jest.fn()
+  fetchEncounterByUuid: jest.fn(),
 }));
 
 describe("<NoteRecord />", () => {

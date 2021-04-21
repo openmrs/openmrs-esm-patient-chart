@@ -1,7 +1,7 @@
 import { openmrsFetch } from "@openmrs/esm-framework";
 import {
   getImmunizationsConceptSet,
-  performPatientImmunizationsSearch
+  performPatientImmunizationsSearch,
 } from "./immunizations.resource";
 import { mockPatientImmunizationsSearchResponse } from "../../__mocks__/immunizations.mock";
 import { FHIRImmunizationBundle, OpenmrsConcept } from "./immunization-domain";
@@ -20,9 +20,9 @@ describe("<ImmunizationResource />", () => {
         display: "conceptSetName",
         setMembers: [
           { uuid: "member1Uuid", display: "member1Name" },
-          { uuid: "member2Uuid", display: "member2Name" }
-        ]
-      }
+          { uuid: "member2Uuid", display: "member2Name" },
+        ],
+      },
     });
 
     const abortController = new AbortController();
@@ -49,11 +49,11 @@ describe("<ImmunizationResource />", () => {
             display: "conceptSetName",
             setMembers: [
               { uuid: "member1Uuid", display: "member1Name" },
-              { uuid: "member2Uuid", display: "member2Name" }
-            ]
-          }
-        ]
-      }
+              { uuid: "member2Uuid", display: "member2Name" },
+            ],
+          },
+        ],
+      },
     });
 
     const abortController = new AbortController();
@@ -75,7 +75,7 @@ describe("<ImmunizationResource />", () => {
 
   it("should fetch immiunization bundles for a given patient", async () => {
     mockOpenmrsFetch.mockResolvedValueOnce({
-      data: mockPatientImmunizationsSearchResponse
+      data: mockPatientImmunizationsSearchResponse,
     });
 
     const abortController = new AbortController();

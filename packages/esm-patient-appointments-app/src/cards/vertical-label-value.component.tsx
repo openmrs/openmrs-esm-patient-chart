@@ -21,7 +21,7 @@ export default function VerticalLabelValue(props: VerticalLabelValueProps) {
 
 VerticalLabelValue.defaultProps = {
   valueStyles: {},
-  className: ""
+  className: "",
 };
 
 type VerticalLabelValueProps = {

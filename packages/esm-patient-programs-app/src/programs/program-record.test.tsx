@@ -10,11 +10,11 @@ import { of } from "rxjs/internal/observable/of";
 const mockFetchPatientProgram = getPatientProgramByUuid as jest.Mock;
 
 jest.mock("./programs.resource", () => ({
-  getPatientProgramByUuid: jest.fn()
+  getPatientProgramByUuid: jest.fn(),
 }));
 
 jest.mock("../shared-utils", () => ({
-  openWorkspaceTab: jest.fn()
+  openWorkspaceTab: jest.fn(),
 }));
 
 describe("<ProgramRecord />", () => {
@@ -58,7 +58,7 @@ describe("<ProgramRecord />", () => {
         enrollmentDate: "2019-11-01T15:00:00.000+0000",
         location: undefined,
         program: "HIV Care and Treatment",
-        programUuid: "8ba6c08f-66d9-4a18-a233-5f658b1755bf"
+        programUuid: "8ba6c08f-66d9-4a18-a233-5f658b1755bf",
       }
     );
   });

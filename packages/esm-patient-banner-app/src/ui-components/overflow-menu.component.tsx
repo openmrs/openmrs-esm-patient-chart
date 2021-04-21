@@ -40,8 +40,9 @@ const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = 
       ref={wrapperRef}
     >
       <button
-        className={`bx--overflow-menu__trigger ${showMenu &&
-          "bx--overflow-menu--open"}`}
+        className={`bx--overflow-menu__trigger ${
+          showMenu && "bx--overflow-menu--open"
+        }`}
         aria-haspopup="true"
         aria-expanded={showMenu}
         id="custom-actions-overflow-menu-trigger"

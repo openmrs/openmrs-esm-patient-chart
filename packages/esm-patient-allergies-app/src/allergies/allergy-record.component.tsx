@@ -17,7 +17,7 @@ interface AllergyRecordProps
 enum Severity {
   Severe = "Severe",
   Mild = "Mild",
-  Moderate = "Moderate"
+  Moderate = "Moderate",
 }
 
 export default function AllergyRecord(props: AllergyRecordProps) {
@@ -29,7 +29,7 @@ export default function AllergyRecord(props: AllergyRecordProps) {
   useEffect(() => {
     if (patient && allergyUuid) {
       const sub = fetchAllergyByUuid(allergyUuid).subscribe(
-        allergy => setAllergy(allergy),
+        (allergy) => setAllergy(allergy),
         createErrorHandler()
       );
 
@@ -50,7 +50,7 @@ export default function AllergyRecord(props: AllergyRecordProps) {
                 AllergyForm,
                 `${t("Edit Allergy", "Edit Allergy")}`,
                 {
-                  allergyUuid: allergy.id
+                  allergyUuid: allergy.id,
                 }
               )
             }

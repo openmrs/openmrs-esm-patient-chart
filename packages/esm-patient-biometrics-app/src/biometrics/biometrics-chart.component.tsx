@@ -24,27 +24,28 @@ const chartColors = { weight: "#6929c4", height: "#6929c4", bmi: "#6929c4" };
 
 const BiometricsChart: React.FC<BiometricsChartProps> = ({
   patientBiometrics,
-  conceptsUnits
+  conceptsUnits,
 }) => {
   const config = useConfig();
   const { bmiUnit } = config.biometrics;
   const [, , , heightUnit, weightUnit] = conceptsUnits;
-  const [selectedBiometrics, setSelectedBiometrics] = React.useState<
-    BiometricChartData
-  >({
+  const [
+    selectedBiometrics,
+    setSelectedBiometrics,
+  ] = React.useState<BiometricChartData>({
     title: `Weight (${weightUnit})`,
     value: "weight",
-    groupName: "weight"
+    groupName: "weight",
   });
 
   const chartData = React.useMemo(
     () =>
-      patientBiometrics.map(biometric => {
+      patientBiometrics.map((biometric) => {
         return biometric[selectedBiometrics.value]
           ? {
               group: selectedBiometrics.groupName,
               key: dayjs(biometric.date).format("DD-MMM"),
-              value: biometric[selectedBiometrics.value]
+              value: biometric[selectedBiometrics.value],
             }
           : {};
       }),
@@ -57,21 +58,21 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({
         bottom: {
           title: "Date",
           mapsTo: "key",
-          scaleType: ScaleTypes.LABELS
+          scaleType: ScaleTypes.LABELS,
         },
         left: {
           mapsTo: "value",
           title: selectedBiometrics.title,
           scaleType: ScaleTypes.LINEAR,
-          includeZero: false
-        }
+          includeZero: false,
+        },
       },
       legend: {
-        enabled: false
+        enabled: false,
       },
       color: {
-        scale: chartColors
-      }
+        scale: chartColors,
+      },
     };
   }, [selectedBiometrics]);
   return (
@@ -93,7 +94,7 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({
           {[
             { id: "weight", label: `Weight (${weightUnit})` },
             { id: "height", label: `Height (${heightUnit})` },
-            { id: "bmi", label: `BMI (${bmiUnit})` }
+            { id: "bmi", label: `BMI (${bmiUnit})` },
           ].map(({ id, label }) => (
             <RadioButton
               id={id}
@@ -104,7 +105,7 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({
                 setSelectedBiometrics({
                   title: label,
                   value: id,
-                  groupName: id
+                  groupName: id,
                 })
               }
             />

@@ -220,7 +220,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid }) => {
       ).subscribe(setVitals, setError);
       return () => subscription.unsubscribe();
     }
-  }, [patientUuid]);
+  }, [patientUuid, config.concepts]);
 
   const tableRows = React.useMemo(
     () =>
@@ -230,8 +230,9 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid }) => {
           return {
             id: `${index}`,
             date: dayjs(vital.date).format(`DD - MMM - YYYY`),
-            bloodPressure: `${vital.systolic ?? "-"} / ${vital.diastolic ??
-              "-"}`,
+            bloodPressure: `${vital.systolic ?? "-"} / ${
+              vital.diastolic ?? "-"
+            }`,
             pulse: vital.pulse,
             spo2: vital.oxygenSaturation,
             temperature: vital.temperature,

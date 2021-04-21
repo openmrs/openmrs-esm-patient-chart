@@ -14,7 +14,7 @@ import DataTable, {
   TableBody,
   TableHead,
   TableHeader,
-  TableRow
+  TableRow,
 } from "carbon-components-react/es/components/DataTable";
 import { useTranslation } from "react-i18next";
 import { mapFromFHIRImmunizationBundle } from "./immunization-mapper";
@@ -29,7 +29,7 @@ export interface ImmunizationsOverviewProps {
 
 const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = ({
   patient,
-  patientUuid
+  patientUuid,
 }) => {
   const immunizationsToShowCount = 5;
   const { t } = useTranslation();
@@ -46,7 +46,7 @@ const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = ({
         patientUuid,
         abortController
       )
-        .then(searchResult => {
+        .then((searchResult) => {
           let allImmunizations = mapFromFHIRImmunizationBundle(searchResult);
           setImmunizations(allImmunizations);
         })
@@ -59,12 +59,12 @@ const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = ({
   const headers = [
     {
       key: "vaccine",
-      header: t("vaccine", "Vaccine")
+      header: t("vaccine", "Vaccine"),
     },
     {
       key: "vaccinationDate",
-      header: t("vaccinationDate", "Vaccination date")
-    }
+      header: t("vaccinationDate", "Vaccination date"),
+    },
   ];
 
   const launchImmunizationsForm = () => {
@@ -103,12 +103,12 @@ const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = ({
                 <Table {...getTableProps()}>
                   <TableHead>
                     <TableRow>
-                      {headers.map(header => (
+                      {headers.map((header) => (
                         <TableHeader
                           className={`${styles.productiveHeading01} ${styles.text02}`}
                           {...getHeaderProps({
                             header,
-                            isSortable: header.isSortable
+                            isSortable: header.isSortable,
                           })}
                         >
                           {header.header?.content ?? header.header}
@@ -117,9 +117,9 @@ const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = ({
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {rows.map(row => (
+                    {rows.map((row) => (
                       <TableRow key={row.id}>
-                        {row.cells.map(cell => (
+                        {row.cells.map((cell) => (
                           <TableCell key={cell.id}>
                             {cell.value?.content ?? cell.value}
                           </TableCell>
@@ -156,7 +156,7 @@ function getRowItems(rows) {
     vaccine: row.vaccineName,
     vaccinationDate: `${dayjs(row.existingDoses[0].occurrenceDateTime).format(
       "MMM-YYYY"
-    )}`
+    )}`,
   }));
 }
 

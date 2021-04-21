@@ -13,7 +13,7 @@ export default function CameraFrame(props: CameraFrameProps) {
           <span
             role="button"
             className={styles.close}
-            onClick={e => handleClick()}
+            onClick={(e) => handleClick()}
             tabIndex={0}
           >
             &times;
@@ -31,7 +31,7 @@ export default function CameraFrame(props: CameraFrameProps) {
                 id="uploadPhoto"
                 accept="image/*"
                 style={{ display: "none" }}
-                onChange={e => props.setSelectedFile(e.target.files[0])}
+                onChange={(e) => props.setSelectedFile(e.target.files[0])}
               />
             </form>
           </div>

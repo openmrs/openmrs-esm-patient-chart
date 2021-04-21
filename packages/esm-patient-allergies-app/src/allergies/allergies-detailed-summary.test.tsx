@@ -16,11 +16,11 @@ const renderAllergiesDetailedSummary = () =>
   );
 
 jest.mock("./allergy-intolerance.resource", () => ({
-  performPatientAllergySearch: jest.fn()
+  performPatientAllergySearch: jest.fn(),
 }));
 
 jest.mock("../shared-utils", () => ({
-  openWorkspaceTab: jest.fn()
+  openWorkspaceTab: jest.fn(),
 }));
 
 describe("AllergiesDetailedSummary />", () => {
