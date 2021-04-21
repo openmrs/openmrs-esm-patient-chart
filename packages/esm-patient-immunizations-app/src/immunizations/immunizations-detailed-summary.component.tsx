@@ -129,7 +129,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
 
       return () => abortController.abort();
     }
-  }, [patient, patientUuid]);
+  }, [patient, patientUuid, immunizationsConfig]);
 
   function displayImmunizations() {
     return (

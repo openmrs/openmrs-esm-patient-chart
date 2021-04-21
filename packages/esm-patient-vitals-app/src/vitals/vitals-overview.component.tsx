@@ -220,7 +220,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid }) => {
       ).subscribe(setVitals, setError);
       return () => subscription.unsubscribe();
     }
-  }, [patientUuid]);
+  }, [patientUuid, config.concepts]);
 
   const tableRows = React.useMemo(
     () =>

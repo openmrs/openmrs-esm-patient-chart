@@ -22,7 +22,7 @@ const CapturePhoto: React.FC<CapturePhotoProps> = ({
   const [openCamera, setOpenCamera] = useState(false);
   const [dataUri, setDataUri] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
-  const [currentPhoto, setCurrentPhoto] = useState(placeholder);
+  const [currentPhoto, setCurrentPhoto] = useState(initialState ?? placeholder);
   const altText = "Photo preview";
   const showCamera = useCallback(() => {
     setOpenCamera(true);
@@ -39,14 +39,8 @@ const CapturePhoto: React.FC<CapturePhotoProps> = ({
       setSelectedFile(selectedFile);
       onCapturePhoto(dataUri, selectedFile, toOmrsIsoString(new Date()));
     },
-    [onCapturePhoto]
+    [onCapturePhoto, closeCamera]
   );
-
-  useEffect(() => {
-    if (initialState) {
-      setCurrentPhoto(initialState);
-    }
-  }, []);
 
   return (
     <div style={{ display: "flex" }}>

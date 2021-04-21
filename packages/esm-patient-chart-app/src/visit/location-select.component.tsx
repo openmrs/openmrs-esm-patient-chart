@@ -20,7 +20,7 @@ const LocationSelect: React.FC<LocationSelectProps> = ({
         locations.find((loc) => loc.uuid == event.target.value)
       );
     },
-    [locations]
+    [locations, onLocationChanged]
   );
 
   return (

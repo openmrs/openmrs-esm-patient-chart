@@ -39,7 +39,7 @@ const ShowTabs: React.FC<ShowTabsProps> = ({ slot, view, fullPath }) => {
   const extensions = React.useMemo(() => {
     const ids = store.slots[slot]?.attachedIds ?? [];
     return ids.map((id) => store.extensions[id]);
-  }, [store]);
+  }, [store, slot]);
   const defaultExtension = extensions[0];
 
   useEffect(() => {
@@ -48,7 +48,7 @@ const ShowTabs: React.FC<ShowTabsProps> = ({ slot, view, fullPath }) => {
         to: `${fullPath}/${defaultExtension.meta.view}`,
       });
     }
-  }, [view, defaultExtension]);
+  }, [view, defaultExtension, fullPath]);
 
   return (
     <ul>

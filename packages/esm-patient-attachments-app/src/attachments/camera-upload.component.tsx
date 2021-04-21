@@ -44,22 +44,24 @@ const CameraUpload: React.FC<CameraUploadProps> = ({
     setCameraIsOpen(true);
   }, []);
 
-  const handleCloseCamera = useCallback(() => {
-    setCameraIsOpen(false);
-    openCameraOnRender = false;
-    closeCamera?.();
-    clearCamera();
-  }, []);
-
-  const handleTakePhoto = useCallback((dataUri: string) => {
-    setDataUri(dataUri);
-    onTakePhoto?.(dataUri);
-  }, []);
-
   const clearCamera = useCallback(() => {
     setDataUri("");
     setSelectedFile(null);
   }, []);
+
+  const handleCloseCamera = useCallback(() => {
+    setCameraIsOpen(false);
+    closeCamera?.();
+    clearCamera();
+  }, [closeCamera, clearCamera]);
+
+  const handleTakePhoto = useCallback(
+    (dataUri: string) => {
+      setDataUri(dataUri);
+      onTakePhoto?.(dataUri);
+    },
+    [onTakePhoto]
+  );
 
   const handleSaveImage = useCallback(
     (dataUri: string, caption: string) => {
@@ -82,7 +84,7 @@ const CameraUpload: React.FC<CameraUploadProps> = ({
         });
       });
     },
-    [patientUuid]
+    [patientUuid, onNewAttachment]
   );
 
   const willSaveImage = useCallback(
@@ -95,7 +97,7 @@ const CameraUpload: React.FC<CameraUploadProps> = ({
       }
       clearCamera();
     },
-    []
+    [clearCamera, delegateSaveImage, handleSaveImage]
   );
 
   useEffect(() => {

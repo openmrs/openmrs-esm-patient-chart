@@ -48,7 +48,7 @@ const VitalHeader: React.FC<VitalHeaderProps> = ({ patientUuid }) => {
       }, createErrorHandler);
       return () => subscription.unsubscribe();
     }
-  }, [patientUuid]);
+  }, [patientUuid, config.concepts]);
 
   useEffect(() => {
     if (vital && !dayjs(vital.date).isToday()) {
