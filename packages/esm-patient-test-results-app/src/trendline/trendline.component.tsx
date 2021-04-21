@@ -91,7 +91,7 @@ const withPatientData = (WrappedComponent) => ({
   const patientData = useTrendlineData({ patientUuid, panelUuid, testUuid });
   const openTimeline = React.useCallback(
     () => openTimelineExternal(panelUuid),
-    [panelUuid]
+    [panelUuid, openTimelineExternal]
   );
 
   if (!patientData) return <div>Loading...</div>;

@@ -83,13 +83,13 @@ const LabResults: React.FC<Record<string, any>> = ({
     (panelUuid) => {
       navigate({ to: `${basePath}/timeline/${panelUuid}` });
     },
-    [setViewState]
+    [basePath]
   );
 
   const openTrendline = React.useCallback(
     (panelUuid, testUuid) =>
       navigate({ to: `${basePath}/trendline/${panelUuid}/${testUuid}` }),
-    [setViewState]
+    [basePath]
   );
 
   return (
