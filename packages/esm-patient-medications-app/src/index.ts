@@ -13,7 +13,7 @@ function setupOpenMRS() {
 
   const options = {
     featureName: "patient-medications",
-    moduleName
+    moduleName,
   };
 
   defineConfigSchema(moduleName, {});
@@ -28,8 +28,8 @@ function setupOpenMRS() {
           options
         ),
         meta: {
-          columnSpan: 1
-        }
+          columnSpan: 1,
+        },
       },
       {
         id: "order-basket-workspace",
@@ -38,10 +38,13 @@ function setupOpenMRS() {
           options
         ),
         meta: {
-          title: 'Order Basket', // t("orderBasket", "Order Basket")
+          title: {
+            key: "orderBasket",
+            default: "Order Basket",
+          },
         },
-      }
-    ]
+      },
+    ],
   };
 }
 

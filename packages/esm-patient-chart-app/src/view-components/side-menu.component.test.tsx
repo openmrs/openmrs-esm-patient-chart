@@ -7,6 +7,7 @@ jest.mock("@openmrs/esm-framework", () => ({
   useLayoutType: jest.fn(() => "tablet"),
   ExtensionSlot: jest.fn(() => <div>rendered</div>),
 }));
+
 jest.mock("./side-menu.component.scss", () => ({}));
 
 describe("sidemenu", () => {

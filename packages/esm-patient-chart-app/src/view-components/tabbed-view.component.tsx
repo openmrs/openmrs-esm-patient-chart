@@ -2,31 +2,14 @@ import React, { useEffect } from "react";
 import styles from "./tabbed-view.css";
 import {
   ConfigurableLink,
-  ExtensionInfo,
   ExtensionSlot,
   navigate,
-  translateFrom,
-  useExtensionStore,
+  useAssignedExtensionIds,
 } from "@openmrs/esm-framework";
 import { useRouteMatch } from "react-router-dom";
 import { DashboardTabConfig } from "../config-schemas";
-import { basePath } from "../constants";
-
-function getTitle(ext: ExtensionInfo) {
-  const title = ext.meta.title;
-
-  if (typeof title === "string") {
-    return title;
-  } else if (title && typeof title === "object") {
-    return translateFrom(
-      ext.moduleName,
-      ext.meta.title.key,
-      ext.meta.title.default
-    );
-  }
-
-  return ext.name;
-}
+import { basePath, moduleName } from "../constants";
+import { getTitle } from "../utils";
 
 interface ShowTabsProps {
   slot: string;
@@ -35,11 +18,7 @@ interface ShowTabsProps {
 }
 
 const ShowTabs: React.FC<ShowTabsProps> = ({ slot, view, fullPath }) => {
-  const store = useExtensionStore();
-  const extensions = React.useMemo(() => {
-    const ids = store.slots[slot]?.attachedIds ?? [];
-    return ids.map((id) => store.extensions[id]);
-  }, [store, slot]);
+  const extensions = useAssignedExtensionIds(moduleName, slot);
   const defaultExtension = extensions[0];
 
   useEffect(() => {

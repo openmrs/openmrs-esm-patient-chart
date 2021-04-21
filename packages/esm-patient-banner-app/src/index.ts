@@ -13,7 +13,7 @@ function setupOpenMRS() {
 
   const options = {
     featureName: "patient-banner",
-    moduleName
+    moduleName,
   };
 
   defineConfigSchema(moduleName, {});
@@ -26,9 +26,9 @@ function setupOpenMRS() {
         load: getAsyncLifecycle(
           () => import("./banner/patient-banner.component"),
           options
-        )
-      }
-    ]
+        ),
+      },
+    ],
   };
 }
 

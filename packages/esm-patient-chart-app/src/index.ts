@@ -5,7 +5,7 @@ import {
   getAsyncLifecycle,
 } from "@openmrs/esm-framework";
 import { esmPatientChartSchema } from "./config-schemas/openmrs-esm-patient-chart-schema";
-import { spaBasePath } from "./constants";
+import { moduleName, spaBasePath } from "./constants";
 import { backendDependencies } from "./openmrs-backend-dependencies";
 
 const importTranslation = require.context(
@@ -16,8 +16,6 @@ const importTranslation = require.context(
 );
 
 function setupOpenMRS() {
-  const moduleName = "@openmrs/esm-patient-chart-app";
-
   defineConfigSchema(moduleName, esmPatientChartSchema);
 
   registerBreadcrumbs([

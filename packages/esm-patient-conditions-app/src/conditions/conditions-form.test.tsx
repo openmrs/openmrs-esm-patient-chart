@@ -1,7 +1,7 @@
 import React from "react";
+import ConditionsForm from "./conditions-form.component";
 import { useHistory, useRouteMatch, BrowserRouter } from "react-router-dom";
 import { fireEvent, render, screen } from "@testing-library/react";
-import { ConditionsForm } from "./conditions-form.component";
 import {
   createPatientCondition,
   updatePatientCondition,

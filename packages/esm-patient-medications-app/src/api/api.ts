@@ -15,7 +15,7 @@ export function getPatientEncounterId(
   return openmrsFetch(
     `/ws/rest/v1/encounter?patient=${patientUuid}&order=desc&limit=1&v=custom:(uuid)`,
     {
-      signal: abortController.signal
+      signal: abortController.signal,
     }
   );
 }
@@ -27,7 +27,7 @@ export function getDrugByName(
   return openmrsFetch(
     `/ws/rest/v1/drug?q=${drugName}&v=custom:(uuid,name,strength,dosageForm:(display,uuid),concept)`,
     {
-      signal: abortController?.signal
+      signal: abortController?.signal,
     }
   );
 }
@@ -46,7 +46,7 @@ export function getMedicationByUuid(
   return openmrsFetch(
     `/ws/rest/v1/order/${orderUuid}?v=custom:(uuid,route:(uuid,display),action,urgency,display,drug:(display,strength),frequency:(display),dose,doseUnits:(display),orderer,dateStopped,dateActivated,previousOrder,numRefills,duration,durationUnits:(display),dosingInstructions)`,
     {
-      signal: abortController.signal
+      signal: abortController.signal,
     }
   );
 }
@@ -56,7 +56,7 @@ export function postOrder(body: OrderPost, abortController?: AbortController) {
     method: "POST",
     signal: abortController?.signal,
     headers: { "Content-Type": "application/json" },
-    body
+    body,
   });
 }
 
@@ -69,5 +69,5 @@ export async function fetchPatientOrders(
     `/ws/rest/v1/order?patient=${patientUuid}&careSetting=${careSetting}&status=${status}&v=custom:(uuid,dosingType,orderNumber,accessionNumber,patient:ref,action,careSetting:ref,previousOrder:ref,dateActivated,scheduledDate,dateStopped,autoExpireDate,orderType:ref,encounter:ref,orderer:ref,orderReason,orderReasonNonCoded,orderType,urgency,instructions,commentToFulfiller,drug:(uuid,name,strength,dosageForm:(display,uuid),concept),dose,doseUnits:ref,frequency:ref,asNeeded,asNeededCondition,quantity,quantityUnits:ref,numRefills,dosingInstructions,duration,durationUnits:ref,route:ref,brandName,dispenseAsWritten)`,
     { signal: abortController?.signal }
   );
-  return data.results.filter(x => x.orderType.display === "Drug Order");
+  return data.results.filter((x) => x.orderType.display === "Drug Order");
 }

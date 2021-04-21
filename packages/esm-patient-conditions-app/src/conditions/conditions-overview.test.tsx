@@ -21,10 +21,6 @@ jest.mock("./conditions.resource", () => ({
   performPatientConditionsSearch: jest.fn(),
 }));
 
-jest.mock("../shared-utils", () => ({
-  openWorkspaceTab: jest.fn(),
-}));
-
 const renderDateDisplay = (time: string) => dayjs(time).format("MMM-YYYY");
 
 describe("<ConditionsOverview />", () => {

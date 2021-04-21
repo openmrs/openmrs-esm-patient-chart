@@ -1,5 +1,5 @@
-import { OpenmrsReactComponentProps } from "@openmrs/esm-framework";
 import * as React from "react";
+import { OpenmrsReactComponentProps } from "@openmrs/esm-framework";
 import { MemoryRouter, Route, useParams } from "react-router-dom";
 
 export default function withWorkspaceRouting<T, K extends Record<string, any>>(
@@ -13,9 +13,9 @@ export default function withWorkspaceRouting<T, K extends Record<string, any>>(
   return (props) => {
     return (
       <MemoryRouter
-        initialEntries={[props._extensionContext?.actualExtensionSlotName]}
+        initialEntries={[props._extensionContext?.extensionSlotName]}
       >
-        <Route path={props._extensionContext?.attachedExtensionSlotName}>
+        <Route path={props._extensionContext?.extensionSlotName}>
           <WrappedWithParams {...props} />
         </Route>
       </MemoryRouter>

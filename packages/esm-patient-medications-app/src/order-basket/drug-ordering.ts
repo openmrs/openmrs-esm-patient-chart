@@ -18,10 +18,10 @@ export async function orderDrugs(
   for (let i = 0; i < dtos.length; i++) {
     const dto = dtos[i];
     const orderBasketItem = orderBasketItems[i];
-    await postOrder(dto, abortController).catch(error => {
+    await postOrder(dto, abortController).catch((error) => {
       erroredItems.push({
         ...orderBasketItem,
-        orderError: error
+        orderError: error,
       });
     });
   }
@@ -33,7 +33,7 @@ function medicationOrderToApiDto(
   orderBasketItems: Array<OrderBasketItem>,
   patientUuid: string
 ): Array<OrderPost> {
-  return orderBasketItems.map(order => {
+  return orderBasketItems.map((order) => {
     if (order.action === "NEW" || order.action === "RENEWED") {
       return {
         action: "NEW",
@@ -62,7 +62,7 @@ function medicationOrderToApiDto(
           : order.patientInstructions,
         concept: order.drug.concept.uuid,
         orderReasonNonCoded: order.indication,
-        dateActivated: toOmrsIsoString(order.startDate)
+        dateActivated: toOmrsIsoString(order.startDate),
       };
     } else if (order.action === "REVISE") {
       return {
@@ -93,7 +93,7 @@ function medicationOrderToApiDto(
           : order.patientInstructions,
         concept: order.drug.concept.uuid,
         orderReasonNonCoded: order.indication,
-        dateActivated: toOmrsIsoString(order.startDate)
+        dateActivated: toOmrsIsoString(order.startDate),
       };
     } else if (order.action === "DISCONTINUE") {
       return {
@@ -106,7 +106,7 @@ function medicationOrderToApiDto(
         orderer: orderer,
         concept: order.drug.concept.uuid,
         drug: order.drug.uuid,
-        orderReasonNonCoded: null
+        orderReasonNonCoded: null,
       };
     } else {
       throw new Error(

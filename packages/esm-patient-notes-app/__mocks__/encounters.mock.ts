@@ -45,6 +45,16 @@ export const mockEncounterResponse = {
   resourceVersion: "1.9",
 };
 
+export const mockFormattedNotes = [
+  {
+    id: "7e2a4abb-4caa-44ad-b3cf-39cd9c59afd8",
+    encounterAuthor: "Dr. G. Testerson",
+    encounterDate: "2020-02-19T08:26:05",
+    encounterType: "Vitals",
+    encounterLocation: "Isolation Ward",
+  },
+];
+
 export const mockAlternativeEncounterResponse = {
   uuid: "3b9ab69d-4479-49f3-bf73-2bf23ada3edf",
   display: "Vitals 28/01/2015",

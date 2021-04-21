@@ -22,12 +22,12 @@ function setupOpenMRS() {
           () => import("./attachments/attachments-overview.component"),
           {
             featureName: "patient-attachments",
-            moduleName
+            moduleName,
           }
         ),
         meta: {
-          columnSpan: 1
-        }
+          columnSpan: 1,
+        },
       },
       {
         id: "capture-photo-widget",
@@ -36,11 +36,11 @@ function setupOpenMRS() {
           () => import("./attachments/capture-photo.component"),
           {
             featureName: "capture-photo-widget",
-            moduleName
+            moduleName,
           }
-        )
-      }
-    ]
+        ),
+      },
+    ],
   };
 }
 

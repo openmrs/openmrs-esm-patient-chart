@@ -1,4 +1,5 @@
 import React from "react";
+import AppointmentsForm from "./appointments-form.component";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { useHistory, BrowserRouter } from "react-router-dom";
 import {
@@ -6,7 +7,6 @@ import {
   mockAppointmentsServiceFullResponse,
 } from "../../__mocks__/appointments.mock";
 import { mockSessionDataResponse } from "../../__mocks__/session.mock";
-import AppointmentsForm from "./appointments-form.component";
 import {
   createAppointment,
   getSession,
@@ -24,10 +24,6 @@ jest.mock("./appointments.resource", () => ({
   createAppointment: jest.fn(),
   getAppointmentService: jest.fn(),
   getAppointmentServiceAll: jest.fn(),
-}));
-
-jest.mock("../vitals/vitals-biometrics.resource", () => ({
-  getSession: jest.fn(),
 }));
 
 jest.mock("react-router-dom", () => ({

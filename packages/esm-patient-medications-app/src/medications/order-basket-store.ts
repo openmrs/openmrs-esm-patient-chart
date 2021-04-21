@@ -14,7 +14,7 @@ export interface OrderBasketStoreActions {
 export const orderBasketStore = createGlobalStore<OrderBasketStore>(
   "drug-order-basket",
   {
-    items: []
+    items: [],
   }
 );
 
@@ -24,5 +24,5 @@ export const orderBasketStoreActions = {
     value: Array<OrderBasketItem> | (() => Array<OrderBasketItem>)
   ) {
     return { items: typeof value === "function" ? value() : value };
-  }
+  },
 };

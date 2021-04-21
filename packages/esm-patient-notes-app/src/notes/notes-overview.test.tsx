@@ -3,26 +3,19 @@ import NotesOverview from "./notes-overview.component";
 import { of } from "rxjs";
 import { BrowserRouter } from "react-router-dom";
 import { render, screen } from "@testing-library/react";
-import { mockFormattedNotes } from "../../../__mocks__/encounters.mock";
+import { mockFormattedNotes } from "../../__mocks__/encounters.mock";
 import { getEncounterObservableRESTAPI } from "./encounter.resource";
-import { openWorkspaceTab } from "../shared-utils";
 
 const mockGetEncounterObservableRESTAPI = getEncounterObservableRESTAPI as jest.Mock;
-const mockOpenWorkspaceTab = openWorkspaceTab as jest.Mock;
 
 jest.mock("./encounter.resource", () => ({
   getEncounters: jest.fn(),
   getEncounterObservableRESTAPI: jest.fn(),
 }));
 
-jest.mock("../shared-utils", () => ({
-  openWorkspaceTab: jest.fn(),
-}));
-
 describe("<NotesOverview />", () => {
   beforeEach(() => {
     mockGetEncounterObservableRESTAPI.mockReset;
-    mockOpenWorkspaceTab.mockReset;
   });
 
   it("should display the patients encounter notes", async () => {

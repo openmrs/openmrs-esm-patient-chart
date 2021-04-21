@@ -1,8 +1,8 @@
 import React from "react";
+import AllergiesOverview from "./allergies-overview.component";
 import { BrowserRouter } from "react-router-dom";
 import { render, screen } from "@testing-library/react";
 import { of } from "rxjs/internal/observable/of";
-import AllergiesOverview from "./allergies-overview.component";
 import { performPatientAllergySearch } from "./allergy-intolerance.resource";
 import { mockPatientAllergies } from "../../__mocks__/allergies.mock";
 
@@ -18,13 +18,6 @@ const renderAllergiesOverview = () => {
 
 jest.mock("./allergy-intolerance.resource", () => ({
   performPatientAllergySearch: jest.fn(),
-}));
-
-jest.mock("../shared-utils", () => ({
-  capitalize: jest
-    .fn()
-    .mockImplementation((s) => s.charAt(0).toUpperCase() + s.slice(1)),
-  openWorkspaceTab: jest.fn(),
 }));
 
 describe("<AllergiesOverview />", () => {
