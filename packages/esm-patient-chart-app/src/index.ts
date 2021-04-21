@@ -46,6 +46,7 @@ function setupOpenMRS() {
     extensions: [
       {
         id: "patient-chart-nav-items",
+        slot: "nav-menu-slot",
         load: getAsyncLifecycle(() => import("./ui-components/nav.component"), {
           featureName: "nav-items",
           moduleName,

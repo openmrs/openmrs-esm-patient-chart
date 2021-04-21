@@ -1,8 +1,8 @@
 import React from "react";
 import {
   ConfigurableLink,
-  useExtensionSlotMeta,
   useConfig,
+  ExtensionSlot,
 } from "@openmrs/esm-framework";
 import { spaBasePath } from "../constants";
 import { ChartConfig, DashboardConfig } from "../config-schemas";
@@ -16,14 +16,10 @@ const PatientChartNavMenu: React.FC = () => {
   const patientUuid = getPatientUuidFromUrl();
   const basePath = spaBasePath.replace(":patientUuid", patientUuid);
   const config = useConfig() as ChartConfig;
-  const meta = useExtensionSlotMeta("patient-chart-dashboard-slot");
 
   return (
     <>
-      {[
-        ...config.dashboardDefinitions,
-        ...(Object.values(meta) as Array<DashboardConfig>),
-      ].map((db) => (
+      {config.dashboardDefinitions.map((db) => (
         <div key={db.name}>
           <ConfigurableLink
             to={`${basePath}/${db.name}`}
@@ -33,6 +29,10 @@ const PatientChartNavMenu: React.FC = () => {
           </ConfigurableLink>
         </div>
       ))}
+      <ExtensionSlot
+        state={{ basePath }}
+        extensionSlotName="patient-chart-dashboard-slot"
+      />
     </>
   );
 };

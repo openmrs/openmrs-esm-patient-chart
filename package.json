@@ -38,7 +38,7 @@
     "css-loader": "^3.6.0",
     "dayjs": "^1.8.36",
     "eslint": "^7.20.0",
-    "eslint-config-prettier": "^8.20.0",
+    "eslint-config-prettier": "^8.2.0",
     "eslint-config-ts-react-important-stuff": "^3.0.0",
     "eslint-plugin-prettier": "^3.3.1",
     "fork-ts-checker-webpack-plugin": "^3.1.1",
