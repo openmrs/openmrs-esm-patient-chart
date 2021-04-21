@@ -52,4 +52,5 @@ describe("<ConditionRecord />", () => {
 
     // Clicking "Edit" launches edit form in workspace tab
     fireEvent.click(editBtn);
+  });
 });

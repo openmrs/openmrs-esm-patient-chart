@@ -30,7 +30,7 @@ function setupOpenMRS() {
       {
         id: "test-results-summary-widget",
         slot: "patient-chart-summary-dashboard-slot",
-        load: getAsyncLifecycle(() => import("./test"), options),
+        load: getAsyncLifecycle(() => import("./test.component"), options),
         meta: {
           columnSpan: 4,
         },

@@ -13,10 +13,7 @@
     "build": "webpack --mode production",
     "analyze": "webpack --mode=production --env.analyze=true",
     "lint": "eslint src --ext tsx",
-    "typescript": "tsc",
-    "test": "jest --config jest.config.json --verbose false --passWithNoTests",
-    "test-watch": "jest --watch --config jest.config.json",
-    "coverage": "npm test -- --coverage"
+    "typescript": "tsc"
   },
   "browserslist": [
     "extends browserslist-config-openmrs"

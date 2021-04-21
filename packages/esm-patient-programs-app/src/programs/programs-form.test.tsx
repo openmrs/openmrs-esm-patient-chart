@@ -1,4 +1,3 @@
-import "@testing-library/jest-dom/extend-expect";
 import React from "react";
 import dayjs from "dayjs";
 import ProgramsForm, { ProgramMatchProps } from "./programs-form.component";
