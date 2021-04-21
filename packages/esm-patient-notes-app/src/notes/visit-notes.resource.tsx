@@ -6,12 +6,12 @@ import {
   DiagnosisData,
   Location,
   Provider,
-  SessionData
+  SessionData,
 } from "../types";
 
 export function fetchCurrentSessionData(abortController: AbortController) {
   return openmrsFetch<SessionData>(`/ws/rest/v1/appui/session`, {
-    signal: abortController.signal
+    signal: abortController.signal,
   });
 }
 
@@ -20,7 +20,7 @@ export function fetchLocationByUuid(
   locationUuid: string
 ) {
   return openmrsFetch<Location>(`/ws/rest/v1/location/${locationUuid}`, {
-    signal: abortController.signal
+    signal: abortController.signal,
   });
 }
 
@@ -29,7 +29,7 @@ export function fetchProviderByUuid(
   providerUuid: string
 ) {
   return openmrsFetch<Provider>(`/ws/rest/v1/provider/${providerUuid}`, {
-    signal: abortController.signal
+    signal: abortController.signal,
   });
 }
 
@@ -53,7 +53,7 @@ function mapDiagnosisProperties(diagnosis: DiagnosisData): Diagnosis {
       diagnosis.concept.conceptMappings
     ).conceptReferenceTerm.code,
     primary: false,
-    confirmed: false
+    confirmed: false,
   };
 }
 
@@ -63,11 +63,11 @@ export function saveVisitNote(
 ) {
   return openmrsFetch(`/ws/rest/v1/encounter`, {
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
     method: "POST",
     body: payload,
-    signal: abortController.signal
+    signal: abortController.signal,
   });
 }
 
@@ -75,6 +75,7 @@ function getConceptReferenceTermCode(
   conceptMapping: Array<ConceptMapping>
 ): ConceptMapping {
   return conceptMapping.find(
-    concept => concept.conceptReferenceTerm.conceptSource.name === "ICD-10-WHO"
+    (concept) =>
+      concept.conceptReferenceTerm.conceptSource.name === "ICD-10-WHO"
   );
 }

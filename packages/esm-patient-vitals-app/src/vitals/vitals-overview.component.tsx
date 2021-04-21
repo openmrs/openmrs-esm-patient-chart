@@ -230,8 +230,9 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid }) => {
           return {
             id: `${index}`,
             date: dayjs(vital.date).format(`DD - MMM - YYYY`),
-            bloodPressure: `${vital.systolic ?? "-"} / ${vital.diastolic ??
-              "-"}`,
+            bloodPressure: `${vital.systolic ?? "-"} / ${
+              vital.diastolic ?? "-"
+            }`,
             pulse: vital.pulse,
             spo2: vital.oxygenSaturation,
             temperature: vital.temperature,

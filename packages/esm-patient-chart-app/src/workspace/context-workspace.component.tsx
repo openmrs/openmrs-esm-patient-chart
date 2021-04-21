@@ -16,9 +16,9 @@ interface ContextWorkspaceParams {
   patientUuid: string;
 }
 
-const ContextWorkspace: React.FC<RouteComponentProps<
-  ContextWorkspaceParams
->> = ({ match }) => {
+const ContextWorkspace: React.FC<
+  RouteComponentProps<ContextWorkspaceParams>
+> = ({ match }) => {
   const { patientUuid } = match.params;
   const { extensionSlot, title, clearExtensionSlot } = useWorkspace();
   const { t } = useTranslation();

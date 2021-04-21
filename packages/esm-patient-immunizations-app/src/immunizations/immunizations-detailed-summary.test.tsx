@@ -6,7 +6,7 @@ import { openmrsFetch, getConfig } from "@openmrs/esm-framework";
 import {
   mockImmunizationConfig,
   mockPatientImmunizationsSearchResponse,
-  mockVaccinesConceptSet
+  mockVaccinesConceptSet,
 } from "../../../__mocks__/immunizations.mock";
 import ImmunizationsDetailedSummary from "./immunizations-detailed-summary.component";
 
@@ -20,7 +20,7 @@ describe("<ImmunizationsDetailedSummary />", () => {
   afterEach(mockGetConfig.mockReset);
 
   it("should render detailed summary from config and search results", async () => {
-    mockOpenmrsFetch.mockImplementation(url => {
+    mockOpenmrsFetch.mockImplementation((url) => {
       return includes(url, "concept")
         ? Promise.resolve({ data: mockVaccinesConceptSet })
         : Promise.resolve({ data: mockPatientImmunizationsSearchResponse });

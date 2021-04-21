@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { useHistory, BrowserRouter } from "react-router-dom";
 import {
   mockAppointmentsServiceResponse,
-  mockAppointmentsServiceFullResponse
+  mockAppointmentsServiceFullResponse,
 } from "../../__mocks__/appointments.mock";
 import { mockSessionDataResponse } from "../../__mocks__/session.mock";
 import AppointmentsForm from "./appointments-form.component";
@@ -11,7 +11,7 @@ import {
   createAppointment,
   getSession,
   getAppointmentService,
-  getAppointmentServiceAll
+  getAppointmentServiceAll,
 } from "./appointments.resource";
 
 const mockUseHistory = useHistory as jest.Mock;
@@ -23,16 +23,16 @@ const mockGetSession = getSession as jest.Mock;
 jest.mock("./appointments.resource", () => ({
   createAppointment: jest.fn(),
   getAppointmentService: jest.fn(),
-  getAppointmentServiceAll: jest.fn()
+  getAppointmentServiceAll: jest.fn(),
 }));
 
 jest.mock("../vitals/vitals-biometrics.resource", () => ({
-  getSession: jest.fn()
+  getSession: jest.fn(),
 }));
 
 jest.mock("react-router-dom", () => ({
   ...jest.requireActual("react-router-dom"),
-  useHistory: jest.fn()
+  useHistory: jest.fn(),
 }));
 
 describe("<AppointmentsForm />", () => {
@@ -57,7 +57,7 @@ describe("<AppointmentsForm />", () => {
       Promise.resolve({ status: 200, statusText: "ok" })
     );
     mockUseHistory.mockReturnValue({
-      push: jest.fn()
+      push: jest.fn(),
     });
 
     render(
@@ -78,7 +78,7 @@ describe("<AppointmentsForm />", () => {
     expect(startTime).toBeInTheDocument();
     expect(endTime).toBeInTheDocument();
     const walkInAppointmentCheck = screen.getByRole("checkbox", {
-      name: "Walk-in appointment"
+      name: "Walk-in appointment",
     });
     const commentBox = screen.getByRole("textbox", { name: "" });
     expect(walkInAppointmentCheck).toBeInTheDocument();
@@ -93,18 +93,18 @@ describe("<AppointmentsForm />", () => {
     const serviceSelector = screen.getAllByRole("combobox", { name: "" })[0];
 
     fireEvent.change(serviceSelector, {
-      target: { value: "f1c1a452-d2de-4392-ac23-cd4a4f5e84aa" }
+      target: { value: "f1c1a452-d2de-4392-ac23-cd4a4f5e84aa" },
     });
 
     await screen.findByText("Inpatient");
 
     // Select Chemotherapy service
     const serviceTypeSelector = screen.getAllByRole("combobox", {
-      name: ""
+      name: "",
     })[1];
 
     fireEvent.change(serviceTypeSelector, {
-      target: { value: "53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1" }
+      target: { value: "53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1" },
     });
 
     await screen.findByText("Chemotherapy");
@@ -128,7 +128,7 @@ describe("<AppointmentsForm />", () => {
 
     // Add comment
     fireEvent.change(commentBox, {
-      target: { value: "Testing out the Appointments form" }
+      target: { value: "Testing out the Appointments form" },
     });
 
     await screen.findByDisplayValue("Testing out the Appointments form");
@@ -147,7 +147,7 @@ describe("<AppointmentsForm />", () => {
         locationUuid: "b1a8b05e-3542-4037-bbd3-998ee9c40574",
         patientUuid: "8673ee4f-e2ab-4077-ba55-4980f408773e",
         status: null,
-        providerUuid: "b1a8b05e-3542-4037-bbd3-998ee9c4057z"
+        providerUuid: "b1a8b05e-3542-4037-bbd3-998ee9c4057z",
       }),
       new AbortController()
     );

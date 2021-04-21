@@ -44,9 +44,10 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({
     conceptsUnits,
   } = useVitalsSignsConceptMetaData();
   const biometricsUnitsSymbols = config.biometrics;
-  const [patientVitalAndBiometrics, setPatientVitalAndBiometrics] = useState<
-    PatientVitalAndBiometric
-  >();
+  const [
+    patientVitalAndBiometrics,
+    setPatientVitalAndBiometrics,
+  ] = useState<PatientVitalAndBiometric>();
   const [patientBMI, setPatientBMI] = useState<number>();
 
   const [

@@ -33,7 +33,7 @@ const CameraUpload: React.FC<CameraUploadProps> = ({
   onTakePhoto,
   patientUuid,
   shouldNotRenderButton,
-  collectCaption = true
+  collectCaption = true,
 }) => {
   const [cameraIsOpen, setCameraIsOpen] = useState(openCameraOnRender);
   const [dataUri, setDataUri] = useState("");
@@ -70,7 +70,7 @@ const CameraUpload: React.FC<CameraUploadProps> = ({
         caption,
         abortController,
         dataUri
-      ).then(res => {
+      ).then((res) => {
         onNewAttachment?.({
           id: `${res.data.uuid}`,
           src: `${window.openmrsBase}/ws/rest/v1/attachment/${res.data.uuid}/bytes`,
@@ -78,7 +78,7 @@ const CameraUpload: React.FC<CameraUploadProps> = ({
           thumbnailWidth: 320,
           thumbnailHeight: 212,
           caption: res.data.comment,
-          isSelected: false
+          isSelected: false,
         });
       });
     },

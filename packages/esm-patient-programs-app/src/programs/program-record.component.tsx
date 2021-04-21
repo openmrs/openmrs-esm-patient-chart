@@ -22,7 +22,7 @@ const ProgramRecord: React.FC<ProgramRecordProps> = ({ match }) => {
   useEffect(() => {
     if (patient && patientUuid) {
       const subscription = getPatientProgramByUuid(programUuid).subscribe(
-        program => {
+        (program) => {
           setPatientProgram(program), createErrorHandler();
         }
       );
@@ -48,7 +48,7 @@ const ProgramRecord: React.FC<ProgramRecordProps> = ({ match }) => {
                   programUuid: patientProgram?.uuid,
                   enrollmentDate: patientProgram?.dateEnrolled,
                   completionDate: patientProgram?.dateCompleted,
-                  locationUuid: patientProgram?.location?.uuid
+                  locationUuid: patientProgram?.location?.uuid,
                 }
               )
             }

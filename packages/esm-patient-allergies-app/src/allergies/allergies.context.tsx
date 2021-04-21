@@ -7,7 +7,7 @@ export interface AllergiesContextShape {
 
 export const AllergiesContext = createContext<AllergiesContextShape>({
   patientUuid: undefined,
-  patient: undefined
+  patient: undefined,
 });
 
 export function useAllergiesContext() {

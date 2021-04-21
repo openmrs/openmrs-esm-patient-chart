@@ -9,7 +9,7 @@ import { mockCurrentVisit } from "../../__mocks__/visits.mock";
 
 const mockSwitchTo = switchTo as jest.Mock;
 
-jest.mock("lodash-es/debounce", () => jest.fn(fn => fn));
+jest.mock("lodash-es/debounce", () => jest.fn((fn) => fn));
 
 describe("<FormViewComponent/>", () => {
   beforeEach(() => {
@@ -52,7 +52,7 @@ describe("<FormViewComponent/>", () => {
       {
         encounterUuid: "5859f098-45d6-4c4e-9447-53dd4032d7d7",
         formUuid: "c51b0cbe-32d8-4ea5-81d2-8f3ade30c2de",
-        title: "POC Vitals v1.0"
+        title: "POC Vitals v1.0",
       }
     );
   });

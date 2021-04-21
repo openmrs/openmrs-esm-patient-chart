@@ -10,13 +10,15 @@ export interface LocationSelectProps {
 const LocationSelect: React.FC<LocationSelectProps> = ({
   id = "visitLocation",
   currentLocationUuid,
-  onLocationChanged
+  onLocationChanged,
 }) => {
   const locations = useLocations();
 
   const onLocationsChanged = React.useCallback(
     (event: React.ChangeEvent<HTMLSelectElement>) => {
-      onLocationChanged(locations.find(loc => loc.uuid == event.target.value));
+      onLocationChanged(
+        locations.find((loc) => loc.uuid == event.target.value)
+      );
     },
     [locations]
   );
@@ -31,7 +33,7 @@ const LocationSelect: React.FC<LocationSelectProps> = ({
       onChange={onLocationsChanged}
     >
       <option value="" className="omrs-padding-8" />
-      {locations.map(location => {
+      {locations.map((location) => {
         return (
           <option
             key={location.uuid}

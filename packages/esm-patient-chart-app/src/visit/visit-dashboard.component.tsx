@@ -20,7 +20,7 @@ enum DisplayModes {
   NEW_VISIT = "newVisit",
   EDIT_VISIT = "editVisit",
   DASHBOARD = "dashboard",
-  EDITTING_VISIT = "edittingVisit"
+  EDITTING_VISIT = "edittingVisit",
 }
 
 interface NewVisitAction {
@@ -47,28 +47,28 @@ function reducer(
         displayVisitDashboard: false,
         displayNewVisit: true,
         displayEditVisit: false,
-        editMode: true
+        editMode: true,
       };
     case DisplayModes.EDIT_VISIT:
       return {
         displayVisitDashboard: false,
         displayNewVisit: false,
         displayEditVisit: true,
-        editMode: false
+        editMode: false,
       };
     case DisplayModes.EDITTING_VISIT:
       return {
         displayVisitDashboard: false,
         displayNewVisit: true,
         displayEditVisit: false,
-        editMode: false
+        editMode: false,
       };
     default:
       return {
         displayVisitDashboard: true,
         displayNewVisit: false,
         displayEditVisit: false,
-        editMode: true
+        editMode: true,
       };
   }
 }
@@ -77,12 +77,12 @@ const visitDashboardInitialState: VisitDashboardPropsDefaultState = {
   editMode: true,
   displayVisitDashboard: true,
   displayNewVisit: false,
-  displayEditVisit: false
+  displayEditVisit: false,
 };
 
 const VisitDashboard: React.FC<VisitDashboardProps> = ({
   closeComponent = () => {},
-  patientUuid
+  patientUuid,
 }) => {
   const [state, dispatch] = useReducer(reducer, visitDashboardInitialState);
 

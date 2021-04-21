@@ -21,7 +21,7 @@ describe("<VitalsHeaderStateDetails/>", () => {
     weight: "85",
     height: "185",
     bmi: "24.8",
-    respiratoryRate: "45"
+    respiratoryRate: "45",
   };
 
   it("should display the vitals title", () => {
@@ -29,7 +29,7 @@ describe("<VitalsHeaderStateDetails/>", () => {
       view: "Warning",
       toggleView: mockToggleView,
       showDetails: false,
-      isEmpty: false
+      isEmpty: false,
     };
     render(
       <VitalsHeaderStateTitle
@@ -57,7 +57,7 @@ describe("<VitalsHeaderStateDetails/>", () => {
       date: new Date(),
       toggleView: mockToggleView,
       showDetails: false,
-      isEmpty: true
+      isEmpty: true,
     };
     render(
       <VitalsHeaderStateTitle

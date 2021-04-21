@@ -5,7 +5,7 @@ import { BrowserRouter } from "react-router-dom";
 
 const match = { params: {}, isExact: false, path: "/", url: "/" };
 
-const renderVaccinationRow = immunization => {
+const renderVaccinationRow = (immunization) => {
   const tbody = document.createElement("tbody");
   render(
     <BrowserRouter>
@@ -19,7 +19,7 @@ describe("<VaccinationRow />", () => {
   it("should show just vaccine name and add button when no doses are given", async () => {
     const immunization = {
       vaccineName: "Rotavirus",
-      existingDoses: []
+      existingDoses: [],
     };
 
     renderVaccinationRow(immunization);
@@ -41,15 +41,15 @@ describe("<VaccinationRow />", () => {
           series: "4 Months",
           occurrenceDateTime: "2019-06-18",
           doseNumberPositiveInt: 1,
-          expirationDate: "2019-06-18"
+          expirationDate: "2019-06-18",
         },
         {
           series: "2 Months",
           occurrenceDateTime: "2018-06-18",
           doseNumberPositiveInt: 1,
-          expirationDate: "2018-06-18"
-        }
-      ]
+          expirationDate: "2018-06-18",
+        },
+      ],
     };
 
     renderVaccinationRow(immunization);
@@ -72,22 +72,22 @@ describe("<VaccinationRow />", () => {
       sequences: [
         { sequenceLabel: "2 Months", sequenceNumber: 1 },
         { sequenceLabel: "4 Months", sequenceNumber: 2 },
-        { sequenceLabel: "6 Months", sequenceNumber: 3 }
+        { sequenceLabel: "6 Months", sequenceNumber: 3 },
       ],
       existingDoses: [
         {
           sequenceLabel: "4 Months",
           occurrenceDateTime: "2019-05-18",
           doseNumberPositiveInt: 2,
-          expirationDate: "2019-06-18"
+          expirationDate: "2019-06-18",
         },
         {
           sequenceLabel: "2 Months",
           occurrenceDateTime: "2018-05-18",
           doseNumberPositiveInt: 1,
-          expirationDate: "2018-06-18"
-        }
-      ]
+          expirationDate: "2018-06-18",
+        },
+      ],
     };
 
     renderVaccinationRow(immunization);

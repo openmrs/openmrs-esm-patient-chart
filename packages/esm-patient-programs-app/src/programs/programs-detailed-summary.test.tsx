@@ -16,11 +16,11 @@ const renderProgramsDetailedSummary = () =>
   );
 
 jest.mock("./programs.resource", () => ({
-  fetchEnrolledPrograms: jest.fn()
+  fetchEnrolledPrograms: jest.fn(),
 }));
 
 jest.mock("../shared-utils", () => ({
-  openWorkspaceTab: jest.fn()
+  openWorkspaceTab: jest.fn(),
 }));
 
 describe("<ProgramsDetailedSummary />", () => {

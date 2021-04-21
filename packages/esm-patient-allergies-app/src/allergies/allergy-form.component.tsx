@@ -12,7 +12,7 @@ import {
   getPatientAllergyByPatientUuid,
   updatePatientAllergy,
   fetchAllergyByUuid,
-  Allergy
+  Allergy,
 } from "./allergy-intolerance.resource";
 import { createErrorHandler, showToast } from "@openmrs/esm-framework";
 import Button from "carbon-components-react/es/components/Button";
@@ -26,7 +26,7 @@ import {
   AllergyData,
   AllergicReaction,
   Allergen,
-  DataCaptureComponentProps
+  DataCaptureComponentProps,
 } from "../types";
 import styles from "./allergy-form.css";
 
@@ -36,7 +36,7 @@ enum AllergyConcept {
   FOOD_ALLERGEN = "162553AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
   MILD_REACTION_SEVERITY = "1498AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
   MODERATE_REACTION_SEVERITY = "1499AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-  SEVERE_REACTION_SEVERITY = "1500AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+  SEVERE_REACTION_SEVERITY = "1500AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
 }
 
 function getAllergyType(allergyConcept: string): string {
@@ -81,7 +81,7 @@ const AllergyForm: React.FC<AllergyFormProps> = ({
   patientUuid,
   entryStarted = () => {},
   entryCancelled = () => {},
-  closeComponent = () => {}
+  closeComponent = () => {},
 }) => {
   const formRef = useRef<HTMLFormElement>(null);
   const createFormOnsetDateRef = useRef<HTMLInputElement>(null);
@@ -101,9 +101,10 @@ const AllergyForm: React.FC<AllergyFormProps> = ({
   const [enableCreateButtons, setEnableCreateButtons] = useState(true);
   const [enableEditButtons, setEnableEditButtons] = useState(true);
   const [comment, setComment] = useState("");
-  const [selectedAllergyCategory, setSelectedAllergyCategory] = useState<
-    string
-  >(null);
+  const [
+    selectedAllergyCategory,
+    setSelectedAllergyCategory,
+  ] = useState<string>(null);
   const [reactionSeverityUuid, setReactionSeverityUuid] = useState<string>(
     null
   );
@@ -123,7 +124,7 @@ const AllergyForm: React.FC<AllergyFormProps> = ({
     const abortController = new AbortController();
     if (patientUuid && isEditFormActive) {
       getPatientAllergyByPatientUuid(patientUuid, match.params, abortController)
-        .then(response => setPatientAllergy(response.data))
+        .then((response) => setPatientAllergy(response.data))
         .catch(createErrorHandler());
 
       return () => abortController.abort();
@@ -136,10 +137,10 @@ const AllergyForm: React.FC<AllergyFormProps> = ({
       setReactionSeverityUuid(patientAllergy.severity.uuid);
       setUpdatedOnsetDate(patientAllergy.auditInfo.dateCreated);
       setSelectedAllergicReactions(
-        patientAllergy.reactions?.map(reaction => {
+        patientAllergy.reactions?.map((reaction) => {
           return {
             display: reaction.reaction.display,
-            uuid: reaction.reaction.uuid
+            uuid: reaction.reaction.uuid,
           };
         })
       );
@@ -196,9 +197,9 @@ const AllergyForm: React.FC<AllergyFormProps> = ({
     if (selectedAllergyCategory && !isEditFormActive) {
       const getAllergensSub = getAllergyAllergenByConceptUuid(
         selectedAllergyCategory
-      ).subscribe(data => setAllergensArray(data), createErrorHandler());
+      ).subscribe((data) => setAllergensArray(data), createErrorHandler());
       const getAllergicReactionsSub = getAllergicReactions().subscribe(
-        data => setAllergicReactions(data),
+        (data) => setAllergicReactions(data),
         createErrorHandler()
       );
       return () => {
@@ -221,7 +222,7 @@ const AllergyForm: React.FC<AllergyFormProps> = ({
           return reactions;
         } else {
           return reactions.filter(
-            reaction => reaction.uuid !== eventTarget.value
+            (reaction) => reaction.uuid !== eventTarget.value
           );
         }
       }
@@ -235,19 +236,19 @@ const AllergyForm: React.FC<AllergyFormProps> = ({
       codedAllergenUuid: codedAllergenUuid,
       severityUuid: reactionSeverityUuid,
       comment: comment,
-      reactionUuids: selectedAllergicReactions
+      reactionUuids: selectedAllergicReactions,
     };
     const abortController = new AbortController();
     savePatientAllergy(patientAllergy, patientUuid, abortController)
-      .then(response => {
+      .then((response) => {
         if (response.status === 201) {
           showToast({
             description: t(
               "allergySuccessfullyAdded",
               "Allergy has been added successfully"
-            )
+            ),
           });
-          fetchAllergyByUuid(response.data.uuid).subscribe(allergy => {
+          fetchAllergyByUuid(response.data.uuid).subscribe((allergy) => {
             match.params.setAllergies([...match.params.allergies, allergy]);
             navigate();
           }, createErrorHandler());
@@ -264,7 +265,7 @@ const AllergyForm: React.FC<AllergyFormProps> = ({
       codedAllergenUuid: patientAllergy?.allergen?.codedAllergen?.uuid,
       severityUuid: reactionSeverityUuid,
       comment: allergyComment,
-      reactionUuids: selectedAllergicReactions
+      reactionUuids: selectedAllergicReactions,
     };
     const abortController = new AbortController();
     updatePatientAllergy(
@@ -272,7 +273,7 @@ const AllergyForm: React.FC<AllergyFormProps> = ({
       patientUuid,
       match.params,
       abortController
-    ).then(response => {
+    ).then((response) => {
       response.status === 200 && navigate();
     }, createErrorHandler);
     return () => abortController.abort();
@@ -285,20 +286,20 @@ const AllergyForm: React.FC<AllergyFormProps> = ({
 
   const allergyHasReaction = (uuid: string) => {
     return patientAllergy?.reactions?.some(
-      reaction => reaction?.reaction?.uuid === uuid
+      (reaction) => reaction?.reaction?.uuid === uuid
     );
   };
 
   const handleDeletePatientAllergy = () => {
     const abortController = new AbortController();
     deletePatientAllergy(patientUuid, match.params, abortController).then(
-      response => {
+      (response) => {
         response.status === 204 && navigate();
       }
     );
   };
 
-  const handleAllergenChange = event => {
+  const handleAllergenChange = (event) => {
     setAllergensArray(null);
     setAllergenType(getAllergyType(event));
     setSelectedAllergyCategory(event);
@@ -328,7 +329,7 @@ const AllergyForm: React.FC<AllergyFormProps> = ({
         name={t("Record a new allergy", "Record a new allergy")}
         styles={{
           width: "100%",
-          background: "var(--omrs-color-bg-medium-contrast)"
+          background: "var(--omrs-color-bg-medium-contrast)",
         }}
       >
         <form
@@ -384,7 +385,7 @@ const AllergyForm: React.FC<AllergyFormProps> = ({
                   labelPosition="right"
                   orientation="vertical"
                   name="allergen"
-                  onChange={evt => setCodedAllergenUuid(evt.toString())}
+                  onChange={(evt) => setCodedAllergenUuid(evt.toString())}
                 >
                   {allergensArray.map((allergen, index) => (
                     <RadioButton
@@ -429,7 +430,7 @@ const AllergyForm: React.FC<AllergyFormProps> = ({
                   labelPosition="right"
                   orientation="vertical"
                   name="reactionSeverity"
-                  onChange={evt => setReactionSeverityUuid(evt.toString())}
+                  onChange={(evt) => setReactionSeverityUuid(evt.toString())}
                 >
                   <RadioButton
                     id="mild"
@@ -464,7 +465,7 @@ const AllergyForm: React.FC<AllergyFormProps> = ({
                     placeholder="mm/dd/yyyy"
                     type="text"
                     labelText=""
-                    onChange={evt => setFirstOnsetDate(evt.target.value)}
+                    onChange={(evt) => setFirstOnsetDate(evt.target.value)}
                   />
                 </DatePicker>
               </div>
@@ -477,7 +478,7 @@ const AllergyForm: React.FC<AllergyFormProps> = ({
                   invalidText="A valid value is required"
                   labelText=""
                   rows={6}
-                  onChange={evt => setComment(evt.target.value)}
+                  onChange={(evt) => setComment(evt.target.value)}
                 />
               </div>
             </div>
@@ -512,7 +513,7 @@ const AllergyForm: React.FC<AllergyFormProps> = ({
         name={t("Edit existing allergy", "Edit existing allergy")}
         styles={{
           width: "100%",
-          background: "var(--omrs-color-bg-medium-contrast)"
+          background: "var(--omrs-color-bg-medium-contrast)",
         }}
       >
         {patientAllergy && allergicReactions?.length && (
@@ -568,7 +569,7 @@ const AllergyForm: React.FC<AllergyFormProps> = ({
                     labelPosition="right"
                     orientation="vertical"
                     name="reactionSeverity"
-                    onChange={evt => setReactionSeverityUuid(evt.toString())}
+                    onChange={(evt) => setReactionSeverityUuid(evt.toString())}
                     valueSelected={patientAllergy?.severity?.uuid}
                   >
                     <RadioButton
@@ -604,7 +605,7 @@ const AllergyForm: React.FC<AllergyFormProps> = ({
                       ).format("MM/DD/YYYY")}
                       labelText="Date of first onset"
                       hideLabel={true}
-                      onChange={evt => setUpdatedOnsetDate(evt.target.value)}
+                      onChange={(evt) => setUpdatedOnsetDate(evt.target.value)}
                       max={new Date().toUTCString()}
                     />
                   </DatePicker>
@@ -620,7 +621,7 @@ const AllergyForm: React.FC<AllergyFormProps> = ({
                     defaultValue={patientAllergy?.comment}
                     rows={6}
                     name="comments"
-                    onChange={evt => setAllergyComment(evt.target.value)}
+                    onChange={(evt) => setAllergyComment(evt.target.value)}
                   />
                 </div>
               </div>

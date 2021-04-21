@@ -4,7 +4,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { ConditionsForm } from "./conditions-form.component";
 import {
   createPatientCondition,
-  updatePatientCondition
+  updatePatientCondition,
 } from "./conditions.resource";
 import { mockPatient } from "../../__mocks__/patient.mock";
 
@@ -25,13 +25,13 @@ const renderConditionsForm = () => {
 
 jest.mock("./conditions.resource", () => ({
   createPatientCondition: jest.fn(),
-  updatePatientCondition: jest.fn()
+  updatePatientCondition: jest.fn(),
 }));
 
 jest.mock("react-router-dom", () => ({
   ...jest.requireActual("react-router-dom"),
   useHistory: jest.fn(),
-  useRouteMatch: jest.fn()
+  useRouteMatch: jest.fn(),
 }));
 
 describe("<ConditionsForm />", () => {
@@ -49,7 +49,7 @@ describe("<ConditionsForm />", () => {
       Promise.resolve({ status: 201, body: "Condition created" })
     );
     mockUseHistory.mockReturnValue({
-      push: jest.fn()
+      push: jest.fn(),
     });
 
     renderConditionsForm();
@@ -89,7 +89,7 @@ describe("<ConditionsForm />", () => {
       {
         clinicalStatus: "active",
         conditionName: "Myalgia",
-        onsetDateTime: "2020-05-05"
+        onsetDateTime: "2020-05-05",
       },
       mockPatientId,
       new AbortController()
@@ -115,7 +115,7 @@ describe("<ConditionsForm />", () => {
       conditionUuid: "26EFFA98F55D48B38687B3920285BE15",
       conditionName: "Hypertension",
       clinicalStatus: "active",
-      onsetDateTime: "2015-06-22"
+      onsetDateTime: "2015-06-22",
     };
     mockUseRouteMatch.mockReturnValue(testMatch);
     mockUpdatePatientCondition.mockReturnValue(
@@ -134,7 +134,7 @@ describe("<ConditionsForm />", () => {
     const activeStatusInput = screen.getByRole("radio", { name: "Active" });
     const inactiveStatusInput = screen.getByRole("radio", { name: "Inactive" });
     const historyOfStatusInput = screen.getByRole("radio", {
-      name: "History of"
+      name: "History of",
     });
 
     expect(activeStatusInput).toBeInTheDocument();
@@ -161,7 +161,7 @@ describe("<ConditionsForm />", () => {
     expect(inactiveStatusInput).toBeChecked();
 
     fireEvent.change(screen.getByLabelText("Date of inactivity"), {
-      target: { value: "2020-04-05" }
+      target: { value: "2020-04-05" },
     });
 
     await screen.getByDisplayValue("2020-04-05");
@@ -175,7 +175,7 @@ describe("<ConditionsForm />", () => {
         conditionName: "Hypertension",
         conditionUuid: "26EFFA98F55D48B38687B3920285BE15",
         onsetDateTime: "2015-06-22",
-        inactivityDate: "2020-04-05"
+        inactivityDate: "2020-04-05",
       },
       mockPatientId,
       new AbortController()

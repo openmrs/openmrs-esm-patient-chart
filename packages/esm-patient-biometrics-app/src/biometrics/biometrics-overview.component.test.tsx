@@ -8,7 +8,7 @@ import { of } from "rxjs";
 const mockGetPatientBiometric = getPatientBiometrics as jest.Mock;
 
 jest.mock("./biometric.resource", () => ({
-  getPatientBiometrics: jest.fn()
+  getPatientBiometrics: jest.fn(),
 }));
 
 describe("<Biometric/>", () => {
@@ -18,15 +18,15 @@ describe("<Biometric/>", () => {
       weight: 65,
       height: 185,
       date: "27-Nov 12:06 PM",
-      bmi: "24.8"
+      bmi: "24.8",
     },
     {
       id: "1ca4d5f1-ee6a-4282-a5ff-c8db12c4247c",
       weight: 100,
       height: 180,
       date: "28-Nov 12:06 PM",
-      bmi: "25.8"
-    }
+      bmi: "25.8",
+    },
   ];
 
   it("should render patient biometrics", () => {

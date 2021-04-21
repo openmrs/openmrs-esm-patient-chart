@@ -30,25 +30,26 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
   textFieldWidth,
   placeholder,
   disabled,
-  inputIsNormal
+  inputIsNormal,
 }) => {
   return (
     <div className={styles.inputContainer} style={{ width: textFieldWidth }}>
       <p className={styles.vitalsBiometricInputLabel01}>{title}</p>
       <div
-        className={`${styles.textInputContainer} ${disabled &&
-          styles.disableInput} ${!inputIsNormal && styles.danger}`}
+        className={`${styles.textInputContainer} ${
+          disabled && styles.disableInput
+        } ${!inputIsNormal && styles.danger}`}
         style={{ ...textFieldStyles }}
       >
         <div className={styles.centerDiv}>
-          {textFields.map(val => {
+          {textFields.map((val) => {
             return val.type === "text" ? (
               <Fragment key={val.name}>
                 <TextInput
                   style={{ ...textFieldStyles }}
-                  className={`${styles.textInput} ${disabled &&
-                    styles.disableInput} ${val.className} ${!inputIsNormal &&
-                    styles.danger}`}
+                  className={`${styles.textInput} ${
+                    disabled && styles.disableInput
+                  } ${val.className} ${!inputIsNormal && styles.danger}`}
                   id={val.name}
                   name={val.name}
                   onChange={onInputChange}

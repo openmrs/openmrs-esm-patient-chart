@@ -15,7 +15,7 @@ export interface OrderBasketSearchProps {
 
 export default function OrderBasketSearch({
   encounterUuid,
-  onSearchResultClicked
+  onSearchResultClicked,
 }: OrderBasketSearchProps) {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
@@ -33,7 +33,7 @@ export default function OrderBasketSearch({
             "searchFieldPlaceholder",
             'Search for an order (e.g. "Aspirin")'
           )}
-          onChange={e => setSearchTerm(e.currentTarget?.value ?? "")}
+          onChange={(e) => setSearchTerm(e.currentTarget?.value ?? "")}
         />
         <div style={{ margin: "1rem" }}>
           <OrderBasketSearchResults

@@ -24,7 +24,7 @@ export default function ConditionRecord(props: ConditionRecordProps) {
   useEffect(() => {
     if (patient) {
       const sub = getConditionByUuid(conditionUuid).subscribe(
-        condition => setPatientCondition(condition),
+        (condition) => setPatientCondition(condition),
         createErrorHandler()
       );
       return () => sub.unsubscribe();
@@ -47,7 +47,7 @@ export default function ConditionRecord(props: ConditionRecordProps) {
                   conditionUuid: patientCondition?.id,
                   conditionName: patientCondition?.display,
                   clinicalStatus: patientCondition?.clinicalStatus,
-                  onsetDateTime: patientCondition?.onsetDateTime
+                  onsetDateTime: patientCondition?.onsetDateTime,
                 }
               );
             }}
