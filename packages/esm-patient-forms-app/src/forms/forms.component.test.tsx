@@ -13,7 +13,7 @@ const mockFetchPatientEncounters = fetchPatientEncounters as jest.Mock;
 
 jest.mock("./forms.resource", () => ({
   fetchAllForms: jest.fn(),
-  fetchPatientEncounters: jest.fn()
+  fetchPatientEncounters: jest.fn(),
 }));
 
 describe("<FormsComponent>", () => {
@@ -60,7 +60,7 @@ describe("<FormsComponent>", () => {
     userEvent.click(allFormsButton);
     expect(allFormsButton).toHaveAttribute("aria-selected", "true");
     const completedFormsButton = screen.getByRole("tab", {
-      name: /Completed/i
+      name: /Completed/i,
     });
     userEvent.click(completedFormsButton);
     expect(completedFormsButton).toHaveAttribute("aria-selected", "true");

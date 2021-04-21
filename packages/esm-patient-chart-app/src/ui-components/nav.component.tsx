@@ -15,7 +15,7 @@ const PatientChartNavMenu: React.FC = () => {
 
   return (
     <>
-      {config.dashboardDefinitions.map(db => (
+      {config.dashboardDefinitions.map((db) => (
         <div key={db.name}>
           <ConfigurableLink
             to={`${basePath}/${db.name}`}

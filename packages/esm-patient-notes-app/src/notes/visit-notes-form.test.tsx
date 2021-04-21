@@ -10,13 +10,13 @@ import {
   fetchDiagnosisByName,
   fetchLocationByUuid,
   fetchProviderByUuid,
-  saveVisitNote
+  saveVisitNote,
 } from "./visit-notes.resource";
 import {
   currentSessionResponse,
   diagnosisSearchResponse,
   mockFetchLocationByUuidResponse,
-  mockFetchProviderByUuidResponse
+  mockFetchProviderByUuidResponse,
 } from "../../../__mocks__/visit-note.mock";
 import { mockPatient } from "../../../__mocks__/patient.mock";
 
@@ -31,7 +31,7 @@ jest.mock("./visit-notes.resource", () => ({
   fetchDiagnosisByName: jest.fn(),
   fetchLocationByUuid: jest.fn(),
   fetchProviderByUuid: jest.fn(),
-  saveVisitNote: jest.fn()
+  saveVisitNote: jest.fn(),
 }));
 
 describe("Visit notes form", () => {
@@ -94,7 +94,7 @@ describe("Visit notes form", () => {
     ); // primary diagnosis tags have a red background
 
     const closeTagButton = screen.getByRole("button", {
-      name: "Clear filter Diabetes Mellitus"
+      name: "Clear filter Diabetes Mellitus",
     });
     // Clicking the close button on the tag removes the selected diagnosis
     userEvent.click(closeTagButton);
@@ -120,8 +120,8 @@ describe("Visit notes form", () => {
       encounterProviders: jasmine.arrayContaining([
         {
           encounterRole: mockConfig.visitNoteConfig.clinicianEncounterRole,
-          provider: mockFetchProviderByUuidResponse.data.uuid
-        }
+          provider: mockFetchProviderByUuidResponse.data.uuid,
+        },
       ]),
       encounterType: mockConfig.visitNoteConfig.encounterTypeUuid,
       form: mockConfig.visitNoteConfig.formConceptUuid,
@@ -129,11 +129,11 @@ describe("Visit notes form", () => {
       obs: jasmine.arrayContaining([
         {
           concept: mockConfig.visitNoteConfig.encounterNoteConceptUuid,
-          value: "Sample clinical note"
+          value: "Sample clinical note",
         },
-        undefined
+        undefined,
       ]),
-      patient: mockPatient.id
+      patient: mockPatient.id,
     };
 
     mockSaveVisitNote.mockResolvedValue(testPayload);

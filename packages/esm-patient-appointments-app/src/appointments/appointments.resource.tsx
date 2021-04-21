@@ -9,9 +9,9 @@ export function createAppointment(
     method: "POST",
     signal: abortController.signal,
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
-    body: appointment
+    body: appointment,
   });
 }
 
@@ -24,12 +24,12 @@ export function getAppointments(
     method: "POST",
     signal: abortController.signal,
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
     body: {
       patientUuid: patientUuid,
-      startDate: startDate
-    }
+      startDate: startDate,
+    },
   });
 }
 
@@ -38,18 +38,18 @@ export function getAppointmentsByUuid(
   abortController: AbortController
 ) {
   return openmrsFetch(`/ws/rest/v1/appointments/${appointmentUuid}`, {
-    signal: abortController.signal
+    signal: abortController.signal,
   });
 }
 
 export function getAppointmentServiceAll(abortController: AbortController) {
   return openmrsFetch(`/ws/rest/v1/appointmentService/all/full`, {
-    signal: abortController.signal
+    signal: abortController.signal,
   });
 }
 export function getAppointmentService(abortController: AbortController, uuid) {
   return openmrsFetch(`/ws/rest/v1/appointmentService?uuid=` + uuid, {
-    signal: abortController.signal
+    signal: abortController.signal,
   });
 }
 
@@ -59,6 +59,6 @@ export function getTimeSlots(abortController: AbortController) {
 
 export function getSession(abortController: AbortController) {
   return openmrsFetch(`/ws/rest/v1/appui/session`, {
-    signal: abortController.signal
+    signal: abortController.signal,
   });
 }

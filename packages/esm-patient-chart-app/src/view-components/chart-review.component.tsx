@@ -12,7 +12,7 @@ function makePath(
 ) {
   const parts = `${basePath}/${target.name}/:subview?`.split("/");
 
-  Object.keys(params).forEach(key => {
+  Object.keys(params).forEach((key) => {
     for (let i = 0; i < parts.length; i++) {
       if (parts[i][0] === ":" && parts[i].indexOf(key) === 1) {
         parts[i] = params[key];
@@ -34,12 +34,12 @@ const ChartReview: React.FC<ChartReviewProps> = ({
   patientUuid,
   patient,
   view,
-  subview
+  subview,
 }) => {
   const config = useConfig() as ChartConfig;
   const [dashboard] = config.dashboardDefinitions
-    .filter(dashboard => dashboard.name === view)
-    .map(dashboard =>
+    .filter((dashboard) => dashboard.name === view)
+    .map((dashboard) =>
       dashboard.config.type === "grid" ? (
         <GridView
           slot={dashboard.slot}
@@ -65,7 +65,7 @@ const ChartReview: React.FC<ChartReviewProps> = ({
       <Redirect
         to={makePath(config.dashboardDefinitions[0], {
           patientUuid,
-          subview: ""
+          subview: "",
         })}
       />
     );

@@ -19,7 +19,7 @@ export function usePatientOrders(
   const [orders, setOrders] = useState<Array<Order>>(null);
   const fetchOrders = (abortController?: AbortController) => {
     return fetchPatientOrders(patientUuid, status, abortController).then(
-      orders => {
+      (orders) => {
         setOrders(orders);
       },
       createErrorHandler

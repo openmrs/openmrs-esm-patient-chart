@@ -10,7 +10,7 @@ import { useTranslation } from "react-i18next";
 import { useConfig, createErrorHandler } from "@openmrs/esm-framework";
 import {
   PatientVitals,
-  performPatientsVitalsSearch
+  performPatientsVitalsSearch,
 } from "../vitals-biometrics.resource";
 
 interface ViewState {
@@ -26,11 +26,11 @@ const VitalHeader: React.FC<VitalHeaderProps> = ({ patientUuid }) => {
   const config = useConfig();
   const [vital, setVital] = useState<PatientVitals>();
   const [displayState, setDisplayState] = useState<ViewState>({
-    view: "Default"
+    view: "Default",
   });
   const [showDetails, setShowDetails] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const toggleView = () => setShowDetails(prevState => !prevState);
+  const toggleView = () => setShowDetails((prevState) => !prevState);
   const cls =
     displayState.view === "Warning"
       ? styles.warningBackground
@@ -42,13 +42,13 @@ const VitalHeader: React.FC<VitalHeaderProps> = ({ patientUuid }) => {
         config.concepts,
         patientUuid,
         10
-      ).subscribe(vitals => {
+      ).subscribe((vitals) => {
         setVital(first(vitals));
         setIsLoading(false);
       }, createErrorHandler);
       return () => subscription.unsubscribe();
     }
-  }, [patientUuid]);
+  }, [patientUuid, config.concepts]);
 
   useEffect(() => {
     if (vital && !dayjs(vital.date).isToday()) {

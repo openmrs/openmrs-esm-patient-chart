@@ -38,7 +38,7 @@ export interface VisitNotePayload {
 }
 
 export function convertToObsPayLoad(diagnosisArray: Array<any>): Array<obs> {
-  return diagnosisArray.map(diagnosis => {
+  return diagnosisArray.map((diagnosis) => {
     if (diagnosis.confirmed === true && diagnosis.primary === true) {
       // confirmed and primary diagnosis
       return {
@@ -46,17 +46,17 @@ export function convertToObsPayLoad(diagnosisArray: Array<any>): Array<obs> {
         groupMembers: [
           {
             concept: DIAGNOSIS_CERTAINTY_CONCEPT,
-            value: CONFIRMED_DIAGNOSIS_CONCEPT
+            value: CONFIRMED_DIAGNOSIS_CONCEPT,
           },
           {
             concept: DIAGNOSIS_ORDER_CONCEPT,
-            value: PRIMARY_DIAGNOSIS_ORDER_CONCEPT
+            value: PRIMARY_DIAGNOSIS_ORDER_CONCEPT,
           },
           {
             concept: PROBLEM_LIST_CONCEPT,
-            value: diagnosis.concept.uuid
-          }
-        ]
+            value: diagnosis.concept.uuid,
+          },
+        ],
       };
     } else if (diagnosis.confirmed === true && diagnosis.primary === false) {
       // confirmed and secondary diagnosis
@@ -65,17 +65,17 @@ export function convertToObsPayLoad(diagnosisArray: Array<any>): Array<obs> {
         groupMembers: [
           {
             concept: DIAGNOSIS_CERTAINTY_CONCEPT,
-            value: CONFIRMED_DIAGNOSIS_CONCEPT
+            value: CONFIRMED_DIAGNOSIS_CONCEPT,
           },
           {
             concept: DIAGNOSIS_ORDER_CONCEPT,
-            value: SECONDARY_DIAGNOSIS_ORDER_CONCEPT
+            value: SECONDARY_DIAGNOSIS_ORDER_CONCEPT,
           },
           {
             concept: PROBLEM_LIST_CONCEPT,
-            value: diagnosis.concept.uuid
-          }
-        ]
+            value: diagnosis.concept.uuid,
+          },
+        ],
       };
     } else if (diagnosis.confirmed === false && diagnosis.primary === true) {
       // presumed and primary diagnosis
@@ -84,17 +84,17 @@ export function convertToObsPayLoad(diagnosisArray: Array<any>): Array<obs> {
         groupMembers: [
           {
             concept: DIAGNOSIS_CERTAINTY_CONCEPT,
-            value: PRESUMED_DIAGNOSIS_CONCEPT
+            value: PRESUMED_DIAGNOSIS_CONCEPT,
           },
           {
             concept: DIAGNOSIS_ORDER_CONCEPT,
-            value: PRIMARY_DIAGNOSIS_ORDER_CONCEPT
+            value: PRIMARY_DIAGNOSIS_ORDER_CONCEPT,
           },
           {
             concept: PROBLEM_LIST_CONCEPT,
-            value: diagnosis.concept.uuid
-          }
-        ]
+            value: diagnosis.concept.uuid,
+          },
+        ],
       };
     } else if (diagnosis.confirmed === false && diagnosis.primary === false) {
       // presumed and secondary diagnosis
@@ -103,17 +103,17 @@ export function convertToObsPayLoad(diagnosisArray: Array<any>): Array<obs> {
         groupMembers: [
           {
             concept: DIAGNOSIS_CERTAINTY_CONCEPT,
-            value: PRESUMED_DIAGNOSIS_CONCEPT
+            value: PRESUMED_DIAGNOSIS_CONCEPT,
           },
           {
             concept: DIAGNOSIS_ORDER_CONCEPT,
-            value: SECONDARY_DIAGNOSIS_ORDER_CONCEPT
+            value: SECONDARY_DIAGNOSIS_ORDER_CONCEPT,
           },
           {
             concept: PROBLEM_LIST_CONCEPT,
-            value: diagnosis.concept.uuid
-          }
-        ]
+            value: diagnosis.concept.uuid,
+          },
+        ],
       };
     }
   });

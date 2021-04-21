@@ -18,7 +18,7 @@ const renderConditionsDetailedSummary = () => {
 };
 
 jest.mock("./conditions.resource", () => ({
-  performPatientConditionsSearch: jest.fn()
+  performPatientConditionsSearch: jest.fn(),
 }));
 
 const renderDateDisplay = (time: string) => dayjs(time).format("MMM-YYYY");

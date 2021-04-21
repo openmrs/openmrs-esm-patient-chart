@@ -10,7 +10,7 @@ import { useTranslation, Trans } from "react-i18next";
 import { createErrorHandler } from "@openmrs/esm-framework";
 import {
   Condition,
-  performPatientConditionsSearch
+  performPatientConditionsSearch,
 } from "./conditions.resource";
 import { openWorkspaceTab } from "./openWorkspaceTab";
 
@@ -21,7 +21,7 @@ interface ConditionsDetailedSummaryProps {
 
 const ConditionsDetailedSummary: React.FC<ConditionsDetailedSummaryProps> = ({
   patient,
-  basePath
+  basePath,
 }) => {
   const [patientConditions, setPatientConditions] = useState<Array<Condition>>(
     null
@@ -33,7 +33,7 @@ const ConditionsDetailedSummary: React.FC<ConditionsDetailedSummaryProps> = ({
     if (patient) {
       const sub = performPatientConditionsSearch(
         patient.identifier[0].value
-      ).subscribe(conditions => {
+      ).subscribe((conditions) => {
         setPatientConditions(conditions);
       }, createErrorHandler());
 
@@ -71,7 +71,7 @@ const ConditionsDetailedSummary: React.FC<ConditionsDetailedSummaryProps> = ({
               </tr>
             </thead>
             <tbody>
-              {patientConditions.map(condition => {
+              {patientConditions.map((condition) => {
                 return (
                   <React.Fragment key={condition.id}>
                     <tr

@@ -86,9 +86,9 @@ export default function VaccinationRow(params: ImmunizationProps) {
                       sequences: patientImmunization.sequences,
                       currentDose: {
                         sequenceLabel: dose.sequenceLabel,
-                        sequenceNumber: dose.sequenceNumber
+                        sequenceNumber: dose.sequenceNumber,
                       },
-                      vaccinationDate: dose.occurrenceDateTime
+                      vaccinationDate: dose.occurrenceDateTime,
                     });
                   }}
                 >
@@ -109,8 +109,9 @@ export default function VaccinationRow(params: ImmunizationProps) {
           <td className="omrs-medium">
             <div className={styles.expandSequence}>
               <svg
-                className={`omrs-icon ${hasExistingDoses(patientImmunization) &&
-                  styles.expandButton}`}
+                className={`omrs-icon ${
+                  hasExistingDoses(patientImmunization) && styles.expandButton
+                }`}
                 fill="var(--omrs-color-ink-low-contrast)"
                 onClick={() => {
                   hasExistingDoses(patientImmunization) &&
@@ -147,7 +148,7 @@ export default function VaccinationRow(params: ImmunizationProps) {
                   return openWorkspaceTab(ImmunizationsForm, formHeader, {
                     vaccineName: patientImmunization?.vaccineName,
                     vaccineUuid: patientImmunization?.vaccineUuid,
-                    sequences: patientImmunization?.sequences
+                    sequences: patientImmunization?.sequences,
                   });
                 }}
               >

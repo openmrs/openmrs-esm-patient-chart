@@ -7,7 +7,7 @@ import { mockPatient } from "../../__mocks__/patient.mock";
 import { getStartedVisit } from "@openmrs/esm-framework";
 import { mockCurrentVisit } from "../../__mocks__/visits.mock";
 
-jest.mock("lodash-es/debounce", () => jest.fn(fn => fn));
+jest.mock("lodash-es/debounce", () => jest.fn((fn) => fn));
 
 describe("<FormViewComponent/>", () => {
   beforeEach(() => {

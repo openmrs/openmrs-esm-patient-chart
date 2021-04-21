@@ -13,8 +13,8 @@ const mockVitalsConfig = {
     bloodPressureUnit: "mmHg",
     oxygenSaturationUnit: "%",
     pulseUnit: "bpm",
-    temperatureUnit: "°C"
-  }
+    temperatureUnit: "°C",
+  },
 };
 
 const renderVitalsOverview = () =>
@@ -25,11 +25,11 @@ const renderVitalsOverview = () =>
   );
 
 jest.mock("./vitals-biometrics.resource", () => ({
-  performPatientsVitalsSearch: jest.fn()
+  performPatientsVitalsSearch: jest.fn(),
 }));
 
 jest.mock("../shared-utils", () => ({
-  openWorkspaceTab: jest.fn()
+  openWorkspaceTab: jest.fn(),
 }));
 // TO DO Write test for carbon intergration
 describe("<VitalsOverview />", () => {

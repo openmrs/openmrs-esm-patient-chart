@@ -11,7 +11,7 @@ interface EmptyStateProps {
   launchForm?(): void;
 }
 
-const EmptyState: React.FC<EmptyStateProps> = props => {
+const EmptyState: React.FC<EmptyStateProps> = (props) => {
   const { t } = useTranslation();
 
   return (

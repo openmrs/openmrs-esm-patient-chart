@@ -15,7 +15,7 @@ interface AppointmentsDetailedSummaryProps {
 }
 
 export default function AppointmentsDetailedSummary({
-  patientUuid
+  patientUuid,
 }: AppointmentsDetailedSummaryProps) {
   const [patientAppointments, setPatientAppointments] = useState([]);
   const { t } = useTranslation();
@@ -69,7 +69,7 @@ export default function AppointmentsDetailedSummary({
               </tr>
             </thead>
             <tbody>
-              {patientAppointments?.map(appointment => {
+              {patientAppointments?.map((appointment) => {
                 return (
                   <tr key={appointment?.uuid}>
                     <td>

@@ -21,9 +21,9 @@ export function getDosage(strength, doseNumber) {
     const concentrationUnits = strength.substring(
       concentrationStartIndex + 1 + j
     );
-    dosage = `${doseNumber} ${strengthUnits} (${(doseNumber /
-      strengthQuantity) *
-      concentrationQuantity} ${concentrationUnits})`;
+    dosage = `${doseNumber} ${strengthUnits} (${
+      (doseNumber / strengthQuantity) * concentrationQuantity
+    } ${concentrationUnits})`;
   } else {
     dosage = strengthQuantity * doseNumber + " " + strengthUnits;
   }

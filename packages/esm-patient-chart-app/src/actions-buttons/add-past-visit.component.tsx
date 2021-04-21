@@ -8,7 +8,7 @@ const AddPastVisitOverflowMenuItem: React.FC<AddPastVisitOverflowMenuItemProps> 
   const { t } = useTranslation();
   const handleClick = React.useCallback(
     () => openVisitDashboard(`${t("visitDashboard", "Visit Dashboard")}`),
-    []
+    [t]
   );
 
   return (

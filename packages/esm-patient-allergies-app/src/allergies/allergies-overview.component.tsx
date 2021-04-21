@@ -10,7 +10,7 @@ import DataTable, {
   TableBody,
   TableHead,
   TableHeader,
-  TableRow
+  TableRow,
 } from "carbon-components-react/es/components/DataTable";
 import AllergyForm from "./allergy-form.component";
 import EmptyState from "./empty-state/empty-state.component";
@@ -19,7 +19,7 @@ import styles from "./allergies-overview.scss";
 import { useTranslation } from "react-i18next";
 import {
   performPatientAllergySearch,
-  Allergy
+  Allergy,
 } from "./allergy-intolerance.resource";
 import { openWorkspaceTab } from "./openWorkspaceTab";
 
@@ -41,7 +41,7 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient }) => {
     if (patient) {
       const sub = performPatientAllergySearch(
         patient.identifier[0].value
-      ).subscribe(allergies => {
+      ).subscribe((allergies) => {
         setAllergies(allergies);
       }, setError);
 
@@ -52,12 +52,12 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient }) => {
   const headers = [
     {
       key: "display",
-      header: t("name", "Name")
+      header: t("name", "Name"),
     },
     {
       key: "reactions",
-      header: t("reactions", "Reactions")
-    }
+      header: t("reactions", "Reactions"),
+    },
   ];
 
   const toggleShowAllAllergies = () => {
@@ -71,11 +71,11 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient }) => {
   const getRowItems = (rows: Array<Allergy>) => {
     return rows
       .slice(0, showAllAllergies ? rows.length : allergiesToShowCount)
-      .map(row => ({
+      .map((row) => ({
         ...row,
         reactions: `${row.reactionManifestations?.join(", ") || ""} ${
           row.reactionSeverity ? `(${capitalize(row.reactionSeverity)})` : ""
-        }`
+        }`,
       }));
   };
 
@@ -108,12 +108,12 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient }) => {
                 <Table {...getTableProps()}>
                   <TableHead>
                     <TableRow>
-                      {headers.map(header => (
+                      {headers.map((header) => (
                         <TableHeader
                           className={`${styles.productiveHeading01} ${styles.text02}`}
                           {...getHeaderProps({
                             header,
-                            isSortable: header.isSortable
+                            isSortable: header.isSortable,
                           })}
                         >
                           {header.header?.content ?? header.header}
@@ -122,9 +122,9 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient }) => {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {rows.map(row => (
+                    {rows.map((row) => (
                       <TableRow key={row.id}>
-                        {row.cells.map(cell => (
+                        {row.cells.map((cell) => (
                           <TableCell key={cell.id}>
                             {cell.value?.content ?? cell.value}
                           </TableCell>
@@ -138,7 +138,7 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient }) => {
                             <span
                               style={{
                                 display: "inline-block",
-                                margin: "0.45rem 0rem"
+                                margin: "0.45rem 0rem",
                               }}
                             >
                               {`${allergiesToShowCount} / ${allergies.length}`}{" "}

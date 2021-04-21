@@ -10,7 +10,7 @@ interface VitalHeaderStateDetailsProps {
 const VitalHeaderStateDetails: React.FC<VitalHeaderStateDetailsProps> = ({
   unitName,
   value,
-  unitSymbol
+  unitSymbol,
 }) => {
   return (
     <div className={styles.vitalsHeaderStateDetailsContainer}>

@@ -21,7 +21,7 @@ interface VitalsChartProps {
 
 const VitalsChart: React.FC<VitalsChartProps> = ({
   patientVitals,
-  conceptsUnits
+  conceptsUnits,
 }) => {
   const [chartData, setChartData] = React.useState([]);
   const [
@@ -33,22 +33,23 @@ const VitalsChart: React.FC<VitalsChartProps> = ({
     pulseUnit,
     oxygenSaturationUnit,
     ,
-    respiratoryRateUnit
+    respiratoryRateUnit,
   ] = conceptsUnits;
-  const [selectedVitalSign, setSelecteVitalsSign] = React.useState<
-    vitalsChartData
-  >({
+  const [
+    selectedVitalSign,
+    setSelecteVitalsSign,
+  ] = React.useState<vitalsChartData>({
     title: `BP (${bloodPressureUnit})`,
-    value: "systolic"
+    value: "systolic",
   });
 
   React.useEffect(() => {
-    const chartData = patientVitals.map(vitals => {
+    const chartData = patientVitals.map((vitals) => {
       return vitals[selectedVitalSign.value]
         ? {
             group: "vitalsChartData",
             key: dayjs(vitals.date).format("DD-MMM"),
-            value: vitals[selectedVitalSign.value]
+            value: vitals[selectedVitalSign.value],
           }
         : {};
     });
@@ -60,7 +61,7 @@ const VitalsChart: React.FC<VitalsChartProps> = ({
     "Oxygen Saturation": "#6929c4",
     Temperature: "#6929c4",
     "Respiratory Rate": "#6929c4",
-    Pulse: "#6929c4"
+    Pulse: "#6929c4",
   };
 
   const chartOptions: LineChartOptions = {
@@ -68,49 +69,49 @@ const VitalsChart: React.FC<VitalsChartProps> = ({
       bottom: {
         title: "Date",
         mapsTo: "key",
-        scaleType: ScaleTypes.LABELS
+        scaleType: ScaleTypes.LABELS,
       },
       left: {
         mapsTo: "value",
         title: selectedVitalSign.title,
         scaleType: ScaleTypes.LINEAR,
-        includeZero: false
-      }
+        includeZero: false,
+      },
     },
     legend: {
-      enabled: false
+      enabled: false,
     },
     color: {
-      scale: chartColors
-    }
+      scale: chartColors,
+    },
   };
 
   const vitalSigns = [
     {
       id: "bloodPressure",
       title: `BP (${bloodPressureUnit})`,
-      value: "systolic"
+      value: "systolic",
     },
     {
       id: "oxygenSaturation",
       title: `SPO2 (${oxygenSaturationUnit})`,
-      value: "oxygenSaturation"
+      value: "oxygenSaturation",
     },
     {
       id: "temperature",
       title: `Temp (${temperatureUnit})`,
-      value: "temperature"
+      value: "temperature",
     },
     {
       id: "Respiratory Rate",
       title: `R.Rate ${respiratoryRateUnit}`,
-      value: "respiratoryRate"
+      value: "respiratoryRate",
     },
     {
       id: "pulse",
       title: `Pulse (${pulseUnit})`,
-      value: "pulse"
-    }
+      value: "pulse",
+    },
   ];
 
   return (
@@ -136,7 +137,7 @@ const VitalsChart: React.FC<VitalsChartProps> = ({
               onClick={() =>
                 setSelecteVitalsSign({
                   title: title,
-                  value: value
+                  value: value,
                 })
               }
             />

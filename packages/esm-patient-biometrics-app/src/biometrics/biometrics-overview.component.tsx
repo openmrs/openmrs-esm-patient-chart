@@ -16,7 +16,7 @@ import DataTable, {
   TableBody,
   TableHead,
   TableHeader,
-  TableRow
+  TableRow,
 } from "carbon-components-react/es/components/DataTable";
 import { useTranslation } from "react-i18next";
 import { attach, useConfig } from "@openmrs/esm-framework";
@@ -41,7 +41,7 @@ const RenderBiometrics: React.FC<RenderBiometricsProps> = ({
   bmiUnit,
   showAllBiometrics,
   biometrics,
-  toggleShowAllBiometrics
+  toggleShowAllBiometrics,
 }) => {
   const { t } = useTranslation();
   const { conceptsUnits } = useVitalsSignsConceptMetaData();
@@ -53,7 +53,7 @@ const RenderBiometrics: React.FC<RenderBiometricsProps> = ({
     { key: "date", header: "Date" },
     { key: "weight", header: `Weight (${weightUnit})` },
     { key: "height", header: `Height (${heightUnit})` },
-    { key: "bmi", header: `BMI (${bmiUnit})` }
+    { key: "bmi", header: `BMI (${bmiUnit})` },
   ];
 
   const launchBiometricsForm = React.useCallback(() => {
@@ -116,12 +116,12 @@ const RenderBiometrics: React.FC<RenderBiometricsProps> = ({
                 <Table {...getTableProps()}>
                   <TableHead>
                     <TableRow>
-                      {headers.map(header => (
+                      {headers.map((header) => (
                         <TableHeader
                           className={`${styles.productiveHeading01} ${styles.text02}`}
                           {...getHeaderProps({
                             header,
-                            isSortable: header.isSortable
+                            isSortable: header.isSortable,
                           })}
                         >
                           {header.header?.content ?? header.header}
@@ -130,9 +130,9 @@ const RenderBiometrics: React.FC<RenderBiometricsProps> = ({
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {rows.map(row => (
+                    {rows.map((row) => (
                       <TableRow key={row.id}>
-                        {row.cells.map(cell => (
+                        {row.cells.map((cell) => (
                           <TableCell key={cell.id}>
                             {cell.value?.content ?? cell.value}
                           </TableCell>
@@ -146,7 +146,7 @@ const RenderBiometrics: React.FC<RenderBiometricsProps> = ({
                             <span
                               style={{
                                 display: "inline-block",
-                                margin: "0.45rem 0rem"
+                                margin: "0.45rem 0rem",
                               }}
                             >
                               {`${biometricsToShowCount} / ${biometrics.length}`}{" "}
@@ -193,7 +193,7 @@ interface BiometricsOverviewProps {
 }
 
 const BiometricsOverview: React.FC<BiometricsOverviewProps> = ({
-  patientUuid
+  patientUuid,
 }) => {
   const config = useConfig() as ConfigObject;
   const { bmiUnit } = config.biometrics;
@@ -204,7 +204,7 @@ const BiometricsOverview: React.FC<BiometricsOverviewProps> = ({
   const headerTitle = t("biometrics", "Biometrics");
 
   const toggleShowAllBiometrics = React.useCallback(
-    () => setShowAllBiometrics(value => !value),
+    () => setShowAllBiometrics((value) => !value),
     []
   );
 
@@ -232,7 +232,7 @@ const BiometricsOverview: React.FC<BiometricsOverviewProps> = ({
             date: dayjs(biometric.date).format(`DD - MMM - YYYY`),
             weight: biometric.weight,
             height: biometric.height,
-            bmi: biometric.bmi
+            bmi: biometric.bmi,
           };
         }),
     [biometrics, showAllBiometrics]

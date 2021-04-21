@@ -9,16 +9,16 @@ import { mockPatientAllergy } from "../../__mocks__/allergies.mock";
 const mockFetchPatientAllergy = fetchAllergyByUuid as jest.Mock;
 
 jest.mock("./allergy-intolerance.resource", () => ({
-  fetchAllergyByUuid: jest.fn()
+  fetchAllergyByUuid: jest.fn(),
 }));
 
 jest.mock("react-router-dom", () => ({
   ...jest.requireActual("react-router-dom"),
-  useRouteMatch: jest.fn()
+  useRouteMatch: jest.fn(),
 }));
 
 jest.mock("../shared-utils", () => ({
-  openWorkspaceTab: jest.fn()
+  openWorkspaceTab: jest.fn(),
 }));
 
 describe("<AllergyRecord />", () => {
@@ -26,7 +26,7 @@ describe("<AllergyRecord />", () => {
     params: { allergyUuid: "4ef4abef-57b3-4df0-b5c1-41c763e34965" },
     isExact: false,
     path: "/",
-    url: "/"
+    url: "/",
   };
 
   beforeEach(() => {

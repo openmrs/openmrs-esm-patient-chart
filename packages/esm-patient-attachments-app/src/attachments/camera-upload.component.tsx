@@ -33,7 +33,7 @@ const CameraUpload: React.FC<CameraUploadProps> = ({
   onTakePhoto,
   patientUuid,
   shouldNotRenderButton,
-  collectCaption = true
+  collectCaption = true,
 }) => {
   const [cameraIsOpen, setCameraIsOpen] = useState(openCameraOnRender);
   const [dataUri, setDataUri] = useState("");
@@ -44,22 +44,24 @@ const CameraUpload: React.FC<CameraUploadProps> = ({
     setCameraIsOpen(true);
   }, []);
 
-  const handleCloseCamera = useCallback(() => {
-    setCameraIsOpen(false);
-    openCameraOnRender = false;
-    closeCamera?.();
-    clearCamera();
-  }, []);
-
-  const handleTakePhoto = useCallback((dataUri: string) => {
-    setDataUri(dataUri);
-    onTakePhoto?.(dataUri);
-  }, []);
-
   const clearCamera = useCallback(() => {
     setDataUri("");
     setSelectedFile(null);
   }, []);
+
+  const handleCloseCamera = useCallback(() => {
+    setCameraIsOpen(false);
+    closeCamera?.();
+    clearCamera();
+  }, [closeCamera, clearCamera]);
+
+  const handleTakePhoto = useCallback(
+    (dataUri: string) => {
+      setDataUri(dataUri);
+      onTakePhoto?.(dataUri);
+    },
+    [onTakePhoto]
+  );
 
   const handleSaveImage = useCallback(
     (dataUri: string, caption: string) => {
@@ -70,7 +72,7 @@ const CameraUpload: React.FC<CameraUploadProps> = ({
         caption,
         abortController,
         dataUri
-      ).then(res => {
+      ).then((res) => {
         onNewAttachment?.({
           id: `${res.data.uuid}`,
           src: `${window.openmrsBase}/ws/rest/v1/attachment/${res.data.uuid}/bytes`,
@@ -78,11 +80,11 @@ const CameraUpload: React.FC<CameraUploadProps> = ({
           thumbnailWidth: 320,
           thumbnailHeight: 212,
           caption: res.data.comment,
-          isSelected: false
+          isSelected: false,
         });
       });
     },
-    [patientUuid]
+    [patientUuid, onNewAttachment]
   );
 
   const willSaveImage = useCallback(
@@ -95,7 +97,7 @@ const CameraUpload: React.FC<CameraUploadProps> = ({
       }
       clearCamera();
     },
-    []
+    [clearCamera, delegateSaveImage, handleSaveImage]
   );
 
   useEffect(() => {

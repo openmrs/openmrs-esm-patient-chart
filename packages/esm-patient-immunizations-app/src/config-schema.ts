@@ -2,7 +2,7 @@ import immunizationWidgetSchema from "./immunizations/immunization-widget-config
 import { ImmunizationWidgetConfigObject } from "./immunizations/immunization-domain";
 
 export const configSchema = {
-  immunizationsConfig: immunizationWidgetSchema
+  immunizationsConfig: immunizationWidgetSchema,
 };
 
 export interface ConfigObject {

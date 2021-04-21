@@ -3,7 +3,7 @@ import InlineLoading from "carbon-components-react/es/components/InlineLoading";
 import { createErrorHandler } from "@openmrs/esm-framework";
 import {
   fetchPatientRelationships,
-  Relationship
+  Relationship,
 } from "./relationships.resource";
 import styles from "./contact-details.scss";
 
@@ -23,7 +23,7 @@ const Address: React.FC<{ address: fhir.Address }> = ({ address }) => {
 };
 
 const Contact: React.FC<{ telecom: Array<fhir.ContactPoint> }> = ({
-  telecom
+  telecom,
 }) => {
   const value = telecom ? telecom[0].value : "-";
 
@@ -54,7 +54,7 @@ const Relationships: React.FC<{ patientId: string }> = ({ patientId }) => {
             display: r.personB.person.display,
             relativeAge: r.personB.person.age,
             relativeUuid: r.personB.uuid,
-            relationshipType: r.relationshipType.bIsToA
+            relationshipType: r.relationshipType.bIsToA,
           });
         } else {
           relationshipsData.push({
@@ -62,7 +62,7 @@ const Relationships: React.FC<{ patientId: string }> = ({ patientId }) => {
             display: r.personA.person.display,
             relativeAge: r.personA.person.age,
             relativeUuid: r.personA.uuid,
-            relationshipType: r.relationshipType.aIsToB
+            relationshipType: r.relationshipType.aIsToB,
           });
         }
       }
@@ -83,7 +83,7 @@ const Relationships: React.FC<{ patientId: string }> = ({ patientId }) => {
     if (relationships.length) {
       return (
         <ul style={{ width: "50%" }}>
-          {relationships.map(r => (
+          {relationships.map((r) => (
             <li key={r.uuid} className={styles.relationship}>
               <div>{r.display}</div>
               <div>{r.relationshipType}</div>
@@ -113,9 +113,9 @@ const Relationships: React.FC<{ patientId: string }> = ({ patientId }) => {
 const ContactDetails: React.FC<ContactDetailsProps> = ({
   address,
   telecom,
-  patientId
+  patientId,
 }) => {
-  const currentAddress = address.find(a => a.use === "home");
+  const currentAddress = address.find((a) => a.use === "home");
 
   return (
     <div className={styles.contactDetails}>

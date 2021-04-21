@@ -13,22 +13,22 @@ dayjs.extend(utc);
 
 jest.mock("./appointments.resource", () => ({
   getAppointments: jest.fn(),
-  getAppointmentsByUuid: jest.fn()
+  getAppointmentsByUuid: jest.fn(),
 }));
 
 jest.mock("../shared-utils", () => ({
-  openWorkspaceTab: jest.fn()
+  openWorkspaceTab: jest.fn(),
 }));
 
 describe("<AppointmentRecord />", () => {
   const match = {
     params: {
-      appointmentUuid: "68ab2e6e-7af7-4b2c-bd6f-7e2ecf30faee"
+      appointmentUuid: "68ab2e6e-7af7-4b2c-bd6f-7e2ecf30faee",
     },
     isExact: true,
     url: "/",
     path:
-      "/patient/64cb4894-848a-4027-8174-05c52989c0ca/chart/appointments/details/:appointmentUuid"
+      "/patient/64cb4894-848a-4027-8174-05c52989c0ca/chart/appointments/details/:appointmentUuid",
   };
 
   beforeEach(() => {

@@ -14,7 +14,7 @@ function setupOpenMRS() {
 
   const options = {
     featureName: "patient-biometrics",
-    moduleName
+    moduleName,
   };
 
   defineConfigSchema(moduleName, configSchema);
@@ -29,8 +29,8 @@ function setupOpenMRS() {
           options
         ),
         meta: {
-          columnSpan: 2
-        }
+          columnSpan: 2,
+        },
       },
       {
         id: "biometrics-details-widget",
@@ -41,10 +41,10 @@ function setupOpenMRS() {
         ),
         meta: {
           view: "biometrics",
-          title: "Biometrics"
-        }
-      }
-    ]
+          title: "Biometrics",
+        },
+      },
+    ],
   };
 }
 

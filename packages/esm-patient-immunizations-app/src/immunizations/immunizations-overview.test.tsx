@@ -16,7 +16,7 @@ const renderImmunizationsOverview = () => {
 };
 
 jest.mock("./immunizations.resource", () => ({
-  performPatientImmunizationsSearch: jest.fn()
+  performPatientImmunizationsSearch: jest.fn(),
 }));
 
 describe("<ImmunizationsOverview />", () => {

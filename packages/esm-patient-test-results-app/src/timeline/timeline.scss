@@ -1,0 +1,137 @@
+.grid {
+  display: grid;
+  width: fit-content;
+  gap: 1px;
+
+  grid-auto-rows: auto;
+  justify-items: center;
+  align-items: center;
+  background-color: #c6c6c6;
+}
+
+.padded-main {
+  box-sizing: border-box;
+  padding: 20px;
+}
+
+.timeline-cell {
+  background-color: white;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  justify-items: center;
+  align-items: center;
+
+  padding: 0.5em;
+}
+
+.padding-container {
+  height: fit-content;
+  max-height: 100%;
+  width: fit-content;
+  max-width: 100%;
+  padding: 0px 0 0 0;
+  z-index: 9999;
+  box-sizing: border-box;
+  margin: 0;
+  overflow: auto;
+
+  scrollbar-width: none;
+  display: grid;
+  grid-auto-flow: row;
+  gap: 1px;
+  background-color: #c6c6c6;
+  grid-template: auto auto / 9em auto;
+}
+
+.padding-container::-webkit-scrollbar {
+  display: none;
+}
+
+.time-slot-inner {
+  background-color: #e0e0e0;
+  font-weight: 600;
+
+  padding: 3px 10px;
+
+  justify-self: stretch;
+  align-self: stretch;
+
+  display: grid;
+  align-items: center;
+
+  div {
+    position: sticky;
+    left: calc(9em + 10px);
+    width: fit-content;
+  }
+}
+
+.corner-grid-element {
+  grid-row: span 1;
+  position: sticky;
+  left: 0px;
+  top: 0px;
+  z-index: 3;
+}
+
+.off-scale-high,
+.off-scale-low,
+.critically-high,
+.critically-low,
+.high,
+.low {
+  background-color: #fff1f1;
+  color: #161616;
+  p {
+    font-weight: 600;
+    font-family: "IBM Plex Sans", sans-serif;
+  }
+}
+
+.critically-high,
+.critically-low {
+  box-sizing: content-box;
+  padding: 0;
+  box-shadow: 0 0 0 1px #da1e28, inset 0 0 0 1px #da1e28;
+
+  td {
+    border: unset !important;
+  }
+}
+
+.off-scale-high {
+  p::after {
+    content: " ↑↑↑";
+  }
+}
+.critically-high {
+  p::after {
+    content: " ↑↑";
+  }
+}
+.high {
+  p::after {
+    content: " ↑";
+  }
+}
+.off-scale-low {
+  p::after {
+    content: " ↓↓↓";
+  }
+}
+.critically-low {
+  p::after {
+    content: " ↓↓";
+  }
+}
+.low {
+  p::after {
+    content: " ↓";
+  }
+}
+
+.shadow-box {
+  grid-row: 2 / -1;
+  grid-column: 1 / 2;
+}

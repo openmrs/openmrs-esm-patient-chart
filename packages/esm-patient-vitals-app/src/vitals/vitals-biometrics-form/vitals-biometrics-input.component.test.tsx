@@ -11,10 +11,10 @@ describe("<VitalsBiometricsInput/>", () => {
       {
         name: "heartRate",
         type: "text",
-        value: 120
-      }
+        value: 120,
+      },
     ],
-    unitSymbol: "bpm"
+    unitSymbol: "bpm",
   };
 
   it("should display the correct text input with correct value", async () => {
@@ -44,8 +44,8 @@ describe("<VitalsBiometricsInput/>", () => {
           {
             name: "Notes",
             type: "textArea",
-            value: ""
-          }
+            value: "",
+          },
         ]}
       />
     );

@@ -1,7 +1,7 @@
 import {
   openmrsObservableFetch,
   fhirBaseUrl,
-  FHIRResource
+  FHIRResource,
 } from "@openmrs/esm-framework";
 import { map } from "rxjs/operators";
 import { calculateBMI } from "./biometric.helper";
@@ -16,7 +16,7 @@ export function getPatientBiometrics(
     heightUuid,
     patientId
   ).pipe(
-    map(data => (data ? formatDimensions(data.weights, data.heights) : []))
+    map((data) => (data ? formatDimensions(data.weights, data.heights) : []))
   );
 }
 
@@ -30,15 +30,15 @@ function getPatientBiometricObservations(
     `${fhirBaseUrl}/Observation?subject:Patient=${patientId}&code=${weightUuid},${heightUuid}&_count=${DEFAULT_PAGE_SIZE}`
   ).pipe(
     map(({ data }) => data.entry),
-    map(entries => entries?.map(entry => entry.resource)),
-    map(dimensions => {
+    map((entries) => entries?.map((entry) => entry.resource)),
+    map((dimensions) => {
       return {
-        heights: dimensions?.filter(dimension =>
-          dimension.code.coding.some(sys => sys.code === heightUuid)
+        heights: dimensions?.filter((dimension) =>
+          dimension.code.coding.some((sys) => sys.code === heightUuid)
         ),
-        weights: dimensions?.filter(dimension =>
-          dimension.code.coding.some(sys => sys.code === weightUuid)
-        )
+        weights: dimensions?.filter((dimension) =>
+          dimension.code.coding.some((sys) => sys.code === weightUuid)
+        ),
       };
     })
   );
@@ -51,9 +51,9 @@ function formatDimensions(weights, heights) {
     new Set(weightDates?.concat(heightDates))
   ).sort(latestFirst);
 
-  return uniqueDates.map(date => {
-    const weight = weights.find(weight => weight.issued === date);
-    const height = heights.find(height => height.issued === date);
+  return uniqueDates.map((date) => {
+    const weight = weights.find((weight) => weight.issued === date);
+    const height = heights.find((height) => height.issued === date);
     return {
       id: weight && weight?.encounter?.reference?.replace("Encounter/", ""),
       weight: weight ? weight.valueQuantity.value : weight,
@@ -65,8 +65,8 @@ function formatDimensions(weights, heights) {
           : null,
       obsData: {
         weight: weight,
-        height: height
-      }
+        height: height,
+      },
     };
   });
 }
@@ -76,7 +76,7 @@ function latestFirst(a, b) {
 }
 
 function getDatesIssued(dimensionArray): string[] {
-  return dimensionArray?.map(dimension => dimension.issued);
+  return dimensionArray?.map((dimension) => dimension.issued);
 }
 
 type DimensionFetchResponse = {

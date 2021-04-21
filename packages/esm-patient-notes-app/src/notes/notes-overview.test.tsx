@@ -12,11 +12,11 @@ const mockOpenWorkspaceTab = openWorkspaceTab as jest.Mock;
 
 jest.mock("./encounter.resource", () => ({
   getEncounters: jest.fn(),
-  getEncounterObservableRESTAPI: jest.fn()
+  getEncounterObservableRESTAPI: jest.fn(),
 }));
 
 jest.mock("../shared-utils", () => ({
-  openWorkspaceTab: jest.fn()
+  openWorkspaceTab: jest.fn(),
 }));
 
 describe("<NotesOverview />", () => {
