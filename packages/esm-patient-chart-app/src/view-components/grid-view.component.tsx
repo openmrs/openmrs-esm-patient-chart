@@ -5,7 +5,7 @@ import {
   Extension,
   ExtensionData,
   ExtensionSlot,
-  useExtensionStore
+  useExtensionStore,
 } from "@openmrs/esm-framework";
 import { DashbardGridConfig } from "../config-schemas";
 import { basePath } from "../constants";
@@ -27,7 +27,7 @@ export default function GridView({
   slot,
   layout,
   patient,
-  patientUuid
+  patientUuid,
 }: GridViewProps) {
   const store = useExtensionStore();
   const { url } = useRouteMatch(basePath);
@@ -36,7 +36,7 @@ export default function GridView({
     () => ({
       basePath: url,
       patient,
-      patientUuid
+      patientUuid,
     }),
     [url, patientUuid, patient]
   );

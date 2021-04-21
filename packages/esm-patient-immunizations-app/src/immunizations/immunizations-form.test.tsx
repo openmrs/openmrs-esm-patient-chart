@@ -6,7 +6,7 @@ import { of } from "rxjs/internal/observable/of";
 import {
   openmrsObservableFetch,
   getStartedVisit,
-  VisitItem
+  VisitItem,
 } from "@openmrs/esm-framework";
 import { ImmunizationsForm } from "./immunizations-form.component";
 import { savePatientImmunization } from "./immunizations.resource";
@@ -29,13 +29,13 @@ const renderImmunizationsForm = () => {
 mockOpenmrsObservableFetch.mockImplementation(jest.fn());
 
 jest.mock("./immunizations.resource", () => ({
-  savePatientImmunization: jest.fn()
+  savePatientImmunization: jest.fn(),
 }));
 
 describe("<ImmunizationsForm />", () => {
-  getStartedVisit.getValue = function() {
+  getStartedVisit.getValue = function () {
     const mockVisitItem: VisitItem = {
-      visitData: { uuid: "visitUuid" } as any
+      visitData: { uuid: "visitUuid" } as any,
     } as any;
     return mockVisitItem;
   };
@@ -48,7 +48,7 @@ describe("<ImmunizationsForm />", () => {
 
   it("renders immunization form without dying", async () => {
     testMatch.params = {
-      vaccineName: "Rotavirus"
+      vaccineName: "Rotavirus",
     };
 
     renderImmunizationsForm();
@@ -56,7 +56,7 @@ describe("<ImmunizationsForm />", () => {
 
   it("displays the appropriate fields when adding a new immunization without sequence", async () => {
     testMatch.params = {
-      vaccineName: "Rotavirus"
+      vaccineName: "Rotavirus",
     };
 
     renderImmunizationsForm();
@@ -79,8 +79,8 @@ describe("<ImmunizationsForm />", () => {
       sequences: [
         { sequenceLabel: "2 Months", sequenceNumber: 1 },
         { sequenceLabel: "4 Months", sequenceNumber: 2 },
-        { sequenceLabel: "6 Months", sequenceNumber: 3 }
-      ]
+        { sequenceLabel: "6 Months", sequenceNumber: 3 },
+      ],
     };
 
     renderImmunizationsForm();
@@ -102,7 +102,7 @@ describe("<ImmunizationsForm />", () => {
       manufacturer: "Organization/hl7",
       expirationDate: "2018-12-15",
       vaccinationDate: "2018-06-18",
-      lotNumber: "12345"
+      lotNumber: "12345",
     };
 
     renderImmunizationsForm();
@@ -135,9 +135,9 @@ describe("<ImmunizationsForm />", () => {
       sequences: [
         { sequenceLabel: "2 Months", sequenceNumber: 1 },
         { sequenceLabel: "4 Months", sequenceNumber: 2 },
-        { sequenceLabel: "6 Months", sequenceNumber: 3 }
+        { sequenceLabel: "6 Months", sequenceNumber: 3 },
       ],
-      currentDose: { sequenceLabel: "2 Months", sequenceNumber: 1 }
+      currentDose: { sequenceLabel: "2 Months", sequenceNumber: 1 },
     };
 
     renderImmunizationsForm();
@@ -162,7 +162,7 @@ describe("<ImmunizationsForm />", () => {
   it("should have save button disabled unless data entered", () => {
     mockSavePatientImmunization.mockResolvedValue({ status: 200 });
     testMatch.params = {
-      vaccineName: "Rotavirus"
+      vaccineName: "Rotavirus",
     };
 
     renderImmunizationsForm();
@@ -173,7 +173,7 @@ describe("<ImmunizationsForm />", () => {
   it("should enable save button when mandatory fields are selected", async () => {
     mockSavePatientImmunization.mockResolvedValue({ status: 200 });
     testMatch.params = {
-      vaccineName: "Rotavirus"
+      vaccineName: "Rotavirus",
     };
 
     renderImmunizationsForm();
@@ -191,7 +191,7 @@ describe("<ImmunizationsForm />", () => {
     mockSavePatientImmunization.mockResolvedValue({ status: 200 });
     testMatch.params = {
       vaccineName: "Rotavirus",
-      vaccineUuid: "RotavirusUuid"
+      vaccineUuid: "RotavirusUuid",
     };
 
     renderImmunizationsForm();
@@ -203,7 +203,7 @@ describe("<ImmunizationsForm />", () => {
 
     const vaccinationExpiration = screen.getByLabelText("Expiration Date");
     fireEvent.change(vaccinationExpiration, {
-      target: { value: "2020-06-30" }
+      target: { value: "2020-06-30" },
     });
 
     const lotNumber = screen.getByLabelText("Lot Number");
@@ -241,8 +241,8 @@ describe("<ImmunizationsForm />", () => {
       sequences: [
         { sequenceLabel: "2 Months", sequenceNumber: 1 },
         { sequenceLabel: "4 Months", sequenceNumber: 2 },
-        { sequenceLabel: "6 Months", sequenceNumber: 3 }
-      ]
+        { sequenceLabel: "6 Months", sequenceNumber: 3 },
+      ],
     };
 
     renderImmunizationsForm();
@@ -256,7 +256,7 @@ describe("<ImmunizationsForm />", () => {
 
     const vaccinationExpiration = screen.getByLabelText("Expiration Date");
     fireEvent.change(vaccinationExpiration, {
-      target: { value: "2020-06-30" }
+      target: { value: "2020-06-30" },
     });
 
     const lotNumber = screen.getByLabelText("Lot Number");
@@ -297,9 +297,9 @@ describe("<ImmunizationsForm />", () => {
       sequence: [
         { sequenceLabel: "2 Months", sequenceNumber: 1 },
         { sequenceLabel: "4 Months", sequenceNumber: 2 },
-        { sequenceLabel: "6 Months", sequenceNumber: 3 }
+        { sequenceLabel: "6 Months", sequenceNumber: 3 },
       ],
-      currentDose: { sequenceLabel: "2 Months", sequenceNumber: 1 }
+      currentDose: { sequenceLabel: "2 Months", sequenceNumber: 1 },
     };
 
     renderImmunizationsForm();
@@ -321,9 +321,9 @@ describe("<ImmunizationsForm />", () => {
       sequences: [
         { sequenceLabel: "2 Months", sequenceNumber: 1 },
         { sequenceLabel: "4 Months", sequenceNumber: 2 },
-        { sequenceLabel: "6 Months", sequenceNumber: 3 }
+        { sequenceLabel: "6 Months", sequenceNumber: 3 },
       ],
-      currentDose: { sequenceLabel: "2 Months", sequenceNumber: 1 }
+      currentDose: { sequenceLabel: "2 Months", sequenceNumber: 1 },
     };
 
     renderImmunizationsForm();

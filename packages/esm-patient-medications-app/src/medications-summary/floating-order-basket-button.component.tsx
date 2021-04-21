@@ -8,7 +8,7 @@ import { connect } from "unistore/react";
 import { attach } from "@openmrs/esm-framework";
 import {
   OrderBasketStoreActions,
-  OrderBasketStore
+  OrderBasketStore,
 } from "../medications/order-basket-store";
 
 export interface FloatingOrderBasketButtonProps {}

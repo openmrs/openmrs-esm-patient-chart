@@ -11,13 +11,13 @@ import { Trans, useTranslation } from "react-i18next";
 import { mapFromFHIRImmunizationBundle } from "./immunization-mapper";
 import {
   getImmunizationsConceptSet,
-  performPatientImmunizationsSearch
+  performPatientImmunizationsSearch,
 } from "./immunizations.resource";
 import {
   ImmunizationData,
   ImmunizationSequenceDefinition,
   ImmunizationWidgetConfigObject,
-  OpenmrsConcept
+  OpenmrsConcept,
 } from "./immunization-domain";
 
 interface ImmunizationsDetailedSummaryProps {
@@ -27,7 +27,7 @@ interface ImmunizationsDetailedSummaryProps {
 
 const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> = ({
   patientUuid,
-  patient
+  patient,
 }) => {
   const config = useConfig();
   const { t } = useTranslation();
@@ -43,16 +43,16 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
     ): Array<ImmunizationData> => {
       const immunizationConcepts: Array<OpenmrsConcept> =
         immunizationsConceptSet?.setMembers;
-      return map(immunizationConcepts, immunizationConcept => {
+      return map(immunizationConcepts, (immunizationConcept) => {
         const immunizationDataFromConfig: ImmunizationData = {
           vaccineName: immunizationConcept.display,
           vaccineUuid: immunizationConcept.uuid,
-          existingDoses: []
+          existingDoses: [],
         };
 
         const matchingSequenceDef = find(
           configuredSequences,
-          sequencesDef =>
+          (sequencesDef) =>
             sequencesDef.vaccineConceptUuid === immunizationConcept.uuid
         );
         immunizationDataFromConfig.sequences = matchingSequenceDef?.sequences;
@@ -61,14 +61,14 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
     };
   }
 
-  const findExistingDoses = function(
+  const findExistingDoses = function (
     configuredImmunizations: Array<ImmunizationData>,
     existingImmunizationsForPatient: Array<ImmunizationData>
   ): Array<ImmunizationData> {
-    return map(configuredImmunizations, immunizationFromConfig => {
+    return map(configuredImmunizations, (immunizationFromConfig) => {
       const matchingExistingImmunization = find(
         existingImmunizationsForPatient,
-        existingImmunization =>
+        (existingImmunization) =>
           existingImmunization.vaccineUuid ===
           immunizationFromConfig.vaccineUuid
       );
@@ -85,25 +85,25 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
 
     if (patient) {
       const searchTerm = immunizationsConfig?.vaccinesConceptSet;
-      const configuredImmunizations: Promise<Array<
-        ImmunizationData
-      >> = getImmunizationsConceptSet(searchTerm, abortController).then(
+      const configuredImmunizations: Promise<
+        Array<ImmunizationData>
+      > = getImmunizationsConceptSet(searchTerm, abortController).then(
         findConfiguredSequences(immunizationsConfig?.sequenceDefinitions)
       );
 
-      const existingImmunizationsForPatient: Promise<Array<
-        ImmunizationData
-      >> = performPatientImmunizationsSearch(
+      const existingImmunizationsForPatient: Promise<
+        Array<ImmunizationData>
+      > = performPatientImmunizationsSearch(
         patient.identifier[0].value,
         patientUuid,
         abortController
       ).then(mapFromFHIRImmunizationBundle);
 
-      const consolidatedImmunizations: Promise<Array<
-        ImmunizationData
-      >> = Promise.all([
+      const consolidatedImmunizations: Promise<
+        Array<ImmunizationData>
+      > = Promise.all([
         configuredImmunizations,
-        existingImmunizationsForPatient
+        existingImmunizationsForPatient,
       ]).then(([configuredImmunizations, existingImmunizationsForPatient]) =>
         findExistingDoses(
           configuredImmunizations,
@@ -115,12 +115,12 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
         .then((consolidatedImmunizations: Array<ImmunizationData>) => {
           const sortedImmunizationsForPatient = orderBy(
             consolidatedImmunizations,
-            [immunization => get(immunization, "existingDoses.length", 0)],
+            [(immunization) => get(immunization, "existingDoses.length", 0)],
             ["desc"]
           );
           setAllImmunizations(sortedImmunizationsForPatient);
         })
-        .catch(err => {
+        .catch((err) => {
           if (err.name !== "AbortError") {
             setAllImmunizations([]);
             createErrorHandler();
@@ -164,7 +164,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
           width: "100%",
           background: "var(--omrs-color-bg-low-contrast)",
           border: "none",
-          boxShadow: "none"
+          boxShadow: "none",
         }}
       >
         <div className={styles.immunizationMargin}>

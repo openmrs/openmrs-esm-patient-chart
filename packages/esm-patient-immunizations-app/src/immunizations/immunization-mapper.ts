@@ -13,7 +13,7 @@ import {
   ImmunizationData,
   ImmunizationDoseData,
   ImmunizationFormData,
-  Reference
+  Reference,
 } from "./immunization-domain";
 
 const mapToImmunizationDose = (
@@ -42,15 +42,15 @@ const mapToImmunizationDose = (
     sequenceLabel,
     sequenceNumber,
     occurrenceDateTime,
-    expirationDate
+    expirationDate,
   };
 };
 
-const findCodeWithoutSystem = function(
+const findCodeWithoutSystem = function (
   immunizationResource: FHIRImmunizationResource
 ) {
   //Code without system represents internal code using uuid
-  return find(immunizationResource?.vaccineCode?.coding, function(code: Code) {
+  return find(immunizationResource?.vaccineCode?.coding, function (code: Code) {
     return isUndefined(code.system);
   });
 };
@@ -60,7 +60,7 @@ export const mapFromFHIRImmunizationBundle = (
 ): Array<ImmunizationData> => {
   const groupByImmunization = groupBy(
     immunizationBundle.entry,
-    immunizationResourceEntry => {
+    (immunizationResourceEntry) => {
       return findCodeWithoutSystem(immunizationResourceEntry.resource)?.code;
     }
   );
@@ -80,9 +80,9 @@ export const mapFromFHIRImmunizationBundle = (
         vaccineUuid: codeWithoutSystem.code,
         existingDoses: orderBy(
           existingDoses,
-          [dose => get(dose, "occurrenceDateTime")],
+          [(dose) => get(dose, "occurrenceDateTime")],
           ["desc"]
-        )
+        ),
       };
     }
   );
@@ -107,9 +107,9 @@ export const mapToFHIRImmunizationResource = (
       coding: [
         {
           code: immunizationForData.vaccineUuid,
-          display: immunizationForData.vaccineName
-        }
-      ]
+          display: immunizationForData.vaccineName,
+        },
+      ],
     },
     patient: toReferenceOfType("Patient", immunizationForData.patientUuid),
     encounter: toReferenceOfType("Encounter", visitUuid), //Reference of visit instead of encounter
@@ -122,8 +122,8 @@ export const mapToFHIRImmunizationResource = (
     protocolApplied: [
       {
         doseNumberPositiveInt: immunizationForData.currentDose.sequenceNumber,
-        series: immunizationForData.currentDose.sequenceLabel
-      }
-    ]
+        series: immunizationForData.currentDose.sequenceLabel,
+      },
+    ],
   };
 };

@@ -3,12 +3,12 @@ import VisitButton from "./visit-button.component";
 import { render, fireEvent, screen } from "@testing-library/react";
 import {
   openmrsObservableFetch,
-  newWorkspaceItem
+  newWorkspaceItem,
 } from "@openmrs/esm-framework";
 import { of } from "rxjs/internal/observable/of";
 import {
   mockPatientNoVisitsResponse,
-  mockPatientCurrentVisitsResponse
+  mockPatientCurrentVisitsResponse,
 } from "../../../__mocks__/patient-visits.mock";
 
 const mockOpenmrsObservableFetch = openmrsObservableFetch as jest.Mock;

@@ -16,7 +16,7 @@ export function useWorkspace(): WorkspaceDetails {
   const store = useExtensionStore();
   const extensions = useMemo(() => {
     const ids = store.slots[patientChartWorkspaceSlot]?.attachedIds ?? [];
-    return ids.map(id => store.extensions[id]);
+    return ids.map((id) => store.extensions[id]);
   }, [store]);
 
   const title = useMemo(() => {
@@ -39,6 +39,6 @@ export function useWorkspace(): WorkspaceDetails {
     title,
     extensionSlot:
       extensions.length > 0 ? patientChartWorkspaceSlot : undefined,
-    clearExtensionSlot
+    clearExtensionSlot,
   };
 }

@@ -12,7 +12,7 @@ const mockPerformPatientsVitalSearch = performPatientsVitalsSearch as jest.Mock;
 dayjs.extend(isToday);
 
 jest.mock("../vitals-biometrics.resource", () => ({
-  performPatientsVitalsSearch: jest.fn()
+  performPatientsVitalsSearch: jest.fn(),
 }));
 
 describe("<VitalHeader/>", () => {
@@ -27,8 +27,8 @@ describe("<VitalHeader/>", () => {
       weight: 85,
       height: 185,
       bmi: "24.8",
-      respiratoryRate: 45
-    }
+      respiratoryRate: 45,
+    },
   ];
 
   beforeEach(() => {

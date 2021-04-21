@@ -21,7 +21,7 @@ const VitalsHeaderStateTitle: React.FC<VitalsHeaderStateTitleProps> = ({
   view,
   vitals,
   toggleView,
-  showDetails
+  showDetails,
 }) => {
   const { t } = useTranslation();
   const launchVitalsBiometricsForm = React.useCallback(() => {
@@ -71,7 +71,7 @@ const VitalsHeaderStateTitle: React.FC<VitalsHeaderStateTitleProps> = ({
               <ChevronUp20
                 className={styles.expandButton}
                 title={"ChevronUp"}
-                onClick={e => {
+                onClick={(e) => {
                   e.stopPropagation();
                   toggleView();
                 }}
@@ -80,7 +80,7 @@ const VitalsHeaderStateTitle: React.FC<VitalsHeaderStateTitleProps> = ({
               <ChevronDown20
                 className={styles.expandButton}
                 title={"ChevronDown"}
-                onClick={e => {
+                onClick={(e) => {
                   e.stopPropagation();
                   toggleView();
                 }}

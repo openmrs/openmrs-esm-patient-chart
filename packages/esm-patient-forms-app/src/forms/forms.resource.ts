@@ -12,7 +12,7 @@ export function fetchAllForms(): Observable<Array<Form>> {
     `/ws/rest/v1/form?v=custom:(uuid,name,encounterType:(uuid,name),version,published,retired,resources:(uuid,name,dataType,valueReference))`
   ).pipe(
     map(({ data }) => data),
-    map(({ results }) => results.map(form => toFormObject(form)))
+    map(({ results }) => results.map((form) => toFormObject(form)))
   );
 }
 
@@ -27,7 +27,7 @@ export function toFormObject(openmrsRestForm): Form {
       : null,
     encounterTypeName: openmrsRestForm.encounterType
       ? openmrsRestForm.encounterType.name
-      : null
+      : null,
   };
 }
 
@@ -41,7 +41,7 @@ export function fetchPatientEncounters(
     `/ws/rest/v1/encounter?v=${customRepresentation}&patient=${patientUuid}&fromdate=${startDate.toISOString()}&todate=${endDate.toISOString()}`
   ).pipe(
     map(({ data }) => data),
-    map(({ results }) => results.map(result => toEncounterObject(result)))
+    map(({ results }) => results.map((result) => toEncounterObject(result)))
   );
 }
 
@@ -57,6 +57,6 @@ export function toEncounterObject(openmrsRestEncounter: any): Encounter {
       : null,
     form: openmrsRestEncounter.form
       ? toFormObject(openmrsRestEncounter.form)
-      : null
+      : null,
   };
 }

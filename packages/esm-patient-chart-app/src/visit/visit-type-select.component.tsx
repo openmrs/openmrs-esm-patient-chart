@@ -13,7 +13,7 @@ export default function VisitTypeSelect(props: VisitTypeSelectProps) {
   const onVisitTypesChanged = React.useCallback(
     (event: React.ChangeEvent<HTMLSelectElement>) => {
       props.onVisitTypeChanged(
-        visitTypes.find(loc => loc.uuid === event.target.value)
+        visitTypes.find((loc) => loc.uuid === event.target.value)
       );
     },
     [visitTypes, props.onVisitTypeChanged]
@@ -30,7 +30,7 @@ export default function VisitTypeSelect(props: VisitTypeSelectProps) {
         value={props.visitTypeUuid}
       >
         <option value="" className="omrs-padding-8" />
-        {visitTypes.map(visitType => (
+        {visitTypes.map((visitType) => (
           <option
             key={visitType.uuid}
             value={visitType.uuid}

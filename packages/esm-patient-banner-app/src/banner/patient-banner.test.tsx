@@ -13,7 +13,7 @@ jest.unmock("lodash");
 const lodash = jest.requireActual("lodash");
 lodash.capitalize = jest
   .fn()
-  .mockImplementation(s => s.charAt(0).toUpperCase() + s.slice(1));
+  .mockImplementation((s) => s.charAt(0).toUpperCase() + s.slice(1));
 
 function renderPatientBanner() {
   render(<PatientBanner />);
@@ -30,13 +30,13 @@ describe("<PatientBanner />", () => {
     renderPatientBanner();
 
     const showContactDetailsBtn = screen.getByRole("button", {
-      name: "Show Contact Details"
+      name: "Show Contact Details",
     });
 
     fireEvent.click(showContactDetailsBtn);
 
     const hideContactDetailsBtn = screen.getByRole("button", {
-      name: "Hide Contact Details"
+      name: "Hide Contact Details",
     });
     expect(hideContactDetailsBtn).toBeInTheDocument();
     expect(screen.getByText("Address")).toBeInTheDocument();
@@ -50,7 +50,7 @@ describe("<PatientBanner />", () => {
   it("should display the Active Visit tag when there is an active visit", () => {
     getStartedVisit.next({
       mode: visitMode.NEWVISIT,
-      status: visitStatus.NOTSTARTED
+      status: visitStatus.NOTSTARTED,
     });
 
     renderPatientBanner();

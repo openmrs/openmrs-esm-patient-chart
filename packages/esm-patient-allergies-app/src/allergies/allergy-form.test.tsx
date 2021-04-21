@@ -7,7 +7,7 @@ import {
   mockAllergicReactions,
   mockEnvironmentalAllergens,
   mockSaveAllergyResponse,
-  mockUpdatedAllergyResult
+  mockUpdatedAllergyResult,
 } from "../../__mocks__/allergies.mock";
 import {
   deletePatientAllergy,
@@ -15,7 +15,7 @@ import {
   getPatientAllergyByPatientUuid,
   getAllergyAllergenByConceptUuid,
   savePatientAllergy,
-  updatePatientAllergy
+  updatePatientAllergy,
 } from "./allergy-intolerance.resource";
 import AllergyForm from "./allergy-form.component";
 import { mockPatient } from "../../__mocks__/patient.mock";
@@ -44,12 +44,12 @@ jest.mock("./allergy-intolerance.resource", () => ({
   getAllergyAllergenByConceptUuid: jest.fn(),
   getPatientAllergyByPatientUuid: jest.fn(),
   savePatientAllergy: jest.fn(),
-  updatePatientAllergy: jest.fn()
+  updatePatientAllergy: jest.fn(),
 }));
 
 jest.mock("react-router-dom", () => ({
   ...jest.requireActual("react-router-dom"),
-  useRouteMatch: jest.fn()
+  useRouteMatch: jest.fn(),
 }));
 
 describe("<AllergyForm />", () => {
@@ -151,7 +151,7 @@ describe("<AllergyForm />", () => {
         codedAllergenUuid: null,
         comment: "",
         reactionUuids: [{ uuid: "121677AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" }],
-        severityUuid: null
+        severityUuid: null,
       },
       mockPatientId,
       new AbortController()
@@ -161,11 +161,11 @@ describe("<AllergyForm />", () => {
   it("renders the edit allergy form with the relevant form fields prefilled", async () => {
     testMatch = {
       params: {
-        allergyUuid: "4ef4abef-57b3-4df0-b5c1-41c763e34965"
+        allergyUuid: "4ef4abef-57b3-4df0-b5c1-41c763e34965",
       },
       isExact: false,
       path: "/",
-      url: "/"
+      url: "/",
     };
     mockGetPatientAllergyByPatientUuid.mockResolvedValue(
       Promise.resolve(mockAllergyResult)
@@ -179,7 +179,7 @@ describe("<AllergyForm />", () => {
         ok: true,
         redirected: false,
         status: 204,
-        statusText: "No Content"
+        statusText: "No Content",
       })
     );
     mockUpdatePatientAllergy.mockReturnValue(
@@ -254,9 +254,9 @@ describe("<AllergyForm />", () => {
         reactionUuids: [
           {
             display: "Mental status change",
-            uuid: "121677AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-          }
-        ]
+            uuid: "121677AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+          },
+        ],
       },
       mockPatientId,
       { allergyUuid: testMatch.params["allergyUuid"] },

@@ -4,7 +4,7 @@ import styles from "./immunizations-form.css";
 import {
   createErrorHandler,
   getStartedVisit,
-  useSessionUser
+  useSessionUser,
 } from "@openmrs/esm-framework";
 import { useTranslation } from "react-i18next";
 import { savePatientImmunization } from "./immunizations.resource";
@@ -12,7 +12,7 @@ import { mapToFHIRImmunizationResource } from "./immunization-mapper";
 import { useHistory } from "react-router-dom";
 import {
   ImmunizationFormData,
-  ImmunizationSequence
+  ImmunizationSequence,
 } from "./immunization-domain";
 import { DataCaptureComponentProps } from "../types";
 
@@ -43,7 +43,7 @@ const ImmunizationsForm: React.FC<ImmunizationsFormProps> = ({
   match,
   closeComponent = () => {},
   entryStarted = () => {},
-  entryCancelled = () => {}
+  entryCancelled = () => {},
 }) => {
   const initialState: ImmunizationFormState = {
     vaccineName: "",
@@ -55,13 +55,13 @@ const ImmunizationsForm: React.FC<ImmunizationsFormProps> = ({
     expirationDate: null,
     lotNumber: "",
     manufacturer: "",
-    formChanged: false
+    formChanged: false,
   };
   const [formState, setFormState] = useState(initialState);
   const updateSingle = <T extends keyof ImmunizationFormState>(
     name: T,
     value: typeof formState[T]
-  ) => setFormState(state => ({ ...state, [name]: value }));
+  ) => setFormState((state) => ({ ...state, [name]: value }));
 
   const formRef = useRef<HTMLFormElement>(null);
   const { t } = useTranslation();
@@ -84,7 +84,7 @@ const ImmunizationsForm: React.FC<ImmunizationsFormProps> = ({
         vaccinationDate,
         lotNumber,
         sequences,
-        currentDose
+        currentDose,
       }: ImmunizationFormData = match.params;
 
       const formStateFromParam: ImmunizationFormState = {
@@ -97,13 +97,13 @@ const ImmunizationsForm: React.FC<ImmunizationsFormProps> = ({
         vaccinationDate,
         formChanged: false,
         sequences: hasSequences(sequences) ? sequences : [],
-        currentDose: currentDose || ({} as ImmunizationSequence)
+        currentDose: currentDose || ({} as ImmunizationSequence),
       };
       setFormState(formStateFromParam);
     }
   }, [match.params]);
 
-  const handleFormSubmit = event => {
+  const handleFormSubmit = (event) => {
     event.preventDefault();
     const currentVisitUuid = getStartedVisit?.getValue()?.visitData?.uuid;
     const currentLocationUuid = currentUser?.sessionLocation?.uuid;
@@ -118,7 +118,7 @@ const ImmunizationsForm: React.FC<ImmunizationsFormProps> = ({
       expirationDate: formState.expirationDate,
       vaccinationDate: formState.vaccinationDate,
       lotNumber: formState.lotNumber,
-      currentDose: formState.currentDose
+      currentDose: formState.currentDose,
     };
     const abortController = new AbortController();
 
@@ -132,7 +132,7 @@ const ImmunizationsForm: React.FC<ImmunizationsFormProps> = ({
       patientUuid,
       formState.immunizationObsUuid,
       abortController
-    ).then(response => {
+    ).then((response) => {
       response.status === 200 && navigate();
     }, createErrorHandler);
     return () => abortController.abort();
@@ -147,11 +147,11 @@ const ImmunizationsForm: React.FC<ImmunizationsFormProps> = ({
     return !isNaN(value);
   }
 
-  const onDoseSelect = event => {
+  const onDoseSelect = (event) => {
     const defaultDose = {} as ImmunizationSequence;
     const currentDose: ImmunizationSequence =
       formState.sequences.find(
-        s =>
+        (s) =>
           isNumber(event.target.value) &&
           s.sequenceNumber === parseInt(event.target.value)
       ) || defaultDose;
@@ -203,7 +203,7 @@ const ImmunizationsForm: React.FC<ImmunizationsFormProps> = ({
                       <option value="DEFAULT">
                         {t("pleaseSelect", "Please select")}
                       </option>
-                      {formState.sequences.map(s => {
+                      {formState.sequences.map((s) => {
                         return (
                           <option
                             key={s.sequenceNumber}
@@ -229,7 +229,7 @@ const ImmunizationsForm: React.FC<ImmunizationsFormProps> = ({
                     max={today}
                     required
                     defaultValue={formState.vaccinationDate}
-                    onChange={evt =>
+                    onChange={(evt) =>
                       updateSingle("vaccinationDate", evt.target.value)
                     }
                   />
@@ -248,7 +248,7 @@ const ImmunizationsForm: React.FC<ImmunizationsFormProps> = ({
                     id="vaccinationExpiration"
                     name="vaccinationExpiration"
                     defaultValue={formState.expirationDate}
-                    onChange={evt =>
+                    onChange={(evt) =>
                       updateSingle("expirationDate", evt.target.value)
                     }
                   />
@@ -268,7 +268,7 @@ const ImmunizationsForm: React.FC<ImmunizationsFormProps> = ({
                     id="lotNumber"
                     style={{ height: "2.75rem" }}
                     defaultValue={formState.lotNumber}
-                    onChange={evt =>
+                    onChange={(evt) =>
                       updateSingle("lotNumber", evt.target.value)
                     }
                   />
@@ -285,7 +285,7 @@ const ImmunizationsForm: React.FC<ImmunizationsFormProps> = ({
                     id="manufacturer"
                     style={{ height: "2.75rem" }}
                     defaultValue={formState.manufacturer}
-                    onChange={evt =>
+                    onChange={(evt) =>
                       updateSingle("manufacturer", evt.target.value)
                     }
                   />
@@ -328,7 +328,7 @@ const ImmunizationsForm: React.FC<ImmunizationsFormProps> = ({
     );
   }
 
-  const closeForm = event => {
+  const closeForm = (event) => {
     let userConfirmed: boolean = false;
     const defaultConfirmMessage =
       "There is ongoing work, are you sure you want to close this tab?";

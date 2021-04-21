@@ -16,7 +16,7 @@ interface PatientChartParams {
 }
 
 const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({
-  match
+  match,
 }) => {
   const { patientUuid, view, subview } = match.params;
   const [loading, patient] = useCurrentPatient(patientUuid);

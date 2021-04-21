@@ -26,7 +26,7 @@ export default function OrderBasketSearchResults({
   searchTerm,
   encounterUuid,
   setSearchTerm,
-  onSearchResultClicked
+  onSearchResultClicked,
 }: OrderBasketSearchResultsProps) {
   const { t } = useTranslation();
   const [searchResults, setSearchResults] = useState<Array<OrderBasketItem>>(
@@ -65,7 +65,7 @@ export default function OrderBasketSearchResults({
                 '{count} exact match(es) for "{searchTerm}"',
                 {
                   count: searchResults.length,
-                  searchTerm
+                  searchTerm,
                 }
               )}
             </span>
@@ -85,7 +85,7 @@ export default function OrderBasketSearchResults({
                 style={{
                   display: "flex",
                   justifyContent: "space-between",
-                  alignItems: "center"
+                  alignItems: "center",
                 }}
               >
                 <Medication16

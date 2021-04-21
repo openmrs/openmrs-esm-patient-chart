@@ -5,7 +5,7 @@ export function getAttachmentByUuid(
   abortController: AbortController
 ) {
   return openmrsFetch(`/ws/rest/v1/attachment/${attachmentUuid}`, {
-    signal: abortController.signal
+    signal: abortController.signal,
   });
 }
 
@@ -17,7 +17,7 @@ export function getAttachments(
   return openmrsFetch(
     `/ws/rest/v1/attachment?patient=${patientUuid}&includeEncounterless=${includeEncounterless}`,
     {
-      signal: abortController.signal
+      signal: abortController.signal,
     }
   );
 }
@@ -44,7 +44,7 @@ export function createAttachment(
   return openmrsFetch(`/ws/rest/v1/attachment`, {
     method: "POST",
     signal: abortController.signal,
-    body: formData
+    body: formData,
   });
 }
 
@@ -54,6 +54,6 @@ export function deleteAttachment(
 ) {
   return openmrsFetch(`/ws/rest/v1/attachment/${attachmentUuid}`, {
     method: "DELETE",
-    signal: abortController.signal
+    signal: abortController.signal,
   });
 }

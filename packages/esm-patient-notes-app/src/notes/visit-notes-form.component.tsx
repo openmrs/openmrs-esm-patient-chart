@@ -18,14 +18,14 @@ import {
   convertToObsPayLoad,
   obs,
   Diagnosis,
-  VisitNotePayload
+  VisitNotePayload,
 } from "./visit-note.util";
 import {
   fetchCurrentSessionData,
   fetchDiagnosisByName,
   fetchLocationByUuid,
   fetchProviderByUuid,
-  saveVisitNote
+  saveVisitNote,
 } from "./visit-notes.resource";
 import { ConfigObject } from "../config-schema";
 
@@ -36,7 +36,7 @@ interface VisitNotesFormProps {
 
 const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   closeWorkspace,
-  patientUuid
+  patientUuid,
 }) => {
   const searchTimeoutInMs = 300;
   const config = useConfig() as ConfigObject;
@@ -44,17 +44,17 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
     clinicianEncounterRole,
     encounterNoteConceptUuid,
     encounterTypeUuid,
-    formConceptUuid
+    formConceptUuid,
   } = config.visitNoteConfig;
   const { t } = useTranslation();
   const [clinicalNote, setClinicalNote] = React.useState("");
   const [
     currentSessionProviderUuid,
-    setCurrentSessionProviderUuid
+    setCurrentSessionProviderUuid,
   ] = React.useState<string | null>("");
   const [
     currentSessionLocationUuid,
-    setCurrentSessionLocationUuid
+    setCurrentSessionLocationUuid,
   ] = React.useState("");
   const [locationUuid, setLocationUuid] = React.useState<string | null>(null);
   const [providerUuid, setProviderUuid] = React.useState<string | null>(null);
@@ -71,7 +71,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   React.useEffect(() => {
     if (searchTerm) {
       const sub = fetchDiagnosisByName(searchTerm).subscribe(
-        results => setSearchResults(results),
+        (results) => setSearchResults(results),
         createErrorHandler()
       );
       return () => sub.unsubscribe();
@@ -116,7 +116,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
     closeWorkspace();
   };
 
-  const handleSearchTermChange = debounce(searchTerm => {
+  const handleSearchTermChange = debounce((searchTerm) => {
     setSearchTerm(searchTerm);
   }, searchTimeoutInMs);
 
@@ -127,21 +127,21 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
 
   const handleAddDiagnosis = (diagnosisToAdd: Diagnosis) => {
     resetSearch();
-    setSelectedDiagnoses(selectedDiagnoses => [
+    setSelectedDiagnoses((selectedDiagnoses) => [
       ...selectedDiagnoses,
-      diagnosisToAdd
+      diagnosisToAdd,
     ]);
   };
 
   const handleRemoveDiagnosis = (diagnosisToRemove: Diagnosis) => {
     setSelectedDiagnoses(
       selectedDiagnoses.filter(
-        diagnosis => diagnosis.concept.id !== diagnosisToRemove.concept.id
+        (diagnosis) => diagnosis.concept.id !== diagnosisToRemove.concept.id
       )
     );
   };
 
-  const handleSubmit = event => {
+  const handleSubmit = (event) => {
     event.preventDefault();
     let obs: Array<obs> = [];
     obs = convertToObsPayLoad(selectedDiagnoses);
@@ -149,9 +149,9 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       obs = [
         {
           concept: encounterNoteConceptUuid,
-          value: clinicalNote
+          value: clinicalNote,
         },
-        ...obs
+        ...obs,
       ];
     }
 
@@ -162,15 +162,15 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       encounterProviders: [
         {
           encounterRole: clinicianEncounterRole,
-          provider: providerUuid
-        }
+          provider: providerUuid,
+        },
       ],
       encounterType: encounterTypeUuid,
       form: formConceptUuid,
-      obs: obs
+      obs: obs,
     };
     const ac = new AbortController();
-    saveVisitNote(ac, visitNotePayload).then(response => {
+    saveVisitNote(ac, visitNotePayload).then((response) => {
       response.status === 201 && closeWorkspace();
       response.status !== 201 && createErrorHandler();
     });
@@ -247,7 +247,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                   "diagnosisInputPlaceholder",
                   "Choose primary diagnosis first, then secondary diagnoses"
                 )}
-                onChange={e =>
+                onChange={(e) =>
                   handleSearchTermChange(e.currentTarget.value ?? "")
                 }
                 ref={searchInputRef}
@@ -296,7 +296,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                 "clinicalNotePlaceholder",
                 "Write any additional points here"
               )}
-              onChange={e => setClinicalNote(e.currentTarget.value)}
+              onChange={(e) => setClinicalNote(e.currentTarget.value)}
             />
           </Column>
         </Row>

@@ -16,7 +16,7 @@ import {
   useVisit,
   getStartedVisit,
   VisitItem,
-  Extension
+  Extension,
 } from "@openmrs/esm-framework";
 import { useTranslation } from "react-i18next";
 
@@ -27,7 +27,7 @@ interface PatientBannerProps {
 
 const PatientBanner: React.FC<PatientBannerProps> = ({
   patient,
-  patientUuid
+  patientUuid,
 }) => {
   const { t } = useTranslation();
   const { currentVisit } = useVisit(patientUuid);
@@ -35,7 +35,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
   const [hasActiveVisit, setActiveVisit] = useState(false);
   const state = useMemo(() => ({ patientUuid }), [patientUuid]);
   const toggleContactDetails = useCallback(
-    () => setShowContactDetails(value => !value),
+    () => setShowContactDetails((value) => !value),
     []
   );
 
@@ -116,7 +116,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
           </div>
           <div className={styles.row}>
             <span className={styles.identifiers}>
-              {patient.identifier.map(i => i.value).join(", ")}
+              {patient.identifier.map((i) => i.value).join(", ")}
             </span>
             <Button
               kind="ghost"

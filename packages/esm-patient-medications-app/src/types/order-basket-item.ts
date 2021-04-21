@@ -2,7 +2,7 @@ import {
   CommonMedicationDosage,
   CommonMedicationDosageUnit,
   CommonMedicationFrequency,
-  CommonMedicationRoute
+  CommonMedicationRoute,
 } from "../api/common-medication";
 import { OpenmrsResource } from "./openmrs-resource";
 import { Drug } from "./order";

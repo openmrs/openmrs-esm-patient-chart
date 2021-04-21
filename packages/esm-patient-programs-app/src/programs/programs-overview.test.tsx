@@ -10,11 +10,11 @@ import { fetchActiveEnrollments } from "./programs.resource";
 const mockFetchActiveEnrollments = fetchActiveEnrollments as jest.Mock;
 
 jest.mock("./programs.resource", () => ({
-  fetchActiveEnrollments: jest.fn()
+  fetchActiveEnrollments: jest.fn(),
 }));
 
 jest.mock("../shared-utils", () => ({
-  openWorkspaceTab: jest.fn()
+  openWorkspaceTab: jest.fn(),
 }));
 
 describe("<ProgramsOverview />", () => {

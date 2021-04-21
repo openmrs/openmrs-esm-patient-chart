@@ -3,7 +3,7 @@ import { pushNavigationContext } from "@openmrs/esm-framework";
 import { newModalItem } from "../visit/visit-dialog.resource";
 import {
   EndVisitConfirmation,
-  StartVisitConfirmation
+  StartVisitConfirmation,
 } from "../visit/visit-button.component";
 
 export function useVisitDialog(patientUuid: string) {
@@ -24,7 +24,7 @@ export function useVisitDialog(patientUuid: string) {
                 />
               ),
               name: "Prompt start Visit",
-              props: { closeComponent: () => state.onPromptClosed?.() }
+              props: { closeComponent: () => state.onPromptClosed?.() },
             });
             return true;
           } else if (link === "/end-visit/prompt") {
@@ -37,13 +37,13 @@ export function useVisitDialog(patientUuid: string) {
                 />
               ),
               name: "Prompt end Visit",
-              props: { closeComponent: () => state.onPromptClosed?.() }
+              props: { closeComponent: () => state.onPromptClosed?.() },
             });
             return true;
           }
 
           return false;
-        }
+        },
       }),
     [patientUuid]
   );

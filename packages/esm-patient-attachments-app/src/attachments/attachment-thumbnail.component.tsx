@@ -39,9 +39,9 @@ export default function AttachmentThumbnail(props: AttachmentThumbnailProps) {
     fetch(`/openmrs/ws/rest/v1/attachment/${props.item.id}`, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     });
   }
 
@@ -153,7 +153,7 @@ function Thumbnail(props: AttachmentThumbnailProps) {
   const imageProps = {
     src: props.imageProps.src,
     title: props.imageProps.title,
-    style: props.imageProps.style
+    style: props.imageProps.style,
   };
 
   if (contentType === "IMAGE") {

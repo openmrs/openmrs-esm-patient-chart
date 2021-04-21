@@ -16,14 +16,14 @@ export interface ConceptMetaData {
 export const useVitalsSignsConceptMetaData = () => {
   const [
     vitalsSignsConceptMetadata,
-    setVitalsSignsConceptMetadata
+    setVitalsSignsConceptMetadata,
   ] = React.useState<Array<ConceptMetaData>>([]);
   const customRepresentation = `?q=VITALS SIGNS&v=custom:(setMembers:(uuid,display,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units))`;
   useEffect(() => {
     const ac = new AbortController();
     if (vitalsSignsConceptMetadata) {
       openmrsFetch(`/ws/rest/v1/concept${customRepresentation}`, {
-        signal: ac.signal
+        signal: ac.signal,
       }).then(({ data }) => {
         setVitalsSignsConceptMetadata(
           first<{ setMembers: Array<ConceptMetaData> }>(data.results).setMembers
@@ -33,7 +33,7 @@ export const useVitalsSignsConceptMetaData = () => {
     return () => ac && ac.abort();
   }, []);
   const conceptsUnits = vitalsSignsConceptMetadata.map(
-    conceptUnit => conceptUnit.units
+    (conceptUnit) => conceptUnit.units
   );
   return { vitalsSignsConceptMetadata, conceptsUnits };
 };

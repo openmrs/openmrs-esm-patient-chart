@@ -13,7 +13,7 @@ interface AllergiesProps {
 export default function Allergies({
   basePath,
   patient,
-  patientUuid
+  patientUuid,
 }: AllergiesProps) {
   return (
     <AllergiesContext.Provider value={{ patientUuid, patient }}>

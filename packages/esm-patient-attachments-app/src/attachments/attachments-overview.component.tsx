@@ -8,7 +8,7 @@ import { UserHasAccess } from "@openmrs/esm-framework";
 import {
   getAttachments,
   createAttachment,
-  deleteAttachment
+  deleteAttachment,
 } from "./attachments.resource";
 import { Trans } from "react-i18next";
 
@@ -30,7 +30,7 @@ interface AttachmentsOverviewProps {
 }
 
 const AttachmentsOverview: React.FC<AttachmentsOverviewProps> = ({
-  patientUuid
+  patientUuid,
 }) => {
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);
   const [currentImage, setCurrentImage] = useState(0);
@@ -40,7 +40,7 @@ const AttachmentsOverview: React.FC<AttachmentsOverviewProps> = ({
       const abortController = new AbortController();
       getAttachments(patientUuid, true, abortController).then(
         (response: any) => {
-          const listItems = response.data.results.map(attachment => ({
+          const listItems = response.data.results.map((attachment) => ({
             id: `${attachment.uuid}`,
             src: `/openmrs/ws/rest/v1/attachment/${attachment.uuid}/bytes`,
             thumbnail: `/openmrs/ws/rest/v1/attachment/${attachment.uuid}/bytes`,
@@ -50,7 +50,7 @@ const AttachmentsOverview: React.FC<AttachmentsOverviewProps> = ({
             isSelected: false,
             dateTime: dayjs(attachment.dateTime).format("YYYY-MM-DD HH:mm:ss"),
             bytesMimeType: attachment.bytesMimeType,
-            bytesContentFamily: attachment.bytesContentFamily
+            bytesContentFamily: attachment.bytesContentFamily,
           }));
           setAttachments(listItems);
         }
@@ -65,7 +65,7 @@ const AttachmentsOverview: React.FC<AttachmentsOverviewProps> = ({
     if (files) {
       const attachments_tmp = attachments.slice();
       const result = Promise.all(
-        Array.prototype.map.call(files, file =>
+        Array.prototype.map.call(files, (file) =>
           createAttachment(patientUuid, file, file.name, abortController).then(
             (response: any) => {
               const new_attachment = {
@@ -80,7 +80,7 @@ const AttachmentsOverview: React.FC<AttachmentsOverviewProps> = ({
                   "YYYY-MM-DD HH:mm:ss"
                 ),
                 bytesMimeType: response.data.bytesMimeType,
-                bytesContentFamily: response.data.bytesContentFamily
+                bytesContentFamily: response.data.bytesContentFamily,
               };
               attachments_tmp.push(new_attachment);
             }
@@ -122,13 +122,13 @@ const AttachmentsOverview: React.FC<AttachmentsOverviewProps> = ({
   }
 
   function deleteSelected() {
-    setAttachments(attachments =>
-      attachments.filter(att => att.isSelected !== true)
+    setAttachments((attachments) =>
+      attachments.filter((att) => att.isSelected !== true)
     );
-    const selected = attachments.filter(att => att.isSelected === true);
+    const selected = attachments.filter((att) => att.isSelected === true);
     const abortController = new AbortController();
     const result = Promise.all(
-      selected.map(att =>
+      selected.map((att) =>
         deleteAttachment(att.id, abortController).then((response: any) => {})
       )
     );
@@ -140,7 +140,7 @@ const AttachmentsOverview: React.FC<AttachmentsOverviewProps> = ({
       const abortController = new AbortController();
       const id = attachments[currentImage].id;
       deleteAttachment(id, abortController).then((response: any) => {
-        const attachments_tmp = attachments.filter(att => att.id != id);
+        const attachments_tmp = attachments.filter((att) => att.id != id);
         setAttachments(attachments_tmp);
       });
     }
@@ -156,8 +156,8 @@ const AttachmentsOverview: React.FC<AttachmentsOverviewProps> = ({
     <UserHasAccess privilege="View Attachments">
       <div
         className={styles.overview}
-        onPaste={e => handleUpload(e, e.clipboardData.files)}
-        onDrop={e => handleUpload(e, e.dataTransfer.files)}
+        onPaste={(e) => handleUpload(e, e.clipboardData.files)}
+        onDrop={(e) => handleUpload(e, e.dataTransfer.files)}
         onDragOver={handleDragOver}
       >
         <div className={styles.upload}>
@@ -169,7 +169,7 @@ const AttachmentsOverview: React.FC<AttachmentsOverviewProps> = ({
               type="file"
               id="fileUpload"
               multiple
-              onChange={e => handleUpload(e, e.target.files)}
+              onChange={(e) => handleUpload(e, e.target.files)}
             />
           </form>
           <CameraUpload
@@ -195,7 +195,7 @@ const AttachmentsOverview: React.FC<AttachmentsOverviewProps> = ({
           customControls={[
             <button key="deleteAttachment" onClick={handleDelete}>
               <Trans i18nKey="delete">Delete</Trans>
-            </button>
+            </button>,
           ]}
           onSelectImage={handleImageSelect}
           thumbnailImageComponent={AttachmentThumbnail}

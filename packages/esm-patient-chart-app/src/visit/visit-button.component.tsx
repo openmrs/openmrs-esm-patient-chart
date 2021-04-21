@@ -14,7 +14,7 @@ import {
   updateVisit,
   UpdateVisitPayload,
   getVisitsForPatient,
-  Visit
+  Visit,
 } from "@openmrs/esm-framework";
 
 export function openVisitDashboard(componentName: string) {
@@ -23,8 +23,8 @@ export function openVisitDashboard(componentName: string) {
     name: componentName,
     props: {},
     inProgress: false,
-    validations: workspaceTabs =>
-      workspaceTabs.findIndex(tab => tab.component === VisitDashboard)
+    validations: (workspaceTabs) =>
+      workspaceTabs.findIndex((tab) => tab.component === VisitDashboard),
   });
 }
 
@@ -54,7 +54,7 @@ const VisitButton: React.FC<VisitProps> = ({ newModalItem, patientUuid }) => {
       const sub = getVisitsForPatient(patientUuid, abortController).subscribe(
         ({ data }) => {
           const currentVisit = data.results.find(
-            visit =>
+            (visit) =>
               dayjs(visit.startDatetime).format("DD-MM-YYYY") ===
               dayjs(new Date()).format("DD-MM-YYYY")
           );
@@ -62,7 +62,7 @@ const VisitButton: React.FC<VisitProps> = ({ newModalItem, patientUuid }) => {
             getStartedVisit.next({
               mode: VisitMode.LOADING,
               visitData: currentVisit,
-              status: VisitStatus.ONGOING
+              status: VisitStatus.ONGOING,
             });
         }
       );
@@ -90,7 +90,7 @@ const VisitButton: React.FC<VisitProps> = ({ newModalItem, patientUuid }) => {
 
   const EditVisitButton: React.FC<VisitProps> = ({
     newModalItem,
-    patientUuid
+    patientUuid,
   }) => {
     const { t } = useTranslation();
     return (
@@ -116,7 +116,7 @@ const VisitButton: React.FC<VisitProps> = ({ newModalItem, patientUuid }) => {
                     />
                   ),
                   name: "End Visit",
-                  props: null
+                  props: null,
                 });
               }}
             >
@@ -135,7 +135,7 @@ const VisitButton: React.FC<VisitProps> = ({ newModalItem, patientUuid }) => {
                   />
                 ),
                 name: "Cancel Visit",
-                props: null
+                props: null,
               });
             }}
           >
@@ -165,7 +165,7 @@ const hideModal = (newModalItem: NewModalItem) => {
 };
 
 export const StartVisitConfirmation: React.FC<VisitProps> = ({
-  newModalItem
+  newModalItem,
 }) => {
   const { t } = useTranslation();
   return (
@@ -199,7 +199,7 @@ export const StartVisitConfirmation: React.FC<VisitProps> = ({
 
 export const CloseActiveVisitConfirmation: React.FC<EndVisitProps> = ({
   visitData,
-  newModalItem
+  newModalItem,
 }) => {
   const { t } = useTranslation();
   return (
@@ -238,7 +238,7 @@ interface EndVisitProps extends VisitProps {
 
 export const EndVisitConfirmation: React.FC<EndVisitProps> = ({
   visitData,
-  newModalItem
+  newModalItem,
 }) => {
   const { t } = useTranslation();
   return (
@@ -278,7 +278,7 @@ function visitUpdate(visitData: Visit) {
     location: visitData.location.uuid,
     startDatetime: visitData.startDatetime,
     visitType: visitData.visitType.uuid,
-    stopDatetime: new Date()
+    stopDatetime: new Date(),
   };
 
   const sub = updateVisit(visitData.uuid, payload, abortController).subscribe(

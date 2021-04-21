@@ -13,18 +13,20 @@ export interface OrderBasketItemListProps {
 export default function OrderBasketItemList({
   orderBasketItems,
   onItemClicked,
-  onItemRemoveClicked
+  onItemRemoveClicked,
 }: OrderBasketItemListProps) {
   const { t } = useTranslation();
-  const newOrderBasketItems = orderBasketItems.filter(x => x.action === "NEW");
+  const newOrderBasketItems = orderBasketItems.filter(
+    (x) => x.action === "NEW"
+  );
   const renewedOrderBasketItems = orderBasketItems.filter(
-    x => x.action === "RENEWED"
+    (x) => x.action === "RENEWED"
   );
   const revisedOrderBasketItems = orderBasketItems.filter(
-    x => x.action === "REVISE"
+    (x) => x.action === "REVISE"
   );
   const discontinuedOrderBasketItems = orderBasketItems.filter(
-    x => x.action === "DISCONTINUE"
+    (x) => x.action === "DISCONTINUE"
   );
 
   return (
@@ -42,7 +44,7 @@ export default function OrderBasketItemList({
         <>
           <h4 className={styles.orderCategoryHeading}>
             {t("newOrders", "{count} new order(s)", {
-              count: newOrderBasketItems.length
+              count: newOrderBasketItems.length,
             })}
           </h4>
           {newOrderBasketItems.map((order, index) => (
@@ -60,7 +62,7 @@ export default function OrderBasketItemList({
         <>
           <h4 className={styles.orderCategoryHeading}>
             {t("renewedOrders", "{count} order(s) being renewed (continued)", {
-              count: renewedOrderBasketItems.length
+              count: renewedOrderBasketItems.length,
             })}
           </h4>
           {renewedOrderBasketItems.map((item, index) => (
@@ -78,7 +80,7 @@ export default function OrderBasketItemList({
         <>
           <h4 className={styles.orderCategoryHeading}>
             {t("revisedOrders", "{count} order(s) being modified (revised)", {
-              count: revisedOrderBasketItems.length
+              count: revisedOrderBasketItems.length,
             })}
           </h4>
           {revisedOrderBasketItems.map((item, index) => (
@@ -96,7 +98,7 @@ export default function OrderBasketItemList({
         <>
           <h4 className={styles.orderCategoryHeading}>
             {t("discontinuedOrders", "{count} discontinued order(s)", {
-              count: discontinuedOrderBasketItems.length
+              count: discontinuedOrderBasketItems.length,
             })}
           </h4>
           {discontinuedOrderBasketItems.map((item, index) => (

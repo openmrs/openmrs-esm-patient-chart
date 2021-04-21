@@ -36,14 +36,14 @@ interface checkBoxProps {
 
 const filterFormsByName = (formName: string, forms: Array<Form>) => {
   return forms.filter(
-    form => form.name.toLowerCase().search(formName.toLowerCase()) !== -1
+    (form) => form.name.toLowerCase().search(formName.toLowerCase()) !== -1
   );
 };
 
 const FormView: React.FC<FormViewProps> = ({
   forms,
   patientUuid,
-  encounterUuid
+  encounterUuid,
 }) => {
   const { t } = useTranslation();
   const [activeVisit, setActiveVisit] = React.useState<VisitItem>();
@@ -51,7 +51,7 @@ const FormView: React.FC<FormViewProps> = ({
   const [allForms, setAllForms] = React.useState<Array<Form>>(forms);
 
   const handleSearch = React.useMemo(
-    () => debounce(searchTerm => setSearchTerm(searchTerm), 300),
+    () => debounce((searchTerm) => setSearchTerm(searchTerm), 300),
     []
   );
 
@@ -62,7 +62,7 @@ const FormView: React.FC<FormViewProps> = ({
   }, [searchTerm, forms]);
 
   React.useEffect(() => {
-    const sub = getStartedVisit.subscribe(visit => setActiveVisit(visit));
+    const sub = getStartedVisit.subscribe((visit) => setActiveVisit(visit));
     return () => sub.unsubscribe();
   }, []);
 
@@ -87,7 +87,7 @@ const FormView: React.FC<FormViewProps> = ({
         labelText=""
         className={styles.formSearchInput}
         placeholder={t("searchForForm", "Search for a form")}
-        onChange={evnt => handleSearch(evnt.target.value)}
+        onChange={(evnt) => handleSearch(evnt.target.value)}
       />
       <>
         {!isEmpty(searchTerm) && !isEmpty(allForms) && (

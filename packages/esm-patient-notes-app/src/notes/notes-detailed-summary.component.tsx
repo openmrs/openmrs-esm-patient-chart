@@ -9,7 +9,7 @@ import { useTranslation } from "react-i18next";
 import { createErrorHandler } from "@openmrs/esm-framework";
 import {
   getEncounterObservableRESTAPI,
-  PatientNote
+  PatientNote,
 } from "./encounter.resource";
 import { formatDate } from "./biometric.helper";
 import { useNotesContext } from "./notes.context";
@@ -34,7 +34,7 @@ const NotesDetailedSummary: React.FC<NotesDetailedSummaryProps> = () => {
   useEffect(() => {
     if (patient) {
       const subscription = getEncounterObservableRESTAPI(patientUuid).subscribe(
-        notes => {
+        (notes) => {
           setPatientNotes(notes);
           setTotalPages(Math.ceil(notes.length / resultsPerPage));
           setCurrentPageResults(notes.slice(0, resultsPerPage));
@@ -103,7 +103,7 @@ const NotesDetailedSummary: React.FC<NotesDetailedSummaryProps> = () => {
                         className="omrs-icon"
                         style={{
                           height: "0.813rem",
-                          fill: "var(--omrs-color-ink-medium-contrast)"
+                          fill: "var(--omrs-color-ink-medium-contrast)",
                         }}
                       >
                         <use xlinkHref="#omrs-icon-arrow-downward"></use>
@@ -120,7 +120,7 @@ const NotesDetailedSummary: React.FC<NotesDetailedSummaryProps> = () => {
                 </thead>
                 <tbody>
                   {currentPageResults &&
-                    currentPageResults.map(note => {
+                    currentPageResults.map((note) => {
                       return (
                         <Fragment key={note.id}>
                           <tr className={styles.notesTableDataRow}>
@@ -135,7 +135,7 @@ const NotesDetailedSummary: React.FC<NotesDetailedSummaryProps> = () => {
                                 style={{
                                   color:
                                     "var(--omrs-color-ink-medium-contrast)",
-                                  margin: "0rem"
+                                  margin: "0rem",
                                 }}
                               >
                                 {capitalize(note.encounterLocation)}
@@ -149,7 +149,7 @@ const NotesDetailedSummary: React.FC<NotesDetailedSummaryProps> = () => {
                             <td
                               style={{
                                 textAlign: "end",
-                                paddingRight: "0.625rem"
+                                paddingRight: "0.625rem",
                               }}
                             >
                               <Link to={`/${note.id}`}>

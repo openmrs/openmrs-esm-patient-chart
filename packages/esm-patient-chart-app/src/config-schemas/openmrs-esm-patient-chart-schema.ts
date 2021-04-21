@@ -9,11 +9,11 @@ export const esmPatientChartSchema = {
       title: { _type: Type.String },
       extensionSlotName: { _type: Type.String },
       layout: {
-        columns: { _type: Type.Number }
-      }
+        columns: { _type: Type.Number },
+      },
     },
-    _default: defaultDashboardDefinitions
-  }
+    _default: defaultDashboardDefinitions,
+  },
 };
 
 export interface ChartConfig {

@@ -21,11 +21,11 @@ const renderAppointmentsOverview = () => {
 };
 
 jest.mock("./appointments.resource", () => ({
-  getAppointments: jest.fn()
+  getAppointments: jest.fn(),
 }));
 
 jest.mock("../shared-utils", () => ({
-  openWorkspaceTab: jest.fn()
+  openWorkspaceTab: jest.fn(),
 }));
 
 describe("<AppointmentsOverview />", () => {

@@ -1,48 +1,48 @@
 import { Type } from "@openmrs/esm-framework";
 import vitalsConfigSchema, {
-  VitalsConfigObject
+  VitalsConfigObject,
 } from "./vitals/vitals-config-schema";
 import biometricsConfigSchema, {
-  BiometricsConfigObject
+  BiometricsConfigObject,
 } from "./vitals/biometrics-config-schema";
 
 export const configSchema = {
   concepts: {
     systolicBloodPressureUuid: {
       _type: Type.ConceptUuid,
-      _default: "5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      _default: "5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
     },
     diastolicBloodPressureUuid: {
       _type: Type.ConceptUuid,
-      _default: "5086AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      _default: "5086AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
     },
     pulseUuid: {
       _type: Type.ConceptUuid,
-      _default: "5087AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      _default: "5087AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
     },
     temperatureUuid: {
       _type: Type.ConceptUuid,
-      _default: "5088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      _default: "5088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
     },
     oxygenSaturationUuid: {
       _type: Type.ConceptUuid,
-      _default: "5092AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      _default: "5092AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
     },
     heightUuid: {
       _type: Type.ConceptUuid,
-      _default: "5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      _default: "5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
     },
     weightUuid: {
       _type: Type.ConceptUuid,
-      _default: "5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+      _default: "5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
     },
     respiratoryRateUuid: {
       _type: Type.ConceptUuid,
-      _default: "5242AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-    }
+      _default: "5242AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+    },
   },
   vitals: vitalsConfigSchema,
-  biometrics: biometricsConfigSchema
+  biometrics: biometricsConfigSchema,
 };
 
 export interface ConfigObject {

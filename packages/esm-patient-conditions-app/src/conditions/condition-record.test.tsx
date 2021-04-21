@@ -12,22 +12,22 @@ const mockGetConditionByUuid = getConditionByUuid as jest.Mock;
 const mockOpenWorkspaceTab = openWorkspaceTab as jest.Mock;
 
 jest.mock("./conditions.resource", () => ({
-  getConditionByUuid: jest.fn()
+  getConditionByUuid: jest.fn(),
 }));
 
 jest.mock("../shared-utils", () => ({
-  openWorkspaceTab: jest.fn()
+  openWorkspaceTab: jest.fn(),
 }));
 
 describe("<ConditionRecord />", () => {
   const conditionUuid = "1e9160ee-8927-409c-b8f3-346c9736f8d7";
   let match = {
     params: {
-      conditionUuid
+      conditionUuid,
     },
     isExact: true,
     url: "/",
-    path: `/patient/8673ee4f-e2ab-4077-ba55-4980f408773e/chart/conditions/details/${conditionUuid}`
+    path: `/patient/8673ee4f-e2ab-4077-ba55-4980f408773e/chart/conditions/details/${conditionUuid}`,
   };
 
   beforeEach(() => {
@@ -68,7 +68,7 @@ describe("<ConditionRecord />", () => {
         conditionUuid,
         clinicalStatus: "active",
         conditionName: "Malaria, confirmed",
-        onsetDateTime: "2019-11-04T00:00:00+00:00"
+        onsetDateTime: "2019-11-04T00:00:00+00:00",
       }
     );
   });

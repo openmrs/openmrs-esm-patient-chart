@@ -18,7 +18,7 @@ export function fetchActiveEnrollments(patientID: string) {
   ).pipe(
     map(({ data }) =>
       data["results"]
-        .filter(res => !res.dateCompleted)
+        .filter((res) => !res.dateCompleted)
         .sort((a, b) => (b.dateEnrolled > a.dateEnrolled ? 1 : -1))
     )
   );
@@ -38,10 +38,10 @@ export function createProgramEnrollment(payload, abortController) {
   return openmrsObservableFetch(`/ws/rest/v1/programenrollment`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
     body: { program, patient, dateEnrolled, dateCompleted, location },
-    signal: abortController.signal
+    signal: abortController.signal,
   });
 }
 
@@ -53,10 +53,10 @@ export function updateProgramEnrollment(payload, abortController) {
   return openmrsObservableFetch(`/ws/rest/v1/programenrollment/${program}`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
     },
     body: { dateEnrolled, dateCompleted, location },
-    signal: abortController.signal
+    signal: abortController.signal,
   });
 }
 
@@ -74,6 +74,6 @@ export function fetchLocations() {
 
 export function getSession(abortController: AbortController) {
   return openmrsFetch<SessionData>(`/ws/rest/v1/appui/session`, {
-    signal: abortController.signal
+    signal: abortController.signal,
   });
 }

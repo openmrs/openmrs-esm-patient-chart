@@ -12,7 +12,7 @@ import DataTable, {
   TableBody,
   TableHead,
   TableHeader,
-  TableRow
+  TableRow,
 } from "carbon-components-react/es/components/DataTable";
 import styles from "./vitals-overview.scss";
 import VitalsChart from "./vitals-chart.component";
@@ -23,7 +23,7 @@ import { useConfig, attach } from "@openmrs/esm-framework";
 import { useVitalsSignsConceptMetaData } from "./vitals-biometrics-form/use-vitalsigns";
 import {
   performPatientsVitalsSearch,
-  PatientVitals
+  PatientVitals,
 } from "./vitals-biometrics.resource";
 
 const vitalsToShowCount = 5;
@@ -41,7 +41,7 @@ const RenderVitals: React.FC<RenderVitalsProps> = ({
   tableRows,
   vitals,
   showAllVitals,
-  toggleShowAllVitals
+  toggleShowAllVitals,
 }) => {
   const { t } = useTranslation();
   const [chartView, setChartView] = React.useState<boolean>();
@@ -57,7 +57,7 @@ const RenderVitals: React.FC<RenderVitalsProps> = ({
     pulseUnit,
     oxygenationUnit,
     ,
-    respiratoryRateUnit
+    respiratoryRateUnit,
   ] = conceptsUnits;
 
   const tableHeaders = [
@@ -68,8 +68,8 @@ const RenderVitals: React.FC<RenderVitalsProps> = ({
     { key: "spo2", header: `SPO2 (${oxygenationUnit})` },
     {
       key: "temperature",
-      header: `Temp (${temperatureUnit})`
-    }
+      header: `Temp (${temperatureUnit})`,
+    },
   ];
 
   const launchVitalsBiometricsForm = React.useCallback(
@@ -131,12 +131,12 @@ const RenderVitals: React.FC<RenderVitalsProps> = ({
                 <Table {...getTableProps()}>
                   <TableHead>
                     <TableRow>
-                      {headers.map(header => (
+                      {headers.map((header) => (
                         <TableHeader
                           className={`${styles.productiveHeading01} ${styles.text02}`}
                           {...getHeaderProps({
                             header,
-                            isSortable: header.isSortable
+                            isSortable: header.isSortable,
                           })}
                         >
                           {header.header?.content ?? header.header}
@@ -145,9 +145,9 @@ const RenderVitals: React.FC<RenderVitalsProps> = ({
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {rows.map(row => (
+                    {rows.map((row) => (
                       <TableRow key={row.id}>
-                        {row.cells.map(cell => (
+                        {row.cells.map((cell) => (
                           <TableCell key={cell.id}>
                             {cell.value?.content ?? cell.value}
                           </TableCell>
@@ -160,7 +160,7 @@ const RenderVitals: React.FC<RenderVitalsProps> = ({
                           <span
                             style={{
                               display: "inline-block",
-                              margin: "0.45rem 0rem"
+                              margin: "0.45rem 0rem",
                             }}
                           >
                             {`${vitalsToShowCount} / ${vitals.length}`}{" "}
@@ -207,7 +207,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid }) => {
   const headerTitle = t("vitals", "Vitals");
 
   const toggleShowAllVitals = React.useCallback(
-    () => setShowAllVitals(value => !value),
+    () => setShowAllVitals((value) => !value),
     []
   );
 
@@ -230,12 +230,13 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid }) => {
           return {
             id: `${index}`,
             date: dayjs(vital.date).format(`DD - MMM - YYYY`),
-            bloodPressure: `${vital.systolic ?? "-"} / ${vital.diastolic ??
-              "-"}`,
+            bloodPressure: `${vital.systolic ?? "-"} / ${
+              vital.diastolic ?? "-"
+            }`,
             pulse: vital.pulse,
             spo2: vital.oxygenSaturation,
             temperature: vital.temperature,
-            rrate: vital.respiratoryRate
+            rrate: vital.respiratoryRate,
           };
         }),
     [vitals, showAllVitals]

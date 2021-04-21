@@ -7,7 +7,7 @@ import { mockLocationsDataResponse } from "../../../__mocks__/location.mock";
 import { mockSessionDataResponse } from "../../../__mocks__/session.mock";
 import {
   openmrsObservableFetch,
-  getCurrentPatientUuid
+  getCurrentPatientUuid,
 } from "@openmrs/esm-framework";
 import NewVisit from "./new-visit.component";
 
@@ -102,12 +102,12 @@ describe("<NewVisit />", () => {
     // simulate date selection
     const dateControl = screen.getByLabelText("Start date");
     fireEvent.change(dateControl, {
-      target: { value: testDate.format("YYYY-MM-DD") }
+      target: { value: testDate.format("YYYY-MM-DD") },
     });
 
     const timeControl = screen.getByLabelText("Start time");
     fireEvent.change(timeControl, {
-      target: { value: testDate.format("HH:mm") }
+      target: { value: testDate.format("HH:mm") },
     });
 
     // simulate clicking of save
@@ -116,7 +116,7 @@ describe("<NewVisit />", () => {
       saveButton,
       new MouseEvent("click", {
         bubbles: true,
-        cancelable: true
+        cancelable: true,
       })
     );
 
@@ -143,7 +143,7 @@ describe("<NewVisit />", () => {
       cancelButton,
       new MouseEvent("click", {
         bubbles: true,
-        cancelable: true
+        cancelable: true,
       })
     );
     expect(mockCancelledCallback.mock.calls.length).toBe(1);

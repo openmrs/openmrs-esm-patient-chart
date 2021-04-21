@@ -61,7 +61,7 @@ export default function NoteRecord({ match }: NoteRecordProps) {
           </SummaryCard>
           {note.obs && note.obs.length > 0 && (
             <RecordDetails>
-              {note.obs.map(ob => (
+              {note.obs.map((ob) => (
                 <Fragment key={ob.uuid}>
                   <p>{ob.display}</p>
                 </Fragment>

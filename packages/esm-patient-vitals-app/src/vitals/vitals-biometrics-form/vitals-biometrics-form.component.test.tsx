@@ -17,7 +17,7 @@ mockOpenmrsObservableFetch.mockImplementation(jest.fn());
 mockOpenmrsFetch.mockImplementation(jest.fn());
 
 jest.mock("../vitals-biometrics.resource", () => ({
-  savePatientVitals: jest.fn()
+  savePatientVitals: jest.fn(),
 }));
 
 window.getOpenmrsSpaBase = jest.fn();
@@ -86,7 +86,7 @@ describe("<VitalsBiometricsForm/>", () => {
         respiratoryRate: "70",
         systolicBloodPressure: "120",
         temperature: "36.5",
-        weight: "70"
+        weight: "70",
       },
       expect.anything(),
       expect.anything(),

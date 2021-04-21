@@ -20,7 +20,7 @@ const AddPastVisitOverflowMenuItem: React.FC<AddPastVisitOverflowMenuItemProps> 
         data-floating-menu-primary-focus
         onClick={handleClick}
         style={{
-          maxWidth: "100vw"
+          maxWidth: "100vw",
         }}
       >
         <span className="bx--overflow-menu-options__option-content">

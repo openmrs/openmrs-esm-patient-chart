@@ -9,7 +9,7 @@ export interface RootMedicationSummaryProps {
 }
 
 export default function RootMedicationSummary({
-  patientUuid
+  patientUuid,
 }: RootMedicationSummaryProps) {
   return (
     <div className={styles.resetPatientChartWidgetContainer}>
