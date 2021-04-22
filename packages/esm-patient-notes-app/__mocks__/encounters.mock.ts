@@ -51,8 +51,8 @@ export const mockFormattedNotes = [
     encounterAuthor: "Dr. G. Testerson",
     encounterDate: "2020-02-19T08:26:05",
     encounterType: "Vitals",
-    encounterLocation: "Isolation Ward"
-  }
+    encounterLocation: "Isolation Ward",
+  },
 ];
 
 export const mockAlternativeEncounterResponse = {

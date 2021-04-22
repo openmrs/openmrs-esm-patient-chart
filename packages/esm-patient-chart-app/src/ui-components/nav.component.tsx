@@ -1,7 +1,11 @@
 import React from "react";
-import { ConfigurableLink, useConfig } from "@openmrs/esm-framework";
+import {
+  ConfigurableLink,
+  useConfig,
+  ExtensionSlot,
+} from "@openmrs/esm-framework";
 import { spaBasePath } from "../constants";
-import { ChartConfig } from "../config-schemas";
+import { ChartConfig, DashboardConfig } from "../config-schemas";
 
 function getPatientUuidFromUrl() {
   const match = /\/patient\/([a-zA-Z0-9\-]+)\/?/.exec(location.pathname);
@@ -25,6 +29,10 @@ const PatientChartNavMenu: React.FC = () => {
           </ConfigurableLink>
         </div>
       ))}
+      <ExtensionSlot
+        state={{ basePath }}
+        extensionSlotName="patient-chart-dashboard-slot"
+      />
     </>
   );
 };
