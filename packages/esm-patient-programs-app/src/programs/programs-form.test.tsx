@@ -23,8 +23,8 @@ import {
   mockEnrolledProgramsResponse,
   mockLocationsResponse,
   mockOncProgramResponse,
-} from "../../__mocks__/programs.mock";
-import { mockSessionDataResponse } from "../../__mocks__/session.mock";
+} from "../../../../__mocks__/programs.mock";
+import { mockSessionDataResponse } from "../../../../__mocks__/session.mock";
 
 const mockCreateProgramEnrollment = createProgramEnrollment as jest.Mock;
 const mockFetchLocations = fetchLocations as jest.Mock;

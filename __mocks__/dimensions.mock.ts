@@ -23,7 +23,7 @@ export const mockDimensionResponse = {
     resourceType: "Bundle",
     id: "f3714150-5ff8-4356-8dd5-0c5edc195d2a",
     meta: {
-      lastUpdated: `${todaysDate}T09:32:14.334+00:00`
+      lastUpdated: `${todaysDate}T09:32:14.334+00:00`,
     },
     type: "searchset",
     total: 7,
@@ -38,71 +38,71 @@ export const mockDimensionResponse = {
             {
               url:
                 "http://fhir-es.transcendinsights.com/stu3/StructureDefinition/resource-date-created",
-              valueDateTime: `${todaysDate}T06:49:00`
+              valueDateTime: `${todaysDate}T06:49:00`,
             },
             {
               url: "locationUuid",
-              valueString: "b1a8b05e-3542-4037-bbd3-998ee9c40574"
-            }
+              valueString: "b1a8b05e-3542-4037-bbd3-998ee9c40574",
+            },
           ],
           status: "final",
           code: {
             coding: [
               {
                 system: "http://loinc.org",
-                code: "8302-2"
+                code: "8302-2",
               },
               {
                 system: "http://snomed.info/sct",
-                code: "50373000"
+                code: "50373000",
               },
               {
                 system: "http://ampath.com/",
-                code: "5090"
+                code: "5090",
               },
               {
                 system: "http://www.pih.org/country/malawi",
-                code: "5090"
+                code: "5090",
               },
               {
                 system: "http://ciel.org",
-                code: "5090"
+                code: "5090",
               },
               {
                 system: "http://www.pih.org/",
-                code: "5090"
+                code: "5090",
               },
               {
                 system: "http://openmrs.org",
                 code: "5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-                display: "Height (cm)"
-              }
-            ]
+                display: "Height (cm)",
+              },
+            ],
           },
           subject: {
             id: "6c201864-7ec0-4baa-a686-295c2c69ff41",
             reference: "Patient/6c201864-7ec0-4baa-a686-295c2c69ff41",
             identifier: {
-              id: "6c201864-7ec0-4baa-a686-295c2c69ff41"
+              id: "6c201864-7ec0-4baa-a686-295c2c69ff41",
             },
-            display: "John Green(Identifier:10040T)"
+            display: "John Green(Identifier:10040T)",
           },
           context: {
-            reference: "Encounter/509992ff-6b9a-47b2-a946-b42791fdd98f"
+            reference: "Encounter/509992ff-6b9a-47b2-a946-b42791fdd98f",
           },
           effectiveDateTime: `${todaysDate}T06:49:00`,
           issued: `${todaysDate}T06:49:00`,
           performer: [
             {
               reference: "Practitioner/f4308d92-5043-4b49-af89-170953f4748a",
-              display: "Super User(Identifier:UNKNOWN)"
-            }
+              display: "Super User(Identifier:UNKNOWN)",
+            },
           ],
           valueQuantity: {
             value: null,
             unit: "cm",
             system: "http://unitsofmeasure.org",
-            code: "cm"
+            code: "cm",
           },
           referenceRange: [
             {
@@ -110,17 +110,17 @@ export const mockDimensionResponse = {
                 value: 10.0,
                 unit: "cm",
                 system: "http://unitsofmeasure.org",
-                code: "cm"
+                code: "cm",
               },
               high: {
                 value: 272.0,
                 unit: "cm",
                 system: "http://unitsofmeasure.org",
-                code: "cm"
-              }
-            }
-          ]
-        }
+                code: "cm",
+              },
+            },
+          ],
+        },
       },
       {
         fullUrl:
@@ -132,62 +132,62 @@ export const mockDimensionResponse = {
             {
               url:
                 "http://fhir-es.transcendinsights.com/stu3/StructureDefinition/resource-date-created",
-              valueDateTime: "2017-01-18T09:11:20+00:00"
+              valueDateTime: "2017-01-18T09:11:20+00:00",
             },
             {
               url:
                 "https://purl.org/elab/fhir/StructureDefinition/Creator-crew-version1",
-              valueString: "daemon"
+              valueString: "daemon",
             },
             {
               url: "locationUuid",
-              valueString: "58c57d25-8d39-41ab-8422-108a0c277d98"
-            }
+              valueString: "58c57d25-8d39-41ab-8422-108a0c277d98",
+            },
           ],
           status: "final",
           code: {
             coding: [
               {
                 system: "http://loinc.org",
-                code: "8302-2"
+                code: "8302-2",
               },
               {
                 system: "http://snomed.info/sct",
-                code: "50373000"
+                code: "50373000",
               },
               {
                 system: "http://ampath.com/",
-                code: "5090"
+                code: "5090",
               },
               {
                 system: "http://www.pih.org/country/malawi",
-                code: "5090"
+                code: "5090",
               },
               {
                 system: "http://ciel.org",
-                code: "5090"
+                code: "5090",
               },
               {
                 system: "http://www.pih.org/",
-                code: "5090"
+                code: "5090",
               },
               {
                 system: "http://openmrs.org",
                 code: "5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-                display: "Height (cm)"
-              }
-            ]
+                display: "Height (cm)",
+              },
+            ],
           },
           subject: {
             id: "6c201864-7ec0-4baa-a686-295c2c69ff41",
             reference: "Patient/6c201864-7ec0-4baa-a686-295c2c69ff41",
             identifier: {
-              id: "6c201864-7ec0-4baa-a686-295c2c69ff41"
+              id: "6c201864-7ec0-4baa-a686-295c2c69ff41",
             },
-            display: "John Green(Identifier:10040T)"
+            display: "John Green(Identifier:10040T)",
           },
           context: {
-            reference: "Encounter/1a82fdc6-3d14-44c4-ab45-d65baa0062ae"
+            reference: "Encounter/1a82fdc6-3d14-44c4-ab45-d65baa0062ae",
           },
           effectiveDateTime: "2016-12-18T06:48:20",
           issued: "2016-12-18T06:48:20.000",
@@ -195,7 +195,7 @@ export const mockDimensionResponse = {
             value: 173.0,
             unit: "cm",
             system: "http://unitsofmeasure.org",
-            code: "cm"
+            code: "cm",
           },
           referenceRange: [
             {
@@ -203,20 +203,20 @@ export const mockDimensionResponse = {
                 value: 10.0,
                 unit: "cm",
                 system: "http://unitsofmeasure.org",
-                code: "cm"
+                code: "cm",
               },
               high: {
                 value: 272.0,
                 unit: "cm",
                 system: "http://unitsofmeasure.org",
-                code: "cm"
-              }
-            }
-          ]
-        }
-      }
-    ]
-  }
+                code: "cm",
+              },
+            },
+          ],
+        },
+      },
+    ],
+  },
 };
 
 export const mockDimensionResponseRESTAPI = {
@@ -227,49 +227,49 @@ export const mockDimensionResponseRESTAPI = {
         display: "Height (cm): 165.0",
         obsDatetime: `${todaysDate}T06:49:00`,
         encounter: {
-          encounterDatetime: "2020-01-14T00:20:00.000+0000"
+          encounterDatetime: "2020-01-14T00:20:00.000+0000",
         },
         value: 165.0,
         concept: {
-          uuid: "5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-        }
+          uuid: "5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        },
       },
       {
         uuid: "bbd27a2f-442a-418a-9952-f2bb0e54df97",
         display: "Weight (kg): 65.0",
         obsDatetime: `${todaysDate}T06:49:00`,
         encounter: {
-          encounterDatetime: "2020-02-14 06:49:00"
+          encounterDatetime: "2020-02-14 06:49:00",
         },
         value: 65.0,
         concept: {
-          uuid: "5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-        }
+          uuid: "5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        },
       },
       {
         uuid: "9dbadd59-72f0-4e67-8ee8-9341418f6cbe",
         display: "Weight (kg): 14.0",
         obsDatetime: "2016-12-18T06:48:20.000",
         encounter: {
-          encounterDatetime: "2020-01-14T00:20:00.000+0000"
+          encounterDatetime: "2020-01-14T00:20:00.000+0000",
         },
         value: null,
         concept: {
-          uuid: "5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-        }
+          uuid: "5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        },
       },
       {
         uuid: "86fa8f6c-270e-445b-a0bc-1acc82696763",
         display: "Height (cm): 156.0",
         obsDatetime: "2016-12-18T06:48:20.000",
         encounter: {
-          encounterDatetime: "2020-02-14 06:49:00"
+          encounterDatetime: "2020-02-14 06:49:00",
         },
         value: 173,
         concept: {
-          uuid: "5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-        }
-      }
-    ]
-  }
+          uuid: "5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        },
+      },
+    ],
+  },
 };

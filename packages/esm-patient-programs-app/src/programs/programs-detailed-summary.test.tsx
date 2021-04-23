@@ -3,7 +3,7 @@ import ProgramsDetailedSummary from "./programs-detailed-summary.component";
 import { render, screen } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import { of } from "rxjs/internal/observable/of";
-import { mockEnrolledProgramsResponse } from "../../__mocks__/programs.mock";
+import { mockEnrolledProgramsResponse } from "../../../../__mocks__/programs.mock";
 import { fetchEnrolledPrograms } from "./programs.resource";
 
 const mockFetchEnrolledPrograms = fetchEnrolledPrograms as jest.Mock;

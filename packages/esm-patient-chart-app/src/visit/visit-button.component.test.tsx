@@ -9,7 +9,7 @@ import { of } from "rxjs/internal/observable/of";
 import {
   mockPatientNoVisitsResponse,
   mockPatientCurrentVisitsResponse,
-} from "../../../__mocks__/patient-visits.mock";
+} from "../../../../__mocks__/patient-visits.mock";
 
 const mockOpenmrsObservableFetch = openmrsObservableFetch as jest.Mock;
 const mockNewWorkspaceItem = newWorkspaceItem as jest.Mock;

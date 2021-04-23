@@ -4,7 +4,7 @@ import VisitNotesForm from "./visit-notes-form.component";
 import { BrowserRouter } from "react-router-dom";
 import { screen, render } from "@testing-library/react";
 import { of } from "rxjs/internal/observable/of";
-import { ConfigMock } from "../../__mocks__/chart-widgets-config.mock";
+import { ConfigMock } from "../../../../__mocks__/chart-widgets-config.mock";
 import {
   fetchCurrentSessionData,
   fetchDiagnosisByName,
@@ -17,8 +17,8 @@ import {
   diagnosisSearchResponse,
   mockFetchLocationByUuidResponse,
   mockFetchProviderByUuidResponse,
-} from "../../__mocks__/visit-note.mock";
-import { mockPatient } from "../../__mocks__/patient.mock";
+} from "../../../../__mocks__/visit-note.mock";
+import { mockPatient } from "../../../../__mocks__/patient.mock";
 
 const mockFetchCurrentSessionData = fetchCurrentSessionData as jest.Mock;
 const mockFetchDiagnosisByName = fetchDiagnosisByName as jest.Mock;

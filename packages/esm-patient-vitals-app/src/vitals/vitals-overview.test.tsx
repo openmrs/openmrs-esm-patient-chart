@@ -3,7 +3,7 @@ import VitalsOverview from "./vitals-overview.component";
 import { render, screen } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import { of } from "rxjs/internal/observable/of";
-import { mockVitalData } from "../../__mocks__/vitals.mock";
+import { mockVitalData } from "../../../../__mocks__/vitals.mock";
 import { performPatientsVitalsSearch } from "./vitals-biometrics.resource";
 
 const mockPerformPatientVitalsSearch = performPatientsVitalsSearch as jest.Mock;

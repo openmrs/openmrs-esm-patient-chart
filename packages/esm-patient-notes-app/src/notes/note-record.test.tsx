@@ -7,7 +7,7 @@ import { fetchEncounterByUuid } from "./encounter.resource";
 import {
   mockEncounterResponse,
   mockAlternativeEncounterResponse,
-} from "../../__mocks__/encounters.mock";
+} from "../../../../__mocks__/encounters.mock";
 
 const mockFetchPatientEncounter = fetchEncounterByUuid as jest.Mock;
 

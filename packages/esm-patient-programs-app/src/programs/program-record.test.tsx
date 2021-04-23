@@ -3,7 +3,7 @@ import ProgramRecord from "./program-record.component";
 import ProgramsForm from "./programs-form.component";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
-import { mockProgramResponse } from "../../__mocks__/programs.mock";
+import { mockProgramResponse } from "../../../../__mocks__/programs.mock";
 import { getPatientProgramByUuid } from "./programs.resource";
 import { of } from "rxjs/internal/observable/of";
 

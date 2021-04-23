@@ -3,79 +3,82 @@ export const mockAllegenResponse = {
     {
       name: {
         uuid: "162298AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-        display: "ACE inhibitors"
-      }
+        display: "ACE inhibitors",
+      },
     },
     {
       name: {
         uuid: "162299AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-        display: "ARBs (angiotensin II receptor blockers)"
-      }
+        display: "ARBs (angiotensin II receptor blockers)",
+      },
     },
     {
-      name: { uuid: "71617AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", display: "Aspirin" }
+      name: {
+        uuid: "71617AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        display: "Aspirin",
+      },
     },
     {
       name: {
         uuid: "162301AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-        display: "Cephalosporins"
-      }
+        display: "Cephalosporins",
+      },
     },
     {
       name: {
         uuid: "73667AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-        display: "Codeine"
-      }
+        display: "Codeine",
+      },
     },
     {
       name: {
         uuid: "162305AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-        display: "Heparins"
-      }
+        display: "Heparins",
+      },
     },
     {
       name: {
         uuid: "162307AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-        display: "Statins"
-      }
+        display: "Statins",
+      },
     },
     {
       name: {
         uuid: "162302AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-        display: "Erythromycins"
-      }
+        display: "Erythromycins",
+      },
     },
     {
       name: {
         uuid: "80106AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-        display: "Morphine"
-      }
+        display: "Morphine",
+      },
     },
     {
       name: {
         uuid: "162306AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-        display: "NSAIDs"
-      }
+        display: "NSAIDs",
+      },
     },
     {
       name: {
         uuid: "162297AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-        display: "Penicillins"
-      }
+        display: "Penicillins",
+      },
     },
     {
       name: {
         uuid: "162170AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-        display: "Sulfonamides"
-      }
+        display: "Sulfonamides",
+      },
     },
     {
       name: {
         uuid: "5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-        display: "Other"
-      }
-    }
-  ]
+        display: "Other",
+      },
+    },
+  ],
 };
 
 export const mockAllergicReactions = {
@@ -94,15 +97,15 @@ export const mockAllergicReactions = {
           {
             rel: "self",
             uri:
-              "http://localhost:8090/openmrs/ws/rest/v1/concept/121677AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/127084BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
+              "http://localhost:8090/openmrs/ws/rest/v1/concept/121677AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/127084BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
           },
           {
             rel: "full",
             uri:
-              "http://localhost:8090/openmrs/ws/rest/v1/concept/121677AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/127084BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB?v=full"
-          }
+              "http://localhost:8090/openmrs/ws/rest/v1/concept/121677AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/127084BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB?v=full",
+          },
         ],
-        resourceVersion: "1.9"
+        resourceVersion: "1.9",
       },
       datatype: {
         uuid: "8d4a4c94-c2cc-11de-8d13-0010c6dffd0f",
@@ -111,9 +114,9 @@ export const mockAllergicReactions = {
           {
             rel: "self",
             uri:
-              "http://localhost:8090/openmrs/ws/rest/v1/conceptdatatype/8d4a4c94-c2cc-11de-8d13-0010c6dffd0f"
-          }
-        ]
+              "http://localhost:8090/openmrs/ws/rest/v1/conceptdatatype/8d4a4c94-c2cc-11de-8d13-0010c6dffd0f",
+          },
+        ],
       },
       conceptClass: {
         uuid: "8d4918b0-c2cc-11de-8d13-0010c6dffd0f",
@@ -122,9 +125,9 @@ export const mockAllergicReactions = {
           {
             rel: "self",
             uri:
-              "http://localhost:8090/openmrs/ws/rest/v1/conceptclass/8d4918b0-c2cc-11de-8d13-0010c6dffd0f"
-          }
-        ]
+              "http://localhost:8090/openmrs/ws/rest/v1/conceptclass/8d4918b0-c2cc-11de-8d13-0010c6dffd0f",
+          },
+        ],
       },
       set: false,
       version: "",
@@ -137,9 +140,9 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/121677AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/134528BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/121677AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/134528BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
         },
         {
           uuid: "134529BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
@@ -148,9 +151,9 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/121677AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/134529BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/121677AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/134529BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
         },
         {
           uuid: "21808BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
@@ -159,9 +162,9 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/121677AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/21808BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/121677AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/21808BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
         },
         {
           uuid: "80786BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
@@ -170,9 +173,9 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/121677AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/80786BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/121677AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/80786BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
         },
         {
           uuid: "127084BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
@@ -181,10 +184,10 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/121677AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/127084BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
-        }
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/121677AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/127084BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
+        },
       ],
       descriptions: [],
       mappings: [
@@ -195,9 +198,9 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/121677AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/mapping/185768ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/121677AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/mapping/185768ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
         },
         {
           uuid: "70242ABBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
@@ -206,9 +209,9 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/121677AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/mapping/70242ABBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/121677AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/mapping/70242ABBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
         },
         {
           uuid: "266979ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
@@ -217,9 +220,9 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/121677AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/mapping/266979ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/121677AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/mapping/266979ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
         },
         {
           uuid: "95967ABBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
@@ -228,10 +231,10 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/121677AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/mapping/95967ABBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
-        }
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/121677AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/mapping/95967ABBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
+        },
       ],
       answers: [],
       setMembers: [],
@@ -240,15 +243,15 @@ export const mockAllergicReactions = {
         {
           rel: "self",
           uri:
-            "http://localhost:8090/openmrs/ws/rest/v1/concept/121677AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+            "http://localhost:8090/openmrs/ws/rest/v1/concept/121677AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
         },
         {
           rel: "full",
           uri:
-            "http://localhost:8090/openmrs/ws/rest/v1/concept/121677AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA?v=full"
-        }
+            "http://localhost:8090/openmrs/ws/rest/v1/concept/121677AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA?v=full",
+        },
       ],
-      resourceVersion: "2.0"
+      resourceVersion: "2.0",
     },
     {
       uuid: "121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
@@ -264,15 +267,15 @@ export const mockAllergicReactions = {
           {
             rel: "self",
             uri:
-              "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/21761BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
+              "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/21761BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
           },
           {
             rel: "full",
             uri:
-              "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/21761BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB?v=full"
-          }
+              "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/21761BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB?v=full",
+          },
         ],
-        resourceVersion: "1.9"
+        resourceVersion: "1.9",
       },
       datatype: {
         uuid: "8d4a4c94-c2cc-11de-8d13-0010c6dffd0f",
@@ -281,9 +284,9 @@ export const mockAllergicReactions = {
           {
             rel: "self",
             uri:
-              "http://localhost:8090/openmrs/ws/rest/v1/conceptdatatype/8d4a4c94-c2cc-11de-8d13-0010c6dffd0f"
-          }
-        ]
+              "http://localhost:8090/openmrs/ws/rest/v1/conceptdatatype/8d4a4c94-c2cc-11de-8d13-0010c6dffd0f",
+          },
+        ],
       },
       conceptClass: {
         uuid: "8d4918b0-c2cc-11de-8d13-0010c6dffd0f",
@@ -292,9 +295,9 @@ export const mockAllergicReactions = {
           {
             rel: "self",
             uri:
-              "http://localhost:8090/openmrs/ws/rest/v1/conceptclass/8d4918b0-c2cc-11de-8d13-0010c6dffd0f"
-          }
-        ]
+              "http://localhost:8090/openmrs/ws/rest/v1/conceptclass/8d4918b0-c2cc-11de-8d13-0010c6dffd0f",
+          },
+        ],
       },
       set: false,
       version: "",
@@ -307,9 +310,9 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/21764BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/21764BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
         },
         {
           uuid: "130249BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
@@ -318,9 +321,9 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/130249BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/130249BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
         },
         {
           uuid: "131466BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
@@ -329,9 +332,9 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/131466BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/131466BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
         },
         {
           uuid: "80822BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
@@ -340,9 +343,9 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/80822BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/80822BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
         },
         {
           uuid: "134614BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
@@ -351,9 +354,9 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/134614BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/134614BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
         },
         {
           uuid: "21762BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
@@ -362,9 +365,9 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/21762BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/21762BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
         },
         {
           uuid: "127495BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
@@ -373,9 +376,9 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/127495BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/127495BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
         },
         {
           uuid: "111240BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
@@ -384,9 +387,9 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/111240BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/111240BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
         },
         {
           uuid: "127494BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
@@ -395,9 +398,9 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/127494BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/127494BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
         },
         {
           uuid: "21765BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
@@ -406,9 +409,9 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/21765BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/21765BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
         },
         {
           uuid: "21761BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
@@ -417,9 +420,9 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/21761BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/21761BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
         },
         {
           uuid: "21763BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
@@ -428,9 +431,9 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/21763BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/21763BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
         },
         {
           uuid: "100564BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
@@ -439,10 +442,10 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/100564BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
-        }
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/100564BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
+        },
       ],
       descriptions: [
         {
@@ -453,9 +456,9 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/description/6449FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-            }
-          ]
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/description/6449FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+            },
+          ],
         },
         {
           uuid: "6450FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
@@ -464,10 +467,10 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/description/6450FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-            }
-          ]
-        }
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/description/6450FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+            },
+          ],
+        },
       ],
       mappings: [
         {
@@ -477,9 +480,9 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/mapping/185735ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/mapping/185735ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
         },
         {
           uuid: "133869ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
@@ -488,9 +491,9 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/mapping/133869ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/mapping/133869ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
         },
         {
           uuid: "70276ABBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
@@ -499,9 +502,9 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/mapping/70276ABBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/mapping/70276ABBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
         },
         {
           uuid: "88742ABBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
@@ -510,9 +513,9 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/mapping/88742ABBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/mapping/88742ABBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
         },
         {
           uuid: "267206ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
@@ -521,9 +524,9 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/mapping/267206ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/mapping/267206ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
         },
         {
           uuid: "136180ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
@@ -532,9 +535,9 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/mapping/136180ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/mapping/136180ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
         },
         {
           uuid: "143600ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
@@ -543,10 +546,10 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/mapping/143600ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
-        }
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/mapping/143600ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
+        },
       ],
       answers: [],
       setMembers: [],
@@ -555,15 +558,15 @@ export const mockAllergicReactions = {
         {
           rel: "self",
           uri:
-            "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+            "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
         },
         {
           rel: "full",
           uri:
-            "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA?v=full"
-        }
+            "http://localhost:8090/openmrs/ws/rest/v1/concept/121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA?v=full",
+        },
       ],
-      resourceVersion: "2.0"
+      resourceVersion: "2.0",
     },
     {
       uuid: "148888AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
@@ -579,15 +582,15 @@ export const mockAllergicReactions = {
           {
             rel: "self",
             uri:
-              "http://localhost:8090/openmrs/ws/rest/v1/concept/148888AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/48506BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
+              "http://localhost:8090/openmrs/ws/rest/v1/concept/148888AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/48506BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
           },
           {
             rel: "full",
             uri:
-              "http://localhost:8090/openmrs/ws/rest/v1/concept/148888AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/48506BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB?v=full"
-          }
+              "http://localhost:8090/openmrs/ws/rest/v1/concept/148888AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/48506BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB?v=full",
+          },
         ],
-        resourceVersion: "1.9"
+        resourceVersion: "1.9",
       },
       datatype: {
         uuid: "8d4a4c94-c2cc-11de-8d13-0010c6dffd0f",
@@ -596,9 +599,9 @@ export const mockAllergicReactions = {
           {
             rel: "self",
             uri:
-              "http://localhost:8090/openmrs/ws/rest/v1/conceptdatatype/8d4a4c94-c2cc-11de-8d13-0010c6dffd0f"
-          }
-        ]
+              "http://localhost:8090/openmrs/ws/rest/v1/conceptdatatype/8d4a4c94-c2cc-11de-8d13-0010c6dffd0f",
+          },
+        ],
       },
       conceptClass: {
         uuid: "8d4918b0-c2cc-11de-8d13-0010c6dffd0f",
@@ -607,9 +610,9 @@ export const mockAllergicReactions = {
           {
             rel: "self",
             uri:
-              "http://localhost:8090/openmrs/ws/rest/v1/conceptclass/8d4918b0-c2cc-11de-8d13-0010c6dffd0f"
-          }
-        ]
+              "http://localhost:8090/openmrs/ws/rest/v1/conceptclass/8d4918b0-c2cc-11de-8d13-0010c6dffd0f",
+          },
+        ],
       },
       set: false,
       version: "",
@@ -622,9 +625,9 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/148888AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/134615BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/148888AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/134615BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
         },
         {
           uuid: "57491BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
@@ -633,9 +636,9 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/148888AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/57491BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/148888AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/57491BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
         },
         {
           uuid: "134616BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
@@ -644,9 +647,9 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/148888AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/134616BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/148888AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/134616BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
         },
         {
           uuid: "111235BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
@@ -655,9 +658,9 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/148888AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/111235BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/148888AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/111235BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
         },
         {
           uuid: "114498BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
@@ -666,9 +669,9 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/148888AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/114498BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/148888AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/114498BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
         },
         {
           uuid: "48506BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
@@ -677,9 +680,9 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/148888AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/48506BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/148888AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/48506BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
         },
         {
           uuid: "128037BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
@@ -688,10 +691,10 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/148888AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/128037BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
-        }
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/148888AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/name/128037BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
+        },
       ],
       descriptions: [
         {
@@ -702,10 +705,10 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/148888AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/description/15170FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-            }
-          ]
-        }
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/148888AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/description/15170FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF",
+            },
+          ],
+        },
       ],
       mappings: [
         {
@@ -715,9 +718,9 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/148888AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/mapping/150048ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/148888AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/mapping/150048ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
         },
         {
           uuid: "133162ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
@@ -726,9 +729,9 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/148888AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/mapping/133162ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/148888AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/mapping/133162ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
         },
         {
           uuid: "208315ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
@@ -737,9 +740,9 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/148888AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/mapping/208315ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/148888AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/mapping/208315ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
         },
         {
           uuid: "46784ABBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
@@ -748,9 +751,9 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/148888AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/mapping/46784ABBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/148888AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/mapping/46784ABBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
         },
         {
           uuid: "238853ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
@@ -759,9 +762,9 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/148888AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/mapping/238853ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/148888AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/mapping/238853ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
         },
         {
           uuid: "102343ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
@@ -770,9 +773,9 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/148888AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/mapping/102343ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/148888AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/mapping/102343ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
         },
         {
           uuid: "161808ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
@@ -781,10 +784,10 @@ export const mockAllergicReactions = {
             {
               rel: "self",
               uri:
-                "http://localhost:8090/openmrs/ws/rest/v1/concept/148888AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/mapping/161808ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-            }
-          ]
-        }
+                "http://localhost:8090/openmrs/ws/rest/v1/concept/148888AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/mapping/161808ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            },
+          ],
+        },
       ],
       answers: [],
       setMembers: [],
@@ -793,17 +796,17 @@ export const mockAllergicReactions = {
         {
           rel: "self",
           uri:
-            "http://localhost:8090/openmrs/ws/rest/v1/concept/148888AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+            "http://localhost:8090/openmrs/ws/rest/v1/concept/148888AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
         },
         {
           rel: "full",
           uri:
-            "http://localhost:8090/openmrs/ws/rest/v1/concept/148888AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA?v=full"
-        }
+            "http://localhost:8090/openmrs/ws/rest/v1/concept/148888AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA?v=full",
+        },
       ],
-      resourceVersion: "2.0"
-    }
-  ]
+      resourceVersion: "2.0",
+    },
+  ],
 };
 
 export const mockEnvironmentalAllergens = [
@@ -817,15 +820,15 @@ export const mockEnvironmentalAllergens = [
       locale: "en",
       localePreferred: true,
       conceptNameType: null,
-      resourceVersion: "1.9"
+      resourceVersion: "1.9",
     },
     datatype: {
       uuid: "8d4a4c94-c2cc-11de-8d13-0010c6dffd0f",
-      display: "N/A"
+      display: "N/A",
     },
     conceptClass: {
       uuid: "8d492774-c2cc-11de-8d13-0010c6dffd0f",
-      display: "Misc"
+      display: "Misc",
     },
     set: false,
     version: "",
@@ -833,34 +836,34 @@ export const mockEnvironmentalAllergens = [
     names: [
       {
         uuid: "135440BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
-        display: "Piqûres de guêpe"
+        display: "Piqûres de guêpe",
       },
       {
         uuid: "134603BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
-        display: "Myèl pike"
+        display: "Myèl pike",
       },
       {
         uuid: "126138BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
-        display: "Bee venom"
+        display: "Bee venom",
       },
       {
         uuid: "127083BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
-        display: "Bee stings"
+        display: "Bee stings",
       },
       {
         uuid: "134602BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
-        display: "Piqûres d'abeilles"
+        display: "Piqûres d'abeilles",
       },
       {
         uuid: "126208BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
-        display: "Sting of bee"
-      }
+        display: "Sting of bee",
+      },
     ],
     descriptions: [],
     answers: [],
     setMembers: [],
     attributes: [],
-    resourceVersion: "2.0"
+    resourceVersion: "2.0",
   },
   {
     uuid: "162537AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
@@ -872,15 +875,15 @@ export const mockEnvironmentalAllergens = [
       locale: "en",
       localePreferred: true,
       conceptNameType: "FULLY_SPECIFIED",
-      resourceVersion: "1.9"
+      resourceVersion: "1.9",
     },
     datatype: {
       uuid: "8d4a4c94-c2cc-11de-8d13-0010c6dffd0f",
-      display: "N/A"
+      display: "N/A",
     },
     conceptClass: {
       uuid: "8d492774-c2cc-11de-8d13-0010c6dffd0f",
-      display: "Misc"
+      display: "Misc",
     },
     set: false,
     version: "",
@@ -888,22 +891,22 @@ export const mockEnvironmentalAllergens = [
     names: [
       {
         uuid: "134604BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
-        display: "Poussière"
+        display: "Poussière",
       },
       {
         uuid: "126139BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
-        display: "Dust"
+        display: "Dust",
       },
       {
         uuid: "134605BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
-        display: "Pousyè"
-      }
+        display: "Pousyè",
+      },
     ],
     descriptions: [],
     mappings: [
       {
         uuid: "277721ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
-        display: "SNOMED CT: 33008008"
+        display: "SNOMED CT: 33008008",
       },
       {
         uuid: "277722ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
@@ -912,15 +915,15 @@ export const mockEnvironmentalAllergens = [
           {
             rel: "self",
             uri:
-              "http://localhost:8090/openmrs/ws/rest/v1/concept/162537AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/mapping/277722ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
-          }
-        ]
-      }
+              "http://localhost:8090/openmrs/ws/rest/v1/concept/162537AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/mapping/277722ABBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+          },
+        ],
+      },
     ],
     answers: [],
     setMembers: [],
     attributes: [],
-    resourceVersion: "2.0"
+    resourceVersion: "2.0",
   },
   {
     uuid: "162538AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
@@ -932,15 +935,15 @@ export const mockEnvironmentalAllergens = [
       locale: "en",
       localePreferred: true,
       conceptNameType: "FULLY_SPECIFIED",
-      resourceVersion: "1.9"
+      resourceVersion: "1.9",
     },
     datatype: {
       uuid: "8d4a4c94-c2cc-11de-8d13-0010c6dffd0f",
-      display: "N/A"
+      display: "N/A",
     },
     conceptClass: {
       uuid: "8d492774-c2cc-11de-8d13-0010c6dffd0f",
-      display: "Misc"
+      display: "Misc",
     },
     set: false,
     version: "",
@@ -948,23 +951,23 @@ export const mockEnvironmentalAllergens = [
     names: [
       {
         uuid: "134607BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
-        display: "Latèks"
+        display: "Latèks",
       },
       {
         uuid: "126140BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
-        display: "Latex"
+        display: "Latex",
       },
       {
         uuid: "134606BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
-        display: "Latex"
-      }
+        display: "Latex",
+      },
     ],
     descriptions: [],
     answers: [],
     setMembers: [],
     attributes: [],
-    resourceVersion: "2.0"
-  }
+    resourceVersion: "2.0",
+  },
 ];
 
 export const mockPatientAllergy = {
@@ -979,7 +982,7 @@ export const mockPatientAllergy = {
   reactionToSubstance: "ACE inhibitors",
   recordedBy: "JJ Dick",
   recorderType: "Practitioner",
-  recordedDate: "2020-04-02T13:27:22+00:00"
+  recordedDate: "2020-04-02T13:27:22+00:00",
 };
 
 export const mockPatientAllergyResult = {
@@ -997,15 +1000,15 @@ export const mockPatientAllergyResult = {
               {
                 system: "http://openmrs.org",
                 code: "162298AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-                display: "ACE inhibitors"
-              }
+                display: "ACE inhibitors",
+              },
             ],
-            text: "ACE inhibitors"
+            text: "ACE inhibitors",
           },
           note: [
             {
-              text: "comment"
-            }
+              text: "comment",
+            },
           ],
           reaction: [
             {
@@ -1015,15 +1018,15 @@ export const mockPatientAllergyResult = {
                     {
                       system: "http://openmrs.org",
                       code: "124AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-                      display: "Anaphylaxis"
-                    }
+                      display: "Anaphylaxis",
+                    },
                   ],
-                  text: "Anaphylaxis"
-                }
-              ]
-            }
-          ]
-        }
+                  text: "Anaphylaxis",
+                },
+              ],
+            },
+          ],
+        },
       },
       {
         resource: {
@@ -1033,13 +1036,13 @@ export const mockPatientAllergyResult = {
             {
               url:
                 "http://fhir-es.transcendinsights.com/stu3/StructureDefinition/resource-date-created",
-              valueDateTime: "2019-06-21T13:43:47+00:00"
+              valueDateTime: "2019-06-21T13:43:47+00:00",
             },
             {
               url:
                 "https://purl.org/elab/fhir/StructureDefinition/Creator-crew-version1",
-              valueString: "user2"
-            }
+              valueString: "user2",
+            },
           ],
           category: ["medication"],
           criticality: "low",
@@ -1048,10 +1051,10 @@ export const mockPatientAllergyResult = {
               {
                 system: "http://openmrs.org",
                 code: "162299AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-                display: "ARBs (angiotensin II receptor blockers)"
-              }
+                display: "ARBs (angiotensin II receptor blockers)",
+              },
             ],
-            text: "ARBs (angiotensin II receptor blockers)"
+            text: "ARBs (angiotensin II receptor blockers)",
           },
           reaction: [
             {
@@ -1061,18 +1064,18 @@ export const mockPatientAllergyResult = {
                     {
                       system: "http://openmrs.org",
                       code: "124AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-                      display: "Mental status change"
-                    }
+                      display: "Mental status change",
+                    },
                   ],
-                  text: "Mental status change"
-                }
-              ]
-            }
-          ]
-        }
-      }
-    ]
-  }
+                  text: "Mental status change",
+                },
+              ],
+            },
+          ],
+        },
+      },
+    ],
+  },
 };
 
 export const mockAllergyResult = {
@@ -1083,9 +1086,9 @@ export const mockAllergyResult = {
       allergenType: "DRUG",
       codedAllergen: {
         display: "ARBs (angiotensin II receptor blockers)",
-        uuid: "921fbd85-fa49-46c3-9ee1-77e093fd10a5"
+        uuid: "921fbd85-fa49-46c3-9ee1-77e093fd10a5",
       },
-      nonCodedAllergen: null
+      nonCodedAllergen: null,
     },
     severity: {
       uuid: "1498AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
@@ -1096,8 +1099,8 @@ export const mockAllergyResult = {
         name: "Mild",
         locale: "en",
         localePreferred: true,
-        conceptNameType: "FULLY_SPECIFIED"
-      }
+        conceptNameType: "FULLY_SPECIFIED",
+      },
     },
     comment: "The patient is showing a mild reaction to the above allergens",
     reactions: [
@@ -1111,23 +1114,23 @@ export const mockAllergyResult = {
             name: "Mental status change",
             locale: "en",
             localePreferred: true,
-            conceptNameType: null
-          }
-        }
-      }
+            conceptNameType: null,
+          },
+        },
+      },
     ],
     patient: {
       uuid: "90f7f0b4-06a8-4a97-9678-e7a977f4b518",
-      display: "10010W - John Taylor"
+      display: "10010W - John Taylor",
     },
     auditInfo: {
       creator: {
         uuid: "285f67ce-3d8b-4733-96e5-1e2235e8e804",
-        display: "doc"
+        display: "doc",
       },
-      dateChanged: "2020-01-03T07:05:12.000+0000"
-    }
-  }
+      dateChanged: "2020-01-03T07:05:12.000+0000",
+    },
+  },
 };
 
 export const mockUpdatedAllergyResult = {
@@ -1137,9 +1140,9 @@ export const mockUpdatedAllergyResult = {
     allergen: {
       allergenType: "DRUG",
       codedAllergen: {
-        display: "ARBs (angiotensin II receptor blockers)"
+        display: "ARBs (angiotensin II receptor blockers)",
       },
-      nonCodedAllergen: null
+      nonCodedAllergen: null,
     },
     severity: {
       uuid: "1498AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
@@ -1150,8 +1153,8 @@ export const mockUpdatedAllergyResult = {
         name: "Mild",
         locale: "en",
         localePreferred: true,
-        conceptNameType: "FULLY_SPECIFIED"
-      }
+        conceptNameType: "FULLY_SPECIFIED",
+      },
     },
     comment:
       "The patient is showing a mild reaction to Angiotensin II receptor blockers. Low dose antihistamines prescribed",
@@ -1166,23 +1169,23 @@ export const mockUpdatedAllergyResult = {
             name: "Mental status change",
             locale: "en",
             localePreferred: true,
-            conceptNameType: null
-          }
-        }
-      }
+            conceptNameType: null,
+          },
+        },
+      },
     ],
     patient: {
       uuid: "90f7f0b4-06a8-4a97-9678-e7a977f4b518",
-      display: "10010W - John Taylor"
+      display: "10010W - John Taylor",
     },
     auditInfo: {
       creator: {
         uuid: "285f67ce-3d8b-4733-96e5-1e2235e8e804",
-        display: "doc"
+        display: "doc",
       },
-      dateChanged: "2020-01-03T07:05:12.000+0000"
-    }
-  }
+      dateChanged: "2020-01-03T07:05:12.000+0000",
+    },
+  },
 };
 
 export const mockPatientAllergies = [
@@ -1198,7 +1201,7 @@ export const mockPatientAllergies = [
     reactionToSubstance: "Cephalosporins",
     reactionManifestations: ["Angioedema"],
     reactionSeverity: "severe",
-    lastUpdated: "2020-04-02T08:05:49.000+00:00"
+    lastUpdated: "2020-04-02T08:05:49.000+00:00",
   },
   {
     id: "99300205-4653-455f-93fa-692916f9c891",
@@ -1212,7 +1215,7 @@ export const mockPatientAllergies = [
     reactionToSubstance: "Peanuts",
     reactionManifestations: ["Anaphylaxis"],
     reactionSeverity: "mild",
-    lastUpdated: "2020-04-02T08:06:01.000+00:00"
+    lastUpdated: "2020-04-02T08:06:01.000+00:00",
   },
   {
     id: "4ef4abef-57b3-4df0-b5c1-41c763e34965",
@@ -1226,7 +1229,7 @@ export const mockPatientAllergies = [
     reactionToSubstance: "ACE inhibitors",
     reactionManifestations: ["Angioedema", "Anaphylaxis"],
     reactionSeverity: "severe",
-    lastUpdated: "2020-04-02T15:08:51.000+00:00"
+    lastUpdated: "2020-04-02T15:08:51.000+00:00",
   },
   {
     id: "90f7f0b4-06a8-4a97-9678-e7a977f4b518",
@@ -1240,8 +1243,8 @@ export const mockPatientAllergies = [
     reactionToSubstance: "ACE inhibitors",
     reactionManifestations: ["Anaphylaxis", "Severe blistering rash"],
     reactionSeverity: "severe",
-    lastUpdated: "2020-04-08T11:00:22.000+00:00"
-  }
+    lastUpdated: "2020-04-08T11:00:22.000+00:00",
+  },
 ];
 
 export const mockPatientAllergyResultWithoutOnsetDate = {
@@ -1249,15 +1252,15 @@ export const mockPatientAllergyResultWithoutOnsetDate = {
     resourceType: "Bundle",
     id: "bbcb90f8-0e9e-4e61-885f-73eb49dce7b9",
     meta: {
-      lastUpdated: "2019-11-12T07:36:39.592+00:00"
+      lastUpdated: "2019-11-12T07:36:39.592+00:00",
     },
     type: "searchset",
     total: 2,
     link: [
       {
         relation: "self",
-        url: `http://localhost:8080/openmrsws/rest/v1/concept/AllergyIntolerance?patient.identifier=10010W`
-      }
+        url: `http://localhost:8080/openmrsws/rest/v1/concept/AllergyIntolerance?patient.identifier=10010W`,
+      },
     ],
     entry: [
       {
@@ -1271,47 +1274,47 @@ export const mockPatientAllergyResultWithoutOnsetDate = {
             coding: [
               {
                 system: "http://ciel.org",
-                code: "162298"
+                code: "162298",
               },
               {
                 system: "http://snomed.info/sct",
-                code: "41549009"
+                code: "41549009",
               },
               {
                 system:
                   "http://www.nlm.nih.gov/research/umls/sourcereleasedocs/current/NDFRT/",
-                code: "N0000000181"
+                code: "N0000000181",
               },
               {
                 system:
                   "http://www.nlm.nih.gov/research/umls/sourcereleasedocs/current/NDFRT/",
-                code: "N0000175562"
+                code: "N0000175562",
               },
               {
                 system: "med-rt nui",
-                code: "N0000175562"
+                code: "N0000175562",
               },
               {
                 system: "http://openmrs.org",
                 code: "162298AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-                display: "ACE inhibitors"
-              }
+                display: "ACE inhibitors",
+              },
             ],
-            text: "ACE inhibitors"
+            text: "ACE inhibitors",
           },
           patient: {
             id: "90f7f0b4-06a8-4a97-9678-e7a977f4b518",
             reference: "Patient/90f7f0b4-06a8-4a97-9678-e7a977f4b518",
             identifier: {
-              id: "90f7f0b4-06a8-4a97-9678-e7a977f4b518"
+              id: "90f7f0b4-06a8-4a97-9678-e7a977f4b518",
             },
-            display: "John Taylor(Identifier:10010W)"
+            display: "John Taylor(Identifier:10010W)",
           },
           note: [
             {
               text:
-                "The patient is having a difficulty while using this medication"
-            }
+                "The patient is having a difficulty while using this medication",
+            },
           ],
           reaction: [
             {
@@ -1320,45 +1323,45 @@ export const mockPatientAllergyResultWithoutOnsetDate = {
                   coding: [
                     {
                       system: "http://www.semantichealth.org/pubdoc.html",
-                      code: "10005487"
+                      code: "10005487",
                     },
                     {
                       system: "http://www.pih.org/",
-                      code: "998"
+                      code: "998",
                     },
                     {
                       system: "http://ciel.org",
-                      code: "148888"
+                      code: "148888",
                     },
                     {
                       system: "http://snomed.info/sct",
-                      code: "39579001"
+                      code: "39579001",
                     },
                     {
                       system: "https://www.e-imo.com/releases/problem-it",
-                      code: "37966"
+                      code: "37966",
                     },
                     {
                       system: "http://hl7.org/fhir/sid/icd-10",
-                      code: "T78.2"
+                      code: "T78.2",
                     },
                     {
                       system:
                         "http://www.who.int/classifications/icd/adaptations/icpc2/en/",
-                      code: "A92"
+                      code: "A92",
                     },
                     {
                       system: "http://openmrs.org",
                       code: "148888AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-                      display: "Anaphylaxis"
-                    }
+                      display: "Anaphylaxis",
+                    },
                   ],
-                  text: "Anaphylaxis"
-                }
-              ]
-            }
-          ]
-        }
+                  text: "Anaphylaxis",
+                },
+              ],
+            },
+          ],
+        },
       },
       {
         fullUrl: `http://localhost:8080/openmrsws/rest/v1/concept/AllergyIntolerance/981662c2-f861-4e60-ae22-45af8ce13069`,
@@ -1371,59 +1374,59 @@ export const mockPatientAllergyResultWithoutOnsetDate = {
             coding: [
               {
                 system: "http://snomed.info/sct",
-                code: "96308008"
+                code: "96308008",
               },
               {
                 system: "med-rt nui",
-                code: "N0000175561"
+                code: "N0000175561",
               },
               {
                 system: "http://ciel.org",
-                code: "162299"
+                code: "162299",
               },
               {
                 system:
                   "http://www.nlm.nih.gov/research/umls/sourcereleasedocs/current/NDFRT/",
-                code: "N0000175561"
+                code: "N0000175561",
               },
               {
                 system: "http://openmrs.org",
                 code: "162299AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-                display: "ARBs (angiotensin II receptor blockers)"
-              }
+                display: "ARBs (angiotensin II receptor blockers)",
+              },
             ],
-            text: "ARBs (angiotensin II receptor blockers)"
+            text: "ARBs (angiotensin II receptor blockers)",
           },
           patient: {
             id: "90f7f0b4-06a8-4a97-9678-e7a977f4b518",
             reference: "Patient/90f7f0b4-06a8-4a97-9678-e7a977f4b518",
             identifier: {
-              id: "90f7f0b4-06a8-4a97-9678-e7a977f4b518"
+              id: "90f7f0b4-06a8-4a97-9678-e7a977f4b518",
             },
-            display: "John Taylor(Identifier:10010W)"
+            display: "John Taylor(Identifier:10010W)",
           },
           note: [
             {
               text:
-                "The patient had to be rushed to the emergency room after suffering from this reaction"
-            }
+                "The patient had to be rushed to the emergency room after suffering from this reaction",
+            },
           ],
           reaction: [
             {
               manifestation: [
                 {
-                  text: "Hepatotoxicity"
+                  text: "Hepatotoxicity",
                 },
                 {
-                  text: "Rash"
-                }
-              ]
-            }
-          ]
-        }
-      }
-    ]
-  }
+                  text: "Rash",
+                },
+              ],
+            },
+          ],
+        },
+      },
+    ],
+  },
 };
 
 export const mockSaveAllergyResponse = {
@@ -1438,11 +1441,11 @@ export const mockSaveAllergyResponse = {
         {
           rel: "self",
           uri:
-            "http://localhost:8090/openmrs/ws/rest/v1/concept/162536AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-        }
-      ]
+            "http://localhost:8090/openmrs/ws/rest/v1/concept/162536AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        },
+      ],
     },
-    nonCodedAllergen: null
+    nonCodedAllergen: null,
   },
   severity: {
     uuid: "1498AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
@@ -1451,9 +1454,9 @@ export const mockSaveAllergyResponse = {
       {
         rel: "self",
         uri:
-          "http://localhost:8090/openmrs/ws/rest/v1/concept/1498AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-      }
-    ]
+          "http://localhost:8090/openmrs/ws/rest/v1/concept/1498AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      },
+    ],
   },
   comment:
     "Patient was tilling farmland when he was ambushed by a swarm of bees and stung several times.",
@@ -1466,11 +1469,11 @@ export const mockSaveAllergyResponse = {
           {
             rel: "self",
             uri:
-              "http://localhost:8090/openmrs/ws/rest/v1/concept/512AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-          }
-        ]
+              "http://localhost:8090/openmrs/ws/rest/v1/concept/512AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+          },
+        ],
       },
-      reactionNonCoded: null
+      reactionNonCoded: null,
     },
     {
       reaction: {
@@ -1480,28 +1483,28 @@ export const mockSaveAllergyResponse = {
           {
             rel: "self",
             uri:
-              "http://localhost:8090/openmrs/ws/rest/v1/concept/111061AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-          }
-        ]
+              "http://localhost:8090/openmrs/ws/rest/v1/concept/111061AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+          },
+        ],
       },
-      reactionNonCoded: null
-    }
+      reactionNonCoded: null,
+    },
   ],
   patient: {
     uuid: "90f7f0b4-06a8-4a97-9678-e7a977f4b518",
-    display: "10010W - John Taylor"
+    display: "10010W - John Taylor",
   },
   links: [
     {
       rel: "self",
       uri:
-        "http://localhost:8090/openmrs/ws/rest/v1/patient/070f0120-0283-4858-885d-a20d967729cf/allergy/ec0be2bb-2922-4882-bc4b-01939fac72c2"
+        "http://localhost:8090/openmrs/ws/rest/v1/patient/070f0120-0283-4858-885d-a20d967729cf/allergy/ec0be2bb-2922-4882-bc4b-01939fac72c2",
     },
     {
       rel: "full",
       uri:
-        "http://localhost:8090/openmrs/ws/rest/v1/patient/070f0120-0283-4858-885d-a20d967729cf/allergy/ec0be2bb-2922-4882-bc4b-01939fac72c2?v=full"
-    }
+        "http://localhost:8090/openmrs/ws/rest/v1/patient/070f0120-0283-4858-885d-a20d967729cf/allergy/ec0be2bb-2922-4882-bc4b-01939fac72c2?v=full",
+    },
   ],
-  resourceVersion: "1.8"
+  resourceVersion: "1.8",
 };

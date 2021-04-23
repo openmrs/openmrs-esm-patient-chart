@@ -3,8 +3,8 @@ import userEvent from "@testing-library/user-event";
 import VitalsAndBiometricForms from "./vitals-biometrics-form.component";
 import { screen, render, act } from "@testing-library/react";
 import { savePatientVitals } from "../vitals-biometrics.resource";
-import { mockSessionDataResponse } from "../../../__mocks__/session.mock";
-import { mockVitalsSignsConcept } from "../../../__mocks__/vitals.mock";
+import { mockSessionDataResponse } from "../../../../../__mocks__/session.mock";
+import { mockVitalsSignsConcept } from "../../../../../__mocks__/vitals.mock";
 import { openmrsObservableFetch, openmrsFetch } from "@openmrs/esm-framework";
 import { of } from "rxjs";
 

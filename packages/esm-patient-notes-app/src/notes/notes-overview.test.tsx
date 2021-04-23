@@ -3,7 +3,7 @@ import NotesOverview from "./notes-overview.component";
 import { of } from "rxjs";
 import { BrowserRouter } from "react-router-dom";
 import { render, screen } from "@testing-library/react";
-import { mockFormattedNotes } from "../../__mocks__/encounters.mock";
+import { mockFormattedNotes } from "../../../../__mocks__/encounters.mock";
 import { getEncounterObservableRESTAPI } from "./encounter.resource";
 
 const mockGetEncounterObservableRESTAPI = getEncounterObservableRESTAPI as jest.Mock;

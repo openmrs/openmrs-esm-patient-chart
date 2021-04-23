@@ -4,7 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import { render, screen } from "@testing-library/react";
 import { of } from "rxjs/internal/observable/of";
 import { performPatientAllergySearch } from "./allergy-intolerance.resource";
-import { mockPatientAllergies } from "../../__mocks__/allergies.mock";
+import { mockPatientAllergies } from "../../../../__mocks__/allergies.mock";
 
 const mockPerformPatientAllergySearch = performPatientAllergySearch as jest.Mock;
 

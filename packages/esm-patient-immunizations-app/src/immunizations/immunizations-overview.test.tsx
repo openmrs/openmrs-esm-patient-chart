@@ -3,7 +3,7 @@ import ImmunizationsOverview from "./immunizations-overview.component";
 import { render, screen } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import { performPatientImmunizationsSearch } from "./immunizations.resource";
-import { mockPatientImmunizationsSearchResponse } from "../../__mocks__/immunizations.mock";
+import { mockPatientImmunizationsSearchResponse } from "../../../../__mocks__/immunizations.mock";
 
 const mockPerformPatientImmunizationsSearch = performPatientImmunizationsSearch as jest.Mock;
 

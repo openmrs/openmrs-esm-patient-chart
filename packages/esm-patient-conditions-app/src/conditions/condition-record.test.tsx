@@ -3,7 +3,7 @@ import ConditionRecord from "./condition-record.component";
 import { of } from "rxjs/internal/observable/of";
 import { BrowserRouter } from "react-router-dom";
 import { fireEvent, render, screen } from "@testing-library/react";
-import { mockPatientConditionResult } from "../../__mocks__/conditions.mock";
+import { mockPatientConditionResult } from "../../../../__mocks__/conditions.mock";
 import { getConditionByUuid } from "./conditions.resource";
 
 const mockGetConditionByUuid = getConditionByUuid as jest.Mock;

@@ -1,4 +1,13 @@
-import { VisitItem, VisitMode, VisitStatus } from "@openmrs/esm-framework";
+enum VisitMode {
+  NEWVISIT = "startVisit",
+  EDITVISIT = "editVisit",
+  LOADING = "loadingVisit",
+}
+
+enum VisitStatus {
+  NOTSTARTED = "notStarted",
+  ONGOING = "ongoing",
+}
 
 export const mockVisitTypes = [
   {
@@ -44,7 +53,7 @@ export const mockVisits = {
   },
 };
 
-export const mockCurrentVisit: VisitItem = {
+export const mockCurrentVisit = {
   mode: VisitMode.LOADING,
   visitData: {
     uuid: "17f512b4-d264-4113-a6fe-160cb38cb46e",

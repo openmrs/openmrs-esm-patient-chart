@@ -10,8 +10,8 @@ import {
   VisitItem,
 } from "@openmrs/esm-framework";
 import { savePatientImmunization } from "./immunizations.resource";
-import { mockSessionDataResponse } from "../../__mocks__/session.mock";
-import { mockPatient } from "../../__mocks__/patient.mock";
+import { mockSessionDataResponse } from "../../../../__mocks__/session.mock";
+import { mockPatient } from "../../../../__mocks__/patient.mock";
 
 const mockPatientId = mockPatient.id;
 const mockSavePatientImmunization = savePatientImmunization as jest.Mock;

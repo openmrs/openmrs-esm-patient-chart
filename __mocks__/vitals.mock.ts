@@ -6,7 +6,7 @@ export const mockVitalData = [
     diastolic: 72,
     pulse: 22,
     temperature: 37,
-    oxygenSaturation: 30
+    oxygenSaturation: 30,
   },
   {
     id: "d821eb55-1ba8-49c3-9ac8-95882744bd27",
@@ -15,7 +15,7 @@ export const mockVitalData = [
     diastolic: 80,
     pulse: 60,
     temperature: 38,
-    oxygenSaturation: 93
+    oxygenSaturation: 93,
   },
   {
     id: "dda59d9c-1544-4736-80cc-4a87d9b69cfa",
@@ -24,7 +24,7 @@ export const mockVitalData = [
     diastolic: 90,
     pulse: 65,
     temperature: 36,
-    oxygenSaturation: 42
+    oxygenSaturation: 42,
   },
   {
     id: "4133736c-24f7-4971-84e7-986e22cb77b5",
@@ -33,7 +33,7 @@ export const mockVitalData = [
     diastolic: 145,
     pulse: 210,
     temperature: 43,
-    oxygenSaturation: 45
+    oxygenSaturation: 45,
   },
   {
     id: "33f7aff0-07aa-449c-ab89-e8c0fe066adb",
@@ -42,7 +42,7 @@ export const mockVitalData = [
     diastolic: 90,
     pulse: 112,
     temperature: 33,
-    oxygenSaturation: 78
+    oxygenSaturation: 78,
   },
   {
     id: "b3829daf-081b-4837-a2b6-21878a184faf",
@@ -51,7 +51,7 @@ export const mockVitalData = [
     diastolic: 68,
     pulse: 215,
     temperature: 38,
-    oxygenSaturation: 54
+    oxygenSaturation: 54,
   },
   {
     id: "bd54ef4d-c118-4413-8e3e-edfc66afc851",
@@ -60,7 +60,7 @@ export const mockVitalData = [
     diastolic: 46,
     pulse: 53,
     temperature: 36,
-    oxygenSaturation: 50
+    oxygenSaturation: 50,
   },
   {
     id: "41ca9a59-1e61-43ab-b990-c985647fc203",
@@ -69,7 +69,7 @@ export const mockVitalData = [
     diastolic: 96,
     pulse: 189,
     temperature: 39,
-    oxygenSaturation: 20
+    oxygenSaturation: 20,
   },
   {
     id: "732d01c5-218a-4738-846a-a07326bb9ebb",
@@ -78,7 +78,7 @@ export const mockVitalData = [
     diastolic: 59,
     pulse: 193,
     temperature: 33,
-    oxygenSaturation: 36
+    oxygenSaturation: 36,
   },
   {
     id: "52c1a328-083d-48c4-b450-7457650e10f9",
@@ -87,7 +87,7 @@ export const mockVitalData = [
     diastolic: 116,
     pulse: 175,
     temperature: 36,
-    oxygenSaturation: 80
+    oxygenSaturation: 80,
   },
   {
     id: "43fea836-6c82-4df2-9bf1-dd07b6c54651",
@@ -96,7 +96,7 @@ export const mockVitalData = [
     diastolic: 113,
     pulse: 157,
     temperature: 27,
-    oxygenSaturation: 31
+    oxygenSaturation: 31,
   },
   {
     id: "4a5e857f-4bce-4dea-be3b-1d789e125ff9",
@@ -105,7 +105,7 @@ export const mockVitalData = [
     diastolic: 107,
     pulse: 94,
     temperature: 42,
-    oxygenSaturation: 57
+    oxygenSaturation: 57,
   },
   {
     id: "b8375c83-b4c1-4291-9561-d3fb38373cee",
@@ -114,7 +114,7 @@ export const mockVitalData = [
     diastolic: 70,
     pulse: 85,
     temperature: 37,
-    oxygenSaturation: 39
+    oxygenSaturation: 39,
   },
   {
     id: "957e943e-69ca-4378-ad7c-9d76fb11c743",
@@ -123,7 +123,7 @@ export const mockVitalData = [
     diastolic: 64,
     pulse: 173,
     temperature: 37,
-    oxygenSaturation: 41
+    oxygenSaturation: 41,
   },
   {
     id: "115ea6af-92e7-4846-a763-1c4b229feb8b",
@@ -132,7 +132,7 @@ export const mockVitalData = [
     diastolic: 50,
     pulse: 124,
     temperature: 34,
-    oxygenSaturation: 40
+    oxygenSaturation: 40,
   },
   {
     id: "2370f007-0bed-4623-8803-614714e04ec9",
@@ -141,7 +141,7 @@ export const mockVitalData = [
     diastolic: 64,
     pulse: 173,
     temperature: 37,
-    oxygenSaturation: 41
+    oxygenSaturation: 41,
   },
   {
     id: "92f19d94-155b-4aa0-be96-d39149b7bb30",
@@ -150,7 +150,7 @@ export const mockVitalData = [
     diastolic: 92,
     pulse: 130,
     temperature: 37,
-    oxygenSaturation: 45
+    oxygenSaturation: 45,
   },
   {
     id: "93de8c68-7a67-4ea4-9080-ccf6cee13226",
@@ -159,7 +159,7 @@ export const mockVitalData = [
     diastolic: 97,
     pulse: 173,
     temperature: 37,
-    oxygenSaturation: 41
+    oxygenSaturation: 41,
   },
   {
     id: "30eaff83-1e8c-4059-8b70-7a9aa76709fb",
@@ -168,7 +168,7 @@ export const mockVitalData = [
     diastolic: 64,
     pulse: 173,
     temperature: 37,
-    oxygenSaturation: 41
+    oxygenSaturation: 41,
   },
   {
     id: "c141b84c-eb37-49dd-af55-5c46372461d9",
@@ -177,7 +177,7 @@ export const mockVitalData = [
     diastolic: 64,
     pulse: 173,
     temperature: 37,
-    oxygenSaturation: 41
+    oxygenSaturation: 41,
   },
   {
     id: "e1cbd2b8-77b7-4bfc-a019-cad45155a6ac",
@@ -186,7 +186,7 @@ export const mockVitalData = [
     diastolic: 75,
     pulse: 122,
     temperature: 37,
-    oxygenSaturation: 43
+    oxygenSaturation: 43,
   },
   {
     id: "708aa53f-22fd-4b83-b055-7160ed3c3b47",
@@ -195,7 +195,7 @@ export const mockVitalData = [
     diastolic: 64,
     pulse: 173,
     temperature: 37,
-    oxygenSaturation: 41
+    oxygenSaturation: 41,
   },
   {
     id: "da6060ef-bfc2-41e9-97c3-405da77fd3b9",
@@ -204,7 +204,7 @@ export const mockVitalData = [
     diastolic: 64,
     pulse: 173,
     temperature: 37,
-    oxygenSaturation: 41
+    oxygenSaturation: 41,
   },
   {
     id: "abbe10e0-37ca-489b-9133-00b605c85a3f",
@@ -213,7 +213,7 @@ export const mockVitalData = [
     diastolic: 64,
     pulse: 173,
     temperature: 37,
-    oxygenSaturation: 41
+    oxygenSaturation: 41,
   },
   {
     id: "98124239-ca1e-4772-b00a-3ac442233984",
@@ -222,7 +222,7 @@ export const mockVitalData = [
     diastolic: 79,
     pulse: 115,
     temperature: 37,
-    oxygenSaturation: 44
+    oxygenSaturation: 44,
   },
   {
     id: "5e0eb81b-c7da-477a-a031-cd9197614a0d",
@@ -231,7 +231,7 @@ export const mockVitalData = [
     diastolic: 64,
     pulse: 173,
     temperature: 37,
-    oxygenSaturation: 41
+    oxygenSaturation: 41,
   },
   {
     id: "aa94b33a-65b9-4fe7-a6e6-34ecbfab3bc4",
@@ -240,7 +240,7 @@ export const mockVitalData = [
     diastolic: 64,
     pulse: 173,
     temperature: 37,
-    oxygenSaturation: 41
+    oxygenSaturation: 41,
   },
   {
     id: "1b776ac0-3715-4252-af65-54e60efd32ab",
@@ -249,7 +249,7 @@ export const mockVitalData = [
     diastolic: 64,
     pulse: 173,
     temperature: 37,
-    oxygenSaturation: 41
+    oxygenSaturation: 41,
   },
   {
     id: "530d2216-6acb-4573-9625-2683f523f5a3",
@@ -258,7 +258,7 @@ export const mockVitalData = [
     diastolic: 72,
     pulse: 135,
     temperature: 37,
-    oxygenSaturation: 54
+    oxygenSaturation: 54,
   },
   {
     id: "419c7ae0-c13d-4114-a145-f3952bf2d9a6",
@@ -267,7 +267,7 @@ export const mockVitalData = [
     diastolic: 64,
     pulse: 173,
     temperature: 37,
-    oxygenSaturation: 41
+    oxygenSaturation: 41,
   },
   {
     id: "74c650f2-3bc4-4144-ba13-7e1fbc853d7e",
@@ -276,7 +276,7 @@ export const mockVitalData = [
     diastolic: 64,
     pulse: 173,
     temperature: 37,
-    oxygenSaturation: 41
+    oxygenSaturation: 41,
   },
   {
     id: "cfcec828-16f8-44e9-8a89-a872680c6f75",
@@ -285,8 +285,8 @@ export const mockVitalData = [
     diastolic: 64,
     pulse: 173,
     temperature: 37,
-    oxygenSaturation: 41
-  }
+    oxygenSaturation: 41,
+  },
 ];
 
 export const mockVitalSigns = mockVitalData[0];
@@ -305,7 +305,7 @@ export const mockVitalsSignsConcept = {
             lowNormal: 80,
             lowAbsolute: 0.0,
             lowCritical: null,
-            units: "mmHg"
+            units: "mmHg",
           },
           {
             uuid: "5086AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
@@ -316,7 +316,7 @@ export const mockVitalsSignsConcept = {
             lowNormal: 70,
             lowAbsolute: 0.0,
             lowCritical: null,
-            units: "mmHg"
+            units: "mmHg",
           },
           {
             uuid: "5088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
@@ -327,7 +327,7 @@ export const mockVitalsSignsConcept = {
             lowNormal: 36.5,
             lowAbsolute: 25.0,
             lowCritical: null,
-            units: "DEG C"
+            units: "DEG C",
           },
           {
             uuid: "5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
@@ -338,7 +338,7 @@ export const mockVitalsSignsConcept = {
             lowNormal: null,
             lowAbsolute: 10.0,
             lowCritical: null,
-            units: "cm"
+            units: "cm",
           },
           {
             uuid: "5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
@@ -349,7 +349,7 @@ export const mockVitalsSignsConcept = {
             lowNormal: null,
             lowAbsolute: 0.0,
             lowCritical: null,
-            units: "kg"
+            units: "kg",
           },
           {
             uuid: "5087AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
@@ -360,7 +360,7 @@ export const mockVitalsSignsConcept = {
             lowNormal: 30,
             lowAbsolute: 0.0,
             lowCritical: null,
-            units: "beats/min"
+            units: "beats/min",
           },
           {
             uuid: "5092AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
@@ -371,7 +371,7 @@ export const mockVitalsSignsConcept = {
             lowNormal: 95,
             lowAbsolute: 0.0,
             lowCritical: null,
-            units: "%"
+            units: "%",
           },
           {
             uuid: "1343AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
@@ -382,7 +382,7 @@ export const mockVitalsSignsConcept = {
             lowNormal: 23,
             lowAbsolute: null,
             lowCritical: null,
-            units: "cm"
+            units: "cm",
           },
           {
             uuid: "5242AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
@@ -393,12 +393,12 @@ export const mockVitalsSignsConcept = {
             lowNormal: null,
             lowAbsolute: 0.0,
             lowCritical: null,
-            units: "/ min"
-          }
-        ]
-      }
-    ]
-  }
+            units: "/ min",
+          },
+        ],
+      },
+    ],
+  },
 };
 
 export const mockVitalsChartData = [
@@ -413,7 +413,7 @@ export const mockVitalsChartData = [
     weight: "73",
     height: "185",
     bmi: "21.3",
-    respiratoryRate: "16"
+    respiratoryRate: "16",
   },
   {
     id: "0158ad38-d3f4-492a-9e46-1c1e6909c64f",
@@ -426,8 +426,8 @@ export const mockVitalsChartData = [
     weight: "75",
     height: "165",
     bmi: "21.3",
-    respiratoryRate: "16"
-  }
+    respiratoryRate: "16",
+  },
 ];
 
 export const mockConceptsUnits = [
@@ -439,5 +439,5 @@ export const mockConceptsUnits = [
   "beats/min",
   "%",
   "cm",
-  "/ min"
+  "/ min",
 ];

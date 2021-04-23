@@ -5,27 +5,27 @@ export const mockPatient = {
     {
       url:
         "http://fhir-es.transcendinsights.com/stu3/StructureDefinition/resource-date-created",
-      valueDateTime: "2017-01-18T09:42:40+00:00"
+      valueDateTime: "2017-01-18T09:42:40+00:00",
     },
     {
       url:
         "https://purl.org/elab/fhir/StructureDefinition/Creator-crew-version1",
-      valueString: "daemon"
-    }
+      valueString: "daemon",
+    },
   ],
   identifier: [
     {
       id: "1f0ad7a1-430f-4397-b571-59ea654a52db",
       use: "secondary",
       system: "Old Identification Number",
-      value: "100732HE"
+      value: "100732HE",
     },
     {
       id: "1f0ad7a1-430f-4397-b571-59ea654a52db",
       use: "usual",
       system: "OpenMRS ID",
-      value: "100GEJ"
-    }
+      value: "100GEJ",
+    },
   ],
   active: true,
   name: [
@@ -33,8 +33,8 @@ export const mockPatient = {
       id: "efdb246f-4142-4c12-a27a-9be60b9592e9",
       use: "usual",
       family: "Wilson",
-      given: ["John"]
-    }
+      given: ["John"],
+    },
   ],
   gender: "male",
   birthDate: "1972-04-04",
@@ -47,13 +47,13 @@ export const mockPatient = {
       city: "City0351",
       state: "State0351tested",
       postalCode: "60351",
-      country: "Country0351"
-    }
+      country: "Country0351",
+    },
   ],
   telecom: [
     {
       system: "Mobile",
-      value: "+25467388299499"
-    }
-  ]
+      value: "+25467388299499",
+    },
+  ],
 };

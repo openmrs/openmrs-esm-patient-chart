@@ -16,13 +16,13 @@ export const mockRelationships = {
             {
               url:
                 "http://fhir-es.transcendinsights.com/stu3/StructureDefinition/resource-date-created",
-              valueDateTime: "2019-11-05T08:34:57+00:00"
+              valueDateTime: "2019-11-05T08:34:57+00:00",
             },
             {
               url:
                 "https://purl.org/elab/fhir/StructureDefinition/Creator-crew-version1",
-              valueString: "jdenning"
-            }
+              valueString: "jdenning",
+            },
           ],
           identifier: [{ id: "83ad0a03-7c4a-4d89-8c53-57cf1f15718a" }],
           active: true,
@@ -30,25 +30,25 @@ export const mockRelationships = {
             id: "adc4e0fc-c1b8-49a8-adf2-a7c304d56cd7",
             reference: "Patient/adc4e0fc-c1b8-49a8-adf2-a7c304d56cd7",
             identifier: { id: "adc4e0fc-c1b8-49a8-adf2-a7c304d56cd7" },
-            display: "Joshua Johnson(Identifier:1002D2)"
+            display: "Joshua Johnson(Identifier:1002D2)",
           },
           relationship: {
             coding: [
               {
                 system: "http://openmrs.org",
-                code: "Doctor"
-              }
-            ]
+                code: "Doctor",
+              },
+            ],
           },
           name: [
             {
               id: "a0ec6ff2-e29a-4d26-b19d-e62f643a2c72",
               use: "usual",
               family: "Okoro",
-              given: ["Michael"]
-            }
-          ]
-        }
+              given: ["Michael"],
+            },
+          ],
+        },
       },
       {
         fullUrl:
@@ -60,13 +60,13 @@ export const mockRelationships = {
             {
               url:
                 "http://fhir-es.transcendinsights.com/stu3/StructureDefinition/resource-date-created",
-              valueDateTime: "2019-11-05T08:34:57+00:00"
+              valueDateTime: "2019-11-05T08:34:57+00:00",
             },
             {
               url:
                 "https://purl.org/elab/fhir/StructureDefinition/Creator-crew-version1",
-              valueString: "jdenning"
-            }
+              valueString: "jdenning",
+            },
           ],
           identifier: [{ id: "83ad0a03-7c4a-4d89-8c53-57cf1f15718a" }],
           active: true,
@@ -74,26 +74,26 @@ export const mockRelationships = {
             id: "adc4e0fc-c1b8-49a8-adf2-a7c304d56cd7",
             reference: "Patient/adc4e0fc-c1b8-49a8-adf2-a7c304d56cd7",
             identifier: { id: "adc4e0fc-c1b8-49a8-adf2-a7c304d56cd7" },
-            display: "Joshua Johnson(Identifier:1002D2)"
+            display: "Joshua Johnson(Identifier:1002D2)",
           },
           relationship: {
             coding: [
               {
                 system: "http://openmrs.org",
-                code: "Parent"
-              }
-            ]
+                code: "Parent",
+              },
+            ],
           },
           name: [
             {
               id: "a0ec6ff2-e29a-4d26-b19d-e62f643a2c72",
               use: "usual",
               family: "Monica",
-              given: ["Mannet"]
-            }
-          ]
-        }
-      }
-    ]
-  }
+              given: ["Mannet"],
+            },
+          ],
+        },
+      },
+    ],
+  },
 };

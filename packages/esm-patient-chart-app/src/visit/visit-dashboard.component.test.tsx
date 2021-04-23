@@ -11,9 +11,9 @@ import { of } from "rxjs/internal/observable/of";
 import {
   mockVisitTypesDataResponse,
   mockVisits,
-} from "../../../__mocks__/visits.mock";
-import { mockLocationsDataResponse } from "../../../__mocks__/location.mock";
-import { mockSessionDataResponse } from "../../../__mocks__/session.mock";
+} from "../../../../__mocks__/visits.mock";
+import { mockLocationsDataResponse } from "../../../../__mocks__/location.mock";
+import { mockSessionDataResponse } from "../../../../__mocks__/session.mock";
 
 const mockGetCurrentPatientUuid = getCurrentPatientUuid as jest.Mock;
 const mockOpenmrsObservableFetch = openmrsObservableFetch as jest.Mock;

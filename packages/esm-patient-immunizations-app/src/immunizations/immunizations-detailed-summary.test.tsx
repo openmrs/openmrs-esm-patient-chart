@@ -7,7 +7,7 @@ import {
   mockImmunizationConfig,
   mockPatientImmunizationsSearchResponse,
   mockVaccinesConceptSet,
-} from "../../../__mocks__/immunizations.mock";
+} from "../../../../__mocks__/immunizations.mock";
 import ImmunizationsDetailedSummary from "./immunizations-detailed-summary.component";
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;

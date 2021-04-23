@@ -22,7 +22,7 @@ export const mockAppointmentsResponse = {
       patient: {
         identifier: "100HWJ",
         name: "Wafula John Rock",
-        uuid: "64cb4894-848a-4027-8174-05c52989c0ca"
+        uuid: "64cb4894-848a-4027-8174-05c52989c0ca",
       },
       service: {
         appointmentServiceId: 1,
@@ -37,12 +37,12 @@ export const mockAppointmentsResponse = {
         uuid: "243cc533-8be3-4ad6-aefd-024d67058234",
         color: "#006400",
         initialAppointmentStatus: "Requested",
-        creatorName: null
+        creatorName: null,
       },
       serviceType: {
         duration: 15,
         name: "Triage",
-        uuid: "5e508452-288f-4f53-9517-d95d667e9955"
+        uuid: "5e508452-288f-4f53-9517-d95d667e9955",
       },
       provider: null,
       location: null,
@@ -53,7 +53,7 @@ export const mockAppointmentsResponse = {
       comments: "N/A",
       additionalInfo: null,
       providers: [],
-      recurring: false
+      recurring: false,
     },
     {
       uuid: "76579b10-d661-4218-a309-2f7d89cfbf23",
@@ -61,7 +61,7 @@ export const mockAppointmentsResponse = {
       patient: {
         identifier: "100HWJ",
         name: "Wafula John Rock",
-        uuid: "64cb4894-848a-4027-8174-05c52989c0ca"
+        uuid: "64cb4894-848a-4027-8174-05c52989c0ca",
       },
       service: {
         appointmentServiceId: 1,
@@ -76,12 +76,12 @@ export const mockAppointmentsResponse = {
         uuid: "243cc533-8be3-4ad6-aefd-024d67058234",
         color: "#006400",
         initialAppointmentStatus: "Requested",
-        creatorName: null
+        creatorName: null,
       },
       serviceType: {
         duration: 10,
         name: "Consultation",
-        uuid: "12f73c3e-38d0-4abe-8b72-72349172229f"
+        uuid: "12f73c3e-38d0-4abe-8b72-72349172229f",
       },
       provider: null,
       location: null,
@@ -93,9 +93,9 @@ export const mockAppointmentsResponse = {
         "This patient is due for future consultation on the progress of fracture on the left am. Ultra sound is scheduled to take place and enhancement of the born structure.",
       additionalInfo: null,
       providers: [],
-      recurring: false
-    }
-  ]
+      recurring: false,
+    },
+  ],
 };
 
 export const mockAppointmentResponse = {
@@ -105,7 +105,7 @@ export const mockAppointmentResponse = {
     patient: {
       identifier: "100HWJ",
       name: "Wafula John Rock",
-      uuid: "64cb4894-848a-4027-8174-05c52989c0ca"
+      uuid: "64cb4894-848a-4027-8174-05c52989c0ca",
     },
     service: {
       appointmentServiceId: 1,
@@ -120,12 +120,12 @@ export const mockAppointmentResponse = {
       uuid: "243cc533-8be3-4ad6-aefd-024d67058234",
       color: "#006400",
       initialAppointmentStatus: "Requested",
-      creatorName: null
+      creatorName: null,
     },
     serviceType: {
       duration: 15,
       name: "Triage",
-      uuid: "5e508452-288f-4f53-9517-d95d667e9955"
+      uuid: "5e508452-288f-4f53-9517-d95d667e9955",
     },
     provider: null,
     location: null,
@@ -136,8 +136,8 @@ export const mockAppointmentResponse = {
     comments: "N/A",
     additionalInfo: null,
     providers: [],
-    recurring: false
-  }
+    recurring: false,
+  },
 };
 
 export const mockAppointmentsServiceFullResponse = {
@@ -162,58 +162,58 @@ export const mockAppointmentsServiceFullResponse = {
           startTime: "07:00:00",
           endTime: "20:00:00",
           maxAppointmentsLimit: null,
-          uuid: "7c7c53c8-c104-40cc-9926-50fc6fe4c4c1"
+          uuid: "7c7c53c8-c104-40cc-9926-50fc6fe4c4c1",
         },
         {
           dayOfWeek: "TUESDAY",
           startTime: "07:00:00",
           endTime: "20:00:00",
           maxAppointmentsLimit: null,
-          uuid: "7683b94e-6c48-4132-b402-54837a8c0fb2"
+          uuid: "7683b94e-6c48-4132-b402-54837a8c0fb2",
         },
         {
           dayOfWeek: "SUNDAY",
           startTime: "07:00:00",
           endTime: "20:00:00",
           maxAppointmentsLimit: null,
-          uuid: "00be8427-0037-4984-8875-6a5a2bc57e8e"
+          uuid: "00be8427-0037-4984-8875-6a5a2bc57e8e",
         },
         {
           dayOfWeek: "FRIDAY",
           startTime: "07:00:00",
           endTime: "20:00:00",
           maxAppointmentsLimit: null,
-          uuid: "af6b8d5b-be05-4e24-8601-30573f848bec"
+          uuid: "af6b8d5b-be05-4e24-8601-30573f848bec",
         },
         {
           dayOfWeek: "THURSDAY",
           startTime: "07:00:00",
           endTime: "20:00:00",
           maxAppointmentsLimit: null,
-          uuid: "eb35e91b-6909-41fe-9d09-750b83fb3b9c"
+          uuid: "eb35e91b-6909-41fe-9d09-750b83fb3b9c",
         },
         {
           dayOfWeek: "SATURDAY",
           startTime: "07:00:00",
           endTime: "20:00:00",
           maxAppointmentsLimit: null,
-          uuid: "7f6347fd-c514-4fd2-ab79-d7fd760bf82f"
+          uuid: "7f6347fd-c514-4fd2-ab79-d7fd760bf82f",
         },
         {
           dayOfWeek: "WEDNESDAY",
           startTime: "07:00:00",
           endTime: "20:00:00",
           maxAppointmentsLimit: null,
-          uuid: "dad83f54-a0a2-4ba9-819b-01e906c89b69"
-        }
+          uuid: "dad83f54-a0a2-4ba9-819b-01e906c89b69",
+        },
       ],
       serviceTypes: [
         {
           duration: 15,
           name: "Chemotherapy",
-          uuid: "53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1"
-        }
-      ]
+          uuid: "53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1",
+        },
+      ],
     },
     {
       appointmentServiceId: 2,
@@ -235,39 +235,39 @@ export const mockAppointmentsServiceFullResponse = {
           startTime: "07:00:00",
           endTime: "20:00:00",
           maxAppointmentsLimit: null,
-          uuid: "7c7c53c8-c104-40cc-9926-50fc6fe4c4c1"
+          uuid: "7c7c53c8-c104-40cc-9926-50fc6fe4c4c1",
         },
         {
           dayOfWeek: "TUESDAY",
           startTime: "07:00:00",
           endTime: "20:00:00",
           maxAppointmentsLimit: null,
-          uuid: "7683b94e-6c48-4132-b402-54837a8c0fb2"
+          uuid: "7683b94e-6c48-4132-b402-54837a8c0fb2",
         },
         {
           dayOfWeek: "SUNDAY",
           startTime: "07:00:00",
           endTime: "20:00:00",
           maxAppointmentsLimit: null,
-          uuid: "00be8427-0037-4984-8875-6a5a2bc57e8e"
+          uuid: "00be8427-0037-4984-8875-6a5a2bc57e8e",
         },
         {
           dayOfWeek: "FRIDAY",
           startTime: "07:00:00",
           endTime: "20:00:00",
           maxAppointmentsLimit: null,
-          uuid: "af6b8d5b-be05-4e24-8601-30573f848bec"
-        }
+          uuid: "af6b8d5b-be05-4e24-8601-30573f848bec",
+        },
       ],
       serviceTypes: [
         {
           duration: 15,
           name: "Radiotherapy",
-          uuid: "330ab4ac-d450-4f0f-bbe2-3c59eb8a0f87"
-        }
-      ]
-    }
-  ]
+          uuid: "330ab4ac-d450-4f0f-bbe2-3c59eb8a0f87",
+        },
+      ],
+    },
+  ],
 };
 
 export const mockAppointmentsServiceResponse = {
@@ -291,57 +291,57 @@ export const mockAppointmentsServiceResponse = {
         startTime: "07:00:00",
         endTime: "20:00:00",
         maxAppointmentsLimit: null,
-        uuid: "7c7c53c8-c104-40cc-9926-50fc6fe4c4c1"
+        uuid: "7c7c53c8-c104-40cc-9926-50fc6fe4c4c1",
       },
       {
         dayOfWeek: "TUESDAY",
         startTime: "07:00:00",
         endTime: "20:00:00",
         maxAppointmentsLimit: null,
-        uuid: "7683b94e-6c48-4132-b402-54837a8c0fb2"
+        uuid: "7683b94e-6c48-4132-b402-54837a8c0fb2",
       },
       {
         dayOfWeek: "SUNDAY",
         startTime: "07:00:00",
         endTime: "20:00:00",
         maxAppointmentsLimit: null,
-        uuid: "00be8427-0037-4984-8875-6a5a2bc57e8e"
+        uuid: "00be8427-0037-4984-8875-6a5a2bc57e8e",
       },
       {
         dayOfWeek: "FRIDAY",
         startTime: "07:00:00",
         endTime: "20:00:00",
         maxAppointmentsLimit: null,
-        uuid: "af6b8d5b-be05-4e24-8601-30573f848bec"
+        uuid: "af6b8d5b-be05-4e24-8601-30573f848bec",
       },
       {
         dayOfWeek: "THURSDAY",
         startTime: "07:00:00",
         endTime: "20:00:00",
         maxAppointmentsLimit: null,
-        uuid: "eb35e91b-6909-41fe-9d09-750b83fb3b9c"
+        uuid: "eb35e91b-6909-41fe-9d09-750b83fb3b9c",
       },
       {
         dayOfWeek: "SATURDAY",
         startTime: "07:00:00",
         endTime: "20:00:00",
         maxAppointmentsLimit: null,
-        uuid: "7f6347fd-c514-4fd2-ab79-d7fd760bf82f"
+        uuid: "7f6347fd-c514-4fd2-ab79-d7fd760bf82f",
       },
       {
         dayOfWeek: "WEDNESDAY",
         startTime: "07:00:00",
         endTime: "20:00:00",
         maxAppointmentsLimit: null,
-        uuid: "dad83f54-a0a2-4ba9-819b-01e906c89b69"
-      }
+        uuid: "dad83f54-a0a2-4ba9-819b-01e906c89b69",
+      },
     ],
     serviceTypes: [
       {
         duration: 15,
         name: "Chemotherapy",
-        uuid: "53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1"
-      }
-    ]
-  }
+        uuid: "53d58ff1-0c45-4e2e-9bd2-9cc826cb46e1",
+      },
+    ],
+  },
 };

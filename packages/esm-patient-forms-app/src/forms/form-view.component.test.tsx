@@ -2,10 +2,10 @@ import React from "react";
 import FormView from "./form-view.component";
 import userEvent from "@testing-library/user-event";
 import { screen, render } from "@testing-library/react";
-import { mockForms } from "../../__mocks__/forms.mock";
-import { mockPatient } from "../../__mocks__/patient.mock";
 import { getStartedVisit } from "@openmrs/esm-framework";
-import { mockCurrentVisit } from "../../__mocks__/visits.mock";
+import { mockForms } from "../../../../__mocks__/forms.mock";
+import { mockPatient } from "../../../../__mocks__/patient.mock";
+import { mockCurrentVisit } from "../../../../__mocks__/visits.mock";
 
 jest.mock("lodash-es/debounce", () => jest.fn((fn) => fn));
 

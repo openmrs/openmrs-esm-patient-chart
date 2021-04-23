@@ -3,7 +3,7 @@ import AllergiesDetailedSummary from "./allergies-detailed-summary.component";
 import { render, screen } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import { of } from "rxjs/internal/observable/of";
-import { mockPatientAllergies } from "../../__mocks__/allergies.mock";
+import { mockPatientAllergies } from "../../../../__mocks__/allergies.mock";
 import { performPatientAllergySearch } from "./allergy-intolerance.resource";
 
 const mockPerformPatientAllergySearch = performPatientAllergySearch as jest.Mock;

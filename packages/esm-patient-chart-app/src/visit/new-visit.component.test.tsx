@@ -2,9 +2,9 @@ import React from "react";
 import dayjs from "dayjs";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { of } from "rxjs/internal/observable/of";
-import { mockVisitTypesDataResponse } from "../../__mocks__/visits.mock";
-import { mockLocationsDataResponse } from "../../__mocks__/location.mock";
-import { mockSessionDataResponse } from "../../__mocks__/session.mock";
+import { mockVisitTypesDataResponse } from "../../../../__mocks__/visits.mock";
+import { mockLocationsDataResponse } from "../../../../__mocks__/location.mock";
+import { mockSessionDataResponse } from "../../../../__mocks__/session.mock";
 import {
   openmrsObservableFetch,
   getCurrentPatientUuid,

@@ -5,7 +5,7 @@ import { BrowserRouter } from "react-router-dom";
 import { render, screen } from "@testing-library/react";
 import { of } from "rxjs/internal/observable/of";
 import { performPatientConditionsSearch } from "./conditions.resource";
-import { mockPatientConditionsResult } from "../../__mocks__/conditions.mock";
+import { mockPatientConditionsResult } from "../../../../__mocks__/conditions.mock";
 
 const mockPerformPatientConditionsSearch = performPatientConditionsSearch as jest.Mock;
 

@@ -8,7 +8,7 @@ import {
   openmrsObservableFetch,
   openmrsFetch,
 } from "@openmrs/esm-framework";
-import { mockVisits } from "../../__mocks__/visits.mock";
+import { mockVisits } from "../../../../__mocks__/visits.mock";
 import { of } from "rxjs";
 
 const mockOpenmrsObservableFetch = openmrsObservableFetch as jest.Mock;

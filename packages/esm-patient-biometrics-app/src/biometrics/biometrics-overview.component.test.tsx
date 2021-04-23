@@ -2,7 +2,7 @@ import React from "react";
 import { getPatientBiometrics } from "./biometric.resource";
 import { render, screen } from "@testing-library/react";
 import BiometricOverview from "./biometrics-overview.component";
-import { ConfigMock } from "../../__mocks__/chart-widgets-config.mock";
+import { ConfigMock } from "../../../../__mocks__/chart-widgets-config.mock";
 import { of } from "rxjs";
 
 const mockGetPatientBiometric = getPatientBiometrics as jest.Mock;

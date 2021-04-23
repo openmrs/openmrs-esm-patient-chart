@@ -4,7 +4,7 @@ import ProgramsOverview from "./programs-overview.component";
 import { of } from "rxjs/internal/observable/of";
 import { BrowserRouter } from "react-router-dom";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { mockEnrolledProgramsResponse } from "../../__mocks__/programs.mock";
+import { mockEnrolledProgramsResponse } from "../../../../__mocks__/programs.mock";
 import { fetchActiveEnrollments } from "./programs.resource";
 
 const mockFetchActiveEnrollments = fetchActiveEnrollments as jest.Mock;

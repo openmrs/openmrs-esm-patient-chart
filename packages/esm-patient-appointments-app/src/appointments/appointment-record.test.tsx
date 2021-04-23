@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { render, screen } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
-import { mockAppointmentResponse } from "../../__mocks__/appointments.mock";
+import { mockAppointmentResponse } from "../../../../__mocks__/appointments.mock";
 import { getAppointmentsByUuid } from "./appointments.resource";
 
 const mockGetAppointmentsByUuid = getAppointmentsByUuid as jest.Mock;

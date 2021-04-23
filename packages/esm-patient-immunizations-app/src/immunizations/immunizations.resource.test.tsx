@@ -3,7 +3,7 @@ import {
   getImmunizationsConceptSet,
   performPatientImmunizationsSearch,
 } from "./immunizations.resource";
-import { mockPatientImmunizationsSearchResponse } from "../../__mocks__/immunizations.mock";
+import { mockPatientImmunizationsSearchResponse } from "../../../../__mocks__/immunizations.mock";
 import { FHIRImmunizationBundle, OpenmrsConcept } from "./immunization-domain";
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;

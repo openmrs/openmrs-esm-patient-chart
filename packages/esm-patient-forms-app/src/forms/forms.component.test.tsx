@@ -5,7 +5,10 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { navigate } from "@openmrs/esm-framework";
 import { fetchAllForms, fetchPatientEncounters } from "./forms.resource";
 import { of } from "rxjs";
-import { mockForms, mockPatientEncounters } from "../../__mocks__/forms.mock";
+import {
+  mockForms,
+  mockPatientEncounters,
+} from "../../../../__mocks__/forms.mock";
 
 const mockNavigate = navigate as jest.Mock;
 const mockFetchAllForms = fetchAllForms as jest.Mock;

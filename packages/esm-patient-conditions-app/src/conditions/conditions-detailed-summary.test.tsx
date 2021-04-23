@@ -4,7 +4,7 @@ import ConditionsDetailedSummary from "./conditions-detailed-summary.component";
 import { BrowserRouter } from "react-router-dom";
 import { render, screen } from "@testing-library/react";
 import { of } from "rxjs/internal/observable/of";
-import { mockPatientConditionsResult } from "../../__mocks__/conditions.mock";
+import { mockPatientConditionsResult } from "../../../../__mocks__/conditions.mock";
 import { performPatientConditionsSearch } from "./conditions.resource";
 
 const mockPerformPatientConditionsSearch = performPatientConditionsSearch as jest.Mock;

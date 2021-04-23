@@ -10,90 +10,90 @@ export const mockedTabbedViewConfig = {
     {
       label: "Appointments",
       path: "/appointments",
-      view: "appointmentsDashboard"
-    }
+      view: "appointmentsDashboard",
+    },
   ],
   widgetDefinitions: [
     {
       name: "ProgramsOverview",
       esModule: "@openmrs/esm-patient-chart-widgets",
-      usesSingleSpaContext: {}
+      usesSingleSpaContext: {},
     },
     {
       name: "ProgramsSummary",
       esModule: "@openmrs/esm-patient-chart-widgets",
-      usesSingleSpaContext: {}
+      usesSingleSpaContext: {},
     },
     {
       name: "Conditions",
       esModule: "@openmrs/esm-patient-chart-widgets",
-      usesSingleSpaContext: {}
+      usesSingleSpaContext: {},
     },
     {
       name: "MedicationsOverview",
       esModule: "@openmrs/esm-patient-chart-widgets",
-      usesSingleSpaContext: {}
+      usesSingleSpaContext: {},
     },
     {
       name: "MedicationsSummary",
       esModule: "@openmrs/esm-patient-chart-widgets",
-      usesSingleSpaContext: {}
+      usesSingleSpaContext: {},
     },
     {
       name: "HeightAndWeightOverview",
       esModule: "@openmrs/esm-patient-chart-widgets",
-      usesSingleSpaContext: {}
+      usesSingleSpaContext: {},
     },
     {
       name: "HeightAndWeightSummary",
       esModule: "@openmrs/esm-patient-chart-widgets",
-      usesSingleSpaContext: {}
+      usesSingleSpaContext: {},
     },
     {
       name: "VitalsOverview",
       esModule: "@openmrs/esm-patient-chart-widgets",
-      usesSingleSpaContext: {}
+      usesSingleSpaContext: {},
     },
     {
       name: "VitalsSummary",
       esModule: "@openmrs/esm-patient-chart-widgets",
-      usesSingleSpaContext: {}
+      usesSingleSpaContext: {},
     },
     {
       name: "ConditionsOverview",
       esModule: "@openmrs/esm-patient-chart-widgets",
-      usesSingleSpaContext: {}
+      usesSingleSpaContext: {},
     },
     {
       name: "AllergiesOverview",
       esModule: "@openmrs/esm-patient-chart-widgets",
-      usesSingleSpaContext: {}
+      usesSingleSpaContext: {},
     },
     {
       name: "AllergiesSummary",
       esModule: "@openmrs/esm-patient-chart-widgets",
-      usesSingleSpaContext: {}
+      usesSingleSpaContext: {},
     },
     {
       name: "NotesOverview",
       esModule: "@openmrs/esm-patient-chart-widgets",
-      usesSingleSpaContext: {}
+      usesSingleSpaContext: {},
     },
     {
       name: "Notes",
       esModule: "@openmrs/esm-patient-chart-widgets",
-      usesSingleSpaContext: {}
+      usesSingleSpaContext: {},
     },
     {
       name: "AppointmentsOverview",
       esModule: "@openmrs/esm-patient-chart-widgets",
-      usesSingleSpaContext: {}
+      usesSingleSpaContext: {},
     },
     {
       name: "AppointmentsSummary",
       esModule: "@openmrs/esm-patient-chart-widgets",
-      usesSingleSpaContext: {}
-    }
+      usesSingleSpaContext: {},
+    },
   ],
   dashboardDefinitions: [
     {
@@ -105,50 +105,50 @@ export const mockedTabbedViewConfig = {
           name: "ConditionsOverview",
           esModule: "@openmrs/esm-patient-chart-widgets",
           layout: { columnSpan: 2 },
-          params: { basePath: "conditions" }
+          params: { basePath: "conditions" },
         },
         {
           name: "ProgramsOverview",
           esModule: "@openmrs/esm-patient-chart-widgets",
-          layout: { columnSpan: 2 }
+          layout: { columnSpan: 2 },
         },
         {
           name: "NotesOverview",
           esModule: "@openmrs/esm-patient-chart-widgets",
           layout: { columnSpan: 4 },
-          params: { basePath: "encounters/notes" }
+          params: { basePath: "encounters/notes" },
         },
         {
           name: "VitalsOverview",
           esModule: "@openmrs/esm-patient-chart-widgets",
           layout: { columnSpan: 2 },
-          params: { basePath: "results/vitals" }
+          params: { basePath: "results/vitals" },
         },
         {
           name: "HeightAndWeightOverview",
           esModule: "@openmrs/esm-patient-chart-widgets",
           layout: { columnSpan: 2 },
-          params: { basePath: "results/heightAndWeight" }
+          params: { basePath: "results/heightAndWeight" },
         },
         {
           name: "MedicationsOverview",
           esModule: "@openmrs/esm-patient-chart-widgets",
           layout: { columnSpan: 3 },
-          params: { basePath: "orders/medication-orders" }
+          params: { basePath: "orders/medication-orders" },
         },
         {
           name: "AllergiesOverview",
           esModule: "@openmrs/esm-patient-chart-widgets",
           layout: { columnSpan: 1 },
-          params: { basePath: "allergies" }
+          params: { basePath: "allergies" },
         },
         {
           name: "AppointmentsOverview",
           esModule: "@openmrs/esm-patient-chart-widgets",
           layout: { columnSpan: 4 },
-          params: { basePath: "appointments" }
-        }
-      ]
+          params: { basePath: "appointments" },
+        },
+      ],
     },
     {
       name: "resultsOverviewDashboard",
@@ -157,15 +157,15 @@ export const mockedTabbedViewConfig = {
         {
           name: "VitalsOverview",
           esModule: "@openmrs/esm-patient-chart-widgets",
-          params: { basePath: "results/vitals" }
+          params: { basePath: "results/vitals" },
         },
         {
           name: "HeightAndWeightOverview",
           esModule: "@openmrs/esm-patient-chart-widgets",
-          params: { basePath: "results/heightAndWeight" }
-        }
+          params: { basePath: "results/heightAndWeight" },
+        },
       ],
-      title: {}
+      title: {},
     },
     {
       name: "ordersOverviewDashboard",
@@ -175,25 +175,25 @@ export const mockedTabbedViewConfig = {
         {
           name: "MedicationsOverview",
           esModule: "@openmrs/esm-patient-chart-widgets",
-          params: { basePath: "orders/medication-orders" }
-        }
-      ]
+          params: { basePath: "orders/medication-orders" },
+        },
+      ],
     },
     {
       name: "notesDashboard",
       layout: { columns: 1 },
       widgets: [
-        { name: "Notes", esModule: "@openmrs/esm-patient-chart-widgets" }
+        { name: "Notes", esModule: "@openmrs/esm-patient-chart-widgets" },
       ],
-      title: {}
+      title: {},
     },
     {
       name: "conditionsDashboard",
       layout: { columns: 1 },
       widgets: [
-        { name: "Conditions", esModule: "@openmrs/esm-patient-chart-widgets" }
+        { name: "Conditions", esModule: "@openmrs/esm-patient-chart-widgets" },
       ],
-      title: {}
+      title: {},
     },
     {
       name: "allergiesDashboard",
@@ -201,10 +201,10 @@ export const mockedTabbedViewConfig = {
       widgets: [
         {
           name: "AllergiesSummary",
-          esModule: "@openmrs/esm-patient-chart-widgets"
-        }
+          esModule: "@openmrs/esm-patient-chart-widgets",
+        },
       ],
-      title: {}
+      title: {},
     },
     {
       name: "programsDashboard",
@@ -212,10 +212,10 @@ export const mockedTabbedViewConfig = {
       widgets: [
         {
           name: "ProgramsSummary",
-          esModule: "@openmrs/esm-patient-chart-widgets"
-        }
+          esModule: "@openmrs/esm-patient-chart-widgets",
+        },
       ],
-      title: {}
+      title: {},
     },
     {
       name: "appointmentsDashboard",
@@ -223,11 +223,11 @@ export const mockedTabbedViewConfig = {
       widgets: [
         {
           name: "AppointmentsSummary",
-          esModule: "@openmrs/esm-patient-chart-widgets"
-        }
+          esModule: "@openmrs/esm-patient-chart-widgets",
+        },
       ],
-      title: {}
-    }
+      title: {},
+    },
   ],
   tabbedViewDefinitions: [
     {
@@ -237,22 +237,22 @@ export const mockedTabbedViewConfig = {
         {
           label: "Overview",
           path: "/overview",
-          view: "resultsOverviewDashboard"
+          view: "resultsOverviewDashboard",
         },
         { label: "Vitals", path: "/vitals", view: "VitalsSummary" },
         {
           label: "Height and Weight",
           path: "/heightAndWeight",
-          view: "HeightAndWeightSummary"
-        }
-      ]
+          view: "HeightAndWeightSummary",
+        },
+      ],
     },
     {
       name: "encountersTabbedView",
       title: "Encounters",
-      navbar: [{ label: "Notes", path: "/notes", view: "notesDashboard" }]
-    }
-  ]
+      navbar: [{ label: "Notes", path: "/notes", view: "notesDashboard" }],
+    },
+  ],
 };
 
 export const mockConfig = {
@@ -264,9 +264,9 @@ export const mockConfig = {
     {
       label: "Height and Weight",
       path: "/heightAndWeight",
-      view: "HeightAndWeightSummary"
-    }
-  ]
+      view: "HeightAndWeightSummary",
+    },
+  ],
 };
 
 export const mockDefaultPath =

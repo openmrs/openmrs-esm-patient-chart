@@ -5,8 +5,8 @@ import { useHistory, BrowserRouter } from "react-router-dom";
 import {
   mockAppointmentsServiceResponse,
   mockAppointmentsServiceFullResponse,
-} from "../../__mocks__/appointments.mock";
-import { mockSessionDataResponse } from "../../__mocks__/session.mock";
+} from "../../../../__mocks__/appointments.mock";
+import { mockSessionDataResponse } from "../../../../__mocks__/session.mock";
 import {
   createAppointment,
   getSession,
