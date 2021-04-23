@@ -4,11 +4,12 @@ import {
   ConfigurableLink,
   ExtensionSlot,
   navigate,
+  extensionStore,
   useAssignedExtensionIds,
 } from "@openmrs/esm-framework";
 import { useRouteMatch } from "react-router-dom";
 import { DashboardTabConfig } from "../config-schemas";
-import { basePath, moduleName } from "../constants";
+import { basePath } from "../constants";
 import { getTitle } from "../utils";
 
 interface ShowTabsProps {
@@ -18,13 +19,16 @@ interface ShowTabsProps {
 }
 
 const ShowTabs: React.FC<ShowTabsProps> = ({ slot, view, fullPath }) => {
-  const extensions = useAssignedExtensionIds(moduleName, slot);
+  const extensions = useAssignedExtensionIds(slot);
   const defaultExtension = extensions[0];
+  const state = extensionStore.getState();
 
   useEffect(() => {
     if (!view && defaultExtension) {
+      const state = extensionStore.getState();
+      const extension = state.extensions[defaultExtension];
       navigate({
-        to: `${fullPath}/${defaultExtension.meta.view}`,
+        to: `${fullPath}/${extension.meta.view}`,
       });
     }
   }, [view, defaultExtension, fullPath]);
@@ -32,19 +36,24 @@ const ShowTabs: React.FC<ShowTabsProps> = ({ slot, view, fullPath }) => {
   return (
     <ul>
       {view &&
-        extensions.map((ext) => (
-          <li key={ext.name}>
-            <div
-              className={`${
-                ext.meta.view === view ? "selected" : "unselected"
-              }`}
-            >
-              <ConfigurableLink to={`${fullPath}/${ext.meta.view}`}>
-                <button className="omrs-unstyled">{getTitle(ext)}</button>
-              </ConfigurableLink>
-            </div>
-          </li>
-        ))}
+        extensions.map((id) => {
+          const extension = state.extensions[id];
+          return (
+            <li key={id}>
+              <div
+                className={`${
+                  extension.meta.view === view ? "selected" : "unselected"
+                }`}
+              >
+                <ConfigurableLink to={`${fullPath}/${extension.meta.view}`}>
+                  <button className="omrs-unstyled">
+                    {getTitle(extension)}
+                  </button>
+                </ConfigurableLink>
+              </div>
+            </li>
+          );
+        })}
     </ul>
   );
 };

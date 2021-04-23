@@ -5,7 +5,7 @@ import {
   ExtensionSlot,
 } from "@openmrs/esm-framework";
 import { spaBasePath } from "../constants";
-import { ChartConfig, DashboardConfig } from "../config-schemas";
+import { ChartConfig } from "../config-schemas";
 
 function getPatientUuidFromUrl() {
   const match = /\/patient\/([a-zA-Z0-9\-]+)\/?/.exec(location.pathname);
