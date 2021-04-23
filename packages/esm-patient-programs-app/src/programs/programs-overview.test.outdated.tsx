@@ -1,5 +1,5 @@
 import React from "react";
-import ProgramsForm from "../programs/programs-form.component";
+import ProgramsForm from "./programs-form.component";
 import ProgramsOverview from "./programs-overview.component";
 import { of } from "rxjs/internal/observable/of";
 import { BrowserRouter } from "react-router-dom";
