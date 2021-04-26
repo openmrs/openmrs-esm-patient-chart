@@ -1,5 +1,5 @@
 import * as React from "react";
-import AreaChart from "@carbon/charts-react/area-chart";
+import { AreaChart } from "@carbon/charts-react";
 // ScaleTypes
 import {
   default as DataTable,
@@ -69,12 +69,6 @@ const useTrendlineData = ({
         undefined,
       ];
   }
-};
-
-type TrendlineParams = {
-  patientUuid: string;
-  panelUuid: string;
-  testUuid: string;
 };
 
 const TrendLineBackground = ({ ...props }) => (

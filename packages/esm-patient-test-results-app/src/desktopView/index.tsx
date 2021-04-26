@@ -3,7 +3,8 @@ import { Overview } from "../overview/overview.component";
 import { Timeline } from "../timeline/timeline.component";
 import Trendline from "../trendline/trendline.component";
 import withDashboardRouting from "../withDashboardRouting";
-import { navigate } from "@openmrs/esm-framework";
+
+import { navigateToTimeline, navigateToTrendline } from "../helpers";
 
 const Grid: React.FC<{}> = ({ children }) => (
   <div
@@ -64,7 +65,7 @@ const deduceViewState = ({ panelUuid, testUuid, type = "none" }): ViewState => {
   }
 };
 
-const LabResults: React.FC<Record<string, any>> = ({
+const DesktopView: React.FC<Record<string, any>> = ({
   patientUuid,
   panelUuid,
   testUuid,
@@ -80,15 +81,12 @@ const LabResults: React.FC<Record<string, any>> = ({
   }, [panelUuid, testUuid, type]);
 
   const openTimeline = React.useCallback(
-    (panelUuid) => {
-      navigate({ to: `${basePath}/timeline/${panelUuid}` });
-    },
+    (panelUuid) => navigateToTimeline(basePath, panelUuid),
     [basePath]
   );
 
   const openTrendline = React.useCallback(
-    (panelUuid, testUuid) =>
-      navigate({ to: `${basePath}/trendline/${panelUuid}/${testUuid}` }),
+    (panelUuid, testUuid) => navigateToTrendline(basePath, panelUuid, testUuid),
     [basePath]
   );
 
@@ -134,4 +132,4 @@ const LabResults: React.FC<Record<string, any>> = ({
   );
 };
 
-export default withDashboardRouting(LabResults);
+export default withDashboardRouting(DesktopView);

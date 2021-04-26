@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Switch, Route, BrowserRouter, useParams } from "react-router-dom";
+import { testResultsBasePath } from "./helpers";
 
 export default function withDashboardRouting(WrappedComponent) {
   const WrappedWithParams = (props) => {
@@ -7,20 +8,22 @@ export default function withDashboardRouting(WrappedComponent) {
     return <WrappedComponent {...props} {...params} />;
   };
 
-  return ({ basePath, patient, patientUuid }) => (
-    <BrowserRouter basename={`${window.spaBase}${basePath}/test-results`}>
-      <Switch>
-        <Route
-          path="/:type?/:panelUuid?/:testUuid?"
-          component={(props) => (
-            <WrappedWithParams
-              {...props}
-              patientUuid={patientUuid}
-              basePath={`${window.spaBase}${basePath}/test-results`}
-            />
-          )}
-        />
-      </Switch>
-    </BrowserRouter>
-  );
+  return ({ basePath, patientUuid }) => {
+    return (
+      <BrowserRouter basename={testResultsBasePath(basePath)}>
+        <Switch>
+          <Route
+            path="/:type?/:panelUuid?/:testUuid?"
+            component={(props) => (
+              <WrappedWithParams
+                {...props}
+                patientUuid={patientUuid}
+                basePath={basePath}
+              />
+            )}
+          />
+        </Switch>
+      </BrowserRouter>
+    );
+  };
 }

@@ -1,3 +1,5 @@
+import { navigate } from "@openmrs/esm-framework";
+
 export const makeThrottled = <T extends (...args: any[]) => any>(
   func: T,
   time = 1000
@@ -25,3 +27,21 @@ export const makeThrottled = <T extends (...args: any[]) => any>(
 
   return throttledFunc;
 };
+
+export const navigateToTimeline = (basePath: string, panelUuid: string) =>
+  navigate({ to: `${testResultsBasePath(basePath)}/timeline/${panelUuid}` });
+
+export const navigateToTrendline = (
+  basePath: string,
+  panelUuid: string,
+  testUuid: string
+) =>
+  navigate({
+    to: `${testResultsBasePath(basePath)}/trendline/${panelUuid}/${testUuid}`,
+  });
+
+export const navigateToResults = (basePath: string) =>
+  navigate({ to: `${testResultsBasePath(basePath)}` });
+
+export const testResultsBasePath = (basePath: string) =>
+  `${window.spaBase}${basePath}/test-results`;

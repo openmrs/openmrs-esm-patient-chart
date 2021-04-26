@@ -3,28 +3,29 @@ import React from "react";
 import Button from "carbon-components-react/lib/components/Button";
 import DataTableSkeleton from "carbon-components-react/lib/components/DataTableSkeleton";
 
-import { switchTo, useCurrentPatient } from "@openmrs/esm-framework";
-
 import useOverviewData from "./useOverviewData";
 import { RecentResultsGrid, Card } from "./helpers";
 import styles from "./lab-results.scss";
 import CommonOverview from "./common-overview";
+import {
+  navigateToResults,
+  navigateToTimeline,
+  navigateToTrendline,
+} from "../helpers";
 
 const RECENT_COUNT = 2;
 
-interface LabResultsProps {
+interface RecentOverviewProps {
   patientUuid: string;
+  basePath: string;
 }
 
-const withCurrentPatient = (WrappedComponent) => {
-  const PureCompoent = React.memo(WrappedComponent);
-  return (props) => {
-    const [, , patientUuid] = useCurrentPatient();
-    return <PureCompoent {...props} patientUuid={patientUuid} />;
-  };
-};
+navigateToResults;
 
-const LabResults: React.FC<LabResultsProps> = ({ patientUuid }) => {
+const RecentOverview: React.FC<RecentOverviewProps> = ({
+  patientUuid,
+  basePath,
+}) => {
   const { overviewData, loaded, error } = useOverviewData(patientUuid);
 
   return (
@@ -33,16 +34,7 @@ const LabResults: React.FC<LabResultsProps> = ({ patientUuid }) => {
         <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>
           Recent Results ({Math.min(RECENT_COUNT, overviewData.length)})
         </h4>
-        <Button
-          kind="ghost"
-          onClick={() => {
-            const url = `/patient/${patientUuid}/testresults/overview`;
-            switchTo("workspace", url, {
-              title: "Overview",
-              test: "from recent overview",
-            });
-          }}
-        >
+        <Button kind="ghost" onClick={() => navigateToResults(basePath)}>
           All results
         </Button>
       </div>
@@ -52,24 +44,10 @@ const LabResults: React.FC<LabResultsProps> = ({ patientUuid }) => {
             patientUuid,
             overviewData: overviewData.slice(0, RECENT_COUNT),
             insertSeperator: true,
-            openTimeline: (panelUuid) => {
-              const url = `/patient/${patientUuid}/testresults/overview`;
-              switchTo("workspace", url, {
-                title: "Overview",
-                initialState: { type: "timeline", panelUuid },
-              });
-            },
-            openTrendline: (panelUuid, testUuid) => {
-              const url = `/patient/${patientUuid}/testresults/overview`;
-              switchTo("workspace", url, {
-                title: "Overview",
-                initialState: {
-                  type: "trendline",
-                  patientUuid,
-                  panelUuid,
-                },
-              });
-            },
+            openTimeline: (panelUuid) =>
+              navigateToTimeline(basePath, panelUuid),
+            openTrendline: (panelUuid, testUuid) =>
+              navigateToTrendline(basePath, panelUuid, testUuid),
           }}
         />
       ) : (
@@ -81,4 +59,4 @@ const LabResults: React.FC<LabResultsProps> = ({ patientUuid }) => {
   );
 };
 
-export default withCurrentPatient(LabResults);
+export default RecentOverview;
