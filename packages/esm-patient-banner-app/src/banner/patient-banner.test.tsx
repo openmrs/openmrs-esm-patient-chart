@@ -1,9 +1,14 @@
 import React from "react";
 import { render, screen, fireEvent } from "@testing-library/react";
 import PatientBanner from "./patient-banner.component";
-import { getStartedVisit, visitMode, visitStatus } from "../visit/visit-utils";
-import { openmrsObservableFetch, openmrsFetch } from "@openmrs/esm-framework";
-import { mockVisits } from "../../../__mocks__/visits.mock";
+import {
+  getStartedVisit,
+  VisitMode,
+  VisitStatus,
+  openmrsObservableFetch,
+  openmrsFetch,
+} from "@openmrs/esm-framework";
+import { mockVisits } from "../../__mocks__/visits.mock";
 import { of } from "rxjs";
 
 const mockOpenmrsObservableFetch = openmrsObservableFetch as jest.Mock;
@@ -49,8 +54,8 @@ describe("<PatientBanner />", () => {
 
   it("should display the Active Visit tag when there is an active visit", () => {
     getStartedVisit.next({
-      mode: visitMode.NEWVISIT,
-      status: visitStatus.NOTSTARTED,
+      mode: VisitMode.NEWVISIT,
+      status: VisitStatus.NOTSTARTED,
     });
 
     renderPatientBanner();

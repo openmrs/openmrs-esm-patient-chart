@@ -13,10 +13,7 @@
     "build": "webpack --mode production",
     "analyze": "webpack --mode=production --env.analyze=true",
     "lint": "eslint src --ext tsx",
-    "typescript": "tsc",
-    "test": "jest --config jest.config.json --verbose false --passWithNoTests",
-    "test-watch": "jest --watch --config jest.config.json",
-    "coverage": "npm test -- --coverage"
+    "typescript": "tsc"
   },
   "browserslist": [
     "extends browserslist-config-openmrs"
@@ -52,27 +49,13 @@
   },
   "peerDependencies": {
     "@openmrs/esm-framework": "3.x",
-    "carbon-components": "^10.19.0",
-    "carbon-icons": "^7.0.7",
-    "dayjs": "^1.8.24",
-    "react": "^16.13.1",
-    "react-i18next": "^11.7.2",
-    "react-router-dom": "^5.2.0",
-    "rxjs": "^6.6.3"
-  },
-  "devDependencies": {
-    "@openmrs/esm-framework": "next",
-    "@types/carbon-components-react": "^7.10.9",
-    "@types/react": "^17.0.3",
-    "@types/react-dom": "^17.0.1",
-    "@types/react-router-dom": "^5.1.7",
-    "@types/lodash-es": "^4.17.3",
-    "@types/webpack-env": "^1.16.0",
-    "dayjs": "^1.8.24",
+    "carbon-components": "10.x",
+    "carbon-icons": "7.x",
+    "dayjs": "1.x",
     "react": "16.x",
-    "react-dom": "16.x",
-    "react-i18next": "^11.7.2",
+    "react-i18next": "11.x",
     "react-router-dom": "5.x",
-    "rxjs": "^6.6.3"
-  }
+    "rxjs": "6.x"
+  },
+  "devDependencies": {}
 }

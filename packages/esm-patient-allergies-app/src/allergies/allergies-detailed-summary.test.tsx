@@ -1,10 +1,10 @@
 import React from "react";
+import AllergiesDetailedSummary from "./allergies-detailed-summary.component";
 import { render, screen } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
 import { of } from "rxjs/internal/observable/of";
 import { mockPatientAllergies } from "../../__mocks__/allergies.mock";
 import { performPatientAllergySearch } from "./allergy-intolerance.resource";
-import AllergiesDetailedSummary from "./allergies-detailed-summary.component";
 
 const mockPerformPatientAllergySearch = performPatientAllergySearch as jest.Mock;
 
@@ -17,10 +17,6 @@ const renderAllergiesDetailedSummary = () =>
 
 jest.mock("./allergy-intolerance.resource", () => ({
   performPatientAllergySearch: jest.fn(),
-}));
-
-jest.mock("../shared-utils", () => ({
-  openWorkspaceTab: jest.fn(),
 }));
 
 describe("AllergiesDetailedSummary />", () => {

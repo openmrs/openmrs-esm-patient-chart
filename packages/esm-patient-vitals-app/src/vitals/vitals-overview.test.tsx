@@ -1,9 +1,8 @@
 import React from "react";
+import VitalsOverview from "./vitals-overview.component";
 import { render, screen } from "@testing-library/react";
 import { BrowserRouter } from "react-router-dom";
-import VitalsOverview from "./vitals-overview.component";
 import { of } from "rxjs/internal/observable/of";
-
 import { mockVitalData } from "../../__mocks__/vitals.mock";
 import { performPatientsVitalsSearch } from "./vitals-biometrics.resource";
 
@@ -28,9 +27,6 @@ jest.mock("./vitals-biometrics.resource", () => ({
   performPatientsVitalsSearch: jest.fn(),
 }));
 
-jest.mock("../shared-utils", () => ({
-  openWorkspaceTab: jest.fn(),
-}));
 // TO DO Write test for carbon intergration
 describe("<VitalsOverview />", () => {
   beforeEach(() => {

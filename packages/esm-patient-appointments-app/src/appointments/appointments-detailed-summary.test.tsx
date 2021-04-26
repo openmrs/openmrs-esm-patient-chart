@@ -24,10 +24,6 @@ jest.mock("./appointments.resource", () => ({
   getAppointments: jest.fn(),
 }));
 
-jest.mock("../shared-utils", () => ({
-  openWorkspaceTab: jest.fn(),
-}));
-
 describe("<AppointmentsDetailedSummary />", () => {
   beforeEach(() => {
     mockPatientAppointments.mockReset;

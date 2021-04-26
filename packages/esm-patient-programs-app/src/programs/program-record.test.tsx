@@ -13,10 +13,6 @@ jest.mock("./programs.resource", () => ({
   getPatientProgramByUuid: jest.fn(),
 }));
 
-jest.mock("../shared-utils", () => ({
-  openWorkspaceTab: jest.fn(),
-}));
-
 describe("<ProgramRecord />", () => {
   beforeEach(() => {
     mockFetchPatientProgram.mockReset;

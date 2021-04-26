@@ -16,10 +16,6 @@ jest.mock("./appointments.resource", () => ({
   getAppointmentsByUuid: jest.fn(),
 }));
 
-jest.mock("../shared-utils", () => ({
-  openWorkspaceTab: jest.fn(),
-}));
-
 describe("<AppointmentRecord />", () => {
   const match = {
     params: {

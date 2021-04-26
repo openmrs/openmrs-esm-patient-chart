@@ -17,10 +17,6 @@ jest.mock("react-router-dom", () => ({
   useRouteMatch: jest.fn(),
 }));
 
-jest.mock("../shared-utils", () => ({
-  openWorkspaceTab: jest.fn(),
-}));
-
 describe("<AllergyRecord />", () => {
   let match = {
     params: { allergyUuid: "4ef4abef-57b3-4df0-b5c1-41c763e34965" },

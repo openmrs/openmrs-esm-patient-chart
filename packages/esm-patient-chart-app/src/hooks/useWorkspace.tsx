@@ -1,10 +1,11 @@
-import { useCallback, useMemo } from "react";
-import { detach, useExtensionStore } from "@openmrs/esm-framework";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { detach, ExtensionStore, extensionStore } from "@openmrs/esm-framework";
 import { moduleName, patientChartWorkspaceSlot } from "../constants";
+import { getTitle } from "../utils";
 
 export interface WorkspaceState {
   title: string;
-  extensionSlot: string;
+  active: boolean;
 }
 
 export interface WorkspaceDetails extends WorkspaceState {
@@ -12,19 +13,24 @@ export interface WorkspaceDetails extends WorkspaceState {
 }
 
 export function useWorkspace(): WorkspaceDetails {
-  const store = useExtensionStore();
-  const extensions = useMemo(() => {
-    const ids =
-      store.slots[patientChartWorkspaceSlot]?.instances[moduleName]
-        ?.assignedIds ?? [];
-    return ids.map((id) => store.extensions[id]);
-  }, [store]);
+  const [extensions, setExtensions] = useState([]);
+
+  useEffect(() => {
+    const update = (store: ExtensionStore) => {
+      const ids =
+        store.slots[patientChartWorkspaceSlot]?.instances[moduleName]
+          ?.assignedIds ?? [];
+      setExtensions(ids.map((id) => store.extensions[id]));
+    };
+    update(extensionStore.getState());
+    return extensionStore.subscribe(update);
+  }, []);
 
   const title = useMemo(() => {
     if (extensions.length === 0) {
       return "";
     } else if (extensions.length === 1) {
-      return extensions[0].meta.title ?? "";
+      return getTitle(extensions[0]);
     } else {
       return `Workspaces (${extensions.length})`;
     }
@@ -38,8 +44,7 @@ export function useWorkspace(): WorkspaceDetails {
 
   return {
     title,
-    extensionSlot:
-      extensions.length > 0 ? patientChartWorkspaceSlot : undefined,
+    active: extensions.length > 0,
     clearExtensionSlot,
   };
 }

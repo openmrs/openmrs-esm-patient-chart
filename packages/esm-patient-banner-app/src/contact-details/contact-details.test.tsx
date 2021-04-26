@@ -1,8 +1,7 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
-
-import { fetchPatientRelationships } from "./relationships.resource";
 import ContactDetails from "./contact-details.component";
+import { render, screen } from "@testing-library/react";
+import { fetchPatientRelationships } from "./relationships.resource";
 
 const mockFetchPatientRelationships = fetchPatientRelationships as jest.Mock;
 
