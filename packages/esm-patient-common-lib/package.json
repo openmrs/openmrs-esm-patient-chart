@@ -27,9 +27,7 @@
   "bugs": {
     "url": "https://github.com/openmrs/openmrs-esm-patient-chart/issues"
   },
-  "dependencies": {
-    "systemjs-webpack-interop": "^1.2.1"
-  },
+  "dependencies": {},
   "peerDependencies": {
     "@openmrs/esm-framework": "3.x",
     "react": "16.x"
