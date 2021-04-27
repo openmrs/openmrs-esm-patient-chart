@@ -36,7 +36,7 @@ function setupOpenMRS() {
       {
         id: "test-results-dashboard-widget",
         slot: dashboardMeta.slot,
-        load: getAsyncLifecycle(() => import("./desktopView"), options),
+        load: getAsyncLifecycle(() => import("./desktopView/index"), options),
       },
       {
         id: "test-results-summary-dashboard",
