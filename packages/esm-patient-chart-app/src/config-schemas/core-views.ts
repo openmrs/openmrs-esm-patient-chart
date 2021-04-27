@@ -30,57 +30,9 @@ export const defaultDashboardDefinitions: Array<DashboardConfig> = [
     title: "Results",
   },
   {
-    name: "orders",
-    slot: "patient-chart-orders-dashboard-slot",
-    config: { columns: 1, type: "grid" },
-    title: "Orders",
-  },
-  {
     name: "encounters",
     slot: "patient-chart-encounters-dashboard-slot",
     config: { type: "tabs" },
     title: "Encounters",
-  },
-  {
-    name: "conditions",
-    slot: "patient-chart-conditions-dashboard-slot",
-    config: { columns: 1, type: "grid" },
-    title: "Conditions",
-  },
-  {
-    name: "immunizations",
-    slot: "patient-chart-immunizations-dashboard-slot",
-    config: { columns: 1, type: "grid" },
-    title: "Immunizations",
-  },
-  {
-    name: "allergies",
-    slot: "patient-chart-allergies-dashboard-slot",
-    config: { columns: 1, type: "grid" },
-    title: "Allergies",
-  },
-  {
-    name: "programs",
-    slot: "patient-chart-programs-dashboard-slot",
-    config: { columns: 1, type: "grid" },
-    title: "Programs",
-  },
-  {
-    name: "appointments",
-    slot: "patient-chart-appointments-dashboard-slot",
-    config: { columns: 1, type: "grid" },
-    title: "Appointments",
-  },
-  {
-    name: "attachments",
-    slot: "patient-chart-attachments-dashboard-slot",
-    config: { columns: 1, type: "grid" },
-    title: "Attachments",
-  },
-  {
-    name: "test-results",
-    slot: "patient-chart-test-results-dashboard-slot",
-    config: { columns: 1, type: "grid" },
-    title: "Test Results",
   },
 ];

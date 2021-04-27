@@ -1,5 +1,6 @@
 import { defineConfigSchema, getAsyncLifecycle } from "@openmrs/esm-framework";
 import { backendDependencies } from "./openmrs-backend-dependencies";
+import dashboardMeta from "./dashboard/dashboard.meta";
 
 const importTranslation = require.context(
   "../translations",
@@ -33,7 +34,7 @@ function setupOpenMRS() {
       },
       {
         id: "allergies-details-widget",
-        slot: "patient-chart-allergies-dashboard-slot",
+        slot: dashboardMeta.slot,
         load: getAsyncLifecycle(
           () => import("./allergies/allergies.component"),
           options
@@ -41,6 +42,15 @@ function setupOpenMRS() {
         meta: {
           columnSpan: 1,
         },
+      },
+      {
+        id: "allergies-summary-dashboard",
+        slot: "patient-chart-dashboard-slot",
+        load: getAsyncLifecycle(
+          () => import("./dashboard/dashboard-link.component"),
+          options
+        ),
+        meta: dashboardMeta,
       },
     ],
   };
