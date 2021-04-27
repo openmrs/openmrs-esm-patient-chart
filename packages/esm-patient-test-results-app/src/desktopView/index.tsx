@@ -3,9 +3,8 @@ import { Switch, Route, BrowserRouter, useParams } from "react-router-dom";
 import { testResultsBasePath } from "../helpers";
 import DesktopView from "./desktopView";
 
-const RoutedDesktopView = (props) => {
-  const params = useParams();
-  return <DesktopView {...props} {...params} />;
+const RoutedDesktopView = ({ match, ...props }) => {
+  return <DesktopView {...props} {...match.params} />;
 };
 
 const DashboardRoot = ({ basePath, patientUuid }) => (

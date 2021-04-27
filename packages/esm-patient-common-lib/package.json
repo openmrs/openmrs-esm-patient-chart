@@ -2,7 +2,7 @@
   "name": "@openmrs/esm-patient-common-lib",
   "version": "3.0.0",
   "license": "MPL-2.0",
-  "description": "Patient notes microfrontend for the OpenMRS SPA",
+  "description": "Library for common patient chart components",
   "browser": "dist/openmrs-esm-patient-common-lib.js",
   "main": "src/index.ts",
   "source": true,
