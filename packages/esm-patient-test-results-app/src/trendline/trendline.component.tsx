@@ -1,5 +1,5 @@
 import * as React from "react";
-import AreaChart from "@carbon/charts-react/area-chart";
+import { AreaChart } from "@carbon/charts-react";
 // ScaleTypes
 import {
   default as DataTable,
@@ -71,12 +71,6 @@ const useTrendlineData = ({
   }
 };
 
-type TrendlineParams = {
-  patientUuid: string;
-  panelUuid: string;
-  testUuid: string;
-};
-
 const TrendLineBackground = ({ ...props }) => (
   <div {...props} className={styles["Background"]} />
 );
@@ -90,7 +84,7 @@ const withPatientData = (WrappedComponent) => ({
   const patientData = useTrendlineData({ patientUuid, panelUuid, testUuid });
   const openTimeline = React.useCallback(
     () => openTimelineExternal(panelUuid),
-    [panelUuid]
+    [panelUuid, openTimelineExternal]
   );
 
   if (!patientData) return <div>Loading...</div>;

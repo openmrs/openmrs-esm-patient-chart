@@ -12,7 +12,6 @@ import {
 } from "./helpers";
 import { ObsRecord } from "../loadPatientTestData/types";
 import styles from "./timeline.scss";
-import withWorkspaceRouting from "../withWorkspaceRouting";
 
 const PanelNameCorner: React.FC<{ panelName: string }> = ({ panelName }) => (
   <TimeSlots className={styles["corner-grid-element"]}>{panelName}</TimeSlots>
@@ -126,7 +125,7 @@ export const Timeline: React.FC<TimelineParams> = ({
 
   const openTrendline = React.useCallback(
     (testUuid: string) => openTrendlineExternal(panelUuid, testUuid),
-    [panelUuid]
+    [panelUuid, openTrendlineExternal]
   );
 
   if (!loaded) return <LoadingDisplay />;
@@ -156,5 +155,3 @@ export const Timeline: React.FC<TimelineParams> = ({
     </PaddingContainer>
   );
 };
-
-export default withWorkspaceRouting<{}, TimelineParams>(Timeline);

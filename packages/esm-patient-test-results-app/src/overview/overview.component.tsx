@@ -1,9 +1,7 @@
 import React from "react";
 import DataTableSkeleton from "carbon-components-react/lib/components/DataTableSkeleton";
-import { useParams } from "react-router-dom";
 import useOverviewData from "./useOverviewData";
-import { Main, Card } from "./helpers";
-import withWorkspaceRouting from "../withWorkspaceRouting";
+import { Card } from "./helpers";
 import CommonOverview from "./common-overview";
 import { switchTo } from "@openmrs/esm-framework";
 
@@ -47,5 +45,3 @@ export const Overview: React.FC<LabResultProps & LabResultParams> = ({
     </>
   );
 };
-
-export default withWorkspaceRouting<LabResultProps, LabResultParams>(Overview);

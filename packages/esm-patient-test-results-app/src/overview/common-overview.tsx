@@ -23,7 +23,6 @@ import {
   Separator,
   TypedTableRow,
 } from "./helpers";
-import withWorkspaceRouting from "../withWorkspaceRouting";
 import { OverviewPanelEntry } from "./useOverviewData";
 
 const testPatient = "8673ee4f-e2ab-4077-ba55-4980f408773e";

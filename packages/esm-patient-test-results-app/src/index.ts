@@ -25,10 +25,18 @@ function setupOpenMRS() {
       {
         id: "test-results-summary-widget",
         slot: "patient-chart-summary-dashboard-slot",
-        load: getAsyncLifecycle(() => import("./test.component"), options),
+        load: getAsyncLifecycle(
+          () => import("./overview/recent-overview.component"),
+          options
+        ),
         meta: {
-          columnSpan: 4,
+          columnSpan: 2,
         },
+      },
+      {
+        id: "test-results-dashboard-widget",
+        slot: dashboardMeta.slot,
+        load: getAsyncLifecycle(() => import("./desktopView"), options),
       },
       {
         id: "test-results-summary-dashboard",

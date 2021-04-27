@@ -1,5 +1,9 @@
 import { useCallback, useMemo } from "react";
-import { detach, extensionStore, useAssignedExtensionIds } from "@openmrs/esm-framework";
+import {
+  detach,
+  extensionStore,
+  useAssignedExtensionIds,
+} from "@openmrs/esm-framework";
 import { patientChartWorkspaceSlot } from "../constants";
 import { getTitle } from "../utils";
 
