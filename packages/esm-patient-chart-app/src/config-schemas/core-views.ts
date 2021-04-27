@@ -71,16 +71,4 @@ export const defaultDashboardDefinitions: Array<DashboardConfig> = [
     config: { columns: 1, type: "grid" },
     title: "Appointments",
   },
-  {
-    name: "attachments",
-    slot: "patient-chart-attachments-dashboard-slot",
-    config: { columns: 1, type: "grid" },
-    title: "Attachments",
-  },
-  {
-    name: "test-results",
-    slot: "patient-chart-test-results-dashboard-slot",
-    config: { columns: 1, type: "grid" },
-    title: "Test Results",
-  },
 ];
