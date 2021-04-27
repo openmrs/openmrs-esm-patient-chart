@@ -2,7 +2,6 @@ import React from "react";
 import { Overview } from "../overview/overview.component";
 import { Timeline } from "../timeline/timeline.component";
 import Trendline from "../trendline/trendline.component";
-import withDashboardRouting from "../withDashboardRouting";
 
 import { navigateToTimeline, navigateToTrendline } from "../helpers";
 
@@ -132,4 +131,4 @@ const DesktopView: React.FC<Record<string, any>> = ({
   );
 };
 
-export default withDashboardRouting(DesktopView);
+export default DesktopView;
