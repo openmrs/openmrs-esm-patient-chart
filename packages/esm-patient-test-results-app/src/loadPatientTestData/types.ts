@@ -1,3 +1,5 @@
+import { OBSERVATION_INTERPRETATION } from "./helpers";
+
 export type ConceptUuid = string;
 export type ObsUuid = string;
 
@@ -11,6 +13,7 @@ export interface ObsRecord {
 
 export interface ObsMetaInfo {
   [_: string]: any;
+  assessValue?: (value: number) => OBSERVATION_INTERPRETATION;
 }
 
 export interface ConceptRecord {

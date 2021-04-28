@@ -1,16 +1,5 @@
 import * as React from "react";
 import { AreaChart } from "@carbon/charts-react";
-// ScaleTypes
-import {
-  default as DataTable,
-  TableContainer,
-  Table,
-  TableHead,
-  TableRow,
-  TableHeader,
-  TableBody,
-  TableCell,
-} from "carbon-components-react/es/components/DataTable";
 import {
   ScaleTypes,
   AreaChartOptions,
@@ -22,12 +11,17 @@ import "@carbon/charts/styles.css";
 import usePatientResultsData from "../loadPatientTestData/usePatientResultsData";
 import styles from "./trendline.scss";
 import { ObsRecord } from "../loadPatientTestData/types";
-import { exist } from "../loadPatientTestData/helpers";
 import {
-  toOmrsDayDateFormat,
+  exist,
+  OBSERVATION_INTERPRETATION,
+} from "../loadPatientTestData/helpers";
+import {
+  toOmrsDateFormat,
   toOmrsTimeString24,
   toOmrsYearlessDateFormat,
 } from "@openmrs/esm-framework";
+import { CommonDataTable } from "../overview/common-overview";
+import { Tooltip } from "carbon-components-react";
 
 const useTrendlineData = ({
   patientUuid,
@@ -141,6 +135,7 @@ const Trendline: React.FC<{
     time: string;
     value: number;
     id: string;
+    interpretation?: OBSERVATION_INTERPRETATION;
   }> = [];
 
   let dataset = patientData[0];
@@ -167,6 +162,7 @@ const Trendline: React.FC<{
       time: toOmrsTimeString24(entry.effectiveDateTime),
       value: entry.value,
       id: entry.id,
+      interpretation: entry.meta.assessValue?.(entry.value),
     });
   });
 
@@ -204,6 +200,13 @@ const Trendline: React.FC<{
       legend: {
         enabled: false,
       },
+      tooltip: {
+        customHTML: ([{ date, value }]) =>
+          `<div class="bx--tooltip bx--tooltip--shown" style="min-width: max-content; font-weight:600">${value} ${leftAxisLabel}<br>
+          <span style="color: #c6c6c6; font-size: 0.75rem; font-weight:400">${toOmrsDateFormat(
+            date
+          )}</span></div>`,
+      },
     }),
     [leftAxisLabel]
   );
@@ -215,12 +218,12 @@ const Trendline: React.FC<{
         key: "date",
       },
       {
-        header: "Time",
-        key: "time",
-      },
-      {
         header: `Value (${leftAxisLabel})`,
         key: "value",
+      },
+      {
+        header: "Time",
+        key: "time",
       },
     ],
     [leftAxisLabel]
@@ -240,34 +243,7 @@ const Trendline: React.FC<{
 
 const DrawTable = React.memo<{ tableData; tableHeaderData }>(
   ({ tableData, tableHeaderData }) => {
-    return (
-      <DataTable rows={tableData} headers={tableHeaderData}>
-        {({ rows, headers, getHeaderProps, getTableProps }) => (
-          <TableContainer title="DataTable">
-            <Table {...getTableProps()}>
-              <TableHead>
-                <TableRow>
-                  {headers.map((header) => (
-                    <TableHeader {...getHeaderProps({ header })}>
-                      {header.header}
-                    </TableHeader>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row) => (
-                  <TableRow key={row.id}>
-                    {row.cells.map((cell) => (
-                      <TableCell key={cell.id}>{cell.value}</TableCell>
-                    ))}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
-      </DataTable>
-    );
+    return <CommonDataTable data={tableData} tableHeaders={tableHeaderData} />;
   }
 );
 
