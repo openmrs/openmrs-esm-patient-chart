@@ -7,34 +7,23 @@ import {
   attach,
   ExtensionSlot,
   useConfig,
-  useCurrentPatient
+  useCurrentPatient,
 } from "@openmrs/esm-framework";
 import styles from "./clinical-view-overview.component.scss";
 import { tail } from "lodash";
-import { extensionStore } from "@openmrs/esm-framework";
-
-interface ClinicalViewTab {
-  labelName: string;
-  slotName?: string;
-}
+import isEmpty from "lodash-es/isEmpty";
 
 const ClinicalViewOverview: React.FC = () => {
+  const config = useConfig();
   const { t } = useTranslation();
   const [, patient, patientUuid] = useCurrentPatient();
   const [selectedViewIndex, setSelectedViewIndex] = React.useState(0);
-  const [tabLabels, setTabLabels] = React.useState<Array<ClinicalViewTab>>([
-    { labelName: "All", slotName: "" },
-    { labelName: "Patient Info", slotName: "patient-header-slot" }
-  ]);
   const launchClinicalViewForm = React.useCallback(() => {
     attach(
       "patient-chart-workspace-slot",
       "patient-clinical-view-form-workspace"
     );
   }, []);
-
-  const config = useConfig();
-  console.log(config);
 
   const state = React.useMemo(() => {
     return { patient, patientUuid };
@@ -53,29 +42,34 @@ const ClinicalViewOverview: React.FC = () => {
         </Button>
       </div>
       <div>
-        <Tabs
-          scrollIntoView={false}
-          type="container"
-          className={styles.tabsContentClass}
-          tabContentClassName={styles.tabContentClassName}
-          onSelectionChange={event => setSelectedViewIndex(event)}
-        >
-          {tabLabels.map((tab, index) => (
-            <Tab key={index} id={tab.labelName} label={tab.labelName}>
-              {selectedViewIndex !== 0 ? (
-                <ExtensionSlot extensionSlotName={tab.slotName} state={state} />
-              ) : (
-                tail(tabLabels).map((tab, index) => (
+        {!isEmpty(state) && (
+          <Tabs
+            scrollIntoView={false}
+            type="container"
+            className={styles.tabsContentClass}
+            tabContentClassName={styles.tabContentClassName}
+            onSelectionChange={(event) => setSelectedViewIndex(event)}
+          >
+            {config.clinicalViews.map((tab, index) => (
+              <Tab key={index} id={tab.slot} label={tab.slot}>
+                {selectedViewIndex !== 0 ? (
                   <ExtensionSlot
-                    key={tab.labelName}
                     extensionSlotName={tab.slotName}
                     state={state}
                   />
-                ))
-              )}
-            </Tab>
-          ))}
-        </Tabs>
+                ) : (
+                  tail(config.clinicalViews).map((tab: any, index) => (
+                    <ExtensionSlot
+                      key={tab.slot}
+                      extensionSlotName={tab.slotName}
+                      state={state}
+                    />
+                  ))
+                )}
+              </Tab>
+            ))}
+          </Tabs>
+        )}
       </div>
     </div>
   );

@@ -1,13 +1,20 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Search from "carbon-components-react/es/components/Search";
 import Checkbox from "carbon-components-react/es/components/Checkbox";
 import Button from "carbon-components-react/es/components/Button";
 import styles from "./clinical-view-form.component.scss";
 import debounce from "lodash-es/debounce";
 import { useTranslation } from "react-i18next";
-import { useExtensionStore } from "@openmrs/esm-framework";
-import { isEmpty } from "lodash";
+import {
+  detach,
+  temporaryConfigStore,
+  TemporaryConfigStore,
+  useConfig,
+} from "@openmrs/esm-framework";
 import { useClinicalView } from "../store";
+import isEmpty from "lodash-es/isEmpty";
+import cloneDeep from "lodash-es/cloneDeep";
+import { set } from "lodash-es";
 
 interface ClinicalViewFormProps {}
 interface View {
@@ -16,10 +23,13 @@ interface View {
 }
 
 const ClinicalViewForm: React.FC<ClinicalViewFormProps> = ({}) => {
+  const moduleName = "@openmrs/esm-patient-clinical-view-app";
   const { t } = useTranslation();
+  const { clinicalViews } = useConfig();
   const [searchTerm, setSearchTerm] = React.useState<string>("");
-  const [views, setViews] = React.useState<Array<View>>(useClinicalView());
   const [searchResults, setSearchResult] = React.useState<Array<View>>([]);
+  const [views, setViews] = React.useState<Array<View>>(useClinicalView());
+  const [tempConfig, setTempConfig] = useState<TemporaryConfigStore>(null);
 
   React.useEffect(() => {
     !isEmpty(views) && setSearchResult(views);
@@ -39,7 +49,38 @@ const ClinicalViewForm: React.FC<ClinicalViewFormProps> = ({}) => {
     setSearchTerm(searchTerm);
   }, 300);
 
-  console.log(views);
+  const handleChange = (slot: string, slotName: string, checked: boolean) => {
+    checked ? addClinicalView(slot, slotName) : () => {};
+  };
+
+  const closeClinicalViewForm = () => {
+    detach(
+      "patient-chart-workspace-slot",
+      "patient-clinical-view-form-workspace"
+    );
+  };
+
+  const addClinicalView = (slot: string, slotName: string) => {
+    const path = [moduleName, "clinicalViews"];
+    const updateClinicalViews = [
+      ...clinicalViews,
+      { slot: slot, slotName: slotName },
+    ];
+    const tempConfigUpdate = set(
+      cloneDeep(temporaryConfigStore.getState()),
+      ["config", ...path],
+      updateClinicalViews
+    );
+    setTempConfig(tempConfigUpdate);
+  };
+
+  const handleSave = () => {
+    temporaryConfigStore.setState(tempConfig);
+    closeClinicalViewForm();
+  };
+
+  const isChecked = (slot: string): boolean =>
+    clinicalViews.some((view) => view.slotName === slot);
 
   return (
     <div className={styles.formContainer}>
@@ -56,12 +97,20 @@ const ClinicalViewForm: React.FC<ClinicalViewFormProps> = ({}) => {
             id={view.slot}
             labelText={view.slotName}
             className={styles.checkBox}
+            defaultChecked={isChecked(view.slot)}
+            onChange={(checked) =>
+              handleChange(view.slotName, view.slot, checked)
+            }
           />
         ))}
       </div>
       <div className={styles.buttonContainer}>
-        <Button kind="secondary">{t("cancel", "Cancel")}</Button>
-        <Button kind="primary">{t("saveAndClose", "Save & Close")}</Button>
+        <Button kind="secondary" onClick={closeClinicalViewForm}>
+          {t("cancel", "Cancel")}
+        </Button>
+        <Button onClick={handleSave} kind="primary">
+          {t("saveAndClose", "Save & Close")}
+        </Button>
       </div>
     </div>
   );

@@ -14,6 +14,8 @@
 }
 .checkboxContainer div {
   flex: none;
+  display: flex;
+  align-items: center;
 }
 .checkBox {
   height: $spacing-09;

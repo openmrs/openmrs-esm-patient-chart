@@ -9,7 +9,7 @@ export const configSchema = {
     },
     _default: [
       { slot: "All", slotName: "" },
-      { slot: "Patient Info", slotName: "patient-info-slot" },
+      { slot: "Patient Photo", slotName: "patient-photo-slot" },
     ],
   },
 };
