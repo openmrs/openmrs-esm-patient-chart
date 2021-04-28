@@ -1,7 +1,12 @@
-import { defineConfigSchema, getAsyncLifecycle } from "@openmrs/esm-framework";
+import {
+  defineConfigSchema,
+  getAsyncLifecycle,
+  getLifecycle,
+} from "@openmrs/esm-framework";
+import { createDashboardLink } from "@openmrs/esm-patient-common-lib";
 import { configSchema } from "./config-schema";
 import { backendDependencies } from "./openmrs-backend-dependencies";
-import dashboardMeta from "./dashboard/dashboard.meta";
+import { dashboardMeta } from "./dashboard.meta";
 
 const importTranslation = require.context(
   "../translations",
@@ -41,10 +46,7 @@ function setupOpenMRS() {
       {
         id: "test-results-summary-dashboard",
         slot: "patient-chart-dashboard-slot",
-        load: getAsyncLifecycle(
-          () => import("./dashboard/dashboard-link.component"),
-          options
-        ),
+        load: getLifecycle(createDashboardLink(dashboardMeta), options),
         meta: dashboardMeta,
       },
     ],

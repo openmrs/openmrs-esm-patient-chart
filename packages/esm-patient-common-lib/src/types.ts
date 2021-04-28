@@ -7,9 +7,12 @@ export interface DashboardTabConfig {
   type: "tabs";
 }
 
-export interface DashboardConfig {
+export interface DashboardLinkConfig {
   name: string;
-  slot: string;
   title: string;
+}
+
+export interface DashboardConfig extends DashboardLinkConfig {
+  slot: string;
   config: DashbardGridConfig | DashboardTabConfig;
 }

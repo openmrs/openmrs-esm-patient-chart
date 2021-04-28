@@ -16,16 +16,13 @@ const cssLoader = {
 };
 
 module.exports = (env, argv = {}) => ({
-  entry: [
-    resolve(__dirname, "src/set-public-path.ts"),
-    resolve(__dirname, "src/index.ts"),
-  ],
+  entry: [resolve(__dirname, "src/index.ts")],
   mode: argv.mode || "development",
   output: {
     filename: "openmrs-esm-patient-common-lib.js",
     libraryTarget: "system",
     path: resolve(__dirname, "dist"),
-    jsonpFunction: "webpackJsonp_openmrs_esm_patient_test_results_app",
+    jsonpFunction: "webpackJsonp_openmrs_esm_patient_common_lib",
   },
   module: {
     rules: [

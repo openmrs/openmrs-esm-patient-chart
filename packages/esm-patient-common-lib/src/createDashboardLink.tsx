@@ -1,8 +1,8 @@
 import React from "react";
 import { ConfigurableLink } from "@openmrs/esm-framework";
-import { DashboardConfig } from "./types";
+import { DashboardLinkConfig } from "./types";
 
-export const createDashboardLink = (db: DashboardConfig) => {
+export const createDashboardLink = (db: DashboardLinkConfig) => {
   const DashboardLink: React.FC<{ basePath: string }> = ({ basePath }) => {
     return (
       <div key={db.name}>

@@ -62,7 +62,10 @@ function setupOpenMRS() {
           options
         ),
         meta: {
-          title: "Record Vitals and Biometrics", //t("recordVitalsAndBiometrics", "Record Vitals and Biometrics")
+          title: {
+            key: "recordVitalsAndBiometrics",
+            default: "Record Vitals and Biometrics",
+          },
         },
       },
     ],
