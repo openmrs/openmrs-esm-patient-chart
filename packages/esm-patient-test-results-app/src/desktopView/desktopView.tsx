@@ -92,11 +92,13 @@ const DesktopView: React.FC<Record<string, any>> = ({
   return (
     <Grid>
       <OverflowBorder>
-        <Overview
-          patientUuid={patientUuid}
-          openTimeline={openTimeline}
-          openTrendline={openTrendline}
-        ></Overview>
+        <div style={{ display: "grid", gap: "1.5rem" }}>
+          <Overview
+            patientUuid={patientUuid}
+            openTimeline={openTimeline}
+            openTrendline={openTrendline}
+          ></Overview>
+        </div>
       </OverflowBorder>
       <OverflowBorder>
         {(() => {

@@ -30,26 +30,28 @@ const RecentOverview: React.FC<RecentOverviewProps> = ({
 
   return (
     <RecentResultsGrid>
-      <div className={styles["recent-overview-header-container"]}>
-        <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>
-          Recent Results ({Math.min(RECENT_COUNT, overviewData.length)})
-        </h4>
-        <Button kind="ghost" onClick={() => navigateToResults(basePath)}>
-          All results
-        </Button>
-      </div>
       {loaded ? (
-        <CommonOverview
-          {...{
-            patientUuid,
-            overviewData: overviewData.slice(0, RECENT_COUNT),
-            insertSeperator: true,
-            openTimeline: (panelUuid) =>
-              navigateToTimeline(basePath, panelUuid),
-            openTrendline: (panelUuid, testUuid) =>
-              navigateToTrendline(basePath, panelUuid, testUuid),
-          }}
-        />
+        <>
+          <div className={styles["recent-overview-header-container"]}>
+            <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>
+              Recent Results ({Math.min(RECENT_COUNT, overviewData.length)})
+            </h4>
+            <Button kind="ghost" onClick={() => navigateToResults(basePath)}>
+              All results
+            </Button>
+          </div>
+          <CommonOverview
+            {...{
+              patientUuid,
+              overviewData: overviewData.slice(0, RECENT_COUNT),
+              insertSeperator: true,
+              openTimeline: (panelUuid) =>
+                navigateToTimeline(basePath, panelUuid),
+              openTrendline: (panelUuid, testUuid) =>
+                navigateToTrendline(basePath, panelUuid, testUuid),
+            }}
+          />
+        </>
       ) : (
         <Card>
           <DataTableSkeleton columnCount={3} />
