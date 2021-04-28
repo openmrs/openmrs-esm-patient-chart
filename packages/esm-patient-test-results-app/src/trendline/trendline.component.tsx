@@ -1,16 +1,5 @@
 import * as React from "react";
 import { AreaChart } from "@carbon/charts-react";
-// ScaleTypes
-import {
-  default as DataTable,
-  TableContainer,
-  Table,
-  TableHead,
-  TableRow,
-  TableHeader,
-  TableBody,
-  TableCell,
-} from "carbon-components-react/es/components/DataTable";
 import {
   ScaleTypes,
   AreaChartOptions,
@@ -27,11 +16,12 @@ import {
   OBSERVATION_INTERPRETATION,
 } from "../loadPatientTestData/helpers";
 import {
-  toOmrsDayDateFormat,
+  toOmrsDateFormat,
   toOmrsTimeString24,
   toOmrsYearlessDateFormat,
 } from "@openmrs/esm-framework";
 import { CommonDataTable } from "../overview/common-overview";
+import { Tooltip } from "carbon-components-react";
 
 const useTrendlineData = ({
   patientUuid,
@@ -209,6 +199,13 @@ const Trendline: React.FC<{
       },
       legend: {
         enabled: false,
+      },
+      tooltip: {
+        customHTML: ([{ date, value }]) =>
+          `<div class="bx--tooltip bx--tooltip--shown" style="min-width: max-content; font-weight:600">${value} ${leftAxisLabel}<br>
+          <span style="color: #c6c6c6; font-size: 0.75rem; font-weight:400">${toOmrsDateFormat(
+            date
+          )}</span></div>`,
       },
     }),
     [leftAxisLabel]
