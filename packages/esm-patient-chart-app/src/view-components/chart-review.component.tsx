@@ -2,8 +2,8 @@ import React from "react";
 import GridView from "./grid-view.component";
 import TabbedView from "./tabbed-view.component";
 import { Redirect } from "react-router-dom";
-import { useConfig, useExtensionSlotMeta } from "@openmrs/esm-framework";
-import { ChartConfig, DashboardConfig } from "../config-schemas";
+import { useExtensionSlotMeta } from "@openmrs/esm-framework";
+import { DashboardConfig } from "../config-schemas";
 import { basePath } from "../constants";
 
 function makePath(
@@ -36,46 +36,44 @@ const ChartReview: React.FC<ChartReviewProps> = ({
   view,
   subview,
 }) => {
-  const config = useConfig() as ChartConfig;
   const meta = useExtensionSlotMeta("patient-chart-dashboard-slot");
-  const [dashboard] = [
-    ...config.dashboardDefinitions,
-    ...(Object.values(meta) as Array<DashboardConfig>),
-  ]
-    .filter((dashboard) => dashboard.name === view)
-    .map((dashboard) =>
-      dashboard.config.type === "grid" ? (
-        <GridView
-          slot={dashboard.slot}
-          layout={dashboard.config}
-          name={dashboard.name}
-          patient={patient}
-          patientUuid={patientUuid}
-        />
-      ) : (
-        <TabbedView
-          slot={dashboard.slot}
-          layout={dashboard.config}
-          name={dashboard.name}
-          patientUuid={patientUuid}
-          patient={patient}
-          tab={subview}
-        />
-      )
-    );
+  const dashboards = Object.values(meta) as Array<DashboardConfig>;
+  const defaultDashboard = dashboards[0];
+  const dashboard = dashboards.find((dashboard) => dashboard.name === view);
 
-  if (!dashboard) {
+  if (!defaultDashboard) {
+    return null;
+  } else if (!dashboard) {
     return (
       <Redirect
-        to={makePath(config.dashboardDefinitions[0], {
+        to={makePath(defaultDashboard, {
           patientUuid,
           subview: "",
         })}
       />
     );
+  } else if (dashboard.config.type === "grid") {
+    return (
+      <GridView
+        slot={dashboard.slot}
+        layout={dashboard.config}
+        name={dashboard.name}
+        patient={patient}
+        patientUuid={patientUuid}
+      />
+    );
+  } else {
+    return (
+      <TabbedView
+        slot={dashboard.slot}
+        layout={dashboard.config}
+        name={dashboard.name}
+        patientUuid={patientUuid}
+        patient={patient}
+        tab={subview}
+      />
+    );
   }
-
-  return dashboard;
 };
 
 export default ChartReview;

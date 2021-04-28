@@ -1,7 +1,7 @@
 import {
   defineConfigSchema,
   getAsyncLifecycle,
-  getLifecycle,
+  getSyncLifecycle,
 } from "@openmrs/esm-framework";
 import { createDashboardLink } from "@openmrs/esm-patient-common-lib";
 import { backendDependencies } from "./openmrs-backend-dependencies";
@@ -51,7 +51,7 @@ function setupOpenMRS() {
       {
         id: "appointments-summary-dashboard",
         slot: "patient-chart-dashboard-slot",
-        load: getLifecycle(createDashboardLink(dashboardMeta), options),
+        load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
         meta: dashboardMeta,
       },
     ],

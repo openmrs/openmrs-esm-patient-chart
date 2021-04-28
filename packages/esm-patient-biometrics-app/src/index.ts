@@ -1,5 +1,11 @@
-import { defineConfigSchema, getAsyncLifecycle } from "@openmrs/esm-framework";
+import {
+  defineConfigSchema,
+  getAsyncLifecycle,
+  getSyncLifecycle,
+} from "@openmrs/esm-framework";
+import { createDashboardLink } from "@openmrs/esm-patient-common-lib";
 import { configSchema } from "./config-schema";
+import { dashboardMeta } from "./dashboard.meta";
 import { backendDependencies } from "./openmrs-backend-dependencies";
 
 const importTranslation = require.context(
@@ -33,8 +39,14 @@ function setupOpenMRS() {
         },
       },
       {
+        id: "results-summary-dashboard",
+        slot: "patient-chart-dashboard-slot",
+        load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
+        meta: dashboardMeta,
+      },
+      {
         id: "biometrics-details-widget",
-        slot: "patient-chart-results-dashboard-slot",
+        slot: dashboardMeta.slot,
         load: getAsyncLifecycle(
           () => import("./biometrics/biometrics-overview.component"),
           options

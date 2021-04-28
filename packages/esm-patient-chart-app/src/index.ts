@@ -3,7 +3,9 @@ import {
   registerBreadcrumbs,
   defineConfigSchema,
   getAsyncLifecycle,
+  getSyncLifecycle,
 } from "@openmrs/esm-framework";
+import { createDashboardLink } from "@openmrs/esm-patient-common-lib";
 import { esmPatientChartSchema } from "./config-schemas/openmrs-esm-patient-chart-schema";
 import { moduleName, spaBasePath } from "./constants";
 import { backendDependencies } from "./openmrs-backend-dependencies";
@@ -14,6 +16,13 @@ const importTranslation = require.context(
   /.json$/,
   "lazy"
 );
+
+const dashboardMeta = {
+  name: "summary",
+  slot: "patient-chart-summary-dashboard-slot",
+  config: { columns: 4, type: "grid" },
+  title: "Summary",
+};
 
 function setupOpenMRS() {
   defineConfigSchema(moduleName, esmPatientChartSchema);
@@ -42,6 +51,15 @@ function setupOpenMRS() {
       },
     ],
     extensions: [
+      {
+        id: "charts-summary-dashboard",
+        slot: "patient-chart-dashboard-slot",
+        load: getSyncLifecycle(createDashboardLink(dashboardMeta), {
+          featureName: "summary-dashboard",
+          moduleName,
+        }),
+        meta: dashboardMeta,
+      },
       {
         id: "patient-chart-nav-items",
         load: getAsyncLifecycle(() => import("./ui-components/nav.component"), {

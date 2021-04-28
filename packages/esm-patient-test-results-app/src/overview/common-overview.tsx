@@ -13,9 +13,8 @@ import TableCell from "carbon-components-react/lib/components/DataTable/TableCel
 import TableBody from "carbon-components-react/lib/components/DataTable/TableBody";
 import TableToolbarContent from "carbon-components-react/lib/components/DataTable/TableToolbarContent";
 import TableToolbar from "carbon-components-react/lib/components/DataTable/TableToolbar";
-import { switchTo, useCurrentPatient } from "@openmrs/esm-framework";
+import { OverviewPanelEntry } from "./useOverviewData";
 import {
-  Main,
   Card,
   headers,
   formatDate,
@@ -23,7 +22,6 @@ import {
   Separator,
   TypedTableRow,
 } from "./helpers";
-import { OverviewPanelEntry } from "./useOverviewData";
 
 const testPatient = "8673ee4f-e2ab-4077-ba55-4980f408773e";
 
@@ -46,7 +44,7 @@ const CommonOverview: React.FC<CommonOverviewProps> = ({
     <>
       {(() => {
         const cards = overviewData.map(([title, type, data, date, uuid]) => (
-          <Card>
+          <Card key={uuid}>
             <DataTable rows={data} headers={headers}>
               {({
                 rows,
@@ -128,7 +126,11 @@ const CommonOverview: React.FC<CommonOverviewProps> = ({
         if (insertSeperator)
           return cards.reduce((acc, val, i, { length }) => {
             acc.push(val);
-            if (i < length - 1) acc.push(<Separator />);
+
+            if (i < length - 1) {
+              acc.push(<Separator key={i} />);
+            }
+
             return acc;
           }, []);
 

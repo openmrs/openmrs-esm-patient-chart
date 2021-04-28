@@ -9,6 +9,7 @@ import isEmpty from "lodash-es/isEmpty";
 import { useTranslation } from "react-i18next";
 import { attach } from "@openmrs/esm-framework";
 import { PatientVitals } from "../vitals-biometrics.resource";
+import { patientVitalsBiometricsFormWorkspace } from "../../constants";
 
 interface VitalsHeaderStateTitleProps {
   view: string;
@@ -27,7 +28,7 @@ const VitalsHeaderStateTitle: React.FC<VitalsHeaderStateTitleProps> = ({
   const launchVitalsBiometricsForm = React.useCallback(() => {
     attach(
       "patient-chart-workspace-slot",
-      "patient-vitals-biometrics-form-workspace"
+      patientVitalsBiometricsFormWorkspace
     );
   }, []);
 

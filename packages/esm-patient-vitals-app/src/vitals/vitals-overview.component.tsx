@@ -25,6 +25,7 @@ import {
   performPatientsVitalsSearch,
   PatientVitals,
 } from "./vitals-biometrics.resource";
+import { patientVitalsBiometricsFormWorkspace } from "../constants";
 
 const vitalsToShowCount = 5;
 
@@ -76,7 +77,7 @@ const RenderVitals: React.FC<RenderVitalsProps> = ({
     () =>
       attach(
         "patient-chart-workspace-slot",
-        "patient-vitals-biometrics-form-workspace"
+        patientVitalsBiometricsFormWorkspace
       ),
     []
   );

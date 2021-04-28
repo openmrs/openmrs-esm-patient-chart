@@ -1,7 +1,7 @@
 import {
   defineConfigSchema,
   getAsyncLifecycle,
-  getLifecycle,
+  getSyncLifecycle,
 } from "@openmrs/esm-framework";
 import { createDashboardLink } from "@openmrs/esm-patient-common-lib";
 import { backendDependencies } from "./openmrs-backend-dependencies";
@@ -15,10 +15,10 @@ const importTranslation = require.context(
 );
 
 function setupOpenMRS() {
-  const moduleName = "@openmrs/esm-patient-vitals-app";
+  const moduleName = "@openmrs/esm-patient-conditions-app";
 
   const options = {
-    featureName: "patient-vitals",
+    featureName: "patient-conditions",
     moduleName,
   };
 
@@ -51,7 +51,7 @@ function setupOpenMRS() {
       {
         id: "conditions-summary-dashboard",
         slot: "patient-chart-dashboard-slot",
-        load: getLifecycle(createDashboardLink(dashboardMeta), options),
+        load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
         meta: dashboardMeta,
       },
     ],

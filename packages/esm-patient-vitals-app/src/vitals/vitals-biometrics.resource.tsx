@@ -24,6 +24,28 @@ export interface PatientVitals {
   respiratoryRate?: string;
 }
 
+interface VitalsFetchResponse {
+  entry: Array<FHIRResource>;
+  id: string;
+  resourceType: string;
+  total: number;
+  type: string;
+}
+
+interface ObsRecord {
+  concept: string;
+  value: string | number;
+}
+
+function filterByConceptUuid(
+  vitals: Array<FHIRResource["resource"]>,
+  conceptUuid: string
+) {
+  return vitals.filter((obs) =>
+    obs.code.coding.some((c) => c.code === conceptUuid)
+  );
+}
+
 export function performPatientsVitalsSearch(
   concepts: ConfigObject["concepts"],
   patientID: string,
@@ -39,12 +61,6 @@ export function performPatientsVitalsSearch(
     weight: concepts.weightUuid,
     respiratoryRate: concepts.respiratoryRateUuid,
   };
-
-  function filterByConceptUuid(vitals, conceptUuid) {
-    return vitals.filter((obs) =>
-      obs.code.coding.some((c) => c.code === conceptUuid)
-    );
-  }
 
   return openmrsObservableFetch<VitalsFetchResponse>(
     `${fhirBaseUrl}/Observation?subject:Patient=${patientID}&code=` +
@@ -217,17 +233,4 @@ export function getSession(abortController: AbortController) {
   return openmrsFetch(`/ws/rest/v1/appui/session`, {
     signal: abortController.signal,
   });
-}
-
-interface VitalsFetchResponse {
-  entry: Array<FHIRResource>;
-  id: string;
-  resourceType: string;
-  total: number;
-  type: string;
-}
-
-interface ObsRecord {
-  concept: string;
-  value: string | number;
 }

@@ -23,6 +23,7 @@ import { attach, useConfig } from "@openmrs/esm-framework";
 import { getPatientBiometrics } from "./biometric.resource";
 import { useVitalsSignsConceptMetaData } from "./use-vitalsigns";
 import { ConfigObject } from "../config-schema";
+import { patientVitalsBiometricsFormWorkspace } from "../constants";
 
 const biometricsToShowCount = 5;
 
@@ -59,7 +60,7 @@ const RenderBiometrics: React.FC<RenderBiometricsProps> = ({
   const launchBiometricsForm = React.useCallback(() => {
     attach(
       "patient-chart-workspace-slot",
-      "patient-vitals-biometrics-form-workspace"
+      patientVitalsBiometricsFormWorkspace
     );
   }, []);
 
