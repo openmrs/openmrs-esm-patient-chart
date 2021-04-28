@@ -3,31 +3,35 @@ import Button from "carbon-components-react/es/components/Button";
 import Tab from "carbon-components-react/es/components/Tab";
 import Tabs from "carbon-components-react/es/components/Tabs";
 import { useTranslation } from "react-i18next";
-import {
-  attach,
-  ExtensionSlot,
-  useConfig,
-  useCurrentPatient,
-} from "@openmrs/esm-framework";
+import { attach, ExtensionSlot, useConfig } from "@openmrs/esm-framework";
+import tail from "lodash-es/tail";
+import EmptyDataIllustration from "../empty-state/empty-data-illustration.component";
 import styles from "./clinical-view-overview.component.scss";
-import { tail } from "lodash";
-import isEmpty from "lodash-es/isEmpty";
 
-const ClinicalViewOverview: React.FC = () => {
+interface ClinicalViewOverviewProps {
+  patientUuid: string;
+  patient: fhir.Patient;
+}
+
+const ClinicalViewOverview: React.FC<ClinicalViewOverviewProps> = ({
+  patientUuid,
+  patient,
+}) => {
   const config = useConfig();
   const { t } = useTranslation();
-  const [, patient, patientUuid] = useCurrentPatient();
   const [selectedViewIndex, setSelectedViewIndex] = React.useState(0);
+
+  const state = React.useMemo(() => {
+    return { patient, patientUuid };
+  }, [patient, patientUuid]);
+
   const launchClinicalViewForm = React.useCallback(() => {
     attach(
       "patient-chart-workspace-slot",
       "patient-clinical-view-form-workspace"
     );
+    setSelectedViewIndex(0);
   }, []);
-
-  const state = React.useMemo(() => {
-    return { patient, patientUuid };
-  }, [patient, patientUuid]);
 
   return (
     <div className={styles.clinicalViewContainer}>
@@ -42,34 +46,53 @@ const ClinicalViewOverview: React.FC = () => {
         </Button>
       </div>
       <div>
-        {!isEmpty(state) && (
-          <Tabs
-            scrollIntoView={false}
-            type="container"
-            className={styles.tabsContentClass}
-            tabContentClassName={styles.tabContentClassName}
-            onSelectionChange={(event) => setSelectedViewIndex(event)}
-          >
-            {config.clinicalViews.map((tab, index) => (
-              <Tab key={index} id={tab.slot} label={tab.slot}>
-                {selectedViewIndex !== 0 ? (
-                  <ExtensionSlot
-                    extensionSlotName={tab.slotName}
-                    state={state}
-                  />
-                ) : (
-                  tail(config.clinicalViews).map((tab: any, index) => (
-                    <ExtensionSlot
-                      key={tab.slot}
-                      extensionSlotName={tab.slotName}
-                      state={state}
-                    />
-                  ))
-                )}
-              </Tab>
-            ))}
-          </Tabs>
-        )}
+        <Tabs
+          scrollIntoView={false}
+          type="container"
+          className={styles.tabsContentClass}
+          tabContentClassName={styles.tabContentClassName}
+          onSelectionChange={(event) => setSelectedViewIndex(event)}
+        >
+          {config.clinicalViews.map((tab, index) => (
+            <Tab key={index} id={tab.slot} label={tab.slot}>
+              {selectedViewIndex !== 0 ? (
+                <ExtensionSlot extensionSlotName={tab.slotName} state={state} />
+              ) : (
+                <>
+                  {config?.clinicalViews.length > 1 ? (
+                    tail(config.clinicalViews).map((tab: any, index) => (
+                      <ExtensionSlot
+                        key={tab.slot}
+                        extensionSlotName={tab.slotName}
+                        state={state}
+                      />
+                    ))
+                  ) : (
+                    <div className={styles.emptyIllustrationContainer}>
+                      <EmptyDataIllustration />
+                      <p className={styles.content}>
+                        {t(
+                          "noClinicalViewsConfigured",
+                          "Sorry, no clinical views configured"
+                        )}
+                      </p>
+                      <Button
+                        onClick={launchClinicalViewForm}
+                        kind={"ghost"}
+                        className={styles.action}
+                      >
+                        {t(
+                          "clinicalViewConfigure",
+                          "Try Adding clinical views by clicking here"
+                        )}
+                      </Button>
+                    </div>
+                  )}
+                </>
+              )}
+            </Tab>
+          ))}
+        </Tabs>
       </div>
     </div>
   );

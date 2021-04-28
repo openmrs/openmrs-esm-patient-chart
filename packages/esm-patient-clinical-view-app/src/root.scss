@@ -1,16 +1,6 @@
 @import "~carbon-components/scss/globals/scss/vendor/@carbon/elements/scss/type/styles";
 @import "~carbon-components/src/globals/scss/vendor/@carbon/layout/scss/generated/spacing";
 
-$ui-01: #f4f4f4;
-$ui-02: #ffffff;
-$ui-03:  #ededed;
-$ui-05: #161616;
-$carbon--red-50: #fa4d56;
-$support-02: #24a148;
-$interactive-01: #0f62fe;
-$text-02: #525252;
-$danger: #da1e28;
-
 .productiveHeading01 {
   @include carbon--type-style("productive-heading-01");
 }
