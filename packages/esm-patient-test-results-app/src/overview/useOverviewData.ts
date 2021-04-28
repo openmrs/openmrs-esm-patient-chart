@@ -3,7 +3,7 @@ import { OBSERVATION_INTERPRETATION } from "../loadPatientTestData/helpers";
 
 import usePatientResultsData from "../loadPatientTestData/usePatientResultsData";
 
-interface OverviewPanelData {
+export interface OverviewPanelData {
   id: string;
   key?: string;
   name: string;

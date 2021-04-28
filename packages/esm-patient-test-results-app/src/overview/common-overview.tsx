@@ -13,7 +13,6 @@ import TableCell from "carbon-components-react/lib/components/DataTable/TableCel
 import TableBody from "carbon-components-react/lib/components/DataTable/TableBody";
 import TableToolbarContent from "carbon-components-react/lib/components/DataTable/TableToolbarContent";
 import TableToolbar from "carbon-components-react/lib/components/DataTable/TableToolbar";
-import { OverviewPanelEntry } from "./useOverviewData";
 import {
   Card,
   headers,
@@ -22,12 +21,73 @@ import {
   Separator,
   TypedTableRow,
 } from "./helpers";
+import { OverviewPanelEntry, OverviewPanelData } from "./useOverviewData";
 
-const testPatient = "8673ee4f-e2ab-4077-ba55-4980f408773e";
+export const CommonDataTable: React.FC<{
+  data: Array<OverviewPanelData>;
+  tableHeaders: Array<{
+    key: string;
+    header: string;
+  }>;
+  title?: string;
+  toolbar?: React.ReactNode;
+  description?: React.ReactNode;
+}> = ({ title, data, description, toolbar, tableHeaders }) => (
+  <DataTable rows={data} headers={tableHeaders}>
+    {({
+      rows,
+      headers,
+      getHeaderProps,
+      getRowProps,
+      getTableProps,
+      getTableContainerProps,
+    }) => (
+      <TableContainer
+        title={title}
+        description={description}
+        {...getTableContainerProps()}
+      >
+        {toolbar}
+        <Table {...getTableProps()} isSortable>
+          <colgroup>
+            <col span={1} style={{ width: "33%" }} />
+            <col span={1} style={{ width: "33%" }} />
+            <col span={1} style={{ width: "34%" }} />
+          </colgroup>
+          <TableHead>
+            <TableRow>
+              {headers.map((header) => (
+                <TableHeader
+                  key={header.key}
+                  {...getHeaderProps({ header })}
+                  isSortable
+                >
+                  {header.header}
+                </TableHeader>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {rows.map((row, i) => (
+              <TypedTableRow
+                key={row.id}
+                interpretation={data[i].interpretation}
+                {...getRowProps({ row })}
+              >
+                {row.cells.map((cell) => (
+                  <TableCell key={cell.id}>{cell.value}</TableCell>
+                ))}
+              </TypedTableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    )}
+  </DataTable>
+);
 
 interface CommonOverviewProps {
   overviewData: Array<OverviewPanelEntry>;
-  patientUuid: string;
   insertSeperator?: boolean;
   openTimeline: (panelUuid: string) => void;
   openTrendline: (panelUuid: string, testUuid: string) => void;
@@ -35,7 +95,6 @@ interface CommonOverviewProps {
 
 const CommonOverview: React.FC<CommonOverviewProps> = ({
   overviewData = [],
-  patientUuid,
   insertSeperator = false,
   openTimeline,
   openTrendline,
@@ -45,25 +104,18 @@ const CommonOverview: React.FC<CommonOverviewProps> = ({
       {(() => {
         const cards = overviewData.map(([title, type, data, date, uuid]) => (
           <Card key={uuid}>
-            <DataTable rows={data} headers={headers}>
-              {({
-                rows,
-                headers,
-                getHeaderProps,
-                getRowProps,
-                getTableProps,
-                getTableContainerProps,
-              }) => (
-                <TableContainer
-                  title={title}
-                  description={
-                    <div>
-                      {formatDate(date)}
-                      <InfoButton />
-                    </div>
-                  }
-                  {...getTableContainerProps()}
-                >
+            <CommonDataTable
+              {...{
+                title,
+                data,
+                tableHeaders: headers,
+                description: (
+                  <div>
+                    {formatDate(date)}
+                    <InfoButton />
+                  </div>
+                ),
+                toolbar: (
                   <TableToolbar>
                     <TableToolbarContent>
                       {type === "Test" && (
@@ -84,42 +136,9 @@ const CommonOverview: React.FC<CommonOverviewProps> = ({
                       </Button>
                     </TableToolbarContent>
                   </TableToolbar>
-                  <Table {...getTableProps()} isSortable>
-                    <colgroup>
-                      <col span={1} style={{ width: "33%" }} />
-                      <col span={1} style={{ width: "33%" }} />
-                      <col span={1} style={{ width: "34%" }} />
-                    </colgroup>
-                    <TableHead>
-                      <TableRow>
-                        {headers.map((header) => (
-                          <TableHeader
-                            key={header.key}
-                            {...getHeaderProps({ header })}
-                            isSortable
-                          >
-                            {header.header}
-                          </TableHeader>
-                        ))}
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {rows.map((row, i) => (
-                        <TypedTableRow
-                          key={row.id}
-                          interpretation={data[i].interpretation}
-                          {...getRowProps({ row })}
-                        >
-                          {row.cells.map((cell) => (
-                            <TableCell key={cell.id}>{cell.value}</TableCell>
-                          ))}
-                        </TypedTableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              )}
-            </DataTable>
+                ),
+              }}
+            />
           </Card>
         ));
 

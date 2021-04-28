@@ -33,7 +33,6 @@ export const Overview: React.FC<LabResultProps & LabResultParams> = ({
       {loaded ? (
         <CommonOverview
           overviewData={overviewData}
-          patientUuid={patientUuid}
           openTimeline={openTimeline}
           openTrendline={openTrendline}
         />
