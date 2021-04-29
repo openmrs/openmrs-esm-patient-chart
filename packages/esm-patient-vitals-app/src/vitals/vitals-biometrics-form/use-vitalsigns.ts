@@ -19,6 +19,7 @@ export function useVitalsSignsConceptMetaData() {
     setVitalsSignsConceptMetadata,
   ] = React.useState<Array<ConceptMetaData>>([]);
   const customRepresentation = `?q=VITALS SIGNS&v=custom:(setMembers:(uuid,display,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units))`;
+
   useEffect(() => {
     const ac = new AbortController();
     if (vitalsSignsConceptMetadata) {
@@ -39,3 +40,7 @@ export function useVitalsSignsConceptMetaData() {
 
   return { vitalsSignsConceptMetadata, conceptsUnits };
 }
+
+export const withUnit = (label: string, unit: string | null | undefined) => {
+  return `${label} ${unit ? `(${unit})` : ""}`;
+};
