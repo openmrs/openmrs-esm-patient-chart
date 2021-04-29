@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, SyntheticEvent } from "react";
 import styles from "./appointments-form.css";
-import SummaryCard from "../cards/summary-card.component";
+import { SummaryCard } from "@openmrs/esm-patient-common-lib";
 import { createErrorHandler } from "@openmrs/esm-framework";
 import {
   getSession,

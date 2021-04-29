@@ -13,10 +13,9 @@ import DataTable, {
   TableRow,
 } from "carbon-components-react/es/components/DataTable";
 import Add16 from "@carbon/icons-react/es/add/16";
-import EmptyState from "./empty-state/empty-state.component";
-import ErrorState from "./error-state/error-state.component";
 import ConditionsForm from "./conditions-form.component";
 import styles from "./conditions-overview.scss";
+import { EmptyState, ErrorState } from "@openmrs/esm-patient-common-lib";
 import { useTranslation } from "react-i18next";
 import {
   Condition,

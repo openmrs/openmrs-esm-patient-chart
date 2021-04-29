@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
-import SummaryCard from "../cards/summary-card.component";
 import AppointmentsForm from "./appointments-form.component";
 import dayjs from "dayjs";
-import VerticalLabelValue from "../cards/vertical-label-value.component";
 import styles from "./appointment-record.css";
-import RecordDetails from "../cards/record-details-card.component";
+import {
+  VerticalLabelValue,
+  SummaryCard,
+  RecordDetails,
+} from "@openmrs/esm-patient-common-lib";
 import { createErrorHandler } from "@openmrs/esm-framework";
 import { RouteComponentProps } from "react-router-dom";
 import { useTranslation, Trans } from "react-i18next";

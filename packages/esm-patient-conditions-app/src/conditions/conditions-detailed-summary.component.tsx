@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import capitalize from "lodash-es/capitalize";
-import EmptyState from "./empty-state/empty-state.component";
 import ConditionsForm from "./conditions-form.component";
 import styles from "./conditions-detailed-summary.css";
-import SummaryCard from "../cards/summary-card.component";
+import { EmptyState, SummaryCard } from "@openmrs/esm-patient-common-lib";
 import { Link } from "react-router-dom";
 import { useTranslation, Trans } from "react-i18next";
 import { createErrorHandler } from "@openmrs/esm-framework";

@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import ProgramsForm from "./programs-form.component";
-import EmptyState from "./empty-state/empty-state.component";
-import SummaryCard from "../cards/summary-card.component";
 import styles from "./programs-detailed-summary.css";
+import { EmptyState, SummaryCard } from "@openmrs/esm-patient-common-lib";
 import { useTranslation, Trans } from "react-i18next";
 import { RouteComponentProps, Link } from "react-router-dom";
 import { createErrorHandler } from "@openmrs/esm-framework";

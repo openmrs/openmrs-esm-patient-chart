@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef, SyntheticEvent } from "react";
 import dayjs from "dayjs";
 import capitalize from "lodash-es/capitalize";
-import SummaryCard from "../cards/summary-card.component";
-import { useHistory, match } from "react-router-dom";
+import { SummaryCard } from "@openmrs/esm-patient-common-lib";
+import { useHistory } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   getAllergyAllergenByConceptUuid,

@@ -4,8 +4,6 @@ import ImmunizationsForm from "./immunizations-form.component";
 import Add16 from "@carbon/icons-react/es/add/16";
 import Button from "carbon-components-react/es/components/Button";
 import DataTableSkeleton from "carbon-components-react/es/components/DataTableSkeleton";
-import EmptyState from "./empty-state/empty-state.component";
-import ErrorState from "./error-state/error-state.component";
 import styles from "./immunizations-overview.scss";
 import DataTable, {
   Table,
@@ -16,6 +14,7 @@ import DataTable, {
   TableHeader,
   TableRow,
 } from "carbon-components-react/es/components/DataTable";
+import { EmptyState, ErrorState } from "@openmrs/esm-patient-common-lib";
 import { useTranslation } from "react-i18next";
 import { mapFromFHIRImmunizationBundle } from "./immunization-mapper";
 import { performPatientImmunizationsSearch } from "./immunizations.resource";

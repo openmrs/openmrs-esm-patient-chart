@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import dayjs from "dayjs";
-import SummaryCard from "../cards/summary-card.component";
 import styles from "./conditions-form.css";
+import { SummaryCard } from "@openmrs/esm-patient-common-lib";
 import { useHistory } from "react-router-dom";
 import { useTranslation, Trans } from "react-i18next";
 import { createErrorHandler } from "@openmrs/esm-framework";

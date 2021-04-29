@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import dayjs from "dayjs";
-import SummaryCard from "../cards/summary-card.component";
-import RecordDetails from "../cards/record-details-card.component";
 import AllergyForm from "./allergy-form.component";
 import styles from "./allergy-record.css";
+import { SummaryCard, RecordDetails } from "@openmrs/esm-patient-common-lib";
 import { RouteComponentProps } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { createErrorHandler } from "@openmrs/esm-framework";

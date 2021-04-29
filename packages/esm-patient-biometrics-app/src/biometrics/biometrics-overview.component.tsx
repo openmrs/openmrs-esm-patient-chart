@@ -3,10 +3,7 @@ import dayjs from "dayjs";
 import Add16 from "@carbon/icons-react/es/add/16";
 import ChartLineSmooth16 from "@carbon/icons-react/es/chart--line-smooth/16";
 import Table16 from "@carbon/icons-react/es/table/16";
-import EmptyState from "./empty-state/empty-state.component";
-import ErrorState from "./error-state/error-state.component";
 import styles from "./biometrics-overview.scss";
-import BiometricsChart from "./biometrics-chart.component";
 import Button from "carbon-components-react/es/components/Button";
 import DataTableSkeleton from "carbon-components-react/es/components/DataTableSkeleton";
 import DataTable, {
@@ -18,7 +15,9 @@ import DataTable, {
   TableHeader,
   TableRow,
 } from "carbon-components-react/es/components/DataTable";
+import BiometricsChart from "./biometrics-chart.component";
 import { useTranslation } from "react-i18next";
+import { EmptyState, ErrorState } from "@openmrs/esm-patient-common-lib";
 import { attach, useConfig } from "@openmrs/esm-framework";
 import { getPatientBiometrics } from "./biometric.resource";
 import { useVitalsSignsConceptMetaData } from "./use-vitalsigns";

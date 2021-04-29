@@ -16,8 +16,7 @@ import DataTable, {
 } from "carbon-components-react/es/components/DataTable";
 import styles from "./vitals-overview.scss";
 import VitalsChart from "./vitals-chart.component";
-import EmptyState from "./empty-state/empty-state.component";
-import ErrorState from "./error-state/error-state.component";
+import { EmptyState, ErrorState } from "@openmrs/esm-patient-common-lib";
 import { useTranslation } from "react-i18next";
 import { useConfig, attach } from "@openmrs/esm-framework";
 import { useVitalsSignsConceptMetaData } from "./vitals-biometrics-form/use-vitalsigns";

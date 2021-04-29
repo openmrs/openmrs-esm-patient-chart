@@ -1,4 +1,5 @@
 import React from "react";
+import CustomView from "./custom-view.component";
 import GridView from "./grid-view.component";
 import TabbedView from "./tabbed-view.component";
 import { Redirect } from "react-router-dom";
@@ -62,7 +63,7 @@ const ChartReview: React.FC<ChartReviewProps> = ({
         patientUuid={patientUuid}
       />
     );
-  } else {
+  } else if (dashboard.config.type === "tabs") {
     return (
       <TabbedView
         slot={dashboard.slot}
@@ -71,6 +72,15 @@ const ChartReview: React.FC<ChartReviewProps> = ({
         patientUuid={patientUuid}
         patient={patient}
         tab={subview}
+      />
+    );
+  } else {
+    return (
+      <CustomView
+        slot={dashboard.slot}
+        name={dashboard.name}
+        patientUuid={patientUuid}
+        patient={patient}
       />
     );
   }

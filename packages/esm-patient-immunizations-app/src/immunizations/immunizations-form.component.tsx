@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import SummaryCard from "../cards/summary-card.component";
 import styles from "./immunizations-form.css";
+import { SummaryCard } from "@openmrs/esm-patient-common-lib";
 import {
   createErrorHandler,
   getStartedVisit,

@@ -13,9 +13,8 @@ import DataTable, {
   TableRow,
 } from "carbon-components-react/es/components/DataTable";
 import AllergyForm from "./allergy-form.component";
-import EmptyState from "./empty-state/empty-state.component";
-import ErrorState from "./error-state/error-state.component";
 import styles from "./allergies-overview.scss";
+import { EmptyState, ErrorState } from "@openmrs/esm-patient-common-lib";
 import { useTranslation } from "react-i18next";
 import {
   performPatientAllergySearch,

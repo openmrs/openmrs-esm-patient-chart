@@ -1,8 +1,6 @@
 import React from "react";
 import dayjs from "dayjs";
 import ProgramsForm from "./programs-form.component";
-import EmptyState from "./empty-state/empty-state.component";
-import ErrorState from "./error-state/error-state.component";
 import Add16 from "@carbon/icons-react/es/add/16";
 import Button from "carbon-components-react/es/components/Button";
 import Pagination from "carbon-components-react/es/components/Pagination";
@@ -17,6 +15,7 @@ import DataTable, {
   TableRow,
 } from "carbon-components-react/es/components/DataTable";
 import styles from "./programs-overview.scss";
+import { EmptyState, ErrorState } from "@openmrs/esm-patient-common-lib";
 import { useTranslation } from "react-i18next";
 import { createErrorHandler } from "@openmrs/esm-framework";
 import { fetchActiveEnrollments } from "./programs.resource";

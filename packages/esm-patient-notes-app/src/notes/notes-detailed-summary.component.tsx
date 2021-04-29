@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useCallback, Fragment } from "react";
-import EmptyState from "./empty-state/empty-state.component";
-import SummaryCard from "../cards/summary-card.component";
 import VisitNotes from "./visit-notes-form.component";
 import styles from "./notes-detailed-summary.css";
 import capitalize from "lodash-es/capitalize";
+import { EmptyState, SummaryCard } from "@openmrs/esm-patient-common-lib";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { createErrorHandler } from "@openmrs/esm-framework";

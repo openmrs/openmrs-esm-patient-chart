@@ -4,7 +4,7 @@ import filter from "lodash-es/filter";
 import includes from "lodash-es/includes";
 import map from "lodash-es/map";
 import styles from "./programs-form.css";
-import SummaryCard from "../cards/summary-card.component";
+import { SummaryCard } from "@openmrs/esm-patient-common-lib";
 import { match, useHistory } from "react-router-dom";
 import { useTranslation, Trans } from "react-i18next";
 import { createErrorHandler } from "@openmrs/esm-framework";

@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from "react";
 import dayjs from "dayjs";
-import SummaryCard from "../cards/summary-card.component";
 import styles from "./appointments-detailed-summary.css";
 import AppointmentsForm from "./appointments-form.component";
-import EmptyState from "./empty-state/empty-state.component";
+import { EmptyState, SummaryCard } from "@openmrs/esm-patient-common-lib";
 import { createErrorHandler } from "@openmrs/esm-framework";
-import { getAppointments } from "./appointments.resource";
 import { Link } from "react-router-dom";
 import { useTranslation, Trans } from "react-i18next";
+import { getAppointments } from "./appointments.resource";
 import { openWorkspaceTab } from "./openWorkspaceTab";
 
 interface AppointmentsDetailedSummaryProps {
