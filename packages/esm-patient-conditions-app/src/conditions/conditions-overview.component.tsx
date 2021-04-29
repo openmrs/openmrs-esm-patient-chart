@@ -152,7 +152,6 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient }) => {
               }}
             />
           )}
-          ;
         </div>
       );
     }

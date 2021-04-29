@@ -31,7 +31,7 @@ const TimeSlotsInner: React.FC<{
   className?: string;
 }> = ({ className, ...props }) => (
   <div
-    className={styles["time-slot-inner"] + className ? " " + className : ""}
+    className={styles["time-slot-inner"] + (className ? " " + className : "")}
     {...props}
   />
 );
@@ -88,7 +88,7 @@ const TimelineCell: React.FC<{
 export const RowStartCell = ({
   title,
   range,
-  unit,
+  units,
   shadow = false,
   openTrendline,
 }) => (
@@ -98,15 +98,29 @@ export const RowStartCell = ({
       position: "sticky",
       left: "0px",
       boxShadow: shadow ? "8px 0 20px 0 rgba(0,0,0,0.15)" : undefined,
+      display: "grid",
+      gridAutoFlow: "row",
+      justifyItems: "baseline",
+      alignItems: "center",
+      gap: "0.5rem",
+      padding: "1rem",
     }}
   >
-    <p>
-      <span onClick={openTrendline} role={"link"} tabIndex={0}>
-        {title}
-      </span>
-      <br></br>
-      {range} {unit}
-    </p>
+    <span
+      onClick={openTrendline}
+      role={"link"}
+      tabIndex={0}
+      style={{
+        color: "#0f62fe",
+        cursor: "pointer",
+        textTransform: "capitalize",
+      }}
+    >
+      {title.toLowerCase()}
+    </span>
+    <span style={{ color: "#6f6f6f", fontSize: "0.75rem" }}>
+      {range} {units}
+    </span>
   </div>
 );
 
