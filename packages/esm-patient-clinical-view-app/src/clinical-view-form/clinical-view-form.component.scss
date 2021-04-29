@@ -1,0 +1,31 @@
+@import "../root.scss";
+
+.formContainer {
+  width: 100vw;
+}
+.checkboxContainer {
+  display: flex;
+  height: 30rem;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: flex-start;
+  margin: $spacing-05;
+}
+.checkboxContainer div {
+  flex: none;
+  display: flex;
+  align-items: center;
+}
+.checkBox {
+  height: $spacing-09;
+  width: 16rem;
+}
+
+.buttonContainer {
+  margin: $spacing-05;
+}
+
+.buttonContainer button {
+  width: 50%;
+}
