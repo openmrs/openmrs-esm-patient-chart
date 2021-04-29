@@ -1,8 +1,8 @@
 import React from "react";
 import styles from "./vital-header-title.component.scss";
 import WarningFilled20 from "@carbon/icons-react/es/warning--filled/20";
-import ChevronDown20 from "@carbon/icons-react/es/chevron--down/20";
-import ChevronUp20 from "@carbon/icons-react/es/chevron--up/20";
+import ChevronDown16 from "@carbon/icons-react/es/chevron--down/16";
+import ChevronUp16 from "@carbon/icons-react/es/chevron--up/16";
 import dayjs from "dayjs";
 import Button from "carbon-components-react/es/components/Button";
 import isEmpty from "lodash-es/isEmpty";
@@ -69,7 +69,7 @@ const VitalsHeaderStateTitle: React.FC<VitalsHeaderStateTitleProps> = ({
               {t("recordVitals", "Record Vitals")}
             </Button>
             {showDetails ? (
-              <ChevronUp20
+              <ChevronUp16
                 className={styles.expandButton}
                 title={"ChevronUp"}
                 onClick={(e) => {
@@ -78,7 +78,7 @@ const VitalsHeaderStateTitle: React.FC<VitalsHeaderStateTitleProps> = ({
                 }}
               />
             ) : (
-              <ChevronDown20
+              <ChevronDown16
                 className={styles.expandButton}
                 title={"ChevronDown"}
                 onClick={(e) => {

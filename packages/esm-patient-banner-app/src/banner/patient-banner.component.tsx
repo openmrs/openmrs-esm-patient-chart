@@ -2,10 +2,10 @@ import React, { useEffect, useState, useMemo, useCallback } from "react";
 import dayjs from "dayjs";
 import Button from "carbon-components-react/es/components/Button";
 import Tag from "carbon-components-react/es/components/Tag";
-import TooltipDefination from "carbon-components-react/es/components/TooltipDefinition";
-import CaretDown16 from "@carbon/icons-react/es/caret--down/16";
-import CaretUp16 from "@carbon/icons-react/es/caret--up/16";
-import OverflowMenuVertical24 from "@carbon/icons-react/es/overflow-menu--vertical/24";
+import TooltipDefinition from "carbon-components-react/es/components/TooltipDefinition";
+import ChevronDown16 from "@carbon/icons-react/es/chevron--down/16";
+import ChevronUp16 from "@carbon/icons-react/es/chevron--up/16";
+import OverflowMenuVertical16 from "@carbon/icons-react/es/overflow-menu--vertical/16";
 import capitalize from "lodash-es/capitalize";
 import ContactDetails from "../contact-details/contact-details.component";
 import CustomOverflowMenuComponent from "../ui-components/overflow-menu.component";
@@ -64,11 +64,11 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
                 {patient.name[0].given.join(" ")} {patient.name[0].family}
               </span>
               {hasActiveVisit && (
-                <TooltipDefination
+                <TooltipDefinition
                   align="end"
                   tooltipText={
                     <div className={styles.tooltipPadding}>
-                      <h6 style={{ marginBottom: "0.5em" }}>
+                      <h6 style={{ marginBottom: "0.5rem" }}>
                         {currentVisit &&
                           currentVisit.visitType &&
                           currentVisit.visitType.name}
@@ -86,15 +86,16 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
                     </div>
                   }
                 >
-                  <Tag type="blue">{t("Active Visit", "Active Visit")}</Tag>
-                </TooltipDefination>
+                  <Tag type="blue">{t("activeVisit", "Active Visit")}</Tag>
+                </TooltipDefinition>
               )}
             </div>
             <div>
               <CustomOverflowMenuComponent
                 menuTitle={
                   <>
-                    Actions <OverflowMenuVertical24 />
+                    Actions{" "}
+                    <OverflowMenuVertical16 style={{ marginLeft: "0.5rem" }} />
                   </>
                 }
               >
@@ -120,13 +121,14 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
             </span>
             <Button
               kind="ghost"
-              renderIcon={showContactDetails ? CaretUp16 : CaretDown16}
+              renderIcon={showContactDetails ? ChevronUp16 : ChevronDown16}
               iconDescription="Toggle contact details"
               onClick={toggleContactDetails}
+              style={{ marginTop: "-0.25rem" }}
             >
               {showContactDetails
-                ? "Hide Contact Details"
-                : "Show Contact Details"}
+                ? t("hideAllDetails", "Hide all details")
+                : t("showAllDetails", "Show all details")}
             </Button>
           </div>
         </div>
