@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import Button from "carbon-components-react/lib/components/Button";
 import CameraUpload from "./camera-upload.component";
-import placeholder from "../assets/placeholder.png";
+import placeholder from "../assets/placeholder.svg";
 import { toOmrsIsoString } from "@openmrs/esm-framework";
 
 export interface CapturePhotoProps {
