@@ -82,8 +82,6 @@ export const useTimelineData = (patientUuid: string, panelUuid: string) => {
 
     const rowData = parseEntries(entries, panelData.type);
 
-    console.log({ rowData });
-
     return {
       data: { parsedTime: parseTime(times), rowData, panelName },
       loaded: true,
