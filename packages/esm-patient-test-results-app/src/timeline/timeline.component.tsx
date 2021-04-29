@@ -80,14 +80,14 @@ const DataRows: React.FC<{
   >
     {Object.entries(rowData).map(([title, obs]) => {
       const {
-        meta: { unit = "", range = "" },
+        meta: { units = "", range = "" },
         conceptClass,
       } = obs.find((x) => !!x);
       return (
         <React.Fragment key={conceptClass}>
           <RowStartCell
             {...{
-              unit,
+              units,
               range,
               title,
               shadow: displayShadow,
