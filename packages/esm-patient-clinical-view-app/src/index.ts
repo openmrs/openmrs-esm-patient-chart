@@ -1,6 +1,12 @@
-import { defineConfigSchema, getAsyncLifecycle } from "@openmrs/esm-framework";
+import {
+  defineConfigSchema,
+  getAsyncLifecycle,
+  getSyncLifecycle,
+} from "@openmrs/esm-framework";
 import { configSchema } from "./config-schema";
 import { backendDependencies } from "./openmrs-backend-dependencies";
+import { createDashboardLink } from "@openmrs/esm-patient-common-lib";
+import { dashboardMeta } from "./dashboard.meta";
 
 const importTranslation = require.context(
   "../translations",
@@ -44,6 +50,12 @@ function setupOpenMRS() {
         meta: {
           title: "Add Clinical View",
         },
+      },
+      {
+        id: "clinical-view-summary-dashboard",
+        slot: "patient-chart-dashboard-slot",
+        load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
+        meta: dashboardMeta,
       },
     ],
   };
