@@ -30,9 +30,10 @@
   color: $text-02;
 }
 
-.emptyResultsText {
+.emptyResults {
   @include carbon--type-style("body-short-01");
   color: $text-02;
+  min-height: 1rem;
 }
 
 .imgUploadHelperText {
