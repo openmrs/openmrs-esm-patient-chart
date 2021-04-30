@@ -19,12 +19,15 @@ import VitalsChart from "./vitals-chart.component";
 import { EmptyState, ErrorState } from "@openmrs/esm-patient-common-lib";
 import { useTranslation } from "react-i18next";
 import { useConfig, attach } from "@openmrs/esm-framework";
-import { useVitalsSignsConceptMetaData } from "./vitals-biometrics-form/use-vitalsigns";
 import {
-  performPatientsVitalsSearch,
-  PatientVitals,
-} from "./vitals-biometrics.resource";
+  useVitalsSignsConceptMetaData,
+  withUnit,
+} from "./vitals-biometrics-form/use-vitalsigns";
 import { patientVitalsBiometricsFormWorkspace } from "../constants";
+import {
+  PatientVitals,
+  performPatientsVitalsSearch,
+} from "./vitals-biometrics.resource";
 
 const vitalsToShowCount = 5;
 
@@ -55,20 +58,29 @@ const RenderVitals: React.FC<RenderVitalsProps> = ({
     ,
     ,
     pulseUnit,
-    oxygenationUnit,
+    oxygenSaturationUnit,
     ,
     respiratoryRateUnit,
   ] = conceptsUnits;
 
   const tableHeaders = [
     { key: "date", header: "Date", isSortable: true },
-    { key: "bloodPressure", header: `BP (${bloodPressureUnit})` },
-    { key: "rrate", header: `Rate (${respiratoryRateUnit})` },
-    { key: "pulse", header: `Pulse (${pulseUnit})` },
-    { key: "spo2", header: `SPO2 (${oxygenationUnit})` },
+    {
+      key: "bloodPressure",
+      header: withUnit("BP", bloodPressureUnit),
+    },
+    {
+      key: "respiratoryRate",
+      header: withUnit("R. Rate", respiratoryRateUnit),
+    },
+    { key: "pulse", header: withUnit("Pulse", pulseUnit) },
+    {
+      key: "spo2",
+      header: withUnit("SPO2", oxygenSaturationUnit),
+    },
     {
       key: "temperature",
-      header: `Temp (${temperatureUnit})`,
+      header: withUnit("Temp", temperatureUnit),
     },
   ];
 
