@@ -2,13 +2,12 @@ import React, { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import ProgramsForm from "./programs-form.component";
 import styles from "./program-record.css";
-import { SummaryCard } from "@openmrs/esm-patient-common-lib";
+import { SummaryCard, openWorkspaceTab } from "@openmrs/esm-patient-common-lib";
 import { RouteComponentProps } from "react-router-dom";
 import { useTranslation, Trans } from "react-i18next";
 import { createErrorHandler } from "@openmrs/esm-framework";
 import { getPatientProgramByUuid } from "./programs.resource";
 import { useProgramsContext } from "./programs.context";
-import { openWorkspaceTab } from "./openWorkspaceTab";
 
 interface ProgramRecordProps
   extends RouteComponentProps<{ programUuid: string }> {}
@@ -38,7 +37,7 @@ const ProgramRecord: React.FC<ProgramRecordProps> = ({ match }) => {
           <SummaryCard
             name={t("program", "Program")}
             styles={{ width: "100%" }}
-            editComponent={ProgramsForm}
+            editComponent
             showComponent={() =>
               openWorkspaceTab(
                 ProgramsForm,
@@ -92,11 +91,7 @@ const ProgramRecord: React.FC<ProgramRecordProps> = ({ match }) => {
                         <Trans i18nKey="active">Active</Trans>
                       )}
                     </td>
-                    <td>
-                      {patientProgram?.location
-                        ? patientProgram?.location?.display
-                        : "-"}
-                    </td>
+                    <td>{patientProgram?.location?.display || "-"}</td>
                   </tr>
                 </tbody>
               </table>

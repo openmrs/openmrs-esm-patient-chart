@@ -14,10 +14,13 @@ import DataTable, {
   TableHeader,
   TableRow,
 } from "carbon-components-react/es/components/DataTable";
-import { EmptyState, ErrorState } from "@openmrs/esm-patient-common-lib";
+import {
+  EmptyState,
+  ErrorState,
+  openWorkspaceTab,
+} from "@openmrs/esm-patient-common-lib";
 import { useTranslation } from "react-i18next";
 import { getAppointments } from "./appointments.resource";
-import { openWorkspaceTab } from "./openWorkspaceTab";
 
 interface AppointmentOverviewProps {
   basePath: string;

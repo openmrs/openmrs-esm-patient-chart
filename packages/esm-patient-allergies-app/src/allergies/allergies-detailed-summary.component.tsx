@@ -2,7 +2,11 @@ import React, { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import AllergyForm from "./allergy-form.component";
 import styles from "./allergies-detailed-summary.css";
-import { EmptyState, SummaryCard } from "@openmrs/esm-patient-common-lib";
+import {
+  EmptyState,
+  SummaryCard,
+  openWorkspaceTab,
+} from "@openmrs/esm-patient-common-lib";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { createErrorHandler } from "@openmrs/esm-framework";
@@ -10,7 +14,6 @@ import {
   performPatientAllergySearch,
   Allergy,
 } from "./allergy-intolerance.resource";
-import { openWorkspaceTab } from "./openWorkspaceTab";
 
 interface AllergiesDetailedSummaryProps {
   patient: fhir.Patient;
@@ -40,7 +43,7 @@ export default function AllergiesDetailedSummary({
         <SummaryCard
           name={t("Allergies", "Allergies")}
           styles={{ width: "100%" }}
-          addComponent={AllergyForm}
+          addComponent
           showComponent={() =>
             openWorkspaceTab(
               AllergyForm,

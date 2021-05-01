@@ -15,13 +15,16 @@ import DataTable, {
 import Add16 from "@carbon/icons-react/es/add/16";
 import ConditionsForm from "./conditions-form.component";
 import styles from "./conditions-overview.scss";
-import { EmptyState, ErrorState } from "@openmrs/esm-patient-common-lib";
+import {
+  EmptyState,
+  ErrorState,
+  openWorkspaceTab,
+} from "@openmrs/esm-patient-common-lib";
 import { useTranslation } from "react-i18next";
 import {
   Condition,
   performPatientConditionsSearch,
 } from "./conditions.resource";
-import { openWorkspaceTab } from "./openWorkspaceTab";
 
 interface ConditionsOverviewProps {
   basePath: string;
@@ -54,9 +57,9 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient }) => {
     }
   }, [patient]);
 
-  const launchConditionsForm = () => {
+  const launchConditionsForm = React.useCallback(() => {
     openWorkspaceTab(ConditionsForm, t("conditionsForm", "Conditions form"));
-  };
+  }, []);
 
   const headers = [
     {

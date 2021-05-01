@@ -2,12 +2,15 @@ import React, { useState, useEffect } from "react";
 import dayjs from "dayjs";
 import styles from "./appointments-detailed-summary.css";
 import AppointmentsForm from "./appointments-form.component";
-import { EmptyState, SummaryCard } from "@openmrs/esm-patient-common-lib";
+import {
+  EmptyState,
+  SummaryCard,
+  openWorkspaceTab,
+} from "@openmrs/esm-patient-common-lib";
 import { createErrorHandler } from "@openmrs/esm-framework";
 import { Link } from "react-router-dom";
 import { useTranslation, Trans } from "react-i18next";
 import { getAppointments } from "./appointments.resource";
-import { openWorkspaceTab } from "./openWorkspaceTab";
 
 interface AppointmentsDetailedSummaryProps {
   patientUuid: string;
@@ -42,7 +45,7 @@ export default function AppointmentsDetailedSummary({
               `${t("appointmentsForm", "Appointments Form")}`
             )
           }
-          addComponent={AppointmentsForm}
+          addComponent
         >
           <table className={styles.appointmentDetailedSummaryTable}>
             <thead>

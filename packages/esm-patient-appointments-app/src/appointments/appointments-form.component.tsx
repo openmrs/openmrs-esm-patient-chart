@@ -16,7 +16,7 @@ interface AppointmentsFormProps extends DataCaptureComponentProps {
   patientUuid: string;
 }
 
-export type Appointment = {
+export interface Appointment {
   serviceUuid: string;
   serviceTypeUuid?: string;
   startDateTime: Date;
@@ -27,7 +27,7 @@ export type Appointment = {
   providerUuid?: string;
   status?: string;
   patientUuid: string;
-};
+}
 
 const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
   patientUuid,

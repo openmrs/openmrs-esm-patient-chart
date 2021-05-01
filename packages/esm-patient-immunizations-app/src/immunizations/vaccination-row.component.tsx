@@ -5,8 +5,8 @@ import styles from "./immunizations-detailed-summary.css";
 import vaccinationRowStyles from "./vaccination-row.css";
 import { Link } from "react-router-dom";
 import { useTranslation, Trans } from "react-i18next";
+import { openWorkspaceTab } from "@openmrs/esm-patient-common-lib";
 import { ImmunizationData } from "./immunization-domain";
-import { openWorkspaceTab } from "./openWorkspaceTab";
 
 export default function VaccinationRow(params: ImmunizationProps) {
   const [patientImmunization, setPatientImmunization] = useState(null);

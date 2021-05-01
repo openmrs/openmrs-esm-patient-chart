@@ -4,7 +4,7 @@ import isEmpty from "lodash-es/isEmpty";
 import LocationSelect from "./location-select.component";
 import VisitTypeSelect from "./visit-type-select.component";
 import styles from "./new-visit.css";
-import SummaryCard from "../ui-components/cards/summary-card.component";
+import { SummaryCard } from "@openmrs/esm-patient-common-lib";
 import { useTranslation } from "react-i18next";
 import {
   NewVisitPayload,

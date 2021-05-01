@@ -3,13 +3,16 @@ import dayjs from "dayjs";
 import capitalize from "lodash-es/capitalize";
 import ConditionsForm from "./conditions-form.component";
 import styles from "./condition-record.css";
-import { SummaryCard, RecordDetails } from "@openmrs/esm-patient-common-lib";
+import {
+  SummaryCard,
+  RecordDetails,
+  openWorkspaceTab,
+} from "@openmrs/esm-patient-common-lib";
 import { RouteComponentProps } from "react-router-dom";
 import { useTranslation, Trans } from "react-i18next";
 import { createErrorHandler } from "@openmrs/esm-framework";
 import { getConditionByUuid } from "./conditions.resource";
 import { useConditionsContext } from "./conditions.context";
-import { openWorkspaceTab } from "./openWorkspaceTab";
 
 interface ConditionRecordProps
   extends RouteComponentProps<{ conditionUuid: string }> {}
@@ -37,7 +40,7 @@ export default function ConditionRecord(props: ConditionRecordProps) {
           <SummaryCard
             name={t("condition", "Condition")}
             styles={{ width: "100%" }}
-            editComponent={ConditionsForm}
+            editComponent
             showComponent={() => {
               openWorkspaceTab(
                 ConditionsForm,

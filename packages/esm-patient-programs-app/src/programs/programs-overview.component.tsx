@@ -15,11 +15,13 @@ import DataTable, {
   TableRow,
 } from "carbon-components-react/es/components/DataTable";
 import styles from "./programs-overview.scss";
-import { EmptyState, ErrorState } from "@openmrs/esm-patient-common-lib";
+import {
+  EmptyState,
+  ErrorState,
+  openWorkspaceTab,
+} from "@openmrs/esm-patient-common-lib";
 import { useTranslation } from "react-i18next";
-import { createErrorHandler } from "@openmrs/esm-framework";
 import { fetchActiveEnrollments } from "./programs.resource";
-import { openWorkspaceTab } from "./openWorkspaceTab";
 import { PatientProgram } from "../types";
 
 interface ProgramsOverviewProps {
@@ -45,19 +47,16 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ patientUuid }) => {
     if (patientUuid) {
       const sub = fetchActiveEnrollments(patientUuid).subscribe(
         (programs) => setPrograms(programs),
-        (error) => {
-          setError(error);
-          createErrorHandler();
-        }
+        setError
       );
 
       return () => sub.unsubscribe();
     }
   }, [patientUuid]);
 
-  const launchProgramsForm = () => {
+  const launchProgramsForm = React.useCallback(() => {
     openWorkspaceTab(ProgramsForm, t("programsForm", "Programs form"));
-  };
+  }, []);
 
   const headers = [
     {

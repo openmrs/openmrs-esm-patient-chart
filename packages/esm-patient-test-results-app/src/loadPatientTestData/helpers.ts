@@ -27,23 +27,24 @@ let patientResultsDataCache: Record<string, [PatientData, number, string]> = {};
  * @param data {PatientData}
  * @param indicator UUID of the newest observation
  */
-export const addUserDataToCache = (
-  patientUuid,
+export function addUserDataToCache(
+  patientUuid: string,
   data: PatientData,
-  indicator
-) => {
+  indicator: string
+) {
   patientResultsDataCache[patientUuid] = [data, Date.now(), indicator];
   const currentStateEntries = Object.entries(patientResultsDataCache);
 
   if (currentStateEntries.length > PATIEN_DATA_CACHE_SIZE) {
     currentStateEntries.sort(([, [, dateA]], [, [, dateB]]) => dateB - dateA);
+
     patientResultsDataCache = Object.fromEntries(
       currentStateEntries.slice(0, PATIEN_DATA_CACHE_SIZE)
     );
   }
-};
+}
 
-const getLatestObsUuid = async (patientUuid: string): Promise<string> => {
+async function getLatestObsUuid(patientUuid: string): Promise<string> {
   const request = fhirObservationRequests({
     patient: patientUuid,
     category: "laboratory",
@@ -52,9 +53,9 @@ const getLatestObsUuid = async (patientUuid: string): Promise<string> => {
     _format: "json",
     _count: "1",
   });
-
-  return (await request.next().value)?.entry?.[0]?.resource?.id;
-};
+  const result = await request.next().value;
+  return result?.entry?.[0]?.resource?.id;
+}
 
 /**
  * Retrieves cached user testresults data
@@ -64,9 +65,9 @@ const getLatestObsUuid = async (patientUuid: string): Promise<string> => {
  * @param { PatientData } data
  * @param { string } indicator UUID of the newest observation
  */
-export const getUserDataFromCache = (
+export function getUserDataFromCache(
   patientUuid: string
-): [PatientData | undefined, Promise<boolean>] => {
+): [PatientData | undefined, Promise<boolean>] {
   const [data] = patientResultsDataCache[patientUuid] || [];
 
   return [
@@ -77,7 +78,7 @@ export const getUserDataFromCache = (
         )
       : Promise.resolve(true),
   ];
-};
+}
 
 /**
  * Iterator
@@ -104,11 +105,11 @@ function* fhirObservationRequests(queries: Record<string, string>) {
  * Load all patient testresult observations in parallel
  *
  * @param { string } patientUuid
- * @returns { Promise<ObsRecord[]> }
+ * @returns { Promise<Array<ObsRecord>> }
  */
 export const loadObsEntries = async (
   patientUuid: string
-): Promise<ObsRecord[]> => {
+): Promise<Array<ObsRecord>> => {
   const requests = fhirObservationRequests({
     patient: patientUuid,
     category: "laboratory",
@@ -146,10 +147,10 @@ const conceptCache: Record<ConceptUuid, Promise<ConceptRecord>> = {};
 /**
  * fetch all concepts for all given observation entries
  */
-export const loadPresentConcepts = (
-  entries: ObsRecord[]
-): Promise<ConceptRecord[]> =>
-  Promise.all(
+export function loadPresentConcepts(
+  entries: Array<ObsRecord>
+): Promise<Array<ConceptRecord>> {
+  return Promise.all(
     [...new Set(entries.map(getEntryConceptClassUuid))].map(
       (conceptUuid) =>
         conceptCache[conceptUuid] ||
@@ -158,6 +159,7 @@ export const loadPresentConcepts = (
         ).then((res) => res.json()))
     )
   );
+}
 
 /**
  * returns true if no value is null or undefined
@@ -165,12 +167,15 @@ export const loadPresentConcepts = (
  * @param args any
  * @returns {boolean}
  */
-export const exist = (...args: any[]): boolean => {
+export function exist(...args: any[]): boolean {
   for (const y of args) {
-    if (y === null || y === undefined) return false;
+    if (y === null || y === undefined) {
+      return false;
+    }
   }
+
   return true;
-};
+}
 
 export enum OBSERVATION_INTERPRETATION {
   "NORMAL",
@@ -214,9 +219,9 @@ export const assessValue = (meta: ObsMetaInfo) => (
   return OBSERVATION_INTERPRETATION.NORMAL;
 };
 
-export const extractMetaInformation = (
-  concepts: ConceptRecord[]
-): Record<ConceptUuid, ObsMetaInfo> => {
+export function extractMetaInformation(
+  concepts: Array<ConceptRecord>
+): Record<ConceptUuid, ObsMetaInfo> {
   return Object.fromEntries(
     concepts.map(
       ({
@@ -251,4 +256,4 @@ export const extractMetaInformation = (
       }
     )
   );
-};
+}

@@ -1,6 +1,5 @@
-import * as React from "react";
+import { useState, useEffect } from "react";
 import { OBSERVATION_INTERPRETATION } from "../loadPatientTestData/helpers";
-
 import usePatientResultsData from "../loadPatientTestData/usePatientResultsData";
 
 export interface OverviewPanelData {
@@ -15,55 +14,57 @@ export interface OverviewPanelData {
 export type OverviewPanelEntry = [
   string,
   string,
-  OverviewPanelData[],
+  Array<OverviewPanelData>,
   Date,
   string
 ];
 
-const useOverviewData = (patientUuid: string) => {
-  //   const [isLoadingPatient, existingPatient, patientUuid, patientErr] = useCurrentPatient();
+function useOverviewData(patientUuid: string) {
   const { sortedObs, loaded, error } = usePatientResultsData(patientUuid);
-  const [overviewData, setDisplayData] = React.useState<OverviewPanelEntry[]>(
+  const [overviewData, setDisplayData] = useState<Array<OverviewPanelEntry>>(
     []
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     setDisplayData(
       Object.entries(sortedObs)
-        .map(([panelName, { entries, type, uuid }]) => {
-          const newestEntry = entries[0];
+        .map(
+          ([panelName, { entries, type, uuid }]): OverviewPanelEntry => {
+            const newestEntry = entries[0];
+            let data: Array<OverviewPanelData>;
 
-          let data: OverviewPanelData[];
+            if (type === "Test") {
+              data = [
+                {
+                  id: newestEntry.id,
+                  name: panelName,
+                  range: newestEntry.meta?.range || "--",
+                  interpretation: newestEntry.meta.assessValue(
+                    newestEntry.value
+                  ),
+                  value: newestEntry.value,
+                },
+              ];
+            } else {
+              data = newestEntry.members.map((gm) => ({
+                id: gm.id,
+                key: gm.id,
+                name: gm.name,
+                range: gm.meta?.range || "--",
+                interpretation: gm.meta.assessValue(gm.value),
+                value: gm.value,
+              }));
+            }
 
-          if (type === "Test") {
-            data = [
-              {
-                id: newestEntry.id,
-                name: panelName,
-                range: newestEntry.meta?.range || "--",
-                interpretation: newestEntry.meta.assessValue(newestEntry.value),
-                value: newestEntry.value,
-              },
+            return [
+              panelName,
+              type,
+              data,
+              new Date(newestEntry.effectiveDateTime),
+              uuid,
             ];
-          } else {
-            data = newestEntry.members.map((gm) => ({
-              id: gm.id,
-              key: gm.id,
-              name: gm.name,
-              range: gm.meta?.range || "--",
-              interpretation: gm.meta.assessValue(gm.value),
-              value: gm.value,
-            }));
           }
-
-          return [
-            panelName,
-            type,
-            data,
-            new Date(newestEntry.effectiveDateTime),
-            uuid,
-          ] as OverviewPanelEntry;
-        })
+        )
         .sort(
           ([, , , date1], [, , , date2]) => date2.getTime() - date1.getTime()
         )
@@ -71,6 +72,6 @@ const useOverviewData = (patientUuid: string) => {
   }, [sortedObs]);
 
   return { overviewData, loaded, error };
-};
+}
 
 export default useOverviewData;

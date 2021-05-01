@@ -2,13 +2,16 @@ import React, { useEffect, useState } from "react";
 import dayjs from "dayjs";
 import ProgramsForm from "./programs-form.component";
 import styles from "./programs-detailed-summary.css";
-import { EmptyState, SummaryCard } from "@openmrs/esm-patient-common-lib";
+import {
+  EmptyState,
+  SummaryCard,
+  openWorkspaceTab,
+} from "@openmrs/esm-patient-common-lib";
 import { useTranslation, Trans } from "react-i18next";
 import { RouteComponentProps, Link } from "react-router-dom";
 import { createErrorHandler } from "@openmrs/esm-framework";
 import { fetchEnrolledPrograms } from "./programs.resource";
 import { useProgramsContext } from "./programs.context";
-import { openWorkspaceTab } from "./openWorkspaceTab";
 import { PatientProgram } from "../types";
 
 interface ProgramsDetailedSummaryProps extends RouteComponentProps<{}> {}
@@ -39,7 +42,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = () => {
             styles={{
               width: "100%",
             }}
-            addComponent={ProgramsForm}
+            addComponent
             showComponent={() =>
               openWorkspaceTab(
                 ProgramsForm,

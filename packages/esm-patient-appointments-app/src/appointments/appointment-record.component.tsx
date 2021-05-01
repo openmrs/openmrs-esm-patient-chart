@@ -6,13 +6,13 @@ import {
   VerticalLabelValue,
   SummaryCard,
   RecordDetails,
+  openWorkspaceTab,
 } from "@openmrs/esm-patient-common-lib";
 import { createErrorHandler } from "@openmrs/esm-framework";
 import { RouteComponentProps } from "react-router-dom";
 import { useTranslation, Trans } from "react-i18next";
 import { getAppointmentsByUuid } from "./appointments.resource";
 import { useAppointmentsContext } from "./appointments.context";
-import { openWorkspaceTab } from "./openWorkspaceTab";
 
 export interface AppointmentRecordProps
   extends RouteComponentProps<{ appointmentUuid: string }> {}
@@ -40,7 +40,7 @@ export default function AppointmentRecord(props: AppointmentRecordProps) {
         <div className={styles.appointmentContainer}>
           <SummaryCard
             name={t("appointment", "Appointment")}
-            addComponent={AppointmentsForm}
+            addComponent
             showComponent={() =>
               openWorkspaceTab(
                 AppointmentsForm,

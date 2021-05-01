@@ -1,4 +1,8 @@
-import { getStartedVisit, newWorkspaceItem } from "@openmrs/esm-framework";
+import {
+  getStartedVisit,
+  newWorkspaceItem,
+  WorkspaceItem,
+} from "@openmrs/esm-framework";
 import isEmpty from "lodash-es/isEmpty";
 
 export interface DataCaptureComponentProps {
@@ -14,7 +18,7 @@ export function openWorkspaceTab<
 >(
   componentToAdd: React.FC<TProps>,
   componentName: string,
-  params?: TParams,
+  params = {} as TParams,
   requiresVisit = true
 ): void {
   if (isEmpty(getStartedVisit.value) && requiresVisit) {
@@ -28,10 +32,10 @@ export function openWorkspaceTab<
       component: componentToAdd,
       name: componentName,
       props: {
-        match: { params: params ? params : {} },
+        match: { params },
       },
       inProgress: false,
-      validations: (workspaceTabs) =>
+      validations: (workspaceTabs: Array<WorkspaceItem>) =>
         workspaceTabs.findIndex((tab) => tab.component === componentToAdd),
     });
   }

@@ -14,13 +14,16 @@ import DataTable, {
 } from "carbon-components-react/es/components/DataTable";
 import AllergyForm from "./allergy-form.component";
 import styles from "./allergies-overview.scss";
-import { EmptyState, ErrorState } from "@openmrs/esm-patient-common-lib";
+import {
+  EmptyState,
+  ErrorState,
+  openWorkspaceTab,
+} from "@openmrs/esm-patient-common-lib";
 import { useTranslation } from "react-i18next";
 import {
   performPatientAllergySearch,
   Allergy,
 } from "./allergy-intolerance.resource";
-import { openWorkspaceTab } from "./openWorkspaceTab";
 
 interface AllergiesOverviewProps {
   basePath: string;

@@ -2,20 +2,15 @@ import React from "react";
 import VisitDashboard from "./visit-dashboard.component";
 import { BrowserRouter } from "react-router-dom";
 import { render, screen, fireEvent } from "@testing-library/react";
-import {
-  getCurrentPatientUuid,
-  openmrsObservableFetch,
-  openmrsFetch,
-} from "@openmrs/esm-framework";
+import { openmrsObservableFetch, openmrsFetch } from "@openmrs/esm-framework";
 import { of } from "rxjs/internal/observable/of";
+import { mockLocationsDataResponse } from "../../../../__mocks__/location.mock";
+import { mockSessionDataResponse } from "../../../../__mocks__/session.mock";
 import {
   mockVisitTypesDataResponse,
   mockVisits,
 } from "../../../../__mocks__/visits.mock";
-import { mockLocationsDataResponse } from "../../../../__mocks__/location.mock";
-import { mockSessionDataResponse } from "../../../../__mocks__/session.mock";
 
-const mockGetCurrentPatientUuid = getCurrentPatientUuid as jest.Mock;
 const mockOpenmrsObservableFetch = openmrsObservableFetch as jest.Mock;
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 
@@ -25,7 +20,6 @@ mockOpenmrsFetch.mockImplementation(jest.fn());
 describe("VisitDashboard", () => {
   let patientUuid = "some-patient-uuid";
   beforeEach(() => {
-    mockGetCurrentPatientUuid.mockReturnValue(of(patientUuid));
     mockOpenmrsObservableFetch.mockImplementation(
       (url: string, config: { method: string; body: any }) => {
         if (url.indexOf("/visittype") >= 0) {
@@ -61,7 +55,6 @@ describe("VisitDashboard", () => {
     );
   });
 
-  afterEach(mockGetCurrentPatientUuid.mockReset);
   afterEach(mockOpenmrsObservableFetch.mockReset);
 
   it("should display new visit and edit visit buttons", async () => {

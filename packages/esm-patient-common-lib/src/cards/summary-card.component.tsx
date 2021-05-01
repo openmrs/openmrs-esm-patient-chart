@@ -7,10 +7,10 @@ export interface SummaryCardProps {
   name: string;
   styles?: React.CSSProperties;
   link?: string;
-  addComponent?: string | any;
-  editComponent?: string | any;
+  addComponent?: boolean;
+  editComponent?: boolean;
   editBtnUrl?: string;
-  showComponent?: Function;
+  showComponent?(): void;
   className?: string;
 }
 
@@ -44,7 +44,7 @@ export const SummaryCard: React.FC<SummaryCardProps> = (props) => (
         <div className={styles.headerAdd}>
           <button
             className={`omrs-unstyled ${styles.addBtn}`}
-            onClick={() => props.showComponent(props.addComponent, props.name)}
+            onClick={props.showComponent}
           >
             <Trans i18nKey="add">Add</Trans>
           </button>
@@ -54,7 +54,7 @@ export const SummaryCard: React.FC<SummaryCardProps> = (props) => (
         <div className={styles.headerEdit}>
           <button
             className={`omrs-unstyled ${styles.editBtn}`}
-            onClick={() => props.showComponent(props.editComponent, props.name)}
+            onClick={props.showComponent}
           >
             <Trans i18nKey="edit">Edit</Trans>
           </button>

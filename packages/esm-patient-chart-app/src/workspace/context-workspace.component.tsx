@@ -21,12 +21,12 @@ const ContextWorkspace: React.FC<
   RouteComponentProps<ContextWorkspaceParams>
 > = ({ match }) => {
   const { patientUuid } = match.params;
-  const { active, title, clearExtensionSlot } = useWorkspace();
+  const { active, title, closeWorkspace } = useWorkspace();
   const { t } = useTranslation();
-  const props = React.useMemo(
-    () => ({ closeWorkspace: clearExtensionSlot, patientUuid }),
-    [clearExtensionSlot, patientUuid]
-  );
+  const props = React.useMemo(() => ({ closeWorkspace, patientUuid }), [
+    closeWorkspace,
+    patientUuid,
+  ]);
 
   return (
     <aside
@@ -39,7 +39,7 @@ const ContextWorkspace: React.FC<
           <HeaderGlobalAction
             aria-label={t("close", "Close")}
             title={t("close", "Close")}
-            onClick={clearExtensionSlot}
+            onClick={closeWorkspace}
           >
             <Close32 />
           </HeaderGlobalAction>

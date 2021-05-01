@@ -1,20 +1,20 @@
-import React, { useState, useEffect, useCallback, Fragment } from "react";
-import VisitNotes from "./visit-notes-form.component";
+import React, { useState, useEffect, Fragment } from "react";
 import styles from "./notes-detailed-summary.css";
 import capitalize from "lodash-es/capitalize";
-import { EmptyState, SummaryCard } from "@openmrs/esm-patient-common-lib";
+import {
+  EmptyState,
+  SummaryCard,
+  usePagination,
+} from "@openmrs/esm-patient-common-lib";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { createErrorHandler } from "@openmrs/esm-framework";
+import { attach, createErrorHandler } from "@openmrs/esm-framework";
+import { formatDate } from "./biometric.helper";
+import { useNotesContext } from "./notes.context";
 import {
   getEncounterObservableRESTAPI,
   PatientNote,
 } from "./encounter.resource";
-import { formatDate } from "./biometric.helper";
-import { useNotesContext } from "./notes.context";
-import { openWorkspaceTab } from "./openWorkspaceTab";
-
-const resultsPerPage = 10;
 
 interface NotesDetailedSummaryProps {}
 
@@ -22,60 +22,18 @@ const NotesDetailedSummary: React.FC<NotesDetailedSummaryProps> = () => {
   const { t } = useTranslation();
   const { patient, patientUuid } = useNotesContext();
   const [patientNotes, setPatientNotes] = useState<Array<PatientNote>>();
-  const [totalPages, setTotalPages] = useState(1);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [showNextButton, setShowNextButton] = useState(false);
-  const [showPreviousButton, setShowPreviousButton] = useState(false);
-  const [currentPageResults, setCurrentPageResults] = useState<
-    Array<PatientNote>
-  >();
+  const pagination = usePagination(patientNotes);
 
   useEffect(() => {
     if (patient) {
       const subscription = getEncounterObservableRESTAPI(patientUuid).subscribe(
-        (notes) => {
-          setPatientNotes(notes);
-          setTotalPages(Math.ceil(notes.length / resultsPerPage));
-          setCurrentPageResults(notes.slice(0, resultsPerPage));
-        },
+        (notes) => setPatientNotes(notes),
         createErrorHandler()
       );
 
       return () => subscription.unsubscribe();
     }
   }, [patientUuid, patient]);
-
-  useEffect(() => {
-    {
-      patientNotes && currentPage * resultsPerPage >= patientNotes.length
-        ? setShowNextButton(false)
-        : setShowNextButton(true);
-      currentPage !== 1
-        ? setShowPreviousButton(true)
-        : setShowPreviousButton(false);
-    }
-  }, [patientNotes, currentPageResults, currentPage]);
-
-  const nextPage = useCallback(() => {
-    let upperBound = currentPage * resultsPerPage + resultsPerPage;
-    const lowerBound = currentPage * resultsPerPage;
-
-    if (upperBound > patientNotes.length) {
-      upperBound = patientNotes.length;
-    }
-
-    const pageResults = patientNotes.slice(lowerBound, upperBound);
-    setCurrentPageResults(pageResults);
-    setCurrentPage(currentPage + 1);
-  }, [currentPage, patientNotes]);
-
-  const previousPage = useCallback(() => {
-    const lowerBound = resultsPerPage * (currentPage - 2);
-    const upperBound = resultsPerPage * (currentPage - 1);
-    const pageResults = patientNotes.slice(lowerBound, upperBound);
-    setCurrentPageResults(pageResults);
-    setCurrentPage(currentPage - 1);
-  }, [currentPage, patientNotes]);
 
   return (
     <>
@@ -84,9 +42,9 @@ const NotesDetailedSummary: React.FC<NotesDetailedSummaryProps> = () => {
           {patientNotes.length > 0 ? (
             <SummaryCard
               name={t("notes", "Notes")}
-              addComponent={VisitNotes}
+              addComponent
               showComponent={() =>
-                openWorkspaceTab(VisitNotes, `${t("visitNote", "Visit Note")}`)
+                attach("patient-chart-workspace-slot", "visit-notes-workspace")
               }
             >
               <table className={`omrs-type-body-regular ${styles.notesTable}`}>
@@ -118,59 +76,57 @@ const NotesDetailedSummary: React.FC<NotesDetailedSummaryProps> = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {currentPageResults &&
-                    currentPageResults.map((note) => {
-                      return (
-                        <Fragment key={note.id}>
-                          <tr className={styles.notesTableDataRow}>
-                            <td className={styles.noteDate}>
-                              {formatDate(note?.encounterDate)}
-                            </td>
-                            <td className={styles.noteInfo}>
-                              <span className="omrs-medium">
-                                {note.encounterType}
-                              </span>
-                              <div
-                                style={{
-                                  color:
-                                    "var(--omrs-color-ink-medium-contrast)",
-                                  margin: "0rem",
-                                }}
-                              >
-                                {capitalize(note.encounterLocation)}
-                              </div>
-                            </td>
-                            <td className={styles.noteAuthor}>
-                              {note.encounterAuthor
-                                ? note.encounterAuthor
-                                : "\u2014"}
-                            </td>
-                            <td
+                  {pagination.results.map((note) => {
+                    return (
+                      <Fragment key={note.id}>
+                        <tr className={styles.notesTableDataRow}>
+                          <td className={styles.noteDate}>
+                            {formatDate(note?.encounterDate)}
+                          </td>
+                          <td className={styles.noteInfo}>
+                            <span className="omrs-medium">
+                              {note.encounterType}
+                            </span>
+                            <div
                               style={{
-                                textAlign: "end",
-                                paddingRight: "0.625rem",
+                                color: "var(--omrs-color-ink-medium-contrast)",
+                                margin: "0rem",
                               }}
                             >
-                              <Link to={`/${note.id}`}>
-                                <svg className="omrs-icon">
-                                  <use
-                                    fill="var(--omrs-color-ink-low-contrast)"
-                                    xlinkHref="#omrs-icon-chevron-right"
-                                  ></use>
-                                </svg>
-                              </Link>
-                            </td>
-                          </tr>
-                        </Fragment>
-                      );
-                    })}
+                              {capitalize(note.encounterLocation)}
+                            </div>
+                          </td>
+                          <td className={styles.noteAuthor}>
+                            {note.encounterAuthor
+                              ? note.encounterAuthor
+                              : "\u2014"}
+                          </td>
+                          <td
+                            style={{
+                              textAlign: "end",
+                              paddingRight: "0.625rem",
+                            }}
+                          >
+                            <Link to={`/${note.id}`}>
+                              <svg className="omrs-icon">
+                                <use
+                                  fill="var(--omrs-color-ink-low-contrast)"
+                                  xlinkHref="#omrs-icon-chevron-right"
+                                ></use>
+                              </svg>
+                            </Link>
+                          </td>
+                        </tr>
+                      </Fragment>
+                    );
+                  })}
                 </tbody>
               </table>
               <div className={styles.pagination}>
                 <div>
-                  {showPreviousButton && (
+                  {pagination.showPreviousButton && (
                     <button
-                      onClick={previousPage}
+                      onClick={pagination.goToPrevious}
                       className={`${styles.navButton} omrs-bold omrs-btn omrs-text-neutral omrs-rounded`}
                     >
                       <svg
@@ -183,7 +139,12 @@ const NotesDetailedSummary: React.FC<NotesDetailedSummaryProps> = () => {
                     </button>
                   )}
                 </div>
-                {patientNotes.length <= resultsPerPage ? (
+                {pagination.paginated ? (
+                  <div>
+                    {t("page", "Page")} {pagination.currentPage} {t("of", "of")}{" "}
+                    {pagination.totalPages}
+                  </div>
+                ) : (
                   <div
                     className="omrs-type-body-regular"
                     style={{ fontFamily: "Work Sans" }}
@@ -194,16 +155,11 @@ const NotesDetailedSummary: React.FC<NotesDetailedSummaryProps> = () => {
                       {t("noMoreNotesAvailable", "No more notes available")}
                     </p>
                   </div>
-                ) : (
-                  <div>
-                    {t("page", "Page")} {currentPage} {t("of", "of")}{" "}
-                    {totalPages}
-                  </div>
                 )}
                 <div>
-                  {showNextButton && (
+                  {pagination.showNextButton && (
                     <button
-                      onClick={nextPage}
+                      onClick={pagination.goToNext}
                       className={`${styles.navButton} omrs-bold omrs-btn omrs-text-neutral omrs-rounded`}
                     >
                       {t("next", "Next")}
@@ -223,7 +179,7 @@ const NotesDetailedSummary: React.FC<NotesDetailedSummaryProps> = () => {
               displayText={t("notes", "notes")}
               headerTitle={t("notes", "Notes")}
               launchForm={() =>
-                openWorkspaceTab(VisitNotes, `${t("visitNote", "Visit Note")}`)
+                attach("patient-chart-workspace-slot", "visit-notes-workspace")
               }
             />
           )}

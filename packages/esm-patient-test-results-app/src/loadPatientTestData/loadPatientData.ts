@@ -34,9 +34,8 @@ const parseSingleObsData = ({
   entry.name = testConceptNameMap[entry.conceptClass];
 };
 
-const reloadData = async (patientUuid: string) => {
+async function reloadData(patientUuid: string) {
   const entries = await loadObsEntries(patientUuid);
-
   const allConcepts = await loadPresentConcepts(entries);
 
   const testConcepts = allConcepts.filter(
@@ -64,7 +63,9 @@ const reloadData = async (patientUuid: string) => {
 
   entries.forEach((entry) => {
     // remove non test entries (due to unclean FHIR reponse)
-    if (!testConceptUuids.includes(getEntryConceptClassUuid(entry))) return;
+    if (!testConceptUuids.includes(getEntryConceptClassUuid(entry))) {
+      return;
+    }
 
     parseEntry(entry);
 
@@ -78,6 +79,7 @@ const reloadData = async (patientUuid: string) => {
   singeEntries.forEach((entry) => {
     const { id } = entry;
     const memRef = memberRefs[id];
+
     if (memRef) {
       memRef[0][memRef[1]] = entry;
     } else {
@@ -110,14 +112,16 @@ const reloadData = async (patientUuid: string) => {
       })
   );
 
-  addUserDataToCache(patientUuid, sortedObs, entries[0].id);
+  if (entries.length > 0) {
+    addUserDataToCache(patientUuid, sortedObs, entries[0].id);
+  }
 
   return sortedObs;
-};
+}
 
-const loadPatientData = (
+function loadPatientData(
   patientUuid: string
-): [PatientData | undefined, Promise<PatientData>] => {
+): [PatientData | undefined, Promise<PatientData>] {
   const [cachedPatientData, shouldReload] = getUserDataFromCache(patientUuid);
 
   return [
@@ -126,6 +130,6 @@ const loadPatientData = (
       reload ? reloadData(patientUuid) : cachedPatientData
     ),
   ];
-};
+}
 
 export default loadPatientData;

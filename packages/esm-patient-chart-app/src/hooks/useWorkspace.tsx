@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from "react";
 import {
-  detach,
+  detachAll,
   extensionStore,
   useAssignedExtensionIds,
 } from "@openmrs/esm-framework";
@@ -13,7 +13,7 @@ export interface WorkspaceState {
 }
 
 export interface WorkspaceDetails extends WorkspaceState {
-  clearExtensionSlot(): void;
+  closeWorkspace(): void;
 }
 
 export function useWorkspace(): WorkspaceDetails {
@@ -30,15 +30,14 @@ export function useWorkspace(): WorkspaceDetails {
     }
   }, [extensions]);
 
-  const clearExtensionSlot = useCallback(() => {
-    for (const extension of extensions) {
-      detach(patientChartWorkspaceSlot, extension);
-    }
-  }, [extensions]);
+  const closeWorkspace = useCallback(
+    () => detachAll(patientChartWorkspaceSlot),
+    []
+  );
 
   return {
     title,
     active: extensions.length > 0,
-    clearExtensionSlot,
+    closeWorkspace,
   };
 }

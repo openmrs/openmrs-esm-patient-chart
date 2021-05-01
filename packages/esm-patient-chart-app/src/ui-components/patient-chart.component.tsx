@@ -1,10 +1,10 @@
 import React, { useMemo } from "react";
 import styles from "./patient-chart.component.scss";
-import Loader from "../loader/loader.component";
-import WorkspaceWrapper from "../../workspace/workspace-wrapper.component";
-import ChartReview from "../../view-components/chart-review.component";
-import VisitDialog from "../../visit/visit-dialog.component";
-import { useVisitDialog } from "../../hooks/useVisitDialog";
+import Loader from "./loader.component";
+import WorkspaceWrapper from "../workspace/workspace-wrapper.component";
+import ChartReview from "../view-components/chart-review.component";
+import VisitDialog from "../visit/visit-dialog.component";
+import { useVisitDialog } from "../hooks/useVisitDialog";
 import { RouteComponentProps } from "react-router-dom";
 import { ExtensionSlot, useCurrentPatient } from "@openmrs/esm-framework";
 

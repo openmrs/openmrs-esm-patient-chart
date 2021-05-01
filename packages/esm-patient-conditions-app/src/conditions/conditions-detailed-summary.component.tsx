@@ -3,7 +3,11 @@ import dayjs from "dayjs";
 import capitalize from "lodash-es/capitalize";
 import ConditionsForm from "./conditions-form.component";
 import styles from "./conditions-detailed-summary.css";
-import { EmptyState, SummaryCard } from "@openmrs/esm-patient-common-lib";
+import {
+  EmptyState,
+  SummaryCard,
+  openWorkspaceTab,
+} from "@openmrs/esm-patient-common-lib";
 import { Link } from "react-router-dom";
 import { useTranslation, Trans } from "react-i18next";
 import { createErrorHandler } from "@openmrs/esm-framework";
@@ -11,7 +15,6 @@ import {
   Condition,
   performPatientConditionsSearch,
 } from "./conditions.resource";
-import { openWorkspaceTab } from "./openWorkspaceTab";
 
 interface ConditionsDetailedSummaryProps {
   basePath: string;
@@ -46,7 +49,7 @@ const ConditionsDetailedSummary: React.FC<ConditionsDetailedSummaryProps> = ({
         <SummaryCard
           name={t("conditions", "Conditions")}
           styles={{ width: "100%" }}
-          addComponent={ConditionsForm}
+          addComponent
           showComponent={() =>
             openWorkspaceTab(
               ConditionsForm,

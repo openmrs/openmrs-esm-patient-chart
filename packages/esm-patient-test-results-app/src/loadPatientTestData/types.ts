@@ -4,7 +4,7 @@ export type ConceptUuid = string;
 export type ObsUuid = string;
 
 export interface ObsRecord {
-  members?: ObsRecord[];
+  members?: Array<ObsRecord>;
   conceptClass: ConceptUuid;
   meta?: ObsMetaInfo;
   effectiveDateTime: string;
@@ -22,5 +22,9 @@ export interface ConceptRecord {
 }
 
 export interface PatientData {
-  [_: string]: { entries: ObsRecord[]; type: "LabSet" | "Test"; uuid: string };
+  [_: string]: {
+    entries: Array<ObsRecord>;
+    type: "LabSet" | "Test";
+    uuid: string;
+  };
 }

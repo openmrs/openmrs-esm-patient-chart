@@ -14,11 +14,14 @@ import DataTable, {
   TableHeader,
   TableRow,
 } from "carbon-components-react/es/components/DataTable";
-import { EmptyState, ErrorState } from "@openmrs/esm-patient-common-lib";
+import {
+  EmptyState,
+  ErrorState,
+  openWorkspaceTab,
+} from "@openmrs/esm-patient-common-lib";
 import { useTranslation } from "react-i18next";
 import { mapFromFHIRImmunizationBundle } from "./immunization-mapper";
 import { performPatientImmunizationsSearch } from "./immunizations.resource";
-import { openWorkspaceTab } from "./openWorkspaceTab";
 
 export interface ImmunizationsOverviewProps {
   basePath: string;

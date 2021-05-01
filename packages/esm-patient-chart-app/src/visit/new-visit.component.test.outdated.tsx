@@ -5,25 +5,18 @@ import { of } from "rxjs/internal/observable/of";
 import { mockVisitTypesDataResponse } from "../../../../__mocks__/visits.mock";
 import { mockLocationsDataResponse } from "../../../../__mocks__/location.mock";
 import { mockSessionDataResponse } from "../../../../__mocks__/session.mock";
-import {
-  openmrsObservableFetch,
-  getCurrentPatientUuid,
-} from "@openmrs/esm-framework";
+import { openmrsObservableFetch } from "@openmrs/esm-framework";
 import NewVisit from "./new-visit.component";
 
-const mockGetCurrentPatientUuid = getCurrentPatientUuid as jest.Mock;
 const mockOpenmrsObservableFetch = openmrsObservableFetch as jest.Mock;
 
-mockGetCurrentPatientUuid.mockImplementation(jest.fn());
 mockOpenmrsObservableFetch.mockImplementation(jest.fn());
 
 describe("<NewVisit />", () => {
   let patientUuid = "some-patient-uuid";
 
   afterEach(mockOpenmrsObservableFetch.mockReset);
-  afterEach(mockGetCurrentPatientUuid.mockReset);
   beforeEach(() => {
-    mockGetCurrentPatientUuid.mockReturnValue(of(patientUuid));
     mockOpenmrsObservableFetch.mockImplementation(
       (url: string, config: { method: string; body: any }) => {
         if (url.indexOf("/visittype") >= 0) {
