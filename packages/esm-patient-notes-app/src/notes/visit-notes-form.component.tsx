@@ -1,4 +1,5 @@
 import React from "react";
+import dayjs from "dayjs";
 import debounce from "lodash-es/debounce";
 import styles from "./visit-notes-form.scss";
 import Button from "carbon-components-react/es/components/Button";
@@ -13,11 +14,15 @@ import TextArea from "carbon-components-react/es/components/TextArea";
 import { Tile } from "carbon-components-react/es/components/Tile";
 import { useTranslation } from "react-i18next";
 import { Column, Grid, Row } from "carbon-components-react/es/components/Grid";
-import { createErrorHandler, useConfig } from "@openmrs/esm-framework";
+import {
+  createErrorHandler,
+  showToast,
+  useConfig,
+} from "@openmrs/esm-framework";
 import {
   convertToObsPayLoad,
-  obs,
   Diagnosis,
+  ObsData,
   VisitNotePayload,
 } from "./visit-note.util";
 import {
@@ -35,8 +40,8 @@ interface VisitNotesFormProps {
 }
 
 const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
-  closeWorkspace,
   patientUuid,
+  closeWorkspace,
 }) => {
   const searchTimeoutInMs = 300;
   const config = useConfig() as ConfigObject;
@@ -58,27 +63,17 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   ] = React.useState("");
   const [locationUuid, setLocationUuid] = React.useState<string | null>(null);
   const [providerUuid, setProviderUuid] = React.useState<string | null>(null);
+  const [isSearching, setIsSearching] = React.useState(false);
   const [searchTerm, setSearchTerm] = React.useState("");
   const [searchResults, setSearchResults] = React.useState<Array<Diagnosis>>(
     null
   );
+  const [diagnosis, setDiagnosis] = React.useState<any>(null);
   const [selectedDiagnoses, setSelectedDiagnoses] = React.useState<
     Array<Diagnosis>
   >([]);
   const [visitDateTime, setVisitDateTime] = React.useState(new Date());
-  const searchInputRef = React.useRef(null);
-
-  React.useEffect(() => {
-    if (searchTerm) {
-      const sub = fetchDiagnosisByName(searchTerm).subscribe(
-        (results) => setSearchResults(results),
-        createErrorHandler()
-      );
-      return () => sub.unsubscribe();
-    } else {
-      setSearchResults(null);
-    }
-  }, [searchTerm]);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   React.useEffect(() => {
     const ac = new AbortController();
@@ -101,24 +96,33 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
         setProviderUuid(data.uuid);
       });
     }
-  }, [currentSessionProviderUuid]);
-
-  React.useEffect(() => {
-    const ac = new AbortController();
     if (currentSessionLocationUuid) {
       fetchLocationByUuid(ac, currentSessionLocationUuid).then(({ data }) =>
         setLocationUuid(data.uuid)
       );
     }
-  }, [currentSessionLocationUuid]);
+  }, [currentSessionLocationUuid, currentSessionProviderUuid]);
 
-  const handleCancel = () => {
-    closeWorkspace();
-  };
+  const debouncedSearch = React.useMemo(
+    () =>
+      debounce((searchTerm) => {
+        if (searchTerm) {
+          const sub = fetchDiagnosisByName(searchTerm).subscribe(
+            (diagnoses: Array<Diagnosis>) => setSearchResults(diagnoses),
+            createErrorHandler(),
+            () => setIsSearching(false)
+          );
+          return () => sub.unsubscribe();
+        } else {
+          setSearchResults(null);
+        }
+      }, searchTimeoutInMs),
+    []
+  );
 
-  const handleSearchTermChange = debounce((searchTerm) => {
-    setSearchTerm(searchTerm);
-  }, searchTimeoutInMs);
+  React.useEffect(() => {
+    debouncedSearch(searchTerm);
+  }, [searchTerm, debouncedSearch]);
 
   const resetSearch = () => {
     setSearchTerm("");
@@ -142,8 +146,14 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
   };
 
   const handleSubmit = (event) => {
+    setIsSubmitting(true);
     event.preventDefault();
-    let obs: Array<obs> = [];
+    let obs: Array<ObsData> = [];
+
+    if (selectedDiagnoses.length) {
+      selectedDiagnoses[0].primary = true;
+    }
+
     obs = convertToObsPayLoad(selectedDiagnoses);
     if (clinicalNote) {
       obs = [
@@ -156,7 +166,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
     }
 
     let visitNotePayload: VisitNotePayload = {
-      encounterDatetime: visitDateTime,
+      encounterDatetime: dayjs(visitDateTime).format(),
       patient: patientUuid,
       location: locationUuid,
       encounterProviders: [
@@ -169,11 +179,19 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
       form: formConceptUuid,
       obs: obs,
     };
+
     const ac = new AbortController();
     saveVisitNote(ac, visitNotePayload).then((response) => {
-      response.status === 201 && closeWorkspace();
+      if (response.status === 201) {
+        closeWorkspace();
+        showToast({
+          description: t("visitNoteSaved", "Visit note saved successfully"),
+        });
+      }
       response.status !== 201 && createErrorHandler();
+      setIsSubmitting(false);
     });
+
     return () => ac.abort();
   };
 
@@ -198,7 +216,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
             >
               <DatePickerInput
                 id="visitDateTimePicker"
-                labelText={t("visitDate", "Visit Date")}
+                labelText={t("visitDate", "Visit date")}
                 placeholder="dd/mm/yyyy"
               />
             </DatePicker>
@@ -238,48 +256,49 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                 </span>
               )}
             </div>
-            <FormGroup legendText="Search for a diagnosis">
+            <FormGroup
+              legendText={t("searchForDiagnosis", "Search for a diagnosis")}
+            >
               <Search
                 id="diagnosisSearch"
-                light
                 labelText={t("enterDiagnoses", "Enter diagnoses")}
                 placeholder={t(
                   "diagnosisInputPlaceholder",
-                  "Choose primary diagnosis first, then secondary diagnoses"
+                  "Choose a primary diagnosis first, then secondary diagnoses"
                 )}
-                onChange={(e) =>
-                  handleSearchTermChange(e.currentTarget.value ?? "")
-                }
-                ref={searchInputRef}
+                onChange={(event) => {
+                  setIsSearching(true);
+                  setDiagnosis(null);
+                  setSearchTerm(event.target.value);
+                }}
+                value={diagnosis?.concept?.preferredName || searchTerm}
+                light
               />
-              {searchTerm &&
-                (searchResults ? (
-                  searchResults.length ? (
-                    <ul className={styles.diagnosisList}>
-                      {searchResults.map((diagnosis, index) => (
-                        <li
-                          role="menuitem"
-                          className={styles.diagnosis}
-                          key={index}
-                          onClick={() => handleAddDiagnosis(diagnosis)}
-                        >
-                          {diagnosis.concept.preferredName}
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <Tile light className={styles.emptyResultsText}>
-                      <span>
-                        {t(
-                          "noMatchingDiagnosesText",
-                          "No matching diagnoses have been found"
-                        )}
-                      </span>
-                    </Tile>
-                  )
-                ) : (
+              {searchTerm ? (
+                searchResults && searchResults.length ? (
+                  <ul className={styles.diagnosisList}>
+                    {searchResults.map((diagnosis, index) => (
+                      <li
+                        role="menuitem"
+                        className={styles.diagnosis}
+                        key={index}
+                        onClick={() => handleAddDiagnosis(diagnosis)}
+                      >
+                        {diagnosis.concept.preferredName}
+                      </li>
+                    ))}
+                  </ul>
+                ) : isSearching ? (
                   <SearchSkeleton />
-                ))}
+                ) : (
+                  <Tile light className={styles.emptyResults}>
+                    <span>
+                      {t("noMatchingDiagnoses", "No diagnoses found matching")}{" "}
+                      <strong>"{searchTerm}"</strong>
+                    </span>
+                  </Tile>
+                )
+              ) : null}
             </FormGroup>
           </Column>
         </Row>
@@ -296,7 +315,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                 "clinicalNotePlaceholder",
                 "Write any additional points here"
               )}
-              onChange={(e) => setClinicalNote(e.currentTarget.value)}
+              onChange={(event) => setClinicalNote(event.currentTarget.value)}
             />
           </Column>
         </Row>
@@ -319,7 +338,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
                 kind="tertiary"
                 onClick={() => {}}
               >
-                {t("addVisitImage", "Add Image")}
+                {t("addImage", "Add image")}
               </Button>
             </FormGroup>
           </Column>
@@ -328,7 +347,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
           <Column>
             <Button
               kind="secondary"
-              onClick={handleCancel}
+              onClick={closeWorkspace}
               style={{ width: "50%" }}
             >
               {t("cancel", "Cancel")}
@@ -337,6 +356,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({
               kind="primary"
               onClick={handleSubmit}
               style={{ width: "50%" }}
+              disabled={isSubmitting}
               type="submit"
             >
               {t("saveAndClose", "Save & Close")}

@@ -12,10 +12,13 @@ const SECONDARY_DIAGNOSIS_ORDER_CONCEPT: string =
   "159944AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 const PROBLEM_LIST_CONCEPT: string = "1284AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
 
-export interface obs {
+export interface ObsData {
   concept: string;
   value?: string | any;
-  groubMembers?: [{ concept: string; value?: string | any }];
+  groupMembers?: Array<{
+    concept: string;
+    value?: string | any;
+  }>;
 }
 
 export interface Diagnosis {
@@ -26,18 +29,20 @@ export interface Diagnosis {
 }
 
 export interface VisitNotePayload {
-  encounterDatetime: Date; // date and time the encounter was created (ISO8601 Long) (REQUIRED)
+  encounterDatetime: string; // date and time the encounter was created (ISO8601 Long) (REQUIRED)
   encounterType: string; // uuid of the encounter type - initial visit, return visit etc. (REQUIRED)
   patient: string; // the patient to whom the encounter applies
   location: string; // the location at which the encounter occurred (REQUIRED)
   encounterProviders: Array<{ encounterRole: string; provider: string }>; // array of providers and their role within the encounter. At least 1 provider is required
-  obs: Array<any>; // array of observations and values for the encounter
+  obs: Array<ObsData>; // array of observations and values for the encounter
   form: string; // target form uuid to be filled for the encounter
   orders?: Array<any>; // list of orders created during the encounter
   visit?: string; // when creating an encounter for a specific visit, this specifies the visit
 }
 
-export function convertToObsPayLoad(diagnosisArray: Array<any>): Array<obs> {
+export function convertToObsPayLoad(
+  diagnosisArray: Array<Diagnosis>
+): Array<ObsData> {
   return diagnosisArray.map((diagnosis) => {
     if (diagnosis.confirmed === true && diagnosis.primary === true) {
       // confirmed and primary diagnosis

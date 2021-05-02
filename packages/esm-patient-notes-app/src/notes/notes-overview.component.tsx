@@ -53,9 +53,10 @@ const NotesOverview: React.FC<NotesOverviewProps> = ({
     setShowAllNotes(!showAllNotes);
   };
 
-  const launchVisitNoteForm = () => {
-    attach("patient-chart-workspace-context", "visit-notes-workspace");
-  };
+  const launchVisitNoteForm = React.useCallback(
+    () => attach("patient-chart-workspace-slot", "visit-notes-workspace"),
+    []
+  );
 
   const headers = [
     {
