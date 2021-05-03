@@ -94,7 +94,9 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
               <CustomOverflowMenuComponent
                 menuTitle={
                   <>
-                    <span className={styles.actionsButtonText}>Actions</span>{" "}
+                    <span className={styles.actionsButtonText}>
+                      {t("actions", "Actions")}
+                    </span>{" "}
                     <OverflowMenuVertical16 style={{ marginLeft: "0.5rem" }} />
                   </>
                 }

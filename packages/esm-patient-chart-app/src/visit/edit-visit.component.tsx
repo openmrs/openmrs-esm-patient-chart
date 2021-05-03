@@ -48,10 +48,10 @@ const EditVisit: React.FC<EditVisitProps> = ({
       <table className={styles.editVisitTable}>
         <thead>
           <tr>
-            <td>{t("visitStartDate", "Visit Start Date")}</td>
-            <td>{t("visitType", "Visit Type")}</td>
+            <td>{t("visitStartDate", "Visit start date")}</td>
+            <td>{t("visitType", "Visit type")}</td>
             <td>{t("location", "Location")}</td>
-            <td colSpan={3}>{t("visitEndDate", "Visit End Date")}</td>
+            <td colSpan={3}>{t("visitEndDate", "Visit end date")}</td>
           </tr>
         </thead>
         <tbody>

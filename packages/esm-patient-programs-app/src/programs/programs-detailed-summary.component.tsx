@@ -46,7 +46,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = () => {
             showComponent={() =>
               openWorkspaceTab(
                 ProgramsForm,
-                `${t("programsForm", "Programs Form")}`,
+                `${t("programsForm", "Programs form")}`,
                 {
                   setEnrolledPrograms: setEnrolledPrograms,
                   enrolledPrograms: enrolledPrograms,
@@ -58,7 +58,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = () => {
               <thead>
                 <tr>
                   <th>
-                    <Trans i18nKey="activePrograms">Active Programs</Trans>
+                    <Trans i18nKey="activePrograms">Active programs</Trans>
                   </th>
                   <th>
                     <Trans i18nKey="since">Since</Trans>
@@ -87,7 +87,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = () => {
                         <td>
                           {program.dateCompleted ? (
                             <span className={styles.completionDate}>
-                              <Trans i18nKey="Completed on">Completed on</Trans>{" "}
+                              <Trans i18nKey="completedOn">Completed on</Trans>{" "}
                               {dayjs(program.dateCompleted).format(
                                 "DD-MMM-YYYY"
                               )}
@@ -123,7 +123,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = () => {
           launchForm={() =>
             openWorkspaceTab(
               ProgramsForm,
-              `${t("programsForm", "Programs Form")}`,
+              `${t("programsForm", "Programs form")}`,
               {
                 setEnrolledPrograms: setEnrolledPrograms,
                 enrolledPrograms: enrolledPrograms,

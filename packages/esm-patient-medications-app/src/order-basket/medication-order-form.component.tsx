@@ -312,7 +312,7 @@ export default function MedicationOrderForm({
                 <DatePickerInput
                   id="startDatePicker"
                   placeholder="mm/dd/yyyy"
-                  labelText={t("startDate", "Start Date")}
+                  labelText={t("startDate", "Start date")}
                 />
               </DatePicker>
             </Column>

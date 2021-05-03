@@ -44,13 +44,13 @@ export default function AllergyRecord(props: AllergyRecordProps) {
       {allergy && Object.entries(allergy).length && (
         <div className={styles.allergyContainer}>
           <SummaryCard
-            name={t("Allergy", "Allergy")}
+            name={t("allergy", "Allergy")}
             styles={{ width: "100%" }}
             editComponent
             showComponent={() =>
               openWorkspaceTab(
                 AllergyForm,
-                `${t("Edit Allergy", "Edit Allergy")}`,
+                `${t("editAllergy", "Edit Allergy")}`,
                 {
                   allergyUuid: allergy.id,
                 }
@@ -71,9 +71,9 @@ export default function AllergyRecord(props: AllergyRecordProps) {
               <table className={styles.allergyTable}>
                 <thead className="omrs-type-body-regular">
                   <tr>
-                    <th>{t("Severity", "Severity")}</th>
-                    <th>{t("Reaction", "Reaction")}</th>
-                    <th>{t("Onset Date", "Onset Date")}</th>
+                    <th>{t("severity", "Severity")}</th>
+                    <th>{t("reaction", "Reaction")}</th>
+                    <th>{t("onsetDate", "Onset Date")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -112,7 +112,7 @@ export default function AllergyRecord(props: AllergyRecordProps) {
                 <table className={styles.allergyTable}>
                   <thead className="omrs-type-body-regular">
                     <tr>
-                      <th>{t("Comments", "Comments")}</th>
+                      <th>{t("comments", "Comments")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -129,9 +129,9 @@ export default function AllergyRecord(props: AllergyRecordProps) {
             <table className={styles.allergyTable}>
               <thead className="omrs-type-body-regular">
                 <tr>
-                  <th>{t("Last updated", "Last updated")}</th>
-                  <th>{t("Last updated by", "Last updated by")}</th>
-                  <th>{t("Last updated location", "Last updated location")}</th>
+                  <th>{t("lastUpdated", "Last updated")}</th>
+                  <th>{t("lastUpdatedBy", "Last updated by")}</th>
+                  <th>{t("lastUpdatedLocation", "Last updated location")}</th>
                 </tr>
               </thead>
               <tbody>

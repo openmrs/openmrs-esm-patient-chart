@@ -39,7 +39,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient }) => {
   const [firstRowIndex, setFirstRowIndex] = React.useState(0);
   const [currentPageSize, setCurrentPageSize] = React.useState(5);
 
-  const displayText = t("conditions", "conditions");
+  const displayText = t("conditions", "Conditions");
   const headerTitle = t("conditions", "Conditions");
   const previousPage = t("previousPage", "Previous page");
   const nextPage = t("nextPage", "Next Page");

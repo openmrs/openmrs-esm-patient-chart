@@ -94,7 +94,7 @@ const MedicationsDetailsTable = connect<
             {medication.doseUnits?.display} &mdash; {medication.route?.display}
             <br />
             <span className={styles.label01}>
-              {t("dose", "DOSE").toUpperCase()}
+              {t("dose", "Dose").toUpperCase()}
             </span>{" "}
             <strong>
               {getDosage(
@@ -104,7 +104,7 @@ const MedicationsDetailsTable = connect<
             </strong>{" "}
             &mdash; {medication.frequency?.display} &mdash;{" "}
             {!medication.duration
-              ? t("medicationUndefinedDuration", "Indefinite duration")
+              ? t("medicationIndefiniteDuration", "Indefinite duration")
               : t(
                   "medicationDurationAndUnit",
                   "for {duration} {durationUnit}",
@@ -115,7 +115,7 @@ const MedicationsDetailsTable = connect<
                 )}
             <br />
             <span className={styles.label01}>
-              {t("refills", "REFILLS").toUpperCase()}
+              {t("refills", "Refills").toUpperCase()}
             </span>{" "}
             {medication.numRefills}
           </p>

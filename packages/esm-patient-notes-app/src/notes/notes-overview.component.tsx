@@ -36,7 +36,7 @@ const NotesOverview: React.FC<NotesOverviewProps> = ({
   const [notes, setNotes] = React.useState<Array<PatientNote>>(null);
   const [error, setError] = React.useState(null);
   const [showAllNotes, setShowAllNotes] = React.useState(false);
-  const displayText = t("notes", "notes");
+  const displayText = t("notes", "Notes");
   const headerTitle = t("notes", "Notes");
 
   React.useEffect(() => {

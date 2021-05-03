@@ -206,9 +206,9 @@ export const CloseActiveVisitConfirmation: React.FC<EndVisitProps> = ({
     <div className={styles.visitPromptContainer}>
       <h2>{t("endVisitPrompt", "Are you sure you want to end this visit?")}</h2>
       <p>
-        {t("visitType", "Visit Type")}: {visitData.visitType.display}{" "}
+        {t("visitType", "Visit type")}: {visitData.visitType.display}{" "}
         {t("location", "Location")}: {visitData?.location?.display}{" "}
-        {t("startDate", "Start Date")}:{" "}
+        {t("startDate", "Start date")}:{" "}
         {dayjs(visitData.startDatetime).format("DD-MMM-YYYY")}
       </p>
       <div className={styles.visitPromptButtonsContainer}>
@@ -243,11 +243,11 @@ export const EndVisitConfirmation: React.FC<EndVisitProps> = ({
   const { t } = useTranslation();
   return (
     <div className={styles.visitPromptContainer}>
-      <h2>{t("endVisitPrompt", "Are you sure you wish to end this visit?")}</h2>
+      <h2>{t("endVisitPrompt", "Are you sure you want to end this visit?")}</h2>
       <p>
-        {t("visitType", "Visit Type")}: {visitData.visitType.display}{" "}
+        {t("visitType", "Visit type")}: {visitData.visitType.display}{" "}
         {t("location", "Location")}: {visitData?.location?.display}{" "}
-        {t("startDate", "Start Date")}:{" "}
+        {t("startDate", "Start date")}:{" "}
         {dayjs(visitData.startDatetime).format("DD-MMM-YYYY")}
       </p>
       <div className={styles.visitPromptButtonsContainer}>

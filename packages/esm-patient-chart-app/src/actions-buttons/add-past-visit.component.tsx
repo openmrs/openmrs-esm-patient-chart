@@ -16,7 +16,7 @@ const AddPastVisitOverflowMenuItem: React.FC<AddPastVisitOverflowMenuItemProps> 
       <button
         className="bx--overflow-menu-options__btn"
         role="menuitem"
-        title={t("Add Past Visit", "Add Past Visit")}
+        title={t("addPastVisit", "Add Past Visit")}
         data-floating-menu-primary-focus
         onClick={handleClick}
         style={{
@@ -24,7 +24,7 @@ const AddPastVisitOverflowMenuItem: React.FC<AddPastVisitOverflowMenuItemProps> 
         }}
       >
         <span className="bx--overflow-menu-options__option-content">
-          {t("Add Past Visit", "Add Past Visit")}
+          {t("addPastVisit", "Add Past Visit")}
         </span>
       </button>
     </li>

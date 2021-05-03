@@ -41,13 +41,13 @@ export default function AllergiesDetailedSummary({
     <>
       {patientAllergies?.length ? (
         <SummaryCard
-          name={t("Allergies", "Allergies")}
+          name={t("allergies", "Allergies")}
           styles={{ width: "100%" }}
           addComponent
           showComponent={() =>
             openWorkspaceTab(
               AllergyForm,
-              `${t("Allergies Form", "Allergies Form")}`,
+              `${t("allergiesForm", "Allergies Form")}`,
               {
                 allergyUuid: null,
                 setAllergies: setPatientAllergies,
@@ -59,17 +59,17 @@ export default function AllergiesDetailedSummary({
           <table className={`omrs-type-body-regular ${styles.allergyTable}`}>
             <thead>
               <tr>
-                <td>{t("Allergen", "Allergen")}</td>
+                <td>{t("allergen", "Allergen")}</td>
                 <td>
                   <div className={styles.centerItems}>
-                    {t("Severity & Reaction", "Severity & Reaction")}
+                    {t("severityandReaction", "Severity & Reaction")}
                     <svg className="omrs-icon" fill="rgba(0, 0, 0, 0.54)">
                       <use xlinkHref="#omrs-icon-arrow-downward" />
                     </svg>
                   </div>
                 </td>
-                <td>{t("Since", "Since")}</td>
-                <td>{t("Updated", "Updated")}</td>
+                <td>{t("since", "Since")}</td>
+                <td>{t("updated", "Updated")}</td>
               </tr>
             </thead>
             <tbody>
@@ -150,12 +150,12 @@ export default function AllergiesDetailedSummary({
         </SummaryCard>
       ) : (
         <EmptyState
-          displayText={t("allergy intolerances", "allergy intolerances")}
+          displayText={t("allergyIntolerances", "allergy intolerances")}
           headerTitle={t("allergies", "Allergies")}
           launchForm={() =>
             openWorkspaceTab(
               AllergyForm,
-              `${t("Allergies Form", "Allergies Form")}`,
+              `${t("allergiesForm", "Allergies Form")}`,
               {
                 allergyUuid: null,
                 setAllergies: setPatientAllergies,

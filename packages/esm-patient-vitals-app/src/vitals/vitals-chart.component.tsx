@@ -1,5 +1,6 @@
 import React from "react";
 import dayjs from "dayjs";
+import { useTranslation } from "react-i18next";
 import styles from "./vitals-chart.component.scss";
 import RadioButton from "carbon-components-react/es/components/RadioButton";
 import RadioButtonGroup from "carbon-components-react/es/components/RadioButtonGroup";
@@ -24,6 +25,7 @@ const VitalsChart: React.FC<VitalsChartProps> = ({
   patientVitals,
   conceptsUnits,
 }) => {
+  const { t } = useTranslation();
   const [chartData, setChartData] = React.useState([]);
   const [
     bloodPressureUnit,
@@ -119,7 +121,7 @@ const VitalsChart: React.FC<VitalsChartProps> = ({
     <div className={styles.vitalsChartContainer}>
       <div className={styles.vitalSignsArea} style={{ flex: 1 }}>
         <label className={styles.vitalsSign} htmlFor="radio-button-group">
-          Vital Sign Displayed
+          {t("vitalSignDisplayed", "Vital Sign Displayed")}
         </label>
         <RadioButtonGroup
           defaultSelected="bloodPressure"

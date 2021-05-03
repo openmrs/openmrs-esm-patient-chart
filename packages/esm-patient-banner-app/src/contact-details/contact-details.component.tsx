@@ -6,12 +6,14 @@ import {
   Relationship,
 } from "./relationships.resource";
 import styles from "./contact-details.scss";
+import { useTranslation } from "react-i18next";
 
 const Address: React.FC<{ address: fhir.Address }> = ({ address }) => {
+  const { t } = useTranslation();
   const { city, country, postalCode, state } = address;
   return (
     <div className={styles.col}>
-      <p className={styles.heading}>Address</p>
+      <p className={styles.heading}>{t("address", "Address")}</p>
       <ul>
         <li>{postalCode}</li>
         <li>{city}</li>
@@ -25,11 +27,12 @@ const Address: React.FC<{ address: fhir.Address }> = ({ address }) => {
 const Contact: React.FC<{ telecom: Array<fhir.ContactPoint> }> = ({
   telecom,
 }) => {
+  const { t } = useTranslation();
   const value = telecom ? telecom[0].value : "-";
 
   return (
     <div className={styles.col}>
-      <p className={styles.heading}>Contact Details</p>
+      <p className={styles.heading}>{t("contactDetails", "Contact Details")}</p>
       <ul>
         <li>{value}</li>
       </ul>
