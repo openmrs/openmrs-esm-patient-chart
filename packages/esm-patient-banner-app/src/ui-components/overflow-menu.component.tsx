@@ -69,7 +69,7 @@ const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = 
         id="custom-actions-overflow-menu"
         style={{
           display: showMenu ? "block" : "none",
-          top: "3.5rem",
+          top: "3.125rem",
           minWidth: "initial",
           left: "auto",
           right: "0",
