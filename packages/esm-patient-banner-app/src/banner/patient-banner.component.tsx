@@ -74,7 +74,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
                           currentVisit.visitType.name}
                       </h6>
                       <span>
-                        <span className={styles.tooltipSmalltext}>
+                        <span className={styles.tooltipSmallText}>
                           Started:{" "}
                         </span>
                         <span>
@@ -94,7 +94,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
               <CustomOverflowMenuComponent
                 menuTitle={
                   <>
-                    Actions{" "}
+                    <span className={styles.actionsButtonText}>Actions</span>{" "}
                     <OverflowMenuVertical16 style={{ marginLeft: "0.5rem" }} />
                   </>
                 }

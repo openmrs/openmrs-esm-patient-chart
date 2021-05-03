@@ -55,6 +55,11 @@
   padding: 0.25rem;
 }
 
-.tooltipSmalltext {
+.tooltipSmallText {
   font-size: 80%;
+}
+
+.actionsButtonText {
+  @include carbon--type-style("body-short-01");
+  color: $interactive-01;
 }
