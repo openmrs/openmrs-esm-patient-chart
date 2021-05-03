@@ -36,10 +36,17 @@ function setupOpenMRS() {
           options
         ),
         meta: {
-          view: "ClinicalView",
-          title: "Clinical Views",
           columnSpan: 4,
         },
+      },
+      {
+        id: "patient-clinical-view-details",
+        slot: dashboardMeta.slot,
+        load: getAsyncLifecycle(
+          () =>
+            import("./clinical-view-overview/clinical-view-overview.component"),
+          options
+        ),
       },
       {
         id: "patient-clinical-view-form-workspace",
