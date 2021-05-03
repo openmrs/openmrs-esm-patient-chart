@@ -55,7 +55,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
     <div className={styles.container}>
       <div className={styles.patientBanner}>
         <div className={styles.patientAvatar}>
-          <ExtensionSlot extensionSlotName="patient-photo" state={state} />
+          <ExtensionSlot extensionSlotName="patient-photo-slot" state={state} />
         </div>
         <div className={styles.patientInfo}>
           <div className={(styles.row, styles.nameRow)}>
