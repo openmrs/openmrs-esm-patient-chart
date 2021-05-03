@@ -30,7 +30,7 @@ const StopVisitOverflowMenuItem: React.FC<StopVisitOverflowMenuItemProps> = ({
         <button
           className="bx--overflow-menu-options__btn"
           role="menuitem"
-          title={t("End Visit", "End Visit")}
+          title={t("endVisit", "End Visit")}
           data-floating-menu-primary-focus
           onClick={handleClick}
           style={{
@@ -38,7 +38,7 @@ const StopVisitOverflowMenuItem: React.FC<StopVisitOverflowMenuItemProps> = ({
           }}
         >
           <span className="bx--overflow-menu-options__option-content">
-            {t("End Visit", "End Visit")}
+            {t("endVisit", "End Visit")}
           </span>
         </button>
       </li>

@@ -326,7 +326,7 @@ const AllergyForm: React.FC<AllergyFormProps> = ({
   function createAllergy() {
     return (
       <SummaryCard
-        name={t("Record a new allergy", "Record a new allergy")}
+        name={t("recordNewAllergy", "Record a new allergy")}
         styles={{
           width: "100%",
           background: "var(--omrs-color-bg-medium-contrast)",
@@ -341,7 +341,7 @@ const AllergyForm: React.FC<AllergyFormProps> = ({
           }}
         >
           <h4 className={`${styles.allergyHeader}`}>
-            {t("Category of reaction", "Category of reaction")}
+            {t("reactionCategory", "Category of reaction")}
           </h4>
           <div className={`${styles.container}`}>
             <RadioButtonGroup
@@ -351,21 +351,21 @@ const AllergyForm: React.FC<AllergyFormProps> = ({
               onChange={handleAllergenChange}
             >
               <RadioButton
-                labelText={t("Drug", "Drug")}
+                labelText={t("drug", "Drug")}
                 value={AllergyConcept.DRUG_ALLERGEN}
               />
               <RadioButton
-                labelText={t("Food", "Food")}
+                labelText={t("food", "Food")}
                 value={AllergyConcept.FOOD_ALLERGEN}
               />
               <RadioButton
-                labelText={t("Environmental", "Environmental")}
+                labelText={t("environmental", "Environmental")}
                 value={AllergyConcept.ENVIRONMENTAL_ALLERGEN}
               />
               <RadioButton
                 id="no-allergies"
                 labelText={t(
-                  "Patient has no known allergies",
+                  "noKnownAllergies",
                   "Patient has no known allergies"
                 )}
                 value="noAllergy"
@@ -378,7 +378,7 @@ const AllergyForm: React.FC<AllergyFormProps> = ({
                 {capitalize(
                   getAllergyType(selectedAllergyCategory)?.toLowerCase()
                 )}{" "}
-                {t("allergen", "allergen")}
+                {t("allergen", "Allergen")}
               </h4>
               <div className={styles.container}>
                 <RadioButtonGroup
@@ -402,10 +402,10 @@ const AllergyForm: React.FC<AllergyFormProps> = ({
           {allergensArray && allergicReactions && (
             <div>
               <h4 className={`${styles.allergyHeader}`}>
-                {t("Reactions", "Reactions")}
+                {t("reactions", "Reactions")}
               </h4>
               <h4 className={`${styles.allergyHeader} omrs-type-body-regular`}>
-                {t("Select all that apply", "Select all that apply")}
+                {t("selectAllApplicable", "Select all that apply")}
               </h4>
               <div className={styles.container}>
                 {allergicReactions.map((reaction, index) => (
@@ -423,7 +423,7 @@ const AllergyForm: React.FC<AllergyFormProps> = ({
           {allergensArray && (
             <div>
               <h4 className={`${styles.allergyHeader}`}>
-                {t("Severity of worst reaction", "Severity of worst reaction")}
+                {t("severityOfWorstReaction", "Severity of worst reaction")}
               </h4>
               <div className={styles.container}>
                 <RadioButtonGroup
@@ -434,24 +434,24 @@ const AllergyForm: React.FC<AllergyFormProps> = ({
                 >
                   <RadioButton
                     id="mild"
-                    labelText={t("Mild", "Mild")}
+                    labelText={t("mild", "Mild")}
                     value={AllergyConcept.MILD_REACTION_SEVERITY}
                   />
                   <RadioButton
                     id="moderate"
-                    labelText={t("Moderate", "Moderate")}
+                    labelText={t("moderate", "Moderate")}
                     value={AllergyConcept.MODERATE_REACTION_SEVERITY}
                   />
                   <RadioButton
                     id="severe"
-                    labelText={t("Severe", "Severe")}
+                    labelText={t("severe", "Severe")}
                     value={AllergyConcept.SEVERE_REACTION_SEVERITY}
                   />
                 </RadioButtonGroup>
               </div>
               <h4 className={`${styles.allergyHeader}`}>
                 <label htmlFor="first-onset-date">
-                  {t("Date of first onset", "Date of first onset")}
+                  {t("firstOnsetDate", "Date of first onset")}
                 </label>
               </h4>
               <div className={styles.dateContainer}>
@@ -470,7 +470,7 @@ const AllergyForm: React.FC<AllergyFormProps> = ({
                 </DatePicker>
               </div>
               <h4 className={`${styles.allergyHeader}`}>
-                {t("Comments", "Comments")}
+                {t("comments", "Comments")}
               </h4>
               <div className={styles.allergyCommentContainer}>
                 <TextArea
@@ -492,14 +492,14 @@ const AllergyForm: React.FC<AllergyFormProps> = ({
             style={{ position: "sticky" }}
           >
             <Button onClick={closeForm} kind="secondary">
-              {t("Cancel", "Cancel")}
+              {t("cancel", "Cancel")}
             </Button>
             <Button
               type="submit"
               disabled={!enableCreateButtons}
               kind="primary"
             >
-              {t("Sign & Save", "Sign & Save")}
+              {t("signAndSave", "Sign & Save")}
             </Button>
           </div>
         </form>
@@ -510,7 +510,7 @@ const AllergyForm: React.FC<AllergyFormProps> = ({
   function editAllergy() {
     return (
       <SummaryCard
-        name={t("Edit existing allergy", "Edit existing allergy")}
+        name={t("editExistingAllergy", "Edit existing allergy")}
         styles={{
           width: "100%",
           background: "var(--omrs-color-bg-medium-contrast)",
@@ -529,7 +529,7 @@ const AllergyForm: React.FC<AllergyFormProps> = ({
               <div
                 className={`${styles.allergyEditHeader} omrs-padding-bottom-28`}
               >
-                <h4>{t("Allergen", "Allergen")}</h4>
+                <h4>{t("allergen", "Allergen")}</h4>
                 <h3>
                   {patientAllergy?.allergen?.codedAllergen?.display}{" "}
                   <span>
@@ -539,10 +539,10 @@ const AllergyForm: React.FC<AllergyFormProps> = ({
               </div>
               <div>
                 <h4 className={`${styles.allergyHeader}`}>
-                  {t("Reactions", "Reactions")}
+                  {t("reactions", "Reactions")}
                 </h4>
                 <h4 className={`${styles.allergyHeader}`}>
-                  {t("Select all that apply", "Select all that apply")}
+                  {t("selectAllThatApply", "Select all that apply")}
                 </h4>
                 <div className={styles.container}>
                   {allergicReactions.map((reaction, index) => (
@@ -559,10 +559,7 @@ const AllergyForm: React.FC<AllergyFormProps> = ({
               </div>
               <div>
                 <h4 className={`${styles.allergyHeader}`}>
-                  {t(
-                    "Severity of worst reaction",
-                    "Severity of worst reaction"
-                  )}
+                  {t("severityOfWorstReaction", "Severity of worst reaction")}
                 </h4>
                 <div className={styles.container}>
                   <RadioButtonGroup
@@ -574,24 +571,24 @@ const AllergyForm: React.FC<AllergyFormProps> = ({
                   >
                     <RadioButton
                       id="mild"
-                      labelText={t("Mild", "Mild")}
+                      labelText={t("mild", "Mild")}
                       value={AllergyConcept.MILD_REACTION_SEVERITY}
                     />
                     <RadioButton
                       id="moderate"
-                      labelText={t("Moderate", "Moderate")}
+                      labelText={t("moderate", "Moderate")}
                       value={AllergyConcept.MODERATE_REACTION_SEVERITY}
                     />
                     <RadioButton
                       id="severe"
-                      labelText={t("Severe", "Severe")}
+                      labelText={t("severe", "Severe")}
                       value={AllergyConcept.SEVERE_REACTION_SEVERITY}
                     />
                   </RadioButtonGroup>
                 </div>
                 <h4 className={`${styles.allergyHeader}`}>
                   <label htmlFor="first-onset-date">
-                    {t("Date of first onset", "Date of first onset")}
+                    {t("firstOnsetDate", "Date of first onset")}
                   </label>
                 </h4>
                 <div className={styles.dateContainer}>
@@ -603,7 +600,7 @@ const AllergyForm: React.FC<AllergyFormProps> = ({
                       defaultValue={dayjs(
                         patientAllergy?.auditInfo?.dateCreated
                       ).format("MM/DD/YYYY")}
-                      labelText="Date of first onset"
+                      labelText={t("firstOnsetDate", "Date of first onset")}
                       hideLabel={true}
                       onChange={(evt) => setUpdatedOnsetDate(evt.target.value)}
                       max={new Date().toUTCString()}
@@ -611,12 +608,12 @@ const AllergyForm: React.FC<AllergyFormProps> = ({
                   </DatePicker>
                 </div>
                 <h4 className={`${styles.allergyHeader}`}>
-                  {t("Comments", "Comments")}
+                  {t("comments", "Comments")}
                 </h4>
                 <div className={styles.allergyCommentContainer}>
                   <TextArea
                     hideLabel={true}
-                    labelText="comments"
+                    labelText={t("comments", "Comments")}
                     id="comments"
                     defaultValue={patientAllergy?.comment}
                     rows={6}
@@ -638,14 +635,14 @@ const AllergyForm: React.FC<AllergyFormProps> = ({
                 kind="danger"
                 style={{ width: "20%" }}
               >
-                {t("Delete", "Delete")}
+                {t("delete", "Delete")}
               </Button>
               <Button
                 onClick={closeForm}
                 kind="secondary"
                 style={{ width: "30%" }}
               >
-                {t("Cancel", "Cancel")}
+                {t("cancel", "Cancel")}
               </Button>
               <Button
                 type="submit"
@@ -653,7 +650,7 @@ const AllergyForm: React.FC<AllergyFormProps> = ({
                 disabled={!enableEditButtons}
                 style={{ width: "50%" }}
               >
-                {t("Sign & Save", "Sign & Save")}
+                {t("signAndSave", "Sign & Save")}
               </Button>
             </div>
           </form>

@@ -102,7 +102,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({
     <Grid condensed className={styles.vitalsBiometricContainer}>
       <Row>
         <Column>
-          <p className={styles.vitalsTitle}>Vitals</p>
+          <p className={styles.vitalsTitle}>{t("vitals", "Vitals")}</p>
         </Column>
       </Row>
       <Row>
@@ -159,7 +159,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({
             }}
             textFields={[
               {
-                name: t("pulse", "pulse"),
+                name: t("pulse", "Pulse"),
                 type: "text",
                 value: patientVitalAndBiometrics?.pulse || "",
               },
@@ -174,7 +174,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({
         </Column>
         <Column>
           <VitalsBiometricInput
-            title={t("spo2", "Sp02")}
+            title={t("spo2", "SpO2")}
             onInputChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               setPatientVitalAndBiometrics({
                 ...patientVitalAndBiometrics,
@@ -198,7 +198,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({
         </Column>
         <Column>
           <VitalsBiometricInput
-            title={t("respiratoryRate", "Respiration Rate")}
+            title={t("respirationRate", "Respiration Rate")}
             onInputChange={(event: React.ChangeEvent<HTMLInputElement>) => {
               setPatientVitalAndBiometrics({
                 ...patientVitalAndBiometrics,
@@ -207,7 +207,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({
             }}
             textFields={[
               {
-                name: t("respiratoryRate", "Respiration Rate"),
+                name: t("respirationRate", "Respiration Rate"),
                 type: "text",
                 value: patientVitalAndBiometrics?.respiratoryRate || "",
               },
@@ -265,7 +265,10 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({
               },
             ]}
             textFieldWidth="26.375rem"
-            placeholder="Type any additional notes here"
+            placeholder={t(
+              "additionalNoteText",
+              "Type any additional notes here"
+            )}
             inputIsNormal={true}
           />
         </Column>
@@ -273,7 +276,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({
 
       <Row>
         <Column>
-          <p className={styles.vitalsTitle}>Biometrics</p>
+          <p className={styles.vitalsTitle}>{t("biometrics", "Biometrics")}</p>
         </Column>
       </Row>
       <Row>
@@ -319,11 +322,11 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({
         </Column>
         <Column>
           <VitalsBiometricInput
-            title={t("bmiCalc", "BMI(calc.)")}
+            title={t("bmiCalc", "BMI (calc.)")}
             onInputChange={() => {}}
             textFields={[
               {
-                name: t("bmi", "bmi"),
+                name: t("bmi", "BMI"),
                 type: "text",
                 value: patientBMI || "",
               },
@@ -344,7 +347,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({
             }}
             textFields={[
               {
-                name: t("muac", "muac"),
+                name: t("muac", "MUAC"),
                 type: "text",
                 value:
                   patientVitalAndBiometrics?.midUpperArmCircumference || "",
@@ -373,7 +376,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({
             className={styles.vitalsButton}
             kind="primary"
           >
-            {t("signandsave", "Sign & Save")}
+            {t("signAndSave", "Sign & Save")}
           </Button>
         </Column>
       </Row>

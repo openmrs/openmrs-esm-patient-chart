@@ -53,7 +53,7 @@ const ConditionsDetailedSummary: React.FC<ConditionsDetailedSummaryProps> = ({
           showComponent={() =>
             openWorkspaceTab(
               ConditionsForm,
-              `${t("conditionsForm", "Conditions Form")}`
+              `${t("conditionsForm", "Conditions form")}`
             )
           }
         >
@@ -119,12 +119,12 @@ const ConditionsDetailedSummary: React.FC<ConditionsDetailedSummaryProps> = ({
         </SummaryCard>
       ) : (
         <EmptyState
-          displayText={t("conditions", "conditions")}
+          displayText={t("conditions", "Conditions")}
           headerTitle={t("conditions", "Conditions")}
           launchForm={() =>
             openWorkspaceTab(
               ConditionsForm,
-              `${t("conditionsForm", "Conditions Form")}`
+              `${t("conditionsForm", "Conditions form")}`
             )
           }
         />

@@ -235,7 +235,7 @@ const NewVisit: React.FC<NewVisitProps> = ({
           </div>
         </SummaryCard>
       ) : (
-        <SummaryCard name={t("editVisit", "Edit Visit")} styles={{ margin: 0 }}>
+        <SummaryCard name={t("editVisit", "Edit visit")} styles={{ margin: 0 }}>
           <div className={styles.newVisitContainer}>
             <div
               className={`${styles.newVisitInputContainer} ${styles.flexColumn}`}

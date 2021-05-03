@@ -83,7 +83,7 @@ const ClinicalViewOverview: React.FC<ClinicalViewOverviewProps> = ({
                       >
                         {t(
                           "clinicalViewConfigure",
-                          "Try Adding clinical views by clicking here"
+                          "Try adding clinical views by clicking here"
                         )}
                       </Button>
                     </div>

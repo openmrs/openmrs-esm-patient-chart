@@ -176,7 +176,7 @@ const NotesDetailedSummary: React.FC<NotesDetailedSummaryProps> = () => {
             </SummaryCard>
           ) : (
             <EmptyState
-              displayText={t("notes", "notes")}
+              displayText={t("notes", "Notes")}
               headerTitle={t("notes", "Notes")}
               launchForm={() =>
                 attach("patient-chart-workspace-slot", "visit-notes-workspace")

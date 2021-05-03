@@ -141,10 +141,7 @@ export default function VaccinationRow(params: ImmunizationProps) {
               <button
                 className={`${styles.addButton}`}
                 onClick={() => {
-                  const formHeader = t(
-                    "Immunization Form",
-                    "Immunization Form"
-                  );
+                  const formHeader = t("immunizationForm", "Immunization Form");
                   return openWorkspaceTab(ImmunizationsForm, formHeader, {
                     vaccineName: patientImmunization?.vaccineName,
                     vaccineUuid: patientImmunization?.vaccineUuid,

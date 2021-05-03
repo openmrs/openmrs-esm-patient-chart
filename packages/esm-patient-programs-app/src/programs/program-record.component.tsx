@@ -41,7 +41,7 @@ const ProgramRecord: React.FC<ProgramRecordProps> = ({ match }) => {
             showComponent={() =>
               openWorkspaceTab(
                 ProgramsForm,
-                `${t("editProgram", "Edit Program")}`,
+                `${t("editProgram", "Edit program")}`,
                 {
                   program: patientProgram?.program?.name,
                   programUuid: patientProgram?.uuid,

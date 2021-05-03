@@ -48,7 +48,7 @@ const RenderVitals: React.FC<RenderVitalsProps> = ({
 }) => {
   const { t } = useTranslation();
   const [chartView, setChartView] = React.useState<boolean>();
-  const displayText = t("vitalSigns", "vital signs");
+  const displayText = t("vitalSigns", "Vital signs");
   const { conceptsUnits } = useVitalsSignsConceptMetaData();
 
   const [
