@@ -1,479 +1,232 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { SyntheticEvent } from "react";
 import dayjs from "dayjs";
-import styles from "./conditions-form.css";
-import { SummaryCard } from "@openmrs/esm-patient-common-lib";
-import { useHistory } from "react-router-dom";
-import { useTranslation, Trans } from "react-i18next";
-import { createErrorHandler } from "@openmrs/esm-framework";
+import debounce from "lodash-es/debounce";
+import { useTranslation } from "react-i18next";
 import {
+  createErrorHandler,
+  detach,
+  showToast,
+  useSessionUser,
+} from "@openmrs/esm-framework";
+import Button from "carbon-components-react/es/components/Button";
+import DatePicker from "carbon-components-react/es/components/DatePicker";
+import DatePickerInput from "carbon-components-react/es/components/DatePickerInput";
+import Form from "carbon-components-react/es/components/Form";
+import FormGroup from "carbon-components-react/es/components/FormGroup";
+import RadioButton from "carbon-components-react/es/components/RadioButton";
+import RadioButtonGroup from "carbon-components-react/es/components/RadioButtonGroup";
+import Search from "carbon-components-react/es/components/Search";
+import SearchSkeleton from "carbon-components-react/es/components/Search/Search.Skeleton";
+import { Tile } from "carbon-components-react/es/components/Tile";
+import {
+  searchConditionConcepts,
   createPatientCondition,
-  updatePatientCondition,
+  CodedCondition,
 } from "./conditions.resource";
-import { DataCaptureComponentProps } from "../types";
+import styles from "./conditions-form.scss";
 
-type ConditionsFormProps = DataCaptureComponentProps & {
-  match: any;
+interface ConditionsFormProps {
   patientUuid: string;
-};
-
-interface Condition {
-  conditionUuid?: string;
-  inactivityDate?: string;
-  conditionName: string;
-  clinicalStatus: string;
-  onsetDateTime: string;
 }
-
-const ConditionsForm: React.FC<ConditionsFormProps> = ({
-  match,
-  patientUuid,
-  entryStarted = () => {},
-  entryCancelled = () => {},
-  closeComponent = () => {},
-}) => {
-  const formRef = useRef<HTMLFormElement>(null);
-  const [conditionName, setConditionName] = useState("");
-  const [conditionUuid, setConditionUuid] = useState("");
-  const [clinicalStatus, setClinicalStatus] = useState(null);
-  const [onsetDateTime, setOnsetDateTime] = useState(null);
-  const [enableCreateFormButtons, setEnableCreateFormButtons] = useState(false);
-  const [enableEditFormButtons, setEnableEditFormButtons] = useState(true);
-  const [viewEditForm, setViewEditForm] = useState(true);
-  const [inactiveStatus, setInactiveStatus] = useState(false);
-  const [inactivityDate, setInactivityDate] = useState("");
-  const [formChanged, setFormChanged] = useState(false);
+const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const history = useHistory();
+  const searchTimeoutInMs = 300;
+  const session = useSessionUser();
+  const [onsetDate, setOnsetDate] = React.useState(null);
+  const [searchTerm, setSearchTerm] = React.useState("");
+  const [searchResults, setSearchResults] = React.useState<
+    Array<CodedCondition>
+  >(null);
+  const [condition, setCondition] = React.useState<any>(null);
+  const [clinicalStatus, setClinicalStatus] = React.useState("active");
+  const [endDate, setEndDate] = React.useState(null);
+  const [isSearching, setIsSearching] = React.useState(false);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
-  useEffect(() => {
-    if (conditionName && onsetDateTime && clinicalStatus) {
-      setEnableCreateFormButtons(true);
-    } else {
-      setEnableCreateFormButtons(false);
-    }
-  }, [conditionName, onsetDateTime, clinicalStatus]);
+  const closeWorkspace = React.useCallback(
+    () => detach("patient-chart-workspace-slot", "conditions-form-workspace"),
+    []
+  );
 
-  useEffect(() => {
-    if (viewEditForm && formChanged) {
-      setEnableEditFormButtons(true);
-    } else {
-      setEnableEditFormButtons(false);
-    }
-  }, [viewEditForm, formChanged]);
-
-  useEffect(() => {
-    if (match.params) {
-      const {
-        conditionUuid,
-        conditionName,
-        clinicalStatus,
-        onsetDateTime,
-      }: Condition = match.params;
-      if (conditionName && clinicalStatus && onsetDateTime) {
-        setViewEditForm(true);
-        setConditionUuid(conditionUuid), setConditionName(conditionName);
-        setClinicalStatus(clinicalStatus);
-        setOnsetDateTime(onsetDateTime);
-      } else {
-        setViewEditForm(false);
-      }
-    }
-  }, [match.params]);
-
-  const handleCreateFormSubmit = (event) => {
-    event.preventDefault();
-
-    const condition: Condition = {
-      conditionName: conditionName,
-      clinicalStatus: clinicalStatus,
-      onsetDateTime: onsetDateTime,
-    };
-    const abortController = new AbortController();
-    createPatientCondition(condition, patientUuid, abortController)
-      .then((response) => response.status == 201 && navigate())
-      .catch(createErrorHandler());
+  const handleConditionChange = (selectedCondition: CodedCondition) => {
+    resetSearch();
+    setCondition(selectedCondition);
   };
 
-  function navigate() {
-    history.push(`/patient/${patientUuid}/chart/appointments`);
-  }
+  const resetSearch = () => {
+    setSearchTerm("");
+    setSearchResults([]);
+  };
 
-  function createConditions() {
-    return (
-      <form
-        onSubmit={handleCreateFormSubmit}
-        onChange={() => {
-          setFormChanged(true);
-          return entryStarted();
-        }}
-        ref={formRef}
+  const handleSubmit = (event: SyntheticEvent<HTMLFormElement>) => {
+    setIsSubmitting(true);
+    event.preventDefault();
+
+    const payload = {
+      clinicalStatus: clinicalStatus,
+      code: condition?.concept,
+      onsetDateTime: onsetDate ? dayjs(onsetDate).format() : null,
+      subject: {
+        reference: `Patient/${patientUuid}`,
+      },
+      recorder: {
+        reference: `Practitioner/${session?.user?.uuid}`,
+      },
+      recordedDate: new Date().toISOString(),
+      resourceType: "Condition",
+    };
+
+    const sub = createPatientCondition(payload).subscribe(
+      (response) => {
+        if (response.status === 201) {
+          closeWorkspace();
+          showToast({
+            description: t("conditionSaved", "Condition saved successfully"),
+          });
+        }
+      },
+      (err) => {
+        console.error(err);
+        createErrorHandler();
+      },
+      () => setIsSubmitting(false)
+    );
+    return () => sub.unsubscribe();
+  };
+
+  const debouncedSearch = React.useMemo(
+    () =>
+      debounce((searchTerm) => {
+        if (searchTerm) {
+          const sub = searchConditionConcepts(searchTerm).subscribe(
+            (results: Array<CodedCondition>) => setSearchResults(results),
+            createErrorHandler(),
+            () => setIsSearching(false)
+          );
+          return () => sub.unsubscribe();
+        } else {
+          setSearchResults(null);
+        }
+      }, searchTimeoutInMs),
+    []
+  );
+
+  React.useEffect(() => {
+    debouncedSearch(searchTerm);
+  }, [searchTerm, debouncedSearch]);
+
+  return (
+    <Form style={{ margin: "2rem" }} onSubmit={handleSubmit}>
+      <FormGroup
+        style={{ width: "50%" }}
+        legendText={t("condition", "Condition")}
       >
-        <SummaryCard
-          name={t("addANewCondition", "Add a new condition")}
-          styles={{
-            width: "100%",
-            background: "var(--omrs-color-bg-medium-contrast)",
-            height: "auto",
+        <Search
+          id="conditionsSearch"
+          labelText={t("enterCondition", "Enter condition")}
+          placeholder={t("searchConditions", "Search conditions")}
+          onChange={(event) => {
+            setIsSearching(true);
+            setCondition(null);
+            setSearchTerm(event.target.value);
           }}
-        >
-          <div className={styles.conditionsContainerWrapper}>
-            <div style={{ flex: 1, margin: "0rem 0.5rem" }}>
-              <div
-                className={`omrs-type-body-regular ${styles.conditionsInputContainer}`}
-              >
-                <label htmlFor="conditionName">
-                  <Trans i18nKey="condition">Condition</Trans>
-                </label>
-                <div className="omrs-input-group">
-                  <input
-                    id="conditionName"
-                    className="omrs-input-outlined"
-                    type="text"
-                    onChange={(event) => setConditionName(event.target.value)}
-                    required
-                    style={{ height: "2.75rem" }}
-                  />
-                </div>
-              </div>
-              <div className={styles.conditionsInputContainer}>
-                <label htmlFor="onsetDate">
-                  <Trans i18nKey="dateOfOnset">Date of onset</Trans>
-                </label>
-                <div className="omrs-datepicker">
-                  <input
-                    id="onsetDate"
-                    type="date"
-                    name="onsetDate"
-                    max={dayjs(new Date().toUTCString()).format("YYYY-MM-DD")}
-                    onChange={(event) => setOnsetDateTime(event.target.value)}
-                  />
-                  <svg className="omrs-icon" role="img">
-                    <use xlinkHref="#omrs-icon-calendar"></use>
-                  </svg>
-                </div>
-              </div>
-              <div className={styles.conditionsInputContainer}>
-                <label htmlFor="currentStatus">
-                  <Trans i18nKey="currentStatus">Current status</Trans>
-                </label>
-                <div className={styles.statusContainer}>
-                  <div className="omrs-radio-button">
-                    <label>
-                      <input
-                        id="active"
-                        type="radio"
-                        value="active"
-                        onChange={(event) => {
-                          setClinicalStatus(event.target.value);
-                          setInactiveStatus(false);
-                        }}
-                      />
-                      <span>
-                        <Trans i18nKey="active">Active</Trans>
-                      </span>
-                    </label>
-                  </div>
-                  <div className="omrs-radio-button">
-                    <label>
-                      <input
-                        id="inactive"
-                        type="radio"
-                        value="inactive"
-                        onChange={(event) => {
-                          setClinicalStatus(event.target.value);
-                          setInactiveStatus(true);
-                        }}
-                      />
-                      <span>
-                        <Trans i18nKey="inactive">Inactive</Trans>
-                      </span>
-                    </label>
-                  </div>
-                  <div className="omrs-radio-button">
-                    <label>
-                      <input
-                        id="historyOf"
-                        type="radio"
-                        value="historyOf"
-                        onChange={(event) => {
-                          setClinicalStatus(event.target.value);
-                          setInactiveStatus(true);
-                        }}
-                      />
-                      <span>
-                        <Trans i18nKey="historyOf">History of</Trans>
-                      </span>
-                    </label>
-                  </div>
-                </div>
-              </div>
-              {inactiveStatus && (
-                <div className={styles.conditionsInputContainer}>
-                  <label htmlFor="dateOfInactivity">
-                    <Trans i18nKey="dateOfInactivity">Date of inactivity</Trans>
-                  </label>
-                  <div className="omrs-datepicker">
-                    <input
-                      type="date"
-                      id="dateOfInactivity"
-                      name="dateOfInactivity"
-                      defaultValue={inactivityDate}
-                      onChange={(event) =>
-                        setInactivityDate(event.target.value)
-                      }
-                    />
-                    <svg className="omrs-icon" role="img">
-                      <use xlinkHref="#omrs-icon-calendar"></use>
-                    </svg>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </SummaryCard>
-        <div
-          className={
-            enableCreateFormButtons
-              ? `${styles.buttonStyles} ${styles.buttonStylesBorder}`
-              : styles.buttonStyles
-          }
-        >
-          <button
-            type="button"
-            className="omrs-btn omrs-outlined-neutral omrs-rounded"
-            style={{ width: "50%" }}
-            onClick={closeForm}
-          >
-            <Trans i18nKey="cancel">Cancel</Trans>
-          </button>
-          <button
-            type="submit"
-            style={{ width: "50%" }}
-            className={
-              enableCreateFormButtons
-                ? "omrs-btn omrs-filled-action omrs-rounded"
-                : "omrs-btn omrs-outlined omrs-rounded"
-            }
-            onClick={(event) => handleCreateFormSubmit(event)}
-            disabled={!enableCreateFormButtons}
-          >
-            <Trans i18nKey="signAndSave">Sign & Save</Trans>
-          </button>
-        </div>
-      </form>
-    );
-  }
-
-  const closeForm = (event) => {
-    let userConfirmed: boolean = false;
-    if (formChanged) {
-      userConfirmed = confirm(
-        "There is ongoing work, are you sure you want to close this tab?"
-      );
-    }
-
-    if (userConfirmed && formChanged) {
-      entryCancelled();
-      closeComponent();
-    } else if (!formChanged) {
-      entryCancelled();
-      closeComponent();
-    }
-  };
-
-  const handleEditSubmit = (event) => {
-    event.preventDefault();
-
-    const condition: Condition = {
-      conditionUuid: conditionUuid,
-      conditionName: conditionName,
-      clinicalStatus: clinicalStatus,
-      onsetDateTime: onsetDateTime,
-      inactivityDate: inactivityDate,
-    };
-    const abortController = new AbortController();
-    updatePatientCondition(condition, patientUuid, abortController)
-      .then((response) => response.status == 200 && navigate())
-      .catch(createErrorHandler());
-  };
-
-  function editCondition() {
-    return (
-      <>
-        {conditionName && clinicalStatus && onsetDateTime && (
-          <form
-            onChange={() => {
-              setFormChanged(true);
-              return entryStarted();
-            }}
-            onSubmit={handleEditSubmit}
-            className={styles.conditionsForm}
-            ref={formRef}
-          >
-            <SummaryCard
-              name={t("editCondition", "Edit Condition")}
-              styles={{
-                width: "100%",
-                backgroundColor: "var(--omrs-color-bg-medium-contrast)",
-                height: "auto",
-              }}
-            >
-              <div className={styles.conditionsContainerWrapper}>
-                <div style={{ flex: 1, margin: "0rem 0.5rem" }}>
-                  <div
-                    className={`omrs-type-body-regular ${styles.conditionsInputContainer}`}
+          value={condition?.display || searchTerm}
+          light
+        />
+        <div>
+          {searchTerm ? (
+            searchResults && searchResults.length ? (
+              <ul className={styles.conditionsList}>
+                {searchResults.map((condition, index) => (
+                  <li
+                    role="menuitem"
+                    className={styles.condition}
+                    key={index}
+                    onClick={() => handleConditionChange(condition)}
                   >
-                    <label htmlFor="conditionName">
-                      <Trans i18nKey="condition">Condition</Trans>
-                    </label>
-                    <span className="omrs-medium">{conditionName}</span>
-                  </div>
-                  <div className={styles.conditionsInputContainer}>
-                    <label htmlFor="onsetDate">
-                      <Trans i18nKey="dateOfOnset">Date of onset</Trans>
-                    </label>
-                    <div className="omrs-datepicker">
-                      <input
-                        type="date"
-                        id="onsetDate"
-                        name="onsetDate"
-                        defaultValue={dayjs(onsetDateTime).format("YYYY-MM-DD")}
-                      />
-                      <svg className="omrs-icon" role="img">
-                        <use xlinkHref="#omrs-icon-calendar"></use>
-                      </svg>
-                    </div>
-                  </div>
-                  <div className={styles.conditionsInputContainer}>
-                    <label htmlFor="currentStatus">
-                      <Trans i18nKey="currentStatus">Current status</Trans>
-                    </label>
-                    <div className={styles.statusContainer}>
-                      <div className="omrs-radio-button">
-                        <label>
-                          <input
-                            id="active"
-                            type="radio"
-                            name="currentStatus"
-                            value="active"
-                            defaultChecked={clinicalStatus === "active"}
-                            onChange={(event) => {
-                              setClinicalStatus(event.target.value);
-                              setInactiveStatus(false);
-                            }}
-                          />
-                          <span>
-                            <Trans i18nKey="active">Active</Trans>
-                          </span>
-                        </label>
-                      </div>
-                      <div className="omrs-radio-button">
-                        <label>
-                          <input
-                            id="inactive"
-                            type="radio"
-                            name="currentStatus"
-                            value="inactive"
-                            defaultChecked={clinicalStatus === "inactive"}
-                            onChange={(event) => {
-                              setClinicalStatus(event.target.value);
-                              setInactiveStatus(true);
-                            }}
-                          />
-                          <span>
-                            <Trans i18nKey="inactive">Inactive</Trans>
-                          </span>
-                        </label>
-                      </div>
-                      <div className="omrs-radio-button">
-                        <label>
-                          <input
-                            id="historyOf"
-                            type="radio"
-                            name="currentStatus"
-                            value="historyOf"
-                            defaultChecked={clinicalStatus === "historyOf"}
-                            onChange={(event) => {
-                              setClinicalStatus(event.target.value);
-                              setInactiveStatus(true);
-                            }}
-                          />
-                          <span>
-                            <Trans i18nKey="historyOf">History of</Trans>
-                          </span>
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-                  {inactiveStatus && (
-                    <div className={styles.conditionsInputContainer}>
-                      <label htmlFor="dateOfInactivity">
-                        <Trans i18nKey="dateOfInactivity">
-                          Date of inactivity
-                        </Trans>
-                      </label>
-                      <div className="omrs-datepicker">
-                        <input
-                          type="date"
-                          id="dateOfInactivity"
-                          name="dateOfInactivity"
-                          defaultValue={inactivityDate}
-                          onChange={(event) =>
-                            setInactivityDate(event.target.value)
-                          }
-                        />
-                        <svg className="omrs-icon" role="img">
-                          <use xlinkHref="#omrs-icon-calendar"></use>
-                        </svg>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </SummaryCard>
-            <div
-              className={
-                enableEditFormButtons
-                  ? styles.buttonStyles
-                  : `${styles.buttonStyles} ${styles.buttonStylesBorder}`
-              }
-            >
-              <button
-                type="submit"
-                className="omrs-btn omrs-outlined-neutral omrs-rounded"
-                style={{ width: "20%" }}
-              >
-                <Trans i18nKey="delete">Delete</Trans>
-              </button>
-              <button
-                type="button"
-                className="omrs-btn omrs-outlined-neutral omrs-rounded"
-                onClick={closeForm}
-                style={{ width: "30%" }}
-              >
-                <Trans i18nKey="cancelChanges">Cancel changes</Trans>
-              </button>
-              <button
-                type="submit"
-                className={
-                  enableEditFormButtons
-                    ? "omrs-btn omrs-filled-action omrs-rounded"
-                    : "omrs-btn omrs-outlined omrs-rounded"
-                }
-                onClick={(event) => handleEditSubmit(event)}
-                disabled={!enableEditFormButtons}
-                style={{ width: "50%" }}
-              >
-                <Trans i18nKey="signAndSave">Sign & Save</Trans>
-              </button>
-            </div>
-          </form>
-        )}
-      </>
-    );
-  }
-
-  return <div>{viewEditForm ? editCondition() : createConditions()}</div>;
+                    {condition.display}
+                  </li>
+                ))}
+              </ul>
+            ) : isSearching ? (
+              <SearchSkeleton />
+            ) : (
+              <Tile light className={styles.emptyResults}>
+                <span>
+                  {t("noResultsFor", "No results for")}{" "}
+                  <strong>"{searchTerm}"</strong>
+                </span>
+              </Tile>
+            )
+          ) : null}
+        </div>
+      </FormGroup>
+      <FormGroup legendText={t("onsetDate", "Onset date")}>
+        <DatePicker
+          id="onsetDate"
+          datePickerType="single"
+          dateFormat="d/m/Y"
+          maxDate={new Date().toISOString()}
+          name="onsetDate"
+          placeholder="dd/mm/yyyy"
+          onChange={([date]) => setOnsetDate(date)}
+          value={onsetDate}
+          light
+        >
+          <DatePickerInput id="onsetDateInput" labelText="" />
+        </DatePicker>
+      </FormGroup>
+      <FormGroup legendText={t("currentStatus", "Current status")}>
+        <RadioButtonGroup
+          defaultSelected="active"
+          name="clinicalStatus"
+          valueSelected="active"
+          orientation="vertical"
+          onChange={(status) => setClinicalStatus(status.toString())}
+        >
+          <RadioButton id="active" labelText="Active" value="active" />
+          <RadioButton id="inactive" labelText="Inactive" value="inactive" />
+        </RadioButtonGroup>
+      </FormGroup>
+      {clinicalStatus === "inactive" ? (
+        <DatePicker
+          id="endDate"
+          datePickerType="single"
+          dateFormat="d/m/Y"
+          minDate={new Date(onsetDate).toISOString()}
+          maxDate={dayjs().utc().format()}
+          name="endDate"
+          placeholder="dd/mm/yyyy"
+          onChange={([date]) => setEndDate(date)}
+          value={endDate}
+          light
+        >
+          <DatePickerInput
+            id="endDateInput"
+            labelText={t("endDate", "End date")}
+          />
+        </DatePicker>
+      ) : null}
+      <div style={{ marginTop: "1.625rem" }}>
+        <Button
+          style={{ width: "50%" }}
+          kind="secondary"
+          type="button"
+          onClick={closeWorkspace}
+        >
+          {t("cancel", "Cancel")}
+        </Button>
+        <Button
+          style={{ width: "50%" }}
+          kind="primary"
+          type="submit"
+          disabled={isSubmitting}
+        >
+          {t("saveAndClose", "Save & Close")}
+        </Button>
+      </div>
+    </Form>
+  );
 };
 
 export default ConditionsForm;
