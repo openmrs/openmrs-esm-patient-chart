@@ -1,1 +1,8 @@
-{}
+{
+  "actions": "Actions",
+  "activeVisit": "Active Visit",
+  "address": "Address",
+  "contactDetails": "Contact Details",
+  "hideAllDetails": "Hide all details",
+  "showAllDetails": "Show all details"
+}

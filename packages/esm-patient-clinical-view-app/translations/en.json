@@ -1,1 +1,10 @@
-{}
+{
+  "addView": "Add View",
+  "cancel": "Cancel",
+  "clinicalViewConfigure": "Try adding clinical views by clicking here",
+  "clinicalViews": "Clinical Views",
+  "editView": "Edit View",
+  "noClinicalViewsConfigured": "Sorry, no clinical views configured",
+  "saveAndClose": "Save & Close",
+  "searchForView": "Search for a view"
+}
