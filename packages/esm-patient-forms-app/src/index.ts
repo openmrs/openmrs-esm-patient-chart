@@ -20,7 +20,7 @@ function setupOpenMRS() {
         slot: 'patient-chart-summary-dashboard-slot',
         load: getAsyncLifecycle(() => import('./forms/forms.component'), options),
         meta: {
-          columnSpan: 2,
+          columnSpan: 4,
         },
       },
     ],
