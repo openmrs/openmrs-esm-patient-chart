@@ -63,8 +63,23 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid }) => {
     event.preventDefault();
 
     const payload = {
-      clinicalStatus: clinicalStatus,
-      code: condition?.concept,
+      resourceType: "Condition",
+      clinicalStatus: {
+        coding: [
+          {
+            system: "http://terminology.hl7.org/CodeSystem/condition-clinical",
+            code: clinicalStatus,
+          },
+        ],
+      },
+      code: {
+        coding: [
+          {
+            code: condition?.concept?.uuid,
+            display: condition?.concept?.display,
+          },
+        ],
+      },
       onsetDateTime: onsetDate ? dayjs(onsetDate).format() : null,
       subject: {
         reference: `Patient/${patientUuid}`,
@@ -73,7 +88,6 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid }) => {
         reference: `Practitioner/${session?.user?.uuid}`,
       },
       recordedDate: new Date().toISOString(),
-      resourceType: "Condition",
     };
 
     const sub = createPatientCondition(payload).subscribe(
@@ -85,10 +99,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid }) => {
           });
         }
       },
-      (err) => {
-        console.error(err);
-        createErrorHandler();
-      },
+      () => createErrorHandler(),
       () => setIsSubmitting(false)
     );
     return () => sub.unsubscribe();
