@@ -18,10 +18,7 @@ export function performPatientConditionsSearch(patientIdentifier: string) {
 export function searchConditionConcepts(searchTerm: string) {
   return openmrsObservableFetch<Array<CodedCondition>>(
     `/ws/rest/v1/conceptsearch?conceptClasses=8d4918b0-c2cc-11de-8d13-0010c6dffd0f&q=${searchTerm}`
-  ).pipe(
-    map(({ data }) => data["results"]),
-    map((results) => results)
-  );
+  ).pipe(map(({ data }) => data["results"]));
 }
 
 export function getConditionByUuid(conditionUuid: string) {
@@ -48,13 +45,14 @@ function mapConditionProperties(condition: FHIRCondition): Condition {
   };
 }
 
-export function createPatientCondition(payload) {
+export function createPatientCondition(payload, abortController) {
   return openmrsObservableFetch(`${fhirBaseUrl}/Condition`, {
     headers: {
       "Content-Type": "application/json",
     },
     method: "POST",
     body: payload,
+    signal: abortController,
   });
 }
 

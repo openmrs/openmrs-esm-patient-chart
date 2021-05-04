@@ -24,107 +24,159 @@ import {
   CodedCondition,
 } from "./conditions.resource";
 import styles from "./conditions-form.scss";
+const searchTimeoutInMs = 300;
+
+enum StateTypes {
+  IDLE,
+  SEARCH,
+  CONDITION,
+  SUBMIT,
+}
 
 interface ConditionsFormProps {
   patientUuid: string;
 }
+
+interface IdleState {
+  type: StateTypes.IDLE;
+}
+
+interface SearchState {
+  isSearching: boolean;
+  type: StateTypes.SEARCH;
+  searchTerm: string;
+  searchResults?: Array<CodedCondition>;
+}
+
+interface ConditionState {
+  condition: CodedCondition;
+  type: StateTypes.CONDITION;
+}
+
+interface SubmitState {
+  type: StateTypes.SUBMIT;
+}
+
+type ViewState = IdleState | SearchState | ConditionState | SubmitState;
+
 const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const searchTimeoutInMs = 300;
   const session = useSessionUser();
-  const [onsetDate, setOnsetDate] = React.useState(null);
-  const [searchTerm, setSearchTerm] = React.useState("");
-  const [searchResults, setSearchResults] = React.useState<
-    Array<CodedCondition>
-  >(null);
-  const [condition, setCondition] = React.useState<any>(null);
   const [clinicalStatus, setClinicalStatus] = React.useState("active");
   const [endDate, setEndDate] = React.useState(null);
-  const [isSearching, setIsSearching] = React.useState(false);
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [onsetDate, setOnsetDate] = React.useState(null);
+  const [viewState, setViewState] = React.useState<ViewState>({
+    type: StateTypes.IDLE,
+  });
 
   const closeWorkspace = React.useCallback(
     () => detach("patient-chart-workspace-slot", "conditions-form-workspace"),
     []
   );
 
-  const handleConditionChange = (selectedCondition: CodedCondition) => {
-    resetSearch();
-    setCondition(selectedCondition);
-  };
+  const handleConditionChange = React.useCallback(
+    (selectedCondition: CodedCondition) => {
+      setViewState({
+        type: StateTypes.CONDITION,
+        condition: selectedCondition,
+      });
+    },
+    []
+  );
 
-  const resetSearch = () => {
-    setSearchTerm("");
-    setSearchResults([]);
-  };
+  const handleSubmit = React.useCallback(
+    (event: SyntheticEvent<HTMLFormElement>) => {
+      event.preventDefault();
 
-  const handleSubmit = (event: SyntheticEvent<HTMLFormElement>) => {
-    setIsSubmitting(true);
-    event.preventDefault();
+      if (viewState.type !== StateTypes.CONDITION) return;
 
-    const payload = {
-      resourceType: "Condition",
-      clinicalStatus: {
-        coding: [
-          {
-            system: "http://terminology.hl7.org/CodeSystem/condition-clinical",
-            code: clinicalStatus,
-          },
-        ],
-      },
-      code: {
-        coding: [
-          {
-            code: condition?.concept?.uuid,
-            display: condition?.concept?.display,
-          },
-        ],
-      },
-      onsetDateTime: onsetDate ? dayjs(onsetDate).format() : null,
-      subject: {
-        reference: `Patient/${patientUuid}`,
-      },
-      recorder: {
-        reference: `Practitioner/${session?.user?.uuid}`,
-      },
-      recordedDate: new Date().toISOString(),
-    };
+      const condition = viewState.condition;
+      setViewState({ type: StateTypes.SUBMIT });
 
-    const sub = createPatientCondition(payload).subscribe(
-      (response) => {
-        if (response.status === 201) {
-          closeWorkspace();
-          showToast({
-            description: t("conditionSaved", "Condition saved successfully"),
-          });
+      const payload = {
+        resourceType: "Condition",
+        clinicalStatus: {
+          coding: [
+            {
+              system:
+                "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              code: clinicalStatus,
+            },
+          ],
+        },
+        code: {
+          coding: [
+            {
+              code: condition?.concept?.uuid,
+              display: condition?.concept?.display,
+            },
+          ],
+        },
+        endDate: endDate ? dayjs(endDate).format() : null,
+        onsetDateTime: onsetDate ? dayjs(onsetDate).format() : null,
+        subject: {
+          reference: `Patient/${patientUuid}`,
+        },
+        recorder: {
+          reference: `Practitioner/${session?.user?.uuid}`,
+        },
+        recordedDate: new Date().toISOString(),
+      };
+
+      const abortController = new AbortController();
+      const sub = createPatientCondition(payload, abortController).subscribe(
+        (response) => {
+          if (response.status === 201) {
+            closeWorkspace();
+
+            showToast({
+              description: t("conditionSaved", "Condition saved successfully"),
+            });
+          }
+        },
+        () => createErrorHandler(),
+        () => {
+          setViewState({ type: StateTypes.IDLE });
+          sub.unsubscribe();
         }
-      },
-      () => createErrorHandler(),
-      () => setIsSubmitting(false)
-    );
-    return () => sub.unsubscribe();
-  };
+      );
+    },
+    [
+      t,
+      clinicalStatus,
+      closeWorkspace,
+      endDate,
+      onsetDate,
+      patientUuid,
+      session,
+      viewState,
+    ]
+  );
 
   const debouncedSearch = React.useMemo(
     () =>
       debounce((searchTerm) => {
         if (searchTerm) {
           const sub = searchConditionConcepts(searchTerm).subscribe(
-            (results: Array<CodedCondition>) => setSearchResults(results),
-            createErrorHandler(),
-            () => setIsSearching(false)
+            (results: Array<CodedCondition>) =>
+              setViewState((state) => ({ ...state, searchResults: results })),
+            () => createErrorHandler(),
+            () => {
+              setViewState((state) => ({ ...state, isSearching: false }));
+              sub.unsubscribe();
+            }
           );
           return () => sub.unsubscribe();
         } else {
-          setSearchResults(null);
+          setViewState((state) => ({ ...state, searchResults: null }));
         }
       }, searchTimeoutInMs),
     []
   );
 
   React.useEffect(() => {
-    debouncedSearch(searchTerm);
-  }, [searchTerm, debouncedSearch]);
+    debouncedSearch((viewState as SearchState)?.searchTerm);
+  }, [viewState, debouncedSearch]);
 
   return (
     <Form style={{ margin: "2rem" }} onSubmit={handleSubmit}>
@@ -133,43 +185,61 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid }) => {
         legendText={t("condition", "Condition")}
       >
         <Search
+          light
           id="conditionsSearch"
           labelText={t("enterCondition", "Enter condition")}
           placeholder={t("searchConditions", "Search conditions")}
           onChange={(event) => {
-            setIsSearching(true);
-            setCondition(null);
-            setSearchTerm(event.target.value);
+            setViewState(
+              event.target.value
+                ? {
+                    type: StateTypes.SEARCH,
+                    searchTerm: event.target.value,
+                    isSearching: true,
+                    searchResults: null,
+                  }
+                : { type: StateTypes.IDLE }
+            );
           }}
-          value={condition?.display || searchTerm}
-          light
+          value={(() => {
+            switch (viewState.type) {
+              case StateTypes.SEARCH:
+                return viewState.searchTerm;
+              case StateTypes.CONDITION:
+                return viewState.condition.display;
+              default:
+                return "";
+            }
+          })()}
         />
         <div>
-          {searchTerm ? (
-            searchResults && searchResults.length ? (
-              <ul className={styles.conditionsList}>
-                {searchResults.map((condition, index) => (
-                  <li
-                    role="menuitem"
-                    className={styles.condition}
-                    key={index}
-                    onClick={() => handleConditionChange(condition)}
-                  >
-                    {condition.display}
-                  </li>
-                ))}
-              </ul>
-            ) : isSearching ? (
-              <SearchSkeleton />
-            ) : (
+          {(() => {
+            if (viewState.type !== StateTypes.SEARCH) return null;
+            if (viewState.searchResults && viewState.searchResults.length)
+              return (
+                <ul className={styles.conditionsList}>
+                  {viewState.searchResults.map((condition, index) => (
+                    <li
+                      role="menuitem"
+                      className={styles.condition}
+                      key={index}
+                      onClick={() => handleConditionChange(condition)}
+                    >
+                      {condition.display}
+                    </li>
+                  ))}
+                </ul>
+              );
+            if (viewState.isSearching) return <SearchSkeleton />;
+            return (
               <Tile light className={styles.emptyResults}>
                 <span>
                   {t("noResultsFor", "No results for")}{" "}
-                  <strong>"{searchTerm}"</strong>
+                  <strong>"{viewState.searchTerm}"</strong>
                 </span>
               </Tile>
-            )
-          ) : null}
+            );
+          })()}
         </div>
       </FormGroup>
       <FormGroup legendText={t("onsetDate", "Onset date")}>
@@ -199,7 +269,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid }) => {
           <RadioButton id="inactive" labelText="Inactive" value="inactive" />
         </RadioButtonGroup>
       </FormGroup>
-      {clinicalStatus === "inactive" ? (
+      {clinicalStatus === "inactive" && (
         <DatePicker
           id="endDate"
           datePickerType="single"
@@ -217,7 +287,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid }) => {
             labelText={t("endDate", "End date")}
           />
         </DatePicker>
-      ) : null}
+      )}
       <div style={{ marginTop: "1.625rem" }}>
         <Button
           style={{ width: "50%" }}
@@ -231,7 +301,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid }) => {
           style={{ width: "50%" }}
           kind="primary"
           type="submit"
-          disabled={isSubmitting}
+          disabled={viewState.type !== StateTypes.CONDITION}
         >
           {t("saveAndClose", "Save & Close")}
         </Button>
