@@ -3,13 +3,13 @@ import {
   CommonMedicationDosageUnit,
   CommonMedicationFrequency,
   CommonMedicationRoute,
-} from "../api/common-medication";
-import { OpenmrsResource } from "./openmrs-resource";
-import { Drug } from "./order";
+} from '../api/common-medication';
+import { OpenmrsResource } from './openmrs-resource';
+import { Drug } from './order';
 
 export interface OrderBasketItem {
   uuid?: string;
-  action: "NEW" | "REVISE" | "DISCONTINUE" | "RENEWED" | undefined;
+  action: 'NEW' | 'REVISE' | 'DISCONTINUE' | 'RENEWED' | undefined;
   drug: Drug;
   commonMedicationName: string;
   dosage: CommonMedicationDosage;

@@ -1,7 +1,7 @@
-import React from "react";
-import styles from "./summary-card.css";
-import { Link } from "react-router-dom";
-import { Trans } from "react-i18next";
+import React from 'react';
+import styles from './summary-card.css';
+import { Link } from 'react-router-dom';
+import { Trans } from 'react-i18next';
 
 export interface SummaryCardProps {
   name: string;
@@ -26,10 +26,7 @@ function contents(name: string) {
 }
 
 export const SummaryCard: React.FC<SummaryCardProps> = (props) => (
-  <div
-    style={props.styles}
-    className={`omrs-card ${styles.card} ${props.className || ""}`}
-  >
+  <div style={props.styles} className={`omrs-card ${styles.card} ${props.className || ''}`}>
     <div className={styles.header}>
       <div className={styles.headerTitle}>
         {props.link ? (
@@ -42,20 +39,14 @@ export const SummaryCard: React.FC<SummaryCardProps> = (props) => (
       </div>
       {props.addComponent && (
         <div className={styles.headerAdd}>
-          <button
-            className={`omrs-unstyled ${styles.addBtn}`}
-            onClick={props.showComponent}
-          >
+          <button className={`omrs-unstyled ${styles.addBtn}`} onClick={props.showComponent}>
             <Trans i18nKey="add">Add</Trans>
           </button>
         </div>
       )}
       {props.editComponent && (
         <div className={styles.headerEdit}>
-          <button
-            className={`omrs-unstyled ${styles.editBtn}`}
-            onClick={props.showComponent}
-          >
+          <button className={`omrs-unstyled ${styles.editBtn}`} onClick={props.showComponent}>
             <Trans i18nKey="edit">Edit</Trans>
           </button>
         </div>

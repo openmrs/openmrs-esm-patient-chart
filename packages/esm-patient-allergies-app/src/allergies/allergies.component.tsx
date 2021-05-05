@@ -1,8 +1,8 @@
-import React from "react";
-import { BrowserRouter, Switch, Route } from "react-router-dom";
-import AllergyDetailedSummary from "./allergies-detailed-summary.component";
-import { AllergiesContext } from "./allergies.context";
-import AllergyRecord from "./allergy-record.component";
+import React from 'react';
+import { BrowserRouter, Switch, Route } from 'react-router-dom';
+import AllergyDetailedSummary from './allergies-detailed-summary.component';
+import { AllergiesContext } from './allergies.context';
+import AllergyRecord from './allergy-record.component';
 
 interface AllergiesProps {
   basePath: string;
@@ -10,11 +10,7 @@ interface AllergiesProps {
   patientUuid: string;
 }
 
-export default function Allergies({
-  basePath,
-  patient,
-  patientUuid,
-}: AllergiesProps) {
+export default function Allergies({ basePath, patient, patientUuid }: AllergiesProps) {
   return (
     <AllergiesContext.Provider value={{ patientUuid, patient }}>
       <BrowserRouter basename={`${window.spaBase}${basePath}/allergies`}>

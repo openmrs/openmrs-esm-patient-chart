@@ -1,16 +1,15 @@
-import React, { useEffect, useState } from "react";
-import dayjs from "dayjs";
-import ProgramsForm from "./programs-form.component";
-import styles from "./program-record.css";
-import { SummaryCard, openWorkspaceTab } from "@openmrs/esm-patient-common-lib";
-import { RouteComponentProps } from "react-router-dom";
-import { useTranslation, Trans } from "react-i18next";
-import { createErrorHandler } from "@openmrs/esm-framework";
-import { getPatientProgramByUuid } from "./programs.resource";
-import { useProgramsContext } from "./programs.context";
+import React, { useEffect, useState } from 'react';
+import dayjs from 'dayjs';
+import ProgramsForm from './programs-form.component';
+import styles from './program-record.css';
+import { SummaryCard, openWorkspaceTab } from '@openmrs/esm-patient-common-lib';
+import { RouteComponentProps } from 'react-router-dom';
+import { useTranslation, Trans } from 'react-i18next';
+import { createErrorHandler } from '@openmrs/esm-framework';
+import { getPatientProgramByUuid } from './programs.resource';
+import { useProgramsContext } from './programs.context';
 
-interface ProgramRecordProps
-  extends RouteComponentProps<{ programUuid: string }> {}
+interface ProgramRecordProps extends RouteComponentProps<{ programUuid: string }> {}
 
 const ProgramRecord: React.FC<ProgramRecordProps> = ({ match }) => {
   const [patientProgram, setPatientProgram] = useState(null);
@@ -20,11 +19,9 @@ const ProgramRecord: React.FC<ProgramRecordProps> = ({ match }) => {
 
   useEffect(() => {
     if (patient && patientUuid) {
-      const subscription = getPatientProgramByUuid(programUuid).subscribe(
-        (program) => {
-          setPatientProgram(program), createErrorHandler();
-        }
-      );
+      const subscription = getPatientProgramByUuid(programUuid).subscribe((program) => {
+        setPatientProgram(program), createErrorHandler();
+      });
 
       return () => subscription.unsubscribe();
     }
@@ -35,23 +32,18 @@ const ProgramRecord: React.FC<ProgramRecordProps> = ({ match }) => {
       {!!(patientProgram && Object.entries(patientProgram).length) && (
         <div className={styles.programSummary}>
           <SummaryCard
-            name={t("program", "Program")}
-            styles={{ width: "100%" }}
+            name={t('program', 'Program')}
+            styles={{ width: '100%' }}
             editComponent
             showComponent={() =>
-              openWorkspaceTab(
-                ProgramsForm,
-                `${t("editProgram", "Edit program")}`,
-                {
-                  program: patientProgram?.program?.name,
-                  programUuid: patientProgram?.uuid,
-                  enrollmentDate: patientProgram?.dateEnrolled,
-                  completionDate: patientProgram?.dateCompleted,
-                  locationUuid: patientProgram?.location?.uuid,
-                }
-              )
-            }
-          >
+              openWorkspaceTab(ProgramsForm, `${t('editProgram', 'Edit program')}`, {
+                program: patientProgram?.program?.name,
+                programUuid: patientProgram?.uuid,
+                enrollmentDate: patientProgram?.dateEnrolled,
+                completionDate: patientProgram?.dateCompleted,
+                locationUuid: patientProgram?.location?.uuid,
+              })
+            }>
             <div className={`omrs-type-body-regular ${styles.programCard}`}>
               <div>
                 <p className="omrs-type-title-3" data-testid="program-name">
@@ -74,24 +66,18 @@ const ProgramRecord: React.FC<ProgramRecordProps> = ({ match }) => {
                 </thead>
                 <tbody>
                   <tr>
-                    <td>
-                      {dayjs(patientProgram?.dateEnrolled).format(
-                        "DD-MMM-YYYY"
-                      )}
-                    </td>
+                    <td>{dayjs(patientProgram?.dateEnrolled).format('DD-MMM-YYYY')}</td>
                     <td className={styles.completedProgram}>
                       {patientProgram?.dateCompleted ? (
                         <span className={styles.completionDate}>
-                          <Trans i18nKey="completedOn">Completed on</Trans>{" "}
-                          {dayjs(patientProgram?.dateCompleted).format(
-                            "DD-MMM-YYYY"
-                          )}
+                          <Trans i18nKey="completedOn">Completed on</Trans>{' '}
+                          {dayjs(patientProgram?.dateCompleted).format('DD-MMM-YYYY')}
                         </span>
                       ) : (
                         <Trans i18nKey="active">Active</Trans>
                       )}
                     </td>
-                    <td>{patientProgram?.location?.display || "-"}</td>
+                    <td>{patientProgram?.location?.display || '-'}</td>
                   </tr>
                 </tbody>
               </table>

@@ -1,6 +1,6 @@
 export function getDosage(strength, doseNumber) {
   if (!strength || !doseNumber) {
-    return "";
+    return '';
   }
 
   const i = strength.search(/\D/);
@@ -14,18 +14,13 @@ export function getDosage(strength, doseNumber) {
   if (concentrationStartIndex >= 0) {
     strengthUnits = strength.substring(i, concentrationStartIndex);
     const j = strength.substring(concentrationStartIndex + 1).search(/\D/);
-    const concentrationQuantity = strength.substr(
-      concentrationStartIndex + 1,
-      j
-    );
-    const concentrationUnits = strength.substring(
-      concentrationStartIndex + 1 + j
-    );
+    const concentrationQuantity = strength.substr(concentrationStartIndex + 1, j);
+    const concentrationUnits = strength.substring(concentrationStartIndex + 1 + j);
     dosage = `${doseNumber} ${strengthUnits} (${
       (doseNumber / strengthQuantity) * concentrationQuantity
     } ${concentrationUnits})`;
   } else {
-    dosage = strengthQuantity * doseNumber + " " + strengthUnits;
+    dosage = strengthQuantity * doseNumber + ' ' + strengthUnits;
   }
   return dosage;
 }

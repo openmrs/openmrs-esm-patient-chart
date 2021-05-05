@@ -1,4 +1,4 @@
-import { OpenmrsResource } from "./openmrs-resource";
+import { OpenmrsResource } from './openmrs-resource';
 
 export interface Order {
   uuid: string;
@@ -15,9 +15,7 @@ export interface Order {
   dose: number;
   doseUnits: OpenmrsResource;
   dosingInstructions: string | null;
-  dosingType?:
-    | "org.openmrs.FreeTextDosingInstructions"
-    | "org.openmrs.SimpleDosingInstructions";
+  dosingType?: 'org.openmrs.FreeTextDosingInstructions' | 'org.openmrs.SimpleDosingInstructions';
   drug: Drug;
   duration: number;
   durationUnits: OpenmrsResource;
@@ -56,7 +54,7 @@ export interface Drug {
 }
 
 export interface OrderPost {
-  action?: "NEW" | "REVISE" | "DISCONTINUE";
+  action?: 'NEW' | 'REVISE' | 'DISCONTINUE';
   patient?: string;
   careSetting?: string;
   orderer?: string;
@@ -73,9 +71,7 @@ export interface OrderPost {
   type?: string;
   duration?: number;
   durationUnits?: string;
-  dosingType?:
-    | "org.openmrs.FreeTextDosingInstructions"
-    | "org.openmrs.SimpleDosingInstructions";
+  dosingType?: 'org.openmrs.FreeTextDosingInstructions' | 'org.openmrs.SimpleDosingInstructions';
   dosingInstructions?: string;
   concept?: string;
   dateActivated?: string;

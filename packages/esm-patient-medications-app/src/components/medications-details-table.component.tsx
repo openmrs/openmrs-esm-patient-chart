@@ -1,12 +1,12 @@
-import React, { useCallback, useState } from "react";
-import Add16 from "@carbon/icons-react/es/add/16";
-import dayjs from "dayjs";
-import capitalize from "lodash-es/capitalize";
-import styles from "./medications-details-table.scss";
-import Button from "carbon-components-react/es/components/Button";
-import OverflowMenu from "carbon-components-react/es/components/OverflowMenu";
-import OverflowMenuItem from "carbon-components-react/es/components/OverflowMenuItem";
-import Pagination from "carbon-components-react/es/components/Pagination";
+import React, { useCallback, useState } from 'react';
+import Add16 from '@carbon/icons-react/es/add/16';
+import dayjs from 'dayjs';
+import capitalize from 'lodash-es/capitalize';
+import styles from './medications-details-table.scss';
+import Button from 'carbon-components-react/es/components/Button';
+import OverflowMenu from 'carbon-components-react/es/components/OverflowMenu';
+import OverflowMenuItem from 'carbon-components-react/es/components/OverflowMenuItem';
+import Pagination from 'carbon-components-react/es/components/Pagination';
 import DataTable, {
   Table,
   TableBody,
@@ -17,20 +17,16 @@ import DataTable, {
   TableRow,
   TableToolbar,
   TableToolbarContent,
-} from "carbon-components-react/es/components/DataTable";
-import { getDosage } from "../utils/get-dosage";
-import { useTranslation } from "react-i18next";
-import { compare } from "../utils/compare";
-import { paginate } from "../utils/pagination";
-import { connect } from "unistore/react";
-import {
-  OrderBasketStore,
-  OrderBasketStoreActions,
-  orderBasketStoreActions,
-} from "../medications/order-basket-store";
-import { Order } from "../types/order";
-import { OrderBasketItem } from "../types/order-basket-item";
-import { attach } from "@openmrs/esm-framework";
+} from 'carbon-components-react/es/components/DataTable';
+import { getDosage } from '../utils/get-dosage';
+import { useTranslation } from 'react-i18next';
+import { compare } from '../utils/compare';
+import { paginate } from '../utils/pagination';
+import { connect } from 'unistore/react';
+import { OrderBasketStore, OrderBasketStoreActions, orderBasketStoreActions } from '../medications/order-basket-store';
+import { Order } from '../types/order';
+import { OrderBasketItem } from '../types/order-basket-item';
+import { attach } from '@openmrs/esm-framework';
 
 export interface ActiveMedicationsProps {
   title: string;
@@ -47,8 +43,8 @@ const MedicationsDetailsTable = connect<
   OrderBasketStoreActions,
   ActiveMedicationsProps
 >(
-  "items",
-  orderBasketStoreActions
+  'items',
+  orderBasketStoreActions,
 )(
   ({
     title,
@@ -66,19 +62,19 @@ const MedicationsDetailsTable = connect<
     const [currentMedicationPage] = paginate(medications, page, pageSize);
 
     const openOrderBasket = React.useCallback(() => {
-      attach("patient-chart-workspace-slot", "order-basket-workspace");
+      attach('patient-chart-workspace-slot', 'order-basket-workspace');
     }, []);
 
     const tableHeaders = [
       {
-        key: "startDate",
-        header: t("startDate", "Start date"),
+        key: 'startDate',
+        header: t('startDate', 'Start date'),
         isSortable: true,
         isVisible: true,
       },
       {
-        key: "details",
-        header: t("details", "Details"),
+        key: 'details',
+        header: t('details', 'Details'),
         isSortable: true,
         isVisible: true,
       },
@@ -90,40 +86,26 @@ const MedicationsDetailsTable = connect<
         sortKey: medication.drug?.name,
         content: (
           <p className={styles.bodyLong01}>
-            <strong>{capitalize(medication.drug?.name)}</strong> &mdash;{" "}
-            {medication.doseUnits?.display} &mdash; {medication.route?.display}
+            <strong>{capitalize(medication.drug?.name)}</strong> &mdash; {medication.doseUnits?.display} &mdash;{' '}
+            {medication.route?.display}
             <br />
-            <span className={styles.label01}>
-              {t("dose", "Dose").toUpperCase()}
-            </span>{" "}
-            <strong>
-              {getDosage(
-                medication.drug?.strength,
-                medication.dose
-              ).toLowerCase()}
-            </strong>{" "}
-            &mdash; {medication.frequency?.display} &mdash;{" "}
+            <span className={styles.label01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
+            <strong>{getDosage(medication.drug?.strength, medication.dose).toLowerCase()}</strong> &mdash;{' '}
+            {medication.frequency?.display} &mdash;{' '}
             {!medication.duration
-              ? t("medicationIndefiniteDuration", "Indefinite duration")
-              : t(
-                  "medicationDurationAndUnit",
-                  "for {duration} {durationUnit}",
-                  {
-                    duration: medication.duration,
-                    durationUnit: medication.durationUnits?.display,
-                  }
-                )}
+              ? t('medicationIndefiniteDuration', 'Indefinite duration')
+              : t('medicationDurationAndUnit', 'for {duration} {durationUnit}', {
+                  duration: medication.duration,
+                  durationUnit: medication.durationUnits?.display,
+                })}
             <br />
-            <span className={styles.label01}>
-              {t("refills", "Refills").toUpperCase()}
-            </span>{" "}
-            {medication.numRefills}
+            <span className={styles.label01}>{t('refills', 'Refills').toUpperCase()}</span> {medication.numRefills}
           </p>
         ),
       },
       startDate: {
         sortKey: dayjs(medication.dateActivated).toDate(),
-        content: dayjs(medication.dateActivated).format("DD-MMM-YYYY"),
+        content: dayjs(medication.dateActivated).format('DD-MMM-YYYY'),
       },
     }));
 
@@ -134,19 +116,14 @@ const MedicationsDetailsTable = connect<
     };
 
     return (
-      <DataTable
-        headers={tableHeaders}
-        rows={tableRows}
-        isSortable={true}
-        sortRow={sortRow}
-      >
+      <DataTable headers={tableHeaders} rows={tableRows} isSortable={true} sortRow={sortRow}>
         {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
           <TableContainer title={title}>
             {showAddNewButton && (
               <TableToolbar>
                 <TableToolbarContent>
                   <Button renderIcon={Add16} onClick={openOrderBasket}>
-                    {t("add", "Add")}
+                    {t('add', 'Add')}
                   </Button>
                 </TableToolbarContent>
               </TableToolbar>
@@ -159,8 +136,7 @@ const MedicationsDetailsTable = connect<
                       {...getHeaderProps({
                         header,
                         isSortable: header.isSortable,
-                      })}
-                    >
+                      })}>
                       {header.header}
                     </TableHeader>
                   ))}
@@ -171,9 +147,7 @@ const MedicationsDetailsTable = connect<
                 {rows.map((row, rowIndex) => (
                   <TableRow {...getRowProps({ row })}>
                     {row.cells.map((cell) => (
-                      <TableCell key={cell.id}>
-                        {cell.value?.content ?? cell.value}
-                      </TableCell>
+                      <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                     ))}
                     <TableCell className="bx--table-column-menu">
                       <OrderBasketItemActions
@@ -203,7 +177,7 @@ const MedicationsDetailsTable = connect<
         )}
       </DataTable>
     );
-  }
+  },
 );
 
 function OrderBasketItemActions({
@@ -230,7 +204,7 @@ function OrderBasketItemActions({
       {
         uuid: medication.uuid,
         previousOrder: null,
-        action: "DISCONTINUE",
+        action: 'DISCONTINUE',
         drug: medication.drug,
         dosage: {
           dosage: getDosage(medication.drug.strength, medication.dose),
@@ -250,16 +224,11 @@ function OrderBasketItemActions({
         },
         encounterUuid: medication.encounter.uuid,
         commonMedicationName: medication.drug.name,
-        isFreeTextDosage:
-          medication.dosingType === "org.openmrs.FreeTextDosingInstructions",
+        isFreeTextDosage: medication.dosingType === 'org.openmrs.FreeTextDosingInstructions',
         freeTextDosage:
-          medication.dosingType === "org.openmrs.FreeTextDosingInstructions"
-            ? medication.dosingInstructions
-            : "",
+          medication.dosingType === 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
         patientInstructions:
-          medication.dosingType !== "org.openmrs.FreeTextDosingInstructions"
-            ? medication.dosingInstructions
-            : "",
+          medication.dosingType !== 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
         asNeeded: medication.asNeeded,
         asNeededCondition: medication.asNeededCondition,
         startDate: medication.dateActivated,
@@ -282,7 +251,7 @@ function OrderBasketItemActions({
         uuid: medication.uuid,
         previousOrder: medication.uuid,
         startDate: new Date(),
-        action: "REVISE",
+        action: 'REVISE',
         drug: medication.drug,
         dosage: {
           dosage: getDosage(medication.drug.strength, medication.dose),
@@ -302,16 +271,11 @@ function OrderBasketItemActions({
         },
         encounterUuid: medication.encounter.uuid,
         commonMedicationName: medication.drug.name,
-        isFreeTextDosage:
-          medication.dosingType === "org.openmrs.FreeTextDosingInstructions",
+        isFreeTextDosage: medication.dosingType === 'org.openmrs.FreeTextDosingInstructions',
         freeTextDosage:
-          medication.dosingType === "org.openmrs.FreeTextDosingInstructions"
-            ? medication.dosingInstructions
-            : "",
+          medication.dosingType === 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
         patientInstructions:
-          medication.dosingType !== "org.openmrs.FreeTextDosingInstructions"
-            ? medication.dosingInstructions
-            : "",
+          medication.dosingType !== 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
         asNeeded: medication.asNeeded,
         asNeededCondition: medication.asNeededCondition,
         duration: medication.duration,
@@ -333,7 +297,7 @@ function OrderBasketItemActions({
         uuid: medication.uuid,
         previousOrder: null,
         startDate: new Date(),
-        action: "RENEWED",
+        action: 'RENEWED',
         drug: medication.drug,
         dosage: {
           dosage: getDosage(medication.drug.strength, medication.dose),
@@ -353,16 +317,11 @@ function OrderBasketItemActions({
         },
         encounterUuid: medication.encounter.uuid,
         commonMedicationName: medication.drug.name,
-        isFreeTextDosage:
-          medication.dosingType === "org.openmrs.FreeTextDosingInstructions",
+        isFreeTextDosage: medication.dosingType === 'org.openmrs.FreeTextDosingInstructions',
         freeTextDosage:
-          medication.dosingType === "org.openmrs.FreeTextDosingInstructions"
-            ? medication.dosingInstructions
-            : "",
+          medication.dosingType === 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
         patientInstructions:
-          medication.dosingType !== "org.openmrs.FreeTextDosingInstructions"
-            ? medication.dosingInstructions
-            : "",
+          medication.dosingType !== 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
         asNeeded: medication.asNeeded,
         asNeededCondition: medication.asNeededCondition,
         duration: medication.duration,
@@ -381,24 +340,16 @@ function OrderBasketItemActions({
     <OverflowMenu flipped>
       {showDiscontinueButton && (
         <OverflowMenuItem
-          itemText={t("discontinue", "Discontinue")}
+          itemText={t('discontinue', 'Discontinue')}
           onClick={handleDiscontinueClick}
           disabled={alreadyInBasket}
         />
       )}
       {showModifyButton && (
-        <OverflowMenuItem
-          itemText={t("modify", "Modify")}
-          onClick={handleModifyClick}
-          disabled={alreadyInBasket}
-        />
+        <OverflowMenuItem itemText={t('modify', 'Modify')} onClick={handleModifyClick} disabled={alreadyInBasket} />
       )}
       {showReorderButton && (
-        <OverflowMenuItem
-          itemText={t("reorder", "Reorder")}
-          onClick={handleReorderClick}
-          disabled={alreadyInBasket}
-        />
+        <OverflowMenuItem itemText={t('reorder', 'Reorder')} onClick={handleReorderClick} disabled={alreadyInBasket} />
       )}
     </OverflowMenu>
   );

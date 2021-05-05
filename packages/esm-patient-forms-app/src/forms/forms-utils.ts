@@ -1,8 +1,8 @@
-import { Encounter, Form } from "../types";
+import { Encounter, Form } from '../types';
 
 export function filterAvailableAndCompletedForms(
   forms: Array<Form>,
-  encounters: Array<Encounter>
+  encounters: Array<Encounter>,
 ): {
   available: Array<Form>;
   completed: Array<Encounter>;

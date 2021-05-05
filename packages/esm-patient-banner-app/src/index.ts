@@ -1,18 +1,13 @@
-import { defineConfigSchema, getAsyncLifecycle } from "@openmrs/esm-framework";
-import { backendDependencies } from "./openmrs-backend-dependencies";
+import { defineConfigSchema, getAsyncLifecycle } from '@openmrs/esm-framework';
+import { backendDependencies } from './openmrs-backend-dependencies';
 
-const importTranslation = require.context(
-  "../translations",
-  false,
-  /.json$/,
-  "lazy"
-);
+const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 function setupOpenMRS() {
-  const moduleName = "@openmrs/esm-patient-banner-app";
+  const moduleName = '@openmrs/esm-patient-banner-app';
 
   const options = {
-    featureName: "patient-banner",
+    featureName: 'patient-banner',
     moduleName,
   };
 
@@ -21,12 +16,9 @@ function setupOpenMRS() {
   return {
     extensions: [
       {
-        id: "patient-banner",
-        slot: "patient-header-slot",
-        load: getAsyncLifecycle(
-          () => import("./banner/patient-banner.component"),
-          options
-        ),
+        id: 'patient-banner',
+        slot: 'patient-header-slot',
+        load: getAsyncLifecycle(() => import('./banner/patient-banner.component'), options),
       },
     ],
   };

@@ -1,14 +1,14 @@
-import React from "react";
-import DataTableSkeleton from "carbon-components-react/lib/components/DataTableSkeleton";
-import useOverviewData from "./useOverviewData";
-import { Card } from "./helpers";
-import CommonOverview from "./common-overview";
-import { switchTo } from "@openmrs/esm-framework";
+import React from 'react';
+import DataTableSkeleton from 'carbon-components-react/lib/components/DataTableSkeleton';
+import useOverviewData from './useOverviewData';
+import { Card } from './helpers';
+import CommonOverview from './common-overview';
+import { switchTo } from '@openmrs/esm-framework';
 
 const defaultOpenTimeline = (patientUuid, panelUuid) => {
   const url = `/patient/${patientUuid}/testresults/timeline/${panelUuid}`;
-  switchTo("workspace", url, {
-    title: "Timeline",
+  switchTo('workspace', url, {
+    title: 'Timeline',
   });
 };
 
@@ -31,11 +31,7 @@ export const Overview: React.FC<LabResultProps & LabResultParams> = ({
   return (
     <>
       {loaded ? (
-        <CommonOverview
-          overviewData={overviewData}
-          openTimeline={openTimeline}
-          openTrendline={openTrendline}
-        />
+        <CommonOverview overviewData={overviewData} openTimeline={openTimeline} openTrendline={openTrendline} />
       ) : (
         <Card>
           <DataTableSkeleton columnCount={3} />

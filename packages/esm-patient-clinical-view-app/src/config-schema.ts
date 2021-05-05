@@ -1,4 +1,4 @@
-import { Type } from "@openmrs/esm-framework";
+import { Type } from '@openmrs/esm-framework';
 
 export const configSchema = {
   clinicalViews: {
@@ -8,8 +8,8 @@ export const configSchema = {
       slotName: { _type: Type.String },
     },
     _default: [
-      { slot: "All", slotName: "" },
-      { slot: "Medication Orders", slotName: "patient-chart-orders-dashboard-slot" },
+      { slot: 'All', slotName: '' },
+      { slot: 'Medication Orders', slotName: 'patient-chart-orders-dashboard-slot' },
     ],
   },
 };

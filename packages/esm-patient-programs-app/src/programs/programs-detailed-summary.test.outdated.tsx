@@ -1,10 +1,10 @@
-import React from "react";
-import ProgramsDetailedSummary from "./programs-detailed-summary.component";
-import { render, screen } from "@testing-library/react";
-import { BrowserRouter } from "react-router-dom";
-import { of } from "rxjs/internal/observable/of";
-import { mockEnrolledProgramsResponse } from "../../../../__mocks__/programs.mock";
-import { fetchEnrolledPrograms } from "./programs.resource";
+import React from 'react';
+import ProgramsDetailedSummary from './programs-detailed-summary.component';
+import { render, screen } from '@testing-library/react';
+import { BrowserRouter } from 'react-router-dom';
+import { of } from 'rxjs/internal/observable/of';
+import { mockEnrolledProgramsResponse } from '../../../../__mocks__/programs.mock';
+import { fetchEnrolledPrograms } from './programs.resource';
 
 const mockFetchEnrolledPrograms = fetchEnrolledPrograms as jest.Mock;
 
@@ -12,14 +12,14 @@ const renderProgramsDetailedSummary = () =>
   render(
     <BrowserRouter>
       <ProgramsDetailedSummary />
-    </BrowserRouter>
+    </BrowserRouter>,
   );
 
-jest.mock("./programs.resource", () => ({
+jest.mock('./programs.resource', () => ({
   fetchEnrolledPrograms: jest.fn(),
 }));
 
-describe("<ProgramsDetailedSummary />", () => {
+describe('<ProgramsDetailedSummary />', () => {
   beforeEach(() => {
     mockFetchEnrolledPrograms.mockReset;
   });
@@ -29,29 +29,25 @@ describe("<ProgramsDetailedSummary />", () => {
 
     renderProgramsDetailedSummary();
 
-    await screen.findByRole("heading", { name: /Care Programs/i });
+    await screen.findByRole('heading', { name: /Care Programs/i });
     expect(screen.getByText(/Care Programs/i)).toBeInTheDocument();
 
-    expect(screen.getByText("Active Programs")).toBeInTheDocument();
-    expect(screen.getByText("Since")).toBeInTheDocument();
-    expect(screen.getByText("Status")).toBeInTheDocument();
-    expect(screen.getByText("HIV Care and Treatment")).toBeInTheDocument();
-    expect(screen.getByText("Jan-2020")).toBeInTheDocument();
-    expect(screen.getByText("Active")).toBeInTheDocument();
+    expect(screen.getByText('Active Programs')).toBeInTheDocument();
+    expect(screen.getByText('Since')).toBeInTheDocument();
+    expect(screen.getByText('Status')).toBeInTheDocument();
+    expect(screen.getByText('HIV Care and Treatment')).toBeInTheDocument();
+    expect(screen.getByText('Jan-2020')).toBeInTheDocument();
+    expect(screen.getByText('Active')).toBeInTheDocument();
   });
 
-  it("renders an empty state view when program enrollment data is absent", async () => {
+  it('renders an empty state view when program enrollment data is absent', async () => {
     mockFetchEnrolledPrograms.mockReturnValue(of({}));
 
     renderProgramsDetailedSummary();
 
-    await screen.findByRole("heading", { name: /Care Programs/i });
+    await screen.findByRole('heading', { name: /Care Programs/i });
     expect(screen.getByText(/Care Programs/i)).toBeInTheDocument();
 
-    expect(
-      screen.getByText(
-        /There are no program enrollments to display for this patient/
-      )
-    ).toBeInTheDocument();
+    expect(screen.getByText(/There are no program enrollments to display for this patient/)).toBeInTheDocument();
   });
 });

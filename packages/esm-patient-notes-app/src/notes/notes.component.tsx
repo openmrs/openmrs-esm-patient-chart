@@ -1,8 +1,8 @@
-import React from "react";
-import NotesDetailedSummary from "./notes-detailed-summary.component";
-import NoteRecord from "./note-record.component";
-import { Switch, Route, BrowserRouter } from "react-router-dom";
-import { NotesContext } from "./notes.context";
+import React from 'react';
+import NotesDetailedSummary from './notes-detailed-summary.component';
+import NoteRecord from './note-record.component';
+import { Switch, Route, BrowserRouter } from 'react-router-dom';
+import { NotesContext } from './notes.context';
 
 interface NotesProps {
   basePath: string;

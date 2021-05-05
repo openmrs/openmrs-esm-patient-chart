@@ -16,7 +16,7 @@
     "ci:release": "lerna version --no-git-tag-version",
     "ci:prerelease": "lerna version prerelease --no-git-tag-version --yes",
     "verify": "lerna run lint && lerna run test && lerna run typescript",
-    "prettier": "prettier \"packages/**/src/**/*\" --write",
+    "prettier": "prettier --config prettier.config.js --write \"packages/**/*.{ts,tsx}\"",
     "test": "jest --config jest.config.json --verbose false --passWithNoTests",
     "test-watch": "jest --watch --config jest.config.json",
     "coverage": "yarn test --coverage",

@@ -1,8 +1,8 @@
-import React from "react";
-import ProgramsDetailedSummary from "./programs-detailed-summary.component";
-import ProgramRecord from "./program-record.component";
-import { Switch, Route, BrowserRouter } from "react-router-dom";
-import { ProgramsContext } from "./programs.context";
+import React from 'react';
+import ProgramsDetailedSummary from './programs-detailed-summary.component';
+import ProgramRecord from './program-record.component';
+import { Switch, Route, BrowserRouter } from 'react-router-dom';
+import { ProgramsContext } from './programs.context';
 
 interface ProgramsProps {
   basePath: string;
@@ -10,11 +10,7 @@ interface ProgramsProps {
   patientUuid: string;
 }
 
-export default function Programs({
-  basePath,
-  patient,
-  patientUuid,
-}: ProgramsProps) {
+export default function Programs({ basePath, patient, patientUuid }: ProgramsProps) {
   return (
     <ProgramsContext.Provider value={{ patientUuid, patient }}>
       <BrowserRouter basename={`${window.spaBase}${basePath}/programs`}>

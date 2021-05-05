@@ -1,10 +1,10 @@
 export interface DashbardGridConfig {
   columns: number;
-  type: "grid";
+  type: 'grid';
 }
 
 export interface DashboardTabConfig {
-  type: "tabs";
+  type: 'tabs';
 }
 
 export type DashbardLayoutConfig = DashbardGridConfig | DashboardTabConfig;

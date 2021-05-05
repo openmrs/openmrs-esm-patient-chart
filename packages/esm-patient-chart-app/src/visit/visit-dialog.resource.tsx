@@ -1,4 +1,4 @@
-import { Subject, Observable } from "rxjs";
+import { Subject, Observable } from 'rxjs';
 
 const modalItem = new Subject<ModalItem>();
 

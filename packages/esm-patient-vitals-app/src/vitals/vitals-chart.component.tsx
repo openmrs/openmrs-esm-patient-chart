@@ -1,15 +1,15 @@
-import React from "react";
-import dayjs from "dayjs";
-import { useTranslation } from "react-i18next";
-import styles from "./vitals-chart.component.scss";
-import RadioButton from "carbon-components-react/es/components/RadioButton";
-import RadioButtonGroup from "carbon-components-react/es/components/RadioButtonGroup";
-import { withUnit } from "./vitals-biometrics-form/use-vitalsigns";
-import { PatientVitals } from "./vitals-biometrics.resource";
-import { LineChart } from "@carbon/charts-react";
-import { LineChartOptions } from "@carbon/charts/interfaces/charts";
-import { ScaleTypes } from "@carbon/charts/interfaces/enums";
-import "@carbon/charts/styles.css";
+import React from 'react';
+import dayjs from 'dayjs';
+import { useTranslation } from 'react-i18next';
+import styles from './vitals-chart.component.scss';
+import RadioButton from 'carbon-components-react/es/components/RadioButton';
+import RadioButtonGroup from 'carbon-components-react/es/components/RadioButtonGroup';
+import { withUnit } from './vitals-biometrics-form/use-vitalsigns';
+import { PatientVitals } from './vitals-biometrics.resource';
+import { LineChart } from '@carbon/charts-react';
+import { LineChartOptions } from '@carbon/charts/interfaces/charts';
+import { ScaleTypes } from '@carbon/charts/interfaces/enums';
+import '@carbon/charts/styles.css';
 
 interface vitalsChartData {
   title: string;
@@ -21,10 +21,7 @@ interface VitalsChartProps {
   conceptsUnits: Array<string>;
 }
 
-const VitalsChart: React.FC<VitalsChartProps> = ({
-  patientVitals,
-  conceptsUnits,
-}) => {
+const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptsUnits }) => {
   const { t } = useTranslation();
   const [chartData, setChartData] = React.useState([]);
   const [
@@ -38,20 +35,17 @@ const VitalsChart: React.FC<VitalsChartProps> = ({
     ,
     respiratoryRateUnit,
   ] = conceptsUnits;
-  const [
-    selectedVitalSign,
-    setSelecteVitalsSign,
-  ] = React.useState<vitalsChartData>({
+  const [selectedVitalSign, setSelecteVitalsSign] = React.useState<vitalsChartData>({
     title: `BP (${bloodPressureUnit})`,
-    value: "systolic",
+    value: 'systolic',
   });
 
   React.useEffect(() => {
     const chartData = patientVitals.map((vitals) => {
       return vitals[selectedVitalSign.value]
         ? {
-            group: "vitalsChartData",
-            key: dayjs(vitals.date).format("DD-MMM"),
+            group: 'vitalsChartData',
+            key: dayjs(vitals.date).format('DD-MMM'),
             value: vitals[selectedVitalSign.value],
           }
         : {};
@@ -60,22 +54,22 @@ const VitalsChart: React.FC<VitalsChartProps> = ({
   }, [patientVitals, selectedVitalSign]);
 
   const chartColors = {
-    "Blood Pressure": "#6929c4",
-    "Oxygen Saturation": "#6929c4",
-    Temperature: "#6929c4",
-    "Respiratory Rate": "#6929c4",
-    Pulse: "#6929c4",
+    'Blood Pressure': '#6929c4',
+    'Oxygen Saturation': '#6929c4',
+    Temperature: '#6929c4',
+    'Respiratory Rate': '#6929c4',
+    Pulse: '#6929c4',
   };
 
   const chartOptions: LineChartOptions = {
     axes: {
       bottom: {
-        title: "Date",
-        mapsTo: "key",
+        title: 'Date',
+        mapsTo: 'key',
         scaleType: ScaleTypes.LABELS,
       },
       left: {
-        mapsTo: "value",
+        mapsTo: 'value',
         title: selectedVitalSign.title,
         scaleType: ScaleTypes.LINEAR,
         includeZero: false,
@@ -91,29 +85,29 @@ const VitalsChart: React.FC<VitalsChartProps> = ({
 
   const vitalSigns = [
     {
-      id: "bloodPressure",
-      title: withUnit("BP", bloodPressureUnit),
-      value: "systolic",
+      id: 'bloodPressure',
+      title: withUnit('BP', bloodPressureUnit),
+      value: 'systolic',
     },
     {
-      id: "oxygenSaturation",
-      title: withUnit("SPO2", oxygenSaturationUnit),
-      value: "oxygenSaturation",
+      id: 'oxygenSaturation',
+      title: withUnit('SPO2', oxygenSaturationUnit),
+      value: 'oxygenSaturation',
     },
     {
-      id: "temperature",
-      title: withUnit("Temp", temperatureUnit),
-      value: "temperature",
+      id: 'temperature',
+      title: withUnit('Temp', temperatureUnit),
+      value: 'temperature',
     },
     {
-      id: "Respiratory Rate",
-      title: withUnit("R. Rate", respiratoryRateUnit),
-      value: "respiratoryRate",
+      id: 'Respiratory Rate',
+      title: withUnit('R. Rate', respiratoryRateUnit),
+      value: 'respiratoryRate',
     },
     {
-      id: "pulse",
-      title: withUnit("Pulse", pulseUnit),
-      value: "pulse",
+      id: 'pulse',
+      title: withUnit('Pulse', pulseUnit),
+      value: 'pulse',
     },
   ];
 
@@ -121,15 +115,14 @@ const VitalsChart: React.FC<VitalsChartProps> = ({
     <div className={styles.vitalsChartContainer}>
       <div className={styles.vitalSignsArea} style={{ flex: 1 }}>
         <label className={styles.vitalsSign} htmlFor="radio-button-group">
-          {t("vitalSignDisplayed", "Vital Sign Displayed")}
+          {t('vitalSignDisplayed', 'Vital Sign Displayed')}
         </label>
         <RadioButtonGroup
           defaultSelected="bloodPressure"
           name="radio-button-group"
           valueSelected="systolic"
           orientation="vertical"
-          labelPosition="right"
-        >
+          labelPosition="right">
           {vitalSigns.map(({ id, title, value }) => (
             <RadioButton
               key={id}

@@ -1,6 +1,4 @@
-import notesConfigSchema, {
-  VisitNoteConfigObject,
-} from "./notes/visit-note-config-schema";
+import notesConfigSchema, { VisitNoteConfigObject } from './notes/visit-note-config-schema';
 
 export const configSchema = {
   visitNoteConfig: notesConfigSchema,

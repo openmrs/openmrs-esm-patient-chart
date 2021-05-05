@@ -1,6 +1,6 @@
-import { useMemo } from "react";
-import usePatientResultsData from "../loadPatientTestData/usePatientResultsData";
-import { ObsRecord } from "../loadPatientTestData/types";
+import { useMemo } from 'react';
+import usePatientResultsData from '../loadPatientTestData/usePatientResultsData';
+import { ObsRecord } from '../loadPatientTestData/types';
 
 const parseTime = (sortedTimes: string[]) => {
   const yearColumns: Array<{ year: string; size: number }> = [],
@@ -12,16 +12,11 @@ const parseTime = (sortedTimes: string[]) => {
     const date = `${month}/${day}`;
     const time = `${hour}:${minutes}`;
 
-    const yearColumn = yearColumns.find(
-      ({ year: innerYear }) => year === innerYear
-    );
+    const yearColumn = yearColumns.find(({ year: innerYear }) => year === innerYear);
     if (yearColumn) yearColumn.size++;
     else yearColumns.push({ year, size: 1 });
 
-    const dayColumn = dayColumns.find(
-      ({ year: innerYear, day: innerDay }) =>
-        date === innerDay && year === innerYear
-    );
+    const dayColumn = dayColumns.find(({ year: innerYear, day: innerDay }) => date === innerDay && year === innerYear);
     if (dayColumn) dayColumn.size++;
     else dayColumns.push({ day: date, year, size: 1 });
 
@@ -34,7 +29,7 @@ const parseTime = (sortedTimes: string[]) => {
 const parseEntries = (entries: ObsRecord[] = [], type: string) => {
   const rows: Record<string, Array<ObsRecord | undefined>> = {};
 
-  if (type === "LabSet") {
+  if (type === 'LabSet') {
     entries.forEach((entry, index) => {
       const { members } = entry;
       members.forEach((member) => {
@@ -43,7 +38,7 @@ const parseEntries = (entries: ObsRecord[] = [], type: string) => {
         row[index] = member;
       });
     });
-  } else if (type === "Test") {
+  } else if (type === 'Test') {
     entries.forEach((member, index) => {
       const { name } = member;
       const row = rows[name] || (rows[name] = []);
@@ -67,14 +62,12 @@ export const useTimelineData = (patientUuid: string, panelUuid: string) => {
         error,
       };
 
-    const [panelName, panelData] =
-      Object.entries(sortedObs).find(([, { uuid }]) => uuid === panelUuid) ||
-      [];
+    const [panelName, panelData] = Object.entries(sortedObs).find(([, { uuid }]) => uuid === panelUuid) || [];
     if (!panelData)
       return {
         data: { parsedTime: {} as ReturnType<typeof parseTime> },
         loaded,
-        error: new Error("panel data missing"),
+        error: new Error('panel data missing'),
       };
 
     const { entries } = panelData;

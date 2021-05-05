@@ -22,7 +22,7 @@ export interface FHIRAllergy {
   note?: [
     {
       text: string;
-    }
+    },
   ];
   patient: {
     display: string;
@@ -108,7 +108,7 @@ export interface AllergyData {
   reactions: [
     {
       reaction: AllergicReaction;
-    }
+    },
   ];
   severity: {
     name: {

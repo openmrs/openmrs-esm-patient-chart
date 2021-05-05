@@ -1,11 +1,11 @@
-import React, { useEffect } from "react";
-import dayjs from "dayjs";
-import isEmpty from "lodash-es/isEmpty";
-import LocationSelect from "./location-select.component";
-import VisitTypeSelect from "./visit-type-select.component";
-import styles from "./new-visit.css";
-import { SummaryCard } from "@openmrs/esm-patient-common-lib";
-import { useTranslation } from "react-i18next";
+import React, { useEffect } from 'react';
+import dayjs from 'dayjs';
+import isEmpty from 'lodash-es/isEmpty';
+import LocationSelect from './location-select.component';
+import VisitTypeSelect from './visit-type-select.component';
+import styles from './new-visit.css';
+import { SummaryCard } from '@openmrs/esm-patient-common-lib';
+import { useTranslation } from 'react-i18next';
 import {
   NewVisitPayload,
   saveVisit,
@@ -16,7 +16,7 @@ import {
   VisitMode,
   VisitStatus,
   useSessionUser,
-} from "@openmrs/esm-framework";
+} from '@openmrs/esm-framework';
 
 export interface NewVisitProps {
   onVisitStarted(visit: any): void;
@@ -26,24 +26,14 @@ export interface NewVisitProps {
   patientUuid: string;
 }
 
-const NewVisit: React.FC<NewVisitProps> = ({
-  patientUuid,
-  onVisitStarted,
-  onCanceled,
-  closeComponent,
-  viewMode,
-}) => {
+const NewVisit: React.FC<NewVisitProps> = ({ patientUuid, onVisitStarted, onCanceled, closeComponent, viewMode }) => {
   const currentUser = useSessionUser();
   const { t } = useTranslation();
-  const [visitStartDate, setVisitStartDate] = React.useState(
-    dayjs(new Date()).format("YYYY-MM-DD")
-  );
-  const [visitStartTime, setVisitStartTime] = React.useState(
-    dayjs(new Date()).format("HH:mm")
-  );
-  const [visitEndDate, setVisitEndDate] = React.useState("");
-  const [visitEndTime, setVisitEndTime] = React.useState("");
-  const [locationUuid, setLocationUuid] = React.useState("");
+  const [visitStartDate, setVisitStartDate] = React.useState(dayjs(new Date()).format('YYYY-MM-DD'));
+  const [visitStartTime, setVisitStartTime] = React.useState(dayjs(new Date()).format('HH:mm'));
+  const [visitEndDate, setVisitEndDate] = React.useState('');
+  const [visitEndTime, setVisitEndTime] = React.useState('');
+  const [locationUuid, setLocationUuid] = React.useState('');
   const [visitUuid, setVisitUuid] = React.useState<string>();
 
   if (!locationUuid && currentUser?.sessionLocation?.uuid) {
@@ -51,7 +41,7 @@ const NewVisit: React.FC<NewVisitProps> = ({
     setLocationUuid(currentUser?.sessionLocation?.uuid);
   }
 
-  const [visitTypeUuid, setVisitTypeUuid] = React.useState("");
+  const [visitTypeUuid, setVisitTypeUuid] = React.useState('');
 
   // events
   const startVisit = () => {
@@ -72,14 +62,13 @@ const NewVisit: React.FC<NewVisitProps> = ({
         closeComponent();
       },
       (error) => {
-        console.error("Error saving visit: ", error);
-      }
+        console.error('Error saving visit: ', error);
+      },
     );
   };
 
   const handleUpdateVisit = (): void => {
-    const stopDatetime =
-      visitEndDate && new Date(`${visitEndDate} ${visitEndTime}:00`);
+    const stopDatetime = visitEndDate && new Date(`${visitEndDate} ${visitEndTime}:00`);
     const updateVisitPayload: UpdateVisitPayload = {
       startDatetime: new Date(`${visitStartDate} ${visitStartTime}:00`),
       visitType: visitTypeUuid,
@@ -114,16 +103,10 @@ const NewVisit: React.FC<NewVisitProps> = ({
       if (visit) {
         setVisitUuid(visit.visitData.uuid);
         setLocationUuid(visit.visitData.location.uuid);
-        setVisitStartDate(
-          dayjs(visit.visitData.startDatetime).format("YYYY-MM-DD")
-        );
-        setVisitStartTime(dayjs(visit.visitData.startDatetime).format("HH:mm"));
-        visit.visitData.stopDatetime &&
-          setVisitEndDate(
-            dayjs(visit.visitData.stopDatetime).format("YYYY-MM-DD")
-          );
-        visit.visitData.stopDatetime &&
-          setVisitEndTime(dayjs(visit.visitData.stopDatetime).format("HH:mm"));
+        setVisitStartDate(dayjs(visit.visitData.startDatetime).format('YYYY-MM-DD'));
+        setVisitStartTime(dayjs(visit.visitData.startDatetime).format('HH:mm'));
+        visit.visitData.stopDatetime && setVisitEndDate(dayjs(visit.visitData.stopDatetime).format('YYYY-MM-DD'));
+        visit.visitData.stopDatetime && setVisitEndTime(dayjs(visit.visitData.stopDatetime).format('HH:mm'));
 
         setVisitTypeUuid(visit.visitData.visitType.uuid);
       }
@@ -135,46 +118,31 @@ const NewVisit: React.FC<NewVisitProps> = ({
   return (
     <>
       {viewMode ? (
-        <SummaryCard
-          name={t("startNewVisit", "Start new visit")}
-          styles={{ margin: 0 }}
-        >
+        <SummaryCard name={t('startNewVisit', 'Start new visit')} styles={{ margin: 0 }}>
           <div className={styles.newVisitContainer}>
-            <div
-              className={`${styles.newVisitInputContainer} ${styles.flexColumn}`}
-            >
-              <label htmlFor="visitType">
-                {t("typeOfVisit", "Type of visit")}
-              </label>
+            <div className={`${styles.newVisitInputContainer} ${styles.flexColumn}`}>
+              <label htmlFor="visitType">{t('typeOfVisit', 'Type of visit')}</label>
               <VisitTypeSelect
-                onVisitTypeChanged={(visitType) =>
-                  onVisitTypeChanged(visitType.uuid)
-                }
+                onVisitTypeChanged={(visitType) => onVisitTypeChanged(visitType.uuid)}
                 id="visitType"
                 visitTypeUuid={visitTypeUuid}
               />
             </div>
             <div
               style={{
-                display: "flex",
-                flexFlow: "row wrap",
-                justifyContent: "space-between",
-              }}
-            >
-              <div
-                className={`${styles.newVisitInputContainer}  ${styles.flexColumn}`}
-                style={{ width: "50%" }}
-              >
-                <label htmlFor="startDate">
-                  {t("startDate", "Start date")}
-                </label>
+                display: 'flex',
+                flexFlow: 'row wrap',
+                justifyContent: 'space-between',
+              }}>
+              <div className={`${styles.newVisitInputContainer}  ${styles.flexColumn}`} style={{ width: '50%' }}>
+                <label htmlFor="startDate">{t('startDate', 'Start date')}</label>
                 <div className="omrs-datepicker">
                   <input
                     type="date"
                     name="startDate"
                     id="startDate"
                     defaultValue={visitStartDate}
-                    max={dayjs(new Date().toUTCString()).format("YYYY-MM-DD")}
+                    max={dayjs(new Date().toUTCString()).format('YYYY-MM-DD')}
                     onChange={onStartDateChanged}
                   />
                   <svg className="omrs-icon" role="img">
@@ -182,13 +150,8 @@ const NewVisit: React.FC<NewVisitProps> = ({
                   </svg>
                 </div>
               </div>
-              <div
-                className={`${styles.newVisitInputContainer}  ${styles.flexColumn}`}
-                style={{ width: "50%" }}
-              >
-                <label htmlFor="startTime">
-                  {t("startTime", "Start time")}
-                </label>
+              <div className={`${styles.newVisitInputContainer}  ${styles.flexColumn}`} style={{ width: '50%' }}>
+                <label htmlFor="startTime">{t('startTime', 'Start time')}</label>
                 <div className="omrs-datepicker">
                   <input
                     type="time"
@@ -203,68 +166,43 @@ const NewVisit: React.FC<NewVisitProps> = ({
                 </div>
               </div>
             </div>
-            <div
-              className={`${styles.newVisitInputContainer} ${styles.flexColumn}`}
-            >
-              <label htmlFor="location">{t("location", "Location")}</label>
+            <div className={`${styles.newVisitInputContainer} ${styles.flexColumn}`}>
+              <label htmlFor="location">{t('location', 'Location')}</label>
               <LocationSelect
                 currentLocationUuid={locationUuid}
-                onLocationChanged={(location) =>
-                  onLocationChanged(location.uuid)
-                }
-                id={"location"}
+                onLocationChanged={(location) => onLocationChanged(location.uuid)}
+                id={'location'}
               />
             </div>
-            <div
-              className={styles.newVisitButtonContainer}
-              style={{ flexDirection: "row" }}
-            >
-              <button
-                className={`omrs-btn omrs-outlined-neutral`}
-                onClick={onCanceled}
-              >
-                {t("cancel", "Cancel")}
+            <div className={styles.newVisitButtonContainer} style={{ flexDirection: 'row' }}>
+              <button className={`omrs-btn omrs-outlined-neutral`} onClick={onCanceled}>
+                {t('cancel', 'Cancel')}
               </button>
-              <button
-                className={`omrs-btn omrs-filled-action`}
-                onClick={() => startVisit()}
-              >
-                {t("start", "Start")}
+              <button className={`omrs-btn omrs-filled-action`} onClick={() => startVisit()}>
+                {t('start', 'Start')}
               </button>
             </div>
           </div>
         </SummaryCard>
       ) : (
-        <SummaryCard name={t("editVisit", "Edit visit")} styles={{ margin: 0 }}>
+        <SummaryCard name={t('editVisit', 'Edit visit')} styles={{ margin: 0 }}>
           <div className={styles.newVisitContainer}>
-            <div
-              className={`${styles.newVisitInputContainer} ${styles.flexColumn}`}
-            >
-              <label htmlFor="visitType">
-                {t("typeOfVisit", "Type of visit")}
-              </label>
+            <div className={`${styles.newVisitInputContainer} ${styles.flexColumn}`}>
+              <label htmlFor="visitType">{t('typeOfVisit', 'Type of visit')}</label>
               <VisitTypeSelect
-                onVisitTypeChanged={(visitType) =>
-                  onVisitTypeChanged(visitType.uuid)
-                }
-                id={"visitType"}
+                onVisitTypeChanged={(visitType) => onVisitTypeChanged(visitType.uuid)}
+                id={'visitType'}
                 visitTypeUuid={visitTypeUuid}
               />
             </div>
             <div
               style={{
-                display: "flex",
-                flexFlow: "row wrap",
-                justifyContent: "space-between",
-              }}
-            >
-              <div
-                className={`${styles.newVisitInputContainer}  ${styles.flexColumn}`}
-                style={{ width: "50%" }}
-              >
-                <label htmlFor="startDate">
-                  {t("startDate", "Start date")}
-                </label>
+                display: 'flex',
+                flexFlow: 'row wrap',
+                justifyContent: 'space-between',
+              }}>
+              <div className={`${styles.newVisitInputContainer}  ${styles.flexColumn}`} style={{ width: '50%' }}>
+                <label htmlFor="startDate">{t('startDate', 'Start date')}</label>
                 <div className="omrs-datepicker">
                   <input
                     type="date"
@@ -279,13 +217,8 @@ const NewVisit: React.FC<NewVisitProps> = ({
                   </svg>
                 </div>
               </div>
-              <div
-                className={`${styles.newVisitInputContainer}  ${styles.flexColumn}`}
-                style={{ width: "50%" }}
-              >
-                <label htmlFor="startTime">
-                  {t("startTime", "Start time")}
-                </label>
+              <div className={`${styles.newVisitInputContainer}  ${styles.flexColumn}`} style={{ width: '50%' }}>
+                <label htmlFor="startTime">{t('startTime', 'Start time')}</label>
                 <div className="omrs-datepicker">
                   <input
                     type="time"
@@ -302,16 +235,12 @@ const NewVisit: React.FC<NewVisitProps> = ({
             </div>
             <div
               style={{
-                display: "flex",
-                flexFlow: "row wrap",
-                justifyContent: "space-between",
-              }}
-            >
-              <div
-                className={`${styles.newVisitInputContainer}  ${styles.flexColumn}`}
-                style={{ width: "50%" }}
-              >
-                <label htmlFor="endDate">{t("endDate", "End date")}</label>
+                display: 'flex',
+                flexFlow: 'row wrap',
+                justifyContent: 'space-between',
+              }}>
+              <div className={`${styles.newVisitInputContainer}  ${styles.flexColumn}`} style={{ width: '50%' }}>
+                <label htmlFor="endDate">{t('endDate', 'End date')}</label>
                 <div className="omrs-datepicker">
                   <input
                     type="date"
@@ -326,11 +255,8 @@ const NewVisit: React.FC<NewVisitProps> = ({
                   </svg>
                 </div>
               </div>
-              <div
-                className={`${styles.newVisitInputContainer}  ${styles.flexColumn}`}
-                style={{ width: "50%" }}
-              >
-                <label htmlFor="endTime">{t("endTime", "End time")}</label>
+              <div className={`${styles.newVisitInputContainer}  ${styles.flexColumn}`} style={{ width: '50%' }}>
+                <label htmlFor="endTime">{t('endTime', 'End time')}</label>
                 <div className="omrs-datepicker">
                   <input
                     type="time"
@@ -346,36 +272,25 @@ const NewVisit: React.FC<NewVisitProps> = ({
                 </div>
               </div>
             </div>
-            <div
-              className={`${styles.newVisitInputContainer} ${styles.flexColumn}`}
-            >
-              <label htmlFor="location">{t("location", "Location")}</label>
+            <div className={`${styles.newVisitInputContainer} ${styles.flexColumn}`}>
+              <label htmlFor="location">{t('location', 'Location')}</label>
               <LocationSelect
                 currentLocationUuid={locationUuid}
-                onLocationChanged={(location) =>
-                  onLocationChanged(location.uuid)
-                }
-                id={"location"}
+                onLocationChanged={(location) => onLocationChanged(location.uuid)}
+                id={'location'}
               />
             </div>
-            <div
-              className={styles.newVisitButtonContainer}
-              style={{ flexDirection: "row" }}
-            >
+            <div className={styles.newVisitButtonContainer} style={{ flexDirection: 'row' }}>
               <button
                 className={`omrs-btn omrs-outlined-neutral`}
                 onClick={() => {
                   onCanceled();
                   getStartedVisit.next(null);
-                }}
-              >
-                {t("cancel", "Cancel")}
+                }}>
+                {t('cancel', 'Cancel')}
               </button>
-              <button
-                className={`omrs-btn omrs-filled-action`}
-                onClick={handleUpdateVisit}
-              >
-                {t("editVisit", "Edit visit")}
+              <button className={`omrs-btn omrs-filled-action`} onClick={handleUpdateVisit}>
+                {t('editVisit', 'Edit visit')}
               </button>
             </div>
           </div>

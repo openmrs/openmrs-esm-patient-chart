@@ -1,4 +1,4 @@
-import { OBSERVATION_INTERPRETATION } from "./helpers";
+import { OBSERVATION_INTERPRETATION } from './helpers';
 
 export type ConceptUuid = string;
 export type ObsUuid = string;
@@ -24,7 +24,7 @@ export interface ConceptRecord {
 export interface PatientData {
   [_: string]: {
     entries: Array<ObsRecord>;
-    type: "LabSet" | "Test";
+    type: 'LabSet' | 'Test';
     uuid: string;
   };
 }

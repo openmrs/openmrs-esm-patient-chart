@@ -1,8 +1,8 @@
-import React, { useReducer } from "react";
-import styles from "./visit-dashboard.css";
-import NewVisit from "./new-visit.component";
-import EditVisit from "./edit-visit.component";
-import { Trans } from "react-i18next";
+import React, { useReducer } from 'react';
+import styles from './visit-dashboard.css';
+import NewVisit from './new-visit.component';
+import EditVisit from './edit-visit.component';
+import { Trans } from 'react-i18next';
 
 export interface VisitDashboardProps {
   patientUuid: string;
@@ -17,10 +17,10 @@ interface VisitDashboardPropsDefaultState {
 }
 
 enum DisplayModes {
-  NEW_VISIT = "newVisit",
-  EDIT_VISIT = "editVisit",
-  DASHBOARD = "dashboard",
-  EDITTING_VISIT = "edittingVisit",
+  NEW_VISIT = 'newVisit',
+  EDIT_VISIT = 'editVisit',
+  DASHBOARD = 'dashboard',
+  EDITTING_VISIT = 'edittingVisit',
 }
 
 interface NewVisitAction {
@@ -37,10 +37,7 @@ interface EditVisitAction {
 
 type ActionTypes = EditVisitAction | NewVisitAction;
 
-function reducer(
-  state: VisitDashboardPropsDefaultState,
-  action: ActionTypes
-): VisitDashboardPropsDefaultState {
+function reducer(state: VisitDashboardPropsDefaultState, action: ActionTypes): VisitDashboardPropsDefaultState {
   switch (action.displayMode) {
     case DisplayModes.NEW_VISIT:
       return {
@@ -80,10 +77,7 @@ const visitDashboardInitialState: VisitDashboardPropsDefaultState = {
   displayEditVisit: false,
 };
 
-const VisitDashboard: React.FC<VisitDashboardProps> = ({
-  closeComponent = () => {},
-  patientUuid,
-}) => {
+const VisitDashboard: React.FC<VisitDashboardProps> = ({ closeComponent = () => {}, patientUuid }) => {
   const [state, dispatch] = useReducer(reducer, visitDashboardInitialState);
 
   return (
@@ -93,8 +87,7 @@ const VisitDashboard: React.FC<VisitDashboardProps> = ({
           <button
             type="button"
             className={`omrs-btn omrs-outlined-action`}
-            onClick={() => dispatch({ displayMode: DisplayModes.NEW_VISIT })}
-          >
+            onClick={() => dispatch({ displayMode: DisplayModes.NEW_VISIT })}>
             <Trans i18nKey="newVisit">New visit</Trans>
             <svg className="omrs-icon">
               <use xlinkHref="#omrs-icon-chevron-right"></use>
@@ -104,8 +97,7 @@ const VisitDashboard: React.FC<VisitDashboardProps> = ({
           <button
             type="button"
             className={`omrs-btn omrs-outlined-action`}
-            onClick={() => dispatch({ displayMode: DisplayModes.EDIT_VISIT })}
-          >
+            onClick={() => dispatch({ displayMode: DisplayModes.EDIT_VISIT })}>
             <Trans i18nKey="editVisit">Edit visit</Trans>
             <svg className="omrs-icon">
               <use xlinkHref="#omrs-icon-zoomoutmap"></use>

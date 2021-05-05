@@ -1,8 +1,8 @@
-import React from "react";
-import ConditionsDetailedSummary from "./conditions-detailed-summary.component";
-import ConditionRecord from "./condition-record.component";
-import { Switch, Route, BrowserRouter } from "react-router-dom";
-import { ConditionsContext } from "./conditions.context";
+import React from 'react';
+import ConditionsDetailedSummary from './conditions-detailed-summary.component';
+import ConditionRecord from './condition-record.component';
+import { Switch, Route, BrowserRouter } from 'react-router-dom';
+import { ConditionsContext } from './conditions.context';
 
 interface ConditionsProps {
   basePath: string;
@@ -10,11 +10,7 @@ interface ConditionsProps {
   patientUuid: string;
 }
 
-export default function Conditions({
-  basePath,
-  patientUuid,
-  patient,
-}: ConditionsProps) {
+export default function Conditions({ basePath, patientUuid, patient }: ConditionsProps) {
   return (
     <ConditionsContext.Provider value={{ patientUuid, patient }}>
       <BrowserRouter basename={`${window.spaBase}${basePath}/conditions`}>

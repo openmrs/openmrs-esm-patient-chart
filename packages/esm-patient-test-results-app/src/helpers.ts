@@ -1,8 +1,8 @@
-import { navigate } from "@openmrs/esm-framework";
+import { navigate } from '@openmrs/esm-framework';
 
 export const makeThrottled = <T extends (...args: any[]) => any>(
   func: T,
-  time = 1000
+  time = 1000,
 ): ((...funcArgs: Parameters<T>) => void) => {
   let waiting = false;
   let toBeExecuted = false;
@@ -31,17 +31,11 @@ export const makeThrottled = <T extends (...args: any[]) => any>(
 export const navigateToTimeline = (basePath: string, panelUuid: string) =>
   navigate({ to: `${testResultsBasePath(basePath)}/timeline/${panelUuid}` });
 
-export const navigateToTrendline = (
-  basePath: string,
-  panelUuid: string,
-  testUuid: string
-) =>
+export const navigateToTrendline = (basePath: string, panelUuid: string, testUuid: string) =>
   navigate({
     to: `${testResultsBasePath(basePath)}/trendline/${panelUuid}/${testUuid}`,
   });
 
-export const navigateToResults = (basePath: string) =>
-  navigate({ to: `${testResultsBasePath(basePath)}` });
+export const navigateToResults = (basePath: string) => navigate({ to: `${testResultsBasePath(basePath)}` });
 
-export const testResultsBasePath = (basePath: string) =>
-  `${window.spaBase}${basePath}/test-results`;
+export const testResultsBasePath = (basePath: string) => `${window.spaBase}${basePath}/test-results`;

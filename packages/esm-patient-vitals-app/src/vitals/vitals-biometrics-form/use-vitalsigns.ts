@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
-import { openmrsFetch } from "@openmrs/esm-framework";
-import first from "lodash-es/first";
+import React, { useEffect } from 'react';
+import { openmrsFetch } from '@openmrs/esm-framework';
+import first from 'lodash-es/first';
 
 export interface ConceptMetaData {
   uuid: string;
@@ -14,10 +14,7 @@ export interface ConceptMetaData {
   units: string | null;
 }
 export function useVitalsSignsConceptMetaData() {
-  const [
-    vitalsSignsConceptMetadata,
-    setVitalsSignsConceptMetadata,
-  ] = React.useState<Array<ConceptMetaData>>([]);
+  const [vitalsSignsConceptMetadata, setVitalsSignsConceptMetadata] = React.useState<Array<ConceptMetaData>>([]);
   const customRepresentation = `?q=VITALS SIGNS&v=custom:(setMembers:(uuid,display,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units))`;
 
   useEffect(() => {
@@ -26,21 +23,17 @@ export function useVitalsSignsConceptMetaData() {
       openmrsFetch(`/ws/rest/v1/concept${customRepresentation}`, {
         signal: ac.signal,
       }).then(({ data }) => {
-        setVitalsSignsConceptMetadata(
-          first<{ setMembers: Array<ConceptMetaData> }>(data.results).setMembers
-        );
+        setVitalsSignsConceptMetadata(first<{ setMembers: Array<ConceptMetaData> }>(data.results).setMembers);
       });
     }
     return () => ac && ac.abort();
   }, []);
 
-  const conceptsUnits = vitalsSignsConceptMetadata.map(
-    (conceptUnit) => conceptUnit.units
-  );
+  const conceptsUnits = vitalsSignsConceptMetadata.map((conceptUnit) => conceptUnit.units);
 
   return { vitalsSignsConceptMetadata, conceptsUnits };
 }
 
 export const withUnit = (label: string, unit: string | null | undefined) => {
-  return `${label} ${unit ? `(${unit})` : ""}`;
+  return `${label} ${unit ? `(${unit})` : ''}`;
 };

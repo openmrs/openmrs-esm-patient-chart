@@ -1,18 +1,13 @@
-import React from "react";
-import styles from "./grid-view.css";
-import { useRouteMatch } from "react-router-dom";
-import {
-  Extension,
-  ExtensionData,
-  ExtensionSlot,
-  useExtensionStore,
-} from "@openmrs/esm-framework";
-import { DashbardGridConfig } from "../config-schemas";
-import { basePath } from "../constants";
+import React from 'react';
+import styles from './grid-view.css';
+import { useRouteMatch } from 'react-router-dom';
+import { Extension, ExtensionData, ExtensionSlot, useExtensionStore } from '@openmrs/esm-framework';
+import { DashbardGridConfig } from '../config-schemas';
+import { basePath } from '../constants';
 
 function getColumnsLayoutStyle(layout: DashbardGridConfig) {
   const numberOfColumns = layout?.columns ?? 2;
-  return "1fr ".repeat(numberOfColumns).trimRight();
+  return '1fr '.repeat(numberOfColumns).trimRight();
 }
 
 export interface GridViewProps {
@@ -23,12 +18,7 @@ export interface GridViewProps {
   layout: DashbardGridConfig;
 }
 
-export default function GridView({
-  slot,
-  layout,
-  patient,
-  patientUuid,
-}: GridViewProps) {
+export default function GridView({ slot, layout, patient, patientUuid }: GridViewProps) {
   const store = useExtensionStore();
   const { url } = useRouteMatch(basePath);
 
@@ -38,7 +28,7 @@ export default function GridView({
       patient,
       patientUuid,
     }),
-    [url, patientUuid, patient]
+    [url, patientUuid, patient],
   );
 
   const wrapItem = React.useCallback(
@@ -46,18 +36,13 @@ export default function GridView({
       const { columnSpan = 1 } = store.extensions[extension.extensionId].meta;
       return <div style={{ gridColumn: `span ${columnSpan}` }}>{slot}</div>;
     },
-    [store.extensions]
+    [store.extensions],
   );
 
   const gridTemplateColumns = getColumnsLayoutStyle(layout);
 
   return (
-    <ExtensionSlot
-      key={slot}
-      extensionSlotName={slot}
-      className={styles.dashboard}
-      style={{ gridTemplateColumns }}
-    >
+    <ExtensionSlot key={slot} extensionSlotName={slot} className={styles.dashboard} style={{ gridTemplateColumns }}>
       <Extension state={state} wrap={wrapItem} />
     </ExtensionSlot>
   );

@@ -1,16 +1,16 @@
-import React, { useEffect, useRef, useState, SyntheticEvent } from "react";
-import styles from "./appointments-form.css";
-import { SummaryCard } from "@openmrs/esm-patient-common-lib";
-import { createErrorHandler } from "@openmrs/esm-framework";
+import React, { useEffect, useRef, useState, SyntheticEvent } from 'react';
+import styles from './appointments-form.css';
+import { SummaryCard } from '@openmrs/esm-patient-common-lib';
+import { createErrorHandler } from '@openmrs/esm-framework';
 import {
   getSession,
   createAppointment,
   getAppointmentService,
   getAppointmentServiceAll,
-} from "./appointments.resource";
-import { useHistory } from "react-router-dom";
-import { Trans, useTranslation } from "react-i18next";
-import { DataCaptureComponentProps } from "../types";
+} from './appointments.resource';
+import { useHistory } from 'react-router-dom';
+import { Trans, useTranslation } from 'react-i18next';
+import { DataCaptureComponentProps } from '../types';
 
 interface AppointmentsFormProps extends DataCaptureComponentProps {
   patientUuid: string;
@@ -42,15 +42,13 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
   const [appointmentDate, setAppointmentDate] = useState(null);
   const [appointmentStartTime, setAppointmentStartTime] = useState(null);
   const [appointmentEndTime, setAppointmentEndTime] = useState(null);
-  const [appointmentKind, setAppointmentKind] = useState("Scheduled");
+  const [appointmentKind, setAppointmentKind] = useState('Scheduled');
   const [comments, setComment] = useState(null);
   const [location, setLocation] = useState(null);
-  const [serviceUuid, setServiceUuid] = useState("");
+  const [serviceUuid, setServiceUuid] = useState('');
   const [serviceTypeUuid, setServiceTypeUuid] = useState(null);
   const [formChanged, setFormChanged] = useState<boolean>(false);
-  const [enableCreateButtons, setEnableCreateButtons] = useState<boolean>(
-    false
-  );
+  const [enableCreateButtons, setEnableCreateButtons] = useState<boolean>(false);
   const { t } = useTranslation();
   const history = useHistory();
 
@@ -79,7 +77,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
 
   useEffect(() => {
     const abortController = new AbortController();
-    if (serviceUuid && serviceUuid !== "default") {
+    if (serviceUuid && serviceUuid !== 'default') {
       getAppointmentService(abortController, serviceUuid).then(({ data }) => {
         setAppointmentServiceType(data.serviceTypes);
       });
@@ -94,9 +92,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
     formRef.current.reset();
     let userConfirmed: boolean = false;
     if (formChanged) {
-      userConfirmed = confirm(
-        "There is ongoing work, are you sure you want to close this tab?"
-      );
+      userConfirmed = confirm('There is ongoing work, are you sure you want to close this tab?');
     }
 
     if (userConfirmed && formChanged) {
@@ -110,8 +106,8 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
 
   const handleCreateFormSubmit = (event: SyntheticEvent<HTMLFormElement>) => {
     event.preventDefault();
-    let startDateTime = new Date(appointmentDate + " " + appointmentStartTime);
-    let endDateTime = new Date(appointmentDate + " " + appointmentEndTime);
+    let startDateTime = new Date(appointmentDate + ' ' + appointmentStartTime);
+    let endDateTime = new Date(appointmentDate + ' ' + appointmentEndTime);
 
     let appointment: Appointment = {
       serviceTypeUuid: serviceTypeUuid,
@@ -133,9 +129,8 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
 
   return (
     <SummaryCard
-      name={t("scheduleNewAppointment", "Schedule new appointment")}
-      styles={{ backgroundColor: "var(--omrs-color-bg-medium-contrast)" }}
-    >
+      name={t('scheduleNewAppointment', 'Schedule new appointment')}
+      styles={{ backgroundColor: 'var(--omrs-color-bg-medium-contrast)' }}>
       <form
         ref={formRef}
         onSubmit={handleCreateFormSubmit}
@@ -143,8 +138,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
           setFormChanged(true);
           return entryStarted();
         }}
-        className={styles.appointmentContainer}
-      >
+        className={styles.appointmentContainer}>
         <div className={styles.inputContainer}>
           <label htmlFor="service">
             <Trans i18nKey="service">Service</Trans>
@@ -154,10 +148,9 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
             name="select-service"
             value={serviceUuid}
             defaultChecked={true}
-            onChange={(event) => setServiceUuid(event.target.value)}
-          >
-            <option key={0} value={"default"}>
-              {t("selectService", "Select service")}
+            onChange={(event) => setServiceUuid(event.target.value)}>
+            <option key={0} value={'default'}>
+              {t('selectService', 'Select service')}
             </option>
             {appointmentService &&
               appointmentService.map((service) => (
@@ -175,8 +168,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
             name="serviceType"
             id="serviceType"
             onChange={(event) => setServiceTypeUuid(event.target.value)}
-            defaultValue={serviceTypeUuid}
-          >
+            defaultValue={serviceTypeUuid}>
             {appointmentServiceType &&
               appointmentServiceType.map((serviceType) => {
                 return (
@@ -187,7 +179,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
               })}
           </select>
         </div>
-        <div className={styles.inputContainer} style={{ flexDirection: "row" }}>
+        <div className={styles.inputContainer} style={{ flexDirection: 'row' }}>
           <div className={styles.inputContainer}>
             <label htmlFor="date">
               <Trans i18nKey="date">Date</Trans>
@@ -214,9 +206,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                 id="startTime"
                 type="time"
                 name="datepicker"
-                onChange={(event) =>
-                  setAppointmentStartTime(event.target.value)
-                }
+                onChange={(event) => setAppointmentStartTime(event.target.value)}
                 required
               />
               <svg className="omrs-icon" role="img">
@@ -249,7 +239,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
                 type="checkbox"
                 name="omrs-checkbox"
                 onChange={(event) => setAppointmentKind(event.target.value)}
-                style={{ marginRight: "0.5rem" }}
+                style={{ marginRight: '0.5rem' }}
                 value="WalkIn"
               />
               <span>
@@ -262,38 +252,24 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
           <label htmlFor="notes">
             <Trans i18nKey="notes">Notes</Trans>
           </label>
-          <textarea
-            name="notes"
-            id="notes"
-            rows={5}
-            onChange={(event) => setComment(event.target.value)}
-          />
+          <textarea name="notes" id="notes" rows={5} onChange={(event) => setComment(event.target.value)} />
         </div>
         <div
-          className={
-            enableCreateButtons
-              ? styles.buttonStyles
-              : `${styles.buttonStyles} ${styles.buttonStylesBorder}`
-          }
-        >
+          className={enableCreateButtons ? styles.buttonStyles : `${styles.buttonStyles} ${styles.buttonStylesBorder}`}>
           <button
             type="button"
             className="omrs-btn omrs-outlined-neutral omrs-rounded"
-            style={{ width: "50%" }}
-            onClick={closeForm}
-          >
+            style={{ width: '50%' }}
+            onClick={closeForm}>
             <Trans i18nKey="cancel">Cancel</Trans>
           </button>
           <button
             type="submit"
-            style={{ width: "50%" }}
+            style={{ width: '50%' }}
             className={
-              enableCreateButtons
-                ? "omrs-btn omrs-filled-action omrs-rounded"
-                : "omrs-btn omrs-outlined omrs-rounded"
+              enableCreateButtons ? 'omrs-btn omrs-filled-action omrs-rounded' : 'omrs-btn omrs-outlined omrs-rounded'
             }
-            disabled={!enableCreateButtons}
-          >
+            disabled={!enableCreateButtons}>
             <Trans i18nKey="save">Save</Trans>
           </button>
         </div>

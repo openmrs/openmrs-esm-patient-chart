@@ -1,12 +1,12 @@
-import React, { useEffect, useState, Fragment } from "react";
-import dayjs from "dayjs";
-import styles from "./note-record.css";
-import { SummaryCard, RecordDetails } from "@openmrs/esm-patient-common-lib";
-import { RouteComponentProps } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import { createErrorHandler } from "@openmrs/esm-framework";
-import { fetchEncounterByUuid } from "./encounter.resource";
-import { useNotesContext } from "./notes.context";
+import React, { useEffect, useState, Fragment } from 'react';
+import dayjs from 'dayjs';
+import styles from './note-record.css';
+import { SummaryCard, RecordDetails } from '@openmrs/esm-patient-common-lib';
+import { RouteComponentProps } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { createErrorHandler } from '@openmrs/esm-framework';
+import { fetchEncounterByUuid } from './encounter.resource';
+import { useNotesContext } from './notes.context';
 
 interface NoteRecordProps
   extends RouteComponentProps<{
@@ -21,10 +21,7 @@ export default function NoteRecord({ match }: NoteRecordProps) {
 
   useEffect(() => {
     if (patient && encounterUuid) {
-      const sub = fetchEncounterByUuid(encounterUuid).subscribe(
-        setNote,
-        createErrorHandler()
-      );
+      const sub = fetchEncounterByUuid(encounterUuid).subscribe(setNote, createErrorHandler());
       return () => sub.unsubscribe();
     }
   }, [patient, encounterUuid]);
@@ -33,7 +30,7 @@ export default function NoteRecord({ match }: NoteRecordProps) {
     <>
       {Object.keys(note || {}).length > 0 && (
         <div className={styles.noteContainer}>
-          <SummaryCard name={t("note", "Note")} styles={{ width: "100%" }}>
+          <SummaryCard name={t('note', 'Note')} styles={{ width: '100%' }}>
             <div className={`omrs-type-body-regular ${styles.noteCard}`}>
               <div>
                 <p className="omrs-type-title-3">{note?.display}</p>
@@ -41,18 +38,16 @@ export default function NoteRecord({ match }: NoteRecordProps) {
               <table className={styles.noteTable}>
                 <thead>
                   <tr>
-                    <td>{t("encounterType", "Encounter type")}</td>
-                    <td>{t("location", "Location")}</td>
-                    <td>{t("encounterDate", "Encounter date")}</td>
+                    <td>{t('encounterType', 'Encounter type')}</td>
+                    <td>{t('location', 'Location')}</td>
+                    <td>{t('encounterDate', 'Encounter date')}</td>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
                     <td>{note?.encounterType?.display}</td>
                     <td>{note?.location?.display}</td>
-                    <td>
-                      {dayjs(note?.encounterDatetime).format("DD-MM-YYYY")}
-                    </td>
+                    <td>{dayjs(note?.encounterDatetime).format('DD-MM-YYYY')}</td>
                   </tr>
                 </tbody>
               </table>

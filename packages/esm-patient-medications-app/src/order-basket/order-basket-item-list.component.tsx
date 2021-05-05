@@ -1,8 +1,8 @@
-import React from "react";
-import OrderBasketItemTile from "./order-basket-item.component";
-import styles from "./order-basket-item-list.scss";
-import { useTranslation } from "react-i18next";
-import { OrderBasketItem } from "../types/order-basket-item";
+import React from 'react';
+import OrderBasketItemTile from './order-basket-item.component';
+import styles from './order-basket-item-list.scss';
+import { useTranslation } from 'react-i18next';
+import { OrderBasketItem } from '../types/order-basket-item';
 
 export interface OrderBasketItemListProps {
   orderBasketItems: Array<OrderBasketItem>;
@@ -16,34 +16,20 @@ export default function OrderBasketItemList({
   onItemRemoveClicked,
 }: OrderBasketItemListProps) {
   const { t } = useTranslation();
-  const newOrderBasketItems = orderBasketItems.filter(
-    (x) => x.action === "NEW"
-  );
-  const renewedOrderBasketItems = orderBasketItems.filter(
-    (x) => x.action === "RENEWED"
-  );
-  const revisedOrderBasketItems = orderBasketItems.filter(
-    (x) => x.action === "REVISE"
-  );
-  const discontinuedOrderBasketItems = orderBasketItems.filter(
-    (x) => x.action === "DISCONTINUE"
-  );
+  const newOrderBasketItems = orderBasketItems.filter((x) => x.action === 'NEW');
+  const renewedOrderBasketItems = orderBasketItems.filter((x) => x.action === 'RENEWED');
+  const revisedOrderBasketItems = orderBasketItems.filter((x) => x.action === 'REVISE');
+  const discontinuedOrderBasketItems = orderBasketItems.filter((x) => x.action === 'DISCONTINUE');
 
   return (
     <>
-      <h3 className={styles.productiveHeading02}>
-        {t("orderBasket", "Order Basket")}
-      </h3>
-      {orderBasketItems.length === 0 && (
-        <p>
-          {t("emptyMedicationOrderBasket", "Your basket is currently empty.")}
-        </p>
-      )}
+      <h3 className={styles.productiveHeading02}>{t('orderBasket', 'Order Basket')}</h3>
+      {orderBasketItems.length === 0 && <p>{t('emptyMedicationOrderBasket', 'Your basket is currently empty.')}</p>}
 
       {newOrderBasketItems.length > 0 && (
         <>
           <h4 className={styles.orderCategoryHeading}>
-            {t("newOrders", "{count} new order(s)", {
+            {t('newOrders', '{count} new order(s)', {
               count: newOrderBasketItems.length,
             })}
           </h4>
@@ -61,7 +47,7 @@ export default function OrderBasketItemList({
       {renewedOrderBasketItems.length > 0 && (
         <>
           <h4 className={styles.orderCategoryHeading}>
-            {t("renewedOrders", "{count} order(s) being renewed (continued)", {
+            {t('renewedOrders', '{count} order(s) being renewed (continued)', {
               count: renewedOrderBasketItems.length,
             })}
           </h4>
@@ -79,7 +65,7 @@ export default function OrderBasketItemList({
       {revisedOrderBasketItems.length > 0 && (
         <>
           <h4 className={styles.orderCategoryHeading}>
-            {t("revisedOrders", "{count} order(s) being modified (revised)", {
+            {t('revisedOrders', '{count} order(s) being modified (revised)', {
               count: revisedOrderBasketItems.length,
             })}
           </h4>
@@ -97,7 +83,7 @@ export default function OrderBasketItemList({
       {discontinuedOrderBasketItems.length > 0 && (
         <>
           <h4 className={styles.orderCategoryHeading}>
-            {t("discontinuedOrders", "{count} discontinued order(s)", {
+            {t('discontinuedOrders', '{count} discontinued order(s)', {
               count: discontinuedOrderBasketItems.length,
             })}
           </h4>

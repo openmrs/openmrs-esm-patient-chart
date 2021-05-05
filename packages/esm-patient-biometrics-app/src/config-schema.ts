@@ -1,17 +1,15 @@
-import { Type } from "@openmrs/esm-framework";
-import biometricsConfigSchema, {
-  BiometricsConfigObject,
-} from "./biometrics/biometrics-config-schema";
+import { Type } from '@openmrs/esm-framework';
+import biometricsConfigSchema, { BiometricsConfigObject } from './biometrics/biometrics-config-schema';
 
 export const configSchema = {
   concepts: {
     heightUuid: {
       _type: Type.ConceptUuid,
-      _default: "5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      _default: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
     weightUuid: {
       _type: Type.ConceptUuid,
-      _default: "5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+      _default: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
   },
   biometrics: biometricsConfigSchema,

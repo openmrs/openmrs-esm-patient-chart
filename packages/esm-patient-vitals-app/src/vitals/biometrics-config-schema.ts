@@ -1,9 +1,9 @@
-import { Type } from "@openmrs/esm-framework";
+import { Type } from '@openmrs/esm-framework';
 
 export default {
   bmiUnit: {
     _type: Type.String,
-    _default: "kg / m²",
+    _default: 'kg / m²',
   },
 };
 

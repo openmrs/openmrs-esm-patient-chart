@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
-import { OBSERVATION_INTERPRETATION } from "../loadPatientTestData/helpers";
-import usePatientResultsData from "../loadPatientTestData/usePatientResultsData";
+import { useState, useEffect } from 'react';
+import { OBSERVATION_INTERPRETATION } from '../loadPatientTestData/helpers';
+import usePatientResultsData from '../loadPatientTestData/usePatientResultsData';
 
 export interface OverviewPanelData {
   id: string;
@@ -11,19 +11,11 @@ export interface OverviewPanelData {
   value?: string | number;
 }
 
-export type OverviewPanelEntry = [
-  string,
-  string,
-  Array<OverviewPanelData>,
-  Date,
-  string
-];
+export type OverviewPanelEntry = [string, string, Array<OverviewPanelData>, Date, string];
 
 function useOverviewData(patientUuid: string) {
   const { sortedObs, loaded, error } = usePatientResultsData(patientUuid);
-  const [overviewData, setDisplayData] = useState<Array<OverviewPanelEntry>>(
-    []
-  );
+  const [overviewData, setDisplayData] = useState<Array<OverviewPanelEntry>>([]);
 
   useEffect(() => {
     setDisplayData(
@@ -33,15 +25,13 @@ function useOverviewData(patientUuid: string) {
             const newestEntry = entries[0];
             let data: Array<OverviewPanelData>;
 
-            if (type === "Test") {
+            if (type === 'Test') {
               data = [
                 {
                   id: newestEntry.id,
                   name: panelName,
-                  range: newestEntry.meta?.range || "--",
-                  interpretation: newestEntry.meta.assessValue(
-                    newestEntry.value
-                  ),
+                  range: newestEntry.meta?.range || '--',
+                  interpretation: newestEntry.meta.assessValue(newestEntry.value),
                   value: newestEntry.value,
                 },
               ];
@@ -50,24 +40,16 @@ function useOverviewData(patientUuid: string) {
                 id: gm.id,
                 key: gm.id,
                 name: gm.name,
-                range: gm.meta?.range || "--",
+                range: gm.meta?.range || '--',
                 interpretation: gm.meta.assessValue(gm.value),
                 value: gm.value,
               }));
             }
 
-            return [
-              panelName,
-              type,
-              data,
-              new Date(newestEntry.effectiveDateTime),
-              uuid,
-            ];
-          }
+            return [panelName, type, data, new Date(newestEntry.effectiveDateTime), uuid];
+          },
         )
-        .sort(
-          ([, , , date1], [, , , date2]) => date2.getTime() - date1.getTime()
-        )
+        .sort(([, , , date1], [, , , date2]) => date2.getTime() - date1.getTime()),
     );
   }, [sortedObs]);
 

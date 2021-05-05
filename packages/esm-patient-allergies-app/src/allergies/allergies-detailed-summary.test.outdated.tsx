@@ -1,10 +1,10 @@
-import React from "react";
-import AllergiesDetailedSummary from "./allergies-detailed-summary.component";
-import { render, screen } from "@testing-library/react";
-import { BrowserRouter } from "react-router-dom";
-import { of } from "rxjs/internal/observable/of";
-import { mockPatientAllergies } from "../../../../__mocks__/allergies.mock";
-import { performPatientAllergySearch } from "./allergy-intolerance.resource";
+import React from 'react';
+import AllergiesDetailedSummary from './allergies-detailed-summary.component';
+import { render, screen } from '@testing-library/react';
+import { BrowserRouter } from 'react-router-dom';
+import { of } from 'rxjs/internal/observable/of';
+import { mockPatientAllergies } from '../../../../__mocks__/allergies.mock';
+import { performPatientAllergySearch } from './allergy-intolerance.resource';
 
 const mockPerformPatientAllergySearch = performPatientAllergySearch as jest.Mock;
 
@@ -12,14 +12,14 @@ const renderAllergiesDetailedSummary = () =>
   render(
     <BrowserRouter>
       <AllergiesDetailedSummary />
-    </BrowserRouter>
+    </BrowserRouter>,
   );
 
-jest.mock("./allergy-intolerance.resource", () => ({
+jest.mock('./allergy-intolerance.resource', () => ({
   performPatientAllergySearch: jest.fn(),
 }));
 
-describe("AllergiesDetailedSummary />", () => {
+describe('AllergiesDetailedSummary />', () => {
   beforeEach(() => {
     mockPerformPatientAllergySearch.mockReset;
   });
@@ -29,34 +29,30 @@ describe("AllergiesDetailedSummary />", () => {
 
     renderAllergiesDetailedSummary();
 
-    await screen.findByText("Allergies");
+    await screen.findByText('Allergies');
 
-    expect(screen.getByText("Allergen")).toBeInTheDocument();
-    expect(screen.getByText("Severity & Reaction")).toBeInTheDocument();
-    expect(screen.getByText("Since")).toBeInTheDocument();
-    expect(screen.getByText("Updated")).toBeInTheDocument();
-    expect(screen.getByText("Cephalosporins")).toBeInTheDocument();
-    expect(screen.getByText("Angioedema")).toBeInTheDocument();
-    expect(screen.getByText("happened today")).toBeInTheDocument();
-    expect(screen.getByText("Peanuts")).toBeInTheDocument();
-    expect(screen.getByText("Anaphylaxis")).toBeInTheDocument();
-    expect(screen.getByText("ACE inhibitors")).toBeInTheDocument();
-    expect(screen.getAllByText("high").length).toEqual(2);
-    expect(screen.getAllByText("Severe reaction").length).toEqual(2);
+    expect(screen.getByText('Allergen')).toBeInTheDocument();
+    expect(screen.getByText('Severity & Reaction')).toBeInTheDocument();
+    expect(screen.getByText('Since')).toBeInTheDocument();
+    expect(screen.getByText('Updated')).toBeInTheDocument();
+    expect(screen.getByText('Cephalosporins')).toBeInTheDocument();
+    expect(screen.getByText('Angioedema')).toBeInTheDocument();
+    expect(screen.getByText('happened today')).toBeInTheDocument();
+    expect(screen.getByText('Peanuts')).toBeInTheDocument();
+    expect(screen.getByText('Anaphylaxis')).toBeInTheDocument();
+    expect(screen.getByText('ACE inhibitors')).toBeInTheDocument();
+    expect(screen.getAllByText('high').length).toEqual(2);
+    expect(screen.getAllByText('Severe reaction').length).toEqual(2);
   });
 
-  it("renders an empty state view when allergies are absent", async () => {
+  it('renders an empty state view when allergies are absent', async () => {
     mockPerformPatientAllergySearch.mockReturnValue(of([]));
 
     renderAllergiesDetailedSummary();
 
-    await screen.findByText("Allergies");
+    await screen.findByText('Allergies');
 
-    expect(screen.getByText("Allergies")).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        "There are no allergy intolerances to display for this patient"
-      )
-    ).toBeInTheDocument();
+    expect(screen.getByText('Allergies')).toBeInTheDocument();
+    expect(screen.getByText('There are no allergy intolerances to display for this patient')).toBeInTheDocument();
   });
 });

@@ -1,13 +1,13 @@
-import React, { useEffect, useRef, useState } from "react";
-import dayjs from "dayjs";
-import filter from "lodash-es/filter";
-import includes from "lodash-es/includes";
-import map from "lodash-es/map";
-import styles from "./programs-form.css";
-import { SummaryCard } from "@openmrs/esm-patient-common-lib";
-import { match, useHistory } from "react-router-dom";
-import { useTranslation, Trans } from "react-i18next";
-import { createErrorHandler } from "@openmrs/esm-framework";
+import React, { useEffect, useRef, useState } from 'react';
+import dayjs from 'dayjs';
+import filter from 'lodash-es/filter';
+import includes from 'lodash-es/includes';
+import map from 'lodash-es/map';
+import styles from './programs-form.css';
+import { SummaryCard } from '@openmrs/esm-patient-common-lib';
+import { match, useHistory } from 'react-router-dom';
+import { useTranslation, Trans } from 'react-i18next';
+import { createErrorHandler } from '@openmrs/esm-framework';
 import {
   createProgramEnrollment,
   fetchPrograms,
@@ -16,8 +16,8 @@ import {
   getPatientProgramByUuid,
   getSession,
   updateProgramEnrollment,
-} from "./programs.resource";
-import { DataCaptureComponentProps } from "../types";
+} from './programs.resource';
+import { DataCaptureComponentProps } from '../types';
 
 export type ProgramsFormProps = DataCaptureComponentProps & {
   match: match<ProgramMatchProps>;
@@ -57,11 +57,9 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
   const [allPrograms, setAllPrograms] = useState(null);
   const [eligiblePrograms, setEligiblePrograms] = useState(null);
   const [enrolledPrograms, setEnrolledPrograms] = useState(null);
-  const [location, setLocation] = useState("");
-  const [program, setProgram] = useState("");
-  const [enrollmentDate, setEnrollmentDate] = useState(
-    dayjs(new Date()).format("YYYY-MM-DD")
-  );
+  const [location, setLocation] = useState('');
+  const [program, setProgram] = useState('');
+  const [enrollmentDate, setEnrollmentDate] = useState(dayjs(new Date()).format('YYYY-MM-DD'));
   const [completionDate, setCompletionDate] = useState(null);
   const [locations, setLocations] = useState(null);
   const [formChanged, setFormChanged] = useState<Boolean>(false);
@@ -69,13 +67,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
   const { t } = useTranslation();
 
   useEffect(() => {
-    const {
-      program,
-      programUuid,
-      enrollmentDate,
-      completionDate,
-      locationUuid,
-    } = match.params;
+    const { program, programUuid, enrollmentDate, completionDate, locationUuid } = match.params;
 
     if (program && enrollmentDate) {
       setViewEditForm(true);
@@ -103,18 +95,11 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
       const sub1 = fetchLocations().subscribe((locations) => {
         return setLocations(locations);
       }, createErrorHandler());
-      const sub2 = fetchPrograms().subscribe(
-        (programs) => setAllPrograms(programs),
-        createErrorHandler()
-      );
+      const sub2 = fetchPrograms().subscribe((programs) => setAllPrograms(programs), createErrorHandler());
       const sub3 = fetchEnrolledPrograms(patientUuid).subscribe(
         (enrolledPrograms) =>
-          setEnrolledPrograms(
-            enrolledPrograms.filter(
-              (enrolledProgram) => !enrolledProgram.dateCompleted
-            )
-          ),
-        createErrorHandler()
+          setEnrolledPrograms(enrolledPrograms.filter((enrolledProgram) => !enrolledProgram.dateCompleted)),
+        createErrorHandler(),
       );
 
       return () => {
@@ -127,11 +112,9 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
 
   useEffect(() => {
     if (viewEditForm && patientUuid && match.params) {
-      const subscription = getPatientProgramByUuid(
-        match.params["programUuid"]
-      ).subscribe(
+      const subscription = getPatientProgramByUuid(match.params['programUuid']).subscribe(
         (program) => setPatientProgram(program),
-        createErrorHandler()
+        createErrorHandler(),
       );
 
       return () => subscription.unsubscribe();
@@ -142,18 +125,14 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
     if (allPrograms && enrolledPrograms) {
       setEligiblePrograms(
         filter(allPrograms, (program) => {
-          return !includes(map(enrolledPrograms, "program.uuid"), program.uuid);
-        })
+          return !includes(map(enrolledPrograms, 'program.uuid'), program.uuid);
+        }),
       );
     }
   }, [allPrograms, enrolledPrograms]);
 
   useEffect(() => {
-    if (
-      enrollmentDate &&
-      program &&
-      enrollmentDateRef?.current?.validity?.valid
-    ) {
+    if (enrollmentDate && program && enrollmentDateRef?.current?.validity?.valid) {
       setEnableCreateButtons(true);
     } else {
       setEnableCreateButtons(false);
@@ -178,17 +157,12 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
       location: location,
     };
     const abortController = new AbortController();
-    createProgramEnrollment(enrollmentPayload, abortController).subscribe(
-      (response) => {
-        if (response.ok) {
-          match.params["setEnrolledPrograms"]([
-            ...match.params["enrolledPrograms"],
-            response.data,
-          ]);
-          navigate();
-        }
+    createProgramEnrollment(enrollmentPayload, abortController).subscribe((response) => {
+      if (response.ok) {
+        match.params['setEnrolledPrograms']([...match.params['enrolledPrograms'], response.data]);
+        navigate();
       }
-    );
+    });
     return () => abortController.abort();
   };
 
@@ -203,7 +177,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
       };
       const abortController = new AbortController();
       updateProgramEnrollment(updatePayload, abortController).subscribe(
-        (response) => response.status === 200 && navigate()
+        (response) => response.status === 200 && navigate(),
       );
       return () => abortController.abort();
     }
@@ -217,9 +191,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
   const closeForm = ($event) => {
     let userConfirmed: boolean = false;
     if (formChanged) {
-      userConfirmed = confirm(
-        "There is ongoing work, are you sure you want to close this tab?"
-      );
+      userConfirmed = confirm('There is ongoing work, are you sure you want to close this tab?');
     }
 
     if (userConfirmed && formChanged) {
@@ -240,18 +212,16 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
         }}
         onSubmit={handleCreateSubmit}
         className={styles.programsForm}
-        ref={formRef}
-      >
+        ref={formRef}>
         <SummaryCard
-          name={t("addNewProgram", "Add a new program")}
+          name={t('addNewProgram', 'Add a new program')}
           styles={{
-            width: "100%",
-            backgroundColor: "var(--omrs-color-bg-medium-contrast)",
-            height: "auto",
-          }}
-        >
+            width: '100%',
+            backgroundColor: 'var(--omrs-color-bg-medium-contrast)',
+            height: 'auto',
+          }}>
           <div className={styles.programsContainerWrapper}>
-            <div style={{ flex: 1, margin: "0rem 0.5rem" }}>
+            <div style={{ flex: 1, margin: '0rem 0.5rem' }}>
               <div className={styles.programsInputContainer}>
                 <label htmlFor="program">
                   <Trans i18nKey="program">Program</Trans>
@@ -261,9 +231,8 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
                   name="programs"
                   value={program}
                   onChange={(evt) => setProgram(evt.target.value)}
-                  required
-                >
-                  <option>{t("chooseProgram", "Choose a program")}:</option>
+                  required>
+                  <option>{t('chooseProgram', 'Choose a program')}:</option>
                   {eligiblePrograms &&
                     eligiblePrograms.map((program) => (
                       <option value={program.uuid} key={program.uuid}>
@@ -282,30 +251,27 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
                     id="enrollmentDate"
                     type="date"
                     name="enrollmentDate"
-                    max={dayjs(new Date().toUTCString()).format("YYYY-MM-DD")}
+                    max={dayjs(new Date().toUTCString()).format('YYYY-MM-DD')}
                     required
                     onChange={(evt) => {
                       setEnrollmentDate(evt.target.value);
                     }}
-                    defaultValue={dayjs(new Date()).format("YYYY-MM-DD")}
+                    defaultValue={dayjs(new Date()).format('YYYY-MM-DD')}
                   />
                   <svg className="omrs-icon" role="img">
                     <use xlinkHref="#omrs-icon-calendar"></use>
                   </svg>
                 </div>
-                {enrollmentDateRef &&
-                  !enrollmentDateRef?.current?.validity?.valid && (
-                    <div className={styles.dateError}>
-                      <span>
-                        <svg className="omrs-icon" role="img">
-                          <use xlinkHref="#omrs-icon-important-notification"></use>
-                        </svg>
-                        <Trans i18nKey="futureDateErrorMsg">
-                          Please enter a date that is either on or before today.
-                        </Trans>
-                      </span>
-                    </div>
-                  )}
+                {enrollmentDateRef && !enrollmentDateRef?.current?.validity?.valid && (
+                  <div className={styles.dateError}>
+                    <span>
+                      <svg className="omrs-icon" role="img">
+                        <use xlinkHref="#omrs-icon-important-notification"></use>
+                      </svg>
+                      <Trans i18nKey="futureDateErrorMsg">Please enter a date that is either on or before today.</Trans>
+                    </span>
+                  </div>
+                )}
               </div>
               <div className={styles.programsInputContainer}>
                 <label htmlFor="completionDate">
@@ -325,9 +291,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
               </div>
               <div className={styles.programsInputContainer}>
                 <label htmlFor="location">
-                  <Trans i18nKey="enrollmentLocation">
-                    Enrollment location
-                  </Trans>
+                  <Trans i18nKey="enrollmentLocation">Enrollment location</Trans>
                 </label>
                 <select
                   id="location"
@@ -335,9 +299,8 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
                   value={location}
                   onChange={(evt) => {
                     setLocation(evt.target.value);
-                  }}
-                >
-                  <option>{t("chooseLocation", "Choose a location")}:</option>
+                  }}>
+                  <option>{t('chooseLocation', 'Choose a location')}:</option>
                   {locations &&
                     locations.map((location) => (
                       <option value={location.uuid} key={location.uuid}>
@@ -350,30 +313,21 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
           </div>
         </SummaryCard>
         <div
-          className={
-            enableCreateButtons
-              ? `${styles.buttonStyles} ${styles.buttonStylesBorder}`
-              : styles.buttonStyles
-          }
-        >
+          className={enableCreateButtons ? `${styles.buttonStyles} ${styles.buttonStylesBorder}` : styles.buttonStyles}>
           <button
             type="button"
             className="omrs-btn omrs-outlined-neutral omrs-rounded"
-            style={{ width: "50%" }}
-            onClick={closeForm}
-          >
+            style={{ width: '50%' }}
+            onClick={closeForm}>
             <Trans i18nKey="cancel">Cancel</Trans>
           </button>
           <button
             type="submit"
-            style={{ width: "50%" }}
+            style={{ width: '50%' }}
             className={
-              enableCreateButtons
-                ? "omrs-btn omrs-filled-action omrs-rounded"
-                : "omrs-btn omrs-outlined omrs-rounded"
+              enableCreateButtons ? 'omrs-btn omrs-filled-action omrs-rounded' : 'omrs-btn omrs-outlined omrs-rounded'
             }
-            disabled={!enableCreateButtons}
-          >
+            disabled={!enableCreateButtons}>
             <Trans i18nKey="enroll">Enroll</Trans>
           </button>
         </div>
@@ -392,18 +346,16 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
             }}
             onSubmit={handleEditSubmit}
             className={styles.programsForm}
-            ref={formRef}
-          >
+            ref={formRef}>
             <SummaryCard
-              name={t("editProgram", "Edit program")}
+              name={t('editProgram', 'Edit program')}
               styles={{
-                width: "100%",
-                backgroundColor: "var(--omrs-color-bg-medium-contrast)",
-                height: "auto",
-              }}
-            >
+                width: '100%',
+                backgroundColor: 'var(--omrs-color-bg-medium-contrast)',
+                height: 'auto',
+              }}>
               <div className={styles.programsContainerWrapper}>
-                <div style={{ flex: 1, margin: "0rem 0.5rem" }}>
+                <div style={{ flex: 1, margin: '0rem 0.5rem' }}>
                   <div className={styles.programsInputContainer}>
                     <label htmlFor="program">
                       <Trans i18nKey="program">Program</Trans>
@@ -423,9 +375,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
                         name="enrollmentDate"
                         required
                         onChange={(evt) => setEnrollmentDate(evt.target.value)}
-                        defaultValue={dayjs(enrollmentDate).format(
-                          "YYYY-MM-DD"
-                        )}
+                        defaultValue={dayjs(enrollmentDate).format('YYYY-MM-DD')}
                       />
                       <svg className="omrs-icon" role="img">
                         <use xlinkHref="#omrs-icon-calendar"></use>
@@ -442,11 +392,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
                         type="date"
                         name="completionDate"
                         onChange={(evt) => setCompletionDate(evt.target.value)}
-                        defaultValue={
-                          completionDate
-                            ? dayjs(completionDate).format("YYYY-MM-DD")
-                            : ""
-                        }
+                        defaultValue={completionDate ? dayjs(completionDate).format('YYYY-MM-DD') : ''}
                       />
                       <svg className="omrs-icon" role="img">
                         <use xlinkHref="#omrs-icon-calendar"></use>
@@ -455,16 +401,13 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
                   </div>
                   <div className={styles.programsInputContainer}>
                     <label htmlFor="location">
-                      <Trans i18nKey="enrollmentLocation">
-                        Enrollment location
-                      </Trans>
+                      <Trans i18nKey="enrollmentLocation">Enrollment location</Trans>
                     </label>
                     <select
                       id="location"
                       name="locations"
                       value={location}
-                      onChange={(evt) => setLocation(evt.target.value)}
-                    >
+                      onChange={(evt) => setLocation(evt.target.value)}>
                       {locations &&
                         locations.map((location) => (
                           <option value={location.uuid} key={location.uuid}>
@@ -478,29 +421,22 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
             </SummaryCard>
             <div
               className={
-                enableEditButtons
-                  ? styles.buttonStyles
-                  : `${styles.buttonStyles} ${styles.buttonStylesBorder}`
-              }
-            >
+                enableEditButtons ? styles.buttonStyles : `${styles.buttonStyles} ${styles.buttonStylesBorder}`
+              }>
               <button
                 type="submit"
-                style={{ width: "50%" }}
+                style={{ width: '50%' }}
                 className={
-                  enableEditButtons
-                    ? "omrs-btn omrs-filled-action omrs-rounded"
-                    : "omrs-btn omrs-outlined omrs-rounded"
+                  enableEditButtons ? 'omrs-btn omrs-filled-action omrs-rounded' : 'omrs-btn omrs-outlined omrs-rounded'
                 }
-                disabled={!enableEditButtons}
-              >
+                disabled={!enableEditButtons}>
                 <Trans i18nKey="save">Save</Trans>
               </button>
               <button
                 type="button"
                 className="omrs-btn omrs-outlined-neutral omrs-rounded"
-                style={{ width: "50%" }}
-                onClick={closeForm}
-              >
+                style={{ width: '50%' }}
+                onClick={closeForm}>
                 <Trans i18nKey="cancel">Cancel</Trans>
               </button>
             </div>

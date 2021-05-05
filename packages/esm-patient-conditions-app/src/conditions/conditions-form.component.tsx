@@ -1,29 +1,20 @@
-import React, { SyntheticEvent } from "react";
-import dayjs from "dayjs";
-import debounce from "lodash-es/debounce";
-import { useTranslation } from "react-i18next";
-import {
-  createErrorHandler,
-  detach,
-  showToast,
-  useSessionUser,
-} from "@openmrs/esm-framework";
-import Button from "carbon-components-react/es/components/Button";
-import DatePicker from "carbon-components-react/es/components/DatePicker";
-import DatePickerInput from "carbon-components-react/es/components/DatePickerInput";
-import Form from "carbon-components-react/es/components/Form";
-import FormGroup from "carbon-components-react/es/components/FormGroup";
-import RadioButton from "carbon-components-react/es/components/RadioButton";
-import RadioButtonGroup from "carbon-components-react/es/components/RadioButtonGroup";
-import Search from "carbon-components-react/es/components/Search";
-import SearchSkeleton from "carbon-components-react/es/components/Search/Search.Skeleton";
-import { Tile } from "carbon-components-react/es/components/Tile";
-import {
-  searchConditionConcepts,
-  createPatientCondition,
-  CodedCondition,
-} from "./conditions.resource";
-import styles from "./conditions-form.scss";
+import React, { SyntheticEvent } from 'react';
+import dayjs from 'dayjs';
+import debounce from 'lodash-es/debounce';
+import { useTranslation } from 'react-i18next';
+import { createErrorHandler, detach, showToast, useSessionUser } from '@openmrs/esm-framework';
+import Button from 'carbon-components-react/es/components/Button';
+import DatePicker from 'carbon-components-react/es/components/DatePicker';
+import DatePickerInput from 'carbon-components-react/es/components/DatePickerInput';
+import Form from 'carbon-components-react/es/components/Form';
+import FormGroup from 'carbon-components-react/es/components/FormGroup';
+import RadioButton from 'carbon-components-react/es/components/RadioButton';
+import RadioButtonGroup from 'carbon-components-react/es/components/RadioButtonGroup';
+import Search from 'carbon-components-react/es/components/Search';
+import SearchSkeleton from 'carbon-components-react/es/components/Search/Search.Skeleton';
+import { Tile } from 'carbon-components-react/es/components/Tile';
+import { searchConditionConcepts, createPatientCondition, CodedCondition } from './conditions.resource';
+import styles from './conditions-form.scss';
 const searchTimeoutInMs = 300;
 
 enum StateTypes {
@@ -62,7 +53,7 @@ type ViewState = IdleState | SearchState | ConditionState | SubmitState;
 const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const session = useSessionUser();
-  const [clinicalStatus, setClinicalStatus] = React.useState("active");
+  const [clinicalStatus, setClinicalStatus] = React.useState('active');
   const [endDate, setEndDate] = React.useState(null);
   const [onsetDate, setOnsetDate] = React.useState(null);
   const [viewState, setViewState] = React.useState<ViewState>({
@@ -70,19 +61,16 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid }) => {
   });
 
   const closeWorkspace = React.useCallback(
-    () => detach("patient-chart-workspace-slot", "conditions-form-workspace"),
-    []
+    () => detach('patient-chart-workspace-slot', 'conditions-form-workspace'),
+    [],
   );
 
-  const handleConditionChange = React.useCallback(
-    (selectedCondition: CodedCondition) => {
-      setViewState({
-        type: StateTypes.CONDITION,
-        condition: selectedCondition,
-      });
-    },
-    []
-  );
+  const handleConditionChange = React.useCallback((selectedCondition: CodedCondition) => {
+    setViewState({
+      type: StateTypes.CONDITION,
+      condition: selectedCondition,
+    });
+  }, []);
 
   const handleSubmit = React.useCallback(
     (event: SyntheticEvent<HTMLFormElement>) => {
@@ -94,12 +82,11 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid }) => {
       setViewState({ type: StateTypes.SUBMIT });
 
       const payload = {
-        resourceType: "Condition",
+        resourceType: 'Condition',
         clinicalStatus: {
           coding: [
             {
-              system:
-                "http://terminology.hl7.org/CodeSystem/condition-clinical",
+              system: 'http://terminology.hl7.org/CodeSystem/condition-clinical',
               code: clinicalStatus,
             },
           ],
@@ -130,7 +117,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid }) => {
             closeWorkspace();
 
             showToast({
-              description: t("conditionSaved", "Condition saved successfully"),
+              description: t('conditionSaved', 'Condition saved successfully'),
             });
           }
         },
@@ -138,19 +125,10 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid }) => {
         () => {
           setViewState({ type: StateTypes.IDLE });
           sub.unsubscribe();
-        }
+        },
       );
     },
-    [
-      t,
-      clinicalStatus,
-      closeWorkspace,
-      endDate,
-      onsetDate,
-      patientUuid,
-      session,
-      viewState,
-    ]
+    [t, clinicalStatus, closeWorkspace, endDate, onsetDate, patientUuid, session, viewState],
   );
 
   const debouncedSearch = React.useMemo(
@@ -158,19 +136,18 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid }) => {
       debounce((searchTerm) => {
         if (searchTerm) {
           const sub = searchConditionConcepts(searchTerm).subscribe(
-            (results: Array<CodedCondition>) =>
-              setViewState((state) => ({ ...state, searchResults: results })),
+            (results: Array<CodedCondition>) => setViewState((state) => ({ ...state, searchResults: results })),
             () => createErrorHandler(),
             () => {
               setViewState((state) => ({ ...state, isSearching: false }));
               sub.unsubscribe();
-            }
+            },
           );
         } else {
           setViewState((state) => ({ ...state, searchResults: null }));
         }
       }, searchTimeoutInMs),
-    []
+    [],
   );
 
   React.useEffect(() => {
@@ -178,16 +155,13 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid }) => {
   }, [(viewState as SearchState)?.searchTerm, debouncedSearch]);
 
   return (
-    <Form style={{ margin: "2rem" }} onSubmit={handleSubmit}>
-      <FormGroup
-        style={{ width: "50%" }}
-        legendText={t("condition", "Condition")}
-      >
+    <Form style={{ margin: '2rem' }} onSubmit={handleSubmit}>
+      <FormGroup style={{ width: '50%' }} legendText={t('condition', 'Condition')}>
         <Search
           light
           id="conditionsSearch"
-          labelText={t("enterCondition", "Enter condition")}
-          placeholder={t("searchConditions", "Search conditions")}
+          labelText={t('enterCondition', 'Enter condition')}
+          placeholder={t('searchConditions', 'Search conditions')}
           onChange={(event) => {
             setViewState(
               event.target.value
@@ -197,7 +171,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid }) => {
                     isSearching: true,
                     searchResults: null,
                   }
-                : { type: StateTypes.IDLE }
+                : { type: StateTypes.IDLE },
             );
           }}
           value={(() => {
@@ -207,7 +181,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid }) => {
               case StateTypes.CONDITION:
                 return viewState.condition.display;
               default:
-                return "";
+                return '';
             }
           })()}
         />
@@ -222,8 +196,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid }) => {
                       role="menuitem"
                       className={styles.condition}
                       key={index}
-                      onClick={() => handleConditionChange(condition)}
-                    >
+                      onClick={() => handleConditionChange(condition)}>
                       {condition.display}
                     </li>
                   ))}
@@ -233,15 +206,14 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid }) => {
             return (
               <Tile light className={styles.emptyResults}>
                 <span>
-                  {t("noResultsFor", "No results for")}{" "}
-                  <strong>"{viewState.searchTerm}"</strong>
+                  {t('noResultsFor', 'No results for')} <strong>"{viewState.searchTerm}"</strong>
                 </span>
               </Tile>
             );
           })()}
         </div>
       </FormGroup>
-      <FormGroup legendText={t("onsetDate", "Onset date")}>
+      <FormGroup legendText={t('onsetDate', 'Onset date')}>
         <DatePicker
           id="onsetDate"
           datePickerType="single"
@@ -251,24 +223,22 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid }) => {
           placeholder="dd/mm/yyyy"
           onChange={([date]) => setOnsetDate(date)}
           value={onsetDate}
-          light
-        >
+          light>
           <DatePickerInput id="onsetDateInput" labelText="" />
         </DatePicker>
       </FormGroup>
-      <FormGroup legendText={t("currentStatus", "Current status")}>
+      <FormGroup legendText={t('currentStatus', 'Current status')}>
         <RadioButtonGroup
           defaultSelected="active"
           name="clinicalStatus"
           valueSelected="active"
           orientation="vertical"
-          onChange={(status) => setClinicalStatus(status.toString())}
-        >
+          onChange={(status) => setClinicalStatus(status.toString())}>
           <RadioButton id="active" labelText="Active" value="active" />
           <RadioButton id="inactive" labelText="Inactive" value="inactive" />
         </RadioButtonGroup>
       </FormGroup>
-      {clinicalStatus === "inactive" && (
+      {clinicalStatus === 'inactive' && (
         <DatePicker
           id="endDate"
           datePickerType="single"
@@ -279,30 +249,20 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid }) => {
           placeholder="dd/mm/yyyy"
           onChange={([date]) => setEndDate(date)}
           value={endDate}
-          light
-        >
-          <DatePickerInput
-            id="endDateInput"
-            labelText={t("endDate", "End date")}
-          />
+          light>
+          <DatePickerInput id="endDateInput" labelText={t('endDate', 'End date')} />
         </DatePicker>
       )}
-      <div style={{ marginTop: "1.625rem" }}>
-        <Button
-          style={{ width: "50%" }}
-          kind="secondary"
-          type="button"
-          onClick={closeWorkspace}
-        >
-          {t("cancel", "Cancel")}
+      <div style={{ marginTop: '1.625rem' }}>
+        <Button style={{ width: '50%' }} kind="secondary" type="button" onClick={closeWorkspace}>
+          {t('cancel', 'Cancel')}
         </Button>
         <Button
-          style={{ width: "50%" }}
+          style={{ width: '50%' }}
           kind="primary"
           type="submit"
-          disabled={viewState.type !== StateTypes.CONDITION}
-        >
-          {t("saveAndClose", "Save & Close")}
+          disabled={viewState.type !== StateTypes.CONDITION}>
+          {t('saveAndClose', 'Save & Close')}
         </Button>
       </div>
     </Form>

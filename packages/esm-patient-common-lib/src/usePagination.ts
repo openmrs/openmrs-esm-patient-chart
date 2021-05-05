@@ -1,16 +1,10 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState } from 'react';
 
 const defaultResultsPerPage = 10;
 
-export function usePagination<T>(
-  data: Array<T> = [],
-  resultsPerPage = defaultResultsPerPage
-) {
+export function usePagination<T>(data: Array<T> = [], resultsPerPage = defaultResultsPerPage) {
   const [page, setPage] = useState(1);
-  const totalPages = useMemo(
-    () => Math.max(1, Math.ceil(data.length / resultsPerPage)),
-    [data.length, resultsPerPage]
-  );
+  const totalPages = useMemo(() => Math.max(1, Math.ceil(data.length / resultsPerPage)), [data.length, resultsPerPage]);
   const results = useMemo(() => {
     const lowerBound = (page - 1) * resultsPerPage;
     const upperBound = (page + 0) * resultsPerPage;

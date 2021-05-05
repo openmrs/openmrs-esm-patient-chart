@@ -1,19 +1,16 @@
-import React from "react";
-import InlineLoading from "carbon-components-react/es/components/InlineLoading";
-import { createErrorHandler } from "@openmrs/esm-framework";
-import {
-  fetchPatientRelationships,
-  Relationship,
-} from "./relationships.resource";
-import styles from "./contact-details.scss";
-import { useTranslation } from "react-i18next";
+import React from 'react';
+import InlineLoading from 'carbon-components-react/es/components/InlineLoading';
+import { createErrorHandler } from '@openmrs/esm-framework';
+import { fetchPatientRelationships, Relationship } from './relationships.resource';
+import styles from './contact-details.scss';
+import { useTranslation } from 'react-i18next';
 
 const Address: React.FC<{ address: fhir.Address }> = ({ address }) => {
   const { t } = useTranslation();
   const { city, country, postalCode, state } = address;
   return (
     <div className={styles.col}>
-      <p className={styles.heading}>{t("address", "Address")}</p>
+      <p className={styles.heading}>{t('address', 'Address')}</p>
       <ul>
         <li>{postalCode}</li>
         <li>{city}</li>
@@ -24,15 +21,13 @@ const Address: React.FC<{ address: fhir.Address }> = ({ address }) => {
   );
 };
 
-const Contact: React.FC<{ telecom: Array<fhir.ContactPoint> }> = ({
-  telecom,
-}) => {
+const Contact: React.FC<{ telecom: Array<fhir.ContactPoint> }> = ({ telecom }) => {
   const { t } = useTranslation();
-  const value = telecom ? telecom[0].value : "-";
+  const value = telecom ? telecom[0].value : '-';
 
   return (
     <div className={styles.col}>
-      <p className={styles.heading}>{t("contactDetails", "Contact Details")}</p>
+      <p className={styles.heading}>{t('contactDetails', 'Contact Details')}</p>
       <ul>
         <li>{value}</li>
       </ul>
@@ -41,14 +36,10 @@ const Contact: React.FC<{ telecom: Array<fhir.ContactPoint> }> = ({
 };
 
 const Relationships: React.FC<{ patientId: string }> = ({ patientId }) => {
-  const [relationships, setRelationships] = React.useState<
-    Array<ExtractedRelationship>
-  >(null);
+  const [relationships, setRelationships] = React.useState<Array<ExtractedRelationship>>(null);
 
   React.useEffect(() => {
-    function extractRelationshipData(
-      relationships: Array<Relationship>
-    ): Array<ExtractedRelationship> {
+    function extractRelationshipData(relationships: Array<Relationship>): Array<ExtractedRelationship> {
       const relationshipsData = [];
       for (const r of relationships) {
         if (patientId === r.personA.uuid) {
@@ -85,14 +76,12 @@ const Relationships: React.FC<{ patientId: string }> = ({ patientId }) => {
   const RenderRelationships: React.FC = () => {
     if (relationships.length) {
       return (
-        <ul style={{ width: "50%" }}>
+        <ul style={{ width: '50%' }}>
           {relationships.map((r) => (
             <li key={r.uuid} className={styles.relationship}>
               <div>{r.display}</div>
               <div>{r.relationshipType}</div>
-              <div>{`${r.relativeAge} ${
-                r.relativeAge === 1 ? "yr" : "yrs"
-              }`}</div>
+              <div>{`${r.relativeAge} ${r.relativeAge === 1 ? 'yr' : 'yrs'}`}</div>
             </li>
           ))}
         </ul>
@@ -104,21 +93,13 @@ const Relationships: React.FC<{ patientId: string }> = ({ patientId }) => {
   return (
     <div className={styles.col}>
       <p className={styles.heading}>Relationships</p>
-      {relationships ? (
-        <RenderRelationships />
-      ) : (
-        <InlineLoading description="Loading..." />
-      )}
+      {relationships ? <RenderRelationships /> : <InlineLoading description="Loading..." />}
     </div>
   );
 };
 
-const ContactDetails: React.FC<ContactDetailsProps> = ({
-  address,
-  telecom,
-  patientId,
-}) => {
-  const currentAddress = address.find((a) => a.use === "home");
+const ContactDetails: React.FC<ContactDetailsProps> = ({ address, telecom, patientId }) => {
+  const currentAddress = address.find((a) => a.use === 'home');
 
   return (
     <div className={styles.contactDetails}>

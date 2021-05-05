@@ -1,4 +1,4 @@
-import dayjs from "dayjs";
+import dayjs from 'dayjs';
 
 const FEET: number = 0.0328084;
 const INCH: number = 12;
@@ -13,16 +13,12 @@ export function calculateBMI(weight: number, height: number) {
 export function formatDate(strDate: string) {
   const date = dayjs(strDate);
   const today = dayjs(new Date());
-  if (
-    date.date() === today.date() &&
-    date.month() === today.month() &&
-    date.year() === today.year()
-  ) {
-    return `Today ${date.format("hh:mm A")}`;
+  if (date.date() === today.date() && date.month() === today.month() && date.year() === today.year()) {
+    return `Today ${date.format('hh:mm A')}`;
   } else if (date.year() === today.year()) {
-    return date.format("DD-MMM hh:mm A");
+    return date.format('DD-MMM hh:mm A');
   } else {
-    return date.format("YYYY DD-MMM");
+    return date.format('YYYY DD-MMM');
   }
 }
 
@@ -35,9 +31,7 @@ export function convertToFeet(centiMeters: number) {
 }
 
 export function convertoToInches(centiMeters: number) {
-  return (INCH * (FEET * centiMeters - Math.floor(FEET * centiMeters))).toFixed(
-    2
-  );
+  return (INCH * (FEET * centiMeters - Math.floor(FEET * centiMeters))).toFixed(2);
 }
 
 export function customDateFormat(date: any, dateFormat: string) {

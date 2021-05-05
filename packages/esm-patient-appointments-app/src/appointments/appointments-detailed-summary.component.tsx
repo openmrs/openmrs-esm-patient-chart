@@ -1,24 +1,18 @@
-import React, { useState, useEffect } from "react";
-import dayjs from "dayjs";
-import styles from "./appointments-detailed-summary.css";
-import AppointmentsForm from "./appointments-form.component";
-import {
-  EmptyState,
-  SummaryCard,
-  openWorkspaceTab,
-} from "@openmrs/esm-patient-common-lib";
-import { createErrorHandler } from "@openmrs/esm-framework";
-import { Link } from "react-router-dom";
-import { useTranslation, Trans } from "react-i18next";
-import { getAppointments } from "./appointments.resource";
+import React, { useState, useEffect } from 'react';
+import dayjs from 'dayjs';
+import styles from './appointments-detailed-summary.css';
+import AppointmentsForm from './appointments-form.component';
+import { EmptyState, SummaryCard, openWorkspaceTab } from '@openmrs/esm-patient-common-lib';
+import { createErrorHandler } from '@openmrs/esm-framework';
+import { Link } from 'react-router-dom';
+import { useTranslation, Trans } from 'react-i18next';
+import { getAppointments } from './appointments.resource';
 
 interface AppointmentsDetailedSummaryProps {
   patientUuid: string;
 }
 
-export default function AppointmentsDetailedSummary({
-  patientUuid,
-}: AppointmentsDetailedSummaryProps) {
+export default function AppointmentsDetailedSummary({ patientUuid }: AppointmentsDetailedSummaryProps) {
   const [patientAppointments, setPatientAppointments] = useState([]);
   const { t } = useTranslation();
   const [startDate] = useState(dayjs().format());
@@ -28,7 +22,7 @@ export default function AppointmentsDetailedSummary({
       const abortController = new AbortController();
       getAppointments(patientUuid, startDate, abortController).then(
         ({ data }) => setPatientAppointments(data),
-        createErrorHandler()
+        createErrorHandler(),
       );
       return () => abortController.abort();
     }
@@ -38,15 +32,9 @@ export default function AppointmentsDetailedSummary({
     <>
       {patientAppointments?.length ? (
         <SummaryCard
-          name={t("appointments", "Appointments")}
-          showComponent={() =>
-            openWorkspaceTab(
-              AppointmentsForm,
-              `${t("appointmentsForm", "Appointments Form")}`
-            )
-          }
-          addComponent
-        >
+          name={t('appointments', 'Appointments')}
+          showComponent={() => openWorkspaceTab(AppointmentsForm, `${t('appointmentsForm', 'Appointments Form')}`)}
+          addComponent>
           <table className={styles.appointmentDetailedSummaryTable}>
             <thead>
               <tr>
@@ -74,26 +62,15 @@ export default function AppointmentsDetailedSummary({
               {patientAppointments?.map((appointment) => {
                 return (
                   <tr key={appointment?.uuid}>
-                    <td>
-                      {dayjs
-                        .utc(appointment?.startDateTime)
-                        .format("YYYY-MMM-DD")}
-                    </td>
-                    <td>
-                      {dayjs.utc(appointment?.startDateTime).format("HH:mm A")}
-                    </td>
-                    <td>
-                      {dayjs.utc(appointment?.endDateTime).format("HH:mm A")}
-                    </td>
+                    <td>{dayjs.utc(appointment?.startDateTime).format('YYYY-MMM-DD')}</td>
+                    <td>{dayjs.utc(appointment?.startDateTime).format('HH:mm A')}</td>
+                    <td>{dayjs.utc(appointment?.endDateTime).format('HH:mm A')}</td>
                     <td>{appointment?.serviceType?.name}</td>
                     <td>{appointment?.appointmentKind}</td>
                     <td>{appointment?.status}</td>
                     <td>
                       <Link to={`/${appointment?.uuid}`}>
-                        <svg
-                          className="omrs-icon"
-                          fill="var(--omrs-color-ink-low-contrast)"
-                        >
+                        <svg className="omrs-icon" fill="var(--omrs-color-ink-low-contrast)">
                           <use xlinkHref="#omrs-icon-chevron-right" />
                         </svg>
                       </Link>
@@ -106,14 +83,9 @@ export default function AppointmentsDetailedSummary({
         </SummaryCard>
       ) : (
         <EmptyState
-          displayText={t("appointments", "appointments")}
-          headerTitle={t("appointments", "Appointments")}
-          launchForm={() =>
-            openWorkspaceTab(
-              AppointmentsForm,
-              `${t("appointmentsForm", "Appointments Form")}`
-            )
-          }
+          displayText={t('appointments', 'appointments')}
+          headerTitle={t('appointments', 'Appointments')}
+          launchForm={() => openWorkspaceTab(AppointmentsForm, `${t('appointmentsForm', 'Appointments Form')}`)}
         />
       )}
     </>
