@@ -42,3 +42,7 @@ export const formatDate = (strDate: string | Date) => {
   }
   return date.format("DD - MMM - YYYY @ HH:mm");
 };
+
+export const sortFormLatestFirst = (formA: Form, formB: Form) =>
+  new Date(formB.lastCompleted).getTime() -
+  new Date(formA.lastCompleted).getTime();

@@ -1,8 +1,8 @@
-import React from "react";
-import { useTranslation } from "react-i18next";
-import styles from "./pagination.component.scss";
-import Pagination from "carbon-components-react/es/components/Pagination";
-import { ConfigurableLink } from "@openmrs/esm-framework";
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import styles from './pagination.component.scss';
+import Pagination from 'carbon-components-react/es/components/Pagination';
+import { ConfigurableLink } from '@openmrs/esm-framework';
 
 interface PatientChartPaginationProps {
   items: Array<unknown>;
@@ -48,9 +48,7 @@ const PatientChartPagination: React.FC<PatientChartPaginationProps> = ({
     const totalItems = items.length;
     if (pageSize > totalItems) return `${totalItems} / ${totalItems} `;
     if (pageSize * pageNumber > totalItems) {
-      return `${
-        pageSize * (pageNumber - 1) + currentPage.length
-      } / ${totalItems} `;
+      return `${pageSize * (pageNumber - 1) + currentPage.length} / ${totalItems} `;
     } else {
       return `${pageSize * pageNumber} / ${totalItems} `;
     }
@@ -62,12 +60,9 @@ const PatientChartPagination: React.FC<PatientChartPaginationProps> = ({
         <div className={styles.paginationContainer}>
           <div className={styles.paginationLink}>
             {numberOfItemsDisplayed()}
-            {t("items", " items")}
-            <ConfigurableLink
-              to={`${chartBasePath}${pageUrl}`}
-              className={styles.configurableLink}
-            >
-              {t("seeAll", "See all")}
+            {t('items', ' items')}
+            <ConfigurableLink to={`${chartBasePath}${pageUrl}`} className={styles.configurableLink}>
+              {t('seeAll', 'See all')}
             </ConfigurableLink>
           </div>
           <Pagination
