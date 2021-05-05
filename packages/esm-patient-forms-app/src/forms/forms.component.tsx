@@ -11,6 +11,7 @@ import { navigate } from '@openmrs/esm-framework';
 import { fetchAllForms, fetchPatientEncounters } from './forms.resource';
 import { filterAvailableAndCompletedForms } from './forms-utils';
 import { Encounter, Form } from '../types';
+import EmptyFormView from './empty-form.component';
 
 enum FormViewState {
   recommended = 0,
@@ -38,7 +39,7 @@ const Forms: React.FC<FormsProps> = ({ patientUuid }) => {
   }, []);
 
   React.useEffect(() => {
-    const fromDate = dayjs(new Date()).startOf('day');
+    const fromDate = dayjs(new Date()).startOf('day').subtract(500, 'day');
     const toDate = dayjs(new Date()).endOf('day');
     fetchPatientEncounters(patientUuid, fromDate.toDate(), toDate.toDate()).subscribe(
       (encounters) => setEncounters(encounters),
@@ -50,6 +51,7 @@ const Forms: React.FC<FormsProps> = ({ patientUuid }) => {
     const availableForms = filterAvailableAndCompletedForms(forms, encounters);
     const completedForms = availableForms.completed.map((encounters) => {
       encounters.form.complete = true;
+      encounters.form.lastCompleted = encounters.encounterDateTime ? encounters.encounterDateTime : null;
       return encounters.form;
     });
     setCompletedForms(completedForms);
@@ -60,6 +62,7 @@ const Forms: React.FC<FormsProps> = ({ patientUuid }) => {
       completedForms.map((completeForm) => {
         if (completeForm.uuid === form.uuid) {
           form.complete = true;
+          form.lastCompleted = completeForm.lastCompleted ? completeForm.lastCompleted : null;
         }
       });
       return form;
@@ -97,6 +100,9 @@ const Forms: React.FC<FormsProps> = ({ patientUuid }) => {
               patientUuid={patientUuid}
               encounterUuid={first<Encounter>(encounters)?.uuid}
             />
+          )}
+          {selectedFormView === FormViewState.recommended && (
+            <EmptyFormView action={t('noRecommendedFormsAvailable', 'No recommended forms available at the moment')} />
           )}
         </div>
       </div>

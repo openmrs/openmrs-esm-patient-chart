@@ -1,15 +1,28 @@
-import React from 'react';
-import CheckmarkFilled16 from '@carbon/icons-react/es/checkmark--filled/16';
-import RadioButton16 from '@carbon/icons-react/es/radio-button/16';
+import React, { useMemo } from 'react';
 import Search from 'carbon-components-react/es/components/Search';
 import debounce from 'lodash-es/debounce';
 import isEmpty from 'lodash-es/isEmpty';
 import styles from './form-view.component.scss';
-import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
 import { getStartedVisit, VisitItem } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { Form } from '../types';
-import { Tile } from 'carbon-components-react/es/components/Tile';
+import DataTable, {
+  Table,
+  TableCell,
+  TableContainer,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
+  DataTableCell,
+  DataTableHeader,
+  DataTableRow,
+} from 'carbon-components-react/es/components/DataTable';
+import { formatDate, sortFormLatestFirst } from './forms-utils';
+import EmptyFormView from './empty-form.component';
+import PatientChartPagination from '../pagination/pagination.component';
+import first from 'lodash-es/first';
+import { usePagination } from '@openmrs/esm-patient-common-lib';
 
 function startVisitPrompt() {
   window.dispatchEvent(
@@ -35,11 +48,6 @@ interface FormViewProps {
   encounterUuid?: string;
 }
 
-interface checkBoxProps {
-  label: string;
-  form: Form;
-}
-
 const filterFormsByName = (formName: string, forms: Array<Form>) => {
   return forms.filter((form) => form.name.toLowerCase().search(formName.toLowerCase()) !== -1);
 };
@@ -49,6 +57,7 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, encounterUuid }
   const [activeVisit, setActiveVisit] = React.useState<VisitItem>();
   const [searchTerm, setSearchTerm] = React.useState<string>(null);
   const [allForms, setAllForms] = React.useState<Array<Form>>(forms);
+  const { results, goTo, currentPage } = usePagination(allForms.sort(sortFormLatestFirst), 5);
 
   const handleSearch = React.useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), 300), []);
 
@@ -61,19 +70,41 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, encounterUuid }
     return () => sub.unsubscribe();
   }, []);
 
-  const CheckedComponent: React.FC<checkBoxProps> = ({ label, form }) => {
+  const tableHeaders: Array<DataTableHeader> = useMemo(
+    () => [
+      {
+        key: 'lastCompleted',
+        header: t('lastCompleted', 'Last Completed'),
+      },
+      { key: 'formName', header: t('formName', 'Form Name (A-Z)') },
+    ],
+    [t],
+  );
+
+  const tableRows: Array<DataTableRow> = useMemo(
+    () =>
+      results.map((form, index) => {
+        return {
+          id: `${index}`,
+          lastCompleted: form.lastCompleted && formatDate(form.lastCompleted),
+          formName: form.name,
+          formUuid: form.uuid,
+        };
+      }),
+    [results],
+  );
+
+  const withValue = (cell, row) => {
     return (
-      <div
-        tabIndex={0}
-        role="button"
-        onClick={() => launchFormEntry(activeVisit, form)}
-        className={styles.customCheckBoxContainer}>
-        {form.complete ? <CheckmarkFilled16 /> : <RadioButton16 />}
-        <div className={styles.label}>{label}</div>
-      </div>
+      <TableCell
+        style={{
+          color: first<DataTableCell>(row.cells).value ? `#0f62fe` : `#525252`,
+        }}
+        key={cell.id}>
+        {cell.value ? cell.value : `${t('never', 'Never')}`}
+      </TableCell>
     );
   };
-
   return (
     <div className={styles.formContainer}>
       <Search
@@ -90,19 +121,57 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, encounterUuid }
           </p>
         )}
         {isEmpty(allForms) && !isEmpty(searchTerm) && (
-          <Tile light className={styles.formTile}>
-            <EmptyDataIllustration />
-            <p className={styles.content}>{t('noFormsFound', 'Sorry, no forms have been found')}</p>
-            <p className={styles.action}>
-              {t('formSearchHint', 'Try searching for the form using an alternative name or keyword')}
-            </p>
-          </Tile>
+          <EmptyFormView
+            action={t('formSearchHint', 'Try searching for the form using an alternative name or keyword')}
+          />
         )}
-        <div className={styles.formCheckBoxContainer}>
-          {allForms.map((form, index) => (
-            <CheckedComponent key={index} label={form.name} form={form} />
-          ))}
-        </div>
+        {!isEmpty(allForms) && (
+          <>
+            <TableContainer className={styles.tableContainer}>
+              <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="short">
+                {({ rows, headers, getHeaderProps, getTableProps }) => (
+                  <Table {...getTableProps()}>
+                    <TableHead>
+                      <TableRow>
+                        {headers.map((header) => (
+                          <TableHeader
+                            className={`${styles.productiveHeading01} ${styles.text02}`}
+                            {...getHeaderProps({
+                              header,
+                              isSortable: header.isSortable,
+                            })}>
+                            {header.header?.content ?? header.header}
+                          </TableHeader>
+                        ))}
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {rows.map((row) => (
+                        <TableRow key={row.id} onClick={() => launchFormEntry(activeVisit, row.cells[1].value)}>
+                          {row.cells.map((cell) => withValue(cell, row))}
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                )}
+              </DataTable>
+            </TableContainer>
+            <PatientChartPagination
+              pageNumber={currentPage}
+              currentPage={results}
+              patientUuid={patientUuid}
+              pageSize={5}
+              pageUrl=""
+              onPageNumberChange={({ page }) => goTo(page)}
+              items={allForms}
+            />
+          </>
+        )}
+        {isEmpty(allForms) && (
+          <EmptyFormView
+            action={t('formSearchHint', 'Try searching for the form using an alternative name or keyword')}
+          />
+        )}
       </>
     </div>
   );

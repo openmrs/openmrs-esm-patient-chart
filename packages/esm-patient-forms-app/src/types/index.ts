@@ -6,6 +6,7 @@ export interface Form {
   encounterTypeUuid?: string;
   encounterTypeName?: string;
   complete?: boolean;
+  lastCompleted: string | Date;
 }
 
 export interface Encounter {
