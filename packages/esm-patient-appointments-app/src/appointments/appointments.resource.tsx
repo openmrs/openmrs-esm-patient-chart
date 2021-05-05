@@ -1,30 +1,23 @@
-import { openmrsFetch } from "@openmrs/esm-framework";
-import { Appointment } from "./appointments-form.component";
+import { openmrsFetch } from '@openmrs/esm-framework';
+import { Appointment } from './appointments-form.component';
 
-export function createAppointment(
-  appointment: Appointment,
-  abortController: AbortController
-) {
+export function createAppointment(appointment: Appointment, abortController: AbortController) {
   return openmrsFetch(`/ws/rest/v1/appointment`, {
-    method: "POST",
+    method: 'POST',
     signal: abortController.signal,
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
     body: appointment,
   });
 }
 
-export function getAppointments(
-  patientUuid: string,
-  startDate: string,
-  abortController: AbortController
-) {
+export function getAppointments(patientUuid: string, startDate: string, abortController: AbortController) {
   return openmrsFetch(`/ws/rest/v1/appointments/search`, {
-    method: "POST",
+    method: 'POST',
     signal: abortController.signal,
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
     body: {
       patientUuid: patientUuid,
@@ -33,10 +26,7 @@ export function getAppointments(
   });
 }
 
-export function getAppointmentsByUuid(
-  appointmentUuid: string,
-  abortController: AbortController
-) {
+export function getAppointmentsByUuid(appointmentUuid: string, abortController: AbortController) {
   return openmrsFetch(`/ws/rest/v1/appointments/${appointmentUuid}`, {
     signal: abortController.signal,
   });

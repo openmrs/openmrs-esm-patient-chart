@@ -5,21 +5,17 @@ import {
   loadPresentConcepts,
   extractMetaInformation,
   addUserDataToCache,
-} from "./helpers";
-import { PatientData, ObsRecord, ConceptUuid, ObsUuid } from "./types";
+} from './helpers';
+import { PatientData, ObsRecord, ConceptUuid, ObsUuid } from './types';
 
-const parseSingleObsData = ({
-  testConceptNameMap,
-  memberRefs,
-  metaInfomation,
-}) => (entry: ObsRecord) => {
+const parseSingleObsData = ({ testConceptNameMap, memberRefs, metaInfomation }) => (entry: ObsRecord) => {
   entry.conceptClass = getEntryConceptClassUuid(entry);
 
   if (entry.hasMember) {
     // is a panel
     entry.members = new Array(entry.hasMember.length);
     entry.hasMember.forEach((memb, i) => {
-      memberRefs[memb.reference.split("/")[1]] = [entry.members, i];
+      memberRefs[memb.reference.split('/')[1]] = [entry.members, i];
     });
   } else {
     // is a singe test
@@ -38,16 +34,12 @@ async function reloadData(patientUuid: string) {
   const entries = await loadObsEntries(patientUuid);
   const allConcepts = await loadPresentConcepts(entries);
 
-  const testConcepts = allConcepts.filter(
-    (x) => x.conceptClass.name === "Test" || x.conceptClass.name === "LabSet"
-  );
+  const testConcepts = allConcepts.filter((x) => x.conceptClass.name === 'Test' || x.conceptClass.name === 'LabSet');
   const testConceptUuids: ConceptUuid[] = testConcepts.map((x) => x.uuid);
   const testConceptNameMap: Record<ConceptUuid, string> = Object.fromEntries(
-    testConcepts.map(({ uuid, display }) => [uuid, display])
+    testConcepts.map(({ uuid, display }) => [uuid, display]),
   );
-  const obsByClass: Record<ConceptUuid, ObsRecord[]> = Object.fromEntries(
-    testConceptUuids.map((x) => [x, []])
-  );
+  const obsByClass: Record<ConceptUuid, ObsRecord[]> = Object.fromEntries(testConceptUuids.map((x) => [x, []]));
   const metaInfomation = extractMetaInformation(testConcepts);
 
   // obs that are not panels
@@ -100,16 +92,12 @@ async function reloadData(patientUuid: string) {
         return [
           display,
           {
-            entries: val.sort(
-              (ent1, ent2) =>
-                Date.parse(ent2.effectiveDateTime) -
-                Date.parse(ent1.effectiveDateTime)
-            ),
+            entries: val.sort((ent1, ent2) => Date.parse(ent2.effectiveDateTime) - Date.parse(ent1.effectiveDateTime)),
             type,
             uuid,
           },
         ];
-      })
+      }),
   );
 
   if (entries.length > 0) {
@@ -119,17 +107,10 @@ async function reloadData(patientUuid: string) {
   return sortedObs;
 }
 
-function loadPatientData(
-  patientUuid: string
-): [PatientData | undefined, Promise<PatientData>] {
+function loadPatientData(patientUuid: string): [PatientData | undefined, Promise<PatientData>] {
   const [cachedPatientData, shouldReload] = getUserDataFromCache(patientUuid);
 
-  return [
-    cachedPatientData,
-    shouldReload.then((reload) =>
-      reload ? reloadData(patientUuid) : cachedPatientData
-    ),
-  ];
+  return [cachedPatientData, shouldReload.then((reload) => (reload ? reloadData(patientUuid) : cachedPatientData))];
 }
 
 export default loadPatientData;

@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
-import dayjs from "dayjs";
-import ImmunizationsForm from "./immunizations-form.component";
-import styles from "./immunizations-detailed-summary.css";
-import vaccinationRowStyles from "./vaccination-row.css";
-import { Link } from "react-router-dom";
-import { useTranslation, Trans } from "react-i18next";
-import { openWorkspaceTab } from "@openmrs/esm-patient-common-lib";
-import { ImmunizationData } from "./immunization-domain";
+import React, { useEffect, useState } from 'react';
+import dayjs from 'dayjs';
+import ImmunizationsForm from './immunizations-form.component';
+import styles from './immunizations-detailed-summary.css';
+import vaccinationRowStyles from './vaccination-row.css';
+import { Link } from 'react-router-dom';
+import { useTranslation, Trans } from 'react-i18next';
+import { openWorkspaceTab } from '@openmrs/esm-patient-common-lib';
+import { ImmunizationData } from './immunization-domain';
 
 export default function VaccinationRow(params: ImmunizationProps) {
   const [patientImmunization, setPatientImmunization] = useState(null);
@@ -19,29 +19,21 @@ export default function VaccinationRow(params: ImmunizationProps) {
 
   function getRecentVaccinationText(patientImmunization: ImmunizationData) {
     if (!hasExistingDoses(patientImmunization)) {
-      return "";
+      return '';
     }
 
     let recentDose = patientImmunization.existingDoses[0];
-    const vaccinationDate = dayjs(recentDose.occurrenceDateTime).format(
-      "DD-MMM-YYYY"
-    );
+    const vaccinationDate = dayjs(recentDose.occurrenceDateTime).format('DD-MMM-YYYY');
     if (hasSequence(patientImmunization)) {
       const doseName = recentDose.sequenceLabel;
       return (
-        <Trans
-          i18nKey="recentDoseWithSequenceFormat"
-          values={{ doseName: doseName, vaccinationDate: vaccinationDate }}
-        >
+        <Trans i18nKey="recentDoseWithSequenceFormat" values={{ doseName: doseName, vaccinationDate: vaccinationDate }}>
           {doseName} on {vaccinationDate}
         </Trans>
       );
     }
     return (
-      <Trans
-        i18nKey="recentDoseWithoutSequenceFormat"
-        values={{ vaccinationDate: vaccinationDate }}
-      >
+      <Trans i18nKey="recentDoseWithoutSequenceFormat" values={{ vaccinationDate: vaccinationDate }}>
         Single Dose on {vaccinationDate}
       </Trans>
     );
@@ -52,18 +44,12 @@ export default function VaccinationRow(params: ImmunizationProps) {
       return (
         <tr key={`${patientImmunization.vaccineUuid}-${i}`}>
           {hasSequence(patientImmunization) && <td>{dose.sequenceLabel}</td>}
-          {hasSequence(patientImmunization) || (
-            <td>{t("singleDose", "Single Dose")}</td>
-          )}
+          {hasSequence(patientImmunization) || <td>{t('singleDose', 'Single Dose')}</td>}
           <td>
-            <div className={`${styles.alignRight}`}>
-              {dayjs(dose.occurrenceDateTime).format("DD-MMM-YYYY")}
-            </div>
+            <div className={`${styles.alignRight}`}>{dayjs(dose.occurrenceDateTime).format('DD-MMM-YYYY')}</div>
           </td>
           <td>
-            <div className={`${styles.alignRight}`}>
-              {dayjs(dose.expirationDate).format("DD-MMM-YYYY")}
-            </div>
+            <div className={`${styles.alignRight}`}>{dayjs(dose.expirationDate).format('DD-MMM-YYYY')}</div>
           </td>
           <td>
             {
@@ -72,10 +58,7 @@ export default function VaccinationRow(params: ImmunizationProps) {
                   className="omrs-icon"
                   fill="var(--omrs-color-ink-low-contrast)"
                   onClick={() => {
-                    const formHeader = t(
-                      "immunizationForm",
-                      "Immunization Form"
-                    );
+                    const formHeader = t('immunizationForm', 'Immunization Form');
                     return openWorkspaceTab(ImmunizationsForm, formHeader, {
                       vaccineName: patientImmunization?.vaccineName,
                       vaccineUuid: patientImmunization?.vaccineUuid,
@@ -90,8 +73,7 @@ export default function VaccinationRow(params: ImmunizationProps) {
                       },
                       vaccinationDate: dose.occurrenceDateTime,
                     });
-                  }}
-                >
+                  }}>
                   <use xlinkHref="#omrs-icon-chevron-right" />
                 </svg>
               </Link>
@@ -109,22 +91,18 @@ export default function VaccinationRow(params: ImmunizationProps) {
           <td className="omrs-medium">
             <div className={styles.expandSequence}>
               <svg
-                className={`omrs-icon ${
-                  hasExistingDoses(patientImmunization) && styles.expandButton
-                }`}
+                className={`omrs-icon ${hasExistingDoses(patientImmunization) && styles.expandButton}`}
                 fill="var(--omrs-color-ink-low-contrast)"
                 onClick={() => {
-                  hasExistingDoses(patientImmunization) &&
-                    setToggleOpen(!toggleOpen);
-                }}
-              >
+                  hasExistingDoses(patientImmunization) && setToggleOpen(!toggleOpen);
+                }}>
                 <use
                   xlinkHref={
                     hasExistingDoses(patientImmunization)
                       ? toggleOpen
-                        ? "#omrs-icon-chevron-up"
-                        : "#omrs-icon-chevron-down"
-                      : ""
+                        ? '#omrs-icon-chevron-up'
+                        : '#omrs-icon-chevron-down'
+                      : ''
                   }
                 />
               </svg>
@@ -132,42 +110,35 @@ export default function VaccinationRow(params: ImmunizationProps) {
             <span>{patientImmunization.vaccineName}</span>
           </td>
           <td>
-            <div className={`${styles.alignRight}`}>
-              {getRecentVaccinationText(patientImmunization)}
-            </div>
+            <div className={`${styles.alignRight}`}>{getRecentVaccinationText(patientImmunization)}</div>
           </td>
           <td>
             <div className={styles.headerAdd}>
               <button
                 className={`${styles.addButton}`}
                 onClick={() => {
-                  const formHeader = t("immunizationForm", "Immunization Form");
+                  const formHeader = t('immunizationForm', 'Immunization Form');
                   return openWorkspaceTab(ImmunizationsForm, formHeader, {
                     vaccineName: patientImmunization?.vaccineName,
                     vaccineUuid: patientImmunization?.vaccineUuid,
                     sequences: patientImmunization?.sequences,
                   });
-                }}
-              >
+                }}>
                 +
-              </button>{" "}
+              </button>{' '}
             </div>
           </td>
         </tr>
         {toggleOpen && (
-          <tr
-            id={patientImmunization?.uuid}
-            className={`immunizationSequenceRow ${vaccinationRowStyles.sequenceRow}`}
-          >
+          <tr id={patientImmunization?.uuid} className={`immunizationSequenceRow ${vaccinationRowStyles.sequenceRow}`}>
             <td colSpan={4}>
               <table
-                className={`omrs-type-body-regular immunizationSequenceTable ${vaccinationRowStyles.sequenceTable}`}
-              >
+                className={`omrs-type-body-regular immunizationSequenceTable ${vaccinationRowStyles.sequenceTable}`}>
                 <thead>
                   <tr>
-                    <td>{t("sequence", "Sequence")}</td>
-                    <td>{t("vaccinationDate", "Vaccination Date")}</td>
-                    <td>{t("expirationDate", "Expiration Date")}</td>
+                    <td>{t('sequence', 'Sequence')}</td>
+                    <td>{t('vaccinationDate', 'Vaccination Date')}</td>
+                    <td>{t('expirationDate', 'Expiration Date')}</td>
                     <td />
                   </tr>
                 </thead>
@@ -182,16 +153,11 @@ export default function VaccinationRow(params: ImmunizationProps) {
 }
 
 function hasExistingDoses(patientImmunization: ImmunizationData) {
-  return (
-    patientImmunization.existingDoses &&
-    patientImmunization.existingDoses.length > 0
-  );
+  return patientImmunization.existingDoses && patientImmunization.existingDoses.length > 0;
 }
 
 function hasSequence(patientImmunization: ImmunizationData) {
-  return (
-    patientImmunization?.sequences && patientImmunization?.sequences?.length > 0
-  );
+  return patientImmunization?.sequences && patientImmunization?.sequences?.length > 0;
 }
 
 type ImmunizationProps = { immunization: any };

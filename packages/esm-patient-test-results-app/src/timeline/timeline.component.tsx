@@ -1,38 +1,24 @@
-import * as React from "react";
-import useScrollIndicator from "./useScroll";
-import { useTimelineData } from "./useTimelineData";
-import {
-  Main,
-  PaddingContainer,
-  TimeSlots,
-  Grid,
-  RowStartCell,
-  GridItems,
-  ShadowBox,
-} from "./helpers";
-import { ObsRecord } from "../loadPatientTestData/types";
-import styles from "./timeline.scss";
+import * as React from 'react';
+import useScrollIndicator from './useScroll';
+import { useTimelineData } from './useTimelineData';
+import { Main, PaddingContainer, TimeSlots, Grid, RowStartCell, GridItems, ShadowBox } from './helpers';
+import { ObsRecord } from '../loadPatientTestData/types';
+import styles from './timeline.scss';
 
 const PanelNameCorner: React.FC<{ panelName: string }> = ({ panelName }) => (
-  <TimeSlots className={styles["corner-grid-element"]}>{panelName}</TimeSlots>
+  <TimeSlots className={styles['corner-grid-element']}>{panelName}</TimeSlots>
 );
 
-const DateHeaderGrid = ({
-  timeColumns,
-  yearColumns,
-  dayColumns,
-  displayShadow,
-}) => (
+const DateHeaderGrid = ({ timeColumns, yearColumns, dayColumns, displayShadow }) => (
   <Grid
     dataColumns={timeColumns.length}
     style={{
-      gridTemplateRows: "repeat(3, 24px)",
-      position: "sticky",
-      top: "0px",
+      gridTemplateRows: 'repeat(3, 24px)',
+      position: 'sticky',
+      top: '0px',
       zIndex: 2,
-      boxShadow: displayShadow ? "8px 0 20px 0 rgba(0,0,0,0.15)" : undefined,
-    }}
-  >
+      boxShadow: displayShadow ? '8px 0 20px 0 rgba(0,0,0,0.15)' : undefined,
+    }}>
     {yearColumns.map(({ year, size }) => {
       return (
         <TimeSlots key={year} style={{ gridColumn: `${size} span` }}>
@@ -49,10 +35,7 @@ const DateHeaderGrid = ({
     })}
     {timeColumns.map((time, i) => {
       return (
-        <TimeSlots
-          key={time + i}
-          style={{ scrollSnapAlign: "start", fontWeight: 400 }}
-        >
+        <TimeSlots key={time + i} style={{ scrollSnapAlign: 'start', fontWeight: 400 }}>
           {time}
         </TimeSlots>
       );
@@ -73,14 +56,10 @@ const DataRows: React.FC<{
   displayShadow: boolean;
   openTrendline: (testUuid: string) => void;
 }> = ({ timeColumns, rowData, sortedTimes, displayShadow, openTrendline }) => (
-  <Grid
-    dataColumns={timeColumns.length}
-    padding
-    style={{ gridColumn: "span 2" }}
-  >
+  <Grid dataColumns={timeColumns.length} padding style={{ gridColumn: 'span 2' }}>
     {Object.entries(rowData).map(([title, obs]) => {
       const {
-        meta: { units = "", range = "" },
+        meta: { units = '', range = '' },
         conceptClass,
       } = obs.find((x) => !!x);
       return (
@@ -123,10 +102,10 @@ export const Timeline: React.FC<TimelineParams> = ({
     loaded,
   } = useTimelineData(patientUuid, panelUuid);
 
-  const openTrendline = React.useCallback(
-    (testUuid: string) => openTrendlineExternal(panelUuid, testUuid),
-    [panelUuid, openTrendlineExternal]
-  );
+  const openTrendline = React.useCallback((testUuid: string) => openTrendlineExternal(panelUuid, testUuid), [
+    panelUuid,
+    openTrendlineExternal,
+  ]);
 
   if (!loaded) return <LoadingDisplay />;
 

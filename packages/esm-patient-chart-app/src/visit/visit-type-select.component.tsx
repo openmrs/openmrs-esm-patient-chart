@@ -1,5 +1,5 @@
-import React from "react";
-import { VisitType, useVisitTypes } from "@openmrs/esm-framework";
+import React from 'react';
+import { VisitType, useVisitTypes } from '@openmrs/esm-framework';
 
 export interface VisitTypeSelectProps {
   onVisitTypeChanged: (selected: VisitType) => any;
@@ -13,30 +13,23 @@ export default function VisitTypeSelect(props: VisitTypeSelectProps) {
   const onVisitTypeChanged = props.onVisitTypeChanged;
   const onVisitTypesChanged = React.useCallback(
     (event: React.ChangeEvent<HTMLSelectElement>) => {
-      onVisitTypeChanged(
-        visitTypes.find((loc) => loc.uuid === event.target.value)
-      );
+      onVisitTypeChanged(visitTypes.find((loc) => loc.uuid === event.target.value));
     },
-    [visitTypes, onVisitTypeChanged]
+    [visitTypes, onVisitTypeChanged],
   );
 
   return (
     <>
       <select
         name="visitType"
-        id={props.id || "visitType"}
+        id={props.id || 'visitType'}
         className="omrs-type-body-regular"
-        style={{ height: "40px" }}
+        style={{ height: '40px' }}
         onChange={onVisitTypesChanged}
-        value={props.visitTypeUuid}
-      >
+        value={props.visitTypeUuid}>
         <option value="" className="omrs-padding-8" />
         {visitTypes.map((visitType) => (
-          <option
-            key={visitType.uuid}
-            value={visitType.uuid}
-            className="omrs-padding-8"
-          >
+          <option key={visitType.uuid} value={visitType.uuid} className="omrs-padding-8">
             {visitType.display}
           </option>
         ))}

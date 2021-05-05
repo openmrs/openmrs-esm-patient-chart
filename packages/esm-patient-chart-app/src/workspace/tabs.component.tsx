@@ -1,5 +1,5 @@
-import React from "react";
-import styles from "./tabs.component.css";
+import React from 'react';
+import styles from './tabs.component.css';
 
 export function Tabs(props) {
   function removeTab($event, index) {
@@ -14,27 +14,20 @@ export function Tabs(props) {
             return (
               <div
                 key={index}
-                className={`${
-                  index == props.selected ? styles.selected : styles.unselected
-                }`}
+                className={`${index == props.selected ? styles.selected : styles.unselected}`}
                 style={{
-                  display: "flex",
-                  width: "100%",
-                  justifyContent: "space-between",
-                }}
-              >
+                  display: 'flex',
+                  width: '100%',
+                  justifyContent: 'space-between',
+                }}>
                 <div key={index} className={styles.tab}>
-                  <button
-                    className="omrs-unstyled"
-                    onClick={() => props.setSelected(index)}
-                  >
+                  <button className="omrs-unstyled" onClick={() => props.setSelected(index)}>
                     {elem.props.title}
                   </button>
                 </div>
                 <button
                   onClick={($event) => removeTab($event, index)}
-                  className={`${styles.closeIcon} omrs-unstyled omrs-btn-icon-small`}
-                >
+                  className={`${styles.closeIcon} omrs-unstyled omrs-btn-icon-small`}>
                   <svg className="omrs-icon">
                     <use xlinkHref="#omrs-icon-close"></use>
                   </svg>

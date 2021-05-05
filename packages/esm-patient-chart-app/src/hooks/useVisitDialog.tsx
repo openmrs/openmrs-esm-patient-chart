@@ -1,38 +1,26 @@
-import React from "react";
-import { newModalItem } from "../visit/visit-dialog.resource";
-import {
-  EndVisitConfirmation,
-  StartVisitConfirmation,
-} from "../visit/visit-button.component";
+import React from 'react';
+import { newModalItem } from '../visit/visit-dialog.resource';
+import { EndVisitConfirmation, StartVisitConfirmation } from '../visit/visit-button.component';
 
 function createVisitDialog(patientUuid: string) {
   return (ev: CustomEvent) => {
     const { type, state = {} } = ev.detail;
 
     switch (type) {
-      case "start":
+      case 'start':
         return newModalItem(state);
-      case "prompt":
+      case 'prompt':
         return newModalItem({
-          component: (
-            <StartVisitConfirmation
-              patientUuid={patientUuid}
-              newModalItem={newModalItem}
-            />
-          ),
-          name: "Prompt start Visit",
+          component: <StartVisitConfirmation patientUuid={patientUuid} newModalItem={newModalItem} />,
+          name: 'Prompt start Visit',
           props: { closeComponent: () => state.onPromptClosed?.() },
         });
-      case "end":
+      case 'end':
         return newModalItem({
           component: (
-            <EndVisitConfirmation
-              patientUuid={patientUuid}
-              visitData={state.visitData}
-              newModalItem={newModalItem}
-            />
+            <EndVisitConfirmation patientUuid={patientUuid} visitData={state.visitData} newModalItem={newModalItem} />
           ),
-          name: "Prompt end Visit",
+          name: 'Prompt end Visit',
           props: { closeComponent: () => state.onPromptClosed?.() },
         });
     }
@@ -42,7 +30,7 @@ function createVisitDialog(patientUuid: string) {
 export function useVisitDialog(patientUuid: string) {
   React.useEffect(() => {
     const handler = createVisitDialog(patientUuid);
-    window.addEventListener("visit-dialog", handler);
-    return () => window.removeEventListener("visit-dialog", handler);
+    window.addEventListener('visit-dialog', handler);
+    return () => window.removeEventListener('visit-dialog', handler);
   }, [patientUuid]);
 }

@@ -1,4 +1,4 @@
-import chunk from "lodash-es/chunk";
+import chunk from 'lodash-es/chunk';
 
 /**
  * Paginates the specified array into a set of pages and returns the page with the specified page number.
@@ -7,11 +7,7 @@ import chunk from "lodash-es/chunk";
  *                   The first page has the number 1.
  * @param itemsPerPage The number of items per page.
  */
-export function paginate<T>(
-  items: Array<T>,
-  pageNumber: number,
-  itemsPerPage: number
-): [Array<T>, Array<Array<T>>] {
+export function paginate<T>(items: Array<T>, pageNumber: number, itemsPerPage: number): [Array<T>, Array<Array<T>>] {
   const allPages = chunk(items, itemsPerPage);
   const page = allPages[pageNumber - 1] ?? [];
   return [page, allPages];

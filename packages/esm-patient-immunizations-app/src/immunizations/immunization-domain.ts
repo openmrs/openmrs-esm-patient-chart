@@ -16,8 +16,8 @@ export type Reference = {
 };
 
 export type FHIRImmunizationResource = {
-  resourceType: "Immunization";
-  status: "completed";
+  resourceType: 'Immunization';
+  status: 'completed';
   id: string;
   vaccineCode: { coding: Array<Code> };
   patient: Reference;
@@ -32,7 +32,7 @@ export type FHIRImmunizationResource = {
     {
       doseNumberPositiveInt: number;
       series?: string;
-    }
+    },
   ];
 };
 
@@ -42,7 +42,7 @@ export type FHIRImmunizationBundleEntry = {
 };
 
 export type FHIRImmunizationBundle = {
-  resourceType: "Bundle";
+  resourceType: 'Bundle';
   entry: Array<FHIRImmunizationBundleEntry>;
 };
 

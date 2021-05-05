@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
-import { createErrorHandler } from "@openmrs/esm-framework";
-import { fetchPatientOrders } from "../api/api";
-import { Order } from "../types/order";
+import { useEffect, useState } from 'react';
+import { createErrorHandler } from '@openmrs/esm-framework';
+import { fetchPatientOrders } from '../api/api';
+import { Order } from '../types/order';
 
 /**
  * Fetches the orders belonging of a patient and optional provides a way to trigger a re-fetch of
@@ -11,19 +11,13 @@ import { Order } from "../types/order";
  */
 export function usePatientOrders(
   patientUuid: string,
-  status: "ACTIVE" | "any"
-): [
-  Array<Order> | null,
-  (abortController?: AbortController) => Promise<unknown>
-] {
+  status: 'ACTIVE' | 'any',
+): [Array<Order> | null, (abortController?: AbortController) => Promise<unknown>] {
   const [orders, setOrders] = useState<Array<Order>>(null);
   const fetchOrders = (abortController?: AbortController) => {
-    return fetchPatientOrders(patientUuid, status, abortController).then(
-      (orders) => {
-        setOrders(orders);
-      },
-      createErrorHandler
-    );
+    return fetchPatientOrders(patientUuid, status, abortController).then((orders) => {
+      setOrders(orders);
+    }, createErrorHandler);
   };
 
   useEffect(() => {

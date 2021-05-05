@@ -1,13 +1,13 @@
-import React, { useCallback, useEffect, useState } from "react";
-import CameraFrame from "./camera-frame.component";
-import ImagePreview from "./image-preview.component";
-import styles from "./camera-upload.css";
-import Camera from "react-html5-camera-photo";
-import { createAttachment } from "./attachments.resource";
-import { useTranslation } from "react-i18next";
-import { Attachment } from "./attachments-overview.component";
-import "react-html5-camera-photo/build/css/index.css";
-import "./styles.css";
+import React, { useCallback, useEffect, useState } from 'react';
+import CameraFrame from './camera-frame.component';
+import ImagePreview from './image-preview.component';
+import styles from './camera-upload.css';
+import Camera from 'react-html5-camera-photo';
+import { createAttachment } from './attachments.resource';
+import { useTranslation } from 'react-i18next';
+import { Attachment } from './attachments-overview.component';
+import 'react-html5-camera-photo/build/css/index.css';
+import './styles.css';
 
 export interface CameraUploadProps {
   openCameraOnRender?: boolean;
@@ -16,11 +16,7 @@ export interface CameraUploadProps {
   patientUuid: string;
   closeCamera?(): void;
   onTakePhoto?(dataUri: string): void;
-  delegateSaveImage?(
-    dataUri: string,
-    selectedFile: File,
-    caption: string
-  ): void;
+  delegateSaveImage?(dataUri: string, selectedFile: File, caption: string): void;
   selectedFile?: File;
   onNewAttachment?(att: Attachment): void;
 }
@@ -36,7 +32,7 @@ const CameraUpload: React.FC<CameraUploadProps> = ({
   collectCaption = true,
 }) => {
   const [cameraIsOpen, setCameraIsOpen] = useState(openCameraOnRender);
-  const [dataUri, setDataUri] = useState("");
+  const [dataUri, setDataUri] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
   const { t } = useTranslation();
 
@@ -45,7 +41,7 @@ const CameraUpload: React.FC<CameraUploadProps> = ({
   }, []);
 
   const clearCamera = useCallback(() => {
-    setDataUri("");
+    setDataUri('');
     setSelectedFile(null);
   }, []);
 
@@ -60,19 +56,13 @@ const CameraUpload: React.FC<CameraUploadProps> = ({
       setDataUri(dataUri);
       onTakePhoto?.(dataUri);
     },
-    [onTakePhoto]
+    [onTakePhoto],
   );
 
   const handleSaveImage = useCallback(
     (dataUri: string, caption: string) => {
       const abortController = new AbortController();
-      createAttachment(
-        patientUuid,
-        null,
-        caption,
-        abortController,
-        dataUri
-      ).then((res) => {
+      createAttachment(patientUuid, null, caption, abortController, dataUri).then((res) => {
         onNewAttachment?.({
           id: `${res.data.uuid}`,
           src: `${window.openmrsBase}/ws/rest/v1/attachment/${res.data.uuid}/bytes`,
@@ -84,7 +74,7 @@ const CameraUpload: React.FC<CameraUploadProps> = ({
         });
       });
     },
-    [patientUuid, onNewAttachment]
+    [patientUuid, onNewAttachment],
   );
 
   const willSaveImage = useCallback(
@@ -97,7 +87,7 @@ const CameraUpload: React.FC<CameraUploadProps> = ({
       }
       clearCamera();
     },
-    [clearCamera, delegateSaveImage, handleSaveImage]
+    [clearCamera, delegateSaveImage, handleSaveImage],
   );
 
   useEffect(() => {
@@ -108,15 +98,14 @@ const CameraUpload: React.FC<CameraUploadProps> = ({
     <div className={styles.cameraSection}>
       {!shouldNotRenderButton && (
         <button className="cameraButton" onClick={openCamera}>
-          {t("camera", "Camera")}
+          {t('camera', 'Camera')}
         </button>
       )}
       {cameraIsOpen && (
         <CameraFrame
           onCloseCamera={handleCloseCamera}
           setSelectedFile={setSelectedFile}
-          inPreview={dataUri || selectedFile}
-        >
+          inPreview={dataUri || selectedFile}>
           {dataUri || selectedFile ? (
             <ImagePreview
               dataUri={dataUri}

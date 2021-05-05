@@ -1,13 +1,13 @@
-import React from "react";
-import dayjs from "dayjs";
-import RadioButton from "carbon-components-react/es/components/RadioButton";
-import RadioButtonGroup from "carbon-components-react/es/components/RadioButtonGroup";
-import styles from "./biometrics-chart.component.scss";
-import { LineChart } from "@carbon/charts-react";
-import { LineChartOptions } from "@carbon/charts/interfaces/charts";
-import { ScaleTypes } from "@carbon/charts/interfaces/enums";
-import { useConfig } from "@openmrs/esm-framework";
-import { PatientBiometrics } from "./biometrics-overview.component";
+import React from 'react';
+import dayjs from 'dayjs';
+import RadioButton from 'carbon-components-react/es/components/RadioButton';
+import RadioButtonGroup from 'carbon-components-react/es/components/RadioButtonGroup';
+import styles from './biometrics-chart.component.scss';
+import { LineChart } from '@carbon/charts-react';
+import { LineChartOptions } from '@carbon/charts/interfaces/charts';
+import { ScaleTypes } from '@carbon/charts/interfaces/enums';
+import { useConfig } from '@openmrs/esm-framework';
+import { PatientBiometrics } from './biometrics-overview.component';
 
 interface BiometricsChartProps {
   patientBiometrics: Array<PatientBiometrics>;
@@ -17,25 +17,19 @@ interface BiometricsChartProps {
 interface BiometricChartData {
   title: string;
   value: number | string;
-  groupName: "weight" | "height" | "bmi" | string;
+  groupName: 'weight' | 'height' | 'bmi' | string;
 }
 
-const chartColors = { weight: "#6929c4", height: "#6929c4", bmi: "#6929c4" };
+const chartColors = { weight: '#6929c4', height: '#6929c4', bmi: '#6929c4' };
 
-const BiometricsChart: React.FC<BiometricsChartProps> = ({
-  patientBiometrics,
-  conceptsUnits,
-}) => {
+const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, conceptsUnits }) => {
   const config = useConfig();
   const { bmiUnit } = config.biometrics;
   const [, , , heightUnit, weightUnit] = conceptsUnits;
-  const [
-    selectedBiometrics,
-    setSelectedBiometrics,
-  ] = React.useState<BiometricChartData>({
+  const [selectedBiometrics, setSelectedBiometrics] = React.useState<BiometricChartData>({
     title: `Weight (${weightUnit})`,
-    value: "weight",
-    groupName: "weight",
+    value: 'weight',
+    groupName: 'weight',
   });
 
   const chartData = React.useMemo(
@@ -44,24 +38,24 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({
         return biometric[selectedBiometrics.value]
           ? {
               group: selectedBiometrics.groupName,
-              key: dayjs(biometric.date).format("DD-MMM"),
+              key: dayjs(biometric.date).format('DD-MMM'),
               value: biometric[selectedBiometrics.value],
             }
           : {};
       }),
-    [patientBiometrics, selectedBiometrics]
+    [patientBiometrics, selectedBiometrics],
   );
 
   const chartOptions: LineChartOptions = React.useMemo(() => {
     return {
       axes: {
         bottom: {
-          title: "Date",
-          mapsTo: "key",
+          title: 'Date',
+          mapsTo: 'key',
           scaleType: ScaleTypes.LABELS,
         },
         left: {
-          mapsTo: "value",
+          mapsTo: 'value',
           title: selectedBiometrics.title,
           scaleType: ScaleTypes.LINEAR,
           includeZero: false,
@@ -78,10 +72,7 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({
   return (
     <div className={styles.biometricChartContainer}>
       <div className={styles.biometricSignsArea}>
-        <label
-          className={styles.biometricSign}
-          htmlFor="biometrics-chart-radio-group"
-        >
+        <label className={styles.biometricSign} htmlFor="biometrics-chart-radio-group">
           Biometric Displayed
         </label>
         <RadioButtonGroup
@@ -89,12 +80,11 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({
           name="biometrics-chart-radio-group"
           valueSelected="weight"
           orientation="vertical"
-          labelPosition="right"
-        >
+          labelPosition="right">
           {[
-            { id: "weight", label: `Weight (${weightUnit})` },
-            { id: "height", label: `Height (${heightUnit})` },
-            { id: "bmi", label: `BMI (${bmiUnit})` },
+            { id: 'weight', label: `Weight (${weightUnit})` },
+            { id: 'height', label: `Height (${heightUnit})` },
+            { id: 'bmi', label: `BMI (${bmiUnit})` },
           ].map(({ id, label }) => (
             <RadioButton
               id={id}

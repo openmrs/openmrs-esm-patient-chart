@@ -1,2 +1,1 @@
-export const patientVitalsBiometricsFormWorkspace =
-  "patient-vitals-biometrics-form-workspace";
+export const patientVitalsBiometricsFormWorkspace = 'patient-vitals-biometrics-form-workspace';

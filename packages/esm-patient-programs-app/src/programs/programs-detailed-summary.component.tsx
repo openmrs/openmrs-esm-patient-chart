@@ -1,25 +1,19 @@
-import React, { useEffect, useState } from "react";
-import dayjs from "dayjs";
-import ProgramsForm from "./programs-form.component";
-import styles from "./programs-detailed-summary.css";
-import {
-  EmptyState,
-  SummaryCard,
-  openWorkspaceTab,
-} from "@openmrs/esm-patient-common-lib";
-import { useTranslation, Trans } from "react-i18next";
-import { RouteComponentProps, Link } from "react-router-dom";
-import { createErrorHandler } from "@openmrs/esm-framework";
-import { fetchEnrolledPrograms } from "./programs.resource";
-import { useProgramsContext } from "./programs.context";
-import { PatientProgram } from "../types";
+import React, { useEffect, useState } from 'react';
+import dayjs from 'dayjs';
+import ProgramsForm from './programs-form.component';
+import styles from './programs-detailed-summary.css';
+import { EmptyState, SummaryCard, openWorkspaceTab } from '@openmrs/esm-patient-common-lib';
+import { useTranslation, Trans } from 'react-i18next';
+import { RouteComponentProps, Link } from 'react-router-dom';
+import { createErrorHandler } from '@openmrs/esm-framework';
+import { fetchEnrolledPrograms } from './programs.resource';
+import { useProgramsContext } from './programs.context';
+import { PatientProgram } from '../types';
 
 interface ProgramsDetailedSummaryProps extends RouteComponentProps<{}> {}
 
 const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = () => {
-  const [enrolledPrograms, setEnrolledPrograms] = useState<
-    Array<PatientProgram>
-  >([]);
+  const [enrolledPrograms, setEnrolledPrograms] = useState<Array<PatientProgram>>([]);
   const { patientUuid } = useProgramsContext();
   const { t } = useTranslation();
 
@@ -27,7 +21,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = () => {
     if (patientUuid) {
       const subscription = fetchEnrolledPrograms(patientUuid).subscribe(
         (enrolledPrograms) => setEnrolledPrograms(enrolledPrograms),
-        createErrorHandler()
+        createErrorHandler(),
       );
       return () => subscription.unsubscribe();
     }
@@ -38,22 +32,17 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = () => {
       {enrolledPrograms?.length ? (
         <div className={styles.programsSummary}>
           <SummaryCard
-            name={t("carePrograms", "Care Programs")}
+            name={t('carePrograms', 'Care Programs')}
             styles={{
-              width: "100%",
+              width: '100%',
             }}
             addComponent
             showComponent={() =>
-              openWorkspaceTab(
-                ProgramsForm,
-                `${t("programsForm", "Programs form")}`,
-                {
-                  setEnrolledPrograms: setEnrolledPrograms,
-                  enrolledPrograms: enrolledPrograms,
-                }
-              )
-            }
-          >
+              openWorkspaceTab(ProgramsForm, `${t('programsForm', 'Programs form')}`, {
+                setEnrolledPrograms: setEnrolledPrograms,
+                enrolledPrograms: enrolledPrograms,
+              })
+            }>
             <table className={`omrs-type-body-regular ${styles.programTable}`}>
               <thead>
                 <tr>
@@ -73,24 +62,14 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = () => {
                 {enrolledPrograms?.map((program) => {
                   return (
                     <React.Fragment key={program.uuid}>
-                      <tr
-                        className={`${
-                          program.dateCompleted
-                            ? `${styles.inactive}`
-                            : `${styles.active}`
-                        }`}
-                      >
+                      <tr className={`${program.dateCompleted ? `${styles.inactive}` : `${styles.active}`}`}>
                         <td className="omrs-medium">{program.display}</td>
-                        <td>
-                          {dayjs(program.dateEnrolled).format("MMM-YYYY")}
-                        </td>
+                        <td>{dayjs(program.dateEnrolled).format('MMM-YYYY')}</td>
                         <td>
                           {program.dateCompleted ? (
                             <span className={styles.completionDate}>
-                              <Trans i18nKey="completedOn">Completed on</Trans>{" "}
-                              {dayjs(program.dateCompleted).format(
-                                "DD-MMM-YYYY"
-                              )}
+                              <Trans i18nKey="completedOn">Completed on</Trans>{' '}
+                              {dayjs(program.dateCompleted).format('DD-MMM-YYYY')}
                             </span>
                           ) : (
                             <Trans i18nKey="active">Active</Trans>
@@ -99,10 +78,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = () => {
                         <td>
                           {
                             <Link to={`/${program.uuid}`}>
-                              <svg
-                                className="omrs-icon"
-                                fill="var(--omrs-color-ink-low-contrast)"
-                              >
+                              <svg className="omrs-icon" fill="var(--omrs-color-ink-low-contrast)">
                                 <use xlinkHref="#omrs-icon-chevron-right" />
                               </svg>
                             </Link>
@@ -118,17 +94,13 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = () => {
         </div>
       ) : (
         <EmptyState
-          displayText={t("programEnrollments", "program enrollments")}
-          headerTitle={t("carePrograms", "Care Programs")}
+          displayText={t('programEnrollments', 'program enrollments')}
+          headerTitle={t('carePrograms', 'Care Programs')}
           launchForm={() =>
-            openWorkspaceTab(
-              ProgramsForm,
-              `${t("programsForm", "Programs form")}`,
-              {
-                setEnrolledPrograms: setEnrolledPrograms,
-                enrolledPrograms: enrolledPrograms,
-              }
-            )
+            openWorkspaceTab(ProgramsForm, `${t('programsForm', 'Programs form')}`, {
+              setEnrolledPrograms: setEnrolledPrograms,
+              enrolledPrograms: enrolledPrograms,
+            })
           }
         />
       )}

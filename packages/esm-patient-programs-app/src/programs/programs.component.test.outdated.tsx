@@ -1,18 +1,16 @@
-import React from "react";
-import { render, screen } from "@testing-library/react";
-import { BrowserRouter } from "react-router-dom";
-import Programs from "./programs.component";
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import { BrowserRouter } from 'react-router-dom';
+import Programs from './programs.component';
 
-describe("<ProgramsComponent />", () => {
-  it("renders without dying", () => {
+describe('<ProgramsComponent />', () => {
+  it('renders without dying', () => {
     render(
       <BrowserRouter>
         <Programs />
-      </BrowserRouter>
+      </BrowserRouter>,
     );
 
-    expect(
-      screen.getByRole("heading", { name: /Care Programs/i })
-    ).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Care Programs/i })).toBeInTheDocument();
   });
 });

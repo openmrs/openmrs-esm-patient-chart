@@ -1,7 +1,7 @@
-import React from "react";
-import { useRouteMatch } from "react-router-dom";
-import { ExtensionSlot } from "@openmrs/esm-framework";
-import { basePath } from "../constants";
+import React from 'react';
+import { useRouteMatch } from 'react-router-dom';
+import { ExtensionSlot } from '@openmrs/esm-framework';
+import { basePath } from '../constants';
 
 export interface CustomViewProps {
   name: string;
@@ -10,11 +10,7 @@ export interface CustomViewProps {
   patientUuid: string;
 }
 
-export default function CustomView({
-  slot,
-  patient,
-  patientUuid,
-}: CustomViewProps) {
+export default function CustomView({ slot, patient, patientUuid }: CustomViewProps) {
   const { url } = useRouteMatch(basePath);
 
   const state = React.useMemo(
@@ -23,7 +19,7 @@ export default function CustomView({
       patient,
       patientUuid,
     }),
-    [url, patientUuid, patient]
+    [url, patientUuid, patient],
   );
 
   return <ExtensionSlot key={slot} state={state} extensionSlotName={slot} />;

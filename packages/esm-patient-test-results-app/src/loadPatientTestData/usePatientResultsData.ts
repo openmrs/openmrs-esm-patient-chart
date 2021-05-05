@@ -1,7 +1,7 @@
-import React from "react";
+import React from 'react';
 
-import loadPatientData from "./loadPatientData";
-import { PatientData } from "./types";
+import loadPatientData from './loadPatientData';
+import { PatientData } from './types';
 
 type LoadingState = {
   sortedObs: PatientData;
@@ -22,8 +22,7 @@ const usePatientResultsData = (patientUuid: string): LoadingState => {
       const [data, reloadedDataPromise] = loadPatientData(patientUuid);
       if (!!data) setState({ sortedObs: data, loaded: true, error: undefined });
       reloadedDataPromise.then((reloadedData) => {
-        if (reloadedData !== data && !unmounted)
-          setState({ sortedObs: reloadedData, loaded: true, error: undefined });
+        if (reloadedData !== data && !unmounted) setState({ sortedObs: reloadedData, loaded: true, error: undefined });
       });
     }
     return () => {

@@ -1,27 +1,25 @@
-import React from "react";
-import { useTranslation } from "react-i18next";
-import { useVisit } from "@openmrs/esm-framework";
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { useVisit } from '@openmrs/esm-framework';
 
 interface StopVisitOverflowMenuItemProps {
   patientUuid: string;
 }
 
-const StopVisitOverflowMenuItem: React.FC<StopVisitOverflowMenuItemProps> = ({
-  patientUuid,
-}) => {
+const StopVisitOverflowMenuItem: React.FC<StopVisitOverflowMenuItemProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const { currentVisit } = useVisit(patientUuid);
   const handleClick = React.useCallback(
     () =>
       window.dispatchEvent(
-        new CustomEvent("visit-dialog", {
+        new CustomEvent('visit-dialog', {
           detail: {
-            type: "end",
+            type: 'end',
             state: { visitData: currentVisit },
           },
-        })
+        }),
       ),
-    [currentVisit]
+    [currentVisit],
   );
 
   return (
@@ -30,16 +28,13 @@ const StopVisitOverflowMenuItem: React.FC<StopVisitOverflowMenuItemProps> = ({
         <button
           className="bx--overflow-menu-options__btn"
           role="menuitem"
-          title={t("endVisit", "End Visit")}
+          title={t('endVisit', 'End Visit')}
           data-floating-menu-primary-focus
           onClick={handleClick}
           style={{
-            maxWidth: "100vw",
-          }}
-        >
-          <span className="bx--overflow-menu-options__option-content">
-            {t("endVisit", "End Visit")}
-          </span>
+            maxWidth: '100vw',
+          }}>
+          <span className="bx--overflow-menu-options__option-content">{t('endVisit', 'End Visit')}</span>
         </button>
       </li>
     )

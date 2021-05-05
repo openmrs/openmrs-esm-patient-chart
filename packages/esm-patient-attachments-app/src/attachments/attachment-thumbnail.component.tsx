@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import styles from "./attachment-thumbnail.css";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
+import React, { useState } from 'react';
+import styles from './attachment-thumbnail.css';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faInfoCircle } from '@fortawesome/free-solid-svg-icons';
 
 export default function AttachmentThumbnail(props: AttachmentThumbnailProps) {
   const [editingCaption, setEditingCaption] = useState(false);
@@ -35,11 +35,11 @@ export default function AttachmentThumbnail(props: AttachmentThumbnailProps) {
     e.stopPropagation();
     setEditingCaption(false);
     const data = new FormData();
-    data.append("comment", caption);
+    data.append('comment', caption);
     fetch(`/openmrs/ws/rest/v1/attachment/${props.item.id}`, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(data),
     });
@@ -52,12 +52,7 @@ export default function AttachmentThumbnail(props: AttachmentThumbnailProps) {
 
   return (
     <div className={styles.thumbnail}>
-      <div
-        className={styles.infoIcon}
-        onClick={showInfo}
-        role="button"
-        tabIndex={0}
-      >
+      <div className={styles.infoIcon} onClick={showInfo} role="button" tabIndex={0}>
         <FontAwesomeIcon icon={faInfoCircle} />
         <span className={styles.infoText}>{props.item.dateTime}</span>
       </div>
@@ -65,11 +60,7 @@ export default function AttachmentThumbnail(props: AttachmentThumbnailProps) {
         {editingCaption ? (
           <div onClick={handleClick} role="button" tabIndex={0}>
             <form>
-              <input
-                type="text"
-                defaultValue={caption}
-                onChange={updateCaption}
-              />
+              <input type="text" defaultValue={caption} onChange={updateCaption} />
               <div className={styles.actionButtons}>
                 <span onClick={cancelEdit} role="button" tabIndex={0}>
                   x
@@ -82,12 +73,7 @@ export default function AttachmentThumbnail(props: AttachmentThumbnailProps) {
           </div>
         ) : (
           <div>
-            <span
-              onClick={showEditCaptionForm}
-              role="button"
-              tabIndex={0}
-              className={styles.captionText}
-            >
+            <span onClick={showEditCaptionForm} role="button" tabIndex={0} className={styles.captionText}>
               {caption}
             </span>
           </div>
@@ -110,16 +96,11 @@ function PdfThumbnail(props: ImageProps) {
   function handleClick(e: React.SyntheticEvent) {
     e.preventDefault();
     e.stopPropagation();
-    window.open(props.src, "_blank");
+    window.open(props.src, '_blank');
   }
 
   return (
-    <div
-      className={styles.pdfThumbnail}
-      onClick={handleClick}
-      role="button"
-      tabIndex={0}
-    >
+    <div className={styles.pdfThumbnail} onClick={handleClick} role="button" tabIndex={0}>
       <img src={props.src} alt={props.title} style={props.style} />
     </div>
   );
@@ -129,19 +110,14 @@ function OtherThumbnail(props: ImageProps) {
   function handleClick(e: React.SyntheticEvent) {
     e.preventDefault();
     e.stopPropagation();
-    const anchor = document.createElement("a");
-    anchor.setAttribute("href", props.src);
-    anchor.setAttribute("download", "download");
+    const anchor = document.createElement('a');
+    anchor.setAttribute('href', props.src);
+    anchor.setAttribute('download', 'download');
     anchor.click();
   }
 
   return (
-    <div
-      className={styles.otherThumbnail}
-      onClick={handleClick}
-      role="button"
-      tabIndex={0}
-    >
+    <div className={styles.otherThumbnail} onClick={handleClick} role="button" tabIndex={0}>
       <img src={props.src} alt={props.title} style={props.style} />
     </div>
   );
@@ -156,9 +132,9 @@ function Thumbnail(props: AttachmentThumbnailProps) {
     style: props.imageProps.style,
   };
 
-  if (contentType === "IMAGE") {
+  if (contentType === 'IMAGE') {
     return <ImageThumbnail {...imageProps} />;
-  } else if (contentType === "PDF") {
+  } else if (contentType === 'PDF') {
     return <PdfThumbnail {...imageProps} />;
   } else {
     return <OtherThumbnail {...imageProps} />;

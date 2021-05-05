@@ -1,32 +1,28 @@
-import { openmrsObservableFetch, fhirBaseUrl } from "@openmrs/esm-framework";
-import { map } from "rxjs/operators";
-import { FHIRCondition } from "../types";
+import { openmrsObservableFetch, fhirBaseUrl } from '@openmrs/esm-framework';
+import { map } from 'rxjs/operators';
+import { FHIRCondition } from '../types';
 
 export function performPatientConditionsSearch(patientIdentifier: string) {
   return openmrsObservableFetch<Array<Condition>>(
-    `${fhirBaseUrl}/Condition?patient.identifier=${patientIdentifier}`
+    `${fhirBaseUrl}/Condition?patient.identifier=${patientIdentifier}`,
   ).pipe(
-    map(({ data }) => data["entry"]),
+    map(({ data }) => data['entry']),
     map((entries) => entries?.map((entry) => entry.resource) ?? []),
     map((data) => formatConditions(data)),
-    map((data) =>
-      data.sort((a, b) => (b?.onsetDateTime > a?.onsetDateTime ? 1 : -1))
-    )
+    map((data) => data.sort((a, b) => (b?.onsetDateTime > a?.onsetDateTime ? 1 : -1))),
   );
 }
 
 export function searchConditionConcepts(searchTerm: string) {
   return openmrsObservableFetch<Array<CodedCondition>>(
-    `/ws/rest/v1/conceptsearch?conceptClasses=8d4918b0-c2cc-11de-8d13-0010c6dffd0f&q=${searchTerm}`
-  ).pipe(map(({ data }) => data["results"]));
+    `/ws/rest/v1/conceptsearch?conceptClasses=8d4918b0-c2cc-11de-8d13-0010c6dffd0f&q=${searchTerm}`,
+  ).pipe(map(({ data }) => data['results']));
 }
 
 export function getConditionByUuid(conditionUuid: string) {
-  return openmrsObservableFetch(
-    `${fhirBaseUrl}/Condition/${conditionUuid}`
-  ).pipe(
+  return openmrsObservableFetch(`${fhirBaseUrl}/Condition/${conditionUuid}`).pipe(
     map(({ data }) => data),
-    map((data: FHIRCondition) => mapConditionProperties(data))
+    map((data: FHIRCondition) => mapConditionProperties(data)),
   );
 }
 
@@ -48,20 +44,16 @@ function mapConditionProperties(condition: FHIRCondition): Condition {
 export function createPatientCondition(payload, abortController) {
   return openmrsObservableFetch(`${fhirBaseUrl}/Condition`, {
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
-    method: "POST",
+    method: 'POST',
     body: payload,
     signal: abortController,
   });
 }
 
-export function updatePatientCondition(
-  patientCondition,
-  patientUuid,
-  abortController
-) {
-  return Promise.resolve({ status: 200, body: "Ok" });
+export function updatePatientCondition(patientCondition, patientUuid, abortController) {
+  return Promise.resolve({ status: 200, body: 'Ok' });
 }
 
 export type Condition = {

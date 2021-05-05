@@ -1,6 +1,6 @@
-import React from "react";
-import { getNewWorkspaceItem, WorkspaceItem } from "@openmrs/esm-framework";
-import { Panel, Tabs } from "./tabs.component";
+import React from 'react';
+import { getNewWorkspaceItem, WorkspaceItem } from '@openmrs/esm-framework';
+import { Panel, Tabs } from './tabs.component';
 
 interface WorkspaceProps {
   patientUuid: string;
@@ -42,9 +42,7 @@ const Workspace: React.FC<WorkspaceProps> = (props) => {
     let userConfirmed = false;
 
     if (tab.inProgress) {
-      userConfirmed = confirm(
-        "There is ongoing work, are you sure you want to close this tab?"
-      );
+      userConfirmed = confirm('There is ongoing work, are you sure you want to close this tab?');
     }
 
     if (userConfirmed || !tab.inProgress) {
@@ -77,10 +75,7 @@ const Workspace: React.FC<WorkspaceProps> = (props) => {
     }
   }
 
-  function getSelectedTabAfterRemove(
-    removedItemIndex: number,
-    currentTab: number
-  ) {
+  function getSelectedTabAfterRemove(removedItemIndex: number, currentTab: number) {
     if (removedItemIndex === currentTab) {
       return removedItemIndex > 0 ? removedItemIndex - 1 : null;
     } else if (removedItemIndex < currentTab) {
@@ -93,18 +88,10 @@ const Workspace: React.FC<WorkspaceProps> = (props) => {
   return (
     <>
       {openTabs.length && (
-        <Tabs
-          selected={selectedTab}
-          setSelected={setSelectedTab}
-          removeTab={removeTab}
-        >
+        <Tabs selected={selectedTab} setSelected={setSelectedTab} removeTab={removeTab}>
           {openTabs.map((tab, i) => {
             return (
-              <Panel
-                key={i}
-                title={tab.name}
-                style={selectedTab === i ? {} : { display: "none" }}
-              >
+              <Panel key={i} title={tab.name} style={selectedTab === i ? {} : { display: 'none' }}>
                 <tab.component
                   {...tab.props}
                   patientUuid={props.patientUuid}

@@ -1,3 +1,3 @@
-import { setPublicPath } from "systemjs-webpack-interop";
+import { setPublicPath } from 'systemjs-webpack-interop';
 
-setPublicPath("@openmrs/esm-patient-programs-app");
+setPublicPath('@openmrs/esm-patient-programs-app');

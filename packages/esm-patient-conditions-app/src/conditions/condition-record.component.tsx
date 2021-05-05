@@ -1,21 +1,16 @@
-import React, { useEffect, useState } from "react";
-import dayjs from "dayjs";
-import capitalize from "lodash-es/capitalize";
-import ConditionsForm from "./conditions-form.component";
-import styles from "./condition-record.css";
-import {
-  SummaryCard,
-  RecordDetails,
-  openWorkspaceTab,
-} from "@openmrs/esm-patient-common-lib";
-import { RouteComponentProps } from "react-router-dom";
-import { useTranslation, Trans } from "react-i18next";
-import { createErrorHandler } from "@openmrs/esm-framework";
-import { getConditionByUuid } from "./conditions.resource";
-import { useConditionsContext } from "./conditions.context";
+import React, { useEffect, useState } from 'react';
+import dayjs from 'dayjs';
+import capitalize from 'lodash-es/capitalize';
+import ConditionsForm from './conditions-form.component';
+import styles from './condition-record.css';
+import { SummaryCard, RecordDetails, openWorkspaceTab } from '@openmrs/esm-patient-common-lib';
+import { RouteComponentProps } from 'react-router-dom';
+import { useTranslation, Trans } from 'react-i18next';
+import { createErrorHandler } from '@openmrs/esm-framework';
+import { getConditionByUuid } from './conditions.resource';
+import { useConditionsContext } from './conditions.context';
 
-interface ConditionRecordProps
-  extends RouteComponentProps<{ conditionUuid: string }> {}
+interface ConditionRecordProps extends RouteComponentProps<{ conditionUuid: string }> {}
 
 export default function ConditionRecord(props: ConditionRecordProps) {
   const [patientCondition, setPatientCondition] = useState(null);
@@ -27,7 +22,7 @@ export default function ConditionRecord(props: ConditionRecordProps) {
     if (patient) {
       const sub = getConditionByUuid(conditionUuid).subscribe(
         (condition) => setPatientCondition(condition),
-        createErrorHandler()
+        createErrorHandler(),
       );
       return () => sub.unsubscribe();
     }
@@ -38,23 +33,18 @@ export default function ConditionRecord(props: ConditionRecordProps) {
       {!!(patientCondition && Object.entries(patientCondition).length) && (
         <div className={styles.conditionContainer}>
           <SummaryCard
-            name={t("condition", "Condition")}
-            styles={{ width: "100%" }}
+            name={t('condition', 'Condition')}
+            styles={{ width: '100%' }}
             editComponent
             showComponent={() => {
-              openWorkspaceTab(
-                ConditionsForm,
-                `${t("editCondition", "Edit Condition")}`,
-                {
-                  conditionUuid: patientCondition?.id,
-                  conditionName: patientCondition?.display,
-                  clinicalStatus: patientCondition?.clinicalStatus,
-                  onsetDateTime: patientCondition?.onsetDateTime,
-                }
-              );
+              openWorkspaceTab(ConditionsForm, `${t('editCondition', 'Edit Condition')}`, {
+                conditionUuid: patientCondition?.id,
+                conditionName: patientCondition?.display,
+                clinicalStatus: patientCondition?.clinicalStatus,
+                onsetDateTime: patientCondition?.onsetDateTime,
+              });
             }}
-            link="/"
-          >
+            link="/">
             <div className={`omrs-type-body-regular ${styles.conditionCard}`}>
               <div>
                 <p className="omrs-type-title-3">{patientCondition.display}</p>
@@ -72,9 +62,7 @@ export default function ConditionRecord(props: ConditionRecordProps) {
                 </thead>
                 <tbody>
                   <tr>
-                    <td>
-                      {dayjs(patientCondition.onsetDateTime).format("MMM-YYYY")}
-                    </td>
+                    <td>{dayjs(patientCondition.onsetDateTime).format('MMM-YYYY')}</td>
                     <td>{capitalize(patientCondition.clinicalStatus)}</td>
                   </tr>
                 </tbody>
@@ -92,23 +80,17 @@ export default function ConditionRecord(props: ConditionRecordProps) {
                     <Trans i18nKey="lastUpdatedBy">Last updated by</Trans>
                   </th>
                   <th>
-                    <Trans i18nKey="lastUpdatedLocation">
-                      Last updated location
-                    </Trans>
+                    <Trans i18nKey="lastUpdatedLocation">Last updated location</Trans>
                   </th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   <td>
-                    {patientCondition?.lastUpdated
-                      ? dayjs(patientCondition?.lastUpdated).format(
-                          "DD-MMM-YYYY"
-                        )
-                      : "-"}
+                    {patientCondition?.lastUpdated ? dayjs(patientCondition?.lastUpdated).format('DD-MMM-YYYY') : '-'}
                   </td>
-                  <td>{patientCondition?.lastUpdatedBy ?? "-"}</td>
-                  <td>{patientCondition?.lastUpdatedLocation ?? "-"}</td>
+                  <td>{patientCondition?.lastUpdatedBy ?? '-'}</td>
+                  <td>{patientCondition?.lastUpdatedLocation ?? '-'}</td>
                 </tr>
               </tbody>
             </table>

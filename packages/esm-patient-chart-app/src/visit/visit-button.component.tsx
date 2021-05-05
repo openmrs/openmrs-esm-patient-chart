@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
-import dayjs from "dayjs";
-import isEmpty from "lodash-es/isEmpty";
-import VisitDashboard from "./visit-dashboard.component";
-import styles from "./visit-button.css";
-import { useTranslation } from "react-i18next";
+import React, { useEffect, useState } from 'react';
+import dayjs from 'dayjs';
+import isEmpty from 'lodash-es/isEmpty';
+import VisitDashboard from './visit-dashboard.component';
+import styles from './visit-button.css';
+import { useTranslation } from 'react-i18next';
 import {
   newWorkspaceItem,
   FetchResponse,
@@ -15,7 +15,7 @@ import {
   UpdateVisitPayload,
   getVisitsForPatient,
   Visit,
-} from "@openmrs/esm-framework";
+} from '@openmrs/esm-framework';
 
 export function openVisitDashboard(componentName: string) {
   newWorkspaceItem({
@@ -23,8 +23,7 @@ export function openVisitDashboard(componentName: string) {
     name: componentName,
     props: {},
     inProgress: false,
-    validations: (workspaceTabs) =>
-      workspaceTabs.findIndex((tab) => tab.component === VisitDashboard),
+    validations: (workspaceTabs) => workspaceTabs.findIndex((tab) => tab.component === VisitDashboard),
   });
 }
 
@@ -51,21 +50,17 @@ const VisitButton: React.FC<VisitProps> = ({ newModalItem, patientUuid }) => {
   useEffect(() => {
     if (patientUuid) {
       const abortController = new AbortController();
-      const sub = getVisitsForPatient(patientUuid, abortController).subscribe(
-        ({ data }) => {
-          const currentVisit = data.results.find(
-            (visit) =>
-              dayjs(visit.startDatetime).format("DD-MM-YYYY") ===
-              dayjs(new Date()).format("DD-MM-YYYY")
-          );
-          currentVisit &&
-            getStartedVisit.next({
-              mode: VisitMode.LOADING,
-              visitData: currentVisit,
-              status: VisitStatus.ONGOING,
-            });
-        }
-      );
+      const sub = getVisitsForPatient(patientUuid, abortController).subscribe(({ data }) => {
+        const currentVisit = data.results.find(
+          (visit) => dayjs(visit.startDatetime).format('DD-MM-YYYY') === dayjs(new Date()).format('DD-MM-YYYY'),
+        );
+        currentVisit &&
+          getStartedVisit.next({
+            mode: VisitMode.LOADING,
+            visitData: currentVisit,
+            status: VisitStatus.ONGOING,
+          });
+      });
       return () => sub && sub.unsubscribe();
     }
   }, [patientUuid]);
@@ -78,30 +73,22 @@ const VisitButton: React.FC<VisitProps> = ({ newModalItem, patientUuid }) => {
           className={styles.startVisitButton}
           data-testid="start-visit"
           onClick={() => {
-            openVisitDashboard(`${t("visitDashboard", "Visit Dashboard")}`);
+            openVisitDashboard(`${t('visitDashboard', 'Visit Dashboard')}`);
             setVisitStarted(true);
-          }}
-        >
-          {t("startVisit", "Start visit")}
+          }}>
+          {t('startVisit', 'Start visit')}
         </button>
       </div>
     );
   };
 
-  const EditVisitButton: React.FC<VisitProps> = ({
-    newModalItem,
-    patientUuid,
-  }) => {
+  const EditVisitButton: React.FC<VisitProps> = ({ newModalItem, patientUuid }) => {
     const { t } = useTranslation();
     return (
       selectedVisit && (
         <div className={styles.editContainer}>
           <span>{selectedVisit.visitData.visitType.display}</span>
-          <span>
-            {`(${dayjs(selectedVisit.visitData.startDatetime).format(
-              "YYYY-MM-DD"
-            )})`}
-          </span>
+          <span>{`(${dayjs(selectedVisit.visitData.startDatetime).format('YYYY-MM-DD')})`}</span>
           {isEmpty(selectedVisit.visitData.stopDatetime) && (
             <button
               className={styles.editVisitButton}
@@ -115,12 +102,11 @@ const VisitButton: React.FC<VisitProps> = ({ newModalItem, patientUuid }) => {
                       newModalItem={newModalItem}
                     />
                   ),
-                  name: "End Visit",
+                  name: 'End Visit',
                   props: null,
                 });
-              }}
-            >
-              {t("end", "End")}
+              }}>
+              {t('end', 'End')}
             </button>
           )}
           <svg
@@ -134,11 +120,10 @@ const VisitButton: React.FC<VisitProps> = ({ newModalItem, patientUuid }) => {
                     visitData={getStartedVisit.value.visitData}
                   />
                 ),
-                name: "Cancel Visit",
+                name: 'Cancel Visit',
                 props: null,
               });
-            }}
-          >
+            }}>
             <use xlinkHref="#omrs-icon-close"></use>
           </svg>
         </div>
@@ -151,10 +136,7 @@ const VisitButton: React.FC<VisitProps> = ({ newModalItem, patientUuid }) => {
       {isEmpty(selectedVisit) ? (
         <StartVisitButton />
       ) : (
-        <EditVisitButton
-          patientUuid={patientUuid}
-          newModalItem={newModalItem}
-        />
+        <EditVisitButton patientUuid={patientUuid} newModalItem={newModalItem} />
       )}
     </div>
   );
@@ -164,52 +146,37 @@ const hideModal = (newModalItem: NewModalItem) => {
   newModalItem({ component: null, name: null, props: null });
 };
 
-export const StartVisitConfirmation: React.FC<VisitProps> = ({
-  newModalItem,
-}) => {
+export const StartVisitConfirmation: React.FC<VisitProps> = ({ newModalItem }) => {
   const { t } = useTranslation();
   return (
     <div className={styles.visitPromptContainer}>
-      <h2>
-        {t(
-          "startVisitPrompt",
-          "No active visit is selected. Do you want to start a visit?"
-        )}
-      </h2>
+      <h2>{t('startVisitPrompt', 'No active visit is selected. Do you want to start a visit?')}</h2>
       <div className={styles.visitPromptButtonsContainer}>
         <button
           className={`omrs-btn omrs-outlined-action`}
           onClick={() => {
-            openVisitDashboard(`${t("visitDashboard", "Visit Dashboard")}`);
+            openVisitDashboard(`${t('visitDashboard', 'Visit Dashboard')}`);
             hideModal(newModalItem);
-          }}
-        >
-          {t("yes", "Yes")}
+          }}>
+          {t('yes', 'Yes')}
         </button>
-        <button
-          className={`omrs-btn omrs-outlined-neutral`}
-          onClick={() => hideModal(newModalItem)}
-        >
-          {t("no", "No")}
+        <button className={`omrs-btn omrs-outlined-neutral`} onClick={() => hideModal(newModalItem)}>
+          {t('no', 'No')}
         </button>
       </div>
     </div>
   );
 };
 
-export const CloseActiveVisitConfirmation: React.FC<EndVisitProps> = ({
-  visitData,
-  newModalItem,
-}) => {
+export const CloseActiveVisitConfirmation: React.FC<EndVisitProps> = ({ visitData, newModalItem }) => {
   const { t } = useTranslation();
   return (
     <div className={styles.visitPromptContainer}>
-      <h2>{t("endVisitPrompt", "Are you sure you want to end this visit?")}</h2>
+      <h2>{t('endVisitPrompt', 'Are you sure you want to end this visit?')}</h2>
       <p>
-        {t("visitType", "Visit type")}: {visitData.visitType.display}{" "}
-        {t("location", "Location")}: {visitData?.location?.display}{" "}
-        {t("startDate", "Start date")}:{" "}
-        {dayjs(visitData.startDatetime).format("DD-MMM-YYYY")}
+        {t('visitType', 'Visit type')}: {visitData.visitType.display} {t('location', 'Location')}:{' '}
+        {visitData?.location?.display} {t('startDate', 'Start date')}:{' '}
+        {dayjs(visitData.startDatetime).format('DD-MMM-YYYY')}
       </p>
       <div className={styles.visitPromptButtonsContainer}>
         <button
@@ -217,15 +184,11 @@ export const CloseActiveVisitConfirmation: React.FC<EndVisitProps> = ({
           onClick={() => {
             getStartedVisit.next(null);
             hideModal(newModalItem);
-          }}
-        >
-          {t("yes", "Yes")}
+          }}>
+          {t('yes', 'Yes')}
         </button>
-        <button
-          className={`omrs-btn omrs-outlined-neutral`}
-          onClick={() => hideModal(newModalItem)}
-        >
-          {t("no", "No")}
+        <button className={`omrs-btn omrs-outlined-neutral`} onClick={() => hideModal(newModalItem)}>
+          {t('no', 'No')}
         </button>
       </div>
     </div>
@@ -236,19 +199,15 @@ interface EndVisitProps extends VisitProps {
   visitData: Visit;
 }
 
-export const EndVisitConfirmation: React.FC<EndVisitProps> = ({
-  visitData,
-  newModalItem,
-}) => {
+export const EndVisitConfirmation: React.FC<EndVisitProps> = ({ visitData, newModalItem }) => {
   const { t } = useTranslation();
   return (
     <div className={styles.visitPromptContainer}>
-      <h2>{t("endVisitPrompt", "Are you sure you want to end this visit?")}</h2>
+      <h2>{t('endVisitPrompt', 'Are you sure you want to end this visit?')}</h2>
       <p>
-        {t("visitType", "Visit type")}: {visitData.visitType.display}{" "}
-        {t("location", "Location")}: {visitData?.location?.display}{" "}
-        {t("startDate", "Start date")}:{" "}
-        {dayjs(visitData.startDatetime).format("DD-MMM-YYYY")}
+        {t('visitType', 'Visit type')}: {visitData.visitType.display} {t('location', 'Location')}:{' '}
+        {visitData?.location?.display} {t('startDate', 'Start date')}:{' '}
+        {dayjs(visitData.startDatetime).format('DD-MMM-YYYY')}
       </p>
       <div className={styles.visitPromptButtonsContainer}>
         <button
@@ -256,15 +215,11 @@ export const EndVisitConfirmation: React.FC<EndVisitProps> = ({
           onClick={() => {
             visitUpdate(visitData);
             hideModal(newModalItem);
-          }}
-        >
-          {t("yes", "Yes")}
+          }}>
+          {t('yes', 'Yes')}
         </button>
-        <button
-          className={`omrs-btn omrs-outlined-neutral`}
-          onClick={() => hideModal(newModalItem)}
-        >
-          {t("no", "No")}
+        <button className={`omrs-btn omrs-outlined-neutral`} onClick={() => hideModal(newModalItem)}>
+          {t('no', 'No')}
         </button>
       </div>
     </div>
@@ -281,11 +236,9 @@ function visitUpdate(visitData: Visit) {
     stopDatetime: new Date(),
   };
 
-  const sub = updateVisit(visitData.uuid, payload, abortController).subscribe(
-    (response: FetchResponse) => {
-      response.status === 200 && getStartedVisit.next(null);
-    }
-  );
+  const sub = updateVisit(visitData.uuid, payload, abortController).subscribe((response: FetchResponse) => {
+    response.status === 200 && getStartedVisit.next(null);
+  });
 
   return () => sub && sub.unsubscribe();
 }

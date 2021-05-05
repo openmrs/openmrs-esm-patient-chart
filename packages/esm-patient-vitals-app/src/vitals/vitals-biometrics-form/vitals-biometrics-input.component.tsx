@@ -1,7 +1,7 @@
-import React, { Fragment } from "react";
-import TextArea from "carbon-components-react/es/components/TextArea";
-import TextInput from "carbon-components-react/es/components/TextInput";
-import styles from "./vitals-biometrics-input.component.scss";
+import React, { Fragment } from 'react';
+import TextArea from 'carbon-components-react/es/components/TextArea';
+import TextInput from 'carbon-components-react/es/components/TextInput';
+import styles from './vitals-biometrics-input.component.scss';
 
 interface VitalsBiometricInputProps {
   title: string;
@@ -9,7 +9,7 @@ interface VitalsBiometricInputProps {
   textFields: Array<{
     name: string;
     separator?: string;
-    type?: string | "text";
+    type?: string | 'text';
     value: number | string;
     className?: string;
   }>;
@@ -36,24 +36,21 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
     <div className={styles.inputContainer} style={{ width: textFieldWidth }}>
       <p className={styles.vitalsBiometricInputLabel01}>{title}</p>
       <div
-        className={`${styles.textInputContainer} ${
-          disabled && styles.disableInput
-        } ${!inputIsNormal && styles.danger}`}
-        style={{ ...textFieldStyles }}
-      >
+        className={`${styles.textInputContainer} ${disabled && styles.disableInput} ${!inputIsNormal && styles.danger}`}
+        style={{ ...textFieldStyles }}>
         <div className={styles.centerDiv}>
           {textFields.map((val) => {
-            return val.type === "text" ? (
+            return val.type === 'text' ? (
               <Fragment key={val.name}>
                 <TextInput
                   style={{ ...textFieldStyles }}
-                  className={`${styles.textInput} ${
-                    disabled && styles.disableInput
-                  } ${val.className} ${!inputIsNormal && styles.danger}`}
+                  className={`${styles.textInput} ${disabled && styles.disableInput} ${val.className} ${
+                    !inputIsNormal && styles.danger
+                  }`}
                   id={val.name}
                   name={val.name}
                   onChange={onInputChange}
-                  labelText={""}
+                  labelText={''}
                   value={val.value}
                   title={val.name}
                 />
@@ -66,7 +63,7 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
                 className={styles.textArea}
                 id={val.name}
                 name={val.name}
-                labelText={""}
+                labelText={''}
                 onChange={onInputChange}
                 rows={2}
                 placeholder={placeholder}

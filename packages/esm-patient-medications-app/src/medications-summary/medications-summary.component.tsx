@@ -1,30 +1,26 @@
-import React from "react";
-import DataTableSkeleton from "carbon-components-react/es/components/DataTableSkeleton";
-import FloatingOrderBasketButton from "./floating-order-basket-button.component";
-import styles from "./medications-summary.scss";
-import MedicationsDetailsTable from "../components/medications-details-table.component";
-import { useTranslation } from "react-i18next";
-import { usePatientOrders } from "../utils/use-current-patient-orders.hook";
+import React from 'react';
+import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
+import FloatingOrderBasketButton from './floating-order-basket-button.component';
+import styles from './medications-summary.scss';
+import MedicationsDetailsTable from '../components/medications-details-table.component';
+import { useTranslation } from 'react-i18next';
+import { usePatientOrders } from '../utils/use-current-patient-orders.hook';
 
 export interface MedicationsSummaryProps {
   patientUuid: string;
 }
 
-export default function MedicationsSummary({
-  patientUuid,
-}: MedicationsSummaryProps) {
+export default function MedicationsSummary({ patientUuid }: MedicationsSummaryProps) {
   const { t } = useTranslation();
-  const [activePatientOrders] = usePatientOrders(patientUuid, "ACTIVE");
-  const [pastPatientOrders] = usePatientOrders(patientUuid, "any");
+  const [activePatientOrders] = usePatientOrders(patientUuid, 'ACTIVE');
+  const [pastPatientOrders] = usePatientOrders(patientUuid, 'any');
 
   return (
     <>
-      <h1 className={styles.productiveHeading03}>
-        {t("medications", "Medications")}
-      </h1>
+      <h1 className={styles.productiveHeading03}>{t('medications', 'Medications')}</h1>
       {activePatientOrders ? (
         <MedicationsDetailsTable
-          title={t("activeMedications", "Active Medications")}
+          title={t('activeMedications', 'Active Medications')}
           medications={activePatientOrders}
           showDiscontinueButton={true}
           showModifyButton={true}
@@ -34,10 +30,10 @@ export default function MedicationsSummary({
       ) : (
         <DataTableSkeleton />
       )}
-      <div style={{ marginTop: "3rem" }}>
+      <div style={{ marginTop: '3rem' }}>
         {pastPatientOrders ? (
           <MedicationsDetailsTable
-            title={t("pastMedications", "Past Medications")}
+            title={t('pastMedications', 'Past Medications')}
             medications={pastPatientOrders}
             showDiscontinueButton={false}
             showModifyButton={false}

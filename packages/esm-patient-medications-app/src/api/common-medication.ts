@@ -1,4 +1,4 @@
-import commonMedications from "./common-medication.json";
+import commonMedications from './common-medication.json';
 
 export interface CommonMedication {
   name: string;
@@ -34,16 +34,10 @@ export interface CommonMedicationDosage {
   selected?: boolean;
 }
 
-export function getCommonMedicationByUuid(
-  uuid: string
-): CommonMedication | undefined {
+export function getCommonMedicationByUuid(uuid: string): CommonMedication | undefined {
   return commonMedications.filter((x) => x.uuid === uuid)[0];
 }
 
-export function getCommonMedicationByName(
-  name: string
-): CommonMedication | undefined {
-  return commonMedications.filter(
-    (x) => x.name.toLowerCase() === name.toLowerCase()
-  )[0];
+export function getCommonMedicationByName(name: string): CommonMedication | undefined {
+  return commonMedications.filter((x) => x.name.toLowerCase() === name.toLowerCase())[0];
 }

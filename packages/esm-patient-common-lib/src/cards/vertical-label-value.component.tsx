@@ -1,5 +1,5 @@
-import React from "react";
-import styles from "./vertical-label-value.css";
+import React from 'react';
+import styles from './vertical-label-value.css';
 
 export interface VerticalLabelValueProps {
   label: string;
@@ -9,9 +9,9 @@ export interface VerticalLabelValueProps {
 }
 
 export const VerticalLabelValue: React.FC<VerticalLabelValueProps> = ({
-  value = "\u2014",
+  value = '\u2014',
   label,
-  className = "",
+  className = '',
   valueStyles = {},
 }) => (
   <div className={styles.root}>

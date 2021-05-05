@@ -1,8 +1,8 @@
-import React from "react";
-import dayjs from "dayjs";
-import Button from "carbon-components-react/es/components/Button";
-import DataTableSkeleton from "carbon-components-react/es/components/DataTableSkeleton";
-import Pagination from "carbon-components-react/es/components/Pagination";
+import React from 'react';
+import dayjs from 'dayjs';
+import Button from 'carbon-components-react/es/components/Button';
+import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
+import Pagination from 'carbon-components-react/es/components/Pagination';
 import DataTable, {
   Table,
   TableCell,
@@ -11,16 +11,13 @@ import DataTable, {
   TableHead,
   TableHeader,
   TableRow,
-} from "carbon-components-react/es/components/DataTable";
-import Add16 from "@carbon/icons-react/es/add/16";
-import styles from "./conditions-overview.scss";
-import { EmptyState, ErrorState } from "@openmrs/esm-patient-common-lib";
-import { useTranslation } from "react-i18next";
-import {
-  Condition,
-  performPatientConditionsSearch,
-} from "./conditions.resource";
-import { attach } from "@openmrs/esm-framework";
+} from 'carbon-components-react/es/components/DataTable';
+import Add16 from '@carbon/icons-react/es/add/16';
+import styles from './conditions-overview.scss';
+import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
+import { useTranslation } from 'react-i18next';
+import { Condition, performPatientConditionsSearch } from './conditions.resource';
+import { attach } from '@openmrs/esm-framework';
 
 interface ConditionsOverviewProps {
   basePath: string;
@@ -35,17 +32,15 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient }) => {
   const [firstRowIndex, setFirstRowIndex] = React.useState(0);
   const [currentPageSize, setCurrentPageSize] = React.useState(5);
 
-  const displayText = t("conditions", "Conditions");
-  const headerTitle = t("conditions", "Conditions");
-  const previousPage = t("previousPage", "Previous page");
-  const nextPage = t("nextPage", "Next Page");
-  const itemPerPage = t("itemPerPage", "Item per page");
+  const displayText = t('conditions', 'Conditions');
+  const headerTitle = t('conditions', 'Conditions');
+  const previousPage = t('previousPage', 'Previous page');
+  const nextPage = t('nextPage', 'Next Page');
+  const itemPerPage = t('itemPerPage', 'Item per page');
 
   React.useEffect(() => {
     if (patient) {
-      const sub = performPatientConditionsSearch(
-        patient.identifier[0].value
-      ).subscribe((conditions) => {
+      const sub = performPatientConditionsSearch(patient.identifier[0].value).subscribe((conditions) => {
         setConditions(conditions);
       }, setError);
 
@@ -54,28 +49,26 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient }) => {
   }, [patient]);
 
   const launchConditionsForm = React.useCallback(
-    () => attach("patient-chart-workspace-slot", "conditions-form-workspace"),
-    []
+    () => attach('patient-chart-workspace-slot', 'conditions-form-workspace'),
+    [],
   );
 
   const headers = [
     {
-      key: "display",
-      header: t("activeConditions", "Active Conditions"),
+      key: 'display',
+      header: t('activeConditions', 'Active Conditions'),
     },
     {
-      key: "onsetDateTime",
-      header: t("since", "Since"),
+      key: 'onsetDateTime',
+      header: t('since', 'Since'),
     },
   ];
 
   const getRowItems = (rows: Array<Condition>) => {
-    return rows
-      .slice(firstRowIndex, firstRowIndex + currentPageSize)
-      .map((row) => ({
-        ...row,
-        onsetDateTime: dayjs(row.onsetDateTime).format("MMM-YYYY"),
-      }));
+    return rows.slice(firstRowIndex, firstRowIndex + currentPageSize).map((row) => ({
+      ...row,
+      onsetDateTime: dayjs(row.onsetDateTime).format('MMM-YYYY'),
+    }));
   };
 
   const RenderConditions: React.FC = () => {
@@ -85,25 +78,13 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient }) => {
       return (
         <div>
           <div className={styles.conditionsHeader}>
-            <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>
-              {headerTitle}
-            </h4>
-            <Button
-              kind="ghost"
-              renderIcon={Add16}
-              iconDescription="Add conditions"
-              onClick={launchConditionsForm}
-            >
-              {t("add", "Add")}
+            <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
+            <Button kind="ghost" renderIcon={Add16} iconDescription="Add conditions" onClick={launchConditionsForm}>
+              {t('add', 'Add')}
             </Button>
           </div>
           <TableContainer>
-            <DataTable
-              rows={rows}
-              headers={headers}
-              isSortable={true}
-              size="short"
-            >
+            <DataTable rows={rows} headers={headers} isSortable={true} size="short">
               {({ rows, headers, getHeaderProps, getTableProps }) => (
                 <Table {...getTableProps()}>
                   <TableHead>
@@ -114,8 +95,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient }) => {
                           {...getHeaderProps({
                             header,
                             isSortable: header.isSortable,
-                          })}
-                        >
+                          })}>
                           {header.header?.content ?? header.header}
                         </TableHeader>
                       ))}
@@ -125,9 +105,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient }) => {
                     {rows.map((row) => (
                       <TableRow key={row.id}>
                         {row.cells.map((cell) => (
-                          <TableCell key={cell.id}>
-                            {cell.value?.content ?? cell.value}
-                          </TableCell>
+                          <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                         ))}
                       </TableRow>
                     ))}
@@ -155,13 +133,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient }) => {
         </div>
       );
     }
-    return (
-      <EmptyState
-        displayText={displayText}
-        headerTitle={headerTitle}
-        launchForm={launchConditionsForm}
-      />
-    );
+    return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchConditionsForm} />;
   };
 
   return (

@@ -1,7 +1,7 @@
-import React from "react";
-import Workspace from "./workspace.component";
-import styles from "./workspace-wrapper.component.css";
-import { WorkspaceItem, getNewWorkspaceItem } from "@openmrs/esm-framework";
+import React from 'react';
+import Workspace from './workspace.component';
+import styles from './workspace-wrapper.component.css';
+import { WorkspaceItem, getNewWorkspaceItem } from '@openmrs/esm-framework';
 
 interface WorkspaceWrapperProps {
   patientUuid: string;
@@ -10,10 +10,7 @@ interface WorkspaceWrapperProps {
 
 const WorkspaceWrapper: React.FC<WorkspaceWrapperProps> = (props) => {
   const [showWorkspace, setShowWorkspace] = React.useState(false);
-  const [
-    toggleMobileTableView,
-    setToggleMobileTabletView,
-  ] = React.useState<Boolean>(window.innerWidth <= 1200);
+  const [toggleMobileTableView, setToggleMobileTabletView] = React.useState<Boolean>(window.innerWidth <= 1200);
   const [openTabs, setOpenTabs] = React.useState<WorkspaceItem[]>([]);
   const [selectedTab, setSelectedTab] = React.useState(null);
 
@@ -49,8 +46,7 @@ const WorkspaceWrapper: React.FC<WorkspaceWrapperProps> = (props) => {
             className="omrs-btn-icon-medium"
             onClick={() => {
               setToggleMobileTabletView(!toggleMobileTableView);
-            }}
-          >
+            }}>
             <svg>
               <use xlinkHref="#omrs-icon-arrow-back"></use>
             </svg>
@@ -60,8 +56,7 @@ const WorkspaceWrapper: React.FC<WorkspaceWrapperProps> = (props) => {
             className="omrs-btn-icon-medium"
             onClick={() => {
               setToggleMobileTabletView(!toggleMobileTableView);
-            }}
-          >
+            }}>
             <svg>
               <use xlinkHref="#omrs-icon-arrow-forward"></use>
             </svg>
@@ -78,8 +73,7 @@ const WorkspaceWrapper: React.FC<WorkspaceWrapperProps> = (props) => {
                 } else {
                   setToggleMobileTabletView(toggleMobileTableView);
                 }
-              }}
-            >
+              }}>
               {tab.name.charAt(0)}
             </button>
           ))}
@@ -89,17 +83,12 @@ const WorkspaceWrapper: React.FC<WorkspaceWrapperProps> = (props) => {
 
   return (
     <div
-      className={`${styles.workspace} ${
-        showWorkspace ? styles.visible : styles.invisible
-      } ${toggleMobileTableView ? styles.halfWidth : styles.fullWidth}`}
-    >
+      className={`${styles.workspace} ${showWorkspace ? styles.visible : styles.invisible} ${
+        toggleMobileTableView ? styles.halfWidth : styles.fullWidth
+      }`}>
       {toggleMobileAndTabletNavBar()}
       <div className={toggleMobileTableView ? styles.hide : styles.fullWidth}>
-        <Workspace
-          {...props}
-          showWorkspace={setShowWorkspace}
-          openTabs={setOpenTabs}
-        />
+        <Workspace {...props} showWorkspace={setShowWorkspace} openTabs={setOpenTabs} />
       </div>
     </div>
   );

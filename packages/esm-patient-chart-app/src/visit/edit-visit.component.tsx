@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import dayjs from "dayjs";
-import styles from "./edit-visit.css";
-import { useTranslation } from "react-i18next";
+import React, { useState, useEffect } from 'react';
+import dayjs from 'dayjs';
+import styles from './edit-visit.css';
+import { useTranslation } from 'react-i18next';
 import {
   createErrorHandler,
   getStartedVisit,
@@ -9,7 +9,7 @@ import {
   VisitMode,
   getVisitsForPatient,
   Visit,
-} from "@openmrs/esm-framework";
+} from '@openmrs/esm-framework';
 
 interface EditVisitProps {
   onVisitStarted(): void;
@@ -18,29 +18,21 @@ interface EditVisitProps {
   patientUuid: string;
 }
 
-const EditVisit: React.FC<EditVisitProps> = ({
-  onVisitStarted,
-  closeComponent,
-  onCanceled,
-  patientUuid,
-}) => {
+const EditVisit: React.FC<EditVisitProps> = ({ onVisitStarted, closeComponent, onCanceled, patientUuid }) => {
   const [patientVisits, setPatientVisits] = useState<Array<Visit>>([]);
   const { t } = useTranslation();
 
   useEffect(() => {
     if (patientUuid) {
       const abortController = new AbortController();
-      getVisitsForPatient(patientUuid, abortController).subscribe(
-        ({ data }) => {
-          setPatientVisits(data.results);
-        },
-        createErrorHandler()
-      );
+      getVisitsForPatient(patientUuid, abortController).subscribe(({ data }) => {
+        setPatientVisits(data.results);
+      }, createErrorHandler());
     }
   }, [patientUuid]);
 
   const formatVisitDate = (inputDate: any) => {
-    return dayjs(inputDate).format("DD-MMM.YYYY");
+    return dayjs(inputDate).format('DD-MMM.YYYY');
   };
 
   return (
@@ -48,10 +40,10 @@ const EditVisit: React.FC<EditVisitProps> = ({
       <table className={styles.editVisitTable}>
         <thead>
           <tr>
-            <td>{t("visitStartDate", "Visit start date")}</td>
-            <td>{t("visitType", "Visit type")}</td>
-            <td>{t("location", "Location")}</td>
-            <td colSpan={3}>{t("visitEndDate", "Visit end date")}</td>
+            <td>{t('visitStartDate', 'Visit start date')}</td>
+            <td>{t('visitType', 'Visit type')}</td>
+            <td>{t('location', 'Location')}</td>
+            <td colSpan={3}>{t('visitEndDate', 'Visit end date')}</td>
           </tr>
         </thead>
         <tbody>
@@ -62,14 +54,10 @@ const EditVisit: React.FC<EditVisitProps> = ({
                   <td>{formatVisitDate(visit.startDatetime)}</td>
                   <td>{visit.visitType.display}</td>
                   <td>{visit.location?.display}</td>
-                  <td>
-                    {visit.stopDatetime
-                      ? formatVisitDate(visit.stopDatetime)
-                      : "\u2014"}
-                  </td>
+                  <td>{visit.stopDatetime ? formatVisitDate(visit.stopDatetime) : '\u2014'}</td>
                   <td>
                     <button
-                      style={{ cursor: "pointer" }}
+                      style={{ cursor: 'pointer' }}
                       className={`omrs-btn omrs-outlined-action`}
                       onClick={() => {
                         onVisitStarted();
@@ -78,14 +66,13 @@ const EditVisit: React.FC<EditVisitProps> = ({
                           visitData: visit,
                           status: VisitStatus.ONGOING,
                         });
-                      }}
-                    >
-                      {t("edit", "Edit")}
+                      }}>
+                      {t('edit', 'Edit')}
                     </button>
                   </td>
                   <td>
                     <button
-                      style={{ cursor: "pointer" }}
+                      style={{ cursor: 'pointer' }}
                       className={`omrs-btn omrs-outlined-action`}
                       onClick={() => {
                         getStartedVisit.next({
@@ -94,9 +81,8 @@ const EditVisit: React.FC<EditVisitProps> = ({
                           status: VisitStatus.ONGOING,
                         });
                         closeComponent();
-                      }}
-                    >
-                      {t("load", "Load")}
+                      }}>
+                      {t('load', 'Load')}
                     </button>
                   </td>
                 </tr>
@@ -107,14 +93,13 @@ const EditVisit: React.FC<EditVisitProps> = ({
       <div className={styles.cancelButtonContainer}>
         <button
           style={{
-            cursor: "pointer",
-            width: "25%",
-            borderRadius: "1.5rem",
+            cursor: 'pointer',
+            width: '25%',
+            borderRadius: '1.5rem',
           }}
           className={`omrs-btn omrs-outlined-action`}
-          onClick={onCanceled}
-        >
-          {t("cancel", "Cancel")}
+          onClick={onCanceled}>
+          {t('cancel', 'Cancel')}
         </button>
       </div>
     </div>

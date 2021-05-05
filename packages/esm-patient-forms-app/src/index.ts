@@ -1,18 +1,13 @@
-import { defineConfigSchema, getAsyncLifecycle } from "@openmrs/esm-framework";
-import { backendDependencies } from "./openmrs-backend-dependencies";
+import { defineConfigSchema, getAsyncLifecycle } from '@openmrs/esm-framework';
+import { backendDependencies } from './openmrs-backend-dependencies';
 
-const importTranslation = require.context(
-  "../translations",
-  false,
-  /.json$/,
-  "lazy"
-);
+const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 function setupOpenMRS() {
-  const moduleName = "@openmrs/esm-patient-forms-app";
+  const moduleName = '@openmrs/esm-patient-forms-app';
 
   const options = {
-    featureName: "patient-forms",
+    featureName: 'patient-forms',
     moduleName,
   };
 
@@ -21,12 +16,9 @@ function setupOpenMRS() {
   return {
     extensions: [
       {
-        id: "forms-widget",
-        slot: "patient-chart-summary-dashboard-slot",
-        load: getAsyncLifecycle(
-          () => import("./forms/forms.component"),
-          options
-        ),
+        id: 'forms-widget',
+        slot: 'patient-chart-summary-dashboard-slot',
+        load: getAsyncLifecycle(() => import('./forms/forms.component'), options),
         meta: {
           columnSpan: 2,
         },

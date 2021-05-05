@@ -1,29 +1,21 @@
-import React, { useCallback, useEffect, useState } from "react";
-import Button from "carbon-components-react/lib/components/Button";
-import CameraUpload from "./camera-upload.component";
-import placeholder from "../assets/placeholder.svg";
-import { toOmrsIsoString } from "@openmrs/esm-framework";
+import React, { useCallback, useEffect, useState } from 'react';
+import Button from 'carbon-components-react/lib/components/Button';
+import CameraUpload from './camera-upload.component';
+import placeholder from '../assets/placeholder.svg';
+import { toOmrsIsoString } from '@openmrs/esm-framework';
 
 export interface CapturePhotoProps {
   patientUuid?: string;
-  onCapturePhoto(
-    dataUri: string,
-    selectedFile: File,
-    photoDateTime: string
-  ): void;
+  onCapturePhoto(dataUri: string, selectedFile: File, photoDateTime: string): void;
   initialState?: string;
 }
 
-const CapturePhoto: React.FC<CapturePhotoProps> = ({
-  patientUuid,
-  initialState,
-  onCapturePhoto,
-}) => {
+const CapturePhoto: React.FC<CapturePhotoProps> = ({ patientUuid, initialState, onCapturePhoto }) => {
   const [openCamera, setOpenCamera] = useState(false);
   const [dataUri, setDataUri] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [currentPhoto, setCurrentPhoto] = useState(initialState ?? placeholder);
-  const altText = "Photo preview";
+  const altText = 'Photo preview';
   const showCamera = useCallback(() => {
     setOpenCamera(true);
   }, []);
@@ -39,22 +31,16 @@ const CapturePhoto: React.FC<CapturePhotoProps> = ({
       setSelectedFile(selectedFile);
       onCapturePhoto(dataUri, selectedFile, toOmrsIsoString(new Date()));
     },
-    [onCapturePhoto, closeCamera]
+    [onCapturePhoto, closeCamera],
   );
 
   return (
-    <div style={{ display: "flex" }}>
-      <div style={{ maxWidth: "20%", margin: "4px" }}>
+    <div style={{ display: 'flex' }}>
+      <div style={{ maxWidth: '20%', margin: '4px' }}>
         <img
-          src={
-            dataUri
-              ? dataUri
-              : selectedFile
-              ? URL.createObjectURL(selectedFile)
-              : currentPhoto
-          }
+          src={dataUri ? dataUri : selectedFile ? URL.createObjectURL(selectedFile) : currentPhoto}
           alt={altText}
-          style={{ width: "100%" }}
+          style={{ width: '100%' }}
         />
       </div>
       <div>

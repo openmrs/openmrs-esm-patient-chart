@@ -1,10 +1,7 @@
-import * as React from "react";
-import { makeThrottled } from "../helpers";
+import * as React from 'react';
+import { makeThrottled } from '../helpers';
 
-const useScrollIndicator = (
-  xThreshold: number,
-  yThreshold: number
-): [boolean, boolean, React.Ref<HTMLElement>] => {
+const useScrollIndicator = (xThreshold: number, yThreshold: number): [boolean, boolean, React.Ref<HTMLElement>] => {
   const [xIsScrolled, setXIsScrolled] = React.useState(false);
   const [yIsScrolled, setYIsScrolled] = React.useState(false);
 
@@ -19,10 +16,10 @@ const useScrollIndicator = (
         setYIsScrolled(element.scrollTop > yThreshold);
       }, 200);
 
-      element.addEventListener("scroll", scrollHandler);
-      return () => element.removeEventListener("scroll", scrollHandler);
+      element.addEventListener('scroll', scrollHandler);
+      return () => element.removeEventListener('scroll', scrollHandler);
     },
-    [xThreshold, yThreshold]
+    [xThreshold, yThreshold],
   );
 
   return [xIsScrolled, yIsScrolled, ref];

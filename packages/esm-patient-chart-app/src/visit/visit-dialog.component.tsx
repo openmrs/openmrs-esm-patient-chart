@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useCallback } from "react";
-import styles from "./visit-dialog.css";
-import isEmpty from "lodash-es/isEmpty";
-import { ModalItem, getModalItem } from "./visit-dialog.resource";
+import React, { useState, useEffect, useCallback } from 'react';
+import styles from './visit-dialog.css';
+import isEmpty from 'lodash-es/isEmpty';
+import { ModalItem, getModalItem } from './visit-dialog.resource';
 
 const VisitDialog: React.FC = () => {
   const [child, setChild] = useState<React.ReactNode>(null);
@@ -23,11 +23,7 @@ const VisitDialog: React.FC = () => {
     <div className={!isEmpty(child) ? styles.visitModal : styles.hideModal}>
       <div className={styles.visitModalContent}>
         <div className={styles.closeButtonContainer}>
-          <svg
-            className="omrs-icon"
-            fill="var(--omrs-color-danger)"
-            onClick={toggleDisplay}
-          >
+          <svg className="omrs-icon" fill="var(--omrs-color-danger)" onClick={toggleDisplay}>
             <use xlinkHref="#omrs-icon-close"></use>
           </svg>
         </div>

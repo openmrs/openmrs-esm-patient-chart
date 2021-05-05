@@ -1,14 +1,9 @@
-import {
-  openmrsObservableFetch,
-  openmrsFetch,
-  fhirBaseUrl,
-  FHIRResource,
-} from "@openmrs/esm-framework";
-import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
-import { PatientVitalAndBiometric } from "./vitals-biometrics-form/vitals-biometrics-form.component";
-import { calculateBMI } from "./vitals-biometrics-form/vitals-biometrics-form.utils";
-import { ConfigObject } from "../config-schema";
+import { openmrsObservableFetch, openmrsFetch, fhirBaseUrl, FHIRResource } from '@openmrs/esm-framework';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { PatientVitalAndBiometric } from './vitals-biometrics-form/vitals-biometrics-form.component';
+import { calculateBMI } from './vitals-biometrics-form/vitals-biometrics-form.utils';
+import { ConfigObject } from '../config-schema';
 
 export interface PatientVitals {
   id: string;
@@ -37,19 +32,14 @@ interface ObsRecord {
   value: string | number;
 }
 
-function filterByConceptUuid(
-  vitals: Array<FHIRResource["resource"]>,
-  conceptUuid: string
-) {
-  return vitals.filter((obs) =>
-    obs.code.coding.some((c) => c.code === conceptUuid)
-  );
+function filterByConceptUuid(vitals: Array<FHIRResource['resource']>, conceptUuid: string) {
+  return vitals.filter((obs) => obs.code.coding.some((c) => c.code === conceptUuid));
 }
 
 export function performPatientsVitalsSearch(
-  concepts: ConfigObject["concepts"],
+  concepts: ConfigObject['concepts'],
   patientID: string,
-  pageSize: number = 100
+  pageSize: number = 100,
 ): Observable<Array<PatientVitals>> {
   const vitalsConcepts = {
     systolicBloodPressure: concepts.systolicBloodPressureUuid,
@@ -64,9 +54,9 @@ export function performPatientsVitalsSearch(
 
   return openmrsObservableFetch<VitalsFetchResponse>(
     `${fhirBaseUrl}/Observation?subject:Patient=${patientID}&code=` +
-      Object.values(vitalsConcepts).join(",") +
-      "&_summary=data&_sort=-date" +
-      `&_count=${pageSize}`
+      Object.values(vitalsConcepts).join(',') +
+      '&_summary=data&_sort=-date' +
+      `&_count=${pageSize}`,
   ).pipe(
     map(({ data }) => {
       return data.entry;
@@ -81,9 +71,9 @@ export function performPatientsVitalsSearch(
         filterByConceptUuid(vitals, concepts.oxygenSaturationUuid),
         filterByConceptUuid(vitals, concepts.heightUuid),
         filterByConceptUuid(vitals, concepts.weightUuid),
-        filterByConceptUuid(vitals, concepts.respiratoryRateUuid)
+        filterByConceptUuid(vitals, concepts.respiratoryRateUuid),
       );
-    })
+    }),
   );
 }
 
@@ -97,37 +87,25 @@ function formatVitals(
   oxygenSaturationData: Vitals,
   heightData: Vitals,
   weightData: Vitals,
-  respiratoryRateData: Vitals
+  respiratoryRateData: Vitals,
 ): Array<PatientVitals> {
   let patientVitals: PatientVitals;
   const systolicDates = getDatesIssued(systolicBloodPressure);
   const diastolicDates = getDatesIssued(diastolicBloodPressure);
 
-  const uniqueDates = Array.from(
-    new Set(systolicDates?.concat(diastolicDates))
-  ).sort(latestFirst);
+  const uniqueDates = Array.from(new Set(systolicDates?.concat(diastolicDates))).sort(latestFirst);
 
   return uniqueDates.map((date) => {
-    const systolic = systolicBloodPressure.find(
-      (systolic) => systolic.issued === date
-    );
-    const diastolic = diastolicBloodPressure.find(
-      (diastolic) => diastolic.issued === date
-    );
+    const systolic = systolicBloodPressure.find((systolic) => systolic.issued === date);
+    const diastolic = diastolicBloodPressure.find((diastolic) => diastolic.issued === date);
     const pulse = pulseData.find((pulse) => pulse.issued === date);
-    const temperature = temperatureData.find(
-      (temperature) => temperature.issued === date
-    );
-    const oxygenSaturation = oxygenSaturationData.find(
-      (oxygenSaturation) => oxygenSaturation.issued === date
-    );
+    const temperature = temperatureData.find((temperature) => temperature.issued === date);
+    const oxygenSaturation = oxygenSaturationData.find((oxygenSaturation) => oxygenSaturation.issued === date);
     const height = heightData.find((height) => height.issued === date);
     const weight = weightData.find((weight) => weight.issued === date);
-    const respiratoryRate = respiratoryRateData.find(
-      (respiratoryRate) => respiratoryRate.issued === date
-    );
+    const respiratoryRate = respiratoryRateData.find((respiratoryRate) => respiratoryRate.issued === date);
     return (patientVitals = {
-      id: systolic?.encounter?.reference.replace("Encounter/", ""),
+      id: systolic?.encounter?.reference.replace('Encounter/', ''),
       date: systolic?.issued,
       systolic: systolic?.valueQuantity?.value,
       diastolic: diastolic?.valueQuantity?.value,
@@ -136,10 +114,7 @@ function formatVitals(
       oxygenSaturation: oxygenSaturation?.valueQuantity?.value,
       weight: weight?.valueQuantity?.value,
       height: height?.valueQuantity?.value,
-      bmi:
-        weight && height
-          ? calculateBMI(weight.valueQuantity.value, height.valueQuantity.value)
-          : null,
+      bmi: weight && height ? calculateBMI(weight.valueQuantity.value, height.valueQuantity.value) : null,
       respiratoryRate: respiratoryRate?.valueQuantity?.value,
     });
   });
@@ -153,30 +128,27 @@ function latestFirst(a: Date, b: Date) {
   return new Date(b).getTime() - new Date(a).getTime();
 }
 
-export function getPatientsLatestVitals(
-  patientUuuid: string,
-  abortController: AbortController
-) {
+export function getPatientsLatestVitals(patientUuuid: string, abortController: AbortController) {
   return openmrsFetch(
     `/ws/rest/v1/encounter?patient=${patientUuuid}&v=custom:(uuid,encounterDatetime,obs:(uuid,value))`,
-    { signal: abortController.signal }
+    { signal: abortController.signal },
   );
 }
 
 export function savePatientVitals(
   encounterTypeUuid: string,
   formUuid: string,
-  concepts: ConfigObject["concepts"],
+  concepts: ConfigObject['concepts'],
   patientUuid: string,
   vitals: PatientVitalAndBiometric,
   encounterDatetime: Date,
   abortController: AbortController,
-  location: string
+  location: string,
 ) {
   return openmrsFetch(`/ws/rest/v1/encounter`, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
     signal: abortController.signal,
     body: {
@@ -190,33 +162,30 @@ export function savePatientVitals(
   });
 }
 
-function createObsObject(
-  vitals: PatientVitalAndBiometric,
-  concepts: ConfigObject["concepts"]
-): Array<ObsRecord> {
+function createObsObject(vitals: PatientVitalAndBiometric, concepts: ConfigObject['concepts']): Array<ObsRecord> {
   return Object.entries(vitals)
     .filter(([_, result]) => result != null)
     .map(([name, result]) => {
       return {
-        concept: concepts[name + "Uuid"],
+        concept: concepts[name + 'Uuid'],
         value: result,
       };
     });
 }
 
 export function editPatientVitals(
-  concepts: ConfigObject["concepts"],
+  concepts: ConfigObject['concepts'],
   patientUuid: string,
   vitals: PatientVitalAndBiometric,
   encounterDatetime: Date,
   abortController: AbortController,
   encounterUuid: string,
-  location: string
+  location: string,
 ) {
   return openmrsFetch(`/ws/rest/v1/encounter/${encounterUuid}`, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
     signal: abortController.signal,
     body: {

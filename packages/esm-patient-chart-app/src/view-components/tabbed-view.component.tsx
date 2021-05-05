@@ -1,16 +1,16 @@
-import React, { useEffect } from "react";
-import styles from "./tabbed-view.css";
+import React, { useEffect } from 'react';
+import styles from './tabbed-view.css';
 import {
   ConfigurableLink,
   ExtensionSlot,
   navigate,
   extensionStore,
   useAssignedExtensionIds,
-} from "@openmrs/esm-framework";
-import { useRouteMatch } from "react-router-dom";
-import { DashboardTabConfig } from "../config-schemas";
-import { basePath } from "../constants";
-import { getTitle } from "../utils";
+} from '@openmrs/esm-framework';
+import { useRouteMatch } from 'react-router-dom';
+import { DashboardTabConfig } from '../config-schemas';
+import { basePath } from '../constants';
+import { getTitle } from '../utils';
 
 interface ShowTabsProps {
   slot: string;
@@ -40,15 +40,9 @@ const ShowTabs: React.FC<ShowTabsProps> = ({ slot, view, fullPath }) => {
           const extension = state.extensions[id];
           return (
             <li key={id}>
-              <div
-                className={`${
-                  extension.meta.view === view ? "selected" : "unselected"
-                }`}
-              >
+              <div className={`${extension.meta.view === view ? 'selected' : 'unselected'}`}>
                 <ConfigurableLink to={`${fullPath}/${extension.meta.view}`}>
-                  <button className="omrs-unstyled">
-                    {getTitle(extension)}
-                  </button>
+                  <button className="omrs-unstyled">{getTitle(extension)}</button>
                 </ConfigurableLink>
               </div>
             </li>
@@ -67,13 +61,7 @@ export interface TabbedViewProps {
   layout: DashboardTabConfig;
 }
 
-const TabbedView: React.FC<TabbedViewProps> = ({
-  name,
-  slot,
-  patient,
-  patientUuid,
-  tab,
-}) => {
+const TabbedView: React.FC<TabbedViewProps> = ({ name, slot, patient, patientUuid, tab }) => {
   const { url } = useRouteMatch(basePath);
   const fullPath = `${window.spaBase}${url}/${name}`;
   const state = React.useMemo(
@@ -84,7 +72,7 @@ const TabbedView: React.FC<TabbedViewProps> = ({
       patient,
       view: tab,
     }),
-    [patientUuid, patient, tab, fullPath, url]
+    [patientUuid, patient, tab, fullPath, url],
   );
 
   return (
@@ -96,9 +84,7 @@ const TabbedView: React.FC<TabbedViewProps> = ({
         className={styles.routesContainer}
         extensionSlotName={slot}
         state={state}
-        select={(extensions) =>
-          extensions.filter((ext) => ext.meta.view === tab)
-        }
+        select={(extensions) => extensions.filter((ext) => ext.meta.view === tab)}
       />
     </>
   );
