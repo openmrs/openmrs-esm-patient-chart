@@ -166,7 +166,6 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid }) => {
               sub.unsubscribe();
             }
           );
-          return () => sub.unsubscribe();
         } else {
           setViewState((state) => ({ ...state, searchResults: null }));
         }
@@ -176,7 +175,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid }) => {
 
   React.useEffect(() => {
     debouncedSearch((viewState as SearchState)?.searchTerm);
-  }, [viewState, debouncedSearch]);
+  }, [(viewState as SearchState)?.searchTerm, debouncedSearch]);
 
   return (
     <Form style={{ margin: "2rem" }} onSubmit={handleSubmit}>
