@@ -54,6 +54,16 @@ function setupOpenMRS() {
         load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
         meta: dashboardMeta,
       },
+      {
+        id: "conditions-form-workspace",
+        load: getAsyncLifecycle(
+          () => import("./conditions/conditions-form.component"),
+          options
+        ),
+        meta: {
+          title: "Record a Condition",
+        },
+      },
     ],
   };
 }

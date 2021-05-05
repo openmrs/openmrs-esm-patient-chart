@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import dayjs from "dayjs";
 import capitalize from "lodash-es/capitalize";
 import ConditionsForm from "./conditions-form.component";
@@ -10,7 +10,7 @@ import {
 } from "@openmrs/esm-patient-common-lib";
 import { Link } from "react-router-dom";
 import { useTranslation, Trans } from "react-i18next";
-import { createErrorHandler } from "@openmrs/esm-framework";
+import { attach, createErrorHandler } from "@openmrs/esm-framework";
 import {
   Condition,
   performPatientConditionsSearch,
@@ -25,13 +25,15 @@ const ConditionsDetailedSummary: React.FC<ConditionsDetailedSummaryProps> = ({
   patient,
   basePath,
 }) => {
-  const [patientConditions, setPatientConditions] = useState<Array<Condition>>(
-    null
-  );
   const { t } = useTranslation();
   const path = `${basePath}/details`;
+  const displayText = t("conditions", "Conditions");
+  const headerTitle = t("conditions", "Conditions");
+  const [patientConditions, setPatientConditions] = React.useState<
+    Array<Condition>
+  >(null);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (patient) {
       const sub = performPatientConditionsSearch(
         patient.identifier[0].value
@@ -42,6 +44,11 @@ const ConditionsDetailedSummary: React.FC<ConditionsDetailedSummaryProps> = ({
       return () => sub.unsubscribe();
     }
   }, [patient]);
+
+  const launchConditionsForm = React.useCallback(
+    () => attach("patient-chart-workspace-slot", "conditions-form-workspace"),
+    []
+  );
 
   return (
     <div className="styles.conditionSummary">
@@ -119,14 +126,9 @@ const ConditionsDetailedSummary: React.FC<ConditionsDetailedSummaryProps> = ({
         </SummaryCard>
       ) : (
         <EmptyState
-          displayText={t("conditions", "Conditions")}
-          headerTitle={t("conditions", "Conditions")}
-          launchForm={() =>
-            openWorkspaceTab(
-              ConditionsForm,
-              `${t("conditionsForm", "Conditions form")}`
-            )
-          }
+          displayText={displayText}
+          headerTitle={headerTitle}
+          launchForm={launchConditionsForm}
         />
       )}
     </div>
