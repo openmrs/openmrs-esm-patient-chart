@@ -1,4 +1,10 @@
-import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
+import {
+  defineConfigSchema,
+  fhirBaseUrl,
+  getAsyncLifecycle,
+  getSyncLifecycle,
+  messageOmrsServiceWorker,
+} from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { backendDependencies } from './openmrs-backend-dependencies';
 import { dashboardMeta } from './dashboard.meta';
@@ -6,6 +12,21 @@ import { dashboardMeta } from './dashboard.meta';
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 function setupOpenMRS() {
+  messageOmrsServiceWorker({
+    type: 'registerDynamicRoute',
+    pattern: '.+/ws/rest/v1/concept.+',
+  });
+
+  messageOmrsServiceWorker({
+    type: 'registerDynamicRoute',
+    pattern: '.+/ws/rest/v1/patient/.+/allergy.+',
+  });
+
+  messageOmrsServiceWorker({
+    type: 'registerDynamicRoute',
+    pattern: `.+${fhirBaseUrl}/AllergyIntolerance.+`,
+  });
+
   const moduleName = '@openmrs/esm-patient-allergies-app';
 
   const options = {
@@ -24,6 +45,8 @@ function setupOpenMRS() {
         meta: {
           columnSpan: 2,
         },
+        online: { showAddAllergy: true },
+        offline: { showAddAllergy: false },
       },
       {
         id: 'allergies-details-widget',
@@ -32,12 +55,16 @@ function setupOpenMRS() {
         meta: {
           columnSpan: 1,
         },
+        online: true,
+        offline: true,
       },
       {
         id: 'allergies-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
         load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
         meta: dashboardMeta,
+        online: { showAddAllergy: true },
+        offline: { showAddAllergy: false },
       },
     ],
   };

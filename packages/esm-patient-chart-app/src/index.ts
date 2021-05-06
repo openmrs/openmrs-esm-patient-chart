@@ -1,5 +1,11 @@
 import capitalize from 'lodash-es/capitalize';
-import { registerBreadcrumbs, defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
+import {
+  registerBreadcrumbs,
+  defineConfigSchema,
+  getAsyncLifecycle,
+  getSyncLifecycle,
+  messageOmrsServiceWorker,
+} from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { esmPatientChartSchema } from './config-schemas/openmrs-esm-patient-chart-schema';
 import { moduleName, spaBasePath } from './constants';
@@ -15,6 +21,11 @@ const dashboardMeta = {
 };
 
 function setupOpenMRS() {
+  messageOmrsServiceWorker({
+    type: 'registerDynamicRoute',
+    pattern: '.+/openmrs/ws/fhir2/R4/Patient/.+',
+  });
+
   defineConfigSchema(moduleName, esmPatientChartSchema);
 
   registerBreadcrumbs([
@@ -38,6 +49,8 @@ function setupOpenMRS() {
           featureName: 'patient-chart',
           moduleName,
         }),
+        online: true,
+        offline: true,
       },
     ],
     extensions: [
@@ -49,6 +62,8 @@ function setupOpenMRS() {
           moduleName,
         }),
         meta: dashboardMeta,
+        online: true,
+        offline: true,
       },
       {
         id: 'patient-chart-nav-items',
@@ -56,6 +71,8 @@ function setupOpenMRS() {
           featureName: 'nav-items',
           moduleName,
         }),
+        online: true,
+        offline: true,
       },
       {
         id: 'start-visit-patient-actions-slot',

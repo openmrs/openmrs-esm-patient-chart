@@ -16,9 +16,16 @@ interface VitalsHeaderStateTitleProps {
   vitals: PatientVitals;
   toggleView(): void;
   showDetails: boolean;
+  showRecordVitals: boolean;
 }
 
-const VitalsHeaderStateTitle: React.FC<VitalsHeaderStateTitleProps> = ({ view, vitals, toggleView, showDetails }) => {
+const VitalsHeaderStateTitle: React.FC<VitalsHeaderStateTitleProps> = ({
+  view,
+  vitals,
+  toggleView,
+  showDetails,
+  showRecordVitals,
+}) => {
   const { t } = useTranslation();
   const launchVitalsBiometricsForm = React.useCallback(() => {
     attach('patient-chart-workspace-slot', patientVitalsBiometricsFormWorkspace);
@@ -41,9 +48,11 @@ const VitalsHeaderStateTitle: React.FC<VitalsHeaderStateTitleProps> = ({ view, v
             </span>
           </span>
           <div className={styles.alignCenter}>
-            <Button className={styles.buttonText} kind="ghost" size="small" onClick={launchVitalsBiometricsForm}>
-              {t('recordVitals', 'Record Vitals')}
-            </Button>
+            {showRecordVitals && (
+              <Button className={styles.buttonText} kind="ghost" size="small" onClick={launchVitalsBiometricsForm}>
+                {t('recordVitals', 'Record Vitals')}
+              </Button>
+            )}
             {showDetails ? (
               <ChevronUp16
                 className={styles.expandButton}
@@ -74,11 +83,13 @@ const VitalsHeaderStateTitle: React.FC<VitalsHeaderStateTitleProps> = ({ view, v
               {t('noDataRecorded', 'No data has been recorded for this patient')}
             </span>
           </span>
-          <div className={styles.alignCenter}>
-            <Button className={styles.buttonText} onClick={launchVitalsBiometricsForm} kind="ghost" size="small">
-              {t('recordVitals', 'Record Vitals')}
-            </Button>
-          </div>
+          {showRecordVitals && (
+            <div className={styles.alignCenter}>
+              <Button className={styles.buttonText} onClick={launchVitalsBiometricsForm} kind="ghost" size="small">
+                {t('recordVitals', 'Record Vitals')}
+              </Button>
+            </div>
+          )}
         </div>
       )}
     </>

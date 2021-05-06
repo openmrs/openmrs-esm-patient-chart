@@ -32,6 +32,7 @@ interface RenderBiometricsProps {
   bmiUnit: string;
   biometrics: Array<any>;
   showAllBiometrics: boolean;
+  showAddBiometrics: boolean;
   toggleShowAllBiometrics(): void;
 }
 
@@ -40,6 +41,7 @@ const RenderBiometrics: React.FC<RenderBiometricsProps> = ({
   tableRows,
   bmiUnit,
   showAllBiometrics,
+  showAddBiometrics,
   biometrics,
   toggleShowAllBiometrics,
 }) => {
@@ -85,9 +87,11 @@ const RenderBiometrics: React.FC<RenderBiometricsProps> = ({
               onClick={() => setChartView(true)}
             />
           </div>
-          <Button kind="ghost" renderIcon={Add16} iconDescription="Add biometrics" onClick={launchBiometricsForm}>
-            {t('add', 'Add')}
-          </Button>
+          {showAddBiometrics && (
+            <Button kind="ghost" renderIcon={Add16} iconDescription="Add biometrics" onClick={launchBiometricsForm}>
+              {t('add', 'Add')}
+            </Button>
+          )}
         </div>
         {chartView ? (
           <BiometricsChart patientBiometrics={biometrics} conceptsUnits={conceptsUnits} />
@@ -156,9 +160,10 @@ export interface PatientBiometrics {
 
 interface BiometricsOverviewProps {
   patientUuid: string;
+  showAddBiometrics: boolean;
 }
 
-const BiometricsOverview: React.FC<BiometricsOverviewProps> = ({ patientUuid }) => {
+const BiometricsOverview: React.FC<BiometricsOverviewProps> = ({ patientUuid, showAddBiometrics }) => {
   const config = useConfig() as ConfigObject;
   const { bmiUnit } = config.biometrics;
   const { t } = useTranslation();
@@ -204,6 +209,7 @@ const BiometricsOverview: React.FC<BiometricsOverviewProps> = ({ patientUuid }) 
           tableRows={tableRows}
           toggleShowAllBiometrics={toggleShowAllBiometrics}
           showAllBiometrics={showAllBiometrics}
+          showAddBiometrics={showAddBiometrics}
           bmiUnit={bmiUnit}
         />
       ) : error ? (

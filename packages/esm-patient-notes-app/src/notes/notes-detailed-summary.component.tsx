@@ -9,9 +9,11 @@ import { formatDate } from './biometric.helper';
 import { useNotesContext } from './notes.context';
 import { getEncounterObservableRESTAPI, PatientNote } from './encounter.resource';
 
-interface NotesDetailedSummaryProps {}
+interface NotesDetailedSummaryProps {
+  showAddNote: boolean;
+}
 
-const NotesDetailedSummary: React.FC<NotesDetailedSummaryProps> = () => {
+const NotesDetailedSummary: React.FC<NotesDetailedSummaryProps> = ({ showAddNote }) => {
   const { t } = useTranslation();
   const { patient, patientUuid } = useNotesContext();
   const [patientNotes, setPatientNotes] = useState<Array<PatientNote>>();
@@ -35,7 +37,7 @@ const NotesDetailedSummary: React.FC<NotesDetailedSummaryProps> = () => {
           {patientNotes.length > 0 ? (
             <SummaryCard
               name={t('notes', 'Notes')}
-              addComponent
+              addComponent={showAddNote}
               showComponent={() => attach('patient-chart-workspace-slot', 'visit-notes-workspace')}>
               <table className={`omrs-type-body-regular ${styles.notesTable}`}>
                 <thead>

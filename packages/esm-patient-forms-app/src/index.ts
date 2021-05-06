@@ -1,9 +1,19 @@
-import { defineConfigSchema, getAsyncLifecycle } from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle, messageOmrsServiceWorker } from '@openmrs/esm-framework';
 import { backendDependencies } from './openmrs-backend-dependencies';
 
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 function setupOpenMRS() {
+  messageOmrsServiceWorker({
+    type: 'registerDynamicRoute',
+    pattern: '.+/ws/rest/v1/form.*',
+  });
+
+  messageOmrsServiceWorker({
+    type: 'registerDynamicRoute',
+    pattern: '.+/ws/rest/v1/encounter.*',
+  });
+
   const moduleName = '@openmrs/esm-patient-forms-app';
 
   const options = {
@@ -22,6 +32,8 @@ function setupOpenMRS() {
         meta: {
           columnSpan: 4,
         },
+        online: true,
+        offline: true,
       },
     ],
   };

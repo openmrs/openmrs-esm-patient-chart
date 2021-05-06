@@ -1,9 +1,14 @@
-import { defineConfigSchema, getAsyncLifecycle } from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle, messageOmrsServiceWorker } from '@openmrs/esm-framework';
 import { backendDependencies } from './openmrs-backend-dependencies';
 
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 function setupOpenMRS() {
+  messageOmrsServiceWorker({
+    type: 'registerDynamicRoute',
+    pattern: '.+/ws/rest/v1/relationship.+',
+  });
+
   const moduleName = '@openmrs/esm-patient-banner-app';
 
   const options = {
@@ -19,6 +24,8 @@ function setupOpenMRS() {
         id: 'patient-banner',
         slot: 'patient-header-slot',
         load: getAsyncLifecycle(() => import('./banner/patient-banner.component'), options),
+        online: true,
+        offline: true,
       },
     ],
   };

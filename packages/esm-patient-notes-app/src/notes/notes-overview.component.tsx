@@ -22,9 +22,10 @@ interface NotesOverviewProps {
   basePath: string;
   patient: fhir.Patient;
   patientUuid: string;
+  showAddNote: boolean;
 }
 
-const NotesOverview: React.FC<NotesOverviewProps> = ({ patientUuid, patient }) => {
+const NotesOverview: React.FC<NotesOverviewProps> = ({ patientUuid, patient, showAddNote }) => {
   const notesToShowCount = 5;
   const { t } = useTranslation();
   const [notes, setNotes] = React.useState<Array<PatientNote>>(null);
@@ -83,9 +84,11 @@ const NotesOverview: React.FC<NotesOverviewProps> = ({ patientUuid, patient }) =
           <div>
             <div className={styles.notesHeader}>
               <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
-              <Button kind="ghost" renderIcon={Add16} iconDescription="Add visit note" onClick={launchVisitNoteForm}>
-                {t('add', 'Add')}
-              </Button>
+              {showAddNote && (
+                <Button kind="ghost" renderIcon={Add16} iconDescription="Add visit note" onClick={launchVisitNoteForm}>
+                  {t('add', 'Add')}
+                </Button>
+              )}
             </div>
             <TableContainer>
               <DataTable rows={getRowItems(notes)} headers={headers} isSortable={true} size="short">

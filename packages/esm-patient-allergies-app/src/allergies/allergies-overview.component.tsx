@@ -21,9 +21,10 @@ import { performPatientAllergySearch, Allergy } from './allergy-intolerance.reso
 interface AllergiesOverviewProps {
   basePath: string;
   patient: fhir.Patient;
+  showAddAllergy: boolean;
 }
 
-const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient }) => {
+const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient, showAddAllergy }) => {
   const allergiesToShowCount = 5;
   const { t } = useTranslation();
   const [allergies, setAllergies] = React.useState<Array<Allergy>>(null);
@@ -77,9 +78,11 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient }) => {
         <div>
           <div className={styles.allergiesHeader}>
             <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
-            <Button kind="ghost" renderIcon={Add16} iconDescription="Add allergies" onClick={launchAllergiesForm}>
-              {t('add', 'Add')}
-            </Button>
+            {showAddAllergy && (
+              <Button kind="ghost" renderIcon={Add16} iconDescription="Add allergies" onClick={launchAllergiesForm}>
+                {t('add', 'Add')}
+              </Button>
+            )}
           </div>
           <TableContainer>
             <DataTable rows={rows} headers={headers} isSortable={true} size="short">

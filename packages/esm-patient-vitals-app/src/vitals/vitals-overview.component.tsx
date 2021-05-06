@@ -30,6 +30,7 @@ interface RenderVitalsProps {
   tableRows: Array<{}>;
   vitals: Array<PatientVitals>;
   showAllVitals: boolean;
+  showAddVitals: boolean;
   toggleShowAllVitals(): void;
 }
 
@@ -38,6 +39,7 @@ const RenderVitals: React.FC<RenderVitalsProps> = ({
   tableRows,
   vitals,
   showAllVitals,
+  showAddVitals,
   toggleShowAllVitals,
 }) => {
   const { t } = useTranslation();
@@ -108,9 +110,11 @@ const RenderVitals: React.FC<RenderVitalsProps> = ({
               onClick={() => setChartView(true)}
             />
           </div>
-          <Button kind="ghost" renderIcon={Add16} iconDescription="Add vitals" onClick={launchVitalsBiometricsForm}>
-            {t('add', 'Add')}
-          </Button>
+          {showAddVitals && (
+            <Button kind="ghost" renderIcon={Add16} iconDescription="Add vitals" onClick={launchVitalsBiometricsForm}>
+              {t('add', 'Add')}
+            </Button>
+          )}
         </div>
         {chartView ? (
           <VitalsChart patientVitals={vitals} conceptsUnits={conceptsUnits} />
@@ -171,9 +175,10 @@ const RenderVitals: React.FC<RenderVitalsProps> = ({
 
 interface VitalsOverviewProps {
   patientUuid: string;
+  showAddVitals: boolean;
 }
 
-const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid }) => {
+const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVitals }) => {
   const config = useConfig();
   const { t } = useTranslation();
   const [vitals, setVitals] = React.useState<Array<PatientVitals>>(null);
@@ -217,6 +222,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid }) => {
           tableRows={tableRows}
           vitals={vitals}
           showAllVitals={showAllVitals}
+          showAddVitals={showAddVitals}
           toggleShowAllVitals={toggleShowAllVitals}
         />
       ) : error ? (

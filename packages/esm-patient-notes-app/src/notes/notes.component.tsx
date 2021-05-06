@@ -8,14 +8,15 @@ interface NotesProps {
   basePath: string;
   patient: fhir.Patient;
   patientUuid: string;
+  showAddNote: boolean;
 }
 
-export default function Notes({ basePath, patient, patientUuid }: NotesProps) {
+export default function Notes({ basePath, patient, patientUuid, showAddNote }: NotesProps) {
   return (
     <NotesContext.Provider value={{ patient, patientUuid }}>
       <BrowserRouter basename={`${window.spaBase}${basePath}/encounters/notes`}>
         <Switch>
-          <Route exact path="/" component={NotesDetailedSummary} />
+          <Route exact path="/" render={() => <NotesDetailedSummary showAddNote={showAddNote} />} />
           <Route exact path="/:encounterUuid" component={NoteRecord} />
         </Switch>
       </BrowserRouter>
