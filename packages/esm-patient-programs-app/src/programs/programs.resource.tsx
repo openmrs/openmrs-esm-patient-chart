@@ -52,7 +52,7 @@ export function updateProgramEnrollment(payload, abortController) {
   });
 }
 
-export function fetchPrograms() {
+export function fetchAvailablePrograms() {
   return openmrsObservableFetch<Array<Program>>(
     `/ws/rest/v1/program?v=custom:(uuid,display,allWorkflows,concept:(uuid,display))`,
   ).pipe(map(({ data }) => data['results']));
@@ -62,10 +62,4 @@ export function fetchLocations() {
   return openmrsObservableFetch<Array<LocationData>>(`/ws/rest/v1/location?v=custom:(uuid,display)`).pipe(
     map(({ data }) => data['results']),
   );
-}
-
-export function getSession(abortController: AbortController) {
-  return openmrsFetch<SessionData>(`/ws/rest/v1/appui/session`, {
-    signal: abortController.signal,
-  });
 }

@@ -1,6 +1,5 @@
 import React from 'react';
 import dayjs from 'dayjs';
-import ProgramsForm from './programs-form.component';
 import Add16 from '@carbon/icons-react/es/add/16';
 import Button from 'carbon-components-react/es/components/Button';
 import Pagination from 'carbon-components-react/es/components/Pagination';
@@ -15,10 +14,11 @@ import DataTable, {
   TableRow,
 } from 'carbon-components-react/es/components/DataTable';
 import styles from './programs-overview.scss';
-import { EmptyState, ErrorState, openWorkspaceTab } from '@openmrs/esm-patient-common-lib';
+import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { fetchActiveEnrollments } from './programs.resource';
 import { PatientProgram } from '../types';
+import { attach } from '@openmrs/esm-framework';
 
 interface ProgramsOverviewProps {
   basePath: string;
@@ -33,11 +33,11 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ patientUuid }) => {
   const [firstRowIndex, setFirstRowIndex] = React.useState(0);
   const [currentPageSize, setCurrentPageSize] = React.useState(5);
 
-  const displayText = t('programs', 'program enrollments');
+  const displayText = t('programs', 'Program enrollments');
   const headerTitle = t('carePrograms', 'Care Programs');
   const previousPage = t('previousPage', 'Previous page');
   const nextPage = t('nextPage', 'Next Page');
-  const itemPerPage = t('itemPerPage', 'Item per page');
+  const itemsPerPage = t('itemsPerPage', 'Items per page');
 
   React.useEffect(() => {
     if (patientUuid) {
@@ -47,9 +47,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ patientUuid }) => {
     }
   }, [patientUuid]);
 
-  const launchProgramsForm = React.useCallback(() => {
-    openWorkspaceTab(ProgramsForm, t('programsForm', 'Programs form'));
-  }, []);
+  const launchProgramsForm = React.useCallback(() => attach('patient-chart-workspace-slot', 'programs-workspace'), []);
 
   const headers = [
     {
@@ -119,7 +117,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ patientUuid }) => {
               forwardText={nextPage}
               pageSize={currentPageSize}
               pageSizes={[5, 10, 15, 25]}
-              itemsPerPageText={itemPerPage}
+              itemsPerPageText={itemsPerPage}
               onChange={({ page, pageSize }) => {
                 if (pageSize !== currentPageSize) {
                   setCurrentPageSize(pageSize);

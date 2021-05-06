@@ -39,6 +39,13 @@ function setupOpenMRS() {
         load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
         meta: dashboardMeta,
       },
+      {
+        id: 'programs-workspace',
+        load: getAsyncLifecycle(() => import('./programs/programs-form.component'), options),
+        meta: {
+          title: 'Record Program enrollment',
+        },
+      },
     ],
   };
 }
