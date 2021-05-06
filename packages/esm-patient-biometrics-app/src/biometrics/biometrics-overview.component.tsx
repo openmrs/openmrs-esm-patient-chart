@@ -87,11 +87,11 @@ const RenderBiometrics: React.FC<RenderBiometricsProps> = ({
               onClick={() => setChartView(true)}
             />
           </div>
-          {showAddBiometrics &&
-          <Button kind="ghost" renderIcon={Add16} iconDescription="Add biometrics" onClick={launchBiometricsForm}>
-            {t('add', 'Add')}
-          </Button>
-          }
+          {showAddBiometrics && (
+            <Button kind="ghost" renderIcon={Add16} iconDescription="Add biometrics" onClick={launchBiometricsForm}>
+              {t('add', 'Add')}
+            </Button>
+          )}
         </div>
         {chartView ? (
           <BiometricsChart patientBiometrics={biometrics} conceptsUnits={conceptsUnits} />
