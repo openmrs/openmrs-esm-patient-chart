@@ -16,9 +16,10 @@ interface ViewState {
 
 interface VitalHeaderProps {
   patientUuid: string;
+  showRecordVitals: boolean;
 }
 
-const VitalHeader: React.FC<VitalHeaderProps> = ({ patientUuid }) => {
+const VitalHeader: React.FC<VitalHeaderProps> = ({ patientUuid, showRecordVitals }) => {
   const { t } = useTranslation();
   const config = useConfig();
   const [vital, setVital] = useState<PatientVitals>();
@@ -59,6 +60,7 @@ const VitalHeader: React.FC<VitalHeaderProps> = ({ patientUuid }) => {
             showDetails={showDetails}
             view={displayState.view}
             vitals={vital}
+            showRecordVitals={showRecordVitals}
           />
           {showDetails && (
             <div className={`${cls} ${styles.overlay}`}>

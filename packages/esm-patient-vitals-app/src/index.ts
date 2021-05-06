@@ -1,4 +1,4 @@
-import { defineConfigSchema, getAsyncLifecycle } from '@openmrs/esm-framework';
+import { defineConfigSchema, fhirBaseUrl, getAsyncLifecycle, messageOmrsServiceWorker } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 import { patientVitalsBiometricsFormWorkspace } from './constants';
 import { backendDependencies } from './openmrs-backend-dependencies';
@@ -6,6 +6,11 @@ import { backendDependencies } from './openmrs-backend-dependencies';
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 function setupOpenMRS() {
+  messageOmrsServiceWorker({
+    type: 'registerDynamicRoute',
+    pattern: `${fhirBaseUrl}/Observation.+`,
+  });
+
   const moduleName = '@openmrs/esm-patient-vitals-app';
 
   const options = {
@@ -24,6 +29,8 @@ function setupOpenMRS() {
         meta: {
           columnSpan: 2,
         },
+        online: { showAddVitals: true },
+        offline: { showAddVitals: false },
       },
       {
         id: 'vitals-details-widget',
@@ -38,6 +45,8 @@ function setupOpenMRS() {
         id: 'patient-vitals-info',
         slot: 'patient-info-slot',
         load: getAsyncLifecycle(() => import('./vitals/vitals-header/vital-header-state.component'), options),
+        online: { showRecordVitals: true },
+        offline: { showRecordVitals: false },
       },
       {
         id: patientVitalsBiometricsFormWorkspace,
