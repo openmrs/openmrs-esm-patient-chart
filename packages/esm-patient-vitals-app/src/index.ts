@@ -40,6 +40,8 @@ function setupOpenMRS() {
           view: 'vitals',
           title: 'Vitals',
         },
+        online: { showAddVitals: true },
+        offline: { showAddVitals: false },
       },
       {
         id: 'patient-vitals-info',
