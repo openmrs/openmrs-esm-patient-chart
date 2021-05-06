@@ -52,7 +52,5 @@
     "react-router-dom": "^5.2.0",
     "rxjs": "^6.6.3"
   },
-  "devDependencies": {
-    "webpack-stats-plugin": "1.0.3"
-  }
+  "devDependencies": {}
 }
