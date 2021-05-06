@@ -2,11 +2,9 @@ const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const { resolve } = require('path');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
-const { StatsWriterPlugin } = require('webpack-stats-plugin');
 
 const { peerDependencies } = require('./package.json');
 
-const filename = 'openmrs-esm-patient-common-lib.js';
 const cssLoader = {
   loader: 'css-loader',
   options: {
@@ -20,7 +18,7 @@ module.exports = (env, argv = {}) => ({
   entry: [resolve(__dirname, 'src/index.ts')],
   mode: argv.mode || 'development',
   output: {
-    filename,
+    filename: 'openmrs-esm-patient-common-lib.js',
     libraryTarget: 'system',
     path: resolve(__dirname, 'dist'),
     jsonpFunction: 'webpackJsonp_openmrs_esm_patient_common_lib',
@@ -70,13 +68,6 @@ module.exports = (env, argv = {}) => ({
     new CleanWebpackPlugin(),
     new BundleAnalyzerPlugin({
       analyzerMode: env && env.analyze ? 'server' : 'disabled',
-    }),
-    new StatsWriterPlugin({
-      filename: `${filename}.buildmanifest.json`,
-      stats: {
-        all: false,
-        chunks: true,
-      },
     }),
   ],
   resolve: {
