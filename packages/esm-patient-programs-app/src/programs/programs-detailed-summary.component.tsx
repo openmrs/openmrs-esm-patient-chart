@@ -5,7 +5,7 @@ import styles from './programs-detailed-summary.css';
 import { EmptyState, SummaryCard, openWorkspaceTab } from '@openmrs/esm-patient-common-lib';
 import { useTranslation, Trans } from 'react-i18next';
 import { RouteComponentProps, Link } from 'react-router-dom';
-import { createErrorHandler } from '@openmrs/esm-framework';
+import { attach, createErrorHandler } from '@openmrs/esm-framework';
 import { fetchEnrolledPrograms } from './programs.resource';
 import { useProgramsContext } from './programs.context';
 import { PatientProgram } from '../types';
@@ -13,9 +13,11 @@ import { PatientProgram } from '../types';
 interface ProgramsDetailedSummaryProps extends RouteComponentProps<{}> {}
 
 const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = () => {
+  const { t } = useTranslation();
+  const displayText = t('programEnrollments', 'Program enrollments');
+  const headerTitle = t('carePrograms', 'Care Programs');
   const [enrolledPrograms, setEnrolledPrograms] = useState<Array<PatientProgram>>([]);
   const { patientUuid } = useProgramsContext();
-  const { t } = useTranslation();
 
   useEffect(() => {
     if (patientUuid) {
@@ -26,6 +28,8 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = () => {
       return () => subscription.unsubscribe();
     }
   }, [patientUuid]);
+
+  const launchProgramsForm = React.useCallback(() => attach('patient-chart-workspace-slot', 'programs-workspace'), []);
 
   return (
     <>
@@ -93,16 +97,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = () => {
           </SummaryCard>
         </div>
       ) : (
-        <EmptyState
-          displayText={t('programEnrollments', 'program enrollments')}
-          headerTitle={t('carePrograms', 'Care Programs')}
-          launchForm={() =>
-            openWorkspaceTab(ProgramsForm, `${t('programsForm', 'Programs form')}`, {
-              setEnrolledPrograms: setEnrolledPrograms,
-              enrolledPrograms: enrolledPrograms,
-            })
-          }
-        />
+        <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchProgramsForm} />
       )}
     </>
   );

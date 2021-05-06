@@ -1,452 +1,228 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { SyntheticEvent } from 'react';
 import dayjs from 'dayjs';
 import filter from 'lodash-es/filter';
 import includes from 'lodash-es/includes';
 import map from 'lodash-es/map';
-import styles from './programs-form.css';
-import { SummaryCard } from '@openmrs/esm-patient-common-lib';
-import { match, useHistory } from 'react-router-dom';
-import { useTranslation, Trans } from 'react-i18next';
-import { createErrorHandler } from '@openmrs/esm-framework';
+import Button from 'carbon-components-react/es/components/Button';
+import DatePicker from 'carbon-components-react/es/components/DatePicker';
+import DatePickerInput from 'carbon-components-react/es/components/DatePickerInput';
+import Select from 'carbon-components-react/es/components/Select';
+import SelectItem from 'carbon-components-react/es/components/SelectItem';
+import Form from 'carbon-components-react/es/components/Form';
+import FormGroup from 'carbon-components-react/es/components/FormGroup';
+import { useTranslation } from 'react-i18next';
+import { createErrorHandler, showToast, useSessionUser } from '@openmrs/esm-framework';
 import {
   createProgramEnrollment,
-  fetchPrograms,
   fetchEnrolledPrograms,
   fetchLocations,
-  getPatientProgramByUuid,
-  getSession,
-  updateProgramEnrollment,
+  fetchAvailablePrograms,
 } from './programs.resource';
-import { DataCaptureComponentProps } from '../types';
 
-export type ProgramsFormProps = DataCaptureComponentProps & {
-  match: match<ProgramMatchProps>;
+interface ProgramsFormProps {
+  closeWorkspace(): void;
   patientUuid: string;
-};
-
-// exported so we can use this for tests
-export interface ProgramMatchProps {
-  program?: string;
-  programUuid?: string;
-  enrollmentDate?: string;
-  completionDate?: string;
-  locationUuid?: string;
 }
 
-export interface ProgramEnrollment {
-  program: string;
-  patient?: string;
-  dateEnrolled?: string;
-  dateCompleted?: string;
-  location?: string;
+enum StateTypes {
+  IDLE,
+  PROGRAM,
+  SUBMIT,
 }
 
-const ProgramsForm: React.FC<ProgramsFormProps> = ({
-  match,
-  patientUuid,
-  closeComponent = () => {},
-  entryCancelled = () => {},
-  entryStarted = () => {},
-}) => {
-  const formRef = useRef<HTMLFormElement>(null);
-  const enrollmentDateRef = useRef<HTMLInputElement>(null);
-  const [viewEditForm, setViewEditForm] = useState(false);
-  const [enableCreateButtons, setEnableCreateButtons] = useState(false);
-  const [enableEditButtons, setEnableEditButtons] = useState(false);
-  const [patientProgram, setPatientProgram] = useState(null);
-  const [allPrograms, setAllPrograms] = useState(null);
-  const [eligiblePrograms, setEligiblePrograms] = useState(null);
-  const [enrolledPrograms, setEnrolledPrograms] = useState(null);
-  const [location, setLocation] = useState('');
-  const [program, setProgram] = useState('');
-  const [enrollmentDate, setEnrollmentDate] = useState(dayjs(new Date()).format('YYYY-MM-DD'));
-  const [completionDate, setCompletionDate] = useState(null);
-  const [locations, setLocations] = useState(null);
-  const [formChanged, setFormChanged] = useState<Boolean>(false);
-  const history = useHistory();
+interface IdleState {
+  type: StateTypes.IDLE;
+}
+
+interface ProgramState {
+  availablePrograms?: Array<any>;
+  eligiblePrograms?: Array<any>;
+  program: any;
+  type: StateTypes.PROGRAM;
+}
+
+interface SubmitState {
+  type: StateTypes.SUBMIT;
+}
+
+type ViewState = IdleState | ProgramState | SubmitState;
+
+const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, closeWorkspace }) => {
   const { t } = useTranslation();
+  const session = useSessionUser();
+  const [availableLocations, setAvailableLocations] = React.useState(null);
+  const [completionDate, setCompletionDate] = React.useState(null);
+  const [enrollmentDate, setEnrollmentDate] = React.useState(new Date());
+  const [userLocation, setUserLocation] = React.useState('');
+  const [viewState, setViewState] = React.useState<ViewState>({
+    type: StateTypes.IDLE,
+  });
 
-  useEffect(() => {
-    const { program, programUuid, enrollmentDate, completionDate, locationUuid } = match.params;
+  if (!userLocation && session?.sessionLocation?.uuid) {
+    setUserLocation(session?.sessionLocation?.uuid);
+  }
 
-    if (program && enrollmentDate) {
-      setViewEditForm(true);
-      setLocation(locationUuid);
-      setProgram(programUuid);
-      setCompletionDate(completionDate);
-      setEnrollmentDate(enrollmentDate);
-    }
-  }, [match.params]);
-
-  useEffect(() => {
-    if (patientUuid && !viewEditForm) {
-      const abortController = new AbortController();
-      getSession(abortController).then(({ data }) => {
-        const { sessionLocation } = data;
-        if (sessionLocation && sessionLocation.uuid) {
-          setLocation(sessionLocation.uuid);
-        }
-      });
-    }
-  }, [patientUuid, viewEditForm]);
-
-  useEffect(() => {
+  React.useEffect(() => {
     if (patientUuid) {
-      const sub1 = fetchLocations().subscribe((locations) => {
-        return setLocations(locations);
-      }, createErrorHandler());
-      const sub2 = fetchPrograms().subscribe((programs) => setAllPrograms(programs), createErrorHandler());
-      const sub3 = fetchEnrolledPrograms(patientUuid).subscribe(
-        (enrolledPrograms) =>
-          setEnrolledPrograms(enrolledPrograms.filter((enrolledProgram) => !enrolledProgram.dateCompleted)),
-        createErrorHandler(),
+      const sub1 = fetchAvailablePrograms().subscribe(
+        (availablePrograms) =>
+          setViewState((state) => ({
+            ...state,
+            availablePrograms: availablePrograms,
+            program: null,
+            type: StateTypes.PROGRAM,
+          })),
+        () => createErrorHandler(),
+        () => sub1.unsubscribe(),
       );
 
-      return () => {
-        sub1.unsubscribe();
-        sub2.unsubscribe();
-        sub3.unsubscribe();
-      };
+      const sub2 = fetchLocations().subscribe(
+        (locations) => setAvailableLocations(locations),
+        () => createErrorHandler(),
+        () => sub2.unsubscribe(),
+      );
     }
   }, [patientUuid]);
 
-  useEffect(() => {
-    if (viewEditForm && patientUuid && match.params) {
-      const subscription = getPatientProgramByUuid(match.params['programUuid']).subscribe(
-        (program) => setPatientProgram(program),
-        createErrorHandler(),
+  React.useEffect(() => {
+    if ((viewState as ProgramState)?.availablePrograms) {
+      const sub = fetchEnrolledPrograms(patientUuid).subscribe(
+        (enrolledPrograms) =>
+          setViewState((state) => ({
+            ...state,
+            availablePrograms: (viewState as ProgramState)?.availablePrograms,
+            eligiblePrograms: filter(
+              (viewState as ProgramState)?.availablePrograms,
+              (program) => !includes(map(enrolledPrograms, 'program.uuid'), program.uuid),
+            ),
+            program: null,
+            type: StateTypes.PROGRAM,
+          })),
+        () => createErrorHandler(),
+        () => sub.unsubscribe(),
       );
-
-      return () => subscription.unsubscribe();
     }
-  }, [viewEditForm, patientUuid, match.params]);
+  }, [(viewState as ProgramState)?.availablePrograms]);
 
-  useEffect(() => {
-    if (allPrograms && enrolledPrograms) {
-      setEligiblePrograms(
-        filter(allPrograms, (program) => {
-          return !includes(map(enrolledPrograms, 'program.uuid'), program.uuid);
-        }),
-      );
-    }
-  }, [allPrograms, enrolledPrograms]);
+  const handleSubmit = React.useCallback(
+    (event: SyntheticEvent<HTMLFormElement>) => {
+      event.preventDefault();
 
-  useEffect(() => {
-    if (enrollmentDate && program && enrollmentDateRef?.current?.validity?.valid) {
-      setEnableCreateButtons(true);
-    } else {
-      setEnableCreateButtons(false);
-    }
-  }, [enrollmentDate, program]);
+      if (viewState.type !== StateTypes.PROGRAM) return;
 
-  useEffect(() => {
-    if (viewEditForm && formChanged) {
-      setEnableEditButtons(true);
-    } else {
-      setEnableEditButtons(false);
-    }
-  }, [viewEditForm, formChanged]);
+      const program = viewState.program;
+      setViewState({ type: StateTypes.SUBMIT });
 
-  const handleCreateSubmit = ($event) => {
-    $event.preventDefault();
-    const enrollmentPayload: ProgramEnrollment = {
-      program: program,
-      patient: patientUuid,
-      dateEnrolled: enrollmentDate,
-      dateCompleted: completionDate,
-      location: location,
-    };
-    const abortController = new AbortController();
-    createProgramEnrollment(enrollmentPayload, abortController).subscribe((response) => {
-      if (response.ok) {
-        match.params['setEnrolledPrograms']([...match.params['enrolledPrograms'], response.data]);
-        navigate();
-      }
-    });
-    return () => abortController.abort();
-  };
-
-  const handleEditSubmit = ($event) => {
-    $event.preventDefault();
-    if (completionDate || enrollmentDate || location) {
-      const updatePayload: ProgramEnrollment = {
+      const payload = {
+        patient: patientUuid,
         program: program,
-        dateCompleted: completionDate,
-        dateEnrolled: enrollmentDate,
-        location: location,
+        dateEnrolled: enrollmentDate ? dayjs(enrollmentDate).format() : null,
+        dateCompleted: completionDate ? dayjs(completionDate).format() : null,
+        location: userLocation,
       };
+
       const abortController = new AbortController();
-      updateProgramEnrollment(updatePayload, abortController).subscribe(
-        (response) => response.status === 200 && navigate(),
+
+      const sub = createProgramEnrollment(payload, abortController).subscribe(
+        (response) => {
+          if (response.status === 201) {
+            closeWorkspace();
+            showToast({
+              description: t('programEnrollmentSaved', 'Program enrollment saved successfully'),
+            });
+          }
+        },
+        () => createErrorHandler(),
+        () => {
+          setViewState({ type: StateTypes.IDLE });
+          sub.unsubscribe();
+        },
       );
-      return () => abortController.abort();
-    }
-  };
+    },
+    [closeWorkspace, completionDate, enrollmentDate, patientUuid, t, userLocation, viewState],
+  );
 
-  const navigate = () => {
-    history.push(`/patient/${patientUuid}/chart/programs/care-programs`);
-    closeComponent();
-  };
-
-  const closeForm = ($event) => {
-    let userConfirmed: boolean = false;
-    if (formChanged) {
-      userConfirmed = confirm('There is ongoing work, are you sure you want to close this tab?');
-    }
-
-    if (userConfirmed && formChanged) {
-      entryCancelled();
-      closeComponent();
-    } else if (!formChanged) {
-      entryCancelled();
-      closeComponent();
-    }
-  };
-
-  function createProgramForm() {
-    return (
-      <form
-        onChange={() => {
-          setFormChanged(true);
-          return entryStarted();
-        }}
-        onSubmit={handleCreateSubmit}
-        className={styles.programsForm}
-        ref={formRef}>
-        <SummaryCard
-          name={t('addNewProgram', 'Add a new program')}
-          styles={{
-            width: '100%',
-            backgroundColor: 'var(--omrs-color-bg-medium-contrast)',
-            height: 'auto',
+  return (
+    <Form style={{ margin: '2rem' }} onSubmit={handleSubmit}>
+      <FormGroup style={{ width: '50%' }} legendText={t('program', 'Program')}>
+        <Select
+          id="program"
+          invalidText={t('required', 'Required')}
+          labelText=""
+          light
+          onChange={(event) => {
+            setViewState({
+              availablePrograms: (viewState as ProgramState)?.availablePrograms,
+              eligiblePrograms: (viewState as ProgramState)?.eligiblePrograms,
+              program: event.target.value,
+              type: StateTypes.PROGRAM,
+            });
           }}>
-          <div className={styles.programsContainerWrapper}>
-            <div style={{ flex: 1, margin: '0rem 0.5rem' }}>
-              <div className={styles.programsInputContainer}>
-                <label htmlFor="program">
-                  <Trans i18nKey="program">Program</Trans>
-                </label>
-                <select
-                  id="program"
-                  name="programs"
-                  value={program}
-                  onChange={(evt) => setProgram(evt.target.value)}
-                  required>
-                  <option>{t('chooseProgram', 'Choose a program')}:</option>
-                  {eligiblePrograms &&
-                    eligiblePrograms.map((program) => (
-                      <option value={program.uuid} key={program.uuid}>
-                        {program.display}
-                      </option>
-                    ))}
-                </select>
-              </div>
-              <div className={styles.programsInputContainer}>
-                <label htmlFor="enrollmentDate">
-                  <Trans i18nKey="dateEnrolled">Date enrolled</Trans>
-                </label>
-                <div className="omrs-datepicker">
-                  <input
-                    ref={enrollmentDateRef}
-                    id="enrollmentDate"
-                    type="date"
-                    name="enrollmentDate"
-                    max={dayjs(new Date().toUTCString()).format('YYYY-MM-DD')}
-                    required
-                    onChange={(evt) => {
-                      setEnrollmentDate(evt.target.value);
-                    }}
-                    defaultValue={dayjs(new Date()).format('YYYY-MM-DD')}
-                  />
-                  <svg className="omrs-icon" role="img">
-                    <use xlinkHref="#omrs-icon-calendar"></use>
-                  </svg>
-                </div>
-                {enrollmentDateRef && !enrollmentDateRef?.current?.validity?.valid && (
-                  <div className={styles.dateError}>
-                    <span>
-                      <svg className="omrs-icon" role="img">
-                        <use xlinkHref="#omrs-icon-important-notification"></use>
-                      </svg>
-                      <Trans i18nKey="futureDateErrorMsg">Please enter a date that is either on or before today.</Trans>
-                    </span>
-                  </div>
-                )}
-              </div>
-              <div className={styles.programsInputContainer}>
-                <label htmlFor="completionDate">
-                  <Trans i18nKey="dateCompleted">Date completed</Trans>
-                </label>
-                <div className="omrs-datepicker">
-                  <input
-                    id="completionDate"
-                    type="date"
-                    name="completionDate"
-                    onChange={(evt) => setCompletionDate(evt.target.value)}
-                  />
-                  <svg className="omrs-icon" role="img">
-                    <use xlinkHref="#omrs-icon-calendar"></use>
-                  </svg>
-                </div>
-              </div>
-              <div className={styles.programsInputContainer}>
-                <label htmlFor="location">
-                  <Trans i18nKey="enrollmentLocation">Enrollment location</Trans>
-                </label>
-                <select
-                  id="location"
-                  name="locations"
-                  value={location}
-                  onChange={(evt) => {
-                    setLocation(evt.target.value);
-                  }}>
-                  <option>{t('chooseLocation', 'Choose a location')}:</option>
-                  {locations &&
-                    locations.map((location) => (
-                      <option value={location.uuid} key={location.uuid}>
-                        {location.display}
-                      </option>
-                    ))}
-                </select>
-              </div>
-            </div>
-          </div>
-        </SummaryCard>
-        <div
-          className={enableCreateButtons ? `${styles.buttonStyles} ${styles.buttonStylesBorder}` : styles.buttonStyles}>
-          <button
-            type="button"
-            className="omrs-btn omrs-outlined-neutral omrs-rounded"
-            style={{ width: '50%' }}
-            onClick={closeForm}>
-            <Trans i18nKey="cancel">Cancel</Trans>
-          </button>
-          <button
-            type="submit"
-            style={{ width: '50%' }}
-            className={
-              enableCreateButtons ? 'omrs-btn omrs-filled-action omrs-rounded' : 'omrs-btn omrs-outlined omrs-rounded'
-            }
-            disabled={!enableCreateButtons}>
-            <Trans i18nKey="enroll">Enroll</Trans>
-          </button>
-        </div>
-      </form>
-    );
-  }
-
-  function editProgramForm() {
-    return (
-      <>
-        {patientProgram && (
-          <form
-            onChange={() => {
-              setFormChanged(true);
-              return entryStarted();
-            }}
-            onSubmit={handleEditSubmit}
-            className={styles.programsForm}
-            ref={formRef}>
-            <SummaryCard
-              name={t('editProgram', 'Edit program')}
-              styles={{
-                width: '100%',
-                backgroundColor: 'var(--omrs-color-bg-medium-contrast)',
-                height: 'auto',
-              }}>
-              <div className={styles.programsContainerWrapper}>
-                <div style={{ flex: 1, margin: '0rem 0.5rem' }}>
-                  <div className={styles.programsInputContainer}>
-                    <label htmlFor="program">
-                      <Trans i18nKey="program">Program</Trans>
-                    </label>
-                    <span id="program" className="omrs-medium">
-                      {patientProgram.display}
-                    </span>
-                  </div>
-                  <div className={styles.programsInputContainer}>
-                    <label htmlFor="enrollmentDate">
-                      <Trans i18nKey="dateEnrolled">Date enrolled</Trans>
-                    </label>
-                    <div className="omrs-datepicker">
-                      <input
-                        id="enrollmentDate"
-                        type="date"
-                        name="enrollmentDate"
-                        required
-                        onChange={(evt) => setEnrollmentDate(evt.target.value)}
-                        defaultValue={dayjs(enrollmentDate).format('YYYY-MM-DD')}
-                      />
-                      <svg className="omrs-icon" role="img">
-                        <use xlinkHref="#omrs-icon-calendar"></use>
-                      </svg>
-                    </div>
-                  </div>
-                  <div className={styles.programsInputContainer}>
-                    <label htmlFor="completionDate">
-                      <Trans i18nKey="dateCompleted">Date completed</Trans>
-                    </label>
-                    <div className="omrs-datepicker">
-                      <input
-                        id="completionDate"
-                        type="date"
-                        name="completionDate"
-                        onChange={(evt) => setCompletionDate(evt.target.value)}
-                        defaultValue={completionDate ? dayjs(completionDate).format('YYYY-MM-DD') : ''}
-                      />
-                      <svg className="omrs-icon" role="img">
-                        <use xlinkHref="#omrs-icon-calendar"></use>
-                      </svg>
-                    </div>
-                  </div>
-                  <div className={styles.programsInputContainer}>
-                    <label htmlFor="location">
-                      <Trans i18nKey="enrollmentLocation">Enrollment location</Trans>
-                    </label>
-                    <select
-                      id="location"
-                      name="locations"
-                      value={location}
-                      onChange={(evt) => setLocation(evt.target.value)}>
-                      {locations &&
-                        locations.map((location) => (
-                          <option value={location.uuid} key={location.uuid}>
-                            {location.display}
-                          </option>
-                        ))}
-                    </select>
-                  </div>
-                </div>
-              </div>
-            </SummaryCard>
-            <div
-              className={
-                enableEditButtons ? styles.buttonStyles : `${styles.buttonStyles} ${styles.buttonStylesBorder}`
-              }>
-              <button
-                type="submit"
-                style={{ width: '50%' }}
-                className={
-                  enableEditButtons ? 'omrs-btn omrs-filled-action omrs-rounded' : 'omrs-btn omrs-outlined omrs-rounded'
-                }
-                disabled={!enableEditButtons}>
-                <Trans i18nKey="save">Save</Trans>
-              </button>
-              <button
-                type="button"
-                className="omrs-btn omrs-outlined-neutral omrs-rounded"
-                style={{ width: '50%' }}
-                onClick={closeForm}>
-                <Trans i18nKey="cancel">Cancel</Trans>
-              </button>
-            </div>
-          </form>
-        )}
-      </>
-    );
-  }
-
-  return <div>{viewEditForm ? editProgramForm() : createProgramForm()}</div>;
+          {!(viewState as ProgramState)?.program ? (
+            <SelectItem text={t('chooseProgram', 'Choose a program')} value="" />
+          ) : null}
+          {(viewState as ProgramState).eligiblePrograms?.length > 0 &&
+            (viewState as ProgramState).eligiblePrograms.map((program) => (
+              <SelectItem key={program.uuid} text={program.display} value={program.uuid}>
+                {program.display}
+              </SelectItem>
+            ))}
+        </Select>
+      </FormGroup>
+      <FormGroup legendText={t('dateEnrolled', 'Date enrolled')}>
+        <DatePicker
+          id="enrollmentDate"
+          datePickerType="single"
+          dateFormat="d/m/Y"
+          light
+          maxDate={new Date().toISOString()}
+          placeholder="dd/mm/yyyy"
+          onChange={([date]) => setEnrollmentDate(date)}
+          value={enrollmentDate}>
+          <DatePickerInput id="enrollmentDateInput" labelText="" />
+        </DatePicker>
+      </FormGroup>
+      <FormGroup legendText={t('dateCompleted', 'Date completed')}>
+        <DatePicker
+          id="completionDate"
+          datePickerType="single"
+          dateFormat="d/m/Y"
+          light
+          minDate={new Date(enrollmentDate).toISOString()}
+          maxDate={new Date().toISOString()}
+          placeholder="dd/mm/yyyy"
+          onChange={([date]) => setCompletionDate(date)}
+          value={completionDate}>
+          <DatePickerInput id="completionDateInput" labelText="" />
+        </DatePicker>
+      </FormGroup>
+      <FormGroup style={{ width: '50%' }} legendText={t('enrollmentLocation', 'Enrollment location')}>
+        <Select
+          id="location"
+          invalidText="Required"
+          labelText=""
+          light
+          onChange={(event) => setUserLocation(event.target.value)}
+          value={userLocation}>
+          {!userLocation ? <SelectItem text={t('chooseLocation', 'Choose a location')} value="" /> : null}
+          {availableLocations?.length > 0 &&
+            availableLocations.map((location) => (
+              <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
+                {location.display}
+              </SelectItem>
+            ))}
+        </Select>
+      </FormGroup>
+      <div style={{ marginTop: '1.625rem' }}>
+        <Button style={{ width: '50%' }} kind="secondary" type="button" onClick={closeWorkspace}>
+          {t('cancel', 'Cancel')}
+        </Button>
+        <Button style={{ width: '50%' }} kind="primary" type="submit" disabled={!(viewState as ProgramState).program}>
+          {t('enroll', 'Enroll')}
+        </Button>
+      </div>
+    </Form>
+  );
 };
 
 export default ProgramsForm;
