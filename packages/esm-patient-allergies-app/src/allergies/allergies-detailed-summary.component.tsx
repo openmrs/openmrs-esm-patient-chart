@@ -10,9 +10,10 @@ import { performPatientAllergySearch, Allergy } from './allergy-intolerance.reso
 
 interface AllergiesDetailedSummaryProps {
   patient: fhir.Patient;
+  showAddAllergy: boolean;
 }
 
-export default function AllergiesDetailedSummary({ patient }: AllergiesDetailedSummaryProps) {
+export default function AllergiesDetailedSummary({ patient, showAddAllergy }: AllergiesDetailedSummaryProps) {
   const [patientAllergies, setPatientAllergies] = useState<Array<Allergy>>([]);
   const { t } = useTranslation();
 
@@ -32,7 +33,7 @@ export default function AllergiesDetailedSummary({ patient }: AllergiesDetailedS
         <SummaryCard
           name={t('allergies', 'Allergies')}
           styles={{ width: '100%' }}
-          addComponent
+          addComponent={showAddAllergy}
           showComponent={() =>
             openWorkspaceTab(AllergyForm, `${t('allergiesForm', 'Allergies Form')}`, {
               allergyUuid: null,
