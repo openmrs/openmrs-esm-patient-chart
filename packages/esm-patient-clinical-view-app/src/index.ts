@@ -25,11 +25,15 @@ function setupOpenMRS() {
         meta: {
           columnSpan: 4,
         },
+        online: true,
+        offline: true,
       },
       {
         id: 'patient-clinical-view-details',
         slot: dashboardMeta.slot,
         load: getAsyncLifecycle(() => import('./clinical-view-overview/clinical-view-overview.component'), options),
+        online: true,
+        offline: true,
       },
       {
         id: 'patient-clinical-view-form-workspace',
@@ -37,12 +41,16 @@ function setupOpenMRS() {
         meta: {
           title: 'Add Clinical View',
         },
+        online: true,
+        offline: true,
       },
       {
         id: 'clinical-view-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
         load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
         meta: dashboardMeta,
+        online: true,
+        offline: true,
       },
     ],
   };
