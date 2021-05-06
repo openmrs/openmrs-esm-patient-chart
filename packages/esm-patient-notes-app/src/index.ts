@@ -1,4 +1,9 @@
-import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
+import {
+  defineConfigSchema,
+  getAsyncLifecycle,
+  getSyncLifecycle,
+  messageOmrsServiceWorker,
+} from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
@@ -7,6 +12,11 @@ import { backendDependencies } from './openmrs-backend-dependencies';
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 function setupOpenMRS() {
+  messageOmrsServiceWorker({
+    type: 'registerDynamicRoute',
+    pattern: '.+/ws/rest/v1/encounter.+',
+  });
+
   const moduleName = '@openmrs/esm-patient-notes-app';
 
   const options = {
@@ -25,6 +35,8 @@ function setupOpenMRS() {
         meta: {
           columnSpan: 4,
         },
+        online: { showAddNote: true },
+        offline: { showAddNote: false },
       },
       {
         id: 'notes-details-widget',
@@ -34,12 +46,16 @@ function setupOpenMRS() {
           title: 'Notes',
           view: 'notes',
         },
+        online: { showAddNote: true },
+        offline: { showAddNote: false },
       },
       {
         id: 'notes-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
         load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
         meta: dashboardMeta,
+        online: true,
+        offline: true,
       },
       {
         id: 'visit-notes-workspace',
