@@ -42,6 +42,13 @@ function setupOpenMRS() {
           title: 'Form Entry',
         },
       },
+      {
+        id: 'patient-form-entry-workspace',
+        load: getAsyncLifecycle(() => import('./forms/form-entry.component'), options),
+        meta: {
+          title: 'Form entry',
+        },
+      },
     ],
   };
 }
