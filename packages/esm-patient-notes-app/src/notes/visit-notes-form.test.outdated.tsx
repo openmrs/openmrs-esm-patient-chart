@@ -5,13 +5,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { screen, render } from '@testing-library/react';
 import { of } from 'rxjs/internal/observable/of';
 import { ConfigMock } from '../../../../__mocks__/chart-widgets-config.mock';
-import {
-  fetchCurrentSessionData,
-  fetchDiagnosisByName,
-  fetchLocationByUuid,
-  fetchProviderByUuid,
-  saveVisitNote,
-} from './visit-notes.resource';
+import { fetchDiagnosisByName, fetchLocationByUuid, fetchProviderByUuid, saveVisitNote } from './visit-notes.resource';
 import {
   currentSessionResponse,
   diagnosisSearchResponse,
@@ -20,14 +14,12 @@ import {
 } from '../../../../__mocks__/visit-note.mock';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 
-const mockFetchCurrentSessionData = fetchCurrentSessionData as jest.Mock;
 const mockFetchDiagnosisByName = fetchDiagnosisByName as jest.Mock;
 const mockFetchLocationByUuid = fetchLocationByUuid as jest.Mock;
 const mockFetchProviderByUuid = fetchProviderByUuid as jest.Mock;
 const mockSaveVisitNote = saveVisitNote as jest.Mock;
 
 jest.mock('./visit-notes.resource', () => ({
-  fetchCurrentSessionData: jest.fn(),
   fetchDiagnosisByName: jest.fn(),
   fetchLocationByUuid: jest.fn(),
   fetchProviderByUuid: jest.fn(),
@@ -38,14 +30,12 @@ describe('Visit notes form', () => {
   let mockConfig = ConfigMock;
 
   beforeEach(() => {
-    mockFetchCurrentSessionData.mockResolvedValue(currentSessionResponse);
     mockFetchLocationByUuid.mockResolvedValue(mockFetchLocationByUuidResponse);
     mockFetchProviderByUuid.mockResolvedValue(mockFetchProviderByUuidResponse);
     mockFetchDiagnosisByName.mockReturnValue(of(diagnosisSearchResponse.results));
   });
 
   afterEach(() => {
-    mockFetchCurrentSessionData.mockReset();
     mockFetchLocationByUuid.mockReset();
     mockFetchProviderByUuid.mockReset();
     mockFetchDiagnosisByName.mockReset();

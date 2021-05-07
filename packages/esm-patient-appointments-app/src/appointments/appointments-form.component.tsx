@@ -1,13 +1,8 @@
 import React, { useEffect, useRef, useState, SyntheticEvent } from 'react';
 import styles from './appointments-form.css';
 import { SummaryCard } from '@openmrs/esm-patient-common-lib';
-import { createErrorHandler } from '@openmrs/esm-framework';
-import {
-  getSession,
-  createAppointment,
-  getAppointmentService,
-  getAppointmentServiceAll,
-} from './appointments.resource';
+import { createErrorHandler, useSessionUser } from '@openmrs/esm-framework';
+import { createAppointment, getAppointmentService, getAppointmentServiceAll } from './appointments.resource';
 import { useHistory } from 'react-router-dom';
 import { Trans, useTranslation } from 'react-i18next';
 import { DataCaptureComponentProps } from '../types';
@@ -35,6 +30,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
   entryCancelled = () => {},
   closeComponent = () => {},
 }) => {
+  const session = useSessionUser();
   const formRef = useRef<HTMLFormElement>(null);
   const [currentSession, setCurrentSession] = useState(null);
   const [appointmentService, setAppointmentService] = useState(null);
@@ -60,15 +56,18 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
   }, [appointmentDate, appointmentStartTime, appointmentEndTime]);
 
   useEffect(() => {
+    if (session && !currentSession && !location) {
+      setCurrentSession(session);
+      setLocation(session?.sessionLocation?.uuid);
+    }
+  }, [session, currentSession, location]);
+
+  useEffect(() => {
     const abortController = new AbortController();
 
     if (patientUuid) {
       getAppointmentServiceAll(abortController).then(({ data }) => {
         setAppointmentService(data);
-      }, createErrorHandler());
-      getSession(abortController).then((response) => {
-        setCurrentSession(response?.data);
-        setLocation(response?.data?.sessionLocation?.uuid);
       }, createErrorHandler());
     }
 

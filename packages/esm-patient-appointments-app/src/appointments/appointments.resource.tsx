@@ -46,9 +46,3 @@ export function getAppointmentService(abortController: AbortController, uuid) {
 export function getTimeSlots(abortController: AbortController) {
   //https://openmrs-spa.org/openmrs/ws/rest/v1/appointment/all?forDate=2020-03-02T21:00:00.000Z
 }
-
-export function getSession(abortController: AbortController) {
-  return openmrsFetch(`/ws/rest/v1/appui/session`, {
-    signal: abortController.signal,
-  });
-}
