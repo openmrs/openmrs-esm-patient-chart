@@ -3,12 +3,6 @@ import { map } from 'rxjs/operators';
 import { Diagnosis, VisitNotePayload } from './visit-note.util';
 import { ConceptMapping, DiagnosisData, Location, Provider, SessionData } from '../types';
 
-export function fetchCurrentSessionData(abortController: AbortController) {
-  return openmrsFetch<SessionData>(`/ws/rest/v1/appui/session`, {
-    signal: abortController.signal,
-  });
-}
-
 export function fetchLocationByUuid(abortController: AbortController, locationUuid: string) {
   return openmrsFetch<Location>(`/ws/rest/v1/location/${locationUuid}`, {
     signal: abortController.signal,

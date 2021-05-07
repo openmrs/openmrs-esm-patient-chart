@@ -14,15 +14,9 @@ import TextArea from 'carbon-components-react/es/components/TextArea';
 import { Tile } from 'carbon-components-react/es/components/Tile';
 import { useTranslation } from 'react-i18next';
 import { Column, Grid, Row } from 'carbon-components-react/es/components/Grid';
-import { createErrorHandler, showToast, useConfig } from '@openmrs/esm-framework';
+import { createErrorHandler, showToast, useConfig, useSessionUser } from '@openmrs/esm-framework';
 import { convertToObsPayLoad, Diagnosis, ObsData, VisitNotePayload } from './visit-note.util';
-import {
-  fetchCurrentSessionData,
-  fetchDiagnosisByName,
-  fetchLocationByUuid,
-  fetchProviderByUuid,
-  saveVisitNote,
-} from './visit-notes.resource';
+import { fetchDiagnosisByName, fetchLocationByUuid, fetchProviderByUuid, saveVisitNote } from './visit-notes.resource';
 import { ConfigObject } from '../config-schema';
 
 interface VisitNotesFormProps {
@@ -32,6 +26,7 @@ interface VisitNotesFormProps {
 
 const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, closeWorkspace }) => {
   const searchTimeoutInMs = 300;
+  const session = useSessionUser();
   const config = useConfig() as ConfigObject;
   const {
     clinicianEncounterRole,
@@ -54,18 +49,11 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, closeWorks
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   React.useEffect(() => {
-    const ac = new AbortController();
-    fetchCurrentSessionData(ac).then(({ data }) => {
-      const { currentProvider, sessionLocation } = data;
-      if (currentProvider.uuid) {
-        setCurrentSessionProviderUuid(currentProvider.uuid);
-      }
-      if (sessionLocation.uuid) {
-        setCurrentSessionLocationUuid(sessionLocation.uuid);
-      }
-    });
-    return () => ac.abort();
-  }, []);
+    if (session && !currentSessionLocationUuid && !currentSessionProviderUuid) {
+      setCurrentSessionLocationUuid(session?.sessionLocation?.uuid);
+      setCurrentSessionProviderUuid(session?.currentProvider?.uuid);
+    }
+  }, [currentSessionLocationUuid, currentSessionProviderUuid, session]);
 
   React.useEffect(() => {
     const ac = new AbortController();

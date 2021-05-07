@@ -64,7 +64,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
       patientVitalAndBiometrics,
       new Date(),
       ac,
-      session.sessionLocation.uuid,
+      session?.sessionLocation?.uuid,
     ).then((response) => {
       response.status === 201 && closeWorkspace();
       response.status !== 201 && createErrorHandler();
