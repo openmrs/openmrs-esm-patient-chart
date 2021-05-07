@@ -3,7 +3,7 @@ import Search from 'carbon-components-react/es/components/Search';
 import debounce from 'lodash-es/debounce';
 import isEmpty from 'lodash-es/isEmpty';
 import styles from './form-view.component.scss';
-import { getStartedVisit, VisitItem } from '@openmrs/esm-framework';
+import { attach, getStartedVisit, VisitItem } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { Form } from '../types';
 import DataTable, {
@@ -18,7 +18,7 @@ import DataTable, {
   DataTableHeader,
   DataTableRow,
 } from 'carbon-components-react/es/components/DataTable';
-import { formatDate, sortFormLatestFirst } from './forms-utils';
+import { formatDate, formEntrySub, sortFormLatestFirst, FormEntryProps } from './forms-utils';
 import EmptyFormView from './empty-form.component';
 import PatientChartPagination from '../pagination/pagination.component';
 import first from 'lodash-es/first';
@@ -34,9 +34,10 @@ function startVisitPrompt() {
   );
 }
 
-function launchFormEntry(activeVisit: VisitItem, _: Form) {
+function launchFormEntry(activeVisit: VisitItem, formUuid: string) {
   if (activeVisit) {
-    //TODO launch into patient-chart-workspace-slot using formUuid: form.uuid, encounterUuid: encounterUuid;
+    formEntrySub.next({ formUuid: formUuid });
+    attach('patient-chart-workspace-slot', 'patient-form-entry-workspace');
   } else {
     startVisitPrompt();
   }
@@ -85,7 +86,7 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, encounterUuid }
     () =>
       results.map((form, index) => {
         return {
-          id: `${index}`,
+          id: form.uuid,
           lastCompleted: form.lastCompleted && formatDate(form.lastCompleted),
           formName: form.name,
           formUuid: form.uuid,
@@ -147,7 +148,7 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, encounterUuid }
                     </TableHead>
                     <TableBody>
                       {rows.map((row) => (
-                        <TableRow key={row.id} onClick={() => launchFormEntry(activeVisit, row.cells[1].value)}>
+                        <TableRow key={row.id} onClick={() => launchFormEntry(activeVisit, row.id)}>
                           {row.cells.map((cell) => withValue(cell, row))}
                         </TableRow>
                       ))}
