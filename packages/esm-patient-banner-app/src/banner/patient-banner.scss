@@ -1,6 +1,7 @@
 @import "carbon-components/scss/globals/scss/typography.scss";
 
 .container {
+  border-top: 0.063rem solid $ui-03;
   border-bottom: 0.063rem solid $ui-03;
   background-color: $ui-01;
 }
