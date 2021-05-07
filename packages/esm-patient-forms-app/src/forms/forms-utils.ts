@@ -1,9 +1,10 @@
-import dayjs from "dayjs";
-import { Encounter, Form } from "../types";
+import dayjs from 'dayjs';
+import { BehaviorSubject } from 'rxjs';
+import { Encounter, Form } from '../types';
 
 export function filterAvailableAndCompletedForms(
   forms: Array<Form>,
-  encounters: Array<Encounter>
+  encounters: Array<Encounter>,
 ): {
   available: Array<Form>;
   completed: Array<Encounter>;
@@ -33,16 +34,19 @@ export function areFormsEqual(a: Form, b: Form): boolean {
 export const formatDate = (strDate: string | Date) => {
   const date = dayjs(strDate);
   const today = dayjs(new Date());
-  if (
-    date.date() === today.date() &&
-    date.month() === today.month() &&
-    date.year() === today.year()
-  ) {
-    return `Today @ ${date.format("HH:mm")}`;
+  if (date.date() === today.date() && date.month() === today.month() && date.year() === today.year()) {
+    return `Today @ ${date.format('HH:mm')}`;
   }
-  return date.format("DD - MMM - YYYY @ HH:mm");
+  return date.format('DD - MMM - YYYY @ HH:mm');
 };
 
 export const sortFormLatestFirst = (formA: Form, formB: Form) =>
-  new Date(formB.lastCompleted).getTime() -
-  new Date(formA.lastCompleted).getTime();
+  new Date(formB.lastCompleted).getTime() - new Date(formA.lastCompleted).getTime();
+
+// This is a work around until attach function is re-worked to enable passing of props
+export interface FormEntryProps {
+  encounterUuid?: string;
+  formUuid: string;
+}
+
+export const formEntrySub = new BehaviorSubject<FormEntryProps | null>(null);
