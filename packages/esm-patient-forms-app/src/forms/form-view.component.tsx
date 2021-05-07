@@ -3,7 +3,7 @@ import Search from 'carbon-components-react/es/components/Search';
 import debounce from 'lodash-es/debounce';
 import isEmpty from 'lodash-es/isEmpty';
 import styles from './form-view.component.scss';
-import { attach, getStartedVisit, VisitItem } from '@openmrs/esm-framework';
+import { attach, getStartedVisit, VisitItem, navigate } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { Form } from '../types';
 import DataTable, {
@@ -35,10 +35,14 @@ function startVisitPrompt() {
   );
 }
 
-function launchFormEntry(activeVisit: VisitItem, formUuid: string) {
+function launchFormEntry(activeVisit: VisitItem, formUuid: string, patientUuid: string) {
   if (activeVisit) {
-    formEntrySub.next({ formUuid: formUuid });
-    attach('patient-chart-workspace-slot', 'patient-form-entry-workspace');
+    const htmlForm = isHTMLForm(formUuid);
+    isEmpty(htmlForm)
+      ? launchWorkSpace(formUuid)
+      : navigate({
+          to: `\${openmrsBase}/htmlformentryui/htmlform/${htmlForm.UIPage}.page?patientId=${patientUuid}&definitionUiResource=referenceapplication:htmlforms/${htmlForm.formAppUrl}.xml`,
+        });
   } else {
     startVisitPrompt();
   }
@@ -159,7 +163,7 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, encounterUuid }
                     </TableHead>
                     <TableBody>
                       {rows.map((row) => (
-                        <TableRow key={row.id} onClick={() => launchFormEntry(activeVisit, row.id)}>
+                        <TableRow key={row.id} onClick={() => launchFormEntry(activeVisit, row.id, patientUuid)}>
                           {row.cells.map((cell) => withValue(cell, row))}
                         </TableRow>
                       ))}
