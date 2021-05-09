@@ -38,8 +38,7 @@
     "@openmrs/esm-patient-common-lib": "^3.0.0",
     "carbon-components-react": "^7.25.0",
     "d3": "^5.16.0",
-    "lodash-es": "^4.17.15",
-    "systemjs-webpack-interop": "^1.2.1"
+    "lodash-es": "^4.17.15"
   },
   "peerDependencies": {
     "@openmrs/esm-framework": "3.x",

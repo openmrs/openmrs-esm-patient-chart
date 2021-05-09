@@ -44,8 +44,7 @@
     "d3": "^5.16.0",
     "lodash-es": "^4.17.15",
     "react-grid-gallery": "^0.5.5",
-    "react-html5-camera-photo": "^1.5.4",
-    "systemjs-webpack-interop": "^1.2.1"
+    "react-html5-camera-photo": "^1.5.4"
   },
   "peerDependencies": {
     "@openmrs/esm-framework": "3.x",
