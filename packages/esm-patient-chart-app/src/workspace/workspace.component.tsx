@@ -10,13 +10,14 @@ interface WorkspaceProps {
 }
 
 const Workspace: React.FC<WorkspaceProps> = (props) => {
-  const [openTabs, setOpenTabs] = React.useState<WorkspaceItem[]>([]);
+  const [openTabs, setOpenTabs] = React.useState<Array<WorkspaceItem>>([]);
   const [selectedTab, setSelectedTab] = React.useState(null);
 
   React.useEffect(() => {
     const sub = getNewWorkspaceItem().subscribe((item) => {
       if (item.validations) {
         const validation = item.validations(openTabs);
+
         if (validation > -1) {
           setSelectedTab(validation);
         } else {
@@ -30,60 +31,74 @@ const Workspace: React.FC<WorkspaceProps> = (props) => {
         setSelectedTab(updatedOpenTabs.length - 1);
       }
     });
+
     return () => sub.unsubscribe();
-  });
+  }, [openTabs]);
 
-  React.useEffect(() => {
-    openTabs.length ? props.showWorkspace(true) : props.showWorkspace(false);
-  }, [openTabs, props]);
+  React.useEffect(() => props.showWorkspace(openTabs.length > 0), [openTabs.length, props.showWorkspace]);
 
-  function removeTab(index: number) {
-    const tab = openTabs[index];
-    let userConfirmed = false;
+  const getSelectedTabAfterRemove = React.useCallback(
+    (removedItemIndex: number, currentTab: number) => {
+      if (removedItemIndex === currentTab) {
+        return removedItemIndex > 0 ? removedItemIndex - 1 : null;
+      } else if (removedItemIndex < currentTab) {
+        return currentTab - 1;
+      } else {
+        return selectedTab;
+      }
+    },
+    [selectedTab],
+  );
 
-    if (tab.inProgress) {
-      userConfirmed = confirm('There is ongoing work, are you sure you want to close this tab?');
-    }
+  const removeTab = React.useCallback(
+    (index: number) => {
+      const tab = openTabs[index];
+      let userConfirmed = false;
 
-    if (userConfirmed || !tab.inProgress) {
-      const updatedOpenTabs = openTabs.slice();
-      updatedOpenTabs.splice(index, 1);
-      setOpenTabs(updatedOpenTabs);
-      setSelectedTab(getSelectedTabAfterRemove(index, selectedTab));
-      props.openTabs(updatedOpenTabs);
-    }
-  }
+      if (tab.inProgress) {
+        userConfirmed = confirm('There is ongoing work, are you sure you want to close this tab?');
+      }
 
-  function setWorkBegan(index: number) {
-    const updatedTabs = openTabs.slice();
-    updatedTabs[index].inProgress = true;
-    setOpenTabs(updatedTabs);
-  }
+      if (userConfirmed || !tab.inProgress) {
+        const updatedOpenTabs = openTabs.slice();
+        updatedOpenTabs.splice(index, 1);
+        setOpenTabs(updatedOpenTabs);
+        setSelectedTab(getSelectedTabAfterRemove(index, selectedTab));
+        props.openTabs(updatedOpenTabs);
+      }
+    },
+    [props.openTabs, openTabs, selectedTab, getSelectedTabAfterRemove],
+  );
 
-  function setWorkEnded(index: number) {
-    const updatedTabs = openTabs.slice();
-    updatedTabs[index].inProgress = false;
-    setOpenTabs(updatedTabs);
-  }
+  const setWorkBegan = React.useCallback(
+    (index: number) => {
+      const updatedTabs = openTabs.slice();
+      updatedTabs[index].inProgress = true;
+      setOpenTabs(updatedTabs);
+    },
+    [openTabs],
+  );
 
-  function onCloseTabRequest(index: number, tab: WorkspaceItem) {
-    setWorkEnded(index);
-    removeTab(index);
+  const setWorkEnded = React.useCallback(
+    (index: number) => {
+      const updatedTabs = openTabs.slice();
+      updatedTabs[index].inProgress = false;
+      setOpenTabs(updatedTabs);
+    },
+    [openTabs],
+  );
 
-    if (tab.componentClosed) {
-      tab.componentClosed();
-    }
-  }
+  const onCloseTabRequest = React.useCallback(
+    (index: number, tab: WorkspaceItem) => {
+      setWorkEnded(index);
+      removeTab(index);
 
-  function getSelectedTabAfterRemove(removedItemIndex: number, currentTab: number) {
-    if (removedItemIndex === currentTab) {
-      return removedItemIndex > 0 ? removedItemIndex - 1 : null;
-    } else if (removedItemIndex < currentTab) {
-      return currentTab - 1;
-    } else {
-      return selectedTab;
-    }
-  }
+      if (tab.componentClosed) {
+        tab.componentClosed();
+      }
+    },
+    [setWorkEnded, removeTab],
+  );
 
   return (
     <>

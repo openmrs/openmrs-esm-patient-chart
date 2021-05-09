@@ -18,6 +18,16 @@ const ContextWorkspace: React.FC<RouteComponentProps<ContextWorkspaceParams>> = 
   const { t } = useTranslation();
   const props = React.useMemo(() => ({ closeWorkspace, patientUuid }), [closeWorkspace, patientUuid]);
 
+  React.useEffect(() => {
+    if (active) {
+      const original = window.getComputedStyle(document.body).overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = original;
+      };
+    }
+  }, [active]);
+
   return (
     <aside className={styles.contextWorkspaceContainer} style={{ visibility: active ? 'visible' : 'collapse' }}>
       <Header aria-label={title} style={{ position: 'sticky' }}>
