@@ -22,6 +22,7 @@ const FormEntry: React.FC = () => {
             formUuid: selectedForm.formUuid,
             encounterUuid: null,
             view: 'form',
+            patient: selectedForm.patient,
             closeWorkspace: closeWorkspace,
           }}
         />

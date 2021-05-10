@@ -21,9 +21,10 @@ enum FormViewState {
 
 interface FormsProps {
   patientUuid: string;
+  patient: fhir.Patient;
 }
 
-const Forms: React.FC<FormsProps> = ({ patientUuid }) => {
+const Forms: React.FC<FormsProps> = ({ patientUuid, patient }) => {
   const { t } = useTranslation();
   const displayText = t('forms', 'Forms');
   const headerTitle = t('forms', 'Forms');
@@ -91,6 +92,7 @@ const Forms: React.FC<FormsProps> = ({ patientUuid }) => {
             <FormView
               forms={completedForms}
               patientUuid={patientUuid}
+              patient={patient}
               encounterUuid={first<Encounter>(encounters)?.uuid}
             />
           )}
@@ -98,6 +100,7 @@ const Forms: React.FC<FormsProps> = ({ patientUuid }) => {
             <FormView
               forms={filledForms}
               patientUuid={patientUuid}
+              patient={patient}
               encounterUuid={first<Encounter>(encounters)?.uuid}
             />
           )}
