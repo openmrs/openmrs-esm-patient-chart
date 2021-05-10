@@ -47,6 +47,7 @@ export const sortFormLatestFirst = (formA: Form, formB: Form) =>
 export interface FormEntryProps {
   encounterUuid?: string;
   formUuid: string;
+  patient: fhir.Patient;
 }
 
 export const formEntrySub = new BehaviorSubject<FormEntryProps | null>(null);

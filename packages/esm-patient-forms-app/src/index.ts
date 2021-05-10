@@ -1,4 +1,11 @@
-import { defineConfigSchema, getAsyncLifecycle, messageOmrsServiceWorker } from '@openmrs/esm-framework';
+import {
+  defineConfigSchema,
+  getAsyncLifecycle,
+  getSyncLifecycle,
+  messageOmrsServiceWorker,
+} from '@openmrs/esm-framework';
+import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
+import { dashboardMeta } from './dashboard.meta';
 import { backendDependencies } from './openmrs-backend-dependencies';
 
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
@@ -43,11 +50,22 @@ function setupOpenMRS() {
         },
       },
       {
+        id: 'patient-form-dashboard',
+        slot: dashboardMeta.slot,
+        load: getAsyncLifecycle(() => import('./forms/forms.component'), options),
+      },
+      {
         id: 'patient-form-entry-workspace',
         load: getAsyncLifecycle(() => import('./forms/form-entry.component'), options),
         meta: {
           title: 'Form Entry',
         },
+      },
+      {
+        id: 'forms-summary-dashboard',
+        slot: 'patient-chart-dashboard-slot',
+        load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
+        meta: dashboardMeta,
       },
     ],
   };

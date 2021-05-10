@@ -18,7 +18,7 @@ import DataTable, {
   DataTableHeader,
   DataTableRow,
 } from 'carbon-components-react/es/components/DataTable';
-import { formatDate, formEntrySub, sortFormLatestFirst, FormEntryProps } from './forms-utils';
+import { formatDate, formEntrySub, sortFormLatestFirst } from './forms-utils';
 import EmptyFormView from './empty-form.component';
 import PatientChartPagination from '../pagination/pagination.component';
 import first from 'lodash-es/first';
@@ -35,21 +35,21 @@ function startVisitPrompt() {
   );
 }
 
-function launchFormEntry(activeVisit: VisitItem, formUuid: string, patientUuid: string) {
+function launchFormEntry(activeVisit: VisitItem, formUuid: string, patient: fhir.Patient) {
   if (activeVisit) {
     const htmlForm = isHTMLForm(formUuid);
     isEmpty(htmlForm)
-      ? launchWorkSpace(formUuid)
+      ? launchWorkSpace(formUuid, patient)
       : navigate({
-          to: `\${openmrsBase}/htmlformentryui/htmlform/${htmlForm.UIPage}.page?patientId=${patientUuid}&definitionUiResource=referenceapplication:htmlforms/${htmlForm.formAppUrl}.xml`,
+          to: `\${openmrsBase}/htmlformentryui/htmlform/${htmlForm.UIPage}.page?patientId=${patient.id}&definitionUiResource=referenceapplication:htmlforms/${htmlForm.formAppUrl}.xml`,
         });
   } else {
     startVisitPrompt();
   }
 }
 
-const launchWorkSpace = (formUuid: string) => {
-  formEntrySub.next({ formUuid: formUuid });
+const launchWorkSpace = (formUuid: string, patient: fhir.Patient) => {
+  formEntrySub.next({ formUuid: formUuid, patient: patient });
   attach('patient-chart-workspace-slot', 'patient-form-entry-workspace');
 };
 
@@ -61,6 +61,7 @@ function isHTMLForm(formUuid: string) {
 interface FormViewProps {
   forms: Array<Form>;
   patientUuid: string;
+  patient: fhir.Patient;
   encounterUuid?: string;
 }
 
@@ -68,7 +69,7 @@ const filterFormsByName = (formName: string, forms: Array<Form>) => {
   return forms.filter((form) => form.name.toLowerCase().search(formName.toLowerCase()) !== -1);
 };
 
-const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, encounterUuid }) => {
+const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, encounterUuid }) => {
   const { t } = useTranslation();
   const [activeVisit, setActiveVisit] = React.useState<VisitItem>();
   const [searchTerm, setSearchTerm] = React.useState<string>(null);
@@ -163,7 +164,7 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, encounterUuid }
                     </TableHead>
                     <TableBody>
                       {rows.map((row) => (
-                        <TableRow key={row.id} onClick={() => launchFormEntry(activeVisit, row.id, patientUuid)}>
+                        <TableRow key={row.id} onClick={() => launchFormEntry(activeVisit, row.id, patient)}>
                           {row.cells.map((cell) => withValue(cell, row))}
                         </TableRow>
                       ))}
