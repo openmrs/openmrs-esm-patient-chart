@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import dayjs from 'dayjs';
 import styles from './appointments-overview.scss';
 import Add16 from '@carbon/icons-react/es/add/16';
@@ -23,12 +23,16 @@ interface AppointmentOverviewProps {
   patientUuid: string;
 }
 
+function getStartDate() {
+  return dayjs().format();
+}
+
 const AppointmentsOverview: React.FC<AppointmentOverviewProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const appointmentsToShowCount = 5;
   const [appointments, setAppointments] = React.useState(null);
   const [error, setError] = React.useState(null);
-  const startDate = dayjs().format();
+  const startDate = useMemo(getStartDate, []);
   const displayText = t('appointments', 'appointments');
   const headerTitle = t('appointments', 'Appointments');
 
