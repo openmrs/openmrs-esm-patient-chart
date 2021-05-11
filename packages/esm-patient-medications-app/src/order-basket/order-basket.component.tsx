@@ -33,9 +33,8 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
   const [isLoading, setIsLoading] = useState(true);
   const [medicationOrderFormItem, setMedicationOrderFormItem] = useState<OrderBasketItem | null>(null);
   const [isMedicationOrderFormVisible, setIsMedicationOrderFormVisible] = useState(false);
-  const [onMedicationOrderFormSigned, setOnMedicationOrderFormSign] = useState<
-    (finalizedOrderBasketItem: OrderBasketItem) => void | null
-  >(null);
+  const [onMedicationOrderFormSigned, setOnMedicationOrderFormSign] =
+    useState<(finalizedOrderBasketItem: OrderBasketItem) => void | null>(null);
   const [activePatientOrders, fetchActivePatientOrders] = usePatientOrders(patientUuid, 'ACTIVE');
 
   useEffect(() => {

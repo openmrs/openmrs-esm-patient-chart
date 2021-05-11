@@ -70,9 +70,10 @@ const DesktopView: React.FC<Record<string, any>> = ({ patientUuid, panelUuid, te
 
   const openTimeline = React.useCallback((panelUuid) => navigateToTimeline(basePath, panelUuid), [basePath]);
 
-  const openTrendline = React.useCallback((panelUuid, testUuid) => navigateToTrendline(basePath, panelUuid, testUuid), [
-    basePath,
-  ]);
+  const openTrendline = React.useCallback(
+    (panelUuid, testUuid) => navigateToTrendline(basePath, panelUuid, testUuid),
+    [basePath],
+  );
 
   return (
     <Grid>
