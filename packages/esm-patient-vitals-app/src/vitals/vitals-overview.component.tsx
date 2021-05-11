@@ -208,7 +208,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
           pulse: vital.pulse,
           spo2: vital.oxygenSaturation,
           temperature: vital.temperature,
-          rrate: vital.respiratoryRate,
+          respiratoryRate: vital.respiratoryRate,
         };
       }),
     [vitals, showAllVitals],

@@ -36,6 +36,14 @@ export const configSchema = {
       _type: Type.ConceptUuid,
       _default: '5242AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
+    generalPatientNoteUuid: {
+      _type: Type.ConceptUuid,
+      _default: '165095AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    },
+    midUpperArmCircumferenceUuid: {
+      _type: Type.ConceptUuid,
+      _default: '1343AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    },
   },
   vitals: vitalsConfigSchema,
   biometrics: biometricsConfigSchema,
