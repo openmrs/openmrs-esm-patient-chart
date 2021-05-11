@@ -27,9 +27,7 @@ module.exports = (env, argv = {}) => ({
   module: {
     rules: [
       {
-        parser: {
-          system: false,
-        },
+        parser: {},
       },
       {
         test: /\.m?(js|ts|tsx)$/,
