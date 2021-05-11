@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import dayjs from 'dayjs';
 import isEmpty from 'lodash-es/isEmpty';
 import first from 'lodash-es/first';
@@ -9,6 +9,7 @@ import styles from './vital-header-state.component.scss';
 import { useTranslation } from 'react-i18next';
 import { useConfig, createErrorHandler } from '@openmrs/esm-framework';
 import { PatientVitals, performPatientsVitalsSearch } from '../vitals-biometrics.resource';
+import { useVitalsSignsConceptMetaData } from '../vitals-biometrics-form/use-vitalsigns';
 
 interface ViewState {
   view: 'Default' | 'Warning';
@@ -30,7 +31,18 @@ const VitalHeader: React.FC<VitalHeaderProps> = ({ patientUuid, showRecordVitals
   const [isLoading, setIsLoading] = useState(true);
   const toggleView = () => setShowDetails((prevState) => !prevState);
   const cls = displayState.view === 'Warning' ? styles.warningBackground : styles.defaultBackground;
-
+  const { conceptsUnits } = useVitalsSignsConceptMetaData();
+  const [
+    bloodPressureUnit,
+    ,
+    temperatureUnit,
+    heightUnit,
+    weightUnit,
+    pulseUnit,
+    oxygenSaturationUnit,
+    midUpperArmCircumferenceUnit,
+    respiratoryRateUnit,
+  ] = conceptsUnits;
   useEffect(() => {
     if (patientUuid) {
       const subscription = performPatientsVitalsSearch(config.concepts, patientUuid, 10).subscribe((vitals) => {
@@ -67,30 +79,46 @@ const VitalHeader: React.FC<VitalHeaderProps> = ({ patientUuid, showRecordVitals
               <div className={styles.row}>
                 <VitalHeaderStateDetails
                   unitName={t('temperatureAbbreviated', 'Temp')}
-                  unitSymbol="°C"
+                  unitSymbol={temperatureUnit}
                   value={vital.temperature}
                 />
                 <VitalHeaderStateDetails
                   unitName={t('bp', 'BP')}
-                  unitSymbol="mmHg"
+                  unitSymbol={bloodPressureUnit}
                   value={`${vital.systolic} / ${vital.diastolic}`}
                 />
-                <VitalHeaderStateDetails unitName={t('heartRate', 'Heart Rate')} unitSymbol="bpm" value={vital.pulse} />
-                <VitalHeaderStateDetails unitName={t('spo2', 'SpO2')} unitSymbol="%" value={vital.oxygenSaturation} />
+                <VitalHeaderStateDetails
+                  unitName={t('heartRate', 'Heart Rate')}
+                  unitSymbol={pulseUnit}
+                  value={vital.pulse}
+                />
+                <VitalHeaderStateDetails
+                  unitName={t('spo2', 'SpO2')}
+                  unitSymbol={oxygenSaturationUnit}
+                  value={vital.oxygenSaturation}
+                />
               </div>
               <div className={styles.row}>
                 <VitalHeaderStateDetails
                   unitName={t('respiratoryRate', 'R. Rate')}
-                  unitSymbol="/ min"
-                  value={vital.temperature}
+                  unitSymbol={respiratoryRateUnit}
+                  value={vital.respiratoryRate}
                 />
-                <VitalHeaderStateDetails unitName={t('height', 'Height')} unitSymbol="cm" value={vital.height} />
+                <VitalHeaderStateDetails
+                  unitName={t('height', 'Height')}
+                  unitSymbol={heightUnit}
+                  value={vital.height}
+                />
                 <VitalHeaderStateDetails
                   unitName={t('bmi', 'BMI')}
-                  unitSymbol={<span>kg / m²</span>}
+                  unitSymbol={config.biometrics['bmiUnit']}
                   value={vital.bmi}
                 />
-                <VitalHeaderStateDetails unitName={t('weight', 'Weight')} unitSymbol="kg" value={vital.weight} />
+                <VitalHeaderStateDetails
+                  unitName={t('weight', 'Weight')}
+                  unitSymbol={weightUnit}
+                  value={vital.weight}
+                />
               </div>
             </div>
           )}
