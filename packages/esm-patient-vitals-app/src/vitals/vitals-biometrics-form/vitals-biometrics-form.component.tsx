@@ -36,6 +36,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
   const biometricsUnitsSymbols = config.biometrics;
   const [patientVitalAndBiometrics, setPatientVitalAndBiometrics] = useState<PatientVitalAndBiometric>();
   const [patientBMI, setPatientBMI] = useState<number>();
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const [
     bloodPressureUnit,
@@ -55,6 +56,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
   };
 
   const savePatientVitalsAndBiometrics = () => {
+    setIsSubmitting(true);
     const ac = new AbortController();
     savePatientVitals(
       config.vitals.encounterTypeUuid,
@@ -67,8 +69,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
       session?.sessionLocation?.uuid,
     ).then((response) => {
       response.status === 201 && closeWorkspace();
-      response.status !== 201 && createErrorHandler();
-    });
+    }, createErrorHandler());
     return () => ac.abort();
   };
 
@@ -347,7 +348,11 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
           <Button onClick={closeWorkspace} className={styles.vitalsButton} kind="secondary">
             {t('cancel', 'Cancel')}
           </Button>
-          <Button onClick={savePatientVitalsAndBiometrics} className={styles.vitalsButton} kind="primary">
+          <Button
+            disabled={isSubmitting}
+            onClick={savePatientVitalsAndBiometrics}
+            className={styles.vitalsButton}
+            kind="primary">
             {t('signAndSave', 'Sign & Save')}
           </Button>
         </Column>
