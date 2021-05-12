@@ -27,9 +27,6 @@ module.exports = (env, argv = {}) => ({
   module: {
     rules: [
       {
-        parser: {},
-      },
-      {
         test: /\.m?(js|ts|tsx)$/,
         exclude: /(node_modules|bower_components)/,
         use: {
