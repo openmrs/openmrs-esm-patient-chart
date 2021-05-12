@@ -1,13 +1,13 @@
-import React, { useCallback, useEffect, useState } from "react";
-import CameraFrame from "./camera-frame.component";
-import ImagePreview from "./image-preview.component";
-import styles from "./camera-upload.css";
-import Camera from "react-html5-camera-photo";
-import "react-html5-camera-photo/build/css/index.css";
-import "./styles.css";
-import { createAttachment } from "./attachments.resource";
-import { useTranslation } from "react-i18next";
-import { Attachment } from "./attachments-overview.component";
+import React, { useCallback, useEffect, useState } from 'react';
+import CameraFrame from './camera-frame.component';
+import ImagePreview from './image-preview.component';
+import styles from './camera-upload.css';
+import Camera from 'react-html5-camera-photo';
+import 'react-html5-camera-photo/build/css/index.css';
+import './styles.css';
+import { createAttachment } from './attachments.resource';
+import { useTranslation } from 'react-i18next';
+import { Attachment } from './attachments-overview.component';
 export interface CameraUploadProps {
   openCameraOnRender?: boolean;
   collectCaption?: boolean;
@@ -61,13 +61,7 @@ const CameraUpload: React.FC<CameraUploadProps> = ({
   const handleSaveImage = useCallback(
     (dataUri: string, caption: string, selectedFile: File) => {
       const abortController = new AbortController();
-      createAttachment(
-        patientUuid,
-        selectedFile,
-        caption,
-        abortController,
-        dataUri
-      ).then((res) => {
+      createAttachment(patientUuid, selectedFile, caption, abortController, dataUri).then((res) => {
         onNewAttachment?.({
           id: `${res.data.uuid}`,
           src: `${window.openmrsBase}/ws/rest/v1/attachment/${res.data.uuid}/bytes`,

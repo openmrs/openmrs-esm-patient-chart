@@ -1,6 +1,6 @@
-import React from "react";
-import styles from "./attachment-thumbnail.scss";
-import regularFile from "../assets/file-regular.svg";
+import React from 'react';
+import styles from './attachment-thumbnail.scss';
+import regularFile from '../assets/file-regular.svg';
 
 export default function AttachmentThumbnail(props: AttachmentThumbnailProps) {
   return (
@@ -43,18 +43,8 @@ function OtherThumbnail(props: ImageProps) {
   }
 
   return (
-    <div
-      className={styles.otherThumbnail}
-      onClick={handleClick}
-      role="button"
-      tabIndex={0}
-    >
-      <img
-        src={regularFile}
-        alt={props.title}
-        style={props.style}
-        className={styles.otherThumbnail}
-      />
+    <div className={styles.otherThumbnail} onClick={handleClick} role="button" tabIndex={0}>
+      <img src={regularFile} alt={props.title} style={props.style} className={styles.otherThumbnail} />
     </div>
   );
 }

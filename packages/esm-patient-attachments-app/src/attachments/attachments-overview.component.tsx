@@ -1,25 +1,18 @@
-import React, { useState, useEffect } from "react";
-import AttachmentThumbnail from "./attachment-thumbnail.component";
-import dayjs from "dayjs";
-import Gallery from "react-grid-gallery";
-import styles from "./attachments-overview.scss";
-import CameraUpload from "./camera-upload.component";
-import { useLayoutType, UserHasAccess } from "@openmrs/esm-framework";
-import Button from "carbon-components-react/lib/components/Button";
-import Add16 from "@carbon/icons-react/es/add/16";
-import PatientChartPagination, {
-  paginate,
-} from "../ui-components/pagination/pagination.component";
-import {
-  getAttachments,
-  createAttachment,
-  deleteAttachment,
-  getAttachmentByUuid,
-} from "./attachments.resource";
-import { Trans } from "react-i18next";
-import { Modal } from "../ui-components/modal/modal.component";
-import "./gallery.overrides.scss";
-import { EmptyState } from "@openmrs/esm-patient-common-lib";
+import React, { useState, useEffect } from 'react';
+import AttachmentThumbnail from './attachment-thumbnail.component';
+import dayjs from 'dayjs';
+import Gallery from 'react-grid-gallery';
+import styles from './attachments-overview.scss';
+import CameraUpload from './camera-upload.component';
+import { useLayoutType, UserHasAccess } from '@openmrs/esm-framework';
+import Button from 'carbon-components-react/lib/components/Button';
+import Add16 from '@carbon/icons-react/es/add/16';
+import PatientChartPagination, { paginate } from '../ui-components/pagination/pagination.component';
+import { getAttachments, createAttachment, deleteAttachment, getAttachmentByUuid } from './attachments.resource';
+import { Trans } from 'react-i18next';
+import { Modal } from '../ui-components/modal/modal.component';
+import './gallery.overrides.scss';
+import { EmptyState } from '@openmrs/esm-patient-common-lib';
 export interface Attachment {
   id: string;
   src: string;
@@ -33,9 +26,7 @@ export interface Attachment {
   bytesContentFamily?: string;
 }
 
-const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({
-  patientUuid,
-}) => {
+const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);
   const [currentImage, setCurrentImage] = useState(0);
   const [pageNumber, setPageNumber] = React.useState(1);
@@ -44,13 +35,13 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({
   const layOutType = useLayoutType();
   let pageSize = 8;
   switch (layOutType) {
-    case "tablet":
+    case 'tablet':
       pageSize = 9;
       break;
-    case "phone":
+    case 'phone':
       pageSize = 3;
       break;
-    case "desktop":
+    case 'desktop':
       pageSize = 25;
       break;
   }
@@ -58,28 +49,26 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({
   useEffect(() => {
     if (patientUuid) {
       const abortController = new AbortController();
-      getAttachments(patientUuid, true, abortController).then(
-        (response: any) => {
-          const listItems = response.data.results.map((attachment) => ({
-            id: `${attachment.uuid}`,
-            src: `/openmrs/ws/rest/v1/attachment/${attachment.uuid}/bytes`,
-            thumbnail: `/openmrs/ws/rest/v1/attachment/${attachment.uuid}/bytes`,
-            thumbnailWidth: 170,
-            thumbnailHeight: 130,
-            isSelected: false,
-            dateTime: dayjs(attachment.dateTime).format("YYYY-MM-DD HH:mm:ss"),
-            bytesMimeType: attachment.bytesMimeType,
-            bytesContentFamily: attachment.bytesContentFamily,
-            customOverlay: attachment.comment && (
-              <div className={styles.thumbnailOverlay}>
-                <div>{attachment.comment}</div>
-              </div>
-            ),
-            caption: attachment.comment,
-          }));
-          setAttachments(listItems);
-        }
-      );
+      getAttachments(patientUuid, true, abortController).then((response: any) => {
+        const listItems = response.data.results.map((attachment) => ({
+          id: `${attachment.uuid}`,
+          src: `/openmrs/ws/rest/v1/attachment/${attachment.uuid}/bytes`,
+          thumbnail: `/openmrs/ws/rest/v1/attachment/${attachment.uuid}/bytes`,
+          thumbnailWidth: 170,
+          thumbnailHeight: 130,
+          isSelected: false,
+          dateTime: dayjs(attachment.dateTime).format('YYYY-MM-DD HH:mm:ss'),
+          bytesMimeType: attachment.bytesMimeType,
+          bytesContentFamily: attachment.bytesContentFamily,
+          customOverlay: attachment.comment && (
+            <div className={styles.thumbnailOverlay}>
+              <div>{attachment.comment}</div>
+            </div>
+          ),
+          caption: attachment.comment,
+        }));
+        setAttachments(listItems);
+      });
     }
   }, [patientUuid]);
 
@@ -98,26 +87,22 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({
       const attachments_tmp = attachments.slice();
       const result = Promise.all(
         Array.prototype.map.call(files, (file) =>
-          createAttachment(patientUuid, file, file.name, abortController).then(
-            (response: any) => {
-              const new_attachment = {
-                id: `${response.data.uuid}`,
-                src: `/openmrs/ws/rest/v1/attachment/${response.data.uuid}/bytes`,
-                thumbnail: `/openmrs/ws/rest/v1/attachment/${response.data.uuid}/bytes?view=complexdata.view.thumbnail`,
-                thumbnailWidth: 320,
-                thumbnailHeight: 212,
-                caption: response.data.comment,
-                isSelected: false,
-                dateTime: dayjs(response.data.dateTime).format(
-                  "YYYY-MM-DD HH:mm:ss"
-                ),
-                bytesMimeType: response.data.bytesMimeType,
-                bytesContentFamily: response.data.bytesContentFamily,
-              };
-              attachments_tmp.push(new_attachment);
-            }
-          )
-        )
+          createAttachment(patientUuid, file, file.name, abortController).then((response: any) => {
+            const new_attachment = {
+              id: `${response.data.uuid}`,
+              src: `/openmrs/ws/rest/v1/attachment/${response.data.uuid}/bytes`,
+              thumbnail: `/openmrs/ws/rest/v1/attachment/${response.data.uuid}/bytes?view=complexdata.view.thumbnail`,
+              thumbnailWidth: 320,
+              thumbnailHeight: 212,
+              caption: response.data.comment,
+              isSelected: false,
+              dateTime: dayjs(response.data.dateTime).format('YYYY-MM-DD HH:mm:ss'),
+              bytesMimeType: response.data.bytesMimeType,
+              bytesContentFamily: response.data.bytesContentFamily,
+            };
+            attachments_tmp.push(new_attachment);
+          }),
+        ),
       );
       result.then(() => setAttachments(attachments_tmp));
     }
@@ -191,8 +176,7 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({
         className={styles.overview}
         onPaste={(e) => handleUpload(e, e.clipboardData.files)}
         onDrop={(e) => handleUpload(e, e.dataTransfer.files)}
-        onDragOver={handleDragOver}
-      >
+        onDragOver={handleDragOver}>
         {showCam && (
           <Modal>
             <CameraUpload
@@ -216,20 +200,14 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({
         {attachments.length ? (
           <div
             id="container"
-            className={`${styles.galleryContainer} ${
-              layOutType === "phone" ? styles.mobileLayout : ""
-            }`}
-          >
+            className={`${styles.galleryContainer} ${layOutType === 'phone' ? styles.mobileLayout : ''}`}>
             <div className={styles.attachmentsHeader}>
-              <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>
-                Attachments
-              </h4>
+              <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>Attachments</h4>
               <Button
                 kind="ghost"
                 renderIcon={Add16}
                 iconDescription="Add attachment"
-                onClick={(e) => setShowCam(true)}
-              >
+                onClick={(e) => setShowCam(true)}>
                 Add
               </Button>
             </div>
@@ -237,11 +215,7 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({
               images={currentPage}
               currentImageWillChange={handleCurrentImageChange}
               customControls={[
-                <Button
-                  kind="danger"
-                  onClick={handleDelete}
-                  className={styles.btnOverrides}
-                >
+                <Button kind="danger" onClick={handleDelete} className={styles.btnOverrides}>
                   Delete
                 </Button>,
               ]}
@@ -259,11 +233,7 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({
             />
           </div>
         ) : (
-          <EmptyState
-            displayText={"attachments"}
-            headerTitle="Attachments"
-            launchForm={() => setShowCam(true)}
-          />
+          <EmptyState displayText={'attachments'} headerTitle="Attachments" launchForm={() => setShowCam(true)} />
         )}
       </div>
     </UserHasAccess>

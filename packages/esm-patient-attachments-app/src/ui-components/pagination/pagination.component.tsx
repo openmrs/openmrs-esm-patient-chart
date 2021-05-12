@@ -1,9 +1,9 @@
-import React from "react";
-import { useTranslation } from "react-i18next";
-import styles from "./pagination.component.scss";
-import Pagination from "carbon-components-react/es/components/Pagination";
-import { useCurrentPatient } from "@openmrs/esm-framework";
-import chunk from "lodash-es/chunk";
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import styles from './pagination.component.scss';
+import Pagination from 'carbon-components-react/es/components/Pagination';
+import { useCurrentPatient } from '@openmrs/esm-framework';
+import chunk from 'lodash-es/chunk';
 
 interface PatientChartPaginationProps {
   items: Array<unknown>;
@@ -47,9 +47,7 @@ const PatientChartPagination: React.FC<PatientChartPaginationProps> = ({
     const totalItems = items.length;
     if (pageSize > totalItems) return `${totalItems} / ${totalItems} `;
     if (pageSize * pageNumber > totalItems) {
-      return `${
-        pageSize * (pageNumber - 1) + currentPage.length
-      } / ${totalItems} `;
+      return `${pageSize * (pageNumber - 1) + currentPage.length} / ${totalItems} `;
     } else {
       return `${pageSize * pageNumber} / ${totalItems} `;
     }
@@ -61,7 +59,7 @@ const PatientChartPagination: React.FC<PatientChartPaginationProps> = ({
         <div className={styles.paginationContainer}>
           <div className={styles.paginationLink}>
             {numberOfItemsDisplayed()}
-            {t("items", " items")}
+            {t('items', ' items')}
           </div>
           <Pagination
             className={styles.pagination}
@@ -84,11 +82,7 @@ const PatientChartPagination: React.FC<PatientChartPaginationProps> = ({
  *                   The first page has the number 1.
  * @param itemsPerPage The number of items per page.
  */
-export function paginate<T>(
-  items: Array<T>,
-  pageNumber: number,
-  itemsPerPage: number
-): [Array<T>, Array<Array<T>>] {
+export function paginate<T>(items: Array<T>, pageNumber: number, itemsPerPage: number): [Array<T>, Array<Array<T>>] {
   const allPages = chunk(items, itemsPerPage);
   const page = allPages[pageNumber - 1] ?? [];
   return [page, allPages];
