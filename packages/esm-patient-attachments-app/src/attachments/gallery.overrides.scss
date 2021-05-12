@@ -1,0 +1,22 @@
+:global(#ReactGridGallery) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 5px;
+
+  :global(.ReactGridGallery_tile) {
+    overflow: hidden;
+
+    :global(.ReactGridGallery_tile-viewport) {
+      width: 100% !important;
+
+      img {
+        width: 100% !important;
+        margin: auto !important;
+      }
+    }
+  }
+}
+
+:global(#lightboxBackdrop) {
+  z-index: 10000;
+}

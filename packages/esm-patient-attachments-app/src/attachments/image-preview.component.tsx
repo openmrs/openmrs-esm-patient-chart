@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { UserHasAccess } from '@openmrs/esm-framework';
-import Button from 'carbon-components-react/es/components/Button';
-import ButtonSet from 'carbon-components-react/es/components/ButtonSet';
-import styles from './image-preview.css';
+import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { UserHasAccess } from "@openmrs/esm-framework";
+import Button from "carbon-components-react/es/components/Button";
+import ButtonSet from "carbon-components-react/es/components/ButtonSet";
+import styles from "./image-preview.css";
+import { TextInput } from "carbon-components-react";
 
 export default function ImagePreview(props: ImagePreviewProps) {
   const [caption, setCaption] = useState('');
@@ -37,14 +38,20 @@ export default function ImagePreview(props: ImagePreviewProps) {
         alt={t('webcamPreview', 'Webcam preview')}
       />
       {props.collectCaption && (
-        <input
-          type="text"
-          placeholder={t('attachmentCaptionInstruction', 'Enter a caption for the image')}
-          onChange={updateCaption}
-        />
+        <div style={{ marginBottom: ".3rem" }}>
+          <TextInput
+            id="caption"
+            labelText={null}
+            placeholder={t("attachmentCaptionInstruction", "Enter caption")}
+            onChange={updateCaption}
+          />
+        </div>
       )}
       <UserHasAccess privilege="Create Attachment">
-        <ButtonSet style={{ width: '50%' }}>
+        <ButtonSet
+          style={{ width: "50%" }}
+          className={styles.buttonSetOverrides}
+        >
           <Button size="small" onClick={saveImage}>
             {t('save', 'Save')}{' '}
           </Button>
