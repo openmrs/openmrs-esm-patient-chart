@@ -1,3 +1,7 @@
+$actionNavOffset: 45px;
+$actionPanelOffset: 256px;
+$actionPanelExpandedOffset: $actionNavOffset + $actionPanelOffset;
+
 .grid {
   display: grid;
   grid-template-columns: 1fr min-content;
@@ -35,10 +39,21 @@
   flex-direction: column;
 }
 
+:global(.omrs-breakpoint-lt-desktop) .innerChartContainer {
+  padding-right: 0;
+}
+
 :global(.omrs-breakpoint-gt-tablet) .chartContainer {
   margin-left: var(--omrs-sidenav-width);
 }
 
+:global(.action-menu-expanded) .innerChartContainer {
+  padding-right: $actionPanelExpandedOffset;
+}
+
 .innerChartContainer {
+  display: flex;
   width: 100%;
+  padding-right: $actionNavOffset;
+  flex-direction: column;
 }

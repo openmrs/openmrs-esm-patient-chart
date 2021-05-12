@@ -1,0 +1,26 @@
+$icon-button-size: 48px;
+$actionPanelOffset: 48px;
+
+.rightSideNav {
+  position: fixed;
+  align-self: flex-end;
+  background: #ededed;
+  flex-direction: column;
+  display: flex;
+  height: 100%;
+  z-index: 9000;
+}
+
+.actionPanel {
+  right: $actionPanelOffset;
+  background: #fff;
+
+  border: 1px solid #a8a8a8;
+}
+
+.iconButton {
+  width: $icon-button-size;
+  height: $icon-button-size;
+
+  color: #000;
+}
