@@ -1,10 +1,9 @@
 {
   "attachmentCaptionInstruction": "Enter a caption for the image",
-  "attachmentUploadText": "",
   "camera": "Camera",
   "cancel": "Cancel",
-  "delete": "Delete",
   "deleteSelected": "Delete selected",
+  "items": " items",
   "save": "Save",
   "webcamPreview": "Webcam preview"
 }
