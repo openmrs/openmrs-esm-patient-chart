@@ -24,17 +24,8 @@ interface VitalsChartProps {
 const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptsUnits }) => {
   const { t } = useTranslation();
   const [chartData, setChartData] = React.useState([]);
-  const [
-    bloodPressureUnit,
-    ,
-    temperatureUnit,
-    ,
-    ,
-    pulseUnit,
-    oxygenSaturationUnit,
-    ,
-    respiratoryRateUnit,
-  ] = conceptsUnits;
+  const [bloodPressureUnit, , temperatureUnit, , , pulseUnit, oxygenSaturationUnit, , respiratoryRateUnit] =
+    conceptsUnits;
   const [selectedVitalSign, setSelecteVitalsSign] = React.useState<vitalsChartData>({
     title: `BP (${bloodPressureUnit})`,
     value: 'systolic',

@@ -46,19 +46,16 @@ const useTrendlineData = ({
 
 const TrendLineBackground = ({ ...props }) => <div {...props} className={styles['Background']} />;
 
-const withPatientData = (WrappedComponent) => ({
-  patientUuid,
-  panelUuid,
-  testUuid,
-  openTimeline: openTimelineExternal,
-}) => {
-  const patientData = useTrendlineData({ patientUuid, panelUuid, testUuid });
-  const openTimeline = React.useCallback(() => openTimelineExternal(panelUuid), [panelUuid, openTimelineExternal]);
+const withPatientData =
+  (WrappedComponent) =>
+  ({ patientUuid, panelUuid, testUuid, openTimeline: openTimelineExternal }) => {
+    const patientData = useTrendlineData({ patientUuid, panelUuid, testUuid });
+    const openTimeline = React.useCallback(() => openTimelineExternal(panelUuid), [panelUuid, openTimelineExternal]);
 
-  if (!patientData) return <div>Loading...</div>;
+    if (!patientData) return <div>Loading...</div>;
 
-  return <WrappedComponent patientData={patientData} openTimeline={openTimeline} />;
-};
+    return <WrappedComponent patientData={patientData} openTimeline={openTimeline} />;
+  };
 
 const DateFormatOption: Intl.DateTimeFormatOptions = {
   month: 'short',

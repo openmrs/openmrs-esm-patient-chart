@@ -47,17 +47,8 @@ const RenderVitals: React.FC<RenderVitalsProps> = ({
   const displayText = t('vitalSigns', 'Vital signs');
   const { conceptsUnits } = useVitalsSignsConceptMetaData();
 
-  const [
-    bloodPressureUnit,
-    ,
-    temperatureUnit,
-    ,
-    ,
-    pulseUnit,
-    oxygenSaturationUnit,
-    ,
-    respiratoryRateUnit,
-  ] = conceptsUnits;
+  const [bloodPressureUnit, , temperatureUnit, , , pulseUnit, oxygenSaturationUnit, , respiratoryRateUnit] =
+    conceptsUnits;
 
   const tableHeaders = [
     { key: 'date', header: 'Date', isSortable: true },

@@ -21,15 +21,9 @@ module.exports = (env, argv = {}) => ({
     filename: 'openmrs-esm-patient-common-lib.js',
     libraryTarget: 'system',
     path: resolve(__dirname, 'dist'),
-    jsonpFunction: 'webpackJsonp_openmrs_esm_patient_common_lib',
   },
   module: {
     rules: [
-      {
-        parser: {
-          system: false,
-        },
-      },
       {
         test: /\.m?(js|ts|tsx)$/,
         exclude: /(node_modules|bower_components)/,
@@ -55,7 +49,7 @@ module.exports = (env, argv = {}) => ({
       },
     ],
   },
-  devtool: 'sourcemap',
+  devtool: 'source-map',
   devServer: {
     headers: {
       'Access-Control-Allow-Origin': '*',

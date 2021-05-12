@@ -28,12 +28,8 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, closeWorks
   const searchTimeoutInMs = 300;
   const session = useSessionUser();
   const config = useConfig() as ConfigObject;
-  const {
-    clinicianEncounterRole,
-    encounterNoteConceptUuid,
-    encounterTypeUuid,
-    formConceptUuid,
-  } = config.visitNoteConfig;
+  const { clinicianEncounterRole, encounterNoteConceptUuid, encounterTypeUuid, formConceptUuid } =
+    config.visitNoteConfig;
   const { t } = useTranslation();
   const [clinicalNote, setClinicalNote] = React.useState('');
   const [currentSessionProviderUuid, setCurrentSessionProviderUuid] = React.useState<string | null>('');

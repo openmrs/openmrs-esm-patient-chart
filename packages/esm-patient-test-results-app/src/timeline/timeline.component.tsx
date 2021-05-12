@@ -102,10 +102,10 @@ export const Timeline: React.FC<TimelineParams> = ({
     loaded,
   } = useTimelineData(patientUuid, panelUuid);
 
-  const openTrendline = React.useCallback((testUuid: string) => openTrendlineExternal(panelUuid, testUuid), [
-    panelUuid,
-    openTrendlineExternal,
-  ]);
+  const openTrendline = React.useCallback(
+    (testUuid: string) => openTrendlineExternal(panelUuid, testUuid),
+    [panelUuid, openTrendlineExternal],
+  );
 
   if (!loaded) return <LoadingDisplay />;
 
