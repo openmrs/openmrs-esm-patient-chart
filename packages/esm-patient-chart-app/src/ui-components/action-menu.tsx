@@ -1,5 +1,10 @@
 import React, { useCallback } from "react";
-import { Notification20, ShoppingBag20, Document20 } from "@carbon/icons-react";
+import {
+  Edit20,
+  Notification20,
+  ShoppingBag20,
+  Document20,
+} from "@carbon/icons-react";
 import Button from "carbon-components-react/es/components/Button";
 import { HeaderPanel } from "carbon-components-react";
 
@@ -33,46 +38,52 @@ export const ActionMenu: React.FC<ActionMenuInterface> = ({ config }) => {
     [config.state.type]
   );
 
+  const menu = isDesktop(layout) ? (
+    <aside className={styles.rightSideNav}>
+      <Button
+        onClick={onNotificationsClick}
+        iconDescription="Notifications"
+        className={styles.iconButton}
+        kind="ghost"
+        hasIconOnly
+      >
+        <Notification20 aria-label="Notifications" />
+      </Button>
+      <Button
+        onClick={onCartClick}
+        iconDescription="Cart"
+        className={styles.iconButton}
+        kind="ghost"
+        hasIconOnly
+      >
+        <ShoppingBag20 aria-label="Cart" />
+      </Button>
+      <Button
+        onClick={onDocumentsClick}
+        iconDescription="Documents"
+        className={styles.iconButton}
+        kind="ghost"
+        hasIconOnly
+      >
+        <Document20 aria-label="Documents" />
+      </Button>
+    </aside>
+  ) : (
+    <button className={styles.actionBtn}>
+      <Edit20 />
+    </button>
+  );
+
   return (
-    isDesktop(layout) && (
-      <>
-        <aside className={styles.rightSideNav}>
-          <Button
-            onClick={onNotificationsClick}
-            iconDescription="Notifications"
-            className={styles.iconButton}
-            kind="ghost"
-            hasIconOnly
-          >
-            <Notification20 aria-label="Notifications" />
-          </Button>
-          <Button
-            onClick={onCartClick}
-            iconDescription="Cart"
-            className={styles.iconButton}
-            kind="ghost"
-            hasIconOnly
-          >
-            <ShoppingBag20 aria-label="Cart" />
-          </Button>
-          <Button
-            onClick={onDocumentsClick}
-            iconDescription="Documents"
-            className={styles.iconButton}
-            kind="ghost"
-            hasIconOnly
-          >
-            <Document20 aria-label="Documents" />
-          </Button>
-        </aside>
-        <HeaderPanel
-          className={styles.actionPanel}
-          expanded={!!config?.state.type}
-        >
-          {/* Drawer main content goes inside here */}
-        </HeaderPanel>
-      </>
-    )
+    <>
+      {menu}
+      <HeaderPanel
+        className={styles.actionPanel}
+        expanded={!!config?.state.type}
+      >
+        {/* Drawer main content goes inside here */}
+      </HeaderPanel>
+    </>
   );
 };
 
