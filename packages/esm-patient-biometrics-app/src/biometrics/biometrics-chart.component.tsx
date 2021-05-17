@@ -87,6 +87,7 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
             { id: 'bmi', label: `BMI (${bmiUnit})` },
           ].map(({ id, label }) => (
             <RadioButton
+              key={id}
               id={id}
               labelText={label}
               value={id}
