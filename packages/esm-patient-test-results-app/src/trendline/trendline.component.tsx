@@ -11,6 +11,7 @@ import { exist, OBSERVATION_INTERPRETATION } from '../loadPatientTestData/helper
 import { toOmrsDateFormat, toOmrsTimeString24, toOmrsYearlessDateFormat } from '@openmrs/esm-framework';
 import { CommonDataTable } from '../overview/common-overview';
 import { Tooltip } from 'carbon-components-react';
+import { RangeTypes, deduceRange, RangeSelector } from './RangeSelector';
 
 const useTrendlineData = ({
   patientUuid,
@@ -57,20 +58,6 @@ const withPatientData =
     return <WrappedComponent patientData={patientData} openTimeline={openTimeline} />;
   };
 
-const DateFormatOption: Intl.DateTimeFormatOptions = {
-  month: 'short',
-  day: 'numeric',
-};
-const TableDateFormatOption: Intl.DateTimeFormatOptions = {
-  year: 'numeric',
-  month: 'short',
-  day: 'numeric',
-};
-const TableTimeFormatOption: Intl.DateTimeFormatOptions = {
-  hour: '2-digit',
-  minute: '2-digit',
-};
-
 const TrendlineHeader = ({ openTimeline, title }) => (
   <div className={styles['header']}>
     <div onClick={openTimeline} role="button" className={styles['back-button']} tabIndex={0}>
@@ -85,6 +72,14 @@ const Trendline: React.FC<{
   openTimeline: () => void;
 }> = ({ patientData, openTimeline }) => {
   const leftAxisLabel = patientData?.[1]?.[0]?.meta?.units ?? '';
+  const [range, setRange] = React.useState<RangeTypes>();
+
+  const [upperRange, lowerRange] = React.useMemo(() => {
+    const dates = patientData[1].map((entry) => new Date(Date.parse(entry.effectiveDateTime)));
+    return [dates[0], dates[dates.length - 1]];
+  }, patientData);
+
+  console.log({ patientData, upperRange, lowerRange });
 
   const data: Array<{
     date: Date;
@@ -146,6 +141,7 @@ const Trendline: React.FC<{
             rotation: TickRotations.ALWAYS,
             // formatter: x => x.toLocaleDateString("en-US", TableDateFormatOption)
           },
+          domain: deduceRange(range, upperRange, lowerRange),
         },
         left: {
           mapsTo: 'value',
@@ -170,7 +166,7 @@ const Trendline: React.FC<{
           <span style="color: #c6c6c6; font-size: 0.75rem; font-weight:400">${toOmrsDateFormat(date)}</span></div>`,
       },
     }),
-    [leftAxisLabel],
+    [leftAxisLabel, range],
   );
 
   const tableHeaderData = React.useMemo(
@@ -195,6 +191,7 @@ const Trendline: React.FC<{
     <>
       <TrendlineHeader openTimeline={openTimeline} title={dataset} />
       <TrendLineBackground>
+        <RangeSelector setRange={setRange} />
         <AreaChart data={data} options={options} />
       </TrendLineBackground>
 
