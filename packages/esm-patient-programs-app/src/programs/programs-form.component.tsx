@@ -18,6 +18,7 @@ import {
   fetchLocations,
   fetchAvailablePrograms,
 } from './programs.resource';
+import { Program } from '../types';
 
 interface ProgramsFormProps {
   closeWorkspace(): void;
@@ -26,26 +27,26 @@ interface ProgramsFormProps {
 
 enum StateTypes {
   IDLE,
-  PROGRAM,
-  SUBMIT,
+  RESOLVED,
+  SUBMITTING,
 }
 
 interface IdleState {
   type: StateTypes.IDLE;
 }
 
-interface ProgramState {
-  availablePrograms?: Array<any>;
-  eligiblePrograms?: Array<any>;
-  program: any;
-  type: StateTypes.PROGRAM;
+interface ResolvedState {
+  availablePrograms?: Array<Program>;
+  eligiblePrograms?: Array<Program>;
+  program: Program | null;
+  type: StateTypes.RESOLVED;
 }
 
-interface SubmitState {
-  type: StateTypes.SUBMIT;
+interface SubmittingState {
+  type: StateTypes.SUBMITTING;
 }
 
-type ViewState = IdleState | ProgramState | SubmitState;
+type ViewState = IdleState | ResolvedState | SubmittingState;
 
 const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, closeWorkspace }) => {
   const { t } = useTranslation();
@@ -70,7 +71,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, closeWorkspace
             ...state,
             availablePrograms: availablePrograms,
             program: null,
-            type: StateTypes.PROGRAM,
+            type: StateTypes.RESOLVED,
           })),
         () => createErrorHandler(),
         () => sub1.unsubscribe(),
@@ -85,33 +86,33 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, closeWorkspace
   }, [patientUuid]);
 
   React.useEffect(() => {
-    if ((viewState as ProgramState)?.availablePrograms) {
+    if ((viewState as ResolvedState)?.availablePrograms) {
       const sub = fetchEnrolledPrograms(patientUuid).subscribe(
         (enrolledPrograms) =>
           setViewState((state) => ({
             ...state,
-            availablePrograms: (viewState as ProgramState)?.availablePrograms,
+            availablePrograms: (viewState as ResolvedState)?.availablePrograms,
             eligiblePrograms: filter(
-              (viewState as ProgramState)?.availablePrograms,
+              (viewState as ResolvedState)?.availablePrograms,
               (program) => !includes(map(enrolledPrograms, 'program.uuid'), program.uuid),
             ),
             program: null,
-            type: StateTypes.PROGRAM,
+            type: StateTypes.RESOLVED,
           })),
         () => createErrorHandler(),
         () => sub.unsubscribe(),
       );
     }
-  }, [(viewState as ProgramState)?.availablePrograms]);
+  }, [patientUuid, (viewState as ResolvedState)?.availablePrograms]);
 
   const handleSubmit = React.useCallback(
     (event: SyntheticEvent<HTMLFormElement>) => {
       event.preventDefault();
 
-      if (viewState.type !== StateTypes.PROGRAM) return;
+      if (viewState.type !== StateTypes.RESOLVED) return;
 
       const program = viewState.program;
-      setViewState({ type: StateTypes.SUBMIT });
+      setViewState({ type: StateTypes.SUBMITTING });
 
       const payload = {
         patient: patientUuid,
@@ -122,7 +123,6 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, closeWorkspace
       };
 
       const abortController = new AbortController();
-
       const sub = createProgramEnrollment(payload, abortController).subscribe(
         (response) => {
           if (response.status === 201) {
@@ -152,17 +152,17 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, closeWorkspace
           light
           onChange={(event) => {
             setViewState({
-              availablePrograms: (viewState as ProgramState)?.availablePrograms,
-              eligiblePrograms: (viewState as ProgramState)?.eligiblePrograms,
+              availablePrograms: (viewState as ResolvedState)?.availablePrograms,
+              eligiblePrograms: (viewState as ResolvedState)?.eligiblePrograms,
               program: event.target.value,
-              type: StateTypes.PROGRAM,
+              type: StateTypes.RESOLVED,
             });
           }}>
-          {!(viewState as ProgramState)?.program ? (
+          {!(viewState as ResolvedState)?.program ? (
             <SelectItem text={t('chooseProgram', 'Choose a program')} value="" />
           ) : null}
-          {(viewState as ProgramState).eligiblePrograms?.length > 0 &&
-            (viewState as ProgramState).eligiblePrograms.map((program) => (
+          {(viewState as ResolvedState).eligiblePrograms?.length > 0 &&
+            (viewState as ResolvedState).eligiblePrograms.map((program) => (
               <SelectItem key={program.uuid} text={program.display} value={program.uuid}>
                 {program.display}
               </SelectItem>
@@ -217,7 +217,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, closeWorkspace
         <Button style={{ width: '50%' }} kind="secondary" type="button" onClick={closeWorkspace}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button style={{ width: '50%' }} kind="primary" type="submit" disabled={!(viewState as ProgramState).program}>
+        <Button style={{ width: '50%' }} kind="primary" type="submit" disabled={!(viewState as ResolvedState).program}>
           {t('enroll', 'Enroll')}
         </Button>
       </div>
