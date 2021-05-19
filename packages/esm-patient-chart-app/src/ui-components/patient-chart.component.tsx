@@ -9,7 +9,6 @@ import ChartReview from "../view-components/chart-review.component";
 import VisitDialog from "../visit/visit-dialog.component";
 import { useVisitDialog } from "../hooks/useVisitDialog";
 import ActionMenu from "./action-menu";
-import useActionMenuState from "../hooks/useActionMenuState";
 
 interface PatientChartParams {
   patientUuid: string;
@@ -26,12 +25,10 @@ const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({
     patient,
     patientUuid,
   ]);
-  const actionMenuConfig = useActionMenuState();
 
   const mainClassName = `
     omrs-main-content 
     ${styles.chartContainer} 
-    ${!!actionMenuConfig.state.type ? "action-menu-expanded" : ""}
   `;
 
   useVisitDialog(patientUuid);
@@ -65,7 +62,7 @@ const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({
             </div>
           </div>
           {/* sidebar */}
-          <ActionMenu config={actionMenuConfig} />
+          <ActionMenu open={false} />
         </>
       )}
     </main>
