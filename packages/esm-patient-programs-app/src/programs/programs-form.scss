@@ -1,0 +1,20 @@
+@import "~@openmrs/esm-styleguide/src/vars";
+@import "~carbon-components/src/globals/scss/vars";
+@import "~carbon-components/src/globals/scss/mixins";
+
+.alreadyEnrolledText {
+  @include carbon--type-style("body-short-01");
+  color: $text-02;
+  min-height: 1rem;
+}
+
+.selectContainer {
+  display: flex;
+  align-items: center;
+}
+
+.loading {
+  margin-left: 1rem;
+  width: 2rem;
+  min-height: 2.5rem;
+}

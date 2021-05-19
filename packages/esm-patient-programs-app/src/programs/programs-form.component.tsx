@@ -3,15 +3,17 @@ import dayjs from 'dayjs';
 import filter from 'lodash-es/filter';
 import includes from 'lodash-es/includes';
 import map from 'lodash-es/map';
+import { useTranslation } from 'react-i18next';
+import { createErrorHandler, showToast, useSessionUser } from '@openmrs/esm-framework';
 import Button from 'carbon-components-react/es/components/Button';
 import DatePicker from 'carbon-components-react/es/components/DatePicker';
 import DatePickerInput from 'carbon-components-react/es/components/DatePickerInput';
+import InlineLoading from 'carbon-components-react/es/components/InlineLoading';
 import Select from 'carbon-components-react/es/components/Select';
 import SelectItem from 'carbon-components-react/es/components/SelectItem';
 import Form from 'carbon-components-react/es/components/Form';
 import FormGroup from 'carbon-components-react/es/components/FormGroup';
-import { useTranslation } from 'react-i18next';
-import { createErrorHandler, showToast, useSessionUser } from '@openmrs/esm-framework';
+import { Tile } from 'carbon-components-react/es/components/Tile';
 import {
   createProgramEnrollment,
   fetchEnrolledPrograms,
@@ -19,6 +21,7 @@ import {
   fetchAvailablePrograms,
 } from './programs.resource';
 import { Program } from '../types';
+import styles from './programs-form.scss';
 
 interface ProgramsFormProps {
   closeWorkspace(): void;
@@ -145,29 +148,37 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, closeWorkspace
   return (
     <Form style={{ margin: '2rem' }} onSubmit={handleSubmit}>
       <FormGroup style={{ width: '50%' }} legendText={t('program', 'Program')}>
-        <Select
-          id="program"
-          invalidText={t('required', 'Required')}
-          labelText=""
-          light
-          onChange={(event) => {
-            setViewState({
-              availablePrograms: (viewState as ResolvedState)?.availablePrograms,
-              eligiblePrograms: (viewState as ResolvedState)?.eligiblePrograms,
-              program: event.target.value,
-              type: StateTypes.RESOLVED,
-            });
-          }}>
-          {!(viewState as ResolvedState)?.program ? (
-            <SelectItem text={t('chooseProgram', 'Choose a program')} value="" />
-          ) : null}
-          {(viewState as ResolvedState).eligiblePrograms?.length > 0 &&
-            (viewState as ResolvedState).eligiblePrograms.map((program) => (
-              <SelectItem key={program.uuid} text={program.display} value={program.uuid}>
-                {program.display}
-              </SelectItem>
-            ))}
-        </Select>
+        <div className={styles.selectContainer}>
+          <Select
+            id="program"
+            invalidText={t('required', 'Required')}
+            labelText=""
+            light
+            onChange={(event) => {
+              setViewState({
+                availablePrograms: (viewState as ResolvedState)?.availablePrograms,
+                eligiblePrograms: (viewState as ResolvedState)?.eligiblePrograms,
+                program: event.target.value,
+                type: StateTypes.RESOLVED,
+              });
+            }}>
+            {!(viewState as ResolvedState)?.program ? (
+              <SelectItem text={t('chooseProgram', 'Choose a program')} value="" />
+            ) : null}
+            {(viewState as ResolvedState).eligiblePrograms?.length > 0 &&
+              (viewState as ResolvedState).eligiblePrograms.map((program) => (
+                <SelectItem key={program.uuid} text={program.display} value={program.uuid}>
+                  {program.display}
+                </SelectItem>
+              ))}
+          </Select>
+          {!(viewState as ResolvedState).eligiblePrograms && <InlineLoading className={styles.loading} />}
+        </div>
+        {(viewState as ResolvedState).eligiblePrograms?.length === 0 && (
+          <Tile light className={styles.alreadyEnrolledText}>
+            <span>{t('alreadyEnrolledText', 'This patient is already enrolled in all of the available programs')}</span>
+          </Tile>
+        )}
       </FormGroup>
       <FormGroup legendText={t('dateEnrolled', 'Date enrolled')}>
         <DatePicker
