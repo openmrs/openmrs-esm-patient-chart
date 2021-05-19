@@ -91,6 +91,14 @@ function setupOpenMRS() {
         }),
       },
       {
+        id: 'notification-buttons-slot',
+        slot: 'action-menu-items-slot',
+        load: getAsyncLifecycle(() => import('./ui-components/notifications-button.component'), {
+          featureName: 'notification-buttons-slot',
+          moduleName,
+        }),
+      },
+      {
         id: 'add-past-visit-patient-actions-slot',
         slot: 'patient-actions-slot',
         load: getAsyncLifecycle(() => import('./actions-buttons/add-past-visit.component'), {

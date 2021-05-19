@@ -39,6 +39,17 @@
   margin-left: var(--omrs-sidenav-width);
 }
 
+:global(.omrs-breakpoint-lt-desktop) .innerChartContainer {
+  padding-right: 0;
+}
+
+:global(.action-menu-expanded) .innerChartContainer {
+  padding-right: $actionPanelExpandedOffset;
+}
+
 .innerChartContainer {
+  display: flex;
   width: 100%;
+  padding-right: $actionNavOffset;
+  flex-direction: column;
 }

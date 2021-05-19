@@ -1,0 +1,49 @@
+$icon-button-size: 48px;
+$actionPanelOffset: 48px;
+
+.rightSideNav {
+  position: fixed;
+  align-self: flex-end;
+  background: #ededed;
+  flex-direction: column;
+  display: flex;
+  height: 100%;
+  z-index: 9000;
+}
+
+.actionPanel {
+  right: $actionPanelOffset;
+  background: #fff;
+
+  border: 1px solid #a8a8a8;
+}
+
+:global(.omrs-breakpoint-lt-desktop) .actionPanel {
+  border: 0;
+  right: 0;
+}
+
+.iconButton {
+  width: $icon-button-size;
+  height: $icon-button-size;
+
+  color: #000;
+}
+
+.actionBtn {
+  bottom: 3rem;
+  right: 2rem;
+
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  border-color: transparent;
+
+  color: #fff;
+  background: #005d5d;
+  transition: all 0.11s;
+  z-index: 9000;
+  padding-top: 0.325rem;
+  cursor: pointer;
+  position: fixed;
+}
