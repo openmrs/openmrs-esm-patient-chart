@@ -117,6 +117,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid }) => {
             closeWorkspace();
 
             showToast({
+              kind: 'success',
               description: t('conditionSaved', 'Condition saved successfully'),
             });
           }
