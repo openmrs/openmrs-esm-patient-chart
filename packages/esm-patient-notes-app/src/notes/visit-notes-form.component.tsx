@@ -140,6 +140,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, closeWorks
       if (response.status === 201) {
         closeWorkspace();
         showToast({
+          kind: 'success',
           description: t('visitNoteSaved', 'Visit note saved successfully'),
         });
       }

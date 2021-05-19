@@ -128,6 +128,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, closeWorkspace
           if (response.status === 201) {
             closeWorkspace();
             showToast({
+              kind: 'success',
               description: t('programEnrollmentSaved', 'Program enrollment saved successfully'),
             });
           }

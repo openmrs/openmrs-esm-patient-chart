@@ -221,7 +221,8 @@ const AllergyForm: React.FC<AllergyFormProps> = ({
       .then((response) => {
         if (response.status === 201) {
           showToast({
-            description: t('allergySuccessfullyAdded', 'Allergy has been added successfully'),
+            kind: 'success',
+            description: t('allergySuccessfullyAdded', 'Allergy saved successfully'),
           });
           fetchAllergyByUuid(response.data.uuid).subscribe((allergy) => {
             match.params.setAllergies([...match.params.allergies, allergy]);
