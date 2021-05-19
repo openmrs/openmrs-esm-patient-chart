@@ -2,7 +2,6 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './pagination.component.scss';
 import Pagination from 'carbon-components-react/es/components/Pagination';
-import { useCurrentPatient } from '@openmrs/esm-framework';
 import chunk from 'lodash-es/chunk';
 
 interface PatientChartPaginationProps {
@@ -33,9 +32,6 @@ const PatientChartPagination: React.FC<PatientChartPaginationProps> = ({
   currentPage,
 }) => {
   const { t } = useTranslation();
-  const [, , patientUuid] = useCurrentPatient();
-  const chartBasePath = `$\{openmrsSpaBase}/patient/${patientUuid}/chart/`;
-
   const generatePageSizes = () => {
     const numberOfPages = Math.ceil(items?.length / pageSize);
     return [...Array(numberOfPages).keys()].map((x) => {

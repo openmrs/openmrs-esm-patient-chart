@@ -4,7 +4,7 @@ import { UserHasAccess } from '@openmrs/esm-framework';
 import Button from 'carbon-components-react/es/components/Button';
 import ButtonSet from 'carbon-components-react/es/components/ButtonSet';
 import styles from './image-preview.css';
-import { TextInput } from 'carbon-components-react';
+import TextInput from 'carbon-components-react/lib/components/TextInput';
 
 export default function ImagePreview(props: ImagePreviewProps) {
   const [caption, setCaption] = useState('');
