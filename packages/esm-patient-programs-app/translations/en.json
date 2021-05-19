@@ -2,6 +2,7 @@
   "active": "Active",
   "activePrograms": "Active programs",
   "add": "Add",
+  "alreadyEnrolledText": "This patient is already enrolled in all of the available programs",
   "cancel": "Cancel",
   "carePrograms": "Care Programs",
   "chooseLocation": "Choose a location",
