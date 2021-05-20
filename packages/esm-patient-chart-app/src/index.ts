@@ -26,6 +26,11 @@ function setupOpenMRS() {
     pattern: '.+/openmrs/ws/fhir2/R4/Patient/.+',
   });
 
+  messageOmrsServiceWorker({
+    type: 'registerDynamicRoute',
+    pattern: '.+/ws/rest/v1/visit.+',
+  });
+
   defineConfigSchema(moduleName, esmPatientChartSchema);
 
   registerBreadcrumbs([
