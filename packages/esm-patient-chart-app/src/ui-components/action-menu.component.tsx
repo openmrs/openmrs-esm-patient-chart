@@ -1,10 +1,9 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { ExtensionSlot, useLayoutType } from '@openmrs/esm-framework';
-import Button from 'carbon-components-react/es/components/Button';
 import { HeaderPanel } from 'carbon-components-react';
 
 import { Edit20 } from '@carbon/icons-react';
-import styles from './action-menu.scss';
+import styles from './action-menu.component.scss';
 import { isDesktop } from '../utils';
 
 interface ActionMenuInterface {

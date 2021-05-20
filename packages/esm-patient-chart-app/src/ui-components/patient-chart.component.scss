@@ -1,3 +1,7 @@
+$actionNavOffset: 45px;
+$actionPanelOffset: 256px;
+$actionPanelExpandedOffset: $actionNavOffset + $actionPanelOffset;
+
 .grid {
   display: grid;
   grid-template-columns: 1fr min-content;

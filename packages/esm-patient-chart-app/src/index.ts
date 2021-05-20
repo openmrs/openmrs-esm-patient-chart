@@ -91,10 +91,10 @@ function setupOpenMRS() {
         }),
       },
       {
-        id: 'notification-buttons-slot',
+        id: 'notification-buttons',
         slot: 'action-menu-items-slot',
         load: getAsyncLifecycle(() => import('./ui-components/notifications-button.component'), {
-          featureName: 'notification-buttons-slot',
+          featureName: 'notification-buttons',
           moduleName,
         }),
       },

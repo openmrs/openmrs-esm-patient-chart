@@ -1,7 +1,7 @@
 import React from 'react';
 import Button from 'carbon-components-react/es/components/Button';
 import { Notification20 } from '@carbon/icons-react';
-import styles from './action-menu.scss';
+import styles from './action-menu.component.scss';
 
 interface NotificationsButtonInterface {
   onClick: Function;
