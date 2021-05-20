@@ -48,6 +48,8 @@ function setupOpenMRS() {
         meta: {
           title: 'Form Entry',
         },
+        online: true,
+        offline: true,
       },
       {
         id: 'patient-form-dashboard',
@@ -60,6 +62,8 @@ function setupOpenMRS() {
         meta: {
           title: 'Form Entry',
         },
+        online: true,
+        offline: true,
       },
       {
         id: 'forms-summary-dashboard',
