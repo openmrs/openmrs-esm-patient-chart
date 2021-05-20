@@ -4,4 +4,3 @@ export * from './error-state';
 export * from './createDashboardLink';
 export * from './openWorkspaceTab';
 export * from './types';
-export * from './usePagination';
