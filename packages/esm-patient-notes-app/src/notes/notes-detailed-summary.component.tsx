@@ -1,10 +1,10 @@
 import React, { useState, useEffect, Fragment } from 'react';
 import styles from './notes-detailed-summary.css';
 import capitalize from 'lodash-es/capitalize';
-import { EmptyState, SummaryCard, usePagination } from '@openmrs/esm-patient-common-lib';
+import { EmptyState, SummaryCard } from '@openmrs/esm-patient-common-lib';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { attach, createErrorHandler } from '@openmrs/esm-framework';
+import { attach, createErrorHandler, usePagination } from '@openmrs/esm-framework';
 import { formatDate } from './biometric.helper';
 import { useNotesContext } from './notes.context';
 import { getEncounterObservableRESTAPI, PatientNote } from './encounter.resource';
