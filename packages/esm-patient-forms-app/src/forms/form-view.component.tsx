@@ -136,11 +136,6 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, encoun
             {allForms.length} {t('matchFound', 'match found')}
           </p>
         )}
-        {isEmpty(allForms) && !isEmpty(searchTerm) && (
-          <EmptyFormView
-            action={t('formSearchHint', 'Try searching for the form using an alternative name or keyword')}
-          />
-        )}
         {!isEmpty(allForms) && (
           <>
             <TableContainer className={styles.tableContainer}>
