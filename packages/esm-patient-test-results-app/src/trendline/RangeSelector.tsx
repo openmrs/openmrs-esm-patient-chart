@@ -1,5 +1,8 @@
-import { Button } from 'carbon-components-react';
+import Tabs from 'carbon-components-react/es/components/Tabs';
+import Tab from 'carbon-components-react/es/components/Tab';
 import * as React from 'react';
+
+import styles from './trendline.scss';
 
 export enum RangeTypes {
   DAY_1,
@@ -33,14 +36,14 @@ export const deduceRange = (type: RangeTypes, upperRange: Date, lowerRange: Date
 
 export const RangeSelector: React.FC<{ setRange: (range: RangeTypes) => void }> = ({ setRange }) => {
   return (
-    <div style={{ padding: '0rem 0rem 1rem 3rem' }}>
-      <Button onClick={() => setRange(RangeTypes.DAY_1)}>1 day</Button>
-      <Button onClick={() => setRange(RangeTypes.DAY_5)}>5 days</Button>
-      <Button onClick={() => setRange(RangeTypes.MONTH_1)}>1 month</Button>
-      <Button onClick={() => setRange(RangeTypes.MONTH_6)}>6 months</Button>
-      <Button onClick={() => setRange(RangeTypes.YEAR_1)}>1 year</Button>
-      <Button onClick={() => setRange(RangeTypes.YEAR_5)}>5 years</Button>
-      <Button onClick={() => setRange(RangeTypes.ALL)}>Max</Button>
-    </div>
+    <Tabs light selected={6} className={styles['range-tabs']}>
+      <Tab label="1 day" onClick={() => setRange(RangeTypes.DAY_1)}></Tab>
+      <Tab label="5 days" onClick={() => setRange(RangeTypes.DAY_5)}></Tab>
+      <Tab label="1 month" onClick={() => setRange(RangeTypes.MONTH_1)}></Tab>
+      <Tab label="6 months" onClick={() => setRange(RangeTypes.MONTH_6)}></Tab>
+      <Tab label="1 year" onClick={() => setRange(RangeTypes.YEAR_1)}></Tab>
+      <Tab label="5 years" onClick={() => setRange(RangeTypes.YEAR_5)}></Tab>
+      <Tab label="All" onClick={() => setRange(RangeTypes.ALL)}></Tab>
+    </Tabs>
   );
 };

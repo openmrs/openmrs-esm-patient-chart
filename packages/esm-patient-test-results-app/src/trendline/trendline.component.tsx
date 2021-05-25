@@ -1,17 +1,16 @@
 import * as React from 'react';
-import { AreaChart } from '@carbon/charts-react';
-import { ScaleTypes, AreaChartOptions, TickRotations } from '@carbon/charts/interfaces';
-import ArrowLeft24 from '@carbon/icons-react/es/arrow--left/24';
 import '@carbon/charts/styles.css';
+import AreaChart from '@carbon/charts-react/area-chart';
+import ArrowLeft24 from '@carbon/icons-react/es/arrow--left/24';
+import { ScaleTypes, AreaChartOptions, TickRotations } from '@carbon/charts/interfaces';
+import { toOmrsDateFormat, toOmrsTimeString24, toOmrsYearlessDateFormat } from '@openmrs/esm-framework';
 
-import usePatientResultsData from '../loadPatientTestData/usePatientResultsData';
 import styles from './trendline.scss';
 import { ObsRecord } from '../loadPatientTestData/types';
-import { exist, OBSERVATION_INTERPRETATION } from '../loadPatientTestData/helpers';
-import { toOmrsDateFormat, toOmrsTimeString24, toOmrsYearlessDateFormat } from '@openmrs/esm-framework';
 import { CommonDataTable } from '../overview/common-overview';
-import { Tooltip } from 'carbon-components-react';
 import { RangeTypes, deduceRange, RangeSelector } from './RangeSelector';
+import usePatientResultsData from '../loadPatientTestData/usePatientResultsData';
+import { exist, OBSERVATION_INTERPRETATION } from '../loadPatientTestData/helpers';
 
 const useTrendlineData = ({
   patientUuid,
@@ -79,8 +78,6 @@ const Trendline: React.FC<{
     return [dates[0], dates[dates.length - 1]];
   }, patientData);
 
-  console.log({ patientData, upperRange, lowerRange });
-
   const data: Array<{
     date: Date;
     value: number;
@@ -131,7 +128,6 @@ const Trendline: React.FC<{
         lowerBoundMapsTo: 'min',
         upperBoundMapsTo: 'max',
       },
-      // "title": dataset,
       axes: {
         bottom: {
           title: 'Date',
