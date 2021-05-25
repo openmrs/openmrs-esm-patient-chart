@@ -1,128 +1,161 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import dayjs from 'dayjs';
-import AllergyForm from './allergy-form.component';
-import styles from './allergies-detailed-summary.css';
-import { EmptyState, SummaryCard, openWorkspaceTab } from '@openmrs/esm-patient-common-lib';
-import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import AllergyForm from './allergy-form.component';
+import { EmptyState, openWorkspaceTab, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { createErrorHandler } from '@openmrs/esm-framework';
 import { performPatientAllergySearch, Allergy } from './allergy-intolerance.resource';
+import Add16 from '@carbon/icons-react/es/add/16';
+import Button from 'carbon-components-react/es/components/Button';
+import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
+import DataTable, {
+  Table,
+  TableCell,
+  TableContainer,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'carbon-components-react/es/components/DataTable';
+import styles from './allergies-detailed-summary.scss';
 
 interface AllergiesDetailedSummaryProps {
   patient: fhir.Patient;
   showAddAllergy: boolean;
 }
 
-export default function AllergiesDetailedSummary({ patient, showAddAllergy }: AllergiesDetailedSummaryProps) {
-  const [patientAllergies, setPatientAllergies] = useState<Array<Allergy>>([]);
+const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ patient, showAddAllergy }) => {
   const { t } = useTranslation();
+  const displayText = t('allergyIntolerances', 'allergy intolerances');
+  const headerTitle = t('allergies', 'Allergies');
 
-  useEffect(() => {
+  const [allergies, setAllergies] = React.useState<Array<Allergy>>(null);
+  const [error, setError] = React.useState(null);
+
+  React.useEffect(() => {
     if (patient) {
-      const sub = performPatientAllergySearch(patient.identifier[0].value).subscribe((allergies) => {
-        setPatientAllergies(allergies);
-      }, createErrorHandler());
+      const sub = performPatientAllergySearch(patient.identifier[0].value).subscribe(
+        (allergies) => setAllergies(allergies),
+        (err) => {
+          setError(err);
+          createErrorHandler();
+        },
+      );
 
       return () => sub.unsubscribe();
     }
   }, [patient]);
 
+  const headers = [
+    { key: 'display', header: t('allergen', 'Allergen') },
+    {
+      key: 'criticality',
+      header: t('severityandReaction', 'Severity and Reaction'),
+    },
+    {
+      key: 'recordedDate',
+      header: t('since', 'Since'),
+    },
+    {
+      key: 'lastUpdated',
+      header: t('lastUpdated', 'Last updated'),
+    },
+  ];
+
+  const launchAllergiesForm = () => {
+    openWorkspaceTab(AllergyForm, t('allergiesForm', 'Allergies Form'));
+  };
+
+  const getRowItems = (rows: Array<Allergy>) => {
+    return rows.map((row) => ({
+      ...row,
+      criticality: {
+        content: (
+          <div className={styles.allergyDetails}>
+            <p className={styles.allergyCriticality}>
+              {row.criticality === 'high' && (
+                <svg className="omrs-icon omrs-margin-right-4" fill="rgba(181, 7, 6, 1)" style={{ height: '1.25rem' }}>
+                  <use xlinkHref="#omrs-icon-important-notification" />
+                </svg>
+              )}
+              <span
+                className={`${styles.allergySeverity} ${
+                  row.criticality === 'high' ? styles.productiveHeading02 : styles.bodyShort02
+                }`}>
+                {row.criticality}
+              </span>
+            </p>
+            <p>{row.reactionManifestations.join(', ')}</p>
+            <p className={styles.note}>{row?.note}</p>
+          </div>
+        ),
+      },
+      recordedDate: dayjs(row.recordedDate).format('MMM-YYYY') ?? '-',
+      lastUpdated: dayjs(row.lastUpdated).format('DD-MMM-YYYY'),
+    }));
+  };
+
+  const RenderAllergies: React.FC = () => {
+    if (allergies.length) {
+      const rows = getRowItems(allergies);
+      return (
+        <div>
+          <div className={styles.allergiesHeader}>
+            <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
+            {showAddAllergy && (
+              <Button kind="ghost" renderIcon={Add16} iconDescription="Add allergies" onClick={launchAllergiesForm}>
+                {t('add', 'Add')}
+              </Button>
+            )}
+          </div>
+          <TableContainer>
+            <DataTable rows={rows} headers={headers} isSortable={true}>
+              {({ rows, headers, getHeaderProps, getTableProps }) => (
+                <Table {...getTableProps()}>
+                  <TableHead>
+                    <TableRow>
+                      {headers.map((header) => (
+                        <TableHeader
+                          className={`${styles.productiveHeading01} ${styles.text02}`}
+                          {...getHeaderProps({
+                            header,
+                            isSortable: header.isSortable,
+                          })}>
+                          {header.header?.content ?? header.header}
+                        </TableHeader>
+                      ))}
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {rows.map((row) => (
+                      <TableRow key={row.id}>
+                        {row.cells.map((cell) => (
+                          <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+                        ))}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </DataTable>
+          </TableContainer>
+        </div>
+      );
+    }
+    return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchAllergiesForm} />;
+  };
+
   return (
     <>
-      {patientAllergies?.length ? (
-        <SummaryCard
-          name={t('allergies', 'Allergies')}
-          styles={{ width: '100%' }}
-          addComponent={showAddAllergy}
-          showComponent={() =>
-            openWorkspaceTab(AllergyForm, `${t('allergiesForm', 'Allergies Form')}`, {
-              allergyUuid: null,
-              setAllergies: setPatientAllergies,
-              allergies: patientAllergies,
-            })
-          }>
-          <table className={`omrs-type-body-regular ${styles.allergyTable}`}>
-            <thead>
-              <tr>
-                <td>{t('allergen', 'Allergen')}</td>
-                <td>
-                  <div className={styles.centerItems}>
-                    {t('severityandReaction', 'Severity & Reaction')}
-                    <svg className="omrs-icon" fill="rgba(0, 0, 0, 0.54)">
-                      <use xlinkHref="#omrs-icon-arrow-downward" />
-                    </svg>
-                  </div>
-                </td>
-                <td>{t('since', 'Since')}</td>
-                <td>{t('updated', 'Updated')}</td>
-              </tr>
-            </thead>
-            <tbody>
-              {patientAllergies.map((allergy) => {
-                return (
-                  <React.Fragment key={allergy?.id}>
-                    <tr className={`${allergy?.criticality === 'high' ? `${styles.high}` : `${styles.low}`}`}>
-                      <td className="omrs-medium">{allergy?.display}</td>
-                      <td>
-                        <div
-                          className={`${styles.centerItems} ${styles.allergySeverity} ${
-                            allergy?.criticality === 'high' ? `omrs-bold` : ``
-                          }`}
-                          style={{ textTransform: 'uppercase' }}>
-                          {allergy?.criticality === 'high' && (
-                            <svg
-                              className="omrs-icon omrs-margin-right-4"
-                              fill="rgba(181, 7, 6, 1)"
-                              style={{ height: '1.833rem' }}>
-                              <use xlinkHref="#omrs-icon-important-notification" />
-                            </svg>
-                          )}
-                          {allergy?.criticality}
-                        </div>
-                      </td>
-                      <td>{dayjs(allergy?.recordedDate).format('MMM-YYYY') ?? '-'}</td>
-                      <td>
-                        <div className={`${styles.centerItems} ${styles.alignRight}`}>
-                          <span>{dayjs(allergy?.lastUpdated).format('DD-MMM-YYYY')}</span>
-                          <Link to={`/details/${allergy?.id}`}>
-                            <svg className="omrs-icon" fill="rgba(0, 0, 0, 0.54)">
-                              <use xlinkHref="#omrs-icon-chevron-right" />
-                            </svg>
-                          </Link>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td></td>
-                      <td style={{ textAlign: 'left' }}>{allergy?.reactionManifestations?.join(', ')}</td>
-                    </tr>
-                    <tr>
-                      <td></td>
-                      <td colSpan={3}>
-                        <span className={styles.allergyComment}>
-                          <span style={{ textAlign: 'left' }}>{allergy?.note}</span>
-                        </span>
-                      </td>
-                    </tr>
-                  </React.Fragment>
-                );
-              })}
-            </tbody>
-          </table>
-        </SummaryCard>
+      {allergies ? (
+        <RenderAllergies />
+      ) : error ? (
+        <ErrorState error={error} headerTitle={headerTitle} />
       ) : (
-        <EmptyState
-          displayText={t('allergyIntolerances', 'allergy intolerances')}
-          headerTitle={t('allergies', 'Allergies')}
-          launchForm={() =>
-            openWorkspaceTab(AllergyForm, `${t('allergiesForm', 'Allergies Form')}`, {
-              allergyUuid: null,
-              setAllergies: setPatientAllergies,
-              allergies: patientAllergies,
-            })
-          }
-        />
+        <DataTableSkeleton rowCount={5} />
       )}
     </>
   );
-}
+};
+
+export default AllergiesDetailedSummary;
