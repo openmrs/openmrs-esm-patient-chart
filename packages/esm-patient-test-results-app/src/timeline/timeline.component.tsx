@@ -57,7 +57,7 @@ const DataRows: React.FC<{
   openTrendline: (testUuid: string) => void;
 }> = ({ timeColumns, rowData, sortedTimes, displayShadow, openTrendline }) => (
   <Grid dataColumns={timeColumns.length} padding style={{ gridColumn: 'span 2' }}>
-    {Object.entries(rowData).map(([title, obs]) => {
+    {Object.entries(rowData).map(([title, obs], rowCount) => {
       const {
         meta: { units = '', range = '' },
         conceptClass,
@@ -73,7 +73,7 @@ const DataRows: React.FC<{
               openTrendline: () => openTrendline(conceptClass),
             }}
           />
-          <GridItems {...{ sortedTimes, obs }} />
+          <GridItems {...{ sortedTimes, obs, zebra: !!(rowCount % 2) }} />
         </React.Fragment>
       );
     })}
