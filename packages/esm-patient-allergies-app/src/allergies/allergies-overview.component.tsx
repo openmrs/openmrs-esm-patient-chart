@@ -1,5 +1,4 @@
 import React from 'react';
-import capitalize from 'lodash-es/capitalize';
 import Add16 from '@carbon/icons-react/es/add/16';
 import Button from 'carbon-components-react/es/components/Button';
 import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
@@ -17,6 +16,7 @@ import styles from './allergies-overview.scss';
 import { EmptyState, ErrorState, openWorkspaceTab } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { performPatientAllergySearch, Allergy } from './allergy-intolerance.resource';
+const allergiesToShowCount = 5;
 
 interface AllergiesOverviewProps {
   basePath: string;
@@ -25,19 +25,20 @@ interface AllergiesOverviewProps {
 }
 
 const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient, showAddAllergy }) => {
-  const allergiesToShowCount = 5;
   const { t } = useTranslation();
-  const [allergies, setAllergies] = React.useState<Array<Allergy>>(null);
-  const [error, setError] = React.useState(null);
-  const [showAllAllergies, setShowAllAllergies] = React.useState(false);
   const displayText = t('allergyIntolerances', 'allergy intolerances');
   const headerTitle = t('allergies', 'Allergies');
 
+  const [allergies, setAllergies] = React.useState<Array<Allergy>>(null);
+  const [error, setError] = React.useState(null);
+  const [showAllAllergies, setShowAllAllergies] = React.useState(false);
+
   React.useEffect(() => {
     if (patient) {
-      const sub = performPatientAllergySearch(patient.identifier[0].value).subscribe((allergies) => {
-        setAllergies(allergies);
-      }, setError);
+      const sub = performPatientAllergySearch(patient.identifier[0].value).subscribe(
+        (allergies) => setAllergies(allergies),
+        (err) => setError(err),
+      );
 
       return () => sub.unsubscribe();
     }
@@ -66,7 +67,7 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient, showAddA
     return rows.slice(0, showAllAllergies ? rows.length : allergiesToShowCount).map((row) => ({
       ...row,
       reactions: `${row.reactionManifestations?.join(', ') || ''} ${
-        row.reactionSeverity ? `(${capitalize(row.reactionSeverity)})` : ''
+        row.reactionSeverity ? `(${row.reactionSeverity})` : ''
       }`,
     }));
   };

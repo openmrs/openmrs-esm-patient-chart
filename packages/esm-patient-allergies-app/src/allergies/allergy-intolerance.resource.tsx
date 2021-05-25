@@ -1,14 +1,15 @@
-import { openmrsFetch, openmrsObservableFetch, fhirBaseUrl } from '@openmrs/esm-framework';
 import { map } from 'rxjs/operators';
-import { AllergyData, AllergicReaction, FHIRAllergy } from '../types';
+import capitalize from 'lodash-es/capitalize';
+import { fhirBaseUrl, openmrsFetch, openmrsObservableFetch } from '@openmrs/esm-framework';
+import { AllergyData, AllergicReaction, FHIRAllergy, FHIRAllergyResponse } from '../types';
 
 const ALLERGY_REACTION_CONCEPT = '162555AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 
 export function performPatientAllergySearch(patientIdentifier: string) {
-  return openmrsObservableFetch<Array<Allergy>>(
+  return openmrsObservableFetch<FHIRAllergyResponse>(
     `${fhirBaseUrl}/AllergyIntolerance?patient.identifier=${patientIdentifier}`,
   ).pipe(
-    map(({ data }) => data['entry']),
+    map(({ data }) => data.entry),
     map((entries) => entries?.map((entry) => entry?.resource) ?? []),
     map((data) => formatAllergies(data)),
     map((data) => data.sort((a, b) => (b.lastUpdated > a.lastUpdated ? 1 : -1))),
@@ -23,8 +24,7 @@ export function fetchAllergyByUuid(allergyUuid: string) {
 }
 
 function mapAllergyProperties(allergy: FHIRAllergy): Allergy {
-  let manifestations: Array<string> = [];
-  allergy?.reaction[0]?.manifestation?.map((coding) => manifestations.push(coding.coding[0]?.display));
+  const manifestations = allergy?.reaction[0]?.manifestation?.map((coding) => coding.coding[0]?.display);
   const formattedAllergy: Allergy = {
     id: allergy?.id,
     clinicalStatus: allergy?.clinicalStatus?.coding[0]?.display,
@@ -36,14 +36,14 @@ function mapAllergyProperties(allergy: FHIRAllergy): Allergy {
     note: allergy?.note?.[0]?.text,
     reactionToSubstance: allergy?.reaction[0]?.substance?.coding[1]?.display,
     reactionManifestations: manifestations,
-    reactionSeverity: allergy?.reaction[0]?.severity,
+    reactionSeverity: capitalize(allergy?.reaction[0]?.severity),
     lastUpdated: allergy?.meta?.lastUpdated,
   };
   return formattedAllergy;
 }
 
 function formatAllergies(allergies: Array<FHIRAllergy>): Array<Allergy> {
-  return allergies.map(mapAllergyProperties);
+  return allergies.map((allergy) => mapAllergyProperties(allergy));
 }
 
 export function getPatientAllergyByPatientUuid(
