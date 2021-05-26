@@ -6,13 +6,7 @@ describe('<VitalsHeaderDetails>', () => {
   const mockParams = { unitName: 'Temp', value: '36.5', unitSymbol: '°C' };
 
   beforeEach(() => {
-    render(
-      <VitalsHeaderStateDetails
-        unitName={mockParams.unitName}
-        value={mockParams.value}
-        unitSymbol={mockParams.unitSymbol}
-      />,
-    );
+    render(<VitalsHeaderStateDetails {...mockParams} />);
   });
 
   it('should display temperature and its symbol', () => {
