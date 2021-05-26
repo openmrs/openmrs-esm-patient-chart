@@ -1,1 +1,9 @@
-{}
+{
+    "trendlineRangeSelector1Day": "1 day",
+    "trendlineRangeSelector5Days": "5 days",
+    "trendlineRangeSelector1Month": "1 month",
+    "trendlineRangeSelectorMonths": "6 months",
+    "trendlineRangeSelector1Year": "1 year",
+    "trendlineRangeSelector5Years": "5 years",
+    "trendlineRangeSelectorAll": "All"
+}

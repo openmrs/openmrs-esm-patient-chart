@@ -1,16 +1,16 @@
 import * as React from 'react';
-import { AreaChart } from '@carbon/charts-react';
-import { ScaleTypes, AreaChartOptions, TickRotations } from '@carbon/charts/interfaces';
-import ArrowLeft24 from '@carbon/icons-react/es/arrow--left/24';
 import '@carbon/charts/styles.css';
+import AreaChart from '@carbon/charts-react/area-chart';
+import ArrowLeft24 from '@carbon/icons-react/es/arrow--left/24';
+import { ScaleTypes, AreaChartOptions, TickRotations } from '@carbon/charts/interfaces';
+import { toOmrsDateFormat, toOmrsTimeString24, toOmrsYearlessDateFormat } from '@openmrs/esm-framework';
 
-import usePatientResultsData from '../loadPatientTestData/usePatientResultsData';
 import styles from './trendline.scss';
 import { ObsRecord } from '../loadPatientTestData/types';
-import { exist, OBSERVATION_INTERPRETATION } from '../loadPatientTestData/helpers';
-import { toOmrsDateFormat, toOmrsTimeString24, toOmrsYearlessDateFormat } from '@openmrs/esm-framework';
 import { CommonDataTable } from '../overview/common-overview';
-import { Tooltip } from 'carbon-components-react';
+import RangeSelector from './RangeSelector';
+import usePatientResultsData from '../loadPatientTestData/usePatientResultsData';
+import { exist, OBSERVATION_INTERPRETATION } from '../loadPatientTestData/helpers';
 
 const useTrendlineData = ({
   patientUuid,
@@ -57,20 +57,6 @@ const withPatientData =
     return <WrappedComponent patientData={patientData} openTimeline={openTimeline} />;
   };
 
-const DateFormatOption: Intl.DateTimeFormatOptions = {
-  month: 'short',
-  day: 'numeric',
-};
-const TableDateFormatOption: Intl.DateTimeFormatOptions = {
-  year: 'numeric',
-  month: 'short',
-  day: 'numeric',
-};
-const TableTimeFormatOption: Intl.DateTimeFormatOptions = {
-  hour: '2-digit',
-  minute: '2-digit',
-};
-
 const TrendlineHeader = ({ openTimeline, title }) => (
   <div className={styles['header']}>
     <div onClick={openTimeline} role="button" className={styles['back-button']} tabIndex={0}>
@@ -85,6 +71,19 @@ const Trendline: React.FC<{
   openTimeline: () => void;
 }> = ({ patientData, openTimeline }) => {
   const leftAxisLabel = patientData?.[1]?.[0]?.meta?.units ?? '';
+  const [range, setRange] = React.useState<[Date, Date]>();
+
+  const [upperRange, lowerRange] = React.useMemo(() => {
+    const dates = patientData[1].map((entry) => new Date(Date.parse(entry.effectiveDateTime)));
+    return [dates[0], dates[dates.length - 1]];
+  }, patientData);
+
+  const setLowerRange = React.useCallback(
+    (selectedLowerRange: Date) => {
+      setRange([selectedLowerRange > lowerRange ? selectedLowerRange : lowerRange, upperRange]);
+    },
+    [setRange, upperRange],
+  );
 
   const data: Array<{
     date: Date;
@@ -136,7 +135,6 @@ const Trendline: React.FC<{
         lowerBoundMapsTo: 'min',
         upperBoundMapsTo: 'max',
       },
-      // "title": dataset,
       axes: {
         bottom: {
           title: 'Date',
@@ -146,6 +144,7 @@ const Trendline: React.FC<{
             rotation: TickRotations.ALWAYS,
             // formatter: x => x.toLocaleDateString("en-US", TableDateFormatOption)
           },
+          domain: range,
         },
         left: {
           mapsTo: 'value',
@@ -170,7 +169,7 @@ const Trendline: React.FC<{
           <span style="color: #c6c6c6; font-size: 0.75rem; font-weight:400">${toOmrsDateFormat(date)}</span></div>`,
       },
     }),
-    [leftAxisLabel],
+    [leftAxisLabel, range],
   );
 
   const tableHeaderData = React.useMemo(
@@ -195,6 +194,7 @@ const Trendline: React.FC<{
     <>
       <TrendlineHeader openTimeline={openTimeline} title={dataset} />
       <TrendLineBackground>
+        <RangeSelector setLowerRange={setLowerRange} upperRange={upperRange} />
         <AreaChart data={data} options={options} />
       </TrendLineBackground>
 
