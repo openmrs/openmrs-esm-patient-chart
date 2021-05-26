@@ -1,8 +1,8 @@
 import React from 'react';
 import { ExtensionSlot, useLayoutType } from '@openmrs/esm-framework';
-import { HeaderPanel } from 'carbon-components-react';
+import { HeaderPanel } from 'carbon-components-react/es/components/UIShell';
 
-import { Edit20 } from '@carbon/icons-react';
+import Edit20 from '@carbon/icons-react/es/edit/20';
 import styles from './action-menu.component.scss';
 import { isDesktop } from '../utils';
 
