@@ -7,6 +7,7 @@ import VisitDialog from '../visit/visit-dialog.component';
 import { useVisitDialog } from '../hooks/useVisitDialog';
 import { RouteComponentProps } from 'react-router-dom';
 import { ExtensionSlot, useCurrentPatient } from '@openmrs/esm-framework';
+import ActionMenu from './action-menu.component';
 
 interface PatientChartParams {
   patientUuid: string;
@@ -19,29 +20,37 @@ const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({ match
   const [loading, patient] = useCurrentPatient(patientUuid);
   const state = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);
 
+  const mainClassName = `
+    omrs-main-content 
+    ${styles.chartContainer} 
+  `;
+
   useVisitDialog(patientUuid);
 
   return (
-    <main className={`omrs-main-content ${styles.chartContainer}`}>
+    <main className={mainClassName}>
       {loading ? (
         <Loader />
       ) : (
-        <div className={styles.innerChartContainer}>
-          <ExtensionSlot extensionSlotName="breadcrumbs-slot" />
-          <aside className={styles.patientBanner}>
-            <ExtensionSlot extensionSlotName="patient-header-slot" state={state} />
-            <ExtensionSlot extensionSlotName="patient-info-slot" state={state} />
-          </aside>
-          <div className={styles.grid}>
-            <div className={styles.chartreview}>
-              <ChartReview {...state} view={view} subview={subview} />
-              <VisitDialog />
-            </div>
-            <div className={styles.workspace}>
-              <WorkspaceWrapper {...state} />
+        <>
+          <div className={styles.innerChartContainer}>
+            <ExtensionSlot extensionSlotName="breadcrumbs-slot" />
+            <aside className={styles.patientBanner}>
+              <ExtensionSlot extensionSlotName="patient-header-slot" state={state} />
+              <ExtensionSlot extensionSlotName="patient-info-slot" state={state} />
+            </aside>
+            <div className={styles.grid}>
+              <div className={styles.chartreview}>
+                <ChartReview {...state} view={view} subview={subview} />
+                <VisitDialog />
+              </div>
+              <div className={styles.workspace}>
+                <WorkspaceWrapper {...state} />
+              </div>
             </div>
           </div>
-        </div>
+          <ActionMenu open={false} />
+        </>
       )}
     </main>
   );
