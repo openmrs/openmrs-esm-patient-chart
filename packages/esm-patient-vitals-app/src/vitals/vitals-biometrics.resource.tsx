@@ -22,6 +22,9 @@ export interface PatientVitals {
 interface VitalsFetchResponse {
   entry: Array<FHIRResource>;
   id: string;
+  meta: {
+    lastUpdated: string;
+  };
   resourceType: string;
   total: number;
   type: string;
@@ -58,9 +61,7 @@ export function performPatientsVitalsSearch(
       '&_summary=data&_sort=-date' +
       `&_count=${pageSize}`,
   ).pipe(
-    map(({ data }) => {
-      return data.entry;
-    }),
+    map(({ data }) => data.entry),
     map((entries) => entries?.map((entry) => entry.resource) ?? []),
     map((vitals) => {
       return formatVitals(

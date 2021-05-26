@@ -1,5 +1,6 @@
 import React from 'react';
 import { of } from 'rxjs/internal/observable/of';
+import { throwError } from 'rxjs/internal/observable/throwError';
 import { render, screen } from '@testing-library/react';
 import { openmrsObservableFetch } from '@openmrs/esm-framework';
 import { mockFhirAllergyIntoleranceResponse } from '../../../../__mocks__/allergies.mock';
@@ -29,15 +30,26 @@ it('renders an empty state view if allergy data is unavailable', () => {
   expect(screen.getByText(/Record allergy intolerances/i)).toBeInTheDocument();
 });
 
-it('renders an error state view if there was a problem fetching allergies data', () => {
-  mockOpenmrsObservableFetch.mockReturnValue(of({ data: [] }));
+it('renders an error state view if there is a problem fetching allergies data', () => {
+  const error = {
+    message: 'You are not logged in',
+    response: {
+      status: 401,
+      statusText: 'Unauthorized',
+    },
+  };
+  mockOpenmrsObservableFetch.mockReturnValue(throwError(error));
 
   renderAllergiesOverview();
 
   expect(screen.queryByRole('table')).not.toBeInTheDocument();
   expect(screen.getByRole('heading', { name: /allergies/i })).toBeInTheDocument();
-  expect(screen.getByText(/There are no allergy intolerances to display for this patient/i)).toBeInTheDocument();
-  expect(screen.getByText(/Record allergy intolerances/i)).toBeInTheDocument();
+  expect(screen.getByText(/Error 401: Unauthorized/i)).toBeInTheDocument();
+  expect(
+    screen.getByText(
+      /Sorry, there was a problem displaying this information. You can try to reload this page, or contact the site administrator and quote the error code above/i,
+    ),
+  ).toBeInTheDocument();
 });
 
 it("renders an overview of the patient's allergic reactions and their manifestations", async () => {
@@ -47,21 +59,21 @@ it("renders an overview of the patient's allergic reactions and their manifestat
 
   await screen.findByRole('heading', { name: /allergies/i });
 
-  const expectedColumnHeaders = [/name/i, /reactions/i];
+  const expectedColumnHeaders = [/name/, /reactions/];
   const expectedAllergies = [
-    /ACE inhibitors Anaphylaxis \(moderate\)/i,
-    /Aspirin Mental status change \(severe\)/i,
-    /Fish Anaphylaxis, Angioedema, Fever, Hives \(mild\)/i,
-    /Morphine Mental status change \(severe\)/i,
-    /Penicillins Diarrhea, Cough, Musculoskeletal pain, Mental status change, Angioedema \(Severe\)/i,
+    /ACE inhibitors Anaphylaxis \(moderate\)/,
+    /Aspirin Mental status change \(severe\)/,
+    /Fish Anaphylaxis, Angioedema, Fever, Hives \(mild\)/,
+    /Morphine Mental status change \(severe\)/,
+    /Penicillins Diarrhea, Cough, Musculoskeletal pain, Mental status change, Angioedema \(Severe\)/,
   ];
 
   expect(screen.getByRole('heading', { name: /allergies/i })).toBeInTheDocument();
   expectedColumnHeaders.forEach((header) => {
-    expect(screen.getByRole('columnheader', { name: new RegExp(header) })).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument();
   });
   expectedAllergies.forEach((allergy) => {
-    expect(screen.getByRole('row', { name: new RegExp(allergy) })).toBeInTheDocument();
+    expect(screen.getByRole('row', { name: new RegExp(allergy, 'i') })).toBeInTheDocument();
   });
 
   expect(screen.queryByRole('button', { name: /add/i })).not.toBeInTheDocument();
