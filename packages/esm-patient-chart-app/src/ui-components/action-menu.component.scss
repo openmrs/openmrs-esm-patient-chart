@@ -8,13 +8,12 @@ $actionPanelOffset: 48px;
   flex-direction: column;
   display: flex;
   height: 100%;
-  z-index: 9000;
 }
 
 .actionPanel {
   right: $actionPanelOffset;
   background: #fff;
-
+  z-index: auto;
   border: 1px solid #a8a8a8;
 }
 
