@@ -70,11 +70,7 @@ const EncounterListDataTable = ({ encounters }) => {
               ))}
             </TableBody>
           </Table>
-          {encounters.length === 0 && (
-            // <TableRow>
-            <p className={styles.dataTableRow}>No encounters found!</p>
-            // </TableRow>
-          )}
+          {encounters.length === 0 && <p className={styles.dataTableRow}>No encounters found.</p>}
         </TableContainer>
       )}
     </DataTable>
