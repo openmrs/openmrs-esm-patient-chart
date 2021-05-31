@@ -1,6 +1,6 @@
 import React from 'react';
 import Close32 from '@carbon/icons-react/es/close/32';
-import styles from './context-workspace.css';
+import styles from './context-workspace.scss';
 import { ExtensionSlot } from '@openmrs/esm-framework';
 import { RouteComponentProps } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';

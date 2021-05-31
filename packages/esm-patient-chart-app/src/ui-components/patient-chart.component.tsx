@@ -8,6 +8,7 @@ import { useVisitDialog } from '../hooks/useVisitDialog';
 import { RouteComponentProps } from 'react-router-dom';
 import { ExtensionSlot, useCurrentPatient } from '@openmrs/esm-framework';
 import ActionMenu from './action-menu.component';
+import { useWorkspace } from '../hooks/useWorkspace';
 
 interface PatientChartParams {
   patientUuid: string;
@@ -19,10 +20,11 @@ const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({ match
   const { patientUuid, view, subview } = match.params;
   const [loading, patient] = useCurrentPatient(patientUuid);
   const state = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);
+  const { active } = useWorkspace();
 
   const mainClassName = `
     omrs-main-content 
-    ${styles.chartContainer} 
+    ${styles.chartContainer} ${active && styles.marginRight}
   `;
 
   useVisitDialog(patientUuid);

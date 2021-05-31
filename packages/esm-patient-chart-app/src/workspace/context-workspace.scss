@@ -1,0 +1,49 @@
+@import "~@openmrs/esm-styleguide/src/vars";
+@import "~carbon-components/src/globals/scss/vars";
+@import "~carbon-components/src/globals/scss/mixins";
+
+ :global(.omrs-breakpoint-lt-desktop) .contextWorkspaceContainer {
+   position: fixed;
+   top: 0;
+   left: 0;
+   right: 0;
+   bottom: 0;
+   z-index: 10000;
+   background-color: #f4f4f4;
+   overflow-y: auto;
+ }
+
+ /* Desktop view */
+ :global(.omrs-breakpoint-gt-tablet) .contextWorkspaceContainer {
+   position: fixed;
+   top: 0;
+   right: 0;
+   bottom: 0;
+   z-index: 10000;
+   background-color: #f4f4f4;
+   overflow-y: auto;
+   margin-right: 48px;
+   margin-top: 3rem;
+   width: 35%;
+ }
+
+ :global(.omrs-breakpoint-gt-tablet) .contextWorkspaceContainer header,
+ :global(.omrs-breakpoint-gt-tablet) .contextWorkspaceContainer header a {
+  background-color: #e0e0e0;
+  color: $ui-05;
+}
+
+:global(.omrs-breakpoint-gt-tablet) .contextWorkspaceContainer header button {
+  color: $color-blue-60-2;
+  fill:$color-blue-60-2
+}
+
+:global(.omrs-breakpoint-gt-tablet) .contextWorkspaceContainer header button {
+  background-color: $ui-03;
+}
+
+:global(.omrs-breakpoint-gt-tablet) .contextWorkspaceContainer header button:hover {
+  background-color: $ui-02;
+  color: $color-blue-60-2;
+  fill:$color-blue-60-2;
+}
