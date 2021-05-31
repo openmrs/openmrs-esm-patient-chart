@@ -27,6 +27,7 @@
 
 :global(.bx--cc--area path.area) {
   stroke: none !important;
+  fill: #a7f0ba !important;
 }
 
 .header {
@@ -61,4 +62,8 @@
   width: 1.25rem;
   height: 1.25rem;
   background-color: var(--open-mrs-background-gray);
+}
+
+.range-tabs :global(.bx--tabs--scrollable__nav-link) {
+  width: 7rem;
 }

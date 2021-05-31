@@ -30,7 +30,7 @@ export const CommonDataTable: React.FC<{
     {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getTableContainerProps }) => (
       <TableContainer title={title} description={description} {...getTableContainerProps()}>
         {toolbar}
-        <Table {...getTableProps()} isSortable>
+        <Table {...getTableProps()} isSortable useZebraStyles>
           <colgroup>
             <col span={1} style={{ width: '33%' }} />
             <col span={1} style={{ width: '33%' }} />

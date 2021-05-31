@@ -27,13 +27,14 @@ const VitalsHeaderStateTitle: React.FC<VitalsHeaderStateTitleProps> = ({
   showRecordVitals,
 }) => {
   const { t } = useTranslation();
+
   const launchVitalsBiometricsForm = React.useCallback(() => {
     attach('patient-chart-workspace-slot', patientVitalsBiometricsFormWorkspace);
   }, []);
 
   return (
     <>
-      {!isEmpty(vitals) ? (
+      {vitals && Object.keys(vitals)?.length ? (
         <div className={styles.vitalsHeader} role="button" tabIndex={0} onClick={toggleView}>
           <span className={styles.alignCenter}>
             {view === 'Warning' && (
@@ -78,7 +79,7 @@ const VitalsHeaderStateTitle: React.FC<VitalsHeaderStateTitleProps> = ({
         <div className={styles.vitalsHeader}>
           <span className={styles.alignCenter}>
             {view === 'Warning' && <WarningFilled20 aria-label="Warning" className={styles.warningIcon} />}
-            <span className={styles.vitalName}>Vitals & Biometrics</span>
+            <span className={styles.vitalName}>{t('vitalsAndBiometrics', 'Vitals & Biometrics')}</span>
             <span className={styles.bodyShort01}>
               {t('noDataRecorded', 'No data has been recorded for this patient')}
             </span>

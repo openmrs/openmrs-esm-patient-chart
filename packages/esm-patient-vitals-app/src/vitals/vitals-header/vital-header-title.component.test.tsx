@@ -24,49 +24,39 @@ describe('<VitalsHeaderStateDetails/>', () => {
     respiratoryRate: '45',
   };
 
-  it('should display the vitals title', () => {
-    const mockParamas = {
-      view: 'Warning',
-      toggleView: mockToggleView,
+  it("renders an empty state view when there's no vitals data to show", async () => {
+    const mockParams = {
       showDetails: false,
-      isEmpty: false,
+      showRecordVitals: true,
+      toggleView: mockToggleView,
+      view: '',
+      vitals: null,
     };
-    render(
-      <VitalsHeaderStateTitle
-        view={mockParamas.view}
-        vitals={mockVitals}
-        toggleView={mockParamas.toggleView}
-        showDetails={mockParamas.showDetails}
-      />,
-    );
+
+    render(<VitalsHeaderStateTitle {...mockParams} />);
+    expect(await screen.findByText(/No data has been recorded for this patient/i)).toBeInTheDocument();
+
+    expect(screen.getByRole('button', { name: /Record Vitals/i })).toBeInTheDocument();
+  });
+
+  it("renders the patient's last recorded vitals", () => {
+    const mockParams = {
+      showDetails: false,
+      showRecordVitals: true,
+      toggleView: mockToggleView,
+      view: 'Warning',
+      vitals: mockVitals,
+    };
+
+    render(<VitalsHeaderStateTitle {...mockParams} />);
     expect(screen.getByText(/Record Vitals/i)).toBeInTheDocument();
     expect(screen.getByText(/Vitals & Biometrics/i)).toBeInTheDocument();
     expect(screen.getByText(/Last recorded: 12 - Mar - 2019/i)).toBeInTheDocument();
+    expect(screen.getByTitle(/warningfilled/i)).toBeInTheDocument();
 
     const ChevronDown = screen.queryByTitle(/ChevronDown/);
     userEvent.click(ChevronDown);
 
     expect(mockToggleView).toHaveBeenCalledTimes(1);
-  });
-
-  it('should display an empty message when vitals is not recorded', async () => {
-    const mockParamas = {
-      view: 'Warning',
-      date: new Date(),
-      toggleView: mockToggleView,
-      showDetails: false,
-      isEmpty: true,
-    };
-    render(
-      <VitalsHeaderStateTitle
-        view={mockParamas.view}
-        vitals={null}
-        toggleView={mockParamas.toggleView}
-        showDetails={mockParamas.showDetails}
-      />,
-    );
-    expect(await screen.findByText(/No data has been recorded for this patient/i)).toBeInTheDocument();
-
-    expect(screen.getByRole('button', { name: /Record Vitals/i })).toBeInTheDocument();
   });
 });

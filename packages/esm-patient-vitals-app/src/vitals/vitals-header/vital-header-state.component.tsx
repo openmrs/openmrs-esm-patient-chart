@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import isEmpty from 'lodash-es/isEmpty';
-import first from 'lodash-es/first';
 import VitalHeaderStateDetails from './vital-header-details.component';
 import VitalsHeaderStateTitle from './vital-header-title.component';
 import InlineLoading from 'carbon-components-react/es/components/InlineLoading';
@@ -40,13 +39,14 @@ const VitalHeader: React.FC<VitalHeaderProps> = ({ patientUuid, showRecordVitals
     weightUnit,
     pulseUnit,
     oxygenSaturationUnit,
-    midUpperArmCircumferenceUnit,
+    ,
     respiratoryRateUnit,
   ] = conceptsUnits;
+
   useEffect(() => {
     if (patientUuid) {
       const subscription = performPatientsVitalsSearch(config.concepts, patientUuid, 10).subscribe((vitals) => {
-        setVital(first(vitals));
+        setVital(vitals[0]);
         setIsLoading(false);
       }, createErrorHandler);
       return () => subscription.unsubscribe();

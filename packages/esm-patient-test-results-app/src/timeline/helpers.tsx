@@ -36,7 +36,8 @@ export const ShadowBox: React.FC = () => <div className={styles['shadow-box']} /
 const TimelineCell: React.FC<{
   text: string;
   interpretation?: OBSERVATION_INTERPRETATION;
-}> = ({ text, interpretation = OBSERVATION_INTERPRETATION.NORMAL }) => {
+  zebra: boolean;
+}> = ({ text, interpretation = OBSERVATION_INTERPRETATION.NORMAL, zebra }) => {
   let additionalClassname: string;
 
   switch (interpretation) {
@@ -70,7 +71,7 @@ const TimelineCell: React.FC<{
   }
 
   return (
-    <div className={`${styles['timeline-cell']} ${additionalClassname}`}>
+    <div className={`${styles['timeline-cell']} ${zebra ? styles['timeline-cell-zebra'] : ''} ${additionalClassname}`}>
       <p>{text}</p>
     </div>
   );
@@ -119,12 +120,13 @@ export const TimeSlots: React.FC<{
 export const GridItems = React.memo<{
   sortedTimes: Array<string>;
   obs: Array<ObsRecord>;
-}>(({ sortedTimes, obs }) => (
+  zebra: boolean;
+}>(({ sortedTimes, obs, zebra }) => (
   <>
     {sortedTimes.map((_, i) => {
-      if (!obs[i]) return <TimelineCell key={i} text={'--'} />;
+      if (!obs[i]) return <TimelineCell key={i} text={'--'} zebra={zebra} />;
       const interpretation = obs[i].meta.assessValue(obs[i].value);
-      return <TimelineCell key={i} text={obs[i].value} interpretation={interpretation} />;
+      return <TimelineCell key={i} text={obs[i].value} interpretation={interpretation} zebra={zebra} />;
     })}
   </>
 ));

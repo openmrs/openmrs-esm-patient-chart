@@ -25,6 +25,10 @@
   padding: 0.5em;
 }
 
+.timeline-cell-zebra {
+  background-color: #ededed;
+}
+
 .padding-container {
   height: fit-content;
   max-height: 100%;
@@ -81,11 +85,21 @@
 .critically-low,
 .high,
 .low {
-  background-color: #fff1f1;
   color: #161616;
   p {
     font-weight: 600;
     font-family: "IBM Plex Sans", sans-serif;
+  }
+}
+
+.high,
+.low {
+  box-sizing: content-box;
+  padding: 0;
+  box-shadow: 0 0 0 1px #000000;
+
+  td {
+    border: unset !important;
   }
 }
 

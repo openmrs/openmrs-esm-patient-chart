@@ -10,8 +10,9 @@ import capitalize from 'lodash-es/capitalize';
 import ContactDetails from '../contact-details/contact-details.component';
 import CustomOverflowMenuComponent from '../ui-components/overflow-menu.component';
 import styles from './patient-banner.scss';
-import { ExtensionSlot, age, useVisit, getStartedVisit, VisitItem, Extension } from '@openmrs/esm-framework';
+import { ExtensionSlot, age, useVisit, getStartedVisit } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
+import isEmpty from 'lodash-es/isEmpty';
 
 interface PatientBannerProps {
   patient: fhir.Patient;
@@ -30,11 +31,8 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid }) =
     if (currentVisit) {
       setActiveVisit(true);
     } else {
-      const sub = getStartedVisit.subscribe((visit?: VisitItem) => {
-        setActiveVisit(visit !== null);
-      });
-
-      return () => sub.unsubscribe();
+      const visit = getStartedVisit?.value;
+      setActiveVisit(!isEmpty(visit));
     }
   }, [currentVisit]);
 

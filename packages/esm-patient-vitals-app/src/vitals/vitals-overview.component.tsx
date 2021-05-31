@@ -182,8 +182,8 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
   React.useEffect(() => {
     if (patientUuid) {
       const subscription = performPatientsVitalsSearch(config.concepts, patientUuid, 100).subscribe(
-        setVitals,
-        setError,
+        (vitals) => setVitals(vitals),
+        (err) => setError(err),
       );
       return () => subscription.unsubscribe();
     }
