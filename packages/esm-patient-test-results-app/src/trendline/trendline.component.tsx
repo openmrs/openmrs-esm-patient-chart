@@ -76,13 +76,13 @@ const Trendline: React.FC<{
   const [upperRange, lowerRange] = React.useMemo(() => {
     const dates = patientData[1].map((entry) => new Date(Date.parse(entry.effectiveDateTime)));
     return [dates[0], dates[dates.length - 1]];
-  }, patientData);
+  }, [patientData]);
 
   const setLowerRange = React.useCallback(
     (selectedLowerRange: Date) => {
       setRange([selectedLowerRange > lowerRange ? selectedLowerRange : lowerRange, upperRange]);
     },
-    [setRange, upperRange],
+    [setRange, upperRange, lowerRange],
   );
 
   /**

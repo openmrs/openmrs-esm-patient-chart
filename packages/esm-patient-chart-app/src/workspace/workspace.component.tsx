@@ -9,7 +9,7 @@ interface WorkspaceProps {
   showWorkspace(value: boolean): void;
 }
 
-const Workspace: React.FC<WorkspaceProps> = (props) => {
+const Workspace: React.FC<WorkspaceProps> = ({ patientUuid, patient, openTabs: doOpenTabs, showWorkspace }) => {
   const [openTabs, setOpenTabs] = React.useState<Array<WorkspaceItem>>([]);
   const [selectedTab, setSelectedTab] = React.useState(null);
 
@@ -35,7 +35,7 @@ const Workspace: React.FC<WorkspaceProps> = (props) => {
     return () => sub.unsubscribe();
   }, [openTabs]);
 
-  React.useEffect(() => props.showWorkspace(openTabs.length > 0), [openTabs.length, props.showWorkspace]);
+  React.useEffect(() => showWorkspace(openTabs.length > 0), [openTabs.length, showWorkspace]);
 
   const getSelectedTabAfterRemove = React.useCallback(
     (removedItemIndex: number, currentTab: number) => {
@@ -64,10 +64,10 @@ const Workspace: React.FC<WorkspaceProps> = (props) => {
         updatedOpenTabs.splice(index, 1);
         setOpenTabs(updatedOpenTabs);
         setSelectedTab(getSelectedTabAfterRemove(index, selectedTab));
-        props.openTabs(updatedOpenTabs);
+        doOpenTabs(updatedOpenTabs);
       }
     },
-    [props.openTabs, openTabs, selectedTab, getSelectedTabAfterRemove],
+    [doOpenTabs, openTabs, selectedTab, getSelectedTabAfterRemove],
   );
 
   const setWorkBegan = React.useCallback(
@@ -109,8 +109,8 @@ const Workspace: React.FC<WorkspaceProps> = (props) => {
               <Panel key={i} title={tab.name} style={selectedTab === i ? {} : { display: 'none' }}>
                 <tab.component
                   {...tab.props}
-                  patientUuid={props.patientUuid}
-                  patient={props.patient}
+                  patientUuid={patientUuid}
+                  patient={patient}
                   entryStarted={() => setWorkBegan(i)}
                   entrySubmitted={() => setWorkEnded(i)}
                   entryCancelled={() => setWorkEnded(i)}

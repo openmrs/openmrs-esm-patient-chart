@@ -151,9 +151,10 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid }) => {
     [],
   );
 
+  const searchTerm = (viewState as SearchState).searchTerm;
   React.useEffect(() => {
-    debouncedSearch((viewState as SearchState)?.searchTerm);
-  }, [(viewState as SearchState)?.searchTerm, debouncedSearch]);
+    debouncedSearch(searchTerm);
+  }, [searchTerm, debouncedSearch]);
 
   return (
     <Form style={{ margin: '2rem' }} onSubmit={handleSubmit}>

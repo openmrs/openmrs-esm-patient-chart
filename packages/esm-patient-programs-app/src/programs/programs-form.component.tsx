@@ -88,15 +88,16 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, closeWorkspace
     }
   }, [patientUuid]);
 
+  const availablePrograms = (viewState as ResolvedState).availablePrograms;
   React.useEffect(() => {
-    if ((viewState as ResolvedState)?.availablePrograms) {
+    if (availablePrograms) {
       const sub = fetchEnrolledPrograms(patientUuid).subscribe(
         (enrolledPrograms) =>
           setViewState((state) => ({
             ...state,
-            availablePrograms: (viewState as ResolvedState)?.availablePrograms,
+            availablePrograms: availablePrograms,
             eligiblePrograms: filter(
-              (viewState as ResolvedState)?.availablePrograms,
+              availablePrograms,
               (program) => !includes(map(enrolledPrograms, 'program.uuid'), program.uuid),
             ),
             program: null,
@@ -106,7 +107,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, closeWorkspace
         () => sub.unsubscribe(),
       );
     }
-  }, [patientUuid, (viewState as ResolvedState)?.availablePrograms]);
+  }, [patientUuid, availablePrograms]);
 
   const handleSubmit = React.useCallback(
     (event: SyntheticEvent<HTMLFormElement>) => {
