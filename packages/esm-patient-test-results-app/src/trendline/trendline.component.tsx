@@ -3,7 +3,7 @@ import '@carbon/charts/styles.css';
 import AreaChart from '@carbon/charts-react/area-chart';
 import ArrowLeft24 from '@carbon/icons-react/es/arrow--left/24';
 import { ScaleTypes, AreaChartOptions, TickRotations } from '@carbon/charts/interfaces';
-import { toOmrsDateFormat, toOmrsTimeString24, toOmrsYearlessDateFormat } from '@openmrs/esm-framework';
+import { toOmrsDateFormat, toOmrsTimeString24 } from '@openmrs/esm-framework';
 
 import styles from './trendline.scss';
 import { ObsRecord } from '../loadPatientTestData/types';
@@ -85,6 +85,17 @@ const Trendline: React.FC<{
     [setRange, upperRange],
   );
 
+  /**
+   * reorder svg element to bring line in front of the area
+   */
+  React.useEffect(() => {
+    if (patientData)
+      setTimeout(() => {
+        const graph = document.querySelector('g.bx--cc--area').parentElement;
+        graph.insertBefore(graph.children[3], graph.childNodes[2]);
+      }, 0);
+  }, [patientData]);
+
   const data: Array<{
     date: Date;
     value: number;
@@ -121,7 +132,7 @@ const Trendline: React.FC<{
     });
 
     tableData.push({
-      date: toOmrsYearlessDateFormat(entry.effectiveDateTime),
+      date: toOmrsDateFormat(entry.effectiveDateTime),
       time: toOmrsTimeString24(entry.effectiveDateTime),
       value: entry.value,
       id: entry.id,
@@ -157,7 +168,7 @@ const Trendline: React.FC<{
 
       color: {
         scale: {
-          dataset: '#6929c4',
+          [dataset]: '#6929c4',
         },
       },
       legend: {
@@ -169,7 +180,7 @@ const Trendline: React.FC<{
           <span style="color: #c6c6c6; font-size: 0.75rem; font-weight:400">${toOmrsDateFormat(date)}</span></div>`,
       },
     }),
-    [leftAxisLabel, range],
+    [leftAxisLabel, range, dataset],
   );
 
   const tableHeaderData = React.useMemo(
