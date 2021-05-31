@@ -100,7 +100,6 @@ const EncounterListDataTable: React.FC<EncounterListProps> = ({ encounters }) =>
   return (
     <DataTable rows={encounters} headers={headerData}>
       {({ rows, headers, getHeaderProps, getRowProps, getTableProps }) => {
-        console.log(rows, 'rows');
         return (
           <TableContainer>
             <Table {...getTableProps()} useZebraStyles>
