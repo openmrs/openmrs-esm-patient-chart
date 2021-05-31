@@ -112,7 +112,7 @@ function setupOpenMRS() {
         }),
       },
       {
-        id: 'past-visits-detail-overview-slot',
+        id: 'past-visits-detail-overview',
         slot: 'patient-chart-encounters-dashboard-slot',
         load: getAsyncLifecycle(() => import('./visit/visits-widget/visit-detail-overview.component'), {
           featureName: 'visits-detail-slot',
