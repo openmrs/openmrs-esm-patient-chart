@@ -88,12 +88,11 @@ const Trendline: React.FC<{
   /**
    * reorder svg element to bring line in front of the area
    */
-  React.useEffect(() => {
-    if (patientData)
-      setTimeout(() => {
-        const graph = document.querySelector('g.bx--cc--area').parentElement;
-        graph.insertBefore(graph.children[3], graph.childNodes[2]);
-      }, 0);
+  React.useLayoutEffect(() => {
+    const graph = document.querySelector('g.bx--cc--area')?.parentElement;
+    if (patientData && graph) {
+      graph.insertBefore(graph.children[3], graph.childNodes[2]);
+    }
   }, [patientData]);
 
   const data: Array<{
