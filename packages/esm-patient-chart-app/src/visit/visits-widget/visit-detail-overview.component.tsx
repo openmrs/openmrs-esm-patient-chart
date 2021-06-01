@@ -192,7 +192,7 @@ interface VisitOverviewComponentProps {
 }
 
 function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentProps) {
-  const [visits, setvisits] = useState<Array<Visit>>([]);
+  const [visits, setvisits] = useState<Array<Visit | null>>(null);
 
   useEffect(() => {
     if (patientUuid) {
@@ -203,12 +203,18 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
     }
   }, [patientUuid]);
 
-  return (
-    <div className={styles.container}>
-      {visits?.map((visit, ind) => (
-        <SingleVisitDetailComponent key={ind} visit={visit} />
-      ))}
-    </div>
+  return visits ? (
+    visits.length > 0 ? (
+      <div className={styles.container}>
+        {visits.map((visit, ind) => (
+          <SingleVisitDetailComponent key={ind} visit={visit} />
+        ))}
+      </div>
+    ) : (
+      <p>No Visit Found</p>
+    )
+  ) : (
+    <SkeletonText heading />
   );
 }
 
