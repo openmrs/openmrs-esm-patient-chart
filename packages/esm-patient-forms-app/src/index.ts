@@ -55,6 +55,8 @@ function setupOpenMRS() {
         id: 'patient-form-dashboard',
         slot: dashboardMeta.slot,
         load: getAsyncLifecycle(() => import('./forms/forms.component'), options),
+        online: true,
+        offline: true,
       },
       {
         id: 'patient-form-entry-workspace',
@@ -70,6 +72,8 @@ function setupOpenMRS() {
         slot: 'patient-chart-dashboard-slot',
         load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
         meta: dashboardMeta,
+        online: true,
+        offline: true,
       },
     ],
   };
