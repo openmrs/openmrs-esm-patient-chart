@@ -120,7 +120,8 @@ const EncounterListDataTable: React.FC<EncounterListProps> = ({ encounters }) =>
                       ))}
                     </TableExpandRow>
                     {row.isExpanded && (
-                      <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 2}>
+                      <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 1}>
+                        <TableCell />
                         <div className={styles.EncounterObservations}>
                           <EncounterObservations encounterUuid={row.id} />
                         </div>
@@ -191,8 +192,6 @@ interface VisitOverviewComponentProps {
 }
 
 function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentProps) {
-  let A = [1, 2, 3, 4, 5];
-
   const [visits, setvisits] = useState<Array<Visit>>([]);
 
   useEffect(() => {
