@@ -16,6 +16,7 @@ import DataTable, {
   TableCell,
   TableExpandedRow,
 } from 'carbon-components-react/es/components/DataTable';
+import SkeletonText from 'carbon-components-react/es/components/SkeletonText';
 import { fetchEncounterObservations } from './visit.resource';
 
 function formatDateTime(date) {
@@ -65,7 +66,7 @@ const EncounterObservations: React.FC<EncounterObservationsProps> = ({ encounter
       ))}
     </div>
   ) : (
-    <p>Loading</p>
+    <SkeletonText />
   );
 };
 
@@ -120,9 +121,8 @@ const EncounterListDataTable: React.FC<EncounterListProps> = ({ encounters }) =>
                       ))}
                     </TableExpandRow>
                     {row.isExpanded && (
-                      <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 1}>
-                        <TableCell />
-                        <div className={styles.EncounterObservations}>
+                      <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 2}>
+                        <div style={{ width: '100%' }}>
                           <EncounterObservations encounterUuid={row.id} />
                         </div>
                       </TableExpandedRow>
