@@ -3,6 +3,24 @@
 @import "~carbon-components/src/globals/scss/mixins";
 @import "../../root.scss";
 
+// Typography
+
+.caption01 {
+  @include carbon--type-style("caption-01");
+}
+
+.bodyShort02 {
+  @include carbon--type-style("body-short-02");
+}
+
+.productiveHeading01 {
+  @include carbon--type-style("productive-heading-01");
+}
+
+.bodyLong01 {
+  @include carbon--type-style("body-long-01");
+}
+
 .container  {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -78,10 +96,41 @@
   margin: 0.75rem 0;
 }
 
-.caption01 {
-  @include carbon--type-style("caption-01");
+.summaryContainer {
+  margin: 0 1rem;
 }
 
-.bodyShort02  {
-  @include carbon--type-style("body-short-02");
+.tabSections {
+  display: flex;
+}
+
+.verticalTabs {
+  width: 30% !important;
+  padding: 1rem 0;
+}
+
+.verticalTabs > ul {
+  flex-direction: column !important;
+}
+
+.tab > button {
+  border-bottom: 0 !important;
+  border-left: 2px solid #e0e0e0 !important;
+}
+
+.tab > button, .tab > button:focus, .tab > button:active {
+  outline: 0 !important;
+  outline-offset: 0 !important;
+}
+
+.selectedTab > button {
+  border-left: 2px solid #007d79 !important;
+  border-bottom: 0 !important;
+  font-weight: 600 !important;
+}
+
+.tabContent {
+  border-top: 1px solid #e0e0e0;
+  padding: 1rem 0;
+  width: 70%;
 }
