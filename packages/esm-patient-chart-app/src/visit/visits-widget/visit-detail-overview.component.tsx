@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import styles from './visit-detail-overview.scss';
-import { Visit, getVisitsForPatient, createErrorHandler, OpenmrsResource } from '@openmrs/esm-framework';
+import capitalize from 'lodash-es/capitalize';
+import { Visit, createErrorHandler, OpenmrsResource } from '@openmrs/esm-framework';
 import Button from 'carbon-components-react/es/components/Button';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
@@ -19,10 +20,14 @@ import DataTable, {
 import Tabs from 'carbon-components-react/es/components/Tabs';
 import Tab from 'carbon-components-react/es/components/Tab';
 import SkeletonText from 'carbon-components-react/es/components/SkeletonText';
-import { fetchEncounterObservations } from './visit.resource';
+import { fetchEncounterObservations, getVisitsForPatient, getDosage } from './visit.resource';
 
 function formatDateTime(date) {
   return dayjs(date).format('MMM DD, YYYY - hh:mm');
+}
+
+function formatTime(dateTime) {
+  return dayjs(dateTime).format('hh:mm');
 }
 
 interface Observation {
@@ -31,10 +36,90 @@ interface Observation {
   links: Array<any>;
 }
 
+interface Order {
+  uuid: string;
+  dateActivated: string;
+  dose: number;
+  doseUnits: {
+    uuid: string;
+    display: string;
+  };
+  drug: {
+    uuid: string;
+    name: string;
+    strength: string;
+  };
+  duration: number;
+  durationUnits: {
+    uuid: string;
+    display: string;
+  };
+  frequency: {
+    uuid: string;
+    display: string;
+  };
+  numRefills: number;
+  orderer: {
+    uuid: string;
+    person: {
+      uuid: string;
+      display: string;
+    };
+  };
+  route: {
+    uuid: string;
+    display: string;
+  };
+}
+
 // Visit Summary Components
 
-const VisitSummary = () => {
+interface VisitSummaryProps {
+  orders: Array<Order>;
+}
+
+const VisitSummary: React.FC<VisitSummaryProps> = ({ orders }) => {
+  const { t } = useTranslation();
   const [tabSelected, setSelectedTab] = useState(0);
+
+  let tabContent = null;
+  if (tabSelected == 0) {
+    tabContent = 'Notes Content';
+  } else if (tabSelected == 1) {
+    tabContent = 'Tests Content';
+  } else {
+    tabContent =
+      orders.length > 0 ? (
+        orders.map(
+          (order) =>
+            order.dose && (
+              <>
+                <p className={`${styles.bodyLong01} ${styles.medicationBlock}`}>
+                  <strong>{capitalize(order.drug?.name)}</strong> &mdash; {order.doseUnits?.display} &mdash;{' '}
+                  {order.route?.display}
+                  <br />
+                  <span className={styles.label01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
+                  <strong>{getDosage(order.drug?.strength, order.dose).toLowerCase()}</strong> &mdash;{' '}
+                  {order.frequency?.display} &mdash;{' '}
+                  {!order.duration
+                    ? t('orderIndefiniteDuration', 'Indefinite duration')
+                    : t('orderDurationAndUnit', 'for {duration} {durationUnit}', {
+                        duration: order.duration,
+                        durationUnit: order.durationUnits?.display,
+                      })}
+                  <br />
+                  <span className={styles.label01}>{t('refills', 'Refills').toUpperCase()}</span> {order.numRefills}
+                </p>
+                <p className={styles.caption01} style={{ color: '#525252' }}>
+                  {formatTime(order.dateActivated)} &middot; {order.orderer.person?.display}
+                </p>
+              </>
+            ),
+        )
+      ) : (
+        <p className={styles.bodyLong01}>No Medications found.</p>
+      );
+  }
 
   return (
     <div className={styles.summaryContainer}>
@@ -65,7 +150,7 @@ const VisitSummary = () => {
             id="tab-3"
             label="Medications"></Tab>
         </Tabs>
-        <div className={`${styles.tabContent} ${styles.bodyLong01}`}>Some content</div>
+        <div className={`${styles.tabContent} ${styles.bodyLong01}`}>{tabContent}</div>
       </div>
     </div>
   );
@@ -196,10 +281,18 @@ const SingleVisitDetailComponent: React.FC<SingleVisitDetailComponentProps> = ({
         id: encounter.uuid,
         time: dayjs(encounter.encounterDateTime).format('hh:mm'),
         encounterType: encounter.encounterType.display,
-        provider: encounter.encounterProviders.length > 0 ? 'Provider' : '',
+        provider: encounter.encounterProviders.length > 0 ? encounter.encounterProviders[0].display : '',
       })),
     [visit],
   );
+
+  const orders: Array<Order> = useMemo(() => {
+    let orders: Array<Order> = [];
+    visit.encounters.forEach((enc) => {
+      orders = [...orders, ...enc.orders];
+    });
+    return orders;
+  }, [visit]);
 
   return (
     <div className={styles.visitsDetailWidgetContainer}>
@@ -227,7 +320,7 @@ const SingleVisitDetailComponent: React.FC<SingleVisitDetailComponentProps> = ({
         </div>
       </div>
       {listView && visit?.encounters && <EncounterListDataTable encounters={encounters} />}
-      {!listView && <VisitSummary />}
+      {!listView && <VisitSummary orders={orders} />}
     </div>
   );
 };
@@ -244,9 +337,13 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
   useEffect(() => {
     if (patientUuid) {
       const abortController = new AbortController();
-      getVisitsForPatient(patientUuid, abortController, 'full').subscribe(({ data }) => {
+      const sub = getVisitsForPatient(patientUuid, abortController).subscribe(({ data }) => {
         setvisits(data.results);
       }, createErrorHandler());
+      return () => {
+        abortController.abort();
+        sub.unsubscribe();
+      };
     }
   }, [patientUuid]);
 
