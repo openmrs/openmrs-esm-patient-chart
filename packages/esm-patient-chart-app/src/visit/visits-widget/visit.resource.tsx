@@ -58,15 +58,14 @@ export function getVisitsForPatient(
   const custom =
     v ||
     'custom:(uuid,encounters:(uuid,encounterDatetime,' +
-      'form:(uuid,name),orders:(uuid,dateActivated,' +
+      'orders:(uuid,dateActivated,' +
       'drug:(uuid,name,strength),doseUnits:(uuid,display),' +
       'dose,route:(uuid,display),frequency:(uuid,display),' +
       'duration,durationUnits:(uuid,display),numRefills,' +
-      'orderer:(uuid,person:(uuid,display))),location:ref,' +
+      'orderer:(uuid,person:(uuid,display))),obs,' +
       'encounterType:ref,encounterProviders:(uuid,display,' +
-      'provider:(uuid,display))),patient:(uuid,uuid),' +
-      'visitType:(uuid,name,display),attributes:(uuid,display,value),location:(uuid,name,display),startDatetime,' +
-      'stopDatetime)';
+      'provider:(uuid,display))),' +
+      'visitType:(uuid,name,display),startDatetime';
 
   return openmrsObservableFetch(`/ws/rest/v1/visit?patient=${patientUuid}&v=${custom}`, {
     signal: abortController.signal,

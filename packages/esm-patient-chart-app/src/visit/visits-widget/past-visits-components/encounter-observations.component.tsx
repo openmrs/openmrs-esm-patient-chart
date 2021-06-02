@@ -6,42 +6,42 @@ import styles from '../visit-detail-overview.scss';
 
 interface EncounterObservationsProps {
   encounterUuid: string;
+  observations: any;
 }
 
-const EncounterObservations: React.FC<EncounterObservationsProps> = ({ encounterUuid }) => {
+const EncounterObservations: React.FC<EncounterObservationsProps> = ({ encounterUuid, observations }) => {
   const { t } = useTranslation();
-  const [observations, setObservations] = useState<Array<Observation>>([]);
-
-  useEffect(() => {
-    const sub = fetchEncounterObservations(encounterUuid).subscribe((data) => setObservations(data.obs));
-    return () => {
-      sub.unsubscribe();
-    };
-  }, [encounterUuid]);
 
   const observationsList = useMemo(() => {
-    return observations.map((obs: Observation) => {
-      const qna = obs.display.split(':');
-      return {
-        question: qna[0],
-        answer: qna[1],
-      };
-    });
+    return (
+      observations &&
+      observations.map((obs: Observation) => {
+        const qna = obs.display.split(':');
+        return {
+          question: qna[0],
+          answer: qna[1],
+        };
+      })
+    );
   }, [observations]);
 
-  return observationsList.length > 0 ? (
-    <div>
-      {observationsList.map((obs, ind) => (
-        <div key={ind} className={styles.observation}>
-          <span className={styles.caption01} style={{ marginRight: '0.125rem' }}>
-            {obs.question}:{' '}
-          </span>
-          <span className={styles.bodyShort02}>{obs.answer}</span>
-        </div>
-      ))}
-    </div>
+  return observationsList ? (
+    observationsList.length > 0 ? (
+      <div>
+        {observationsList.map((obs, ind) => (
+          <div key={ind} className={styles.observation}>
+            <span className={styles.caption01} style={{ marginRight: '0.125rem' }}>
+              {obs.question}:{' '}
+            </span>
+            <span className={styles.bodyShort02}>{obs.answer}</span>
+          </div>
+        ))}
+      </div>
+    ) : (
+      <SkeletonText />
+    )
   ) : (
-    <SkeletonText />
+    <p>No Observations found.</p>
   );
 };
 

@@ -100,13 +100,13 @@
   margin: 0 1rem;
 }
 
-.tabSections {
+.flexSections {
   display: flex;
 }
 
 .verticalTabs {
   width: 30% !important;
-  padding: 1rem 0;
+  margin: 1rem 0;
 }
 
 .verticalTabs > ul {
@@ -143,4 +143,30 @@
 
 .medicationBlock:first-child {
   margin-top: 0;
+}
+
+.diagnosesList {
+  display: flex;
+  padding-bottom: 0.5rem;
+  margin-left: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.diagnosis {
+  border-radius: 12px;
+  height: 1.5rem;
+  display: flex;
+  align-items: center;
+  padding: 0 0.5rem;
+  margin: 0 0.5rem 0.5rem 0;
+}
+
+.primaryDiagnose {
+  background-color: #d0e2ff;
+  color: #0043ce;
+}
+
+.secondaryDiagnose {
+  background-color: #ffd7d9;
+  color:#a2191f;
 }

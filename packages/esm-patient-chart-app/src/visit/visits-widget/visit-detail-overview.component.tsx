@@ -27,17 +27,10 @@ const SingleVisitDetailComponent: React.FC<SingleVisitDetailComponentProps> = ({
         time: dayjs(encounter.encounterDateTime).format('hh:mm'),
         encounterType: encounter.encounterType.display,
         provider: encounter.encounterProviders.length > 0 ? encounter.encounterProviders[0].display : '',
+        obs: encounter.obs,
       })),
     [visit],
   );
-
-  const orders: Array<Order> = useMemo(() => {
-    let orders: Array<Order> = [];
-    visit.encounters.forEach((enc) => {
-      orders = [...orders, ...enc.orders];
-    });
-    return orders;
-  }, [visit]);
 
   return (
     <div className={styles.visitsDetailWidgetContainer}>
@@ -65,7 +58,7 @@ const SingleVisitDetailComponent: React.FC<SingleVisitDetailComponentProps> = ({
         </div>
       </div>
       {listView && visit?.encounters && <EncounterListDataTable encounters={encounters} />}
-      {!listView && <VisitSummary orders={orders} />}
+      {!listView && <VisitSummary encounters={visit.encounters} />}
     </div>
   );
 };

@@ -20,6 +20,7 @@ interface EncounterListProps {
     time: any;
     encounterType: string;
     provider: string;
+    obs: any;
   }>;
 }
 
@@ -57,7 +58,7 @@ const EncounterListDataTable: React.FC<EncounterListProps> = ({ encounters }) =>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {rows.map((row) => (
+                {rows.map((row, ind) => (
                   <React.Fragment key={row.id}>
                     <TableExpandRow {...getRowProps({ row })}>
                       {row.cells.map((cell) => (
@@ -67,7 +68,7 @@ const EncounterListDataTable: React.FC<EncounterListProps> = ({ encounters }) =>
                     {row.isExpanded && (
                       <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 2}>
                         <div style={{ width: '100%' }}>
-                          <EncounterObservations encounterUuid={row.id} />
+                          <EncounterObservations encounterUuid={row.id} observations={encounters[ind].obs} />
                         </div>
                       </TableExpandedRow>
                     )}
