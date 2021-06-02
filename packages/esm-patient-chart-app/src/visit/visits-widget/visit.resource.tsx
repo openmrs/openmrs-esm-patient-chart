@@ -2,6 +2,48 @@ import { openmrsObservableFetch, FetchResponse, OpenmrsResource, Visit } from '@
 import { take, map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
+export interface Observation {
+  uuid: string;
+  display: string;
+  links: Array<any>;
+}
+
+export interface Order {
+  uuid: string;
+  dateActivated: string;
+  dose: number;
+  doseUnits: {
+    uuid: string;
+    display: string;
+  };
+  drug: {
+    uuid: string;
+    name: string;
+    strength: string;
+  };
+  duration: number;
+  durationUnits: {
+    uuid: string;
+    display: string;
+  };
+  frequency: {
+    uuid: string;
+    display: string;
+  };
+  numRefills: number;
+  orderer: {
+    uuid: string;
+    person: {
+      uuid: string;
+      display: string;
+    };
+  };
+  route: {
+    uuid: string;
+    display: string;
+  };
+}
+
 export function fetchEncounterObservations(encounterUuid) {
   return openmrsObservableFetch(`/ws/rest/v1/encounter/${encounterUuid}`)
     .pipe(take(1))
