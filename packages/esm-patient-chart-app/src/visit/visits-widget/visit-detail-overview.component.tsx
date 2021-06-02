@@ -1,11 +1,10 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import styles from './visit-detail-overview.scss';
-import { Visit, createErrorHandler, OpenmrsResource } from '@openmrs/esm-framework';
+import { Visit, getVisitsForPatient, createErrorHandler, OpenmrsResource } from '@openmrs/esm-framework';
 import Button from 'carbon-components-react/es/components/Button';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import SkeletonText from 'carbon-components-react/es/components/SkeletonText';
-import { Order, getVisitsForPatient } from './visit.resource';
 import EncounterListDataTable from './past-visits-components/encounter-list.component';
 import VisitSummary from './past-visits-components/visit-summary.component';
 
@@ -19,7 +18,7 @@ interface SingleVisitDetailComponentProps {
 
 const SingleVisitDetailComponent: React.FC<SingleVisitDetailComponentProps> = ({ visit }) => {
   const { t } = useTranslation();
-  const [listView, setView] = useState<boolean>(true);
+  const [listView, setView] = useState<boolean>(false);
   const encounters = useMemo(
     () =>
       visit.encounters.map((encounter: OpenmrsResource, ind) => ({
@@ -75,7 +74,16 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
   useEffect(() => {
     if (patientUuid) {
       const abortController = new AbortController();
-      const sub = getVisitsForPatient(patientUuid, abortController).subscribe(({ data }) => {
+      const custom =
+        'custom:(uuid,encounters:(uuid,encounterDatetime,' +
+        'orders:(uuid,dateActivated,' +
+        'drug:(uuid,name,strength),doseUnits:(uuid,display),' +
+        'dose,route:(uuid,display),frequency:(uuid,display),' +
+        'duration,durationUnits:(uuid,display),numRefills,' +
+        'orderer:(uuid,person:(uuid,display))),obs,' +
+        'encounterType:ref,encounterProviders:(encounterRole,provider)),' +
+        'visitType:(uuid,name,display),startDatetime';
+      const sub = getVisitsForPatient(patientUuid, abortController, custom).subscribe(({ data }) => {
         setvisits(data.results);
       }, createErrorHandler());
       return () => {

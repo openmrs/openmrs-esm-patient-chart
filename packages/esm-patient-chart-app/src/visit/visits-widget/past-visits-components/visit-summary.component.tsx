@@ -2,9 +2,15 @@ import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import Tabs from 'carbon-components-react/es/components/Tabs';
 import Tab from 'carbon-components-react/es/components/Tab';
+import dayjs from 'dayjs';
 import { Order } from '../visit.resource';
 import styles from '../visit-detail-overview.scss';
 import MedicationSummary from './medications-summary.component';
+import NotesSummary from './notes-summary.component';
+
+function formatTime(date) {
+  return dayjs(date).format('hh:mm');
+}
 
 interface VisitSummaryProps {
   encounters: any;
@@ -14,11 +20,18 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters }) => {
   const { t } = useTranslation();
   const [tabSelected, setSelectedTab] = useState(0);
 
-  const [diagnoses, orders] = useMemo(() => {
-    let orders: Array<Order> = [];
+  const [diagnoses, notes, medications] = useMemo(() => {
+    let medications = [];
     let diagnoses = [];
+    let notes = [];
     encounters.forEach((enc) => {
-      orders = [...orders, ...enc.orders];
+      medications = [
+        ...medications,
+        ...enc.orders.map((order) => ({
+          order,
+          provider: enc.encounterProviders.length > 0 ? enc.encounterProviders[0] : null,
+        })),
+      ];
       if (enc.encounterType.display == 'Visit Note') {
         enc.obs.forEach((obs) => {
           if (obs.concept.display == 'Visit Diagnoses') {
@@ -26,11 +39,17 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters }) => {
               diagnosis: obs.groupMembers.find((mem) => mem.concept.display === 'PROBLEM LIST').value.display,
               order: obs.groupMembers.find((mem) => mem.concept.display === 'Diagnosis order').value.display,
             });
+          } else if (obs.concept.display == 'Text of encounter note') {
+            notes.push({
+              note: obs.value,
+              provider: enc.encounterProviders.length > 0 ? enc.encounterProviders[0].display : '',
+              time: formatTime(obs.obsDatetime),
+            });
           }
         });
       }
     });
-    return [diagnoses, orders];
+    return [diagnoses, notes, medications];
   }, [encounters]);
 
   return (
@@ -41,8 +60,9 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters }) => {
         </p>
         <div className={`${styles.caption01} ${styles.diagnosesList}`} style={{ width: '70%' }}>
           {diagnoses.length > 0 ? (
-            diagnoses.map((d) => (
+            diagnoses.map((d, ind) => (
               <span
+                key={ind}
                 className={`${styles.diagnosis} ${
                   d.order === 'Primary' ? styles.primaryDiagnose : styles.secondaryDiagnose
                 }`}>
@@ -59,15 +79,13 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters }) => {
           <Tab
             className={`${styles.tab} ${styles.bodyLong01} ${tabSelected == 0 && styles.selectedTab}`}
             onClick={() => setSelectedTab(0)}
-            href="#"
             id="tab-1"
             label={t('Notes', 'Notes')}>
-            Notes Content
+            <NotesSummary notes={notes} />
           </Tab>
           <Tab
             className={`${styles.tab} ${tabSelected == 1 && styles.selectedTab}`}
             onClick={() => setSelectedTab(1)}
-            href="#"
             id="tab-2"
             label={t('Tests', 'Tests')}>
             Tests Content
@@ -75,10 +93,9 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters }) => {
           <Tab
             className={`${styles.tab} ${tabSelected == 2 && styles.selectedTab}`}
             onClick={() => setSelectedTab(2)}
-            href="#"
             id="tab-3"
             label={t('Medications', 'Medications')}>
-            <MedicationSummary orders={orders} />
+            <MedicationSummary medications={medications} />
           </Tab>
         </Tabs>
         {/* <div className={`${styles.tabContent} ${styles.bodyLong01}`}>{tabContent}</div> */}

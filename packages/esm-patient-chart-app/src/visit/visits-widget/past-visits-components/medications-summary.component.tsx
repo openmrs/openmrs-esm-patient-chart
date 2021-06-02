@@ -9,36 +9,35 @@ function formatTime(dateTime) {
   return dayjs(dateTime).format('hh:mm');
 }
 
-interface MedicationSummaryProps {
-  orders: Array<Order>;
-}
-
-const MedicationSummary = ({ orders }) => {
+const MedicationSummary = ({ medications }) => {
   const { t } = useTranslation();
 
-  return orders.length > 0 ? (
-    orders.map(
-      (order) =>
-        order.dose && (
+  return medications.length > 0 ? (
+    medications.map(
+      (medication) =>
+        medication.order.dose && (
           <>
             <p className={`${styles.bodyLong01} ${styles.medicationBlock}`}>
-              <strong>{capitalize(order.drug?.name)}</strong> &mdash; {order.doseUnits?.display} &mdash;{' '}
-              {order.route?.display}
+              <strong>{capitalize(medication.order.drug?.name)}</strong> &mdash; {medication.order.doseUnits?.display}{' '}
+              &mdash; {medication.order.route?.display}
               <br />
               <span className={styles.label01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
-              <strong>{getDosage(order.drug?.strength, order.dose).toLowerCase()}</strong> &mdash;{' '}
-              {order.frequency?.display} &mdash;{' '}
-              {!order.duration
+              <strong>{getDosage(medication.order.drug?.strength, medication.order.dose).toLowerCase()}</strong> &mdash;{' '}
+              {medication.order.frequency?.display} &mdash;{' '}
+              {!medication.order.duration
                 ? t('orderIndefiniteDuration', 'Indefinite duration')
                 : t('orderDurationAndUnit', 'for {duration} {durationUnit}', {
-                    duration: order.duration,
-                    durationUnit: order.durationUnits?.display,
+                    duration: medication.order.duration,
+                    durationUnit: medication.order.durationUnits?.display,
                   })}
               <br />
-              <span className={styles.label01}>{t('refills', 'Refills').toUpperCase()}</span> {order.numRefills}
+              <span className={styles.label01}>{t('refills', 'Refills').toUpperCase()}</span>{' '}
+              {medication.order.numRefills}
             </p>
             <p className={styles.caption01} style={{ color: '#525252' }}>
-              {formatTime(order.dateActivated)} &middot; {order.orderer.person?.display}
+              {formatTime(medication.order.dateActivated)} &middot;{' '}
+              {medication.provider && medication.provider.provider.person.display} &middot;{' '}
+              {medication.provider && medication.provider.encounterRole.display}
             </p>
           </>
         ),
