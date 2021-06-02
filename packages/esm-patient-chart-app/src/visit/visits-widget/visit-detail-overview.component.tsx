@@ -70,7 +70,7 @@ interface VisitOverviewComponentProps {
 }
 
 function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentProps) {
-  const [visits, setvisits] = useState<Array<Visit | null>>(null);
+  const [visits, setvisits] = useState<Array<Visit> | null>(null);
 
   useEffect(() => {
     if (patientUuid) {
@@ -81,9 +81,12 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
         'drug:(uuid,name,strength),doseUnits:(uuid,display),' +
         'dose,route:(uuid,display),frequency:(uuid,display),' +
         'duration,durationUnits:(uuid,display),numRefills,' +
-        'orderer:(uuid,person:(uuid,display))),obs:(uuid,concept:(uuid,display),display,groupMembers:(uuid,concept:(uuid,display),value:(uuid,display)),value),' +
-        'encounterType:(uuid,display),encounterProviders:(uuid,display,encounterRole:(uuid,display),provider:(uuid,person:(uuid,display)))),' +
-        'visitType:(uuid,name,display),startDatetime';
+        'orderer:(uuid,person:(uuid,display))),obs:(uuid,' +
+        'concept:(uuid,display),display,groupMembers:(uuid,' +
+        'concept:(uuid,display),value:(uuid,display)),value),' +
+        'encounterType:(uuid,display),encounterProviders:(uuid,' +
+        'display,encounterRole:(uuid,display),provider:(uuid,' +
+        'person:(uuid,display)))),visitType:(uuid,name,display),startDatetime';
       const sub = getVisitsForPatient(patientUuid, abortController, custom).subscribe(({ data }) => {
         setvisits(data.results);
       }, createErrorHandler());
