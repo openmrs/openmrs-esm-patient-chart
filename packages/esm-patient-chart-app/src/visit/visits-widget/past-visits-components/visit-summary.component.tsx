@@ -3,46 +3,67 @@ import { useTranslation } from 'react-i18next';
 import Tabs from 'carbon-components-react/es/components/Tabs';
 import Tab from 'carbon-components-react/es/components/Tab';
 import dayjs from 'dayjs';
-import { Order } from '../visit.resource';
+import { Medication, Encounter, Note, Observation, MedicationItem } from '../visit.resource';
 import styles from '../visit-detail-overview.scss';
 import MedicationSummary from './medications-summary.component';
 import NotesSummary from './notes-summary.component';
+import { OpenmrsResource } from '@openmrs/esm-framework';
 
 function formatTime(date) {
   return dayjs(date).format('hh:mm');
 }
 
+interface DiagnosisItem {
+  diagnosis: string;
+  order: string;
+}
+
 interface VisitSummaryProps {
-  encounters: any;
+  encounters: Array<Encounter | OpenmrsResource>;
 }
 
 const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters }) => {
   const { t } = useTranslation();
   const [tabSelected, setSelectedTab] = useState(0);
 
-  const [diagnoses, notes, medications] = useMemo(() => {
-    let medications = [];
-    let diagnoses = [];
-    let notes = [];
-    encounters.forEach((enc) => {
-      medications = [
-        ...medications,
-        ...enc.orders.map((order) => ({
+  const [diagnoses, notes, medications]: [Array<DiagnosisItem>, Array<Note>, Array<MedicationItem>] = useMemo(() => {
+    // Medication Tab
+    let medications: Array<MedicationItem> = [];
+    // Diagnoses in a Visit
+    let diagnoses: Array<DiagnosisItem> = [];
+    // Notes Tab
+    let notes: Array<Note> = [];
+
+    // Iterating through every Encounter
+    encounters.forEach((enc: Encounter) => {
+      // Orders of every encounter put in a single array.
+      medications = medications.concat(
+        enc.orders.map((order: Medication) => ({
           order,
-          provider: enc.encounterProviders.length > 0 ? enc.encounterProviders[0] : null,
+          provider: {
+            name: enc.encounterProviders.length ? enc.encounterProviders[0].provider.person.display : '',
+            role: enc.encounterProviders.length ? enc.encounterProviders[0].encounterRole.display : '',
+          },
         })),
-      ];
+      );
+
+      // Check for Visit Diagnoses and Notes
       if (enc.encounterType.display == 'Visit Note') {
-        enc.obs.forEach((obs) => {
+        enc.obs.forEach((obs: Observation) => {
           if (obs.concept.display == 'Visit Diagnoses') {
+            // Putting all the diagnoses in a single array.
             diagnoses.push({
               diagnosis: obs.groupMembers.find((mem) => mem.concept.display === 'PROBLEM LIST').value.display,
               order: obs.groupMembers.find((mem) => mem.concept.display === 'Diagnosis order').value.display,
             });
           } else if (obs.concept.display == 'Text of encounter note') {
+            // Putting all notes in a single array.
             notes.push({
               note: obs.value,
-              provider: enc.encounterProviders.length > 0 ? enc.encounterProviders[0].display : '',
+              provider: {
+                name: enc.encounterProviders.length ? enc.encounterProviders[0].provider.person.display : '',
+                role: enc.encounterProviders.length ? enc.encounterProviders[0].encounterRole.display : '',
+              },
               time: formatTime(obs.obsDatetime),
             });
           }
@@ -60,7 +81,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters }) => {
         </p>
         <div className={`${styles.caption01} ${styles.diagnosesList}`} style={{ width: '70%' }}>
           {diagnoses.length > 0 ? (
-            diagnoses.map((d, ind) => (
+            diagnoses.map((d: DiagnosisItem, ind) => (
               <span
                 key={ind}
                 className={`${styles.diagnosis} ${

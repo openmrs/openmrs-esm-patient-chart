@@ -1,14 +1,68 @@
-import { openmrsObservableFetch, FetchResponse, OpenmrsResource, Visit } from '@openmrs/esm-framework';
-import { take, map } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+export interface Encounter {
+  uuid: string;
+  encounterDateTime: string;
+  encounterProviders: Array<{
+    uuid: string;
+    display: string;
+    encounterRole: {
+      uuid: string;
+      display: string;
+    };
+    provider: {
+      uuid: string;
+      person: {
+        uuid: string;
+        display: string;
+      };
+    };
+  }>;
+  encounterType: {
+    uuid: string;
+    display: string;
+  };
+  obs: Array<Observation>;
+  orders: Array<Medication>;
+}
+
+export interface EncounterProvider {
+  uuid: string;
+  display: string;
+  encounterRole: {
+    uuid: string;
+    display: string;
+  };
+  provider: {
+    uuid: string;
+    person: {
+      uuid: string;
+      display: string;
+    };
+  };
+}
 
 export interface Observation {
   uuid: string;
+  concept: {
+    uuid: string;
+    display: string;
+  };
   display: string;
-  links: Array<any>;
+  groupMembers: null | Array<{
+    uuid: string;
+    concept: {
+      uuid: string;
+      display: string;
+    };
+    value: {
+      uuid: string;
+      display: string;
+    };
+  }>;
+  value: any;
+  obsDatetime: string;
 }
 
-export interface Order {
+export interface Medication {
   uuid: string;
   dateActivated: string;
   dose: number;
@@ -44,42 +98,21 @@ export interface Order {
   };
 }
 
-export function fetchEncounterObservations(encounterUuid) {
-  return openmrsObservableFetch(`/ws/rest/v1/encounter/${encounterUuid}`)
-    .pipe(take(1))
-    .pipe(map((res: FetchResponse<OpenmrsResource>) => res.data));
+export interface Note {
+  note: string;
+  provider: {
+    name: string;
+    role: string;
+  };
+  time: string;
 }
 
-export function getVisitsForPatient(
-  patientUuid: string,
-  abortController: AbortController,
-  v?: string,
-): Observable<FetchResponse<{ results: Array<Visit> }>> {
-  const custom =
-    v ||
-    'custom:(uuid,encounters:(uuid,encounterDatetime,' +
-      'orders:(uuid,dateActivated,' +
-      'drug:(uuid,name,strength),doseUnits:(uuid,display),' +
-      'dose,route:(uuid,display),frequency:(uuid,display),' +
-      'duration,durationUnits:(uuid,display),numRefills,' +
-      'orderer:(uuid,person:(uuid,display))),obs,' +
-      'encounterType:ref,encounterProviders:(uuid,display,' +
-      'provider:(uuid,display))),' +
-      'visitType:(uuid,name,display),startDatetime';
-
-  return openmrsObservableFetch(`/ws/rest/v1/visit?patient=${patientUuid}&v=${custom}`, {
-    signal: abortController.signal,
-    method: 'GET',
-    headers: {
-      'Content-type': 'application/json',
-    },
-  })
-    .pipe(take(1))
-    .pipe(
-      map((response: FetchResponse<{ results: Array<Visit> }>) => {
-        return response;
-      }),
-    );
+export interface MedicationItem {
+  order: Medication;
+  provider: {
+    name: string;
+    role: string;
+  };
 }
 
 export function getDosage(strength, doseNumber) {

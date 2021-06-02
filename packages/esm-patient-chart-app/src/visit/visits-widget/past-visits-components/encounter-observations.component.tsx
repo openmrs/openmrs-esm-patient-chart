@@ -1,15 +1,14 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import SkeletonText from 'carbon-components-react/es/components/SkeletonText';
-import { Observation, fetchEncounterObservations } from '../visit.resource';
+import { Observation } from '../visit.resource';
 import styles from '../visit-detail-overview.scss';
 
 interface EncounterObservationsProps {
-  encounterUuid: string;
-  observations: any;
+  observations: Array<Observation>;
 }
 
-const EncounterObservations: React.FC<EncounterObservationsProps> = ({ encounterUuid, observations }) => {
+const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observations }) => {
   const { t } = useTranslation();
 
   const observationsList = useMemo(() => {

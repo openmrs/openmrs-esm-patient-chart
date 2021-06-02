@@ -13,6 +13,7 @@ import DataTable, {
 } from 'carbon-components-react/es/components/DataTable';
 import EncounterObservations from './encounter-observations.component';
 import styles from '../visit-detail-overview.scss';
+import { Observation } from '../visit.resource';
 
 interface EncounterListProps {
   encounters: Array<{
@@ -20,7 +21,7 @@ interface EncounterListProps {
     time: any;
     encounterType: string;
     provider: string;
-    obs: any;
+    obs: Array<Observation>;
   }>;
 }
 
@@ -68,7 +69,7 @@ const EncounterListDataTable: React.FC<EncounterListProps> = ({ encounters }) =>
                     {row.isExpanded && (
                       <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 2}>
                         <div style={{ width: '100%' }}>
-                          <EncounterObservations encounterUuid={row.id} observations={encounters[ind].obs} />
+                          <EncounterObservations observations={encounters[ind].obs} />
                         </div>
                       </TableExpandedRow>
                     )}

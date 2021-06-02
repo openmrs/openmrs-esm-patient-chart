@@ -1,12 +1,13 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import styles from './visit-detail-overview.scss';
-import { Visit, getVisitsForPatient, createErrorHandler, OpenmrsResource } from '@openmrs/esm-framework';
+import { Visit, getVisitsForPatient, createErrorHandler } from '@openmrs/esm-framework';
 import Button from 'carbon-components-react/es/components/Button';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import SkeletonText from 'carbon-components-react/es/components/SkeletonText';
 import EncounterListDataTable from './past-visits-components/encounter-list.component';
 import VisitSummary from './past-visits-components/visit-summary.component';
+import { Encounter } from './visit.resource';
 
 function formatDateTime(date) {
   return dayjs(date).format('MMM DD, YYYY - hh:mm');
@@ -18,10 +19,10 @@ interface SingleVisitDetailComponentProps {
 
 const SingleVisitDetailComponent: React.FC<SingleVisitDetailComponentProps> = ({ visit }) => {
   const { t } = useTranslation();
-  const [listView, setView] = useState<boolean>(false);
+  const [listView, setView] = useState<boolean>(true);
   const encounters = useMemo(
     () =>
-      visit.encounters.map((encounter: OpenmrsResource, ind) => ({
+      visit.encounters.map((encounter: Encounter) => ({
         id: encounter.uuid,
         time: dayjs(encounter.encounterDateTime).format('hh:mm'),
         encounterType: encounter.encounterType.display,
@@ -80,8 +81,8 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
         'drug:(uuid,name,strength),doseUnits:(uuid,display),' +
         'dose,route:(uuid,display),frequency:(uuid,display),' +
         'duration,durationUnits:(uuid,display),numRefills,' +
-        'orderer:(uuid,person:(uuid,display))),obs,' +
-        'encounterType:ref,encounterProviders:(encounterRole,provider)),' +
+        'orderer:(uuid,person:(uuid,display))),obs:(uuid,concept:(uuid,display),display,groupMembers:(uuid,concept:(uuid,display),value:(uuid,display)),value),' +
+        'encounterType:(uuid,display),encounterProviders:(uuid,display,encounterRole:(uuid,display),provider:(uuid,person:(uuid,display)))),' +
         'visitType:(uuid,name,display),startDatetime';
       const sub = getVisitsForPatient(patientUuid, abortController, custom).subscribe(({ data }) => {
         setvisits(data.results);
