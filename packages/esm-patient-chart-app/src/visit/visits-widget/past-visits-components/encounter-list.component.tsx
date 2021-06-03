@@ -14,6 +14,7 @@ import DataTable, {
 import EncounterObservations from './encounter-observations.component';
 import styles from '../visit-detail-overview.scss';
 import { Observation } from '../visit.resource';
+import { useTranslation } from 'react-i18next';
 
 interface EncounterListProps {
   encounters: Array<{
@@ -26,6 +27,7 @@ interface EncounterListProps {
 }
 
 const EncounterListDataTable: React.FC<EncounterListProps> = ({ encounters }) => {
+  const { t } = useTranslation();
   const headerData = [
     {
       id: 1,
@@ -77,7 +79,9 @@ const EncounterListDataTable: React.FC<EncounterListProps> = ({ encounters }) =>
                 ))}
               </TableBody>
             </Table>
-            {encounters.length === 0 && <p className={styles.dataTableRow}>No encounters found.</p>}
+            {encounters.length === 0 && (
+              <p className={styles.dataTableRow}>{t('noEncountersFound', 'No encounters found.')}</p>
+            )}
           </TableContainer>
         );
       }}

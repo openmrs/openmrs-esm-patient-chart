@@ -1,12 +1,15 @@
 import React from 'react';
 import styles from '../visit-detail-overview.scss';
 import { Note } from '../visit.resource';
+import { useTranslation } from 'react-i18next';
 
 interface NotesSummaryProps {
   notes: Array<Note>;
 }
 
 const NotesSummary: React.FC<NotesSummaryProps> = ({ notes }) => {
+  const { t } = useTranslation();
+
   return (
     <React.Fragment>
       {notes.length > 0 ? (
@@ -19,7 +22,7 @@ const NotesSummary: React.FC<NotesSummaryProps> = ({ notes }) => {
           </React.Fragment>
         ))
       ) : (
-        <p className={styles.bodyLong01}>No notes found.</p>
+        <p className={styles.bodyLong01}>{t('noNotesFound', 'No notes found.')}</p>
       )}
     </React.Fragment>
   );

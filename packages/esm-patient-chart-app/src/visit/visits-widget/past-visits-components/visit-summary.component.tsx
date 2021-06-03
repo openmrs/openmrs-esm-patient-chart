@@ -77,7 +77,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters }) => {
     <div className={styles.summaryContainer}>
       <div className={styles.flexSections}>
         <p className={styles.productiveHeading01} style={{ width: '30%' }}>
-          Diagnoses
+          {t('diagnoses', 'Diagnoses')}
         </p>
         <div className={`${styles.caption01} ${styles.diagnosesList}`} style={{ width: '70%' }}>
           {diagnoses.length > 0 ? (

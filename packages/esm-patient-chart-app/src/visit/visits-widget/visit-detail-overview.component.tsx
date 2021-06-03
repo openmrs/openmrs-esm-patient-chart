@@ -13,11 +13,11 @@ function formatDateTime(date) {
   return dayjs(date).format('MMM DD, YYYY - hh:mm');
 }
 
-interface SingleVisitDetailComponentProps {
+interface VisitDetailComponentProps {
   visit: Visit;
 }
 
-const SingleVisitDetailComponent: React.FC<SingleVisitDetailComponentProps> = ({ visit }) => {
+const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visit }) => {
   const { t } = useTranslation();
   const [listView, setView] = useState<boolean>(true);
   const encounters = useMemo(
@@ -46,14 +46,14 @@ const SingleVisitDetailComponent: React.FC<SingleVisitDetailComponentProps> = ({
             size="small"
             kind="ghost"
             onClick={() => setView(true)}>
-            {t('All Encounters', 'All Encounters')}
+            {t('allEncounters', 'All Encounters')}
           </Button>
           <Button
             className={`${styles.toggle} ${!listView ? styles.toggleActive : ''}`}
             size="small"
             kind="ghost"
             onClick={() => setView(false)}>
-            {t('Visit Summary', 'Visit Summary')}
+            {t('visitSummary', 'Visit Summary')}
           </Button>
         </div>
       </div>
@@ -70,7 +70,7 @@ interface VisitOverviewComponentProps {
 }
 
 function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentProps) {
-  const [visits, setvisits] = useState<Array<Visit> | null>(null);
+  const [visits, setVisits] = useState<Array<Visit> | null>(null);
 
   useEffect(() => {
     if (patientUuid) {
@@ -88,7 +88,7 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
         'display,encounterRole:(uuid,display),provider:(uuid,' +
         'person:(uuid,display)))),visitType:(uuid,name,display),startDatetime';
       const sub = getVisitsForPatient(patientUuid, abortController, custom).subscribe(({ data }) => {
-        setvisits(data.results);
+        setVisits(data.results);
       }, createErrorHandler());
       return () => {
         abortController.abort();
@@ -101,7 +101,7 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
     visits.length > 0 ? (
       <div className={styles.container}>
         {visits.map((visit, ind) => (
-          <SingleVisitDetailComponent key={ind} visit={visit} />
+          <VisitDetailComponent key={ind} visit={visit} />
         ))}
       </div>
     ) : (
