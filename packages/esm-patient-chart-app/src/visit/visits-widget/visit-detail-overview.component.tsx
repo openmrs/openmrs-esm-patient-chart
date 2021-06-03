@@ -82,7 +82,7 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
         'dose,route:(uuid,display),frequency:(uuid,display),' +
         'duration,durationUnits:(uuid,display),numRefills,' +
         'orderer:(uuid,person:(uuid,display))),obs:(uuid,' +
-        'concept:(uuid,display),display,groupMembers:(uuid,' +
+        'concept,display,groupMembers:(uuid,' +
         'concept:(uuid,display),value:(uuid,display)),value),' +
         'encounterType:(uuid,display),encounterProviders:(uuid,' +
         'display,encounterRole:(uuid,display),provider:(uuid,' +

@@ -45,6 +45,9 @@ export interface Observation {
   concept: {
     uuid: string;
     display: string;
+    conceptClass: {
+      display: string;
+    };
   };
   display: string;
   groupMembers: null | Array<{
