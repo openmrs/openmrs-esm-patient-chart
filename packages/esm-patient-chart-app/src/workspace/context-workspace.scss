@@ -8,8 +8,8 @@
    left: 0;
    right: 0;
    bottom: 0;
-   z-index: 10000;
-   background-color: #f4f4f4;
+   z-index: 10;
+   background-color: $ui-01;
    overflow-y: auto;
  }
 
@@ -19,17 +19,17 @@
    top: 0;
    right: 0;
    bottom: 0;
-   z-index: 10000;
-   background-color: #f4f4f4;
+   z-index: 10;
+   background-color: $ui-01;
    overflow-y: auto;
    margin-right: 48px;
    margin-top: 3rem;
-   width: 35%;
+   width: 520px;
  }
 
  :global(.omrs-breakpoint-gt-tablet) .contextWorkspaceContainer header,
  :global(.omrs-breakpoint-gt-tablet) .contextWorkspaceContainer header a {
-  background-color: #e0e0e0;
+  background-color: $ui-03;
   color: $ui-05;
 }
 
@@ -47,3 +47,4 @@
   color: $color-blue-60-2;
   fill:$color-blue-60-2;
 }
+
