@@ -87,52 +87,46 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters }) => {
 
   return (
     <div className={styles.summaryContainer}>
-      <div className={styles.flexSections}>
-        <p className={styles.productiveHeading01} style={{ width: '30%' }}>
-          {t('diagnoses', 'Diagnoses')}
-        </p>
-        <div className={`${styles.caption01} ${styles.diagnosesList}`} style={{ width: '70%' }}>
-          {diagnoses.length > 0 ? (
-            diagnoses.map((d: DiagnosisItem, ind) => (
-              <span
-                key={ind}
-                className={`${styles.diagnosis} ${
-                  d.order === 'Primary' ? styles.primaryDiagnose : styles.secondaryDiagnose
-                }`}>
-                {d.diagnosis}
-              </span>
-            ))
-          ) : (
-            <span style={{ marginBottom: '0.5rem' }}>No Diagnoses found.</span>
-          )}
-        </div>
+      <p className={styles.productiveHeading01}>{t('diagnoses', 'Diagnoses')}</p>
+      <div className={`${styles.caption01} ${styles.diagnosesList}`}>
+        {diagnoses.length > 0 ? (
+          diagnoses.map((d: DiagnosisItem, ind) => (
+            <span
+              key={ind}
+              className={`${styles.diagnosis} ${
+                d.order === 'Primary' ? styles.primaryDiagnose : styles.secondaryDiagnose
+              }`}>
+              {d.diagnosis}
+            </span>
+          ))
+        ) : (
+          <span style={{ marginBottom: '0.5rem' }}>No Diagnoses found.</span>
+        )}
       </div>
-      <div className={`${styles.flexSections} ${styles.bodyLong01}`}>
-        <Tabs className={styles.verticalTabs}>
-          <Tab
-            className={`${styles.tab} ${styles.bodyLong01} ${tabSelected == 0 && styles.selectedTab}`}
-            onClick={() => setSelectedTab(0)}
-            id="tab-1"
-            label={t('Notes', 'Notes')}>
-            <NotesSummary notes={notes} />
-          </Tab>
-          <Tab
-            className={`${styles.tab} ${tabSelected == 1 && styles.selectedTab}`}
-            onClick={() => setSelectedTab(1)}
-            id="tab-2"
-            label={t('Tests', 'Tests')}>
-            <TestsSummary tests={tests} />
-          </Tab>
-          <Tab
-            className={`${styles.tab} ${tabSelected == 2 && styles.selectedTab}`}
-            onClick={() => setSelectedTab(2)}
-            id="tab-3"
-            label={t('Medications', 'Medications')}>
-            <MedicationSummary medications={medications} />
-          </Tab>
-        </Tabs>
-        {/* <div className={`${styles.tabContent} ${styles.bodyLong01}`}>{tabContent}</div> */}
-      </div>
+      <Tabs className={styles.verticalTabs}>
+        <Tab
+          className={`${styles.tab} ${styles.bodyLong01} ${tabSelected == 0 && styles.selectedTab}`}
+          onClick={() => setSelectedTab(0)}
+          id="tab-1"
+          label={t('Notes', 'Notes')}>
+          <NotesSummary notes={notes} />
+        </Tab>
+        <Tab
+          className={`${styles.tab} ${tabSelected == 1 && styles.selectedTab}`}
+          onClick={() => setSelectedTab(1)}
+          id="tab-2"
+          label={t('Tests', 'Tests')}>
+          <TestsSummary tests={tests} />
+        </Tab>
+        <Tab
+          className={`${styles.tab} ${tabSelected == 2 && styles.selectedTab}`}
+          onClick={() => setSelectedTab(2)}
+          id="tab-3"
+          label={t('Medications', 'Medications')}>
+          <MedicationSummary medications={medications} />
+        </Tab>
+      </Tabs>
+      {/* <div className={`${styles.tabContent} ${styles.bodyLong01}`}>{tabContent}</div> */}
     </div>
   );
 };

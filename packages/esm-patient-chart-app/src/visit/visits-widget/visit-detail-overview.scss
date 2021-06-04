@@ -22,17 +22,15 @@
 }
 
 .container  {
-  display: grid;
-  grid-template-columns: 1fr;
-  grid-auto-rows: auto;
-  grid-auto-columns: auto;
-  grid-gap: 25px;
-  margin: 1.3125rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .visitsDetailWidgetContainer {
   background-color: $ui-background;
-  position: relative;
+  width: 66%;
+  margin-bottom: 1.3125rem;
 }
 
 .visitsDetailHeaderContainer {
@@ -52,7 +50,6 @@
 }
 
 .toggleButtons {
-  width: fit-content;
   margin: 0 $spacing-03;
   height: 2.5rem;
 }
@@ -75,11 +72,9 @@
 }
 
 .dataTableRow{
-  height: 3rem;
   min-height: unset;
   color: #525252;
-  padding: 0 1rem;
-  margin-left: 3rem;
+  // padding: 0 1rem;
   vertical-align: center;
   display: flex;
   align-items: center;
@@ -91,13 +86,20 @@
 }
 
 .observation {
-  display: flex;
-  align-items: center;
-  margin: 0.75rem 0;
+  display: grid;
+  grid-template-columns: max-content auto;
+  grid-gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.observation > span {
+  align-self: center;
 }
 
 .summaryContainer {
   margin: 0 1rem;
+  display: grid;
+  grid-template-columns: max-content auto;
 }
 
 .flexSections {
@@ -105,7 +107,6 @@
 }
 
 .verticalTabs {
-  width: 30% !important;
   margin: 1rem 0;
 }
 
@@ -115,7 +116,11 @@
 
 .tab > button {
   border-bottom: 0 !important;
-  border-left: 2px solid #e0e0e0 !important;
+  border-left: 3px solid #e0e0e0 !important;
+}
+
+tab > button:first {
+  margin-left: 10px;
 }
 
 .tab > button, .tab > button:focus, .tab > button:active {
@@ -124,7 +129,7 @@
 }
 
 .selectedTab > button {
-  border-left: 2px solid #007d79 !important;
+  border-left: 3px solid #007d79 !important;
   border-bottom: 0 !important;
   font-weight: 600 !important;
 }
@@ -149,7 +154,7 @@
 .diagnosesList {
   display: flex;
   padding-bottom: 0.5rem;
-  margin-left: 1rem;
+  margin: 0 1rem;
   border-bottom: 1px solid #e0e0e0;
 }
 

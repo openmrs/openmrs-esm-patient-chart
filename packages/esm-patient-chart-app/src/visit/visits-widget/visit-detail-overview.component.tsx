@@ -57,7 +57,7 @@ const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visit }) =>
           </Button>
         </div>
       </div>
-      {listView && visit?.encounters && <EncounterListDataTable encounters={encounters} />}
+      {listView && visit?.encounters && <EncounterListDataTable visitUuid={visit.uuid} encounters={encounters} />}
       {!listView && <VisitSummary encounters={visit.encounters} />}
     </div>
   );

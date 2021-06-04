@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import DataTable, {
   TableContainer,
   Table,
@@ -15,6 +15,7 @@ import EncounterObservations from './encounter-observations.component';
 import styles from '../visit-detail-overview.scss';
 import { Observation } from '../visit.resource';
 import { useTranslation } from 'react-i18next';
+import { useLayoutType } from '@openmrs/esm-framework';
 
 interface EncounterListProps {
   encounters: Array<{
@@ -24,10 +25,15 @@ interface EncounterListProps {
     provider: string;
     obs: Array<Observation>;
   }>;
+  visitUuid: string;
 }
 
-const EncounterListDataTable: React.FC<EncounterListProps> = ({ encounters }) => {
+const EncounterListDataTable: React.FC<EncounterListProps> = ({ encounters, visitUuid }) => {
   const { t } = useTranslation();
+  const layout = useLayoutType();
+  const isDesktop = layout === 'desktop';
+  const [headerWidth, setHeaderWidth] = useState(0);
+
   const headerData = [
     {
       id: 1,
@@ -46,17 +52,26 @@ const EncounterListDataTable: React.FC<EncounterListProps> = ({ encounters }) =>
     },
   ];
 
+  useEffect(() => {
+    setHeaderWidth(document.getElementById(`header_${visitUuid}_0`).clientWidth);
+    const handler = () => setHeaderWidth(document.getElementById(`header_${visitUuid}_0`).clientWidth);
+    window.addEventListener('resize', handler);
+    return () => window.removeEventListener('resize', handler);
+  }, []);
+
   return (
     <DataTable rows={encounters} headers={headerData}>
       {({ rows, headers, getHeaderProps, getRowProps, getTableProps }) => {
         return (
           <TableContainer>
-            <Table {...getTableProps()} useZebraStyles>
+            <Table {...getTableProps()} size={!isDesktop ? 'normal' : 'short'}>
               <TableHead>
                 <TableRow>
                   <TableExpandHeader />
-                  {headers.map((header) => (
-                    <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
+                  {headers.map((header, ind) => (
+                    <TableHeader id={`header_${visitUuid}_${ind}`} {...getHeaderProps({ header })}>
+                      {header.header}
+                    </TableHeader>
                   ))}
                 </TableRow>
               </TableHead>
@@ -64,13 +79,16 @@ const EncounterListDataTable: React.FC<EncounterListProps> = ({ encounters }) =>
                 {rows.map((row, ind) => (
                   <React.Fragment key={row.id}>
                     <TableExpandRow {...getRowProps({ row })}>
-                      {row.cells.map((cell) => (
+                      {row.cells.map((cell, ind) => (
                         <TableCell key={cell.id}>{cell.value}</TableCell>
                       ))}
                     </TableExpandRow>
                     {row.isExpanded && (
-                      <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 2}>
-                        <div style={{ width: '100%' }}>
+                      <TableExpandedRow
+                        className={styles.expandedRow}
+                        style={{ paddingLeft: isDesktop ? '3rem' : '4rem' }}
+                        colSpan={headers.length + 1}>
+                        <div style={{ marginLeft: headerWidth }}>
                           <EncounterObservations observations={encounters[ind].obs} />
                         </div>
                       </TableExpandedRow>
@@ -80,7 +98,15 @@ const EncounterListDataTable: React.FC<EncounterListProps> = ({ encounters }) =>
               </TableBody>
             </Table>
             {encounters.length === 0 && (
-              <p className={styles.dataTableRow}>{t('noEncountersFound', 'No encounters found.')}</p>
+              <p
+                className={styles.dataTableRow}
+                style={{
+                  height: isDesktop ? '2rem' : '3rem',
+                  marginLeft: isDesktop ? '3rem' : '4rem',
+                }}>
+                <TableExpandHeader />
+                {t('noEncountersFound', 'No encounters found.')}
+              </p>
             )}
           </TableContainer>
         );

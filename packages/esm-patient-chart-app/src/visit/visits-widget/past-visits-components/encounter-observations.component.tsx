@@ -26,14 +26,12 @@ const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observati
 
   return observationsList ? (
     observationsList.length > 0 ? (
-      <div>
+      <div className={styles.observation}>
         {observationsList.map((obs, ind) => (
-          <div key={ind} className={styles.observation}>
-            <span className={styles.caption01} style={{ marginRight: '0.125rem' }}>
-              {obs.question}:{' '}
-            </span>
+          <React.Fragment key={ind}>
+            <span className={styles.caption01}>{obs.question}: </span>
             <span className={styles.bodyShort02}>{obs.answer}</span>
-          </div>
+          </React.Fragment>
         ))}
       </div>
     ) : (
