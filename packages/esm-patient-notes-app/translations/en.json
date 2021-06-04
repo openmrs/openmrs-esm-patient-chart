@@ -14,6 +14,7 @@
   "encounterDate": "Encounter date",
   "encounterType": "Encounter type",
   "enterDiagnoses": "Enter diagnoses",
+  "errorSavingVisitNote": "",
   "image": "Image",
   "imageUploadHelperText": "Upload an image or use this device's camera to capture an image",
   "items": "Items",
