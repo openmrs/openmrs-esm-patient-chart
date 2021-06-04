@@ -35,10 +35,10 @@ const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observati
         ))}
       </div>
     ) : (
-      <SkeletonText />
+      <p className={styles.caption01}>No Observations found.</p>
     )
   ) : (
-    <p>No Observations found.</p>
+    <SkeletonText />
   );
 };
 

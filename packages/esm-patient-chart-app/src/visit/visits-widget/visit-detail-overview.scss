@@ -81,9 +81,12 @@
   align-items: center;
 }
 
+.expandedRow > td {
+  padding: inherit !important
+}
+
 .expandedRow > td > div {
   max-height: max-content !important;
-  display: flex;
 }
 
 .observation {
