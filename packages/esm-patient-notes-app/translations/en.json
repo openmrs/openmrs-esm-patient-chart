@@ -14,7 +14,6 @@
   "encounterDate": "Encounter date",
   "encounterType": "Encounter type",
   "enterDiagnoses": "Enter diagnoses",
-  "errorSavingVisitNote": "",
   "image": "Image",
   "imageUploadHelperText": "Upload an image or use this device's camera to capture an image",
   "items": "Items",
@@ -31,5 +30,6 @@
   "searchForDiagnosis": "Search for a diagnosis",
   "seeAll": "See all",
   "visitDate": "Visit date",
-  "visitNoteSaved": "Visit note saved successfully"
+  "visitNoteSaved": "Visit note saved successfully",
+  "visitNoteSaveError": "Error saving visit note"
 }
