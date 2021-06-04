@@ -29,8 +29,9 @@
 
 .visitsDetailWidgetContainer {
   background-color: $ui-background;
-  width: 66%;
-  margin-bottom: 1.3125rem;
+  width: 100%;
+  max-width: 688px;
+  margin: 0 1rem 1.3125rem 1rem;
 }
 
 .visitsDetailHeaderContainer {

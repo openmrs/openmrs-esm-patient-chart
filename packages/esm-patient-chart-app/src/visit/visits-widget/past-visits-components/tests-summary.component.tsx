@@ -4,7 +4,6 @@ import styles from '../visit-detail-overview.scss';
 
 const TestsSummary = ({ tests }) => {
   const { t } = useTranslation();
-  console.log(tests);
   return tests.length ? (
     tests.map((test) => (
       <>
