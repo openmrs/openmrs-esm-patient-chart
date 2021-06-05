@@ -15,9 +15,10 @@ import { Tile } from 'carbon-components-react/es/components/Tile';
 import { useTranslation } from 'react-i18next';
 import { Column, Grid, Row } from 'carbon-components-react/es/components/Grid';
 import { createErrorHandler, showToast, useConfig, useSessionUser } from '@openmrs/esm-framework';
-import { convertToObsPayLoad, Diagnosis, ObsData, VisitNotePayload } from './visit-note.util';
+import { convertToObsPayLoad, Diagnosis, VisitNotePayload } from './visit-note.util';
 import { fetchDiagnosisByName, fetchLocationByUuid, fetchProviderByUuid, saveVisitNote } from './visit-notes.resource';
 import { ConfigObject } from '../config-schema';
+const searchTimeoutInMs = 300;
 
 enum StateTypes {
   IDLE,
@@ -36,11 +37,10 @@ interface IdleState {
 }
 
 interface SearchState {
-  diagnosis: any;
   isSearching: boolean;
+  searchResults?: Array<Diagnosis>;
   searchTerm: string;
   type: StateTypes.SEARCH;
-  searchResults?: Array<any>;
 }
 
 interface DiagnosesState {
@@ -55,12 +55,11 @@ interface SubmitState {
 type ViewState = IdleState | SearchState | DiagnosesState | SubmitState;
 
 const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, closeWorkspace }) => {
-  const searchTimeoutInMs = 300;
+  const { t } = useTranslation();
   const session = useSessionUser();
   const config = useConfig() as ConfigObject;
   const { clinicianEncounterRole, encounterNoteConceptUuid, encounterTypeUuid, formConceptUuid } =
     config.visitNoteConfig;
-  const { t } = useTranslation();
   const [clinicalNote, setClinicalNote] = React.useState('');
   const [currentSessionProviderUuid, setCurrentSessionProviderUuid] = React.useState<string | null>('');
   const [currentSessionLocationUuid, setCurrentSessionLocationUuid] = React.useState('');
@@ -97,7 +96,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, closeWorks
         if (searchTerm) {
           const sub = fetchDiagnosisByName(searchTerm).subscribe(
             (diagnoses: Array<Diagnosis>) => setViewState((state) => ({ ...state, searchResults: diagnoses })),
-            () => createErrorHandler,
+            createErrorHandler(),
             () => {
               setViewState((state) => ({ ...state, isSearching: false }));
               sub.unsubscribe();
@@ -142,13 +141,11 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, closeWorks
 
     if (viewState.type !== StateTypes.DIAGNOSES) return;
 
-    let obs: Array<ObsData> = [];
-
     if (selectedDiagnoses.length) {
       selectedDiagnoses[0].primary = true;
     }
 
-    obs = convertToObsPayLoad(selectedDiagnoses);
+    let obs = convertToObsPayLoad(selectedDiagnoses);
 
     if (clinicalNote) {
       obs = [
@@ -188,18 +185,12 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, closeWorks
         }
       })
       .catch((err) => {
-        showToast({
-          kind: 'error',
-          description: err.message ? err.message : `${err}`,
-          title: t('visitNoteSaveError', 'Error saving visit note'),
-        });
         createErrorHandler();
+      })
+      .finally(() => {
+        ac.abort();
+        setViewState({ type: StateTypes.IDLE });
       });
-
-    return () => {
-      ac.abort();
-      setViewState({ type: StateTypes.IDLE });
-    };
   };
 
   return (
@@ -262,7 +253,6 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, closeWorks
                   setViewState(
                     event.target.value
                       ? {
-                          diagnosis: null,
                           isSearching: true,
                           searchTerm: event.target.value,
                           type: StateTypes.SEARCH,

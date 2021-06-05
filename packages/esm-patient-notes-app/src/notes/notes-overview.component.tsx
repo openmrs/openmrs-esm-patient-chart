@@ -46,10 +46,7 @@ const NotesOverview: React.FC<NotesOverviewProps> = ({ patientUuid, patient, sho
 
   React.useEffect(() => {
     if (patient && patientUuid) {
-      const sub = getEncounterObservableRESTAPI(patientUuid).subscribe(
-        (notes) => setNotes(notes),
-        (err) => setError(err),
-      );
+      const sub = getEncounterObservableRESTAPI(patientUuid).subscribe(setNotes, setError);
       return () => sub.unsubscribe();
     }
   }, [patient, patientUuid]);
