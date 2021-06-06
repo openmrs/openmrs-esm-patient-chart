@@ -22,7 +22,7 @@ const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({ match
 
   const mainClassName = `
     omrs-main-content 
-    ${styles.chartContainer} 
+    ${styles.chartContainer}
   `;
 
   useVisitDialog(patientUuid);
