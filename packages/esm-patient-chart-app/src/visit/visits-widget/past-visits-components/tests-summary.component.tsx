@@ -5,7 +5,11 @@ import styles from '../visit-detail-overview.scss';
 
 const TestsSummary = ({ tests }) => {
   const { t } = useTranslation();
-  return <ExtensionSlot extensionSlotName="past-visit-test-results" />;
+  return tests && tests.length > 0 ? (
+    <ExtensionSlot extensionSlotName="past-visit-test-results" />
+  ) : (
+    <p className={`${styles.bodyLong01} ${styles.text02}`}>{t('noTestsFound', 'No tests found')}</p>
+  );
 };
 
 export default TestsSummary;
