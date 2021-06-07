@@ -17,18 +17,19 @@ import DataTable, {
 } from 'carbon-components-react/es/components/DataTable';
 import { getEncounterObservableRESTAPI, PatientNote } from './encounter.resource';
 import { formatNotesDate } from './notes-helper';
+import { useNotesContext } from './notes.context';
 const notesToShowCount = 5;
 
 interface NotesDetailedSummaryProps {
   showAddNote: boolean;
-  patientUuid: string;
 }
 
-const NotesDetailedSummary: React.FC<NotesDetailedSummaryProps> = ({ showAddNote, patientUuid }) => {
+const NotesDetailedSummary: React.FC<NotesDetailedSummaryProps> = ({ showAddNote }) => {
   const { t } = useTranslation();
   const displayText = t('notes', 'Notes');
   const headerTitle = t('notes', 'Notes');
 
+  const { patientUuid } = useNotesContext();
   const [activeVisit, setActiveVisit] = React.useState<VisitItem>(null);
   const [notes, setNotes] = React.useState<Array<PatientNote>>(null);
   const [showAllNotes, setShowAllNotes] = React.useState(false);
@@ -54,9 +55,9 @@ const NotesDetailedSummary: React.FC<NotesDetailedSummaryProps> = ({ showAddNote
     }
   }, [patientUuid]);
 
-  const toggleShowAllNotes = () => {
-    setShowAllNotes(!showAllNotes);
-  };
+  const toggleShowAllNotes = React.useCallback(() => {
+    setShowAllNotes((current) => !current);
+  }, []);
 
   const headers = [
     {
