@@ -100,6 +100,7 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
   return visits ? (
     visits.length > 0 ? (
       <div className={styles.container}>
+        <h2 className={`${styles.productiveHeading03} ${styles.encounterHeading}`}>Encounters</h2>
         {visits.map((visit, ind) => (
           <VisitDetailComponent key={ind} visit={visit} />
         ))}

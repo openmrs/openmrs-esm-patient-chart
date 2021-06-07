@@ -53,13 +53,13 @@ const EncounterListDataTable: React.FC<EncounterListProps> = ({ encounters, visi
   ];
 
   useEffect(() => {
-    setHeaderWidth(document.getElementById(`header_${visitUuid}_0`).clientWidth);
-    const handler = () => setHeaderWidth(document.getElementById(`header_${visitUuid}_0`).clientWidth);
+    setHeaderWidth(document.getElementById(`header_${visitUuid}_0`)?.clientWidth);
+    const handler = () => setHeaderWidth(document.getElementById(`header_${visitUuid}_0`)?.clientWidth);
     window.addEventListener('resize', handler);
     return () => window.removeEventListener('resize', handler);
   }, []);
 
-  return (
+  return encounters.length != 0 ? (
     <DataTable rows={encounters} headers={headerData}>
       {({ rows, headers, getHeaderProps, getRowProps, getTableProps }) => {
         return (
@@ -97,21 +97,15 @@ const EncounterListDataTable: React.FC<EncounterListProps> = ({ encounters, visi
                 ))}
               </TableBody>
             </Table>
-            {encounters.length === 0 && (
-              <p
-                className={styles.dataTableRow}
-                style={{
-                  height: isDesktop ? '2rem' : '3rem',
-                  marginLeft: isDesktop ? '3rem' : '4rem',
-                }}>
-                <TableExpandHeader />
-                {t('noEncountersFound', 'No encounters found.')}
-              </p>
-            )}
           </TableContainer>
         );
       }}
     </DataTable>
+  ) : (
+    <div style={{ textAlign: 'center', margin: '1rem' }}>
+      <h4 className={styles.productiveHeading02}>{t('noEncountersFound', 'No encounters found.')}</h4>
+      <p className={styles.bodyLong01}>There is no information to display here.</p>
+    </div>
   );
 };
 
