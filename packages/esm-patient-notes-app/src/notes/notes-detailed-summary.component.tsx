@@ -1,148 +1,171 @@
-import React, { useState, useEffect, Fragment } from 'react';
-import styles from './notes-detailed-summary.css';
-import capitalize from 'lodash-es/capitalize';
-import { EmptyState, SummaryCard } from '@openmrs/esm-patient-common-lib';
-import { Link } from 'react-router-dom';
+import React from 'react';
+import styles from './notes-overview.scss';
+import { EmptyState, ErrorState, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
-import { attach, createErrorHandler, usePagination } from '@openmrs/esm-framework';
-import { formatDate } from './biometric.helper';
-import { useNotesContext } from './notes.context';
+import { attach, createErrorHandler, getStartedVisit, usePagination, VisitItem } from '@openmrs/esm-framework';
+import Add16 from '@carbon/icons-react/es/add/16';
+import Button from 'carbon-components-react/es/components/Button';
+import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
+import DataTable, {
+  Table,
+  TableCell,
+  TableContainer,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'carbon-components-react/es/components/DataTable';
 import { getEncounterObservableRESTAPI, PatientNote } from './encounter.resource';
+import { formatNotesDate } from './notes-helper';
+const notesToShowCount = 5;
 
 interface NotesDetailedSummaryProps {
   showAddNote: boolean;
+  patientUuid: string;
 }
 
-const NotesDetailedSummary: React.FC<NotesDetailedSummaryProps> = ({ showAddNote }) => {
+const NotesDetailedSummary: React.FC<NotesDetailedSummaryProps> = ({ showAddNote, patientUuid }) => {
   const { t } = useTranslation();
-  const { patient, patientUuid } = useNotesContext();
-  const [patientNotes, setPatientNotes] = useState<Array<PatientNote>>();
-  const pagination = usePagination(patientNotes);
+  const displayText = t('notes', 'Notes');
+  const headerTitle = t('notes', 'Notes');
 
-  useEffect(() => {
-    if (patient) {
-      const subscription = getEncounterObservableRESTAPI(patientUuid).subscribe(
-        (notes) => setPatientNotes(notes),
-        createErrorHandler(),
-      );
+  const [activeVisit, setActiveVisit] = React.useState<VisitItem>(null);
+  const [notes, setNotes] = React.useState<Array<PatientNote>>(null);
+  const [showAllNotes, setShowAllNotes] = React.useState(false);
+  const [error, setError] = React.useState(null);
 
-      return () => subscription.unsubscribe();
+  React.useEffect(() => {
+    const sub = getStartedVisit.subscribe((visit) => {
+      if (visit && visit.status === 'ongoing') {
+        setActiveVisit(visit);
+      }
+    });
+    return () => sub.unsubscribe();
+  }, []);
+
+  React.useEffect(() => {
+    if (patientUuid) {
+      const sub = getEncounterObservableRESTAPI(patientUuid).subscribe(setNotes, (err) => {
+        setError(err);
+        createErrorHandler();
+      });
+
+      return () => sub.unsubscribe();
     }
-  }, [patientUuid, patient]);
+  }, [patientUuid]);
+
+  const toggleShowAllNotes = () => {
+    setShowAllNotes(!showAllNotes);
+  };
+
+  const headers = [
+    {
+      key: 'encounterDate',
+      header: t('date', 'Date'),
+    },
+    {
+      key: 'encounterType',
+      header: t('encounterType', 'Encounter type'),
+    },
+    {
+      key: 'encounterLocation',
+      header: t('location', 'Location'),
+    },
+    {
+      key: 'encounterAuthor',
+      header: t('author', 'Author'),
+    },
+  ];
+
+  const launchVisitNoteForm = React.useCallback(() => {
+    if (activeVisit) {
+      attach('patient-chart-workspace-slot', 'visit-notes-workspace');
+    } else {
+      launchStartVisitPrompt();
+    }
+  }, [activeVisit]);
+
+  const getRowItems = (rows: Array<PatientNote>) => {
+    return rows?.slice(0, showAllNotes ? rows.length : notesToShowCount).map((row) => ({
+      ...row,
+      encounterDate: formatNotesDate(row.encounterDate),
+    }));
+  };
+
+  function RenderNotes() {
+    if (notes.length) {
+      const rows = getRowItems(notes);
+      return (
+        <div>
+          <div className={styles.notesHeader}>
+            <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
+            {showAddNote && (
+              <Button kind="ghost" renderIcon={Add16} iconDescription="Add notes" onClick={launchVisitNoteForm}>
+                {t('add', 'Add')}
+              </Button>
+            )}
+          </div>
+          <TableContainer>
+            <DataTable rows={getRowItems(notes)} headers={headers} isSortable={true} size="short">
+              {({ rows, headers, getHeaderProps, getTableProps }) => (
+                <Table {...getTableProps()}>
+                  <TableHead>
+                    <TableRow>
+                      {headers.map((header) => (
+                        <TableHeader
+                          className={`${styles.productiveHeading01} ${styles.text02}`}
+                          {...getHeaderProps({
+                            header,
+                            isSortable: header.isSortable,
+                          })}>
+                          {header.header?.content ?? header.header}
+                        </TableHeader>
+                      ))}
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {rows.map((row) => (
+                      <TableRow key={row.id}>
+                        {row.cells.map((cell) => (
+                          <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+                        ))}
+                      </TableRow>
+                    ))}
+                    {!showAllNotes && notes?.length > notesToShowCount && (
+                      <TableRow>
+                        <TableCell colSpan={4}>
+                          <span
+                            style={{
+                              display: 'inline-block',
+                              margin: '0.45rem 0rem',
+                            }}>
+                            {`${notesToShowCount} / ${notes.length}`} {t('items', 'items')}
+                          </span>
+                          <Button size="small" kind="ghost" onClick={toggleShowAllNotes}>
+                            {t('seeAll', 'See all')}
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              )}
+            </DataTable>
+          </TableContainer>
+        </div>
+      );
+    }
+    return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchVisitNoteForm} />;
+  }
 
   return (
     <>
-      {patientNotes && (
-        <div className={styles.notesSummary}>
-          {patientNotes.length > 0 ? (
-            <SummaryCard
-              name={t('notes', 'Notes')}
-              addComponent={showAddNote}
-              showComponent={() => attach('patient-chart-workspace-slot', 'visit-notes-workspace')}>
-              <table className={`omrs-type-body-regular ${styles.notesTable}`}>
-                <thead>
-                  <tr className={styles.notesTableRow} style={{ textTransform: 'uppercase' }}>
-                    <th>{t('date', 'Date')}</th>
-                    <th style={{ textAlign: 'left' }}>
-                      {t('note', 'Note')}
-                      <svg
-                        className="omrs-icon"
-                        style={{
-                          height: '0.813rem',
-                          fill: 'var(--omrs-color-ink-medium-contrast)',
-                        }}>
-                        <use xlinkHref="#omrs-icon-arrow-downward"></use>
-                      </svg>
-                      <span style={{ marginLeft: '1.25rem' }}>{t('location', 'Location')}</span>
-                    </th>
-                    <th style={{ textAlign: 'left' }}>{t('author', 'Author')}</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {pagination.results.map((note) => {
-                    return (
-                      <Fragment key={note.id}>
-                        <tr className={styles.notesTableDataRow}>
-                          <td className={styles.noteDate}>{formatDate(note?.encounterDate)}</td>
-                          <td className={styles.noteInfo}>
-                            <span className="omrs-medium">{note.encounterType}</span>
-                            <div
-                              style={{
-                                color: 'var(--omrs-color-ink-medium-contrast)',
-                                margin: '0rem',
-                              }}>
-                              {capitalize(note.encounterLocation)}
-                            </div>
-                          </td>
-                          <td className={styles.noteAuthor}>
-                            {note.encounterAuthor ? note.encounterAuthor : '\u2014'}
-                          </td>
-                          <td
-                            style={{
-                              textAlign: 'end',
-                              paddingRight: '0.625rem',
-                            }}>
-                            <Link to={`/${note.id}`}>
-                              <svg className="omrs-icon">
-                                <use
-                                  fill="var(--omrs-color-ink-low-contrast)"
-                                  xlinkHref="#omrs-icon-chevron-right"></use>
-                              </svg>
-                            </Link>
-                          </td>
-                        </tr>
-                      </Fragment>
-                    );
-                  })}
-                </tbody>
-              </table>
-              <div className={styles.pagination}>
-                <div>
-                  {pagination.showPreviousButton && (
-                    <button
-                      onClick={pagination.goToPrevious}
-                      className={`${styles.navButton} omrs-bold omrs-btn omrs-text-neutral omrs-rounded`}>
-                      <svg className="omrs-icon" fill="var(--omrs-color-ink-low-contrast)">
-                        <use xlinkHref="#omrs-icon-chevron-left" />
-                      </svg>
-                      {t('previous', 'Previous')}
-                    </button>
-                  )}
-                </div>
-                {pagination.paginated ? (
-                  <div>
-                    {t('page', 'Page')} {pagination.currentPage} {t('of', 'of')} {pagination.totalPages}
-                  </div>
-                ) : (
-                  <div className="omrs-type-body-regular" style={{ fontFamily: 'Work Sans' }}>
-                    <p style={{ color: 'var(--omrs-color-ink-medium-contrast)' }}>
-                      {t('noMoreNotesAvailable', 'No more notes available')}
-                    </p>
-                  </div>
-                )}
-                <div>
-                  {pagination.showNextButton && (
-                    <button
-                      onClick={pagination.goToNext}
-                      className={`${styles.navButton} omrs-bold omrs-btn omrs-text-neutral omrs-rounded`}>
-                      {t('next', 'Next')}
-                      <svg className="omrs-icon" fill="var(--omrs-color-ink-low-contrast)">
-                        <use xlinkHref="#omrs-icon-chevron-right" />
-                      </svg>
-                    </button>
-                  )}
-                </div>
-              </div>
-            </SummaryCard>
-          ) : (
-            <EmptyState
-              displayText={t('notes', 'Notes')}
-              headerTitle={t('notes', 'Notes')}
-              launchForm={() => attach('patient-chart-workspace-slot', 'visit-notes-workspace')}
-            />
-          )}
-        </div>
+      {notes ? (
+        <RenderNotes />
+      ) : error ? (
+        <ErrorState error={error} headerTitle={headerTitle} />
+      ) : (
+        <DataTableSkeleton rowCount={5} />
       )}
     </>
   );
