@@ -81,14 +81,24 @@
   border: 1px solid #A6C8FF;
 }
 
-.toggle:hover, .toggle:active, .toggle:focus {
+.toggle:hover {
   background-color: #EDF5FF;
+}
+
+.toggle:active, .toggle:focus {
   box-shadow: none;
+  background-color: #EDF5FF;
 }
 
 .toggleActive{
   background-color: #EDF5FF;
   border: 1px solid $link-01;
+}
+
+.toggleActive:active, .toggleActive:focus {
+  box-shadow: none;
+  border: 1px solid $link-01;
+  background-color: #EDF5FF;
 }
 
 .toggle:first-of-type {

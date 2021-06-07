@@ -120,7 +120,7 @@ function setupOpenMRS() {
         }),
         meta: {
           title: 'Visits',
-          view: 'Visits',
+          view: 'visits',
         },
       },
     ],
