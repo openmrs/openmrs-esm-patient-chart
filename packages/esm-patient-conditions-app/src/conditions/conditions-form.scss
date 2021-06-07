@@ -9,7 +9,7 @@
 .conditionsList {
   background-color: $ui-02;
   max-height: 14rem;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 .conditionsList li:hover {
