@@ -25,10 +25,8 @@ export function getEncounterObservableRESTAPI(patientUuid: string) {
   return openmrsObservableFetch<{ results: Array<RESTPatientNote> }>(
     `/ws/rest/v1/encounter?patient=${patientUuid}&v=custom:(uuid,display,encounterDatetime,location:(uuid,display,name),encounterType:(name,uuid),auditInfo:(creator:(display),changedBy:(display)),encounterProviders:(provider:(person:(display))))`,
   ).pipe(
-    map(({ data }) => data.results),
-    map((notes) => {
-      return formatNotes(notes);
-    }),
+    map(({ data }) => data.results ?? []),
+    map((notes) => formatNotes(notes)),
     map((data) => data.sort((a, b) => (a.encounterDate < b.encounterDate ? 1 : -1))),
   );
 }
@@ -47,7 +45,7 @@ function mapNoteProperties(note: RESTPatientNote): PatientNote {
     encounterDate: note.encounterDatetime,
     encounterType: note.encounterType?.name,
     encounterLocation: note.location?.display,
-    encounterAuthor: note.encounterProviders[0]?.provider?.person?.display,
+    encounterAuthor: note.encounterProviders?.[0]?.provider?.person?.display,
   };
 }
 
