@@ -100,7 +100,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters }) => {
             </span>
           ))
         ) : (
-          <span style={{ marginBottom: '0.5rem' }}>{t('noDiagnosesFound', 'No Diagnoses found')}</span>
+          <span style={{ marginBottom: '0.5rem' }}>{t('noDiagnosesFound', 'No diagnoses found')}</span>
         )}
       </div>
       <Tabs className={styles.verticalTabs}>
