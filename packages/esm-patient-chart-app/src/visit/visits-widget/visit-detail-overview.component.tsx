@@ -3,6 +3,7 @@ import styles from './visit-detail-overview.scss';
 import { Visit, getVisitsForPatient, createErrorHandler } from '@openmrs/esm-framework';
 import SkeletonText from 'carbon-components-react/es/components/SkeletonText';
 import VisitDetailComponent from './past-visits-components/visit-detail.component';
+import { useTranslation } from 'react-i18next';
 
 interface VisitOverviewComponentProps {
   patientUuid: string;
@@ -10,6 +11,7 @@ interface VisitOverviewComponentProps {
 
 function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentProps) {
   const [visits, setVisits] = useState<Array<Visit> | null>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (patientUuid) {
@@ -36,19 +38,23 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
     }
   }, [patientUuid]);
 
-  return visits ? (
-    visits.length > 0 ? (
-      <div className={styles.container}>
-        <h2 className={`${styles.productiveHeading03} ${styles.encounterHeading}`}>Encounters</h2>
-        {visits.map((visit, ind) => (
-          <VisitDetailComponent key={ind} visit={visit} />
-        ))}
-      </div>
-    ) : (
-      <p>No Visit Found</p>
-    )
-  ) : (
-    <SkeletonText heading />
+  return (
+    <div style={{ padding: '0 1rem' }}>
+      {visits ? (
+        visits.length > 0 ? (
+          <div className={styles.container}>
+            <h2 className={`${styles.productiveHeading03} ${styles.encounterHeading}`}>Encounters</h2>
+            {visits.map((visit, ind) => (
+              <VisitDetailComponent key={ind} visit={visit} />
+            ))}
+          </div>
+        ) : (
+          <p className={styles.bodyShort02}>{t('NoVisitsFound', 'No visits found')}</p>
+        )
+      ) : (
+        <SkeletonText heading />
+      )}
+    </div>
   );
 }
 

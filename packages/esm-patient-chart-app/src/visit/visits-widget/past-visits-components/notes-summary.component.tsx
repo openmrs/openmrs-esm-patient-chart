@@ -22,7 +22,7 @@ const NotesSummary: React.FC<NotesSummaryProps> = ({ notes }) => {
           </React.Fragment>
         ))
       ) : (
-        <p className={styles.bodyLong01}>{t('noNotesFound', 'No notes found')}</p>
+        <p className={`${styles.bodyLong01} ${styles.text02}`}>{t('noNotesFound', 'No notes found')}</p>
       )}
     </React.Fragment>
   );

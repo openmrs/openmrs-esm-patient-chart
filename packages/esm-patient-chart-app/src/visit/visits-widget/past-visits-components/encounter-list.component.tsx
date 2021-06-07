@@ -64,7 +64,7 @@ const EncounterListDataTable: React.FC<EncounterListProps> = ({ encounters, visi
       {({ rows, headers, getHeaderProps, getRowProps, getTableProps }) => {
         return (
           <TableContainer>
-            <Table {...getTableProps()} size={!isDesktop ? 'normal' : 'short'}>
+            <Table className={styles.customTable} {...getTableProps()} size={!isDesktop ? 'normal' : 'short'}>
               <TableHead>
                 <TableRow>
                   <TableExpandHeader />
@@ -104,7 +104,7 @@ const EncounterListDataTable: React.FC<EncounterListProps> = ({ encounters, visi
   ) : (
     <div style={{ textAlign: 'center', margin: '0 1rem 1rem 1rem' }}>
       <h4 className={styles.productiveHeading02}>{t('noEncountersFound', 'No encounters found')}</h4>
-      <p className={styles.bodyLong01}>
+      <p className={`${styles.bodyLong01} ${styles.text02}`}>
         {t('thereIsNoInformationToDisplayHere', 'There is no information to display here')}
       </p>
     </div>

@@ -25,6 +25,14 @@
   @include carbon--type-style("body-long-01");
 }
 
+.text02 {
+  color: #525252;
+}
+
+.text01 {
+  color: #161616;
+}
+
 .container  {
   display: flex;
   flex-direction: column;
@@ -45,6 +53,7 @@
   width: 100%;
   max-width: 688px;
   margin: 0 1rem 1.3125rem 1rem;
+  border: 1px solid #e0e0e0;
 }
 
 .visitsDetailHeaderContainer {
@@ -69,11 +78,16 @@
 }
 
 .toggle{
-  border: 1px solid $hover-ui;
+  border: 1px solid #A6C8FF;
+}
+
+.toggle:hover, .toggle:active, .toggle:focus {
+  background-color: #EDF5FF;
+  box-shadow: none;
 }
 
 .toggleActive{
-  background-color: $hover-ui;
+  background-color: #EDF5FF;
   border-color: $link-01;
 }
 
@@ -83,6 +97,14 @@
 
 .toggle:last-of-type {
   border-radius: 0 $spacing-02 $spacing-02 0;
+}
+
+.customTable tr[data-parent-row]:nth-child(odd) td {
+  background-color: #fff;
+}
+
+.customTable  tbody  tr[data-parent-row]:nth-child(even)  td {
+  background-color: #f4f4f4;
 }
 
 .expandedRow > td {
@@ -97,7 +119,7 @@
   display: grid;
   grid-template-columns: max-content auto;
   grid-gap: 0.5rem;
-  margin-bottom: 0.5rem;
+  margin: 0.5rem 0;
 }
 
 .observation > span {

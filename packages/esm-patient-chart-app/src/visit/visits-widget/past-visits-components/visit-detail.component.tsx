@@ -37,7 +37,7 @@ const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visit }) =>
         <h4 className={styles.productiveHeading02}>
           {visit.visitType.display}
           <br />
-          <p className={styles.bodyLong01}>{formatDateTime(visit.startDatetime)}</p>
+          <p className={`${styles.bodyLong01} ${styles.text02}`}>{formatDateTime(visit.startDatetime)}</p>
         </h4>
         <div className={styles.toggleButtons}>
           <Button

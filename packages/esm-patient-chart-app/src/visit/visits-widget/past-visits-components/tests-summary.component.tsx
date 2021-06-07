@@ -1,10 +1,11 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { ExtensionSlot } from '@openmrs/esm-framework';
 import styles from '../visit-detail-overview.scss';
 
 const TestsSummary = ({ tests }) => {
   const { t } = useTranslation();
-  return <p className={styles.bodyLong01}>{t('noTestsFound', 'No tests found')}</p>;
+  return <ExtensionSlot extensionSlotName="past-visit-test-results" />;
 };
 
 export default TestsSummary;

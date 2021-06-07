@@ -30,12 +30,12 @@ const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observati
         {observationsList.map((obs, ind) => (
           <React.Fragment key={ind}>
             <span className={styles.caption01}>{obs.question}: </span>
-            <span className={styles.bodyShort02}>{obs.answer}</span>
+            <span className={`${styles.bodyShort02} ${styles.text01}`}>{obs.answer}</span>
           </React.Fragment>
         ))}
       </div>
     ) : (
-      <p className={styles.caption01}>No Observations found.</p>
+      <p className={styles.caption01}>{t('noObservationsFound', 'No observations found')}</p>
     )
   ) : (
     <SkeletonText />

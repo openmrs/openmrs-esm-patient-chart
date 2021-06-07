@@ -100,7 +100,9 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters }) => {
             </span>
           ))
         ) : (
-          <span style={{ marginBottom: '0.5rem' }}>{t('noDiagnosesFound', 'No diagnoses found')}</span>
+          <span className={`${styles.bodyLong01} ${styles.text02}`} style={{ marginBottom: '0.5rem' }}>
+            {t('noDiagnosesFound', 'No diagnoses found')}
+          </span>
         )}
       </div>
       <Tabs className={styles.verticalTabs}>
@@ -108,21 +110,21 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters }) => {
           className={`${styles.tab} ${styles.bodyLong01} ${tabSelected === 0 && styles.selectedTab}`}
           onClick={() => setSelectedTab(0)}
           id="tab-1"
-          label={t('Notes', 'Notes')}>
+          label={t('notes', 'Notes')}>
           <NotesSummary notes={notes} />
         </Tab>
         <Tab
           className={`${styles.tab} ${tabSelected === 1 && styles.selectedTab}`}
           onClick={() => setSelectedTab(1)}
           id="tab-2"
-          label={t('Tests', 'Tests')}>
+          label={t('tests', 'Tests')}>
           <TestsSummary tests={tests} />
         </Tab>
         <Tab
           className={`${styles.tab} ${tabSelected === 2 && styles.selectedTab}`}
           onClick={() => setSelectedTab(2)}
           id="tab-3"
-          label={t('Medications', 'Medications')}>
+          label={t('medications', 'Medications')}>
           <MedicationSummary medications={medications} />
         </Tab>
       </Tabs>
