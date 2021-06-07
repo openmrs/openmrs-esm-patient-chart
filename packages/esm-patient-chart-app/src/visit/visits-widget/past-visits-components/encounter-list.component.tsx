@@ -102,9 +102,11 @@ const EncounterListDataTable: React.FC<EncounterListProps> = ({ encounters, visi
       }}
     </DataTable>
   ) : (
-    <div style={{ textAlign: 'center', margin: '1rem' }}>
-      <h4 className={styles.productiveHeading02}>{t('noEncountersFound', 'No encounters found.')}</h4>
-      <p className={styles.bodyLong01}>There is no information to display here.</p>
+    <div style={{ textAlign: 'center', margin: '0 1rem 1rem 1rem' }}>
+      <h4 className={styles.productiveHeading02}>{t('noEncountersFound', 'No encounters found')}</h4>
+      <p className={styles.bodyLong01}>
+        {t('thereIsNoInformationToDisplayHere', 'There is no information to display here')}
+      </p>
     </div>
   );
 };

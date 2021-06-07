@@ -52,15 +52,15 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters }) => {
         );
 
         // Check for Visit Diagnoses and Notes
-        if (enc.encounterType.display == 'Visit Note') {
+        if (enc.encounterType.display === 'Visit Note') {
           enc.obs.forEach((obs: Observation) => {
-            if (obs.concept.display == 'Visit Diagnoses') {
+            if (obs.concept.display === 'Visit Diagnoses') {
               // Putting all the diagnoses in a single array.
               diagnoses.push({
                 diagnosis: obs.groupMembers.find((mem) => mem.concept.display === 'PROBLEM LIST').value.display,
                 order: obs.groupMembers.find((mem) => mem.concept.display === 'Diagnosis order').value.display,
               });
-            } else if (obs.concept.display == 'Text of encounter note') {
+            } else if (obs.concept.display === 'Text of encounter note') {
               // Putting all notes in a single array.
               notes.push({
                 note: obs.value,
@@ -74,7 +74,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters }) => {
           });
         } else {
           enc.obs.forEach((obs: Observation) => {
-            if (obs.concept.conceptClass.display == 'Test' || obs.concept.conceptClass.display == 'LabSet')
+            if (obs.concept.conceptClass.display === 'Test' || obs.concept.conceptClass.display === 'LabSet')
               tests.push({
                 testName: obs.concept.display,
                 value: obs.value,
@@ -100,33 +100,32 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters }) => {
             </span>
           ))
         ) : (
-          <span style={{ marginBottom: '0.5rem' }}>No Diagnoses found.</span>
+          <span style={{ marginBottom: '0.5rem' }}>{t('noDiagnosesFound', 'No Diagnoses found')}</span>
         )}
       </div>
       <Tabs className={styles.verticalTabs}>
         <Tab
-          className={`${styles.tab} ${styles.bodyLong01} ${tabSelected == 0 && styles.selectedTab}`}
+          className={`${styles.tab} ${styles.bodyLong01} ${tabSelected === 0 && styles.selectedTab}`}
           onClick={() => setSelectedTab(0)}
           id="tab-1"
           label={t('Notes', 'Notes')}>
           <NotesSummary notes={notes} />
         </Tab>
         <Tab
-          className={`${styles.tab} ${tabSelected == 1 && styles.selectedTab}`}
+          className={`${styles.tab} ${tabSelected === 1 && styles.selectedTab}`}
           onClick={() => setSelectedTab(1)}
           id="tab-2"
           label={t('Tests', 'Tests')}>
           <TestsSummary tests={tests} />
         </Tab>
         <Tab
-          className={`${styles.tab} ${tabSelected == 2 && styles.selectedTab}`}
+          className={`${styles.tab} ${tabSelected === 2 && styles.selectedTab}`}
           onClick={() => setSelectedTab(2)}
           id="tab-3"
           label={t('Medications', 'Medications')}>
           <MedicationSummary medications={medications} />
         </Tab>
       </Tabs>
-      {/* <div className={`${styles.tabContent} ${styles.bodyLong01}`}>{tabContent}</div> */}
     </div>
   );
 };

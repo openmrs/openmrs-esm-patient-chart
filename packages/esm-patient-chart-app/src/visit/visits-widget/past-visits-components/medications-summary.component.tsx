@@ -49,7 +49,7 @@ const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) =>
             ),
         )
       ) : (
-        <p className={styles.bodyLong01}>{t('noMedicationsFound', 'No Medications found')}</p>
+        <p className={styles.bodyLong01}>{t('noMedicationsFound', 'No medications found')}</p>
       )}
     </React.Fragment>
   );

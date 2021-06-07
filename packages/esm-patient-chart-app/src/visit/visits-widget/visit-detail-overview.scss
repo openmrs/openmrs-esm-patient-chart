@@ -85,15 +85,6 @@
   border-radius: 0 $spacing-02 $spacing-02 0;
 }
 
-.dataTableRow{
-  min-height: unset;
-  color: #525252;
-  // padding: 0 1rem;
-  vertical-align: center;
-  display: flex;
-  align-items: center;
-}
-
 .expandedRow > td {
   padding: inherit !important
 }
