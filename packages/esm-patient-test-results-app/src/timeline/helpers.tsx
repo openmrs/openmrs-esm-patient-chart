@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { OBSERVATION_INTERPRETATION } from '../loadPatientTestData/helpers';
-import { ObsRecord } from '../loadPatientTestData/types';
+import { ObsRecord, OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import styles from './timeline.scss';
 
 export const Grid: React.FC<{

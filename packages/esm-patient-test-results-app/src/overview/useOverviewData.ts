@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { OBSERVATION_INTERPRETATION } from '../loadPatientTestData/helpers';
-import { ObsRecord } from '../loadPatientTestData/types';
+import { ObsRecord, OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import usePatientResultsData from '../loadPatientTestData/usePatientResultsData';
 
 export interface OverviewPanelData {

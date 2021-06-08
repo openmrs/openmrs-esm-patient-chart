@@ -1,5 +1,3 @@
-import { OBSERVATION_INTERPRETATION } from './helpers';
-
 export type ConceptUuid = string;
 export type ObsUuid = string;
 
@@ -31,4 +29,16 @@ export interface PatientData {
     type: 'LabSet' | 'Test';
     uuid: string;
   };
+}
+
+export enum OBSERVATION_INTERPRETATION {
+  'NORMAL',
+
+  'HIGH',
+  'CRITICALLY_HIGH',
+  'OFF_SCALE_HIGH',
+
+  'LOW',
+  'CRITICALLY_LOW',
+  'OFF_SCALE_LOW',
 }

@@ -1,4 +1,11 @@
-import { PatientData, ObsRecord, ConceptUuid, ConceptRecord, ObsMetaInfo } from './types';
+import {
+  PatientData,
+  ObsRecord,
+  ConceptUuid,
+  ConceptRecord,
+  ObsMetaInfo,
+  OBSERVATION_INTERPRETATION,
+} from '@openmrs/esm-patient-common-lib';
 
 const PAGE_SIZE = 100;
 const CHUNK_PREFETCH_COUNT = 6;
@@ -120,9 +127,9 @@ export function loadPresentConcepts(entries: Array<ObsRecord>): Promise<Array<Co
     [...new Set(entries.map(getEntryConceptClassUuid))].map(
       (conceptUuid) =>
         conceptCache[conceptUuid] ||
-        (conceptCache[conceptUuid] = fetch(
-          `${window.openmrsBase}/ws/rest/v1/concept/${conceptUuid}?v=full`,
-        ).then((res) => res.json())),
+        (conceptCache[conceptUuid] = fetch(`${window.openmrsBase}/ws/rest/v1/concept/${conceptUuid}?v=full`).then(
+          (res) => res.json(),
+        )),
     ),
   );
 }
@@ -143,45 +150,35 @@ export function exist(...args: any[]): boolean {
   return true;
 }
 
-export enum OBSERVATION_INTERPRETATION {
-  'NORMAL',
+export const assessValue =
+  (meta: ObsMetaInfo) =>
+  (value: number): OBSERVATION_INTERPRETATION => {
+    if (exist(meta.hiAbsolute) && value > meta.hiAbsolute) {
+      return OBSERVATION_INTERPRETATION.OFF_SCALE_HIGH;
+    }
 
-  'HIGH',
-  'CRITICALLY_HIGH',
-  'OFF_SCALE_HIGH',
+    if (exist(meta.hiCritical) && value > meta.hiCritical) {
+      return OBSERVATION_INTERPRETATION.CRITICALLY_HIGH;
+    }
 
-  'LOW',
-  'CRITICALLY_LOW',
-  'OFF_SCALE_LOW',
-}
+    if (exist(meta.hiNormal) && value > meta.hiNormal) {
+      return OBSERVATION_INTERPRETATION.HIGH;
+    }
 
-export const assessValue = (meta: ObsMetaInfo) => (value: number): OBSERVATION_INTERPRETATION => {
-  if (exist(meta.hiAbsolute) && value > meta.hiAbsolute) {
-    return OBSERVATION_INTERPRETATION.OFF_SCALE_HIGH;
-  }
+    if (exist(meta.lowAbsolute) && value < meta.lowAbsolute) {
+      return OBSERVATION_INTERPRETATION.OFF_SCALE_LOW;
+    }
 
-  if (exist(meta.hiCritical) && value > meta.hiCritical) {
-    return OBSERVATION_INTERPRETATION.CRITICALLY_HIGH;
-  }
+    if (exist(meta.lowCritical) && value < meta.lowCritical) {
+      return OBSERVATION_INTERPRETATION.CRITICALLY_LOW;
+    }
 
-  if (exist(meta.hiNormal) && value > meta.hiNormal) {
-    return OBSERVATION_INTERPRETATION.HIGH;
-  }
+    if (exist(meta.lowNormal) && value < meta.lowNormal) {
+      return OBSERVATION_INTERPRETATION.LOW;
+    }
 
-  if (exist(meta.lowAbsolute) && value < meta.lowAbsolute) {
-    return OBSERVATION_INTERPRETATION.OFF_SCALE_LOW;
-  }
-
-  if (exist(meta.lowCritical) && value < meta.lowCritical) {
-    return OBSERVATION_INTERPRETATION.CRITICALLY_LOW;
-  }
-
-  if (exist(meta.lowNormal) && value < meta.lowNormal) {
-    return OBSERVATION_INTERPRETATION.LOW;
-  }
-
-  return OBSERVATION_INTERPRETATION.NORMAL;
-};
+    return OBSERVATION_INTERPRETATION.NORMAL;
+  };
 
 export function extractMetaInformation(concepts: Array<ConceptRecord>): Record<ConceptUuid, ObsMetaInfo> {
   return Object.fromEntries(

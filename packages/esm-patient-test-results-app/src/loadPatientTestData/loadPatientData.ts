@@ -6,29 +6,31 @@ import {
   extractMetaInformation,
   addUserDataToCache,
 } from './helpers';
-import { PatientData, ObsRecord, ConceptUuid, ObsUuid } from './types';
+import { PatientData, ObsRecord, ConceptUuid, ObsUuid } from '@openmrs/esm-patient-common-lib';
 
-const parseSingleObsData = ({ testConceptNameMap, memberRefs, metaInfomation }) => (entry: ObsRecord) => {
-  entry.conceptClass = getEntryConceptClassUuid(entry);
+const parseSingleObsData =
+  ({ testConceptNameMap, memberRefs, metaInfomation }) =>
+  (entry: ObsRecord) => {
+    entry.conceptClass = getEntryConceptClassUuid(entry);
 
-  if (entry.hasMember) {
-    // is a panel
-    entry.members = new Array(entry.hasMember.length);
-    entry.hasMember.forEach((memb, i) => {
-      memberRefs[memb.reference.split('/')[1]] = [entry.members, i];
-    });
-  } else {
-    // is a singe test
-    entry.meta = metaInfomation[entry.conceptClass];
-  }
+    if (entry.hasMember) {
+      // is a panel
+      entry.members = new Array(entry.hasMember.length);
+      entry.hasMember.forEach((memb, i) => {
+        memberRefs[memb.reference.split('/')[1]] = [entry.members, i];
+      });
+    } else {
+      // is a singe test
+      entry.meta = metaInfomation[entry.conceptClass];
+    }
 
-  if (entry.valueQuantity) {
-    entry.value = entry.valueQuantity.value;
-    delete entry.valueQuantity;
-  }
+    if (entry.valueQuantity) {
+      entry.value = entry.valueQuantity.value;
+      delete entry.valueQuantity;
+    }
 
-  entry.name = testConceptNameMap[entry.conceptClass];
-};
+    entry.name = testConceptNameMap[entry.conceptClass];
+  };
 
 async function reloadData(patientUuid: string) {
   const entries = await loadObsEntries(patientUuid);
