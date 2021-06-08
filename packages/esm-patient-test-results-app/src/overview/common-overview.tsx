@@ -60,18 +60,38 @@ export const CommonDataTable: React.FC<{
   </DataTable>
 );
 
-interface CommonOverviewProps {
+interface CommonOverviewPropsBase {
   overviewData: Array<OverviewPanelEntry>;
   insertSeperator?: boolean;
+}
+
+interface CommonOverviewPropsWithToolbar {
   openTimeline: (panelUuid: string) => void;
   openTrendline: (panelUuid: string, testUuid: string) => void;
 }
+
+interface CommonOverviewPropsWithoutToolbar {
+  deactivateToolbar: true;
+}
+
+type Only<T, U> = {
+  [P in keyof T]: T[P];
+} &
+  {
+    [P in keyof U]?: never;
+  };
+
+type Either<T, U> = Only<T, U> | Only<U, T>;
+
+type CommonOverviewProps = CommonOverviewPropsBase &
+  Either<CommonOverviewPropsWithToolbar, CommonOverviewPropsWithoutToolbar>;
 
 const CommonOverview: React.FC<CommonOverviewProps> = ({
   overviewData = [],
   insertSeperator = false,
   openTimeline,
   openTrendline,
+  deactivateToolbar = false,
 }) => {
   return (
     <>
@@ -89,7 +109,7 @@ const CommonOverview: React.FC<CommonOverviewProps> = ({
                     <InfoButton />
                   </div>
                 ),
-                toolbar: (
+                toolbar: deactivateToolbar || (
                   <TableToolbar>
                     <TableToolbarContent>
                       {type === 'Test' && (

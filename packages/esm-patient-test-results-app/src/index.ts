@@ -9,6 +9,7 @@ import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { backendDependencies } from './openmrs-backend-dependencies';
 import { dashboardMeta } from './dashboard.meta';
+export type { RecentOverviewProps } from './overview/external-overview.component';
 
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -33,6 +34,16 @@ function setupOpenMRS() {
         id: 'test-results-summary-widget',
         slot: 'patient-chart-summary-dashboard-slot',
         load: getAsyncLifecycle(() => import('./overview/recent-overview.component'), options),
+        meta: {
+          columnSpan: 2,
+        },
+        online: true,
+        offline: true,
+      },
+      {
+        id: 'test-results-summary-widget',
+        slot: 'test-results-filtered-overview',
+        load: getAsyncLifecycle(() => import('./overview/external-overview.component'), options),
         meta: {
           columnSpan: 2,
         },
