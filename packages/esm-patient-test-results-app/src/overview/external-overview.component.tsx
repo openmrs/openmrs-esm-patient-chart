@@ -10,9 +10,9 @@ import { ObsRecord } from '../loadPatientTestData/types';
 
 const RECENT_COUNT = 2;
 
-interface RecentOverviewProps {
+export interface RecentOverviewProps {
   patientUuid: string;
-  basePath: string;
+  filter: (filterProps: PanelFilterProps) => boolean;
 }
 
 type PanelFilterProps = [entry: ObsRecord, uuid: string, type: string, panelName: string];
@@ -38,8 +38,8 @@ function useFilteredOverviewData(patientUuid: string, filter: (filterProps: Pane
   return { overviewData, loaded, error };
 }
 
-const RecentOverview: React.FC<RecentOverviewProps> = ({ patientUuid, basePath }) => {
-  const { overviewData, loaded, error } = useFilteredOverviewData(patientUuid);
+const RecentOverview: React.FC<RecentOverviewProps> = ({ patientUuid, filter }) => {
+  const { overviewData, loaded, error } = useFilteredOverviewData(patientUuid, filter);
 
   return (
     <RecentResultsGrid>

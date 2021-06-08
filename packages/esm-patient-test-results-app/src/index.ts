@@ -9,6 +9,7 @@ import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { backendDependencies } from './openmrs-backend-dependencies';
 import { dashboardMeta } from './dashboard.meta';
+export type { RecentOverviewProps } from './overview/external-overview.component';
 
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
