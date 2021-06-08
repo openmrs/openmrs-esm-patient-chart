@@ -1,4 +1,5 @@
 import React from 'react';
+import { ExternalOverviewProps, PanelFilterProps } from '@openmrs/esm-patient-common-lib';
 
 import DataTableSkeleton from 'carbon-components-react/lib/components/DataTableSkeleton';
 
@@ -6,16 +7,8 @@ import { parseSingleEntry, OverviewPanelEntry } from './useOverviewData';
 import { RecentResultsGrid, Card } from './helpers';
 import CommonOverview from './common-overview';
 import usePatientResultsData from '../loadPatientTestData/usePatientResultsData';
-import { ObsRecord } from '@openmrs/esm-patient-common-lib';
 
 const RECENT_COUNT = 2;
-
-export interface RecentOverviewProps {
-  patientUuid: string;
-  filter: (filterProps: PanelFilterProps) => boolean;
-}
-
-type PanelFilterProps = [entry: ObsRecord, uuid: string, type: string, panelName: string];
 
 function useFilteredOverviewData(patientUuid: string, filter: (filterProps: PanelFilterProps) => boolean = () => true) {
   const { sortedObs, loaded, error } = usePatientResultsData(patientUuid);
@@ -38,7 +31,7 @@ function useFilteredOverviewData(patientUuid: string, filter: (filterProps: Pane
   return { overviewData, loaded, error };
 }
 
-const RecentOverview: React.FC<RecentOverviewProps> = ({ patientUuid, filter }) => {
+const RecentOverview: React.FC<ExternalOverviewProps> = ({ patientUuid, filter }) => {
   const { overviewData, loaded, error } = useFilteredOverviewData(patientUuid, filter);
 
   return (
