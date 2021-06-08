@@ -45,7 +45,7 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
           <div className={styles.container}>
             <h2 className={`${styles.productiveHeading03} ${styles.encounterHeading}`}>Encounters</h2>
             {visits.map((visit, ind) => (
-              <VisitDetailComponent key={ind} visit={visit} />
+              <VisitDetailComponent key={ind} visit={visit} patientUuid={patientUuid} />
             ))}
           </div>
         ) : (

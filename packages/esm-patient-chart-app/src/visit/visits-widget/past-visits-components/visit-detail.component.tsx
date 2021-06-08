@@ -14,9 +14,10 @@ function formatDateTime(date) {
 
 interface VisitDetailComponentProps {
   visit: Visit;
+  patientUuid: string;
 }
 
-const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visit }) => {
+const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visit, patientUuid }) => {
   const { t } = useTranslation();
   const [listView, setView] = useState<boolean>(true);
   const encounters = useMemo(
@@ -57,7 +58,7 @@ const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visit }) =>
         </div>
       </div>
       {listView && visit?.encounters && <EncounterList visitUuid={visit.uuid} encounters={encounters} />}
-      {!listView && <VisitSummary encounters={visit.encounters} />}
+      {!listView && <VisitSummary encounters={visit.encounters} patientUuid={patientUuid} />}
     </div>
   );
 };

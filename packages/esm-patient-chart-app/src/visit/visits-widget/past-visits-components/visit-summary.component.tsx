@@ -21,9 +21,10 @@ interface DiagnosisItem {
 
 interface VisitSummaryProps {
   encounters: Array<Encounter | OpenmrsResource>;
+  patientUuid: string;
 }
 
-const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters }) => {
+const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid }) => {
   const { t } = useTranslation();
   const [tabSelected, setSelectedTab] = useState(0);
 
@@ -118,7 +119,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters }) => {
           onClick={() => setSelectedTab(1)}
           id="tab-2"
           label={t('tests', 'Tests')}>
-          <TestsSummary tests={tests} />
+          <TestsSummary patientUuid={patientUuid} encounters={encounters as Array<Encounter>} />
         </Tab>
         <Tab
           className={`${styles.tab} ${tabSelected === 2 && styles.selectedTab}`}
