@@ -31,7 +31,7 @@ export interface PatientData {
   };
 }
 
-export enum OBSERVATION_INTERPRETATION {
+export const enum OBSERVATION_INTERPRETATION {
   'NORMAL',
 
   'HIGH',

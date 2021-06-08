@@ -8,9 +8,8 @@ import {
 } from './helpers';
 import { PatientData, ObsRecord, ConceptUuid, ObsUuid } from '@openmrs/esm-patient-common-lib';
 
-const parseSingleObsData =
-  ({ testConceptNameMap, memberRefs, metaInfomation }) =>
-  (entry: ObsRecord) => {
+function parseSingleObsData({ testConceptNameMap, memberRefs, metaInfomation }) {
+  return (entry: ObsRecord) => {
     entry.conceptClass = getEntryConceptClassUuid(entry);
 
     if (entry.hasMember) {
@@ -31,6 +30,7 @@ const parseSingleObsData =
 
     entry.name = testConceptNameMap[entry.conceptClass];
   };
+}
 
 async function reloadData(patientUuid: string) {
   const entries = await loadObsEntries(patientUuid);
