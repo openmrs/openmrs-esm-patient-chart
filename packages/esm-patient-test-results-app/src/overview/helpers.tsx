@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './lab-results.scss';
 import { TableRow } from 'carbon-components-react';
-import { OBSERVATION_INTERPRETATION } from '../loadPatientTestData/helpers';
+import { OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import Information16 from '@carbon/icons-react/es/information/16';
 import dayjs from 'dayjs';
 
@@ -30,25 +30,25 @@ export const TypedTableRow: React.FC<{
   interpretation: OBSERVATION_INTERPRETATION;
 }> = ({ interpretation, ...props }) => {
   switch (interpretation) {
-    case OBSERVATION_INTERPRETATION.OFF_SCALE_HIGH:
+    case 'OFF_SCALE_HIGH':
       return <TableRow {...props} className={styles['off-scale-high']} />;
 
-    case OBSERVATION_INTERPRETATION.CRITICALLY_HIGH:
+    case 'CRITICALLY_HIGH':
       return <TableRow {...props} className={styles['critically-high']} />;
 
-    case OBSERVATION_INTERPRETATION.HIGH:
+    case 'HIGH':
       return <TableRow {...props} className={styles['high']} />;
 
-    case OBSERVATION_INTERPRETATION.OFF_SCALE_LOW:
+    case 'OFF_SCALE_LOW':
       return <TableRow {...props} className={styles['off-scale-low']} />;
 
-    case OBSERVATION_INTERPRETATION.CRITICALLY_LOW:
+    case 'CRITICALLY_LOW':
       return <TableRow {...props} className={styles['critically-low']} />;
 
-    case OBSERVATION_INTERPRETATION.LOW:
+    case 'LOW':
       return <TableRow {...props} className={styles['low']} />;
 
-    case OBSERVATION_INTERPRETATION.NORMAL:
+    case 'NORMAL':
     default:
       return <TableRow {...props} />;
   }

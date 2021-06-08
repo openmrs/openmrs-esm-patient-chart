@@ -6,29 +6,35 @@ import {
   extractMetaInformation,
   addUserDataToCache,
 } from './helpers';
-import { PatientData, ObsRecord, ConceptUuid, ObsUuid } from './types';
+import { PatientData, ObsRecord, ConceptUuid, ObsUuid, ObsMetaInfo } from '@openmrs/esm-patient-common-lib';
 
-const parseSingleObsData = ({ testConceptNameMap, memberRefs, metaInfomation }) => (entry: ObsRecord) => {
-  entry.conceptClass = getEntryConceptClassUuid(entry);
+function parseSingleObsData(
+  testConceptNameMap: Record<ConceptUuid, string>,
+  memberRefs: Record<ObsUuid, [ObsRecord[], number]>,
+  metaInfomation: Record<ConceptUuid, ObsMetaInfo>,
+) {
+  return (entry: ObsRecord) => {
+    entry.conceptClass = getEntryConceptClassUuid(entry);
 
-  if (entry.hasMember) {
-    // is a panel
-    entry.members = new Array(entry.hasMember.length);
-    entry.hasMember.forEach((memb, i) => {
-      memberRefs[memb.reference.split('/')[1]] = [entry.members, i];
-    });
-  } else {
-    // is a singe test
-    entry.meta = metaInfomation[entry.conceptClass];
-  }
+    if (entry.hasMember) {
+      // is a panel
+      entry.members = new Array(entry.hasMember.length);
+      entry.hasMember.forEach((memb, i) => {
+        memberRefs[memb.reference.split('/')[1]] = [entry.members, i];
+      });
+    } else {
+      // is a singe test
+      entry.meta = metaInfomation[entry.conceptClass];
+    }
 
-  if (entry.valueQuantity) {
-    entry.value = entry.valueQuantity.value;
-    delete entry.valueQuantity;
-  }
+    if (entry.valueQuantity) {
+      entry.value = entry.valueQuantity.value;
+      delete entry.valueQuantity;
+    }
 
-  entry.name = testConceptNameMap[entry.conceptClass];
-};
+    entry.name = testConceptNameMap[entry.conceptClass];
+  };
+}
 
 async function reloadData(patientUuid: string) {
   const entries = await loadObsEntries(patientUuid);
@@ -47,11 +53,7 @@ async function reloadData(patientUuid: string) {
 
   // a record of observation uuids that are members of panels, mapped to the place where to put them
   const memberRefs: Record<ObsUuid, [ObsRecord[], number]> = {};
-  const parseEntry = parseSingleObsData({
-    testConceptNameMap,
-    memberRefs,
-    metaInfomation,
-  });
+  const parseEntry = parseSingleObsData(testConceptNameMap, memberRefs, metaInfomation);
 
   entries.forEach((entry) => {
     // remove non test entries (due to unclean FHIR reponse)
