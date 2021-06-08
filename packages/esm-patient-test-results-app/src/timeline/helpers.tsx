@@ -36,35 +36,35 @@ const TimelineCell: React.FC<{
   text: string;
   interpretation?: OBSERVATION_INTERPRETATION;
   zebra: boolean;
-}> = ({ text, interpretation = OBSERVATION_INTERPRETATION.NORMAL, zebra }) => {
+}> = ({ text, interpretation = 'NORMAL', zebra }) => {
   let additionalClassname: string;
 
   switch (interpretation) {
-    case OBSERVATION_INTERPRETATION.OFF_SCALE_HIGH:
+    case 'OFF_SCALE_HIGH':
       additionalClassname = styles['off-scale-high'];
       break;
 
-    case OBSERVATION_INTERPRETATION.CRITICALLY_HIGH:
+    case 'CRITICALLY_HIGH':
       additionalClassname = styles['critically-high'];
       break;
 
-    case OBSERVATION_INTERPRETATION.HIGH:
+    case 'HIGH':
       additionalClassname = styles['high'];
       break;
 
-    case OBSERVATION_INTERPRETATION.OFF_SCALE_LOW:
+    case 'OFF_SCALE_LOW':
       additionalClassname = styles['off-scale-low'];
       break;
 
-    case OBSERVATION_INTERPRETATION.CRITICALLY_LOW:
+    case 'CRITICALLY_LOW':
       additionalClassname = styles['critically-low'];
       break;
 
-    case OBSERVATION_INTERPRETATION.LOW:
+    case 'LOW':
       additionalClassname = styles['low'];
       break;
 
-    case OBSERVATION_INTERPRETATION.NORMAL:
+    case 'NORMAL':
     default:
       additionalClassname = '';
   }

@@ -31,14 +31,11 @@ export interface PatientData {
   };
 }
 
-export const enum OBSERVATION_INTERPRETATION {
-  'NORMAL',
-
-  'HIGH',
-  'CRITICALLY_HIGH',
-  'OFF_SCALE_HIGH',
-
-  'LOW',
-  'CRITICALLY_LOW',
-  'OFF_SCALE_LOW',
-}
+export type OBSERVATION_INTERPRETATION =
+  | 'NORMAL'
+  | 'HIGH'
+  | 'CRITICALLY_HIGH'
+  | 'OFF_SCALE_HIGH'
+  | 'LOW'
+  | 'CRITICALLY_LOW'
+  | 'OFF_SCALE_LOW';

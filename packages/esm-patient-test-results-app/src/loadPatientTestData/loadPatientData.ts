@@ -6,9 +6,13 @@ import {
   extractMetaInformation,
   addUserDataToCache,
 } from './helpers';
-import { PatientData, ObsRecord, ConceptUuid, ObsUuid } from '@openmrs/esm-patient-common-lib';
+import { PatientData, ObsRecord, ConceptUuid, ObsUuid, ObsMetaInfo } from '@openmrs/esm-patient-common-lib';
 
-function parseSingleObsData({ testConceptNameMap, memberRefs, metaInfomation }) {
+function parseSingleObsData(
+  testConceptNameMap: Record<ConceptUuid, string>,
+  memberRefs: Record<ObsUuid, [ObsRecord[], number]>,
+  metaInfomation: Record<ConceptUuid, ObsMetaInfo>,
+) {
   return (entry: ObsRecord) => {
     entry.conceptClass = getEntryConceptClassUuid(entry);
 
@@ -49,11 +53,7 @@ async function reloadData(patientUuid: string) {
 
   // a record of observation uuids that are members of panels, mapped to the place where to put them
   const memberRefs: Record<ObsUuid, [ObsRecord[], number]> = {};
-  const parseEntry = parseSingleObsData({
-    testConceptNameMap,
-    memberRefs,
-    metaInfomation,
-  });
+  const parseEntry = parseSingleObsData(testConceptNameMap, memberRefs, metaInfomation);
 
   entries.forEach((entry) => {
     // remove non test entries (due to unclean FHIR reponse)

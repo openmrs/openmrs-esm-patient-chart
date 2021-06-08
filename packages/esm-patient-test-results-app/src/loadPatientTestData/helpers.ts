@@ -154,30 +154,30 @@ export const assessValue =
   (meta: ObsMetaInfo) =>
   (value: number): OBSERVATION_INTERPRETATION => {
     if (exist(meta.hiAbsolute) && value > meta.hiAbsolute) {
-      return OBSERVATION_INTERPRETATION.OFF_SCALE_HIGH;
+      return 'OFF_SCALE_HIGH';
     }
 
     if (exist(meta.hiCritical) && value > meta.hiCritical) {
-      return OBSERVATION_INTERPRETATION.CRITICALLY_HIGH;
+      return 'CRITICALLY_HIGH';
     }
 
     if (exist(meta.hiNormal) && value > meta.hiNormal) {
-      return OBSERVATION_INTERPRETATION.HIGH;
+      return 'HIGH';
     }
 
     if (exist(meta.lowAbsolute) && value < meta.lowAbsolute) {
-      return OBSERVATION_INTERPRETATION.OFF_SCALE_LOW;
+      return 'OFF_SCALE_LOW';
     }
 
     if (exist(meta.lowCritical) && value < meta.lowCritical) {
-      return OBSERVATION_INTERPRETATION.CRITICALLY_LOW;
+      return 'CRITICALLY_LOW';
     }
 
     if (exist(meta.lowNormal) && value < meta.lowNormal) {
-      return OBSERVATION_INTERPRETATION.LOW;
+      return 'LOW';
     }
 
-    return OBSERVATION_INTERPRETATION.NORMAL;
+    return 'NORMAL';
   };
 
 export function extractMetaInformation(concepts: Array<ConceptRecord>): Record<ConceptUuid, ObsMetaInfo> {
