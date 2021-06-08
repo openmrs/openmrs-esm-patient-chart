@@ -20,7 +20,7 @@
 .diagnosisList {
   background-color: $ui-02;
   max-height: 14rem;
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 .diagnosisList li:hover {

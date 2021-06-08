@@ -3,16 +3,17 @@
 @import "~carbon-components/src/globals/scss/mixins";
 
 .condition {
-  padding: 0.625rem;
+  padding: 0.875rem;
 }
 
 .conditionsList {
   background-color: $ui-02;
+  max-height: 14rem;
+  overflow-y: auto;
 }
 
 .conditionsList li:hover {
-  background-color: $hover-primary;
-  color: $ui-01;
+  background-color: $ui-03;
 }
 
 .emptyResults {
