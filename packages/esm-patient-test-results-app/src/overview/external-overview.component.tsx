@@ -6,7 +6,7 @@ import { parseSingleEntry, OverviewPanelEntry } from './useOverviewData';
 import { RecentResultsGrid, Card } from './helpers';
 import CommonOverview from './common-overview';
 import usePatientResultsData from '../loadPatientTestData/usePatientResultsData';
-import { ObsRecord } from '../loadPatientTestData/types';
+import { ObsRecord } from '@openmrs/esm-patient-common-lib';
 
 const RECENT_COUNT = 2;
 
