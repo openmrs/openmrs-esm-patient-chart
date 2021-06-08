@@ -8,6 +8,10 @@ export interface ObsRecord {
   conceptClass: ConceptUuid;
   meta?: ObsMetaInfo;
   effectiveDateTime: string;
+  encounter: {
+    reference: string;
+    type: string;
+  };
   [_: string]: any;
 }
 
