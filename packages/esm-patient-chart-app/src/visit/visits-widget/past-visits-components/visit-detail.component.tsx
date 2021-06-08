@@ -19,7 +19,7 @@ interface VisitDetailComponentProps {
 
 const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visit, patientUuid }) => {
   const { t } = useTranslation();
-  const [listView, setView] = useState<boolean>(true);
+  const [listView, setView] = useState(true);
   const encounters = useMemo(
     () =>
       visit.encounters.map((encounter: Encounter) => ({

@@ -123,11 +123,6 @@ export interface OrderItem {
   };
 }
 
-export interface TestItem {
-  testName: string;
-  value: number;
-}
-
 export function getDosage(strength: string, doseNumber: number) {
   if (!strength || !doseNumber) {
     return '';

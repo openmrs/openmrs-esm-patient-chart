@@ -15,11 +15,8 @@ const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observati
     return (
       observations &&
       observations.map((obs: Observation) => {
-        const qna = obs.display.split(':');
-        return {
-          question: qna[0],
-          answer: qna[1],
-        };
+        const [question, answer] = obs.display.split(':');
+        return { question, answer };
       })
     );
   }, [observations]);
