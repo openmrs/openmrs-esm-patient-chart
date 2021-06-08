@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import Tabs from 'carbon-components-react/es/components/Tabs';
 import Tab from 'carbon-components-react/es/components/Tab';
 import dayjs from 'dayjs';
-import { Medication, Encounter, Note, Observation, MedicationItem } from '../visit.resource';
+import { Order, Encounter, Note, Observation, OrderItem, TestItem } from '../visit.resource';
 import styles from '../visit-detail-overview.scss';
 import MedicationSummary from './medications-summary.component';
 import NotesSummary from './notes-summary.component';
@@ -27,22 +27,22 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters }) => {
   const { t } = useTranslation();
   const [tabSelected, setSelectedTab] = useState(0);
 
-  const [diagnoses, notes, tests, medications]: [Array<DiagnosisItem>, Array<Note>, any, Array<MedicationItem>] =
+  const [diagnoses, notes, tests, medications]: [Array<DiagnosisItem>, Array<Note>, Array<TestItem>, Array<OrderItem>] =
     useMemo(() => {
       // Medication Tab
-      let medications: Array<MedicationItem> = [];
+      let medications: Array<OrderItem> = [];
       // Diagnoses in a Visit
       let diagnoses: Array<DiagnosisItem> = [];
       // Notes Tab
       let notes: Array<Note> = [];
       // Tests Tabs
-      let tests = [];
+      let tests: Array<TestItem> = [];
 
       // Iterating through every Encounter
       encounters.forEach((enc: Encounter) => {
         // Orders of every encounter put in a single array.
         medications = medications.concat(
-          enc.orders.map((order: Medication) => ({
+          enc.orders.map((order: Order) => ({
             order,
             provider: {
               name: enc.encounterProviders.length ? enc.encounterProviders[0].provider.person.display : '',

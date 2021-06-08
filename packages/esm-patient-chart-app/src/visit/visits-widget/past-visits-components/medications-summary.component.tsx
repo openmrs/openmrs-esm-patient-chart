@@ -2,7 +2,7 @@ import React from 'react';
 import capitalize from 'lodash-es/capitalize';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { MedicationItem, getDosage } from '../visit.resource';
+import { OrderItem, getDosage } from '../visit.resource';
 import styles from '../visit-detail-overview.scss';
 
 function formatTime(dateTime) {
@@ -10,7 +10,7 @@ function formatTime(dateTime) {
 }
 
 interface MedicationSummaryProps {
-  medications: Array<MedicationItem>;
+  medications: Array<OrderItem>;
 }
 
 const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) => {
@@ -20,8 +20,9 @@ const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) =>
     <React.Fragment>
       {medications.length > 0 ? (
         medications.map(
-          (medication: MedicationItem, ind) =>
-            medication.order.dose && (
+          (medication: OrderItem, ind) =>
+            medication.order?.dose &&
+            medication.order?.orderType?.display === 'Drug Order' && (
               <React.Fragment key={ind}>
                 <p className={`${styles.bodyLong01} ${styles.medicationBlock}`}>
                   <strong>{capitalize(medication.order.drug?.name)}</strong> &mdash;{' '}

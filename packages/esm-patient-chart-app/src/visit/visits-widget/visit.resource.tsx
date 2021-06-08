@@ -21,7 +21,7 @@ export interface Encounter {
     display: string;
   };
   obs: Array<Observation>;
-  orders: Array<Medication>;
+  orders: Array<Order>;
 }
 
 export interface EncounterProvider {
@@ -46,6 +46,7 @@ export interface Observation {
     uuid: string;
     display: string;
     conceptClass: {
+      uuid: string;
       display: string;
     };
   };
@@ -65,7 +66,7 @@ export interface Observation {
   obsDatetime: string;
 }
 
-export interface Medication {
+export interface Order {
   uuid: string;
   dateActivated: string;
   dose: number;
@@ -95,6 +96,10 @@ export interface Medication {
       display: string;
     };
   };
+  orderType: {
+    uuid: string;
+    display: string;
+  };
   route: {
     uuid: string;
     display: string;
@@ -110,37 +115,40 @@ export interface Note {
   time: string;
 }
 
-export interface MedicationItem {
-  order: Medication;
+export interface OrderItem {
+  order: Order;
   provider: {
     name: string;
     role: string;
   };
 }
 
-export function getDosage(strength, doseNumber) {
+export interface TestItem {
+  testName: string;
+  value: number;
+}
+
+export function getDosage(strength: string, doseNumber: number) {
   if (!strength || !doseNumber) {
     return '';
   }
 
   const i = strength.search(/\D/);
-  const strengthQuantity = strength.substring(0, i);
+  const strengthQuantity = parseInt(strength.substring(0, i));
 
   const concentrationStartIndex = strength.search(/\//);
 
   let strengthUnits = strength.substring(i);
-  let dosage;
 
   if (concentrationStartIndex >= 0) {
     strengthUnits = strength.substring(i, concentrationStartIndex);
     const j = strength.substring(concentrationStartIndex + 1).search(/\D/);
-    const concentrationQuantity = strength.substr(concentrationStartIndex + 1, j);
+    const concentrationQuantity = parseInt(strength.substr(concentrationStartIndex + 1, j));
     const concentrationUnits = strength.substring(concentrationStartIndex + 1 + j);
-    dosage = `${doseNumber} ${strengthUnits} (${
+    return `${doseNumber} ${strengthUnits} (${
       (doseNumber / strengthQuantity) * concentrationQuantity
     } ${concentrationUnits})`;
   } else {
-    dosage = strengthQuantity * doseNumber + ' ' + strengthUnits;
+    return `${strengthQuantity * doseNumber} ${strengthUnits}`;
   }
-  return dosage;
 }
