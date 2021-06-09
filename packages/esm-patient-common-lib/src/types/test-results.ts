@@ -1,5 +1,3 @@
-import { OBSERVATION_INTERPRETATION } from './helpers';
-
 export type ConceptUuid = string;
 export type ObsUuid = string;
 
@@ -8,6 +6,10 @@ export interface ObsRecord {
   conceptClass: ConceptUuid;
   meta?: ObsMetaInfo;
   effectiveDateTime: string;
+  encounter: {
+    reference: string;
+    type: string;
+  };
   [_: string]: any;
 }
 
@@ -28,3 +30,12 @@ export interface PatientData {
     uuid: string;
   };
 }
+
+export type OBSERVATION_INTERPRETATION =
+  | 'NORMAL'
+  | 'HIGH'
+  | 'CRITICALLY_HIGH'
+  | 'OFF_SCALE_HIGH'
+  | 'LOW'
+  | 'CRITICALLY_LOW'
+  | 'OFF_SCALE_LOW';

@@ -6,11 +6,11 @@ import { ScaleTypes, AreaChartOptions, TickRotations } from '@carbon/charts/inte
 import { toOmrsDateFormat, toOmrsTimeString24 } from '@openmrs/esm-framework';
 
 import styles from './trendline.scss';
-import { ObsRecord } from '../loadPatientTestData/types';
+import { ObsRecord, OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import { CommonDataTable } from '../overview/common-overview';
 import RangeSelector from './RangeSelector';
 import usePatientResultsData from '../loadPatientTestData/usePatientResultsData';
-import { exist, OBSERVATION_INTERPRETATION } from '../loadPatientTestData/helpers';
+import { exist } from '../loadPatientTestData/helpers';
 
 const useTrendlineData = ({
   patientUuid,

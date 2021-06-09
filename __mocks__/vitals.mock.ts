@@ -430,7 +430,10 @@ export const mockVitalsChartData = [
   },
 ];
 
-export const mockConceptsUnits = ['mmHg', 'mmHg', 'DEG C', 'cm', 'kg', 'beats/min', '%', 'cm', '/ min'];
+export const mockConceptsUnits = {
+  vitalsSignsConceptMetadata: mockVitalsSignsConcept.data.results,
+  conceptsUnits: ['mmHg', 'mmHg', 'DEG C', 'cm', 'kg', 'beats/min', '%', 'cm', '/ min'],
+};
 
 export const mockFhirVitalsResponse = {
   resourceType: 'Bundle',
@@ -2364,4 +2367,24 @@ export const mockFhirVitalsResponse = {
       },
     },
   ],
+};
+
+export const mockVitalsConfig = {
+  biometrics: { bmiUnit: 'kg / m²' },
+  concepts: {
+    diastolicBloodPressureUuid: '5086AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    generalPatientNoteUuid: '165095AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    heightUuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    midUpperArmCircumferenceUuid: '1343AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    oxygenSaturationUuid: '5092AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    pulseUuid: '5087AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    respiratoryRateUuid: '5242AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    systolicBloodPressureUuid: '5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    temperatureUuid: '5088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    weightUuid: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  },
+  vitals: {
+    encounterTypeUuid: '67a71486-1a54-468f-ac3e-7091a9a79584',
+    formUuid: 'a000cb34-9ec1-4344-a1c8-f692232f6edd',
+  },
 };

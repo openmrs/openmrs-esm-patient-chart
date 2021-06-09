@@ -5,8 +5,11 @@ import isToday from 'dayjs/plugin/isToday';
 import VitalsHeaderStateTitle from './vital-header-title.component';
 import { render, screen } from '@testing-library/react';
 import { PatientVitals } from '../vitals-biometrics.resource';
+import { attach } from '@openmrs/esm-framework';
 
 dayjs.extend(isToday);
+
+const mockAttach = attach as jest.Mock;
 
 describe('<VitalsHeaderStateDetails/>', () => {
   const mockToggleView = jest.fn();
@@ -22,6 +25,14 @@ describe('<VitalsHeaderStateDetails/>', () => {
     height: '185',
     bmi: '24.8',
     respiratoryRate: '45',
+  };
+
+  const mockParams = {
+    showDetails: false,
+    showRecordVitals: true,
+    toggleView: mockToggleView,
+    view: 'Warning',
+    vitals: mockVitals,
   };
 
   it("renders an empty state view when there's no vitals data to show", async () => {
@@ -40,14 +51,6 @@ describe('<VitalsHeaderStateDetails/>', () => {
   });
 
   it("renders the patient's last recorded vitals", () => {
-    const mockParams = {
-      showDetails: false,
-      showRecordVitals: true,
-      toggleView: mockToggleView,
-      view: 'Warning',
-      vitals: mockVitals,
-    };
-
     render(<VitalsHeaderStateTitle {...mockParams} />);
     expect(screen.getByText(/Record Vitals/i)).toBeInTheDocument();
     expect(screen.getByText(/Vitals & Biometrics/i)).toBeInTheDocument();
@@ -58,5 +61,15 @@ describe('<VitalsHeaderStateDetails/>', () => {
     userEvent.click(ChevronDown);
 
     expect(mockToggleView).toHaveBeenCalledTimes(1);
+  });
+
+  it('should launch the vitals form when record vitals button is clicked', () => {
+    render(<VitalsHeaderStateTitle {...mockParams} />);
+
+    const recordVitalsButton = screen.getByText(/Record Vitals/i);
+    userEvent.click(recordVitalsButton);
+
+    expect(mockAttach).toHaveBeenCalled();
+    expect(mockAttach).toHaveBeenCalledWith('patient-chart-workspace-slot', 'patient-vitals-biometrics-form-workspace');
   });
 });

@@ -1,7 +1,7 @@
 import React from 'react';
 
 import loadPatientData from './loadPatientData';
-import { PatientData } from './types';
+import { PatientData } from '@openmrs/esm-patient-common-lib';
 
 type LoadingState = {
   sortedObs: PatientData;

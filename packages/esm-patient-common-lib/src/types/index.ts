@@ -1,3 +1,5 @@
+export * from './test-results';
+
 export interface DashbardGridConfig {
   columns: number;
   type: 'grid';

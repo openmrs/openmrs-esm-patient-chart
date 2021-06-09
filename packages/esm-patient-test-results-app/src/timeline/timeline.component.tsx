@@ -2,7 +2,7 @@ import * as React from 'react';
 import useScrollIndicator from './useScroll';
 import { useTimelineData } from './useTimelineData';
 import { Main, PaddingContainer, TimeSlots, Grid, RowStartCell, GridItems, ShadowBox } from './helpers';
-import { ObsRecord } from '../loadPatientTestData/types';
+import { ObsRecord } from '@openmrs/esm-patient-common-lib';
 import styles from './timeline.scss';
 
 const PanelNameCorner: React.FC<{ panelName: string }> = ({ panelName }) => (

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import usePatientResultsData from '../loadPatientTestData/usePatientResultsData';
-import { ObsRecord } from '../loadPatientTestData/types';
+import { ObsRecord } from '@openmrs/esm-patient-common-lib';
 
 const parseTime = (sortedTimes: string[]) => {
   const yearColumns: Array<{ year: string; size: number }> = [],

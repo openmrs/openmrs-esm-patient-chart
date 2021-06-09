@@ -12,9 +12,9 @@ import DataTable, {
 } from 'carbon-components-react/es/components/DataTable';
 import Add16 from '@carbon/icons-react/es/add/16';
 import styles from './notes-overview.scss';
-import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
+import { EmptyState, ErrorState, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
-import { attach } from '@openmrs/esm-framework';
+import { attach, getStartedVisit, VisitItem } from '@openmrs/esm-framework';
 import { getEncounterObservableRESTAPI, PatientNote } from './encounter.resource';
 import { formatNotesDate } from './notes-helper';
 
@@ -28,6 +28,7 @@ interface NotesOverviewProps {
 const NotesOverview: React.FC<NotesOverviewProps> = ({ patientUuid, patient, showAddNote }) => {
   const notesToShowCount = 5;
   const { t } = useTranslation();
+  const [activeVisit, setActiveVisit] = React.useState<VisitItem>(null);
   const [notes, setNotes] = React.useState<Array<PatientNote>>(null);
   const [error, setError] = React.useState(null);
   const [showAllNotes, setShowAllNotes] = React.useState(false);
@@ -35,8 +36,17 @@ const NotesOverview: React.FC<NotesOverviewProps> = ({ patientUuid, patient, sho
   const headerTitle = t('notes', 'Notes');
 
   React.useEffect(() => {
+    const sub = getStartedVisit.subscribe((visit) => {
+      if (visit && visit.status === 'ongoing') {
+        setActiveVisit(visit);
+      }
+    });
+    return () => sub.unsubscribe();
+  }, []);
+
+  React.useEffect(() => {
     if (patient && patientUuid) {
-      const sub = getEncounterObservableRESTAPI(patientUuid).subscribe((notes) => setNotes(notes), setError);
+      const sub = getEncounterObservableRESTAPI(patientUuid).subscribe(setNotes, setError);
       return () => sub.unsubscribe();
     }
   }, [patient, patientUuid]);
@@ -45,10 +55,13 @@ const NotesOverview: React.FC<NotesOverviewProps> = ({ patientUuid, patient, sho
     setShowAllNotes(!showAllNotes);
   };
 
-  const launchVisitNoteForm = React.useCallback(
-    () => attach('patient-chart-workspace-slot', 'visit-notes-workspace'),
-    [],
-  );
+  const launchVisitNoteForm = React.useCallback(() => {
+    if (activeVisit) {
+      attach('patient-chart-workspace-slot', 'visit-notes-workspace');
+    } else {
+      launchStartVisitPrompt();
+    }
+  }, [activeVisit]);
 
   const headers = [
     {
