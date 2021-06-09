@@ -122,12 +122,12 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
             inputIsNormal={
               isInNormalRange(
                 vitalsSignsConceptMetadata,
-                config.concepts['systolicBloodPressureUuid'],
+                config.concepts.systolicBloodPressureUuid,
                 patientVitalAndBiometrics?.systolicBloodPressure,
               ) &&
               isInNormalRange(
                 vitalsSignsConceptMetadata,
-                config.concepts['diastolicBloodPressureUuid'],
+                config.concepts.diastolicBloodPressureUuid,
                 patientVitalAndBiometrics?.diastolicBloodPressure,
               )
             }
