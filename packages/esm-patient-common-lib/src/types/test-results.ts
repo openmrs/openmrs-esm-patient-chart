@@ -39,3 +39,10 @@ export type OBSERVATION_INTERPRETATION =
   | 'LOW'
   | 'CRITICALLY_LOW'
   | 'OFF_SCALE_LOW';
+
+export interface ExternalOverviewProps {
+  patientUuid: string;
+  filter: (filterProps: PanelFilterProps) => boolean;
+}
+
+export type PanelFilterProps = [ObsRecord, string, string, string];
