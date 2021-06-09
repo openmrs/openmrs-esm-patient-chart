@@ -73,7 +73,7 @@
 }
 
 .toggleButtons {
-  margin: 0 $spacing-03;
+  margin: 0 1rem;
   height: 2.5rem;
 }
 
@@ -142,7 +142,7 @@
 }
 
 .summaryContainer {
-  margin: 0 1rem;
+  margin-left: 1rem;
   display: grid;
   grid-template-columns: max-content auto;
 }

@@ -45,4 +45,4 @@ export interface ExternalOverviewProps {
   filter: (filterProps: PanelFilterProps) => boolean;
 }
 
-export type PanelFilterProps = [entry: ObsRecord, uuid: string, type: string, panelName: string];
+export type PanelFilterProps = [ObsRecord, string, string, string];

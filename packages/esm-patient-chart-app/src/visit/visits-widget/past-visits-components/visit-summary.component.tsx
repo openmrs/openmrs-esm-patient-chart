@@ -30,17 +30,17 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid }) 
 
   const [diagnoses, notes, medications]: [Array<DiagnosisItem>, Array<Note>, Array<OrderItem>] = useMemo(() => {
     // Medication Tab
-    let medications: Array<OrderItem> = [];
+    const medications: Array<OrderItem> = [];
     // Diagnoses in a Visit
-    let diagnoses: Array<DiagnosisItem> = [];
+    const diagnoses: Array<DiagnosisItem> = [];
     // Notes Tab
-    let notes: Array<Note> = [];
+    const notes: Array<Note> = [];
 
     // Iterating through every Encounter
     encounters.forEach((enc: Encounter) => {
       // Orders of every encounter put in a single array.
-      medications = medications.concat(
-        enc.orders.map((order: Order) => ({
+      medications.push(
+        ...enc.orders.map((order: Order) => ({
           order,
           provider: {
             name: enc.encounterProviders.length ? enc.encounterProviders[0].provider.person.display : '',
