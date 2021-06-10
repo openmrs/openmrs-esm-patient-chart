@@ -96,5 +96,41 @@
         "selected": true
       }
     ]
-  }
+  },
+    {
+    "name": "Efavirenz",
+    "uuid": "9152d395-e821-47f0-b15c-588808585350",
+    "strength": "600mg",
+    "dosageUnits": [
+      {
+        "uuid": "1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "name": "Tablet",
+        "selected": true
+      }
+    ],
+    "route": [
+      {
+        "name": "Oral",
+        "conceptUuid": "160240AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "selected": true
+      }
+    ],
+    "commonFrequencies": [
+      {
+        "name": "Once daily",
+        "conceptUuid": "160862AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+        "selected": true
+      }
+    ],
+    "commonDosages": [
+      {
+        "dosage": "600 mg",
+        "numberOfPills": 1
+      },
+      {
+        "dosage": "300 mg",
+        "numberOfPills": 0.5
+      }
+    ]
+  },
 ]
