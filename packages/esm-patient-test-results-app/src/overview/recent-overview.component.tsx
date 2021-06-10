@@ -8,6 +8,7 @@ import { RecentResultsGrid, Card } from './helpers';
 import styles from './lab-results.scss';
 import CommonOverview from './common-overview';
 import { navigateToResults, navigateToTimeline, navigateToTrendline } from '../helpers';
+import { useTranslation } from 'react-i18next';
 
 const RECENT_COUNT = 2;
 
@@ -16,9 +17,8 @@ interface RecentOverviewProps {
   basePath: string;
 }
 
-navigateToResults;
-
 const RecentOverview: React.FC<RecentOverviewProps> = ({ patientUuid, basePath }) => {
+  const { t } = useTranslation();
   const { overviewData, loaded, error } = useOverviewData(patientUuid);
 
   return (
@@ -27,10 +27,10 @@ const RecentOverview: React.FC<RecentOverviewProps> = ({ patientUuid, basePath }
         <>
           <div className={styles['recent-overview-header-container']}>
             <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>
-              Recent Results ({Math.min(RECENT_COUNT, overviewData.length)})
+              {t('recent_results', 'Recent Results')} ({Math.min(RECENT_COUNT, overviewData.length)})
             </h4>
             <Button kind="ghost" onClick={() => navigateToResults(basePath)}>
-              All results
+              {t('all_results', 'All results')}
             </Button>
           </div>
           <CommonOverview
