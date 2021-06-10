@@ -4,15 +4,15 @@ import dayjs from 'dayjs';
 import Gallery from 'react-grid-gallery';
 import styles from './attachments-overview.scss';
 import CameraUpload from './camera-upload.component';
-import { useLayoutType, UserHasAccess } from '@openmrs/esm-framework';
 import Button from 'carbon-components-react/lib/components/Button';
 import Add16 from '@carbon/icons-react/es/add/16';
-import PatientChartPagination, { paginate } from '../ui-components/pagination/pagination.component';
-import { getAttachments, createAttachment, deleteAttachment, getAttachmentByUuid } from './attachments.resource';
 import { Trans } from 'react-i18next';
+import { LayoutType, useLayoutType, usePagination, UserHasAccess } from '@openmrs/esm-framework';
+import { PatientChartPagination, EmptyState } from '@openmrs/esm-patient-common-lib';
 import { Modal } from '../ui-components/modal/modal.component';
+import { getAttachments, createAttachment, deleteAttachment, getAttachmentByUuid } from './attachments.resource';
 import './gallery.overrides.scss';
-import { EmptyState } from '@openmrs/esm-patient-common-lib';
+
 export interface Attachment {
   id: string;
   src: string;
@@ -26,25 +26,26 @@ export interface Attachment {
   bytesContentFamily?: string;
 }
 
+function getPageSize(layoutType: LayoutType) {
+  switch (layoutType) {
+    case 'tablet':
+      return 9;
+    case 'phone':
+      return 3;
+    case 'desktop':
+      return 25;
+    default:
+      return 8;
+  }
+}
+
 const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);
   const [currentImage, setCurrentImage] = useState(0);
-  const [pageNumber, setPageNumber] = React.useState(1);
-  const [currentPage, setCurrentPage] = React.useState<Array<any>>([]);
   const [showCam, setShowCam] = useState(false);
   const layOutType = useLayoutType();
-  let pageSize = 8;
-  switch (layOutType) {
-    case 'tablet':
-      pageSize = 9;
-      break;
-    case 'phone':
-      pageSize = 3;
-      break;
-    case 'desktop':
-      pageSize = 25;
-      break;
-  }
+  const pageSize = getPageSize(layOutType);
+  const pagination = usePagination(attachments, pageSize);
 
   useEffect(() => {
     if (patientUuid) {
@@ -71,13 +72,6 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
       });
     }
   }, [patientUuid]);
-
-  useEffect(() => {
-    if (attachments.length) {
-      const [page, allPages] = paginate<any>(attachments, pageNumber, pageSize);
-      setCurrentPage(page);
-    }
-  }, [attachments, pageNumber, layOutType]);
 
   function handleUpload(e: React.SyntheticEvent, files: FileList | null) {
     e.preventDefault();
@@ -212,7 +206,7 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
               </Button>
             </div>
             <Gallery
-              images={currentPage}
+              images={pagination.results}
               currentImageWillChange={handleCurrentImageChange}
               customControls={[
                 <Button kind="danger" onClick={handleDelete} className={styles.btnOverrides}>
@@ -224,12 +218,11 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
               margin={3}
             />
             <PatientChartPagination
-              items={attachments}
-              onPageNumberChange={(prop) => setPageNumber(prop.page)}
-              pageNumber={pageNumber}
+              currentItems={pagination.results.length}
+              totalItems={attachments.length}
+              onPageNumberChange={(prop) => pagination.goTo(prop.page)}
+              pageNumber={pagination.currentPage}
               pageSize={pageSize}
-              pageUrl=""
-              currentPage={currentPage}
             />
           </div>
         ) : (

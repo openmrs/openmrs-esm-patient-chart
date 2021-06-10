@@ -3,8 +3,16 @@ import { useTranslation } from 'react-i18next';
 import { UserHasAccess } from '@openmrs/esm-framework';
 import Button from 'carbon-components-react/es/components/Button';
 import ButtonSet from 'carbon-components-react/es/components/ButtonSet';
-import styles from './image-preview.css';
 import TextInput from 'carbon-components-react/lib/components/TextInput';
+import styles from './image-preview.css';
+
+interface ImagePreviewProps {
+  dataUri: string;
+  collectCaption: boolean;
+  selectedFile?: File;
+  onSaveImage?(dataUri: string, selectedFile: File, caption: string): void;
+  onCancelCapture?(): void;
+}
 
 export default function ImagePreview(props: ImagePreviewProps) {
   const [caption, setCaption] = useState('');
@@ -48,7 +56,7 @@ export default function ImagePreview(props: ImagePreviewProps) {
         </div>
       )}
       <UserHasAccess privilege="Create Attachment">
-        <ButtonSet style={{ width: '50%' }} className={styles.buttonSetOverrides}>
+        <ButtonSet className={styles.buttonSetOverrides}>
           <Button size="small" onClick={saveImage}>
             {t('save', 'Save')}{' '}
           </Button>
@@ -60,11 +68,3 @@ export default function ImagePreview(props: ImagePreviewProps) {
     </form>
   );
 }
-
-type ImagePreviewProps = {
-  dataUri: string;
-  collectCaption: boolean;
-  selectedFile?: File;
-  onSaveImage?(dataUri: string, selectedFile: File, caption: string): void;
-  onCancelCapture?(): void;
-};

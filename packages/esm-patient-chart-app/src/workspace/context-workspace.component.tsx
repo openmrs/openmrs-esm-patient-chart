@@ -4,6 +4,7 @@ import styles from './context-workspace.scss';
 import { ExtensionSlot } from '@openmrs/esm-framework';
 import { RouteComponentProps } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { useBodyScrollLock } from '@openmrs/esm-patient-common-lib';
 import { Header, HeaderGlobalAction, HeaderGlobalBar, HeaderName } from 'carbon-components-react/es/components/UIShell';
 import { useWorkspace } from '../hooks/useWorkspace';
 import { patientChartWorkspaceSlot } from '../constants';
@@ -18,15 +19,7 @@ const ContextWorkspace: React.FC<RouteComponentProps<ContextWorkspaceParams>> = 
   const { t } = useTranslation();
   const props = React.useMemo(() => ({ closeWorkspace, patientUuid }), [closeWorkspace, patientUuid]);
 
-  React.useEffect(() => {
-    if (active) {
-      const original = window.getComputedStyle(document.body).overflow;
-      document.body.style.overflow = 'hidden';
-      return () => {
-        document.body.style.overflow = original;
-      };
-    }
-  }, [active]);
+  useBodyScrollLock(active);
 
   return (
     <aside className={styles.contextWorkspaceContainer} style={{ visibility: active ? 'visible' : 'collapse' }}>

@@ -4,6 +4,7 @@ import debounce from 'lodash-es/debounce';
 import isEmpty from 'lodash-es/isEmpty';
 import styles from './form-view.component.scss';
 import { attach, getStartedVisit, VisitItem, navigate, usePagination } from '@openmrs/esm-framework';
+import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { Form } from '../types';
 import DataTable, {
@@ -20,7 +21,6 @@ import DataTable, {
 } from 'carbon-components-react/es/components/DataTable';
 import { formatDate, formEntrySub, sortFormLatestFirst } from './forms-utils';
 import EmptyFormView from './empty-form.component';
-import PatientChartPagination from '../pagination/pagination.component';
 import first from 'lodash-es/first';
 import { CoreHTMLForms } from '../core-html-forms';
 
@@ -169,12 +169,11 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, encoun
             </TableContainer>
             <PatientChartPagination
               pageNumber={currentPage}
-              currentPage={results}
-              patientUuid={patientUuid}
+              totalItems={allForms.length}
+              currentItems={results.length}
+              pageUrl={`$\{openmrsSpaBase}/patient/${patientUuid}/chart/`}
               pageSize={5}
-              pageUrl=""
               onPageNumberChange={({ page }) => goTo(page)}
-              items={allForms}
             />
           </>
         )}
