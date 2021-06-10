@@ -11,6 +11,7 @@ import { CommonDataTable } from '../overview/common-overview';
 import RangeSelector from './RangeSelector';
 import usePatientResultsData from '../loadPatientTestData/usePatientResultsData';
 import { exist } from '../loadPatientTestData/helpers';
+import { useTranslation } from 'react-i18next';
 
 const useTrendlineData = ({
   patientUuid,
@@ -57,15 +58,17 @@ const withPatientData =
     return <WrappedComponent patientData={patientData} openTimeline={openTimeline} />;
   };
 
-const TrendlineHeader = ({ openTimeline, title }) => (
-  <div className={styles['header']}>
-    <div onClick={openTimeline} role="button" className={styles['back-button']} tabIndex={0}>
-      <ArrowLeft24></ArrowLeft24> Back to timeline
+const TrendlineHeader = ({ openTimeline, title }) => {
+  const { t } = useTranslation();
+  return (
+    <div className={styles['header']}>
+      <div onClick={openTimeline} role="button" className={styles['back-button']} tabIndex={0}>
+        <ArrowLeft24></ArrowLeft24> {t('back_to_timeline', 'Back to timeline')}
+      </div>
+      <div className={styles['title']}>{title}</div>
     </div>
-    <div className={styles['title']}>{title}</div>
-  </div>
-);
-
+  );
+};
 const Trendline: React.FC<{
   patientData: ReturnType<typeof useTrendlineData>;
   openTimeline: () => void;

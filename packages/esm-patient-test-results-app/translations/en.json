@@ -5,5 +5,11 @@
     "trendlineRangeSelectorMonths": "6 months",
     "trendlineRangeSelector1Year": "1 year",
     "trendlineRangeSelector5Years": "5 years",
-    "trendlineRangeSelectorAll": "All"
+    "trendlineRangeSelectorAll": "All",
+    "trend": "Trend",
+    "timeline": "Timeline",
+    "no_tests":"No tests found",
+    "all_results": "All results",
+    "recent_results": "Recent Results",
+    "back_to_timeline": "Back to timeline"
 }

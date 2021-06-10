@@ -8,8 +8,6 @@ import { RecentResultsGrid, Card } from './helpers';
 import CommonOverview from './common-overview';
 import usePatientResultsData from '../loadPatientTestData/usePatientResultsData';
 
-const RECENT_COUNT = 2;
-
 function useFilteredOverviewData(patientUuid: string, filter: (filterProps: PanelFilterProps) => boolean = () => true) {
   const { sortedObs, loaded, error } = usePatientResultsData(patientUuid);
   const [overviewData, setDisplayData] = React.useState<Array<OverviewPanelEntry>>([]);
@@ -41,7 +39,7 @@ const RecentOverview: React.FC<ExternalOverviewProps> = ({ patientUuid, filter }
           <CommonOverview
             {...{
               patientUuid,
-              overviewData: overviewData.slice(0, RECENT_COUNT),
+              overviewData,
               insertSeperator: true,
               deactivateToolbar: true,
             }}

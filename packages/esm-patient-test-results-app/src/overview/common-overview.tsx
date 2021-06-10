@@ -15,6 +15,7 @@ import TableToolbarContent from 'carbon-components-react/lib/components/DataTabl
 import TableToolbar from 'carbon-components-react/lib/components/DataTable/TableToolbar';
 import { Card, headers, formatDate, InfoButton, Separator, TypedTableRow } from './helpers';
 import { OverviewPanelEntry, OverviewPanelData } from './useOverviewData';
+import { useTranslation } from 'react-i18next';
 
 export const CommonDataTable: React.FC<{
   data: Array<OverviewPanelData>;
@@ -93,6 +94,10 @@ const CommonOverview: React.FC<CommonOverviewProps> = ({
   openTrendline,
   deactivateToolbar = false,
 }) => {
+  const { t } = useTranslation();
+
+  if (!overviewData.length) return <p>{t('no_tests', 'No tests found')}</p>;
+
   return (
     <>
       {(() => {
@@ -114,11 +119,11 @@ const CommonOverview: React.FC<CommonOverviewProps> = ({
                     <TableToolbarContent>
                       {type === 'Test' && (
                         <Button kind="ghost" renderIcon={ChartLine16} onClick={() => openTrendline(uuid, uuid)}>
-                          Trend
+                          {t('trend', 'Trend')}
                         </Button>
                       )}
                       <Button kind="ghost" renderIcon={Table16} onClick={() => openTimeline(uuid)}>
-                        Timeline
+                        {t('timeline', 'Timeline')}
                       </Button>
                     </TableToolbarContent>
                   </TableToolbar>
