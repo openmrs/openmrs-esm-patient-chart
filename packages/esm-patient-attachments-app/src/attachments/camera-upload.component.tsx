@@ -3,12 +3,11 @@ import CameraFrame from './camera-frame.component';
 import ImagePreview from './image-preview.component';
 import styles from './camera-upload.css';
 import Camera from 'react-html5-camera-photo';
+import 'react-html5-camera-photo/build/css/index.css';
+import './styles.css';
 import { createAttachment } from './attachments.resource';
 import { useTranslation } from 'react-i18next';
 import { Attachment } from './attachments-overview.component';
-import 'react-html5-camera-photo/build/css/index.css';
-import './styles.css';
-
 export interface CameraUploadProps {
   openCameraOnRender?: boolean;
   collectCaption?: boolean;
@@ -60,9 +59,9 @@ const CameraUpload: React.FC<CameraUploadProps> = ({
   );
 
   const handleSaveImage = useCallback(
-    (dataUri: string, caption: string) => {
+    (dataUri: string, caption: string, selectedFile: File) => {
       const abortController = new AbortController();
-      createAttachment(patientUuid, null, caption, abortController, dataUri).then((res) => {
+      createAttachment(patientUuid, selectedFile, caption, abortController, dataUri).then((res) => {
         onNewAttachment?.({
           id: `${res.data.uuid}`,
           src: `${window.openmrsBase}/ws/rest/v1/attachment/${res.data.uuid}/bytes`,
@@ -83,7 +82,7 @@ const CameraUpload: React.FC<CameraUploadProps> = ({
         delegateSaveImage(dataUri, selectedFile, caption);
       } else {
         // fallback to default implementation
-        handleSaveImage(dataUri, caption);
+        handleSaveImage(dataUri, caption, selectedFile);
       }
       clearCamera();
     },
