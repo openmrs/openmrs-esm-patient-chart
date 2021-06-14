@@ -14,7 +14,7 @@ import TextArea from 'carbon-components-react/es/components/TextArea';
 import { Tile } from 'carbon-components-react/es/components/Tile';
 import { useTranslation } from 'react-i18next';
 import { Column, Grid, Row } from 'carbon-components-react/es/components/Grid';
-import { createErrorHandler, showToast, useConfig, useSessionUser } from '@openmrs/esm-framework';
+import { createErrorHandler, showNotification, showToast, useConfig, useSessionUser } from '@openmrs/esm-framework';
 import { convertToObsPayLoad, Diagnosis, VisitNotePayload } from './visit-note.util';
 import { fetchDiagnosisByName, fetchLocationByUuid, fetchProviderByUuid, saveVisitNote } from './visit-notes.resource';
 import { ConfigObject } from '../config-schema';
@@ -186,6 +186,13 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, closeWorks
       })
       .catch((err) => {
         createErrorHandler();
+
+        showNotification({
+          title: t('visitNoteSaveError', 'Error saving visit note'),
+          kind: 'error',
+          critical: true,
+          description: err?.message,
+        });
       })
       .finally(() => {
         ac.abort();

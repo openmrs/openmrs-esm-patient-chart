@@ -3,7 +3,7 @@ import VitalsBiometricInput from './vitals-biometrics-input.component';
 import Button from 'carbon-components-react/es/components/Button';
 import styles from './vitals-biometrics-form.component.scss';
 import { useTranslation } from 'react-i18next';
-import { useConfig, createErrorHandler, useSessionUser } from '@openmrs/esm-framework';
+import { useConfig, createErrorHandler, useSessionUser, showToast, showNotification } from '@openmrs/esm-framework';
 import { Column, Grid, Row } from 'carbon-components-react/es/components/Grid';
 import { calculateBMI, isInNormalRange } from './vitals-biometrics-form.utils';
 import { savePatientVitals } from '../vitals-biometrics.resource';
@@ -67,10 +67,30 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
       new Date(),
       ac,
       session?.sessionLocation?.uuid,
-    ).then((response) => {
-      response.status === 201 && closeWorkspace();
-    }, createErrorHandler());
-    return () => ac.abort();
+    )
+      .then((response) => {
+        if (response.status === 201) {
+          closeWorkspace();
+
+          showToast({
+            kind: 'success',
+            description: t('vitalsAndBiometricsSaved', 'Vitals and biometrics saved successfully'),
+          });
+        }
+      })
+      .catch((err) => {
+        createErrorHandler();
+
+        showNotification({
+          title: t('vitalsAndBiometricsSaveError', 'Error saving vitals and biometrics'),
+          kind: 'error',
+          critical: true,
+          description: err?.message,
+        });
+      })
+      .finally(() => {
+        ac.abort();
+      });
   };
 
   useEffect(() => {
