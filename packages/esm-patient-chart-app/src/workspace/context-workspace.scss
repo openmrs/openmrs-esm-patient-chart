@@ -1,3 +1,4 @@
+@import "../root.scss";
 @import "~@openmrs/esm-styleguide/src/vars";
 @import "~carbon-components/src/globals/scss/vars";
 @import "~carbon-components/src/globals/scss/mixins";
@@ -15,34 +16,31 @@
 
  /* Desktop view */
  :global(.omrs-breakpoint-gt-tablet) .contextWorkspaceContainer {
-   position: fixed;
-   top: 0;
-   right: 0;
-   bottom: 0;
-   z-index: 10;
-   background-color: $ui-01;
-   overflow-y: auto;
-   margin-right: 48px;
+   z-index: 1;
+   background-color: $ui-02;
+   margin-right: 50px;
    margin-top: 3rem;
-   width: 520px;
+   flex: 1;
+   border-left: 0.0625rem solid $openmrs-background-grey;
+   overflow-y: auto;
  }
 
- :global(.omrs-breakpoint-gt-tablet) .contextWorkspaceContainer header,
- :global(.omrs-breakpoint-gt-tablet) .contextWorkspaceContainer header a {
+ :global(.omrs-breakpoint-gt-tablet) .contextWorkspaceContainer > header,
+ :global(.omrs-breakpoint-gt-tablet) .contextWorkspaceContainer > header a {
   background-color: $ui-03;
   color: $ui-05;
 }
 
-:global(.omrs-breakpoint-gt-tablet) .contextWorkspaceContainer header button {
+:global(.omrs-breakpoint-gt-tablet) .contextWorkspaceContainer > header button {
   color: $color-blue-60-2;
   fill:$color-blue-60-2
 }
 
-:global(.omrs-breakpoint-gt-tablet) .contextWorkspaceContainer header button {
+:global(.omrs-breakpoint-gt-tablet) .contextWorkspaceContainer > header button {
   background-color: $ui-03;
 }
 
-:global(.omrs-breakpoint-gt-tablet) .contextWorkspaceContainer header button:hover {
+:global(.omrs-breakpoint-gt-tablet) .contextWorkspaceContainer > header button:hover {
   background-color: $ui-02;
   color: $color-blue-60-2;
   fill:$color-blue-60-2;

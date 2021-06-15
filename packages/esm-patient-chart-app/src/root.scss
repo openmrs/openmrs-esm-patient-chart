@@ -1,6 +1,12 @@
 @import "carbon-components/scss/globals/scss/typography.scss";
 
 $brand-01: #005d5d;
+$text-03:#a8a8a8;
+
+.patientChartWrapper {
+  display: flex;
+  position: relative;
+}
 
 .productiveHeading01 {
   @include carbon--type-style("productive-heading-01");
