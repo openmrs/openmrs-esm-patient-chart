@@ -2,7 +2,7 @@ import React, { SyntheticEvent } from 'react';
 import dayjs from 'dayjs';
 import debounce from 'lodash-es/debounce';
 import { useTranslation } from 'react-i18next';
-import { createErrorHandler, detach, showToast, useSessionUser } from '@openmrs/esm-framework';
+import { createErrorHandler, detach, showNotification, showToast, useSessionUser } from '@openmrs/esm-framework';
 import Button from 'carbon-components-react/es/components/Button';
 import DatePicker from 'carbon-components-react/es/components/DatePicker';
 import DatePickerInput from 'carbon-components-react/es/components/DatePickerInput';
@@ -122,7 +122,16 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid }) => {
             });
           }
         },
-        () => createErrorHandler(),
+        (err) => {
+          createErrorHandler();
+
+          showNotification({
+            title: t('conditionSaveError', 'Error saving condition'),
+            kind: 'error',
+            critical: true,
+            description: err?.message,
+          });
+        },
         () => {
           setViewState({ type: StateTypes.IDLE });
           sub.unsubscribe();

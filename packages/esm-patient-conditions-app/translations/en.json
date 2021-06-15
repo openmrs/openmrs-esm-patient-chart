@@ -5,6 +5,7 @@
   "condition": "Condition",
   "conditions": "Conditions",
   "conditionSaved": "Condition saved successfully",
+  "conditionSaveError": "Error saving condition",
   "conditionsForm": "Conditions form",
   "currentStatus": "Current status",
   "editCondition": "Edit Condition",

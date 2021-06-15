@@ -4,7 +4,7 @@ import filter from 'lodash-es/filter';
 import includes from 'lodash-es/includes';
 import map from 'lodash-es/map';
 import { useTranslation } from 'react-i18next';
-import { createErrorHandler, showToast, useSessionUser } from '@openmrs/esm-framework';
+import { createErrorHandler, showNotification, showToast, useSessionUser } from '@openmrs/esm-framework';
 import Button from 'carbon-components-react/es/components/Button';
 import DatePicker from 'carbon-components-react/es/components/DatePicker';
 import DatePickerInput from 'carbon-components-react/es/components/DatePickerInput';
@@ -137,7 +137,16 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, closeWorkspace
             });
           }
         },
-        () => createErrorHandler(),
+        (err) => {
+          createErrorHandler();
+
+          showNotification({
+            title: t('programEnrollmentSaveError', 'Error saving program enrollment'),
+            kind: 'error',
+            critical: true,
+            description: err?.message,
+          });
+        },
         () => {
           setViewState({ type: StateTypes.IDLE });
           sub.unsubscribe();

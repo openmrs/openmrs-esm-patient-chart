@@ -33,6 +33,8 @@
   "today": "Today",
   "vitals": "Vitals",
   "vitalsAndBiometrics": "Vitals & Biometrics",
+  "vitalsAndBiometricsSaved": "Vitals and biometrics saved successfully",
+  "vitalsAndBiometricsSaveError": "Error saving vitals and biometrics",
   "vitalSignDisplayed": "Vital Sign Displayed",
   "vitalSigns": "Vital signs",
   "weight": "Weight"

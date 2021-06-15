@@ -25,5 +25,6 @@
   "searchForDiagnosis": "Search for a diagnosis",
   "seeAll": "See all",
   "visitDate": "Visit date",
-  "visitNoteSaved": "Visit note saved successfully"
+  "visitNoteSaved": "Visit note saved successfully",
+  "visitNoteSaveError": "Error saving visit note"
 }

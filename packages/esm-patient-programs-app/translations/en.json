@@ -21,6 +21,7 @@
   "program": "Program",
   "programEnrollments": "Program enrollments",
   "programEnrollmentSaved": "Program enrollment saved successfully",
+  "programEnrollmentSaveError": "Error saving program enrollment",
   "programs": "programs",
   "required": "Required",
   "status": "Status"
