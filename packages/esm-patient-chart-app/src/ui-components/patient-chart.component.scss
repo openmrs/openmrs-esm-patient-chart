@@ -13,8 +13,6 @@ $actionPanelExpandedOffset: $actionNavOffset + $actionPanelOffset;
 .patientBanner {
   position: relative;
   z-index: 1;
-  width: 100%;
-  padding-right: 0.5rem;
 }
 
 .chartreview {
@@ -30,15 +28,16 @@ $actionPanelExpandedOffset: $actionNavOffset + $actionPanelOffset;
   grid-column: 2;
   align-self: start;
   height: 90%;
-  border-left: 0.5px solid lightgray;
   padding-bottom: 10px;
 }
 
 
 .chartContainer {
+  flex: 1;
   display: flex;
   align-items: flex-start;
   flex-direction: column;
+  padding-right: 1rem;
 }
 
 
