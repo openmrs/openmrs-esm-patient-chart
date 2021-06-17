@@ -29,7 +29,7 @@ import { OrderBasketItem } from '../types/order-basket-item';
 import { attach } from '@openmrs/esm-framework';
 
 export interface ActiveMedicationsProps {
-  title: string;
+  title?: string;
   medications?: Array<Order> | null;
   showAddNewButton: boolean;
   showDiscontinueButton: boolean;
