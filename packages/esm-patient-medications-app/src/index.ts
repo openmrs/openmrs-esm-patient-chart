@@ -26,6 +26,16 @@ function setupOpenMRS() {
         },
       },
       {
+        id: 'active-medications-widget',
+        slot: 'patient-chart-summary-dashboard-slot',
+        load: getAsyncLifecycle(() => import('./medications/active-medications.component'), options),
+        meta: {
+          columnSpan: 4,
+        },
+        online: { showAddMedications: true },
+        offline: { showAddMedications: false },
+      },
+      {
         id: 'order-basket-workspace',
         load: getAsyncLifecycle(() => import('./medications/root-order-basket'), options),
         meta: {
