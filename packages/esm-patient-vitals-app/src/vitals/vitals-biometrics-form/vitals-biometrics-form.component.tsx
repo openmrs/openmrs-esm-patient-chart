@@ -3,7 +3,14 @@ import VitalsBiometricInput from './vitals-biometrics-input.component';
 import Button from 'carbon-components-react/es/components/Button';
 import styles from './vitals-biometrics-form.component.scss';
 import { useTranslation } from 'react-i18next';
-import { useConfig, createErrorHandler, useSessionUser, showToast, showNotification } from '@openmrs/esm-framework';
+import {
+  useConfig,
+  createErrorHandler,
+  useSessionUser,
+  showToast,
+  showNotification,
+  useLayoutType,
+} from '@openmrs/esm-framework';
 import { Column, Grid, Row } from 'carbon-components-react/es/components/Grid';
 import { calculateBMI, isInNormalRange } from './vitals-biometrics-form.utils';
 import { savePatientVitals } from '../vitals-biometrics.resource';
@@ -32,11 +39,13 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
   const session = useSessionUser();
   const config = useConfig() as ConfigObject;
   const { t } = useTranslation();
+  const layout = useLayoutType();
   const { vitalsSignsConceptMetadata, conceptsUnits } = useVitalsSignsConceptMetaData();
   const biometricsUnitsSymbols = config.biometrics;
   const [patientVitalAndBiometrics, setPatientVitalAndBiometrics] = useState<PatientVitalAndBiometric>();
   const [patientBMI, setPatientBMI] = useState<number>();
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [lightMode, setLightMode] = useState<boolean>();
 
   const [
     bloodPressureUnit,
@@ -103,8 +112,12 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
     }
   }, [patientVitalAndBiometrics?.weight, patientVitalAndBiometrics?.height]);
 
+  useEffect(() => {
+    layout === 'desktop' ? setLightMode(false) : setLightMode(true);
+  }, [layout]);
+
   return (
-    <Grid condensed className={styles.vitalsBiometricContainer}>
+    <Grid condensed>
       <Row>
         <Column>
           <p className={styles.vitalsTitle}>{t('vitals', 'Vitals')}</p>
@@ -151,6 +164,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
                 patientVitalAndBiometrics?.diastolicBloodPressure,
               )
             }
+            lightMode={lightMode}
           />
         </Column>
         <Column>
@@ -175,6 +189,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
               config.concepts['pulseUuid'],
               patientVitalAndBiometrics?.pulse,
             )}
+            lightMode={lightMode}
           />
         </Column>
         <Column>
@@ -199,6 +214,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
               config.concepts['oxygenSaturationUuid'],
               patientVitalAndBiometrics?.oxygenSaturation,
             )}
+            lightMode={lightMode}
           />
         </Column>
         <Column>
@@ -223,6 +239,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
               config.concepts['respiratoryRateUuid'],
               patientVitalAndBiometrics?.respiratoryRate,
             )}
+            lightMode={lightMode}
           />
         </Column>
       </Row>
@@ -249,6 +266,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
               config.concepts['temperatureUuid'],
               patientVitalAndBiometrics?.temperature,
             )}
+            lightMode={lightMode}
           />
         </Column>
       </Row>
@@ -272,6 +290,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
             textFieldWidth="26.375rem"
             placeholder={t('additionalNoteText', 'Type any additional notes here')}
             inputIsNormal={true}
+            lightMode={lightMode}
           />
         </Column>
       </Row>
@@ -300,6 +319,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
             ]}
             unitSymbol={weightUnit}
             inputIsNormal={true}
+            lightMode={lightMode}
           />
         </Column>
         <Column>
@@ -320,6 +340,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
             ]}
             unitSymbol={heightUnit}
             inputIsNormal={true}
+            lightMode={lightMode}
           />
         </Column>
         <Column>
@@ -336,6 +357,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
             unitSymbol={biometricsUnitsSymbols['bmiUnit']}
             disabled={true}
             inputIsNormal={isBMIInNormalRange(patientBMI)}
+            lightMode={lightMode}
           />
         </Column>
         <Column>
@@ -360,6 +382,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
               config.concepts['midUpperArmCircumferenceUuid'],
               patientVitalAndBiometrics?.midUpperArmCircumference,
             )}
+            lightMode={lightMode}
           />
         </Column>
       </Row>

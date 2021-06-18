@@ -28,7 +28,6 @@
 
 .textInput {
   border: none;
-  background-color: white;
   @extend .productiveHeading04;
   text-align: center;
   padding: 0;
@@ -37,7 +36,6 @@
 
 .textInputContainer {
   @extend .productiveHeading04;
-  background-color: #ffffff;
   height: 4.875rem;
   display: flex;
   justify-content: center;
@@ -45,11 +43,15 @@
   text-align: center;
   padding: $spacing-03;
   color: $text-02;
+  background-color: $ui-02;
+}
+
+:global(.omrs-breakpoint-gt-tablet) .textInputContainer {
+background-color: $ui-01;
 }
 
 .textArea {
   border: none;
-  background-color: white;
   @extend .bodyLong01;
   text-align: left;
 }

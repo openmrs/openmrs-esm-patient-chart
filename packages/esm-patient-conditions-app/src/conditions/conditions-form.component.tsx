@@ -1,8 +1,15 @@
-import React, { SyntheticEvent } from 'react';
+import React, { SyntheticEvent, useEffect, useState } from 'react';
 import dayjs from 'dayjs';
 import debounce from 'lodash-es/debounce';
 import { useTranslation } from 'react-i18next';
-import { createErrorHandler, detach, showNotification, showToast, useSessionUser } from '@openmrs/esm-framework';
+import {
+  createErrorHandler,
+  detach,
+  showNotification,
+  showToast,
+  useLayoutType,
+  useSessionUser,
+} from '@openmrs/esm-framework';
 import Button from 'carbon-components-react/es/components/Button';
 import DatePicker from 'carbon-components-react/es/components/DatePicker';
 import DatePickerInput from 'carbon-components-react/es/components/DatePickerInput';
@@ -53,12 +60,18 @@ type ViewState = IdleState | SearchState | ConditionState | SubmitState;
 const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const session = useSessionUser();
+  const layout = useLayoutType();
   const [clinicalStatus, setClinicalStatus] = React.useState('active');
   const [endDate, setEndDate] = React.useState(null);
   const [onsetDate, setOnsetDate] = React.useState(null);
   const [viewState, setViewState] = React.useState<ViewState>({
     type: StateTypes.IDLE,
   });
+  const [lightMode, setLightMode] = useState<boolean>();
+
+  useEffect(() => {
+    layout === 'desktop' ? setLightMode(false) : setLightMode(true);
+  }, [layout]);
 
   const closeWorkspace = React.useCallback(
     () => detach('patient-chart-workspace-slot', 'conditions-form-workspace'),
@@ -169,7 +182,8 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid }) => {
     <Form style={{ margin: '2rem' }} onSubmit={handleSubmit}>
       <FormGroup style={{ width: '50%' }} legendText={t('condition', 'Condition')}>
         <Search
-          light
+          light={lightMode}
+          size="xl"
           id="conditionsSearch"
           labelText={t('enterCondition', 'Enter condition')}
           placeholder={t('searchConditions', 'Search conditions')}
@@ -234,7 +248,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid }) => {
           placeholder="dd/mm/yyyy"
           onChange={([date]) => setOnsetDate(date)}
           value={onsetDate}
-          light>
+          light={lightMode}>
           <DatePickerInput id="onsetDateInput" labelText="" />
         </DatePicker>
       </FormGroup>
@@ -260,7 +274,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid }) => {
           placeholder="dd/mm/yyyy"
           onChange={([date]) => setEndDate(date)}
           value={endDate}
-          light>
+          light={lightMode}>
           <DatePickerInput id="endDateInput" labelText={t('endDate', 'End date')} />
         </DatePicker>
       )}

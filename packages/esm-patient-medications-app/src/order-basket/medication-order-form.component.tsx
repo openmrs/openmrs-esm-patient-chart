@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './medication-order-form.scss';
 import capitalize from 'lodash-es/capitalize';
 import Button from 'carbon-components-react/es/components/Button';
@@ -20,6 +20,7 @@ import { OrderBasketItem } from '../types/order-basket-item';
 import { daysDurationUnit } from '../constants';
 import { getCommonMedicationByUuid } from '../api/common-medication';
 import { OpenmrsResource } from '../types/openmrs-resource';
+import { useLayoutType } from '@openmrs/esm-framework';
 
 export interface MedicationOrderFormProps {
   initialOrderBasketItem: OrderBasketItem;
@@ -35,8 +36,14 @@ export default function MedicationOrderForm({
   onCancel,
 }: MedicationOrderFormProps) {
   const { t } = useTranslation();
+  const layout = useLayoutType();
   const [orderBasketItem, setOrderBasketItem] = useState(initialOrderBasketItem);
   const commonMedication = getCommonMedicationByUuid(orderBasketItem.drug.uuid);
+  const [lightMode, setLightMode] = useState<boolean>();
+
+  useEffect(() => {
+    layout === 'desktop' ? setLightMode(false) : setLightMode(true);
+  }, [layout]);
 
   return (
     <>
@@ -84,6 +91,7 @@ export default function MedicationOrderForm({
             <Row style={{ marginTop: '0.5rem' }}>
               <Column md={8}>
                 <TextArea
+                  light={lightMode}
                   labelText={t('freeTextDosage', 'Free Text Dosage')}
                   placeholder={t('freeTextDosage', 'Free Text Dosage')}
                   value={orderBasketItem.freeTextDosage}
@@ -103,6 +111,7 @@ export default function MedicationOrderForm({
                 <Column md={4}>
                   <ComboBox
                     id="doseSelection"
+                    light={lightMode}
                     items={commonMedication.commonDosages.map((x) => ({
                       id: x.dosage,
                       text: x.dosage,
@@ -129,6 +138,7 @@ export default function MedicationOrderForm({
                 <Column md={4}>
                   <ComboBox
                     id="editFrequency"
+                    light={lightMode}
                     items={commonMedication.commonFrequencies.map((x) => ({
                       id: x.conceptUuid,
                       text: x.name,
@@ -157,6 +167,7 @@ export default function MedicationOrderForm({
                 <Column md={4}>
                   <ComboBox
                     id="editRoute"
+                    light={lightMode}
                     items={commonMedication.route.map((x) => ({
                       id: x.conceptUuid,
                       text: x.name,
@@ -184,6 +195,7 @@ export default function MedicationOrderForm({
               <Row style={{ marginTop: '1rem' }}>
                 <Column className={styles.fullHeightTextAreaContainer}>
                   <TextArea
+                    light={lightMode}
                     labelText={t('patientInstructions', 'Patient Instructions')}
                     placeholder={t(
                       'patientInstructionsPlaceholder',
@@ -202,6 +214,7 @@ export default function MedicationOrderForm({
                 <Column>
                   <FormGroup legendText={t('prn', 'P.R.N.')}>
                     <Checkbox
+                      light={lightMode}
                       id="prn"
                       labelText={t('takeAsNeeded', 'Take As Needed')}
                       checked={orderBasketItem.asNeeded}
@@ -217,6 +230,7 @@ export default function MedicationOrderForm({
                     className={styles.fullHeightTextAreaContainer}
                     style={orderBasketItem.asNeeded ? {} : { visibility: 'hidden' }}>
                     <TextArea
+                      light={lightMode}
                       labelText={t('prnReason', 'P.R.N. Reason')}
                       placeholder={t('prnReasonPlaceholder', 'Reason to take medicine')}
                       rows={3}
@@ -242,6 +256,7 @@ export default function MedicationOrderForm({
           <Row style={{ marginTop: '1rem' }}>
             <Column md={4} className={styles.fullWidthDatePickerContainer}>
               <DatePicker
+                light={lightMode}
                 datePickerType="single"
                 maxDate={new Date()}
                 value={[orderBasketItem.startDate]}
@@ -260,6 +275,7 @@ export default function MedicationOrderForm({
             </Column>
             <Column md={2}>
               <NumberInput
+                light={lightMode}
                 id="durationInput"
                 label={t('duration', 'Duration')}
                 min={1}
@@ -280,6 +296,7 @@ export default function MedicationOrderForm({
             <Column md={2}>
               <FormGroup legendText={t('durationUnit', 'Duration Unit')}>
                 <ComboBox
+                  light={lightMode}
                   id="durationUnitPlaceholder"
                   selectedItem={{
                     id: orderBasketItem.durationUnit.uuid,
@@ -318,6 +335,7 @@ export default function MedicationOrderForm({
             <Column md={2}>
               <FormGroup legendText={t('quantityDispensed', 'Quantity Dispensed')}>
                 <NumberInput
+                  light={lightMode}
                   id="quantityDispensed"
                   helperText={t('pillsDispensed', 'Pills dispensed')}
                   value={orderBasketItem.pillsDispensed}
@@ -335,6 +353,7 @@ export default function MedicationOrderForm({
             <Column md={2}>
               <FormGroup legendText={t('prescriptionRefills', 'Prescription Refills')}>
                 <NumberInput
+                  light={lightMode}
                   id="prescriptionRefills"
                   min={0}
                   value={orderBasketItem.numRefills}
@@ -352,6 +371,7 @@ export default function MedicationOrderForm({
           <Row>
             <Column md={8}>
               <TextInput
+                light={lightMode}
                 id="indication"
                 labelText={t('indication', 'Indication')}
                 placeholder={t('indicationPlaceholder', 'e.g. "Hypertension"')}
