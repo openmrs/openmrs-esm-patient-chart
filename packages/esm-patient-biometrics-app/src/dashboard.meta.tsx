@@ -1,6 +1,6 @@
 export const dashboardMeta = {
-  name: 'results',
+  name: 'vitalsAndBiometrics',
   slot: 'patient-chart-results-dashboard-slot',
   config: { type: 'tabs' },
-  title: 'Results',
+  title: 'Vitals & Biometrics',
 };
