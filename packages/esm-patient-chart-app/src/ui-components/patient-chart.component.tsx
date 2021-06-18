@@ -37,7 +37,7 @@ const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({ match
         <>
           <div className={styles.innerChartContainer} style={{ paddingRight: active && '0rem' }}>
             <ExtensionSlot extensionSlotName="breadcrumbs-slot" />
-            <aside className={styles.patientBanner}>
+            <aside>
               <ExtensionSlot extensionSlotName="patient-header-slot" state={state} />
               <ExtensionSlot extensionSlotName="patient-info-slot" state={state} />
             </aside>

@@ -75,7 +75,7 @@ const VitalHeader: React.FC<VitalHeaderProps> = ({ patientUuid, showRecordVitals
             showRecordVitals={showRecordVitals}
           />
           {showDetails && (
-            <div className={`${cls} ${styles.overlay}`}>
+            <div>
               <div className={styles.row}>
                 <VitalHeaderStateDetails
                   unitName={t('temperatureAbbreviated', 'Temp')}

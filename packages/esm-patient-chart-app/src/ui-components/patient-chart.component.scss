@@ -10,11 +10,6 @@ $actionPanelExpandedOffset: $actionNavOffset + $actionPanelOffset;
   width: inherit;
 }
 
-.patientBanner {
-  position: relative;
-  z-index: 1;
-}
-
 .chartreview {
   grid-row: 1;
   grid-column: 1;
