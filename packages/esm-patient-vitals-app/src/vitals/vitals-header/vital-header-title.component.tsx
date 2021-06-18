@@ -28,7 +28,8 @@ const VitalsHeaderStateTitle: React.FC<VitalsHeaderStateTitleProps> = ({
 }) => {
   const { t } = useTranslation();
 
-  const launchVitalsBiometricsForm = React.useCallback(() => {
+  const launchVitalsBiometricsForm = React.useCallback((e) => {
+    e.stopPropagation();
     attach('patient-chart-workspace-slot', patientVitalsBiometricsFormWorkspace);
   }, []);
 
