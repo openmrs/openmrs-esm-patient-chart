@@ -26,6 +26,7 @@ enum StateTypes {
 
 interface ConditionsFormProps {
   patientUuid: string;
+  isTablet: boolean;
 }
 
 interface IdleState {
@@ -50,7 +51,7 @@ interface SubmitState {
 
 type ViewState = IdleState | SearchState | ConditionState | SubmitState;
 
-const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid }) => {
+const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid, isTablet }) => {
   const { t } = useTranslation();
   const session = useSessionUser();
   const [clinicalStatus, setClinicalStatus] = React.useState('active');
@@ -169,7 +170,8 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid }) => {
     <Form style={{ margin: '2rem' }} onSubmit={handleSubmit}>
       <FormGroup style={{ width: '50%' }} legendText={t('condition', 'Condition')}>
         <Search
-          light
+          light={isTablet}
+          size="xl"
           id="conditionsSearch"
           labelText={t('enterCondition', 'Enter condition')}
           placeholder={t('searchConditions', 'Search conditions')}
@@ -234,7 +236,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid }) => {
           placeholder="dd/mm/yyyy"
           onChange={([date]) => setOnsetDate(date)}
           value={onsetDate}
-          light>
+          light={isTablet}>
           <DatePickerInput id="onsetDateInput" labelText="" />
         </DatePicker>
       </FormGroup>
@@ -260,7 +262,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid }) => {
           placeholder="dd/mm/yyyy"
           onChange={([date]) => setEndDate(date)}
           value={endDate}
-          light>
+          light={isTablet}>
           <DatePickerInput id="endDateInput" labelText={t('endDate', 'End date')} />
         </DatePicker>
       )}

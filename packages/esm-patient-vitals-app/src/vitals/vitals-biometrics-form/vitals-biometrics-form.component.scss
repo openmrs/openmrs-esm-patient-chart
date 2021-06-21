@@ -6,11 +6,6 @@
   @include carbon--type-style("productive-heading-03");
 }
 
-.vitalsBiometricContainer {
-  background-color: $ui-01;
-  margin-left: $spacing-05;
-}
-
 .vitalsTitle {
   @extend .productiveHeading03;
   margin: 0 $spacing-03 $spacing-05 0;

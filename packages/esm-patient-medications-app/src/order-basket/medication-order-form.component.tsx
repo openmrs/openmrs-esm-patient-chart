@@ -26,6 +26,7 @@ export interface MedicationOrderFormProps {
   durationUnits: Array<OpenmrsResource>;
   onSign: (finalizedOrder: OrderBasketItem) => void;
   onCancel: () => void;
+  isTablet: boolean;
 }
 
 export default function MedicationOrderForm({
@@ -33,6 +34,7 @@ export default function MedicationOrderForm({
   durationUnits,
   onSign,
   onCancel,
+  isTablet,
 }: MedicationOrderFormProps) {
   const { t } = useTranslation();
   const [orderBasketItem, setOrderBasketItem] = useState(initialOrderBasketItem);
@@ -84,6 +86,7 @@ export default function MedicationOrderForm({
             <Row style={{ marginTop: '0.5rem' }}>
               <Column md={8}>
                 <TextArea
+                  light={isTablet}
                   labelText={t('freeTextDosage', 'Free Text Dosage')}
                   placeholder={t('freeTextDosage', 'Free Text Dosage')}
                   value={orderBasketItem.freeTextDosage}
@@ -103,6 +106,7 @@ export default function MedicationOrderForm({
                 <Column md={4}>
                   <ComboBox
                     id="doseSelection"
+                    light={isTablet}
                     items={commonMedication.commonDosages.map((x) => ({
                       id: x.dosage,
                       text: x.dosage,
@@ -129,6 +133,7 @@ export default function MedicationOrderForm({
                 <Column md={4}>
                   <ComboBox
                     id="editFrequency"
+                    light={isTablet}
                     items={commonMedication.commonFrequencies.map((x) => ({
                       id: x.conceptUuid,
                       text: x.name,
@@ -157,6 +162,7 @@ export default function MedicationOrderForm({
                 <Column md={4}>
                   <ComboBox
                     id="editRoute"
+                    light={isTablet}
                     items={commonMedication.route.map((x) => ({
                       id: x.conceptUuid,
                       text: x.name,
@@ -184,6 +190,7 @@ export default function MedicationOrderForm({
               <Row style={{ marginTop: '1rem' }}>
                 <Column className={styles.fullHeightTextAreaContainer}>
                   <TextArea
+                    light={isTablet}
                     labelText={t('patientInstructions', 'Patient Instructions')}
                     placeholder={t(
                       'patientInstructionsPlaceholder',
@@ -202,6 +209,7 @@ export default function MedicationOrderForm({
                 <Column>
                   <FormGroup legendText={t('prn', 'P.R.N.')}>
                     <Checkbox
+                      light={isTablet}
                       id="prn"
                       labelText={t('takeAsNeeded', 'Take As Needed')}
                       checked={orderBasketItem.asNeeded}
@@ -217,6 +225,7 @@ export default function MedicationOrderForm({
                     className={styles.fullHeightTextAreaContainer}
                     style={orderBasketItem.asNeeded ? {} : { visibility: 'hidden' }}>
                     <TextArea
+                      light={isTablet}
                       labelText={t('prnReason', 'P.R.N. Reason')}
                       placeholder={t('prnReasonPlaceholder', 'Reason to take medicine')}
                       rows={3}
@@ -242,6 +251,7 @@ export default function MedicationOrderForm({
           <Row style={{ marginTop: '1rem' }}>
             <Column md={4} className={styles.fullWidthDatePickerContainer}>
               <DatePicker
+                light={isTablet}
                 datePickerType="single"
                 maxDate={new Date()}
                 value={[orderBasketItem.startDate]}
@@ -260,6 +270,7 @@ export default function MedicationOrderForm({
             </Column>
             <Column md={2}>
               <NumberInput
+                light={isTablet}
                 id="durationInput"
                 label={t('duration', 'Duration')}
                 min={1}
@@ -280,6 +291,7 @@ export default function MedicationOrderForm({
             <Column md={2}>
               <FormGroup legendText={t('durationUnit', 'Duration Unit')}>
                 <ComboBox
+                  light={isTablet}
                   id="durationUnitPlaceholder"
                   selectedItem={{
                     id: orderBasketItem.durationUnit.uuid,
@@ -318,6 +330,7 @@ export default function MedicationOrderForm({
             <Column md={2}>
               <FormGroup legendText={t('quantityDispensed', 'Quantity Dispensed')}>
                 <NumberInput
+                  light={isTablet}
                   id="quantityDispensed"
                   helperText={t('pillsDispensed', 'Pills dispensed')}
                   value={orderBasketItem.pillsDispensed}
@@ -335,6 +348,7 @@ export default function MedicationOrderForm({
             <Column md={2}>
               <FormGroup legendText={t('prescriptionRefills', 'Prescription Refills')}>
                 <NumberInput
+                  light={isTablet}
                   id="prescriptionRefills"
                   min={0}
                   value={orderBasketItem.numRefills}
@@ -352,6 +366,7 @@ export default function MedicationOrderForm({
           <Row>
             <Column md={8}>
               <TextInput
+                light={isTablet}
                 id="indication"
                 labelText={t('indication', 'Indication')}
                 placeholder={t('indicationPlaceholder', 'e.g. "Hypertension"')}

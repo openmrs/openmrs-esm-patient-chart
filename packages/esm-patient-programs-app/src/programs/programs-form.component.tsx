@@ -26,6 +26,7 @@ import styles from './programs-form.scss';
 interface ProgramsFormProps {
   closeWorkspace(): void;
   patientUuid: string;
+  isTablet: boolean;
 }
 
 enum StateTypes {
@@ -51,7 +52,7 @@ interface SubmittingState {
 
 type ViewState = IdleState | ResolvedState | SubmittingState;
 
-const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, closeWorkspace }) => {
+const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, closeWorkspace, isTablet }) => {
   const { t } = useTranslation();
   const session = useSessionUser();
   const [availableLocations, setAvailableLocations] = React.useState(null);
@@ -164,7 +165,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, closeWorkspace
             id="program"
             invalidText={t('required', 'Required')}
             labelText=""
-            light
+            light={isTablet}
             onChange={(event) => {
               setViewState({
                 availablePrograms: (viewState as ResolvedState)?.availablePrograms,
@@ -196,7 +197,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, closeWorkspace
           id="enrollmentDate"
           datePickerType="single"
           dateFormat="d/m/Y"
-          light
+          light={isTablet}
           maxDate={new Date().toISOString()}
           placeholder="dd/mm/yyyy"
           onChange={([date]) => setEnrollmentDate(date)}
@@ -209,7 +210,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, closeWorkspace
           id="completionDate"
           datePickerType="single"
           dateFormat="d/m/Y"
-          light
+          light={isTablet}
           minDate={new Date(enrollmentDate).toISOString()}
           maxDate={new Date().toISOString()}
           placeholder="dd/mm/yyyy"
@@ -223,7 +224,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, closeWorkspace
           id="location"
           invalidText="Required"
           labelText=""
-          light
+          light={isTablet}
           onChange={(event) => setUserLocation(event.target.value)}
           value={userLocation}>
           {!userLocation ? <SelectItem text={t('chooseLocation', 'Choose a location')} value="" /> : null}

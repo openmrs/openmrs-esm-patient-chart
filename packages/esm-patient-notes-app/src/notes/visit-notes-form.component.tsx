@@ -30,6 +30,7 @@ enum StateTypes {
 interface VisitNotesFormProps {
   closeWorkspace(): void;
   patientUuid: string;
+  isTablet: boolean;
 }
 
 interface IdleState {
@@ -54,7 +55,7 @@ interface SubmitState {
 
 type ViewState = IdleState | SearchState | DiagnosesState | SubmitState;
 
-const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, closeWorkspace }) => {
+const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, closeWorkspace, isTablet }) => {
   const { t } = useTranslation();
   const session = useSessionUser();
   const config = useConfig() as ConfigObject;
@@ -212,7 +213,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, closeWorks
             <DatePicker
               dateFormat="d/m/Y"
               datePickerType="single"
-              light
+              light={isTablet}
               maxDate={new Date().toISOString()}
               value={visitDateTime}
               onChange={([date]) => setVisitDateTime(date)}>
@@ -249,7 +250,8 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, closeWorks
             </div>
             <FormGroup legendText={t('searchForDiagnosis', 'Search for a diagnosis')}>
               <Search
-                light
+                light={isTablet}
+                size="xl"
                 id="diagnosisSearch"
                 labelText={t('enterDiagnoses', 'Enter diagnoses')}
                 placeholder={t(
@@ -295,7 +297,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, closeWorks
                     );
                   if (viewState.isSearching) return <SearchSkeleton />;
                   return (
-                    <Tile light className={styles.emptyResults}>
+                    <Tile light={isTablet} className={styles.emptyResults}>
                       <span>
                         {t('noMatchingDiagnoses', 'No diagnoses found matching')} <strong>"{searchTerm}"</strong>
                       </span>
@@ -313,7 +315,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, closeWorks
           <Column sm={3}>
             <TextArea
               id="additionalNote"
-              light
+              light={isTablet}
               labelText={t('clinicalNoteLabel', 'Write an additional note')}
               placeholder={t('clinicalNotePlaceholder', 'Write any additional points here')}
               onChange={(event) => setClinicalNote(event.currentTarget.value)}

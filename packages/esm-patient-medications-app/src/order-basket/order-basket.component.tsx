@@ -21,139 +21,153 @@ import { usePatientOrders } from '../utils/use-current-patient-orders.hook';
 export interface OrderBasketProps {
   patientUuid: string;
   closeWorkspace(): void;
+  isTablet: boolean;
 }
 
 const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBasketStore, {}>(
   'items',
   orderBasketStoreActions,
-)(({ patientUuid, items, closeWorkspace, setItems }: OrderBasketProps & OrderBasketStore & OrderBasketStoreActions) => {
-  const { t } = useTranslation();
-  const [durationUnits, setDurationUnits] = useState<Array<OpenmrsResource>>([]);
-  const [encounterUuid, setEncounterUuid] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
-  const [medicationOrderFormItem, setMedicationOrderFormItem] = useState<OrderBasketItem | null>(null);
-  const [isMedicationOrderFormVisible, setIsMedicationOrderFormVisible] = useState(false);
-  const [onMedicationOrderFormSigned, setOnMedicationOrderFormSign] =
-    useState<(finalizedOrderBasketItem: OrderBasketItem) => void | null>(null);
-  const [activePatientOrders, fetchActivePatientOrders] = usePatientOrders(patientUuid, 'ACTIVE');
+)(
+  ({
+    patientUuid,
+    items,
+    closeWorkspace,
+    setItems,
+    isTablet,
+  }: OrderBasketProps & OrderBasketStore & OrderBasketStoreActions) => {
+    const { t } = useTranslation();
+    const [durationUnits, setDurationUnits] = useState<Array<OpenmrsResource>>([]);
+    const [encounterUuid, setEncounterUuid] = useState('');
+    const [isLoading, setIsLoading] = useState(true);
+    const [medicationOrderFormItem, setMedicationOrderFormItem] = useState<OrderBasketItem | null>(null);
+    const [isMedicationOrderFormVisible, setIsMedicationOrderFormVisible] = useState(false);
+    const [onMedicationOrderFormSigned, setOnMedicationOrderFormSign] =
+      useState<(finalizedOrderBasketItem: OrderBasketItem) => void | null>(null);
+    const [activePatientOrders, fetchActivePatientOrders] = usePatientOrders(patientUuid, 'ACTIVE');
 
-  useEffect(() => {
-    const abortController = new AbortController();
-    const durationUnitsRequest = getDurationUnits(abortController).then(
-      (res) => setDurationUnits(res.data.answers),
-      createErrorHandler,
-    );
-    const patientEncounterRequest = getPatientEncounterId(patientUuid, abortController).then(
-      ({ data }) => setEncounterUuid(data.results[0].uuid),
-      createErrorHandler,
-    );
+    useEffect(() => {
+      const abortController = new AbortController();
+      const durationUnitsRequest = getDurationUnits(abortController).then(
+        (res) => setDurationUnits(res.data.answers),
+        createErrorHandler,
+      );
+      const patientEncounterRequest = getPatientEncounterId(patientUuid, abortController).then(
+        ({ data }) => setEncounterUuid(data.results[0].uuid),
+        createErrorHandler,
+      );
 
-    Promise.all([durationUnitsRequest, patientEncounterRequest]).finally(() => setIsLoading(false));
-    return () => abortController.abort();
-  }, [patientUuid]);
+      Promise.all([durationUnitsRequest, patientEncounterRequest]).finally(() => setIsLoading(false));
+      return () => abortController.abort();
+    }, [patientUuid]);
 
-  const handleSearchResultClicked = (searchResult: OrderBasketItem, directlyAddToBasket: boolean) => {
-    if (directlyAddToBasket) {
-      setItems([...items, searchResult]);
-    } else {
-      openMedicationOrderFormForAddingNewOrder(searchResult);
-    }
-  };
-
-  const openMedicationOrderForm = (item: OrderBasketItem, onSigned: (finalizedOrder: OrderBasketItem) => void) => {
-    setMedicationOrderFormItem(item);
-    setOnMedicationOrderFormSign((_) => (finalizedOrder) => {
-      setIsMedicationOrderFormVisible(false);
-      setMedicationOrderFormItem(null);
-      onSigned(finalizedOrder);
-    });
-    setIsMedicationOrderFormVisible(true);
-  };
-
-  const handleSaveClicked = () => {
-    const abortController = new AbortController();
-    orderDrugs(items, patientUuid, abortController).then((erroredItems) => {
-      setItems(erroredItems);
-      fetchActivePatientOrders();
-
-      if (erroredItems.length == 0) {
-        closeWorkspace();
+    const handleSearchResultClicked = (searchResult: OrderBasketItem, directlyAddToBasket: boolean) => {
+      if (directlyAddToBasket) {
+        setItems([...items, searchResult]);
+      } else {
+        openMedicationOrderFormForAddingNewOrder(searchResult);
       }
-    });
-    return () => abortController.abort();
-  };
+    };
 
-  const handleCancelClicked = () => {
-    setItems([]);
-    closeWorkspace();
-  };
+    const openMedicationOrderForm = (item: OrderBasketItem, onSigned: (finalizedOrder: OrderBasketItem) => void) => {
+      setMedicationOrderFormItem(item);
+      setOnMedicationOrderFormSign((_) => (finalizedOrder) => {
+        setIsMedicationOrderFormVisible(false);
+        setMedicationOrderFormItem(null);
+        onSigned(finalizedOrder);
+      });
+      setIsMedicationOrderFormVisible(true);
+    };
 
-  const openMedicationOrderFormForAddingNewOrder = (newOrderBasketItem: OrderBasketItem) => {
-    openMedicationOrderForm(newOrderBasketItem, (finalizedOrder) => setItems([...items, finalizedOrder]));
-  };
+    const handleSaveClicked = () => {
+      const abortController = new AbortController();
+      orderDrugs(items, patientUuid, abortController).then((erroredItems) => {
+        setItems(erroredItems);
+        fetchActivePatientOrders();
 
-  const openMedicationOrderFormForUpdatingExistingOrder = (existingOrderIndex: number) => {
-    const order = items[existingOrderIndex];
-    openMedicationOrderForm(order, (finalizedOrder) =>
-      setItems(() => {
-        const newOrders = [...items];
-        newOrders[existingOrderIndex] = finalizedOrder;
-        return newOrders;
-      }),
-    );
-  };
+        if (erroredItems.length == 0) {
+          closeWorkspace();
+        }
+      });
+      return () => abortController.abort();
+    };
 
-  return (
-    <>
-      <Loading active={isLoading} withOverlay={true} />
-      {isMedicationOrderFormVisible ? (
-        <MedicationOrderForm
-          durationUnits={durationUnits}
-          initialOrderBasketItem={medicationOrderFormItem}
-          onSign={onMedicationOrderFormSigned}
-          onCancel={() => setIsMedicationOrderFormVisible(false)}
-        />
-      ) : (
-        <>
-          <OrderBasketSearch encounterUuid={encounterUuid} onSearchResultClicked={handleSearchResultClicked} />
+    const handleCancelClicked = () => {
+      setItems([]);
+      closeWorkspace();
+    };
 
-          <div className={styles.orderBasketContainer}>
-            <OrderBasketItemList
-              orderBasketItems={items}
-              onItemClicked={(order) => openMedicationOrderFormForUpdatingExistingOrder(items.indexOf(order))}
-              onItemRemoveClicked={(order) => {
-                const newOrders = [...items];
-                newOrders.splice(items.indexOf(order), 1);
-                setItems(newOrders);
-              }}
+    const openMedicationOrderFormForAddingNewOrder = (newOrderBasketItem: OrderBasketItem) => {
+      openMedicationOrderForm(newOrderBasketItem, (finalizedOrder) => setItems([...items, finalizedOrder]));
+    };
+
+    const openMedicationOrderFormForUpdatingExistingOrder = (existingOrderIndex: number) => {
+      const order = items[existingOrderIndex];
+      openMedicationOrderForm(order, (finalizedOrder) =>
+        setItems(() => {
+          const newOrders = [...items];
+          newOrders[existingOrderIndex] = finalizedOrder;
+          return newOrders;
+        }),
+      );
+    };
+
+    return (
+      <>
+        <Loading active={isLoading} withOverlay={true} />
+        {isMedicationOrderFormVisible ? (
+          <MedicationOrderForm
+            durationUnits={durationUnits}
+            initialOrderBasketItem={medicationOrderFormItem}
+            onSign={onMedicationOrderFormSigned}
+            onCancel={() => setIsMedicationOrderFormVisible(false)}
+            isTablet={isTablet}
+          />
+        ) : (
+          <>
+            <OrderBasketSearch
+              encounterUuid={encounterUuid}
+              onSearchResultClicked={handleSearchResultClicked}
+              isTablet={isTablet}
             />
 
-            {activePatientOrders ? (
-              <MedicationsDetailsTable
-                title={t('activeMedications', 'Active Medications')}
-                medications={activePatientOrders}
-                showDiscontinueButton={true}
-                showModifyButton={true}
-                showReorderButton={false}
-                showAddNewButton={false}
+            <div className={styles.orderBasketContainer}>
+              <OrderBasketItemList
+                orderBasketItems={items}
+                onItemClicked={(order) => openMedicationOrderFormForUpdatingExistingOrder(items.indexOf(order))}
+                onItemRemoveClicked={(order) => {
+                  const newOrders = [...items];
+                  newOrders.splice(items.indexOf(order), 1);
+                  setItems(newOrders);
+                }}
               />
-            ) : (
-              <DataTableSkeleton />
-            )}
 
-            <ButtonSet style={{ marginTop: '2rem' }}>
-              <Button kind="secondary" onClick={handleCancelClicked}>
-                {t('cancel', 'Cancel')}
-              </Button>
-              <Button kind="primary" onClick={handleSaveClicked}>
-                {t('save', 'Save')}
-              </Button>
-            </ButtonSet>
-          </div>
-        </>
-      )}
-    </>
-  );
-});
+              {activePatientOrders ? (
+                <MedicationsDetailsTable
+                  title={t('activeMedications', 'Active Medications')}
+                  medications={activePatientOrders}
+                  showDiscontinueButton={true}
+                  showModifyButton={true}
+                  showReorderButton={false}
+                  showAddNewButton={false}
+                />
+              ) : (
+                <DataTableSkeleton />
+              )}
+
+              <ButtonSet style={{ marginTop: '2rem' }}>
+                <Button kind="secondary" onClick={handleCancelClicked}>
+                  {t('cancel', 'Cancel')}
+                </Button>
+                <Button kind="primary" onClick={handleSaveClicked}>
+                  {t('save', 'Save')}
+                </Button>
+              </ButtonSet>
+            </div>
+          </>
+        )}
+      </>
+    );
+  },
+);
 
 export default OrderBasket;

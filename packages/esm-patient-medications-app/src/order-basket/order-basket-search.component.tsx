@@ -8,9 +8,10 @@ import { OrderBasketItem } from '../types/order-basket-item';
 export interface OrderBasketSearchProps {
   encounterUuid: string;
   onSearchResultClicked: (searchResult: OrderBasketItem, directlyAddToBasket: boolean) => void;
+  isTablet: boolean;
 }
 
-export default function OrderBasketSearch({ encounterUuid, onSearchResultClicked }: OrderBasketSearchProps) {
+export default function OrderBasketSearch({ encounterUuid, onSearchResultClicked, isTablet }: OrderBasketSearchProps) {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -18,6 +19,8 @@ export default function OrderBasketSearch({ encounterUuid, onSearchResultClicked
     <>
       <div className={styles.searchPopupContainer}>
         <Search
+          size="xl"
+          light={isTablet}
           value={searchTerm}
           placeholder={t('searchFieldPlaceholder', 'Search for an order (e.g. "Aspirin")')}
           labelText={t('searchFieldPlaceholder', 'Search for an order (e.g. "Aspirin")')}
