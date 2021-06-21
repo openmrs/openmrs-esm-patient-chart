@@ -19,7 +19,7 @@ interface VitalsBiometricInputProps {
   placeholder?: string;
   disabled?: boolean;
   inputIsNormal: boolean;
-  lightMode?: boolean;
+  isTablet: boolean;
 }
 
 const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
@@ -32,7 +32,7 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
   placeholder,
   disabled,
   inputIsNormal,
-  lightMode,
+  isTablet,
 }) => {
   return (
     <div className={styles.inputContainer} style={{ width: textFieldWidth }}>
@@ -55,7 +55,7 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
                   labelText={''}
                   value={val.value}
                   title={val.name}
-                  light={lightMode}
+                  light={isTablet}
                 />
                 {val?.separator}
               </Fragment>
@@ -72,7 +72,7 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
                 placeholder={placeholder}
                 value={val.value}
                 title={val.name}
-                light={lightMode}
+                light={isTablet}
               />
             );
           })}

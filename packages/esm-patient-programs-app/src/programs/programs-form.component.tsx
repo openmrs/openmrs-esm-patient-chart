@@ -1,10 +1,10 @@
-import React, { SyntheticEvent, useEffect, useState } from 'react';
+import React, { SyntheticEvent } from 'react';
 import dayjs from 'dayjs';
 import filter from 'lodash-es/filter';
 import includes from 'lodash-es/includes';
 import map from 'lodash-es/map';
 import { useTranslation } from 'react-i18next';
-import { createErrorHandler, showNotification, showToast, useLayoutType, useSessionUser } from '@openmrs/esm-framework';
+import { createErrorHandler, showNotification, showToast, useSessionUser } from '@openmrs/esm-framework';
 import Button from 'carbon-components-react/es/components/Button';
 import DatePicker from 'carbon-components-react/es/components/DatePicker';
 import DatePickerInput from 'carbon-components-react/es/components/DatePickerInput';
@@ -26,6 +26,7 @@ import styles from './programs-form.scss';
 interface ProgramsFormProps {
   closeWorkspace(): void;
   patientUuid: string;
+  isTablet: boolean;
 }
 
 enum StateTypes {
@@ -51,10 +52,9 @@ interface SubmittingState {
 
 type ViewState = IdleState | ResolvedState | SubmittingState;
 
-const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, closeWorkspace }) => {
+const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, closeWorkspace, isTablet }) => {
   const { t } = useTranslation();
   const session = useSessionUser();
-  const layout = useLayoutType();
   const [availableLocations, setAvailableLocations] = React.useState(null);
   const [completionDate, setCompletionDate] = React.useState(null);
   const [enrollmentDate, setEnrollmentDate] = React.useState(new Date());
@@ -62,11 +62,6 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, closeWorkspace
   const [viewState, setViewState] = React.useState<ViewState>({
     type: StateTypes.IDLE,
   });
-  const [lightMode, setLightMode] = useState<boolean>();
-
-  useEffect(() => {
-    layout === 'desktop' ? setLightMode(false) : setLightMode(true);
-  }, [layout]);
 
   if (!userLocation && session?.sessionLocation?.uuid) {
     setUserLocation(session?.sessionLocation?.uuid);
@@ -170,7 +165,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, closeWorkspace
             id="program"
             invalidText={t('required', 'Required')}
             labelText=""
-            light={lightMode}
+            light={isTablet}
             onChange={(event) => {
               setViewState({
                 availablePrograms: (viewState as ResolvedState)?.availablePrograms,
@@ -202,7 +197,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, closeWorkspace
           id="enrollmentDate"
           datePickerType="single"
           dateFormat="d/m/Y"
-          light={lightMode}
+          light={isTablet}
           maxDate={new Date().toISOString()}
           placeholder="dd/mm/yyyy"
           onChange={([date]) => setEnrollmentDate(date)}
@@ -215,7 +210,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, closeWorkspace
           id="completionDate"
           datePickerType="single"
           dateFormat="d/m/Y"
-          light={lightMode}
+          light={isTablet}
           minDate={new Date(enrollmentDate).toISOString()}
           maxDate={new Date().toISOString()}
           placeholder="dd/mm/yyyy"
@@ -229,7 +224,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, closeWorkspace
           id="location"
           invalidText="Required"
           labelText=""
-          light={lightMode}
+          light={isTablet}
           onChange={(event) => setUserLocation(event.target.value)}
           value={userLocation}>
           {!userLocation ? <SelectItem text={t('chooseLocation', 'Choose a location')} value="" /> : null}

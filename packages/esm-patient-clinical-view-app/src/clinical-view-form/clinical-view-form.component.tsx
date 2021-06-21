@@ -11,13 +11,15 @@ import isEmpty from 'lodash-es/isEmpty';
 import cloneDeep from 'lodash-es/cloneDeep';
 import set from 'lodash-es/set';
 
-interface ClinicalViewFormProps {}
+interface ClinicalViewFormProps {
+  isTablet: boolean;
+}
 interface View {
   slotName: string;
   slot: string;
 }
 
-const ClinicalViewForm: React.FC<ClinicalViewFormProps> = () => {
+const ClinicalViewForm: React.FC<ClinicalViewFormProps> = ({ isTablet }) => {
   const { t } = useTranslation();
   const { clinicalViews } = useConfig();
   const moduleName = '@openmrs/esm-patient-clinical-view-app';
@@ -89,8 +91,10 @@ const ClinicalViewForm: React.FC<ClinicalViewFormProps> = () => {
         id="search"
         onChange={(event) => handleSearch(event.target.value)}
         labelText=""
+        light={isTablet}
+        size="xl"
       />
-      <div className={styles.checkboxContainer}>
+      <section className={styles.checkboxContainer}>
         {searchResults.map((view) => (
           <Checkbox
             key={view.slot}
@@ -101,7 +105,7 @@ const ClinicalViewForm: React.FC<ClinicalViewFormProps> = () => {
             onChange={(checked) => handleChange(view.slotName, view.slot, checked)}
           />
         ))}
-      </div>
+      </section>
       <div className={styles.buttonContainer}>
         <Button kind="secondary" onClick={closeClinicalViewForm}>
           {t('cancel', 'Cancel')}

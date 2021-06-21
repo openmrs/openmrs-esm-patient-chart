@@ -19,7 +19,11 @@ const ContextWorkspace: React.FC<RouteComponentProps<ContextWorkspaceParams>> = 
   const { patientUuid } = match.params;
   const { active, title, closeWorkspace } = useWorkspace();
   const { t } = useTranslation();
-  const props = React.useMemo(() => ({ closeWorkspace, patientUuid }), [closeWorkspace, patientUuid]);
+  const isTablet = layout === 'tablet';
+  const props = React.useMemo(
+    () => ({ closeWorkspace, patientUuid, isTablet }),
+    [closeWorkspace, isTablet, patientUuid],
+  );
 
   useBodyScrollLock(active && !isDesktop(layout));
 

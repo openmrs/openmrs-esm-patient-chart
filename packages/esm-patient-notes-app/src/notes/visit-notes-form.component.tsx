@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import dayjs from 'dayjs';
 import debounce from 'lodash-es/debounce';
 import styles from './visit-notes-form.scss';
@@ -14,14 +14,7 @@ import TextArea from 'carbon-components-react/es/components/TextArea';
 import { Tile } from 'carbon-components-react/es/components/Tile';
 import { useTranslation } from 'react-i18next';
 import { Column, Grid, Row } from 'carbon-components-react/es/components/Grid';
-import {
-  createErrorHandler,
-  showNotification,
-  showToast,
-  useConfig,
-  useLayoutType,
-  useSessionUser,
-} from '@openmrs/esm-framework';
+import { createErrorHandler, showNotification, showToast, useConfig, useSessionUser } from '@openmrs/esm-framework';
 import { convertToObsPayLoad, Diagnosis, VisitNotePayload } from './visit-note.util';
 import { fetchDiagnosisByName, fetchLocationByUuid, fetchProviderByUuid, saveVisitNote } from './visit-notes.resource';
 import { ConfigObject } from '../config-schema';
@@ -37,6 +30,7 @@ enum StateTypes {
 interface VisitNotesFormProps {
   closeWorkspace(): void;
   patientUuid: string;
+  isTablet: boolean;
 }
 
 interface IdleState {
@@ -61,11 +55,10 @@ interface SubmitState {
 
 type ViewState = IdleState | SearchState | DiagnosesState | SubmitState;
 
-const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, closeWorkspace }) => {
+const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, closeWorkspace, isTablet }) => {
   const { t } = useTranslation();
   const session = useSessionUser();
   const config = useConfig() as ConfigObject;
-  const layout = useLayoutType();
   const { clinicianEncounterRole, encounterNoteConceptUuid, encounterTypeUuid, formConceptUuid } =
     config.visitNoteConfig;
   const [clinicalNote, setClinicalNote] = React.useState('');
@@ -78,7 +71,6 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, closeWorks
   const [viewState, setViewState] = React.useState<ViewState>({
     type: StateTypes.IDLE,
   });
-  const [lightMode, setLightMode] = useState<boolean>();
 
   React.useEffect(() => {
     if (session && !currentSessionLocationUuid && !currentSessionProviderUuid) {
@@ -98,10 +90,6 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, closeWorks
       fetchLocationByUuid(ac, currentSessionLocationUuid).then(({ data }) => setLocationUuid(data.uuid));
     }
   }, [currentSessionLocationUuid, currentSessionProviderUuid]);
-
-  useEffect(() => {
-    layout === 'desktop' ? setLightMode(false) : setLightMode(true);
-  }, [layout]);
 
   const debouncedSearch = React.useMemo(
     () =>
@@ -225,7 +213,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, closeWorks
             <DatePicker
               dateFormat="d/m/Y"
               datePickerType="single"
-              light={lightMode}
+              light={isTablet}
               maxDate={new Date().toISOString()}
               value={visitDateTime}
               onChange={([date]) => setVisitDateTime(date)}>
@@ -262,7 +250,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, closeWorks
             </div>
             <FormGroup legendText={t('searchForDiagnosis', 'Search for a diagnosis')}>
               <Search
-                light={lightMode}
+                light={isTablet}
                 size="xl"
                 id="diagnosisSearch"
                 labelText={t('enterDiagnoses', 'Enter diagnoses')}
@@ -309,7 +297,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, closeWorks
                     );
                   if (viewState.isSearching) return <SearchSkeleton />;
                   return (
-                    <Tile light={lightMode} className={styles.emptyResults}>
+                    <Tile light={isTablet} className={styles.emptyResults}>
                       <span>
                         {t('noMatchingDiagnoses', 'No diagnoses found matching')} <strong>"{searchTerm}"</strong>
                       </span>
@@ -327,7 +315,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, closeWorks
           <Column sm={3}>
             <TextArea
               id="additionalNote"
-              light={lightMode}
+              light={isTablet}
               labelText={t('clinicalNoteLabel', 'Write an additional note')}
               placeholder={t('clinicalNotePlaceholder', 'Write any additional points here')}
               onChange={(event) => setClinicalNote(event.currentTarget.value)}
