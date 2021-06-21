@@ -18,6 +18,7 @@ import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { Condition, performPatientConditionsSearch } from './conditions.resource';
 import { attach } from '@openmrs/esm-framework';
+const conditionsToShowCount = 5;
 
 interface ConditionsOverviewProps {
   basePath: string;
@@ -25,7 +26,6 @@ interface ConditionsOverviewProps {
 }
 
 const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient }) => {
-  const conditionsToShowCount = 5;
   const { t } = useTranslation();
   const [conditions, setConditions] = React.useState<Array<Condition>>(null);
   const [error, setError] = React.useState(null);
@@ -40,9 +40,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient }) => {
 
   React.useEffect(() => {
     if (patient) {
-      const sub = performPatientConditionsSearch(patient.identifier[0].value).subscribe((conditions) => {
-        setConditions(conditions);
-      }, setError);
+      const sub = performPatientConditionsSearch(patient.identifier[0].value).subscribe(setConditions, setError);
 
       return () => sub.unsubscribe();
     }
@@ -143,7 +141,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient }) => {
       ) : error ? (
         <ErrorState error={error} headerTitle={headerTitle} />
       ) : (
-        <DataTableSkeleton rowCount={conditionsToShowCount} />
+        <DataTableSkeleton role="progressbar" rowCount={conditionsToShowCount} />
       )}
     </>
   );
