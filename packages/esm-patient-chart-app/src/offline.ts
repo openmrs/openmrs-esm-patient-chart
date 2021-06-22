@@ -1,59 +1,76 @@
 import { NewVisitPayload, Visit } from '@openmrs/esm-api';
 import {
   getStartedVisit,
+  getSynchronizationItems,
+  messageOmrsServiceWorker,
+  queueSynchronizationItem,
   saveVisit,
+  setupOfflineSync,
   subscribeConnectivityChanged,
   VisitMode,
   VisitStatus,
+  generateOfflineUuid,
 } from '@openmrs/esm-framework';
-import { Dexie, Table } from 'dexie';
 import { useEffect } from 'react';
-import { v4 } from 'uuid';
 
-export async function syncOfflineVisits() {
-  const db = new PatientChartDb();
-  const visits = await db.offlineVisits.toArray();
-  await Promise.all(visits.map(async (visit) => saveVisit(visit.visit, new AbortController())));
+interface OfflineVisit extends NewVisitPayload {
+  uuid: string;
 }
 
-export function useOfflineVisitForPatient(patientUuid?: string, location?: string, visitType?: string) {
+const visitSyncType = 'visit';
+
+export function setupOfflineVisitsSync() {
+  setupOfflineSync<OfflineVisit>(visitSyncType, [], async (item, options) => {
+    const { uuid, ...visit } = item;
+    await saveVisit(visit, options.abort);
+  });
+}
+
+export function setupCacheableRoutes() {
+  messageOmrsServiceWorker({
+    type: 'registerDynamicRoute',
+    pattern: '.+/openmrs/ws/fhir2/R4/Patient/.+',
+  });
+
+  messageOmrsServiceWorker({
+    type: 'registerDynamicRoute',
+    pattern: '.+/ws/rest/v1/visit.+',
+  });
+}
+
+export function useOfflineVisitForPatient(patientUuid?: string, location?: string) {
   useEffect(() => {
     return subscribeConnectivityChanged(async ({ online }) => {
-      if (!online && patientUuid && location && visitType) {
+      if (!online && patientUuid && location) {
         const offlineVisit =
-          (await getOfflineVisitForPatient(patientUuid)) ??
-          (await createOfflineVisitForPatient(patientUuid, location, visitType));
+          (await getOfflineVisitForPatient(patientUuid)) ?? (await createOfflineVisitForPatient(patientUuid, location));
 
         getStartedVisit.next({
           mode: VisitMode.NEWVISIT,
           status: VisitStatus.ONGOING,
-          visitData: offlineVisitToVisit(offlineVisit.visit),
+          visitData: offlineVisitToVisit(offlineVisit),
         });
       }
     });
-  }, [patientUuid, location, visitType]);
+  }, [patientUuid, location]);
 }
 
 async function getOfflineVisitForPatient(patientUuid: string) {
-  const db = new PatientChartDb();
-  return await db.offlineVisits.get({ 'visit.patient': patientUuid });
+  const offlineVisits = await getSynchronizationItems<OfflineVisit>(visitSyncType);
+  return offlineVisits.find((visit) => visit.patient === patientUuid);
 }
 
-async function createOfflineVisitForPatient(patientUuid: string, location: string, visitType: string) {
-  const db = new PatientChartDb();
-  await db.offlineVisits.add({
-    visit: {
-      uuid: 'OFFLINE+' + v4(),
-      patient: patientUuid,
-      startDatetime: new Date(),
-      location,
-      // @ts-ignore
-      visitType: undefined,
-      // visitType,
-    },
-  });
+async function createOfflineVisitForPatient(patientUuid: string, location: string) {
+  const offlineVisit: OfflineVisit = {
+    uuid: generateOfflineUuid(),
+    patient: patientUuid,
+    startDatetime: new Date(),
+    location,
+    visitType: undefined,
+  };
 
-  return await getOfflineVisitForPatient(patientUuid);
+  await queueSynchronizationItem(visitSyncType, offlineVisit);
+  return offlineVisit;
 }
 
 function offlineVisitToVisit(offlineVisit: OfflineVisit): Visit {
@@ -70,27 +87,4 @@ function offlineVisitToVisit(offlineVisit: OfflineVisit): Visit {
       uuid: offlineVisit.patient,
     },
   };
-}
-
-export class PatientChartDb extends Dexie {
-  offlineVisits: Table<QueuedOfflineVisit, number>;
-
-  constructor() {
-    super('EsmPatientChart');
-
-    this.version(1).stores({
-      offlineVisits: '++id,&visit.patient',
-    });
-
-    this.offlineVisits = this.table('offlineVisits');
-  }
-}
-
-export interface QueuedOfflineVisit {
-  id?: number;
-  visit: OfflineVisit;
-}
-
-export interface OfflineVisit extends NewVisitPayload {
-  uuid: string;
 }

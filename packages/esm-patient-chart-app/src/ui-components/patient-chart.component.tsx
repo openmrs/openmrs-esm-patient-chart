@@ -30,7 +30,7 @@ const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({ match
   `;
 
   useVisitDialog(patientUuid);
-  useOfflineVisitForPatient(patientUuid, sessionUser?.sessionLocation, '1234');
+  useOfflineVisitForPatient(patientUuid, sessionUser?.sessionLocation.uuid);
 
   return (
     <main className={mainClassName}>

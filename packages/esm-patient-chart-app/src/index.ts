@@ -10,6 +10,7 @@ import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { esmPatientChartSchema } from './config-schemas/openmrs-esm-patient-chart-schema';
 import { moduleName, spaBasePath } from './constants';
 import { backendDependencies } from './openmrs-backend-dependencies';
+import { setupCacheableRoutes, setupOfflineVisitsSync } from './offline';
 
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -21,15 +22,8 @@ const dashboardMeta = {
 };
 
 function setupOpenMRS() {
-  messageOmrsServiceWorker({
-    type: 'registerDynamicRoute',
-    pattern: '.+/openmrs/ws/fhir2/R4/Patient/.+',
-  });
-
-  messageOmrsServiceWorker({
-    type: 'registerDynamicRoute',
-    pattern: '.+/ws/rest/v1/visit.+',
-  });
+  setupOfflineVisitsSync();
+  setupCacheableRoutes();
 
   defineConfigSchema(moduleName, esmPatientChartSchema);
 
