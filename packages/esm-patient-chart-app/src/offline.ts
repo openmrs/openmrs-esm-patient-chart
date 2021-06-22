@@ -6,10 +6,10 @@ import {
   queueSynchronizationItem,
   saveVisit,
   setupOfflineSync,
-  subscribeConnectivityChanged,
   VisitMode,
   VisitStatus,
   generateOfflineUuid,
+  subscribeConnectivity,
 } from '@openmrs/esm-framework';
 import { useEffect } from 'react';
 
@@ -18,13 +18,6 @@ interface OfflineVisit extends NewVisitPayload {
 }
 
 const visitSyncType = 'visit';
-
-export function setupOfflineVisitsSync() {
-  setupOfflineSync<OfflineVisit>(visitSyncType, [], async (item, options) => {
-    const { uuid, ...visit } = item;
-    await saveVisit(visit, options.abort);
-  });
-}
 
 export function setupCacheableRoutes() {
   messageOmrsServiceWorker({
@@ -38,9 +31,21 @@ export function setupCacheableRoutes() {
   });
 }
 
+export function setupOfflineVisitsSync() {
+  setupOfflineSync<OfflineVisit>(visitSyncType, [], async (item, options) => {
+    const { uuid, ...visitData } = item;
+    const visitPayload = {
+      ...visitData,
+      stopDatetime: new Date(),
+    };
+
+    await saveVisit(visitPayload, options.abort);
+  });
+}
+
 export function useOfflineVisitForPatient(patientUuid?: string, location?: string) {
   useEffect(() => {
-    return subscribeConnectivityChanged(async ({ online }) => {
+    return subscribeConnectivity(async ({ online }) => {
       if (!online && patientUuid && location) {
         const offlineVisit =
           (await getOfflineVisitForPatient(patientUuid)) ?? (await createOfflineVisitForPatient(patientUuid, location));
