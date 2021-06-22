@@ -6,9 +6,10 @@ import ChartReview from '../view-components/chart-review.component';
 import VisitDialog from '../visit/visit-dialog.component';
 import { useVisitDialog } from '../hooks/useVisitDialog';
 import { RouteComponentProps } from 'react-router-dom';
-import { ExtensionSlot, useCurrentPatient } from '@openmrs/esm-framework';
+import { ExtensionSlot, useCurrentPatient, useSessionUser } from '@openmrs/esm-framework';
 import ActionMenu from './action-menu.component';
 import { useWorkspace } from '../hooks/useWorkspace';
+import { useOfflineVisitForPatient } from '../offline';
 
 interface PatientChartParams {
   patientUuid: string;
@@ -19,15 +20,17 @@ interface PatientChartParams {
 const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({ match }) => {
   const { patientUuid, view, subview } = match.params;
   const [loading, patient] = useCurrentPatient(patientUuid);
+  const sessionUser = useSessionUser();
   const state = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);
   const { active } = useWorkspace();
 
   const mainClassName = `
-    omrs-main-content 
+    omrs-main-content
     ${styles.chartContainer}
   `;
 
   useVisitDialog(patientUuid);
+  useOfflineVisitForPatient(patientUuid, sessionUser?.sessionLocation, '1234');
 
   return (
     <main className={mainClassName}>
