@@ -1,11 +1,6 @@
 {
   "name": "@openmrs/esm-patient-chart",
   "private": true,
-  "husky": {
-    "hooks": {
-      "pre-commit": "pretty-quick --staged && lerna run lint && lerna run test && lerna run typescript && yarn run extract-translations"
-    }
-  },
   "workspaces": [
     "packages/*"
   ],
@@ -51,7 +46,7 @@
     "eslint-config-prettier": "^8.2.0",
     "eslint-config-ts-react-important-stuff": "^3.0.0",
     "eslint-plugin-prettier": "^3.3.1",
-    "husky": "^3.1.0",
+    "husky": "^6.0.0",
     "i18next": "^19.7.0",
     "i18next-parser": "^3.11.0",
     "identity-obj-proxy": "^3.0.0",
