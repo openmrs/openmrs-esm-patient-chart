@@ -980,18 +980,18 @@
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
 "@carbon/charts-react@^0.41.14":
-  version "0.41.71"
-  resolved "https://registry.yarnpkg.com/@carbon/charts-react/-/charts-react-0.41.71.tgz#26861b1360b3480698b99001753bdcd8ebd15c4a"
-  integrity sha512-D4cYtCRULfd25xdv9jvxImL4Kn3FbmgeN1d+kdBwWJPwEOoNKhAz3Y35oTncglEKcwnV/dqMPMSq0ZTnoC1Usg==
+  version "0.41.72"
+  resolved "https://registry.yarnpkg.com/@carbon/charts-react/-/charts-react-0.41.72.tgz#19515e58c0e2e6b251b1a643180f14b334c84b59"
+  integrity sha512-gncA8FbXtDZ3bu2Pp+I3KrxJlApH9Sa1XB1WvqiYqaro4quszGBBxy7Hay5LsID2p9WCC3kESmlrI7/VpeBlPw==
   dependencies:
-    "@carbon/charts" "^0.41.71"
+    "@carbon/charts" "^0.41.72"
     "@carbon/icons-react" "^10.32.0"
     "@carbon/telemetry" "0.0.0-alpha.6"
 
-"@carbon/charts@^0.41.57", "@carbon/charts@^0.41.71":
-  version "0.41.71"
-  resolved "https://registry.yarnpkg.com/@carbon/charts/-/charts-0.41.71.tgz#70a0daadd445c3e14531d355c4c378dc2d0ae644"
-  integrity sha512-X41gD8gRQNxEyjLznb2R1HJyRel8BYCc3BDNx6JnrWZF0lpS2gm/IqeLcS06YWiXJQd5jDwPoOgTQsWOje4+VQ==
+"@carbon/charts@^0.41.57", "@carbon/charts@^0.41.72":
+  version "0.41.72"
+  resolved "https://registry.yarnpkg.com/@carbon/charts/-/charts-0.41.72.tgz#3f3d8dbebe88efbf59bb18cbf80694f2523cdf88"
+  integrity sha512-juCp3D6fyt3Ti1ZDAfXkiLl3LSoQYxK13G+oGaUnHdd3QpolwvQH8RqdAqLfj966rDd8vIVzP3YuTausWWZVrw==
   dependencies:
     "@carbon/colors" "10.15.0"
     "@carbon/telemetry" "0.0.0-alpha.6"
@@ -2423,10 +2423,10 @@
     is-plain-object "^5.0.0"
     universal-user-agent "^6.0.0"
 
-"@octokit/openapi-types@^7.3.2":
-  version "7.3.2"
-  resolved "https://registry.yarnpkg.com/@octokit/openapi-types/-/openapi-types-7.3.2.tgz#065ce49b338043ec7f741316ce06afd4d459d944"
-  integrity sha512-oJhK/yhl9Gt430OrZOzAl2wJqR0No9445vmZ9Ey8GjUZUpwuu/vmEFP0TDhDXdpGDoxD6/EIFHJEcY8nHXpDTA==
+"@octokit/openapi-types@^7.3.3":
+  version "7.3.3"
+  resolved "https://registry.yarnpkg.com/@octokit/openapi-types/-/openapi-types-7.3.3.tgz#a7ab7bd16cea040b836521a5afaf08fa36085e5f"
+  integrity sha512-/tpvcWCjYUHtvdc/t/bX6pxaOoeYPhfPCyvUaSWP29YkRcdZmlhRaMsXudZhvXm8GBPBxmCOsf1Ye/FpkszOHw==
 
 "@octokit/plugin-enterprise-rest@^6.0.1":
   version "6.0.1"
@@ -2513,26 +2513,26 @@
     "@types/node" ">= 8"
 
 "@octokit/types@^6.0.3", "@octokit/types@^6.16.1":
-  version "6.16.4"
-  resolved "https://registry.yarnpkg.com/@octokit/types/-/types-6.16.4.tgz#d24f5e1bacd2fe96d61854b5bda0e88cf8288dfe"
-  integrity sha512-UxhWCdSzloULfUyamfOg4dJxV9B+XjgrIZscI0VCbp4eNrjmorGEw+4qdwcpTsu6DIrm9tQsFQS2pK5QkqQ04A==
+  version "6.16.5"
+  resolved "https://registry.yarnpkg.com/@octokit/types/-/types-6.16.5.tgz#75f03ed0b48565fc7afb0e5ebd658e802ed0b7c1"
+  integrity sha512-2v30UzgezzVZNCZlEryr8ujqaFW0EEH0fyuNxz5QdE3rlkCG2SXz8RTCT1V4q7inEI2kd2xTcROlq9OkEvY0TQ==
   dependencies:
-    "@octokit/openapi-types" "^7.3.2"
+    "@octokit/openapi-types" "^7.3.3"
 
-"@openmrs/esm-api@^3.1.10-pre.375":
-  version "3.1.10-pre.375"
-  resolved "https://registry.yarnpkg.com/@openmrs/esm-api/-/esm-api-3.1.10-pre.375.tgz#c6373afeef5b831566473a808ae23f83d1e6054b"
-  integrity sha512-urELNnSPWaZIuaplAaTX3+J0oD6siyY4fcgWbzHv9Iiw5TIYUv0UFcC6A2QDwSSIIYPnkOQdx7EqGWUCyoL/3g==
+"@openmrs/esm-api@^3.1.10-pre.378":
+  version "3.1.10-pre.378"
+  resolved "https://registry.yarnpkg.com/@openmrs/esm-api/-/esm-api-3.1.10-pre.378.tgz#e4a40ad8aea02bbff4752795ca8d6966bf14c72a"
+  integrity sha512-1yd15S4vzdRWLztu9mvrsxz0SICkXp3OABzj4JnI+qpMUUCfQ1MIS+DMpguoIATkREEhwqrdk3s7wnJHtPy6UA==
   dependencies:
     fhir.js "0.0.22"
     lodash-es "^4.17.21"
 
-"@openmrs/esm-app-shell@^3.1.10-pre.375":
-  version "3.1.10-pre.375"
-  resolved "https://registry.yarnpkg.com/@openmrs/esm-app-shell/-/esm-app-shell-3.1.10-pre.375.tgz#93e2f12fa897134dd0893b2977bcddfe2179b8a4"
-  integrity sha512-78azAFT5XoKlJVKjqleZ4olspzooCgUld0HvmmFlbJ57fAkxq5+gWlWkiRa2oej8aE3QqF28b48xW4wy7LMPpA==
+"@openmrs/esm-app-shell@^3.1.10-pre.378":
+  version "3.1.10-pre.378"
+  resolved "https://registry.yarnpkg.com/@openmrs/esm-app-shell/-/esm-app-shell-3.1.10-pre.378.tgz#827302791be394d7c5a3fa44bf94216f99471a19"
+  integrity sha512-p5Vixjxt6uUZDCrJhZt9oOecRGc1FUJDfXwpIVXr6yJlStRHJ34eiga9hvawNjMJtQ9ySPAkwq/t4ETjyj2BqQ==
   dependencies:
-    "@openmrs/esm-framework" "^3.1.10-pre.375"
+    "@openmrs/esm-framework" "^3.1.10-pre.378"
     carbon-components "10.31.0"
     carbon-icons "7.0.7"
     dayjs "^1.10.4"
@@ -2555,89 +2555,89 @@
     workbox-strategies "^6.1.5"
     workbox-window "^6.1.5"
 
-"@openmrs/esm-breadcrumbs@^3.1.10-pre.375":
-  version "3.1.10-pre.375"
-  resolved "https://registry.yarnpkg.com/@openmrs/esm-breadcrumbs/-/esm-breadcrumbs-3.1.10-pre.375.tgz#91dccda59aafbcf5819748b7f2f0dbcda80e602c"
-  integrity sha512-YJX+7LRNREUB2YDIKAcIiC2lwp2S957C4v99dkPCxO6Ln8MXicxOO5DmEKljX7x7omLBRihES5GMhRdoqfmC4A==
+"@openmrs/esm-breadcrumbs@^3.1.10-pre.378":
+  version "3.1.10-pre.378"
+  resolved "https://registry.yarnpkg.com/@openmrs/esm-breadcrumbs/-/esm-breadcrumbs-3.1.10-pre.378.tgz#5ca1c65309a826196c694a93b3ef0d778239a05b"
+  integrity sha512-T5O7PH/6qrLkuPvRKg8znEoCtBCQ+PHyESG5CFd4KVpjJkVQugIi+ETniSnQP6NV0TU2ZZxKNbFu1DyPdM0Dow==
   dependencies:
     path-to-regexp "6.1.0"
 
-"@openmrs/esm-config@^3.1.10-pre.375":
-  version "3.1.10-pre.375"
-  resolved "https://registry.yarnpkg.com/@openmrs/esm-config/-/esm-config-3.1.10-pre.375.tgz#3fff754400c7b0ae78bf536f606c10cd55f3ba79"
-  integrity sha512-75D/HzQop4T+YyfxqAELTG1jC4YetJ1vadBV3Q9LWmaySBd0FQiR85fOmRvqTdy2lY6aAqyduaVipE8iTOHo3w==
+"@openmrs/esm-config@^3.1.10-pre.378":
+  version "3.1.10-pre.378"
+  resolved "https://registry.yarnpkg.com/@openmrs/esm-config/-/esm-config-3.1.10-pre.378.tgz#35f289d816ec75122613e8ece3c798df1c20906c"
+  integrity sha512-k4MmaZpN34eL/34kX4v48w6VbRlWELURT9QF7eCuSb6EqhJ/kHA/v3Dhecp/pksSHpWgl7tj7jXJN7PMUF+1BA==
   dependencies:
     ramda "^0.26.1"
 
-"@openmrs/esm-error-handling@^3.1.10-pre.375":
-  version "3.1.10-pre.375"
-  resolved "https://registry.yarnpkg.com/@openmrs/esm-error-handling/-/esm-error-handling-3.1.10-pre.375.tgz#d270f09a3ce62d4383402749bb4160aecc262a7e"
-  integrity sha512-Vu1A6XVy9DT7YbVCLl3iyQ8RgJ0YDLoWLS3BQeonuidMerBgc/9F2hLjAs9YX4kinq7IgN/BO+CdwDKN2zIDiQ==
+"@openmrs/esm-error-handling@^3.1.10-pre.378":
+  version "3.1.10-pre.378"
+  resolved "https://registry.yarnpkg.com/@openmrs/esm-error-handling/-/esm-error-handling-3.1.10-pre.378.tgz#2b5d71577312a667da4d458409a2c9c25314a31f"
+  integrity sha512-ThlJIsM9aOOl/PbW4qiHrT8TmbtoziHjUiYmhdKq02cyMAhq8aOTmsX1066I54t9aT6yPMVVU9fLwSCMbYAhig==
 
-"@openmrs/esm-extensions@^3.1.10-pre.375":
-  version "3.1.10-pre.375"
-  resolved "https://registry.yarnpkg.com/@openmrs/esm-extensions/-/esm-extensions-3.1.10-pre.375.tgz#c278e14ec0bd8da7f6302ae25d236b337233be4c"
-  integrity sha512-IV2MGR+ZM7v9nC3obV6J1Zx1ZH//3QkuuTAkqnzw/SKR4lNinta0HUR71osyGlg0bvpFtU7GKAXG+7nghZ3hUA==
+"@openmrs/esm-extensions@^3.1.10-pre.378":
+  version "3.1.10-pre.378"
+  resolved "https://registry.yarnpkg.com/@openmrs/esm-extensions/-/esm-extensions-3.1.10-pre.378.tgz#3aec20ef8d281b13524e772373ad48e819f455ed"
+  integrity sha512-f2p7GwV90RCPI663mJQQ1vyczA9GR4WN4V18URyAjOoGaaY3+0s4emWvZcZToqJpad1BbURzTttKdx58KL8pUw==
 
-"@openmrs/esm-framework@^3.1.10-pre.375", "@openmrs/esm-framework@next":
-  version "3.1.10-pre.375"
-  resolved "https://registry.yarnpkg.com/@openmrs/esm-framework/-/esm-framework-3.1.10-pre.375.tgz#29381f9c313065988d838b2f742f9643e536d8be"
-  integrity sha512-QmcKSU+Nz39V3CXgGmTyb2KXDHFmBgEPiRiMrjal7uDRoBhXrJ/dWzsB2o9Sxzfi737xrgvYI9EckaDcoyX6MA==
+"@openmrs/esm-framework@^3.1.10-pre.378", "@openmrs/esm-framework@next":
+  version "3.1.10-pre.378"
+  resolved "https://registry.yarnpkg.com/@openmrs/esm-framework/-/esm-framework-3.1.10-pre.378.tgz#f77a6b72707b2aff88d40fc4ccdec7a5646b08f3"
+  integrity sha512-l1BZzO8yFEWdMXmYgGqXeEiMYa1YXD6jSQs96+tdA09K+K2EKpFOazd/nPW1ZCu8bvJZYz7OMkbx4BewI3Rocw==
   dependencies:
-    "@openmrs/esm-api" "^3.1.10-pre.375"
-    "@openmrs/esm-breadcrumbs" "^3.1.10-pre.375"
-    "@openmrs/esm-config" "^3.1.10-pre.375"
-    "@openmrs/esm-error-handling" "^3.1.10-pre.375"
-    "@openmrs/esm-extensions" "^3.1.10-pre.375"
-    "@openmrs/esm-globals" "^3.1.10-pre.375"
-    "@openmrs/esm-offline" "^3.1.10-pre.375"
-    "@openmrs/esm-react-utils" "^3.1.10-pre.375"
-    "@openmrs/esm-state" "^3.1.10-pre.375"
-    "@openmrs/esm-styleguide" "^3.1.10-pre.375"
-    "@openmrs/esm-utils" "^3.1.10-pre.375"
+    "@openmrs/esm-api" "^3.1.10-pre.378"
+    "@openmrs/esm-breadcrumbs" "^3.1.10-pre.378"
+    "@openmrs/esm-config" "^3.1.10-pre.378"
+    "@openmrs/esm-error-handling" "^3.1.10-pre.378"
+    "@openmrs/esm-extensions" "^3.1.10-pre.378"
+    "@openmrs/esm-globals" "^3.1.10-pre.378"
+    "@openmrs/esm-offline" "^3.1.10-pre.378"
+    "@openmrs/esm-react-utils" "^3.1.10-pre.378"
+    "@openmrs/esm-state" "^3.1.10-pre.378"
+    "@openmrs/esm-styleguide" "^3.1.10-pre.378"
+    "@openmrs/esm-utils" "^3.1.10-pre.378"
 
-"@openmrs/esm-globals@^3.1.10-pre.375":
-  version "3.1.10-pre.375"
-  resolved "https://registry.yarnpkg.com/@openmrs/esm-globals/-/esm-globals-3.1.10-pre.375.tgz#d7aefea4e58ff74416ed1dd0afcbc8c03e95aa35"
-  integrity sha512-OOJzG1SRpv8ibiGdrnljgdL8qzjF9MAxwZhsnyXo1UlAx5w0Sykfzc96h73LITY70QtVJTlfwuJb3jGbavH8/g==
+"@openmrs/esm-globals@^3.1.10-pre.378":
+  version "3.1.10-pre.378"
+  resolved "https://registry.yarnpkg.com/@openmrs/esm-globals/-/esm-globals-3.1.10-pre.378.tgz#3ca4df3ab70c99ec97eb91fbfbcde8bb619cde23"
+  integrity sha512-hxNLg94yD9LYiCRmTcoyaKutuFjhPHiWqIQw0B8GuKiVBy5Dm5Di3wCnOgQHMQDfgf+lIPx9JdoeunDHokOIJg==
 
-"@openmrs/esm-offline@^3.1.10-pre.375":
-  version "3.1.10-pre.375"
-  resolved "https://registry.yarnpkg.com/@openmrs/esm-offline/-/esm-offline-3.1.10-pre.375.tgz#d1ae3b38194b67d721128d67dc333e6a756f39b4"
-  integrity sha512-A+Il/gVgIpWZBvfAaN0PlUUoek+cFoD95iuDtSLpb80funVlqyx81FhxSCrSFe+UbyJefb+jSkb6jO08i7MefQ==
+"@openmrs/esm-offline@^3.1.10-pre.378":
+  version "3.1.10-pre.378"
+  resolved "https://registry.yarnpkg.com/@openmrs/esm-offline/-/esm-offline-3.1.10-pre.378.tgz#03e58ce586a3b712f342b73c9f6f1a16dcb22959"
+  integrity sha512-+Vz98Bz6/tfQ+JPXU88jlDc3HbK60FkI0sEydrvnDk3O8BWYVtxDKQK120rK4dLK56mJkyrU2b4aZpTK8wMUfA==
   dependencies:
     dexie "^3.0.3"
     lodash-es "4.17.21"
     workbox-window "^6.1.5"
 
-"@openmrs/esm-react-utils@^3.1.10-pre.375":
-  version "3.1.10-pre.375"
-  resolved "https://registry.yarnpkg.com/@openmrs/esm-react-utils/-/esm-react-utils-3.1.10-pre.375.tgz#32517d82e07adf4f494d69563c0a5db4e9404f3d"
-  integrity sha512-VqBsJbMJM8MpWjmMZR9MVqm8a9/rZwq8eQaNcl6A0OR3RH3mN7fNIXekv263pAM8zRzNYqEkb/bQLGW/LHCH3Q==
+"@openmrs/esm-react-utils@^3.1.10-pre.378":
+  version "3.1.10-pre.378"
+  resolved "https://registry.yarnpkg.com/@openmrs/esm-react-utils/-/esm-react-utils-3.1.10-pre.378.tgz#81e4b9079190ab4996905a55f51a836d7aedd11c"
+  integrity sha512-2x+yAuFXE9UjmC11no9xoks8QknXI5Sq2Cdrq8P36m2M44wIDf6fgS1GqAbW1jcGUKbG1LsYVqj2n/9xHOHOJw==
   dependencies:
     lodash-es "^4.17.21"
     single-spa-react "^4.1.1"
 
-"@openmrs/esm-state@^3.1.10-pre.375":
-  version "3.1.10-pre.375"
-  resolved "https://registry.yarnpkg.com/@openmrs/esm-state/-/esm-state-3.1.10-pre.375.tgz#7137467f84fdff26f908e6177aca8de0fd15e114"
-  integrity sha512-fzqXquv86iw7k6Zm2mu3SI2RsaAfULnUTgXccP6qasvDNwcwklWhgDIt3hKCWlRdFHi5RhGT2Rnv4TYXRGxiQQ==
+"@openmrs/esm-state@^3.1.10-pre.378":
+  version "3.1.10-pre.378"
+  resolved "https://registry.yarnpkg.com/@openmrs/esm-state/-/esm-state-3.1.10-pre.378.tgz#236fbd4dd2f30957c5b71a17ba7443dfabe846e3"
+  integrity sha512-dXI44VyQgjHev+SQYveNPC+qmnGHxugcBggc4IX1vEY6Nu1s6lkhvF9t5ZYMp3/9EIjwoG1EEXokJwJe7bau/g==
   dependencies:
     unistore "^3.5.2"
 
-"@openmrs/esm-styleguide@^3.1.10-pre.375":
-  version "3.1.10-pre.375"
-  resolved "https://registry.yarnpkg.com/@openmrs/esm-styleguide/-/esm-styleguide-3.1.10-pre.375.tgz#ef1a5f9e99f468156f9cef8a648e8cb47f318be7"
-  integrity sha512-sIrGaNHQzTuf92o2QzTbztF/v0rj4B+JdbIqB/lNCG5mTtBnswchZz4X8GcrE8PiUWVTjv+XywRUOiypBuNN8g==
+"@openmrs/esm-styleguide@^3.1.10-pre.378":
+  version "3.1.10-pre.378"
+  resolved "https://registry.yarnpkg.com/@openmrs/esm-styleguide/-/esm-styleguide-3.1.10-pre.378.tgz#a475c5732453910aef44be33572d7ceb665f9cd5"
+  integrity sha512-7/DhrdZ/gD+Kaj0MXaw1It9IAlzh9DJBNdMv/yo6fzDPKGcdyUnyj3Xmk6DQsa0ydIFMyX31TYxFOKra5ZJxqA==
   dependencies:
     "@carbon/charts" "^0.41.57"
     carbon-components-react "7.31.0"
     lodash-es "^4.17.21"
 
-"@openmrs/esm-utils@^3.1.10-pre.375":
-  version "3.1.10-pre.375"
-  resolved "https://registry.yarnpkg.com/@openmrs/esm-utils/-/esm-utils-3.1.10-pre.375.tgz#4740b327712f66ea21b19245ba89436b2bf90d6b"
-  integrity sha512-GLc0D9iMzvyWcKqsMOmvu7iMsIdE1UzgABxAhRbpzp/8KwlhDTefXp98WVEyXZe8vtZMxYZJckShDsii6Nz/cQ==
+"@openmrs/esm-utils@^3.1.10-pre.378":
+  version "3.1.10-pre.378"
+  resolved "https://registry.yarnpkg.com/@openmrs/esm-utils/-/esm-utils-3.1.10-pre.378.tgz#c0239a1301a39c853420dc6ef054ad6a0d2668a3"
+  integrity sha512-AP/evtjUdU4rLFRfk14kPz4tZYLWcemzrkrKDjKpcjDTjVOZi9hX6dspB6vNOihB6XKu2FlOZ7YqeobCosgX7w==
   dependencies:
     semver "^7.3.2"
 
@@ -6095,9 +6095,9 @@ ejs@^2.6.1, ejs@^2.6.2:
   integrity sha512-7vmuyh5+kuUyJKePhQfRQBhXV5Ce+RnaeeQArKu1EAMpL3WbgMt5WG6uQZpEVvYSSsxMXRKOewtDk9RaTKXRlA==
 
 electron-to-chromium@^1.3.723:
-  version "1.3.755"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.755.tgz#4b6101f13de910cf3f0a1789ddc57328133b9332"
-  integrity sha512-BJ1s/kuUuOeo1bF/EM2E4yqW9te0Hpof3wgwBx40AWJE18zsD1Tqo0kr7ijnOc+lRsrlrqKPauJAHqaxOItoUA==
+  version "1.3.756"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.756.tgz#942cee59cd64d19f576d8d5804eef09cb423740c"
+  integrity sha512-WsmJym1TMeHVndjPjczTFbnRR/c4sbzg8fBFtuhlb2Sru3i/S1VGpzDSrv/It8ctMU2bj8G7g7/O3FzYMGw6eA==
 
 emittery@^0.7.1:
   version "0.7.2"
@@ -10224,6 +10224,11 @@ normalize-range@^0.1.2:
   resolved "https://registry.yarnpkg.com/normalize-range/-/normalize-range-0.1.2.tgz#2d10c06bdfd312ea9777695a4d28439456b75942"
   integrity sha1-LRDAa9/TEuqXd2laTShDlFa3WUI=
 
+normalize-url@4.5.0:
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/normalize-url/-/normalize-url-4.5.0.tgz#453354087e6ca96957bd8f5baf753f5982142129"
+  integrity sha512-2s47yzUxdexf1OhyRi4Em83iQk0aPvwTddtFz4hnSSw9dCEsLEGf6SwIO8ss/19S9iBb5sJaOuTvTGDeZI00BQ==
+
 normalize-url@^3.0.0:
   version "3.3.0"
   resolved "https://registry.yarnpkg.com/normalize-url/-/normalize-url-3.3.0.tgz#b2e1c4dc4f7c6d57743df733a4f5978d18650559"
@@ -10503,15 +10508,15 @@ opener@^1.5.2:
   integrity sha512-ur5UIdyw5Y7yEj9wLzhqXiy6GZ3Mwx0yGI+5sMn2r0N0v3cKJvUmFH5yPP+WXh9e0xfyzyJX95D8l088DNFj7A==
 
 openmrs@next:
-  version "3.1.10-pre.375"
-  resolved "https://registry.yarnpkg.com/openmrs/-/openmrs-3.1.10-pre.375.tgz#828dc4eefa30b154580e7361e029ba3afa2e9b48"
-  integrity sha512-vLIcUk1qtVYZI0zJud/qgHTYxF4gDJyzn6im3zaGSlRhH69vWW7bHj0b1JyfglK4WsHFRTbSzILZ1Pk0Te4D8w==
+  version "3.1.10-pre.378"
+  resolved "https://registry.yarnpkg.com/openmrs/-/openmrs-3.1.10-pre.378.tgz#309e0c4006fb78b62335bca8d1cbac921405ebeb"
+  integrity sha512-zYrw+VvvsApv1CRhdO0X5YGr5BnIxXfM1NSPkAdZh5nx6qBw2Hk1o+Ri+XJ+ao0wvitUS5WreAvVxXv2meQ+sA==
   dependencies:
     "@babel/core" "^7.11.4"
     "@babel/preset-env" "^7.11.0"
     "@babel/preset-react" "^7.10.4"
     "@babel/preset-typescript" "^7.10.4"
-    "@openmrs/esm-app-shell" "^3.1.10-pre.375"
+    "@openmrs/esm-app-shell" "^3.1.10-pre.378"
     "@types/react" "^16.9.46"
     "@types/systemjs" "^6.1.0"
     autoprefixer "^9.6.1"
@@ -10840,12 +10845,12 @@ parse-path@^4.0.0:
     query-string "^6.13.8"
 
 parse-url@^5.0.0:
-  version "5.0.3"
-  resolved "https://registry.yarnpkg.com/parse-url/-/parse-url-5.0.3.tgz#c158560f14cb1560917e0b7fd8b01adc1e9d3cab"
-  integrity sha512-nrLCVMJpqo12X8uUJT4GJPd5AFaTOrGx/QpJy3HNcVtq0AZSstVIsnxS5fqNPuoqMUs3MyfBoOP6Zvu2Arok5A==
+  version "5.0.5"
+  resolved "https://registry.yarnpkg.com/parse-url/-/parse-url-5.0.5.tgz#06b7f6978b65cac7851bb768bec4e0b950714e1a"
+  integrity sha512-AwfVhXaQrNNI6UPUJq/GJN2qoY0L9gPgxhh9VbDP0bfBAJWaC/Zh8hjQ58YKTi4AagOT70fpadkYSKPo+eFb1w==
   dependencies:
     is-ssh "^1.3.0"
-    normalize-url "^6.0.1"
+    normalize-url "4.5.0"
     parse-path "^4.0.0"
     protocols "^1.4.0"
 

@@ -11,7 +11,7 @@ const backendDependencies = {
 };
 
 const frontendDependencies = {
-  "@openmrs/esm-framework": process.env.FRAMEWORK_VERSION,
+  '@openmrs/esm-framework': process.env.FRAMEWORK_VERSION,
 };
 
 function setupOpenMRS() {

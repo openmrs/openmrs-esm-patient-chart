@@ -1,21 +1,16 @@
 import capitalize from 'lodash-es/capitalize';
-import {
-  registerBreadcrumbs,
-  defineConfigSchema,
-  getAsyncLifecycle,
-  getSyncLifecycle,
-  messageOmrsServiceWorker,
-} from '@openmrs/esm-framework';
+import { registerBreadcrumbs, defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { esmPatientChartSchema } from './config-schemas/openmrs-esm-patient-chart-schema';
 import { moduleName, spaBasePath } from './constants';
+import { setupCacheableRoutes, setupOfflineVisitsSync } from './offline';
 
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 const backendDependencies = {};
 
 const frontendDependencies = {
-  "@openmrs/esm-framework": process.env.FRAMEWORK_VERSION,
+  '@openmrs/esm-framework': process.env.FRAMEWORK_VERSION,
 };
 
 const dashboardMeta = {
@@ -26,15 +21,8 @@ const dashboardMeta = {
 };
 
 function setupOpenMRS() {
-  messageOmrsServiceWorker({
-    type: 'registerDynamicRoute',
-    pattern: '.+/openmrs/ws/fhir2/R4/Patient/.+',
-  });
-
-  messageOmrsServiceWorker({
-    type: 'registerDynamicRoute',
-    pattern: '.+/ws/rest/v1/visit.+',
-  });
+  setupOfflineVisitsSync();
+  setupCacheableRoutes();
 
   defineConfigSchema(moduleName, esmPatientChartSchema);
 
