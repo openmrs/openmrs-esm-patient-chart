@@ -24,10 +24,7 @@ const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({ match
   const state = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);
   const { active } = useWorkspace();
 
-  const mainClassName = `
-    omrs-main-content
-    ${styles.chartContainer}
-  `;
+  const mainClassName = `omrs-main-content ${styles.chartContainer}`;
 
   useVisitDialog(patientUuid);
   useOfflineVisitForPatient(patientUuid, sessionUser?.sessionLocation.uuid);
