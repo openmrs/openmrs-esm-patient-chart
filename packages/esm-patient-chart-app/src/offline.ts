@@ -22,7 +22,7 @@ const visitSyncType = 'visit';
 export function setupCacheableRoutes() {
   messageOmrsServiceWorker({
     type: 'registerDynamicRoute',
-    pattern: '.+/openmrs/ws/fhir2/R4/Patient/.+',
+    pattern: '.+/ws/fhir2/R4/Patient/.+',
   });
 
   messageOmrsServiceWorker({
