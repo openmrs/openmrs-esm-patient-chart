@@ -8,9 +8,17 @@ import {
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
-import { backendDependencies } from './openmrs-backend-dependencies';
 
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
+
+const backendDependencies = {
+  'webservices.rest': '^2.2.0',
+  fhir: '^1.4.2',
+};
+
+const frontendDependencies = {
+  '@openmrs/esm-framework': process.env.FRAMEWORK_VERSION,
+};
 
 function setupOpenMRS() {
   messageOmrsServiceWorker({
@@ -67,4 +75,4 @@ function setupOpenMRS() {
   };
 }
 
-export { backendDependencies, importTranslation, setupOpenMRS };
+export { backendDependencies, frontendDependencies, importTranslation, setupOpenMRS };

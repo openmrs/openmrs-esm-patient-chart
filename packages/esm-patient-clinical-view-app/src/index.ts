@@ -1,10 +1,18 @@
 import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
-import { configSchema } from './config-schema';
-import { backendDependencies } from './openmrs-backend-dependencies';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
+import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
 
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
+
+const backendDependencies = {
+  'webservices.rest': '^2.2.0',
+  fhir: '^1.4.2',
+};
+
+const frontendDependencies = {
+  '@openmrs/esm-framework': process.env.FRAMEWORK_VERSION,
+};
 
 function setupOpenMRS() {
   const moduleName = '@openmrs/esm-patient-clinical-view-app';
@@ -56,4 +64,4 @@ function setupOpenMRS() {
   };
 }
 
-export { backendDependencies, importTranslation, setupOpenMRS };
+export { backendDependencies, frontendDependencies, importTranslation, setupOpenMRS };

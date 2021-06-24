@@ -3,10 +3,15 @@ import { registerBreadcrumbs, defineConfigSchema, getAsyncLifecycle, getSyncLife
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { esmPatientChartSchema } from './config-schemas/openmrs-esm-patient-chart-schema';
 import { moduleName, spaBasePath } from './constants';
-import { backendDependencies } from './openmrs-backend-dependencies';
 import { setupCacheableRoutes, setupOfflineVisitsSync } from './offline';
 
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
+
+const backendDependencies = {};
+
+const frontendDependencies = {
+  '@openmrs/esm-framework': process.env.FRAMEWORK_VERSION,
+};
 
 const dashboardMeta = {
   name: 'summary',
@@ -115,4 +120,4 @@ function setupOpenMRS() {
   };
 }
 
-export { backendDependencies, importTranslation, setupOpenMRS };
+export { backendDependencies, frontendDependencies, importTranslation, setupOpenMRS };
