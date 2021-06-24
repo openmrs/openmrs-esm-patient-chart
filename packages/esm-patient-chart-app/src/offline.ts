@@ -39,7 +39,10 @@ export function setupOfflineVisitsSync() {
       stopDatetime: new Date(),
     };
 
-    await saveVisit(visitPayload, options.abort);
+    const res = await saveVisit(visitPayload, options.abort).toPromise();
+    if (!res.ok) {
+      throw new Error(`Failed to synchronize offline visit with the UUID: ${uuid}. Error: ${JSON.stringify(res.data)}`);
+    }
   });
 }
 
@@ -71,7 +74,9 @@ async function createOfflineVisitForPatient(patientUuid: string, location: strin
     patient: patientUuid,
     startDatetime: new Date(),
     location,
-    visitType: undefined,
+    // TODO: This UUID belongs to the "Facility Visit" type.
+    //       This should be replaced with the dedicated offline visit as soon as it exists in the BE.
+    visitType: '7b0f5697-27e3-40c4-8bae-f4049abfb4ed',
   };
 
   await queueSynchronizationItem(visitSyncType, offlineVisit);
