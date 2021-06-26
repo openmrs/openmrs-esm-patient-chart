@@ -11,11 +11,12 @@ import DataTable, {
   TableHeader,
   TableRow,
 } from 'carbon-components-react/es/components/DataTable';
-import AllergyForm from './allergy-form.component';
 import styles from './allergies-overview.scss';
-import { EmptyState, ErrorState, openWorkspaceTab } from '@openmrs/esm-patient-common-lib';
+import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { performPatientAllergySearch, Allergy } from './allergy-intolerance.resource';
+import { attach } from '@openmrs/esm-framework';
+import { patientAllergiesFormWorkspace } from '../constants';
 const allergiesToShowCount = 5;
 
 interface AllergiesOverviewProps {
@@ -59,9 +60,10 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient, showAddA
     setShowAllAllergies(!showAllAllergies);
   };
 
-  const launchAllergiesForm = () => {
-    openWorkspaceTab(AllergyForm, t('allergiesForm', 'Allergies Form'));
-  };
+  const launchAllergiesForm = React.useCallback(
+    () => attach('patient-chart-workspace-slot', patientAllergiesFormWorkspace),
+    [],
+  );
 
   const getRowItems = (rows: Array<Allergy>) => {
     return rows.slice(0, showAllAllergies ? rows.length : allergiesToShowCount).map((row) => ({
