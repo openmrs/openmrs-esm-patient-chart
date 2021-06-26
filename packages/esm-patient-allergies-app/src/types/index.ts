@@ -183,3 +183,8 @@ export interface DisplayMetadata {
   links?: Links;
   uuid?: string;
 }
+
+export interface OpenMRSResource {
+  uuid: string;
+  display: string;
+}

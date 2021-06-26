@@ -1,14 +1,10 @@
 import { openmrsFetch, openmrsObservableFetch } from '@openmrs/esm-framework';
 import { forkJoin } from 'rxjs';
 import { map } from 'rxjs/operators';
-
-interface FetchResponse {
-  uuid: string;
-  display: string;
-}
+import { OpenMRSResource } from '../../types';
 
 interface AllergenReaction {
-  setMembers: Array<FetchResponse>;
+  setMembers: Array<OpenMRSResource>;
 }
 
 export const fetchAllergensAndReaction = (concepts: Array<string>) => {

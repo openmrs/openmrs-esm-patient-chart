@@ -74,7 +74,7 @@ function setupOpenMRS() {
         load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
         meta: dashboardMeta,
         online: { showAddAllergy: true },
-        offline: { showAddAllergy: false },
+        offline: { showAddAllergy: true },
       },
       {
         id: patientAllergiesFormWorkspace,

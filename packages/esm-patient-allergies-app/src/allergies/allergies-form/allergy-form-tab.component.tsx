@@ -2,9 +2,10 @@ import React from 'react';
 import styles from './allergy-form-tab.component.scss';
 import RadioButtonGroup from 'carbon-components-react/es/components/RadioButtonGroup';
 import RadioButton from 'carbon-components-react/es/components/RadioButton';
+import { OpenMRSResource } from '../../types';
 
 interface AllergyFormTabProps {
-  allergens: Array<{ uuid: string; display: string }>;
+  allergens: Array<OpenMRSResource>;
   selectedAllergen: string;
   handleChange: Function;
   name: string;

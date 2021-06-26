@@ -15,11 +15,18 @@ import { AllergiesConfigObject } from '../../config-schema';
 import { fetchAllergensAndReaction, savePatientAllergy } from './allergy-form.resource';
 import AllergyFormTab from './allergy-form-tab.component';
 import SearchSkeleton from 'carbon-components-react/lib/components/Search/Search.Skeleton';
+import TextInput from 'carbon-components-react/lib/components/TextInput/TextInput';
+import { OpenMRSResource } from '../../types';
+import { ErrorState } from '@openmrs/esm-patient-common-lib';
 
 enum StateTypes {
   PENDING = 'pending',
   RESOLVED = 'resolved',
   ERROR = 'error',
+}
+
+interface ActionType {
+  type: 'pending' | 'resolved' | 'error';
 }
 
 enum AllergenType {
@@ -36,13 +43,24 @@ interface AllergyFormProps {
 }
 
 interface AllergyAndReactions {
-  drugAllergens: Array<{ uuid: string; display: string }>;
-  foodAllergens: Array<{ uuid: string; display: string }>;
-  environmentalAllergens: Array<{ uuid: string; display: string }>;
-  allergyReaction: Array<{ uuid: string; display: string }>;
+  drugAllergens: Array<OpenMRSResource>;
+  foodAllergens: Array<OpenMRSResource>;
+  environmentalAllergens: Array<OpenMRSResource>;
+  allergyReaction: Array<OpenMRSResource>;
 }
 
-const AllergyFormCarbon: React.FC<AllergyFormProps> = ({ isTablet, closeWorkspace, patientUuid }) => {
+const formStatusReducer = (state: StateTypes, action: ActionType) => {
+  switch (action.type) {
+    case 'pending':
+      return StateTypes.PENDING;
+    case 'resolved':
+      return StateTypes.RESOLVED;
+    case 'error':
+      return StateTypes.ERROR;
+  }
+};
+
+const AllergyForm: React.FC<AllergyFormProps> = ({ isTablet, closeWorkspace, patientUuid }) => {
   const { t } = useTranslation();
   const { concepts } = useConfig() as AllergiesConfigObject;
   const {
@@ -53,6 +71,7 @@ const AllergyFormCarbon: React.FC<AllergyFormProps> = ({ isTablet, closeWorkspac
     mildReactionUuid,
     severeReactionUuid,
     moderateReactionUuid,
+    otherReactionUuid,
   } = React.useMemo(() => concepts, [concepts]);
   const [allergenAndReaction, setAllergenAndReactions] = React.useState<AllergyAndReactions>();
   const [comment, setComment] = React.useState<string>();
@@ -60,8 +79,10 @@ const AllergyFormCarbon: React.FC<AllergyFormProps> = ({ isTablet, closeWorkspac
   const [selectedAllergen, setSelectedAllergen] = React.useState<string>();
   const [severityOfReaction, setSeverityOfReaction] = React.useState<string>();
   const [dateOfOnset, setDateOfOnset] = React.useState<string | Date>();
-  const [status, setStatus] = React.useState<StateTypes>(StateTypes.PENDING);
+  const [status, dispatch] = React.useReducer(formStatusReducer, StateTypes.PENDING);
   const [allergenType, setAllergenType] = React.useState<AllergenType>(AllergenType.DRUG);
+  const [otherReaction, setOtherReaction] = React.useState<string>();
+  const [error, setError] = React.useState();
 
   React.useEffect(() => {
     if (drugAllergenUuid && foodAllergenUuid && environmentalAllergenUuid) {
@@ -73,9 +94,13 @@ const AllergyFormCarbon: React.FC<AllergyFormProps> = ({ isTablet, closeWorkspac
       ]).subscribe(
         (data) => {
           setAllergenAndReactions(data);
-          setStatus(StateTypes.RESOLVED);
+          dispatch({ type: 'resolved' });
         },
-        (error) => console.error(error),
+        (error) => {
+          setError(error);
+          createErrorHandler();
+          dispatch({ type: 'error' });
+        },
       );
       return () => sub.unsubscribe();
     }
@@ -91,9 +116,14 @@ const AllergyFormCarbon: React.FC<AllergyFormProps> = ({ isTablet, closeWorkspac
   );
 
   const handleAllergenTypeChange = React.useCallback((index: number) => {
-    if (index === 0) setAllergenType(AllergenType.DRUG);
-    if (index === 1) setAllergenType(AllergenType.FOOD);
-    if (index === 2) setAllergenType(AllergenType.ENVIRONMENT);
+    switch (index) {
+      case 0:
+        setAllergenType(AllergenType.DRUG);
+      case 1:
+        setAllergenType(AllergenType.FOOD);
+      case 2:
+        setAllergenType(AllergenType.ENVIRONMENT);
+    }
   }, []);
 
   const handleSavePatientAllergy = React.useCallback(() => {
@@ -109,7 +139,9 @@ const AllergyFormCarbon: React.FC<AllergyFormProps> = ({ isTablet, closeWorkspac
       },
       comment: comment,
       reactions: patientReactions?.map((reaction) => {
-        return { reaction: { uuid: reaction } };
+        return reaction === otherReactionUuid
+          ? { reaction: { uuid: reaction }, reactionNonCoded: otherReaction }
+          : { reaction: { uuid: reaction } };
       }),
     };
 
@@ -125,7 +157,8 @@ const AllergyFormCarbon: React.FC<AllergyFormProps> = ({ isTablet, closeWorkspac
       }
       (err) => {
         createErrorHandler();
-
+        dispatch({ type: 'error' });
+        setError(error);
         showNotification({
           title: t('allergySaveError', 'Error saving allergy'),
           kind: 'error',
@@ -134,7 +167,20 @@ const AllergyFormCarbon: React.FC<AllergyFormProps> = ({ isTablet, closeWorkspac
         });
       };
     });
-  }, [allergenType, closeWorkspace, comment, patientReactions, patientUuid, selectedAllergen, severityOfReaction, t]);
+    return () => ac.abort();
+  }, [
+    allergenType,
+    closeWorkspace,
+    comment,
+    error,
+    otherReaction,
+    otherReactionUuid,
+    patientReactions,
+    patientUuid,
+    selectedAllergen,
+    severityOfReaction,
+    t,
+  ]);
 
   return (
     <main className={styles.allergyFormWrapper}>
@@ -145,7 +191,9 @@ const AllergyFormCarbon: React.FC<AllergyFormProps> = ({ isTablet, closeWorkspac
             <header className={styles.productiveHeading03}>{t('allergenAndReaction', 'Allergen and Reactions')}</header>
             <div className={styles.sectionWrapper}>
               <section>
-                <header className={styles.productiveHeading02}>Select the allergens</header>
+                <header className={styles.productiveHeading02}>
+                  {t('selectTheAllergens', 'Select the allergens')}
+                </header>
                 <Tabs
                   onSelectionChange={handleAllergenTypeChange}
                   tabContentClassName={styles.allergyFormTabs}
@@ -191,6 +239,15 @@ const AllergyFormCarbon: React.FC<AllergyFormProps> = ({ isTablet, closeWorkspac
                     />
                   ))}
                 </div>
+                <TextInput
+                  light={isTablet}
+                  id="otherReaction"
+                  invalidText={t('otherReactionInvalidText', 'Other reaction is required')}
+                  disabled={!patientReactions.includes(otherReactionUuid)}
+                  labelText={t('pleaseSpecifyOtherReaction', 'Please specify other reaction')}
+                  onChange={(event) => setOtherReaction(event.target.value)}
+                  placeholder={t('enterOtherReaction', 'Type in other reaction')}
+                />
               </section>
             </div>
           </div>
@@ -253,8 +310,9 @@ const AllergyFormCarbon: React.FC<AllergyFormProps> = ({ isTablet, closeWorkspac
           </div>
         </>
       )}
+      {status === StateTypes.ERROR && <ErrorState headerTitle={'Allergy Form Error'} error={error} />}
     </main>
   );
 };
 
-export default AllergyFormCarbon;
+export default AllergyForm;
