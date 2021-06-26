@@ -6,6 +6,8 @@ import {
   messageOmrsServiceWorker,
 } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
+import { configSchema } from './config-schema';
+import { patientAllergiesFormWorkspace } from './constants';
 import { dashboardMeta } from './dashboard.meta';
 
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
@@ -42,7 +44,7 @@ function setupOpenMRS() {
     moduleName,
   };
 
-  defineConfigSchema(moduleName, {});
+  defineConfigSchema(moduleName, configSchema);
 
   return {
     extensions: [
@@ -63,8 +65,8 @@ function setupOpenMRS() {
         meta: {
           columnSpan: 1,
         },
-        online: true,
-        offline: true,
+        online: { showAddAllergy: true },
+        offline: { showAddAllergy: false },
       },
       {
         id: 'allergies-summary-dashboard',
@@ -73,6 +75,16 @@ function setupOpenMRS() {
         meta: dashboardMeta,
         online: { showAddAllergy: true },
         offline: { showAddAllergy: false },
+      },
+      {
+        id: patientAllergiesFormWorkspace,
+        load: getAsyncLifecycle(() => import('./allergies/allergies-form/allergy-form.component'), options),
+        meta: {
+          title: {
+            key: 'recordNewAllergy',
+            default: 'Record a  new Allergy',
+          },
+        },
       },
     ],
   };

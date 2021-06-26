@@ -1,9 +1,8 @@
 import React from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import AllergyForm from './allergy-form.component';
-import { EmptyState, openWorkspaceTab, ErrorState } from '@openmrs/esm-patient-common-lib';
-import { createErrorHandler } from '@openmrs/esm-framework';
+import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
+import { attach, createErrorHandler } from '@openmrs/esm-framework';
 import { performPatientAllergySearch, Allergy } from './allergy-intolerance.resource';
 import Add16 from '@carbon/icons-react/es/add/16';
 import Button from 'carbon-components-react/es/components/Button';
@@ -18,6 +17,7 @@ import DataTable, {
   TableRow,
 } from 'carbon-components-react/es/components/DataTable';
 import styles from './allergies-detailed-summary.scss';
+import { patientAllergiesFormWorkspace } from '../constants';
 
 interface AllergiesDetailedSummaryProps {
   patient: fhir.Patient;
@@ -31,6 +31,11 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
 
   const [allergies, setAllergies] = React.useState<Array<Allergy>>(null);
   const [error, setError] = React.useState(null);
+
+  const launchAllergiesForm = React.useCallback(
+    () => attach('patient-chart-workspace-slot', patientAllergiesFormWorkspace),
+    [],
+  );
 
   React.useEffect(() => {
     if (patient) {
@@ -61,10 +66,6 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
       header: t('lastUpdated', 'Last updated'),
     },
   ];
-
-  const launchAllergiesForm = () => {
-    openWorkspaceTab(AllergyForm, t('allergiesForm', 'Allergies Form'));
-  };
 
   const getRowItems = (rows: Array<Allergy>) => {
     return rows.map((row) => ({
