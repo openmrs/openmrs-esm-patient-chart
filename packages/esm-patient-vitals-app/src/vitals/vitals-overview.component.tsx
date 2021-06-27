@@ -176,18 +176,19 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
   const [error, setError] = React.useState(null);
   const [showAllVitals, setShowAllVitals] = React.useState(false);
   const headerTitle = t('vitals', 'Vitals');
+  const { concepts } = React.useMemo(() => config, [config]);
 
   const toggleShowAllVitals = React.useCallback(() => setShowAllVitals((value) => !value), []);
 
   React.useEffect(() => {
-    if (patientUuid) {
-      const subscription = performPatientsVitalsSearch(config.concepts, patientUuid, 100).subscribe(
+    if (patientUuid && concepts) {
+      const subscription = performPatientsVitalsSearch(concepts, patientUuid, 100).subscribe(
         (vitals) => setVitals(vitals),
         (err) => setError(err),
       );
       return () => subscription.unsubscribe();
     }
-  }, [patientUuid, config.concepts]);
+  }, [patientUuid]);
 
   const tableRows = React.useMemo(
     () =>

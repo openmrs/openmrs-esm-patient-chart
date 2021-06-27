@@ -22,6 +22,7 @@ interface VitalHeaderProps {
 const VitalHeader: React.FC<VitalHeaderProps> = ({ patientUuid, showRecordVitals }) => {
   const { t } = useTranslation();
   const config = useConfig();
+  const { concepts } = React.useMemo(() => config, [config]);
   const [vital, setVital] = useState<PatientVitals>();
   const [displayState, setDisplayState] = useState<ViewState>({
     view: 'Default',
@@ -44,14 +45,14 @@ const VitalHeader: React.FC<VitalHeaderProps> = ({ patientUuid, showRecordVitals
   ] = conceptsUnits;
 
   useEffect(() => {
-    if (patientUuid) {
-      const subscription = performPatientsVitalsSearch(config.concepts, patientUuid, 10).subscribe((vitals) => {
+    if (patientUuid && concepts) {
+      const subscription = performPatientsVitalsSearch(concepts, patientUuid, 10).subscribe((vitals) => {
         setVital(vitals[0]);
         setIsLoading(false);
       }, createErrorHandler);
       return () => subscription.unsubscribe();
     }
-  }, [patientUuid, config.concepts]);
+  }, [patientUuid]);
 
   useEffect(() => {
     if (vital && !dayjs(vital.date).isToday()) {
