@@ -9,7 +9,7 @@ export interface AllergiesConfigObject {
     moderateReactionUuid: string;
     severeReactionUuid: string;
     allergyReactionUuid: string;
-    otherReactionUuid: string;
+    otherConceptUuid: string;
   };
 }
 export const configSchema = {
@@ -42,7 +42,7 @@ export const configSchema = {
       _type: Type.ConceptUuid,
       _default: '162555AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
-    otherReactionUuid: {
+    otherConceptUuid: {
       _type: Type.ConceptUuid,
       _default: '5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
