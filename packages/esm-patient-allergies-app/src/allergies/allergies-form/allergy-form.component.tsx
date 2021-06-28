@@ -71,7 +71,7 @@ const AllergyForm: React.FC<AllergyFormProps> = ({ isTablet, closeWorkspace, pat
     mildReactionUuid,
     severeReactionUuid,
     moderateReactionUuid,
-    otherReactionUuid,
+    otherConceptUuid,
   } = React.useMemo(() => concepts, [concepts]);
   const [allergenAndReaction, setAllergenAndReactions] = React.useState<AllergyAndReactions>();
   const [comment, setComment] = React.useState<string>();
@@ -82,6 +82,7 @@ const AllergyForm: React.FC<AllergyFormProps> = ({ isTablet, closeWorkspace, pat
   const [status, dispatch] = React.useReducer(formStatusReducer, StateTypes.PENDING);
   const [allergenType, setAllergenType] = React.useState<AllergenType>(AllergenType.DRUG);
   const [otherReaction, setOtherReaction] = React.useState<string>();
+  const [otherAllergen, setOtherAllergen] = React.useState<string>();
   const [error, setError] = React.useState();
 
   React.useEffect(() => {
@@ -128,18 +129,27 @@ const AllergyForm: React.FC<AllergyFormProps> = ({ isTablet, closeWorkspace, pat
 
   const handleSavePatientAllergy = React.useCallback(() => {
     const restApiPayLoad = {
-      allergen: {
-        allergenType: allergenType,
-        codedAllergen: {
-          uuid: selectedAllergen,
-        },
-      },
+      allergen:
+        selectedAllergen === otherConceptUuid
+          ? {
+              allergenType: allergenType,
+              codedAllergen: {
+                uuid: selectedAllergen,
+              },
+              nonCodedAllergen: otherAllergen,
+            }
+          : {
+              allergenType: allergenType,
+              codedAllergen: {
+                uuid: selectedAllergen,
+              },
+            },
       severity: {
         uuid: severityOfReaction,
       },
       comment: comment,
       reactions: patientReactions?.map((reaction) => {
-        return reaction === otherReactionUuid
+        return reaction === otherConceptUuid
           ? { reaction: { uuid: reaction }, reactionNonCoded: otherReaction }
           : { reaction: { uuid: reaction } };
       }),
@@ -169,17 +179,18 @@ const AllergyForm: React.FC<AllergyFormProps> = ({ isTablet, closeWorkspace, pat
     });
     return () => ac.abort();
   }, [
+    selectedAllergen,
+    otherConceptUuid,
     allergenType,
-    closeWorkspace,
+    otherAllergen,
+    severityOfReaction,
     comment,
-    error,
-    otherReaction,
-    otherReactionUuid,
     patientReactions,
     patientUuid,
-    selectedAllergen,
-    severityOfReaction,
+    otherReaction,
+    closeWorkspace,
     t,
+    error,
   ]);
 
   return (
@@ -223,6 +234,16 @@ const AllergyForm: React.FC<AllergyFormProps> = ({ isTablet, closeWorkspace, pat
                     />
                   </Tab>
                 </Tabs>
+                {selectedAllergen === otherConceptUuid && (
+                  <TextInput
+                    light={isTablet}
+                    id="otherAllergen"
+                    invalidText={t('otherAllergenInvalidText', 'Other allergen is required')}
+                    labelText={t('pleaseSpecifyOtherReaction', 'Please specify other allergen')}
+                    onChange={(event) => setOtherAllergen(event.target.value)}
+                    placeholder={t('enterOtherReaction', 'Type in other Allergen')}
+                  />
+                )}
               </section>
               <section>
                 <header className={styles.productiveHeading02}>
@@ -239,15 +260,16 @@ const AllergyForm: React.FC<AllergyFormProps> = ({ isTablet, closeWorkspace, pat
                     />
                   ))}
                 </div>
-                <TextInput
-                  light={isTablet}
-                  id="otherReaction"
-                  invalidText={t('otherReactionInvalidText', 'Other reaction is required')}
-                  disabled={!patientReactions.includes(otherReactionUuid)}
-                  labelText={t('pleaseSpecifyOtherReaction', 'Please specify other reaction')}
-                  onChange={(event) => setOtherReaction(event.target.value)}
-                  placeholder={t('enterOtherReaction', 'Type in other reaction')}
-                />
+                {patientReactions.includes(otherConceptUuid) && (
+                  <TextInput
+                    light={isTablet}
+                    id="otherReaction"
+                    invalidText={t('otherReactionInvalidText', 'Other reaction is required')}
+                    labelText={t('pleaseSpecifyOtherReaction', 'Please specify other reaction')}
+                    onChange={(event) => setOtherReaction(event.target.value)}
+                    placeholder={t('enterOtherReaction', 'Type in other reaction')}
+                  />
+                )}
               </section>
             </div>
           </div>
