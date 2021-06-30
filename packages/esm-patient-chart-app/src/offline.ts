@@ -8,10 +8,10 @@ import {
   setupOfflineSync,
   VisitMode,
   VisitStatus,
-  generateOfflineUuid,
   subscribeConnectivity,
 } from '@openmrs/esm-framework';
 import { useEffect } from 'react';
+import { v4 } from 'uuid';
 
 interface OfflineVisit extends NewVisitPayload {
   uuid: string;
@@ -32,16 +32,17 @@ export function setupCacheableRoutes() {
 }
 
 export function setupOfflineVisitsSync() {
-  setupOfflineSync<OfflineVisit>(visitSyncType, [], async (item, options) => {
-    const { uuid, ...visitData } = item;
+  setupOfflineSync<OfflineVisit>(visitSyncType, [], async (visit, options) => {
     const visitPayload = {
-      ...visitData,
+      ...visit,
       stopDatetime: new Date(),
     };
 
     const res = await saveVisit(visitPayload, options.abort).toPromise();
     if (!res.ok) {
-      throw new Error(`Failed to synchronize offline visit with the UUID: ${uuid}. Error: ${JSON.stringify(res.data)}`);
+      throw new Error(
+        `Failed to synchronize offline visit with the UUID: ${visit.uuid}. Error: ${JSON.stringify(res.data)}`,
+      );
     }
   });
 }
@@ -70,7 +71,7 @@ async function getOfflineVisitForPatient(patientUuid: string) {
 
 async function createOfflineVisitForPatient(patientUuid: string, location: string) {
   const offlineVisit: OfflineVisit = {
-    uuid: generateOfflineUuid(),
+    uuid: v4(),
     patient: patientUuid,
     startDatetime: new Date(),
     location,
