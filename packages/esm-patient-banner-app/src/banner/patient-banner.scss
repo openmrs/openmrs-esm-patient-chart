@@ -64,3 +64,7 @@
   @include carbon--type-style("body-short-01");
   color: $interactive-01;
 }
+
+:global(.bx--tooltip--definition .bx--tooltip__trigger){
+  border-bottom: none;
+}

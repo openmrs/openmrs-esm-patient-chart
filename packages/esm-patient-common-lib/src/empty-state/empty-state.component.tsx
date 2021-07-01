@@ -24,6 +24,7 @@ export const EmptyState: React.FC<EmptyStateProps> = (props) => {
         </Trans>
       </p>
       <p className={styles.action}>
+        {' '}
         <Link onClick={() => props.launchForm()}>
           {t('record', 'Record')} {props.displayText.toLowerCase()}
         </Link>

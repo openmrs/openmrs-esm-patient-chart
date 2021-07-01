@@ -7,7 +7,6 @@ import FormView from './form-view.component';
 import styles from './forms.component.scss';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
-import { navigate } from '@openmrs/esm-framework';
 import { fetchAllForms, fetchPatientEncounters } from './forms.resource';
 import { filterAvailableAndCompletedForms } from './forms-utils';
 import { Encounter, Form } from '../types';
@@ -117,13 +116,7 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient }) => {
       {filledForms.length > 0 ? (
         <RenderForm />
       ) : (
-        <EmptyState
-          displayText={displayText}
-          headerTitle={headerTitle}
-          launchForm={() => {
-            navigate({ to: '/formbuilder/#/forms' });
-          }}
-        />
+        <EmptyState displayText={displayText} headerTitle={t('helpText', 'Contact system Admin to configure form')} />
       )}
       {error && <ErrorState error={error} headerTitle={headerTitle} />}
     </>
