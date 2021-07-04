@@ -5,10 +5,7 @@ import { dashboardMeta } from './dashboard.meta';
 
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
-const backendDependencies = {
-  'webservices.rest': '^2.2.0',
-  'fhir2': '^1.2.0',
-};
+const backendDependencies = {};
 
 const frontendDependencies = {
   '@openmrs/esm-framework': process.env.FRAMEWORK_VERSION,
