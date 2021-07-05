@@ -13,7 +13,6 @@ import Select from 'carbon-components-react/es/components/Select';
 import SelectItem from 'carbon-components-react/es/components/SelectItem';
 import Form from 'carbon-components-react/es/components/Form';
 import FormGroup from 'carbon-components-react/es/components/FormGroup';
-import { Tile } from 'carbon-components-react/es/components/Tile';
 import {
   createProgramEnrollment,
   fetchEnrolledPrograms,
@@ -23,34 +22,68 @@ import {
 import { Program } from '../types';
 import styles from './programs-form.scss';
 
+interface Idle {
+  type: ActionTypes.idle;
+}
+
+interface SelectProgram {
+  availablePrograms?: Array<Program>;
+  eligiblePrograms?: Array<Program>;
+  program: Program | null;
+  type: ActionTypes.selectProgram;
+}
+
+interface Submit {
+  type: ActionTypes.submit;
+}
+
+type Action = Idle | SelectProgram | Submit;
+
+interface ViewState {
+  status: string;
+  program?: Program | null;
+  availablePrograms?: Array<Program>;
+  eligiblePrograms?: Array<Program>;
+}
+
+enum ActionTypes {
+  idle = 'idle',
+  selectProgram = 'selectProgram',
+  submit = 'submit',
+}
+
+function viewStateReducer(state: ViewState, action: Action): ViewState {
+  switch (action.type) {
+    case ActionTypes.idle:
+      return {
+        status: 'idle',
+      };
+    case ActionTypes.selectProgram:
+      return {
+        ...state,
+        status: 'selectProgram',
+        availablePrograms: action.availablePrograms,
+        eligiblePrograms: action.eligiblePrograms,
+        program: action.program,
+      };
+    case ActionTypes.submit:
+      return {
+        status: 'submit',
+      };
+    default:
+      return state;
+  }
+}
+
+const initialViewState: ViewState = {
+  status: 'idle',
+};
+
 interface ProgramsFormProps {
   closeWorkspace(): void;
   patientUuid: string;
   isTablet: boolean;
 }
-
-enum StateTypes {
-  IDLE,
-  RESOLVED,
-  SUBMITTING,
-}
-
-interface IdleState {
-  type: StateTypes.IDLE;
-}
-
-interface ResolvedState {
-  availablePrograms?: Array<Program>;
-  eligiblePrograms?: Array<Program>;
-  program: Program | null;
-  type: StateTypes.RESOLVED;
-}
-
-interface SubmittingState {
-  type: StateTypes.SUBMITTING;
-}
-
-type ViewState = IdleState | ResolvedState | SubmittingState;
 
 const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, closeWorkspace, isTablet }) => {
   const { t } = useTranslation();
@@ -59,24 +92,30 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, closeWorkspace
   const [completionDate, setCompletionDate] = React.useState(null);
   const [enrollmentDate, setEnrollmentDate] = React.useState(new Date());
   const [userLocation, setUserLocation] = React.useState('');
-  const [viewState, setViewState] = React.useState<ViewState>({
-    type: StateTypes.IDLE,
-  });
+  const [viewState, dispatch] = React.useReducer(viewStateReducer, initialViewState);
 
   if (!userLocation && session?.sessionLocation?.uuid) {
     setUserLocation(session?.sessionLocation?.uuid);
+  }
+
+  function handleProgramChange(event) {
+    dispatch({
+      type: ActionTypes.selectProgram,
+      program: event.target.value,
+      availablePrograms: viewState.availablePrograms,
+      eligiblePrograms: viewState.eligiblePrograms,
+    });
   }
 
   React.useEffect(() => {
     if (patientUuid) {
       const sub1 = fetchAvailablePrograms().subscribe(
         (availablePrograms) =>
-          setViewState((state) => ({
-            ...state,
+          dispatch({
             availablePrograms: availablePrograms,
             program: null,
-            type: StateTypes.RESOLVED,
-          })),
+            type: ActionTypes.selectProgram,
+          }),
         () => createErrorHandler(),
         () => sub1.unsubscribe(),
       );
@@ -89,21 +128,20 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, closeWorkspace
     }
   }, [patientUuid]);
 
-  const availablePrograms = (viewState as ResolvedState).availablePrograms;
+  const availablePrograms = viewState.availablePrograms;
   React.useEffect(() => {
     if (availablePrograms) {
       const sub = fetchEnrolledPrograms(patientUuid).subscribe(
         (enrolledPrograms) =>
-          setViewState((state) => ({
-            ...state,
+          dispatch({
             availablePrograms: availablePrograms,
             eligiblePrograms: filter(
               availablePrograms,
               (program) => !includes(map(enrolledPrograms, 'program.uuid'), program.uuid),
             ),
             program: null,
-            type: StateTypes.RESOLVED,
-          })),
+            type: ActionTypes.selectProgram,
+          }),
         () => createErrorHandler(),
         () => sub.unsubscribe(),
       );
@@ -114,10 +152,13 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, closeWorkspace
     (event: SyntheticEvent<HTMLFormElement>) => {
       event.preventDefault();
 
-      if (viewState.type !== StateTypes.RESOLVED) return;
+      if (viewState.status !== ActionTypes.selectProgram) return;
 
       const program = viewState.program;
-      setViewState({ type: StateTypes.SUBMITTING });
+
+      dispatch({
+        type: ActionTypes.submit,
+      });
 
       const payload = {
         patient: patientUuid,
@@ -132,6 +173,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, closeWorkspace
         (response) => {
           if (response.status === 201) {
             closeWorkspace();
+
             showToast({
               kind: 'success',
               description: t('programEnrollmentSaved', 'Program enrollment saved successfully'),
@@ -149,12 +191,16 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, closeWorkspace
           });
         },
         () => {
-          setViewState({ type: StateTypes.IDLE });
-          sub.unsubscribe();
+          dispatch({
+            type: ActionTypes.idle,
+          });
         },
       );
+      return () => {
+        sub.unsubscribe();
+      };
     },
-    [closeWorkspace, completionDate, enrollmentDate, patientUuid, t, userLocation, viewState],
+    [closeWorkspace, completionDate, enrollmentDate, patientUuid, t, userLocation, viewState.program, viewState.status],
   );
 
   return (
@@ -166,31 +212,27 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, closeWorkspace
             invalidText={t('required', 'Required')}
             labelText=""
             light={isTablet}
-            onChange={(event) => {
-              setViewState({
-                availablePrograms: (viewState as ResolvedState)?.availablePrograms,
-                eligiblePrograms: (viewState as ResolvedState)?.eligiblePrograms,
-                program: event.target.value,
-                type: StateTypes.RESOLVED,
-              });
-            }}>
-            {!(viewState as ResolvedState)?.program ? (
-              <SelectItem text={t('chooseProgram', 'Choose a program')} value="" />
-            ) : null}
-            {(viewState as ResolvedState).eligiblePrograms?.length > 0 &&
-              (viewState as ResolvedState).eligiblePrograms.map((program) => (
+            onChange={handleProgramChange}>
+            {!viewState?.program ? <SelectItem text={t('chooseProgram', 'Choose a program')} value="" /> : null}
+            {viewState.eligiblePrograms?.length > 0 &&
+              viewState.eligiblePrograms.map((program) => (
                 <SelectItem key={program.uuid} text={program.display} value={program.uuid}>
                   {program.display}
                 </SelectItem>
               ))}
           </Select>
-          {!(viewState as ResolvedState).eligiblePrograms && <InlineLoading className={styles.loading} />}
+          {(() => {
+            if (viewState.status !== ActionTypes.selectProgram) return null;
+            if (!viewState.eligiblePrograms) return <InlineLoading className={styles.loading} />;
+          })()}
         </div>
-        {(viewState as ResolvedState).eligiblePrograms?.length === 0 && (
-          <Tile light className={styles.alreadyEnrolledText}>
-            <span>{t('alreadyEnrolledText', 'This patient is already enrolled in all of the available programs')}</span>
-          </Tile>
-        )}
+        {viewState.eligiblePrograms?.length === 0 &&
+          showNotification({
+            title: t('error', 'Error'),
+            kind: 'error',
+            critical: true,
+            description: t('alreadyEnrolledText', 'This patient is already enrolled in all of the available programs'),
+          })}
       </FormGroup>
       <FormGroup legendText={t('dateEnrolled', 'Date enrolled')}>
         <DatePicker
@@ -240,7 +282,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, closeWorkspace
         <Button style={{ width: '50%' }} kind="secondary" type="button" onClick={closeWorkspace}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button style={{ width: '50%' }} kind="primary" type="submit" disabled={!(viewState as ResolvedState).program}>
+        <Button style={{ width: '50%' }} kind="primary" type="submit" disabled={!viewState.program}>
           {t('enroll', 'Enroll')}
         </Button>
       </div>
