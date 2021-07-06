@@ -15,72 +15,154 @@ import SearchSkeleton from 'carbon-components-react/es/components/Search/Search.
 import { Tile } from 'carbon-components-react/es/components/Tile';
 import { searchConditionConcepts, createPatientCondition, CodedCondition } from './conditions.resource';
 import styles from './conditions-form.scss';
-const searchTimeoutInMs = 300;
+const searchTimeoutInMs = 500;
 
-enum StateTypes {
-  IDLE,
-  SEARCH,
-  CONDITION,
-  SUBMIT,
+interface Idle {
+  type: ActionTypes.idle;
 }
+
+interface Search {
+  isSearching: boolean;
+  searchTerm: string;
+  searchResults: Array<CodedCondition>;
+  type: ActionTypes.search;
+}
+
+interface SelectCondition {
+  condition: CodedCondition;
+  type: ActionTypes.selectCondition;
+}
+
+interface Submit {
+  type: ActionTypes.submit;
+}
+
+type Action = Idle | Search | SelectCondition | Submit;
+
+interface ViewState {
+  status: string;
+  condition?: CodedCondition;
+  isSearching?: boolean;
+  searchResults?: Array<CodedCondition>;
+  searchTerm?: string;
+}
+
+enum ActionTypes {
+  idle = 'idle',
+  search = 'search',
+  selectCondition = 'selectCondition',
+  submit = 'submit',
+}
+
+function viewStateReducer(state: ViewState, action: Action): ViewState {
+  switch (action.type) {
+    case ActionTypes.idle:
+      return {
+        status: 'idle',
+      };
+    case ActionTypes.search:
+      return {
+        ...state,
+        status: 'search',
+        isSearching: action.isSearching,
+        searchResults: action.searchResults,
+        searchTerm: action.searchTerm,
+      };
+    case ActionTypes.selectCondition:
+      return {
+        ...state,
+        status: 'selectCondition',
+        condition: action.condition,
+      };
+    case ActionTypes.submit:
+      return {
+        ...state,
+        status: 'submit',
+      };
+    default:
+      return state;
+  }
+}
+
+const initialViewState: ViewState = {
+  status: 'idle',
+};
 
 interface ConditionsFormProps {
   patientUuid: string;
   isTablet: boolean;
 }
 
-interface IdleState {
-  type: StateTypes.IDLE;
-}
-
-interface SearchState {
-  isSearching: boolean;
-  type: StateTypes.SEARCH;
-  searchTerm: string;
-  searchResults?: Array<CodedCondition>;
-}
-
-interface ConditionState {
-  condition: CodedCondition;
-  type: StateTypes.CONDITION;
-}
-
-interface SubmitState {
-  type: StateTypes.SUBMIT;
-}
-
-type ViewState = IdleState | SearchState | ConditionState | SubmitState;
-
 const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid, isTablet }) => {
   const { t } = useTranslation();
   const session = useSessionUser();
   const [clinicalStatus, setClinicalStatus] = React.useState('active');
   const [endDate, setEndDate] = React.useState(null);
-  const [onsetDate, setOnsetDate] = React.useState(null);
-  const [viewState, setViewState] = React.useState<ViewState>({
-    type: StateTypes.IDLE,
-  });
+  const [onsetDate, setOnsetDate] = React.useState(new Date());
+  const [viewState, dispatch] = React.useReducer(viewStateReducer, initialViewState);
+
+  const handleSearchChange = (event) => {
+    const query = event.target.value.trim();
+    if (query) {
+      dispatch({
+        isSearching: true,
+        searchResults: null,
+        searchTerm: query,
+        type: ActionTypes.search,
+      });
+      debouncedSearch(query);
+    } else {
+      dispatch({
+        type: ActionTypes.idle,
+      });
+    }
+  };
+
+  const debouncedSearch = React.useMemo(
+    () =>
+      debounce((searchTerm) => {
+        if (searchTerm) {
+          const sub = searchConditionConcepts(searchTerm).subscribe(
+            (searchResults: Array<CodedCondition>) =>
+              dispatch({
+                type: ActionTypes.search,
+                isSearching: false,
+                searchResults: searchResults,
+                searchTerm: searchTerm,
+              }),
+            () => createErrorHandler(),
+          );
+          return () => {
+            sub.unsubscribe();
+          };
+        }
+      }, searchTimeoutInMs),
+    [],
+  );
+
+  const handleConditionChange = React.useCallback((selectedCondition: CodedCondition) => {
+    dispatch({
+      type: ActionTypes.selectCondition,
+      condition: selectedCondition,
+    });
+  }, []);
 
   const closeWorkspace = React.useCallback(
     () => detach('patient-chart-workspace-slot', 'conditions-form-workspace'),
     [],
   );
 
-  const handleConditionChange = React.useCallback((selectedCondition: CodedCondition) => {
-    setViewState({
-      type: StateTypes.CONDITION,
-      condition: selectedCondition,
-    });
-  }, []);
-
   const handleSubmit = React.useCallback(
     (event: SyntheticEvent<HTMLFormElement>) => {
       event.preventDefault();
 
-      if (viewState.type !== StateTypes.CONDITION) return;
+      if (viewState.status !== ActionTypes.selectCondition) return;
 
       const condition = viewState.condition;
-      setViewState({ type: StateTypes.SUBMIT });
+
+      dispatch({
+        type: ActionTypes.submit,
+      });
 
       const payload = {
         resourceType: 'Condition',
@@ -134,37 +216,17 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid, isTablet }
           });
         },
         () => {
-          setViewState({ type: StateTypes.IDLE });
-          sub.unsubscribe();
+          dispatch({
+            type: ActionTypes.idle,
+          });
         },
       );
+      return () => {
+        sub.unsubscribe();
+      };
     },
-    [t, clinicalStatus, closeWorkspace, endDate, onsetDate, patientUuid, session, viewState],
+    [clinicalStatus, closeWorkspace, endDate, onsetDate, patientUuid, session?.user?.uuid, t, viewState],
   );
-
-  const debouncedSearch = React.useMemo(
-    () =>
-      debounce((searchTerm) => {
-        if (searchTerm) {
-          const sub = searchConditionConcepts(searchTerm).subscribe(
-            (results: Array<CodedCondition>) => setViewState((state) => ({ ...state, searchResults: results })),
-            () => createErrorHandler(),
-            () => {
-              setViewState((state) => ({ ...state, isSearching: false }));
-              sub.unsubscribe();
-            },
-          );
-        } else {
-          setViewState((state) => ({ ...state, searchResults: null }));
-        }
-      }, searchTimeoutInMs),
-    [],
-  );
-
-  const searchTerm = (viewState as SearchState).searchTerm;
-  React.useEffect(() => {
-    debouncedSearch(searchTerm);
-  }, [searchTerm, debouncedSearch]);
 
   return (
     <Form style={{ margin: '2rem' }} onSubmit={handleSubmit}>
@@ -175,23 +237,12 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid, isTablet }
           id="conditionsSearch"
           labelText={t('enterCondition', 'Enter condition')}
           placeholder={t('searchConditions', 'Search conditions')}
-          onChange={(event) => {
-            setViewState(
-              event.target.value
-                ? {
-                    type: StateTypes.SEARCH,
-                    searchTerm: event.target.value,
-                    isSearching: true,
-                    searchResults: null,
-                  }
-                : { type: StateTypes.IDLE },
-            );
-          }}
+          onChange={handleSearchChange}
           value={(() => {
-            switch (viewState.type) {
-              case StateTypes.SEARCH:
+            switch (viewState.status) {
+              case ActionTypes.search:
                 return viewState.searchTerm;
-              case StateTypes.CONDITION:
+              case ActionTypes.selectCondition:
                 return viewState.condition.display;
               default:
                 return '';
@@ -200,8 +251,9 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid, isTablet }
         />
         <div>
           {(() => {
-            if (viewState.type !== StateTypes.SEARCH) return null;
-            if (viewState.searchResults && viewState.searchResults.length)
+            if (viewState.status !== ActionTypes.search) return null;
+            if (viewState.isSearching) return <SearchSkeleton />;
+            if (viewState.searchResults && viewState.searchResults.length) {
               return (
                 <ul className={styles.conditionsList}>
                   {viewState.searchResults.map((condition, index) => (
@@ -215,7 +267,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid, isTablet }
                   ))}
                 </ul>
               );
-            if (viewState.isSearching) return <SearchSkeleton />;
+            }
             return (
               <Tile light className={styles.emptyResults}>
                 <span>
@@ -274,7 +326,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid, isTablet }
           style={{ width: '50%' }}
           kind="primary"
           type="submit"
-          disabled={viewState.type !== StateTypes.CONDITION}>
+          disabled={viewState.status !== ActionTypes.selectCondition}>
           {t('saveAndClose', 'Save & Close')}
         </Button>
       </div>

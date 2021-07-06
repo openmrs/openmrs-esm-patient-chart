@@ -35,7 +35,7 @@ export interface VisitNotePayload {
   visit?: string; // when creating an encounter for a specific visit, this specifies the visit
 }
 
-export function convertToObsPayLoad(diagnosisArray: Array<Diagnosis>): Array<ObsData> {
+export function convertToObsPayload(diagnosisArray: Array<Diagnosis>): Array<ObsData> {
   return diagnosisArray.map((diagnosis) => {
     if (diagnosis.confirmed === true && diagnosis.primary === true) {
       // confirmed and primary diagnosis
