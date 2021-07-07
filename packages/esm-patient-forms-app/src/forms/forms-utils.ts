@@ -46,6 +46,7 @@ export const sortFormLatestFirst = (formA: Form, formB: Form) =>
 // This is a work around until attach function is re-worked to enable passing of props
 export interface FormEntryProps {
   encounterUuid?: string;
+  visitUuid?: string;
   formUuid: string;
   patient: fhir.Patient;
 }
