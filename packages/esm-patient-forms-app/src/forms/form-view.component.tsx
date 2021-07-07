@@ -3,7 +3,7 @@ import Search from 'carbon-components-react/es/components/Search';
 import debounce from 'lodash-es/debounce';
 import isEmpty from 'lodash-es/isEmpty';
 import styles from './form-view.component.scss';
-import { attach, getStartedVisit, VisitItem, navigate, usePagination } from '@openmrs/esm-framework';
+import { attach, navigate, usePagination, useVisit, Visit } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { Form } from '../types';
@@ -34,8 +34,8 @@ function startVisitPrompt() {
   );
 }
 
-function launchFormEntry(activeVisit: VisitItem, formUuid: string, patient: fhir.Patient) {
-  if (activeVisit) {
+function launchFormEntry(currentVisit: Visit | undefined, formUuid: string, patient: fhir.Patient) {
+  if (currentVisit) {
     const htmlForm = isHTMLForm(formUuid);
     isEmpty(htmlForm)
       ? launchWorkSpace(formUuid, patient)
@@ -68,9 +68,9 @@ const filterFormsByName = (formName: string, forms: Array<Form>) => {
   return forms.filter((form) => form.name.toLowerCase().search(formName.toLowerCase()) !== -1);
 };
 
-const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, encounterUuid }) => {
+const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient }) => {
   const { t } = useTranslation();
-  const [activeVisit, setActiveVisit] = React.useState<VisitItem>();
+  const { currentVisit } = useVisit(patientUuid);
   const [searchTerm, setSearchTerm] = React.useState<string>(null);
   const [allForms, setAllForms] = React.useState<Array<Form>>(forms);
   const { results, goTo, currentPage } = usePagination(allForms.sort(sortFormLatestFirst), 5);
@@ -80,11 +80,6 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, encoun
   React.useEffect(() => {
     setAllForms(!isEmpty(searchTerm) ? filterFormsByName(searchTerm, forms) : forms);
   }, [searchTerm, forms]);
-
-  React.useEffect(() => {
-    const sub = getStartedVisit.subscribe((visit) => setActiveVisit(visit));
-    return () => sub.unsubscribe();
-  }, []);
 
   const tableHeaders: Array<DataTableHeader> = useMemo(
     () => [
@@ -99,7 +94,7 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, encoun
 
   const tableRows: Array<DataTableRow> = useMemo(
     () =>
-      results.map((form, index) => {
+      results.map((form) => {
         return {
           id: form.uuid,
           lastCompleted: form.lastCompleted && formatDate(form.lastCompleted),
@@ -158,7 +153,7 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, encoun
                     </TableHead>
                     <TableBody>
                       {rows.map((row) => (
-                        <TableRow key={row.id} onClick={() => launchFormEntry(activeVisit, row.id, patient)}>
+                        <TableRow key={row.id} onClick={() => launchFormEntry(currentVisit, row.id, patient)}>
                           {row.cells.map((cell) => withValue(cell, row))}
                         </TableRow>
                       ))}

@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './notes-overview.scss';
 import { EmptyState, ErrorState, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
-import { attach, createErrorHandler, getStartedVisit, usePagination, VisitItem } from '@openmrs/esm-framework';
+import { attach, createErrorHandler, usePagination, useVisit, VisitItem } from '@openmrs/esm-framework';
 import Add16 from '@carbon/icons-react/es/add/16';
 import Button from 'carbon-components-react/es/components/Button';
 import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
@@ -30,19 +30,10 @@ const NotesDetailedSummary: React.FC<NotesDetailedSummaryProps> = ({ showAddNote
   const headerTitle = t('notes', 'Notes');
 
   const { patientUuid } = useNotesContext();
-  const [activeVisit, setActiveVisit] = React.useState<VisitItem>(null);
+  const { currentVisit } = useVisit(patientUuid);
   const [notes, setNotes] = React.useState<Array<PatientNote>>(null);
   const [showAllNotes, setShowAllNotes] = React.useState(false);
   const [error, setError] = React.useState(null);
-
-  React.useEffect(() => {
-    const sub = getStartedVisit.subscribe((visit) => {
-      if (visit && visit.status === 'ongoing') {
-        setActiveVisit(visit);
-      }
-    });
-    return () => sub.unsubscribe();
-  }, []);
 
   React.useEffect(() => {
     if (patientUuid) {
@@ -79,12 +70,12 @@ const NotesDetailedSummary: React.FC<NotesDetailedSummaryProps> = ({ showAddNote
   ];
 
   const launchVisitNoteForm = React.useCallback(() => {
-    if (activeVisit) {
+    if (currentVisit) {
       attach('patient-chart-workspace-slot', 'visit-notes-workspace');
     } else {
       launchStartVisitPrompt();
     }
-  }, [activeVisit]);
+  }, [currentVisit]);
 
   const getRowItems = (rows: Array<PatientNote>) => {
     return rows?.slice(0, showAllNotes ? rows.length : notesToShowCount).map((row) => ({
@@ -95,7 +86,6 @@ const NotesDetailedSummary: React.FC<NotesDetailedSummaryProps> = ({ showAddNote
 
   function RenderNotes() {
     if (notes.length) {
-      const rows = getRowItems(notes);
       return (
         <div>
           <div className={styles.notesHeader}>

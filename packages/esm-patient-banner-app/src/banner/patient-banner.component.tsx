@@ -10,9 +10,8 @@ import capitalize from 'lodash-es/capitalize';
 import ContactDetails from '../contact-details/contact-details.component';
 import CustomOverflowMenuComponent from '../ui-components/overflow-menu.component';
 import styles from './patient-banner.scss';
-import { ExtensionSlot, age, useVisit, getStartedVisit } from '@openmrs/esm-framework';
+import { ExtensionSlot, age, useVisit } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import isEmpty from 'lodash-es/isEmpty';
 
 interface PatientBannerProps {
   patient: fhir.Patient;
@@ -23,18 +22,8 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid }) =
   const { t } = useTranslation();
   const { currentVisit } = useVisit(patientUuid);
   const [showContactDetails, setShowContactDetails] = useState(false);
-  const [hasActiveVisit, setActiveVisit] = useState(false);
   const state = useMemo(() => ({ patientUuid }), [patientUuid]);
   const toggleContactDetails = useCallback(() => setShowContactDetails((value) => !value), []);
-
-  useEffect(() => {
-    if (currentVisit) {
-      setActiveVisit(true);
-    } else {
-      const visit = getStartedVisit?.value;
-      setActiveVisit(!isEmpty(visit));
-    }
-  }, [currentVisit]);
 
   return (
     <div className={styles.container}>
@@ -48,7 +37,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid }) =
               <span className={styles.patientName}>
                 {patient.name[0].given.join(' ')} {patient.name[0].family}
               </span>
-              {hasActiveVisit && (
+              {currentVisit && (
                 <TooltipDefinition
                   align="end"
                   tooltipText={
