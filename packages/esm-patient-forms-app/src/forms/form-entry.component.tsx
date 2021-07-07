@@ -20,6 +20,7 @@ const FormEntry: React.FC = () => {
           extensionSlotName="form-widget-slot"
           state={{
             formUuid: selectedForm.formUuid,
+            visitUuid: selectedForm.visitUuid,
             encounterUuid: null,
             view: 'form',
             patient: selectedForm.patient,

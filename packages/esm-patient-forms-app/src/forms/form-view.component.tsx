@@ -38,7 +38,7 @@ function launchFormEntry(currentVisit: Visit | undefined, formUuid: string, pati
   if (currentVisit) {
     const htmlForm = isHTMLForm(formUuid);
     isEmpty(htmlForm)
-      ? launchWorkSpace(formUuid, patient)
+      ? launchWorkSpace(formUuid, patient, currentVisit?.uuid)
       : navigate({
           to: `\${openmrsBase}/htmlformentryui/htmlform/${htmlForm.UIPage}.page?patientId=${patient.id}&definitionUiResource=referenceapplication:htmlforms/${htmlForm.formAppUrl}.xml`,
         });
@@ -47,8 +47,8 @@ function launchFormEntry(currentVisit: Visit | undefined, formUuid: string, pati
   }
 }
 
-const launchWorkSpace = (formUuid: string, patient: fhir.Patient) => {
-  formEntrySub.next({ formUuid: formUuid, patient: patient });
+const launchWorkSpace = (formUuid: string, patient: fhir.Patient, visitUuid?: string) => {
+  formEntrySub.next({ formUuid, patient, visitUuid });
   attach('patient-chart-workspace-slot', 'patient-form-entry-workspace');
 };
 
