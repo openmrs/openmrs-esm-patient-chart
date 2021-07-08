@@ -9,6 +9,7 @@ import {
   VisitMode,
   VisitStatus,
   subscribeConnectivity,
+  QueueItemDescriptor,
 } from '@openmrs/esm-framework';
 import { useEffect } from 'react';
 import { v4 } from 'uuid';
@@ -44,6 +45,8 @@ export function setupOfflineVisitsSync() {
         `Failed to synchronize offline visit with the UUID: ${visit.uuid}. Error: ${JSON.stringify(res.data)}`,
       );
     }
+
+    return res.data;
   });
 }
 
@@ -80,7 +83,12 @@ async function createOfflineVisitForPatient(patientUuid: string, location: strin
     visitType: '7b0f5697-27e3-40c4-8bae-f4049abfb4ed',
   };
 
-  await queueSynchronizationItem(visitSyncType, offlineVisit);
+  const descriptor: QueueItemDescriptor = {
+    id: offlineVisit.uuid,
+    dependencies: [],
+  };
+
+  await queueSynchronizationItem(visitSyncType, offlineVisit, descriptor);
   return offlineVisit;
 }
 
