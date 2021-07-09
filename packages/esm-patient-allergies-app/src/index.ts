@@ -6,17 +6,19 @@ import {
   messageOmrsServiceWorker,
 } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
+import { configSchema } from './config-schema';
+import { patientAllergiesFormWorkspace } from './constants';
 import { dashboardMeta } from './dashboard.meta';
 
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 const backendDependencies = {
   'webservices.rest': '^2.2.0',
-  fhir: '^1.4.2',
+  'fhir2': '^1.2.0',
 };
 
 const frontendDependencies = {
-  "@openmrs/esm-framework": process.env.FRAMEWORK_VERSION,
+  '@openmrs/esm-framework': process.env.FRAMEWORK_VERSION,
 };
 
 function setupOpenMRS() {
@@ -42,7 +44,7 @@ function setupOpenMRS() {
     moduleName,
   };
 
-  defineConfigSchema(moduleName, {});
+  defineConfigSchema(moduleName, configSchema);
 
   return {
     extensions: [
@@ -63,8 +65,8 @@ function setupOpenMRS() {
         meta: {
           columnSpan: 1,
         },
-        online: true,
-        offline: true,
+        online: { showAddAllergy: true },
+        offline: { showAddAllergy: false },
       },
       {
         id: 'allergies-summary-dashboard',
@@ -72,7 +74,17 @@ function setupOpenMRS() {
         load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
         meta: dashboardMeta,
         online: { showAddAllergy: true },
-        offline: { showAddAllergy: false },
+        offline: { showAddAllergy: true },
+      },
+      {
+        id: patientAllergiesFormWorkspace,
+        load: getAsyncLifecycle(() => import('./allergies/allergies-form/allergy-form.component'), options),
+        meta: {
+          title: {
+            key: 'recordNewAllergy',
+            default: 'Record a  new Allergy',
+          },
+        },
       },
     ],
   };

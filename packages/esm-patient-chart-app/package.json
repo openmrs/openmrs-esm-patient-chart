@@ -37,7 +37,8 @@
     "@carbon/icons-react": "^10.18.0",
     "@openmrs/esm-patient-common-lib": "^3.0.0",
     "carbon-components-react": "^7.25.0",
-    "lodash-es": "^4.17.15"
+    "lodash-es": "^4.17.15",
+    "uuid": "^8.3.2"
   },
   "peerDependencies": {
     "@openmrs/esm-framework": "3.x",
@@ -49,5 +50,7 @@
     "react-router-dom": "5.x",
     "rxjs": "6.x"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@types/uuid": "^8.3.0"
+  }
 }

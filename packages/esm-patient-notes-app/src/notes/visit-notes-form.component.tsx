@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { SyntheticEvent } from 'react';
 import dayjs from 'dayjs';
 import debounce from 'lodash-es/debounce';
 import styles from './visit-notes-form.scss';
@@ -15,45 +15,87 @@ import { Tile } from 'carbon-components-react/es/components/Tile';
 import { useTranslation } from 'react-i18next';
 import { Column, Grid, Row } from 'carbon-components-react/es/components/Grid';
 import { createErrorHandler, showNotification, showToast, useConfig, useSessionUser } from '@openmrs/esm-framework';
-import { convertToObsPayLoad, Diagnosis, VisitNotePayload } from './visit-note.util';
+import { convertToObsPayload, Diagnosis, VisitNotePayload } from './visit-note.util';
 import { fetchDiagnosisByName, fetchLocationByUuid, fetchProviderByUuid, saveVisitNote } from './visit-notes.resource';
 import { ConfigObject } from '../config-schema';
-const searchTimeoutInMs = 300;
+const searchTimeoutInMs = 500;
 
-enum StateTypes {
-  IDLE,
-  SEARCH,
-  DIAGNOSES,
-  SUBMIT,
+interface Idle {
+  type: ActionTypes.idle;
 }
+
+interface Search {
+  isSearching: boolean;
+  searchResults?: Array<Diagnosis>;
+  searchTerm: string;
+  type: ActionTypes.search;
+}
+
+interface SelectDiagnoses {
+  selectedDiagnoses: Array<Diagnosis>;
+  type: ActionTypes.selectDiagnoses;
+}
+
+interface Submit {
+  type: ActionTypes.submit;
+}
+
+type Action = Idle | Search | SelectDiagnoses | Submit;
+
+interface ViewState {
+  status: string;
+  isSearching?: boolean;
+  searchResults?: Array<Diagnosis>;
+  searchTerm?: string;
+  selectedDiagnoses?: Array<Diagnosis>;
+}
+
+enum ActionTypes {
+  idle = 'idle',
+  search = 'search',
+  selectDiagnoses = 'selectDiagnoses',
+  submit = 'submitting',
+}
+
+function viewStateReducer(state: ViewState, action: Action): ViewState {
+  switch (action.type) {
+    case ActionTypes.idle:
+      return {
+        status: 'idle',
+      };
+    case ActionTypes.search:
+      return {
+        ...state,
+        status: 'search',
+        isSearching: action.isSearching,
+        searchResults: action.searchResults,
+        searchTerm: action.searchTerm,
+      };
+    case ActionTypes.selectDiagnoses:
+      return {
+        ...state,
+        status: 'selectDiagnoses',
+        selectedDiagnoses: action.selectedDiagnoses,
+      };
+    case ActionTypes.submit:
+      return {
+        ...state,
+        status: 'submit',
+      };
+    default:
+      return state;
+  }
+}
+
+const initialViewState: ViewState = {
+  status: 'idle',
+};
 
 interface VisitNotesFormProps {
   closeWorkspace(): void;
   patientUuid: string;
   isTablet: boolean;
 }
-
-interface IdleState {
-  type: StateTypes.IDLE;
-}
-
-interface SearchState {
-  isSearching: boolean;
-  searchResults?: Array<Diagnosis>;
-  searchTerm: string;
-  type: StateTypes.SEARCH;
-}
-
-interface DiagnosesState {
-  selectedDiagnoses: Array<Diagnosis>;
-  type: StateTypes.DIAGNOSES;
-}
-
-interface SubmitState {
-  type: StateTypes.SUBMIT;
-}
-
-type ViewState = IdleState | SearchState | DiagnosesState | SubmitState;
 
 const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, closeWorkspace, isTablet }) => {
   const { t } = useTranslation();
@@ -68,9 +110,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, closeWorks
   const [providerUuid, setProviderUuid] = React.useState<string | null>(null);
   const [selectedDiagnoses, setSelectedDiagnoses] = React.useState<Array<Diagnosis>>([]);
   const [visitDateTime, setVisitDateTime] = React.useState(new Date());
-  const [viewState, setViewState] = React.useState<ViewState>({
-    type: StateTypes.IDLE,
-  });
+  const [viewState, dispatch] = React.useReducer(viewStateReducer, initialViewState);
 
   React.useEffect(() => {
     if (session && !currentSessionLocationUuid && !currentSessionProviderUuid) {
@@ -91,35 +131,49 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, closeWorks
     }
   }, [currentSessionLocationUuid, currentSessionProviderUuid]);
 
+  const handleSearchChange = (event) => {
+    const query = event.target.value.trim();
+    if (query) {
+      dispatch({
+        isSearching: true,
+        searchTerm: query,
+        type: ActionTypes.search,
+      });
+      debouncedSearch(query);
+    } else {
+      dispatch({
+        type: ActionTypes.idle,
+      });
+    }
+  };
+
   const debouncedSearch = React.useMemo(
     () =>
       debounce((searchTerm) => {
         if (searchTerm) {
           const sub = fetchDiagnosisByName(searchTerm).subscribe(
-            (diagnoses: Array<Diagnosis>) => setViewState((state) => ({ ...state, searchResults: diagnoses })),
-            createErrorHandler(),
-            () => {
-              setViewState((state) => ({ ...state, isSearching: false }));
-              sub.unsubscribe();
-            },
+            (matchingDiagnoses: Array<Diagnosis>) =>
+              dispatch({
+                isSearching: false,
+                searchResults: matchingDiagnoses,
+                searchTerm: searchTerm,
+                type: ActionTypes.search,
+              }),
+            () => createErrorHandler(),
           );
-        } else {
-          setViewState((state) => ({ ...state, searchResults: null }));
+          return () => {
+            sub.unsubscribe();
+          };
         }
       }, searchTimeoutInMs),
     [],
   );
 
-  const searchTerm = (viewState as SearchState).searchTerm;
-  React.useEffect(() => {
-    debouncedSearch(searchTerm);
-  }, [searchTerm, debouncedSearch]);
-
   const handleAddDiagnosis = (diagnosisToAdd: Diagnosis) => {
     setSelectedDiagnoses((selectedDiagnoses) => [...selectedDiagnoses, diagnosisToAdd]);
-    setViewState({
-      type: StateTypes.DIAGNOSES,
+    dispatch({
       selectedDiagnoses: selectedDiagnoses,
+      type: ActionTypes.selectDiagnoses,
     });
   };
 
@@ -131,75 +185,100 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, closeWorks
 
   React.useMemo(() => {
     if (!selectedDiagnoses.length) {
-      setViewState({
-        type: StateTypes.IDLE,
+      dispatch({
+        type: ActionTypes.idle,
       });
     }
   }, [selectedDiagnoses]);
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
+  const handleSubmit = React.useCallback(
+    (event: SyntheticEvent<HTMLFormElement>) => {
+      event.preventDefault();
 
-    if (viewState.type !== StateTypes.DIAGNOSES) return;
+      if (viewState.status !== ActionTypes.selectDiagnoses) return;
 
-    if (selectedDiagnoses.length) {
-      selectedDiagnoses[0].primary = true;
-    }
+      const diagnoses = viewState.selectedDiagnoses;
 
-    let obs = convertToObsPayLoad(selectedDiagnoses);
-
-    if (clinicalNote) {
-      obs = [
-        {
-          concept: encounterNoteConceptUuid,
-          value: clinicalNote,
-        },
-        ...obs,
-      ];
-    }
-
-    let visitNotePayload: VisitNotePayload = {
-      encounterDatetime: dayjs(visitDateTime).format(),
-      patient: patientUuid,
-      location: locationUuid,
-      encounterProviders: [
-        {
-          encounterRole: clinicianEncounterRole,
-          provider: providerUuid,
-        },
-      ],
-      encounterType: encounterTypeUuid,
-      form: formConceptUuid,
-      obs: obs,
-    };
-
-    const ac = new AbortController();
-    saveVisitNote(ac, visitNotePayload)
-      .then((response) => {
-        if (response.status === 201) {
-          closeWorkspace();
-
-          showToast({
-            kind: 'success',
-            description: t('visitNoteSaved', 'Visit note saved successfully'),
-          });
-        }
-      })
-      .catch((err) => {
-        createErrorHandler();
-
-        showNotification({
-          title: t('visitNoteSaveError', 'Error saving visit note'),
-          kind: 'error',
-          critical: true,
-          description: err?.message,
-        });
-      })
-      .finally(() => {
-        ac.abort();
-        setViewState({ type: StateTypes.IDLE });
+      dispatch({
+        type: ActionTypes.submit,
       });
-  };
+
+      if (diagnoses.length) {
+        diagnoses[0].primary = true;
+      }
+
+      let obs = convertToObsPayload(diagnoses);
+
+      if (clinicalNote) {
+        obs = [
+          {
+            concept: encounterNoteConceptUuid,
+            value: clinicalNote,
+          },
+          ...obs,
+        ];
+      }
+
+      let visitNotePayload: VisitNotePayload = {
+        encounterDatetime: dayjs(visitDateTime).format(),
+        patient: patientUuid,
+        location: locationUuid,
+        encounterProviders: [
+          {
+            encounterRole: clinicianEncounterRole,
+            provider: providerUuid,
+          },
+        ],
+        encounterType: encounterTypeUuid,
+        form: formConceptUuid,
+        obs: obs,
+      };
+
+      const ac = new AbortController();
+      saveVisitNote(ac, visitNotePayload)
+        .then((response) => {
+          if (response.status === 201) {
+            closeWorkspace();
+
+            showToast({
+              kind: 'success',
+              description: t('visitNoteSaved', 'Visit note saved successfully'),
+            });
+          }
+        })
+        .catch((err) => {
+          createErrorHandler();
+
+          showNotification({
+            title: t('visitNoteSaveError', 'Error saving visit note'),
+            kind: 'error',
+            critical: true,
+            description: err?.message,
+          });
+        })
+        .finally(() => {
+          ac.abort();
+          dispatch({
+            type: ActionTypes.idle,
+          });
+        });
+    },
+    [
+      clinicalNote,
+      clinicianEncounterRole,
+      closeWorkspace,
+      encounterNoteConceptUuid,
+      encounterTypeUuid,
+      formConceptUuid,
+      locationUuid,
+      patientUuid,
+      providerUuid,
+      t,
+      viewState.selectedDiagnoses,
+      viewState.status,
+      visitDateTime,
+    ],
+  );
 
   return (
     <Form className={styles.visitNoteForm}>
@@ -258,20 +337,10 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, closeWorks
                   'diagnosisInputPlaceholder',
                   'Choose a primary diagnosis first, then secondary diagnoses',
                 )}
-                onChange={(event) => {
-                  setViewState(
-                    event.target.value
-                      ? {
-                          isSearching: true,
-                          searchTerm: event.target.value,
-                          type: StateTypes.SEARCH,
-                        }
-                      : { type: StateTypes.IDLE },
-                  );
-                }}
+                onChange={handleSearchChange}
                 value={(() => {
-                  switch (viewState.type) {
-                    case StateTypes.SEARCH:
+                  switch (viewState.status) {
+                    case ActionTypes.search:
                       return viewState.searchTerm;
                     default:
                       return '';
@@ -280,7 +349,8 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, closeWorks
               />
               <div>
                 {(() => {
-                  if (viewState.type !== StateTypes.SEARCH) return null;
+                  if (viewState.status !== ActionTypes.search) return null;
+                  if (viewState.isSearching) return <SearchSkeleton />;
                   if (viewState.searchResults && viewState.searchResults.length)
                     return (
                       <ul className={styles.diagnosisList}>
@@ -295,11 +365,11 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, closeWorks
                         ))}
                       </ul>
                     );
-                  if (viewState.isSearching) return <SearchSkeleton />;
                   return (
                     <Tile light={isTablet} className={styles.emptyResults}>
                       <span>
-                        {t('noMatchingDiagnoses', 'No diagnoses found matching')} <strong>"{searchTerm}"</strong>
+                        {t('noMatchingDiagnoses', 'No diagnoses found matching')}{' '}
+                        <strong>"{viewState.searchTerm}"</strong>
                       </span>
                     </Tile>
                   );
@@ -346,7 +416,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, closeWorks
               kind="primary"
               onClick={handleSubmit}
               style={{ width: '50%' }}
-              disabled={viewState.type !== StateTypes.DIAGNOSES}
+              disabled={viewState.status !== ActionTypes.selectDiagnoses}
               type="submit">
               {t('saveAndClose', 'Save & Close')}
             </Button>

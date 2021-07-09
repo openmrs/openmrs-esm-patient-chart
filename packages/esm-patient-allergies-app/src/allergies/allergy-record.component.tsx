@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
-import AllergyForm from './allergy-form.component';
 import styles from './allergy-record.css';
-import { SummaryCard, RecordDetails, openWorkspaceTab } from '@openmrs/esm-patient-common-lib';
+import { SummaryCard, RecordDetails } from '@openmrs/esm-patient-common-lib';
 import { RouteComponentProps } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { createErrorHandler } from '@openmrs/esm-framework';
@@ -35,16 +34,7 @@ export default function AllergyRecord(props: AllergyRecordProps) {
     <>
       {allergy && Object.entries(allergy).length && (
         <div className={styles.allergyContainer}>
-          <SummaryCard
-            name={t('allergy', 'Allergy')}
-            styles={{ width: '100%' }}
-            editComponent
-            showComponent={() =>
-              openWorkspaceTab(AllergyForm, `${t('editAllergy', 'Edit Allergy')}`, {
-                allergyUuid: allergy.id,
-              })
-            }
-            link="/">
+          <SummaryCard name={t('allergy', 'Allergy')} styles={{ width: '100%' }} editComponent link="/">
             <div
               className={`omrs-type-body-regular ${styles.allergyCard} ${
                 allergy.reactionSeverity === 'Severe' ? `${styles.highSeverity}` : `${styles.lowSeverity}`

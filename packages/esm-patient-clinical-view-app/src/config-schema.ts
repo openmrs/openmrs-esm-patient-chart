@@ -7,9 +7,6 @@ export const configSchema = {
       slot: { _type: Type.String },
       slotName: { _type: Type.String },
     },
-    _default: [
-      { slot: 'All', slotName: '' },
-      { slot: 'Medication Orders', slotName: 'patient-chart-orders-dashboard-slot' },
-    ],
+    _default: [{ slot: 'All', slotName: '' }],
   },
 };
