@@ -1,7 +1,5 @@
 @import "carbon-components/scss/globals/scss/typography.scss";
-
-$brand-01: #005d5d;
-$text-03:#a8a8a8;
+@import "~@openmrs/esm-styleguide/src/vars";
 
 .patientChartWrapper {
   display: flex;
