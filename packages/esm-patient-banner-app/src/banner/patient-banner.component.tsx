@@ -1,8 +1,6 @@
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import dayjs from 'dayjs';
 import Button from 'carbon-components-react/es/components/Button';
-import Tag from 'carbon-components-react/es/components/Tag';
-import TooltipDefinition from 'carbon-components-react/es/components/TooltipDefinition';
 import ChevronDown16 from '@carbon/icons-react/es/chevron--down/16';
 import ChevronUp16 from '@carbon/icons-react/es/chevron--up/16';
 import OverflowMenuVertical16 from '@carbon/icons-react/es/overflow-menu--vertical/16';
@@ -10,7 +8,7 @@ import capitalize from 'lodash-es/capitalize';
 import ContactDetails from '../contact-details/contact-details.component';
 import CustomOverflowMenuComponent from '../ui-components/overflow-menu.component';
 import styles from './patient-banner.scss';
-import { ExtensionSlot, age, useVisit } from '@openmrs/esm-framework';
+import { ExtensionSlot, age } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 
 interface PatientBannerProps {
@@ -20,7 +18,6 @@ interface PatientBannerProps {
 
 const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid }) => {
   const { t } = useTranslation();
-  const { currentVisit } = useVisit(patientUuid);
   const [showContactDetails, setShowContactDetails] = useState(false);
   const state = useMemo(() => ({ patientUuid }), [patientUuid]);
   const toggleContactDetails = useCallback(() => setShowContactDetails((value) => !value), []);
@@ -32,30 +29,16 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid }) =
           <ExtensionSlot extensionSlotName="patient-photo-slot" state={state} />
         </div>
         <div className={styles.patientInfo}>
-          <div className={(styles.row, styles.nameRow)}>
-            <div>
+          <div className={styles.row}>
+            <div className={styles.flexRow}>
               <span className={styles.patientName}>
                 {patient.name[0].given.join(' ')} {patient.name[0].family}
               </span>
-              {currentVisit && (
-                <TooltipDefinition
-                  align="end"
-                  tooltipText={
-                    <div className={styles.tooltipPadding}>
-                      <h6 style={{ marginBottom: '0.5rem' }}>
-                        {currentVisit && currentVisit.visitType && currentVisit.visitType.name}
-                      </h6>
-                      <span>
-                        <span className={styles.tooltipSmallText}>Started: </span>
-                        <span>
-                          {dayjs(currentVisit && currentVisit.startDatetime).format('DD - MMM - YYYY @ HH:mm')}
-                        </span>
-                      </span>
-                    </div>
-                  }>
-                  <Tag type="blue">{t('activeVisit', 'Active Visit')}</Tag>
-                </TooltipDefinition>
-              )}
+              <ExtensionSlot
+                extensionSlotName="patient-banner-tags-slot"
+                state={{ patientUuid }}
+                className={styles.flexRow}
+              />
             </div>
             <div>
               <CustomOverflowMenuComponent

@@ -37,14 +37,13 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: baseline;
+  margin-top: 0.875rem;
 }
 
-.nameRow {
+.flexRow {
   display: flex;
   flex-flow: row wrap;
-  justify-content: space-between;
   align-items: center;
-  margin-top: 0.875rem;
 }
 
 .identifiers {
