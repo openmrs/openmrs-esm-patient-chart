@@ -34,6 +34,13 @@ function setupOpenMRS() {
         online: true,
         offline: true,
       },
+      {
+        id: 'patient-active-visit-tag',
+        slot: 'patient-banner-tags-slot',
+        load: getAsyncLifecycle(() => import('./banner-tags/active-visit-tag.component'), options),
+        online: true,
+        offline: true,
+      },
     ],
   };
 }

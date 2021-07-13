@@ -32,30 +32,16 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid }) =
           <ExtensionSlot extensionSlotName="patient-photo-slot" state={state} />
         </div>
         <div className={styles.patientInfo}>
-          <div className={(styles.row, styles.nameRow)}>
-            <div>
+          <div className={styles.row}>
+            <div className={styles.flexRow}>
               <span className={styles.patientName}>
                 {patient.name[0].given.join(' ')} {patient.name[0].family}
               </span>
-              {currentVisit && (
-                <TooltipDefinition
-                  align="end"
-                  tooltipText={
-                    <div className={styles.tooltipPadding}>
-                      <h6 style={{ marginBottom: '0.5rem' }}>
-                        {currentVisit && currentVisit.visitType && currentVisit.visitType.name}
-                      </h6>
-                      <span>
-                        <span className={styles.tooltipSmallText}>Started: </span>
-                        <span>
-                          {dayjs(currentVisit && currentVisit.startDatetime).format('DD - MMM - YYYY @ HH:mm')}
-                        </span>
-                      </span>
-                    </div>
-                  }>
-                  <Tag type="blue">{t('activeVisit', 'Active Visit')}</Tag>
-                </TooltipDefinition>
-              )}
+              <ExtensionSlot
+                extensionSlotName="patient-banner-tags-slot"
+                state={{ patientUuid }}
+                className={styles.flexRow}
+              />
             </div>
             <div>
               <CustomOverflowMenuComponent

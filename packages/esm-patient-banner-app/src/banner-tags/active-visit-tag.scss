@@ -1,0 +1,11 @@
+.tooltipPadding {
+  padding: 0.25rem;
+}
+
+.tooltipSmallText {
+  font-size: 80%;
+}
+
+:global(.bx--tooltip--definition .bx--tooltip__trigger){
+  border-bottom: none;
+}
