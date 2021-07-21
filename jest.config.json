@@ -12,7 +12,7 @@
     "lodash-es": "lodash"
   },
   "collectCoverageFrom": [
-    "**/src/**/*.tsx",
+    "**/src/**/*.component.tsx",
     "!**/node_modules/**",
     "!**/vendor/**",
     "!**/src/**/*.test.*",
