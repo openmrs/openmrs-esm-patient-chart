@@ -1,61 +1,41 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import Button from 'carbon-components-react/lib/components/Button';
-import CameraUpload from './camera-upload.component';
 import placeholder from '../assets/placeholder.svg';
-import { toOmrsIsoString } from '@openmrs/esm-framework';
+import { showModal, toOmrsIsoString } from '@openmrs/esm-framework';
+import { useTranslation } from 'react-i18next';
 
 export interface CapturePhotoProps {
   patientUuid?: string;
-  onCapturePhoto(dataUri: string, selectedFile: File, photoDateTime: string): void;
+  onCapturePhoto(dataUri: string, photoDateTime: string): void;
   initialState?: string;
 }
 
 const CapturePhoto: React.FC<CapturePhotoProps> = ({ patientUuid, initialState, onCapturePhoto }) => {
-  const [openCamera, setOpenCamera] = useState(false);
+  const { t } = useTranslation();
   const [dataUri, setDataUri] = useState(null);
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [currentPhoto, setCurrentPhoto] = useState(initialState ?? placeholder);
-  const altText = 'Photo preview';
-  const showCamera = useCallback(() => {
-    setOpenCamera(true);
-  }, []);
 
-  const closeCamera = useCallback(() => {
-    setOpenCamera(false);
-  }, []);
-
-  const processCapturedImage = useCallback(
-    (dataUri: string, selectedFile: File) => {
-      closeCamera();
-      setDataUri(dataUri);
-      setSelectedFile(selectedFile);
-      onCapturePhoto(dataUri, selectedFile, toOmrsIsoString(new Date()));
-    },
-    [onCapturePhoto, closeCamera],
-  );
+  const showCam = useCallback(() => {
+    const close = showModal('capture-photo-modal', {
+      delegateSaveImage(dataUri: string) {
+        setDataUri(dataUri);
+        onCapturePhoto(dataUri, toOmrsIsoString(new Date()));
+        close();
+      },
+      collectCaption: false,
+      openCameraOnRender: true,
+      shouldNotRenderButton: true,
+      patientUuid,
+    });
+  }, [patientUuid, onCapturePhoto]);
 
   return (
-    <div style={{ display: 'flex' }}>
-      <div style={{ maxWidth: '20%', margin: '4px' }}>
-        <img
-          src={dataUri ? dataUri : selectedFile ? URL.createObjectURL(selectedFile) : currentPhoto}
-          alt={altText}
-          style={{ width: '100%' }}
-        />
+    <div style={{ display: 'flex', alignItems: 'center' }}>
+      <div style={{ maxWidth: '64px' }}>
+        <img src={dataUri || initialState || placeholder} alt="Photo Preview" style={{ width: '100%' }} />
       </div>
-      <div>
-        <Button kind="ghost" onClick={showCamera}>
-          Change
-        </Button>
-        <CameraUpload
-          patientUuid={patientUuid}
-          openCameraOnRender={openCamera}
-          shouldNotRenderButton
-          closeCamera={closeCamera}
-          delegateSaveImage={processCapturedImage}
-          collectCaption={false}
-        />
-      </div>
+      <Button kind="ghost" onClick={showCam} style={{ flex: 1 }}>
+        {t('change', 'Change')}
+      </Button>
     </div>
   );
 };

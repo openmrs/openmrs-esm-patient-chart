@@ -11,3 +11,7 @@
 .buttonSetOverrides button {
   max-width: 20rem !important;
 }
+
+.captionFrame {
+  margin-bottom: .3rem;
+}

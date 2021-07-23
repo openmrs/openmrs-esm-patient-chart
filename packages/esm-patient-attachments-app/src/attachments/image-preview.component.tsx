@@ -3,14 +3,13 @@ import { useTranslation } from 'react-i18next';
 import { UserHasAccess } from '@openmrs/esm-framework';
 import Button from 'carbon-components-react/es/components/Button';
 import ButtonSet from 'carbon-components-react/es/components/ButtonSet';
-import TextInput from 'carbon-components-react/lib/components/TextInput';
+import TextInput from 'carbon-components-react/es/components/TextInput';
 import styles from './image-preview.css';
 
 interface ImagePreviewProps {
-  dataUri: string;
+  content: string;
   collectCaption: boolean;
-  selectedFile?: File;
-  onSaveImage?(dataUri: string, selectedFile: File, caption: string): void;
+  onSaveImage?(dataUri: string, caption: string): void;
   onCancelCapture?(): void;
 }
 
@@ -18,37 +17,32 @@ export default function ImagePreview(props: ImagePreviewProps) {
   const [caption, setCaption] = useState('');
   const { t } = useTranslation();
 
-  function saveImage(e: React.SyntheticEvent) {
+  const saveImage = (e: React.SyntheticEvent) => {
     e.preventDefault();
-    props.onSaveImage(props.dataUri, props.selectedFile, caption);
-  }
+    props.onSaveImage?.(props.content, caption);
+  };
 
-  function cancelCapture(e: React.SyntheticEvent) {
-    e.preventDefault();
-    props.onCancelCapture();
-  }
+  const cancelCapture = React.useCallback(
+    (e: React.SyntheticEvent) => {
+      e.preventDefault();
+      props.onCancelCapture?.();
+    },
+    [props.onCancelCapture],
+  );
 
-  function handleSubmit(e: React.SyntheticEvent) {
+  const updateCaption = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
-    e.stopPropagation();
-  }
-
-  function updateCaption(e: React.ChangeEvent<HTMLInputElement>) {
-    e.preventDefault();
-    e.stopPropagation();
     setCaption(e.target.value);
-  }
+  }, []);
 
   return (
-    <form className={styles.overview} onSubmit={handleSubmit}>
-      <img
-        src={props.dataUri ? props.dataUri : URL.createObjectURL(props.selectedFile)}
-        alt={t('webcamPreview', 'Webcam preview')}
-      />
+    <form className={styles.overview} onSubmit={saveImage}>
+      <img src={props.content} alt={t('webcamPreview', 'Webcam preview')} />
       {props.collectCaption && (
-        <div style={{ marginBottom: '.3rem' }}>
+        <div className={styles.captionFrame}>
           <TextInput
             id="caption"
+            autoFocus
             labelText={null}
             placeholder={t('attachmentCaptionInstruction', 'Enter caption')}
             onChange={updateCaption}
@@ -58,10 +52,10 @@ export default function ImagePreview(props: ImagePreviewProps) {
       <UserHasAccess privilege="Create Attachment">
         <ButtonSet className={styles.buttonSetOverrides}>
           <Button size="small" onClick={saveImage}>
-            {t('save', 'Save')}{' '}
+            {t('save', 'Save')}
           </Button>
           <Button kind="danger" size="small" onClick={cancelCapture}>
-            {t('cancel', 'Cancel')}{' '}
+            {t('cancel', 'Cancel')}
           </Button>
         </ButtonSet>
       </UserHasAccess>

@@ -47,6 +47,15 @@ function setupOpenMRS() {
         }),
         meta: dashboardMeta,
       },
+      {
+        id: 'capture-photo-modal',
+        load: getAsyncLifecycle(() => import('./attachments/camera-upload.component'), {
+          featureName: 'capture-photo-modal',
+          moduleName,
+        }),
+        online: true,
+        offline: true,
+      },
     ],
   };
 }

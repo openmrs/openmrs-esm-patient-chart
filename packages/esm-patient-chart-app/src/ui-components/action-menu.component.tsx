@@ -1,10 +1,9 @@
 import React from 'react';
 import { ExtensionSlot, useLayoutType } from '@openmrs/esm-framework';
 import { HeaderPanel } from 'carbon-components-react/es/components/UIShell';
-
+import { isDesktop } from '../utils';
 import Edit20 from '@carbon/icons-react/es/edit/20';
 import styles from './action-menu.component.scss';
-import { isDesktop } from '../utils';
 
 interface ActionMenuInterface {
   open: boolean;
@@ -29,9 +28,8 @@ export const ActionMenu: React.FC<ActionMenuInterface> = ({ open }) => {
   return (
     <>
       {menu}
-      <HeaderPanel className={styles.actionPanel} expanded={open}>
+      <HeaderPanel className={styles.actionPanel} expanded={open} aria-label="Drawer">
         <ExtensionSlot extensionSlotName={CHARTS_DRAWER_SLOT} />
-        {/* Drawer main content goes inside here */}
       </HeaderPanel>
     </>
   );

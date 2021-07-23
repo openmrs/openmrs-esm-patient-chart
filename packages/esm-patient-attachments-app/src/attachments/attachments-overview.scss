@@ -50,17 +50,43 @@
 }
 
 .thumbnailOverlay {
-  background-color: rgba(0, 0, 0, 0.8);
-  max-height: 240px;
+  background-color: rgba(0, 0, 0, 0.6);
   overflow: hidden;
   position: absolute;
   bottom: 0;
   width: 100%;
   color: white;
-  padding: 2px;
+  padding: 0.5em;
   font-size: 90%;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
 }
 
 .actions {
   margin-bottom: 0.5rem;
+}
+
+:global(#ReactGridGallery) {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 5px;
+
+  :global(.ReactGridGallery_tile) {
+    overflow: hidden;
+
+    :global(.ReactGridGallery_tile-viewport) {
+      width: 100% !important;
+
+      img {
+        width: 100% !important;
+        margin: auto !important;
+      }
+    }
+  }
+}
+
+:global(#lightboxBackdrop) {
+  z-index: 10000;
 }

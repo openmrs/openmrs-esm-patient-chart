@@ -1,54 +1,41 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import CameraFrame from './camera-frame.component';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
+import Button from 'carbon-components-react/lib/components/Button';
 import ImagePreview from './image-preview.component';
 import styles from './camera-upload.css';
 import Camera from 'react-html5-camera-photo';
-import 'react-html5-camera-photo/build/css/index.css';
-import './styles.css';
-import { createAttachment } from './attachments.resource';
 import { useTranslation } from 'react-i18next';
-import { Attachment } from './attachments-overview.component';
+import { createAttachment } from './attachments.resource';
+import { readFileAsString } from './utils';
+import 'react-html5-camera-photo/build/css/index.css';
+
 export interface CameraUploadProps {
   openCameraOnRender?: boolean;
   collectCaption?: boolean;
   shouldNotRenderButton?: boolean;
   patientUuid: string;
-  closeCamera?(): void;
-  onTakePhoto?(dataUri: string): void;
-  delegateSaveImage?(dataUri: string, selectedFile: File, caption: string): void;
   selectedFile?: File;
-  onNewAttachment?(att: Attachment): void;
+  onTakePhoto?(dataUri: string): void;
+  delegateSaveImage?(dataUri: string, caption: string): void;
+  onNewAttachment?(att: any): void;
 }
 
 const CameraUpload: React.FC<CameraUploadProps> = ({
   openCameraOnRender,
   onNewAttachment,
   delegateSaveImage,
-  closeCamera,
   onTakePhoto,
   patientUuid,
   shouldNotRenderButton,
   collectCaption = true,
 }) => {
+  const mediaStream = useRef<MediaStream | undefined>();
   const [cameraIsOpen, setCameraIsOpen] = useState(openCameraOnRender);
   const [dataUri, setDataUri] = useState('');
-  const [selectedFile, setSelectedFile] = useState(null);
   const { t } = useTranslation();
 
-  const openCamera = useCallback(() => {
-    setCameraIsOpen(true);
-  }, []);
+  const openCamera = useCallback(() => setCameraIsOpen(true), []);
 
-  const clearCamera = useCallback(() => {
-    setDataUri('');
-    setSelectedFile(null);
-  }, []);
-
-  const handleCloseCamera = useCallback(() => {
-    setCameraIsOpen(false);
-    closeCamera?.();
-    clearCamera();
-  }, [closeCamera, clearCamera]);
+  const clearCamera = useCallback(() => setDataUri(''), []);
 
   const handleTakePhoto = useCallback(
     (dataUri: string) => {
@@ -58,67 +45,64 @@ const CameraUpload: React.FC<CameraUploadProps> = ({
     [onTakePhoto],
   );
 
+  const upload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    readFileAsString(e.target.files[0]).then(setDataUri);
+  }, []);
+
+  const setMediaStream = useCallback((ms: MediaStream) => {
+    mediaStream.current = ms;
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      mediaStream.current?.getTracks().forEach((t) => t.stop());
+    };
+  }, []);
+
   const handleSaveImage = useCallback(
-    (dataUri: string, caption: string, selectedFile: File) => {
+    (dataUri: string, caption: string) => {
       const abortController = new AbortController();
-      createAttachment(patientUuid, selectedFile, caption, abortController, dataUri).then((res) => {
-        onNewAttachment?.({
-          id: `${res.data.uuid}`,
-          src: `${window.openmrsBase}/ws/rest/v1/attachment/${res.data.uuid}/bytes`,
-          thumbnail: `${window.openmrsBase}/ws/rest/v1/attachment/${res.data.uuid}/bytes`,
-          thumbnailWidth: 320,
-          thumbnailHeight: 212,
-          caption: res.data.comment,
-          isSelected: false,
-        });
-      });
+      createAttachment(patientUuid, dataUri, caption, abortController).then((res) => onNewAttachment?.(res.data));
     },
     [patientUuid, onNewAttachment],
   );
 
+  const save = delegateSaveImage ?? handleSaveImage;
+
   const willSaveImage = useCallback(
-    (dataUri: string, selectedFile: File, caption: string) => {
-      if (delegateSaveImage) {
-        delegateSaveImage(dataUri, selectedFile, caption);
-      } else {
-        // fallback to default implementation
-        handleSaveImage(dataUri, caption, selectedFile);
-      }
+    (dataUri: string, caption: string) => {
+      save(dataUri, caption);
       clearCamera();
     },
-    [clearCamera, delegateSaveImage, handleSaveImage],
+    [clearCamera, save],
   );
 
-  useEffect(() => {
-    setCameraIsOpen(openCameraOnRender);
-  }, [openCameraOnRender]);
+  useEffect(() => setCameraIsOpen(openCameraOnRender), [openCameraOnRender]);
 
   return (
     <div className={styles.cameraSection}>
-      {!shouldNotRenderButton && (
-        <button className="cameraButton" onClick={openCamera}>
-          {t('camera', 'Camera')}
-        </button>
-      )}
+      {!shouldNotRenderButton && !cameraIsOpen && <Button onClick={openCamera}>{t('camera', 'Camera')}</Button>}
       {cameraIsOpen && (
-        <CameraFrame
-          onCloseCamera={handleCloseCamera}
-          setSelectedFile={setSelectedFile}
-          inPreview={dataUri || selectedFile}>
-          {dataUri || selectedFile ? (
+        <div className={styles.frameContent}>
+          {dataUri ? (
             <ImagePreview
-              dataUri={dataUri}
-              selectedFile={selectedFile}
+              content={dataUri}
               onCancelCapture={clearCamera}
               onSaveImage={willSaveImage}
               collectCaption={collectCaption}
             />
           ) : (
-            <div id="camera-inner-wrapper">
-              <Camera onTakePhoto={handleTakePhoto} />
-            </div>
+            <>
+              <Camera onTakePhoto={handleTakePhoto} onCameraStart={setMediaStream} />
+              <div>
+                <label htmlFor="uploadPhoto" className={styles.choosePhoto}>
+                  {t('selectPhoto', 'Select local photo instead')}
+                </label>
+                <input type="file" id="uploadPhoto" accept="image/*" className={styles.uploadFile} onChange={upload} />
+              </div>
+            </>
           )}
-        </CameraFrame>
+        </div>
       )}
     </div>
   );

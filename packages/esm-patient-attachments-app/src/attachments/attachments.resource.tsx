@@ -1,37 +1,33 @@
 import { openmrsFetch } from '@openmrs/esm-framework';
 
+export const attachmentUrl = '/ws/rest/v1/attachment';
+
 export function getAttachmentByUuid(attachmentUuid: string, abortController: AbortController) {
-  return openmrsFetch(`/ws/rest/v1/attachment/${attachmentUuid}`, {
+  return openmrsFetch(`${attachmentUrl}/${attachmentUuid}`, {
     signal: abortController.signal,
   });
 }
 
 export function getAttachments(patientUuid: string, includeEncounterless: boolean, abortController: AbortController) {
-  return openmrsFetch(`/ws/rest/v1/attachment?patient=${patientUuid}&includeEncounterless=${includeEncounterless}`, {
+  return openmrsFetch(`${attachmentUrl}?patient=${patientUuid}&includeEncounterless=${includeEncounterless}`, {
     signal: abortController.signal,
   });
 }
 
 export function createAttachment(
   patientUuid: string,
-  file: File,
+  content: string,
   fileCaption: string,
   abortController: AbortController,
-  base64Content?: string,
 ) {
   const formData = new FormData();
+  const emptyFile = new File([''], 'randomfile');
   formData.append('fileCaption', fileCaption);
   formData.append('patient', patientUuid);
+  formData.append('file', emptyFile);
+  formData.append('base64Content', content);
 
-  if (base64Content) {
-    const emptyFile = new File([''], 'randomfile');
-    formData.append('file', emptyFile);
-    formData.append('base64Content', base64Content);
-  } else {
-    formData.append('file', file);
-  }
-
-  return openmrsFetch(`/ws/rest/v1/attachment`, {
+  return openmrsFetch(`${attachmentUrl}`, {
     method: 'POST',
     signal: abortController.signal,
     body: formData,
@@ -39,7 +35,7 @@ export function createAttachment(
 }
 
 export function deleteAttachment(attachmentUuid: string, abortController: AbortController) {
-  return openmrsFetch(`/ws/rest/v1/attachment/${attachmentUuid}`, {
+  return openmrsFetch(`${attachmentUrl}/${attachmentUuid}`, {
     method: 'DELETE',
     signal: abortController.signal,
   });
