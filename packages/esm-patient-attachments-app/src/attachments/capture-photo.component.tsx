@@ -31,7 +31,7 @@ const CapturePhoto: React.FC<CapturePhotoProps> = ({ patientUuid, initialState, 
   return (
     <div style={{ display: 'flex', alignItems: 'center' }}>
       <div style={{ maxWidth: '64px' }}>
-        <img src={dataUri || initialState || placeholder} alt="Photo Preview" style={{ width: '100%' }} />
+        <img src={dataUri || initialState || placeholder} alt="Preview" style={{ width: '100%' }} />
       </div>
       <Button kind="ghost" onClick={showCam} style={{ flex: 1 }}>
         {t('change', 'Change')}
