@@ -36,6 +36,12 @@ function getPageSize(layoutType: LayoutType) {
   }
 }
 
+function handleDragOver(e: React.DragEvent) {
+  e.preventDefault();
+  e.stopPropagation();
+  e.dataTransfer.dropEffect = 'copy';
+}
+
 const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);
@@ -48,29 +54,38 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
     if (patientUuid) {
       const abortController = new AbortController();
       getAttachments(patientUuid, true, abortController).then((response) => {
-        setAttachments(response.data.results.map(createGalleryEntry));
+        pushAttachments(response.data.results, abortController);
       });
       return () => abortController.abort();
     }
   }, [patientUuid]);
 
-  const pushAttachment = useCallback((data: any) => {
-    const att = createGalleryEntry(data);
+  const pushAttachments = useCallback(async (items: Array<any>, abortController: AbortController) => {
+    const newAttachments = await Promise.all(
+      items.map(async (item) => {
+        if (!item.bytesContentFamily) {
+          const { data } = await getAttachmentByUuid(item.uuid, abortController);
+          item.bytesContentFamily = data.bytesContentFamily;
+        }
 
-    if (att.bytesContentFamily) {
-      setAttachments((attachments) => [...attachments, att]);
-    } else {
-      getAttachmentByUuid(att.id, new AbortController()).then(({ data }) => {
-        att.bytesContentFamily = data.bytesContentFamily;
-        setAttachments((attachments) => [...attachments, att]);
-      });
-    }
+        return {
+          ...createGalleryEntry(item),
+          customOverlay: item.comment && (
+            <div className={styles.thumbnailOverlay}>
+              <div>{item.comment}</div>
+            </div>
+          ),
+        };
+      }),
+    );
+
+    setAttachments((oldAttachments) => [...oldAttachments, ...newAttachments]);
   }, []);
 
   const showCam = useCallback(() => {
     const close = showModal('capture-photo-modal', {
       onNewAttachment: (data: any) => {
-        pushAttachment(data);
+        pushAttachments([data], new AbortController());
         close();
       },
       openCameraOnRender: true,
@@ -79,19 +94,20 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
     });
   }, [patientUuid]);
 
-  function handleUpload(e: React.SyntheticEvent, files: FileList | null) {
+  const handleUpload = useCallback((e: React.SyntheticEvent, files: FileList | null) => {
     e.preventDefault();
     e.stopPropagation();
-    const abortController = new AbortController();
 
     if (files) {
+      const abortController = new AbortController();
+
       Promise.all<Attachment>(
         Array.prototype.map.call(files, (file) =>
           readFileAsString(file).then(
             (content) =>
               content &&
               createAttachment(patientUuid, content, file.name, abortController).then((res) =>
-                pushAttachment(res.data),
+                pushAttachments([res.data], abortController),
               ),
           ),
         ),
@@ -99,19 +115,9 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
         .then((newAttachments) => newAttachments.filter(Boolean))
         .then((newAttachments) => setAttachments((attachments) => [...attachments, ...newAttachments]));
     }
-  }
+  }, []);
 
-  function handleDragOver(e: React.DragEvent) {
-    e.preventDefault();
-    e.stopPropagation();
-    e.dataTransfer.dropEffect = 'copy';
-  }
-
-  function handleCurrentImageChange(index: number) {
-    setCurrentImage(index);
-  }
-
-  function handleImageSelect(index: number) {
+  const handleImageSelect = useCallback((index: number) => {
     setAttachments((attachments) =>
       attachments.map((a, i) =>
         i === index
@@ -122,39 +128,26 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
           : a,
       ),
     );
-  }
+  }, []);
 
   function deleteSelected() {
     setAttachments((attachments) => attachments.filter((att) => att.isSelected !== true));
     const selected = attachments.filter((att) => att.isSelected === true);
     const abortController = new AbortController();
-    const result = Promise.all(
-      selected.map((att) => deleteAttachment(att.id, abortController).then((response: any) => {})),
-    );
-    result.then(() => {});
+    Promise.all(selected.map((att) => deleteAttachment(att.id, abortController).then(() => {})));
   }
 
   function handleDelete() {
     if (window.confirm('Are you sure you want to delete this attachment?')) {
       const abortController = new AbortController();
       const id = attachments[currentImage].id;
-      deleteAttachment(id, abortController).then((response: any) => {
+
+      deleteAttachment(id, abortController).then(() => {
         const attachments_tmp = attachments.filter((att) => att.id != id);
         setAttachments(attachments_tmp);
       });
     }
   }
-
-  const currentAttachments = useMemo(() => {
-    return pagination.results.map((attachment) => ({
-      ...attachment,
-      customOverlay: attachment.caption && (
-        <div className={styles.thumbnailOverlay}>
-          <div>{attachment.caption}</div>
-        </div>
-      ),
-    }));
-  }, [pagination.results]);
 
   return (
     <UserHasAccess privilege="View Attachments">
@@ -183,8 +176,8 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
               </Button>
             </div>
             <Gallery
-              images={currentAttachments}
-              currentImageWillChange={handleCurrentImageChange}
+              images={attachments}
+              currentImageWillChange={setCurrentImage}
               customControls={[
                 <Button kind="danger" onClick={handleDelete} className={styles.btnOverrides}>
                   {t('delete', 'Delete')}

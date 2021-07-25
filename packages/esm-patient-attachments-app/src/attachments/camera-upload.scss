@@ -2,8 +2,10 @@
   padding: 10px;
 }
 
-:global(.react-html5-camera-photo) > img, :global(.react-html5-camera-photo) > video {
-  width: 100% !important;
+:global(.react-html5-camera-photo) {
+  & > img, & > video {
+    width: 100% !important;
+  }
 }
 
 .frameContent {
@@ -12,16 +14,16 @@
   width: 80%;
 }
 
-.choosePhoto:hover {
-  color: #000;
-  text-decoration: none;
-}
-
 .choosePhoto {
   float: right;
   color: #0f62fe;
   cursor: pointer;
   margin: 1rem 0;
+
+  &:hover {
+    color: #000;
+    text-decoration: none;
+  }
 }
 
 .uploadFile {

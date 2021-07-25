@@ -4,7 +4,7 @@ import { UserHasAccess } from '@openmrs/esm-framework';
 import Button from 'carbon-components-react/es/components/Button';
 import ButtonSet from 'carbon-components-react/es/components/ButtonSet';
 import TextInput from 'carbon-components-react/es/components/TextInput';
-import styles from './image-preview.css';
+import styles from './image-preview.scss';
 
 interface ImagePreviewProps {
   content: string;

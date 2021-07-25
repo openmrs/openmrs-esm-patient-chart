@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
 import Button from 'carbon-components-react/lib/components/Button';
 import ImagePreview from './image-preview.component';
-import styles from './camera-upload.css';
+import styles from './camera-upload.scss';
 import Camera from 'react-html5-camera-photo';
+import { showToast } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { createAttachment } from './attachments.resource';
 import { readFileAsString } from './utils';
@@ -29,6 +30,7 @@ const CameraUpload: React.FC<CameraUploadProps> = ({
   collectCaption = true,
 }) => {
   const mediaStream = useRef<MediaStream | undefined>();
+  const [error, setError] = useState<Error>(undefined);
   const [cameraIsOpen, setCameraIsOpen] = useState(openCameraOnRender);
   const [dataUri, setDataUri] = useState('');
   const { t } = useTranslation();
@@ -52,6 +54,16 @@ const CameraUpload: React.FC<CameraUploadProps> = ({
   const setMediaStream = useCallback((ms: MediaStream) => {
     mediaStream.current = ms;
   }, []);
+
+  useEffect(() => {
+    if (error) {
+      showToast({
+        description: error.message,
+        kind: 'error',
+        title: t('cameraError', 'Camera Error'),
+      });
+    }
+  }, [error]);
 
   useEffect(() => {
     return () => {
@@ -93,7 +105,9 @@ const CameraUpload: React.FC<CameraUploadProps> = ({
             />
           ) : (
             <>
-              <Camera onTakePhoto={handleTakePhoto} onCameraStart={setMediaStream} />
+              {!error && (
+                <Camera onTakePhoto={handleTakePhoto} onCameraStart={setMediaStream} onCameraError={setError} />
+              )}
               <div>
                 <label htmlFor="uploadPhoto" className={styles.choosePhoto}>
                   {t('selectPhoto', 'Select local photo instead')}
