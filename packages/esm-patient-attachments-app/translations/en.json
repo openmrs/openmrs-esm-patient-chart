@@ -1,8 +1,14 @@
 {
+  "add": "Add",
   "attachmentCaptionInstruction": "Enter a caption for the image",
+  "attachments": "Attachments",
   "camera": "Camera",
+  "cameraError": "Camera Error",
   "cancel": "Cancel",
+  "change": "Change",
+  "delete": "Delete",
   "deleteSelected": "Delete selected",
   "save": "Save",
+  "selectPhoto": "Select local photo instead",
   "webcamPreview": "Webcam preview"
 }
