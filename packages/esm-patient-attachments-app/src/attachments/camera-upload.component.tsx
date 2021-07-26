@@ -1,41 +1,23 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
-import Button from 'carbon-components-react/lib/components/Button';
 import ImagePreview from './image-preview.component';
 import styles from './camera-upload.scss';
 import Camera from 'react-html5-camera-photo';
 import { showToast } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import { createAttachment } from './attachments.resource';
 import { readFileAsString } from './utils';
 import 'react-html5-camera-photo/build/css/index.css';
 
 export interface CameraUploadProps {
-  openCameraOnRender?: boolean;
   collectCaption?: boolean;
-  shouldNotRenderButton?: boolean;
-  patientUuid: string;
-  selectedFile?: File;
   onTakePhoto?(dataUri: string): void;
-  delegateSaveImage?(dataUri: string, caption: string): void;
-  onNewAttachment?(att: any): void;
+  onSavePhoto?(dataUri: string, caption: string): void;
 }
 
-const CameraUpload: React.FC<CameraUploadProps> = ({
-  openCameraOnRender,
-  onNewAttachment,
-  delegateSaveImage,
-  onTakePhoto,
-  patientUuid,
-  shouldNotRenderButton,
-  collectCaption = true,
-}) => {
+const CameraUpload: React.FC<CameraUploadProps> = ({ onSavePhoto, onTakePhoto, collectCaption = true }) => {
   const mediaStream = useRef<MediaStream | undefined>();
   const [error, setError] = useState<Error>(undefined);
-  const [cameraIsOpen, setCameraIsOpen] = useState(openCameraOnRender);
   const [dataUri, setDataUri] = useState('');
   const { t } = useTranslation();
-
-  const openCamera = useCallback(() => setCameraIsOpen(true), []);
 
   const clearCamera = useCallback(() => setDataUri(''), []);
 
@@ -71,53 +53,36 @@ const CameraUpload: React.FC<CameraUploadProps> = ({
     };
   }, []);
 
-  const handleSaveImage = useCallback(
-    (dataUri: string, caption: string) => {
-      const abortController = new AbortController();
-      createAttachment(patientUuid, dataUri, caption, abortController).then((res) => onNewAttachment?.(res.data));
-    },
-    [patientUuid, onNewAttachment],
-  );
-
-  const save = delegateSaveImage ?? handleSaveImage;
-
   const willSaveImage = useCallback(
     (dataUri: string, caption: string) => {
-      save(dataUri, caption);
+      onSavePhoto?.(dataUri, caption);
       clearCamera();
     },
-    [clearCamera, save],
+    [clearCamera, onSavePhoto],
   );
-
-  useEffect(() => setCameraIsOpen(openCameraOnRender), [openCameraOnRender]);
 
   return (
     <div className={styles.cameraSection}>
-      {!shouldNotRenderButton && !cameraIsOpen && <Button onClick={openCamera}>{t('camera', 'Camera')}</Button>}
-      {cameraIsOpen && (
-        <div className={styles.frameContent}>
-          {dataUri ? (
-            <ImagePreview
-              content={dataUri}
-              onCancelCapture={clearCamera}
-              onSaveImage={willSaveImage}
-              collectCaption={collectCaption}
-            />
-          ) : (
-            <>
-              {!error && (
-                <Camera onTakePhoto={handleTakePhoto} onCameraStart={setMediaStream} onCameraError={setError} />
-              )}
-              <div>
-                <label htmlFor="uploadPhoto" className={styles.choosePhoto}>
-                  {t('selectPhoto', 'Select local photo instead')}
-                </label>
-                <input type="file" id="uploadPhoto" accept="image/*" className={styles.uploadFile} onChange={upload} />
-              </div>
-            </>
-          )}
-        </div>
-      )}
+      <div className={styles.frameContent}>
+        {dataUri ? (
+          <ImagePreview
+            content={dataUri}
+            onCancelCapture={clearCamera}
+            onSaveImage={willSaveImage}
+            collectCaption={collectCaption}
+          />
+        ) : (
+          <>
+            {!error && <Camera onTakePhoto={handleTakePhoto} onCameraStart={setMediaStream} onCameraError={setError} />}
+            <div>
+              <label htmlFor="uploadPhoto" className={styles.choosePhoto}>
+                {t('selectPhoto', 'Select local photo instead')}
+              </label>
+              <input type="file" id="uploadPhoto" accept="image/*" className={styles.uploadFile} onChange={upload} />
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 };

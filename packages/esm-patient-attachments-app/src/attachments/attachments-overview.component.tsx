@@ -84,13 +84,14 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
 
   const showCam = useCallback(() => {
     const close = showModal('capture-photo-modal', {
-      onNewAttachment: (data: any) => {
-        pushAttachments([data], new AbortController());
-        close();
+      onSavePhoto(dataUri: string, caption: string) {
+        const abortController = new AbortController();
+        createAttachment(patientUuid, dataUri, caption, abortController).then((res) => {
+          pushAttachments([res.data], new AbortController());
+          close();
+        });
       },
-      openCameraOnRender: true,
-      shouldNotRenderButton: true,
-      patientUuid,
+      collectCaption: true,
     });
   }, [patientUuid]);
 

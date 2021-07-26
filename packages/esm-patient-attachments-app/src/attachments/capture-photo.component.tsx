@@ -5,28 +5,24 @@ import { showModal, toOmrsIsoString } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 
 export interface CapturePhotoProps {
-  patientUuid?: string;
   onCapturePhoto(dataUri: string, photoDateTime: string): void;
   initialState?: string;
 }
 
-const CapturePhoto: React.FC<CapturePhotoProps> = ({ patientUuid, initialState, onCapturePhoto }) => {
+const CapturePhoto: React.FC<CapturePhotoProps> = ({ initialState, onCapturePhoto }) => {
   const { t } = useTranslation();
   const [dataUri, setDataUri] = useState(null);
 
   const showCam = useCallback(() => {
     const close = showModal('capture-photo-modal', {
-      delegateSaveImage(dataUri: string) {
+      onSavePhoto(dataUri: string) {
         setDataUri(dataUri);
         onCapturePhoto(dataUri, toOmrsIsoString(new Date()));
         close();
       },
       collectCaption: false,
-      openCameraOnRender: true,
-      shouldNotRenderButton: true,
-      patientUuid,
     });
-  }, [patientUuid, onCapturePhoto]);
+  }, [onCapturePhoto]);
 
   return (
     <div style={{ display: 'flex', alignItems: 'center' }}>
