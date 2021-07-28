@@ -138,17 +138,15 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
           boxShadow: 'none',
         }}>
         <div className={styles.immunizationMargin}>
-          {error != null ? (
+          {!error ? (
             <>
-            <p className="omrs-medium">
-              <Trans i18nKey="errorCopy">
-                Sorry, there was a problem displaying this information. You can try to reload this page, or contact the
-                site administrator and quote the error below:
-              </Trans>
-            </p>
-            <p>
-              { error.toString() }
-            </p>
+              <p className="omrs-medium">
+                <Trans i18nKey="errorCopy">
+                  Sorry, there was a problem displaying this information. You can try to reload this page, or contact
+                  the site administrator and quote the error below:
+                </Trans>
+              </p>
+              <p>{error.toString()}</p>
             </>
           ) : (
             <p className="omrs-medium">
