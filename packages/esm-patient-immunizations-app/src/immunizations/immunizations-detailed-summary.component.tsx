@@ -26,6 +26,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
   const config = useConfig();
   const { t } = useTranslation();
   const [allImmunizations, setAllImmunizations] = useState(null);
+  const [error, setError] = useState(null);
   const immunizationsConfig: ImmunizationWidgetConfigObject = config.immunizationsConfig;
 
   function findConfiguredSequences(configuredSequences: Array<ImmunizationSequenceDefinition>) {
@@ -69,40 +70,37 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
 
     if (patient) {
       const searchTerm = immunizationsConfig?.vaccinesConceptSet;
-      const configuredImmunizations: Promise<Array<ImmunizationData>> = getImmunizationsConceptSet(
-        searchTerm,
-        abortController,
-      ).then(findConfiguredSequences(immunizationsConfig?.sequenceDefinitions));
+      const configuredImmunizations = getImmunizationsConceptSet(searchTerm, abortController).then(
+        findConfiguredSequences(immunizationsConfig?.sequenceDefinitions),
+      );
 
-      const existingImmunizationsForPatient: Promise<Array<ImmunizationData>> = performPatientImmunizationsSearch(
+      const existingImmunizationsForPatient = performPatientImmunizationsSearch(
         patient.identifier[0].value,
         patientUuid,
         abortController,
       ).then(mapFromFHIRImmunizationBundle);
 
-      const consolidatedImmunizations: Promise<Array<ImmunizationData>> = Promise.all([
-        configuredImmunizations,
-        existingImmunizationsForPatient,
-      ]).then(([configuredImmunizations, existingImmunizationsForPatient]) =>
-        findExistingDoses(configuredImmunizations, existingImmunizationsForPatient),
-      );
-
-      consolidatedImmunizations
-        .then((consolidatedImmunizations: Array<ImmunizationData>) => {
+      Promise.all([configuredImmunizations, existingImmunizationsForPatient])
+        .then(([configuredImmunizations, existingImmunizationsForPatient]) => {
+          const consolidatedImmunizations = findExistingDoses(
+            configuredImmunizations,
+            existingImmunizationsForPatient || [],
+          );
           const sortedImmunizationsForPatient = orderBy(
             consolidatedImmunizations,
             [(immunization) => get(immunization, 'existingDoses.length', 0)],
             ['desc'],
           );
+          setError(null);
           setAllImmunizations(sortedImmunizationsForPatient);
         })
         .catch((err) => {
           if (err.name !== 'AbortError') {
             setAllImmunizations([]);
-            createErrorHandler();
+            setError(err);
+            createErrorHandler()(err);
           }
         });
-
       return () => abortController.abort();
     }
   }, [patient, patientUuid, immunizationsConfig]);
@@ -140,14 +138,21 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
           boxShadow: 'none',
         }}>
         <div className={styles.immunizationMargin}>
-          <p className="omrs-medium">
-            <Trans i18nKey="noImmunizationsAreConfigured">No immunizations are configured.</Trans>
-          </p>
-          <p className="omrs-medium">
-            <a href="https://github.com/openmrs/openmrs-esm-patient-chart-widgets#configuration">
-              <Trans i18nKey="configureImmunizationsPrompt">Please configure immunizations.</Trans>
-            </a>
-          </p>
+          {!error ? (
+            <>
+              <p className="omrs-medium">
+                <Trans i18nKey="errorCopy">
+                  Sorry, there was a problem displaying this information. You can try to reload this page, or contact
+                  the site administrator and quote the error below:
+                </Trans>
+              </p>
+              <p>{error.toString()}</p>
+            </>
+          ) : (
+            <p className="omrs-medium">
+              <Trans i18nKey="noImmunizationsAreConfigured">No immunizations are configured.</Trans>
+            </p>
+          )}
         </div>
       </SummaryCard>
     );

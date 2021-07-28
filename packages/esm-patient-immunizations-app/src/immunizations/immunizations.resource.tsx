@@ -23,18 +23,22 @@ function searchImmunizationsConceptSetByMapping(
   const [source, code] = split(immunizationsConceptSetSearchText, ':');
   return openmrsFetch(`/ws/rest/v1/concept?source=${source}&code=${code}&v=full`, {
     signal: abortController.signal,
-  }).then((response) => response.data.results[0]);
+  }).then((response) => {
+    return response.data.results[0];
+  });
 }
 
-export function getImmunizationsConceptSet(
+export async function getImmunizationsConceptSet(
   immunizationsConceptSetSearchText: string,
   abortController: AbortController,
 ): Promise<OpenmrsConcept> {
-  if (isConceptMapping(immunizationsConceptSetSearchText)) {
-    return searchImmunizationsConceptSetByMapping(immunizationsConceptSetSearchText, abortController);
-  } else {
-    return getImmunizationsConceptSetByUuid(immunizationsConceptSetSearchText, abortController);
+  const result = isConceptMapping(immunizationsConceptSetSearchText)
+    ? await searchImmunizationsConceptSetByMapping(immunizationsConceptSetSearchText, abortController)
+    : await getImmunizationsConceptSetByUuid(immunizationsConceptSetSearchText, abortController);
+  if (!result) {
+    throw new Error(`No concept found identified by '${immunizationsConceptSetSearchText}'`);
   }
+  return result;
 }
 
 export function performPatientImmunizationsSearch(

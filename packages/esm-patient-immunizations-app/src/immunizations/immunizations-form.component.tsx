@@ -121,7 +121,7 @@ const ImmunizationsForm: React.FC<ImmunizationsFormProps> = ({
       abortController,
     ).then((response) => {
       response.status === 200 && navigate();
-    }, createErrorHandler);
+    }, createErrorHandler());
     return () => abortController.abort();
   };
 
