@@ -4,7 +4,7 @@ import debounce from 'lodash-es/debounce';
 import isEmpty from 'lodash-es/isEmpty';
 import styles from './form-view.component.scss';
 import { attach, navigate, usePagination, useVisit, Visit } from '@openmrs/esm-framework';
-import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
+import { PatientChartPagination } from './pagination-see-all.component';
 import { useTranslation } from 'react-i18next';
 import { Form } from '../types';
 import DataTable, {
@@ -73,7 +73,7 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient }) => {
   const { currentVisit } = useVisit(patientUuid);
   const [searchTerm, setSearchTerm] = React.useState<string>(null);
   const [allForms, setAllForms] = React.useState<Array<Form>>(forms);
-  const { results, goTo, currentPage } = usePagination(allForms.sort(sortFormLatestFirst), 5);
+  const { results, goTo, currentPage } = usePagination(allForms.sort(sortFormLatestFirst), 10);
 
   const handleSearch = React.useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), 300), []);
 
@@ -166,8 +166,8 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient }) => {
               pageNumber={currentPage}
               totalItems={allForms.length}
               currentItems={results.length}
-              pageUrl={`./forms-see-all.component.tsx?patientUuid=${patientUuid}`}
-              pageSize={5}
+              pageUrl={`$\{openmrsSpaBase}/patient/${patientUuid}/chart/summary`}
+              pageSize={10}
               onPageNumberChange={({ page }) => goTo(page)}
             />
           </>

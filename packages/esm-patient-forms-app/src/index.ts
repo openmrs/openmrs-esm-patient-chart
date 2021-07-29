@@ -38,6 +38,8 @@ function setupOpenMRS() {
   defineConfigSchema(moduleName, {});
 
   return {
+    lifecycle: getAsyncLifecycle(() => import('./forms/forms-see-all.component'), options),
+    activate: 'forms-see-all.component',
     extensions: [
       {
         id: 'forms-widget',
