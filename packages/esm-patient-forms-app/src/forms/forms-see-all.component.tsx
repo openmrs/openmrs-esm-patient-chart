@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import dayjs from 'dayjs';
 import first from 'lodash-es/first';
 import ContentSwitcher from 'carbon-components-react/es/components/ContentSwitcher';
@@ -11,7 +11,7 @@ import { fetchAllForms, fetchPatientEncounters } from './forms.resource';
 import { filterAvailableAndCompletedForms } from './forms-utils';
 import { Encounter, Form } from '../types';
 import EmptyFormView from './empty-form.component';
-import { fhir } from '@openmrs/esm-framework';
+import { getObjectFHIR } from './get-FHIR-object';
 
 enum FormViewState {
   recommended = 0,
@@ -19,19 +19,11 @@ enum FormViewState {
   all,
 }
 
-interface FormsProps {
-  patientUuid: string;
-  patient: fhir.Patient;
-}
-
-const Forms: React.FC<FormsProps> = ({ patientUuid, patient }) => {
-  async function setPatient(uUid) {
-    patient = (await fhir.read<fhir.Patient>({ type: 'Patient', patient: uUid })).data;
-  }
-
+const Forms = () => {
   const query = new URLSearchParams(location.search);
-  patientUuid = query.get('patientUuid');
-  setPatient(patientUuid);
+  const patientUuid = query.get('patientUuid');
+  const [patient, setPatient] = useState<fhir.Patient>();
+  getObjectFHIR(patientUuid).then(setPatient);
   const { t } = useTranslation();
   const displayText = t('forms', 'Forms');
   const headerTitle = t('forms', 'Forms');
@@ -78,51 +70,47 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient }) => {
     setFilledForms(filledForms);
   }, [forms, completedForms]);
 
-  const RenderForm = () => {
-    return (
-      <div className={styles.formsWidgetContainer}>
-        <div className={styles.formsHeaderContainer}>
-          <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
-          <div className={styles.contextSwitcherContainer}>
-            <ContentSwitcher
-              className={styles.contextSwitcherWidth}
-              onChange={(event) => setSelectedFormView(event.name as any)}
-              selectedIndex={selectedFormView}>
-              <Switch name={FormViewState.recommended} text="Recommended" />
-              <Switch name={FormViewState.completed} text="Completed" />
-              <Switch name={FormViewState.all} text="All" />
-            </ContentSwitcher>
-          </div>
-        </div>
-        <div style={{ width: '100%' }}>
-          {selectedFormView === FormViewState.completed && (
-            <FormView
-              forms={completedForms}
-              patientUuid={patientUuid}
-              patient={patient}
-              encounterUuid={first<Encounter>(encounters)?.uuid}
-            />
-          )}
-          {selectedFormView === FormViewState.all && (
-            <FormView
-              forms={filledForms}
-              patientUuid={patientUuid}
-              patient={patient}
-              encounterUuid={first<Encounter>(encounters)?.uuid}
-            />
-          )}
-          {selectedFormView === FormViewState.recommended && (
-            <EmptyFormView action={t('noRecommendedFormsAvailable', 'No recommended forms available at the moment')} />
-          )}
-        </div>
-      </div>
-    );
-  };
-
   return (
     <>
       {filledForms.length > 0 ? (
-        <RenderForm />
+        <div className={styles.formsWidgetContainer}>
+          <div className={styles.formsHeaderContainer}>
+            <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
+            <div className={styles.contextSwitcherContainer}>
+              <ContentSwitcher
+                className={styles.contextSwitcherWidth}
+                onChange={(event) => setSelectedFormView(event.name as any)}
+                selectedIndex={selectedFormView}>
+                <Switch name={FormViewState.recommended} text="Recommended" />
+                <Switch name={FormViewState.completed} text="Completed" />
+                <Switch name={FormViewState.all} text="All" />
+              </ContentSwitcher>
+            </div>
+          </div>
+          <div style={{ width: '100%' }}>
+            {selectedFormView === FormViewState.completed && (
+              <FormView
+                forms={completedForms}
+                patientUuid={patientUuid}
+                patient={patient}
+                encounterUuid={first<Encounter>(encounters)?.uuid}
+              />
+            )}
+            {selectedFormView === FormViewState.all && (
+              <FormView
+                forms={filledForms}
+                patientUuid={patientUuid}
+                patient={patient}
+                encounterUuid={first<Encounter>(encounters)?.uuid}
+              />
+            )}
+            {selectedFormView === FormViewState.recommended && (
+              <EmptyFormView
+                action={t('noRecommendedFormsAvailable', 'No recommended forms available at the moment')}
+              />
+            )}
+          </div>
+        </div>
       ) : (
         <EmptyState displayText={displayText} headerTitle={t('helpText', 'Contact system Admin to configure form')} />
       )}
