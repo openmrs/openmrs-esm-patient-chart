@@ -3,45 +3,68 @@
 @import "~carbon-components/src/globals/scss/vars";
 @import "~carbon-components/src/globals/scss/mixins";
 
- :global(.omrs-breakpoint-lt-desktop) .contextWorkspaceContainer {
-   position: fixed;
-   top: 0;
-   left: 0;
-   right: 0;
-   bottom: 0;
-   z-index: 10;
-   background-color: $ui-01;
-   overflow-y: auto;
- }
+:global(.omrs-breakpoint-lt-desktop) .contextWorkspaceContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  background-color: $ui-01;
+  overflow-y: auto;
+}
 
- /* Desktop view */
- :global(.omrs-breakpoint-gt-tablet) .contextWorkspaceContainer {
-   z-index: 1;
-   background-color: $ui-02;
-   margin-right: 50px;
-   flex: 1;
-   border-left: 0.0625rem solid $openmrs-background-grey;
-   overflow-y: auto;
- }
+/* Desktop view */
+:global(.omrs-breakpoint-gt-tablet) .contextWorkspaceContainer {
+  z-index: 1;
+  background-color: $ui-02;
+  margin-right: 50px;
+  flex: 1;
+  border-left: 0.0625rem solid $openmrs-background-grey;
+  overflow-y: auto;
+}
 
- :global(.omrs-breakpoint-gt-tablet) .contextWorkspaceContainer > header,
- :global(.omrs-breakpoint-gt-tablet) .contextWorkspaceContainer > header a {
+:global(.omrs-breakpoint-gt-tablet) .contextWorkspaceContainer>header {
   background-color: $ui-03;
+  border-bottom: 0.0625rem solid #a8a8a8;
+}
+
+:global(.omrs-breakpoint-gt-tablet) .contextWorkspaceContainer>header a {
   color: $ui-05;
 }
 
-:global(.omrs-breakpoint-gt-tablet) .contextWorkspaceContainer > header button {
-  color: $color-blue-60-2;
-  fill:$color-blue-60-2
+:global(.omrs-breakpoint-gt-tablet) .contextWorkspaceContainer>header button {
+  color: $ui-05;
+  fill: $ui-05;
+  background-color: transparent;
+  min-height: 1rem;
+  height: 2.9375rem;
 }
 
-:global(.omrs-breakpoint-gt-tablet) .contextWorkspaceContainer > header button {
-  background-color: $ui-03;
-}
-
-:global(.omrs-breakpoint-gt-tablet) .contextWorkspaceContainer > header button:hover {
+:global(.omrs-breakpoint-gt-tablet) .contextWorkspaceContainer>header button:last-child {
   background-color: $ui-02;
-  color: $color-blue-60-2;
-  fill:$color-blue-60-2;
 }
 
+:global(.omrs-breakpoint-gt-tablet) .contextWorkspaceContainer>header button:hover {
+  background-color: #BFBFBF;
+  color: $ui-05;
+  fill: $ui-05;
+}
+
+
+:global(.omrs-breakpoint-gt-tablet) .maximized {
+  position: fixed;
+  top: 3rem;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10000;
+}
+
+.hide {
+  display: none;
+}
+
+.show {
+  display: inline-block;
+}
