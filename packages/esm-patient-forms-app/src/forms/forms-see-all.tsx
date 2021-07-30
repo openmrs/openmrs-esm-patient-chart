@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import dayjs from 'dayjs';
 import first from 'lodash-es/first';
 import ContentSwitcher from 'carbon-components-react/es/components/ContentSwitcher';
@@ -20,10 +20,16 @@ enum FormViewState {
 }
 
 const Forms = () => {
-  const query = new URLSearchParams(location.search);
-  const patientUuid = query.get('patientUuid');
-  const [patient, setPatient] = useState<fhir.Patient>();
-  getObjectFHIR(patientUuid).then(setPatient);
+  const urlPathArray = window.location.pathname.split('/');
+  const pathUuid = urlPathArray[urlPathArray.length - 2];
+  const [patientUuid, setUUID] = React.useState(null);
+  const [patient, setPatient] = React.useState<fhir.Patient>();
+
+  React.useEffect(() => {
+    getObjectFHIR(patientUuid).then(setPatient);
+    setUUID(pathUuid);
+  }, [pathUuid, patientUuid]);
+
   const { t } = useTranslation();
   const displayText = t('forms', 'Forms');
   const headerTitle = t('forms', 'Forms');

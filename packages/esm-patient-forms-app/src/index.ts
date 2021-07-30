@@ -38,8 +38,12 @@ function setupOpenMRS() {
   defineConfigSchema(moduleName, {});
 
   return {
-    lifecycle: getAsyncLifecycle(() => import('./forms/forms-see-all.component'), options),
-    activate: 'forms-see-all.component',
+    pages: [
+      {
+        load: getAsyncLifecycle(() => import('./forms/forms-see-all'), options),
+        route: 'patient/forms',
+      }
+    ],
     extensions: [
       {
         id: 'forms-widget',
