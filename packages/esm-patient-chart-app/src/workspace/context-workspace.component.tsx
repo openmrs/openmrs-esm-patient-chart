@@ -18,13 +18,13 @@ type ActionTypes = 'minimize' | 'maximize' | 'hide' | 'reopen';
 const reducer = (state: WindowSize, action: ActionTypes) => {
   switch (action) {
     case 'maximize':
-      return (state = 'maximize');
+      return 'maximize';
     case 'minimize':
-      return (state = 'normal');
+      return 'normal';
     case 'hide':
-      return (state = 'hide');
+      return 'hide';
     case 'reopen':
-      return (state = 'normal');
+      return 'normal';
   }
 };
 
