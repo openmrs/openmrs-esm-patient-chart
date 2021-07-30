@@ -10,6 +10,7 @@ export interface WorkspaceState {
 
 export interface WorkspaceDetails extends WorkspaceState {
   closeWorkspace(): void;
+  extensions: Array<string>;
 }
 
 export function useWorkspace(): WorkspaceDetails {
@@ -32,5 +33,6 @@ export function useWorkspace(): WorkspaceDetails {
     title,
     active: extensions.length > 0,
     closeWorkspace,
+    extensions,
   };
 }
