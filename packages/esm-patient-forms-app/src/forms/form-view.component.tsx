@@ -166,7 +166,7 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient }) => {
               pageNumber={currentPage}
               totalItems={allForms.length}
               currentItems={results.length}
-              pageUrl={`patient/forms/${patientUuid}/forms-see-all`}
+              pageUrl={`chart/patient/${patientUuid}/forms`}
               pageSize={5}
               onPageNumberChange={({ page }) => goTo(page)}
             />

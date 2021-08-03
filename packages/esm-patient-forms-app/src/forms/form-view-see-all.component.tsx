@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Search from 'carbon-components-react/es/components/Search';
 import debounce from 'lodash-es/debounce';
 import isEmpty from 'lodash-es/isEmpty';
@@ -71,13 +71,15 @@ const filterFormsByName = (formName: string, forms: Array<Form>) => {
 const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient }) => {
   const { t } = useTranslation();
   const { currentVisit } = useVisit(patientUuid);
-  const [searchTerm, setSearchTerm] = React.useState<string>(null);
-  const [allForms, setAllForms] = React.useState<Array<Form>>(forms);
+  const [searchTerm, setSearchTerm] = useState<string>(null);
+  const [allForms, setAllForms] = useState<Array<Form>>(forms);
   const { results, goTo, currentPage } = usePagination(allForms.sort(sortFormLatestFirst), 10);
 
-  const handleSearch = React.useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), 300), []);
+  const handleSearch = (event) => {
+    setSearchTerm(event.target.value);
+  };
 
-  React.useEffect(() => {
+  useEffect(() => {
     setAllForms(!isEmpty(searchTerm) ? filterFormsByName(searchTerm, forms) : forms);
   }, [searchTerm, forms]);
 
@@ -123,7 +125,7 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient }) => {
         labelText=""
         className={styles.formSearchInput}
         placeholder={t('searchForForm', 'Search for a form')}
-        onChange={(evnt) => handleSearch(evnt.target.value)}
+        onChange={handleSearch}
       />
       <>
         {!isEmpty(searchTerm) && !isEmpty(allForms) && (
