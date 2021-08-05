@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { FunctionComponent } from 'react';
 import Pagination from 'carbon-components-react/es/components/Pagination';
 import styles from '@openmrs/esm-patient-common-lib/src/pagination/pagination.component.scss';
 import { useTranslation } from 'react-i18next';
 import { ConfigurableLink } from '@openmrs/esm-framework';
-import { usePaginationInfo } from '@openmrs/esm-patient-common-lib/src/pagination/usePaginationInfo';
+import { usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 
 interface PatientChartPaginationProps {
   currentItems: number;
@@ -14,7 +14,7 @@ interface PatientChartPaginationProps {
   pageUrl?: string;
 }
 
-export const PatientChartPagination: React.FC<PatientChartPaginationProps> = ({
+export const PatientChartPagination: FunctionComponent<PatientChartPaginationProps> = ({
   totalItems,
   pageSize,
   onPageNumberChange,

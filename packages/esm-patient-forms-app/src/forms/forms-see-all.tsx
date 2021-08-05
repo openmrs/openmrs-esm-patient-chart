@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import dayjs from 'dayjs';
-import first from 'lodash-es/first';
 import ContentSwitcher from 'carbon-components-react/es/components/ContentSwitcher';
 import Switch from 'carbon-components-react/es/components/Switch';
 import FormView from './form-view-see-all.component';
@@ -13,7 +12,10 @@ import { Form } from '../types';
 import EmptyFormView from './empty-form.component';
 import { getObjectFHIR } from './get-FHIR-object';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import _ from 'lodash';
+import first from 'lodash-es/first';
+import uniqBy from 'lodash-es/uniqBy';
+import orderBy from 'lodash-es/orderBy';
+import map from 'lodash-es/map';
 
 enum FormViewState {
   recommended = 0,
@@ -82,11 +84,13 @@ const Forms = () => {
       },
     );
     var result_transformed = searchResult.data.results.map((result) => toEncounterObject(result));
-    _.map(result_transformed, function (row) {
+
+    result_transformed = map(result_transformed, function (row) {
       if (row.form_id != null) return row;
     });
-    result_transformed = _.uniqBy(result_transformed, 'form_id');
-    return _.orderBy(result_transformed, ['encounterDateTime'], ['desc']);
+
+    result_transformed = uniqBy(result_transformed, 'form_id');
+    return orderBy(result_transformed, ['encounterDateTime'], ['desc']);
   }
 
   useEffect(() => {

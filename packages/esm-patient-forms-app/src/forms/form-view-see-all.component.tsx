@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, FunctionComponent } from 'react';
 import Search from 'carbon-components-react/es/components/Search';
-import debounce from 'lodash-es/debounce';
 import isEmpty from 'lodash-es/isEmpty';
 import styles from './form-view.component.scss';
 import { attach, navigate, usePagination, useVisit, Visit } from '@openmrs/esm-framework';
@@ -68,7 +67,7 @@ const filterFormsByName = (formName: string, forms: Array<Form>) => {
   return forms.filter((form) => form.name.toLowerCase().search(formName.toLowerCase()) !== -1);
 };
 
-const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient }) => {
+const FormView: FunctionComponent<FormViewProps> = ({ forms, patientUuid, patient }) => {
   const { t } = useTranslation();
   const { currentVisit } = useVisit(patientUuid);
   const [searchTerm, setSearchTerm] = useState<string>(null);
