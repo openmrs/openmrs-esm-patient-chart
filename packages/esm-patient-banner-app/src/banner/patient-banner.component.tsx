@@ -5,9 +5,9 @@ import ChevronDown16 from '@carbon/icons-react/es/chevron--down/16';
 import ChevronUp16 from '@carbon/icons-react/es/chevron--up/16';
 import OverflowMenuVertical16 from '@carbon/icons-react/es/overflow-menu--vertical/16';
 import capitalize from 'lodash-es/capitalize';
+import styles from './patient-banner.scss';
 import ContactDetails from '../contact-details/contact-details.component';
 import CustomOverflowMenuComponent from '../ui-components/overflow-menu.component';
-import styles from './patient-banner.scss';
 import { ExtensionSlot, age } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 
