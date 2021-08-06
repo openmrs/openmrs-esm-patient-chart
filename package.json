@@ -55,7 +55,7 @@
     "jest": "^26.4.2",
     "jest-cli": "^26.4.2",
     "lerna": "^3.22.1",
-    "openmrs": "^3.1.10-pre.464",
+    "openmrs": "next",
     "prettier": "^2.2.1",
     "pretty-quick": "^2.0.2",
     "react": "^16.0.0",
