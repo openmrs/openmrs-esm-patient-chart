@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import React from 'react';
 import dayjs from 'dayjs';
 import Add16 from '@carbon/icons-react/es/add/16';
@@ -83,24 +84,25 @@ const RenderVitals: React.FC<RenderVitalsProps> = ({
           <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
           <div className={styles.toggleButtons}>
             <Button
-              className={styles.toggle}
+              className={`${styles.toggle} ${!chartView && styles.activeButton}`}
               size="field"
-              kind={chartView ? 'ghost' : 'secondary'}
+              kind="ghost"
               hasIconOnly
               renderIcon={Table16}
               iconDescription={t('tableView', 'Table View')}
               onClick={() => setChartView(false)}
             />
             <Button
-              className={styles.toggle}
+             className={`${styles.toggle} ${chartView && styles.activeButton}`}
               size="field"
-              kind={chartView ? 'secondary' : 'ghost'}
+              kind="ghost"
               hasIconOnly
               renderIcon={ChartLineSmooth16}
               iconDescription={t('chartView', 'Chart View')}
               onClick={() => setChartView(true)}
             />
           </div>
+          <div className={styles.divider}></div>
           {showAddVitals && (
             <Button kind="ghost" renderIcon={Add16} iconDescription="Add vitals" onClick={launchVitalsBiometricsForm}>
               {t('add', 'Add')}

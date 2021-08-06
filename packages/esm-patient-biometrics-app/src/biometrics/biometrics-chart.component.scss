@@ -41,8 +41,41 @@
   width: 7.063rem;
 }
 
-.biometricSignsRadioButton {
-  @extend .bodyShort01;
-  color: $ui-05;
-  padding: $spacing-03 0;
+.verticalTabs {
+  margin: 1rem 0;
+  scroll-behavior: smooth;
+}
+
+.verticalTabs > ul {
+  flex-direction: column !important;
+  text-decoration: none;
+}
+
+.tab:hover {
+  border-bottom: none !important;
+}
+
+tab > button:first {
+  margin-left: 10px;
+}
+
+.tab > button, .tab > button:focus, .tab > button:active {
+  outline: 0 !important;
+  outline-offset: 0 !important;
+}
+
+.selectedTab > button {
+  border-left: 3px solid #007d79 !important;
+  border-bottom: 0 !important;
+  font-weight: 600 !important;
+}
+
+.tabContent {
+  border-top: 1px solid #e0e0e0;
+  padding: 1rem 0;
+  width: 70%;
+}
+
+:global(.bx--tabs--scrollable .bx--tabs--scrollable__nav-link){
+  border-bottom:none !important ;
 }

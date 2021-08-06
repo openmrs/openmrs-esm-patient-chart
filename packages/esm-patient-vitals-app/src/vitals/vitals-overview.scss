@@ -13,7 +13,7 @@
   padding: $spacing-04 0 $spacing-04 $spacing-05;
 }
 
-.vitalsHeaderContainer > h4:after {
+.vitalsHeaderContainer>h4:after {
   content: "";
   display: block;
   width: 2rem;
@@ -21,9 +21,22 @@
   border-bottom: 0.375rem solid $brand-teal-01;
 }
 
+.activeButton {
+  background-color: #C2D8FF;
+  border: solid blue 2px;
+  color: darkblue;
+}
+
+.toggle {
+  border: 1px solid #C2D8FF;
+}
+
 .toggleButtons {
   width: fit-content;
   margin: 0 $spacing-03;
+  padding-left: 52.875rem;
+  height: 2.5rem;
+  border-radius: 4px;
 }
 
 .toggle:first-of-type {
@@ -32,6 +45,13 @@
 
 .toggle:last-of-type {
   border-radius: 0 $spacing-02 $spacing-02 0;
+}
+
+.divider {
+  width: 0.063rem;
+  height: 1rem;
+  margin: 1rem 0.5rem 1rem 1.5rem;
+  background-color: #C2C2C2;
 }
 
 .vitalsWidgetContainer {

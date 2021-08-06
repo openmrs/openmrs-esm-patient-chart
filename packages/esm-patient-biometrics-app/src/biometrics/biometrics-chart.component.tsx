@@ -1,7 +1,8 @@
+/* eslint-disable prettier/prettier */
 import React from 'react';
 import dayjs from 'dayjs';
-import RadioButton from 'carbon-components-react/es/components/RadioButton';
-import RadioButtonGroup from 'carbon-components-react/es/components/RadioButtonGroup';
+import Tab from 'carbon-components-react/es/components/Tab';
+import Tabs from 'carbon-components-react/es/components/Tabs';
 import styles from './biometrics-chart.component.scss';
 import { LineChart } from '@carbon/charts-react';
 import { LineChartOptions } from '@carbon/charts/interfaces/charts';
@@ -32,15 +33,16 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
     groupName: 'weight',
   });
 
+
   const chartData = React.useMemo(
     () =>
       patientBiometrics.map((biometric) => {
         return biometric[selectedBiometrics.value]
           ? {
-              group: selectedBiometrics.groupName,
-              key: dayjs(biometric.date).format('DD-MMM'),
-              value: biometric[selectedBiometrics.value],
-            }
+            group: selectedBiometrics.groupName,
+            key: dayjs(biometric.date).format('DD-MMM'),
+            value: biometric[selectedBiometrics.value],
+          }
           : {};
       }),
     [patientBiometrics, selectedBiometrics],
@@ -75,33 +77,29 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
         <label className={styles.biometricSign} htmlFor="biometrics-chart-radio-group">
           Biometric Displayed
         </label>
-        <RadioButtonGroup
-          defaultSelected="weight"
-          name="biometrics-chart-radio-group"
-          valueSelected="weight"
-          orientation="vertical"
-          labelPosition="right">
+        <Tabs
+          className={styles.verticalTabs}
+          type="default">
           {[
             { id: 'weight', label: `Weight (${weightUnit})` },
             { id: 'height', label: `Height (${heightUnit})` },
             { id: 'bmi', label: `BMI (${bmiUnit})` },
           ].map(({ id, label }) => (
-            <RadioButton
-              key={id}
-              id={id}
-              labelText={label}
-              value={id}
-              className={styles.biometricSignsRadioButton}
-              onClick={() =>
-                setSelectedBiometrics({
-                  title: label,
-                  value: id,
-                  groupName: id,
-                })
+            <Tab
+            className={`${styles.tab} ${styles.bodyLong01} ${selectedBiometrics.title === label && styles.selectedTab}`}
+              onClick={() => setSelectedBiometrics({
+                title: label,
+                value: id,
+                groupName: id,
+              })
               }
+              label={label}
             />
+
           ))}
-        </RadioButtonGroup>
+        </Tabs>
+
+
       </div>
       <div className={styles.biometricChartArea}>
         <LineChart data={chartData} options={chartOptions} />
