@@ -1,0 +1,82 @@
+{
+  "name": "@openmrs/esm-form-entry-app",
+  "version": "3.0.0",
+  "license": "MPL-2.0",
+  "description": "Patient allergies microfrontend for the OpenMRS SPA",
+  "browser": "dist/main.js",
+  "main": "src/index.ts",
+  "source": true,
+  "scripts": {
+    "start": "openmrs develop --command serve",
+    "serve": "ng serve",
+    "debug": "npm run serve",
+    "build": "ng build",
+    "lint": "eslint src --ext ts",
+    "extract-translations": "ng extract-i18n"
+  },
+  "browserslist": [
+    "extends browserslist-config-openmrs"
+  ],
+  "keywords": [
+    "openmrs"
+  ],
+  "homepage": "https://github.com/openmrs/openmrs-esm-patient-chart#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/openmrs/openmrs-esm-patient-chart.git"
+  },
+  "bugs": {
+    "url": "https://github.com/openmrs/openmrs-esm-patient-chart/issues"
+  },
+  "dependencies": {
+    "@ampath-kenya/ngx-formentry": "^3.0.0-alpha5",
+    "@angular/animations": "~11.2.14",
+    "@angular/cdk": "~11.2.13",
+    "@angular/common": "~11.2.14",
+    "@angular/compiler": "~11.2.14",
+    "@angular/core": "~11.2.14",
+    "@angular/forms": "~11.2.14",
+    "@angular/platform-browser": "~11.2.14",
+    "@angular/platform-browser-dynamic": "~11.2.14",
+    "@angular/router": "~11.2.14",
+    "@ng-select/ng-select": "^6.1.0",
+    "hammerjs": "^2.0.8",
+    "jspdf": "^1.5.3",
+    "moment": "^2.17.1",
+    "ngx-bootstrap": "5.6.x",
+    "ngx-file-uploader": "0.0.18",
+    "ngx-webcam": "^0.2.2",
+    "single-spa-angular": "^4.9.2",
+    "slick-carousel": "^1.6.0",
+    "tree-model": "^1.0.5",
+    "tslib": "^2.0.0",
+    "zone.js": "~0.10.2"
+  },
+  "peerDependencies": {
+    "@openmrs/esm-framework": "3.x",
+    "carbon-components": "10.x",
+    "rxjs": "6.x"
+  },
+  "devDependencies": {
+    "@angular-builders/custom-webpack": "~11.1.1",
+    "@angular-devkit/build-angular": "~0.1102.14",
+    "@angular/cli": "~11.2.14",
+    "@angular/compiler-cli": "~11.2.14",
+    "@angular/language-service": "~11.2.14",
+    "@types/jasmine": "~3.6.0",
+    "@types/jasminewd2": "~2.0.3",
+    "codelyzer": "^6.0.0",
+    "jasmine-core": "~3.6.0",
+    "jasmine-spec-reporter": "~5.0.0",
+    "karma": "~6.3.4",
+    "karma-chrome-launcher": "~3.1.0",
+    "karma-coverage-istanbul-reporter": "~3.0.2",
+    "karma-jasmine": "~4.0.0",
+    "karma-jasmine-html-reporter": "^1.5.0",
+    "protractor": "~7.0.0",
+    "replace-in-file-webpack-plugin": "^1.0.6"
+  }
+}
