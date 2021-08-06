@@ -5,12 +5,7 @@ import { throwError as observableThrowError, of } from 'rxjs';
 import { FormSubmissionService } from './form-submission.service';
 import { OpenmrsApiModule } from '../openmrs-api/openmrs-api.module';
 import { EncounterResourceService } from '../openmrs-api/encounter-resource.service';
-import {
-  PersonAttribuAdapter,
-  Form,
-  EncounterAdapter,
-  FormEntryModule,
-} from '@ampath-kenya/ngx-formentry';
+import { PersonAttribuAdapter, Form, EncounterAdapter, FormEntryModule } from '@ampath-kenya/ngx-formentry';
 import { PersonResourceService } from '../openmrs-api/person-resource.service';
 import { FormDataSourceService } from '../form-data-source/form-data-source.service';
 import { LocalStorageService } from '../local-storage/local-storage.service';

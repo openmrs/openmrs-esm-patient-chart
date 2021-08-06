@@ -18,25 +18,24 @@ describe('FeWrapperComponent', () => {
   let component: FeWrapperComponent;
   let fixture: ComponentFixture<FeWrapperComponent>;
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      declarations: [
-        FeWrapperComponent,
-        FormSubmittedComponent
-      ],
-      imports: [BrowserModule, BrowserAnimationsModule, FormEntryModule, ReactiveFormsModule, OpenmrsApiModule],
-      providers: [
-        {
-          provide: OpenmrsEsmApiService,
-        },
-        FormSchemaService,
-        LocalStorageService,
-        FormDataSourceService,
-        FormSubmissionService,
-      ],
-      // schemas: [NO_ERRORS_SCHEMA]
-    }).compileComponents();
-  }));
+  beforeEach(
+    waitForAsync(() => {
+      TestBed.configureTestingModule({
+        declarations: [FeWrapperComponent, FormSubmittedComponent],
+        imports: [BrowserModule, BrowserAnimationsModule, FormEntryModule, ReactiveFormsModule, OpenmrsApiModule],
+        providers: [
+          {
+            provide: OpenmrsEsmApiService,
+          },
+          FormSchemaService,
+          LocalStorageService,
+          FormDataSourceService,
+          FormSubmissionService,
+        ],
+        // schemas: [NO_ERRORS_SCHEMA]
+      }).compileComponents();
+    }),
+  );
 
   beforeEach(() => {
     fixture = TestBed.createComponent(FeWrapperComponent);

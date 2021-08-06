@@ -7,5 +7,5 @@ import { fhir } from '@openmrs/esm-framework';
  * @returns A FHIR object of type fhir.Patient
  */
 export async function getObjectFHIR(uUid) {
-   return (await fhir.read<fhir.Patient>({ type: 'Patient', patient: uUid })).data;
+  return (await fhir.read<fhir.Patient>({ type: 'Patient', patient: uUid })).data;
 }

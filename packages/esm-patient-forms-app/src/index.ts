@@ -42,7 +42,7 @@ function setupOpenMRS() {
       {
         load: getAsyncLifecycle(() => import('./forms/forms-see-all'), options),
         route: /^chart\/patient\/.+\/forms/,
-      }
+      },
     ],
     extensions: [
       {

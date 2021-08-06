@@ -16,19 +16,8 @@ import { FormSubmissionService } from './form-submission/form-submission.service
 import { FormSubmittedComponent } from './form-submitted/form-submitted.component';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    EmptyRouteComponent,
-    FeWrapperComponent,
-    FormSubmittedComponent
-  ],
-  imports: [
-    BrowserModule,
-    FormEntryModule,
-    ReactiveFormsModule,
-    BrowserAnimationsModule,
-    OpenmrsApiModule,
-  ],
+  declarations: [AppComponent, EmptyRouteComponent, FeWrapperComponent, FormSubmittedComponent],
+  imports: [BrowserModule, FormEntryModule, ReactiveFormsModule, BrowserAnimationsModule, OpenmrsApiModule],
   providers: [FormSchemaService, LocalStorageService, FormDataSourceService, FormSubmissionService],
   bootstrap: [AppComponent],
 })

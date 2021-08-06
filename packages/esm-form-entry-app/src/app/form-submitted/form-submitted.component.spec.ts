@@ -6,11 +6,13 @@ describe('FormSubmittedComponent', () => {
   let component: FormSubmittedComponent;
   let fixture: ComponentFixture<FormSubmittedComponent>;
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      declarations: [FormSubmittedComponent],
-    }).compileComponents();
-  }));
+  beforeEach(
+    waitForAsync(() => {
+      TestBed.configureTestingModule({
+        declarations: [FormSubmittedComponent],
+      }).compileComponents();
+    }),
+  );
 
   beforeEach(() => {
     fixture = TestBed.createComponent(FormSubmittedComponent);
