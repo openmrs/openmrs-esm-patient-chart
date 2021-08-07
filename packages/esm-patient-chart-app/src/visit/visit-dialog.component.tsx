@@ -16,7 +16,7 @@ const VisitDialog: React.FC<VisitDialogProps> = ({ patientUuid }) => {
 
   return (
     <>
-      <StartVisitPrompt openModal={type == 'start'} />
+      <StartVisitPrompt openModal={type == 'start'} closeModal={closeModal} />
       <EndVisitPrompt openModal={type === 'end'} patientUuid={patientUuid} closeModal={closeModal} />
     </>
   );

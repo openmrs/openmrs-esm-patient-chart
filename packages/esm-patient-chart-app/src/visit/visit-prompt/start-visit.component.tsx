@@ -1,15 +1,27 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import styles from './start-visit.component.scss';
 import ComposedModal, { ModalHeader, ModalBody } from 'carbon-components-react/es/components/ComposedModal';
 import Button from 'carbon-components-react/es/components/Button';
 import { useTranslation } from 'react-i18next';
+import { attach } from '@openmrs/esm-framework';
 
 interface StartVisitPromptProps {
   openModal: boolean;
+  closeModal: () => void;
 }
 
-const StartVisitPrompt: React.FC<StartVisitPromptProps> = ({ openModal }) => {
+const StartVisitPrompt: React.FC<StartVisitPromptProps> = ({ openModal, closeModal }) => {
   const { t } = useTranslation();
+
+  const handleOpenEditPastVisit = useCallback(() => {
+    attach('patient-chart-workspace-slot', 'past-visits-overview');
+    closeModal();
+  }, [closeModal]);
+
+  const handleOpenStartVisitForm = useCallback(() => {
+    attach('patient-chart-workspace-slot', 'start-visit-workspace-form'), closeModal();
+  }, [closeModal]);
+
   return (
     <ComposedModal open={openModal}>
       <ModalHeader>
@@ -28,8 +40,12 @@ const StartVisitPrompt: React.FC<StartVisitPromptProps> = ({ openModal }) => {
           <Button kind="ghost">{t('cancel', 'Cancel')}</Button>
         </div>
         <div className={styles.right}>
-          <Button kind="secondary">{t('editPastVisit', 'Edit Past Visit')}</Button>
-          <Button kind="primary">{t('startNewVisit', 'Start New Visit')}</Button>
+          <Button onClick={handleOpenEditPastVisit} kind="secondary">
+            {t('editPastVisit', 'Edit Past Visit')}
+          </Button>
+          <Button onClick={handleOpenStartVisitForm} kind="primary">
+            {t('startNewVisit', 'Start New Visit')}
+          </Button>
         </div>
       </div>
     </ComposedModal>

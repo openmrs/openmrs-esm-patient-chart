@@ -1,0 +1,18 @@
+@import "~@openmrs/esm-styleguide/src/vars";
+@import "~carbon-components/src/globals/scss/vars";
+@import "~carbon-components/src/globals/scss/mixins";
+
+.heading {
+  @include carbon--type-style("productive-heading-03");
+  color: $text-01;
+  margin: 1rem;
+}
+
+.columnLabel {
+  @include carbon--type-style("productive-heading-02");
+  color: $text-02;
+}
+
+.contentSwitcher {
+  height: 3rem;
+}

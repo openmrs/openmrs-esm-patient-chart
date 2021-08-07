@@ -1,0 +1,33 @@
+@import "~@openmrs/esm-styleguide/src/vars";
+@import "~carbon-components/src/globals/scss/vars";
+@import "~carbon-components/src/globals/scss/mixins";
+
+.visitTypeOverviewWrapper {
+    margin: 1rem 0rem;
+    border: 1px solid $grey-2;
+    background-color: $ui-02;
+}
+
+.visitTypeOverviewWrapper div:nth-child(3) > div:nth-child(2){
+    position: relative;
+}
+
+.visitTypeOverviewWrapper div:nth-child(3)  span *{
+    display: none;
+}
+
+
+
+.radioButtonGroup {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: 0.5rem;
+    min-height: 15rem;
+    background-color: $ui-02;
+    width: 100%;
+}
+
+.radioButton {
+    padding: 0.625rem 1rem;
+}
