@@ -1,0 +1,58 @@
+@import "~carbon-components/scss/globals/scss/vendor/@carbon/elements/scss/type/styles";
+@import "~carbon-components/src/globals/scss/vendor/@carbon/layout/scss/generated/spacing";
+@import "~@openmrs/esm-styleguide/src/vars";
+
+.productiveHeading03 {
+  @include carbon--type-style("productive-heading-03");
+  color: $ui-05;
+}
+
+.buttonContainer {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: row;
+}
+
+.buttonContainer button {
+  height: 4rem;
+  display: flex;
+  align-content: flex-start;
+  flex-direction: column;
+  margin-left: 0.125rem;
+}
+
+.customLabel {
+  padding: 0.25rem 1rem;
+  display: flex;
+  @extend .bodyLong01;
+}
+
+.customLabel span:nth-child(1){
+  flex: 1;
+}
+.customLabel span:nth-child(2){
+  flex: 4;
+}
+
+.right {
+  display: flex;
+  flex-direction: row;
+}
+
+
+.bodyShort01 {
+  @include carbon--type-style("body-short-01");
+}
+
+.bodyShort02 {
+  @include carbon--type-style("body-short-02");
+}
+
+.bodyLong01 {
+  @include carbon--type-style("body-long-01");
+}
+
+.bodyLong02 {
+  @include carbon--type-style("body-long-02");
+}
+

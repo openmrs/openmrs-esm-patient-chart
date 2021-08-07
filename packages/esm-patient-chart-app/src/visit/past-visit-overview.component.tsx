@@ -1,8 +1,7 @@
-import { getVisitsForPatient, Visit } from '@openmrs/esm-api';
+import { Visit } from '@openmrs/esm-api';
 import { createErrorHandler } from '@openmrs/esm-error-handling';
-import React, { useState, useEffect } from 'react';
-import {
-  DataTable,
+import React, { useState, useEffect, useMemo, useReducer } from 'react';
+import DataTable, {
   TableContainer,
   Table,
   TableBody,
@@ -17,9 +16,9 @@ import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSk
 import OverflowMenu from 'carbon-components-react/es/components/OverflowMenu';
 import OverflowMenuItem from 'carbon-components-react/es/components/OverflowMenuItem';
 import { useTranslation } from 'react-i18next';
-import { useMemo, useReducer } from 'react-router/node_modules/@types/react';
 import dayjs from 'dayjs';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
+import { getVisitsForPatient } from '@openmrs/esm-framework';
 
 // TO DO Abstract this logic for state machines to a hook
 enum ActionTypes {
@@ -77,23 +76,24 @@ const PastVisitOverview: React.FC<PastVisitOverviewProps> = ({ patientUuid }) =>
       { key: 'startDate', header: t('startDate', 'Start Date') },
       { key: 'visitType', header: t('type', 'Type') },
       { key: 'location', header: t('location', 'Location') },
-      { key: 'endDate', header: t('endDate', 'End Date') },
-      { key: 'Actions', header: t('actions', 'Actions') },
+      { key: 'endDate', header: t('endDate', 'End Date'), colSpan: 2 },
     ],
     [t],
   );
 
   const rowData: Array<DataTableRow> = useMemo(
     () =>
-      patientPastVisits.map((visit) => {
-        return {
-          id: `${visit.uuid}`,
-          startDate: dayjs(visit.startDatetime).format(dateFormat),
-          visitType: visit.visitType,
-          location: visit.location.display,
-          endDate: dayjs(visit.stopDatetime).format(dateFormat),
-        };
-      }),
+      patientPastVisits.length
+        ? patientPastVisits.map((visit, index) => {
+            return {
+              id: `${index}`,
+              startDate: dayjs(visit.startDatetime).format(dateFormat),
+              visitType: visit.visitType.display,
+              location: visit.location?.display,
+              endDate: visit.stopDatetime ? dayjs(visit.stopDatetime).format(dateFormat) : '',
+            };
+          })
+        : [],
     [patientPastVisits],
   );
   useEffect(() => {
@@ -110,6 +110,7 @@ const PastVisitOverview: React.FC<PastVisitOverviewProps> = ({ patientUuid }) =>
           dispatch({ type: ActionTypes.error });
         },
       );
+      return () => ac.abort();
     }
   }, [patientUuid]);
 
@@ -117,25 +118,32 @@ const PastVisitOverview: React.FC<PastVisitOverviewProps> = ({ patientUuid }) =>
     <>
       {viewState.status === ActionTypes.pending && <DataTableSkeleton />}
       {viewState.status === ActionTypes.resolved && (
-        <DataTable rows={rowData} headers={headerData}>
-          {({ rows, headers, getHeaderProps, getTableProps }) => (
-            <TableContainer title="DataTable">
+        <DataTable headers={headerData} rows={rowData}>
+          {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
+            <TableContainer title={t('pastVisit', 'Past Visit')}>
               <Table {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
-                      <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
+                      <TableHeader
+                        {...getHeaderProps({
+                          header,
+                          isSortable: header.isSortable,
+                        })}>
+                        {header.header}
+                      </TableHeader>
                     ))}
+                    <TableHeader />
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {rows.map((row) => (
-                    <TableRow key={row.id}>
+                  {rows.map((row, rowIndex) => (
+                    <TableRow {...getRowProps({ row })}>
                       {row.cells.map((cell) => (
-                        <TableCell key={cell.id}>{cell.value}</TableCell>
+                        <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                       ))}
                       <TableCell className="bx--table-column-menu">
-                        <OverflowMenu selectorPrimaryFocus="option-two">
+                        <OverflowMenu flipped selectorPrimaryFocus="option-two">
                           <OverflowMenuItem itemText={t('edit', 'Edit')} />
                           <OverflowMenuItem itemText={t('load', 'Load Visit Info')} />
                         </OverflowMenu>

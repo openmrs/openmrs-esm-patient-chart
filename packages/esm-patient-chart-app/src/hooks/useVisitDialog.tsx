@@ -1,36 +1,32 @@
-import React from 'react';
-import { newModalItem } from '../visit/visit-dialog.resource';
-import { EndVisitConfirmation, StartVisitConfirmation } from '../visit/visit-button.component';
+import React, { useState } from 'react';
 
-function createVisitDialog(patientUuid: string) {
-  return (ev: CustomEvent) => {
-    const { type, state = {} } = ev.detail;
-
-    switch (type) {
-      case 'start':
-        return newModalItem(state);
-      case 'prompt':
-        return newModalItem({
-          component: <StartVisitConfirmation patientUuid={patientUuid} newModalItem={newModalItem} />,
-          name: 'Prompt start Visit',
-          props: { closeComponent: () => state.onPromptClosed?.() },
-        });
-      case 'end':
-        return newModalItem({
-          component: (
-            <EndVisitConfirmation patientUuid={patientUuid} visitData={state.visitData} newModalItem={newModalItem} />
-          ),
-          name: 'Prompt end Visit',
-          props: { closeComponent: () => state.onPromptClosed?.() },
-        });
-    }
-  };
+interface VisitDialogType {
+  type: 'start' | 'prompt' | 'end' | 'close';
 }
 
 export function useVisitDialog(patientUuid: string) {
+  const [visitDialogType, setVisitDialogType] = useState<VisitDialogType>({ type: 'close' });
+
   React.useEffect(() => {
-    const handler = createVisitDialog(patientUuid);
+    const handler = (ev: CustomEvent) => {
+      const { type, state = {} } = ev.detail;
+
+      switch (type) {
+        case 'start':
+          return setVisitDialogType({ type: 'start' });
+        case 'prompt':
+          return setVisitDialogType({ type: 'prompt' });
+        case 'end':
+          return setVisitDialogType({ type: 'end' });
+        case 'close':
+          return setVisitDialogType({ type: 'close' });
+      }
+    };
     window.addEventListener('visit-dialog', handler);
     return () => window.removeEventListener('visit-dialog', handler);
   }, [patientUuid]);
+
+  console.log(visitDialogType);
+
+  return visitDialogType;
 }

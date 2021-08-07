@@ -14,7 +14,7 @@ const StartVisitOverflowMenuItem: React.FC<StartVisitOverflowMenuItemProps> = ({
       window.dispatchEvent(
         new CustomEvent('visit-dialog', {
           detail: {
-            type: 'prompt',
+            type: 'start',
           },
         }),
       ),

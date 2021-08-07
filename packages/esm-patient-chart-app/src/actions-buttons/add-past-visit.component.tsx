@@ -6,7 +6,15 @@ interface AddPastVisitOverflowMenuItemProps {}
 
 const AddPastVisitOverflowMenuItem: React.FC<AddPastVisitOverflowMenuItemProps> = () => {
   const { t } = useTranslation();
-  const handleClick = React.useCallback(() => openVisitDashboard(`${t('visitDashboard', 'Visit Dashboard')}`), [t]);
+  const handleClick = React.useCallback(() => {
+    window.dispatchEvent(
+      new CustomEvent('visit-dialog', {
+        detail: {
+          type: 'start',
+        },
+      }),
+    );
+  }, []);
 
   return (
     <li className="bx--overflow-menu-options__option">
