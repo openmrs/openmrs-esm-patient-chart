@@ -1,8 +1,6 @@
 import React from 'react';
 import { ExternalOverviewProps, PanelFilterProps } from '@openmrs/esm-patient-common-lib';
-
-import DataTableSkeleton from 'carbon-components-react/lib/components/DataTableSkeleton';
-
+import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
 import { parseSingleEntry, OverviewPanelEntry } from './useOverviewData';
 import { RecentResultsGrid, Card } from './helpers';
 import CommonOverview from './common-overview';

@@ -212,7 +212,7 @@ describe('ImmunizationMapper#mapFromFHIRImmunizationBundle', () => {
       manufacturer: 'Organization/hl7',
       occurrenceDateTime: '2018-06-18',
     };
-    expect(immunizations[0].existingDoses[0]).toStrictEqual(expectedDose);
+    expect(immunizations[0].existingDoses[0]).toEqual(expectedDose);
   });
 
   it('should map multiple entries for same immunization as different doses', function () {
@@ -239,8 +239,8 @@ describe('ImmunizationMapper#mapFromFHIRImmunizationBundle', () => {
       manufacturer: 'Organization/hl7',
       occurrenceDateTime: '2018-06-18',
     };
-    expect(immunizations[0].existingDoses[1]).toStrictEqual(expectedDose2);
-    expect(immunizations[0].existingDoses[0]).toStrictEqual(expectedDose1);
+    expect(immunizations[0].existingDoses[1]).toEqual(expectedDose2);
+    expect(immunizations[0].existingDoses[0]).toEqual(expectedDose1);
   });
 
   it('should map multiple entries for different immunization as different immunization', function () {
@@ -305,6 +305,6 @@ describe('ImmunizationMapper#mapToFHIRImmunizationResource', () => {
       protocolApplied: [{ doseNumberPositiveInt: 2, series: '2 Months' }],
     };
 
-    expect(fhirImmunization).toStrictEqual(expectedFHIRResource);
+    expect(fhirImmunization).toEqual(expectedFHIRResource);
   });
 });

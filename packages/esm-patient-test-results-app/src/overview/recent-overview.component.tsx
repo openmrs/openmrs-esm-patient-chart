@@ -1,7 +1,7 @@
 import React from 'react';
 
-import Button from 'carbon-components-react/lib/components/Button';
-import DataTableSkeleton from 'carbon-components-react/lib/components/DataTableSkeleton';
+import Button from 'carbon-components-react/es/components/Button';
+import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
 
 import useOverviewData from './useOverviewData';
 import { RecentResultsGrid, Card } from './helpers';
