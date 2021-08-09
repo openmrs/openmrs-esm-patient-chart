@@ -5,11 +5,15 @@
 .heading {
   @include carbon--type-style("productive-heading-03");
   color: $text-01;
-  margin: 1rem;
+  margin: $spacing-05;
+}
+
+.grid {
+  padding: 0;
 }
 
 .gridRow {
-  margin: 0.5rem 0 2.75rem 0;
+  margin: $spacing-03 0 $spacing-08 0;
 }
 
 .columnLabel {
@@ -18,20 +22,21 @@
 }
 
 .contentSwitcher {
-  height: 3rem;
+  height: $spacing-09;
 }
 
 .buttonContainer {
   display: flex;
+  margin: $spacing-05;
 }
 
 .buttonContainer button {
-  height: 4rem;
+  height: $spacing-10;
   display: flex;
   align-content: flex-start;
   align-items: flex-start;
   flex-direction: row;
-  margin-left: 0.125rem;
+  margin-left: $spacing-01;
 }
 
 .right {

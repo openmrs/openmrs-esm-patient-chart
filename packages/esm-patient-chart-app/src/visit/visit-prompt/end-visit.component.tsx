@@ -3,7 +3,7 @@ import styles from './end-visit.component.scss';
 import ComposedModal, { ModalHeader, ModalBody } from 'carbon-components-react/es/components/ComposedModal';
 import Button from 'carbon-components-react/es/components/Button';
 import { useTranslation } from 'react-i18next';
-import { createErrorHandler, getStartedVisit, showToast, updateVisit, useVisit } from '@openmrs/esm-framework';
+import { getStartedVisit, showToast, updateVisit, useVisit } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 
 interface EndVisitPromptProps {
@@ -38,9 +38,8 @@ const EndVisitPrompt: React.FC<EndVisitPromptProps> = ({ patientUuid, openModal,
         }
       },
       (error) => {
-        createErrorHandler();
         showToast({
-          kind: 'success',
+          kind: 'error',
           description: t('visitEndError', 'Error ending current visit'),
         });
       },

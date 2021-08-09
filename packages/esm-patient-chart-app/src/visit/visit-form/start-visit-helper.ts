@@ -1,9 +1,9 @@
-import dayjs from 'dayjs';
+export type amPm = 'AM' | 'PM';
 
-export const convertTime12to24 = (time12h, timeFormat: string) => {
+export const convertTime12to24 = (time12h, timeFormat: amPm) => {
   let [hours, minutes] = time12h.split(':');
 
-  if (hours === '12') {
+  if (hours === '12' && timeFormat === 'AM') {
     hours = '00';
   }
 
@@ -12,16 +12,4 @@ export const convertTime12to24 = (time12h, timeFormat: string) => {
   }
 
   return [hours, minutes];
-};
-
-export const getDatePart = (type: 'year' | 'month' | 'date', date: string | Date) => {
-  const visitDate = dayjs(date).format('DD/MM/YYYY');
-  switch (type) {
-    case 'year':
-      return dayjs(visitDate).year();
-    case 'month':
-      return dayjs(visitDate).month();
-    case 'date':
-      return dayjs(visitDate).date();
-  }
 };

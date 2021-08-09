@@ -1,5 +1,4 @@
 import { Visit } from '@openmrs/esm-api';
-import { createErrorHandler } from '@openmrs/esm-error-handling';
 import React, { useState, useEffect, useMemo, useReducer, useCallback } from 'react';
 import DataTable, {
   TableContainer,
@@ -11,7 +10,7 @@ import DataTable, {
   TableCell,
   DataTableHeader,
   DataTableRow,
-} from 'carbon-components-react/es/components//DataTable';
+} from 'carbon-components-react/es/components/DataTable';
 import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
 import OverflowMenu from 'carbon-components-react/es/components/OverflowMenu';
 import OverflowMenuItem from 'carbon-components-react/es/components/OverflowMenuItem';
@@ -22,41 +21,52 @@ import { attach, detach, getStartedVisit, getVisitsForPatient, VisitMode, VisitS
 import styles from './past-visit-overview.component.scss';
 import Button from 'carbon-components-react/es/components/Button';
 
-// TO DO Abstract this logic for state machines to a hook
 enum ActionTypes {
   pending = 'pending',
   resolved = 'resolved',
   error = 'error',
 }
-
-interface ViewState {
-  status: string;
-}
-
 interface Pending {
   type: ActionTypes.pending;
 }
 
 interface Error {
   type: ActionTypes.error;
+  payload: Error;
 }
 
 interface Resolved {
   type: ActionTypes.resolved;
+  payload: Array<Visit>;
 }
 
 type Action = Pending | Error | Resolved;
 
-function viewStateReducer(state: ViewState, action: Action): ViewState {
+interface PastVisitOverviewState {
+  status: 'pending' | 'resolved' | 'error';
+  patientPastVisits: Array<Visit>;
+  error?: null | Error;
+}
+
+function reducer(state: PastVisitOverviewState, action: Action): PastVisitOverviewState {
   switch (action.type) {
     case ActionTypes.pending:
       return {
         status: 'pending',
+        ...state,
       };
     case ActionTypes.resolved:
-      return { status: 'resolved' };
+      return {
+        status: 'resolved',
+        patientPastVisits: action.payload,
+        error: null,
+      };
     case ActionTypes.error:
-      return { status: 'error' };
+      return {
+        status: 'error',
+        patientPastVisits: null,
+        error: action.payload,
+      };
     default:
       return state;
   }
@@ -68,9 +78,10 @@ interface PastVisitOverviewProps {
 
 const PastVisitOverview: React.FC<PastVisitOverviewProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const [viewState, dispatch] = useReducer(viewStateReducer, { status: 'pending' });
-  const [patientPastVisits, setPatientPastVisits] = useState<Array<Visit>>([]);
-  const [error, setError] = useState<Error>();
+  const [{ status, patientPastVisits, error }, dispatch] = useReducer(reducer, {
+    status: 'pending',
+    patientPastVisits: null,
+  });
   const dateFormat = 'DD-MMM-YYYY';
 
   const headerData: Array<DataTableHeader> = useMemo(
@@ -104,13 +115,10 @@ const PastVisitOverview: React.FC<PastVisitOverviewProps> = ({ patientUuid }) =>
       const ac = new AbortController();
       getVisitsForPatient(patientUuid, ac).subscribe(
         ({ data }) => {
-          setPatientPastVisits(data.results);
-          dispatch({ type: ActionTypes.resolved });
+          dispatch({ type: ActionTypes.resolved, payload: data.results });
         },
         (error) => {
-          createErrorHandler();
-          setError(error);
-          dispatch({ type: ActionTypes.error });
+          dispatch({ type: ActionTypes.error, payload: error });
         },
       );
       return () => ac.abort();
@@ -128,8 +136,8 @@ const PastVisitOverview: React.FC<PastVisitOverviewProps> = ({ patientUuid }) =>
 
   return (
     <>
-      {viewState.status === ActionTypes.pending && <DataTableSkeleton />}
-      {viewState.status === ActionTypes.resolved && (
+      {status === ActionTypes.pending && <DataTableSkeleton />}
+      {status === ActionTypes.resolved && (
         <>
           <DataTable headers={headerData} rows={rowData}>
             {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
@@ -184,7 +192,7 @@ const PastVisitOverview: React.FC<PastVisitOverviewProps> = ({ patientUuid }) =>
           </div>
         </>
       )}
-      {viewState.status === ActionTypes.error && (
+      {status === ActionTypes.error && (
         <ErrorState error={error} headerTitle={t('pastVisitErrorText', 'Past Visit Error')} />
       )}
     </>

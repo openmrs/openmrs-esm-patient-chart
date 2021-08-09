@@ -22,6 +22,7 @@ export function useVisitDialog(patientUuid: string) {
         case 'close':
           return setVisitDialogType({ type: 'close', state });
       }
+      return setVisitDialogType({ type, state });
     };
     window.addEventListener('visit-dialog', handler);
     return () => window.removeEventListener('visit-dialog', handler);

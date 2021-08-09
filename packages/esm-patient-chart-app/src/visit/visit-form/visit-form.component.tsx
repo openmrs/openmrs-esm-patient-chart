@@ -26,7 +26,7 @@ import {
   VisitStatus,
 } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
-import { convertTime12to24, getDatePart } from './start-visit-helper';
+import { amPm, convertTime12to24 } from './start-visit-helper';
 
 interface StartVisitFormProps {
   isTablet: boolean;
@@ -37,11 +37,10 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({ isTablet, patientUuid }
   const { t } = useTranslation();
   const locations = useLocations();
   const sessionUser = useSessionUser();
-  const isPM = useCallback(() => new Date().getHours() >= 12, []);
   const [selectedLocation, setSelectedLocation] = useState<string>('');
   const [visitDate, setVisitDate] = useState<string>(dayjs(new Date()).format('DD/MM/YYYY'));
   const [visitTime, setVisitTime] = useState<string>(dayjs(new Date()).format('hh:mm'));
-  const [timeFormat, setTimeFormat] = useState<string>(isPM() ? 'PM' : 'AM');
+  const [timeFormat, setTimeFormat] = useState<amPm>(new Date().getHours() >= 12 ? 'PM' : 'AM');
   const [contentSwitcherIndex, setContentSwitcherIndex] = useState<number>(1);
   const [visitType, setVisitType] = useState<string>();
 
@@ -60,9 +59,9 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({ isTablet, patientUuid }
       let visitPayload: NewVisitPayload = {
         patient: patientUuid,
         startDatetime: new Date(
-          getDatePart('year', visitDate),
-          getDatePart('month', visitDate),
-          getDatePart('date', visitDate),
+          dayjs(visitDate).year(),
+          dayjs(visitDate).month(),
+          dayjs(visitDate).date(),
           hours,
           minutes,
         ),
@@ -86,7 +85,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({ isTablet, patientUuid }
           }
         },
         (error) => {
-          createErrorHandler();
           showToast({
             kind: 'error',
             description: t('startVisitErrorMessage', 'An error occurred while starting a visit'),
@@ -99,8 +97,8 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({ isTablet, patientUuid }
 
   return (
     <Form>
-      <Grid style={{ margin: 0, padding: '0 1rem' }}>
-        <Row style={{ marginTop: '0.5rem', marginBottom: '2.75rem' }}>
+      <Grid className={styles.grid}>
+        <Row className={styles.gridRow}>
           <Column sm={1}>
             <span className={styles.columnLabel}>{t('dateAndTimeOfVisit', 'Date and time of visit')}</span>
           </Column>
@@ -134,7 +132,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({ isTablet, patientUuid }
             </TimePicker>
           </Column>
         </Row>
-        <Row style={{ marginTop: '0.5rem', marginBottom: '2.75rem' }}>
+        <Row className={styles.gridRow}>
           <Column sm={1}>
             <span className={styles.columnLabel}>{t('visitLocation', 'Visit Location')}</span>
           </Column>
@@ -155,7 +153,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({ isTablet, patientUuid }
             </Select>
           </Column>
         </Row>
-        <Row style={{ marginTop: '0.5rem', marginBottom: '2.75rem' }}>
+        <Row className={styles.gridRow}>
           <Column sm={1}>
             <span className={styles.columnLabel}>{t('visitType', 'Visit Type')}</span>
           </Column>
@@ -173,10 +171,10 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({ isTablet, patientUuid }
         </Row>
         <Row>
           <Column className={styles.buttonContainer}>
-            <Button onClick={handleCloseForm} kind="secondary" style={{ width: '100%' }}>
+            <Button onClick={handleCloseForm} kind="secondary" style={{ width: '50%' }}>
               {t('discard', 'Discard')}
             </Button>
-            <Button onClick={handleStartVisit} kind="primary" style={{ width: '100%' }} type="submit">
+            <Button onClick={handleStartVisit} kind="primary" style={{ width: '50%' }} type="submit">
               {t('startVisit', 'Start visit')}
             </Button>
           </Column>

@@ -1,6 +1,5 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { openVisitDashboard } from '../visit/visit-button.component';
 
 interface AddPastVisitOverflowMenuItemProps {}
 

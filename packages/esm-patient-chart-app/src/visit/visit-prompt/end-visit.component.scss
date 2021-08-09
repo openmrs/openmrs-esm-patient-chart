@@ -14,15 +14,15 @@
 }
 
 .buttonContainer button {
-  height: 4rem;
+  height: $spacing-10;
   display: flex;
   align-content: flex-start;
   flex-direction: column;
-  margin-left: 0.125rem;
+  margin-left: $spacing-01;
 }
 
 .customLabel {
-  padding: 0.25rem 0rem;
+  padding: $spacing-02 0rem;
   display: flex;
   @extend .bodyLong01;
 }

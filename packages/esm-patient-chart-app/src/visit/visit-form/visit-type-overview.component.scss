@@ -3,8 +3,8 @@
 @import "~carbon-components/src/globals/scss/mixins";
 
 .visitTypeOverviewWrapper {
-    margin: 1rem 0rem;
-    border: 1px solid $grey-2;
+    margin: $spacing-05 0rem;
+    border: 0.0625rem solid $grey-2;
     background-color: $ui-02;
 }
 
@@ -22,12 +22,12 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    margin-top: 0.5rem;
-    min-height: 15rem;
+    margin-top: $spacing-03;
+    min-height: $spacing-10;
     background-color: $ui-02;
     width: 100%;
 }
 
 .radioButton {
-    padding: 0.25rem 1rem;
+    padding: $spacing-02 $spacing-05;
 }

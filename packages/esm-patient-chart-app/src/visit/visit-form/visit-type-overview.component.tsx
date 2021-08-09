@@ -1,11 +1,11 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import Search from 'carbon-components-react/es/components/Search';
 import RadioButtonGroup from 'carbon-components-react/es/components/RadioButtonGroup';
 import RadioButton from 'carbon-components-react/es/components/RadioButton';
 import { useTranslation } from 'react-i18next';
 import styles from './visit-type-overview.component.scss';
 import debounce from 'lodash-es/debounce';
-import { useLocations, usePagination, useVisitTypes, VisitType } from '@openmrs/esm-framework';
+import { usePagination, useVisitTypes } from '@openmrs/esm-framework';
 import isEmpty from 'lodash-es/isEmpty';
 import { PatientChartPagination } from '../../../../esm-patient-common-lib/src';
 
@@ -18,22 +18,18 @@ const VisitTypeOverview: React.FC<VisitTypeOverviewProps> = ({ isTablet, onChang
   const { t } = useTranslation();
   const visitTypes = useVisitTypes();
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const [searchResults, setSearchResults] = useState<Array<VisitType>>([]);
 
-  useEffect(() => {
+  const searchResults = useMemo(() => {
     if (!isEmpty(searchTerm)) {
-      const results = visitTypes.filter(
-        (visitType) => visitType.display.toLowerCase().search(searchTerm.toLowerCase()) !== -1,
-      );
-      setSearchResults(results);
+      return visitTypes.filter((visitType) => visitType.display.toLowerCase().search(searchTerm.toLowerCase()) !== -1);
     } else {
-      setSearchResults(visitTypes);
+      return visitTypes;
     }
   }, [searchTerm, visitTypes]);
 
-  const handleSearch = useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), 300), []);
+  const handleSearch = React.useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), 300), []);
 
-  const { results, goTo, currentPage } = usePagination(searchResults, 5);
+  const { results, currentPage, goTo } = usePagination(searchResults, 5);
 
   return (
     <div className={styles.visitTypeOverviewWrapper}>
