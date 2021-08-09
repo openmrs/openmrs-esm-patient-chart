@@ -64,13 +64,13 @@
 }
 
 .selectedTab > button {
-  border-left: 3px solid #007d79 !important;
+  border-left: 3px solid $brand-teal-01 !important;
   font-weight: 600 !important;
   border-bottom:none !important;
 }
 
 .tabContent {
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid $ui-03;
   padding: 1rem 0;
   width: 100%;
 }
