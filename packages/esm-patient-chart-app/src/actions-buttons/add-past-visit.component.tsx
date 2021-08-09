@@ -10,7 +10,8 @@ const AddPastVisitOverflowMenuItem: React.FC<AddPastVisitOverflowMenuItemProps> 
     window.dispatchEvent(
       new CustomEvent('visit-dialog', {
         detail: {
-          type: 'start',
+          type: 'prompt',
+          state: { type: 'past' },
         },
       }),
     );

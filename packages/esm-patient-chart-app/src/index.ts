@@ -129,7 +129,7 @@ function setupOpenMRS() {
       },
       {
         id: 'start-visit-workspace-form',
-        load: getAsyncLifecycle(() => import('./visit/visit-form/start-visit.component'), {
+        load: getAsyncLifecycle(() => import('./visit/visit-form/visit-form.component'), {
           featureName: 'start-visit-form',
           moduleName,
         }),

@@ -8,6 +8,10 @@
   margin: 1rem;
 }
 
+.gridRow {
+  margin: 0.5rem 0 2.75rem 0;
+}
+
 .columnLabel {
   @include carbon--type-style("productive-heading-02");
   color: $text-02;
@@ -15,4 +19,22 @@
 
 .contentSwitcher {
   height: 3rem;
+}
+
+.buttonContainer {
+  display: flex;
+}
+
+.buttonContainer button {
+  height: 4rem;
+  display: flex;
+  align-content: flex-start;
+  align-items: flex-start;
+  flex-direction: row;
+  margin-left: 0.125rem;
+}
+
+.right {
+  display: flex;
+  flex-direction: row;
 }

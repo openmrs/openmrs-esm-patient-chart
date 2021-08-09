@@ -3,7 +3,7 @@ import styles from './end-visit.component.scss';
 import ComposedModal, { ModalHeader, ModalBody } from 'carbon-components-react/es/components/ComposedModal';
 import Button from 'carbon-components-react/es/components/Button';
 import { useTranslation } from 'react-i18next';
-import { getStartedVisit, showToast, updateVisit, useVisit } from '@openmrs/esm-framework';
+import { createErrorHandler, getStartedVisit, showToast, updateVisit, useVisit } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 
 interface EndVisitPromptProps {
@@ -26,16 +26,25 @@ const EndVisitPrompt: React.FC<EndVisitPromptProps> = ({ patientUuid, openModal,
       stopDatetime: new Date(),
     };
     const ac = new AbortController();
-    const sub = updateVisit(currentVisit.uuid, endVisitPayload, ac).subscribe((response) => {
-      if (response.status === 200) {
-        getStartedVisit.next(null);
-        closeModal();
+    const sub = updateVisit(currentVisit.uuid, endVisitPayload, ac).subscribe(
+      (response) => {
+        if (response.status === 200) {
+          getStartedVisit.next(null);
+          closeModal();
+          showToast({
+            kind: 'success',
+            description: t('visitEndSuccessfully', 'Ended current visit successfully'),
+          });
+        }
+      },
+      (error) => {
+        createErrorHandler();
         showToast({
           kind: 'success',
-          description: t('visitEndSuccessfully', 'Ended current visit successfully'),
+          description: t('visitEndError', 'Error ending current visit'),
         });
-      }
-    });
+      },
+    );
 
     return () => sub && sub.unsubscribe();
   };
@@ -46,18 +55,16 @@ const EndVisitPrompt: React.FC<EndVisitPromptProps> = ({ patientUuid, openModal,
         <span className={styles.productiveHeading03}>{t('noActiveVisit', 'End Current visit')}</span>
       </ModalHeader>
       <ModalBody>
-        <div>
-          <p className={styles.customLabel}>
-            <span>{t('startDate', 'Start Date')}</span>{' '}
-            <span>{dayjs(currentVisit?.startDatetime).format(dateFormat)}</span>
-          </p>
-          <p className={styles.customLabel}>
-            <span>{t('visitType', 'Visit Type')}</span> <span>{currentVisit?.visitType.display}</span>
-          </p>
-          <p className={styles.customLabel}>
-            <span>{t('visitLocation', 'Visit Location')}</span> <span>{currentVisit?.location.display}</span>
-          </p>
-        </div>
+        <p className={styles.customLabel}>
+          <span>{t('startDate', 'Start Date')}</span>{' '}
+          <span>{dayjs(currentVisit?.startDatetime).format(dateFormat)}</span>
+        </p>
+        <p className={styles.customLabel}>
+          <span>{t('visitType', 'Visit Type')}</span> <span>{currentVisit?.visitType.display}</span>
+        </p>
+        <p className={styles.customLabel}>
+          <span>{t('visitLocation', 'Visit Location')}</span> <span>{currentVisit?.location.display}</span>
+        </p>
       </ModalBody>
       <div className={styles.buttonContainer}>
         <div className={styles.left}>

@@ -1,6 +1,6 @@
 import { Visit } from '@openmrs/esm-api';
 import { createErrorHandler } from '@openmrs/esm-error-handling';
-import React, { useState, useEffect, useMemo, useReducer } from 'react';
+import React, { useState, useEffect, useMemo, useReducer, useCallback } from 'react';
 import DataTable, {
   TableContainer,
   Table,
@@ -18,7 +18,9 @@ import OverflowMenuItem from 'carbon-components-react/es/components/OverflowMenu
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
-import { getVisitsForPatient } from '@openmrs/esm-framework';
+import { attach, detach, getStartedVisit, getVisitsForPatient, VisitMode, VisitStatus } from '@openmrs/esm-framework';
+import styles from './past-visit-overview.component.scss';
+import Button from 'carbon-components-react/es/components/Button';
 
 // TO DO Abstract this logic for state machines to a hook
 enum ActionTypes {
@@ -91,6 +93,7 @@ const PastVisitOverview: React.FC<PastVisitOverviewProps> = ({ patientUuid }) =>
               visitType: visit.visitType.display,
               location: visit.location?.display,
               endDate: visit.stopDatetime ? dayjs(visit.stopDatetime).format(dateFormat) : '',
+              visit: visit,
             };
           })
         : [],
@@ -114,47 +117,72 @@ const PastVisitOverview: React.FC<PastVisitOverviewProps> = ({ patientUuid }) =>
     }
   }, [patientUuid]);
 
+  const handleClose = useCallback(() => {
+    detach('patient-chart-workspace-slot', 'past-visits-overview');
+  }, []);
+
+  const handleOpenVisitForm = useCallback(() => {
+    attach('patient-chart-workspace-slot', 'start-visit-workspace-form');
+    handleClose();
+  }, [handleClose]);
+
   return (
     <>
       {viewState.status === ActionTypes.pending && <DataTableSkeleton />}
       {viewState.status === ActionTypes.resolved && (
-        <DataTable headers={headerData} rows={rowData}>
-          {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-            <TableContainer title={t('pastVisit', 'Past Visit')}>
-              <Table {...getTableProps()}>
-                <TableHead>
-                  <TableRow>
-                    {headers.map((header) => (
-                      <TableHeader
-                        {...getHeaderProps({
-                          header,
-                          isSortable: header.isSortable,
-                        })}>
-                        {header.header}
-                      </TableHeader>
-                    ))}
-                    <TableHeader />
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {rows.map((row, rowIndex) => (
-                    <TableRow {...getRowProps({ row })}>
-                      {row.cells.map((cell) => (
-                        <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+        <>
+          <DataTable headers={headerData} rows={rowData}>
+            {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
+              <TableContainer title={t('pastVisit', 'Past Visit')}>
+                <Table {...getTableProps()}>
+                  <TableHead>
+                    <TableRow>
+                      {headers.map((header) => (
+                        <TableHeader
+                          {...getHeaderProps({
+                            header,
+                            isSortable: header.isSortable,
+                          })}>
+                          {header.header}
+                        </TableHeader>
                       ))}
-                      <TableCell className="bx--table-column-menu">
-                        <OverflowMenu flipped selectorPrimaryFocus="option-two">
-                          <OverflowMenuItem itemText={t('edit', 'Edit')} />
-                          <OverflowMenuItem itemText={t('load', 'Load Visit Info')} />
-                        </OverflowMenu>
-                      </TableCell>
+                      <TableHeader />
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          )}
-        </DataTable>
+                  </TableHead>
+                  <TableBody>
+                    {rows.map((row, rowIndex) => (
+                      <TableRow {...getRowProps({ row })}>
+                        {row.cells.map((cell) => (
+                          <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+                        ))}
+                        <TableCell className="bx--table-column-menu">
+                          <OverflowMenu flipped selectorPrimaryFocus="option-two">
+                            <OverflowMenuItem onClick={handleOpenVisitForm} itemText={t('edit', 'Edit')} />
+                            <OverflowMenuItem
+                              onClick={() => {
+                                getStartedVisit.next({
+                                  mode: VisitMode.LOADING,
+                                  visitData: rowData[rowIndex],
+                                  status: VisitStatus.ONGOING,
+                                });
+                              }}
+                              itemText={t('load', 'Load Visit Info')}
+                            />
+                          </OverflowMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+          </DataTable>
+          <div className={styles.buttonContainer}>
+            <Button onClick={handleClose} kind="secondary">
+              {t('cancel', 'Cancel')}
+            </Button>
+          </div>
+        </>
       )}
       {viewState.status === ActionTypes.error && (
         <ErrorState error={error} headerTitle={t('pastVisitErrorText', 'Past Visit Error')} />

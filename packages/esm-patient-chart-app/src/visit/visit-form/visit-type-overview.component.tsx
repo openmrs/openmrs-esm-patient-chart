@@ -11,9 +11,10 @@ import { PatientChartPagination } from '../../../../esm-patient-common-lib/src';
 
 interface VisitTypeOverviewProps {
   isTablet: boolean;
+  onChange: (event) => void;
 }
 
-const VisitTypeOverview: React.FC<VisitTypeOverviewProps> = ({ isTablet }) => {
+const VisitTypeOverview: React.FC<VisitTypeOverviewProps> = ({ isTablet, onChange }) => {
   const { t } = useTranslation();
   const visitTypes = useVisitTypes();
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -47,6 +48,7 @@ const VisitTypeOverview: React.FC<VisitTypeOverviewProps> = ({ isTablet }) => {
         defaultSelected="default-selected"
         legend="Group Legend"
         orientation="vertical"
+        onChange={onChange}
         name="radio-button-group"
         valueSelected="default-selected">
         {results.map(({ uuid, display, name }) => (

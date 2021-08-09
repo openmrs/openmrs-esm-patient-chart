@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 
 interface VisitDialogType {
   type: 'start' | 'prompt' | 'end' | 'close';
+  state?: {};
 }
 
 export function useVisitDialog(patientUuid: string) {
-  const [visitDialogType, setVisitDialogType] = useState<VisitDialogType>({ type: 'close' });
+  const [visitDialogType, setVisitDialogType] = useState<VisitDialogType>({ type: 'close', state: {} });
 
   React.useEffect(() => {
     const handler = (ev: CustomEvent) => {
@@ -13,20 +14,18 @@ export function useVisitDialog(patientUuid: string) {
 
       switch (type) {
         case 'start':
-          return setVisitDialogType({ type: 'start' });
+          return setVisitDialogType({ type: 'start', state });
         case 'prompt':
-          return setVisitDialogType({ type: 'prompt' });
+          return setVisitDialogType({ type: 'prompt', state });
         case 'end':
-          return setVisitDialogType({ type: 'end' });
+          return setVisitDialogType({ type: 'end', state });
         case 'close':
-          return setVisitDialogType({ type: 'close' });
+          return setVisitDialogType({ type: 'close', state });
       }
     };
     window.addEventListener('visit-dialog', handler);
     return () => window.removeEventListener('visit-dialog', handler);
   }, [patientUuid]);
-
-  console.log(visitDialogType);
 
   return visitDialogType;
 }
