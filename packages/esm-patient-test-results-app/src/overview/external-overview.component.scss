@@ -2,7 +2,7 @@
 @import "~carbon-components/src/globals/scss/vars";
 @import "~carbon-components/src/globals/scss/mixins";
 
-.conditionsHeader {
+.externalOverviewHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -10,7 +10,7 @@
   background-color: $ui-background;
 }
 
-.conditionsHeader > h4:after {
+.externalOverviewHeader > h4:after {
   content: "";
   display: block;
   width: 2rem;

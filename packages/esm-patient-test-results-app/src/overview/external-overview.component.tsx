@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { ExternalOverviewProps, PanelFilterProps } from '@openmrs/esm-patient-common-lib';
 import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
 import { parseSingleEntry, OverviewPanelEntry } from './useOverviewData';
@@ -10,7 +10,6 @@ import { useTranslation } from 'react-i18next';
 import Button from 'carbon-components-react/es/components/Button';
 import ArrowRight16 from '@carbon/icons-react/es/arrow--right/16';
 import { navigate } from '@openmrs/esm-framework';
-import { useMemo } from 'react';
 
 function useFilteredOverviewData(patientUuid: string, filter: (filterProps: PanelFilterProps) => boolean = () => true) {
   const { sortedObs, loaded, error } = usePatientResultsData(patientUuid);
@@ -47,7 +46,7 @@ const RecentOverview: React.FC<ExternalOverviewProps> = ({ patientUuid, filter }
     <RecentResultsGrid>
       {loaded ? (
         <div>
-          <div className={styles.conditionsHeader}>
+          <div className={styles.externalOverviewHeader}>
             <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{t('recentResults', 'Recent Results')}</h4>
             <Button kind="ghost" renderIcon={ArrowRight16} iconDescription="Add conditions" onClick={handleSeeAll}>
               {t('seeAllResults', 'See all results')}
