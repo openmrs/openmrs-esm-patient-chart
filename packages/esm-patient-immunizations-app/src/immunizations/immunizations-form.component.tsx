@@ -128,7 +128,6 @@ const ImmunizationsForm: React.FC<ImmunizationsFormProps> = ({
         });
       },
       (err) => {
-        createErrorHandler();
         showNotification({
           title: t('errorSaving', 'Error Saving Vaccination'),
           kind: 'error',
