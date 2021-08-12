@@ -1,11 +1,6 @@
 import React, { SyntheticEvent, useEffect, useState } from 'react';
-import styles from './immunizations-form.css';
-<<<<<<< HEAD
-import { SummaryCard } from '@openmrs/esm-patient-common-lib';
-import { createErrorHandler, showNotification, showToast, useSessionUser, useVisit } from '@openmrs/esm-framework';
-=======
-import { createErrorHandler, detach, useSessionUser, useVisit } from '@openmrs/esm-framework';
->>>>>>> f60fa48 (carbonize immunizations form)
+import styles from './immunizations-form.scss';
+import { showNotification, showToast, detach, useSessionUser, useVisit } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { savePatientImmunization } from './immunizations.resource';
 import { mapToFHIRImmunizationResource } from './immunization-mapper';
@@ -83,14 +78,7 @@ const ImmunizationsForm: React.FC<ImmunizationsFormProps> = ({ patientUuid }) =>
 
       const immunization: ImmunizationFormData = {
         patientUuid,
-        immunizationObsUuid: formState.immunizationObsUuid,
-        vaccineName: formState.vaccineName,
-        vaccineUuid: formState.vaccineUuid,
-        manufacturer: formState.manufacturer,
-        expirationDate: formState.expirationDate,
-        vaccinationDate: formState.vaccinationDate,
-        lotNumber: formState.lotNumber,
-        currentDose: formState.currentDose,
+        ...formState,
       };
 
       const abortController = new AbortController();
@@ -100,55 +88,27 @@ const ImmunizationsForm: React.FC<ImmunizationsFormProps> = ({ patientUuid }) =>
         patientUuid,
         formState.immunizationObsUuid,
         abortController,
-      ).then((response) => {
-        response.status === 201 && closeWorkspace();
-      }, createErrorHandler());
+      ).then(
+        (response) => {
+          response.status === 201 && closeWorkspace();
+          showToast({
+            kind: 'success',
+            description: t('vaccinationSaved', 'Vaccination saved successfully'),
+          });
+        },
+        (err) => {
+          showNotification({
+            title: t('errorSaving', 'Error saving vaccination'),
+            kind: 'error',
+            critical: true,
+            description: err?.message,
+          });
+        },
+      );
       return () => abortController.abort();
     },
-    [
-      closeWorkspace,
-      currentUser?.currentProvider?.uuid,
-      currentUser?.sessionLocation?.uuid,
-      currentVisit?.uuid,
-      formState.currentDose,
-      formState.expirationDate,
-      formState.immunizationObsUuid,
-<<<<<<< HEAD
-      abortController,
-    ).then(
-      (response) => {
-        response.status === 201 && navigate();
-        showToast({
-          kind: 'success',
-          description: t('vaccinationSaved', 'Vaccination saved successfully'),
-        });
-      },
-      (err) => {
-        showNotification({
-          title: t('errorSaving', 'Error saving vaccination'),
-          kind: 'error',
-          critical: true,
-          description: err?.message,
-        });
-      },
-    );
-    return () => abortController.abort();
-  };
-
-  function navigate() {
-    history.push(`/patient/${patientUuid}/chart/immunizations`);
-    closeComponent();
-  }
-=======
-      formState.lotNumber,
-      formState.manufacturer,
-      formState.vaccinationDate,
-      formState.vaccineName,
-      formState.vaccineUuid,
-      patientUuid,
-    ],
+    [closeWorkspace, formState, patientUuid],
   );
->>>>>>> f60fa48 (carbonize immunizations form)
 
   function isNumber(value) {
     return !isNaN(value);
@@ -166,6 +126,9 @@ const ImmunizationsForm: React.FC<ImmunizationsFormProps> = ({ patientUuid }) =>
   function createForm() {
     return (
       <Form onSubmit={handleFormSubmit} data-testid="immunization-form">
+        <h4 className={styles.immunizationSequenceSelect}>
+          {`${t('vaccine', 'Vaccine')} : ${formState?.vaccineName}`}{' '}
+        </h4>
         {hasSequences(formState.sequences) && (
           <div className={styles.immunizationSequenceSelect}>
             <Select
@@ -174,7 +137,6 @@ const ImmunizationsForm: React.FC<ImmunizationsFormProps> = ({ patientUuid }) =>
               value={formState.currentDose.sequenceNumber}
               onChange={onDoseSelect}
               className="immunizationSequenceSelect"
-              required
               labelText={t('sequence', 'Sequence')}>
               <SelectItem text={t('pleaseSelect', 'Please select')} value="DEFAULT">
                 {t('pleaseSelect', 'Please select')}
@@ -210,6 +172,7 @@ const ImmunizationsForm: React.FC<ImmunizationsFormProps> = ({ patientUuid }) =>
           <DatePicker
             id="vaccinationExpiration"
             className="vaccinationExpiration"
+            minDate={new Date().toISOString()}
             dateFormat="d/m/Y"
             datePickerType="single"
             value={formState.expirationDate}
@@ -227,7 +190,7 @@ const ImmunizationsForm: React.FC<ImmunizationsFormProps> = ({ patientUuid }) =>
             type="text"
             id="lotNumber"
             labelText={t('lotNumber', 'Lot Number')}
-            defaultValue={formState.lotNumber}
+            value={formState.lotNumber}
             onChange={(evt) => updateSingle('lotNumber', evt.target.value)}
           />
         </div>
@@ -236,7 +199,7 @@ const ImmunizationsForm: React.FC<ImmunizationsFormProps> = ({ patientUuid }) =>
             type="text"
             id="manufacturer"
             labelText={t('manufacturer', 'Manufacturer')}
-            defaultValue={formState.manufacturer}
+            value={formState.manufacturer}
             onChange={(evt) => updateSingle('manufacturer', evt.target.value)}
           />
         </div>
