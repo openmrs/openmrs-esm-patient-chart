@@ -48,6 +48,13 @@ function setupOpenMRS() {
         load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
         meta: dashboardMeta,
       },
+      {
+        id: 'immunization-workspace-form',
+        load: getAsyncLifecycle(() => import('./immunizations/immunizations-form.component'), options),
+        meta: {
+          title: 'Immunization Form',
+        },
+      },
     ],
   };
 }

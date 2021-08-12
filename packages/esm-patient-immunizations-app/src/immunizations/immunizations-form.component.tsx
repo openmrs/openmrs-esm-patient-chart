@@ -1,20 +1,29 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { SyntheticEvent, useEffect, useState } from 'react';
 import styles from './immunizations-form.css';
+<<<<<<< HEAD
 import { SummaryCard } from '@openmrs/esm-patient-common-lib';
 import { createErrorHandler, showNotification, showToast, useSessionUser, useVisit } from '@openmrs/esm-framework';
+=======
+import { createErrorHandler, detach, useSessionUser, useVisit } from '@openmrs/esm-framework';
+>>>>>>> f60fa48 (carbonize immunizations form)
 import { useTranslation } from 'react-i18next';
 import { savePatientImmunization } from './immunizations.resource';
 import { mapToFHIRImmunizationResource } from './immunization-mapper';
-import { useHistory } from 'react-router-dom';
 import { ImmunizationFormData, ImmunizationSequence } from './immunization-domain';
-import { DataCaptureComponentProps } from '../types';
+import Button from 'carbon-components-react/es/components/Button';
+import DatePicker from 'carbon-components-react/es/components/DatePicker';
+import DatePickerInput from 'carbon-components-react/es/components/DatePickerInput';
+import Form from 'carbon-components-react/es/components/Form';
+import Select from 'carbon-components-react/es/components/Select';
+import SelectItem from 'carbon-components-react/es/components/SelectItem';
+import TextInput from 'carbon-components-react/es/components/TextInput';
+import { immunizationFormSub } from './immunization-utils';
 
 function hasSequences<T>(sequences: Array<T>) {
   return sequences && sequences?.length > 0;
 }
 
-type ImmunizationsFormProps = DataCaptureComponentProps & {
-  match: { params: ImmunizationFormData };
+type ImmunizationsFormProps = {
   patientUuid: string;
 };
 
@@ -31,13 +40,7 @@ interface ImmunizationFormState {
   formChanged: boolean;
 }
 
-const ImmunizationsForm: React.FC<ImmunizationsFormProps> = ({
-  patientUuid,
-  match,
-  closeComponent = () => {},
-  entryStarted = () => {},
-  entryCancelled = () => {},
-}) => {
+const ImmunizationsForm: React.FC<ImmunizationsFormProps> = ({ patientUuid }) => {
   const initialState: ImmunizationFormState = {
     vaccineName: '',
     vaccineUuid: '',
@@ -54,70 +57,63 @@ const ImmunizationsForm: React.FC<ImmunizationsFormProps> = ({
   const updateSingle = <T extends keyof ImmunizationFormState>(name: T, value: typeof formState[T]) =>
     setFormState((state) => ({ ...state, [name]: value }));
 
-  const formRef = useRef<HTMLFormElement>(null);
   const { t } = useTranslation();
-  const history = useHistory();
-  const today = new Date().toISOString().split('T')[0];
   const currentUser = useSessionUser();
   const { currentVisit } = useVisit(patientUuid);
 
   const isViewEditMode = !!formState.immunizationObsUuid;
   const enableCreateButtons = !isViewEditMode && !!formState.vaccinationDate;
   const enableEditButtons = isViewEditMode && formState.formChanged;
+  const closeWorkspace = React.useCallback(
+    () => detach('patient-chart-workspace-slot', 'immunization-workspace-form'),
+    [],
+  );
 
   useEffect(() => {
-    if (match.params) {
-      const {
-        immunizationObsUuid,
-        vaccineName,
-        vaccineUuid,
-        manufacturer,
-        expirationDate,
-        vaccinationDate,
-        lotNumber,
-        sequences,
-        currentDose,
-      }: ImmunizationFormData = match.params;
+    const sub = immunizationFormSub.subscribe((props) => setFormState(props));
+    return () => sub.unsubscribe();
+  }, []);
 
-      const formStateFromParam: ImmunizationFormState = {
-        immunizationObsUuid,
-        vaccineName,
-        vaccineUuid,
-        manufacturer,
-        lotNumber,
-        expirationDate,
-        vaccinationDate,
-        formChanged: false,
-        sequences: hasSequences(sequences) ? sequences : [],
-        currentDose: currentDose || ({} as ImmunizationSequence),
+  const handleFormSubmit = React.useCallback(
+    (event: SyntheticEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      const currentVisitUuid = currentVisit?.uuid;
+      const currentLocationUuid = currentUser?.sessionLocation?.uuid;
+      const currentProviderUuid = currentUser?.currentProvider?.uuid;
+
+      const immunization: ImmunizationFormData = {
+        patientUuid,
+        immunizationObsUuid: formState.immunizationObsUuid,
+        vaccineName: formState.vaccineName,
+        vaccineUuid: formState.vaccineUuid,
+        manufacturer: formState.manufacturer,
+        expirationDate: formState.expirationDate,
+        vaccinationDate: formState.vaccinationDate,
+        lotNumber: formState.lotNumber,
+        currentDose: formState.currentDose,
       };
-      setFormState(formStateFromParam);
-    }
-  }, [match.params]);
 
-  const handleFormSubmit = (event) => {
-    event.preventDefault();
-    const currentVisitUuid = currentVisit?.uuid;
-    const currentLocationUuid = currentUser?.sessionLocation?.uuid;
-    const currentProviderUuid = currentUser?.currentProvider?.uuid;
+      const abortController = new AbortController();
 
-    const immunization: ImmunizationFormData = {
-      patientUuid,
-      immunizationObsUuid: formState.immunizationObsUuid,
-      vaccineName: formState.vaccineName,
-      vaccineUuid: formState.vaccineUuid,
-      manufacturer: formState.manufacturer,
-      expirationDate: formState.expirationDate,
-      vaccinationDate: formState.vaccinationDate,
-      lotNumber: formState.lotNumber,
-      currentDose: formState.currentDose,
-    };
-    const abortController = new AbortController();
-
-    savePatientImmunization(
-      mapToFHIRImmunizationResource(immunization, currentVisitUuid, currentLocationUuid, currentProviderUuid),
-      patientUuid,
+      savePatientImmunization(
+        mapToFHIRImmunizationResource(immunization, currentVisitUuid, currentLocationUuid, currentProviderUuid),
+        patientUuid,
+        formState.immunizationObsUuid,
+        abortController,
+      ).then((response) => {
+        response.status === 201 && closeWorkspace();
+      }, createErrorHandler());
+      return () => abortController.abort();
+    },
+    [
+      closeWorkspace,
+      currentUser?.currentProvider?.uuid,
+      currentUser?.sessionLocation?.uuid,
+      currentVisit?.uuid,
+      formState.currentDose,
+      formState.expirationDate,
       formState.immunizationObsUuid,
+<<<<<<< HEAD
       abortController,
     ).then(
       (response) => {
@@ -143,6 +139,16 @@ const ImmunizationsForm: React.FC<ImmunizationsFormProps> = ({
     history.push(`/patient/${patientUuid}/chart/immunizations`);
     closeComponent();
   }
+=======
+      formState.lotNumber,
+      formState.manufacturer,
+      formState.vaccinationDate,
+      formState.vaccineName,
+      formState.vaccineUuid,
+      patientUuid,
+    ],
+  );
+>>>>>>> f60fa48 (carbonize immunizations form)
 
   function isNumber(value) {
     return !isNaN(value);
@@ -158,157 +164,108 @@ const ImmunizationsForm: React.FC<ImmunizationsFormProps> = ({
   };
 
   function createForm() {
-    const addFormHeader = t('addVaccineFormat', `Add Vaccine: ${formState?.vaccineName}`, { formState });
-
-    const editFormHeader = t('editVaccineFormat', `Edit Vaccine: ${formState?.vaccineName}`, { formState });
-
     return (
-      <form
-        onSubmit={handleFormSubmit}
-        data-testid="immunization-form"
-        onChange={() => {
-          updateSingle('formChanged', true);
-          return entryStarted();
-        }}
-        className={styles.immunizationsForm}
-        ref={formRef}>
-        <SummaryCard
-          name={isViewEditMode ? editFormHeader : addFormHeader}
-          className={styles.immunizationsFormSummaryCard}>
-          <div className={styles.immunizationsContainerWrapper}>
-            <div style={{ flex: 1, margin: '0rem 0.5rem' }}>
-              {hasSequences(formState.sequences) && (
-                <div className={styles.immunizationsInputContainer}>
-                  <label htmlFor="sequence">{t('sequence', 'Sequence')}</label>
-                  <div className="omrs-select">
-                    <select
-                      id="sequence"
-                      name="sequence"
-                      value={formState.currentDose.sequenceNumber}
-                      onChange={onDoseSelect}
-                      className={`immunizationSequenceSelect`}
-                      required>
-                      <option value="DEFAULT">{t('pleaseSelect', 'Please select')}</option>
-                      {formState.sequences.map((s) => {
-                        return (
-                          <option key={s.sequenceNumber} value={s.sequenceNumber}>
-                            {t(s.sequenceLabel, s.sequenceLabel)}
-                          </option>
-                        );
-                      })}
-                    </select>
-                  </div>
-                </div>
-              )}
-              <div className={styles.immunizationsInputContainer}>
-                <label htmlFor="vaccinationDate">{t('vaccinationDate', 'Vaccination Date')}</label>
-                <div className="omrs-datepicker">
-                  <input
-                    type="date"
-                    id="vaccinationDate"
-                    name="vaccinationDate"
-                    max={today}
-                    required
-                    defaultValue={formState.vaccinationDate}
-                    onChange={(evt) => updateSingle('vaccinationDate', evt.target.value)}
-                  />
-                  <svg className="omrs-icon" role="img">
-                    <use xlinkHref="#omrs-icon-calendar"></use>
-                  </svg>
-                </div>
-              </div>
-              <div className={styles.immunizationsInputContainer}>
-                <label htmlFor="vaccinationExpiration">{t('expirationDate', 'Expiration Date')}</label>
-                <div className="omrs-datepicker">
-                  <input
-                    type="date"
-                    id="vaccinationExpiration"
-                    name="vaccinationExpiration"
-                    defaultValue={formState.expirationDate}
-                    onChange={(evt) => updateSingle('expirationDate', evt.target.value)}
-                  />
-                  <svg className="omrs-icon" role="img">
-                    <use xlinkHref="#omrs-icon-calendar"></use>
-                  </svg>
-                </div>
-              </div>
-              <div className={styles.immunizationsInputContainer}>
-                <label htmlFor="lotNumber">{t('lotNumber', 'Lot Number')}</label>
-                <div className="omrs-input-group">
-                  <input
-                    className="omrs-input-outlined"
-                    type="text"
-                    id="lotNumber"
-                    style={{ height: '2.75rem' }}
-                    defaultValue={formState.lotNumber}
-                    onChange={(evt) => updateSingle('lotNumber', evt.target.value)}
-                  />
-                </div>
-              </div>
-              <div className={styles.immunizationsInputContainer}>
-                <label htmlFor="manufacturer">{t('manufacturer', 'Manufacturer')}</label>
-                <div className="omrs-input-group">
-                  <input
-                    className="omrs-input-outlined"
-                    type="text"
-                    id="manufacturer"
-                    style={{ height: '2.75rem' }}
-                    defaultValue={formState.manufacturer}
-                    onChange={(evt) => updateSingle('manufacturer', evt.target.value)}
-                  />
-                </div>
-              </div>
-            </div>
+      <Form onSubmit={handleFormSubmit} data-testid="immunization-form">
+        {hasSequences(formState.sequences) && (
+          <div className={styles.immunizationSequenceSelect}>
+            <Select
+              id="sequence"
+              name="sequence"
+              value={formState.currentDose.sequenceNumber}
+              onChange={onDoseSelect}
+              className="immunizationSequenceSelect"
+              required
+              labelText={t('sequence', 'Sequence')}>
+              <SelectItem text={t('pleaseSelect', 'Please select')} value="DEFAULT">
+                {t('pleaseSelect', 'Please select')}
+              </SelectItem>
+              {formState.sequences.map((s) => {
+                return (
+                  <SelectItem key={s.sequenceNumber} text={s.sequenceLabel} value={s.sequenceNumber}>
+                    {t(s.sequenceLabel, s.sequenceLabel)}
+                  </SelectItem>
+                );
+              })}
+            </Select>
           </div>
-        </SummaryCard>
-        <div
-          className={
-            enableCreateButtons || enableEditButtons
-              ? `${styles.buttonStyles} ${styles.buttonStylesBorder}`
-              : styles.buttonStyles
-          }>
-          <button
-            type="button"
-            className="omrs-btn omrs-outlined-neutral omrs-rounded"
-            style={{ width: '50%' }}
-            onClick={closeForm}>
-            {t('cancel', 'Cancel')}
-          </button>
-          <button
-            type="submit"
-            style={{ width: '50%' }}
+        )}
+        <div className={styles.immunizationSequenceSelect}>
+          <DatePicker
+            id="vaccinationDate"
+            className="vaccinationDate"
+            maxDate={new Date().toISOString()}
+            dateFormat="d/m/Y"
+            datePickerType="single"
+            value={formState.vaccinationDate}
+            onChange={([date]) => updateSingle('vaccinationDate', date)}>
+            <DatePickerInput
+              id="date-picker-calendar-id"
+              placeholder="dd/mm/yyyy"
+              labelText={t('vaccinationDate', 'Vaccination Date')}
+              type="text"
+            />
+          </DatePicker>
+        </div>
+        <div className={styles.immunizationSequenceSelect}>
+          <DatePicker
+            id="vaccinationExpiration"
+            className="vaccinationExpiration"
+            dateFormat="d/m/Y"
+            datePickerType="single"
+            value={formState.expirationDate}
+            onChange={([date]) => updateSingle('expirationDate', date)}>
+            <DatePickerInput
+              id="date-picker-calendar-id"
+              placeholder="dd/mm/yyyy"
+              labelText={t('expirationDate', 'Expiration Date')}
+              type="text"
+            />
+          </DatePicker>
+        </div>
+        <div className={styles.immunizationSequenceSelect}>
+          <TextInput
+            type="text"
+            id="lotNumber"
+            labelText={t('lotNumber', 'Lot Number')}
+            defaultValue={formState.lotNumber}
+            onChange={(evt) => updateSingle('lotNumber', evt.target.value)}
+          />
+        </div>
+        <div className={styles.immunizationSequenceSelect}>
+          <TextInput
+            type="text"
+            id="manufacturer"
+            labelText={t('manufacturer', 'Manufacturer')}
+            defaultValue={formState.manufacturer}
+            onChange={(evt) => updateSingle('manufacturer', evt.target.value)}
+          />
+        </div>
+        <div className={styles.immunizationSequenceSelect}>
+          <div
             className={
               enableCreateButtons || enableEditButtons
-                ? 'omrs-btn omrs-filled-action omrs-rounded'
-                : 'omrs-btn omrs-outlined omrs-rounded'
-            }
-            disabled={isViewEditMode ? !enableEditButtons : !enableCreateButtons}>
-            {t('save', 'Save')}
-          </button>
+                ? `${styles.buttonStyles} ${styles.buttonStylesBorder}`
+                : styles.buttonStyles
+            }>
+            <Button
+              type="button"
+              kind="secondary"
+              style={{ width: '50%', marginBottom: '1rem' }}
+              onClick={closeWorkspace}>
+              {t('cancel', 'Cancel')}
+            </Button>
+            <Button
+              type="submit"
+              kind="primary"
+              style={{ width: '50%', marginBottom: '1rem' }}
+              disabled={isViewEditMode ? !enableEditButtons : !enableCreateButtons}>
+              {t('save', 'Save')}
+            </Button>
+          </div>
         </div>
-      </form>
+      </Form>
     );
   }
-
-  const closeForm = (event) => {
-    let userConfirmed: boolean = false;
-    const defaultConfirmMessage = 'There is ongoing work, are you sure you want to close this tab?';
-    const confirmMessage = t('close form confirm message', defaultConfirmMessage);
-    if (formState.formChanged) {
-      userConfirmed = confirm(confirmMessage);
-    }
-
-    if (userConfirmed && formState.formChanged) {
-      entryCancelled();
-      history.push(`/patient/${patientUuid}/chart/immunizations`);
-      closeComponent();
-    } else if (!formState.formChanged) {
-      entryCancelled();
-      history.push(`/patient/${patientUuid}/chart/immunizations`);
-      closeComponent();
-    }
-  };
-
   return <div>{createForm()}</div>;
 };
 
