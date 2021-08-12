@@ -3,8 +3,9 @@ import styles from './end-visit.component.scss';
 import ComposedModal, { ModalHeader, ModalBody } from 'carbon-components-react/es/components/ComposedModal';
 import Button from 'carbon-components-react/es/components/Button';
 import { useTranslation } from 'react-i18next';
-import { getStartedVisit, showToast, updateVisit, useVisit } from '@openmrs/esm-framework';
+import { getStartedVisit, showNotification, showToast, updateVisit, useVisit } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
+import { first } from 'rxjs/operators';
 
 interface EndVisitPromptProps {
   patientUuid: string;
@@ -13,9 +14,8 @@ interface EndVisitPromptProps {
 }
 
 const EndVisitPrompt: React.FC<EndVisitPromptProps> = ({ patientUuid, openModal, closeModal }) => {
-  const { t } = useTranslation();
-  const dateFormat = 'DD - MMM - YYYY';
-
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language.toLowerCase().replace('_', '-');
   const { currentVisit } = useVisit(patientUuid);
 
   const endCurrentVisit = () => {
@@ -26,26 +26,28 @@ const EndVisitPrompt: React.FC<EndVisitPromptProps> = ({ patientUuid, openModal,
       stopDatetime: new Date(),
     };
     const ac = new AbortController();
-    const sub = updateVisit(currentVisit.uuid, endVisitPayload, ac).subscribe(
-      (response) => {
-        if (response.status === 200) {
-          getStartedVisit.next(null);
-          closeModal();
-          showToast({
-            kind: 'success',
-            description: t('visitEndSuccessfully', 'Ended current visit successfully'),
+    updateVisit(currentVisit.uuid, endVisitPayload, ac)
+      .pipe(first())
+      .subscribe(
+        (response) => {
+          if (response.status === 200) {
+            getStartedVisit.next(null);
+            closeModal();
+            showToast({
+              kind: 'success',
+              description: t('visitEndSuccessfully', 'Ended current visit successfully'),
+            });
+          }
+        },
+        (error) => {
+          showNotification({
+            title: t('endVisitError', 'Error ending current visit'),
+            kind: 'error',
+            critical: true,
+            description: error?.message,
           });
-        }
-      },
-      (error) => {
-        showToast({
-          kind: 'error',
-          description: t('visitEndError', 'Error ending current visit'),
-        });
-      },
-    );
-
-    return () => sub && sub.unsubscribe();
+        },
+      );
   };
 
   return (
@@ -55,8 +57,8 @@ const EndVisitPrompt: React.FC<EndVisitPromptProps> = ({ patientUuid, openModal,
       </ModalHeader>
       <ModalBody>
         <p className={styles.customLabel}>
-          <span>{t('startDate', 'Start Date')}</span>{' '}
-          <span>{dayjs(currentVisit?.startDatetime).format(dateFormat)}</span>
+          <span>{t('startDate', 'Start Date')}</span>
+          <span>{new Date(currentVisit?.startDatetime).toLocaleDateString(locale, { dateStyle: 'medium' })}</span>
         </p>
         <p className={styles.customLabel}>
           <span>{t('visitType', 'Visit Type')}</span> <span>{currentVisit?.visitType.display}</span>

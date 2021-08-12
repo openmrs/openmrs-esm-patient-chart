@@ -20,6 +20,7 @@ import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { attach, detach, getStartedVisit, getVisitsForPatient, VisitMode, VisitStatus } from '@openmrs/esm-framework';
 import styles from './past-visit-overview.component.scss';
 import Button from 'carbon-components-react/es/components/Button';
+import { first } from 'rxjs/operators';
 
 enum ActionTypes {
   pending = 'pending',
@@ -77,12 +78,12 @@ interface PastVisitOverviewProps {
 }
 
 const PastVisitOverview: React.FC<PastVisitOverviewProps> = ({ patientUuid }) => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language.toLowerCase().replace('_', '-');
   const [{ status, patientPastVisits, error }, dispatch] = useReducer(reducer, {
     status: 'pending',
     patientPastVisits: null,
   });
-  const dateFormat = 'DD-MMM-YYYY';
 
   const headerData: Array<DataTableHeader> = useMemo(
     () => [
@@ -96,32 +97,35 @@ const PastVisitOverview: React.FC<PastVisitOverviewProps> = ({ patientUuid }) =>
 
   const rowData: Array<DataTableRow> = useMemo(
     () =>
-      patientPastVisits.length
+      patientPastVisits?.length
         ? patientPastVisits.map((visit, index) => {
             return {
               id: `${index}`,
-              startDate: dayjs(visit.startDatetime).format(dateFormat),
+              startDate: new Date(visit.startDatetime).toLocaleDateString(locale, { dateStyle: 'medium' }),
               visitType: visit.visitType.display,
               location: visit.location?.display,
-              endDate: visit.stopDatetime ? dayjs(visit.stopDatetime).format(dateFormat) : '',
+              endDate: visit.stopDatetime
+                ? new Date(visit.startDatetime).toLocaleDateString(locale, { dateStyle: 'medium' })
+                : '',
               visit: visit,
             };
           })
         : [],
-    [patientPastVisits],
+    [locale, patientPastVisits],
   );
   useEffect(() => {
     if (patientUuid) {
       const ac = new AbortController();
-      getVisitsForPatient(patientUuid, ac).subscribe(
-        ({ data }) => {
-          dispatch({ type: ActionTypes.resolved, payload: data.results });
-        },
-        (error) => {
-          dispatch({ type: ActionTypes.error, payload: error });
-        },
-      );
-      return () => ac.abort();
+      getVisitsForPatient(patientUuid, ac)
+        .pipe(first())
+        .subscribe(
+          ({ data }) => {
+            dispatch({ type: ActionTypes.resolved, payload: data.results });
+          },
+          (error) => {
+            dispatch({ type: ActionTypes.error, payload: error });
+          },
+        );
     }
   }, [patientUuid]);
 

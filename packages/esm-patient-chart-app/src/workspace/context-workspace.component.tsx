@@ -26,7 +26,7 @@ const ContextWorkspace: React.FC<RouteComponentProps<ContextWorkspaceParams>> = 
   const { windowSize, updateWindowSize } = useContextWorkspace();
   const { size } = windowSize;
   const props = React.useMemo(
-    () => ({ closeWorkspace, patientUuid, isTablet, props }),
+    () => ({ closeWorkspace, patientUuid, isTablet }),
     [closeWorkspace, isTablet, patientUuid],
   );
   const [openContextWorkspace, setOpenContextWorkspace] = useState(false);

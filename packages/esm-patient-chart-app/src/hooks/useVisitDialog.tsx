@@ -11,18 +11,7 @@ export function useVisitDialog(patientUuid: string) {
   React.useEffect(() => {
     const handler = (ev: CustomEvent) => {
       const { type, state = {} } = ev.detail;
-
-      switch (type) {
-        case 'start':
-          return setVisitDialogType({ type: 'start', state });
-        case 'prompt':
-          return setVisitDialogType({ type: 'prompt', state });
-        case 'end':
-          return setVisitDialogType({ type: 'end', state });
-        case 'close':
-          return setVisitDialogType({ type: 'close', state });
-      }
-      return setVisitDialogType({ type, state });
+      setVisitDialogType({ type, state });
     };
     window.addEventListener('visit-dialog', handler);
     return () => window.removeEventListener('visit-dialog', handler);

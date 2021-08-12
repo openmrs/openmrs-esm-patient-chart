@@ -14,11 +14,11 @@ import Switch from 'carbon-components-react/es/components/Switch';
 import Select from 'carbon-components-react/es/components/Select';
 import VisitTypeOverview from './visit-type-overview.component';
 import {
-  createErrorHandler,
   detach,
   getStartedVisit,
   NewVisitPayload,
   saveVisit,
+  showNotification,
   showToast,
   useLocations,
   useSessionUser,
@@ -27,6 +27,7 @@ import {
 } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import { amPm, convertTime12to24 } from './start-visit-helper';
+import { first } from 'rxjs/operators';
 
 interface StartVisitFormProps {
   isTablet: boolean;
@@ -38,8 +39,8 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({ isTablet, patientUuid }
   const locations = useLocations();
   const sessionUser = useSessionUser();
   const [selectedLocation, setSelectedLocation] = useState<string>('');
-  const [visitDate, setVisitDate] = useState<string>(dayjs(new Date()).format('DD/MM/YYYY'));
-  const [visitTime, setVisitTime] = useState<string>(dayjs(new Date()).format('hh:mm'));
+  const [visitDate, setVisitDate] = useState(new Date().toISOString());
+  const [visitTime, setVisitTime] = useState(dayjs(new Date()).format('hh:mm'));
   const [timeFormat, setTimeFormat] = useState<amPm>(new Date().getHours() >= 12 ? 'PM' : 'AM');
   const [contentSwitcherIndex, setContentSwitcherIndex] = useState<number>(1);
   const [visitType, setVisitType] = useState<string>();
@@ -69,28 +70,32 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({ isTablet, patientUuid }
         location: selectedLocation,
       };
 
-      saveVisit(visitPayload, new AbortController()).subscribe(
-        (response) => {
-          if (response.status === 201) {
-            getStartedVisit.next({
-              mode: VisitMode.NEWVISIT,
-              visitData: response.data,
-              status: VisitStatus.ONGOING,
+      saveVisit(visitPayload, new AbortController())
+        .pipe(first())
+        .subscribe(
+          (response) => {
+            if (response.status === 201) {
+              getStartedVisit.next({
+                mode: VisitMode.NEWVISIT,
+                visitData: response.data,
+                status: VisitStatus.ONGOING,
+              });
+              handleCloseForm();
+              showToast({
+                kind: 'success',
+                description: t('startVisitSuccessfully', 'Visit has been started successfully'),
+              });
+            }
+          },
+          (error) => {
+            showNotification({
+              title: t('startVisitError', 'Error starting current visit'),
+              kind: 'error',
+              critical: true,
+              description: error?.message,
             });
-            handleCloseForm();
-            showToast({
-              kind: 'success',
-              description: t('startVisitSuccessfully', 'Visit has been started successfully'),
-            });
-          }
-        },
-        (error) => {
-          showToast({
-            kind: 'error',
-            description: t('startVisitErrorMessage', 'An error occurred while starting a visit'),
-          });
-        },
-      );
+          },
+        );
     },
     [handleCloseForm, patientUuid, selectedLocation, t, timeFormat, visitDate, visitTime, visitType],
   );
