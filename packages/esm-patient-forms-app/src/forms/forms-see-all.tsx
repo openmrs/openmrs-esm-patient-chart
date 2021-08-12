@@ -25,13 +25,8 @@ enum FormViewState {
 
 const Forms = () => {
   const urlPathArray = window.location.pathname.split('/');
-  const patientUuid = urlPathArray[urlPathArray.length - 2];
+  const patientUuid = urlPathArray[urlPathArray.length - 3];
   const [patient, setPatient] = useState<fhir.Patient>();
-
-  useEffect(() => {
-    getObjectFHIR(patientUuid).then(setPatient);
-  }, [patientUuid]);
-
   const { t } = useTranslation();
   const displayText = t('forms', 'Forms');
   const headerTitle = t('forms', 'Forms');
@@ -40,6 +35,10 @@ const Forms = () => {
   const [completedForms, setCompletedForms] = useState<Array<Form>>([]);
   const [selectedFormView, setSelectedFormView] = useState<FormViewState>(FormViewState.all);
   const [filledForms, setFilledForms] = useState<Array<Form>>([]);
+
+  useEffect(() => {
+    getObjectFHIR(patientUuid).then(setPatient);
+  }, [patientUuid]);
 
   async function fetchAllForms() {
     const searchResult = await openmrsFetch(
@@ -53,6 +52,30 @@ const Forms = () => {
 
   useEffect(() => {
     fetchAllForms().then(setForms);
+  }, []);
+
+  const rows_count: number = React.useMemo(() => {
+    var temp: number = 10;
+    if (urlPathArray[urlPathArray.length - 1] === 'summary') {
+      temp = 5;
+    }
+    return temp;
+  }, []);
+
+  const pageUrl: string = React.useMemo(() => {
+    var temp = `$\{openmrsSpaBase}/patient/${patientUuid}/chart/summary`;
+    if (urlPathArray[urlPathArray.length - 1] === 'summary') {
+      temp = `$\{openmrsSpaBase}/patient/${patientUuid}/chart/forms`;
+    }
+    return temp;
+  }, []);
+
+  const urlLabel = React.useMemo(() => {
+    var temp = ['goToSummary', 'Go to Summary'];
+    if (urlPathArray[urlPathArray.length - 1] === 'summary') {
+      temp = ['seeAll', 'See all'];
+    }
+    return temp;
   }, []);
 
   interface Encounter_see_all {
@@ -146,6 +169,9 @@ const Forms = () => {
                 patientUuid={patientUuid}
                 patient={patient}
                 encounterUuid={first<Encounter_see_all>(encounters)?.uuid}
+                rows_count={rows_count}
+                pageUrl={pageUrl}
+                urlLabel={urlLabel}
               />
             )}
             {selectedFormView === FormViewState.all && (
@@ -154,6 +180,9 @@ const Forms = () => {
                 patientUuid={patientUuid}
                 patient={patient}
                 encounterUuid={first<Encounter_see_all>(encounters)?.uuid}
+                rows_count={rows_count}
+                pageUrl={pageUrl}
+                urlLabel={urlLabel}
               />
             )}
             {selectedFormView === FormViewState.recommended && (

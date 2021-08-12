@@ -12,6 +12,7 @@ interface PatientChartPaginationProps {
   pageSize: number;
   onPageNumberChange?: any;
   pageUrl?: string;
+  urlLabel: Array<string>;
 }
 
 export const PatientChartPagination: FunctionComponent<PatientChartPaginationProps> = ({
@@ -21,6 +22,7 @@ export const PatientChartPagination: FunctionComponent<PatientChartPaginationPro
   pageNumber,
   pageUrl = '',
   currentItems,
+  urlLabel,
 }) => {
   const { t } = useTranslation();
   const { itemsDisplayed, pageSizes } = usePaginationInfo(pageSize, totalItems, pageNumber, currentItems);
@@ -33,7 +35,7 @@ export const PatientChartPagination: FunctionComponent<PatientChartPaginationPro
             {itemsDisplayed}
             {pageUrl && (
               <ConfigurableLink to={pageUrl} className={styles.configurableLink}>
-                {t('goToSummary', 'Go to Summary')}
+                {t(urlLabel)}
               </ConfigurableLink>
             )}
           </div>

@@ -38,17 +38,11 @@ function setupOpenMRS() {
   defineConfigSchema(moduleName, {});
 
   return {
-    pages: [
-      {
-        load: getAsyncLifecycle(() => import('./forms/forms-see-all'), options),
-        route: /^chart\/patient\/.+\/forms/,
-      },
-    ],
     extensions: [
       {
         id: 'forms-widget',
         slot: 'patient-chart-summary-dashboard-slot',
-        load: getAsyncLifecycle(() => import('./forms/forms.component'), options),
+        load: getAsyncLifecycle(() => import('./forms/forms-see-all'), options),
         meta: {
           columnSpan: 4,
         },
@@ -67,7 +61,7 @@ function setupOpenMRS() {
       {
         id: 'patient-form-dashboard',
         slot: dashboardMeta.slot,
-        load: getAsyncLifecycle(() => import('./forms/forms.component'), options),
+        load: getAsyncLifecycle(() => import('./forms/forms-see-all'), options),
         online: true,
         offline: true,
       },
