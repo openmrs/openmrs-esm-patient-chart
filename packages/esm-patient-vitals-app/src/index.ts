@@ -35,7 +35,7 @@ function setupOpenMRS() {
         slot: 'patient-chart-summary-dashboard-slot',
         load: getAsyncLifecycle(() => import('./vitals/vitals-overview.component'), options),
         meta: {
-          columnSpan: 2,
+          columnSpan: 4,
         },
         online: { showAddVitals: true },
         offline: { showAddVitals: false },
