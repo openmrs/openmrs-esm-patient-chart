@@ -191,17 +191,20 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
 
   const tableRows = React.useMemo(
     () =>
-      vitals?.slice(0, showAllVitals ? vitals.length : vitalsToShowCount).map((vital, index) => {
-        return {
-          id: `${index}`,
-          date: dayjs(vital.date).format(`DD - MMM - YYYY`),
-          bloodPressure: `${vital.systolic ?? '-'} / ${vital.diastolic ?? '-'}`,
-          pulse: vital.pulse,
-          spo2: vital.oxygenSaturation,
-          temperature: vital.temperature,
-          respiratoryRate: vital.respiratoryRate,
-        };
-      }),
+      vitals
+        ?.slice(0, showAllVitals ? vitals.length : vitalsToShowCount)
+        .sort((a, b) => (b.date > a.date ? 1 : -1))
+        .map((vital, index) => {
+          return {
+            id: `${index}`,
+            date: dayjs(vital.date).format(`DD - MMM - YYYY`),
+            bloodPressure: `${vital.systolic ?? '-'} / ${vital.diastolic ?? '-'}`,
+            pulse: vital.pulse,
+            spo2: vital.oxygenSaturation,
+            temperature: vital.temperature,
+            respiratoryRate: vital.respiratoryRate,
+          };
+        }),
     [vitals, showAllVitals],
   );
 
