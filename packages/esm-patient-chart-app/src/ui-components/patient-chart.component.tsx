@@ -26,7 +26,6 @@ const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({ match
 
   const mainClassName = `omrs-main-content ${styles.chartContainer}`;
 
-  useVisitDialog(patientUuid);
   useOfflineVisitForPatient(patientUuid, sessionUser?.sessionLocation.uuid);
 
   return (
@@ -44,7 +43,7 @@ const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({ match
             <div className={styles.grid}>
               <div className={styles.chartreview}>
                 <ChartReview {...state} view={view} subview={subview} />
-                <VisitDialog />
+                <VisitDialog patientUuid={patientUuid} />
               </div>
               <div className={styles.workspace}>
                 <WorkspaceWrapper {...state} />

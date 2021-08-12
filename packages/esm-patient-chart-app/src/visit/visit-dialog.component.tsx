@@ -1,35 +1,23 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import styles from './visit-dialog.css';
-import isEmpty from 'lodash-es/isEmpty';
-import { ModalItem, getModalItem } from './visit-dialog.resource';
+import React from 'react';
+import { useVisitDialog } from '../hooks/useVisitDialog';
+import StartVisitPrompt from './visit-prompt/start-visit.component';
+import EndVisitPrompt from './visit-prompt/end-visit.component';
 
-const VisitDialog: React.FC = () => {
-  const [child, setChild] = useState<React.ReactNode>(null);
-  const [childProps, setChildProps] = useState<any>(null);
+interface VisitDialogProps {
+  patientUuid: string;
+}
 
-  const toggleDisplay = useCallback(() => {
-    setChild(!isEmpty(childProps));
-  }, [childProps]);
-
-  useEffect(() => {
-    const sub = getModalItem().subscribe((item: ModalItem) => {
-      setChild(item.component);
-      setChildProps(item.props);
-    });
-    return () => sub.unsubscribe();
-  }, [child]);
+const VisitDialog: React.FC<VisitDialogProps> = ({ patientUuid }) => {
+  const { type, state } = useVisitDialog(patientUuid);
+  const closeModal = () => {
+    window.dispatchEvent(new CustomEvent('visit-dialog', { detail: { type: 'close' } }));
+  };
 
   return (
-    <div className={!isEmpty(child) ? styles.visitModal : styles.hideModal}>
-      <div className={styles.visitModalContent}>
-        <div className={styles.closeButtonContainer}>
-          <svg className="omrs-icon" fill="var(--omrs-color-danger)" onClick={toggleDisplay}>
-            <use xlinkHref="#omrs-icon-close"></use>
-          </svg>
-        </div>
-        {child}
-      </div>
-    </div>
+    <>
+      <StartVisitPrompt openModal={type == 'prompt'} closeModal={closeModal} state={state} />
+      <EndVisitPrompt openModal={type === 'end'} patientUuid={patientUuid} closeModal={closeModal} />
+    </>
   );
 };
 

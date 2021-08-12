@@ -116,6 +116,27 @@ function setupOpenMRS() {
           view: 'visits',
         },
       },
+      {
+        id: 'past-visits-overview',
+        load: getAsyncLifecycle(() => import('./visit/past-visit-overview.component'), {
+          featureName: 'past-visits-overview',
+          moduleName,
+        }),
+        meta: {
+          title: 'Past Visits',
+          view: 'visits',
+        },
+      },
+      {
+        id: 'start-visit-workspace-form',
+        load: getAsyncLifecycle(() => import('./visit/visit-form/visit-form.component'), {
+          featureName: 'start-visit-form',
+          moduleName,
+        }),
+        meta: {
+          title: 'Start Visit Form',
+        },
+      },
     ],
   };
 }
