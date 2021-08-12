@@ -193,7 +193,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
     () =>
       vitals
         ?.slice(0, showAllVitals ? vitals.length : vitalsToShowCount)
-        .sort((a: any, b: any) => (b.date > a.date ? 1 : -1))
+        .sort((a, b) => (b.date > a.date ? 1 : -1))
         .map((vital, index) => {
           return {
             id: `${index}`,
