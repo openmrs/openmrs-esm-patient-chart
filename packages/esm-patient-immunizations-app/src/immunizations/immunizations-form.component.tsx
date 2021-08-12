@@ -124,12 +124,12 @@ const ImmunizationsForm: React.FC<ImmunizationsFormProps> = ({
         response.status === 201 && navigate();
         showToast({
           kind: 'success',
-          description: t('vaccinationSaved', 'Vaccination Saved Successfully'),
+          description: t('vaccinationSaved', 'Vaccination saved successfully'),
         });
       },
       (err) => {
         showNotification({
-          title: t('errorSaving', 'Error Saving Vaccination'),
+          title: t('errorSaving', 'Error saving vaccination'),
           kind: 'error',
           critical: true,
           description: err?.message,
