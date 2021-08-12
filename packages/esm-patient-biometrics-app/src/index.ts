@@ -47,7 +47,7 @@ function setupOpenMRS() {
         slot: 'patient-chart-summary-dashboard-slot',
         load: getAsyncLifecycle(() => import('./biometrics/biometrics-overview.component'), options),
         meta: {
-          columnSpan: 2,
+          columnSpan: 4,
         },
         online: { showAddBiometrics: true },
         offline: { showAddBiometrics: false },
