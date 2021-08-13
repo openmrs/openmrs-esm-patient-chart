@@ -11,7 +11,7 @@ import styles from './order-basket.scss';
 import { useTranslation } from 'react-i18next';
 import { OrderBasketItem } from '../types/order-basket-item';
 import { getDurationUnits, getPatientEncounterId } from '../api/api';
-import { createErrorHandler } from '@openmrs/esm-framework';
+import { createErrorHandler, showToast, showNotification } from '@openmrs/esm-framework';
 import { OpenmrsResource } from '../types/openmrs-resource';
 import { orderDrugs } from './drug-ordering';
 import { connect } from 'unistore/react';
@@ -83,9 +83,23 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
       orderDrugs(items, patientUuid, abortController).then((erroredItems) => {
         setItems(erroredItems);
         fetchActivePatientOrders();
-
         if (erroredItems.length == 0) {
+          showToast({
+            kind: 'success',
+            title: 'Order placed',
+            description: t(
+              'OrderSavedSuccefully',
+              'Your order is complete.The items will now appear on the orders page successfully',
+            ),
+          });
           closeWorkspace();
+        } else {
+          showNotification({
+            title: t('orderPlaceError', 'Order place error'),
+            kind: 'error',
+            critical: true,
+            description: 'Order cannot have more than one',
+          });
         }
       });
       return () => abortController.abort();
