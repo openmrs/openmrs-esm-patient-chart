@@ -61,21 +61,21 @@ interface FormViewProps {
   patientUuid: string;
   patient: fhir.Patient;
   encounterUuid?: string;
-  rows_count: number;
+  pageSize: number;
   pageUrl: string;
-  urlLabel: Array<string>;
+  urlLabel: string;
 }
 
 const filterFormsByName = (formName: string, forms: Array<Form>) => {
   return forms.filter((form) => form.name.toLowerCase().search(formName.toLowerCase()) !== -1);
 };
 
-const FormView: FunctionComponent<FormViewProps> = ({ forms, patientUuid, patient, rows_count, pageUrl, urlLabel }) => {
+const FormView: FunctionComponent<FormViewProps> = ({ forms, patientUuid, patient, pageSize, pageUrl, urlLabel }) => {
   const { t } = useTranslation();
   const { currentVisit } = useVisit(patientUuid);
   const [searchTerm, setSearchTerm] = useState<string>(null);
   const [allForms, setAllForms] = useState<Array<Form>>(forms);
-  const { results, goTo, currentPage } = usePagination(allForms.sort(sortFormLatestFirst), rows_count);
+  const { results, goTo, currentPage } = usePagination(allForms.sort(sortFormLatestFirst), pageSize);
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
@@ -171,7 +171,7 @@ const FormView: FunctionComponent<FormViewProps> = ({ forms, patientUuid, patien
               totalItems={allForms.length}
               currentItems={results.length}
               pageUrl={pageUrl}
-              pageSize={rows_count}
+              pageSize={pageSize}
               onPageNumberChange={({ page }) => goTo(page)}
               urlLabel={urlLabel}
             />

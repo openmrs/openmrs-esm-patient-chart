@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, FunctionComponent } from 'react';
 import dayjs from 'dayjs';
 import ContentSwitcher from 'carbon-components-react/es/components/ContentSwitcher';
 import Switch from 'carbon-components-react/es/components/Switch';
@@ -10,7 +10,6 @@ import { toFormObject } from './forms.resource';
 import { filterAvailableAndCompletedForms } from './forms-utils';
 import { Form } from '../types';
 import EmptyFormView from './empty-form.component';
-import { getObjectFHIR } from './get-FHIR-object';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import first from 'lodash-es/first';
 import uniqBy from 'lodash-es/uniqBy';
@@ -23,10 +22,16 @@ enum FormViewState {
   all,
 }
 
-const Forms = () => {
+interface FormsProps {
+  patientUuid: string;
+  patient: fhir.Patient;
+  pageSize: number;
+  pageUrl: string;
+  urlLabel: string;
+}
+
+const Forms: FunctionComponent<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, urlLabel }) => {
   const urlPathArray = window.location.pathname.split('/');
-  const patientUuid = urlPathArray[urlPathArray.length - 3];
-  const [patient, setPatient] = useState<fhir.Patient>();
   const { t } = useTranslation();
   const displayText = t('forms', 'Forms');
   const headerTitle = t('forms', 'Forms');
@@ -35,10 +40,6 @@ const Forms = () => {
   const [completedForms, setCompletedForms] = useState<Array<Form>>([]);
   const [selectedFormView, setSelectedFormView] = useState<FormViewState>(FormViewState.all);
   const [filledForms, setFilledForms] = useState<Array<Form>>([]);
-
-  useEffect(() => {
-    getObjectFHIR(patientUuid).then(setPatient);
-  }, [patientUuid]);
 
   async function fetchAllForms() {
     const searchResult = await openmrsFetch(
@@ -52,30 +53,6 @@ const Forms = () => {
 
   useEffect(() => {
     fetchAllForms().then(setForms);
-  }, []);
-
-  const rows_count: number = React.useMemo(() => {
-    var temp: number = 10;
-    if (urlPathArray[urlPathArray.length - 1] === 'summary') {
-      temp = 5;
-    }
-    return temp;
-  }, []);
-
-  const pageUrl: string = React.useMemo(() => {
-    var temp = `$\{openmrsSpaBase}/patient/${patientUuid}/chart/summary`;
-    if (urlPathArray[urlPathArray.length - 1] === 'summary') {
-      temp = `$\{openmrsSpaBase}/patient/${patientUuid}/chart/forms`;
-    }
-    return temp;
-  }, []);
-
-  const urlLabel = React.useMemo(() => {
-    var temp = ['goToSummary', 'Go to Summary'];
-    if (urlPathArray[urlPathArray.length - 1] === 'summary') {
-      temp = ['seeAll', 'See all'];
-    }
-    return temp;
   }, []);
 
   interface Encounter_see_all {
@@ -169,7 +146,7 @@ const Forms = () => {
                 patientUuid={patientUuid}
                 patient={patient}
                 encounterUuid={first<Encounter_see_all>(encounters)?.uuid}
-                rows_count={rows_count}
+                pageSize={pageSize}
                 pageUrl={pageUrl}
                 urlLabel={urlLabel}
               />
@@ -180,7 +157,7 @@ const Forms = () => {
                 patientUuid={patientUuid}
                 patient={patient}
                 encounterUuid={first<Encounter_see_all>(encounters)?.uuid}
-                rows_count={rows_count}
+                pageSize={pageSize}
                 pageUrl={pageUrl}
                 urlLabel={urlLabel}
               />
