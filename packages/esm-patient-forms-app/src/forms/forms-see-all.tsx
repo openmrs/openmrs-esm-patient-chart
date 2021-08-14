@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, FunctionComponent } from 'react';
 import dayjs from 'dayjs';
 import ContentSwitcher from 'carbon-components-react/es/components/ContentSwitcher';
 import Switch from 'carbon-components-react/es/components/Switch';
@@ -10,7 +10,6 @@ import { toFormObject } from './forms.resource';
 import { filterAvailableAndCompletedForms } from './forms-utils';
 import { Form } from '../types';
 import EmptyFormView from './empty-form.component';
-import { getObjectFHIR } from './get-FHIR-object';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import first from 'lodash-es/first';
 import uniqBy from 'lodash-es/uniqBy';
@@ -23,15 +22,16 @@ enum FormViewState {
   all,
 }
 
-const Forms = () => {
+interface FormsProps {
+  patientUuid: string;
+  patient: fhir.Patient;
+  pageSize: number;
+  pageUrl: string;
+  urlLabel: string;
+}
+
+const Forms: FunctionComponent<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, urlLabel }) => {
   const urlPathArray = window.location.pathname.split('/');
-  const patientUuid = urlPathArray[urlPathArray.length - 2];
-  const [patient, setPatient] = useState<fhir.Patient>();
-
-  useEffect(() => {
-    getObjectFHIR(patientUuid).then(setPatient);
-  }, [patientUuid]);
-
   const { t } = useTranslation();
   const displayText = t('forms', 'Forms');
   const headerTitle = t('forms', 'Forms');
@@ -146,6 +146,9 @@ const Forms = () => {
                 patientUuid={patientUuid}
                 patient={patient}
                 encounterUuid={first<Encounter_see_all>(encounters)?.uuid}
+                pageSize={pageSize}
+                pageUrl={pageUrl}
+                urlLabel={urlLabel}
               />
             )}
             {selectedFormView === FormViewState.all && (
@@ -154,6 +157,9 @@ const Forms = () => {
                 patientUuid={patientUuid}
                 patient={patient}
                 encounterUuid={first<Encounter_see_all>(encounters)?.uuid}
+                pageSize={pageSize}
+                pageUrl={pageUrl}
+                urlLabel={urlLabel}
               />
             )}
             {selectedFormView === FormViewState.recommended && (
