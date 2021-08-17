@@ -24,13 +24,15 @@
 }
 
 .activeButton {
-  background-color:$inverse-link;opacity: 0.7;
+  background-color:$inverse-link;
+  opacity: 0.7;
   border: solid $inverse-link 2px;
   color: $color-blue-60-2;
 }
 
 .toggle {
-  border: 1px solid $inverse-link;opacity: 0.7;
+  border: 1px solid $inverse-link;
+  opacity: 0.7;
 }
 
 .toggleButtons {
