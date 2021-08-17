@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { attach } from '@openmrs/esm-framework';
 import { PatientVitals } from '../vitals-biometrics.resource';
 import { patientVitalsBiometricsFormWorkspace } from '../../constants';
+import { clearWorkspace } from '../../clear-workspace';
 
 interface VitalsHeaderStateTitleProps {
   view: string;
@@ -30,6 +31,7 @@ const VitalsHeaderStateTitle: React.FC<VitalsHeaderStateTitleProps> = ({
 
   const launchVitalsBiometricsForm = React.useCallback((e) => {
     e.stopPropagation();
+    clearWorkspace('patient-chart-workspace-slot');
     attach('patient-chart-workspace-slot', patientVitalsBiometricsFormWorkspace);
   }, []);
 

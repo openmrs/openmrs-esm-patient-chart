@@ -22,6 +22,7 @@ import { useConfig, attach } from '@openmrs/esm-framework';
 import { useVitalsSignsConceptMetaData, withUnit } from './vitals-biometrics-form/use-vitalsigns';
 import { patientVitalsBiometricsFormWorkspace } from '../constants';
 import { PatientVitals, performPatientsVitalsSearch } from './vitals-biometrics.resource';
+import { clearWorkspace } from '../clear-workspace';
 
 const vitalsToShowCount = 5;
 
@@ -71,10 +72,10 @@ const RenderVitals: React.FC<RenderVitalsProps> = ({
     },
   ];
 
-  const launchVitalsBiometricsForm = React.useCallback(
-    () => attach('patient-chart-workspace-slot', patientVitalsBiometricsFormWorkspace),
-    [],
-  );
+  const launchVitalsBiometricsForm = React.useCallback(() => {
+    clearWorkspace('patient-chart-workspace-slot');
+    attach('patient-chart-workspace-slot', patientVitalsBiometricsFormWorkspace);
+  }, []);
 
   if (tableRows.length) {
     return (

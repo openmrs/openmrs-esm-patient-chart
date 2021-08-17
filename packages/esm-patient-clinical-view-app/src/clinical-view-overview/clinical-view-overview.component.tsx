@@ -7,6 +7,7 @@ import { attach, ExtensionSlot, useConfig } from '@openmrs/esm-framework';
 import tail from 'lodash-es/tail';
 import EmptyDataIllustration from '../empty-state/empty-data-illustration.component';
 import styles from './clinical-view-overview.component.scss';
+import { clearWorkspace } from '../clear-workspace';
 
 interface ClinicalViewOverviewProps {
   patientUuid: string;
@@ -23,6 +24,7 @@ const ClinicalViewOverview: React.FC<ClinicalViewOverviewProps> = ({ patientUuid
   }, [patient, patientUuid]);
 
   const launchClinicalViewForm = React.useCallback(() => {
+    clearWorkspace('patient-chart-workspace-slot');
     attach('patient-chart-workspace-slot', 'patient-clinical-view-form-workspace');
     setSelectedViewIndex(0);
   }, []);
