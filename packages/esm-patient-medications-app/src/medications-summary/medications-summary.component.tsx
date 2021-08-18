@@ -16,7 +16,7 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
   const [pastPatientOrders] = usePatientOrders(patientUuid, 'any');
   useEffect(() => {
     fetchActivePatientOrders();
-  });
+  },[activePatientOrders]);
   return (
     <>
       <h1 className={styles.productiveHeading03}>{t('medications', 'Medications')}</h1>
