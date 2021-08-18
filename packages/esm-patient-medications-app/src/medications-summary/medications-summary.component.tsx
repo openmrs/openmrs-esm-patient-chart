@@ -5,6 +5,7 @@ import styles from './medications-summary.scss';
 import MedicationsDetailsTable from '../components/medications-details-table.component';
 import { useTranslation } from 'react-i18next';
 import { usePatientOrders } from '../utils/use-current-patient-orders.hook';
+import { useEffect } from 'react';
 
 export interface MedicationsSummaryProps {
   patientUuid: string;
@@ -12,9 +13,11 @@ export interface MedicationsSummaryProps {
 
 export default function MedicationsSummary({ patientUuid }: MedicationsSummaryProps) {
   const { t } = useTranslation();
-  const [activePatientOrders] = usePatientOrders(patientUuid, 'ACTIVE');
+  const [activePatientOrders,fetchActivePatientOrders] = usePatientOrders(patientUuid, 'ACTIVE');
   const [pastPatientOrders] = usePatientOrders(patientUuid, 'any');
-
+  useEffect(() => {
+    fetchActivePatientOrders();
+  });
   return (
     <>
       <h1 className={styles.productiveHeading03}>{t('medications', 'Medications')}</h1>
