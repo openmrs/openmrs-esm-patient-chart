@@ -1,11 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
 import FloatingOrderBasketButton from './floating-order-basket-button.component';
 import styles from './medications-summary.scss';
 import MedicationsDetailsTable from '../components/medications-details-table.component';
 import { useTranslation } from 'react-i18next';
 import { usePatientOrders } from '../utils/use-current-patient-orders.hook';
-import { useEffect } from 'react';
 
 export interface MedicationsSummaryProps {
   patientUuid: string;
@@ -13,7 +12,7 @@ export interface MedicationsSummaryProps {
 
 export default function MedicationsSummary({ patientUuid }: MedicationsSummaryProps) {
   const { t } = useTranslation();
-  const [activePatientOrders,fetchActivePatientOrders] = usePatientOrders(patientUuid, 'ACTIVE');
+  const [activePatientOrders, fetchActivePatientOrders] = usePatientOrders(patientUuid, 'ACTIVE');
   const [pastPatientOrders] = usePatientOrders(patientUuid, 'any');
   useEffect(() => {
     fetchActivePatientOrders();
