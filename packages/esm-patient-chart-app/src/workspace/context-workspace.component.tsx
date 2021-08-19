@@ -47,8 +47,9 @@ const ContextWorkspace: React.FC<RouteComponentProps<ContextWorkspaceParams>> = 
 
   return (
     <aside
-      className={`${styles.contextWorkspaceContainer} ${openContextWorkspace ? styles.show : styles.hide} ${size === 'maximize' && styles.maximized
-        }`}>
+      className={`${styles.contextWorkspaceContainer} ${openContextWorkspace ? styles.show : styles.hide} ${
+        size === 'maximize' && styles.maximized
+      }`}>
       <Header aria-label={title} style={{ position: 'sticky' }}>
         <HeaderName prefix="">{title}</HeaderName>
         <HeaderGlobalBar>
