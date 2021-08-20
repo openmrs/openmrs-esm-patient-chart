@@ -55,8 +55,8 @@ const RecentOverview: React.FC<ExternalOverviewProps> = ({ patientUuid, filter }
           <CommonOverview
             {...{
               patientUuid,
-              overviewData: overViewDataResult,
-              insertSeperator: true,
+              overviewData,
+              insertSeparator: true,
               deactivateToolbar: true,
             }}
           />
