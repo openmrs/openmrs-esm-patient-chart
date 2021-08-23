@@ -7,6 +7,7 @@ import Document20 from '@carbon/icons-react/es/document/20';
 import styles from './action-menu.component.scss';
 import Button from 'carbon-components-react/es/components/Button';
 import { useContextWorkspace } from '../hooks/useContextWindowSize';
+import { useWorkspace } from '../hooks/useWorkspace';
 
 interface ActionMenuInterface {
   open: boolean;
@@ -17,13 +18,22 @@ export const CHARTS_ACTION_MENU_ITEMS_SLOT = 'action-menu-items-slot';
 
 export const ActionMenu: React.FC<ActionMenuInterface> = ({ open }) => {
   const layout = useLayoutType();
+  const { screenMode } = useWorkspace();
   const { openWindows, updateWindowSize } = useContextWorkspace();
+
+  const checkViewMode = () => {
+    if (screenMode === 'maximize') {
+      updateWindowSize('maximize')
+    } else {
+      updateWindowSize('reopen')
+    }
+  }
 
   const menu = isDesktop(layout) ? (
     <aside className={styles.rightSideNav}>
       <ExtensionSlot extensionSlotName={CHARTS_ACTION_MENU_ITEMS_SLOT} />
       <Button
-        onClick={() => updateWindowSize('reopen')}
+        onClick={() => checkViewMode()}
         iconDescription="WorkSpace Items"
         className={`${styles.iconButton} ${openWindows > 0 && styles.activeIconButton} `}
         kind="ghost"
