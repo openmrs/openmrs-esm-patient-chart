@@ -8,26 +8,27 @@ import DataTable, {
   TableBody,
   TableCell,
 } from 'carbon-components-react/lib/components/DataTable';
-import { isEmpty } from 'lodash-es';
+import isEmpty from 'lodash-es/isEmpty';
 import { openWorkspaceTab } from '../../../esm-patient-common-lib/src';
 import ImmunizationsForm from './immunizations-form.component';
 import { useTranslation } from 'react-i18next';
 import { ExistingDoses, Immunization } from '../types';
 
-interface DetailsTableProps {
+interface SequenceTableProps {
   immunizations: Immunization;
   patientUuid: string;
 }
 
-const InnerTable: React.FC<DetailsTableProps> = ({ immunizations, patientUuid }) => {
+const SequenceTable: React.FC<SequenceTableProps> = ({ immunizations }) => {
   const { t } = useTranslation();
+  const { existingDoses, sequences } = immunizations;
 
-  const editPatientVaccine = useCallback(
+  const launchPatientImmunizationForm = useCallback(
     (immunizationFormData: Immunization, existingDoses: ExistingDoses) => {
       const { vaccineName, vaccineUuid, sequences } = immunizationFormData;
       const { sequenceLabel, sequenceNumber } = existingDoses;
       const formHeader = t('immunizationForm', 'Immunization Form');
-      return openWorkspaceTab(ImmunizationsForm, formHeader, {
+      openWorkspaceTab(ImmunizationsForm, formHeader, {
         vaccineName,
         vaccineUuid,
         immunizationObsUuid: existingDoses.immunizationObsUuid,
@@ -55,8 +56,6 @@ const InnerTable: React.FC<DetailsTableProps> = ({ immunizations, patientUuid })
     [t],
   );
 
-  const { existingDoses, sequences, vaccineName, vaccineUuid } = immunizations;
-
   const tableRows = existingDoses?.map((dose, index) => {
     return {
       id: dose?.immunizationObsUuid,
@@ -64,7 +63,7 @@ const InnerTable: React.FC<DetailsTableProps> = ({ immunizations, patientUuid })
       vaccinationDate: dose?.occurrenceDateTime,
       expirationDate: dose?.expirationDate,
       edit: (
-        <Button kind="ghost" iconDescription="Edit" onClick={() => editPatientVaccine(immunizations, dose)}>
+        <Button kind="ghost" iconDescription="Edit" onClick={() => launchPatientImmunizationForm(immunizations, dose)}>
           {t('edit', 'Edit')}
         </Button>
       ),
@@ -72,31 +71,33 @@ const InnerTable: React.FC<DetailsTableProps> = ({ immunizations, patientUuid })
   });
 
   return (
-    <DataTable rows={tableRows} headers={tableHeader}>
-      {({ rows, headers, getHeaderProps, getTableProps }) => (
-        <Table {...getTableProps()} useZebraStyles>
-          <TableHead>
-            <TableRow>
-              {headers.map((header) => (
-                <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.map((row) => {
-              return (
-                <TableRow key={row.id}>
-                  {row.cells.map((cell) => (
-                    <TableCell key={cell?.id}>{cell?.value}</TableCell>
-                  ))}
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      )}
-    </DataTable>
+    tableRows.length > 0 && (
+      <DataTable rows={tableRows} headers={tableHeader}>
+        {({ rows, headers, getHeaderProps, getTableProps }) => (
+          <Table {...getTableProps()} useZebraStyles>
+            <TableHead>
+              <TableRow>
+                {headers.map((header) => (
+                  <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {rows.map((row) => {
+                return (
+                  <TableRow key={row.id}>
+                    {row.cells.map((cell) => (
+                      <TableCell key={cell?.id}>{cell?.value}</TableCell>
+                    ))}
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        )}
+      </DataTable>
+    )
   );
 };
 
-export default InnerTable;
+export default SequenceTable;
