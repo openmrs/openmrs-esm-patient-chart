@@ -33,7 +33,7 @@ function setupOpenMRS() {
       {
         id: 'vitals-overview-widget',
         slot: 'patient-chart-summary-dashboard-slot',
-        load: getAsyncLifecycle(() => import('./vitals/vitals-overview.component'), options),
+        load: getAsyncLifecycle(() => import('./vitals/vitals-summary.component'), options),
         meta: {
           columnSpan: 4,
         },
@@ -43,7 +43,7 @@ function setupOpenMRS() {
       {
         id: 'vitals-details-widget',
         slot: 'patient-chart-results-dashboard-slot',
-        load: getAsyncLifecycle(() => import('./vitals/vitals-overview.component'), options),
+        load: getAsyncLifecycle(() => import('./vitals/vitals-main.component'), options),
         meta: {
           view: 'vitals',
           title: 'Vitals',

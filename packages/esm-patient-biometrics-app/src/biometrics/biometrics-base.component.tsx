@@ -6,15 +6,6 @@ import Table16 from '@carbon/icons-react/es/table/16';
 import styles from './biometrics-overview.scss';
 import Button from 'carbon-components-react/es/components/Button';
 import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
-import DataTable, {
-  Table,
-  TableCell,
-  TableContainer,
-  TableBody,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from 'carbon-components-react/es/components/DataTable';
 import BiometricsChart from './biometrics-chart.component';
 import { useTranslation } from 'react-i18next';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
@@ -23,27 +14,28 @@ import { getPatientBiometrics } from './biometric.resource';
 import { useVitalsSignsConceptMetaData } from './use-vitalsigns';
 import { ConfigObject } from '../config-schema';
 import { patientVitalsBiometricsFormWorkspace } from '../constants';
-
-const biometricsToShowCount = 5;
+import BiometricsPagination from './biometricsPagination.component';
 
 interface RenderBiometricsProps {
   headerTitle: string;
-  tableRows: Array<{}>;
+  tableRows: Array<PatientBiometrics>;
   bmiUnit: string;
   biometrics: Array<any>;
-  showAllBiometrics: boolean;
   showAddBiometrics: boolean;
-  toggleShowAllBiometrics(): void;
+  pageSize: number;
+  urlLabel: string;
+  pageUrl: string;
 }
 
 const RenderBiometrics: React.FC<RenderBiometricsProps> = ({
   headerTitle,
   tableRows,
   bmiUnit,
-  showAllBiometrics,
   showAddBiometrics,
   biometrics,
-  toggleShowAllBiometrics,
+  pageSize,
+  urlLabel,
+  pageUrl,
 }) => {
   const { t } = useTranslation();
   const { conceptsUnits } = useVitalsSignsConceptMetaData();
@@ -96,6 +88,7 @@ const RenderBiometrics: React.FC<RenderBiometricsProps> = ({
         {chartView ? (
           <BiometricsChart patientBiometrics={biometrics} conceptsUnits={conceptsUnits} />
         ) : (
+<<<<<<< HEAD:packages/esm-patient-biometrics-app/src/biometrics/biometrics-overview.component.tsx
           <TableContainer>
             <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="short" useZebraStyles>
               {({ rows, headers, getHeaderProps, getTableProps }) => (
@@ -143,6 +136,15 @@ const RenderBiometrics: React.FC<RenderBiometricsProps> = ({
               )}
             </DataTable>
           </TableContainer>
+=======
+          <BiometricsPagination
+            tableRows={tableRows}
+            pageSize={pageSize}
+            urlLabel={urlLabel}
+            pageUrl={pageUrl}
+            tableHeaders={tableHeaders}
+          />
+>>>>>>> MF-439 Vitals/Biometrics/Forms Pagination:packages/esm-patient-biometrics-app/src/biometrics/biometrics-base.component.tsx
         )}
       </div>
     );
@@ -158,21 +160,27 @@ export interface PatientBiometrics {
   bmi: number;
 }
 
-interface BiometricsOverviewProps {
+interface BiometricsBaseProps {
   patientUuid: string;
   showAddBiometrics: boolean;
+  pageSize: number;
+  urlLabel: string;
+  pageUrl: string;
 }
 
-const BiometricsOverview: React.FC<BiometricsOverviewProps> = ({ patientUuid, showAddBiometrics }) => {
+const BiometricsBase: React.FC<BiometricsBaseProps> = ({
+  patientUuid,
+  showAddBiometrics,
+  pageSize,
+  urlLabel,
+  pageUrl,
+}) => {
   const config = useConfig() as ConfigObject;
   const { bmiUnit } = config.biometrics;
   const { t } = useTranslation();
   const [biometrics, setBiometrics] = React.useState<Array<any>>();
   const [error, setError] = React.useState(null);
-  const [showAllBiometrics, setShowAllBiometrics] = React.useState(false);
   const headerTitle = t('biometrics', 'Biometrics');
-
-  const toggleShowAllBiometrics = React.useCallback(() => setShowAllBiometrics((value) => !value), []);
 
   React.useEffect(() => {
     if (patientUuid) {
@@ -186,6 +194,7 @@ const BiometricsOverview: React.FC<BiometricsOverviewProps> = ({ patientUuid, sh
 
   const tableRows = React.useMemo(
     () =>
+<<<<<<< HEAD:packages/esm-patient-biometrics-app/src/biometrics/biometrics-overview.component.tsx
       biometrics
         ?.slice(0, showAllBiometrics ? biometrics.length : biometricsToShowCount)
         ?.map((biometric: PatientBiometrics, index) => {
@@ -198,6 +207,18 @@ const BiometricsOverview: React.FC<BiometricsOverviewProps> = ({ patientUuid, sh
           };
         }),
     [biometrics, showAllBiometrics],
+=======
+      biometrics?.map((biometric: PatientBiometrics, index) => {
+        return {
+          id: `${index}`,
+          date: dayjs(biometric.date).format(`DD - MMM - YYYY`),
+          weight: biometric.weight,
+          height: biometric.height,
+          bmi: biometric.bmi,
+        };
+      }),
+    [biometrics],
+>>>>>>> MF-439 Vitals/Biometrics/Forms Pagination:packages/esm-patient-biometrics-app/src/biometrics/biometrics-base.component.tsx
   );
 
   return (
@@ -207,18 +228,19 @@ const BiometricsOverview: React.FC<BiometricsOverviewProps> = ({ patientUuid, sh
           headerTitle={headerTitle}
           biometrics={biometrics}
           tableRows={tableRows}
-          toggleShowAllBiometrics={toggleShowAllBiometrics}
-          showAllBiometrics={showAllBiometrics}
           showAddBiometrics={showAddBiometrics}
           bmiUnit={bmiUnit}
+          pageSize={pageSize}
+          urlLabel={urlLabel}
+          pageUrl={pageUrl}
         />
       ) : error ? (
         <ErrorState error={error} headerTitle={headerTitle} />
       ) : (
-        <DataTableSkeleton rowCount={biometricsToShowCount} />
+        <DataTableSkeleton rowCount={pageSize} />
       )}
     </>
   );
 };
 
-export default BiometricsOverview;
+export default BiometricsBase;
