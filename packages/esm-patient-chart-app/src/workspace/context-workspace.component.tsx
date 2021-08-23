@@ -28,6 +28,7 @@ const ContextWorkspace: React.FC<RouteComponentProps<ContextWorkspaceParams>> = 
     () => ({ closeWorkspace, patientUuid, isTablet }),
     [closeWorkspace, isTablet, patientUuid],
   );
+
   const [openContextWorkspace, setOpenContextWorkspace] = useState(false);
 
   useEffect(() => {
