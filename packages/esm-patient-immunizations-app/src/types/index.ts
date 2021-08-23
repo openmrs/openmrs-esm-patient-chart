@@ -12,7 +12,7 @@ export interface Immunization {
   vaccineUuid: string;
 }
 
-interface Sequence {
+export interface Sequence {
   sequenceLabel: string;
   sequenceNumber: string | number;
 }

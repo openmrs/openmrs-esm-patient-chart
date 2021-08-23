@@ -19,15 +19,15 @@ interface DetailsTableProps {
   patientUuid: string;
 }
 
-const InnerTable: React.FC<DetailsTableProps> = ({ immunizations, patientUuid }) => {
+const SequenceTable: React.FC<DetailsTableProps> = ({ immunizations }) => {
   const { t } = useTranslation();
 
-  const editPatientVaccine = useCallback(
+  const launchPatientImmunizationForm = useCallback(
     (immunizationFormData: Immunization, existingDoses: ExistingDoses) => {
       const { vaccineName, vaccineUuid, sequences } = immunizationFormData;
       const { sequenceLabel, sequenceNumber } = existingDoses;
       const formHeader = t('immunizationForm', 'Immunization Form');
-      return openWorkspaceTab(ImmunizationsForm, formHeader, {
+      openWorkspaceTab(ImmunizationsForm, formHeader, {
         vaccineName,
         vaccineUuid,
         immunizationObsUuid: existingDoses.immunizationObsUuid,
@@ -55,7 +55,7 @@ const InnerTable: React.FC<DetailsTableProps> = ({ immunizations, patientUuid })
     [t],
   );
 
-  const { existingDoses, sequences, vaccineName, vaccineUuid } = immunizations;
+  const { existingDoses, sequences } = immunizations;
 
   const tableRows = existingDoses?.map((dose, index) => {
     return {
@@ -64,7 +64,7 @@ const InnerTable: React.FC<DetailsTableProps> = ({ immunizations, patientUuid })
       vaccinationDate: dose?.occurrenceDateTime,
       expirationDate: dose?.expirationDate,
       edit: (
-        <Button kind="ghost" iconDescription="Edit" onClick={() => editPatientVaccine(immunizations, dose)}>
+        <Button kind="ghost" iconDescription="Edit" onClick={() => launchPatientImmunizationForm(immunizations, dose)}>
           {t('edit', 'Edit')}
         </Button>
       ),
@@ -72,31 +72,33 @@ const InnerTable: React.FC<DetailsTableProps> = ({ immunizations, patientUuid })
   });
 
   return (
-    <DataTable rows={tableRows} headers={tableHeader}>
-      {({ rows, headers, getHeaderProps, getTableProps }) => (
-        <Table {...getTableProps()} useZebraStyles>
-          <TableHead>
-            <TableRow>
-              {headers.map((header) => (
-                <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.map((row) => {
-              return (
-                <TableRow key={row.id}>
-                  {row.cells.map((cell) => (
-                    <TableCell key={cell?.id}>{cell?.value}</TableCell>
-                  ))}
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      )}
-    </DataTable>
+    tableRows.length > 0 && (
+      <DataTable rows={tableRows} headers={tableHeader}>
+        {({ rows, headers, getHeaderProps, getTableProps }) => (
+          <Table {...getTableProps()} useZebraStyles>
+            <TableHead>
+              <TableRow>
+                {headers.map((header) => (
+                  <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {rows.map((row) => {
+                return (
+                  <TableRow key={row.id}>
+                    {row.cells.map((cell) => (
+                      <TableCell key={cell?.id}>{cell?.value}</TableCell>
+                    ))}
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        )}
+      </DataTable>
+    )
   );
 };
 
-export default InnerTable;
+export default SequenceTable;
