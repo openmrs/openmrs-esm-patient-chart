@@ -27,7 +27,7 @@ export const ActionMenu: React.FC<ActionMenuInterface> = ({ open }) => {
     } else {
       updateWindowSize('reopen');
     }
-  }
+  };
 
   const menu = isDesktop(layout) ? (
     <aside className={styles.rightSideNav}>
