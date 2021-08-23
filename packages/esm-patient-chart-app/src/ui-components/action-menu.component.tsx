@@ -23,9 +23,9 @@ export const ActionMenu: React.FC<ActionMenuInterface> = ({ open }) => {
 
   const checkViewMode = () => {
     if (screenMode === 'maximize') {
-      updateWindowSize('maximize')
+      updateWindowSize('maximize');
     } else {
-      updateWindowSize('reopen')
+      updateWindowSize('reopen');
     }
   }
 
