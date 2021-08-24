@@ -1,6 +1,6 @@
 import map from 'lodash-es/map';
 import find from 'lodash-es/find';
-import { Immunization } from '../types';
+import { ExistingDoses, Immunization } from '../types';
 import { ImmunizationSequenceDefinition, OpenmrsConcept, ImmunizationData } from './immunization-domain';
 
 export const findConfiguredSequences = (configuredSequences: Array<ImmunizationSequenceDefinition>) => {
@@ -38,3 +38,6 @@ export const findExistingDoses = (
     return immunizationFromConfig;
   });
 };
+
+export const latestFirst = (a: ExistingDoses, b: ExistingDoses) =>
+  new Date(b.occurrenceDateTime).getTime() - new Date(a.occurrenceDateTime).getTime();

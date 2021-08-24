@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useReducer, useCallback, useMemo } from 'react';
 import get from 'lodash-es/get';
 import orderBy from 'lodash-es/orderBy';
 import styles from './immunizations-detailed-summary.scss';
@@ -7,10 +7,8 @@ import { useConfig, usePagination } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { mapFromFHIRImmunizationBundle } from './immunization-mapper';
 import { getImmunizationsConceptSet, performPatientImmunizationsSearch } from './immunizations.resource';
-import { ImmunizationWidgetConfigObject } from './immunization-domain';
 import first from 'lodash-es/first';
 import isEmpty from 'lodash-es/isEmpty';
-import dayjs from 'dayjs';
 import DataTable, {
   Table,
   TableHead,
@@ -28,7 +26,7 @@ import Button from 'carbon-components-react/es/components/Button';
 import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
 import SequenceTable from './immunizations-sequence-table';
 import { ExistingDoses, Immunization, Sequence } from '../types';
-import { findConfiguredSequences, findExistingDoses } from './utils';
+import { findConfiguredSequences, findExistingDoses, latestFirst } from './utils';
 
 interface ImmunizationsDetailedSummaryProps {
   patient: fhir.Patient;
@@ -58,12 +56,12 @@ const tableStatusReducer = (state: StateTypes, action: ActionType) => {
 };
 
 const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> = ({ patientUuid, patient }) => {
-  const config = useConfig();
-  const { t } = useTranslation();
+  const { immunizationsConfig } = useConfig();
+  const { t, i18n } = useTranslation();
   const [allImmunizations, setAllImmunizations] = useState<Array<Immunization>>([]);
   const [error, setError] = useState(null);
-  const [status, dispatch] = React.useReducer(tableStatusReducer, StateTypes.PENDING);
-  const immunizationsConfig: ImmunizationWidgetConfigObject = config.immunizationsConfig;
+  const [status, dispatch] = useReducer(tableStatusReducer, StateTypes.PENDING);
+  const locale = i18n.language.replace('_', '-');
 
   useEffect(() => {
     const abortController = new AbortController();
@@ -106,7 +104,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
     }
   }, [patient, patientUuid, immunizationsConfig]);
 
-  const launchPatientImmunizationForm = React.useCallback(
+  const launchPatientImmunizationForm = useCallback(
     (vaccineName: string, vaccineUuid: string, sequences: any) => {
       const formHeader = t('immunizationForm', 'Immunization Form');
       openWorkspaceTab(ImmunizationsForm, formHeader, {
@@ -118,7 +116,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
     [t],
   );
 
-  const tableHeader = React.useMemo(
+  const tableHeader = useMemo(
     () => [
       { key: 'vaccine', header: t('vaccine', 'Vaccine') },
       { key: 'recentVaccination', header: t('recentVaccination', 'Recent Vaccination') },
@@ -126,22 +124,18 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
     ],
     [t],
   );
-
-  const tableRows = React.useMemo(
+  const tableRows = useMemo(
     () =>
       allImmunizations?.map((immunization) => {
-        const latestFirst = (a: ExistingDoses, b: ExistingDoses) =>
-          new Date(b.occurrenceDateTime).getTime() - new Date(a.occurrenceDateTime).getTime();
-
         const occurrenceDate =
           isEmpty(immunization.sequences) && !isEmpty(immunization.existingDoses)
-            ? `${t('singleDoseOn', 'Single Dose on')} ${dayjs(
+            ? `${t('singleDoseOn', 'Single Dose on')} ${new Date(
                 first<ExistingDoses>(immunization.existingDoses.sort(latestFirst))?.occurrenceDateTime,
-              ).format('DD-MMM-YYYY')}`
+              ).toLocaleDateString(locale, { dateStyle: 'medium' })}`
             : !isEmpty(immunization.existingDoses)
-            ? `${first<Sequence>(immunization?.sequences)?.sequenceLabel} on ${dayjs(
+            ? `${first<Sequence>(immunization?.sequences)?.sequenceLabel} on ${new Date(
                 first<ExistingDoses>(immunization.existingDoses.sort(latestFirst))?.occurrenceDateTime,
-              ).format('DD-MMM-YYYY')} `
+              ).toLocaleDateString(locale, { dateStyle: 'medium' })} `
             : '';
         return {
           id: immunization.vaccineUuid,
@@ -162,7 +156,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
           ),
         };
       }),
-    [launchPatientImmunizationForm, allImmunizations, t],
+    [allImmunizations, t, locale, launchPatientImmunizationForm],
   );
 
   const { results, currentPage, goTo } = usePagination(tableRows, 10);
