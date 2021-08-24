@@ -111,7 +111,7 @@ const RenderVitals: React.FC<RenderVitalsProps> = ({
           <VitalsChart patientVitals={vitals} conceptsUnits={conceptsUnits} />
         ) : (
           <TableContainer>
-            <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="short">
+            <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="short" useZebraStyles>
               {({ rows, headers, getHeaderProps, getTableProps }) => (
                 <Table {...getTableProps()}>
                   <TableHead>
