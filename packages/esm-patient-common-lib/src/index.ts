@@ -5,5 +5,4 @@ export * from './createDashboardLink';
 export * from './openWorkspaceTab';
 export * from './types';
 export * from './launchStartVisitPrompt';
-export * from './useBodyScrollLock';
 export * from './pagination';

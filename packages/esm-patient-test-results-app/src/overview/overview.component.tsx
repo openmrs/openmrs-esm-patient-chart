@@ -1,5 +1,5 @@
 import React from 'react';
-import DataTableSkeleton from 'carbon-components-react/lib/components/DataTableSkeleton';
+import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
 import useOverviewData from './useOverviewData';
 import { Card } from './helpers';
 import CommonOverview from './common-overview';

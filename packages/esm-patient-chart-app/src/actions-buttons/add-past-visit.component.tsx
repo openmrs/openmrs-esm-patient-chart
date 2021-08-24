@@ -1,12 +1,20 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { openVisitDashboard } from '../visit/visit-button.component';
 
 interface AddPastVisitOverflowMenuItemProps {}
 
 const AddPastVisitOverflowMenuItem: React.FC<AddPastVisitOverflowMenuItemProps> = () => {
   const { t } = useTranslation();
-  const handleClick = React.useCallback(() => openVisitDashboard(`${t('visitDashboard', 'Visit Dashboard')}`), [t]);
+  const handleClick = React.useCallback(() => {
+    window.dispatchEvent(
+      new CustomEvent('visit-dialog', {
+        detail: {
+          type: 'prompt',
+          state: { type: 'past' },
+        },
+      }),
+    );
+  }, []);
 
   return (
     <li className="bx--overflow-menu-options__option">

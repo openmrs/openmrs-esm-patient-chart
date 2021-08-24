@@ -1,18 +1,18 @@
 import React from 'react';
-
 import Table16 from '@carbon/icons-react/es/table/16';
 import ChartLine16 from '@carbon/icons-react/es/chart--line/16';
-import Button from 'carbon-components-react/lib/components/Button';
-import DataTable from 'carbon-components-react/lib/components/DataTable';
-import Table from 'carbon-components-react/lib/components/DataTable/Table';
-import TableContainer from 'carbon-components-react/lib/components/DataTable/TableContainer';
-import TableHead from 'carbon-components-react/lib/components/DataTable/TableHead';
-import TableHeader from 'carbon-components-react/lib/components/DataTable/TableHeader';
-import TableRow from 'carbon-components-react/lib/components/DataTable/TableRow';
-import TableCell from 'carbon-components-react/lib/components/DataTable/TableCell';
-import TableBody from 'carbon-components-react/lib/components/DataTable/TableBody';
-import TableToolbarContent from 'carbon-components-react/lib/components/DataTable/TableToolbarContent';
-import TableToolbar from 'carbon-components-react/lib/components/DataTable/TableToolbar';
+import Button from 'carbon-components-react/es/components/Button';
+import DataTable from 'carbon-components-react/es/components/DataTable';
+import Table from 'carbon-components-react/es/components/DataTable/Table';
+import TableContainer from 'carbon-components-react/es/components/DataTable/TableContainer';
+import TableHead from 'carbon-components-react/es/components/DataTable/TableHead';
+import TableHeader from 'carbon-components-react/es/components/DataTable/TableHeader';
+import TableRow from 'carbon-components-react/es/components/DataTable/TableRow';
+import TableCell from 'carbon-components-react/es/components/DataTable/TableCell';
+import TableBody from 'carbon-components-react/es/components/DataTable/TableBody';
+import TableToolbarContent from 'carbon-components-react/es/components/DataTable/TableToolbarContent';
+import TableToolbar from 'carbon-components-react/es/components/DataTable/TableToolbar';
+import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { Card, headers, formatDate, InfoButton, Separator, TypedTableRow } from './helpers';
 import { OverviewPanelEntry, OverviewPanelData } from './useOverviewData';
 import { useTranslation } from 'react-i18next';
@@ -63,7 +63,7 @@ export const CommonDataTable: React.FC<{
 
 interface CommonOverviewPropsBase {
   overviewData: Array<OverviewPanelEntry>;
-  insertSeperator?: boolean;
+  insertSeparator?: boolean;
 }
 
 interface CommonOverviewPropsWithToolbar {
@@ -89,14 +89,15 @@ type CommonOverviewProps = CommonOverviewPropsBase &
 
 const CommonOverview: React.FC<CommonOverviewProps> = ({
   overviewData = [],
-  insertSeperator = false,
+  insertSeparator = false,
   openTimeline,
   openTrendline,
   deactivateToolbar = false,
 }) => {
   const { t } = useTranslation();
 
-  if (!overviewData.length) return <p>{t('no_tests', 'No tests found')}</p>;
+  if (!overviewData.length)
+    return <EmptyState headerTitle={t('testResults', 'Test Results')} displayText={t('testResults', 'test results')} />;
 
   return (
     <>
@@ -133,7 +134,7 @@ const CommonOverview: React.FC<CommonOverviewProps> = ({
           </Card>
         ));
 
-        if (insertSeperator)
+        if (insertSeparator)
           return cards.reduce((acc, val, i, { length }) => {
             acc.push(val);
 

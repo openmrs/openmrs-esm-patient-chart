@@ -97,7 +97,7 @@ const RenderBiometrics: React.FC<RenderBiometricsProps> = ({
           <BiometricsChart patientBiometrics={biometrics} conceptsUnits={conceptsUnits} />
         ) : (
           <TableContainer>
-            <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="short">
+            <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="short" useZebraStyles>
               {({ rows, headers, getHeaderProps, getTableProps }) => (
                 <Table {...getTableProps()}>
                   <TableHead>

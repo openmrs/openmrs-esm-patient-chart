@@ -1,0 +1,30 @@
+<div class="error-text">{{ loadingError }}</div>
+<div class="form-title" [ngClass]="{'error': hasValidationErrors}">
+    <span *ngIf="encounter" class="omrs-type-body-small" style="color: var(--omrs-color-ink-medium-contrast);">
+        <svg class="omrs-icon title-icon-size" fill="var(--omrs-color-ink-low-contrast)">
+            <use xlink:href="#omrs-icon-calendar"></use>
+        </svg>
+        {{encounterDate + " "}}
+        <svg class="omrs-icon title-icon-size" fill="var(--omrs-color-ink-low-contrast)">
+            <use xlink:href="#omrs-icon-access-time"></use>
+        </svg>
+        {{encounterTime}}
+    </span>
+</div>
+<div *ngIf="!formSubmitted" [ngClass]="{'error': hasValidationErrors}">
+    <div class="content" (click)="onErrorPanelLostFocus()">
+        <form class="bx--form no-padding" *ngIf="formSchema" [formGroup]="form.rootNode.control">
+            <form-renderer [node]="form.rootNode"></form-renderer>
+        </form>
+        <div class="bx--row button-margin">
+            <button (click)="onCancel()" class="bx--btn bx--btn--secondary" type="button"
+                style="width: 50%;">Cancel</button>
+            <button class="bx--btn bx--btn--primary" (click)="onSubmit($event)" type="submit"
+                style="width: 50%;">Save</button>
+        </div>
+    </div>
+</div>
+<div class="form-container">
+    <my-app-form-submitted *ngIf="formSubmitted" (cancelled)="onCancel()" (editRequested)="onEditSaved()">
+    </my-app-form-submitted>
+</div>

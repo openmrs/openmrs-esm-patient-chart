@@ -1,6 +1,8 @@
+@import "~carbon-components/src/globals/scss/vendor/@carbon/layout/scss/generated/spacing";
+
 $actionNavOffset: 45px;
 $actionPanelOffset: 256px;
-$actionPanelExpandedOffset: $actionNavOffset + $actionPanelOffset;
+$actionPanelExpandedOffset: $actionNavOffset+$actionPanelOffset;
 
 .grid {
   display: grid;
@@ -32,7 +34,7 @@ $actionPanelExpandedOffset: $actionNavOffset + $actionPanelOffset;
   display: flex;
   align-items: flex-start;
   flex-direction: column;
-  padding-right: 1rem;
+  padding-right: $spacing-01;
 }
 
 
@@ -55,3 +57,10 @@ $actionPanelExpandedOffset: $actionNavOffset + $actionPanelOffset;
   flex-direction: column;
 }
 
+.closeWorkspace{
+  padding-right: 0;
+}
+
+.activeWorkspace {
+  padding-right: $actionNavOffset;
+}

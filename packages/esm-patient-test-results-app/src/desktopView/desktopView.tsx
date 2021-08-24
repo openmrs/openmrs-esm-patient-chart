@@ -2,7 +2,6 @@ import React from 'react';
 import { Overview } from '../overview/overview.component';
 import { Timeline } from '../timeline/timeline.component';
 import Trendline from '../trendline/trendline.component';
-
 import { navigateToTimeline, navigateToTrendline } from '../helpers';
 
 const Grid: React.FC<{}> = ({ children }) => (
