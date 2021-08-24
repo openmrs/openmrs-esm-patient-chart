@@ -24,8 +24,12 @@
 .toggleButtons {
   width: fit-content;
   margin: 0 $spacing-03;
+  border: $spacing-01 solid $inverse-support-04;
+  border-radius: $spacing-03 $spacing-03  $spacing-03  $spacing-03;
 }
-
+.toggle:focus{
+  background-color: $focus;
+}
 .toggle:first-of-type {
   border-radius: $spacing-02 0 0 $spacing-02;
 }
