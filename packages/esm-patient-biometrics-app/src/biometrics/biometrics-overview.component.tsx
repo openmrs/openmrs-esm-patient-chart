@@ -52,7 +52,7 @@ const RenderBiometrics: React.FC<RenderBiometricsProps> = ({
   const [chartView, setChartView] = React.useState<boolean>();
 
   const tableHeaders = [
-    { key: 'date', header: 'Date' },
+    { key: 'date', header: 'Date and time' },
     { key: 'weight', header: `Weight (${weightUnit})` },
     { key: 'height', header: `Height (${heightUnit})` },
     { key: 'bmi', header: `BMI (${bmiUnit})` },
@@ -191,7 +191,7 @@ const BiometricsOverview: React.FC<BiometricsOverviewProps> = ({ patientUuid, sh
         ?.map((biometric: PatientBiometrics, index) => {
           return {
             id: `${index}`,
-            date: dayjs(biometric.date).format(`DD - MMM - YYYY`),
+            date: dayjs(biometric.date).format(`DD - MMM - YYYY, hh:mm`),
             weight: biometric.weight,
             height: biometric.height,
             bmi: biometric.bmi,

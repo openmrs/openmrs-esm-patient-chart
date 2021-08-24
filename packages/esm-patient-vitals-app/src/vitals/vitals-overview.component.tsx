@@ -51,7 +51,7 @@ const RenderVitals: React.FC<RenderVitalsProps> = ({
     conceptsUnits;
 
   const tableHeaders = [
-    { key: 'date', header: 'Date', isSortable: true },
+    { key: 'date', header: 'Date and time', isSortable: true },
     {
       key: 'bloodPressure',
       header: withUnit('BP', bloodPressureUnit),
@@ -197,7 +197,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
         .map((vital, index) => {
           return {
             id: `${index}`,
-            date: dayjs(vital.date).format(`DD - MMM - YYYY`),
+            date: dayjs(vital.date).format(`DD - MMM - YYYY, hh:mm`),
             bloodPressure: `${vital.systolic ?? '-'} / ${vital.diastolic ?? '-'}`,
             pulse: vital.pulse,
             spo2: vital.oxygenSaturation,
