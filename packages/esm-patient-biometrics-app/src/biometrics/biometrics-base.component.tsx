@@ -211,7 +211,7 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({
       biometrics?.map((biometric: PatientBiometrics, index) => {
         return {
           id: `${index}`,
-          date: dayjs(biometric.date).format(`DD - MMM - YYYY`),
+          date: dayjs(biometric.date).format(`DD - MMM - YYYY, hh:mm`),
           weight: biometric.weight,
           height: biometric.height,
           bmi: biometric.bmi,

@@ -54,7 +54,7 @@ const NotesPagination: FunctionComponent<FormsProps> = ({ notes, pageSize, pageU
   return (
     <div>
       <TableContainer>
-        <DataTable rows={getRowItems(results)} headers={headers} isSortable={true} size="short">
+        <DataTable rows={getRowItems(results)} headers={headers} isSortable={true} size="short" useZebraStyles>
           {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
             <Table {...getTableProps()}>
               <TableHead>

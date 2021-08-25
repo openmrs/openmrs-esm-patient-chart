@@ -26,7 +26,7 @@ const VitalsPagination: FunctionComponent<FormsProps> = ({ tableRows, pageSize, 
   return (
     <div>
       <TableContainer>
-        <DataTable rows={results} headers={tableHeaders} isSortable={true} size="short">
+        <DataTable rows={results} headers={tableHeaders} isSortable={true} size="short" useZebraStyles>
           {({ rows, headers, getHeaderProps, getTableProps }) => (
             <Table {...getTableProps()}>
               <TableHead>

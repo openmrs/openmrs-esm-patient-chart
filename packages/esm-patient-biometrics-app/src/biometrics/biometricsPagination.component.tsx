@@ -32,7 +32,7 @@ const BiometricsPagination: FunctionComponent<FormsProps> = ({
   return (
     <div>
       <TableContainer>
-        <DataTable rows={results} headers={tableHeaders} isSortable={true} size="short">
+        <DataTable rows={results} headers={tableHeaders} isSortable={true} size="short" useZebraStyles>
           {({ rows, headers, getHeaderProps, getTableProps }) => (
             <Table {...getTableProps()}>
               <TableHead>
