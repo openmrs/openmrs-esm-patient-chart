@@ -88,55 +88,6 @@ const RenderBiometrics: React.FC<RenderBiometricsProps> = ({
         {chartView ? (
           <BiometricsChart patientBiometrics={biometrics} conceptsUnits={conceptsUnits} />
         ) : (
-<<<<<<< HEAD:packages/esm-patient-biometrics-app/src/biometrics/biometrics-overview.component.tsx
-          <TableContainer>
-            <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="short" useZebraStyles>
-              {({ rows, headers, getHeaderProps, getTableProps }) => (
-                <Table {...getTableProps()}>
-                  <TableHead>
-                    <TableRow>
-                      {headers.map((header) => (
-                        <TableHeader
-                          className={`${styles.productiveHeading01} ${styles.text02}`}
-                          {...getHeaderProps({
-                            header,
-                            isSortable: header.isSortable,
-                          })}>
-                          {header.header?.content ?? header.header}
-                        </TableHeader>
-                      ))}
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {rows.map((row) => (
-                      <TableRow key={row.id}>
-                        {row.cells.map((cell) => (
-                          <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
-                        ))}
-                      </TableRow>
-                    ))}
-                    {!showAllBiometrics && biometrics.length > biometricsToShowCount && (
-                      <TableRow>
-                        <TableCell colSpan={4}>
-                          <span
-                            style={{
-                              display: 'inline-block',
-                              margin: '0.45rem 0rem',
-                            }}>
-                            {`${biometricsToShowCount} / ${biometrics.length}`} {t('items', 'items')}
-                          </span>
-                          <Button size="small" kind="ghost" onClick={toggleShowAllBiometrics}>
-                            {t('seeAll', 'See all')}
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              )}
-            </DataTable>
-          </TableContainer>
-=======
           <BiometricsPagination
             tableRows={tableRows}
             pageSize={pageSize}
@@ -144,7 +95,6 @@ const RenderBiometrics: React.FC<RenderBiometricsProps> = ({
             pageUrl={pageUrl}
             tableHeaders={tableHeaders}
           />
->>>>>>> MF-439 Vitals/Biometrics/Forms Pagination:packages/esm-patient-biometrics-app/src/biometrics/biometrics-base.component.tsx
         )}
       </div>
     );
@@ -194,20 +144,6 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({
 
   const tableRows = React.useMemo(
     () =>
-<<<<<<< HEAD:packages/esm-patient-biometrics-app/src/biometrics/biometrics-overview.component.tsx
-      biometrics
-        ?.slice(0, showAllBiometrics ? biometrics.length : biometricsToShowCount)
-        ?.map((biometric: PatientBiometrics, index) => {
-          return {
-            id: `${index}`,
-            date: dayjs(biometric.date).format(`DD - MMM - YYYY, hh:mm`),
-            weight: biometric.weight,
-            height: biometric.height,
-            bmi: biometric.bmi,
-          };
-        }),
-    [biometrics, showAllBiometrics],
-=======
       biometrics?.map((biometric: PatientBiometrics, index) => {
         return {
           id: `${index}`,
@@ -218,7 +154,6 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({
         };
       }),
     [biometrics],
->>>>>>> MF-439 Vitals/Biometrics/Forms Pagination:packages/esm-patient-biometrics-app/src/biometrics/biometrics-base.component.tsx
   );
 
   return (

@@ -102,55 +102,6 @@ const RenderVitals: React.FC<RenderVitalsProps> = ({
         {chartView ? (
           <VitalsChart patientVitals={vitals} conceptsUnits={conceptsUnits} />
         ) : (
-<<<<<<< HEAD
-          <TableContainer>
-            <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="short" useZebraStyles>
-              {({ rows, headers, getHeaderProps, getTableProps }) => (
-                <Table {...getTableProps()}>
-                  <TableHead>
-                    <TableRow>
-                      {headers.map((header) => (
-                        <TableHeader
-                          className={`${styles.productiveHeading01} ${styles.text02}`}
-                          {...getHeaderProps({
-                            header,
-                            isSortable: header.isSortable,
-                          })}>
-                          {header.header?.content ?? header.header}
-                        </TableHeader>
-                      ))}
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {rows.map((row) => (
-                      <TableRow key={row.id}>
-                        {row.cells.map((cell) => (
-                          <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
-                        ))}
-                      </TableRow>
-                    ))}
-                    {!showAllVitals && vitals?.length > vitalsToShowCount && (
-                      <TableRow>
-                        <TableCell colSpan={4}>
-                          <span
-                            style={{
-                              display: 'inline-block',
-                              margin: '0.45rem 0rem',
-                            }}>
-                            {`${vitalsToShowCount} / ${vitals.length}`} {t('items', 'items')}
-                          </span>
-                          <Button size="small" kind="ghost" onClick={toggleShowAllVitals}>
-                            {t('seeAll', 'See all')}
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              )}
-            </DataTable>
-          </TableContainer>
-=======
           <VitalsPagination
             tableRows={tableRows}
             pageSize={pageSize}
@@ -158,7 +109,6 @@ const RenderVitals: React.FC<RenderVitalsProps> = ({
             pageUrl={pageUrl}
             tableHeaders={tableHeaders}
           />
->>>>>>> MF-439 Vitals/Biometrics/Forms Pagination
         )}
       </div>
     );
