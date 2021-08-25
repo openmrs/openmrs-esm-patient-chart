@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import React from 'react';
 import DataTable, {
   Table,
   TableCell,
@@ -10,7 +10,7 @@ import DataTable, {
 } from 'carbon-components-react/es/components/DataTable';
 import styles from './notes-overview.scss';
 import { usePagination } from '@openmrs/esm-framework';
-import { PatientChartPagination } from './pagination-see-all.component';
+import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { PatientNote } from './encounter.resource';
 import { useTranslation } from 'react-i18next';
 import { formatNotesDate } from './notes-helper';
@@ -22,7 +22,7 @@ interface FormsProps {
   urlLabel: string;
 }
 
-const NotesPagination: FunctionComponent<FormsProps> = ({ notes, pageSize, pageUrl, urlLabel }) => {
+const NotesPagination: React.FC<FormsProps> = ({ notes, pageSize, pageUrl, urlLabel }) => {
   const getRowItems = (rows: Array<PatientNote>) => {
     return rows.map((row) => ({
       ...row,

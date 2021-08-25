@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import React from 'react';
 import DataTable, {
   Table,
   TableCell,
@@ -9,7 +9,7 @@ import DataTable, {
   TableRow,
 } from 'carbon-components-react/es/components/DataTable';
 import { usePagination } from '@openmrs/esm-framework';
-import { PatientChartPagination } from './pagination-see-all.component';
+import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import styles from './vitals-overview.scss';
 
 interface FormsProps {
@@ -20,7 +20,7 @@ interface FormsProps {
   tableHeaders: Array<{}>;
 }
 
-const VitalsPagination: FunctionComponent<FormsProps> = ({ tableRows, pageSize, pageUrl, urlLabel, tableHeaders }) => {
+const VitalsPagination: React.FC<FormsProps> = ({ tableRows, pageSize, pageUrl, urlLabel, tableHeaders }) => {
   const { results, goTo, currentPage } = usePagination(tableRows, pageSize);
 
   return (
