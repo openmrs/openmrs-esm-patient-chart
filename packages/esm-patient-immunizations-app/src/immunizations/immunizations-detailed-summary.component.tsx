@@ -38,30 +38,13 @@ enum StateTypes {
   RESOLVED = 'resolved',
   ERROR = 'error',
 }
-interface ActionType {
-  type: 'pending' | 'resolved' | 'error';
-}
-
-const tableStatusReducer = (state: StateTypes, action: ActionType) => {
-  switch (action.type) {
-    case 'pending':
-      return StateTypes.PENDING;
-    case 'resolved':
-      return StateTypes.RESOLVED;
-    case 'error':
-      return StateTypes.ERROR;
-    default:
-      return StateTypes.PENDING;
-  }
-};
-
 const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> = ({ patientUuid, patient }) => {
   const { immunizationsConfig } = useConfig();
   const { t, i18n } = useTranslation();
   const [allImmunizations, setAllImmunizations] = useState<Array<Immunization>>([]);
   const [error, setError] = useState(null);
-  const [status, dispatch] = useReducer(tableStatusReducer, StateTypes.PENDING);
   const locale = i18n.language.replace('_', '-');
+  const [status, setStatus] = useState(StateTypes.PENDING);
 
   useEffect(() => {
     const abortController = new AbortController();
@@ -91,13 +74,13 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
           );
           setError(null);
           setAllImmunizations(sortedImmunizationsForPatient);
-          dispatch({ type: 'resolved' });
+          setStatus(StateTypes.RESOLVED);
         })
         .catch((err) => {
           if (err.name !== 'AbortError') {
             setAllImmunizations([]);
             setError(err);
-            dispatch({ type: 'error' });
+            setStatus(StateTypes.ERROR);
           }
         });
       return () => abortController.abort();
