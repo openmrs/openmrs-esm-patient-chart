@@ -1,25 +1,23 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import NotesMain from './notes-main.component';
+import VitalsOverview from './vitals-overview.component';
 
-interface NotesDetailsProps {
+interface VitalsMainProps {
   patientUuid: string;
-  patient: fhir.Patient;
-  showAddNote: boolean;
+  showAddVitals: boolean;
   basePath: string;
 }
 
-const NotesDetailedSummary: React.FC<NotesDetailsProps> = ({ patientUuid, patient, showAddNote, basePath }) => {
+const VitalsMain: React.FC<VitalsMainProps> = ({ patientUuid, showAddVitals, basePath }) => {
   const pageSize = 10;
   const { t } = useTranslation();
   const pageUrl = window.spaBase + basePath + '/summary';
   const urlLabel = t('goToSummary', 'Go to Summary');
 
   return (
-    <NotesMain
+    <VitalsOverview
       patientUuid={patientUuid}
-      patient={patient}
-      showAddNote={showAddNote}
+      showAddVitals={showAddVitals}
       pageSize={pageSize}
       urlLabel={urlLabel}
       pageUrl={pageUrl}
@@ -27,4 +25,4 @@ const NotesDetailedSummary: React.FC<NotesDetailsProps> = ({ patientUuid, patien
   );
 };
 
-export default NotesDetailedSummary;
+export default VitalsMain;

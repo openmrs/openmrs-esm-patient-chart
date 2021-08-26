@@ -1,25 +1,23 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import NotesMain from './notes-main.component';
+import BiometricsBase from './biometrics-base.component';
 
-interface NotesDetailsProps {
+interface BiometricsProps {
   patientUuid: string;
-  patient: fhir.Patient;
-  showAddNote: boolean;
+  showAddBiometrics: boolean;
   basePath: string;
 }
 
-const NotesDetailedSummary: React.FC<NotesDetailsProps> = ({ patientUuid, patient, showAddNote, basePath }) => {
+const BiometricsMain: React.FC<BiometricsProps> = ({ patientUuid, showAddBiometrics, basePath }) => {
   const pageSize = 10;
   const { t } = useTranslation();
   const pageUrl = window.spaBase + basePath + '/summary';
   const urlLabel = t('goToSummary', 'Go to Summary');
 
   return (
-    <NotesMain
+    <BiometricsBase
       patientUuid={patientUuid}
-      patient={patient}
-      showAddNote={showAddNote}
+      showAddBiometrics={showAddBiometrics}
       pageSize={pageSize}
       urlLabel={urlLabel}
       pageUrl={pageUrl}
@@ -27,4 +25,4 @@ const NotesDetailedSummary: React.FC<NotesDetailsProps> = ({ patientUuid, patien
   );
 };
 
-export default NotesDetailedSummary;
+export default BiometricsMain;
