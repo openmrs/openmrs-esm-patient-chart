@@ -11,4 +11,5 @@ export interface BiometricsConfigObject {
   bmiUnit: string;
   heightUnit: string;
   weightUnit: string;
+  muacUnit: string;
 }
