@@ -11,6 +11,10 @@ export const configSchema = {
       _type: Type.ConceptUuid,
       _default: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
+    muacUuid: {
+      _type: Type.ConceptUuid,
+      _default: '1343AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    },
   },
   biometrics: biometricsConfigSchema,
 };
@@ -19,6 +23,7 @@ export interface ConfigObject {
   concepts: {
     heightUuid: string;
     weightUuid: string;
+    muacUuid: string;
   };
   biometrics: BiometricsConfigObject;
 }

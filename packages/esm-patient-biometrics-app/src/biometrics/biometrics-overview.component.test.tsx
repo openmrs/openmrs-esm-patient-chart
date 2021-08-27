@@ -12,7 +12,7 @@ const mockAttach = attach as jest.Mock;
 describe('<Biometric/>', () => {
   const mockBiometricsConfig = {
     biometrics: { bmiUnit: 'kg / m²' },
-    concepts: { weightUuid: '5089', heighUuid: '5090' },
+    concepts: { weightUuid: '5089', heighUuid: '5090', muacUuid: '1343' },
   };
   const mockConceptsUnits = {
     conceptsUnits: ['mmHg', '%', 'breather/min', 'cm', 'Kg'],
@@ -24,6 +24,7 @@ describe('<Biometric/>', () => {
       height: 185,
       date: '27-Nov 12:06 PM',
       bmi: '24.8',
+      muac: 25,
     },
     {
       id: '1ca4d5f1-ee6a-4282-a5ff-c8db12c4247c',
@@ -31,6 +32,7 @@ describe('<Biometric/>', () => {
       height: 180,
       date: '28-Nov 12:06 PM',
       bmi: '25.8',
+      muac: 24,
     },
   ];
 
@@ -63,8 +65,10 @@ describe('<Biometric/>', () => {
     expect(screen.getByText(/65/i)).toBeInTheDocument();
     expect(screen.getByText(/185/i)).toBeInTheDocument();
     expect(screen.getByText(/24.8/i)).toBeInTheDocument();
+    expect(screen.getByText(/25/i)).toBeInTheDocument();
     expect(screen.getByText('Height (cm)')).toBeInTheDocument();
     expect(screen.getByText('Weight (Kg)')).toBeInTheDocument();
+    expect(screen.getByText('Muac (cm)')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Table View/ })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Chart View/ })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Add/ })).toBeInTheDocument();
