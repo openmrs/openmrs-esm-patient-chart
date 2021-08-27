@@ -12,6 +12,7 @@ interface PatientChartPaginationProps {
   pageSize: number;
   onPageNumberChange?: any;
   pageUrl?: string;
+  urlLabel?: string;
 }
 
 export const PatientChartPagination: React.FC<PatientChartPaginationProps> = ({
@@ -21,6 +22,7 @@ export const PatientChartPagination: React.FC<PatientChartPaginationProps> = ({
   pageNumber,
   pageUrl = '',
   currentItems,
+  urlLabel,
 }) => {
   const { t } = useTranslation();
   const { itemsDisplayed, pageSizes } = usePaginationInfo(pageSize, totalItems, pageNumber, currentItems);
@@ -33,7 +35,7 @@ export const PatientChartPagination: React.FC<PatientChartPaginationProps> = ({
             {itemsDisplayed}
             {pageUrl && (
               <ConfigurableLink to={pageUrl} className={styles.configurableLink}>
-                {t('seeAll', 'See all')}
+                {urlLabel ?? t('seeAll', 'See all')}
               </ConfigurableLink>
             )}
           </div>

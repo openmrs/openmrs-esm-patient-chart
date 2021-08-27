@@ -45,9 +45,9 @@ function setupOpenMRS() {
       {
         id: 'biometrics-overview-widget',
         slot: 'patient-chart-summary-dashboard-slot',
-        load: getAsyncLifecycle(() => import('./biometrics/biometrics-overview.component'), options),
+        load: getAsyncLifecycle(() => import('./biometrics/biometrics-summary.component'), options),
         meta: {
-          columnSpan: 2,
+          columnSpan: 4,
         },
         online: { showAddBiometrics: true },
         offline: { showAddBiometrics: false },
@@ -63,7 +63,7 @@ function setupOpenMRS() {
       {
         id: 'biometrics-details-widget',
         slot: dashboardMeta.slot,
-        load: getAsyncLifecycle(() => import('./biometrics/biometrics-overview.component'), options),
+        load: getAsyncLifecycle(() => import('./biometrics/biometrics-main.component'), options),
         meta: {
           view: 'biometrics',
           title: 'Biometrics',

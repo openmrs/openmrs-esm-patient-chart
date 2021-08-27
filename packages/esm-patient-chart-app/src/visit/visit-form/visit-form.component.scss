@@ -1,0 +1,45 @@
+@import "~@openmrs/esm-styleguide/src/vars";
+@import "~carbon-components/src/globals/scss/vars";
+@import "~carbon-components/src/globals/scss/mixins";
+
+.heading {
+  @include carbon--type-style("productive-heading-03");
+  color: $text-01;
+  margin: $spacing-05;
+}
+
+.grid {
+  padding: 0;
+}
+
+.gridRow {
+  margin: $spacing-03 0 $spacing-08 0;
+}
+
+.columnLabel {
+  @include carbon--type-style("productive-heading-02");
+  color: $text-02;
+}
+
+.contentSwitcher {
+  height: $spacing-09;
+}
+
+.buttonContainer {
+  display: flex;
+  margin: $spacing-05;
+}
+
+.buttonContainer button {
+  height: $spacing-10;
+  display: flex;
+  align-content: flex-start;
+  align-items: flex-start;
+  flex-direction: row;
+  margin-left: $spacing-01;
+}
+
+.right {
+  display: flex;
+  flex-direction: row;
+}

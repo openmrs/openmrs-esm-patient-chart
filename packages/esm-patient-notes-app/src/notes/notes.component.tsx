@@ -16,7 +16,18 @@ export default function Notes({ basePath, patient, patientUuid, showAddNote }: N
     <NotesContext.Provider value={{ patient, patientUuid }}>
       <BrowserRouter basename={`${window.spaBase}${basePath}/encounters/notes`}>
         <Switch>
-          <Route exact path="/" render={() => <NotesDetailedSummary showAddNote={showAddNote} />} />
+          <Route
+            exact
+            path="/"
+            render={() => (
+              <NotesDetailedSummary
+                patientUuid={patientUuid}
+                patient={patient}
+                showAddNote={showAddNote}
+                basePath={basePath}
+              />
+            )}
+          />
           <Route exact path="/:encounterUuid" component={NoteRecord} />
         </Switch>
       </BrowserRouter>

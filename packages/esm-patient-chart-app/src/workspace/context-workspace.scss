@@ -3,6 +3,12 @@
 @import "~carbon-components/src/globals/scss/vars";
 @import "~carbon-components/src/globals/scss/mixins";
 
+.contextWorkspaceContainer {
+  border-width: 0.0625rem 0 0.0625rem 0.0625rem;
+  border-style: solid;
+  border-color: $text-03;
+}
+
 :global(.omrs-breakpoint-lt-desktop) .contextWorkspaceContainer {
   position: fixed;
   top: 0;
@@ -20,13 +26,12 @@
   background-color: $ui-02;
   margin-right: 50px;
   flex: 1;
-  border-left: 0.0625rem solid $openmrs-background-grey;
   overflow-y: auto;
 }
 
 :global(.omrs-breakpoint-gt-tablet) .contextWorkspaceContainer>header {
   background-color: $ui-03;
-  border-bottom: 0.0625rem solid #a8a8a8;
+  border-bottom: 0.0625rem solid $text-03;
 }
 
 :global(.omrs-breakpoint-gt-tablet) .contextWorkspaceContainer>header a {
