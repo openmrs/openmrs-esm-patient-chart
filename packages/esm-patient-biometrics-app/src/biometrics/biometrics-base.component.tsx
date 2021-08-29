@@ -40,7 +40,7 @@ const RenderBiometrics: React.FC<RenderBiometricsProps> = ({
   const { t } = useTranslation();
   const { conceptsUnits } = useVitalsSignsConceptMetaData();
   const displayText = t('biometrics', 'biometrics');
-  const [, , , heightUnit, weightUnit] = conceptsUnits;
+  const [, , , heightUnit, weightUnit, , , muacUnit] = conceptsUnits;
   const [chartView, setChartView] = React.useState<boolean>();
 
   const tableHeaders = [
@@ -48,6 +48,7 @@ const RenderBiometrics: React.FC<RenderBiometricsProps> = ({
     { key: 'weight', header: `Weight (${weightUnit})` },
     { key: 'height', header: `Height (${heightUnit})` },
     { key: 'bmi', header: `BMI (${bmiUnit})` },
+    { key: 'muac', header: `Muac (${muacUnit})` },
   ];
 
   const launchBiometricsForm = React.useCallback(() => {
@@ -108,6 +109,7 @@ export interface PatientBiometrics {
   weight: number;
   height: number;
   bmi: number;
+  muac: number;
 }
 
 interface BiometricsBaseProps {
@@ -134,13 +136,15 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({
 
   React.useEffect(() => {
     if (patientUuid) {
-      const sub = getPatientBiometrics(config.concepts.weightUuid, config.concepts.heightUuid, patientUuid).subscribe(
-        setBiometrics,
-        setError,
-      );
+      const sub = getPatientBiometrics(
+        config.concepts.weightUuid,
+        config.concepts.heightUuid,
+        patientUuid,
+        config.concepts.muacUuid,
+      ).subscribe(setBiometrics, setError);
       return () => sub.unsubscribe();
     }
-  }, [patientUuid, config.concepts.weightUuid, config.concepts.heightUuid]);
+  }, [patientUuid, config.concepts.weightUuid, config.concepts.heightUuid, config.concepts.muacUuid]);
 
   const tableRows = React.useMemo(
     () =>
@@ -151,6 +155,7 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({
           weight: biometric.weight,
           height: biometric.height,
           bmi: biometric.bmi,
+          muac: biometric.muac,
         };
       }),
     [biometrics],
