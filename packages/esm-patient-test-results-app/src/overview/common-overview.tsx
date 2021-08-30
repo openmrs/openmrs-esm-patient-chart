@@ -95,6 +95,14 @@ const CommonOverview: React.FC<CommonOverviewProps> = ({
   deactivateToolbar = false,
 }) => {
   const { t } = useTranslation();
+  const abnormalInterpretation = [
+    'HIGH',
+    'CRITICALLY_HIGH',
+    'OFF_SCALE_HIGH',
+    'LOW',
+    'CRITICALLY_LOW',
+    'OFF_SCALE_LOW',
+  ];
 
   if (!overviewData.length)
     return <EmptyState headerTitle={t('testResults', 'Test Results')} displayText={t('testResults', 'test results')} />;
@@ -102,37 +110,40 @@ const CommonOverview: React.FC<CommonOverviewProps> = ({
   return (
     <>
       {(() => {
-        const cards = overviewData.map(([title, type, data, date, uuid]) => (
-          <Card key={uuid}>
-            <CommonDataTable
-              {...{
-                title,
-                data,
-                tableHeaders: headers,
-                description: (
-                  <div>
-                    {formatDate(date)}
-                    <InfoButton />
-                  </div>
-                ),
-                toolbar: deactivateToolbar || (
-                  <TableToolbar>
-                    <TableToolbarContent>
-                      {type === 'Test' && (
-                        <Button kind="ghost" renderIcon={ChartLine16} onClick={() => openTrendline(uuid, uuid)}>
-                          {t('trend', 'Trend')}
+        const cards = overviewData.map(([title, type, data, date, uuid]) => {
+          const allNormalResults = !data.some((result) => abnormalInterpretation.includes(result.interpretation));
+          return (
+            <Card allNormalResults={allNormalResults} key={uuid}>
+              <CommonDataTable
+                {...{
+                  title,
+                  data,
+                  tableHeaders: headers,
+                  description: (
+                    <div>
+                      {formatDate(date)}
+                      <InfoButton />
+                    </div>
+                  ),
+                  toolbar: deactivateToolbar || (
+                    <TableToolbar>
+                      <TableToolbarContent>
+                        {type === 'Test' && (
+                          <Button kind="ghost" renderIcon={ChartLine16} onClick={() => openTrendline(uuid, uuid)}>
+                            {t('trend', 'Trend')}
+                          </Button>
+                        )}
+                        <Button kind="ghost" renderIcon={Table16} onClick={() => openTimeline(uuid)}>
+                          {t('timeline', 'Timeline')}
                         </Button>
-                      )}
-                      <Button kind="ghost" renderIcon={Table16} onClick={() => openTimeline(uuid)}>
-                        {t('timeline', 'Timeline')}
-                      </Button>
-                    </TableToolbarContent>
-                  </TableToolbar>
-                ),
-              }}
-            />
-          </Card>
-        ));
+                      </TableToolbarContent>
+                    </TableToolbar>
+                  ),
+                }}
+              />
+            </Card>
+          );
+        });
 
         if (insertSeparator)
           return cards.reduce((acc, val, i, { length }) => {
