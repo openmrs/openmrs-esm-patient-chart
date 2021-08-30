@@ -1,9 +1,9 @@
-import React, { useEffect, useState, useReducer, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import get from 'lodash-es/get';
 import orderBy from 'lodash-es/orderBy';
 import styles from './immunizations-detailed-summary.scss';
-import { ErrorState, openWorkspaceTab, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
-import { useConfig, usePagination } from '@openmrs/esm-framework';
+import { ErrorState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
+import { attach, useConfig, usePagination } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { mapFromFHIRImmunizationBundle } from './immunization-mapper';
 import { getImmunizationsConceptSet, performPatientImmunizationsSearch } from './immunizations.resource';
@@ -27,6 +27,7 @@ import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSk
 import SequenceTable from './immunizations-sequence-table';
 import { ExistingDoses, Immunization, Sequence } from '../types';
 import { findConfiguredSequences, findExistingDoses, latestFirst } from './utils';
+import { immunizationFormSub } from './immunization-utils';
 
 interface ImmunizationsDetailedSummaryProps {
   patient: fhir.Patient;
@@ -41,7 +42,7 @@ enum StateTypes {
 const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> = ({ patientUuid, patient }) => {
   const { immunizationsConfig } = useConfig();
   const { t, i18n } = useTranslation();
-  const [allImmunizations, setAllImmunizations] = useState<Array<Immunization>>([]);
+  const [allImmunizations, setAllImmunizations] = useState(null);
   const [error, setError] = useState(null);
   const locale = i18n.language.replace('_', '-');
   const [status, setStatus] = useState(StateTypes.PENDING);
@@ -87,16 +88,9 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
     }
   }, [patient, patientUuid, immunizationsConfig]);
 
-  const launchPatientImmunizationForm = useCallback(
-    (vaccineName: string, vaccineUuid: string, sequences: any) => {
-      const formHeader = t('immunizationForm', 'Immunization Form');
-      openWorkspaceTab(ImmunizationsForm, formHeader, {
-        vaccineName: vaccineName,
-        vaccineUuid: vaccineUuid,
-        sequences: sequences,
-      });
-    },
-    [t],
+  const launchImmunizationForm = React.useCallback(
+    () => attach('patient-chart-workspace-slot', 'immunization-workspace-form'),
+    [],
   );
 
   const tableHeader = useMemo(
@@ -129,17 +123,29 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
               kind="ghost"
               renderIcon={Add16}
               iconDescription="Add"
-              onClick={() =>
-                launchPatientImmunizationForm(
-                  immunization.vaccineName,
-                  immunization.vaccineUuid,
-                  immunization.sequences,
-                )
-              }></Button>
+              onClick={() => {
+                immunizationFormSub.next({
+                  vaccineName: immunization.vaccineName,
+                  vaccineUuid: immunization.vaccineUuid,
+                  sequences: immunization?.sequences,
+                  existingDoses: immunization?.existingDoses,
+                  immunizationObsUuid: immunization?.immunizationObsUuid,
+                  manufacturer: immunization.manufacturer,
+                  lotNumber: immunization.lotNumber,
+                  expirationDate: immunization.expirationDate,
+                  currentDose: {
+                    sequenceLabel: immunization.sequenceLabel,
+                    sequenceNumber: immunization.sequenceNumber,
+                  },
+                  vaccinationDate: immunization.occurrenceDateTime,
+                  formChanged: immunization.formChanged,
+                });
+                launchImmunizationForm();
+              }}></Button>
           ),
         };
       }),
-    [allImmunizations, t, locale, launchPatientImmunizationForm],
+    [allImmunizations, t, locale, launchImmunizationForm],
   );
 
   const { results, currentPage, goTo } = usePagination(tableRows, 10);
