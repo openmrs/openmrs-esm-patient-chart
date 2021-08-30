@@ -68,8 +68,8 @@ const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = 
           left: 'auto',
           right: '0',
           backgroundColor: '#f4f4f4',
-          marginRight:'0.2rem',
-          boxShadow:'  0 6px 6px rgb(0 0 0 / 30%)',
+          marginRight: '0.2rem',
+          boxShadow: '0 6px 6px rgb(0 0 0 / 30%)',
         }}>
         <ul className="bx--overflow-menu-options__content">{children}</ul>
         <span />
