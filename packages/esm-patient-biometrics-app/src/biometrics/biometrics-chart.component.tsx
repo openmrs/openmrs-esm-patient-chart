@@ -7,7 +7,7 @@ import { LineChart } from '@carbon/charts-react';
 import { LineChartOptions } from '@carbon/charts/interfaces/charts';
 import { ScaleTypes } from '@carbon/charts/interfaces/enums';
 import { useConfig } from '@openmrs/esm-framework';
-import { PatientBiometrics } from './biometrics-overview.component';
+import { PatientBiometrics } from './biometrics-base.component';
 
 interface BiometricsChartProps {
   patientBiometrics: Array<PatientBiometrics>;

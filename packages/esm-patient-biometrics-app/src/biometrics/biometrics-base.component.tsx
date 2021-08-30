@@ -6,15 +6,6 @@ import Table16 from '@carbon/icons-react/es/table/16';
 import styles from './biometrics-overview.scss';
 import Button from 'carbon-components-react/es/components/Button';
 import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
-import DataTable, {
-  Table,
-  TableCell,
-  TableContainer,
-  TableBody,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from 'carbon-components-react/es/components/DataTable';
 import BiometricsChart from './biometrics-chart.component';
 import { useTranslation } from 'react-i18next';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
@@ -23,32 +14,33 @@ import { getPatientBiometrics } from './biometric.resource';
 import { useVitalsSignsConceptMetaData } from './use-vitalsigns';
 import { ConfigObject } from '../config-schema';
 import { patientVitalsBiometricsFormWorkspace } from '../constants';
-
-const biometricsToShowCount = 5;
+import BiometricsPagination from './biometricsPagination.component';
 
 interface RenderBiometricsProps {
   headerTitle: string;
-  tableRows: Array<{}>;
+  tableRows: Array<PatientBiometrics>;
   bmiUnit: string;
   biometrics: Array<any>;
-  showAllBiometrics: boolean;
   showAddBiometrics: boolean;
-  toggleShowAllBiometrics(): void;
+  pageSize: number;
+  urlLabel: string;
+  pageUrl: string;
 }
 
 const RenderBiometrics: React.FC<RenderBiometricsProps> = ({
   headerTitle,
   tableRows,
   bmiUnit,
-  showAllBiometrics,
   showAddBiometrics,
   biometrics,
-  toggleShowAllBiometrics,
+  pageSize,
+  urlLabel,
+  pageUrl,
 }) => {
   const { t } = useTranslation();
   const { conceptsUnits } = useVitalsSignsConceptMetaData();
   const displayText = t('biometrics', 'biometrics');
-  const [, , , heightUnit, weightUnit] = conceptsUnits;
+  const [, , , heightUnit, weightUnit, , , muacUnit] = conceptsUnits;
   const [chartView, setChartView] = React.useState<boolean>();
 
   const tableHeaders = [
@@ -56,6 +48,7 @@ const RenderBiometrics: React.FC<RenderBiometricsProps> = ({
     { key: 'weight', header: `Weight (${weightUnit})` },
     { key: 'height', header: `Height (${heightUnit})` },
     { key: 'bmi', header: `BMI (${bmiUnit})` },
+    { key: 'muac', header: `MUAC (${muacUnit})` },
   ];
 
   const launchBiometricsForm = React.useCallback(() => {
@@ -96,53 +89,13 @@ const RenderBiometrics: React.FC<RenderBiometricsProps> = ({
         {chartView ? (
           <BiometricsChart patientBiometrics={biometrics} conceptsUnits={conceptsUnits} />
         ) : (
-          <TableContainer>
-            <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="short" useZebraStyles>
-              {({ rows, headers, getHeaderProps, getTableProps }) => (
-                <Table {...getTableProps()}>
-                  <TableHead>
-                    <TableRow>
-                      {headers.map((header) => (
-                        <TableHeader
-                          className={`${styles.productiveHeading01} ${styles.text02}`}
-                          {...getHeaderProps({
-                            header,
-                            isSortable: header.isSortable,
-                          })}>
-                          {header.header?.content ?? header.header}
-                        </TableHeader>
-                      ))}
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {rows.map((row) => (
-                      <TableRow key={row.id}>
-                        {row.cells.map((cell) => (
-                          <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
-                        ))}
-                      </TableRow>
-                    ))}
-                    {!showAllBiometrics && biometrics.length > biometricsToShowCount && (
-                      <TableRow>
-                        <TableCell colSpan={4}>
-                          <span
-                            style={{
-                              display: 'inline-block',
-                              margin: '0.45rem 0rem',
-                            }}>
-                            {`${biometricsToShowCount} / ${biometrics.length}`} {t('items', 'items')}
-                          </span>
-                          <Button size="small" kind="ghost" onClick={toggleShowAllBiometrics}>
-                            {t('seeAll', 'See all')}
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              )}
-            </DataTable>
-          </TableContainer>
+          <BiometricsPagination
+            tableRows={tableRows}
+            pageSize={pageSize}
+            urlLabel={urlLabel}
+            pageUrl={pageUrl}
+            tableHeaders={tableHeaders}
+          />
         )}
       </div>
     );
@@ -156,48 +109,56 @@ export interface PatientBiometrics {
   weight: number;
   height: number;
   bmi: number;
+  muac: number;
 }
 
-interface BiometricsOverviewProps {
+interface BiometricsBaseProps {
   patientUuid: string;
   showAddBiometrics: boolean;
+  pageSize: number;
+  urlLabel: string;
+  pageUrl: string;
 }
 
-const BiometricsOverview: React.FC<BiometricsOverviewProps> = ({ patientUuid, showAddBiometrics }) => {
+const BiometricsBase: React.FC<BiometricsBaseProps> = ({
+  patientUuid,
+  showAddBiometrics,
+  pageSize,
+  urlLabel,
+  pageUrl,
+}) => {
   const config = useConfig() as ConfigObject;
   const { bmiUnit } = config.biometrics;
   const { t } = useTranslation();
   const [biometrics, setBiometrics] = React.useState<Array<any>>();
   const [error, setError] = React.useState(null);
-  const [showAllBiometrics, setShowAllBiometrics] = React.useState(false);
   const headerTitle = t('biometrics', 'Biometrics');
-
-  const toggleShowAllBiometrics = React.useCallback(() => setShowAllBiometrics((value) => !value), []);
 
   React.useEffect(() => {
     if (patientUuid) {
-      const sub = getPatientBiometrics(config.concepts.weightUuid, config.concepts.heightUuid, patientUuid).subscribe(
-        setBiometrics,
-        setError,
-      );
+      const sub = getPatientBiometrics(
+        config.concepts.weightUuid,
+        config.concepts.heightUuid,
+        patientUuid,
+        config.concepts.muacUuid,
+      ).subscribe(setBiometrics, setError);
       return () => sub.unsubscribe();
     }
-  }, [patientUuid, config.concepts.weightUuid, config.concepts.heightUuid]);
+  }, [patientUuid, config.concepts.weightUuid, config.concepts.heightUuid, config.concepts.muacUuid]);
 
   const tableRows = React.useMemo(
     () =>
-      biometrics
-        ?.slice(0, showAllBiometrics ? biometrics.length : biometricsToShowCount)
-        ?.map((biometric: PatientBiometrics, index) => {
-          return {
-            id: `${index}`,
-            date: dayjs(biometric.date).format(`DD - MMM - YYYY, hh:mm`),
-            weight: biometric.weight,
-            height: biometric.height,
-            bmi: biometric.bmi,
-          };
-        }),
-    [biometrics, showAllBiometrics],
+      biometrics?.map((biometric: PatientBiometrics, index) => {
+        return {
+          id: `${index}`,
+          date: dayjs(biometric.date).format(`DD - MMM - YYYY, hh:mm`),
+          weight: biometric.weight,
+          height: biometric.height,
+          bmi: biometric.bmi,
+          muac: biometric.muac,
+        };
+      }),
+    [biometrics],
   );
 
   return (
@@ -207,18 +168,19 @@ const BiometricsOverview: React.FC<BiometricsOverviewProps> = ({ patientUuid, sh
           headerTitle={headerTitle}
           biometrics={biometrics}
           tableRows={tableRows}
-          toggleShowAllBiometrics={toggleShowAllBiometrics}
-          showAllBiometrics={showAllBiometrics}
           showAddBiometrics={showAddBiometrics}
           bmiUnit={bmiUnit}
+          pageSize={pageSize}
+          urlLabel={urlLabel}
+          pageUrl={pageUrl}
         />
       ) : error ? (
         <ErrorState error={error} headerTitle={headerTitle} />
       ) : (
-        <DataTableSkeleton rowCount={biometricsToShowCount} />
+        <DataTableSkeleton rowCount={pageSize} />
       )}
     </>
   );
 };
 
-export default BiometricsOverview;
+export default BiometricsBase;

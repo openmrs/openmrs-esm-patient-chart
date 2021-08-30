@@ -5,15 +5,6 @@ import ChartLineSmooth16 from '@carbon/icons-react/es/chart--line-smooth/16';
 import Table16 from '@carbon/icons-react/es/table/16';
 import Button from 'carbon-components-react/es/components/Button';
 import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
-import DataTable, {
-  Table,
-  TableCell,
-  TableContainer,
-  TableBody,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from 'carbon-components-react/es/components/DataTable';
 import styles from './vitals-overview.scss';
 import VitalsChart from './vitals-chart.component';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
@@ -22,25 +13,26 @@ import { useConfig, attach } from '@openmrs/esm-framework';
 import { useVitalsSignsConceptMetaData, withUnit } from './vitals-biometrics-form/use-vitalsigns';
 import { patientVitalsBiometricsFormWorkspace } from '../constants';
 import { PatientVitals, performPatientsVitalsSearch } from './vitals-biometrics.resource';
-
-const vitalsToShowCount = 5;
+import VitalsPagination from './vitalsPagination.component';
 
 interface RenderVitalsProps {
   headerTitle: string;
   tableRows: Array<{}>;
   vitals: Array<PatientVitals>;
-  showAllVitals: boolean;
   showAddVitals: boolean;
-  toggleShowAllVitals(): void;
+  pageSize: number;
+  urlLabel: string;
+  pageUrl: string;
 }
 
 const RenderVitals: React.FC<RenderVitalsProps> = ({
   headerTitle,
   tableRows,
   vitals,
-  showAllVitals,
   showAddVitals,
-  toggleShowAllVitals,
+  pageSize,
+  urlLabel,
+  pageUrl,
 }) => {
   const { t } = useTranslation();
   const [chartView, setChartView] = React.useState<boolean>();
@@ -110,53 +102,13 @@ const RenderVitals: React.FC<RenderVitalsProps> = ({
         {chartView ? (
           <VitalsChart patientVitals={vitals} conceptsUnits={conceptsUnits} />
         ) : (
-          <TableContainer>
-            <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="short" useZebraStyles>
-              {({ rows, headers, getHeaderProps, getTableProps }) => (
-                <Table {...getTableProps()}>
-                  <TableHead>
-                    <TableRow>
-                      {headers.map((header) => (
-                        <TableHeader
-                          className={`${styles.productiveHeading01} ${styles.text02}`}
-                          {...getHeaderProps({
-                            header,
-                            isSortable: header.isSortable,
-                          })}>
-                          {header.header?.content ?? header.header}
-                        </TableHeader>
-                      ))}
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {rows.map((row) => (
-                      <TableRow key={row.id}>
-                        {row.cells.map((cell) => (
-                          <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
-                        ))}
-                      </TableRow>
-                    ))}
-                    {!showAllVitals && vitals?.length > vitalsToShowCount && (
-                      <TableRow>
-                        <TableCell colSpan={4}>
-                          <span
-                            style={{
-                              display: 'inline-block',
-                              margin: '0.45rem 0rem',
-                            }}>
-                            {`${vitalsToShowCount} / ${vitals.length}`} {t('items', 'items')}
-                          </span>
-                          <Button size="small" kind="ghost" onClick={toggleShowAllVitals}>
-                            {t('seeAll', 'See all')}
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              )}
-            </DataTable>
-          </TableContainer>
+          <VitalsPagination
+            tableRows={tableRows}
+            pageSize={pageSize}
+            urlLabel={urlLabel}
+            pageUrl={pageUrl}
+            tableHeaders={tableHeaders}
+          />
         )}
       </div>
     );
@@ -167,17 +119,17 @@ const RenderVitals: React.FC<RenderVitalsProps> = ({
 interface VitalsOverviewProps {
   patientUuid: string;
   showAddVitals: boolean;
+  pageSize: number;
+  urlLabel: string;
+  pageUrl: string;
 }
 
-const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVitals }) => {
+const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVitals, pageSize, urlLabel, pageUrl }) => {
   const config = useConfig();
   const { t } = useTranslation();
   const [vitals, setVitals] = React.useState<Array<PatientVitals>>(null);
   const [error, setError] = React.useState(null);
-  const [showAllVitals, setShowAllVitals] = React.useState(false);
   const headerTitle = t('vitals', 'Vitals');
-
-  const toggleShowAllVitals = React.useCallback(() => setShowAllVitals((value) => !value), []);
 
   React.useEffect(() => {
     if (patientUuid) {
@@ -192,8 +144,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
   const tableRows = React.useMemo(
     () =>
       vitals
-        ?.slice(0, showAllVitals ? vitals.length : vitalsToShowCount)
-        .sort((a, b) => (b.date > a.date ? 1 : -1))
+        ?.sort((a, b) => (b.date > a.date ? 1 : -1))
         .map((vital, index) => {
           return {
             id: `${index}`,
@@ -205,7 +156,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
             respiratoryRate: vital.respiratoryRate,
           };
         }),
-    [vitals, showAllVitals],
+    [vitals],
   );
 
   return (
@@ -215,14 +166,15 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
           headerTitle={headerTitle}
           tableRows={tableRows}
           vitals={vitals}
-          showAllVitals={showAllVitals}
           showAddVitals={showAddVitals}
-          toggleShowAllVitals={toggleShowAllVitals}
+          urlLabel={urlLabel}
+          pageUrl={pageUrl}
+          pageSize={pageSize}
         />
       ) : error ? (
         <ErrorState error={error} headerTitle={headerTitle} />
       ) : (
-        <DataTableSkeleton rowCount={vitalsToShowCount} />
+        <DataTableSkeleton rowCount={pageSize} />
       )}
     </>
   );
