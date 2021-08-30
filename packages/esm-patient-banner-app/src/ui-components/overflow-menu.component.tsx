@@ -49,6 +49,7 @@ const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = 
           height: 'auto',
           padding: '1rem',
           color: '#0f62fe',
+          outline: '2rem solid transparent',
           boxShadow: showMenu ? '0 2px 6px 0 rgb(0 0 0 / 30%)' : 'none',
         }}>
         {menuTitle}
@@ -67,6 +68,8 @@ const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = 
           left: 'auto',
           right: '0',
           backgroundColor: '#f4f4f4',
+          marginRight:'0.2rem',
+          boxShadow:'  0 6px 6px rgb(0 0 0 / 30%)',
         }}>
         <ul className="bx--overflow-menu-options__content">{children}</ul>
         <span />
