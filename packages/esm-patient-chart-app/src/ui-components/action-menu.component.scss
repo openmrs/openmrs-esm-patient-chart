@@ -1,3 +1,7 @@
+@import "~@openmrs/esm-styleguide/src/vars";
+@import "~carbon-components/src/globals/scss/vars";
+@import "../root.scss";
+
 $icon-button-size: 48px;
 $actionPanelOffset: 48px;
 
@@ -33,7 +37,7 @@ $actionPanelOffset: 48px;
   padding: 0.625rem;
   border-radius: 24px;
   border-radius: 50%;
-  border: solid 6px #007d79;
+  border: solid 4px #007d79;
   background-color: #ffffff;
 }
 
@@ -45,9 +49,10 @@ $actionPanelOffset: 48px;
   bottom: 3rem;
   right: 2rem;
 
-  width: 3rem;
+  width: fit-content;
+  padding: 0.625rem;
   height: 3rem;
-  border-radius: 50%;
+  border-radius: 1.75rem;
   border-color: transparent;
 
   color: #fff;
@@ -57,4 +62,42 @@ $actionPanelOffset: 48px;
   padding-top: 0.325rem;
   cursor: pointer;
   position: fixed;
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  
+}
+
+.actionBtn > div {
+  margin-right: 0.25rem;
+  height: 40px;
+  width: 36px;
+  padding: 0.625rem;
+  position: relative;
+}
+
+.actionBtn > span {
+  @extend .productiveHeading01;
+}
+
+:global(.omrs-breakpoint-gt-tablet) .warningButton {
+  position: absolute;
+  top: 0;
+  right: 0;
+  fill: $danger !important;
+}
+
+
+:global(.omrs-breakpoint-lt-desktop) .warningButton {
+  position: absolute;
+  top: 0;
+  right: 0;
+  fill: $danger !important;
+}
+
+:global(.omrs-breakpoint-lt-desktop) .warningButton [data-icon-path="inner-path"] {
+  fill: white !important;
+  opacity: 1;
 }
