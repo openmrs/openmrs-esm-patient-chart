@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 const Address: React.FC<{ address: fhir.Address }> = ({ address }) => {
   const { t } = useTranslation();
   const { city, country, postalCode, state } = address;
+
   return (
     <div className={styles.col}>
       <p className={styles.heading}>{t('address', 'Address')}</p>
@@ -102,14 +103,19 @@ const ContactDetails: React.FC<ContactDetailsProps> = ({ address, telecom, patie
   const currentAddress = address.find((a) => a.use === 'home');
 
   return (
-    <div className={styles.contactDetails}>
-      <div className={styles.row}>
-        <Address address={currentAddress} />
-        <Contact telecom={telecom} />
+    <div className={styles.verticalLine}>
+      <hr className={styles.hr} />
+      <div className={styles.contactDetails}>
+        <div className={styles.row}>
+          <Address address={currentAddress} />
+          <Contact telecom={telecom} />
+        </div>
+        <hr className={styles.hr} />
+        <div className={styles.row}>
+          <Relationships patientId={patientId} />
+        </div>
       </div>
-      <div className={styles.row}>
-        <Relationships patientId={patientId} />
-      </div>
+      <hr className={styles.hr} />
     </div>
   );
 };

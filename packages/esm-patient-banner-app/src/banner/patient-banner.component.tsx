@@ -71,7 +71,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid }) =
               iconDescription="Toggle contact details"
               onClick={toggleContactDetails}
               style={{ marginTop: '-0.25rem' }}>
-              {showContactDetails ? t('hideAllDetails', 'Hide all details') : t('showAllDetails', 'Show all details')}
+              {showContactDetails ? t('showLess', 'Show less') : t('showAllDetails', 'Show all details')}
             </Button>
           </div>
         </div>
