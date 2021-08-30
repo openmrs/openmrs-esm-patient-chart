@@ -1,76 +1,54 @@
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
-import PatientBanner from './patient-banner.component';
-import { openmrsObservableFetch, openmrsFetch, useVisit, age } from '@openmrs/esm-framework';
-import { mockCurrentVisit, mockVisits } from '../../../../__mocks__/visits.mock';
-import { of } from 'rxjs';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
-
-const mockUseVisit = useVisit as jest.Mock;
-const mockOpenmrsObservableFetch = openmrsObservableFetch as jest.Mock;
-const mockOpenmrsFetch = openmrsFetch as jest.Mock;
-const mockAge = age as jest.Mock;
-
-jest.mock('@openmrs/esm-framework', () => ({
-  ...jest.requireActual('@openmrs/esm-framework/mock'),
-  useVisit: jest.fn(),
-  age: jest.fn(),
-}));
+import PatientBanner from './patient-banner.component';
 
 jest.unmock('lodash');
 const lodash = jest.requireActual('lodash');
 lodash.capitalize = jest.fn().mockImplementation((s) => s.charAt(0).toUpperCase() + s.slice(1));
 
-function renderPatientBanner() {
-  mockAge.mockReturnValue('49 years');
-  mockUseVisit.mockReturnValue({ currentVisit: mockCurrentVisit, error: null });
-  mockOpenmrsObservableFetch.mockReturnValue(of(mockVisits));
-  mockOpenmrsFetch.mockReturnValue(Promise.resolve([]));
-  render(<PatientBanner patientUuid={mockPatient.id} patient={mockPatient} />);
-}
+jest.mock('@openmrs/esm-framework', () => ({
+  ...(jest.requireActual('@openmrs/esm-framework') as any),
+  useVisit: jest.fn(),
+  age: jest.fn(),
+}));
 
-function renderEmptyPatientBanner() {
-  mockAge.mockReturnValue('49 years');
-  mockUseVisit.mockReturnValue({
-    currentVisit: undefined,
-    error: null,
+describe('PatientBanner: ', () => {
+  it('renders patient-related information in a banner at the top of the page', () => {
+    renderPatientBanner();
+
+    expect(screen.getByRole('banner')).toBeInTheDocument();
+    expect(screen.getByRole('img')).toHaveClass('patientAvatar');
+    expect(screen.getByText(/John Wilson/)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Actions/i })).toBeInTheDocument();
+    expect(screen.getByText(/04 - Apr - 1972/i)).toBeInTheDocument();
+    expect(screen.getByText(/100732HE, 100GEJ/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Show all details/i })).toBeInTheDocument();
   });
-  mockOpenmrsObservableFetch.mockReturnValue(of([]));
-  mockOpenmrsFetch.mockReturnValue(Promise.resolve([]));
-  render(<PatientBanner patientUuid={mockPatient.id} patient={mockPatient} />);
-}
 
-describe('<PatientBanner />', () => {
-  it("clicking the button toggles displaying the patient's contact details", () => {
+  it("can toggle between showing or hiding the patient's contact details", () => {
     renderPatientBanner();
 
     const showContactDetailsBtn = screen.getByRole('button', {
-      name: 'Show all details',
+      name: /Show all details/i,
     });
 
-    fireEvent.click(showContactDetailsBtn);
+    userEvent.click(showContactDetailsBtn);
 
-    const hideContactDetailsBtn = screen.getByRole('button', {
-      name: 'Hide all details',
+    const showLessBtn = screen.getByRole('button', {
+      name: /Show less/i,
     });
-    expect(hideContactDetailsBtn).toBeInTheDocument();
+    expect(showLessBtn).toBeInTheDocument();
     expect(screen.getByText('Address')).toBeInTheDocument();
-    expect(screen.getByText('Contact Details')).toBeInTheDocument();
+    expect(screen.getByText(/Contact Details/i)).toBeInTheDocument();
 
-    fireEvent.click(hideContactDetailsBtn);
+    userEvent.click(showLessBtn);
 
     expect(showContactDetailsBtn).toBeInTheDocument();
   });
-
-  it('should display the Active Visit tag when there is an active visit', () => {
-    renderPatientBanner();
-
-    expect(screen.queryByTitle('Active Visit')).toBeVisible();
-  });
-
-  it('should not display the Active Visit tag when there is not an active visit', () => {
-    renderEmptyPatientBanner();
-
-    expect(screen.queryByTitle('Active Visit')).toBeNull();
-  });
 });
+
+function renderPatientBanner() {
+  render(<PatientBanner patient={mockPatient} patientUuid={mockPatient.id} />);
+}

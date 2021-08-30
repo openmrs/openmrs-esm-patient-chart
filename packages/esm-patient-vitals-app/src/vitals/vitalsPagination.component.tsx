@@ -12,7 +12,7 @@ import { usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import styles from './vitals-overview.scss';
 
-interface FormsProps {
+interface VitalsPaginationProps {
   tableRows: Array<{}>;
   pageSize: number;
   pageUrl: string;
@@ -20,7 +20,13 @@ interface FormsProps {
   tableHeaders: Array<{}>;
 }
 
-const VitalsPagination: React.FC<FormsProps> = ({ tableRows, pageSize, pageUrl, urlLabel, tableHeaders }) => {
+const VitalsPagination: React.FC<VitalsPaginationProps> = ({
+  tableRows,
+  pageSize,
+  pageUrl,
+  urlLabel,
+  tableHeaders,
+}) => {
   const { results, goTo, currentPage } = usePagination(tableRows, pageSize);
 
   return (

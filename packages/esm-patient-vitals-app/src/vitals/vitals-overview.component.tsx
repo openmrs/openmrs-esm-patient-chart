@@ -15,32 +15,26 @@ import { patientVitalsBiometricsFormWorkspace } from '../constants';
 import { PatientVitals, performPatientsVitalsSearch } from './vitals-biometrics.resource';
 import VitalsPagination from './vitalsPagination.component';
 
-interface RenderVitalsProps {
-  headerTitle: string;
-  tableRows: Array<{}>;
-  vitals: Array<PatientVitals>;
+interface VitalsOverviewProps {
+  patientUuid: string;
   showAddVitals: boolean;
   pageSize: number;
   urlLabel: string;
   pageUrl: string;
 }
 
-const RenderVitals: React.FC<RenderVitalsProps> = ({
-  headerTitle,
-  tableRows,
-  vitals,
-  showAddVitals,
-  pageSize,
-  urlLabel,
-  pageUrl,
-}) => {
+const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVitals, pageSize, urlLabel, pageUrl }) => {
   const { t } = useTranslation();
-  const [chartView, setChartView] = React.useState<boolean>();
   const displayText = t('vitalSigns', 'Vital signs');
-  const { conceptsUnits } = useVitalsSignsConceptMetaData();
+  const headerTitle = t('vitals', 'Vitals');
 
+  const config = useConfig();
+  const { conceptsUnits } = useVitalsSignsConceptMetaData();
   const [bloodPressureUnit, , temperatureUnit, , , pulseUnit, oxygenSaturationUnit, , respiratoryRateUnit] =
     conceptsUnits;
+  const [vitals, setVitals] = React.useState<Array<PatientVitals>>(null);
+  const [chartView, setChartView] = React.useState<boolean>();
+  const [error, setError] = React.useState(null);
 
   const tableHeaders = [
     { key: 'date', header: 'Date and time', isSortable: true },
@@ -68,73 +62,12 @@ const RenderVitals: React.FC<RenderVitalsProps> = ({
     [],
   );
 
-  if (tableRows.length) {
-    return (
-      <div className={styles.vitalsWidgetContainer}>
-        <div className={styles.vitalsHeaderContainer}>
-          <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
-          <div className={styles.toggleButtons}>
-            <Button
-              className={styles.toggle}
-              size="field"
-              kind={chartView ? 'ghost' : 'secondary'}
-              hasIconOnly
-              renderIcon={Table16}
-              iconDescription={t('tableView', 'Table View')}
-              onClick={() => setChartView(false)}
-            />
-            <Button
-              className={styles.toggle}
-              size="field"
-              kind={chartView ? 'secondary' : 'ghost'}
-              hasIconOnly
-              renderIcon={ChartLineSmooth16}
-              iconDescription={t('chartView', 'Chart View')}
-              onClick={() => setChartView(true)}
-            />
-          </div>
-          {showAddVitals && (
-            <Button kind="ghost" renderIcon={Add16} iconDescription="Add vitals" onClick={launchVitalsBiometricsForm}>
-              {t('add', 'Add')}
-            </Button>
-          )}
-        </div>
-        {chartView ? (
-          <VitalsChart patientVitals={vitals} conceptsUnits={conceptsUnits} />
-        ) : (
-          <VitalsPagination
-            tableRows={tableRows}
-            pageSize={pageSize}
-            urlLabel={urlLabel}
-            pageUrl={pageUrl}
-            tableHeaders={tableHeaders}
-          />
-        )}
-      </div>
-    );
-  }
-  return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchVitalsBiometricsForm} />;
-};
-
-interface VitalsOverviewProps {
-  patientUuid: string;
-  showAddVitals: boolean;
-  pageSize: number;
-  urlLabel: string;
-  pageUrl: string;
-}
-
-const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVitals, pageSize, urlLabel, pageUrl }) => {
-  const config = useConfig();
-  const { t } = useTranslation();
-  const [vitals, setVitals] = React.useState<Array<PatientVitals>>(null);
-  const [error, setError] = React.useState(null);
-  const headerTitle = t('vitals', 'Vitals');
-
   React.useEffect(() => {
     if (patientUuid) {
       const subscription = performPatientsVitalsSearch(config.concepts, patientUuid, 100).subscribe(
-        (vitals) => setVitals(vitals),
+        (vitals) => {
+          setVitals(vitals);
+        },
         (err) => setError(err),
       );
       return () => subscription.unsubscribe();
@@ -161,21 +94,63 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
 
   return (
     <>
-      {tableRows ? (
-        <RenderVitals
-          headerTitle={headerTitle}
-          tableRows={tableRows}
-          vitals={vitals}
-          showAddVitals={showAddVitals}
-          urlLabel={urlLabel}
-          pageUrl={pageUrl}
-          pageSize={pageSize}
-        />
-      ) : error ? (
-        <ErrorState error={error} headerTitle={headerTitle} />
-      ) : (
-        <DataTableSkeleton rowCount={pageSize} />
-      )}
+      {(() => {
+        if (tableRows && !tableRows?.length)
+          return (
+            <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchVitalsBiometricsForm} />
+          );
+        if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
+        if (tableRows?.length) {
+          return (
+            <div className={styles.vitalsWidgetContainer}>
+              <div className={styles.vitalsHeaderContainer}>
+                <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
+                <div className={styles.toggleButtons}>
+                  <Button
+                    className={styles.toggle}
+                    size="field"
+                    kind={chartView ? 'ghost' : 'secondary'}
+                    hasIconOnly
+                    renderIcon={Table16}
+                    iconDescription={t('tableView', 'Table View')}
+                    onClick={() => setChartView(false)}
+                  />
+                  <Button
+                    className={styles.toggle}
+                    size="field"
+                    kind={chartView ? 'secondary' : 'ghost'}
+                    hasIconOnly
+                    renderIcon={ChartLineSmooth16}
+                    iconDescription={t('chartView', 'Chart View')}
+                    onClick={() => setChartView(true)}
+                  />
+                </div>
+                {showAddVitals && (
+                  <Button
+                    kind="ghost"
+                    renderIcon={Add16}
+                    iconDescription="Add vitals"
+                    onClick={launchVitalsBiometricsForm}>
+                    {t('add', 'Add')}
+                  </Button>
+                )}
+              </div>
+              {chartView ? (
+                <VitalsChart patientVitals={vitals} conceptsUnits={conceptsUnits} />
+              ) : (
+                <VitalsPagination
+                  tableRows={tableRows}
+                  pageSize={pageSize}
+                  urlLabel={urlLabel}
+                  pageUrl={pageUrl}
+                  tableHeaders={tableHeaders}
+                />
+              )}
+            </div>
+          );
+        }
+        return <DataTableSkeleton rowCount={pageSize} />;
+      })()}
     </>
   );
 };

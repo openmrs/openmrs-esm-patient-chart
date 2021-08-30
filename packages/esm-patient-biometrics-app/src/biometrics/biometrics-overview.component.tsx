@@ -8,7 +8,7 @@ interface BiometricsProps {
   basePath: string;
 }
 
-const BiometricsSummary: React.FC<BiometricsProps> = ({ patientUuid, showAddBiometrics, basePath }) => {
+const BiometricsOverview: React.FC<BiometricsProps> = ({ patientUuid, showAddBiometrics, basePath }) => {
   const pageSize = 5;
   const { t } = useTranslation();
   const pageUrl = window.spaBase + basePath + '/vitalsAndBiometrics/biometrics';
@@ -25,4 +25,4 @@ const BiometricsSummary: React.FC<BiometricsProps> = ({ patientUuid, showAddBiom
   );
 };
 
-export default BiometricsSummary;
+export default BiometricsOverview;

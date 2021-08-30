@@ -2388,3 +2388,33 @@ export const mockVitalsConfig = {
     formUuid: 'a000cb34-9ec1-4344-a1c8-f692232f6edd',
   },
 };
+
+export const formattedVitals = [
+  {
+    id: '0',
+    date: '19 - May - 2021, 07:26',
+    bloodPressure: '121 / 121',
+    pulse: 76,
+    spo2: undefined,
+    temperature: 37,
+    respiratoryRate: 12,
+  },
+  {
+    id: '1',
+    date: '10 - May - 2021, 09:41',
+    bloodPressure: '120 / 120',
+    pulse: 66,
+    spo2: 90,
+    temperature: 37,
+    respiratoryRate: 45,
+  },
+  {
+    id: '2',
+    date: '07 - May - 2021, 12:04',
+    bloodPressure: '120 / 120',
+    pulse: undefined,
+    spo2: undefined,
+    temperature: undefined,
+    respiratoryRate: undefined,
+  },
+];

@@ -1,15 +1,15 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React from 'react';
 import dayjs from 'dayjs';
+import capitalize from 'lodash-es/capitalize';
+import { useTranslation } from 'react-i18next';
 import Button from 'carbon-components-react/es/components/Button';
 import ChevronDown16 from '@carbon/icons-react/es/chevron--down/16';
 import ChevronUp16 from '@carbon/icons-react/es/chevron--up/16';
 import OverflowMenuVertical16 from '@carbon/icons-react/es/overflow-menu--vertical/16';
-import capitalize from 'lodash-es/capitalize';
-import styles from './patient-banner.scss';
+import { ExtensionSlot, age } from '@openmrs/esm-framework';
 import ContactDetails from '../contact-details/contact-details.component';
 import CustomOverflowMenuComponent from '../ui-components/overflow-menu.component';
-import { ExtensionSlot, age } from '@openmrs/esm-framework';
-import { useTranslation } from 'react-i18next';
+import styles from './patient-banner.scss';
 
 interface PatientBannerProps {
   patient: fhir.Patient;
@@ -18,14 +18,14 @@ interface PatientBannerProps {
 
 const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid }) => {
   const { t } = useTranslation();
-  const [showContactDetails, setShowContactDetails] = useState(false);
-  const state = useMemo(() => ({ patientUuid }), [patientUuid]);
-  const toggleContactDetails = useCallback(() => setShowContactDetails((value) => !value), []);
+  const state = React.useMemo(() => ({ patientUuid }), [patientUuid]);
+  const [showContactDetails, setShowContactDetails] = React.useState(false);
+  const toggleContactDetails = React.useCallback(() => setShowContactDetails((value) => !value), []);
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} role="banner">
       <div className={styles.patientBanner}>
-        <div className={styles.patientAvatar}>
+        <div className={styles.patientAvatar} role="img">
           <ExtensionSlot extensionSlotName="patient-photo-slot" state={state} />
         </div>
         <div className={styles.patientInfo}>

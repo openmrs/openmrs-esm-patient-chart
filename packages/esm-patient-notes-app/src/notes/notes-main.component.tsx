@@ -1,13 +1,13 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Button from 'carbon-components-react/es/components/Button';
 import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
 import Add16 from '@carbon/icons-react/es/add/16';
-import styles from './notes-overview.scss';
 import { EmptyState, ErrorState, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
-import { useTranslation } from 'react-i18next';
 import { attach, useVisit } from '@openmrs/esm-framework';
 import { getEncounterObservableRESTAPI, PatientNote } from './encounter.resource';
 import NotesPagination from './notesPagination.component';
+import styles from './notes-overview.scss';
 
 interface NotesOverviewProps {
   patientUuid: string;
@@ -50,27 +50,30 @@ const NotesMain: React.FC<NotesOverviewProps> = ({
 
   return (
     <>
-      {notes ? (
-        notes.length ? (
-          <div>
-            <div className={styles.notesHeader}>
-              <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
-              {showAddNote && (
-                <Button kind="ghost" renderIcon={Add16} iconDescription="Add visit note" onClick={launchVisitNoteForm}>
-                  {t('add', 'Add')}
-                </Button>
-              )}
+      {(() => {
+        if (notes && !notes?.length)
+          return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchVisitNoteForm} />;
+        if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
+        if (notes?.length)
+          return (
+            <div>
+              <div className={styles.notesHeader}>
+                <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
+                {showAddNote && (
+                  <Button
+                    kind="ghost"
+                    renderIcon={Add16}
+                    iconDescription="Add visit note"
+                    onClick={launchVisitNoteForm}>
+                    {t('add', 'Add')}
+                  </Button>
+                )}
+              </div>
+              <NotesPagination notes={notes} pageSize={pageSize} urlLabel={urlLabel} pageUrl={pageUrl} />
             </div>
-            <NotesPagination notes={notes} pageSize={pageSize} urlLabel={urlLabel} pageUrl={pageUrl} />
-          </div>
-        ) : (
-          <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchVisitNoteForm} />
-        )
-      ) : error ? (
-        <ErrorState error={error} headerTitle={headerTitle} />
-      ) : (
-        <DataTableSkeleton rowCount={pageSize} />
-      )}
+          );
+        return <DataTableSkeleton rowCount={pageSize} />;
+      })()}
     </>
   );
 };

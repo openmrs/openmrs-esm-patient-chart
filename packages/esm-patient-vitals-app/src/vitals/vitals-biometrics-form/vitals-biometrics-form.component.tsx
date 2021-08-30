@@ -75,9 +75,9 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
 
           showToast({
             critical: true,
-            title: t('VitalSignsRecorded', 'Vital Signs Recorded'),
+            title: t('vitalSignsRecorded', 'Vital Signs Recorded'),
             kind: 'success',
-            description: t('VitalsAndBiometricsSaved', 'Most recent vital signs are visible below the patient header.'),
+            description: t('vitalsAndBiometricsSaved', 'Most recent vital signs are visible below the patient header'),
           });
         }
       })

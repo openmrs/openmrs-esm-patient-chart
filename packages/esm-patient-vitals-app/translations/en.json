@@ -33,9 +33,10 @@
   "today": "Today",
   "vitals": "Vitals",
   "vitalsAndBiometrics": "Vitals & Biometrics",
-  "vitalsAndBiometricsSaved": "Vitals and biometrics saved successfully",
+  "vitalsAndBiometricsSaved": "Most recent vital signs are visible below the patient header",
   "vitalsAndBiometricsSaveError": "Error saving vitals and biometrics",
   "vitalSignDisplayed": "Vital Sign Displayed",
   "vitalSigns": "Vital signs",
+  "vitalSignsRecorded": "Vital Signs Recorded",
   "weight": "Weight"
 }
