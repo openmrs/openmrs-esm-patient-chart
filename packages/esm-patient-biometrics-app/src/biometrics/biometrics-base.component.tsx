@@ -48,7 +48,7 @@ const RenderBiometrics: React.FC<RenderBiometricsProps> = ({
     { key: 'weight', header: `Weight (${weightUnit})` },
     { key: 'height', header: `Height (${heightUnit})` },
     { key: 'bmi', header: `BMI (${bmiUnit})` },
-    { key: 'muac', header: `Muac (${muacUnit})` },
+    { key: 'muac', header: `MUAC (${muacUnit})` },
   ];
 
   const launchBiometricsForm = React.useCallback(() => {
