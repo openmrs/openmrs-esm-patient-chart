@@ -30,7 +30,7 @@ const CapturePhoto: React.FC<CapturePhotoProps> = ({ initialState, onCapturePhot
         <img src={dataUri || initialState || placeholder} alt="Preview" style={{ width: '100%' }} />
       </div>
       <Button kind="ghost" onClick={showCam} style={{ flex: 1 }}>
-        {t('change', 'Change')}
+        {initialState ? t('changeImage', 'Change image') : t('addImage', 'Add image +')}
       </Button>
     </div>
   );
