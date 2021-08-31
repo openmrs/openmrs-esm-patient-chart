@@ -37,7 +37,7 @@ const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({ match
             className={`${styles.innerChartContainer} ${
               windowSize.size === 'normal' && openWindows > 0 ? styles.closeWorkspace : styles.activeWorkspace
             }`}>
-            <ExtensionSlot extensionSlotName="breadcrumbs-slot" />
+            <ExtensionSlot className={styles.breadcrumbs} extensionSlotName="breadcrumbs-slot" />
             <aside>
               <ExtensionSlot extensionSlotName="patient-header-slot" state={state} />
               <ExtensionSlot extensionSlotName="patient-info-slot" state={state} />
