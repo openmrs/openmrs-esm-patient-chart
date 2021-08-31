@@ -127,9 +127,9 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({
   urlLabel,
   pageUrl,
 }) => {
+  const { t } = useTranslation();
   const config = useConfig() as ConfigObject;
   const { bmiUnit } = config.biometrics;
-  const { t } = useTranslation();
   const [biometrics, setBiometrics] = React.useState<Array<any>>();
   const [error, setError] = React.useState(null);
   const headerTitle = t('biometrics', 'Biometrics');
