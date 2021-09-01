@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import Table16 from '@carbon/icons-react/es/table/16';
 import ChartLine16 from '@carbon/icons-react/es/chart--line/16';
 import Button from 'carbon-components-react/es/components/Button';
@@ -16,6 +16,9 @@ import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { Card, headers, formatDate, InfoButton, Separator, TypedTableRow } from './helpers';
 import { OverviewPanelEntry, OverviewPanelData } from './useOverviewData';
 import { useTranslation } from 'react-i18next';
+import { navigate } from '@openmrs/esm-framework';
+
+const DashboardResultsCount = 5;
 
 export const CommonDataTable: React.FC<{
   data: Array<OverviewPanelData>;
@@ -64,6 +67,8 @@ export const CommonDataTable: React.FC<{
 interface CommonOverviewPropsBase {
   overviewData: Array<OverviewPanelEntry>;
   insertSeparator?: boolean;
+  isPatientSummaryDashboard?: boolean;
+  patientUuid?: string;
 }
 
 interface CommonOverviewPropsWithToolbar {
@@ -93,6 +98,8 @@ const CommonOverview: React.FC<CommonOverviewProps> = ({
   openTimeline,
   openTrendline,
   deactivateToolbar = false,
+  isPatientSummaryDashboard,
+  patientUuid,
 }) => {
   const { t } = useTranslation();
   const abnormalInterpretation = [
@@ -104,6 +111,10 @@ const CommonOverview: React.FC<CommonOverviewProps> = ({
     'OFF_SCALE_LOW',
   ];
 
+  const handleSeeAvailableResults = useCallback(() => {
+    navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/chart/test-results` });
+  }, [patientUuid]);
+
   if (!overviewData.length)
     return <EmptyState headerTitle={t('testResults', 'Test Results')} displayText={t('testResults', 'test results')} />;
 
@@ -112,12 +123,13 @@ const CommonOverview: React.FC<CommonOverviewProps> = ({
       {(() => {
         const cards = overviewData.map(([title, type, data, date, uuid]) => {
           const allNormalResults = !data.some((result) => abnormalInterpretation.includes(result.interpretation));
+          const patientSummaryDashboardData = data.slice(0, DashboardResultsCount);
           return (
             <Card allNormalResults={allNormalResults} key={uuid}>
               <CommonDataTable
                 {...{
                   title,
-                  data,
+                  data: isPatientSummaryDashboard ? patientSummaryDashboardData : data,
                   tableHeaders: headers,
                   description: (
                     <div>
@@ -141,6 +153,11 @@ const CommonOverview: React.FC<CommonOverviewProps> = ({
                   ),
                 }}
               />
+              {data.length > DashboardResultsCount && isPatientSummaryDashboard && (
+                <Button onClick={handleSeeAvailableResults} kind="ghost">
+                  {t('moreResultsAvailable', 'More results available')}
+                </Button>
+              )}
             </Card>
           );
         });
