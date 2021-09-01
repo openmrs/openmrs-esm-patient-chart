@@ -288,6 +288,7 @@ function OrderBasketItemActions({
         indication: medication.orderReasonNonCoded,
       },
     ]);
+    attach('patient-chart-workspace-slot', 'order-basket-workspace');
   }, [items, setItems, medication]);
 
   const handleReorderClick = useCallback(() => {
