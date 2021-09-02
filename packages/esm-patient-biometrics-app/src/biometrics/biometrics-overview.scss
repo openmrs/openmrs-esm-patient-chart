@@ -35,3 +35,11 @@
 .toggle:last-of-type {
   border-radius: 0 $spacing-02 $spacing-02 0;
 }
+
+.customTable tr:nth-child(odd) td {
+  background-color: #fff;
+}
+
+.customTable  tbody  tr:nth-child(even)  td {
+  background-color: #f4f4f4;
+}

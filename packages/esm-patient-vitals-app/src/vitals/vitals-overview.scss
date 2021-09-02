@@ -38,3 +38,11 @@
   background-color: $ui-background;
   position: relative;
 }
+
+.customTable tr:nth-child(odd) td {
+  background-color: #fff;
+}
+
+.customTable  tbody  tr:nth-child(even)  td {
+  background-color: #f4f4f4;
+}
