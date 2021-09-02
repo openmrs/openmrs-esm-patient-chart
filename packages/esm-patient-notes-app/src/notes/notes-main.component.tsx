@@ -42,7 +42,7 @@ const NotesMain: React.FC<NotesOverviewProps> = ({
 
   const launchVisitNoteForm = React.useCallback(() => {
     if (currentVisit) {
-      attach('patient-chart-workspace-slot', 'visit-notes-workspace');
+      attach('patient-chart-workspace-slot', 'visit-notes-form-workspace');
     } else {
       launchStartVisitPrompt();
     }

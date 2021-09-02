@@ -73,7 +73,10 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = () => {
     });
   }, [enrolledPrograms, t]);
 
-  const launchProgramsForm = React.useCallback(() => attach('patient-chart-workspace-slot', 'programs-workspace'), []);
+  const launchProgramsForm = React.useCallback(
+    () => attach('patient-chart-workspace-slot', 'programs-form-workspace'),
+    [],
+  );
 
   const RenderPrograms = () => {
     return (
