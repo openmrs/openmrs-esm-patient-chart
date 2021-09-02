@@ -388,3 +388,17 @@ export const mockPatientConditionsResult: Condition[] = [
 ];
 
 export const mockPatientConditionResult: Condition = mockPatientConditionsResult[0];
+
+export const searchedCondition = [
+  {
+    display: 'Headache',
+    concept: {
+      uuid: '139084AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      display: 'Headache',
+    },
+    conceptName: {
+      uuid: '38867BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
+      display: 'Headache',
+    },
+  },
+];

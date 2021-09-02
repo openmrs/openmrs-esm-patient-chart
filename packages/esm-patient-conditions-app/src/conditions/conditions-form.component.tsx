@@ -123,13 +123,14 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid, isTablet }
       debounce((searchTerm) => {
         if (searchTerm) {
           const sub = searchConditionConcepts(searchTerm).subscribe(
-            (searchResults: Array<CodedCondition>) =>
+            (searchResults: Array<CodedCondition>) => {
               dispatch({
                 type: ActionTypes.search,
                 isSearching: false,
                 searchResults: searchResults,
                 searchTerm: searchTerm,
-              }),
+              });
+            },
             () => createErrorHandler(),
           );
           return () => {
@@ -252,7 +253,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid, isTablet }
         <div>
           {(() => {
             if (viewState.status !== ActionTypes.search) return null;
-            if (viewState.isSearching) return <SearchSkeleton />;
+            if (viewState.isSearching) return <SearchSkeleton role="progressbar" />;
             if (viewState.searchResults && viewState.searchResults.length) {
               return (
                 <ul className={styles.conditionsList}>
