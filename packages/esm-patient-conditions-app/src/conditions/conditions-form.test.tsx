@@ -1,20 +1,19 @@
-import { createErrorHandler, detach, showNotification, showToast } from '@openmrs/esm-framework';
-import { fireEvent, render, screen } from '@testing-library/react';
-import dayjs from 'dayjs';
 import React from 'react';
-import { throwError } from 'rxjs';
-import { of } from 'rxjs/internal/observable/of';
+import dayjs from 'dayjs';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { delay } from 'rxjs/operators';
-import { searchedCondition } from '../../../../__mocks__/conditions.mock';
+import { of } from 'rxjs/internal/observable/of';
+import { throwError } from 'rxjs';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
-import ConditionsForm from './conditions-form.component';
+import { searchedCondition } from '../../../../__mocks__/conditions.mock';
+import { createErrorHandler, detach, showNotification, showToast } from '@openmrs/esm-framework';
 import { createPatientCondition, searchConditionConcepts } from './conditions.resource';
+import ConditionsForm from './conditions-form.component';
 
 const utc = require('dayjs/plugin/utc');
 dayjs.extend(utc);
 
-const lodash = require('lodash');
-lodash.debounce = jest.fn((fn) => fn);
+jest.mock('lodash-es/debounce', () => jest.fn((fn) => fn));
 
 const testProps = {
   isTablet: false,

@@ -1,7 +1,6 @@
 import React, { SyntheticEvent } from 'react';
 import dayjs from 'dayjs';
-import { debounce } from 'lodash-es';
-import styles from './visit-notes-form.scss';
+import debounce from 'lodash-es/debounce';
 import Button from 'carbon-components-react/es/components/Button';
 import DatePicker from 'carbon-components-react/es/components/DatePicker';
 import DatePickerInput from 'carbon-components-react/es/components/DatePickerInput';
@@ -25,6 +24,7 @@ import {
 import { convertToObsPayload, Diagnosis, VisitNotePayload } from './visit-note.util';
 import { fetchDiagnosisByName, fetchLocationByUuid, fetchProviderByUuid, saveVisitNote } from './visit-notes.resource';
 import { ConfigObject } from '../config-schema';
+import styles from './visit-notes-form.scss';
 const searchTimeoutInMs = 500;
 
 interface Idle {

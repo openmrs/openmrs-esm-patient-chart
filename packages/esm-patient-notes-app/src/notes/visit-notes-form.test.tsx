@@ -1,6 +1,6 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { screen, render } from '@testing-library/react';
+import { screen, render, act } from '@testing-library/react';
 import { of } from 'rxjs/internal/observable/of';
 import {
   createErrorHandler,
@@ -21,8 +21,7 @@ import {
 import VisitNotesForm from './visit-notes-form.component';
 import { mockSessionDataResponse } from '../../../../__mocks__/session.mock';
 
-const lodash = require('lodash');
-lodash.debounce = jest.fn((fn) => fn);
+jest.mock('lodash-es/debounce', () => jest.fn((fn) => fn));
 
 const testProps = {
   isTablet: false,
@@ -140,6 +139,7 @@ describe('Visit notes form: ', () => {
 
   describe('Form Submission: ', () => {
     it('renders a success toast notification upon successfully recording a visit note', async () => {
+      const promise = Promise.resolve();
       const successPayload = {
         encounterProviders: jasmine.arrayContaining([
           {
@@ -177,12 +177,14 @@ describe('Visit notes form: ', () => {
       const submitButton = screen.getByRole('button', { name: /Save & Close/i });
       userEvent.click(submitButton);
 
+      await act(() => promise);
       expect(mockSaveVisitNote).toHaveBeenCalledTimes(1);
       expect(mockSaveVisitNote).toHaveBeenCalledWith(new AbortController(), jasmine.objectContaining(successPayload));
     });
   });
 
-  it.only('renders an error notification if there was a problem recording a condition', async () => {
+  it('renders an error notification if there was a problem recording a condition', async () => {
+    const promise = Promise.resolve();
     const error = {
       message: 'Internal Server Error',
       response: {
@@ -209,14 +211,16 @@ describe('Visit notes form: ', () => {
     const submitButton = screen.getByRole('button', { name: /Save & Close/i });
     userEvent.click(submitButton);
 
-    // expect(mockCreateErrorHandler).toHaveBeenCalledTimes(1);
-    // expect(mockShowNotification).toHaveBeenCalledTimes(1);
-    // expect(mockShowNotification).toHaveBeenCalledWith({
-    //   critical: true,
-    //   description: 'Internal Server Error',
-    //   kind: 'error',
-    //   title: 'Error saving condition',
-    // });
+    await act(() => promise);
+
+    expect(mockCreateErrorHandler).toHaveBeenCalledTimes(1);
+    expect(mockShowNotification).toHaveBeenCalledTimes(1);
+    expect(mockShowNotification).toHaveBeenCalledWith({
+      critical: true,
+      description: 'Internal Server Error',
+      kind: 'error',
+      title: 'Error saving visit note',
+    });
   });
 });
 

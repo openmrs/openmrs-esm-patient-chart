@@ -1,6 +1,6 @@
 import React, { SyntheticEvent } from 'react';
 import dayjs from 'dayjs';
-import { debounce } from 'lodash-es';
+import debounce from 'lodash-es/debounce';
 import { useTranslation } from 'react-i18next';
 import { createErrorHandler, detach, showNotification, showToast, useSessionUser } from '@openmrs/esm-framework';
 import Button from 'carbon-components-react/es/components/Button';
@@ -320,7 +320,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid, isTablet }
         </DatePicker>
       )}
       <div style={{ marginTop: '1.625rem' }}>
-        <Button style={{ width: '50%' }} kind="secondary" type="button" onClick={() => closeWorkspace()}>
+        <Button style={{ width: '50%' }} kind="secondary" type="button" onClick={closeWorkspace}>
           {t('cancel', 'Cancel')}
         </Button>
         <Button
