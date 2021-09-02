@@ -1,21 +1,24 @@
-import React from 'react';
-
+import React, { useCallback } from 'react';
 import Table16 from '@carbon/icons-react/es/table/16';
 import ChartLine16 from '@carbon/icons-react/es/chart--line/16';
-import Button from 'carbon-components-react/lib/components/Button';
-import DataTable from 'carbon-components-react/lib/components/DataTable';
-import Table from 'carbon-components-react/lib/components/DataTable/Table';
-import TableContainer from 'carbon-components-react/lib/components/DataTable/TableContainer';
-import TableHead from 'carbon-components-react/lib/components/DataTable/TableHead';
-import TableHeader from 'carbon-components-react/lib/components/DataTable/TableHeader';
-import TableRow from 'carbon-components-react/lib/components/DataTable/TableRow';
-import TableCell from 'carbon-components-react/lib/components/DataTable/TableCell';
-import TableBody from 'carbon-components-react/lib/components/DataTable/TableBody';
-import TableToolbarContent from 'carbon-components-react/lib/components/DataTable/TableToolbarContent';
-import TableToolbar from 'carbon-components-react/lib/components/DataTable/TableToolbar';
+import Button from 'carbon-components-react/es/components/Button';
+import DataTable from 'carbon-components-react/es/components/DataTable';
+import Table from 'carbon-components-react/es/components/DataTable/Table';
+import TableContainer from 'carbon-components-react/es/components/DataTable/TableContainer';
+import TableHead from 'carbon-components-react/es/components/DataTable/TableHead';
+import TableHeader from 'carbon-components-react/es/components/DataTable/TableHeader';
+import TableRow from 'carbon-components-react/es/components/DataTable/TableRow';
+import TableCell from 'carbon-components-react/es/components/DataTable/TableCell';
+import TableBody from 'carbon-components-react/es/components/DataTable/TableBody';
+import TableToolbarContent from 'carbon-components-react/es/components/DataTable/TableToolbarContent';
+import TableToolbar from 'carbon-components-react/es/components/DataTable/TableToolbar';
+import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { Card, headers, formatDate, InfoButton, Separator, TypedTableRow } from './helpers';
 import { OverviewPanelEntry, OverviewPanelData } from './useOverviewData';
 import { useTranslation } from 'react-i18next';
+import { navigate } from '@openmrs/esm-framework';
+
+const DashboardResultsCount = 5;
 
 export const CommonDataTable: React.FC<{
   data: Array<OverviewPanelData>;
@@ -63,7 +66,9 @@ export const CommonDataTable: React.FC<{
 
 interface CommonOverviewPropsBase {
   overviewData: Array<OverviewPanelEntry>;
-  insertSeperator?: boolean;
+  insertSeparator?: boolean;
+  isPatientSummaryDashboard?: boolean;
+  patientUuid?: string;
 }
 
 interface CommonOverviewPropsWithToolbar {
@@ -89,51 +94,75 @@ type CommonOverviewProps = CommonOverviewPropsBase &
 
 const CommonOverview: React.FC<CommonOverviewProps> = ({
   overviewData = [],
-  insertSeperator = false,
+  insertSeparator = false,
   openTimeline,
   openTrendline,
   deactivateToolbar = false,
+  isPatientSummaryDashboard,
+  patientUuid,
 }) => {
   const { t } = useTranslation();
+  const abnormalInterpretation = [
+    'HIGH',
+    'CRITICALLY_HIGH',
+    'OFF_SCALE_HIGH',
+    'LOW',
+    'CRITICALLY_LOW',
+    'OFF_SCALE_LOW',
+  ];
 
-  if (!overviewData.length) return <p>{t('no_tests', 'No tests found')}</p>;
+  const handleSeeAvailableResults = useCallback(() => {
+    navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/chart/test-results` });
+  }, [patientUuid]);
+
+  if (!overviewData.length)
+    return <EmptyState headerTitle={t('testResults', 'Test Results')} displayText={t('testResults', 'test results')} />;
 
   return (
     <>
       {(() => {
-        const cards = overviewData.map(([title, type, data, date, uuid]) => (
-          <Card key={uuid}>
-            <CommonDataTable
-              {...{
-                title,
-                data,
-                tableHeaders: headers,
-                description: (
-                  <div>
-                    {formatDate(date)}
-                    <InfoButton />
-                  </div>
-                ),
-                toolbar: deactivateToolbar || (
-                  <TableToolbar>
-                    <TableToolbarContent>
-                      {type === 'Test' && (
-                        <Button kind="ghost" renderIcon={ChartLine16} onClick={() => openTrendline(uuid, uuid)}>
-                          {t('trend', 'Trend')}
+        const cards = overviewData.map(([title, type, data, date, uuid]) => {
+          const allNormalResults = !data.some((result) => abnormalInterpretation.includes(result.interpretation));
+          const patientSummaryDashboardData = data.slice(0, DashboardResultsCount);
+          return (
+            <Card allNormalResults={allNormalResults} key={uuid}>
+              <CommonDataTable
+                {...{
+                  title,
+                  data: isPatientSummaryDashboard ? patientSummaryDashboardData : data,
+                  tableHeaders: headers,
+                  description: (
+                    <div>
+                      {formatDate(date)}
+                      <InfoButton />
+                    </div>
+                  ),
+                  toolbar: deactivateToolbar || (
+                    <TableToolbar>
+                      <TableToolbarContent>
+                        {type === 'Test' && (
+                          <Button kind="ghost" renderIcon={ChartLine16} onClick={() => openTrendline(uuid, uuid)}>
+                            {t('trend', 'Trend')}
+                          </Button>
+                        )}
+                        <Button kind="ghost" renderIcon={Table16} onClick={() => openTimeline(uuid)}>
+                          {t('timeline', 'Timeline')}
                         </Button>
-                      )}
-                      <Button kind="ghost" renderIcon={Table16} onClick={() => openTimeline(uuid)}>
-                        {t('timeline', 'Timeline')}
-                      </Button>
-                    </TableToolbarContent>
-                  </TableToolbar>
-                ),
-              }}
-            />
-          </Card>
-        ));
+                      </TableToolbarContent>
+                    </TableToolbar>
+                  ),
+                }}
+              />
+              {data.length > DashboardResultsCount && isPatientSummaryDashboard && (
+                <Button onClick={handleSeeAvailableResults} kind="ghost">
+                  {t('moreResultsAvailable', 'More results available')}
+                </Button>
+              )}
+            </Card>
+          );
+        });
 
-        if (insertSeperator)
+        if (insertSeparator)
           return cards.reduce((acc, val, i, { length }) => {
             acc.push(val);
 

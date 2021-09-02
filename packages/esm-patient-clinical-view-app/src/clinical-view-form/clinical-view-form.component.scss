@@ -31,3 +31,12 @@
   flex: 1;
   margin: 0.125rem;
 }
+
+.searchContainer {
+  display: flex;
+  border-bottom: 0.125px solid $ui-04;
+}
+
+.searchContainer input{
+  border-bottom: none;
+}

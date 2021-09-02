@@ -11,7 +11,7 @@ patient's information, such as vitals, demographic and relationships.
 ## Setup
 
 See the guidance in the [Developer Documentation](https://openmrs.github.io/openmrs-esm-core/#/getting_started/setup?id=developing-microfrontends-in-a-lerna-monorepo).
-This respository uses Yarn and Lerna.
+This repository uses Yarn and Lerna.
 
 To start the dev server for a specific package, run
 

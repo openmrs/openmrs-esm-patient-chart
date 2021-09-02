@@ -1,12 +1,13 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 
 interface CustomOverflowMenuComponentProps {
   menuTitle: React.ReactNode;
 }
 
 const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = ({ menuTitle, children }) => {
-  const [showMenu, toggleShowMenu] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
   const wrapperRef = useRef(null);
+  const toggleShowMenu = useCallback(() => setShowMenu((state) => !state), []);
 
   useEffect(() => {
     /**
@@ -14,7 +15,7 @@ const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = 
      */
     function handleClickOutside(event: MouseEvent) {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
-        toggleShowMenu(false);
+        setShowMenu(false);
       }
     }
 
@@ -43,7 +44,7 @@ const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = 
         aria-expanded={showMenu}
         id="custom-actions-overflow-menu-trigger"
         aria-controls="custom-actions-overflow-menu"
-        onClick={() => toggleShowMenu(!showMenu)}
+        onClick={toggleShowMenu}
         style={{
           width: 'auto',
           height: 'auto',
@@ -68,8 +69,8 @@ const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = 
           left: 'auto',
           right: '0',
           backgroundColor: '#f4f4f4',
-          marginRight:'0.2rem',
-          boxShadow:'  0 6px 6px rgb(0 0 0 / 30%)',
+          marginRight: '0.2rem',
+          boxShadow: '0 6px 6px rgb(0 0 0 / 30%)',
         }}>
         <ul className="bx--overflow-menu-options__content">{children}</ul>
         <span />

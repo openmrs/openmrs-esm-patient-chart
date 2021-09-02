@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useVisit } from '@openmrs/esm-framework';
+import { attach, useVisit } from '@openmrs/esm-framework';
 
 interface StartVisitOverflowMenuItemProps {
   patientUuid: string;
@@ -9,17 +9,9 @@ interface StartVisitOverflowMenuItemProps {
 const StartVisitOverflowMenuItem: React.FC<StartVisitOverflowMenuItemProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const { currentVisit } = useVisit(patientUuid);
-  const handleClick = React.useCallback(
-    () =>
-      window.dispatchEvent(
-        new CustomEvent('visit-dialog', {
-          detail: {
-            type: 'prompt',
-          },
-        }),
-      ),
-    [],
-  );
+  const handleClick = React.useCallback(() => {
+    attach('patient-chart-workspace-slot', 'start-visit-workspace-form');
+  }, []);
 
   return (
     !currentVisit && (

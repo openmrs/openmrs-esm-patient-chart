@@ -23,7 +23,7 @@ function parseSingleObsData(
         memberRefs[memb.reference.split('/')[1]] = [entry.members, i];
       });
     } else {
-      // is a singe test
+      // is a single test
       entry.meta = metaInfomation[entry.conceptClass];
     }
 
@@ -49,7 +49,7 @@ async function reloadData(patientUuid: string) {
   const metaInfomation = extractMetaInformation(testConcepts);
 
   // obs that are not panels
-  const singeEntries: ObsRecord[] = [];
+  const singleEntries: ObsRecord[] = [];
 
   // a record of observation uuids that are members of panels, mapped to the place where to put them
   const memberRefs: Record<ObsUuid, [ObsRecord[], number]> = {};
@@ -66,11 +66,11 @@ async function reloadData(patientUuid: string) {
     if (entry.members) {
       obsByClass[entry.conceptClass].push(entry);
     } else {
-      singeEntries.push(entry);
+      singleEntries.push(entry);
     }
   });
 
-  singeEntries.forEach((entry) => {
+  singleEntries.forEach((entry) => {
     const { id } = entry;
     const memRef = memberRefs[id];
 

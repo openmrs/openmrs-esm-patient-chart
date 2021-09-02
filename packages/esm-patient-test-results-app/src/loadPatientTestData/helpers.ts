@@ -15,7 +15,7 @@ const retrieveFromIterator = <T>(iteratorOrIterable: IterableIterator<T>, length
   return Array.from({ length }, () => iterator.next().value);
 };
 
-const PATIEN_DATA_CACHE_SIZE = 5;
+const PATIENT_DATA_CACHE_SIZE = 5;
 let patientResultsDataCache: Record<string, [PatientData, number, string]> = {};
 
 /**
@@ -29,10 +29,10 @@ export function addUserDataToCache(patientUuid: string, data: PatientData, indic
   patientResultsDataCache[patientUuid] = [data, Date.now(), indicator];
   const currentStateEntries = Object.entries(patientResultsDataCache);
 
-  if (currentStateEntries.length > PATIEN_DATA_CACHE_SIZE) {
+  if (currentStateEntries.length > PATIENT_DATA_CACHE_SIZE) {
     currentStateEntries.sort(([, [, dateA]], [, [, dateB]]) => dateB - dateA);
 
-    patientResultsDataCache = Object.fromEntries(currentStateEntries.slice(0, PATIEN_DATA_CACHE_SIZE));
+    patientResultsDataCache = Object.fromEntries(currentStateEntries.slice(0, PATIENT_DATA_CACHE_SIZE));
   }
 }
 

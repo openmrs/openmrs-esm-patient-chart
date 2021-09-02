@@ -1,17 +1,16 @@
 import * as React from 'react';
-import '@carbon/charts/styles.css';
 import AreaChart from '@carbon/charts-react/area-chart';
 import ArrowLeft24 from '@carbon/icons-react/es/arrow--left/24';
-import { ScaleTypes, AreaChartOptions, TickRotations } from '@carbon/charts/interfaces';
-import { toOmrsDateFormat, toOmrsTimeString24 } from '@openmrs/esm-framework';
-
 import styles from './trendline.scss';
-import { ObsRecord, OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
-import { CommonDataTable } from '../overview/common-overview';
 import RangeSelector from './RangeSelector';
 import usePatientResultsData from '../loadPatientTestData/usePatientResultsData';
+import { ScaleTypes, AreaChartOptions, TickRotations } from '@carbon/charts/interfaces';
+import { toOmrsDateFormat, toOmrsTimeString24 } from '@openmrs/esm-framework';
+import { ObsRecord, OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
+import { CommonDataTable } from '../overview/common-overview';
 import { exist } from '../loadPatientTestData/helpers';
 import { useTranslation } from 'react-i18next';
+import '@carbon/charts/styles.css';
 
 const useTrendlineData = ({
   patientUuid,

@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './lab-results.scss';
-import { TableRow } from 'carbon-components-react';
+import TableRow from 'carbon-components-react/es/components/DataTable/TableRow';
 import { OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import Information16 from '@carbon/icons-react/es/information/16';
 import dayjs from 'dayjs';
@@ -20,7 +20,10 @@ export const Main = ({ className = '', ...props }) => <main {...props} className
 export const RecentResultsGrid = (props) => {
   return <div {...props} className={styles['recent-results-grid']} />;
 };
-export const Card = ({ ...props }) => <div {...props} className={styles.card} />;
+export const Card = ({ ...props }) => {
+  const { allNormalResults = false } = props;
+  return <div {...props} className={`${styles.card} ${allNormalResults ? styles['normal-results'] : ''}`} />;
+};
 
 export const Separator = ({ ...props }) => <div {...props} className={styles.separator} />;
 

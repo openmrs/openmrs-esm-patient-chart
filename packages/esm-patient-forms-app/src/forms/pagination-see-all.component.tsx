@@ -1,7 +1,6 @@
 import React, { FunctionComponent } from 'react';
 import Pagination from 'carbon-components-react/es/components/Pagination';
 import styles from '@openmrs/esm-patient-common-lib/src/pagination/pagination.component.scss';
-import { useTranslation } from 'react-i18next';
 import { ConfigurableLink } from '@openmrs/esm-framework';
 import { usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 
@@ -12,6 +11,7 @@ interface PatientChartPaginationProps {
   pageSize: number;
   onPageNumberChange?: any;
   pageUrl?: string;
+  urlLabel: string;
 }
 
 export const PatientChartPagination: FunctionComponent<PatientChartPaginationProps> = ({
@@ -21,8 +21,8 @@ export const PatientChartPagination: FunctionComponent<PatientChartPaginationPro
   pageNumber,
   pageUrl = '',
   currentItems,
+  urlLabel,
 }) => {
-  const { t } = useTranslation();
   const { itemsDisplayed, pageSizes } = usePaginationInfo(pageSize, totalItems, pageNumber, currentItems);
 
   return (
@@ -33,7 +33,7 @@ export const PatientChartPagination: FunctionComponent<PatientChartPaginationPro
             {itemsDisplayed}
             {pageUrl && (
               <ConfigurableLink to={pageUrl} className={styles.configurableLink}>
-                {t('goToSummary', 'Go to Summary')}
+                {urlLabel}
               </ConfigurableLink>
             )}
           </div>

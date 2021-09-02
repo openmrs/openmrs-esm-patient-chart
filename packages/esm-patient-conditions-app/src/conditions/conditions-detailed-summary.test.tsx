@@ -3,16 +3,14 @@ import { delay } from 'rxjs/operators';
 import { of } from 'rxjs/internal/observable/of';
 import { throwError } from 'rxjs/internal/observable/throwError';
 import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
-import ConditionsDetailedSummary from './conditions-detailed-summary.component';
-import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { attach, fhirBaseUrl, openmrsObservableFetch } from '@openmrs/esm-framework';
+import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { mockFhirConditionsResponse } from '../../../../__mocks__/conditions.mock';
-import { useConditionsContext } from './conditions.context';
 import userEvent from '@testing-library/user-event';
+import ConditionsDetailedSummary from './conditions-detailed-summary.component';
 
 const mockAttach = attach as jest.Mock;
 const mockOpenmrsObservableFetch = openmrsObservableFetch as jest.Mock;
-const mockUseConditionsContext = useConditionsContext as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...(jest.requireActual('@openmrs/esm-framework') as any),
@@ -21,9 +19,9 @@ jest.mock('@openmrs/esm-framework', () => ({
 }));
 
 jest.mock('./conditions.context', () => ({
-  useConditionsContext: jest.fn().mockImplementation(() => ({
+  useConditionsContext: jest.fn().mockReturnValue({
     patient: mockPatient,
-  })),
+  }),
 }));
 
 function renderConditionsDetailedSummary() {

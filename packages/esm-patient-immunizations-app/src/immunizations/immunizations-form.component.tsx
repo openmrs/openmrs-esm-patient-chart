@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styles from './immunizations-form.css';
 import { SummaryCard } from '@openmrs/esm-patient-common-lib';
-import { createErrorHandler, useSessionUser, useVisit } from '@openmrs/esm-framework';
+import { createErrorHandler, showNotification, showToast, useSessionUser, useVisit } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { savePatientImmunization } from './immunizations.resource';
 import { mapToFHIRImmunizationResource } from './immunization-mapper';
@@ -119,9 +119,23 @@ const ImmunizationsForm: React.FC<ImmunizationsFormProps> = ({
       patientUuid,
       formState.immunizationObsUuid,
       abortController,
-    ).then((response) => {
-      response.status === 200 && navigate();
-    }, createErrorHandler());
+    ).then(
+      (response) => {
+        response.status === 201 && navigate();
+        showToast({
+          kind: 'success',
+          description: t('vaccinationSaved', 'Vaccination saved successfully'),
+        });
+      },
+      (err) => {
+        showNotification({
+          title: t('errorSaving', 'Error saving vaccination'),
+          kind: 'error',
+          critical: true,
+          description: err?.message,
+        });
+      },
+    );
     return () => abortController.abort();
   };
 

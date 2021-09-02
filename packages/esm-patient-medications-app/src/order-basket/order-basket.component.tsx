@@ -83,7 +83,6 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
       orderDrugs(items, patientUuid, abortController).then((erroredItems) => {
         setItems(erroredItems);
         fetchActivePatientOrders();
-
         if (erroredItems.length == 0) {
           closeWorkspace();
         }

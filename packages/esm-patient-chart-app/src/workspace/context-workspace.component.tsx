@@ -3,10 +3,9 @@ import ArrowRight16 from '@carbon/icons-react/es/arrow--right/16';
 import Maximize16 from '@carbon/icons-react/es/maximize/16';
 import Minimize16 from '@carbon/icons-react/es/minimize/16';
 import styles from './context-workspace.scss';
-import { ExtensionSlot, useLayoutType } from '@openmrs/esm-framework';
+import { ExtensionSlot, useLayoutType, useBodyScrollLock } from '@openmrs/esm-framework';
 import { RouteComponentProps } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useBodyScrollLock } from '@openmrs/esm-patient-common-lib';
 import { Header, HeaderGlobalAction, HeaderGlobalBar, HeaderName } from 'carbon-components-react/es/components/UIShell';
 import { useWorkspace } from '../hooks/useWorkspace';
 import { patientChartWorkspaceSlot } from '../constants';
@@ -29,6 +28,7 @@ const ContextWorkspace: React.FC<RouteComponentProps<ContextWorkspaceParams>> = 
     () => ({ closeWorkspace, patientUuid, isTablet }),
     [closeWorkspace, isTablet, patientUuid],
   );
+
   const [openContextWorkspace, setOpenContextWorkspace] = useState(false);
 
   useEffect(() => {

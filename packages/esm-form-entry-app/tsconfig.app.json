@@ -1,0 +1,25 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./out-tsc/app",
+    "types": [
+      "node",
+      "webpack-env"
+    ],
+    "paths": {
+      "@openmrs/esm-framework": [
+        "../../node_modules/@openmrs/esm-framework/dist/openmrs-esm-framework.js"
+      ]
+    }
+  },
+  "files": [
+    "src/index.ts"
+  ],
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "src/test.ts",
+    "src/**/*.spec.ts"
+  ]
+}

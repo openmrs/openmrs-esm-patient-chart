@@ -74,8 +74,10 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
           closeWorkspace();
 
           showToast({
+            critical: true,
+            title: t('vitalSignsRecorded', 'Vital Signs Recorded'),
             kind: 'success',
-            description: t('vitalsAndBiometricsSaved', 'Vitals and biometrics saved successfully'),
+            description: t('vitalsAndBiometricsSaved', 'Most recent vital signs are visible below the patient header'),
           });
         }
       })
