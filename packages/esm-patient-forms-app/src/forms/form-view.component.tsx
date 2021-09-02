@@ -1,10 +1,9 @@
-import React, { useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Search from 'carbon-components-react/es/components/Search';
-import debounce from 'lodash-es/debounce';
 import isEmpty from 'lodash-es/isEmpty';
 import styles from './form-view.component.scss';
 import { attach, navigate, usePagination, useVisit, Visit } from '@openmrs/esm-framework';
-import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
+import { PatientChartPagination } from './pagination-see-all.component';
 import { useTranslation } from 'react-i18next';
 import { Form } from '../types';
 import DataTable, {
@@ -23,6 +22,7 @@ import { formatDate, formEntrySub, sortFormLatestFirst } from './forms-utils';
 import EmptyFormView from './empty-form.component';
 import first from 'lodash-es/first';
 import { CoreHTMLForms } from '../core-html-forms';
+import debounce from 'lodash-es/debounce';
 
 function startVisitPrompt() {
   window.dispatchEvent(
@@ -62,22 +62,25 @@ interface FormViewProps {
   patientUuid: string;
   patient: fhir.Patient;
   encounterUuid?: string;
+  pageSize: number;
+  pageUrl: string;
+  urlLabel: string;
 }
 
 const filterFormsByName = (formName: string, forms: Array<Form>) => {
-  return forms.filter((form) => form.name.toLowerCase().search(formName.toLowerCase()) !== -1);
+  return forms.filter((form) => form.name.toLowerCase().search(formName?.toLowerCase()) !== -1);
 };
 
-const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient }) => {
+const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSize, pageUrl, urlLabel }) => {
   const { t } = useTranslation();
   const { currentVisit } = useVisit(patientUuid);
-  const [searchTerm, setSearchTerm] = React.useState<string>(null);
-  const [allForms, setAllForms] = React.useState<Array<Form>>(forms);
-  const { results, goTo, currentPage } = usePagination(allForms.sort(sortFormLatestFirst), 5);
+  const [searchTerm, setSearchTerm] = useState<string>(null);
+  const [allForms, setAllForms] = useState<Array<Form>>(forms);
+  const { results, goTo, currentPage } = usePagination(allForms.sort(sortFormLatestFirst), pageSize);
 
-  const handleSearch = React.useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), 300), []);
+  const handleSearch = useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), 300), []);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setAllForms(!isEmpty(searchTerm) ? filterFormsByName(searchTerm, forms) : forms);
   }, [searchTerm, forms]);
 
@@ -116,6 +119,7 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient }) => {
       </TableCell>
     );
   };
+
   return (
     <div className={styles.formContainer}>
       <Search
@@ -126,12 +130,12 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient }) => {
         onChange={(evnt) => handleSearch(evnt.target.value)}
       />
       <>
-        {!isEmpty(searchTerm) && !isEmpty(allForms) && (
+        {searchTerm?.length > 0 && allForms?.length > 0 && (
           <p className={styles.formResultsLabel}>
             {allForms.length} {t('matchFound', 'match found')}
           </p>
         )}
-        {!isEmpty(allForms) && (
+        {allForms.length && (
           <>
             <TableContainer className={styles.tableContainer}>
               <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="short">
@@ -166,9 +170,10 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient }) => {
               pageNumber={currentPage}
               totalItems={allForms.length}
               currentItems={results.length}
-              pageUrl={`chart/patient/${patientUuid}/forms`}
-              pageSize={5}
+              pageUrl={pageUrl}
+              pageSize={pageSize}
               onPageNumberChange={({ page }) => goTo(page)}
+              urlLabel={urlLabel}
             />
           </>
         )}

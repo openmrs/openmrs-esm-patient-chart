@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from 'react';
-import Forms from './forms-see-all';
+import Forms from './forms.component';
 import { useTranslation } from 'react-i18next';
 
 interface FormsProps {
