@@ -247,7 +247,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, isTablet }) =>
           placeholder="dd/mm/yyyy"
           onChange={([date]) => setEnrollmentDate(date)}
           value={enrollmentDate}>
-          <DatePickerInput id="enrollmentDateInput" labelText={t('dateEnrolled', 'Date enrolled')} />
+          <DatePickerInput id="enrollmentDateInput" labelText="" />
         </DatePicker>
       </FormGroup>
       <FormGroup legendText={t('dateCompleted', 'Date completed')}>
