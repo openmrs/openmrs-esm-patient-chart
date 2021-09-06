@@ -118,7 +118,7 @@ const MedicationsDetailsTable = connect<
     return (
       <DataTable headers={tableHeaders} rows={tableRows} isSortable={true} sortRow={sortRow}>
         {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-          <TableContainer title={title}>
+          <TableContainer className={styles.tableHeader} title={title}>
             {showAddNewButton && (
               <TableToolbar>
                 <TableToolbarContent>
