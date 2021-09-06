@@ -6,7 +6,7 @@ import { useWorkspace } from '../hooks/useWorkspace';
 interface WindowSize {
   size: string;
 }
-type ActionTypes = 'minimize' | 'maximize' | 'hide' | 'reopen';
+type ActionTypes = 'minimize' | 'maximize' | 'hide' | 'reopen' | string;
 
 interface ContextWindowSizeContextShape {
   windowSize: WindowSize;

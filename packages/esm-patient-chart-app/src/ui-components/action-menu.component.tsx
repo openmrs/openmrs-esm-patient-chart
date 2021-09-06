@@ -25,11 +25,11 @@ export const ActionMenu: React.FC<ActionMenuInterface> = ({ open }) => {
   const { openWindows, updateWindowSize, windowSize } = useContextWorkspace();
 
   const checkViewMode = () => {
-    if (screenMode === 'maximize') {
-      updateWindowSize('maximize');
-    } else {
-      updateWindowSize('reopen');
-    }
+    if (windowSize.size === 'maximize') {
+      updateWindowSize('hide');
+    } else if (windowSize.size === 'normal') {
+      updateWindowSize('hide');
+    } else updateWindowSize(screenMode ?? 'reopen');
   };
 
   const menu = isDesktop(layout) ? (
