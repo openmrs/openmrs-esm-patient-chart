@@ -10,7 +10,7 @@ export interface RootMedicationSummaryProps {
 
 export default function RootMedicationSummary({ patientUuid }: RootMedicationSummaryProps) {
   return (
-    <div className={styles.resetPatientChartWidgetContainer}>
+    <div>
       <Provider store={orderBasketStore}>
         <MedicationsSummary patientUuid={patientUuid} />
       </Provider>

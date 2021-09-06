@@ -1,5 +1,5 @@
-import React, { FunctionComponent } from 'react';
-import Forms from './forms-see-all';
+import React from 'react';
+import Forms from './forms.component';
 import { useTranslation } from 'react-i18next';
 
 interface FormsProps {
@@ -7,7 +7,7 @@ interface FormsProps {
   patient: fhir.Patient;
 }
 
-const FormsSeeAll: FunctionComponent<FormsProps> = ({ patientUuid, patient }) => {
+const FormsDetailedOverView: React.FC<FormsProps> = ({ patientUuid, patient }) => {
   const pageSize: number = 10;
   const { t } = useTranslation();
   const urlLabel: string = t('goToSummary', 'Go to Summary');
@@ -18,4 +18,4 @@ const FormsSeeAll: FunctionComponent<FormsProps> = ({ patientUuid, patient }) =>
   );
 };
 
-export default FormsSeeAll;
+export default FormsDetailedOverView;

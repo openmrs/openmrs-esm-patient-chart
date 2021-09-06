@@ -42,7 +42,7 @@ function setupOpenMRS() {
       {
         id: 'forms-widget',
         slot: 'patient-chart-summary-dashboard-slot',
-        load: getAsyncLifecycle(() => import('./forms/formsSummaryDashboard.component'), options),
+        load: getAsyncLifecycle(() => import('./forms/forms-overview.component'), options),
         meta: {
           columnSpan: 4,
         },
@@ -61,7 +61,7 @@ function setupOpenMRS() {
       {
         id: 'patient-form-dashboard',
         slot: dashboardMeta.slot,
-        load: getAsyncLifecycle(() => import('./forms/formsSeeAll.component'), options),
+        load: getAsyncLifecycle(() => import('./forms/forms-detailed-overview.component'), options),
         online: true,
         offline: true,
       },

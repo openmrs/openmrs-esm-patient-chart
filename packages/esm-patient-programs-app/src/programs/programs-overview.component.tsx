@@ -47,7 +47,10 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ patientUuid }) => {
     }
   }, [patientUuid]);
 
-  const launchProgramsForm = React.useCallback(() => attach('patient-chart-workspace-slot', 'programs-workspace'), []);
+  const launchProgramsForm = React.useCallback(
+    () => attach('patient-chart-workspace-slot', 'programs-form-workspace'),
+    [],
+  );
 
   const headers = [
     {
