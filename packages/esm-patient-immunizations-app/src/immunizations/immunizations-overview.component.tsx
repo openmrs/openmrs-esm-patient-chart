@@ -61,7 +61,7 @@ const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = ({ patient, 
   ];
 
   const launchImmunizationsForm = () => {
-    attach('patient-chart-workspace-slot', 'immunization-workspace-form');
+    attach('patient-chart-workspace-slot', 'immunization-form-workspace');
   };
 
   const RenderImmunizations: React.FC = () => {

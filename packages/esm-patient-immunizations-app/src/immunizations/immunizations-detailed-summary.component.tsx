@@ -42,7 +42,7 @@ enum StateTypes {
 const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> = ({ patientUuid, patient }) => {
   const { immunizationsConfig } = useConfig();
   const { t, i18n } = useTranslation();
-  const [allImmunizations, setAllImmunizations] = useState(null);
+  const [allImmunizations, setAllImmunizations] = useState<Array<Immunization>>([]);
   const [error, setError] = useState(null);
   const locale = i18n.language.replace('_', '-');
   const [status, setStatus] = useState(StateTypes.PENDING);
@@ -89,7 +89,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
   }, [patient, patientUuid, immunizationsConfig]);
 
   const launchImmunizationForm = React.useCallback(
-    () => attach('patient-chart-workspace-slot', 'immunization-workspace-form'),
+    () => attach('patient-chart-workspace-slot', 'immunization-form-workspace'),
     [],
   );
 

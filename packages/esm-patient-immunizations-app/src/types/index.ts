@@ -10,6 +10,14 @@ export interface Immunization {
   existingDoses: Array<ExistingDoses>;
   vaccineName: string;
   vaccineUuid: string;
+  immunizationObsUuid?: string;
+  manufacturer?: string;
+  expirationDate?: string;
+  occurrenceDateTime?: string;
+  lotNumber?: string;
+  sequenceLabel?: string;
+  sequenceNumber?: string | number;
+  formChanged?: any;
 }
 
 export interface Sequence {

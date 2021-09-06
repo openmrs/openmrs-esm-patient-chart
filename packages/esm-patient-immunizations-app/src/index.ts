@@ -49,7 +49,7 @@ function setupOpenMRS() {
         meta: dashboardMeta,
       },
       {
-        id: 'immunization-workspace-form',
+        id: 'immunization-form-workspace',
         load: getAsyncLifecycle(() => import('./immunizations/immunizations-form.component'), options),
         meta: {
           title: 'Immunization Form',
