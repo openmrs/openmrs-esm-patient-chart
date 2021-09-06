@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useReducer, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import get from 'lodash-es/get';
 import orderBy from 'lodash-es/orderBy';
 import styles from './immunizations-detailed-summary.scss';
