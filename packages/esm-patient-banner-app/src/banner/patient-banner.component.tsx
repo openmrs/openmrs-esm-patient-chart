@@ -29,7 +29,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid }) =
           <ExtensionSlot extensionSlotName="patient-photo-slot" state={state} />
         </div>
         <div className={styles.patientInfo}>
-          <div className={styles.row}>
+          <div className={`${styles.row} ${styles.patientNameRow}`}>
             <div className={styles.flexRow}>
               <span className={styles.patientName}>
                 {patient.name[0].given.join(' ')} {patient.name[0].family}
@@ -57,11 +57,9 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid }) =
               </CustomOverflowMenuComponent>
             </div>
           </div>
-          <div className={styles.row}>
-            <div className={styles.demographics}>
-              <span>{capitalize(patient.gender)}</span> &middot; <span>{age(patient.birthDate)}</span> &middot;{' '}
-              <span>{dayjs(patient.birthDate).format('DD - MMM - YYYY')}</span>
-            </div>
+          <div className={styles.demographics}>
+            <span>{capitalize(patient.gender)}</span> &middot; <span>{age(patient.birthDate)}</span> &middot;{' '}
+            <span>{dayjs(patient.birthDate).format('DD - MMM - YYYY')}</span>
           </div>
           <div className={styles.row}>
             <span className={styles.identifiers}>{patient.identifier.map((i) => i.value).join(', ')}</span>
