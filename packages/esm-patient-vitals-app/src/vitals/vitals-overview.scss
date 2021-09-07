@@ -46,3 +46,7 @@
 .customTable  tbody  tr:nth-child(even)  td {
   background-color: #f4f4f4;
 }
+
+.customTable {
+  width: max-content;
+}
