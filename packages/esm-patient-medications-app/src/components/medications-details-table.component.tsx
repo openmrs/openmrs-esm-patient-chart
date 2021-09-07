@@ -86,20 +86,20 @@ const MedicationsDetailsTable = connect<
         sortKey: medication.drug?.name,
         content: (
           <p className={styles.bodyLong01}>
-            <strong>{capitalize(medication.drug?.name)}</strong> &mdash; {medication.doseUnits?.display} &mdash;{' '}
-            {medication.route?.display}
+            <strong>{capitalize(medication.drug?.name)}</strong> &mdash; {medication.drug?.strength} &mdash;{' '}
+            {medication.doseUnits?.display}
             <br />
             <span className={styles.label01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
             <strong>{getDosage(medication.drug?.strength, medication.dose).toLowerCase()}</strong> &mdash;{' '}
-            {medication.frequency?.display} &mdash;{' '}
+            {medication.route?.display} &mdash; {medication.frequency?.display} &mdash;{' '}
             {!medication.duration
               ? t('medicationIndefiniteDuration', 'Indefinite duration')
               : t('medicationDurationAndUnit', 'for {duration} {durationUnit}', {
                   duration: medication.duration,
                   durationUnit: medication.durationUnits?.display,
-                })}
+                })}{' '}
+            {medication.numRefills ? `&mdash; ${t('refills', 'Refills').toUpperCase()} ${medication.numRefills}` : ''}
             <br />
-            <span className={styles.label01}>{t('refills', 'Refills').toUpperCase()}</span> {medication.numRefills}
           </p>
         ),
       },
@@ -149,7 +149,7 @@ const MedicationsDetailsTable = connect<
                     {row.cells.map((cell) => (
                       <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                     ))}
-                    <TableCell className="bx--table-column-menu">
+                    <TableCell className="bx--table-column-menu" style={{ padding: '0.5rem 0' }}>
                       <OrderBasketItemActions
                         showDiscontinueButton={showDiscontinueButton}
                         showModifyButton={showModifyButton}
