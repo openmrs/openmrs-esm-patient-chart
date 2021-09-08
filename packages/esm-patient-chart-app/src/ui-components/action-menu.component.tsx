@@ -32,7 +32,7 @@ export const ActionMenu: React.FC<ActionMenuInterface> = ({ open }) => {
       } else if (windowSize.size === 'normal') {
         updateWindowSize('hide');
       } else {
-        updateWindowSize((screenMode as ScreenModeTypes) ?? 'reopen');
+        updateWindowSize(screenMode);
       }
     }
   };
