@@ -4,7 +4,6 @@ import { Visit, getVisitsForPatient, createErrorHandler } from '@openmrs/esm-fra
 import SkeletonText from 'carbon-components-react/es/components/SkeletonText';
 import VisitDetailComponent from './past-visits-components/visit-detail.component';
 import { useTranslation } from 'react-i18next';
-import { filter } from 'lodash';
 
 interface VisitOverviewComponentProps {
   patientUuid: string;

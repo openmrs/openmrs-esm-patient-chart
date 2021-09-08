@@ -51,39 +51,35 @@ const EndVisitPrompt: React.FC<EndVisitPromptProps> = ({ patientUuid, openModal,
   };
 
   return (
-    <>
-      {currentVisit && (
-        <ComposedModal open={openModal} onClose={() => closeModal()}>
-          <ModalHeader>
-            <span className={styles.productiveHeading03}>{t('noActiveVisit', 'End Current visit')}</span>
-          </ModalHeader>
-          <ModalBody>
-            <p className={styles.customLabel}>
-              <span>{t('startDate', 'Start Date')}</span>
-              <span>{new Date(currentVisit?.startDatetime).toLocaleDateString(locale, { dateStyle: 'medium' })}</span>
-            </p>
-            <p className={styles.customLabel}>
-              <span>{t('visitType', 'Visit Type')}</span> <span>{currentVisit?.visitType?.display}</span>
-            </p>
-            <p className={styles.customLabel}>
-              <span>{t('visitLocation', 'Visit Location')}</span> <span>{currentVisit?.location?.display}</span>
-            </p>
-          </ModalBody>
-          <div className={styles.buttonContainer}>
-            <div className={styles.left}>
-              <Button onClick={closeModal} kind="ghost">
-                {t('cancel', 'Cancel')}
-              </Button>
-            </div>
-            <div className={styles.right}>
-              <Button onClick={endCurrentVisit} kind="primary">
-                {t('endVisit', 'End Visit')}
-              </Button>
-            </div>
-          </div>
-        </ComposedModal>
-      )}
-    </>
+    <ComposedModal open={openModal} onClose={() => closeModal()}>
+      <ModalHeader>
+        <span className={styles.productiveHeading03}>{t('noActiveVisit', 'End Current visit')}</span>
+      </ModalHeader>
+      <ModalBody>
+        <p className={styles.customLabel}>
+          <span>{t('startDate', 'Start Date')}</span>
+          <span>{new Date(currentVisit?.startDatetime).toLocaleDateString(locale, { dateStyle: 'medium' })}</span>
+        </p>
+        <p className={styles.customLabel}>
+          <span>{t('visitType', 'Visit Type')}</span> <span>{currentVisit?.visitType?.display}</span>
+        </p>
+        <p className={styles.customLabel}>
+          <span>{t('visitLocation', 'Visit Location')}</span> <span>{currentVisit?.location?.display}</span>
+        </p>
+      </ModalBody>
+      <div className={styles.buttonContainer}>
+        <div className={styles.left}>
+          <Button onClick={closeModal} kind="ghost">
+            {t('cancel', 'Cancel')}
+          </Button>
+        </div>
+        <div className={styles.right}>
+          <Button onClick={endCurrentVisit} kind="primary">
+            {t('endVisit', 'End Visit')}
+          </Button>
+        </div>
+      </div>
+    </ComposedModal>
   );
 };
 
