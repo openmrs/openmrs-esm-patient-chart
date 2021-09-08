@@ -7,7 +7,7 @@ const TestsSummary = ({ patientUuid, encounters }: { patientUuid: string; encoun
   const filter = React.useMemo<ExternalOverviewProps['filter']>(() => {
     const encounterIds = encounters.map((e) => `Encounter/${e.uuid}`);
     return ([entry]) => {
-      return encounterIds.includes(entry.encounter.reference);
+      return encounterIds.includes(entry.encounter?.reference);
     };
   }, [encounters]);
 
