@@ -1,7 +1,8 @@
 import React from 'react';
-import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { fetchPatientRelationships } from './relationships.resource';
 import ContactDetails from './contact-details.component';
+import { waitForLoadingToFinish } from '../../../../tools/test-helpers';
 
 const testProps = {
   address: [
@@ -66,10 +67,4 @@ describe('ContactDetails: ', () => {
 
 function renderContactDetails() {
   render(<ContactDetails {...testProps} />);
-}
-
-function waitForLoadingToFinish() {
-  waitForElementToBeRemoved(() => [...screen.queryAllByRole(/progressbar/i, ...screen.queryAllByText(/loading/i))], {
-    timeout: 4000,
-  });
 }
