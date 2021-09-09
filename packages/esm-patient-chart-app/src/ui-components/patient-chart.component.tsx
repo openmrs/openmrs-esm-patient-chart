@@ -26,8 +26,8 @@ const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({ match
   const { windowSize, openWindows } = useContextWorkspace();
 
   useEffect(() => {
-    !loading && detachAll('patient-chart-workspace-slot');
-  }, [loading]);
+    detachAll('patient-chart-workspace-slot');
+  }, [patientUuid]);
 
   const mainClassName = `omrs-main-content ${styles.chartContainer}`;
 
