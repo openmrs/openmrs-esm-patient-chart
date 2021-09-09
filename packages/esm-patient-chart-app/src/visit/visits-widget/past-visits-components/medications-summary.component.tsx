@@ -15,7 +15,6 @@ interface MedicationSummaryProps {
 
 const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) => {
   const { t } = useTranslation();
-
   return (
     <React.Fragment>
       {medications.length > 0 ? (

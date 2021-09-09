@@ -19,15 +19,25 @@ import TextInput from 'carbon-components-react/lib/components/TextInput/TextInpu
 import { OpenMRSResource } from '../../types';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
 
-enum StateTypes {
-  PENDING = 'pending',
-  RESOLVED = 'resolved',
-  ERROR = 'error',
+enum ActionTypes {
+  pending = 'pending',
+  resolved = 'resolved',
+  error = 'error',
+}
+interface Pending {
+  type: ActionTypes.pending;
+}
+interface Error {
+  type: ActionTypes.error;
+  payload: Error;
 }
 
-interface ActionType {
-  type: 'pending' | 'resolved' | 'error';
+interface Resolved {
+  type: ActionTypes.resolved;
+  payload: AllergyAndReactions;
 }
+
+type Action = Pending | Error | Resolved;
 
 enum AllergenType {
   FOOD = 'FOOD',
@@ -49,14 +59,20 @@ interface AllergyAndReactions {
   allergyReaction: Array<OpenMRSResource>;
 }
 
-const formStatusReducer = (state: StateTypes, action: ActionType) => {
+interface PatientAllergenAndReactions {
+  status: 'pending' | 'resolved' | 'error';
+  allergenAndReaction: AllergyAndReactions;
+  error?: null | Error;
+}
+
+const formStatusReducer = (state: PatientAllergenAndReactions, action: Action): PatientAllergenAndReactions => {
   switch (action.type) {
     case 'pending':
-      return StateTypes.PENDING;
+      return { ...state, status: action.type };
     case 'resolved':
-      return StateTypes.RESOLVED;
+      return { allergenAndReaction: action.payload, status: action.type };
     case 'error':
-      return StateTypes.ERROR;
+      return { ...state, error: action.payload, status: action.type };
   }
 };
 
@@ -73,17 +89,18 @@ const AllergyForm: React.FC<AllergyFormProps> = ({ isTablet, closeWorkspace, pat
     moderateReactionUuid,
     otherConceptUuid,
   } = React.useMemo(() => concepts, [concepts]);
-  const [allergenAndReaction, setAllergenAndReactions] = React.useState<AllergyAndReactions>();
   const [comment, setComment] = React.useState<string>();
   const [patientReactions, setPatientReactions] = React.useState<Array<string>>([]);
   const [selectedAllergen, setSelectedAllergen] = React.useState<string>();
   const [severityOfReaction, setSeverityOfReaction] = React.useState<string>();
   const [dateOfOnset, setDateOfOnset] = React.useState<string | Date>();
-  const [status, dispatch] = React.useReducer(formStatusReducer, StateTypes.PENDING);
+  const [{ status, allergenAndReaction, error }, dispatch] = React.useReducer(formStatusReducer, {
+    status: ActionTypes.pending,
+    allergenAndReaction: null,
+  });
   const [allergenType, setAllergenType] = React.useState<AllergenType>(AllergenType.DRUG);
   const [otherReaction, setOtherReaction] = React.useState<string>();
   const [otherAllergen, setOtherAllergen] = React.useState<string>();
-  const [error, setError] = React.useState();
 
   React.useEffect(() => {
     if (drugAllergenUuid && foodAllergenUuid && environmentalAllergenUuid) {
@@ -94,13 +111,10 @@ const AllergyForm: React.FC<AllergyFormProps> = ({ isTablet, closeWorkspace, pat
         allergyReactionUuid,
       ]).subscribe(
         (data) => {
-          setAllergenAndReactions(data);
-          dispatch({ type: 'resolved' });
+          dispatch({ type: ActionTypes.resolved, payload: data });
         },
         (error) => {
-          setError(error);
-          createErrorHandler();
-          dispatch({ type: 'error' });
+          dispatch({ type: ActionTypes.error, payload: error });
         },
       );
       return () => sub.unsubscribe();
@@ -156,27 +170,27 @@ const AllergyForm: React.FC<AllergyFormProps> = ({ isTablet, closeWorkspace, pat
     };
 
     const ac = new AbortController();
-    savePatientAllergy(restApiPayLoad, patientUuid, ac).then((response) => {
-      if (response.status === 201) {
-        closeWorkspace();
+    savePatientAllergy(restApiPayLoad, patientUuid, ac).then(
+      (response) => {
+        if (response.status === 201) {
+          closeWorkspace();
 
-        showToast({
-          kind: 'success',
-          description: t('allergySaved', 'Allergy saved successfully'),
-        });
-      }
+          showToast({
+            kind: 'success',
+            description: t('allergySaved', 'Allergy saved successfully'),
+          });
+        }
+      },
       (err) => {
-        createErrorHandler();
-        dispatch({ type: 'error' });
-        setError(error);
+        dispatch({ type: ActionTypes.error, payload: err });
         showNotification({
           title: t('allergySaveError', 'Error saving allergy'),
           kind: 'error',
           critical: true,
           description: err?.message,
         });
-      };
-    });
+      },
+    );
     return () => ac.abort();
   }, [
     selectedAllergen,
@@ -190,13 +204,12 @@ const AllergyForm: React.FC<AllergyFormProps> = ({ isTablet, closeWorkspace, pat
     otherReaction,
     closeWorkspace,
     t,
-    error,
   ]);
 
   return (
     <main className={styles.allergyFormWrapper}>
-      {status === StateTypes.PENDING && <SearchSkeleton />}
-      {status === StateTypes.RESOLVED && (
+      {status === ActionTypes.pending && <SearchSkeleton />}
+      {status === ActionTypes.resolved && (
         <>
           <div>
             <header className={styles.productiveHeading03}>{t('allergenAndReaction', 'Allergen and Reactions')}</header>
@@ -209,7 +222,7 @@ const AllergyForm: React.FC<AllergyFormProps> = ({ isTablet, closeWorkspace, pat
                   onSelectionChange={handleAllergenTypeChange}
                   tabContentClassName={styles.allergyFormTabs}
                   scrollIntoView={true}>
-                  <Tab href="#" id="tab-1" label={t('drug', 'Drug')}>
+                  <Tab id="tab-1" label={t('drug', 'Drug')}>
                     <AllergyFormTab
                       name={'drug'}
                       allergens={allergenAndReaction?.drugAllergens}
@@ -217,7 +230,7 @@ const AllergyForm: React.FC<AllergyFormProps> = ({ isTablet, closeWorkspace, pat
                       handleChange={setSelectedAllergen}
                     />
                   </Tab>
-                  <Tab href="#" id="tab-2" label={t('food', 'Food')}>
+                  <Tab id="tab-2" label={t('food', 'Food')}>
                     <AllergyFormTab
                       name="food"
                       allergens={allergenAndReaction?.foodAllergens}
@@ -225,7 +238,7 @@ const AllergyForm: React.FC<AllergyFormProps> = ({ isTablet, closeWorkspace, pat
                       handleChange={setSelectedAllergen}
                     />
                   </Tab>
-                  <Tab href="#" id="tab-3" label={t('environmental', 'Environmental')}>
+                  <Tab id="tab-3" label={t('environmental', 'Environmental')}>
                     <AllergyFormTab
                       name="environment"
                       allergens={allergenAndReaction?.environmentalAllergens}
@@ -332,7 +345,7 @@ const AllergyForm: React.FC<AllergyFormProps> = ({ isTablet, closeWorkspace, pat
           </div>
         </>
       )}
-      {status === StateTypes.ERROR && <ErrorState headerTitle={'Allergy Form Error'} error={error} />}
+      {status === ActionTypes.error && <ErrorState headerTitle={'Allergy Form Error'} error={error} />}
     </main>
   );
 };

@@ -20,6 +20,7 @@ import {
 } from '../../../../__mocks__/visit-note.mock';
 import VisitNotesForm from './visit-notes-form.component';
 import { mockSessionDataResponse } from '../../../../__mocks__/session.mock';
+import { getByTextWithMarkup } from '../../../../tools/test-helpers';
 
 jest.mock('lodash-es/debounce', () => jest.fn((fn) => fn));
 
@@ -113,18 +114,7 @@ describe('Visit notes form: ', () => {
 
     const searchbox = screen.getByRole('searchbox');
     userEvent.type(searchbox, 'COVID-21');
-
-    expect(
-      screen.getByText((content, node) => {
-        const textMatch = 'No diagnoses found matching "COVID-21"';
-        const hasText = (node: Element) => node.textContent === textMatch || node.textContent.match(textMatch);
-
-        const nodeHasText = hasText(node);
-        const childrenDontHaveText = Array.from(node.children).every((child) => !hasText(child));
-
-        return nodeHasText && childrenDontHaveText;
-      }),
-    ).toBeInTheDocument();
+    expect(getByTextWithMarkup('No diagnoses found matching "COVID-21"')).toBeInTheDocument();
   });
 
   it('closes the form and the workspace when the cancel button is clicked', () => {
