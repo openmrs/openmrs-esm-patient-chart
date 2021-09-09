@@ -30,7 +30,7 @@ const BiometricsPagination: React.FC<FormsProps> = ({ tableRows, pageSize, pageU
           {({ rows, headers, getHeaderProps, getTableProps }) => (
             <Table {...getTableProps()} className={styles.customTable}>
               <TableHead>
-                <TableRow>
+                <TableRow className={styles.customRow}>
                   {headers.map((header) => (
                     <TableHeader
                       className={`${styles.productiveHeading01} ${styles.text02}`}
@@ -45,7 +45,7 @@ const BiometricsPagination: React.FC<FormsProps> = ({ tableRows, pageSize, pageU
               </TableHead>
               <TableBody>
                 {rows.map((row) => (
-                  <TableRow key={row.id}>
+                  <TableRow key={row.id} className={styles.customRow}>
                     {row.cells.map((cell) => (
                       <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                     ))}

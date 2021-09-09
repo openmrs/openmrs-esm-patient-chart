@@ -47,6 +47,8 @@
   background-color: #f4f4f4;
 }
 
-.customTable {
-  min-width: max-content;
+.customRow {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-columns: max-content;
 }
