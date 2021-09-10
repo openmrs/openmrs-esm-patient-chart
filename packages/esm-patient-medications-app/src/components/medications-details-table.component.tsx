@@ -85,7 +85,7 @@ const MedicationsDetailsTable = connect<
       details: {
         sortKey: medication.drug?.name,
         content: (
-          <p className={styles.bodyLong01}>
+          <p className={`${styles.bodyLong01} ${styles.medicationRecord}`}>
             <strong>{capitalize(medication.drug?.name)}</strong> &mdash; {medication.drug?.strength} &mdash;{' '}
             {medication.doseUnits?.display}
             <br />
@@ -98,8 +98,7 @@ const MedicationsDetailsTable = connect<
                   duration: medication.duration,
                   durationUnit: medication.durationUnits?.display,
                 })}{' '}
-            {medication.numRefills ? `&mdash; ${t('refills', 'Refills').toUpperCase()} ${medication.numRefills}` : ''}
-            <br />
+            <br /> {t('refills', 'Refills').toUpperCase()} {medication.numRefills}
           </p>
         ),
       },
@@ -149,7 +148,7 @@ const MedicationsDetailsTable = connect<
                     {row.cells.map((cell) => (
                       <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                     ))}
-                    <TableCell className="bx--table-column-menu" style={{ padding: '0.5rem 0' }}>
+                    <TableCell className="bx--table-column-menu">
                       <OrderBasketItemActions
                         showDiscontinueButton={showDiscontinueButton}
                         showModifyButton={showModifyButton}
