@@ -11,4 +11,20 @@
 .medicationRecord {
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.leftColumn {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.indicationRow {
+  padding: 0.25rem 0;
 }

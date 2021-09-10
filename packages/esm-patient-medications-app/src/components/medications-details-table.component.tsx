@@ -27,6 +27,7 @@ import { OrderBasketStore, OrderBasketStoreActions, orderBasketStoreActions } fr
 import { Order } from '../types/order';
 import { OrderBasketItem } from '../types/order-basket-item';
 import { attach } from '@openmrs/esm-framework';
+import User16 from '@carbon/icons-react/es/user/16';
 
 export interface ActiveMedicationsProps {
   title?: string;
@@ -85,26 +86,59 @@ const MedicationsDetailsTable = connect<
       details: {
         sortKey: medication.drug?.name,
         content: (
-          <p className={`${styles.bodyLong01} ${styles.medicationRecord}`}>
-            <strong>{capitalize(medication.drug?.name)}</strong> &mdash; {medication.drug?.strength} &mdash;{' '}
-            {medication.doseUnits?.display}
-            <br />
-            <span className={styles.label01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
-            <strong>{getDosage(medication.drug?.strength, medication.dose).toLowerCase()}</strong> &mdash;{' '}
-            {medication.route?.display} &mdash; {medication.frequency?.display} &mdash;{' '}
-            {!medication.duration
-              ? t('medicationIndefiniteDuration', 'Indefinite duration')
-              : t('medicationDurationAndUnit', 'for {duration} {durationUnit}', {
-                  duration: medication.duration,
-                  durationUnit: medication.durationUnits?.display,
-                })}{' '}
-            <br /> {t('refills', 'Refills').toUpperCase()} {medication.numRefills}
-          </p>
+          <div className={styles.medicationRecord}>
+            <div>
+              <p className={styles.bodyLong01}>
+                <strong>{capitalize(medication.drug?.name)}</strong> &mdash; {medication.drug?.strength.toLowerCase()}{' '}
+                &mdash; {medication.doseUnits?.display.toLowerCase()}
+              </p>
+              <p className={styles.bodyLong01}>
+                <span className={styles.label01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
+                <strong>{getDosage(medication.drug?.strength, medication.dose).toLowerCase()}</strong>
+                &mdash; {medication.route?.display.toLowerCase()} &mdash; {medication.frequency?.display.toLowerCase()}
+                &mdash;{' '}
+                {!medication.duration
+                  ? t('medicationIndefiniteDuration', 'Indefinite duration').toLowerCase()
+                  : t('medicationDurationAndUnit', 'for {duration} {durationUnit}', {
+                      duration: medication.duration,
+                      durationUnit: medication.durationUnits?.display.toLowerCase(),
+                    })}{' '}
+                {medication.numRefills !== 0 && (
+                  <span>
+                    <span className={styles.label01}> &mdash; {t('refills', 'Refills').toUpperCase()}</span>{' '}
+                    {medication.numRefills}
+                  </span>
+                )}
+                {medication.dosingInstructions && (
+                  <span> &mdash; {medication.dosingInstructions.toLocaleLowerCase()}</span>
+                )}
+              </p>
+            </div>
+            <p className={`${styles.bodyLong01} ${styles.indicationRow}`}>
+              <span>
+                <span className={styles.label01}>{t('indication', 'Indication').toUpperCase()}</span>{' '}
+                {medication.orderReasonNonCoded}
+              </span>
+              {medication.quantity !== 0 && (
+                <span>
+                  <span className={styles.label01}> &mdash; {t('quantity', 'Quantity').toUpperCase()}</span>{' '}
+                  {medication.quantity}
+                </span>
+              )}
+            </p>
+          </div>
         ),
       },
       startDate: {
         sortKey: dayjs(medication.dateActivated).toDate(),
-        content: dayjs(medication.dateActivated).format('DD-MMM-YYYY'),
+        content: (
+          <div className={styles.leftColumn}>
+            <span>{dayjs(medication.dateActivated).format('DD-MMM-YYYY')}</span>
+            <span className={styles.indicationRow}>
+              <User16 />
+            </span>
+          </div>
+        ),
       },
     }));
 
@@ -117,7 +151,7 @@ const MedicationsDetailsTable = connect<
     return (
       <DataTable headers={tableHeaders} rows={tableRows} isSortable={true} sortRow={sortRow}>
         {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-          <TableContainer className={styles.tableHeader} title={title}>
+          <TableContainer className={styles.tableHeader} title={title} zebra>
             {showAddNewButton && (
               <TableToolbar>
                 <TableToolbarContent>

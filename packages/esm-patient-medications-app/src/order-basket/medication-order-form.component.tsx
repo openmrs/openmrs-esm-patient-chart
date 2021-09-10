@@ -377,6 +377,7 @@ export default function MedicationOrderForm({
                     indication: e.target.value,
                   })
                 }
+                required
                 maxLength={150}
               />
             </Column>
