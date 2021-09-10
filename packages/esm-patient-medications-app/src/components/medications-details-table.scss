@@ -1,6 +1,19 @@
 @import "../root";
 
-.tableHeader > :global(.bx--data-table-header) > h4:after {
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-04 0 $spacing-04 $spacing-05;
+  background-color: $ui-background;
+}
+
+.cardHeader h4 {
+  @include carbon--type-style("productive-heading-03");
+  color: $text-02;
+}
+
+.cardHeader > h4:after {
   content: "";
   display: block;
   width: 2rem;
