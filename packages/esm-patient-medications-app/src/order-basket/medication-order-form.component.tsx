@@ -54,10 +54,14 @@ export default function MedicationOrderForm({
           ) : (
             <>
               <span>
-                <strong>{capitalize(orderBasketItem.commonMedicationName)}</strong> &mdash; {orderBasketItem.route.name}{' '}
-                &mdash; {orderBasketItem.dosageUnit.name} &mdash;{' '}
-                <span className={styles.label01}>{t('dose', 'Dose').toUpperCase()}</span> &mdash;{' '}
-                <strong>{orderBasketItem.dosage.dosage}</strong>
+                <strong className={styles.dosageInfo}>
+                  {capitalize(orderBasketItem.commonMedicationName)} ({orderBasketItem.dosage.dosage})
+                </strong>{' '}
+                <span className={styles.bodyShort01}>
+                  &mdash; {orderBasketItem.route.name} &mdash; {orderBasketItem.dosageUnit.name} &mdash;{' '}
+                </span>
+                <span className={styles.caption01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
+                <strong className={styles.dosageInfo}>{orderBasketItem.dosage.dosage}</strong>
               </span>
             </>
           )}
@@ -390,10 +394,10 @@ export default function MedicationOrderForm({
 
         <ButtonSet style={{ marginTop: '2rem' }}>
           <Button kind="secondary" onClick={onCancel}>
-            {t('cancel', 'Cancel')}
+            {t('discard', 'Discard')}
           </Button>
           <Button kind="primary" type="submit">
-            {t('save', 'Save')}
+            {t('saveOrder', 'Save order')}
           </Button>
         </ButtonSet>
       </Form>

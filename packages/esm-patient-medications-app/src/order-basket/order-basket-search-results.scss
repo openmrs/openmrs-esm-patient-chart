@@ -1,5 +1,64 @@
 @import "../root";
 
+.desktopSearchResultTile {
+  margin-top: 0.3125rem;
+  border-left: 4px solid $brand-teal-01;
+
+  &:not(:last-of-type) {
+    margin-bottom: 0.5rem;
+  }
+}
+
+.tabletSearchResultTile {
+  margin-top: 0.3125rem;
+  border-left: 2px solid $brand-teal-01;
+
+  &:not(:last-of-type) {
+    margin-bottom: 1rem;
+  }
+}
+
+.divider {
+  border: 0;
+  border-top: 1px solid $color-gray-30;
+  width: 66.66666667%;
+}
+
+.desktopDivider {
+  margin: 3rem auto;
+}
+
+.tabletDivider {
+  margin: 2.5rem auto;
+}
+
+.searchResultsCount {
+  @include carbon--type-style('body-short-01');
+  color: $text-02;
+}
+
+.orderBasketSearchResultsHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.875rem;
+}
+
 .searchResultTile {
-  border-left: 2px solid $interactive-01;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.medicationIcon {
+  flex: 0 0 auto;
+  margin-right: 1.25rem;
+}
+
+.searchResultTileContent {
+  flex: 1 1 auto;
+}
+
+.addToBasketButton {
+  color: #000;
+  flex: 0 0 auto;
 }

@@ -1,16 +1,19 @@
 import React from 'react';
+import { Tile } from 'carbon-components-react/es/components/Tile';
 import OrderBasketItemTile from './order-basket-item.component';
 import styles from './order-basket-item-list.scss';
 import { useTranslation } from 'react-i18next';
 import { OrderBasketItem } from '../types/order-basket-item';
 
 export interface OrderBasketItemListProps {
+  isTablet: boolean;
   orderBasketItems: Array<OrderBasketItem>;
   onItemClicked: (order: OrderBasketItem) => void;
   onItemRemoveClicked: (order: OrderBasketItem) => void;
 }
 
 export default function OrderBasketItemList({
+  isTablet,
   orderBasketItems,
   onItemClicked,
   onItemRemoveClicked,
@@ -22,19 +25,33 @@ export default function OrderBasketItemList({
   const discontinuedOrderBasketItems = orderBasketItems.filter((x) => x.action === 'DISCONTINUE');
 
   return (
-    <>
-      <h3 className={styles.productiveHeading02}>{t('orderBasket', 'Order Basket')}</h3>
-      {orderBasketItems.length === 0 && <p>{t('emptyMedicationOrderBasket', 'Your basket is currently empty.')}</p>}
+    <div className={isTablet ? `${styles.orderBasketContainerTablet}` : `${styles.orderBasketContainerDesktop}`}>
+      {orderBasketItems.length === 0 && (
+        <Tile light className={isTablet ? `${styles.tabletTile}` : `${styles.desktopTile}`}>
+          <h3 className={styles.heading}>{t('orderBasket', 'Order Basket')}</h3>
+          <p className={styles.content}>{t('emptyOrderBasket', 'Your basket is empty')}</p>
+          <p className={styles.actionText}>{t('searchForAnOrder', 'Search for an order above')}</p>
+        </Tile>
+      )}
 
       {newOrderBasketItems.length > 0 && (
         <>
-          <h4 className={styles.orderCategoryHeading}>
-            {t('newOrders', '{count} new order(s)', {
-              count: newOrderBasketItems.length,
-            })}
-          </h4>
+          {isTablet ? (
+            <div className={styles.orderBasketHeader}>
+              <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>
+                {t('orderBasketWithCount', 'Order Basket ({count})', { count: newOrderBasketItems.length })}
+              </h4>
+            </div>
+          ) : (
+            <h4 className={styles.orderCategoryHeading}>
+              {t('ordersAlreadyInBasketWithCount', '{count} item(s) already in your basket', {
+                count: newOrderBasketItems.length,
+              })}
+            </h4>
+          )}
           {newOrderBasketItems.map((order, index) => (
             <OrderBasketItemTile
+              isTablet={isTablet}
               key={index}
               orderBasketItem={order}
               onClick={() => onItemClicked(order)}
@@ -53,6 +70,7 @@ export default function OrderBasketItemList({
           </h4>
           {renewedOrderBasketItems.map((item, index) => (
             <OrderBasketItemTile
+              isTablet={isTablet}
               key={index}
               orderBasketItem={item}
               onClick={() => onItemClicked(item)}
@@ -71,6 +89,7 @@ export default function OrderBasketItemList({
           </h4>
           {revisedOrderBasketItems.map((item, index) => (
             <OrderBasketItemTile
+              isTablet={isTablet}
               key={index}
               orderBasketItem={item}
               onClick={() => onItemClicked(item)}
@@ -89,6 +108,7 @@ export default function OrderBasketItemList({
           </h4>
           {discontinuedOrderBasketItems.map((item, index) => (
             <OrderBasketItemTile
+              isTablet={isTablet}
               key={index}
               orderBasketItem={item}
               onClick={() => onItemClicked(item)}
@@ -97,6 +117,6 @@ export default function OrderBasketItemList({
           ))}
         </>
       )}
-    </>
+    </div>
   );
 }

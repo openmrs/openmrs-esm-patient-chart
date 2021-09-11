@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styles from './order-basket-search.scss';
-import OrderBasketSearchResults from './order-basket-search-results';
 import { Search } from 'carbon-components-react';
+import OrderBasketSearchResults from './order-basket-search-results.component';
 import { useTranslation } from 'react-i18next';
 import { OrderBasketItem } from '../types/order-basket-item';
 
@@ -28,6 +28,7 @@ export default function OrderBasketSearch({ encounterUuid, onSearchResultClicked
         />
         <div style={{ margin: '1rem' }}>
           <OrderBasketSearchResults
+            isTablet={isTablet}
             encounterUuid={encounterUuid}
             searchTerm={searchTerm}
             setSearchTerm={setSearchTerm}

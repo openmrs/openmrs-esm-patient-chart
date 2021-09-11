@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Medication16 from '@carbon/icons-react/es/medication/16';
-import ShoppingBag16 from '@carbon/icons-react/es/shopping--bag/16';
+import ShoppingCart16 from '@carbon/icons-react/es/shopping--cart/16';
 import styles from './order-basket-search-results.scss';
 import { Button, Link, Pagination, ClickableTile } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
@@ -10,6 +10,7 @@ import { OrderBasketItem } from '../types/order-basket-item';
 import { paginate } from '../utils/pagination';
 
 export interface OrderBasketSearchResultsProps {
+  isTablet: boolean;
   searchTerm: string;
   encounterUuid: string;
   setSearchTerm: (value: string) => void;
@@ -17,6 +18,7 @@ export interface OrderBasketSearchResultsProps {
 }
 
 export default function OrderBasketSearchResults({
+  isTablet,
   searchTerm,
   encounterUuid,
   setSearchTerm,
@@ -44,8 +46,8 @@ export default function OrderBasketSearchResults({
     <>
       {!!searchTerm && (
         <>
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <span className={styles.label01}>
+          <div className={styles.orderBasketSearchResultsHeader}>
+            <span className={styles.searchResultsCount}>
               {t('searchResultsExactMatchesForTerm', '{count} exact match(es) for "{searchTerm}"', {
                 count: searchResults.length,
                 searchTerm,
@@ -53,36 +55,29 @@ export default function OrderBasketSearchResults({
             </span>
             <Link onClick={() => setSearchTerm('')}>{t('clearSearchResults', 'Clear Results')}</Link>
           </div>
-
           {currentSearchResultPage.map((result, index) => (
             <ClickableTile
+              light={isTablet}
+              role="listitem"
               key={index}
-              className={styles.searchResultTile}
-              style={{ marginTop: '5px' }}
+              className={isTablet ? `${styles.tabletSearchResultTile}` : `${styles.desktopSearchResultTile}`}
               handleClick={() => handleSearchResultClicked(result, false)}>
-              <div
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}>
-                <Medication16 style={{ flex: '0 0 auto', marginRight: '20px' }} />
-                <div style={{ flex: '1 1 auto' }}>
+              <div className={styles.searchResultTile}>
+                <Medication16 className={styles.medicationIcon} />
+                <div className={styles.searchResultTileContent}>
                   <p>
-                    <strong>
-                      {result.drug.concept.display} ({result.dosage?.dosage})
-                    </strong>
+                    <strong>{result.drug.concept.display}</strong> &mdash; {result.dosage?.dosage} &mdash;{' '}
+                    {result.dosageUnit.name}
                     <br />
-                    <span className={styles.label01}>{result.dosageUnit.name}</span> &mdash;{' '}
                     <span className={styles.label01}>{result.frequency.name}</span> &mdash;{' '}
                     <span className={styles.label01}>{result.route.name}</span>
                   </p>
                 </div>
                 <Button
-                  style={{ flex: '0 0 auto' }}
+                  className={styles.addToBasketButton}
                   kind="ghost"
                   hasIconOnly={true}
-                  renderIcon={() => <ShoppingBag16 />}
+                  renderIcon={() => <ShoppingCart16 />}
                   iconDescription={t('directlyAddToBasket', 'Immediately add to basket')}
                   onClick={() => handleSearchResultClicked(result, true)}
                 />
@@ -90,16 +85,21 @@ export default function OrderBasketSearchResults({
             </ClickableTile>
           ))}
           {searchResults.length > 0 && (
-            <Pagination
-              page={page}
-              pageSize={pageSize}
-              pageSizes={[10, 20, 30, 40, 50]}
-              totalItems={searchResults.length}
-              onChange={({ page, pageSize }) => {
-                setPage(page);
-                setPageSize(pageSize);
-              }}
-            />
+            <>
+              <Pagination
+                page={page}
+                pageSize={pageSize}
+                pageSizes={[10, 20, 30, 40, 50]}
+                totalItems={searchResults.length}
+                onChange={({ page, pageSize }) => {
+                  setPage(page);
+                  setPageSize(pageSize);
+                }}
+              />
+              <hr
+                className={`${styles.divider} ${isTablet ? `${styles.tabletDivider}` : `${styles.desktopDivider}`}`}
+              />
+            </>
           )}
         </>
       )}

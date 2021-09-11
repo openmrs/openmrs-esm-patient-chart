@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import styles from './order-basket.scss';
 import OrderBasketSearch from './order-basket-search.component';
 import MedicationOrderForm from './medication-order-form.component';
 import OrderBasketItemList from './order-basket-item-list.component';
 import MedicationsDetailsTable from '../components/medications-details-table.component';
-import { Button, ButtonSet, Loading, DataTableSkeleton } from 'carbon-components-react';
+import { Button, ButtonSet, DataTableSkeleton, SearchSkeleton } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 import { OrderBasketItem } from '../types/order-basket-item';
 import { getDurationUnits, getPatientEncounterId, usePatientOrders } from '../api/api';
-import { createErrorHandler } from '@openmrs/esm-framework';
+import { createErrorHandler, showToast } from '@openmrs/esm-framework';
 import { OpenmrsResource } from '../types/openmrs-resource';
 import { orderDrugs } from './drug-ordering';
 import { connect } from 'unistore/react';
 import { OrderBasketStore, OrderBasketStoreActions, orderBasketStoreActions } from '../medications/order-basket-store';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
+import styles from './order-basket.scss';
 
 export interface OrderBasketProps {
   patientUuid: string;
@@ -90,6 +90,16 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
         setItems(erroredItems);
         if (erroredItems.length == 0) {
           closeWorkspace();
+
+          showToast({
+            critical: true,
+            kind: 'success',
+            title: t('orderCompleted', 'Order placed'),
+            description: t(
+              'orderCompletedSuccessText',
+              'Your order is complete. The items will now appear on the Orders page.',
+            ),
+          });
         }
       });
       return () => abortController.abort();
@@ -117,62 +127,67 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
 
     return (
       <>
-        <Loading active={isLoading} withOverlay={true} />
-        {isMedicationOrderFormVisible ? (
-          <MedicationOrderForm
-            durationUnits={durationUnits}
-            initialOrderBasketItem={medicationOrderFormItem}
-            onSign={onMedicationOrderFormSigned}
-            onCancel={() => setIsMedicationOrderFormVisible(false)}
-            isTablet={isTablet}
-          />
-        ) : (
-          <>
-            <OrderBasketSearch
-              encounterUuid={encounterUuid}
-              onSearchResultClicked={handleSearchResultClicked}
-              isTablet={isTablet}
-            />
-
-            <div className={styles.orderBasketContainer}>
-              <OrderBasketItemList
-                orderBasketItems={items}
-                onItemClicked={(order) => openMedicationOrderFormForUpdatingExistingOrder(items.indexOf(order))}
-                onItemRemoveClicked={(order) => {
-                  const newOrders = [...items];
-                  newOrders.splice(items.indexOf(order), 1);
-                  setItems(newOrders);
-                }}
+        {(() => {
+          if (isLoading) return <SearchSkeleton />;
+          if (isMedicationOrderFormVisible) {
+            return (
+              <MedicationOrderForm
+                durationUnits={durationUnits}
+                initialOrderBasketItem={medicationOrderFormItem}
+                onSign={onMedicationOrderFormSigned}
+                onCancel={() => setIsMedicationOrderFormVisible(false)}
+                isTablet={isTablet}
               />
-              {(() => {
-                if (isLoadingOrders) return <DataTableSkeleton role="progressbar" />;
-                if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
-                if (activePatientOrders?.length) {
-                  return (
-                    <MedicationsDetailsTable
-                      isValidating={isValidating}
-                      title={t('activeMedications', 'Active Medications')}
-                      medications={activePatientOrders}
-                      showDiscontinueButton={true}
-                      showModifyButton={true}
-                      showReorderButton={false}
-                      showAddNewButton={false}
-                    />
-                  );
-                }
-                return <EmptyState displayText={displayText} headerTitle={headerTitle} />;
-              })()}
-              <ButtonSet style={{ marginTop: '2rem' }}>
-                <Button kind="secondary" onClick={handleCancelClicked}>
-                  {t('cancel', 'Cancel')}
-                </Button>
-                <Button kind="primary" onClick={handleSaveClicked}>
-                  {t('save', 'Save')}
-                </Button>
-              </ButtonSet>
-            </div>
-          </>
-        )}
+            );
+          }
+          return (
+            <>
+              <OrderBasketSearch
+                encounterUuid={encounterUuid}
+                onSearchResultClicked={handleSearchResultClicked}
+                isTablet={isTablet}
+              />
+              <div className={styles.orderBasketContainer}>
+                <OrderBasketItemList
+                  isTablet={isTablet}
+                  orderBasketItems={items}
+                  onItemClicked={(order) => openMedicationOrderFormForUpdatingExistingOrder(items.indexOf(order))}
+                  onItemRemoveClicked={(order) => {
+                    const newOrders = [...items];
+                    newOrders.splice(items.indexOf(order), 1);
+                    setItems(newOrders);
+                  }}
+                />
+                {(() => {
+                  if (isLoadingOrders) return <DataTableSkeleton role="progressbar" />;
+                  if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
+                  if (activePatientOrders?.length) {
+                    return (
+                      <MedicationsDetailsTable
+                        isValidating={isValidating}
+                        title={t('activeMedications', 'Active Medications')}
+                        medications={activePatientOrders}
+                        showDiscontinueButton={true}
+                        showModifyButton={true}
+                        showReorderButton={false}
+                        showAddNewButton={false}
+                      />
+                    );
+                  }
+                  return <EmptyState displayText={displayText} headerTitle={headerTitle} />;
+                })()}
+                <ButtonSet style={{ marginTop: '2rem' }}>
+                  <Button kind="secondary" onClick={handleCancelClicked}>
+                    {t('cancel', 'Cancel')}
+                  </Button>
+                  <Button kind="primary" onClick={handleSaveClicked}>
+                    {t('save', 'Save')}
+                  </Button>
+                </ButtonSet>
+              </div>
+            </>
+          );
+        })()}
       </>
     );
   },
