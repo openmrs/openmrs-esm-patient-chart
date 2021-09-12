@@ -6,7 +6,7 @@
 
 .clickableTileTablet {
   &:not(:last-of-type) {
-    border-bottom: 0.063rem solid $ui-03;
+    border-bottom: 0.0625rem solid $ui-03;
   }
 
   &:nth-child(even) {

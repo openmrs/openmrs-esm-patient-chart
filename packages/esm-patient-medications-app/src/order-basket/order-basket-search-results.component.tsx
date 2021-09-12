@@ -10,7 +10,7 @@ import { OrderBasketItem } from '../types/order-basket-item';
 import { paginate } from '../utils/pagination';
 
 export interface OrderBasketSearchResultsProps {
-  isTablet: boolean;
+  isTablet?: boolean;
   searchTerm: string;
   encounterUuid: string;
   setSearchTerm: (value: string) => void;
@@ -63,7 +63,6 @@ export default function OrderBasketSearchResults({
               className={isTablet ? `${styles.tabletSearchResultTile}` : `${styles.desktopSearchResultTile}`}
               handleClick={() => handleSearchResultClicked(result, false)}>
               <div className={styles.searchResultTile}>
-                <Medication16 className={styles.medicationIcon} />
                 <div className={styles.searchResultTileContent}>
                   <p>
                     <strong>{result.drug.concept.display}</strong> &mdash; {result.dosage?.dosage} &mdash;{' '}

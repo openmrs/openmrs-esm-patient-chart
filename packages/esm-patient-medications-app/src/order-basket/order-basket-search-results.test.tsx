@@ -12,7 +12,6 @@ const mockSearchMedications = searchMedications as jest.Mock;
 
 const testProps = {
   encounterUuid: '',
-  isTablet: false,
   onSearchResultClicked: jest.fn(),
   searchTerm: 'aspirin',
   setSearchTerm: jest.fn(),

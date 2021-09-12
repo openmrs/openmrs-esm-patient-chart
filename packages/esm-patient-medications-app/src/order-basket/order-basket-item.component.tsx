@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { OrderBasketItem } from '../types/order-basket-item';
 
 export interface OrderBasketItemTileProps {
-  isTablet: boolean;
+  isTablet?: boolean;
   orderBasketItem: OrderBasketItem;
   onClick: () => void;
   onRemoveClick: () => void;

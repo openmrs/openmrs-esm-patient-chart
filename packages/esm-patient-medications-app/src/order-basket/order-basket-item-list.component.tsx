@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { OrderBasketItem } from '../types/order-basket-item';
 
 export interface OrderBasketItemListProps {
-  isTablet: boolean;
+  isTablet?: boolean;
   orderBasketItems: Array<OrderBasketItem>;
   onItemClicked: (order: OrderBasketItem) => void;
   onItemRemoveClicked: (order: OrderBasketItem) => void;

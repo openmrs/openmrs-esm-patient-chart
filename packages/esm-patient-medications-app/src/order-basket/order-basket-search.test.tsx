@@ -5,7 +5,6 @@ import OrderBasketSearch from './order-basket-search.component';
 
 const testProps = {
   encounterUuid: '',
-  isTablet: false,
   onSearchResultClicked: () => {},
 };
 

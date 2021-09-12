@@ -1,7 +1,7 @@
 @import "../root";
 
 .desktopSearchResultTile {
-  margin-top: 0.3125rem;
+  margin-top: 5px;
   border-left: 4px solid $brand-teal-01;
 
   &:not(:last-of-type) {
@@ -10,7 +10,7 @@
 }
 
 .tabletSearchResultTile {
-  margin-top: 0.3125rem;
+  margin-top: 5px;
   border-left: 2px solid $brand-teal-01;
 
   &:not(:last-of-type) {
@@ -21,7 +21,7 @@
 .divider {
   border: 0;
   border-top: 1px solid $color-gray-30;
-  width: 66.66666667%;
+  width: 66%;
 }
 
 .desktopDivider {
@@ -47,11 +47,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-
-.medicationIcon {
-  flex: 0 0 auto;
-  margin-right: 1.25rem;
 }
 
 .searchResultTileContent {

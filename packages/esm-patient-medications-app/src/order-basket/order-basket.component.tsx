@@ -16,9 +16,9 @@ import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import styles from './order-basket.scss';
 
 export interface OrderBasketProps {
+  isTablet?: boolean;
   patientUuid: string;
   closeWorkspace(): void;
-  isTablet: boolean;
 }
 
 const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBasketStore, {}>(

@@ -7,7 +7,6 @@ import { getByTextWithMarkup } from '../../../../tools/test-helpers';
 const mockOnItemRemoved = jest.fn();
 
 const testProps = {
-  isTablet: false,
   orderBasketItems: [],
   onItemClicked: jest.fn(),
   onItemRemoveClicked: mockOnItemRemoved,
