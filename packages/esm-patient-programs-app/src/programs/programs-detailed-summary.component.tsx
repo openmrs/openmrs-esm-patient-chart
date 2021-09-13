@@ -93,7 +93,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = () => {
             <TableContainer>
               <DataTable rows={tableRows} headers={tableHeader} isSortable={true} size="short">
                 {({ rows, headers, getHeaderProps, getTableProps }) => (
-                  <Table {...getTableProps()}>
+                  <Table {...getTableProps()} useZebraStyles>
                     <TableHead>
                       <TableRow>
                         {headers.map((header) => (

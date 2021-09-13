@@ -104,7 +104,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
           return (
             <div className={styles.vitalsWidgetContainer}>
               <div className={styles.vitalsHeaderContainer}>
-                <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
+                <h4>{headerTitle}</h4>
                 <div className={styles.toggleButtons}>
                   <Button
                     className={styles.toggle}

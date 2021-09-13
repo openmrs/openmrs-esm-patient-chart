@@ -140,7 +140,7 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
             <TableContainer className={styles.tableContainer}>
               <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="short">
                 {({ rows, headers, getHeaderProps, getTableProps }) => (
-                  <Table {...getTableProps()}>
+                  <Table {...getTableProps()} useZebraStyles>
                     <TableHead>
                       <TableRow>
                         {headers.map((header) => (
