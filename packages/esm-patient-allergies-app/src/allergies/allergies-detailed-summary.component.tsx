@@ -100,7 +100,7 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
     if (allergies.length) {
       const rows = getRowItems(allergies);
       return (
-        <div>
+        <div className={styles.widgetCard}>
           <div className={styles.allergiesHeader}>
             <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
             {showAddAllergy && (

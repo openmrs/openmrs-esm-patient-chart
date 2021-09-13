@@ -79,7 +79,7 @@ const AppointmentsOverview: React.FC<AppointmentOverviewProps> = ({ patientUuid 
     if (appointments.length) {
       const rows = getRowItems(appointments);
       return (
-        <div>
+        <div className={styles.widgetCard}>
           <div className={styles.appointmentsHeader}>
             <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
             <Button kind="ghost" renderIcon={Add16} iconDescription="Add appointments" onClick={launchAppointmentsForm}>

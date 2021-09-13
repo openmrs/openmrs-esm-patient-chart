@@ -50,7 +50,7 @@ const RecentOverview: React.FC<ExternalOverviewProps> = ({ patientUuid, filter }
           {(() => {
             if (overviewData.length) {
               return (
-                <div>
+                <div className={styles.widgetCard}>
                   <div className={styles.externalOverviewHeader}>
                     <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{cardTitle}</h4>
                     <Button

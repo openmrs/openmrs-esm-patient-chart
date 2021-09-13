@@ -56,7 +56,7 @@ const NotesMain: React.FC<NotesOverviewProps> = ({
         if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
         if (notes?.length)
           return (
-            <div>
+            <div className={styles.widgetCard}>
               <div className={styles.notesHeader}>
                 <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
                 {showAddNote && (

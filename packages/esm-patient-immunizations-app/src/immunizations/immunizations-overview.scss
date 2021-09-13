@@ -2,6 +2,10 @@
 @import "~carbon-components/src/globals/scss/mixins";
 @import "~@openmrs/esm-styleguide/src/vars";
 
+.widgetCard {
+  border: 1px solid $ui-03;
+}
+
 .immunizationsHeader {
   display: flex;
   justify-content: space-between;
