@@ -149,7 +149,7 @@ const MedicationsDetailsTable = connect<
     };
 
     return (
-      <>
+      <div className={styles.widgetCard}>
         <div className={styles.cardHeader}>
           <h4>{title}</h4>
           {showAddNewButton && (
@@ -209,7 +209,7 @@ const MedicationsDetailsTable = connect<
             </TableContainer>
           )}
         </DataTable>
-      </>
+      </div>
     );
   },
 );

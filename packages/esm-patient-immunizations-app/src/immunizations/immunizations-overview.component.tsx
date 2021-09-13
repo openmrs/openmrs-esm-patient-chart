@@ -66,7 +66,7 @@ const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = ({ patient, 
     if (immunizations.length) {
       const rows = getRowItems(immunizations);
       return (
-        <div>
+        <div className={styles.widgetCard}>
           <div className={styles.immunizationsHeader}>
             <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
             <Button

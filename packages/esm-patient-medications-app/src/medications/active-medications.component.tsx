@@ -6,6 +6,7 @@ import MedicationsDetailsTable from '../components/medications-details-table.com
 import { Provider } from 'unistore/react';
 import { orderBasketStore } from './order-basket-store';
 import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
+import { EmptyState } from '@openmrs/esm-patient-common-lib';
 
 interface ActiveMedicationsProps {
   patientUuid: string;
@@ -18,20 +19,30 @@ const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patientUuid, show
 
   return (
     <Provider store={orderBasketStore}>
-      {activePatientOrders ? (
-        <div className={styles.activeMedicationContainer}>
-          <MedicationsDetailsTable
-            title={t('activeMedications', 'Active Medications')}
-            medications={activePatientOrders}
-            showDiscontinueButton={true}
-            showModifyButton={true}
-            showReorderButton={false}
-            showAddNewButton={true}
-          />
-        </div>
-      ) : (
-        <DataTableSkeleton role="progressbar" />
-      )}
+      {(() => {
+        if (activePatientOrders && !activePatientOrders?.length)
+          return (
+            <EmptyState
+              displayText={t('activeMedications', 'Active medications')}
+              headerTitle={t('activeMedications', 'active medications')}
+            />
+          );
+        if (activePatientOrders?.length) {
+          return (
+            <div className={styles.activeMedicationContainer}>
+              <MedicationsDetailsTable
+                title={t('activeMedications', 'Active Medications')}
+                medications={activePatientOrders}
+                showDiscontinueButton={true}
+                showModifyButton={true}
+                showReorderButton={false}
+                showAddNewButton={false}
+              />
+            </div>
+          );
+        }
+        return <DataTableSkeleton role="progressbar" />;
+      })()}
     </Provider>
   );
 };

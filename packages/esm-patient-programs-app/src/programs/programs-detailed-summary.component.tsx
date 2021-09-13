@@ -82,7 +82,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = () => {
     return (
       <>
         {enrolledPrograms?.length ? (
-          <>
+          <div className={styles.widgetCard}>
             <div className={styles.programsHeader}>
               <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
               <Button kind="ghost" renderIcon={Add16} iconDescription="Add programs" onClick={launchProgramsForm}>
@@ -121,7 +121,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = () => {
                 )}
               </DataTable>
             </TableContainer>
-          </>
+          </div>
         ) : (
           <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchProgramsForm} />
         )}
