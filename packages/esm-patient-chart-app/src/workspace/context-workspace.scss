@@ -23,10 +23,10 @@
 /* Desktop view */
 :global(.omrs-breakpoint-gt-tablet) .contextWorkspaceContainer {
   z-index: 1;
+  background-color: $ui-02;
   margin-right: 50px;
   flex: 1;
   overflow-y: auto;
-  width: 100%;
   height: 100vh;
 }
 
