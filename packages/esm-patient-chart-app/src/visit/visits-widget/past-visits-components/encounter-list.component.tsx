@@ -64,7 +64,7 @@ const EncounterListDataTable: React.FC<EncounterListProps> = ({ encounters, visi
       {({ rows, headers, getHeaderProps, getRowProps, getTableProps }) => {
         return (
           <TableContainer>
-            <Table className={styles.customTable} {...getTableProps()} size={!isDesktop ? 'normal' : 'short'}>
+            <Table {...getTableProps()} size={!isDesktop ? 'normal' : 'short'} useZebraStyles>
               <TableHead>
                 <TableRow>
                   <TableExpandHeader />

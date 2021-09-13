@@ -85,7 +85,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ patientUuid }) => {
           <TableContainer>
             <DataTable rows={rows} headers={headers} isSortable={true} size="short">
               {({ rows, headers, getHeaderProps, getTableProps }) => (
-                <Table {...getTableProps()}>
+                <Table {...getTableProps()} useZebraStyles>
                   <TableHead>
                     <TableRow>
                       {headers.map((header) => (

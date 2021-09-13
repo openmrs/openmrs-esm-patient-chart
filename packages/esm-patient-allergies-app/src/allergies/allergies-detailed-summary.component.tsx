@@ -112,7 +112,7 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
           <TableContainer>
             <DataTable rows={rows} headers={headers} isSortable={true}>
               {({ rows, headers, getHeaderProps, getTableProps }) => (
-                <Table {...getTableProps()}>
+                <Table {...getTableProps()} useZebraStyles>
                   <TableHead>
                     <TableRow>
                       {headers.map((header) => (

@@ -84,7 +84,7 @@ const ConditionsDetailedSummary: React.FC = () => {
           <TableContainer>
             <DataTable rows={tableRows} headers={headers} isSortable={true} size="short">
               {({ rows, headers, getHeaderProps, getTableProps }) => (
-                <Table {...getTableProps()}>
+                <Table {...getTableProps()} useZebraStyles>
                   <TableHead>
                     <TableRow>
                       {headers.map((header) => (

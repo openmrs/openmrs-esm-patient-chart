@@ -28,7 +28,7 @@ const BiometricsPagination: React.FC<FormsProps> = ({ tableRows, pageSize, pageU
       <TableContainer>
         <DataTable rows={results} headers={tableHeaders} isSortable={true} size="short">
           {({ rows, headers, getHeaderProps, getTableProps }) => (
-            <Table {...getTableProps()} className={styles.customTable}>
+            <Table {...getTableProps()}>
               <TableHead>
                 <TableRow>
                   {headers.map((header) => (

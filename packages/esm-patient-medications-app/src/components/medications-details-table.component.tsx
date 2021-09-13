@@ -161,7 +161,7 @@ const MedicationsDetailsTable = connect<
         <DataTable headers={tableHeaders} rows={tableRows} isSortable={true} sortRow={sortRow}>
           {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
             <TableContainer className={styles.tableHeader} zebra>
-              <Table {...getTableProps()}>
+              <Table {...getTableProps()} useZebraStyles>
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
