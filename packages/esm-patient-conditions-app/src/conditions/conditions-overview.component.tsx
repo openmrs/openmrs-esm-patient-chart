@@ -74,17 +74,17 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient }) => {
       const rows = getRowItems(conditions);
       const totalRows = conditions.length;
       return (
-        <div>
+        <div className={styles.widgetCard}>
           <div className={styles.conditionsHeader}>
             <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
             <Button kind="ghost" renderIcon={Add16} iconDescription="Add conditions" onClick={launchConditionsForm}>
               {t('add', 'Add')}
             </Button>
           </div>
-          <TableContainer>
-            <DataTable rows={rows} headers={headers} isSortable={true} size="short">
-              {({ rows, headers, getHeaderProps, getTableProps }) => (
-                <Table {...getTableProps()}>
+          <DataTable rows={rows} headers={headers} isSortable={true} size="short">
+            {({ rows, headers, getHeaderProps, getTableProps }) => (
+              <TableContainer>
+                <Table {...getTableProps()} useZebraStyles>
                   <TableHead>
                     <TableRow>
                       {headers.map((header) => (
@@ -109,25 +109,25 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient }) => {
                     ))}
                   </TableBody>
                 </Table>
-              )}
-            </DataTable>
-          </TableContainer>
-          {totalRows > conditionsToShowCount && (
-            <Pagination
-              totalItems={conditions.length}
-              backwardText={previousPage}
-              forwardText={nextPage}
-              pageSize={currentPageSize}
-              pageSizes={[5, 10, 15, 25]}
-              itemsPerPageText={itemPerPage}
-              onChange={({ page, pageSize }) => {
-                if (pageSize !== currentPageSize) {
-                  setCurrentPageSize(pageSize);
-                }
-                setFirstRowIndex(pageSize * (page - 1));
-              }}
-            />
-          )}
+                {totalRows > conditionsToShowCount && (
+                  <Pagination
+                    totalItems={conditions.length}
+                    backwardText={previousPage}
+                    forwardText={nextPage}
+                    pageSize={currentPageSize}
+                    pageSizes={[5, 10, 15, 25]}
+                    itemsPerPageText={itemPerPage}
+                    onChange={({ page, pageSize }) => {
+                      if (pageSize !== currentPageSize) {
+                        setCurrentPageSize(pageSize);
+                      }
+                      setFirstRowIndex(pageSize * (page - 1));
+                    }}
+                  />
+                )}
+              </TableContainer>
+            )}
+          </DataTable>
         </div>
       );
     }

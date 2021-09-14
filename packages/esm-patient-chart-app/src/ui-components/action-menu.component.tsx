@@ -10,6 +10,7 @@ import Button from 'carbon-components-react/es/components/Button';
 import { useContextWorkspace } from '../hooks/useContextWindowSize';
 import { useWorkspace } from '../hooks/useWorkspace';
 import { useTranslation } from 'react-i18next';
+import { ScreenModeTypes } from '../types';
 
 interface ActionMenuInterface {
   open: boolean;
@@ -21,14 +22,18 @@ export const CHARTS_ACTION_MENU_ITEMS_SLOT = 'action-menu-items-slot';
 export const ActionMenu: React.FC<ActionMenuInterface> = ({ open }) => {
   const { t } = useTranslation();
   const layout = useLayoutType();
-  const { screenMode } = useWorkspace();
+  const { screenMode, active } = useWorkspace();
   const { openWindows, updateWindowSize, windowSize } = useContextWorkspace();
 
   const checkViewMode = () => {
-    if (screenMode === 'maximize') {
-      updateWindowSize('maximize');
-    } else {
-      updateWindowSize('reopen');
+    if (active) {
+      if (windowSize.size === 'maximize') {
+        updateWindowSize('hide');
+      } else if (windowSize.size === 'normal') {
+        updateWindowSize('hide');
+      } else {
+        updateWindowSize(screenMode);
+      }
     }
   };
 

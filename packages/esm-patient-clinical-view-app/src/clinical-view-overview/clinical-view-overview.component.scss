@@ -6,7 +6,9 @@
 }
 .clinicalViewContainer {
   background-color: $ui-02;
+  border: 1px solid $ui-03;
 }
+
 .clinicalViewHeaderContainer {
   display: flex;
   align-items: center;

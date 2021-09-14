@@ -74,7 +74,7 @@ const ConditionsDetailedSummary: React.FC = () => {
   const RenderConditionsSummary: React.FC = () => {
     if (conditions.length) {
       return (
-        <div>
+        <div className={styles.widgetCard}>
           <div className={styles.conditionsHeader}>
             <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
             <Button kind="ghost" renderIcon={Add16} iconDescription="Add conditions" onClick={launchConditionsForm}>
@@ -84,7 +84,7 @@ const ConditionsDetailedSummary: React.FC = () => {
           <TableContainer>
             <DataTable rows={tableRows} headers={headers} isSortable={true} size="short">
               {({ rows, headers, getHeaderProps, getTableProps }) => (
-                <Table {...getTableProps()}>
+                <Table {...getTableProps()} useZebraStyles>
                   <TableHead>
                     <TableRow>
                       {headers.map((header) => (

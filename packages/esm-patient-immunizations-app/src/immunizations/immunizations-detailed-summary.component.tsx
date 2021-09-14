@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useReducer, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import get from 'lodash-es/get';
 import orderBy from 'lodash-es/orderBy';
 import styles from './immunizations-detailed-summary.scss';
@@ -148,11 +148,10 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
     <>
       {status === StateTypes.PENDING && <DataTableSkeleton />}
       {status === StateTypes.RESOLVED && (
-        <div>
+        <div className={styles.widgetCard}>
           <div className={styles.immunizationsHeader}>
             <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{t('immunizations', 'Immunizations')}</h4>
           </div>
-
           <DataTable rows={results} headers={tableHeader}>
             {({ rows, headers, getHeaderProps, getRowProps, getTableProps }) => (
               <Table {...getTableProps()} useZebraStyles>

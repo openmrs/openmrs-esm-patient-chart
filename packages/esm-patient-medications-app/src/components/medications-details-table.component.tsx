@@ -27,6 +27,7 @@ import { OrderBasketStore, OrderBasketStoreActions, orderBasketStoreActions } fr
 import { Order } from '../types/order';
 import { OrderBasketItem } from '../types/order-basket-item';
 import { attach } from '@openmrs/esm-framework';
+import User16 from '@carbon/icons-react/es/user/16';
 
 export interface ActiveMedicationsProps {
   title?: string;
@@ -85,27 +86,59 @@ const MedicationsDetailsTable = connect<
       details: {
         sortKey: medication.drug?.name,
         content: (
-          <p className={styles.bodyLong01}>
-            <strong>{capitalize(medication.drug?.name)}</strong> &mdash; {medication.doseUnits?.display} &mdash;{' '}
-            {medication.route?.display}
-            <br />
-            <span className={styles.label01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
-            <strong>{getDosage(medication.drug?.strength, medication.dose).toLowerCase()}</strong> &mdash;{' '}
-            {medication.frequency?.display} &mdash;{' '}
-            {!medication.duration
-              ? t('medicationIndefiniteDuration', 'Indefinite duration')
-              : t('medicationDurationAndUnit', 'for {duration} {durationUnit}', {
-                  duration: medication.duration,
-                  durationUnit: medication.durationUnits?.display,
-                })}
-            <br />
-            <span className={styles.label01}>{t('refills', 'Refills').toUpperCase()}</span> {medication.numRefills}
-          </p>
+          <div className={styles.medicationRecord}>
+            <div>
+              <p className={styles.bodyLong01}>
+                <strong>{capitalize(medication.drug?.name)}</strong> &mdash; {medication.drug?.strength.toLowerCase()}{' '}
+                &mdash; {medication.doseUnits?.display.toLowerCase()}
+              </p>
+              <p className={styles.bodyLong01}>
+                <span className={styles.label01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
+                <strong>{getDosage(medication.drug?.strength, medication.dose).toLowerCase()}</strong> &mdash;{' '}
+                {medication.route?.display.toLowerCase()} &mdash; {medication.frequency?.display.toLowerCase()}
+                &mdash;{' '}
+                {!medication.duration
+                  ? t('medicationIndefiniteDuration', 'Indefinite duration').toLowerCase()
+                  : t('medicationDurationAndUnit', 'for {duration} {durationUnit}', {
+                      duration: medication.duration,
+                      durationUnit: medication.durationUnits?.display.toLowerCase(),
+                    })}{' '}
+                {medication.numRefills !== 0 && (
+                  <span>
+                    <span className={styles.label01}> &mdash; {t('refills', 'Refills').toUpperCase()}</span>{' '}
+                    {medication.numRefills}
+                  </span>
+                )}
+                {medication.dosingInstructions && (
+                  <span> &mdash; {medication.dosingInstructions.toLocaleLowerCase()}</span>
+                )}
+              </p>
+            </div>
+            <p className={`${styles.bodyLong01} ${styles.indicationRow}`}>
+              <span>
+                <span className={styles.label01}>{t('indication', 'Indication').toUpperCase()}</span>{' '}
+                {medication.orderReasonNonCoded}
+              </span>
+              {medication.quantity !== 0 && (
+                <span>
+                  <span className={styles.label01}> &mdash; {t('quantity', 'Quantity').toUpperCase()}</span>{' '}
+                  {medication.quantity}
+                </span>
+              )}
+            </p>
+          </div>
         ),
       },
       startDate: {
         sortKey: dayjs(medication.dateActivated).toDate(),
-        content: dayjs(medication.dateActivated).format('DD-MMM-YYYY'),
+        content: (
+          <div className={styles.leftColumn}>
+            <span>{dayjs(medication.dateActivated).format('DD-MMM-YYYY')}</span>
+            <span className={styles.indicationRow}>
+              <User16 />
+            </span>
+          </div>
+        ),
       },
     }));
 
@@ -116,66 +149,67 @@ const MedicationsDetailsTable = connect<
     };
 
     return (
-      <DataTable headers={tableHeaders} rows={tableRows} isSortable={true} sortRow={sortRow}>
-        {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-          <TableContainer className={styles.tableHeader} title={title}>
-            {showAddNewButton && (
-              <TableToolbar>
-                <TableToolbarContent>
-                  <Button renderIcon={Add16} onClick={openOrderBasket}>
-                    {t('add', 'Add')}
-                  </Button>
-                </TableToolbarContent>
-              </TableToolbar>
-            )}
-            <Table {...getTableProps()}>
-              <TableHead>
-                <TableRow>
-                  {headers.map((header) => (
-                    <TableHeader
-                      {...getHeaderProps({
-                        header,
-                        isSortable: header.isSortable,
-                      })}>
-                      {header.header}
-                    </TableHeader>
-                  ))}
-                  <TableHeader />
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row, rowIndex) => (
-                  <TableRow {...getRowProps({ row })}>
-                    {row.cells.map((cell) => (
-                      <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+      <div className={styles.widgetCard}>
+        <div className={styles.cardHeader}>
+          <h4>{title}</h4>
+          {showAddNewButton && (
+            <Button kind="ghost" renderIcon={Add16} iconDescription="Launch order basket" onClick={openOrderBasket}>
+              {t('add', 'Add')}
+            </Button>
+          )}
+        </div>
+        <DataTable headers={tableHeaders} rows={tableRows} isSortable={true} sortRow={sortRow}>
+          {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
+            <TableContainer className={styles.tableHeader} zebra>
+              <Table {...getTableProps()} useZebraStyles>
+                <TableHead>
+                  <TableRow>
+                    {headers.map((header) => (
+                      <TableHeader
+                        {...getHeaderProps({
+                          header,
+                          isSortable: header.isSortable,
+                        })}>
+                        {header.header}
+                      </TableHeader>
                     ))}
-                    <TableCell className="bx--table-column-menu">
-                      <OrderBasketItemActions
-                        showDiscontinueButton={showDiscontinueButton}
-                        showModifyButton={showModifyButton}
-                        showReorderButton={showReorderButton}
-                        medication={medications[rowIndex]}
-                        items={items}
-                        setItems={setItems}
-                      />
-                    </TableCell>
+                    <TableHeader />
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            <Pagination
-              page={page}
-              pageSize={pageSize}
-              pageSizes={[10, 20, 30, 40, 50]}
-              totalItems={medications.length}
-              onChange={({ page, pageSize }) => {
-                setPage(page);
-                setPageSize(pageSize);
-              }}
-            />
-          </TableContainer>
-        )}
-      </DataTable>
+                </TableHead>
+                <TableBody>
+                  {rows.map((row, rowIndex) => (
+                    <TableRow {...getRowProps({ row })}>
+                      {row.cells.map((cell) => (
+                        <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+                      ))}
+                      <TableCell className="bx--table-column-menu">
+                        <OrderBasketItemActions
+                          showDiscontinueButton={showDiscontinueButton}
+                          showModifyButton={showModifyButton}
+                          showReorderButton={showReorderButton}
+                          medication={medications[rowIndex]}
+                          items={items}
+                          setItems={setItems}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              <Pagination
+                page={page}
+                pageSize={pageSize}
+                pageSizes={[10, 20, 30, 40, 50]}
+                totalItems={medications.length}
+                onChange={({ page, pageSize }) => {
+                  setPage(page);
+                  setPageSize(pageSize);
+                }}
+              />
+            </TableContainer>
+          )}
+        </DataTable>
+      </div>
     );
   },
 );

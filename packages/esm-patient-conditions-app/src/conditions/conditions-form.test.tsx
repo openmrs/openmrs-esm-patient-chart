@@ -9,6 +9,7 @@ import { searchedCondition } from '../../../../__mocks__/conditions.mock';
 import { createErrorHandler, detach, showNotification, showToast } from '@openmrs/esm-framework';
 import { createPatientCondition, searchConditionConcepts } from './conditions.resource';
 import ConditionsForm from './conditions-form.component';
+import { getByTextWithMarkup } from '../../../../tools/test-helpers';
 
 const utc = require('dayjs/plugin/utc');
 dayjs.extend(utc);
@@ -131,18 +132,7 @@ describe('ConditionsForm: ', () => {
 
       expect(screen.queryByRole('menuitem', { name: /Post-acute sequelae of COVID-19/i })).not.toBeInTheDocument();
       expect(screen.getByDisplayValue(/Post-acute sequelae of COVID-19/i)).toBeInTheDocument();
-
-      expect(
-        screen.getByText((content, node) => {
-          const textMatch = 'No results for "Post-acute sequelae of COVID-19"';
-          const hasText = (node: Element) => node.textContent === textMatch || node.textContent.match(textMatch);
-
-          const nodeHasText = hasText(node);
-          const childrenDontHaveText = Array.from(node.children).every((child) => !hasText(child));
-
-          return nodeHasText && childrenDontHaveText;
-        }),
-      ).toBeInTheDocument();
+      expect(getByTextWithMarkup('No results for "Post-acute sequelae of COVID-19"')).toBeInTheDocument();
     });
   });
 

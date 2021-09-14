@@ -16,7 +16,7 @@ This repository uses Yarn and Lerna.
 To start the dev server for a specific package, run
 
 ```bash
-yarn start --sources packages/esm-patient-<package>-app
+yarn start --sources 'packages/esm-patient-<package>-app'
 ```
 
 This will start a dev server for that package as well as `esm-patient-chart-app`.

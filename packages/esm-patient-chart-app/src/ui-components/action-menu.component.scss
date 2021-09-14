@@ -22,7 +22,7 @@ $actionPanelOffset: 48px;
   border: 1px solid #a8a8a8;
 }
 
-:global(.omrs-breakpoint-lt-desktop) .actionPanel {
+.actionPanel :global(.omrs-breakpoint-lt-desktop) {
   border: 0;
   right: 0;
 }
@@ -41,7 +41,7 @@ $actionPanelOffset: 48px;
   background-color: #ffffff;
 }
 
-:global(.bx--btn.bx--btn--icon-only.bx--tooltip__trigger:focus){
+.actionBtn :global(.bx--btn.bx--btn--icon-only.bx--tooltip__trigger:focus){
   border-color: #007d79;
 }
 

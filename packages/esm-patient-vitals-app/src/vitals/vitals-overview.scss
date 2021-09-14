@@ -4,6 +4,7 @@
 
 .vitalsWidgetContainer {
   background-color: $ui-background;
+  border: 1px solid $ui-03;
 }
 
 .vitalsHeaderContainer {
@@ -11,6 +12,18 @@
   justify-content: space-between;
   align-items: center;
   padding: $spacing-04 0 $spacing-04 $spacing-05;
+}
+
+.divider {
+  width: 1px;
+  height: 1rem;
+  color: $ui-03;
+  margin: 0rem 0.5rem;
+}
+
+.vitalsHeaderContainer h4 {
+  @include carbon--type-style('productive-heading-03');
+  color: $text-02;
 }
 
 .vitalsHeaderContainer > h4:after {
@@ -26,12 +39,59 @@
   margin: 0 $spacing-03;
 }
 
+.toggle {
+  padding: 0.5rem;
+  color: $interactive-01;
+  min-height: 0px;
+
+  &:global(.bx--btn--tertiary) {
+    border-color: $interactive-01;
+  }
+
+  &:global(.bx--tooltip__trigger:active:not([disabled])) {
+    border-color: $interactive-01;
+  }
+
+  &:global(.bx--btn--tertiary:active) {
+    border-color: $interactive-01;
+    background-color: #edf5ff;
+    color: #edf5ff;
+  }
+
+  &:global(.bx--btn--tertiary:focus) {
+    background-color: $interactive-01;
+    color: $ui-background;
+  }
+
+  &:global(.bx--btn--tertiary:hover) {
+    color: $ui-background;
+    background-color: $interactive-01;
+  }
+
+  &:global(.bx--btn--ghost) {
+    border-color: #a6c8ff;
+  }
+
+  &:global(.bx--btn--ghost:hover) {
+    color:  #000;
+    background-color: $ui-01;
+  }
+}
+
 .toggle:first-of-type {
   border-radius: $spacing-02 0 0 $spacing-02;
+
+  &:global(.bx--btn--ghost) {
+    border-right: 0;
+  }
 }
 
 .toggle:last-of-type {
   border-radius: 0 $spacing-02 $spacing-02 0;
+
+  &:global(.bx--btn--ghost) {
+    border-left: 0rem;
+  }
 }
 
 .vitalsWidgetContainer {
@@ -39,8 +99,11 @@
   position: relative;
 }
 
-.customTable tr:nth-child(odd) td {
-  background-color: #fff;
+.vitalsHeaderActionItems {
+  align-items: center;
+  display: flex;
+  flex: 1 1 0%;
+  justify-content: end;
 }
 
 .customTable  tbody  tr:nth-child(even)  td {

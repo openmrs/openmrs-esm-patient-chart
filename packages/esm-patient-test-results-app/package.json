@@ -11,7 +11,7 @@
     "serve": "webpack serve --mode=development",
     "debug": "npm run serve",
     "build": "webpack --mode production",
-    "analyze": "webpack --mode=production --env.analyze=true",
+    "analyze": "webpack --mode=production --env analyze=true",
     "lint": "eslint src --ext tsx",
     "typescript": "tsc"
   },

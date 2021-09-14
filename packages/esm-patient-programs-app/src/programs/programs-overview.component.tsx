@@ -75,7 +75,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ patientUuid }) => {
     if (programs.length) {
       const rows = getRowItems(programs);
       return (
-        <div>
+        <div className={styles.widgetCard}>
           <div className={styles.programsHeader}>
             <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
             <Button kind="ghost" renderIcon={Add16} iconDescription="Add programs" onClick={launchProgramsForm}>
@@ -85,7 +85,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ patientUuid }) => {
           <TableContainer>
             <DataTable rows={rows} headers={headers} isSortable={true} size="short">
               {({ rows, headers, getHeaderProps, getTableProps }) => (
-                <Table {...getTableProps()}>
+                <Table {...getTableProps()} useZebraStyles>
                   <TableHead>
                     <TableRow>
                       {headers.map((header) => (

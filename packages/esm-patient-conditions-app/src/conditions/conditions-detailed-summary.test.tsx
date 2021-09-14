@@ -2,12 +2,13 @@ import React from 'react';
 import { delay } from 'rxjs/operators';
 import { of } from 'rxjs/internal/observable/of';
 import { throwError } from 'rxjs/internal/observable/throwError';
-import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { attach, fhirBaseUrl, openmrsObservableFetch } from '@openmrs/esm-framework';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { mockFhirConditionsResponse } from '../../../../__mocks__/conditions.mock';
 import userEvent from '@testing-library/user-event';
 import ConditionsDetailedSummary from './conditions-detailed-summary.component';
+import { waitForLoadingToFinish } from '../../../../tools/test-helpers';
 
 const mockAttach = attach as jest.Mock;
 const mockOpenmrsObservableFetch = openmrsObservableFetch as jest.Mock;
@@ -26,12 +27,6 @@ jest.mock('./conditions.context', () => ({
 
 function renderConditionsDetailedSummary() {
   render(<ConditionsDetailedSummary />);
-}
-
-function waitForLoadingToFinish() {
-  return waitForElementToBeRemoved(() => [...screen.queryAllByRole(/progressbar/i)], {
-    timeout: 4000,
-  });
 }
 
 it('renders an empty state view if conditions data is unavailable', async () => {

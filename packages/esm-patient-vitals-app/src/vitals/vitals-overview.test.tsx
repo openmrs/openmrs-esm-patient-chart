@@ -127,8 +127,8 @@ describe('VitalsOverview: ', () => {
     userEvent.click(chartViewButton);
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
     expect(screen.getByText(/vital sign displayed/i)).toBeInTheDocument();
-    expect(screen.getAllByRole('radio').length).toEqual(5);
-    expect(screen.getByRole('radio', { name: /bp/i })).toBeChecked();
+    expect(screen.getAllByRole('tab').length).toEqual(5);
+    expect(screen.getByRole('tab', { name: /bp/i })).toHaveValue('');
 
     userEvent.click(tableViewButton);
     expect(screen.queryByRole('table')).toBeInTheDocument();

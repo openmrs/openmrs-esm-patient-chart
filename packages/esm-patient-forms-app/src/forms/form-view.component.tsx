@@ -135,12 +135,12 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
             {allForms.length} {t('matchFound', 'match found')}
           </p>
         )}
-        {allForms.length && (
+        {allForms?.length > 0 && (
           <>
             <TableContainer className={styles.tableContainer}>
               <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="short">
                 {({ rows, headers, getHeaderProps, getTableProps }) => (
-                  <Table {...getTableProps()}>
+                  <Table {...getTableProps()} useZebraStyles>
                     <TableHead>
                       <TableRow>
                         {headers.map((header) => (
