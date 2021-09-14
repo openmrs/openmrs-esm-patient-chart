@@ -1,13 +1,13 @@
 import React from 'react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { delay } from 'rxjs/operators';
 import { of } from 'rxjs/internal/observable/of';
 import { throwError } from 'rxjs/internal/observable/throwError';
-import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
-import userEvent from '@testing-library/user-event';
-import { render, screen } from '@testing-library/react';
-import { openmrsObservableFetch } from '@openmrs/esm-framework';
-import NotesOverview from './notes-overview.component';
+import { openmrsObservableFetch, usePagination } from '@openmrs/esm-framework';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
-import { mockPatientEncountersRESTAPI } from '../../../../__mocks__/encounters.mock';
+import { mockPatientEncountersRESTAPI, formattedNotes } from '../../../../__mocks__/encounters.mock';
+import NotesOverview from './notes-overview.component';
 
 const testProps = {
   basePath: '/',
@@ -17,70 +17,91 @@ const testProps = {
 };
 
 const mockOpenmrsObservableFetch = openmrsObservableFetch as jest.Mock;
-const mockGetStartedVisitGetter = jest.fn();
+const mockUsePagination = usePagination as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => ({
-  get getStartedVisit() {
-    return mockGetStartedVisitGetter();
-  },
+  ...(jest.requireActual('@openmrs/esm-framework') as any),
   openmrsObservableFetch: jest.fn(),
+  usePagination: jest.fn(),
+  useVisit: jest.fn().mockReturnValue([{}]),
 }));
 
-const renderNotesOverview = () => render(<NotesOverview {...testProps} />);
+jest.mock('./notes.context', () => ({
+  useNotesContext: jest.fn().mockReturnValue({
+    patient: mockPatient,
+    patientUuid: mockPatient.id,
+  }),
+}));
 
-it('renders an empty state view if encounter data is unavailable', () => {
-  mockOpenmrsObservableFetch.mockReturnValue(of({ data: [] }));
-  mockGetStartedVisitGetter.mockReturnValue(new BehaviorSubject(null));
+describe('NotesOverview: ', () => {
+  it("renders a tabular overview of the patient's encounters when present", async () => {
+    mockOpenmrsObservableFetch.mockReturnValueOnce(of({ data: mockPatientEncountersRESTAPI }).pipe(delay(10)));
+    mockUsePagination.mockReturnValueOnce({
+      results: formattedNotes.slice(0, 10),
+      goTo: () => {},
+      currentPage: 1,
+    });
 
-  renderNotesOverview();
+    renderNotesOverview();
 
-  expect(screen.queryByRole('table')).not.toBeInTheDocument();
-  expect(screen.getByRole('heading', { name: /notes/i })).toBeInTheDocument();
-  expect(screen.getByText(/There are no notes to display for this patient/i)).toBeInTheDocument();
-  expect(screen.getByText(/Record notes/i)).toBeInTheDocument();
-});
+    await screen.findByRole('heading', { name: /notes/i });
+    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
 
-it('renders an error state view if there is a problem fetching allergies data', () => {
-  const error = {
-    message: 'You are not logged in',
-    response: {
-      status: 401,
-      statusText: 'Unauthorized',
-    },
-  };
-  mockOpenmrsObservableFetch.mockReturnValueOnce(throwError(error));
+    const expectedColumnHeaders = [/Date/, /encounter type/, /location/, /author/];
+    expectedColumnHeaders.forEach((header) => {
+      expect(screen.getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument();
+    });
 
-  renderNotesOverview();
+    expect(screen.getAllByRole('row').length).toEqual(11);
+    expect(screen.getByText(/1–5 of 24 items/i)).toBeInTheDocument();
 
-  expect(screen.queryByRole('table')).not.toBeInTheDocument();
-  expect(screen.getByRole('heading', { name: /notes/i })).toBeInTheDocument();
-  expect(screen.getByText(/Error 401: Unauthorized/i)).toBeInTheDocument();
-  expect(
-    screen.getByText(
-      /Sorry, there was a problem displaying this information. You can try to reload this page, or contact the site administrator and quote the error code above/i,
-    ),
-  ).toBeInTheDocument();
-});
+    const prevButton = screen.getByRole('button', { name: /previous/i });
+    const nextButton = screen.getByRole('button', { name: /next/i });
+    expect(prevButton).toBeInTheDocument();
+    expect(prevButton).toBeDisabled();
+    expect(nextButton).toBeInTheDocument();
+    expect(nextButton).not.toBeDisabled();
 
-it("renders an overview of the patient's encounters when present", async () => {
-  mockOpenmrsObservableFetch.mockReturnValue(of({ data: mockPatientEncountersRESTAPI }));
-
-  renderNotesOverview();
-
-  await screen.findByRole('heading', { name: /notes/i });
-
-  const expectedColumnHeaders = [/Date/, /encounter type/, /location/, /author/];
-  expectedColumnHeaders.forEach((header) => {
-    expect(screen.getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument();
+    userEvent.click(nextButton);
+    expect(screen.findByText(/6-10 of 24 items/i)).toBeTruthy();
+    expect(prevButton).not.toBeDisabled();
   });
 
-  expect(screen.getAllByRole('row').length).toEqual(7);
-  expect(screen.getByText(/5 \/ 24 items/)).toBeInTheDocument();
-  const seeAllBtn = screen.getByRole('button', { name: /see all/i });
-  expect(seeAllBtn).toBeInTheDocument();
+  it('renders an empty state view if encounter data is unavailable', async () => {
+    mockOpenmrsObservableFetch.mockReturnValueOnce(of({ data: [] }));
 
-  userEvent.click(seeAllBtn);
+    renderNotesOverview();
 
-  expect(screen.getAllByRole('row').length).toBeGreaterThan(7);
-  expect(seeAllBtn).not.toBeInTheDocument();
+    await screen.findByRole('heading', { name: /notes/i });
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
+    expect(screen.getByText(/There are no notes to display for this patient/i)).toBeInTheDocument();
+    expect(screen.getByText(/Record notes/i)).toBeInTheDocument();
+  });
+
+  it('renders an error state view if there is a problem fetching encounter data', async () => {
+    const error = {
+      message: 'You are not logged in',
+      response: {
+        status: 401,
+        statusText: 'Unauthorized',
+      },
+    };
+    mockOpenmrsObservableFetch.mockReturnValueOnce(throwError(error));
+
+    renderNotesOverview();
+
+    await screen.findByRole('heading', { name: /notes/i });
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /notes/i })).toBeInTheDocument();
+    expect(screen.getByText(/Error 401: Unauthorized/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /Sorry, there was a problem displaying this information. You can try to reload this page, or contact the site administrator and quote the error code above/i,
+      ),
+    ).toBeInTheDocument();
+  });
 });
+
+function renderNotesOverview() {
+  render(<NotesOverview {...testProps} />);
+}

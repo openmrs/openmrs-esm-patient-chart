@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import Table16 from '@carbon/icons-react/es/table/16';
 import ChartLine16 from '@carbon/icons-react/es/chart--line/16';
 import Button from 'carbon-components-react/es/components/Button';
@@ -16,6 +16,9 @@ import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { Card, headers, formatDate, InfoButton, Separator, TypedTableRow } from './helpers';
 import { OverviewPanelEntry, OverviewPanelData } from './useOverviewData';
 import { useTranslation } from 'react-i18next';
+import { navigate } from '@openmrs/esm-framework';
+
+const DashboardResultsCount = 5;
 
 export const CommonDataTable: React.FC<{
   data: Array<OverviewPanelData>;
@@ -64,6 +67,8 @@ export const CommonDataTable: React.FC<{
 interface CommonOverviewPropsBase {
   overviewData: Array<OverviewPanelEntry>;
   insertSeparator?: boolean;
+  isPatientSummaryDashboard?: boolean;
+  patientUuid?: string;
 }
 
 interface CommonOverviewPropsWithToolbar {
@@ -93,8 +98,22 @@ const CommonOverview: React.FC<CommonOverviewProps> = ({
   openTimeline,
   openTrendline,
   deactivateToolbar = false,
+  isPatientSummaryDashboard,
+  patientUuid,
 }) => {
   const { t } = useTranslation();
+  const abnormalInterpretation = [
+    'HIGH',
+    'CRITICALLY_HIGH',
+    'OFF_SCALE_HIGH',
+    'LOW',
+    'CRITICALLY_LOW',
+    'OFF_SCALE_LOW',
+  ];
+
+  const handleSeeAvailableResults = useCallback(() => {
+    navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/chart/test-results` });
+  }, [patientUuid]);
 
   if (!overviewData.length)
     return <EmptyState headerTitle={t('testResults', 'Test Results')} displayText={t('testResults', 'test results')} />;
@@ -102,37 +121,46 @@ const CommonOverview: React.FC<CommonOverviewProps> = ({
   return (
     <>
       {(() => {
-        const cards = overviewData.map(([title, type, data, date, uuid]) => (
-          <Card key={uuid}>
-            <CommonDataTable
-              {...{
-                title,
-                data,
-                tableHeaders: headers,
-                description: (
-                  <div>
-                    {formatDate(date)}
-                    <InfoButton />
-                  </div>
-                ),
-                toolbar: deactivateToolbar || (
-                  <TableToolbar>
-                    <TableToolbarContent>
-                      {type === 'Test' && (
-                        <Button kind="ghost" renderIcon={ChartLine16} onClick={() => openTrendline(uuid, uuid)}>
-                          {t('trend', 'Trend')}
+        const cards = overviewData.map(([title, type, data, date, uuid]) => {
+          const allNormalResults = !data.some((result) => abnormalInterpretation.includes(result.interpretation));
+          const patientSummaryDashboardData = data.slice(0, DashboardResultsCount);
+          return (
+            <Card allNormalResults={allNormalResults} key={uuid}>
+              <CommonDataTable
+                {...{
+                  title,
+                  data: isPatientSummaryDashboard ? patientSummaryDashboardData : data,
+                  tableHeaders: headers,
+                  description: (
+                    <div>
+                      {formatDate(date)}
+                      <InfoButton />
+                    </div>
+                  ),
+                  toolbar: deactivateToolbar || (
+                    <TableToolbar>
+                      <TableToolbarContent>
+                        {type === 'Test' && (
+                          <Button kind="ghost" renderIcon={ChartLine16} onClick={() => openTrendline(uuid, uuid)}>
+                            {t('trend', 'Trend')}
+                          </Button>
+                        )}
+                        <Button kind="ghost" renderIcon={Table16} onClick={() => openTimeline(uuid)}>
+                          {t('timeline', 'Timeline')}
                         </Button>
-                      )}
-                      <Button kind="ghost" renderIcon={Table16} onClick={() => openTimeline(uuid)}>
-                        {t('timeline', 'Timeline')}
-                      </Button>
-                    </TableToolbarContent>
-                  </TableToolbar>
-                ),
-              }}
-            />
-          </Card>
-        ));
+                      </TableToolbarContent>
+                    </TableToolbar>
+                  ),
+                }}
+              />
+              {data.length > DashboardResultsCount && isPatientSummaryDashboard && (
+                <Button onClick={handleSeeAvailableResults} kind="ghost">
+                  {t('moreResultsAvailable', 'More results available')}
+                </Button>
+              )}
+            </Card>
+          );
+        });
 
         if (insertSeparator)
           return cards.reduce((acc, val, i, { length }) => {

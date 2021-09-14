@@ -2,19 +2,19 @@ import { useAssignedExtensionIds } from '@openmrs/esm-framework';
 import React, { createContext, useContext, useMemo, useEffect, useCallback } from 'react';
 import { patientChartWorkspaceSlot } from '../constants';
 import { useWorkspace } from '../hooks/useWorkspace';
+import { ScreenModeTypes } from '../types';
 
 interface WindowSize {
   size: string;
 }
-type ActionTypes = 'minimize' | 'maximize' | 'hide' | 'reopen';
 
 interface ContextWindowSizeContextShape {
   windowSize: WindowSize;
-  updateWindowSize?(value: ActionTypes): any;
+  updateWindowSize?(value: ScreenModeTypes): any;
   openWindows: number;
 }
 
-const reducer = (state: WindowSize, action: ActionTypes) => {
+const reducer = (state: WindowSize, action: ScreenModeTypes) => {
   switch (action) {
     case 'maximize':
       return { size: 'maximize' };
@@ -51,7 +51,7 @@ export const ContextWindowSizeProvider: React.FC = ({ children }) => {
     }
   }, [extensions.length, screenMode]);
 
-  const updateWindowSize = useCallback((action: ActionTypes) => {
+  const updateWindowSize = useCallback((action: ScreenModeTypes) => {
     updateContextWorkspaceWindowSize(action);
   }, []);
 

@@ -2,8 +2,8 @@ import React from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import styles from './vitals-chart.component.scss';
-import RadioButton from 'carbon-components-react/es/components/RadioButton';
-import RadioButtonGroup from 'carbon-components-react/es/components/RadioButtonGroup';
+import Tab from 'carbon-components-react/es/components/Tab';
+import Tabs from 'carbon-components-react/es/components/Tabs';
 import { withUnit } from './vitals-biometrics-form/use-vitalsigns';
 import { PatientVitals } from './vitals-biometrics.resource';
 import { LineChart } from '@carbon/charts-react';
@@ -26,7 +26,7 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptsUnits 
   const [chartData, setChartData] = React.useState([]);
   const [bloodPressureUnit, , temperatureUnit, , , pulseUnit, oxygenSaturationUnit, , respiratoryRateUnit] =
     conceptsUnits;
-  const [selectedVitalSign, setSelecteVitalsSign] = React.useState<vitalsChartData>({
+  const [selectedVitalSign, setSelectedVitalsSign] = React.useState<vitalsChartData>({
     title: `BP (${bloodPressureUnit})`,
     value: 'systolic',
   });
@@ -105,31 +105,28 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptsUnits 
   return (
     <div className={styles.vitalsChartContainer}>
       <div className={styles.vitalSignsArea} style={{ flex: 1 }}>
-        <label className={styles.vitalsSign} htmlFor="radio-button-group">
+        <label className={styles.vitalsSign} htmlFor="vitals-chart-tab-group">
           {t('vitalSignDisplayed', 'Vital Sign Displayed')}
         </label>
-        <RadioButtonGroup
-          defaultSelected="bloodPressure"
-          name="radio-button-group"
-          valueSelected="systolic"
-          orientation="vertical"
-          labelPosition="right">
-          {vitalSigns.map(({ id, title, value }) => (
-            <RadioButton
-              key={id}
-              id={id}
-              labelText={title}
-              value={value}
-              className={styles.vitalsSignsRadioButton}
-              onClick={() =>
-                setSelecteVitalsSign({
-                  title: title,
-                  value: value,
-                })
-              }
-            />
-          ))}
-        </RadioButtonGroup>
+        <Tabs className={styles.verticalTabs} type="default">
+          {vitalSigns.map(({ id, title, value }) => {
+            return (
+              <Tab
+                key={id}
+                className={`${styles.tab} ${styles.bodyLong01} ${
+                  selectedVitalSign.title === title && styles.selectedTab
+                }`}
+                onClick={() =>
+                  setSelectedVitalsSign({
+                    title: title,
+                    value: value,
+                  })
+                }
+                label={title}
+              />
+            );
+          })}
+        </Tabs>
       </div>
       <div className={styles.vitalsChartArea} style={{ flex: 4 }}>
         <LineChart data={chartData} options={chartOptions} />

@@ -2,7 +2,6 @@
 
 .contactDetails {
   color: $text-02;
-  padding: 1.3125rem;
   width: 100%;
 }
 
@@ -19,6 +18,7 @@
 
 .row .col {
   flex: 1;
+  padding: 1.3125rem;
 }
 
 .row li {
@@ -33,3 +33,23 @@
 .relationship div {
   flex: 1 1;
 }
+
+.verticalLine {
+  position: relative;
+}
+
+.verticalLine:after {
+  content: '';
+  position: absolute;
+  border-left: $spacing-01 solid $ui-03;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+}
+
+.hr{
+  height: $spacing-01;
+  background-color: $ui-03;
+  border: none;
+}
+

@@ -1,0 +1,12 @@
+@import '../root.scss';
+
+.activeMedicationContainer {
+  display: flex;
+  justify-content: space-between;
+  background-color: $ui-background;
+  flex-direction: column;
+}
+
+.title {
+  @extend .productiveHeading03;
+}

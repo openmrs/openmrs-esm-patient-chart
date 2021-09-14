@@ -1,10 +1,8 @@
 import React, { SyntheticEvent } from 'react';
 import dayjs from 'dayjs';
-import filter from 'lodash-es/filter';
-import includes from 'lodash-es/includes';
-import map from 'lodash-es/map';
+import { filter, includes, map } from 'lodash-es';
 import { useTranslation } from 'react-i18next';
-import { createErrorHandler, showNotification, showToast, useSessionUser } from '@openmrs/esm-framework';
+import { createErrorHandler, detach, showNotification, showToast, useSessionUser } from '@openmrs/esm-framework';
 import Button from 'carbon-components-react/es/components/Button';
 import DatePicker from 'carbon-components-react/es/components/DatePicker';
 import DatePickerInput from 'carbon-components-react/es/components/DatePickerInput';
@@ -80,12 +78,11 @@ const initialViewState: ViewState = {
 };
 
 interface ProgramsFormProps {
-  closeWorkspace(): void;
   patientUuid: string;
   isTablet: boolean;
 }
 
-const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, closeWorkspace, isTablet }) => {
+const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, isTablet }) => {
   const { t } = useTranslation();
   const session = useSessionUser();
   const [availableLocations, setAvailableLocations] = React.useState(null);
@@ -117,14 +114,17 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, closeWorkspace
             type: ActionTypes.selectProgram,
           }),
         () => createErrorHandler(),
-        () => sub1.unsubscribe(),
       );
 
       const sub2 = fetchLocations().subscribe(
         (locations) => setAvailableLocations(locations),
         () => createErrorHandler(),
-        () => sub2.unsubscribe(),
       );
+
+      return () => {
+        sub1.unsubscribe();
+        sub2.unsubscribe();
+      };
     }
   }, [patientUuid]);
 
@@ -132,7 +132,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, closeWorkspace
   React.useEffect(() => {
     if (availablePrograms) {
       const sub = fetchEnrolledPrograms(patientUuid).subscribe(
-        (enrolledPrograms) =>
+        (enrolledPrograms) => {
           dispatch({
             availablePrograms: availablePrograms,
             eligiblePrograms: filter(
@@ -141,12 +141,15 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, closeWorkspace
             ),
             program: null,
             type: ActionTypes.selectProgram,
-          }),
+          });
+        },
         () => createErrorHandler(),
-        () => sub.unsubscribe(),
       );
+      return () => sub.unsubscribe();
     }
   }, [patientUuid, availablePrograms]);
+
+  const closeWorkspace = React.useCallback(() => detach('patient-chart-workspace-slot', 'programs-form-workspace'), []);
 
   const handleSubmit = React.useCallback(
     (event: SyntheticEvent<HTMLFormElement>) => {

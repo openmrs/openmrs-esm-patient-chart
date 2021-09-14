@@ -66,7 +66,7 @@ function setupOpenMRS() {
         offline: true,
       },
       {
-        id: 'visit-notes-workspace',
+        id: 'visit-notes-form-workspace',
         load: getAsyncLifecycle(() => import('./notes/visit-notes-form.component'), options),
         meta: {
           title: {

@@ -76,9 +76,9 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({ isTablet, patientUuid }
           (response) => {
             if (response.status === 201) {
               getStartedVisit.next({
-                mode: VisitMode.NEWVISIT,
+                mode: VisitMode?.NEWVISIT,
                 visitData: response.data,
-                status: VisitStatus.ONGOING,
+                status: VisitStatus?.ONGOING,
               });
               handleCloseForm();
               showToast({

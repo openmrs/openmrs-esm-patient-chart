@@ -30,7 +30,7 @@ const RecentOverview: React.FC<RecentOverviewProps> = ({ patientUuid, basePath }
           {(() => {
             if (overviewData.length) {
               return (
-                <div>
+                <div className={styles.widgetCard}>
                   <div className={styles['recent-overview-header-container']}>
                     <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>
                       {cardTitle} ({Math.min(RECENT_COUNT, overviewData.length)})

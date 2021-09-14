@@ -1,7 +1,6 @@
 import React, { SyntheticEvent } from 'react';
 import dayjs from 'dayjs';
 import debounce from 'lodash-es/debounce';
-import styles from './visit-notes-form.scss';
 import Button from 'carbon-components-react/es/components/Button';
 import DatePicker from 'carbon-components-react/es/components/DatePicker';
 import DatePickerInput from 'carbon-components-react/es/components/DatePickerInput';
@@ -14,10 +13,18 @@ import TextArea from 'carbon-components-react/es/components/TextArea';
 import { Tile } from 'carbon-components-react/es/components/Tile';
 import { useTranslation } from 'react-i18next';
 import { Column, Grid, Row } from 'carbon-components-react/es/components/Grid';
-import { createErrorHandler, showNotification, showToast, useConfig, useSessionUser } from '@openmrs/esm-framework';
+import {
+  createErrorHandler,
+  detach,
+  showNotification,
+  showToast,
+  useConfig,
+  useSessionUser,
+} from '@openmrs/esm-framework';
 import { convertToObsPayload, Diagnosis, VisitNotePayload } from './visit-note.util';
 import { fetchDiagnosisByName, fetchLocationByUuid, fetchProviderByUuid, saveVisitNote } from './visit-notes.resource';
 import { ConfigObject } from '../config-schema';
+import styles from './visit-notes-form.scss';
 const searchTimeoutInMs = 500;
 
 interface Idle {
@@ -92,12 +99,11 @@ const initialViewState: ViewState = {
 };
 
 interface VisitNotesFormProps {
-  closeWorkspace(): void;
   patientUuid: string;
   isTablet: boolean;
 }
 
-const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, closeWorkspace, isTablet }) => {
+const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, isTablet }) => {
   const { t } = useTranslation();
   const session = useSessionUser();
   const config = useConfig() as ConfigObject;
@@ -191,6 +197,11 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, closeWorks
     }
   }, [selectedDiagnoses]);
 
+  const closeWorkspace = React.useCallback(
+    () => detach('patient-chart-workspace-slot', 'visit-notes-form-workspace'),
+    [],
+  );
+
   const handleSubmit = React.useCallback(
     (event: SyntheticEvent<HTMLFormElement>) => {
       event.preventDefault();
@@ -234,8 +245,8 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, closeWorks
         obs: obs,
       };
 
-      const ac = new AbortController();
-      saveVisitNote(ac, visitNotePayload)
+      const abortController = new AbortController();
+      saveVisitNote(abortController, visitNotePayload)
         .then((response) => {
           if (response.status === 201) {
             closeWorkspace();
@@ -257,7 +268,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, closeWorks
           });
         })
         .finally(() => {
-          ac.abort();
+          abortController.abort();
           dispatch({
             type: ActionTypes.idle,
           });

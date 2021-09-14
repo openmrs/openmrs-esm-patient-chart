@@ -109,14 +109,6 @@
   border-radius: 0 $spacing-02 $spacing-02 0;
 }
 
-.customTable tr[data-parent-row]:nth-child(odd) td {
-  background-color: #fff;
-}
-
-.customTable  tbody  tr[data-parent-row]:nth-child(even)  td {
-  background-color: #f4f4f4;
-}
-
 .encounterEmptyState {
   text-align: center;
   margin: 0 1rem 1rem 1rem; 
