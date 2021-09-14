@@ -146,7 +146,7 @@ const PastVisitOverview: React.FC<PastVisitOverviewProps> = ({ patientUuid }) =>
           <DataTable headers={headerData} rows={rowData}>
             {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
               <TableContainer title={t('pastVisit', 'Past Visit')}>
-                <Table {...getTableProps()}>
+                <Table {...getTableProps()} useZebraStyles>
                   <TableHead>
                     <TableRow>
                       {headers.map((header) => (

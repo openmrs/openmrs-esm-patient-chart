@@ -2,6 +2,10 @@
 @import "~carbon-components/src/globals/scss/vars";
 @import "~carbon-components/src/globals/scss/mixins";
 
+.widgetCard {
+  border: 1px solid $ui-03;
+}
+
 .separator {
   height: 1.5rem;
   border-bottom: #e0e0e0 solid 1px;
@@ -20,6 +24,10 @@
   h4 {
     width: calc(100% - 220px);
   }
+}
+
+.normal-results {
+  border: 0.125rem solid $brand-01;
 }
 
 .recent-overview-header-container {
@@ -57,12 +65,14 @@
     font-weight: 600;
     font-family: "IBM Plex Sans", sans-serif;
   }
+  outline: 0.063rem solid $ui-05;
+  outline-offset: -0.130rem;
 }
 
 .critically-high,
 .critically-low {
-  box-sizing: border-box;
-  box-shadow: inset 0 0 0 2px #da1e28;
+  outline: 0.063rem solid $danger;
+  outline-offset: -0.130rem;
 
   td {
     border: unset !important;

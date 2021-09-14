@@ -1,0 +1,8 @@
+@import "~@openmrs/esm-styleguide/src/vars";
+@import "~carbon-components/src/globals/scss/vars";
+@import "../root.scss";
+
+.dashboardTitle {
+  @include carbon--type-style("productive-heading-03");
+  margin: 1rem 0rem 1rem 1.3125rem;
+}

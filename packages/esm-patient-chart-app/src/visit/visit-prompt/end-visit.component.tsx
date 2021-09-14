@@ -61,10 +61,10 @@ const EndVisitPrompt: React.FC<EndVisitPromptProps> = ({ patientUuid, openModal,
           <span>{new Date(currentVisit?.startDatetime).toLocaleDateString(locale, { dateStyle: 'medium' })}</span>
         </p>
         <p className={styles.customLabel}>
-          <span>{t('visitType', 'Visit Type')}</span> <span>{currentVisit?.visitType.display}</span>
+          <span>{t('visitType', 'Visit Type')}</span> <span>{currentVisit?.visitType?.display}</span>
         </p>
         <p className={styles.customLabel}>
-          <span>{t('visitLocation', 'Visit Location')}</span> <span>{currentVisit?.location.display}</span>
+          <span>{t('visitLocation', 'Visit Location')}</span> <span>{currentVisit?.location?.display}</span>
         </p>
       </ModalBody>
       <div className={styles.buttonContainer}>

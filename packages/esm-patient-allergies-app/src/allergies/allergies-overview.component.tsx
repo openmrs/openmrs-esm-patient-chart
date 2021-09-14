@@ -78,7 +78,7 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient, showAddA
     if (allergies.length) {
       const rows = getRowItems(allergies);
       return (
-        <div>
+        <div className={styles.widgetCard}>
           <div className={styles.allergiesHeader}>
             <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
             {showAddAllergy && (
@@ -90,7 +90,7 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient, showAddA
           <TableContainer>
             <DataTable rows={rows} headers={headers} isSortable={true} size="short">
               {({ rows, headers, getHeaderProps, getTableProps }) => (
-                <Table {...getTableProps()}>
+                <Table {...getTableProps()} useZebraStyles>
                   <TableHead>
                     <TableRow>
                       {headers.map((header) => (

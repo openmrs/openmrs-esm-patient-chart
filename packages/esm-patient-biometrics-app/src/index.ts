@@ -63,7 +63,7 @@ function setupOpenMRS() {
       {
         id: 'biometrics-details-widget',
         slot: dashboardMeta.slot,
-        load: getAsyncLifecycle(() => import('./biometrics/biometrics-overview.component'), options),
+        load: getAsyncLifecycle(() => import('./biometrics/biometrics-main.component'), options),
         meta: {
           view: 'biometrics',
           title: 'Biometrics',

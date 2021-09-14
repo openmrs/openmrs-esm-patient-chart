@@ -79,8 +79,8 @@ const AppointmentsOverview: React.FC<AppointmentOverviewProps> = ({ patientUuid 
     if (appointments.length) {
       const rows = getRowItems(appointments);
       return (
-        <div>
-          <div className={styles.allergiesHeader}>
+        <div className={styles.widgetCard}>
+          <div className={styles.appointmentsHeader}>
             <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
             <Button kind="ghost" renderIcon={Add16} iconDescription="Add appointments" onClick={launchAppointmentsForm}>
               {t('add', 'Add')}
@@ -89,7 +89,7 @@ const AppointmentsOverview: React.FC<AppointmentOverviewProps> = ({ patientUuid 
           <TableContainer>
             <DataTable rows={rows} headers={headers} isSortable={true} size="short">
               {({ rows, headers, getHeaderProps, getTableProps }) => (
-                <Table {...getTableProps()}>
+                <Table {...getTableProps()} useZebraStyles>
                   <TableHead>
                     <TableRow>
                       {headers.map((header) => (

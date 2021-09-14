@@ -17,7 +17,7 @@ const dashboardMeta = {
   name: 'summary',
   slot: 'patient-chart-summary-dashboard-slot',
   config: { columns: 4, type: 'grid' },
-  title: 'Summary',
+  title: 'Patient Summary',
 };
 
 function setupOpenMRS() {

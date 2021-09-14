@@ -1,10 +1,11 @@
 {
   "add": "Add",
+  "addImage": "Add image +",
   "attachmentCaptionInstruction": "Enter a caption for the image",
   "attachments": "Attachments",
   "cameraError": "Camera Error",
   "cancel": "Cancel",
-  "change": "Change",
+  "changeImage": "Change image",
   "delete": "Delete",
   "deleteSelected": "Delete selected",
   "save": "Save",

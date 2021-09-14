@@ -2,7 +2,6 @@ import React from 'react';
 import { BrowserRouter, Switch, Route } from 'react-router-dom';
 import AllergyDetailedSummary from './allergies-detailed-summary.component';
 import { AllergiesContext } from './allergies.context';
-import AllergyRecord from './allergy-record.component';
 
 interface AllergiesProps {
   basePath: string;
@@ -21,7 +20,6 @@ export default function Allergies({ basePath, patient, patientUuid, showAddAller
             path="/"
             render={() => <AllergyDetailedSummary patient={patient} showAddAllergy={showAddAllergy} />}
           />
-          <Route exact path="/details/:allergyUuid" component={AllergyRecord} />
         </Switch>
       </BrowserRouter>
     </AllergiesContext.Provider>

@@ -2,12 +2,6 @@
 @import "~carbon-components/src/globals/scss/vendor/@carbon/layout/scss/generated/spacing";
 @import "~@openmrs/esm-styleguide/src/vars";
 
-.resetPatientChartWidgetContainer {
-  /* The patient chart's .widgetContainer centers text. We don't want that with Carbon. */
-  text-align: initial;
-  margin: 0 $spacing-05 $spacing-05 $spacing-05;
-}
-
 .productiveHeading01 {
   @include carbon--type-style("productive-heading-01");
   margin-bottom: $spacing-03;

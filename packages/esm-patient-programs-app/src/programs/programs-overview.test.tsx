@@ -44,7 +44,7 @@ describe('<ProgramsOverview />', () => {
 
     // Clicking "Add" launches form tab
     fireEvent.click(addBtn);
-    expect(mockAttach).toHaveBeenCalledWith('patient-chart-workspace-slot', 'programs-workspace');
+    expect(mockAttach).toHaveBeenCalledWith('patient-chart-workspace-slot', 'programs-form-workspace');
   });
 
   it('renders an empty state view when conditions data is absent', async () => {

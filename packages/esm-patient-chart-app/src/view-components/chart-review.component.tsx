@@ -6,6 +6,7 @@ import { Redirect } from 'react-router-dom';
 import { useExtensionSlotMeta } from '@openmrs/esm-framework';
 import { DashboardConfig } from '../config-schemas';
 import { basePath } from '../constants';
+import styles from './chart-review.scss';
 
 function makePath(target: DashboardConfig, params: Record<string, string> = {}) {
   const parts = `${basePath}/${target.name}/:subview?`.split('/');
@@ -47,13 +48,16 @@ const ChartReview: React.FC<ChartReviewProps> = ({ patientUuid, patient, view, s
     );
   } else if (dashboard.config.type === 'grid') {
     return (
-      <GridView
-        slot={dashboard.slot}
-        layout={dashboard.config}
-        name={dashboard.name}
-        patient={patient}
-        patientUuid={patientUuid}
-      />
+      <>
+        {dashboard.title && <h1 className={styles.dashboardTitle}>{dashboard.title}</h1>}
+        <GridView
+          slot={dashboard.slot}
+          layout={dashboard.config}
+          name={dashboard.name}
+          patient={patient}
+          patientUuid={patientUuid}
+        />
+      </>
     );
   } else if (dashboard.config.type === 'tabs') {
     return (

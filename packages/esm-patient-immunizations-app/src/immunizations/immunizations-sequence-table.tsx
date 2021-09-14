@@ -1,5 +1,5 @@
 import React, { useMemo, useCallback } from 'react';
-import Button from 'carbon-components-react/lib/components/Button';
+import Button from 'carbon-components-react/es/components/Button';
 import DataTable, {
   Table,
   TableHead,
@@ -7,7 +7,7 @@ import DataTable, {
   TableHeader,
   TableBody,
   TableCell,
-} from 'carbon-components-react/lib/components/DataTable';
+} from 'carbon-components-react/es/components/DataTable';
 import isEmpty from 'lodash-es/isEmpty';
 import { openWorkspaceTab } from '../../../esm-patient-common-lib/src';
 import ImmunizationsForm from './immunizations-form.component';
