@@ -1,12 +1,62 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useMemo, useReducer } from 'react';
 import dayjs from 'dayjs';
 import { getAppointments } from '../appointments/appointments.resource';
 import { Appointment } from '../types';
 
+enum ActionTypes {
+  pending = 'pending',
+  resolved = 'resolved',
+  error = 'error',
+}
+interface Pending {
+  type: ActionTypes.pending;
+}
+
+interface Error {
+  type: ActionTypes.error;
+  payload: Error;
+}
+
+interface Resolved {
+  type: ActionTypes.resolved;
+  payload: Array<Appointment>;
+}
+
+type Action = Pending | Error | Resolved;
+
+interface PatientAppointments {
+  status: 'pending' | 'resolved' | 'error';
+  patientAppointments: Array<Appointment>;
+  error?: null | Error;
+}
+
+function reducer(state: PatientAppointments, action: Action): PatientAppointments {
+  switch (action.type) {
+    case ActionTypes.pending:
+      return {
+        status: 'pending',
+        ...state,
+      };
+    case ActionTypes.resolved:
+      return {
+        status: 'resolved',
+        patientAppointments: action.payload,
+        error: null,
+      };
+    case ActionTypes.error:
+      return {
+        status: 'error',
+        patientAppointments: null,
+        error: action.payload,
+      };
+    default:
+      return state;
+  }
+}
+
 export const useAppointments = (patientUuid: string) => {
-  const [patientAppointments, setPatientAppointments] = useState<Array<Appointment>>([]);
-  const [error, setError] = useState<Error>(null);
-  const [status, setStatus] = useState<'pending' | 'resolved' | 'error'>('pending');
+  const initialState: PatientAppointments = { status: 'pending', patientAppointments: [] };
+  const [{ status, patientAppointments, error }, dispatch] = useReducer(reducer, initialState);
 
   useEffect(() => {
     if (patientUuid) {
@@ -14,12 +64,10 @@ export const useAppointments = (patientUuid: string) => {
       const startDate = dayjs(new Date().toISOString()).subtract(6, 'month').toISOString();
       getAppointments(patientUuid, startDate, ac).then(
         ({ data }) => {
-          setPatientAppointments(data);
-          setStatus('resolved');
+          dispatch({ type: ActionTypes.resolved, payload: data });
         },
         (error) => {
-          setError(error);
-          setStatus('error');
+          dispatch({ type: ActionTypes.error, payload: error });
         },
       );
       return () => ac.abort();
