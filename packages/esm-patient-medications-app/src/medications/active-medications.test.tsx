@@ -7,7 +7,7 @@ import { mockMedicationOrderByUuidResponse } from '../../../../__mocks__/medicat
 
 const testProps = {
   patientUuid: mockPatient.id,
-  showAddMedications: false,
+  showAddMedications: true,
 };
 
 const mockUsePatientOrders = usePatientOrders as jest.Mock;
@@ -18,7 +18,7 @@ jest.mock('../utils/use-current-patient-orders.hook', () => ({
 
 describe('ActiveMedications: ', () => {
   test('renders the active medications widget', () => {
-    mockUsePatientOrders.mockReturnValue([mockMedicationOrderByUuidResponse, jest.fn]);
+    mockUsePatientOrders.mockReturnValue([mockMedicationOrderByUuidResponse.data, jest.fn]);
 
     renderActiveMedications();
 

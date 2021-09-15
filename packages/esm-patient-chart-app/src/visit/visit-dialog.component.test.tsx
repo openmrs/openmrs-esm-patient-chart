@@ -93,7 +93,7 @@ describe('VisitDialog', () => {
 
     expect(screen.getByText(/End Current visit/)).toBeInTheDocument();
     expect(screen.getByText(/Start Date/)).toBeInTheDocument();
-    expect(screen.getByText(/16 Mar 2021/)).toBeInTheDocument();
+    expect(screen.getByText(/Mar 16, 2021/)).toBeInTheDocument();
     expect(screen.getByText(/Visit Type/)).toBeInTheDocument();
     expect(await screen.findByText(/Facility Visit/)).toBeInTheDocument();
     expect(await screen.findByText(/Visit Location/)).toBeInTheDocument();

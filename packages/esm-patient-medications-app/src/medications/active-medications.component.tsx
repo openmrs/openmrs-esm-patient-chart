@@ -36,7 +36,7 @@ const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patientUuid, show
                 showDiscontinueButton={true}
                 showModifyButton={true}
                 showReorderButton={false}
-                showAddNewButton={false}
+                showAddNewButton={showAddMedications}
               />
             </div>
           );
