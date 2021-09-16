@@ -1,16 +1,13 @@
-import React, { useState, useCallback, useMemo, useReducer } from 'react';
-import Search from 'carbon-components-react/es/components/Search';
-import Checkbox from 'carbon-components-react/es/components/Checkbox';
-import Button from 'carbon-components-react/es/components/Button';
+import React, { useState, useCallback, useMemo } from 'react';
 import styles from './clinical-view-form.component.scss';
 import debounce from 'lodash-es/debounce';
-import { useTranslation } from 'react-i18next';
-import { detach, temporaryConfigStore, TemporaryConfigStore } from '@openmrs/esm-framework';
-import { useClinicalView } from '../store';
 import isEmpty from 'lodash-es/isEmpty';
 import cloneDeep from 'lodash-es/cloneDeep';
 import set from 'lodash-es/set';
-import { StructuredListSkeleton } from 'carbon-components-react/es/components/StructuredList';
+import { Search, Checkbox, Button, StructuredListSkeleton } from 'carbon-components-react';
+import { useTranslation } from 'react-i18next';
+import { detach, temporaryConfigStore, TemporaryConfigStore } from '@openmrs/esm-framework';
+import { useClinicalView } from '../store';
 
 interface ClinicalViewFormProps {
   isTablet: boolean;

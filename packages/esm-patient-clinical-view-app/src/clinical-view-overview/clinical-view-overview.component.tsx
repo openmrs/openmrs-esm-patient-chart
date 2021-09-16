@@ -1,12 +1,10 @@
 import React from 'react';
-import Button from 'carbon-components-react/es/components/Button';
-import Tab from 'carbon-components-react/es/components/Tab';
-import Tabs from 'carbon-components-react/es/components/Tabs';
-import { useTranslation } from 'react-i18next';
-import { attach, ExtensionSlot, useConfig } from '@openmrs/esm-framework';
 import tail from 'lodash-es/tail';
 import EmptyDataIllustration from '../empty-state/empty-data-illustration.component';
 import styles from './clinical-view-overview.component.scss';
+import { Button, Tab, Tabs } from 'carbon-components-react';
+import { useTranslation } from 'react-i18next';
+import { attach, ExtensionSlot, useConfig } from '@openmrs/esm-framework';
 
 interface ClinicalViewOverviewProps {
   patientUuid: string;

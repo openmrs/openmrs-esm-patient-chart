@@ -1,12 +1,12 @@
 import React, { useState, useMemo } from 'react';
-import Button from 'carbon-components-react/es/components/Button';
-import { useTranslation } from 'react-i18next';
-import { Encounter } from '../visit.resource';
 import dayjs from 'dayjs';
-import { Visit } from '@openmrs/esm-framework';
 import styles from '../visit-detail-overview.scss';
 import EncounterList from './encounter-list.component';
 import VisitSummary from './visit-summary.component';
+import { Button } from 'carbon-components-react';
+import { useTranslation } from 'react-i18next';
+import { Encounter } from '../visit.resource';
+import { Visit } from '@openmrs/esm-framework';
 
 function formatDateTime(date) {
   return dayjs(date).format('MMM DD, YYYY - hh:mm');

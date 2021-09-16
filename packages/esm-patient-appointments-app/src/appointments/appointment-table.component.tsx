@@ -1,7 +1,10 @@
 import React, { useMemo } from 'react';
+import styles from './appointment-table.component.scss';
+import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { Appointment } from '../types';
-import DataTable, {
+import {
+  DataTable,
   Table,
   TableCell,
   TableContainer,
@@ -10,9 +13,7 @@ import DataTable, {
   TableHeader,
   TableRow,
   DataTableHeader,
-} from 'carbon-components-react/es/components/DataTable';
-import styles from './appointment-table.component.scss';
-import dayjs from 'dayjs';
+} from 'carbon-components-react';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { usePagination } from '@openmrs/esm-framework';
 

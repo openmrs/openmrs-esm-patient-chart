@@ -1,8 +1,7 @@
 import React from 'react';
-import Link from 'carbon-components-react/es/components/Link';
 import styles from './empty-state.scss';
+import { Link, Tile } from 'carbon-components-react';
 import { Trans, useTranslation } from 'react-i18next';
-import { Tile } from 'carbon-components-react/es/components/Tile';
 import { EmptyDataIllustration } from './empty-data-illustration.component';
 
 export interface EmptyStateProps {

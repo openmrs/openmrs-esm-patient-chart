@@ -1,7 +1,6 @@
 import React from 'react';
 import styles from './allergy-form-tab.component.scss';
-import RadioButtonGroup from 'carbon-components-react/es/components/RadioButtonGroup';
-import RadioButton from 'carbon-components-react/es/components/RadioButton';
+import { RadioButtonGroup, RadioButton } from 'carbon-components-react';
 import { OpenMRSResource } from '../../types';
 
 interface AllergyFormTabProps {

@@ -1,9 +1,9 @@
 import React from 'react';
+import styles from './contact-details.scss';
 import { useTranslation } from 'react-i18next';
 import { createErrorHandler } from '@openmrs/esm-framework';
-import InlineLoading from 'carbon-components-react/es/components/InlineLoading';
+import { InlineLoading } from 'carbon-components-react';
 import { fetchPatientRelationships } from './relationships.resource';
-import styles from './contact-details.scss';
 
 const Address: React.FC<{ address: fhir.Address }> = ({ address }) => {
   const { t } = useTranslation();

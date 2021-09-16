@@ -1,16 +1,17 @@
 import React, { useMemo, useCallback } from 'react';
-import Button from 'carbon-components-react/es/components/Button';
-import DataTable, {
+import isEmpty from 'lodash-es/isEmpty';
+import ImmunizationsForm from './immunizations-form.component';
+import {
+  Button,
+  DataTable,
   Table,
   TableHead,
   TableRow,
   TableHeader,
   TableBody,
   TableCell,
-} from 'carbon-components-react/es/components/DataTable';
-import isEmpty from 'lodash-es/isEmpty';
-import { openWorkspaceTab } from '../../../esm-patient-common-lib/src';
-import ImmunizationsForm from './immunizations-form.component';
+} from 'carbon-components-react';
+import { openWorkspaceTab } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { ExistingDoses, Immunization } from '../types';
 

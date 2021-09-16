@@ -1,8 +1,7 @@
 import React from 'react';
 import dayjs from 'dayjs';
-import Tab from 'carbon-components-react/es/components/Tab';
-import Tabs from 'carbon-components-react/es/components/Tabs';
 import styles from './biometrics-chart.component.scss';
+import { Tab, Tabs } from 'carbon-components-react';
 import { LineChart } from '@carbon/charts-react';
 import { LineChartOptions } from '@carbon/charts/interfaces/charts';
 import { ScaleTypes } from '@carbon/charts/interfaces/enums';

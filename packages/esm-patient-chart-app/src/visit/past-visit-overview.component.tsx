@@ -1,6 +1,10 @@
-import { Visit } from '@openmrs/esm-api';
-import React, { useState, useEffect, useMemo, useReducer, useCallback } from 'react';
-import DataTable, {
+import React, { useEffect, useMemo, useReducer, useCallback } from 'react';
+import {
+  Button,
+  DataTable,
+  DataTableSkeleton,
+  OverflowMenu,
+  OverflowMenuItem,
   TableContainer,
   Table,
   TableBody,
@@ -9,17 +13,19 @@ import DataTable, {
   TableHeader,
   TableCell,
   DataTableHeader,
-  DataTableRow,
-} from 'carbon-components-react/es/components/DataTable';
-import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
-import OverflowMenu from 'carbon-components-react/es/components/OverflowMenu';
-import OverflowMenuItem from 'carbon-components-react/es/components/OverflowMenuItem';
+} from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
-import dayjs from 'dayjs';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
-import { attach, detach, getStartedVisit, getVisitsForPatient, VisitMode, VisitStatus } from '@openmrs/esm-framework';
+import {
+  attach,
+  detach,
+  getStartedVisit,
+  getVisitsForPatient,
+  VisitMode,
+  VisitStatus,
+  Visit,
+} from '@openmrs/esm-framework';
 import styles from './past-visit-overview.component.scss';
-import Button from 'carbon-components-react/es/components/Button';
 import { first } from 'rxjs/operators';
 
 enum ActionTypes {
@@ -95,7 +101,7 @@ const PastVisitOverview: React.FC<PastVisitOverviewProps> = ({ patientUuid }) =>
     [t],
   );
 
-  const rowData: Array<DataTableRow> = useMemo(
+  const rowData = useMemo(
     () =>
       patientPastVisits?.length
         ? patientPastVisits.map((visit, index) => {
@@ -174,7 +180,7 @@ const PastVisitOverview: React.FC<PastVisitOverviewProps> = ({ patientUuid }) =>
                               onClick={() => {
                                 getStartedVisit.next({
                                   mode: VisitMode.LOADING,
-                                  visitData: rowData[rowIndex],
+                                  visitData: rowData[rowIndex].visit,
                                   status: VisitStatus.ONGOING,
                                 });
                               }}

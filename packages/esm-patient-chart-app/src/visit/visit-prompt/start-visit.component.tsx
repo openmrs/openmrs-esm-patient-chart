@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react';
 import styles from './start-visit.component.scss';
-import ComposedModal, { ModalHeader, ModalBody } from 'carbon-components-react/es/components/ComposedModal';
-import Button from 'carbon-components-react/es/components/Button';
+import { ComposedModal, Button, ModalHeader, ModalBody } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 import { attach } from '@openmrs/esm-framework';
 

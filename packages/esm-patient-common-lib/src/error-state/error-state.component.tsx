@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './error-state.scss';
-import { Tile } from 'carbon-components-react/es/components/Tile';
+import { Tile } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 
 export interface ErrorStateProps {

@@ -1,14 +1,13 @@
 import React, { useState, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-import Tabs from 'carbon-components-react/es/components/Tabs';
-import Tab from 'carbon-components-react/es/components/Tab';
 import dayjs from 'dayjs';
-import { Order, Encounter, Note, Observation, OrderItem } from '../visit.resource';
 import styles from '../visit-detail-overview.scss';
 import MedicationSummary from './medications-summary.component';
 import NotesSummary from './notes-summary.component';
 import TestsSummary from './tests-summary.component';
+import { useTranslation } from 'react-i18next';
+import { Tab, Tabs } from 'carbon-components-react';
 import { OpenmrsResource } from '@openmrs/esm-framework';
+import { Order, Encounter, Note, Observation, OrderItem } from '../visit.resource';
 
 function formatTime(date) {
   return dayjs(date).format('hh:mm');

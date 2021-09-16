@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react';
-import Button from 'carbon-components-react/lib/components/Button';
 import placeholder from '../assets/placeholder.svg';
+import { Button } from 'carbon-components-react';
 import { showModal, toOmrsIsoString } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 

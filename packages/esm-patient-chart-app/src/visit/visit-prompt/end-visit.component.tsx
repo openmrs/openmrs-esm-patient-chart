@@ -1,10 +1,8 @@
 import React from 'react';
 import styles from './end-visit.component.scss';
-import ComposedModal, { ModalHeader, ModalBody } from 'carbon-components-react/es/components/ComposedModal';
-import Button from 'carbon-components-react/es/components/Button';
+import { ComposedModal, Button, ModalHeader, ModalBody } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 import { getStartedVisit, showNotification, showToast, updateVisit, useVisit } from '@openmrs/esm-framework';
-import dayjs from 'dayjs';
 import { first } from 'rxjs/operators';
 
 interface EndVisitPromptProps {

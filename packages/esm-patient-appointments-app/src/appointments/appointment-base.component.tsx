@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
 import styles from './appointment-base.component.scss';
 import Add16 from '@carbon/icons-react/es/add/16';
-import Button from 'carbon-components-react/es/components/Button';
-import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
+import AppointmentTable from './appointment-table.component';
+import { Button, DataTableSkeleton, ContentSwitcher, Switch } from 'carbon-components-react';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { useAppointments } from '../hooks/useAppointments';
-import ContentSwitcher from 'carbon-components-react/es/components/ContentSwitcher';
-import Switch from 'carbon-components-react/es/components/Switch';
-import AppointmentTable from './appointment-table.component';
 import { attach } from '@openmrs/esm-framework';
 
 interface AppointmentBaseProps {

@@ -6,7 +6,7 @@ import styles from './context-workspace.scss';
 import { ExtensionSlot, useLayoutType, useBodyScrollLock } from '@openmrs/esm-framework';
 import { RouteComponentProps } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Header, HeaderGlobalAction, HeaderGlobalBar, HeaderName } from 'carbon-components-react/es/components/UIShell';
+import { Header, HeaderGlobalAction, HeaderGlobalBar, HeaderName } from 'carbon-components-react';
 import { useWorkspace } from '../hooks/useWorkspace';
 import { patientChartWorkspaceSlot } from '../constants';
 import { isDesktop } from '../utils';

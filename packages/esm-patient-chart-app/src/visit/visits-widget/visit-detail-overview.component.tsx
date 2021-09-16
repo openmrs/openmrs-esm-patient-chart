@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import styles from './visit-detail-overview.scss';
-import { Visit, getVisitsForPatient, createErrorHandler } from '@openmrs/esm-framework';
-import SkeletonText from 'carbon-components-react/es/components/SkeletonText';
 import VisitDetailComponent from './past-visits-components/visit-detail.component';
+import { Visit, getVisitsForPatient, createErrorHandler } from '@openmrs/esm-framework';
+import { SkeletonText } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 
 interface VisitOverviewComponentProps {

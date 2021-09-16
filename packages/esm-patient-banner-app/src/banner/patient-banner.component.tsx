@@ -1,15 +1,15 @@
 import React from 'react';
 import dayjs from 'dayjs';
 import capitalize from 'lodash-es/capitalize';
-import { useTranslation } from 'react-i18next';
-import Button from 'carbon-components-react/es/components/Button';
 import ChevronDown16 from '@carbon/icons-react/es/chevron--down/16';
 import ChevronUp16 from '@carbon/icons-react/es/chevron--up/16';
 import OverflowMenuVertical16 from '@carbon/icons-react/es/overflow-menu--vertical/16';
-import { ExtensionSlot, age } from '@openmrs/esm-framework';
 import ContactDetails from '../contact-details/contact-details.component';
 import CustomOverflowMenuComponent from '../ui-components/overflow-menu.component';
 import styles from './patient-banner.scss';
+import { useTranslation } from 'react-i18next';
+import { Button } from 'carbon-components-react';
+import { ExtensionSlot, age } from '@openmrs/esm-framework';
 
 interface PatientBannerProps {
   patient: fhir.Patient;

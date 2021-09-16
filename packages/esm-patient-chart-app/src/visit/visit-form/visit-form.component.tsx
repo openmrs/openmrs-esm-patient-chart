@@ -1,18 +1,23 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import styles from './visit-form.component.scss';
-import Button from 'carbon-components-react/es/components/Button';
-import DatePicker from 'carbon-components-react/es/components/DatePicker';
-import DatePickerInput from 'carbon-components-react/es/components/DatePickerInput';
-import Form from 'carbon-components-react/es/components/Form';
-import { useTranslation } from 'react-i18next';
-import { Column, Grid, Row } from 'carbon-components-react/es/components/Grid';
-import TimePicker from 'carbon-components-react/es/components/TimePicker';
-import TimePickerSelect from 'carbon-components-react/es/components/TimePickerSelect';
-import SelectItem from 'carbon-components-react/es/components/SelectItem';
-import ContentSwitcher from 'carbon-components-react/es/components/ContentSwitcher';
-import Switch from 'carbon-components-react/es/components/Switch';
-import Select from 'carbon-components-react/es/components/Select';
+import dayjs from 'dayjs';
 import VisitTypeOverview from './visit-type-overview.component';
+import styles from './visit-form.component.scss';
+import {
+  Column,
+  Grid,
+  Row,
+  Form,
+  DatePickerInput,
+  DatePicker,
+  Button,
+  TimePicker,
+  TimePickerSelect,
+  SelectItem,
+  ContentSwitcher,
+  Switch,
+  Select,
+} from 'carbon-components-react';
+import { useTranslation } from 'react-i18next';
 import {
   detach,
   getStartedVisit,
@@ -25,7 +30,6 @@ import {
   VisitMode,
   VisitStatus,
 } from '@openmrs/esm-framework';
-import dayjs from 'dayjs';
 import { amPm, convertTime12to24 } from './start-visit-helper';
 import { first } from 'rxjs/operators';
 
@@ -127,7 +131,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({ isTablet, patientUuid }
               labelText={t('time', 'Time')}
               id="time-picker">
               <TimePickerSelect
-                onChange={(event) => setTimeFormat(event.target.value)}
+                onChange={(event) => setTimeFormat(event.target.value as amPm)}
                 value={timeFormat}
                 labelText={t('time', 'Time')}
                 id="time-picker-select-1">

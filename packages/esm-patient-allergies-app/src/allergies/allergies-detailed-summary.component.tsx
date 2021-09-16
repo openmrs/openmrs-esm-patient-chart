@@ -5,9 +5,10 @@ import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { attach, createErrorHandler } from '@openmrs/esm-framework';
 import { performPatientAllergySearch, Allergy } from './allergy-intolerance.resource';
 import Add16 from '@carbon/icons-react/es/add/16';
-import Button from 'carbon-components-react/es/components/Button';
-import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
-import DataTable, {
+import {
+  Button,
+  DataTable,
+  DataTableSkeleton,
   Table,
   TableCell,
   TableContainer,
@@ -15,7 +16,7 @@ import DataTable, {
   TableHead,
   TableHeader,
   TableRow,
-} from 'carbon-components-react/es/components/DataTable';
+} from 'carbon-components-react';
 import styles from './allergies-detailed-summary.scss';
 import { patientAllergiesFormWorkspace } from '../constants';
 

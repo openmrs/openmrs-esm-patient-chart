@@ -1,9 +1,7 @@
-import React, { useState } from 'react';
+import React, { SyntheticEvent, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { UserHasAccess } from '@openmrs/esm-framework';
-import Button from 'carbon-components-react/es/components/Button';
-import ButtonSet from 'carbon-components-react/es/components/ButtonSet';
-import TextInput from 'carbon-components-react/es/components/TextInput';
+import { Button, ButtonSet, TextInput } from 'carbon-components-react';
 import styles from './image-preview.scss';
 
 interface ImagePreviewProps {
@@ -14,23 +12,32 @@ interface ImagePreviewProps {
 }
 
 export default function ImagePreview(props: ImagePreviewProps) {
+  const [saving, setSaving] = useState(false);
   const [caption, setCaption] = useState('');
   const { t } = useTranslation();
 
-  const saveImage = (e: React.SyntheticEvent) => {
-    e.preventDefault();
-    props.onSaveImage?.(props.content, caption);
-  };
-
-  const cancelCapture = React.useCallback(
-    (e: React.SyntheticEvent) => {
-      e.preventDefault();
-      props.onCancelCapture?.();
+  const saveImage = useCallback(
+    (e: SyntheticEvent) => {
+      if (!saving) {
+        e.preventDefault();
+        props.onSaveImage?.(props.content, caption);
+        setSaving(true);
+      }
     },
-    [props.onCancelCapture],
+    [props.onSaveImage, saving],
   );
 
-  const updateCaption = React.useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const cancelCapture = useCallback(
+    (e: SyntheticEvent) => {
+      if (!saving) {
+        e.preventDefault();
+        props.onCancelCapture?.();
+      }
+    },
+    [props.onCancelCapture, saving],
+  );
+
+  const updateCaption = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     setCaption(e.target.value);
   }, []);
@@ -44,6 +51,7 @@ export default function ImagePreview(props: ImagePreviewProps) {
             id="caption"
             autoFocus
             labelText={null}
+            readOnly={saving}
             placeholder={t('attachmentCaptionInstruction', 'Enter caption')}
             onChange={updateCaption}
           />
@@ -51,10 +59,10 @@ export default function ImagePreview(props: ImagePreviewProps) {
       )}
       <UserHasAccess privilege="Create Attachment">
         <ButtonSet className={styles.buttonSetOverrides}>
-          <Button size="small" onClick={saveImage}>
+          <Button size="small" onClick={saveImage} disabled={saving}>
             {t('save', 'Save')}
           </Button>
-          <Button kind="danger" size="small" onClick={cancelCapture}>
+          <Button kind="danger" size="small" onClick={cancelCapture} disabled={saving}>
             {t('cancel', 'Cancel')}
           </Button>
         </ButtonSet>

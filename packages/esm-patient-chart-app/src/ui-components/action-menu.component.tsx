@@ -1,16 +1,14 @@
 import React from 'react';
-import { ExtensionSlot, useLayoutType } from '@openmrs/esm-framework';
-import { HeaderPanel } from 'carbon-components-react/es/components/UIShell';
-import { isDesktop } from '../utils';
 import Edit20 from '@carbon/icons-react/es/edit/20';
 import DocumentBlank20 from '@carbon/icons-react/es/document--blank/20';
 import WarningFilled16 from '@carbon/icons-react/es/warning--filled/16';
 import styles from './action-menu.component.scss';
-import Button from 'carbon-components-react/es/components/Button';
+import { ExtensionSlot, useLayoutType } from '@openmrs/esm-framework';
+import { HeaderPanel, Button } from 'carbon-components-react';
+import { isDesktop } from '../utils';
 import { useContextWorkspace } from '../hooks/useContextWindowSize';
 import { useWorkspace } from '../hooks/useWorkspace';
 import { useTranslation } from 'react-i18next';
-import { ScreenModeTypes } from '../types';
 
 interface ActionMenuInterface {
   open: boolean;

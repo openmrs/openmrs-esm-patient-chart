@@ -1,23 +1,25 @@
 import React from 'react';
 import styles from './allergy-form.component.scss';
+import AllergyFormTab from './allergy-form-tab.component';
 import { useTranslation } from 'react-i18next';
-import Button from 'carbon-components-react/es/components/Button';
-import RadioButtonGroup from 'carbon-components-react/es/components/RadioButtonGroup';
-import RadioButton from 'carbon-components-react/es/components/RadioButton';
-import DatePicker from 'carbon-components-react/es/components/DatePicker';
-import DatePickerInput from 'carbon-components-react/es/components/DatePickerInput';
-import TextArea from 'carbon-components-react/es/components/TextArea';
-import Checkbox from 'carbon-components-react/es/components/Checkbox';
-import Tabs from 'carbon-components-react/es/components/Tabs';
-import Tab from 'carbon-components-react/es/components/Tab';
-import { createErrorHandler, showNotification, showToast, useConfig } from '@openmrs/esm-framework';
+import { showNotification, showToast, useConfig } from '@openmrs/esm-framework';
 import { AllergiesConfigObject } from '../../config-schema';
 import { fetchAllergensAndReaction, savePatientAllergy } from './allergy-form.resource';
-import AllergyFormTab from './allergy-form-tab.component';
-import SearchSkeleton from 'carbon-components-react/lib/components/Search/Search.Skeleton';
-import TextInput from 'carbon-components-react/lib/components/TextInput/TextInput';
-import { OpenMRSResource } from '../../types';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
+import {
+  SearchSkeleton,
+  TextInput,
+  TextArea,
+  Checkbox,
+  Tabs,
+  Tab,
+  DatePicker,
+  DatePickerInput,
+  RadioButton,
+  Button,
+  RadioButtonGroup,
+} from 'carbon-components-react';
+import { OpenMRSResource } from '../../types';
 
 enum ActionTypes {
   pending = 'pending',
@@ -93,7 +95,7 @@ const AllergyForm: React.FC<AllergyFormProps> = ({ isTablet, closeWorkspace, pat
   const [patientReactions, setPatientReactions] = React.useState<Array<string>>([]);
   const [selectedAllergen, setSelectedAllergen] = React.useState<string>();
   const [severityOfReaction, setSeverityOfReaction] = React.useState<string>();
-  const [dateOfOnset, setDateOfOnset] = React.useState<string | Date>();
+  const [dateOfOnset, setDateOfOnset] = React.useState<Date>();
   const [{ status, allergenAndReaction, error }, dispatch] = React.useReducer(formStatusReducer, {
     status: ActionTypes.pending,
     allergenAndReaction: null,
@@ -296,7 +298,7 @@ const AllergyForm: React.FC<AllergyFormProps> = ({ isTablet, closeWorkspace, pat
                   {t('severityOfWorstReaction', 'Severity of worst reaction')}
                 </header>
                 <RadioButtonGroup
-                  onChange={(event) => setSeverityOfReaction(event)}
+                  onChange={(event) => setSeverityOfReaction(event.toString())}
                   name="severityOfWorstReaction"
                   valueSelected={severityOfReaction}>
                   <RadioButton id="mild" labelText={t('mild', 'Mild')} value={mildReactionUuid} />
@@ -318,7 +320,7 @@ const AllergyForm: React.FC<AllergyFormProps> = ({ isTablet, closeWorkspace, pat
                     type="text"
                     size="xl"
                     style={{ width: '18rem' }}
-                    onChange={(event) => setDateOfOnset(event)}
+                    onChange={(event) => setDateOfOnset(event.target.valueAsDate)}
                   />
                 </DatePicker>
                 <TextArea

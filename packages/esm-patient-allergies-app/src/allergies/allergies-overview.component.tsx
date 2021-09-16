@@ -1,8 +1,9 @@
 import React from 'react';
 import Add16 from '@carbon/icons-react/es/add/16';
-import Button from 'carbon-components-react/es/components/Button';
-import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
-import DataTable, {
+import {
+  DataTableSkeleton,
+  DataTable,
+  Button,
   Table,
   TableCell,
   TableContainer,
@@ -10,7 +11,7 @@ import DataTable, {
   TableHead,
   TableHeader,
   TableRow,
-} from 'carbon-components-react/es/components/DataTable';
+} from 'carbon-components-react';
 import styles from './allergies-overview.scss';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';

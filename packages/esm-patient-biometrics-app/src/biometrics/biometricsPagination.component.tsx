@@ -1,5 +1,7 @@
 import React from 'react';
-import DataTable, {
+import styles from './biometrics-overview.scss';
+import {
+  DataTable,
   Table,
   TableCell,
   TableContainer,
@@ -7,17 +9,16 @@ import DataTable, {
   TableHead,
   TableHeader,
   TableRow,
-} from 'carbon-components-react/es/components/DataTable';
+} from 'carbon-components-react';
 import { usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
-import styles from './biometrics-overview.scss';
 
 interface FormsProps {
-  tableRows: Array<{}>;
+  tableRows: Array<any>;
   pageSize: number;
   pageUrl: string;
   urlLabel: string;
-  tableHeaders: Array<{}>;
+  tableHeaders: Array<any>;
 }
 
 const BiometricsPagination: React.FC<FormsProps> = ({ tableRows, pageSize, pageUrl, urlLabel, tableHeaders }) => {
@@ -26,7 +27,7 @@ const BiometricsPagination: React.FC<FormsProps> = ({ tableRows, pageSize, pageU
   return (
     <div>
       <TableContainer>
-        <DataTable rows={results} headers={tableHeaders} isSortable={true} size="short">
+        <DataTable rows={results} headers={tableHeaders} isSortable size="short">
           {({ rows, headers, getHeaderProps, getTableProps }) => (
             <Table {...getTableProps()}>
               <TableHead>

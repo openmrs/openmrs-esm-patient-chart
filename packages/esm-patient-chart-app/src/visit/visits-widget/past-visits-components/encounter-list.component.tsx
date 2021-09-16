@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import DataTable, {
+import EncounterObservations from './encounter-observations.component';
+import styles from '../visit-detail-overview.scss';
+import {
+  DataTable,
   TableContainer,
   Table,
   TableHead,
@@ -10,9 +13,7 @@ import DataTable, {
   TableExpandRow,
   TableCell,
   TableExpandedRow,
-} from 'carbon-components-react/es/components/DataTable';
-import EncounterObservations from './encounter-observations.component';
-import styles from '../visit-detail-overview.scss';
+} from 'carbon-components-react';
 import { Observation } from '../visit.resource';
 import { useTranslation } from 'react-i18next';
 import { useLayoutType } from '@openmrs/esm-framework';

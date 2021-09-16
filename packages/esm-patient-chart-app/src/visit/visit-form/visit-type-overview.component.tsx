@@ -1,13 +1,11 @@
 import React, { useState, useMemo } from 'react';
-import Search from 'carbon-components-react/es/components/Search';
-import RadioButtonGroup from 'carbon-components-react/es/components/RadioButtonGroup';
-import RadioButton from 'carbon-components-react/es/components/RadioButton';
-import { useTranslation } from 'react-i18next';
 import styles from './visit-type-overview.component.scss';
 import debounce from 'lodash-es/debounce';
-import { usePagination, useVisitTypes } from '@openmrs/esm-framework';
 import isEmpty from 'lodash-es/isEmpty';
-import { PatientChartPagination } from '../../../../esm-patient-common-lib/src';
+import { Search, RadioButtonGroup, RadioButton } from 'carbon-components-react';
+import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
+import { useTranslation } from 'react-i18next';
+import { usePagination, useVisitTypes } from '@openmrs/esm-framework';
 
 interface VisitTypeOverviewProps {
   isTablet: boolean;
@@ -42,7 +40,6 @@ const VisitTypeOverview: React.FC<VisitTypeOverviewProps> = ({ isTablet, onChang
       <RadioButtonGroup
         className={styles.radioButtonGroup}
         defaultSelected="default-selected"
-        legend="Group Legend"
         orientation="vertical"
         onChange={onChange}
         name="radio-button-group"

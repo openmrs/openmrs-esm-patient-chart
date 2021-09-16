@@ -1,13 +1,17 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import dayjs from 'dayjs';
+import Add16 from '@carbon/icons-react/es/add/16';
 import styles from './programs-detailed-summary.scss';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
-import { attach, createErrorHandler } from '@openmrs/esm-framework';
+import { attach } from '@openmrs/esm-framework';
 import { fetchEnrolledPrograms } from './programs.resource';
 import { useProgramsContext } from './programs.context';
 import { PatientProgram } from '../types';
-import DataTable, {
+import {
+  Button,
+  DataTable,
+  DataTableSkeleton,
   Table,
   TableCell,
   TableContainer,
@@ -17,10 +21,7 @@ import DataTable, {
   TableRow,
   DataTableHeader,
   DataTableRow,
-} from 'carbon-components-react/es/components/DataTable';
-import Button from 'carbon-components-react/es/components/Button';
-import Add16 from '@carbon/icons-react/es/add/16';
-import DataTableSkeleton from 'carbon-components-react/lib/components/DataTableSkeleton/DataTableSkeleton';
+} from 'carbon-components-react';
 
 interface ProgramsDetailedSummaryProps {}
 

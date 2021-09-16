@@ -1,6 +1,6 @@
 import React from 'react';
-import Pagination from 'carbon-components-react/es/components/Pagination';
 import styles from './pagination.component.scss';
+import { Pagination } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 import { ConfigurableLink } from '@openmrs/esm-framework';
 import { usePaginationInfo } from './usePaginationInfo';
