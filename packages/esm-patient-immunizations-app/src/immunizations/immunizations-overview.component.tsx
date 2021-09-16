@@ -18,6 +18,8 @@ import { EmptyState, ErrorState, openWorkspaceTab } from '@openmrs/esm-patient-c
 import { useTranslation } from 'react-i18next';
 import { mapFromFHIRImmunizationBundle } from './immunization-mapper';
 import { performPatientImmunizationsSearch } from './immunizations.resource';
+import { attach } from '@openmrs/esm-framework';
+import { immunizationFormSub } from './immunization-utils';
 
 export interface ImmunizationsOverviewProps {
   basePath: string;
@@ -59,7 +61,7 @@ const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = ({ patient, 
   ];
 
   const launchImmunizationsForm = () => {
-    openWorkspaceTab(ImmunizationsForm, t('immunizationsForm', 'Immunizations Form'));
+    attach('patient-chart-workspace-slot', 'immunization-form-workspace');
   };
 
   const RenderImmunizations: React.FC = () => {
