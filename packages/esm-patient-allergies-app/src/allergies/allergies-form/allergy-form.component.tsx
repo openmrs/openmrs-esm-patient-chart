@@ -180,8 +180,10 @@ const AllergyForm: React.FC<AllergyFormProps> = ({ isTablet, closeWorkspace, pat
           closeWorkspace();
 
           showToast({
+            critical: true,
             kind: 'success',
-            description: t('allergySaved', 'It is now visible on the Allergies page'),
+            title: t('allergySaved', 'Allergy saved'),
+            description: t('allergyNowVisible', 'It is now visible on the Allergies page'),
           });
 
           mutate(`${fhirBaseUrl}/AllergyIntolerance?patient=${patientUuid}`);
