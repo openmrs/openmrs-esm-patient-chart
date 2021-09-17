@@ -15,16 +15,16 @@ const swrConfiguration = {
 
 export default function Root() {
   return (
-    <BrowserRouter basename={spaRoot}>
-      <ContextWindowSizeProvider>
-        <div className={styles.patientChartWrapper}>
-          <SideMenu />
-          <SWRConfig value={{ ...swrConfiguration }}>
+    <SWRConfig value={swrConfiguration}>
+      <BrowserRouter basename={spaRoot}>
+        <ContextWindowSizeProvider>
+          <div className={styles.patientChartWrapper}>
+            <SideMenu />
             <Route path={dashboardPath} component={PatientChart} />
-          </SWRConfig>
-          <Route path={basePath} component={ContextWorkspace} />
-        </div>
-      </ContextWindowSizeProvider>
-    </BrowserRouter>
+            <Route path={basePath} component={ContextWorkspace} />
+          </div>
+        </ContextWindowSizeProvider>
+      </BrowserRouter>
+    </SWRConfig>
   );
 }
