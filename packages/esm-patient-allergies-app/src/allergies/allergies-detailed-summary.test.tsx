@@ -1,9 +1,8 @@
 import React from 'react';
-import { of } from 'rxjs/internal/observable/of';
-import { render, screen } from '@testing-library/react';
-import { openmrsObservableFetch } from '@openmrs/esm-framework';
+import { openmrsFetch } from '@openmrs/esm-framework';
 import { mockFhirAllergyIntoleranceResponse } from '../../../../__mocks__/allergies.mock';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
+import { render, screen, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import AllergiesDetailedSummary from './allergies-detailed-summary.component';
 
 const testProps = {
@@ -11,16 +10,16 @@ const testProps = {
   showAddAllergy: false,
 };
 
-const mockOpenmrsObservableFetch = openmrsObservableFetch as jest.Mock;
-
-mockOpenmrsObservableFetch.mockImplementation(jest.fn());
+const mockOpenmrsFetch = openmrsFetch as jest.Mock;
+mockOpenmrsFetch.mockImplementation(jest.fn());
 
 const renderAllergiesDetailedSummary = () => render(<AllergiesDetailedSummary {...testProps} />);
 
-it('renders an empty state view if allergy data is unavailable', () => {
-  mockOpenmrsObservableFetch.mockReturnValue(of({ data: [] }));
-
+it('renders an empty state view if allergy data is unavailable', async () => {
+  mockOpenmrsFetch.mockReturnValueOnce({ data: [] });
   renderAllergiesDetailedSummary();
+
+  await waitForLoadingToFinish();
 
   expect(screen.queryByRole('table')).not.toBeInTheDocument();
   expect(screen.getByRole('heading', { name: /allergies/i })).toBeInTheDocument();
@@ -28,23 +27,36 @@ it('renders an empty state view if allergy data is unavailable', () => {
   expect(screen.getByText(/Record allergy intolerances/i)).toBeInTheDocument();
 });
 
-it('renders an error state view if there was a problem fetching allergies data', () => {
-  mockOpenmrsObservableFetch.mockReturnValue(of({ data: [] }));
-
+it('renders an error state view if there was a problem fetching allergies data', async () => {
+  const error = {
+    message: 'You are not logged in',
+    response: {
+      status: 401,
+      statusText: 'Unauthorized',
+    },
+  };
+  mockOpenmrsFetch.mockRejectedValueOnce(error);
   renderAllergiesDetailedSummary();
+
+  await waitForLoadingToFinish();
 
   expect(screen.queryByRole('table')).not.toBeInTheDocument();
   expect(screen.getByRole('heading', { name: /allergies/i })).toBeInTheDocument();
-  expect(screen.getByText(/There are no allergy intolerances to display for this patient/i)).toBeInTheDocument();
-  expect(screen.getByText(/Record allergy intolerances/i)).toBeInTheDocument();
+  expect(screen.getByText(/Error 401: Unauthorized/i)).toBeInTheDocument();
+  expect(
+    screen.getByText(
+      /Sorry, there was a problem displaying this information. You can try to reload this page, or contact the site administrator and quote the error code above/i,
+    ),
+  ).toBeInTheDocument();
 });
 
 it("renders a detailed summary of the patient's allergic reactions and their manifestations", async () => {
-  mockOpenmrsObservableFetch.mockReturnValue(of({ data: mockFhirAllergyIntoleranceResponse }));
-
+  mockOpenmrsFetch.mockReturnValueOnce({ data: mockFhirAllergyIntoleranceResponse });
   renderAllergiesDetailedSummary();
 
-  await screen.findByRole('heading', { name: /allergies/i });
+  await waitForLoadingToFinish();
+
+  expect(screen.getByRole('heading', { name: /allergies/i })).toBeInTheDocument();
 
   const expectedColumnHeaders = [/allergen/i, /severity and reaction/i, /since/i, /last updated/i];
   const expectedAllergies = [

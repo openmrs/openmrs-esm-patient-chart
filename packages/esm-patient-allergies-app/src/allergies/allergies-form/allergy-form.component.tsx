@@ -1,8 +1,9 @@
 import React from 'react';
+import { mutate } from 'swr';
 import styles from './allergy-form.component.scss';
 import AllergyFormTab from './allergy-form-tab.component';
 import { useTranslation } from 'react-i18next';
-import { showNotification, showToast, useConfig } from '@openmrs/esm-framework';
+import { fhirBaseUrl, showNotification, showToast, useConfig } from '@openmrs/esm-framework';
 import { AllergiesConfigObject } from '../../config-schema';
 import { fetchAllergensAndReaction, savePatientAllergy } from './allergy-form.resource';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
@@ -144,7 +145,7 @@ const AllergyForm: React.FC<AllergyFormProps> = ({ isTablet, closeWorkspace, pat
   }, []);
 
   const handleSavePatientAllergy = React.useCallback(() => {
-    const restApiPayLoad = {
+    const allergyPayload = {
       allergen:
         selectedAllergen === otherConceptUuid
           ? {
@@ -172,15 +173,18 @@ const AllergyForm: React.FC<AllergyFormProps> = ({ isTablet, closeWorkspace, pat
     };
 
     const ac = new AbortController();
-    savePatientAllergy(restApiPayLoad, patientUuid, ac).then(
+
+    savePatientAllergy(allergyPayload, patientUuid, ac).then(
       (response) => {
         if (response.status === 201) {
           closeWorkspace();
 
           showToast({
             kind: 'success',
-            description: t('allergySaved', 'Allergy saved successfully'),
+            description: t('allergySaved', 'It is now visible on the Allergies page'),
           });
+
+          mutate(`${fhirBaseUrl}/AllergyIntolerance?patient=${patientUuid}`);
         }
       },
       (err) => {
