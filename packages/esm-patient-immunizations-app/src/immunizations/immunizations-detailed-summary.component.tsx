@@ -1,5 +1,9 @@
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
+import Add16 from '@carbon/icons-react/es/add/16';
+import SequenceTable from './immunizations-sequence-table';
 import get from 'lodash-es/get';
+import first from 'lodash-es/first';
+import isEmpty from 'lodash-es/isEmpty';
 import orderBy from 'lodash-es/orderBy';
 import styles from './immunizations-detailed-summary.scss';
 import { ErrorState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
@@ -7,9 +11,10 @@ import { attach, useConfig, usePagination } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { mapFromFHIRImmunizationBundle } from './immunization-mapper';
 import { getImmunizationsConceptSet, performPatientImmunizationsSearch } from './immunizations.resource';
-import first from 'lodash-es/first';
-import isEmpty from 'lodash-es/isEmpty';
-import DataTable, {
+import {
+  Button,
+  DataTable,
+  DataTableSkeleton,
   Table,
   TableHead,
   TableRow,
@@ -19,12 +24,7 @@ import DataTable, {
   TableExpandRow,
   TableCell,
   TableExpandedRow,
-} from 'carbon-components-react/es/components/DataTable';
-import Add16 from '@carbon/icons-react/es/add/16';
-import ImmunizationsForm from './immunizations-form.component';
-import Button from 'carbon-components-react/es/components/Button';
-import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
-import SequenceTable from './immunizations-sequence-table';
+} from 'carbon-components-react';
 import { ExistingDoses, Immunization, Sequence } from '../types';
 import { findConfiguredSequences, findExistingDoses, latestFirst } from './utils';
 import { immunizationFormSub } from './immunization-utils';

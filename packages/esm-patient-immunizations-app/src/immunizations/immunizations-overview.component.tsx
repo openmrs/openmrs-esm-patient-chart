@@ -1,11 +1,11 @@
 import React from 'react';
 import dayjs from 'dayjs';
-import ImmunizationsForm from './immunizations-form.component';
 import Add16 from '@carbon/icons-react/es/add/16';
-import Button from 'carbon-components-react/es/components/Button';
-import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
 import styles from './immunizations-overview.scss';
-import DataTable, {
+import {
+  Button,
+  DataTableSkeleton,
+  DataTable,
   Table,
   TableCell,
   TableContainer,
@@ -13,13 +13,12 @@ import DataTable, {
   TableHead,
   TableHeader,
   TableRow,
-} from 'carbon-components-react/es/components/DataTable';
-import { EmptyState, ErrorState, openWorkspaceTab } from '@openmrs/esm-patient-common-lib';
+} from 'carbon-components-react';
+import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { mapFromFHIRImmunizationBundle } from './immunization-mapper';
 import { performPatientImmunizationsSearch } from './immunizations.resource';
 import { attach } from '@openmrs/esm-framework';
-import { immunizationFormSub } from './immunization-utils';
 
 export interface ImmunizationsOverviewProps {
   basePath: string;

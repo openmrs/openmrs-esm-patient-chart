@@ -5,13 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { savePatientImmunization } from './immunizations.resource';
 import { mapToFHIRImmunizationResource } from './immunization-mapper';
 import { ImmunizationFormData, ImmunizationSequence } from './immunization-domain';
-import Button from 'carbon-components-react/es/components/Button';
-import DatePicker from 'carbon-components-react/es/components/DatePicker';
-import DatePickerInput from 'carbon-components-react/es/components/DatePickerInput';
-import Form from 'carbon-components-react/es/components/Form';
-import Select from 'carbon-components-react/es/components/Select';
-import SelectItem from 'carbon-components-react/es/components/SelectItem';
-import TextInput from 'carbon-components-react/es/components/TextInput';
+import { Button, DatePicker, DatePickerInput, Form, Select, SelectItem, TextInput } from 'carbon-components-react';
 import { immunizationFormSub } from './immunization-utils';
 
 function hasSequences<T>(sequences: Array<T>) {
@@ -156,7 +150,7 @@ const ImmunizationsForm: React.FC<ImmunizationsFormProps> = ({ patientUuid }) =>
           dateFormat="d/m/Y"
           datePickerType="single"
           value={formState.vaccinationDate}
-          onChange={([date]) => updateSingle('vaccinationDate', date)}>
+          onChange={([date]) => updateSingle('vaccinationDate', date.toISOString())}>
           <DatePickerInput
             id="date-picker-calendar-id"
             placeholder="dd/mm/yyyy"
@@ -173,7 +167,7 @@ const ImmunizationsForm: React.FC<ImmunizationsFormProps> = ({ patientUuid }) =>
           dateFormat="d/m/Y"
           datePickerType="single"
           value={formState.expirationDate}
-          onChange={([date]) => updateSingle('expirationDate', date)}>
+          onChange={([date]) => updateSingle('expirationDate', date.toISOString())}>
           <DatePickerInput
             id="date-picker-calendar-id"
             placeholder="dd/mm/yyyy"

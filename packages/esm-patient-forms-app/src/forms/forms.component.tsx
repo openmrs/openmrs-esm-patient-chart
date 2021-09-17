@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
-import ContentSwitcher from 'carbon-components-react/es/components/ContentSwitcher';
-import Switch from 'carbon-components-react/es/components/Switch';
 import FormView from './form-view.component';
 import styles from './forms.component.scss';
-import { ErrorState } from '@openmrs/esm-patient-common-lib';
-import { useTranslation } from 'react-i18next';
 import EmptyFormView from './empty-form.component';
 import first from 'lodash-es/first';
+import { ContentSwitcher, Switch, DataTableSkeleton } from 'carbon-components-react';
+import { ErrorState } from '@openmrs/esm-patient-common-lib';
+import { useTranslation } from 'react-i18next';
 import { useForms } from '../hooks/useForms';
 import { Encounter } from '../types';
-import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
 
 enum FormViewState {
   recommended = 0,

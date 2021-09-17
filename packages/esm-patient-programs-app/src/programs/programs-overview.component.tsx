@@ -1,10 +1,13 @@
 import React from 'react';
 import dayjs from 'dayjs';
 import Add16 from '@carbon/icons-react/es/add/16';
-import Button from 'carbon-components-react/es/components/Button';
-import Pagination from 'carbon-components-react/es/components/Pagination';
-import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
-import DataTable, {
+import styles from './programs-overview.scss';
+import { attach } from '@openmrs/esm-framework';
+import {
+  DataTable,
+  Pagination,
+  DataTableSkeleton,
+  Button,
   Table,
   TableCell,
   TableContainer,
@@ -12,13 +15,11 @@ import DataTable, {
   TableHead,
   TableHeader,
   TableRow,
-} from 'carbon-components-react/es/components/DataTable';
-import styles from './programs-overview.scss';
+} from 'carbon-components-react';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { fetchActiveEnrollments } from './programs.resource';
 import { PatientProgram } from '../types';
-import { attach } from '@openmrs/esm-framework';
 
 interface ProgramsOverviewProps {
   basePath: string;

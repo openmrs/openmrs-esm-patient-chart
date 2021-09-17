@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import VitalsBiometricInput from './vitals-biometrics-input.component';
-import Button from 'carbon-components-react/es/components/Button';
 import styles from './vitals-biometrics-form.component.scss';
 import { useTranslation } from 'react-i18next';
 import { useConfig, createErrorHandler, useSessionUser, showToast, showNotification } from '@openmrs/esm-framework';
-import { Column, Grid, Row } from 'carbon-components-react/es/components/Grid';
+import { Column, Grid, Row, Button } from 'carbon-components-react';
 import { calculateBMI, isInNormalRange } from './vitals-biometrics-form.utils';
 import { savePatientVitals } from '../vitals-biometrics.resource';
 import { useVitalsSignsConceptMetaData } from './use-vitalsigns';

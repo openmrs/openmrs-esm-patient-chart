@@ -1,9 +1,8 @@
 import React from 'react';
 import dayjs from 'dayjs';
-import { useTranslation } from 'react-i18next';
 import styles from './vitals-chart.component.scss';
-import Tab from 'carbon-components-react/es/components/Tab';
-import Tabs from 'carbon-components-react/es/components/Tabs';
+import { useTranslation } from 'react-i18next';
+import { Tab, Tabs } from 'carbon-components-react';
 import { withUnit } from './vitals-biometrics-form/use-vitalsigns';
 import { PatientVitals } from './vitals-biometrics.resource';
 import { LineChart } from '@carbon/charts-react';

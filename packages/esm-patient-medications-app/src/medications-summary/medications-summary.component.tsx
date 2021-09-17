@@ -1,7 +1,7 @@
 import React from 'react';
-import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
 import FloatingOrderBasketButton from './floating-order-basket-button.component';
 import MedicationsDetailsTable from '../components/medications-details-table.component';
+import { DataTableSkeleton } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 import { usePatientOrders } from '../utils/use-current-patient-orders.hook';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';

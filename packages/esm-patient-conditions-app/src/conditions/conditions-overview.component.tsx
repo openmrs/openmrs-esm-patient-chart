@@ -1,9 +1,10 @@
 import React from 'react';
 import dayjs from 'dayjs';
-import Button from 'carbon-components-react/es/components/Button';
-import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
-import Pagination from 'carbon-components-react/es/components/Pagination';
-import DataTable, {
+import {
+  DataTable,
+  Pagination,
+  DataTableSkeleton,
+  Button,
   Table,
   TableCell,
   TableContainer,
@@ -11,13 +12,14 @@ import DataTable, {
   TableHead,
   TableHeader,
   TableRow,
-} from 'carbon-components-react/es/components/DataTable';
+} from 'carbon-components-react';
 import Add16 from '@carbon/icons-react/es/add/16';
 import styles from './conditions-overview.scss';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { Condition, performPatientConditionsSearch } from './conditions.resource';
 import { attach } from '@openmrs/esm-framework';
+
 const conditionsToShowCount = 5;
 
 interface ConditionsOverviewProps {

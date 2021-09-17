@@ -1,17 +1,19 @@
 import React, { useCallback } from 'react';
 import Table16 from '@carbon/icons-react/es/table/16';
 import ChartLine16 from '@carbon/icons-react/es/chart--line/16';
-import Button from 'carbon-components-react/es/components/Button';
-import DataTable from 'carbon-components-react/es/components/DataTable';
-import Table from 'carbon-components-react/es/components/DataTable/Table';
-import TableContainer from 'carbon-components-react/es/components/DataTable/TableContainer';
-import TableHead from 'carbon-components-react/es/components/DataTable/TableHead';
-import TableHeader from 'carbon-components-react/es/components/DataTable/TableHeader';
-import TableRow from 'carbon-components-react/es/components/DataTable/TableRow';
-import TableCell from 'carbon-components-react/es/components/DataTable/TableCell';
-import TableBody from 'carbon-components-react/es/components/DataTable/TableBody';
-import TableToolbarContent from 'carbon-components-react/es/components/DataTable/TableToolbarContent';
-import TableToolbar from 'carbon-components-react/es/components/DataTable/TableToolbar';
+import {
+  Button,
+  DataTable,
+  Table,
+  TableContainer,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TableCell,
+  TableBody,
+  TableToolbarContent,
+  TableToolbar,
+} from 'carbon-components-react';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { Card, headers, formatDate, InfoButton, Separator, TypedTableRow } from './helpers';
 import { OverviewPanelEntry, OverviewPanelData } from './useOverviewData';

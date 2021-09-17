@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from 'react';
-import Pagination from 'carbon-components-react/es/components/Pagination';
 import styles from '@openmrs/esm-patient-common-lib/src/pagination/pagination.component.scss';
+import { Pagination } from 'carbon-components-react';
 import { ConfigurableLink } from '@openmrs/esm-framework';
 import { usePaginationInfo } from '@openmrs/esm-patient-common-lib';
 

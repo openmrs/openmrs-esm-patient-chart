@@ -1,8 +1,7 @@
 import React from 'react';
-import Button from 'carbon-components-react/es/components/Button';
-import Tag from 'carbon-components-react/es/components/Tag';
 import styles from './floating-order-basket-button.scss';
 import ShoppingBag16 from '@carbon/icons-react/es/shopping--bag/16';
+import { Button, Tag } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 import { connect } from 'unistore/react';
 import { attach } from '@openmrs/esm-framework';

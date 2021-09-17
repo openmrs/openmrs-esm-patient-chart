@@ -1,16 +1,21 @@
 import React, { SyntheticEvent } from 'react';
 import dayjs from 'dayjs';
-import { filter, includes, map } from 'lodash-es';
+import filter from 'lodash-es/filter';
+import includes from 'lodash-es/includes';
+import map from 'lodash-es/map';
+import styles from './programs-form.scss';
 import { useTranslation } from 'react-i18next';
 import { createErrorHandler, detach, showNotification, showToast, useSessionUser } from '@openmrs/esm-framework';
-import Button from 'carbon-components-react/es/components/Button';
-import DatePicker from 'carbon-components-react/es/components/DatePicker';
-import DatePickerInput from 'carbon-components-react/es/components/DatePickerInput';
-import InlineLoading from 'carbon-components-react/es/components/InlineLoading';
-import Select from 'carbon-components-react/es/components/Select';
-import SelectItem from 'carbon-components-react/es/components/SelectItem';
-import Form from 'carbon-components-react/es/components/Form';
-import FormGroup from 'carbon-components-react/es/components/FormGroup';
+import {
+  Button,
+  DatePicker,
+  DatePickerInput,
+  InlineLoading,
+  Select,
+  SelectItem,
+  Form,
+  FormGroup,
+} from 'carbon-components-react';
 import {
   createProgramEnrollment,
   fetchEnrolledPrograms,
@@ -18,7 +23,6 @@ import {
   fetchAvailablePrograms,
 } from './programs.resource';
 import { Program } from '../types';
-import styles from './programs-form.scss';
 
 interface Idle {
   type: ActionTypes.idle;

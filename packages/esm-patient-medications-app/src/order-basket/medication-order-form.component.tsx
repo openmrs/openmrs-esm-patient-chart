@@ -1,20 +1,25 @@
 import React, { useState } from 'react';
 import styles from './medication-order-form.scss';
 import capitalize from 'lodash-es/capitalize';
-import Button from 'carbon-components-react/es/components/Button';
-import ButtonSet from 'carbon-components-react/es/components/ButtonSet';
-import Checkbox from 'carbon-components-react/es/components/Checkbox';
-import DatePicker from 'carbon-components-react/es/components/DatePicker';
-import DatePickerInput from 'carbon-components-react/es/components/DatePickerInput';
-import NumberInput from 'carbon-components-react/es/components/NumberInput';
-import TextInput from 'carbon-components-react/es/components/TextInput';
-import TextArea from 'carbon-components-react/es/components/TextArea';
-import ComboBox from 'carbon-components-react/es/components/ComboBox';
-import ToggleSmall from 'carbon-components-react/es/components/ToggleSmall';
-import Form from 'carbon-components-react/es/components/Form';
-import FormGroup from 'carbon-components-react/es/components/FormGroup';
-import { Grid, Row, Column } from 'carbon-components-react/es/components/Grid';
-import { Header, HeaderName } from 'carbon-components-react/es/components/UIShell';
+import {
+  Button,
+  ButtonSet,
+  Checkbox,
+  DatePicker,
+  DatePickerInput,
+  NumberInput,
+  TextInput,
+  TextArea,
+  ComboBox,
+  ToggleSmall,
+  Form,
+  FormGroup,
+  Grid,
+  Row,
+  Column,
+  Header,
+  HeaderName,
+} from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 import { OrderBasketItem } from '../types/order-basket-item';
 import { daysDurationUnit } from '../constants';
@@ -209,7 +214,6 @@ export default function MedicationOrderForm({
                 <Column>
                   <FormGroup legendText={t('prn', 'P.R.N.')}>
                     <Checkbox
-                      light={isTablet}
                       id="prn"
                       labelText={t('takeAsNeeded', 'Take As Needed')}
                       checked={orderBasketItem.asNeeded}

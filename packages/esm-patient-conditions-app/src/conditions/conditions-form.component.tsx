@@ -1,27 +1,30 @@
 import React, { SyntheticEvent } from 'react';
 import dayjs from 'dayjs';
 import debounce from 'lodash-es/debounce';
+import styles from './conditions-form.scss';
 import { useTranslation } from 'react-i18next';
 import { createErrorHandler, detach, showNotification, showToast, useSessionUser } from '@openmrs/esm-framework';
-import Button from 'carbon-components-react/es/components/Button';
-import DatePicker from 'carbon-components-react/es/components/DatePicker';
-import DatePickerInput from 'carbon-components-react/es/components/DatePickerInput';
-import Form from 'carbon-components-react/es/components/Form';
-import FormGroup from 'carbon-components-react/es/components/FormGroup';
-import RadioButton from 'carbon-components-react/es/components/RadioButton';
-import RadioButtonGroup from 'carbon-components-react/es/components/RadioButtonGroup';
-import Search from 'carbon-components-react/es/components/Search';
-import SearchSkeleton from 'carbon-components-react/es/components/Search/Search.Skeleton';
-import { Tile } from 'carbon-components-react/es/components/Tile';
+import {
+  Tile,
+  SearchSkeleton,
+  Search,
+  Button,
+  RadioButtonGroup,
+  RadioButton,
+  FormGroup,
+  Form,
+  DatePickerInput,
+  DatePicker,
+} from 'carbon-components-react';
 import { searchConditionConcepts, createPatientCondition, CodedCondition } from './conditions.resource';
-import styles from './conditions-form.scss';
+
 const searchTimeoutInMs = 500;
 
 interface Idle {
   type: ActionTypes.idle;
 }
 
-interface Search {
+interface SearchAction {
   isSearching: boolean;
   searchTerm: string;
   searchResults: Array<CodedCondition>;
@@ -37,7 +40,7 @@ interface Submit {
   type: ActionTypes.submit;
 }
 
-type Action = Idle | Search | SelectCondition | Submit;
+type Action = Idle | SearchAction | SelectCondition | Submit;
 
 interface ViewState {
   status: string;
@@ -285,7 +288,6 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid, isTablet }
           datePickerType="single"
           dateFormat="d/m/Y"
           maxDate={new Date().toISOString()}
-          name="onsetDate"
           placeholder="dd/mm/yyyy"
           onChange={([date]) => setOnsetDate(date)}
           value={onsetDate}
@@ -311,7 +313,6 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid, isTablet }
           dateFormat="d/m/Y"
           minDate={new Date(onsetDate).toISOString()}
           maxDate={dayjs().utc().format()}
-          name="endDate"
           placeholder="dd/mm/yyyy"
           onChange={([date]) => setEndDate(date)}
           value={endDate}

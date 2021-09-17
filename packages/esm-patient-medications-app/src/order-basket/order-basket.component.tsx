@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from 'react';
+import styles from './order-basket.scss';
 import OrderBasketSearch from './order-basket-search.component';
 import MedicationOrderForm from './medication-order-form.component';
 import OrderBasketItemList from './order-basket-item-list.component';
 import MedicationsDetailsTable from '../components/medications-details-table.component';
-import Button from 'carbon-components-react/es/components/Button';
-import ButtonSet from 'carbon-components-react/es/components/ButtonSet';
-import Loading from 'carbon-components-react/es/components/Loading';
-import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
-import styles from './order-basket.scss';
+import { Button, ButtonSet, Loading, DataTableSkeleton } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 import { OrderBasketItem } from '../types/order-basket-item';
 import { getDurationUnits, getPatientEncounterId } from '../api/api';

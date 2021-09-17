@@ -1,14 +1,11 @@
 import React from 'react';
-
-import Button from 'carbon-components-react/es/components/Button';
-import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
+import useOverviewData from './useOverviewData';
+import CommonOverview from './common-overview';
+import styles from './lab-results.scss';
+import { Button, DataTableSkeleton } from 'carbon-components-react';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
-
-import useOverviewData from './useOverviewData';
 import { RecentResultsGrid, Card } from './helpers';
-import styles from './lab-results.scss';
-import CommonOverview from './common-overview';
 import { navigateToResults, navigateToTimeline, navigateToTrendline } from '../helpers';
 
 const RECENT_COUNT = 2;

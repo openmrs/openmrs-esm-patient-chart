@@ -1,13 +1,15 @@
 import React, { useCallback, useState } from 'react';
 import Add16 from '@carbon/icons-react/es/add/16';
+import User16 from '@carbon/icons-react/es/user/16';
 import dayjs from 'dayjs';
 import capitalize from 'lodash-es/capitalize';
 import styles from './medications-details-table.scss';
-import Button from 'carbon-components-react/es/components/Button';
-import OverflowMenu from 'carbon-components-react/es/components/OverflowMenu';
-import OverflowMenuItem from 'carbon-components-react/es/components/OverflowMenuItem';
-import Pagination from 'carbon-components-react/es/components/Pagination';
-import DataTable, {
+import {
+  OverflowMenu,
+  OverflowMenuItem,
+  DataTable,
+  Pagination,
+  Button,
   Table,
   TableBody,
   TableCell,
@@ -15,9 +17,7 @@ import DataTable, {
   TableHead,
   TableHeader,
   TableRow,
-  TableToolbar,
-  TableToolbarContent,
-} from 'carbon-components-react/es/components/DataTable';
+} from 'carbon-components-react';
 import { getDosage } from '../utils/get-dosage';
 import { useTranslation } from 'react-i18next';
 import { compare } from '../utils/compare';
@@ -27,7 +27,6 @@ import { OrderBasketStore, OrderBasketStoreActions, orderBasketStoreActions } fr
 import { Order } from '../types/order';
 import { OrderBasketItem } from '../types/order-basket-item';
 import { attach } from '@openmrs/esm-framework';
-import User16 from '@carbon/icons-react/es/user/16';
 
 export interface ActiveMedicationsProps {
   title?: string;
@@ -158,9 +157,9 @@ const MedicationsDetailsTable = connect<
             </Button>
           )}
         </div>
-        <DataTable headers={tableHeaders} rows={tableRows} isSortable={true} sortRow={sortRow}>
+        <DataTable headers={tableHeaders} rows={tableRows} isSortable={true} sortRow={sortRow} useZebraStyles>
           {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-            <TableContainer className={styles.tableHeader} zebra>
+            <TableContainer className={styles.tableHeader}>
               <Table {...getTableProps()} useZebraStyles>
                 <TableHead>
                   <TableRow>

@@ -3,17 +3,16 @@ import dayjs from 'dayjs';
 import Add16 from '@carbon/icons-react/es/add/16';
 import ChartLineSmooth16 from '@carbon/icons-react/es/chart--line-smooth/16';
 import Table16 from '@carbon/icons-react/es/table/16';
-import Button from 'carbon-components-react/es/components/Button';
-import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
 import styles from './vitals-overview.scss';
 import VitalsChart from './vitals-chart.component';
+import VitalsPagination from './vitalsPagination.component';
+import { DataTableSkeleton, Button } from 'carbon-components-react';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { useConfig, attach } from '@openmrs/esm-framework';
 import { useVitalsSignsConceptMetaData, withUnit } from './vitals-biometrics-form/use-vitalsigns';
 import { patientVitalsBiometricsFormWorkspace } from '../constants';
 import { PatientVitals, performPatientsVitalsSearch } from './vitals-biometrics.resource';
-import VitalsPagination from './vitalsPagination.component';
 
 interface VitalsOverviewProps {
   patientUuid: string;

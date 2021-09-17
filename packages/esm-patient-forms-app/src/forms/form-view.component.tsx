@@ -1,12 +1,16 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import Search from 'carbon-components-react/es/components/Search';
-import isEmpty from 'lodash-es/isEmpty';
 import styles from './form-view.component.scss';
+import EmptyFormView from './empty-form.component';
+import isEmpty from 'lodash-es/isEmpty';
+import first from 'lodash-es/first';
+import debounce from 'lodash-es/debounce';
 import { attach, navigate, usePagination, useVisit, Visit } from '@openmrs/esm-framework';
 import { PatientChartPagination } from './pagination-see-all.component';
 import { useTranslation } from 'react-i18next';
 import { Form } from '../types';
-import DataTable, {
+import {
+  DataTable,
+  Search,
   Table,
   TableCell,
   TableContainer,
@@ -17,12 +21,9 @@ import DataTable, {
   DataTableCell,
   DataTableHeader,
   DataTableRow,
-} from 'carbon-components-react/es/components/DataTable';
+} from 'carbon-components-react';
 import { formatDate, formEntrySub, sortFormLatestFirst } from './forms-utils';
-import EmptyFormView from './empty-form.component';
-import first from 'lodash-es/first';
 import { CoreHTMLForms } from '../core-html-forms';
-import debounce from 'lodash-es/debounce';
 
 function startVisitPrompt() {
   window.dispatchEvent(

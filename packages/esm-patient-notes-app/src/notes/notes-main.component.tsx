@@ -1,13 +1,12 @@
 import React from 'react';
-import { useTranslation } from 'react-i18next';
-import Button from 'carbon-components-react/es/components/Button';
-import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
 import Add16 from '@carbon/icons-react/es/add/16';
+import NotesPagination from './notesPagination.component';
+import styles from './notes-overview.scss';
+import { useTranslation } from 'react-i18next';
+import { Button, DataTableSkeleton } from 'carbon-components-react';
 import { EmptyState, ErrorState, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
 import { attach, useVisit } from '@openmrs/esm-framework';
 import { getEncounterObservableRESTAPI, PatientNote } from './encounter.resource';
-import NotesPagination from './notesPagination.component';
-import styles from './notes-overview.scss';
 
 interface NotesOverviewProps {
   patientUuid: string;

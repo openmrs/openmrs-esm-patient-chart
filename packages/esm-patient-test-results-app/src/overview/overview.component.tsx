@@ -1,8 +1,8 @@
 import React from 'react';
-import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
 import useOverviewData from './useOverviewData';
-import { Card } from './helpers';
 import CommonOverview from './common-overview';
+import { DataTableSkeleton } from 'carbon-components-react';
+import { Card } from './helpers';
 import { switchTo } from '@openmrs/esm-framework';
 
 const defaultOpenTimeline = (patientUuid, panelUuid) => {
@@ -13,20 +13,20 @@ const defaultOpenTimeline = (patientUuid, panelUuid) => {
 };
 
 interface LabResultProps {
-  openTimeline?: (panelUuid) => void;
-  openTrendline?: (panelUuid, testUuid) => void;
+  openTimeline?: (panelUuid: string) => void;
+  openTrendline?: (panelUuid: string, testUuid: string) => void;
 }
 
-type LabResultParams = {
+interface LabResultParams {
   patientUuid: string;
-};
+}
 
 export const Overview: React.FC<LabResultProps & LabResultParams> = ({
   patientUuid,
   openTimeline = (panelUuid) => defaultOpenTimeline(patientUuid, panelUuid),
   openTrendline,
 }) => {
-  const { overviewData, loaded, error } = useOverviewData(patientUuid);
+  const { overviewData, loaded } = useOverviewData(patientUuid);
 
   return (
     <>

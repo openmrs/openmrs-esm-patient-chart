@@ -1,9 +1,13 @@
 import React from 'react';
 import dayjs from 'dayjs';
+import Add16 from '@carbon/icons-react/es/add/16';
+import styles from './conditions-detailed-summary.scss';
+import capitalize from 'lodash-es/capitalize';
 import { useTranslation } from 'react-i18next';
-import Button from 'carbon-components-react/es/components/Button';
-import DataTableSkeleton from 'carbon-components-react/es/components/DataTableSkeleton';
-import DataTable, {
+import {
+  DataTable,
+  DataTableSkeleton,
+  Button,
   Table,
   TableCell,
   TableContainer,
@@ -11,14 +15,11 @@ import DataTable, {
   TableHead,
   TableHeader,
   TableRow,
-} from 'carbon-components-react/es/components/DataTable';
-import Add16 from '@carbon/icons-react/es/add/16';
-import styles from './conditions-detailed-summary.scss';
+} from 'carbon-components-react';
 import { attach } from '@openmrs/esm-framework';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { Condition, performPatientConditionsSearch } from './conditions.resource';
 import { useConditionsContext } from './conditions.context';
-import { capitalize } from 'lodash-es';
 
 const ConditionsDetailedSummary: React.FC = () => {
   const { t } = useTranslation();

@@ -1,18 +1,22 @@
 import React, { SyntheticEvent } from 'react';
 import dayjs from 'dayjs';
 import debounce from 'lodash-es/debounce';
-import Button from 'carbon-components-react/es/components/Button';
-import DatePicker from 'carbon-components-react/es/components/DatePicker';
-import DatePickerInput from 'carbon-components-react/es/components/DatePickerInput';
-import Form from 'carbon-components-react/es/components/Form';
-import FormGroup from 'carbon-components-react/es/components/FormGroup';
-import Search from 'carbon-components-react/es/components/Search';
-import SearchSkeleton from 'carbon-components-react/es/components/Search/Search.Skeleton';
-import Tag from 'carbon-components-react/es/components/Tag';
-import TextArea from 'carbon-components-react/es/components/TextArea';
-import { Tile } from 'carbon-components-react/es/components/Tile';
 import { useTranslation } from 'react-i18next';
-import { Column, Grid, Row } from 'carbon-components-react/es/components/Grid';
+import {
+  Column,
+  Grid,
+  Row,
+  Button,
+  DatePicker,
+  DatePickerInput,
+  Form,
+  FormGroup,
+  Search,
+  SearchSkeleton,
+  Tag,
+  TextArea,
+  Tile,
+} from 'carbon-components-react';
 import {
   createErrorHandler,
   detach,
@@ -25,13 +29,14 @@ import { convertToObsPayload, Diagnosis, VisitNotePayload } from './visit-note.u
 import { fetchDiagnosisByName, fetchLocationByUuid, fetchProviderByUuid, saveVisitNote } from './visit-notes.resource';
 import { ConfigObject } from '../config-schema';
 import styles from './visit-notes-form.scss';
+
 const searchTimeoutInMs = 500;
 
 interface Idle {
   type: ActionTypes.idle;
 }
 
-interface Search {
+interface SearchAction {
   isSearching: boolean;
   searchResults?: Array<Diagnosis>;
   searchTerm: string;
@@ -47,7 +52,7 @@ interface Submit {
   type: ActionTypes.submit;
 }
 
-type Action = Idle | Search | SelectDiagnoses | Submit;
+type Action = Idle | SearchAction | SelectDiagnoses | Submit;
 
 interface ViewState {
   status: string;

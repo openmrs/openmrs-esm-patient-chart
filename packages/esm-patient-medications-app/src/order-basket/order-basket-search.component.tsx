@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import Search from 'carbon-components-react/es/components/Search';
 import styles from './order-basket-search.scss';
 import OrderBasketSearchResults from './order-basket-search-results';
+import { Search } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 import { OrderBasketItem } from '../types/order-basket-item';
 

@@ -1,8 +1,6 @@
-import Tabs from 'carbon-components-react/es/components/Tabs';
-import Tab from 'carbon-components-react/es/components/Tab';
-import * as React from 'react';
-
+import React from 'react';
 import styles from './trendline.scss';
+import { Tabs, Tab } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 
 const RangeSelector: React.FC<{ setLowerRange: (lowerRange: Date) => void; upperRange: Date }> = ({
@@ -10,8 +8,7 @@ const RangeSelector: React.FC<{ setLowerRange: (lowerRange: Date) => void; upper
   upperRange,
 }) => {
   const { t } = useTranslation();
-
-  const ranges = [
+  const ranges: Array<[string, () => void]> = [
     [
       t('trendlineRangeSelector1Day', '1 day'),
       () => setLowerRange(new Date(Date.parse(upperRange.toString()) - 1 * 24 * 3600 * 1000)),

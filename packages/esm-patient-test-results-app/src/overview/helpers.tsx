@@ -1,9 +1,9 @@
 import React from 'react';
-import styles from './lab-results.scss';
-import TableRow from 'carbon-components-react/es/components/DataTable/TableRow';
-import { OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import Information16 from '@carbon/icons-react/es/information/16';
 import dayjs from 'dayjs';
+import styles from './lab-results.scss';
+import { TableRow } from 'carbon-components-react';
+import { OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 
 export function formatDate(date: Date) {
   return dayjs(date).format('DD/MM/YYYY · HH:mm');

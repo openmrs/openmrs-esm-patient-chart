@@ -1,5 +1,6 @@
 import React from 'react';
-import DataTable, {
+import {
+  DataTable,
   Table,
   TableCell,
   TableContainer,
@@ -7,7 +8,7 @@ import DataTable, {
   TableHead,
   TableHeader,
   TableRow,
-} from 'carbon-components-react/es/components/DataTable';
+} from 'carbon-components-react';
 import styles from './notes-overview.scss';
 import { usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
