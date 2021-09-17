@@ -6,6 +6,12 @@ import { BrowserRouter, Route } from 'react-router-dom';
 import { basePath, dashboardPath, spaRoot } from './constants';
 import styles from './root.scss';
 import { ContextWindowSizeProvider } from './hooks/useContextWindowSize';
+import { SWRConfig } from 'swr';
+
+const swrConfiguration = {
+  // Maximum number of retries when the backend returns an error
+  errorRetryCount: 3,
+};
 
 export default function Root() {
   return (
@@ -13,7 +19,9 @@ export default function Root() {
       <ContextWindowSizeProvider>
         <div className={styles.patientChartWrapper}>
           <SideMenu />
-          <Route path={dashboardPath} component={PatientChart} />
+          <SWRConfig value={{ ...swrConfiguration }}>
+            <Route path={dashboardPath} component={PatientChart} />
+          </SWRConfig>
           <Route path={basePath} component={ContextWorkspace} />
         </div>
       </ContextWindowSizeProvider>
