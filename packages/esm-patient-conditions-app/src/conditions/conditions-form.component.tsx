@@ -1,9 +1,17 @@
 import React, { SyntheticEvent } from 'react';
 import dayjs from 'dayjs';
 import debounce from 'lodash-es/debounce';
+import { mutate } from 'swr';
 import styles from './conditions-form.scss';
 import { useTranslation } from 'react-i18next';
-import { createErrorHandler, detach, showNotification, showToast, useSessionUser } from '@openmrs/esm-framework';
+import {
+  createErrorHandler,
+  detach,
+  fhirBaseUrl,
+  showNotification,
+  showToast,
+  useSessionUser,
+} from '@openmrs/esm-framework';
 import {
   Tile,
   SearchSkeleton,
@@ -204,9 +212,13 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid, isTablet }
             closeWorkspace();
 
             showToast({
+              critical: true,
               kind: 'success',
-              description: t('conditionSaved', 'Condition saved successfully'),
+              description: t('conditionNowVisible', 'It is now visible on the Conditions page'),
+              title: t('conditionSaved', 'Condition saved'),
             });
+
+            mutate(`${fhirBaseUrl}/Condition?patient=${patientUuid}`);
           }
         },
         (err) => {

@@ -1,6 +1,29 @@
-import { openmrsObservableFetch, fhirBaseUrl } from '@openmrs/esm-framework';
+import useSWR from 'swr';
 import { map } from 'rxjs/operators';
-import { FHIRCondition } from '../types';
+import { openmrsObservableFetch, fhirBaseUrl, openmrsFetch } from '@openmrs/esm-framework';
+import { FHIRCondition, FHIRConditionResponse } from '../types';
+
+export function useConditions(patientUuid: string) {
+  const { data, error, isValidating } = useSWR<{ data: FHIRConditionResponse }, Error>(
+    `${fhirBaseUrl}/Condition?patient=${patientUuid}`,
+    openmrsFetch,
+  );
+
+  const formattedConditions =
+    data?.data?.total > 0
+      ? data?.data?.entry
+          .map((entry) => entry.resource ?? [])
+          .map(mapConditionProperties)
+          .sort((a, b) => (b.onsetDateTime > a.onsetDateTime ? 1 : -1))
+      : null;
+
+  return {
+    data: data ? formattedConditions : null,
+    isError: error,
+    isLoading: !data && !error,
+    isValidating,
+  };
+}
 
 export function performPatientConditionsSearch(patientIdentifier: string) {
   return openmrsObservableFetch<Array<Condition>>(

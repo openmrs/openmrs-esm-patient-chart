@@ -211,8 +211,10 @@ describe('ConditionsForm: ', () => {
       expect(mockShowToast).toHaveBeenCalledTimes(1);
       expect(mockShowToast).toHaveBeenCalledWith(
         expect.objectContaining({
-          description: 'Condition saved successfully',
+          critical: true,
+          description: 'It is now visible on the Conditions page',
           kind: 'success',
+          title: 'Condition saved',
         }),
       );
     });
