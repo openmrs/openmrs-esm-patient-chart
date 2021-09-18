@@ -46,21 +46,6 @@ function mapAllergyProperties(allergy: FHIRAllergy): Allergy {
   return formattedAllergy;
 }
 
-function formatAllergies(allergies: Array<FHIRAllergy>): Array<Allergy> {
-  return allergies.map((allergy) => mapAllergyProperties(allergy));
-}
-
-export function performPatientAllergySearch(patientIdentifier: string) {
-  return openmrsObservableFetch<FHIRAllergyResponse>(
-    `${fhirBaseUrl}/AllergyIntolerance?patient.identifier=${patientIdentifier}`,
-  ).pipe(
-    map(({ data }) => data.entry),
-    map((entries) => entries?.map((entry) => entry?.resource) ?? []),
-    map((data) => formatAllergies(data)),
-    map((data) => data.sort((a, b) => (b.lastUpdated > a.lastUpdated ? 1 : -1))),
-  );
-}
-
 export function fetchAllergyByUuid(allergyUuid: string) {
   return openmrsObservableFetch(`${fhirBaseUrl}/AllergyIntolerance/${allergyUuid}`).pipe(
     map(({ data }) => data),

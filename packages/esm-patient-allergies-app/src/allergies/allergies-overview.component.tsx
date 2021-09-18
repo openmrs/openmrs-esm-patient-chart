@@ -4,6 +4,7 @@ import {
   DataTableSkeleton,
   DataTable,
   Button,
+  InlineLoading,
   Table,
   TableCell,
   TableContainer,
@@ -13,12 +14,11 @@ import {
   TableRow,
 } from 'carbon-components-react';
 import styles from './allergies-overview.scss';
-import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
+import { EmptyState, ErrorState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { useAllergies } from './allergy-intolerance.resource';
-import { attach } from '@openmrs/esm-framework';
-import { patientAllergiesFormWorkspace } from '../constants';
-const allergiesToShowCount = 5;
+import { attach, usePagination } from '@openmrs/esm-framework';
+import { allergiesToShowCount, patientAllergiesFormWorkspace } from '../constants';
 
 interface AllergiesOverviewProps {
   basePath: string;
@@ -26,13 +26,15 @@ interface AllergiesOverviewProps {
   showAddAllergy: boolean;
 }
 
-const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient, showAddAllergy }) => {
+const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient, showAddAllergy, basePath }) => {
   const { t } = useTranslation();
   const displayText = t('allergyIntolerances', 'allergy intolerances');
   const headerTitle = t('allergies', 'Allergies');
+  const urlLabel = t('seeAll', 'See all');
+  const pageUrl = window.spaBase + basePath + '/allergies';
 
-  const [showAllAllergies, setShowAllAllergies] = React.useState(false);
-  const { data: allergies, isError, isLoading } = useAllergies(patient.id);
+  const { data: allergies, isError, isLoading, isValidating } = useAllergies(patient.id);
+  const { results: paginatedAllergies, goTo, currentPage } = usePagination(allergies ?? [], allergiesToShowCount);
 
   const tableHeaders = [
     {
@@ -46,17 +48,13 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient, showAddA
   ];
 
   const tableRows = React.useMemo(() => {
-    return allergies?.map((allergy) => ({
+    return paginatedAllergies?.map((allergy) => ({
       ...allergy,
       reactions: `${allergy.reactionManifestations?.join(', ') || ''} ${
         allergy.reactionSeverity ? `(${allergy.reactionSeverity})` : ''
       }`,
     }));
-  }, [allergies]);
-
-  const toggleShowAllAllergies = () => {
-    setShowAllAllergies(!showAllAllergies);
-  };
+  }, [paginatedAllergies]);
 
   const launchAllergiesForm = React.useCallback(
     () => attach('patient-chart-workspace-slot', patientAllergiesFormWorkspace),
@@ -70,6 +68,7 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient, showAddA
       <div className={styles.widgetCard}>
         <div className={styles.allergiesHeader}>
           <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
+          <span>{isValidating ? <InlineLoading /> : null}</span>
           {showAddAllergy && (
             <Button kind="ghost" renderIcon={Add16} iconDescription="Add allergies" onClick={launchAllergiesForm}>
               {t('add', 'Add')}
@@ -102,27 +101,20 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient, showAddA
                       ))}
                     </TableRow>
                   ))}
-                  {!showAllAllergies && allergies?.length > allergiesToShowCount && (
-                    <TableRow>
-                      <TableCell colSpan={4}>
-                        <span
-                          style={{
-                            display: 'inline-block',
-                            margin: '0.45rem 0rem',
-                          }}>
-                          {`${allergiesToShowCount} / ${allergies.length}`} {t('items', 'items')}
-                        </span>
-                        <Button size="small" kind="ghost" onClick={toggleShowAllAllergies}>
-                          {t('seeAll', 'See all')}
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  )}
                 </TableBody>
               </Table>
             )}
           </DataTable>
         </TableContainer>
+        <PatientChartPagination
+          currentItems={paginatedAllergies.length}
+          onPageNumberChange={({ page }) => goTo(page)}
+          pageNumber={currentPage}
+          pageSize={allergiesToShowCount}
+          pageUrl={pageUrl}
+          totalItems={allergies.length}
+          urlLabel={urlLabel}
+        />
       </div>
     );
   }

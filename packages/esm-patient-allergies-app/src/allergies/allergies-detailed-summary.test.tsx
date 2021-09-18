@@ -16,7 +16,7 @@ mockOpenmrsFetch.mockImplementation(jest.fn());
 const renderAllergiesDetailedSummary = () => render(<AllergiesDetailedSummary {...testProps} />);
 
 it('renders an empty state view if allergy data is unavailable', async () => {
-  mockOpenmrsFetch.mockReturnValueOnce({ data: [] });
+  mockOpenmrsFetch.mockReturnValueOnce({ data: { entry: [] } });
   renderAllergiesDetailedSummary();
 
   await waitForLoadingToFinish();

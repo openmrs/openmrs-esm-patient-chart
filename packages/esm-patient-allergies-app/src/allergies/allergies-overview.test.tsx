@@ -1,18 +1,32 @@
 import React from 'react';
-import { openmrsFetch } from '@openmrs/esm-framework';
-import { mockFhirAllergyIntoleranceResponse } from '../../../../__mocks__/allergies.mock';
+import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
+import { mockAllergies, mockFhirAllergyIntoleranceResponse } from '../../../../__mocks__/allergies.mock';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { render, screen, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import AllergiesOverview from './allergies-overview.component';
 
 const testProps = {
   patient: mockPatient,
-  basePath: '/',
+  basePath: `/patient/${mockPatient.id}/chart`,
   showAddAllergy: false,
 };
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
-mockOpenmrsFetch.mockImplementation(jest.fn());
+const mockUsePagination = usePagination as jest.Mock;
+
+jest.mock('@openmrs/esm-framework', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-framework');
+
+  return {
+    ...originalModule,
+    attach: jest.fn(),
+    usePagination: jest.fn().mockImplementation(() => ({
+      currentPage: 1,
+      goTo: () => {},
+      results: [],
+    })),
+  };
+});
 
 const renderAllergiesOverview = () => render(<AllergiesOverview {...testProps} />);
 
@@ -54,6 +68,11 @@ describe('AllergiesOverview: ', () => {
 
   it("renders an overview of the patient's allergic reactions and their manifestations", async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: mockFhirAllergyIntoleranceResponse });
+    mockUsePagination.mockImplementation(() => ({
+      currentPage: 1,
+      goTo: () => {},
+      results: mockAllergies,
+    }));
     renderAllergiesOverview();
 
     await waitForLoadingToFinish();
@@ -76,5 +95,7 @@ describe('AllergiesOverview: ', () => {
     expectedAllergies.forEach((allergy) => {
       expect(screen.getByRole('row', { name: new RegExp(allergy, 'i') })).toBeInTheDocument();
     });
+    expect(screen.getByRole('button', { name: /previous page/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /next page/i })).toBeInTheDocument();
   });
 });
