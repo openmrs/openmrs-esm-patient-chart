@@ -2418,3 +2418,19 @@ export const formattedVitals = [
     respiratoryRate: undefined,
   },
 ];
+
+export const mockConceptUnits = ['mmHg', 'mmHg', 'DEG C', 'cm', 'kg', 'beats/min', '%', 'cm', 'breaths/min'];
+
+export const mockConceptMetadata = [
+  {
+    display: 'Systolic',
+    hiAbsolute: 250,
+    hiCritical: 180,
+    hiNormal: 140,
+    lowAbsolute: 0,
+    lowCritical: 85,
+    lowNormal: 100,
+    units: 'mmHg',
+    uuid: '5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  },
+];

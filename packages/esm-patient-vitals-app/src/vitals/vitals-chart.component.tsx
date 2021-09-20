@@ -3,11 +3,12 @@ import dayjs from 'dayjs';
 import styles from './vitals-chart.component.scss';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs } from 'carbon-components-react';
-import { withUnit } from './vitals-biometrics-form/use-vitalsigns';
-import { PatientVitals } from './vitals-biometrics.resource';
+import { PatientVitals } from './vitals.resource';
 import { LineChart } from '@carbon/charts-react';
 import { LineChartOptions } from '@carbon/charts/interfaces/charts';
 import { ScaleTypes } from '@carbon/charts/interfaces/enums';
+import { withUnit } from '@openmrs/esm-patient-common-lib';
+import '@carbon/charts/styles.css';
 
 interface vitalsChartData {
   title: string;
@@ -16,13 +17,13 @@ interface vitalsChartData {
 
 interface VitalsChartProps {
   patientVitals: Array<PatientVitals>;
-  conceptsUnits: Array<string>;
+  conceptUnits: Array<string>;
 }
 
-const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptsUnits }) => {
+const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits }) => {
   const { t } = useTranslation();
   const [bloodPressureUnit, , temperatureUnit, , , pulseUnit, oxygenSaturationUnit, , respiratoryRateUnit] =
-    conceptsUnits;
+    conceptUnits;
   const [selectedVitalSign, setSelectedVitalsSign] = React.useState<vitalsChartData>({
     title: `BP (${bloodPressureUnit})`,
     value: 'systolic',

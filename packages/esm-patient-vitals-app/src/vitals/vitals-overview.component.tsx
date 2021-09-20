@@ -5,14 +5,13 @@ import ChartLineSmooth16 from '@carbon/icons-react/es/chart--line-smooth/16';
 import Table16 from '@carbon/icons-react/es/table/16';
 import styles from './vitals-overview.scss';
 import VitalsChart from './vitals-chart.component';
-import VitalsPagination from './vitalsPagination.component';
-import { DataTableSkeleton, Button } from 'carbon-components-react';
-import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
+import VitalsPagination from './vitals-pagination.component';
+import { DataTableSkeleton, Button, InlineLoading } from 'carbon-components-react';
+import { EmptyState, ErrorState, useVitalsConceptMetadata, withUnit } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
-import { useConfig, attach } from '@openmrs/esm-framework';
-import { useVitalsSignsConceptMetaData, withUnit } from './vitals-biometrics-form/use-vitalsigns';
+import { attach } from '@openmrs/esm-framework';
 import { patientVitalsBiometricsFormWorkspace } from '../constants';
-import { PatientVitals, performPatientsVitalsSearch } from './vitals-biometrics.resource';
+import { useVitals } from './vitals.resource';
 
 interface VitalsOverviewProps {
   patientUuid: string;
@@ -26,84 +25,67 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
   const { t } = useTranslation();
   const displayText = t('vitalSigns', 'Vital signs');
   const headerTitle = t('vitals', 'Vitals');
-
-  const config = useConfig();
-  const { conceptsUnits } = useVitalsSignsConceptMetaData();
-  const [bloodPressureUnit, , temperatureUnit, , , pulseUnit, oxygenSaturationUnit, , respiratoryRateUnit] =
-    conceptsUnits;
-  const [vitals, setVitals] = React.useState<Array<PatientVitals>>(null);
   const [chartView, setChartView] = React.useState<boolean>();
-  const [error, setError] = React.useState(null);
 
-  const tableHeaders = [
-    { key: 'date', header: 'Date and time', isSortable: true },
-    {
-      key: 'bloodPressure',
-      header: withUnit('BP', bloodPressureUnit),
-    },
-    {
-      key: 'respiratoryRate',
-      header: withUnit('R. Rate', respiratoryRateUnit),
-    },
-    { key: 'pulse', header: withUnit('Pulse', pulseUnit) },
-    {
-      key: 'spo2',
-      header: withUnit('SPO2', oxygenSaturationUnit),
-    },
-    {
-      key: 'temperature',
-      header: withUnit('Temp', temperatureUnit),
-    },
-  ];
+  const { data: vitals, isError, isLoading, isValidating } = useVitals(patientUuid);
+  const { data: conceptData } = useVitalsConceptMetadata();
+  const conceptUnits = conceptData ? conceptData.conceptUnits : null;
 
   const launchVitalsBiometricsForm = React.useCallback(
     () => attach('patient-chart-workspace-slot', patientVitalsBiometricsFormWorkspace),
     [],
   );
 
-  React.useEffect(() => {
-    if (patientUuid) {
-      const subscription = performPatientsVitalsSearch(config.concepts, patientUuid, 100).subscribe(
-        (vitals) => {
-          setVitals(vitals);
-        },
-        (err) => setError(err),
-      );
-      return () => subscription.unsubscribe();
-    }
-  }, [patientUuid, config.concepts]);
+  const tableHeaders = [
+    { key: 'date', header: 'Date and time', isSortable: true },
+    {
+      key: 'bloodPressure',
+      header: withUnit('BP', conceptUnits ? conceptUnits[0] : ''),
+    },
+    {
+      key: 'respiratoryRate',
+      header: withUnit('R. Rate', conceptUnits ? conceptUnits[8] : ''),
+    },
+    { key: 'pulse', header: withUnit('Pulse', conceptUnits ? conceptUnits[5] : '') },
+    {
+      key: 'spo2',
+      header: withUnit('SPO2', conceptUnits ? conceptUnits[6] : ''),
+    },
+    {
+      key: 'temperature',
+      header: withUnit('Temp', conceptUnits ? conceptUnits[2] : ''),
+    },
+  ];
 
   const tableRows = React.useMemo(
     () =>
-      vitals
-        ?.sort((a, b) => (b.date > a.date ? 1 : -1))
-        .map((vital, index) => {
-          return {
-            id: `${index}`,
-            date: dayjs(vital.date).format(`DD - MMM - YYYY, hh:mm`),
-            bloodPressure: `${vital.systolic ?? '-'} / ${vital.diastolic ?? '-'}`,
-            pulse: vital.pulse,
-            spo2: vital.oxygenSaturation,
-            temperature: vital.temperature,
-            respiratoryRate: vital.respiratoryRate,
-          };
-        }),
+      vitals?.map((vital, index) => {
+        return {
+          id: `${index}`,
+          date: dayjs(vital.date).format(`DD - MMM - YYYY, hh:mm`),
+          bloodPressure: `${vital.systolic ?? '-'} / ${vital.diastolic ?? '-'}`,
+          pulse: vital.pulse,
+          spo2: vital.oxygenSaturation,
+          temperature: vital.temperature,
+          respiratoryRate: vital.respiratoryRate,
+        };
+      }),
     [vitals],
   );
 
   return (
     <>
       {(() => {
-        if (tableRows && !tableRows?.length)
-          return (
-            <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchVitalsBiometricsForm} />
-          );
-        if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
-        if (tableRows?.length) {
+        if (isLoading) return <DataTableSkeleton role="progressbar" />;
+        if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
+        if (vitals?.length) {
           return (
             <div className={styles.vitalsWidgetContainer}>
               <div className={styles.vitalsHeaderContainer}>
                 <h4>{headerTitle}</h4>
+                <div className={styles.backgroundDataFetchingIndicator}>
+                  <span>{isValidating ? <InlineLoading /> : null}</span>
+                </div>
                 <div className={styles.vitalsHeaderActionItems}>
                   <div className={styles.toggleButtons}>
                     <Button
@@ -138,7 +120,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
                 </div>
               </div>
               {chartView ? (
-                <VitalsChart patientVitals={vitals} conceptsUnits={conceptsUnits} />
+                <VitalsChart patientVitals={vitals} conceptUnits={conceptUnits} />
               ) : (
                 <VitalsPagination
                   tableRows={tableRows}
@@ -151,7 +133,9 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
             </div>
           );
         }
-        return <DataTableSkeleton rowCount={pageSize} />;
+        return (
+          <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchVitalsBiometricsForm} />
+        );
       })()}
     </>
   );

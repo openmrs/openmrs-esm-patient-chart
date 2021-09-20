@@ -1,81 +1,78 @@
-import { openmrsObservableFetch, openmrsFetch, fhirBaseUrl, FHIRResource } from '@openmrs/esm-framework';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import useSWR from 'swr';
 import { PatientVitalAndBiometric } from './vitals-biometrics-form/vitals-biometrics-form.component';
+import { openmrsFetch, fhirBaseUrl, useConfig } from '@openmrs/esm-framework';
 import { calculateBMI } from './vitals-biometrics-form/vitals-biometrics-form.utils';
 import { ConfigObject } from '../config-schema';
 
-export interface PatientVitals {
-  id: string;
-  date: Date;
-  systolic?: string;
-  diastolic?: string;
-  pulse?: string;
-  temperature?: string;
-  oxygenSaturation?: string;
-  height?: string;
-  weight?: string;
-  bmi?: any;
-  respiratoryRate?: string;
-}
+export const pageSize = 100;
 
-interface VitalsFetchResponse {
-  entry: Array<FHIRResource>;
-  id: string;
-  meta: {
-    lastUpdated: string;
-  };
-  resourceType: string;
-  total: number;
-  type: string;
-}
-
-interface ObsRecord {
-  concept: string;
-  value: string | number;
-}
-
-function filterByConceptUuid(vitals: Array<FHIRResource['resource']>, conceptUuid: string) {
-  return vitals.filter((obs) => obs.code.coding.some((c) => c.code === conceptUuid));
-}
-
-export function performPatientsVitalsSearch(
-  concepts: ConfigObject['concepts'],
-  patientID: string,
-  pageSize: number = 100,
-): Observable<Array<PatientVitals>> {
+export function useVitals(patientUuid: string) {
+  const config = useConfig();
   const vitalsConcepts = {
-    systolicBloodPressure: concepts.systolicBloodPressureUuid,
-    diastolicBloodPressure: concepts.diastolicBloodPressureUuid,
-    pulse: concepts.pulseUuid,
-    temperature: concepts.temperatureUuid,
-    oxygenSaturation: concepts.oxygenSaturationUuid,
-    height: concepts.heightUuid,
-    weight: concepts.weightUuid,
-    respiratoryRate: concepts.respiratoryRateUuid,
+    systolicBloodPressure: config.concepts.systolicBloodPressureUuid,
+    diastolicBloodPressure: config.concepts.diastolicBloodPressureUuid,
+    pulse: config.concepts.pulseUuid,
+    temperature: config.concepts.temperatureUuid,
+    oxygenSaturation: config.concepts.oxygenSaturationUuid,
+    height: config.concepts.heightUuid,
+    weight: config.concepts.weightUuid,
+    respiratoryRate: config.concepts.respiratoryRateUuid,
   };
 
-  return openmrsObservableFetch<VitalsFetchResponse>(
-    `${fhirBaseUrl}/Observation?subject:Patient=${patientID}&code=` +
+  const { data, error, isValidating } = useSWR<{ data: VitalsFetchResponse }, Error>(
+    `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&code=` +
       Object.values(vitalsConcepts).join(',') +
       '&_summary=data&_sort=-date' +
-      `&_count=${pageSize}`,
-  ).pipe(
-    map(({ data }) => data.entry),
-    map((entries) => entries?.map((entry) => entry.resource) ?? []),
-    map((vitals) => {
-      return formatVitals(
-        filterByConceptUuid(vitals, concepts.systolicBloodPressureUuid),
-        filterByConceptUuid(vitals, concepts.diastolicBloodPressureUuid),
-        filterByConceptUuid(vitals, concepts.pulseUuid),
-        filterByConceptUuid(vitals, concepts.temperatureUuid),
-        filterByConceptUuid(vitals, concepts.oxygenSaturationUuid),
-        filterByConceptUuid(vitals, concepts.heightUuid),
-        filterByConceptUuid(vitals, concepts.weightUuid),
-        filterByConceptUuid(vitals, concepts.respiratoryRateUuid),
-      );
-    }),
+      `&_count=${pageSize}
+  `,
+    openmrsFetch,
   );
+
+  const observations = data?.data?.total > 0 ? data.data?.entry?.map((entry) => entry.resource ?? []) : null;
+
+  const systolicBloodPressureData = observations?.filter((obs) =>
+    obs.code.coding.some((sys) => sys.code === config.concepts.systolicBloodPressureUuid),
+  );
+  const diastolicBloodPressureData = observations?.filter((obs) =>
+    obs.code.coding.some((sys) => sys.code === config.concepts.diastolicBloodPressureUuid),
+  );
+  const pulseData = observations?.filter((obs) =>
+    obs.code.coding.some((sys) => sys.code === config.concepts.pulseUuid),
+  );
+  const temperatureData = observations?.filter((obs) =>
+    obs.code.coding.some((sys) => sys.code === config.concepts.temperatureUuid),
+  );
+  const oxygenSaturationData = observations?.filter((obs) =>
+    obs.code.coding.some((sys) => sys.code === config.concepts.oxygenSaturationUuid),
+  );
+  const heightData = observations?.filter((obs) =>
+    obs.code.coding.some((sys) => sys.code === config.concepts.heightUuid),
+  );
+  const weightData = observations?.filter((obs) =>
+    obs.code.coding.some((sys) => sys.code === config.concepts.weightUuid),
+  );
+  const respiratoryRateData = observations?.filter((obs) =>
+    obs.code.coding.some((sys) => sys.code === config.concepts.respiratoryRateUuid),
+  );
+
+  return {
+    data:
+      data?.data?.total > 0
+        ? formatVitals(
+            systolicBloodPressureData,
+            diastolicBloodPressureData,
+            pulseData,
+            temperatureData,
+            oxygenSaturationData,
+            heightData,
+            weightData,
+            respiratoryRateData,
+          )
+        : null,
+    isError: error,
+    isLoading: !data && !error,
+    isValidating,
+  };
 }
 
 type Vitals = Array<{ issued: Date; valueQuantity: any; encounter: any }>;
@@ -90,7 +87,6 @@ function formatVitals(
   weightData: Vitals,
   respiratoryRateData: Vitals,
 ): Array<PatientVitals> {
-  let patientVitals: PatientVitals;
   const systolicDates = getDatesIssued(systolicBloodPressure);
   const diastolicDates = getDatesIssued(diastolicBloodPressure);
 
@@ -105,7 +101,7 @@ function formatVitals(
     const height = heightData.find((height) => height.issued === date);
     const weight = weightData.find((weight) => weight.issued === date);
     const respiratoryRate = respiratoryRateData.find((respiratoryRate) => respiratoryRate.issued === date);
-    return (patientVitals = {
+    return {
       id: systolic?.encounter?.reference.replace('Encounter/', ''),
       date: systolic?.issued,
       systolic: systolic?.valueQuantity?.value,
@@ -117,7 +113,7 @@ function formatVitals(
       height: height?.valueQuantity?.value,
       bmi: weight && height ? calculateBMI(weight.valueQuantity.value, height.valueQuantity.value) : null,
       respiratoryRate: respiratoryRate?.valueQuantity?.value,
-    });
+    };
   });
 }
 
@@ -197,4 +193,36 @@ export function editPatientVitals(
       orders: [],
     },
   });
+}
+
+export interface PatientVitals {
+  id: string;
+  date: Date | string;
+  systolic?: string;
+  diastolic?: string;
+  pulse?: string;
+  temperature?: string;
+  oxygenSaturation?: string;
+  height?: string;
+  weight?: string;
+  bmi?: any;
+  respiratoryRate?: string;
+}
+
+interface VitalsFetchResponse {
+  entry: Array<{
+    resource: any;
+  }>;
+  id: string;
+  meta: {
+    lastUpdated: string;
+  };
+  resourceType: string;
+  total: number;
+  type: string;
+}
+
+interface ObsRecord {
+  concept: string;
+  value: string | number;
 }
