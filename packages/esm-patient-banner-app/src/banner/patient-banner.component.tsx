@@ -9,25 +9,43 @@ import CustomOverflowMenuComponent from '../ui-components/overflow-menu.componen
 import styles from './patient-banner.scss';
 import { useTranslation } from 'react-i18next';
 import { Button } from 'carbon-components-react';
-import { ExtensionSlot, age } from '@openmrs/esm-framework';
+import { ExtensionSlot, age, ConfigurableLink, navigate } from '@openmrs/esm-framework';
 
 interface PatientBannerProps {
   patient: fhir.Patient;
   patientUuid: string;
+  patientUrl?: string;
+  hidePatientSearchPanel?: () => void;
 }
 
-const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid }) => {
+const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, patientUrl, hidePatientSearchPanel }) => {
   const { t } = useTranslation();
   const state = React.useMemo(() => ({ patientUuid }), [patientUuid]);
   const [showContactDetails, setShowContactDetails] = React.useState(false);
   const toggleContactDetails = React.useCallback(() => setShowContactDetails((value) => !value), []);
 
+  const patientAvatar = (
+    <div className={styles.patientAvatar} role="img">
+      <ExtensionSlot extensionSlotName="patient-photo-slot" state={state} />
+    </div>
+  );
   return (
     <div className={styles.container} role="banner">
       <div className={styles.patientBanner}>
-        <div className={styles.patientAvatar} role="img">
-          <ExtensionSlot extensionSlotName="patient-photo-slot" state={state} />
-        </div>
+        {patientUrl ? (
+          <div
+            role="button"
+            tabIndex={0}
+            className={styles.patientAvatarButton}
+            onClick={() => {
+              navigate({ to: patientUrl });
+              hidePatientSearchPanel && hidePatientSearchPanel();
+            }}>
+            {patientAvatar}
+          </div>
+        ) : (
+          patientAvatar
+        )}
         <div className={styles.patientInfo}>
           <div className={`${styles.row} ${styles.patientNameRow}`}>
             <div className={styles.flexRow}>
