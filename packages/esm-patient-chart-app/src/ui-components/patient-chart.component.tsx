@@ -19,13 +19,13 @@ interface PatientChartParams {
 const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({ match }) => {
   const { patientUuid, view, subview } = match.params;
   const [loading, patient] = useCurrentPatient(patientUuid);
-  const sessionUser = useSessionUser();
+  const sessionUser = null;
   const state = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);
   const { windowSize, openWindows } = useContextWorkspace();
 
   const mainClassName = `omrs-main-content ${styles.chartContainer}`;
 
-  useOfflineVisitForPatient(patientUuid, sessionUser?.sessionLocation.uuid);
+  useOfflineVisitForPatient(patientUuid, sessionUser?.sessionLocation?.uuid);
 
   return (
     <main className={mainClassName}>
