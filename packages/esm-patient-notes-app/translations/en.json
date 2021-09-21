@@ -25,6 +25,7 @@
   "searchForDiagnosis": "Search for a diagnosis",
   "seeAll": "See all",
   "visitDate": "Visit date",
+  "visitNoteNowVisible": "It is now visible on the Encounters page",
   "visitNoteSaved": "Visit note saved successfully",
   "visitNoteSaveError": "Error saving visit note"
 }

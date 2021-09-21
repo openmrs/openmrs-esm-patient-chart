@@ -12,9 +12,9 @@ import {
 import styles from './notes-overview.scss';
 import { usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
-import { PatientNote } from './encounter.resource';
 import { useTranslation } from 'react-i18next';
 import { formatNotesDate } from './notes-helper';
+import { PatientNote } from '../types';
 
 interface FormsProps {
   notes: Array<PatientNote>;
@@ -24,16 +24,10 @@ interface FormsProps {
 }
 
 const NotesPagination: React.FC<FormsProps> = ({ notes, pageSize, pageUrl, urlLabel }) => {
-  const getRowItems = (rows: Array<PatientNote>) => {
-    return rows.map((row) => ({
-      ...row,
-      encounterDate: formatNotesDate(row.encounterDate),
-    }));
-  };
-
-  const { results, goTo, currentPage } = usePagination(notes, pageSize);
   const { t } = useTranslation();
-  const headers = [
+  const { results: paginatedNotes, goTo, currentPage } = usePagination(notes, pageSize);
+
+  const tableHeaders = [
     {
       key: 'encounterDate',
       header: t('date', 'Date'),
@@ -52,10 +46,19 @@ const NotesPagination: React.FC<FormsProps> = ({ notes, pageSize, pageUrl, urlLa
     },
   ];
 
+  const tableRows = React.useMemo(
+    () =>
+      paginatedNotes.map((note) => ({
+        ...note,
+        encounterDate: formatNotesDate(note.encounterDate),
+      })),
+    [paginatedNotes],
+  );
+
   return (
     <div>
       <TableContainer>
-        <DataTable rows={getRowItems(results)} headers={headers} isSortable={true} size="short" useZebraStyles>
+        <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="short" useZebraStyles>
           {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
             <Table {...getTableProps()} useZebraStyles>
               <TableHead>
@@ -88,7 +91,7 @@ const NotesPagination: React.FC<FormsProps> = ({ notes, pageSize, pageUrl, urlLa
       <PatientChartPagination
         pageNumber={currentPage}
         totalItems={notes.length}
-        currentItems={results.length}
+        currentItems={paginatedNotes.length}
         pageUrl={pageUrl}
         pageSize={pageSize}
         onPageNumberChange={({ page }) => goTo(page)}
