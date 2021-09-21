@@ -27,7 +27,7 @@ const AddPastVisitOverflowMenuItem: React.FC<AddPastVisitOverflowMenuItemProps> 
         style={{
           maxWidth: '100vw',
         }}>
-        <span className="bx--overflow-menu-options__option-content">{t('addPastVisit', 'Add Past Visit')}</span>
+        <span className="bx--overflow-menu-options__option-content">{t('addPastVisit', 'Add past visit')}</span>
       </button>
     </li>
   );
