@@ -1,0 +1,70 @@
+@import "~@openmrs/esm-styleguide/src/vars";
+@import "~carbon-components/src/globals/scss/vars";
+@import "~carbon-components/src/globals/scss/mixins";
+@import "~carbon-components/scss/globals/scss/vendor/@carbon/elements/scss/type/styles";
+@import "~carbon-components/src/globals/scss/vendor/@carbon/layout/scss/generated/spacing";
+
+.productiveHeading02 {
+  color: $color-gray-70;
+  @include carbon--type-style("productive-heading-02");
+}
+
+$openmrs-background-grey: #ededed;
+
+
+:global(.omrs-breakpoint-lt-desktop) .formWrapper {
+  background-color: $openmrs-background-grey;
+}
+
+:global(.omrs-breakpoint-gt-tablet) .formWrapper {
+  background-color: $ui-02;
+}
+
+.formGroup {
+  display: flex;
+  margin-bottom: $spacing-02;
+  padding: $spacing-05;
+}
+
+:global(.omrs-breakpoint-lt-desktop) .formGroup > span{
+  flex: 1
+}
+:global(.omrs-breakpoint-lt-desktop) .formGroup > div{
+  flex: 3;
+}
+
+.formGroup span {
+  @extend .productiveHeading02;
+}
+
+.datePickerControl {
+  display: flex;
+}
+
+:global(.omrs-breakpoint-lt-desktop) .formGroup {
+  flex-direction: row;
+}
+
+:global(.omrs-breakpoint-gt-tablet) .formGroup {
+  flex-direction: column;
+}
+
+.buttonGroup {
+  display: flex;
+  position: sticky;
+  bottom: 0;
+  width: 100%;
+}
+
+:global(.omrs-breakpoint-lt-desktop) .buttonGroup {
+  padding: $spacing-05 $spacing-06;
+  background-color: $ui-02;
+}
+
+.buttonGroup button {
+  max-width: none;
+  width: 50%;
+  height: $spacing-10;
+  align-items: flex-start;
+}
+
