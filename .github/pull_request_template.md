@@ -23,13 +23,12 @@ Don't forget to remove the *None.* above if you do fill this section.
 -->
 
 
-## Related Issue
+## Issue
 
 *None.*
 <!--
-Optional.
+Required if applicable.
 If present, please link any related issue here, e.g. "https://issues.openmrs.org/browse/123").
-Don't forget to remove the *None.* above if you do fill this section.
 -->
 
 
