@@ -214,7 +214,7 @@ const AllergyForm: React.FC<AllergyFormProps> = ({ isTablet, closeWorkspace, pat
       {status === ActionTypes.resolved && (
         <>
           <div>
-            <header className={styles.productiveHeading03}>{t('allergenAndReaction', 'Allergen and Reactions')}</header>
+            <header className={styles.productiveHeading03}>{t('allergenAndReaction', 'Allergen and reactions')}</header>
             <div className={styles.sectionWrapper}>
               <section>
                 <header className={styles.productiveHeading02}>
@@ -342,7 +342,7 @@ const AllergyForm: React.FC<AllergyFormProps> = ({ isTablet, closeWorkspace, pat
               <Button onClick={closeWorkspace} kind="secondary">
                 {t('discard', 'Discard')}
               </Button>
-              <Button onClick={handleSavePatientAllergy}>{t('saveAndClose', 'Save and Close')}</Button>
+              <Button onClick={handleSavePatientAllergy}>{t('saveAndClose', 'Save and close')}</Button>
             </section>
           </div>
         </>
