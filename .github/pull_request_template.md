@@ -1,5 +1,6 @@
 ## Requirements
 
+- [ ] This PR has a title that briefly describes the work done, including the ticket number if there is a ticket.
 - [ ] My work conforms to the [**OpenMRS 3.0 Styleguide**](https://om.rs/styleguide).
 - [ ] I checked for feature overlap with [**existing widgets**](https://om.rs/directory).
 
