@@ -332,18 +332,18 @@ export default function MedicationOrderForm({
           </Row>
           <Row style={{ marginTop: '1rem' }}>
             <Column md={2}>
-              <FormGroup legendText={t('quantityDispensed', 'Quantity Dispensed')}>
+              <FormGroup legendText={t('quantity', 'Quantity')}>
                 <NumberInput
                   light={isTablet}
-                  id="quantityDispensed"
-                  helperText={t('pillsDispensed', 'Pills dispensed')}
+                  id="quantity"
+                  helperText={t('pillstoDispense', 'Pills to dispense')}
                   value={orderBasketItem.pillsDispensed}
                   min={0}
                   onChange={(e) => {
                     setOrderBasketItem({
                       ...orderBasketItem,
                       // @ts-ignore
-                      pillsDispensed: +e.imaginaryTarget.value,
+                      pillstoDispense: +e.imaginaryTarget.value,
                     });
                   }}
                 />
