@@ -337,13 +337,13 @@ export default function MedicationOrderForm({
                   light={isTablet}
                   id="quantity"
                   helperText={t('pillsToDispense', 'Pills to dispense')}
-                  value={orderBasketItem.pillsDispensed}
+                  value={orderBasketItem.pillsToDispense}
                   min={0}
                   onChange={(e) => {
                     setOrderBasketItem({
                       ...orderBasketItem,
                       // @ts-ignore
-                      pillstoDispense: +e.imaginaryTarget.value,
+                      pillsToDispense: +e.imaginaryTarget.value,
                     });
                   }}
                 />
