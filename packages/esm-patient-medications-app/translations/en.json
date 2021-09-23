@@ -40,6 +40,7 @@
   "patientInstructions": "Patient Instructions",
   "patientInstructionsPlaceholder": "Additional dosing instructions (e.g. \"Take after eating\")",
   "pillsDispensed": "Pills dispensed",
+  "pillsToDispense": "Pills to dispense",
   "prescriptionDuration": "2. Prescription Duration",
   "prescriptionRefills": "Prescription Refills",
   "prn": "P.R.N.",
