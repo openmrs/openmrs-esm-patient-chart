@@ -336,7 +336,7 @@ export default function MedicationOrderForm({
                 <NumberInput
                   light={isTablet}
                   id="quantity"
-                  helperText={t('pillstoDispense', 'Pills to dispense')}
+                  helperText={t('pillsToDispense', 'Pills to dispense')}
                   value={orderBasketItem.pillsDispensed}
                   min={0}
                   onChange={(e) => {
