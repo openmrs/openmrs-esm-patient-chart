@@ -14,11 +14,10 @@ import {
 } from 'carbon-components-react';
 import { useLocations, useSessionUser, detach, showToast, showNotification } from '@openmrs/esm-framework';
 import useAppointmentService from '../hooks/useAppointmentService';
-import { ErrorState } from '@openmrs/esm-patient-common-lib';
+import { ErrorState, amPm, convertTime12to24 } from '@openmrs/esm-patient-common-lib';
 import { AppointmentPayload, ServiceTypes } from '../types';
 import dayjs from 'dayjs';
 import isEmpty from 'lodash-es/isEmpty';
-import { amPm, convertTime12to24 } from './appointments.helpers';
 import { createAppointment } from './appointments.resource';
 
 interface AppointmentsFormProps {
@@ -43,7 +42,10 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({ patientUuid, isTabl
   const { t } = useTranslation();
   const locations = useLocations();
   const session = useSessionUser();
-  const { status, services, error } = useAppointmentService();
+  const { data, error } = useAppointmentService();
+  const isPending = !data && !error;
+
+  const services = useMemo(() => data?.data ?? [], [data]);
 
   const [formData, setFormData] = useState<AppointmentFormData>({
     timeFormat: new Date().getHours() >= 12 ? 'PM' : 'AM',
@@ -66,7 +68,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({ patientUuid, isTabl
       hours,
       minutes,
     );
-    dayjs();
+
     const endDatetime = dayjs(
       new Date(dayjs(startDate).year(), dayjs(startDate).month(), dayjs(startDate).date(), hours, minutes),
     )
@@ -115,7 +117,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({ patientUuid, isTabl
 
   return (
     <>
-      {status === 'resolved' && session?.sessionLocation && (
+      {!isPending && session?.sessionLocation && !error && (
         <div className={styles.formWrapper}>
           <section className={styles.formGroup}>
             <span>{t('location', 'Location')}</span>
@@ -222,8 +224,8 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({ patientUuid, isTabl
           </section>
         </div>
       )}
-      {status === 'pending' && <DataTableSkeleton rowCount={5} />}
-      {status === 'error' && <ErrorState headerTitle={t('appointmentForm', 'Appointment Form')} error={error} />}
+      {isPending && <DataTableSkeleton rowCount={5} />}
+      {error && <ErrorState headerTitle={t('appointmentForm', 'Appointment Form')} error={error} />}
     </>
   );
 };
