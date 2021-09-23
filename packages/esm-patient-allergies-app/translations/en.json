@@ -1,7 +1,7 @@
 {
   "add": "Add",
   "allergen": "Allergen",
-  "allergenAndReaction": "Allergen and Reactions",
+  "allergenAndReaction": "Allergen and reactions",
   "allergies": "Allergies",
   "allergyIntolerances": "allergy intolerances",
   "allergySaved": "Allergy saved successfully",
@@ -24,7 +24,7 @@
   "otherReactionInvalidText": "Other reaction is required",
   "pleaseSpecifyOtherReaction": "Please specify other reaction",
   "reactions": "Reactions",
-  "saveAndClose": "Save and Close",
+  "saveAndClose": "Save and close",
   "seeAll": "See all",
   "selectTheAllergens": "Select the allergens",
   "selectTheReactions": "Select the reactions",
