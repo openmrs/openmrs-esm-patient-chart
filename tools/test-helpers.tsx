@@ -15,7 +15,7 @@ const swrWrapper = ({ children }) => {
   );
 };
 
-const customRender = (ui, options?) => render(ui, { wrapper: swrWrapper, ...options });
+export const swrRender = (ui, options?) => render(ui, { wrapper: swrWrapper, ...options });
 
 // Custom matcher that queries elements split up by multiple HTML elements by text
 export function getByTextWithMarkup(text: RegExp | string) {
@@ -33,5 +33,3 @@ export function waitForLoadingToFinish() {
 }
 
 export const patientChartBasePath = `/patient/${mockPatient.id}/chart`;
-export * from '@testing-library/react';
-export { customRender as render };
