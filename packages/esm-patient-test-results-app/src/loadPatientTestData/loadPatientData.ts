@@ -76,7 +76,9 @@ async function reloadData(patientUuid: string) {
 
     if (memRef) {
       memRef[0][memRef[1]] = entry;
-    } else {
+    }
+
+    if (obsByClass[entry.conceptClass]) {
       obsByClass[entry.conceptClass].push(entry);
     }
   });
@@ -111,7 +113,6 @@ async function reloadData(patientUuid: string) {
 
 function loadPatientData(patientUuid: string): [PatientData | undefined, Promise<PatientData>] {
   const [cachedPatientData, shouldReload] = getUserDataFromCache(patientUuid);
-
   return [cachedPatientData, shouldReload.then((reload) => (reload ? reloadData(patientUuid) : cachedPatientData))];
 }
 
