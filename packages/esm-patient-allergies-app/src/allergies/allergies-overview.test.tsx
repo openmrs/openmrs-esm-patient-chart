@@ -1,13 +1,14 @@
 import React from 'react';
+import { screen } from '@testing-library/react';
 import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
 import { mockAllergies, mockFhirAllergyIntoleranceResponse } from '../../../../__mocks__/allergies.mock';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
-import { render, screen, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { patientChartBasePath, swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import AllergiesOverview from './allergies-overview.component';
 
 const testProps = {
   patient: mockPatient,
-  basePath: `/patient/${mockPatient.id}/chart`,
+  basePath: patientChartBasePath,
   showAddAllergy: false,
 };
 
@@ -27,8 +28,6 @@ jest.mock('@openmrs/esm-framework', () => {
     })),
   };
 });
-
-const renderAllergiesOverview = () => render(<AllergiesOverview {...testProps} />);
 
 describe('AllergiesOverview: ', () => {
   it('renders an empty state view if allergy data is unavailable', async () => {
@@ -99,3 +98,7 @@ describe('AllergiesOverview: ', () => {
     expect(screen.getByRole('button', { name: /next page/i })).toBeInTheDocument();
   });
 });
+
+function renderAllergiesOverview() {
+  swrRender(<AllergiesOverview {...testProps} />);
+}
