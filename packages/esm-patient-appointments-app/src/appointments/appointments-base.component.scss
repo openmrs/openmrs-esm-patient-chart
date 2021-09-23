@@ -17,15 +17,15 @@ $color-blue-10: #edf5ff;
   @include carbon--type-style("productive-heading-01");
 }
 
-.appointmentHeader {
+.appointmentsHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: $spacing-04 0 0 $spacing-05;
+  padding: $spacing-04 0 $spacing-04 $spacing-05;
   background-color: $ui-background;
 }
 
-.appointmentHeader > h4:after {
+.appointmentsHeader > h4:after {
   content: "";
   display: block;
   width: $spacing-07;
@@ -41,7 +41,6 @@ $color-blue-10: #edf5ff;
   width: 60%;
 }
 
-
 .contentSwitcherWrapper > div > button {
   background-color: $ui-02;
 }
@@ -53,6 +52,7 @@ $color-blue-10: #edf5ff;
   border-right: none;
   border-radius: $spacing-02 0 0px $spacing-02;
 }
+
 .contentSwitcherWrapper > div button:last-child {
   border-top: 1px solid $color-blue-30;
   border-bottom: 1px solid $color-blue-30;
@@ -81,9 +81,19 @@ $color-blue-10: #edf5ff;
   box-shadow: none;
 }
 
-
 .divider {
   border-left: 1px solid $ui-03;
   height: $spacing-05;
   margin: 0 $spacing-05 0 $spacing-06;
+}
+
+.content {
+  @include carbon--type-style("productive-heading-01");
+  color: $text-02;
+  margin-top: $spacing-05;
+  margin-bottom: $spacing-03;
+}
+
+.tile {
+  text-align: center;
 }
