@@ -82,7 +82,7 @@ function setupOpenMRS() {
         meta: {
           title: {
             key: 'recordNewAllergy',
-            default: 'Record a  new Allergy',
+            default: 'Record a new allergy',
           },
         },
       },

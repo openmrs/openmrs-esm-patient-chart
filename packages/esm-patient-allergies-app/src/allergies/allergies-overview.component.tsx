@@ -4,6 +4,7 @@ import {
   DataTableSkeleton,
   DataTable,
   Button,
+  InlineLoading,
   Table,
   TableCell,
   TableContainer,
@@ -13,12 +14,11 @@ import {
   TableRow,
 } from 'carbon-components-react';
 import styles from './allergies-overview.scss';
-import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
+import { EmptyState, ErrorState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
-import { performPatientAllergySearch, Allergy } from './allergy-intolerance.resource';
-import { attach } from '@openmrs/esm-framework';
-import { patientAllergiesFormWorkspace } from '../constants';
-const allergiesToShowCount = 5;
+import { useAllergies } from './allergy-intolerance.resource';
+import { attach, usePagination } from '@openmrs/esm-framework';
+import { allergiesToShowCount, patientAllergiesFormWorkspace } from '../constants';
 
 interface AllergiesOverviewProps {
   basePath: string;
@@ -26,27 +26,17 @@ interface AllergiesOverviewProps {
   showAddAllergy: boolean;
 }
 
-const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient, showAddAllergy }) => {
+const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient, showAddAllergy, basePath }) => {
   const { t } = useTranslation();
   const displayText = t('allergyIntolerances', 'allergy intolerances');
   const headerTitle = t('allergies', 'Allergies');
+  const urlLabel = t('seeAll', 'See all');
+  const pageUrl = window.spaBase + basePath + '/allergies';
 
-  const [allergies, setAllergies] = React.useState<Array<Allergy>>(null);
-  const [error, setError] = React.useState(null);
-  const [showAllAllergies, setShowAllAllergies] = React.useState(false);
+  const { data: allergies, isError, isLoading, isValidating } = useAllergies(patient.id);
+  const { results: paginatedAllergies, goTo, currentPage } = usePagination(allergies ?? [], allergiesToShowCount);
 
-  React.useEffect(() => {
-    if (patient) {
-      const sub = performPatientAllergySearch(patient.identifier[0].value).subscribe(
-        (allergies) => setAllergies(allergies),
-        (err) => setError(err),
-      );
-
-      return () => sub.unsubscribe();
-    }
-  }, [patient]);
-
-  const headers = [
+  const tableHeaders = [
     {
       key: 'display',
       header: t('name', 'Name'),
@@ -57,101 +47,78 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient, showAddA
     },
   ];
 
-  const toggleShowAllAllergies = () => {
-    setShowAllAllergies(!showAllAllergies);
-  };
+  const tableRows = React.useMemo(() => {
+    return paginatedAllergies?.map((allergy) => ({
+      ...allergy,
+      reactions: `${allergy.reactionManifestations?.join(', ') || ''} ${
+        allergy.reactionSeverity ? `(${allergy.reactionSeverity})` : ''
+      }`,
+    }));
+  }, [paginatedAllergies]);
 
   const launchAllergiesForm = React.useCallback(
     () => attach('patient-chart-workspace-slot', patientAllergiesFormWorkspace),
     [],
   );
 
-  const getRowItems = (rows: Array<Allergy>) => {
-    return rows.slice(0, showAllAllergies ? rows.length : allergiesToShowCount).map((row) => ({
-      ...row,
-      reactions: `${row.reactionManifestations?.join(', ') || ''} ${
-        row.reactionSeverity ? `(${row.reactionSeverity})` : ''
-      }`,
-    }));
-  };
-
-  const RenderAllergies: React.FC = () => {
-    if (allergies.length) {
-      const rows = getRowItems(allergies);
-      return (
-        <div className={styles.widgetCard}>
-          <div className={styles.allergiesHeader}>
-            <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
-            {showAddAllergy && (
-              <Button kind="ghost" renderIcon={Add16} iconDescription="Add allergies" onClick={launchAllergiesForm}>
-                {t('add', 'Add')}
-              </Button>
-            )}
-          </div>
-          <TableContainer>
-            <DataTable rows={rows} headers={headers} isSortable={true} size="short">
-              {({ rows, headers, getHeaderProps, getTableProps }) => (
-                <Table {...getTableProps()} useZebraStyles>
-                  <TableHead>
-                    <TableRow>
-                      {headers.map((header) => (
-                        <TableHeader
-                          className={`${styles.productiveHeading01} ${styles.text02}`}
-                          {...getHeaderProps({
-                            header,
-                            isSortable: header.isSortable,
-                          })}>
-                          {header.header?.content ?? header.header}
-                        </TableHeader>
+  if (isLoading) return <DataTableSkeleton role="progressbar" />;
+  if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
+  if (allergies?.length) {
+    return (
+      <div className={styles.widgetCard}>
+        <div className={styles.allergiesHeader}>
+          <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
+          <span>{isValidating ? <InlineLoading /> : null}</span>
+          {showAddAllergy && (
+            <Button kind="ghost" renderIcon={Add16} iconDescription="Add allergies" onClick={launchAllergiesForm}>
+              {t('add', 'Add')}
+            </Button>
+          )}
+        </div>
+        <TableContainer>
+          <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="short">
+            {({ rows, headers, getHeaderProps, getTableProps }) => (
+              <Table {...getTableProps()} useZebraStyles>
+                <TableHead>
+                  <TableRow>
+                    {headers.map((header) => (
+                      <TableHeader
+                        className={`${styles.productiveHeading01} ${styles.text02}`}
+                        {...getHeaderProps({
+                          header,
+                          isSortable: header.isSortable,
+                        })}>
+                        {header.header?.content ?? header.header}
+                      </TableHeader>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {rows.map((row) => (
+                    <TableRow key={row.id}>
+                      {row.cells.map((cell) => (
+                        <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                       ))}
                     </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {rows.map((row) => (
-                      <TableRow key={row.id}>
-                        {row.cells.map((cell) => (
-                          <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
-                        ))}
-                      </TableRow>
-                    ))}
-                    {!showAllAllergies && allergies?.length > allergiesToShowCount && (
-                      <TableRow>
-                        <TableCell colSpan={4}>
-                          <span
-                            style={{
-                              display: 'inline-block',
-                              margin: '0.45rem 0rem',
-                            }}>
-                            {`${allergiesToShowCount} / ${allergies.length}`} {t('items', 'items')}
-                          </span>
-                          <Button size="small" kind="ghost" onClick={toggleShowAllAllergies}>
-                            {t('seeAll', 'See all')}
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              )}
-            </DataTable>
-          </TableContainer>
-        </div>
-      );
-    }
-    return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchAllergiesForm} />;
-  };
-
-  return (
-    <>
-      {allergies ? (
-        <RenderAllergies />
-      ) : error ? (
-        <ErrorState error={error} headerTitle={headerTitle} />
-      ) : (
-        <DataTableSkeleton rowCount={allergiesToShowCount} />
-      )}
-    </>
-  );
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </DataTable>
+        </TableContainer>
+        <PatientChartPagination
+          currentItems={paginatedAllergies.length}
+          onPageNumberChange={({ page }) => goTo(page)}
+          pageNumber={currentPage}
+          pageSize={allergiesToShowCount}
+          pageUrl={pageUrl}
+          totalItems={allergies.length}
+          urlLabel={urlLabel}
+        />
+      </div>
+    );
+  }
+  return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchAllergiesForm} />;
 };
 
 export default AllergiesOverview;

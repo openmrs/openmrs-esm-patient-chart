@@ -1,26 +1,30 @@
+import useSWR from 'swr';
 import { map } from 'rxjs/operators';
 import capitalize from 'lodash-es/capitalize';
 import { fhirBaseUrl, openmrsFetch, openmrsObservableFetch } from '@openmrs/esm-framework';
 import { AllergyData, AllergicReaction, FHIRAllergy, FHIRAllergyResponse } from '../types';
+import { ALLERGY_REACTION_CONCEPT } from '../constants';
 
-const ALLERGY_REACTION_CONCEPT = '162555AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
-
-export function performPatientAllergySearch(patientIdentifier: string) {
-  return openmrsObservableFetch<FHIRAllergyResponse>(
-    `${fhirBaseUrl}/AllergyIntolerance?patient.identifier=${patientIdentifier}`,
-  ).pipe(
-    map(({ data }) => data.entry),
-    map((entries) => entries?.map((entry) => entry?.resource) ?? []),
-    map((data) => formatAllergies(data)),
-    map((data) => data.sort((a, b) => (b.lastUpdated > a.lastUpdated ? 1 : -1))),
+export function useAllergies(patientUuid: string) {
+  const { data, error, isValidating } = useSWR<{ data: FHIRAllergyResponse }, Error>(
+    `${fhirBaseUrl}/AllergyIntolerance?patient=${patientUuid}`,
+    openmrsFetch,
   );
-}
 
-export function fetchAllergyByUuid(allergyUuid: string) {
-  return openmrsObservableFetch(`${fhirBaseUrl}/AllergyIntolerance/${allergyUuid}`).pipe(
-    map(({ data }) => data),
-    map((data: FHIRAllergy) => mapAllergyProperties(data)),
-  );
+  const formattedAllergies =
+    data?.data?.total > 0
+      ? data?.data.entry
+          .map((entry) => entry.resource ?? [])
+          .map(mapAllergyProperties)
+          .sort((a, b) => (b.lastUpdated > a.lastUpdated ? 1 : -1))
+      : null;
+
+  return {
+    data: data ? formattedAllergies : null,
+    isError: error,
+    isLoading: !data && !error,
+    isValidating,
+  };
 }
 
 function mapAllergyProperties(allergy: FHIRAllergy): Allergy {
@@ -42,8 +46,11 @@ function mapAllergyProperties(allergy: FHIRAllergy): Allergy {
   return formattedAllergy;
 }
 
-function formatAllergies(allergies: Array<FHIRAllergy>): Array<Allergy> {
-  return allergies.map((allergy) => mapAllergyProperties(allergy));
+export function fetchAllergyByUuid(allergyUuid: string) {
+  return openmrsObservableFetch(`${fhirBaseUrl}/AllergyIntolerance/${allergyUuid}`).pipe(
+    map(({ data }) => data),
+    map((data: FHIRAllergy) => mapAllergyProperties(data)),
+  );
 }
 
 export function getPatientAllergyByPatientUuid(
