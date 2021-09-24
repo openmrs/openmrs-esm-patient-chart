@@ -91,7 +91,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
             title: t('orderPlaced', 'Order placed'),
             description: t(
               'OrderSavedSuccefully',
-              'Your order is complete.The items will now appear on the Orders page succefully',
+              'Order saved successfully.',
             ),
           });
         } else {
