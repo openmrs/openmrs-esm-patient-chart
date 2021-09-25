@@ -25,20 +25,11 @@ export function useConditions(patientUuid: string) {
   };
 }
 
-export function performPatientConditionsSearch(patientIdentifier: string) {
-  return openmrsObservableFetch<Array<Condition>>(
-    `${fhirBaseUrl}/Condition?patient.identifier=${patientIdentifier}`,
-  ).pipe(
-    map(({ data }) => data['entry']),
-    map((entries) => entries?.map((entry) => entry.resource) ?? []),
-    map((data) => formatConditions(data)),
-    map((data) => data.sort((a, b) => (b?.onsetDateTime > a?.onsetDateTime ? 1 : -1))),
-  );
-}
-
 export function searchConditionConcepts(searchTerm: string) {
+  const conditionConceptClassUuid = '8d4918b0-c2cc-11de-8d13-0010c6dffd0f';
+
   return openmrsObservableFetch<Array<CodedCondition>>(
-    `/ws/rest/v1/conceptsearch?conceptClasses=8d4918b0-c2cc-11de-8d13-0010c6dffd0f&q=${searchTerm}`,
+    `/ws/rest/v1/conceptsearch?conceptClasses=${conditionConceptClassUuid}&q=${searchTerm}`,
   ).pipe(map(({ data }) => data['results']));
 }
 
@@ -47,10 +38,6 @@ export function getConditionByUuid(conditionUuid: string) {
     map(({ data }) => data),
     map((data: FHIRCondition) => mapConditionProperties(data)),
   );
-}
-
-function formatConditions(conditions: Array<FHIRCondition>): Array<Condition> {
-  return conditions.map(mapConditionProperties);
 }
 
 function mapConditionProperties(condition: FHIRCondition): Condition {

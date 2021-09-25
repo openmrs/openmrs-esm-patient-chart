@@ -24,80 +24,9 @@ import {
   DatePickerInput,
   DatePicker,
 } from 'carbon-components-react';
-import { searchConditionConcepts, createPatientCondition, CodedCondition } from './conditions.resource';
+import { createPatientCondition, searchConditionConcepts, CodedCondition } from './conditions.resource';
 
 const searchTimeoutInMs = 500;
-
-interface Idle {
-  type: ActionTypes.idle;
-}
-
-interface SearchAction {
-  isSearching: boolean;
-  searchTerm: string;
-  searchResults: Array<CodedCondition>;
-  type: ActionTypes.search;
-}
-
-interface SelectCondition {
-  condition: CodedCondition;
-  type: ActionTypes.selectCondition;
-}
-
-interface Submit {
-  type: ActionTypes.submit;
-}
-
-type Action = Idle | SearchAction | SelectCondition | Submit;
-
-interface ViewState {
-  status: string;
-  condition?: CodedCondition;
-  isSearching?: boolean;
-  searchResults?: Array<CodedCondition>;
-  searchTerm?: string;
-}
-
-enum ActionTypes {
-  idle = 'idle',
-  search = 'search',
-  selectCondition = 'selectCondition',
-  submit = 'submit',
-}
-
-function viewStateReducer(state: ViewState, action: Action): ViewState {
-  switch (action.type) {
-    case ActionTypes.idle:
-      return {
-        status: 'idle',
-      };
-    case ActionTypes.search:
-      return {
-        ...state,
-        status: 'search',
-        isSearching: action.isSearching,
-        searchResults: action.searchResults,
-        searchTerm: action.searchTerm,
-      };
-    case ActionTypes.selectCondition:
-      return {
-        ...state,
-        status: 'selectCondition',
-        condition: action.condition,
-      };
-    case ActionTypes.submit:
-      return {
-        ...state,
-        status: 'submit',
-      };
-    default:
-      return state;
-  }
-}
-
-const initialViewState: ViewState = {
-  status: 'idle',
-};
 
 interface ConditionsFormProps {
   patientUuid: string;
@@ -110,22 +39,18 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid, isTablet }
   const [clinicalStatus, setClinicalStatus] = React.useState('active');
   const [endDate, setEndDate] = React.useState(null);
   const [onsetDate, setOnsetDate] = React.useState(new Date());
-  const [viewState, dispatch] = React.useReducer(viewStateReducer, initialViewState);
+  const [isSearching, setIsSearching] = React.useState(false);
+  const [searchTerm, setSearchTerm] = React.useState<null | string>('');
+  const [searchResults, setSearchResults] = React.useState<null | Array<CodedCondition>>(null);
+  const [selectedCondition, setSelectedCondition] = React.useState(null);
 
   const handleSearchChange = (event) => {
-    const query = event.target.value.trim();
+    setSelectedCondition(null);
+    setIsSearching(true);
+    const query = event.target.value;
+    setSearchTerm(query);
     if (query) {
-      dispatch({
-        isSearching: true,
-        searchResults: null,
-        searchTerm: query,
-        type: ActionTypes.search,
-      });
       debouncedSearch(query);
-    } else {
-      dispatch({
-        type: ActionTypes.idle,
-      });
     }
   };
 
@@ -135,12 +60,8 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid, isTablet }
         if (searchTerm) {
           const sub = searchConditionConcepts(searchTerm).subscribe(
             (searchResults: Array<CodedCondition>) => {
-              dispatch({
-                type: ActionTypes.search,
-                isSearching: false,
-                searchResults: searchResults,
-                searchTerm: searchTerm,
-              });
+              setSearchResults(searchResults);
+              setIsSearching(false);
             },
             () => createErrorHandler(),
           );
@@ -153,10 +74,8 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid, isTablet }
   );
 
   const handleConditionChange = React.useCallback((selectedCondition: CodedCondition) => {
-    dispatch({
-      type: ActionTypes.selectCondition,
-      condition: selectedCondition,
-    });
+    setSelectedCondition(selectedCondition);
+    setSearchTerm('');
   }, []);
 
   const closeWorkspace = React.useCallback(
@@ -168,13 +87,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid, isTablet }
     (event: SyntheticEvent<HTMLFormElement>) => {
       event.preventDefault();
 
-      if (viewState.status !== ActionTypes.selectCondition) return;
-
-      const condition = viewState.condition;
-
-      dispatch({
-        type: ActionTypes.submit,
-      });
+      if (!selectedCondition) return;
 
       const payload = {
         resourceType: 'Condition',
@@ -189,8 +102,8 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid, isTablet }
         code: {
           coding: [
             {
-              code: condition?.concept?.uuid,
-              display: condition?.concept?.display,
+              code: selectedCondition?.concept?.uuid,
+              display: selectedCondition?.concept?.display,
             },
           ],
         },
@@ -231,17 +144,12 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid, isTablet }
             description: err?.message,
           });
         },
-        () => {
-          dispatch({
-            type: ActionTypes.idle,
-          });
-        },
       );
       return () => {
         sub.unsubscribe();
       };
     },
-    [clinicalStatus, closeWorkspace, endDate, onsetDate, patientUuid, session?.user?.uuid, t, viewState],
+    [clinicalStatus, closeWorkspace, endDate, onsetDate, patientUuid, selectedCondition, session?.user?.uuid, t],
   );
 
   return (
@@ -255,24 +163,23 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid, isTablet }
           placeholder={t('searchConditions', 'Search conditions')}
           onChange={handleSearchChange}
           value={(() => {
-            switch (viewState.status) {
-              case ActionTypes.search:
-                return viewState.searchTerm;
-              case ActionTypes.selectCondition:
-                return viewState.condition.display;
-              default:
-                return '';
+            if (searchTerm) {
+              return searchTerm;
             }
+            if (selectedCondition && !isSearching) {
+              return selectedCondition.display;
+            }
+            return '';
           })()}
         />
         <div>
           {(() => {
-            if (viewState.status !== ActionTypes.search) return null;
-            if (viewState.isSearching) return <SearchSkeleton role="progressbar" />;
-            if (viewState.searchResults && viewState.searchResults.length) {
+            if (!searchTerm || selectedCondition) return null;
+            if (isSearching) return <SearchSkeleton role="progressbar" />;
+            if (searchResults && searchResults.length) {
               return (
                 <ul className={styles.conditionsList}>
-                  {viewState.searchResults.map((condition, index) => (
+                  {searchResults.map((condition, index) => (
                     <li
                       role="menuitem"
                       className={styles.condition}
@@ -287,7 +194,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid, isTablet }
             return (
               <Tile light className={styles.emptyResults}>
                 <span>
-                  {t('noResultsFor', 'No results for')} <strong>"{viewState.searchTerm}"</strong>
+                  {t('noResultsFor', 'No results for')} <strong>"{searchTerm}"</strong>
                 </span>
               </Tile>
             );
@@ -336,11 +243,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid, isTablet }
         <Button style={{ width: '50%' }} kind="secondary" type="button" onClick={closeWorkspace}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button
-          style={{ width: '50%' }}
-          kind="primary"
-          type="submit"
-          disabled={viewState.status !== ActionTypes.selectCondition}>
+        <Button style={{ width: '50%' }} kind="primary" type="submit" disabled={!selectedCondition}>
           {t('saveAndClose', 'Save & Close')}
         </Button>
       </div>
