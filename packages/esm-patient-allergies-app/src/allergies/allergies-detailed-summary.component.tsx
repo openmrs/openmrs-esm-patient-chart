@@ -1,8 +1,7 @@
 import React from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
-import { attach } from '@openmrs/esm-framework';
+import { EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { useAllergies } from './allergy-intolerance.resource';
 import Add16 from '@carbon/icons-react/es/add/16';
 import {
@@ -33,10 +32,7 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
 
   const { data: allergies, isError, isLoading, isValidating } = useAllergies(patient.id);
 
-  const launchAllergiesForm = React.useCallback(
-    () => attach('patient-chart-workspace-slot', patientAllergiesFormWorkspace),
-    [],
-  );
+  const launchAllergiesForm = React.useCallback(() => launchPatientWorkspace(patientAllergiesFormWorkspace), []);
 
   const tableHeaders = [
     { key: 'display', header: t('allergen', 'Allergen') },

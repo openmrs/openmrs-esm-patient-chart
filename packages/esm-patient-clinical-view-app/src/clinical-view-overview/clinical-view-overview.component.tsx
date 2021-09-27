@@ -4,7 +4,8 @@ import EmptyDataIllustration from '../empty-state/empty-data-illustration.compon
 import styles from './clinical-view-overview.component.scss';
 import { Button, Tab, Tabs } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
-import { attach, ExtensionSlot, useConfig } from '@openmrs/esm-framework';
+import { ExtensionSlot, useConfig } from '@openmrs/esm-framework';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 
 interface ClinicalViewOverviewProps {
   patientUuid: string;
@@ -21,7 +22,7 @@ const ClinicalViewOverview: React.FC<ClinicalViewOverviewProps> = ({ patientUuid
   }, [patient, patientUuid]);
 
   const launchClinicalViewForm = React.useCallback(() => {
-    attach('patient-chart-workspace-slot', 'patient-clinical-view-form-workspace');
+    launchPatientWorkspace('patient-clinical-view-form-workspace');
     setSelectedViewIndex(0);
   }, []);
 

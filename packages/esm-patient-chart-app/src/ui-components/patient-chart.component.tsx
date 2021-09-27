@@ -9,6 +9,8 @@ import { ExtensionSlot, useCurrentPatient, useSessionUser } from '@openmrs/esm-f
 import ActionMenu from './action-menu.component';
 import { useOfflineVisitForPatient } from '../offline';
 import { useContextWorkspace } from '../hooks/useContextWindowSize';
+import { ScreenModeTypes } from '../types';
+import WorkspaceNotification from './workspace-notification.component';
 
 interface PatientChartParams {
   patientUuid: string;
@@ -35,7 +37,9 @@ const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({ match
         <>
           <div
             className={`${styles.innerChartContainer} ${
-              windowSize.size === 'normal' && openWindows > 0 ? styles.closeWorkspace : styles.activeWorkspace
+              windowSize.size === ScreenModeTypes.normal && openWindows > 0
+                ? styles.closeWorkspace
+                : styles.activeWorkspace
             }`}>
             <ExtensionSlot extensionSlotName="breadcrumbs-slot" />
             <aside>
@@ -46,6 +50,7 @@ const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({ match
               <div className={styles.chartreview}>
                 <ChartReview {...state} view={view} subview={subview} />
                 <VisitDialog patientUuid={patientUuid} />
+                <WorkspaceNotification />
               </div>
               <div className={styles.workspace}>
                 <WorkspaceWrapper {...state} />

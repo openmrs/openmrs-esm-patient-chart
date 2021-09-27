@@ -31,7 +31,7 @@ export function useWorkspace(): WorkspaceDetails {
 
   const screenMode = useMemo(() => {
     if (extensions.length === 0) {
-      return 'hide';
+      return ScreenModeTypes.hide;
     } else if (extensions.length === 1) {
       const state = extensionStore.getState();
       return checkScreenMode(state.extensions[extensions[0]]);

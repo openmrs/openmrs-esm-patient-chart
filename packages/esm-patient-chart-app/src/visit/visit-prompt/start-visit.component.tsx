@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import styles from './start-visit.component.scss';
 import { ComposedModal, Button, ModalHeader, ModalBody } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
-import { attach } from '@openmrs/esm-framework';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 
 interface StartVisitPromptProps {
   openModal: boolean;
@@ -27,12 +27,12 @@ const StartVisitPrompt: React.FC<StartVisitPromptProps> = ({ openModal, closeMod
         );
 
   const handleOpenEditPastVisit = useCallback(() => {
-    attach('patient-chart-workspace-slot', 'past-visits-overview');
+    launchPatientWorkspace('past-visits-overview');
     closeModal();
   }, [closeModal]);
 
   const handleOpenStartVisitForm = useCallback(() => {
-    attach('patient-chart-workspace-slot', 'start-visit-workspace-form');
+    launchPatientWorkspace('start-visit-workspace-form');
     closeModal();
   }, [closeModal]);
 

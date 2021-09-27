@@ -15,16 +15,8 @@ import {
   DataTableHeader,
 } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
-import { ErrorState } from '@openmrs/esm-patient-common-lib';
-import {
-  attach,
-  detach,
-  getStartedVisit,
-  getVisitsForPatient,
-  VisitMode,
-  VisitStatus,
-  Visit,
-} from '@openmrs/esm-framework';
+import { ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { detach, getStartedVisit, getVisitsForPatient, VisitMode, VisitStatus, Visit } from '@openmrs/esm-framework';
 import styles from './past-visit-overview.component.scss';
 import { first } from 'rxjs/operators';
 
@@ -140,7 +132,7 @@ const PastVisitOverview: React.FC<PastVisitOverviewProps> = ({ patientUuid }) =>
   }, []);
 
   const handleOpenVisitForm = useCallback(() => {
-    attach('patient-chart-workspace-slot', 'start-visit-workspace-form');
+    launchPatientWorkspace('start-visit-workspace-form');
     handleClose();
   }, [handleClose]);
 
