@@ -15,10 +15,10 @@ interface PatientBannerProps {
   patient: fhir.Patient;
   patientUuid: string;
   patientUrl?: string;
-  hidePatientSearchPanel?: () => void;
+  onClick?: (patientUrl: string) => void;
 }
 
-const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, patientUrl, hidePatientSearchPanel }) => {
+const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, patientUrl, onClick }) => {
   const { t } = useTranslation();
   const state = React.useMemo(() => ({ patientUuid }), [patientUuid]);
   const [showContactDetails, setShowContactDetails] = React.useState(false);
@@ -33,16 +33,9 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, pat
     <div className={styles.container} role="banner">
       <div className={styles.patientBanner}>
         {patientUrl ? (
-          <div
-            role="button"
-            tabIndex={0}
-            className={styles.patientAvatarButton}
-            onClick={() => {
-              navigate({ to: patientUrl });
-              hidePatientSearchPanel && hidePatientSearchPanel();
-            }}>
+          <button className={styles.patientAvatarButton} onClick={() => onClick(patientUrl)}>
             {patientAvatar}
-          </div>
+          </button>
         ) : (
           patientAvatar
         )}
