@@ -9,7 +9,7 @@ import CustomOverflowMenuComponent from '../ui-components/overflow-menu.componen
 import styles from './patient-banner.scss';
 import { useTranslation } from 'react-i18next';
 import { Button } from 'carbon-components-react';
-import { ExtensionSlot, age, navigate } from '@openmrs/esm-framework';
+import { ExtensionSlot, age } from '@openmrs/esm-framework';
 
 interface PatientBannerProps {
   patient: fhir.Patient;
