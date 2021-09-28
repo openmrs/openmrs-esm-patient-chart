@@ -39,6 +39,7 @@ function setupOpenMRS() {
       {
         id: 'notes-overview-widget',
         slot: 'patient-chart-summary-dashboard-slot',
+        order: 7,
         load: getAsyncLifecycle(() => import('./notes/notes-overview.component'), options),
         meta: {
           columnSpan: 4,
@@ -60,6 +61,7 @@ function setupOpenMRS() {
       {
         id: 'notes-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
+        order: 5,
         load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
         meta: dashboardMeta,
         online: true,

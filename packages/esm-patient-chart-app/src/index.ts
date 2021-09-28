@@ -55,6 +55,7 @@ function setupOpenMRS() {
       {
         id: 'charts-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
+        order: 0,
         load: getSyncLifecycle(createDashboardLink(dashboardMeta), {
           featureName: 'summary-dashboard',
           moduleName,

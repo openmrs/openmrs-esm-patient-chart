@@ -33,6 +33,7 @@ function setupOpenMRS() {
       {
         id: 'vitals-overview-widget',
         slot: 'patient-chart-summary-dashboard-slot',
+        order: 4,
         load: getAsyncLifecycle(() => import('./vitals/vitals-summary.component'), options),
         meta: {
           columnSpan: 4,
