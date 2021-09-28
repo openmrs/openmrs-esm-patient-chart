@@ -14,11 +14,10 @@ import { ExtensionSlot, age } from '@openmrs/esm-framework';
 interface PatientBannerProps {
   patient: fhir.Patient;
   patientUuid: string;
-  patientUrl?: string;
-  onClick?: (patientUrl: string) => void;
+  onClick?: (patientUuid: string) => void;
 }
 
-const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, patientUrl, onClick }) => {
+const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, onClick }) => {
   const { t } = useTranslation();
   const state = React.useMemo(() => ({ patientUuid }), [patientUuid]);
   const [showContactDetails, setShowContactDetails] = React.useState(false);
@@ -32,8 +31,8 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, pat
   return (
     <div className={styles.container} role="banner">
       <div className={styles.patientBanner}>
-        {patientUrl ? (
-          <button className={styles.patientAvatarButton} onClick={() => onClick(patientUrl)}>
+        {onClick ? (
+          <button className={styles.patientAvatarButton} onClick={() => onClick(patientUuid)}>
             {patientAvatar}
           </button>
         ) : (
