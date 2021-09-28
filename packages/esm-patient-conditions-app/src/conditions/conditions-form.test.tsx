@@ -112,7 +112,7 @@ describe('ConditionsForm: ', () => {
     });
 
     it('renders a list of related condition concepts when the user types in the searchbox', async () => {
-      mockSearchConditionConcepts.mockReturnValueOnce(of(searchedCondition).pipe(delay(1000)));
+      mockSearchConditionConcepts.mockReturnValueOnce(of(searchedCondition).pipe(delay(10)));
 
       expect(screen.queryByRole('menuitem', { name: /Headache/i })).not.toBeInTheDocument();
       expect(screen.queryByDisplayValue('Headache')).not.toBeInTheDocument();
@@ -125,7 +125,7 @@ describe('ConditionsForm: ', () => {
     });
 
     it('renders an error message when no matching conditions are found', async () => {
-      mockSearchConditionConcepts.mockReturnValueOnce(of([]).pipe(delay(1000)));
+      mockSearchConditionConcepts.mockReturnValueOnce(of([]).pipe(delay(10)));
 
       expect(screen.queryByRole('menuitem', { name: /Post-acute sequelae of COVID-19/i })).not.toBeInTheDocument();
       expect(screen.queryByDisplayValue(/Post-acute sequelae of COVID-19/i)).not.toBeInTheDocument();
