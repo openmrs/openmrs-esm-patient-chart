@@ -30,7 +30,7 @@ import {
   VisitMode,
   VisitStatus,
 } from '@openmrs/esm-framework';
-import { amPm, convertTime12to24 } from './start-visit-helper';
+import { amPm, convertTime12to24 } from '@openmrs/esm-patient-common-lib';
 import { first } from 'rxjs/operators';
 
 interface StartVisitFormProps {
