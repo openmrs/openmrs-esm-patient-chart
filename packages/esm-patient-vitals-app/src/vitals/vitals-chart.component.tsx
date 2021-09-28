@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import dayjs from 'dayjs';
 import styles from './vitals-chart.component.scss';
 import { useTranslation } from 'react-i18next';
@@ -8,7 +8,6 @@ import { PatientVitals } from './vitals-biometrics.resource';
 import { LineChart } from '@carbon/charts-react';
 import { LineChartOptions } from '@carbon/charts/interfaces/charts';
 import { ScaleTypes } from '@carbon/charts/interfaces/enums';
-import '@carbon/charts/styles.css';
 
 interface vitalsChartData {
   title: string;
@@ -22,7 +21,6 @@ interface VitalsChartProps {
 
 const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptsUnits }) => {
   const { t } = useTranslation();
-  const [chartData, setChartData] = React.useState([]);
   const [bloodPressureUnit, , temperatureUnit, , , pulseUnit, oxygenSaturationUnit, , respiratoryRateUnit] =
     conceptsUnits;
   const [selectedVitalSign, setSelectedVitalsSign] = React.useState<vitalsChartData>({
@@ -30,17 +28,18 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptsUnits 
     value: 'systolic',
   });
 
-  React.useEffect(() => {
-    const chartData = patientVitals.map((vitals) => {
-      return vitals[selectedVitalSign.value]
-        ? {
+  const chartData = useMemo(() => {
+    return patientVitals
+      .filter((vitals) => vitals[selectedVitalSign.value])
+      .map((vitals) => {
+        return (
+          vitals[selectedVitalSign.value] && {
             group: 'vitalsChartData',
             key: dayjs(vitals.date).format('DD-MMM'),
             value: vitals[selectedVitalSign.value],
           }
-        : {};
-    });
-    setChartData(chartData);
+        );
+      });
   }, [patientVitals, selectedVitalSign]);
 
   const chartColors = {

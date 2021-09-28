@@ -7,6 +7,7 @@ import { LineChartOptions } from '@carbon/charts/interfaces/charts';
 import { ScaleTypes } from '@carbon/charts/interfaces/enums';
 import { useConfig } from '@openmrs/esm-framework';
 import { PatientBiometrics } from './biometrics-base.component';
+import { useTranslation } from 'react-i18next';
 
 interface BiometricsChartProps {
   patientBiometrics: Array<PatientBiometrics>;
@@ -23,6 +24,7 @@ const chartColors = { weight: '#6929c4', height: '#6929c4', bmi: '#6929c4' };
 
 const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, conceptsUnits }) => {
   const config = useConfig();
+  const { t } = useTranslation();
   const { bmiUnit } = config.biometrics;
   const [, , , heightUnit, weightUnit] = conceptsUnits;
   const [selectedBiometrics, setSelectedBiometrics] = React.useState<BiometricChartData>({
@@ -33,16 +35,18 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
 
   const chartData = React.useMemo(
     () =>
-      patientBiometrics.map((biometric) => {
-        return biometric[selectedBiometrics.value]
-          ? {
+      patientBiometrics
+        .filter((biometric) => biometric[selectedBiometrics.value])
+        .map((biometric) => {
+          return (
+            biometric[selectedBiometrics.value] && {
               group: selectedBiometrics.groupName,
               key: dayjs(biometric.date).format('DD-MMM'),
               value: biometric[selectedBiometrics.value],
             }
-          : {};
-      }),
-    [patientBiometrics, selectedBiometrics],
+          );
+        }),
+    [patientBiometrics, selectedBiometrics.groupName, selectedBiometrics.value],
   );
 
   const chartOptions: LineChartOptions = React.useMemo(() => {
@@ -72,7 +76,7 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
     <div className={styles.biometricChartContainer}>
       <div className={styles.biometricSignsArea}>
         <label className={styles.biometricSign} htmlFor="biometrics-chart-radio-group">
-          Biometric Displayed
+          {t('biometricDisplayed', 'Biometric Displayed')}
         </label>
         <Tabs className={styles.verticalTabs} type="default">
           {[
