@@ -33,7 +33,7 @@ const AppointmentsBase: React.FC<AppointmentsBaseProps> = ({ patientUuid }) => {
   } = useAppointments(patientUuid, startDate, new AbortController());
 
   const launchAppointmentsForm = () => {
-    attach('patient-chart-workspace-slot', 'appointment-form-workspace');
+    attach('patient-chart-workspace-slot', 'appointments-form-workspace');
   };
 
   if (isLoading) return <DataTableSkeleton role="progressbar" />;

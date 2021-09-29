@@ -1,4 +1,9 @@
 import { OpenmrsResource } from '@openmrs/esm-framework';
+
+export interface AppointmentsFetchResponse {
+  data: Array<Appointment>;
+}
+
 export interface Appointment {
   appointmentKind: string;
   appointmentNumber: string;
@@ -9,7 +14,7 @@ export interface Appointment {
   provider: OpenmrsResource;
   providers: Array<OpenmrsResource>;
   recurring: boolean;
-  service: Service;
+  service: AppointmentService;
   startDateTime: number | any;
   status: string;
   uuid: string;
@@ -21,7 +26,7 @@ export interface ServiceTypes {
   uuid: string;
 }
 
-export interface Service {
+export interface AppointmentService {
   appointmentServiceId: number;
   color: string;
   creatorName: string;
@@ -42,8 +47,8 @@ export interface AppointmentPayload {
   providerUuid: string;
   patientUuid: string;
   serviceUuid: string;
-  startDateTime: Date;
-  endDateTime: Date;
+  startDateTime: string;
+  endDateTime: string;
   appointmentKind: string;
   providers: Array<{ uuid: string; comments: string; response?: string }>;
   locationUuid: string;

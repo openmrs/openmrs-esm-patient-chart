@@ -1,5 +1,7 @@
 import React, { useMemo } from 'react';
 import dayjs from 'dayjs';
+const utc = require('dayjs/plugin/utc');
+dayjs.extend(utc);
 import { useTranslation } from 'react-i18next';
 import { Appointment } from '../types';
 import {
@@ -41,7 +43,7 @@ const AppointmentsTable: React.FC<AppointmentTableProps> = ({ patientAppointment
       paginatedAppointments?.map((appointment) => {
         return {
           id: appointment.uuid,
-          date: dayjs((appointment.startDateTime / 1000) * 1000).format('DD - MMM -YYYY , HH:MM'),
+          date: dayjs(appointment.startDateTime).format('DD - MMM - YYYY, hh:mm'),
           location: appointment.location.name,
           service: appointment.service.name,
         };

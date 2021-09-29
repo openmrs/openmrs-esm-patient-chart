@@ -1,17 +1,17 @@
 import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { AppointmentPayload } from '../types';
+import { AppointmentPayload, AppointmentService, AppointmentsFetchResponse } from '../types';
+
+export const appointmentsSearchUrl = `/ws/rest/v1/appointments/search`;
 
 export function useAppointments(patientUuid: string, startDate: string, abortController: AbortController) {
-  const appointmentsUrl = `/ws/rest/v1/appointments/search`;
-
   /* 
-    Disclaimer: SWR isn't meant to do POST requests for data fetching.
-    This works but isn't recommended.
+    SWR isn't meant to make POST requests for data fetching. This is a consequence of the API only exposing this resource via POST.
+    This works but likely isn't recommended.
   */
   const fetcher = () =>
-    openmrsFetch(appointmentsUrl, {
+    openmrsFetch(appointmentsSearchUrl, {
       method: 'POST',
       signal: abortController.signal,
       headers: {
@@ -23,7 +23,7 @@ export function useAppointments(patientUuid: string, startDate: string, abortCon
       },
     });
 
-  const { data, error, isValidating } = useSWR<{ data: any }, Error>(appointmentsUrl, fetcher);
+  const { data, error, isValidating } = useSWR<AppointmentsFetchResponse, Error>(appointmentsSearchUrl, fetcher);
 
   const appointments = data?.data?.length
     ? data.data.sort((a, b) => (b.startDateTime > a.startDateTime ? 1 : -1))
@@ -45,6 +45,19 @@ export function useAppointments(patientUuid: string, startDate: string, abortCon
   };
 }
 
+export function useAppointmentService() {
+  const { data, error } = useSWR<{ data: Array<AppointmentService> }, Error>(
+    `/ws/rest/v1/appointmentService/all/full`,
+    openmrsFetch,
+  );
+
+  return {
+    data: data ? data.data : null,
+    isError: error,
+    isLoading: !data && !error,
+  };
+}
+
 export function createAppointment(appointment: AppointmentPayload, abortController: AbortController) {
   return openmrsFetch(`/ws/rest/v1/appointment`, {
     method: 'POST',
@@ -58,12 +71,6 @@ export function createAppointment(appointment: AppointmentPayload, abortControll
 
 export function getAppointmentsByUuid(appointmentUuid: string, abortController: AbortController) {
   return openmrsFetch(`/ws/rest/v1/appointments/${appointmentUuid}`, {
-    signal: abortController.signal,
-  });
-}
-
-export function getAppointmentServiceAll(abortController: AbortController) {
-  return openmrsFetch(`/ws/rest/v1/appointmentService/all/full`, {
     signal: abortController.signal,
   });
 }
