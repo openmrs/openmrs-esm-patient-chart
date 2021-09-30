@@ -1,3 +1,7 @@
+export interface ProgramsFetchResponse {
+  results: Array<PatientProgram>;
+}
+
 export interface PatientProgram {
   uuid: string;
   patient?: DisplayMetadata;
