@@ -25,7 +25,7 @@ const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({ match
 
   const mainClassName = `omrs-main-content ${styles.chartContainer}`;
 
-  useOfflineVisitForPatient(patientUuid, sessionUser?.sessionLocation.uuid);
+  useOfflineVisitForPatient(patientUuid, sessionUser?.sessionLocation?.uuid);
 
   return (
     <main className={mainClassName}>

@@ -4,7 +4,7 @@ import Notification20 from '@carbon/icons-react/es/notification/20';
 import { Button } from 'carbon-components-react';
 
 interface NotificationsButtonInterface {
-  onClick: Function;
+  onClick: () => void;
 }
 
 const NotificationsButton: React.FC<NotificationsButtonInterface> = ({ onClick }) => {

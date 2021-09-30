@@ -208,7 +208,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, isTablet }
   );
 
   const handleSubmit = React.useCallback(
-    (event: SyntheticEvent<HTMLFormElement>) => {
+    (event: SyntheticEvent) => {
       event.preventDefault();
 
       if (viewState.status !== ActionTypes.selectDiagnoses) return;
