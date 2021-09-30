@@ -19,7 +19,7 @@ interface PatientChartParams {
 const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({ match }) => {
   const { patientUuid, view, subview } = match.params;
   const [loading, patient] = useCurrentPatient(patientUuid);
-  const sessionUser = null;
+  const sessionUser = useSessionUser();
   const state = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);
   const { windowSize, openWindows } = useContextWorkspace();
 
