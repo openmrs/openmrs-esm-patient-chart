@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, render, act, waitFor } from '@testing-library/react';
+import { screen, render, act, waitFor, fireEvent } from '@testing-library/react';
 import AllergyForm from './allergy-form.component';
 import { mockPatient } from '../../../../../__mocks__/patient.mock';
 import { useConfig, showToast, showNotification } from '@openmrs/esm-framework';
@@ -123,7 +123,7 @@ describe('<AllergyForm>', () => {
     userEvent.type(commentText, 'patient test comment');
 
     const dateOfFirstOnset = screen.getByRole('textbox', { name: /Date of first onset/i });
-    userEvent.type(dateOfFirstOnset, new Date('2021-12-12').toISOString());
+    fireEvent.change(dateOfFirstOnset, new Date('2021-12-12').toISOString());
 
     // Save patient allergy
     mockSavePatientAllergy.mockReturnValue(Promise.resolve({ status: 201 }));

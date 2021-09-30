@@ -1,3 +1,15 @@
+export interface FHIRConditionResponse {
+  entry: Array<{
+    resource: FHIRCondition;
+  }>;
+  id: string;
+  meta: {
+    lastUpdated: string;
+  };
+  resourceType: string;
+  total: number;
+  type: string;
+}
 export interface FHIRCondition {
   clinicalStatus: {
     coding: Array<CodingData>;

@@ -15,16 +15,11 @@ $actionPanelOffset: 48px;
   right: 0;
 }
 
-.actionPanel {
+:global(.omrs-breakpoint-gt-tablet) .actionPanel {
   right: $actionPanelOffset;
   background: #fff;
   z-index: auto;
   border: 1px solid #a8a8a8;
-}
-
-.actionPanel :global(.omrs-breakpoint-lt-desktop) {
-  border: 0;
-  right: 0;
 }
 
 .iconButton {

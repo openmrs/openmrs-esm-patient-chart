@@ -8,6 +8,7 @@ import {
   DataTable,
   DataTableSkeleton,
   Button,
+  InlineLoading,
   Table,
   TableCell,
   TableContainer,
@@ -18,7 +19,7 @@ import {
 } from 'carbon-components-react';
 import { attach } from '@openmrs/esm-framework';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
-import { Condition, performPatientConditionsSearch } from './conditions.resource';
+import { Condition, useConditions } from './conditions.resource';
 import { useConditionsContext } from './conditions.context';
 
 const ConditionsDetailedSummary: React.FC = () => {
@@ -26,16 +27,7 @@ const ConditionsDetailedSummary: React.FC = () => {
   const { patient } = useConditionsContext();
   const displayText = t('conditions', 'Conditions');
   const headerTitle = t('conditions', 'Conditions');
-  const [error, setError] = React.useState(null);
-  const [conditions, setConditions] = React.useState<Array<Condition>>(null);
-
-  React.useEffect(() => {
-    if (patient) {
-      const sub = performPatientConditionsSearch(patient.identifier[0].value).subscribe(setConditions, setError);
-
-      return () => sub.unsubscribe();
-    }
-  }, [patient]);
+  const { data: conditions, isError, isLoading, isValidating } = useConditions(patient.id);
 
   const headers = React.useMemo(
     () => [
@@ -72,64 +64,53 @@ const ConditionsDetailedSummary: React.FC = () => {
     [],
   );
 
-  const RenderConditionsSummary: React.FC = () => {
-    if (conditions.length) {
-      return (
-        <div className={styles.widgetCard}>
-          <div className={styles.conditionsHeader}>
-            <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
-            <Button kind="ghost" renderIcon={Add16} iconDescription="Add conditions" onClick={launchConditionsForm}>
-              {t('add', 'Add')}
-            </Button>
-          </div>
-          <TableContainer>
-            <DataTable rows={tableRows} headers={headers} isSortable={true} size="short">
-              {({ rows, headers, getHeaderProps, getTableProps }) => (
-                <Table {...getTableProps()} useZebraStyles>
-                  <TableHead>
-                    <TableRow>
-                      {headers.map((header) => (
-                        <TableHeader
-                          className={`${styles.productiveHeading01} ${styles.text02}`}
-                          {...getHeaderProps({
-                            header,
-                            isSortable: header.isSortable,
-                          })}>
-                          {header.header?.content ?? header.header}
-                        </TableHeader>
+  if (isLoading) return <DataTableSkeleton role="progressbar" />;
+  if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
+  if (conditions?.length) {
+    return (
+      <div className={styles.widgetCard}>
+        <div className={styles.conditionsHeader}>
+          <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
+          <span>{isValidating ? <InlineLoading /> : null}</span>
+          <Button kind="ghost" renderIcon={Add16} iconDescription="Add conditions" onClick={launchConditionsForm}>
+            {t('add', 'Add')}
+          </Button>
+        </div>
+        <TableContainer>
+          <DataTable rows={tableRows} headers={headers} isSortable={true} size="short">
+            {({ rows, headers, getHeaderProps, getTableProps }) => (
+              <Table {...getTableProps()} useZebraStyles>
+                <TableHead>
+                  <TableRow>
+                    {headers.map((header) => (
+                      <TableHeader
+                        className={`${styles.productiveHeading01} ${styles.text02}`}
+                        {...getHeaderProps({
+                          header,
+                          isSortable: header.isSortable,
+                        })}>
+                        {header.header?.content ?? header.header}
+                      </TableHeader>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {rows.map((row) => (
+                    <TableRow key={row.id}>
+                      {row.cells.map((cell) => (
+                        <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                       ))}
                     </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {rows.map((row) => (
-                      <TableRow key={row.id}>
-                        {row.cells.map((cell) => (
-                          <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
-                        ))}
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
-            </DataTable>
-          </TableContainer>
-        </div>
-      );
-    }
-    return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchConditionsForm} />;
-  };
-
-  return (
-    <>
-      {conditions ? (
-        <RenderConditionsSummary />
-      ) : error ? (
-        <ErrorState error={error} headerTitle={headerTitle} />
-      ) : (
-        <DataTableSkeleton role="progressbar" />
-      )}
-    </>
-  );
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </DataTable>
+        </TableContainer>
+      </div>
+    );
+  }
+  return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchConditionsForm} />;
 };
 
 export default ConditionsDetailedSummary;

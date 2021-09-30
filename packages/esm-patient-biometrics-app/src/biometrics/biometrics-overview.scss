@@ -97,3 +97,9 @@
     border-left: 0rem;
   }
 }
+
+.customRow {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-columns: max-content;
+}

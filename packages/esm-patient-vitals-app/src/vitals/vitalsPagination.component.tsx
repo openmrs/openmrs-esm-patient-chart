@@ -37,7 +37,7 @@ const VitalsPagination: React.FC<VitalsPaginationProps> = ({
           {({ rows, headers, getHeaderProps, getTableProps }) => (
             <Table {...getTableProps()} useZebraStyles>
               <TableHead>
-                <TableRow>
+                <TableRow className={styles.customRow}>
                   {headers.map((header) => (
                     <TableHeader
                       className={`${styles.productiveHeading01} ${styles.text02}`}
@@ -52,7 +52,7 @@ const VitalsPagination: React.FC<VitalsPaginationProps> = ({
               </TableHead>
               <TableBody>
                 {rows.map((row) => (
-                  <TableRow key={row.id}>
+                  <TableRow key={row.id} className={styles.customRow}>
                     {row.cells.map((cell) => (
                       <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                     ))}

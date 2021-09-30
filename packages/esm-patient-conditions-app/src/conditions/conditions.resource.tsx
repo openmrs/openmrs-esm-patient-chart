@@ -1,21 +1,35 @@
-import { openmrsObservableFetch, fhirBaseUrl } from '@openmrs/esm-framework';
+import useSWR from 'swr';
 import { map } from 'rxjs/operators';
-import { FHIRCondition } from '../types';
+import { openmrsObservableFetch, fhirBaseUrl, openmrsFetch } from '@openmrs/esm-framework';
+import { FHIRCondition, FHIRConditionResponse } from '../types';
 
-export function performPatientConditionsSearch(patientIdentifier: string) {
-  return openmrsObservableFetch<Array<Condition>>(
-    `${fhirBaseUrl}/Condition?patient.identifier=${patientIdentifier}`,
-  ).pipe(
-    map(({ data }) => data['entry']),
-    map((entries) => entries?.map((entry) => entry.resource) ?? []),
-    map((data) => formatConditions(data)),
-    map((data) => data.sort((a, b) => (b?.onsetDateTime > a?.onsetDateTime ? 1 : -1))),
+export function useConditions(patientUuid: string) {
+  const { data, error, isValidating } = useSWR<{ data: FHIRConditionResponse }, Error>(
+    `${fhirBaseUrl}/Condition?patient=${patientUuid}`,
+    openmrsFetch,
   );
+
+  const formattedConditions =
+    data?.data?.total > 0
+      ? data?.data?.entry
+          .map((entry) => entry.resource ?? [])
+          .map(mapConditionProperties)
+          .sort((a, b) => (b.onsetDateTime > a.onsetDateTime ? 1 : -1))
+      : null;
+
+  return {
+    data: data ? formattedConditions : null,
+    isError: error,
+    isLoading: !data && !error,
+    isValidating,
+  };
 }
 
 export function searchConditionConcepts(searchTerm: string) {
+  const conditionConceptClassUuid = '8d4918b0-c2cc-11de-8d13-0010c6dffd0f';
+
   return openmrsObservableFetch<Array<CodedCondition>>(
-    `/ws/rest/v1/conceptsearch?conceptClasses=8d4918b0-c2cc-11de-8d13-0010c6dffd0f&q=${searchTerm}`,
+    `/ws/rest/v1/conceptsearch?conceptClasses=${conditionConceptClassUuid}&q=${searchTerm}`,
   ).pipe(map(({ data }) => data['results']));
 }
 
@@ -24,10 +38,6 @@ export function getConditionByUuid(conditionUuid: string) {
     map(({ data }) => data),
     map((data: FHIRCondition) => mapConditionProperties(data)),
   );
-}
-
-function formatConditions(conditions: Array<FHIRCondition>): Array<Condition> {
-  return conditions.map(mapConditionProperties);
 }
 
 function mapConditionProperties(condition: FHIRCondition): Condition {

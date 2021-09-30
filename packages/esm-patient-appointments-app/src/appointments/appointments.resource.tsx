@@ -1,7 +1,7 @@
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { Appointment } from './appointments-form.component';
+import { Appointment, AppointmentPayload } from '../types';
 
-export function createAppointment(appointment: Appointment, abortController: AbortController) {
+export function createAppointment(appointment: AppointmentPayload, abortController: AbortController) {
   return openmrsFetch(`/ws/rest/v1/appointment`, {
     method: 'POST',
     signal: abortController.signal,

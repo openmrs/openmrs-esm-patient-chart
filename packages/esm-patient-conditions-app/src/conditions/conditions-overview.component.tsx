@@ -2,9 +2,9 @@ import React from 'react';
 import dayjs from 'dayjs';
 import {
   DataTable,
-  Pagination,
   DataTableSkeleton,
   Button,
+  InlineLoading,
   Table,
   TableCell,
   TableContainer,
@@ -15,10 +15,10 @@ import {
 } from 'carbon-components-react';
 import Add16 from '@carbon/icons-react/es/add/16';
 import styles from './conditions-overview.scss';
-import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
+import { attach, usePagination } from '@openmrs/esm-framework';
+import { EmptyState, ErrorState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
-import { Condition, performPatientConditionsSearch } from './conditions.resource';
-import { attach } from '@openmrs/esm-framework';
+import { useConditions } from './conditions.resource';
 
 const conditionsToShowCount = 5;
 
@@ -27,33 +27,17 @@ interface ConditionsOverviewProps {
   patient: fhir.Patient;
 }
 
-const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient }) => {
+const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient, basePath }) => {
   const { t } = useTranslation();
-  const [conditions, setConditions] = React.useState<Array<Condition>>(null);
-  const [error, setError] = React.useState(null);
-  const [firstRowIndex, setFirstRowIndex] = React.useState(0);
-  const [currentPageSize, setCurrentPageSize] = React.useState(5);
-
   const displayText = t('conditions', 'Conditions');
   const headerTitle = t('conditions', 'Conditions');
-  const previousPage = t('previousPage', 'Previous page');
-  const nextPage = t('nextPage', 'Next Page');
-  const itemPerPage = t('itemPerPage', 'Item per page');
+  const urlLabel = t('seeAll', 'See all');
+  const pageUrl = window.spaBase + basePath + '/conditions';
 
-  React.useEffect(() => {
-    if (patient) {
-      const sub = performPatientConditionsSearch(patient.identifier[0].value).subscribe(setConditions, setError);
+  const { data: conditions, isError, isLoading, isValidating } = useConditions(patient.id);
+  const { results: paginatedConditions, goTo, currentPage } = usePagination(conditions ?? [], conditionsToShowCount);
 
-      return () => sub.unsubscribe();
-    }
-  }, [patient]);
-
-  const launchConditionsForm = React.useCallback(
-    () => attach('patient-chart-workspace-slot', 'conditions-form-workspace'),
-    [],
-  );
-
-  const headers = [
+  const tableHeaders = [
     {
       key: 'display',
       header: t('activeConditions', 'Active Conditions'),
@@ -64,89 +48,74 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient }) => {
     },
   ];
 
-  const getRowItems = (rows: Array<Condition>) => {
-    return rows.slice(firstRowIndex, firstRowIndex + currentPageSize).map((row) => ({
-      ...row,
-      onsetDateTime: dayjs(row.onsetDateTime).format('MMM-YYYY'),
+  const tableRows = React.useMemo(() => {
+    return paginatedConditions?.map((condition) => ({
+      ...condition,
+      onsetDateTime: dayjs(condition.onsetDateTime).format('MMM-YYYY'),
     }));
-  };
+  }, [paginatedConditions]);
 
-  const RenderConditions: React.FC = () => {
-    if (conditions.length) {
-      const rows = getRowItems(conditions);
-      const totalRows = conditions.length;
-      return (
-        <div className={styles.widgetCard}>
-          <div className={styles.conditionsHeader}>
-            <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
-            <Button kind="ghost" renderIcon={Add16} iconDescription="Add conditions" onClick={launchConditionsForm}>
-              {t('add', 'Add')}
-            </Button>
-          </div>
-          <DataTable rows={rows} headers={headers} isSortable={true} size="short">
+  const launchConditionsForm = React.useCallback(
+    () => attach('patient-chart-workspace-slot', 'conditions-form-workspace'),
+    [],
+  );
+
+  if (isLoading) return <DataTableSkeleton role="progressbar" />;
+  if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
+  if (conditions?.length) {
+    return (
+      <div className={styles.widgetCard}>
+        <div className={styles.conditionsHeader}>
+          <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
+          <span>{isValidating ? <InlineLoading /> : null}</span>
+          <Button kind="ghost" renderIcon={Add16} iconDescription="Add conditions" onClick={launchConditionsForm}>
+            {t('add', 'Add')}
+          </Button>
+        </div>
+        <TableContainer>
+          <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="short">
             {({ rows, headers, getHeaderProps, getTableProps }) => (
-              <TableContainer>
-                <Table {...getTableProps()} useZebraStyles>
-                  <TableHead>
-                    <TableRow>
-                      {headers.map((header) => (
-                        <TableHeader
-                          className={`${styles.productiveHeading01} ${styles.text02}`}
-                          {...getHeaderProps({
-                            header,
-                            isSortable: header.isSortable,
-                          })}>
-                          {header.header?.content ?? header.header}
-                        </TableHeader>
+              <Table {...getTableProps()} useZebraStyles>
+                <TableHead>
+                  <TableRow>
+                    {headers.map((header) => (
+                      <TableHeader
+                        className={`${styles.productiveHeading01} ${styles.text02}`}
+                        {...getHeaderProps({
+                          header,
+                          isSortable: header.isSortable,
+                        })}>
+                        {header.header?.content ?? header.header}
+                      </TableHeader>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {rows.map((row) => (
+                    <TableRow key={row.id}>
+                      {row.cells.map((cell) => (
+                        <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                       ))}
                     </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {rows.map((row) => (
-                      <TableRow key={row.id}>
-                        {row.cells.map((cell) => (
-                          <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
-                        ))}
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-                {totalRows > conditionsToShowCount && (
-                  <Pagination
-                    totalItems={conditions.length}
-                    backwardText={previousPage}
-                    forwardText={nextPage}
-                    pageSize={currentPageSize}
-                    pageSizes={[5, 10, 15, 25]}
-                    itemsPerPageText={itemPerPage}
-                    onChange={({ page, pageSize }) => {
-                      if (pageSize !== currentPageSize) {
-                        setCurrentPageSize(pageSize);
-                      }
-                      setFirstRowIndex(pageSize * (page - 1));
-                    }}
-                  />
-                )}
-              </TableContainer>
+                  ))}
+                </TableBody>
+              </Table>
             )}
           </DataTable>
-        </div>
-      );
-    }
-    return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchConditionsForm} />;
-  };
-
-  return (
-    <>
-      {conditions ? (
-        <RenderConditions />
-      ) : error ? (
-        <ErrorState error={error} headerTitle={headerTitle} />
-      ) : (
-        <DataTableSkeleton role="progressbar" rowCount={conditionsToShowCount} />
-      )}
-    </>
-  );
+        </TableContainer>
+        <PatientChartPagination
+          currentItems={paginatedConditions.length}
+          onPageNumberChange={({ page }) => goTo(page)}
+          pageNumber={currentPage}
+          pageSize={conditionsToShowCount}
+          pageUrl={pageUrl}
+          totalItems={conditions.length}
+          urlLabel={urlLabel}
+        />
+      </div>
+    );
+  }
+  return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchConditionsForm} />;
 };
 
 export default ConditionsOverview;

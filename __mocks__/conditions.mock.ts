@@ -336,58 +336,48 @@ export const mockFhirConditionsResponse = {
   ],
 };
 
-export const mockPatientConditionsResult: Condition[] = [
+export const mockConditions: Array<Condition> = [
+  {
+    clinicalStatus: 'active',
+    conceptId: '138571AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    display: 'HIV Positive',
+    onsetDateTime: '2021-05-15T21:00:00+00:00',
+    recordedDate: '2021-05-17T07:07:43+00:00',
+    id: 'cbffbb42-41b4-4c38-bc14-842ef675df85',
+  },
   {
     clinicalStatus: 'active',
     conceptId: '160148AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     display: 'Malaria, confirmed',
-    onsetDateTime: '2019-11-04T00:00:00+00:00',
-    recordedDate: '2019-11-04T04:49:28+00:00',
-    id: '1e9160ee-8927-409c-b8f3-346c9736f8d7',
+    onsetDateTime: '2021-05-04T21:00:00+00:00',
+    recordedDate: '2021-05-05T10:09:33+00:00',
+    id: 'b648963a-8258-4131-a7fc-257f2a347435',
   },
   {
     clinicalStatus: 'active',
-    conceptId: '116128AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    conceptId: '160155AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    display: 'Malaria sevère',
+    onsetDateTime: '2021-01-27T00:00:00+00:00',
+    recordedDate: '2021-01-28T09:09:27+00:00',
+    id: '9479e872-c9ca-48cc-82ee-273d67c41187',
+  },
+  {
+    clinicalStatus: 'active',
+    conceptId: '121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     display: 'Anaemia',
-    onsetDateTime: '2019-02-28T00:00:00+00:00',
-    recordedDate: '2019-02-28T11:15:22+00:00',
-    id: '5be1a412-406a-43ed-a2de-d4995884baa1',
+    onsetDateTime: '2021-01-27T00:00:00+00:00',
+    recordedDate: '2021-01-28T09:09:27+00:00',
+    id: 'c1006bd4-0b21-4305-9eba-c9c647534502',
   },
   {
     clinicalStatus: 'active',
-    conceptId: '116128AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    display: 'Anosmia',
-    onsetDateTime: '2020-10-01T00:00:00+00:00',
-    recordedDate: '2020-10-25T09:36:55+00:00',
-    id: '1a790e53-2ff5-4689-9ea7-d7da8cca367e',
-  },
-  {
-    clinicalStatus: 'active',
-    conceptId: '160161AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    display: 'Generalized Skin Infection due to AIDS',
-    onsetDateTime: '2020-06-30T00:00:00+00:00',
-    recordedDate: '2020-06-19T06:41:25+00:00',
-    id: '43578769-f1a4-46af-b08b-d9fe8a07066f',
-  },
-  {
-    clinicalStatus: 'inactive',
-    conceptId: '512AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    display: 'Rash',
-    onsetDateTime: '2019-06-19T00:00:00+00:00',
-    recordedDate: '2019-06-19T06:40:22+00:00',
-    id: '37d2ed09-a85f-44b3-9e4e-dd77b3f4dacd',
-  },
-  {
-    clinicalStatus: 'active',
-    conceptId: '143264AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    display: 'Cough',
-    onsetDateTime: '2020-01-19T00:00:00+00:00',
-    recordedDate: '2020-01-19T06:43:01+00:00',
-    id: '2a7c1279-407d-43f4-af87-5a59562ec2c9',
+    conceptId: '117399AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    display: 'Hypertension',
+    onsetDateTime: '2020-08-19T00:00:00+00:00',
+    recordedDate: '2020-08-19T18:42:25+00:00',
+    id: '08c4dbcb-b474-4843-8e62-7096ff6dd6a2',
   },
 ];
-
-export const mockPatientConditionResult: Condition = mockPatientConditionsResult[0];
 
 export const searchedCondition = [
   {

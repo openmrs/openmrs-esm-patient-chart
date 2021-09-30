@@ -8,8 +8,8 @@ import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { searchedCondition } from '../../../../__mocks__/conditions.mock';
 import { createErrorHandler, detach, showNotification, showToast } from '@openmrs/esm-framework';
 import { createPatientCondition, searchConditionConcepts } from './conditions.resource';
+import { getByTextWithMarkup, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import ConditionsForm from './conditions-form.component';
-import { getByTextWithMarkup } from '../../../../tools/test-helpers';
 
 const utc = require('dayjs/plugin/utc');
 dayjs.extend(utc);
@@ -111,24 +111,28 @@ describe('ConditionsForm: ', () => {
       conditionSearchInput = screen.getByRole('searchbox', { name: /Enter condition/i });
     });
 
-    it('renders related condition concepts when the user types in the searchbox', () => {
-      mockSearchConditionConcepts.mockReturnValueOnce(of(searchedCondition).pipe(delay(1000)));
+    it('renders a list of related condition concepts when the user types in the searchbox', async () => {
+      mockSearchConditionConcepts.mockReturnValueOnce(of(searchedCondition).pipe(delay(10)));
 
       expect(screen.queryByRole('menuitem', { name: /Headache/i })).not.toBeInTheDocument();
       expect(screen.queryByDisplayValue('Headache')).not.toBeInTheDocument();
 
       fireEvent.change(conditionSearchInput, { target: { value: 'Headache' } });
 
+      await waitForLoadingToFinish();
+
       expect(screen.getByDisplayValue('Headache')).toBeInTheDocument();
     });
 
-    it('renders an error message when no matching conditions are found', () => {
-      mockSearchConditionConcepts.mockReturnValueOnce(of([]));
+    it('renders an error message when no matching conditions are found', async () => {
+      mockSearchConditionConcepts.mockReturnValueOnce(of([]).pipe(delay(10)));
 
       expect(screen.queryByRole('menuitem', { name: /Post-acute sequelae of COVID-19/i })).not.toBeInTheDocument();
       expect(screen.queryByDisplayValue(/Post-acute sequelae of COVID-19/i)).not.toBeInTheDocument();
 
       fireEvent.change(conditionSearchInput, { target: { value: 'Post-acute sequelae of COVID-19' } });
+
+      await waitForLoadingToFinish();
 
       expect(screen.queryByRole('menuitem', { name: /Post-acute sequelae of COVID-19/i })).not.toBeInTheDocument();
       expect(screen.getByDisplayValue(/Post-acute sequelae of COVID-19/i)).toBeInTheDocument();
@@ -211,8 +215,10 @@ describe('ConditionsForm: ', () => {
       expect(mockShowToast).toHaveBeenCalledTimes(1);
       expect(mockShowToast).toHaveBeenCalledWith(
         expect.objectContaining({
-          description: 'Condition saved successfully',
+          critical: true,
+          description: 'It is now visible on the Conditions page',
           kind: 'success',
+          title: 'Condition saved',
         }),
       );
     });
@@ -231,16 +237,17 @@ describe('ConditionsForm: ', () => {
 
       fireEvent.change(conditionSearchInput, { target: { value: 'Headache' } });
       screen.getByDisplayValue('Headache');
-      fireEvent.click(screen.getByRole('menuitem', { name: /Headache/i }));
 
+      fireEvent.click(screen.getByRole('menuitem', { name: /Headache/i }));
       fireEvent.change(onsetDateInput, { target: { value: '2020-05-05' } });
       screen.getByDisplayValue('2020-05-05');
 
       fireEvent.click(activeStatusInput);
+
       await screen.findByRole('radio', { name: 'Active' });
       expect(activeStatusInput).toBeChecked();
-
       expect(submitButton).not.toBeDisabled();
+
       fireEvent.click(submitButton);
 
       expect(mockCreateErrorHandler).toHaveBeenCalledTimes(1);

@@ -1,4 +1,21 @@
-import { screen, waitForElementToBeRemoved } from '@testing-library/react';
+import React from 'react';
+import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
+import { SWRConfig } from 'swr';
+import { mockPatient } from '../__mocks__/patient.mock';
+
+const swrWrapper = ({ children }) => {
+  return (
+    <SWRConfig
+      value={{
+        dedupingInterval: 0,
+        provider: () => new Map(),
+      }}>
+      {children}
+    </SWRConfig>
+  );
+};
+
+export const swrRender = (ui, options?) => render(ui, { wrapper: swrWrapper, ...options });
 
 // Custom matcher that queries elements split up by multiple HTML elements by text
 export function getByTextWithMarkup(text: RegExp | string) {
@@ -14,3 +31,5 @@ export function waitForLoadingToFinish() {
     timeout: 4000,
   });
 }
+
+export const patientChartBasePath = `/patient/${mockPatient.id}/chart`;

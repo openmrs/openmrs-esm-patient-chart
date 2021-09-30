@@ -1,12 +1,4 @@
 import { OpenmrsResource } from '@openmrs/esm-framework';
-
-export interface DataCaptureComponentProps {
-  entryStarted: () => void;
-  entrySubmitted: () => void;
-  entryCancelled: () => void;
-  closeComponent: () => void;
-}
-
 export interface Appointment {
   appointmentKind: string;
   appointmentNumber: string;
@@ -17,23 +9,42 @@ export interface Appointment {
   provider: OpenmrsResource;
   providers: Array<OpenmrsResource>;
   recurring: boolean;
-  service: {
-    appointmentServiceId: number;
-    color: string;
-    creatorName: string;
-    description: string;
-    durationMins: string;
-    endTime: string;
-    initialAppointmentStatus: string;
-    location: OpenmrsResource;
-    maxAppointmentsLimit: number | null;
-    name: string;
-    speciality: OpenmrsResource;
-    startTime: string;
-    uuid: string;
-  };
-  serviceType: string;
+  service: Service;
   startDateTime: number | any;
   status: string;
   uuid: string;
+}
+
+export interface ServiceTypes {
+  duration: number;
+  name: string;
+  uuid: string;
+}
+
+export interface Service {
+  appointmentServiceId: number;
+  color: string;
+  creatorName: string;
+  description: string;
+  durationMins: string;
+  endTime: string;
+  initialAppointmentStatus: string;
+  location: OpenmrsResource;
+  maxAppointmentsLimit: number | null;
+  name: string;
+  speciality: OpenmrsResource;
+  startTime: string;
+  uuid: string;
+  serviceTypes: Array<ServiceTypes>;
+}
+
+export interface AppointmentPayload {
+  providerUuid: string;
+  patientUuid: string;
+  serviceUuid: string;
+  startDateTime: Date;
+  endDateTime: Date;
+  appointmentKind: string;
+  providers: Array<{ uuid: string; comments: string; response?: string }>;
+  locationUuid: string;
 }

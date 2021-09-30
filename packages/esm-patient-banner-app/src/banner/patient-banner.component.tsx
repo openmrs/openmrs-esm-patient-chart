@@ -14,20 +14,30 @@ import { ExtensionSlot, age } from '@openmrs/esm-framework';
 interface PatientBannerProps {
   patient: fhir.Patient;
   patientUuid: string;
+  onClick?: (patientUuid: string) => void;
 }
 
-const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid }) => {
+const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, onClick }) => {
   const { t } = useTranslation();
   const state = React.useMemo(() => ({ patientUuid }), [patientUuid]);
   const [showContactDetails, setShowContactDetails] = React.useState(false);
   const toggleContactDetails = React.useCallback(() => setShowContactDetails((value) => !value), []);
 
+  const patientAvatar = (
+    <div className={styles.patientAvatar} role="img">
+      <ExtensionSlot extensionSlotName="patient-photo-slot" state={state} />
+    </div>
+  );
   return (
     <div className={styles.container} role="banner">
       <div className={styles.patientBanner}>
-        <div className={styles.patientAvatar} role="img">
-          <ExtensionSlot extensionSlotName="patient-photo-slot" state={state} />
-        </div>
+        {onClick ? (
+          <button className={styles.patientAvatarButton} onClick={() => onClick(patientUuid)}>
+            {patientAvatar}
+          </button>
+        ) : (
+          patientAvatar
+        )}
         <div className={styles.patientInfo}>
           <div className={`${styles.row} ${styles.patientNameRow}`}>
             <div className={styles.flexRow}>
