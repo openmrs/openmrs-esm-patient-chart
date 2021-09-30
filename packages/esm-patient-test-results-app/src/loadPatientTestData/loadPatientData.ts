@@ -7,6 +7,7 @@ import {
   addUserDataToCache,
 } from './helpers';
 import { PatientData, ObsRecord, ConceptUuid, ObsUuid, ObsMetaInfo } from '@openmrs/esm-patient-common-lib';
+import uniq from 'lodash-es/uniq';
 
 function parseSingleObsData(
   testConceptNameMap: Record<ConceptUuid, string>,
@@ -82,6 +83,30 @@ async function reloadData(patientUuid: string) {
       obsByClass[entry.conceptClass].push(entry);
     }
   });
+
+  // At this point all panels have their members as coming from the backend (i.e. the `hasMembers` field).
+  // The panels should display *all* data though, i.e. also the test results that are not listed on `hasMembers`,
+  // but share the same concept class as another existing member.
+  // -> Go through each panel and add those single entries that are not yet present in the panel.
+  Object.values(obsByClass)
+    .filter((observations) => observations.some((obs) => obs.members))
+    .forEach((observations) => {
+      const allSingleMembers = observations.flatMap((obs) => obs.members);
+      const allMemberConcepts = uniq(allSingleMembers.map((member) => member.conceptClass));
+
+      for (const concept of allMemberConcepts) {
+        const missingEntries = singleEntries.filter(
+          (x) => x.conceptClass === concept && !allSingleMembers.some((member) => member.id === x.id),
+        );
+
+        for (const missingEntry of missingEntries) {
+          observations.push({
+            ...missingEntry,
+            members: [missingEntry],
+          });
+        }
+      }
+    });
 
   const sortedObs: PatientData = Object.fromEntries(
     Object.entries(obsByClass)
