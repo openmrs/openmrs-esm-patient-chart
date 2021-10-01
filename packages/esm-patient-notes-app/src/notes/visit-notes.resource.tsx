@@ -1,7 +1,6 @@
 import { openmrsFetch, openmrsObservableFetch } from '@openmrs/esm-framework';
 import { map } from 'rxjs/operators';
-import { Diagnosis, VisitNotePayload } from './visit-note.util';
-import { ConceptMapping, DiagnosisData, Location, Provider, SessionData } from '../types';
+import { ConceptMapping, Diagnosis, DiagnosisData, Location, Provider, VisitNotePayload } from '../types';
 
 export function fetchLocationByUuid(abortController: AbortController, locationUuid: string) {
   return openmrsFetch<Location>(`/ws/rest/v1/location/${locationUuid}`, {

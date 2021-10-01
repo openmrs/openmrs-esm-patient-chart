@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
-import styles from './appointment-table.component.scss';
 import dayjs from 'dayjs';
+const utc = require('dayjs/plugin/utc');
+dayjs.extend(utc);
 import { useTranslation } from 'react-i18next';
 import { Appointment } from '../types';
 import {
@@ -16,6 +17,7 @@ import {
 } from 'carbon-components-react';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { usePagination } from '@openmrs/esm-framework';
+import styles from './appointments-table.component.scss';
 
 const pageSize = 5;
 
@@ -23,10 +25,11 @@ interface AppointmentTableProps {
   patientAppointments: Array<Appointment>;
 }
 
-const AppointmentTable: React.FC<AppointmentTableProps> = ({ patientAppointments = [] }) => {
+const AppointmentsTable: React.FC<AppointmentTableProps> = ({ patientAppointments }) => {
   const { t } = useTranslation();
-  const { results, currentPage, goTo } = usePagination(patientAppointments, pageSize);
-  const tableHeader: Array<DataTableHeader> = useMemo(
+  const { results: paginatedAppointments, currentPage, goTo } = usePagination(patientAppointments, pageSize);
+
+  const tableHeaders: Array<DataTableHeader> = useMemo(
     () => [
       { key: 'date', header: t('date', 'Date') },
       { key: 'location', header: t('location', 'Location') },
@@ -37,21 +40,21 @@ const AppointmentTable: React.FC<AppointmentTableProps> = ({ patientAppointments
 
   const tableRows = useMemo(
     () =>
-      results.map((appointment) => {
+      paginatedAppointments?.map((appointment) => {
         return {
-          id: `${appointment.uuid}`,
-          date: dayjs((appointment.startDateTime / 1000) * 1000).format('DD - MMM -YYYY , HH:MM'),
+          id: appointment.uuid,
+          date: dayjs(appointment.startDateTime).format('DD - MMM - YYYY, hh:mm'),
           location: appointment.location.name,
           service: appointment.service.name,
         };
       }),
-    [results],
+    [paginatedAppointments],
   );
 
   return (
     <div>
       <TableContainer>
-        <DataTable rows={tableRows} headers={tableHeader} isSortable={true} size="short">
+        <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="short">
           {({ rows, headers, getHeaderProps, getTableProps }) => (
             <Table {...getTableProps()} useZebraStyles>
               <TableHead>
@@ -82,7 +85,7 @@ const AppointmentTable: React.FC<AppointmentTableProps> = ({ patientAppointments
         </DataTable>
       </TableContainer>
       <PatientChartPagination
-        currentItems={results.length}
+        currentItems={paginatedAppointments.length}
         totalItems={patientAppointments.length}
         onPageNumberChange={({ page }) => goTo(page)}
         pageNumber={currentPage}
@@ -92,4 +95,4 @@ const AppointmentTable: React.FC<AppointmentTableProps> = ({ patientAppointments
   );
 };
 
-export default AppointmentTable;
+export default AppointmentsTable;

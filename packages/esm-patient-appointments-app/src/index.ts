@@ -47,7 +47,7 @@ function setupOpenMRS() {
         meta: dashboardMeta,
       },
       {
-        id: 'appointment-form-workspace',
+        id: 'appointments-form-workspace',
         load: getAsyncLifecycle(() => import('./appointments/appointments-form.component'), options),
         meta: {
           title: 'Create appointment',

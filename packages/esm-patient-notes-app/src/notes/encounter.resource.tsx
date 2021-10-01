@@ -1,7 +1,35 @@
-import { openmrsFetch, openmrsObservableFetch, fhirBaseUrl } from '@openmrs/esm-framework';
+import useSWR from 'swr';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { RESTPatientNote } from '../types';
+import { openmrsFetch, openmrsObservableFetch, fhirBaseUrl } from '@openmrs/esm-framework';
+import { EncountersFetchResponse, RESTPatientNote, PatientNote } from '../types';
+
+export const encountersCustomRepresentation =
+  'custom:(uuid,display,encounterDatetime,' +
+  'location:(uuid,display,name),' +
+  'encounterType:(name,uuid),' +
+  'auditInfo:(creator:(display),changedBy:(display)),' +
+  'encounterProviders:(provider:(person:(display))))';
+
+export function useEncounters(patientUuid: string) {
+  const encountersApiUrl = `/ws/rest/v1/encounter?patient=${patientUuid}&v=${encountersCustomRepresentation}`;
+
+  const { data, error, isValidating } = useSWR<{ data: EncountersFetchResponse }, Error>(
+    encountersApiUrl,
+    openmrsFetch,
+  );
+
+  const formattedNotes = data?.data?.results.length
+    ? data?.data?.results.map(mapNoteProperties).sort((a, b) => (b?.encounterDate > a?.encounterDate ? 1 : -1))
+    : null;
+
+  return {
+    data: data ? formattedNotes : null,
+    isError: error,
+    isLoading: !data && !error,
+    isValidating,
+  };
+}
 
 export function getEncounters(patientIdentifer: string, abortController: AbortController) {
   return openmrsFetch(`${fhirBaseUrl}/Encounter?identifier=${patientIdentifer}`, {
@@ -21,22 +49,8 @@ export function searchEncounterByPatientIdentifierWithMatchingVisit(patientIdent
   return openmrsFetch(`${fhirBaseUrl}/Encounter?identifier=${patientIdentifer},part-of=${visitUuid}`);
 }
 
-export function getEncounterObservableRESTAPI(patientUuid: string) {
-  return openmrsObservableFetch<{ results: Array<RESTPatientNote> }>(
-    `/ws/rest/v1/encounter?patient=${patientUuid}&v=custom:(uuid,display,encounterDatetime,location:(uuid,display,name),encounterType:(name,uuid),auditInfo:(creator:(display),changedBy:(display)),encounterProviders:(provider:(person:(display))))`,
-  ).pipe(
-    map(({ data }) => data.results ?? []),
-    map((notes) => formatNotes(notes)),
-    map((data) => data.sort((a, b) => (a.encounterDate < b.encounterDate ? 1 : -1))),
-  );
-}
-
 export function fetchEncounterByUuid(encounterUuid): Observable<any> {
   return openmrsObservableFetch(`/ws/rest/v1/encounter/${encounterUuid}`).pipe(map(({ data }) => data));
-}
-
-function formatNotes(notes: Array<RESTPatientNote>): Array<PatientNote> {
-  return notes.map(mapNoteProperties);
 }
 
 function mapNoteProperties(note: RESTPatientNote): PatientNote {
@@ -48,11 +62,3 @@ function mapNoteProperties(note: RESTPatientNote): PatientNote {
     encounterAuthor: note.encounterProviders?.[0]?.provider?.person?.display,
   };
 }
-
-export type PatientNote = {
-  id: string;
-  encounterAuthor?: string;
-  encounterDate: string;
-  encounterType: string;
-  encounterLocation: string;
-};
