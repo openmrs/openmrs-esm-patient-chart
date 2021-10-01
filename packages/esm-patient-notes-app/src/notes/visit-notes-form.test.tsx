@@ -18,11 +18,9 @@ import {
   mockFetchLocationByUuidResponse,
   mockFetchProviderByUuidResponse,
 } from '../../../../__mocks__/visit-note.mock';
-import VisitNotesForm from './visit-notes-form.component';
 import { mockSessionDataResponse } from '../../../../__mocks__/session.mock';
 import { getByTextWithMarkup } from '../../../../tools/test-helpers';
-
-jest.mock('lodash-es/debounce', () => jest.fn((fn) => fn));
+import VisitNotesForm from './visit-notes-form.component';
 
 const testProps = {
   isTablet: false,
@@ -39,6 +37,8 @@ const mockShowNotification = showNotification as jest.Mock;
 const mockShowToast = showToast as jest.Mock;
 const mockUseConfig = useConfig as jest.Mock;
 const mockUseSessionUser = useSessionUser as jest.Mock;
+
+jest.mock('lodash-es/debounce', () => jest.fn((fn) => fn));
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -110,6 +110,7 @@ describe('Visit notes form: ', () => {
   it('renders an error message when no matching diagnoses are found', () => {
     mockFetchDiagnosisByName.mockClear();
     mockFetchDiagnosisByName.mockReturnValue(of([]));
+
     renderVisitNotesForm();
 
     const searchbox = screen.getByRole('searchbox');
