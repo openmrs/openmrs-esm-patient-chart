@@ -1,5 +1,5 @@
 import React from 'react';
-import AppointmentBase from './appointment-base.component';
+import AppointmentsBase from './appointments-base.component';
 
 interface AppointmentOverviewProps {
   basePath: string;
@@ -7,6 +7,7 @@ interface AppointmentOverviewProps {
 }
 
 const AppointmentsOverview: React.FC<AppointmentOverviewProps> = ({ patientUuid }) => (
-  <AppointmentBase patientUuid={patientUuid} />
+  <AppointmentsBase patientUuid={patientUuid} />
 );
+
 export default AppointmentsOverview;

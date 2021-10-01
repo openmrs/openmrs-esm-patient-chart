@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAppointmentsContext } from './appointments.context';
-import AppointmentBase from './appointment-base.component';
+import AppointmentBase from './appointments-base.component';
 
 interface AppointmentsDetailedSummaryProps {}
 
