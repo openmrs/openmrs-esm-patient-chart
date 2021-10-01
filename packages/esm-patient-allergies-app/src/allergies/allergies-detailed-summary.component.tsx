@@ -73,7 +73,7 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
                 {allergy.criticality}
               </span>
             </p>
-            <p>{allergy.reactionManifestations.join(', ')}</p>
+            <p>{allergy.reactionManifestations?.join(', ')}</p>
             <p className={styles.note}>{allergy?.note}</p>
           </div>
         ),
