@@ -1,9 +1,14 @@
 import React from 'react';
-import styles from './contact-details.scss';
 import { useTranslation } from 'react-i18next';
-import { createErrorHandler } from '@openmrs/esm-framework';
 import { InlineLoading } from 'carbon-components-react';
-import { fetchPatientRelationships } from './relationships.resource';
+import { useRelationships } from './relationships.resource';
+import styles from './contact-details.scss';
+
+interface ContactDetailsProps {
+  address: Array<fhir.Address>;
+  telecom: Array<fhir.ContactPoint>;
+  patientId: string;
+}
 
 const Address: React.FC<{ address: fhir.Address }> = ({ address }) => {
   const { t } = useTranslation();
@@ -37,24 +42,15 @@ const Contact: React.FC<{ telecom: Array<fhir.ContactPoint> }> = ({ telecom }) =
 };
 
 const Relationships: React.FC<{ patientId: string }> = ({ patientId }) => {
-  const [relationships, setRelationships] = React.useState<Array<ExtractedRelationship> | null>(null);
-  const [isLoaded, setIsLoaded] = React.useState(false);
-
-  React.useEffect(() => {
-    fetchPatientRelationships(patientId)
-      .then((relationships) => {
-        setRelationships(relationships);
-        setIsLoaded(true);
-      })
-      .catch(createErrorHandler());
-  }, [patientId]);
+  const { t } = useTranslation();
+  const { data: relationships, isLoading } = useRelationships(patientId);
 
   return (
     <div className={styles.col}>
-      <p className={styles.heading}>Relationships</p>
+      <p className={styles.heading}>{t('relationships', 'Relationships')}</p>
       <>
         {(() => {
-          if (!isLoaded) return <InlineLoading description="Loading..." role="progressbar" />;
+          if (isLoading) return <InlineLoading description="Loading..." role="progressbar" />;
           if (relationships?.length) {
             return (
               <ul style={{ width: '50%' }}>
@@ -97,17 +93,3 @@ const ContactDetails: React.FC<ContactDetailsProps> = ({ address, telecom, patie
 };
 
 export default ContactDetails;
-
-type ContactDetailsProps = {
-  address: Array<fhir.Address>;
-  telecom: Array<fhir.ContactPoint>;
-  patientId: string;
-};
-
-type ExtractedRelationship = {
-  uuid: string;
-  display: string;
-  relativeAge: number;
-  relativeUuid: string;
-  relationshipType: string;
-};

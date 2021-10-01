@@ -3,6 +3,8 @@
   "activeVisit": "Active Visit",
   "address": "Address",
   "contactDetails": "Contact Details",
+  "relationships": "Relationships",
   "showAllDetails": "Show all details",
-  "showLess": "Show less"
+  "showLess": "Show less",
+  "started": "Started"
 }

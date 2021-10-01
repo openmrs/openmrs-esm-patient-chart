@@ -16,7 +16,7 @@ function ActiveVisitBannerTag({ patientUuid }) {
           <div className={styles.tooltipPadding}>
             <h6 style={{ marginBottom: '0.5rem' }}>{currentVisit?.visitType?.name}</h6>
             <span>
-              <span className={styles.tooltipSmallText}>Started: </span>
+              <span className={styles.tooltipSmallText}>{t('started', 'Started')}: </span>
               <span>{dayjs(currentVisit?.startDatetime).format('DD - MMM - YYYY @ HH:mm')}</span>
             </span>
           </div>
