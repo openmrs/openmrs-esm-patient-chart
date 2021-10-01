@@ -332,11 +332,11 @@ export default function MedicationOrderForm({
           </Row>
           <Row style={{ marginTop: '1rem' }}>
             <Column md={2}>
-              <FormGroup legendText={t('quantityDispensed', 'Quantity Dispensed')}>
+              <FormGroup legendText={t('quantity', 'Quantity')}>
                 <NumberInput
                   light={isTablet}
                   id="quantityDispensed"
-                  helperText={t('pillsDispensed', 'Pills dispensed')}
+                  helperText={t('pillsToDispense', 'Pills to dispense')}
                   value={orderBasketItem.pillsDispensed}
                   min={0}
                   onChange={(e) => {
