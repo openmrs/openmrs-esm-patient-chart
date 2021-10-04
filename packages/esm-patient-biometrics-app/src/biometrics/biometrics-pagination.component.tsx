@@ -12,22 +12,29 @@ import {
 } from 'carbon-components-react';
 import { usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
+import { PatientBiometrics } from './biometrics.resource';
 
-interface FormsProps {
-  tableRows: Array<any>;
+interface BiometricsPaginationProps {
+  tableRows: Array<PatientBiometrics>;
   pageSize: number;
   pageUrl: string;
   urlLabel: string;
-  tableHeaders: Array<any>;
+  tableHeaders: Array<{ key: string; header: string }>;
 }
 
-const BiometricsPagination: React.FC<FormsProps> = ({ tableRows, pageSize, pageUrl, urlLabel, tableHeaders }) => {
-  const { results, goTo, currentPage } = usePagination(tableRows, pageSize);
+const BiometricsPagination: React.FC<BiometricsPaginationProps> = ({
+  tableRows,
+  pageSize,
+  pageUrl,
+  urlLabel,
+  tableHeaders,
+}) => {
+  const { results: paginatedBiometrics, goTo, currentPage } = usePagination(tableRows, pageSize);
 
   return (
     <div>
       <TableContainer>
-        <DataTable rows={results} headers={tableHeaders} isSortable size="short">
+        <DataTable rows={paginatedBiometrics} headers={tableHeaders} isSortable size="short">
           {({ rows, headers, getHeaderProps, getTableProps }) => (
             <Table {...getTableProps()}>
               <TableHead>
@@ -60,7 +67,7 @@ const BiometricsPagination: React.FC<FormsProps> = ({ tableRows, pageSize, pageU
       <PatientChartPagination
         pageNumber={currentPage}
         totalItems={tableRows.length}
-        currentItems={results.length}
+        currentItems={paginatedBiometrics.length}
         pageUrl={pageUrl}
         pageSize={pageSize}
         onPageNumberChange={({ page }) => goTo(page)}

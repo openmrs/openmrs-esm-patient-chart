@@ -1,14 +1,13 @@
 import React from 'react';
-import { screen, render } from '@testing-library/react';
-import { of } from 'rxjs/internal/observable/of';
-import { throwError } from 'rxjs';
-import { openmrsObservableFetch, useConfig, usePagination } from '@openmrs/esm-framework';
+import { screen } from '@testing-library/react';
+import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { mockBiometricsResponse, formattedBiometrics } from '../../../../__mocks__/biometrics.mock';
+import { patientChartBasePath, swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import BiometricsOverview from './biometrics-overview.component';
 
 const testProps = {
-  basePath: '/',
+  basePath: patientChartBasePath,
   showAddBiometrics: true,
   patientUuid: mockPatient.id,
 };
@@ -18,27 +17,31 @@ const mockBiometricsConfig = {
   concepts: { heightUuid: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', weightUuid: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
 };
 
-const mockOpenmrsObservableFetch = openmrsObservableFetch as jest.Mock;
+const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockUsePagination = usePagination as jest.Mock;
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...(jest.requireActual('@openmrs/esm-framework') as any),
-  openmrsObservableFetch: jest.fn(),
-  useConfig: jest.fn().mockImplementation(() => mockBiometricsConfig),
-  usePagination: jest.fn(),
-}));
+jest.mock('@openmrs/esm-framework', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-framework');
 
-function renderBiometricsOverview() {
-  render(<BiometricsOverview {...testProps} />);
-}
+  return {
+    ...originalModule,
+    useConfig: jest.fn().mockImplementation(() => mockBiometricsConfig),
+    usePagination: jest.fn().mockImplementation(() => ({
+      currentPage: 1,
+      goTo: () => {},
+      results: [],
+    })),
+  };
+});
 
 describe('BiometricsOverview: ', () => {
   it('renders an empty state view if biometrics data is unavailable', async () => {
-    mockOpenmrsObservableFetch.mockReturnValueOnce(of({ data: [] }));
+    mockOpenmrsFetch.mockReturnValueOnce({ data: [] });
 
     renderBiometricsOverview();
 
-    await screen.getByRole('heading', { name: /biometrics/i });
+    await waitForLoadingToFinish();
+
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /biometrics/i })).toBeInTheDocument();
     expect(screen.getByText(/There are no biometrics to display for this patient/i)).toBeInTheDocument();
@@ -54,10 +57,12 @@ describe('BiometricsOverview: ', () => {
       },
     };
 
-    mockOpenmrsObservableFetch.mockReturnValue(throwError(error));
+    mockOpenmrsFetch.mockRejectedValueOnce(error);
+
     renderBiometricsOverview();
 
-    await screen.getByRole('heading', { name: /biometrics/i });
+    await waitForLoadingToFinish();
+
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /biometrics/i })).toBeInTheDocument();
     expect(screen.getByText(/Error 401: Unauthorized/i)).toBeInTheDocument();
@@ -68,17 +73,18 @@ describe('BiometricsOverview: ', () => {
     ).toBeInTheDocument();
   });
 
-  it("renders an overview of the patient's biometrics", async () => {
-    mockOpenmrsObservableFetch.mockReturnValueOnce(of({ data: mockBiometricsResponse }));
+  it("renders an overview  the patient's biometrics", async () => {
+    mockOpenmrsFetch.mockReturnValueOnce({ data: mockBiometricsResponse });
     mockUsePagination.mockReturnValueOnce({
-      results: formattedBiometrics.slice(0, 5),
-      goTo: () => {},
       currentPage: 1,
+      goTo: () => {},
+      results: formattedBiometrics.slice(0, 5),
     });
 
     renderBiometricsOverview();
 
-    await screen.getByRole('heading', { name: /biometrics/i });
+    await waitForLoadingToFinish();
+
     expect(screen.getByRole('heading', { name: /biometrics/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /table view/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /chart view/i })).toBeInTheDocument();
@@ -100,3 +106,7 @@ describe('BiometricsOverview: ', () => {
     expectedTableRows.map((row) => expect(screen.getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument());
   });
 });
+
+function renderBiometricsOverview() {
+  swrRender(<BiometricsOverview {...testProps} />);
+}
