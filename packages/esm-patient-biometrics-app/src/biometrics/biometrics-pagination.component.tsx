@@ -12,13 +12,14 @@ import {
 } from 'carbon-components-react';
 import { usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
+import { PatientBiometrics } from './biometrics.resource';
 
 interface BiometricsPaginationProps {
-  tableRows: Array<any>;
+  tableRows: Array<PatientBiometrics>;
   pageSize: number;
   pageUrl: string;
   urlLabel: string;
-  tableHeaders: Array<any>;
+  tableHeaders: Array<{ key: string; header: string }>;
 }
 
 const BiometricsPagination: React.FC<BiometricsPaginationProps> = ({

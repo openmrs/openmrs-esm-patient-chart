@@ -5,7 +5,7 @@ const INCH: number = 12;
 
 export function calculateBMI(weight: number, height: number) {
   if (weight > 0 && height > 0) {
-    return (weight / (height / 100) ** 2).toFixed(1);
+    return Number((weight / (height / 100) ** 2).toFixed(1));
   }
   return null;
 }

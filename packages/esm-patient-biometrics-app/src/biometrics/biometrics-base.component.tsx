@@ -7,7 +7,7 @@ import BiometricsChart from './biometrics-chart.component';
 import BiometricsPagination from './biometrics-pagination.component';
 import { Button, DataTableSkeleton, InlineLoading } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
-import { EmptyState, ErrorState, useVitalsConceptMetadata } from '@openmrs/esm-patient-common-lib';
+import { EmptyState, ErrorState, useVitalsConceptMetadata, withUnit } from '@openmrs/esm-patient-common-lib';
 import { attach, useConfig } from '@openmrs/esm-framework';
 import { useBiometrics } from './biometrics.resource';
 import { ConfigObject } from '../config-schema';
@@ -48,10 +48,10 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({
 
   const tableHeaders = [
     { key: 'date', header: 'Date and time' },
-    { key: 'weight', header: `Weight (${conceptUnits?.[3]})` },
-    { key: 'height', header: `Height (${conceptUnits?.[4]})` },
+    { key: 'weight', header: withUnit('Weight', conceptUnits?.[3] ?? '') },
+    { key: 'height', header: withUnit('Weight', conceptUnits?.[4] ?? '') },
     { key: 'bmi', header: `BMI (${bmiUnit})` },
-    { key: 'muac', header: `MUAC (${conceptUnits?.[7]})` },
+    { key: 'muac', header: withUnit('MUAC', conceptUnits?.[7] ?? '') },
   ];
   const tableRows = React.useMemo(
     () =>

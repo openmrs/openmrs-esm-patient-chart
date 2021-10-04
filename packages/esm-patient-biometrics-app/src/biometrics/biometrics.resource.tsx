@@ -1,39 +1,42 @@
+import useSWR from 'swr';
 import { fhirBaseUrl, FHIRResource, useConfig, openmrsFetch } from '@openmrs/esm-framework';
 import { calculateBMI } from './biometrics-helpers';
-import useSWR from 'swr';
-const pageSize = 100;
+
+export const pageSize = 100;
+
+type Biometrics = Array<FHIRResource['resource']>;
 
 export function useBiometrics(patientUuid: string) {
   const { concepts } = useConfig();
+
   const { data, error, isValidating } = useSWR<{ data: BiometricsFetchResponse }, Error>(
     `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&` +
       `code=${Object.values(concepts).join(',')}&_count=${pageSize}`,
     openmrsFetch,
   );
 
-  const observations = data?.data?.total > 0 ? data.data?.entry?.map((entry) => entry.resource ?? []) : null;
+  const filterByConceptUuid = (biometrics: Biometrics, conceptUuid: string) => {
+    return biometrics.filter((obs) => obs.code.coding.some((c) => c.code === conceptUuid));
+  };
 
-  const muacData = observations?.length
-    ? observations.filter((obs: any) => obs.code.coding.some((sys) => sys.code === concepts.muacUuid))
-    : [];
-  const heightData = observations?.length
-    ? observations.filter((obs: any) => obs.code.coding.some((sys) => sys.code === concepts.heightUuid))
-    : [];
-  const weightData = observations?.length
-    ? observations.filter((obs: any) => obs.code.coding.some((sys) => sys.code === concepts.weightUuid))
-    : [];
-
-  const formattedDimensions = data?.data?.total > 0 ? formatDimensions(weightData, heightData, muacData) : null;
+  const observations: Biometrics = data?.data?.entry?.map((entry) => entry.resource) ?? [];
 
   return {
-    data: data ? formattedDimensions : null,
+    data:
+      data?.data?.total > 0
+        ? formatDimensions(
+            filterByConceptUuid(observations, concepts.muacUuid),
+            filterByConceptUuid(observations, concepts.heightUuid),
+            filterByConceptUuid(observations, concepts.weightUuid),
+          )
+        : null,
     isError: error,
     isLoading: !data && !error,
     isValidating,
   };
 }
 
-function formatDimensions(heights, weights, muacs) {
+function formatDimensions(heights: Biometrics, weights: Biometrics, muacs: Biometrics): Array<PatientBiometrics> {
   const weightDates = getDatesIssued(weights);
   const heightDates = getDatesIssued(heights);
   const uniqueDates = Array.from(new Set(weightDates?.concat(heightDates))).sort(latestFirst);
@@ -43,16 +46,16 @@ function formatDimensions(heights, weights, muacs) {
     const weight = weights.find((weight) => weight.issued === date);
     const height = heights.find((height) => height.issued === date);
     return {
-      id: weight && weight?.encounter?.reference?.replace('Encounter/', ''),
-      weight: weight ? weight.valueQuantity.value : weight,
-      height: height ? height.valueQuantity.value : height,
+      id: weight?.encounter?.reference?.replace('Encounter/', ''),
+      weight: weight?.valueQuantity?.value,
+      height: height?.valueQuantity?.value,
       date: date,
       bmi: weight && height ? calculateBMI(weight.valueQuantity.value, height.valueQuantity.value) : null,
       obsData: {
         weight: weight,
         height: height,
       },
-      muac: muac?.valueQuantity.value,
+      muac: muac?.valueQuantity?.value,
     };
   });
 }
