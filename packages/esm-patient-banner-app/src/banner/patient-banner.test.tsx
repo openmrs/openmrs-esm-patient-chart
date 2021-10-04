@@ -4,9 +4,10 @@ import userEvent from '@testing-library/user-event';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import PatientBanner from './patient-banner.component';
 
-jest.unmock('lodash');
-const lodash = jest.requireActual('lodash');
-lodash.capitalize = jest.fn().mockImplementation((s) => s.charAt(0).toUpperCase() + s.slice(1));
+const testProps = {
+  patient: mockPatient,
+  patientUuid: mockPatient.id,
+};
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...(jest.requireActual('@openmrs/esm-framework') as any),
@@ -50,5 +51,5 @@ describe('PatientBanner: ', () => {
 });
 
 function renderPatientBanner() {
-  render(<PatientBanner patient={mockPatient} patientUuid={mockPatient.id} />);
+  render(<PatientBanner {...testProps} />);
 }
