@@ -1,21 +1,24 @@
 import React from 'react';
 import dayjs from 'dayjs';
-import { of } from 'rxjs/internal/observable/of';
+import * as SWR from 'swr';
 import { throwError } from 'rxjs';
+import { of } from 'rxjs/internal/observable/of';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { createErrorHandler, detach, showNotification, showToast } from '@openmrs/esm-framework';
+import {
+  createErrorHandler,
+  detach,
+  openmrsFetch,
+  showNotification,
+  showToast,
+  useLocations,
+} from '@openmrs/esm-framework';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import {
   mockCareProgramsResponse,
   mockEnrolledProgramsResponse,
   mockLocationsResponse,
 } from '../../../../__mocks__/programs.mock';
-import {
-  createProgramEnrollment,
-  fetchAvailablePrograms,
-  fetchEnrolledPrograms,
-  fetchLocations,
-} from './programs.resource';
+import { createProgramEnrollment } from './programs.resource';
 import ProgramsForm from './programs-form.component';
 
 const testProps = {
@@ -26,11 +29,10 @@ const testProps = {
 const mockCreateErrorHandler = createErrorHandler as jest.Mock;
 const mockCreateProgramEnrollment = createProgramEnrollment as jest.Mock;
 const mockDetach = detach as jest.Mock;
-const mockFetchAvailablePrograms = fetchAvailablePrograms as jest.Mock;
-const mockFetchEnrolledPrograms = fetchEnrolledPrograms as jest.Mock;
-const mockFetchLocations = fetchLocations as jest.Mock;
+const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockShowNotification = showNotification as jest.Mock;
 const mockShowToast = showToast as jest.Mock;
+const mockUseLocations = useLocations as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -41,27 +43,29 @@ jest.mock('@openmrs/esm-framework', () => {
     detach: jest.fn(),
     showNotification: jest.fn(),
     showToast: jest.fn(),
+    useLocations: jest.fn().mockImplementation(() => mockLocationsResponse),
   };
 });
 
-jest.mock('./programs.resource', () => ({
-  createProgramEnrollment: jest.fn(),
-  fetchAvailablePrograms: jest.fn(),
-  fetchEnrolledPrograms: jest.fn(),
-  fetchLocations: jest.fn(),
-}));
+jest.mock('./programs.resource', () => {
+  const originalModule = jest.requireActual('./programs.resource');
+
+  return {
+    ...originalModule,
+    createProgramEnrollment: jest.fn(),
+  };
+});
 
 describe('ProgramsForm: ', () => {
   beforeEach(() => {
-    mockFetchAvailablePrograms.mockReturnValue(of(mockCareProgramsResponse));
-    mockFetchEnrolledPrograms.mockReturnValue(of(mockEnrolledProgramsResponse));
-    mockFetchLocations.mockReturnValue(of(mockLocationsResponse));
+    mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockCareProgramsResponse } });
+    mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockEnrolledProgramsResponse } });
   });
 
   it('renders the programs form with all the relevant fields and values', async () => {
     renderProgramsForm();
 
-    expect(screen.getByRole('group', { name: /Program/i })).toBeInTheDocument();
+    await screen.findByRole('group', { name: /Program/i });
     expect(screen.getByRole('group', { name: /Date enrolled/i })).toBeInTheDocument();
     expect(screen.getByRole('group', { name: /Date completed/i })).toBeInTheDocument();
     expect(screen.getByRole('group', { name: /Enrollment location/i })).toBeInTheDocument();
@@ -100,13 +104,13 @@ describe('ProgramsForm: ', () => {
   });
 
   describe('Form submission: ', () => {
+    const inpatientWardUuid = 'b1a8b05e-3542-4037-bbd3-998ee9c40574';
+    const oncologyScreeningProgramUuid = '11b129ca-a5e7-4025-84bf-b92a173e20de';
     let cancelButton: HTMLElement;
     let enrollButton: HTMLElement;
     let enrollmentDateInput: HTMLElement;
     let selectLocationInput: HTMLElement;
     let selectProgramInput: HTMLElement;
-    const inpatientWardUuid = 'b1a8b05e-3542-4037-bbd3-998ee9c40574';
-    const oncologyScreeningProgramUuid = '11b129ca-a5e7-4025-84bf-b92a173e20de';
 
     beforeEach(() => {
       renderProgramsForm();
@@ -119,6 +123,7 @@ describe('ProgramsForm: ', () => {
     });
 
     it('renders a success toast notification upon successfully recording a program enrollment', () => {
+      const mockMutate = jest.spyOn(SWR, 'mutate').mockImplementation(jest.fn());
       mockCreateProgramEnrollment.mockReturnValueOnce(of({ status: 201, statusText: 'Created' }));
 
       fireEvent.change(selectProgramInput, {
@@ -152,10 +157,15 @@ describe('ProgramsForm: ', () => {
       expect(mockShowToast).toHaveBeenCalledTimes(1);
       expect(mockShowToast).toHaveBeenCalledWith(
         expect.objectContaining({
-          description: 'Program enrollment saved successfully',
+          critical: true,
+          description: 'It is now visible on the Programs page',
           kind: 'success',
+          title: 'Program enrollment saved',
         }),
       );
+
+      expect(mockMutate).toHaveBeenCalledTimes(1);
+      expect(mockMutate).toHaveBeenCalledWith(`/ws/rest/v1/programenrollment?patient=${mockPatient.id}`);
     });
 
     it('renders an error notification if there was a problem recording a program enrollment', async () => {
@@ -186,7 +196,6 @@ describe('ProgramsForm: ', () => {
       fireEvent.click(enrollButton);
 
       expect(mockCreateErrorHandler).toHaveBeenCalledTimes(1);
-      expect(mockShowNotification).toHaveBeenCalledTimes(1);
       expect(mockShowNotification).toHaveBeenCalledWith({
         critical: true,
         description: 'Internal Server Error',

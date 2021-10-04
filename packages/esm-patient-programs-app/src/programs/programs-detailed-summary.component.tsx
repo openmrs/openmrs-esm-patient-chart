@@ -1,17 +1,17 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React from 'react';
 import dayjs from 'dayjs';
 import Add16 from '@carbon/icons-react/es/add/16';
 import styles from './programs-detailed-summary.scss';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { attach } from '@openmrs/esm-framework';
-import { fetchEnrolledPrograms } from './programs.resource';
+import { useEnrollments } from './programs.resource';
 import { useProgramsContext } from './programs.context';
-import { PatientProgram } from '../types';
 import {
   Button,
   DataTable,
   DataTableSkeleton,
+  InlineLoading,
   Table,
   TableCell,
   TableContainer,
@@ -27,23 +27,13 @@ interface ProgramsDetailedSummaryProps {}
 
 const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = () => {
   const { t } = useTranslation();
+  const { patientUuid } = useProgramsContext();
   const displayText = t('programEnrollments', 'Program enrollments');
   const headerTitle = t('carePrograms', 'Care Programs');
-  const [enrolledPrograms, setEnrolledPrograms] = useState<Array<PatientProgram>>(null);
-  const { patientUuid } = useProgramsContext();
-  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    if (patientUuid) {
-      const subscription = fetchEnrolledPrograms(patientUuid).subscribe(
-        (enrolledPrograms) => setEnrolledPrograms(enrolledPrograms),
-        setError,
-      );
-      return () => subscription.unsubscribe();
-    }
-  }, [patientUuid]);
+  const { data: enrolledPrograms, isError, isLoading, isValidating } = useEnrollments(patientUuid);
 
-  const tableHeader: Array<DataTableHeader> = useMemo(
+  const tableHeaders: Array<DataTableHeader> = React.useMemo(
     () => [
       {
         key: 'display',
@@ -61,14 +51,14 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = () => {
     [t],
   );
 
-  const tableRows: Array<DataTableRow> = useMemo(() => {
-    return enrolledPrograms?.map((programs) => {
+  const tableRows: Array<DataTableRow> = React.useMemo(() => {
+    return enrolledPrograms?.map((program) => {
       return {
-        id: programs.uuid,
-        display: programs.display,
-        dateEnrolled: dayjs(programs.dateEnrolled).format('MMM-YYYY'),
-        status: programs.dateCompleted
-          ? `${t('completedOn', 'Completed On')} ${dayjs(programs.dateCompleted).format('MMM-YYYY')}`
+        id: program.uuid,
+        display: program.display,
+        dateEnrolled: dayjs(program.dateEnrolled).format('MMM-YYYY'),
+        status: program.dateCompleted
+          ? `${t('completedOn', 'Completed On')} ${dayjs(program.dateCompleted).format('MMM-YYYY')}`
           : t('active', 'Active'),
       };
     });
@@ -79,68 +69,53 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = () => {
     [],
   );
 
-  const RenderPrograms = () => {
+  if (isLoading) return <DataTableSkeleton role="progressbar" />;
+  if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
+  if (enrolledPrograms?.length) {
     return (
-      <>
-        {enrolledPrograms?.length ? (
-          <div className={styles.widgetCard}>
-            <div className={styles.programsHeader}>
-              <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
-              <Button kind="ghost" renderIcon={Add16} iconDescription="Add programs" onClick={launchProgramsForm}>
-                {t('add', 'Add')}
-              </Button>
-            </div>
-
-            <TableContainer>
-              <DataTable rows={tableRows} headers={tableHeader} isSortable={true} size="short">
-                {({ rows, headers, getHeaderProps, getTableProps }) => (
-                  <Table {...getTableProps()} useZebraStyles>
-                    <TableHead>
-                      <TableRow>
-                        {headers.map((header) => (
-                          <TableHeader
-                            className={`${styles.productiveHeading01} ${styles.text02}`}
-                            {...getHeaderProps({
-                              header,
-                              isSortable: header.isSortable,
-                            })}>
-                            {header.header?.content ?? header.header}
-                          </TableHeader>
-                        ))}
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {rows.map((row) => (
-                        <TableRow key={row.id}>
-                          {row.cells.map((cell) => (
-                            <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
-                          ))}
-                        </TableRow>
+      <div className={styles.widgetCard}>
+        <div className={styles.programsHeader}>
+          <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
+          <span>{isValidating ? <InlineLoading /> : null}</span>
+          <Button kind="ghost" renderIcon={Add16} iconDescription="Add programs" onClick={launchProgramsForm}>
+            {t('add', 'Add')}
+          </Button>
+        </div>
+        <TableContainer>
+          <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="short">
+            {({ rows, headers, getHeaderProps, getTableProps }) => (
+              <Table {...getTableProps()} useZebraStyles>
+                <TableHead>
+                  <TableRow>
+                    {headers.map((header) => (
+                      <TableHeader
+                        className={`${styles.productiveHeading01} ${styles.text02}`}
+                        {...getHeaderProps({
+                          header,
+                          isSortable: header.isSortable,
+                        })}>
+                        {header.header?.content ?? header.header}
+                      </TableHeader>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {rows.map((row) => (
+                    <TableRow key={row.id}>
+                      {row.cells.map((cell) => (
+                        <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                       ))}
-                    </TableBody>
-                  </Table>
-                )}
-              </DataTable>
-            </TableContainer>
-          </div>
-        ) : (
-          <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchProgramsForm} />
-        )}
-      </>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </DataTable>
+        </TableContainer>
+      </div>
     );
-  };
-
-  return (
-    <>
-      {enrolledPrograms ? (
-        <RenderPrograms />
-      ) : error ? (
-        <ErrorState error={error} headerTitle={headerTitle} />
-      ) : (
-        <DataTableSkeleton rowCount={5} />
-      )}
-    </>
-  );
+  }
+  return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchProgramsForm} />;
 };
 
 export default ProgramsDetailedSummary;

@@ -1,71 +1,75 @@
 import React from 'react';
-import ProgramsDetailedSummary from './programs-detailed-summary.component';
-import { cleanup, render, RenderResult, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { attach, openmrsFetch } from '@openmrs/esm-framework';
 import { mockEnrolledProgramsResponse } from '../../../../__mocks__/programs.mock';
-import * as mockProgramContext from './programs.context';
-import * as mockProgramsResource from './programs.resource';
-import { mockPatient } from '../../../../__mocks__/patient.mock';
-import { of, throwError } from 'rxjs';
+import { swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import ProgramsDetailedSummary from './programs-detailed-summary.component';
 
-describe('<ProgramsDetailedSummary />', () => {
-  afterEach(cleanup);
-  let wrapper: RenderResult;
-  const renderDetailedPrograms = () => {
-    spyOn(mockProgramsResource, 'fetchEnrolledPrograms').and.returnValue(of(mockEnrolledProgramsResponse));
-    spyOn(mockProgramContext, 'useProgramsContext').and.returnValue({
-      patient: mockPatient,
-      patientUuid: mockPatient.id,
-    });
-    wrapper = render(<ProgramsDetailedSummary />);
-  };
+const mockAttach = attach as jest.Mock;
+const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 
-  const renderEmptyStatePrograms = () => {
-    spyOn(mockProgramsResource, 'fetchEnrolledPrograms').and.returnValue(of([]));
-    spyOn(mockProgramContext, 'useProgramsContext').and.returnValue({
-      patient: mockPatient,
-      patientUuid: mockPatient.id,
-    });
-    wrapper = render(<ProgramsDetailedSummary />);
-  };
+describe('ProgramsDetailedSummary ', () => {
+  it('renders an empty state view when the patient is not enrolled into any programs', async () => {
+    mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
 
-  const renderErrorStateProgram = () => {
-    spyOn(mockProgramsResource, 'fetchEnrolledPrograms').and.returnValue(throwError('loading error'));
-    spyOn(mockProgramContext, 'useProgramsContext').and.returnValue({
-      patient: mockPatient,
-      patientUuid: mockPatient.id,
-    });
-    wrapper = render(<ProgramsDetailedSummary />);
-  };
+    renderProgramsOverview();
 
-  it("displays a detailed summary of the patient's program enrollments", async () => {
-    renderDetailedPrograms();
-    await screen.findByRole('heading', { name: /Care Programs/i });
+    await waitForLoadingToFinish();
+
     expect(screen.getByText(/Care Programs/i)).toBeInTheDocument();
-
-    expect(screen.getByText('Active programs')).toBeInTheDocument();
-    expect(screen.getByText('Date enrolled')).toBeInTheDocument();
-    expect(screen.getByText('Status')).toBeInTheDocument();
-    expect(screen.getByText('HIV Care and Treatment')).toBeInTheDocument();
-    expect(screen.getByText('Jan-2020')).toBeInTheDocument();
-    expect(screen.getByText('Active')).toBeInTheDocument();
-  });
-
-  it('renders an empty state view when program enrollment data is absent', async () => {
-    renderEmptyStatePrograms();
-    screen.findByRole('heading', { name: /Care Programs/i });
-    expect(screen.getByText(/Care Programs/i)).toBeInTheDocument();
-
     expect(screen.getByText(/There are no program enrollments to display for this patient/)).toBeInTheDocument();
+    expect(screen.getByText(/Record program enrollments/)).toBeInTheDocument();
   });
 
-  it('renders an error state, when an error occurs while loading data', () => {
-    renderErrorStateProgram();
-    expect(screen.getByText(/Care Programs/i)).toBeInTheDocument();
+  it('renders an error state view if there is a problem fetching program enrollments', async () => {
+    const error = {
+      message: 'You are not logged in',
+      response: {
+        status: 401,
+        statusText: 'Unauthorized',
+      },
+    };
 
+    mockOpenmrsFetch.mockRejectedValueOnce(error);
+
+    renderProgramsOverview();
+
+    await waitForLoadingToFinish();
+
+    expect(screen.getByText(/Care Programs/i)).toBeInTheDocument();
     expect(
       screen.getByText(
         /Sorry, there was a problem displaying this information. You can try to reload this page, or contact the site administrator and quote the error code above./,
       ),
     ).toBeInTheDocument();
   });
+
+  it("renders a detailed tabular summary of the patient's program enrollments", async () => {
+    mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockEnrolledProgramsResponse } });
+
+    renderProgramsOverview();
+
+    await waitForLoadingToFinish();
+
+    expect(screen.getByText(/Care Programs/i)).toBeInTheDocument();
+    expect(screen.getByRole('table')).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: /active programs/i })).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: /date enrolled/i })).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: /status/i })).toBeInTheDocument();
+
+    const addButton = screen.getByRole('button', { name: /Add/ });
+    expect(addButton).toBeInTheDocument();
+    expect(screen.getByRole('row', { name: /hiv care and treatment/i })).toBeInTheDocument();
+    expect(screen.getByRole('row', { name: /jan-2020/i })).toBeInTheDocument();
+    expect(screen.getByRole('row', { name: /active$/i })).toBeInTheDocument();
+
+    // Clicking "Add" launches the programs form in a workspace
+    userEvent.click(addButton);
+    expect(mockAttach).toHaveBeenCalledWith('patient-chart-workspace-slot', 'programs-form-workspace');
+  });
 });
+
+function renderProgramsOverview() {
+  swrRender(<ProgramsDetailedSummary />);
+}
