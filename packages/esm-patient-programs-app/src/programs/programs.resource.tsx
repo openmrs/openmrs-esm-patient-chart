@@ -1,38 +1,43 @@
-import { openmrsObservableFetch } from '@openmrs/esm-framework';
+import useSWR from 'swr';
 import { map } from 'rxjs/operators';
-import { LocationData, PatientProgram, Program } from '../types';
+import { openmrsFetch, openmrsObservableFetch } from '@openmrs/esm-framework';
+import { PatientProgram, Program, ProgramsFetchResponse } from '../types';
 
-export function fetchActiveEnrollments(patientID: string) {
-  return openmrsObservableFetch<{ results: Array<PatientProgram> }>(
-    `/ws/rest/v1/programenrollment?patient=${patientID}`,
-  ).pipe(
-    map(({ data }) =>
-      data.results.filter((res) => !res.dateCompleted).sort((a, b) => (b.dateEnrolled > a.dateEnrolled ? 1 : -1)),
-    ),
+export function useEnrollments(patientUuid: string) {
+  const { data, error, isValidating } = useSWR<{ data: ProgramsFetchResponse }, Error>(
+    `/ws/rest/v1/programenrollment?patient=${patientUuid}`,
+    openmrsFetch,
   );
+
+  const formattedEnrollments =
+    data?.data?.results.length > 0
+      ? data?.data.results.sort((a, b) => (b.dateEnrolled > a.dateEnrolled ? 1 : -1))
+      : null;
+
+  return {
+    data: data ? formattedEnrollments : null,
+    isError: error,
+    isLoading: !data && !error,
+    isValidating,
+  };
 }
 
-export function fetchAvailablePrograms() {
-  return openmrsObservableFetch<{ results: Array<Program> }>(
+export function useAvailablePrograms() {
+  const { data, error } = useSWR<{ data: { results: Array<Program> } }, Error>(
     `/ws/rest/v1/program?v=custom:(uuid,display,allWorkflows,concept:(uuid,display))`,
-  ).pipe(map(({ data }) => data.results));
-}
+    openmrsFetch,
+  );
 
-export function fetchEnrolledPrograms(patientID: string) {
-  return openmrsObservableFetch<{ results: Array<PatientProgram> }>(
-    `/ws/rest/v1/programenrollment?patient=${patientID}`,
-  ).pipe(map(({ data }) => data.results.sort((a, b) => (b.dateEnrolled > a.dateEnrolled ? 1 : -1))));
+  return {
+    data: data?.data?.results?.length ? data.data.results : null,
+    isError: error,
+    isLoading: !data && !error,
+  };
 }
 
 export function getPatientProgramByUuid(programUuid: string) {
   return openmrsObservableFetch<PatientProgram>(`/ws/rest/v1/programenrollment/${programUuid}`).pipe(
     map(({ data }) => data),
-  );
-}
-
-export function fetchLocations() {
-  return openmrsObservableFetch<{ results: Array<LocationData> }>(`/ws/rest/v1/location?v=custom:(uuid,display)`).pipe(
-    map(({ data }) => data.results),
   );
 }
 

@@ -15,15 +15,14 @@
   "enrolledAt": "Enrolled at",
   "enrolledOn": "Enrolled on",
   "enrollmentLocation": "Enrollment location",
+  "enrollmentNowVisible": "It is now visible on the Programs page",
+  "enrollmentSaved": "Program enrollment saved",
   "error": "Error",
-  "itemsPerPage": "Items per page",
-  "nextPage": "Next Page",
-  "previousPage": "Previous page",
   "program": "Program",
   "programEnrollments": "Program enrollments",
-  "programEnrollmentSaved": "Program enrollment saved successfully",
   "programEnrollmentSaveError": "Error saving program enrollment",
   "programs": "programs",
   "required": "Required",
+  "seeAll": "See all",
   "status": "Status"
 }
