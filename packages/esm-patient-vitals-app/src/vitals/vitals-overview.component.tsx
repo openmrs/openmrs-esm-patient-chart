@@ -40,20 +40,20 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
     { key: 'date', header: 'Date and time', isSortable: true },
     {
       key: 'bloodPressure',
-      header: withUnit('BP', conceptUnits ? conceptUnits[0] : ''),
+      header: withUnit('BP', conceptUnits?.[0] ?? ''),
     },
     {
       key: 'respiratoryRate',
-      header: withUnit('R. Rate', conceptUnits ? conceptUnits[8] : ''),
+      header: withUnit('R. Rate', conceptUnits?.[8] ?? ''),
     },
-    { key: 'pulse', header: withUnit('Pulse', conceptUnits ? conceptUnits[5] : '') },
+    { key: 'pulse', header: withUnit('Pulse', conceptUnits?.[5] ?? '') },
     {
       key: 'spo2',
-      header: withUnit('SPO2', conceptUnits ? conceptUnits[6] : ''),
+      header: withUnit('SPO2', conceptUnits?.[6] ?? ''),
     },
     {
       key: 'temperature',
-      header: withUnit('Temp', conceptUnits ? conceptUnits[2] : ''),
+      header: withUnit('Temp', conceptUnits?.[2] ?? ''),
     },
   ];
 

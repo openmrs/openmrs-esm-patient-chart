@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
-import isEmpty from 'lodash-es/isEmpty';
 import InlineLoading from 'carbon-components-react/es/components/InlineLoading';
 import VitalsHeaderItem from './vitals-header-item.component';
 import VitalsHeaderTitle from './vitals-header-title.component';
@@ -50,34 +49,34 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
               <div className={styles.row}>
                 <VitalsHeaderItem
                   unitName={t('temperatureAbbreviated', 'Temp')}
-                  unitSymbol={conceptUnits ? conceptUnits[2] : ''}
+                  unitSymbol={conceptUnits?.[2] ?? ''}
                   value={latestVitals?.temperature}
                 />
                 <VitalsHeaderItem
                   unitName={t('bp', 'BP')}
-                  unitSymbol={conceptUnits ? conceptUnits[0] : ''}
+                  unitSymbol={conceptUnits?.[0] ?? ''}
                   value={`${latestVitals?.systolic} / ${latestVitals?.diastolic}`}
                 />
                 <VitalsHeaderItem
                   unitName={t('heartRate', 'Heart Rate')}
-                  unitSymbol={conceptUnits ? conceptUnits[5] : ''}
+                  unitSymbol={conceptUnits?.[5] ?? ''}
                   value={latestVitals?.pulse}
                 />
                 <VitalsHeaderItem
                   unitName={t('spo2', 'SpO2')}
-                  unitSymbol={conceptUnits ? conceptUnits[6] : ''}
+                  unitSymbol={conceptUnits?.[6] ?? ''}
                   value={latestVitals?.oxygenSaturation}
                 />
               </div>
               <div className={styles.row}>
                 <VitalsHeaderItem
                   unitName={t('respiratoryRate', 'R. Rate')}
-                  unitSymbol={conceptUnits ? conceptUnits[8] : ''}
+                  unitSymbol={conceptUnits?.[8] ?? ''}
                   value={latestVitals?.respiratoryRate}
                 />
                 <VitalsHeaderItem
                   unitName={t('height', 'Height')}
-                  unitSymbol={conceptUnits ? conceptUnits[3] : ''}
+                  unitSymbol={conceptUnits?.[3] ?? ''}
                   value={latestVitals?.height}
                 />
                 <VitalsHeaderItem
@@ -87,7 +86,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
                 />
                 <VitalsHeaderItem
                   unitName={t('weight', 'Weight')}
-                  unitSymbol={conceptUnits ? conceptUnits[4] : ''}
+                  unitSymbol={conceptUnits?.[4] ?? ''}
                   value={latestVitals?.weight}
                 />
               </div>

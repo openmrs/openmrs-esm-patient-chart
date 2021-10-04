@@ -1,72 +1,43 @@
 import useSWR from 'swr';
 import { PatientVitalAndBiometric } from './vitals-biometrics-form/vitals-biometrics-form.component';
-import { openmrsFetch, fhirBaseUrl, useConfig } from '@openmrs/esm-framework';
+import { openmrsFetch, fhirBaseUrl, useConfig, FHIRResource } from '@openmrs/esm-framework';
 import { calculateBMI } from './vitals-biometrics-form/vitals-biometrics-form.utils';
 import { ConfigObject } from '../config-schema';
 
 export const pageSize = 100;
 
+type Vitals = Array<FHIRResource['resource']>;
+
 export function useVitals(patientUuid: string) {
-  const config = useConfig();
-  const vitalsConcepts = {
-    systolicBloodPressure: config.concepts.systolicBloodPressureUuid,
-    diastolicBloodPressure: config.concepts.diastolicBloodPressureUuid,
-    pulse: config.concepts.pulseUuid,
-    temperature: config.concepts.temperatureUuid,
-    oxygenSaturation: config.concepts.oxygenSaturationUuid,
-    height: config.concepts.heightUuid,
-    weight: config.concepts.weightUuid,
-    respiratoryRate: config.concepts.respiratoryRateUuid,
-  };
+  const { concepts } = useConfig();
 
   const { data, error, isValidating } = useSWR<{ data: VitalsFetchResponse }, Error>(
     `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&code=` +
-      Object.values(vitalsConcepts).join(',') +
+      Object.values(concepts).join(',') +
       '&_summary=data&_sort=-date' +
       `&_count=${pageSize}
   `,
     openmrsFetch,
   );
 
-  const observations = data?.data?.total > 0 ? data.data?.entry?.map((entry) => entry.resource ?? []) : null;
+  const filterByConceptUuid = (vitals: Vitals, conceptUuid: string) => {
+    return vitals.filter((obs) => obs.code.coding.some((c) => c.code === conceptUuid));
+  };
 
-  const systolicBloodPressureData = observations?.filter((obs) =>
-    obs.code.coding.some((sys) => sys.code === config.concepts.systolicBloodPressureUuid),
-  );
-  const diastolicBloodPressureData = observations?.filter((obs) =>
-    obs.code.coding.some((sys) => sys.code === config.concepts.diastolicBloodPressureUuid),
-  );
-  const pulseData = observations?.filter((obs) =>
-    obs.code.coding.some((sys) => sys.code === config.concepts.pulseUuid),
-  );
-  const temperatureData = observations?.filter((obs) =>
-    obs.code.coding.some((sys) => sys.code === config.concepts.temperatureUuid),
-  );
-  const oxygenSaturationData = observations?.filter((obs) =>
-    obs.code.coding.some((sys) => sys.code === config.concepts.oxygenSaturationUuid),
-  );
-  const heightData = observations?.filter((obs) =>
-    obs.code.coding.some((sys) => sys.code === config.concepts.heightUuid),
-  );
-  const weightData = observations?.filter((obs) =>
-    obs.code.coding.some((sys) => sys.code === config.concepts.weightUuid),
-  );
-  const respiratoryRateData = observations?.filter((obs) =>
-    obs.code.coding.some((sys) => sys.code === config.concepts.respiratoryRateUuid),
-  );
+  const observations: Vitals = data?.data?.entry?.map((entry) => entry.resource) ?? [];
 
   return {
     data:
       data?.data?.total > 0
         ? formatVitals(
-            systolicBloodPressureData,
-            diastolicBloodPressureData,
-            pulseData,
-            temperatureData,
-            oxygenSaturationData,
-            heightData,
-            weightData,
-            respiratoryRateData,
+            filterByConceptUuid(observations, concepts.systolicBloodPressureUuid),
+            filterByConceptUuid(observations, concepts.diastolicBloodPressureUuid),
+            filterByConceptUuid(observations, concepts.pulseUuid),
+            filterByConceptUuid(observations, concepts.temperatureUuid),
+            filterByConceptUuid(observations, concepts.oxygenSaturationUuid),
+            filterByConceptUuid(observations, concepts.heightUuid),
+            filterByConceptUuid(observations, concepts.weightUuid),
+            filterByConceptUuid(observations, concepts.respiratoryRateUuid),
           )
         : null,
     isError: error,
@@ -74,8 +45,6 @@ export function useVitals(patientUuid: string) {
     isValidating,
   };
 }
-
-type Vitals = Array<{ issued: Date; valueQuantity: any; encounter: any }>;
 
 function formatVitals(
   systolicBloodPressure: Vitals,
@@ -198,20 +167,20 @@ export function editPatientVitals(
 export interface PatientVitals {
   id: string;
   date: Date | string;
-  systolic?: string;
-  diastolic?: string;
-  pulse?: string;
-  temperature?: string;
-  oxygenSaturation?: string;
-  height?: string;
-  weight?: string;
-  bmi?: any;
-  respiratoryRate?: string;
+  systolic?: number;
+  diastolic?: number;
+  pulse?: number;
+  temperature?: number;
+  oxygenSaturation?: number;
+  height?: number;
+  weight?: number;
+  bmi?: number | null;
+  respiratoryRate?: number;
 }
 
 interface VitalsFetchResponse {
   entry: Array<{
-    resource: any;
+    resource: FHIRResource['resource'];
   }>;
   id: string;
   meta: {
