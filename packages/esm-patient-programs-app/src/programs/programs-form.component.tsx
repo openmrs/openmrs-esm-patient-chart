@@ -16,7 +16,6 @@ import {
 } from '@openmrs/esm-framework';
 import { Button, DatePicker, DatePickerInput, Select, SelectItem, Form, FormGroup } from 'carbon-components-react';
 import { createProgramEnrollment, useAvailablePrograms, useEnrollments } from './programs.resource';
-import { Program } from '../types';
 
 interface ProgramsFormProps {
   patientUuid: string;
@@ -38,15 +37,11 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, isTablet }) =>
 
   const [completionDate, setCompletionDate] = React.useState(null);
   const [enrollmentDate, setEnrollmentDate] = React.useState(new Date());
-  const [selectedProgram, setSelectedProgram] = React.useState<Program | null>(null);
+  const [selectedProgram, setSelectedProgram] = React.useState<string>('');
   const [userLocation, setUserLocation] = React.useState('');
 
   if (!userLocation && session?.sessionLocation?.uuid) {
     setUserLocation(session?.sessionLocation?.uuid);
-  }
-
-  function handleProgramChange(event) {
-    setSelectedProgram(event.target.value);
   }
 
   const closeWorkspace = React.useCallback(() => detach('patient-chart-workspace-slot', 'programs-form-workspace'), []);
@@ -108,7 +103,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, isTablet }) =>
             invalidText={t('required', 'Required')}
             labelText=""
             light={isTablet}
-            onChange={handleProgramChange}>
+            onChange={(event) => setSelectedProgram(event.target.value)}>
             {!selectedProgram ? <SelectItem text={t('chooseProgram', 'Choose a program')} value="" /> : null}
             {eligiblePrograms?.length > 0 &&
               eligiblePrograms.map((program) => (
@@ -118,7 +113,8 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, isTablet }) =>
               ))}
           </Select>
         </div>
-        {eligiblePrograms?.length === 0 &&
+        {availablePrograms?.length &&
+          eligiblePrograms?.length === 0 &&
           showNotification({
             title: t('error', 'Error'),
             kind: 'error',
