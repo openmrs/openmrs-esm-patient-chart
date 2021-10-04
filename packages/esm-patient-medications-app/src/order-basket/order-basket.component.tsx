@@ -7,13 +7,12 @@ import MedicationsDetailsTable from '../components/medications-details-table.com
 import { Button, ButtonSet, Loading, DataTableSkeleton } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 import { OrderBasketItem } from '../types/order-basket-item';
-import { getDurationUnits, getPatientEncounterId } from '../api/api';
+import { getDurationUnits, getPatientEncounterId, usePatientOrders } from '../api/api';
 import { createErrorHandler } from '@openmrs/esm-framework';
 import { OpenmrsResource } from '../types/openmrs-resource';
 import { orderDrugs } from './drug-ordering';
 import { connect } from 'unistore/react';
 import { OrderBasketStore, OrderBasketStoreActions, orderBasketStoreActions } from '../medications/order-basket-store';
-import { usePatientOrders } from '../utils/use-current-patient-orders.hook';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 
 export interface OrderBasketProps {
