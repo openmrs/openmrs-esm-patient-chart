@@ -1,10 +1,10 @@
 import * as React from 'react';
-import AreaChart from '@carbon/charts-react/area-chart';
+import LineChart from '@carbon/charts-react/line-chart';
 import ArrowLeft24 from '@carbon/icons-react/es/arrow--left/24';
 import styles from './trendline.scss';
 import RangeSelector from './RangeSelector';
 import usePatientResultsData from '../loadPatientTestData/usePatientResultsData';
-import { ScaleTypes, AreaChartOptions, TickRotations } from '@carbon/charts/interfaces';
+import { ScaleTypes, LineChartOptions, TickRotations } from '@carbon/charts/interfaces';
 import { toOmrsDateFormat, toOmrsTimeString24 } from '@openmrs/esm-framework';
 import { ObsRecord, OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import { CommonDataTable } from '../overview/common-overview';
@@ -141,7 +141,7 @@ const Trendline: React.FC<{
     });
   });
 
-  const options = React.useMemo<AreaChartOptions>(
+  const options = React.useMemo<LineChartOptions>(
     () => ({
       bounds: {
         lowerBoundMapsTo: 'min',
@@ -171,6 +171,10 @@ const Trendline: React.FC<{
         scale: {
           [dataset]: '#6929c4',
         },
+      },
+      points: {
+        radius: 5,
+        enabled: true,
       },
       legend: {
         enabled: false,
@@ -207,7 +211,7 @@ const Trendline: React.FC<{
       <TrendlineHeader openTimeline={openTimeline} title={dataset} />
       <TrendLineBackground>
         <RangeSelector setLowerRange={setLowerRange} upperRange={upperRange} />
-        <AreaChart data={data} options={options} />
+        <LineChart data={data} options={options} />
       </TrendLineBackground>
 
       <DrawTable {...{ tableData, tableHeaderData }} />
