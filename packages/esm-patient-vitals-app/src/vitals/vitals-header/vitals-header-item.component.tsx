@@ -1,13 +1,13 @@
 import React from 'react';
-import styles from './vital-header-details.component.scss';
+import styles from './vitals-header-item.component.scss';
 
-interface VitalHeaderStateDetailsProps {
+interface VitalsHeaderItemProps {
   unitName: string;
-  value: string | number;
   unitSymbol: React.ReactChild;
+  value: string | number;
 }
 
-const VitalHeaderStateDetails: React.FC<VitalHeaderStateDetailsProps> = ({ unitName, value, unitSymbol }) => {
+const VitalsHeaderItem: React.FC<VitalsHeaderItemProps> = ({ unitName, value, unitSymbol }) => {
   return (
     <div className={styles.vitalsHeaderStateDetailsContainer}>
       <label className={`${styles.label01} ${styles.text02}`}>{unitName}</label>
@@ -19,4 +19,4 @@ const VitalHeaderStateDetails: React.FC<VitalHeaderStateDetailsProps> = ({ unitN
   );
 };
 
-export default VitalHeaderStateDetails;
+export default VitalsHeaderItem;

@@ -111,3 +111,11 @@
   grid-auto-flow: column;
   grid-template-columns: max-content;
 }
+
+.backgroundDataFetchingIndicator {
+  align-items: center;
+  display: flex;
+  flex: 1 1 0%;
+  justify-content: end;
+}
+

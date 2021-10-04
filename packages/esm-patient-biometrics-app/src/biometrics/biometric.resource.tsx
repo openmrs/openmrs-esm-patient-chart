@@ -2,16 +2,21 @@ import { openmrsObservableFetch, fhirBaseUrl, FHIRResource } from '@openmrs/esm-
 import { map } from 'rxjs/operators';
 import { calculateBMI } from './biometric.helper';
 
-export function getPatientBiometrics(weightUuid: string, heightUuid: string, patientId: string, muacUuid: string) {
-  return getPatientBiometricObservations(weightUuid, heightUuid, patientId, muacUuid).pipe(
+export function getPatientBiometrics(patientUuid: string, weightUuid: string, heightUuid: string, muacUuid: string) {
+  return getPatientBiometricObservations(patientUuid, weightUuid, heightUuid, muacUuid).pipe(
     map((data) => (data ? formatDimensions(data.weights, data.heights, data.muac) : [])),
   );
 }
 
-function getPatientBiometricObservations(weightUuid: string, heightUuid: string, patientId: string, muacUuid: string) {
+function getPatientBiometricObservations(
+  patientUuid: string,
+  weightUuid: string,
+  heightUuid: string,
+  muacUuid: string,
+) {
   const DEFAULT_PAGE_SIZE = 100;
   return openmrsObservableFetch<DimensionFetchResponse>(
-    `${fhirBaseUrl}/Observation?subject:Patient=${patientId}&code=${weightUuid},${heightUuid},${muacUuid}&_count=${DEFAULT_PAGE_SIZE}`,
+    `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&code=${weightUuid},${heightUuid},${muacUuid}&_count=${DEFAULT_PAGE_SIZE}`,
   ).pipe(
     map(({ data }) => data.entry),
     map((entries) => entries?.map((entry) => entry.resource)),

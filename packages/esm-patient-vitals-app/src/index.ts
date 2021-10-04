@@ -54,7 +54,7 @@ function setupOpenMRS() {
       {
         id: 'patient-vitals-info',
         slot: 'patient-info-slot',
-        load: getAsyncLifecycle(() => import('./vitals/vitals-header/vital-header-state.component'), options),
+        load: getAsyncLifecycle(() => import('./vitals/vitals-header/vitals-header.component'), options),
         online: { showRecordVitals: true },
         offline: { showRecordVitals: false },
       },

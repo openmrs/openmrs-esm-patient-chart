@@ -28,12 +28,12 @@ const VitalsPagination: React.FC<VitalsPaginationProps> = ({
   urlLabel,
   tableHeaders,
 }) => {
-  const { results, goTo, currentPage } = usePagination(tableRows, pageSize);
+  const { results: paginatedVitals, goTo, currentPage } = usePagination(tableRows, pageSize);
 
   return (
     <div>
       <TableContainer>
-        <DataTable rows={results} headers={tableHeaders} isSortable={true} size="short">
+        <DataTable rows={paginatedVitals} headers={tableHeaders} isSortable={true} size="short">
           {({ rows, headers, getHeaderProps, getTableProps }) => (
             <Table {...getTableProps()} useZebraStyles>
               <TableHead>
@@ -66,7 +66,7 @@ const VitalsPagination: React.FC<VitalsPaginationProps> = ({
       <PatientChartPagination
         pageNumber={currentPage}
         totalItems={tableRows.length}
-        currentItems={results.length}
+        currentItems={paginatedVitals.length}
         pageUrl={pageUrl}
         pageSize={pageSize}
         onPageNumberChange={({ page }) => goTo(page)}

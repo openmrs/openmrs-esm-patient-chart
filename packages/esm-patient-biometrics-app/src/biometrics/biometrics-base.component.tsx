@@ -8,10 +8,9 @@ import BiometricsChart from './biometrics-chart.component';
 import BiometricsPagination from './biometricsPagination.component';
 import { Button, DataTableSkeleton } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
-import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
+import { EmptyState, ErrorState, useVitalsConceptMetadata } from '@openmrs/esm-patient-common-lib';
 import { attach, useConfig } from '@openmrs/esm-framework';
 import { getPatientBiometrics } from './biometric.resource';
-import { useVitalsSignsConceptMetaData } from './use-vitalsigns';
 import { ConfigObject } from '../config-schema';
 import { patientVitalsBiometricsFormWorkspace } from '../constants';
 
@@ -37,17 +36,18 @@ const RenderBiometrics: React.FC<RenderBiometricsProps> = ({
   pageUrl,
 }) => {
   const { t } = useTranslation();
-  const { conceptsUnits } = useVitalsSignsConceptMetaData();
   const displayText = t('biometrics', 'biometrics');
-  const [, , , heightUnit, weightUnit, , , muacUnit] = conceptsUnits;
-  const [chartView, setChartView] = React.useState<boolean>();
+  const [chartView, setChartView] = React.useState(false);
+
+  const { data: conceptData } = useVitalsConceptMetadata();
+  const conceptUnits = conceptData ? conceptData.conceptUnits : null;
 
   const tableHeaders = [
     { key: 'date', header: 'Date and time' },
-    { key: 'weight', header: `Weight (${weightUnit})` },
-    { key: 'height', header: `Height (${heightUnit})` },
+    { key: 'weight', header: `Weight (${conceptUnits?.[3]})` },
+    { key: 'height', header: `Height (${conceptUnits?.[4]})` },
     { key: 'bmi', header: `BMI (${bmiUnit})` },
-    { key: 'muac', header: `MUAC (${muacUnit})` },
+    { key: 'muac', header: `MUAC (${conceptUnits?.[7]})` },
   ];
 
   const launchBiometricsForm = React.useCallback(() => {
@@ -89,7 +89,7 @@ const RenderBiometrics: React.FC<RenderBiometricsProps> = ({
           </div>
         </div>
         {chartView ? (
-          <BiometricsChart patientBiometrics={biometrics} conceptsUnits={conceptsUnits} />
+          <BiometricsChart patientBiometrics={biometrics} conceptsUnits={conceptUnits} />
         ) : (
           <BiometricsPagination
             tableRows={tableRows}
@@ -139,9 +139,9 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({
   React.useEffect(() => {
     if (patientUuid) {
       const sub = getPatientBiometrics(
+        patientUuid,
         config.concepts.weightUuid,
         config.concepts.heightUuid,
-        patientUuid,
         config.concepts.muacUuid,
       ).subscribe(setBiometrics, setError);
       return () => sub.unsubscribe();
