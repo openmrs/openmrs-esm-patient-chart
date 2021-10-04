@@ -12,6 +12,10 @@
   background-color: $ui-background;
 }
 
+.cardHeader span {
+  margin: auto;
+}
+
 .cardHeader h4 {
   @include carbon--type-style("productive-heading-03");
   color: $text-02;

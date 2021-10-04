@@ -7,13 +7,13 @@ import MedicationsDetailsTable from '../components/medications-details-table.com
 import { Button, ButtonSet, Loading, DataTableSkeleton } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 import { OrderBasketItem } from '../types/order-basket-item';
-import { getDurationUnits, getPatientEncounterId } from '../api/api';
+import { getDurationUnits, getPatientEncounterId, usePatientOrders } from '../api/api';
 import { createErrorHandler } from '@openmrs/esm-framework';
 import { OpenmrsResource } from '../types/openmrs-resource';
 import { orderDrugs } from './drug-ordering';
 import { connect } from 'unistore/react';
 import { OrderBasketStore, OrderBasketStoreActions, orderBasketStoreActions } from '../medications/order-basket-store';
-import { usePatientOrders } from '../utils/use-current-patient-orders.hook';
+import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 
 export interface OrderBasketProps {
   patientUuid: string;
@@ -33,6 +33,9 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
     isTablet,
   }: OrderBasketProps & OrderBasketStore & OrderBasketStoreActions) => {
     const { t } = useTranslation();
+    const displayText = t('activeMedications', 'Active medications');
+    const headerTitle = t('activeMedications', 'active medications');
+
     const [durationUnits, setDurationUnits] = useState<Array<OpenmrsResource>>([]);
     const [encounterUuid, setEncounterUuid] = useState('');
     const [isLoading, setIsLoading] = useState(true);
@@ -40,7 +43,13 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
     const [isMedicationOrderFormVisible, setIsMedicationOrderFormVisible] = useState(false);
     const [onMedicationOrderFormSigned, setOnMedicationOrderFormSign] =
       useState<(finalizedOrderBasketItem: OrderBasketItem) => void | null>(null);
-    const [activePatientOrders, fetchActivePatientOrders] = usePatientOrders(patientUuid, 'ACTIVE');
+
+    const {
+      data: activePatientOrders,
+      isError,
+      isLoading: isLoadingOrders,
+      isValidating,
+    } = usePatientOrders(patientUuid, 'ACTIVE');
 
     useEffect(() => {
       const abortController = new AbortController();
@@ -79,7 +88,6 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
       const abortController = new AbortController();
       orderDrugs(items, patientUuid, abortController).then((erroredItems) => {
         setItems(erroredItems);
-        fetchActivePatientOrders();
         if (erroredItems.length == 0) {
           closeWorkspace();
         }
@@ -136,20 +144,24 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
                   setItems(newOrders);
                 }}
               />
-
-              {activePatientOrders ? (
-                <MedicationsDetailsTable
-                  title={t('activeMedications', 'Active Medications')}
-                  medications={activePatientOrders}
-                  showDiscontinueButton={true}
-                  showModifyButton={true}
-                  showReorderButton={false}
-                  showAddNewButton={false}
-                />
-              ) : (
-                <DataTableSkeleton />
-              )}
-
+              {(() => {
+                if (isLoadingOrders) return <DataTableSkeleton role="progressbar" />;
+                if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
+                if (activePatientOrders?.length) {
+                  return (
+                    <MedicationsDetailsTable
+                      isValidating={isValidating}
+                      title={t('activeMedications', 'Active Medications')}
+                      medications={activePatientOrders}
+                      showDiscontinueButton={true}
+                      showModifyButton={true}
+                      showReorderButton={false}
+                      showAddNewButton={false}
+                    />
+                  );
+                }
+                return <EmptyState displayText={displayText} headerTitle={headerTitle} />;
+              })()}
               <ButtonSet style={{ marginTop: '2rem' }}>
                 <Button kind="secondary" onClick={handleCancelClicked}>
                   {t('cancel', 'Cancel')}

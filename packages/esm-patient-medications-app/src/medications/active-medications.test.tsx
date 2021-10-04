@@ -1,29 +1,27 @@
 import React from 'react';
-import { screen, render } from '@testing-library/react';
+import { screen } from '@testing-library/react';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
+import { mockDrugOrders } from '../../../../__mocks__/medication.mock';
+import { swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { openmrsFetch } from '@openmrs/esm-framework';
 import ActiveMedications from './active-medications.component';
-import { usePatientOrders } from '../utils/use-current-patient-orders.hook';
-import { mockMedicationOrderByUuidResponse } from '../../../../__mocks__/medication.mock';
 
 const testProps = {
   patientUuid: mockPatient.id,
   showAddMedications: true,
 };
 
-const mockUsePatientOrders = usePatientOrders as jest.Mock;
-
-jest.mock('../utils/use-current-patient-orders.hook', () => ({
-  usePatientOrders: jest.fn(),
-}));
+const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 
 describe('ActiveMedications: ', () => {
-  test('renders the active medications widget', () => {
-    mockUsePatientOrders.mockReturnValue([mockMedicationOrderByUuidResponse.data, jest.fn]);
+  test('renders the active medications widget', async () => {
+    mockOpenmrsFetch.mockReturnValueOnce(mockDrugOrders);
 
     renderActiveMedications();
 
+    await waitForLoadingToFinish();
+
     expect(screen.getByRole('heading', { name: /active medications/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /add/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /previous page/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /next page/i })).toBeInTheDocument();
 
@@ -35,5 +33,5 @@ describe('ActiveMedications: ', () => {
 });
 
 function renderActiveMedications() {
-  render(<ActiveMedications {...testProps} />);
+  swrRender(<ActiveMedications {...testProps} />);
 }

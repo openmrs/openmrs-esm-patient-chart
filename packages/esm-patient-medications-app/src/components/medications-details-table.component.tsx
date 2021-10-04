@@ -5,11 +5,12 @@ import dayjs from 'dayjs';
 import capitalize from 'lodash-es/capitalize';
 import styles from './medications-details-table.scss';
 import {
+  DataTable,
+  Button,
+  InlineLoading,
   OverflowMenu,
   OverflowMenuItem,
-  DataTable,
   Pagination,
-  Button,
   Table,
   TableBody,
   TableCell,
@@ -29,6 +30,7 @@ import { OrderBasketItem } from '../types/order-basket-item';
 import { attach } from '@openmrs/esm-framework';
 
 export interface ActiveMedicationsProps {
+  isValidating?: boolean;
   title?: string;
   medications?: Array<Order> | null;
   showAddNewButton: boolean;
@@ -47,6 +49,7 @@ const MedicationsDetailsTable = connect<
   orderBasketStoreActions,
 )(
   ({
+    isValidating,
     title,
     medications,
     showDiscontinueButton,
@@ -151,6 +154,11 @@ const MedicationsDetailsTable = connect<
       <div className={styles.widgetCard}>
         <div className={styles.cardHeader}>
           <h4>{title}</h4>
+          {isValidating ? (
+            <span>
+              <InlineLoading />
+            </span>
+          ) : null}
           {showAddNewButton && (
             <Button kind="ghost" renderIcon={Add16} iconDescription="Launch order basket" onClick={openOrderBasket}>
               {t('add', 'Add')}
