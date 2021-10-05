@@ -36,9 +36,9 @@ const BiometricsPagination: React.FC<BiometricsPaginationProps> = ({
       <TableContainer>
         <DataTable rows={paginatedBiometrics} headers={tableHeaders} isSortable size="short">
           {({ rows, headers, getHeaderProps, getTableProps }) => (
-            <Table {...getTableProps()}>
+            <Table {...getTableProps()} className={styles.customRow}>
               <TableHead>
-                <TableRow className={styles.customRow}>
+                <TableRow>
                   {headers.map((header) => (
                     <TableHeader
                       className={`${styles.productiveHeading01} ${styles.text02}`}
@@ -53,7 +53,7 @@ const BiometricsPagination: React.FC<BiometricsPaginationProps> = ({
               </TableHead>
               <TableBody>
                 {rows.map((row) => (
-                  <TableRow key={row.id} className={styles.customRow}>
+                  <TableRow key={row.id}>
                     {row.cells.map((cell) => (
                       <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                     ))}

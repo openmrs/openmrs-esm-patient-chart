@@ -35,9 +35,9 @@ const VitalsPagination: React.FC<VitalsPaginationProps> = ({
       <TableContainer>
         <DataTable rows={paginatedVitals} headers={tableHeaders} isSortable={true} size="short">
           {({ rows, headers, getHeaderProps, getTableProps }) => (
-            <Table {...getTableProps()} useZebraStyles>
+            <Table {...getTableProps()} useZebraStyles className={styles.customRow}>
               <TableHead>
-                <TableRow className={styles.customRow}>
+                <TableRow>
                   {headers.map((header) => (
                     <TableHeader
                       className={`${styles.productiveHeading01} ${styles.text02}`}
@@ -52,7 +52,7 @@ const VitalsPagination: React.FC<VitalsPaginationProps> = ({
               </TableHead>
               <TableBody>
                 {rows.map((row) => (
-                  <TableRow key={row.id} className={styles.customRow}>
+                  <TableRow key={row.id}>
                     {row.cells.map((cell) => (
                       <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                     ))}

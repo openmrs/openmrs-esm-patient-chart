@@ -106,10 +106,8 @@
   justify-content: end;
 }
 
-.customRow {
-  display: grid;
-  grid-auto-flow: column;
-  grid-template-columns: max-content;
+.customRow tbody{
+  white-space: nowrap;
 }
 
 .backgroundDataFetchingIndicator {
