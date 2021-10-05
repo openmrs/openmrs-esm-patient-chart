@@ -42,7 +42,7 @@ function setupOpenMRS() {
         slot: 'patient-chart-summary-dashboard-slot',
         load: getAsyncLifecycle(() => import('./overview/recent-overview.component'), options),
         meta: {
-          columnSpan: 2,
+          columnSpan: 4,
         },
         online: true,
         offline: true,
@@ -52,7 +52,7 @@ function setupOpenMRS() {
         slot: 'test-results-filtered-overview',
         load: getAsyncLifecycle(() => import('./overview/external-overview.component'), options),
         meta: {
-          columnSpan: 2,
+          columnSpan: 4,
         },
         online: true,
         offline: true,
