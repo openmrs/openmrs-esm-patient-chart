@@ -12,7 +12,7 @@ import { Button } from 'carbon-components-react';
 import { ExtensionSlot, age } from '@openmrs/esm-framework';
 
 interface PatientBannerProps {
-  patient: fhir.Patient;
+  patient: Pick<fhir.Patient, 'id' | 'name' | 'gender' | 'birthDate' | 'identifier' | 'address' | 'telecom'>;
   patientUuid: string;
   onClick?: (patientUuid: string) => void;
 }
