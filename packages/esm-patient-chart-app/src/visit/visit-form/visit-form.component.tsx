@@ -106,7 +106,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({ isTablet, patientUuid }
           title: t('startVisitTypeError', 'No Visit Type selected'),
           kind: 'error',
           critical: true,
-          description: 'Please select a Vist Type',
+          description: 'Please select a Visit Type',
         });
       }
     },
