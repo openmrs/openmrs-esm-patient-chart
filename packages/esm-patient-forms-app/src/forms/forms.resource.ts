@@ -1,64 +1,59 @@
-import { openmrsObservableFetch } from '@openmrs/esm-framework';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { Encounter, Form } from '../types';
-import uniqBy from 'lodash-es/uniqBy';
+// import { openmrsFetch } from '@openmrs/esm-framework';
+// import { Encounter, FormEncounter, Form, EncounterWithFormRef } from '../types';
+// import uniqBy from 'lodash-es/uniqBy';
+// import useSWR from 'swr';
 
-interface searchResponse {
-  results: Array<Form>;
-}
+// const customFormRepresentation =
+//   '(uuid,name,encounterType:(uuid,name),version,published,retired,resources:(uuid,name,dataType,valueReference))';
+// const customEncounterRepresentation = `custom:(uuid,encounterDatetime,encounterType:(uuid,name),form:${customFormRepresentation}`;
 
-export function fetchAllForms(): Observable<Array<Form>> {
-  return openmrsObservableFetch<searchResponse>(
-    `/ws/rest/v1/form?v=custom:(uuid,name,encounterType:(uuid,name),version,published,retired,resources:(uuid,name,dataType,valueReference))`,
-  ).pipe(
-    map(({ data }) => data),
-    map(({ results }) => results.map((form) => toFormObject(form))),
-  );
-}
+// interface ListResponse<T> {
+//   results: Array<T>;
+// }
 
-export function toFormObject(openmrsRestForm): Form {
-  return {
-    uuid: openmrsRestForm.uuid,
-    name: openmrsRestForm.name || openmrsRestForm.display,
-    published: openmrsRestForm.published,
-    retired: openmrsRestForm.retired,
-    encounterTypeUuid: openmrsRestForm.encounterType ? openmrsRestForm.encounterType.uuid : null,
-    encounterTypeName: openmrsRestForm.encounterType ? openmrsRestForm.encounterType.name : null,
-    lastCompleted: null,
-  };
-}
+// export async function useAllForms() {
+//   const url = `/ws/rest/v1/form?v=custom:${customFormRepresentation}`;
+//   return useSWR(url, (url) => openmrsFetch<ListResponse<FormEncounter>>(url));
+// }
 
-export function fetchPatientEncounters(
-  patientUuid: string,
-  startDate: Date,
-  endDate: Date,
-): Observable<Array<Encounter>> {
-  const customRepresentation = `custom:(uuid,encounterDatetime,encounterType:(uuid,name),form:(uuid,name,encounterType:(uuid,name),version,published,retired,resources:(uuid,name,dataType,valueReference))`;
-  return openmrsObservableFetch<searchResponse>(
-    `/ws/rest/v1/encounter?v=${customRepresentation}&patient=${patientUuid}&fromdate=${startDate.toISOString()}&todate=${endDate.toISOString()}`,
-  ).pipe(
-    map(({ data }) => data),
-    map(({ results }) => results.map((result) => toEncounterObject(result))),
-    map((encounters) => {
-      return uniqBy(
-        encounters
-          .filter((encounter) => encounter.form !== null)
-          .sort(
-            (encounterA, encounterB) => encounterB.encounterDateTime.getTime() - encounterA.encounterDateTime.getTime(),
-          ),
-        'form.uuid',
-      );
-    }),
-  );
-}
+// export async function useEncountersWithFormRef(patientUuid: string, startDate: Date, endDate: Date) {
+//   const url = `/ws/rest/v1/encounter?v=${customEncounterRepresentation}&patient=${patientUuid}&fromdate=${startDate.toISOString()}&todate=${endDate.toISOString()}`;
+//   return useSWR(url, (url) => openmrsFetch<ListResponse<EncounterWithFormRef>>(url));
+// }
 
-export function toEncounterObject(openmrsRestEncounter: any): Encounter {
-  return {
-    uuid: openmrsRestEncounter.uuid,
-    encounterDateTime: new Date(openmrsRestEncounter.encounterDatetime),
-    encounterTypeUuid: openmrsRestEncounter.encounterType ? openmrsRestEncounter.encounterType.uuid : null,
-    encounterTypeName: openmrsRestEncounter.encounterType ? openmrsRestEncounter.encounterType.name : null,
-    form: openmrsRestEncounter.form ? toFormObject(openmrsRestEncounter.form) : null,
-  };
-}
+// export async function
+
+// export async function fetchAllForms() {
+//   const res = await openmrsFetch<ListResponse<FormEncounter>>(`/ws/rest/v1/form?v=custom:${customFormRepresentation}`);
+//   return res.data.results.map(toEnrichedForm);
+// }
+
+// export async function fetchPatientEncountersWithFormRef(patientUuid: string, startDate: Date, endDate: Date) {
+//   const res = await openmrsFetch<ListResponse<EncounterWithFormRef>>(
+//     `/ws/rest/v1/encounter?v=${customEncounterRepresentation}&patient=${patientUuid}&fromdate=${startDate.toISOString()}&todate=${endDate.toISOString()}`,
+//   );
+
+//   const encountersWithForm = res.data.results
+//     .map(toEnrichedEncounter)
+//     .filter((encounter) => !!encounter.form)
+//     .sort((encounterA, encounterB) => encounterB.encounterDatetime.getTime() - encounterA.encounterDatetime.getTime());
+//   return uniqBy(encountersWithForm, 'form.uuid');
+// }
+
+// function toEnrichedEncounter(encounter: EncounterWithFormRef): Encounter {
+//   return {
+//     ...encounter,
+//     encounterDatetime: new Date(encounter.encounterDatetime),
+//     encounterTypeUuid: encounter.encounterType?.uuid,
+//     encounterTypeName: encounter.encounterType?.name,
+//     form: encounter.form ? toEnrichedForm(encounter.form) : null,
+//   };
+// }
+
+// function toEnrichedForm(formEncounter: FormEncounter): Form {
+//   return {
+//     ...formEncounter,
+//     encounterTypeUuid: formEncounter.encounterType?.uuid,
+//     encounterTypeName: formEncounter.encounterType?.name,
+//   };
+// }

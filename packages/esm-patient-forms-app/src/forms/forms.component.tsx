@@ -2,12 +2,10 @@ import React, { useState } from 'react';
 import FormView from './form-view.component';
 import styles from './forms.component.scss';
 import EmptyFormView from './empty-form.component';
-import first from 'lodash-es/first';
 import { ContentSwitcher, Switch, DataTableSkeleton } from 'carbon-components-react';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
-import { useForms } from '../hooks/useForms';
-import { Encounter } from '../types';
+import { useFilledForms } from '../hooks/useForms';
 
 enum FormViewState {
   recommended = 0,
@@ -27,14 +25,14 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
   const { t } = useTranslation();
   const headerTitle = t('forms', 'Forms');
   const [selectedFormView, setSelectedFormView] = useState<FormViewState>(FormViewState.all);
-  const { filledForms, completedForms, encounters, loading, error, forms } = useForms(patientUuid);
+  const { data, error } = useFilledForms(patientUuid);
 
   return (
     <>
-      {loading === true && error.length === 0 && <DataTableSkeleton rowCount={5} />}
-      {loading === false && error.length === 0 && (
+      {!data && !error && <DataTableSkeleton rowCount={5} />}
+      {data && !error && (
         <>
-          {forms.length > 0 ? (
+          {data.length > 0 ? (
             <div className={styles.formsWidgetContainer}>
               <div className={styles.formsHeaderContainer}>
                 <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
@@ -52,10 +50,9 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
               <div style={{ width: '100%' }}>
                 {selectedFormView === FormViewState.completed && (
                   <FormView
-                    forms={completedForms}
+                    forms={data.filter((formInfo) => formInfo.associatedEncounters.length > 0)}
                     patientUuid={patientUuid}
                     patient={patient}
-                    encounterUuid={first<Encounter>(encounters)?.uuid}
                     pageSize={pageSize}
                     pageUrl={pageUrl}
                     urlLabel={urlLabel}
@@ -63,10 +60,9 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
                 )}
                 {selectedFormView === FormViewState.all && (
                   <FormView
-                    forms={filledForms}
+                    forms={data}
                     patientUuid={patientUuid}
                     patient={patient}
-                    encounterUuid={first<Encounter>(encounters)?.uuid}
                     pageSize={pageSize}
                     pageUrl={pageUrl}
                     urlLabel={urlLabel}
@@ -84,7 +80,7 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
           )}
         </>
       )}
-      {error.length > 0 && <ErrorState headerTitle={t('errorHeader', 'Forms Error')} error={error[0]} />}
+      {error && <ErrorState headerTitle={t('errorHeader', 'Forms Error')} error={error} />}
     </>
   );
 };
