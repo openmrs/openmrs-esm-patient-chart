@@ -5,7 +5,7 @@ import EmptyFormView from './empty-form.component';
 import { ContentSwitcher, Switch, DataTableSkeleton } from 'carbon-components-react';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
-import { useFilledForms } from '../hooks/useForms';
+import { useForms } from '../hooks/useForms';
 
 enum FormViewState {
   recommended = 0,
@@ -25,7 +25,7 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
   const { t } = useTranslation();
   const headerTitle = t('forms', 'Forms');
   const [selectedFormView, setSelectedFormView] = useState<FormViewState>(FormViewState.all);
-  const { data, error } = useFilledForms(patientUuid);
+  const { data, error } = useForms(patientUuid);
 
   return (
     <>

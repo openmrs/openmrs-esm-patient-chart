@@ -7,7 +7,7 @@ const customFormRepresentation =
   '(uuid,name,encounterType:(uuid,name),version,published,retired,resources:(uuid,name,dataType,valueReference))';
 const customEncounterRepresentation = `custom:(uuid,encounterDatetime,encounterType:(uuid,name),form:${customFormRepresentation}`;
 
-export function useAllForms() {
+export function useFormEncounters() {
   const url = `/ws/rest/v1/form?v=custom:${customFormRepresentation}`;
   return useSWR(url, (url) => openmrsFetch<ListResponse<FormEncounter>>(url));
 }
@@ -21,8 +21,8 @@ export function useEncountersWithFormRef(
   return useSWR(url, (url) => openmrsFetch<ListResponse<EncounterWithFormRef>>(url));
 }
 
-export function useFilledForms(patientUuid: string, startDate?: Date, endDate?: Date) {
-  const allFormsRes = useAllForms();
+export function useForms(patientUuid: string, startDate?: Date, endDate?: Date) {
+  const allFormsRes = useFormEncounters();
   const encountersRes = useEncountersWithFormRef(patientUuid, startDate, endDate);
   const data =
     allFormsRes.data && encountersRes.data
