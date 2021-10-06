@@ -4,9 +4,14 @@ import NotesPagination from './notes-pagination.component';
 import styles from './notes-overview.scss';
 import { useTranslation } from 'react-i18next';
 import { Button, DataTableSkeleton, InlineLoading } from 'carbon-components-react';
-import { EmptyState, ErrorState, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
-import { attach, useVisit } from '@openmrs/esm-framework';
+import { useVisit } from '@openmrs/esm-framework';
 import { useEncounters } from './encounter.resource';
+import {
+  EmptyState,
+  ErrorState,
+  launchPatientWorkspace,
+  launchStartVisitPrompt,
+} from '@openmrs/esm-patient-common-lib';
 
 interface NotesOverviewProps {
   patientUuid: string;
@@ -33,7 +38,7 @@ const NotesMain: React.FC<NotesOverviewProps> = ({
 
   const launchVisitNoteForm = React.useCallback(() => {
     if (currentVisit) {
-      attach('patient-chart-workspace-slot', 'visit-notes-form-workspace');
+      launchPatientWorkspace('visit-notes-form-workspace');
     } else {
       launchStartVisitPrompt();
     }

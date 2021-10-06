@@ -6,9 +6,9 @@ import ChevronUp16 from '@carbon/icons-react/es/chevron--up/16';
 import dayjs from 'dayjs';
 import { Button } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
-import { attach } from '@openmrs/esm-framework';
 import { PatientVitals } from '../vitals.resource';
 import { patientVitalsBiometricsFormWorkspace } from '../../constants';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 
 interface VitalsHeaderTitleProps {
   view: string;
@@ -29,7 +29,7 @@ const VitalsHeaderTitle: React.FC<VitalsHeaderTitleProps> = ({
 
   const launchVitalsBiometricsForm = React.useCallback((e) => {
     e.stopPropagation();
-    attach('patient-chart-workspace-slot', patientVitalsBiometricsFormWorkspace);
+    launchPatientWorkspace(patientVitalsBiometricsFormWorkspace);
   }, []);
 
   return (
