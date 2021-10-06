@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import Medication16 from '@carbon/icons-react/es/medication/16';
 import ShoppingCart16 from '@carbon/icons-react/es/shopping--cart/16';
 import styles from './order-basket-search-results.scss';
 import { Button, Link, Pagination, ClickableTile } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
-import { createErrorHandler } from '@openmrs/esm-framework';
+import { createErrorHandler, useLayoutType } from '@openmrs/esm-framework';
 import { searchMedications } from './drug-search';
 import { OrderBasketItem } from '../types/order-basket-item';
 import { paginate } from '../utils/pagination';
 
 export interface OrderBasketSearchResultsProps {
-  isTablet?: boolean;
   searchTerm: string;
   encounterUuid: string;
   setSearchTerm: (value: string) => void;
@@ -18,13 +16,13 @@ export interface OrderBasketSearchResultsProps {
 }
 
 export default function OrderBasketSearchResults({
-  isTablet,
   searchTerm,
   encounterUuid,
   setSearchTerm,
   onSearchResultClicked,
 }: OrderBasketSearchResultsProps) {
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
   const [searchResults, setSearchResults] = useState<Array<OrderBasketItem>>([]);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);

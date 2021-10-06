@@ -5,21 +5,17 @@ import styles from './order-basket-item.scss';
 import { Button, ClickableTile, Tile } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 import { OrderBasketItem } from '../types/order-basket-item';
+import { useLayoutType } from '@openmrs/esm-framework';
 
 export interface OrderBasketItemTileProps {
-  isTablet?: boolean;
   orderBasketItem: OrderBasketItem;
   onClick: () => void;
   onRemoveClick: () => void;
 }
 
-export default function OrderBasketItemTile({
-  isTablet,
-  orderBasketItem,
-  onClick,
-  onRemoveClick,
-}: OrderBasketItemTileProps) {
+export default function OrderBasketItemTile({ orderBasketItem, onClick, onRemoveClick }: OrderBasketItemTileProps) {
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
 
   // This here is really dirty, but required.
   // If the ref's value is false, we won't react to the ClickableTile's handleClick function.

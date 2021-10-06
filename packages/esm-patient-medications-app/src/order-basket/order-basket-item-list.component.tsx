@@ -4,21 +4,21 @@ import OrderBasketItemTile from './order-basket-item.component';
 import styles from './order-basket-item-list.scss';
 import { useTranslation } from 'react-i18next';
 import { OrderBasketItem } from '../types/order-basket-item';
+import { useLayoutType } from '@openmrs/esm-framework';
 
 export interface OrderBasketItemListProps {
-  isTablet?: boolean;
   orderBasketItems: Array<OrderBasketItem>;
   onItemClicked: (order: OrderBasketItem) => void;
   onItemRemoveClicked: (order: OrderBasketItem) => void;
 }
 
 export default function OrderBasketItemList({
-  isTablet,
   orderBasketItems,
   onItemClicked,
   onItemRemoveClicked,
 }: OrderBasketItemListProps) {
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
   const newOrderBasketItems = orderBasketItems.filter((x) => x.action === 'NEW');
   const renewedOrderBasketItems = orderBasketItems.filter((x) => x.action === 'RENEWED');
   const revisedOrderBasketItems = orderBasketItems.filter((x) => x.action === 'REVISE');
@@ -51,7 +51,6 @@ export default function OrderBasketItemList({
           )}
           {newOrderBasketItems.map((order, index) => (
             <OrderBasketItemTile
-              isTablet={isTablet}
               key={index}
               orderBasketItem={order}
               onClick={() => onItemClicked(order)}
@@ -70,7 +69,6 @@ export default function OrderBasketItemList({
           </h4>
           {renewedOrderBasketItems.map((item, index) => (
             <OrderBasketItemTile
-              isTablet={isTablet}
               key={index}
               orderBasketItem={item}
               onClick={() => onItemClicked(item)}
@@ -89,7 +87,6 @@ export default function OrderBasketItemList({
           </h4>
           {revisedOrderBasketItems.map((item, index) => (
             <OrderBasketItemTile
-              isTablet={isTablet}
               key={index}
               orderBasketItem={item}
               onClick={() => onItemClicked(item)}
@@ -108,7 +105,6 @@ export default function OrderBasketItemList({
           </h4>
           {discontinuedOrderBasketItems.map((item, index) => (
             <OrderBasketItemTile
-              isTablet={isTablet}
               key={index}
               orderBasketItem={item}
               onClick={() => onItemClicked(item)}

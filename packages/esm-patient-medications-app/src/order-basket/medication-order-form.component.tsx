@@ -21,6 +21,7 @@ import {
   HeaderName,
 } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
+import { useLayoutType } from '@openmrs/esm-framework';
 import { OrderBasketItem } from '../types/order-basket-item';
 import { daysDurationUnit } from '../constants';
 import { getCommonMedicationByUuid } from '../api/common-medication';
@@ -39,9 +40,9 @@ export default function MedicationOrderForm({
   durationUnits,
   onSign,
   onCancel,
-  isTablet,
 }: MedicationOrderFormProps) {
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
   const [orderBasketItem, setOrderBasketItem] = useState(initialOrderBasketItem);
   const commonMedication = getCommonMedicationByUuid(orderBasketItem.drug.uuid);
 
