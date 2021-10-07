@@ -41,7 +41,7 @@ export const ContextWindowSizeProvider: React.FC = ({ children }) => {
   const { screenMode } = useWorkspace();
 
   useEffect(() => {
-    if (extensions.length > 0 && screenMode === ScreenModeTypes.normal) {
+    if (extensions.length > 0 && screenMode === ScreenModeTypes.maximize) {
       updateContextWorkspaceWindowSize(ScreenModeTypes.maximize);
     } else {
       updateContextWorkspaceWindowSize(ScreenModeTypes.reopen);
