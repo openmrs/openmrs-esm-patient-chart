@@ -8,13 +8,13 @@ interface FormsProps {
 }
 
 const FormsDetailedOverView: React.FC<FormsProps> = ({ patientUuid, patient }) => {
-  const pageSize: number = 10;
   const { t } = useTranslation();
-  const urlLabel: string = t('goToSummary', 'Go to Summary');
-  const pageUrl: string = `$\{openmrsSpaBase}/patient/${patientUuid}/chart/summary`;
+  const pageSize = 10;
+  const urlLabel = t('goToSummary', 'Go to Summary');
+  const pageUrl = `$\{openmrsSpaBase}/patient/${patientUuid}/chart/summary`;
 
   return (
-    <Forms patientUuid={patientUuid} patient={patient} pageSize={pageSize} urlLabel={urlLabel} pageUrl={pageUrl} />
+    <Forms patientUuid={patientUuid} patient={patient} pageSize={pageSize} pageUrl={pageUrl} urlLabel={urlLabel} />
   );
 };
 

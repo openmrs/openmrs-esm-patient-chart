@@ -129,12 +129,12 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
         labelText=""
         className={styles.formSearchInput}
         placeholder={t('searchForForm', 'Search for a form')}
-        onChange={(evnt) => handleSearch(evnt.target.value)}
+        onChange={(event) => handleSearch(event.target.value)}
       />
       <>
         {searchTerm?.length > 0 && allForms?.length > 0 && (
           <p className={styles.formResultsLabel}>
-            {allForms.length} {t('matchFound', 'match found')}
+            {allForms.length} {t('matchesFound', 'match(es) found')}
           </p>
         )}
         {allForms?.length > 0 && (
@@ -158,8 +158,8 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {rows.map((row) => (
-                        <TableRow key={row.id} onClick={() => launchFormEntry(currentVisit, row.id, patient)}>
+                      {rows.map((row, index) => (
+                        <TableRow key={index} onClick={() => launchFormEntry(currentVisit, row.id, patient)}>
                           {row.cells.map((cell) => withValue(cell, row))}
                         </TableRow>
                       ))}

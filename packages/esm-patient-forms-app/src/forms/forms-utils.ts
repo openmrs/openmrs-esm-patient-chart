@@ -14,7 +14,11 @@ export function filterAvailableAndCompletedForms(
     completed: [],
   };
 
-  forms.forEach((form) => {
+  if (!forms && !encounters) {
+    return availability;
+  }
+
+  forms?.forEach((form) => {
     const completedEncounters = encounters.filter((encounter) => {
       return areFormsEqual(encounter.form, form);
     });

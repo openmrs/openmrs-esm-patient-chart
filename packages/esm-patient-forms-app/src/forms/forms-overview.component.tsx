@@ -8,13 +8,13 @@ interface FormsProps {
 }
 
 const FormsSummaryDashboard: FunctionComponent<FormsProps> = ({ patientUuid, patient }) => {
-  const pageSize: number = 5;
   const { t } = useTranslation();
-  const urlLabel: string = t('seeAll', 'See all');
-  const pageUrl: string = `$\{openmrsSpaBase}/patient/${patientUuid}/chart/forms`;
+  const pageSize: number = 5;
+  const urlLabel = t('seeAll', 'See all');
+  const pageUrl = `$\{openmrsSpaBase}/patient/${patientUuid}/chart/forms`;
 
   return (
-    <Forms patientUuid={patientUuid} patient={patient} pageSize={pageSize} urlLabel={urlLabel} pageUrl={pageUrl} />
+    <Forms patientUuid={patientUuid} patient={patient} pageSize={pageSize} pageUrl={pageUrl} urlLabel={urlLabel} />
   );
 };
 
