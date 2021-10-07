@@ -29,7 +29,7 @@ const Address: React.FC<{ address: fhir.Address }> = ({ address }) => {
 
 const Contact: React.FC<{ telecom: Array<fhir.ContactPoint> }> = ({ telecom }) => {
   const { t } = useTranslation();
-  const value = telecom ? telecom[0].value : '-';
+  const value = telecom && telecom.length ? telecom[0].value : '-';
 
   return (
     <div className={styles.col}>

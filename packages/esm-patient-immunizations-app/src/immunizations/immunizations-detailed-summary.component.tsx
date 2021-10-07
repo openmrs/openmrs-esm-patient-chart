@@ -6,8 +6,8 @@ import first from 'lodash-es/first';
 import isEmpty from 'lodash-es/isEmpty';
 import orderBy from 'lodash-es/orderBy';
 import styles from './immunizations-detailed-summary.scss';
-import { ErrorState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
-import { attach, useConfig, usePagination } from '@openmrs/esm-framework';
+import { ErrorState, launchPatientWorkspace, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
+import { useConfig, usePagination } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { mapFromFHIRImmunizationBundle } from './immunization-mapper';
 import { getImmunizationsConceptSet, performPatientImmunizationsSearch } from './immunizations.resource';
@@ -88,10 +88,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
     }
   }, [patient, patientUuid, immunizationsConfig]);
 
-  const launchImmunizationForm = React.useCallback(
-    () => attach('patient-chart-workspace-slot', 'immunization-form-workspace'),
-    [],
-  );
+  const launchImmunizationForm = React.useCallback(() => launchPatientWorkspace('immunization-form-workspace'), []);
 
   const tableHeader = useMemo(
     () => [

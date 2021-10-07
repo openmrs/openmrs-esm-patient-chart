@@ -5,7 +5,7 @@ import { useWorkspace } from '../hooks/useWorkspace';
 import { ScreenModeTypes } from '../types';
 
 interface WindowSize {
-  size: string;
+  size: ScreenModeTypes;
 }
 
 interface ContextWindowSizeContextShape {
@@ -16,19 +16,16 @@ interface ContextWindowSizeContextShape {
 
 const reducer = (state: WindowSize, action: ScreenModeTypes) => {
   switch (action) {
-    case 'maximize':
-      return { size: 'maximize' };
-    case 'minimize':
-      return { size: 'normal' };
-    case 'hide':
-      return { size: 'hide' };
-    case 'reopen':
-      return { size: 'normal' };
+    case ScreenModeTypes.minimize:
+    case ScreenModeTypes.reopen:
+      return { size: ScreenModeTypes.normal };
+    default:
+      return { size: action };
   }
 };
 
 const ContextWindowSizeContext = createContext<ContextWindowSizeContextShape>({
-  windowSize: { size: 'normal' },
+  windowSize: { size: ScreenModeTypes.normal },
   openWindows: 0,
 });
 
@@ -39,15 +36,15 @@ export const useContextWorkspace = () => {
 
 export const ContextWindowSizeProvider: React.FC = ({ children }) => {
   const extensions = useAssignedExtensionIds(patientChartWorkspaceSlot);
-  const initialValue: WindowSize = { size: 'normal' };
+  const initialValue: WindowSize = { size: ScreenModeTypes.normal };
   const [contextWorkspaceWindowSize, updateContextWorkspaceWindowSize] = React.useReducer(reducer, initialValue);
   const { screenMode } = useWorkspace();
 
   useEffect(() => {
-    if (extensions.length > 0 && screenMode === 'maximize') {
-      updateContextWorkspaceWindowSize('maximize');
+    if (extensions.length > 0 && screenMode === ScreenModeTypes.normal) {
+      updateContextWorkspaceWindowSize(ScreenModeTypes.maximize);
     } else {
-      updateContextWorkspaceWindowSize('reopen');
+      updateContextWorkspaceWindowSize(ScreenModeTypes.reopen);
     }
   }, [extensions.length, screenMode]);
 

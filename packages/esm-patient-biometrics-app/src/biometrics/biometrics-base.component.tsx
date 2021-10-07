@@ -7,9 +7,15 @@ import BiometricsChart from './biometrics-chart.component';
 import BiometricsPagination from './biometrics-pagination.component';
 import { Button, DataTableSkeleton, InlineLoading } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
-import { EmptyState, ErrorState, useVitalsConceptMetadata, withUnit } from '@openmrs/esm-patient-common-lib';
-import { attach, useConfig } from '@openmrs/esm-framework';
+import { useConfig } from '@openmrs/esm-framework';
 import { useBiometrics } from './biometrics.resource';
+import {
+  EmptyState,
+  ErrorState,
+  useVitalsConceptMetadata,
+  launchPatientWorkspace,
+  withUnit,
+} from '@openmrs/esm-patient-common-lib';
 import { ConfigObject } from '../config-schema';
 import { patientVitalsBiometricsFormWorkspace } from '../constants';
 import styles from './biometrics-overview.scss';
@@ -42,9 +48,10 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({
 
   const { data: biometrics, isLoading, isError, isValidating } = useBiometrics(patientUuid);
 
-  const launchBiometricsForm = React.useCallback(() => {
-    attach('patient-chart-workspace-slot', patientVitalsBiometricsFormWorkspace);
-  }, []);
+  const launchBiometricsForm = React.useCallback(
+    () => launchPatientWorkspace(patientVitalsBiometricsFormWorkspace),
+    [],
+  );
 
   const tableHeaders = [
     { key: 'date', header: 'Date and time' },

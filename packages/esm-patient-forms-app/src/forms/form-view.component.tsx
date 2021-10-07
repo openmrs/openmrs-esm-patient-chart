@@ -4,7 +4,7 @@ import EmptyFormView from './empty-form.component';
 import isEmpty from 'lodash-es/isEmpty';
 import first from 'lodash-es/first';
 import debounce from 'lodash-es/debounce';
-import { attach, navigate, usePagination, useVisit, Visit } from '@openmrs/esm-framework';
+import { navigate, usePagination, useVisit, Visit } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
@@ -22,7 +22,7 @@ import {
 } from 'carbon-components-react';
 import { formEntrySub } from './forms-utils';
 import { CoreHTMLForms } from '../core-html-forms';
-import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
+import { PatientChartPagination, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { CompletedFormInfo } from '../hooks/types';
 import dayjs from 'dayjs';
 
@@ -51,7 +51,7 @@ function launchFormEntry(currentVisit: Visit | undefined, formUuid: string, pati
 
 const launchWorkSpace = (formUuid: string, patient: fhir.Patient, visitUuid?: string) => {
   formEntrySub.next({ formUuid, patient, visitUuid });
-  attach('patient-chart-workspace-slot', 'patient-form-entry-workspace');
+  launchPatientWorkspace('patient-form-entry-workspace');
 };
 
 function isHTMLForm(formUuid: string) {
