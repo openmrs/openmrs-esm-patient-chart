@@ -21,6 +21,7 @@ import {
   HeaderName,
 } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
+import { useLayoutType } from '@openmrs/esm-framework';
 import { OrderBasketItem } from '../types/order-basket-item';
 import { daysDurationUnit } from '../constants';
 import { getCommonMedicationByUuid } from '../api/common-medication';
@@ -31,7 +32,7 @@ export interface MedicationOrderFormProps {
   durationUnits: Array<OpenmrsResource>;
   onSign: (finalizedOrder: OrderBasketItem) => void;
   onCancel: () => void;
-  isTablet: boolean;
+  isTablet?: boolean;
 }
 
 export default function MedicationOrderForm({
@@ -39,9 +40,9 @@ export default function MedicationOrderForm({
   durationUnits,
   onSign,
   onCancel,
-  isTablet,
 }: MedicationOrderFormProps) {
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
   const [orderBasketItem, setOrderBasketItem] = useState(initialOrderBasketItem);
   const commonMedication = getCommonMedicationByUuid(orderBasketItem.drug.uuid);
 
@@ -54,10 +55,14 @@ export default function MedicationOrderForm({
           ) : (
             <>
               <span>
-                <strong>{capitalize(orderBasketItem.commonMedicationName)}</strong> &mdash; {orderBasketItem.route.name}{' '}
-                &mdash; {orderBasketItem.dosageUnit.name} &mdash;{' '}
-                <span className={styles.label01}>{t('dose', 'Dose').toUpperCase()}</span> &mdash;{' '}
-                <strong>{orderBasketItem.dosage.dosage}</strong>
+                <strong className={styles.dosageInfo}>
+                  {capitalize(orderBasketItem.commonMedicationName)} ({orderBasketItem.dosage.dosage})
+                </strong>{' '}
+                <span className={styles.bodyShort01}>
+                  &mdash; {orderBasketItem.route.name} &mdash; {orderBasketItem.dosageUnit.name} &mdash;{' '}
+                </span>
+                <span className={styles.caption01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
+                <strong className={styles.dosageInfo}>{orderBasketItem.dosage.dosage}</strong>
               </span>
             </>
           )}
@@ -390,10 +395,10 @@ export default function MedicationOrderForm({
 
         <ButtonSet style={{ marginTop: '2rem' }}>
           <Button kind="secondary" onClick={onCancel}>
-            {t('cancel', 'Cancel')}
+            {t('discard', 'Discard')}
           </Button>
           <Button kind="primary" type="submit">
-            {t('save', 'Save')}
+            {t('saveOrder', 'Save order')}
           </Button>
         </ButtonSet>
       </Form>

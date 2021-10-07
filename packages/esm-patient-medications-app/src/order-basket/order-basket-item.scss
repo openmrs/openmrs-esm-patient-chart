@@ -1,21 +1,49 @@
 @import "../root";
 
+.clickableTileDesktop {
+  margin-bottom: 0.5rem;
+}
+
+.clickableTileTablet {
+  &:not(:last-of-type) {
+    border-bottom: 0.0625rem solid $ui-03;
+  }
+
+  &:nth-child(even) {
+    background-color: $ui-02;
+  }
+
+  &:nth-child(odd) {
+    background-color: $ui-01;
+  }
+}
+
+.orderBasketItemTile {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .orderActionNewLabel {
+  margin-bottom: 0.5625rem;
   @extend .label01;
-  color: $support-02;
+  color: $support-01;
 }
 
 .orderActionRenewLabel {
+  margin-bottom: 0.5625rem;
   @extend .label01;
-  color: $support-02;
+  color: $support-01;
 }
 
 .orderActionRevisedLabel {
+  margin-bottom: 0.5625rem;
   @extend .label01;
   color: $text-02;
 }
 
 .orderActionDiscontinueLabel {
+  margin-bottom: 0.5625rem;
   @extend .label01;
   color: $text-02;
 }
@@ -24,4 +52,34 @@
   color: $danger;
   display: flex;
   align-items: center;
+}
+
+.doseCaption {
+  @include carbon--type-style("body-short-01");  
+  color: $text-02;
+}
+
+.dosageLabel {
+  @include carbon--type-style("productive-heading-01");
+  color: $text-01;
+}
+
+.dosageInfo {
+  @include carbon--type-style("body-short-01");  
+  color: $text-02;
+}
+
+.drugName {
+  @include carbon--type-style("productive-heading-01");
+  color: $text-02;
+}
+
+.indicationLabel {
+  @include carbon--type-style('label-01');
+  color: $text-02;
+}
+
+.removeButton {
+  flex: 0 0 auto; 
+  color: $danger; 
 }
