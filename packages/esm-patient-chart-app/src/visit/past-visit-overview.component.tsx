@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useReducer, useCallback } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import {
   Button,
   DataTable,
@@ -16,60 +16,9 @@ import {
 } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 import { ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { detach, getStartedVisit, getVisitsForPatient, VisitMode, VisitStatus, Visit } from '@openmrs/esm-framework';
-import styles from './past-visit-overview.component.scss';
-import { first } from 'rxjs/operators';
-
-enum ActionTypes {
-  pending = 'pending',
-  resolved = 'resolved',
-  error = 'error',
-}
-interface Pending {
-  type: ActionTypes.pending;
-}
-
-interface Error {
-  type: ActionTypes.error;
-  payload: Error;
-}
-
-interface Resolved {
-  type: ActionTypes.resolved;
-  payload: Array<Visit>;
-}
-
-type Action = Pending | Error | Resolved;
-
-interface PastVisitOverviewState {
-  status: 'pending' | 'resolved' | 'error';
-  patientPastVisits: Array<Visit>;
-  error?: null | Error;
-}
-
-function reducer(state: PastVisitOverviewState, action: Action): PastVisitOverviewState {
-  switch (action.type) {
-    case ActionTypes.pending:
-      return {
-        status: 'pending',
-        ...state,
-      };
-    case ActionTypes.resolved:
-      return {
-        status: 'resolved',
-        patientPastVisits: action.payload,
-        error: null,
-      };
-    case ActionTypes.error:
-      return {
-        status: 'error',
-        patientPastVisits: null,
-        error: action.payload,
-      };
-    default:
-      return state;
-  }
-}
+import { detach, getStartedVisit, VisitMode, VisitStatus } from '@openmrs/esm-framework';
+import { usePastVisits } from './visits-widget/visit.resource';
+import styles from './past-visit-overview.scss';
 
 interface PastVisitOverviewProps {
   patientUuid: string;
@@ -78,10 +27,8 @@ interface PastVisitOverviewProps {
 const PastVisitOverview: React.FC<PastVisitOverviewProps> = ({ patientUuid }) => {
   const { t, i18n } = useTranslation();
   const locale = i18n.language.toLowerCase().replace('_', '-');
-  const [{ status, patientPastVisits, error }, dispatch] = useReducer(reducer, {
-    status: 'pending',
-    patientPastVisits: null,
-  });
+
+  const { data: pastVisits, isError, isLoading } = usePastVisits(patientUuid);
 
   const headerData: Array<DataTableHeader> = useMemo(
     () => [
@@ -93,39 +40,18 @@ const PastVisitOverview: React.FC<PastVisitOverviewProps> = ({ patientUuid }) =>
     [t],
   );
 
-  const rowData = useMemo(
-    () =>
-      patientPastVisits?.length
-        ? patientPastVisits.map((visit, index) => {
-            return {
-              id: `${index}`,
-              startDate: new Date(visit.startDatetime).toLocaleDateString(locale, { dateStyle: 'medium' }),
-              visitType: visit.visitType.display,
-              location: visit.location?.display,
-              endDate: visit.stopDatetime
-                ? new Date(visit.startDatetime).toLocaleDateString(locale, { dateStyle: 'medium' })
-                : '',
-              visit: visit,
-            };
-          })
-        : [],
-    [locale, patientPastVisits],
-  );
-  useEffect(() => {
-    if (patientUuid) {
-      const ac = new AbortController();
-      getVisitsForPatient(patientUuid, ac)
-        .pipe(first())
-        .subscribe(
-          ({ data }) => {
-            dispatch({ type: ActionTypes.resolved, payload: data.results });
-          },
-          (error) => {
-            dispatch({ type: ActionTypes.error, payload: error });
-          },
-        );
-    }
-  }, [patientUuid]);
+  const rowData = useMemo(() => {
+    return pastVisits?.map((visit, index) => ({
+      id: `${index}`,
+      startDate: new Date(visit.startDatetime).toLocaleDateString(locale, { dateStyle: 'medium' }),
+      visitType: visit.visitType.display,
+      location: visit.location?.display,
+      endDate: visit.stopDatetime
+        ? new Date(visit.startDatetime).toLocaleDateString(locale, { dateStyle: 'medium' })
+        : '',
+      visit: visit,
+    }));
+  }, [locale, pastVisits]);
 
   const handleClose = useCallback(() => {
     detach('patient-chart-workspace-slot', 'past-visits-overview');
@@ -136,69 +62,69 @@ const PastVisitOverview: React.FC<PastVisitOverviewProps> = ({ patientUuid }) =>
     handleClose();
   }, [handleClose]);
 
-  return (
-    <>
-      {status === ActionTypes.pending && <DataTableSkeleton />}
-      {status === ActionTypes.resolved && (
-        <>
-          <DataTable headers={headerData} rows={rowData}>
-            {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-              <TableContainer title={t('pastVisit', 'Past Visit')}>
-                <Table {...getTableProps()} useZebraStyles>
-                  <TableHead>
-                    <TableRow>
-                      {headers.map((header) => (
-                        <TableHeader
-                          {...getHeaderProps({
-                            header,
-                            isSortable: header.isSortable,
-                          })}>
-                          {header.header}
-                        </TableHeader>
-                      ))}
-                      <TableHeader />
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {rows.map((row, rowIndex) => (
-                      <TableRow {...getRowProps({ row })}>
-                        {row.cells.map((cell) => (
-                          <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
-                        ))}
-                        <TableCell className="bx--table-column-menu">
-                          <OverflowMenu flipped selectorPrimaryFocus="option-two">
-                            <OverflowMenuItem onClick={handleOpenVisitForm} itemText={t('edit', 'Edit')} />
-                            <OverflowMenuItem
-                              onClick={() => {
-                                getStartedVisit.next({
-                                  mode: VisitMode.LOADING,
-                                  visitData: rowData[rowIndex].visit,
-                                  status: VisitStatus.ONGOING,
-                                });
-                              }}
-                              itemText={t('load', 'Load Visit Info')}
-                            />
-                          </OverflowMenu>
-                        </TableCell>
-                      </TableRow>
+  if (isLoading) {
+    return <DataTableSkeleton role="progressbar" />;
+  }
+  if (isError) {
+    return <ErrorState error={isError} headerTitle={t('pastVisitErrorText', 'Past Visit Error')} />;
+  }
+  if (pastVisits?.length) {
+    return (
+      <>
+        <DataTable headers={headerData} rows={rowData}>
+          {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
+            <TableContainer title={t('pastVisits', 'Past Visits')}>
+              <Table {...getTableProps()} useZebraStyles>
+                <TableHead>
+                  <TableRow>
+                    {headers.map((header) => (
+                      <TableHeader
+                        {...getHeaderProps({
+                          header,
+                          isSortable: header.isSortable,
+                        })}>
+                        {header.header}
+                      </TableHeader>
                     ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            )}
-          </DataTable>
-          <div className={styles.buttonContainer}>
-            <Button onClick={handleClose} kind="secondary">
-              {t('cancel', 'Cancel')}
-            </Button>
-          </div>
-        </>
-      )}
-      {status === ActionTypes.error && (
-        <ErrorState error={error} headerTitle={t('pastVisitErrorText', 'Past Visit Error')} />
-      )}
-    </>
-  );
+                    <TableHeader />
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {rows.map((row, rowIndex) => (
+                    <TableRow {...getRowProps({ row })}>
+                      {row.cells.map((cell) => (
+                        <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+                      ))}
+                      <TableCell className="bx--table-column-menu">
+                        <OverflowMenu flipped selectorPrimaryFocus="option-two">
+                          <OverflowMenuItem onClick={handleOpenVisitForm} itemText={t('edit', 'Edit')} />
+                          <OverflowMenuItem
+                            onClick={() => {
+                              getStartedVisit.next({
+                                mode: VisitMode.LOADING,
+                                visitData: rowData[rowIndex].visit,
+                                status: VisitStatus.ONGOING,
+                              });
+                            }}
+                            itemText={t('loadVisitInfo', 'Load Visit Info')}
+                          />
+                        </OverflowMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+        </DataTable>
+        <div className={styles.buttonContainer}>
+          <Button onClick={handleClose} kind="secondary">
+            {t('cancel', 'Cancel')}
+          </Button>
+        </div>
+      </>
+    );
+  }
 };
 
 export default PastVisitOverview;

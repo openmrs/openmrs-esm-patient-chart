@@ -1,3 +1,55 @@
+import useSWR from 'swr';
+import { openmrsFetch, Visit } from '@openmrs/esm-framework';
+
+export function useVisits(patientUuid: string) {
+  const customRepresentation =
+    'custom:(uuid,encounters:(uuid,encounterDatetime,' +
+    'orders:(uuid,dateActivated,' +
+    'drug:(uuid,name,strength),doseUnits:(uuid,display),' +
+    'dose,route:(uuid,display),frequency:(uuid,display),' +
+    'duration,durationUnits:(uuid,display),numRefills,' +
+    'orderType:(uuid,display),orderer:(uuid,person:(uuid,display))),' +
+    'obs:(uuid,concept:(uuid,display,conceptClass:(uuid,display)),' +
+    'display,groupMembers:(uuid,concept:(uuid,display),' +
+    'value:(uuid,display)),value),encounterType:(uuid,display),' +
+    'encounterProviders:(uuid,display,encounterRole:(uuid,display),' +
+    'provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime';
+
+  const { data, error, isValidating } = useSWR<{ data: { results: Array<Visit> } }, Error>(
+    `/ws/rest/v1/visit?patient=${patientUuid}&v=${customRepresentation}`,
+    openmrsFetch,
+  );
+
+  return {
+    data: data ? data.data.results : null,
+    isError: error,
+    isLoading: !data && !error,
+    isValidating,
+  };
+}
+
+export function usePastVisits(patientUuid: string) {
+  const customRepresentation =
+    'custom:(uuid,encounters:(uuid,encounterDatetime,' +
+    'form:(uuid,name),location:ref,' +
+    'encounterType:ref,encounterProviders:(uuid,display,' +
+    'provider:(uuid,display))),patient:(uuid,uuid),' +
+    'visitType:(uuid,name,display),attributes:(uuid,display,value),location:(uuid,name,display),startDatetime,' +
+    'stopDatetime)';
+
+  const { data, error, isValidating } = useSWR<{ data: { results: Array<Visit> } }, Error>(
+    `/ws/rest/v1/visit?patient=${patientUuid}&v=${customRepresentation}`,
+    openmrsFetch,
+  );
+
+  return {
+    data: data ? data.data.results : null,
+    isError: error,
+    isLoading: !data && !error,
+    isValidating,
+  };
+}
+
 export interface Encounter {
   uuid: string;
   encounterDateTime: string;

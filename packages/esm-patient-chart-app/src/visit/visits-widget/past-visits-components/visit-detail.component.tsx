@@ -19,7 +19,7 @@ interface VisitDetailComponentProps {
 
 const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visit, patientUuid }) => {
   const { t } = useTranslation();
-  const [listView, setView] = useState(true);
+  const [listView, setListView] = useState(true);
   const encounters = useMemo(
     () =>
       visit.encounters.map((encounter: Encounter) => ({
@@ -45,14 +45,14 @@ const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visit, pati
             className={`${styles.toggle} ${listView ? styles.toggleActive : ''}`}
             size="small"
             kind="ghost"
-            onClick={() => setView(true)}>
+            onClick={() => setListView(true)}>
             {t('allEncounters', 'All Encounters')}
           </Button>
           <Button
             className={`${styles.toggle} ${!listView ? styles.toggleActive : ''}`}
             size="small"
             kind="ghost"
-            onClick={() => setView(false)}>
+            onClick={() => setListView(false)}>
             {t('visitSummary', 'Visit Summary')}
           </Button>
         </div>
