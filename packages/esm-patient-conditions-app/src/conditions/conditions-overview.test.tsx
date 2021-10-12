@@ -2,7 +2,8 @@ import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
-import { attach, openmrsFetch, usePagination } from '@openmrs/esm-framework';
+import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { mockConditions, mockFhirConditionsResponse } from '../../../../__mocks__/conditions.mock';
 import { patientChartBasePath, swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import ConditionsOverview from './conditions-overview.component';
@@ -12,7 +13,6 @@ const testProps = {
   patient: mockPatient,
 };
 
-const mockAttach = attach as jest.Mock;
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockUsePagination = usePagination as jest.Mock;
 
@@ -21,12 +21,20 @@ jest.mock('@openmrs/esm-framework', () => {
 
   return {
     ...originalModule,
-    attach: jest.fn(),
     usePagination: jest.fn().mockImplementation(() => ({
       currentPage: 1,
       goTo: () => {},
       results: [],
     })),
+  };
+});
+
+jest.mock('@openmrs/esm-patient-common-lib', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
+
+  return {
+    ...originalModule,
+    launchPatientWorkspace: jest.fn(),
   };
 });
 
@@ -114,8 +122,8 @@ describe('ConditionsOverview: ', () => {
     const recordConditionsLink = screen.getByText(/record conditions/i);
     userEvent.click(recordConditionsLink);
 
-    expect(mockAttach).toHaveBeenCalledTimes(1);
-    expect(mockAttach).toHaveBeenCalledWith('patient-chart-workspace-slot', 'conditions-form-workspace');
+    expect(launchPatientWorkspace).toHaveBeenCalledTimes(1);
+    expect(launchPatientWorkspace).toHaveBeenCalledWith('conditions-form-workspace');
   });
 });
 

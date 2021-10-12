@@ -1,9 +1,9 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import ClinicalViewForm from './clinical-view-form.component';
-import { useClinicalView } from '../store';
 import userEvent from '@testing-library/user-event';
 import { detach } from '@openmrs/esm-framework';
+import { useClinicalView } from '../store';
+import ClinicalViewForm from './clinical-view-form.component';
 
 const mockUseClinicalView = useClinicalView as jest.Mock;
 

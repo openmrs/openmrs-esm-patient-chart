@@ -2,6 +2,7 @@ import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { attach, openmrsFetch } from '@openmrs/esm-framework';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { mockFhirConditionsResponse } from '../../../../__mocks__/conditions.mock';
 import { swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
@@ -10,13 +11,12 @@ import ConditionsDetailedSummary from './conditions-detailed-summary.component';
 const mockAttach = attach as jest.Mock;
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
+jest.mock('@openmrs/esm-patient-common-lib', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
 
   return {
     ...originalModule,
-    attach: jest.fn(),
-    openmrsFetch: jest.fn(),
+    launchPatientWorkspace: jest.fn(),
   };
 });
 
@@ -96,8 +96,8 @@ it('clicking the Add button or Record Conditions link launches the conditions fo
   const recordConditionsLink = screen.getByText(/record conditions/i);
   userEvent.click(recordConditionsLink);
 
-  expect(mockAttach).toHaveBeenCalledTimes(1);
-  expect(mockAttach).toHaveBeenCalledWith('patient-chart-workspace-slot', 'conditions-form-workspace');
+  expect(launchPatientWorkspace).toHaveBeenCalledTimes(1);
+  expect(launchPatientWorkspace).toHaveBeenCalledWith('conditions-form-workspace');
 });
 
 function renderConditionsDetailedSummary() {

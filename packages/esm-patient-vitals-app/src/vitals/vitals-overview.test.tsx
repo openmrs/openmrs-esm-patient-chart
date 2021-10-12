@@ -1,7 +1,7 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { attach, openmrsFetch, usePagination } from '@openmrs/esm-framework';
+import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import {
   formattedVitals,
@@ -12,6 +12,7 @@ import {
 } from '../../../../__mocks__/vitals.mock';
 import { swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import VitalsOverview from './vitals-overview.component';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 
 const testProps = {
   patientUuid: mockPatient.id,
@@ -21,7 +22,6 @@ const testProps = {
   urlLabel: '',
 };
 
-const mockAttach = attach as jest.Mock;
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockUsePagination = usePagination as jest.Mock;
 
@@ -30,6 +30,7 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
 
   return {
     ...originalModule,
+    launchPatientWorkspace: jest.fn(),
     useVitalsConceptMetadata: jest.fn().mockImplementation(() => ({
       data: {
         conceptUnits: mockConceptUnits,
@@ -170,10 +171,11 @@ describe('VitalsOverview: ', () => {
 
     const addVitalsButton = screen.getByLabelText(/Add vitals/i);
     expect(addVitalsButton).toBeInTheDocument();
+
     userEvent.click(addVitalsButton);
 
-    expect(mockAttach).toHaveBeenCalledTimes(1);
-    expect(mockAttach).toHaveBeenCalledWith('patient-chart-workspace-slot', 'patient-vitals-biometrics-form-workspace');
+    expect(launchPatientWorkspace).toHaveBeenCalledTimes(1);
+    expect(launchPatientWorkspace).toHaveBeenCalledWith('patient-vitals-biometrics-form-workspace');
   });
 });
 

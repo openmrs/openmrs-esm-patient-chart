@@ -1,15 +1,24 @@
 import React from 'react';
-import StartVisitOverflowMenuItem from './start-visit.component';
-import { useVisit, attach } from '@openmrs/esm-framework';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useVisit } from '@openmrs/esm-framework';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import StartVisitOverflowMenuItem from './start-visit.component';
 
 const mockUseVisit = useVisit as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => ({
   useVisit: jest.fn(),
-  attach: jest.fn(),
 }));
+
+jest.mock('@openmrs/esm-patient-common-lib', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
+
+  return {
+    ...originalModule,
+    launchPatientWorkspace: jest.fn(),
+  };
+});
 
 describe('StartVisitOverflowMenuItem', () => {
   it('should launch start visit form', () => {
@@ -21,7 +30,7 @@ describe('StartVisitOverflowMenuItem', () => {
 
     userEvent.click(startVisitButton);
 
-    expect(attach).toHaveBeenCalledTimes(1);
-    expect(attach).toHaveBeenCalledWith('patient-chart-workspace-slot', 'start-visit-workspace-form');
+    expect(launchPatientWorkspace).toHaveBeenCalledTimes(1);
+    expect(launchPatientWorkspace).toHaveBeenCalledWith('start-visit-workspace-form');
   });
 });

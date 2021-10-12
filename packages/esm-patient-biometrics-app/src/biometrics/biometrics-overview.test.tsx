@@ -2,7 +2,12 @@ import React from 'react';
 import { screen } from '@testing-library/react';
 import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
-import { mockBiometricsResponse, formattedBiometrics } from '../../../../__mocks__/biometrics.mock';
+import {
+  formattedBiometrics,
+  mockBiometricsResponse,
+  mockConceptMetadata,
+  mockConceptUnits,
+} from '../../../../__mocks__/biometrics.mock';
 import { patientChartBasePath, swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import BiometricsOverview from './biometrics-overview.component';
 
@@ -30,6 +35,20 @@ jest.mock('@openmrs/esm-framework', () => {
       currentPage: 1,
       goTo: () => {},
       results: [],
+    })),
+  };
+});
+
+jest.mock('@openmrs/esm-patient-common-lib', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
+
+  return {
+    ...originalModule,
+    useVitalsConceptMetadata: jest.fn().mockImplementation(() => ({
+      data: {
+        conceptUnits: mockConceptUnits,
+        conceptMetadata: mockConceptMetadata,
+      },
     })),
   };
 });
@@ -73,7 +92,7 @@ describe('BiometricsOverview: ', () => {
     ).toBeInTheDocument();
   });
 
-  it("renders an overview  the patient's biometrics", async () => {
+  it("renders a tabular overview of the patient's biometrics data when available", async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: mockBiometricsResponse });
     mockUsePagination.mockReturnValueOnce({
       currentPage: 1,

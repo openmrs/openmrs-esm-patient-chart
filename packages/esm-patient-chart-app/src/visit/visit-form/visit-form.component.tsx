@@ -75,32 +75,30 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({ isTablet, patientUuid }
       };
 
       if (visitPayload.visitType !== undefined) {
-        saveVisit(visitPayload, new AbortController())
-          .pipe(first())
-          .subscribe(
-            (response) => {
-              if (response.status === 201) {
-                getStartedVisit.next({
-                  mode: VisitMode?.NEWVISIT,
-                  visitData: response.data,
-                  status: VisitStatus?.ONGOING,
-                });
-                handleCloseForm();
-                showToast({
-                  kind: 'success',
-                  description: t('startVisitSuccessfully', 'Visit has been started successfully'),
-                });
-              }
-            },
-            (error) => {
-              showNotification({
-                title: t('startVisitError', 'Error starting current visit'),
-                kind: 'error',
-                critical: true,
-                description: error?.message,
+        saveVisit(visitPayload, new AbortController()).subscribe(
+          (response) => {
+            if (response.status === 201) {
+              getStartedVisit.next({
+                mode: VisitMode?.NEWVISIT,
+                visitData: response.data,
+                status: VisitStatus?.ONGOING,
               });
-            },
-          );
+              handleCloseForm();
+              showToast({
+                kind: 'success',
+                description: t('startVisitSuccessfully', 'Visit has been started successfully'),
+              });
+            }
+          },
+          (error) => {
+            showNotification({
+              title: t('startVisitError', 'Error starting current visit'),
+              kind: 'error',
+              critical: true,
+              description: error?.message,
+            });
+          },
+        );
       } else {
         showNotification({
           title: t('startVisitTypeError', 'No Visit Type selected'),

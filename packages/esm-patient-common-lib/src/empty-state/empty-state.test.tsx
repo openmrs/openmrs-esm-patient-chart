@@ -1,15 +1,17 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { attach } from '@openmrs/esm-framework';
 import { EmptyState } from '.';
+import { launchPatientWorkspace } from '..';
 
-const mockAttach = attach as jest.Mock;
+jest.mock('@openmrs/esm-patient-common-lib', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...(jest.requireActual('@openmrs/esm-framework') as any),
-  attach: jest.fn(),
-}));
+  return {
+    ...originalModule,
+    launchPatientWorkspace: jest.fn(),
+  };
+});
 
 describe('EmptyState: ', () => {
   it('renders an empty state widget card', () => {
@@ -27,11 +29,11 @@ describe('EmptyState: ', () => {
     expect(recordAppointmentsLink).toBeInTheDocument();
     userEvent.click(recordAppointmentsLink);
 
-    expect(mockAttach).toHaveBeenCalledTimes(1);
-    expect(mockAttach).toHaveBeenCalledWith('patient-chart-workspace-slot', 'sample-form-workspace');
+    expect(launchPatientWorkspace).toHaveBeenCalledTimes(1);
+    expect(launchPatientWorkspace).toHaveBeenCalledWith('sample-form-workspace');
   });
 });
 
 function launchAppointmentsForm() {
-  attach('patient-chart-workspace-slot', 'sample-form-workspace');
+  launchPatientWorkspace('sample-form-workspace');
 }
