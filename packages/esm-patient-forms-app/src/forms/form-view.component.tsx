@@ -38,23 +38,25 @@ function startVisitPrompt() {
 
 function launchFormEntry(currentVisit: Visit | undefined, formUuid: string, patient: fhir.Patient) {
   if (currentVisit) {
-    const htmlForm = isHTMLForm(formUuid);
-    isEmpty(htmlForm)
-      ? launchWorkSpace(formUuid, patient, currentVisit?.uuid)
-      : navigate({
-          to: `\${openmrsBase}/htmlformentryui/htmlform/${htmlForm.UIPage}.page?patientId=${patient.id}&definitionUiResource=referenceapplication:htmlforms/${htmlForm.formAppUrl}.xml`,
-        });
+    const htmlForm = findHtmlForm(formUuid);
+    if (isEmpty(htmlForm)) {
+      launchWorkSpace(formUuid, patient, currentVisit?.uuid);
+    } else {
+      navigate({
+        to: `\${openmrsBase}/htmlformentryui/htmlform/${htmlForm.UIPage}.page?patientId=${patient.id}&definitionUiResource=referenceapplication:htmlforms/${htmlForm.formAppUrl}.xml`,
+      });
+    }
   } else {
     startVisitPrompt();
   }
 }
 
-const launchWorkSpace = (formUuid: string, patient: fhir.Patient, visitUuid?: string) => {
+function launchWorkSpace(formUuid: string, patient: fhir.Patient, visitUuid?: string) {
   formEntrySub.next({ formUuid, patient, visitUuid });
   launchPatientWorkspace('patient-form-entry-workspace');
-};
+}
 
-function isHTMLForm(formUuid: string) {
+function findHtmlForm(formUuid: string) {
   const htmlForms = CoreHTMLForms;
   return htmlForms.find((form) => form.formUuid === formUuid);
 }
