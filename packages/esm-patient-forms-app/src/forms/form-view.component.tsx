@@ -139,12 +139,12 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
         labelText=""
         className={styles.formSearchInput}
         placeholder={t('searchForForm', 'Search for a form')}
-        onChange={(evnt) => handleSearch(evnt.target.value)}
+        onChange={(e) => handleSearch(e.target.value)}
       />
       <>
         {searchTerm?.length > 0 && allFormInfos?.length > 0 && (
           <p className={styles.formResultsLabel}>
-            {allFormInfos.length} {t('matchFound', 'match found')}
+            {allFormInfos.length} {t('matchesFound', 'match(es) found')}
           </p>
         )}
         {allFormInfos?.length > 0 && (
