@@ -23,7 +23,7 @@ import {
 import { formEntrySub } from './forms-utils';
 import { CoreHTMLForms } from '../core-html-forms';
 import { PatientChartPagination, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { CompletedFormInfo } from '../hooks/types';
+import { CompletedFormInfo } from '../types';
 import dayjs from 'dayjs';
 
 function startVisitPrompt() {

@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { ListResponse, FormEncounter, EncounterWithFormRef, CompletedFormInfo } from './types';
+import { ListResponse, FormEncounter, EncounterWithFormRef, CompletedFormInfo } from '../types';
 
 const customFormRepresentation =
   '(uuid,name,encounterType:(uuid,name),version,published,retired,resources:(uuid,name,dataType,valueReference))';
@@ -31,8 +31,8 @@ export function useForms(patientUuid: string, startDate?: Date, endDate?: Date) 
 
   return {
     data,
-    error: allFormsRes.error ?? encountersRes.error,
-    isValidating: allFormsRes.isValidating ?? encountersRes.isValidating,
+    error: allFormsRes.error || encountersRes.error,
+    isValidating: allFormsRes.isValidating || encountersRes.isValidating,
   };
 }
 
