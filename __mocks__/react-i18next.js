@@ -31,7 +31,7 @@ const renderNodes = (reactNodes) => {
 
 const useMock = [(k) => k, {}];
 useMock.t = (k, o) => (o && o.defaultValue) || (typeof o === 'string' ? o : k);
-useMock.i18n = { language: 'en_GB' };
+useMock.i18n = { language: 'en_US' };
 
 module.exports = {
   // this mock makes sure any components using the translate HoC receive the t function as a prop

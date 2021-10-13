@@ -1,10 +1,10 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
-import { mockPatient } from '../../../../__mocks__/patient.mock';
-import { getVisitsForPatient, detach, openmrsFetch } from '@openmrs/esm-framework';
 import userEvent from '@testing-library/user-event';
-import PastVisitOverview from './past-visit-overview.component';
+import { mockPatient } from '../../../../__mocks__/patient.mock';
+import { detach, openmrsFetch } from '@openmrs/esm-framework';
 import { swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import PastVisitOverview from './past-visit-overview.component';
 
 const testProps = {
   patientUuid: mockPatient.id,
@@ -67,7 +67,7 @@ describe('PastVisitOverview', () => {
     const tableHeaders = [/Start Date/i, /Type/i, /Location/i, /End Date/i];
     tableHeaders.forEach((header) => expect(screen.getByRole('columnheader', { name: header })).toBeInTheDocument());
 
-    const tableRows = [/7 Sep 2021 ECH Laboratory/i, /3 Sep 2021 Facility Visit Registration Desk/i];
+    const tableRows = [/Sep 7, 2021 ECH Laboratory/i, /Sep 3, 2021 Facility Visit Registration Desk/i];
     tableRows.forEach((header) => expect(screen.getByRole('row', { name: header })).toBeInTheDocument());
 
     const cancelButton = screen.getByRole('button', { name: /Cancel/i });
