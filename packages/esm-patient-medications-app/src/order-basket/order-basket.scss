@@ -3,3 +3,16 @@
 .orderBasketContainer {
   margin: $spacing-05;
 }
+
+.orderBasketContainer :global(.bx--btn-set .bx--btn) {
+  max-width: 50%;
+  height: 4rem;
+}
+
+.spinner :global(.bx--loading__stroke) {
+  stroke: $brand-teal-01;
+}
+
+.activeMedicationsContainer {
+  border: 1px solid $ui-03;
+}

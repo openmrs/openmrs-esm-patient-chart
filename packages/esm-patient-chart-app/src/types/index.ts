@@ -1,7 +1,7 @@
 export enum ScreenModeTypes {
-  'minimize',
-  'maximize',
-  'hide',
-  'reopen',
-  'normal',
+  minimize = 'minimize',
+  maximize = 'maximize',
+  hide = 'hide',
+  reopen = 'reopen',
+  normal = 'normal',
 }

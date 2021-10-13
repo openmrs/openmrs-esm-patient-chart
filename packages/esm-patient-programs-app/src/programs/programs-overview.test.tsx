@@ -1,13 +1,13 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { attach, openmrsFetch, usePagination } from '@openmrs/esm-framework';
+import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { mockEnrolledProgramsResponse } from '../../../../__mocks__/programs.mock';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import ProgramsOverview from './programs-overview.component';
 
-const mockAttach = attach as jest.Mock;
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockUsePagination = usePagination as jest.Mock;
 
@@ -16,13 +16,21 @@ jest.mock('@openmrs/esm-framework', () => {
 
   return {
     ...originalModule,
-    attach: jest.fn(),
     openmrsFetch: jest.fn(),
     usePagination: jest.fn().mockImplementation(() => ({
       currentPage: 1,
       goTo: () => {},
       results: [],
     })),
+  };
+});
+
+jest.mock('@openmrs/esm-patient-common-lib', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
+
+  return {
+    ...originalModule,
+    launchPatientWorkspace: jest.fn(),
   };
 });
 
@@ -96,7 +104,7 @@ describe('ProgramsOverview', () => {
 
     // Clicking "Add" launches the programs form in a workspace
     userEvent.click(addButton);
-    expect(mockAttach).toHaveBeenCalledWith('patient-chart-workspace-slot', 'programs-form-workspace');
+    expect(launchPatientWorkspace).toHaveBeenCalledWith('programs-form-workspace');
   });
 });
 

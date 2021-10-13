@@ -5,6 +5,7 @@ import styles from './order-basket-item.scss';
 import { Button, ClickableTile, Tile } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 import { OrderBasketItem } from '../types/order-basket-item';
+import { useLayoutType } from '@openmrs/esm-framework';
 
 export interface OrderBasketItemTileProps {
   orderBasketItem: OrderBasketItem;
@@ -14,6 +15,7 @@ export interface OrderBasketItemTileProps {
 
 export default function OrderBasketItemTile({ orderBasketItem, onClick, onRemoveClick }: OrderBasketItemTileProps) {
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
 
   // This here is really dirty, but required.
   // If the ref's value is false, we won't react to the ClickableTile's handleClick function.
@@ -24,45 +26,53 @@ export default function OrderBasketItemTile({ orderBasketItem, onClick, onRemove
   const shouldOnClickBeCalled = useRef(true);
 
   const tileContent = (
-    <div
-      style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-      }}>
+    <div className={styles.orderBasketItemTile}>
       <p className={styles.clipTextWithEllipsis}>
         <OrderActionLabel orderBasketItem={orderBasketItem} />
         <br />
         {orderBasketItem.isFreeTextDosage ? (
           <>
-            <strong>{orderBasketItem.drug.concept.display}</strong> &mdash; {orderBasketItem.freeTextDosage}
+            <span className={styles.drugName}>{orderBasketItem.drug.concept.display}</span>
+            <span className={styles.dosageInfo}> &mdash; {orderBasketItem.freeTextDosage}</span>
           </>
         ) : (
           <>
-            <strong>{orderBasketItem.drug.concept.display}</strong> &mdash;{' '}
-            <strong>{orderBasketItem.dosage.dosage}</strong>
-            &mdash; {orderBasketItem.dosageUnit.name} &mdash; {orderBasketItem.route.name} &mdash;{' '}
-            {orderBasketItem.frequency.name}
-          </>
-        )}
-        <br />
-        <span className={styles.label01}>{t('refills', 'Refills').toUpperCase()}</span> {orderBasketItem.numRefills}{' '}
-        &mdash; <span className={styles.label01}>{t('quantity', 'Quantity').toUpperCase()}</span>{' '}
-        {orderBasketItem.pillsDispensed} &mdash;{' '}
-        <span className={styles.label01}>{t('indication', 'Indication').toUpperCase()}</span>{' '}
-        {!!orderBasketItem.indication ? orderBasketItem.indication : <i>{t('none', 'None')}</i>}
-        {!!orderBasketItem.orderError && (
-          <>
-            <br />
-            <span className={styles.orderErrorText}>
-              <Warning16 /> &nbsp; <span className={styles.label01}>{t('error', 'Error').toUpperCase()}</span> &nbsp;
-              {orderBasketItem.orderError.responseBody?.error?.message ?? orderBasketItem.orderError.message}
+            <span className={styles.drugName}>{orderBasketItem.drug.concept.display}</span>
+            <span className={styles.dosageInfo}>
+              {' '}
+              &mdash; {orderBasketItem.dosage.dosage} &mdash; {orderBasketItem.dosageUnit.name}
             </span>
           </>
         )}
+        <br />
+        <span className={styles.label01}>
+          <span className={styles.doseCaption}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
+          <span className={styles.dosageLabel}>{orderBasketItem.dosage.dosage}</span>{' '}
+          <span className={styles.dosageInfo}>
+            &mdash; {orderBasketItem.route.name} &mdash; {orderBasketItem.frequency.name} &mdash;{' '}
+            {t('refills', 'Refills').toUpperCase()} {orderBasketItem.numRefills}{' '}
+            {t('quantity', 'Quantity').toUpperCase()} {orderBasketItem.pillsDispensed}{' '}
+          </span>
+        </span>
+        <br />
+        <span className={styles.label01}>
+          <span className={styles.indicationLabel}>{t('indication', 'Indication').toUpperCase()}</span>{' '}
+          <span className={styles.dosageInfo}>
+            {!!orderBasketItem.indication ? orderBasketItem.indication : <i>{t('none', 'None')}</i>}
+          </span>
+          {!!orderBasketItem.orderError && (
+            <>
+              <br />
+              <span className={styles.orderErrorText}>
+                <Warning16 /> &nbsp; <span className={styles.label01}>{t('error', 'Error').toUpperCase()}</span> &nbsp;
+                {orderBasketItem.orderError.responseBody?.error?.message ?? orderBasketItem.orderError.message}
+              </span>
+            </>
+          )}
+        </span>
       </p>
       <Button
-        style={{ flex: '0 0 auto' }}
+        className={styles.removeButton}
         kind="ghost"
         hasIconOnly={true}
         renderIcon={() => <TrashCan16 />}
@@ -78,7 +88,12 @@ export default function OrderBasketItemTile({ orderBasketItem, onClick, onRemove
   return orderBasketItem.action === 'DISCONTINUE' ? (
     <Tile>{tileContent}</Tile>
   ) : (
-    <ClickableTile handleClick={() => shouldOnClickBeCalled.current && onClick()}>{tileContent}</ClickableTile>
+    <ClickableTile
+      role="listitem"
+      className={isTablet ? styles.clickableTileTablet : styles.clickableTileDesktop}
+      handleClick={() => shouldOnClickBeCalled.current && onClick()}>
+      {tileContent}
+    </ClickableTile>
   );
 }
 

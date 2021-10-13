@@ -41,14 +41,14 @@ const ClinicalViewOverview: React.FC<ClinicalViewOverviewProps> = ({ patientUuid
           className={styles.tabsContentClass}
           tabContentClassName={styles.tabContentClassName}
           onSelectionChange={(event) => setSelectedViewIndex(event)}>
-          {config.clinicalViews.map((tab, index) => (
+          {config?.clinicalViews?.map((tab, index) => (
             <Tab key={index} id={tab.slot} label={tab.slot}>
               {selectedViewIndex !== 0 ? (
                 <ExtensionSlot extensionSlotName={tab.slotName} state={state} />
               ) : (
                 <>
-                  {config?.clinicalViews.length > 1 ? (
-                    tail(config.clinicalViews).map((tab: any, index) => (
+                  {config.clinicalViews.length > 1 ? (
+                    config.clinicalViews.map((tab: any, index) => (
                       <ExtensionSlot key={tab.slot} extensionSlotName={tab.slotName} state={state} />
                     ))
                   ) : (

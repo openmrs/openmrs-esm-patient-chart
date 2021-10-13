@@ -1,13 +1,22 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { attach, openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch } from '@openmrs/esm-framework';
 import { mockEnrolledProgramsResponse } from '../../../../__mocks__/programs.mock';
 import { swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import ProgramsDetailedSummary from './programs-detailed-summary.component';
 
-const mockAttach = attach as jest.Mock;
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
+
+jest.mock('@openmrs/esm-patient-common-lib', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
+
+  return {
+    ...originalModule,
+    launchPatientWorkspace: jest.fn(),
+  };
+});
 
 describe('ProgramsDetailedSummary ', () => {
   it('renders an empty state view when the patient is not enrolled into any programs', async () => {
@@ -66,7 +75,7 @@ describe('ProgramsDetailedSummary ', () => {
 
     // Clicking "Add" launches the programs form in a workspace
     userEvent.click(addButton);
-    expect(mockAttach).toHaveBeenCalledWith('patient-chart-workspace-slot', 'programs-form-workspace');
+    expect(launchPatientWorkspace).toHaveBeenCalledWith('programs-form-workspace');
   });
 });
 

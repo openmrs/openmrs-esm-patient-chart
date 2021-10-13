@@ -7,7 +7,13 @@ import styles from './vitals-overview.scss';
 import VitalsChart from './vitals-chart.component';
 import VitalsPagination from './vitals-pagination.component';
 import { DataTableSkeleton, Button, InlineLoading } from 'carbon-components-react';
-import { EmptyState, ErrorState, useVitalsConceptMetadata, withUnit } from '@openmrs/esm-patient-common-lib';
+import {
+  EmptyState,
+  ErrorState,
+  launchPatientWorkspace,
+  useVitalsConceptMetadata,
+  withUnit,
+} from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { attach } from '@openmrs/esm-framework';
 import { patientVitalsBiometricsFormWorkspace } from '../constants';
@@ -32,7 +38,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
   const conceptUnits = conceptData ? conceptData.conceptUnits : null;
 
   const launchVitalsBiometricsForm = React.useCallback(
-    () => attach('patient-chart-workspace-slot', patientVitalsBiometricsFormWorkspace),
+    () => launchPatientWorkspace(patientVitalsBiometricsFormWorkspace),
     [],
   );
 
