@@ -4,6 +4,7 @@ interface HTMLForm {
   formAppUrl: string;
   UIPage: 'enterHtmlFormWithSimpleUi' | 'enterHtmlFormWithStandardUi';
 }
+
 export const CoreHTMLForms: Array<HTMLForm> = [
   {
     formUuid: 'd2c7532c-fb01-11e2-8ff2-fd54ab5fdb2a',

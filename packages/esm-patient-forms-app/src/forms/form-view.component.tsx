@@ -5,9 +5,7 @@ import isEmpty from 'lodash-es/isEmpty';
 import first from 'lodash-es/first';
 import debounce from 'lodash-es/debounce';
 import { navigate, usePagination, useVisit, Visit } from '@openmrs/esm-framework';
-import { PatientChartPagination } from './pagination-see-all.component';
 import { useTranslation } from 'react-i18next';
-import { Form } from '../types';
 import {
   DataTable,
   Search,
@@ -22,9 +20,11 @@ import {
   DataTableHeader,
   DataTableRow,
 } from 'carbon-components-react';
-import { formatDate, formEntrySub, sortFormLatestFirst } from './forms-utils';
+import { formEntrySub } from './forms-utils';
 import { CoreHTMLForms } from '../core-html-forms';
-import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { PatientChartPagination, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { CompletedFormInfo } from '../types';
+import dayjs from 'dayjs';
 
 function startVisitPrompt() {
   window.dispatchEvent(
@@ -38,52 +38,64 @@ function startVisitPrompt() {
 
 function launchFormEntry(currentVisit: Visit | undefined, formUuid: string, patient: fhir.Patient) {
   if (currentVisit) {
-    const htmlForm = isHTMLForm(formUuid);
-    isEmpty(htmlForm)
-      ? launchWorkSpace(formUuid, patient, currentVisit?.uuid)
-      : navigate({
-          to: `\${openmrsBase}/htmlformentryui/htmlform/${htmlForm.UIPage}.page?patientId=${patient.id}&definitionUiResource=referenceapplication:htmlforms/${htmlForm.formAppUrl}.xml`,
-        });
+    const htmlForm = findHtmlForm(formUuid);
+    if (isEmpty(htmlForm)) {
+      launchWorkSpace(formUuid, patient, currentVisit?.uuid);
+    } else {
+      navigate({
+        to: `\${openmrsBase}/htmlformentryui/htmlform/${htmlForm.UIPage}.page?patientId=${patient.id}&definitionUiResource=referenceapplication:htmlforms/${htmlForm.formAppUrl}.xml`,
+      });
+    }
   } else {
     startVisitPrompt();
   }
 }
 
-const launchWorkSpace = (formUuid: string, patient: fhir.Patient, visitUuid?: string) => {
+function launchWorkSpace(formUuid: string, patient: fhir.Patient, visitUuid?: string) {
   formEntrySub.next({ formUuid, patient, visitUuid });
   launchPatientWorkspace('patient-form-entry-workspace');
-};
+}
 
-function isHTMLForm(formUuid: string) {
+function findHtmlForm(formUuid: string) {
   const htmlForms = CoreHTMLForms;
   return htmlForms.find((form) => form.formUuid === formUuid);
 }
 
+function formatDate(strDate: string | Date) {
+  const date = dayjs(strDate);
+  const today = dayjs(new Date());
+  if (date.date() === today.date() && date.month() === today.month() && date.year() === today.year()) {
+    return `Today @ ${date.format('HH:mm')}`;
+  }
+  return date.format('DD - MMM - YYYY @ HH:mm');
+}
+
 interface FormViewProps {
-  forms: Array<Form>;
+  forms: Array<CompletedFormInfo>;
   patientUuid: string;
   patient: fhir.Patient;
-  encounterUuid?: string;
   pageSize: number;
   pageUrl: string;
   urlLabel: string;
 }
 
-const filterFormsByName = (formName: string, forms: Array<Form>) => {
-  return forms.filter((form) => form.name.toLowerCase().search(formName?.toLowerCase()) !== -1);
-};
-
 const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSize, pageUrl, urlLabel }) => {
   const { t } = useTranslation();
   const { currentVisit } = useVisit(patientUuid);
   const [searchTerm, setSearchTerm] = useState<string>(null);
-  const [allForms, setAllForms] = useState<Array<Form>>(forms);
-  const { results, goTo, currentPage } = usePagination(allForms.sort(sortFormLatestFirst), pageSize);
+  const [allFormInfos, setAllFormInfos] = useState<Array<CompletedFormInfo>>(forms);
+  const { results, goTo, currentPage } = usePagination(
+    allFormInfos.sort((a, b) => (b.lastCompleted?.getTime() ?? 0) - (a.lastCompleted?.getTime() ?? 0)),
+    pageSize,
+  );
 
   const handleSearch = useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), 300), []);
 
   useEffect(() => {
-    setAllForms(!isEmpty(searchTerm) ? filterFormsByName(searchTerm, forms) : forms);
+    const entriesToDisplay = isEmpty(searchTerm)
+      ? forms
+      : forms.filter((formInfo) => formInfo.form.name.toLowerCase().search(searchTerm?.toLowerCase()) !== -1);
+    setAllFormInfos(entriesToDisplay);
   }, [searchTerm, forms]);
 
   const tableHeaders: Array<DataTableHeader> = useMemo(
@@ -99,12 +111,12 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
 
   const tableRows: Array<DataTableRow> = useMemo(
     () =>
-      results.map((form) => {
+      results.map((formInfo) => {
         return {
-          id: form.uuid,
-          lastCompleted: form.lastCompleted && formatDate(form.lastCompleted),
-          formName: form.name,
-          formUuid: form.uuid,
+          id: formInfo.form.uuid,
+          lastCompleted: formInfo.lastCompleted ? formatDate(formInfo.lastCompleted) : undefined,
+          formName: formInfo.form.name,
+          formUuid: formInfo.form.uuid,
         };
       }),
     [results],
@@ -129,15 +141,15 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
         labelText=""
         className={styles.formSearchInput}
         placeholder={t('searchForForm', 'Search for a form')}
-        onChange={(evnt) => handleSearch(evnt.target.value)}
+        onChange={(e) => handleSearch(e.target.value)}
       />
       <>
-        {searchTerm?.length > 0 && allForms?.length > 0 && (
+        {searchTerm?.length > 0 && allFormInfos?.length > 0 && (
           <p className={styles.formResultsLabel}>
-            {allForms.length} {t('matchFound', 'match found')}
+            {allFormInfos.length} {t('matchesFound', 'match(es) found')}
           </p>
         )}
-        {allForms?.length > 0 && (
+        {allFormInfos?.length > 0 && (
           <>
             <TableContainer className={styles.tableContainer}>
               <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="short">
@@ -170,7 +182,7 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
             </TableContainer>
             <PatientChartPagination
               pageNumber={currentPage}
-              totalItems={allForms.length}
+              totalItems={allFormInfos.length}
               currentItems={results.length}
               pageUrl={pageUrl}
               pageSize={pageSize}
@@ -179,7 +191,7 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
             />
           </>
         )}
-        {isEmpty(allForms) && (
+        {isEmpty(allFormInfos) && (
           <EmptyFormView
             action={t('formSearchHint', 'Try searching for the form using an alternative name or keyword')}
           />

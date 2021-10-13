@@ -1,1 +1,14 @@
-{}
+{
+  "formName": "Form Name (A-Z)",
+  "forms": "Forms",
+  "formSearchHint": "Try searching for the form using an alternative name or keyword",
+  "goToSummary": "Go to Summary",
+  "lastCompleted": "Last Completed",
+  "matchesFound": "match(es) found",
+  "never": "Never",
+  "noFormsAvailable": "There are no Forms to display for this patient",
+  "noFormsFound": "Sorry, no forms have been found",
+  "noRecommendedFormsAvailable": "No recommended forms available at the moment",
+  "searchForForm": "Search for a form",
+  "seeAll": "See all"
+}
