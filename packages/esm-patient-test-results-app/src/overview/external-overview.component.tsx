@@ -33,7 +33,7 @@ const RecentOverview: React.FC<ExternalOverviewProps> = ({ patientUuid, filter }
                     <Button
                       kind="ghost"
                       renderIcon={ArrowRight16}
-                      iconDescription="Add conditions"
+                      iconDescription="See all results"
                       onClick={handleSeeAll}>
                       {t('seeAllResults', 'See all results')}
                     </Button>
