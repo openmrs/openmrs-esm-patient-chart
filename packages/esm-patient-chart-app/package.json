@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-chart-app",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "license": "MPL-2.0",
   "description": "Patient dashboard microfrontend for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-patient-chart-app.js",
@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "@carbon/icons-react": "^10.18.0",
-    "@openmrs/esm-patient-common-lib": "^3.0.1",
+    "@openmrs/esm-patient-common-lib": "^3.0.2",
     "carbon-components-react": "^7.25.0",
     "lodash-es": "^4.17.15",
     "uuid": "^8.3.2"
