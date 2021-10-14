@@ -55,8 +55,8 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({
 
   const tableHeaders = [
     { key: 'date', header: 'Date and time' },
-    { key: 'weight', header: withUnit('Weight', conceptUnits?.[3] ?? '') },
-    { key: 'height', header: withUnit('Height', conceptUnits?.[4] ?? '') },
+    { key: 'weight', header: withUnit('Weight', conceptUnits?.[4] ?? '') },
+    { key: 'height', header: withUnit('Height', conceptUnits?.[3] ?? '') },
     { key: 'bmi', header: `BMI (${bmiUnit})` },
     { key: 'muac', header: withUnit('MUAC', conceptUnits?.[7] ?? '') },
   ];
