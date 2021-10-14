@@ -103,7 +103,8 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, isTablet }) =>
             invalidText={t('required', 'Required')}
             labelText=""
             light={isTablet}
-            onChange={(event) => setSelectedProgram(event.target.value)}>
+            onChange={(event) => setSelectedProgram(event.target.value)}
+          >
             {!selectedProgram ? <SelectItem text={t('chooseProgram', 'Choose a program')} value="" /> : null}
             {eligiblePrograms?.length > 0 &&
               eligiblePrograms.map((program) => (
@@ -131,7 +132,8 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, isTablet }) =>
           maxDate={new Date().toISOString()}
           placeholder="dd/mm/yyyy"
           onChange={([date]) => setEnrollmentDate(date)}
-          value={enrollmentDate}>
+          value={enrollmentDate}
+        >
           <DatePickerInput id="enrollmentDateInput" labelText="" />
         </DatePicker>
       </FormGroup>
@@ -145,7 +147,8 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, isTablet }) =>
           maxDate={new Date().toISOString()}
           placeholder="dd/mm/yyyy"
           onChange={([date]) => setCompletionDate(date)}
-          value={completionDate}>
+          value={completionDate}
+        >
           <DatePickerInput id="completionDateInput" labelText="" />
         </DatePicker>
       </FormGroup>
@@ -156,7 +159,8 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, isTablet }) =>
           labelText=""
           light={isTablet}
           onChange={(event) => setUserLocation(event.target.value)}
-          value={userLocation}>
+          value={userLocation}
+        >
           {!userLocation ? <SelectItem text={t('chooseLocation', 'Choose a location')} value="" /> : null}
           {availableLocations?.length > 0 &&
             availableLocations.map((location) => (

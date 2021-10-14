@@ -156,7 +156,8 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
         className={styles.overview}
         onPaste={(e) => handleUpload(e, e.clipboardData.files)}
         onDrop={(e) => handleUpload(e, e.dataTransfer.files)}
-        onDragOver={handleDragOver}>
+        onDragOver={handleDragOver}
+      >
         {attachments.some((m) => m.isSelected) && (
           <UserHasAccess privilege="Delete Attachment">
             <div className={styles.actions}>
@@ -169,7 +170,8 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
         {attachments.length ? (
           <div
             id="container"
-            className={`${styles.galleryContainer} ${layOutType === 'phone' ? styles.mobileLayout : ''}`}>
+            className={`${styles.galleryContainer} ${layOutType === 'phone' ? styles.mobileLayout : ''}`}
+          >
             <div className={styles.attachmentsHeader}>
               <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{t('attachments', 'Attachments')}</h4>
               <Button kind="ghost" renderIcon={Add16} iconDescription="Add attachment" onClick={showCam}>

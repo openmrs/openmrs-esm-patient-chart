@@ -57,7 +57,8 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, onC
                     <span className={styles.actionsButtonText}>{t('actions', 'Actions')}</span>{' '}
                     <OverflowMenuVertical16 style={{ marginLeft: '0.5rem' }} />
                   </>
-                }>
+                }
+              >
                 <ExtensionSlot
                   extensionSlotName="patient-actions-slot"
                   key="patient-actions-slot"
@@ -78,7 +79,8 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, onC
               renderIcon={showContactDetails ? ChevronUp16 : ChevronDown16}
               iconDescription="Toggle contact details"
               onClick={toggleContactDetails}
-              style={{ marginTop: '-0.25rem' }}>
+              style={{ marginTop: '-0.25rem' }}
+            >
               {showContactDetails ? t('showLess', 'Show less') : t('showAllDetails', 'Show all details')}
             </Button>
           </div>

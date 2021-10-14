@@ -44,7 +44,8 @@ export const ActionMenu: React.FC<ActionMenuInterface> = ({ open }) => {
         iconDescription="WorkSpace Items"
         className={`${styles.iconButton} ${openWindows > 0 && styles.activeIconButton} `}
         kind="ghost"
-        hasIconOnly>
+        hasIconOnly
+      >
         <div>
           <Pen20 /> {windowSize.size === ScreenModeTypes.hide && <WarningFilled16 className={styles.warningButton} />}
         </div>

@@ -71,7 +71,8 @@ const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = ({ patient, 
               kind="ghost"
               renderIcon={Add16}
               iconDescription="Add immunizations"
-              onClick={launchImmunizationsForm}>
+              onClick={launchImmunizationsForm}
+            >
               {t('add', 'Add')}
             </Button>
           </div>
@@ -87,7 +88,8 @@ const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = ({ patient, 
                           {...getHeaderProps({
                             header,
                             isSortable: header.isSortable,
-                          })}>
+                          })}
+                        >
                           {header.header?.content ?? header.header}
                         </TableHeader>
                       ))}

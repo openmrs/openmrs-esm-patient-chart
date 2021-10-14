@@ -88,7 +88,8 @@ const EncounterListDataTable: React.FC<EncounterListProps> = ({ encounters, visi
                       <TableExpandedRow
                         className={styles.expandedRow}
                         style={{ paddingLeft: isDesktop ? '3rem' : '4rem' }}
-                        colSpan={headers.length + 2}>
+                        colSpan={headers.length + 2}
+                      >
                         <div style={{ marginLeft: headerWidth }}>
                           <EncounterObservations observations={encounters[ind].obs} />
                         </div>

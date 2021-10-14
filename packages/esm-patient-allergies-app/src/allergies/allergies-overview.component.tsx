@@ -89,7 +89,8 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient, showAddA
                         {...getHeaderProps({
                           header,
                           isSortable: header.isSortable,
-                        })}>
+                        })}
+                      >
                         {header.header?.content ?? header.header}
                       </TableHeader>
                     ))}

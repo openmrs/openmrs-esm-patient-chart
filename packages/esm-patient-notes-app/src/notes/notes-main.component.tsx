@@ -60,7 +60,8 @@ const NotesMain: React.FC<NotesOverviewProps> = ({
                     kind="ghost"
                     renderIcon={Add16}
                     iconDescription="Add visit note"
-                    onClick={launchVisitNoteForm}>
+                    onClick={launchVisitNoteForm}
+                  >
                     {t('add', 'Add')}
                   </Button>
                 )}

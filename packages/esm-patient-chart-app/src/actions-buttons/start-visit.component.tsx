@@ -23,7 +23,8 @@ const StartVisitOverflowMenuItem: React.FC<StartVisitOverflowMenuItemProps> = ({
           onClick={handleClick}
           style={{
             maxWidth: '100vw',
-          }}>
+          }}
+        >
           <span className="bx--overflow-menu-options__option-content">{t('startVisit', 'Start visit')}</span>
         </button>
       </li>

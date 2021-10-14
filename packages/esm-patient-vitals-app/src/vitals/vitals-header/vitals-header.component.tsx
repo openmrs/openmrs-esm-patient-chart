@@ -36,7 +36,8 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
             latestVitals && Object.keys(latestVitals)?.length && !dayjs(latestVitals.date).isToday()
               ? styles.warningBackground
               : styles.defaultBackground
-          } ${styles.vitalHeaderStateContainer}`}>
+          } ${styles.vitalHeaderStateContainer}`}
+        >
           <VitalsHeaderTitle
             showDetails={showDetails}
             showRecordVitals={showRecordVitals}

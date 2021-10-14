@@ -5,5 +5,4 @@ module.exports = {
   bracketSpacing: true,
   parser: 'typescript',
   semi: true,
-  jsxBracketSameLine: true,
 };

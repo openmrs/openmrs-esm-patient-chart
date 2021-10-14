@@ -50,7 +50,8 @@ const ContextWorkspace: React.FC<RouteComponentProps<ContextWorkspaceParams>> = 
     <aside
       className={`${styles.contextWorkspaceContainer} ${openContextWorkspace ? styles.show : styles.hide} ${
         size === ScreenModeTypes.maximize && styles.maximized
-      }`}>
+      }`}
+    >
       <Header aria-label={title} style={{ position: 'sticky' }}>
         <HeaderName prefix="">{title}</HeaderName>
         <HeaderGlobalBar>
@@ -61,13 +62,15 @@ const ContextWorkspace: React.FC<RouteComponentProps<ContextWorkspaceParams>> = 
                 : updateWindowSize(ScreenModeTypes.maximize);
             }}
             aria-label={t('maximize', 'Maximize')}
-            title={t('maximize', 'Maximize')}>
+            title={t('maximize', 'Maximize')}
+          >
             <Icon />
           </HeaderGlobalAction>
           <HeaderGlobalAction
             aria-label={t('hide', 'Hide workspace')}
             title={t('hide', 'Hide workspace')}
-            onClick={() => updateWindowSize(ScreenModeTypes.hide)}>
+            onClick={() => updateWindowSize(ScreenModeTypes.hide)}
+          >
             <ArrowRight16 />
           </HeaderGlobalAction>
         </HeaderGlobalBar>

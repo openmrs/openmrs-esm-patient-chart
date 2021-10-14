@@ -84,7 +84,8 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid }) 
               key={ind}
               className={`${styles.diagnosis} ${
                 d.order === 'Primary' ? styles.primaryDiagnose : styles.secondaryDiagnose
-              }`}>
+              }`}
+            >
               {d.diagnosis}
             </span>
           ))
@@ -99,21 +100,24 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid }) 
           className={`${styles.tab} ${styles.bodyLong01} ${tabSelected === 0 && styles.selectedTab}`}
           onClick={() => setSelectedTab(0)}
           id="notes-tab"
-          label={t('notes', 'Notes')}>
+          label={t('notes', 'Notes')}
+        >
           <NotesSummary notes={notes} />
         </Tab>
         <Tab
           className={`${styles.tab} ${tabSelected === 1 && styles.selectedTab}`}
           onClick={() => setSelectedTab(1)}
           id="tests-tab"
-          label={t('tests', 'Tests')}>
+          label={t('tests', 'Tests')}
+        >
           <TestsSummary patientUuid={patientUuid} encounters={encounters as Array<Encounter>} />
         </Tab>
         <Tab
           className={`${styles.tab} ${tabSelected === 2 && styles.selectedTab}`}
           onClick={() => setSelectedTab(2)}
           id="tab-3"
-          label={t('medications', 'Medications')}>
+          label={t('medications', 'Medications')}
+        >
           <MedicationSummary medications={medications} />
         </Tab>
       </Tabs>

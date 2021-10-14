@@ -34,7 +34,8 @@ const RecentOverview: React.FC<ExternalOverviewProps> = ({ patientUuid, filter }
                       kind="ghost"
                       renderIcon={ArrowRight16}
                       iconDescription="See all results"
-                      onClick={handleSeeAll}>
+                      onClick={handleSeeAll}
+                    >
                       {t('seeAllResults', 'See all results')}
                     </Button>
                   </div>

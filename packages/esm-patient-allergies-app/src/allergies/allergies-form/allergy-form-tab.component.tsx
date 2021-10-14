@@ -20,7 +20,8 @@ const AllergyFormTab: React.FC<AllergyFormTabProps> = ({ allergens, selectedAlle
       name={name}
       valueSelected={selectedAllergen}
       orientation="vertical"
-      onChange={handleOnChange}>
+      onChange={handleOnChange}
+    >
       {allergens?.map((allergen) => (
         <RadioButton key={allergen.uuid} labelText={allergen.display} value={allergen.uuid} />
       ))}

@@ -138,7 +138,8 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
                   formChanged: immunization.formChanged,
                 });
                 launchImmunizationForm();
-              }}></Button>
+              }}
+            ></Button>
           ),
         };
       }),

@@ -40,7 +40,8 @@ const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({ match
               windowSize.size === ScreenModeTypes.normal && openWindows > 0
                 ? styles.closeWorkspace
                 : styles.activeWorkspace
-            }`}>
+            }`}
+          >
             <ExtensionSlot extensionSlotName="breadcrumbs-slot" />
             <aside>
               <ExtensionSlot extensionSlotName="patient-header-slot" state={state} />

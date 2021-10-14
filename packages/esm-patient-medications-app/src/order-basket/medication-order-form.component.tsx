@@ -232,7 +232,8 @@ export default function MedicationOrderForm({
                   </FormGroup>
                   <div
                     className={styles.fullHeightTextAreaContainer}
-                    style={orderBasketItem.asNeeded ? {} : { visibility: 'hidden' }}>
+                    style={orderBasketItem.asNeeded ? {} : { visibility: 'hidden' }}
+                  >
                     <TextArea
                       light={isTablet}
                       labelText={t('prnReason', 'P.R.N. Reason')}
@@ -269,7 +270,8 @@ export default function MedicationOrderForm({
                     ...orderBasketItem,
                     startDate: newStartDate,
                   })
-                }>
+                }
+              >
                 <DatePickerInput
                   id="startDatePicker"
                   placeholder="mm/dd/yyyy"

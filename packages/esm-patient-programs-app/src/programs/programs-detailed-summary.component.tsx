@@ -89,7 +89,8 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = () => {
                         {...getHeaderProps({
                           header,
                           isSortable: header.isSortable,
-                        })}>
+                        })}
+                      >
                         {header.header?.content ?? header.header}
                       </TableHeader>
                     ))}

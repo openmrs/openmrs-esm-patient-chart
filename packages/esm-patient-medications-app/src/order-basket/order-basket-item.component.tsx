@@ -91,7 +91,8 @@ export default function OrderBasketItemTile({ orderBasketItem, onClick, onRemove
     <ClickableTile
       role="listitem"
       className={isTablet ? styles.clickableTileTablet : styles.clickableTileDesktop}
-      handleClick={() => shouldOnClickBeCalled.current && onClick()}>
+      handleClick={() => shouldOnClickBeCalled.current && onClick()}
+    >
       {tileContent}
     </ClickableTile>
   );

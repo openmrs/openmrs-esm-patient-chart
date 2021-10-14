@@ -45,7 +45,8 @@ const BiometricsPagination: React.FC<BiometricsPaginationProps> = ({
                       {...getHeaderProps({
                         header,
                         isSortable: header.isSortable,
-                      })}>
+                      })}
+                    >
                       {header.header?.content ?? header.header}
                     </TableHeader>
                   ))}

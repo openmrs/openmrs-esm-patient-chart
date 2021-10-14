@@ -128,7 +128,8 @@ const ImmunizationsForm: React.FC<ImmunizationsFormProps> = ({ patientUuid }) =>
             value={formState.currentDose.sequenceNumber}
             onChange={onDoseSelect}
             className="immunizationSequenceSelect"
-            labelText={t('sequence', 'Sequence')}>
+            labelText={t('sequence', 'Sequence')}
+          >
             <SelectItem text={t('pleaseSelect', 'Please select')} value="DEFAULT">
               {t('pleaseSelect', 'Please select')}
             </SelectItem>
@@ -150,7 +151,8 @@ const ImmunizationsForm: React.FC<ImmunizationsFormProps> = ({ patientUuid }) =>
           dateFormat="d/m/Y"
           datePickerType="single"
           value={formState.vaccinationDate}
-          onChange={([date]) => updateSingle('vaccinationDate', date.toISOString())}>
+          onChange={([date]) => updateSingle('vaccinationDate', date.toISOString())}
+        >
           <DatePickerInput
             id="date-picker-calendar-id"
             placeholder="dd/mm/yyyy"
@@ -167,7 +169,8 @@ const ImmunizationsForm: React.FC<ImmunizationsFormProps> = ({ patientUuid }) =>
           dateFormat="d/m/Y"
           datePickerType="single"
           value={formState.expirationDate}
-          onChange={([date]) => updateSingle('expirationDate', date.toISOString())}>
+          onChange={([date]) => updateSingle('expirationDate', date.toISOString())}
+        >
           <DatePickerInput
             id="date-picker-calendar-id"
             placeholder="dd/mm/yyyy"
@@ -200,19 +203,22 @@ const ImmunizationsForm: React.FC<ImmunizationsFormProps> = ({ patientUuid }) =>
             enableCreateButtons || enableEditButtons
               ? `${styles.buttonStyles} ${styles.buttonStylesBorder}`
               : styles.buttonStyles
-          }>
+          }
+        >
           <Button
             type="button"
             kind="secondary"
             style={{ width: '50%', marginBottom: '1rem' }}
-            onClick={closeWorkspace}>
+            onClick={closeWorkspace}
+          >
             {t('cancel', 'Cancel')}
           </Button>
           <Button
             type="submit"
             kind="primary"
             style={{ width: '50%', marginBottom: '1rem' }}
-            disabled={isViewEditMode ? !enableEditButtons : !enableCreateButtons}>
+            disabled={isViewEditMode ? !enableEditButtons : !enableCreateButtons}
+          >
             {t('save', 'Save')}
           </Button>
         </div>
