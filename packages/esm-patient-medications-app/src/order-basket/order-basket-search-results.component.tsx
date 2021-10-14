@@ -59,7 +59,8 @@ export default function OrderBasketSearchResults({
               role="listitem"
               key={index}
               className={isTablet ? `${styles.tabletSearchResultTile}` : `${styles.desktopSearchResultTile}`}
-              handleClick={() => handleSearchResultClicked(result, false)}>
+              handleClick={() => handleSearchResultClicked(result, false)}
+            >
               <div className={styles.searchResultTile}>
                 <div className={styles.searchResultTileContent}>
                   <p>

@@ -33,7 +33,8 @@ const StopVisitOverflowMenuItem: React.FC<StopVisitOverflowMenuItemProps> = ({ p
           onClick={handleClick}
           style={{
             maxWidth: '100vw',
-          }}>
+          }}
+        >
           <span className="bx--overflow-menu-options__option-content">{t('endVisit', 'End Visit')}</span>
         </button>
       </li>

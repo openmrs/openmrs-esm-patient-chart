@@ -28,7 +28,8 @@ const FloatingOrderBasketButton = connect<
       }
       onClick={() => {
         launchPatientWorkspace('order-basket-workspace');
-      }}>
+      }}
+    >
       <div className={styles.elementContainer}>
         <span>{t('orderBasket', 'Order Basket')}</span>
         <ShoppingBag16 />

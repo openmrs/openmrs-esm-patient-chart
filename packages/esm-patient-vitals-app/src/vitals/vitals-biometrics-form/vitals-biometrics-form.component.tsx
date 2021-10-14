@@ -412,7 +412,8 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
             disabled={isSubmitting}
             onClick={savePatientVitalsAndBiometrics}
             className={styles.vitalsButton}
-            kind="primary">
+            kind="primary"
+          >
             {t('signAndSave', 'Sign & Save')}
           </Button>
         </Column>

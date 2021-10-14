@@ -40,7 +40,8 @@ const ClinicalViewOverview: React.FC<ClinicalViewOverviewProps> = ({ patientUuid
           type="container"
           className={styles.tabsContentClass}
           tabContentClassName={styles.tabContentClassName}
-          onSelectionChange={(event) => setSelectedViewIndex(event)}>
+          onSelectionChange={(event) => setSelectedViewIndex(event)}
+        >
           {config?.clinicalViews?.map((tab, index) => (
             <Tab key={index} id={tab.slot} label={tab.slot}>
               {selectedViewIndex !== 0 ? (

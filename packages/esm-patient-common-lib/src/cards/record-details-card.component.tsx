@@ -16,7 +16,8 @@ export const RecordDetails: React.FC<RecordDetailsProps> = (props) => {
       styles={{
         width: '100%',
         backgroundColor: 'var(--omrs-color-bg-medium-contrast)',
-      }}>
+      }}
+    >
       <div style={props.styles} className={`omrs-type-body-regular ${styles.detailsCard}`}>
         {props.children}
       </div>

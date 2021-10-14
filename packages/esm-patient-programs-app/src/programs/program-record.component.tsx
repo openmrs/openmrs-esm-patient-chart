@@ -43,7 +43,8 @@ const ProgramRecord: React.FC<ProgramRecordProps> = ({ match }) => {
                 completionDate: patientProgram?.dateCompleted,
                 locationUuid: patientProgram?.location?.uuid,
               })
-            }>
+            }
+          >
             <div className={`omrs-type-body-regular ${styles.programCard}`}>
               <div>
                 <p className="omrs-type-title-3" data-testid="program-name">

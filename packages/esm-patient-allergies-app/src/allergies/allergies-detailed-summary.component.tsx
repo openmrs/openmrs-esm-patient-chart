@@ -65,7 +65,8 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
               <span
                 className={`${styles.allergySeverity} ${
                   allergy.criticality === 'high' ? styles.productiveHeading02 : styles.bodyShort02
-                }`}>
+                }`}
+              >
                 {allergy.criticality}
               </span>
             </p>
@@ -105,7 +106,8 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
                         {...getHeaderProps({
                           header,
                           isSortable: header.isSortable,
-                        })}>
+                        })}
+                      >
                         {header.header?.content ?? header.header}
                       </TableHeader>
                     ))}

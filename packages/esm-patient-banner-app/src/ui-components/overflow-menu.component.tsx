@@ -37,7 +37,8 @@ const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = 
         marginBottom: '-1.5rem',
         marginTop: '-1.25rem',
       }}
-      ref={wrapperRef}>
+      ref={wrapperRef}
+    >
       <button
         className={`bx--overflow-menu__trigger ${showMenu && 'bx--overflow-menu--open'}`}
         aria-haspopup="true"
@@ -52,7 +53,8 @@ const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = 
           color: '#0f62fe',
           outline: '2rem solid transparent',
           boxShadow: showMenu ? '0 2px 6px 0 rgb(0 0 0 / 30%)' : 'none',
-        }}>
+        }}
+      >
         {menuTitle}
       </button>
       <div
@@ -71,7 +73,8 @@ const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = 
           backgroundColor: '#f4f4f4',
           marginRight: '0.2rem',
           boxShadow: '0 6px 6px rgb(0 0 0 / 30%)',
-        }}>
+        }}
+      >
         <ul className="bx--overflow-menu-options__content">{children}</ul>
         <span />
       </div>

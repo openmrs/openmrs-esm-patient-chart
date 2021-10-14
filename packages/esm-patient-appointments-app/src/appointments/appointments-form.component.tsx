@@ -125,7 +125,8 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({ patientUuid, isTabl
           labelText={t('selectLocation', 'Select a location')}
           light={isTablet}
           onChange={(event) => setUserLocation(event.target.value)}
-          value={userLocation}>
+          value={userLocation}
+        >
           {!userLocation ? <SelectItem text={t('chooseLocation', 'Choose a location')} value="" /> : null}
           {locations?.length > 0 &&
             locations.map((location) => (
@@ -143,7 +144,8 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({ patientUuid, isTabl
             dateFormat="d/m/Y"
             light={isTablet}
             value={startDate}
-            onChange={([date]) => setStartDate(date)}>
+            onChange={([date]) => setStartDate(date)}
+          >
             <DatePickerInput
               id="datePickerInput"
               labelText={t('date', 'Date')}
@@ -158,12 +160,14 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({ patientUuid, isTabl
             value={startTime}
             style={{ marginLeft: '0.125rem', flex: 'none' }}
             labelText={t('time', 'Time')}
-            id="time-picker">
+            id="time-picker"
+          >
             <TimePickerSelect
               id="time-picker-select-1"
               onChange={(event) => setTimeFormat(event.target.value as amPm)}
               value={timeFormat}
-              labelText={t('time', 'Time')}>
+              labelText={t('time', 'Time')}
+            >
               <SelectItem value="AM" text="AM" />
               <SelectItem value="PM" text="PM" />
             </TimePickerSelect>
@@ -178,7 +182,8 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({ patientUuid, isTabl
           labelText={t('selectService', 'Select a service')}
           light={isTablet}
           onChange={(event) => setSelectedService(event.target.value)}
-          value={selectedServiceType}>
+          value={selectedServiceType}
+        >
           {!selectedService ? <SelectItem text={t('chooseService', 'Select service')} value="" /> : null}
           {services?.length > 0 &&
             services.map((service) => (
@@ -196,7 +201,8 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({ patientUuid, isTabl
           labelText="Select the type of service"
           light={isTablet}
           onChange={(event) => setSelectedServiceType(event.target.value)}
-          value={selectedServiceType}>
+          value={selectedServiceType}
+        >
           {!selectedServiceType ? <SelectItem text={t('chooseService', 'Select service type')} value="" /> : null}
           {serviceTypes?.length > 0 &&
             serviceTypes.map((serviceType) => (
@@ -215,7 +221,8 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({ patientUuid, isTabl
           labelText={t('selectAppointmentType', 'Select the type of appointment')}
           light={isTablet}
           onChange={(event) => setSelectedAppointmentType(event.target.value)}
-          value={selectedAppointmentType}>
+          value={selectedAppointmentType}
+        >
           {!selectedAppointmentType ? (
             <SelectItem text={t('chooseAppointmentType', 'Choose appointment type')} value="" />
           ) : null}

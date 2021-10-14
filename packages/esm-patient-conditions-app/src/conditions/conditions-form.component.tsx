@@ -184,7 +184,8 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid, isTablet }
                       role="menuitem"
                       className={styles.condition}
                       key={index}
-                      onClick={() => handleConditionChange(condition)}>
+                      onClick={() => handleConditionChange(condition)}
+                    >
                       {condition.display}
                     </li>
                   ))}
@@ -210,7 +211,8 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid, isTablet }
           placeholder="dd/mm/yyyy"
           onChange={([date]) => setOnsetDate(date)}
           value={onsetDate}
-          light={isTablet}>
+          light={isTablet}
+        >
           <DatePickerInput id="onsetDateInput" labelText="" />
         </DatePicker>
       </FormGroup>
@@ -220,7 +222,8 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid, isTablet }
           name="clinicalStatus"
           valueSelected="active"
           orientation="vertical"
-          onChange={(status) => setClinicalStatus(status.toString())}>
+          onChange={(status) => setClinicalStatus(status.toString())}
+        >
           <RadioButton id="active" labelText="Active" value="active" />
           <RadioButton id="inactive" labelText="Inactive" value="inactive" />
         </RadioButtonGroup>
@@ -235,7 +238,8 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid, isTablet }
           placeholder="dd/mm/yyyy"
           onChange={([date]) => setEndDate(date)}
           value={endDate}
-          light={isTablet}>
+          light={isTablet}
+        >
           <DatePickerInput id="endDateInput" labelText={t('endDate', 'End date')} />
         </DatePicker>
       )}

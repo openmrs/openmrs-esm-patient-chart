@@ -38,7 +38,8 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
       <p className={styles.vitalsBiometricInputLabel01}>{title}</p>
       <div
         className={`${styles.textInputContainer} ${disabled && styles.disableInput} ${!inputIsNormal && styles.danger}`}
-        style={{ ...textFieldStyles }}>
+        style={{ ...textFieldStyles }}
+      >
         <div className={styles.centerDiv}>
           {textFields.map((val) => {
             return val.type === 'text' ? (

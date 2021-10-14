@@ -229,7 +229,8 @@ const AllergyForm: React.FC<AllergyFormProps> = ({ isTablet, closeWorkspace, pat
                 <Tabs
                   onSelectionChange={handleAllergenTypeChange}
                   tabContentClassName={styles.allergyFormTabs}
-                  scrollIntoView={true}>
+                  scrollIntoView={true}
+                >
                   <Tab id="tab-1" label={t('drug', 'Drug')}>
                     <AllergyFormTab
                       name={'drug'}
@@ -306,7 +307,8 @@ const AllergyForm: React.FC<AllergyFormProps> = ({ isTablet, closeWorkspace, pat
                 <RadioButtonGroup
                   onChange={(event) => setSeverityOfReaction(event.toString())}
                   name="severityOfWorstReaction"
-                  valueSelected={severityOfReaction}>
+                  valueSelected={severityOfReaction}
+                >
                   <RadioButton id="mild" labelText={t('mild', 'Mild')} value={mildReactionUuid} />
                   <RadioButton id="moderate" labelText={t('moderate', 'Moderate')} value={moderateReactionUuid} />
                   <RadioButton id="severe" labelText={t('severe', 'Severe')} value={severeReactionUuid} />
@@ -318,7 +320,8 @@ const AllergyForm: React.FC<AllergyFormProps> = ({ isTablet, closeWorkspace, pat
                   light={isTablet}
                   maxDate={new Date().toISOString()}
                   dateFormat="m/d/Y"
-                  datePickerType="single">
+                  datePickerType="single"
+                >
                   <DatePickerInput
                     id="date-of-first-onset"
                     placeholder="mm/dd/yyyy"

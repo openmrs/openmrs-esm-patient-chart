@@ -119,7 +119,8 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
                       kind="ghost"
                       renderIcon={Add16}
                       iconDescription="Add vitals"
-                      onClick={launchVitalsBiometricsForm}>
+                      onClick={launchVitalsBiometricsForm}
+                    >
                       {t('add', 'Add')}
                     </Button>
                   )}

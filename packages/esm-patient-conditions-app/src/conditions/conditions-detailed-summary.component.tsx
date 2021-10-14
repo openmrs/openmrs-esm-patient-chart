@@ -84,7 +84,8 @@ const ConditionsDetailedSummary: React.FC = () => {
                         {...getHeaderProps({
                           header,
                           isSortable: header.isSortable,
-                        })}>
+                        })}
+                      >
                         {header.header?.content ?? header.header}
                       </TableHeader>
                     ))}

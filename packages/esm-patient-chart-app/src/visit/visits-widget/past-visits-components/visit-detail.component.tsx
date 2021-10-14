@@ -45,14 +45,16 @@ const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visit, pati
             className={`${styles.toggle} ${listView ? styles.toggleActive : ''}`}
             size="small"
             kind="ghost"
-            onClick={() => setListView(true)}>
+            onClick={() => setListView(true)}
+          >
             {t('allEncounters', 'All Encounters')}
           </Button>
           <Button
             className={`${styles.toggle} ${!listView ? styles.toggleActive : ''}`}
             size="small"
             kind="ghost"
-            onClick={() => setListView(false)}>
+            onClick={() => setListView(false)}
+          >
             {t('visitSummary', 'Visit Summary')}
           </Button>
         </div>

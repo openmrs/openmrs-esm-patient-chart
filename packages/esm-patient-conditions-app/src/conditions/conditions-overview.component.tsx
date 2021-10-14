@@ -85,7 +85,8 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient, basePa
                         {...getHeaderProps({
                           header,
                           isSortable: header.isSortable,
-                        })}>
+                        })}
+                      >
                         {header.header?.content ?? header.header}
                       </TableHeader>
                     ))}

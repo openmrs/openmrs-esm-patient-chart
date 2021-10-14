@@ -219,7 +219,8 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, isTablet }
               light={isTablet}
               maxDate={new Date().toISOString()}
               value={visitDateTime}
-              onChange={([date]) => setVisitDateTime(date)}>
+              onChange={([date]) => setVisitDateTime(date)}
+            >
               <DatePickerInput
                 id="visitDateTimePicker"
                 labelText={t('visitDate', 'Visit date')}
@@ -242,7 +243,8 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, isTablet }
                       key={index}
                       onClose={() => handleRemoveDiagnosis(diagnosis)}
                       style={{ marginRight: '0.5rem' }}
-                      type={index === 0 ? 'red' : 'blue'}>
+                      type={index === 0 ? 'red' : 'blue'}
+                    >
                       {diagnosis.concept.preferredName}
                     </Tag>
                   ))}
@@ -281,7 +283,8 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, isTablet }
                             role="menuitem"
                             className={styles.diagnosis}
                             key={index}
-                            onClick={() => handleAddDiagnosis(diagnosis)}>
+                            onClick={() => handleAddDiagnosis(diagnosis)}
+                          >
                             {diagnosis.concept.preferredName}
                           </li>
                         ))}
@@ -338,7 +341,8 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, isTablet }
               onClick={handleSubmit}
               style={{ width: '50%' }}
               disabled={!selectedDiagnoses.length}
-              type="submit">
+              type="submit"
+            >
               {t('saveAndClose', 'Save & Close')}
             </Button>
           </Column>

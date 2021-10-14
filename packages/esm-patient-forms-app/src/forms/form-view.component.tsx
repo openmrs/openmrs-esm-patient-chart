@@ -128,7 +128,8 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
         style={{
           color: first<DataTableCell>(row.cells).value ? `#0f62fe` : `#525252`,
         }}
-        key={cell.id}>
+        key={cell.id}
+      >
         {cell.value ? cell.value : `${t('never', 'Never')}`}
       </TableCell>
     );
@@ -163,7 +164,8 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
                             {...getHeaderProps({
                               header,
                               isSortable: header.isSortable,
-                            })}>
+                            })}
+                          >
                             {header.header?.content ?? header.header}
                           </TableHeader>
                         ))}

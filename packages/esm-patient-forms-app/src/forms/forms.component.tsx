@@ -52,7 +52,8 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
           <ContentSwitcher
             className={styles.contextSwitcherWidth}
             onChange={(event) => setFormsCategory(event.name as any)}
-            selectedIndex={formsCategory}>
+            selectedIndex={formsCategory}
+          >
             <Switch name={FormsCategory.Recommended} text="Recommended" />
             <Switch name={FormsCategory.Completed} text="Completed" />
             <Switch name={FormsCategory.All} text="All" />

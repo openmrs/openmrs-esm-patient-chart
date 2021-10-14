@@ -43,7 +43,8 @@ const VisitTypeOverview: React.FC<VisitTypeOverviewProps> = ({ isTablet, onChang
         orientation="vertical"
         onChange={onChange}
         name="radio-button-group"
-        valueSelected="default-selected">
+        valueSelected="default-selected"
+      >
         {results.map(({ uuid, display, name }) => (
           <RadioButton key={uuid} className={styles.radioButton} id={name} labelText={display} value={uuid} />
         ))}

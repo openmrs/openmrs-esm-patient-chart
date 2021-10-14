@@ -44,7 +44,8 @@ export default function ConditionRecord(props: ConditionRecordProps) {
                 onsetDateTime: patientCondition?.onsetDateTime,
               });
             }}
-            link="/">
+            link="/"
+          >
             <div className={`omrs-type-body-regular ${styles.conditionCard}`}>
               <div>
                 <p className="omrs-type-title-3">{patientCondition.display}</p>

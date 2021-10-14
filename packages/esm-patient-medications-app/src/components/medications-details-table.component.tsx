@@ -174,7 +174,8 @@ const MedicationsDetailsTable = connect<
                         {...getHeaderProps({
                           header,
                           isSortable: header.isSortable,
-                        })}>
+                        })}
+                      >
                         {header.header}
                       </TableHeader>
                     ))}

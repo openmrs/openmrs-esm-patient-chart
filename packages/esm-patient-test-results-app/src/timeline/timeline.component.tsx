@@ -18,7 +18,8 @@ const DateHeaderGrid = ({ timeColumns, yearColumns, dayColumns, displayShadow })
       top: '0px',
       zIndex: 2,
       boxShadow: displayShadow ? '8px 0 20px 0 rgba(0,0,0,0.15)' : undefined,
-    }}>
+    }}
+  >
     {yearColumns.map(({ year, size }) => {
       return (
         <TimeSlots key={year} style={{ gridColumn: `${size} span` }}>
