@@ -50,15 +50,10 @@ const WorkspaceNotification: React.FC = () => {
   return (
     <ComposedModal open={isOpen} onClose={toggleActive}>
       <ModalHeader>
-        <span className={styles.productiveHeading04}>{t('activeWorkspaceText', `${formName} form is active`)}</span>
+        <span className={styles.productiveHeading04}>{t('activeWorkspaceText', { formName })}</span>
       </ModalHeader>
       <ModalBody>
-        <p className={styles.messageBody}>
-          {t(
-            'workspaceNotificationHelperText',
-            `Please select the below options, to either close ${formName} form and open the new form losing active data or cancel this operation`,
-          )}
-        </p>
+        <p className={styles.messageBody}>{t('workspaceNotificationHelperText', { formName })}</p>
       </ModalBody>
       <div className={styles.buttonContainer}>
         <Button onClick={toggleActive} kind="secondary">

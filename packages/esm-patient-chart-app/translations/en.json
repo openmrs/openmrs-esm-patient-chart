@@ -1,5 +1,5 @@
 {
-  "activeWorkspaceText": "",
+  "activeWorkspaceText": "{formName} form is active",
   "addPastVisit": "Add past visit",
   "addPastVisitText": "You can add past visit, update past visit or add new past visit, Click on one of the buttons below",
   "all": "All",
@@ -54,5 +54,5 @@
   "visitLocation": "Visit Location",
   "visitSummary": "Visit Summary",
   "visitType": "Visit type",
-  "workspaceNotificationHelperText": ""
+  "workspaceNotificationHelperText": "Opening a new form will cause you to loose unsaved work on {formName}."
 }
