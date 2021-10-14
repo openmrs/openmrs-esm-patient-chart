@@ -49,6 +49,8 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
                     !inputIsNormal && styles.danger
                   }`}
                   id={val.name}
+                  type="number"
+                  min={0}
                   name={val.name}
                   onChange={onInputChange}
                   labelText={''}
