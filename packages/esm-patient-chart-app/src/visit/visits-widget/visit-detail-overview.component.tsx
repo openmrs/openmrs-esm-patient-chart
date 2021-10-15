@@ -23,7 +23,9 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
   if (visits?.length) {
     return (
       <div className={styles.container}>
-        <h2 className={`${styles.productiveHeading03} ${styles.encounterHeading}`}>{t('encounters', 'Encounters')}</h2>
+        <h2 className={`${styles.productiveHeading03} ${styles.encounterHeading}`}>
+          {t('encountersHeading', 'Encounters')}
+        </h2>
         {visits.map((visit, index) => (
           <VisitDetailComponent key={index} visit={visit} patientUuid={patientUuid} />
         ))}
