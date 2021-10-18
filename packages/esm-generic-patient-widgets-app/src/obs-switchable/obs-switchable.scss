@@ -2,12 +2,12 @@
 @import "~carbon-components/src/globals/scss/vars";
 @import "~carbon-components/src/globals/scss/mixins";
 
-.vitalsWidgetContainer {
+.widgetContainer {
   background-color: $ui-background;
   border: 1px solid $ui-03;
 }
 
-.vitalsHeaderContainer {
+.headerContainer {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -21,12 +21,12 @@
   margin: 0rem 0.5rem;
 }
 
-.vitalsHeaderContainer h4 {
+.headerContainer h4 {
   @include carbon--type-style('productive-heading-03');
   color: $text-02;
 }
 
-.vitalsHeaderContainer > h4:after {
+.headerContainer > h4:after {
   content: "";
   display: block;
   width: 2rem;
@@ -94,20 +94,16 @@
   }
 }
 
-.vitalsWidgetContainer {
+.widgetContainer {
   background-color: $ui-background;
   position: relative;
 }
 
-.vitalsHeaderActionItems {
+.headerActionItems {
   align-items: center;
   display: flex;
   flex: 1 1 0%;
   justify-content: end;
-}
-
-.customRow tbody{
-  white-space: nowrap;
 }
 
 .backgroundDataFetchingIndicator {

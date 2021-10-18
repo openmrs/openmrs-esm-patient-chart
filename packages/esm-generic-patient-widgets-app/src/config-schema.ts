@@ -1,65 +1,44 @@
 import { Type } from '@openmrs/esm-framework';
-import vitalsConfigSchema, { VitalsConfigObject } from './vitals/vitals-config-schema';
-import biometricsConfigSchema, { BiometricsConfigObject } from './vitals/biometrics-config-schema';
 
 export const configSchema = {
-  concepts: {
-    systolicBloodPressureUuid: {
-      _type: Type.ConceptUuid,
-      _default: '5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  data: {
+    _type: Type.Array,
+    _elements: {
+      concept: {
+        _type: Type.ConceptUuid
+      },
+      label: {
+        _type: Type.String
+      },
+      color: {
+        _type: Type.String
+      }
     },
-    diastolicBloodPressureUuid: {
-      _type: Type.ConceptUuid,
-      _default: '5086AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    },
-    pulseUuid: {
-      _type: Type.ConceptUuid,
-      _default: '5087AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    },
-    temperatureUuid: {
-      _type: Type.ConceptUuid,
-      _default: '5088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    },
-    oxygenSaturationUuid: {
-      _type: Type.ConceptUuid,
-      _default: '5092AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    },
-    heightUuid: {
-      _type: Type.ConceptUuid,
-      _default: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    },
-    weightUuid: {
-      _type: Type.ConceptUuid,
-      _default: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    },
-    respiratoryRateUuid: {
-      _type: Type.ConceptUuid,
-      _default: '5242AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    },
-    generalPatientNoteUuid: {
-      _type: Type.ConceptUuid,
-      _default: '165095AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    },
-    midUpperArmCircumferenceUuid: {
-      _type: Type.ConceptUuid,
-      _default: '1343AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    },
+    _default: [
+      {
+        label: "Height",
+        concept: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        color: "red"
+      },
+      {
+        label: "Weight",
+        concept: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        color: "blue"
+      }
+    ]
   },
-  vitals: vitalsConfigSchema,
-  biometrics: biometricsConfigSchema,
+  table: {
+    pageSize: {
+      _type: Type.Number,
+      _default: 5
+    }
+  }
 };
 
 export interface ConfigObject {
-  concepts: {
-    systolicBloodPressureUuid: string;
-    diastolicBloodPressureUuid: string;
-    pulseUuid: string;
-    temperatureUuid: string;
-    oxygenSaturationUuid: string;
-    heightUuid: string;
-    weightUuid: string;
-    respiratoryRateUuid: string;
-  };
-  vitals: VitalsConfigObject;
-  biometrics: BiometricsConfigObject;
+  data: Array<{
+    concept: string,
+    label: string,
+    color: string
+  }>;
 }

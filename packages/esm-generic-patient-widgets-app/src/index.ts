@@ -1,10 +1,9 @@
-import { defineConfigSchema, fhirBaseUrl, getAsyncLifecycle, messageOmrsServiceWorker } from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 const backendDependencies = {
-  'webservices.rest': '^2.2.0',
   fhir2: '^1.2.0',
 };
 
@@ -13,15 +12,10 @@ const frontendDependencies = {
 };
 
 function setupOpenMRS() {
-  messageOmrsServiceWorker({
-    type: 'registerDynamicRoute',
-    pattern: `${fhirBaseUrl}/Observation.+`,
-  });
-
-  const moduleName = '@openmrs/esm-patient-vitals-app';
+  const moduleName = '@openmrs/esm-generic-patient-widgets-app';
 
   const options = {
-    featureName: 'patient-vitals',
+    featureName: 'Generic widgets',
     moduleName,
   };
 
@@ -31,7 +25,8 @@ function setupOpenMRS() {
     extensions: [
       {
         id: 'obs-by-encounter-widget',
-        load: getAsyncLifecycle(() => import('./obs-by-encounter/obs-by-encounter.component'), options),
+        slot: 'patient-chart-conditions-dashboard-slot',
+        load: getAsyncLifecycle(() => import('./obs-switchable/obs-switchable.component'), options),
         meta: {
           columnSpan: 4,
         }
