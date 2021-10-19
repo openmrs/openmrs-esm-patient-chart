@@ -9,6 +9,8 @@ const testProps = {
   patientUuid: mockPatient.id,
 };
 
+const mockNavigateTo = jest.fn()
+
 jest.mock('@openmrs/esm-framework', () => ({
   ...(jest.requireActual('@openmrs/esm-framework') as any),
   useVisit: jest.fn(),
@@ -22,23 +24,23 @@ describe('PatientBanner: ', () => {
     expect(screen.getByRole('banner')).toBeInTheDocument();
     expect(screen.getByRole('img')).toHaveClass('patientAvatar');
     expect(screen.getByText(/John Wilson/)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Actions/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^Actions$/i })).toBeInTheDocument();
     expect(screen.getByText(/04 - Apr - 1972/i)).toBeInTheDocument();
     expect(screen.getByText(/100732HE, 100GEJ/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Show all details/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^Show all details$/i })).toBeInTheDocument();
   });
 
   it("can toggle between showing or hiding the patient's contact details", () => {
     renderPatientBanner();
 
     const showContactDetailsBtn = screen.getByRole('button', {
-      name: /Show all details/i,
+      name: /^Show all details$/i,
     });
 
     userEvent.click(showContactDetailsBtn);
 
     const showLessBtn = screen.getByRole('button', {
-      name: /Show less/i,
+      name: /^Show less$/i,
     });
     expect(showLessBtn).toBeInTheDocument();
     expect(screen.getByText('Address')).toBeInTheDocument();
@@ -47,6 +49,31 @@ describe('PatientBanner: ', () => {
     userEvent.click(showLessBtn);
 
     expect(showContactDetailsBtn).toBeInTheDocument();
+  });
+
+  it("should allow navigate to patient-chart on patient-search", () => {
+    const patientBannerSeachPageProps = { ...testProps, onClick: mockNavigateTo };
+    render(<PatientBanner {...patientBannerSeachPageProps} />);
+
+    const imgAvatar = screen.getByRole('img');
+    userEvent.click(imgAvatar);
+
+    expect(mockNavigateTo).toHaveBeenCalled();
+    expect(mockNavigateTo).toHaveBeenCalledWith(patientBannerSeachPageProps.patientUuid);
+
+    const showContactDetailsBtn = screen.getByRole('button', {
+      name: /^Show all details$/i,
+    });
+    userEvent.click(showContactDetailsBtn);
+
+    expect(mockNavigateTo).toHaveBeenCalledTimes(1);
+
+    const showLessBtn = screen.getByRole('button', {
+      name: /^Show less$/i,
+    });
+    expect(showLessBtn).toBeInTheDocument();
+    expect(screen.getByText('Address')).toBeInTheDocument();
+    expect(screen.getByText(/Contact Details/i)).toBeInTheDocument();
   });
 });
 
