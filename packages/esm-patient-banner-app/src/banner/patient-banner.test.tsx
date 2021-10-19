@@ -9,7 +9,7 @@ const testProps = {
   patientUuid: mockPatient.id,
 };
 
-const mockNavigateTo = jest.fn()
+const mockNavigateTo = jest.fn();
 
 jest.mock('@openmrs/esm-framework', () => ({
   ...(jest.requireActual('@openmrs/esm-framework') as any),
@@ -51,7 +51,7 @@ describe('PatientBanner: ', () => {
     expect(showContactDetailsBtn).toBeInTheDocument();
   });
 
-  it("should allow navigate to patient-chart on patient-search", () => {
+  it('should allow navigate to patient-chart on patient-search', () => {
     const patientBannerSeachPageProps = { ...testProps, onClick: mockNavigateTo };
     render(<PatientBanner {...patientBannerSeachPageProps} />);
 
