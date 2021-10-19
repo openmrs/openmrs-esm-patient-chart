@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { MouseEvent } from 'react';
 import dayjs from 'dayjs';
 import capitalize from 'lodash-es/capitalize';
 import ChevronDown16 from '@carbon/icons-react/es/chevron--down/16';
@@ -19,25 +19,35 @@ interface PatientBannerProps {
 
 const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, onClick }) => {
   const { t } = useTranslation();
-  const state = React.useMemo(() => ({ patientUuid }), [patientUuid]);
+  const overFlowMenuRef = React.useRef(null);
+  const state = React.useMemo(() => ({ patientUuid, onClick }), [patientUuid, onClick]);
   const [showContactDetails, setShowContactDetails] = React.useState(false);
-  const toggleContactDetails = React.useCallback(() => setShowContactDetails((value) => !value), []);
+  const toggleContactDetails = React.useCallback((event: MouseEvent) => {
+    event.stopPropagation();
+    setShowContactDetails((value) => !value);
+  }, []);
 
   const patientAvatar = (
     <div className={styles.patientAvatar} role="img">
       <ExtensionSlot extensionSlotName="patient-photo-slot" state={state} />
     </div>
   );
+
+  const handleNavigateToPatientChart = (event: MouseEvent) => {
+    if (onClick) {
+      !(overFlowMenuRef?.current && overFlowMenuRef?.current.contains(event.target)) && onClick(patientUuid);
+    }
+  };
+
   return (
     <div className={styles.container} role="banner">
-      <div className={styles.patientBanner}>
-        {onClick ? (
-          <button className={styles.patientAvatarButton} onClick={() => onClick(patientUuid)}>
-            {patientAvatar}
-          </button>
-        ) : (
-          patientAvatar
-        )}
+      <div
+        onClick={handleNavigateToPatientChart}
+        tabIndex={0}
+        role="button"
+        className={`${styles.patientBanner} ${onClick && styles.patientAvatarButton}`}
+      >
+        {patientAvatar}
         <div className={styles.patientInfo}>
           <div className={`${styles.row} ${styles.patientNameRow}`}>
             <div className={styles.flexRow}>
@@ -50,7 +60,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, onC
                 className={styles.flexRow}
               />
             </div>
-            <div>
+            <div ref={overFlowMenuRef}>
               <CustomOverflowMenuComponent
                 menuTitle={
                   <>
