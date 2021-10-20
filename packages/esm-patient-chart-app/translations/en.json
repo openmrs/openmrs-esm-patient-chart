@@ -1,12 +1,10 @@
 {
-  "activeWorkspaceText": "",
   "addPastVisit": "Add past visit",
   "addPastVisitText": "You can add past visit, update past visit or add new past visit, Click on one of the buttons below",
   "all": "All",
   "allEncounters": "All Encounters",
   "cancel": "Cancel",
   "careActivities": "Care Activities",
-  "closeCurrent": "Open new form",
   "date": "Date",
   "dateAndTimeOfVisit": "Date and time of visit",
   "diagnoses": "Diagnoses",
@@ -45,7 +43,6 @@
   "startVisit": "Start visit",
   "startVisitError": "Error starting current visit",
   "startVisitSuccessfully": "Visit has been started successfully",
-  "startVisitTypeError": "No Visit Type selected",
   "tests": "Tests",
   "thereIsNoInformationToDisplayHere": "There is no information to display here",
   "time": "Time",
@@ -53,6 +50,5 @@
   "visitEndSuccessfully": "Ended current visit successfully",
   "visitLocation": "Visit Location",
   "visitSummary": "Visit Summary",
-  "visitType": "Visit type",
-  "workspaceNotificationHelperText": ""
+  "visitType": "Visit type"
 }
