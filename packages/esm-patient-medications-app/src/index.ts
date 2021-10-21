@@ -35,6 +35,7 @@ function setupOpenMRS() {
       {
         id: 'active-medications-widget',
         slot: 'patient-chart-summary-dashboard-slot',
+        order: 1,
         load: getAsyncLifecycle(() => import('./medications/active-medications.component'), options),
         meta: {
           columnSpan: 4,
@@ -55,6 +56,7 @@ function setupOpenMRS() {
       {
         id: 'medications-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
+        order: 3,
         load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
         meta: dashboardMeta,
       },

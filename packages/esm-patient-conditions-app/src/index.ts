@@ -28,6 +28,7 @@ function setupOpenMRS() {
       {
         id: 'conditions-overview-widget',
         slot: 'patient-chart-summary-dashboard-slot',
+        order: 6,
         load: getAsyncLifecycle(() => import('./conditions/conditions-overview.component'), options),
         meta: {
           columnSpan: 4,
@@ -44,6 +45,7 @@ function setupOpenMRS() {
       {
         id: 'conditions-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
+        order: 7,
         load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
         meta: dashboardMeta,
       },
