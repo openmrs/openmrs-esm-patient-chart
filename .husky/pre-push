@@ -7,4 +7,3 @@ npx pretty-quick --staged
 npx lerna run lint
 yarn test
 npx lerna run typescript
-yarn run extract-translations
