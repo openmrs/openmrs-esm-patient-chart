@@ -8,7 +8,7 @@ export function useObs(patientUuid: string): UseObsResult {
 
   const { data: result, error, isValidating } = useSWR<{ data: ObsFetchResponse }, Error>(
     `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&code=` +
-      data.join(',') +
+      data.map(d => d.concept).join(',') +
       '&_summary=data&_sort=-date' +
       `&_count=${pageSize}
   `,
