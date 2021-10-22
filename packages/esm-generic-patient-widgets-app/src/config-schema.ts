@@ -5,40 +5,40 @@ export const configSchema = {
     _type: Type.Array,
     _elements: {
       concept: {
-        _type: Type.ConceptUuid
+        _type: Type.ConceptUuid,
       },
       label: {
-        _type: Type.String
+        _type: Type.String,
       },
       color: {
-        _type: Type.String
-      }
+        _type: Type.String,
+      },
     },
     _default: [
       {
-        label: "Height",
+        label: 'Height',
         concept: '5090AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-        color: "red"
+        color: 'red',
       },
       {
-        label: "Weight",
+        label: 'Weight',
         concept: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-        color: "blue"
-      }
-    ]
+        color: 'blue',
+      },
+    ],
   },
   table: {
     pageSize: {
       _type: Type.Number,
-      _default: 5
-    }
-  }
+      _default: 5,
+    },
+  },
 };
 
 export interface ConfigObject {
   data: Array<{
-    concept: string,
-    label: string,
-    color: string
+    concept: string;
+    label: string;
+    color: string;
   }>;
 }

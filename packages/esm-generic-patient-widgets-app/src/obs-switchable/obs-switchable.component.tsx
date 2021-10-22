@@ -6,10 +6,7 @@ import styles from './obs-switchable.scss';
 import ObsGraph from '../obs-graph/obs-graph.component';
 import ObsTable from '../obs-table/obs-table.component';
 import { DataTableSkeleton, Button, InlineLoading } from 'carbon-components-react';
-import {
-  EmptyState,
-  ErrorState,
-} from '@openmrs/esm-patient-common-lib';
+import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { useObs } from '../resources/useObs';
 
@@ -60,17 +57,11 @@ const ObsSwitchable: React.FC<ObsSwitchableProps> = ({ patientUuid }) => {
                   </div>
                 </div>
               </div>
-              {chartView ? (
-                <ObsGraph patientUuid={patientUuid} />
-              ) : (
-                <ObsTable patientUuid={patientUuid} />
-              )}
+              {chartView ? <ObsGraph patientUuid={patientUuid} /> : <ObsTable patientUuid={patientUuid} />}
             </div>
           );
         }
-        return (
-          <EmptyState displayText={displayText} headerTitle={headerTitle} />
-        );
+        return <EmptyState displayText={displayText} headerTitle={headerTitle} />;
       })()}
     </>
   );

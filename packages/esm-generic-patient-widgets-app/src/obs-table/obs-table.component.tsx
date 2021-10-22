@@ -22,30 +22,30 @@ interface ObsTableProps {
 const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
   const config = useConfig();
   const { data: obss, isError, isLoading, isValidating } = useObs(patientUuid);
-  
-  const uniqueDates = [...new Set(obss.map(o => o.issued))].sort();
-  const obssByDate = uniqueDates.map(date => obss.filter(o => o.issued === date));
+
+  const uniqueDates = [...new Set(obss.map((o) => o.issued))].sort();
+  const obssByDate = uniqueDates.map((date) => obss.filter((o) => o.issued === date));
 
   const tableHeaders = [
     { key: 'date', header: 'Date and time', isSortable: true },
-    ...config.data.map(({ concept, label}) => ({
+    ...config.data.map(({ concept, label }) => ({
       key: concept,
-      header: label
-    }))
+      header: label,
+    })),
   ];
 
   const tableRows = React.useMemo(
     () =>
-    obssByDate?.map((obss, index) => {
-      const rowData = {
-        id: `${index}`,
-        date: dayjs(obss[0].issued).format(`DD - MMM - YYYY, hh:mm`),
-      };
-      for (let obs of obss) {
-        rowData[obs.conceptUuid] = obs.valueQuantity.value;
-      }
-      return rowData;
-    }),
+      obssByDate?.map((obss, index) => {
+        const rowData = {
+          id: `${index}`,
+          date: dayjs(obss[0].issued).format(`DD - MMM - YYYY, hh:mm`),
+        };
+        for (let obs of obss) {
+          rowData[obs.conceptUuid] = obs.valueQuantity.value;
+        }
+        return rowData;
+      }),
     [obssByDate],
   );
 

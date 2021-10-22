@@ -11,8 +11,8 @@ import { useConfig } from '@openmrs/esm-react-utils';
 import { useObs } from '../resources/useObs';
 
 interface ConceptDescriptor {
-  label: string,
-  uuid: string
+  label: string;
+  uuid: string;
 }
 
 interface ObsGraphProps {
@@ -26,18 +26,22 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
 
   const [selectedConcept, setSelectedConcept] = React.useState<ConceptDescriptor>({
     label: config.data[0]?.label,
-    uuid: config.data[0]?.concept
+    uuid: config.data[0]?.concept,
   });
 
-  const chartData = useMemo(() => obss
-      .filter(obs => obs.conceptUuid === selectedConcept.uuid)
-      .map((obs) => ({
-            group: 'data',  // what does this do?
-            key: dayjs(obs.issued).format('DD-MMM'),
-            value: obs.valueQuantity.value,
-          })), [obss, selectedConcept.uuid]);
+  const chartData = useMemo(
+    () =>
+      obss
+        .filter((obs) => obs.conceptUuid === selectedConcept.uuid)
+        .map((obs) => ({
+          group: 'data', // what does this do?
+          key: dayjs(obs.issued).format('DD-MMM'),
+          value: obs.valueQuantity.value,
+        })),
+    [obss, selectedConcept.uuid],
+  );
 
-  const chartColors = Object.fromEntries(config.data.map(d => [d.label, d.color]));
+  const chartColors = Object.fromEntries(config.data.map((d) => [d.label, d.color]));
 
   const chartOptions: LineChartOptions = {
     axes: {
