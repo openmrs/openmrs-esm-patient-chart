@@ -4,8 +4,8 @@ import ShoppingBag16 from '@carbon/icons-react/es/shopping--bag/16';
 import { Button, Tag } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 import { connect } from 'unistore/react';
-import { attach } from '@openmrs/esm-framework';
 import { OrderBasketStoreActions, OrderBasketStore } from '../medications/order-basket-store';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 
 export interface FloatingOrderBasketButtonProps {}
 
@@ -27,8 +27,9 @@ const FloatingOrderBasketButton = connect<
         process.env.NODE_ENV === 'production' ? {} : { bottom: '4rem' }
       }
       onClick={() => {
-        attach('patient-chart-workspace-slot', 'order-basket-workspace');
-      }}>
+        launchPatientWorkspace('order-basket-workspace');
+      }}
+    >
       <div className={styles.elementContainer}>
         <span>{t('orderBasket', 'Order Basket')}</span>
         <ShoppingBag16 />

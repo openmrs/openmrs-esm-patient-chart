@@ -2,7 +2,7 @@ import React from 'react';
 import dayjs from 'dayjs';
 import Add16 from '@carbon/icons-react/es/add/16';
 import styles from './programs-overview.scss';
-import { attach, usePagination } from '@openmrs/esm-framework';
+import { usePagination } from '@openmrs/esm-framework';
 import {
   DataTable,
   DataTableSkeleton,
@@ -16,7 +16,12 @@ import {
   TableHeader,
   TableRow,
 } from 'carbon-components-react';
-import { EmptyState, ErrorState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
+import {
+  EmptyState,
+  ErrorState,
+  PatientChartPagination,
+  launchPatientWorkspace,
+} from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { useEnrollments } from './programs.resource';
 const programsToShowCount = 5;
@@ -42,10 +47,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ patientUuid, basePa
     currentPage,
   } = usePagination(activeEnrollments ?? [], programsToShowCount);
 
-  const launchProgramsForm = React.useCallback(
-    () => attach('patient-chart-workspace-slot', 'programs-form-workspace'),
-    [],
-  );
+  const launchProgramsForm = React.useCallback(() => launchPatientWorkspace('programs-form-workspace'), []);
 
   const tableHeaders = [
     {
@@ -91,7 +93,8 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ patientUuid, basePa
                         {...getHeaderProps({
                           header,
                           isSortable: header.isSortable,
-                        })}>
+                        })}
+                      >
                         {header.header?.content ?? header.header}
                       </TableHeader>
                     ))}

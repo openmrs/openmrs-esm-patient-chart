@@ -5,11 +5,12 @@ import dayjs from 'dayjs';
 import capitalize from 'lodash-es/capitalize';
 import styles from './medications-details-table.scss';
 import {
+  DataTable,
+  Button,
+  InlineLoading,
   OverflowMenu,
   OverflowMenuItem,
-  DataTable,
   Pagination,
-  Button,
   Table,
   TableBody,
   TableCell,
@@ -26,9 +27,10 @@ import { connect } from 'unistore/react';
 import { OrderBasketStore, OrderBasketStoreActions, orderBasketStoreActions } from '../medications/order-basket-store';
 import { Order } from '../types/order';
 import { OrderBasketItem } from '../types/order-basket-item';
-import { attach } from '@openmrs/esm-framework';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 
 export interface ActiveMedicationsProps {
+  isValidating?: boolean;
   title?: string;
   medications?: Array<Order> | null;
   showAddNewButton: boolean;
@@ -47,6 +49,7 @@ const MedicationsDetailsTable = connect<
   orderBasketStoreActions,
 )(
   ({
+    isValidating,
     title,
     medications,
     showDiscontinueButton,
@@ -61,9 +64,7 @@ const MedicationsDetailsTable = connect<
     const [pageSize, setPageSize] = useState(10);
     const [currentMedicationPage] = paginate(medications, page, pageSize);
 
-    const openOrderBasket = React.useCallback(() => {
-      attach('patient-chart-workspace-slot', 'order-basket-workspace');
-    }, []);
+    const openOrderBasket = React.useCallback(() => launchPatientWorkspace('order-basket-workspace'), []);
 
     const tableHeaders = [
       {
@@ -151,6 +152,11 @@ const MedicationsDetailsTable = connect<
       <div className={styles.widgetCard}>
         <div className={styles.cardHeader}>
           <h4>{title}</h4>
+          {isValidating ? (
+            <span>
+              <InlineLoading />
+            </span>
+          ) : null}
           {showAddNewButton && (
             <Button kind="ghost" renderIcon={Add16} iconDescription="Launch order basket" onClick={openOrderBasket}>
               {t('add', 'Add')}
@@ -168,7 +174,8 @@ const MedicationsDetailsTable = connect<
                         {...getHeaderProps({
                           header,
                           isSortable: header.isSortable,
-                        })}>
+                        })}
+                      >
                         {header.header}
                       </TableHeader>
                     ))}
@@ -321,7 +328,7 @@ function OrderBasketItemActions({
         indication: medication.orderReasonNonCoded,
       },
     ]);
-    attach('patient-chart-workspace-slot', 'order-basket-workspace');
+    launchPatientWorkspace('order-basket-workspace');
   }, [items, setItems, medication]);
 
   const handleReorderClick = useCallback(() => {

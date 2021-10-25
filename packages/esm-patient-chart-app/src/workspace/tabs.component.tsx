@@ -19,7 +19,8 @@ export function Tabs(props) {
                   display: 'flex',
                   width: '100%',
                   justifyContent: 'space-between',
-                }}>
+                }}
+              >
                 <div key={index} className={styles.tab}>
                   <button className="omrs-unstyled" onClick={() => props.setSelected(index)}>
                     {elem.props.title}
@@ -27,7 +28,8 @@ export function Tabs(props) {
                 </div>
                 <button
                   onClick={($event) => removeTab($event, index)}
-                  className={`${styles.closeIcon} omrs-unstyled omrs-btn-icon-small`}>
+                  className={`${styles.closeIcon} omrs-unstyled omrs-btn-icon-small`}
+                >
                   <svg className="omrs-icon">
                     <use xlinkHref="#omrs-icon-close"></use>
                   </svg>

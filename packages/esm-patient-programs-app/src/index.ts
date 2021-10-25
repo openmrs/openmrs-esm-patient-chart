@@ -27,6 +27,7 @@ function setupOpenMRS() {
       {
         id: 'programs-overview-widget',
         slot: 'patient-chart-summary-dashboard-slot',
+        order: 0,
         load: getAsyncLifecycle(() => import('./programs/programs-overview.component'), options),
         meta: {
           columnSpan: 4,
@@ -43,6 +44,7 @@ function setupOpenMRS() {
       {
         id: 'programs-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
+        order: 10,
         load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
         meta: dashboardMeta,
       },

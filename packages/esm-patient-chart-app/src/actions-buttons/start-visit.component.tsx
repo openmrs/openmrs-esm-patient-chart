@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { attach, useVisit } from '@openmrs/esm-framework';
+import { useVisit } from '@openmrs/esm-framework';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 
 interface StartVisitOverflowMenuItemProps {
   patientUuid: string;
@@ -9,9 +10,7 @@ interface StartVisitOverflowMenuItemProps {
 const StartVisitOverflowMenuItem: React.FC<StartVisitOverflowMenuItemProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const { currentVisit } = useVisit(patientUuid);
-  const handleClick = React.useCallback(() => {
-    attach('patient-chart-workspace-slot', 'start-visit-workspace-form');
-  }, []);
+  const handleClick = React.useCallback(() => launchPatientWorkspace('start-visit-workspace-form'), []);
 
   return (
     !currentVisit && (
@@ -24,7 +23,8 @@ const StartVisitOverflowMenuItem: React.FC<StartVisitOverflowMenuItemProps> = ({
           onClick={handleClick}
           style={{
             maxWidth: '100vw',
-          }}>
+          }}
+        >
           <span className="bx--overflow-menu-options__option-content">{t('startVisit', 'Start visit')}</span>
         </button>
       </li>

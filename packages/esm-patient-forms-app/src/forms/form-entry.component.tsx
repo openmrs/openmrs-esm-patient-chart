@@ -15,7 +15,7 @@ const FormEntry: React.FC = () => {
 
   return (
     <div>
-      {selectedForm?.formUuid && (
+      {selectedForm && (
         <ExtensionSlot
           extensionSlotName="form-widget-slot"
           state={{

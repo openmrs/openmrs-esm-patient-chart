@@ -89,7 +89,8 @@ export const RowStartCell = ({ title, range, units, shadow = false, openTrendlin
       alignItems: 'center',
       gap: '0.5rem',
       padding: '1rem',
-    }}>
+    }}
+  >
     <span
       onClick={openTrendline}
       role={'link'}
@@ -98,7 +99,8 @@ export const RowStartCell = ({ title, range, units, shadow = false, openTrendlin
         color: '#0f62fe',
         cursor: 'pointer',
         textTransform: 'capitalize',
-      }}>
+      }}
+    >
       {title.toLowerCase()}
     </span>
     <span style={{ color: '#6f6f6f', fontSize: '0.75rem' }}>

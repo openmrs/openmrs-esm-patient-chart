@@ -1,16 +1,16 @@
 import React from 'react';
-import styles from './vital-header-title.component.scss';
-import WarningFilled20 from '@carbon/icons-react/es/warning--filled/20';
+import dayjs from 'dayjs';
+import { useTranslation } from 'react-i18next';
+import { Button } from 'carbon-components-react';
 import ChevronDown16 from '@carbon/icons-react/es/chevron--down/16';
 import ChevronUp16 from '@carbon/icons-react/es/chevron--up/16';
-import dayjs from 'dayjs';
-import { Button } from 'carbon-components-react';
-import { useTranslation } from 'react-i18next';
-import { attach } from '@openmrs/esm-framework';
-import { PatientVitals } from '../vitals-biometrics.resource';
+import WarningFilled20 from '@carbon/icons-react/es/warning--filled/20';
+import { PatientVitals } from '../vitals.resource';
 import { patientVitalsBiometricsFormWorkspace } from '../../constants';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import styles from './vitals-header-title.component.scss';
 
-interface VitalsHeaderStateTitleProps {
+interface VitalsHeaderTitleProps {
   view: string;
   vitals: PatientVitals;
   toggleView(): void;
@@ -18,7 +18,7 @@ interface VitalsHeaderStateTitleProps {
   showRecordVitals: boolean;
 }
 
-const VitalsHeaderStateTitle: React.FC<VitalsHeaderStateTitleProps> = ({
+const VitalsHeaderTitle: React.FC<VitalsHeaderTitleProps> = ({
   view,
   vitals,
   toggleView,
@@ -29,7 +29,7 @@ const VitalsHeaderStateTitle: React.FC<VitalsHeaderStateTitleProps> = ({
 
   const launchVitalsBiometricsForm = React.useCallback((e) => {
     e.stopPropagation();
-    attach('patient-chart-workspace-slot', patientVitalsBiometricsFormWorkspace);
+    launchPatientWorkspace(patientVitalsBiometricsFormWorkspace);
   }, []);
 
   return (
@@ -97,4 +97,4 @@ const VitalsHeaderStateTitle: React.FC<VitalsHeaderStateTitleProps> = ({
   );
 };
 
-export default VitalsHeaderStateTitle;
+export default VitalsHeaderTitle;

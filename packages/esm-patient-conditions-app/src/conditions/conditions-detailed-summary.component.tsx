@@ -17,9 +17,8 @@ import {
   TableHeader,
   TableRow,
 } from 'carbon-components-react';
-import { attach } from '@openmrs/esm-framework';
-import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { Condition, useConditions } from './conditions.resource';
+import { EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { useConditionsContext } from './conditions.context';
 
 const ConditionsDetailedSummary: React.FC = () => {
@@ -59,10 +58,7 @@ const ConditionsDetailedSummary: React.FC = () => {
     });
   }, [conditions]);
 
-  const launchConditionsForm = React.useCallback(
-    () => attach('patient-chart-workspace-slot', 'conditions-form-workspace'),
-    [],
-  );
+  const launchConditionsForm = React.useCallback(() => launchPatientWorkspace('conditions-form-workspace'), []);
 
   if (isLoading) return <DataTableSkeleton role="progressbar" />;
   if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
@@ -88,7 +84,8 @@ const ConditionsDetailedSummary: React.FC = () => {
                         {...getHeaderProps({
                           header,
                           isSortable: header.isSortable,
-                        })}>
+                        })}
+                      >
                         {header.header?.content ?? header.header}
                       </TableHeader>
                     ))}

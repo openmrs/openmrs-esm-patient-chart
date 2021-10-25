@@ -1,10 +1,8 @@
 import React from 'react';
 import FormEntry from './form-entry.component';
 import { screen, render } from '@testing-library/react';
-import { formEntrySub } from './forms-utils';
 import { BehaviorSubject } from 'rxjs';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
-import { ExtensionSlot } from '@openmrs/esm-framework';
 
 const mockFormEntrySub = jest.fn();
 

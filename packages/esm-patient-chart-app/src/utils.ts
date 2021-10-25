@@ -6,7 +6,7 @@ export function isDesktop(layout: LayoutType) {
 }
 
 export function getTitle(ext: ExtensionInfo) {
-  const title = ext.meta?.title;
+  const title = ext?.meta?.title;
 
   if (typeof title === 'string') {
     return title;
@@ -23,5 +23,5 @@ export function checkScreenMode(ext: ExtensionInfo): ScreenModeTypes {
   if (typeof screenMode === 'string') {
     return screenMode;
   }
-  return 'minimize';
+  return ScreenModeTypes.minimize;
 }

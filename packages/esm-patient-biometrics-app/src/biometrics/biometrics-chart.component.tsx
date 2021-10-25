@@ -6,11 +6,10 @@ import { LineChart } from '@carbon/charts-react';
 import { LineChartOptions } from '@carbon/charts/interfaces/charts';
 import { ScaleTypes } from '@carbon/charts/interfaces/enums';
 import { useConfig } from '@openmrs/esm-framework';
-import { PatientBiometrics } from './biometrics-base.component';
 import { useTranslation } from 'react-i18next';
 
 interface BiometricsChartProps {
-  patientBiometrics: Array<PatientBiometrics>;
+  patientBiometrics: Array<any>;
   conceptsUnits: Array<string>;
 }
 

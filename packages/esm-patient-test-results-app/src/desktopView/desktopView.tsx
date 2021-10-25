@@ -12,7 +12,8 @@ const Grid: React.FC<{}> = ({ children }) => (
       gap: '20px',
       height: 'calc(100vh - 48px)',
       width: '100%',
-    }}>
+    }}
+  >
     {children}
   </div>
 );
@@ -24,7 +25,8 @@ const OverflowBorder: React.FC<{}> = ({ children }) => (
       width: '100%',
       position: 'relative',
       overflow: 'auto',
-    }}>
+    }}
+  >
     {children}
   </div>
 );

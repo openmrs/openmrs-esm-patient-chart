@@ -1,6 +1,6 @@
 import React from 'react';
 import Edit20 from '@carbon/icons-react/es/edit/20';
-import DocumentBlank20 from '@carbon/icons-react/es/document--blank/20';
+import Pen20 from '@carbon/icons-react/es/pen/20';
 import WarningFilled16 from '@carbon/icons-react/es/warning--filled/16';
 import styles from './action-menu.component.scss';
 import { ExtensionSlot, useLayoutType } from '@openmrs/esm-framework';
@@ -9,6 +9,7 @@ import { isDesktop } from '../utils';
 import { useContextWorkspace } from '../hooks/useContextWindowSize';
 import { useWorkspace } from '../hooks/useWorkspace';
 import { useTranslation } from 'react-i18next';
+import { ScreenModeTypes } from '../types';
 
 interface ActionMenuInterface {
   open: boolean;
@@ -25,10 +26,10 @@ export const ActionMenu: React.FC<ActionMenuInterface> = ({ open }) => {
 
   const checkViewMode = () => {
     if (active) {
-      if (windowSize.size === 'maximize') {
-        updateWindowSize('hide');
-      } else if (windowSize.size === 'normal') {
-        updateWindowSize('hide');
+      if (windowSize.size === ScreenModeTypes.maximize) {
+        updateWindowSize(ScreenModeTypes.hide);
+      } else if (windowSize.size === ScreenModeTypes.normal) {
+        updateWindowSize(ScreenModeTypes.hide);
       } else {
         updateWindowSize(screenMode);
       }
@@ -43,9 +44,10 @@ export const ActionMenu: React.FC<ActionMenuInterface> = ({ open }) => {
         iconDescription="WorkSpace Items"
         className={`${styles.iconButton} ${openWindows > 0 && styles.activeIconButton} `}
         kind="ghost"
-        hasIconOnly>
+        hasIconOnly
+      >
         <div>
-          <DocumentBlank20 /> {windowSize.size === 'hide' && <WarningFilled16 className={styles.warningButton} />}
+          <Pen20 /> {windowSize.size === ScreenModeTypes.hide && <WarningFilled16 className={styles.warningButton} />}
         </div>
       </Button>
     </aside>
@@ -53,7 +55,7 @@ export const ActionMenu: React.FC<ActionMenuInterface> = ({ open }) => {
     <Button className={styles.actionBtn}>
       <div>
         <Edit20 />
-        {windowSize.size === 'hide' && <WarningFilled16 className={styles.warningButton} />}
+        {windowSize.size === ScreenModeTypes.hide && <WarningFilled16 className={styles.warningButton} />}
       </div>
       <span>{t('careActivities', 'Care Activities')}</span>
     </Button>

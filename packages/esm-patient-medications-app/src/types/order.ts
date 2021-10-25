@@ -1,5 +1,9 @@
 import { OpenmrsResource } from './openmrs-resource';
 
+export interface PatientMedicationFetchResponse {
+  results: Array<Order>;
+}
+
 export interface Order {
   uuid: string;
   action: string;

@@ -74,9 +74,8 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({ isTablet, patientUuid }
         location: selectedLocation,
       };
 
-      saveVisit(visitPayload, new AbortController())
-        .pipe(first())
-        .subscribe(
+      if (visitPayload.visitType !== undefined) {
+        saveVisit(visitPayload, new AbortController()).subscribe(
           (response) => {
             if (response.status === 201) {
               getStartedVisit.next({
@@ -100,6 +99,14 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({ isTablet, patientUuid }
             });
           },
         );
+      } else {
+        showNotification({
+          title: t('startVisitTypeError', 'No Visit Type selected'),
+          kind: 'error',
+          critical: true,
+          description: 'Please select a Visit Type',
+        });
+      }
     },
     [handleCloseForm, patientUuid, selectedLocation, t, timeFormat, visitDate, visitTime, visitType],
   );
@@ -129,12 +136,14 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({ isTablet, patientUuid }
               light={isTablet}
               style={{ marginLeft: '0.125rem', flex: 'none' }}
               labelText={t('time', 'Time')}
-              id="time-picker">
+              id="time-picker"
+            >
               <TimePickerSelect
                 onChange={(event) => setTimeFormat(event.target.value as amPm)}
                 value={timeFormat}
                 labelText={t('time', 'Time')}
-                id="time-picker-select-1">
+                id="time-picker-select-1"
+              >
                 <SelectItem value="AM" text="AM" />
                 <SelectItem value="PM" text="PM" />
               </TimePickerSelect>
@@ -152,7 +161,8 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({ isTablet, patientUuid }
               invalidText="Required"
               value={selectedLocation}
               onChange={(event) => setSelectedLocation(event.target.value)}
-              light={isTablet}>
+              light={isTablet}
+            >
               {locations?.length > 0 &&
                 locations.map((location) => (
                   <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
@@ -171,7 +181,8 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({ isTablet, patientUuid }
               selectedIndex={contentSwitcherIndex}
               className={styles.contentSwitcher}
               size="lg"
-              onChange={({ index }) => setContentSwitcherIndex(index)}>
+              onChange={({ index }) => setContentSwitcherIndex(index)}
+            >
               <Switch name={'recommended'} text={t('recommended', 'Recommended')} />
               <Switch name={'All'} text={t('all', 'All')} />
             </ContentSwitcher>

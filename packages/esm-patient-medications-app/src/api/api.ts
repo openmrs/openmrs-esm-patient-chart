@@ -1,11 +1,40 @@
+import useSWR from 'swr';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { careSetting } from '../constants';
-import { Order, OrderPost } from '../types/order';
+import { OrderPost, PatientMedicationFetchResponse } from '../types/order';
+import { careSettingUuid } from '../constants';
 
 const durationUnitsConcept = '1732AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 
-export interface PatientMedicationFetchResponse {
-  results: Array<Order>;
+/**
+ * Fast, lighweight, reusable data fetcher with built-in cache invalidation that
+ * returns a patient's current orders.
+ * @param patientUuid The UUID of the patient whose orders should be fetched.
+ * @param status The status/the kind of orders to be fetched.
+ */
+export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any') {
+  const customRepresentation =
+    'custom:(uuid,dosingType,orderNumber,accessionNumber,' +
+    'patient:ref,action,careSetting:ref,previousOrder:ref,dateActivated,scheduledDate,dateStopped,autoExpireDate,' +
+    'orderType:ref,encounter:ref,orderer:ref,orderReason,orderReasonNonCoded,orderType,urgency,instructions,' +
+    'commentToFulfiller,drug:(uuid,name,strength,dosageForm:(display,uuid),concept),dose,doseUnits:ref,' +
+    'frequency:ref,asNeeded,asNeededCondition,quantity,quantityUnits:ref,numRefills,dosingInstructions,' +
+    'duration,durationUnits:ref,route:ref,brandName,dispenseAsWritten)';
+
+  const { data, error, isValidating } = useSWR<{ data: PatientMedicationFetchResponse }, Error>(
+    `/ws/rest/v1/order?patient=${patientUuid}&careSetting=${careSettingUuid}&status=${status}&v=${customRepresentation}`,
+    openmrsFetch,
+  );
+
+  const drugOrders = data?.data?.results
+    ? data.data.results.filter((order) => order.orderType.display === 'Drug Order')
+    : null;
+
+  return {
+    data: data ? drugOrders : null,
+    isLoading: !data && !error,
+    isError: error,
+    isValidating,
+  };
 }
 
 export function getPatientEncounterId(patientUuid: string, abortController: AbortController) {
@@ -43,16 +72,4 @@ export function postOrder(body: OrderPost, abortController?: AbortController) {
     headers: { 'Content-Type': 'application/json' },
     body,
   });
-}
-
-export async function fetchPatientOrders(
-  patientUuid: string,
-  status: 'ACTIVE' | 'any',
-  abortController?: AbortController,
-) {
-  const { data } = await openmrsFetch<PatientMedicationFetchResponse>(
-    `/ws/rest/v1/order?patient=${patientUuid}&careSetting=${careSetting}&status=${status}&v=custom:(uuid,dosingType,orderNumber,accessionNumber,patient:ref,action,careSetting:ref,previousOrder:ref,dateActivated,scheduledDate,dateStopped,autoExpireDate,orderType:ref,encounter:ref,orderer:ref,orderReason,orderReasonNonCoded,orderType,urgency,instructions,commentToFulfiller,drug:(uuid,name,strength,dosageForm:(display,uuid),concept),dose,doseUnits:ref,frequency:ref,asNeeded,asNeededCondition,quantity,quantityUnits:ref,numRefills,dosingInstructions,duration,durationUnits:ref,route:ref,brandName,dispenseAsWritten)`,
-    { signal: abortController?.signal },
-  );
-  return data.results.filter((x) => x.orderType.display === 'Drug Order');
 }

@@ -15,10 +15,15 @@ import {
 } from 'carbon-components-react';
 import Add16 from '@carbon/icons-react/es/add/16';
 import styles from './conditions-overview.scss';
-import { attach, usePagination } from '@openmrs/esm-framework';
-import { EmptyState, ErrorState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
+import { usePagination } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { useConditions } from './conditions.resource';
+import {
+  EmptyState,
+  ErrorState,
+  PatientChartPagination,
+  launchPatientWorkspace,
+} from '@openmrs/esm-patient-common-lib';
 
 const conditionsToShowCount = 5;
 
@@ -37,6 +42,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient, basePa
   const { data: conditions, isError, isLoading, isValidating } = useConditions(patient.id);
   const { results: paginatedConditions, goTo, currentPage } = usePagination(conditions ?? [], conditionsToShowCount);
 
+  const launchConditionsForm = React.useCallback(() => launchPatientWorkspace('conditions-form-workspace'), []);
   const tableHeaders = [
     {
       key: 'display',
@@ -54,11 +60,6 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient, basePa
       onsetDateTime: dayjs(condition.onsetDateTime).format('MMM-YYYY'),
     }));
   }, [paginatedConditions]);
-
-  const launchConditionsForm = React.useCallback(
-    () => attach('patient-chart-workspace-slot', 'conditions-form-workspace'),
-    [],
-  );
 
   if (isLoading) return <DataTableSkeleton role="progressbar" />;
   if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
@@ -84,7 +85,8 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient, basePa
                         {...getHeaderProps({
                           header,
                           isSortable: header.isSortable,
-                        })}>
+                        })}
+                      >
                         {header.header?.content ?? header.header}
                       </TableHeader>
                     ))}

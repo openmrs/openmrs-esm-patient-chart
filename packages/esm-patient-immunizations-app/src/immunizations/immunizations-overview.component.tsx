@@ -14,11 +14,10 @@ import {
   TableHeader,
   TableRow,
 } from 'carbon-components-react';
-import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
+import { EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { mapFromFHIRImmunizationBundle } from './immunization-mapper';
 import { performPatientImmunizationsSearch } from './immunizations.resource';
-import { attach } from '@openmrs/esm-framework';
 
 export interface ImmunizationsOverviewProps {
   basePath: string;
@@ -59,9 +58,7 @@ const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = ({ patient, 
     },
   ];
 
-  const launchImmunizationsForm = () => {
-    attach('patient-chart-workspace-slot', 'immunization-form-workspace');
-  };
+  const launchImmunizationsForm = () => launchPatientWorkspace('immunization-form-workspace');
 
   const RenderImmunizations: React.FC = () => {
     if (immunizations.length) {
@@ -74,7 +71,8 @@ const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = ({ patient, 
               kind="ghost"
               renderIcon={Add16}
               iconDescription="Add immunizations"
-              onClick={launchImmunizationsForm}>
+              onClick={launchImmunizationsForm}
+            >
               {t('add', 'Add')}
             </Button>
           </div>
@@ -90,7 +88,8 @@ const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = ({ patient, 
                           {...getHeaderProps({
                             header,
                             isSortable: header.isSortable,
-                          })}>
+                          })}
+                        >
                           {header.header?.content ?? header.header}
                         </TableHeader>
                       ))}

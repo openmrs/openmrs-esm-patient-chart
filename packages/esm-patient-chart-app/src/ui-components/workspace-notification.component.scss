@@ -1,0 +1,20 @@
+@import '../root.scss';
+
+.messageBody {
+    @extend .productiveHeading02;
+}
+
+.buttonContainer {
+    display: flex;
+    width: 100%;
+    padding: 0.625rem;
+}
+
+.buttonContainer button {
+    width: 50%;
+    height: 4rem;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    max-width: 100%;
+}

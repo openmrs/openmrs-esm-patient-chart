@@ -22,7 +22,7 @@ jobs:
       - run: npx lerna bootstrap
       - run: npx lerna run lint
       - run: npx lerna run typescript
-      - run: npx lerna run test
+      - run: npm run test
       - run: npx lerna run build
       - name: Upload Artifacts
         uses: actions/upload-artifact@v2

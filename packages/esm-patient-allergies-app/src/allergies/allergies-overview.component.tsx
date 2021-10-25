@@ -14,10 +14,15 @@ import {
   TableRow,
 } from 'carbon-components-react';
 import styles from './allergies-overview.scss';
-import { EmptyState, ErrorState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
+import {
+  EmptyState,
+  ErrorState,
+  launchPatientWorkspace,
+  PatientChartPagination,
+} from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { useAllergies } from './allergy-intolerance.resource';
-import { attach, usePagination } from '@openmrs/esm-framework';
+import { usePagination } from '@openmrs/esm-framework';
 import { allergiesToShowCount, patientAllergiesFormWorkspace } from '../constants';
 
 interface AllergiesOverviewProps {
@@ -56,10 +61,7 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient, showAddA
     }));
   }, [paginatedAllergies]);
 
-  const launchAllergiesForm = React.useCallback(
-    () => attach('patient-chart-workspace-slot', patientAllergiesFormWorkspace),
-    [],
-  );
+  const launchAllergiesForm = React.useCallback(() => launchPatientWorkspace(patientAllergiesFormWorkspace), []);
 
   if (isLoading) return <DataTableSkeleton role="progressbar" />;
   if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
@@ -87,7 +89,8 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient, showAddA
                         {...getHeaderProps({
                           header,
                           isSortable: header.isSortable,
-                        })}>
+                        })}
+                      >
                         {header.header?.content ?? header.header}
                       </TableHeader>
                     ))}

@@ -2,9 +2,8 @@ import React from 'react';
 import dayjs from 'dayjs';
 import Add16 from '@carbon/icons-react/es/add/16';
 import styles from './programs-detailed-summary.scss';
-import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
+import { EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
-import { attach } from '@openmrs/esm-framework';
 import { useEnrollments } from './programs.resource';
 import { useProgramsContext } from './programs.context';
 import {
@@ -64,10 +63,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = () => {
     });
   }, [enrolledPrograms, t]);
 
-  const launchProgramsForm = React.useCallback(
-    () => attach('patient-chart-workspace-slot', 'programs-form-workspace'),
-    [],
-  );
+  const launchProgramsForm = React.useCallback(() => launchPatientWorkspace('programs-form-workspace'), []);
 
   if (isLoading) return <DataTableSkeleton role="progressbar" />;
   if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
@@ -93,7 +89,8 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = () => {
                         {...getHeaderProps({
                           header,
                           isSortable: header.isSortable,
-                        })}>
+                        })}
+                      >
                         {header.header?.content ?? header.header}
                       </TableHeader>
                     ))}

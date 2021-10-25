@@ -29,6 +29,7 @@ function setupOpenMRS() {
       {
         id: 'immunization-overview-widget',
         slot: 'patient-chart-summary-dashboard-slot',
+        order: 10,
         load: getAsyncLifecycle(() => import('./immunizations/immunizations-overview.component'), options),
         meta: {
           columnSpan: 4,
@@ -45,6 +46,7 @@ function setupOpenMRS() {
       {
         id: 'immunization-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
+        order: 8,
         load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
         meta: dashboardMeta,
       },

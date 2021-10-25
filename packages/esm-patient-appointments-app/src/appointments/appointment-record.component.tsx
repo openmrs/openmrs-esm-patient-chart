@@ -35,7 +35,8 @@ export default function AppointmentRecord(props: AppointmentRecordProps) {
           <SummaryCard
             name={t('appointment', 'Appointment')}
             addComponent
-            showComponent={() => openWorkspaceTab(AppointmentsForm, `${t('appointmentsForm', 'Appointment Form')}`)}>
+            showComponent={() => openWorkspaceTab(AppointmentsForm, `${t('appointmentsForm', 'Appointment Form')}`)}
+          >
             <table className={`omrs-type-body-regular ${styles.appointmentRecordTable}`}>
               <thead>
                 <tr>

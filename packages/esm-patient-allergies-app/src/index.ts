@@ -51,6 +51,7 @@ function setupOpenMRS() {
       {
         id: 'allergies-overview-widget',
         slot: 'patient-chart-summary-dashboard-slot',
+        order: 9,
         load: getAsyncLifecycle(() => import('./allergies/allergies-overview.component'), options),
         meta: {
           columnSpan: 4,
@@ -71,6 +72,7 @@ function setupOpenMRS() {
       {
         id: 'allergies-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
+        order: 6,
         load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
         meta: dashboardMeta,
         online: { showAddAllergy: true },

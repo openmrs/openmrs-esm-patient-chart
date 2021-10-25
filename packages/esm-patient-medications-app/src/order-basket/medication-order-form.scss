@@ -2,7 +2,8 @@
 
 .medicationDetailsHeader {
   position: sticky;
-  background-color: $interactive-01;
+  background-color: $brand-02;
+  color: $inverse-01;
   border: 0;
   top: 3rem;
 }
@@ -41,4 +42,13 @@
       height: 100%;
     }
   }
+}
+
+.dosageInfo {
+  @include carbon--type-style("productive-heading-01");
+}
+
+.orderForm :global(.bx--btn-set .bx--btn) {
+  max-width: 50%;
+  height: 4rem;
 }

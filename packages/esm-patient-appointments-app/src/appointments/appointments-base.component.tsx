@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import Add16 from '@carbon/icons-react/es/add/16';
 import { attach } from '@openmrs/esm-framework';
-import { EmptyDataIllustration, ErrorState } from '@openmrs/esm-patient-common-lib';
+import { EmptyDataIllustration, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { Button, DataTableSkeleton, ContentSwitcher, InlineLoading, Switch, Tile } from 'carbon-components-react';
 import { useAppointments } from './appointments.resource';
 import styles from './appointments-base.component.scss';
@@ -32,9 +32,7 @@ const AppointmentsBase: React.FC<AppointmentsBaseProps> = ({ patientUuid }) => {
     isValidating,
   } = useAppointments(patientUuid, startDate, new AbortController());
 
-  const launchAppointmentsForm = () => {
-    attach('patient-chart-workspace-slot', 'appointments-form-workspace');
-  };
+  const launchAppointmentsForm = () => launchPatientWorkspace('appointments-form-workspace');
 
   if (isLoading) return <DataTableSkeleton role="progressbar" />;
   if (isError) {

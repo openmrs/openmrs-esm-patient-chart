@@ -17,7 +17,6 @@
   bottom: 0;
   z-index: 10;
   background-color: $ui-01;
-  overflow-y: auto;
 }
 
 /* Desktop view */
@@ -26,7 +25,6 @@
   background-color: $ui-02;
   margin-right: 50px;
   flex: 1;
-  overflow-y: auto;
 }
 
 :global(.omrs-breakpoint-gt-tablet) .contextWorkspaceContainer>header {

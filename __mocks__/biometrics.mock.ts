@@ -3598,3 +3598,19 @@ export const formattedBiometrics = [
     bmi: '27.5',
   },
 ];
+
+export const mockConceptMetadata = [
+  {
+    uuid: '5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    display: 'Systolic',
+    hiNormal: 140,
+    hiAbsolute: 250,
+    hiCritical: 180,
+    lowNormal: 100,
+    lowAbsolute: 0,
+    lowCritical: 85,
+    units: 'mmHg',
+  },
+];
+
+export const mockConceptUnits = ['mmHg', 'mmHg', 'DEG C', 'cm', 'kg', 'beats/min', '%', 'cm', 'breaths/min'];

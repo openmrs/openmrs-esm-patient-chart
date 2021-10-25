@@ -8,9 +8,10 @@ import { RouteComponentProps } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Header, HeaderGlobalAction, HeaderGlobalBar, HeaderName } from 'carbon-components-react';
 import { useWorkspace } from '../hooks/useWorkspace';
-import { patientChartWorkspaceSlot } from '../constants';
+import { patientChartWorkspaceHeaderSlot, patientChartWorkspaceSlot } from '../constants';
 import { isDesktop } from '../utils';
 import { useContextWorkspace } from '../hooks/useContextWindowSize';
+import { ScreenModeTypes } from '../types';
 
 interface ContextWorkspaceParams {
   patientUuid: string;
@@ -32,9 +33,9 @@ const ContextWorkspace: React.FC<RouteComponentProps<ContextWorkspaceParams>> = 
   const [openContextWorkspace, setOpenContextWorkspace] = useState(false);
 
   useEffect(() => {
-    if (extensions.length > 0 && (size === 'maximize' || size === 'normal')) {
+    if (extensions.length > 0 && (size === ScreenModeTypes.maximize || size === ScreenModeTypes.normal)) {
       setOpenContextWorkspace(true);
-    } else if (extensions.length > 0 && size === 'hide') {
+    } else if (extensions.length > 0 && size === ScreenModeTypes.hide) {
       setOpenContextWorkspace(false);
     } else {
       setOpenContextWorkspace(false);
@@ -43,28 +44,34 @@ const ContextWorkspace: React.FC<RouteComponentProps<ContextWorkspaceParams>> = 
 
   useBodyScrollLock(active && !isDesktop(layout));
 
-  const Icon = size === 'maximize' ? Minimize16 : Maximize16;
+  const Icon = size === ScreenModeTypes.maximize ? Minimize16 : Maximize16;
 
   return (
     <aside
       className={`${styles.contextWorkspaceContainer} ${openContextWorkspace ? styles.show : styles.hide} ${
-        size === 'maximize' && styles.maximized
-      }`}>
+        size === ScreenModeTypes.maximize && styles.maximized
+      }`}
+    >
       <Header aria-label={title} style={{ position: 'sticky' }}>
         <HeaderName prefix="">{title}</HeaderName>
         <HeaderGlobalBar>
+          <ExtensionSlot extensionSlotName={patientChartWorkspaceHeaderSlot} state={props} />
           <HeaderGlobalAction
             onClick={() => {
-              size === 'maximize' ? updateWindowSize('minimize') : updateWindowSize('maximize');
+              size === ScreenModeTypes.maximize
+                ? updateWindowSize(ScreenModeTypes.minimize)
+                : updateWindowSize(ScreenModeTypes.maximize);
             }}
             aria-label={t('maximize', 'Maximize')}
-            title={t('maximize', 'Maximize')}>
+            title={t('maximize', 'Maximize')}
+          >
             <Icon />
           </HeaderGlobalAction>
           <HeaderGlobalAction
             aria-label={t('hide', 'Hide workspace')}
             title={t('hide', 'Hide workspace')}
-            onClick={() => updateWindowSize('hide')}>
+            onClick={() => updateWindowSize(ScreenModeTypes.hide)}
+          >
             <ArrowRight16 />
           </HeaderGlobalAction>
         </HeaderGlobalBar>

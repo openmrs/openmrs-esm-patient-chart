@@ -4,7 +4,8 @@ import EmptyDataIllustration from '../empty-state/empty-data-illustration.compon
 import styles from './clinical-view-overview.component.scss';
 import { Button, Tab, Tabs } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
-import { attach, ExtensionSlot, useConfig } from '@openmrs/esm-framework';
+import { ExtensionSlot, useConfig } from '@openmrs/esm-framework';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 
 interface ClinicalViewOverviewProps {
   patientUuid: string;
@@ -21,7 +22,7 @@ const ClinicalViewOverview: React.FC<ClinicalViewOverviewProps> = ({ patientUuid
   }, [patient, patientUuid]);
 
   const launchClinicalViewForm = React.useCallback(() => {
-    attach('patient-chart-workspace-slot', 'patient-clinical-view-form-workspace');
+    launchPatientWorkspace('patient-clinical-view-form-workspace');
     setSelectedViewIndex(0);
   }, []);
 
@@ -39,15 +40,16 @@ const ClinicalViewOverview: React.FC<ClinicalViewOverviewProps> = ({ patientUuid
           type="container"
           className={styles.tabsContentClass}
           tabContentClassName={styles.tabContentClassName}
-          onSelectionChange={(event) => setSelectedViewIndex(event)}>
-          {config.clinicalViews.map((tab, index) => (
+          onSelectionChange={(event) => setSelectedViewIndex(event)}
+        >
+          {config?.clinicalViews?.map((tab, index) => (
             <Tab key={index} id={tab.slot} label={tab.slot}>
               {selectedViewIndex !== 0 ? (
                 <ExtensionSlot extensionSlotName={tab.slotName} state={state} />
               ) : (
                 <>
-                  {config?.clinicalViews.length > 1 ? (
-                    tail(config.clinicalViews).map((tab: any, index) => (
+                  {config.clinicalViews.length > 1 ? (
+                    config.clinicalViews.map((tab: any, index) => (
                       <ExtensionSlot key={tab.slot} extensionSlotName={tab.slotName} state={state} />
                     ))
                   ) : (

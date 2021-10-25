@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './biometrics-overview.scss';
+import styles from './vitals-overview.scss';
 import {
   DataTable,
   Table,
@@ -13,7 +13,7 @@ import {
 import { usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 
-interface FormsProps {
+interface VitalsPaginationProps {
   tableRows: Array<any>;
   pageSize: number;
   pageUrl: string;
@@ -21,24 +21,31 @@ interface FormsProps {
   tableHeaders: Array<any>;
 }
 
-const BiometricsPagination: React.FC<FormsProps> = ({ tableRows, pageSize, pageUrl, urlLabel, tableHeaders }) => {
-  const { results, goTo, currentPage } = usePagination(tableRows, pageSize);
+const VitalsPagination: React.FC<VitalsPaginationProps> = ({
+  tableRows,
+  pageSize,
+  pageUrl,
+  urlLabel,
+  tableHeaders,
+}) => {
+  const { results: paginatedVitals, goTo, currentPage } = usePagination(tableRows, pageSize);
 
   return (
     <div>
       <TableContainer>
-        <DataTable rows={results} headers={tableHeaders} isSortable size="short">
+        <DataTable rows={paginatedVitals} headers={tableHeaders} isSortable={true} size="short">
           {({ rows, headers, getHeaderProps, getTableProps }) => (
-            <Table {...getTableProps()}>
+            <Table {...getTableProps()} useZebraStyles className={styles.customRow}>
               <TableHead>
-                <TableRow className={styles.customRow}>
+                <TableRow>
                   {headers.map((header) => (
                     <TableHeader
                       className={`${styles.productiveHeading01} ${styles.text02}`}
                       {...getHeaderProps({
                         header,
                         isSortable: header.isSortable,
-                      })}>
+                      })}
+                    >
                       {header.header?.content ?? header.header}
                     </TableHeader>
                   ))}
@@ -46,7 +53,7 @@ const BiometricsPagination: React.FC<FormsProps> = ({ tableRows, pageSize, pageU
               </TableHead>
               <TableBody>
                 {rows.map((row) => (
-                  <TableRow key={row.id} className={styles.customRow}>
+                  <TableRow key={row.id}>
                     {row.cells.map((cell) => (
                       <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                     ))}
@@ -60,7 +67,7 @@ const BiometricsPagination: React.FC<FormsProps> = ({ tableRows, pageSize, pageU
       <PatientChartPagination
         pageNumber={currentPage}
         totalItems={tableRows.length}
-        currentItems={results.length}
+        currentItems={paginatedVitals.length}
         pageUrl={pageUrl}
         pageSize={pageSize}
         onPageNumberChange={({ page }) => goTo(page)}
@@ -70,4 +77,4 @@ const BiometricsPagination: React.FC<FormsProps> = ({ tableRows, pageSize, pageU
   );
 };
 
-export default BiometricsPagination;
+export default VitalsPagination;
