@@ -5,6 +5,5 @@ set -e  # die on error
 
 npx pretty-quick --staged
 npx lerna run lint
-npx lerna run test
+yarn test
 npx lerna run typescript
-yarn run extract-translations

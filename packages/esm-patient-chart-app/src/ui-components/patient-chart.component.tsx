@@ -1,11 +1,11 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import styles from './patient-chart.component.scss';
 import Loader from './loader.component';
 import WorkspaceWrapper from '../workspace/workspace-wrapper.component';
 import ChartReview from '../view-components/chart-review.component';
 import VisitDialog from '../visit/visit-dialog.component';
 import { RouteComponentProps } from 'react-router-dom';
-import { ExtensionSlot, useCurrentPatient, useSessionUser } from '@openmrs/esm-framework';
+import { detachAll, ExtensionSlot, useCurrentPatient, useSessionUser } from '@openmrs/esm-framework';
 import ActionMenu from './action-menu.component';
 import { useOfflineVisitForPatient } from '../offline';
 import { useContextWorkspace } from '../hooks/useContextWindowSize';
@@ -24,6 +24,10 @@ const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({ match
   const sessionUser = useSessionUser();
   const state = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);
   const { windowSize, openWindows } = useContextWorkspace();
+
+  useEffect(() => {
+    detachAll('patient-chart-workspace-slot');
+  }, [patientUuid]);
 
   const mainClassName = `omrs-main-content ${styles.chartContainer}`;
 

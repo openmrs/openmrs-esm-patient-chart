@@ -8,7 +8,7 @@ import { RouteComponentProps } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Header, HeaderGlobalAction, HeaderGlobalBar, HeaderName } from 'carbon-components-react';
 import { useWorkspace } from '../hooks/useWorkspace';
-import { patientChartWorkspaceSlot } from '../constants';
+import { patientChartWorkspaceHeaderSlot, patientChartWorkspaceSlot } from '../constants';
 import { isDesktop } from '../utils';
 import { useContextWorkspace } from '../hooks/useContextWindowSize';
 import { ScreenModeTypes } from '../types';
@@ -55,6 +55,7 @@ const ContextWorkspace: React.FC<RouteComponentProps<ContextWorkspaceParams>> = 
       <Header aria-label={title} style={{ position: 'sticky' }}>
         <HeaderName prefix="">{title}</HeaderName>
         <HeaderGlobalBar>
+          <ExtensionSlot extensionSlotName={patientChartWorkspaceHeaderSlot} state={props} />
           <HeaderGlobalAction
             onClick={() => {
               size === ScreenModeTypes.maximize

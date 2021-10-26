@@ -26,6 +26,7 @@ function setupOpenMRS() {
       {
         id: 'patient-clinical-view-overview',
         slot: 'patient-chart-summary-dashboard-slot',
+        order: 11,
         load: getAsyncLifecycle(() => import('./clinical-view-overview/clinical-view-overview.component'), options),
         meta: {
           columnSpan: 4,
@@ -52,6 +53,7 @@ function setupOpenMRS() {
       {
         id: 'clinical-view-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
+        order: 1,
         load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
         meta: dashboardMeta,
         online: true,
