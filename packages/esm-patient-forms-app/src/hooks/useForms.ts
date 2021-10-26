@@ -2,14 +2,10 @@ import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { ListResponse, FormEncounter, EncounterWithFormRef, CompletedFormInfo } from '../types';
-
-const customFormRepresentation =
-  '(uuid,name,encounterType:(uuid,name),version,published,retired,resources:(uuid,name,dataType,valueReference))';
-const customEncounterRepresentation = `custom:(uuid,encounterDatetime,encounterType:(uuid,name),form:${customFormRepresentation}`;
+import { customEncounterRepresentation, formEncounterUrl } from '../constants';
 
 export function useFormEncounters() {
-  const url = `/ws/rest/v1/form?v=custom:${customFormRepresentation}`;
-  return useSWR(url, (url) => openmrsFetch<ListResponse<FormEncounter>>(url));
+  return useSWR(formEncounterUrl, (url) => openmrsFetch<ListResponse<FormEncounter>>(url));
 }
 
 export function useEncountersWithFormRef(

@@ -7,6 +7,11 @@
   margin-bottom: $spacing-03;
 }
 
+.productiveHeading03 {
+  @include carbon--type-style("productive-heading-03");
+  margin-bottom: $spacing-03;
+}
+
 .bodyLong01 {
   @include carbon--type-style("body-long-01");
 }
