@@ -114,14 +114,6 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, isTablet }) =>
               ))}
           </Select>
         </div>
-        {availablePrograms?.length &&
-          eligiblePrograms?.length === 0 &&
-          showNotification({
-            title: t('error', 'Error'),
-            kind: 'error',
-            critical: true,
-            description: t('alreadyEnrolledText', 'This patient is already enrolled in all of the available programs'),
-          })}
       </FormGroup>
       <FormGroup legendText={t('dateEnrolled', 'Date enrolled')}>
         <DatePicker
