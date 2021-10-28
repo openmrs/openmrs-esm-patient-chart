@@ -20,9 +20,15 @@ export function useEncountersWithFormRef(
 export function useForms(patientUuid: string, startDate?: Date, endDate?: Date) {
   const allFormsRes = useFormEncounters();
   const encountersRes = useEncountersWithFormRef(patientUuid, startDate, endDate);
-  const data = allFormsRes.data
-    ? mapToFormCompletedInfo(allFormsRes.data.data.results, encountersRes.data?.data?.results ?? [])
-    : undefined;
+  const pastEncounters = encountersRes.data?.data?.results ?? [];
+  const data = allFormsRes.data ? mapToFormCompletedInfo(allFormsRes.data.data.results, pastEncounters) : undefined;
+  // Note:
+  // `pastEncounters` is currently considered as optional (i.e. any errors are ignored) since it's only used for display
+  // and doesn't change any functional flows. This makes offline mode much easier to implement since the past encounters
+  // don't have to be cached regularly.
+  // If this ever becomes a problem for online mode (i.e. if an error should be rendered there when past encounters
+  // for determining filled out forms can't be loaded) this should ideally be conditionally controlled via a flag
+  // such that the current offline behavior doesn't change.
 
   return {
     data,
