@@ -62,8 +62,8 @@ const ContextWorkspace: React.FC<RouteComponentProps<ContextWorkspaceParams>> = 
                 ? updateWindowSize(ScreenModeTypes.minimize)
                 : updateWindowSize(ScreenModeTypes.maximize);
             }}
-            aria-label={t('maximize', 'Maximize')}
-            title={t('maximize', 'Maximize')}
+            aria-label={size === ScreenModeTypes.maximize ? t('minimize', 'Minimize') : t('maximize', 'Maximize')}
+            title={size === ScreenModeTypes.maximize ? t('minimize', 'Minimize') : t('maximize', 'Maximize')}
           >
             <Icon />
           </HeaderGlobalAction>
