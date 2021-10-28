@@ -1,11 +1,11 @@
 import { openmrsFetch, OmrsOfflineHttpHeaders, omrsOfflineCachingStrategyHttpHeaderName } from '@openmrs/esm-framework';
 import { formEncounterUrl } from '../constants';
-import { useLocalStorage } from '../hooks/useLocalStorage';
+import { useLocalStorage } from './useLocalStorage';
 import { FormEncounter } from '../types';
 import escapeRegExp from 'lodash-es/escapeRegExp';
 import useSWR from 'swr';
 
-export function useOfflineFormInfo(form: FormEncounter) {
+export function useOfflineFormManagement(form: FormEncounter) {
   const isFormFullyCachedSwr = useSWR(`offlineFormInfo/${form.uuid}`, () => isFormFullyCached(form.uuid));
   const { formsMarkedAsOffline, setMarkedForOffline } = useOfflineFormsLocalStorage();
   const isFormMarkedAsOffline = formsMarkedAsOffline.some((markedForm) => markedForm.uuid === form.uuid);

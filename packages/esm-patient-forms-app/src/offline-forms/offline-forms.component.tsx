@@ -19,7 +19,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useFormEncounters } from '../hooks/useForms';
 import { FormEncounter } from '../types';
-import { useOfflineFormInfo } from './offline-forms';
+import { useOfflineFormManagement } from '../hooks/useOfflineFormManagement';
 import styles from './offline-forms.styles.scss';
 
 export interface OfflineFormsProps {
@@ -99,7 +99,7 @@ const OfflineForms: React.FC<OfflineFormsProps> = ({ canMarkFormsAsOffline }) =>
 
 function OfflineFormToggle({ form, disabled }: { form: FormEncounter; disabled: boolean }) {
   const { isFormFullyCachedSwr, isFormMarkedAsOffline, registerFormAsOffline, unregisterFormAsOffline } =
-    useOfflineFormInfo(form);
+    useOfflineFormManagement(form);
 
   const handleToggled = (checked: boolean) => {
     if (checked) {
