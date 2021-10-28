@@ -20,14 +20,13 @@ export function useEncountersWithFormRef(
 export function useForms(patientUuid: string, startDate?: Date, endDate?: Date) {
   const allFormsRes = useFormEncounters();
   const encountersRes = useEncountersWithFormRef(patientUuid, startDate, endDate);
-  const data =
-    allFormsRes.data && encountersRes.data
-      ? mapToFormCompletedInfo(allFormsRes.data.data.results, encountersRes.data.data.results)
-      : undefined;
+  const data = allFormsRes.data
+    ? mapToFormCompletedInfo(allFormsRes.data.data.results, encountersRes.data?.data?.results ?? [])
+    : undefined;
 
   return {
     data,
-    error: allFormsRes.error || encountersRes.error,
+    error: allFormsRes.error,
     isValidating: allFormsRes.isValidating || encountersRes.isValidating,
   };
 }

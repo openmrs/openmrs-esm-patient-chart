@@ -19,16 +19,6 @@ const frontendDependencies = {
 };
 
 function setupOpenMRS() {
-  messageOmrsServiceWorker({
-    type: 'registerDynamicRoute',
-    pattern: '.+/ws/rest/v1/form.*',
-  });
-
-  messageOmrsServiceWorker({
-    type: 'registerDynamicRoute',
-    pattern: '.+/ws/rest/v1/encounter.*',
-  });
-
   const moduleName = '@openmrs/esm-patient-forms-app';
 
   const options = {
