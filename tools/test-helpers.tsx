@@ -9,7 +9,8 @@ const swrWrapper = ({ children }) => {
       value={{
         dedupingInterval: 0,
         provider: () => new Map(),
-      }}>
+      }}
+    >
       {children}
     </SWRConfig>
   );

@@ -1,7 +1,9 @@
+import useSWR from 'swr';
 import { openmrsFetch, fhirBaseUrl } from '@openmrs/esm-framework';
 import includes from 'lodash-es/includes';
 import split from 'lodash-es/split';
 import { FHIRImmunizationBundle, FHIRImmunizationResource, OpenmrsConcept } from './immunization-domain';
+import { mapFromFHIRImmunizationBundle } from './immunization-mapper';
 
 function getImmunizationsConceptSetByUuid(
   immunizationsConceptSetSearchText: string,
@@ -41,14 +43,17 @@ export async function getImmunizationsConceptSet(
   return result;
 }
 
-export function performPatientImmunizationsSearch(
-  patientIdentifier: string,
-  patientUuid: string,
-  abortController: AbortController,
-): Promise<FHIRImmunizationBundle> {
-  return openmrsFetch(`${fhirBaseUrl}/Immunization?patient.identifier=${patientIdentifier}`, {
-    signal: abortController.signal,
-  }).then((response) => response.data);
+export function useImmunizations(patientUuid: string) {
+  const immunizationsUrl = `${fhirBaseUrl}/Immunization?patient=${patientUuid}`;
+
+  const { data, error, isValidating } = useSWR<{ data: FHIRImmunizationBundle }, Error>(immunizationsUrl, openmrsFetch);
+
+  return {
+    data: data ? mapFromFHIRImmunizationBundle(data.data) : null,
+    isError: error,
+    isLoading: !data && !error,
+    isValidating,
+  };
 }
 
 export function savePatientImmunization(

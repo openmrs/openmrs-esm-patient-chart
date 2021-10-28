@@ -13,11 +13,17 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  InlineLoading,
 } from 'carbon-components-react';
-import { EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import {
+  EmptyState,
+  ErrorState,
+  launchPatientWorkspace,
+  PatientChartPagination,
+} from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
-import { mapFromFHIRImmunizationBundle } from './immunization-mapper';
-import { performPatientImmunizationsSearch } from './immunizations.resource';
+import { useImmunizations } from './immunizations.resource';
+import { usePagination } from '@openmrs/esm-framework';
 
 export interface ImmunizationsOverviewProps {
   basePath: string;
@@ -25,32 +31,27 @@ export interface ImmunizationsOverviewProps {
   patientUuid: string;
 }
 
-const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = ({ patient, patientUuid }) => {
-  const immunizationsToShowCount = 5;
+const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = ({ patient, patientUuid, basePath }) => {
   const { t } = useTranslation();
-  const [immunizations, setImmunizations] = React.useState(null);
-  const [error, setError] = React.useState(null);
+  const immunizationsToShowCount = 5;
   const displayText = t('immunizations', 'immunizations');
   const headerTitle = t('immunizations', 'Immunizations');
+  const urlLabel = t('seeAll', 'See all');
+  const pageUrl = window.spaBase + basePath + '/immunizations';
 
-  React.useEffect(() => {
-    if (patient) {
-      const abortController = new AbortController();
-      performPatientImmunizationsSearch(patient.identifier[0].value, patientUuid, abortController)
-        .then((searchResult) => {
-          let allImmunizations = mapFromFHIRImmunizationBundle(searchResult);
-          setImmunizations(allImmunizations);
-        })
-        .catch(setError);
+  const { data: immunizations, isError, isLoading, isValidating } = useImmunizations(patientUuid);
+  const {
+    results: paginatedImmunizations,
+    goTo,
+    currentPage,
+  } = usePagination(immunizations ?? [], immunizationsToShowCount);
 
-      return () => abortController.abort();
-    }
-  }, [patient, patientUuid]);
+  const launchImmunizationsForm = React.useCallback(() => launchPatientWorkspace('immunization-form-workspace'), []);
 
-  const headers = [
+  const tableHeaders = [
     {
-      key: 'vaccine',
-      header: t('vaccine', 'Vaccine'),
+      key: 'vaccineName',
+      header: t('recentVaccination', 'Recent vaccination'),
     },
     {
       key: 'vaccinationDate',
@@ -58,81 +59,72 @@ const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = ({ patient, 
     },
   ];
 
-  const launchImmunizationsForm = () => launchPatientWorkspace('immunization-form-workspace');
+  const tableRows = React.useMemo(() => {
+    return paginatedImmunizations?.map((immunization, index) => ({
+      ...immunization,
+      id: `${index}`,
+      vaccineName: immunization.vaccineName,
+      vaccinationDate: `${dayjs(immunization.existingDoses[0].occurrenceDateTime).format('MMM-YYYY')}`,
+    }));
+  }, [paginatedImmunizations]);
 
-  const RenderImmunizations: React.FC = () => {
-    if (immunizations.length) {
-      const rows = getRowItems(immunizations);
-      return (
-        <div className={styles.widgetCard}>
-          <div className={styles.immunizationsHeader}>
-            <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
-            <Button
-              kind="ghost"
-              renderIcon={Add16}
-              iconDescription="Add immunizations"
-              onClick={launchImmunizationsForm}
-            >
-              {t('add', 'Add')}
-            </Button>
-          </div>
-          <TableContainer>
-            <DataTable rows={rows} headers={headers} isSortable={true} size="short">
-              {({ rows, headers, getHeaderProps, getTableProps }) => (
-                <Table {...getTableProps()} useZebraStyles>
-                  <TableHead>
-                    <TableRow>
-                      {headers.map((header) => (
-                        <TableHeader
-                          className={`${styles.productiveHeading01} ${styles.text02}`}
-                          {...getHeaderProps({
-                            header,
-                            isSortable: header.isSortable,
-                          })}
-                        >
-                          {header.header?.content ?? header.header}
-                        </TableHeader>
+  if (isLoading) return <DataTableSkeleton role="progressbar" />;
+  if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
+  if (immunizations?.length) {
+    return (
+      <div className={styles.widgetCard}>
+        <div className={styles.immunizationsHeader}>
+          <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
+          <span>{isValidating ? <InlineLoading /> : null}</span>
+          <Button kind="ghost" renderIcon={Add16} iconDescription="Add immunizations" onClick={launchImmunizationsForm}>
+            {t('add', 'Add')}
+          </Button>
+        </div>
+        <TableContainer>
+          <DataTable headers={tableHeaders} rows={tableRows} isSortable={true} size="short">
+            {({ rows, headers, getHeaderProps, getTableProps }) => (
+              <Table {...getTableProps()} useZebraStyles>
+                <TableHead>
+                  <TableRow>
+                    {headers.map((header) => (
+                      <TableHeader
+                        className={`${styles.productiveHeading01} ${styles.text02}`}
+                        {...getHeaderProps({
+                          header,
+                          isSortable: header.isSortable,
+                        })}
+                      >
+                        {header.header?.content ?? header.header}
+                      </TableHeader>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {rows.map((row) => (
+                    <TableRow key={row.id}>
+                      {row.cells.map((cell) => (
+                        <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                       ))}
                     </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {rows.map((row) => (
-                      <TableRow key={row.id}>
-                        {row.cells.map((cell) => (
-                          <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
-                        ))}
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              )}
-            </DataTable>
-          </TableContainer>
-        </div>
-      );
-    }
-    return <EmptyState displayText={displayText} headerTitle={headerTitle} />;
-  };
-
-  return (
-    <>
-      {immunizations ? (
-        <RenderImmunizations />
-      ) : error ? (
-        <ErrorState error={error} headerTitle={headerTitle} />
-      ) : (
-        <DataTableSkeleton rowCount={immunizationsToShowCount} />
-      )}
-    </>
-  );
+                  ))}
+                </TableBody>
+              </Table>
+            )}
+          </DataTable>
+        </TableContainer>
+        <PatientChartPagination
+          currentItems={paginatedImmunizations.length}
+          onPageNumberChange={({ page }) => goTo(page)}
+          pageNumber={currentPage}
+          pageSize={immunizationsToShowCount}
+          pageUrl={pageUrl}
+          totalItems={immunizations.length}
+          urlLabel={urlLabel}
+        />
+      </div>
+    );
+  }
+  return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchImmunizationsForm} />;
 };
-
-function getRowItems(rows) {
-  return rows.map((row, index) => ({
-    id: `${index}`,
-    vaccine: row.vaccineName,
-    vaccinationDate: `${dayjs(row.existingDoses[0].occurrenceDateTime).format('MMM-YYYY')}`,
-  }));
-}
 
 export default ImmunizationsOverview;
