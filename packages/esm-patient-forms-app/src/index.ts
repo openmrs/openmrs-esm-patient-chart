@@ -1,9 +1,4 @@
-import {
-  defineConfigSchema,
-  getAsyncLifecycle,
-  getSyncLifecycle,
-  messageOmrsServiceWorker,
-} from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { dashboardMeta } from './dashboard.meta';
 import OfflineToolsNavLink from './offline-forms/offline-tools-nav-link.component';
@@ -15,7 +10,7 @@ const backendDependencies = {
 };
 
 const frontendDependencies = {
-  // '@openmrs/esm-framework': process.env.FRAMEWORK_VERSION,
+  '@openmrs/esm-framework': process.env.FRAMEWORK_VERSION,
 };
 
 function setupOpenMRS() {
