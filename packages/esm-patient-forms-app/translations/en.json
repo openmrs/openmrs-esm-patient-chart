@@ -9,6 +9,11 @@
   "noFormsAvailable": "There are no Forms to display for this patient",
   "noFormsFound": "Sorry, no forms have been found",
   "noRecommendedFormsAvailable": "No recommended forms available at the moment",
+  "offlineFormsTableFormAvailableOffline": "Offline",
+  "offlineFormsTableFormNameHeader": "Form name",
+  "offlineFormsTitle": "Offline forms",
+  "offlinePatientsTableSearchLabel": "Search this list",
+  "offlinePatientsTableSearchPlaceholder": "Search this list",
   "searchForForm": "Search for a form",
   "seeAll": "See all"
 }
