@@ -1,38 +1,52 @@
 import { openmrsFetch, OmrsOfflineHttpHeaders, omrsOfflineCachingStrategyHttpHeaderName } from '@openmrs/esm-framework';
 import { formEncounterUrl } from '../constants';
-import { useFormEncounters } from '../hooks/useForms';
 import { useLocalStorage } from '../hooks/useLocalStorage';
-import escapeRegExp from 'lodash-es/escapeRegExp';
 import { FormEncounter } from '../types';
+import escapeRegExp from 'lodash-es/escapeRegExp';
+import useSWR from 'swr';
 
-export function useOfflineForms() {
-  const formsResponse = useFormEncounters();
-  return;
-}
+export function useOfflineFormInfo(form: FormEncounter) {
+  const isFormFullyCachedSwr = useSWR(`offlineFormInfo/${form.uuid}`, () => isFormFullyCached(form.uuid));
+  const { formsMarkedAsOffline, setMarkedForOffline } = useOfflineFormsLocalStorage();
+  const isFormMarkedAsOffline = formsMarkedAsOffline.some((markedForm) => markedForm.uuid === form.uuid);
 
-export interface OfflineFormState {
-  formEncounter: FormEncounter;
-  markedForOffline: boolean;
-  synchronizationStatus: 'unknown' | 'synchronizing' | 'synchronized';
-}
-
-function useCurrentOfflineFormsState() {
-  const [offlineForms, setOfflineForms] = useLocalStorage<Array<{ uuid: string }>>(
-    '@openmrs/esm-patient-forms-app:offline-forms',
-    [],
-  );
-  const registerOfflineForm = (uuid: string) => {
-    setOfflineForms((previous) => [...previous, { uuid }]);
-    addFormToCache(uuid);
+  const registerFormAsOffline = async () => {
+    setMarkedForOffline(form.uuid, true);
+    isFormFullyCachedSwr.mutate(async () => {
+      await addFormToCache(form.uuid);
+      return await isFormFullyCached(form.uuid);
+    });
   };
-  const unregisterOfflineForm = (uuid: string) => {
-    setOfflineForms((previous) => previous.filter((entry) => entry.uuid !== uuid));
+
+  const unregisterFormAsOffline = () => {
+    setMarkedForOffline(form.uuid, false);
   };
 
   return {
-    offlineForms,
-    registerOfflineForm,
-    unregisterOfflineForm,
+    isFormFullyCachedSwr,
+    isFormMarkedAsOffline,
+    registerFormAsOffline,
+    unregisterFormAsOffline,
+  };
+}
+
+function useOfflineFormsLocalStorage() {
+  const [formsMarkedAsOffline, setFormsMarkedAsOffline] = useLocalStorage<Array<{ uuid: string }>>(
+    '@openmrs/esm-patient-forms-app:offline-forms',
+    [],
+  );
+
+  const setMarkedForOffline = (uuid: string, markedForOffline: boolean) => {
+    if (markedForOffline) {
+      setFormsMarkedAsOffline((previous) => [...previous, { uuid }]);
+    } else {
+      setFormsMarkedAsOffline((previous) => previous.filter((entry) => entry.uuid !== uuid));
+    }
+  };
+
+  return {
+    formsMarkedAsOffline,
+    setMarkedForOffline,
   };
 }
 

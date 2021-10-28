@@ -1,24 +1,32 @@
 import { useState, SetStateAction } from 'react';
 
-export function useLocalStorage<T>(key: string, initialValue: T) {
-  const [value, setValue] = useState<T>(() => {
-    try {
-      const item = window.localStorage.getItem(key);
-      return item ? JSON.parse(item) : initialValue;
-    } catch (e) {
-      console.warn('Unhandled error in useLocalStorage. Failed to read persisted value.', e);
-      return initialValue;
-    }
-  });
+export function useLocalStorage<T>(key: string, fallback: T) {
+  const [value, setValue] = useState<T>(() => readWithFallback(key, fallback));
 
   const setter = (value: SetStateAction<T>) => {
-    try {
-      setValue(value);
-      window.localStorage.setItem(key, JSON.stringify(value));
-    } catch (e) {
-      console.warn('Unhandled error in useLocalStorage. Value most likely not persisted.', e);
-    }
+    setValue(() => {
+      const previous = readWithFallback(key, fallback);
+      const next = value instanceof Function ? value(previous) : value;
+
+      try {
+        window.localStorage.setItem(key, JSON.stringify(next));
+      } catch (e) {
+        console.warn('useLocalStorage: Failed to write value.', e);
+      }
+
+      return next;
+    });
   };
 
   return [value, setter] as const;
+}
+
+function readWithFallback<T>(key: string, fallback: T) {
+  try {
+    const item = window.localStorage.getItem(key);
+    return item ? JSON.parse(item) : fallback;
+  } catch (e) {
+    console.warn('useLocalStorage: Failed to read/deserialize value.', e);
+    return fallback;
+  }
 }

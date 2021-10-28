@@ -13,47 +13,34 @@ import {
   DataTableHeader,
   DataTableRow,
   Toggle,
+  SkeletonPlaceholder,
 } from 'carbon-components-react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useFormEncounters } from '../hooks/useForms';
+import { FormEncounter } from '../types';
+import { useOfflineFormInfo } from './offline-forms';
 import styles from './offline-forms.styles.scss';
 
-const forms = [
-  {
-    uuid: '1',
-    name: 'Offline form 1',
-    availableOffline: false,
-  },
-  {
-    uuid: '2',
-    name: 'Offline form 2',
-    availableOffline: true,
-  },
-];
+export interface OfflineFormsProps {
+  canMarkFormsAsOffline: boolean;
+}
 
-const OfflineForms: React.FC = () => {
+const OfflineForms: React.FC<OfflineFormsProps> = ({ canMarkFormsAsOffline }) => {
   const { t } = useTranslation();
+  const forms = useFormEncounters();
   const layout = useLayoutType();
   const toolbarItemSize = layout === 'desktop' ? 'sm' : undefined;
   const headers: Array<DataTableHeader> = [
     { key: 'formName', header: t('offlineFormsTableFormNameHeader', 'Form name') },
     { key: 'availableOffline', header: t('offlineFormsTableFormAvailableOffline', 'Offline') },
   ];
-  const rows: Array<DataTableRow & Record<string, unknown>> = forms.map((offlineFormInfo) => ({
-    id: offlineFormInfo.uuid,
-    formName: offlineFormInfo.name,
-    availableOffline: (
-      <div>
-        <Toggle
-          id={`${offlineFormInfo.uuid}-available-offline-toggle`}
-          className={styles.availableOfflineToggle}
-          labelA=""
-          labelB=""
-          size="sm"
-        />
-      </div>
-    ),
-  }));
+  const rows: Array<DataTableRow & Record<string, unknown>> =
+    forms.data?.data?.results?.map((form) => ({
+      id: form.uuid,
+      formName: form.name,
+      availableOffline: <OfflineFormToggle form={form} disabled={!canMarkFormsAsOffline} />,
+    })) ?? [];
 
   return (
     <>
@@ -109,5 +96,38 @@ const OfflineForms: React.FC = () => {
     </>
   );
 };
+
+function OfflineFormToggle({ form, disabled }: { form: FormEncounter; disabled: boolean }) {
+  const { isFormFullyCachedSwr, isFormMarkedAsOffline, registerFormAsOffline, unregisterFormAsOffline } =
+    useOfflineFormInfo(form);
+
+  const handleToggled = (checked: boolean) => {
+    if (checked) {
+      registerFormAsOffline();
+    } else {
+      unregisterFormAsOffline();
+    }
+  };
+
+  if (isFormFullyCachedSwr.data === undefined) {
+    // ^ Using an explicit undefined check since 'data' is a bool. We want to handle false separately.
+    return <SkeletonPlaceholder className={styles.availableOfflineToggleSkeleton} />;
+  }
+
+  return (
+    <div>
+      <Toggle
+        id={`${form.uuid}-offline-toggle`}
+        className={styles.availableOfflineToggle}
+        labelA=""
+        labelB=""
+        size="sm"
+        toggled={isFormMarkedAsOffline}
+        disabled={disabled || isFormFullyCachedSwr.isValidating}
+        onToggle={handleToggled}
+      />
+    </div>
+  );
+}
 
 export default OfflineForms;

@@ -100,8 +100,12 @@ function setupOpenMRS() {
         id: 'offline-tools-page-forms',
         slot: 'offline-tools-page-forms-slot',
         load: getAsyncLifecycle(() => import('./offline-forms/offline-forms.component'), options),
-        online: true,
-        offline: true,
+        online: {
+          canMarkFormsAsOffline: true,
+        },
+        offline: {
+          canMarkFormsAsOffline: false,
+        },
       },
     ],
   };
