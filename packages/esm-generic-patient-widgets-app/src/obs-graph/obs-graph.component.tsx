@@ -7,7 +7,7 @@ import { LineChart } from '@carbon/charts-react';
 import { LineChartOptions } from '@carbon/charts/interfaces/charts';
 import { ScaleTypes } from '@carbon/charts/interfaces/enums';
 import '@carbon/charts/styles.css';
-import { useConfig } from '@openmrs/esm-react-utils';
+import { useConfig } from '@openmrs/esm-framework';
 import { useObs } from '../resources/useObs';
 
 interface ConceptDescriptor {

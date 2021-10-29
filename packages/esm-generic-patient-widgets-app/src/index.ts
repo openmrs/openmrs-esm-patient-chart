@@ -28,7 +28,6 @@ function setupOpenMRS() {
     extensions: [
       {
         id: 'obs-by-encounter-widget',
-        slot: 'patient-chart-conditions-dashboard-slot',
         load: getAsyncLifecycle(() => import('./obs-switchable/obs-switchable.component'), options),
         meta: {
           columnSpan: 4,

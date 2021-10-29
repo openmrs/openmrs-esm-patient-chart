@@ -1,6 +1,14 @@
 import { Type } from '@openmrs/esm-framework';
 
 export const configSchema = {
+  title: {
+    _type: Type.String,
+    _default: "Vitals"
+  },
+  noDataMessage: {
+    _type: Type.String,
+    _default: "There's no data to display here"
+  },
   data: {
     _type: Type.Array,
     _elements: {
@@ -36,9 +44,14 @@ export const configSchema = {
 };
 
 export interface ConfigObject {
+  title: string;
+  noDataMessage: string;
   data: Array<{
     concept: string;
     label: string;
     color: string;
   }>;
+  table: {
+    pageSize: number
+  }
 }

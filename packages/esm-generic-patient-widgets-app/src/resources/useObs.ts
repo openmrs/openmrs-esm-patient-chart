@@ -57,5 +57,5 @@ type ObsResult = FHIRResource['resource'] & {
 };
 
 function isUuid(input: string) {
-  return input.replace(/-/, '').length === 32;
+  return input.length === 36;
 }
