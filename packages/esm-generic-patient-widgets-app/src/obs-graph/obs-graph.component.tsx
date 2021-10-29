@@ -22,7 +22,7 @@ interface ObsGraphProps {
 const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const config = useConfig();
-  const { data: obss, isError, isLoading, isValidating } = useObs(patientUuid);
+  const { data: obss, error, isLoading, isValidating } = useObs(patientUuid);
 
   const [selectedConcept, setSelectedConcept] = React.useState<ConceptDescriptor>({
     label: config.data[0]?.label,

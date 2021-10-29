@@ -3,11 +3,13 @@ import { Type } from '@openmrs/esm-framework';
 export const configSchema = {
   title: {
     _type: Type.String,
+    _description: "Displayed at the top of the widget",
     _default: 'Vitals',
   },
-  noDataMessage: {
+  resultsName: {
     _type: Type.String,
-    _default: "There's no data to display here",
+    _description: "Displayed in messages about this data",
+    _default: "results",
   },
   data: {
     _type: Type.Array,
@@ -45,7 +47,7 @@ export const configSchema = {
 
 export interface ConfigObject {
   title: string;
-  noDataMessage: string;
+  resultsName: string;
   data: Array<{
     concept: string;
     label: string;

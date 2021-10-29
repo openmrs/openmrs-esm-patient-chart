@@ -19,13 +19,13 @@ const ObsSwitchable: React.FC<ObsSwitchableProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const config = useConfig() as ConfigObject;
   const [chartView, setChartView] = React.useState<boolean>();
-  const { data, isError, isLoading, isValidating } = useObs(patientUuid);
+  const { data, error, isLoading, isValidating } = useObs(patientUuid);
 
   return (
     <>
       {(() => {
         if (isLoading) return <DataTableSkeleton role="progressbar" />;
-        if (isError) return <ErrorState error={isError} headerTitle={config.title} />;
+        if (error) return <ErrorState error={error} headerTitle={config.title} />;
         if (data?.length) {
           return (
             <div className={styles.widgetContainer}>
@@ -61,7 +61,7 @@ const ObsSwitchable: React.FC<ObsSwitchableProps> = ({ patientUuid }) => {
             </div>
           );
         }
-        return <EmptyState displayText={config.noDataMessage} headerTitle={config.title} />;
+        return <EmptyState displayText={config.resultsName} headerTitle={config.title} />;
       })()}
     </>
   );

@@ -1,76 +1,48 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
+import { within } from '@testing-library/dom';
 import userEvent from '@testing-library/user-event';
-import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
-import { mockPatient } from '../../../../__mocks__/patient.mock';
-import {
-  formattedVitals,
-  mockConceptMetadata,
-  mockConceptUnits,
-  mockFhirVitalsResponse,
-  mockVitalsConfig,
-} from '../../../../__mocks__/vitals.mock';
+import { openmrsFetch, useConfig , usePagination} from '@openmrs/esm-framework';
 import { swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
-import VitalsOverview from './vitals-overview.component';
-import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import ObsSwitchable from './obs-switchable.component';
+import { ConfigObject } from '../config-schema';
+import { mockWeightAndViralLoadResult } from '../../../../__mocks__/generic-widgets.mock';
 
-const testProps = {
-  patientUuid: mockPatient.id,
-  showAddVitals: false,
-  pageSize: 5,
-  pageUrl: '',
-  urlLabel: '',
-};
-
-const mockOpenmrsFetch = openmrsFetch as jest.Mock;
-const mockUsePagination = usePagination as jest.Mock;
-
-jest.mock('@openmrs/esm-patient-common-lib', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
-
-  return {
-    ...originalModule,
-    launchPatientWorkspace: jest.fn(),
-    useVitalsConceptMetadata: jest.fn().mockImplementation(() => ({
-      data: {
-        conceptUnits: mockConceptUnits,
-        conceptMetadata: mockConceptMetadata,
-      },
-    })),
-  };
-});
+const mockedUseConfig = useConfig as jest.Mock;
+const mockedOpenmrsFetch = openmrsFetch as jest.Mock;
+const mockedUsePagination = usePagination as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
 
   return {
     ...originalModule,
-    attach: jest.fn(),
-    openmrsFetch: jest.fn(),
-    useConfig: jest.fn(() => mockVitalsConfig),
-    usePagination: jest.fn().mockImplementation(() => ({
+    usePagination: jest.fn().mockImplementation((data) => ({
       currentPage: 1,
       goTo: () => {},
-      results: [],
+      results: data,
     })),
   };
 });
 
-describe('VitalsOverview: ', () => {
-  it('renders an empty state view if vitals data is unavailable', async () => {
-    mockOpenmrsFetch.mockReturnValueOnce({ data: [] });
+describe('Switchable obs viewer: ', () => {
 
-    renderVitalsOverview();
+  it('renders an empty state view if data is unavailable', async () => {
+    mockedOpenmrsFetch.mockResolvedValue({ data: [] });
+    mockedUseConfig.mockReturnValue({ title: "Blood", resultsName: "blood data", data: [] } as ConfigObject);
+
+    renderObsSwitchable();
 
     await waitForLoadingToFinish();
 
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /vitals/i })).toBeInTheDocument();
-    expect(screen.getByText(/There are no vital signs to display for this patient/i)).toBeInTheDocument();
-    expect(screen.getByText(/Record vital signs/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: "Blood" })).toBeInTheDocument();
+    expect(screen.getByText(/There are no blood data.*/)).toBeInTheDocument();
   });
 
-  it('renders an error state view if there is a problem fetching allergies data', async () => {
+  it('renders an error state view if there is a problem fetching data', async () => {
+    mockedUseConfig.mockReturnValue({ title: "Yellow bile", data: [] } as ConfigObject);
+
     const error = {
       message: 'You are not logged in',
       response: {
@@ -78,65 +50,65 @@ describe('VitalsOverview: ', () => {
         statusText: 'Unauthorized',
       },
     };
-    mockOpenmrsFetch.mockRejectedValueOnce(error);
+    mockedOpenmrsFetch.mockRejectedValue(error);
 
-    renderVitalsOverview();
+    renderObsSwitchable();
 
     await waitForLoadingToFinish();
 
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /vitals/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Yellow bile/i })).toBeInTheDocument();
     expect(screen.getByText(/Error 401: Unauthorized/i)).toBeInTheDocument();
     expect(
       screen.getByText(
-        /Sorry, there was a problem displaying this information. You can try to reload this page, or contact the site administrator and quote the error code above/i,
+        /Sorry, there was a problem.*/i,
       ),
     ).toBeInTheDocument();
   });
 
-  it("renders an overview of the patient's vital signs", async () => {
-    mockOpenmrsFetch.mockReturnValueOnce({ data: mockFhirVitalsResponse });
-    mockUsePagination.mockReturnValueOnce({
-      results: formattedVitals.slice(0, 5),
-      goTo: () => {},
-      currentPage: 1,
-    });
+  it("renders data for the configured concepts", async () => {
+    mockedUseConfig.mockReturnValue({ title: "Black bile", data: [
+      {concept: "5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "label": "Weight", "color": "brown"},
+      {concept: "856AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "label": "Viral Load", "color": "green"},
+    ], table: { pageSize: 5 } } as ConfigObject);
+    mockedOpenmrsFetch.mockResolvedValue({ data: mockWeightAndViralLoadResult });
 
-    renderVitalsOverview();
+    renderObsSwitchable();
 
     await waitForLoadingToFinish();
 
-    expect(screen.getByRole('heading', { name: /vitals/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Black bile/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /table view/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /chart view/i })).toBeInTheDocument();
 
-    const expectedColumnHeaders = [/date and time/, /bp/, /r. rate/, /pulse/, /spO2/, /temp/];
+    const table = screen.getByRole("table");
 
-    expectedColumnHeaders.map((header) =>
-      expect(screen.getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument(),
+    const expectedColumnHeaders = [/date and time/, /weight/, /viral load/];
+
+    expectedColumnHeaders.forEach((header) =>
+      expect(within(table).getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument(),
     );
 
     const expectedTableRows = [
-      /19 - May - 2021, 07:26 121 \/ 121 12 76 37/,
-      /10 - May - 2021, 09:41 120 \/ 120 45 66 90 37/,
-      /07 - May - 2021, 12:04 120 \/ 120/,
+      /28 - Oct - 2021, 04:57 180/,
+      /15 - Oct - 2021, 02:25 198 200/
     ];
 
-    expectedTableRows.map((row) => expect(screen.getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument());
+    expectedTableRows.map((row) => expect(within(table).getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument());
   });
 
   it('toggles between rendering either a tabular view or a chart view', async () => {
-    mockOpenmrsFetch.mockReturnValueOnce({ data: mockFhirVitalsResponse });
-    mockUsePagination.mockReturnValue({
-      results: formattedVitals.slice(0, 5),
-      goTo: () => {},
-      currentPage: 1,
-    });
-    renderVitalsOverview();
+    mockedUseConfig.mockReturnValue({ title: "Phlegm", data: [
+      {concept: "5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "label": "Weight", "color": "brown"},
+      {concept: "856AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "label": "Viral Load", "color": "green"},
+    ], table: { pageSize: 5 } } as ConfigObject);
+    mockedOpenmrsFetch.mockResolvedValue({ data: mockWeightAndViralLoadResult });
+
+    renderObsSwitchable();
 
     await waitForLoadingToFinish();
 
-    expect(screen.getByRole('heading', { name: /vitals/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /phlegm/i })).toBeInTheDocument();
 
     const chartViewButton = screen.getByRole('button', {
       name: /chart view/i,
@@ -147,38 +119,14 @@ describe('VitalsOverview: ', () => {
 
     userEvent.click(chartViewButton);
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
-    expect(screen.getByText(/vital sign displayed/i)).toBeInTheDocument();
-    expect(screen.getAllByRole('tab').length).toEqual(5);
-    expect(screen.getByRole('tab', { name: /bp/i })).toHaveValue('');
+    expect(screen.getAllByRole('tab').length).toEqual(2);
+    expect(screen.getByRole('tab', { name: /viral load/i })).toHaveValue('');
 
     userEvent.click(tabularViewButton);
     expect(screen.queryByRole('table')).toBeInTheDocument();
-    expect(screen.queryByText(/vital sign displayed/i)).not.toBeInTheDocument();
-  });
-
-  it('clicking the Add button launches the vitals form in a workspace', async () => {
-    testProps.showAddVitals = true;
-    mockOpenmrsFetch.mockReturnValueOnce({ data: mockFhirVitalsResponse });
-    mockUsePagination.mockReturnValueOnce({
-      results: formattedVitals.slice(0, 5),
-      goTo: () => {},
-      currentPage: 1,
-    });
-
-    renderVitalsOverview();
-
-    await screen.findByRole('heading', { name: /vitals/i });
-
-    const addVitalsButton = screen.getByLabelText(/Add vitals/i);
-    expect(addVitalsButton).toBeInTheDocument();
-
-    userEvent.click(addVitalsButton);
-
-    expect(launchPatientWorkspace).toHaveBeenCalledTimes(1);
-    expect(launchPatientWorkspace).toHaveBeenCalledWith('patient-vitals-biometrics-form-workspace');
   });
 });
 
-function renderVitalsOverview() {
-  swrRender(<VitalsOverview {...testProps} />);
+function renderObsSwitchable() {
+  swrRender(<ObsSwitchable patientUuid={"foo-patient-123"} />);
 }

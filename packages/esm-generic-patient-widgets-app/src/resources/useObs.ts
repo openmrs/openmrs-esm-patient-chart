@@ -26,7 +26,7 @@ export function useObs(patientUuid: string): UseObsResult {
 
   return {
     data: observations,
-    isError: error,
+    error: error,
     isLoading: !result && !error,
     isValidating,
   };
@@ -47,7 +47,7 @@ interface ObsFetchResponse {
 
 export interface UseObsResult {
   data: Array<ObsResult>;
-  isError: Error;
+  error: Error;
   isLoading: boolean;
   isValidating: boolean;
 }

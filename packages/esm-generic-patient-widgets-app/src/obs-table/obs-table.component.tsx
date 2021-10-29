@@ -21,7 +21,7 @@ interface ObsTableProps {
 
 const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
   const config = useConfig();
-  const { data: obss, isError, isLoading, isValidating } = useObs(patientUuid);
+  const { data: obss, error, isLoading, isValidating } = useObs(patientUuid);
 
   const uniqueDates = [...new Set(obss.map((o) => o.issued))].sort();
   const obssByDate = uniqueDates.map((date) => obss.filter((o) => o.issued === date));
