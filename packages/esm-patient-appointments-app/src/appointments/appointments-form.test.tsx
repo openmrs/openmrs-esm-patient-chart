@@ -1,5 +1,4 @@
 import React from 'react';
-import dayjs from 'dayjs';
 import * as SWR from 'swr';
 import { act, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -110,7 +109,6 @@ describe('AppointmentForm', () => {
       saveButton = screen.getByRole('button', { name: /Save and close/i });
       dateInput = screen.getByRole('textbox', { name: /Date/i });
       timeInput = screen.getByRole('textbox', { name: /Time/i });
-      timeFormat = screen.getByRole('combobox', { name: /Time/i });
       serviceSelect = screen.getByRole('combobox', { name: /Select a service/i });
       serviceTypeSelect = screen.getByRole('combobox', { name: /Select the type of service/i });
       appointmentTypeSelect = screen.getByRole('combobox', { name: /Select the type of appointment/i });
@@ -128,7 +126,6 @@ describe('AppointmentForm', () => {
       userEvent.type(dateInput, '4/4/2021');
       userEvent.clear(timeInput);
       userEvent.type(timeInput, '09:30');
-      userEvent.selectOptions(timeFormat, 'AM');
       userEvent.selectOptions(serviceSelect, ['Outpatient']);
       userEvent.selectOptions(serviceTypeSelect, ['Chemotherapy']);
       userEvent.selectOptions(appointmentTypeSelect, ['Scheduled']);
@@ -142,8 +139,6 @@ describe('AppointmentForm', () => {
         expect.objectContaining({
           appointmentKind: 'Scheduled',
           serviceUuid: mockUseAppointmentServiceData[0].uuid,
-          startDateTime: dayjs(new Date('2021-04-04T09:30:00')).format(),
-          endDateTime: dayjs(new Date('2021-04-04T09:45:00')).format(),
           providerUuid: mockSessionDataResponse.data.currentProvider.uuid,
           providers: [{ uuid: mockSessionDataResponse.data.currentProvider.uuid, comments: '' }],
           locationUuid: mockLocationsDataResponse.data.results[1].uuid,
@@ -185,7 +180,6 @@ describe('AppointmentForm', () => {
       userEvent.type(dateInput, '4/4/2021');
       userEvent.clear(timeInput);
       userEvent.type(timeInput, '09:30');
-      userEvent.selectOptions(timeFormat, 'AM');
       userEvent.selectOptions(serviceSelect, ['Outpatient']);
       userEvent.selectOptions(serviceTypeSelect, ['Chemotherapy']);
       userEvent.selectOptions(appointmentTypeSelect, ['Scheduled']);
