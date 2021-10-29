@@ -94,8 +94,10 @@ const MedicationsDetailsTable = connect<
               </p>
               <p className={styles.bodyLong01}>
                 <span className={styles.label01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
-                <strong>{getDosage(medication.drug?.strength, medication.dose).toLowerCase()}</strong> &mdash;{' '}
-                {medication.route?.display.toLowerCase()} &mdash; {medication.frequency?.display.toLowerCase()}
+                <span className={styles.dosage}>
+                  {getDosage(medication.drug?.strength, medication.dose).toLowerCase()}
+                </span>{' '}
+                &mdash; {medication.route?.display.toLowerCase()} &mdash; {medication.frequency?.display.toLowerCase()}
                 &mdash;{' '}
                 {!medication.duration
                   ? t('medicationIndefiniteDuration', 'Indefinite duration').toLowerCase()

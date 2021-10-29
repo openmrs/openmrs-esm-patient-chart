@@ -49,3 +49,8 @@
 .indicationRow {
   padding: 0.25rem 0;
 }
+
+.dosage {
+  @include carbon--type-style("productive-heading-01");
+  color: $text-01;
+}
