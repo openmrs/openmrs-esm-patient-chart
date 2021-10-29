@@ -11,10 +11,7 @@ const frontendDependencies = {
   '@openmrs/esm-framework': process.env.FRAMEWORK_VERSION,
 };
 
-console.log('Executing index.ts!');
-
 function setupOpenMRS() {
-  console.log('Setting it up!');
   const moduleName = '@openmrs/esm-generic-patient-widgets-app';
 
   const options = {
