@@ -2,7 +2,7 @@ import React from 'react';
 import { screen } from '@testing-library/react';
 import { within } from '@testing-library/dom';
 import userEvent from '@testing-library/user-event';
-import { openmrsFetch, useConfig , usePagination} from '@openmrs/esm-framework';
+import { openmrsFetch, useConfig, usePagination } from '@openmrs/esm-framework';
 import { swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import ObsSwitchable from './obs-switchable.component';
 import { ConfigObject } from '../config-schema';
@@ -26,22 +26,21 @@ jest.mock('@openmrs/esm-framework', () => {
 });
 
 describe('Switchable obs viewer: ', () => {
-
   it('renders an empty state view if data is unavailable', async () => {
     mockedOpenmrsFetch.mockResolvedValue({ data: [] });
-    mockedUseConfig.mockReturnValue({ title: "Blood", resultsName: "blood data", data: [] } as ConfigObject);
+    mockedUseConfig.mockReturnValue({ title: 'Blood', resultsName: 'blood data', data: [] } as ConfigObject);
 
     renderObsSwitchable();
 
     await waitForLoadingToFinish();
 
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: "Blood" })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Blood' })).toBeInTheDocument();
     expect(screen.getByText(/There are no blood data.*/)).toBeInTheDocument();
   });
 
   it('renders an error state view if there is a problem fetching data', async () => {
-    mockedUseConfig.mockReturnValue({ title: "Yellow bile", data: [] } as ConfigObject);
+    mockedUseConfig.mockReturnValue({ title: 'Yellow bile', data: [] } as ConfigObject);
 
     const error = {
       message: 'You are not logged in',
@@ -59,18 +58,18 @@ describe('Switchable obs viewer: ', () => {
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /Yellow bile/i })).toBeInTheDocument();
     expect(screen.getByText(/Error 401: Unauthorized/i)).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        /Sorry, there was a problem.*/i,
-      ),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Sorry, there was a problem.*/i)).toBeInTheDocument();
   });
 
-  it("renders data for the configured concepts", async () => {
-    mockedUseConfig.mockReturnValue({ title: "Black bile", data: [
-      {concept: "5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "label": "Weight", "color": "brown"},
-      {concept: "856AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "label": "Viral Load", "color": "green"},
-    ], table: { pageSize: 5 } } as ConfigObject);
+  it('renders data for the configured concepts', async () => {
+    mockedUseConfig.mockReturnValue({
+      title: 'Black bile',
+      data: [
+        { concept: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', label: 'Weight', color: 'brown' },
+        { concept: '856AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', label: 'Viral Load', color: 'green' },
+      ],
+      table: { pageSize: 5 },
+    } as ConfigObject);
     mockedOpenmrsFetch.mockResolvedValue({ data: mockWeightAndViralLoadResult });
 
     renderObsSwitchable();
@@ -81,7 +80,7 @@ describe('Switchable obs viewer: ', () => {
     expect(screen.getByRole('button', { name: /table view/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /chart view/i })).toBeInTheDocument();
 
-    const table = screen.getByRole("table");
+    const table = screen.getByRole('table');
 
     const expectedColumnHeaders = [/date and time/, /weight/, /viral load/];
 
@@ -89,19 +88,22 @@ describe('Switchable obs viewer: ', () => {
       expect(within(table).getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument(),
     );
 
-    const expectedTableRows = [
-      /28 - Oct - 2021, 04:57 180/,
-      /15 - Oct - 2021, 02:25 198 200/
-    ];
+    const expectedTableRows = [/28 - Oct - 2021, 04:57 180/, /15 - Oct - 2021, 02:25 198 200/];
 
-    expectedTableRows.map((row) => expect(within(table).getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument());
+    expectedTableRows.map((row) =>
+      expect(within(table).getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument(),
+    );
   });
 
   it('toggles between rendering either a tabular view or a chart view', async () => {
-    mockedUseConfig.mockReturnValue({ title: "Phlegm", data: [
-      {concept: "5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "label": "Weight", "color": "brown"},
-      {concept: "856AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "label": "Viral Load", "color": "green"},
-    ], table: { pageSize: 5 } } as ConfigObject);
+    mockedUseConfig.mockReturnValue({
+      title: 'Phlegm',
+      data: [
+        { concept: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', label: 'Weight', color: 'brown' },
+        { concept: '856AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', label: 'Viral Load', color: 'green' },
+      ],
+      table: { pageSize: 5 },
+    } as ConfigObject);
     mockedOpenmrsFetch.mockResolvedValue({ data: mockWeightAndViralLoadResult });
 
     renderObsSwitchable();
@@ -128,5 +130,5 @@ describe('Switchable obs viewer: ', () => {
 });
 
 function renderObsSwitchable() {
-  swrRender(<ObsSwitchable patientUuid={"foo-patient-123"} />);
+  swrRender(<ObsSwitchable patientUuid={'foo-patient-123'} />);
 }

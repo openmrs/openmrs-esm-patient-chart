@@ -3,13 +3,13 @@ import { Type } from '@openmrs/esm-framework';
 export const configSchema = {
   title: {
     _type: Type.String,
-    _description: "Displayed at the top of the widget",
+    _description: 'Displayed at the top of the widget',
     _default: 'Vitals',
   },
   resultsName: {
     _type: Type.String,
-    _description: "Displayed in messages about this data",
-    _default: "results",
+    _description: 'Displayed in messages about this data',
+    _default: 'results',
   },
   data: {
     _type: Type.Array,
