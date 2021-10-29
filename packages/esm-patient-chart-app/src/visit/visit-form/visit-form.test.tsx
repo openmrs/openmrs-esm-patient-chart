@@ -44,6 +44,7 @@ describe('VisitForm: ', () => {
 
     expect(screen.getByRole('textbox', { name: /Date/i })).toBeInTheDocument();
     expect(screen.getByRole('textbox', { name: /Time/i })).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: /Time/i })).toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: /Select a location/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /Recommended/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /All/i })).toBeInTheDocument();
@@ -74,6 +75,9 @@ describe('VisitForm: ', () => {
 
       const visitType = screen.getByRole('radio', { name: /Outpatient Visit/ });
       userEvent.click(visitType);
+
+      const timeFormat = screen.getByRole('combobox', { name: /Time/i });
+      userEvent.selectOptions(timeFormat, 'AM');
 
       const locationOptions = screen.getByRole('combobox', { name: /Select a location/i });
       userEvent.selectOptions(locationOptions, 'b1a8b05e-3542-4037-bbd3-998ee9c40574');
