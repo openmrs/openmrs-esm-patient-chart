@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useMemo } from 'react';
 import dayjs from 'dayjs';
 import VisitTypeOverview from './visit-type-overview.component';
 import styles from './visit-form.component.scss';
@@ -29,6 +29,7 @@ import {
   useSessionUser,
   VisitMode,
   VisitStatus,
+  ExtensionSlot,
 } from '@openmrs/esm-framework';
 import { amPm, convertTime12to24 } from '@openmrs/esm-patient-common-lib';
 import { first } from 'rxjs/operators';
@@ -48,6 +49,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({ isTablet, patientUuid }
   const [timeFormat, setTimeFormat] = useState<amPm>(new Date().getHours() >= 12 ? 'PM' : 'AM');
   const [contentSwitcherIndex, setContentSwitcherIndex] = useState<number>(1);
   const [visitType, setVisitType] = useState<string>();
+  const state = useMemo(() => ({ patientUuid }), [patientUuid]);
 
   useEffect(() => {
     if (locations && sessionUser?.sessionLocation?.uuid) {
@@ -114,6 +116,11 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({ isTablet, patientUuid }
   return (
     <Form>
       <Grid className={styles.grid}>
+        {isTablet && (
+          <Row className={styles.headerGridRow}>
+            <ExtensionSlot extensionSlotName="visit-form-header-slot" className={styles.dataGridRow} state={state} />
+          </Row>
+        )}
         <Row className={styles.gridRow}>
           <Column sm={1}>
             <span className={styles.columnLabel}>{t('dateAndTimeOfVisit', 'Date and time of visit')}</span>
