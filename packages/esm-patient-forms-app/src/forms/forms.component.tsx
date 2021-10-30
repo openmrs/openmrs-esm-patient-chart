@@ -6,6 +6,7 @@ import { ContentSwitcher, Switch, DataTableSkeleton, InlineLoading } from 'carbo
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { useForms } from '../hooks/useForms';
+import { useLayoutType } from '@openmrs/esm-framework';
 
 const enum FormsCategory {
   Recommended,
@@ -24,6 +25,7 @@ interface FormsProps {
 const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, urlLabel }) => {
   const { t } = useTranslation();
   const headerTitle = t('forms', 'Forms');
+  const isTablet = useLayoutType() === 'tablet';
   const [formsCategory, setFormsCategory] = useState(FormsCategory.All);
   const { isValidating, data, error } = useForms(patientUuid);
 
@@ -40,9 +42,9 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
   }
 
   return (
-    <div className={styles.formsWidgetContainer}>
-      <div className={styles.formsHeaderContainer}>
-        <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
+    <div className={styles.widgetCard}>
+      <div className={isTablet ? styles.tabletHeader : styles.desktopHeader}>
+        <h4>{headerTitle}</h4>
         {isValidating ? (
           <span>
             <InlineLoading />
@@ -50,7 +52,7 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
         ) : null}
         <div className={styles.contextSwitcherContainer}>
           <ContentSwitcher
-            className={styles.contextSwitcherWidth}
+            className={isTablet ? styles.tabletContentSwitcher : styles.desktopContentSwitcher}
             onChange={(event) => setFormsCategory(event.name as any)}
             selectedIndex={formsCategory}
           >

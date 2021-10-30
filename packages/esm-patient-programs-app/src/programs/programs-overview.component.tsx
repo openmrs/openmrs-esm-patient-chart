@@ -2,7 +2,7 @@ import React from 'react';
 import dayjs from 'dayjs';
 import Add16 from '@carbon/icons-react/es/add/16';
 import styles from './programs-overview.scss';
-import { usePagination } from '@openmrs/esm-framework';
+import { useLayoutType, usePagination } from '@openmrs/esm-framework';
 import {
   DataTable,
   DataTableSkeleton,
@@ -42,6 +42,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ patientUuid, basePa
   const headerTitle = t('carePrograms', 'Care Programs');
   const urlLabel = t('seeAll', 'See all');
   const pageUrl = window.spaBase + basePath + '/programs';
+  const isTablet = useLayoutType() === 'tablet';
 
   const { data: enrollments, isError, isLoading, isValidating } = useEnrollments(patientUuid);
   const activeEnrollments = enrollments?.filter((enrollment) => !enrollment.dateCompleted);
@@ -86,8 +87,8 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ patientUuid, basePa
   if (activeEnrollments?.length) {
     return (
       <div className={styles.widgetCard}>
-        <div className={styles.programsHeader}>
-          <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
+        <div className={isTablet ? styles.tabletHeader : styles.desktopHeader}>
+          <h4>{headerTitle}</h4>
           <span>{isValidating ? <InlineLoading /> : null}</span>
           <Button
             kind="ghost"

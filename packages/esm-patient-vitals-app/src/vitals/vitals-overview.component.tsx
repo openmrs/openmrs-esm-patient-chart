@@ -15,7 +15,7 @@ import {
   withUnit,
 } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
-import { attach } from '@openmrs/esm-framework';
+import { useLayoutType } from '@openmrs/esm-framework';
 import { patientVitalsBiometricsFormWorkspace } from '../constants';
 import { useVitals } from './vitals.resource';
 
@@ -32,6 +32,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
   const displayText = t('vitalSigns', 'Vital signs');
   const headerTitle = t('vitals', 'Vitals');
   const [chartView, setChartView] = React.useState<boolean>();
+  const isTablet = useLayoutType() === 'tablet';
 
   const { data: vitals, isError, isLoading, isValidating } = useVitals(patientUuid);
   const { data: conceptData } = useVitalsConceptMetadata();
@@ -86,8 +87,8 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
         if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
         if (vitals?.length) {
           return (
-            <div className={styles.vitalsWidgetContainer}>
-              <div className={styles.vitalsHeaderContainer}>
+            <div className={styles.widgetCard}>
+              <div className={isTablet ? styles.tabletHeader : styles.desktopHeader}>
                 <h4>{headerTitle}</h4>
                 <div className={styles.backgroundDataFetchingIndicator}>
                   <span>{isValidating ? <InlineLoading /> : null}</span>
