@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import Add16 from '@carbon/icons-react/es/add/16';
 import SequenceTable from './immunizations-sequence-table';
 import get from 'lodash-es/get';
@@ -14,7 +14,7 @@ import {
 } from '@openmrs/esm-patient-common-lib';
 import { useConfig, usePagination } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import { getImmunizationsConceptSet, useImmunizations } from './immunizations.resource';
+import { useImmunizations, useImmunizationsConceptSet } from './immunizations.resource';
 import {
   Button,
   DataTable,
@@ -30,7 +30,7 @@ import {
   TableExpandedRow,
   InlineLoading,
 } from 'carbon-components-react';
-import { ExistingDoses, Immunization, Sequence } from '../types';
+import { ExistingDoses, Sequence } from '../types';
 import { findConfiguredSequences, findExistingDoses, latestFirst } from './utils';
 import { immunizationFormSub } from './immunization-utils';
 
@@ -42,41 +42,23 @@ interface ImmunizationsDetailedSummaryProps {
 const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> = ({ patientUuid, basePath }) => {
   const { t, i18n } = useTranslation();
   const { immunizationsConfig } = useConfig();
+  const sequenceDefinitions = immunizationsConfig?.sequenceDefinitions;
   const displayText = t('immunizations', 'immunizations');
   const headerTitle = t('immunizations', 'Immunizations');
-  const [allImmunizations, setAllImmunizations] = useState<Array<Immunization>>([]);
-  const [hasFetchedSortedImmunizations, setHasFetchedSortedImmunizations] = useState(false);
   const locale = i18n.language.replace('_', '-');
   const pageUrl = window.spaBase + basePath + '/summary';
   const urlLabel = t('goToSummary', 'Go to Summary');
 
-  const { data: existingImmunizationsForPatient, isError, isLoading, isValidating } = useImmunizations(patientUuid);
+  const { data: immunizationsConceptSetData } = useImmunizationsConceptSet();
+  const { data: existingImmunizations, isError, isLoading, isValidating } = useImmunizations(patientUuid);
 
-  const abortController = new AbortController();
-  const searchTerm = immunizationsConfig?.vaccinesConceptSet;
-  const configuredImmunizations = getImmunizationsConceptSet(searchTerm, abortController).then(
-    findConfiguredSequences(immunizationsConfig?.sequenceDefinitions),
+  const configuredImmunizations = findConfiguredSequences(sequenceDefinitions, immunizationsConceptSetData);
+  const consolidatedImmunizations = findExistingDoses(configuredImmunizations, existingImmunizations || []);
+  const sortedImmunizations = orderBy(
+    consolidatedImmunizations,
+    [(immunization) => get(immunization, 'existingDoses.length', 0)],
+    ['desc'],
   );
-
-  configuredImmunizations
-    .then((configuredImmunizations) => {
-      const consolidatedImmunizations = findExistingDoses(
-        configuredImmunizations,
-        existingImmunizationsForPatient || [],
-      );
-      const sortedImmunizationsForPatient = orderBy(
-        consolidatedImmunizations,
-        [(immunization) => get(immunization, 'existingDoses.length', 0)],
-        ['desc'],
-      );
-      setAllImmunizations(sortedImmunizationsForPatient);
-      setHasFetchedSortedImmunizations(true);
-    })
-    .catch((err) => {
-      if (err.name !== 'AbortError') {
-        setAllImmunizations([]);
-      }
-    });
 
   const launchImmunizationsForm = React.useCallback(() => launchPatientWorkspace('immunization-form-workspace'), []);
 
@@ -91,7 +73,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
 
   const tableRows = useMemo(
     () =>
-      allImmunizations?.map((immunization) => {
+      sortedImmunizations?.map((immunization) => {
         const occurrenceDate =
           isEmpty(immunization.sequences) && !isEmpty(immunization.existingDoses)
             ? `${t('singleDoseOn', 'Single Dose on')} ${new Date(
@@ -134,64 +116,62 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
           ),
         };
       }),
-    [allImmunizations, t, locale, launchImmunizationsForm],
+    [sortedImmunizations, t, locale, launchImmunizationsForm],
   );
 
   const { results: paginatedImmunizations, currentPage, goTo } = usePagination(tableRows, 10);
 
-  if (isLoading || !hasFetchedSortedImmunizations) return <DataTableSkeleton role="progressbar" />;
+  if (isLoading || !sortedImmunizations) return <DataTableSkeleton role="progressbar" />;
   if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
-  if (allImmunizations?.length) {
-    return (
-      <div className={styles.widgetCard}>
-        <div className={styles.immunizationsHeader}>
-          <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{t('immunizations', 'Immunizations')}</h4>
-          <span>{isValidating ? <InlineLoading /> : null}</span>
-          <Button kind="ghost" renderIcon={Add16} iconDescription="Add immunizations" onClick={launchImmunizationsForm}>
-            {t('add', 'Add')}
-          </Button>
-        </div>
-        <DataTable rows={paginatedImmunizations} headers={tableHeader}>
-          {({ rows, headers, getHeaderProps, getRowProps, getTableProps }) => (
-            <Table {...getTableProps()} useZebraStyles>
-              <TableHead>
-                <TableRow>
-                  <TableExpandHeader />
-                  {headers.map((header) => (
-                    <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
-                  ))}
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {rows.map((row, index) => (
-                  <React.Fragment key={row.id}>
-                    <TableExpandRow {...getRowProps({ row })}>
-                      {row.cells.map((cell) => (
-                        <TableCell key={cell.id}>{cell.value}</TableCell>
-                      ))}
-                    </TableExpandRow>
-                    {row.isExpanded && (
-                      <TableExpandedRow colSpan={headers.length + 1}>
-                        {<SequenceTable immunizations={allImmunizations[index]} patientUuid={patientUuid} />}
-                      </TableExpandedRow>
-                    )}
-                  </React.Fragment>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </DataTable>
-        <PatientChartPagination
-          totalItems={tableRows?.length}
-          pageSize={10}
-          onPageNumberChange={({ page }) => goTo(page)}
-          pageNumber={currentPage}
-          pageUrl={pageUrl}
-          currentItems={paginatedImmunizations?.length}
-          urlLabel={urlLabel}
-        />
+  if (sortedImmunizations?.length) {
+    <div className={styles.widgetCard}>
+      <div className={styles.immunizationsHeader}>
+        <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{t('immunizations', 'Immunizations')}</h4>
+        <span>{isValidating ? <InlineLoading /> : null}</span>
+        <Button kind="ghost" renderIcon={Add16} iconDescription="Add immunizations" onClick={launchImmunizationsForm}>
+          {t('add', 'Add')}
+        </Button>
       </div>
-    );
+      <DataTable rows={paginatedImmunizations} headers={tableHeader}>
+        {({ rows, headers, getHeaderProps, getRowProps, getTableProps }) => (
+          <Table {...getTableProps()} useZebraStyles>
+            <TableHead>
+              <TableRow>
+                <TableExpandHeader />
+                {headers.map((header) => (
+                  <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {rows.map((row, index) => (
+                <React.Fragment key={row.id}>
+                  <TableExpandRow {...getRowProps({ row })}>
+                    {row.cells.map((cell) => (
+                      <TableCell key={cell.id}>{cell.value}</TableCell>
+                    ))}
+                  </TableExpandRow>
+                  {row.isExpanded && (
+                    <TableExpandedRow colSpan={headers.length + 1}>
+                      {<SequenceTable immunizations={sortedImmunizations[index]} patientUuid={patientUuid} />}
+                    </TableExpandedRow>
+                  )}
+                </React.Fragment>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </DataTable>
+      <PatientChartPagination
+        totalItems={tableRows?.length}
+        pageSize={10}
+        onPageNumberChange={({ page }) => goTo(page)}
+        pageNumber={currentPage}
+        pageUrl={pageUrl}
+        currentItems={paginatedImmunizations?.length}
+        urlLabel={urlLabel}
+      />
+    </div>;
   }
   return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchImmunizationsForm} />;
 };
