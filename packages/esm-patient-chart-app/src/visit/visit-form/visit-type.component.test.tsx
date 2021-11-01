@@ -13,6 +13,7 @@ const mockHandleChange = jest.fn();
 const mockGoToPage = jest.fn();
 
 jest.mock('@openmrs/esm-framework', () => ({
+  ...(jest.requireActual('@openmrs/esm-framework') as any),
   usePagination: jest.fn(),
   useVisitTypes: jest.fn(),
 }));
