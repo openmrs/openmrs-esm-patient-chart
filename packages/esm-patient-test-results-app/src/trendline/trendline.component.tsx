@@ -11,6 +11,7 @@ import { CommonDataTable } from '../overview/common-overview';
 import { exist } from '../loadPatientTestData/helpers';
 import { useTranslation } from 'react-i18next';
 import '@carbon/charts/styles.css';
+import dayjs from 'dayjs';
 
 const useTrendlineData = ({
   patientUuid,
@@ -77,7 +78,10 @@ const Trendline: React.FC<{
 
   const [upperRange, lowerRange] = React.useMemo(() => {
     const dates = patientData[1].map((entry) => new Date(Date.parse(entry.effectiveDateTime)));
-    return [dates[0], dates[dates.length - 1]];
+    const newUpperRangeVal = dates.filter(
+      (result) => dayjs(result).format('MM/DD/YYYY') == dayjs().format('MM/DD/YYYY'),
+    );
+    return [newUpperRangeVal.length > 0 ? dates[0] : new Date(dayjs().format('MM/DD/YYYY')), dates[dates.length - 1]];
   }, [patientData]);
 
   const setLowerRange = React.useCallback(
@@ -114,6 +118,19 @@ const Trendline: React.FC<{
   }> = [];
 
   let dataset = patientData[0];
+
+  const currentDate = patientData[1].filter(
+    (result) => dayjs(result.effectiveDateTime).format('MM/DD/YYYY') == dayjs().format('MM/DD/YYYY'),
+  );
+
+  if (currentDate.length === 0) {
+    data.push({
+      date: new Date(dayjs().format('MM/DD/YYYY')),
+      value: 0,
+      group: dataset,
+      id: dataset,
+    });
+  }
 
   patientData[1].forEach((entry) => {
     const range =
