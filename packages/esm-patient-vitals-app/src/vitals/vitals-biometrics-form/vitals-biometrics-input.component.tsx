@@ -1,6 +1,7 @@
-import React, { Fragment } from 'react';
-import { TextArea, TextInput } from 'carbon-components-react';
+import React, { Fragment, useState } from 'react';
+import { FormLabel, TextArea, TextInput } from 'carbon-components-react';
 import styles from './vitals-biometrics-input.component.scss';
+import { useTranslation } from 'react-i18next';
 
 interface VitalsBiometricInputProps {
   title: string;
@@ -11,6 +12,7 @@ interface VitalsBiometricInputProps {
     type?: string | 'text';
     value: number | string;
     className?: string;
+    invalid?: boolean;
   }>;
   unitSymbol?: string;
   textFieldWidth?: string;
@@ -33,6 +35,14 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
   inputIsNormal,
   isTablet,
 }) => {
+  const { t } = useTranslation();
+  const [invalid, setInvalid] = useState<boolean>(false);
+  const check = (value) => {
+    Number(value) || value === '' ? setInvalid(false) : setInvalid(true);
+  };
+  const error = () => {
+    return <FormLabel className={styles.danger}>{t('numericInputError', 'Must be a number')}</FormLabel>;
+  };
   return (
     <div className={styles.inputContainer} style={{ width: textFieldWidth }}>
       <p className={styles.vitalsBiometricInputLabel01}>{title}</p>
@@ -49,10 +59,10 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
                     !inputIsNormal && styles.danger
                   }`}
                   id={val.name}
-                  type="number"
-                  min={0}
+                  invalid={invalid}
                   name={val.name}
-                  onChange={onInputChange}
+                  onChange={(e) => check(e.target.value)}
+                  onInput={onInputChange}
                   labelText={''}
                   value={val.value}
                   title={val.name}
@@ -80,6 +90,7 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
         </div>
         <p className={styles.unitName}>{unitSymbol}</p>
       </div>
+      {invalid ? error() : null}
     </div>
   );
 };
