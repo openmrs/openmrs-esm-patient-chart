@@ -23,7 +23,7 @@ import {
 } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { useImmunizations } from './immunizations.resource';
-import { usePagination } from '@openmrs/esm-framework';
+import { useLayoutType, usePagination } from '@openmrs/esm-framework';
 
 export interface ImmunizationsOverviewProps {
   basePath: string;
@@ -38,6 +38,7 @@ const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = ({ patient, 
   const headerTitle = t('immunizations', 'Immunizations');
   const urlLabel = t('seeAll', 'See all');
   const pageUrl = window.spaBase + basePath + '/immunizations';
+  const isTablet = useLayoutType() === 'tablet';
 
   const { data: immunizations, isError, isLoading, isValidating } = useImmunizations(patientUuid);
   const {
@@ -73,8 +74,8 @@ const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = ({ patient, 
   if (immunizations?.length) {
     return (
       <div className={styles.widgetCard}>
-        <div className={styles.immunizationsHeader}>
-          <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
+        <div className={isTablet ? styles.tabletHeader : styles.desktopHeader}>
+          <h4>{headerTitle}</h4>
           <span>{isValidating ? <InlineLoading /> : null}</span>
           <Button kind="ghost" renderIcon={Add16} iconDescription="Add immunizations" onClick={launchImmunizationsForm}>
             {t('add', 'Add')}
