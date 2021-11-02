@@ -3,24 +3,25 @@ import find from 'lodash-es/find';
 import { ExistingDoses, Immunization } from '../types';
 import { ImmunizationSequenceDefinition, OpenmrsConcept, ImmunizationData } from './immunization-domain';
 
-export const findConfiguredSequences = (configuredSequences: Array<ImmunizationSequenceDefinition>) => {
-  return (immunizationsConceptSet: OpenmrsConcept): Array<ImmunizationData> => {
-    const immunizationConcepts: Array<OpenmrsConcept> = immunizationsConceptSet?.setMembers;
-    return map(immunizationConcepts, (immunizationConcept) => {
-      const immunizationDataFromConfig: ImmunizationData = {
-        vaccineName: immunizationConcept.display,
-        vaccineUuid: immunizationConcept.uuid,
-        existingDoses: [],
-      };
+export const findConfiguredSequences = (
+  configuredSequences: Array<ImmunizationSequenceDefinition>,
+  immunizationsConceptSet: OpenmrsConcept,
+) => {
+  const immunizationConcepts: Array<OpenmrsConcept> = immunizationsConceptSet?.setMembers;
+  return map(immunizationConcepts, (immunizationConcept) => {
+    const immunizationDataFromConfig: ImmunizationData = {
+      vaccineName: immunizationConcept.display,
+      vaccineUuid: immunizationConcept.uuid,
+      existingDoses: [],
+    };
 
-      const matchingSequenceDef = find(
-        configuredSequences,
-        (sequencesDef) => sequencesDef.vaccineConceptUuid === immunizationConcept.uuid,
-      );
-      immunizationDataFromConfig.sequences = matchingSequenceDef?.sequences;
-      return immunizationDataFromConfig;
-    });
-  };
+    const matchingSequenceDef = find(
+      configuredSequences,
+      (sequencesDef) => sequencesDef.vaccineConceptUuid === immunizationConcept.uuid,
+    );
+    immunizationDataFromConfig.sequences = matchingSequenceDef?.sequences;
+    return immunizationDataFromConfig;
+  });
 };
 
 export const findExistingDoses = (

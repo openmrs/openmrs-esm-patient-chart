@@ -1,7 +1,9 @@
-import { openmrsFetch, fhirBaseUrl } from '@openmrs/esm-framework';
+import useSWR from 'swr';
+import { openmrsFetch, fhirBaseUrl, useConfig } from '@openmrs/esm-framework';
 import includes from 'lodash-es/includes';
 import split from 'lodash-es/split';
 import { FHIRImmunizationBundle, FHIRImmunizationResource, OpenmrsConcept } from './immunization-domain';
+import { mapFromFHIRImmunizationBundle } from './immunization-mapper';
 
 function getImmunizationsConceptSetByUuid(
   immunizationsConceptSetSearchText: string,
@@ -41,14 +43,39 @@ export async function getImmunizationsConceptSet(
   return result;
 }
 
-export function performPatientImmunizationsSearch(
-  patientIdentifier: string,
-  patientUuid: string,
-  abortController: AbortController,
-): Promise<FHIRImmunizationBundle> {
-  return openmrsFetch(`${fhirBaseUrl}/Immunization?patient.identifier=${patientIdentifier}`, {
-    signal: abortController.signal,
-  }).then((response) => response.data);
+export function useImmunizationsConceptSet() {
+  const { immunizationsConfig } = useConfig();
+  const conceptSetSearchTerm = immunizationsConfig?.vaccinesConceptSet;
+  const [source, code] = conceptSetSearchTerm.split(':');
+
+  const conceptSetMappingUrl = `/ws/rest/v1/concept?source=${source}&code=${code}&v=full`;
+  const conceptSetUuidUrl = `/ws/rest/v1/concept/${conceptSetSearchTerm}?v=full`;
+
+  const { data, error } = useSWR<{ data: { results: Array<OpenmrsConcept> } }, Error>(
+    isConceptMapping(conceptSetSearchTerm) ? conceptSetMappingUrl : conceptSetUuidUrl,
+    openmrsFetch,
+  );
+
+  return {
+    data: data ? data.data.results[0] : null,
+    isError: error,
+    isLoading: !data && !error,
+  };
+}
+
+export function useImmunizations(patientUuid: string) {
+  const immunizationsUrl = `${fhirBaseUrl}/Immunization?patient=${patientUuid}`;
+
+  const { data, error, isValidating } = useSWR<{ data: FHIRImmunizationBundle }, Error>(immunizationsUrl, openmrsFetch);
+
+  const existingImmunizations = data ? mapFromFHIRImmunizationBundle(data.data) : null;
+
+  return {
+    data: data ? existingImmunizations : null,
+    isError: error,
+    isLoading: !data && !error,
+    isValidating,
+  };
 }
 
 export function savePatientImmunization(
