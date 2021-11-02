@@ -7,7 +7,7 @@ import BiometricsChart from './biometrics-chart.component';
 import BiometricsPagination from './biometrics-pagination.component';
 import { Button, DataTableSkeleton, InlineLoading } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
-import { useConfig } from '@openmrs/esm-framework';
+import { useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { useBiometrics } from './biometrics.resource';
 import {
   EmptyState,
@@ -39,6 +39,7 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({
   const displayText = t('biometrics', 'biometrics');
   const headerTitle = t('biometrics', 'Biometrics');
   const [chartView, setChartView] = React.useState(false);
+  const isTablet = useLayoutType() === 'tablet';
 
   const config = useConfig() as ConfigObject;
   const { bmiUnit } = config.biometrics;
@@ -76,9 +77,9 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({
   if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
   if (biometrics?.length) {
     return (
-      <div className={styles.biometricsWidgetContainer}>
-        <div className={styles.biometricsHeaderContainer}>
-          <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
+      <div className={styles.widgetCard}>
+        <div className={isTablet ? styles.tabletHeader : styles.desktopHeader}>
+          <h4>{headerTitle}</h4>
           <div className={styles.backgroundDataFetchingIndicator}>
             <span>{isValidating ? <InlineLoading /> : null}</span>
           </div>

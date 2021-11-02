@@ -80,7 +80,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = () => {
     return (
       <div className={styles.widgetCard}>
         <div className={styles.programsHeader}>
-          <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
+          <h4>{headerTitle}</h4>
           <span>{isValidating ? <InlineLoading /> : null}</span>
           <Button
             kind="ghost"

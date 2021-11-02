@@ -66,7 +66,7 @@ const ConditionsDetailedSummary: React.FC = () => {
     return (
       <div className={styles.widgetCard}>
         <div className={styles.conditionsHeader}>
-          <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
+          <h4>{headerTitle}</h4>
           <span>{isValidating ? <InlineLoading /> : null}</span>
           <Button kind="ghost" renderIcon={Add16} iconDescription="Add conditions" onClick={launchConditionsForm}>
             {t('add', 'Add')}

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import Add16 from '@carbon/icons-react/es/add/16';
-import { attach } from '@openmrs/esm-framework';
+import { useLayoutType } from '@openmrs/esm-framework';
 import { EmptyDataIllustration, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { Button, DataTableSkeleton, ContentSwitcher, InlineLoading, Switch, Tile } from 'carbon-components-react';
 import { useAppointments } from './appointments.resource';
@@ -22,6 +22,7 @@ enum AppointmentTypes {
 const AppointmentsBase: React.FC<AppointmentsBaseProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const headerTitle = t('appointments', 'Appointments');
+  const isTablet = useLayoutType() === 'tablet';
 
   const [contentSwitcherValue, setContentSwitcherValue] = useState(0);
   const startDate = dayjs(new Date().toISOString()).subtract(6, 'month').toISOString();
@@ -40,9 +41,9 @@ const AppointmentsBase: React.FC<AppointmentsBaseProps> = ({ patientUuid }) => {
   }
   if (Object.keys(appointmentsData)?.length) {
     return (
-      <div className={styles.card}>
-        <div className={styles.appointmentsHeader}>
-          <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
+      <div className={styles.widgetCard}>
+        <div className={isTablet ? styles.tabletHeader : styles.desktopHeader}>
+          <h4>{headerTitle}</h4>
           {isValidating ? (
             <span>
               <InlineLoading />
