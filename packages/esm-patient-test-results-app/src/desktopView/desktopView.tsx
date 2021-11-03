@@ -3,6 +3,7 @@ import { Overview } from '../overview/overview.component';
 import { Timeline } from '../timeline/timeline.component';
 import Trendline from '../trendline/trendline.component';
 import { navigateToTimeline, navigateToTrendline } from '../helpers';
+import { useLayoutType } from '@openmrs/esm-framework';
 
 const Grid: React.FC<{}> = ({ children }) => (
   <div
@@ -64,6 +65,7 @@ const deduceViewState = ({ panelUuid, testUuid, type = 'none' }): ViewState => {
 
 const DesktopView: React.FC<Record<string, any>> = ({ patientUuid, panelUuid, testUuid, type, basePath }) => {
   const [viewState, setViewState] = React.useState<ViewState>(deduceViewState({ panelUuid, testUuid, type }));
+  const isTablet = useLayoutType() === 'tablet';
 
   React.useEffect(() => {
     setViewState(deduceViewState({ panelUuid, testUuid, type }));
@@ -76,7 +78,7 @@ const DesktopView: React.FC<Record<string, any>> = ({ patientUuid, panelUuid, te
     [basePath],
   );
 
-  return (
+  return !isTablet ? (
     <Grid>
       <OverflowBorder>
         <div style={{ display: 'grid', gap: '1.5rem' }}>
@@ -111,6 +113,43 @@ const DesktopView: React.FC<Record<string, any>> = ({ patientUuid, panelUuid, te
               return <div></div>;
           }
         })()}
+      </OverflowBorder>
+    </Grid>
+  ) : (
+    <Grid>
+      <OverflowBorder>
+        <div style={{ display: 'grid', gap: '1.5rem' }}>
+          <Overview patientUuid={patientUuid} openTimeline={openTimeline} openTrendline={openTrendline}></Overview>
+        </div>
+        <OverflowBorder>
+          {(() => {
+            switch (viewState.type) {
+              case 'timeline':
+                return (
+                  <Timeline
+                    patientUuid={patientUuid}
+                    panelUuid={viewState.panelUuid}
+                    key={viewState.panelUuid}
+                    openTrendline={openTrendline}
+                  />
+                );
+
+              case 'trendline':
+                return (
+                  <Trendline
+                    patientUuid={patientUuid}
+                    panelUuid={viewState.panelUuid}
+                    testUuid={viewState.testUuid}
+                    openTimeline={openTimeline}
+                  />
+                );
+
+              case 'none':
+              default:
+                return <div></div>;
+            }
+          })()}
+        </OverflowBorder>
       </OverflowBorder>
     </Grid>
   );
