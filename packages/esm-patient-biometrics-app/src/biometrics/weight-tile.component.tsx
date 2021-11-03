@@ -12,13 +12,12 @@ const WeightTile: React.FC<WeightTileInterface> = ({ patientUuid }) => {
   const { data: biometrics } = useBiometrics(patientUuid);
   const { data: conceptUnits } = useVitalsConceptMetadata();
   const { t } = useTranslation();
+  const weight = biometrics.filter((result) => result.weight && result.weight);
 
   return (
     <div className={styles.gridColumn}>
       <p>{t('weight', 'Weight')}</p>
-      <span>
-        {biometrics?.[0].weight} {biometrics?.[0].weight && conceptUnits?.conceptUnits[4]}
-      </span>
+      <span>{weight.length > 0 ? weight?.[0].weight + ' ' + conceptUnits?.conceptUnits[4] : ''}</span>
     </div>
   );
 };
