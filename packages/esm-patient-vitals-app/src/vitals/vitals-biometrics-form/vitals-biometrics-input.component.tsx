@@ -41,16 +41,6 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
   function check(value) {
     setInvalid(!(Number(value) || value === ''));
   }
-  const error = () => {
-    return <FormLabel className={styles.danger}>{t('numericInputError', 'Must be a number')}</FormLabel>;
-  };
-  function preventNonNumericalInput(e) {
-    e = e || window.event;
-    let charCode = typeof e.which == 'undefined' ? e.keyCode : e.which;
-    let charStr = String.fromCharCode(charCode);
-
-    if (!charStr.match(/^[0-9]+$/)) e.preventDefault();
-  }
 
   return (
     <div className={styles.inputContainer} style={{ width: textFieldWidth }}>
@@ -74,7 +64,6 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
                   name={val.name}
                   onChange={(e) => check(e.target.value)}
                   onInput={onInputChange}
-                  onKeyPress={(e) => preventNonNumericalInput(e)}
                   labelText={''}
                   value={val.value}
                   title={val.name}
@@ -102,7 +91,7 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
         </div>
         <p className={styles.unitName}>{unitSymbol}</p>
       </div>
-      {invalid ? error() : null}
+      {invalid ? <FormLabel className={styles.danger}>{t('numericInputError', 'Must be a number')}</FormLabel> : null}
     </div>
   );
 };
