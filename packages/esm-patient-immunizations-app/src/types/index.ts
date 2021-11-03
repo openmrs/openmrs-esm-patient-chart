@@ -1,10 +1,3 @@
-export interface DataCaptureComponentProps {
-  entryStarted: () => void;
-  entrySubmitted: () => void;
-  entryCancelled: () => void;
-  closeComponent: () => void;
-}
-
 export interface Immunization {
   sequences?: Array<Sequence>;
   existingDoses: Array<ExistingDoses>;

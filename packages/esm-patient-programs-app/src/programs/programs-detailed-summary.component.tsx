@@ -1,10 +1,13 @@
 import React from 'react';
 import dayjs from 'dayjs';
 import Add16 from '@carbon/icons-react/es/add/16';
+import filter from 'lodash-es/filter';
+import includes from 'lodash-es/includes';
+import map from 'lodash-es/map';
 import styles from './programs-detailed-summary.scss';
 import { EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
-import { useEnrollments } from './programs.resource';
+import { useAvailablePrograms, useEnrollments } from './programs.resource';
 import { useProgramsContext } from './programs.context';
 import {
   Button,
@@ -20,6 +23,7 @@ import {
   TableRow,
   DataTableHeader,
   DataTableRow,
+  InlineNotification,
 } from 'carbon-components-react';
 
 interface ProgramsDetailedSummaryProps {}
@@ -31,6 +35,11 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = () => {
   const headerTitle = t('carePrograms', 'Care Programs');
 
   const { data: enrolledPrograms, isError, isLoading, isValidating } = useEnrollments(patientUuid);
+  const { data: availablePrograms } = useAvailablePrograms();
+  const eligiblePrograms = filter(
+    availablePrograms,
+    (program) => !includes(map(enrolledPrograms, 'program.uuid'), program.uuid),
+  );
 
   const tableHeaders: Array<DataTableHeader> = React.useMemo(
     () => [
@@ -71,13 +80,28 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = () => {
     return (
       <div className={styles.widgetCard}>
         <div className={styles.programsHeader}>
-          <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
+          <h4>{headerTitle}</h4>
           <span>{isValidating ? <InlineLoading /> : null}</span>
-          <Button kind="ghost" renderIcon={Add16} iconDescription="Add programs" onClick={launchProgramsForm}>
+          <Button
+            kind="ghost"
+            renderIcon={Add16}
+            iconDescription="Add programs"
+            onClick={launchProgramsForm}
+            disabled={availablePrograms?.length && eligiblePrograms?.length === 0}
+          >
             {t('add', 'Add')}
           </Button>
         </div>
         <TableContainer>
+          {availablePrograms?.length && eligiblePrograms?.length === 0 && (
+            <InlineNotification
+              style={{ minWidth: '100%', margin: '0rem', padding: '0rem' }}
+              kind={'info'}
+              lowContrast={true}
+              subtitle={t('noEligibleEnrollments', 'There are no more programs left to enroll this patient in')}
+              title={t('fullyEnrolled', 'Enrolled in all programs')}
+            />
+          )}
           <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="short">
             {({ rows, headers, getHeaderProps, getTableProps }) => (
               <Table {...getTableProps()} useZebraStyles>

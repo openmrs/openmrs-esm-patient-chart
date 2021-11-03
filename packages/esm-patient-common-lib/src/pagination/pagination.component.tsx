@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './pagination.component.scss';
 import { Pagination } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
-import { ConfigurableLink } from '@openmrs/esm-framework';
+import { ConfigurableLink, useLayoutType } from '@openmrs/esm-framework';
 import { usePaginationInfo } from './usePaginationInfo';
 
 interface PatientChartPaginationProps {
@@ -26,12 +26,13 @@ export const PatientChartPagination: React.FC<PatientChartPaginationProps> = ({
 }) => {
   const { t } = useTranslation();
   const { itemsDisplayed, pageSizes } = usePaginationInfo(pageSize, totalItems, pageNumber, currentItems);
+  const isTablet = useLayoutType() === 'tablet';
 
   return (
     <>
       {totalItems > 0 && (
-        <div className={styles.paginationContainer}>
-          <div className={styles.paginationLink}>
+        <div className={isTablet ? styles.tablet : styles.desktop}>
+          <div>
             {itemsDisplayed}
             {pageUrl && (
               <ConfigurableLink to={pageUrl} className={styles.configurableLink}>

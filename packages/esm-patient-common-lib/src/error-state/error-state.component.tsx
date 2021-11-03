@@ -2,6 +2,7 @@ import React from 'react';
 import styles from './error-state.scss';
 import { Tile } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
+import { useLayoutType } from '@openmrs/esm-react-utils';
 
 export interface ErrorStateProps {
   error: any;
@@ -10,10 +11,13 @@ export interface ErrorStateProps {
 
 export const ErrorState: React.FC<ErrorStateProps> = ({ error, headerTitle }) => {
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
 
   return (
     <Tile light className={styles.tile}>
-      <h1 className={styles.heading}>{headerTitle}</h1>
+      <div className={isTablet ? styles.tabletHeading : styles.desktopHeading}>
+        <h4>{headerTitle}</h4>
+      </div>
       <p className={styles.errorMessage}>
         {t('error', 'Error')} {`${error?.response?.status}: `}
         {error?.response?.statusText}

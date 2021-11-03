@@ -4,29 +4,45 @@
   border: 1px solid $ui-03;
 }
 
-.cardHeader {
+.desktopHeader, .tabletHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: $spacing-04 0 $spacing-04 $spacing-05;
   background-color: $ui-background;
+
+  h4 {
+    @include carbon--type-style("productive-heading-03");
+    color: $text-02;
+  }
+
+  h4:after {
+    content: "";
+    display: block;
+    width: 2rem;
+    padding-top: 0.188rem;
+    border-bottom: 0.375rem solid $brand-teal-01;
+  }
+
+  span {
+    margin: auto;
+  }
 }
 
-.cardHeader span {
-  margin: auto;
+.desktopHeader {  
+  height: 3rem;
+  h4 {
+    @include carbon--type-style('productive-heading-02');
+    color: $text-02;
+  }
 }
 
-.cardHeader h4 {
-  @include carbon--type-style("productive-heading-03");
-  color: $text-02;
-}
-
-.cardHeader > h4:after {
-  content: "";
-  display: block;
-  width: 2rem;
-  padding-top: 3px;
-  border-bottom: 0.375rem solid $brand-teal-01;
+.tabletHeader {  
+  height: 4.5rem;
+  h4 {
+    @include carbon--type-style('productive-heading-03');
+    color: $text-02;
+  }
 }
 
 .medicationRecord {
@@ -48,4 +64,9 @@
 
 .indicationRow {
   padding: 0.25rem 0;
+}
+
+.dosage {
+  @include carbon--type-style("productive-heading-01");
+  color: $text-01;
 }

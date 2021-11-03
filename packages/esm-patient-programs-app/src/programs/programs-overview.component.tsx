@@ -2,7 +2,7 @@ import React from 'react';
 import dayjs from 'dayjs';
 import Add16 from '@carbon/icons-react/es/add/16';
 import styles from './programs-overview.scss';
-import { usePagination } from '@openmrs/esm-framework';
+import { useLayoutType, usePagination } from '@openmrs/esm-framework';
 import {
   DataTable,
   DataTableSkeleton,
@@ -15,7 +15,11 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  InlineNotification,
 } from 'carbon-components-react';
+import filter from 'lodash-es/filter';
+import includes from 'lodash-es/includes';
+import map from 'lodash-es/map';
 import {
   EmptyState,
   ErrorState,
@@ -23,7 +27,8 @@ import {
   launchPatientWorkspace,
 } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
-import { useEnrollments } from './programs.resource';
+import { useAvailablePrograms, useEnrollments } from './programs.resource';
+
 const programsToShowCount = 5;
 
 interface ProgramsOverviewProps {
@@ -37,9 +42,17 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ patientUuid, basePa
   const headerTitle = t('carePrograms', 'Care Programs');
   const urlLabel = t('seeAll', 'See all');
   const pageUrl = window.spaBase + basePath + '/programs';
+  const isTablet = useLayoutType() === 'tablet';
 
   const { data: enrollments, isError, isLoading, isValidating } = useEnrollments(patientUuid);
   const activeEnrollments = enrollments?.filter((enrollment) => !enrollment.dateCompleted);
+
+  const { data: availablePrograms } = useAvailablePrograms();
+
+  const eligiblePrograms = filter(
+    availablePrograms,
+    (program) => !includes(map(enrollments, 'program.uuid'), program.uuid),
+  );
 
   const {
     results: paginatedEnrollments,
@@ -74,14 +87,29 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ patientUuid, basePa
   if (activeEnrollments?.length) {
     return (
       <div className={styles.widgetCard}>
-        <div className={styles.programsHeader}>
-          <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
+        <div className={isTablet ? styles.tabletHeader : styles.desktopHeader}>
+          <h4>{headerTitle}</h4>
           <span>{isValidating ? <InlineLoading /> : null}</span>
-          <Button kind="ghost" renderIcon={Add16} iconDescription="Add programs" onClick={launchProgramsForm}>
+          <Button
+            kind="ghost"
+            renderIcon={Add16}
+            iconDescription="Add programs"
+            onClick={launchProgramsForm}
+            disabled={availablePrograms?.length && eligiblePrograms?.length === 0}
+          >
             {t('add', 'Add')}
           </Button>
         </div>
         <TableContainer>
+          {availablePrograms?.length && eligiblePrograms?.length === 0 && (
+            <InlineNotification
+              style={{ minWidth: '100%', margin: '0rem', padding: '0rem' }}
+              kind={'info'}
+              lowContrast={true}
+              subtitle={t('noEligibleEnrollments', 'There are no more programs left to enroll this patient in')}
+              title={t('fullyEnrolled', 'Enrolled in all programs')}
+            />
+          )}
           <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="short">
             {({ rows, headers, getHeaderProps, getTableProps }) => (
               <Table {...getTableProps()} useZebraStyles>

@@ -4,7 +4,7 @@ import NotesPagination from './notes-pagination.component';
 import styles from './notes-overview.scss';
 import { useTranslation } from 'react-i18next';
 import { Button, DataTableSkeleton, InlineLoading } from 'carbon-components-react';
-import { useVisit } from '@openmrs/esm-framework';
+import { useLayoutType, useVisit } from '@openmrs/esm-framework';
 import { useEncounters } from './encounter.resource';
 import {
   EmptyState,
@@ -35,6 +35,7 @@ const NotesMain: React.FC<NotesOverviewProps> = ({
   const displayText = t('notes', 'Notes');
   const headerTitle = t('notes', 'Notes');
   const { data: notes, isError, isLoading, isValidating } = useEncounters(patientUuid);
+  const isTablet = useLayoutType() === 'tablet';
 
   const launchVisitNoteForm = React.useCallback(() => {
     if (currentVisit) {
@@ -52,8 +53,8 @@ const NotesMain: React.FC<NotesOverviewProps> = ({
         if (notes?.length)
           return (
             <div className={styles.widgetCard}>
-              <div className={styles.notesHeader}>
-                <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{headerTitle}</h4>
+              <div className={isTablet ? styles.tabletHeader : styles.desktopHeader}>
+                <h4>{headerTitle}</h4>
                 <span>{isValidating ? <InlineLoading /> : null}</span>
                 {showAddNote && (
                   <Button

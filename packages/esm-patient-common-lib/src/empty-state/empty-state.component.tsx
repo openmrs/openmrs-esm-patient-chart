@@ -3,6 +3,7 @@ import styles from './empty-state.scss';
 import { Link, Tile } from 'carbon-components-react';
 import { Trans, useTranslation } from 'react-i18next';
 import { EmptyDataIllustration } from './empty-data-illustration.component';
+import { useLayoutType } from '@openmrs/esm-framework';
 
 export interface EmptyStateProps {
   headerTitle: string;
@@ -12,10 +13,13 @@ export interface EmptyStateProps {
 
 export const EmptyState: React.FC<EmptyStateProps> = (props) => {
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
 
   return (
     <Tile light className={styles.tile}>
-      <h1 className={styles.heading}>{props.headerTitle}</h1>
+      <div className={isTablet ? styles.tabletHeading : styles.desktopHeading}>
+        <h4>{props.headerTitle}</h4>
+      </div>
       <EmptyDataIllustration />
       <p className={styles.content}>
         <Trans i18nKey="emptyStateText" values={{ displayText: props.displayText.toLowerCase() }}>

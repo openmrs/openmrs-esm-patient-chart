@@ -28,6 +28,7 @@ import { OrderBasketStore, OrderBasketStoreActions, orderBasketStoreActions } fr
 import { Order } from '../types/order';
 import { OrderBasketItem } from '../types/order-basket-item';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { useLayoutType } from '@openmrs/esm-framework';
 
 export interface ActiveMedicationsProps {
   isValidating?: boolean;
@@ -63,6 +64,7 @@ const MedicationsDetailsTable = connect<
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [currentMedicationPage] = paginate(medications, page, pageSize);
+    const isTablet = useLayoutType() === 'tablet';
 
     const openOrderBasket = React.useCallback(() => launchPatientWorkspace('order-basket-workspace'), []);
 
@@ -94,8 +96,10 @@ const MedicationsDetailsTable = connect<
               </p>
               <p className={styles.bodyLong01}>
                 <span className={styles.label01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
-                <strong>{getDosage(medication.drug?.strength, medication.dose).toLowerCase()}</strong> &mdash;{' '}
-                {medication.route?.display.toLowerCase()} &mdash; {medication.frequency?.display.toLowerCase()}
+                <span className={styles.dosage}>
+                  {getDosage(medication.drug?.strength, medication.dose).toLowerCase()}
+                </span>{' '}
+                &mdash; {medication.route?.display.toLowerCase()} &mdash; {medication.frequency?.display.toLowerCase()}
                 &mdash;{' '}
                 {!medication.duration
                   ? t('medicationIndefiniteDuration', 'Indefinite duration').toLowerCase()
@@ -150,7 +154,7 @@ const MedicationsDetailsTable = connect<
 
     return (
       <div className={styles.widgetCard}>
-        <div className={styles.cardHeader}>
+        <div className={isTablet ? styles.tabletHeader : styles.desktopHeader}>
           <h4>{title}</h4>
           {isValidating ? (
             <span>

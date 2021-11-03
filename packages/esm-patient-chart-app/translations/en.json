@@ -25,6 +25,7 @@
   "location": "Location",
   "maximize": "Maximize",
   "medications": "Medications",
+  "minimize": "Minimize",
   "noActiveVisit": "No Active Visit",
   "noActiveVisitText": "You can't add data to the patient chart without an active visit. Choose from one of the options below to continue.",
   "noDiagnosesFound": "No diagnoses found",

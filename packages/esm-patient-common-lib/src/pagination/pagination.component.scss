@@ -8,28 +8,39 @@
   @include carbon--type-style("body-short-01");
 }
 
-.paginationContainer {
+.desktop, .tablet {
+  @include carbon--type-style('body-short-01');
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  background-color: $ui-02;
-  width: 100%;
-  min-height: 3rem;
-  overflow: hidden;
-}
-
-.paginationLink {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  z-index: 1;
-  position: absolute;
+  border-top: 1px solid #e0e0e0;
+  justify-content: space-between;
+  color: $text-02;
   background-color: $ui-02;
   padding-left: 1rem;
-  color: $color-gray-70;
-  @extend .bodyShort01;
-  height: 3rem;
-  margin: 0;
+  align-items: center;
+}
+
+.desktop :global(.bx--pagination) {
+  min-height: 0rem;
+  height: 2rem;
+  width: auto;
+  border: none;
+
+  & :global(.bx--select-input), :global(.bx--btn), :global(.bx--pagination__right) {
+    min-height: 0rem;
+    height: 2rem;
+  }
+}
+
+.tablet :global(.bx--pagination) {
+  min-height: 0rem;
+  height: 3rem; 
+  width: auto;   
+  border: none;
+
+  & :global(.bx--select-input), :global(.bx--btn), :global(.bx--pagination__right) {
+    min-height: 0rem;
+    height: 3rem;
+  }
 }
 
 .configurableLink {
@@ -39,18 +50,14 @@
 }
 
 .pagination {
-  border: none;
+  @include carbon--type-style('body-short-01');
   background-color: $ui-02;
-  position: absolute;
-  right: 0;
-  max-width: 100%;
-}
-.pagination > :first-child {
-  visibility: hidden;
-  width: 0;
+  color: $text-02;
+  display: flex;
 }
 
-.pagination :nth-child(2),
-.pagination :nth-child(2) > div {
-  display: flex;
+div.pagination {
+  & > :global(.bx--pagination__left) {
+    display: none;
+  }
 }

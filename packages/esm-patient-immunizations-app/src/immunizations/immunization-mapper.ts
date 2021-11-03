@@ -54,8 +54,8 @@ export const mapFromFHIRImmunizationBundle = (immunizationBundle: FHIRImmunizati
     const codeWithoutSystem = findCodeWithoutSystem(immunizationsForOneVaccine[0]?.resource);
 
     return {
-      vaccineName: codeWithoutSystem.display,
-      vaccineUuid: codeWithoutSystem.code,
+      vaccineName: codeWithoutSystem?.display,
+      vaccineUuid: codeWithoutSystem?.code,
       existingDoses: orderBy(existingDoses, [(dose) => get(dose, 'occurrenceDateTime')], ['desc']),
     };
   });
@@ -67,7 +67,7 @@ function toReferenceOfType(type: string, referenceValue: string): Reference {
 }
 
 export const mapToFHIRImmunizationResource = (
-  immunizationForData: ImmunizationFormData,
+  immunizationFormData: ImmunizationFormData,
   visitUuid,
   locationUuid,
   providerUuid,
@@ -75,27 +75,27 @@ export const mapToFHIRImmunizationResource = (
   return {
     resourceType: 'Immunization',
     status: 'completed',
-    id: immunizationForData.immunizationObsUuid,
+    id: immunizationFormData.immunizationObsUuid,
     vaccineCode: {
       coding: [
         {
-          code: immunizationForData.vaccineUuid,
-          display: immunizationForData.vaccineName,
+          code: immunizationFormData.vaccineUuid,
+          display: immunizationFormData.vaccineName,
         },
       ],
     },
-    patient: toReferenceOfType('Patient', immunizationForData.patientUuid),
+    patient: toReferenceOfType('Patient', immunizationFormData.patientUuid),
     encounter: toReferenceOfType('Encounter', visitUuid), //Reference of visit instead of encounter
-    occurrenceDateTime: dayjs(immunizationForData.vaccinationDate).toDate(),
-    expirationDate: dayjs(immunizationForData.expirationDate).toDate(),
+    occurrenceDateTime: dayjs(immunizationFormData.vaccinationDate).toDate(),
+    expirationDate: dayjs(immunizationFormData.expirationDate).toDate(),
     location: toReferenceOfType('Location', locationUuid),
     performer: [{ actor: toReferenceOfType('Practitioner', providerUuid) }],
-    manufacturer: { display: immunizationForData.manufacturer },
-    lotNumber: immunizationForData.lotNumber,
+    manufacturer: { display: immunizationFormData.manufacturer },
+    lotNumber: immunizationFormData.lotNumber,
     protocolApplied: [
       {
-        doseNumberPositiveInt: immunizationForData.currentDose.sequenceNumber,
-        series: immunizationForData.currentDose.sequenceLabel,
+        doseNumberPositiveInt: immunizationFormData.currentDose.sequenceNumber,
+        series: immunizationFormData.currentDose.sequenceLabel,
       },
     ],
   };
