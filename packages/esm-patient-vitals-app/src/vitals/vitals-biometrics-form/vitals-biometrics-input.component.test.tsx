@@ -10,7 +10,7 @@ describe('<VitalsBiometricsInput/>', () => {
     textFields: [
       {
         name: 'heartRate',
-        type: 'text',
+        type: 'number',
         value: 120,
       },
     ],
@@ -28,9 +28,9 @@ describe('<VitalsBiometricsInput/>', () => {
     );
     expect(screen.getByText(/Heart Rate/i)).toBeInTheDocument();
     expect(screen.getByText(/bpm/i)).toBeInTheDocument();
-    expect(screen.getByRole('textbox')).toBeInTheDocument();
+    expect(screen.getByRole('spinbutton')).toBeInTheDocument();
 
-    const inputTextBox = await screen.findByRole('textbox');
+    const inputTextBox = await screen.findByRole('spinbutton');
     userEvent.type(inputTextBox, '75');
     expect(mockOnChange).toHaveBeenCalledTimes(2);
   });
@@ -65,9 +65,9 @@ describe('<VitalsBiometricsInput/>', () => {
     );
     expect(screen.getByText(/Heart Rate/i)).toBeInTheDocument();
     expect(screen.getByText(/bpm/i)).toBeInTheDocument();
-    expect(screen.getByRole('textbox')).toBeInTheDocument();
+    expect(screen.getByRole('spinbutton')).toBeInTheDocument();
 
-    const inputTextBox = await screen.findByRole('textbox');
+    const inputTextBox = await screen.findByRole('spinbutton');
     userEvent.type(inputTextBox, '7');
     expect(inputTextBox).toHaveProperty('disabled');
     expect(inputTextBox).toHaveClass('danger');
