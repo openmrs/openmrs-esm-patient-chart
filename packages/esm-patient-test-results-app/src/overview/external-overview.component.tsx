@@ -3,11 +3,11 @@ import ArrowRight16 from '@carbon/icons-react/es/arrow--right/16';
 import CommonOverview from './common-overview';
 import styles from './external-overview.component.scss';
 import useOverviewData from './useOverviewData';
-import { EmptyState, ExternalOverviewProps } from '@openmrs/esm-patient-common-lib';
+import { CardHeader, EmptyState, ExternalOverviewProps } from '@openmrs/esm-patient-common-lib';
 import { RecentResultsGrid, Card } from './helpers';
 import { useTranslation } from 'react-i18next';
 import { Button, DataTableSkeleton } from 'carbon-components-react';
-import { navigate, useLayoutType } from '@openmrs/esm-framework';
+import { navigate } from '@openmrs/esm-framework';
 
 const resultsToShow = 5;
 
@@ -15,7 +15,6 @@ const RecentOverview: React.FC<ExternalOverviewProps> = ({ patientUuid, filter }
   const { t } = useTranslation();
   const cardTitle = t('recentResults', 'Recent Results');
   const { overviewData, loaded, error } = useOverviewData(patientUuid);
-  const isTablet = useLayoutType() === 'tablet';
 
   const handleSeeAll = useCallback(() => {
     navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/chart/test-results` });
@@ -29,8 +28,7 @@ const RecentOverview: React.FC<ExternalOverviewProps> = ({ patientUuid, filter }
             if (overviewData.length) {
               return (
                 <div className={styles.widgetCard}>
-                  <div className={isTablet ? styles.tabletHeader : styles.desktopHeader}>
-                    <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{cardTitle}</h4>
+                  <CardHeader title={cardTitle}>
                     <Button
                       kind="ghost"
                       renderIcon={ArrowRight16}
@@ -39,7 +37,7 @@ const RecentOverview: React.FC<ExternalOverviewProps> = ({ patientUuid, filter }
                     >
                       {t('seeAllResults', 'See all results')}
                     </Button>
-                  </div>
+                  </CardHeader>
                   <CommonOverview
                     {...{
                       patientUuid,

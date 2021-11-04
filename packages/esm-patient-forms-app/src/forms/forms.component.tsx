@@ -3,7 +3,7 @@ import FormView from './form-view.component';
 import styles from './forms.component.scss';
 import EmptyFormView from './empty-form.component';
 import { ContentSwitcher, Switch, DataTableSkeleton, InlineLoading } from 'carbon-components-react';
-import { ErrorState } from '@openmrs/esm-patient-common-lib';
+import { CardHeader, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { useForms } from '../hooks/useForms';
 import { useLayoutType } from '@openmrs/esm-framework';
@@ -43,8 +43,7 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
 
   return (
     <div className={styles.widgetCard}>
-      <div className={isTablet ? styles.tabletHeader : styles.desktopHeader}>
-        <h4>{headerTitle}</h4>
+      <CardHeader title={headerTitle}>
         {isValidating ? (
           <span>
             <InlineLoading />
@@ -61,7 +60,7 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
             <Switch name={FormsCategory.All} text="All" />
           </ContentSwitcher>
         </div>
-      </div>
+      </CardHeader>
       <div style={{ width: '100%' }}>
         {formsCategory === FormsCategory.Completed && (
           <FormView

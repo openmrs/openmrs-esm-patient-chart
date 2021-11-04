@@ -17,6 +17,7 @@
   "muac": "MUAC",
   "noDataRecorded": "No data has been recorded for this patient",
   "notes": "Notes",
+  "numericInputError": "Must be a number",
   "oxygenSaturation": "Oxygen Saturation",
   "pulse": "Pulse",
   "recordVitals": "Record Vitals",

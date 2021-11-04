@@ -7,6 +7,7 @@ import isEmpty from 'lodash-es/isEmpty';
 import orderBy from 'lodash-es/orderBy';
 import styles from './immunizations-detailed-summary.scss';
 import {
+  CardHeader,
   EmptyState,
   ErrorState,
   launchPatientWorkspace,
@@ -125,13 +126,12 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
   if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
   if (sortedImmunizations?.length) {
     <div className={styles.widgetCard}>
-      <div className={styles.immunizationsHeader}>
-        <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{t('immunizations', 'Immunizations')}</h4>
+      <CardHeader title={headerTitle}>
         <span>{isValidating ? <InlineLoading /> : null}</span>
         <Button kind="ghost" renderIcon={Add16} iconDescription="Add immunizations" onClick={launchImmunizationsForm}>
           {t('add', 'Add')}
         </Button>
-      </div>
+      </CardHeader>
       <DataTable rows={paginatedImmunizations} headers={tableHeader}>
         {({ rows, headers, getHeaderProps, getRowProps, getTableProps }) => (
           <Table {...getTableProps()} useZebraStyles>
