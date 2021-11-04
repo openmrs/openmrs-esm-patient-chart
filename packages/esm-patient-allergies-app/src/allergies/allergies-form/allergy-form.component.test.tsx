@@ -2,15 +2,17 @@ import React from 'react';
 import { screen, render, act, waitFor, fireEvent } from '@testing-library/react';
 import AllergyForm from './allergy-form.component';
 import { mockPatient } from '../../../../../__mocks__/patient.mock';
-import { useConfig, showToast, showNotification } from '@openmrs/esm-framework';
+import { useConfig, showNotification } from '@openmrs/esm-framework';
 import { savePatientAllergy, fetchAllergensAndReaction } from './allergy-form.resource';
 import { of, throwError } from 'rxjs';
 import { mockAllergenAndReactions } from '../../../../../__mocks__/allergies.mock';
 import userEvent from '@testing-library/user-event';
 
-const mockCloseWorkspace = jest.fn();
+const mockedCloseWorkspace = jest.fn();
+const mockedShowNotification = showNotification as jest.Mock;
+const mockedUseConfig = useConfig as jest.Mock;
+
 window.HTMLElement.prototype.scrollIntoView = jest.fn();
-const mockConfig = useConfig as jest.Mock;
 const mockSavePatientAllergy = savePatientAllergy as jest.Mock;
 const mockFetchAllergensAndReaction = fetchAllergensAndReaction as jest.Mock;
 
@@ -27,12 +29,6 @@ const mockConcepts = {
   },
 };
 
-jest.mock('@openmrs/esm-framework', () => ({
-  useConfig: jest.fn(),
-  showToast: jest.fn(),
-  showNotification: jest.fn(),
-}));
-
 jest.mock('./allergy-form.resource', () => ({
   savePatientAllergy: jest.fn(),
   fetchAllergensAndReaction: jest.fn(),
@@ -40,11 +36,11 @@ jest.mock('./allergy-form.resource', () => ({
 
 describe('<AllergyForm>', () => {
   const renderAllergyForm = () => {
-    mockConfig.mockReturnValue(mockConcepts);
+    mockedUseConfig.mockReturnValue(mockConcepts);
     mockFetchAllergensAndReaction.mockReturnValue(of(mockAllergenAndReactions));
     render(
       <AllergyForm
-        closeWorkspace={mockCloseWorkspace}
+        closeWorkspace={mockedCloseWorkspace}
         isTablet={true}
         patient={mockPatient}
         patientUuid={mockPatient.id}
@@ -146,11 +142,11 @@ describe('<AllergyForm>', () => {
   });
 
   it('should display an error when loading the form fails', () => {
-    mockConfig.mockReturnValue(mockConcepts);
+    mockedUseConfig.mockReturnValue(mockConcepts);
     mockFetchAllergensAndReaction.mockReturnValue(throwError('loading error'));
     render(
       <AllergyForm
-        closeWorkspace={mockCloseWorkspace}
+        closeWorkspace={mockedCloseWorkspace}
         isTablet={true}
         patient={mockPatient}
         patientUuid={mockPatient.id}
@@ -160,14 +156,14 @@ describe('<AllergyForm>', () => {
     expect(screen.getByText(/Allergy Form Error/i)).toBeInTheDocument();
   });
 
-  it('should display error message when error occurs while saving patient allergy', async () => {
+  it('should display an error message when error occurs while saving patient allergy', async () => {
     renderAllergyForm();
     const promise = Promise.resolve();
     mockSavePatientAllergy.mockReturnValue(Promise.reject({ status: 500 }));
     const saveButton = screen.getByRole('button', { name: /Save and Close/i });
     userEvent.click(saveButton);
     await waitFor(() =>
-      expect(showNotification).toHaveBeenCalledWith({
+      expect(mockedShowNotification).toHaveBeenCalledWith({
         critical: true,
         description: undefined,
         kind: 'error',

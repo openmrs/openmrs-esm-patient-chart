@@ -159,12 +159,12 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
               {
                 name: t('systolic', 'systolic'),
                 separator: '/',
-                type: 'text',
+                type: 'number',
                 value: patientVitalAndBiometrics?.systolicBloodPressure || '',
               },
               {
                 name: t('diastolic', 'diastolic'),
-                type: 'text',
+                type: 'number',
                 value: patientVitalAndBiometrics?.diastolicBloodPressure || '',
               },
             ]}
@@ -196,7 +196,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
             textFields={[
               {
                 name: t('pulse', 'Pulse'),
-                type: 'text',
+                type: 'number',
                 value: patientVitalAndBiometrics?.pulse || '',
               },
             ]}
@@ -221,7 +221,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
             textFields={[
               {
                 name: t('oxygenSaturation', 'Oxygen Saturation'),
-                type: 'text',
+                type: 'number',
                 value: patientVitalAndBiometrics?.oxygenSaturation || '',
               },
             ]}
@@ -246,7 +246,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
             textFields={[
               {
                 name: t('respirationRate', 'Respiration Rate'),
-                type: 'text',
+                type: 'number',
                 value: patientVitalAndBiometrics?.respiratoryRate || '',
               },
             ]}
@@ -273,7 +273,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
             textFields={[
               {
                 name: t('temperature', 'Temperature'),
-                type: 'text',
+                type: 'number',
                 value: patientVitalAndBiometrics?.temperature || '',
               },
             ]}
@@ -330,7 +330,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
             textFields={[
               {
                 name: t('weight', 'Weight'),
-                type: 'text',
+                type: 'number',
                 value: patientVitalAndBiometrics?.weight || '',
               },
             ]}
@@ -351,7 +351,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
             textFields={[
               {
                 name: t('height', 'Height'),
-                type: 'text',
+                type: 'number',
                 value: patientVitalAndBiometrics?.height || '',
               },
             ]}
@@ -367,7 +367,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
             textFields={[
               {
                 name: t('bmi', 'BMI'),
-                type: 'text',
+                type: 'number',
                 value: patientBMI || '',
               },
             ]}
@@ -389,7 +389,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
             textFields={[
               {
                 name: t('muac', 'MUAC'),
-                type: 'text',
+                type: 'number',
                 value: patientVitalAndBiometrics?.midUpperArmCircumference || '',
               },
             ]}

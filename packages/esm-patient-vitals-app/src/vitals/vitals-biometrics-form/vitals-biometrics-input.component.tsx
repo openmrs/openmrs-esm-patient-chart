@@ -1,6 +1,7 @@
-import React, { Fragment } from 'react';
-import { TextArea, TextInput } from 'carbon-components-react';
+import React, { Fragment, useState } from 'react';
+import { FormLabel, TextArea, TextInput } from 'carbon-components-react';
 import styles from './vitals-biometrics-input.component.scss';
+import { useTranslation } from 'react-i18next';
 
 interface VitalsBiometricInputProps {
   title: string;
@@ -11,6 +12,7 @@ interface VitalsBiometricInputProps {
     type?: string | 'text';
     value: number | string;
     className?: string;
+    invalid?: boolean;
   }>;
   unitSymbol?: string;
   textFieldWidth?: string;
@@ -33,6 +35,13 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
   inputIsNormal,
   isTablet,
 }) => {
+  const { t } = useTranslation();
+  const [invalid, setInvalid] = useState<boolean>(false);
+
+  function check(value) {
+    setInvalid(!(Number(value) || value === ''));
+  }
+
   return (
     <div className={styles.inputContainer} style={{ width: textFieldWidth }}>
       <p className={styles.vitalsBiometricInputLabel01}>{title}</p>
@@ -42,7 +51,7 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
       >
         <div className={styles.centerDiv}>
           {textFields.map((val) => {
-            return val.type === 'text' ? (
+            return val.type === 'number' ? (
               <Fragment key={val.name}>
                 <TextInput
                   style={{ ...textFieldStyles }}
@@ -50,8 +59,12 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
                     !inputIsNormal && styles.danger
                   }`}
                   id={val.name}
+                  invalid={invalid}
+                  type={val.type}
+                  min={0}
                   name={val.name}
-                  onChange={onInputChange}
+                  onChange={(e) => check(e.target.value)}
+                  onInput={onInputChange}
                   labelText={''}
                   value={val.value}
                   title={val.name}
@@ -79,6 +92,7 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
         </div>
         <p className={styles.unitName}>{unitSymbol}</p>
       </div>
+      {invalid ? <FormLabel className={styles.danger}>{t('numericInputError', 'Must be a number')}</FormLabel> : null}
     </div>
   );
 };
