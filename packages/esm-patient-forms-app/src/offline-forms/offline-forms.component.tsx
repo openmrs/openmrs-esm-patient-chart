@@ -17,10 +17,10 @@ import {
 } from 'carbon-components-react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useFormEncounters } from '../hooks/useForms';
 import { FormEncounter } from '../types';
-import { useOfflineFormManagement } from '../hooks/useOfflineFormManagement';
+import { useOfflineFormManagement } from './use-offline-form-management';
 import styles from './offline-forms.styles.scss';
+import { useValidOfflineFormEncounters } from './use-offline-form-encounters';
 
 export interface OfflineFormsProps {
   canMarkFormsAsOffline: boolean;
@@ -28,7 +28,7 @@ export interface OfflineFormsProps {
 
 const OfflineForms: React.FC<OfflineFormsProps> = ({ canMarkFormsAsOffline }) => {
   const { t } = useTranslation();
-  const forms = useFormEncounters();
+  const forms = useValidOfflineFormEncounters();
   const layout = useLayoutType();
   const toolbarItemSize = layout === 'desktop' ? 'sm' : undefined;
   const headers: Array<DataTableHeader> = [
@@ -36,7 +36,7 @@ const OfflineForms: React.FC<OfflineFormsProps> = ({ canMarkFormsAsOffline }) =>
     { key: 'availableOffline', header: t('offlineFormsTableFormAvailableOffline', 'Offline') },
   ];
   const rows: Array<DataTableRow & Record<string, unknown>> =
-    forms.data?.data?.results?.map((form) => ({
+    forms.data?.map((form) => ({
       id: form.uuid,
       formName: form.name,
       availableOffline: <OfflineFormToggle form={form} disabled={!canMarkFormsAsOffline} />,

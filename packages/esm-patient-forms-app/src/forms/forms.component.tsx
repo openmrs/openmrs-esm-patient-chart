@@ -5,8 +5,9 @@ import EmptyFormView from './empty-form.component';
 import { ContentSwitcher, Switch, DataTableSkeleton, InlineLoading } from 'carbon-components-react';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
-import { useForms } from '../hooks/useForms';
+import { useForms } from '../hooks/use-forms';
 import { useLayoutType } from '@openmrs/esm-framework';
+import { isValidOfflineFormEncounter } from '../offline-forms/offline-form-helpers';
 
 const enum FormsCategory {
   Recommended,
@@ -20,16 +21,18 @@ interface FormsProps {
   pageSize: number;
   pageUrl: string;
   urlLabel: string;
+  isOffline: boolean;
 }
 
-const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, urlLabel }) => {
+const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, urlLabel, isOffline }) => {
   const { t } = useTranslation();
   const headerTitle = t('forms', 'Forms');
   const isTablet = useLayoutType() === 'tablet';
   const [formsCategory, setFormsCategory] = useState(FormsCategory.All);
-  const { isValidating, data, error } = useForms(patientUuid);
+  const { isValidating, data, error } = useForms(patientUuid, undefined, undefined, isOffline);
+  const formsToDisplay = data?.filter((formInfo) => isValidOfflineFormEncounter(formInfo.form));
 
-  if (!data && !error) {
+  if (!formsToDisplay && !error) {
     return <DataTableSkeleton role="progressbar" rowCount={5} />;
   }
 
@@ -37,7 +40,7 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
     return <ErrorState headerTitle={t('forms', 'Forms')} error={error} />;
   }
 
-  if (data.length === 0) {
+  if (formsToDisplay.length === 0) {
     return <EmptyFormView action={t('noFormsAvailable', 'There are no Forms to display for this patient')} />;
   }
 
@@ -65,7 +68,7 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
       <div style={{ width: '100%' }}>
         {formsCategory === FormsCategory.Completed && (
           <FormView
-            forms={data.filter((formInfo) => formInfo.associatedEncounters.length > 0)}
+            forms={formsToDisplay.filter((formInfo) => formInfo.associatedEncounters.length > 0)}
             patientUuid={patientUuid}
             patient={patient}
             pageSize={pageSize}
@@ -75,7 +78,7 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
         )}
         {formsCategory === FormsCategory.All && (
           <FormView
-            forms={data}
+            forms={formsToDisplay}
             patientUuid={patientUuid}
             patient={patient}
             pageSize={pageSize}

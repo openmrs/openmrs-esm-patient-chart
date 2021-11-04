@@ -3,9 +3,24 @@ import useSWR from 'swr';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { ListResponse, FormEncounter, EncounterWithFormRef, CompletedFormInfo } from '../types';
 import { customEncounterRepresentation, formEncounterUrl } from '../constants';
+import { isFormFullyCached } from '../offline-forms/offline-form-helpers';
 
-export function useFormEncounters() {
-  return useSWR(formEncounterUrl, (url) => openmrsFetch<ListResponse<FormEncounter>>(url));
+export function useFormEncounters(cachedOfflineFormsOnly = false) {
+  return useSWR(formEncounterUrl, async (url) => {
+    const res = await openmrsFetch<ListResponse<FormEncounter>>(url);
+    const forms = res.data?.results ?? [];
+
+    console.info('forms', forms);
+
+    if (!cachedOfflineFormsOnly) {
+      return forms;
+    }
+
+    const offlineForms = await Promise.all(forms.map(async (form) => ((await isFormFullyCached(form)) ? form : null)));
+
+    console.info('offlineForms', offlineForms);
+    return offlineForms.filter(Boolean);
+  });
 }
 
 export function useEncountersWithFormRef(
@@ -17,11 +32,11 @@ export function useEncountersWithFormRef(
   return useSWR(url, (url) => openmrsFetch<ListResponse<EncounterWithFormRef>>(url));
 }
 
-export function useForms(patientUuid: string, startDate?: Date, endDate?: Date) {
-  const allFormsRes = useFormEncounters();
+export function useForms(patientUuid: string, startDate?: Date, endDate?: Date, cachedOfflineFormsOnly = false) {
+  const allFormsRes = useFormEncounters(cachedOfflineFormsOnly);
   const encountersRes = useEncountersWithFormRef(patientUuid, startDate, endDate);
   const pastEncounters = encountersRes.data?.data?.results ?? [];
-  const data = allFormsRes.data ? mapToFormCompletedInfo(allFormsRes.data.data.results, pastEncounters) : undefined;
+  const data = allFormsRes.data ? mapToFormCompletedInfo(allFormsRes.data, pastEncounters) : undefined;
   // Note:
   // `pastEncounters` is currently considered as optional (i.e. any errors are ignored) since it's only used for display
   // and doesn't change any functional flows. This makes offline mode much easier to implement since the past encounters

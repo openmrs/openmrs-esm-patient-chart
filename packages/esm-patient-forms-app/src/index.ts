@@ -10,7 +10,7 @@ const backendDependencies = {
 };
 
 const frontendDependencies = {
-  '@openmrs/esm-framework': process.env.FRAMEWORK_VERSION,
+  // '@openmrs/esm-framework': process.env.FRAMEWORK_VERSION,
 };
 
 function setupOpenMRS() {
@@ -33,8 +33,12 @@ function setupOpenMRS() {
         meta: {
           columnSpan: 4,
         },
-        online: true,
-        offline: true,
+        online: {
+          isOffline: false,
+        },
+        offline: {
+          isOffline: true,
+        },
       },
       {
         id: 'patient-form-entry-workspace',
@@ -49,8 +53,12 @@ function setupOpenMRS() {
         id: 'patient-form-dashboard',
         slot: dashboardMeta.slot,
         load: getAsyncLifecycle(() => import('./forms/forms-detailed-overview.component'), options),
-        online: true,
-        offline: true,
+        online: {
+          isOffline: false,
+        },
+        offline: {
+          isOffline: true,
+        },
       },
       {
         id: 'patient-form-entry-workspace',
