@@ -73,6 +73,12 @@ function setupOpenMRS() {
         online: { showAddBiometrics: true },
         offline: { showAddBiometrics: false },
       },
+      {
+        id: 'weight-tile',
+        order: 2,
+        slot: 'visit-form-header-slot',
+        load: getAsyncLifecycle(() => import('./biometrics/weight-tile.component'), options),
+      },
     ],
   };
 }

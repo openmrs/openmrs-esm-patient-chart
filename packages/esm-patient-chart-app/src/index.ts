@@ -138,6 +138,15 @@ function setupOpenMRS() {
           title: 'Start Visit Form',
         },
       },
+      {
+        id: 'patient-details-tile',
+        slot: 'visit-form-header-slot',
+        order: 1,
+        load: getAsyncLifecycle(() => import('./ui-components/patient-details-tile.component'), {
+          featureName: 'patient-details-tile',
+          moduleName,
+        }),
+      },
     ],
   };
 }
