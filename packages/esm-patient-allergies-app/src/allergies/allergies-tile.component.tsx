@@ -14,7 +14,7 @@ const AllergyTile: React.FC<AllergyTileInterface> = ({ patientUuid }) => {
   return (
     <div className={styles.gridColumn}>
       <p>{t('allergies', 'Allergies')}</p>
-      <span>{allergies?.map((allergy) => allergy?.display).join(', ')}</span>
+      <span>{allergies?.map((allergy) => allergy.display).join(', ')}</span>
     </div>
   );
 };
