@@ -3,11 +3,10 @@ import useOverviewData from './useOverviewData';
 import CommonOverview from './common-overview';
 import styles from './lab-results.scss';
 import { Button, DataTableSkeleton } from 'carbon-components-react';
-import { EmptyState } from '@openmrs/esm-patient-common-lib';
+import { CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { RecentResultsGrid, Card } from './helpers';
 import { navigateToResults, navigateToTimeline, navigateToTrendline } from '../helpers';
-import { useLayoutType } from '@openmrs/esm-framework';
 
 const RECENT_COUNT = 2;
 
@@ -20,7 +19,6 @@ const RecentOverview: React.FC<RecentOverviewProps> = ({ patientUuid, basePath }
   const { t } = useTranslation();
   const cardTitle = t('recentResults', 'Recent Results');
   const { overviewData, loaded, error } = useOverviewData(patientUuid);
-  const isTablet = useLayoutType() === 'tablet';
 
   return (
     <RecentResultsGrid>
@@ -28,16 +26,14 @@ const RecentOverview: React.FC<RecentOverviewProps> = ({ patientUuid, basePath }
         <>
           {(() => {
             if (overviewData.length) {
+              const resultsCount = Math.min(RECENT_COUNT, overviewData.length);
               return (
                 <div className={styles.widgetCard}>
-                  <div className={isTablet ? styles.tabletHeader : styles.desktopHeader}>
-                    <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>
-                      {cardTitle} ({Math.min(RECENT_COUNT, overviewData.length)})
-                    </h4>
+                  <CardHeader title={`${cardTitle} ${resultsCount}`}>
                     <Button kind="ghost" onClick={() => navigateToResults(basePath)}>
                       {t('all_results', 'All results')}
                     </Button>
-                  </div>
+                  </CardHeader>
                   <CommonOverview
                     {...{
                       patientUuid,

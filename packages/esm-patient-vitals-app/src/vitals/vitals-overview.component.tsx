@@ -8,6 +8,7 @@ import VitalsChart from './vitals-chart.component';
 import VitalsPagination from './vitals-pagination.component';
 import { DataTableSkeleton, Button, InlineLoading } from 'carbon-components-react';
 import {
+  CardHeader,
   EmptyState,
   ErrorState,
   launchPatientWorkspace,
@@ -15,7 +16,6 @@ import {
   withUnit,
 } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
-import { useLayoutType } from '@openmrs/esm-framework';
 import { patientVitalsBiometricsFormWorkspace } from '../constants';
 import { useVitals } from './vitals.resource';
 
@@ -32,7 +32,6 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
   const displayText = t('vitalSigns', 'Vital signs');
   const headerTitle = t('vitals', 'Vitals');
   const [chartView, setChartView] = React.useState<boolean>();
-  const isTablet = useLayoutType() === 'tablet';
 
   const { data: vitals, isError, isLoading, isValidating } = useVitals(patientUuid);
   const { data: conceptData } = useVitalsConceptMetadata();
@@ -88,8 +87,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
         if (vitals?.length) {
           return (
             <div className={styles.widgetCard}>
-              <div className={isTablet ? styles.tabletHeader : styles.desktopHeader}>
-                <h4>{headerTitle}</h4>
+              <CardHeader title={headerTitle}>
                 <div className={styles.backgroundDataFetchingIndicator}>
                   <span>{isValidating ? <InlineLoading /> : null}</span>
                 </div>
@@ -126,7 +124,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
                     </Button>
                   )}
                 </div>
-              </div>
+              </CardHeader>
               {chartView ? (
                 <VitalsChart patientVitals={vitals} conceptUnits={conceptUnits} />
               ) : (

@@ -6,7 +6,7 @@ import Add16 from '@carbon/icons-react/es/add/16';
 import { useTranslation } from 'react-i18next';
 import { Button } from 'carbon-components-react';
 import { LayoutType, showModal, useLayoutType, usePagination, UserHasAccess } from '@openmrs/esm-framework';
-import { PatientChartPagination, EmptyState } from '@openmrs/esm-patient-common-lib';
+import { PatientChartPagination, EmptyState, CardHeader } from '@openmrs/esm-patient-common-lib';
 import { getAttachments, createAttachment, deleteAttachment, getAttachmentByUuid } from './attachments.resource';
 import { createGalleryEntry, readFileAsString } from './utils';
 
@@ -173,10 +173,11 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
             className={`${styles.galleryContainer} ${layOutType === 'phone' ? styles.mobileLayout : ''}`}
           >
             <div className={styles.attachmentsHeader}>
-              <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{t('attachments', 'Attachments')}</h4>
-              <Button kind="ghost" renderIcon={Add16} iconDescription="Add attachment" onClick={showCam}>
-                {t('add', 'Add')}
-              </Button>
+              <CardHeader title={t('attachments', 'Attachments')}>
+                <Button kind="ghost" renderIcon={Add16} iconDescription="Add attachment" onClick={showCam}>
+                  {t('add', 'Add')}
+                </Button>
+              </CardHeader>
             </div>
             <Gallery
               images={attachments}

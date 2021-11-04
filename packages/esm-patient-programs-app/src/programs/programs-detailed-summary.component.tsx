@@ -5,7 +5,7 @@ import filter from 'lodash-es/filter';
 import includes from 'lodash-es/includes';
 import map from 'lodash-es/map';
 import styles from './programs-detailed-summary.scss';
-import { EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { CardHeader, EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { useAvailablePrograms, useEnrollments } from './programs.resource';
 import { useProgramsContext } from './programs.context';
@@ -79,8 +79,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = () => {
   if (enrolledPrograms?.length) {
     return (
       <div className={styles.widgetCard}>
-        <div className={styles.programsHeader}>
-          <h4>{headerTitle}</h4>
+        <CardHeader title={headerTitle}>
           <span>{isValidating ? <InlineLoading /> : null}</span>
           <Button
             kind="ghost"
@@ -91,7 +90,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = () => {
           >
             {t('add', 'Add')}
           </Button>
-        </div>
+        </CardHeader>
         <TableContainer>
           {availablePrograms?.length && eligiblePrograms?.length === 0 && (
             <InlineNotification

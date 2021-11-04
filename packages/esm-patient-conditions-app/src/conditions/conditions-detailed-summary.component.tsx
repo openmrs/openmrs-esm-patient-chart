@@ -18,7 +18,7 @@ import {
   TableRow,
 } from 'carbon-components-react';
 import { Condition, useConditions } from './conditions.resource';
-import { EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { CardHeader, EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { useConditionsContext } from './conditions.context';
 
 const ConditionsDetailedSummary: React.FC = () => {
@@ -65,13 +65,12 @@ const ConditionsDetailedSummary: React.FC = () => {
   if (conditions?.length) {
     return (
       <div className={styles.widgetCard}>
-        <div className={styles.conditionsHeader}>
-          <h4>{headerTitle}</h4>
+        <CardHeader title={headerTitle}>
           <span>{isValidating ? <InlineLoading /> : null}</span>
           <Button kind="ghost" renderIcon={Add16} iconDescription="Add conditions" onClick={launchConditionsForm}>
             {t('add', 'Add')}
           </Button>
-        </div>
+        </CardHeader>
         <TableContainer>
           <DataTable rows={tableRows} headers={headers} isSortable={true} size="short">
             {({ rows, headers, getHeaderProps, getTableProps }) => (

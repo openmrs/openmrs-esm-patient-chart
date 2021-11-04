@@ -4,9 +4,10 @@ import NotesPagination from './notes-pagination.component';
 import styles from './notes-overview.scss';
 import { useTranslation } from 'react-i18next';
 import { Button, DataTableSkeleton, InlineLoading } from 'carbon-components-react';
-import { useLayoutType, useVisit } from '@openmrs/esm-framework';
+import { useVisit } from '@openmrs/esm-framework';
 import { useEncounters } from './encounter.resource';
 import {
+  CardHeader,
   EmptyState,
   ErrorState,
   launchPatientWorkspace,
@@ -35,7 +36,6 @@ const NotesMain: React.FC<NotesOverviewProps> = ({
   const displayText = t('notes', 'Notes');
   const headerTitle = t('notes', 'Notes');
   const { data: notes, isError, isLoading, isValidating } = useEncounters(patientUuid);
-  const isTablet = useLayoutType() === 'tablet';
 
   const launchVisitNoteForm = React.useCallback(() => {
     if (currentVisit) {
@@ -53,8 +53,7 @@ const NotesMain: React.FC<NotesOverviewProps> = ({
         if (notes?.length)
           return (
             <div className={styles.widgetCard}>
-              <div className={isTablet ? styles.tabletHeader : styles.desktopHeader}>
-                <h4>{headerTitle}</h4>
+              <CardHeader title={headerTitle}>
                 <span>{isValidating ? <InlineLoading /> : null}</span>
                 {showAddNote && (
                   <Button
@@ -66,7 +65,7 @@ const NotesMain: React.FC<NotesOverviewProps> = ({
                     {t('add', 'Add')}
                   </Button>
                 )}
-              </div>
+              </CardHeader>
               <NotesPagination notes={notes} pageSize={pageSize} urlLabel={urlLabel} pageUrl={pageUrl} />
             </div>
           );

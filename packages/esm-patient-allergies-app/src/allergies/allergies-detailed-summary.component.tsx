@@ -1,7 +1,7 @@
 import React from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { CardHeader, EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { useAllergies } from './allergy-intolerance.resource';
 import Add16 from '@carbon/icons-react/es/add/16';
 import {
@@ -85,15 +85,14 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
   if (allergies?.length) {
     return (
       <div className={styles.widgetCard}>
-        <div className={styles.allergiesHeader}>
-          <h4>{headerTitle}</h4>
+        <CardHeader title={headerTitle}>
           <span>{isValidating ? <InlineLoading /> : null}</span>
           {showAddAllergy && (
             <Button kind="ghost" renderIcon={Add16} iconDescription="Add allergies" onClick={launchAllergiesForm}>
               {t('add', 'Add')}
             </Button>
           )}
-        </div>
+        </CardHeader>
         <TableContainer>
           <DataTable rows={tableRows} headers={tableHeaders} isSortable={true}>
             {({ rows, headers, getHeaderProps, getTableProps }) => (

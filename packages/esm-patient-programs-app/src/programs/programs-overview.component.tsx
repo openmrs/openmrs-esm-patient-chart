@@ -2,7 +2,7 @@ import React from 'react';
 import dayjs from 'dayjs';
 import Add16 from '@carbon/icons-react/es/add/16';
 import styles from './programs-overview.scss';
-import { useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { usePagination } from '@openmrs/esm-framework';
 import {
   DataTable,
   DataTableSkeleton,
@@ -21,6 +21,7 @@ import filter from 'lodash-es/filter';
 import includes from 'lodash-es/includes';
 import map from 'lodash-es/map';
 import {
+  CardHeader,
   EmptyState,
   ErrorState,
   PatientChartPagination,
@@ -42,7 +43,6 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ patientUuid, basePa
   const headerTitle = t('carePrograms', 'Care Programs');
   const urlLabel = t('seeAll', 'See all');
   const pageUrl = window.spaBase + basePath + '/programs';
-  const isTablet = useLayoutType() === 'tablet';
 
   const { data: enrollments, isError, isLoading, isValidating } = useEnrollments(patientUuid);
   const activeEnrollments = enrollments?.filter((enrollment) => !enrollment.dateCompleted);
@@ -87,8 +87,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ patientUuid, basePa
   if (activeEnrollments?.length) {
     return (
       <div className={styles.widgetCard}>
-        <div className={isTablet ? styles.tabletHeader : styles.desktopHeader}>
-          <h4>{headerTitle}</h4>
+        <CardHeader title={headerTitle}>
           <span>{isValidating ? <InlineLoading /> : null}</span>
           <Button
             kind="ghost"
@@ -99,7 +98,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ patientUuid, basePa
           >
             {t('add', 'Add')}
           </Button>
-        </div>
+        </CardHeader>
         <TableContainer>
           {availablePrograms?.length && eligiblePrograms?.length === 0 && (
             <InlineNotification
