@@ -6,19 +6,15 @@ import { customEncounterRepresentation, formEncounterUrl } from '../constants';
 import { isFormFullyCached } from '../offline-forms/offline-form-helpers';
 
 export function useFormEncounters(cachedOfflineFormsOnly = false) {
-  return useSWR(formEncounterUrl, async (url) => {
-    const res = await openmrsFetch<ListResponse<FormEncounter>>(url);
+  return useSWR([formEncounterUrl, cachedOfflineFormsOnly], async () => {
+    const res = await openmrsFetch<ListResponse<FormEncounter>>(formEncounterUrl);
     const forms = res.data?.results ?? [];
-
-    console.info('forms', forms);
 
     if (!cachedOfflineFormsOnly) {
       return forms;
     }
 
     const offlineForms = await Promise.all(forms.map(async (form) => ((await isFormFullyCached(form)) ? form : null)));
-
-    console.info('offlineForms', offlineForms);
     return offlineForms.filter(Boolean);
   });
 }

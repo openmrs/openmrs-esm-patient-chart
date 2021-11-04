@@ -35,12 +35,6 @@ export async function isFormFullyCached(form: FormEncounter) {
   const expectedUrls = getCacheableFormUrls(form);
   const cache = await caches.open('omrs-spa-cache-v1'); // TODO: Ideally add the cache name as const to esm-offline.
   const keys = await cache.keys();
-  const missingUrls = expectedUrls.filter(
-    (expectedUrl) => !keys.some((key) => new RegExp(escapeRegExp(expectedUrl)).test(key.url)),
-  );
-
-  console.info('Missing for ' + form.name + ': ', missingUrls);
-
   return expectedUrls.every((expectedUrl) => keys.some((key) => new RegExp(escapeRegExp(expectedUrl)).test(key.url)));
 }
 
