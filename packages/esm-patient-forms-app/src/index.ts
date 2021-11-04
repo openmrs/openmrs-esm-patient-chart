@@ -26,6 +26,15 @@ function setupOpenMRS() {
   return {
     extensions: [
       {
+        id: 'patient-form-entry-workspace',
+        load: getAsyncLifecycle(() => import('./forms/form-entry.component'), options),
+        meta: {
+          title: 'Form Entry',
+        },
+        online: true,
+        offline: true,
+      },
+      {
         id: 'forms-widget',
         slot: 'patient-chart-summary-dashboard-slot',
         order: 5,
@@ -41,15 +50,6 @@ function setupOpenMRS() {
         },
       },
       {
-        id: 'patient-form-entry-workspace',
-        load: getAsyncLifecycle(() => import('./forms/form-entry.component'), options),
-        meta: {
-          title: 'Form Entry',
-        },
-        online: true,
-        offline: true,
-      },
-      {
         id: 'patient-form-dashboard',
         slot: dashboardMeta.slot,
         load: getAsyncLifecycle(() => import('./forms/forms-detailed-overview.component'), options),
@@ -59,15 +59,6 @@ function setupOpenMRS() {
         offline: {
           isOffline: true,
         },
-      },
-      {
-        id: 'patient-form-entry-workspace',
-        load: getAsyncLifecycle(() => import('./forms/form-entry.component'), options),
-        meta: {
-          title: 'Form Entry',
-        },
-        online: true,
-        offline: true,
       },
       {
         id: 'forms-summary-dashboard',
