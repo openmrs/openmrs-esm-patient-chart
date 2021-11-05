@@ -5,7 +5,7 @@ import styles from './obs-switchable.scss';
 import ObsGraph from '../obs-graph/obs-graph.component';
 import ObsTable from '../obs-table/obs-table.component';
 import { DataTableSkeleton, Button, InlineLoading } from 'carbon-components-react';
-import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
+import { CardHeader, EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { useObs } from '../resources/useObs';
 import { useConfig } from '@openmrs/esm-framework';
@@ -29,8 +29,7 @@ const ObsSwitchable: React.FC<ObsSwitchableProps> = ({ patientUuid }) => {
         if (data?.length) {
           return (
             <div className={styles.widgetContainer}>
-              <div className={styles.headerContainer}>
-                <h4>{config.title}</h4>
+              <CardHeader title={config.title}>
                 <div className={styles.backgroundDataFetchingIndicator}>
                   <span>{isValidating ? <InlineLoading /> : null}</span>
                 </div>
@@ -56,7 +55,7 @@ const ObsSwitchable: React.FC<ObsSwitchableProps> = ({ patientUuid }) => {
                     />
                   </div>
                 </div>
-              </div>
+              </CardHeader>
               {chartView ? <ObsGraph patientUuid={patientUuid} /> : <ObsTable patientUuid={patientUuid} />}
             </div>
           );
