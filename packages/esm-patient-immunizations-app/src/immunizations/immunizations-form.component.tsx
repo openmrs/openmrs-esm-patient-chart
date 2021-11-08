@@ -59,7 +59,7 @@ const ImmunizationsForm: React.FC<ImmunizationsFormProps> = ({ patientUuid }) =>
   );
 
   useEffect(() => {
-    const sub = immunizationFormSub.subscribe((props) => setFormState(props));
+    const sub = immunizationFormSub.subscribe((props) => props && setFormState(props));
     return () => sub.unsubscribe();
   }, []);
 
