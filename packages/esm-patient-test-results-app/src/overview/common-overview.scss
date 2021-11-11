@@ -1,0 +1,23 @@
+@import "~@openmrs/esm-styleguide/src/vars";
+
+.cardHeader {
+  &:after {
+    content: "";
+    display: block;
+    width: 2rem;
+    padding-top: 0.188rem;
+    border-bottom: 0.375rem solid $brand-teal-01;
+  }
+}
+
+.activeCard {
+  border: 1px solid $brand-teal-01;
+}
+
+.tableContainer :global(.bx--data-table-header) {
+  padding: 0.75rem 1rem 0.25rem 1rem;
+
+  *:not(:first-child) {
+    margin: 0.25rem 0rem;
+  }
+}

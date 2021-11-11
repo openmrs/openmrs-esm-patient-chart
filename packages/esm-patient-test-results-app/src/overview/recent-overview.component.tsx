@@ -39,6 +39,7 @@ const RecentOverview: React.FC<RecentOverviewProps> = ({ patientUuid, basePath }
                       patientUuid,
                       overviewData: overviewData.slice(0, RECENT_COUNT),
                       insertSeparator: true,
+                      isPatientSummaryDashboard: true,
                       openTimeline: (panelUuid) => navigateToTimeline(basePath, panelUuid),
                       openTrendline: (panelUuid, testUuid) => navigateToTrendline(basePath, panelUuid, testUuid),
                     }}

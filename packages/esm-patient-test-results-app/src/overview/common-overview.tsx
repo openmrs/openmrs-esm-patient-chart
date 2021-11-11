@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import Table16 from '@carbon/icons-react/es/table/16';
 import ChartLine16 from '@carbon/icons-react/es/chart--line/16';
 import {
@@ -19,10 +19,11 @@ import { Card, headers, formatDate, InfoButton, Separator, TypedTableRow } from 
 import { OverviewPanelEntry, OverviewPanelData } from './useOverviewData';
 import { useTranslation } from 'react-i18next';
 import { navigate } from '@openmrs/esm-framework';
+import styles from './common-overview.scss';
 
 const DashboardResultsCount = 5;
 
-export const CommonDataTable: React.FC<{
+interface CommonDataTableProps {
   data: Array<OverviewPanelData>;
   tableHeaders: Array<{
     key: string;
@@ -31,10 +32,23 @@ export const CommonDataTable: React.FC<{
   title?: string;
   toolbar?: React.ReactNode;
   description?: React.ReactNode;
-}> = ({ title, data, description, toolbar, tableHeaders }) => (
-  <DataTable rows={data} headers={tableHeaders}>
+}
+
+export const CommonDataTable: React.FC<CommonDataTableProps> = ({
+  title,
+  data,
+  description,
+  toolbar,
+  tableHeaders,
+}) => (
+  <DataTable rows={data} headers={tableHeaders} size="short">
     {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getTableContainerProps }) => (
-      <TableContainer title={title} description={description} {...getTableContainerProps()}>
+      <TableContainer
+        className={styles.tableContainer}
+        title={title}
+        description={description}
+        {...getTableContainerProps()}
+      >
         {toolbar}
         <Table {...getTableProps()} isSortable useZebraStyles>
           <colgroup>
@@ -116,6 +130,8 @@ const CommonOverview: React.FC<CommonOverviewProps> = ({
     navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/chart/test-results` });
   }, [patientUuid]);
 
+  const [activeCard, setActiveCard] = useState('');
+
   if (!overviewData.length)
     return <EmptyState headerTitle={t('testResults', 'Test Results')} displayText={t('testResults', 'test results')} />;
 
@@ -126,14 +142,22 @@ const CommonOverview: React.FC<CommonOverviewProps> = ({
           const allNormalResults = !data.some((result) => abnormalInterpretation.includes(result.interpretation));
           const patientSummaryDashboardData = data.slice(0, DashboardResultsCount);
           return (
-            <Card allNormalResults={allNormalResults} key={uuid}>
+            <Card
+              allNormalResults={allNormalResults}
+              key={uuid}
+              isPatientSummaryDashboard={isPatientSummaryDashboard}
+              isActiveCard={
+                (activeCard && activeCard === uuid) ||
+                (!activeCard && uuid === overviewData[0][overviewData[0].length - 1])
+              }
+            >
               <CommonDataTable
                 {...{
                   title,
                   data: isPatientSummaryDashboard ? patientSummaryDashboardData : data,
                   tableHeaders: headers,
                   description: (
-                    <div>
+                    <div className={!isPatientSummaryDashboard ? styles.cardHeader : ''}>
                       {formatDate(date)}
                       <InfoButton />
                     </div>
@@ -142,11 +166,25 @@ const CommonOverview: React.FC<CommonOverviewProps> = ({
                     <TableToolbar>
                       <TableToolbarContent>
                         {type === 'Test' && (
-                          <Button kind="ghost" renderIcon={ChartLine16} onClick={() => openTrendline(uuid, uuid)}>
+                          <Button
+                            kind="ghost"
+                            renderIcon={ChartLine16}
+                            onClick={() => {
+                              setActiveCard(uuid);
+                              openTrendline(uuid, uuid);
+                            }}
+                          >
                             {t('trend', 'Trend')}
                           </Button>
                         )}
-                        <Button kind="ghost" renderIcon={Table16} onClick={() => openTimeline(uuid)}>
+                        <Button
+                          kind="ghost"
+                          renderIcon={Table16}
+                          onClick={() => {
+                            setActiveCard(uuid);
+                            openTimeline(uuid);
+                          }}
+                        >
                           {t('timeline', 'Timeline')}
                         </Button>
                       </TableToolbarContent>

@@ -4,9 +4,10 @@ import dayjs from 'dayjs';
 import styles from './lab-results.scss';
 import { TableRow } from 'carbon-components-react';
 import { OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
+import { useLayoutType } from '@openmrs/esm-framework';
 
 export function formatDate(date: Date) {
-  return dayjs(date).format('DD/MM/YYYY · HH:mm');
+  return dayjs(date).format('DD - MMM - YYYY · HH:mm');
 }
 
 export const headers = [
@@ -20,9 +21,19 @@ export const Main = ({ className = '', ...props }) => <main {...props} className
 export const RecentResultsGrid = (props) => {
   return <div {...props} className={styles['recent-results-grid']} />;
 };
+
 export const Card = ({ ...props }) => {
-  const { allNormalResults = false } = props;
-  return <div {...props} className={`${styles.card} ${allNormalResults ? styles['normal-results'] : ''}`} />;
+  const { isActiveCard, isPatientSummaryDashboard } = props;
+  const isTablet = useLayoutType() === 'tablet';
+
+  return (
+    <div
+      {...props}
+      className={`${styles.card} ${isPatientSummaryDashboard ? '' : styles['outlined-card']} ${
+        isActiveCard && !isTablet && !isPatientSummaryDashboard ? styles['active-card'] : ''
+      }`}
+    />
+  );
 };
 
 export const Separator = ({ ...props }) => <div {...props} className={styles.separator} />;

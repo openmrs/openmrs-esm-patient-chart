@@ -31,7 +31,12 @@ export const Overview: React.FC<LabResultProps & LabResultParams> = ({
   return (
     <>
       {loaded ? (
-        <CommonOverview overviewData={overviewData} openTimeline={openTimeline} openTrendline={openTrendline} />
+        <CommonOverview
+          overviewData={overviewData}
+          openTimeline={openTimeline}
+          openTrendline={openTrendline}
+          isPatientSummaryDashboard={false}
+        />
       ) : (
         <Card>
           <DataTableSkeleton columnCount={3} />
