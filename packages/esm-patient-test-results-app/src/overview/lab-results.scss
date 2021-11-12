@@ -8,7 +8,7 @@
 
 .separator {
   height: 1.5rem;
-  border-bottom: #e0e0e0 solid 1px;
+  border-bottom: 1px solid $ui-03;
   width: calc(100% - 1.5rem);
   margin-left: 0.75rem;
 }
@@ -26,70 +26,65 @@
   }
 }
 
-.normal-results {
-  border: 0.125rem solid $brand-01;
-}
-
 .info-button {
   margin-left: 10px;
   padding-top: 1px;
   box-sizing: content-box;
   position: absolute;
+  color: black;
 }
 
-.off-scale-high,
-.off-scale-low,
-.critically-high,
-.critically-low,
-.high,
-.low {
-  background-color: #fff1f1;
-  color: #161616;
-  td:nth-child(2) {
-    font-weight: 600;
-    font-family: "IBM Plex Sans", sans-serif;
+tr {
+  &.critically-low, &.critically-high, &.low, &.high {
+    td:nth-child(2) {
+      @include carbon--type-style("productive-heading-01");
+      color: $ui-05;
+    }
   }
-  outline: 0.063rem solid $ui-05;
-  outline-offset: -0.130rem;
-}
 
-.critically-high,
-.critically-low {
-  outline: 0.063rem solid $danger;
-  outline-offset: -0.130rem;
+  &.critically-low, &.critically-high, &.off-scale-high, &.off-scale-low {
+    outline: 2px solid $danger;
+    outline-offset: -1px;
+  }
 
-  td {
-    border: unset !important;
+  &.low, &.high {
+    outline: 1px solid black;
+    outline-offset: -1px;
   }
-}
 
-.off-scale-high {
-  td:nth-child(2)::after {
-    content: " ↑↑↑";
+  &.critically-low {
+    td:nth-child(2)::after {
+      content: " ↓↓";
+    }
   }
-}
-.critically-high {
-  td:nth-child(2)::after {
-    content: " ↑↑";
+  
+  &.critically-high {
+    td:nth-child(2)::after {
+      content: " ↑↑";
+    }
   }
-}
-.high {
-  td:nth-child(2)::after {
-    content: " ↑";
+
+  &.low {
+    td:nth-child(2)::after {
+      content: " ↓";
+    }
   }
-}
-.off-scale-low {
-  td:nth-child(2)::after {
-    content: " ↓↓↓";
+
+  &.high {
+    td:nth-child(2)::after {
+      content: " ↑";
+    }
   }
-}
-.critically-low {
-  td:nth-child(2)::after {
-    content: " ↓↓";
+
+  &.off-scale-low {
+    td:nth-child(2)::after {
+      content: " ↓↓↓";
+    }
   }
-}
-.low {
-  td:nth-child(2)::after {
-    content: " ↓";
+
+  &.off-scale-high {
+    td:nth-child(2)::after {
+      content: " ↑↑↑";
+    }
   }
 }
