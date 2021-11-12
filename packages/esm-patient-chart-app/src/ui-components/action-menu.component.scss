@@ -26,12 +26,17 @@ $actionPanelOffset: 48px;
   width: $icon-button-size;
   height: $icon-button-size;
   color: #000;
+  border-radius: 50%;
 }
 
-.activeIconButton {
+.iconButton:hover{
+  background-color: #c6c6c6;
+  color: #000;
+}
+
+.activeIconButton,
+.activeIconButton:hover{
   padding: 0.625rem;
-  border-radius: 24px;
-  border-radius: 50%;
   border: solid 4px #007d79;
   background-color: #ffffff;
 }

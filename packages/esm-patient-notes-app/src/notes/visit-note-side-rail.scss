@@ -1,0 +1,46 @@
+@import "~@openmrs/esm-styleguide/src/vars";
+@import "~carbon-components/src/globals/scss/vars";
+
+$icon-button-size: 48px;
+
+
+.iconButton {
+  width: $icon-button-size;
+  height: $icon-button-size;
+  color: #000;
+  border-radius: 50%;
+  margin-top: 0.125rem;
+}
+
+.iconButton:hover {
+  background-color: #c6c6c6;
+  color: #000;
+}
+
+.activeIconButton,
+.activeIconButton:hover {
+  padding: 0.625rem;
+  border: solid 4px #007d79;
+  background-color: #ffffff;
+}
+
+
+:global(.omrs-breakpoint-gt-tablet) .warningButton {
+  position: absolute;
+  top: 0;
+  right: 0;
+  fill: $danger !important;
+}
+
+
+:global(.omrs-breakpoint-lt-desktop) .warningButton {
+  position: absolute;
+  top: 0;
+  right: 0;
+  fill: $danger !important;
+}
+
+:global(.omrs-breakpoint-lt-desktop) .warningButton [data-icon-path="inner-path"] {
+  fill: white !important;
+  opacity: 1;
+}

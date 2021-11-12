@@ -1,16 +1,14 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import Edit20 from '@carbon/icons-react/es/edit/20';
-import Pen20 from '@carbon/icons-react/es/pen/20';
 import WarningFilled16 from '@carbon/icons-react/es/warning--filled/16';
 import styles from './action-menu.component.scss';
-import { ExtensionSlot, useLayoutType } from '@openmrs/esm-framework';
+import { detachAll, ExtensionSlot, useLayoutType } from '@openmrs/esm-framework';
 import { HeaderPanel, Button } from 'carbon-components-react';
 import { isDesktop } from '../utils';
-import { useContextWorkspace } from '../hooks/useContextWindowSize';
-import { useWorkspace } from '../hooks/useWorkspace';
 import { useTranslation } from 'react-i18next';
 import { ScreenModeTypes } from '../types';
-
+import { patientChartWorkspaceSlot } from '../constants';
+import { useContextWorkspace } from '../hooks/useContextWindowSize';
 interface ActionMenuInterface {
   open: boolean;
 }
@@ -21,35 +19,29 @@ export const CHARTS_ACTION_MENU_ITEMS_SLOT = 'action-menu-items-slot';
 export const ActionMenu: React.FC<ActionMenuInterface> = ({ open }) => {
   const { t } = useTranslation();
   const layout = useLayoutType();
-  const { screenMode, active } = useWorkspace();
-  const { openWindows, updateWindowSize, windowSize } = useContextWorkspace();
+  const { windowSize, openWindows, updateWindowSize, screenMode } = useContextWorkspace();
 
-  const checkViewMode = () => {
-    if (active) {
-      if (windowSize.size === ScreenModeTypes.maximize) {
-        updateWindowSize(ScreenModeTypes.hide);
-      } else if (windowSize.size === ScreenModeTypes.normal) {
-        updateWindowSize(ScreenModeTypes.hide);
-      } else {
-        updateWindowSize(screenMode);
+  const checkViewMode = useCallback(
+    (active: boolean) => {
+      {
+        if (active && windowSize.size !== ScreenModeTypes.hide) {
+          switch (windowSize.size) {
+            case ScreenModeTypes.maximize:
+            case ScreenModeTypes.normal:
+              detachAll(patientChartWorkspaceSlot);
+              break;
+          }
+        } else if (active) {
+          updateWindowSize(screenMode);
+        }
       }
-    }
-  };
+    },
+    [screenMode, updateWindowSize, windowSize],
+  );
 
   const menu = isDesktop(layout) ? (
     <aside className={styles.rightSideNav}>
-      <ExtensionSlot extensionSlotName={CHARTS_ACTION_MENU_ITEMS_SLOT} />
-      <Button
-        onClick={() => checkViewMode()}
-        iconDescription="WorkSpace Items"
-        className={`${styles.iconButton} ${openWindows > 0 && styles.activeIconButton} `}
-        kind="ghost"
-        hasIconOnly
-      >
-        <div>
-          <Pen20 /> {windowSize.size === ScreenModeTypes.hide && <WarningFilled16 className={styles.warningButton} />}
-        </div>
-      </Button>
+      <ExtensionSlot state={{ checkViewMode, windowSize }} extensionSlotName={CHARTS_ACTION_MENU_ITEMS_SLOT} />
     </aside>
   ) : (
     <Button className={styles.actionBtn}>

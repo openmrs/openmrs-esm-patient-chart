@@ -90,14 +90,6 @@ function setupOpenMRS() {
         }),
       },
       {
-        id: 'notification-buttons',
-        slot: 'action-menu-items-slot',
-        load: getAsyncLifecycle(() => import('./ui-components/notifications-button.component'), {
-          featureName: 'notification-buttons',
-          moduleName,
-        }),
-      },
-      {
         id: 'add-past-visit-patient-actions-slot',
         slot: 'patient-actions-slot',
         load: getAsyncLifecycle(() => import('./actions-buttons/add-past-visit.component'), {
@@ -144,6 +136,15 @@ function setupOpenMRS() {
         order: 1,
         load: getAsyncLifecycle(() => import('./ui-components/patient-details-tile.component'), {
           featureName: 'patient-details-tile',
+          moduleName,
+        }),
+      },
+      {
+        id: 'form-side-rail',
+        slot: 'action-menu-items-slot',
+        order: 2,
+        load: getAsyncLifecycle(() => import('./ui-components/forms-side-rail.component'), {
+          featureName: 'form-side-rail',
           moduleName,
         }),
       },

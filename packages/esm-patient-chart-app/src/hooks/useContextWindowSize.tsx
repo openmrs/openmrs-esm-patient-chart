@@ -3,15 +3,13 @@ import React, { createContext, useContext, useMemo, useEffect, useCallback } fro
 import { patientChartWorkspaceSlot } from '../constants';
 import { useWorkspace } from '../hooks/useWorkspace';
 import { ScreenModeTypes } from '../types';
-
-interface WindowSize {
-  size: ScreenModeTypes;
-}
+import { WindowSize } from '@openmrs/esm-patient-common-lib';
 
 interface ContextWindowSizeContextShape {
   windowSize: WindowSize;
   updateWindowSize?(value: ScreenModeTypes): any;
   openWindows: number;
+  screenMode: ScreenModeTypes;
 }
 
 const reducer = (state: WindowSize, action: ScreenModeTypes) => {
@@ -27,6 +25,7 @@ const reducer = (state: WindowSize, action: ScreenModeTypes) => {
 const ContextWindowSizeContext = createContext<ContextWindowSizeContextShape>({
   windowSize: { size: ScreenModeTypes.normal },
   openWindows: 0,
+  screenMode: ScreenModeTypes.normal,
 });
 
 export const useContextWorkspace = () => {
@@ -57,8 +56,9 @@ export const ContextWindowSizeProvider: React.FC = ({ children }) => {
       windowSize: contextWorkspaceWindowSize,
       updateWindowSize: updateWindowSize,
       openWindows: extensions.length,
+      screenMode,
     };
-  }, [contextWorkspaceWindowSize, extensions.length, updateWindowSize]);
+  }, [contextWorkspaceWindowSize, extensions.length, screenMode, updateWindowSize]);
 
   return <ContextWindowSizeContext.Provider value={windowSizeValue}>{children}</ContextWindowSizeContext.Provider>;
 };
