@@ -2,7 +2,7 @@ import * as React from 'react';
 import LineChart from '@carbon/charts-react/line-chart';
 import ArrowLeft24 from '@carbon/icons-react/es/arrow--left/24';
 import styles from './trendline.scss';
-import RangeSelector from './RangeSelector';
+import RangeSelector from './range-selector.component';
 import usePatientResultsData from '../loadPatientTestData/usePatientResultsData';
 import { ScaleTypes, LineChartOptions, TickRotations } from '@carbon/charts/interfaces';
 import { toOmrsDateFormat, toOmrsTimeString24 } from '@openmrs/esm-framework';
