@@ -5,4 +5,5 @@
 .dashboardTitle {
   @include carbon--type-style("productive-heading-03");
   margin: 1rem 0rem 1rem 1.3125rem;
+  color: $text-01;
 }
