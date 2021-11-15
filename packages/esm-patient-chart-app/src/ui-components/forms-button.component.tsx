@@ -1,19 +1,19 @@
 import React, { useState } from 'react';
 import { Button } from 'carbon-components-react';
 import Document20 from '@carbon/icons-react/es/document/20';
-import styles from './forms-side-rail.scss';
+import styles from './forms-button.scss';
 import { ScreenModeTypes, WindowSize } from '@openmrs/esm-patient-common-lib';
 import Close20 from '@carbon/icons-react/es/close/20';
 import WarningFilled16 from '@carbon/icons-react/es/warning--filled/16';
 import { patientChartWorkspaceSlot } from '../constants';
 import { useAssignedExtensionIds } from '@openmrs/esm-framework';
 
-interface FormsSideRailProps {
+interface FormsButtonProps {
   checkViewMode: (active: boolean) => void;
   windowSize: WindowSize;
 }
 
-const FormsSideSideRail: React.FC<FormsSideRailProps> = ({ checkViewMode, windowSize }) => {
+const FormsButton: React.FC<FormsButtonProps> = ({ checkViewMode, windowSize }) => {
   const extensions = useAssignedExtensionIds(patientChartWorkspaceSlot);
   const [mouseHover, setMouseHover] = useState<boolean>(false);
 
@@ -43,4 +43,4 @@ const FormsSideSideRail: React.FC<FormsSideRailProps> = ({ checkViewMode, window
   );
 };
 
-export default FormsSideSideRail;
+export default FormsButton;

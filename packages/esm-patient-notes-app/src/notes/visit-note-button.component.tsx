@@ -1,18 +1,18 @@
 import React, { useState, useMemo } from 'react';
 import { useAssignedExtensionIds } from '@openmrs/esm-framework';
 import { launchPatientWorkspace, ScreenModeTypes, WindowSize } from '@openmrs/esm-patient-common-lib';
-import styles from './visit-note-side-rail.scss';
+import styles from './visit-note-button.scss';
 import Close20 from '@carbon/icons-react/es/close/20';
 import Pen20 from '@carbon/icons-react/es/pen/20';
 import WarningFilled16 from '@carbon/icons-react/es/warning--filled/16';
 import { Button } from 'carbon-components-react';
 
-interface VisitNoteSideRailProps {
+interface VisitNoteButtonProps {
   windowSize: WindowSize;
   checkViewMode: (active: boolean) => void;
 }
 
-const VisitNoteSideRail: React.FC<VisitNoteSideRailProps> = ({ checkViewMode, windowSize }) => {
+const VisitNoteButton: React.FC<VisitNoteButtonProps> = ({ checkViewMode, windowSize }) => {
   const extensions = useAssignedExtensionIds('patient-chart-workspace-slot');
   const [mouseHover, setMouseHover] = useState<boolean>(false);
 
@@ -38,4 +38,4 @@ const VisitNoteSideRail: React.FC<VisitNoteSideRailProps> = ({ checkViewMode, wi
     </Button>
   );
 };
-export default VisitNoteSideRail;
+export default VisitNoteButton;

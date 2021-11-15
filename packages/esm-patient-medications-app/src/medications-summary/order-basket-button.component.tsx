@@ -1,18 +1,18 @@
 import React, { useState, useMemo } from 'react';
 import { launchPatientWorkspace, ScreenModeTypes, WindowSize } from '@openmrs/esm-patient-common-lib';
 import { Button } from 'carbon-components-react';
-import styles from './order-basklet-side-rail.scss';
+import styles from './order-basket-button.scss';
 import ShoppingCart20 from '@carbon/icons-react/es/shopping--cart/20';
 import WarningFilled16 from '@carbon/icons-react/es/warning--filled/16';
 import Close20 from '@carbon/icons-react/es/close/20';
 import { useAssignedExtensionIds } from '@openmrs/esm-framework';
 
-interface OrderBasketSideRailProps {
+interface OrderBasketButton {
   windowSize: WindowSize;
   checkViewMode: (active: boolean) => void;
 }
 
-const OrderBasketSideRail: React.FC<OrderBasketSideRailProps> = ({ windowSize, checkViewMode }) => {
+const OrderBasketButton: React.FC<OrderBasketButton> = ({ windowSize, checkViewMode }) => {
   const extensions = useAssignedExtensionIds('patient-chart-workspace-slot');
   const [mouseHover, setMouseHover] = useState<boolean>(false);
 
@@ -41,4 +41,4 @@ const OrderBasketSideRail: React.FC<OrderBasketSideRailProps> = ({ windowSize, c
   );
 };
 
-export default OrderBasketSideRail;
+export default OrderBasketButton;

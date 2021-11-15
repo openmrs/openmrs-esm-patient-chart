@@ -81,7 +81,7 @@ function setupOpenMRS() {
         id: 'visit-note-side-rail',
         slot: 'action-menu-items-slot',
         order: 1,
-        load: getAsyncLifecycle(() => import('./notes/visit-note-side-rail.component'), {
+        load: getAsyncLifecycle(() => import('./notes/visit-note-button.component'), {
           featureName: 'visit-note-side-rail',
           moduleName,
         }),

@@ -143,7 +143,7 @@ function setupOpenMRS() {
         id: 'form-side-rail',
         slot: 'action-menu-items-slot',
         order: 2,
-        load: getAsyncLifecycle(() => import('./ui-components/forms-side-rail.component'), {
+        load: getAsyncLifecycle(() => import('./ui-components/forms-button.component'), {
           featureName: 'form-side-rail',
           moduleName,
         }),
