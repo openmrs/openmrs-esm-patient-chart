@@ -8,7 +8,7 @@ $actionPanelOffset: 48px;
 .rightSideNav {
   position: fixed;
   align-self: flex-end;
-  background: #ededed;
+  background: $text-03;
   flex-direction: column;
   display: flex;
   height: 100%;
@@ -17,32 +17,32 @@ $actionPanelOffset: 48px;
 
 :global(.omrs-breakpoint-gt-tablet) .actionPanel {
   right: $actionPanelOffset;
-  background: #fff;
+  background: $ui-02;
   z-index: auto;
-  border: 1px solid #a8a8a8;
+  border: 1px solid $text-03;
 }
 
 .iconButton {
   width: $icon-button-size;
   height: $icon-button-size;
-  color: #000;
+  color: $ui-05;
   border-radius: 50%;
 }
 
-.iconButton:hover{
-  background-color: #c6c6c6;
-  color: #000;
+.iconButton:hover {
+  background-color: $color-gray-30;
+  color: $ui-05;
 }
 
 .activeIconButton,
-.activeIconButton:hover{
+.activeIconButton:hover {
   padding: 0.625rem;
-  border: solid 4px #007d79;
-  background-color: #ffffff;
+  border: solid 4px $brand-teal-01;
+  background-color: $ui-02;
 }
 
-.actionBtn :global(.bx--btn.bx--btn--icon-only.bx--tooltip__trigger:focus){
-  border-color: #007d79;
+.actionBtn :global(.bx--btn.bx--btn--icon-only.bx--tooltip__trigger:focus) {
+  border-color: $brand-teal-01;
 }
 
 .actionBtn {
@@ -55,8 +55,8 @@ $actionPanelOffset: 48px;
   border-radius: 1.75rem;
   border-color: transparent;
 
-  color: #fff;
-  background: #005d5d;
+  color: $ui-02;
+  background: $brand-teal-01;
   transition: all 0.11s;
   z-index: 9000;
   padding-top: 0.325rem;
@@ -67,10 +67,10 @@ $actionPanelOffset: 48px;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  
+
 }
 
-.actionBtn > div {
+.actionBtn>div {
   margin-right: 0.25rem;
   height: 40px;
   width: 36px;
@@ -78,7 +78,7 @@ $actionPanelOffset: 48px;
   position: relative;
 }
 
-.actionBtn > span {
+.actionBtn>span {
   @extend .productiveHeading01;
 }
 
@@ -98,6 +98,6 @@ $actionPanelOffset: 48px;
 }
 
 :global(.omrs-breakpoint-lt-desktop) .warningButton [data-icon-path="inner-path"] {
-  fill: white !important;
+  fill: $ui-02 !important;
   opacity: 1;
 }

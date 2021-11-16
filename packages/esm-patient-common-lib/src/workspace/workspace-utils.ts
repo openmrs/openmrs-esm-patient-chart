@@ -1,7 +1,7 @@
 import { ExtensionInfo, extensionStore } from '@openmrs/esm-framework';
 import { ScreenModeTypes } from '..';
 
-export function checkScreenMode(ext: ExtensionInfo): ScreenModeTypes {
+export function getDefaultScreenMode(ext: ExtensionInfo): ScreenModeTypes {
   const screenMode: ScreenModeTypes = ext.meta?.screenSize;
 
   if (typeof screenMode === 'string') {
@@ -10,11 +10,11 @@ export function checkScreenMode(ext: ExtensionInfo): ScreenModeTypes {
   return ScreenModeTypes.minimize;
 }
 
-export const screenMode = (extensions) => {
+export const getWorkspaceScreenMode = (extensions) => {
   if (extensions.length === 0) {
     return ScreenModeTypes.normal;
   } else if (extensions.length === 1) {
     const state = extensionStore.getState();
-    return checkScreenMode(state.extensions[extensions[0]]);
+    return getDefaultScreenMode(state.extensions[extensions[0]]);
   }
 };

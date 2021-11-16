@@ -9,6 +9,9 @@ const mockUseVisit = useVisit as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => ({
   useVisit: jest.fn(),
+  createGlobalStore: jest.fn().mockImplementation(() => {
+    return { action: jest.fn() };
+  }),
 }));
 
 jest.mock('@openmrs/esm-patient-common-lib', () => {

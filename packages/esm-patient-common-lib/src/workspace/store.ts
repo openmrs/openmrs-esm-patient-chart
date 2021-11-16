@@ -1,7 +1,7 @@
 import { createGlobalStore, useAssignedExtensionIds, useStore } from '@openmrs/esm-framework';
 import { ScreenModeTypes, WindowSize } from '..';
 import { useEffect, useCallback } from 'react';
-import { screenMode } from './workspace-utils';
+import { getWorkspaceScreenMode } from './workspace-utils';
 
 const patientChartWorkspaceSlot = 'patient-chart-workspace-slot';
 
@@ -41,7 +41,7 @@ export const useWorkspaceStore = () => {
   );
 
   useEffect(() => {
-    const mode = screenMode(extensions);
+    const mode = getWorkspaceScreenMode(extensions);
     updateWindowSize(mode);
   }, [extensions]);
 

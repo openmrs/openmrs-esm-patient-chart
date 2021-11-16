@@ -78,11 +78,11 @@ function setupOpenMRS() {
         },
       },
       {
-        id: 'visit-note-side-rail',
+        id: 'visit-note-button',
         slot: 'action-menu-items-slot',
         order: 1,
         load: getAsyncLifecycle(() => import('./notes/visit-note-button.component'), {
-          featureName: 'visit-note-side-rail',
+          featureName: 'visit-note-button',
           moduleName,
         }),
       },
