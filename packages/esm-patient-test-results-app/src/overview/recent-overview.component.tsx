@@ -31,7 +31,7 @@ const RecentOverview: React.FC<RecentOverviewProps> = ({ patientUuid, basePath }
                 <div className={styles.widgetCard}>
                   <CardHeader title={`${cardTitle} ${resultsCount}`}>
                     <Button kind="ghost" onClick={() => navigateToResults(basePath)}>
-                      {t('all_results', 'All results')}
+                      {t('allResults', 'All results')}
                     </Button>
                   </CardHeader>
                   <CommonOverview
