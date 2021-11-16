@@ -10,8 +10,8 @@ import { Header, HeaderGlobalAction, HeaderGlobalBar, HeaderName } from 'carbon-
 import { useWorkspace } from '../hooks/useWorkspace';
 import { patientChartWorkspaceHeaderSlot, patientChartWorkspaceSlot } from '../constants';
 import { isDesktop } from '../utils';
-import { useContextWorkspace } from '../hooks/useContextWindowSize';
 import { ScreenModeTypes } from '../types';
+import { useWorkspaceStore } from '@openmrs/esm-patient-common-lib';
 
 interface ContextWorkspaceParams {
   patientUuid: string;
@@ -22,9 +22,9 @@ const ContextWorkspace: React.FC<RouteComponentProps<ContextWorkspaceParams>> = 
   const { patientUuid } = match.params;
   const { t } = useTranslation();
   const isTablet = layout === 'tablet';
-  const { active, title, closeWorkspace, extensions } = useWorkspace();
-  const { windowSize, updateWindowSize } = useContextWorkspace();
-  const { size } = windowSize;
+  const { title, closeWorkspace, extensions } = useWorkspace();
+  const { workspaceStore, active, updateWindowSize } = useWorkspaceStore();
+  const { size } = workspaceStore.windowSize;
   const props = React.useMemo(
     () => ({ closeWorkspace, patientUuid, isTablet }),
     [closeWorkspace, isTablet, patientUuid],

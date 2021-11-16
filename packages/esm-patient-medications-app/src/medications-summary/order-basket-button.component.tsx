@@ -1,29 +1,38 @@
-import React, { useState, useMemo } from 'react';
-import { launchPatientWorkspace, ScreenModeTypes, WindowSize } from '@openmrs/esm-patient-common-lib';
+import React, { useState } from 'react';
+import {
+  launchPatientWorkspace,
+  ScreenModeTypes,
+  updateWindowSize,
+  useWorkspaceStore,
+} from '@openmrs/esm-patient-common-lib';
 import { Button } from 'carbon-components-react';
 import styles from './order-basket-button.scss';
 import ShoppingCart20 from '@carbon/icons-react/es/shopping--cart/20';
 import WarningFilled16 from '@carbon/icons-react/es/warning--filled/16';
 import Close20 from '@carbon/icons-react/es/close/20';
-import { useAssignedExtensionIds } from '@openmrs/esm-framework';
+import { detachAll } from '@openmrs/esm-framework';
 
-interface OrderBasketButton {
-  windowSize: WindowSize;
-  checkViewMode: (active: boolean) => void;
-}
+interface OrderBasketButton {}
 
-const OrderBasketButton: React.FC<OrderBasketButton> = ({ windowSize, checkViewMode }) => {
-  const extensions = useAssignedExtensionIds('patient-chart-workspace-slot');
+const OrderBasketButton: React.FC<OrderBasketButton> = () => {
   const [mouseHover, setMouseHover] = useState<boolean>(false);
+  const { windowSize, isWorkspaceOpen } = useWorkspaceStore();
 
-  const active = useMemo(() => extensions.some((ext) => ext === 'order-basket-workspace'), [extensions]);
+  const active = isWorkspaceOpen('order-basket-workspace');
 
-  const handleClick = () => (active ? checkViewMode(active) : launchPatientWorkspace('order-basket-workspace'));
-
+  const handleClick = () => {
+    if (active && windowSize.size !== ScreenModeTypes.hide) {
+      detachAll('patient-chart-workspace-slot');
+    } else {
+      windowSize.size !== ScreenModeTypes.hide
+        ? launchPatientWorkspace('order-basket-workspace')
+        : updateWindowSize(ScreenModeTypes.normal);
+    }
+  };
   return (
     <Button
-      onClick={handleClick}
-      iconDescription="Orders"
+      onClick={() => handleClick()}
+      iconDescription="Forms"
       tooltipAlignment="start"
       className={`${styles.iconButton} ${
         active && windowSize.size !== ScreenModeTypes.hide && styles.activeIconButton

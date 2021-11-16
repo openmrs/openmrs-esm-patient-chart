@@ -8,7 +8,7 @@ import { isDesktop } from '../utils';
 import { useTranslation } from 'react-i18next';
 import { ScreenModeTypes } from '../types';
 import { patientChartWorkspaceSlot } from '../constants';
-import { useContextWorkspace } from '../hooks/useContextWindowSize';
+import { useWorkspaceStore } from '@openmrs/esm-patient-common-lib';
 interface ActionMenuInterface {
   open: boolean;
 }
@@ -19,29 +19,11 @@ export const CHARTS_ACTION_MENU_ITEMS_SLOT = 'action-menu-items-slot';
 export const ActionMenu: React.FC<ActionMenuInterface> = ({ open }) => {
   const { t } = useTranslation();
   const layout = useLayoutType();
-  const { windowSize, openWindows, updateWindowSize, screenMode } = useContextWorkspace();
-
-  const checkViewMode = useCallback(
-    (active: boolean) => {
-      {
-        if (active && windowSize.size !== ScreenModeTypes.hide) {
-          switch (windowSize.size) {
-            case ScreenModeTypes.maximize:
-            case ScreenModeTypes.normal:
-              detachAll(patientChartWorkspaceSlot);
-              break;
-          }
-        } else if (active) {
-          updateWindowSize(screenMode);
-        }
-      }
-    },
-    [screenMode, updateWindowSize, windowSize],
-  );
+  const { windowSize } = useWorkspaceStore();
 
   const menu = isDesktop(layout) ? (
     <aside className={styles.rightSideNav}>
-      <ExtensionSlot state={{ checkViewMode, windowSize }} extensionSlotName={CHARTS_ACTION_MENU_ITEMS_SLOT} />
+      <ExtensionSlot extensionSlotName={CHARTS_ACTION_MENU_ITEMS_SLOT} />
     </aside>
   ) : (
     <Button className={styles.actionBtn}>

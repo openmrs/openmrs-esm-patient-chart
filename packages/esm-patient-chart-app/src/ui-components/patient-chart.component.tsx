@@ -8,9 +8,9 @@ import { RouteComponentProps } from 'react-router-dom';
 import { detachAll, ExtensionSlot, useCurrentPatient, useSessionUser } from '@openmrs/esm-framework';
 import ActionMenu from './action-menu.component';
 import { useOfflineVisitForPatient } from '../offline';
-import { useContextWorkspace } from '../hooks/useContextWindowSize';
 import { ScreenModeTypes } from '../types';
 import WorkspaceNotification from './workspace-notification.component';
+import { useWorkspaceStore } from '@openmrs/esm-patient-common-lib';
 
 interface PatientChartParams {
   patientUuid: string;
@@ -23,7 +23,9 @@ const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({ match
   const [loading, patient] = useCurrentPatient(patientUuid);
   const sessionUser = useSessionUser();
   const state = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);
-  const { windowSize, openWindows } = useContextWorkspace();
+  const { workspaceStore, active, updateWindowSize } = useWorkspaceStore();
+
+  const { windowSize } = workspaceStore;
 
   useEffect(() => {
     detachAll('patient-chart-workspace-slot');
@@ -41,9 +43,7 @@ const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({ match
         <>
           <div
             className={`${styles.innerChartContainer} ${
-              windowSize.size === ScreenModeTypes.normal && openWindows > 0
-                ? styles.closeWorkspace
-                : styles.activeWorkspace
+              windowSize.size === ScreenModeTypes.normal && active ? styles.closeWorkspace : styles.activeWorkspace
             }`}
           >
             <ExtensionSlot extensionSlotName="breadcrumbs-slot" />

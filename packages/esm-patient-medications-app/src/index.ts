@@ -51,6 +51,7 @@ function setupOpenMRS() {
             key: 'orderBasket',
             default: 'Order Basket',
           },
+          screenSize: 'maximize',
         },
       },
       {
