@@ -1,15 +1,16 @@
 import * as React from 'react';
-import LineChart from '@carbon/charts-react/line-chart';
-import ArrowLeft24 from '@carbon/icons-react/es/arrow--left/24';
-import styles from './trendline.scss';
 import RangeSelector from './range-selector.component';
 import usePatientResultsData from '../loadPatientTestData/usePatientResultsData';
+import { Button } from 'carbon-components-react';
+import ArrowLeft24 from '@carbon/icons-react/es/arrow--left/24';
+import LineChart from '@carbon/charts-react/line-chart';
 import { ScaleTypes, LineChartOptions, TickRotations } from '@carbon/charts/interfaces';
 import { toOmrsDateFormat, toOmrsTimeString24 } from '@openmrs/esm-framework';
 import { ObsRecord, OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import { CommonDataTable } from '../overview/common-overview';
 import { exist } from '../loadPatientTestData/helpers';
 import { useTranslation } from 'react-i18next';
+import styles from './trendline.scss';
 import '@carbon/charts/styles.css';
 
 const useTrendlineData = ({
@@ -57,21 +58,29 @@ const withPatientData =
     return <WrappedComponent patientData={patientData} openTimeline={openTimeline} />;
   };
 
-const TrendlineHeader = ({ openTimeline, title }) => {
+const TrendlineHeader = ({ openTimeline, title, referenceRange }) => {
   const { t } = useTranslation();
   return (
     <div className={styles['header']}>
-      <div onClick={openTimeline} role="button" className={styles['back-button']} tabIndex={0}>
-        <ArrowLeft24></ArrowLeft24> {t('back_to_timeline', 'Back to timeline')}
+      <div className={styles['back-button']}>
+        <Button kind="ghost" renderIcon={ArrowLeft24} iconDescription="Return to timeline" onClick={openTimeline}>
+          <span>{t('backToTimeline', 'Back to timeline')}</span>
+        </Button>
       </div>
-      <div className={styles['title']}>{title}</div>
+      <div className={styles['content']}>
+        <span className={styles['title']}>{title}</span>
+        <span className={styles['reference-range']}>{referenceRange}</span>
+      </div>
     </div>
   );
 };
+
 const Trendline: React.FC<{
   patientData: ReturnType<typeof useTrendlineData>;
   openTimeline: () => void;
 }> = ({ patientData, openTimeline }) => {
+  const { t } = useTranslation();
+
   const leftAxisLabel = patientData?.[1]?.[0]?.meta?.units ?? '';
   const [range, setRange] = React.useState<[Date, Date]>();
 
@@ -105,6 +114,7 @@ const Trendline: React.FC<{
     min?: number;
     max?: number;
   }> = [];
+
   const tableData: Array<{
     date: string;
     time: string;
@@ -113,7 +123,8 @@ const Trendline: React.FC<{
     interpretation?: OBSERVATION_INTERPRETATION;
   }> = [];
 
-  let dataset = patientData[0];
+  const dataset = patientData[0];
+  const referenceRange = patientData[1][0]?.meta?.range;
 
   patientData[1].forEach((entry) => {
     const range =
@@ -191,24 +202,24 @@ const Trendline: React.FC<{
   const tableHeaderData = React.useMemo(
     () => [
       {
-        header: 'Date',
+        header: t('date', 'Date'),
         key: 'date',
       },
       {
-        header: `Value (${leftAxisLabel})`,
+        header: t('value', 'Value') + ` (${leftAxisLabel})`,
         key: 'value',
       },
       {
-        header: 'Time',
+        header: t('timeOfTest', 'Time of Test'),
         key: 'time',
       },
     ],
-    [leftAxisLabel],
+    [leftAxisLabel, t],
   );
 
   return (
     <>
-      <TrendlineHeader openTimeline={openTimeline} title={dataset} />
+      <TrendlineHeader openTimeline={openTimeline} title={dataset} referenceRange={referenceRange} />
       <TrendLineBackground>
         <RangeSelector setLowerRange={setLowerRange} upperRange={upperRange} />
         <LineChart data={data} options={options} />
