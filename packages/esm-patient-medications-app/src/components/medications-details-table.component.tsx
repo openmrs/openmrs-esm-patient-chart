@@ -27,8 +27,7 @@ import { connect } from 'unistore/react';
 import { OrderBasketStore, OrderBasketStoreActions, orderBasketStoreActions } from '../medications/order-basket-store';
 import { Order } from '../types/order';
 import { OrderBasketItem } from '../types/order-basket-item';
-import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { useLayoutType } from '@openmrs/esm-framework';
+import { CardHeader, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 
 export interface ActiveMedicationsProps {
   isValidating?: boolean;
@@ -64,7 +63,6 @@ const MedicationsDetailsTable = connect<
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
     const [currentMedicationPage] = paginate(medications, page, pageSize);
-    const isTablet = useLayoutType() === 'tablet';
 
     const openOrderBasket = React.useCallback(() => launchPatientWorkspace('order-basket-workspace'), []);
 
@@ -154,8 +152,7 @@ const MedicationsDetailsTable = connect<
 
     return (
       <div className={styles.widgetCard}>
-        <div className={isTablet ? styles.tabletHeader : styles.desktopHeader}>
-          <h4>{title}</h4>
+        <CardHeader title={title}>
           {isValidating ? (
             <span>
               <InlineLoading />
@@ -166,7 +163,7 @@ const MedicationsDetailsTable = connect<
               {t('add', 'Add')}
             </Button>
           )}
-        </div>
+        </CardHeader>
         <DataTable headers={tableHeaders} rows={tableRows} isSortable={true} sortRow={sortRow} useZebraStyles>
           {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
             <TableContainer className={styles.tableHeader}>

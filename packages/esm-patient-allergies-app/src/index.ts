@@ -88,6 +88,12 @@ function setupOpenMRS() {
           },
         },
       },
+      {
+        id: 'allergy-tile',
+        slot: 'visit-form-header-slot',
+        order: 3,
+        load: getAsyncLifecycle(() => import('./allergies/allergies-tile.component'), options),
+      },
     ],
   };
 }

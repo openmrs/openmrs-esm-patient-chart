@@ -15,6 +15,7 @@ import {
 } from 'carbon-components-react';
 import styles from './allergies-overview.scss';
 import {
+  CardHeader,
   EmptyState,
   ErrorState,
   launchPatientWorkspace,
@@ -22,7 +23,7 @@ import {
 } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { useAllergies } from './allergy-intolerance.resource';
-import { useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { usePagination } from '@openmrs/esm-framework';
 import { allergiesToShowCount, patientAllergiesFormWorkspace } from '../constants';
 
 interface AllergiesOverviewProps {
@@ -37,7 +38,6 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient, showAddA
   const headerTitle = t('allergies', 'Allergies');
   const urlLabel = t('seeAll', 'See all');
   const pageUrl = window.spaBase + basePath + '/allergies';
-  const isTablet = useLayoutType() === 'tablet';
 
   const { data: allergies, isError, isLoading, isValidating } = useAllergies(patient.id);
   const { results: paginatedAllergies, goTo, currentPage } = usePagination(allergies ?? [], allergiesToShowCount);
@@ -69,15 +69,14 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient, showAddA
   if (allergies?.length) {
     return (
       <div className={styles.widgetCard}>
-        <div className={isTablet ? styles.tabletHeader : styles.desktopHeader}>
-          <h4>{headerTitle}</h4>
+        <CardHeader title={headerTitle}>
           <span>{isValidating ? <InlineLoading /> : null}</span>
           {showAddAllergy && (
             <Button kind="ghost" renderIcon={Add16} iconDescription="Add allergies" onClick={launchAllergiesForm}>
               {t('add', 'Add')}
             </Button>
           )}
-        </div>
+        </CardHeader>
         <TableContainer>
           <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="short">
             {({ rows, headers, getHeaderProps, getTableProps }) => (

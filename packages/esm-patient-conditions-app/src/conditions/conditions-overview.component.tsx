@@ -15,7 +15,7 @@ import {
 } from 'carbon-components-react';
 import Add16 from '@carbon/icons-react/es/add/16';
 import styles from './conditions-overview.scss';
-import { useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { usePagination } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { useConditions } from './conditions.resource';
 import {
@@ -23,6 +23,7 @@ import {
   ErrorState,
   PatientChartPagination,
   launchPatientWorkspace,
+  CardHeader,
 } from '@openmrs/esm-patient-common-lib';
 
 const conditionsToShowCount = 5;
@@ -38,7 +39,6 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient, basePa
   const headerTitle = t('conditions', 'Conditions');
   const urlLabel = t('seeAll', 'See all');
   const pageUrl = window.spaBase + basePath + '/conditions';
-  const isTablet = useLayoutType() === 'tablet';
 
   const { data: conditions, isError, isLoading, isValidating } = useConditions(patient.id);
   const { results: paginatedConditions, goTo, currentPage } = usePagination(conditions ?? [], conditionsToShowCount);
@@ -67,13 +67,12 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient, basePa
   if (conditions?.length) {
     return (
       <div className={styles.widgetCard}>
-        <div className={isTablet ? styles.tabletHeader : styles.desktopHeader}>
-          <h4>{headerTitle}</h4>
+        <CardHeader title={headerTitle}>
           <span>{isValidating ? <InlineLoading /> : null}</span>
           <Button kind="ghost" renderIcon={Add16} iconDescription="Add conditions" onClick={launchConditionsForm}>
             {t('add', 'Add')}
           </Button>
-        </div>
+        </CardHeader>
         <TableContainer>
           <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="short">
             {({ rows, headers, getHeaderProps, getTableProps }) => (

@@ -53,7 +53,7 @@ export const CommonDataTable: React.FC<{
           </TableHead>
           <TableBody>
             {rows.map((row, i) => (
-              <TypedTableRow key={row.id} interpretation={data[i].interpretation} {...getRowProps({ row })}>
+              <TypedTableRow key={row.id} interpretation={data[i]?.interpretation} {...getRowProps({ row })}>
                 {row.cells.map((cell) => (
                   <TableCell key={cell.id}>{cell.value}</TableCell>
                 ))}
