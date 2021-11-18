@@ -1,12 +1,26 @@
-.grid {
-  display: grid;
-  width: fit-content;
-  gap: 1px;
+@import "~@openmrs/esm-styleguide/src/vars";
+@import "~carbon-components/src/globals/scss/vars";
+@import "~carbon-components/src/globals/scss/mixins";
 
+.grid {
+  width: fit-content;
+  background-color: $color-gray-30;
+  display: grid;
   grid-auto-rows: auto;
+  gap: 1px;
   justify-items: center;
   align-items: center;
-  background-color: #c6c6c6;
+}
+
+.day-column, .year-column {
+  @include carbon--type-style('productive-heading-01');
+  color: $text-02;
+}
+
+.time-column {
+  @include carbon--type-style('body-short-01');
+  color: $text-02;
+  scroll-snap-align: start;
 }
 
 .padded-main {
@@ -21,12 +35,33 @@
   display: grid;
   justify-items: center;
   align-items: center;
+  padding: 0.5rem;
+}
 
-  padding: 0.5em;
+.timeline-data-cell {
+  @extend .timeline-cell;
+  justify-items: first baseline;
+  
+  p {
+    @include carbon--type-style('body-short-01');
+    color: $text-02;
+  }
+}
+
+.row-start-cell {
+  @extend .timeline-cell;
+  position: sticky;
+  left: 0;
+  display: grid;
+  grid-auto-flow: row;
+  gap: 0.5px;
+  justify-items: baseline;
+  align-items: center;
+  padding: 1rem;
 }
 
 .timeline-cell-zebra {
-  background-color: #ededed;
+  background-color: $ui-03;
 }
 
 .padding-container {
@@ -43,8 +78,9 @@
   scrollbar-width: none;
   display: grid;
   grid-auto-flow: row;
-  gap: 1px;
-  background-color: #c6c6c6;
+  column-gap: 1px;
+  row-gap: 0px;
+  background-color: $color-gray-30;
   grid-template: auto auto / 9em auto;
 }
 
@@ -53,20 +89,16 @@
 }
 
 .time-slot-inner {
-  background-color: #e0e0e0;
-  font-weight: 600;
-
+  background-color: $ui-03;
   padding: 3px 10px;
-
   justify-self: stretch;
   align-self: stretch;
-
   display: grid;
   align-items: center;
 
   div {
     position: sticky;
-    left: calc(9em + 10px);
+    left: calc(10em + 10px);
     width: fit-content;
   }
 }
@@ -77,6 +109,24 @@
   left: 0px;
   top: 0px;
   z-index: 3;
+  padding: 0rem 1rem;
+
+  div {
+    @include carbon--type-style('productive-heading-01');
+    color: $text-01;
+    left: 0;
+  }
+}
+
+.trendline-link {
+  @include carbon--type-style('body-short-01');
+  color: $interactive-01;
+  cursor: pointer;
+}
+
+.range-units {
+  @include carbon--type-style('helper-text-01');
+  color: $text-05;
 }
 
 .off-scale-high,
@@ -85,32 +135,25 @@
 .critically-low,
 .high,
 .low {
-  color: #161616;
   p {
-    font-weight: 600;
-    font-family: "IBM Plex Sans", sans-serif;
-  }
+    @include carbon--type-style('productive-heading-01');
+    color: $text-01;
+  }  
 }
 
 .high,
 .low {
-  box-sizing: content-box;
-  padding: 0;
   box-shadow: 0 0 0 1px #000000;
-
-  td {
-    border: unset !important;
-  }
 }
 
 .critically-high,
 .critically-low {
-  box-sizing: content-box;
-  padding: 0;
-  box-shadow: 0 0 0 1px #da1e28, inset 0 0 0 1px #da1e28;
+  box-shadow: 0 0 0 1px $danger, inset 0 0 0 1px $danger;
+}
 
-  td {
-    border: unset !important;
+.off-scale-low {
+  p::after {
+    content: " ↓↓↓";
   }
 }
 
@@ -119,29 +162,28 @@
     content: " ↑↑↑";
   }
 }
-.critically-high {
-  p::after {
-    content: " ↑↑";
-  }
-}
-.high {
-  p::after {
-    content: " ↑";
-  }
-}
-.off-scale-low {
-  p::after {
-    content: " ↓↓↓";
-  }
-}
+
 .critically-low {
   p::after {
     content: " ↓↓";
   }
 }
+
+.critically-high {
+  p::after {
+    content: " ↑↑";
+  }
+}
+
 .low {
   p::after {
     content: " ↓";
+  }
+}
+
+.high {
+  p::after {
+    content: " ↑";
   }
 }
 
