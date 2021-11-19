@@ -22,21 +22,21 @@ const DateHeaderGrid = ({ timeColumns, yearColumns, dayColumns, displayShadow })
   >
     {yearColumns.map(({ year, size }) => {
       return (
-        <TimeSlots key={year} style={{ gridColumn: `${size} span` }}>
+        <TimeSlots key={year} className={styles['year-column']} style={{ gridColumn: `${size} span` }}>
           {year}
         </TimeSlots>
       );
     })}
     {dayColumns.map(({ day, size }) => {
       return (
-        <TimeSlots key={day} style={{ gridColumn: `${size} span` }}>
+        <TimeSlots key={day} className={styles['day-column']} style={{ gridColumn: `${size} span` }}>
           {day}
         </TimeSlots>
       );
     })}
     {timeColumns.map((time, i) => {
       return (
-        <TimeSlots key={time + i} style={{ scrollSnapAlign: 'start', fontWeight: 400 }}>
+        <TimeSlots key={time + i} className={styles['time-column']}>
           {time}
         </TimeSlots>
       );
