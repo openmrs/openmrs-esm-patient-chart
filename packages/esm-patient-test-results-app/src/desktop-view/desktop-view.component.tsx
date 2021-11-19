@@ -3,33 +3,11 @@ import { Overview } from '../overview/overview.component';
 import { Timeline } from '../timeline/timeline.component';
 import Trendline from '../trendline/trendline.component';
 import { navigateToTimeline, navigateToTrendline } from '../helpers';
+import styles from './desktop-view.scss';
 
-const Grid: React.FC<{}> = ({ children }) => (
-  <div
-    style={{
-      display: 'grid',
-      gridTemplateColumns: '600px 1fr',
-      gap: '20px',
-      height: 'calc(100vh - 48px)',
-      width: '100%',
-    }}
-  >
-    {children}
-  </div>
-);
+const Grid: React.FC<{}> = ({ children }) => <div className={styles.grid}>{children}</div>;
 
-const OverflowBorder: React.FC<{}> = ({ children }) => (
-  <div
-    style={{
-      height: '100%',
-      width: '100%',
-      position: 'relative',
-      overflow: 'auto',
-    }}
-  >
-    {children}
-  </div>
-);
+const OverflowBorder: React.FC<{}> = ({ children }) => <div className={styles['overflow-border']}>{children}</div>;
 
 interface NoneViewState {
   type: 'none';
@@ -79,7 +57,7 @@ const DesktopView: React.FC<Record<string, any>> = ({ patientUuid, panelUuid, te
   return (
     <Grid>
       <OverflowBorder>
-        <div style={{ display: 'grid', gap: '1.5rem' }}>
+        <div className={styles.overview}>
           <Overview patientUuid={patientUuid} openTimeline={openTimeline} openTrendline={openTrendline}></Overview>
         </div>
       </OverflowBorder>

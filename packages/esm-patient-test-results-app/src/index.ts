@@ -49,19 +49,9 @@ function setupOpenMRS() {
         offline: true,
       },
       {
-        id: 'test-results-summary-widget',
-        slot: 'test-results-filtered-overview',
-        load: getAsyncLifecycle(() => import('./overview/external-overview.component'), options),
-        meta: {
-          columnSpan: 4,
-        },
-        online: true,
-        offline: true,
-      },
-      {
         id: 'test-results-dashboard-widget',
         slot: dashboardMeta.slot,
-        load: getAsyncLifecycle(() => import('./desktopView/index'), options),
+        load: getAsyncLifecycle(() => import('./desktop-view/index'), options),
         online: true,
         offline: true,
       },

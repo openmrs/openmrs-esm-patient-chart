@@ -1,0 +1,7 @@
+.tableContainer :global(.bx--data-table-header) {
+  padding: 0.75rem 1rem 0.25rem 1rem;
+
+  *:not(:first-child) {
+    margin: 0.25rem 0rem;
+  }
+}
