@@ -6,6 +6,14 @@
   border: 1px solid $ui-03;
 }
 
+.outlined-card {
+  border: 1px solid $ui-03;
+}
+
+.active-card {
+  border: 2px solid $brand-teal-01;
+}
+
 .separator {
   height: 1.5rem;
   border-bottom: 1px solid $ui-03;

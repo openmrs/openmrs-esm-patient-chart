@@ -1,0 +1,31 @@
+@import "~@openmrs/esm-styleguide/src/vars";
+@import "~carbon-components/src/globals/scss/vars";
+@import "~carbon-components/src/globals/scss/mixins";
+
+.widgetCard {
+  border: 1px solid $ui-03;
+}
+
+.desktopHeader, .tabletHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-04 0 $spacing-04 $spacing-05;
+  background-color: $ui-background;
+}
+
+.desktopHeader {  
+  height: 3rem;
+  h4 {
+    @include carbon--type-style('productive-heading-02');
+    color: $text-02;
+  }
+}
+
+.tabletHeader {  
+  height: 4.5rem;
+  h4 {
+    @include carbon--type-style('productive-heading-03');
+    color: $text-02;
+  }
+}
