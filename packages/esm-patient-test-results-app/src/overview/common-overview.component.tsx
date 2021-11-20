@@ -1,9 +1,10 @@
 import React, { useCallback } from 'react';
+import dayjs from 'dayjs';
 import Table16 from '@carbon/icons-react/es/table/16';
 import ChartLine16 from '@carbon/icons-react/es/chart--line/16';
+import Information16 from '@carbon/icons-react/es/information/16';
 import { Button, TableToolbarContent, TableToolbar } from 'carbon-components-react';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
-import { headers, formatDate, InfoButton, Separator } from './helpers';
 import { OverviewPanelEntry } from './useOverviewData';
 import { useTranslation } from 'react-i18next';
 import { navigate } from '@openmrs/esm-framework';
@@ -30,7 +31,7 @@ interface CommonOverviewPropsWithoutToolbar {
 type Only<T, U> = {
   [P in keyof T]: T[P];
 } & {
-  [P in keyof U]?: never;
+  [P in keyof Omit<U, keyof T>]?: never;
 };
 
 type Either<T, U> = Only<T, U> | Only<U, T>;
@@ -48,6 +49,12 @@ const CommonOverview: React.FC<CommonOverviewProps> = ({
 }) => {
   const { t } = useTranslation();
   const [activeCardUuid, setActiveCardUuid] = React.useState('');
+
+  const headers = [
+    { key: 'name', header: 'Test Name' },
+    { key: 'value', header: 'Value' },
+    { key: 'range', header: 'Reference Range' },
+  ];
 
   const isActiveCard = useCallback(
     (uuid: string) =>
@@ -135,5 +142,13 @@ const CommonOverview: React.FC<CommonOverviewProps> = ({
     </>
   );
 };
+
+const Separator = ({ ...props }) => <div {...props} className={styles.separator} />;
+
+const InfoButton = () => <Information16 className={styles['infoButton']} />;
+
+function formatDate(date: Date) {
+  return dayjs(date).format('DD - MMM - YYYY · HH:mm');
+}
 
 export default CommonOverview;

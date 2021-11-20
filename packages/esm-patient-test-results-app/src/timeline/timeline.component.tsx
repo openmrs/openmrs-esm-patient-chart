@@ -1,7 +1,8 @@
 import * as React from 'react';
+import { InlineLoading } from 'carbon-components-react';
 import useScrollIndicator from './useScroll';
 import { useTimelineData } from './useTimelineData';
-import { Main, PaddingContainer, TimeSlots, Grid, RowStartCell, GridItems, ShadowBox } from './helpers';
+import { PaddingContainer, TimeSlots, Grid, RowStartCell, GridItems, ShadowBox } from './helpers';
 import { ObsRecord } from '@openmrs/esm-patient-common-lib';
 import styles from './timeline.scss';
 
@@ -42,12 +43,6 @@ const DateHeaderGrid = ({ timeColumns, yearColumns, dayColumns, displayShadow })
       );
     })}
   </Grid>
-);
-
-const LoadingDisplay: React.FC = () => (
-  <Main>
-    <h1>Loading</h1>
-  </Main>
 );
 
 const DataRows: React.FC<{
@@ -108,7 +103,7 @@ export const Timeline: React.FC<TimelineParams> = ({
     [panelUuid, openTrendlineExternal],
   );
 
-  if (!loaded) return <LoadingDisplay />;
+  if (!loaded) return <InlineLoading description="Loading" />;
 
   return (
     <PaddingContainer ref={containerRef}>

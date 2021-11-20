@@ -9,7 +9,7 @@ import {
   TableCell,
   TableBody,
 } from 'carbon-components-react';
-import { TypedTableRow } from './helpers';
+import { OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import { OverviewPanelData } from '../overview/useOverviewData';
 import styles from './common-datatable.scss';
 
@@ -63,5 +63,33 @@ const CommonDataTable: React.FC<CommonDataTableProps> = ({ title, data, descript
     )}
   </DataTable>
 );
+
+const TypedTableRow: React.FC<{
+  interpretation: OBSERVATION_INTERPRETATION;
+}> = ({ interpretation, ...props }) => {
+  switch (interpretation) {
+    case 'OFF_SCALE_HIGH':
+      return <TableRow {...props} className={styles['off-scale-high']} />;
+
+    case 'CRITICALLY_HIGH':
+      return <TableRow {...props} className={styles['critically-high']} />;
+
+    case 'HIGH':
+      return <TableRow {...props} className={styles['high']} />;
+
+    case 'OFF_SCALE_LOW':
+      return <TableRow {...props} className={styles['off-scale-low']} />;
+
+    case 'CRITICALLY_LOW':
+      return <TableRow {...props} className={styles['critically-low']} />;
+
+    case 'LOW':
+      return <TableRow {...props} className={styles['low']} />;
+
+    case 'NORMAL':
+    default:
+      return <TableRow {...props} />;
+  }
+};
 
 export default CommonDataTable;

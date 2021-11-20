@@ -4,7 +4,6 @@ import CommonOverview from './common-overview.component';
 import { Button, DataTableSkeleton } from 'carbon-components-react';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
-import { RecentResultsGrid } from './helpers';
 import { navigateToResults, navigateToTimeline, navigateToTrendline } from '../helpers';
 import { useLayoutType } from '@openmrs/esm-framework';
 import styles from './recent-overview.scss';
@@ -58,6 +57,10 @@ const RecentOverview: React.FC<RecentOverviewProps> = ({ patientUuid, basePath }
       )}
     </RecentResultsGrid>
   );
+};
+
+const RecentResultsGrid = (props) => {
+  return <div {...props} className={styles['recent-results-grid']} />;
 };
 
 export default RecentOverview;
