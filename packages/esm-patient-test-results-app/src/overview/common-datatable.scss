@@ -1,7 +1,66 @@
+@import "~@openmrs/esm-styleguide/src/vars";
+@import "~carbon-components/src/globals/scss/vars";
+@import "~carbon-components/src/globals/scss/mixins";
+
 .tableContainer :global(.bx--data-table-header) {
   padding: 0.75rem 1rem 0.25rem 1rem;
 
   *:not(:first-child) {
     margin: 0.25rem 0rem;
+  }
+}
+
+tr {
+  &.critically-low, &.critically-high, &.low, &.high {
+    td:nth-child(2) {
+      @include carbon--type-style("productive-heading-01");
+      color: $ui-05;
+    }
+  }
+
+  &.critically-low, &.critically-high, &.off-scale-high, &.off-scale-low {
+    outline: 2px solid $danger;
+    outline-offset: -1px;
+  }
+
+  &.low, &.high {
+    outline: 1px solid black;
+    outline-offset: -1px;
+  }
+
+  &.critically-low {
+    td:nth-child(2)::after {
+      content: " ↓↓";
+    }
+  }
+  
+  &.critically-high {
+    td:nth-child(2)::after {
+      content: " ↑↑";
+    }
+  }
+
+  &.low {
+    td:nth-child(2)::after {
+      content: " ↓";
+    }
+  }
+
+  &.high {
+    td:nth-child(2)::after {
+      content: " ↑";
+    }
+  }
+
+  &.off-scale-low {
+    td:nth-child(2)::after {
+      content: " ↓↓↓";
+    }
+  }
+
+  &.off-scale-high {
+    td:nth-child(2)::after {
+      content: " ↑↑↑";
+    }
   }
 }

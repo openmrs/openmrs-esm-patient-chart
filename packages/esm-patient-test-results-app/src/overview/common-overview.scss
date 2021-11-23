@@ -23,3 +23,18 @@
     width: 33.3%;
   }
 }
+
+.separator {
+  height: 1.5rem;
+  border-bottom: 1px solid $ui-03;
+  width: calc(100% - 1.5rem);
+  margin-left: 0.75rem;
+}
+
+.infoButton {
+  margin-left: 10px;
+  padding-top: 1px;
+  box-sizing: content-box;
+  position: absolute;
+  color: black;
+}
