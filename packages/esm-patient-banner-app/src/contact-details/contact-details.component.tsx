@@ -72,16 +72,33 @@ const Relationships: React.FC<{ patientId: string }> = ({ patientId }) => {
 };
 
 const ContactDetails: React.FC<ContactDetailsProps> = ({ address, telecom, patientId }) => {
-  const currentAddress = address.find((a) => a.use === 'home');
+  const { t } = useTranslation();
+  const currentAddress = address ? address.find((a) => a.use === 'home') : null;
 
   return (
     <div className={styles.contactDetails}>
       <div className={styles.row}>
         <div className={styles.col}>
-          <Address address={currentAddress} />
+          {address ? (
+            <Address address={currentAddress} />
+          ) : (
+            <>
+              <p className={styles.heading}>{t('address', 'Address')}</p>
+              <p className={styles.label}>{t('noAddress', 'There is no address to display for this patient')}</p>
+            </>
+          )}
         </div>
         <div className={styles.col}>
-          <Contact telecom={telecom} />
+          {telecom ? (
+            <Contact telecom={telecom} />
+          ) : (
+            <>
+              <p className={styles.heading}>{t('contactDetails', 'Contact Details')}</p>
+              <p className={styles.label}>
+                {t('noContactDetails', 'There are no contact details to display for this patient')}
+              </p>
+            </>
+          )}
         </div>
       </div>
       <div className={styles.row}>

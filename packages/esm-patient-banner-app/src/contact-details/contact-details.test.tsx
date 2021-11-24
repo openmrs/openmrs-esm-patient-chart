@@ -78,6 +78,14 @@ describe('ContactDetails: ', () => {
     expect(screen.getByText(/Sibling/i)).toBeInTheDocument();
     expect(screen.getByText(/24 yrs/i)).toBeInTheDocument();
   });
+
+  it('renders an empty state view when address and contact details is not available', () => {
+    swrRender(<ContactDetails address={null} telecom={null} patientId={'some-uuid'} />);
+    mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
+
+    expect(screen.getByText('There is no address to display for this patient')).toBeInTheDocument();
+    expect(screen.getByText('There are no contact details to display for this patient')).toBeInTheDocument();
+  });
 });
 
 function renderContactDetails() {
