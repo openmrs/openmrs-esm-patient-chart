@@ -7,7 +7,7 @@ import { Button, TableToolbarContent, TableToolbar } from 'carbon-components-rea
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { OverviewPanelEntry } from './useOverviewData';
 import { useTranslation } from 'react-i18next';
-import { navigate } from '@openmrs/esm-framework';
+import { navigate, useLayoutType } from '@openmrs/esm-framework';
 import CommonDataTable from './common-datatable.component';
 import styles from './common-overview.scss';
 
@@ -48,6 +48,7 @@ const CommonOverview: React.FC<CommonOverviewProps> = ({
   patientUuid,
 }) => {
   const { t } = useTranslation();
+  const isDesktop = useLayoutType() === 'desktop';
   const [activeCardUuid, setActiveCardUuid] = React.useState('');
 
   const headers = [
@@ -57,9 +58,12 @@ const CommonOverview: React.FC<CommonOverviewProps> = ({
   ];
 
   const isActiveCard = useCallback(
-    (uuid: string) =>
-      activeCardUuid === uuid || (!activeCardUuid && uuid === overviewData[0][overviewData[0].length - 1]),
-    [activeCardUuid, overviewData],
+    (uuid: string) => {
+      const isFirstCard = uuid === overviewData[0][overviewData[0].length - 1];
+
+      return isDesktop && (activeCardUuid === uuid || (!activeCardUuid && isFirstCard));
+    },
+    [activeCardUuid, isDesktop, overviewData],
   );
 
   const handleSeeAvailableResults = useCallback(() => {

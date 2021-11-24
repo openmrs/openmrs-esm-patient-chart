@@ -40,7 +40,15 @@ const deduceViewState = ({ panelUuid, testUuid, type = 'none' }): ViewState => {
   }
 };
 
-const DesktopView: React.FC<Record<string, any>> = ({ patientUuid, panelUuid, testUuid, type, basePath }) => {
+interface DesktopViewProps {
+  basePath: string;
+  patientUuid: string;
+  panelUuid: string;
+  testUuid: string;
+  type: string;
+}
+
+const DesktopView: React.FC<DesktopViewProps> = ({ patientUuid, panelUuid, testUuid, type, basePath }) => {
   const [viewState, setViewState] = React.useState<ViewState>(deduceViewState({ panelUuid, testUuid, type }));
 
   React.useEffect(() => {
@@ -58,7 +66,7 @@ const DesktopView: React.FC<Record<string, any>> = ({ patientUuid, panelUuid, te
     <Grid>
       <OverflowBorder>
         <div className={styles.overview}>
-          <Overview patientUuid={patientUuid} openTimeline={openTimeline} openTrendline={openTrendline}></Overview>
+          <Overview patientUuid={patientUuid} openTimeline={openTimeline} openTrendline={openTrendline} />
         </div>
       </OverflowBorder>
       <OverflowBorder>
