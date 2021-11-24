@@ -1,6 +1,7 @@
 import React from 'react';
 import useOverviewData from './useOverviewData';
 import CommonOverview from './common-overview.component';
+import ArrowRight24 from '@carbon/icons-react/es/arrow--right/24';
 import { Button, DataTableSkeleton } from 'carbon-components-react';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
@@ -32,8 +33,13 @@ const RecentOverview: React.FC<RecentOverviewProps> = ({ patientUuid, basePath }
                 <div className={styles.widgetCard}>
                   <div className={isTablet ? styles.tabletHeader : styles.desktopHeader}>
                     <h4>{`${cardTitle} (${resultsCount})`}</h4>
-                    <Button kind="ghost" onClick={() => navigateToResults(basePath)}>
-                      {t('allResults', 'All results')}
+                    <Button
+                      kind="ghost"
+                      onClick={() => navigateToResults(basePath)}
+                      iconDescription="See all results"
+                      renderIcon={ArrowRight24}
+                    >
+                      {t('seeAllResults', 'See all results')}
                     </Button>
                   </div>
                   <CommonOverview
