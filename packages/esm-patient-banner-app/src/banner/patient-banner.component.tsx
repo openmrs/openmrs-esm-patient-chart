@@ -15,12 +15,21 @@ interface PatientBannerProps {
   patient: Pick<fhir.Patient, 'id' | 'name' | 'gender' | 'birthDate' | 'identifier' | 'address' | 'telecom'>;
   patientUuid: string;
   onClick?: (patientUuid: string) => void;
+  closePatientSearchResultsPanel?: () => void;
 }
 
-const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, onClick }) => {
+const PatientBanner: React.FC<PatientBannerProps> = ({
+  patient,
+  patientUuid,
+  onClick,
+  closePatientSearchResultsPanel,
+}) => {
   const { t } = useTranslation();
   const overFlowMenuRef = React.useRef(null);
-  const state = React.useMemo(() => ({ patientUuid, onClick }), [patientUuid, onClick]);
+  const state = React.useMemo(
+    () => ({ patientUuid, onClick, closePatientSearchResultsPanel }),
+    [patientUuid, onClick, closePatientSearchResultsPanel],
+  );
   const [showContactDetails, setShowContactDetails] = React.useState(false);
   const toggleContactDetails = React.useCallback((event: MouseEvent) => {
     event.stopPropagation();
