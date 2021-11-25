@@ -61,7 +61,7 @@ describe('ContactDetails: ', () => {
 
     screen.findByText('Relationships');
     expect(screen.getByText('Relationships')).toBeInTheDocument();
-    expect(screen.getByText('-')).toBeInTheDocument();
+    expect(screen.getByText('--')).toBeInTheDocument();
   });
 
   it("renders the patient's address, contact details and relationships when available", async () => {
@@ -83,8 +83,9 @@ describe('ContactDetails: ', () => {
     swrRender(<ContactDetails address={null} telecom={null} patientId={'some-uuid'} />);
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
 
-    expect(screen.getByText('There is no address to display for this patient')).toBeInTheDocument();
-    expect(screen.getByText('There are no contact details to display for this patient')).toBeInTheDocument();
+    expect(screen.getByText('Address')).toBeInTheDocument();
+    expect(screen.getByText('Contact Details')).toBeInTheDocument();
+    expect(screen.getAllByText('--').length).toBe(2);
   });
 });
 

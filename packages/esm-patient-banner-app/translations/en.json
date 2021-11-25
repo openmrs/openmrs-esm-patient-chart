@@ -3,8 +3,6 @@
   "activeVisit": "Active Visit",
   "address": "Address",
   "contactDetails": "Contact Details",
-  "noAddress": "There is no address to display for this patient",
-  "noContactDetails": "There are no contact details to display for this patient",
   "relationships": "Relationships",
   "showAllDetails": "Show all details",
   "showLess": "Show less",

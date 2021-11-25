@@ -12,16 +12,25 @@ interface ContactDetailsProps {
 
 const Address: React.FC<{ address: fhir.Address }> = ({ address }) => {
   const { t } = useTranslation();
-  const { city, country, postalCode, state } = address;
 
   return (
     <>
       <p className={styles.heading}>{t('address', 'Address')}</p>
       <ul>
-        <li>{postalCode}</li>
-        <li>{city}</li>
-        <li>{state}</li>
-        <li>{country}</li>
+        {(() => {
+          if (address) {
+            const { city, country, postalCode, state } = address;
+            return (
+              <>
+                <li>{postalCode}</li>
+                <li>{city}</li>
+                <li>{state}</li>
+                <li>{country}</li>
+              </>
+            );
+          }
+          return '--';
+        })()}
       </ul>
     </>
   );
@@ -29,7 +38,7 @@ const Address: React.FC<{ address: fhir.Address }> = ({ address }) => {
 
 const Contact: React.FC<{ telecom: Array<fhir.ContactPoint> }> = ({ telecom }) => {
   const { t } = useTranslation();
-  const value = telecom && telecom.length ? telecom[0].value : '-';
+  const value = telecom && telecom.length ? telecom[0].value : '--';
 
   return (
     <>
@@ -64,7 +73,7 @@ const Relationships: React.FC<{ patientId: string }> = ({ patientId }) => {
               </ul>
             );
           }
-          return <p>-</p>;
+          return <p>--</p>;
         })()}
       </>
     </>
@@ -79,26 +88,10 @@ const ContactDetails: React.FC<ContactDetailsProps> = ({ address, telecom, patie
     <div className={styles.contactDetails}>
       <div className={styles.row}>
         <div className={styles.col}>
-          {address ? (
-            <Address address={currentAddress} />
-          ) : (
-            <>
-              <p className={styles.heading}>{t('address', 'Address')}</p>
-              <p className={styles.label}>{t('noAddress', 'There is no address to display for this patient')}</p>
-            </>
-          )}
+          <Address address={currentAddress} />
         </div>
         <div className={styles.col}>
-          {telecom ? (
-            <Contact telecom={telecom} />
-          ) : (
-            <>
-              <p className={styles.heading}>{t('contactDetails', 'Contact Details')}</p>
-              <p className={styles.label}>
-                {t('noContactDetails', 'There are no contact details to display for this patient')}
-              </p>
-            </>
-          )}
+          <Contact telecom={telecom} />
         </div>
       </div>
       <div className={styles.row}>
