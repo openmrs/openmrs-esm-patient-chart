@@ -6,11 +6,25 @@ import { PaddingContainer, TimeSlots, Grid, RowStartCell, GridItems, ShadowBox }
 import { ObsRecord } from '@openmrs/esm-patient-common-lib';
 import styles from './timeline.scss';
 
-const PanelNameCorner: React.FC<{ panelName: string }> = ({ panelName }) => (
-  <TimeSlots className={styles['corner-grid-element']}>{panelName}</TimeSlots>
+interface PanelNameCornerProps {
+  showShadow: boolean;
+  panelName: string;
+}
+
+const PanelNameCorner: React.FC<PanelNameCornerProps> = ({ showShadow, panelName }) => (
+  <TimeSlots className={`${styles['corner-grid-element']} ${showShadow ? `${styles.shadow}` : ''}`}>
+    {panelName}
+  </TimeSlots>
 );
 
-const DateHeaderGrid = ({ timeColumns, yearColumns, dayColumns, displayShadow }) => (
+interface DateHeaderGridProps {
+  timeColumns: Array<string>;
+  yearColumns: Array<Record<string, number | string>>;
+  dayColumns: Array<Record<string, number | string>>;
+  showShadow: boolean;
+}
+
+const DateHeaderGrid: React.FC<DateHeaderGridProps> = ({ timeColumns, yearColumns, dayColumns, showShadow }) => (
   <Grid
     dataColumns={timeColumns.length}
     style={{
@@ -18,7 +32,7 @@ const DateHeaderGrid = ({ timeColumns, yearColumns, dayColumns, displayShadow })
       position: 'sticky',
       top: '0px',
       zIndex: 2,
-      boxShadow: displayShadow ? '8px 0 20px 0 rgba(0,0,0,0.15)' : undefined,
+      boxShadow: showShadow ? '8px 0 20px 0 rgba(0,0,0,0.15)' : undefined,
     }}
   >
     {yearColumns.map(({ year, size }) => {
@@ -45,13 +59,15 @@ const DateHeaderGrid = ({ timeColumns, yearColumns, dayColumns, displayShadow })
   </Grid>
 );
 
-const DataRows: React.FC<{
+interface DataRowsProps {
   rowData: Record<string, Array<ObsRecord>>;
   timeColumns: Array<string>;
   sortedTimes: Array<string>;
-  displayShadow: boolean;
+  showShadow: boolean;
   openTrendline: (testUuid: string) => void;
-}> = ({ timeColumns, rowData, sortedTimes, displayShadow, openTrendline }) => (
+}
+
+const DataRows: React.FC<DataRowsProps> = ({ timeColumns, rowData, sortedTimes, showShadow, openTrendline }) => (
   <Grid dataColumns={timeColumns.length} padding style={{ gridColumn: 'span 2' }}>
     {Object.entries(rowData).map(([title, obs], rowCount) => {
       const {
@@ -65,7 +81,7 @@ const DataRows: React.FC<{
               units,
               range,
               title,
-              shadow: displayShadow,
+              shadow: showShadow,
               openTrendline: () => openTrendline(conceptClass),
             }}
           />
@@ -76,11 +92,11 @@ const DataRows: React.FC<{
   </Grid>
 );
 
-type TimelineParams = {
+interface TimelineParams {
   patientUuid: string;
   panelUuid: string;
   openTrendline: (panelUuid: string, testUuid: string) => void;
-};
+}
 
 export const Timeline: React.FC<TimelineParams> = ({
   patientUuid,
@@ -107,13 +123,13 @@ export const Timeline: React.FC<TimelineParams> = ({
 
   return (
     <PaddingContainer ref={containerRef}>
-      <PanelNameCorner panelName={panelName} />
+      <PanelNameCorner showShadow={xIsScrolled} panelName={panelName} />
       <DateHeaderGrid
         {...{
           timeColumns,
           yearColumns,
           dayColumns,
-          displayShadow: yIsScrolled,
+          showShadow: yIsScrolled,
         }}
       />
       <DataRows
@@ -121,7 +137,7 @@ export const Timeline: React.FC<TimelineParams> = ({
           timeColumns,
           rowData,
           sortedTimes,
-          displayShadow: xIsScrolled,
+          showShadow: xIsScrolled,
           panelUuid,
           openTrendline,
         }}
