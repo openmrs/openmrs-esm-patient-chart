@@ -61,7 +61,7 @@ describe('ContactDetails: ', () => {
 
     screen.findByText('Relationships');
     expect(screen.getByText('Relationships')).toBeInTheDocument();
-    expect(screen.getByText('-')).toBeInTheDocument();
+    expect(screen.getByText('--')).toBeInTheDocument();
   });
 
   it("renders the patient's address, contact details and relationships when available", async () => {
@@ -77,6 +77,15 @@ describe('ContactDetails: ', () => {
     expect(screen.getByText(/Amanda Robinson/)).toBeInTheDocument();
     expect(screen.getByText(/Sibling/i)).toBeInTheDocument();
     expect(screen.getByText(/24 yrs/i)).toBeInTheDocument();
+  });
+
+  it('renders an empty state view when address and contact details is not available', () => {
+    swrRender(<ContactDetails address={null} telecom={null} patientId={'some-uuid'} />);
+    mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
+
+    expect(screen.getByText('Address')).toBeInTheDocument();
+    expect(screen.getByText('Contact Details')).toBeInTheDocument();
+    expect(screen.getAllByText('--').length).toBe(2);
   });
 });
 
