@@ -1,4 +1,9 @@
-import { OmrsOfflineHttpHeaders, omrsOfflineCachingStrategyHttpHeaderName, openmrsFetch } from '@openmrs/esm-framework';
+import {
+  OmrsOfflineHttpHeaders,
+  omrsOfflineCachingStrategyHttpHeaderName,
+  openmrsFetch,
+  messageOmrsServiceWorker,
+} from '@openmrs/esm-framework';
 import { formEncounterUrl } from '../constants';
 import { CoreHTMLForms } from '../core-html-forms';
 import { FormEncounter, FormEncounterResource } from '../types';
@@ -28,7 +33,17 @@ export async function addFormToCache(form: FormEncounter) {
   const headers: OmrsOfflineHttpHeaders = {
     [omrsOfflineCachingStrategyHttpHeaderName]: 'network-first',
   };
-  await Promise.allSettled(urlsToCache.map((urlToCache) => openmrsFetch(urlToCache, { headers })));
+
+  await Promise.allSettled(
+    urlsToCache.map(async (urlToCache) => {
+      await messageOmrsServiceWorker({
+        type: 'registerDynamicRoute',
+        pattern: escapeRegExp(urlToCache),
+        strategy: 'network-first',
+      });
+      await openmrsFetch(urlToCache, { headers });
+    }),
+  );
 }
 
 export async function isFormFullyCached(form: FormEncounter) {
