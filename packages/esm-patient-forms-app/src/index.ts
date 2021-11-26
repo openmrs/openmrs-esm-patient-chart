@@ -1,4 +1,4 @@
-import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { dashboardMeta } from './dashboard.meta';
 import OfflineToolsNavLink from './offline-forms/offline-tools-nav-link.component';
@@ -10,7 +10,7 @@ const backendDependencies = {
 };
 
 const frontendDependencies = {
-  // '@openmrs/esm-framework': process.env.FRAMEWORK_VERSION,
+  '@openmrs/esm-framework': process.env.FRAMEWORK_VERSION,
 };
 
 function setupOpenMRS() {
@@ -22,6 +22,14 @@ function setupOpenMRS() {
   };
 
   defineConfigSchema(moduleName, {});
+
+  registerBreadcrumbs([
+    {
+      path: `${window.spaBase}/offline-tools/forms`,
+      title: 'Offline forms',
+      parent: `${window.spaBase}/offline-tools`,
+    },
+  ]);
 
   return {
     extensions: [
@@ -66,6 +74,13 @@ function setupOpenMRS() {
         order: 12,
         load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
         meta: dashboardMeta,
+        online: true,
+        offline: true,
+      },
+      {
+        id: 'offline-tools-dashboard-forms-card',
+        slot: 'offline-tools-dashboard-cards',
+        load: getAsyncLifecycle(() => import('./offline-forms/offline-forms-overview-card.component'), options),
         online: true,
         offline: true,
       },
