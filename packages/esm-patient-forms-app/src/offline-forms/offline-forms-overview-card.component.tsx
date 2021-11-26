@@ -21,7 +21,6 @@ function useCountOfFormsAvailableOffline() {
 const OfflineFormsOverviewCard: React.FC = () => {
   const { t } = useTranslation();
   const { data: availableFormsCount, error } = useCountOfFormsAvailableOffline();
-  console.info(availableFormsCount, error);
 
   return (
     <Tile light className={`${styles.overviewCard}`}>
