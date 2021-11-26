@@ -1,14 +1,14 @@
 import React from 'react';
 import useOverviewData from './useOverviewData';
-import CommonOverview from './common-overview';
-import styles from './lab-results.scss';
+import CommonOverview from './common-overview.component';
 import { Button, DataTableSkeleton } from 'carbon-components-react';
-import { CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib';
+import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
-import { RecentResultsGrid, Card } from './helpers';
 import { navigateToResults, navigateToTimeline, navigateToTrendline } from '../helpers';
+import { useLayoutType } from '@openmrs/esm-framework';
+import styles from './recent-overview.scss';
 
-const RECENT_COUNT = 2;
+const RECENT_COUNT = 5;
 
 interface RecentOverviewProps {
   patientUuid: string;
@@ -17,6 +17,7 @@ interface RecentOverviewProps {
 
 const RecentOverview: React.FC<RecentOverviewProps> = ({ patientUuid, basePath }) => {
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
   const cardTitle = t('recentResults', 'Recent Results');
   const { overviewData, loaded, error } = useOverviewData(patientUuid);
 
@@ -29,11 +30,12 @@ const RecentOverview: React.FC<RecentOverviewProps> = ({ patientUuid, basePath }
               const resultsCount = Math.min(RECENT_COUNT, overviewData.length);
               return (
                 <div className={styles.widgetCard}>
-                  <CardHeader title={`${cardTitle} ${resultsCount}`}>
+                  <div className={isTablet ? styles.tabletHeader : styles.desktopHeader}>
+                    <h4>{`${cardTitle} (${resultsCount})`}</h4>
                     <Button kind="ghost" onClick={() => navigateToResults(basePath)}>
                       {t('allResults', 'All results')}
                     </Button>
-                  </CardHeader>
+                  </div>
                   <CommonOverview
                     {...{
                       patientUuid,
@@ -51,12 +53,14 @@ const RecentOverview: React.FC<RecentOverviewProps> = ({ patientUuid, basePath }
           })()}
         </>
       ) : (
-        <Card>
-          <DataTableSkeleton columnCount={3} />
-        </Card>
+        <DataTableSkeleton columnCount={3} />
       )}
     </RecentResultsGrid>
   );
+};
+
+const RecentResultsGrid = (props) => {
+  return <div {...props} className={styles['recent-results-grid']} />;
 };
 
 export default RecentOverview;

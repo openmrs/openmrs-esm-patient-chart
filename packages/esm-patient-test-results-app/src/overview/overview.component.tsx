@@ -1,15 +1,13 @@
 import React from 'react';
 import useOverviewData from './useOverviewData';
-import CommonOverview from './common-overview';
+import CommonOverview from './common-overview.component';
 import { DataTableSkeleton } from 'carbon-components-react';
-import { Card } from './helpers';
-import { switchTo } from '@openmrs/esm-framework';
+import { navigate } from '@openmrs/esm-framework';
 
 const defaultOpenTimeline = (patientUuid, panelUuid) => {
   const url = `/patient/${patientUuid}/testresults/timeline/${panelUuid}`;
-  switchTo('workspace', url, {
-    title: 'Timeline',
-  });
+
+  navigate({ to: url });
 };
 
 interface LabResultProps {
@@ -33,9 +31,7 @@ export const Overview: React.FC<LabResultProps & LabResultParams> = ({
       {loaded ? (
         <CommonOverview overviewData={overviewData} openTimeline={openTimeline} openTrendline={openTrendline} />
       ) : (
-        <Card>
-          <DataTableSkeleton columnCount={3} />
-        </Card>
+        <DataTableSkeleton columnCount={3} />
       )}
     </>
   );

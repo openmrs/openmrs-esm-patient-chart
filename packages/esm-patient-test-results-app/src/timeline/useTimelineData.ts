@@ -81,6 +81,6 @@ export const useTimelineData = (patientUuid: string, panelUuid: string) => {
       data: { parsedTime: parseTime(times), rowData, panelName },
       loaded: true,
     };
-  }, [sortedObs, loaded, error]);
+  }, [sortedObs, loaded, error, panelUuid]);
   return timelineData;
 };

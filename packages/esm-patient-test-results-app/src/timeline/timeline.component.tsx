@@ -1,7 +1,8 @@
 import * as React from 'react';
+import { InlineLoading } from 'carbon-components-react';
 import useScrollIndicator from './useScroll';
 import { useTimelineData } from './useTimelineData';
-import { Main, PaddingContainer, TimeSlots, Grid, RowStartCell, GridItems, ShadowBox } from './helpers';
+import { PaddingContainer, TimeSlots, Grid, RowStartCell, GridItems, ShadowBox } from './helpers';
 import { ObsRecord } from '@openmrs/esm-patient-common-lib';
 import styles from './timeline.scss';
 
@@ -22,32 +23,26 @@ const DateHeaderGrid = ({ timeColumns, yearColumns, dayColumns, displayShadow })
   >
     {yearColumns.map(({ year, size }) => {
       return (
-        <TimeSlots key={year} style={{ gridColumn: `${size} span` }}>
+        <TimeSlots key={year} className={styles['year-column']} style={{ gridColumn: `${size} span` }}>
           {year}
         </TimeSlots>
       );
     })}
     {dayColumns.map(({ day, size }) => {
       return (
-        <TimeSlots key={day} style={{ gridColumn: `${size} span` }}>
+        <TimeSlots key={day} className={styles['day-column']} style={{ gridColumn: `${size} span` }}>
           {day}
         </TimeSlots>
       );
     })}
     {timeColumns.map((time, i) => {
       return (
-        <TimeSlots key={time + i} style={{ scrollSnapAlign: 'start', fontWeight: 400 }}>
+        <TimeSlots key={time + i} className={styles['time-column']}>
           {time}
         </TimeSlots>
       );
     })}
   </Grid>
-);
-
-const LoadingDisplay: React.FC = () => (
-  <Main>
-    <h1>Loading</h1>
-  </Main>
 );
 
 const DataRows: React.FC<{
@@ -108,7 +103,7 @@ export const Timeline: React.FC<TimelineParams> = ({
     [panelUuid, openTrendlineExternal],
   );
 
-  if (!loaded) return <LoadingDisplay />;
+  if (!loaded) return <InlineLoading description="Loading" />;
 
   return (
     <PaddingContainer ref={containerRef}>

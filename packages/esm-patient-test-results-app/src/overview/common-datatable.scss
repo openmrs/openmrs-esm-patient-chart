@@ -2,36 +2,12 @@
 @import "~carbon-components/src/globals/scss/vars";
 @import "~carbon-components/src/globals/scss/mixins";
 
-.widgetCard {
-  border: 1px solid $ui-03;
-}
+.tableContainer :global(.bx--data-table-header) {
+  padding: 0.75rem 1rem 0.25rem 1rem;
 
-.separator {
-  height: 1.5rem;
-  border-bottom: 1px solid $ui-03;
-  width: calc(100% - 1.5rem);
-  margin-left: 0.75rem;
-}
-
-.recent-results-grid {
-  display: grid;
-  background-color: white;
-}
-
-.card {
-  border-radius: 0px;
-
-  h4 {
-    width: calc(100% - 220px);
+  *:not(:first-child) {
+    margin: 0.25rem 0rem;
   }
-}
-
-.info-button {
-  margin-left: 10px;
-  padding-top: 1px;
-  box-sizing: content-box;
-  position: absolute;
-  color: black;
 }
 
 tr {

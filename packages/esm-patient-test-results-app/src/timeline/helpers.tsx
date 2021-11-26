@@ -11,6 +11,7 @@ export const Grid: React.FC<{
     style={{
       ...style,
       gridTemplateColumns: `${padding ? '9em ' : ''} repeat(${dataColumns}, 5em)`,
+      margin: '1px',
     }}
     className={styles['grid']}
     {...props}
@@ -70,7 +71,9 @@ const TimelineCell: React.FC<{
   }
 
   return (
-    <div className={`${styles['timeline-cell']} ${zebra ? styles['timeline-cell-zebra'] : ''} ${additionalClassname}`}>
+    <div
+      className={`${styles['timeline-data-cell']} ${zebra ? styles['timeline-cell-zebra'] : ''} ${additionalClassname}`}
+    >
       <p>{text}</p>
     </div>
   );
@@ -78,32 +81,15 @@ const TimelineCell: React.FC<{
 
 export const RowStartCell = ({ title, range, units, shadow = false, openTrendline }) => (
   <div
-    className={styles['timeline-cell']}
+    className={styles['row-start-cell']}
     style={{
-      position: 'sticky',
-      left: '0px',
       boxShadow: shadow ? '8px 0 20px 0 rgba(0,0,0,0.15)' : undefined,
-      display: 'grid',
-      gridAutoFlow: 'row',
-      justifyItems: 'baseline',
-      alignItems: 'center',
-      gap: '0.5rem',
-      padding: '1rem',
     }}
   >
-    <span
-      onClick={openTrendline}
-      role={'link'}
-      tabIndex={0}
-      style={{
-        color: '#0f62fe',
-        cursor: 'pointer',
-        textTransform: 'capitalize',
-      }}
-    >
-      {title.toLowerCase()}
+    <span className={styles['trendline-link']} onClick={openTrendline} role={'link'} tabIndex={0}>
+      {title}
     </span>
-    <span style={{ color: '#6f6f6f', fontSize: '0.75rem' }}>
+    <span className={styles['range-units']}>
       {range} {units}
     </span>
   </div>

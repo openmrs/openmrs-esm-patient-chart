@@ -7,7 +7,7 @@ import LineChart from '@carbon/charts-react/line-chart';
 import { ScaleTypes, LineChartOptions, TickRotations } from '@carbon/charts/interfaces';
 import { toOmrsDateFormat, toOmrsTimeString24 } from '@openmrs/esm-framework';
 import { ObsRecord, OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
-import { CommonDataTable } from '../overview/common-overview';
+import CommonDataTable from '../overview/common-datatable.component';
 import { exist } from '../loadPatientTestData/helpers';
 import { useTranslation } from 'react-i18next';
 import styles from './trendline.scss';
