@@ -8,7 +8,7 @@
   "source": true,
   "scripts": {
     "start": "openmrs develop",
-    "serve": "ng serve --port 4200 --live-reload",
+    "serve": "ng serve --port 4200 --live-reload true",
     "debug": "npm run serve",
     "build": "ng build --configuration production",
     "lint": "eslint src --ext ts"
