@@ -149,6 +149,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({ isTablet, patientUuid }
                 onChange={(event) => setTimeFormat(event.target.value as amPm)}
                 value={timeFormat}
                 labelText={t('time', 'Time')}
+                aria-label={t('time', 'Time')}
                 id="time-picker-select-1"
               >
                 <SelectItem value="AM" text="AM" />

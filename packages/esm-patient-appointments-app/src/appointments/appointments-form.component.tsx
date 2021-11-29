@@ -167,6 +167,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({ patientUuid, isTabl
               onChange={(event) => setTimeFormat(event.target.value as amPm)}
               value={timeFormat}
               labelText={t('time', 'Time')}
+              aria-label={t('time', 'Time')}
             >
               <SelectItem value="AM" text="AM" />
               <SelectItem value="PM" text="PM" />
