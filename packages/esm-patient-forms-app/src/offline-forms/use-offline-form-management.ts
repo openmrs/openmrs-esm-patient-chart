@@ -34,12 +34,13 @@ function useOfflineFormsLocalStorage() {
     [],
   );
 
-  const setMarkedForOffline = (uuid: string, markedForOffline: boolean) => {
-    if (markedForOffline) {
-      setFormsMarkedAsOffline((previous) => [...previous, { uuid }]);
-    } else {
-      setFormsMarkedAsOffline((previous) => previous.filter((entry) => entry.uuid !== uuid));
-    }
+  const setMarkedForOffline = (uuid: string, isThisFormAvailableOffline: boolean) => {
+    setFormsMarkedAsOffline((previous) => {
+      const offlineFormUuids = isThisFormAvailableOffline
+        ? [...previous, { uuid }]
+        : previous.filter((entry) => entry.uuid !== uuid);
+      return offlineFormUuids.length > 0 ? offlineFormUuids : null;
+    });
   };
 
   return {

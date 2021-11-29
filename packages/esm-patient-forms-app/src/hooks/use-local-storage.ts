@@ -8,19 +8,21 @@ import { useState, SetStateAction } from 'react';
 export function useLocalStorage<T>(key: string, fallback: T) {
   const [value, setValue] = useState<T>(() => readWithFallback(key, fallback));
 
-  const setter = (value: SetStateAction<T>) => {
-    setValue(() => {
-      const previous = readWithFallback(key, fallback);
-      const next = value instanceof Function ? value(previous) : value;
+  const setter = (value: SetStateAction<T | null | undefined>) => {
+    const previous = readWithFallback(key, fallback);
+    const next = value instanceof Function ? value(previous) : value;
 
-      try {
-        window.localStorage.setItem(key, JSON.stringify(next));
-      } catch (e) {
-        console.warn('useLocalStorage: Failed to write value.', e);
+    try {
+      if (next === null || next === undefined) {
+        localStorage.removeItem(key);
+      } else {
+        localStorage.setItem(key, JSON.stringify(next));
       }
+    } catch (e) {
+      console.warn('useLocalStorage: Failed to write value.', e);
+    }
 
-      return next;
-    });
+    setValue(readWithFallback(key, fallback));
   };
 
   return [value, setter] as const;
@@ -28,7 +30,7 @@ export function useLocalStorage<T>(key: string, fallback: T) {
 
 function readWithFallback<T>(key: string, fallback: T) {
   try {
-    const item = window.localStorage.getItem(key);
+    const item = localStorage.getItem(key);
     return item ? JSON.parse(item) : fallback;
   } catch (e) {
     console.warn('useLocalStorage: Failed to read/deserialize value.', e);
