@@ -8,12 +8,17 @@ export interface FormEncounter {
   version: string;
   published: boolean;
   retired: boolean;
-  resources: Array<{
-    uuid: string;
-    name: string;
-    dataType: string;
-    valueReference: string;
-  }>;
+  resources: Array<FormEncounterResource>;
+}
+
+/**
+ * The resource part of a form encounter.
+ */
+export interface FormEncounterResource {
+  uuid: string;
+  name: string;
+  dataType: string;
+  valueReference: string;
 }
 
 /**

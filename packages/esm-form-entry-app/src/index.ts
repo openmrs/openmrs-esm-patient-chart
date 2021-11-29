@@ -17,11 +17,6 @@ function setupOpenMRS() {
 
   messageOmrsServiceWorker({
     type: 'registerDynamicRoute',
-    pattern: '.+/ws/rest/v1/clobdata/.+',
-  });
-
-  messageOmrsServiceWorker({
-    type: 'registerDynamicRoute',
     pattern: '.+/ws/fhir2/R4/Observation.+',
   });
 

@@ -1,11 +1,7 @@
-import {
-  defineConfigSchema,
-  getAsyncLifecycle,
-  getSyncLifecycle,
-  messageOmrsServiceWorker,
-} from '@openmrs/esm-framework';
+import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { dashboardMeta } from './dashboard.meta';
+import OfflineToolsNavLink from './offline-forms/offline-tools-nav-link.component';
 
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -18,16 +14,6 @@ const frontendDependencies = {
 };
 
 function setupOpenMRS() {
-  messageOmrsServiceWorker({
-    type: 'registerDynamicRoute',
-    pattern: '.+/ws/rest/v1/form.*',
-  });
-
-  messageOmrsServiceWorker({
-    type: 'registerDynamicRoute',
-    pattern: '.+/ws/rest/v1/encounter.*',
-  });
-
   const moduleName = '@openmrs/esm-patient-forms-app';
 
   const options = {
@@ -37,8 +23,25 @@ function setupOpenMRS() {
 
   defineConfigSchema(moduleName, {});
 
+  registerBreadcrumbs([
+    {
+      path: `${window.spaBase}/offline-tools/forms`,
+      title: 'Offline forms',
+      parent: `${window.spaBase}/offline-tools`,
+    },
+  ]);
+
   return {
     extensions: [
+      {
+        id: 'patient-form-entry-workspace',
+        load: getAsyncLifecycle(() => import('./forms/form-entry.component'), options),
+        meta: {
+          title: 'Form Entry',
+        },
+        online: true,
+        offline: true,
+      },
       {
         id: 'forms-widget',
         slot: 'patient-chart-summary-dashboard-slot',
@@ -47,33 +50,23 @@ function setupOpenMRS() {
         meta: {
           columnSpan: 4,
         },
-        online: true,
-        offline: true,
-      },
-      {
-        id: 'patient-form-entry-workspace',
-        load: getAsyncLifecycle(() => import('./forms/form-entry.component'), options),
-        meta: {
-          title: 'Form Entry',
+        online: {
+          isOffline: false,
         },
-        online: true,
-        offline: true,
+        offline: {
+          isOffline: true,
+        },
       },
       {
         id: 'patient-form-dashboard',
         slot: dashboardMeta.slot,
         load: getAsyncLifecycle(() => import('./forms/forms-detailed-overview.component'), options),
-        online: true,
-        offline: true,
-      },
-      {
-        id: 'patient-form-entry-workspace',
-        load: getAsyncLifecycle(() => import('./forms/form-entry.component'), options),
-        meta: {
-          title: 'Form Entry',
+        online: {
+          isOffline: false,
         },
-        online: true,
-        offline: true,
+        offline: {
+          isOffline: true,
+        },
       },
       {
         id: 'forms-summary-dashboard',
@@ -83,6 +76,35 @@ function setupOpenMRS() {
         meta: dashboardMeta,
         online: true,
         offline: true,
+      },
+      {
+        id: 'offline-tools-dashboard-forms-card',
+        slot: 'offline-tools-dashboard-cards',
+        load: getAsyncLifecycle(() => import('./offline-forms/offline-forms-overview-card.component'), options),
+        online: true,
+        offline: true,
+      },
+      {
+        id: 'offline-tools-page-forms-link',
+        slot: 'offline-tools-page-slot',
+        load: getSyncLifecycle(() => OfflineToolsNavLink({ page: 'forms', title: 'Offline forms' }), options),
+        meta: {
+          name: 'forms',
+          slot: 'offline-tools-page-forms-slot',
+        },
+        online: true,
+        offline: true,
+      },
+      {
+        id: 'offline-tools-page-forms',
+        slot: 'offline-tools-page-forms-slot',
+        load: getAsyncLifecycle(() => import('./offline-forms/offline-forms.component'), options),
+        online: {
+          canMarkFormsAsOffline: true,
+        },
+        offline: {
+          canMarkFormsAsOffline: false,
+        },
       },
     ],
   };
