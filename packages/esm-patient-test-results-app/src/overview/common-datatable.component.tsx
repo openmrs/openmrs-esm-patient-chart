@@ -9,6 +9,7 @@ import {
   TableCell,
   TableBody,
 } from 'carbon-components-react';
+import { useLayoutType } from '@openmrs/esm-framework';
 import { OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import { OverviewPanelData } from '../overview/useOverviewData';
 import styles from './common-datatable.scss';
@@ -24,45 +25,49 @@ interface CommonDataTableProps {
   description?: React.ReactNode;
 }
 
-const CommonDataTable: React.FC<CommonDataTableProps> = ({ title, data, description, toolbar, tableHeaders }) => (
-  <DataTable rows={data} headers={tableHeaders} size="short">
-    {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getTableContainerProps }) => (
-      <TableContainer
-        className={styles.tableContainer}
-        title={title}
-        description={description}
-        {...getTableContainerProps()}
-      >
-        {toolbar}
-        <Table {...getTableProps()} isSortable useZebraStyles>
-          <colgroup className={styles.columns}>
-            <col span={1} />
-            <col span={1} />
-            <col span={1} />
-          </colgroup>
-          <TableHead>
-            <TableRow>
-              {headers.map((header) => (
-                <TableHeader key={header.key} {...getHeaderProps({ header })} isSortable>
-                  {header.header}
-                </TableHeader>
-              ))}
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.map((row, i) => (
-              <TypedTableRow key={row.id} interpretation={data[i]?.interpretation} {...getRowProps({ row })}>
-                {row.cells.map((cell) => (
-                  <TableCell key={cell.id}>{cell.value}</TableCell>
+const CommonDataTable: React.FC<CommonDataTableProps> = ({ title, data, description, toolbar, tableHeaders }) => {
+  const isTablet = useLayoutType() === 'tablet';
+
+  return (
+    <DataTable rows={data} headers={tableHeaders} size="short">
+      {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getTableContainerProps }) => (
+        <TableContainer
+          className={`${styles.tableContainer} ${isTablet ? `${styles.tablet}` : `${styles.desktop}`}`}
+          title={title}
+          description={description}
+          {...getTableContainerProps()}
+        >
+          {toolbar}
+          <Table {...getTableProps()} isSortable useZebraStyles>
+            <colgroup className={styles.columns}>
+              <col span={1} />
+              <col span={1} />
+              <col span={1} />
+            </colgroup>
+            <TableHead>
+              <TableRow>
+                {headers.map((header) => (
+                  <TableHeader key={header.key} {...getHeaderProps({ header })} isSortable>
+                    {header.header}
+                  </TableHeader>
                 ))}
-              </TypedTableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    )}
-  </DataTable>
-);
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {rows.map((row, i) => (
+                <TypedTableRow key={row.id} interpretation={data[i]?.interpretation} {...getRowProps({ row })}>
+                  {row.cells.map((cell) => (
+                    <TableCell key={cell.id}>{cell.value}</TableCell>
+                  ))}
+                </TypedTableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
+    </DataTable>
+  );
+};
 
 const TypedTableRow: React.FC<{
   interpretation: OBSERVATION_INTERPRETATION;
