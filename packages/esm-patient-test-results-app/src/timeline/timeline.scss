@@ -118,6 +118,10 @@
   }
 }
 
+.shadow {
+  box-shadow: 8px 0 20px 0 rgba(0, 0, 0 , 0.15);
+}
+
 .trendline-link {
   @include carbon--type-style('body-short-01');
   color: $interactive-01;
