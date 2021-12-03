@@ -15,21 +15,18 @@ interface PatientBannerProps {
   patient: Pick<fhir.Patient, 'id' | 'name' | 'gender' | 'birthDate' | 'identifier' | 'address' | 'telecom'>;
   patientUuid: string;
   onClick?: (patientUuid: string) => void;
-  closePatientSearchResultsPanel?: () => void;
+  onTransition?: () => void;
 }
 
-const PatientBanner: React.FC<PatientBannerProps> = ({
-  patient,
-  patientUuid,
-  onClick,
-  closePatientSearchResultsPanel,
-}) => {
+const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, onClick, onTransition }) => {
   const { t } = useTranslation();
   const overFlowMenuRef = React.useRef(null);
-  const state = React.useMemo(
-    () => ({ patientUuid, onClick, closePatientSearchResultsPanel }),
-    [patientUuid, onClick, closePatientSearchResultsPanel],
+  const patientActionsSlotState = React.useMemo(
+    () => ({ patientUuid, onClick, onTransition }),
+    [patientUuid, onClick, onTransition],
   );
+
+  const patientPhotoSlotState = React.useMemo(() => ({ patientUuid }), [patientUuid]);
   const [showContactDetails, setShowContactDetails] = React.useState(false);
   const toggleContactDetails = React.useCallback((event: MouseEvent) => {
     event.stopPropagation();
@@ -38,7 +35,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
 
   const patientAvatar = (
     <div className={styles.patientAvatar} role="img">
-      <ExtensionSlot extensionSlotName="patient-photo-slot" state={state} />
+      <ExtensionSlot extensionSlotName="patient-photo-slot" state={patientPhotoSlotState} />
     </div>
   );
 
@@ -82,7 +79,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
                   extensionSlotName="patient-actions-slot"
                   key="patient-actions-slot"
                   className={styles.overflowMenuItemList}
-                  state={state}
+                  state={patientActionsSlotState}
                 />
               </CustomOverflowMenuComponent>
             </div>
