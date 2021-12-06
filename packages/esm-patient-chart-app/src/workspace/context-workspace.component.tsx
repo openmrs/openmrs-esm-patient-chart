@@ -35,6 +35,11 @@ const ContextWorkspace: React.FC<RouteComponentProps<ContextWorkspaceParams>> = 
   useEffect(() => {
     if (extensions.length > 0 && (size === ScreenModeTypes.maximize || size === ScreenModeTypes.normal)) {
       setOpenContextWorkspace(true);
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: 'smooth',
+      });
     } else if (extensions.length > 0 && size === ScreenModeTypes.hide) {
       setOpenContextWorkspace(false);
     } else {
