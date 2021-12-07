@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { take, map, tap } from 'rxjs/operators';
 import { Observable, Subject } from 'rxjs';
+import { age } from '@openmrs/esm-framework';
 
 import { ProviderResourceService } from '../openmrs-api/provider-resource.service';
 import { LocationResourceService } from '../openmrs-api/location-resource.service';
@@ -189,5 +190,22 @@ export class FormDataSourceService {
   private setCachedProviderSearchResults(searchProviderResults): void {
     const sourcekey = 'cachedproviders';
     this.localStorageService.setObject(sourcekey, searchProviderResults);
+  }
+
+  public getPatientObject(patient): object {
+    const model: object = {};
+    model['sex'] = patient?.gender === 'male' ? 'M' : 'F';
+    model['birthdate'] = new Date(patient?.birthDate);
+    model['age'] = parseInt(age(patient?.birthDate).match(/\d+/g).join(''));
+
+    // define gender based constant:
+    if (patient?.gender === 'female') {
+      model['gendercreatconstant'] = 0.85;
+    }
+    if (patient?.gender === 'male') {
+      model['gendercreatconstant'] = 1;
+    }
+
+    return model;
   }
 }

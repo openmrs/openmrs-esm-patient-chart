@@ -277,6 +277,8 @@ export class FeWrapperComponent implements OnInit {
     this.dataSources.registerDataSource('problem', this.formDataSourceService.getDataSources().problem);
     this.dataSources.registerDataSource('personAttribute', this.formDataSourceService.getDataSources().location);
     this.dataSources.registerDataSource('conceptAnswers', this.formDataSourceService.getDataSources().conceptAnswers);
+    this.dataSources.registerDataSource('patient', { visitTypeUuid: this.singleSpaProps.visitTypeUuid }, true);
+    this.dataSources.registerDataSource('patient', this.formDataSourceService.getPatientObject(this.patient), true);
   }
 
   private setDefaultValues() {
