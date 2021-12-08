@@ -67,6 +67,9 @@ export class FormDataSourceService {
       });
       return valuesObservable;
     };
+    const resolve = (uuid: string) => {
+      return this.resolveConcept(uuid);
+    };
 
     const changeConcept = (uuid: string) => {
       datasource.dataSourceOptions.concept = uuid;
@@ -77,7 +80,7 @@ export class FormDataSourceService {
       });
     };
 
-    datasource.resolveSelectedValue = this.resolveConcept.bind(this);
+    datasource.resolveSelectedValue = resolve;
     datasource.searchOptions = find;
     datasource.changeConcept = changeConcept;
 
