@@ -160,6 +160,29 @@ export class FeWrapperComponent implements OnInit {
     return subject.asObservable();
   }
 
+  private setUpWHOCascading() {
+    try {
+      let whoQuestions = this.form.searchNodeByQuestionId('adultWhoStage');
+
+      if (whoQuestions.length === 0) {
+        whoQuestions = this.form.searchNodeByQuestionId('pedWhoStage');
+      }
+
+      const whoStageQuestion = whoQuestions[0];
+
+      whoStageQuestion.control.valueChanges.subscribe((val) => {
+        if (val && val !== '') {
+          const source = this.form.dataSourcesContainer.dataSources['conceptAnswers'];
+          if (source.changeConcept) {
+            source.changeConcept(val);
+          }
+        }
+      });
+    } catch (error) {
+      console.error(`Error setting up Who Staging Cascading, ${error}`);
+    }
+  }
+
   public launchForm(): Observable<Form> {
     const subject = new ReplaySubject<Form>(1);
     const loadForm = () => {
@@ -262,9 +285,12 @@ export class FeWrapperComponent implements OnInit {
     this.wireDataSources();
     this.formName = this.formSchema.name;
     this.form = this.formFactory.createForm(this.formSchema, this.dataSources.dataSources);
+    this.setUpWHOCascading();
     if (this.encounter) {
       this.populateEncounterForEditing();
+      this.form.valueProcessingInfo.encounterUuid = this.singleSpaProps.encounterUuid;
     } else {
+      this.form.valueProcessingInfo.patientUuid = this.singleSpaProps.patient.id;
       this.setDefaultValues();
     }
     this.setUpPayloadProcessingInformation();
@@ -277,6 +303,8 @@ export class FeWrapperComponent implements OnInit {
     this.dataSources.registerDataSource('problem', this.formDataSourceService.getDataSources().problem);
     this.dataSources.registerDataSource('personAttribute', this.formDataSourceService.getDataSources().location);
     this.dataSources.registerDataSource('conceptAnswers', this.formDataSourceService.getDataSources().conceptAnswers);
+    this.dataSources.registerDataSource('patient', { visitTypeUuid: this.singleSpaProps.visitTypeUuid }, true);
+    this.dataSources.registerDataSource('patient', this.formDataSourceService.getPatientObject(this.patient), true);
   }
 
   private setDefaultValues() {

@@ -6,7 +6,7 @@ import { WindowRef } from '../window-ref';
 
 @Injectable()
 export class ConceptResourceService {
-  public v = 'custom:(uuid,name,conceptClass,answers)';
+  public v = 'custom:(uuid,name,conceptClass,setMembers)';
 
   constructor(protected http: HttpClient, protected windowRef: WindowRef) {}
 
