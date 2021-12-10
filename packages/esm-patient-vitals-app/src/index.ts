@@ -43,7 +43,7 @@ function setupOpenMRS() {
       },
       {
         id: 'vitals-details-widget',
-        slot: 'patient-chart-results-dashboard-slot',
+        slot: 'patient-chart-vitals-biometrics-dashboard-slot',
         load: getAsyncLifecycle(() => import('./vitals/vitals-main.component'), options),
         meta: {
           view: 'vitals',
