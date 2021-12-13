@@ -26,7 +26,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, onC
     () => ({ patientUuid, onClick, onTransition }),
     [patientUuid, onClick, onTransition],
   );
-  
+
   const patientName = `${patient.name[0].given.join(' ')} ${patient.name[0].family}`;
   const patientPhotoSlotState = React.useMemo(() => ({ patientUuid, patientName }), [patientUuid]);
 
