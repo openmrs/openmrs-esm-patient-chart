@@ -333,6 +333,7 @@ export class FeWrapperComponent implements OnInit {
     this.form.valueProcessingInfo.personUuid = this.patient.id;
     this.form.valueProcessingInfo.patientUuid = this.patient.id;
     this.form.valueProcessingInfo.formUuid = this.formSchema.uuid;
+    this.form.valueProcessingInfo.providerUuid = this.loggedInUser.currentProvider.uuid;
     if (this.formSchema.encounterType) {
       this.form.valueProcessingInfo.encounterTypeUuid = this.formSchema.encounterType.uuid;
     } else {
