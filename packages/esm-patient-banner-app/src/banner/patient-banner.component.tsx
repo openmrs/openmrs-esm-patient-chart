@@ -21,12 +21,15 @@ interface PatientBannerProps {
 const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, onClick, onTransition }) => {
   const { t } = useTranslation();
   const overFlowMenuRef = React.useRef(null);
+
   const patientActionsSlotState = React.useMemo(
     () => ({ patientUuid, onClick, onTransition }),
     [patientUuid, onClick, onTransition],
   );
+  
+  const patientName = `${patient.name[0].given.join(' ')} ${patient.name[0].family}`;
+  const patientPhotoSlotState = React.useMemo(() => ({ patientUuid, patientName }), [patientUuid]);
 
-  const patientPhotoSlotState = React.useMemo(() => ({ patientUuid }), [patientUuid]);
   const [showContactDetails, setShowContactDetails] = React.useState(false);
   const toggleContactDetails = React.useCallback((event: MouseEvent) => {
     event.stopPropagation();
@@ -57,9 +60,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, onC
         <div className={styles.patientInfo}>
           <div className={`${styles.row} ${styles.patientNameRow}`}>
             <div className={styles.flexRow}>
-              <span className={styles.patientName}>
-                {patient.name[0].given.join(' ')} {patient.name[0].family}
-              </span>
+              <span className={styles.patientName}>{patientName}</span>
               <ExtensionSlot
                 extensionSlotName="patient-banner-tags-slot"
                 state={{ patientUuid }}
