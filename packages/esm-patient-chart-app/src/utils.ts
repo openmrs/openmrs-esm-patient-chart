@@ -1,5 +1,5 @@
 import { ExtensionInfo, LayoutType, translateFrom } from '@openmrs/esm-framework';
-import { ScreenModeTypes } from './types';
+import { WorkspaceWindowState } from './types';
 
 export function isDesktop(layout: LayoutType) {
   return layout === 'desktop';
@@ -17,11 +17,12 @@ export function getTitle(ext: ExtensionInfo) {
   return ext.name;
 }
 
-export function checkScreenMode(ext: ExtensionInfo): ScreenModeTypes {
-  const screenMode: ScreenModeTypes = ext.meta?.screenSize;
+export function determineWindowState(ext: ExtensionInfo): WorkspaceWindowState {
+  const screenMode: WorkspaceWindowState = ext.meta?.screenSize;
 
   if (typeof screenMode === 'string') {
     return screenMode;
   }
-  return ScreenModeTypes.minimize;
+
+  return WorkspaceWindowState.minimized;
 }

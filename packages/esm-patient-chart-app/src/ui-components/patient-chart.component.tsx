@@ -9,7 +9,7 @@ import { detachAll, ExtensionSlot, useCurrentPatient, useSessionUser } from '@op
 import ActionMenu from './action-menu.component';
 import { useOfflineVisitForPatient } from '../offline';
 import { useContextWorkspace } from '../hooks/useContextWindowSize';
-import { ScreenModeTypes } from '../types';
+import { WorkspaceWindowState } from '../types';
 import WorkspaceNotification from './workspace-notification.component';
 
 interface PatientChartParams {
@@ -41,7 +41,7 @@ const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({ match
         <>
           <div
             className={`${styles.innerChartContainer} ${
-              windowSize.size === ScreenModeTypes.normal && openWindows > 0
+              windowSize.size === WorkspaceWindowState.normal && openWindows > 0
                 ? styles.closeWorkspace
                 : styles.activeWorkspace
             }`}
