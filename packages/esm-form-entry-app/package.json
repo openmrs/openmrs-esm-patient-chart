@@ -52,6 +52,7 @@
     "ngx-bootstrap": "5.6.x",
     "ngx-file-uploader": "0.0.18",
     "ngx-webcam": "^0.2.2",
+    "reflect-metadata": "^0.1.13",
     "single-spa-angular": "^4.9.2",
     "slick-carousel": "^1.6.0",
     "systemjs-webpack-interop": "^2.3.7",
