@@ -1,12 +1,11 @@
 {
-  "activeWorkspaceText": "{formName} form is active",
+  "activeFormWarning": "There is an active form open in the workspace",
   "addPastVisit": "Add past visit",
   "addPastVisitText": "You can add past visit, update past visit or add new past visit, Click on one of the buttons below",
   "all": "All",
   "allEncounters": "All Encounters",
   "cancel": "Cancel",
   "careActivities": "Care Activities",
-  "closeCurrent": "Open new form",
   "date": "Date",
   "dateAndTimeOfVisit": "Date and time of visit",
   "diagnoses": "Diagnoses",
@@ -34,6 +33,7 @@
   "noNotesFound": "No notes found",
   "noObservationsFound": "No observations found",
   "notes": "Notes",
+  "openAnyway": "Open anyway",
   "orderDurationAndUnit": "for {duration} {durationUnit}",
   "orderIndefiniteDuration": "Indefinite duration",
   "pastVisitErrorText": "Past Visit Error",
@@ -56,5 +56,6 @@
   "visitLocation": "Visit Location",
   "visitSummary": "Visit Summary",
   "visitType": "Visit type",
-  "workspaceNotificationHelperText": "Opening a new form will cause you to loose unsaved work on {formName}."
+  "workspaceModalText": "Launching a new form in the workspace could cause you to lose unsaved work on the <2>{formName}</2> form.",
+  "workspaceWarning": "Workspace warning"
 }
