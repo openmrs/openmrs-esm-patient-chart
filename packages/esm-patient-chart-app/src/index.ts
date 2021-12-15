@@ -4,6 +4,7 @@ import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { esmPatientChartSchema } from './config-schemas/openmrs-esm-patient-chart-schema';
 import { moduleName, spaBasePath } from './constants';
 import { setupCacheableRoutes, setupOfflineVisitsSync } from './offline';
+import { dashboardMeta, encountersDashboardMeta } from './dashboard.meta';
 
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -11,13 +12,6 @@ const backendDependencies = {};
 
 const frontendDependencies = {
   '@openmrs/esm-framework': process.env.FRAMEWORK_VERSION,
-};
-
-const dashboardMeta = {
-  name: 'summary',
-  slot: 'patient-chart-summary-dashboard-slot',
-  config: { columns: 4, type: 'grid' },
-  title: 'Patient Summary',
 };
 
 function setupOpenMRS() {
@@ -106,7 +100,17 @@ function setupOpenMRS() {
         }),
       },
       {
+        id: 'encounters-summary-dashboard',
+        slot: 'patient-chart-dashboard-slot',
+        order: 5,
+        load: getSyncLifecycle(createDashboardLink(encountersDashboardMeta), { featureName: 'encounter', moduleName }),
+        meta: encountersDashboardMeta,
+        online: true,
+        offline: true,
+      },
+      {
         id: 'past-visits-detail-overview',
+        order: 1,
         slot: 'patient-chart-encounters-dashboard-slot',
         load: getAsyncLifecycle(() => import('./visit/visits-widget/visit-detail-overview.component'), {
           featureName: 'visits-detail-slot',
@@ -117,6 +121,7 @@ function setupOpenMRS() {
           view: 'visits',
         },
       },
+      ,
       {
         id: 'past-visits-overview',
         load: getAsyncLifecycle(() => import('./visit/past-visit-overview.component'), {

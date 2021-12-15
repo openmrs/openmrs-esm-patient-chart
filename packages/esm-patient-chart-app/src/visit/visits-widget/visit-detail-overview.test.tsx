@@ -71,7 +71,6 @@ describe('VisitDetailOverview', () => {
     await waitForLoadingToFinish();
 
     expect(screen.getByRole('table')).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /Encounters/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /ECH Aug 18, 2021/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /All encounters/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Visit summary/i })).toBeInTheDocument();

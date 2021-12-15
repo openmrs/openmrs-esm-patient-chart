@@ -49,8 +49,8 @@ describe('NotesDetailedSummary: ', () => {
 
     expect(screen.getByRole('heading', { name: /notes/i })).toBeInTheDocument();
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
-    expect(screen.getByText(/There are no notes to display for this patient/i)).toBeInTheDocument();
-    expect(screen.getByText(/Record notes/i)).toBeInTheDocument();
+    expect(screen.getByText(/There are no visit notes to display for this patient/i)).toBeInTheDocument();
+    expect(screen.getByText(/Record visit notes/i)).toBeInTheDocument();
   });
 
   it('renders an error state view if there is a problem fetching encounter data', async () => {

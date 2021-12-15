@@ -20,12 +20,12 @@
   "location": "Location",
   "noMatchingDiagnoses": "No diagnoses found matching",
   "note": "Note",
-  "notes": "Notes",
   "saveAndClose": "Save & Close",
   "searchForDiagnosis": "Search for a diagnosis",
   "seeAll": "See all",
   "visitDate": "Visit date",
   "visitNoteNowVisible": "It is now visible on the Encounters page",
+  "visitNotes": "Visit notes",
   "visitNoteSaved": "Visit note saved successfully",
   "visitNoteSaveError": "Error saving visit note"
 }

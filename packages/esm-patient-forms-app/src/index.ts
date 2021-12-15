@@ -59,6 +59,7 @@ function setupOpenMRS() {
       },
       {
         id: 'patient-form-dashboard',
+        order: 0,
         slot: dashboardMeta.slot,
         load: getAsyncLifecycle(() => import('./forms/forms-detailed-overview.component'), options),
         online: {
