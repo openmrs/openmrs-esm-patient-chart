@@ -212,3 +212,13 @@ tab > button:first {
   background-color: #ffd7d9;
   color:#a2191f;
 }
+
+.toggleSwitch {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  margin-bottom: $spacing-02;
+}
+.toggleSwitch div {
+  width: 30%;
+}
