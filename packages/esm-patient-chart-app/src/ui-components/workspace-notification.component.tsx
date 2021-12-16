@@ -1,17 +1,16 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useTranslation, Trans } from 'react-i18next';
 import styles from './workspace-notification.component.scss';
-import { Button, ComposedModal, ModalBody, ModalHeader } from 'carbon-components-react';
+import { Button, ComposedModal, ModalBody, ModalFooter, ModalHeader } from 'carbon-components-react';
 import { patientChartWorkspaceSlot } from '../constants';
 import { useAssignedExtensionIds, attach, detachAll, extensionStore } from '@openmrs/esm-framework';
 import { getTitle } from '../utils';
 
 const WorkspaceNotification: React.FC = () => {
   const { t } = useTranslation();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [extensionSlotName, setExtensionSlotName] = useState('');
   const extensions = useAssignedExtensionIds(patientChartWorkspaceSlot);
-
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [extensionSlotName, setExtensionSlotName] = useState<string>('');
 
   const formName = useMemo(() => {
     if (extensions.length === 1) {
@@ -23,7 +22,7 @@ const WorkspaceNotification: React.FC = () => {
   }, [extensions]);
 
   const toggleActive = () => {
-    setIsOpen((prevState) => !prevState);
+    setIsModalOpen((prevState) => !prevState);
   };
 
   useEffect(() => {
@@ -32,11 +31,12 @@ const WorkspaceNotification: React.FC = () => {
       const { extensionSlotName } = state;
       setExtensionSlotName(extensionSlotName);
       if (extensions.length > 0) {
-        setIsOpen(true);
+        setIsModalOpen(true);
       } else {
         attach(patientChartWorkspaceSlot, extensionSlotName);
       }
     };
+
     window.addEventListener('workspace-dialog', handler);
     return () => window.removeEventListener('workspace-dialog', handler);
   }, [extensions.length]);
@@ -48,21 +48,27 @@ const WorkspaceNotification: React.FC = () => {
   };
 
   return (
-    <ComposedModal open={isOpen} onClose={toggleActive}>
-      <ModalHeader>
-        <span className={styles.productiveHeading04}>{t('activeWorkspaceText', { formName })}</span>
-      </ModalHeader>
+    <ComposedModal open={isModalOpen} onClose={toggleActive}>
+      <ModalHeader
+        label={t('workspaceWarning', 'Workspace warning')}
+        title={t('activeFormWarning', 'There is an active form open in the workspace')}
+      ></ModalHeader>
       <ModalBody>
-        <p className={styles.messageBody}>{t('workspaceNotificationHelperText', { formName })}</p>
+        <p className={styles.messageBody}>
+          <Trans i18nKey="workspaceModalText" values={{ formName: formName }}>
+            Launching a new form in the workspace could cause you to lose unsaved work on the{' '}
+            <strong>{formName}</strong> form.
+          </Trans>
+        </p>
       </ModalBody>
-      <div className={styles.buttonContainer}>
-        <Button onClick={toggleActive} kind="secondary">
+      <ModalFooter>
+        <Button kind="secondary" onClick={toggleActive}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button onClick={handleOpenNewForm} kind="danger">
-          {t('closeCurrent', 'Open new form')}
+        <Button kind="danger" onClick={handleOpenNewForm}>
+          {t('openAnyway', 'Open anyway')}
         </Button>
-      </div>
+      </ModalFooter>
     </ComposedModal>
   );
 };
