@@ -1,6 +1,7 @@
 import useSWR from 'swr';
 import { fhirBaseUrl, FHIRResource, useConfig, openmrsFetch } from '@openmrs/esm-framework';
 import { calculateBMI } from './biometrics-helpers';
+import { toDateWithoutSeconds } from '@openmrs/esm-patient-common-lib';
 
 export const pageSize = 100;
 
@@ -25,9 +26,9 @@ export function useBiometrics(patientUuid: string) {
     data:
       data?.data?.total > 0
         ? formatDimensions(
-            filterByConceptUuid(observations, concepts.muacUuid),
             filterByConceptUuid(observations, concepts.heightUuid),
             filterByConceptUuid(observations, concepts.weightUuid),
+            filterByConceptUuid(observations, concepts.muacUuid),
           )
         : null,
     isError: error,
@@ -41,10 +42,11 @@ function formatDimensions(heights: Biometrics, weights: Biometrics, muacs: Biome
   const heightDates = getDatesIssued(heights);
   const uniqueDates = Array.from(new Set(weightDates?.concat(heightDates))).sort(latestFirst);
 
-  return uniqueDates.map((date: Date | string) => {
-    const muac = muacs.find((muac) => muac.issued === date);
-    const weight = weights.find((weight) => weight.issued === date);
-    const height = heights.find((height) => height.issued === date);
+  return uniqueDates.map((date: Date) => {
+    const uniqDate = toDateWithoutSeconds(date);
+    const muac = muacs.find((muac) => toDateWithoutSeconds(muac.issued) === uniqDate);
+    const weight = weights.find((weight) => toDateWithoutSeconds(weight.issued) === uniqDate);
+    const height = heights.find((height) => toDateWithoutSeconds(height.issued) === uniqDate);
     return {
       id: weight?.encounter?.reference?.replace('Encounter/', ''),
       weight: weight?.valueQuantity?.value,
@@ -64,8 +66,8 @@ function latestFirst(a, b) {
   return new Date(b).getTime() - new Date(a).getTime();
 }
 
-function getDatesIssued(dimensionArray): string[] {
-  return dimensionArray?.map((dimension) => dimension.issued);
+function getDatesIssued(dimensionArray): Array<Date> {
+  return dimensionArray?.map((dimension) => toDateWithoutSeconds(dimension.issued));
 }
 
 interface BiometricsFetchResponse {

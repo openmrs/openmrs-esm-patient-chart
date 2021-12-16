@@ -3,6 +3,7 @@ import { PatientVitalAndBiometric } from './vitals-biometrics-form/vitals-biomet
 import { openmrsFetch, fhirBaseUrl, useConfig, FHIRResource } from '@openmrs/esm-framework';
 import { calculateBMI } from './vitals-biometrics-form/vitals-biometrics-form.utils';
 import { ConfigObject } from '../config-schema';
+import { toDateWithoutSeconds } from '@openmrs/esm-patient-common-lib';
 
 export const pageSize = 100;
 
@@ -61,15 +62,17 @@ function formatVitals(
 
   const uniqueDates = Array.from(new Set(systolicDates?.concat(diastolicDates))).sort(latestFirst);
 
-  return uniqueDates.map((date) => {
-    const systolic = systolicBloodPressure.find((systolic) => systolic.issued === date);
-    const diastolic = diastolicBloodPressure.find((diastolic) => diastolic.issued === date);
-    const pulse = pulseData.find((pulse) => pulse.issued === date);
-    const temperature = temperatureData.find((temperature) => temperature.issued === date);
-    const oxygenSaturation = oxygenSaturationData.find((oxygenSaturation) => oxygenSaturation.issued === date);
-    const height = heightData.find((height) => height.issued === date);
-    const weight = weightData.find((weight) => weight.issued === date);
-    const respiratoryRate = respiratoryRateData.find((respiratoryRate) => respiratoryRate.issued === date);
+  return uniqueDates.map((date: Date | string) => {
+    const systolic = systolicBloodPressure.find((systolic) => toDateWithoutSeconds(systolic.issued) === date);
+    const diastolic = diastolicBloodPressure.find((diastolic) => toDateWithoutSeconds(diastolic.issued) === date);
+    const pulse = pulseData.find((pulse) => toDateWithoutSeconds(pulse.issued) === date);
+    const temperature = temperatureData.find((temperature) => toDateWithoutSeconds(temperature.issued) === date);
+    const oxygenSaturation = oxygenSaturationData.find(
+      (oxygenSaturation) => toDateWithoutSeconds(oxygenSaturation.issued) === date,
+    );
+    const respiratoryRate = respiratoryRateData.find(
+      (respiratoryRate) => toDateWithoutSeconds(respiratoryRate.issued) === date,
+    );
     return {
       id: systolic?.encounter?.reference.replace('Encounter/', ''),
       date: systolic?.issued,
@@ -78,16 +81,13 @@ function formatVitals(
       pulse: pulse?.valueQuantity?.value,
       temperature: temperature?.valueQuantity?.value,
       oxygenSaturation: oxygenSaturation?.valueQuantity?.value,
-      weight: weight?.valueQuantity?.value,
-      height: height?.valueQuantity?.value,
-      bmi: weight && height ? calculateBMI(weight.valueQuantity.value, height.valueQuantity.value) : null,
       respiratoryRate: respiratoryRate?.valueQuantity?.value,
     };
   });
 }
 
-function getDatesIssued(vitalsArray: Vitals): Array<Date> {
-  return vitalsArray.map((vitals) => vitals.issued);
+function getDatesIssued(vitalsArray: Vitals): Array<Date | string> {
+  return vitalsArray.map((vitals) => toDateWithoutSeconds(vitals.issued));
 }
 
 function latestFirst(a: Date, b: Date) {
