@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import dayjs from 'dayjs';
 import styles from '../visit-detail-overview.scss';
 import EncounterList from './encounter-list.component';
@@ -33,10 +33,8 @@ const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visit, pati
     [visit],
   );
 
-  const toggleView = () => setListView((prevState) => !prevState);
-
-  React.useEffect(() => {
-    toggleView();
+  useEffect(() => {
+    setListView(toggleAll);
   }, [toggleAll]);
 
   return (

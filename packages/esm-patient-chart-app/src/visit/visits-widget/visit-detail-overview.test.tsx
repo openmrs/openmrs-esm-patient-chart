@@ -21,7 +21,7 @@ jest.mock('@openmrs/esm-framework', () => {
     getVisitsForPatient: jest.fn(),
     createErrorHandler: jest.fn(),
     useLayoutType: jest.fn(),
-    ExtensionSlot: jest.fn().mockImplementation((ext) => ext.slotName),
+    ExtensionSlot: jest.fn().mockImplementation((ext) => ext.extensionSlotName),
   };
 });
 
@@ -69,6 +69,9 @@ describe('VisitDetailOverview', () => {
     renderVisitDetailOverview();
 
     await waitForLoadingToFinish();
+
+    const allEncountersButton = screen.getByRole('button', { name: /All Encounters/i });
+    userEvent.click(allEncountersButton);
 
     expect(screen.getByRole('table')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /ECH Aug 18, 2021/i })).toBeInTheDocument();
