@@ -2,6 +2,10 @@
 @import "~carbon-components/src/globals/scss/vars";
 @import "~carbon-components/src/globals/scss/mixins";
 
+.container {
+  margin: 1rem 0;
+}
+
 .heading {
   @include carbon--type-style("productive-heading-03");
   color: $text-01;
@@ -45,12 +49,18 @@
 }
 
 .headerGridRow {
-  margin: $spacing-03 0 $spacing-08 0;
+  // margin: $spacing-03 0 $spacing-08 0;
+  // margin: 0 $spacing-05;
   border-bottom: 0.0625rem solid $grey-2;
+  margin: 0;
 }
 
 .dataGridRow {
   // @include carbon--type-style("body-short-02");
-  display: flex;
-  flex-direction: row;
+  // display: flex;
+  // flex-direction: row;
+  display: grid;
+  grid-template-columns: 50% 10% 1fr;
+  margin: 0.5rem 1rem;
+  width: 100%;
 }

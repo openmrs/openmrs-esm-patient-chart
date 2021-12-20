@@ -8,13 +8,19 @@ interface AllergyTileInterface {
 }
 
 const AllergyTile: React.FC<AllergyTileInterface> = ({ patientUuid }) => {
-  const { data: allergies } = useAllergies(patientUuid);
   const { t } = useTranslation();
+  const { data: allergies } = useAllergies(patientUuid);
 
   return (
-    <div className={styles.gridColumn}>
-      <p>{t('allergies', 'Allergies')}</p>
-      <span>{allergies?.map((allergy) => allergy.display).join(', ')}</span>
+    <div>
+      <p className={styles.label}>{t('allergies', 'Allergies')}</p>
+      <p className={styles.content}>
+        {allergies?.length ? (
+          <span className={styles.value}>{allergies?.map((allergy) => allergy.display).join(', ')}</span>
+        ) : (
+          '--'
+        )}
+      </p>
     </div>
   );
 };

@@ -117,7 +117,7 @@ describe('VisitForm: ', () => {
       expect(showNotification).toHaveBeenCalledWith(
         expect.objectContaining({
           kind: 'error',
-          title: 'Error starting current visit',
+          title: 'Error starting a visit',
         }),
       );
     });

@@ -12,18 +12,15 @@ const PatientDetailsTile: React.FC<PatientDetailsTileInterface> = ({ patientUuid
   const [, patient] = useCurrentPatient(patientUuid);
 
   return (
-    <>
-      <div className={styles.detailsColumn}>
-        <p>
-          {patient?.name[0].given.join(' ')} {patient?.name[0].family}
-        </p>
-        <div>
-          <span>{capitalize(patient?.gender)}</span> &middot; <span>{age(patient?.birthDate)}</span> &middot;{' '}
-          <span>{dayjs(patient?.birthDate).format('DD - MMM - YYYY')} </span>
-        </div>
+    <div className={styles.container}>
+      <p className={styles.name}>
+        {patient?.name[0].given.join(' ')} {patient?.name[0].family}
+      </p>
+      <div className={styles.details}>
+        <span>{capitalize(patient?.gender)}</span> &middot; <span>{age(patient?.birthDate)}</span> &middot;{' '}
+        <span>{dayjs(patient?.birthDate).format('DD - MMM - YYYY')} </span>
       </div>
-      <span className={styles.divider}></span>
-    </>
+    </div>
   );
 };
 
