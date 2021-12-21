@@ -49,16 +49,11 @@
 }
 
 .headerGridRow {
-  // margin: $spacing-03 0 $spacing-08 0;
-  // margin: 0 $spacing-05;
   border-bottom: 0.0625rem solid $grey-2;
   margin: 0;
 }
 
 .dataGridRow {
-  // @include carbon--type-style("body-short-02");
-  // display: flex;
-  // flex-direction: row;
   display: grid;
   grid-template-columns: 50% 10% 1fr;
   margin: 0.5rem 1rem;
