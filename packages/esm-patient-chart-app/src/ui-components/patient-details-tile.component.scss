@@ -2,19 +2,24 @@
 @import "~carbon-components/src/globals/scss/vars";
 @import "~carbon-components/src/globals/scss/mixins";
 
-.detailsColumn{
-    width: max-content;
-    color: $text-02;
-    margin-right: $spacing-02;
-    padding: $spacing-02;
+.container:after {
+	content: '';
+	height: 100%;
+	width: 1px;
+	position: absolute;
+	right: 0;
+	top: 0;
+	background-color: $color-gray-30;
+	margin: 0 1rem;
 }
 
-.divider {
-    position: absolute;
-    margin: 0 $spacing-02 $spacing-02 0;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    height: 96%;
-    border-right: 0.0625rem solid $grey-2;
+.details {
+	margin-top: 5px;
+	@include carbon--type-style('body-short-01');
+	color: $text-02;
+}
+
+.name {
+	@include carbon--type-style('body-short-02');
+	color: $text-01;
 }

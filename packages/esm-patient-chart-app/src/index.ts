@@ -135,7 +135,7 @@ function setupOpenMRS() {
           moduleName,
         }),
         meta: {
-          title: 'Start Visit Form',
+          title: 'Start a visit',
         },
       },
       {
