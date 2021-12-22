@@ -1,10 +1,9 @@
 import React, { useEffect, useState, Fragment } from 'react';
-import dayjs from 'dayjs';
 import styles from './note-record.css';
 import { SummaryCard, RecordDetails } from '@openmrs/esm-patient-common-lib';
 import { RouteComponentProps } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { createErrorHandler } from '@openmrs/esm-framework';
+import { createErrorHandler, formatDate } from '@openmrs/esm-framework';
 import { fetchEncounterByUuid } from './encounter.resource';
 import { useNotesContext } from './notes.context';
 
@@ -47,7 +46,7 @@ export default function NoteRecord({ match }: NoteRecordProps) {
                   <tr>
                     <td>{note?.encounterType?.display}</td>
                     <td>{note?.location?.display}</td>
-                    <td>{dayjs(note?.encounterDatetime).format('DD-MM-YYYY')}</td>
+                    <td>{formatDate(note?.encounterDatetime)}</td>
                   </tr>
                 </tbody>
               </table>

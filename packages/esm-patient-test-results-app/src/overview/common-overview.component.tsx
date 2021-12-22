@@ -1,12 +1,11 @@
 import React, { useCallback } from 'react';
-import dayjs from 'dayjs';
 import Table16 from '@carbon/icons-react/es/table/16';
 import ChartLine16 from '@carbon/icons-react/es/chart--line/16';
 import { Button, TableToolbarContent, TableToolbar, Tooltip } from 'carbon-components-react';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { OverviewPanelEntry } from './useOverviewData';
 import { useTranslation } from 'react-i18next';
-import { navigate } from '@openmrs/esm-framework';
+import { formatDatetime, navigate } from '@openmrs/esm-framework';
 import CommonDataTable from './common-datatable.component';
 import styles from './common-overview.scss';
 
@@ -83,7 +82,7 @@ const CommonOverview: React.FC<CommonOverviewProps> = ({
                 description: (
                   <div className={`${insertSeparator ? '' : styles.cardHeader}`}>
                     <div className={styles.meta}>
-                      {formatDate(effectiveDateTime)}
+                      {formatDatetime(effectiveDateTime, 'wide')}
                       <InfoTooltip effectiveDateTime={effectiveDateTime} issuedDateTime={issuedDateTime} />
                     </div>
                   </div>
@@ -153,18 +152,14 @@ const InfoTooltip = ({ effectiveDateTime, issuedDateTime }) => {
       <div className={styles.tooltip}>
         <p>{t('dateCollected', 'Displaying date collected')}</p>
         <p>
-          <span className={styles.label}>{t('resulted', 'Resulted')}: </span> {formatDate(issuedDateTime)}
+          <span className={styles.label}>{t('resulted', 'Resulted')}: </span> {formatDatetime(issuedDateTime, 'wide')}
         </p>
         <p>
-          <span className={styles.label}>{t('ordered', 'Ordered')}: </span> {formatDate(effectiveDateTime)}
+          <span className={styles.label}>{t('ordered', 'Ordered')}: </span> {formatDatetime(effectiveDateTime, 'wide')}
         </p>
       </div>
     </Tooltip>
   );
 };
-
-function formatDate(date: Date) {
-  return dayjs(date).format('DD - MMM - YYYY · HH:mm');
-}
 
 export default CommonOverview;

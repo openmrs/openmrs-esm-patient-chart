@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import dayjs from 'dayjs';
 import ProgramsForm from './programs-form.component';
 import styles from './program-record.css';
 import { SummaryCard, openWorkspaceTab } from '@openmrs/esm-patient-common-lib';
 import { RouteComponentProps } from 'react-router-dom';
 import { useTranslation, Trans } from 'react-i18next';
-import { createErrorHandler } from '@openmrs/esm-framework';
+import { createErrorHandler, formatDate } from '@openmrs/esm-framework';
 import { getPatientProgramByUuid } from './programs.resource';
 import { useProgramsContext } from './programs.context';
 
@@ -67,12 +66,11 @@ const ProgramRecord: React.FC<ProgramRecordProps> = ({ match }) => {
                 </thead>
                 <tbody>
                   <tr>
-                    <td>{dayjs(patientProgram?.dateEnrolled).format('DD-MMM-YYYY')}</td>
+                    <td>{formatDate(patientProgram?.dateEnrolled)}</td>
                     <td className={styles.completedProgram}>
                       {patientProgram?.dateCompleted ? (
                         <span className={styles.completionDate}>
-                          <Trans i18nKey="completedOn">Completed on</Trans>{' '}
-                          {dayjs(patientProgram?.dateCompleted).format('DD-MMM-YYYY')}
+                          <Trans i18nKey="completedOn">Completed on</Trans> {formatDate(patientProgram?.dateCompleted)}
                         </span>
                       ) : (
                         <Trans i18nKey="active">Active</Trans>

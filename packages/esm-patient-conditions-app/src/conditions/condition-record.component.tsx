@@ -6,7 +6,7 @@ import styles from './condition-record.css';
 import { SummaryCard, RecordDetails, openWorkspaceTab } from '@openmrs/esm-patient-common-lib';
 import { RouteComponentProps } from 'react-router-dom';
 import { useTranslation, Trans } from 'react-i18next';
-import { createErrorHandler } from '@openmrs/esm-framework';
+import { createErrorHandler, formatDate } from '@openmrs/esm-framework';
 import { getConditionByUuid } from './conditions.resource';
 import { useConditionsContext } from './conditions.context';
 
@@ -63,7 +63,7 @@ export default function ConditionRecord(props: ConditionRecordProps) {
                 </thead>
                 <tbody>
                   <tr>
-                    <td>{dayjs(patientCondition.onsetDateTime).format('MMM-YYYY')}</td>
+                    <td>{formatDate(patientCondition.onsetDateTime, 'no day')}</td>
                     <td>{capitalize(patientCondition.clinicalStatus)}</td>
                   </tr>
                 </tbody>
@@ -87,9 +87,7 @@ export default function ConditionRecord(props: ConditionRecordProps) {
               </thead>
               <tbody>
                 <tr>
-                  <td>
-                    {patientCondition?.lastUpdated ? dayjs(patientCondition?.lastUpdated).format('DD-MMM-YYYY') : '-'}
-                  </td>
+                  <td>{patientCondition?.lastUpdated ? formatDate(patientCondition?.lastUpdated) : '-'}</td>
                   <td>{patientCondition?.lastUpdatedBy ?? '-'}</td>
                   <td>{patientCondition?.lastUpdatedLocation ?? '-'}</td>
                 </tr>

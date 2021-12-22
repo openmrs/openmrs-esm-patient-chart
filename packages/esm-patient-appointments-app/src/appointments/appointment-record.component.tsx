@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import AppointmentsForm from './appointments-form.component';
-import dayjs from 'dayjs';
 import styles from './appointment-record.css';
 import { VerticalLabelValue, SummaryCard, RecordDetails, openWorkspaceTab } from '@openmrs/esm-patient-common-lib';
-import { createErrorHandler } from '@openmrs/esm-framework';
+import { createErrorHandler, formatDate, formatTime, parseDate } from '@openmrs/esm-framework';
 import { RouteComponentProps } from 'react-router-dom';
 import { useTranslation, Trans } from 'react-i18next';
 import { getAppointmentsByUuid } from './appointments.resource';
@@ -50,20 +49,20 @@ export default function AppointmentRecord(props: AppointmentRecordProps) {
                   <td>
                     <VerticalLabelValue
                       label={t('date', 'Date')}
-                      value={dayjs(patientAppointment?.startDateTime).format('YYYY-MMM-DD')}
+                      value={patientAppointment?.startDateTime && formatDate(patientAppointment?.startDateTime)}
                       valueStyles={{ fontFamily: 'Work Sans' }}
                     />
                   </td>
                   <td>
                     <VerticalLabelValue
                       label={t('startTime', 'Start time')}
-                      value={dayjs.utc(patientAppointment?.startDateTime).format('HH:mm A')}
+                      value={patientAppointment?.startDateTime && formatTime(patientAppointment?.startDateTime)}
                     />
                   </td>
                   <td>
                     <VerticalLabelValue
                       label={t('endTime', 'End time')}
-                      value={dayjs.utc(patientAppointment?.endDateTime).format('HH:mm A')}
+                      value={patientAppointment?.endDateTime && formatTime(patientAppointment?.endDateTime)}
                     />
                   </td>
                 </tr>
@@ -113,7 +112,7 @@ export default function AppointmentRecord(props: AppointmentRecordProps) {
               </thead>
               <tbody>
                 <tr>
-                  <td>{dayjs(patientAppointment?.startDateTime).format('DD-MMM-YYYY')}</td>
+                  <td>{formatDate(patientAppointment?.startDateTime)}</td>
                   <td>{patientAppointment?.service?.creatorName || '\u2014'}</td>
                   <td>{patientAppointment?.location ? patientAppointment?.location?.name : '\u2014'}</td>
                 </tr>

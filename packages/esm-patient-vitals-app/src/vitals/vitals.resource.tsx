@@ -160,7 +160,7 @@ export function editPatientVitals(
 
 export interface PatientVitals {
   id: string;
-  date: Date | string;
+  date: Date;
   systolic?: number;
   diastolic?: number;
   pulse?: number;

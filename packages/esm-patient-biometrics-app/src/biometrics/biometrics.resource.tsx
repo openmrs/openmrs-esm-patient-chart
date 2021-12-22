@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { fhirBaseUrl, FHIRResource, useConfig, openmrsFetch } from '@openmrs/esm-framework';
+import { fhirBaseUrl, FHIRResource, parseDate, useConfig, openmrsFetch } from '@openmrs/esm-framework';
 import { calculateBMI } from './biometrics-helpers';
 
 export const pageSize = 100;
@@ -65,7 +65,7 @@ function latestFirst(a, b) {
 }
 
 function getDatesIssued(dimensionArray): Array<Date> {
-  return dimensionArray?.map((dimension) => dimension.issued);
+  return dimensionArray?.map((dimension) => parseDate(dimension.issued));
 }
 
 interface BiometricsFetchResponse {
@@ -78,7 +78,16 @@ interface BiometricsFetchResponse {
 
 export interface PatientBiometrics {
   id: string;
-  date: string | Date;
+  date: Date;
+  weight: number;
+  height: number;
+  bmi: number | null;
+  muac: number;
+}
+
+export interface PatientBiometricsDisplay {
+  id: string;
+  date: string;
   weight: number;
   height: number;
   bmi: number | null;

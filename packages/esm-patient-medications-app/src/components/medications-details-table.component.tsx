@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import Add16 from '@carbon/icons-react/es/add/16';
 import User16 from '@carbon/icons-react/es/user/16';
+import { formatDate } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import capitalize from 'lodash-es/capitalize';
 import styles from './medications-details-table.scss';
@@ -135,7 +136,7 @@ const MedicationsDetailsTable = connect<
         sortKey: dayjs(medication.dateActivated).toDate(),
         content: (
           <div className={styles.leftColumn}>
-            <span>{dayjs(medication.dateActivated).format('DD-MMM-YYYY')}</span>
+            <span>{formatDate(medication.dateActivated)}</span>
             <span className={styles.indicationRow}>
               <User16 />
             </span>

@@ -1,5 +1,4 @@
 import React from 'react';
-import dayjs from 'dayjs';
 import {
   DataTable,
   DataTableSkeleton,
@@ -15,7 +14,7 @@ import {
 } from 'carbon-components-react';
 import Add16 from '@carbon/icons-react/es/add/16';
 import styles from './conditions-overview.scss';
-import { usePagination } from '@openmrs/esm-framework';
+import { formatDate, parseDate, usePagination } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { useConditions } from './conditions.resource';
 import {
@@ -58,7 +57,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient, basePa
   const tableRows = React.useMemo(() => {
     return paginatedConditions?.map((condition) => ({
       ...condition,
-      onsetDateTime: dayjs(condition.onsetDateTime).format('MMM-YYYY'),
+      onsetDateTime: formatDate(parseDate(condition.onsetDateTime), 'no day'),
     }));
   }, [paginatedConditions]);
 

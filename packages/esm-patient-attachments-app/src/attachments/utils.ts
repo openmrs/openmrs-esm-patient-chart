@@ -1,3 +1,4 @@
+import { formatDatetime } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import { attachmentUrl } from './attachments.resource';
 
@@ -37,7 +38,7 @@ export function createGalleryEntry(data: any) {
     thumbnailHeight: 130,
     caption: data.comment,
     isSelected: false,
-    dateTime: dayjs(data.dateTime).format('YYYY-MM-DD HH:mm:ss'),
+    dateTime: formatDatetime(data.dateTime),
     bytesMimeType: data.bytesMimeType,
     bytesContentFamily: data.bytesContentFamily,
   };

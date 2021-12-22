@@ -11,6 +11,7 @@ import {
   FormErrorsService,
   Form,
 } from '@ampath-kenya/ngx-formentry';
+import { formatDate, formatTime, parseDate } from '@openmrs/esm-framework';
 import { Observable, forkJoin, ReplaySubject, Subscription } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { OpenmrsEsmApiService } from '../openmrs-api/openmrs-esm-api.service';
@@ -49,11 +50,11 @@ export class FeWrapperComponent implements OnInit {
   submittedOrder: Array<Order> = [];
 
   public get encounterDate(): string {
-    return moment(this.encounter.encounterDatetime).format('YYYY-MM-DD');
+    return formatDate(parseDate(this.encounter.encounterDatetime));
   }
 
   public get encounterTime(): string {
-    return moment(this.encounter.encounterDatetime).format('HH:mm');
+    return formatTime(parseDate(this.encounter.encounterDatetime));
   }
 
   public get hasValidationErrors(): boolean {

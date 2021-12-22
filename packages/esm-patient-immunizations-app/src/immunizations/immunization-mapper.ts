@@ -4,6 +4,7 @@ import groupBy from 'lodash-es/groupBy';
 import isUndefined from 'lodash-es/isUndefined';
 import map from 'lodash-es/map';
 import orderBy from 'lodash-es/orderBy';
+import { formatDate } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import {
   Code,
@@ -24,8 +25,8 @@ const mapToImmunizationDose = (immunizationBundleEntry: FHIRImmunizationBundleEn
   const protocolApplied = immunizationResource?.protocolApplied?.length > 0 && immunizationResource?.protocolApplied[0];
   const sequenceLabel = protocolApplied?.series;
   const sequenceNumber = protocolApplied?.doseNumberPositiveInt;
-  const occurrenceDateTime = dayjs(immunizationResource?.occurrenceDateTime).format('YYYY-MM-DD');
-  const expirationDate = dayjs(immunizationResource?.expirationDate).format('YYYY-MM-DD');
+  const occurrenceDateTime = formatDate(immunizationResource?.occurrenceDateTime);
+  const expirationDate = formatDate(immunizationResource?.expirationDate);
 
   return {
     immunizationObsUuid,

@@ -7,7 +7,7 @@ import BiometricsChart from './biometrics-chart.component';
 import BiometricsPagination from './biometrics-pagination.component';
 import { Button, DataTableSkeleton, InlineLoading } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
-import { useConfig } from '@openmrs/esm-framework';
+import { formatDatetime, useConfig } from '@openmrs/esm-framework';
 import { useBiometrics } from './biometrics.resource';
 import {
   CardHeader,
@@ -67,7 +67,7 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({
         return {
           ...data,
           id: `${index}`,
-          date: dayjs(data.date).format(`DD - MMM - YYYY, hh:mm`),
+          date: formatDatetime(data.date, 'wide'),
         };
       }),
     [biometrics],

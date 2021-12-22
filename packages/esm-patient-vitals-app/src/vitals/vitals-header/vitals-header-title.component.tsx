@@ -8,6 +8,7 @@ import WarningFilled20 from '@carbon/icons-react/es/warning--filled/20';
 import { PatientVitals } from '../vitals.resource';
 import { patientVitalsBiometricsFormWorkspace } from '../../constants';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { formatDatetime, formatDate } from '@openmrs/esm-framework';
 import styles from './vitals-header-title.component.scss';
 
 interface VitalsHeaderTitleProps {
@@ -43,9 +44,7 @@ const VitalsHeaderTitle: React.FC<VitalsHeaderTitleProps> = ({
             <span className={styles.vitalName}>Vitals & Biometrics</span>
             <span className={`${styles.bodyShort01} ${styles.text02}`}>
               {t('lastRecorded', 'Last Recorded')}:{' '}
-              {dayjs(vitals.date).isToday()
-                ? `${t('today', 'Today')}, ${dayjs(vitals.date).format('hh:mm A')}`
-                : dayjs(vitals.date).format('DD - MMM - YYYY')}
+              {dayjs(vitals.date).isToday() ? formatDatetime(vitals.date) : formatDate(vitals.date, 'wide')}
             </span>
           </span>
           <div className={styles.alignCenter}>

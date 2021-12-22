@@ -18,6 +18,7 @@
     ],
     "resolveJsonModule": true,
     "noEmit": true,
-    "target": "esnext"
+    "target": "esnext",
+    "includes": ["tools/setupTests.ts"]
   }
 }

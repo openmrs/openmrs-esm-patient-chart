@@ -1,5 +1,4 @@
 import React from 'react';
-import dayjs from 'dayjs';
 import Add16 from '@carbon/icons-react/es/add/16';
 import ChartLineSmooth16 from '@carbon/icons-react/es/chart--line-smooth/16';
 import Table16 from '@carbon/icons-react/es/table/16';
@@ -7,6 +6,7 @@ import styles from './vitals-overview.scss';
 import VitalsChart from './vitals-chart.component';
 import VitalsPagination from './vitals-pagination.component';
 import { DataTableSkeleton, Button, InlineLoading } from 'carbon-components-react';
+import { formatDatetime } from '@openmrs/esm-framework';
 import {
   CardHeader,
   EmptyState,
@@ -68,7 +68,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
       vitals?.map((vital, index) => {
         return {
           id: `${index}`,
-          date: dayjs(vital.date).format(`DD - MMM - YYYY, hh:mm`),
+          date: formatDatetime(vital.date, 'wide'),
           bloodPressure: `${vital.systolic ?? '-'} / ${vital.diastolic ?? '-'}`,
           pulse: vital.pulse,
           spo2: vital.oxygenSaturation,

@@ -132,7 +132,7 @@ describe('ProgramsForm: ', () => {
       expect(screen.getByDisplayValue('Oncology Screening and Diagnosis')).toBeInTheDocument();
 
       fireEvent.change(enrollmentDateInput, { target: { value: '2020-05-05' } });
-      expect(screen.getByDisplayValue(renderDate('2020-05-05'))).toBeInTheDocument();
+      expect(screen.getByDisplayValue('2020-05-05')).toBeInTheDocument();
 
       fireEvent.change(selectLocationInput, {
         target: { value: inpatientWardUuid },
@@ -185,7 +185,7 @@ describe('ProgramsForm: ', () => {
       expect(screen.getByDisplayValue('Oncology Screening and Diagnosis')).toBeInTheDocument();
 
       fireEvent.change(enrollmentDateInput, { target: { value: '2020-05-05' } });
-      expect(screen.getByDisplayValue(renderDate('2020-05-05'))).toBeInTheDocument();
+      expect(screen.getByDisplayValue('2020-05-05')).toBeInTheDocument();
 
       fireEvent.change(selectLocationInput, {
         target: { value: inpatientWardUuid },
@@ -208,8 +208,4 @@ describe('ProgramsForm: ', () => {
 
 function renderProgramsForm() {
   render(<ProgramsForm {...testProps} />);
-}
-
-function renderDate(time: string) {
-  return dayjs(time).format('YYYY-MM-DD');
 }

@@ -1,9 +1,9 @@
 import React from 'react';
-import dayjs from 'dayjs';
 import Add16 from '@carbon/icons-react/es/add/16';
 import styles from './conditions-detailed-summary.scss';
 import capitalize from 'lodash-es/capitalize';
 import { useTranslation } from 'react-i18next';
+import { formatDate, parseDate } from '@openmrs/esm-framework';
 import {
   DataTable,
   DataTableSkeleton,
@@ -52,7 +52,7 @@ const ConditionsDetailedSummary: React.FC = () => {
         ...condition,
         id: condition.id,
         condition: condition.display,
-        onsetDateTime: dayjs(condition.onsetDateTime).format('MMM-YYYY'),
+        onsetDateTime: formatDate(parseDate(condition.onsetDateTime), 'no day'),
         status: capitalize(condition.clinicalStatus),
       };
     });

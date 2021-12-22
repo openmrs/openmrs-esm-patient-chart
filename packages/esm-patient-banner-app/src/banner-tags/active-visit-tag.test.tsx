@@ -2,9 +2,8 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import ActiveVisitBannerTag from './active-visit-tag.component';
-import { useVisit } from '@openmrs/esm-framework';
+import { formatDatetime, useVisit } from '@openmrs/esm-framework';
 import { mockCurrentVisit } from '../../../../__mocks__/visits.mock';
-import dayjs from 'dayjs';
 
 const mockUseVisit = useVisit as jest.Mock;
 
@@ -25,7 +24,7 @@ describe('ActiveVisitBannerTag: ', () => {
     const visitMetadata =
       mockCurrentVisit.visitData.visitType.name +
       ' Started: ' +
-      dayjs(mockCurrentVisit.visitData.startDatetime).format('DD - MMM - YYYY @ HH:mm');
+      formatDatetime(mockCurrentVisit.visitData.startDatetime, 'wide');
 
     expect(
       screen.getByRole('tooltip', {

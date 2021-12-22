@@ -1,7 +1,7 @@
 import React from 'react';
-import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { CardHeader, EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { formatDate, parseDate } from '@openmrs/esm-framework';
 import { useAllergies } from './allergy-intolerance.resource';
 import Add16 from '@carbon/icons-react/es/add/16';
 import {
@@ -75,8 +75,8 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
           </div>
         ),
       },
-      recordedDate: dayjs(allergy.recordedDate).format('MMM-YYYY') ?? '-',
-      lastUpdated: dayjs(allergy.lastUpdated).format('DD-MMM-YYYY'),
+      recordedDate: allergy.recordedDate ? formatDate(parseDate(allergy.recordedDate), 'no day') : '-',
+      lastUpdated: formatDate(parseDate(allergy.lastUpdated)),
     }));
   }, [allergies]);
 

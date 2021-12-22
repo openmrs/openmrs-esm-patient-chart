@@ -4,7 +4,7 @@ import EmptyFormView from './empty-form.component';
 import isEmpty from 'lodash-es/isEmpty';
 import first from 'lodash-es/first';
 import debounce from 'lodash-es/debounce';
-import { navigate, usePagination, useVisit, Visit } from '@openmrs/esm-framework';
+import { formatDatetime, parseDate, navigate, usePagination, useVisit, Visit } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
@@ -61,15 +61,6 @@ function findHtmlForm(formUuid: string) {
   return htmlForms.find((form) => form.formUuid === formUuid);
 }
 
-function formatDate(strDate: string | Date) {
-  const date = dayjs(strDate);
-  const today = dayjs(new Date());
-  if (date.date() === today.date() && date.month() === today.month() && date.year() === today.year()) {
-    return `Today @ ${date.format('HH:mm')}`;
-  }
-  return date.format('DD - MMM - YYYY @ HH:mm');
-}
-
 interface FormViewProps {
   forms: Array<CompletedFormInfo>;
   patientUuid: string;
@@ -114,7 +105,7 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
       results.map((formInfo) => {
         return {
           id: formInfo.form.uuid,
-          lastCompleted: formInfo.lastCompleted ? formatDate(formInfo.lastCompleted) : undefined,
+          lastCompleted: formInfo.lastCompleted ? formatDatetime(formInfo.lastCompleted) : undefined,
           formName: formInfo.form.name,
           formUuid: formInfo.form.uuid,
         };
