@@ -30,7 +30,7 @@ const StartVisitPrompt: React.FC<StartVisitPromptProps> = ({ isModalOpen, closeM
     state?.type === 'past'
       ? t(
           'addPastVisitText',
-          'You can add past visit, update past visit or add new past visit. Choose from one of the options below to continue.',
+          'You can add a new past visit or update an old one. Choose from one of the options below to continue.',
         )
       : t(
           'noActiveVisitText',
