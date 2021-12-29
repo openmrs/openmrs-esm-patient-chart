@@ -1,64 +1,61 @@
 import React, { useCallback } from 'react';
-import styles from './start-visit.component.scss';
-import { ComposedModal, Button, ModalHeader, ModalBody } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
+import { ComposedModal, Button, ModalBody, ModalHeader, ModalFooter } from 'carbon-components-react';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import styles from './start-visit.component.scss';
 
 interface StartVisitPromptProps {
-  openModal: boolean;
+  isModalOpen: boolean;
   closeModal: () => void;
   state: any;
 }
 
-const StartVisitPrompt: React.FC<StartVisitPromptProps> = ({ openModal, closeModal, state }) => {
+const StartVisitPrompt: React.FC<StartVisitPromptProps> = ({ isModalOpen, closeModal, state }) => {
   const { t } = useTranslation();
 
-  const modalHeaderText =
-    state?.type === 'start' ? t('noActiveVisit', 'No Active Visit') : t('addPastVisit', 'Add Past Visit');
-  const modalBodyText =
-    state?.type === 'start'
-      ? t(
-          'noActiveVisitText',
-          "You can't add data to the patient chart without an active visit. Choose from one of the options below to continue.",
-        )
-      : t(
-          'addPastVisitText',
-          'You can add past visit, update past visit or add new past visit, Click on one of the buttons below',
-        );
-
-  const handleOpenEditPastVisit = useCallback(() => {
+  const handleEditPastVisit = useCallback(() => {
     launchPatientWorkspace('past-visits-overview');
     closeModal();
   }, [closeModal]);
 
-  const handleOpenStartVisitForm = useCallback(() => {
+  const handleStartNewVisit = useCallback(() => {
     launchPatientWorkspace('start-visit-workspace-form');
     closeModal();
   }, [closeModal]);
 
+  const modalHeaderText =
+    state?.type === 'past' ? t('addPastVisit', 'Add a past visit') : t('noActiveVisit', 'No active visit');
+
+  const modalBodyText =
+    state?.type === 'past'
+      ? t(
+          'addPastVisitText',
+          'You can add past visit, update past visit or add new past visit. Choose from one of the options below to continue.',
+        )
+      : t(
+          'noActiveVisitText',
+          "You can't add data to the patient chart without an active visit. Choose from one of the options below to continue.",
+        );
+
   return (
-    <ComposedModal open={openModal} onClose={() => closeModal()}>
+    <ComposedModal open={isModalOpen} onClose={closeModal}>
       <ModalHeader>
-        <span className={styles.productiveHeading03}>{modalHeaderText}</span>
+        <span className={styles.header}>{modalHeaderText}</span>
       </ModalHeader>
       <ModalBody>
-        <p>{modalBodyText}</p>
+        <p className={styles.body}>{modalBodyText}</p>
       </ModalBody>
-      <div className={styles.buttonContainer}>
-        <div className={styles.left}>
-          <Button onClick={closeModal} kind="ghost">
-            {t('cancel', 'Cancel')}
-          </Button>
-        </div>
-        <div className={styles.right}>
-          <Button onClick={handleOpenEditPastVisit} kind="secondary">
-            {t('editPastVisit', 'Edit Past Visit')}
-          </Button>
-          <Button onClick={handleOpenStartVisitForm} kind="primary">
-            {t('startNewVisit', 'Start New Visit')}
-          </Button>
-        </div>
-      </div>
+      <ModalFooter className={styles.footer}>
+        <Button kind="secondary" onClick={closeModal}>
+          {t('cancel', 'Cancel')}
+        </Button>
+        <Button kind="secondary" onClick={handleEditPastVisit}>
+          {t('editPastVisit', 'Edit past visit')}
+        </Button>
+        <Button kind="primary" onClick={handleStartNewVisit}>
+          {t('startNewVisit', 'Start new visit')}
+        </Button>
+      </ModalFooter>
     </ComposedModal>
   );
 };

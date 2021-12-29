@@ -1,12 +1,16 @@
 import React from 'react';
-import { screen, render } from '@testing-library/react';
+import dayjs from 'dayjs';
+import { screen, render, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { BehaviorSubject, of, throwError } from 'rxjs';
 import { mockPatient } from '../../../../../__mocks__/patient.mock';
 import { mockLocations } from '../../../../../__mocks__/location.mock';
 import { mockCurrentVisit, mockVisitTypes } from '../../../../../__mocks__/visits.mock';
-import { saveVisit, showNotification, showToast } from '@openmrs/esm-framework';
+import { saveVisit, showNotification, showToast, toOmrsIsoString, toDateObjectStrict } from '@openmrs/esm-framework';
+import { getByTextWithMarkup } from '../../../../../tools/test-helpers';
 import StartVisitForm from './visit-form.component';
+
+const isoFormat = 'YYYY-MM-DDTHH:mm:ss.SSSZZ';
 
 const testProps = {
   isTablet: false,
@@ -15,6 +19,8 @@ const testProps = {
 
 const mockSaveVisit = saveVisit as jest.Mock;
 const mockGetStartedVisitGetter = jest.fn();
+const mockToOmrsIsoString = toOmrsIsoString as jest.Mock;
+const mockToDateObjectStrict = toDateObjectStrict as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -26,8 +32,8 @@ jest.mock('@openmrs/esm-framework', () => {
       return mockGetStartedVisitGetter();
     },
     saveVisit: jest.fn(),
-    showNotification: jest.fn(),
-    showToast: jest.fn(),
+    toOmrsIsoString: jest.fn(),
+    toDateObjectStrict: jest.fn(),
     useLocations: jest.fn().mockImplementation(() => mockLocations),
     useVisitTypes: jest.fn().mockImplementation(() => mockVisitTypes),
     usePagination: jest.fn().mockImplementation(() => ({
@@ -62,30 +68,48 @@ describe('VisitForm: ', () => {
     let saveButton: HTMLElement;
 
     beforeEach(() => {
+      mockToDateObjectStrict.mockImplementation((date) => dayjs(date, isoFormat).toDate());
+      mockToOmrsIsoString.mockImplementation((date) => dayjs(date).format(isoFormat));
+      mockGetStartedVisitGetter.mockReturnValueOnce(new BehaviorSubject(mockCurrentVisit));
+
       renderVisitForm();
       saveButton = screen.getByRole('button', { name: /Start Visit/i });
     });
 
+    it('renders an error message if a Visit Type is not selected', () => {
+      userEvent.click(saveButton);
+
+      const errorAlert = screen.getByRole('alert');
+      expect(errorAlert).toBeInTheDocument();
+      expect(getByTextWithMarkup(/Missing visit type/i)).toBeInTheDocument();
+      expect(getByTextWithMarkup(/Please select a visit type/i)).toBeInTheDocument();
+
+      userEvent.click(screen.getByLabelText(/Outpatient visit/i));
+
+      expect(errorAlert).not.toBeInTheDocument();
+    });
+
     it('starts a new visit upon successful submission', () => {
-      const dateInput = screen.getByLabelText('Date');
-      userEvent.type(dateInput, new Date('2021-12-12').toISOString());
+      // Set date
+      const datePicker = screen.getByLabelText(/Date/i);
+      userEvent.click(screen.getByLabelText(/December 5, 2021/i));
+      expect(datePicker).toHaveValue('05/12/2021');
 
-      const timeInput = screen.getByRole('textbox', { name: /Time/i });
-      userEvent.type(timeInput, '1:30');
+      // Set time
+      const timePicker = screen.getByRole('textbox', { name: /Time/i });
 
-      const visitType = screen.getByRole('radio', { name: /Outpatient Visit/ });
-      userEvent.click(visitType);
-
+      // Set time format
       const timeFormat = screen.getByRole('combobox', { name: /Time/i });
       userEvent.selectOptions(timeFormat, 'AM');
+      fireEvent.change(timePicker, { target: { value: '08:15' } });
 
+      // Set visit type
+      userEvent.click(screen.getByLabelText(/Outpatient visit/i));
+
+      // Set location
       const locationOptions = screen.getByRole('combobox', { name: /Select a location/i });
       userEvent.selectOptions(locationOptions, 'b1a8b05e-3542-4037-bbd3-998ee9c40574');
 
-      const recommended = screen.getByRole('tab', { name: /Recommended/i });
-      userEvent.click(recommended);
-
-      mockGetStartedVisitGetter.mockReturnValueOnce(new BehaviorSubject(mockCurrentVisit));
       mockSaveVisit.mockReturnValueOnce(of({ status: 201 }));
 
       userEvent.click(saveButton);
@@ -101,14 +125,12 @@ describe('VisitForm: ', () => {
       );
 
       expect(showToast).toHaveBeenCalledTimes(1);
-      expect(showToast).toHaveBeenCalledWith({ description: 'Visit has been started successfully', kind: 'success' });
+      expect(showToast).toHaveBeenCalledWith({ description: 'Visit started successfully', kind: 'success' });
     });
 
     it('renders an error message if there was a problem starting a new visit', () => {
-      const visitType = screen.getByRole('radio', { name: /Outpatient Visit/ });
-      userEvent.click(visitType);
+      userEvent.click(screen.getByLabelText(/Outpatient visit/i));
 
-      mockGetStartedVisitGetter.mockReturnValueOnce(new BehaviorSubject(mockCurrentVisit));
       mockSaveVisit.mockReturnValueOnce(throwError({ status: 500, statusText: 'Internal server error' }));
 
       userEvent.click(saveButton);
@@ -117,7 +139,7 @@ describe('VisitForm: ', () => {
       expect(showNotification).toHaveBeenCalledWith(
         expect.objectContaining({
           kind: 'error',
-          title: 'Error starting a visit',
+          title: 'Error starting visit',
         }),
       );
     });
