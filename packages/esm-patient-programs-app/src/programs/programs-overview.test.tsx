@@ -16,6 +16,8 @@ jest.mock('@openmrs/esm-framework', () => {
 
   return {
     ...originalModule,
+    formatDate: jest.fn(),
+    formatDatetime: jest.fn(),
     openmrsFetch: jest.fn(),
     usePagination: jest.fn().mockImplementation(() => ({
       currentPage: 1,

@@ -20,8 +20,8 @@ const EndVisitPrompt: React.FC<EndVisitPromptProps> = ({ patientUuid, isModalOpe
     const endVisitPayload = {
       location: currentVisit.location.uuid,
       startDatetime: parseDate(currentVisit.startDatetime),
-      stopDatetime: new Date(),
       visitType: currentVisit.visitType.uuid,
+      stopDatetime: new Date(),
     };
 
     const abortController = new AbortController();

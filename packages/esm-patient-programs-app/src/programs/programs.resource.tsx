@@ -4,8 +4,9 @@ import { openmrsFetch, openmrsObservableFetch } from '@openmrs/esm-framework';
 import { PatientProgram, Program, ProgramsFetchResponse } from '../types';
 
 export function useEnrollments(patientUuid: string) {
+  const customRepresentation = `custom:(uuid,display,program,dateEnrolled,dateCompleted,location:(uuid,display))`;
   const { data, error, isValidating } = useSWR<{ data: ProgramsFetchResponse }, Error>(
-    `/ws/rest/v1/programenrollment?patient=${patientUuid}`,
+    `/ws/rest/v1/programenrollment?patient=${patientUuid}&v=${customRepresentation}`,
     openmrsFetch,
   );
 
