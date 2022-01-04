@@ -1,4 +1,3 @@
-const regex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/;
 export type amPm = 'AM' | 'PM';
 
 export const convertTime12to24 = (time12h, timeFormat: amPm) => {
@@ -15,6 +14,3 @@ export const convertTime12to24 = (time12h, timeFormat: amPm) => {
   return [hours, minutes];
 };
 
-export function toDateWithoutSeconds(date: Date | string) {
-  return regex.exec(date.toString())[0];
-}

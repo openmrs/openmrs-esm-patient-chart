@@ -1,7 +1,6 @@
 import useSWR from 'swr';
 import { fhirBaseUrl, FHIRResource, useConfig, openmrsFetch } from '@openmrs/esm-framework';
 import { calculateBMI } from './biometrics-helpers';
-import { toDateWithoutSeconds } from '@openmrs/esm-patient-common-lib';
 
 export const pageSize = 100;
 
@@ -43,10 +42,9 @@ function formatDimensions(heights: Biometrics, weights: Biometrics, muacs: Biome
   const uniqueDates = Array.from(new Set(weightDates?.concat(heightDates))).sort(latestFirst);
 
   return uniqueDates.map((date: Date) => {
-    const uniqDate = toDateWithoutSeconds(date);
-    const muac = muacs.find((muac) => toDateWithoutSeconds(muac.issued) === uniqDate);
-    const weight = weights.find((weight) => toDateWithoutSeconds(weight.issued) === uniqDate);
-    const height = heights.find((height) => toDateWithoutSeconds(height.issued) === uniqDate);
+    const muac = muacs.find((muac) => muac.issued === date);
+    const weight = weights.find((weight) => weight.issued === date);
+    const height = heights.find((height) => height.issued === date);
     return {
       id: weight?.encounter?.reference?.replace('Encounter/', ''),
       weight: weight?.valueQuantity?.value,
@@ -67,7 +65,7 @@ function latestFirst(a, b) {
 }
 
 function getDatesIssued(dimensionArray): Array<Date> {
-  return dimensionArray?.map((dimension) => toDateWithoutSeconds(dimension.issued));
+  return dimensionArray?.map((dimension) => dimension.issued);
 }
 
 interface BiometricsFetchResponse {
