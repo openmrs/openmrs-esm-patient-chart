@@ -1,24 +1,15 @@
-@import "~carbon-components/scss/globals/scss/vendor/@carbon/elements/scss/type/styles";
-@import "~carbon-components/src/globals/scss/vendor/@carbon/layout/scss/generated/spacing";
 @import "~@openmrs/esm-styleguide/src/vars";
+@import "~carbon-components/src/globals/scss/vars";
+@import "~carbon-components/src/globals/scss/mixins";
 
-.productiveHeading03 {
-  @include carbon--type-style("productive-heading-03");
-  color: $ui-05;
+.header {
+  @include carbon--type-style('productive-heading-03');
+  color: $text-01;
 }
 
-.buttonContainer {
-  display: flex;
-  justify-content: space-between;
-  flex-direction: row;
-}
-
-.buttonContainer button {
-  height: $spacing-10;
-  display: flex;
-  align-content: flex-start;
-  flex-direction: column;
-  margin-left: $spacing-01;
+.body {
+  @include carbon--type-style('body-long-01');
+  color: $text-01;
 }
 
 .customLabel {
@@ -30,15 +21,10 @@
 .customLabel span:nth-child(1){
   flex: 1;
 }
+
 .customLabel span:nth-child(2){
   flex: 4;
 }
-
-.right {
-  display: flex;
-  flex-direction: row;
-}
-
 
 .bodyShort01 {
   @include carbon--type-style("body-short-01");

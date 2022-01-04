@@ -2,26 +2,17 @@
 @import "~carbon-components/src/globals/scss/vars";
 @import "~carbon-components/src/globals/scss/mixins";
 
-.productiveHeading03 {
-  @include carbon--type-style("productive-heading-03");
-  color: $ui-05;
+.header {
+  @include carbon--type-style('productive-heading-03');
+  color: $text-01;
 }
 
-.buttonContainer {
-  display: flex;
-  justify-content: space-between;
-  flex-direction: row;
+.body {
+  @include carbon--type-style('body-long-01');
+  color: $text-01;
 }
 
-.buttonContainer button {
-  height: $spacing-10;
-  display: flex;
-  align-content: flex-start;
-  flex-direction: column;
-  margin-left: $spacing-01;
-}
-
-.right {
-  display: flex;
-  flex-direction: row;
+.footer {
+  width: 75%;
+  justify-self: flex-end;
 }
