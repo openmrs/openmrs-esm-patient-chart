@@ -4,7 +4,7 @@ import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { esmPatientChartSchema } from './config-schemas/openmrs-esm-patient-chart-schema';
 import { moduleName, spaBasePath } from './constants';
 import { setupCacheableRoutes, setupOfflineVisitsSync } from './offline';
-import { dashboardMeta, encountersDashboardMeta } from './dashboard.meta';
+import { summaryDashboardMeta, encountersDashboardMeta } from './dashboard.meta';
 
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -50,11 +50,11 @@ function setupOpenMRS() {
         id: 'charts-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
         order: 0,
-        load: getSyncLifecycle(createDashboardLink(dashboardMeta), {
+        load: getSyncLifecycle(createDashboardLink(summaryDashboardMeta), {
           featureName: 'summary-dashboard',
           moduleName,
         }),
-        meta: dashboardMeta,
+        meta: summaryDashboardMeta,
         online: true,
         offline: true,
       },

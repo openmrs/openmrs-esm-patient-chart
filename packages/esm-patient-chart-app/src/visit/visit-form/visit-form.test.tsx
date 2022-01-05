@@ -68,6 +68,13 @@ describe('VisitForm: ', () => {
     let saveButton: HTMLElement;
 
     beforeEach(() => {
+      // @ts-ignore
+      jest.useFakeTimers('modern');
+      // @ts-ignore
+      jest.setSystemTime(1638682781000);
+    });
+
+    beforeEach(() => {
       mockToDateObjectStrict.mockImplementation((date) => dayjs(date, isoFormat).toDate());
       mockToOmrsIsoString.mockImplementation((date) => dayjs(date).format(isoFormat));
       mockGetStartedVisitGetter.mockReturnValueOnce(new BehaviorSubject(mockCurrentVisit));
