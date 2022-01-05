@@ -45,6 +45,12 @@ jest.mock('@openmrs/esm-framework', () => {
 });
 
 describe('VisitForm: ', () => {
+  beforeEach(() => {
+    // @ts-ignore
+    jest.useFakeTimers('modern');
+    // @ts-ignore
+    jest.setSystemTime(1638682781000);
+  });
   it('renders the Start Visit form with all the relevant fields and values', () => {
     renderVisitForm();
 

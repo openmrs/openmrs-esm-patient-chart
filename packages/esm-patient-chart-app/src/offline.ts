@@ -92,11 +92,11 @@ async function createOfflineVisitForPatient(patientUuid: string, location: strin
   return offlineVisit;
 }
 
-function offlineVisitToVisit(offlineVisit: OfflineVisit): Visit {
+function offlineVisitToVisit(offlineVisit: OfflineVisit) {
   return {
     uuid: offlineVisit.uuid,
-    startDatetime: offlineVisit.startDatetime,
-    stopDatetime: offlineVisit.stopDatetime,
+    startDatetime: offlineVisit.startDatetime.toString(),
+    stopDatetime: offlineVisit.stopDatetime.toString(),
     encounters: [],
     visitType: {
       uuid: offlineVisit.visitType,
