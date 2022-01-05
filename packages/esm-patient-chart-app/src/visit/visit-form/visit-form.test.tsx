@@ -90,11 +90,6 @@ describe('VisitForm: ', () => {
     });
 
     it('starts a new visit upon successful submission', () => {
-      // Set date
-      const datePicker = screen.getByLabelText(/Date/i);
-      userEvent.click(screen.getByLabelText(/December 5, 2021/i));
-      expect(datePicker).toHaveValue('05/12/2021');
-
       // Set time
       const timePicker = screen.getByRole('textbox', { name: /Time/i });
 
