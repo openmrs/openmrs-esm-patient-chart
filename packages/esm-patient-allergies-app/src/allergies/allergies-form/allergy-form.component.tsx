@@ -1,88 +1,50 @@
-import React from 'react';
-import { mutate } from 'swr';
-import styles from './allergy-form.component.scss';
-import AllergyFormTab from './allergy-form-tab.component';
-import { useTranslation } from 'react-i18next';
-import { fhirBaseUrl, showNotification, showToast, useConfig } from '@openmrs/esm-framework';
-import { AllergiesConfigObject } from '../../config-schema';
-import { fetchAllergensAndReaction, savePatientAllergy } from './allergy-form.resource';
-import { ErrorState } from '@openmrs/esm-patient-common-lib';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
-  SearchSkeleton,
-  TextInput,
-  TextArea,
+  Button,
+  ButtonSet,
   Checkbox,
-  Tabs,
-  Tab,
   DatePicker,
   DatePickerInput,
+  Form,
   RadioButton,
-  Button,
   RadioButtonGroup,
-  ButtonSet,
+  Row,
+  Tab,
+  Tabs,
+  TextArea,
+  TextInput,
 } from 'carbon-components-react';
-import { OpenMRSResource } from '../../types';
+import { useTranslation } from 'react-i18next';
+import { first } from 'rxjs/operators';
+import { mutate } from 'swr';
+import {
+  ExtensionSlot,
+  FetchResponse,
+  fhirBaseUrl,
+  showNotification,
+  showToast,
+  useConfig,
+} from '@openmrs/esm-framework';
+import { Allergens, fetchAllergensAndAllergicReactions, NewAllergy } from './allergy-form.resource';
+import { saveAllergy } from '../allergy-intolerance.resource';
+import styles from './allergy-form.scss';
 
-enum ActionTypes {
-  pending = 'pending',
-  resolved = 'resolved',
-  error = 'error',
-}
-interface Pending {
-  type: ActionTypes.pending;
-}
-interface Error {
-  type: ActionTypes.error;
-  payload: Error;
-}
-
-interface Resolved {
-  type: ActionTypes.resolved;
-  payload: AllergyAndReactions;
-}
-
-type Action = Pending | Error | Resolved;
-
-enum AllergenType {
+enum AllergenTypes {
   FOOD = 'FOOD',
   DRUG = 'DRUG',
   ENVIRONMENT = 'ENVIRONMENT',
 }
 
 interface AllergyFormProps {
+  closeWorkspace: () => void;
+  isTablet: boolean;
   patient: fhir.Patient;
   patientUuid: string;
-  closeWorkspace(): void;
-  isTablet: boolean;
 }
 
-interface AllergyAndReactions {
-  drugAllergens: Array<OpenMRSResource>;
-  foodAllergens: Array<OpenMRSResource>;
-  environmentalAllergens: Array<OpenMRSResource>;
-  allergyReaction: Array<OpenMRSResource>;
-}
-
-interface PatientAllergenAndReactions {
-  status: 'pending' | 'resolved' | 'error';
-  allergenAndReaction: AllergyAndReactions;
-  error?: null | Error;
-}
-
-const formStatusReducer = (state: PatientAllergenAndReactions, action: Action): PatientAllergenAndReactions => {
-  switch (action.type) {
-    case 'pending':
-      return { ...state, status: action.type };
-    case 'resolved':
-      return { allergenAndReaction: action.payload, status: action.type };
-    case 'error':
-      return { ...state, error: action.payload, status: action.type };
-  }
-};
-
-const AllergyForm: React.FC<AllergyFormProps> = ({ isTablet, closeWorkspace, patientUuid }) => {
+const AllergyForm: React.FC<AllergyFormProps> = ({ closeWorkspace, isTablet, patientUuid }) => {
   const { t } = useTranslation();
-  const { concepts } = useConfig() as AllergiesConfigObject;
+  const { concepts } = useConfig();
   const {
     drugAllergenUuid,
     foodAllergenUuid,
@@ -92,277 +54,282 @@ const AllergyForm: React.FC<AllergyFormProps> = ({ isTablet, closeWorkspace, pat
     severeReactionUuid,
     moderateReactionUuid,
     otherConceptUuid,
-  } = React.useMemo(() => concepts, [concepts]);
-  const [comment, setComment] = React.useState<string>();
-  const [patientReactions, setPatientReactions] = React.useState<Array<string>>([]);
-  const [selectedAllergen, setSelectedAllergen] = React.useState<string>();
-  const [severityOfReaction, setSeverityOfReaction] = React.useState<string>();
-  const [dateOfOnset, setDateOfOnset] = React.useState<Date>();
-  const [{ status, allergenAndReaction, error }, dispatch] = React.useReducer(formStatusReducer, {
-    status: ActionTypes.pending,
-    allergenAndReaction: null,
-  });
-  const [allergenType, setAllergenType] = React.useState<AllergenType>(AllergenType.DRUG);
-  const [otherReaction, setOtherReaction] = React.useState<string>();
-  const [otherAllergen, setOtherAllergen] = React.useState<string>();
+  } = useMemo(() => concepts, [concepts]);
+  const patientState = useMemo(() => ({ patientUuid }), [patientUuid]);
+  const [allergens, setAllergens] = useState<Allergens>(null);
+  const [allergicReactions, setAllergicReactions] = useState<Array<string>>([]);
+  const [comment, setComment] = useState('');
+  const [nonCodedAllergenType, setNonCodedAllergenType] = useState('');
+  const [nonCodedAllergicReaction, setNonCodedAllergicReaction] = useState('');
+  const [onsetDate, setOnsetDate] = useState<Date | null>(null);
+  const [selectedAllergen, setSelectedAllergen] = useState('');
+  const [selectedAllergenType, setSelectedAllergenType] = useState(AllergenTypes.DRUG);
+  const [severityOfWorstReaction, setSeverityOfWorstReaction] = useState('');
+  const allergenTypes = [t('drug', 'Drug'), t('food', 'Food'), t('environmental', 'Environmental')];
+  const severityLevels = [t('mild', 'Mild'), t('moderate', 'Moderate'), t('severe', 'Severe')];
 
-  React.useEffect(() => {
-    if (drugAllergenUuid && foodAllergenUuid && environmentalAllergenUuid) {
-      const sub = fetchAllergensAndReaction([
-        drugAllergenUuid,
-        foodAllergenUuid,
-        environmentalAllergenUuid,
-        allergyReactionUuid,
-      ]).subscribe(
-        (data) => {
-          dispatch({ type: ActionTypes.resolved, payload: data });
-        },
-        (error) => {
-          dispatch({ type: ActionTypes.error, payload: error });
-        },
-      );
-      return () => sub.unsubscribe();
-    }
-  }, [drugAllergenUuid, environmentalAllergenUuid, foodAllergenUuid, allergyReactionUuid]);
+  useEffect(() => {
+    const allergenUuids = [drugAllergenUuid, foodAllergenUuid, environmentalAllergenUuid, allergyReactionUuid];
+    fetchAllergensAndAllergicReactions(allergenUuids).pipe(first()).subscribe(setAllergens);
+  }, [allergyReactionUuid, drugAllergenUuid, environmentalAllergenUuid, foodAllergenUuid]);
 
-  const handlePatientReactionChange = React.useCallback(
-    (value: boolean, id: string, event: React.ChangeEvent<HTMLInputElement>) => {
-      value
-        ? setPatientReactions((prevState) => [...prevState, id])
-        : setPatientReactions((prevState) => prevState.filter((reaction) => reaction !== id));
-    },
-    [],
-  );
-
-  const handleAllergenTypeChange = React.useCallback((index: number) => {
+  const handleTabChange = (index: number) => {
     switch (index) {
       case 0:
-        setAllergenType(AllergenType.DRUG);
+        setSelectedAllergenType(AllergenTypes.DRUG);
+        break;
       case 1:
-        setAllergenType(AllergenType.FOOD);
+        setSelectedAllergenType(AllergenTypes.FOOD);
+        break;
       case 2:
-        setAllergenType(AllergenType.ENVIRONMENT);
+        setSelectedAllergenType(AllergenTypes.ENVIRONMENT);
+        break;
     }
+  };
+
+  const handleAllergicReactionChange = useCallback((value: boolean, id: string) => {
+    value
+      ? setAllergicReactions((prevState) => [...prevState, id])
+      : setAllergicReactions((prevState) => prevState.filter((reaction) => reaction !== id));
   }, []);
 
-  const handleSavePatientAllergy = React.useCallback(() => {
-    const allergyPayload = {
-      allergen:
-        selectedAllergen === otherConceptUuid
-          ? {
-              allergenType: allergenType,
-              codedAllergen: {
-                uuid: selectedAllergen,
+  const handleSubmit = useCallback(
+    (event: React.SyntheticEvent) => {
+      event.preventDefault();
+
+      let payload: NewAllergy = {
+        allergen:
+          selectedAllergen === otherConceptUuid
+            ? {
+                allergenType: selectedAllergenType,
+                codedAllergen: {
+                  uuid: selectedAllergen,
+                },
+                nonCodedAllergen: nonCodedAllergenType,
+              }
+            : {
+                allergenType: selectedAllergenType,
+                codedAllergen: {
+                  uuid: selectedAllergen,
+                },
               },
-              nonCodedAllergen: otherAllergen,
+        severity: {
+          uuid: severityOfWorstReaction,
+        },
+        comment: comment,
+        reactions: allergicReactions?.map((reaction) => {
+          return reaction === otherConceptUuid
+            ? { reaction: { uuid: reaction }, reactionNonCoded: nonCodedAllergicReaction }
+            : { reaction: { uuid: reaction } };
+        }),
+      };
+
+      const abortController = new AbortController();
+      saveAllergy(payload, patientUuid, abortController)
+        .then(
+          (response: FetchResponse) => {
+            if (response.status === 201) {
+              closeWorkspace();
+
+              showToast({
+                critical: true,
+                kind: 'success',
+                title: t('allergySaved', 'Allergy saved'),
+                description: t('allergyNowVisible', 'It is now visible on the Allergies page'),
+              });
+
+              mutate(`${fhirBaseUrl}/AllergyIntolerance?patient=${patientUuid}`);
             }
-          : {
-              allergenType: allergenType,
-              codedAllergen: {
-                uuid: selectedAllergen,
-              },
-            },
-      severity: {
-        uuid: severityOfReaction,
-      },
-      comment: comment,
-      reactions: patientReactions?.map((reaction) => {
-        return reaction === otherConceptUuid
-          ? { reaction: { uuid: reaction }, reactionNonCoded: otherReaction }
-          : { reaction: { uuid: reaction } };
-      }),
-    };
-
-    const ac = new AbortController();
-
-    savePatientAllergy(allergyPayload, patientUuid, ac).then(
-      (response) => {
-        if (response.status === 201) {
-          closeWorkspace();
-
-          showToast({
-            critical: true,
-            kind: 'success',
-            title: t('allergySaved', 'Allergy saved'),
-            description: t('allergyNowVisible', 'It is now visible on the Allergies page'),
-          });
-
-          mutate(`${fhirBaseUrl}/AllergyIntolerance?patient=${patientUuid}`);
-        }
-      },
-      (err) => {
-        dispatch({ type: ActionTypes.error, payload: err });
-        showNotification({
-          title: t('allergySaveError', 'Error saving allergy'),
-          kind: 'error',
-          critical: true,
-          description: err?.message,
-        });
-      },
-    );
-    return () => ac.abort();
-  }, [
-    selectedAllergen,
-    otherConceptUuid,
-    allergenType,
-    otherAllergen,
-    severityOfReaction,
-    comment,
-    patientReactions,
-    patientUuid,
-    otherReaction,
-    closeWorkspace,
-    t,
-  ]);
+          },
+          (err) => {
+            showNotification({
+              title: t('allergySaveError', 'Error saving allergy'),
+              kind: 'error',
+              critical: true,
+              description: err?.message,
+            });
+          },
+        )
+        .finally(() => abortController.abort());
+    },
+    [
+      selectedAllergen,
+      otherConceptUuid,
+      selectedAllergenType,
+      nonCodedAllergenType,
+      severityOfWorstReaction,
+      comment,
+      allergicReactions,
+      patientUuid,
+      nonCodedAllergicReaction,
+      closeWorkspace,
+      t,
+    ],
+  );
 
   return (
-    <main>
-      {status === ActionTypes.pending && <SearchSkeleton />}
-      {status === ActionTypes.resolved && (
-        <div className={styles.form}>
-          <div className={styles.allergyFormWrapper}>
-            <div>
-              <header className={styles.productiveHeading03}>
-                {t('allergenAndReaction', 'Allergen and reactions')}
-              </header>
-              <div className={styles.sectionWrapper}>
-                <section>
-                  <header className={styles.productiveHeading02}>
-                    {t('selectTheAllergens', 'Select the allergens')}
-                  </header>
-                  <Tabs
-                    onSelectionChange={handleAllergenTypeChange}
-                    tabContentClassName={styles.allergyFormTabs}
-                    scrollIntoView={true}
-                  >
-                    <Tab id="tab-1" label={t('drug', 'Drug')}>
-                      <AllergyFormTab
-                        name={'drug'}
-                        allergens={allergenAndReaction?.drugAllergens}
-                        selectedAllergen={selectedAllergen}
-                        handleChange={setSelectedAllergen}
-                      />
-                    </Tab>
-                    <Tab id="tab-2" label={t('food', 'Food')}>
-                      <AllergyFormTab
-                        name="food"
-                        allergens={allergenAndReaction?.foodAllergens}
-                        selectedAllergen={selectedAllergen}
-                        handleChange={setSelectedAllergen}
-                      />
-                    </Tab>
-                    <Tab id="tab-3" label={t('environmental', 'Environmental')}>
-                      <AllergyFormTab
-                        name="environment"
-                        allergens={allergenAndReaction?.environmentalAllergens}
-                        selectedAllergen={selectedAllergen}
-                        handleChange={setSelectedAllergen}
-                      />
-                    </Tab>
-                  </Tabs>
-                  {selectedAllergen === otherConceptUuid && (
-                    <TextInput
-                      light={isTablet}
-                      id="otherAllergen"
-                      invalidText={t('otherAllergenInvalidText', 'Other allergen is required')}
-                      labelText={t('pleaseSpecifyOtherReaction', 'Please specify other allergen')}
-                      onChange={(event) => setOtherAllergen(event.target.value)}
-                      placeholder={t('enterOtherReaction', 'Type in other Allergen')}
-                    />
-                  )}
-                </section>
-                <section>
-                  <header className={styles.productiveHeading02}>
-                    {t('selectTheReactions', 'Select the reactions')}
-                  </header>
-                  <div className={styles.checkBoxWrapper}>
-                    {allergenAndReaction?.allergyReaction?.map((reaction, index) => (
-                      <Checkbox
-                        onChange={handlePatientReactionChange}
-                        key={index}
-                        labelText={reaction.display}
-                        id={reaction.uuid}
-                        value={reaction.display}
-                      />
-                    ))}
+    <Form>
+      {isTablet ? (
+        <Row className={styles.header}>
+          <ExtensionSlot
+            className={styles.content}
+            extensionSlotName="patient-details-header-slot"
+            state={patientState}
+          />
+        </Row>
+      ) : null}
+      <h1 className={styles.heading}>{t('allergensAndReactions', 'Allergens and reactions')}</h1>
+      <div className={`${styles.container} ${isTablet ? `${styles.tablet}` : `${styles.desktop}`}`}>
+        <section className={styles.section}>
+          <h2 className={styles.sectionHeading}>{t('selectAllergens', 'Select the allergens')}</h2>
+          <Tabs onSelectionChange={handleTabChange}>
+            {allergenTypes.map((allergenType, index) => {
+              const allergenCategory = allergenType.toLowerCase() + 'Allergens';
+              return (
+                <Tab id={`tab-${index + 1}`} key={index} label={allergenType}>
+                  <div className={isTablet && styles.wrapperContainer}>
+                    <RadioButtonGroup
+                      name={`allergen-type-${index + 1}`}
+                      orientation="vertical"
+                      onChange={(event) => setSelectedAllergen(event.toString())}
+                      valueSelected={selectedAllergen}
+                    >
+                      {allergens?.[allergenCategory]?.map((allergen) => (
+                        <RadioButton
+                          className={styles.radio}
+                          id={allergen.display}
+                          key={allergen.uuid}
+                          labelText={allergen.display}
+                          value={allergen.uuid}
+                        />
+                      ))}
+                    </RadioButtonGroup>
                   </div>
-                  {patientReactions.includes(otherConceptUuid) && (
-                    <TextInput
-                      light={isTablet}
-                      id="otherReaction"
-                      invalidText={t('otherReactionInvalidText', 'Other reaction is required')}
-                      labelText={t('pleaseSpecifyOtherReaction', 'Please specify other reaction')}
-                      onChange={(event) => setOtherReaction(event.target.value)}
-                      placeholder={t('enterOtherReaction', 'Type in other reaction')}
-                    />
-                  )}
-                </section>
-              </div>
+                </Tab>
+              );
+            })}
+          </Tabs>
+          {selectedAllergen === otherConceptUuid ? (
+            <div className={styles.input}>
+              <TextInput
+                light={isTablet}
+                id="nonCodedAllergenType"
+                labelText={t('otherNonCodedAllergen', 'Other non-coded allergen')}
+                onChange={(event) => setNonCodedAllergenType(event.target.value)}
+                placeholder={t('typeAllergenName', 'Please type in the name of the allergen')}
+              />
             </div>
-            <div>
-              <header className={styles.productiveHeading03}>
-                {t('severityAndDateOfOnset', 'Severity and date of onset')}
-              </header>
-              <div className={styles.sectionWrapper}>
-                <section>
-                  <header className={styles.productiveHeading02}>
-                    {t('severityOfWorstReaction', 'Severity of worst reaction')}
-                  </header>
-                  <RadioButtonGroup
-                    onChange={(event) => setSeverityOfReaction(event.toString())}
-                    name="severityOfWorstReaction"
-                    valueSelected={severityOfReaction}
-                  >
-                    <RadioButton id="mild" labelText={t('mild', 'Mild')} value={mildReactionUuid} />
-                    <RadioButton id="moderate" labelText={t('moderate', 'Moderate')} value={moderateReactionUuid} />
-                    <RadioButton id="severe" labelText={t('severe', 'Severe')} value={severeReactionUuid} />
-                  </RadioButtonGroup>
-                </section>
-                <section>
-                  <header className={styles.productiveHeading02}>{t('dateAndComments', 'Date and comments')}</header>
-                  <DatePicker
-                    light={isTablet}
-                    maxDate={new Date().toISOString()}
-                    dateFormat="m/d/Y"
-                    datePickerType="single"
-                  >
-                    <DatePickerInput
-                      id="date-of-first-onset"
-                      placeholder="mm/dd/yyyy"
-                      labelText={t('dateOfFirstOnset', 'Date of first onset')}
-                      type="text"
-                      size="xl"
-                      style={{ width: '18rem' }}
-                      onChange={(event) => setDateOfOnset(event.target.valueAsDate)}
-                    />
-                  </DatePicker>
-                  <TextArea
-                    light={isTablet}
-                    cols={25}
-                    onChange={(event) => setComment(event.target.value)}
-                    id="comments"
-                    invalidText={t('invalidComment', 'Invalid comment, try again')}
-                    labelText={t('comments', 'Comments')}
-                    placeholder={t('typeAnyAdditional', 'Type any additional comments here')}
-                    rows={4}
-                    style={{ width: '26.375rem' }}
-                  />
-                </section>
-              </div>
-            </div>
+          ) : null}
+        </section>
+        <section className={styles.section}>
+          <h2 className={styles.sectionHeading}>{t('selectReactions', 'Select the reactions')}</h2>
+          <div className={isTablet && styles.checkboxContainer} style={{ margin: '1rem' }}>
+            {allergens?.allergicReactions?.map((reaction, index) => (
+              <Checkbox
+                className={styles.checkbox}
+                key={index}
+                labelText={reaction.display}
+                id={reaction.uuid}
+                onChange={handleAllergicReactionChange}
+                value={reaction.display}
+              />
+            ))}
           </div>
-          <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-            <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
-              {t('discard', 'Discard')}
-            </Button>
-            <Button className={styles.button} kind="primary" onClick={handleSavePatientAllergy} type="submit">
-              {t('saveAndClose', 'Save and close')}
-            </Button>
-          </ButtonSet>
-        </div>
-      )}
-      {status === ActionTypes.error && <ErrorState headerTitle={'Allergy Form Error'} error={error} />}
-    </main>
+          {allergicReactions.includes(otherConceptUuid) ? (
+            <div className={styles.input}>
+              <TextInput
+                light={isTablet}
+                id="nonCodedAllergicReaction"
+                labelText={t('otherNonCodedAllergicReaction', 'Other non-coded allergic reaction')}
+                onChange={(event) => setNonCodedAllergicReaction(event.target.value)}
+                placeholder={t('typeAllergicReactionName', 'Please type in the name of the allergic reaction')}
+              />
+            </div>
+          ) : null}
+        </section>
+      </div>
+      <h1 className={styles.heading}>{t('severityAndOnsetDate', 'Severity and date of onset')}</h1>
+      <div className={`${styles.container} ${isTablet ? `${styles.tablet}` : `${styles.desktop}`}`}>
+        <section className={styles.section}>
+          <h2 className={styles.sectionHeading}>{t('severityOfWorstReaction', 'Severity of worst reaction')}</h2>
+          <div className={styles.wrapper}>
+            <RadioButtonGroup
+              name="severity-of-worst-reaction"
+              onChange={(event) => setSeverityOfWorstReaction(event.toString())}
+              valueSelected={severityOfWorstReaction}
+            >
+              {severityLevels.map((severity, index) => (
+                <RadioButton
+                  id={severity.toLowerCase() + 'Severity'}
+                  key={index}
+                  labelText={severity}
+                  value={(() => {
+                    switch (severity.toLowerCase()) {
+                      case 'mild':
+                        return mildReactionUuid;
+                      case 'moderate':
+                        return moderateReactionUuid;
+                      case 'severe':
+                        return severeReactionUuid;
+                      default:
+                        return '';
+                    }
+                  })()}
+                />
+              ))}
+            </RadioButtonGroup>
+          </div>
+        </section>
+        <section className={styles.section}>
+          <h2 className={styles.sectionHeading}>{t('dateAndComments', 'Date and comments')}</h2>
+          <div className={styles.wrapper}>
+            <DatePicker
+              id="onsetDate"
+              dateFormat="d/m/Y"
+              datePickerType="single"
+              light={!isTablet}
+              maxDate={new Date().toISOString()}
+              onChange={([date]) => setOnsetDate(date)}
+              value={onsetDate}
+            >
+              <DatePickerInput
+                id="onsetDateInput"
+                placeholder="dd/mm/yyyy"
+                labelText={t('dateOfFirstOnset', 'Date of first onset')}
+              />
+            </DatePicker>
+          </div>
+          <div className={styles.wrapper}>
+            <TextArea
+              className={styles.textbox}
+              cols={20}
+              light={!isTablet}
+              id="comments"
+              invalidText={t('invalidComment', 'Invalid comment, try again')}
+              labelText={t('comments', 'Comments')}
+              onChange={(event) => setComment(event.target.value)}
+              placeholder={t('typeAdditionalComments', 'Type any additional comments here')}
+              rows={4}
+            />
+          </div>
+        </section>
+      </div>
+      <div className={styles.buttonContainer}>
+        <ButtonSet style={{ margin: isTablet ? '1.5rem 1rem' : '0rem' }}>
+          <Button className={styles.button} onClick={closeWorkspace} kind="secondary">
+            {t('discard', 'Discard')}
+          </Button>
+          <Button
+            className={styles.button}
+            disabled={!selectedAllergen || (selectedAllergen === otherConceptUuid && !nonCodedAllergenType)}
+            onClick={handleSubmit}
+            kind="primary"
+          >
+            {t('saveAndClose', 'Save and close')}
+          </Button>
+        </ButtonSet>
+      </div>
+    </Form>
   );
 };
 

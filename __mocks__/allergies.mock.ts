@@ -1730,7 +1730,7 @@ export const mockAllergenAndReactions = {
     { uuid: '162542AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Adhesive tape' },
     { uuid: '5622AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Other' },
   ],
-  allergyReaction: [
+  allergicReactions: [
     { uuid: '121677AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Mental status change' },
     { uuid: '121629AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Anaemia' },
     { uuid: '148888AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Anaphylaxis' },

@@ -8,7 +8,7 @@ import AllergiesDetailedSummary from './allergies-detailed-summary.component';
 
 const testProps = {
   patient: mockPatient,
-  showAddAllergy: false,
+  showAddAllergyButton: false,
 };
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;

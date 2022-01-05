@@ -6,9 +6,7 @@ export const pageSize = 100;
 
 type Biometrics = Array<FHIRResource['resource']>;
 
-export function useBiometrics(patientUuid: string) {
-  const { concepts } = useConfig();
-
+export function useBiometrics(patientUuid: string, concepts: Record<string, string>) {
   const { data, error, isValidating } = useSWR<{ data: BiometricsFetchResponse }, Error>(
     `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&` +
       `code=${Object.values(concepts).join(',')}&_count=${pageSize}`,
@@ -22,7 +20,7 @@ export function useBiometrics(patientUuid: string) {
   const observations: Biometrics = data?.data?.entry?.map((entry) => entry.resource) ?? [];
 
   return {
-    data:
+    biometrics:
       data?.data?.total > 0
         ? formatDimensions(
             filterByConceptUuid(observations, concepts.heightUuid),

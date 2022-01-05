@@ -49,6 +49,16 @@
   flex-direction: column !important;
 }
 
+.verticalTabs :global(.bx--tabs--scrollable .bx--tabs--scrollable__nav-item+.bx--tabs--scrollable__nav-item) {
+  margin-left: 0rem;
+}
+
+.verticalTabs :global(.bx--tabs--scrollable .bx--tabs--scrollable__nav-link) {
+  border-bottom: 0 !important;
+  border-left: 2px solid $color-gray-30;
+}
+
+
 .tab:hover {
   border-bottom: none !important;
 }
@@ -76,11 +86,3 @@
   width: 10rem;
 }
 
-:global(.bx--tabs--scrollable .bx--tabs--scrollable__nav-item+.bx--tabs--scrollable__nav-item) {
-  margin-left: 0rem;
-}
-
-:global(.bx--tabs--scrollable .bx--tabs--scrollable__nav-link) {
-  border-bottom: 0 !important;
-  border-left: 2px solid $color-gray-30;
-}
