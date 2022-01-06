@@ -13,3 +13,4 @@ export const convertTime12to24 = (time12h, timeFormat: amPm) => {
 
   return [hours, minutes];
 };
+

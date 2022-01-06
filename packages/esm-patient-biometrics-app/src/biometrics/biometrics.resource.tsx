@@ -25,9 +25,9 @@ export function useBiometrics(patientUuid: string) {
     data:
       data?.data?.total > 0
         ? formatDimensions(
-            filterByConceptUuid(observations, concepts.muacUuid),
             filterByConceptUuid(observations, concepts.heightUuid),
             filterByConceptUuid(observations, concepts.weightUuid),
+            filterByConceptUuid(observations, concepts.muacUuid),
           )
         : null,
     isError: error,
@@ -41,7 +41,7 @@ function formatDimensions(heights: Biometrics, weights: Biometrics, muacs: Biome
   const heightDates = getDatesIssued(heights);
   const uniqueDates = Array.from(new Set(weightDates?.concat(heightDates))).sort(latestFirst);
 
-  return uniqueDates.map((date: Date | string) => {
+  return uniqueDates.map((date: Date) => {
     const muac = muacs.find((muac) => muac.issued === date);
     const weight = weights.find((weight) => weight.issued === date);
     const height = heights.find((height) => height.issued === date);
@@ -64,7 +64,7 @@ function latestFirst(a, b) {
   return new Date(b).getTime() - new Date(a).getTime();
 }
 
-function getDatesIssued(dimensionArray): string[] {
+function getDatesIssued(dimensionArray): Array<Date> {
   return dimensionArray?.map((dimension) => dimension.issued);
 }
 
