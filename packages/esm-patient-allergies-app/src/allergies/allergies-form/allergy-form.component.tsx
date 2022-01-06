@@ -6,6 +6,7 @@ import {
   DatePicker,
   DatePickerInput,
   Form,
+  InlineNotification,
   RadioButton,
   RadioButtonGroup,
   Row,
@@ -25,8 +26,7 @@ import {
   showToast,
   useConfig,
 } from '@openmrs/esm-framework';
-import { Allergens, fetchAllergensAndAllergicReactions, NewAllergy } from './allergy-form.resource';
-import { saveAllergy } from '../allergy-intolerance.resource';
+import { Allergens, fetchAllergensAndAllergicReactions, saveAllergy, NewAllergy } from './allergy-form.resource';
 import styles from './allergy-form.scss';
 
 enum AllergenTypes {
@@ -59,6 +59,7 @@ const AllergyForm: React.FC<AllergyFormProps> = ({ closeWorkspace, isTablet, pat
   const [allergens, setAllergens] = useState<Allergens>(null);
   const [allergicReactions, setAllergicReactions] = useState<Array<string>>([]);
   const [comment, setComment] = useState('');
+  const [error, setError] = useState<Error | null>(null);
   const [nonCodedAllergenType, setNonCodedAllergenType] = useState('');
   const [nonCodedAllergicReaction, setNonCodedAllergicReaction] = useState('');
   const [onsetDate, setOnsetDate] = useState<Date | null>(null);
@@ -70,7 +71,7 @@ const AllergyForm: React.FC<AllergyFormProps> = ({ closeWorkspace, isTablet, pat
 
   useEffect(() => {
     const allergenUuids = [drugAllergenUuid, foodAllergenUuid, environmentalAllergenUuid, allergyReactionUuid];
-    fetchAllergensAndAllergicReactions(allergenUuids).pipe(first()).subscribe(setAllergens);
+    fetchAllergensAndAllergicReactions(allergenUuids).pipe(first()).subscribe(setAllergens, setError);
   }, [allergyReactionUuid, drugAllergenUuid, environmentalAllergenUuid, foodAllergenUuid]);
 
   const handleTabChange = (index: number) => {
@@ -179,6 +180,15 @@ const AllergyForm: React.FC<AllergyFormProps> = ({ closeWorkspace, isTablet, pat
         </Row>
       ) : null}
       <h1 className={styles.heading}>{t('allergensAndReactions', 'Allergens and reactions')}</h1>
+      {error ? (
+        <InlineNotification
+          style={{ margin: '0rem', minWidth: '100%' }}
+          kind="error"
+          lowContrast={true}
+          title={t('errorFetchingData', 'Error fetching allergens and reactions')}
+          subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
+        />
+      ) : null}
       <div className={`${styles.container} ${isTablet ? `${styles.tablet}` : `${styles.desktop}`}`}>
         <section className={styles.section}>
           <h2 className={styles.sectionHeading}>{t('selectAllergens', 'Select the allergens')}</h2>
@@ -187,7 +197,7 @@ const AllergyForm: React.FC<AllergyFormProps> = ({ closeWorkspace, isTablet, pat
               const allergenCategory = allergenType.toLowerCase() + 'Allergens';
               return (
                 <Tab id={`tab-${index + 1}`} key={index} label={allergenType}>
-                  <div className={isTablet && styles.wrapperContainer}>
+                  <div className={isTablet ? styles.wrapperContainer : undefined}>
                     <RadioButtonGroup
                       name={`allergen-type-${index + 1}`}
                       orientation="vertical"
@@ -223,7 +233,7 @@ const AllergyForm: React.FC<AllergyFormProps> = ({ closeWorkspace, isTablet, pat
         </section>
         <section className={styles.section}>
           <h2 className={styles.sectionHeading}>{t('selectReactions', 'Select the reactions')}</h2>
-          <div className={isTablet && styles.checkboxContainer} style={{ margin: '1rem' }}>
+          <div className={isTablet ? styles.checkboxContainer : undefined} style={{ margin: '1rem' }}>
             {allergens?.allergicReactions?.map((reaction, index) => (
               <Checkbox
                 className={styles.checkbox}

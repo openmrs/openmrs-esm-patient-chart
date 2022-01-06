@@ -1011,58 +1011,69 @@ export const mockPatientAllergyResult = {
 };
 
 export const mockAllergyResult = {
-  data: {
-    display: 'ARBs (angiotensin II receptor blockers)',
-    uuid: '90c17541-833d-419e-b5d3-bc06828bf95f',
-    allergen: {
-      allergenType: 'DRUG',
-      codedAllergen: {
-        display: 'ARBs (angiotensin II receptor blockers)',
-        uuid: '921fbd85-fa49-46c3-9ee1-77e093fd10a5',
-      },
-      nonCodedAllergen: null,
-    },
-    severity: {
-      uuid: '1498AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-      display: 'Mild',
-      name: {
-        display: 'Mild',
-        uuid: '1738BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
-        name: 'Mild',
-        locale: 'en',
-        localePreferred: true,
-        conceptNameType: 'FULLY_SPECIFIED',
-      },
-    },
-    comment: 'The patient is showing a mild reaction to the above allergens',
-    reactions: [
-      {
-        reaction: {
-          uuid: '121677AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-          display: 'Mental status change',
-          name: {
-            display: 'Mental status change',
-            uuid: '127084BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
-            name: 'Mental status change',
-            locale: 'en',
-            localePreferred: true,
-            conceptNameType: null,
-          },
+  display: 'ACE inhibitors',
+  uuid: 'dbba59ef-c8a5-4967-b20a-5761b1954f6d',
+  allergen: {
+    allergenType: 'DRUG',
+    codedAllergen: {
+      uuid: '162298AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      display: 'ACE inhibitors',
+      links: [
+        {
+          rel: 'self',
+          uri: 'http://localhost:8090/openmrslocalhost:8080/openmrs/ws/rest/v1/concept/162298AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
         },
+      ],
+    },
+    nonCodedAllergen: null,
+  },
+  severity: {
+    uuid: '1498AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    display: 'Mild',
+    links: [
+      {
+        rel: 'self',
+        uri: 'http://localhost:8090/openmrslocalhost:8080/openmrs/ws/rest/v1/concept/1498AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
       },
     ],
-    patient: {
-      uuid: '90f7f0b4-06a8-4a97-9678-e7a977f4b518',
-      display: '10010W - John Taylor',
-    },
-    auditInfo: {
-      creator: {
-        uuid: '285f67ce-3d8b-4733-96e5-1e2235e8e804',
-        display: 'doc',
-      },
-      dateChanged: '2020-01-03T07:05:12.000+0000',
-    },
   },
+  comment: null,
+  reactions: [
+    {
+      reaction: {
+        uuid: '143264AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        display: 'Cough',
+        links: [
+          {
+            rel: 'self',
+            uri: 'http://localhost:8090/openmrslocalhost:8080/openmrs/ws/rest/v1/concept/143264AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+          },
+        ],
+      },
+      reactionNonCoded: null,
+    },
+  ],
+  patient: {
+    uuid: '011cffa0-7383-45ef-962c-d1976718b8d4',
+    display: '103H22 - test test test',
+    links: [
+      {
+        rel: 'self',
+        uri: 'http://localhost:8090/openmrslocalhost:8080/openmrs/ws/rest/v1/patient/011cffa0-7383-45ef-962c-d1976718b8d4',
+      },
+    ],
+  },
+  links: [
+    {
+      rel: 'self',
+      uri: 'http://localhost:8090/openmrslocalhost:8080/openmrs/ws/rest/v1/patient/011cffa0-7383-45ef-962c-d1976718b8d4/allergy/dbba59ef-c8a5-4967-b20a-5761b1954f6d',
+    },
+    {
+      rel: 'full',
+      uri: 'http://localhost:8090/openmrslocalhost:8080/openmrs/ws/rest/v1/patient/011cffa0-7383-45ef-962c-d1976718b8d4/allergy/dbba59ef-c8a5-4967-b20a-5761b1954f6d?v=full',
+    },
+  ],
+  resourceVersion: '1.8',
 };
 
 export const mockUpdatedAllergyResult = {
@@ -1689,7 +1700,7 @@ export const mockFhirAllergyIntoleranceResponse = {
   ],
 };
 
-export const mockAllergenAndReactions = {
+export const mockAllergensAndAllergicReactions = {
   drugAllergens: [
     { uuid: '162298AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'ACE inhibitors' },
     { uuid: '162299AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'ARBs (angiotensin II receptor blockers)' },

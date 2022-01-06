@@ -13,6 +13,7 @@
   "discard": "Discard",
   "drug": "Drug",
   "environmental": "Environmental",
+  "errorFetchingData": "Error fetching allergens and reactions",
   "food": "Food",
   "invalidComment": "Invalid comment, try again",
   "lastUpdated": "Last updated",
@@ -32,6 +33,7 @@
   "severityandReaction": "Severity & Reaction",
   "severityOfWorstReaction": "Severity of worst reaction",
   "since": "Since",
+  "tryReopeningTheForm": "Please try launching the form again",
   "typeAdditionalComments": "Type any additional comments here",
   "typeAllergenName": "Please type in the name of the allergen",
   "typeAllergicReactionName": "Please type in the name of the allergic reaction"
