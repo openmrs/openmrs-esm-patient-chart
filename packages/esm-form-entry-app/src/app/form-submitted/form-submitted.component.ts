@@ -1,4 +1,6 @@
-import { Component, OnInit, EventEmitter, Output } from '@angular/core';
+import { Component, OnInit, EventEmitter, Output, Input } from '@angular/core';
+
+import { Order } from '../types';
 
 @Component({
   selector: 'my-app-form-submitted',
@@ -6,6 +8,7 @@ import { Component, OnInit, EventEmitter, Output } from '@angular/core';
   styleUrls: ['./form-submitted.component.css'],
 })
 export class FormSubmittedComponent implements OnInit {
+  @Input() orders: Array<Order>;
   @Output() cancelled = new EventEmitter();
   @Output() editRequested = new EventEmitter();
 

@@ -1,0 +1,8 @@
+<div class="order-list-container" *ngIf="orders && orders.length > 0">
+  <h5>Here are order(s) submitted</h5>
+  <ul>
+    <li class="order-list" *ngFor="let order of orders">
+      <span>{{order.display}}</span> <b>{{order.orderNumber}}</b>
+    </li>
+  </ul>
+</div>

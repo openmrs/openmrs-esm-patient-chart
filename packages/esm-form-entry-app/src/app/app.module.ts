@@ -14,9 +14,10 @@ import { LocalStorageService } from './local-storage/local-storage.service';
 import { FormDataSourceService } from './form-data-source/form-data-source.service';
 import { FormSubmissionService } from './form-submission/form-submission.service';
 import { FormSubmittedComponent } from './form-submitted/form-submitted.component';
+import { OrderListComponent } from './orders-list/order-list.component';
 
 @NgModule({
-  declarations: [AppComponent, EmptyRouteComponent, FeWrapperComponent, FormSubmittedComponent],
+  declarations: [AppComponent, EmptyRouteComponent, FeWrapperComponent, FormSubmittedComponent, OrderListComponent],
   imports: [BrowserModule, FormEntryModule, ReactiveFormsModule, BrowserAnimationsModule, OpenmrsApiModule],
   providers: [FormSchemaService, LocalStorageService, FormDataSourceService, FormSubmissionService],
   bootstrap: [AppComponent],

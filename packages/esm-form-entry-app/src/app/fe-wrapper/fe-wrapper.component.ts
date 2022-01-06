@@ -19,6 +19,7 @@ import { FormDataSourceService } from '../form-data-source/form-data-source.serv
 import { FormSubmissionService } from '../form-submission/form-submission.service';
 import { EncounterResourceService } from '../openmrs-api/encounter-resource.service';
 import { singleSpaPropsSubject, SingleSpaProps } from '../../single-spa-props';
+import { Order } from '../types';
 
 @Component({
   selector: 'my-app-fe-wrapper',
@@ -44,6 +45,7 @@ export class FeWrapperComponent implements OnInit {
   loggedInUser: LoggedInUser;
   triedSubmitting = false;
   errorPanelOpen = false;
+  submittedOrder: Array<Order> = [];
 
   public get encounterDate(): string {
     return moment(this.encounter.encounterDatetime).format('YYYY-MM-DD');
@@ -90,7 +92,19 @@ export class FeWrapperComponent implements OnInit {
       this.saveForm().subscribe(
         (response) => {
           this.encounterUuid = response[0] && response[0].uuid;
-          this.formSubmitted = true;
+          if (this.encounterUuid) {
+            this.encounterResourceService
+              .getEncounterByUuid(this.encounterUuid)
+              .pipe(take(1))
+              .subscribe((encounter) => {
+                if (encounter && encounter.orders) {
+                  this.submittedOrder = encounter.orders.filter(({ auditInfo }) => !auditInfo.dateVoided);
+                  this.formSubmitted = true;
+                }
+              });
+          } else {
+            this.formSubmitted;
+          }
         },
         (error) => {
           console.error('Error submitting form', error);

@@ -25,6 +25,6 @@
     </div>
 </div>
 <div class="form-container">
-    <my-app-form-submitted *ngIf="formSubmitted" (cancelled)="onCancel()" (editRequested)="onEditSaved()">
+    <my-app-form-submitted [orders]="submittedOrder" *ngIf="formSubmitted" (cancelled)="onCancel()" (editRequested)="onEditSaved()">
     </my-app-form-submitted>
 </div>
