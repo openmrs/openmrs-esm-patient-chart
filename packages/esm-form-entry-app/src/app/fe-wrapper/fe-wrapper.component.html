@@ -17,14 +17,10 @@
             <form-renderer [node]="form.rootNode"></form-renderer>
         </form>
         <div class="bx--row button-margin">
-            <button (click)="onCancel()" class="bx--btn bx--btn--secondary" type="button"
+            <button (click)="closeForm()" class="bx--btn bx--btn--secondary" type="button"
                 style="width: 50%;">Cancel</button>
             <button class="bx--btn bx--btn--primary" (click)="onSubmit($event)" type="submit"
                 style="width: 50%;">Save</button>
         </div>
     </div>
-</div>
-<div class="form-container">
-    <my-app-form-submitted [orders]="submittedOrder" *ngIf="formSubmitted" (cancelled)="onCancel()" (editRequested)="onEditSaved()">
-    </my-app-form-submitted>
 </div>

@@ -20,7 +20,8 @@ import { FormSubmissionService } from '../form-submission/form-submission.servic
 import { EncounterResourceService } from '../openmrs-api/encounter-resource.service';
 import { singleSpaPropsSubject, SingleSpaProps } from '../../single-spa-props';
 import { Order } from '../types';
-
+// @ts-ignore
+import { showToast, detach, showNotification } from '@openmrs/esm-framework';
 @Component({
   selector: 'my-app-fe-wrapper',
   templateUrl: './fe-wrapper.component.html',
@@ -87,6 +88,24 @@ export class FeWrapperComponent implements OnInit {
     );
   }
 
+  public displayLabOrdersNotification() {
+    const orders =
+      this.submittedOrder.map((order, index) => ` ${index + 1} : ${order.display} : ${order.orderNumber}`).join() ?? '';
+    showToast({
+      critical: true,
+      kind: 'success',
+      description: `The form has been submitted successfully`,
+      title: this.formName,
+    });
+    showNotification({
+      title: 'Lab order(s) generated',
+      kind: 'success',
+      critical: true,
+      description: orders,
+    });
+    this.closeForm();
+  }
+
   public onSubmit(event: any) {
     if (this.isFormValid()) {
       this.saveForm().subscribe(
@@ -99,15 +118,28 @@ export class FeWrapperComponent implements OnInit {
               .subscribe((encounter) => {
                 if (encounter && encounter.orders) {
                   this.submittedOrder = encounter.orders.filter(({ auditInfo }) => !auditInfo.dateVoided);
-                  this.formSubmitted = true;
+                  this.displayLabOrdersNotification();
                 }
               });
           } else {
-            this.formSubmitted;
+            showToast({
+              critical: true,
+              kind: 'success',
+              description: `The form has been submitted successfully`,
+              title: this.formName,
+            });
+            detach('patient-chart-workspace-slot', 'patient-form-entry-workspace');
           }
         },
         (error) => {
           console.error('Error submitting form', error);
+          detach('patient-chart-workspace-slot', 'patient-form-entry-workspace');
+          showToast({
+            critical: true,
+            kind: 'error',
+            description: `An error has occurred while submitting the form ${JSON.stringify(error, null, 2)}`,
+            title: this.formName,
+          });
         },
       );
     } else {
@@ -119,8 +151,8 @@ export class FeWrapperComponent implements OnInit {
     }
   }
 
-  public onCancel() {
-    this.singleSpaProps.closeWorkspace();
+  public closeForm() {
+    detach('patient-chart-workspace-slot', 'patient-form-entry-workspace');
   }
 
   public onEditSaved() {

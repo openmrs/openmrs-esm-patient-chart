@@ -74,6 +74,8 @@ export interface Order {
     uuid: string;
     display: string;
   };
+  orderNumber: number;
+  display: string;
   drug: {
     uuid: string;
     name: string;
