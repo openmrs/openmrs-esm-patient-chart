@@ -154,7 +154,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
                 value: patientVitalAndBiometrics?.diastolicBloodPressure || '',
               },
             ]}
-            unitSymbol={conceptUnits.get(config.concepts.temperatureUuid) ?? ''}
+            unitSymbol={conceptUnits.get(config.concepts.systolicBloodPressureUuid) ?? ''}
             inputIsNormal={
               isInNormalRange(
                 conceptMetadata,

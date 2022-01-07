@@ -6,9 +6,9 @@ import { mockPatient } from '../../../../__mocks__/patient.mock';
 import {
   formattedVitals,
   mockConceptMetadata,
-  mockConceptUnits,
   mockFhirVitalsResponse,
   mockVitalsConfig,
+  mockVitalsSignsConcept,
 } from '../../../../__mocks__/vitals.mock';
 import { swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import VitalsOverview from './vitals-overview.component';
@@ -22,6 +22,10 @@ const testProps = {
   urlLabel: '',
 };
 
+const mockConceptUnits = new Map<string, string>(
+  mockVitalsSignsConcept.data.results[0].setMembers.map((concept) => [concept.uuid, concept.units]),
+);
+
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockUsePagination = usePagination as jest.Mock;
 
@@ -32,10 +36,8 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
     ...originalModule,
     launchPatientWorkspace: jest.fn(),
     useVitalsConceptMetadata: jest.fn().mockImplementation(() => ({
-      data: {
-        conceptUnits: mockConceptUnits,
-        conceptMetadata: mockConceptMetadata,
-      },
+      data: mockConceptUnits,
+      conceptMetadata: mockConceptMetadata,
     })),
   };
 });

@@ -11,10 +11,10 @@ export function useVitalsConceptMetadata() {
   );
 
   const conceptMetadata = data?.data?.results[0]?.setMembers;
+
   const conceptUnits = conceptMetadata?.length
     ? new Map<string, string>(conceptMetadata.map((concept) => [concept.uuid, concept.units]))
     : new Map<string, string>([]);
-
   return {
     data: conceptUnits,
     isError: error,

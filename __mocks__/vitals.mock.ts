@@ -393,7 +393,7 @@ export const mockVitalsSignsConcept = {
             lowNormal: null,
             lowAbsolute: 0.0,
             lowCritical: null,
-            units: '/ min',
+            units: 'breaths/min',
           },
         ],
       },
