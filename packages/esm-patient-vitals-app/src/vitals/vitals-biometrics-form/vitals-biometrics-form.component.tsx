@@ -40,9 +40,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
   const { t } = useTranslation();
   const session = useSessionUser();
   const config = useConfig() as ConfigObject;
-  const {
-    data: { conceptUnits, conceptMetadata },
-  } = useVitalsConceptMetadata();
+  const { data: conceptUnits, conceptMetadata } = useVitalsConceptMetadata();
   const biometricsUnitsSymbols = config.biometrics;
   const [patientVitalAndBiometrics, setPatientVitalAndBiometrics] = useState<PatientVitalAndBiometric>();
   const [patientBMI, setPatientBMI] = useState<number>();
@@ -58,18 +56,6 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
     weight: config.concepts.weightUuid,
     respiratoryRate: config.concepts.respiratoryRateUuid,
   };
-
-  const [
-    bloodPressureUnit,
-    ,
-    temperatureUnit,
-    heightUnit,
-    weightUnit,
-    pulseUnit,
-    oxygenSaturationUnit,
-    midUpperArmCircumferenceUnit,
-    respiratoryRateUnit,
-  ] = conceptUnits;
 
   const isBMIInNormalRange = (value: number | undefined | string) => {
     if (value === undefined || value === '') return true;
@@ -168,7 +154,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
                 value: patientVitalAndBiometrics?.diastolicBloodPressure || '',
               },
             ]}
-            unitSymbol={bloodPressureUnit}
+            unitSymbol={conceptUnits.get(config.concepts.temperatureUuid) ?? ''}
             inputIsNormal={
               isInNormalRange(
                 conceptMetadata,
@@ -200,7 +186,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
                 value: patientVitalAndBiometrics?.pulse || '',
               },
             ]}
-            unitSymbol={pulseUnit}
+            unitSymbol={conceptUnits.get(config.concepts.pulseUuid) ?? ''}
             inputIsNormal={isInNormalRange(
               conceptMetadata,
               config.concepts['pulseUuid'],
@@ -225,7 +211,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
                 value: patientVitalAndBiometrics?.oxygenSaturation || '',
               },
             ]}
-            unitSymbol={oxygenSaturationUnit}
+            unitSymbol={conceptUnits.get(config.concepts.oxygenSaturationUuid) ?? ''}
             inputIsNormal={isInNormalRange(
               conceptMetadata,
               config.concepts['oxygenSaturationUuid'],
@@ -250,7 +236,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
                 value: patientVitalAndBiometrics?.respiratoryRate || '',
               },
             ]}
-            unitSymbol={respiratoryRateUnit}
+            unitSymbol={conceptUnits.get(config.concepts.respiratoryRateUuid) ?? ''}
             inputIsNormal={isInNormalRange(
               conceptMetadata,
               config.concepts['respiratoryRateUuid'],
@@ -277,7 +263,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
                 value: patientVitalAndBiometrics?.temperature || '',
               },
             ]}
-            unitSymbol={temperatureUnit}
+            unitSymbol={conceptUnits.get(config.concepts.temperatureUuid) ?? ''}
             inputIsNormal={isInNormalRange(
               conceptMetadata,
               config.concepts['temperatureUuid'],
@@ -334,7 +320,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
                 value: patientVitalAndBiometrics?.weight || '',
               },
             ]}
-            unitSymbol={weightUnit}
+            unitSymbol={conceptUnits.get(config.concepts.weightUuid) ?? ''}
             inputIsNormal={true}
             isTablet={isTablet}
           />
@@ -355,7 +341,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
                 value: patientVitalAndBiometrics?.height || '',
               },
             ]}
-            unitSymbol={heightUnit}
+            unitSymbol={conceptUnits.get(config.concepts.heightUuid) ?? ''}
             inputIsNormal={true}
             isTablet={isTablet}
           />
@@ -393,7 +379,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
                 value: patientVitalAndBiometrics?.midUpperArmCircumference || '',
               },
             ]}
-            unitSymbol={midUpperArmCircumferenceUnit}
+            unitSymbol={conceptUnits.get(config.concepts.midUpperArmCircumferenceUuid) ?? ''}
             inputIsNormal={isInNormalRange(
               conceptMetadata,
               config.concepts['midUpperArmCircumferenceUuid'],

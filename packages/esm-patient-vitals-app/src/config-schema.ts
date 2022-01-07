@@ -59,6 +59,7 @@ export interface ConfigObject {
     heightUuid: string;
     weightUuid: string;
     respiratoryRateUuid: string;
+    midUpperArmCircumferenceUuid: string;
   };
   vitals: VitalsConfigObject;
   biometrics: BiometricsConfigObject;

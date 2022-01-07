@@ -9,6 +9,7 @@ import { LineChartOptions } from '@carbon/charts/interfaces/charts';
 import { ScaleTypes } from '@carbon/charts/interfaces/enums';
 import { withUnit } from '@openmrs/esm-patient-common-lib';
 import '@carbon/charts/styles.css';
+import { ConfigObject } from '../config-schema';
 
 interface vitalsChartData {
   title: string;
@@ -17,15 +18,14 @@ interface vitalsChartData {
 
 interface VitalsChartProps {
   patientVitals: Array<PatientVitals>;
-  conceptUnits: Array<string>;
+  conceptUnits: Map<string, string>;
+  config: ConfigObject;
 }
 
-const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits }) => {
+const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, config }) => {
   const { t } = useTranslation();
-  const [bloodPressureUnit, , temperatureUnit, , , pulseUnit, oxygenSaturationUnit, , respiratoryRateUnit] =
-    conceptUnits;
   const [selectedVitalSign, setSelectedVitalsSign] = React.useState<vitalsChartData>({
-    title: `BP (${bloodPressureUnit})`,
+    title: `BP (${conceptUnits.get(config.concepts.systolicBloodPressureUuid)})`,
     value: 'systolic',
   });
 
@@ -76,27 +76,27 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits }
   const vitalSigns = [
     {
       id: 'bloodPressure',
-      title: withUnit('BP', bloodPressureUnit),
+      title: withUnit('BP', conceptUnits.get(config.concepts.systolicBloodPressureUuid) ?? '-'),
       value: 'systolic',
     },
     {
       id: 'oxygenSaturation',
-      title: withUnit('SPO2', oxygenSaturationUnit),
+      title: withUnit('SPO2', conceptUnits.get(config.concepts.oxygenSaturationUuid) ?? '-'),
       value: 'oxygenSaturation',
     },
     {
       id: 'temperature',
-      title: withUnit('Temp', temperatureUnit),
+      title: withUnit('Temp', conceptUnits.get(config.concepts.temperatureUuid) ?? '-'),
       value: 'temperature',
     },
     {
       id: 'Respiratory Rate',
-      title: withUnit('R. Rate', respiratoryRateUnit),
+      title: withUnit('R. Rate', conceptUnits.get(config.concepts.respiratoryRateUuid) ?? '-'),
       value: 'respiratoryRate',
     },
     {
       id: 'pulse',
-      title: withUnit('Pulse', pulseUnit),
+      title: withUnit('Pulse', conceptUnits.get(config.concepts.pulseUuid) ?? '-'),
       value: 'pulse',
     },
   ];
