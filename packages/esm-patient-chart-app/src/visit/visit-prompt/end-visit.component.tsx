@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './end-visit.component.scss';
 import { ComposedModal, Button, ModalBody, ModalFooter, ModalHeader } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
-import { getStartedVisit, showNotification, showToast, updateVisit, useVisit } from '@openmrs/esm-framework';
+import { getStartedVisit, parseDate, showNotification, showToast, updateVisit, useVisit } from '@openmrs/esm-framework';
 import { first } from 'rxjs/operators';
 
 interface EndVisitPromptProps {
@@ -19,7 +19,7 @@ const EndVisitPrompt: React.FC<EndVisitPromptProps> = ({ patientUuid, isModalOpe
   const endCurrentVisit = () => {
     const endVisitPayload = {
       location: currentVisit.location.uuid,
-      startDatetime: currentVisit.startDatetime,
+      startDatetime: parseDate(currentVisit.startDatetime),
       stopDatetime: new Date(),
       visitType: currentVisit.visitType.uuid,
     };

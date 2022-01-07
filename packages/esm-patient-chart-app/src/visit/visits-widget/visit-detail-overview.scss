@@ -43,7 +43,7 @@
 .encounterHeading {
   text-align: left;
   width: 100%;
-  max-width: 688px;
+  
   margin: 0 1rem 1.3125rem 1rem;
   color: #161616;
 }
@@ -51,7 +51,6 @@
 .visitsDetailWidgetContainer {
   background-color: $ui-background;
   width: 100%;
-  max-width: 688px;
   margin: 0 1rem 1.3125rem 1rem;
   border: 1px solid #e0e0e0;
 }
@@ -212,4 +211,14 @@ tab > button:first {
 .secondaryDiagnose {
   background-color: #ffd7d9;
   color:#a2191f;
+}
+
+.toggleSwitch {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  margin-bottom: $spacing-02;
+}
+.toggleSwitch div {
+  width: 30%;
 }
