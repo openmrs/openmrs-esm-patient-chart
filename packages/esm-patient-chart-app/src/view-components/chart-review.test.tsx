@@ -15,7 +15,7 @@ jest.mock('@openmrs/esm-framework', () => {
     ...originalModule,
     useAssignedExtensions: jest.fn(),
     useExtensionSlotMeta: jest.fn(),
-    getExtensionInternalStore: jest.fn()
+    getExtensionInternalStore: jest.fn(),
   };
 });
 
@@ -121,10 +121,14 @@ describe('ChartReview: ', () => {
               ],
               instances: {},
             },
-        }
-      }
-    }});
-    mockUseAssignedExtensions.mockReturnValue([{ name: 'vitals-details-widget' }, { name: 'biometrics-details-widget' }]);
+          },
+        };
+      },
+    });
+    mockUseAssignedExtensions.mockReturnValue([
+      { name: 'vitals-details-widget' },
+      { name: 'biometrics-details-widget' },
+    ]);
     mockUseExtensionSlotMeta.mockReturnValue(tabBasedDashboards);
 
     renderChartReview();

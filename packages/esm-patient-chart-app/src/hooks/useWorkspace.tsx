@@ -43,7 +43,7 @@ export function useWorkspace(): WorkspaceDetails {
   return {
     active: extensions.length > 0,
     closeWorkspace,
-    extensions: extensions.map(e => e.name),
+    extensions: extensions.map((e) => e.name),
     title,
     windowState,
   };
