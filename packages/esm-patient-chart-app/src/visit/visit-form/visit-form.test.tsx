@@ -71,7 +71,7 @@ describe('VisitForm: ', () => {
       // @ts-ignore
       jest.useFakeTimers('modern');
       // @ts-ignore
-      jest.setSystemTime(1638682781000);  // 5 Dec 2021 05:39:41 GMT
+      jest.setSystemTime(1638682781000); // 5 Dec 2021 05:39:41 GMT
     });
 
     beforeEach(() => {
