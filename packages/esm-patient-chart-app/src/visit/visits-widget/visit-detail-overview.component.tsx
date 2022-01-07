@@ -31,7 +31,7 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
         </div>
         <div className={styles.container}>
           {visits.map((visit, index) => (
-            <VisitDetailComponent toggleAll={toggleAll} key={index} visit={visit} patientUuid={patientUuid} />
+            <VisitDetailComponent listViewOverride={toggleAll} key={index} visit={visit} patientUuid={patientUuid} />
           ))}
         </div>
       </>

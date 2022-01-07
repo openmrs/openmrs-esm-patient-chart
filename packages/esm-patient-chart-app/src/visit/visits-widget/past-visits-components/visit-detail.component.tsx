@@ -15,10 +15,10 @@ function formatDateTime(date) {
 interface VisitDetailComponentProps {
   visit: Visit;
   patientUuid: string;
-  toggleAll: boolean;
+  listViewOverride: boolean;
 }
 
-const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visit, patientUuid, toggleAll }) => {
+const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visit, patientUuid, listViewOverride }) => {
   const { t } = useTranslation();
   const [listView, setListView] = useState(false);
   const encounters = useMemo(
@@ -34,8 +34,8 @@ const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visit, pati
   );
 
   useEffect(() => {
-    setListView(toggleAll);
-  }, [toggleAll]);
+    setListView(listViewOverride);
+  }, [listViewOverride]);
 
   return (
     <div className={styles.visitsDetailWidgetContainer}>
