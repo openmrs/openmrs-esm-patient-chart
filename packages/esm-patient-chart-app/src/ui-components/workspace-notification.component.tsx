@@ -3,19 +3,19 @@ import { useTranslation, Trans } from 'react-i18next';
 import styles from './workspace-notification.component.scss';
 import { Button, ComposedModal, ModalBody, ModalFooter, ModalHeader } from 'carbon-components-react';
 import { patientChartWorkspaceSlot } from '../constants';
-import { useAssignedExtensionIds, attach, detachAll, extensionStore } from '@openmrs/esm-framework';
+import { useAssignedExtensions, attach, detachAll, getExtensionInternalStore } from '@openmrs/esm-framework';
 import { getTitle } from '../utils';
 
 const WorkspaceNotification: React.FC = () => {
   const { t } = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [extensionSlotName, setExtensionSlotName] = useState('');
-  const extensions = useAssignedExtensionIds(patientChartWorkspaceSlot);
+  const extensions = useAssignedExtensions(patientChartWorkspaceSlot);
 
   const formName = useMemo(() => {
     if (extensions.length === 1) {
-      const state = extensionStore.getState();
-      return getTitle(state.extensions[extensions[0]]);
+      const state = getExtensionInternalStore().getState();
+      return getTitle(state.extensions[extensions[0].name]);
     } else {
       return '';
     }

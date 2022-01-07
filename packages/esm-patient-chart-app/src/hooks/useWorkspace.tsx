@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from 'react';
-import { detachAll, extensionStore, useAssignedExtensionIds } from '@openmrs/esm-framework';
+import { detachAll, getExtensionInternalStore, useAssignedExtensions } from '@openmrs/esm-framework';
 import { patientChartWorkspaceSlot } from '../constants';
 import { getTitle, determineWindowState } from '../utils';
 import { WorkspaceWindowState } from '../types';
@@ -16,14 +16,14 @@ export interface WorkspaceDetails extends WorkspaceState {
 }
 
 export function useWorkspace(): WorkspaceDetails {
-  const extensions = useAssignedExtensionIds(patientChartWorkspaceSlot);
+  const extensions = useAssignedExtensions(patientChartWorkspaceSlot);
 
   const title = useMemo(() => {
     if (extensions.length === 0) {
       return '';
     } else if (extensions.length === 1) {
-      const state = extensionStore.getState();
-      return getTitle(state.extensions[extensions[0]]);
+      const state = getExtensionInternalStore().getState();
+      return getTitle(state.extensions[extensions[0].name]);
     } else {
       return `Workspaces (${extensions.length})`;
     }
@@ -33,8 +33,8 @@ export function useWorkspace(): WorkspaceDetails {
     if (extensions.length === 0) {
       return WorkspaceWindowState.hidden;
     } else if (extensions.length === 1) {
-      const state = extensionStore.getState();
-      return determineWindowState(state.extensions[extensions[0]]);
+      const state = getExtensionInternalStore().getState();
+      return determineWindowState(state.extensions[extensions[0].name]);
     }
   }, [extensions]);
 
@@ -43,7 +43,7 @@ export function useWorkspace(): WorkspaceDetails {
   return {
     active: extensions.length > 0,
     closeWorkspace,
-    extensions,
+    extensions: extensions.map(e => e.name),
     title,
     windowState,
   };
