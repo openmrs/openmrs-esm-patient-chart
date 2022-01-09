@@ -11,6 +11,7 @@ import { getByTextWithMarkup } from '../../../../../tools/test-helpers';
 import StartVisitForm from './visit-form.component';
 
 const isoFormat = 'YYYY-MM-DDTHH:mm:ss.SSSZZ';
+const mockDateTimeStampInSeconds = 1638682781000;
 
 const testProps = {
   isTablet: false,
@@ -45,6 +46,12 @@ jest.mock('@openmrs/esm-framework', () => {
 });
 
 describe('VisitForm: ', () => {
+  beforeEach(() => {
+    // @ts-ignore
+    jest.useFakeTimers('modern');
+    // @ts-ignore
+    jest.setSystemTime(mockDateTimeStampInSeconds);
+  });
   it('renders the Start Visit form with all the relevant fields and values', () => {
     renderVisitForm();
 
