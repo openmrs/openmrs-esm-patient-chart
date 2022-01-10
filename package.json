@@ -73,6 +73,6 @@
     "webpack-cli": "^4.7.0"
   },
   "dependencies": {
-    "swr": "^1.0.1"
+    "swr": "^1.1.2"
   }
 }
