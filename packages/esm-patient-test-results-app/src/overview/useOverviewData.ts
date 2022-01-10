@@ -11,7 +11,7 @@ export interface OverviewPanelData {
   value?: string | number;
 }
 
-export type OverviewPanelEntry = [string, string, Array<OverviewPanelData>, Date, string];
+export type OverviewPanelEntry = [string, string, Array<OverviewPanelData>, Date, Date, string];
 
 export function parseSingleEntry(entry: ObsRecord, type: string, panelName: string): Array<OverviewPanelData> {
   if (type === 'Test') {
@@ -51,6 +51,7 @@ function useOverviewData(patientUuid: string) {
             type,
             parseSingleEntry(newestEntry, type, panelName),
             new Date(newestEntry.effectiveDateTime),
+            new Date(newestEntry.issued),
             uuid,
           ];
         })

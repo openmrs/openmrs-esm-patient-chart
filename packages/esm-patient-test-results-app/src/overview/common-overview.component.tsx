@@ -2,8 +2,7 @@ import React, { useCallback } from 'react';
 import dayjs from 'dayjs';
 import Table16 from '@carbon/icons-react/es/table/16';
 import ChartLine16 from '@carbon/icons-react/es/chart--line/16';
-import Information16 from '@carbon/icons-react/es/information/16';
-import { Button, TableToolbarContent, TableToolbar } from 'carbon-components-react';
+import { Button, TableToolbarContent, TableToolbar, Tooltip } from 'carbon-components-react';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { OverviewPanelEntry } from './useOverviewData';
 import { useTranslation } from 'react-i18next';
@@ -72,7 +71,7 @@ const CommonOverview: React.FC<CommonOverviewProps> = ({
   return (
     <>
       {(() => {
-        const cards = overviewData.map(([title, type, data, date, uuid]) => (
+        const cards = overviewData.map(([title, type, data, effectiveDateTime, issuedDateTime, uuid]) => (
           <article
             key={uuid}
             className={`${insertSeparator ? '' : `${styles.card} ${isActiveCard(uuid) ? styles.activeCard : ''}`}`}
@@ -82,9 +81,9 @@ const CommonOverview: React.FC<CommonOverviewProps> = ({
                 title,
                 data,
                 description: (
-                  <div className={insertSeparator ? '' : styles.cardHeader}>
-                    {formatDate(date)}
-                    <InfoButton />
+                  <div className={`${styles.meta} ${insertSeparator ? '' : styles.cardHeader}`}>
+                    {formatDate(effectiveDateTime)}
+                    <InfoTooltip effectiveDateTime={effectiveDateTime} issuedDateTime={issuedDateTime} />
                   </div>
                 ),
                 tableHeaders: headers,
@@ -145,7 +144,22 @@ const CommonOverview: React.FC<CommonOverviewProps> = ({
 
 const Separator = ({ ...props }) => <div {...props} className={styles.separator} />;
 
-const InfoButton = () => <Information16 className={styles['infoButton']} />;
+const InfoTooltip = ({ effectiveDateTime, issuedDateTime }) => {
+  const { t } = useTranslation();
+  return (
+    <Tooltip align="start">
+      <div className={styles.tooltip}>
+        <p>{t('dateCollected', 'Displaying date collected')}</p>
+        <p>
+          <span className={styles.label}>{t('resulted', 'Resulted')}: </span> {formatDate(issuedDateTime)}
+        </p>
+        <p>
+          <span className={styles.label}>{t('ordered', 'Ordered')}: </span> {formatDate(effectiveDateTime)}
+        </p>
+      </div>
+    </Tooltip>
+  );
+};
 
 function formatDate(date: Date) {
   return dayjs(date).format('DD - MMM - YYYY · HH:mm');
