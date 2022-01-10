@@ -40,16 +40,18 @@ export const ActionMenu: React.FC<ActionMenuInterface> = ({ open }) => {
     <aside className={styles.rightSideNav}>
       <ExtensionSlot extensionSlotName={CHARTS_ACTION_MENU_ITEMS_SLOT} />
       <Button
-        onClick={() => checkViewMode()}
-        iconDescription="WorkSpace Items"
+        onClick={checkViewMode}
+        iconDescription={t('workspaceItems', 'Workspace items')}
         className={`${styles.iconButton} ${openWindows > 0 && styles.activeIconButton} `}
         kind="ghost"
         hasIconOnly
+        tooltipPosition="bottom"
+        tooltipAlignment="end"
       >
-        <div>
+        <>
           <Pen20 />{' '}
           {windowSize.size === WorkspaceWindowState.hidden && <WarningFilled16 className={styles.warningButton} />}
-        </div>
+        </>
       </Button>
     </aside>
   ) : (

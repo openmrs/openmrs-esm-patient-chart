@@ -56,8 +56,11 @@ const ContextWorkspace: React.FC<RouteComponentProps<ContextWorkspaceParams>> = 
 
   return (
     <aside
-      className={`${styles.container} ${maximized && styles.maximized} ${
-        isWorkspaceOpen ? `${styles.show}` : `${styles.hide}`
+      className={`${styles.container} ${maximized ? `${styles.maximized}` : undefined} ${
+        isWorkspaceOpen
+          ? `${styles.show}`
+          : `${styles.hide}
+      }`
       }`}
     >
       <Header aria-label="Workspace Title" className={styles.header}>
@@ -79,10 +82,15 @@ const ContextWorkspace: React.FC<RouteComponentProps<ContextWorkspaceParams>> = 
             onClick={() => updateWindowSize(WorkspaceWindowState.hidden)}
             renderIcon={ArrowRight16}
             tooltipPosition="bottom"
+            tooltipAlignment="end"
           />
         </HeaderGlobalBar>
       </Header>
-      <ExtensionSlot extensionSlotName={patientChartWorkspaceSlot} state={props} />
+      <ExtensionSlot
+        className={`${styles.fixed} ${maximized ? `${styles.fullWidth}` : `${styles.dynamicWidth}`}`}
+        extensionSlotName={patientChartWorkspaceSlot}
+        state={props}
+      />
     </aside>
   );
 };

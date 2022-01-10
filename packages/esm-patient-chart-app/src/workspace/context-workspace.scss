@@ -1,7 +1,4 @@
 @import "../root.scss";
-@import "~@openmrs/esm-styleguide/src/vars";
-@import "~carbon-components/src/globals/scss/vars";
-@import "~carbon-components/src/globals/scss/mixins";
 
 .container {
   border-width: 0.0625rem 0 0.0625rem 0.0625rem;
@@ -11,7 +8,6 @@
 
 .header {
   background-color: $ui-03;
-  position: sticky;
   top: 3rem;
   border-bottom: 1px solid $text-03;
   z-index: 1000;
@@ -24,6 +20,10 @@
       color: inherit;
     }
   }
+
+  &:not(.maximized) {
+    position: sticky;
+  }
 }
 
 /* Tablet */
@@ -35,11 +35,12 @@
   right: 0;
   bottom: 0;
   z-index: 1000;
+
+  > .dynamicWidth {
+    width: 100%;
+  }
 }
 
-:global(.omrs-breakpoint-lt-desktop) .header {
-  display: none;
-}
 
 /* Desktop */
 :global(.omrs-breakpoint-gt-tablet) .container {
@@ -63,4 +64,22 @@
 
 .show {
   display: inline-block;
+}
+
+.fixed {
+  position: fixed !important;
+  top: 6rem;
+  right: auto;
+  left: auto;
+  overflow-y: auto;
+  bottom: 1px;
+}
+
+.fullWidth {
+  // Subtract side rail width
+  width: calc(100% - 50px);
+}
+
+.dynamicWidth {
+  width: calc(50% - 9.6rem);
 }
