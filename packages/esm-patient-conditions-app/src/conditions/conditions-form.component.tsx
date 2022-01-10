@@ -154,7 +154,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid, isTablet }
 
   return (
     <Form style={{ margin: '2rem' }} onSubmit={handleSubmit}>
-      <FormGroup style={{ width: '50%' }} legendText={t('condition', 'Condition')}>
+      <FormGroup legendText={t('condition', 'Condition')}>
         <Search
           light={isTablet}
           size="xl"
@@ -193,7 +193,7 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid, isTablet }
               );
             }
             return (
-              <Tile light className={styles.emptyResults}>
+              <Tile light={isTablet} className={styles.emptyResults}>
                 <span>
                   {t('noResultsFor', 'No results for')} <strong>"{searchTerm}"</strong>
                 </span>
