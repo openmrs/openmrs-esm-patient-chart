@@ -81,9 +81,11 @@ const CommonOverview: React.FC<CommonOverviewProps> = ({
                 title,
                 data,
                 description: (
-                  <div className={`${styles.meta} ${insertSeparator ? '' : styles.cardHeader}`}>
-                    {formatDate(effectiveDateTime)}
-                    <InfoTooltip effectiveDateTime={effectiveDateTime} issuedDateTime={issuedDateTime} />
+                  <div className={`${insertSeparator ? '' : styles.cardHeader}`}>
+                    <div className={styles.meta}>
+                      {formatDate(effectiveDateTime)}
+                      <InfoTooltip effectiveDateTime={effectiveDateTime} issuedDateTime={issuedDateTime} />
+                    </div>
                   </div>
                 ),
                 tableHeaders: headers,
