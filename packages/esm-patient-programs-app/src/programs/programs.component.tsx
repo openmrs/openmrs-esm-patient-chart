@@ -53,11 +53,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ patientUuid, basePa
     (program) => !includes(map(enrollments, 'program.uuid'), program.uuid),
   );
 
-  const {
-    results: paginatedEnrollments,
-    goTo,
-    currentPage,
-  } = usePagination(activeEnrollments ?? [], programsToShowCount);
+  const { results: paginatedEnrollments, goTo, currentPage } = usePagination(enrollments ?? [], programsToShowCount);
 
   const launchProgramsForm = React.useCallback(() => launchPatientWorkspace('programs-form-workspace'), []);
 
@@ -94,7 +90,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ patientUuid, basePa
 
   if (isLoading) return <DataTableSkeleton role="progressbar" />;
   if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
-  if (activeEnrollments?.length) {
+  if (paginatedEnrollments?.length) {
     return (
       <div className={styles.widgetCard}>
         <CardHeader title={headerTitle}>
@@ -156,7 +152,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ patientUuid, basePa
           pageNumber={currentPage}
           pageSize={programsToShowCount}
           pageUrl={pageUrl}
-          totalItems={activeEnrollments.length}
+          totalItems={enrollments.length}
           urlLabel={urlLabel}
         />
       </div>
