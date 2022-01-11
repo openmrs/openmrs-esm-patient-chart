@@ -1,13 +1,33 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { formatDate, formatDatetime, openmrsFetch, usePagination } from '@openmrs/esm-framework';
 import { mockEnrolledProgramsResponse } from '../../../../__mocks__/programs.mock';
 import { swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import ProgramsDetailedSummary from './programs-detailed-summary.component';
+import dayjs from 'dayjs';
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
+const mockUsePagination = usePagination as jest.Mock;
+const mockFormatDate = formatDate as jest.Mock;
+const mockFormatDateTime = formatDatetime as jest.Mock;
+
+jest.mock('@openmrs/esm-framework', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-framework');
+
+  return {
+    ...originalModule,
+    formatDate: jest.fn(),
+    formatDatetime: jest.fn(),
+    openmrsFetch: jest.fn(),
+    usePagination: jest.fn().mockImplementation(() => ({
+      currentPage: 1,
+      goTo: () => {},
+      results: [],
+    })),
+  };
+});
 
 jest.mock('@openmrs/esm-patient-common-lib', () => {
   const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
@@ -56,6 +76,13 @@ describe('ProgramsDetailedSummary ', () => {
 
   it("renders a detailed tabular summary of the patient's program enrollments", async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockEnrolledProgramsResponse } });
+    mockUsePagination.mockImplementation(() => ({
+      currentPage: 1,
+      goTo: () => {},
+      results: mockEnrolledProgramsResponse.slice(0, 5),
+    }));
+    mockFormatDate.mockImplementation((dateTime) => dayjs(dateTime).format('MMM-YYYY'));
+    mockFormatDateTime.mockImplementation((dateTime) => dayjs(dateTime).format('DD-MMM-YYYY HH:mm'));
 
     renderProgramsOverview();
 

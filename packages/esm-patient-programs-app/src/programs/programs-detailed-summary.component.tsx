@@ -25,6 +25,7 @@ import {
   DataTableRow,
   InlineNotification,
 } from 'carbon-components-react';
+import { formatDate, formatDatetime } from '@openmrs/esm-framework';
 
 interface ProgramsDetailedSummaryProps {}
 
@@ -48,6 +49,10 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = () => {
         header: t('activePrograms', 'Active programs'),
       },
       {
+        key: 'location',
+        header: t('location', 'Location'),
+      },
+      {
         key: 'dateEnrolled',
         header: t('dateEnrolled', 'Date enrolled'),
       },
@@ -64,9 +69,10 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = () => {
       return {
         id: program.uuid,
         display: program.display,
-        dateEnrolled: dayjs(program.dateEnrolled).format('MMM-YYYY'),
+        location: program.location?.display,
+        dateEnrolled: formatDatetime(new Date(program.dateEnrolled)),
         status: program.dateCompleted
-          ? `${t('completedOn', 'Completed On')} ${dayjs(program.dateCompleted).format('MMM-YYYY')}`
+          ? `${t('completedOn', 'Completed On')} ${formatDate(new Date(program.dateCompleted))}`
           : t('active', 'Active'),
       };
     });

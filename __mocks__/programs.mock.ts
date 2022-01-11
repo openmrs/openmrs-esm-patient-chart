@@ -52,6 +52,7 @@ export const mockEnrolledProgramsResponse = [
       allWorkflows: [],
     },
     display: 'HIV Care and Treatment',
+    location: { display: 'Location Test' },
     dateEnrolled: '2020-01-16T00:00:00.000+0000',
     dateCompleted: null,
   },
