@@ -4,8 +4,8 @@ import {
   ConfigurableLink,
   ExtensionSlot,
   navigate,
-  useAssignedExtensions,
-  getExtensionInternalStore,
+  extensionStore,
+  useAssignedExtensionIds,
 } from '@openmrs/esm-framework';
 import { useRouteMatch } from 'react-router-dom';
 import { DashboardTabConfig } from '../config-schemas';
@@ -19,13 +19,13 @@ interface ShowTabsProps {
 }
 
 const ShowTabs: React.FC<ShowTabsProps> = ({ slot, view, fullPath }) => {
-  const extensions = useAssignedExtensions(slot);
-  const defaultExtension = extensions[0].name;
-  const state = getExtensionInternalStore().getState();
+  const extensions = useAssignedExtensionIds(slot);
+  const defaultExtension = extensions[0];
+  const state = extensionStore.getState();
 
   useEffect(() => {
     if (!view && defaultExtension) {
-      const state = getExtensionInternalStore().getState();
+      const state = extensionStore.getState();
       const extension = state.extensions[defaultExtension];
       navigate({
         to: `${fullPath}/${extension.meta.view}`,
@@ -36,10 +36,10 @@ const ShowTabs: React.FC<ShowTabsProps> = ({ slot, view, fullPath }) => {
   return (
     <ul>
       {view &&
-        extensions.map(({ name }) => {
-          const extension = state.extensions[name];
+        extensions.map((id) => {
+          const extension = state.extensions[id];
           return (
-            <li key={name}>
+            <li key={id}>
               <div className={`${extension.meta.view === view ? 'selected' : 'unselected'}`}>
                 <ConfigurableLink to={`${fullPath}/${extension.meta.view}`}>
                   <button className="omrs-unstyled">{getTitle(extension)}</button>
