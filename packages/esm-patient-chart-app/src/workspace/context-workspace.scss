@@ -1,67 +1,61 @@
 @import "../root.scss";
-@import "~@openmrs/esm-styleguide/src/vars";
-@import "~carbon-components/src/globals/scss/vars";
-@import "~carbon-components/src/globals/scss/mixins";
 
-.contextWorkspaceContainer {
+.container {
   border-width: 0.0625rem 0 0.0625rem 0.0625rem;
   border-style: solid;
   border-color: $text-03;
 }
 
-:global(.omrs-breakpoint-lt-desktop) .contextWorkspaceContainer {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 10;
-  background-color: $ui-01;
-}
-
-/* Desktop view */
-:global(.omrs-breakpoint-gt-tablet) .contextWorkspaceContainer {
-  z-index: 1;
-  background-color: $ui-02;
-  margin-right: 50px;
-  flex: 1;
-}
-
-:global(.omrs-breakpoint-gt-tablet) .contextWorkspaceContainer>header {
+.header {
   background-color: $ui-03;
-  border-bottom: 0.0625rem solid $text-03;
+  top: 3rem;
+  border-bottom: 1px solid $text-03;
+  z-index: 1000;
+
+  a {
+    @include carbon--type-style('productive-heading-02');
+    color: $text-01;
+
+    &:hover {
+      color: inherit;
+    }
+  }
+
+  &:not(.maximized) {
+    position: sticky;
+  }
 }
 
-:global(.omrs-breakpoint-gt-tablet) .contextWorkspaceContainer>header a {
-  color: $ui-05;
-}
-
-:global(.omrs-breakpoint-gt-tablet) .contextWorkspaceContainer>header button {
-  color: $ui-05;
-  fill: $ui-05;
-  background-color: transparent;
-  min-height: 1rem;
-  height: 2.9375rem;
-}
-
-:global(.omrs-breakpoint-gt-tablet) .contextWorkspaceContainer>header button:last-child {
-  background-color: $ui-02;
-}
-
-:global(.omrs-breakpoint-gt-tablet) .contextWorkspaceContainer>header button:hover {
-  background-color: #BFBFBF;
-  color: $ui-05;
-  fill: $ui-05;
-}
-
-
-:global(.omrs-breakpoint-gt-tablet) .maximized {
+/* Tablet */
+:global(.omrs-breakpoint-lt-desktop) .container {
+  background-color: $ui-01;
   position: fixed;
   top: 3rem;
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 10000;
+  z-index: 1000;
+
+  > .dynamicWidth {
+    width: 100%;
+  }
+}
+
+
+/* Desktop */
+:global(.omrs-breakpoint-gt-tablet) .container {
+  background-color: $ui-02;
+  margin-right: 50px;
+  flex: 1;
+  
+  &.maximized {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+  }
 }
 
 .hide {
@@ -70,4 +64,22 @@
 
 .show {
   display: inline-block;
+}
+
+.fixed {
+  position: fixed !important;
+  top: 6rem;
+  right: auto;
+  left: auto;
+  overflow-y: auto;
+  bottom: 1px;
+}
+
+.fullWidth {
+  // Subtract side rail width
+  width: calc(100% - 50px);
+}
+
+.dynamicWidth {
+  width: calc(50% - 9.6rem);
 }

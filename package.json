@@ -14,8 +14,8 @@
     "verify": "lerna run lint && lerna run test && lerna run typescript",
     "prettier": "prettier --config prettier.config.js --write \"packages/**/*.{ts,tsx}\"",
     "prepare": "husky install",
-    "test": "jest --config jest.config.json --verbose false --passWithNoTests",
-    "test-watch": "jest --watch --config jest.config.json",
+    "test": "TZ=UTC jest --config jest.config.json --verbose false --passWithNoTests",
+    "test-watch": "TZ=UTC jest --watch --config jest.config.json",
     "coverage": "yarn test --coverage",
     "extract-translations": "lerna run extract-translations"
   },
@@ -73,6 +73,6 @@
     "webpack-cli": "^4.7.0"
   },
   "dependencies": {
-    "swr": "^1.0.1"
+    "swr": "^1.1.2"
   }
 }

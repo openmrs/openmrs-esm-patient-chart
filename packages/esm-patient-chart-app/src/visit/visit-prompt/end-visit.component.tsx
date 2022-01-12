@@ -1,17 +1,17 @@
 import React from 'react';
 import styles from './end-visit.component.scss';
-import { ComposedModal, Button, ModalHeader, ModalBody } from 'carbon-components-react';
+import { ComposedModal, Button, ModalBody, ModalFooter, ModalHeader } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
-import { getStartedVisit, showNotification, showToast, updateVisit, useVisit } from '@openmrs/esm-framework';
+import { getStartedVisit, parseDate, showNotification, showToast, updateVisit, useVisit } from '@openmrs/esm-framework';
 import { first } from 'rxjs/operators';
 
 interface EndVisitPromptProps {
   patientUuid: string;
-  openModal: boolean;
+  isModalOpen: boolean;
   closeModal: () => void;
 }
 
-const EndVisitPrompt: React.FC<EndVisitPromptProps> = ({ patientUuid, openModal, closeModal }) => {
+const EndVisitPrompt: React.FC<EndVisitPromptProps> = ({ patientUuid, isModalOpen, closeModal }) => {
   const { t, i18n } = useTranslation();
   const locale = i18n.language.toLowerCase().replace('_', '-');
   const { currentVisit } = useVisit(patientUuid);
@@ -19,27 +19,29 @@ const EndVisitPrompt: React.FC<EndVisitPromptProps> = ({ patientUuid, openModal,
   const endCurrentVisit = () => {
     const endVisitPayload = {
       location: currentVisit.location.uuid,
-      startDatetime: currentVisit.startDatetime,
+      startDatetime: parseDate(currentVisit.startDatetime),
       visitType: currentVisit.visitType.uuid,
       stopDatetime: new Date(),
     };
-    const ac = new AbortController();
-    updateVisit(currentVisit.uuid, endVisitPayload, ac)
+
+    const abortController = new AbortController();
+    updateVisit(currentVisit.uuid, endVisitPayload, abortController)
       .pipe(first())
       .subscribe(
         (response) => {
           if (response.status === 200) {
             getStartedVisit.next(null);
             closeModal();
+
             showToast({
               kind: 'success',
-              description: t('visitEndSuccessfully', 'Ended current visit successfully'),
+              description: t('visitEndSuccessfully', 'Ended active visit successfully'),
             });
           }
         },
         (error) => {
           showNotification({
-            title: t('endVisitError', 'Error ending current visit'),
+            title: t('endVisitError', 'Error ending active visit'),
             kind: 'error',
             critical: true,
             description: error?.message,
@@ -49,11 +51,11 @@ const EndVisitPrompt: React.FC<EndVisitPromptProps> = ({ patientUuid, openModal,
   };
 
   return (
-    <ComposedModal open={openModal} onClose={() => closeModal()}>
+    <ComposedModal open={isModalOpen} onClose={closeModal}>
       <ModalHeader>
-        <span className={styles.productiveHeading03}>{t('noActiveVisit', 'End Current visit')}</span>
+        <span className={styles.header}>{t('endActiveVisit', 'End active visit')}</span>
       </ModalHeader>
-      <ModalBody>
+      <ModalBody className={styles.body}>
         <p className={styles.customLabel}>
           <span>{t('startDate', 'Start Date')}</span>
           <span>{new Date(currentVisit?.startDatetime).toLocaleDateString(locale, { dateStyle: 'medium' })}</span>
@@ -65,18 +67,14 @@ const EndVisitPrompt: React.FC<EndVisitPromptProps> = ({ patientUuid, openModal,
           <span>{t('visitLocation', 'Visit Location')}</span> <span>{currentVisit?.location?.display}</span>
         </p>
       </ModalBody>
-      <div className={styles.buttonContainer}>
-        <div className={styles.left}>
-          <Button onClick={closeModal} kind="ghost">
-            {t('cancel', 'Cancel')}
-          </Button>
-        </div>
-        <div className={styles.right}>
-          <Button onClick={endCurrentVisit} kind="primary">
-            {t('endVisit', 'End Visit')}
-          </Button>
-        </div>
-      </div>
+      <ModalFooter>
+        <Button kind="secondary" onClick={closeModal}>
+          {t('cancel', 'Cancel')}
+        </Button>
+        <Button kind="danger" onClick={endCurrentVisit}>
+          {t('endVisit', 'End Visit')}
+        </Button>
+      </ModalFooter>
     </ComposedModal>
   );
 };

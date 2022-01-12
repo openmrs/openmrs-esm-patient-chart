@@ -1,27 +1,26 @@
 import React, { useCallback, useEffect, useState, useMemo } from 'react';
 import dayjs from 'dayjs';
-import VisitTypeOverview from './visit-type-overview.component';
-import styles from './visit-form.component.scss';
 import {
-  Column,
-  Grid,
-  Row,
-  Form,
-  DatePickerInput,
-  DatePicker,
   Button,
+  Column,
+  ContentSwitcher,
+  DatePicker,
+  DatePickerInput,
+  Form,
+  Grid,
+  InlineNotification,
+  Row,
+  Select,
+  SelectItem,
+  Switch,
   TimePicker,
   TimePickerSelect,
-  SelectItem,
-  ContentSwitcher,
-  Switch,
-  Select,
 } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
+import { first } from 'rxjs/operators';
 import {
   detach,
   getStartedVisit,
-  NewVisitPayload,
   saveVisit,
   showNotification,
   showToast,
@@ -30,9 +29,13 @@ import {
   VisitMode,
   VisitStatus,
   ExtensionSlot,
+  NewVisitPayload,
+  toOmrsIsoString,
+  toDateObjectStrict,
 } from '@openmrs/esm-framework';
 import { amPm, convertTime12to24 } from '@openmrs/esm-patient-common-lib';
-import { first } from 'rxjs/operators';
+import VisitTypeOverview from './visit-type-overview.component';
+import styles from './visit-form.component.scss';
 
 interface StartVisitFormProps {
   isTablet: boolean;
@@ -43,12 +46,14 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({ isTablet, patientUuid }
   const { t } = useTranslation();
   const locations = useLocations();
   const sessionUser = useSessionUser();
-  const [selectedLocation, setSelectedLocation] = useState<string>('');
-  const [visitDate, setVisitDate] = useState(new Date().toISOString());
-  const [visitTime, setVisitTime] = useState(dayjs(new Date()).format('hh:mm'));
+  const [contentSwitcherIndex, setContentSwitcherIndex] = useState(1);
+  const [isMissingVisitType, setIsMissingVisitType] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState('');
   const [timeFormat, setTimeFormat] = useState<amPm>(new Date().getHours() >= 12 ? 'PM' : 'AM');
-  const [contentSwitcherIndex, setContentSwitcherIndex] = useState<number>(1);
-  const [visitType, setVisitType] = useState<string>();
+  const [visitDate, setVisitDate] = useState(new Date());
+  const [visitTime, setVisitTime] = useState(dayjs(new Date()).format('hh:mm'));
+  const [visitType, setVisitType] = useState<string | null>(null);
   const state = useMemo(() => ({ patientUuid }), [patientUuid]);
 
   useEffect(() => {
@@ -57,60 +62,63 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({ isTablet, patientUuid }
     }
   }, [locations, sessionUser]);
 
-  const handleCloseForm = useCallback(() => detach('patient-chart-workspace-slot', 'start-visit-workspace-form'), []);
+  const closeWorkspace = useCallback(() => detach('patient-chart-workspace-slot', 'start-visit-workspace-form'), []);
 
   const handleStartVisit = useCallback(
     (event) => {
       event.preventDefault();
+
+      if (!visitType) {
+        setIsMissingVisitType(true);
+        return;
+      }
+
+      setIsSubmitting(true);
+
       const [hours, minutes] = convertTime12to24(visitTime, timeFormat);
-      let visitPayload: NewVisitPayload = {
+
+      const payload: NewVisitPayload = {
         patient: patientUuid,
-        startDatetime: new Date(
-          dayjs(visitDate).year(),
-          dayjs(visitDate).month(),
-          dayjs(visitDate).date(),
-          hours,
-          minutes,
+        startDatetime: toDateObjectStrict(
+          toOmrsIsoString(
+            new Date(dayjs(visitDate).year(), dayjs(visitDate).month(), dayjs(visitDate).date(), hours, minutes),
+          ),
         ),
         visitType: visitType,
         location: selectedLocation,
       };
 
-      if (visitPayload.visitType !== undefined) {
-        saveVisit(visitPayload, new AbortController()).subscribe(
+      const abortController = new AbortController();
+      saveVisit(payload, abortController)
+        .pipe(first())
+        .subscribe(
           (response) => {
             if (response.status === 201) {
+              closeWorkspace();
+
               getStartedVisit.next({
                 mode: VisitMode?.NEWVISIT,
                 visitData: response.data,
                 status: VisitStatus?.ONGOING,
               });
-              handleCloseForm();
+
               showToast({
                 kind: 'success',
-                description: t('startVisitSuccessfully', 'Visit has been started successfully'),
+                description: t('startVisitSuccessfully', 'Visit started successfully'),
               });
             }
           },
           (error) => {
             showNotification({
-              title: t('startVisitError', 'Error starting current visit'),
+              title: t('startVisitError', 'Error starting visit'),
               kind: 'error',
               critical: true,
               description: error?.message,
             });
           },
         );
-      } else {
-        showNotification({
-          title: t('startVisitTypeError', 'No Visit Type selected'),
-          kind: 'error',
-          critical: true,
-          description: 'Please select a Visit Type',
-        });
-      }
     },
-    [handleCloseForm, patientUuid, selectedLocation, t, timeFormat, visitDate, visitTime, visitType],
+    [closeWorkspace, patientUuid, selectedLocation, t, timeFormat, visitDate, visitTime, visitType],
   );
 
   return (
@@ -121,92 +129,125 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({ isTablet, patientUuid }
             <ExtensionSlot extensionSlotName="visit-form-header-slot" className={styles.dataGridRow} state={state} />
           </Row>
         )}
-        <Row className={styles.gridRow}>
-          <Column sm={1}>
-            <span className={styles.columnLabel}>{t('dateAndTimeOfVisit', 'Date and time of visit')}</span>
-          </Column>
-          <Column sm={3} style={{ display: 'flex' }}>
-            <DatePicker light={isTablet} dateFormat="d/m/Y" datePickerType="single" maxDate={new Date().toISOString()}>
-              <DatePickerInput
+        <div className={styles.container}>
+          <Row className={styles.gridRow}>
+            <Column sm={1}>
+              <span className={styles.columnLabel}>{t('dateAndTimeOfVisit', 'Date and time of visit')}</span>
+            </Column>
+            <Column sm={3} style={{ display: 'flex' }}>
+              <DatePicker
+                dateFormat="d/m/Y"
+                datePickerType="single"
+                id="visitDate"
+                light={isTablet}
+                maxDate={new Date().toISOString()}
+                onChange={([date]) => setVisitDate(date)}
                 value={visitDate}
-                onChange={(event) => setVisitDate(event.target.value)}
-                id="visitDateTimePicker"
-                labelText={t('date', 'Date')}
-                placeholder="dd/mm/yyyy"
-                style={{ width: '100%' }}
-              />
-            </DatePicker>
-            <TimePicker
-              pattern="([\d]+:[\d]{2})"
-              value={visitTime}
-              onChange={(event) => setVisitTime(event.target.value)}
-              light={isTablet}
-              style={{ marginLeft: '0.125rem', flex: 'none' }}
-              labelText={t('time', 'Time')}
-              id="time-picker"
-            >
-              <TimePickerSelect
-                onChange={(event) => setTimeFormat(event.target.value as amPm)}
-                value={timeFormat}
-                labelText={t('time', 'Time')}
-                aria-label={t('time', 'Time')}
-                id="time-picker-select-1"
               >
-                <SelectItem value="AM" text="AM" />
-                <SelectItem value="PM" text="PM" />
-              </TimePickerSelect>
-            </TimePicker>
-          </Column>
-        </Row>
-        <Row className={styles.gridRow}>
-          <Column sm={1}>
-            <span className={styles.columnLabel}>{t('visitLocation', 'Visit Location')}</span>
-          </Column>
-          <Column sm={3}>
-            <Select
-              labelText={t('searchForALocation', 'Select a location')}
-              id="location"
-              invalidText="Required"
-              value={selectedLocation}
-              onChange={(event) => setSelectedLocation(event.target.value)}
-              light={isTablet}
-            >
-              {locations?.length > 0 &&
-                locations.map((location) => (
-                  <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
-                    {location.display}
-                  </SelectItem>
-                ))}
-            </Select>
-          </Column>
-        </Row>
-        <Row className={styles.gridRow}>
-          <Column sm={1}>
-            <span className={styles.columnLabel}>{t('visitType', 'Visit Type')}</span>
-          </Column>
-          <Column sm={3}>
-            <ContentSwitcher
-              selectedIndex={contentSwitcherIndex}
-              className={styles.contentSwitcher}
-              size="lg"
-              onChange={({ index }) => setContentSwitcherIndex(index)}
-            >
-              <Switch name={'recommended'} text={t('recommended', 'Recommended')} />
-              <Switch name={'All'} text={t('all', 'All')} />
-            </ContentSwitcher>
-            <VisitTypeOverview isTablet={isTablet} onChange={setVisitType} />
-          </Column>
-        </Row>
-        <Row>
-          <Column className={styles.buttonContainer}>
-            <Button onClick={handleCloseForm} kind="secondary" style={{ width: '50%' }}>
-              {t('discard', 'Discard')}
-            </Button>
-            <Button onClick={handleStartVisit} kind="primary" style={{ width: '50%' }} type="submit">
-              {t('startVisit', 'Start visit')}
-            </Button>
-          </Column>
-        </Row>
+                <DatePickerInput
+                  id="visitStartDateInput"
+                  labelText={t('date', 'Date')}
+                  placeholder="dd/mm/yyyy"
+                  style={{ width: '100%' }}
+                />
+              </DatePicker>
+              <TimePicker
+                id="visitStartTime"
+                labelText={t('time', 'Time')}
+                light={isTablet}
+                onChange={(event) => setVisitTime(event.target.value)}
+                pattern="(1[012]|[1-9]):[0-5][0-9](\\s)?"
+                style={{ marginLeft: '0.125rem', flex: 'none' }}
+                value={visitTime}
+              >
+                <TimePickerSelect
+                  id="visitStartTimeSelect"
+                  onChange={(event) => setTimeFormat(event.target.value as amPm)}
+                  value={timeFormat}
+                  labelText={t('time', 'Time')}
+                  aria-label={t('time', 'Time')}
+                >
+                  <SelectItem value="AM" text="AM" />
+                  <SelectItem value="PM" text="PM" />
+                </TimePickerSelect>
+              </TimePicker>
+            </Column>
+          </Row>
+          <Row className={styles.gridRow}>
+            <Column sm={1}>
+              <span className={styles.columnLabel}>{t('visitLocation', 'Visit Location')}</span>
+            </Column>
+            <Column sm={3}>
+              <Select
+                labelText={t('selectLocation', 'Select a location')}
+                id="location"
+                invalidText="Required"
+                value={selectedLocation}
+                onChange={(event) => setSelectedLocation(event.target.value)}
+                light={isTablet}
+              >
+                {locations?.length > 0 &&
+                  locations.map((location) => (
+                    <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
+                      {location.display}
+                    </SelectItem>
+                  ))}
+              </Select>
+            </Column>
+          </Row>
+          <Row className={styles.gridRow}>
+            <Column sm={1}>
+              <span className={styles.columnLabel}>{t('visitType', 'Visit Type')}</span>
+            </Column>
+            <Column sm={3}>
+              <ContentSwitcher
+                selectedIndex={contentSwitcherIndex}
+                className={styles.contentSwitcher}
+                size="lg"
+                onChange={({ index }) => setContentSwitcherIndex(index)}
+              >
+                <Switch name="recommended" text={t('recommended', 'Recommended')} />
+                <Switch name="all" text={t('all', 'All')} />
+              </ContentSwitcher>
+              <VisitTypeOverview
+                isTablet={isTablet}
+                onChange={(visitType) => {
+                  setVisitType(visitType);
+                  setIsMissingVisitType(false);
+                }}
+              />
+            </Column>
+          </Row>
+          {isMissingVisitType && (
+            <Row className={styles.gridRow}>
+              <Column sm={4}>
+                <InlineNotification
+                  style={{ margin: '0', minWidth: '100%' }}
+                  kind="error"
+                  lowContrast={true}
+                  title={t('missingVisitType', 'Missing visit type')}
+                  subtitle={t('selectVisitType', 'Please select a Visit Type')}
+                />
+              </Column>
+            </Row>
+          )}
+          <Row>
+            <Column className={styles.buttonContainer}>
+              <Button onClick={closeWorkspace} kind="secondary" style={{ width: '50%' }}>
+                {t('discard', 'Discard')}
+              </Button>
+              <Button
+                onClick={handleStartVisit}
+                kind="primary"
+                style={{ width: '50%' }}
+                type="submit"
+                disabled={isSubmitting}
+              >
+                {t('startVisit', 'Start visit')}
+              </Button>
+            </Column>
+          </Row>
+        </div>
       </Grid>
     </Form>
   );

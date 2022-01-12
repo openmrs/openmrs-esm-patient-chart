@@ -9,7 +9,15 @@ interface NotificationsButtonInterface {
 
 const NotificationsButton: React.FC<NotificationsButtonInterface> = ({ onClick }) => {
   return (
-    <Button onClick={onClick} iconDescription="Notifications" className={styles.iconButton} kind="ghost" hasIconOnly>
+    <Button
+      onClick={onClick}
+      iconDescription="Notifications"
+      className={styles.iconButton}
+      kind="ghost"
+      hasIconOnly
+      tooltipPosition="bottom"
+      tooltipAlignment="end"
+    >
       <Notification20 aria-label="Notifications" />
     </Button>
   );

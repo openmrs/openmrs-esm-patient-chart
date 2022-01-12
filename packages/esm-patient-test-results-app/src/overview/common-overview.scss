@@ -1,4 +1,6 @@
 @import "~@openmrs/esm-styleguide/src/vars";
+@import "~carbon-components/src/globals/scss/vars";
+@import "~carbon-components/src/globals/scss/mixins";
 
 .card {
   border: 1px solid $ui-03;
@@ -31,10 +33,24 @@
   margin-left: 0.75rem;
 }
 
-.infoButton {
-  margin-left: 10px;
-  padding-top: 1px;
-  box-sizing: content-box;
-  position: absolute;
-  color: black;
+.meta {
+  display: flex;
+}
+
+.tooltip {
+  @include carbon--type-style('body-short-01');
+  color: $ui-01;
+
+  p {
+    margin: 0.5rem 0;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+}
+
+.label {
+  @include carbon--type-style('label-01');
+  color: $labeldropdown;
+  margin-right: 0.25rem;
 }

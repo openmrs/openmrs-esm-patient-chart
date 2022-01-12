@@ -33,8 +33,8 @@ const NotesMain: React.FC<NotesOverviewProps> = ({
 }) => {
   const { currentVisit } = useVisit(patientUuid);
   const { t } = useTranslation();
-  const displayText = t('notes', 'Notes');
-  const headerTitle = t('notes', 'Notes');
+  const displayText = t('visitNotes', 'Visit notes');
+  const headerTitle = t('visitNotes', 'Visit notes');
   const { data: notes, isError, isLoading, isValidating } = useEncounters(patientUuid);
 
   const launchVisitNoteForm = React.useCallback(() => {

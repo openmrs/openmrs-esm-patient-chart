@@ -2,7 +2,7 @@ import React from 'react';
 import dayjs from 'dayjs';
 import Add16 from '@carbon/icons-react/es/add/16';
 import styles from './programs-overview.scss';
-import { usePagination } from '@openmrs/esm-framework';
+import { formatDate, formatDatetime, usePagination } from '@openmrs/esm-framework';
 import {
   DataTable,
   DataTableSkeleton,
@@ -54,11 +54,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ patientUuid, basePa
     (program) => !includes(map(enrollments, 'program.uuid'), program.uuid),
   );
 
-  const {
-    results: paginatedEnrollments,
-    goTo,
-    currentPage,
-  } = usePagination(activeEnrollments ?? [], programsToShowCount);
+  const { results: paginatedEnrollments, goTo, currentPage } = usePagination(enrollments ?? [], programsToShowCount);
 
   const launchProgramsForm = React.useCallback(() => launchPatientWorkspace('programs-form-workspace'), []);
 
@@ -68,19 +64,30 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ patientUuid, basePa
       header: t('activePrograms', 'Active programs'),
     },
     {
+      key: 'location',
+      header: t('location', 'Location'),
+    },
+    {
       key: 'dateEnrolled',
       header: t('dateEnrolled', 'Date enrolled'),
+    },
+    {
+      key: 'status',
+      header: t('status', 'Status'),
     },
   ];
 
   const tableRows = React.useMemo(() => {
     return paginatedEnrollments?.map((enrollment) => ({
-      ...enrollment,
       id: enrollment.uuid,
       display: enrollment.display,
-      dateEnrolled: dayjs(enrollment.dateEnrolled).format('MMM-YYYY'),
+      location: enrollment.location?.display,
+      dateEnrolled: formatDatetime(new Date(enrollment.dateEnrolled)),
+      status: enrollment.dateCompleted
+        ? `${t('completedOn', 'Completed On')} ${formatDate(new Date(enrollment.dateCompleted))}`
+        : t('active', 'Active'),
     }));
-  }, [paginatedEnrollments]);
+  }, [paginatedEnrollments, t]);
 
   if (isLoading) return <DataTableSkeleton role="progressbar" />;
   if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
@@ -146,7 +153,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ patientUuid, basePa
           pageNumber={currentPage}
           pageSize={programsToShowCount}
           pageUrl={pageUrl}
-          totalItems={activeEnrollments.length}
+          totalItems={enrollments.length}
           urlLabel={urlLabel}
         />
       </div>

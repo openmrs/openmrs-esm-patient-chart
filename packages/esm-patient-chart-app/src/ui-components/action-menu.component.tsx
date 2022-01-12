@@ -9,7 +9,7 @@ import { isDesktop } from '../utils';
 import { useContextWorkspace } from '../hooks/useContextWindowSize';
 import { useWorkspace } from '../hooks/useWorkspace';
 import { useTranslation } from 'react-i18next';
-import { ScreenModeTypes } from '../types';
+import { WorkspaceWindowState } from '../types';
 
 interface ActionMenuInterface {
   open: boolean;
@@ -21,15 +21,15 @@ export const CHARTS_ACTION_MENU_ITEMS_SLOT = 'action-menu-items-slot';
 export const ActionMenu: React.FC<ActionMenuInterface> = ({ open }) => {
   const { t } = useTranslation();
   const layout = useLayoutType();
-  const { screenMode, active } = useWorkspace();
+  const { windowState: screenMode, active } = useWorkspace();
   const { openWindows, updateWindowSize, windowSize } = useContextWorkspace();
 
   const checkViewMode = () => {
     if (active) {
-      if (windowSize.size === ScreenModeTypes.maximize) {
-        updateWindowSize(ScreenModeTypes.hide);
-      } else if (windowSize.size === ScreenModeTypes.normal) {
-        updateWindowSize(ScreenModeTypes.hide);
+      if (windowSize.size === WorkspaceWindowState.maximized) {
+        updateWindowSize(WorkspaceWindowState.hidden);
+      } else if (windowSize.size === WorkspaceWindowState.normal) {
+        updateWindowSize(WorkspaceWindowState.hidden);
       } else {
         updateWindowSize(screenMode);
       }
@@ -40,22 +40,25 @@ export const ActionMenu: React.FC<ActionMenuInterface> = ({ open }) => {
     <aside className={styles.rightSideNav}>
       <ExtensionSlot extensionSlotName={CHARTS_ACTION_MENU_ITEMS_SLOT} />
       <Button
-        onClick={() => checkViewMode()}
-        iconDescription="WorkSpace Items"
+        onClick={checkViewMode}
+        iconDescription={t('workspaceItems', 'Workspace items')}
         className={`${styles.iconButton} ${openWindows > 0 && styles.activeIconButton} `}
         kind="ghost"
         hasIconOnly
+        tooltipPosition="bottom"
+        tooltipAlignment="end"
       >
-        <div>
-          <Pen20 /> {windowSize.size === ScreenModeTypes.hide && <WarningFilled16 className={styles.warningButton} />}
-        </div>
+        <>
+          <Pen20 />{' '}
+          {windowSize.size === WorkspaceWindowState.hidden && <WarningFilled16 className={styles.warningButton} />}
+        </>
       </Button>
     </aside>
   ) : (
     <Button className={styles.actionBtn}>
       <div>
         <Edit20 />
-        {windowSize.size === ScreenModeTypes.hide && <WarningFilled16 className={styles.warningButton} />}
+        {windowSize.size === WorkspaceWindowState.hidden && <WarningFilled16 className={styles.warningButton} />}
       </div>
       <span>{t('careActivities', 'Care Activities')}</span>
     </Button>

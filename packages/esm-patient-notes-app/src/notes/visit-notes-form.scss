@@ -14,13 +14,15 @@
 }
 
 .diagnosis {
-  padding: 0.875rem;
+  padding: 1rem 0.75rem;
 }
 
 .diagnosisList {
+  margin-top: 0.25rem;
   background-color: $ui-02;
   max-height: 14rem;
   overflow-y: auto;
+  border: 1px solid $ui-03;
 }
 
 .diagnosisList li:hover {

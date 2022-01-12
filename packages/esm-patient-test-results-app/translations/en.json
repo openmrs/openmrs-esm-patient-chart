@@ -1,9 +1,12 @@
 {
   "backToTimeline": "Back to timeline",
   "date": "Date",
+  "dateCollected": "Displaying date collected",
   "moreResultsAvailable": "More results available",
+  "ordered": "Ordered",
   "recentResults": "Recent Results",
   "recentTestResults": "recent test results",
+  "resulted": "Resulted",
   "seeAllResults": "See all results",
   "testResults": "test results",
   "timeline": "Timeline",

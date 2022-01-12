@@ -49,23 +49,10 @@ function setupOpenMRS() {
       },
       {
         id: 'notes-details-widget',
-        slot: dashboardMeta.slot,
-        load: getAsyncLifecycle(() => import('./notes/notes.component'), options),
-        meta: {
-          title: 'Notes',
-          view: 'notes',
-        },
+        slot: 'patient-chart-form-dashboard-slot',
+        load: getAsyncLifecycle(() => import('./notes/notes-detailed-summary.component'), options),
         online: { showAddNote: true },
         offline: { showAddNote: false },
-      },
-      {
-        id: 'notes-summary-dashboard',
-        slot: 'patient-chart-dashboard-slot',
-        order: 5,
-        load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
-        meta: dashboardMeta,
-        online: true,
-        offline: true,
       },
       {
         id: 'visit-notes-form-workspace',

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import dayjs from 'dayjs';
 import styles from '../visit-detail-overview.scss';
 import EncounterList from './encounter-list.component';
@@ -15,11 +15,12 @@ function formatDateTime(date) {
 interface VisitDetailComponentProps {
   visit: Visit;
   patientUuid: string;
+  listViewOverride: boolean;
 }
 
-const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visit, patientUuid }) => {
+const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visit, patientUuid, listViewOverride }) => {
   const { t } = useTranslation();
-  const [listView, setListView] = useState(true);
+  const [listView, setListView] = useState(false);
   const encounters = useMemo(
     () =>
       visit.encounters.map((encounter: Encounter) => ({
@@ -31,6 +32,10 @@ const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visit, pati
       })),
     [visit],
   );
+
+  useEffect(() => {
+    setListView(listViewOverride);
+  }, [listViewOverride]);
 
   return (
     <div className={styles.visitsDetailWidgetContainer}>
@@ -47,7 +52,7 @@ const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visit, pati
             kind="ghost"
             onClick={() => setListView(true)}
           >
-            {t('allEncounters', 'All Encounters')}
+            {t('visitSummary', 'Visit Summary')}
           </Button>
           <Button
             className={`${styles.toggle} ${!listView ? styles.toggleActive : ''}`}
@@ -55,12 +60,12 @@ const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visit, pati
             kind="ghost"
             onClick={() => setListView(false)}
           >
-            {t('visitSummary', 'Visit Summary')}
+            {t('allEncounters', 'All Encounters')}
           </Button>
         </div>
       </div>
-      {listView && visit?.encounters && <EncounterList visitUuid={visit.uuid} encounters={encounters} />}
-      {!listView && <VisitSummary encounters={visit.encounters} patientUuid={patientUuid} />}
+      {!listView && visit?.encounters && <EncounterList visitUuid={visit.uuid} encounters={encounters} />}
+      {listView && <VisitSummary encounters={visit.encounters} patientUuid={patientUuid} />}
     </div>
   );
 };

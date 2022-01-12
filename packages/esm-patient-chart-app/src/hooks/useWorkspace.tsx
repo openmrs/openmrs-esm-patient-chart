@@ -1,13 +1,13 @@
 import { useCallback, useMemo } from 'react';
 import { detachAll, extensionStore, useAssignedExtensionIds } from '@openmrs/esm-framework';
 import { patientChartWorkspaceSlot } from '../constants';
-import { getTitle, checkScreenMode } from '../utils';
-import { ScreenModeTypes } from '../types';
+import { getTitle, determineWindowState } from '../utils';
+import { WorkspaceWindowState } from '../types';
 
 export interface WorkspaceState {
-  title: string;
   active: boolean;
-  screenMode: ScreenModeTypes;
+  title: string;
+  windowState: WorkspaceWindowState;
 }
 
 export interface WorkspaceDetails extends WorkspaceState {
@@ -29,22 +29,22 @@ export function useWorkspace(): WorkspaceDetails {
     }
   }, [extensions]);
 
-  const screenMode = useMemo(() => {
+  const windowState = useMemo(() => {
     if (extensions.length === 0) {
-      return ScreenModeTypes.hide;
+      return WorkspaceWindowState.hidden;
     } else if (extensions.length === 1) {
       const state = extensionStore.getState();
-      return checkScreenMode(state.extensions[extensions[0]]);
+      return determineWindowState(state.extensions[extensions[0]]);
     }
   }, [extensions]);
 
   const closeWorkspace = useCallback(() => detachAll(patientChartWorkspaceSlot), []);
 
   return {
-    title,
-    screenMode,
     active: extensions.length > 0,
     closeWorkspace,
     extensions,
+    title,
+    windowState,
   };
 }

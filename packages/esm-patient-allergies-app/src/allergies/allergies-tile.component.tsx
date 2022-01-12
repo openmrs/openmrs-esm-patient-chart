@@ -1,6 +1,7 @@
 import React from 'react';
-import { useAllergies } from './allergy-intolerance.resource';
 import { useTranslation } from 'react-i18next';
+import { InlineLoading } from 'carbon-components-react';
+import { useAllergies } from './allergy-intolerance.resource';
 import styles from './allergies-tile.component.scss';
 
 interface AllergyTileInterface {
@@ -8,13 +9,26 @@ interface AllergyTileInterface {
 }
 
 const AllergyTile: React.FC<AllergyTileInterface> = ({ patientUuid }) => {
-  const { data: allergies } = useAllergies(patientUuid);
   const { t } = useTranslation();
+  const { data: allergies, isLoading } = useAllergies(patientUuid);
 
+  if (isLoading) {
+    return <InlineLoading role="progressbar" description={`${t('loading', 'Loading')} ...`} />;
+  }
+  if (allergies?.length) {
+    return (
+      <div>
+        <p className={styles.label}>{t('allergies', 'Allergies')}</p>
+        <p className={styles.content}>
+          <span className={styles.value}>{allergies?.map((allergy) => allergy?.display).join(', ')}</span>
+        </p>
+      </div>
+    );
+  }
   return (
-    <div className={styles.gridColumn}>
-      <p>{t('allergies', 'Allergies')}</p>
-      <span>{allergies?.map((allergy) => allergy.display).join(', ')}</span>
+    <div>
+      <p className={styles.label}>{t('allergies', 'Allergies')}</p>
+      <p className={styles.content}>--</p>
     </div>
   );
 };
