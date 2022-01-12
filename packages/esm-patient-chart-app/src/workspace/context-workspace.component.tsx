@@ -63,7 +63,10 @@ const ContextWorkspace: React.FC<RouteComponentProps<ContextWorkspaceParams>> = 
       }`
       }`}
     >
-      <Header aria-label="Workspace Title" className={styles.header}>
+      <Header
+        aria-label="Workspace Title"
+        className={`${styles.header} ${maximized ? `${styles.fullWidth}` : `${styles.dynamicWidth}`}`}
+      >
         <HeaderName prefix="">{title}</HeaderName>
         <HeaderGlobalBar>
           <ExtensionSlot extensionSlotName={patientChartWorkspaceHeaderSlot} state={props} />
@@ -87,7 +90,7 @@ const ContextWorkspace: React.FC<RouteComponentProps<ContextWorkspaceParams>> = 
         </HeaderGlobalBar>
       </Header>
       <ExtensionSlot
-        className={`${styles.fixed} ${maximized ? `${styles.fullWidth}` : `${styles.dynamicWidth}`}`}
+        className={`${styles.fixed} ${maximized && !isTablet ? `${styles.fullWidth}` : `${styles.dynamicWidth}`}`}
         extensionSlotName={patientChartWorkspaceSlot}
         state={props}
       />
