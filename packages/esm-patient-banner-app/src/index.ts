@@ -41,6 +41,15 @@ function setupOpenMRS() {
         online: true,
         offline: true,
       },
+
+      {
+        id: 'deceased-tag',
+        slot: 'deceased-tags-slot',
+        load: getAsyncLifecycle(() => import('./banner-tags/deceased-tag.component'), options),
+        
+        online: true,
+        offline: true,
+      },
     ],
   };
 }
