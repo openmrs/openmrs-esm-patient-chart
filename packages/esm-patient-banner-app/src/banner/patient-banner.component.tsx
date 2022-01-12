@@ -12,7 +12,7 @@ import { Button } from 'carbon-components-react';
 import { ExtensionSlot, age } from '@openmrs/esm-framework';
 
 interface PatientBannerProps {
-  patient: Pick<fhir.Patient, 'id' | 'name' | 'gender' | 'birthDate' | 'identifier' | 'address' | 'telecom'>;
+  patient: fhir.Patient;
   patientUuid: string;
   onClick?: (patientUuid: string) => void;
   onTransition?: () => void;
@@ -27,7 +27,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, onC
     [patientUuid, onClick, onTransition],
   );
 
-  const patientName = `${patient.name[0].given.join(' ')} ${patient.name[0].family}`;
+  const patientName = `${patient.name?.[0].given?.join(' ')} ${patient?.name?.[0].family}`;
   const patientPhotoSlotState = React.useMemo(() => ({ patientUuid, patientName }), [patientUuid]);
 
   const [showContactDetails, setShowContactDetails] = React.useState(false);
@@ -90,7 +90,9 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, onC
             <span>{dayjs(patient.birthDate).format('DD - MMM - YYYY')}</span>
           </div>
           <div className={styles.row}>
-            <span className={styles.identifiers}>{patient.identifier.map((i) => i.value).join(', ')}</span>
+            <span className={styles.identifiers}>
+              {patient.identifier?.length ? patient.identifier.map((i) => i.value).join(', ') : '--'}
+            </span>
             <Button
               kind="ghost"
               renderIcon={showContactDetails ? ChevronUp16 : ChevronDown16}
@@ -104,7 +106,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, onC
         </div>
       </div>
       {showContactDetails && (
-        <ContactDetails address={patient.address} telecom={patient.telecom} patientId={patient.id} />
+        <ContactDetails address={patient.address ?? []} telecom={patient.telecom ?? []} patientId={patient.id} />
       )}
     </div>
   );

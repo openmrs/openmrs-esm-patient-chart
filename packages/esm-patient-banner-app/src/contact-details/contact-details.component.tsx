@@ -10,27 +10,23 @@ interface ContactDetailsProps {
   patientId: string;
 }
 
-const Address: React.FC<{ address: fhir.Address }> = ({ address }) => {
+const Address: React.FC<{ address?: fhir.Address }> = ({ address }) => {
   const { t } = useTranslation();
 
   return (
     <>
       <p className={styles.heading}>{t('address', 'Address')}</p>
       <ul>
-        {(() => {
-          if (address) {
-            const { city, country, postalCode, state } = address;
-            return (
-              <>
-                <li>{postalCode}</li>
-                <li>{city}</li>
-                <li>{state}</li>
-                <li>{country}</li>
-              </>
-            );
-          }
-          return '--';
-        })()}
+        {address ? (
+          <>
+            <li>{address.postalCode}</li>
+            <li>{address.city}</li>
+            <li>{address.state}</li>
+            <li>{address.country}</li>
+          </>
+        ) : (
+          '--'
+        )}
       </ul>
     </>
   );
@@ -38,7 +34,7 @@ const Address: React.FC<{ address: fhir.Address }> = ({ address }) => {
 
 const Contact: React.FC<{ telecom: Array<fhir.ContactPoint> }> = ({ telecom }) => {
   const { t } = useTranslation();
-  const value = telecom && telecom.length ? telecom[0].value : '--';
+  const value = telecom?.length ? telecom[0].value : '--';
 
   return (
     <>
@@ -81,8 +77,7 @@ const Relationships: React.FC<{ patientId: string }> = ({ patientId }) => {
 };
 
 const ContactDetails: React.FC<ContactDetailsProps> = ({ address, telecom, patientId }) => {
-  const { t } = useTranslation();
-  const currentAddress = address ? address.find((a) => a.use === 'home') : null;
+  const currentAddress = address ? address.find((a) => a.use === 'home') : undefined;
 
   return (
     <div className={styles.contactDetails}>
