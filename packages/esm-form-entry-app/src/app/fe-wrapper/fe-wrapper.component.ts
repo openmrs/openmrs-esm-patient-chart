@@ -24,6 +24,7 @@ import { Encounter, FormSchema, LoggedInUser, Order } from '../types';
 import { showToast, detach, showNotification } from '@openmrs/esm-framework';
 import { PatientPreviousEncounterService } from '../openmrs-api/patient-previous-encounter.service';
 
+import { MonthlyScheduleResourceService } from '../services/monthly-scheduled-resource.service';
 @Component({
   selector: 'my-app-fe-wrapper',
   templateUrl: './fe-wrapper.component.html',
@@ -78,6 +79,7 @@ export class FeWrapperComponent implements OnInit {
     private formSubmissionService: FormSubmissionService,
     private formErrorsService: FormErrorsService,
     private patientPreviousEncounter: PatientPreviousEncounterService,
+    private monthlyScheduleResourceService: MonthlyScheduleResourceService,
   ) {}
 
   ngOnInit() {
@@ -362,6 +364,7 @@ export class FeWrapperComponent implements OnInit {
   private wireDataSources() {
     this.dataSources.registerDataSource('location', this.formDataSourceService.getDataSources().location);
     this.dataSources.registerDataSource('provider', this.formDataSourceService.getDataSources().provider);
+    this.dataSources.registerDataSource('monthlyScheduleResourceService', this.monthlyScheduleResourceService);
     this.dataSources.registerDataSource('drug', this.formDataSourceService.getDataSources().drug);
     this.dataSources.registerDataSource('problem', this.formDataSourceService.getDataSources().problem);
     this.dataSources.registerDataSource('personAttribute', this.formDataSourceService.getDataSources().location);
@@ -369,6 +372,7 @@ export class FeWrapperComponent implements OnInit {
     this.dataSources.registerDataSource('patient', { visitTypeUuid: this.singleSpaProps.visitTypeUuid }, true);
     this.dataSources.registerDataSource('patient', this.formDataSourceService.getPatientObject(this.patient), true);
     this.dataSources.registerDataSource('rawPrevEnc', this.prevEncounter, false);
+    this.dataSources.registerDataSource('userLocation', this.loggedInUser.sessionLocation);
   }
 
   private setDefaultValues() {
