@@ -73,6 +73,11 @@ async function getOfflineVisitForPatient(patientUuid: string) {
 }
 
 async function createOfflineVisitForPatient(patientUuid: string, location: string) {
+  const patientRegistrationSyncItems = await getSynchronizationItems<any>('patient-registration');
+  const isVisitForOfflineRegisteredPatient = patientRegistrationSyncItems.some(
+    (item) => item.patientUuid === patientUuid,
+  );
+
   const offlineVisit: OfflineVisit = {
     uuid: v4(),
     patient: patientUuid,
@@ -85,7 +90,15 @@ async function createOfflineVisitForPatient(patientUuid: string, location: strin
 
   const descriptor: QueueItemDescriptor = {
     id: offlineVisit.uuid,
-    dependencies: [],
+    displayName: 'Offline visit',
+    dependencies: isVisitForOfflineRegisteredPatient
+      ? [
+          {
+            type: 'patient-registration',
+            id: patientUuid,
+          },
+        ]
+      : [],
   };
 
   await queueSynchronizationItem(visitSyncType, offlineVisit, descriptor);
