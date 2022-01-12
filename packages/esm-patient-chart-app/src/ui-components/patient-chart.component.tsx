@@ -11,6 +11,7 @@ import { useOfflineVisitForPatient } from '../offline';
 import { useContextWorkspace } from '../hooks/useContextWindowSize';
 import { ScreenModeTypes } from '../types';
 import WorkspaceNotification from './workspace-notification.component';
+import { usePatient } from '@openmrs/esm-patient-common-lib';
 
 interface PatientChartParams {
   patientUuid: string;
@@ -20,7 +21,8 @@ interface PatientChartParams {
 
 const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({ match }) => {
   const { patientUuid, view, subview } = match.params;
-  const [loading, patient] = useCurrentPatient(patientUuid);
+  const { data: patient } = usePatient(patientUuid);
+  const loading = !patient;
   const sessionUser = useSessionUser();
   const state = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);
   const { windowSize, openWindows } = useContextWorkspace();

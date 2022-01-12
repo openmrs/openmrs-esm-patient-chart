@@ -9,3 +9,4 @@ export * from './pagination';
 export * from './time-helper';
 export * from './useVitalsConceptMetadata';
 export * from './launchPatientWorkspace';
+export * from './offline';
