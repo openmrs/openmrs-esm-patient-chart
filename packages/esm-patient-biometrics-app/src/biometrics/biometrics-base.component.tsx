@@ -44,8 +44,7 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({
   const config = useConfig() as ConfigObject;
   const { bmiUnit } = config.biometrics;
 
-  const { data: conceptData } = useVitalsConceptMetadata();
-  const conceptUnits = conceptData ? conceptData.conceptUnits : null;
+  const { data: conceptUnits } = useVitalsConceptMetadata();
 
   const { data: biometrics, isLoading, isError, isValidating } = useBiometrics(patientUuid);
 
@@ -56,10 +55,10 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({
 
   const tableHeaders = [
     { key: 'date', header: 'Date and time' },
-    { key: 'weight', header: withUnit('Weight', conceptUnits?.[4] ?? '') },
-    { key: 'height', header: withUnit('Height', conceptUnits?.[3] ?? '') },
+    { key: 'weight', header: withUnit('Weight', conceptUnits.get(config.concepts.weightUuid) ?? '') },
+    { key: 'height', header: withUnit('Height', conceptUnits.get(config.concepts.heightUuid) ?? '') },
     { key: 'bmi', header: `BMI (${bmiUnit})` },
-    { key: 'muac', header: withUnit('MUAC', conceptUnits?.[7] ?? '') },
+    { key: 'muac', header: withUnit('MUAC', conceptUnits.get(config.concepts.muacUuid) ?? '') },
   ];
   const tableRows = React.useMemo(
     () =>
@@ -112,7 +111,7 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({
           </div>
         </CardHeader>
         {chartView ? (
-          <BiometricsChart patientBiometrics={biometrics} conceptsUnits={conceptUnits} />
+          <BiometricsChart patientBiometrics={biometrics} conceptUnits={conceptUnits} config={config} />
         ) : (
           <BiometricsPagination
             tableRows={tableRows}

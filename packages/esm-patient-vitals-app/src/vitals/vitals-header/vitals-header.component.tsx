@@ -8,6 +8,7 @@ import { useConfig } from '@openmrs/esm-framework';
 import { useVitalsConceptMetadata } from '@openmrs/esm-patient-common-lib';
 import { useVitals } from '../vitals.resource';
 import styles from './vitals-header.component.scss';
+import { ConfigObject } from '../../config-schema';
 
 interface VitalsHeaderProps {
   patientUuid: string;
@@ -15,11 +16,10 @@ interface VitalsHeaderProps {
 }
 
 const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVitals }) => {
-  const config = useConfig();
+  const config = useConfig() as ConfigObject;
   const { t } = useTranslation();
   const { data: vitals, isLoading } = useVitals(patientUuid);
-  const { data: conceptData } = useVitalsConceptMetadata();
-  const conceptUnits = conceptData?.conceptUnits ? conceptData.conceptUnits : null;
+  const { data: conceptUnits } = useVitalsConceptMetadata();
   const latestVitals = vitals?.[0];
 
   const [showDetails, setShowDetails] = useState(false);
@@ -50,34 +50,34 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
               <div className={styles.row}>
                 <VitalsHeaderItem
                   unitName={t('temperatureAbbreviated', 'Temp')}
-                  unitSymbol={conceptUnits?.[2] ?? ''}
+                  unitSymbol={conceptUnits.get(config.concepts.temperatureUuid) ?? ''}
                   value={latestVitals?.temperature}
                 />
                 <VitalsHeaderItem
                   unitName={t('bp', 'BP')}
-                  unitSymbol={conceptUnits?.[0] ?? ''}
+                  unitSymbol={conceptUnits.get(config.concepts.systolicBloodPressureUuid) ?? ''}
                   value={`${latestVitals?.systolic} / ${latestVitals?.diastolic}`}
                 />
                 <VitalsHeaderItem
                   unitName={t('heartRate', 'Heart Rate')}
-                  unitSymbol={conceptUnits?.[5] ?? ''}
+                  unitSymbol={conceptUnits.get(config.concepts.pulseUuid) ?? ''}
                   value={latestVitals?.pulse}
                 />
                 <VitalsHeaderItem
                   unitName={t('spo2', 'SpO2')}
-                  unitSymbol={conceptUnits?.[6] ?? ''}
+                  unitSymbol={conceptUnits.get(config.concepts.oxygenSaturationUuid) ?? ''}
                   value={latestVitals?.oxygenSaturation}
                 />
               </div>
               <div className={styles.row}>
                 <VitalsHeaderItem
                   unitName={t('respiratoryRate', 'R. Rate')}
-                  unitSymbol={conceptUnits?.[8] ?? ''}
+                  unitSymbol={conceptUnits.get(config.concepts.respiratoryRateUuid) ?? ''}
                   value={latestVitals?.respiratoryRate}
                 />
                 <VitalsHeaderItem
                   unitName={t('height', 'Height')}
-                  unitSymbol={conceptUnits?.[3] ?? ''}
+                  unitSymbol={conceptUnits.get(config.concepts.heightUuid) ?? ''}
                   value={latestVitals?.height}
                 />
                 <VitalsHeaderItem
@@ -87,7 +87,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
                 />
                 <VitalsHeaderItem
                   unitName={t('weight', 'Weight')}
-                  unitSymbol={conceptUnits?.[4] ?? ''}
+                  unitSymbol={conceptUnits.get(config.concepts.weightUuid) ?? ''}
                   value={latestVitals?.weight}
                 />
               </div>
