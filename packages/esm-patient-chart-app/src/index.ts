@@ -129,7 +129,7 @@ function setupOpenMRS() {
           moduleName,
         }),
         meta: {
-          title: 'Past Visits',
+          title: 'Edit or load a past visit',
           view: 'visits',
         },
       },

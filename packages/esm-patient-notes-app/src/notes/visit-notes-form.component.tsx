@@ -17,6 +17,7 @@ import {
   Tag,
   TextArea,
   Tile,
+  ButtonSet,
 } from 'carbon-components-react';
 import {
   createErrorHandler,
@@ -205,10 +206,10 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, isTablet }
   );
 
   return (
-    <Form className={styles.visitNoteForm}>
-      <h2 className={styles.heading}>{t('addVisitNote', 'Add a Visit Note')}</h2>
-      <Grid style={{ margin: 0, padding: '0 1rem' }}>
-        <Row style={{ marginTop: '0.5rem', marginBottom: '2.75rem' }}>
+    <Form className={styles.form}>
+      <Grid className={styles.grid}>
+        {isTablet ? <h2 className={styles.heading}>{t('addVisitNote', 'Add a Visit Note')}</h2> : null}
+        <Row className={styles.row}>
           <Column sm={1}>
             <span className={styles.columnLabel}>{t('date', 'Date')}</span>
           </Column>
@@ -229,7 +230,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, isTablet }
             </DatePicker>
           </Column>
         </Row>
-        <Row style={{ marginTop: '0.5rem', marginBottom: '2.75rem' }}>
+        <Row className={styles.row}>
           <Column sm={1}>
             <span className={styles.columnLabel}>{t('diagnosis', 'Diagnosis')}</span>
           </Column>
@@ -302,7 +303,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, isTablet }
             </FormGroup>
           </Column>
         </Row>
-        <Row style={{ marginTop: '0.5rem', marginBottom: '2.75rem' }}>
+        <Row className={styles.row}>
           <Column sm={1}>
             <span className={styles.columnLabel}>{t('note', 'Note')}</span>
           </Column>
@@ -316,7 +317,7 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, isTablet }
             />
           </Column>
         </Row>
-        <Row style={{ marginTop: '0.5rem', marginBottom: '2.75rem' }}>
+        <Row className={styles.row}>
           <Column sm={1}>
             <span className={styles.columnLabel}>{t('image', 'Image')}</span>
           </Column>
@@ -331,23 +332,21 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, isTablet }
             </FormGroup>
           </Column>
         </Row>
-        <Row>
-          <Column>
-            <Button kind="secondary" onClick={closeWorkspace} style={{ width: '50%' }}>
-              {t('cancel', 'Cancel')}
-            </Button>
-            <Button
-              kind="primary"
-              onClick={handleSubmit}
-              style={{ width: '50%' }}
-              disabled={!selectedDiagnoses.length}
-              type="submit"
-            >
-              {t('saveAndClose', 'Save & Close')}
-            </Button>
-          </Column>
-        </Row>
       </Grid>
+      <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
+        <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
+          {t('discard', 'Discard')}
+        </Button>
+        <Button
+          className={styles.button}
+          kind="primary"
+          onClick={handleSubmit}
+          disabled={!selectedDiagnoses.length}
+          type="submit"
+        >
+          {t('saveAndClose', 'Save and close')}
+        </Button>
+      </ButtonSet>
     </Form>
   );
 };

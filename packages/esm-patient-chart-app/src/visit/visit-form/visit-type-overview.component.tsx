@@ -30,7 +30,7 @@ const VisitTypeOverview: React.FC<VisitTypeOverviewProps> = ({ isTablet, onChang
   const { results, currentPage, goTo } = usePagination(searchResults, 5);
 
   return (
-    <div className={styles.visitTypeOverviewWrapper}>
+    <div className={`${styles.visitTypeOverviewWrapper} ${isTablet ? styles.tablet : styles.desktop}`}>
       <Search
         onChange={(event) => handleSearch(event.target.value)}
         placeholder={t('searchForAVisitType', 'Search for a visit type')}
@@ -49,14 +49,16 @@ const VisitTypeOverview: React.FC<VisitTypeOverviewProps> = ({ isTablet, onChang
           <RadioButton key={uuid} className={styles.radioButton} id={name} labelText={display} value={uuid} />
         ))}
       </RadioButtonGroup>
-      <PatientChartPagination
-        pageNumber={currentPage}
-        pageUrl={null}
-        totalItems={visitTypes?.length}
-        currentItems={results.length}
-        pageSize={5}
-        onPageNumberChange={({ page }) => goTo(page)}
-      />
+      <div className={styles.paginationContainer}>
+        <PatientChartPagination
+          pageNumber={currentPage}
+          pageUrl={null}
+          totalItems={visitTypes?.length}
+          currentItems={results.length}
+          pageSize={5}
+          onPageNumberChange={({ page }) => goTo(page)}
+        />
+      </div>
     </div>
   );
 };

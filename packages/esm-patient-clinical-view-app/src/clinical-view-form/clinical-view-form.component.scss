@@ -4,32 +4,18 @@
 .formContainer {
   display: flex;
   flex-direction: column;
-  width: 100%;
-  height: 100vh;
+  justify-content: space-between;
 }
 
 .checkboxContainer {
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+  flex-flow: row wrap;
   margin: 1rem 0rem 0rem 1rem;
 }
 
 .checkBox {
   height: $spacing-09;
   width: 16rem;
-}
-
-.buttonContainer {
-  display: flex;
-  width: 100%;
-  flex-direction: row;
-  padding: $spacing-05;
-}
-
-.buttonContainer button {
-  flex: 1;
-  margin: 0.125rem;
 }
 
 .searchContainer {
@@ -39,4 +25,36 @@
 
 .searchContainer input{
   border-bottom: none;
+}
+
+.button {
+  height: 4rem;
+  display: flex;
+  align-content: flex-start;
+  align-items: baseline;
+  min-width: 50%;
+}
+
+.tablet {
+  padding: 1.5rem 1rem;
+  background-color: $ui-02;
+}
+
+.desktop {
+  padding: 0rem;
+}
+
+
+/* Desktop */
+:global(.omrs-breakpoint-gt-tablet) {
+  .formContainer {
+    height: calc(100vh - 6rem);
+  }
+}
+
+/* Tablet */
+:global(.omrs-breakpoint-lt-desktop) {
+  .formContainer {
+    height: calc(100vh - 3rem);
+  }
 }
