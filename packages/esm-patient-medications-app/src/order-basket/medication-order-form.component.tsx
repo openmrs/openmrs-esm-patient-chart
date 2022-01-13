@@ -17,8 +17,6 @@ import {
   Grid,
   Row,
   Column,
-  Header,
-  HeaderName,
 } from 'carbon-components-react';
 import ArrowLeft24 from '@carbon/icons-react/es/arrow--left/24';
 import { useTranslation } from 'react-i18next';

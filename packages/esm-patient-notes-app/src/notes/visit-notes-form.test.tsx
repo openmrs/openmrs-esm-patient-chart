@@ -72,15 +72,14 @@ describe('Visit notes form: ', () => {
   it('renders the visit notes form with all the relevant fields and values', () => {
     renderVisitNotesForm();
 
-    expect(screen.getByRole('heading', { name: /Add a visit note/i })).toBeInTheDocument();
     expect(screen.getByRole('textbox', { name: /Visit date/i })).toBeInTheDocument();
     expect(screen.getByRole('textbox', { name: /Write an additional note/i })).toBeInTheDocument();
     expect(screen.getByRole('group', { name: /Search for a diagnosis/i })).toBeInTheDocument();
     expect(screen.getByRole('group', { name: /Add an image to this visit/i })).toBeInTheDocument();
     expect(screen.getByRole('search', { name: /Enter diagnoses/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Add image/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Cancel/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Save & close/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Discard/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Save and close/i })).toBeInTheDocument();
   });
 
   it('typing in the diagnosis search input triggers a search', () => {
@@ -121,7 +120,7 @@ describe('Visit notes form: ', () => {
   it('closes the form and the workspace when the cancel button is clicked', () => {
     renderVisitNotesForm();
 
-    const cancelButton = screen.getByRole('button', { name: /Cancel/i });
+    const cancelButton = screen.getByRole('button', { name: /Discard/i });
     userEvent.click(cancelButton);
 
     expect(mockDetach).toHaveBeenCalledTimes(1);
@@ -165,7 +164,7 @@ describe('Visit notes form: ', () => {
       userEvent.type(clinicalNote, 'Sample clinical note');
       expect(clinicalNote).toHaveValue('Sample clinical note');
 
-      const submitButton = screen.getByRole('button', { name: /Save & Close/i });
+      const submitButton = screen.getByRole('button', { name: /Save and close/i });
       userEvent.click(submitButton);
 
       await act(() => promise);
@@ -199,7 +198,7 @@ describe('Visit notes form: ', () => {
     userEvent.type(clinicalNote, 'Sample clinical note');
     expect(clinicalNote).toHaveValue('Sample clinical note');
 
-    const submitButton = screen.getByRole('button', { name: /Save & Close/i });
+    const submitButton = screen.getByRole('button', { name: /Save and close/i });
     userEvent.click(submitButton);
 
     await act(() => promise);
