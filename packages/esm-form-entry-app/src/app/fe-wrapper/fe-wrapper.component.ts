@@ -22,6 +22,8 @@ import { singleSpaPropsSubject, SingleSpaProps } from '../../single-spa-props';
 import { Order } from '../types';
 // @ts-ignore
 import { showToast, detach, showNotification } from '@openmrs/esm-framework';
+import { PatientPreviousEncounterService } from '../openmrs-api/patient-previous-encounter.service';
+
 @Component({
   selector: 'my-app-fe-wrapper',
   templateUrl: './fe-wrapper.component.html',
@@ -47,6 +49,8 @@ export class FeWrapperComponent implements OnInit {
   triedSubmitting = false;
   errorPanelOpen = false;
   submittedOrder: Array<Order> = [];
+  prevEncounter: any;
+  isLoading: boolean = true;
 
   public get encounterDate(): string {
     return moment(this.encounter.encounterDatetime).format('YYYY-MM-DD');
@@ -73,6 +77,7 @@ export class FeWrapperComponent implements OnInit {
     private formDataSourceService: FormDataSourceService,
     private formSubmissionService: FormSubmissionService,
     private formErrorsService: FormErrorsService,
+    private patientPreviousEncounter: PatientPreviousEncounterService,
   ) {}
 
   ngOnInit() {
@@ -236,8 +241,14 @@ export class FeWrapperComponent implements OnInit {
         .pipe(take(1))
         .subscribe(
           (data) => {
-            this.createForm();
-            subject.next(this.form);
+            this.patientPreviousEncounter
+              .getPreviousEncounter(data.formSchema.encounterType?.uuid, this.singleSpaProps.patient.id)
+              .then((prevEnc) => {
+                this.prevEncounter = prevEnc ? prevEnc : {};
+                this.createForm();
+                subject.next(this.form);
+                this.isLoading = false;
+              });
           },
           (err) => {
             subject.error(err);
@@ -351,6 +362,7 @@ export class FeWrapperComponent implements OnInit {
     this.dataSources.registerDataSource('conceptAnswers', this.formDataSourceService.getDataSources().conceptAnswers);
     this.dataSources.registerDataSource('patient', { visitTypeUuid: this.singleSpaProps.visitTypeUuid }, true);
     this.dataSources.registerDataSource('patient', this.formDataSourceService.getPatientObject(this.patient), true);
+    this.dataSources.registerDataSource('rawPrevEnc', this.prevEncounter, false);
   }
 
   private setDefaultValues() {
@@ -383,6 +395,7 @@ export class FeWrapperComponent implements OnInit {
     if (this.formSchema.encounterType) {
       this.form.valueProcessingInfo.encounterTypeUuid = this.formSchema.encounterType.uuid;
     } else {
+      this.isLoading = false;
       throw new Error('Please associate the form with an encounter type.');
     }
     if (this.encounterUuid) {
