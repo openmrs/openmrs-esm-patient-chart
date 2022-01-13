@@ -1,9 +1,10 @@
-import { NewVisitPayload, Visit } from '@openmrs/esm-api';
+import { NewVisitPayload } from '@openmrs/esm-api';
 import {
   getStartedVisit,
   getSynchronizationItems,
   messageOmrsServiceWorker,
   queueSynchronizationItem,
+  fetchCurrentPatient,
   saveVisit,
   setupOfflineSync,
   VisitMode,
@@ -13,12 +14,14 @@ import {
 } from '@openmrs/esm-framework';
 import { useEffect } from 'react';
 import { v4 } from 'uuid';
+import useSWR, { SWRResponse } from 'swr';
+
+const visitSyncType = 'visit';
+const patientRegistrationSyncType = 'patient-registration';
 
 interface OfflineVisit extends NewVisitPayload {
   uuid: string;
 }
-
-const visitSyncType = 'visit';
 
 export function setupCacheableRoutes() {
   messageOmrsServiceWorker({
@@ -73,7 +76,7 @@ async function getOfflineVisitForPatient(patientUuid: string) {
 }
 
 async function createOfflineVisitForPatient(patientUuid: string, location: string) {
-  const patientRegistrationSyncItems = await getSynchronizationItems<any>('patient-registration');
+  const patientRegistrationSyncItems = await getSynchronizationItems<any>(patientRegistrationSyncType);
   const isVisitForOfflineRegisteredPatient = patientRegistrationSyncItems.some(
     (item) => item.patientUuid === patientUuid,
   );
@@ -94,7 +97,7 @@ async function createOfflineVisitForPatient(patientUuid: string, location: strin
     dependencies: isVisitForOfflineRegisteredPatient
       ? [
           {
-            type: 'patient-registration',
+            type: patientRegistrationSyncType,
             id: patientUuid,
           },
         ]
@@ -118,5 +121,68 @@ function offlineVisitToVisit(offlineVisit: OfflineVisit) {
     patient: {
       uuid: offlineVisit.patient,
     },
+  };
+}
+
+export function usePatient(patientUuid: string): SWRResponse<fhir.Patient, Error> {
+  return useSWR(`patient/${patientUuid}`, async () => {
+    const onlinePatient = await fetchCurrentPatient(patientUuid).catch(() => undefined);
+    if (onlinePatient?.data) {
+      return onlinePatient.data;
+    }
+
+    const offlinePatient = await getOfflineRegisteredPatientAsFhirPatient(patientUuid);
+    if (offlinePatient) {
+      return offlinePatient;
+    }
+
+    throw new Error(`Could neither retrieve an online patient, nor an offline patient. UUID: ${patientUuid}`);
+  });
+}
+
+async function getOfflineRegisteredPatientAsFhirPatient(patientUuid: string): Promise<fhir.Patient> {
+  const patientRegistrationSyncItems = await getSynchronizationItems<any>(patientRegistrationSyncType);
+  const patientSyncItem = patientRegistrationSyncItems.find((item) => item.patientUuid === patientUuid);
+  return patientSyncItem
+    ? mapPatientCreateFromPatientRegistrationToFhirPatient(patientSyncItem.preliminaryPatient)
+    : undefined;
+}
+
+function mapPatientCreateFromPatientRegistrationToFhirPatient(patient: any = {}): fhir.Patient {
+  // Important:
+  // When changing this code, ideally assume that `patient` can be missing any attribute.
+  // The `fhir.Patient` provides us with the benefit that all properties are nullable and thus
+  // not required (technically, at least). -> Even if we cannot map some props here, we still
+  // provide a valid fhir.Patient object. The various patient chart modules should be able to handle
+  // such missing props correctly (and should be updated if they don't).
+
+  // Gender in the original object only uses a single letter. fhir.Patient expects a full string.
+  const genderMap = {
+    ['M']: 'male',
+    ['F']: 'female',
+    ['O']: 'other',
+  };
+
+  // Mapping inspired by:
+  // https://github.com/openmrs/openmrs-module-fhir/blob/669b3c52220bb9abc622f815f4dc0d8523687a57/api/src/main/java/org/openmrs/module/fhir/api/util/FHIRPatientUtil.java#L36
+  // https://github.com/openmrs/openmrs-esm-patient-management/blob/94e6f637fb37cf4984163c355c5981ea6b8ca38c/packages/esm-patient-search-app/src/patient-search-result/patient-search-result.component.tsx#L21
+  return {
+    _id: patient.uuid,
+    gender: genderMap[patient.person?.gender] ?? 'unknown',
+    birthDate: patient.person?.birthdate ?? patient.person?.birthdateEstimated,
+    deceasedBoolean: patient.dead,
+    deceasedDateTime: patient.deathDate,
+    name: patient.person?.names?.map((name) => ({
+      given: [name.givenName, name.middleName].filter(Boolean),
+      family: name.familyName,
+    })),
+    address: patient.person?.addresses.map((address) => ({
+      city: address.cityVillage,
+      country: address.country,
+      postalCode: address.postalCode,
+      state: address.stateProvince,
+      use: 'home',
+    })),
+    telecom: patient.attributes?.filter((attribute) => attribute.attributeType.name == 'Telephone Number'),
   };
 }

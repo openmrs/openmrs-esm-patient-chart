@@ -7,11 +7,10 @@ import VisitDialog from '../visit/visit-dialog.component';
 import { RouteComponentProps } from 'react-router-dom';
 import { detachAll, ExtensionSlot, useCurrentPatient, useSessionUser } from '@openmrs/esm-framework';
 import ActionMenu from './action-menu.component';
-import { useOfflineVisitForPatient } from '../offline';
+import { useOfflineVisitForPatient, usePatient } from '../offline';
 import { useContextWorkspace } from '../hooks/useContextWindowSize';
 import { WorkspaceWindowState } from '../types';
 import WorkspaceNotification from './workspace-notification.component';
-import { usePatient } from '@openmrs/esm-patient-common-lib';
 
 interface PatientChartParams {
   patientUuid: string;
