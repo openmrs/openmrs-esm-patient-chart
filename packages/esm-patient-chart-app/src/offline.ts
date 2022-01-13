@@ -127,7 +127,7 @@ function offlineVisitToVisit(offlineVisit: OfflineVisit) {
 export function usePatient(patientUuid: string): SWRResponse<fhir.Patient, Error> {
   return useSWR(`patient/${patientUuid}`, async () => {
     const onlinePatient = await fetchCurrentPatient(patientUuid).catch(() => undefined);
-    if (onlinePatient?.data) {
+    if (onlinePatient?.data && !onlinePatient.data.issue) {
       return onlinePatient.data;
     }
 
