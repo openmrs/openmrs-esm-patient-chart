@@ -17,6 +17,7 @@ import {
   launchPatientWorkspace,
   withUnit,
 } from '@openmrs/esm-patient-common-lib';
+import { ConfigObject } from '../config-schema';
 import { patientVitalsBiometricsFormWorkspace } from '../constants';
 import styles from './biometrics-overview.scss';
 
@@ -40,7 +41,7 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({
   const headerTitle = t('biometrics', 'Biometrics');
   const [chartView, setChartView] = React.useState(false);
 
-  const config = useConfig();
+  const config = useConfig() as ConfigObject;
   const { bmiUnit } = config.biometrics;
   const { biometrics, isLoading, isError, isValidating } = useBiometrics(patientUuid, config.concepts);
 
