@@ -7,10 +7,10 @@ interface AllergiesProps {
   basePath: string;
   patient: fhir.Patient;
   patientUuid: string;
-  showAddAllergy: boolean;
+  showAddAllergyButton: boolean;
 }
 
-export default function Allergies({ basePath, patient, patientUuid, showAddAllergy }: AllergiesProps) {
+export default function Allergies({ basePath, patient, patientUuid, showAddAllergyButton }: AllergiesProps) {
   return (
     <AllergiesContext.Provider value={{ patientUuid, patient }}>
       <BrowserRouter basename={`${window.spaBase}${basePath}/allergies`}>
@@ -18,7 +18,7 @@ export default function Allergies({ basePath, patient, patientUuid, showAddAller
           <Route
             exact
             path="/"
-            render={() => <AllergyDetailedSummary patient={patient} showAddAllergy={showAddAllergy} />}
+            render={() => <AllergyDetailedSummary patient={patient} showAddAllergyButton={showAddAllergyButton} />}
           />
         </Switch>
       </BrowserRouter>

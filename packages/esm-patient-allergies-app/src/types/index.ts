@@ -1,10 +1,3 @@
-export interface DataCaptureComponentProps {
-  entryStarted: () => void;
-  entrySubmitted: () => void;
-  entryCancelled: () => void;
-  closeComponent: () => void;
-}
-
 export interface FHIRAllergyResponse {
   entry: Array<{
     resource: FHIRAllergy;
@@ -48,7 +41,7 @@ export interface FHIRAllergy {
     reference: string;
     type: string;
   };
-  reaction: Array<FHIRAllergicReaction>;
+  reaction: Array<AllergicReaction>;
   recordedDate: string;
   recorder: {
     display: string;
@@ -68,16 +61,14 @@ export interface ExtensionData {
   url: string;
 }
 
-export interface FHIRAllergicReaction {
-  manifestation: Array<FHIRAllergyManifestation>;
+export interface AllergicReaction {
+  manifestation: Array<{
+    coding: CodingData;
+  }>;
   severity: string;
   substance: {
     coding: Array<CodingData>;
   };
-}
-
-export interface FHIRAllergyManifestation {
-  coding: CodingData;
 }
 
 export interface CodingData {
@@ -85,103 +76,6 @@ export interface CodingData {
   display: string;
   extension?: Array<ExtensionData>;
   system?: string;
-}
-
-export interface AllergyData {
-  allergen: {
-    allergenType: string;
-    codedAllergen: {
-      answers: [];
-      attrributes: [];
-      conceptClass: DisplayMetadata;
-      display: string;
-      links: Links;
-      mappings: Array<DisplayMetadata>;
-      name: {
-        conceptNameType: string;
-        display: string;
-        locale: string;
-        name: string;
-        uuid: string;
-      };
-      names: Array<DisplayMetadata>;
-      setMembers: [];
-      uuid: string;
-    };
-  };
-  auditInfo: {
-    changedBy: DisplayMetadata;
-    creator: DisplayMetadata;
-    dateCreated: string;
-    dateChanged: string;
-  };
-  comment: string;
-  display: string;
-  links: Links;
-  reactions: [
-    {
-      reaction: AllergicReaction;
-    },
-  ];
-  severity: {
-    name: {
-      conceptNameType: string;
-      display: string;
-      locale: string;
-      name: string;
-      uuid: string;
-    };
-    names: Array<DisplayMetadata>;
-    uuid: string;
-  };
-}
-
-export type Allergen = {
-  answers: [];
-  attributes: [];
-  conceptClass: DisplayMetadata;
-  dataType: DisplayMetadata;
-  descriptions: [];
-  display: string;
-  links: Links;
-  mappings: Array<DisplayMetadata>;
-  name: {
-    display: string;
-    links: Links;
-    uuid: string;
-    conceptTypeName?: string;
-    locale: string;
-    localePreferred: boolean;
-    name: string;
-    resourceVersion: string;
-  };
-  names: Array<DisplayMetadata>;
-  setMembers: [];
-  uuid: string;
-};
-
-export type AllergicReaction = {
-  answers: [];
-  attributes: [];
-  conceptClass: DisplayMetadata;
-  datatype: DisplayMetadata;
-  descriptions: Array<DisplayMetadata>;
-  name: {
-    display: string;
-  };
-  display: string;
-  uuid: string;
-};
-
-export type Links = Array<{
-  rel: string;
-  uri: string;
-}>;
-
-export interface DisplayMetadata {
-  display?: string;
-  links?: Links;
-  uuid?: string;
 }
 
 export interface OpenMRSResource {

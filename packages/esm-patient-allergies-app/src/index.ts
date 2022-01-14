@@ -56,8 +56,8 @@ function setupOpenMRS() {
         meta: {
           columnSpan: 4,
         },
-        online: { showAddAllergy: true },
-        offline: { showAddAllergy: false },
+        online: { showAddAllergyButton: true },
+        offline: { showAddAllergyButton: false },
       },
       {
         id: 'allergies-details-widget',
@@ -66,8 +66,8 @@ function setupOpenMRS() {
         meta: {
           columnSpan: 1,
         },
-        online: { showAddAllergy: true },
-        offline: { showAddAllergy: false },
+        online: { showAddAllergyButton: true },
+        offline: { showAddAllergyButton: false },
       },
       {
         id: 'allergies-summary-dashboard',
@@ -75,8 +75,8 @@ function setupOpenMRS() {
         order: 6,
         load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
         meta: dashboardMeta,
-        online: { showAddAllergy: true },
-        offline: { showAddAllergy: true },
+        online: { showAddAllergyButton: true },
+        offline: { showAddAllergyButton: true },
       },
       {
         id: patientAllergiesFormWorkspace,
@@ -89,8 +89,26 @@ function setupOpenMRS() {
         },
       },
       {
+        id: 'patient-details-tile',
+        slot: 'patient-details-header-slot',
+        order: 1,
+        load: getAsyncLifecycle(
+          () => import('../../esm-patient-chart-app/src/ui-components/patient-details-tile.component'),
+          options,
+        ),
+      },
+      {
+        id: 'weight-tile',
+        slot: 'patient-details-header-slot',
+        order: 2,
+        load: getAsyncLifecycle(
+          () => import('../../esm-patient-biometrics-app/src/biometrics/weight-tile.component'),
+          options,
+        ),
+      },
+      {
         id: 'allergy-tile',
-        slot: 'visit-form-header-slot',
+        slot: 'patient-details-header-slot',
         order: 3,
         load: getAsyncLifecycle(() => import('./allergies/allergies-tile.component'), options),
       },

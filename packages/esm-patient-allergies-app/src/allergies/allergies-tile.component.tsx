@@ -10,7 +10,7 @@ interface AllergyTileInterface {
 
 const AllergyTile: React.FC<AllergyTileInterface> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const { data: allergies, isLoading } = useAllergies(patientUuid);
+  const { allergies, isLoading } = useAllergies(patientUuid);
 
   if (isLoading) {
     return <InlineLoading role="progressbar" description={`${t('loading', 'Loading')} ...`} />;

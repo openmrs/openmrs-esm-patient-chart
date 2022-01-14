@@ -1,0 +1,148 @@
+@import '../../root.scss';
+
+.header {
+  border-bottom: 0.0625rem solid $grey-2;
+  margin: 0;
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 50% 10% 1fr;
+  margin: 0.5rem 1rem;
+  width: 100%;
+}
+
+.container {
+  border: solid 1px $ui-03;
+  margin: 0rem 1rem 1rem;
+
+  &:first-of-type {
+    margin-bottom: 2rem;
+  }
+
+  &:last-of-type {
+    margin-top: 2.5rem;
+  }
+}
+
+.heading {
+  @include carbon--type-style("productive-heading-03");
+  color: $text-01;
+  margin: 1rem 1rem 0.5rem;
+}
+
+.section {
+  &:not(:first-of-type) {
+    margin-bottom: 2rem;
+  }
+
+  &:last-of-type {
+    margin-top: 2rem;
+  }
+}
+
+.wrapperContainer fieldset {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 100%;
+}
+
+.wrapperContainer :global(.bx--radio-button__label) {
+  justify-content: flex-start;
+}
+
+.sectionHeading {
+  @include carbon--type-style('productive-heading-02');  
+  color: $text-01;
+  margin: 1rem 1rem 0.5rem;
+}
+
+.radio {
+  margin: 1rem 0rem;
+
+  label {
+    justify-content: flex-start;
+  }
+}
+
+.checkbox {
+  &:not(:first-child) {
+    // subtract default checkbox wrapper margins
+    margin: calc(1rem - 0.1875rem - 0.25rem) 0rem;
+  }
+}
+
+.input {
+  margin: 0rem 1rem 1rem;
+}
+
+.checkboxContainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.wrapper { 
+  margin: 1rem;
+
+  &:last-of-type {
+    margin-top: 1.5rem;
+  }
+}
+
+.textbox {
+  width: 26.375rem;
+}
+
+.button {
+  height: 4rem;
+  display: flex;
+  align-content: flex-start;
+  align-items: baseline;
+  min-width: 50%;
+}
+
+.tablet {
+  padding: 0rem;
+}
+
+.desktopButtons {
+  margin-top: 2rem;
+}
+
+.tabletButtons {
+  margin-top: 2rem;
+  padding: 1.5rem 1rem;
+  background-color: $ui-02;
+}
+
+.desktop {
+  padding: 0rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.desktopContainer {
+  background-color: $ui-01;
+}
+
+.tabletContainer {
+  background-color: white;
+}
+
+/* Desktop */
+:global(.omrs-breakpoint-gt-tablet) {
+  .form {
+    height: calc(100vh - 6rem);
+  }
+}
+
+/* Tablet */
+:global(.omrs-breakpoint-lt-desktop) {
+  .form {
+    height: calc(100vh - 9rem);
+  }
+}

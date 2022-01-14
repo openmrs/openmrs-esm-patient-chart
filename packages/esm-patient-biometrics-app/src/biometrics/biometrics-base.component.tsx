@@ -43,10 +43,9 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({
 
   const config = useConfig() as ConfigObject;
   const { bmiUnit } = config.biometrics;
+  const { biometrics, isLoading, isError, isValidating } = useBiometrics(patientUuid, config.concepts);
 
   const { data: conceptUnits } = useVitalsConceptMetadata();
-
-  const { data: biometrics, isLoading, isError, isValidating } = useBiometrics(patientUuid);
 
   const launchBiometricsForm = React.useCallback(
     () => launchPatientWorkspace(patientVitalsBiometricsFormWorkspace),
@@ -60,6 +59,7 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({
     { key: 'bmi', header: `BMI (${bmiUnit})` },
     { key: 'muac', header: withUnit('MUAC', conceptUnits.get(config.concepts.muacUuid) ?? '') },
   ];
+
   const tableRows = React.useMemo(
     () =>
       biometrics?.map((data, index) => {
