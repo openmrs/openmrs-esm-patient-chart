@@ -12,20 +12,12 @@
   width: 100%;
 }
 
-.tablet { 
-  background-color: white;
-}
-
-.desktop {
-  background-color: $ui-01;
-}
-
 .container {
   border: solid 1px $ui-03;
-  margin: 1rem;
-  
+  margin: 0rem 1rem 1rem;
+
   &:first-of-type {
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
   }
 
   &:last-of-type {
@@ -97,22 +89,60 @@
   }
 }
 
+.textbox {
+  width: 26.375rem;
+}
+
 .button {
+  height: 4rem;
+  display: flex;
+  align-content: flex-start;
+  align-items: baseline;
   min-width: 50%;
 }
 
-.buttonContainer {
-  margin-top: 2rem;
+.tablet {
+  padding: 0rem;
+}
 
-  button {
-    height: 4rem;
-    display: flex;
-    align-content: flex-start;
-    align-items: flex-start;
-    flex-direction: row;
+.desktopButtons {
+  margin-top: 2rem;
+}
+
+.tabletButtons {
+  margin-top: 2rem;
+  padding: 1.5rem 1rem;
+  background-color: $ui-02;
+}
+
+.desktop {
+  padding: 0rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.desktopContainer {
+  background-color: $ui-01;
+}
+
+.tabletContainer {
+  background-color: white;
+}
+
+/* Desktop */
+:global(.omrs-breakpoint-gt-tablet) {
+  .form {
+    height: calc(100vh - 6rem);
   }
 }
 
-.textbox {
-  width: 26.375rem;
+/* Tablet */
+:global(.omrs-breakpoint-lt-desktop) {
+  .form {
+    height: calc(100vh - 9rem);
+  }
 }
