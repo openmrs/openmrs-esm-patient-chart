@@ -48,8 +48,7 @@
 
 .allergyFormTabs fieldset {
   display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+  flex-flow: row wrap;
 }
 
 .checkBoxWrapper {
@@ -64,4 +63,41 @@
 .checkBoxWrapper div {
   width: 14rem;
   height: $spacing-07;
+}
+
+.button {
+  height: 4rem;
+  display: flex;
+  align-content: flex-start;
+  align-items: baseline;
+  min-width: 50%;
+}
+
+.tablet {
+  padding: 1.5rem 1rem;
+  background-color: $ui-02;
+}
+
+.desktop {
+  padding: 0rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Desktop */
+:global(.omrs-breakpoint-gt-tablet) {
+  .form {
+    height: calc(100vh - 6rem);
+  }
+}
+
+/* Tablet */
+:global(.omrs-breakpoint-lt-desktop) {
+  .form {
+    height: calc(100vh - 3rem);
+  }
 }

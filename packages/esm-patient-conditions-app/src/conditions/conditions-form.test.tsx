@@ -61,7 +61,7 @@ describe('ConditionsForm: ', () => {
     expect(screen.getByRole('radio', { name: 'Inactive' })).not.toBeChecked();
 
     const cancelButton = screen.getByRole('button', { name: /Cancel/i });
-    const submitButton = screen.getByRole('button', { name: /Save & close/i });
+    const submitButton = screen.getByRole('button', { name: /Save and close/i });
     expect(cancelButton).toBeInTheDocument();
     expect(cancelButton).not.toBeDisabled();
     expect(submitButton).toBeInTheDocument();
@@ -151,7 +151,7 @@ describe('ConditionsForm: ', () => {
       renderConditionsForm();
 
       cancelButton = screen.getByRole('button', { name: /Cancel/i });
-      submitButton = screen.getByRole('button', { name: /Save & close/i });
+      submitButton = screen.getByRole('button', { name: /Save and close/i });
       activeStatusInput = screen.getByRole('radio', { name: 'Active' });
       conditionSearchInput = screen.getByRole('searchbox', { name: /Enter condition/i });
       onsetDateInput = screen.getByRole('textbox', { name: '' });

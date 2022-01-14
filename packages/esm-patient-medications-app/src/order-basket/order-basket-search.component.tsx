@@ -26,14 +26,12 @@ export default function OrderBasketSearch({ encounterUuid, onSearchResultClicked
         labelText={t('searchFieldPlaceholder', 'Search for an order (e.g. "Aspirin")')}
         onChange={(e) => setSearchTerm(e.currentTarget?.value ?? '')}
       />
-      <div style={{ margin: '1rem' }}>
-        <OrderBasketSearchResults
-          encounterUuid={encounterUuid}
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          onSearchResultClicked={onSearchResultClicked}
-        />
-      </div>
+      <OrderBasketSearchResults
+        encounterUuid={encounterUuid}
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        onSearchResultClicked={onSearchResultClicked}
+      />
     </div>
   );
 }

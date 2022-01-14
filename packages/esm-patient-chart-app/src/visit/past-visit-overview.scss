@@ -2,6 +2,30 @@
 @import "~carbon-components/src/globals/scss/vars";
 @import "~carbon-components/src/globals/scss/mixins";
 
-.buttonContainer {
-    margin-top: $spacing-05;
+.button {
+  height: 4rem;
+  display: flex;
+  align-content: flex-start;
+  align-items: baseline;
+  min-width: 50%;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Desktop */
+:global(.omrs-breakpoint-gt-tablet) {
+  .container {
+    height: calc(100vh - 6rem);
+  }
+}
+
+/* Tablet */
+:global(.omrs-breakpoint-lt-desktop) {
+  .container {
+    height: calc(100vh - 3rem);
+  }
 }

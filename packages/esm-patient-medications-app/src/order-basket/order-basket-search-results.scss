@@ -1,5 +1,9 @@
 @import "../root";
 
+.container {
+  margin: 1rem 1rem 0.5rem;
+}
+
 .desktopSearchResultTile {
   margin-top: 5px;
   border-left: 4px solid $brand-teal-01;

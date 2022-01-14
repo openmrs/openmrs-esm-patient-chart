@@ -16,13 +16,6 @@ $actionPanelOffset: 48px;
   z-index: 1001;
 }
 
-:global(.omrs-breakpoint-gt-tablet) .actionPanel {
-  right: $actionPanelOffset;
-  background: #fff;
-  z-index: auto;
-  border: 1px solid #a8a8a8;
-}
-
 .iconButton {
   width: $icon-button-size;
   height: $icon-button-size;
@@ -78,6 +71,13 @@ $actionPanelOffset: 48px;
   @extend .productiveHeading01;
 }
 
+/* Desktop */
+:global(.omrs-breakpoint-gt-tablet) .actionPanel {
+  right: $actionPanelOffset;
+  background: #fff;
+  z-index: auto;
+}
+
 :global(.omrs-breakpoint-gt-tablet) .warningButton {
   position: absolute;
   top: 0;
@@ -85,7 +85,7 @@ $actionPanelOffset: 48px;
   fill: $danger !important;
 }
 
-
+/* Tablet */
 :global(.omrs-breakpoint-lt-desktop) .warningButton {
   position: absolute;
   top: 0;

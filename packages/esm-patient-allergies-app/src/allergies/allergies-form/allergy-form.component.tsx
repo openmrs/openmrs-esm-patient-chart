@@ -19,6 +19,7 @@ import {
   RadioButton,
   Button,
   RadioButtonGroup,
+  ButtonSet,
 } from 'carbon-components-react';
 import { OpenMRSResource } from '../../types';
 
@@ -215,146 +216,150 @@ const AllergyForm: React.FC<AllergyFormProps> = ({ isTablet, closeWorkspace, pat
   ]);
 
   return (
-    <main className={styles.allergyFormWrapper}>
+    <main>
       {status === ActionTypes.pending && <SearchSkeleton />}
       {status === ActionTypes.resolved && (
-        <>
-          <div>
-            <header className={styles.productiveHeading03}>{t('allergenAndReaction', 'Allergen and reactions')}</header>
-            <div className={styles.sectionWrapper}>
-              <section>
-                <header className={styles.productiveHeading02}>
-                  {t('selectTheAllergens', 'Select the allergens')}
-                </header>
-                <Tabs
-                  onSelectionChange={handleAllergenTypeChange}
-                  tabContentClassName={styles.allergyFormTabs}
-                  scrollIntoView={true}
-                >
-                  <Tab id="tab-1" label={t('drug', 'Drug')}>
-                    <AllergyFormTab
-                      name={'drug'}
-                      allergens={allergenAndReaction?.drugAllergens}
-                      selectedAllergen={selectedAllergen}
-                      handleChange={setSelectedAllergen}
+        <div className={styles.form}>
+          <div className={styles.allergyFormWrapper}>
+            <div>
+              <header className={styles.productiveHeading03}>
+                {t('allergenAndReaction', 'Allergen and reactions')}
+              </header>
+              <div className={styles.sectionWrapper}>
+                <section>
+                  <header className={styles.productiveHeading02}>
+                    {t('selectTheAllergens', 'Select the allergens')}
+                  </header>
+                  <Tabs
+                    onSelectionChange={handleAllergenTypeChange}
+                    tabContentClassName={styles.allergyFormTabs}
+                    scrollIntoView={true}
+                  >
+                    <Tab id="tab-1" label={t('drug', 'Drug')}>
+                      <AllergyFormTab
+                        name={'drug'}
+                        allergens={allergenAndReaction?.drugAllergens}
+                        selectedAllergen={selectedAllergen}
+                        handleChange={setSelectedAllergen}
+                      />
+                    </Tab>
+                    <Tab id="tab-2" label={t('food', 'Food')}>
+                      <AllergyFormTab
+                        name="food"
+                        allergens={allergenAndReaction?.foodAllergens}
+                        selectedAllergen={selectedAllergen}
+                        handleChange={setSelectedAllergen}
+                      />
+                    </Tab>
+                    <Tab id="tab-3" label={t('environmental', 'Environmental')}>
+                      <AllergyFormTab
+                        name="environment"
+                        allergens={allergenAndReaction?.environmentalAllergens}
+                        selectedAllergen={selectedAllergen}
+                        handleChange={setSelectedAllergen}
+                      />
+                    </Tab>
+                  </Tabs>
+                  {selectedAllergen === otherConceptUuid && (
+                    <TextInput
+                      light={isTablet}
+                      id="otherAllergen"
+                      invalidText={t('otherAllergenInvalidText', 'Other allergen is required')}
+                      labelText={t('pleaseSpecifyOtherReaction', 'Please specify other allergen')}
+                      onChange={(event) => setOtherAllergen(event.target.value)}
+                      placeholder={t('enterOtherReaction', 'Type in other Allergen')}
                     />
-                  </Tab>
-                  <Tab id="tab-2" label={t('food', 'Food')}>
-                    <AllergyFormTab
-                      name="food"
-                      allergens={allergenAndReaction?.foodAllergens}
-                      selectedAllergen={selectedAllergen}
-                      handleChange={setSelectedAllergen}
+                  )}
+                </section>
+                <section>
+                  <header className={styles.productiveHeading02}>
+                    {t('selectTheReactions', 'Select the reactions')}
+                  </header>
+                  <div className={styles.checkBoxWrapper}>
+                    {allergenAndReaction?.allergyReaction?.map((reaction, index) => (
+                      <Checkbox
+                        onChange={handlePatientReactionChange}
+                        key={index}
+                        labelText={reaction.display}
+                        id={reaction.uuid}
+                        value={reaction.display}
+                      />
+                    ))}
+                  </div>
+                  {patientReactions.includes(otherConceptUuid) && (
+                    <TextInput
+                      light={isTablet}
+                      id="otherReaction"
+                      invalidText={t('otherReactionInvalidText', 'Other reaction is required')}
+                      labelText={t('pleaseSpecifyOtherReaction', 'Please specify other reaction')}
+                      onChange={(event) => setOtherReaction(event.target.value)}
+                      placeholder={t('enterOtherReaction', 'Type in other reaction')}
                     />
-                  </Tab>
-                  <Tab id="tab-3" label={t('environmental', 'Environmental')}>
-                    <AllergyFormTab
-                      name="environment"
-                      allergens={allergenAndReaction?.environmentalAllergens}
-                      selectedAllergen={selectedAllergen}
-                      handleChange={setSelectedAllergen}
-                    />
-                  </Tab>
-                </Tabs>
-                {selectedAllergen === otherConceptUuid && (
-                  <TextInput
+                  )}
+                </section>
+              </div>
+            </div>
+            <div>
+              <header className={styles.productiveHeading03}>
+                {t('severityAndDateOfOnset', 'Severity and date of onset')}
+              </header>
+              <div className={styles.sectionWrapper}>
+                <section>
+                  <header className={styles.productiveHeading02}>
+                    {t('severityOfWorstReaction', 'Severity of worst reaction')}
+                  </header>
+                  <RadioButtonGroup
+                    onChange={(event) => setSeverityOfReaction(event.toString())}
+                    name="severityOfWorstReaction"
+                    valueSelected={severityOfReaction}
+                  >
+                    <RadioButton id="mild" labelText={t('mild', 'Mild')} value={mildReactionUuid} />
+                    <RadioButton id="moderate" labelText={t('moderate', 'Moderate')} value={moderateReactionUuid} />
+                    <RadioButton id="severe" labelText={t('severe', 'Severe')} value={severeReactionUuid} />
+                  </RadioButtonGroup>
+                </section>
+                <section>
+                  <header className={styles.productiveHeading02}>{t('dateAndComments', 'Date and comments')}</header>
+                  <DatePicker
                     light={isTablet}
-                    id="otherAllergen"
-                    invalidText={t('otherAllergenInvalidText', 'Other allergen is required')}
-                    labelText={t('pleaseSpecifyOtherReaction', 'Please specify other allergen')}
-                    onChange={(event) => setOtherAllergen(event.target.value)}
-                    placeholder={t('enterOtherReaction', 'Type in other Allergen')}
-                  />
-                )}
-              </section>
-              <section>
-                <header className={styles.productiveHeading02}>
-                  {t('selectTheReactions', 'Select the reactions')}
-                </header>
-                <div className={styles.checkBoxWrapper}>
-                  {allergenAndReaction?.allergyReaction?.map((reaction, index) => (
-                    <Checkbox
-                      onChange={handlePatientReactionChange}
-                      key={index}
-                      labelText={reaction.display}
-                      id={reaction.uuid}
-                      value={reaction.display}
+                    maxDate={new Date().toISOString()}
+                    dateFormat="m/d/Y"
+                    datePickerType="single"
+                  >
+                    <DatePickerInput
+                      id="date-of-first-onset"
+                      placeholder="mm/dd/yyyy"
+                      labelText={t('dateOfFirstOnset', 'Date of first onset')}
+                      type="text"
+                      size="xl"
+                      style={{ width: '18rem' }}
+                      onChange={(event) => setDateOfOnset(event.target.valueAsDate)}
                     />
-                  ))}
-                </div>
-                {patientReactions.includes(otherConceptUuid) && (
-                  <TextInput
+                  </DatePicker>
+                  <TextArea
                     light={isTablet}
-                    id="otherReaction"
-                    invalidText={t('otherReactionInvalidText', 'Other reaction is required')}
-                    labelText={t('pleaseSpecifyOtherReaction', 'Please specify other reaction')}
-                    onChange={(event) => setOtherReaction(event.target.value)}
-                    placeholder={t('enterOtherReaction', 'Type in other reaction')}
+                    cols={25}
+                    onChange={(event) => setComment(event.target.value)}
+                    id="comments"
+                    invalidText={t('invalidComment', 'Invalid comment, try again')}
+                    labelText={t('comments', 'Comments')}
+                    placeholder={t('typeAnyAdditional', 'Type any additional comments here')}
+                    rows={4}
+                    style={{ width: '26.375rem' }}
                   />
-                )}
-              </section>
+                </section>
+              </div>
             </div>
           </div>
-          <div>
-            <header className={styles.productiveHeading03}>
-              {t('severityAndDateOfOnset', 'Severity and date of onset')}
-            </header>
-            <div className={styles.sectionWrapper}>
-              <section>
-                <header className={styles.productiveHeading02}>
-                  {t('severityOfWorstReaction', 'Severity of worst reaction')}
-                </header>
-                <RadioButtonGroup
-                  onChange={(event) => setSeverityOfReaction(event.toString())}
-                  name="severityOfWorstReaction"
-                  valueSelected={severityOfReaction}
-                >
-                  <RadioButton id="mild" labelText={t('mild', 'Mild')} value={mildReactionUuid} />
-                  <RadioButton id="moderate" labelText={t('moderate', 'Moderate')} value={moderateReactionUuid} />
-                  <RadioButton id="severe" labelText={t('severe', 'Severe')} value={severeReactionUuid} />
-                </RadioButtonGroup>
-              </section>
-              <section>
-                <header className={styles.productiveHeading02}>{t('dateAndComments', 'Date and comments')}</header>
-                <DatePicker
-                  light={isTablet}
-                  maxDate={new Date().toISOString()}
-                  dateFormat="m/d/Y"
-                  datePickerType="single"
-                >
-                  <DatePickerInput
-                    id="date-of-first-onset"
-                    placeholder="mm/dd/yyyy"
-                    labelText={t('dateOfFirstOnset', 'Date of first onset')}
-                    type="text"
-                    size="xl"
-                    style={{ width: '18rem' }}
-                    onChange={(event) => setDateOfOnset(event.target.valueAsDate)}
-                  />
-                </DatePicker>
-                <TextArea
-                  light={isTablet}
-                  cols={25}
-                  onChange={(event) => setComment(event.target.value)}
-                  id="comments"
-                  invalidText={t('invalidComment', 'Invalid comment, try again')}
-                  labelText={t('comments', 'Comments')}
-                  placeholder={t('typeAnyAdditional', 'Type any additional comments here')}
-                  rows={4}
-                  style={{ width: '26.375rem' }}
-                />
-              </section>
-            </div>
-          </div>
-          <div>
-            <section className={styles.buttonWrapper}>
-              <Button onClick={closeWorkspace} kind="secondary">
-                {t('discard', 'Discard')}
-              </Button>
-              <Button onClick={handleSavePatientAllergy}>{t('saveAndClose', 'Save and close')}</Button>
-            </section>
-          </div>
-        </>
+          <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
+            <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
+              {t('discard', 'Discard')}
+            </Button>
+            <Button className={styles.button} kind="primary" onClick={handleSavePatientAllergy} type="submit">
+              {t('saveAndClose', 'Save and close')}
+            </Button>
+          </ButtonSet>
+        </div>
       )}
       {status === ActionTypes.error && <ErrorState headerTitle={'Allergy Form Error'} error={error} />}
     </main>

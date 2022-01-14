@@ -68,8 +68,8 @@ describe('VitalsBiometricsForm: ', () => {
     expect(screen.getByText(/bmi \(calc.\)/i)).toBeInTheDocument();
     expect(screen.getByText(/kg \/ m²/i)).toBeInTheDocument();
     expect(screen.getByRole('spinbutton', { name: /muac/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /sign & save/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /discard/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /save and close/i })).toBeInTheDocument();
   });
 
   it('computes BMI from the given height and weight values', async () => {

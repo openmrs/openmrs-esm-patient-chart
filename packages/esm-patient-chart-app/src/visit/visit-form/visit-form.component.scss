@@ -13,7 +13,8 @@
 }
 
 .grid {
-  padding: 0;
+  margin: 0rem;
+  padding: 0rem;
 }
 
 .gridRow {
@@ -27,20 +28,6 @@
 
 .contentSwitcher {
   height: $spacing-09;
-}
-
-.buttonContainer {
-  display: flex;
-  margin: $spacing-05;
-}
-
-.buttonContainer button {
-  height: $spacing-10;
-  display: flex;
-  align-content: flex-start;
-  align-items: flex-start;
-  flex-direction: row;
-  margin-left: $spacing-01;
 }
 
 .right {
@@ -58,4 +45,41 @@
   grid-template-columns: 50% 10% 1fr;
   margin: 0.5rem 1rem;
   width: 100%;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.button {
+  height: 4rem;
+  display: flex;
+  align-content: flex-start;
+  align-items: baseline;
+  min-width: 50%;
+}
+
+.tablet {
+  padding: 1.5rem 1rem;
+  background-color: $ui-02;
+}
+
+.desktop {
+  padding: 0rem;
+}
+
+/* Desktop */
+:global(.omrs-breakpoint-gt-tablet) {
+  .form {
+    height: calc(100vh - 6rem);
+  }
+}
+
+/* Tablet */
+:global(.omrs-breakpoint-lt-desktop) {
+  .form {
+    height: calc(100vh - 3rem);
+  }
 }

@@ -70,7 +70,7 @@ const PastVisitOverview: React.FC<PastVisitOverviewProps> = ({ patientUuid }) =>
   }
   if (pastVisits?.length) {
     return (
-      <>
+      <div className={styles.container}>
         <DataTable headers={headerData} rows={rowData}>
           {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
             <TableContainer title={t('pastVisits', 'Past Visits')}>
@@ -118,12 +118,10 @@ const PastVisitOverview: React.FC<PastVisitOverviewProps> = ({ patientUuid }) =>
             </TableContainer>
           )}
         </DataTable>
-        <div className={styles.buttonContainer}>
-          <Button onClick={handleClose} kind="secondary">
-            {t('cancel', 'Cancel')}
-          </Button>
-        </div>
-      </>
+        <Button className={styles.button} onClick={handleClose} kind="secondary">
+          {t('cancel', 'Cancel')}
+        </Button>
+      </div>
     );
   }
 };
