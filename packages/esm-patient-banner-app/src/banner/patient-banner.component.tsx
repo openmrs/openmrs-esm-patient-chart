@@ -12,7 +12,10 @@ import { Button } from 'carbon-components-react';
 import { ExtensionSlot, age } from '@openmrs/esm-framework';
 
 interface PatientBannerProps {
-  patient: Pick<fhir.Patient, 'id' | 'name' | 'gender' | 'birthDate' | 'identifier' | 'address' | 'telecom'>;
+  patient: Pick<
+    fhir.Patient,
+    'id' | 'name' | 'gender' | 'birthDate' | 'identifier' | 'address' | 'telecom' | 'deceasedBoolean'
+  >;
   patientUuid: string;
   onClick?: (patientUuid: string) => void;
   onTransition?: () => void;
@@ -63,7 +66,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, onC
               <span className={styles.patientName}>{patientName}</span>
               <ExtensionSlot
                 extensionSlotName="patient-banner-tags-slot"
-                state={{ patientUuid }}
+                state={{ patientUuid, patient }}
                 className={styles.flexRow}
               />
             </div>

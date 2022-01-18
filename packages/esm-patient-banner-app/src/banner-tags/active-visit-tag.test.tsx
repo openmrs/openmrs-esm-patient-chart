@@ -37,5 +37,5 @@ describe('ActiveVisitBannerTag: ', () => {
 });
 
 function renderActiveVisitBannerTag() {
-  render(<ActiveVisitBannerTag patientUuid={mockPatient.id} />);
+  render(<ActiveVisitBannerTag patientUuid={mockPatient.id} patient={mockPatient} />);
 }
