@@ -1,59 +1,97 @@
 .error-text {
-    color: var(--omrs-color-danger);
-}
-
-.error {
-    margin-left: 30px !important;
+  color: var(--omrs-color-danger);
 }
 
 .title-icon-size {
-    height:0.8rem;
-    width:0.8rem;
+  height: 0.8rem;
+  width: 0.8rem;
 }
 
 .no-errors {
-    display: none;
+  display: none;
 }
-.sidebar.open {
-    margin-top: -1px;
-    width: 55%;
-    height: 80%;
-    padding: 4px;
-    overflow-y: scroll;
-    overflow-x: hidden;
+
+.sidebar .open {
+  margin-top: -1px;
+  width: 55%;
+  height: 80%;
+  padding: 4px;
+  overflow-y: scroll;
+  overflow-x: hidden;
 }
-.sidebar.closed {
-    height: 80px;
-    width: 28px;
-    margin-top: -1px;
+
+.sidebar .closed {
+  height: 80px;
+  width: 28px;
+  margin-top: -1px;
 }
-.error-content.closed {
-    display: none;
+
+.error-content .closed {
+  display: none;
 }
 
 .error-content {
-    border-top: 1px solid lightgray;
-    margin: -4px;
-    padding: 4px;
+  border-top: 1px solid lightgray;
+  margin: -4px;
+  padding: 4px;
 }
 
-.error-title.closed {
-    transform: rotate(90deg);
-    margin-top: 14px;
+.error-title .closed {
+  transform: rotate(90deg);
+  margin-top: 14px;
 }
 
-.no-padding{
-    margin-left: -2rem;
-    margin-right: -2rem;
-}
-.button-margin {
-    margin: 2rem;
+.no-padding {
+  margin-left: -2rem;
+  margin-right: -2rem;
 }
 
 .center {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100vh;
 }
 
+.form-container {
+  font-size: 40px !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.button-set button {
+  height: 4rem;
+  align-items: baseline;
+  min-width: 50%;
+}
+
+/* Desktop */
+:host-context(.omrs-breakpoint-gt-tablet) .form-container {
+  height: calc(100vh - 6rem);
+}
+
+:host-context(.omrs-breakpoint-gt-tablet) .button-set {
+  padding: 0rem;
+}
+
+/* Tablet */
+:host-context(.omrs-breakpoint-lt-desktop) .form-container {
+  height: calc(100vh - 3rem);
+}
+
+:host-context(.omrs-breakpoint-lt-desktop) .button-set {
+  padding: 1.5rem 1rem;
+  background-color: white;
+}
+
+.loader-container {
+  height: 100vh;
+}
+
+.loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50%;
+}
