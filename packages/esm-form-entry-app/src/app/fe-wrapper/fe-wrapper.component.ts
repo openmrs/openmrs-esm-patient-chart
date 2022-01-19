@@ -21,7 +21,7 @@ import { EncounterResourceService } from '../openmrs-api/encounter-resource.serv
 import { singleSpaPropsSubject, SingleSpaProps } from '../../single-spa-props';
 import { Encounter, FormSchema, LoggedInUser, Order } from '../types';
 // @ts-ignore
-import { showToast, detach, showNotification, FHIRCode, FHIRResource } from '@openmrs/esm-framework';
+import { showToast, detach, showNotification } from '@openmrs/esm-framework';
 import { PatientPreviousEncounterService } from '../openmrs-api/patient-previous-encounter.service';
 
 @Component({
@@ -90,6 +90,7 @@ export class FeWrapperComponent implements OnInit {
         // TODO: Handle errors
         console.error('Error rendering form', err);
         this.loadingError = 'Error loading form';
+        this.isLoading = false;
       },
     );
   }
@@ -97,19 +98,14 @@ export class FeWrapperComponent implements OnInit {
   public displayLabOrdersNotification() {
     const orders =
       this.submittedOrder.map((order, index) => ` ${index + 1} : ${order.display} : ${order.orderNumber}`).join() ?? '';
-    showToast({
-      critical: true,
-      kind: 'success',
-      description: `The form has been submitted successfully`,
-      title: this.formName,
-    });
-    showNotification({
-      title: 'Lab order(s) generated',
-      kind: 'success',
-      critical: true,
-      description: orders,
-    });
-    this.closeForm();
+    if (orders.length) {
+      showNotification({
+        title: 'Lab order(s) generated',
+        kind: 'success',
+        critical: true,
+        description: orders,
+      });
+    }
   }
 
   public onSubmit(event: any) {
@@ -127,14 +123,13 @@ export class FeWrapperComponent implements OnInit {
                   this.displayLabOrdersNotification();
                 }
               });
-          } else {
             showToast({
               critical: true,
               kind: 'success',
               description: `The form has been submitted successfully`,
               title: this.formName,
             });
-            detach('patient-chart-workspace-slot', 'patient-form-entry-workspace');
+            this.closeForm();
           }
         },
         (error) => {
@@ -237,6 +232,16 @@ export class FeWrapperComponent implements OnInit {
     }
   }
 
+  private loadPatientPreviousEncounters(data, subject) {
+    this.patientPreviousEncounter
+      .getPreviousEncounter(data.formSchema.encounterType?.uuid, this.singleSpaProps.patient.id)
+      .then((prevEnc) => {
+        this.prevEncounter = prevEnc ? prevEnc : Object.create({});
+        this.createForm();
+        subject.next(this.form);
+      });
+  }
+
   public launchForm(): Observable<Form> {
     const subject = new ReplaySubject<Form>(1);
     const loadForm = () => {
@@ -244,13 +249,12 @@ export class FeWrapperComponent implements OnInit {
         .pipe(take(1))
         .subscribe(
           (data) => {
-            this.patientPreviousEncounter
-              .getPreviousEncounter(data.formSchema.encounterType?.uuid, this.singleSpaProps.patient.id)
-              .then((prevEnc) => {
-                this.prevEncounter = prevEnc ? prevEnc : Object.create({});
-                this.createForm();
-                subject.next(this.form);
-              });
+            if (this.singleSpaProps.isOffline) {
+              this.loadPatientPreviousEncounters(data, subject);
+            } else {
+              this.createForm();
+              subject.next(this.form);
+            }
           },
           (err) => {
             subject.error(err);

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { detach, ExtensionSlot, useVisit } from '@openmrs/esm-framework';
+import { detach, ExtensionSlot, useConnectivity, useVisit } from '@openmrs/esm-framework';
 import { FormEntryProps, formEntrySub } from './forms-utils';
 
 interface FormProps {
@@ -8,6 +8,7 @@ interface FormProps {
 }
 
 const FormEntry: React.FC<FormProps> = ({ patientUuid, patient }) => {
+  const isOffline = useConnectivity();
   const { currentVisit } = useVisit(patientUuid);
   const [selectedForm, setSelectedForm] = useState<FormEntryProps>(null);
   const closeWorkspace = useCallback(() => {
@@ -32,6 +33,7 @@ const FormEntry: React.FC<FormProps> = ({ patientUuid, patient }) => {
             view: 'form',
             patient: selectedForm.patient,
             closeWorkspace: closeWorkspace,
+            isOffline: isOffline,
           }}
         />
       )}
