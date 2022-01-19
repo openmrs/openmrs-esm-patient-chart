@@ -98,7 +98,7 @@ const MedicationsDetailsTable = connect<
                 <span className={styles.dosage}>
                   {getDosage(medication.drug?.strength, medication.dose).toLowerCase()}
                 </span>{' '}
-                &mdash; {medication.route?.display.toLowerCase()} &mdash; {medication.frequency?.display.toLowerCase()}
+                &mdash; {medication.route?.display.toLowerCase()} &mdash; {medication.frequency?.display.toLowerCase()}{' '}
                 &mdash;{' '}
                 {!medication.duration
                   ? t('medicationIndefiniteDuration', 'Indefinite duration').toLowerCase()
@@ -117,17 +117,27 @@ const MedicationsDetailsTable = connect<
                 )}
               </p>
             </div>
-            <p className={`${styles.bodyLong01} ${styles.indicationRow}`}>
-              <span>
-                <span className={styles.label01}>{t('indication', 'Indication').toUpperCase()}</span>{' '}
-                {medication.orderReasonNonCoded}
-              </span>
-              {medication.quantity !== 0 && (
+            <p className={styles.bodyLong01}>
+              {medication.orderReasonNonCoded ? (
+                <span>
+                  <span className={styles.label01}>{t('indication', 'Indication').toUpperCase()}</span>{' '}
+                  {medication.orderReasonNonCoded}
+                </span>
+              ) : null}
+              {medication.quantity ? (
                 <span>
                   <span className={styles.label01}> &mdash; {t('quantity', 'Quantity').toUpperCase()}</span>{' '}
                   {medication.quantity}
                 </span>
-              )}
+              ) : null}
+              {medication.dateStopped ? (
+                <span className={styles.bodyShort01}>
+                  <span className={styles.label01}>
+                    {medication.quantity ? ` — ` : ''} {t('endDate', 'End date').toUpperCase()}
+                  </span>{' '}
+                  {dayjs(medication.dateStopped).format('DD-MMM-YYYY')}
+                </span>
+              ) : null}
             </p>
           </div>
         ),
@@ -163,58 +173,69 @@ const MedicationsDetailsTable = connect<
             </Button>
           )}
         </CardHeader>
-        <DataTable headers={tableHeaders} rows={tableRows} isSortable={true} sortRow={sortRow} useZebraStyles>
-          {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-            <TableContainer className={styles.tableHeader}>
-              <Table {...getTableProps()} useZebraStyles>
-                <TableHead>
-                  <TableRow>
-                    {headers.map((header) => (
-                      <TableHeader
-                        {...getHeaderProps({
-                          header,
-                          isSortable: header.isSortable,
-                        })}
-                      >
-                        {header.header}
-                      </TableHeader>
-                    ))}
-                    <TableHeader />
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {rows.map((row, rowIndex) => (
-                    <TableRow {...getRowProps({ row })}>
-                      {row.cells.map((cell) => (
-                        <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+        <TableContainer>
+          <DataTable
+            size="short"
+            headers={tableHeaders}
+            rows={tableRows}
+            isSortable={true}
+            sortRow={sortRow}
+            overflowMenuOnHover={false}
+          >
+            {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
+              <>
+                <Table {...getTableProps()} useZebraStyles>
+                  <TableHead>
+                    <TableRow>
+                      {headers.map((header) => (
+                        <TableHeader
+                          {...getHeaderProps({
+                            header,
+                            isSortable: header.isSortable,
+                          })}
+                        >
+                          {header.header}
+                        </TableHeader>
                       ))}
-                      <TableCell className="bx--table-column-menu">
-                        <OrderBasketItemActions
-                          showDiscontinueButton={showDiscontinueButton}
-                          showModifyButton={showModifyButton}
-                          showReorderButton={showReorderButton}
-                          medication={medications[rowIndex]}
-                          items={items}
-                          setItems={setItems}
-                        />
-                      </TableCell>
+                      <TableHeader />
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-              <Pagination
-                page={page}
-                pageSize={pageSize}
-                pageSizes={[10, 20, 30, 40, 50]}
-                totalItems={medications.length}
-                onChange={({ page, pageSize }) => {
-                  setPage(page);
-                  setPageSize(pageSize);
-                }}
-              />
-            </TableContainer>
-          )}
-        </DataTable>
+                  </TableHead>
+                  <TableBody>
+                    {rows.map((row, rowIndex) => (
+                      <TableRow className={styles.row} {...getRowProps({ row })}>
+                        {row.cells.map((cell) => (
+                          <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+                        ))}
+                        <TableCell className="bx--table-column-menu">
+                          <OrderBasketItemActions
+                            showDiscontinueButton={showDiscontinueButton}
+                            showModifyButton={showModifyButton}
+                            showReorderButton={showReorderButton}
+                            medication={medications[rowIndex]}
+                            items={items}
+                            setItems={setItems}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </>
+            )}
+          </DataTable>
+        </TableContainer>
+        <div className={styles.paginationContainer}>
+          <Pagination
+            page={page}
+            pageSize={pageSize}
+            pageSizes={[10, 20, 30, 40, 50]}
+            totalItems={medications.length}
+            onChange={({ page, pageSize }) => {
+              setPage(page);
+              setPageSize(pageSize);
+            }}
+          />
+        </div>
       </div>
     );
   },
@@ -386,19 +407,35 @@ function OrderBasketItemActions({
   }, [items, setItems, medication]);
 
   return (
-    <OverflowMenu flipped>
-      {showDiscontinueButton && (
+    <OverflowMenu data-floating-menu-container selectorPrimaryFocus={'#modify'} flipped>
+      {showModifyButton && (
         <OverflowMenuItem
-          itemText={t('discontinue', 'Discontinue')}
-          onClick={handleDiscontinueClick}
+          className={styles.menuItem}
+          id="modify"
+          itemText={t('modify', 'Modify')}
+          onClick={handleModifyClick}
           disabled={alreadyInBasket}
         />
       )}
-      {showModifyButton && (
-        <OverflowMenuItem itemText={t('modify', 'Modify')} onClick={handleModifyClick} disabled={alreadyInBasket} />
-      )}
       {showReorderButton && (
-        <OverflowMenuItem itemText={t('reorder', 'Reorder')} onClick={handleReorderClick} disabled={alreadyInBasket} />
+        <OverflowMenuItem
+          className={styles.menuItem}
+          id="reorder"
+          itemText={t('reorder', 'Reorder')}
+          onClick={handleReorderClick}
+          disabled={alreadyInBasket}
+        />
+      )}
+      {showDiscontinueButton && (
+        <OverflowMenuItem
+          className={styles.menuItem}
+          id="discontinue"
+          itemText={t('discontinue', 'Discontinue')}
+          onClick={handleDiscontinueClick}
+          disabled={alreadyInBasket}
+          isDelete={true}
+          hasDivider
+        />
       )}
     </OverflowMenu>
   );
