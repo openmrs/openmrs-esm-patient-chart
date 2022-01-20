@@ -78,7 +78,7 @@ async function getOfflineVisitForPatient(patientUuid: string) {
 async function createOfflineVisitForPatient(patientUuid: string, location: string) {
   const patientRegistrationSyncItems = await getSynchronizationItems<any>(patientRegistrationSyncType);
   const isVisitForOfflineRegisteredPatient = patientRegistrationSyncItems.some(
-    (item) => item.patientUuid === patientUuid,
+    (item) => item.preliminaryPatient.uuid === patientUuid,
   );
 
   const offlineVisit: OfflineVisit = {
@@ -142,7 +142,7 @@ export function usePatient(patientUuid: string): SWRResponse<fhir.Patient, Error
 
 async function getOfflineRegisteredPatientAsFhirPatient(patientUuid: string): Promise<fhir.Patient> {
   const patientRegistrationSyncItems = await getSynchronizationItems<any>(patientRegistrationSyncType);
-  const patientSyncItem = patientRegistrationSyncItems.find((item) => item.patientUuid === patientUuid);
+  const patientSyncItem = patientRegistrationSyncItems.find((item) => item.preliminaryPatient.uuid === patientUuid);
   return patientSyncItem
     ? mapPatientCreateFromPatientRegistrationToFhirPatient(patientSyncItem.preliminaryPatient)
     : undefined;
@@ -161,6 +161,7 @@ function mapPatientCreateFromPatientRegistrationToFhirPatient(patient: any = {})
     ['M']: 'male',
     ['F']: 'female',
     ['O']: 'other',
+    ['U']: 'unknown',
   };
 
   // Mapping inspired by:
@@ -168,7 +169,7 @@ function mapPatientCreateFromPatientRegistrationToFhirPatient(patient: any = {})
   // https://github.com/openmrs/openmrs-esm-patient-management/blob/94e6f637fb37cf4984163c355c5981ea6b8ca38c/packages/esm-patient-search-app/src/patient-search-result/patient-search-result.component.tsx#L21
   return {
     _id: patient.uuid,
-    gender: genderMap[patient.person?.gender] ?? 'unknown',
+    gender: genderMap[patient.person?.gender],
     birthDate: patient.person?.birthdate ?? patient.person?.birthdateEstimated,
     deceasedBoolean: patient.dead,
     deceasedDateTime: patient.deathDate,
