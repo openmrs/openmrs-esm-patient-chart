@@ -14,6 +14,7 @@ import { LocalStorageService } from './local-storage/local-storage.service';
 import { FormDataSourceService } from './form-data-source/form-data-source.service';
 import { FormSubmissionService } from './form-submission/form-submission.service';
 import { MonthlyScheduleResourceService } from './services/monthly-scheduled-resource.service';
+import { ConfigResourceService } from './services/config-resource.service';
 
 @NgModule({
   declarations: [AppComponent, EmptyRouteComponent, FeWrapperComponent],
@@ -24,6 +25,7 @@ import { MonthlyScheduleResourceService } from './services/monthly-scheduled-res
     FormDataSourceService,
     FormSubmissionService,
     MonthlyScheduleResourceService,
+    ConfigResourceService,
   ],
   bootstrap: [AppComponent],
 })

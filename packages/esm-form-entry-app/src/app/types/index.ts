@@ -185,3 +185,9 @@ export interface MonthlyScheduleParams {
   programType: string;
   startDate: string;
 }
+
+export interface FormEntryConfig {
+  dataSources: {
+    monthlySchedule: boolean;
+  };
+}

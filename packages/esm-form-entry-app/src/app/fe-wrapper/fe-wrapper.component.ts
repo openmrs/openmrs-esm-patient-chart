@@ -19,12 +19,13 @@ import { FormDataSourceService } from '../form-data-source/form-data-source.serv
 import { FormSubmissionService } from '../form-submission/form-submission.service';
 import { EncounterResourceService } from '../openmrs-api/encounter-resource.service';
 import { singleSpaPropsSubject, SingleSpaProps } from '../../single-spa-props';
-import { Encounter, FormSchema, LoggedInUser, Order } from '../types';
+import { Encounter, FormEntryConfig, FormSchema, LoggedInUser, Order } from '../types';
 // @ts-ignore
 import { showToast, detach, showNotification } from '@openmrs/esm-framework';
 import { PatientPreviousEncounterService } from '../openmrs-api/patient-previous-encounter.service';
 
 import { MonthlyScheduleResourceService } from '../services/monthly-scheduled-resource.service';
+import { ConfigResourceService } from '../services/config-resource.service';
 @Component({
   selector: 'my-app-fe-wrapper',
   templateUrl: './fe-wrapper.component.html',
@@ -52,6 +53,7 @@ export class FeWrapperComponent implements OnInit {
   submittedOrder: Array<Order> = [];
   prevEncounter: Encounter;
   isLoading: boolean = true;
+  config: FormEntryConfig;
 
   public get encounterDate(): string {
     return moment(this.encounter.encounterDatetime).format('YYYY-MM-DD');
@@ -80,9 +82,11 @@ export class FeWrapperComponent implements OnInit {
     private formErrorsService: FormErrorsService,
     private patientPreviousEncounter: PatientPreviousEncounterService,
     private monthlyScheduleResourceService: MonthlyScheduleResourceService,
+    private configResourceService: ConfigResourceService,
   ) {}
 
   ngOnInit() {
+    this.config = this.configResourceService.getConfig();
     this.launchForm().subscribe(
       (form) => {
         // console.log('Form loaded and rendered', form);
@@ -362,9 +366,9 @@ export class FeWrapperComponent implements OnInit {
   }
 
   private wireDataSources() {
+    this.registerConfigurableDataSources();
     this.dataSources.registerDataSource('location', this.formDataSourceService.getDataSources().location);
     this.dataSources.registerDataSource('provider', this.formDataSourceService.getDataSources().provider);
-    this.dataSources.registerDataSource('monthlyScheduleResourceService', this.monthlyScheduleResourceService);
     this.dataSources.registerDataSource('drug', this.formDataSourceService.getDataSources().drug);
     this.dataSources.registerDataSource('problem', this.formDataSourceService.getDataSources().problem);
     this.dataSources.registerDataSource('personAttribute', this.formDataSourceService.getDataSources().location);
@@ -438,5 +442,12 @@ export class FeWrapperComponent implements OnInit {
 
   private saveForm(): Observable<any> {
     return this.formSubmissionService.submitPayload(this.form);
+  }
+
+  private registerConfigurableDataSources() {
+    const { dataSources } = this.config;
+    if (dataSources.monthlySchedule) {
+      this.dataSources.registerDataSource('monthlyScheduleResourceService', this.monthlyScheduleResourceService);
+    }
   }
 }
