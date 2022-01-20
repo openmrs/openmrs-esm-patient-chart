@@ -36,7 +36,7 @@ export function setupCacheableRoutes() {
 }
 
 export function setupOfflineVisitsSync() {
-  setupOfflineSync<OfflineVisit>(visitSyncType, [], async (visit, options) => {
+  setupOfflineSync<OfflineVisit>(visitSyncType, [patientRegistrationSyncType], async (visit, options) => {
     const visitPayload = {
       ...visit,
       stopDatetime: new Date(),
