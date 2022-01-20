@@ -20,15 +20,6 @@ $actionPanelExpandedOffset: $actionNavOffset+$actionPanelOffset;
   padding-bottom: 10px;
 }
 
-.workspace {
-  grid-row: 1;
-  grid-column: 2;
-  align-self: start;
-  height: 90%;
-  padding-bottom: 10px;
-}
-
-
 .chartContainer {
   flex: 1;
   display: flex;
@@ -36,7 +27,6 @@ $actionPanelExpandedOffset: $actionNavOffset+$actionPanelOffset;
   flex-direction: column;
   padding-right: $spacing-01;
 }
-
 
 :global(.omrs-breakpoint-gt-tablet) .chartContainer {
   margin-left: var(--omrs-sidenav-width);
@@ -57,7 +47,7 @@ $actionPanelExpandedOffset: $actionNavOffset+$actionPanelOffset;
   flex-direction: column;
 }
 
-.closeWorkspace{
+.closeWorkspace {
   padding-right: 0;
 }
 
