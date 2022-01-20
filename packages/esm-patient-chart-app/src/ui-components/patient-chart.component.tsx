@@ -1,7 +1,6 @@
 import React, { useMemo, useEffect } from 'react';
 import styles from './patient-chart.component.scss';
 import Loader from './loader.component';
-import WorkspaceWrapper from '../workspace/workspace-wrapper.component';
 import ChartReview from '../view-components/chart-review.component';
 import VisitDialog from '../visit/visit-dialog.component';
 import { RouteComponentProps } from 'react-router-dom';
@@ -56,9 +55,6 @@ const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({ match
                 <ChartReview {...state} view={view} subview={subview} />
                 <VisitDialog patientUuid={patientUuid} />
                 <WorkspaceNotification />
-              </div>
-              <div className={styles.workspace}>
-                <WorkspaceWrapper {...state} />
               </div>
             </div>
           </div>
