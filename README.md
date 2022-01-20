@@ -1,11 +1,13 @@
+:wave:	*New to our project? Be sure to review the [OpenMRS 3 Frontend Developer Documentation](https://openmrs.github.io/openmrs-esm-core/#/). You may find the [Map of the Project](https://openmrs.github.io/openmrs-esm-core/#/main/map) especially helpful.* :teacher:	
+
+
 ![Node.js CI](https://github.com/openmrs/openmrs-esm-patient-chart/workflows/Node.js%20CI/badge.svg)
 
 # OpenMRS ESM Patient Chart
 
 ## What is this?
 
-openmrs-esm-patient-chart is a patient dashboard microfrontend for the
-OpenMRS SPA. It provides a simple dashboard with cards detailing the
+openmrs-esm-patient-chart is the patient chart frontend module and all its widgets. This creates a patient dashboard microfrontend for the OpenMRS SPA. It provides a simple dashboard with cards detailing the
 patient's information, such as vitals, demographic and relationships.
 
 ## Setup

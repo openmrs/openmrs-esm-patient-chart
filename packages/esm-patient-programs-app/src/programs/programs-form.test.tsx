@@ -78,7 +78,7 @@ describe('ProgramsForm: ', () => {
     expect(screen.getByRole('option', { name: /Laboratory/i })).toBeInTheDocument();
 
     const cancelButton = screen.getByRole('button', { name: /cancel/i });
-    const enrollButton = screen.getByRole('button', { name: /enroll/i });
+    const enrollButton = screen.getByRole('button', { name: /save and close/i });
     expect(cancelButton).toBeInTheDocument();
     expect(enrollButton).toBeInTheDocument();
     expect(enrollButton).toBeDisabled();
@@ -116,7 +116,7 @@ describe('ProgramsForm: ', () => {
       renderProgramsForm();
 
       cancelButton = screen.getByRole('button', { name: /cancel/i });
-      enrollButton = screen.getByRole('button', { name: /enroll/i });
+      enrollButton = screen.getByRole('button', { name: /save and close/i });
       enrollmentDateInput = screen.getAllByRole('textbox', { name: '' })[0];
       selectLocationInput = screen.getAllByRole('combobox', { name: '' })[1];
       selectProgramInput = screen.getAllByRole('combobox', { name: '' })[0];

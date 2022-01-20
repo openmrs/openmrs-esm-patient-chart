@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from 'carbon-components-react';
-import styles from './allergies-overview.scss';
+import { useTranslation } from 'react-i18next';
 import {
   CardHeader,
   EmptyState,
@@ -21,25 +21,25 @@ import {
   launchPatientWorkspace,
   PatientChartPagination,
 } from '@openmrs/esm-patient-common-lib';
-import { useTranslation } from 'react-i18next';
-import { useAllergies } from './allergy-intolerance.resource';
 import { usePagination } from '@openmrs/esm-framework';
 import { allergiesToShowCount, patientAllergiesFormWorkspace } from '../constants';
+import { useAllergies } from './allergy-intolerance.resource';
+import styles from './allergies-overview.scss';
 
 interface AllergiesOverviewProps {
   basePath: string;
   patient: fhir.Patient;
-  showAddAllergy: boolean;
+  showAddAllergyButton: boolean;
 }
 
-const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient, showAddAllergy, basePath }) => {
+const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient, showAddAllergyButton, basePath }) => {
   const { t } = useTranslation();
   const displayText = t('allergyIntolerances', 'allergy intolerances');
   const headerTitle = t('allergies', 'Allergies');
   const urlLabel = t('seeAll', 'See all');
   const pageUrl = window.spaBase + basePath + '/allergies';
 
-  const { data: allergies, isError, isLoading, isValidating } = useAllergies(patient.id);
+  const { allergies, isError, isLoading, isValidating } = useAllergies(patient.id);
   const { results: paginatedAllergies, goTo, currentPage } = usePagination(allergies ?? [], allergiesToShowCount);
 
   const tableHeaders = [
@@ -71,7 +71,7 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient, showAddA
       <div className={styles.widgetCard}>
         <CardHeader title={headerTitle}>
           <span>{isValidating ? <InlineLoading /> : null}</span>
-          {showAddAllergy && (
+          {showAddAllergyButton && (
             <Button kind="ghost" renderIcon={Add16} iconDescription="Add allergies" onClick={launchAllergiesForm}>
               {t('add', 'Add')}
             </Button>

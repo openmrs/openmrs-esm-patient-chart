@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState, useMemo } from 'react';
 import dayjs from 'dayjs';
 import {
   Button,
+  ButtonSet,
   Column,
   ContentSwitcher,
   DatePicker,
@@ -64,7 +65,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({ isTablet, patientUuid }
 
   const closeWorkspace = useCallback(() => detach('patient-chart-workspace-slot', 'start-visit-workspace-form'), []);
 
-  const handleStartVisit = useCallback(
+  const handleSubmit = useCallback(
     (event) => {
       event.preventDefault();
 
@@ -122,7 +123,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({ isTablet, patientUuid }
   );
 
   return (
-    <Form>
+    <Form onSubmit={handleSubmit} className={styles.form}>
       <Grid className={styles.grid}>
         {isTablet && (
           <Row className={styles.headerGridRow}>
@@ -156,7 +157,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({ isTablet, patientUuid }
                 labelText={t('time', 'Time')}
                 light={isTablet}
                 onChange={(event) => setVisitTime(event.target.value)}
-                pattern="(1[012]|[1-9]):[0-5][0-9](\\s)?"
+                pattern="^(1[0-2]|0?[1-9]):([0-5]?[0-9])$"
                 style={{ marginLeft: '0.125rem', flex: 'none' }}
                 value={visitTime}
               >
@@ -231,24 +232,16 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({ isTablet, patientUuid }
               </Column>
             </Row>
           )}
-          <Row>
-            <Column className={styles.buttonContainer}>
-              <Button onClick={closeWorkspace} kind="secondary" style={{ width: '50%' }}>
-                {t('discard', 'Discard')}
-              </Button>
-              <Button
-                onClick={handleStartVisit}
-                kind="primary"
-                style={{ width: '50%' }}
-                type="submit"
-                disabled={isSubmitting}
-              >
-                {t('startVisit', 'Start visit')}
-              </Button>
-            </Column>
-          </Row>
         </div>
       </Grid>
+      <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
+        <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
+          {t('discard', 'Discard')}
+        </Button>
+        <Button className={styles.button} disabled={isSubmitting} kind="primary" type="submit">
+          {t('startVisit', 'Start visit')}
+        </Button>
+      </ButtonSet>
     </Form>
   );
 };

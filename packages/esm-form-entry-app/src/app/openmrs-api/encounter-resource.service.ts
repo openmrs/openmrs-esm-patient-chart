@@ -6,6 +6,7 @@ import { map, flatMap, catchError } from 'rxjs/operators';
 import { WindowRef } from '../window-ref';
 import { getOfflineEncounterForForm } from '../../offline';
 import { generateOfflineUuid } from '@openmrs/esm-framework';
+import { Encounter } from '../types';
 
 @Injectable()
 export class EncounterResourceService {
@@ -21,7 +22,11 @@ export class EncounterResourceService {
     return this.windoRef.openmrsRestBase;
   }
 
-  public getEncountersByPatientUuid(patientUuid: string, cached: boolean = false, v: string = null): Observable<any> {
+  public getEncountersByPatientUuid(
+    patientUuid: string,
+    cached: boolean = false,
+    v: string = null,
+  ): Observable<Array<Encounter>> {
     if (!patientUuid) {
       return null;
     }
@@ -52,7 +57,7 @@ export class EncounterResourceService {
       );
   }
 
-  public getEncounterByUuid(uuid: string): Observable<any> {
+  public getEncounterByUuid(uuid: string): Observable<Encounter> {
     if (!uuid) {
       return null;
     }

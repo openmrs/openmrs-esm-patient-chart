@@ -7,7 +7,7 @@ import { Button, ButtonSet, DataTableSkeleton, SearchSkeleton } from 'carbon-com
 import { useTranslation } from 'react-i18next';
 import { OrderBasketItem } from '../types/order-basket-item';
 import { getDurationUnits, getPatientEncounterId, usePatientOrders } from '../api/api';
-import { createErrorHandler, showToast } from '@openmrs/esm-framework';
+import { createErrorHandler, showToast, useLayoutType } from '@openmrs/esm-framework';
 import { OpenmrsResource } from '../types/openmrs-resource';
 import { orderDrugs } from './drug-ordering';
 import { connect } from 'unistore/react';
@@ -27,6 +27,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
   const { t } = useTranslation();
   const displayText = t('activeMedications', 'Active medications');
   const headerTitle = t('activeMedications', 'active medications');
+  const isTablet = useLayoutType() === 'tablet';
 
   const [durationUnits, setDurationUnits] = useState<Array<OpenmrsResource>>([]);
   const [encounterUuid, setEncounterUuid] = useState('');
@@ -134,40 +135,42 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
         return (
           <>
             <OrderBasketSearch encounterUuid={encounterUuid} onSearchResultClicked={handleSearchResultClicked} />
-            <div className={styles.orderBasketContainer}>
-              <OrderBasketItemList
-                orderBasketItems={items}
-                onItemClicked={(order) => openMedicationOrderFormForUpdatingExistingOrder(items.indexOf(order))}
-                onItemRemoveClicked={(order) => {
-                  const newOrders = [...items];
-                  newOrders.splice(items.indexOf(order), 1);
-                  setItems(newOrders);
-                }}
-              />
-              {(() => {
-                if (isLoadingOrders) return <DataTableSkeleton role="progressbar" />;
-                if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
-                if (activePatientOrders?.length) {
-                  return (
-                    <MedicationsDetailsTable
-                      isValidating={isValidating}
-                      title={t('activeMedications', 'Active Medications')}
-                      medications={activePatientOrders}
-                      showDiscontinueButton={true}
-                      showModifyButton={true}
-                      showReorderButton={false}
-                      showAddNewButton={false}
-                    />
-                  );
-                }
-                return <EmptyState displayText={displayText} headerTitle={headerTitle} />;
-              })()}
-              <ButtonSet style={{ marginTop: '2rem' }}>
-                <Button kind="secondary" onClick={handleCancelClicked}>
+            <div className={styles.container}>
+              <div className={styles.orderBasketContainer}>
+                <OrderBasketItemList
+                  orderBasketItems={items}
+                  onItemClicked={(order) => openMedicationOrderFormForUpdatingExistingOrder(items.indexOf(order))}
+                  onItemRemoveClicked={(order) => {
+                    const newOrders = [...items];
+                    newOrders.splice(items.indexOf(order), 1);
+                    setItems(newOrders);
+                  }}
+                />
+                {(() => {
+                  if (isLoadingOrders) return <DataTableSkeleton role="progressbar" />;
+                  if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
+                  if (activePatientOrders?.length) {
+                    return (
+                      <MedicationsDetailsTable
+                        isValidating={isValidating}
+                        title={t('activeMedications', 'Active Medications')}
+                        medications={activePatientOrders}
+                        showDiscontinueButton={true}
+                        showModifyButton={true}
+                        showReorderButton={false}
+                        showAddNewButton={false}
+                      />
+                    );
+                  }
+                  return <EmptyState displayText={displayText} headerTitle={headerTitle} />;
+                })()}
+              </div>
+              <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
+                <Button className={styles.button} kind="secondary" onClick={handleCancelClicked}>
                   {t('cancel', 'Cancel')}
                 </Button>
-                <Button kind="primary" onClick={handleSaveClicked}>
-                  {t('save', 'Save')}
+                <Button className={styles.button} kind="primary" onClick={handleSaveClicked}>
+                  {t('signAndClose', 'Sign and close')}
                 </Button>
               </ButtonSet>
             </div>

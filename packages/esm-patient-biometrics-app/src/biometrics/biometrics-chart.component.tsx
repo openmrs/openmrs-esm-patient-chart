@@ -7,10 +7,12 @@ import { LineChartOptions } from '@carbon/charts/interfaces/charts';
 import { ScaleTypes } from '@carbon/charts/interfaces/enums';
 import { useConfig } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
+import { ConfigObject } from '../config-schema';
 
 interface BiometricsChartProps {
   patientBiometrics: Array<any>;
-  conceptsUnits: Array<string>;
+  conceptUnits: Map<string, string>;
+  config: ConfigObject;
 }
 
 interface BiometricChartData {
@@ -21,13 +23,11 @@ interface BiometricChartData {
 
 const chartColors = { weight: '#6929c4', height: '#6929c4', bmi: '#6929c4' };
 
-const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, conceptsUnits }) => {
-  const config = useConfig();
+const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, conceptUnits, config }) => {
   const { t } = useTranslation();
   const { bmiUnit } = config.biometrics;
-  const [, , , heightUnit, weightUnit] = conceptsUnits;
   const [selectedBiometrics, setSelectedBiometrics] = React.useState<BiometricChartData>({
-    title: `Weight (${weightUnit})`,
+    title: `Weight (${conceptUnits.get(config.concepts.weightUuid) ?? ''})`,
     value: 'weight',
     groupName: 'weight',
   });
@@ -79,8 +79,8 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
         </label>
         <Tabs className={styles.verticalTabs} type="default">
           {[
-            { id: 'weight', label: `Weight (${weightUnit})` },
-            { id: 'height', label: `Height (${heightUnit})` },
+            { id: 'weight', label: `Weight (${conceptUnits.get(config.concepts.weightUuid) ?? ''})` },
+            { id: 'height', label: `Height (${conceptUnits.get(config.concepts.heightUuid) ?? ''})` },
             { id: 'bmi', label: `BMI (${bmiUnit})` },
           ].map(({ id, label }) => (
             <Tab

@@ -7,13 +7,17 @@ import userEvent from '@testing-library/user-event';
 import { mockPatient } from '../../../../../__mocks__/patient.mock';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { getByTextWithMarkup, swrRender, waitForLoadingToFinish } from '../../../../../tools/test-helpers';
-import { mockFhirVitalsResponse, mockVitalsConfig } from '../../../../../__mocks__/vitals.mock';
+import { mockFhirVitalsResponse, mockVitalsConfig, mockVitalsSignsConcept } from '../../../../../__mocks__/vitals.mock';
 import VitalsHeader from './vitals-header.component';
 
 const testProps = {
   patientUuid: mockPatient.id,
   showRecordVitals: true,
 };
+
+const mockConceptUnits = new Map<string, string>(
+  mockVitalsSignsConcept.data.results[0].setMembers.map((concept) => [concept.uuid, concept.units]),
+);
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 
@@ -23,22 +27,20 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
   return {
     ...originalModule,
     useVitalsConceptMetadata: jest.fn().mockImplementation(() => ({
-      data: {
-        conceptUnits: ['mmHg', 'mmHg', 'DEG C', 'cm', 'kg', 'beats/min', '%', 'cm', 'breaths/min'],
-        conceptMetadata: [
-          {
-            display: 'Systolic',
-            hiAbsolute: 250,
-            hiCritical: 180,
-            hiNormal: 140,
-            lowAbsolute: 0,
-            lowCritical: 85,
-            lowNormal: 100,
-            units: 'mmHg',
-            uuid: '5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-          },
-        ],
-      },
+      data: mockConceptUnits,
+      conceptMetadata: [
+        {
+          display: 'Systolic',
+          hiAbsolute: 250,
+          hiCritical: 180,
+          hiNormal: 140,
+          lowAbsolute: 0,
+          lowCritical: 85,
+          lowNormal: 100,
+          units: 'mmHg',
+          uuid: '5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        },
+      ],
     })),
   };
 });

@@ -4,7 +4,7 @@ import debounce from 'lodash-es/debounce';
 import isEmpty from 'lodash-es/isEmpty';
 import cloneDeep from 'lodash-es/cloneDeep';
 import set from 'lodash-es/set';
-import { Search, Checkbox, Button, StructuredListSkeleton } from 'carbon-components-react';
+import { Search, Checkbox, Button, StructuredListSkeleton, ButtonSet } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 import { detach, temporaryConfigStore, TemporaryConfigStore } from '@openmrs/esm-framework';
 import { useClinicalView } from '../store';
@@ -100,39 +100,41 @@ const ClinicalViewForm: React.FC<ClinicalViewFormProps> = ({ isTablet }) => {
       {isPending && <StructuredListSkeleton />}
       {!isPending && (
         <div className={styles.formContainer}>
-          <div className={styles.searchContainer}>
-            <Search
-              placeholder={t('searchForView', 'Search for a view')}
-              id="search"
-              onChange={(event) => handleSearch(event.target.value)}
-              labelText=""
-              light={isTablet}
-              size="xl"
-            />
-            <Button kind="ghost" onClick={handleReset}>
-              {t('reset', 'Reset')}
-            </Button>
-          </div>
-          <section className={styles.checkboxContainer}>
-            {searchResults?.map((view) => (
-              <Checkbox
-                key={view.slot}
-                id={view.slot}
-                labelText={view.slotName}
-                className={styles.checkBox}
-                checked={view.checked}
-                onChange={(checked) => handleChange(view.slotName, view.slot, checked)}
+          <div>
+            <div className={styles.searchContainer}>
+              <Search
+                placeholder={t('searchForView', 'Search for a view')}
+                id="search"
+                onChange={(event) => handleSearch(event.target.value)}
+                labelText=""
+                light={isTablet}
+                size="xl"
               />
-            ))}
-          </section>
-          <div className={styles.buttonContainer}>
-            <Button kind="secondary" onClick={closeClinicalViewForm}>
+              <Button kind="ghost" onClick={handleReset}>
+                {t('reset', 'Reset')}
+              </Button>
+            </div>
+            <section className={styles.checkboxContainer}>
+              {searchResults?.map((view) => (
+                <Checkbox
+                  key={view.slot}
+                  id={view.slot}
+                  labelText={view.slotName}
+                  className={styles.checkBox}
+                  checked={view.checked}
+                  onChange={(checked) => handleChange(view.slotName, view.slot, checked)}
+                />
+              ))}
+            </section>
+          </div>
+          <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
+            <Button className={styles.button} kind="secondary" onClick={closeClinicalViewForm}>
               {t('cancel', 'Cancel')}
             </Button>
-            <Button onClick={handleSave} kind="primary">
+            <Button className={styles.button} kind="primary" onClick={handleSave}>
               {t('saveAndClose', 'Save & Close')}
             </Button>
-          </div>
+          </ButtonSet>
         </div>
       )}
     </>

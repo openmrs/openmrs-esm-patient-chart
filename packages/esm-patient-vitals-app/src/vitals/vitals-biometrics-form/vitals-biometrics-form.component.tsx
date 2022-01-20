@@ -12,7 +12,7 @@ import {
   fhirBaseUrl,
 } from '@openmrs/esm-framework';
 import { useVitalsConceptMetadata } from '@openmrs/esm-patient-common-lib';
-import { Column, Grid, Row, Button } from 'carbon-components-react';
+import { Column, Grid, Row, Button, ButtonSet, Form } from 'carbon-components-react';
 import { calculateBMI, isInNormalRange } from './vitals-biometrics-form.utils';
 import { pageSize, savePatientVitals } from '../vitals.resource';
 import { ConfigObject } from '../../config-schema';
@@ -40,9 +40,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
   const { t } = useTranslation();
   const session = useSessionUser();
   const config = useConfig() as ConfigObject;
-  const {
-    data: { conceptUnits, conceptMetadata },
-  } = useVitalsConceptMetadata();
+  const { data: conceptUnits, conceptMetadata } = useVitalsConceptMetadata();
   const biometricsUnitsSymbols = config.biometrics;
   const [patientVitalAndBiometrics, setPatientVitalAndBiometrics] = useState<PatientVitalAndBiometric>();
   const [patientBMI, setPatientBMI] = useState<number>();
@@ -58,18 +56,6 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
     weight: config.concepts.weightUuid,
     respiratoryRate: config.concepts.respiratoryRateUuid,
   };
-
-  const [
-    bloodPressureUnit,
-    ,
-    temperatureUnit,
-    heightUnit,
-    weightUnit,
-    pulseUnit,
-    oxygenSaturationUnit,
-    midUpperArmCircumferenceUnit,
-    respiratoryRateUnit,
-  ] = conceptUnits;
 
   const isBMIInNormalRange = (value: number | undefined | string) => {
     if (value === undefined || value === '') return true;
@@ -134,291 +120,292 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
   }, [patientVitalAndBiometrics?.weight, patientVitalAndBiometrics?.height]);
 
   return (
-    <Grid condensed>
-      <Row>
-        <Column>
-          <p className={styles.vitalsTitle}>{t('vitals', 'Vitals')}</p>
-        </Column>
-      </Row>
-      <Row>
-        <Column>
-          <VitalsBiometricInput
-            title={t('bloodPressure', 'Blood Pressure')}
-            onInputChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              event.target.name === 'systolic'
-                ? setPatientVitalAndBiometrics({
-                    ...patientVitalAndBiometrics,
-                    systolicBloodPressure: event.target.value,
-                  })
-                : setPatientVitalAndBiometrics({
-                    ...patientVitalAndBiometrics,
-                    diastolicBloodPressure: event.target.value,
-                  });
-            }}
-            textFields={[
-              {
-                name: t('systolic', 'systolic'),
-                separator: '/',
-                type: 'number',
-                value: patientVitalAndBiometrics?.systolicBloodPressure || '',
-              },
-              {
-                name: t('diastolic', 'diastolic'),
-                type: 'number',
-                value: patientVitalAndBiometrics?.diastolicBloodPressure || '',
-              },
-            ]}
-            unitSymbol={bloodPressureUnit}
-            inputIsNormal={
-              isInNormalRange(
+    <Form className={styles.form}>
+      <Grid className={styles.grid}>
+        <Row className={styles.row}>
+          <Column>
+            <p className={styles.vitalsTitle}>{t('recordVitals', 'Record vitals')}</p>
+          </Column>
+        </Row>
+        <Row className={styles.row}>
+          <Column>
+            <VitalsBiometricInput
+              title={t('bloodPressure', 'Blood Pressure')}
+              onInputChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                event.target.name === 'systolic'
+                  ? setPatientVitalAndBiometrics({
+                      ...patientVitalAndBiometrics,
+                      systolicBloodPressure: event.target.value,
+                    })
+                  : setPatientVitalAndBiometrics({
+                      ...patientVitalAndBiometrics,
+                      diastolicBloodPressure: event.target.value,
+                    });
+              }}
+              textFields={[
+                {
+                  name: t('systolic', 'systolic'),
+                  separator: '/',
+                  type: 'number',
+                  value: patientVitalAndBiometrics?.systolicBloodPressure || '',
+                },
+                {
+                  name: t('diastolic', 'diastolic'),
+                  type: 'number',
+                  value: patientVitalAndBiometrics?.diastolicBloodPressure || '',
+                },
+              ]}
+              unitSymbol={conceptUnits.get(config.concepts.systolicBloodPressureUuid) ?? ''}
+              inputIsNormal={
+                isInNormalRange(
+                  conceptMetadata,
+                  config.concepts.systolicBloodPressureUuid,
+                  patientVitalAndBiometrics?.systolicBloodPressure,
+                ) &&
+                isInNormalRange(
+                  conceptMetadata,
+                  config.concepts.diastolicBloodPressureUuid,
+                  patientVitalAndBiometrics?.diastolicBloodPressure,
+                )
+              }
+              isTablet={isTablet}
+            />
+          </Column>
+          <Column>
+            <VitalsBiometricInput
+              title={t('pulse', 'Pulse')}
+              onInputChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                setPatientVitalAndBiometrics({
+                  ...patientVitalAndBiometrics,
+                  pulse: event.target.value,
+                });
+              }}
+              textFields={[
+                {
+                  name: t('pulse', 'Pulse'),
+                  type: 'number',
+                  value: patientVitalAndBiometrics?.pulse || '',
+                },
+              ]}
+              unitSymbol={conceptUnits.get(config.concepts.pulseUuid) ?? ''}
+              inputIsNormal={isInNormalRange(
                 conceptMetadata,
-                config.concepts.systolicBloodPressureUuid,
-                patientVitalAndBiometrics?.systolicBloodPressure,
-              ) &&
-              isInNormalRange(
+                config.concepts['pulseUuid'],
+                patientVitalAndBiometrics?.pulse,
+              )}
+              isTablet={isTablet}
+            />
+          </Column>
+          <Column>
+            <VitalsBiometricInput
+              title={t('spo2', 'SpO2')}
+              onInputChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                setPatientVitalAndBiometrics({
+                  ...patientVitalAndBiometrics,
+                  oxygenSaturation: event.target.value,
+                });
+              }}
+              textFields={[
+                {
+                  name: t('oxygenSaturation', 'Oxygen Saturation'),
+                  type: 'number',
+                  value: patientVitalAndBiometrics?.oxygenSaturation || '',
+                },
+              ]}
+              unitSymbol={conceptUnits.get(config.concepts.oxygenSaturationUuid) ?? ''}
+              inputIsNormal={isInNormalRange(
                 conceptMetadata,
-                config.concepts.diastolicBloodPressureUuid,
-                patientVitalAndBiometrics?.diastolicBloodPressure,
-              )
-            }
-            isTablet={isTablet}
-          />
-        </Column>
-        <Column>
-          <VitalsBiometricInput
-            title={t('pulse', 'Pulse')}
-            onInputChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              setPatientVitalAndBiometrics({
-                ...patientVitalAndBiometrics,
-                pulse: event.target.value,
-              });
-            }}
-            textFields={[
-              {
-                name: t('pulse', 'Pulse'),
-                type: 'number',
-                value: patientVitalAndBiometrics?.pulse || '',
-              },
-            ]}
-            unitSymbol={pulseUnit}
-            inputIsNormal={isInNormalRange(
-              conceptMetadata,
-              config.concepts['pulseUuid'],
-              patientVitalAndBiometrics?.pulse,
-            )}
-            isTablet={isTablet}
-          />
-        </Column>
-        <Column>
-          <VitalsBiometricInput
-            title={t('spo2', 'SpO2')}
-            onInputChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              setPatientVitalAndBiometrics({
-                ...patientVitalAndBiometrics,
-                oxygenSaturation: event.target.value,
-              });
-            }}
-            textFields={[
-              {
-                name: t('oxygenSaturation', 'Oxygen Saturation'),
-                type: 'number',
-                value: patientVitalAndBiometrics?.oxygenSaturation || '',
-              },
-            ]}
-            unitSymbol={oxygenSaturationUnit}
-            inputIsNormal={isInNormalRange(
-              conceptMetadata,
-              config.concepts['oxygenSaturationUuid'],
-              patientVitalAndBiometrics?.oxygenSaturation,
-            )}
-            isTablet={isTablet}
-          />
-        </Column>
-        <Column>
-          <VitalsBiometricInput
-            title={t('respirationRate', 'Respiration Rate')}
-            onInputChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              setPatientVitalAndBiometrics({
-                ...patientVitalAndBiometrics,
-                respiratoryRate: event.target.value,
-              });
-            }}
-            textFields={[
-              {
-                name: t('respirationRate', 'Respiration Rate'),
-                type: 'number',
-                value: patientVitalAndBiometrics?.respiratoryRate || '',
-              },
-            ]}
-            unitSymbol={respiratoryRateUnit}
-            inputIsNormal={isInNormalRange(
-              conceptMetadata,
-              config.concepts['respiratoryRateUuid'],
-              patientVitalAndBiometrics?.respiratoryRate,
-            )}
-            isTablet={isTablet}
-          />
-        </Column>
-      </Row>
-      <Row>
-        <Column>
-          <VitalsBiometricInput
-            title={t('temp', 'Temp')}
-            onInputChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              setPatientVitalAndBiometrics({
-                ...patientVitalAndBiometrics,
-                temperature: event.target.value,
-              });
-            }}
-            textFields={[
-              {
-                name: t('temperature', 'Temperature'),
-                type: 'number',
-                value: patientVitalAndBiometrics?.temperature || '',
-              },
-            ]}
-            unitSymbol={temperatureUnit}
-            inputIsNormal={isInNormalRange(
-              conceptMetadata,
-              config.concepts['temperatureUuid'],
-              patientVitalAndBiometrics?.temperature,
-            )}
-            isTablet={isTablet}
-          />
-        </Column>
-      </Row>
-      <Row>
-        <Column>
-          <VitalsBiometricInput
-            title={t('notes', 'Notes')}
-            onInputChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              setPatientVitalAndBiometrics({
-                ...patientVitalAndBiometrics,
-                generalPatientNote: event.target.value,
-              });
-            }}
-            textFields={[
-              {
-                name: t('notes', 'Notes'),
-                type: 'textArea',
-                value: patientVitalAndBiometrics?.generalPatientNote,
-              },
-            ]}
-            textFieldWidth="26.375rem"
-            placeholder={t('additionalNoteText', 'Type any additional notes here')}
-            inputIsNormal={true}
-            isTablet={isTablet}
-          />
-        </Column>
-      </Row>
+                config.concepts['oxygenSaturationUuid'],
+                patientVitalAndBiometrics?.oxygenSaturation,
+              )}
+              isTablet={isTablet}
+            />
+          </Column>
+          <Column>
+            <VitalsBiometricInput
+              title={t('respirationRate', 'Respiration Rate')}
+              onInputChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                setPatientVitalAndBiometrics({
+                  ...patientVitalAndBiometrics,
+                  respiratoryRate: event.target.value,
+                });
+              }}
+              textFields={[
+                {
+                  name: t('respirationRate', 'Respiration Rate'),
+                  type: 'number',
+                  value: patientVitalAndBiometrics?.respiratoryRate || '',
+                },
+              ]}
+              unitSymbol={conceptUnits.get(config.concepts.respiratoryRateUuid) ?? ''}
+              inputIsNormal={isInNormalRange(
+                conceptMetadata,
+                config.concepts['respiratoryRateUuid'],
+                patientVitalAndBiometrics?.respiratoryRate,
+              )}
+              isTablet={isTablet}
+            />
+          </Column>
+        </Row>
+        <Row className={styles.row}>
+          <Column>
+            <VitalsBiometricInput
+              title={t('temp', 'Temp')}
+              onInputChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                setPatientVitalAndBiometrics({
+                  ...patientVitalAndBiometrics,
+                  temperature: event.target.value,
+                });
+              }}
+              textFields={[
+                {
+                  name: t('temperature', 'Temperature'),
+                  type: 'number',
+                  value: patientVitalAndBiometrics?.temperature || '',
+                },
+              ]}
+              unitSymbol={conceptUnits.get(config.concepts.temperatureUuid) ?? ''}
+              inputIsNormal={isInNormalRange(
+                conceptMetadata,
+                config.concepts['temperatureUuid'],
+                patientVitalAndBiometrics?.temperature,
+              )}
+              isTablet={isTablet}
+            />
+          </Column>
+        </Row>
+        <Row className={styles.row}>
+          <Column>
+            <VitalsBiometricInput
+              title={t('notes', 'Notes')}
+              onInputChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                setPatientVitalAndBiometrics({
+                  ...patientVitalAndBiometrics,
+                  generalPatientNote: event.target.value,
+                });
+              }}
+              textFields={[
+                {
+                  name: t('notes', 'Notes'),
+                  type: 'textArea',
+                  value: patientVitalAndBiometrics?.generalPatientNote,
+                },
+              ]}
+              textFieldWidth="26.375rem"
+              placeholder={t('additionalNoteText', 'Type any additional notes here')}
+              inputIsNormal={true}
+              isTablet={isTablet}
+            />
+          </Column>
+        </Row>
 
-      <Row>
-        <Column>
-          <p className={styles.vitalsTitle}>{t('biometrics', 'Biometrics')}</p>
-        </Column>
-      </Row>
-      <Row>
-        <Column>
-          <VitalsBiometricInput
-            title={t('weight', 'Weight')}
-            onInputChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              setPatientVitalAndBiometrics({
-                ...patientVitalAndBiometrics,
-                weight: event.target.value,
-              });
-            }}
-            textFields={[
-              {
-                name: t('weight', 'Weight'),
-                type: 'number',
-                value: patientVitalAndBiometrics?.weight || '',
-              },
-            ]}
-            unitSymbol={weightUnit}
-            inputIsNormal={true}
-            isTablet={isTablet}
-          />
-        </Column>
-        <Column>
-          <VitalsBiometricInput
-            title={t('height', 'Height')}
-            onInputChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              setPatientVitalAndBiometrics({
-                ...patientVitalAndBiometrics,
-                height: event.target.value,
-              });
-            }}
-            textFields={[
-              {
-                name: t('height', 'Height'),
-                type: 'number',
-                value: patientVitalAndBiometrics?.height || '',
-              },
-            ]}
-            unitSymbol={heightUnit}
-            inputIsNormal={true}
-            isTablet={isTablet}
-          />
-        </Column>
-        <Column>
-          <VitalsBiometricInput
-            title={t('bmiCalc', 'BMI (calc.)')}
-            onInputChange={() => {}}
-            textFields={[
-              {
-                name: t('bmi', 'BMI'),
-                type: 'number',
-                value: patientBMI || '',
-              },
-            ]}
-            unitSymbol={biometricsUnitsSymbols['bmiUnit']}
-            disabled={true}
-            inputIsNormal={isBMIInNormalRange(patientBMI)}
-            isTablet={isTablet}
-          />
-        </Column>
-        <Column>
-          <VitalsBiometricInput
-            title={t('muac', 'MUAC')}
-            onInputChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              setPatientVitalAndBiometrics({
-                ...patientVitalAndBiometrics,
-                midUpperArmCircumference: event.target.value,
-              });
-            }}
-            textFields={[
-              {
-                name: t('muac', 'MUAC'),
-                type: 'number',
-                value: patientVitalAndBiometrics?.midUpperArmCircumference || '',
-              },
-            ]}
-            unitSymbol={midUpperArmCircumferenceUnit}
-            inputIsNormal={isInNormalRange(
-              conceptMetadata,
-              config.concepts['midUpperArmCircumferenceUuid'],
-              patientVitalAndBiometrics?.midUpperArmCircumference,
-            )}
-            isTablet={isTablet}
-          />
-        </Column>
-      </Row>
-      <Row>
-        <Column>
-          <Button onClick={closeWorkspace} className={styles.vitalsButton} kind="secondary">
-            {t('cancel', 'Cancel')}
-          </Button>
-          <Button
-            disabled={isSubmitting}
-            onClick={savePatientVitalsAndBiometrics}
-            className={styles.vitalsButton}
-            kind="primary"
-          >
-            {t('signAndSave', 'Sign & Save')}
-          </Button>
-        </Column>
-      </Row>
-    </Grid>
+        <Row className={`${styles.row} ${styles.spacer}`}>
+          <Column>
+            <p className={styles.vitalsTitle}>{t('recordBiometrics', 'Record biometrics')}</p>
+          </Column>
+        </Row>
+        <Row className={styles.row}>
+          <Column>
+            <VitalsBiometricInput
+              title={t('weight', 'Weight')}
+              onInputChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                setPatientVitalAndBiometrics({
+                  ...patientVitalAndBiometrics,
+                  weight: event.target.value,
+                });
+              }}
+              textFields={[
+                {
+                  name: t('weight', 'Weight'),
+                  type: 'number',
+                  value: patientVitalAndBiometrics?.weight || '',
+                },
+              ]}
+              unitSymbol={conceptUnits.get(config.concepts.weightUuid) ?? ''}
+              inputIsNormal={true}
+              isTablet={isTablet}
+            />
+          </Column>
+          <Column>
+            <VitalsBiometricInput
+              title={t('height', 'Height')}
+              onInputChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                setPatientVitalAndBiometrics({
+                  ...patientVitalAndBiometrics,
+                  height: event.target.value,
+                });
+              }}
+              textFields={[
+                {
+                  name: t('height', 'Height'),
+                  type: 'number',
+                  value: patientVitalAndBiometrics?.height || '',
+                },
+              ]}
+              unitSymbol={conceptUnits.get(config.concepts.heightUuid) ?? ''}
+              inputIsNormal={true}
+              isTablet={isTablet}
+            />
+          </Column>
+          <Column>
+            <VitalsBiometricInput
+              title={t('bmiCalc', 'BMI (calc.)')}
+              onInputChange={() => {}}
+              textFields={[
+                {
+                  name: t('bmi', 'BMI'),
+                  type: 'number',
+                  value: patientBMI || '',
+                },
+              ]}
+              unitSymbol={biometricsUnitsSymbols['bmiUnit']}
+              disabled={true}
+              inputIsNormal={isBMIInNormalRange(patientBMI)}
+              isTablet={isTablet}
+            />
+          </Column>
+          <Column>
+            <VitalsBiometricInput
+              title={t('muac', 'MUAC')}
+              onInputChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                setPatientVitalAndBiometrics({
+                  ...patientVitalAndBiometrics,
+                  midUpperArmCircumference: event.target.value,
+                });
+              }}
+              textFields={[
+                {
+                  name: t('muac', 'MUAC'),
+                  type: 'number',
+                  value: patientVitalAndBiometrics?.midUpperArmCircumference || '',
+                },
+              ]}
+              unitSymbol={conceptUnits.get(config.concepts.midUpperArmCircumferenceUuid) ?? ''}
+              inputIsNormal={isInNormalRange(
+                conceptMetadata,
+                config.concepts['midUpperArmCircumferenceUuid'],
+                patientVitalAndBiometrics?.midUpperArmCircumference,
+              )}
+              isTablet={isTablet}
+            />
+          </Column>
+        </Row>
+      </Grid>
+      <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
+        <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
+          {t('discard', 'Discard')}
+        </Button>
+        <Button
+          className={styles.button}
+          kind="primary"
+          onClick={savePatientVitalsAndBiometrics}
+          disabled={isSubmitting}
+          type="submit"
+        >
+          {t('saveAndClose', 'Save and close')}
+        </Button>
+      </ButtonSet>
+    </Form>
   );
 };
 

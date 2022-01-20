@@ -1,6 +1,7 @@
 {
   "activeMedications": "Active Medications",
   "add": "Add",
+  "backToOrderBasket": "Back to order basket",
   "cancel": "Cancel",
   "clearSearchResults": "Clear Results",
   "details": "Details",
@@ -60,12 +61,12 @@
   "reorder": "Reorder",
   "revisedOrders": "{count} order(s) being modified (revised)",
   "revisedOrders_plural": "{count} order(s) being modified (revised)",
-  "save": "Save",
   "saveOrder": "Save order",
   "searchFieldPlaceholder": "Search for an order (e.g. \"Aspirin\")",
   "searchForAnOrder": "Search for an order above",
   "searchResultsExactMatchesForTerm": "{count} exact match(es) for \"{searchTerm}\"",
   "searchResultsExactMatchesForTerm_plural": "{count} exact match(es) for \"{searchTerm}\"",
+  "signAndClose": "Sign and close",
   "startDate": "Start date",
   "takeAsNeeded": "Take As Needed",
   "validationNoItemSelected": "Please select one of the available items."

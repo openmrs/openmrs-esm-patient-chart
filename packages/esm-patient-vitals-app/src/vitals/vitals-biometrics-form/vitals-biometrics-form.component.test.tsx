@@ -1,9 +1,13 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render } from '@testing-library/react';
-import { mockConceptMetadata, mockConceptUnits, mockVitalsConfig } from '../../../../../__mocks__/vitals.mock';
+import { mockConceptMetadata, mockVitalsConfig, mockVitalsSignsConcept } from '../../../../../__mocks__/vitals.mock';
 import { mockPatient } from '../../../../../__mocks__/patient.mock';
 import VitalsAndBiometricsForm from './vitals-biometrics-form.component';
+
+const mockConceptUnits = new Map<string, string>(
+  mockVitalsSignsConcept.data.results[0].setMembers.map((concept) => [concept.uuid, concept.units]),
+);
 
 jest.mock('@openmrs/esm-patient-common-lib', () => {
   const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
@@ -11,10 +15,8 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
   return {
     ...originalModule,
     useVitalsConceptMetadata: jest.fn().mockImplementation(() => ({
-      data: {
-        conceptUnits: mockConceptUnits,
-        conceptMetadata: mockConceptMetadata,
-      },
+      data: mockConceptUnits,
+      conceptMetadata: mockConceptMetadata,
     })),
   };
 });
@@ -57,7 +59,7 @@ describe('VitalsBiometricsForm: ', () => {
     expect(screen.getByText(/breaths\/min/i)).toBeInTheDocument();
     expect(screen.getByRole('spinbutton', { name: /temperature/i })).toBeInTheDocument();
     expect(screen.getByText(/temp/i)).toBeInTheDocument();
-    expect(screen.getByText(/deg c/i)).toBeInTheDocument();
+    expect(screen.getByText(/DEG C/i)).toBeInTheDocument();
     expect(screen.getByRole('textbox', { name: /notes/i })).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/type any additional notes here/i)).toBeInTheDocument();
     expect(screen.getByRole('spinbutton', { name: /weight/i })).toBeInTheDocument();
@@ -66,8 +68,8 @@ describe('VitalsBiometricsForm: ', () => {
     expect(screen.getByText(/bmi \(calc.\)/i)).toBeInTheDocument();
     expect(screen.getByText(/kg \/ m²/i)).toBeInTheDocument();
     expect(screen.getByRole('spinbutton', { name: /muac/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /cancel/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /sign & save/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /discard/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /save and close/i })).toBeInTheDocument();
   });
 
   it('computes BMI from the given height and weight values', async () => {

@@ -19,9 +19,11 @@ import { FormDataSourceService } from '../form-data-source/form-data-source.serv
 import { FormSubmissionService } from '../form-submission/form-submission.service';
 import { EncounterResourceService } from '../openmrs-api/encounter-resource.service';
 import { singleSpaPropsSubject, SingleSpaProps } from '../../single-spa-props';
-import { Order } from '../types';
+import { Encounter, FormSchema, LoggedInUser, Order } from '../types';
 // @ts-ignore
 import { showToast, detach, showNotification } from '@openmrs/esm-framework';
+import { PatientPreviousEncounterService } from '../openmrs-api/patient-previous-encounter.service';
+
 @Component({
   selector: 'my-app-fe-wrapper',
   templateUrl: './fe-wrapper.component.html',
@@ -37,8 +39,8 @@ export class FeWrapperComponent implements OnInit {
   formUuid: string;
   encounterUuid: string;
   visitUuid: string;
-  encounter: any;
-  formSchema: any;
+  encounter: Encounter;
+  formSchema: FormSchema;
   patient: any;
   loadingError: string;
   formSubmitted = false;
@@ -47,6 +49,8 @@ export class FeWrapperComponent implements OnInit {
   triedSubmitting = false;
   errorPanelOpen = false;
   submittedOrder: Array<Order> = [];
+  prevEncounter: Encounter;
+  isLoading: boolean = true;
 
   public get encounterDate(): string {
     return moment(this.encounter.encounterDatetime).format('YYYY-MM-DD');
@@ -73,17 +77,20 @@ export class FeWrapperComponent implements OnInit {
     private formDataSourceService: FormDataSourceService,
     private formSubmissionService: FormSubmissionService,
     private formErrorsService: FormErrorsService,
+    private patientPreviousEncounter: PatientPreviousEncounterService,
   ) {}
 
   ngOnInit() {
     this.launchForm().subscribe(
       (form) => {
         // console.log('Form loaded and rendered', form);
+        this.isLoading = false;
       },
       (err) => {
         // TODO: Handle errors
         console.error('Error rendering form', err);
         this.loadingError = 'Error loading form';
+        this.isLoading = false;
       },
     );
   }
@@ -91,19 +98,14 @@ export class FeWrapperComponent implements OnInit {
   public displayLabOrdersNotification() {
     const orders =
       this.submittedOrder.map((order, index) => ` ${index + 1} : ${order.display} : ${order.orderNumber}`).join() ?? '';
-    showToast({
-      critical: true,
-      kind: 'success',
-      description: `The form has been submitted successfully`,
-      title: this.formName,
-    });
-    showNotification({
-      title: 'Lab order(s) generated',
-      kind: 'success',
-      critical: true,
-      description: orders,
-    });
-    this.closeForm();
+    if (orders.length) {
+      showNotification({
+        title: 'Lab order(s) generated',
+        kind: 'success',
+        critical: true,
+        description: orders,
+      });
+    }
   }
 
   public onSubmit(event: any) {
@@ -121,14 +123,13 @@ export class FeWrapperComponent implements OnInit {
                   this.displayLabOrdersNotification();
                 }
               });
-          } else {
             showToast({
               critical: true,
               kind: 'success',
               description: `The form has been submitted successfully`,
               title: this.formName,
             });
-            detach('patient-chart-workspace-slot', 'patient-form-entry-workspace');
+            this.closeForm();
           }
         },
         (error) => {
@@ -208,25 +209,37 @@ export class FeWrapperComponent implements OnInit {
 
   private setUpWHOCascading() {
     try {
-      let whoQuestions = this.form.searchNodeByQuestionId('adultWhoStage');
+      if (this.form) {
+        let whoQuestions = this.form.searchNodeByQuestionId('adultWhoStage');
 
-      if (whoQuestions.length === 0) {
-        whoQuestions = this.form.searchNodeByQuestionId('pedWhoStage');
-      }
-
-      const whoStageQuestion = whoQuestions[0];
-
-      whoStageQuestion.control.valueChanges.subscribe((val) => {
-        if (val && val !== '') {
-          const source = this.form.dataSourcesContainer.dataSources['conceptAnswers'];
-          if (source.changeConcept) {
-            source.changeConcept(val);
-          }
+        if (whoQuestions.length === 0) {
+          whoQuestions = this.form.searchNodeByQuestionId('pedWhoStage');
         }
-      });
+
+        const whoStageQuestion = whoQuestions[0];
+
+        whoStageQuestion?.control.valueChanges.subscribe((val) => {
+          if (val && val !== '') {
+            const source = this.form.dataSourcesContainer.dataSources['conceptAnswers'];
+            if (source.changeConcept) {
+              source.changeConcept(val);
+            }
+          }
+        });
+      }
     } catch (error) {
       console.error(`Error setting up Who Staging Cascading, ${error}`);
     }
+  }
+
+  private loadPatientPreviousEncounters(data, subject) {
+    this.patientPreviousEncounter
+      .getPreviousEncounter(data.formSchema.encounterType?.uuid, this.singleSpaProps.patient.id)
+      .then((prevEnc) => {
+        this.prevEncounter = prevEnc ? prevEnc : Object.create({});
+        this.createForm();
+        subject.next(this.form);
+      });
   }
 
   public launchForm(): Observable<Form> {
@@ -236,8 +249,12 @@ export class FeWrapperComponent implements OnInit {
         .pipe(take(1))
         .subscribe(
           (data) => {
-            this.createForm();
-            subject.next(this.form);
+            if (this.singleSpaProps.isOffline) {
+              this.loadPatientPreviousEncounters(data, subject);
+            } else {
+              this.createForm();
+              subject.next(this.form);
+            }
           },
           (err) => {
             subject.error(err);
@@ -276,7 +293,7 @@ export class FeWrapperComponent implements OnInit {
       observableBatch.push(this.getEncounterToEdit(this.encounterUuid).pipe(take(1)));
     }
     forkJoin(observableBatch).subscribe(
-      (data: any) => {
+      (data) => {
         this.formSchema = data[0] || null;
         this.loggedInUser = data[1] || null;
         this.encounter = data[2] || null;
@@ -296,8 +313,8 @@ export class FeWrapperComponent implements OnInit {
     return trackingSubject.asObservable();
   }
 
-  private fetchCompiledFormSchema(uuid: string): Observable<any> {
-    const subject = new ReplaySubject<any>(1);
+  private fetchCompiledFormSchema(uuid: string): Observable<FormSchema> {
+    const subject = new ReplaySubject<FormSchema>(1);
     this.formSchemaService
       .getFormSchemaByUuid(uuid, true)
       .pipe(take(1))
@@ -312,8 +329,8 @@ export class FeWrapperComponent implements OnInit {
     return subject.asObservable();
   }
 
-  private getEncounterToEdit(encounterUuid: string): Observable<any> {
-    const subject = new ReplaySubject<any>(1);
+  private getEncounterToEdit(encounterUuid: string): Observable<Encounter> {
+    const subject = new ReplaySubject<Encounter>(1);
     const sub: Subscription = this.encounterResourceService.getEncounterByUuid(encounterUuid).subscribe(
       (encounter) => {
         subject.next(encounter);
@@ -351,6 +368,7 @@ export class FeWrapperComponent implements OnInit {
     this.dataSources.registerDataSource('conceptAnswers', this.formDataSourceService.getDataSources().conceptAnswers);
     this.dataSources.registerDataSource('patient', { visitTypeUuid: this.singleSpaProps.visitTypeUuid }, true);
     this.dataSources.registerDataSource('patient', this.formDataSourceService.getPatientObject(this.patient), true);
+    this.dataSources.registerDataSource('rawPrevEnc', this.prevEncounter, false);
   }
 
   private setDefaultValues() {
@@ -376,20 +394,27 @@ export class FeWrapperComponent implements OnInit {
   }
 
   private setUpPayloadProcessingInformation() {
-    this.form.valueProcessingInfo.personUuid = this.patient.id;
-    this.form.valueProcessingInfo.patientUuid = this.patient.id;
-    this.form.valueProcessingInfo.formUuid = this.formSchema.uuid;
-    this.form.valueProcessingInfo.providerUuid = this.loggedInUser.currentProvider.uuid;
-    if (this.formSchema.encounterType) {
-      this.form.valueProcessingInfo.encounterTypeUuid = this.formSchema.encounterType.uuid;
-    } else {
-      throw new Error('Please associate the form with an encounter type.');
-    }
-    if (this.encounterUuid) {
-      this.form.valueProcessingInfo.encounterUuid = this.encounterUuid;
-    }
-    if (this.visitUuid) {
-      this.form.valueProcessingInfo.visitUuid = this.visitUuid;
+    try {
+      if (this.loggedInUser) {
+        this.form.valueProcessingInfo.personUuid = this.patient.id;
+        this.form.valueProcessingInfo.patientUuid = this.patient.id;
+        this.form.valueProcessingInfo.formUuid = this.formSchema.uuid;
+        this.form.valueProcessingInfo.providerUuid = this.loggedInUser?.currentProvider?.uuid;
+        if (this.formSchema.encounterType) {
+          this.form.valueProcessingInfo.encounterTypeUuid = this.formSchema.encounterType.uuid;
+        } else {
+          this.isLoading = false;
+          throw new Error('Please associate the form with an encounter type.');
+        }
+        if (this.encounterUuid) {
+          this.form.valueProcessingInfo.encounterUuid = this.encounterUuid;
+        }
+        if (this.visitUuid) {
+          this.form.valueProcessingInfo.visitUuid = this.visitUuid;
+        }
+      }
+    } catch (error) {
+      console.error(error);
     }
   }
 
@@ -410,18 +435,4 @@ export class FeWrapperComponent implements OnInit {
   private saveForm(): Observable<any> {
     return this.formSubmissionService.submitPayload(this.form);
   }
-}
-
-export interface LoggedInUser {
-  user: any;
-  currentProvider: {
-    uuid: string;
-    display: string;
-    identifier: string;
-  };
-  sessionLocation: {
-    uuid: string;
-    name: string;
-    display: string;
-  };
 }

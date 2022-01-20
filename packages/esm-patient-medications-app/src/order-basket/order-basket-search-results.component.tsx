@@ -43,7 +43,7 @@ export default function OrderBasketSearchResults({
   return (
     <>
       {!!searchTerm && (
-        <>
+        <div className={styles.container}>
           <div className={styles.orderBasketSearchResultsHeader}>
             <span className={styles.searchResultsCount}>
               {t('searchResultsExactMatchesForTerm', '{count} exact match(es) for "{searchTerm}"', {
@@ -99,7 +99,7 @@ export default function OrderBasketSearchResults({
               />
             </>
           )}
-        </>
+        </div>
       )}
     </>
   );

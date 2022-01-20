@@ -10,7 +10,6 @@
   "dateCompleted": "Date completed",
   "dateEnrolled": "Date enrolled",
   "editProgram": "Edit program",
-  "enroll": "Enroll",
   "enrolledAt": "Enrolled at",
   "enrolledOn": "Enrolled on",
   "enrollmentLocation": "Enrollment location",
@@ -24,6 +23,7 @@
   "programEnrollmentSaveError": "Error saving program enrollment",
   "programs": "programs",
   "required": "Required",
+  "saveAndClose": "Save and close",
   "seeAll": "See all",
   "status": "Status"
 }

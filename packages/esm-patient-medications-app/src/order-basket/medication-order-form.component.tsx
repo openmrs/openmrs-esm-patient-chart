@@ -17,9 +17,8 @@ import {
   Grid,
   Row,
   Column,
-  Header,
-  HeaderName,
 } from 'carbon-components-react';
+import ArrowLeft24 from '@carbon/icons-react/es/arrow--left/24';
 import { useTranslation } from 'react-i18next';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { OrderBasketItem } from '../types/order-basket-item';
@@ -42,36 +41,48 @@ export default function MedicationOrderForm({
   onCancel,
 }: MedicationOrderFormProps) {
   const { t } = useTranslation();
+  const isDesktop = useLayoutType() === 'desktop';
   const isTablet = useLayoutType() === 'tablet';
   const [orderBasketItem, setOrderBasketItem] = useState(initialOrderBasketItem);
   const commonMedication = getCommonMedicationByUuid(orderBasketItem.drug.uuid);
 
   return (
     <>
-      <Header aria-label="" className={styles.medicationDetailsHeader}>
-        <HeaderName prefix="">
-          {orderBasketItem.isFreeTextDosage ? (
-            <strong>{capitalize(orderBasketItem.commonMedicationName)}</strong>
-          ) : (
-            <>
-              <span>
-                <strong className={styles.dosageInfo}>
-                  {capitalize(orderBasketItem.commonMedicationName)} ({orderBasketItem.dosage.dosage})
-                </strong>{' '}
-                <span className={styles.bodyShort01}>
-                  &mdash; {orderBasketItem.route.name} &mdash; {orderBasketItem.dosageUnit.name} &mdash;{' '}
-                </span>
-                <span className={styles.caption01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
-                <strong className={styles.dosageInfo}>{orderBasketItem.dosage.dosage}</strong>
+      <div className={styles.medicationDetailsHeader}>
+        {orderBasketItem.isFreeTextDosage ? (
+          <strong>{capitalize(orderBasketItem.commonMedicationName)}</strong>
+        ) : (
+          <>
+            <span>
+              <strong className={styles.dosageInfo}>
+                {capitalize(orderBasketItem.commonMedicationName)} ({orderBasketItem.dosage.dosage})
+              </strong>{' '}
+              <span className={styles.bodyShort01}>
+                &mdash; {orderBasketItem.route.name} &mdash; {orderBasketItem.dosageUnit.name} &mdash;{' '}
               </span>
-            </>
-          )}
-        </HeaderName>
-      </Header>
+              <span className={styles.caption01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
+              <strong className={styles.dosageInfo}>{orderBasketItem.dosage.dosage}</strong>
+            </span>
+          </>
+        )}
+      </div>
       <Form className={styles.orderForm} onSubmit={() => onSign(orderBasketItem)}>
-        <h2 className={styles.productiveHeading03}>{t('orderForm', 'Order Form')}</h2>
-        <Grid style={{ padding: 0 }}>
-          <Row>
+        <Grid className={styles.grid}>
+          {isDesktop ? (
+            <div className={styles.backButton}>
+              <Button
+                kind="ghost"
+                renderIcon={ArrowLeft24}
+                iconDescription="Return to order basket"
+                size="sm"
+                onClick={onCancel}
+              >
+                <span>{t('backToOrderBasket', 'Back to order basket')}</span>
+              </Button>
+            </div>
+          ) : null}
+          <h2 className={styles.heading}>{t('orderForm', 'Order Form')}</h2>
+          <Row className={styles.row}>
             <Column>
               <h3 className={styles.productiveHeading02}>{t('dosageInstructions', '1. Dosage Instructions')}</h3>
             </Column>
@@ -91,9 +102,8 @@ export default function MedicationOrderForm({
               />
             </Column>
           </Row>
-
           {orderBasketItem.isFreeTextDosage ? (
-            <Row style={{ marginTop: '0.5rem' }}>
+            <Row className={styles.row}>
               <Column md={8}>
                 <TextArea
                   light={isTablet}
@@ -112,7 +122,7 @@ export default function MedicationOrderForm({
             </Row>
           ) : (
             <>
-              <Row style={{ marginTop: '1rem' }}>
+              <Row className={styles.row}>
                 <Column md={4}>
                   <ComboBox
                     id="doseSelection"
@@ -168,7 +178,7 @@ export default function MedicationOrderForm({
                   />
                 </Column>
               </Row>
-              <Row style={{ marginTop: '1rem' }}>
+              <Row className={styles.row}>
                 <Column md={4}>
                   <ComboBox
                     id="editRoute"
@@ -197,7 +207,7 @@ export default function MedicationOrderForm({
                   />
                 </Column>
               </Row>
-              <Row style={{ marginTop: '1rem' }}>
+              <Row className={styles.row}>
                 <Column className={styles.fullHeightTextAreaContainer}>
                   <TextArea
                     light={isTablet}
@@ -253,12 +263,12 @@ export default function MedicationOrderForm({
               </Row>
             </>
           )}
-          <Row style={{ marginTop: '2rem' }}>
+          <Row className={`${styles.row} ${styles.spacer}`}>
             <Column md={8}>
               <h3 className={styles.productiveHeading02}>{t('prescriptionDuration', '2. Prescription Duration')}</h3>
             </Column>
           </Row>
-          <Row style={{ marginTop: '1rem' }}>
+          <Row className={styles.row}>
             <Column md={4} className={styles.fullWidthDatePickerContainer}>
               <DatePicker
                 light={isTablet}
@@ -332,13 +342,13 @@ export default function MedicationOrderForm({
               </FormGroup>
             </Column>
           </Row>
-          <Row>
+          <Row className={`${styles.row} ${styles.spacer}`}>
             <Column md={8}>
               <h3 className={styles.productiveHeading02}>{t('dispensingInformation', '3. Dispensing Information')}</h3>
             </Column>
           </Row>
-          <Row style={{ marginTop: '1rem' }}>
-            <Column md={2}>
+          <Row className={styles.row}>
+            <Column md={3}>
               <FormGroup legendText={t('quantity', 'Quantity')}>
                 <NumberInput
                   light={isTablet}
@@ -356,7 +366,7 @@ export default function MedicationOrderForm({
                 />
               </FormGroup>
             </Column>
-            <Column md={2}>
+            <Column md={3}>
               <FormGroup legendText={t('prescriptionRefills', 'Prescription Refills')}>
                 <NumberInput
                   light={isTablet}
@@ -374,7 +384,7 @@ export default function MedicationOrderForm({
               </FormGroup>
             </Column>
           </Row>
-          <Row>
+          <Row className={styles.row}>
             <Column md={8}>
               <TextInput
                 light={isTablet}
@@ -394,12 +404,11 @@ export default function MedicationOrderForm({
             </Column>
           </Row>
         </Grid>
-
-        <ButtonSet style={{ marginTop: '2rem' }}>
-          <Button kind="secondary" onClick={onCancel}>
+        <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
+          <Button className={styles.button} kind="secondary" onClick={onCancel}>
             {t('discard', 'Discard')}
           </Button>
-          <Button kind="primary" type="submit">
+          <Button className={styles.button} kind="primary" type="submit">
             {t('saveOrder', 'Save order')}
           </Button>
         </ButtonSet>

@@ -1,11 +1,20 @@
 import React, { SyntheticEvent, useEffect, useState } from 'react';
 import styles from './immunizations-form.scss';
-import { showNotification, showToast, detach, useSessionUser, useVisit } from '@openmrs/esm-framework';
+import { showNotification, showToast, detach, useSessionUser, useVisit, useLayoutType } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { savePatientImmunization } from './immunizations.resource';
 import { mapToFHIRImmunizationResource } from './immunization-mapper';
 import { ImmunizationFormData, ImmunizationSequence } from './immunization-domain';
-import { Button, DatePicker, DatePickerInput, Form, Select, SelectItem, TextInput } from 'carbon-components-react';
+import {
+  Button,
+  ButtonSet,
+  DatePicker,
+  DatePickerInput,
+  Form,
+  Select,
+  SelectItem,
+  TextInput,
+} from 'carbon-components-react';
 import { immunizationFormSub } from './immunization-utils';
 
 function hasSequences<T>(sequences: Array<T>) {
@@ -49,6 +58,7 @@ const ImmunizationsForm: React.FC<ImmunizationsFormProps> = ({ patientUuid }) =>
   const { t } = useTranslation();
   const currentUser = useSessionUser();
   const { currentVisit } = useVisit(patientUuid);
+  const isTablet = useLayoutType() === 'tablet';
 
   const isViewEditMode = !!formState.immunizationObsUuid;
   const enableCreateButtons = !isViewEditMode && !!formState.vaccinationDate;
@@ -118,111 +128,101 @@ const ImmunizationsForm: React.FC<ImmunizationsFormProps> = ({ patientUuid }) =>
   };
 
   return (
-    <Form onSubmit={handleFormSubmit} data-testid="immunization-form">
-      <h4 className={styles.immunizationSequenceSelect}>{`${t('vaccine', 'Vaccine')} : ${formState?.vaccineName}`} </h4>
-      {hasSequences(formState.sequences) && (
+    <Form className={styles.form} onSubmit={handleFormSubmit} data-testid="immunization-form">
+      <div>
+        <h4 className={styles.immunizationSequenceSelect}>
+          {`${t('vaccine', 'Vaccine')} : ${formState?.vaccineName}`}{' '}
+        </h4>
+        {hasSequences(formState.sequences) && (
+          <div className={styles.immunizationSequenceSelect}>
+            <Select
+              id="sequence"
+              name="sequence"
+              value={formState.currentDose.sequenceNumber}
+              onChange={onDoseSelect}
+              className="immunizationSequenceSelect"
+              labelText={t('sequence', 'Sequence')}
+            >
+              <SelectItem text={t('pleaseSelect', 'Please select')} value="DEFAULT">
+                {t('pleaseSelect', 'Please select')}
+              </SelectItem>
+              {formState.sequences.map((s) => {
+                return (
+                  <SelectItem key={s.sequenceNumber} text={s.sequenceLabel} value={s.sequenceNumber}>
+                    {t(s.sequenceLabel, s.sequenceLabel)}
+                  </SelectItem>
+                );
+              })}
+            </Select>
+          </div>
+        )}
         <div className={styles.immunizationSequenceSelect}>
-          <Select
-            id="sequence"
-            name="sequence"
-            value={formState.currentDose.sequenceNumber}
-            onChange={onDoseSelect}
-            className="immunizationSequenceSelect"
-            labelText={t('sequence', 'Sequence')}
+          <DatePicker
+            id="vaccinationDate"
+            className="vaccinationDate"
+            maxDate={new Date().toISOString()}
+            dateFormat="d/m/Y"
+            datePickerType="single"
+            value={formState.vaccinationDate}
+            onChange={([date]) => updateSingle('vaccinationDate', date.toISOString())}
           >
-            <SelectItem text={t('pleaseSelect', 'Please select')} value="DEFAULT">
-              {t('pleaseSelect', 'Please select')}
-            </SelectItem>
-            {formState.sequences.map((s) => {
-              return (
-                <SelectItem key={s.sequenceNumber} text={s.sequenceLabel} value={s.sequenceNumber}>
-                  {t(s.sequenceLabel, s.sequenceLabel)}
-                </SelectItem>
-              );
-            })}
-          </Select>
+            <DatePickerInput
+              id="date-picker-calendar-id"
+              placeholder="dd/mm/yyyy"
+              labelText={t('vaccinationDate', 'Vaccination Date')}
+              type="text"
+            />
+          </DatePicker>
         </div>
-      )}
-      <div className={styles.immunizationSequenceSelect}>
-        <DatePicker
-          id="vaccinationDate"
-          className="vaccinationDate"
-          maxDate={new Date().toISOString()}
-          dateFormat="d/m/Y"
-          datePickerType="single"
-          value={formState.vaccinationDate}
-          onChange={([date]) => updateSingle('vaccinationDate', date.toISOString())}
-        >
-          <DatePickerInput
-            id="date-picker-calendar-id"
-            placeholder="dd/mm/yyyy"
-            labelText={t('vaccinationDate', 'Vaccination Date')}
-            type="text"
-          />
-        </DatePicker>
-      </div>
-      <div className={styles.immunizationSequenceSelect}>
-        <DatePicker
-          id="vaccinationExpiration"
-          className="vaccinationExpiration"
-          minDate={new Date().toISOString()}
-          dateFormat="d/m/Y"
-          datePickerType="single"
-          value={formState.expirationDate}
-          onChange={([date]) => updateSingle('expirationDate', date.toISOString())}
-        >
-          <DatePickerInput
-            id="date-picker-calendar-id"
-            placeholder="dd/mm/yyyy"
-            labelText={t('expirationDate', 'Expiration Date')}
-            type="text"
-          />
-        </DatePicker>
-      </div>
-      <div className={styles.immunizationSequenceSelect}>
-        <TextInput
-          type="text"
-          id="lotNumber"
-          labelText={t('lotNumber', 'Lot Number')}
-          value={formState.lotNumber}
-          onChange={(evt) => updateSingle('lotNumber', evt.target.value)}
-        />
-      </div>
-      <div className={styles.immunizationSequenceSelect}>
-        <TextInput
-          type="text"
-          id="manufacturer"
-          labelText={t('manufacturer', 'Manufacturer')}
-          value={formState.manufacturer}
-          onChange={(evt) => updateSingle('manufacturer', evt.target.value)}
-        />
-      </div>
-      <div className={styles.immunizationSequenceSelect}>
-        <div
-          className={
-            enableCreateButtons || enableEditButtons
-              ? `${styles.buttonStyles} ${styles.buttonStylesBorder}`
-              : styles.buttonStyles
-          }
-        >
-          <Button
-            type="button"
-            kind="secondary"
-            style={{ width: '50%', marginBottom: '1rem' }}
-            onClick={closeWorkspace}
+        <div className={styles.immunizationSequenceSelect}>
+          <DatePicker
+            id="vaccinationExpiration"
+            className="vaccinationExpiration"
+            minDate={new Date().toISOString()}
+            dateFormat="d/m/Y"
+            datePickerType="single"
+            value={formState.expirationDate}
+            onChange={([date]) => updateSingle('expirationDate', date.toISOString())}
           >
-            {t('cancel', 'Cancel')}
-          </Button>
-          <Button
-            type="submit"
-            kind="primary"
-            style={{ width: '50%', marginBottom: '1rem' }}
-            disabled={isViewEditMode ? !enableEditButtons : !enableCreateButtons}
-          >
-            {t('save', 'Save')}
-          </Button>
+            <DatePickerInput
+              id="date-picker-calendar-id"
+              placeholder="dd/mm/yyyy"
+              labelText={t('expirationDate', 'Expiration Date')}
+              type="text"
+            />
+          </DatePicker>
+        </div>
+        <div className={styles.immunizationSequenceSelect}>
+          <TextInput
+            type="text"
+            id="lotNumber"
+            labelText={t('lotNumber', 'Lot Number')}
+            value={formState.lotNumber}
+            onChange={(evt) => updateSingle('lotNumber', evt.target.value)}
+          />
+        </div>
+        <div className={styles.immunizationSequenceSelect}>
+          <TextInput
+            type="text"
+            id="manufacturer"
+            labelText={t('manufacturer', 'Manufacturer')}
+            value={formState.manufacturer}
+            onChange={(evt) => updateSingle('manufacturer', evt.target.value)}
+          />
         </div>
       </div>
+      <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
+        <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
+          {t('cancel', 'Cancel')}
+        </Button>
+        <Button
+          className={styles.button}
+          kind="primary"
+          disabled={isViewEditMode ? !enableEditButtons : !enableCreateButtons}
+        >
+          {t('save', 'Save')}
+        </Button>
+      </ButtonSet>
     </Form>
   );
 };

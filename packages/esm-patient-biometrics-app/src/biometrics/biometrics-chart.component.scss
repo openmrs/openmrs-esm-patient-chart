@@ -77,11 +77,11 @@
   width: 10rem;
 }
 
-:global(.bx--tabs--scrollable .bx--tabs--scrollable__nav-item+.bx--tabs--scrollable__nav-item) {
+.verticalTabs :global(.bx--tabs--scrollable .bx--tabs--scrollable__nav-item+.bx--tabs--scrollable__nav-item) {
   margin-left: 0rem;
 }
 
-:global(.bx--tabs--scrollable .bx--tabs--scrollable__nav-link) {
+.verticalTabs :global(.bx--tabs--scrollable .bx--tabs--scrollable__nav-link) {
   border-bottom: 0 !important;
   border-left: 2px solid $color-gray-30;
 }

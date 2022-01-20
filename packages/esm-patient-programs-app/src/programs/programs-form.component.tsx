@@ -14,7 +14,16 @@ import {
   useSessionUser,
   useLocations,
 } from '@openmrs/esm-framework';
-import { Button, DatePicker, DatePickerInput, Select, SelectItem, Form, FormGroup } from 'carbon-components-react';
+import {
+  Button,
+  DatePicker,
+  DatePickerInput,
+  Select,
+  SelectItem,
+  Form,
+  FormGroup,
+  ButtonSet,
+} from 'carbon-components-react';
 import { createProgramEnrollment, useAvailablePrograms, useEnrollments } from './programs.resource';
 
 interface ProgramsFormProps {
@@ -95,81 +104,83 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, isTablet }) =>
   );
 
   return (
-    <Form style={{ margin: '2rem' }} onSubmit={handleSubmit}>
-      <FormGroup style={{ width: '50%' }} legendText={t('program', 'Program')}>
-        <div className={styles.selectContainer}>
+    <Form className={styles.form} onSubmit={handleSubmit}>
+      <div className={styles.formContainer}>
+        <FormGroup style={{ width: '50%' }} legendText={t('program', 'Program')}>
+          <div className={styles.selectContainer}>
+            <Select
+              id="program"
+              invalidText={t('required', 'Required')}
+              labelText=""
+              light={isTablet}
+              onChange={(event) => setSelectedProgram(event.target.value)}
+            >
+              {!selectedProgram ? <SelectItem text={t('chooseProgram', 'Choose a program')} value="" /> : null}
+              {eligiblePrograms?.length > 0 &&
+                eligiblePrograms.map((program) => (
+                  <SelectItem key={program.uuid} text={program.display} value={program.uuid}>
+                    {program.display}
+                  </SelectItem>
+                ))}
+            </Select>
+          </div>
+        </FormGroup>
+        <FormGroup legendText={t('dateEnrolled', 'Date enrolled')}>
+          <DatePicker
+            id="enrollmentDate"
+            datePickerType="single"
+            dateFormat="d/m/Y"
+            light={isTablet}
+            maxDate={new Date().toISOString()}
+            placeholder="dd/mm/yyyy"
+            onChange={([date]) => setEnrollmentDate(date)}
+            value={enrollmentDate}
+          >
+            <DatePickerInput id="enrollmentDateInput" labelText="" />
+          </DatePicker>
+        </FormGroup>
+        <FormGroup legendText={t('dateCompleted', 'Date completed')}>
+          <DatePicker
+            id="completionDate"
+            datePickerType="single"
+            dateFormat="d/m/Y"
+            light={isTablet}
+            minDate={new Date(enrollmentDate).toISOString()}
+            maxDate={new Date().toISOString()}
+            placeholder="dd/mm/yyyy"
+            onChange={([date]) => setCompletionDate(date)}
+            value={completionDate}
+          >
+            <DatePickerInput id="completionDateInput" labelText="" />
+          </DatePicker>
+        </FormGroup>
+        <FormGroup style={{ width: '50%' }} legendText={t('enrollmentLocation', 'Enrollment location')}>
           <Select
-            id="program"
-            invalidText={t('required', 'Required')}
+            id="location"
+            invalidText="Required"
             labelText=""
             light={isTablet}
-            onChange={(event) => setSelectedProgram(event.target.value)}
+            onChange={(event) => setUserLocation(event.target.value)}
+            value={userLocation}
           >
-            {!selectedProgram ? <SelectItem text={t('chooseProgram', 'Choose a program')} value="" /> : null}
-            {eligiblePrograms?.length > 0 &&
-              eligiblePrograms.map((program) => (
-                <SelectItem key={program.uuid} text={program.display} value={program.uuid}>
-                  {program.display}
+            {!userLocation ? <SelectItem text={t('chooseLocation', 'Choose a location')} value="" /> : null}
+            {availableLocations?.length > 0 &&
+              availableLocations.map((location) => (
+                <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
+                  {location.display}
                 </SelectItem>
               ))}
           </Select>
-        </div>
-      </FormGroup>
-      <FormGroup legendText={t('dateEnrolled', 'Date enrolled')}>
-        <DatePicker
-          id="enrollmentDate"
-          datePickerType="single"
-          dateFormat="d/m/Y"
-          light={isTablet}
-          maxDate={new Date().toISOString()}
-          placeholder="dd/mm/yyyy"
-          onChange={([date]) => setEnrollmentDate(date)}
-          value={enrollmentDate}
-        >
-          <DatePickerInput id="enrollmentDateInput" labelText="" />
-        </DatePicker>
-      </FormGroup>
-      <FormGroup legendText={t('dateCompleted', 'Date completed')}>
-        <DatePicker
-          id="completionDate"
-          datePickerType="single"
-          dateFormat="d/m/Y"
-          light={isTablet}
-          minDate={new Date(enrollmentDate).toISOString()}
-          maxDate={new Date().toISOString()}
-          placeholder="dd/mm/yyyy"
-          onChange={([date]) => setCompletionDate(date)}
-          value={completionDate}
-        >
-          <DatePickerInput id="completionDateInput" labelText="" />
-        </DatePicker>
-      </FormGroup>
-      <FormGroup style={{ width: '50%' }} legendText={t('enrollmentLocation', 'Enrollment location')}>
-        <Select
-          id="location"
-          invalidText="Required"
-          labelText=""
-          light={isTablet}
-          onChange={(event) => setUserLocation(event.target.value)}
-          value={userLocation}
-        >
-          {!userLocation ? <SelectItem text={t('chooseLocation', 'Choose a location')} value="" /> : null}
-          {availableLocations?.length > 0 &&
-            availableLocations.map((location) => (
-              <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
-                {location.display}
-              </SelectItem>
-            ))}
-        </Select>
-      </FormGroup>
-      <div style={{ marginTop: '1.625rem' }}>
-        <Button style={{ width: '50%' }} kind="secondary" type="button" onClick={closeWorkspace}>
+        </FormGroup>
+      </div>
+      <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
+        <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button style={{ width: '50%' }} kind="primary" type="submit" disabled={!selectedProgram}>
-          {t('enroll', 'Enroll')}
+        <Button className={styles.button} kind="primary" disabled={!selectedProgram} type="submit">
+          {t('saveAndClose', 'Save and close')}
         </Button>
-      </div>
+      </ButtonSet>
     </Form>
   );
 };

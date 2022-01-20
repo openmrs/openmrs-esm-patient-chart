@@ -18,6 +18,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TooltipIcon,
 } from 'carbon-components-react';
 import { getDosage } from '../utils/get-dosage';
 import { useTranslation } from 'react-i18next';
@@ -62,7 +63,7 @@ const MedicationsDetailsTable = connect<
     const { t } = useTranslation();
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
-    const [currentMedicationPage] = paginate(medications, page, pageSize);
+    const [paginatedMedications] = paginate(medications, page, pageSize);
 
     const openOrderBasket = React.useCallback(() => launchPatientWorkspace('order-basket-workspace'), []);
 
@@ -81,7 +82,7 @@ const MedicationsDetailsTable = connect<
       },
     ];
 
-    const tableRows = currentMedicationPage.map((medication, id) => ({
+    const tableRows = paginatedMedications.map((medication, id) => ({
       id: `${id}`,
       details: {
         sortKey: medication.drug?.name,
@@ -134,11 +135,9 @@ const MedicationsDetailsTable = connect<
       startDate: {
         sortKey: dayjs(medication.dateActivated).toDate(),
         content: (
-          <div className={styles.leftColumn}>
+          <div className={styles.startDateColumn}>
             <span>{dayjs(medication.dateActivated).format('DD-MMM-YYYY')}</span>
-            <span className={styles.indicationRow}>
-              <User16 />
-            </span>
+            <InfoTooltip orderer={medication.orderer?.person?.display ?? '--'} />
           </div>
         ),
       },
@@ -220,6 +219,14 @@ const MedicationsDetailsTable = connect<
     );
   },
 );
+
+function InfoTooltip({ orderer }) {
+  return (
+    <TooltipIcon className={styles.tooltip} align="start" direction="top" tooltipText={orderer} renderIcon={User16}>
+      {orderer}
+    </TooltipIcon>
+  );
+}
 
 function OrderBasketItemActions({
   showDiscontinueButton,

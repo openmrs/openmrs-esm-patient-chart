@@ -1,26 +1,43 @@
 <div class="error-text">{{ loadingError }}</div>
 <div class="form-title" [ngClass]="{'error': hasValidationErrors}">
-    <span *ngIf="encounter" class="omrs-type-body-small" style="color: var(--omrs-color-ink-medium-contrast);">
-        <svg class="omrs-icon title-icon-size" fill="var(--omrs-color-ink-low-contrast)">
-            <use xlink:href="#omrs-icon-calendar"></use>
-        </svg>
-        {{encounterDate + " "}}
-        <svg class="omrs-icon title-icon-size" fill="var(--omrs-color-ink-low-contrast)">
-            <use xlink:href="#omrs-icon-access-time"></use>
-        </svg>
-        {{encounterTime}}
-    </span>
+  <span *ngIf="encounter" class="omrs-type-body-small" style="color: var(--omrs-color-ink-medium-contrast);">
+    <svg class="omrs-icon title-icon-size" fill="var(--omrs-color-ink-low-contrast)">
+      <use xlink:href="#omrs-icon-calendar"></use>
+    </svg>
+    {{encounterDate + " "}}
+    <svg class="omrs-icon title-icon-size" fill="var(--omrs-color-ink-low-contrast)">
+      <use xlink:href="#omrs-icon-access-time"></use>
+    </svg>
+    {{encounterTime}}
+  </span>
 </div>
 <div *ngIf="!formSubmitted" [ngClass]="{'error': hasValidationErrors}">
-    <div class="content" (click)="onErrorPanelLostFocus()">
-        <form class="bx--form no-padding" *ngIf="formSchema" [formGroup]="form.rootNode.control">
-            <form-renderer [node]="form.rootNode"></form-renderer>
-        </form>
-        <div class="bx--row button-margin">
-            <button (click)="closeForm()" class="bx--btn bx--btn--secondary" type="button"
-                style="width: 50%;">Cancel</button>
-            <button class="bx--btn bx--btn--primary" (click)="onSubmit($event)" type="submit"
-                style="width: 50%;">Save</button>
-        </div>
+  <div class="content" (click)="onErrorPanelLostFocus()">
+    <div *ngIf="!isLoading" class="form-container">
+      <form class="bx--form no-padding" *ngIf="formSchema" [formGroup]="form.rootNode.control">
+        <form-renderer [node]="form.rootNode"></form-renderer>
+      </form>
+      <div class="bx-btn--set button-set">
+        <button class="bx--btn bx--btn--secondary" (click)="closeForm()" type="button">Discard</button>
+        <button class="bx--btn bx--btn--primary" (click)="onSubmit($event)" type="submit">Save and close</button>
+      </div>
     </div>
+  </div>
+</div>
+
+<div *ngIf="isLoading" class="loader-container">
+  <div class="bx--inline-loading" aria-live="assertive" class="loader">
+    <div class="bx--inline-loading__animation">
+      <div aria-atomic="true" aria-labelledby="loading-id-2" aria-live="assertive"
+        class="bx--loading bx--loading--small">
+        <label id="loading-id-2" class="bx--visually-hidden">Active loading indicator</label>
+        <svg class="bx--loading__svg" viewBox="0 0 100 100">
+          <title>Active loading indicator</title>
+          <circle class="bx--loading__background" cx="50%" cy="50%" r="44"></circle>
+          <circle class="bx--loading__stroke" cx="50%" cy="50%" r="44"></circle>
+        </svg>
+      </div>
+    </div>
+    <div class="bx--inline-loading__text">Loading...</div>
+  </div>
 </div>

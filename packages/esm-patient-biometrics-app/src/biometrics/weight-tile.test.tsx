@@ -3,8 +3,13 @@ import { screen } from '@testing-library/react';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { getByTextWithMarkup, swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
-import { mockBiometricsResponse, mockConceptMetadata, mockConceptUnits } from '../../../../__mocks__/biometrics.mock';
+import { mockBiometricsResponse, mockConceptMetadata } from '../../../../__mocks__/biometrics.mock';
 import WeightTile from './weight-tile.component';
+import { mockVitalsSignsConcept } from '../../../../__mocks__/vitals.mock';
+
+const mockConceptUnits = new Map<string, string>(
+  mockVitalsSignsConcept.data.results[0].setMembers.map((concept) => [concept.uuid, concept.units]),
+);
 
 const testProps = {
   patientUuid: mockPatient.id,
@@ -32,10 +37,8 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
   return {
     ...originalModule,
     useVitalsConceptMetadata: jest.fn().mockImplementation(() => ({
-      data: {
-        conceptUnits: mockConceptUnits,
-        conceptMetadata: mockConceptMetadata,
-      },
+      data: mockConceptUnits,
+      conceptMetadata: mockConceptMetadata,
     })),
   };
 });

@@ -1,11 +1,5 @@
 @import "../root.scss";
 
-.container {
-  border-width: 0.0625rem 0 0.0625rem 0.0625rem;
-  border-style: solid;
-  border-color: $text-03;
-}
-
 .header {
   background-color: $ui-03;
   top: 3rem;
@@ -22,39 +16,8 @@
   }
 
   &:not(.maximized) {
-    position: sticky;
-  }
-}
-
-/* Tablet */
-:global(.omrs-breakpoint-lt-desktop) .container {
-  background-color: $ui-01;
-  position: fixed;
-  top: 3rem;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 1000;
-
-  > .dynamicWidth {
-    width: 100%;
-  }
-}
-
-
-/* Desktop */
-:global(.omrs-breakpoint-gt-tablet) .container {
-  background-color: $ui-02;
-  margin-right: 50px;
-  flex: 1;
-  
-  &.maximized {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 1000;
+    right: auto;
+    left: auto;
   }
 }
 
@@ -72,7 +35,7 @@
   right: auto;
   left: auto;
   overflow-y: auto;
-  bottom: 1px;
+  background-color: $ui-02;
 }
 
 .fullWidth {
@@ -82,4 +45,48 @@
 
 .dynamicWidth {
   width: calc(50% - 9.6rem);
+}
+
+/* Desktop */
+:global(.omrs-breakpoint-gt-tablet) {
+  .maximized {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+  }
+  
+  .container {
+    margin-right: 3rem;
+    flex: 1;
+    height: 100vh;
+  }
+}
+
+/* Tablet */
+:global(.omrs-breakpoint-lt-desktop) {
+  .container {
+    background-color: $ui-01;
+    position: fixed;
+    top: 3rem;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+  }
+
+  .header {
+    display: none;
+  }
+
+  .fixed {
+    top: 3rem;
+    background-color: $ui-01;
+  }
+
+  .dynamicWidth {
+    width: 100%;
+  }
 }

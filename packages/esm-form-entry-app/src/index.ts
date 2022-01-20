@@ -1,5 +1,6 @@
 import 'systemjs-webpack-interop/resource-query-public-path?systemjsModuleName=@openmrs/esm-form-entry-app';
 import 'zone.js/dist/zone';
+import 'reflect-metadata';
 import { messageOmrsServiceWorker } from '@openmrs/esm-framework';
 import {
   setupOfflineEncounterSync,

@@ -1,5 +1,11 @@
 @import "../root";
 
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
 .orderBasketContainer {
   margin: $spacing-05;
 }
@@ -15,4 +21,35 @@
 
 .activeMedicationsContainer {
   border: 1px solid $ui-03;
+}
+
+.tablet {
+  padding: 1.5rem 1rem;
+  background-color: $ui-02;
+}
+
+.desktop {
+  padding: 0rem;
+}
+
+.button {
+  height: 4rem;
+  display: flex;
+  align-content: flex-start;
+  align-items: baseline;
+  min-width: 50%;
+}
+
+/* Desktop */
+:global(.omrs-breakpoint-gt-tablet) {
+  .container {
+    height: calc(100vh - 9rem);
+  }
+}
+
+/* Tablet */
+:global(.omrs-breakpoint-lt-desktop) {
+  .container {
+    height: calc(100vh - 6rem);
+  }
 }

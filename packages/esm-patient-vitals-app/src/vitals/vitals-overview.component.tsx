@@ -18,6 +18,8 @@ import {
 import { useTranslation } from 'react-i18next';
 import { patientVitalsBiometricsFormWorkspace } from '../constants';
 import { useVitals } from './vitals.resource';
+import { ConfigObject } from '../config-schema';
+import { useConfig } from '@openmrs/esm-framework';
 
 interface VitalsOverviewProps {
   patientUuid: string;
@@ -29,13 +31,13 @@ interface VitalsOverviewProps {
 
 const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVitals, pageSize, urlLabel, pageUrl }) => {
   const { t } = useTranslation();
+  const config = useConfig() as ConfigObject;
   const displayText = t('vitalSigns', 'Vital signs');
   const headerTitle = t('vitals', 'Vitals');
   const [chartView, setChartView] = React.useState<boolean>();
 
   const { data: vitals, isError, isLoading, isValidating } = useVitals(patientUuid);
-  const { data: conceptData } = useVitalsConceptMetadata();
-  const conceptUnits = conceptData ? conceptData.conceptUnits : null;
+  const { data: conceptUnits } = useVitalsConceptMetadata();
 
   const launchVitalsBiometricsForm = React.useCallback(
     () => launchPatientWorkspace(patientVitalsBiometricsFormWorkspace),
@@ -46,20 +48,20 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
     { key: 'date', header: 'Date and time', isSortable: true },
     {
       key: 'bloodPressure',
-      header: withUnit('BP', conceptUnits?.[0] ?? ''),
+      header: withUnit('BP', conceptUnits.get(config.concepts.systolicBloodPressureUuid) ?? ''),
     },
     {
       key: 'respiratoryRate',
-      header: withUnit('R. Rate', conceptUnits?.[8] ?? ''),
+      header: withUnit('R. Rate', conceptUnits.get(config.concepts.respiratoryRateUuid) ?? ''),
     },
-    { key: 'pulse', header: withUnit('Pulse', conceptUnits?.[5] ?? '') },
+    { key: 'pulse', header: withUnit('Pulse', conceptUnits.get(config.concepts.pulseUuid) ?? '') },
     {
       key: 'spo2',
-      header: withUnit('SPO2', conceptUnits?.[6] ?? ''),
+      header: withUnit('SPO2', conceptUnits.get(config.concepts.oxygenSaturationUuid) ?? ''),
     },
     {
       key: 'temperature',
-      header: withUnit('Temp', conceptUnits?.[2] ?? ''),
+      header: withUnit('Temp', conceptUnits.get(config.concepts.temperatureUuid) ?? ''),
     },
   ];
 
@@ -126,7 +128,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
                 </div>
               </CardHeader>
               {chartView ? (
-                <VitalsChart patientVitals={vitals} conceptUnits={conceptUnits} />
+                <VitalsChart patientVitals={vitals} conceptUnits={conceptUnits} config={config} />
               ) : (
                 <VitalsPagination
                   tableRows={tableRows}

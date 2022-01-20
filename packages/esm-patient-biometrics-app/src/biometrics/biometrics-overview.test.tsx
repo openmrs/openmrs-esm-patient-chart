@@ -6,16 +6,20 @@ import {
   formattedBiometrics,
   mockBiometricsResponse,
   mockConceptMetadata,
-  mockConceptUnits,
 } from '../../../../__mocks__/biometrics.mock';
 import { patientChartBasePath, swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import BiometricsOverview from './biometrics-overview.component';
+import { mockVitalsSignsConcept } from '../../../../__mocks__/vitals.mock';
 
 const testProps = {
   basePath: patientChartBasePath,
   showAddBiometrics: true,
   patientUuid: mockPatient.id,
 };
+
+const mockConceptUnits = new Map<string, string>(
+  mockVitalsSignsConcept.data.results[0].setMembers.map((concept) => [concept.uuid, concept.units]),
+);
 
 const mockBiometricsConfig = {
   biometrics: { bmiUnit: 'kg / m²' },
@@ -45,10 +49,8 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
   return {
     ...originalModule,
     useVitalsConceptMetadata: jest.fn().mockImplementation(() => ({
-      data: {
-        conceptUnits: mockConceptUnits,
-        conceptMetadata: mockConceptMetadata,
-      },
+      data: mockConceptUnits,
+      conceptMetadata: mockConceptMetadata,
     })),
   };
 });

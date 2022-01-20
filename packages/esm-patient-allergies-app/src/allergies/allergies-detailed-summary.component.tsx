@@ -2,7 +2,6 @@ import React from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { CardHeader, EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { useAllergies } from './allergy-intolerance.resource';
 import Add16 from '@carbon/icons-react/es/add/16';
 import {
   Button,
@@ -18,19 +17,19 @@ import {
   TableRow,
 } from 'carbon-components-react';
 import styles from './allergies-detailed-summary.scss';
+import { useAllergies } from './allergy-intolerance.resource';
 import { patientAllergiesFormWorkspace } from '../constants';
 
 interface AllergiesDetailedSummaryProps {
   patient: fhir.Patient;
-  showAddAllergy: boolean;
+  showAddAllergyButton: boolean;
 }
 
-const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ patient, showAddAllergy }) => {
+const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ patient, showAddAllergyButton }) => {
   const { t } = useTranslation();
   const displayText = t('allergyIntolerances', 'allergy intolerances');
   const headerTitle = t('allergies', 'Allergies');
-
-  const { data: allergies, isError, isLoading, isValidating } = useAllergies(patient.id);
+  const { allergies, isError, isLoading, isValidating } = useAllergies(patient.id);
 
   const launchAllergiesForm = React.useCallback(() => launchPatientWorkspace(patientAllergiesFormWorkspace), []);
 
@@ -75,8 +74,8 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
           </div>
         ),
       },
-      recordedDate: dayjs(allergy.recordedDate).format('MMM-YYYY') ?? '-',
-      lastUpdated: dayjs(allergy.lastUpdated).format('DD-MMM-YYYY'),
+      recordedDate: dayjs(allergy.recordedDate).format('MMM-YYYY') ?? '--',
+      lastUpdated: allergy.lastUpdated ? dayjs(allergy.lastUpdated).format('DD-MMM-YYYY') : '--',
     }));
   }, [allergies]);
 
@@ -87,7 +86,7 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
       <div className={styles.widgetCard}>
         <CardHeader title={headerTitle}>
           <span>{isValidating ? <InlineLoading /> : null}</span>
-          {showAddAllergy && (
+          {showAddAllergyButton && (
             <Button kind="ghost" renderIcon={Add16} iconDescription="Add allergies" onClick={launchAllergiesForm}>
               {t('add', 'Add')}
             </Button>

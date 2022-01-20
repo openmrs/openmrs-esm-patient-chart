@@ -39,7 +39,13 @@ export interface Order {
     retired: boolean;
     uuid: string;
   };
-  orderer: OpenmrsResource;
+  orderer: {
+    display: string;
+    person: {
+      display: string;
+    };
+    uuid: string;
+  };
   patient: OpenmrsResource;
   previousOrder: { uuid: string; type: string; display: string } | null;
   quantity: number;

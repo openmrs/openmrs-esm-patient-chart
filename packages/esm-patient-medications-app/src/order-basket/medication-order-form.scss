@@ -5,11 +5,21 @@
   background-color: $brand-02;
   color: $inverse-01;
   border: 0;
-  top: 3rem;
+  top: 0rem;
+  padding: 1rem;
+  z-index: 1;
 }
 
 .orderForm {
-  margin: $spacing-05;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.heading {
+  @include carbon--type-style("productive-heading-03");
+  color: $text-01;
+  margin: 0.5rem 1rem;
 }
 
 .pullColumnContentRight > div {
@@ -48,7 +58,64 @@
   @include carbon--type-style("productive-heading-01");
 }
 
+.backButton {
+  align-items: center;
+  display: flex;
+  justify-content: flex-start;
+  margin: 0.5rem 0rem;
+
+  button {
+    display: flex;
+   
+    svg {
+      order: 1;
+      margin-right: 0.5rem;
+      margin-left: 0rem !important;
+    }  
+
+    span {
+      order: 2;
+    }
+  }
+}
+
 .orderForm :global(.bx--btn-set .bx--btn) {
   max-width: 50%;
   height: 4rem;
+}
+
+.tablet {
+  padding: 1.5rem 1rem;
+  background-color: $ui-02;
+}
+
+.desktop {
+  padding: 0rem;
+}
+
+/* Desktop */
+:global(.omrs-breakpoint-gt-tablet) {
+  .orderForm {
+    height: calc(100vh - 9rem);
+  }
+}
+
+/* Tablet */
+:global(.omrs-breakpoint-lt-desktop) {
+  .orderForm {
+    height: calc(100vh - 6rem);
+  }
+}
+
+.grid {
+  margin: 0rem;
+  padding: 0rem;
+}
+
+.row {
+  margin: 0.5rem 0rem 0rem;
+}
+
+.spacer {
+  margin-top: 3rem;
 }
