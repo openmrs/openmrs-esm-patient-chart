@@ -6,6 +6,7 @@ import { concat, first } from 'rxjs/operators';
 import { FormResourceService } from '../openmrs-api/form-resource.service';
 import { FormSchemaCompiler } from '@ampath-kenya/ngx-formentry';
 import { LocalStorageService } from '../local-storage/local-storage.service';
+import { FormSchema } from '../types';
 
 @Injectable()
 export class FormSchemaService {
@@ -15,7 +16,7 @@ export class FormSchemaService {
     private formSchemaCompiler: FormSchemaCompiler,
   ) {}
 
-  public getFormSchemaByUuid(formUuid: string, cached: boolean = true): ReplaySubject<any> {
+  public getFormSchemaByUuid(formUuid: string, cached: boolean = true): ReplaySubject<FormSchema> {
     const formSchema: ReplaySubject<any> = new ReplaySubject(1);
     const cachedCompiledSchema: any = this.getCachedCompiledSchemaByUuid(formUuid);
     if (cachedCompiledSchema && cached === true) {
