@@ -2,22 +2,24 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import DeceasedBannerTag from './deceased-tag.component';
 import { mockDeceasedPatient } from '../../../../__mocks__/mockDeceasedPatient';
+import { mockPatient } from '../../../../__mocks__/patient.mock';
 
 describe('deceasedTag', () => {
   it('renders a deceased tag in the patient banner for patients who died', () => {
     renderDeceasedBannerTag();
-    expect(screen.getByRole('button', { name: /Deceased/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Deceased/ })).toBeInTheDocument();
   });
 
   it('doesnot render Deceased tag for patients who are still alive', () => {
     alivePatient();
-    expect(screen.getByRole('button', { name: /Deceased/i })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Deceased/ })).not.toBeInTheDocument();
   });
 });
 
-const renderDeceasedBannerTag = () => {
+function renderDeceasedBannerTag() {
   render(<DeceasedBannerTag patient={mockDeceasedPatient} />);
-};
-const alivePatient = () => {
-  render(<DeceasedBannerTag patient={mockPatient} />);
-};
+}
+
+function alivePatient() {
+  render(<DeceasedBannerTag patient={mockDeceasedPatient} />);
+}
