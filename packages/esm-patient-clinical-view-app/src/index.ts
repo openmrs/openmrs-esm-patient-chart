@@ -7,10 +7,6 @@ const importTranslation = require.context('../translations', false, /.json$/, 'l
 
 const backendDependencies = {};
 
-const frontendDependencies = {
-  '@openmrs/esm-framework': process.env.FRAMEWORK_VERSION,
-};
-
 function setupOpenMRS() {
   const moduleName = '@openmrs/esm-patient-clinical-view-app';
 
@@ -63,4 +59,4 @@ function setupOpenMRS() {
   };
 }
 
-export { backendDependencies, frontendDependencies, importTranslation, setupOpenMRS };
+export { backendDependencies, importTranslation, setupOpenMRS };

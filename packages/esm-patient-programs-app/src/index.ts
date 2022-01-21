@@ -8,10 +8,6 @@ const backendDependencies = {
   'webservices.rest': '^2.2.0',
 };
 
-const frontendDependencies = {
-  '@openmrs/esm-framework': process.env.FRAMEWORK_VERSION,
-};
-
 function setupOpenMRS() {
   const moduleName = '@openmrs/esm-patient-programs-app';
 
@@ -59,4 +55,4 @@ function setupOpenMRS() {
   };
 }
 
-export { backendDependencies, frontendDependencies, importTranslation, setupOpenMRS };
+export { backendDependencies, importTranslation, setupOpenMRS };
