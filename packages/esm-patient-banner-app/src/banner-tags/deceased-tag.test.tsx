@@ -21,5 +21,5 @@ function renderDeceasedBannerTag() {
 }
 
 function alivePatient() {
-  render(<DeceasedBannerTag patient={mockDeceasedPatient} />);
+  render(<DeceasedBannerTag patient={mockPatient} />);
 }
