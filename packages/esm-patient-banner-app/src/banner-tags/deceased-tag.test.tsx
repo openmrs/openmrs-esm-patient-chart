@@ -7,7 +7,6 @@ describe('deceasedTag', () => {
   it('renders a deceased tag in the patient banner for patients who died', () => {
     renderDeceasedBannerTag();
     expect(screen.getByRole('button', { name: /Deceased/i })).toBeInTheDocument();
-
   });
 
   it('doesnot render Deceased tag for patients who are still alive', () => {
