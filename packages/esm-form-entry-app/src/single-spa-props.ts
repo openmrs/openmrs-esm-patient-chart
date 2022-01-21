@@ -13,4 +13,5 @@ export type SingleSpaProps = AppProps & {
   view: string;
   closeWorkspace: () => void;
   patient: any;
+  isOffline: boolean;
 };

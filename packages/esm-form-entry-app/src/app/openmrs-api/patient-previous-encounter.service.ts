@@ -3,12 +3,13 @@ import { Injectable } from '@angular/core';
 import * as _ from 'lodash';
 import { EncounterResourceService } from './encounter-resource.service';
 import { PatientService } from './patient-service';
+import { Encounter } from '../types';
 
 @Injectable()
 export class PatientPreviousEncounterService {
-  constructor(private patientService: PatientService, private encounterResource: EncounterResourceService) {}
+  constructor(private encounterResource: EncounterResourceService) {}
 
-  public getPreviousEncounter(encounterType: string, patientUuid: string): Promise<any> {
+  public getPreviousEncounter(encounterType: string, patientUuid: string): Promise<Encounter> {
     return new Promise((resolve, reject) => {
       this.encounterResource.getEncountersByPatientUuid(patientUuid).subscribe(
         (encounters) => {
@@ -33,12 +34,12 @@ export class PatientPreviousEncounterService {
                   },
                 );
             } else {
-              resolve({});
+              resolve(Object.create({}));
             }
           }
         },
         (error) => {
-          console.error('Previous encounter');
+          console.error('Previous encounter', error);
         },
       );
     });

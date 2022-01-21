@@ -157,7 +157,7 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({ isTablet, patientUuid }
                 labelText={t('time', 'Time')}
                 light={isTablet}
                 onChange={(event) => setVisitTime(event.target.value)}
-                pattern="(1[012]|[1-9]):[0-5][0-9](\\s)?"
+                pattern="^(1[0-2]|0?[1-9]):([0-5]?[0-9])$"
                 style={{ marginLeft: '0.125rem', flex: 'none' }}
                 value={visitTime}
               >

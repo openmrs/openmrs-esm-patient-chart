@@ -2,34 +2,56 @@
 
 .widgetCard {
   border: 1px solid $ui-03;
+}
 
+.row {
   span {
     margin: auto;
+  }
+
+  p {
+    padding: 0.25rem 0;
   }
 }
 
 .medicationRecord {
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 }
 
-.leftColumn {
+.startDateColumn {
   height: 100%;
   display: flex;
-  flex-direction: column;
+  flex-flow: column wrap;
+  align-items: flex-start;
   justify-content: space-between;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-}
-
-.indicationRow {
   padding: 0.25rem 0;
+
+  span {
+    margin: 0rem;
+  }
 }
 
 .dosage {
   @include carbon--type-style("productive-heading-01");
   color: $text-01;
+}
+
+.tooltip {
+  svg {
+    fill: black;
+  }
+}
+
+.menuItem {
+  max-width: none;
+}
+
+.paginationContainer {
+  border-top: 1px solid $ui-03;
+
+  & > :global(.bx--pagination) {
+    border: none;
+  }
 }
