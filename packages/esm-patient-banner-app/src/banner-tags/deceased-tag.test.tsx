@@ -12,7 +12,7 @@ describe('deceasedTag', () => {
 
   it('doesnot render Deceased tag for patients who are still alive', () => {
     alivePatient();
-    expect(screen.getByRole('button', { name: /Deceased/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Deceased/ })).not.toBeInTheDocument();
   });
 });
 
