@@ -1,6 +1,6 @@
 import React from 'react';
 import { capitalize } from 'lodash';
-import { age, useCurrentPatient } from '@openmrs/esm-framework';
+import { age, usePatient } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import styles from './patient-details-tile.component.scss';
 
@@ -9,7 +9,7 @@ interface PatientDetailsTileInterface {
 }
 
 const PatientDetailsTile: React.FC<PatientDetailsTileInterface> = ({ patientUuid }) => {
-  const { patient } = useCurrentPatient(patientUuid);
+  const { patient } = usePatient(patientUuid);
 
   return (
     <div className={styles.container}>

@@ -4,7 +4,7 @@ import Loader from './loader.component';
 import ChartReview from '../view-components/chart-review.component';
 import VisitDialog from '../visit/visit-dialog.component';
 import { RouteComponentProps } from 'react-router-dom';
-import { detachAll, ExtensionSlot, useCurrentPatient, useSessionUser } from '@openmrs/esm-framework';
+import { detachAll, ExtensionSlot, usePatient, useSessionUser } from '@openmrs/esm-framework';
 import ActionMenu from './action-menu.component';
 import { useOfflineVisitForPatient } from '../offline';
 import { useContextWorkspace } from '../hooks/useContextWindowSize';
@@ -19,7 +19,7 @@ interface PatientChartParams {
 
 const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({ match }) => {
   const { patientUuid, view, subview } = match.params;
-  const { isLoading, patient } = useCurrentPatient(patientUuid);
+  const { isLoading, patient } = usePatient(patientUuid);
   const sessionUser = useSessionUser();
   const state = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);
   const { windowSize, openWindows } = useContextWorkspace();
