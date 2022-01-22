@@ -9,7 +9,7 @@ interface PatientDetailsTileInterface {
 }
 
 const PatientDetailsTile: React.FC<PatientDetailsTileInterface> = ({ patientUuid }) => {
-  const [, patient] = useCurrentPatient(patientUuid);
+  const { patient } = useCurrentPatient(patientUuid);
 
   return (
     <div className={styles.container}>

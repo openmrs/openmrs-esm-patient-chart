@@ -19,7 +19,7 @@ interface PatientChartParams {
 
 const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({ match }) => {
   const { patientUuid, view, subview } = match.params;
-  const [loading, patient] = useCurrentPatient(patientUuid);
+  const { isLoading, patient } = useCurrentPatient(patientUuid);
   const sessionUser = useSessionUser();
   const state = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);
   const { windowSize, openWindows } = useContextWorkspace();
@@ -34,7 +34,7 @@ const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({ match
 
   return (
     <main className={mainClassName}>
-      {loading ? (
+      {isLoading ? (
         <Loader />
       ) : (
         <>
