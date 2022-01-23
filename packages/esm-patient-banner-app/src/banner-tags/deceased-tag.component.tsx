@@ -14,7 +14,7 @@ const DeceasedBannerTag: React.FC<DecasedBannerTagProps> = ({ patient }) => {
         align="end"
         tooltipText={
           <div className={styles.tooltipPadding}>
-            <h6 style={{ marginBottom: '0.5rem' }}>deceased</h6>
+            <h6 style={{ marginBottom: '0.5rem' }}>{t('deceased', 'Deceased')}</h6>
           </div>
         }
       >
