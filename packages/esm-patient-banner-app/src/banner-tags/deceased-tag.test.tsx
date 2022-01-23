@@ -6,20 +6,14 @@ import { mockPatient } from '../../../../__mocks__/patient.mock';
 
 describe('deceasedTag', () => {
   it('renders a deceased tag in the patient banner for patients who died', () => {
-    renderDeceasedBannerTag();
+    render(<DeceasedBannerTag patient={mockDeceasedPatient} />);
+
     expect(screen.getByRole('button', { name: /Deceased/ })).toBeInTheDocument();
   });
 
   it('doesnot render Deceased tag for patients who are still alive', () => {
-    alivePatient();
+    render(<DeceasedBannerTag patient={mockPatient} />);
+
     expect(screen.queryByRole('button', { name: /Deceased/ })).not.toBeInTheDocument();
   });
 });
-
-function renderDeceasedBannerTag() {
-  render(<DeceasedBannerTag patient={mockDeceasedPatient} />);
-}
-
-function alivePatient() {
-  render(<DeceasedBannerTag patient={mockPatient} />);
-}
