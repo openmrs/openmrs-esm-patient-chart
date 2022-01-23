@@ -9,10 +9,6 @@ const backendDependencies = {
   fhir2: '^1.2.0',
 };
 
-const frontendDependencies = {
-  '@openmrs/esm-framework': process.env.FRAMEWORK_VERSION,
-};
-
 function setupOpenMRS() {
   messageOmrsServiceWorker({
     type: 'registerDynamicRoute',
@@ -76,4 +72,4 @@ function setupOpenMRS() {
   };
 }
 
-export { backendDependencies, frontendDependencies, importTranslation, setupOpenMRS };
+export { backendDependencies, importTranslation, setupOpenMRS };
