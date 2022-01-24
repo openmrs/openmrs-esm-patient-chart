@@ -2,7 +2,7 @@
 
 .medicationDetailsHeader {
   position: sticky;
-  @include brand-02(background-color);
+  background-color: var(--brand-02);
   color: $inverse-01;
   border: 0;
   top: 3rem;

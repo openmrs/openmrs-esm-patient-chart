@@ -10,7 +10,7 @@
 }
 
 .spinner :global(.bx--loading__stroke) {
-  @include brand-03(stroke);
+  stroke: var(--brand-03);
 }
 
 .activeMedicationsContainer {
