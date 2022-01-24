@@ -15,6 +15,7 @@ import { FormDataSourceService } from './form-data-source/form-data-source.servi
 import { FormSubmissionService } from './form-submission/form-submission.service';
 import { MonthlyScheduleResourceService } from './services/monthly-scheduled-resource.service';
 import { ConfigResourceService } from './services/config-resource.service';
+import { FileUploadResourceService } from './services/file-upload-resource.service';
 
 @NgModule({
   declarations: [AppComponent, EmptyRouteComponent, FeWrapperComponent],
@@ -26,6 +27,7 @@ import { ConfigResourceService } from './services/config-resource.service';
     FormSubmissionService,
     MonthlyScheduleResourceService,
     ConfigResourceService,
+    FileUploadResourceService,
   ],
   bootstrap: [AppComponent],
 })
