@@ -4,7 +4,6 @@ import styles from './active-visit-tag.scss';
 import { useTranslation } from 'react-i18next';
 import { Tag, TooltipDefinition } from 'carbon-components-react';
 import { useVisit } from '@openmrs/esm-framework';
-
 interface ActiveVisitBannerTagProps {
   patientUuid: string;
   patient: fhir.Patient;
@@ -12,10 +11,10 @@ interface ActiveVisitBannerTagProps {
 const ActiveVisitBannerTag: React.FC<ActiveVisitBannerTagProps> = ({ patientUuid, patient }) => {
   const { t } = useTranslation();
   const { currentVisit } = useVisit(patientUuid);
-
+  const deceasedBoolean = patient.deceasedDateTime ? false : true;
   return (
     currentVisit &&
-    !patient.deceasedBoolean && (
+    deceasedBoolean && (
       <TooltipDefinition
         align="end"
         tooltipText={

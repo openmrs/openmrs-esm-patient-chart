@@ -14,7 +14,15 @@ import { ExtensionSlot, age } from '@openmrs/esm-framework';
 interface PatientBannerProps {
   patient: Pick<
     fhir.Patient,
-    'id' | 'name' | 'gender' | 'birthDate' | 'identifier' | 'address' | 'telecom' | 'deceasedBoolean'
+    | 'id'
+    | 'name'
+    | 'gender'
+    | 'birthDate'
+    | 'identifier'
+    | 'address'
+    | 'telecom'
+    | 'deceasedBoolean'
+    | 'deceasedDateTime'
   >;
   patientUuid: string;
   onClick?: (patientUuid: string) => void;
