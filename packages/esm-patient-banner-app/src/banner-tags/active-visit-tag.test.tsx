@@ -20,7 +20,7 @@ describe('ActiveVisitBannerTag: ', () => {
       error: null,
     });
 
-    renderActiveVisitBannerTag();
+    render(<ActiveVisitBannerTag patientUuid={mockPatient.id} patient={mockPatient} />);
 
     const visitMetadata =
       mockCurrentVisit.visitData.visitType.name +
@@ -35,7 +35,3 @@ describe('ActiveVisitBannerTag: ', () => {
     expect(screen.getByRole('button', { name: /Active Visit/i })).toBeInTheDocument();
   });
 });
-
-function renderActiveVisitBannerTag() {
-  render(<ActiveVisitBannerTag patientUuid={mockPatient.id} />);
-}
