@@ -1,6 +1,5 @@
 import React from 'react';
 import NotesDetailedSummary from './notes-detailed-summary.component';
-import NoteRecord from './note-record.component';
 import { Switch, Route, BrowserRouter } from 'react-router-dom';
 import { NotesContext } from './notes.context';
 
@@ -28,7 +27,6 @@ export default function Notes({ basePath, patient, patientUuid, showAddNote }: N
               />
             )}
           />
-          <Route exact path="/:encounterUuid" component={NoteRecord} />
         </Switch>
       </BrowserRouter>
     </NotesContext.Provider>
