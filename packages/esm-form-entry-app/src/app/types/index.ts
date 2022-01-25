@@ -190,4 +190,5 @@ export interface FormEntryConfig {
   dataSources: {
     monthlySchedule: boolean;
   };
+  baseEtlUrl: string;
 }
