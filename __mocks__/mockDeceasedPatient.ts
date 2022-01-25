@@ -37,6 +37,7 @@ export const mockDeceasedPatient = {
   gender: 'male',
   birthDate: '1972-04-04',
   deceasedBoolean: true,
+  deceasedDateTime: '1972-04-04',
   address: [
     {
       id: '0c244eae-85c8-4cc9-b168-96b51f864e77',
