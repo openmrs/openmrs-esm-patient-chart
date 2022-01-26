@@ -4,13 +4,13 @@ import {
   getSynchronizationItems,
   messageOmrsServiceWorker,
   queueSynchronizationItem,
-  fetchCurrentPatient,
   saveVisit,
   setupOfflineSync,
   VisitMode,
   VisitStatus,
   subscribeConnectivity,
   QueueItemDescriptor,
+  usePatient,
 } from '@openmrs/esm-framework';
 import { useEffect } from 'react';
 import { v4 } from 'uuid';
@@ -124,20 +124,50 @@ function offlineVisitToVisit(offlineVisit: OfflineVisit) {
   };
 }
 
-export function usePatient(patientUuid: string): SWRResponse<fhir.Patient, Error> {
-  return useSWR(`patient/${patientUuid}`, async () => {
-    const onlinePatient = await fetchCurrentPatient(patientUuid).catch(() => undefined);
-    if (onlinePatient?.data && !onlinePatient.data.issue) {
-      return onlinePatient.data;
-    }
-
+export function usePatientOrOfflineRegisteredPatient(patientUuid: string): ReturnType<typeof usePatient> {
+  const onlinePatientState = usePatient(patientUuid);
+  const offlinePatientState = useSWR(`offlineRegisteredPatient/${patientUuid}`, async () => {
     const offlinePatient = await getOfflineRegisteredPatientAsFhirPatient(patientUuid);
-    if (offlinePatient) {
-      return offlinePatient;
+    if (!offlinePatient) {
+      throw new Error(`No offline registered patient could be found. UUID: ${patientUuid}`);
     }
 
-    throw new Error(`Could neither retrieve an online patient, nor an offline patient. UUID: ${patientUuid}`);
+    return offlinePatient;
   });
+
+  if (onlinePatientState.isLoading || !offlinePatientState.data) {
+    return {
+      isLoading: true,
+      patient: null,
+      patientUuid,
+      error: null,
+    };
+  }
+
+  if (onlinePatientState.patient && !(onlinePatientState.patient as any).issue) {
+    return {
+      isLoading: false,
+      patient: onlinePatientState.patient,
+      patientUuid,
+      error: null,
+    };
+  }
+
+  if (offlinePatientState.data) {
+    return {
+      isLoading: false,
+      patient: offlinePatientState.data,
+      patientUuid,
+      error: null,
+    };
+  }
+
+  return {
+    isLoading: false,
+    patient: null,
+    patientUuid,
+    error: onlinePatientState.error ?? offlinePatientState.error,
+  };
 }
 
 async function getOfflineRegisteredPatientAsFhirPatient(patientUuid: string): Promise<fhir.Patient> {
