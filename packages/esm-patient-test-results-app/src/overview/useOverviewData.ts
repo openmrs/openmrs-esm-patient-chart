@@ -9,6 +9,11 @@ export interface OverviewPanelData {
   range: string;
   interpretation: OBSERVATION_INTERPRETATION;
   value?: string | number;
+  valueCodeableConcept?: Coding;
+}
+
+interface Coding {
+  coding: Array<{ code: string; display: string }>;
 }
 
 export type OverviewPanelEntry = [string, string, Array<OverviewPanelData>, Date, Date, string];
@@ -20,7 +25,7 @@ export function parseSingleEntry(entry: ObsRecord, type: string, panelName: stri
         id: entry.id,
         name: panelName,
         range: entry.meta?.range || '--',
-        interpretation: entry.meta.assessValue(entry.value),
+        interpretation: entry.meta.assessValue ? entry.meta.assessValue(entry.value) : '--',
         value: entry.value,
       },
     ];
