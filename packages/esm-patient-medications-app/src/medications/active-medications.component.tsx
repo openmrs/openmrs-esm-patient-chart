@@ -30,17 +30,15 @@ const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patientUuid, show
   if (activePatientOrders?.length) {
     return (
       <Provider store={orderBasketStore}>
-        <div className={styles.activeMedicationContainer}>
-          <MedicationsDetailsTable
-            isValidating={isValidating}
-            title={t('activeMedications', 'Active Medications')}
-            medications={activePatientOrders}
-            showDiscontinueButton={true}
-            showModifyButton={true}
-            showReorderButton={false}
-            showAddNewButton={showAddMedications}
-          />
-        </div>
+        <MedicationsDetailsTable
+          isValidating={isValidating}
+          title={t('activeMedications', 'Active Medications')}
+          medications={activePatientOrders}
+          showDiscontinueButton={true}
+          showModifyButton={true}
+          showReorderButton={false}
+          showAddNewButton={showAddMedications}
+        />
       </Provider>
     );
   }

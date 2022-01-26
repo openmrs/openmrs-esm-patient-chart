@@ -6,7 +6,7 @@
 
 .desktopSearchResultTile {
   margin-top: 5px;
-  border-left: 4px solid $brand-teal-01;
+  border-left: 4px solid var(--brand-03);
 
   &:not(:last-of-type) {
     margin-bottom: 0.5rem;
@@ -15,7 +15,7 @@
 
 .tabletSearchResultTile {
   margin-top: 5px;
-  border-left: 2px solid $brand-teal-01;
+  border-left: 2px solid var(--brand-03);
 
   &:not(:last-of-type) {
     margin-bottom: 1rem;

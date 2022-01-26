@@ -63,7 +63,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, onC
               <span className={styles.patientName}>{patientName}</span>
               <ExtensionSlot
                 extensionSlotName="patient-banner-tags-slot"
-                state={{ patientUuid }}
+                state={{ patientUuid, patient }}
                 className={styles.flexRow}
               />
             </div>

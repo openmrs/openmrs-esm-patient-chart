@@ -6,10 +6,6 @@ const backendDependencies = {
   'webservices.rest': '^2.2.0',
 };
 
-const frontendDependencies = {
-  '@openmrs/esm-framework': process.env.FRAMEWORK_VERSION,
-};
-
 function setupOpenMRS() {
   messageOmrsServiceWorker({
     type: 'registerDynamicRoute',
@@ -35,9 +31,16 @@ function setupOpenMRS() {
         offline: true,
       },
       {
-        id: 'patient-active-visit-tag',
+        id: 'active-visit-tag',
         slot: 'patient-banner-tags-slot',
         load: getAsyncLifecycle(() => import('./banner-tags/active-visit-tag.component'), options),
+        online: true,
+        offline: true,
+      },
+      {
+        id: 'deceased-patient-tag',
+        slot: 'patient-banner-tags-slot',
+        load: getAsyncLifecycle(() => import('./banner-tags/deceased-patient-tag.component'), options),
         online: true,
         offline: true,
       },
@@ -45,4 +48,4 @@ function setupOpenMRS() {
   };
 }
 
-export { backendDependencies, frontendDependencies, importTranslation, setupOpenMRS };
+export { backendDependencies, importTranslation, setupOpenMRS };

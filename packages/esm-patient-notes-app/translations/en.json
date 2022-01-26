@@ -11,7 +11,6 @@
   "diagnosisInputPlaceholder": "Choose a primary diagnosis first, then secondary diagnoses",
   "discard": "Discard",
   "emptyDiagnosisText": "No diagnosis selected — Enter a diagnosis below",
-  "encounterDate": "Encounter date",
   "encounterType": "Encounter type",
   "enterDiagnoses": "Enter diagnoses",
   "goToSummary": "Go to Summary",
