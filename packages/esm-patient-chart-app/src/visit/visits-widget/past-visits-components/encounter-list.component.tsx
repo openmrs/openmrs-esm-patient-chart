@@ -18,14 +18,16 @@ import { Observation } from '../visit.resource';
 import { useTranslation } from 'react-i18next';
 import { useLayoutType } from '@openmrs/esm-framework';
 
+interface Encounter {
+  id: string;
+  time: string;
+  encounterType: string;
+  provider: string;
+  obs: Array<Observation>;
+}
+
 interface EncounterListProps {
-  encounters: Array<{
-    id: any;
-    time: any;
-    encounterType: string;
-    provider: string;
-    obs: Array<Observation>;
-  }>;
+  encounters: Array<Encounter>;
   visitUuid: string;
 }
 
@@ -80,7 +82,7 @@ const EncounterListDataTable: React.FC<EncounterListProps> = ({ encounters, visi
                 {rows.map((row, ind) => (
                   <React.Fragment key={row.id}>
                     <TableExpandRow {...getRowProps({ row })}>
-                      {row.cells.map((cell, ind) => (
+                      {row.cells.map((cell) => (
                         <TableCell key={cell.id}>{cell.value}</TableCell>
                       ))}
                     </TableExpandRow>
