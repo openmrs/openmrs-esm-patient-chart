@@ -5,12 +5,14 @@ export const configSchema = {
     monthlySchedule: {
       _type: Type.Boolean,
       _default: false,
-      _description: 'Whether to inject monthly scheduled appointment data source to form-entry engine',
+      _description:
+        'Whether to use monthly scheduled appointment data source in form-entry engine. Requires `appointmentsResourceUrl`.',
     },
   },
-  baseEtlUrl: {
+  appointmentsResourceUrl: {
     _type: Type.String,
-    _default: '/etl-latest/etl/',
-    _description: 'Custom URL to load resources required for form-entry',
+    _default: '/etl-latest/etl/get-monthly-schedule',
+    _description:
+      'Custom URL to load resources required for appointment monthly schedule feature (under `dataSources`).',
   },
 };
