@@ -3333,7 +3333,7 @@
     "@openmrs/esm-utils" "^3.1.15-pre.759"
     dayjs "^1.10.7"
 
-"@openmrs/esm-framework@^3.1.15-pre.853":
+"@openmrs/esm-framework@next":
   version "3.1.15-pre.853"
   resolved "https://registry.yarnpkg.com/@openmrs/esm-framework/-/esm-framework-3.1.15-pre.853.tgz#4ebfec0679bd25278df3aaf9037924cb064473da"
   integrity sha512-Qr2ZMmOUwg7OQQJyqW05jKdaEJ83+wANzLGaw2yoLwHtMgJCLYegfsHjmnFxpS3W8dtgtm9RuNSjSEuQAsH4LQ==
