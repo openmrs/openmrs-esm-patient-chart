@@ -86,9 +86,7 @@ async function createOfflineVisitForPatient(patientUuid: string, location: strin
     patient: patientUuid,
     startDatetime: new Date(),
     location,
-    // TODO: This UUID belongs to the "Facility Visit" type.
-    //       This should be replaced with the dedicated offline visit as soon as it exists in the BE.
-    visitType: '7b0f5697-27e3-40c4-8bae-f4049abfb4ed',
+    visitType: 'a22733fa-3501-4020-a520-da024eeff088', // "Offline" visit type UUID.
   };
 
   const descriptor: QueueItemDescriptor = {
@@ -116,7 +114,7 @@ function offlineVisitToVisit(offlineVisit: OfflineVisit) {
     encounters: [],
     visitType: {
       uuid: offlineVisit.visitType,
-      display: 'OFFLINE_VISIT_PLACEHOLDER',
+      display: 'Offline',
     },
     patient: {
       uuid: offlineVisit.patient,
@@ -135,7 +133,7 @@ export function usePatientOrOfflineRegisteredPatient(patientUuid: string): Retur
     return offlinePatient;
   });
 
-  if (onlinePatientState.isLoading || !offlinePatientState.data) {
+  if (onlinePatientState.isLoading || (!offlinePatientState.data && !offlinePatientState.error)) {
     return {
       isLoading: true,
       patient: null,
