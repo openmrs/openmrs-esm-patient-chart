@@ -78,7 +78,7 @@ async function getOfflineVisitForPatient(patientUuid: string) {
 async function createOfflineVisitForPatient(patientUuid: string, location: string) {
   const patientRegistrationSyncItems = await getSynchronizationItems<any>(patientRegistrationSyncType);
   const isVisitForOfflineRegisteredPatient = patientRegistrationSyncItems.some(
-    (item) => item.preliminaryPatient.uuid === patientUuid,
+    (item) => item.fhirPatient.id === patientUuid,
   );
 
   const offlineVisit: OfflineVisit = {
@@ -170,6 +170,6 @@ export function usePatientOrOfflineRegisteredPatient(patientUuid: string): Retur
 
 async function getOfflineRegisteredPatientAsFhirPatient(patientUuid: string): Promise<fhir.Patient | undefined> {
   const patientRegistrationSyncItems = await getSynchronizationItems<any>(patientRegistrationSyncType);
-  const patientSyncItem = patientRegistrationSyncItems.find((item) => item.preliminaryPatient.uuid === patientUuid);
+  const patientSyncItem = patientRegistrationSyncItems.find((item) => item.fhirPatient.id === patientUuid);
   return patientSyncItem.fhirPatient;
 }
