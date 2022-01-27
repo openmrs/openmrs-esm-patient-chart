@@ -1,4 +1,4 @@
-import { NewVisitPayload, Visit } from '@openmrs/esm-api';
+import { NewVisitPayload } from '@openmrs/esm-api';
 import {
   getStartedVisit,
   getSynchronizationItems,
@@ -10,15 +10,18 @@ import {
   VisitStatus,
   subscribeConnectivity,
   QueueItemDescriptor,
+  usePatient,
 } from '@openmrs/esm-framework';
 import { useEffect } from 'react';
 import { v4 } from 'uuid';
+import useSWR, { SWRResponse } from 'swr';
+
+const visitSyncType = 'visit';
+const patientRegistrationSyncType = 'patient-registration';
 
 interface OfflineVisit extends NewVisitPayload {
   uuid: string;
 }
-
-const visitSyncType = 'visit';
 
 export function setupCacheableRoutes() {
   messageOmrsServiceWorker({
@@ -33,7 +36,7 @@ export function setupCacheableRoutes() {
 }
 
 export function setupOfflineVisitsSync() {
-  setupOfflineSync<OfflineVisit>(visitSyncType, [], async (visit, options) => {
+  setupOfflineSync<OfflineVisit>(visitSyncType, [patientRegistrationSyncType], async (visit, options) => {
     const visitPayload = {
       ...visit,
       stopDatetime: new Date(),
@@ -73,19 +76,30 @@ async function getOfflineVisitForPatient(patientUuid: string) {
 }
 
 async function createOfflineVisitForPatient(patientUuid: string, location: string) {
+  const patientRegistrationSyncItems = await getSynchronizationItems<any>(patientRegistrationSyncType);
+  const isVisitForOfflineRegisteredPatient = patientRegistrationSyncItems.some(
+    (item) => item.fhirPatient.id === patientUuid,
+  );
+
   const offlineVisit: OfflineVisit = {
     uuid: v4(),
     patient: patientUuid,
     startDatetime: new Date(),
     location,
-    // TODO: This UUID belongs to the "Facility Visit" type.
-    //       This should be replaced with the dedicated offline visit as soon as it exists in the BE.
-    visitType: '7b0f5697-27e3-40c4-8bae-f4049abfb4ed',
+    visitType: 'a22733fa-3501-4020-a520-da024eeff088', // "Offline" visit type UUID.
   };
 
   const descriptor: QueueItemDescriptor = {
     id: offlineVisit.uuid,
-    dependencies: [],
+    displayName: 'Offline visit',
+    dependencies: isVisitForOfflineRegisteredPatient
+      ? [
+          {
+            type: patientRegistrationSyncType,
+            id: patientUuid,
+          },
+        ]
+      : [],
   };
 
   await queueSynchronizationItem(visitSyncType, offlineVisit, descriptor);
@@ -95,15 +109,67 @@ async function createOfflineVisitForPatient(patientUuid: string, location: strin
 function offlineVisitToVisit(offlineVisit: OfflineVisit) {
   return {
     uuid: offlineVisit.uuid,
-    startDatetime: offlineVisit.startDatetime.toString(),
-    stopDatetime: offlineVisit.stopDatetime.toString(),
+    startDatetime: offlineVisit.startDatetime?.toString(),
+    stopDatetime: offlineVisit.stopDatetime?.toString(),
     encounters: [],
     visitType: {
       uuid: offlineVisit.visitType,
-      display: 'OFFLINE_VISIT_PLACEHOLDER',
+      display: 'Offline',
     },
     patient: {
       uuid: offlineVisit.patient,
     },
   };
+}
+
+export function usePatientOrOfflineRegisteredPatient(patientUuid: string): ReturnType<typeof usePatient> {
+  const onlinePatientState = usePatient(patientUuid);
+  const offlinePatientState = useSWR(`offlineRegisteredPatient/${patientUuid}`, async () => {
+    const offlinePatient = await getOfflineRegisteredPatientAsFhirPatient(patientUuid);
+    if (!offlinePatient) {
+      throw new Error(`No offline registered patient could be found. UUID: ${patientUuid}`);
+    }
+
+    return offlinePatient;
+  });
+
+  if (onlinePatientState.isLoading || (!offlinePatientState.data && !offlinePatientState.error)) {
+    return {
+      isLoading: true,
+      patient: null,
+      patientUuid,
+      error: null,
+    };
+  }
+
+  if (onlinePatientState.patient && !(onlinePatientState.patient as any).issue) {
+    return {
+      isLoading: false,
+      patient: onlinePatientState.patient,
+      patientUuid,
+      error: null,
+    };
+  }
+
+  if (offlinePatientState.data) {
+    return {
+      isLoading: false,
+      patient: offlinePatientState.data,
+      patientUuid,
+      error: null,
+    };
+  }
+
+  return {
+    isLoading: false,
+    patient: null,
+    patientUuid,
+    error: onlinePatientState.error ?? offlinePatientState.error,
+  };
+}
+
+async function getOfflineRegisteredPatientAsFhirPatient(patientUuid: string): Promise<fhir.Patient | undefined> {
+  const patientRegistrationSyncItems = await getSynchronizationItems<any>(patientRegistrationSyncType);
+  const patientSyncItem = patientRegistrationSyncItems.find((item) => item.fhirPatient.id === patientUuid);
+  return patientSyncItem.fhirPatient;
 }

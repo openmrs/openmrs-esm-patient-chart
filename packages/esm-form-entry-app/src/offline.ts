@@ -112,6 +112,7 @@ export async function setupOfflineEncounterSync() {
 async function queueEncounterRequest(item: QueuedEncounterRequest) {
   const descriptor: QueueItemDescriptor = {
     id: item.body.uuid,
+    displayName: 'Patient form',
     dependencies: [
       {
         type: 'visit',
