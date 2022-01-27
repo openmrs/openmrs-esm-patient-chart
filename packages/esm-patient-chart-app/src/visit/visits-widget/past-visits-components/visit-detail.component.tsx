@@ -60,7 +60,7 @@ const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visit, pati
             kind="ghost"
             onClick={() => setListView(false)}
           >
-            {t('allEncounters', 'All Encounters')}
+            {t('Encounters', 'Encounters')}
           </Button>
         </div>
       </div>

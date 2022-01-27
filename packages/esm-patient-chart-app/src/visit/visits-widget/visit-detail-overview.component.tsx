@@ -26,7 +26,7 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
         <div className={styles.toggleSwitch}>
           <ContentSwitcher onChange={() => setToggleAll((prevState) => !prevState)}>
             <Switch name={'first'} text={t('visitSummary', 'Visit summary')} />
-            <Switch name={'second'} text={t('encounters', 'Encounters')} />
+            <Switch name={'second'} text={t('allEncounters', 'All Encounters')} />
           </ContentSwitcher>
         </div>
         <div className={styles.container}>
