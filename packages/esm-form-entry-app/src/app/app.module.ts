@@ -13,11 +13,20 @@ import { FormSchemaService } from './form-schema/form-schema.service';
 import { LocalStorageService } from './local-storage/local-storage.service';
 import { FormDataSourceService } from './form-data-source/form-data-source.service';
 import { FormSubmissionService } from './form-submission/form-submission.service';
+import { MonthlyScheduleResourceService } from './services/monthly-scheduled-resource.service';
+import { ConfigResourceService } from './services/config-resource.service';
 
 @NgModule({
   declarations: [AppComponent, EmptyRouteComponent, FeWrapperComponent],
   imports: [BrowserModule, FormEntryModule, ReactiveFormsModule, BrowserAnimationsModule, OpenmrsApiModule],
-  providers: [FormSchemaService, LocalStorageService, FormDataSourceService, FormSubmissionService],
+  providers: [
+    FormSchemaService,
+    LocalStorageService,
+    FormDataSourceService,
+    FormSubmissionService,
+    MonthlyScheduleResourceService,
+    ConfigResourceService,
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
