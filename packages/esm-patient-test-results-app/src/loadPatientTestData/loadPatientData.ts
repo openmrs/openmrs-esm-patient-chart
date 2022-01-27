@@ -33,6 +33,11 @@ function parseSingleObsData(
       delete entry.valueQuantity;
     }
 
+    if (entry.valueCodeableConcept) {
+      entry.value = entry?.valueCodeableConcept.coding[0].display;
+      delete entry.valueCodeableConcept;
+    }
+
     entry.name = testConceptNameMap[entry.conceptClass];
   };
 }
