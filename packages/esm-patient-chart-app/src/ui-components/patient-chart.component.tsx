@@ -1,14 +1,13 @@
-import React, { useMemo, useEffect } from 'react';
-import styles from './patient-chart.component.scss';
-import Loader from './loader.component';
+import React, { useEffect, useMemo } from 'react';
+import { ExtensionSlot, useSessionUser } from '@openmrs/esm-framework';
+import { closeAllWorkspaces, useWorkspaceWindowSize, WorkspaceWindowState } from '@openmrs/esm-patient-common-lib';
+import { RouteComponentProps } from 'react-router-dom';
+import { useOfflineVisitForPatient, usePatientOrOfflineRegisteredPatient } from '../offline';
 import ChartReview from '../view-components/chart-review.component';
 import VisitDialog from '../visit/visit-dialog.component';
-import { RouteComponentProps } from 'react-router-dom';
-import { detachAll, ExtensionSlot, useSessionUser } from '@openmrs/esm-framework';
 import ActionMenu from './action-menu.component';
-import { useOfflineVisitForPatient, usePatientOrOfflineRegisteredPatient } from '../offline';
-import { useWorkspaceWindow } from '@openmrs/esm-patient-common-lib';
-import { WorkspaceWindowState } from '../types';
+import Loader from './loader.component';
+import styles from './patient-chart.component.scss';
 import WorkspaceNotification from './workspace-notification.component';
 
 interface PatientChartParams {
@@ -22,27 +21,23 @@ const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({ match
   const { isLoading, patient } = usePatientOrOfflineRegisteredPatient(patientUuid);
   const sessionUser = useSessionUser();
   const state = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);
-  const { windowSize, openWindows } = useWorkspaceWindow();
+  const { windowSize, active } = useWorkspaceWindowSize();
 
   useEffect(() => {
-    detachAll('patient-chart-workspace-slot');
+    closeAllWorkspaces();
   }, [patientUuid]);
-
-  const mainClassName = `omrs-main-content ${styles.chartContainer}`;
 
   useOfflineVisitForPatient(patientUuid, sessionUser?.sessionLocation?.uuid);
 
   return (
-    <main className={mainClassName}>
+    <main className={`omrs-main-content ${styles.chartContainer}`}>
       {isLoading ? (
         <Loader />
       ) : (
         <>
           <div
             className={`${styles.innerChartContainer} ${
-              windowSize.size === WorkspaceWindowState.normal && openWindows > 0
-                ? styles.closeWorkspace
-                : styles.activeWorkspace
+              windowSize.size === WorkspaceWindowState.normal && active ? styles.closeWorkspace : styles.activeWorkspace
             }`}
           >
             <ExtensionSlot extensionSlotName="breadcrumbs-slot" />

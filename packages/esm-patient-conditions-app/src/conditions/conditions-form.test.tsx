@@ -6,7 +6,7 @@ import { of } from 'rxjs/internal/observable/of';
 import { throwError } from 'rxjs';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { searchedCondition } from '../../../../__mocks__/conditions.mock';
-import { createErrorHandler, detach, showNotification, showToast } from '@openmrs/esm-framework';
+import { createErrorHandler, showNotification, showToast } from '@openmrs/esm-framework';
 import { createPatientCondition, searchConditionConcepts } from './conditions.resource';
 import { getByTextWithMarkup, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import ConditionsForm from './conditions-form.component';
@@ -19,11 +19,11 @@ jest.mock('lodash-es/debounce', () => jest.fn((fn) => fn));
 const testProps = {
   isTablet: false,
   patientUuid: mockPatient.id,
+  closeWorkspace: jest.fn(),
 };
 
 const mockCreateErrorHandler = createErrorHandler as jest.Mock;
 const mockCreatePatientCondition = createPatientCondition as jest.Mock;
-const mockDetach = detach as jest.Mock;
 const mockSearchConditionConcepts = searchConditionConcepts as jest.Mock;
 const mockShowNotification = showNotification as jest.Mock;
 const mockShowToast = showToast as jest.Mock;
@@ -34,7 +34,6 @@ jest.mock('@openmrs/esm-framework', () => {
   return {
     ...originalModule,
     createErrorHandler: jest.fn(),
-    detach: jest.fn(),
     showNotification: jest.fn(),
     showToast: jest.fn(),
   };
@@ -47,6 +46,10 @@ jest.mock('./conditions.resource', () => ({
 }));
 
 describe('ConditionsForm: ', () => {
+  beforeEach(() => {
+    testProps.closeWorkspace.mockReset();
+  });
+
   it('renders the conditions form with all the relevant fields and values', () => {
     renderConditionsForm();
 
@@ -74,8 +77,7 @@ describe('ConditionsForm: ', () => {
     const cancelButton = screen.getByRole('button', { name: /Cancel/i });
     fireEvent.click(cancelButton);
 
-    expect(mockDetach).toHaveBeenCalledTimes(1);
-    expect(mockDetach).toHaveBeenCalledWith('patient-chart-workspace-slot', 'conditions-form-workspace');
+    expect(testProps.closeWorkspace).toHaveBeenCalledTimes(1);
   });
 
   it('setting the status of a condition to "inactive" reveals an input for recording the end date', () => {

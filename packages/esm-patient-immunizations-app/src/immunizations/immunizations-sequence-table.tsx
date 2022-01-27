@@ -11,7 +11,7 @@ import {
   TableBody,
   TableCell,
 } from 'carbon-components-react';
-import { openWorkspaceTab } from '@openmrs/esm-patient-common-lib';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { ExistingDoses, Immunization } from '../types';
 
@@ -26,23 +26,27 @@ const SequenceTable: React.FC<SequenceTableProps> = ({ immunizations }) => {
 
   const launchPatientImmunizationForm = useCallback(
     (immunizationFormData: Immunization, existingDoses: ExistingDoses) => {
-      const { vaccineName, vaccineUuid, sequences } = immunizationFormData;
-      const { sequenceLabel, sequenceNumber } = existingDoses;
-      const formHeader = t('immunizationForm', 'Immunization Form');
-      openWorkspaceTab(ImmunizationsForm, formHeader, {
-        vaccineName,
-        vaccineUuid,
-        immunizationObsUuid: existingDoses.immunizationObsUuid,
-        manufacturer: existingDoses.manufacturer,
-        lotNumber: existingDoses.lotNumber,
-        expirationDate: existingDoses.expirationDate,
-        sequences,
-        currentDose: {
-          sequenceLabel,
-          sequenceNumber,
-        },
-        vaccinationDate: existingDoses?.occurrenceDateTime,
-      });
+      launchPatientWorkspace('immunization-form-workspace');
+
+      // What's all this about?
+
+      // const { vaccineName, vaccineUuid, sequences } = immunizationFormData;
+      // const { sequenceLabel, sequenceNumber } = existingDoses;
+      // const formHeader = t('immunizationForm', 'Immunization Form');
+      // openWorkspaceTab(ImmunizationsForm, formHeader, {
+      //   vaccineName,
+      //   vaccineUuid,
+      //   immunizationObsUuid: existingDoses.immunizationObsUuid,
+      //   manufacturer: existingDoses.manufacturer,
+      //   lotNumber: existingDoses.lotNumber,
+      //   expirationDate: existingDoses.expirationDate,
+      //   sequences,
+      //   currentDose: {
+      //     sequenceLabel,
+      //     sequenceNumber,
+      //   },
+      //   vaccinationDate: existingDoses?.occurrenceDateTime,
+      // });
     },
     [t],
   );

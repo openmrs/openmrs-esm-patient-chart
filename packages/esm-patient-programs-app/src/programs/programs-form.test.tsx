@@ -4,14 +4,7 @@ import * as SWR from 'swr';
 import { throwError } from 'rxjs';
 import { of } from 'rxjs/internal/observable/of';
 import { fireEvent, render, screen } from '@testing-library/react';
-import {
-  createErrorHandler,
-  detach,
-  openmrsFetch,
-  showNotification,
-  showToast,
-  useLocations,
-} from '@openmrs/esm-framework';
+import { createErrorHandler, openmrsFetch, showNotification, showToast, useLocations } from '@openmrs/esm-framework';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import {
   mockCareProgramsResponse,
@@ -24,15 +17,14 @@ import ProgramsForm from './programs-form.component';
 const testProps = {
   patientUuid: mockPatient.id,
   isTablet: false,
+  closeWorkspace: jest.fn(),
 };
 
 const mockCreateErrorHandler = createErrorHandler as jest.Mock;
 const mockCreateProgramEnrollment = createProgramEnrollment as jest.Mock;
-const mockDetach = detach as jest.Mock;
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockShowNotification = showNotification as jest.Mock;
 const mockShowToast = showToast as jest.Mock;
-const mockUseLocations = useLocations as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -40,7 +32,6 @@ jest.mock('@openmrs/esm-framework', () => {
   return {
     ...originalModule,
     createErrorHandler: jest.fn(),
-    detach: jest.fn(),
     showNotification: jest.fn(),
     showToast: jest.fn(),
     useLocations: jest.fn().mockImplementation(() => mockLocationsResponse),
@@ -90,8 +81,7 @@ describe('ProgramsForm: ', () => {
     const cancelButton = screen.getByRole('button', { name: /Cancel/i });
     fireEvent.click(cancelButton);
 
-    expect(mockDetach).toHaveBeenCalledTimes(1);
-    expect(mockDetach).toHaveBeenCalledWith('patient-chart-workspace-slot', 'programs-form-workspace');
+    expect(testProps.closeWorkspace).toHaveBeenCalledTimes(1);
   });
 
   it('renders a light background for date inputs in the tablet viewport ', () => {

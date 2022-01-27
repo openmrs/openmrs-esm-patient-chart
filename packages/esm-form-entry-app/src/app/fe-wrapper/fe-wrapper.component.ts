@@ -21,7 +21,7 @@ import { EncounterResourceService } from '../openmrs-api/encounter-resource.serv
 import { singleSpaPropsSubject, SingleSpaProps } from '../../single-spa-props';
 import { Encounter, FormEntryConfig, FormSchema, LoggedInUser, Order } from '../types';
 // @ts-ignore
-import { showToast, detach, showNotification } from '@openmrs/esm-framework';
+import { showToast, showNotification } from '@openmrs/esm-framework';
 import { PatientPreviousEncounterService } from '../openmrs-api/patient-previous-encounter.service';
 
 import { MonthlyScheduleResourceService } from '../services/monthly-scheduled-resource.service';
@@ -140,7 +140,7 @@ export class FeWrapperComponent implements OnInit {
         },
         (error) => {
           console.error('Error submitting form', error);
-          detach('patient-chart-workspace-slot', 'patient-form-entry-workspace');
+          this.singleSpaProps.closeWorkspace();
           showToast({
             critical: true,
             kind: 'error',
@@ -159,7 +159,7 @@ export class FeWrapperComponent implements OnInit {
   }
 
   public closeForm() {
-    detach('patient-chart-workspace-slot', 'patient-form-entry-workspace');
+    this.singleSpaProps.closeWorkspace();
   }
 
   public onEditSaved() {

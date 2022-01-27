@@ -32,6 +32,7 @@
   },
   "peerDependencies": {
     "@openmrs/esm-framework": "3.x",
-    "react": "16.x"
+    "react": "16.x",
+    "single-spa": "5.x"
   }
 }

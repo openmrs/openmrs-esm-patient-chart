@@ -2,14 +2,7 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render, act } from '@testing-library/react';
 import { of } from 'rxjs/internal/observable/of';
-import {
-  createErrorHandler,
-  detach,
-  showNotification,
-  showToast,
-  useConfig,
-  useSessionUser,
-} from '@openmrs/esm-framework';
+import { createErrorHandler, showNotification, showToast, useConfig, useSessionUser } from '@openmrs/esm-framework';
 import { fetchDiagnosisByName, fetchLocationByUuid, fetchProviderByUuid, saveVisitNote } from './visit-notes.resource';
 import { ConfigMock } from '../../../../__mocks__/chart-widgets-config.mock';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
@@ -25,10 +18,10 @@ import VisitNotesForm from './visit-notes-form.component';
 const testProps = {
   isTablet: false,
   patientUuid: mockPatient.id,
+  closeWorkspace: jest.fn(),
 };
 
 const mockCreateErrorHandler = createErrorHandler as jest.Mock;
-const mockDetach = detach as jest.Mock;
 const mockFetchDiagnosisByName = fetchDiagnosisByName as jest.Mock;
 const mockFetchLocationByUuid = fetchLocationByUuid as jest.Mock;
 const mockFetchProviderByUuid = fetchProviderByUuid as jest.Mock;
@@ -46,7 +39,6 @@ jest.mock('@openmrs/esm-framework', () => {
   return {
     ...originalModule,
     createErrorHandler: jest.fn(),
-    detach: jest.fn(),
     showNotification: jest.fn(),
     showToast: jest.fn(),
     useConfig: jest.fn(),
@@ -123,8 +115,7 @@ describe('Visit notes form: ', () => {
     const cancelButton = screen.getByRole('button', { name: /Discard/i });
     userEvent.click(cancelButton);
 
-    expect(mockDetach).toHaveBeenCalledTimes(1);
-    expect(mockDetach).toHaveBeenCalledWith('patient-chart-workspace-slot', 'visit-notes-form-workspace');
+    expect(testProps.closeWorkspace).toHaveBeenCalledTimes(1);
   });
 
   describe('Form Submission: ', () => {

@@ -6,11 +6,12 @@ import {
   navigate,
   extensionStore,
   useAssignedExtensionIds,
+  translateFrom,
+  ExtensionRegistration,
 } from '@openmrs/esm-framework';
 import { useRouteMatch } from 'react-router-dom';
 import { DashboardTabConfig } from '../config-schemas';
 import { basePath } from '../constants';
-import { getTitle } from '../utils';
 
 interface ShowTabsProps {
   slot: string;
@@ -89,5 +90,15 @@ const TabbedView: React.FC<TabbedViewProps> = ({ name, slot, patient, patientUui
     </>
   );
 };
+
+function getTitle(ext: ExtensionRegistration) {
+  const title = ext?.meta?.title;
+  if (typeof title === 'string') {
+    return title;
+  } else if (title && typeof title === 'object') {
+    return translateFrom(ext.moduleName, title.key, title.default);
+  }
+  return ext.name;
+}
 
 export default TabbedView;
