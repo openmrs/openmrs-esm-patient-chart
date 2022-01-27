@@ -1,14 +1,10 @@
 import useSWR from 'swr';
-import { openmrsFetch, Visit } from '@openmrs/esm-framework';
+import { openmrsFetch, OpenmrsResource, Visit } from '@openmrs/esm-framework';
 
 export function useVisits(patientUuid: string) {
   const customRepresentation =
     'custom:(uuid,encounters:(uuid,encounterDatetime,' +
-    'orders:(uuid,dateActivated,' +
-    'drug:(uuid,name,strength),doseUnits:(uuid,display),' +
-    'dose,route:(uuid,display),frequency:(uuid,display),' +
-    'duration,durationUnits:(uuid,display),numRefills,' +
-    'orderType:(uuid,display),orderer:(uuid,person:(uuid,display))),' +
+    'orders:full,' +
     'obs:(uuid,concept:(uuid,display,conceptClass:(uuid,display)),' +
     'display,groupMembers:(uuid,concept:(uuid,display),' +
     'value:(uuid,display)),value),encounterType:(uuid,display),' +
@@ -159,6 +155,7 @@ export interface Order {
 }
 
 export interface Note {
+  concept: OpenmrsResource;
   note: string;
   provider: {
     name: string;

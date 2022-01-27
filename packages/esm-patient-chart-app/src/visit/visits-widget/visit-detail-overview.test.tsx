@@ -70,12 +70,12 @@ describe('VisitDetailOverview', () => {
 
     await waitForLoadingToFinish();
 
-    const allEncountersButton = screen.getByRole('button', { name: /All Encounters/i });
-    userEvent.click(allEncountersButton);
+    const encountersButton = screen.getByRole('button', { name: /Encounters/i });
+    userEvent.click(encountersButton);
 
     expect(screen.getByRole('table')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /ECH Aug 18, 2021/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /All encounters/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /encounters/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Visit summary/i })).toBeInTheDocument();
     expect(screen.getByRole('row', { name: /Vitals/i })).toBeInTheDocument();
 

@@ -222,3 +222,16 @@ tab > button:first {
 .toggleSwitch div {
   width: 30%;
 }
+
+.noteTitle {
+  @extend .productiveHeading01;
+  color: $ui-05;
+  margin: $spacing-02 0;
+}
+
+.noteText {
+  background-color: $openmrs-background-grey;
+  padding: 0.625rem 6.75rem 0.75rem 1.063rem;
+  width: 100% !important;
+  margin: $spacing-02 0;
+}
