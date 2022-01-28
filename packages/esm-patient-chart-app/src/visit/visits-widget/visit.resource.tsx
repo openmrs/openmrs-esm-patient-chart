@@ -48,7 +48,7 @@ export function usePastVisits(patientUuid: string) {
 
 export interface Encounter {
   uuid: string;
-  encounterDateTime: string;
+  encounterDatetime: string;
   encounterProviders: Array<{
     uuid: string;
     display: string;

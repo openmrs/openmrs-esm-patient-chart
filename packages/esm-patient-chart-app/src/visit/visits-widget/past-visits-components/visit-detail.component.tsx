@@ -1,16 +1,12 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import dayjs from 'dayjs';
 import styles from '../visit-detail-overview.scss';
 import EncounterList from './encounter-list.component';
 import VisitSummary from './visit-summary.component';
 import { Button } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 import { Encounter } from '../visit.resource';
-import { Visit } from '@openmrs/esm-framework';
-
-function formatDateTime(date) {
-  return dayjs(date).format('MMM DD, YYYY - hh:mm');
-}
+import { formatDate, formatDatetime, formatTime, parseDate, Visit } from '@openmrs/esm-framework';
+import dayjs from 'dayjs';
 
 interface VisitDetailComponentProps {
   visit: Visit;
@@ -25,7 +21,7 @@ const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visit, pati
     () =>
       visit.encounters.map((encounter: Encounter) => ({
         id: encounter.uuid,
-        time: dayjs(encounter.encounterDateTime).format('hh:mm'),
+        time: formatTime(parseDate(encounter.encounterDatetime)),
         encounterType: encounter.encounterType.display,
         provider: encounter.encounterProviders.length > 0 ? encounter.encounterProviders[0].display : '',
         obs: encounter.obs,
@@ -44,7 +40,7 @@ const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visit, pati
         <h4 className={styles.productiveHeading02}>
           {visit.visitType.display}
           <br />
-          <p className={`${styles.bodyLong01} ${styles.text02}`}>{formatDateTime(visit.startDatetime)}</p>
+          <p className={`${styles.bodyLong01} ${styles.text02}`}>{formatDatetime(parseDate(visit.startDatetime))}</p>
         </h4>
         <div className={styles.toggleButtons}>
           <Button
