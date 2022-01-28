@@ -5,7 +5,7 @@ import VisitSummary from './visit-summary.component';
 import { Button } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 import { Encounter } from '../visit.resource';
-import { formatDate, formatTime, parseDate, Visit } from '@openmrs/esm-framework';
+import { formatDate, formatDatetime, formatTime, parseDate, Visit } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 
 interface VisitDetailComponentProps {
@@ -39,7 +39,7 @@ const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visit, pati
         <h4 className={styles.productiveHeading02}>
           {visit.visitType.display}
           <br />
-          <p className={`${styles.bodyLong01} ${styles.text02}`}>{dayjs(visit.startDatetime).format('MMM DD, YYYY')}</p>
+          <p className={`${styles.bodyLong01} ${styles.text02}`}>{formatDatetime(parseDate(visit.startDatetime))}</p>
         </h4>
         <div className={styles.toggleButtons}>
           <Button
