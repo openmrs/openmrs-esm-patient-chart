@@ -20,9 +20,8 @@ import {
   DataTableHeader,
   DataTableRow,
 } from 'carbon-components-react';
-import { formEntrySub } from './forms-utils';
 import { CoreHTMLForms } from '../core-html-forms';
-import { PatientChartPagination, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { PatientChartPagination, launchPatientWorkspace, formEntrySub } from '@openmrs/esm-patient-common-lib';
 import { CompletedFormInfo } from '../types';
 import dayjs from 'dayjs';
 
@@ -52,7 +51,7 @@ function launchFormEntry(currentVisit: Visit | undefined, formUuid: string, pati
 }
 
 function launchWorkSpace(formUuid: string, patient: fhir.Patient, visitUuid?: string) {
-  formEntrySub.next({ formUuid, patient, visitUuid });
+  formEntrySub.next({ formUuid, visitUuid, patient });
   launchPatientWorkspace('patient-form-entry-workspace');
 }
 

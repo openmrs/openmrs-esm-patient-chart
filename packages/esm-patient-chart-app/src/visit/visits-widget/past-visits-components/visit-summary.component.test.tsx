@@ -7,14 +7,26 @@ import {
   visitOverviewDetailMockDataNotEmpty,
 } from '../../../../../../__mocks__/visits.mock';
 import userEvent from '@testing-library/user-event';
-import { ExtensionSlot } from '@openmrs/esm-framework';
 
 const mockEncounter = visitOverviewDetailMockData.data.results[0].encounters.map((encounter) => encounter);
 window.HTMLElement.prototype.scrollIntoView = jest.fn();
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ExtensionSlot: jest.fn().mockImplementation((ext) => ext.extensionSlotName),
-}));
+jest.mock('@openmrs/esm-framework', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-framework');
+
+  return {
+    ...originalModule,
+    ExtensionSlot: jest.fn().mockImplementation((ext) => ext.extensionSlotName),
+    useConfig: jest.fn(() => {
+      return {
+        notesConceptUuids: ['162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', 'some-uuid2'],
+        visitDiagnosisConceptUuid: '159947AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        problemListConceptUuid: '1284AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        diagnosisOrderConceptUuid: '159946AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      };
+    }),
+  };
+});
 
 describe('VisitSummary', () => {
   const renderVisitSummary = () => {
@@ -64,8 +76,8 @@ describe('VisitSummary', () => {
     const notesTab = screen.getByRole('tab', { name: /Notes/i });
     userEvent.click(notesTab);
 
-    expect(screen.getByText(/Dr James Cook/i)).toBeInTheDocument();
-    expect(screen.getByText(/Admin/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Dr James Cook/i)[0]).toBeInTheDocument();
+    expect(screen.getAllByText(/Admin/i)[0]).toBeInTheDocument();
     expect(screen.getByText(/^Patient seems very unwell$/i)).toBeInTheDocument();
 
     // should display medication panel

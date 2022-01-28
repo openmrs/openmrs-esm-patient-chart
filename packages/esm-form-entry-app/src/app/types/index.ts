@@ -177,3 +177,18 @@ export interface LoggedInUser {
     display: string;
   };
 }
+
+export interface MonthlyScheduleParams {
+  endDate: string;
+  limit: number;
+  locationUuids: string;
+  programType: string;
+  startDate: string;
+}
+
+export interface FormEntryConfig {
+  dataSources: {
+    monthlySchedule: boolean;
+  };
+  appointmentsResourceUrl: string;
+}

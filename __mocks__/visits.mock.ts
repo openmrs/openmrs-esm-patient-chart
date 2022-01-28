@@ -244,10 +244,10 @@ export const visitOverviewDetailMockDataNotEmpty = {
               {
                 uuid: '5171be48-bcfc-4f74-972c-4212db900dc0',
                 display: 'Super User: Unknown',
-                encounterRole: { uuid: 'a0b03050-c99b-11e0-9572-0800200c9a66', display: 'Unknown' },
+                encounterRole: { uuid: 'a0b03050-c99b-11e0-9572-0800200c9a66', display: 'Admin' },
                 provider: {
                   uuid: 'f9badd80-ab76-11e2-9e96-0800200c9a66',
-                  person: { uuid: '24252571-dd5a-11e6-9d9c-0242ac150002', display: 'Super User' },
+                  person: { uuid: '24252571-dd5a-11e6-9d9c-0242ac150002', display: 'Dr James Cook' },
                 },
               },
             ],

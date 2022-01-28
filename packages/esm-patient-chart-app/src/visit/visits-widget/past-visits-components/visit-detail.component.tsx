@@ -25,6 +25,7 @@ const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visit, pati
         encounterType: encounter.encounterType.display,
         provider: encounter.encounterProviders.length > 0 ? encounter.encounterProviders[0].display : '',
         obs: encounter.obs,
+        form: encounter.form,
       })),
     [visit],
   );
@@ -56,7 +57,7 @@ const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visit, pati
             kind="ghost"
             onClick={() => setListView(false)}
           >
-            {t('allEncounters', 'All Encounters')}
+            {t('Encounters', 'Encounters')}
           </Button>
         </div>
       </div>

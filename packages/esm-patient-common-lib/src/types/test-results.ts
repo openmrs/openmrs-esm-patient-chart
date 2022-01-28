@@ -38,7 +38,8 @@ export type OBSERVATION_INTERPRETATION =
   | 'OFF_SCALE_HIGH'
   | 'LOW'
   | 'CRITICALLY_LOW'
-  | 'OFF_SCALE_LOW';
+  | 'OFF_SCALE_LOW'
+  | '--';
 
 export interface ExternalOverviewProps {
   patientUuid: string;

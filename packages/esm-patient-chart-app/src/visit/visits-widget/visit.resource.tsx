@@ -1,19 +1,15 @@
 import useSWR from 'swr';
-import { openmrsFetch, Visit } from '@openmrs/esm-framework';
+import { openmrsFetch, OpenmrsResource, Visit } from '@openmrs/esm-framework';
 
 export function useVisits(patientUuid: string) {
   const customRepresentation =
-    'custom:(uuid,encounters:(uuid,encounterDatetime,' +
-    'orders:(uuid,dateActivated,' +
-    'drug:(uuid,name,strength),doseUnits:(uuid,display),' +
-    'dose,route:(uuid,display),frequency:(uuid,display),' +
-    'duration,durationUnits:(uuid,display),numRefills,' +
-    'orderType:(uuid,display),orderer:(uuid,person:(uuid,display))),' +
+    'custom:(uuid,encounters:(uuid,form:(uuid,display),encounterDatetime,' +
+    'orders:full,' +
     'obs:(uuid,concept:(uuid,display,conceptClass:(uuid,display)),' +
     'display,groupMembers:(uuid,concept:(uuid,display),' +
     'value:(uuid,display)),value),encounterType:(uuid,display),' +
     'encounterProviders:(uuid,display,encounterRole:(uuid,display),' +
-    'provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime';
+    'provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime,patient';
 
   const { data, error, isValidating } = useSWR<{ data: { results: Array<Visit> } }, Error>(
     `/ws/rest/v1/visit?patient=${patientUuid}&v=${customRepresentation}`,
@@ -74,6 +70,8 @@ export interface Encounter {
   };
   obs: Array<Observation>;
   orders: Array<Order>;
+  form: OpenmrsResource;
+  patient: OpenmrsResource;
 }
 
 export interface EncounterProvider {
@@ -159,6 +157,7 @@ export interface Order {
 }
 
 export interface Note {
+  concept: OpenmrsResource;
   note: string;
   provider: {
     name: string;
