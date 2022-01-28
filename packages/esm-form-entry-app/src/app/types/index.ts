@@ -189,6 +189,8 @@ export interface MonthlyScheduleParams {
 export interface FormEntryConfig {
   dataSources: {
     monthlySchedule: boolean;
+    fileUploader: boolean;
   };
   appointmentsResourceUrl: string;
+  fileUploaderResourceUrl: string;
 }

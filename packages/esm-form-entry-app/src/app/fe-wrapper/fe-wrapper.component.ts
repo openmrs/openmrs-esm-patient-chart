@@ -379,10 +379,6 @@ export class FeWrapperComponent implements OnInit {
     this.dataSources.registerDataSource('patient', this.formDataSourceService.getPatientObject(this.patient), true);
     this.dataSources.registerDataSource('rawPrevEnc', this.prevEncounter, false);
     this.dataSources.registerDataSource('userLocation', this.loggedInUser.sessionLocation);
-    this.dataSources.registerDataSource('file', {
-      fileUpload: this.fileUploadResourceService.upload.bind(this.fileUploadResourceService),
-      fetchFile: this.fileUploadResourceService.getFile.bind(this.fileUploadResourceService),
-    });
   }
 
   private setDefaultValues() {
@@ -454,6 +450,12 @@ export class FeWrapperComponent implements OnInit {
     const { dataSources } = this.config;
     if (dataSources.monthlySchedule) {
       this.dataSources.registerDataSource('monthlyScheduleResourceService', this.monthlyScheduleResourceService);
+    }
+    if (dataSources.fileUploader) {
+      this.dataSources.registerDataSource('file', {
+        fileUpload: this.fileUploadResourceService.upload.bind(this.fileUploadResourceService),
+        fetchFile: this.fileUploadResourceService.getFile.bind(this.fileUploadResourceService),
+      });
     }
   }
 }
