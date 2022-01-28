@@ -95,3 +95,13 @@
   align-items: center;
   min-height: 50%;
 }
+
+.encounterHeader {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 14px;
+  line-height: 22px;
+  font-weight: 600;
+  letter-spacing: 0.16px;
+  border-bottom: 1px solid var(--brand-03);
+  padding: 0.625rem;
+}

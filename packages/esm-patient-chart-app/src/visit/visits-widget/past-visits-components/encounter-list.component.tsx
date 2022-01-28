@@ -13,10 +13,13 @@ import {
   TableExpandRow,
   TableCell,
   TableExpandedRow,
+  Button,
 } from 'carbon-components-react';
 import { Observation } from '../visit.resource';
 import { useTranslation } from 'react-i18next';
-import { useLayoutType } from '@openmrs/esm-framework';
+import { OpenmrsResource, useLayoutType, usePatient } from '@openmrs/esm-framework';
+import Edit16 from '@carbon/icons-react/es/edit/16';
+import { formEntrySub, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 
 interface EncounterListProps {
   encounters: Array<{
@@ -25,6 +28,7 @@ interface EncounterListProps {
     encounterType: string;
     provider: string;
     obs: Array<Observation>;
+    form: OpenmrsResource;
   }>;
   visitUuid: string;
 }
@@ -32,6 +36,7 @@ interface EncounterListProps {
 const EncounterListDataTable: React.FC<EncounterListProps> = ({ encounters, visitUuid }) => {
   const { t } = useTranslation();
   const layout = useLayoutType();
+  const { patient } = usePatient();
   const isDesktop = layout === 'desktop';
   const [headerWidth, setHeaderWidth] = useState(0);
 
@@ -59,6 +64,11 @@ const EncounterListDataTable: React.FC<EncounterListProps> = ({ encounters, visi
     window.addEventListener('resize', handler);
     return () => window.removeEventListener('resize', handler);
   }, []);
+
+  function launchWorkSpace(formUuid: string, visitUuid?: string, encounterUuid?: string) {
+    formEntrySub.next({ formUuid, patient, visitUuid, encounterUuid });
+    launchPatientWorkspace('patient-form-entry-workspace');
+  }
 
   return encounters.length !== 0 ? (
     <DataTable rows={encounters} headers={headerData}>
@@ -92,6 +102,14 @@ const EncounterListDataTable: React.FC<EncounterListProps> = ({ encounters, visi
                       >
                         <div style={{ marginLeft: headerWidth }}>
                           <EncounterObservations observations={encounters[ind].obs} />
+                          <Button
+                            onClick={() => launchWorkSpace(encounters[ind].form.uuid, visitUuid, encounters[ind].id)}
+                            style={{ marginLeft: '-1rem' }}
+                            kind="ghost"
+                            renderIcon={Edit16}
+                          >
+                            {t('editEncounter', 'Edit this encounter')}
+                          </Button>
                         </div>
                       </TableExpandedRow>
                     )}
