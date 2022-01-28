@@ -14,11 +14,8 @@ export const esmPatientChartSchema = {
     _type: Type.ConceptUuid,
   },
   notesConceptUuids: {
-    _default: ['162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'],
     _type: Type.Array,
-    _elements: {
-      _type: Type.ConceptUuid,
-    },
+    _default: ['162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'],
   },
 };
 

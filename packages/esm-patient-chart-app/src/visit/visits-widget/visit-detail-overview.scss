@@ -26,11 +26,11 @@
 }
 
 .text02 {
-  color: #525252;
+  color: $text-02;
 }
 
 .text01 {
-  color: #161616;
+  color: $ui-05;
 }
 
 .container  {
@@ -45,14 +45,14 @@
   width: 100%;
   
   margin: 0 1rem 1.3125rem 1rem;
-  color: #161616;
+  color: $ui-05;
 }
 
 .visitsDetailWidgetContainer {
   background-color: $ui-background;
   width: 100%;
   margin: 0 1rem 1.3125rem 1rem;
-  border: 1px solid #e0e0e0;
+  border: 1px solid $grey-2;
 }
 
 .visitsDetailHeaderContainer {
@@ -121,9 +121,13 @@
   max-height: max-content !important;
 }
 
+.expandedRow > div {
+  background-color: $ui-02;
+}
+
 .observation {
   display: grid;
-  grid-template-columns: max-content auto;
+  grid-template-columns: 1fr 1fr;
   grid-gap: 0.5rem;
   margin: 0.5rem 0;
 }
@@ -165,7 +169,7 @@ tab > button:first {
 }
 
 .selectedTab > button {
-  border-left: 3px solid #007d79 !important;
+  border-left: 3px solid var(--brand-03) !important;
   border-bottom: 0 !important;
   font-weight: 600 !important;
 }

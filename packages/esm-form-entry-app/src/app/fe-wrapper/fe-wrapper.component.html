@@ -1,22 +1,14 @@
 <div class="error-text">{{ loadingError }}</div>
-<div class="form-title" [ngClass]="{'error': hasValidationErrors}">
-  <span *ngIf="encounter" class="omrs-type-body-small" style="color: var(--omrs-color-ink-medium-contrast);">
-    <svg class="omrs-icon title-icon-size" fill="var(--omrs-color-ink-low-contrast)">
-      <use xlink:href="#omrs-icon-calendar"></use>
-    </svg>
-    {{encounterDate + " "}}
-    <svg class="omrs-icon title-icon-size" fill="var(--omrs-color-ink-low-contrast)">
-      <use xlink:href="#omrs-icon-access-time"></use>
-    </svg>
-    {{encounterTime}}
-  </span>
-</div>
 <div *ngIf="!formSubmitted" [ngClass]="{'error': hasValidationErrors}">
   <div class="content" (click)="onErrorPanelLostFocus()">
     <div *ngIf="!isLoading" class="form-container">
-      <form class="bx--form no-padding" *ngIf="formSchema" [formGroup]="form.rootNode.control">
-        <form-renderer [node]="form.rootNode"></form-renderer>
-      </form>
+      <div>
+        <h6 *ngIf="singleSpaProps.encounterUuid" class="encounterHeader">Encounter date time {{encounterDate}} @
+          {{encounterTime}}</h6>
+        <form class="bx--form no-padding" *ngIf="formSchema" [formGroup]="form.rootNode.control">
+          <form-renderer [node]="form.rootNode"></form-renderer>
+        </form>
+      </div>
       <div class="bx-btn--set button-set">
         <button class="bx--btn bx--btn--secondary" (click)="closeForm()" type="button">Discard</button>
         <button class="bx--btn bx--btn--primary" (click)="onSubmit($event)" type="submit">Save and close</button>

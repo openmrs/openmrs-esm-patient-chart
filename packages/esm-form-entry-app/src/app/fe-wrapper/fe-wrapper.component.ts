@@ -56,11 +56,11 @@ export class FeWrapperComponent implements OnInit {
   config: FormEntryConfig;
 
   public get encounterDate(): string {
-    return moment(this.encounter.encounterDatetime).format('YYYY-MM-DD');
+    return moment(this.encounter?.encounterDatetime).format('YYYY-MM-DD');
   }
 
   public get encounterTime(): string {
-    return moment(this.encounter.encounterDatetime).format('HH:mm');
+    return moment(this.encounter?.encounterDatetime).format('HH:mm');
   }
 
   public get hasValidationErrors(): boolean {
@@ -240,7 +240,7 @@ export class FeWrapperComponent implements OnInit {
 
   private loadPatientPreviousEncounters(data, subject) {
     this.patientPreviousEncounter
-      .getPreviousEncounter(data.formSchema.encounterType?.uuid, this.singleSpaProps.patient.id)
+      .getPreviousEncounter(data.formSchema.encounterType?.uuid, this.singleSpaProps.patientUuid)
       .then((prevEnc) => {
         this.prevEncounter = prevEnc ? prevEnc : Object.create({});
         this.createForm();
@@ -359,7 +359,7 @@ export class FeWrapperComponent implements OnInit {
       this.populateEncounterForEditing();
       this.form.valueProcessingInfo.encounterUuid = this.singleSpaProps.encounterUuid;
     } else {
-      this.form.valueProcessingInfo.patientUuid = this.singleSpaProps.patient.id;
+      this.form.valueProcessingInfo.patientUuid = this.singleSpaProps.patientUuid;
       this.setDefaultValues();
     }
     this.setUpPayloadProcessingInformation();
@@ -404,8 +404,8 @@ export class FeWrapperComponent implements OnInit {
   private setUpPayloadProcessingInformation() {
     try {
       if (this.loggedInUser) {
-        this.form.valueProcessingInfo.personUuid = this.patient.id;
-        this.form.valueProcessingInfo.patientUuid = this.patient.id;
+        this.form.valueProcessingInfo.personUuid = this.singleSpaProps.patientUuid;
+        this.form.valueProcessingInfo.patientUuid = this.singleSpaProps.patientUuid;
         this.form.valueProcessingInfo.formUuid = this.formSchema.uuid;
         this.form.valueProcessingInfo.providerUuid = this.loggedInUser?.currentProvider?.uuid;
         if (this.formSchema.encounterType) {
