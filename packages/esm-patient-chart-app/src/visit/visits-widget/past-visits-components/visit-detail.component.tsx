@@ -5,8 +5,7 @@ import VisitSummary from './visit-summary.component';
 import { Button } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 import { Encounter } from '../visit.resource';
-import { formatDate, formatDatetime, formatTime, parseDate, Visit } from '@openmrs/esm-framework';
-import dayjs from 'dayjs';
+import { formatDatetime, formatTime, parseDate, Visit } from '@openmrs/esm-framework';
 
 interface VisitDetailComponentProps {
   visit: Visit;
@@ -16,7 +15,7 @@ interface VisitDetailComponentProps {
 
 const VisitDetailComponent: React.FC<VisitDetailComponentProps> = ({ visit, patientUuid, listViewOverride }) => {
   const { t } = useTranslation();
-  const [listView, setListView] = useState(false);
+  const [listView, setListView] = useState(listViewOverride);
   const encounters = useMemo(
     () =>
       visit.encounters.map((encounter: Encounter) => ({

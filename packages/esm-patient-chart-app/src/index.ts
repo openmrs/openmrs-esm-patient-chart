@@ -148,6 +148,14 @@ function setupOpenMRS() {
           moduleName,
         }),
       },
+      {
+        id: 'visit-detail-overview',
+        slot: 'visit-detail-overview-slot',
+        load: getAsyncLifecycle(() => import('./visit/visits-widget/past-visits-components/visit-detail.component'), {
+          featureName: 'visit-details',
+          moduleName,
+        }),
+      },
     ],
   };
 }

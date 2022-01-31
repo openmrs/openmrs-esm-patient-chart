@@ -33,8 +33,11 @@ const CommonDataTable: React.FC<CommonDataTableProps> = ({ title, data, descript
       {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getTableContainerProps }) => (
         <TableContainer
           className={`${styles.tableContainer} ${isTablet ? `${styles.tablet}` : `${styles.desktop}`}`}
-          title={title}
-          description={description}
+          title={
+            <>
+              {title} {description}
+            </>
+          }
           {...getTableContainerProps()}
         >
           {toolbar}

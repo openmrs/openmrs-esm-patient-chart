@@ -18,6 +18,9 @@
     padding-top: 0.188rem;
     border-bottom: 0.375rem solid var(--brand-03);
   }
+  @include carbon--type-style("body-short-01");
+  color: $text-02;
+  margin-top: $spacing-02;
 }
 
 .columns {
