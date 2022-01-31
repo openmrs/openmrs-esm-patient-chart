@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { NgModule } from '@angular/core';
+import { ErrorHandler, NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -16,6 +16,8 @@ import { FormSubmissionService } from './form-submission/form-submission.service
 import { MonthlyScheduleResourceService } from './services/monthly-scheduled-resource.service';
 import { ConfigResourceService } from './services/config-resource.service';
 import { FileUploadResourceService } from './services/file-upload-resource.service';
+import { NotificationService } from './services/notification.service';
+import { GlobalErrorHandler } from './errors/error-handler';
 
 @NgModule({
   declarations: [AppComponent, EmptyRouteComponent, FeWrapperComponent],
@@ -28,6 +30,8 @@ import { FileUploadResourceService } from './services/file-upload-resource.servi
     MonthlyScheduleResourceService,
     ConfigResourceService,
     FileUploadResourceService,
+    NotificationService,
+    { provide: ErrorHandler, useClass: GlobalErrorHandler },
   ],
   bootstrap: [AppComponent],
 })

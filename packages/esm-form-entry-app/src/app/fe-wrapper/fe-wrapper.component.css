@@ -105,3 +105,8 @@
   border-bottom: 1px solid var(--brand-03);
   padding: 0.625rem;
 }
+
+
+.error-container {
+  height: 100vh;
+}

@@ -27,6 +27,7 @@ import { FileUploadResourceService } from '../services/file-upload-resource.serv
 
 import { MonthlyScheduleResourceService } from '../services/monthly-scheduled-resource.service';
 import { ConfigResourceService } from '../services/config-resource.service';
+import { NotificationService } from '../services/notification.service';
 @Component({
   selector: 'my-app-fe-wrapper',
   templateUrl: './fe-wrapper.component.html',
@@ -55,6 +56,7 @@ export class FeWrapperComponent implements OnInit {
   prevEncounter: Encounter;
   isLoading: boolean = true;
   config: FormEntryConfig;
+  hasError: boolean = false;
 
   public get encounterDate(): string {
     return moment(this.encounter?.encounterDatetime).format('YYYY-MM-DD');
@@ -85,9 +87,17 @@ export class FeWrapperComponent implements OnInit {
     private monthlyScheduleResourceService: MonthlyScheduleResourceService,
     private configResourceService: ConfigResourceService,
     private fileUploadResourceService: FileUploadResourceService,
+    private notificationService: NotificationService,
   ) {}
 
   ngOnInit() {
+    this.notificationService.notification$.subscribe((error: Error) => {
+      if (error) {
+        this.isLoading = false;
+        this.hasError = true;
+        this.loadingError = `Form engine error ${error}`;
+      }
+    });
     this.config = this.configResourceService.getConfig();
     this.launchForm().subscribe(
       (form) => {

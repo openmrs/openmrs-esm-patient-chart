@@ -22,11 +22,11 @@ export class FileUploadResourceService {
     return openmrsBase.concat(etlBaseUrl);
   }
   public upload(formData) {
-    const url = this.getUrl().concat('/fileupload');
+    const url = this.getUrl().concat('fileupload');
     return this.http.post(url, formData);
   }
   public getFile(url: string, fileType?: string): Observable<any> {
-    const fullUrl = this.getUrl().concat('/files/') + url;
+    const fullUrl = this.getUrl().concat('files/') + url;
     return new Observable((observer: Subscriber<any>) => {
       let objectUrl: string = null;
       const headers = new HttpHeaders({

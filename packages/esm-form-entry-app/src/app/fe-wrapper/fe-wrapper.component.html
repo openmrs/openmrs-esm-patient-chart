@@ -1,7 +1,6 @@
-<div class="error-text">{{ loadingError }}</div>
 <div *ngIf="!formSubmitted" [ngClass]="{'error': hasValidationErrors}">
   <div class="content" (click)="onErrorPanelLostFocus()">
-    <div *ngIf="!isLoading" class="form-container">
+    <div *ngIf="!isLoading && !hasError" class="form-container">
       <div>
         <h6 *ngIf="singleSpaProps.encounterUuid" class="encounterHeader">Encounter date time {{encounterDate}} @
           {{encounterTime}}</h6>
@@ -12,6 +11,32 @@
       <div class="bx-btn--set button-set">
         <button class="bx--btn bx--btn--secondary" (click)="closeForm()" type="button">Discard</button>
         <button class="bx--btn bx--btn--primary" (click)="onSubmit($event)" type="submit">Save and close</button>
+      </div>
+    </div>
+    <div *ngIf="hasError" class="omrs-app-error error-container">
+      <h1>Form loading error</h1>
+      <p>Something went wrong. Please try reloading.</p>
+      <p>If the problem persists contact your system administrator.</p>
+      <button class="bx--btn bx--btn--secondary" (click)="closeForm()" type="button">Close</button>
+      <div class="bx--snippet bx--snippet--multi">
+        <div class="bx--snippet-container" aria-label="code-snippet" style="max-height: 240px; min-height: 48px;">
+          <pre><code>{{loadingError}}</code></pre>
+        </div>
+        <div class="bx--snippet__overflow-indicator--right"></div><button type="button" class="bx--copy-btn bx--copy"
+          title="Copy to clipboard" aria-live="polite"><svg focusable="false" preserveAspectRatio="xMidYMid meet"
+            xmlns="http://www.w3.org/2000/svg" fill="currentColor" width="16" height="16" viewBox="0 0 32 32"
+            aria-hidden="true" class="bx--snippet__icon">
+            <path d="M28,10V28H10V10H28m0-2H10a2,2,0,0,0-2,2V28a2,2,0,0,0,2,2H28a2,2,0,0,0,2-2V10a2,2,0,0,0-2-2Z">
+            </path>
+            <path d="M4,18H2V4A2,2,0,0,1,4,2H18V4H4Z"></path>
+          </svg>Copy to clipboard<span aria-hidden="true" class="bx--assistive-text bx--copy-btn__feedback">Copied to
+            clipboard</span></button><button tabindex="0"
+          class="bx--snippet-btn--expand bx--btn bx--btn--md bx--btn--ghost" type="button"><span
+            class="bx--snippet-btn--text">Show more</span><svg focusable="false" preserveAspectRatio="xMidYMid meet"
+            xmlns="http://www.w3.org/2000/svg" fill="currentColor" aria-label="Show more" name="chevron--down"
+            role="img" width="16" height="16" viewBox="0 0 16 16" class="bx--icon-chevron--down bx--snippet__icon">
+            <path d="M8 11L3 6 3.7 5.3 8 9.6 12.3 5.3 13 6z"></path>
+          </svg></button>
       </div>
     </div>
   </div>
