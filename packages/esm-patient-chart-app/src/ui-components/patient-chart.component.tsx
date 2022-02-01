@@ -7,7 +7,7 @@ import { RouteComponentProps } from 'react-router-dom';
 import { detachAll, ExtensionSlot, useSessionUser } from '@openmrs/esm-framework';
 import ActionMenu from './action-menu.component';
 import { useOfflineVisitForPatient, usePatientOrOfflineRegisteredPatient } from '../offline';
-import { useContextWorkspace } from '../hooks/useContextWindowSize';
+import { useWorkspaceWindow } from '@openmrs/esm-patient-common-lib';
 import { WorkspaceWindowState } from '../types';
 import WorkspaceNotification from './workspace-notification.component';
 
@@ -22,7 +22,7 @@ const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({ match
   const { isLoading, patient } = usePatientOrOfflineRegisteredPatient(patientUuid);
   const sessionUser = useSessionUser();
   const state = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);
-  const { windowSize, openWindows } = useContextWorkspace();
+  const { windowSize, openWindows } = useWorkspaceWindow();
 
   useEffect(() => {
     detachAll('patient-chart-workspace-slot');
