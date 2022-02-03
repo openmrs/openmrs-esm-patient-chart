@@ -11,7 +11,7 @@ const parseTime = (sortedTimes: string[]) => {
   sortedTimes.forEach((datetime) => {
     const dayJsDate = dayjs(datetime);
     const year = dayJsDate.year().toString();
-    const date = dayJsDate.format('MM/DD');
+    const date = dayJsDate.format('DD - MMM');
     const time = dayJsDate.format('HH:mm');
 
     const yearColumn = yearColumns.find(({ year: innerYear }) => year === innerYear);
