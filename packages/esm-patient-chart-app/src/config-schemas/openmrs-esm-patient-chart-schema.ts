@@ -17,6 +17,13 @@ export const esmPatientChartSchema = {
     _type: Type.Array,
     _default: ['162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'],
   },
+  offlineVisitTypeUuid: {
+    _type: Type.UUID,
+    _description: 'The UUID of the visit type to be used for the automatically created offline visits.',
+    _default: 'a22733fa-3501-4020-a520-da024eeff088',
+  },
 };
 
-export interface ChartConfig {}
+export interface ChartConfig {
+  offlineVisitTypeUuid: string;
+}

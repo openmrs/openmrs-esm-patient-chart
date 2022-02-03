@@ -11,10 +11,11 @@ import {
   subscribeConnectivity,
   QueueItemDescriptor,
   usePatient,
+  useConfig,
 } from '@openmrs/esm-framework';
 import { useEffect } from 'react';
 import { v4 } from 'uuid';
-import useSWR, { SWRResponse } from 'swr';
+import useSWR from 'swr';
 
 const visitSyncType = 'visit';
 const patientRegistrationSyncType = 'patient-registration';
@@ -54,11 +55,14 @@ export function setupOfflineVisitsSync() {
 }
 
 export function useOfflineVisitForPatient(patientUuid?: string, location?: string) {
+  const { offlineVisitTypeUuid } = useConfig();
+
   useEffect(() => {
     return subscribeConnectivity(async ({ online }) => {
       if (!online && patientUuid && location) {
         const offlineVisit =
-          (await getOfflineVisitForPatient(patientUuid)) ?? (await createOfflineVisitForPatient(patientUuid, location));
+          (await getOfflineVisitForPatient(patientUuid)) ??
+          (await createOfflineVisitForPatient(patientUuid, location, offlineVisitTypeUuid));
 
         getStartedVisit.next({
           mode: VisitMode.NEWVISIT,
@@ -67,7 +71,7 @@ export function useOfflineVisitForPatient(patientUuid?: string, location?: strin
         });
       }
     });
-  }, [patientUuid, location]);
+  }, [patientUuid, location, offlineVisitTypeUuid]);
 }
 
 async function getOfflineVisitForPatient(patientUuid: string) {
@@ -75,7 +79,7 @@ async function getOfflineVisitForPatient(patientUuid: string) {
   return offlineVisits.find((visit) => visit.patient === patientUuid);
 }
 
-async function createOfflineVisitForPatient(patientUuid: string, location: string) {
+async function createOfflineVisitForPatient(patientUuid: string, location: string, offlineVisitTypeUuid: string) {
   const patientRegistrationSyncItems = await getSynchronizationItems<any>(patientRegistrationSyncType);
   const isVisitForOfflineRegisteredPatient = patientRegistrationSyncItems.some(
     (item) => item.fhirPatient.id === patientUuid,
@@ -86,7 +90,7 @@ async function createOfflineVisitForPatient(patientUuid: string, location: strin
     patient: patientUuid,
     startDatetime: new Date(),
     location,
-    visitType: 'a22733fa-3501-4020-a520-da024eeff088', // "Offline" visit type UUID.
+    visitType: offlineVisitTypeUuid,
   };
 
   const descriptor: QueueItemDescriptor = {
