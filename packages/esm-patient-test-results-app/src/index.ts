@@ -60,6 +60,16 @@ function setupOpenMRS() {
         online: true,
         offline: true,
       },
+      {
+        id: 'test-results-filtered-overview',
+        slot: 'test-results-filtered-overview-slot',
+        load: getAsyncLifecycle(() => import('./overview/external-overview.component'), options),
+        meta: {
+          columnSpan: 4,
+        },
+        online: true,
+        offline: true,
+      },
     ],
   };
 }

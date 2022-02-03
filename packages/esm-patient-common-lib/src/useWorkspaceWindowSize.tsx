@@ -1,14 +1,14 @@
 import { useAssignedExtensionIds } from '@openmrs/esm-framework';
 import React, { createContext, useContext, useMemo, useEffect, useCallback } from 'react';
-import { patientChartWorkspaceSlot } from '../constants';
-import { useWorkspace } from '../hooks/useWorkspace';
-import { WorkspaceWindowState } from '../types';
+import { patientChartWorkspaceSlot } from '../../esm-patient-chart-app/src/constants';
+import { useWorkspace } from '../../esm-patient-chart-app/src/hooks/useWorkspace';
+import { WorkspaceWindowState } from '../../esm-patient-chart-app/src/types';
 
 interface WindowSize {
   size: WorkspaceWindowState;
 }
 
-interface ContextWindowSizeContextShape {
+interface WorkspaceWindowSizeContextShape {
   windowSize: WindowSize;
   updateWindowSize?(value: WorkspaceWindowState): any;
   openWindows: number;
@@ -24,41 +24,41 @@ const reducer = (state: WindowSize, action: WorkspaceWindowState) => {
   }
 };
 
-const ContextWindowSizeContext = createContext<ContextWindowSizeContextShape>({
+const WorkspaceWindowSizeContext = createContext<WorkspaceWindowSizeContextShape>({
   windowSize: { size: WorkspaceWindowState.normal },
   openWindows: 0,
 });
 
-export const useContextWorkspace = () => {
-  const value = useContext(ContextWindowSizeContext);
+export const useWorkspaceWindow = () => {
+  const value = useContext(WorkspaceWindowSizeContext);
   return value;
 };
 
-export const ContextWindowSizeProvider: React.FC = ({ children }) => {
+export const WorkspaceWindowSizeProvider: React.FC = ({ children }) => {
   const extensions = useAssignedExtensionIds(patientChartWorkspaceSlot);
   const initialValue: WindowSize = { size: WorkspaceWindowState.normal };
-  const [contextWorkspaceWindowSize, updateContextWorkspaceWindowSize] = React.useReducer(reducer, initialValue);
+  const [workspaceWindowSize, updateWorkspaceWindowSize] = React.useReducer(reducer, initialValue);
   const { windowState: screenMode } = useWorkspace();
 
   useEffect(() => {
     if (extensions.length > 0 && screenMode === WorkspaceWindowState.maximized) {
-      updateContextWorkspaceWindowSize(WorkspaceWindowState.maximized);
+      updateWorkspaceWindowSize(WorkspaceWindowState.maximized);
     } else {
-      updateContextWorkspaceWindowSize(WorkspaceWindowState.reopened);
+      updateWorkspaceWindowSize(WorkspaceWindowState.reopened);
     }
   }, [extensions.length, screenMode]);
 
   const updateWindowSize = useCallback((action: WorkspaceWindowState) => {
-    updateContextWorkspaceWindowSize(action);
+    updateWorkspaceWindowSize(action);
   }, []);
 
   const windowSizeValue = useMemo(() => {
     return {
-      windowSize: contextWorkspaceWindowSize,
+      windowSize: workspaceWindowSize,
       updateWindowSize: updateWindowSize,
       openWindows: extensions.length,
     };
-  }, [contextWorkspaceWindowSize, extensions.length, updateWindowSize]);
+  }, [workspaceWindowSize, extensions.length, updateWindowSize]);
 
-  return <ContextWindowSizeContext.Provider value={windowSizeValue}>{children}</ContextWindowSizeContext.Provider>;
+  return <WorkspaceWindowSizeContext.Provider value={windowSizeValue}>{children}</WorkspaceWindowSizeContext.Provider>;
 };

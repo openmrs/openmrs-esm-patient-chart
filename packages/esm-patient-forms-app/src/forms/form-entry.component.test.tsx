@@ -10,7 +10,7 @@ const mockFormEntrySub = jest.fn();
 const mockUseVisit = useVisit as jest.Mock;
 const mockUseConnectivity = useConnectivity as jest.Mock;
 
-jest.mock('./forms-utils', () => ({
+jest.mock('@openmrs/esm-patient-common-lib', () => ({
   get formEntrySub() {
     return mockFormEntrySub();
   },

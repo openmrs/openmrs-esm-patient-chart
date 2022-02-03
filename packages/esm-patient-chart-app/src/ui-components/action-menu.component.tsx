@@ -6,7 +6,7 @@ import styles from './action-menu.component.scss';
 import { ExtensionSlot, useLayoutType } from '@openmrs/esm-framework';
 import { HeaderPanel, Button } from 'carbon-components-react';
 import { isDesktop } from '../utils';
-import { useContextWorkspace } from '../hooks/useContextWindowSize';
+import { useWorkspaceWindow } from '@openmrs/esm-patient-common-lib';
 import { useWorkspace } from '../hooks/useWorkspace';
 import { useTranslation } from 'react-i18next';
 import { WorkspaceWindowState } from '../types';
@@ -22,7 +22,7 @@ export const ActionMenu: React.FC<ActionMenuInterface> = ({ open }) => {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const { windowState: screenMode, active } = useWorkspace();
-  const { openWindows, updateWindowSize, windowSize } = useContextWorkspace();
+  const { openWindows, updateWindowSize, windowSize } = useWorkspaceWindow();
 
   const checkViewMode = () => {
     if (active) {

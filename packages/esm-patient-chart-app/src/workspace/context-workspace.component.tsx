@@ -7,7 +7,7 @@ import Maximize16 from '@carbon/icons-react/es/maximize/16';
 import Minimize16 from '@carbon/icons-react/es/minimize/16';
 import { ExtensionSlot, useLayoutType, useBodyScrollLock } from '@openmrs/esm-framework';
 import { isDesktop } from '../utils';
-import { useContextWorkspace } from '../hooks/useContextWindowSize';
+import { useWorkspaceWindow } from '@openmrs/esm-patient-common-lib';
 import { useWorkspace } from '../hooks/useWorkspace';
 import { patientChartWorkspaceHeaderSlot, patientChartWorkspaceSlot } from '../constants';
 import { WorkspaceWindowState } from '../types';
@@ -24,7 +24,7 @@ const ContextWorkspace: React.FC<RouteComponentProps<ContextWorkspaceParams>> = 
 
   const { patientUuid } = match.params;
   const { active, title, closeWorkspace, extensions } = useWorkspace();
-  const { windowSize, updateWindowSize } = useContextWorkspace();
+  const { windowSize, updateWindowSize } = useWorkspaceWindow();
   const { size } = windowSize;
 
   const hidden = size === WorkspaceWindowState.hidden;

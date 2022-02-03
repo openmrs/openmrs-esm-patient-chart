@@ -1,15 +1,17 @@
 import 'systemjs-webpack-interop/resource-query-public-path?systemjsModuleName=@openmrs/esm-form-entry-app';
 import 'zone.js/dist/zone';
 import 'reflect-metadata';
-import { messageOmrsServiceWorker } from '@openmrs/esm-framework';
+import { messageOmrsServiceWorker, defineConfigSchema } from '@openmrs/esm-framework';
 import {
   setupOfflineEncounterSync,
   setupEncounterRequestInterceptors,
   setupOfflineDataSourcePrecaching,
 } from './offline';
+import { configSchema } from './config-schema';
 
 const backendDependencies = { 'webservices.rest': '^2.24.0' };
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
+const moduleName = '@openmrs/esm-form-entry-app';
 
 function setupOpenMRS() {
   setupEncounterRequestInterceptors();
@@ -45,6 +47,8 @@ function setupOpenMRS() {
     type: 'registerDynamicRoute',
     pattern: '.+/ws/rest/v1/person.*',
   });
+
+  defineConfigSchema(moduleName, configSchema);
 
   return {
     extensions: [

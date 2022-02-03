@@ -6,7 +6,7 @@ import NotesSummary from './notes-summary.component';
 import TestsSummary from './tests-summary.component';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs } from 'carbon-components-react';
-import { OpenmrsResource } from '@openmrs/esm-framework';
+import { OpenmrsResource, useConfig } from '@openmrs/esm-framework';
 import { Order, Encounter, Note, Observation, OrderItem } from '../visit.resource';
 
 function formatTime(date) {
@@ -24,6 +24,7 @@ interface VisitSummaryProps {
 }
 
 const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid }) => {
+  const config = useConfig();
   const { t } = useTranslation();
   const [tabSelected, setSelectedTab] = useState(0);
 
@@ -49,30 +50,36 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid }) 
       );
 
       // Check for Visit Diagnoses and Notes
-      if (enc.encounterType.display === 'Visit Note') {
-        enc.obs.forEach((obs: Observation) => {
-          if (obs.concept.display === 'Visit Diagnoses') {
-            // Putting all the diagnoses in a single array.
-            diagnoses.push({
-              diagnosis: obs.groupMembers.find((mem) => mem.concept.display === 'PROBLEM LIST').value.display,
-              order: obs.groupMembers.find((mem) => mem.concept.display === 'Diagnosis order').value.display,
-            });
-          } else if (obs.concept.display === 'Text of encounter note') {
-            // Putting all notes in a single array.
-            notes.push({
-              note: obs.value,
-              provider: {
-                name: enc.encounterProviders.length ? enc.encounterProviders[0].provider.person.display : '',
-                role: enc.encounterProviders.length ? enc.encounterProviders[0].encounterRole.display : '',
-              },
-              time: formatTime(obs.obsDatetime),
-            });
-          }
-        });
-      }
+      enc.obs.forEach((obs: Observation) => {
+        if (obs.concept.uuid === config.visitDiagnosisConceptUuid) {
+          // Putting all the diagnoses in a single array.
+          diagnoses.push({
+            diagnosis: obs.groupMembers?.find((mem) => mem.concept.uuid === config.problemListConceptUuid).value
+              .display,
+            order: obs.groupMembers?.find((mem) => mem.concept.uuid === config.diagnosisOrderConceptUuid).value.display,
+          });
+        } else if (config.notesConceptUuids?.includes(obs.concept.uuid)) {
+          // Putting all notes in a single array.
+          notes.push({
+            note: obs.value,
+            provider: {
+              name: enc.encounterProviders.length ? enc.encounterProviders[0].provider.person.display : '',
+              role: enc.encounterProviders.length ? enc.encounterProviders[0].encounterRole.display : '',
+            },
+            time: formatTime(obs.obsDatetime),
+            concept: obs.concept,
+          });
+        }
+      });
     });
     return [diagnoses, notes, medications];
-  }, [encounters]);
+  }, [
+    config.diagnosisOrderConceptUuid,
+    config.notesConceptUuids,
+    config.problemListConceptUuid,
+    config.visitDiagnosisConceptUuid,
+    encounters,
+  ]);
 
   return (
     <div className={styles.summaryContainer}>
