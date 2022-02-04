@@ -42,9 +42,9 @@ const DateHeaderGrid: React.FC<DateHeaderGridProps> = ({ timeColumns, yearColumn
         </TimeSlots>
       );
     })}
-    {dayColumns.map(({ day, size }) => {
+    {dayColumns.map(({ day, year, size }) => {
       return (
-        <TimeSlots key={day} className={styles['day-column']} style={{ gridColumn: `${size} span` }}>
+        <TimeSlots key={`${day} - ${year}`} className={styles['day-column']} style={{ gridColumn: `${size} span` }}>
           {day}
         </TimeSlots>
       );
