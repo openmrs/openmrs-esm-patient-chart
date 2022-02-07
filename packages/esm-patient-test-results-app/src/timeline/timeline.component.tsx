@@ -105,6 +105,8 @@ export const Timeline: React.FC<TimelineParams> = ({
 }) => {
   const [xIsScrolled, yIsScrolled, containerRef] = useScrollIndicator(0, 32);
 
+  const timelineData = useTimelineData(patientUuid, panelUuid);
+
   const {
     data: {
       parsedTime: { yearColumns, dayColumns, timeColumns, sortedTimes },
@@ -112,7 +114,7 @@ export const Timeline: React.FC<TimelineParams> = ({
       panelName,
     },
     loaded,
-  } = useTimelineData(patientUuid, panelUuid);
+  } = timelineData;
 
   const openTrendline = React.useCallback(
     (testUuid: string) => openTrendlineExternal(panelUuid, testUuid),
@@ -146,3 +148,5 @@ export const Timeline: React.FC<TimelineParams> = ({
     </PaddingContainer>
   );
 };
+
+export default Timeline;

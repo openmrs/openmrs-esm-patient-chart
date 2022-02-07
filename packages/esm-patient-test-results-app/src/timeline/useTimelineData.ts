@@ -54,6 +54,7 @@ const parseEntries = (entries: ObsRecord[] = [], type: string) => {
 };
 
 export const useTimelineData = (patientUuid: string, panelUuid: string) => {
+  // gets all patient sorted obs, filters for panelUuid, then transforms data
   const { sortedObs, loaded, error } = usePatientResultsData(patientUuid);
 
   const timelineData = useMemo(() => {
@@ -64,7 +65,11 @@ export const useTimelineData = (patientUuid: string, panelUuid: string) => {
         error,
       };
 
-    const [panelName, panelData] = Object.entries(sortedObs).find(([, { uuid }]) => uuid === panelUuid) || [];
+    // look for the specified panelUuid. If none is specified, just take any obs
+    const [panelName, panelData] = panelUuid
+      ? Object.entries(sortedObs).find(([, { uuid }]) => uuid === panelUuid) || []
+      : Object.entries(sortedObs)?.[0];
+
     if (!panelData)
       return {
         data: { parsedTime: {} as ReturnType<typeof parseTime> },

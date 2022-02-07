@@ -26,6 +26,9 @@ interface CommonDataTableProps {
 }
 
 const CommonDataTable: React.FC<CommonDataTableProps> = ({ title, data, description, toolbar, tableHeaders }) => {
+  // Currently description is a complicated component requiring use of div tag, while carbon wraps this
+  // component in <p>, leading to invalid DOM nesting
+  // TODO: make a PR against carbon-components-react to allow for a tag component other than p
   const isTablet = useLayoutType() === 'tablet';
 
   return (
