@@ -19,29 +19,18 @@ import {
   Tile,
   ButtonSet,
 } from 'carbon-components-react';
-import {
-  createErrorHandler,
-  detach,
-  showNotification,
-  showToast,
-  useConfig,
-  useSessionUser,
-} from '@openmrs/esm-framework';
+import { createErrorHandler, showNotification, showToast, useConfig, useSessionUser } from '@openmrs/esm-framework';
 import { convertToObsPayload } from './visit-note.util';
 import { fetchDiagnosisByName, fetchLocationByUuid, fetchProviderByUuid, saveVisitNote } from './visit-notes.resource';
 import { ConfigObject } from '../config-schema';
 import styles from './visit-notes-form.scss';
 import { encountersCustomRepresentation } from './encounter.resource';
 import { Diagnosis, VisitNotePayload } from '../types';
+import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 
 const searchTimeoutInMs = 500;
 
-interface VisitNotesFormProps {
-  patientUuid: string;
-  isTablet: boolean;
-}
-
-const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, isTablet }) => {
+const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patientUuid, isTablet }) => {
   const { t } = useTranslation();
   const session = useSessionUser();
   const config = useConfig() as ConfigObject;
@@ -116,11 +105,6 @@ const VisitNotesForm: React.FC<VisitNotesFormProps> = ({ patientUuid, isTablet }
       selectedDiagnoses.filter((diagnosis) => diagnosis.concept.id !== diagnosisToRemove.concept.id),
     );
   };
-
-  const closeWorkspace = React.useCallback(
-    () => detach('patient-chart-workspace-slot', 'visit-notes-form-workspace'),
-    [],
-  );
 
   const handleSubmit = React.useCallback(
     (event: SyntheticEvent) => {

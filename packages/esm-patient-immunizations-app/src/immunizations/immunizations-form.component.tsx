@@ -1,6 +1,6 @@
 import React, { SyntheticEvent, useEffect, useState } from 'react';
 import styles from './immunizations-form.scss';
-import { showNotification, showToast, detach, useSessionUser, useVisit, useLayoutType } from '@openmrs/esm-framework';
+import { showNotification, showToast, useSessionUser, useVisit, useLayoutType } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { savePatientImmunization } from './immunizations.resource';
 import { mapToFHIRImmunizationResource } from './immunization-mapper';
@@ -16,14 +16,11 @@ import {
   TextInput,
 } from 'carbon-components-react';
 import { immunizationFormSub } from './immunization-utils';
+import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 
 function hasSequences<T>(sequences: Array<T>) {
   return sequences && sequences?.length > 0;
 }
-
-type ImmunizationsFormProps = {
-  patientUuid: string;
-};
 
 interface ImmunizationFormState {
   vaccineName: string;
@@ -38,7 +35,7 @@ interface ImmunizationFormState {
   formChanged: boolean;
 }
 
-const ImmunizationsForm: React.FC<ImmunizationsFormProps> = ({ patientUuid }) => {
+const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace }) => {
   const initialState: ImmunizationFormState = {
     vaccineName: '',
     vaccineUuid: '',
@@ -63,10 +60,6 @@ const ImmunizationsForm: React.FC<ImmunizationsFormProps> = ({ patientUuid }) =>
   const isViewEditMode = !!formState.immunizationObsUuid;
   const enableCreateButtons = !isViewEditMode && !!formState.vaccinationDate;
   const enableEditButtons = isViewEditMode && formState.formChanged;
-  const closeWorkspace = React.useCallback(
-    () => detach('patient-chart-workspace-slot', 'immunization-form-workspace'),
-    [],
-  );
 
   useEffect(() => {
     const sub = immunizationFormSub.subscribe((props) => props && setFormState(props));

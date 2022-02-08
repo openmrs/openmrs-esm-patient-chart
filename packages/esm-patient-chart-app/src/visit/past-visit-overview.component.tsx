@@ -15,16 +15,12 @@ import {
   DataTableHeader,
 } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
-import { ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { detach, getStartedVisit, VisitMode, VisitStatus } from '@openmrs/esm-framework';
+import { DefaultWorkspaceProps, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { getStartedVisit, VisitMode, VisitStatus } from '@openmrs/esm-framework';
 import { usePastVisits } from './visits-widget/visit.resource';
 import styles from './past-visit-overview.scss';
 
-interface PastVisitOverviewProps {
-  patientUuid: string;
-}
-
-const PastVisitOverview: React.FC<PastVisitOverviewProps> = ({ patientUuid }) => {
+const PastVisitOverview: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace }) => {
   const { t, i18n } = useTranslation();
   const locale = i18n.language.toLowerCase().replace('_', '-');
 
@@ -53,14 +49,10 @@ const PastVisitOverview: React.FC<PastVisitOverviewProps> = ({ patientUuid }) =>
     }));
   }, [locale, pastVisits]);
 
-  const handleClose = useCallback(() => {
-    detach('patient-chart-workspace-slot', 'past-visits-overview');
-  }, []);
-
   const handleOpenVisitForm = useCallback(() => {
     launchPatientWorkspace('start-visit-workspace-form');
-    handleClose();
-  }, [handleClose]);
+    closeWorkspace();
+  }, [closeWorkspace]);
 
   if (isLoading) {
     return <DataTableSkeleton role="progressbar" />;
@@ -118,7 +110,7 @@ const PastVisitOverview: React.FC<PastVisitOverviewProps> = ({ patientUuid }) =>
             </TableContainer>
           )}
         </DataTable>
-        <Button className={styles.button} onClick={handleClose} kind="secondary">
+        <Button className={styles.button} onClick={closeWorkspace} kind="secondary">
           {t('cancel', 'Cancel')}
         </Button>
       </div>

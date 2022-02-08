@@ -16,6 +16,7 @@ const mockDateTimeStampInSeconds = 1638682781000;
 const testProps = {
   isTablet: false,
   patientUuid: mockPatient.id,
+  closeWorkspace: jest.fn(),
 };
 
 const mockSaveVisit = saveVisit as jest.Mock;
