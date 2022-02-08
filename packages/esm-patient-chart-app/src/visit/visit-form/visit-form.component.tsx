@@ -20,7 +20,6 @@ import {
 import { useTranslation } from 'react-i18next';
 import { first } from 'rxjs/operators';
 import {
-  detach,
   getStartedVisit,
   saveVisit,
   showNotification,
@@ -34,16 +33,11 @@ import {
   toOmrsIsoString,
   toDateObjectStrict,
 } from '@openmrs/esm-framework';
-import { amPm, convertTime12to24 } from '@openmrs/esm-patient-common-lib';
+import { amPm, convertTime12to24, DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import VisitTypeOverview from './visit-type-overview.component';
 import styles from './visit-form.component.scss';
 
-interface StartVisitFormProps {
-  isTablet: boolean;
-  patientUuid: string;
-}
-
-const StartVisitForm: React.FC<StartVisitFormProps> = ({ isTablet, patientUuid }) => {
+const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ isTablet, patientUuid, closeWorkspace }) => {
   const { t } = useTranslation();
   const locations = useLocations();
   const sessionUser = useSessionUser();
@@ -62,8 +56,6 @@ const StartVisitForm: React.FC<StartVisitFormProps> = ({ isTablet, patientUuid }
       setSelectedLocation(sessionUser?.sessionLocation?.uuid);
     }
   }, [locations, sessionUser]);
-
-  const closeWorkspace = useCallback(() => detach('patient-chart-workspace-slot', 'start-visit-workspace-form'), []);
 
   const handleSubmit = useCallback(
     (event) => {

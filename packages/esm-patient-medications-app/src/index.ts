@@ -47,6 +47,7 @@ function setupOpenMRS() {
             key: 'orderBasket',
             default: 'Order Basket',
           },
+          type: 'order',
         },
       },
       {

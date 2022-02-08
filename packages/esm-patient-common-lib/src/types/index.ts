@@ -1,4 +1,5 @@
 export * from './test-results';
+export * from './workspace';
 
 export interface DashbardGridConfig {
   columns: number;

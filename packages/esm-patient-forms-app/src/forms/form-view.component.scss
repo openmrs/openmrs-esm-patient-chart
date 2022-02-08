@@ -32,3 +32,48 @@
 .formResultsLabel {
   margin: $spacing-05;
 }
+
+// Desktop view
+
+:global(.omrs-breakpoint-gt-tablet) {
+  .tableCell {
+    display: flex;
+    justify-content: space-between;
+    cursor: pointer;
+
+    &>svg {
+      visibility: hidden;
+    }
+
+    &>label {
+      cursor: pointer;
+    }
+
+    &:hover>svg {
+      visibility: visible;
+    }
+  }
+}
+
+.formName {
+  color: $interactive-01;
+}
+
+// Tablet view port
+
+:global(.omrs-breakpoint-lt-desktop) .tableCell {
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+  height: $spacing-09;
+  align-items: center;
+
+
+  &>label {
+    cursor: pointer;
+  }
+
+  &:global(.bx--data-table tr) {
+    height: $spacing-09;
+  }
+}

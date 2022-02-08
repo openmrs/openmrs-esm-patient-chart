@@ -6,14 +6,7 @@ import includes from 'lodash-es/includes';
 import map from 'lodash-es/map';
 import styles from './programs-form.scss';
 import { useTranslation } from 'react-i18next';
-import {
-  createErrorHandler,
-  detach,
-  showNotification,
-  showToast,
-  useSessionUser,
-  useLocations,
-} from '@openmrs/esm-framework';
+import { createErrorHandler, showNotification, showToast, useSessionUser, useLocations } from '@openmrs/esm-framework';
 import {
   Button,
   DatePicker,
@@ -25,13 +18,9 @@ import {
   ButtonSet,
 } from 'carbon-components-react';
 import { createProgramEnrollment, useAvailablePrograms, useEnrollments } from './programs.resource';
+import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 
-interface ProgramsFormProps {
-  patientUuid: string;
-  isTablet: boolean;
-}
-
-const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, isTablet }) => {
+const ProgramsForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patientUuid, isTablet }) => {
   const { t } = useTranslation();
   const session = useSessionUser();
   const availableLocations = useLocations();
@@ -52,8 +41,6 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ patientUuid, isTablet }) =>
   if (!userLocation && session?.sessionLocation?.uuid) {
     setUserLocation(session?.sessionLocation?.uuid);
   }
-
-  const closeWorkspace = React.useCallback(() => detach('patient-chart-workspace-slot', 'programs-form-workspace'), []);
 
   const handleSubmit = React.useCallback(
     (event: SyntheticEvent<HTMLFormElement>) => {

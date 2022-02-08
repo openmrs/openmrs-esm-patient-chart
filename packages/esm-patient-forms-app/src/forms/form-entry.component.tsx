@@ -1,19 +1,11 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { detach, ExtensionSlot, useConnectivity, useVisit } from '@openmrs/esm-framework';
-import { FormEntryProps, formEntrySub } from '@openmrs/esm-patient-common-lib';
+import React, { useEffect, useState } from 'react';
+import { ExtensionSlot, useConnectivity, useVisit } from '@openmrs/esm-framework';
+import { DefaultWorkspaceProps, FormEntryProps, formEntrySub } from '@openmrs/esm-patient-common-lib';
 
-interface FormProps {
-  patientUuid: string;
-  patient: fhir.Patient;
-}
-
-const FormEntry: React.FC<FormProps> = ({ patientUuid }) => {
+const FormEntry: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace }) => {
   const isOffline = useConnectivity();
   const { currentVisit } = useVisit(patientUuid);
   const [selectedForm, setSelectedForm] = useState<FormEntryProps>(null);
-  const closeWorkspace = useCallback(() => {
-    detach('patient-chart-workspace-slot', 'patient-form-entry-workspace');
-  }, []);
 
   useEffect(() => {
     const sub = formEntrySub.subscribe((form) => setSelectedForm(form));
@@ -31,9 +23,9 @@ const FormEntry: React.FC<FormProps> = ({ patientUuid }) => {
             encounterUuid: selectedForm?.encounterUuid ? selectedForm.encounterUuid : null,
             visitTypeUuid: currentVisit?.visitType?.uuid,
             view: 'form',
-            patientUuid: patientUuid,
+            patientUuid,
             patient: selectedForm?.patient,
-            closeWorkspace: closeWorkspace,
+            closeWorkspace,
             isOffline: isOffline,
           }}
         />

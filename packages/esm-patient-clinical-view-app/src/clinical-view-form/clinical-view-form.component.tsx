@@ -6,19 +6,17 @@ import cloneDeep from 'lodash-es/cloneDeep';
 import set from 'lodash-es/set';
 import { Search, Checkbox, Button, StructuredListSkeleton, ButtonSet } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
-import { detach, temporaryConfigStore, TemporaryConfigStore } from '@openmrs/esm-framework';
+import { temporaryConfigStore, TemporaryConfigStore } from '@openmrs/esm-framework';
 import { useClinicalView } from '../store';
+import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 
-interface ClinicalViewFormProps {
-  isTablet: boolean;
-}
 interface View {
   slotName: string;
   slot: string;
   checked: boolean;
 }
 
-const ClinicalViewForm: React.FC<ClinicalViewFormProps> = ({ isTablet }) => {
+const ClinicalViewForm: React.FC<DefaultWorkspaceProps> = ({ isTablet, closeWorkspace }) => {
   const { t } = useTranslation();
   const { views, clinicalViews } = useClinicalView();
   const moduleName = '@openmrs/esm-patient-clinical-view-app';
@@ -43,10 +41,6 @@ const ClinicalViewForm: React.FC<ClinicalViewFormProps> = ({ isTablet }) => {
   }, [searchTerm, views]);
 
   const handleSearch = useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), 300), []);
-
-  const closeClinicalViewForm = useCallback(() => {
-    detach('patient-chart-workspace-slot', 'patient-clinical-view-form-workspace');
-  }, []);
 
   const addClinicalView = useCallback(
     (slot: string, slotName: string) => {
@@ -86,8 +80,8 @@ const ClinicalViewForm: React.FC<ClinicalViewFormProps> = ({ isTablet }) => {
 
   const handleSave = useCallback(() => {
     temporaryConfigStore.setState(tempConfig);
-    closeClinicalViewForm();
-  }, [tempConfig, closeClinicalViewForm]);
+    closeWorkspace();
+  }, [tempConfig, closeWorkspace]);
 
   const handleReset = useCallback(() => {
     const tempConfigUpdate = set(cloneDeep(temporaryConfigStore.getState()), ['config', ...path], clinicalViews);
@@ -128,7 +122,7 @@ const ClinicalViewForm: React.FC<ClinicalViewFormProps> = ({ isTablet }) => {
             </section>
           </div>
           <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-            <Button className={styles.button} kind="secondary" onClick={closeClinicalViewForm}>
+            <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
               {t('cancel', 'Cancel')}
             </Button>
             <Button className={styles.button} kind="primary" onClick={handleSave}>
