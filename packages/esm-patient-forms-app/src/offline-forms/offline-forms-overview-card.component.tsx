@@ -1,4 +1,4 @@
-import { navigate } from '@openmrs/esm-framework';
+import { navigate, useConfig } from '@openmrs/esm-framework';
 import { Tile, Button, SkeletonText } from 'carbon-components-react';
 import React, { ReactNode } from 'react';
 import styles from './offline-forms-overview-card.styles.scss';
@@ -7,9 +7,10 @@ import { useTranslation } from 'react-i18next';
 import { useValidOfflineFormEncounters } from './use-offline-form-encounters';
 import useSWR from 'swr';
 import { isFormFullyCached } from './offline-form-helpers';
+import { ConfigObject, HtmlFormEntryForm } from '../config-schema';
 
-function useCountOfFormsAvailableOffline() {
-  const { data: forms } = useValidOfflineFormEncounters();
+function useCountOfFormsAvailableOffline(htmlFormEntryForms: Array<HtmlFormEntryForm>) {
+  const { data: forms } = useValidOfflineFormEncounters(htmlFormEntryForms);
   const key = forms ? ['offlineForms', 'count', ...forms.map((form) => form.uuid).sort()] : null;
 
   return useSWR(forms ? 'foo' : null, async () => {
@@ -20,7 +21,9 @@ function useCountOfFormsAvailableOffline() {
 
 const OfflineFormsOverviewCard: React.FC = () => {
   const { t } = useTranslation();
-  const { data: availableFormsCount, error } = useCountOfFormsAvailableOffline();
+  const config = useConfig() as ConfigObject;
+  const htmlFormEntryForms = config.htmlFormEntryForms;
+  const { data: availableFormsCount, error } = useCountOfFormsAvailableOffline(htmlFormEntryForms);
 
   return (
     <Tile light className={`${styles.overviewCard}`}>

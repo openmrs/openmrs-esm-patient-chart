@@ -1,4 +1,4 @@
-import { useLayoutType } from '@openmrs/esm-framework';
+import { useConfig, useLayoutType } from '@openmrs/esm-framework';
 import {
   DataTable,
   TableContainer,
@@ -21,6 +21,7 @@ import { FormEncounter } from '../types';
 import { useOfflineFormManagement } from './use-offline-form-management';
 import styles from './offline-forms.styles.scss';
 import { useValidOfflineFormEncounters } from './use-offline-form-encounters';
+import { ConfigObject } from '../config-schema';
 
 export interface OfflineFormsProps {
   canMarkFormsAsOffline: boolean;
@@ -28,7 +29,8 @@ export interface OfflineFormsProps {
 
 const OfflineForms: React.FC<OfflineFormsProps> = ({ canMarkFormsAsOffline }) => {
   const { t } = useTranslation();
-  const forms = useValidOfflineFormEncounters();
+  const config = useConfig() as ConfigObject;
+  const forms = useValidOfflineFormEncounters(config.htmlFormEntryForms);
   const layout = useLayoutType();
   const toolbarItemSize = layout === 'desktop' ? 'sm' : undefined;
   const headers: Array<DataTableHeader> = [
