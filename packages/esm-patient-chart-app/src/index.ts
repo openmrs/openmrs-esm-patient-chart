@@ -6,10 +6,6 @@ import { moduleName, spaBasePath } from './constants';
 import { setupCacheableRoutes, setupOfflineVisitsSync } from './offline';
 import { summaryDashboardMeta, encountersDashboardMeta } from './dashboard.meta';
 
-import singleSpaReact from 'single-spa-react';
-(window as any).singleSpaReact = singleSpaReact;
-(singleSpaReact as any).patientChartIndex = true;
-
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 const backendDependencies = {};

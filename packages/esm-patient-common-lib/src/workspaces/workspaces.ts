@@ -154,5 +154,3 @@ export function getWorkspaceStore() {
 export function resetWorkspaceStore() {
   getWorkspaceStore().setState(initialState);
 }
-
-(window as any).workspaceStore = getWorkspaceStore();

@@ -18,9 +18,6 @@
     ],
     "resolveJsonModule": true,
     "noEmit": true,
-    "target": "esnext",
-    "paths": {
-      "@openmrs/*": ["./node_modules/@openmrs/*"]
-    },
+    "target": "esnext"
   }
 }
