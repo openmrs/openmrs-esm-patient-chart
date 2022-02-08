@@ -1,7 +1,4 @@
 import React from 'react';
-import dayjs from 'dayjs';
-dayjs.extend(isToday);
-import isToday from 'dayjs/plugin/isToday';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { mockPatient } from '../../../../../__mocks__/patient.mock';
@@ -63,7 +60,7 @@ describe('VitalsHeader: ', () => {
     await waitForLoadingToFinish();
 
     expect(screen.getByText(/Vitals & Biometrics/i)).toBeInTheDocument();
-    expect(screen.getByText(/Last recorded: 19 - May - 2021/i)).toBeInTheDocument();
+    expect(screen.getByText(/Last Recorded: 19 — May — 2021/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /^Record Vitals$/i })).toBeInTheDocument();
 
     const expandVitalsHeaderButton = screen.getByTitle(/ChevronDown/);

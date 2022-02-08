@@ -1,5 +1,4 @@
 import React from 'react';
-import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { Button } from 'carbon-components-react';
 import ChevronDown16 from '@carbon/icons-react/es/chevron--down/16';
@@ -9,6 +8,7 @@ import { PatientVitals } from '../vitals.resource';
 import { patientVitalsBiometricsFormWorkspace } from '../../constants';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import styles from './vitals-header-title.component.scss';
+import { formatDate, parseDate } from '@openmrs/esm-framework';
 
 interface VitalsHeaderTitleProps {
   view: string;
@@ -42,10 +42,7 @@ const VitalsHeaderTitle: React.FC<VitalsHeaderTitleProps> = ({
             )}
             <span className={styles.vitalName}>Vitals & Biometrics</span>
             <span className={`${styles.bodyShort01} ${styles.text02}`}>
-              {t('lastRecorded', 'Last Recorded')}:{' '}
-              {dayjs(vitals.date).isToday()
-                ? `${t('today', 'Today')}, ${dayjs(vitals.date).format('hh:mm A')}`
-                : dayjs(vitals.date).format('DD - MMM - YYYY')}
+              {t('lastRecorded', 'Last Recorded')}: {formatDate(parseDate(vitals.date.toString()), { mode: 'wide' })}
             </span>
           </span>
           <div className={styles.alignCenter}>

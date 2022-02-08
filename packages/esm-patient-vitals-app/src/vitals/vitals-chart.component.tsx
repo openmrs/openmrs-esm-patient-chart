@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-import dayjs from 'dayjs';
 import styles from './vitals-chart.component.scss';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs } from 'carbon-components-react';
@@ -10,6 +9,7 @@ import { ScaleTypes } from '@carbon/charts/interfaces/enums';
 import { withUnit } from '@openmrs/esm-patient-common-lib';
 import '@carbon/charts/styles.css';
 import { ConfigObject } from '../config-schema';
+import { formatDate, parseDate } from '@openmrs/esm-framework';
 
 interface vitalsChartData {
   title: string;
@@ -36,7 +36,7 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
         return (
           vitals[selectedVitalSign.value] && {
             group: 'vitalsChartData',
-            key: dayjs(vitals.date).format('DD-MMM'),
+            key: formatDate(parseDate(vitals.date.toString()), { mode: 'wide', year: false }),
             value: vitals[selectedVitalSign.value],
           }
         );
