@@ -72,7 +72,7 @@ function setupOpenMRS() {
       },
       {
         id: 'test-results-timeline',
-        slots: ['patient-chart-summary-dashboard-slot', 'Test results timeline'],
+        slots: ['Test results timeline'],
         load: getAsyncLifecycle(() => import('./timeline'), options),
         meta: {
           columnSpan: 4,
