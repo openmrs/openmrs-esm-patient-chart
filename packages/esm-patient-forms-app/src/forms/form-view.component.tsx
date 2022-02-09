@@ -43,12 +43,12 @@ function launchFormEntry(
   encounterUuid?: string,
 ) {
   if (currentVisit) {
-    const htmlFormCfg = htmlFormEntryForms.find((form) => form.formUuid === formUuid);
-    if (isEmpty(htmlFormCfg)) {
+    const htmlForm = htmlFormEntryForms.find((form) => form.formUuid === formUuid);
+    if (isEmpty(htmlForm)) {
       launchWorkSpace(formUuid, patient, currentVisit?.uuid, encounterUuid);
     } else {
       navigate({
-        to: `\${openmrsBase}/htmlformentryui/htmlform/${htmlFormCfg.formUiPage}.page?patientId=${patient.id}&definitionUiResource=referenceapplication:htmlforms/${htmlFormCfg.formAppUrl}.xml`,
+        to: `\${openmrsBase}/htmlformentryui/htmlform/${htmlForm.formUiPage}.page?patientId=${patient.id}&definitionUiResource=referenceapplication:htmlforms/${htmlForm.formAppUrl}.xml`,
       });
     }
   } else {
