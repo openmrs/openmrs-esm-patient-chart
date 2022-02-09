@@ -44,7 +44,6 @@ function setupOpenMRS() {
     extensions: [
       {
         id: 'charts-summary-dashboard',
-        // TODO: Rename this slot to 'Patient chart left nav'
         slot: 'patient-chart-dashboard-slot',
         order: 0,
         load: getSyncLifecycle(createDashboardLink(summaryDashboardMeta), {

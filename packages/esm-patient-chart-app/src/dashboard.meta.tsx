@@ -1,6 +1,5 @@
 export const summaryDashboardMeta = {
   name: 'summary',
-  // TODO: rename this slot to 'Patient chart dashboard'
   slot: 'patient-chart-summary-dashboard-slot',
   config: { columns: 4, type: 'grid' },
   title: 'Patient Summary',
