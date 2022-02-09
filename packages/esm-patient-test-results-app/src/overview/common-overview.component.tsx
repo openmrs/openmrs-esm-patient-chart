@@ -74,14 +74,14 @@ const CommonOverview: React.FC<CommonOverviewProps> = ({
         const cards = overviewData.map(([title, type, data, effectiveDateTime, issuedDateTime, uuid]) => (
           <article
             key={uuid}
-            className={`${insertSeparator ? '' : `${styles.card} ${isActiveCard(uuid) ? styles.activeCard : ''}`}`}
+            className={insertSeparator ? '' : `${styles.card} ${isActiveCard(uuid) ? styles.activeCard : ''}`}
           >
             <CommonDataTable
               {...{
                 title,
                 data,
                 description: (
-                  <div className={`${insertSeparator ? '' : styles.cardHeader}`}>
+                  <div className={insertSeparator ? '' : styles.cardHeader}>
                     <div className={styles.meta}>
                       {formatDate(effectiveDateTime)}
                       <InfoTooltip effectiveDateTime={effectiveDateTime} issuedDateTime={issuedDateTime} />

@@ -2,12 +2,14 @@ import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
-import { detach, openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch } from '@openmrs/esm-framework';
 import { swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import PastVisitOverview from './past-visit-overview.component';
 
 const testProps = {
+  closeWorkspace: jest.fn(),
   patientUuid: mockPatient.id,
+  isTablet: false,
 };
 
 const mockPastVisits = {
@@ -43,16 +45,10 @@ const mockPastVisits = {
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-    detach: jest.fn(),
-  };
-});
-
 describe('PastVisitOverview', () => {
+  beforeEach(() => {
+    testProps.closeWorkspace.mockReset();
+  });
   it(`renders a tabular overview view of the patient's past visits data`, async () => {
     mockOpenmrsFetch.mockReturnValueOnce(mockPastVisits);
 
@@ -73,8 +69,7 @@ describe('PastVisitOverview', () => {
     const cancelButton = screen.getByRole('button', { name: /Cancel/i });
     userEvent.click(cancelButton);
 
-    expect(detach).toHaveBeenCalledTimes(1);
-    expect(detach).toHaveBeenCalledWith('patient-chart-workspace-slot', 'past-visits-overview');
+    expect(testProps.closeWorkspace).toHaveBeenCalledTimes(1);
   });
 });
 

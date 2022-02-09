@@ -28,6 +28,7 @@ import {
 } from '@openmrs/esm-framework';
 import { Allergens, fetchAllergensAndAllergicReactions, saveAllergy, NewAllergy } from './allergy-form.resource';
 import styles from './allergy-form.scss';
+import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 
 enum AllergenTypes {
   FOOD = 'FOOD',
@@ -35,14 +36,7 @@ enum AllergenTypes {
   ENVIRONMENT = 'ENVIRONMENT',
 }
 
-interface AllergyFormProps {
-  closeWorkspace: () => void;
-  isTablet: boolean;
-  patient: fhir.Patient;
-  patientUuid: string;
-}
-
-const AllergyForm: React.FC<AllergyFormProps> = ({ closeWorkspace, isTablet, patientUuid }) => {
+const AllergyForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, isTablet, patientUuid }) => {
   const { t } = useTranslation();
   const { concepts } = useConfig();
   const {

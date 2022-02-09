@@ -32,9 +32,9 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
   const isTablet = useLayoutType() === 'tablet';
   const [formsCategory, setFormsCategory] = useState(FormsCategory.All);
   const { isValidating, data, error } = useForms(patientUuid, undefined, undefined, isOffline);
-  const formsToDisplay = data?.filter((formInfo) =>
+  const formsToDisplay = isOffline ? data?.filter((formInfo) =>
     isValidOfflineFormEncounter(formInfo.form, config.htmlFormEntryForms),
-  );
+  ) : data;
 
   if (!formsToDisplay && !error) {
     return <DataTableSkeleton role="progressbar" rowCount={5} />;

@@ -1,5 +1,5 @@
 import React from 'react';
-import ContextWorkspace from './workspace/context-workspace.component';
+import WorkspaceWindow from './workspace/workspace-window.component';
 import PatientChart from './ui-components/patient-chart.component';
 import SideMenu from './view-components/side-menu.component';
 import { BrowserRouter, Route } from 'react-router-dom';
@@ -21,7 +21,7 @@ export default function Root() {
           <div className={styles.patientChartWrapper}>
             <SideMenu />
             <Route path={dashboardPath} component={PatientChart} />
-            <Route path={basePath} component={ContextWorkspace} />
+            <Route path={basePath} component={WorkspaceWindow} />
           </div>
         </WorkspaceWindowSizeProvider>
       </BrowserRouter>

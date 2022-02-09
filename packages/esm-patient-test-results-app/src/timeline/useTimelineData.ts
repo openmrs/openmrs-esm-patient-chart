@@ -53,7 +53,17 @@ const parseEntries = (entries: ObsRecord[] = [], type: string) => {
   return rows;
 };
 
-export const useTimelineData = (patientUuid: string, panelUuid: string) => {
+/**
+ * Gets all patient sorted obs from usePatientResultsData, filters for panelUuid (if provided),
+ * then transforms data to be used by DataTable
+ *
+ * @param patientUuid - required patient identifier
+ * @param panelUuid - optional panel identifier
+ * @returns object of {data, loaded, error?} where data is formatted for use by the
+ * timeline data table
+ *
+ */
+export const useTimelineData = (patientUuid: string, panelUuid?: string) => {
   const { sortedObs, loaded, error } = usePatientResultsData(patientUuid);
 
   const timelineData = useMemo(() => {
@@ -64,7 +74,11 @@ export const useTimelineData = (patientUuid: string, panelUuid: string) => {
         error,
       };
 
-    const [panelName, panelData] = Object.entries(sortedObs).find(([, { uuid }]) => uuid === panelUuid) || [];
+    // look for the specified panelUuid. If none is specified, just take any obs
+    const [panelName, panelData] = panelUuid
+      ? Object.entries(sortedObs).find(([, { uuid }]) => uuid === panelUuid) || []
+      : Object.entries(sortedObs)?.[0];
+
     if (!panelData)
       return {
         data: { parsedTime: {} as ReturnType<typeof parseTime> },

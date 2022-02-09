@@ -4,14 +4,7 @@ import debounce from 'lodash-es/debounce';
 import { mutate } from 'swr';
 import styles from './conditions-form.scss';
 import { useTranslation } from 'react-i18next';
-import {
-  createErrorHandler,
-  detach,
-  fhirBaseUrl,
-  showNotification,
-  showToast,
-  useSessionUser,
-} from '@openmrs/esm-framework';
+import { createErrorHandler, fhirBaseUrl, showNotification, showToast, useSessionUser } from '@openmrs/esm-framework';
 import {
   Tile,
   SearchSkeleton,
@@ -26,15 +19,11 @@ import {
   ButtonSet,
 } from 'carbon-components-react';
 import { createPatientCondition, searchConditionConcepts, CodedCondition } from './conditions.resource';
+import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 
 const searchTimeoutInMs = 500;
 
-interface ConditionsFormProps {
-  patientUuid: string;
-  isTablet: boolean;
-}
-
-const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid, isTablet }) => {
+const ConditionsForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patientUuid, isTablet }) => {
   const { t } = useTranslation();
   const session = useSessionUser();
   const [clinicalStatus, setClinicalStatus] = React.useState('active');
@@ -78,11 +67,6 @@ const ConditionsForm: React.FC<ConditionsFormProps> = ({ patientUuid, isTablet }
     setSelectedCondition(selectedCondition);
     setSearchTerm('');
   }, []);
-
-  const closeWorkspace = React.useCallback(
-    () => detach('patient-chart-workspace-slot', 'conditions-form-workspace'),
-    [],
-  );
 
   const handleSubmit = React.useCallback(
     (event: SyntheticEvent<HTMLFormElement>) => {

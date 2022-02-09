@@ -5,21 +5,22 @@ import { act, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { mockLocations, mockLocationsDataResponse } from '../../../../__mocks__/location.mock';
-import { detach, openmrsFetch, showNotification, showToast } from '@openmrs/esm-framework';
+import { openmrsFetch, showNotification, showToast } from '@openmrs/esm-framework';
 import { mockSessionDataResponse } from '../../../../__mocks__/session.mock';
 import { mockAppointmentsData, mockUseAppointmentServiceData } from '../../../../__mocks__/appointments.mock';
 import { swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import { appointmentsSearchUrl, createAppointment } from './appointments.resource';
 import AppointmentForm from './appointments-form.component';
 
+const closeWorkspace = jest.fn();
+
 const testProps = {
-  closeWorkspace: jest.fn(),
+  closeWorkspace,
   isTablet: false,
   patientUuid: mockPatient.id,
 };
 
 const mockCreateAppointment = createAppointment as jest.Mock;
-const mockDetach = detach as jest.Mock;
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockShowNotification = showNotification as jest.Mock;
 const mockShowToast = showToast as jest.Mock;
@@ -29,7 +30,6 @@ jest.mock('@openmrs/esm-framework', () => {
 
   return {
     ...originalModule,
-    detach: jest.fn(),
     useLocations: jest.fn().mockImplementation(() => mockLocations),
     useSessionUser: jest.fn().mockImplementation(() => mockSessionDataResponse.data),
     showToast: jest.fn(),
@@ -46,6 +46,10 @@ jest.mock('./appointments.resource', () => {
 });
 
 describe('AppointmentForm', () => {
+  beforeEach(() => {
+    closeWorkspace.mockReset();
+  });
+
   it('renders the appointments form showing all the relevant fields and values', async () => {
     mockOpenmrsFetch.mockReturnValueOnce(mockUseAppointmentServiceData);
 
@@ -84,8 +88,7 @@ describe('AppointmentForm', () => {
     const cancelButton = screen.getByRole('button', { name: /Discard/i });
     userEvent.click(cancelButton);
 
-    expect(mockDetach).toHaveBeenCalledTimes(1);
-    expect(mockDetach).toHaveBeenCalledWith('patient-chart-workspace-slot', 'appointments-form-workspace');
+    expect(closeWorkspace).toHaveBeenCalledTimes(1);
   });
 
   describe('Form submission', () => {

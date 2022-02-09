@@ -1,18 +1,12 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { detach } from '@openmrs/esm-framework';
 import { useClinicalView } from '../store';
 import ClinicalViewForm from './clinical-view-form.component';
 
 const mockUseClinicalView = useClinicalView as jest.Mock;
 
 jest.mock('lodash-es/isEmpty', () => jest.fn((arr) => arr.length === 0));
-
-jest.mock('@openmrs/esm-framework', () => ({
-  ...(jest.requireActual('@openmrs/esm-framework') as any),
-  detach: jest.fn(),
-}));
 
 jest.mock('../store', () => ({
   useClinicalView: jest.fn(),
@@ -28,10 +22,17 @@ const mockClinicalViews = {
   clinicalViews: [{ slot: 'All', slotName: '' }],
 };
 
+const testProps = {
+  patientUuid: 'abc-123',
+  isTablet: true,
+  closeWorkspace: jest.fn(),
+};
+
 describe('<ClinicalViewForm/>', () => {
   beforeEach(() => {
+    testProps.closeWorkspace.mockReset();
     mockUseClinicalView.mockReturnValue(mockClinicalViews);
-    render(<ClinicalViewForm isTablet={true} />);
+    render(<ClinicalViewForm {...testProps} />);
   });
 
   it('should be able to perform search on form', () => {
@@ -75,6 +76,6 @@ describe('<ClinicalViewForm/>', () => {
   it('should close the form on cancel button click', () => {
     const closeButton = screen.getByRole('button', { name: /Close/i });
     userEvent.click(closeButton);
-    expect(detach).toHaveBeenCalledWith('patient-chart-workspace-slot', 'patient-clinical-view-form-workspace');
+    expect(testProps.closeWorkspace).toHaveBeenCalled();
   });
 });

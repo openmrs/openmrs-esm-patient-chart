@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { mutate } from 'swr';
 import dayjs from 'dayjs';
@@ -14,7 +14,7 @@ import {
   TimePicker,
 } from 'carbon-components-react';
 import { amPm, convertTime12to24 } from '@openmrs/esm-patient-common-lib';
-import { useLocations, useSessionUser, detach, showToast, showNotification } from '@openmrs/esm-framework';
+import { useLocations, useSessionUser, showToast, showNotification } from '@openmrs/esm-framework';
 import { appointmentsSearchUrl, createAppointment, useAppointmentService } from './appointments.resource';
 import styles from './appointments-form.scss';
 import { AppointmentPayload } from '../types';
@@ -50,8 +50,6 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({ patientUuid, isTabl
   if (services?.length) {
     [{ serviceTypes }] = services;
   }
-
-  const handleClose = useCallback(() => detach('patient-chart-workspace-slot', 'appointments-form-workspace'), []);
 
   const handleSubmit = () => {
     if (!selectedServiceType) return;
@@ -246,7 +244,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({ patientUuid, isTabl
         />
       </section>
       <section className={styles.buttonGroup}>
-        <Button onClick={handleClose} kind="secondary">
+        <Button onClick={closeWorkspace} kind="secondary">
           {t('discard', 'Discard')}
         </Button>
         <Button disabled={!selectedService} onClick={handleSubmit}>
