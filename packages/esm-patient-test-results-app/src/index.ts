@@ -70,6 +70,16 @@ function setupOpenMRS() {
         online: true,
         offline: true,
       },
+      {
+        id: 'test-results-timeline',
+        slots: ['Test results timeline'],
+        load: getAsyncLifecycle(() => import('./timeline'), options),
+        meta: {
+          columnSpan: 4,
+        },
+        online: true,
+        offline: true,
+      },
     ],
   };
 }
