@@ -54,6 +54,7 @@ export class FeWrapperComponent implements OnInit {
   prevEncounter: Encounter;
   isLoading: boolean = true;
   config: FormEntryConfig;
+  isSubmitting: boolean = false;
 
   public get encounterDate(): string {
     return moment(this.encounter?.encounterDatetime).format('YYYY-MM-DD');
@@ -116,6 +117,7 @@ export class FeWrapperComponent implements OnInit {
 
   public onSubmit(event: any) {
     if (this.isFormValid()) {
+      this.isSubmitting = true;
       this.saveForm().subscribe(
         (response) => {
           this.encounterUuid = response[0] && response[0].uuid;
@@ -138,13 +140,12 @@ export class FeWrapperComponent implements OnInit {
             this.closeForm();
           }
         },
-        (error) => {
-          console.error('Error submitting form', error);
-          this.singleSpaProps.closeWorkspace();
+        (error: Error) => {
+          this.isSubmitting = false;
           showToast({
             critical: true,
             kind: 'error',
-            description: `An error has occurred while submitting the form ${JSON.stringify(error, null, 2)}`,
+            description: `An error has occurred while submitting the form ${JSON.stringify(error?.message, null, 2)}`,
             title: this.formName,
           });
         },
