@@ -15,9 +15,10 @@ import { FormDataSourceService } from './form-data-source/form-data-source.servi
 import { FormSubmissionService } from './form-submission/form-submission.service';
 import { MonthlyScheduleResourceService } from './services/monthly-scheduled-resource.service';
 import { ConfigResourceService } from './services/config-resource.service';
+import { LoaderComponent } from './loader/loader.component';
 
 @NgModule({
-  declarations: [AppComponent, EmptyRouteComponent, FeWrapperComponent],
+  declarations: [AppComponent, EmptyRouteComponent, FeWrapperComponent, LoaderComponent],
   imports: [BrowserModule, FormEntryModule, ReactiveFormsModule, BrowserAnimationsModule, OpenmrsApiModule],
   providers: [
     FormSchemaService,
