@@ -1,5 +1,4 @@
 import React from 'react';
-import dayjs from 'dayjs';
 import Add16 from '@carbon/icons-react/es/add/16';
 import styles from './programs-overview.scss';
 import { formatDate, formatDatetime, usePagination } from '@openmrs/esm-framework';
