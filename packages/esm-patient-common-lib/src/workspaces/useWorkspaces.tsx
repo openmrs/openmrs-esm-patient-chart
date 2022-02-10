@@ -5,6 +5,7 @@ import {
   OpenWorkspace,
   WorkspaceWindowState,
 } from '@openmrs/esm-patient-common-lib';
+import { WorkspaceStoreState } from '.';
 
 export interface WorkspacesInfo {
   active: boolean;
@@ -18,10 +19,12 @@ export function useWorkspaces(): WorkspacesInfo {
   const [workspaceNeedingConfirmationToOpen, setWorkspaceNeedingConfirmationToOpen] = useState<OpenWorkspace>(null);
 
   useEffect(() => {
-    getWorkspaceStore().subscribe((state) => {
+    function update(state: WorkspaceStoreState) {
       setWorkspaces(state.openWorkspaces.map((w) => ({ ...w, closeWorkspace: () => closeWorkspace(w.name) })));
       setWorkspaceNeedingConfirmationToOpen(state.workspaceNeedingConfirmationToOpen);
-    });
+    }
+    update(getWorkspaceStore().getState());
+    getWorkspaceStore().subscribe(update);
   }, []);
 
   const windowState = useMemo(() => {
