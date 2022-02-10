@@ -77,7 +77,7 @@ export const useTimelineData = (patientUuid: string, panelUuid?: string) => {
     // look for the specified panelUuid. If none is specified, just take any obs
     const [panelName, panelData] = panelUuid
       ? Object.entries(sortedObs).find(([, { uuid }]) => uuid === panelUuid) || []
-      : Object.entries(sortedObs)?.[0];
+      : Object.entries(sortedObs)?.[0] || [];
 
     if (!panelData)
       return {

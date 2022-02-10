@@ -3,8 +3,9 @@ import { InlineLoading } from 'carbon-components-react';
 import useScrollIndicator from './useScroll';
 import { useTimelineData } from './useTimelineData';
 import { PaddingContainer, TimeSlots, Grid, RowStartCell, GridItems, ShadowBox } from './helpers';
-import { ObsRecord } from '@openmrs/esm-patient-common-lib';
+import { ObsRecord, EmptyState } from '@openmrs/esm-patient-common-lib';
 import styles from './timeline.scss';
+import { RecentResultsGrid } from '../overview/recent-overview.component';
 
 interface PanelNameCornerProps {
   showShadow: boolean;
@@ -94,8 +95,8 @@ const DataRows: React.FC<DataRowsProps> = ({ timeColumns, rowData, sortedTimes, 
 
 interface TimelineParams {
   patientUuid: string;
-  panelUuid: string;
-  openTrendline: (panelUuid: string, testUuid: string) => void;
+  panelUuid?: string;
+  openTrendline?: (panelUuid: string, testUuid: string) => void;
 }
 
 export const Timeline: React.FC<TimelineParams> = ({
@@ -121,32 +122,41 @@ export const Timeline: React.FC<TimelineParams> = ({
     [panelUuid, openTrendlineExternal],
   );
 
-  if (!loaded) return <InlineLoading description="Loading" />;
+  if (!loaded)
+    return (
+      <RecentResultsGrid>
+        <InlineLoading description="Loading" />
+      </RecentResultsGrid>
+    );
 
-  return (
-    <PaddingContainer ref={containerRef}>
-      <PanelNameCorner showShadow={xIsScrolled} panelName={panelName} />
-      <DateHeaderGrid
-        {...{
-          timeColumns,
-          yearColumns,
-          dayColumns,
-          showShadow: yIsScrolled,
-        }}
-      />
-      <DataRows
-        {...{
-          timeColumns,
-          rowData,
-          sortedTimes,
-          showShadow: xIsScrolled,
-          panelUuid,
-          openTrendline,
-        }}
-      />
-      <ShadowBox />
-    </PaddingContainer>
-  );
+  if (yearColumns && dayColumns && timeColumns)
+    return (
+      <RecentResultsGrid>
+        <PaddingContainer ref={containerRef}>
+          <PanelNameCorner showShadow={xIsScrolled} panelName={panelName} />
+          <DateHeaderGrid
+            {...{
+              timeColumns,
+              yearColumns,
+              dayColumns,
+              showShadow: yIsScrolled,
+            }}
+          />
+          <DataRows
+            {...{
+              timeColumns,
+              rowData,
+              sortedTimes,
+              showShadow: xIsScrolled,
+              panelUuid,
+              openTrendline,
+            }}
+          />
+          <ShadowBox />
+        </PaddingContainer>
+      </RecentResultsGrid>
+    );
+  return <EmptyState displayText={'timeline data'} headerTitle="Data Timeline" />;
 };
 
 export default Timeline;
