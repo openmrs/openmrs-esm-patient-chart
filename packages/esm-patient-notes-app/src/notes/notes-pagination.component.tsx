@@ -10,7 +10,7 @@ import {
   TableRow,
 } from 'carbon-components-react';
 import styles from './notes-overview.scss';
-import { formatDate, parseDate, usePagination } from '@openmrs/esm-framework';
+import { formatDatetime, parseDate, usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { PatientNote } from '../types';
@@ -49,8 +49,7 @@ const NotesPagination: React.FC<FormsProps> = ({ notes, pageSize, pageUrl, urlLa
     () =>
       paginatedNotes.map((note) => ({
         ...note,
-        encounterDate: formatDate(parseDate(note.encounterDate), { mode: 'wide', time: true }),
-        // TODO: ignore the year if year is equal to the current year
+        encounterDate: formatDatetime(parseDate(note.encounterDate)),
       })),
     [paginatedNotes],
   );

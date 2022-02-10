@@ -1,6 +1,6 @@
-import dayjs from "dayjs";
+import { formatDate } from "@openmrs/esm-framework";
 
-const todaysDate = dayjs().format("YYYY-MM-DD");
+const todaysDate = formatDate(new Date(), { time: false });
 
 export const mockDimensionResponse = {
   headers: null,

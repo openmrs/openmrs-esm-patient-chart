@@ -1,5 +1,4 @@
 import React from 'react';
-import dayjs from 'dayjs';
 import Add16 from '@carbon/icons-react/es/add/16';
 import styles from './immunizations-overview.scss';
 import {
@@ -24,7 +23,7 @@ import {
 } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { useImmunizations } from './immunizations.resource';
-import { usePagination } from '@openmrs/esm-framework';
+import { formatDate, parseDate, usePagination } from '@openmrs/esm-framework';
 
 export interface ImmunizationsOverviewProps {
   basePath: string;
@@ -65,7 +64,11 @@ const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = ({ patient, 
       ...immunization,
       id: `${index}`,
       vaccineName: immunization.vaccineName,
-      vaccinationDate: `${dayjs(immunization.existingDoses[0].occurrenceDateTime).format('MMM-YYYY')}`,
+      vaccinationDate: `${formatDate(parseDate(immunization.existingDoses[0].occurrenceDateTime), {
+        mode: 'wide',
+        day: false,
+        time: false,
+      })}`,
     }));
   }, [paginatedImmunizations]);
 

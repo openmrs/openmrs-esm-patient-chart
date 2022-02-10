@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tag, TooltipDefinition } from 'carbon-components-react';
-import { formatDatetime } from '@openmrs/esm-framework';
+import { formatDatetime, parseDate } from '@openmrs/esm-framework';
 import styles from './deceased-patient-tag.scss';
 
 interface DeceasedPatientBannerTagProps {
@@ -15,7 +15,7 @@ const DeceasedPatientBannerTag: React.FC<DeceasedPatientBannerTagProps> = ({ pat
       tooltipText={
         <div className={styles.tooltipPadding}>
           <h6 style={{ marginBottom: '0.5rem' }}>{t('deceased', 'Deceased')}</h6>
-          <span>{formatDatetime(new Date(patient.deceasedDateTime))}</span>
+          <span>{formatDatetime(parseDate(patient.deceasedDateTime))}</span>
         </div>
       }
     >

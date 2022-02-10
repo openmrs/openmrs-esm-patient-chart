@@ -1,5 +1,4 @@
 import React from 'react';
-import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
 import { CardHeader, EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import Add16 from '@carbon/icons-react/es/add/16';
@@ -19,6 +18,7 @@ import {
 import styles from './allergies-detailed-summary.scss';
 import { useAllergies } from './allergy-intolerance.resource';
 import { patientAllergiesFormWorkspace } from '../constants';
+import { formatDate, parseDate } from '@openmrs/esm-framework';
 
 interface AllergiesDetailedSummaryProps {
   patient: fhir.Patient;
@@ -74,8 +74,8 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
           </div>
         ),
       },
-      recordedDate: dayjs(allergy.recordedDate).format('MMM-YYYY') ?? '--',
-      lastUpdated: allergy.lastUpdated ? dayjs(allergy.lastUpdated).format('DD-MMM-YYYY') : '--',
+      recordedDate: formatDate(parseDate(allergy.recordedDate), { day: false, time: false }) ?? '--',
+      lastUpdated: allergy.lastUpdated ? formatDate(parseDate(allergy.lastUpdated), { time: false }) : '--',
     }));
   }, [allergies]);
 

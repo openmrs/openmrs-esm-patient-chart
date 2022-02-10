@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-import dayjs from 'dayjs';
 import styles from './obs-graph.scss';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs } from 'carbon-components-react';
@@ -7,7 +6,7 @@ import { LineChart } from '@carbon/charts-react';
 import { LineChartOptions } from '@carbon/charts/interfaces/charts';
 import { ScaleTypes } from '@carbon/charts/interfaces/enums';
 import '@carbon/charts/styles.css';
-import { useConfig } from '@openmrs/esm-framework';
+import { formatDate, useConfig } from '@openmrs/esm-framework';
 import { useObs } from '../resources/useObs';
 
 interface ConceptDescriptor {
@@ -35,7 +34,7 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
         .filter((obs) => obs.conceptUuid === selectedConcept.uuid)
         .map((obs) => ({
           group: selectedConcept.label,
-          key: dayjs(obs.issued).format('DD-MMM'),
+          key: formatDate(new Date(obs.issued), { day: false, time: false }),
           value: obs.valueQuantity.value,
         })),
     [obss, selectedConcept.uuid],

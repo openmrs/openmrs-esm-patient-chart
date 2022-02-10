@@ -4,7 +4,7 @@ import EmptyFormView from './empty-form.component';
 import isEmpty from 'lodash-es/isEmpty';
 import first from 'lodash-es/first';
 import debounce from 'lodash-es/debounce';
-import { navigate, useLayoutType, usePagination, useVisit, Visit } from '@openmrs/esm-framework';
+import { formatDatetime, navigate, useLayoutType, usePagination, useVisit, Visit } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
@@ -22,7 +22,6 @@ import {
 import { CoreHTMLForms } from '../core-html-forms';
 import { PatientChartPagination, launchPatientWorkspace, formEntrySub } from '@openmrs/esm-patient-common-lib';
 import { CompletedFormInfo } from '../types';
-import dayjs from 'dayjs';
 import Edit20 from '@carbon/icons-react/es/edit/20';
 
 function startVisitPrompt() {
@@ -63,15 +62,6 @@ function launchWorkSpace(formUuid: string, patient: fhir.Patient, visitUuid?: st
 function findHtmlForm(formUuid: string) {
   const htmlForms = CoreHTMLForms;
   return htmlForms.find((form) => form.formUuid === formUuid);
-}
-
-function formatDate(strDate: string | Date) {
-  const date = dayjs(strDate);
-  const today = dayjs(new Date());
-  if (date.date() === today.date() && date.month() === today.month() && date.year() === today.year()) {
-    return `Today @ ${date.format('HH:mm')}`;
-  }
-  return date.format('DD - MMM - YYYY @ HH:mm');
 }
 
 interface FormViewProps {
@@ -119,7 +109,7 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
       results?.map((formInfo) => {
         return {
           id: formInfo.form.uuid,
-          lastCompleted: formInfo.lastCompleted ? formatDate(formInfo.lastCompleted) : undefined,
+          lastCompleted: formInfo.lastCompleted ? formatDatetime(formInfo.lastCompleted) : undefined,
           formName: formInfo.form.name,
           formUuid: formInfo.form.uuid,
           encounterUuid: formInfo?.associatedEncounters[0]?.uuid,

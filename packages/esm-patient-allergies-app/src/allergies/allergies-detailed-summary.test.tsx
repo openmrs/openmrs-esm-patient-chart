@@ -60,11 +60,11 @@ describe('AllergiesDetailedSummary: ', () => {
 
     const expectedColumnHeaders = [/allergen/i, /severity and reaction/i, /since/i, /last updated/i];
     const expectedAllergies = [
-      /ACE inhibitors unable-to-assess Anaphylaxis May-2021/i,
-      /Fish low Anaphylaxis, Angioedema, Fever, Hives Some Comments Apr-2021/i,
+      /ACE inhibitors unable-to-assess Anaphylaxis May 2021/i,
+      /Fish low Anaphylaxis, Angioedema, Fever, Hives Some Comments Apr 2021/i,
       /Penicillins high Diarrhea, Cough, Musculoskeletal pain, Mental status change, Angioedema Patient allergies have been noted down/i,
-      /Morphine high Mental status change Comments Nov-2020/i,
-      /Aspirin high Mental status change Comments Nov-2020/i,
+      /Morphine high Mental status change Comments Nov 2020/i,
+      /Aspirin high Mental status change Comments Nov 2020/i,
     ];
 
     expectedColumnHeaders.forEach((header) =>
