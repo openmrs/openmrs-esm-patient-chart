@@ -70,3 +70,4 @@ const RecentResultsGrid = (props) => {
 };
 
 export default RecentOverview;
+export { RecentResultsGrid };

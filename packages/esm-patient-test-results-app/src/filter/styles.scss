@@ -1,0 +1,11 @@
+@import "~@openmrs/esm-styleguide/src/vars";
+@import "~carbon-components/src/globals/scss/vars";
+@import "~carbon-components/src/globals/scss/mixins";
+
+.filterRoot {
+  background-color: $openmrs-background-grey;
+  margin: $spacing-02 0;
+  &.active {
+    border-left: 0.2rem solid $brand-02;
+  }
+}
