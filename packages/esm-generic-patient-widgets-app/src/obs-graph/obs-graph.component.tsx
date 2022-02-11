@@ -34,7 +34,7 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
         .filter((obs) => obs.conceptUuid === selectedConcept.uuid)
         .map((obs) => ({
           group: selectedConcept.label,
-          key: formatDate(new Date(obs.issued), { day: false, time: false }),
+          key: formatDate(new Date(obs.issued), { year: false, time: false }),
           value: obs.valueQuantity.value,
         })),
     [obss, selectedConcept.uuid],
