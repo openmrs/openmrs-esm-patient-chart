@@ -96,6 +96,7 @@ async function createOfflineVisitForPatient(patientUuid: string, location: strin
   const descriptor: QueueItemDescriptor = {
     id: offlineVisit.uuid,
     displayName: 'Offline visit',
+    patientUuid,
     dependencies: isVisitForOfflineRegisteredPatient
       ? [
           {
