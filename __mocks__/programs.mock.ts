@@ -40,7 +40,7 @@ export const mockOncProgramResponse = {
   voided: false,
   outcome: null,
   states: [],
-  resourceVersion: '1.8',
+  resourceVersion: '1.8'
 };
 
 export const mockEnrolledProgramsResponse = [
@@ -153,6 +153,6 @@ export const mockLocationsResponse = [
   },
   {
     uuid: '7fdfa2cb-bc95-405a-88c6-32b7673c0453',
-    display: 'Laboratory',
+    display: 'Laboratory'
   },
 ];
