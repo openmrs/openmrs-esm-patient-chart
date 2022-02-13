@@ -2,10 +2,45 @@
 @import "~carbon-components/src/globals/scss/vars";
 @import "~carbon-components/src/globals/scss/mixins";
 
-.filterRoot {
+.filterContainer {
   background-color: $openmrs-background-grey;
   margin: $spacing-02 0;
-  &.active {
-    border-left: 0.2rem solid $brand-02;
+}
+
+.filterContainerActive {
+  border-left: 0.2rem solid $brand-02;
+}
+
+.filterNode {
+  padding: 1rem;
+}
+
+.filterItem {
+  padding: 1rem;
+}
+
+:global {
+  // accordion content
+  .bx--accordion__item > .bx--accordion__content {
+    padding: 0;
+    margin: 0;
+    display: none;
+  }
+
+  .bx--accordion__item--active > .bx--accordion__content {
+    padding: 0;
+    margin: 0;
+    display: block;
+  }
+
+  // Chevron transformations
+  .bx--accordion__item > button[aria-expanded="false"] > .bx--accordion__arrow {
+    transform: rotate(90deg);
+}
+
+  .bx--accordion__item--active > .bx--accordion__heading > .bx--accordion__arrow {
+    /*rtl:ignore*/
+    transform: rotate(-90deg);
+    fill: #3d70b2;
   }
 }

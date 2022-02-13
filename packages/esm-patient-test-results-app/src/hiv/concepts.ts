@@ -1,69 +1,69 @@
 const concepts = {
-  name: 'Bloodwork',
-  class: 'ConvSet', // convienence set
-  tests: [],
-  sub_sets: [
+  display: 'Bloodwork',
+  concept: 'ConvSet', // convienence set
+  obs: [],
+  subSets: [
     {
-      name: 'Hematology',
-      class: 'ConvSet',
-      tests: [],
-      sub_sets: [
+      display: 'Hematology',
+      concept: 'ConvSet',
+      obs: [],
+      subSets: [
         {
-          name: 'Complete Blood Count',
-          class: 'LabSet',
-          tests: [
+          display: 'Complete Blood Count',
+          concept: 'LabSet',
+          obs: [
             {
-              name: 'Hematocrit',
-              class: 'Test',
+              display: 'Hematocrit',
+              concept: 'Test',
               values: {},
               attributes: {},
             },
             {
-              name: 'Platlets',
-              class: 'Test',
+              display: 'Platlets',
+              concept: 'Test',
               values: {},
               attributes: {},
             },
             {
-              name: 'Mean corpuscular hemoglobin',
-              class: 'Test',
+              display: 'Mean corpuscular hemoglobin',
+              concept: 'Test',
               values: {},
               attributes: {},
             },
           ],
-          sub_sets: [],
+          subSets: [],
         },
       ],
     },
     {
-      name: 'Chemistry',
-      class: 'ConvSet',
-      tests: [],
-      sub_sets: [
+      display: 'Chemistry',
+      concept: 'ConvSet',
+      obs: [],
+      subSets: [
         {
-          name: 'Serum chemistry panel',
-          class: 'LabSet',
-          tests: [
+          display: 'Serum chemistry panel',
+          concept: 'LabSet',
+          obs: [
             {
-              name: 'Serum calcium',
-              class: 'Test',
+              display: 'Serum calcium',
+              concept: 'Test',
               values: {},
               attributes: {},
             },
             {
-              name: 'Serum glutamic-pyruvic transaminase',
-              class: 'Test',
+              display: 'Serum glutamic-pyruvic transaminase',
+              concept: 'Test',
               values: {},
               attributes: {},
             },
             {
-              name: 'Serum albumin',
-              class: 'Test',
+              display: 'Serum albumin',
+              concept: 'Test',
               values: {},
               attributes: {},
             },
           ],
-          sub_sets: [],
+          subSets: [],
         },
       ],
     },
