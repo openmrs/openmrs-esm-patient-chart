@@ -65,7 +65,6 @@ const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = ({ patient, 
       id: `${index}`,
       vaccineName: immunization.vaccineName,
       vaccinationDate: `${formatDate(parseDate(immunization.existingDoses[0].occurrenceDateTime), {
-        mode: 'wide',
         day: false,
         time: false,
       })}`,

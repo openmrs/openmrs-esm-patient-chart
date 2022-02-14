@@ -36,7 +36,7 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
         return (
           vitals[selectedVitalSign.value] && {
             group: 'vitalsChartData',
-            key: formatDate(parseDate(vitals.date.toString()), { mode: 'wide', year: false }),
+            key: formatDate(parseDate(vitals.date.toString()), { year: false }),
             value: vitals[selectedVitalSign.value],
           }
         );
