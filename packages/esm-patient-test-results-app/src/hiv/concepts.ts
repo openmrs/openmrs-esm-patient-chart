@@ -15,20 +15,18 @@ const concepts = {
             {
               display: 'Hematocrit',
               concept: 'Test',
-              values: {},
-              attributes: {},
             },
             {
-              display: 'Platlets',
+              display: 'Platelets',
               concept: 'Test',
-              values: {},
-              attributes: {},
             },
             {
-              display: 'Mean corpuscular hemoglobin',
+              display: 'Haemoglobin',
               concept: 'Test',
-              values: {},
-              attributes: {},
+            },
+            {
+              display: 'White blood cells',
+              concept: 'Test',
             },
           ],
           subSets: [],
@@ -45,22 +43,16 @@ const concepts = {
           concept: 'LabSet',
           obs: [
             {
-              display: 'Serum calcium',
+              display: 'Serum chloride',
               concept: 'Test',
-              values: {},
-              attributes: {},
             },
             {
-              display: 'Serum glutamic-pyruvic transaminase',
+              display: 'Serum carbon dioxide',
               concept: 'Test',
-              values: {},
-              attributes: {},
             },
             {
-              display: 'Serum albumin',
+              display: 'Blood urea nitrogen',
               concept: 'Test',
-              values: {},
-              attributes: {},
             },
           ],
           subSets: [],

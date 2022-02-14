@@ -17,12 +17,12 @@ interface FilterNodeProps {
 }
 
 const FilterSet = ({ root, maxNest }: FilterProps) => {
-  //const [expanded, setExpanded] = useState(false);
-  const [active, setActive] = useState(false);
-  // active means checked
+  const { someChecked } = useContext(FilterContext);
 
   return (
-    <div className={`${styles.filterContainer} ${active && styles.filterContainerActive} ${styles.nestedAccordion}`}>
+    <div
+      className={`${styles.filterContainer} ${someChecked && styles.filterContainerActive} ${styles.nestedAccordion}`}
+    >
       <Accordion align="start">
         <AccordionItem title={<Checkbox id={root?.display} labelText={root?.display} />}>
           {root?.subSets?.map((node) => (

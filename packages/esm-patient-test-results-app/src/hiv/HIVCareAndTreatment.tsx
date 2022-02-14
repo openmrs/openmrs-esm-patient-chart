@@ -42,7 +42,7 @@ const HIVCareAndTreatment = ({ patientUuid }) => {
             </Column>
           </Row>
         </Grid>
-        <StatePrinter />
+        {/* <StatePrinter /> */}
       </FilterProvider>
     </div>
   );

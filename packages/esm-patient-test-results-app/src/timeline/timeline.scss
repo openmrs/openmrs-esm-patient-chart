@@ -41,7 +41,7 @@
 .timeline-data-cell {
   @extend .timeline-cell;
   justify-items: first baseline;
-  
+
   p {
     @include carbon--type-style('body-short-01');
     color: $text-02;
@@ -70,7 +70,6 @@
   width: fit-content;
   max-width: 100%;
   padding: 0px 0 0 0;
-  z-index: 9999;
   box-sizing: border-box;
   margin: 0;
   overflow: auto;
@@ -142,7 +141,7 @@
   p {
     @include carbon--type-style('productive-heading-01');
     color: $text-01;
-  }  
+  }
 }
 
 .high,

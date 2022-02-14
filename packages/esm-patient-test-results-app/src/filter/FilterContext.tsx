@@ -7,6 +7,7 @@ interface FilterContextProps {
   updateState?: any;
   initialize?: any;
   toggleVal?: any;
+  someChecked?: boolean;
 }
 
 const FilterContext = createContext<FilterContextProps>({});
@@ -25,12 +26,14 @@ const FilterProvider = ({ children }) => {
   };
 
   const activeTests = Object.keys(state).filter((key) => state[key]);
+  const someChecked = Object.values(state).some((val) => val);
 
   return (
     <FilterContext.Provider
       value={{
         state,
         activeTests,
+        someChecked,
         initialize: actions.initialize,
         updateState: actions.update,
         toggleVal: actions.toggleVal,
