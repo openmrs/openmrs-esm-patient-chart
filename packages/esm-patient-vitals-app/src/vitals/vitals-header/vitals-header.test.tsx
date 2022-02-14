@@ -9,7 +9,7 @@ import VitalsHeader from './vitals-header.component';
 
 const testProps = {
   patientUuid: mockPatient.id,
-  showRecordVitals: true,
+  showRecordVitalsButton: true,
 };
 
 const mockConceptUnits = new Map<string, string>(
@@ -59,21 +59,28 @@ describe('VitalsHeader: ', () => {
 
     await waitForLoadingToFinish();
 
-    expect(screen.getByText(/Vitals & Biometrics/i)).toBeInTheDocument();
-    expect(screen.getByText(/Last Recorded: 19 — May — 2021/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /^Record Vitals$/i })).toBeInTheDocument();
+    expect(screen.getByText(/Vitals and biometrics/i)).toBeInTheDocument();
+    expect(screen.getByText(/Last recorded/i)).toBeInTheDocument();
+    expect(screen.getByText(/19 — May — 2021/i)).toBeInTheDocument();
+    expect(screen.getByText(/Record vitals/i)).toBeInTheDocument();
 
-    const expandVitalsHeaderButton = screen.getByTitle(/ChevronDown/);
-    userEvent.click(expandVitalsHeaderButton);
+    const expandButton = screen.getByTitle(/ChevronDown/);
+    userEvent.click(expandButton);
 
     expect(getByTextWithMarkup(/Temp\s*37\s*DEG C/i)).toBeInTheDocument();
     expect(getByTextWithMarkup(/BP\s*121 \/ 89\s*mmHg/i)).toBeInTheDocument();
-    expect(getByTextWithMarkup(/Heart Rate\s*76\s*beats\/min/i)).toBeInTheDocument();
+    expect(getByTextWithMarkup(/Heart rate\s*76\s*beats\/min/i)).toBeInTheDocument();
     expect(getByTextWithMarkup(/SpO2\s*-\s*/i)).toBeInTheDocument();
     expect(getByTextWithMarkup(/R\. Rate\s*12\s*breaths\/min/i)).toBeInTheDocument();
     expect(getByTextWithMarkup(/Height\s*-\s*/i)).toBeInTheDocument();
     expect(getByTextWithMarkup(/BMI\s*-\s*/i)).toBeInTheDocument();
     expect(getByTextWithMarkup(/Weight\s*-\s*/i)).toBeInTheDocument();
+
+    const collapseButton = screen.getByTitle(/ChevronUp/);
+    userEvent.click(collapseButton);
+
+    expect(screen.queryByText(/Temp/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/BP/i)).not.toBeInTheDocument();
   });
 });
 

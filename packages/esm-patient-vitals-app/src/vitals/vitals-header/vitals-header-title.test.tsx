@@ -22,7 +22,7 @@ const mockVitals: PatientVitals = {
 
 const testProps = {
   showDetails: false,
-  showRecordVitals: true,
+  showRecordVitalsButton: true,
   toggleView: mockToggleView,
   view: 'Warning',
   vitals: mockVitals,
@@ -38,25 +38,16 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
 });
 
 describe('VitalsHeaderTitle: ', () => {
-  it("renders an empty state view when there's no vitals data to show", async () => {
-    testProps.vitals = null;
-
-    renderVitalsHeaderTitle();
-
-    expect(await screen.findByText(/No data has been recorded for this patient/i)).toBeInTheDocument();
-
-    expect(screen.getByRole('button', { name: /Record Vitals/i })).toBeInTheDocument();
-  });
-
   it("renders the patient's most recently recorded vitals", () => {
     testProps.vitals = mockVitals;
 
     renderVitalsHeaderTitle();
 
-    expect(screen.getByText(/Record Vitals/i)).toBeInTheDocument();
-    expect(screen.getByText(/Vitals & Biometrics/i)).toBeInTheDocument();
-    expect(screen.getByText(/Last Recorded: 12 — Mar — 2019/i)).toBeInTheDocument();
-    expect(screen.getByTitle(/warningfilled/i)).toBeInTheDocument();
+    expect(screen.getByText(/Vitals and biometrics/i)).toBeInTheDocument();
+    expect(screen.getByText(/last recorded/i)).toBeInTheDocument();
+    expect(screen.getByText(/12 — Mar — 2019/i)).toBeInTheDocument();
+    expect(screen.getByText(/Record vitals/i)).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: /warning/i })).toBeInTheDocument();
 
     const ChevronDown = screen.queryByTitle(/ChevronDown/);
     userEvent.click(ChevronDown);
@@ -64,10 +55,20 @@ describe('VitalsHeaderTitle: ', () => {
     expect(mockToggleView).toHaveBeenCalledTimes(1);
   });
 
+  it("renders an empty state view when there's no vitals data to show", () => {
+    testProps.vitals = null;
+
+    renderVitalsHeaderTitle();
+
+    expect(screen.getByText(/vitals and biometrics/i)).toBeInTheDocument();
+    expect(screen.getByText(/no data has been recorded for this patient/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /record vitals/i })).toBeInTheDocument();
+  });
+
   it('should launch the vitals form when record vitals button is clicked', () => {
     renderVitalsHeaderTitle();
 
-    const recordVitalsButton = screen.getByText(/Record Vitals/i);
+    const recordVitalsButton = screen.getByText(/Record vitals/i);
     userEvent.click(recordVitalsButton);
 
     expect(launchPatientWorkspace).toHaveBeenCalled();

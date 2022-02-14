@@ -1,9 +1,44 @@
 import useSWR from 'swr';
-import { PatientVitalAndBiometric } from './vitals-biometrics-form/vitals-biometrics-form.component';
+import { PatientVitalsAndBiometrics } from './vitals-biometrics-form/vitals-biometrics-form.component';
 import { openmrsFetch, fhirBaseUrl, useConfig, FHIRResource } from '@openmrs/esm-framework';
 import { ConfigObject } from '../config-schema';
 
 export const pageSize = 100;
+
+export interface PatientVitals {
+  id: string;
+  date: Date;
+  systolic?: number;
+  systolicRange?: any;
+  diastolic?: number;
+  diastolicRange?: any;
+  pulse?: number;
+  temperature?: number;
+  oxygenSaturation?: number;
+  oxygenSaturationRange?: any;
+  height?: number;
+  weight?: number;
+  bmi?: number | null;
+  respiratoryRate?: number;
+}
+
+interface VitalsFetchResponse {
+  entry: Array<{
+    resource: FHIRResource['resource'];
+  }>;
+  id: string;
+  meta: {
+    lastUpdated: string;
+  };
+  resourceType: string;
+  total: number;
+  type: string;
+}
+
+interface ObsRecord {
+  concept: string;
+  value: string | number;
+}
 
 type Vitals = Array<FHIRResource['resource']>;
 
@@ -26,7 +61,7 @@ export function useVitals(patientUuid: string) {
   const observations: Vitals = data?.data?.entry?.map((entry) => entry.resource) ?? [];
 
   return {
-    data:
+    vitals:
       data?.data?.total > 0
         ? formatVitals(
             filterByConceptUuid(observations, concepts.systolicBloodPressureUuid),
@@ -34,8 +69,6 @@ export function useVitals(patientUuid: string) {
             filterByConceptUuid(observations, concepts.pulseUuid),
             filterByConceptUuid(observations, concepts.temperatureUuid),
             filterByConceptUuid(observations, concepts.oxygenSaturationUuid),
-            filterByConceptUuid(observations, concepts.heightUuid),
-            filterByConceptUuid(observations, concepts.weightUuid),
             filterByConceptUuid(observations, concepts.respiratoryRateUuid),
           )
         : null,
@@ -51,16 +84,13 @@ function formatVitals(
   pulseData: Vitals,
   temperatureData: Vitals,
   oxygenSaturationData: Vitals,
-  heightData: Vitals,
-  weightData: Vitals,
   respiratoryRateData: Vitals,
 ): Array<PatientVitals> {
   const systolicDates = getDatesIssued(systolicBloodPressure);
   const diastolicDates = getDatesIssued(diastolicBloodPressure);
-
   const uniqueDates = Array.from(new Set(systolicDates?.concat(diastolicDates))).sort(latestFirst);
 
-  return uniqueDates.map((date: Date | string) => {
+  return uniqueDates.map((date: Date) => {
     const systolic = systolicBloodPressure.find((systolic) => systolic.issued === date);
     const diastolic = diastolicBloodPressure.find((diastolic) => diastolic.issued === date);
     const pulse = pulseData.find((pulse) => pulse.issued === date);
@@ -71,10 +101,13 @@ function formatVitals(
       id: systolic?.encounter?.reference.replace('Encounter/', ''),
       date: systolic?.issued,
       systolic: systolic?.valueQuantity?.value,
+      systolicRange: systolic?.referenceRange[0],
       diastolic: diastolic?.valueQuantity?.value,
+      diastolicRange: diastolic?.referenceRange[0],
       pulse: pulse?.valueQuantity?.value,
       temperature: temperature?.valueQuantity?.value,
       oxygenSaturation: oxygenSaturation?.valueQuantity?.value,
+      oxygenSaturationRange: oxygenSaturation?.referenceRange[0],
       respiratoryRate: respiratoryRate?.valueQuantity?.value,
     };
   });
@@ -100,7 +133,7 @@ export function savePatientVitals(
   formUuid: string,
   concepts: ConfigObject['concepts'],
   patientUuid: string,
-  vitals: PatientVitalAndBiometric,
+  vitals: PatientVitalsAndBiometrics,
   encounterDatetime: Date,
   abortController: AbortController,
   location: string,
@@ -122,7 +155,7 @@ export function savePatientVitals(
   });
 }
 
-function createObsObject(vitals: PatientVitalAndBiometric, concepts: ConfigObject['concepts']): Array<ObsRecord> {
+function createObsObject(vitals: PatientVitalsAndBiometrics, concepts: ConfigObject['concepts']): Array<ObsRecord> {
   return Object.entries(vitals)
     .filter(([_, result]) => result != null)
     .map(([name, result]) => {
@@ -136,7 +169,7 @@ function createObsObject(vitals: PatientVitalAndBiometric, concepts: ConfigObjec
 export function editPatientVitals(
   concepts: ConfigObject['concepts'],
   patientUuid: string,
-  vitals: PatientVitalAndBiometric,
+  vitals: PatientVitalsAndBiometrics,
   encounterDatetime: Date,
   abortController: AbortController,
   encounterUuid: string,
@@ -156,36 +189,4 @@ export function editPatientVitals(
       orders: [],
     },
   });
-}
-
-export interface PatientVitals {
-  id: string;
-  date: Date | string;
-  systolic?: number;
-  diastolic?: number;
-  pulse?: number;
-  temperature?: number;
-  oxygenSaturation?: number;
-  height?: number;
-  weight?: number;
-  bmi?: number | null;
-  respiratoryRate?: number;
-}
-
-interface VitalsFetchResponse {
-  entry: Array<{
-    resource: FHIRResource['resource'];
-  }>;
-  id: string;
-  meta: {
-    lastUpdated: string;
-  };
-  resourceType: string;
-  total: number;
-  type: string;
-}
-
-interface ObsRecord {
-  concept: string;
-  value: string | number;
 }
