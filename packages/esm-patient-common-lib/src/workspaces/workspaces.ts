@@ -2,6 +2,7 @@ import { ExtensionRegistration, getExtensionRegistration, getGlobalStore, transl
 import { WorkspaceWindowState } from '..';
 
 export interface WorkspaceStoreState {
+  patientUuid: string | null;
   openWorkspaces: Array<OpenWorkspace>;
   workspaceNeedingConfirmationToOpen: OpenWorkspace | null;
 }
@@ -134,15 +135,24 @@ export function closeWorkspace(name: string) {
 
 export function closeAllWorkspaces() {
   const store = getWorkspaceStore();
-  store.setState({ openWorkspaces: [] });
+  const state = store.getState();
+  store.setState({ ...state, openWorkspaces: [] });
 }
 
-export interface WorkspaceParcel {
-  unmount: () => void;
-  update: (props) => Promise<any>;
+/**
+ * The set of workspaces is specific to a particular patient. This function
+ * should be used when setting up workspaces for a new patient. If the current
+ * workspace data is for a different patient, the workspace state is cleared.
+ */
+export function changeWorkspaceContext(patientUuid) {
+  const store = getWorkspaceStore();
+  const state = store.getState();
+  if (state.patientUuid != patientUuid) {
+    store.setState({ patientUuid, openWorkspaces: [], workspaceNeedingConfirmationToOpen: null });
+  }
 }
 
-const initialState = { openWorkspaces: [], workspaceNeedingConfirmationToOpen: null };
+const initialState = { patientUuid: null, openWorkspaces: [], workspaceNeedingConfirmationToOpen: null };
 export function getWorkspaceStore() {
   return getGlobalStore<WorkspaceStoreState>('workspace', initialState);
 }

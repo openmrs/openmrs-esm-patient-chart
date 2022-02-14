@@ -113,6 +113,7 @@ async function queueEncounterRequest(item: QueuedEncounterRequest) {
   const descriptor: QueueItemDescriptor = {
     id: item.body.uuid,
     displayName: 'Patient form',
+    patientUuid: item.body.patient,
     dependencies: [
       {
         type: 'visit',
