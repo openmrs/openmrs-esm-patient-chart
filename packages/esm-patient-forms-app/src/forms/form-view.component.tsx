@@ -4,7 +4,15 @@ import EmptyFormView from './empty-form.component';
 import isEmpty from 'lodash-es/isEmpty';
 import first from 'lodash-es/first';
 import debounce from 'lodash-es/debounce';
-import { formatDatetime, navigate, useConfig, useLayoutType, usePagination, useVisit, Visit } from '@openmrs/esm-framework';
+import {
+  formatDatetime,
+  navigate,
+  useConfig,
+  useLayoutType,
+  usePagination,
+  useVisit,
+  Visit,
+} from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
