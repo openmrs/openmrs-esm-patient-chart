@@ -46,4 +46,11 @@
     transform: rotate(-90deg);
     fill: #3d70b2;
   }
+
+  .bx--accordion--start > .bx--accordion__item > button[aria-expanded="true"] {
+    background-color: rgb(231, 231, 231);
+    &:hover {
+      background-color: rgb(179, 179, 179);
+    }
+  }
 }

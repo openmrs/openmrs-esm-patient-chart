@@ -3,16 +3,19 @@ import reducer from './filterReducer';
 
 const initialContext = {
   checkboxes: {},
+  parents: {},
 };
 
 interface FilterContextProps {
   state?: any;
-  checkboxes?: any;
+  checkboxes: any;
+  parents: any;
   activeTests?: any[];
   updateCheckboxes?: any;
   initialize?: any;
   toggleVal?: any;
   someChecked?: boolean;
+  updateParent?: any;
 }
 
 const FilterContext = createContext<FilterContextProps>(initialContext);
@@ -28,6 +31,9 @@ const FilterProvider = ({ children }) => {
     toggleVal: (name) => {
       dispatch({ type: 'toggleVal', name: name });
     },
+    updateParent: (name) => {
+      dispatch({ type: 'updateParent', name: name });
+    },
   };
 
   const activeTests = Object.keys(state?.checkboxes)?.filter((key) => state.checkboxes[key]) || [];
@@ -38,11 +44,13 @@ const FilterProvider = ({ children }) => {
       value={{
         state,
         checkboxes: state.checkboxes,
+        parents: state.parents,
         activeTests,
         someChecked,
         initialize: actions.initialize,
         updateCheckboxes: actions.updateCheckboxes,
         toggleVal: actions.toggleVal,
+        updateParent: actions.updateParent,
       }}
     >
       {children}
