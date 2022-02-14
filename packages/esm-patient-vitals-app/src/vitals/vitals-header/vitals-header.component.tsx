@@ -5,10 +5,18 @@ import InlineLoading from 'carbon-components-react/es/components/InlineLoading';
 import VitalsHeaderItem from './vitals-header-item.component';
 import VitalsHeaderTitle from './vitals-header-title.component';
 import { useConfig } from '@openmrs/esm-framework';
-import { useVitalsConceptMetadata } from '@openmrs/esm-patient-common-lib';
+import { ObsMetaInfo, useVitalsConceptMetadata } from '@openmrs/esm-patient-common-lib';
 import { useVitals } from '../vitals.resource';
 import { ConfigObject } from '../../config-schema';
 import styles from './vitals-header.component.scss';
+
+export enum ObservationInterpretation {
+  LOW = 'low',
+  CRITICALLY_LOW = 'critically_low',
+  NORMAL = 'normal',
+  HIGH = 'high',
+  CRITICALLY_HIGH = 'critically_high',
+}
 
 interface VitalsHeaderProps {
   patientUuid: string;
@@ -19,21 +27,32 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
   const config = useConfig() as ConfigObject;
   const { t } = useTranslation();
   const { vitals, isLoading } = useVitals(patientUuid);
-  const { data: conceptUnits } = useVitalsConceptMetadata();
+  const { data: conceptUnits, conceptMetadata } = useVitalsConceptMetadata();
   const latestVitals = vitals?.[0];
 
-  const isLowDiastolic = latestVitals?.diastolic < latestVitals?.diastolicRange?.low?.value;
-  const isHighDiastolic = latestVitals?.diastolic > latestVitals?.diastolicRange?.high?.value;
-  const isLowSystolic = latestVitals?.systolic < latestVitals?.systolicRange?.low?.value;
-  const isHighSystolic = latestVitals?.systolic > latestVitals?.systolicRange?.high?.value;
-  const isAbnormalBloodPressure = isLowSystolic || isHighSystolic || isLowDiastolic || isHighDiastolic;
-  const isAbnormalOxygenSaturation = latestVitals?.oxygenSaturation < latestVitals?.oxygenSaturationRange?.low?.value;
+  const isAbnormalDiastolicValue =
+    assessValue(
+      latestVitals?.diastolic,
+      conceptMetadata?.find((metadata) => metadata.uuid === config.concepts.diastolicBloodPressureUuid),
+    ) !== ObservationInterpretation.NORMAL;
 
-  const hasAbnormalValues =
+  const isAbnormalSystolicValue =
+    assessValue(
+      latestVitals?.systolic,
+      conceptMetadata?.find((metadata) => metadata.uuid === config.concepts.systolicBloodPressureUuid),
+    ) !== ObservationInterpretation.NORMAL;
+
+  const isAbnormalOxygenSaturationValue =
+    assessValue(
+      latestVitals?.oxygenSaturation,
+      conceptMetadata?.find((metadata) => metadata.uuid === config.concepts.oxygenSaturationUuid),
+    ) !== ObservationInterpretation.NORMAL;
+
+  const isNotRecentAndHasAbnormalValues =
     latestVitals &&
     Object.keys(latestVitals).length &&
     !dayjs(latestVitals.date).isToday() &&
-    (isAbnormalBloodPressure || isAbnormalOxygenSaturation)
+    (isAbnormalDiastolicValue || isAbnormalSystolicValue || isAbnormalOxygenSaturationValue)
       ? true
       : false;
 
@@ -48,19 +67,19 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
 
   return (
     <div
-      className={`${latestVitals && hasAbnormalValues ? styles.warningBackground : styles.defaultBackground} ${
-        styles.vitalHeaderStateContainer
-      }`}
+      className={`${
+        latestVitals && isNotRecentAndHasAbnormalValues ? styles.warningBackground : styles.defaultBackground
+      } ${styles.vitalHeaderStateContainer}`}
     >
       <VitalsHeaderTitle
         showDetails={showDetails}
         showRecordVitalsButton={showRecordVitalsButton}
         toggleView={toggleIsDetailsPanelOpen}
-        view={hasAbnormalValues ? 'Warning' : 'Default'}
+        view={isNotRecentAndHasAbnormalValues ? 'Warning' : 'Default'}
         vitals={latestVitals}
       />
       {showDetails && (
-        <div className={hasAbnormalValues ? `${styles.warningBorder}` : `${styles.defaultBorder}`}>
+        <div className={isNotRecentAndHasAbnormalValues ? `${styles.warningBorder}` : `${styles.defaultBorder}`}>
           <div className={styles.row}>
             <VitalsHeaderItem
               unitName={t('temperatureAbbreviated', 'Temp')}
@@ -68,7 +87,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
               value={latestVitals?.temperature}
             />
             <VitalsHeaderItem
-              flaggedAbnormal={isAbnormalBloodPressure}
+              flaggedAbnormal={isAbnormalDiastolicValue || isAbnormalSystolicValue}
               unitName={t('bp', 'BP')}
               unitSymbol={conceptUnits.get(config.concepts.systolicBloodPressureUuid) ?? ''}
               value={`${latestVitals?.systolic ?? '-'} / ${latestVitals?.diastolic ?? '-'}`}
@@ -79,7 +98,11 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
               value={latestVitals?.pulse}
             />
             <VitalsHeaderItem
-              flaggedAbnormal={isAbnormalOxygenSaturation}
+              flaggedAbnormal={isAbnormalOxygenSaturationValue}
+              interpretation={assessValue(
+                latestVitals?.oxygenSaturation,
+                conceptMetadata?.find((metadata) => metadata.uuid === config.concepts.oxygenSaturationUuid),
+              )}
               unitName={t('spo2', 'SpO2')}
               unitSymbol={conceptUnits.get(config.concepts.oxygenSaturationUuid) ?? ''}
               value={latestVitals?.oxygenSaturation}
@@ -114,3 +137,33 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
 };
 
 export default VitalsHeader;
+
+function assessValue(value: number, range: ObsMetaInfo): ObservationInterpretation {
+  if (exists(range?.hiCritical) && value > range.hiCritical) {
+    return ObservationInterpretation.CRITICALLY_HIGH;
+  }
+
+  if (exists(range?.highNormal) && value > range.highNormal) {
+    return ObservationInterpretation.HIGH;
+  }
+
+  if (exists(range?.lowCritical) && value < range.lowCritical) {
+    return ObservationInterpretation.CRITICALLY_LOW;
+  }
+
+  if (exists(range?.lowNormal) && value < range.lowNormal) {
+    return ObservationInterpretation.LOW;
+  }
+
+  return ObservationInterpretation.NORMAL;
+}
+
+function exists(...args: any[]): boolean {
+  for (const y of args) {
+    if (y === null || y === undefined) {
+      return false;
+    }
+  }
+
+  return true;
+}

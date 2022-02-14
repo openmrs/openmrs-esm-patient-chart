@@ -45,3 +45,30 @@
   margin-right: 0.5rem;
   color: $text-02;
 }
+
+.critically_low, .critically_high, .low, .high {
+  &::after {
+    @include carbon--type-style('productive-heading-01');
+    color: $text-01;
+  }
+}
+
+.low::after {
+  content: " ↓";
+}
+
+.critically_low::after {
+  content: " ↓↓";
+}
+
+.high::after {
+  content: " ↑";
+}
+
+.critically_high::after {
+  content: " ↑↑";
+}
+
+.padRight {
+  margin-right: 2px;
+}

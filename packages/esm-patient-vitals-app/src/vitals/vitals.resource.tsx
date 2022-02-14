@@ -101,13 +101,10 @@ function formatVitals(
       id: systolic?.encounter?.reference.replace('Encounter/', ''),
       date: systolic?.issued,
       systolic: systolic?.valueQuantity?.value,
-      systolicRange: systolic?.referenceRange[0],
       diastolic: diastolic?.valueQuantity?.value,
-      diastolicRange: diastolic?.referenceRange[0],
       pulse: pulse?.valueQuantity?.value,
       temperature: temperature?.valueQuantity?.value,
       oxygenSaturation: oxygenSaturation?.valueQuantity?.value,
-      oxygenSaturationRange: oxygenSaturation?.referenceRange[0],
       respiratoryRate: respiratoryRate?.valueQuantity?.value,
     };
   });
