@@ -5,7 +5,7 @@ import styles from './notes-overview.scss';
 import { useTranslation } from 'react-i18next';
 import { Button, DataTableSkeleton, InlineLoading } from 'carbon-components-react';
 import { useVisit } from '@openmrs/esm-framework';
-import { useEncounters } from './encounter.resource';
+import { useVisitNotes } from './visit-notes.resource';
 import {
   CardHeader,
   EmptyState,
@@ -16,26 +16,18 @@ import {
 
 interface NotesOverviewProps {
   patientUuid: string;
-  patient: fhir.Patient;
   showAddNote: boolean;
   pageSize: number;
   urlLabel: string;
   pageUrl: string;
 }
 
-const NotesMain: React.FC<NotesOverviewProps> = ({
-  patientUuid,
-  patient,
-  showAddNote,
-  pageSize,
-  urlLabel,
-  pageUrl,
-}) => {
-  const { currentVisit } = useVisit(patientUuid);
+const NotesMain: React.FC<NotesOverviewProps> = ({ patientUuid, showAddNote, pageSize, urlLabel, pageUrl }) => {
   const { t } = useTranslation();
+  const { currentVisit } = useVisit(patientUuid);
   const displayText = t('visitNotes', 'Visit notes');
   const headerTitle = t('visitNotes', 'Visit notes');
-  const { data: notes, isError, isLoading, isValidating } = useEncounters(patientUuid);
+  const { visitNotes, isError, isLoading, isValidating } = useVisitNotes(patientUuid);
 
   const launchVisitNoteForm = React.useCallback(() => {
     if (currentVisit) {
@@ -50,7 +42,7 @@ const NotesMain: React.FC<NotesOverviewProps> = ({
       {(() => {
         if (isLoading) return <DataTableSkeleton role="progressbar" />;
         if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
-        if (notes?.length)
+        if (visitNotes?.length)
           return (
             <div className={styles.widgetCard}>
               <CardHeader title={headerTitle}>
@@ -66,7 +58,7 @@ const NotesMain: React.FC<NotesOverviewProps> = ({
                   </Button>
                 )}
               </CardHeader>
-              <NotesPagination notes={notes} pageSize={pageSize} urlLabel={urlLabel} pageUrl={pageUrl} />
+              <NotesPagination notes={visitNotes} pageSize={pageSize} urlLabel={urlLabel} pageUrl={pageUrl} />
             </div>
           );
         return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchVisitNoteForm} />;

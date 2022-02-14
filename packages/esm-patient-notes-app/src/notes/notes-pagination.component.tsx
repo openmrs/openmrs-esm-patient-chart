@@ -8,12 +8,15 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TableExpandHeader,
+  TableExpandRow,
+  TableExpandedRow,
 } from 'carbon-components-react';
-import styles from './notes-overview.scss';
-import { formatDatetime, parseDate, usePagination } from '@openmrs/esm-framework';
+import { formatDate, formatTime, parseDate, usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { PatientNote } from '../types';
+import styles from './notes-overview.scss';
 
 interface FormsProps {
   notes: Array<PatientNote>;
@@ -32,71 +35,87 @@ const NotesPagination: React.FC<FormsProps> = ({ notes, pageSize, pageUrl, urlLa
       header: t('date', 'Date'),
     },
     {
-      key: 'encounterType',
-      header: t('encounterType', 'Encounter type'),
-    },
-    {
-      key: 'encounterLocation',
-      header: t('location', 'Location'),
-    },
-    {
-      key: 'encounterAuthor',
-      header: t('author', 'Author'),
+      key: 'diagnoses',
+      header: t('diagnoses', 'Diagnoses'),
     },
   ];
 
   const tableRows = React.useMemo(
     () =>
-      paginatedNotes.map((note) => ({
+      paginatedNotes?.map((note) => ({
         ...note,
-        encounterDate: formatDatetime(parseDate(note.encounterDate)),
+        id: `${note.id}`,
+        encounterDate: formatDate(parseDate(note.encounterDate), 'wide'),
       })),
     [paginatedNotes],
   );
 
   return (
     <div>
-      <TableContainer>
-        <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="short" useZebraStyles>
-          {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-            <Table {...getTableProps()} useZebraStyles>
+      <DataTable rows={tableRows} headers={tableHeaders} isSortable size="short" useZebraStyles>
+        {({ rows, headers, getTableProps, getTableContainerProps, getHeaderProps, getRowProps }) => (
+          <TableContainer {...getTableContainerProps}>
+            <Table {...getTableProps()}>
               <TableHead>
                 <TableRow>
-                  {headers.map((header) => (
+                  <TableExpandHeader />
+                  {headers.map((header, i) => (
                     <TableHeader
+                      key={i}
                       className={`${styles.productiveHeading01} ${styles.text02}`}
                       {...getHeaderProps({
                         header,
-                        isSortable: header.isSortable,
                       })}
                     >
-                      {header.header?.content ?? header.header}
+                      {header.header}
                     </TableHeader>
                   ))}
                 </TableRow>
               </TableHead>
               <TableBody>
-                {rows.map((row) => (
-                  <TableRow key={row.id} {...getRowProps({ row })}>
-                    {row.cells.map((cell) => (
-                      <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
-                    ))}
-                  </TableRow>
+                {rows.map((row, i) => (
+                  <React.Fragment key={row.id}>
+                    <TableExpandRow {...getRowProps({ row })}>
+                      {row.cells.map((cell) => (
+                        <TableCell key={cell.id}>{cell.value}</TableCell>
+                      ))}
+                    </TableExpandRow>
+                    {row.isExpanded ? (
+                      <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 1}>
+                        <div className={styles.container} key={i}>
+                          {tableRows?.[i]?.encounterNote ? (
+                            <div className={styles.copy}>
+                              <span className={styles.content}>{tableRows?.[i]?.encounterNote}</span>
+                              <span className={styles.metadata}>
+                                {formatTime(new Date(tableRows?.[i]?.encounterNoteRecordedAt))}
+                              </span>
+                            </div>
+                          ) : (
+                            <span className={styles.copy}>{t('noVisitNoteToDisplay', 'No Visit Note to display')}</span>
+                          )}
+                        </div>
+                      </TableExpandedRow>
+                    ) : (
+                      <div />
+                    )}
+                  </React.Fragment>
                 ))}
               </TableBody>
             </Table>
-          )}
-        </DataTable>
-      </TableContainer>
-      <PatientChartPagination
-        pageNumber={currentPage}
-        totalItems={notes.length}
-        currentItems={paginatedNotes.length}
-        pageUrl={pageUrl}
-        pageSize={pageSize}
-        onPageNumberChange={({ page }) => goTo(page)}
-        urlLabel={urlLabel}
-      />
+          </TableContainer>
+        )}
+      </DataTable>
+      <div className={styles.pagination}>
+        <PatientChartPagination
+          pageNumber={currentPage}
+          totalItems={notes.length}
+          currentItems={paginatedNotes.length}
+          pageUrl={pageUrl}
+          pageSize={pageSize}
+          onPageNumberChange={({ page }) => goTo(page)}
+          urlLabel={urlLabel}
+        />
+      </div>
     </div>
   );
 };

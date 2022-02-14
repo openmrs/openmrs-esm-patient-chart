@@ -5,3 +5,38 @@
 .widgetCard {
   border: 1px solid $ui-03;
 }
+
+.expandedRow > td {
+  padding-left: 2.5rem !important;
+}
+
+.expandedRow > td > div {
+  max-height: max-content !important;
+}
+
+.expandedRow th[colspan] td[colspan] > div:first-child {
+  padding: 0 1rem;
+}
+
+.copy {
+  @include carbon--type-style('body-long-01');
+  color: $text-01;
+  display: flex;
+  flex-direction: column;
+}
+
+.container {
+  margin: 0.5rem;
+}
+
+.metadata {
+  @include carbon--type-style('label-01');
+  color: $text-02;
+  margin: 0.5rem 0;
+}
+
+.pagination {
+  :first-child {
+    border-top: none;
+  }
+}

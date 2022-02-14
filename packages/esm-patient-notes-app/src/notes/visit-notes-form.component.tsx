@@ -1,8 +1,8 @@
 import React, { SyntheticEvent } from 'react';
 import dayjs from 'dayjs';
 import { mutate } from 'swr';
-import debounce from 'lodash-es/debounce';
 import { useTranslation } from 'react-i18next';
+import debounce from 'lodash-es/debounce';
 import {
   Column,
   Grid,
@@ -19,22 +19,28 @@ import {
   Tile,
   ButtonSet,
 } from 'carbon-components-react';
+import Add16 from '@carbon/icons-react/es/add/16';
 import { createErrorHandler, showNotification, showToast, useConfig, useSessionUser } from '@openmrs/esm-framework';
 import { convertToObsPayload } from './visit-note.util';
 import { fetchDiagnosisByName, fetchLocationByUuid, fetchProviderByUuid, saveVisitNote } from './visit-notes.resource';
 import { ConfigObject } from '../config-schema';
-import styles from './visit-notes-form.scss';
-import { encountersCustomRepresentation } from './encounter.resource';
 import { Diagnosis, VisitNotePayload } from '../types';
 import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import styles from './visit-notes-form.scss';
 
 const searchTimeoutInMs = 500;
+const encountersCustomRepresentation =
+  'custom:(uuid,display,encounterDatetime,' +
+  'location:(uuid,display,name),' +
+  'encounterType:(name,uuid),' +
+  'auditInfo:(creator:(display),changedBy:(display)),' +
+  'encounterProviders:(provider:(person:(display))))';
 
 const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patientUuid, isTablet }) => {
   const { t } = useTranslation();
   const session = useSessionUser();
   const config = useConfig() as ConfigObject;
-  const { clinicianEncounterRole, encounterNoteConceptUuid, encounterTypeUuid, formConceptUuid } =
+  const { clinicianEncounterRole, encounterNoteTextConceptUuid, encounterTypeUuid, formConceptUuid } =
     config.visitNoteConfig;
   const [clinicalNote, setClinicalNote] = React.useState('');
   const [currentSessionProviderUuid, setCurrentSessionProviderUuid] = React.useState<string | null>('');
@@ -121,7 +127,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
       if (clinicalNote) {
         obs = [
           {
-            concept: encounterNoteConceptUuid,
+            concept: encounterNoteTextConceptUuid,
             value: clinicalNote,
           },
           ...obs,
@@ -177,7 +183,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
       clinicalNote,
       clinicianEncounterRole,
       closeWorkspace,
-      encounterNoteConceptUuid,
+      encounterNoteTextConceptUuid,
       encounterTypeUuid,
       formConceptUuid,
       locationUuid,
@@ -192,7 +198,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
   return (
     <Form className={styles.form}>
       <Grid className={styles.grid}>
-        {isTablet ? <h2 className={styles.heading}>{t('addVisitNote', 'Add a Visit Note')}</h2> : null}
+        {isTablet ? <h2 className={styles.heading}>{t('addVisitNote', 'Add a visit note')}</h2> : null}
         <Row className={styles.row}>
           <Column sm={1}>
             <span className={styles.columnLabel}>{t('date', 'Date')}</span>
@@ -310,7 +316,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
               <p className={styles.imgUploadHelperText}>
                 {t('imageUploadHelperText', "Upload an image or use this device's camera to capture an image")}
               </p>
-              <Button style={{ marginTop: '1rem' }} kind="tertiary" onClick={() => {}}>
+              <Button style={{ marginTop: '1rem' }} kind="tertiary" onClick={() => {}} renderIcon={Add16}>
                 {t('addImage', 'Add image')}
               </Button>
             </FormGroup>
