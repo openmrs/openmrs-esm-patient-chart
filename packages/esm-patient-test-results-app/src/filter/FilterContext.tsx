@@ -1,41 +1,47 @@
 import React, { createContext, useReducer, useState } from 'react';
 import reducer from './filterReducer';
 
+const initialContext = {
+  checkboxes: {},
+};
+
 interface FilterContextProps {
   state?: any;
+  checkboxes?: any;
   activeTests?: any[];
-  updateState?: any;
+  updateCheckboxes?: any;
   initialize?: any;
   toggleVal?: any;
   someChecked?: boolean;
 }
 
-const FilterContext = createContext<FilterContextProps>({});
+const FilterContext = createContext<FilterContextProps>(initialContext);
 
 const FilterProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(reducer, {});
+  const [state, dispatch] = useReducer(reducer, initialContext);
 
   const actions = {
-    initialize: (initialState) => dispatch({ type: 'initialize', payload: initialState }),
-    update: (changes) => {
-      dispatch({ type: 'update', payload: changes });
+    initialize: (initialState, tree) => dispatch({ type: 'initialize', initialState: initialState, tree: tree }),
+    updateCheckboxes: (changes) => {
+      dispatch({ type: 'updateCheckboxes', payload: changes });
     },
     toggleVal: (name) => {
       dispatch({ type: 'toggleVal', name: name });
     },
   };
 
-  const activeTests = Object.keys(state).filter((key) => state[key]);
-  const someChecked = Object.values(state).some((val) => val);
+  const activeTests = Object.keys(state?.checkboxes)?.filter((key) => state.checkboxes[key]) || [];
+  const someChecked = Boolean(activeTests.length);
 
   return (
     <FilterContext.Provider
       value={{
         state,
+        checkboxes: state.checkboxes,
         activeTests,
         someChecked,
         initialize: actions.initialize,
-        updateState: actions.update,
+        updateCheckboxes: actions.updateCheckboxes,
         toggleVal: actions.toggleVal,
       }}
     >

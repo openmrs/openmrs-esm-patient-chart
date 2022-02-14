@@ -35,7 +35,7 @@ const FilterSet = ({ root, maxNest }: FilterProps) => {
 };
 
 const FilterNode = ({ root, level, maxNest = 3 }: FilterNodeProps) => {
-  const { state, toggleVal } = useContext(FilterContext);
+  const { checkboxes, toggleVal } = useContext(FilterContext);
   if (root?.subSets?.length || root?.obs?.length) {
     return (
       <AccordionItem
@@ -57,7 +57,7 @@ const FilterNode = ({ root, level, maxNest = 3 }: FilterNodeProps) => {
       <Checkbox
         id={root?.display}
         labelText={root?.display}
-        checked={state[root?.display]}
+        checked={checkboxes?.[root?.display]}
         onChange={() => toggleVal(root?.display)}
       />
     </div>

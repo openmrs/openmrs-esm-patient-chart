@@ -9,7 +9,7 @@ import { MultiTimeline } from '../timeline/Timeline';
 
 const StatePrinter = () => {
   const { state } = useContext(FilterContext);
-  return <p>{JSON.stringify(state, null, 2)}</p>;
+  return <pre>{JSON.stringify(state, null, 2)}</pre>;
 };
 
 const DataLoader = () => {
@@ -17,11 +17,10 @@ const DataLoader = () => {
   const patientUuid = patient?.patient?.id;
   const { sortedObs, loaded, error } = usePatientResultsData(patientUuid);
   const { state, initialize } = useContext(FilterContext);
-
   useEffect(() => {
     const tests = (sortedObs && Object.keys(sortedObs)) || [];
-    if (tests.length && !Object.keys(state).length) {
-      initialize(Object.fromEntries(tests.map((test) => [test, false])));
+    if (tests.length && !Object.keys(state?.checkboxes).length) {
+      initialize(Object.fromEntries(tests.map((test) => [test, false])), concepts);
     }
   }, [sortedObs, initialize, state]);
   return null;
@@ -42,7 +41,7 @@ const HIVCareAndTreatment = ({ patientUuid }) => {
             </Column>
           </Row>
         </Grid>
-        {/* <StatePrinter /> */}
+        <StatePrinter />
       </FilterProvider>
     </div>
   );
