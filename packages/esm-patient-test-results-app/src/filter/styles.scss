@@ -16,20 +16,23 @@
 }
 
 .filterItem {
-  padding: 1rem;
+  padding: 0.5rem 1rem 0.5rem 3rem;
+  border-bottom: 1px solid lightgray;
 }
 
-:global {
+.nestedAccordion :global {
+  // extending carbon's accordion to handle nested accordions
   // accordion content
-  .bx--accordion__item > .bx--accordion__content {
+  .bx--accordion__content {
     padding: 0;
     margin: 0;
+  }
+
+  .bx--accordion__item > .bx--accordion__content {
     display: none;
   }
 
   .bx--accordion__item--active > .bx--accordion__content {
-    padding: 0;
-    margin: 0;
     display: block;
   }
 

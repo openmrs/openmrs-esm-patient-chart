@@ -1,32 +1,32 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import styles from './styles.scss';
-import ChevronDown from '@carbon/icons-react/es/chevron--down/16';
-import ChevronUp from '@carbon/icons-react/es/chevron--up/16';
-import { Accordion, AccordionItem } from 'carbon-components-react';
+import { Accordion, AccordionItem, Checkbox } from 'carbon-components-react';
+import FilterContext from './FilterContext';
 
 interface FilterProps {
   root: any;
-  active?: boolean;
+  maxNest?: number;
   children?: any;
 }
 
 interface FilterNodeProps {
   root: any;
   level: number;
+  maxNest?: number;
   children?: any;
 }
 
-const FilterSet = ({ root }: FilterProps) => {
+const FilterSet = ({ root, maxNest }: FilterProps) => {
   //const [expanded, setExpanded] = useState(false);
   const [active, setActive] = useState(false);
   // active means checked
 
   return (
-    <div className={`${styles.filterContainer} ${active && styles.filterContainerActive}`}>
+    <div className={`${styles.filterContainer} ${active && styles.filterContainerActive} ${styles.nestedAccordion}`}>
       <Accordion align="start">
-        <AccordionItem title={<span>{root?.display}</span>}>
+        <AccordionItem title={<Checkbox id={root?.display} labelText={root?.display} />}>
           {root?.subSets?.map((node) => (
-            <FilterNode root={node} level={0} />
+            <FilterNode root={node} level={0} maxNest={maxNest} />
           ))}
         </AccordionItem>
       </Accordion>
@@ -34,34 +34,33 @@ const FilterSet = ({ root }: FilterProps) => {
   );
 };
 
-const FilterNode = ({ root, level }: FilterNodeProps) => {
-  if (root?.subSets?.length) {
+const FilterNode = ({ root, level, maxNest = 3 }: FilterNodeProps) => {
+  const { state, toggleVal } = useContext(FilterContext);
+  if (root?.subSets?.length || root?.obs?.length) {
     return (
-      // <Accordion align="start">
-      <AccordionItem title={root.display}>
-        {root.subSets.map((node, index) => (
+      <AccordionItem
+        title={<Checkbox id={root?.display} labelText={root?.display} />}
+        style={{ paddingLeft: level > 0 && level < maxNest ? '1em' : '0' }}
+      >
+        {root?.subSets?.map((node, index) => (
+          <FilterNode root={node} level={level + 1} maxNest={maxNest} key={index} />
+        ))}
+        {root?.obs?.map((node, index) => (
           <FilterNode root={node} level={level + 1} key={index} />
         ))}
       </AccordionItem>
-      // </Accordion>
-    );
-  }
-  if (root?.obs?.length) {
-    return (
-      // <Accordion align="start">
-      <AccordionItem title={root.display}>
-        {root.obs.map((node, index) => (
-          <FilterNode root={node} level={level + 1} key={index} />
-        ))}
-      </AccordionItem>
-      // </Accordion>
     );
   }
 
   return (
-    <div className={styles.filterItem}>{root?.display}</div>
-    // <div className={styles.filterNode} style={{ paddingLeft: `${level + 1}rem` }}>
-    // </div>
+    <div className={styles.filterItem}>
+      <Checkbox
+        id={root?.display}
+        labelText={root?.display}
+        checked={state[root?.display]}
+        onChange={() => toggleVal(root?.display)}
+      />
+    </div>
   );
 };
 

@@ -10,7 +10,7 @@ import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
 
 export const hivMeta = {
-  name: 'hiv-care-and-treatment',
+  name: 'Hiv-care-and-treatment',
   slot: 'Hiv dashboard',
   config: { columns: 1, type: 'grid' },
   title: 'HIV Care and Treatment',

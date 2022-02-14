@@ -75,9 +75,7 @@ export const useTimelineData = (patientUuid: string, panelUuid?: string) => {
       };
 
     // look for the specified panelUuid. If none is specified, just take any obs
-    const [panelName, panelData] = panelUuid
-      ? Object.entries(sortedObs).find(([, { uuid }]) => uuid === panelUuid) || []
-      : Object.entries(sortedObs)?.[0] || [];
+    const [panelName, panelData] = Object.entries(sortedObs).find(([, { uuid }]) => uuid === panelUuid) || [];
 
     if (!panelData)
       return {
@@ -97,4 +95,79 @@ export const useTimelineData = (patientUuid: string, panelUuid?: string) => {
     };
   }, [sortedObs, loaded, error, panelUuid]);
   return timelineData;
+};
+
+/**
+ * Gets all patient sorted obs from usePatientResultsData,
+ * then transforms data to be used by DataTable
+ *
+ * @param patientUuid - required patient identifier
+ * @returns object of [{data, loaded, error?}] where data is formatted for use by the
+ * timeline data table
+ *
+ */
+export const useAllTimelineData = (patientUuid: string, panelUuid?: string) => {
+  const { sortedObs, loaded, error } = usePatientResultsData(patientUuid);
+
+  const timelineData = useMemo(() => {
+    if (!sortedObs || !loaded || !!error)
+      return {
+        data: [{ parsedTime: {} as ReturnType<typeof parseTime> }],
+        loaded,
+        error,
+      };
+    // look for the specified panelUuid. If none is specified, just take any obs
+    const obs = Object.entries(sortedObs) || [];
+
+    //   if (!panelData)
+    //     return {
+    //       data: { parsedTime: {} as ReturnType<typeof parseTime> },
+    //       loaded,
+    //       error: new Error('panel data missing'),
+    //     };
+    const outData = [];
+    obs.forEach((ob) => {
+      const [panelName, panelData] = ob;
+      const { entries } = panelData;
+      const times = entries.map((e) => e.effectiveDateTime);
+
+      const rowData = parseEntries(entries, panelData.type);
+      outData.push({ parsedTime: parseTime(times), rowData, panelName });
+    });
+
+    return {
+      data: outData,
+      loaded: true,
+    };
+  }, [sortedObs, loaded, error]);
+
+  return timelineData;
+};
+
+/**
+ * Very bad way to get panelUuid that for all tests that pertain to a patient
+ * Hopefully there's a better endpoint for this
+ *
+ * @param patientUuid - required patient identifier
+ * @returns Object of {data, loaded, error} where data is an object in format
+ * "PanelName": panelUuid
+ *
+ */
+export const usePatientPanels = (patientUuid: string) => {
+  const { sortedObs, loaded, error } = usePatientResultsData(patientUuid);
+
+  const panels = useMemo(() => {
+    if (!sortedObs || !loaded || !!error)
+      return {
+        data: [{ parsedTime: {} as ReturnType<typeof parseTime> }],
+        loaded,
+        error,
+      };
+
+    const outData = {};
+    Object.entries(sortedObs).forEach(([key, value]) => (outData[key] = value.uuid));
+    return { loaded: true, data: outData };
+  }, [sortedObs, loaded, error]);
+
+  return panels;
 };
