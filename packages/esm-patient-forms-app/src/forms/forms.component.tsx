@@ -6,8 +6,9 @@ import { ContentSwitcher, Switch, DataTableSkeleton, InlineLoading } from 'carbo
 import { CardHeader, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { useForms } from '../hooks/use-forms';
-import { useLayoutType } from '@openmrs/esm-framework';
+import { useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { isValidOfflineFormEncounter } from '../offline-forms/offline-form-helpers';
+import { ConfigObject } from '../config-schema';
 
 const enum FormsCategory {
   Recommended,
@@ -26,11 +27,14 @@ interface FormsProps {
 
 const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, urlLabel, isOffline }) => {
   const { t } = useTranslation();
+  const config = useConfig() as ConfigObject;
   const headerTitle = t('forms', 'Forms');
   const isTablet = useLayoutType() === 'tablet';
   const [formsCategory, setFormsCategory] = useState(FormsCategory.All);
   const { isValidating, data, error } = useForms(patientUuid, undefined, undefined, isOffline);
-  const formsToDisplay = data?.filter((formInfo) => isValidOfflineFormEncounter(formInfo.form));
+  const formsToDisplay = isOffline
+    ? data?.filter((formInfo) => isValidOfflineFormEncounter(formInfo.form, config.htmlFormEntryForms))
+    : data;
 
   if (!formsToDisplay && !error) {
     return <DataTableSkeleton role="progressbar" rowCount={5} />;

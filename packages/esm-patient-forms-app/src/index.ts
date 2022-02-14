@@ -1,5 +1,6 @@
 import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
+import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
 import OfflineToolsNavLink from './offline-forms/offline-tools-nav-link.component';
 
@@ -17,7 +18,7 @@ function setupOpenMRS() {
     moduleName,
   };
 
-  defineConfigSchema(moduleName, {});
+  defineConfigSchema(moduleName, configSchema);
 
   registerBreadcrumbs([
     {

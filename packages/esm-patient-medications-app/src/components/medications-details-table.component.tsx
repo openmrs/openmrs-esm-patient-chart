@@ -174,7 +174,7 @@ const MedicationsDetailsTable = connect<
             </Button>
           )}
         </CardHeader>
-        <TableContainer>
+        <TableContainer data-floating-menu-container>
           <DataTable
             size="short"
             headers={tableHeaders}
@@ -408,7 +408,7 @@ function OrderBasketItemActions({
   }, [items, setItems, medication]);
 
   return (
-    <OverflowMenu data-floating-menu-container selectorPrimaryFocus={'#modify'} flipped>
+    <OverflowMenu selectorPrimaryFocus={'#modify'} flipped>
       {showModifyButton && (
         <OverflowMenuItem
           className={styles.menuItem}

@@ -5,16 +5,16 @@ import {
   messageOmrsServiceWorker,
 } from '@openmrs/esm-framework';
 import { formEncounterUrl } from '../constants';
-import { CoreHTMLForms } from '../core-html-forms';
 import { FormEncounter, FormEncounterResource } from '../types';
 import escapeRegExp from 'lodash-es/escapeRegExp';
+import { HtmlFormEntryForm } from '../config-schema';
 
 /**
  * Returns whether the given form encounter is valid for offline mode and can be cached.
  * @param form The form encounter.
  */
-export function isValidOfflineFormEncounter(form: FormEncounter) {
-  const isHtmlForm = CoreHTMLForms.some((htmlForm) => htmlForm.formUuid === form.uuid);
+export function isValidOfflineFormEncounter(form: FormEncounter, htmlFormEntryForms: Array<HtmlFormEntryForm>) {
+  const isHtmlForm = htmlFormEntryForms.some((htmlForm) => htmlForm.formUuid === form.uuid);
   const hasJsonSchema = form.resources.some(isFormJsonSchema);
   return !isHtmlForm && hasJsonSchema;
 }
