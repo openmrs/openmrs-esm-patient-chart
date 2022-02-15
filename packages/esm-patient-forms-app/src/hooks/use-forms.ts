@@ -8,8 +8,8 @@ import { isFormFullyCached } from '../offline-forms/offline-form-helpers';
 export function useFormEncounters(cachedOfflineFormsOnly = false) {
   return useSWR([formEncounterUrl, cachedOfflineFormsOnly], async () => {
     const res = await openmrsFetch<ListResponse<FormEncounter>>(formEncounterUrl);
-    // Only show published forms
-    const forms = res.data?.results?.filter((form) => form.published) ?? [];
+    // show published forms and hide component forms
+    const forms = res.data?.results?.filter((form) => form.published && !form.name.includes('component')) ?? [];
 
     if (!cachedOfflineFormsOnly) {
       return forms;
