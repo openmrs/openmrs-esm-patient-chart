@@ -45,7 +45,7 @@ const NotesPagination: React.FC<FormsProps> = ({ notes, pageSize, pageUrl, urlLa
       paginatedNotes?.map((note) => ({
         ...note,
         id: `${note.id}`,
-        encounterDate: formatDate(parseDate(note.encounterDate), 'wide'),
+        encounterDate: formatDate(parseDate(note.encounterDate), { mode: 'wide' }),
       })),
     [paginatedNotes],
   );
