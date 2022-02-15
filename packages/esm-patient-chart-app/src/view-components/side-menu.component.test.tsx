@@ -13,12 +13,12 @@ jest.mock('@openmrs/esm-framework', () => ({
 jest.mock('./side-menu.component.scss', () => ({}));
 
 describe('sidemenu', () => {
-  it('is rendered when not viewport != tablet', () => {
+  it('is rendered when viewport != tablet', () => {
     (useLayoutType as jest.Mock).mockImplementationOnce(() => 'desktop');
     expect(render(<SideMenu />).getByText('rendered')).toBeTruthy();
   });
 
-  it('is not rendered when not viewport != tablet', () => {
+  it('is not rendered when viewport == tablet', () => {
     (useLayoutType as jest.Mock).mockImplementationOnce(() => 'tablet');
     expect(render(<SideMenu />).queryAllByText('rendered')).toHaveLength(0);
   });

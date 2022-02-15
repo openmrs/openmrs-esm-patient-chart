@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import usePatientResultsData from '../loadPatientTestData/usePatientResultsData';
 import { ObsRecord } from '@openmrs/esm-patient-common-lib';
-import dayjs from 'dayjs';
+import { formatDate, formatTime, parseDate } from '@openmrs/esm-framework';
 
 const parseTime = (sortedTimes: string[]) => {
   const yearColumns: Array<{ year: string; size: number }> = [],
@@ -9,10 +9,10 @@ const parseTime = (sortedTimes: string[]) => {
     timeColumns: string[] = [];
 
   sortedTimes.forEach((datetime) => {
-    const dayJsDate = dayjs(datetime);
-    const year = dayJsDate.year().toString();
-    const date = dayJsDate.format('DD - MMM');
-    const time = dayJsDate.format('HH:mm');
+    const parsedDate = parseDate(datetime);
+    const year = parsedDate.getFullYear().toString();
+    const date = formatDate(parsedDate, { mode: 'wide', year: false });
+    const time = formatTime(parsedDate);
 
     const yearColumn = yearColumns.find(({ year: innerYear }) => year === innerYear);
     if (yearColumn) yearColumn.size++;

@@ -1,7 +1,6 @@
 import React from 'react';
 import { capitalize } from 'lodash';
-import { age, usePatient } from '@openmrs/esm-framework';
-import dayjs from 'dayjs';
+import { age, formatDate, usePatient } from '@openmrs/esm-framework';
 import styles from './patient-details-tile.component.scss';
 
 interface PatientDetailsTileInterface {
@@ -18,7 +17,7 @@ const PatientDetailsTile: React.FC<PatientDetailsTileInterface> = ({ patientUuid
       </p>
       <div className={styles.details}>
         <span>{capitalize(patient?.gender)}</span> &middot; <span>{age(patient?.birthDate)}</span> &middot;{' '}
-        <span>{dayjs(patient?.birthDate).format('DD - MMM - YYYY')} </span>
+        <span>{formatDate(new Date(patient?.birthDate), { mode: 'wide', time: false })} </span>
       </div>
     </div>
   );

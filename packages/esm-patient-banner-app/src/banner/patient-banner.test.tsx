@@ -25,7 +25,7 @@ describe('PatientBanner: ', () => {
     expect(screen.getByRole('img')).toHaveClass('patientAvatar');
     expect(screen.getByText(/John Wilson/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /^Actions$/i })).toBeInTheDocument();
-    expect(screen.getByText(/04 - Apr - 1972/i)).toBeInTheDocument();
+    expect(screen.getByText(/04 — Apr — 1972/i)).toBeInTheDocument();
     expect(screen.getByText(/100732HE, 100GEJ/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /^Show all details$/i })).toBeInTheDocument();
   });

@@ -1,5 +1,4 @@
 import React, { MouseEvent } from 'react';
-import dayjs from 'dayjs';
 import capitalize from 'lodash-es/capitalize';
 import ChevronDown16 from '@carbon/icons-react/es/chevron--down/16';
 import ChevronUp16 from '@carbon/icons-react/es/chevron--up/16';
@@ -9,7 +8,7 @@ import CustomOverflowMenuComponent from '../ui-components/overflow-menu.componen
 import styles from './patient-banner.scss';
 import { useTranslation } from 'react-i18next';
 import { Button } from 'carbon-components-react';
-import { ExtensionSlot, age } from '@openmrs/esm-framework';
+import { ExtensionSlot, age, formatDate, parseDate } from '@openmrs/esm-framework';
 
 interface PatientBannerProps {
   patient: fhir.Patient;
@@ -87,7 +86,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, onC
           </div>
           <div className={styles.demographics}>
             <span>{capitalize(patient.gender)}</span> &middot; <span>{age(patient.birthDate)}</span> &middot;{' '}
-            <span>{dayjs(patient.birthDate).format('DD - MMM - YYYY')}</span>
+            <span>{formatDate(parseDate(patient.birthDate), { mode: 'wide', time: false })}</span>
           </div>
           <div className={styles.row}>
             <span className={styles.identifiers}>

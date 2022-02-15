@@ -1,17 +1,12 @@
 import React, { useState, useMemo } from 'react';
-import dayjs from 'dayjs';
 import styles from '../visit-detail-overview.scss';
 import MedicationSummary from './medications-summary.component';
 import NotesSummary from './notes-summary.component';
 import TestsSummary from './tests-summary.component';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs } from 'carbon-components-react';
-import { OpenmrsResource, useConfig } from '@openmrs/esm-framework';
+import { formatTime, OpenmrsResource, parseDate, useConfig } from '@openmrs/esm-framework';
 import { Order, Encounter, Note, Observation, OrderItem } from '../visit.resource';
-
-function formatTime(date) {
-  return dayjs(date).format('hh:mm');
-}
 
 interface DiagnosisItem {
   diagnosis: string;
@@ -66,7 +61,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid }) 
               name: enc.encounterProviders.length ? enc.encounterProviders[0].provider.person.display : '',
               role: enc.encounterProviders.length ? enc.encounterProviders[0].encounterRole.display : '',
             },
-            time: formatTime(obs.obsDatetime),
+            time: formatTime(parseDate(obs.obsDatetime)),
             concept: obs.concept,
           });
         }

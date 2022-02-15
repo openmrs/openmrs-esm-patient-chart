@@ -4,7 +4,15 @@ import EmptyFormView from './empty-form.component';
 import isEmpty from 'lodash-es/isEmpty';
 import first from 'lodash-es/first';
 import debounce from 'lodash-es/debounce';
-import { navigate, useConfig, useLayoutType, usePagination, useVisit, Visit } from '@openmrs/esm-framework';
+import {
+  formatDatetime,
+  navigate,
+  useConfig,
+  useLayoutType,
+  usePagination,
+  useVisit,
+  Visit,
+} from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
@@ -21,7 +29,6 @@ import {
 } from 'carbon-components-react';
 import { PatientChartPagination, launchPatientWorkspace, formEntrySub } from '@openmrs/esm-patient-common-lib';
 import { CompletedFormInfo } from '../types';
-import dayjs from 'dayjs';
 import Edit20 from '@carbon/icons-react/es/edit/20';
 import { ConfigObject, HtmlFormEntryForm } from '../config-schema';
 
@@ -59,15 +66,6 @@ function launchFormEntry(
 function launchWorkSpace(formUuid: string, patient: fhir.Patient, visitUuid?: string, encounterUuid?: string) {
   formEntrySub.next({ formUuid, visitUuid, patient, encounterUuid });
   launchPatientWorkspace('patient-form-entry-workspace');
-}
-
-function formatDate(strDate: string | Date) {
-  const date = dayjs(strDate);
-  const today = dayjs(new Date());
-  if (date.date() === today.date() && date.month() === today.month() && date.year() === today.year()) {
-    return `Today @ ${date.format('HH:mm')}`;
-  }
-  return date.format('DD - MMM - YYYY @ HH:mm');
 }
 
 interface FormViewProps {
@@ -117,7 +115,7 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
       results?.map((formInfo) => {
         return {
           id: formInfo.form.uuid,
-          lastCompleted: formInfo.lastCompleted ? formatDate(formInfo.lastCompleted) : undefined,
+          lastCompleted: formInfo.lastCompleted ? formatDatetime(formInfo.lastCompleted) : undefined,
           formName: formInfo.form.name,
           formUuid: formInfo.form.uuid,
           encounterUuid: formInfo?.associatedEncounters[0]?.uuid,
