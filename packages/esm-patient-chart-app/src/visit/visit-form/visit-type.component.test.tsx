@@ -26,7 +26,7 @@ describe('VisitTypeOverview', () => {
       currentPage: 1,
     });
     mockUseVisitTypes.mockReturnValue(mockVisitTypes);
-    render(<VisitTypeOverview isTablet={true} onChange={mockHandleChange} />);
+    render(<VisitTypeOverview onChange={mockHandleChange} />);
   };
 
   it('should be able to search for a visit type', () => {

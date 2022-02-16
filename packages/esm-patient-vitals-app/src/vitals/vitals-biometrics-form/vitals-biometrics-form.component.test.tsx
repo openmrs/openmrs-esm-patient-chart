@@ -37,7 +37,6 @@ jest.mock('../vitals.resource', () => ({
 const testProps = {
   patientUuid: mockPatient.id,
   closeWorkspace: () => {},
-  isTablet: false,
 };
 
 describe('VitalsBiometricsForm: ', () => {

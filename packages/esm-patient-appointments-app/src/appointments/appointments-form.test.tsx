@@ -16,7 +16,6 @@ const closeWorkspace = jest.fn();
 
 const testProps = {
   closeWorkspace,
-  isTablet: false,
   patientUuid: mockPatient.id,
 };
 

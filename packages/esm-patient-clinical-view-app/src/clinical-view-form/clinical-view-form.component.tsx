@@ -6,7 +6,7 @@ import cloneDeep from 'lodash-es/cloneDeep';
 import set from 'lodash-es/set';
 import { Search, Checkbox, Button, StructuredListSkeleton, ButtonSet } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
-import { temporaryConfigStore, TemporaryConfigStore } from '@openmrs/esm-framework';
+import { temporaryConfigStore, TemporaryConfigStore, useLayoutType } from '@openmrs/esm-framework';
 import { useClinicalView } from '../store';
 import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 
@@ -16,8 +16,9 @@ interface View {
   checked: boolean;
 }
 
-const ClinicalViewForm: React.FC<DefaultWorkspaceProps> = ({ isTablet, closeWorkspace }) => {
+const ClinicalViewForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace }) => {
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
   const { views, clinicalViews } = useClinicalView();
   const moduleName = '@openmrs/esm-patient-clinical-view-app';
   const path = useMemo(() => [moduleName, 'clinicalViews'], []);

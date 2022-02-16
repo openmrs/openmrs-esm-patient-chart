@@ -11,5 +11,4 @@ export enum WorkspaceWindowState {
 export interface DefaultWorkspaceProps {
   closeWorkspace(): void;
   patientUuid: string;
-  isTablet: boolean;
 }

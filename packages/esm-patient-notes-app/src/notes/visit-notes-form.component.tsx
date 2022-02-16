@@ -20,7 +20,14 @@ import {
   ButtonSet,
 } from 'carbon-components-react';
 import Add16 from '@carbon/icons-react/es/add/16';
-import { createErrorHandler, showNotification, showToast, useConfig, useSessionUser } from '@openmrs/esm-framework';
+import {
+  createErrorHandler,
+  showNotification,
+  showToast,
+  useConfig,
+  useLayoutType,
+  useSessionUser,
+} from '@openmrs/esm-framework';
 import { convertToObsPayload } from './visit-note.util';
 import { fetchDiagnosisByName, fetchLocationByUuid, fetchProviderByUuid, saveVisitNote } from './visit-notes.resource';
 import { ConfigObject } from '../config-schema';
@@ -36,8 +43,9 @@ const encountersCustomRepresentation =
   'auditInfo:(creator:(display),changedBy:(display)),' +
   'encounterProviders:(provider:(person:(display))))';
 
-const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patientUuid, isTablet }) => {
+const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patientUuid }) => {
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
   const session = useSessionUser();
   const config = useConfig() as ConfigObject;
   const { clinicianEncounterRole, encounterNoteTextConceptUuid, encounterTypeUuid, formConceptUuid } =

@@ -3,7 +3,14 @@ import * as SWR from 'swr';
 import { throwError } from 'rxjs';
 import { of } from 'rxjs/internal/observable/of';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { createErrorHandler, openmrsFetch, showNotification, showToast, useLocations } from '@openmrs/esm-framework';
+import {
+  createErrorHandler,
+  openmrsFetch,
+  showNotification,
+  showToast,
+  useLayoutType,
+  useLocations,
+} from '@openmrs/esm-framework';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import {
   mockCareProgramsResponse,
@@ -15,7 +22,6 @@ import ProgramsForm from './programs-form.component';
 
 const testProps = {
   patientUuid: mockPatient.id,
-  isTablet: false,
   closeWorkspace: jest.fn(),
 };
 
@@ -24,6 +30,7 @@ const mockCreateProgramEnrollment = createProgramEnrollment as jest.Mock;
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockShowNotification = showNotification as jest.Mock;
 const mockShowToast = showToast as jest.Mock;
+const mockUseLayoutType = useLayoutType as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -84,7 +91,7 @@ describe('ProgramsForm: ', () => {
   });
 
   it('renders a light background for date inputs in the tablet viewport ', () => {
-    testProps.isTablet = true;
+    mockUseLayoutType.mockReturnValueOnce('tablet').mockReturnValueOnce('tablet');
 
     renderProgramsForm();
 

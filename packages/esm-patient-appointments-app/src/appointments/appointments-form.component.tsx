@@ -14,21 +14,21 @@ import {
   TimePicker,
 } from 'carbon-components-react';
 import { amPm, convertTime12to24 } from '@openmrs/esm-patient-common-lib';
-import { useLocations, useSessionUser, showToast, showNotification } from '@openmrs/esm-framework';
+import { useLocations, useSessionUser, showToast, showNotification, useLayoutType } from '@openmrs/esm-framework';
 import { appointmentsSearchUrl, createAppointment, useAppointmentService } from './appointments.resource';
 import styles from './appointments-form.scss';
 import { AppointmentPayload } from '../types';
 
 interface AppointmentsFormProps {
   closeWorkspace: () => {};
-  isTablet: boolean;
   patientUuid: string;
 }
 
 const appointmentTypes = [{ name: 'Scheduled' }, { name: 'WalkIn' }];
 
-const AppointmentsForm: React.FC<AppointmentsFormProps> = ({ patientUuid, isTablet, closeWorkspace }) => {
+const AppointmentsForm: React.FC<AppointmentsFormProps> = ({ patientUuid, closeWorkspace }) => {
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
   const locations = useLocations();
   const session = useSessionUser();
   const [appointmentNote, setAppointmentNote] = useState('');
