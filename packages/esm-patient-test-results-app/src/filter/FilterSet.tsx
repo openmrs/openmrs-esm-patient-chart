@@ -55,8 +55,8 @@ const FilterSet = ({ root, maxNest }: FilterProps) => {
             />
           }
         >
-          {root?.subSets?.map((node) => (
-            <FilterNode root={node} level={0} maxNest={maxNest} />
+          {root?.subSets?.map((node, index) => (
+            <FilterNode root={node} level={0} maxNest={maxNest} key={index} />
           ))}
         </AccordionItem>
       </Accordion>
