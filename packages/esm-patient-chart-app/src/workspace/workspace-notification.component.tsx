@@ -4,6 +4,9 @@ import { Button, ComposedModal, ModalBody, ModalFooter, ModalHeader } from 'carb
 import { useTranslation } from 'react-i18next';
 import styles from './workspace-notification.component.scss';
 
+// t('activeFormWarning', 'There is an active form open in the workspace')
+// t('workspaceModalText', 'Launching a new form in the workspace could cause you to lose unsaved work on the {formName} form.')
+
 const WorkspaceNotification: React.FC = () => {
   const { t } = useTranslation();
   const { prompt } = useWorkspaces();

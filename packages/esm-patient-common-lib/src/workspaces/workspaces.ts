@@ -120,13 +120,11 @@ export function launchPatientWorkspace(name: string, additionalProps?: object) {
     } else {
       const currentName = existingWorkspaces[0].title ?? existingWorkspaces[0].name;
       const prompt: Prompt = {
-        // t('activeFormWarning', 'There is an active form open in the workspace')
         title: translateFrom(
           '@openmrs/esm-patient-chart-app',
           'activeFormWarning',
           'There is an active form open in the workspace',
         ),
-        // t('workspaceModalText', 'Launching a new form in the workspace could cause you to lose unsaved work on the {formName} form.')
         body: translateFrom(
           '@openmrs/esm-patient-chart-app',
           'workspaceModalText',
