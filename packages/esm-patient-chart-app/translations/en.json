@@ -37,6 +37,7 @@
   "noNotesFound": "No notes found",
   "noObservationsFound": "No observations found",
   "notes": "Notes",
+  "openAnyway": "Open anyway",
   "orderDurationAndUnit": "for {duration} {durationUnit}",
   "orderIndefiniteDuration": "Indefinite duration",
   "pastVisitErrorText": "Past Visit Error",
