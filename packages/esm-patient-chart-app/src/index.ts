@@ -1,4 +1,5 @@
 import capitalize from 'lodash-es/capitalize';
+import replace from 'lodash-es/replace';
 import { registerBreadcrumbs, defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { esmPatientChartSchema } from './config-schema';
@@ -108,7 +109,6 @@ function setupOpenMRS() {
           view: 'visits',
         },
       },
-      ,
       {
         name: 'past-visits-overview',
         load: getAsyncLifecycle(() => import('./visit/past-visit-overview.component'), {
