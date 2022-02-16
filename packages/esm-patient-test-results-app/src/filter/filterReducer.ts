@@ -24,14 +24,6 @@ const reducer = (state, action) => {
         checkboxes: action.initialState,
         parents: computeParents(action.initialState, action.tree).parents,
       };
-    case 'updateCheckboxes':
-      return {
-        ...state,
-        checkboxes: {
-          ...state.checkboxes,
-          ...action.payload,
-        },
-      };
     case 'toggleVal':
       return {
         ...state,

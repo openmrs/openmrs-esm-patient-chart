@@ -9,6 +9,7 @@ import { MultiTimeline } from '../timeline/Timeline';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 
 const DataLoader = ({ sortedObs }) => {
+  // this is a bad way to do this. Appoogies in advance
   const { state, initialize } = useContext(FilterContext);
   useEffect(() => {
     const tests = (sortedObs && Object.keys(sortedObs)) || [];
