@@ -8,11 +8,6 @@ import { usePatient } from '@openmrs/esm-framework';
 import { MultiTimeline } from '../timeline/Timeline';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 
-const StatePrinter = () => {
-  const { state } = useContext(FilterContext);
-  return <pre>{JSON.stringify(state, null, 2)}</pre>;
-};
-
 const DataLoader = ({ sortedObs }) => {
   const { state, initialize } = useContext(FilterContext);
   useEffect(() => {
@@ -29,32 +24,29 @@ const HIVCareAndTreatment = () => {
   const patientUuid = patient?.patient?.id;
   const { sortedObs, loaded, error } = usePatientResultsData(patientUuid);
   return (
-    <div>
-      <FilterProvider>
-        {!loaded && <InlineLoading />}
-        {error && <ErrorState error={error} headerTitle="Data Load Error" />}
-        {loaded && !error && sortedObs && Object.keys(sortedObs).length && (
-          <>
-            <DataLoader sortedObs={sortedObs} />
-            <Grid>
-              <Row>
-                <Column sm={16} lg={4}>
-                  <FilterSet root={concepts} />
-                </Column>
-                <Column sm={16} lg={8}>
-                  <MultiTimeline patientUuid={patientUuid} />
-                </Column>
-              </Row>
-            </Grid>
-          </>
-        )}
-        {loaded && !error && sortedObs && !Object.keys(sortedObs).length && (
-          <EmptyState displayText="observations" headerTitle="Data Timeline" />
-        )}
-      </FilterProvider>
-    </div>
+    <FilterProvider>
+      {!loaded && <InlineLoading />}
+      {error && <ErrorState error={error} headerTitle="Data Load Error" />}
+      {loaded && !error && sortedObs && !!Object.keys(sortedObs).length && (
+        <>
+          <DataLoader sortedObs={sortedObs} />
+          <Grid>
+            <Row>
+              <Column sm={16} lg={4}>
+                <FilterSet root={concepts} />
+              </Column>
+              <Column sm={16} lg={8}>
+                <MultiTimeline patientUuid={patientUuid} />
+              </Column>
+            </Row>
+          </Grid>
+        </>
+      )}
+      {loaded && !error && sortedObs && !Object.keys(sortedObs).length && (
+        <EmptyState displayText="observations" headerTitle="Data Timeline" />
+      )}
+    </FilterProvider>
   );
 };
 
 export default HIVCareAndTreatment;
-export { StatePrinter };

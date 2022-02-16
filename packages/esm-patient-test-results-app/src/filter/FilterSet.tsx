@@ -3,23 +3,40 @@ import styles from './styles.scss';
 import { Accordion, AccordionItem, Checkbox } from 'carbon-components-react';
 import FilterContext from './FilterContext';
 
+interface Observation {
+  display: string;
+}
+interface TreeNode {
+  display: string;
+  concept?: string;
+  subSets: TreeNode[];
+  obs: Observation[];
+}
+
 interface FilterProps {
-  root: any;
+  root: TreeNode;
   maxNest?: number;
-  children?: any;
+  children?: React.ReactNode;
 }
 
 interface FilterNodeProps {
-  root: any;
+  root: TreeNode;
   level: number;
   maxNest?: number;
-  children?: any;
 }
+
+interface FilterLeafProps {
+  leaf: Observation;
+}
+
+const isIndeterminate = (kids, checkboxes) => {
+  return !kids?.every((kid) => checkboxes[kid]) && !kids?.every((kid) => !checkboxes[kid]);
+};
 
 const FilterSet = ({ root, maxNest }: FilterProps) => {
   const { someChecked, parents, checkboxes, updateParent } = useContext(FilterContext);
   const parent = Object.keys(parents).includes(root.display);
-  const indeterminate = parent ? calcIndeterminate(parents[root.display], checkboxes) : false;
+  const indeterminate = parent ? isIndeterminate(parents[root.display], checkboxes) : false;
   const allChildrenChecked = parents[root.display]?.every((kid) => checkboxes[kid]);
 
   return (
@@ -46,49 +63,47 @@ const FilterSet = ({ root, maxNest }: FilterProps) => {
     </div>
   );
 };
-const calcIndeterminate = (kids, checkboxes) => {
-  return !kids?.every((kid) => checkboxes[kid]) && !kids?.every((kid) => !checkboxes[kid]);
-};
 
 const FilterNode = ({ root, level, maxNest = 3 }: FilterNodeProps) => {
   const { checkboxes, toggleVal, parents, updateParent } = useContext(FilterContext);
   const parent = Object.keys(parents).includes(root.display);
-  const indeterminate = parent ? calcIndeterminate(parents[root.display], checkboxes) : false;
+  const indeterminate = parent ? isIndeterminate(parents[root.display], checkboxes) : false;
   const allChildrenChecked = parents[root.display]?.every((kid) => checkboxes[kid]);
 
-  if (root?.subSets?.length || root?.obs?.length) {
-    return (
-      <Accordion>
-        <AccordionItem
-          title={
-            <Checkbox
-              id={root?.display}
-              checked={allChildrenChecked}
-              indeterminate={indeterminate}
-              labelText={`${root?.display} (${parents?.[root?.display]?.length})`}
-              onChange={() => updateParent(root.display)}
-            />
-          }
-          style={{ paddingLeft: level > 0 && level < maxNest ? '1em' : '0' }}
-        >
-          {root?.subSets?.map((node, index) => (
-            <FilterNode root={node} level={level + 1} maxNest={maxNest} key={index} />
-          ))}
-          {root?.obs?.map((node, index) => (
-            <FilterNode root={node} level={level + 1} key={index} />
-          ))}
-        </AccordionItem>
-      </Accordion>
-    );
-  }
+  return (
+    <Accordion>
+      <AccordionItem
+        title={
+          <Checkbox
+            id={root?.display}
+            checked={allChildrenChecked}
+            indeterminate={indeterminate}
+            labelText={`${root?.display} (${parents?.[root?.display]?.length})`}
+            onChange={() => updateParent(root.display)}
+          />
+        }
+        style={{ paddingLeft: level > 0 && level < maxNest ? '1rem' : '0px' }}
+      >
+        {root?.subSets?.map((node, index) => (
+          <FilterNode root={node} level={level + 1} maxNest={maxNest} key={index} />
+        ))}
+        {root?.obs?.map((obs, index) => (
+          <FilterLeaf leaf={obs} key={index} />
+        ))}
+      </AccordionItem>
+    </Accordion>
+  );
+};
 
+const FilterLeaf = ({ leaf }: FilterLeafProps) => {
+  const { checkboxes, toggleVal, parents, updateParent } = useContext(FilterContext);
   return (
     <div className={styles.filterItem}>
       <Checkbox
-        id={root?.display}
-        labelText={root?.display}
-        checked={checkboxes?.[root?.display]}
-        onChange={() => toggleVal(root?.display)}
+        id={leaf?.display}
+        labelText={leaf?.display}
+        checked={checkboxes?.[leaf?.display]}
+        onChange={() => toggleVal(leaf?.display)}
       />
     </div>
   );

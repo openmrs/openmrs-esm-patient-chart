@@ -8,7 +8,7 @@
 }
 
 .filterContainerActive {
-  border-left: 0.2rem solid $brand-02;
+  border-left: 0.2rem solid var(--brand-01);
 }
 
 .filterNode {
@@ -17,7 +17,7 @@
 
 .filterItem {
   padding: 0.5rem 1rem 0.5rem 4rem;
-  border-bottom: 1px solid lightgray;
+  border-bottom: 1px solid $ui-03;
 }
 
 .nestedAccordion :global {
@@ -44,13 +44,10 @@
   .bx--accordion__item--active > .bx--accordion__heading > .bx--accordion__arrow {
     /*rtl:ignore*/
     transform: rotate(-90deg);
-    fill: #3d70b2;
+    fill: var(--brand-01);
   }
 
   .bx--accordion--start > .bx--accordion__item > button[aria-expanded="true"] {
-    background-color: rgb(231, 231, 231);
-    &:hover {
-      background-color: rgb(179, 179, 179);
-    }
+    background-color: $ui-03;
   }
 }
