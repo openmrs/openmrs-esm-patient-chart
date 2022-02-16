@@ -35,7 +35,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
   const headerTitle = t('vitals', 'Vitals');
   const [chartView, setChartView] = React.useState<boolean>();
 
-  const { data: vitals, isError, isLoading, isValidating } = useVitals(patientUuid);
+  const { vitals, isError, isLoading, isValidating } = useVitals(patientUuid);
   const { data: conceptUnits } = useVitalsConceptMetadata();
 
   const launchVitalsBiometricsForm = React.useCallback(

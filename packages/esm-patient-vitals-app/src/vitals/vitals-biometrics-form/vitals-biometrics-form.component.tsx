@@ -23,7 +23,7 @@ interface VitalsAndBiometricFormProps {
   closeWorkspace(): void;
 }
 
-export interface PatientVitalAndBiometric {
+export interface PatientVitalsAndBiometrics {
   systolicBloodPressure: string;
   diastolicBloodPressure: string;
   pulse: string;
@@ -42,7 +42,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
   const config = useConfig() as ConfigObject;
   const { data: conceptUnits, conceptMetadata } = useVitalsConceptMetadata();
   const biometricsUnitsSymbols = config.biometrics;
-  const [patientVitalAndBiometrics, setPatientVitalAndBiometrics] = useState<PatientVitalAndBiometric>();
+  const [patientVitalAndBiometrics, setPatientVitalAndBiometrics] = useState<PatientVitalsAndBiometrics>();
   const [patientBMI, setPatientBMI] = useState<number>();
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
