@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@ampath-kenya/ngx-formentry@^3.0.0-alpha12":
-  version "3.0.0-alpha13"
-  resolved "https://registry.yarnpkg.com/@ampath-kenya/ngx-formentry/-/ngx-formentry-3.0.0-alpha13.tgz#4f2f0effc193ef5cb7460320306669e5a2454df2"
-  integrity sha512-6lLCTJ8tNdUgPCXk1t7wu7ae+5T+4HQfRvbvWf27uio/KcrTo7/ePVugBfF8QlaCF8xAv3Q9X8rIl9n/ERj6hw==
+"@ampath-kenya/ngx-formentry@^3.0.0-alpha15.0":
+  version "3.0.0-alpha15.0"
+  resolved "https://registry.yarnpkg.com/@ampath-kenya/ngx-formentry/-/ngx-formentry-3.0.0-alpha15.0.tgz#4a38e84e88719f85182add8f2c72e1425e62af9e"
+  integrity sha512-3fJmfeb9YoWkLtHTsei93MwMygrJllg+J8trm8rRajekc9HH+0MnNHIx+HGXTcSaDm91X0Ia/NXJiunLfM1tIQ==
   dependencies:
     tslib "^2.0.0"
 
@@ -155,6 +155,13 @@
     "@angular-devkit/core" "11.2.18"
     ora "5.3.0"
     rxjs "6.6.3"
+
+"@angular-extensions/elements@11.0.1":
+  version "11.0.1"
+  resolved "https://registry.yarnpkg.com/@angular-extensions/elements/-/elements-11.0.1.tgz#9ef08c65d9d65037056e3eafdfab2cf82132d70c"
+  integrity sha512-qiJ++q4m6etf8B4ltLz+lYbKnGjEw8SI13NnUmZVNE2tXdcXvIOTB1QQ2qIf5rtY2BrT5UxEZuDxJM9HMuCfvg==
+  dependencies:
+    tslib "^2.0.0"
 
 "@angular/animations@~11.2.14":
   version "11.2.14"
