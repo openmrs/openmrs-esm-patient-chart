@@ -9,7 +9,7 @@ export function useFormEncounters(cachedOfflineFormsOnly = false) {
   return useSWR([formEncounterUrl, cachedOfflineFormsOnly], async () => {
     const res = await openmrsFetch<ListResponse<FormEncounter>>(formEncounterUrl);
     // show published forms and hide component forms
-    const forms = res.data?.results?.filter((form) => form.published && !form.name.includes('component')) ?? [];
+    const forms = res.data?.results?.filter((form) => form.published && !/component/i.test(form.name)) ?? [];
 
     if (!cachedOfflineFormsOnly) {
       return forms;
