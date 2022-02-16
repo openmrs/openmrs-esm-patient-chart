@@ -1,5 +1,4 @@
 import React from 'react';
-import dayjs from 'dayjs';
 import Add16 from '@carbon/icons-react/es/add/16';
 import styles from './conditions-detailed-summary.scss';
 import capitalize from 'lodash-es/capitalize';
@@ -20,6 +19,7 @@ import {
 import { Condition, useConditions } from './conditions.resource';
 import { CardHeader, EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { useConditionsContext } from './conditions.context';
+import { formatDate, parseDate } from '@openmrs/esm-framework';
 
 const ConditionsDetailedSummary: React.FC = () => {
   const { t } = useTranslation();
@@ -52,7 +52,7 @@ const ConditionsDetailedSummary: React.FC = () => {
         ...condition,
         id: condition.id,
         condition: condition.display,
-        onsetDateTime: dayjs(condition.onsetDateTime).format('MMM-YYYY'),
+        onsetDateTime: formatDate(parseDate(condition.onsetDateTime), { time: false, day: false }),
         status: capitalize(condition.clinicalStatus),
       };
     });

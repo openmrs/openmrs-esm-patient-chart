@@ -1,5 +1,4 @@
 import React from 'react';
-import dayjs from 'dayjs';
 import Add16 from '@carbon/icons-react/es/add/16';
 import filter from 'lodash-es/filter';
 import includes from 'lodash-es/includes';

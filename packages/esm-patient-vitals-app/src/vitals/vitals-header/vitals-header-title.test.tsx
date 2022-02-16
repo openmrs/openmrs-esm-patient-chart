@@ -1,7 +1,4 @@
 import React from 'react';
-import dayjs from 'dayjs';
-import isToday from 'dayjs/plugin/isToday';
-dayjs.extend(isToday);
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
@@ -58,7 +55,7 @@ describe('VitalsHeaderTitle: ', () => {
 
     expect(screen.getByText(/Record Vitals/i)).toBeInTheDocument();
     expect(screen.getByText(/Vitals & Biometrics/i)).toBeInTheDocument();
-    expect(screen.getByText(/Last recorded: 12 - Mar - 2019/i)).toBeInTheDocument();
+    expect(screen.getByText(/Last Recorded: 12 — Mar — 2019/i)).toBeInTheDocument();
     expect(screen.getByTitle(/warningfilled/i)).toBeInTheDocument();
 
     const ChevronDown = screen.queryByTitle(/ChevronDown/);

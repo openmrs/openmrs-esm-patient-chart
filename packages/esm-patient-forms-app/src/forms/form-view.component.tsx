@@ -4,7 +4,15 @@ import EmptyFormView from './empty-form.component';
 import isEmpty from 'lodash-es/isEmpty';
 import first from 'lodash-es/first';
 import debounce from 'lodash-es/debounce';
-import { navigate, useLayoutType, usePagination, useVisit, Visit } from '@openmrs/esm-framework';
+import {
+  formatDatetime,
+  navigate,
+  useConfig,
+  useLayoutType,
+  usePagination,
+  useVisit,
+  Visit,
+} from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
@@ -19,11 +27,10 @@ import {
   DataTableHeader,
   DataTableRow,
 } from 'carbon-components-react';
-import { CoreHTMLForms } from '../core-html-forms';
 import { PatientChartPagination, launchPatientWorkspace, formEntrySub } from '@openmrs/esm-patient-common-lib';
 import { CompletedFormInfo } from '../types';
-import dayjs from 'dayjs';
 import Edit20 from '@carbon/icons-react/es/edit/20';
+import { ConfigObject, HtmlFormEntryForm } from '../config-schema';
 
 function startVisitPrompt() {
   window.dispatchEvent(
@@ -39,15 +46,16 @@ function launchFormEntry(
   currentVisit: Visit | undefined,
   formUuid: string,
   patient: fhir.Patient,
+  htmlFormEntryForms: Array<HtmlFormEntryForm>,
   encounterUuid?: string,
 ) {
   if (currentVisit) {
-    const htmlForm = findHtmlForm(formUuid);
+    const htmlForm = htmlFormEntryForms.find((form) => form.formUuid === formUuid);
     if (isEmpty(htmlForm)) {
       launchWorkSpace(formUuid, patient, currentVisit?.uuid, encounterUuid);
     } else {
       navigate({
-        to: `\${openmrsBase}/htmlformentryui/htmlform/${htmlForm.UIPage}.page?patientId=${patient.id}&definitionUiResource=referenceapplication:htmlforms/${htmlForm.formAppUrl}.xml`,
+        to: `\${openmrsBase}/htmlformentryui/htmlform/${htmlForm.formUiPage}.page?patientId=${patient.id}&definitionUiResource=referenceapplication:htmlforms/${htmlForm.formAppUrl}.xml`,
       });
     }
   } else {
@@ -58,20 +66,6 @@ function launchFormEntry(
 function launchWorkSpace(formUuid: string, patient: fhir.Patient, visitUuid?: string, encounterUuid?: string) {
   formEntrySub.next({ formUuid, visitUuid, patient, encounterUuid });
   launchPatientWorkspace('patient-form-entry-workspace');
-}
-
-function findHtmlForm(formUuid: string) {
-  const htmlForms = CoreHTMLForms;
-  return htmlForms.find((form) => form.formUuid === formUuid);
-}
-
-function formatDate(strDate: string | Date) {
-  const date = dayjs(strDate);
-  const today = dayjs(new Date());
-  if (date.date() === today.date() && date.month() === today.month() && date.year() === today.year()) {
-    return `Today @ ${date.format('HH:mm')}`;
-  }
-  return date.format('DD - MMM - YYYY @ HH:mm');
 }
 
 interface FormViewProps {
@@ -85,6 +79,8 @@ interface FormViewProps {
 
 const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSize, pageUrl, urlLabel }) => {
   const { t } = useTranslation();
+  const config = useConfig() as ConfigObject;
+  const htmlFormEntryForms = config.htmlFormEntryForms;
   const isDesktop = useLayoutType() === 'desktop';
   const { currentVisit } = useVisit(patientUuid);
   const [searchTerm, setSearchTerm] = useState<string>(null);
@@ -119,7 +115,7 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
       results?.map((formInfo) => {
         return {
           id: formInfo.form.uuid,
-          lastCompleted: formInfo.lastCompleted ? formatDate(formInfo.lastCompleted) : undefined,
+          lastCompleted: formInfo.lastCompleted ? formatDatetime(formInfo.lastCompleted) : undefined,
           formName: formInfo.form.name,
           formUuid: formInfo.form.uuid,
           encounterUuid: formInfo?.associatedEncounters[0]?.uuid,
@@ -171,7 +167,7 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
                             <TableCell>{row.cells[0].value ?? t('never', 'Never')}</TableCell>
                             <TableCell className={styles.tableCell}>
                               <label
-                                onClick={() => launchFormEntry(currentVisit, row.id, patient)}
+                                onClick={() => launchFormEntry(currentVisit, row.id, patient, htmlFormEntryForms)}
                                 role="presentation"
                                 className={styles.formName}
                               >
@@ -185,6 +181,7 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
                                       currentVisit,
                                       row.id,
                                       patient,
+                                      htmlFormEntryForms,
                                       first(results[index].associatedEncounters)?.uuid,
                                     )
                                   }

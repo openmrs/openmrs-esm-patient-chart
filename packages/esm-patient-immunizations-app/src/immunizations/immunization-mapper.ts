@@ -1,10 +1,10 @@
+import { formatDate, parseDate } from '@openmrs/esm-framework';
 import find from 'lodash-es/find';
 import get from 'lodash-es/get';
 import groupBy from 'lodash-es/groupBy';
 import isUndefined from 'lodash-es/isUndefined';
 import map from 'lodash-es/map';
 import orderBy from 'lodash-es/orderBy';
-import dayjs from 'dayjs';
 import {
   Code,
   FHIRImmunizationBundle,
@@ -24,8 +24,8 @@ const mapToImmunizationDose = (immunizationBundleEntry: FHIRImmunizationBundleEn
   const protocolApplied = immunizationResource?.protocolApplied?.length > 0 && immunizationResource?.protocolApplied[0];
   const sequenceLabel = protocolApplied?.series;
   const sequenceNumber = protocolApplied?.doseNumberPositiveInt;
-  const occurrenceDateTime = dayjs(immunizationResource?.occurrenceDateTime).format('YYYY-MM-DD');
-  const expirationDate = dayjs(immunizationResource?.expirationDate).format('YYYY-MM-DD');
+  const occurrenceDateTime = formatDate(new Date(immunizationResource?.occurrenceDateTime));
+  const expirationDate = formatDate(new Date(immunizationResource?.expirationDate));
 
   return {
     immunizationObsUuid,
@@ -86,8 +86,8 @@ export const mapToFHIRImmunizationResource = (
     },
     patient: toReferenceOfType('Patient', immunizationFormData.patientUuid),
     encounter: toReferenceOfType('Encounter', visitUuid), //Reference of visit instead of encounter
-    occurrenceDateTime: dayjs(immunizationFormData.vaccinationDate).toDate(),
-    expirationDate: dayjs(immunizationFormData.expirationDate).toDate(),
+    occurrenceDateTime: parseDate(immunizationFormData.vaccinationDate),
+    expirationDate: parseDate(immunizationFormData.expirationDate),
     location: toReferenceOfType('Location', locationUuid),
     performer: [{ actor: toReferenceOfType('Practitioner', providerUuid) }],
     manufacturer: { display: immunizationFormData.manufacturer },

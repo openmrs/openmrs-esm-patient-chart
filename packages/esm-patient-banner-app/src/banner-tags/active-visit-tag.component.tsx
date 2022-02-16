@@ -1,9 +1,8 @@
 import React from 'react';
-import dayjs from 'dayjs';
 import styles from './active-visit-tag.scss';
 import { useTranslation } from 'react-i18next';
 import { Tag, TooltipDefinition } from 'carbon-components-react';
-import { useVisit } from '@openmrs/esm-framework';
+import { formatDatetime, parseDate, useVisit } from '@openmrs/esm-framework';
 interface ActiveVisitBannerTagProps {
   patientUuid: string;
   patient: fhir.Patient;
@@ -22,7 +21,7 @@ const ActiveVisitBannerTag: React.FC<ActiveVisitBannerTagProps> = ({ patientUuid
             <h6 style={{ marginBottom: '0.5rem' }}>{currentVisit?.visitType?.name}</h6>
             <span>
               <span className={styles.tooltipSmallText}>{t('started', 'Started')}: </span>
-              <span>{dayjs(currentVisit?.startDatetime).format('DD - MMM - YYYY @ HH:mm')}</span>
+              <span>{formatDatetime(parseDate(currentVisit?.startDatetime), { mode: 'wide' })}</span>
             </span>
           </div>
         }

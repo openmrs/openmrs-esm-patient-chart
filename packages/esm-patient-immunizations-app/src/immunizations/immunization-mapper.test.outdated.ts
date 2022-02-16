@@ -1,6 +1,6 @@
 import { mapFromFHIRImmunizationBundle, mapToFHIRImmunizationResource } from './immunization-mapper';
 import { FHIRImmunizationBundle, FHIRImmunizationResource, ImmunizationFormData } from './immunization-domain';
-import dayjs from 'dayjs';
+import { parseDate } from '@openmrs/esm-framework';
 
 let rotavirusDose1: FHIRImmunizationResource = {
   resourceType: 'Immunization',
@@ -31,8 +31,8 @@ let rotavirusDose1: FHIRImmunizationResource = {
     display: 'Organization/hl7',
   },
   lotNumber: '123445',
-  occurrenceDateTime: dayjs('2018-09-21').toDate(),
-  expirationDate: dayjs('2025-12-15').toDate(),
+  occurrenceDateTime: parseDate('2018-09-21'),
+  expirationDate: parseDate('2025-12-15'),
   protocolApplied: [
     {
       series: '4 Months',
@@ -69,8 +69,8 @@ let rotavirusDose2: FHIRImmunizationResource = {
     display: 'Organization/hl7',
   },
   lotNumber: '123454',
-  occurrenceDateTime: dayjs('2018-06-18').toDate(),
-  expirationDate: dayjs('2025-12-15').toDate(),
+  occurrenceDateTime: parseDate('2018-06-18'),
+  expirationDate: parseDate('2025-12-15'),
   protocolApplied: [
     {
       series: '2 Months',
@@ -142,8 +142,8 @@ const immunizationsSearchResponseWithMultipleImmunizations: FHIRImmunizationBund
           display: 'Organization/hl7',
         },
         lotNumber: '123456',
-        occurrenceDateTime: dayjs('2018-05-21').toDate(),
-        expirationDate: dayjs('2025-12-15').toDate(),
+        occurrenceDateTime: parseDate('2018-05-21'),
+        expirationDate: parseDate('2025-12-15'),
         protocolApplied: [
           {
             series: '2 Months',
@@ -183,8 +183,8 @@ const immunizationsSearchResponseWithMultipleImmunizations: FHIRImmunizationBund
           display: 'Organization/hl7',
         },
         lotNumber: '12345',
-        occurrenceDateTime: dayjs('2018-11-01').toDate(),
-        expirationDate: dayjs('2025-12-15').toDate(),
+        occurrenceDateTime: parseDate('2018-11-01'),
+        expirationDate: parseDate('2025-12-15'),
         protocolApplied: [
           {
             series: '4 Months',
@@ -289,8 +289,8 @@ describe('ImmunizationMapper#mapToFHIRImmunizationResource', () => {
       },
       patient: { type: 'Patient', reference: 'Patient/paitentUuid' },
       encounter: { type: 'Encounter', reference: 'Encounter/visitUUid' },
-      expirationDate: dayjs('2025-12-15').toDate(),
-      occurrenceDateTime: dayjs('2020-12-15').toDate(),
+      expirationDate: parseDate('2025-12-15'),
+      occurrenceDateTime: parseDate('2020-12-15'),
       location: { type: 'Location', reference: 'Location/locationUuid' },
       performer: [
         {

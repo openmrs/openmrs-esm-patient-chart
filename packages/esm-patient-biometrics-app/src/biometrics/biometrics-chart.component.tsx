@@ -1,11 +1,10 @@
 import React from 'react';
-import dayjs from 'dayjs';
 import styles from './biometrics-chart.component.scss';
 import { Tab, Tabs } from 'carbon-components-react';
 import { LineChart } from '@carbon/charts-react';
 import { LineChartOptions } from '@carbon/charts/interfaces/charts';
 import { ScaleTypes } from '@carbon/charts/interfaces/enums';
-import { useConfig } from '@openmrs/esm-framework';
+import { formatDate } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { ConfigObject } from '../config-schema';
 
@@ -40,7 +39,7 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
           return (
             biometric[selectedBiometrics.value] && {
               group: selectedBiometrics.groupName,
-              key: dayjs(biometric.date).format('DD-MMM'),
+              key: formatDate(new Date(biometric.date), { mode: 'wide', year: false, time: false }),
               value: biometric[selectedBiometrics.value],
             }
           );

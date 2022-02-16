@@ -16,7 +16,7 @@ import {
   DataTableHeader,
 } from 'carbon-components-react';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
-import { usePagination } from '@openmrs/esm-framework';
+import { formatDatetime, parseDate, usePagination } from '@openmrs/esm-framework';
 import styles from './appointments-table.component.scss';
 
 const pageSize = 5;
@@ -43,7 +43,7 @@ const AppointmentsTable: React.FC<AppointmentTableProps> = ({ patientAppointment
       paginatedAppointments?.map((appointment) => {
         return {
           id: appointment.uuid,
-          date: dayjs(appointment.startDateTime).format('DD - MMM - YYYY, hh:mm'),
+          date: formatDatetime(parseDate(appointment.startDateTime), { mode: 'wide' }),
           location: appointment.location.name,
           service: appointment.service.name,
         };
