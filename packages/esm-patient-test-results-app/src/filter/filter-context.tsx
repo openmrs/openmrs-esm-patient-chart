@@ -62,7 +62,7 @@ const FilterProvider = ({ sortedObs, children }: FilterProviderProps) => {
   useEffect(() => {
     const tests = (sortedObs && Object.keys(sortedObs)) || [];
     if (tests.length && !Object.keys(state?.checkboxes).length) {
-      actions.initialize(Object.fromEntries(tests.map((test) => [test, false])), mockConceptTree);
+      actions.initialize(Object.fromEntries(tests.map((test) => [test, true])), mockConceptTree);
     }
   }, [sortedObs, actions, state]);
 
