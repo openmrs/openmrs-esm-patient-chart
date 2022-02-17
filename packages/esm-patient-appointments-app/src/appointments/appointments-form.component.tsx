@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { mutate } from 'swr';
+import { useSWRConfig } from 'swr';
 import dayjs from 'dayjs';
 import {
   Button,
@@ -29,6 +29,7 @@ const appointmentTypes = [{ name: 'Scheduled' }, { name: 'WalkIn' }];
 
 const AppointmentsForm: React.FC<AppointmentsFormProps> = ({ patientUuid, isTablet, closeWorkspace }) => {
   const { t } = useTranslation();
+  const { mutate } = useSWRConfig();
   const locations = useLocations();
   const session = useSessionUser();
   const [appointmentNote, setAppointmentNote] = useState('');

@@ -11,11 +11,9 @@ export interface PatientVitals {
   systolic?: number;
   systolicRange?: any;
   diastolic?: number;
-  diastolicRange?: any;
   pulse?: number;
   temperature?: number;
   oxygenSaturation?: number;
-  oxygenSaturationRange?: any;
   height?: number;
   weight?: number;
   bmi?: number | null;

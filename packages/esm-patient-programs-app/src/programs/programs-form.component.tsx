@@ -1,9 +1,9 @@
 import React, { SyntheticEvent } from 'react';
 import dayjs from 'dayjs';
-import { mutate } from 'swr';
 import filter from 'lodash-es/filter';
 import includes from 'lodash-es/includes';
 import map from 'lodash-es/map';
+import { useSWRConfig } from 'swr';
 import styles from './programs-form.scss';
 import { useTranslation } from 'react-i18next';
 import { createErrorHandler, showNotification, showToast, useSessionUser, useLocations } from '@openmrs/esm-framework';
@@ -17,13 +17,19 @@ import {
   FormGroup,
   ButtonSet,
 } from 'carbon-components-react';
-import { createProgramEnrollment, useAvailablePrograms, useEnrollments } from './programs.resource';
+import {
+  createProgramEnrollment,
+  useAvailablePrograms,
+  useEnrollments,
+  customRepresentation,
+} from './programs.resource';
 import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 
 const ProgramsForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patientUuid, isTablet }) => {
   const { t } = useTranslation();
   const session = useSessionUser();
   const availableLocations = useLocations();
+  const { mutate } = useSWRConfig();
 
   const { data: availablePrograms } = useAvailablePrograms();
   const { data: enrollments } = useEnrollments(patientUuid);
@@ -69,7 +75,7 @@ const ProgramsForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patient
               title: t('enrollmentSaved', 'Program enrollment saved'),
             });
 
-            mutate(`/ws/rest/v1/programenrollment?patient=${patientUuid}`);
+            mutate(`/ws/rest/v1/programenrollment?patient=${patientUuid}&v=${customRepresentation}`);
           }
         },
         (err) => {
@@ -87,7 +93,7 @@ const ProgramsForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patient
         sub.unsubscribe();
       };
     },
-    [closeWorkspace, completionDate, enrollmentDate, patientUuid, selectedProgram, t, userLocation],
+    [closeWorkspace, completionDate, enrollmentDate, mutate, patientUuid, selectedProgram, t, userLocation],
   );
 
   return (

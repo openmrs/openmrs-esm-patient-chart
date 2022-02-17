@@ -1,7 +1,7 @@
 import React, { SyntheticEvent } from 'react';
 import dayjs from 'dayjs';
 import debounce from 'lodash-es/debounce';
-import { mutate } from 'swr';
+import { useSWRConfig } from 'swr';
 import styles from './conditions-form.scss';
 import { useTranslation } from 'react-i18next';
 import { createErrorHandler, fhirBaseUrl, showNotification, showToast, useSessionUser } from '@openmrs/esm-framework';
@@ -26,6 +26,7 @@ const searchTimeoutInMs = 500;
 const ConditionsForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patientUuid, isTablet }) => {
   const { t } = useTranslation();
   const session = useSessionUser();
+  const { mutate } = useSWRConfig();
   const [clinicalStatus, setClinicalStatus] = React.useState('active');
   const [endDate, setEndDate] = React.useState(null);
   const [onsetDate, setOnsetDate] = React.useState(new Date());
@@ -134,7 +135,17 @@ const ConditionsForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
         sub.unsubscribe();
       };
     },
-    [clinicalStatus, closeWorkspace, endDate, onsetDate, patientUuid, selectedCondition, session?.user?.uuid, t],
+    [
+      clinicalStatus,
+      closeWorkspace,
+      endDate,
+      mutate,
+      onsetDate,
+      patientUuid,
+      selectedCondition,
+      session?.user?.uuid,
+      t,
+    ],
   );
 
   return (
