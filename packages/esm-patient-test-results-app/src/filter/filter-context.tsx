@@ -1,5 +1,5 @@
 import React, { createContext, useReducer, useState } from 'react';
-import reducer from './filterReducer';
+import reducer from './filter-reducer';
 
 const initialState = {
   checkboxes: {},

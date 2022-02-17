@@ -1,19 +1,17 @@
 const computeParents = (initialState, node) => {
   var parents = {};
   const leaves = [];
-  if (node.subSets.length) {
-    // has children
+  if (node?.subSets?.length) {
     node.subSets.map((subNode) => {
       const { parents: newParents, leaves: newLeaves } = computeParents(initialState, subNode);
       parents = { ...parents, ...newParents };
       leaves.push(...newLeaves);
     });
   }
-  if (node.obs.length) {
+  if (node?.obs?.length) {
     leaves.push(...node.obs.map((leaf) => leaf.display));
   }
   parents[node.display] = leaves;
-  leaves.push(node.display);
   return { parents: parents, leaves: leaves };
 };
 
@@ -33,19 +31,10 @@ const reducer = (state, action) => {
         },
       };
     case 'updateParent':
-      const affectedKids = state.parents[action.name];
-      // copy the starting state
+      const affectedLeaves = state.parents[action.name];
       let checkboxes = JSON.parse(JSON.stringify(state.checkboxes));
-      // update all kids
-      affectedKids.forEach((kid) => (checkboxes[kid] = !checkboxes[action.name]));
-      // toggle this box
-      checkboxes[action.name] = !state.checkboxes[action.name];
-      // look for all parents of this checkbox
-      Object.entries(state.parents).forEach(([parent, children]: [string, string[]]) => {
-        if (children.includes(action.name)) {
-          checkboxes[parent] = !state.checkboxes[action.name];
-        }
-      });
+      const allChecked = affectedLeaves.every((leaf) => checkboxes[leaf]);
+      affectedLeaves.forEach((leaf) => (checkboxes[leaf] = !allChecked));
       return {
         ...state,
         checkboxes: checkboxes,

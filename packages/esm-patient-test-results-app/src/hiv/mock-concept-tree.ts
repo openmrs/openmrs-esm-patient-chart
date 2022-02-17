@@ -1,16 +1,11 @@
-const concepts = {
+const mockConceptTree = {
   display: 'Bloodwork',
-  concept: 'ConvSet', // convienence set
-  obs: [],
   subSets: [
     {
       display: 'Hematology',
-      concept: 'ConvSet',
-      obs: [],
       subSets: [
         {
           display: 'Complete Blood Count',
-          concept: 'LabSet',
           obs: [
             {
               display: 'Hematocrit',
@@ -25,18 +20,14 @@ const concepts = {
               display: 'White blood cells',
             },
           ],
-          subSets: [],
         },
       ],
     },
     {
       display: 'Chemistry',
-      concept: 'ConvSet',
-      obs: [],
       subSets: [
         {
           display: 'Serum chemistry panel',
-          concept: 'LabSet',
           obs: [
             {
               display: 'Serum chloride',
@@ -48,11 +39,10 @@ const concepts = {
               display: 'Blood urea nitrogen',
             },
           ],
-          subSets: [],
         },
       ],
     },
   ],
 };
 
-export default concepts;
+export default mockConceptTree;

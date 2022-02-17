@@ -1,28 +1,27 @@
 import { Column, Grid, InlineLoading, Row } from 'carbon-components-react';
 import React, { useContext, useEffect } from 'react';
-import concepts from './concepts';
-import FilterSet from '../filter/FilterSet';
-import FilterContext, { FilterProvider } from '../filter/FilterContext';
+import mockConceptTree from './mock-concept-tree';
+import FilterSet from '../filter/filter-set';
+import FilterContext, { FilterProvider } from '../filter/filter-context';
 import usePatientResultsData from '../loadPatientTestData/usePatientResultsData';
 import { usePatient } from '@openmrs/esm-framework';
 import { MultiTimeline } from '../timeline/Timeline';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 
 const DataLoader = ({ sortedObs }) => {
-  // this is a bad way to do this. Appoogies in advance
+  // this is a bad way to do this. Apologies in advance
   const { state, initialize } = useContext(FilterContext);
   useEffect(() => {
     const tests = (sortedObs && Object.keys(sortedObs)) || [];
     if (tests.length && !Object.keys(state?.checkboxes).length) {
-      initialize(Object.fromEntries(tests.map((test) => [test, false])), concepts);
+      initialize(Object.fromEntries(tests.map((test) => [test, false])), mockConceptTree);
     }
   }, [sortedObs, initialize, state]);
   return null;
 };
 
 const HIVCareAndTreatment = () => {
-  const patient = usePatient();
-  const patientUuid = patient?.patient?.id;
+  const { patientUuid } = usePatient();
   const { sortedObs, loaded, error } = usePatientResultsData(patientUuid);
   return (
     <FilterProvider>
@@ -34,7 +33,7 @@ const HIVCareAndTreatment = () => {
           <Grid>
             <Row>
               <Column sm={16} lg={4}>
-                <FilterSet root={concepts} />
+                <FilterSet root={mockConceptTree} />
               </Column>
               <Column sm={16} lg={8}>
                 <MultiTimeline patientUuid={patientUuid} />

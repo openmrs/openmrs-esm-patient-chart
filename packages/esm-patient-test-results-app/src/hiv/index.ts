@@ -1,3 +1,3 @@
-import HIVCareAndTreatment from './HIVCareAndTreatment';
+import HIVCareAndTreatment from './hiv-care-and-treatment';
 
 export default HIVCareAndTreatment;

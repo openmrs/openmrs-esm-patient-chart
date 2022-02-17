@@ -1,16 +1,15 @@
 import React, { useContext, useState } from 'react';
-import styles from './styles.scss';
+import styles from './filter-set.scss';
 import { Accordion, AccordionItem, Checkbox } from 'carbon-components-react';
-import FilterContext from './FilterContext';
+import FilterContext from './filter-context';
 
 interface Observation {
   display: string;
 }
 interface TreeNode {
   display: string;
-  concept?: string;
-  subSets: TreeNode[];
-  obs: Observation[];
+  subSets?: TreeNode[];
+  obs?: Observation[];
 }
 
 interface FilterProps {
@@ -30,13 +29,12 @@ interface FilterLeafProps {
 }
 
 const isIndeterminate = (kids, checkboxes) => {
-  return !kids?.every((kid) => checkboxes[kid]) && !kids?.every((kid) => !checkboxes[kid]);
+  return kids && !kids?.every((kid) => checkboxes[kid]) && !kids?.every((kid) => !checkboxes[kid]);
 };
 
 const FilterSet = ({ root, maxNest }: FilterProps) => {
   const { someChecked, parents, checkboxes, updateParent } = useContext(FilterContext);
-  const parent = Object.keys(parents).includes(root.display);
-  const indeterminate = parent ? isIndeterminate(parents[root.display], checkboxes) : false;
+  const indeterminate = isIndeterminate(parents[root.display], checkboxes);
   const allChildrenChecked = parents[root.display]?.every((kid) => checkboxes[kid]);
 
   return (
@@ -58,6 +56,9 @@ const FilterSet = ({ root, maxNest }: FilterProps) => {
           {root?.subSets?.map((node, index) => (
             <FilterNode root={node} level={0} maxNest={maxNest} key={index} />
           ))}
+          {root?.obs?.map((obs, index) => (
+            <FilterLeaf leaf={obs} key={index} />
+          ))}
         </AccordionItem>
       </Accordion>
     </div>
@@ -65,9 +66,8 @@ const FilterSet = ({ root, maxNest }: FilterProps) => {
 };
 
 const FilterNode = ({ root, level, maxNest = 3 }: FilterNodeProps) => {
-  const { checkboxes, toggleVal, parents, updateParent } = useContext(FilterContext);
-  const parent = Object.keys(parents).includes(root.display);
-  const indeterminate = parent ? isIndeterminate(parents[root.display], checkboxes) : false;
+  const { checkboxes, parents, updateParent } = useContext(FilterContext);
+  const indeterminate = isIndeterminate(parents[root.display], checkboxes);
   const allChildrenChecked = parents[root.display]?.every((kid) => checkboxes[kid]);
 
   return (
@@ -96,7 +96,7 @@ const FilterNode = ({ root, level, maxNest = 3 }: FilterNodeProps) => {
 };
 
 const FilterLeaf = ({ leaf }: FilterLeafProps) => {
-  const { checkboxes, toggleVal, parents, updateParent } = useContext(FilterContext);
+  const { checkboxes, toggleVal } = useContext(FilterContext);
   return (
     <div className={styles.filterItem}>
       <Checkbox

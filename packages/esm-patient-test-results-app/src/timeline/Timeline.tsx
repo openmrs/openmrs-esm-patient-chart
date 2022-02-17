@@ -1,12 +1,12 @@
 import React, { useContext } from 'react';
 import { InlineLoading } from 'carbon-components-react';
 import useScrollIndicator from './useScroll';
-import { useAllTimelineData, usePatientPanels, useTimelineData } from './useTimelineData';
+import { usePatientPanels, useTimelineData } from './useTimelineData';
 import { PaddingContainer, TimeSlots, Grid, RowStartCell, GridItems, ShadowBox } from './helpers';
 import { ObsRecord, EmptyState } from '@openmrs/esm-patient-common-lib';
 import styles from './timeline.scss';
 import { RecentResultsGrid } from '../overview/recent-overview.component';
-import FilterContext from '../filter/FilterContext';
+import FilterContext from '../filter/filter-context';
 
 interface PanelNameCornerProps {
   showShadow: boolean;
