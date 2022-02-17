@@ -8,7 +8,7 @@ import VisitDialog from '../visit/visit-dialog.component';
 import ActionMenu from './action-menu.component';
 import Loader from './loader.component';
 import styles from './patient-chart.component.scss';
-import WorkspaceNotification from './workspace-notification.component';
+import WorkspaceNotification from '../workspace/workspace-notification.component';
 
 interface PatientChartParams {
   patientUuid: string;

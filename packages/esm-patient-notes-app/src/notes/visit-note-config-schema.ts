@@ -5,7 +5,11 @@ export default {
     _type: Type.UUID,
     _default: '240b26f9-dd88-4172-823d-4a8bfeb7841f',
   },
-  encounterNoteConceptUuid: {
+  visitDiagnosesConceptUuid: {
+    _type: Type.ConceptUuid,
+    _default: '159947AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  },
+  encounterNoteTextConceptUuid: {
     _type: Type.ConceptUuid,
     _default: '162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   },
@@ -17,11 +21,19 @@ export default {
     _type: Type.ConceptUuid,
     _default: 'c75f120a-04ec-11e3-8780-2b40bef9a44b',
   },
+  problemListConceptUuid: {
+    _default: '1284AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    _type: Type.ConceptUuid,
+  },
+  diagnosisOrderConceptUuid: {
+    _default: '159946AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+    _type: Type.ConceptUuid,
+  },
 };
 
 export interface VisitNoteConfigObject {
   clinicianEncounterRole: string;
-  encounterNoteConceptUuid: string;
+  encounterNoteTextConceptUuid: string;
   encounterTypeUuid: string;
   formConceptUuid: string;
 }

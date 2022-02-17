@@ -19,12 +19,7 @@ export default function Notes({ basePath, patient, patientUuid, showAddNote }: N
             exact
             path="/"
             render={() => (
-              <NotesDetailedSummary
-                patientUuid={patientUuid}
-                patient={patient}
-                showAddNote={showAddNote}
-                basePath={basePath}
-              />
+              <NotesDetailedSummary patientUuid={patientUuid} showAddNote={showAddNote} basePath={basePath} />
             )}
           />
         </Switch>

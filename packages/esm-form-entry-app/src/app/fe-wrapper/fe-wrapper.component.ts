@@ -55,6 +55,7 @@ export class FeWrapperComponent implements OnInit {
   isLoading: boolean = true;
   config: FormEntryConfig;
   isSubmitting: boolean = false;
+  labelMap: Array<Object> = [];
 
   public get encounterDate(): string {
     return formatDate(new Date(this.encounter?.encounterDatetime), { time: false });

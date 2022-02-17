@@ -10,20 +10,65 @@
   display: flex;
   flex-wrap: wrap;
   flex-direction: column;
-  margin: 0.5rem 1.438rem 1rem $spacing-05;
+  padding: 0.5rem;
+  margin: 0.5rem;
   width: 100%;
+}
+
+.labelContainer {
+  display: flex;
+  align-items: center;
+}
+
+.abnormalValue {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.dangerButton {
+  color: $danger;
+  height: 4px;
+  width: 4px;
 }
 
 .vitalsDetailsBodyShort01 {
   @extend .bodyShort01;
-  color: $color-gray-70;
+  color: $text-02;
 }
 
 .bodyShort02 {
   @include carbon--type-style("body-short-02");
+  color: $text-01;
 }
 
 .label01 {
   @include carbon--type-style("label-01");
-  margin: 0 1.375rem 0.25rem 0;
+  margin-right: 0.5rem;
+  color: $text-02;
+}
+
+.critically_low, .critically_high, .low, .high {
+  &::after {
+    @include carbon--type-style('productive-heading-01');
+    color: $text-01;
+  }
+}
+
+.low::after {
+  content: " ↓";
+}
+
+.critically_low::after {
+  content: " ↓↓";
+}
+
+.high::after {
+  content: " ↑";
+}
+
+.critically_high::after {
+  content: " ↑↑";
+}
+
+.padRight {
+  margin-right: 2px;
 }

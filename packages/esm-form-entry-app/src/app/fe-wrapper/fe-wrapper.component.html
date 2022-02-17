@@ -6,7 +6,7 @@
         <h6 *ngIf="singleSpaProps.encounterUuid" class="encounterHeader">Encounter date time {{encounterDate}} @
           {{encounterTime}}</h6>
         <form class="bx--form no-padding" *ngIf="formSchema" [formGroup]="form.rootNode.control">
-          <form-renderer [node]="form.rootNode"></form-renderer>
+          <form-renderer [labelMap]="labelMap" [node]="form.rootNode"></form-renderer>
         </form>
       </div>
       <div class="bx-btn--set button-set">

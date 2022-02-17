@@ -1,10 +1,21 @@
 import { ExtensionRegistration, getExtensionRegistration, getGlobalStore, translateFrom } from '@openmrs/esm-framework';
+import _i18n from 'i18next';
 import { WorkspaceWindowState } from '..';
+
+export interface Prompt {
+  title: string;
+  body: string;
+  /** Defaults to "Confirm" */
+  confirmText?: string;
+  onConfirm(): void;
+  /** Defaults to "Cancel" */
+  cancelText?: string;
+}
 
 export interface WorkspaceStoreState {
   patientUuid: string | null;
   openWorkspaces: Array<OpenWorkspace>;
-  workspaceNeedingConfirmationToOpen: OpenWorkspace | null;
+  prompt: Prompt | null;
 }
 
 export interface OpenWorkspace extends WorkspaceRegistration {
@@ -96,7 +107,8 @@ export function launchPatientWorkspace(name: string, additionalProps?: object) {
     closeWorkspace: () => closeWorkspace(name),
     additionalProps,
   };
-  if (state.openWorkspaces.filter((w) => w.type == newWorkspace.type).length == 0) {
+  const existingWorkspaces = state.openWorkspaces.filter((w) => w.type == newWorkspace.type);
+  if (existingWorkspaces.length == 0) {
     store.setState({ ...state, openWorkspaces: [newWorkspace, ...state.openWorkspaces] });
   } else {
     const existingIdx = state.openWorkspaces.findIndex((w) => w.name == name);
@@ -106,25 +118,37 @@ export function launchPatientWorkspace(name: string, additionalProps?: object) {
       const openWorkspaces = [state.openWorkspaces[existingIdx], ...restOfWorkspaces];
       store.setState({ ...state, openWorkspaces });
     } else {
-      store.setState({ ...state, workspaceNeedingConfirmationToOpen: newWorkspace });
+      const currentName = existingWorkspaces[0].title ?? existingWorkspaces[0].name;
+      const prompt: Prompt = {
+        title: translateFrom(
+          '@openmrs/esm-patient-chart-app',
+          'activeFormWarning',
+          'There is an active form open in the workspace',
+        ),
+        body: translateFrom(
+          '@openmrs/esm-patient-chart-app',
+          'workspaceModalText',
+          `Launching a new form in the workspace could cause you to lose unsaved work on the ${currentName} form.`,
+          { formName: currentName },
+        ),
+        onConfirm: () => {
+          const state = store.getState();
+          store.setState({
+            openWorkspaces: [newWorkspace, ...state.openWorkspaces.filter((w) => w.type != newWorkspace.type)],
+            prompt: null,
+          });
+        },
+        confirmText: translateFrom('@openmrs/esm-patient-chart-app', 'openAnyway', 'Open anyway')
+      };
+      store.setState({ ...state, prompt });
     }
   }
 }
 
-export function confirmOpeningWorkspace() {
+export function cancelPrompt() {
   const store = getWorkspaceStore();
   const state = store.getState();
-  const newWorkspace = state.workspaceNeedingConfirmationToOpen;
-  store.setState({
-    openWorkspaces: [newWorkspace, ...state.openWorkspaces.filter((w) => w.type != newWorkspace.type)],
-    workspaceNeedingConfirmationToOpen: null,
-  });
-}
-
-export function cancelOpeningWorkspace() {
-  const store = getWorkspaceStore();
-  const state = store.getState();
-  store.setState({ ...state, workspaceNeedingConfirmationToOpen: null });
+  store.setState({ ...state, prompt: null });
 }
 
 export function closeWorkspace(name: string) {
@@ -148,11 +172,11 @@ export function changeWorkspaceContext(patientUuid) {
   const store = getWorkspaceStore();
   const state = store.getState();
   if (state.patientUuid != patientUuid) {
-    store.setState({ patientUuid, openWorkspaces: [], workspaceNeedingConfirmationToOpen: null });
+    store.setState({ patientUuid, openWorkspaces: [], prompt: null });
   }
 }
 
-const initialState = { patientUuid: null, openWorkspaces: [], workspaceNeedingConfirmationToOpen: null };
+const initialState = { patientUuid: null, openWorkspaces: [], prompt: null };
 export function getWorkspaceStore() {
   return getGlobalStore<WorkspaceStoreState>('workspace', initialState);
 }

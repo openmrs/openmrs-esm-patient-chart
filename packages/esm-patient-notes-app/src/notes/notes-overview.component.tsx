@@ -12,13 +12,12 @@ interface NotesOverviewProps {
 const NotesOverview: React.FC<NotesOverviewProps> = ({ patientUuid, patient, showAddNote, basePath }) => {
   const pageSize = 5;
   const { t } = useTranslation();
-  const pageUrl = window.spaBase + basePath + '/encounters/notes';
+  const pageUrl = window.spaBase + basePath + '/forms';
   const urlLabel = t('seeAll', 'See all');
 
   return (
     <NotesMain
       patientUuid={patientUuid}
-      patient={patient}
       showAddNote={showAddNote}
       pageSize={pageSize}
       urlLabel={urlLabel}
