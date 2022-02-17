@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import VitalsBiometricInput from './vitals-biometrics-input.component';
 import styles from './vitals-biometrics-form.component.scss';
 import { useTranslation } from 'react-i18next';
-import { mutate } from 'swr';
+import { useSWRConfig } from 'swr';
 import {
   useConfig,
   createErrorHandler,
@@ -40,6 +40,7 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
   const { t } = useTranslation();
   const session = useSessionUser();
   const config = useConfig() as ConfigObject;
+  const { mutate } = useSWRConfig();
   const { data: conceptUnits, conceptMetadata } = useVitalsConceptMetadata();
   const biometricsUnitsSymbols = config.biometrics;
   const [patientVitalAndBiometrics, setPatientVitalAndBiometrics] = useState<PatientVitalsAndBiometrics>();

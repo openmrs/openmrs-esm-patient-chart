@@ -1,6 +1,6 @@
 import React, { SyntheticEvent } from 'react';
 import dayjs from 'dayjs';
-import { mutate } from 'swr';
+import { useSWRConfig } from 'swr';
 import { useTranslation } from 'react-i18next';
 import debounce from 'lodash-es/debounce';
 import {
@@ -39,6 +39,7 @@ const encountersCustomRepresentation =
 const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patientUuid, isTablet }) => {
   const { t } = useTranslation();
   const session = useSessionUser();
+  const { mutate } = useSWRConfig();
   const config = useConfig() as ConfigObject;
   const { clinicianEncounterRole, encounterNoteTextConceptUuid, encounterTypeUuid, formConceptUuid } =
     config.visitNoteConfig;
@@ -187,6 +188,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
       encounterTypeUuid,
       formConceptUuid,
       locationUuid,
+      mutate,
       patientUuid,
       providerUuid,
       selectedDiagnoses,
