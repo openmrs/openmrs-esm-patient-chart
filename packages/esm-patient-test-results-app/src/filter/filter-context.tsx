@@ -1,5 +1,6 @@
-import React, { createContext, useReducer, useState } from 'react';
+import React, { createContext, useReducer, useEffect, useMemo } from 'react';
 import reducer from './filter-reducer';
+import mockConceptTree from '../hiv/mock-concept-tree';
 
 const initialState = {
   checkboxes: {},
@@ -32,23 +33,38 @@ interface FilterContextProps {
   updateParent: any;
 }
 
+interface FilterProviderProps {
+  sortedObs: any; // this data structure will change later
+  children: React.ReactNode;
+}
+
 const FilterContext = createContext<FilterContextProps>(initialContext);
 
-const FilterProvider = ({ children }) => {
+const FilterProvider = ({ sortedObs, children }: FilterProviderProps) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const actions = {
-    initialize: (initialState, tree) => dispatch({ type: 'initialize', initialState: initialState, tree: tree }),
-    toggleVal: (name) => {
-      dispatch({ type: 'toggleVal', name: name });
-    },
-    updateParent: (name) => {
-      dispatch({ type: 'updateParent', name: name });
-    },
-  };
+  const actions = useMemo(
+    () => ({
+      initialize: (initialState, tree) => dispatch({ type: 'initialize', initialState: initialState, tree: tree }),
+      toggleVal: (name) => {
+        dispatch({ type: 'toggleVal', name: name });
+      },
+      updateParent: (name) => {
+        dispatch({ type: 'updateParent', name: name });
+      },
+    }),
+    [dispatch],
+  );
 
   const activeTests = Object.keys(state?.checkboxes)?.filter((key) => state.checkboxes[key]) || [];
   const someChecked = Boolean(activeTests.length);
+
+  useEffect(() => {
+    const tests = (sortedObs && Object.keys(sortedObs)) || [];
+    if (tests.length && !Object.keys(state?.checkboxes).length) {
+      actions.initialize(Object.fromEntries(tests.map((test) => [test, false])), mockConceptTree);
+    }
+  }, [sortedObs, actions, state]);
 
   return (
     <FilterContext.Provider
