@@ -17,7 +17,7 @@ import {
 } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 import { first } from 'rxjs/operators';
-import { mutate } from 'swr';
+import { useSWRConfig } from 'swr';
 import {
   ExtensionSlot,
   FetchResponse,
@@ -52,6 +52,7 @@ const AllergyForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patientU
     otherConceptUuid,
   } = useMemo(() => concepts, [concepts]);
   const patientState = useMemo(() => ({ patientUuid }), [patientUuid]);
+  const { mutate } = useSWRConfig();
   const [allergens, setAllergens] = useState<Allergens>(null);
   const [allergicReactions, setAllergicReactions] = useState<Array<string>>([]);
   const [comment, setComment] = useState('');
@@ -161,6 +162,7 @@ const AllergyForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patientU
       nonCodedAllergicReaction,
       closeWorkspace,
       t,
+      mutate,
     ],
   );
 

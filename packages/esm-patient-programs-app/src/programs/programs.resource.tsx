@@ -4,8 +4,9 @@ import { openmrsFetch, openmrsObservableFetch } from '@openmrs/esm-framework';
 import { PatientProgram, Program, ProgramsFetchResponse } from '../types';
 import uniqBy from 'lodash-es/uniqBy';
 
+export const customRepresentation = `custom:(uuid,display,program,dateEnrolled,dateCompleted,location:(uuid,display))`;
+
 export function useEnrollments(patientUuid: string) {
-  const customRepresentation = `custom:(uuid,display,program,dateEnrolled,dateCompleted,location:(uuid,display))`;
   const { data, error, isValidating } = useSWR<{ data: ProgramsFetchResponse }, Error>(
     `/ws/rest/v1/programenrollment?patient=${patientUuid}&v=${customRepresentation}`,
     openmrsFetch,
@@ -17,7 +18,7 @@ export function useEnrollments(patientUuid: string) {
       : null;
 
   return {
-    data: data ? uniqBy(formattedEnrollments, (program) => program.program.uuid) : null,
+    data: data ? uniqBy(formattedEnrollments, (program) => program?.program?.uuid) : null,
     isError: error,
     isLoading: !data && !error,
     isValidating,

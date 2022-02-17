@@ -1,5 +1,4 @@
 import React from 'react';
-import * as SWR from 'swr';
 import { throwError } from 'rxjs';
 import { of } from 'rxjs/internal/observable/of';
 import { fireEvent, render, screen } from '@testing-library/react';
@@ -119,7 +118,6 @@ describe('ProgramsForm: ', () => {
     });
 
     it('renders a success toast notification upon successfully recording a program enrollment', () => {
-      const mockMutate = jest.spyOn(SWR, 'mutate').mockImplementation(jest.fn());
       mockCreateProgramEnrollment.mockReturnValueOnce(of({ status: 201, statusText: 'Created' }));
 
       fireEvent.change(selectProgramInput, {
@@ -159,9 +157,6 @@ describe('ProgramsForm: ', () => {
           title: 'Program enrollment saved',
         }),
       );
-
-      expect(mockMutate).toHaveBeenCalledTimes(1);
-      expect(mockMutate).toHaveBeenCalledWith(`/ws/rest/v1/programenrollment?patient=${mockPatient.id}`);
     });
 
     it('renders an error notification if there was a problem recording a program enrollment', async () => {

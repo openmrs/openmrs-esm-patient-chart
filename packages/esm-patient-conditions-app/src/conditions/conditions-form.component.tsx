@@ -1,7 +1,7 @@
 import React, { SyntheticEvent } from 'react';
 import dayjs from 'dayjs';
 import debounce from 'lodash-es/debounce';
-import { mutate } from 'swr';
+import { useSWRConfig } from 'swr';
 import styles from './conditions-form.scss';
 import { useTranslation } from 'react-i18next';
 import {
@@ -34,6 +34,7 @@ const ConditionsForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSessionUser();
+  const { mutate } = useSWRConfig();
   const [clinicalStatus, setClinicalStatus] = React.useState('active');
   const [endDate, setEndDate] = React.useState(null);
   const [onsetDate, setOnsetDate] = React.useState(new Date());
@@ -142,7 +143,17 @@ const ConditionsForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
         sub.unsubscribe();
       };
     },
-    [clinicalStatus, closeWorkspace, endDate, onsetDate, patientUuid, selectedCondition, session?.user?.uuid, t],
+    [
+      clinicalStatus,
+      closeWorkspace,
+      endDate,
+      mutate,
+      onsetDate,
+      patientUuid,
+      selectedCondition,
+      session?.user?.uuid,
+      t,
+    ],
   );
 
   return (

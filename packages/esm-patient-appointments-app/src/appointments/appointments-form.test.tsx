@@ -1,6 +1,5 @@
 import React from 'react';
 import dayjs from 'dayjs';
-import * as SWR from 'swr';
 import { act, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
@@ -9,7 +8,7 @@ import { openmrsFetch, showNotification, showToast } from '@openmrs/esm-framewor
 import { mockSessionDataResponse } from '../../../../__mocks__/session.mock';
 import { mockAppointmentsData, mockUseAppointmentServiceData } from '../../../../__mocks__/appointments.mock';
 import { swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
-import { appointmentsSearchUrl, createAppointment } from './appointments.resource';
+import { createAppointment } from './appointments.resource';
 import AppointmentForm from './appointments-form.component';
 
 const closeWorkspace = jest.fn();
@@ -122,7 +121,6 @@ describe('AppointmentForm', () => {
     it('renders a success toast notification upon successfully scheduling an appointment', async () => {
       const promise = Promise.resolve();
       mockCreateAppointment.mockResolvedValueOnce({ status: 200, statusText: 'Ok' });
-      const mockMutate = jest.spyOn(SWR, 'mutate').mockImplementation(jest.fn());
 
       expect(saveButton).toBeDisabled();
 
@@ -165,9 +163,6 @@ describe('AppointmentForm', () => {
           title: 'Appointment scheduled',
         }),
       );
-
-      expect(mockMutate).toHaveBeenCalledTimes(1);
-      expect(mockMutate).toHaveBeenCalledWith(appointmentsSearchUrl);
     });
 
     it('renders an error notification if there was a problem scheduling an appointment', async () => {

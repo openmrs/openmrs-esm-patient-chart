@@ -6,6 +6,7 @@
   "allEncounters": "All Encounters",
   "cancel": "Cancel",
   "careActivities": "Care Activities",
+  "confirm": "Confirm",
   "date": "Date",
   "dateAndTimeOfVisit": "Date and time of visit",
   "diagnoses": "Diagnoses",
@@ -60,6 +61,5 @@
   "visitSummary": "Visit Summary",
   "visitType": "Visit type",
   "workspaceItems": "Workspace items",
-  "workspaceModalText": "Launching a new form in the workspace could cause you to lose unsaved work on the <2>{formName}</2> form.",
-  "workspaceWarning": "Workspace warning"
+  "workspaceModalText": "Launching a new form in the workspace could cause you to lose unsaved work on the {formName} form."
 }
