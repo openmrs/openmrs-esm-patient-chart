@@ -25,6 +25,7 @@ import {
   showNotification,
   showToast,
   useConfig,
+  useLayoutType,
 } from '@openmrs/esm-framework';
 import { Allergens, fetchAllergensAndAllergicReactions, saveAllergy, NewAllergy } from './allergy-form.resource';
 import styles from './allergy-form.scss';
@@ -36,8 +37,9 @@ enum AllergenTypes {
   ENVIRONMENT = 'ENVIRONMENT',
 }
 
-const AllergyForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, isTablet, patientUuid }) => {
+const AllergyForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patientUuid }) => {
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
   const { concepts } = useConfig();
   const {
     drugAllergenUuid,

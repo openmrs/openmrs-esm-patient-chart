@@ -1,11 +1,5 @@
 import { registerExtension } from '@openmrs/esm-framework';
-import {
-  cancelPrompt,
-  getWorkspaceStore,
-  launchPatientWorkspace,
-  registerWorkspace,
-  resetWorkspaceStore,
-} from '.';
+import { cancelPrompt, getWorkspaceStore, launchPatientWorkspace, registerWorkspace, resetWorkspaceStore } from '.';
 import { WorkspaceWindowState } from '..';
 
 const mockExtensionRegistry = {};
@@ -19,7 +13,7 @@ jest.mock('@openmrs/esm-framework', () => {
       mockExtensionRegistry[name] = { name, ...ext };
     },
     getExtensionRegistration: (name) => mockExtensionRegistry[name],
-    translateFrom: (module, key, defaultValue, options) => defaultValue
+    translateFrom: (module, key, defaultValue, options) => defaultValue,
   };
 });
 

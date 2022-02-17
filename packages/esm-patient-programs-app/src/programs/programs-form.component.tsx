@@ -6,7 +6,14 @@ import map from 'lodash-es/map';
 import { useSWRConfig } from 'swr';
 import styles from './programs-form.scss';
 import { useTranslation } from 'react-i18next';
-import { createErrorHandler, showNotification, showToast, useSessionUser, useLocations } from '@openmrs/esm-framework';
+import {
+  createErrorHandler,
+  showNotification,
+  showToast,
+  useSessionUser,
+  useLocations,
+  useLayoutType,
+} from '@openmrs/esm-framework';
 import {
   Button,
   DatePicker,
@@ -25,8 +32,9 @@ import {
 } from './programs.resource';
 import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 
-const ProgramsForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patientUuid, isTablet }) => {
+const ProgramsForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patientUuid }) => {
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
   const session = useSessionUser();
   const availableLocations = useLocations();
   const { mutate } = useSWRConfig();

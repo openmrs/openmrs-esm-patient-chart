@@ -108,7 +108,6 @@ describe('AllergiesForm: ', () => {
 
 const testProps = {
   closeWorkspace: () => {},
-  isTablet: false,
   patient: mockPatient,
   patientUuid: mockPatient.id,
 };

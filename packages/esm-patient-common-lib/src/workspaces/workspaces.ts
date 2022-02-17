@@ -138,7 +138,7 @@ export function launchPatientWorkspace(name: string, additionalProps?: object) {
             prompt: null,
           });
         },
-        confirmText: translateFrom('@openmrs/esm-patient-chart-app', 'openAnyway', 'Open anyway')
+        confirmText: translateFrom('@openmrs/esm-patient-chart-app', 'openAnyway', 'Open anyway'),
       };
       store.setState({ ...state, prompt });
     }

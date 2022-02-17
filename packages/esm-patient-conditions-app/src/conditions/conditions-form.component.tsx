@@ -4,7 +4,14 @@ import debounce from 'lodash-es/debounce';
 import { useSWRConfig } from 'swr';
 import styles from './conditions-form.scss';
 import { useTranslation } from 'react-i18next';
-import { createErrorHandler, fhirBaseUrl, showNotification, showToast, useSessionUser } from '@openmrs/esm-framework';
+import {
+  createErrorHandler,
+  fhirBaseUrl,
+  showNotification,
+  showToast,
+  useLayoutType,
+  useSessionUser,
+} from '@openmrs/esm-framework';
 import {
   Tile,
   SearchSkeleton,
@@ -23,8 +30,9 @@ import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 
 const searchTimeoutInMs = 500;
 
-const ConditionsForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patientUuid, isTablet }) => {
+const ConditionsForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patientUuid }) => {
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
   const session = useSessionUser();
   const { mutate } = useSWRConfig();
   const [clinicalStatus, setClinicalStatus] = React.useState('active');

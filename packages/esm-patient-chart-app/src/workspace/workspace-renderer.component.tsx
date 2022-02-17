@@ -37,10 +37,9 @@ export function WorkspaceRenderer({ workspace, patientUuid, active }: WorkspaceR
       workspace && {
         closeWorkspace,
         patientUuid,
-        isTablet,
         ...workspace.additionalProps,
       },
-    [workspace, workspace.additionalProps, isTablet, patientUuid, closeWorkspace],
+    [workspace, workspace.additionalProps, patientUuid, closeWorkspace],
   );
 
   return (

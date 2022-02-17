@@ -16,7 +16,6 @@ import { getByTextWithMarkup } from '../../../../tools/test-helpers';
 import VisitNotesForm from './visit-notes-form.component';
 
 const testProps = {
-  isTablet: false,
   patientUuid: mockPatient.id,
   closeWorkspace: jest.fn(),
 };
