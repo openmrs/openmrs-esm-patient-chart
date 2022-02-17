@@ -18,7 +18,7 @@ export function useEnrollments(patientUuid: string) {
       : null;
 
   return {
-    data: data ? uniqBy(formattedEnrollments, (program) => program.program.uuid) : null,
+    data: data ? uniqBy(formattedEnrollments, (program) => program?.program?.uuid) : null,
     isError: error,
     isLoading: !data && !error,
     isValidating,
