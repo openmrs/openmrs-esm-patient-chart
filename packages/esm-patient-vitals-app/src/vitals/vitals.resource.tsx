@@ -2,6 +2,7 @@ import useSWR from 'swr';
 import { PatientVitalsAndBiometrics } from './vitals-biometrics-form/vitals-biometrics-form.component';
 import { openmrsFetch, fhirBaseUrl, useConfig, FHIRResource } from '@openmrs/esm-framework';
 import { ConfigObject } from '../config-schema';
+import { calculateBMI } from './vitals-biometrics-form/vitals-biometrics-form.utils';
 
 export const pageSize = 100;
 
@@ -38,7 +39,7 @@ interface ObsRecord {
   value: string | number;
 }
 
-type Vitals = Array<FHIRResource['resource']>;
+type Observations = Array<FHIRResource['resource']>;
 
 export function useVitals(patientUuid: string) {
   const { concepts } = useConfig();
@@ -52,37 +53,43 @@ export function useVitals(patientUuid: string) {
     openmrsFetch,
   );
 
-  const filterByConceptUuid = (vitals: Vitals, conceptUuid: string) => {
+  const filterByConceptUuid = (vitals: Observations, conceptUuid: string) => {
     return vitals.filter((obs) => obs.code.coding.some((c) => c.code === conceptUuid));
   };
 
-  const observations: Vitals = data?.data?.entry?.map((entry) => entry.resource) ?? [];
+  const observations: Observations = data?.data?.entry?.map((entry) => entry.resource) ?? [];
+
+  const formattedObservations =
+    data?.data?.total > 0
+      ? formatObservations(
+          filterByConceptUuid(observations, concepts.systolicBloodPressureUuid),
+          filterByConceptUuid(observations, concepts.diastolicBloodPressureUuid),
+          filterByConceptUuid(observations, concepts.pulseUuid),
+          filterByConceptUuid(observations, concepts.temperatureUuid),
+          filterByConceptUuid(observations, concepts.oxygenSaturationUuid),
+          filterByConceptUuid(observations, concepts.respiratoryRateUuid),
+          filterByConceptUuid(observations, concepts.heightUuid),
+          filterByConceptUuid(observations, concepts.weightUuid),
+        )
+      : null;
 
   return {
-    vitals:
-      data?.data?.total > 0
-        ? formatVitals(
-            filterByConceptUuid(observations, concepts.systolicBloodPressureUuid),
-            filterByConceptUuid(observations, concepts.diastolicBloodPressureUuid),
-            filterByConceptUuid(observations, concepts.pulseUuid),
-            filterByConceptUuid(observations, concepts.temperatureUuid),
-            filterByConceptUuid(observations, concepts.oxygenSaturationUuid),
-            filterByConceptUuid(observations, concepts.respiratoryRateUuid),
-          )
-        : null,
+    vitals: formattedObservations,
     isError: error,
     isLoading: !data && !error,
     isValidating,
   };
 }
 
-function formatVitals(
-  systolicBloodPressure: Vitals,
-  diastolicBloodPressure: Vitals,
-  pulseData: Vitals,
-  temperatureData: Vitals,
-  oxygenSaturationData: Vitals,
-  respiratoryRateData: Vitals,
+function formatObservations(
+  systolicBloodPressure: Observations,
+  diastolicBloodPressure: Observations,
+  pulseData: Observations,
+  temperatureData: Observations,
+  oxygenSaturationData: Observations,
+  respiratoryRateData: Observations,
+  heightData: Observations,
+  weightData: Observations,
 ): Array<PatientVitals> {
   const systolicDates = getDatesIssued(systolicBloodPressure);
   const diastolicDates = getDatesIssued(diastolicBloodPressure);
@@ -95,20 +102,28 @@ function formatVitals(
     const temperature = temperatureData.find((temperature) => temperature.issued === date);
     const oxygenSaturation = oxygenSaturationData.find((oxygenSaturation) => oxygenSaturation.issued === date);
     const respiratoryRate = respiratoryRateData.find((respiratoryRate) => respiratoryRate.issued === date);
+    const height = heightData.find((height) => height.issued === date);
+    const weight = weightData.find((weight) => weight.issued === date);
     return {
       id: systolic?.encounter?.reference.replace('Encounter/', ''),
-      date: systolic?.issued,
+      date: systolic?.issued || diastolic?.issued || pulse?.issued,
       systolic: systolic?.valueQuantity?.value,
       diastolic: diastolic?.valueQuantity?.value,
       pulse: pulse?.valueQuantity?.value,
       temperature: temperature?.valueQuantity?.value,
       oxygenSaturation: oxygenSaturation?.valueQuantity?.value,
       respiratoryRate: respiratoryRate?.valueQuantity?.value,
+      height: height?.valueQuantity?.value,
+      weight: weight?.valueQuantity?.value,
+      bmi:
+        height?.valueQuantity?.value && weight?.valueQuantity?.value
+          ? calculateBMI(Number(weight?.valueQuantity?.value), Number(height?.valueQuantity?.value))
+          : null,
     };
   });
 }
 
-function getDatesIssued(vitalsArray: Vitals): Array<Date> {
+function getDatesIssued(vitalsArray: Observations): Array<Date> {
   return vitalsArray.map((vitals) => vitals.issued);
 }
 
