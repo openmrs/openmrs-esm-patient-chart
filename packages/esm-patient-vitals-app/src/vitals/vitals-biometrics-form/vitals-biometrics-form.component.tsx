@@ -12,17 +12,11 @@ import {
   fhirBaseUrl,
   useLayoutType,
 } from '@openmrs/esm-framework';
-import { useVitalsConceptMetadata } from '@openmrs/esm-patient-common-lib';
+import { DefaultWorkspaceProps, useVitalsConceptMetadata } from '@openmrs/esm-patient-common-lib';
 import { Column, Grid, Row, Button, ButtonSet, Form } from 'carbon-components-react';
 import { calculateBMI, isInNormalRange } from './vitals-biometrics-form.utils';
 import { pageSize, savePatientVitals } from '../vitals.resource';
 import { ConfigObject } from '../../config-schema';
-
-interface VitalsAndBiometricFormProps {
-  isTablet: boolean;
-  patientUuid: string;
-  closeWorkspace(): void;
-}
 
 export interface PatientVitalsAndBiometrics {
   systolicBloodPressure: string;
@@ -37,7 +31,7 @@ export interface PatientVitalsAndBiometrics {
   midUpperArmCircumference?: string;
 }
 
-const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patientUuid, closeWorkspace }) => {
+const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSessionUser();
