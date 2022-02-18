@@ -21,6 +21,7 @@ export interface WorkspaceStoreState {
 export interface OpenWorkspace extends WorkspaceRegistration {
   additionalProps: object;
   closeWorkspace(): void;
+  promptBeforeClosing(testFcn: () => boolean): void;
 }
 
 export interface WorkspaceRegistration {
@@ -105,6 +106,7 @@ export function launchPatientWorkspace(name: string, additionalProps?: object) {
   const newWorkspace = {
     ...workspace,
     closeWorkspace: () => closeWorkspace(name),
+    promptBeforeClosing: (testFcn) => promptBeforeClosing(name, testFcn),
     additionalProps,
   };
   const existingWorkspaces = state.openWorkspaces.filter((w) => w.type == newWorkspace.type);
@@ -112,12 +114,13 @@ export function launchPatientWorkspace(name: string, additionalProps?: object) {
     store.setState({ ...state, openWorkspaces: [newWorkspace, ...state.openWorkspaces] });
   } else {
     const existingIdx = state.openWorkspaces.findIndex((w) => w.name == name);
+    const promptCheckFcn = getPromptBeforeClosingFcn(existingWorkspaces[0].name);
     if (existingIdx >= 0) {
       const restOfWorkspaces = [...state.openWorkspaces];
       restOfWorkspaces.splice(existingIdx, 1);
       const openWorkspaces = [state.openWorkspaces[existingIdx], ...restOfWorkspaces];
       store.setState({ ...state, openWorkspaces });
-    } else {
+    } else if (!promptCheckFcn || promptCheckFcn()) {
       const currentName = existingWorkspaces[0].title ?? existingWorkspaces[0].name;
       const prompt: Prompt = {
         title: translateFrom(
@@ -141,8 +144,24 @@ export function launchPatientWorkspace(name: string, additionalProps?: object) {
         confirmText: translateFrom('@openmrs/esm-patient-chart-app', 'openAnyway', 'Open anyway'),
       };
       store.setState({ ...state, prompt });
+    } else {
+      const state = store.getState();
+      store.setState({
+        ...state,
+        openWorkspaces: [newWorkspace, ...state.openWorkspaces.filter((w) => w.type != newWorkspace.type)],
+      });
     }
   }
+}
+
+const promptBeforeClosingFcns = {};
+
+export function promptBeforeClosing(workspaceName: string, testFcn: () => boolean) {
+  promptBeforeClosingFcns[workspaceName] = testFcn;
+}
+
+export function getPromptBeforeClosingFcn(workspaceName: string) {
+  return promptBeforeClosingFcns[workspaceName];
 }
 
 export function cancelPrompt() {

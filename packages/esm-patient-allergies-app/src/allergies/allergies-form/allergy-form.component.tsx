@@ -37,7 +37,7 @@ enum AllergenTypes {
   ENVIRONMENT = 'ENVIRONMENT',
 }
 
-const AllergyForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patientUuid }) => {
+const AllergyForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, promptBeforeClosing, patientUuid }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const { concepts } = useConfig();
@@ -65,6 +65,22 @@ const AllergyForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patientU
   const [severityOfWorstReaction, setSeverityOfWorstReaction] = useState('');
   const allergenTypes = [t('drug', 'Drug'), t('food', 'Food'), t('environmental', 'Environmental')];
   const severityLevels = [t('mild', 'Mild'), t('moderate', 'Moderate'), t('severe', 'Severe')];
+
+  useEffect(() => {
+    promptBeforeClosing(() => {
+      return Boolean(
+        nonCodedAllergenType || nonCodedAllergicReaction || onsetDate || selectedAllergen || severityOfWorstReaction,
+      );
+    });
+  }, [
+    promptBeforeClosing,
+    nonCodedAllergenType,
+    nonCodedAllergicReaction,
+    onsetDate,
+    selectedAllergen,
+    selectedAllergenType,
+    severityOfWorstReaction,
+  ]);
 
   useEffect(() => {
     const allergenUuids = [drugAllergenUuid, foodAllergenUuid, environmentalAllergenUuid, allergyReactionUuid];
@@ -114,7 +130,7 @@ const AllergyForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patientU
         severity: {
           uuid: severityOfWorstReaction,
         },
-        comment: comment,
+        comment,
         reactions: allergicReactions?.map((reaction) => {
           return reaction === otherConceptUuid
             ? { reaction: { uuid: reaction }, reactionNonCoded: nonCodedAllergicReaction }
