@@ -82,7 +82,7 @@ describe('workspace system', () => {
     expect(store.getState().openWorkspaces[0].name).toBe('order-meds');
   });
 
-  test("respects promptBeforeClosing function", () => {
+  test('respects promptBeforeClosing function', () => {
     const store = getWorkspaceStore();
     registerWorkspace({ name: 'hiv', title: 'HIV', load: jest.fn() });
     registerWorkspace({ name: 'diabetes', title: 'Diabetes', load: jest.fn() });
@@ -90,13 +90,13 @@ describe('workspace system', () => {
     store.getState().openWorkspaces[0].promptBeforeClosing(() => false);
     launchPatientWorkspace('diabetes');
     expect(store.getState().prompt).toBeNull();
-    expect(store.getState().openWorkspaces[0].name).toBe("diabetes");
+    expect(store.getState().openWorkspaces[0].name).toBe('diabetes');
     store.getState().openWorkspaces[0].promptBeforeClosing(() => true);
     launchPatientWorkspace('hiv');
-    expect(store.getState().openWorkspaces[0].name).toBe("diabetes");
+    expect(store.getState().openWorkspaces[0].name).toBe('diabetes');
     expect(store.getState().prompt.title).toMatch(/active form open/);
     store.getState().prompt.onConfirm();
-    expect(store.getState().openWorkspaces[0].name).toBe("hiv");
+    expect(store.getState().openWorkspaces[0].name).toBe('hiv');
   });
 
   test('is compatible with workspaces registered as extensions', () => {
