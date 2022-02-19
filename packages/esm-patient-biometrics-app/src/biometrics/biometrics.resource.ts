@@ -1,69 +1,59 @@
 import useSWR from 'swr';
-import { fhirBaseUrl, FHIRResource, useConfig, openmrsFetch } from '@openmrs/esm-framework';
+import { fhirBaseUrl, FHIRResource, openmrsFetch } from '@openmrs/esm-framework';
 import { calculateBMI } from './biometrics-helpers';
 
 export const pageSize = 100;
 
-type Biometrics = Array<FHIRResource['resource']>;
-
 export function useBiometrics(patientUuid: string, concepts: Record<string, string>) {
   const { data, error, isValidating } = useSWR<{ data: BiometricsFetchResponse }, Error>(
-    `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&` +
-      `code=${Object.values(concepts).join(',')}&_count=${pageSize}`,
+    `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&code=` +
+      Object.values(concepts).join(',') +
+      '&_summary=data&_sort=-date' +
+      `&_count=${pageSize}
+    `,
     openmrsFetch,
   );
 
-  const filterByConceptUuid = (biometrics: Biometrics, conceptUuid: string) => {
-    return biometrics.filter((obs) => obs.code.coding.some((c) => c.code === conceptUuid));
+  const getBiometricSignKey = (conceptUuid: string) => {
+    if (conceptUuid === concepts.heightUuid) return 'height';
+    if (conceptUuid === concepts.weightUuid) return 'weight';
+    if (conceptUuid === concepts.muacUuid) return 'muac';
+    return;
   };
 
-  const observations: Biometrics = data?.data?.entry?.map((entry) => entry.resource) ?? [];
+  const formattedBiometrics = () => {
+    const biometricsHashTable = new Map<string, Partial<PatientBiometrics>>([]);
+    data?.data?.entry?.map(({ resource }) => {
+      const issuedDate = new Date(new Date(resource.issued).setSeconds(0, 0)).toISOString();
+      if (biometricsHashTable.has(issuedDate)) {
+        biometricsHashTable.set(issuedDate, {
+          ...biometricsHashTable.get(issuedDate),
+          [getBiometricSignKey(resource.code.coding[0].code)]: resource?.valueQuantity?.value,
+        });
+      } else {
+        resource?.valueQuantity?.value &&
+          biometricsHashTable.set(issuedDate, {
+            [getBiometricSignKey(resource.code.coding[0].code)]: resource?.valueQuantity?.value,
+          });
+      }
+    });
+
+    return Array.from(biometricsHashTable).map(([date, biometric], index) => {
+      return {
+        ...biometric,
+        date: date,
+        id: index.toString(),
+        bmi: calculateBMI(biometric.weight, biometric.height),
+      };
+    });
+  };
 
   return {
-    biometrics:
-      data?.data?.total > 0
-        ? formatDimensions(
-            filterByConceptUuid(observations, concepts.heightUuid),
-            filterByConceptUuid(observations, concepts.weightUuid),
-            filterByConceptUuid(observations, concepts.muacUuid),
-          )
-        : null,
+    biometrics: (formattedBiometrics() as Array<PatientBiometrics>) ?? null,
     isError: error,
     isLoading: !data && !error,
     isValidating,
   };
-}
-
-function formatDimensions(heights: Biometrics, weights: Biometrics, muacs: Biometrics): Array<PatientBiometrics> {
-  const weightDates = getDatesIssued(weights);
-  const heightDates = getDatesIssued(heights);
-  const uniqueDates = Array.from(new Set(weightDates?.concat(heightDates))).sort(latestFirst);
-
-  return uniqueDates.map((date: Date) => {
-    const muac = muacs.find((muac) => muac.issued === date);
-    const weight = weights.find((weight) => weight.issued === date);
-    const height = heights.find((height) => height.issued === date);
-    return {
-      id: weight?.encounter?.reference?.replace('Encounter/', ''),
-      weight: weight?.valueQuantity?.value,
-      height: height?.valueQuantity?.value,
-      date: date,
-      bmi: weight && height ? calculateBMI(weight.valueQuantity.value, height.valueQuantity.value) : null,
-      obsData: {
-        weight: weight,
-        height: height,
-      },
-      muac: muac?.valueQuantity?.value,
-    };
-  });
-}
-
-function latestFirst(a, b) {
-  return new Date(b).getTime() - new Date(a).getTime();
-}
-
-function getDatesIssued(dimensionArray): Array<Date> {
-  return dimensionArray?.map((dimension) => dimension.issued);
 }
 
 interface BiometricsFetchResponse {
