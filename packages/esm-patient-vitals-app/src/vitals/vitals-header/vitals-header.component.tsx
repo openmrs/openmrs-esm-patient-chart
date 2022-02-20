@@ -26,7 +26,7 @@ interface VitalsHeaderProps {
 const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVitalsButton }) => {
   const config = useConfig() as ConfigObject;
   const { t } = useTranslation();
-  const { vitals, isLoading } = useVitals(patientUuid);
+  const { vitals, isLoading } = useVitals(patientUuid, true);
   const { data: conceptUnits, conceptMetadata } = useVitalsConceptMetadata();
   const latestVitals = vitals?.[0];
 
