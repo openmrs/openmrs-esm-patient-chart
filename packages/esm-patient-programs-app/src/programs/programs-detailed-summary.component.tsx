@@ -1,5 +1,4 @@
 import React from 'react';
-import dayjs from 'dayjs';
 import Add16 from '@carbon/icons-react/es/add/16';
 import filter from 'lodash-es/filter';
 import includes from 'lodash-es/includes';
@@ -8,7 +7,6 @@ import styles from './programs-detailed-summary.scss';
 import { CardHeader, EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { useAvailablePrograms, useEnrollments } from './programs.resource';
-import { useProgramsContext } from './programs.context';
 import {
   Button,
   DataTable,
@@ -27,19 +25,20 @@ import {
 } from 'carbon-components-react';
 import { formatDate, formatDatetime } from '@openmrs/esm-framework';
 
-interface ProgramsDetailedSummaryProps {}
+interface ProgramsDetailedSummaryProps {
+  patientUuid: string;
+}
 
-const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = () => {
+const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const { patientUuid } = useProgramsContext();
   const displayText = t('programEnrollments', 'Program enrollments');
   const headerTitle = t('carePrograms', 'Care Programs');
 
-  const { data: enrolledPrograms, isError, isLoading, isValidating } = useEnrollments(patientUuid);
+  const { data: enrollments, isError, isLoading, isValidating } = useEnrollments(patientUuid);
   const { data: availablePrograms } = useAvailablePrograms();
   const eligiblePrograms = filter(
     availablePrograms,
-    (program) => !includes(map(enrolledPrograms, 'program.uuid'), program.uuid),
+    (program) => !includes(map(enrollments, 'program.uuid'), program.uuid),
   );
 
   const tableHeaders: Array<DataTableHeader> = React.useMemo(
@@ -65,7 +64,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = () => {
   );
 
   const tableRows: Array<DataTableRow> = React.useMemo(() => {
-    return enrolledPrograms?.map((program) => {
+    return enrollments?.map((program) => {
       return {
         id: program.uuid,
         display: program.display,
@@ -76,13 +75,13 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = () => {
           : t('active', 'Active'),
       };
     });
-  }, [enrolledPrograms, t]);
+  }, [enrollments, t]);
 
   const launchProgramsForm = React.useCallback(() => launchPatientWorkspace('programs-form-workspace'), []);
 
   if (isLoading) return <DataTableSkeleton role="progressbar" />;
   if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
-  if (enrolledPrograms?.length) {
+  if (enrollments?.length) {
     return (
       <div className={styles.widgetCard}>
         <CardHeader title={headerTitle}>
@@ -102,7 +101,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = () => {
             <InlineNotification
               style={{ minWidth: '100%', margin: '0rem', padding: '0rem' }}
               kind={'info'}
-              lowContrast={true}
+              lowContrast
               subtitle={t('noEligibleEnrollments', 'There are no more programs left to enroll this patient in')}
               title={t('fullyEnrolled', 'Enrolled in all programs')}
             />

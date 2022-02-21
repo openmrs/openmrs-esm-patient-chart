@@ -1,10 +1,15 @@
 import React from 'react';
-import dayjs from 'dayjs';
-import * as SWR from 'swr';
 import { throwError } from 'rxjs';
 import { of } from 'rxjs/internal/observable/of';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { createErrorHandler, openmrsFetch, showNotification, showToast, useLocations } from '@openmrs/esm-framework';
+import {
+  createErrorHandler,
+  openmrsFetch,
+  showNotification,
+  showToast,
+  useLayoutType,
+  useLocations,
+} from '@openmrs/esm-framework';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import {
   mockCareProgramsResponse,
@@ -16,7 +21,6 @@ import ProgramsForm from './programs-form.component';
 
 const testProps = {
   patientUuid: mockPatient.id,
-  isTablet: false,
   closeWorkspace: jest.fn(),
 };
 
@@ -25,6 +29,7 @@ const mockCreateProgramEnrollment = createProgramEnrollment as jest.Mock;
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockShowNotification = showNotification as jest.Mock;
 const mockShowToast = showToast as jest.Mock;
+const mockUseLayoutType = useLayoutType as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -85,7 +90,7 @@ describe('ProgramsForm: ', () => {
   });
 
   it('renders a light background for date inputs in the tablet viewport ', () => {
-    testProps.isTablet = true;
+    mockUseLayoutType.mockReturnValueOnce('tablet').mockReturnValueOnce('tablet');
 
     renderProgramsForm();
 
@@ -113,7 +118,6 @@ describe('ProgramsForm: ', () => {
     });
 
     it('renders a success toast notification upon successfully recording a program enrollment', () => {
-      const mockMutate = jest.spyOn(SWR, 'mutate').mockImplementation(jest.fn());
       mockCreateProgramEnrollment.mockReturnValueOnce(of({ status: 201, statusText: 'Created' }));
 
       fireEvent.change(selectProgramInput, {
@@ -122,7 +126,7 @@ describe('ProgramsForm: ', () => {
       expect(screen.getByDisplayValue('Oncology Screening and Diagnosis')).toBeInTheDocument();
 
       fireEvent.change(enrollmentDateInput, { target: { value: '2020-05-05' } });
-      expect(screen.getByDisplayValue(renderDate('2020-05-05'))).toBeInTheDocument();
+      expect(screen.getByDisplayValue('2020-05-05')).toBeInTheDocument();
 
       fireEvent.change(selectLocationInput, {
         target: { value: inpatientWardUuid },
@@ -153,9 +157,6 @@ describe('ProgramsForm: ', () => {
           title: 'Program enrollment saved',
         }),
       );
-
-      expect(mockMutate).toHaveBeenCalledTimes(1);
-      expect(mockMutate).toHaveBeenCalledWith(`/ws/rest/v1/programenrollment?patient=${mockPatient.id}`);
     });
 
     it('renders an error notification if there was a problem recording a program enrollment', async () => {
@@ -175,7 +176,7 @@ describe('ProgramsForm: ', () => {
       expect(screen.getByDisplayValue('Oncology Screening and Diagnosis')).toBeInTheDocument();
 
       fireEvent.change(enrollmentDateInput, { target: { value: '2020-05-05' } });
-      expect(screen.getByDisplayValue(renderDate('2020-05-05'))).toBeInTheDocument();
+      expect(screen.getByDisplayValue('2020-05-05')).toBeInTheDocument();
 
       fireEvent.change(selectLocationInput, {
         target: { value: inpatientWardUuid },
@@ -198,8 +199,4 @@ describe('ProgramsForm: ', () => {
 
 function renderProgramsForm() {
   render(<ProgramsForm {...testProps} />);
-}
-
-function renderDate(time: string) {
-  return dayjs(time).format('YYYY-MM-DD');
 }

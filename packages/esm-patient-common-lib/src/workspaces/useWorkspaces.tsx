@@ -1,33 +1,31 @@
 import { useEffect, useMemo, useState } from 'react';
-import {
-  getWorkspaceStore,
-  closeWorkspace,
-  OpenWorkspace,
-  WorkspaceWindowState,
-} from '@openmrs/esm-patient-common-lib';
+import { getWorkspaceStore, OpenWorkspace, WorkspaceWindowState } from '@openmrs/esm-patient-common-lib';
+import { Prompt, WorkspaceStoreState } from './workspaces';
 
 export interface WorkspacesInfo {
   active: boolean;
   windowState: WorkspaceWindowState;
   workspaces: Array<OpenWorkspace>;
-  workspaceNeedingConfirmationToOpen: OpenWorkspace;
+  prompt: Prompt;
 }
 
 export function useWorkspaces(): WorkspacesInfo {
   const [workspaces, setWorkspaces] = useState<Array<OpenWorkspace>>([]);
-  const [workspaceNeedingConfirmationToOpen, setWorkspaceNeedingConfirmationToOpen] = useState<OpenWorkspace>(null);
+  const [prompt, setPrompt] = useState<Prompt>(null);
 
   useEffect(() => {
-    getWorkspaceStore().subscribe((state) => {
-      setWorkspaces(state.openWorkspaces.map((w) => ({ ...w, closeWorkspace: () => closeWorkspace(w.name) })));
-      setWorkspaceNeedingConfirmationToOpen(state.workspaceNeedingConfirmationToOpen);
-    });
+    function update(state: WorkspaceStoreState) {
+      setWorkspaces(state.openWorkspaces);
+      setPrompt(state.prompt);
+    }
+    update(getWorkspaceStore().getState());
+    getWorkspaceStore().subscribe(update);
   }, []);
 
   const windowState = useMemo(() => {
     if (workspaces.length === 0) {
       return WorkspaceWindowState.hidden;
-    } else if (workspaces.length === 1) {
+    } else {
       return workspaces[0].preferredWindowSize;
     }
   }, [workspaces]);
@@ -36,6 +34,6 @@ export function useWorkspaces(): WorkspacesInfo {
     active: workspaces.length > 0,
     windowState,
     workspaces,
-    workspaceNeedingConfirmationToOpen,
+    prompt,
   };
 }

@@ -1,5 +1,4 @@
 import React from 'react';
-import dayjs from 'dayjs';
 import Add16 from '@carbon/icons-react/es/add/16';
 import ChartLineSmooth16 from '@carbon/icons-react/es/chart--line-smooth/16';
 import Table16 from '@carbon/icons-react/es/table/16';
@@ -19,7 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { patientVitalsBiometricsFormWorkspace } from '../constants';
 import { useVitals } from './vitals.resource';
 import { ConfigObject } from '../config-schema';
-import { useConfig } from '@openmrs/esm-framework';
+import { formatDate, parseDate, useConfig } from '@openmrs/esm-framework';
 
 interface VitalsOverviewProps {
   patientUuid: string;
@@ -36,7 +35,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
   const headerTitle = t('vitals', 'Vitals');
   const [chartView, setChartView] = React.useState<boolean>();
 
-  const { data: vitals, isError, isLoading, isValidating } = useVitals(patientUuid);
+  const { vitals, isError, isLoading, isValidating } = useVitals(patientUuid);
   const { data: conceptUnits } = useVitalsConceptMetadata();
 
   const launchVitalsBiometricsForm = React.useCallback(
@@ -70,7 +69,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
       vitals?.map((vital, index) => {
         return {
           id: `${index}`,
-          date: dayjs(vital.date).format(`DD - MMM - YYYY, hh:mm`),
+          date: formatDate(parseDate(vital.date.toString()), { mode: 'wide', time: true }),
           bloodPressure: `${vital.systolic ?? '-'} / ${vital.diastolic ?? '-'}`,
           pulse: vital.pulse,
           spo2: vital.oxygenSaturation,

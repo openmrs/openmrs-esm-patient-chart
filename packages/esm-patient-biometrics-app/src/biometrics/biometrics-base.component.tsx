@@ -1,5 +1,4 @@
 import React from 'react';
-import dayjs from 'dayjs';
 import Add16 from '@carbon/icons-react/es/add/16';
 import ChartLineSmooth16 from '@carbon/icons-react/es/chart--line-smooth/16';
 import Table16 from '@carbon/icons-react/es/table/16';
@@ -7,7 +6,7 @@ import BiometricsChart from './biometrics-chart.component';
 import BiometricsPagination from './biometrics-pagination.component';
 import { Button, DataTableSkeleton, InlineLoading } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
-import { useConfig } from '@openmrs/esm-framework';
+import { formatDatetime, parseDate, useConfig } from '@openmrs/esm-framework';
 import { useBiometrics } from './biometrics.resource';
 import {
   CardHeader,
@@ -66,7 +65,7 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({
         return {
           ...data,
           id: `${index}`,
-          date: dayjs(data.date).format(`DD - MMM - YYYY, hh:mm`),
+          date: formatDatetime(parseDate(data.date.toString()), { mode: 'wide' }),
         };
       }),
     [biometrics],

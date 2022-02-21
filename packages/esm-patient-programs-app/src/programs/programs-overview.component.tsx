@@ -1,5 +1,4 @@
 import React from 'react';
-import dayjs from 'dayjs';
 import Add16 from '@carbon/icons-react/es/add/16';
 import styles from './programs-overview.scss';
 import { formatDate, formatDatetime, usePagination } from '@openmrs/esm-framework';
@@ -37,7 +36,7 @@ interface ProgramsOverviewProps {
   patientUuid: string;
 }
 
-const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ patientUuid, basePath }) => {
+const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUuid }) => {
   const { t } = useTranslation();
   const displayText = t('programs', 'Program enrollments');
   const headerTitle = t('carePrograms', 'Care Programs');
@@ -111,7 +110,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ patientUuid, basePa
             <InlineNotification
               style={{ minWidth: '100%', margin: '0rem', padding: '0rem' }}
               kind={'info'}
-              lowContrast={true}
+              lowContrast
               subtitle={t('noEligibleEnrollments', 'There are no more programs left to enroll this patient in')}
               title={t('fullyEnrolled', 'Enrolled in all programs')}
             />

@@ -5,15 +5,15 @@ import isEmpty from 'lodash-es/isEmpty';
 import { Search, RadioButtonGroup, RadioButton } from 'carbon-components-react';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
-import { usePagination, useVisitTypes } from '@openmrs/esm-framework';
+import { useLayoutType, usePagination, useVisitTypes } from '@openmrs/esm-framework';
 
 interface VisitTypeOverviewProps {
-  isTablet: boolean;
   onChange: (event) => void;
 }
 
-const VisitTypeOverview: React.FC<VisitTypeOverviewProps> = ({ isTablet, onChange }) => {
+const VisitTypeOverview: React.FC<VisitTypeOverviewProps> = ({ onChange }) => {
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
   const visitTypes = useVisitTypes();
   const [searchTerm, setSearchTerm] = useState<string>('');
 

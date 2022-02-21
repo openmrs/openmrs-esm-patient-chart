@@ -10,13 +10,12 @@ import {
   diagnosisSearchResponse,
   mockFetchLocationByUuidResponse,
   mockFetchProviderByUuidResponse,
-} from '../../../../__mocks__/visit-note.mock';
+} from '../../../../__mocks__/visit-notes.mock';
 import { mockSessionDataResponse } from '../../../../__mocks__/session.mock';
 import { getByTextWithMarkup } from '../../../../tools/test-helpers';
 import VisitNotesForm from './visit-notes-form.component';
 
 const testProps = {
-  isTablet: false,
   patientUuid: mockPatient.id,
   closeWorkspace: jest.fn(),
 };
@@ -133,7 +132,7 @@ describe('Visit notes form: ', () => {
         location: null,
         obs: jasmine.arrayContaining([
           {
-            concept: ConfigMock.visitNoteConfig.encounterNoteConceptUuid,
+            concept: ConfigMock.visitNoteConfig.encounterNoteTextConceptUuid,
             value: 'Sample clinical note',
           },
         ]),

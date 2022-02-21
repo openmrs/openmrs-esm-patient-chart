@@ -10,10 +10,9 @@ import {
   TableHeader,
   TableRow,
 } from 'carbon-components-react';
-import { usePagination, useConfig } from '@openmrs/esm-framework';
+import { usePagination, useConfig, formatDatetime } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { useObs } from '../resources/useObs';
-import dayjs from 'dayjs';
 
 interface ObsTableProps {
   patientUuid: string;
@@ -39,7 +38,7 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
       obssByDate?.map((obss, index) => {
         const rowData = {
           id: `${index}`,
-          date: dayjs(obss[0].issued).format(`DD - MMM - YYYY, hh:mm`),
+          date: formatDatetime(new Date(obss[0].issued), { mode: 'wide' }),
         };
         for (let obs of obss) {
           rowData[obs.conceptUuid] = obs.valueQuantity.value;

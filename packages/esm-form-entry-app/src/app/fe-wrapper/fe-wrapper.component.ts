@@ -21,7 +21,7 @@ import { EncounterResourceService } from '../openmrs-api/encounter-resource.serv
 import { singleSpaPropsSubject, SingleSpaProps } from '../../single-spa-props';
 import { Encounter, FormEntryConfig, FormSchema, LoggedInUser, Order } from '../types';
 // @ts-ignore
-import { showToast, showNotification } from '@openmrs/esm-framework';
+import { showToast, showNotification, formatDate, formatTime } from '@openmrs/esm-framework';
 import { PatientPreviousEncounterService } from '../openmrs-api/patient-previous-encounter.service';
 
 import { MonthlyScheduleResourceService } from '../services/monthly-scheduled-resource.service';
@@ -54,13 +54,15 @@ export class FeWrapperComponent implements OnInit {
   prevEncounter: Encounter;
   isLoading: boolean = true;
   config: FormEntryConfig;
+  isSubmitting: boolean = false;
+  labelMap: Array<Object> = [];
 
   public get encounterDate(): string {
-    return moment(this.encounter?.encounterDatetime).format('YYYY-MM-DD');
+    return formatDate(new Date(this.encounter?.encounterDatetime), { time: false });
   }
 
   public get encounterTime(): string {
-    return moment(this.encounter?.encounterDatetime).format('HH:mm');
+    return formatTime(new Date(this.encounter?.encounterDatetime));
   }
 
   public get hasValidationErrors(): boolean {
@@ -116,6 +118,7 @@ export class FeWrapperComponent implements OnInit {
 
   public onSubmit(event: any) {
     if (this.isFormValid()) {
+      this.isSubmitting = true;
       this.saveForm().subscribe(
         (response) => {
           this.encounterUuid = response[0] && response[0].uuid;
@@ -138,13 +141,12 @@ export class FeWrapperComponent implements OnInit {
             this.closeForm();
           }
         },
-        (error) => {
-          console.error('Error submitting form', error);
-          this.singleSpaProps.closeWorkspace();
+        (error: Error) => {
+          this.isSubmitting = false;
           showToast({
             critical: true,
             kind: 'error',
-            description: `An error has occurred while submitting the form ${JSON.stringify(error, null, 2)}`,
+            description: `An error has occurred while submitting the form ${JSON.stringify(error?.message, null, 2)}`,
             title: this.formName,
           });
         },

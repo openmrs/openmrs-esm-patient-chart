@@ -5,7 +5,7 @@ import { Button } from 'carbon-components-react';
 import ArrowLeft24 from '@carbon/icons-react/es/arrow--left/24';
 import LineChart from '@carbon/charts-react/line-chart';
 import { ScaleTypes, LineChartOptions, TickRotations } from '@carbon/charts/interfaces';
-import { toOmrsDateFormat, toOmrsTimeString24 } from '@openmrs/esm-framework';
+import { formatDate, formatTime, parseDate } from '@openmrs/esm-framework';
 import { ObsRecord, OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import CommonDataTable from '../overview/common-datatable.component';
 import { exist } from '../loadPatientTestData/helpers';
@@ -144,8 +144,8 @@ const Trendline: React.FC<{
     });
 
     tableData.push({
-      date: toOmrsDateFormat(entry.effectiveDateTime),
-      time: toOmrsTimeString24(entry.effectiveDateTime),
+      date: formatDate(parseDate(entry.effectiveDateTime)),
+      time: formatTime(parseDate(entry.effectiveDateTime)),
       value: entry.value,
       id: entry.id,
       interpretation: entry.meta.assessValue?.(entry.value),
@@ -193,7 +193,7 @@ const Trendline: React.FC<{
       tooltip: {
         customHTML: ([{ date, value }]) =>
           `<div class="bx--tooltip bx--tooltip--shown" style="min-width: max-content; font-weight:600">${value} ${leftAxisLabel}<br>
-          <span style="color: #c6c6c6; font-size: 0.75rem; font-weight:400">${toOmrsDateFormat(date)}</span></div>`,
+          <span style="color: #c6c6c6; font-size: 0.75rem; font-weight:400">${formatDate(date)}</span></div>`,
       },
     }),
     [leftAxisLabel, range, dataset],

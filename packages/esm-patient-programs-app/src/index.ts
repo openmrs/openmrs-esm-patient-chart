@@ -32,7 +32,7 @@ function setupOpenMRS() {
       {
         id: 'programs-details-widget',
         slot: dashboardMeta.slot,
-        load: getAsyncLifecycle(() => import('./programs/programs.component'), options),
+        load: getAsyncLifecycle(() => import('./programs/programs-detailed-summary.component'), options),
         meta: {
           columnSpan: 1,
         },

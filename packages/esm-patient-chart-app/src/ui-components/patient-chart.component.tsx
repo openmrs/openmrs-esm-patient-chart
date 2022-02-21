@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
 import { ExtensionSlot, useSessionUser } from '@openmrs/esm-framework';
-import { closeAllWorkspaces, useWorkspaceWindowSize, WorkspaceWindowState } from '@openmrs/esm-patient-common-lib';
+import { changeWorkspaceContext, useWorkspaceWindowSize, WorkspaceWindowState } from '@openmrs/esm-patient-common-lib';
 import { RouteComponentProps } from 'react-router-dom';
 import { useOfflineVisitForPatient, usePatientOrOfflineRegisteredPatient } from '../offline';
 import ChartReview from '../view-components/chart-review.component';
@@ -8,7 +8,7 @@ import VisitDialog from '../visit/visit-dialog.component';
 import ActionMenu from './action-menu.component';
 import Loader from './loader.component';
 import styles from './patient-chart.component.scss';
-import WorkspaceNotification from './workspace-notification.component';
+import WorkspaceNotification from '../workspace/workspace-notification.component';
 
 interface PatientChartParams {
   patientUuid: string;
@@ -24,7 +24,7 @@ const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({ match
   const { windowSize, active } = useWorkspaceWindowSize();
 
   useEffect(() => {
-    closeAllWorkspaces();
+    changeWorkspaceContext(patientUuid);
   }, [patientUuid]);
 
   useOfflineVisitForPatient(patientUuid, sessionUser?.sessionLocation?.uuid);

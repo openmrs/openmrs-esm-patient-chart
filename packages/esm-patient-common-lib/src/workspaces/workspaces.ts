@@ -1,14 +1,27 @@
 import { ExtensionRegistration, getExtensionRegistration, getGlobalStore, translateFrom } from '@openmrs/esm-framework';
+import _i18n from 'i18next';
 import { WorkspaceWindowState } from '..';
 
+export interface Prompt {
+  title: string;
+  body: string;
+  /** Defaults to "Confirm" */
+  confirmText?: string;
+  onConfirm(): void;
+  /** Defaults to "Cancel" */
+  cancelText?: string;
+}
+
 export interface WorkspaceStoreState {
+  patientUuid: string | null;
   openWorkspaces: Array<OpenWorkspace>;
-  workspaceNeedingConfirmationToOpen: OpenWorkspace | null;
+  prompt: Prompt | null;
 }
 
 export interface OpenWorkspace extends WorkspaceRegistration {
   additionalProps: object;
   closeWorkspace(): void;
+  promptBeforeClosing(testFcn: () => boolean): void;
 }
 
 export interface WorkspaceRegistration {
@@ -93,37 +106,68 @@ export function launchPatientWorkspace(name: string, additionalProps?: object) {
   const newWorkspace = {
     ...workspace,
     closeWorkspace: () => closeWorkspace(name),
+    promptBeforeClosing: (testFcn) => promptBeforeClosing(name, testFcn),
     additionalProps,
   };
-  if (state.openWorkspaces.filter((w) => w.type == newWorkspace.type).length == 0) {
+  const existingWorkspaces = state.openWorkspaces.filter((w) => w.type == newWorkspace.type);
+  if (existingWorkspaces.length == 0) {
     store.setState({ ...state, openWorkspaces: [newWorkspace, ...state.openWorkspaces] });
   } else {
     const existingIdx = state.openWorkspaces.findIndex((w) => w.name == name);
+    const promptCheckFcn = getPromptBeforeClosingFcn(existingWorkspaces[0].name);
     if (existingIdx >= 0) {
       const restOfWorkspaces = [...state.openWorkspaces];
       restOfWorkspaces.splice(existingIdx, 1);
       const openWorkspaces = [state.openWorkspaces[existingIdx], ...restOfWorkspaces];
       store.setState({ ...state, openWorkspaces });
+    } else if (!promptCheckFcn || promptCheckFcn()) {
+      const currentName = existingWorkspaces[0].title ?? existingWorkspaces[0].name;
+      const prompt: Prompt = {
+        title: translateFrom(
+          '@openmrs/esm-patient-chart-app',
+          'activeFormWarning',
+          'There is an active form open in the workspace',
+        ),
+        body: translateFrom(
+          '@openmrs/esm-patient-chart-app',
+          'workspaceModalText',
+          `Launching a new form in the workspace could cause you to lose unsaved work on the ${currentName} form.`,
+          { formName: currentName },
+        ),
+        onConfirm: () => {
+          const state = store.getState();
+          store.setState({
+            openWorkspaces: [newWorkspace, ...state.openWorkspaces.filter((w) => w.type != newWorkspace.type)],
+            prompt: null,
+          });
+        },
+        confirmText: translateFrom('@openmrs/esm-patient-chart-app', 'openAnyway', 'Open anyway'),
+      };
+      store.setState({ ...state, prompt });
     } else {
-      store.setState({ ...state, workspaceNeedingConfirmationToOpen: newWorkspace });
+      const state = store.getState();
+      store.setState({
+        ...state,
+        openWorkspaces: [newWorkspace, ...state.openWorkspaces.filter((w) => w.type != newWorkspace.type)],
+      });
     }
   }
 }
 
-export function confirmOpeningWorkspace() {
-  const store = getWorkspaceStore();
-  const state = store.getState();
-  const newWorkspace = state.workspaceNeedingConfirmationToOpen;
-  store.setState({
-    openWorkspaces: [newWorkspace, ...state.openWorkspaces.filter((w) => w.type != newWorkspace.type)],
-    workspaceNeedingConfirmationToOpen: null,
-  });
+const promptBeforeClosingFcns = {};
+
+export function promptBeforeClosing(workspaceName: string, testFcn: () => boolean) {
+  promptBeforeClosingFcns[workspaceName] = testFcn;
 }
 
-export function cancelOpeningWorkspace() {
+export function getPromptBeforeClosingFcn(workspaceName: string) {
+  return promptBeforeClosingFcns[workspaceName];
+}
+
+export function cancelPrompt() {
   const store = getWorkspaceStore();
   const state = store.getState();
-  store.setState({ ...state, workspaceNeedingConfirmationToOpen: null });
+  store.setState({ ...state, prompt: null });
 }
 
 export function closeWorkspace(name: string) {
@@ -134,15 +178,24 @@ export function closeWorkspace(name: string) {
 
 export function closeAllWorkspaces() {
   const store = getWorkspaceStore();
-  store.setState({ openWorkspaces: [] });
+  const state = store.getState();
+  store.setState({ ...state, openWorkspaces: [] });
 }
 
-export interface WorkspaceParcel {
-  unmount: () => void;
-  update: (props) => Promise<any>;
+/**
+ * The set of workspaces is specific to a particular patient. This function
+ * should be used when setting up workspaces for a new patient. If the current
+ * workspace data is for a different patient, the workspace state is cleared.
+ */
+export function changeWorkspaceContext(patientUuid) {
+  const store = getWorkspaceStore();
+  const state = store.getState();
+  if (state.patientUuid != patientUuid) {
+    store.setState({ patientUuid, openWorkspaces: [], prompt: null });
+  }
 }
 
-const initialState = { openWorkspaces: [], workspaceNeedingConfirmationToOpen: null };
+const initialState = { patientUuid: null, openWorkspaces: [], prompt: null };
 export function getWorkspaceStore() {
   return getGlobalStore<WorkspaceStoreState>('workspace', initialState);
 }

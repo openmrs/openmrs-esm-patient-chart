@@ -1,7 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import Add16 from '@carbon/icons-react/es/add/16';
 import User16 from '@carbon/icons-react/es/user/16';
-import dayjs from 'dayjs';
 import capitalize from 'lodash-es/capitalize';
 import styles from './medications-details-table.scss';
 import {
@@ -29,6 +28,8 @@ import { OrderBasketStore, OrderBasketStoreActions, orderBasketStoreActions } fr
 import { Order } from '../types/order';
 import { OrderBasketItem } from '../types/order-basket-item';
 import { CardHeader, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { formatDate } from '@openmrs/esm-framework';
+import dayjs from 'dayjs';
 
 export interface ActiveMedicationsProps {
   isValidating?: boolean;
@@ -135,7 +136,7 @@ const MedicationsDetailsTable = connect<
                   <span className={styles.label01}>
                     {medication.quantity ? ` — ` : ''} {t('endDate', 'End date').toUpperCase()}
                   </span>{' '}
-                  {dayjs(medication.dateStopped).format('DD-MMM-YYYY')}
+                  {formatDate(new Date(medication.dateStopped))}
                 </span>
               ) : null}
             </p>
@@ -146,7 +147,7 @@ const MedicationsDetailsTable = connect<
         sortKey: dayjs(medication.dateActivated).toDate(),
         content: (
           <div className={styles.startDateColumn}>
-            <span>{dayjs(medication.dateActivated).format('DD-MMM-YYYY')}</span>
+            <span>{formatDate(new Date(medication.dateActivated))}</span>
             <InfoTooltip orderer={medication.orderer?.person?.display ?? '--'} />
           </div>
         ),
@@ -173,7 +174,7 @@ const MedicationsDetailsTable = connect<
             </Button>
           )}
         </CardHeader>
-        <TableContainer>
+        <TableContainer data-floating-menu-container>
           <DataTable
             size="short"
             headers={tableHeaders}
@@ -407,7 +408,7 @@ function OrderBasketItemActions({
   }, [items, setItems, medication]);
 
   return (
-    <OverflowMenu data-floating-menu-container selectorPrimaryFocus={'#modify'} flipped>
+    <OverflowMenu selectorPrimaryFocus={'#modify'} flipped>
       {showModifyButton && (
         <OverflowMenuItem
           className={styles.menuItem}

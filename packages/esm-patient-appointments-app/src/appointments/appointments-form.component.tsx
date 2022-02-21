@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { mutate } from 'swr';
+import { useSWRConfig } from 'swr';
 import dayjs from 'dayjs';
 import {
   Button,
@@ -13,22 +13,18 @@ import {
   TimePickerSelect,
   TimePicker,
 } from 'carbon-components-react';
-import { amPm, convertTime12to24 } from '@openmrs/esm-patient-common-lib';
-import { useLocations, useSessionUser, showToast, showNotification } from '@openmrs/esm-framework';
+import { amPm, convertTime12to24, DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import { useLocations, useSessionUser, showToast, showNotification, useLayoutType } from '@openmrs/esm-framework';
 import { appointmentsSearchUrl, createAppointment, useAppointmentService } from './appointments.resource';
 import styles from './appointments-form.scss';
 import { AppointmentPayload } from '../types';
 
-interface AppointmentsFormProps {
-  closeWorkspace: () => {};
-  isTablet: boolean;
-  patientUuid: string;
-}
-
 const appointmentTypes = [{ name: 'Scheduled' }, { name: 'WalkIn' }];
 
-const AppointmentsForm: React.FC<AppointmentsFormProps> = ({ patientUuid, isTablet, closeWorkspace }) => {
+const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace }) => {
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
+  const { mutate } = useSWRConfig();
   const locations = useLocations();
   const session = useSessionUser();
   const [appointmentNote, setAppointmentNote] = useState('');

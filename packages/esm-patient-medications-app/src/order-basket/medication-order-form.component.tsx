@@ -31,7 +31,6 @@ export interface MedicationOrderFormProps {
   durationUnits: Array<OpenmrsResource>;
   onSign: (finalizedOrder: OrderBasketItem) => void;
   onCancel: () => void;
-  isTablet?: boolean;
 }
 
 export default function MedicationOrderForm({

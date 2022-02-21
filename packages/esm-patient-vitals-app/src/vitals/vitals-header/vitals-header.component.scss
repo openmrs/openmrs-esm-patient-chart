@@ -9,14 +9,12 @@
 
 .warningBackground {
   background-color: $warning-background;
-  border-left: 0.19rem solid $inverse-support-03;
-  border-bottom: $spacing-01 solid $color-yellow-50;
+  border-left: 3px solid $inverse-support-03;
 }
 
 .defaultBackground {
   background-color: $openmrs-background-grey;
 }
-
 
 .alignCenter {
   display: flex;
@@ -27,7 +25,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 0 0 0 $spacing-02;
+  margin: 0 0.5rem;
 }
 
 .loading {
@@ -35,4 +33,12 @@
   background-color: $openmrs-background-grey;
   justify-content: center;
   min-height: $spacing-09;
+}
+
+.defaultBorder {
+  border-bottom: 1px solid $ui-03;
+}
+
+.warningBorder {
+  border-bottom: 1px solid $color-yellow-50;
 }

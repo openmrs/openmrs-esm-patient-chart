@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import VitalsBiometricInput from './vitals-biometrics-input.component';
 import styles from './vitals-biometrics-form.component.scss';
 import { useTranslation } from 'react-i18next';
-import { mutate } from 'swr';
+import { useSWRConfig } from 'swr';
 import {
   useConfig,
   createErrorHandler,
@@ -10,20 +10,15 @@ import {
   showToast,
   showNotification,
   fhirBaseUrl,
+  useLayoutType,
 } from '@openmrs/esm-framework';
-import { useVitalsConceptMetadata } from '@openmrs/esm-patient-common-lib';
+import { DefaultWorkspaceProps, useVitalsConceptMetadata } from '@openmrs/esm-patient-common-lib';
 import { Column, Grid, Row, Button, ButtonSet, Form } from 'carbon-components-react';
 import { calculateBMI, isInNormalRange } from './vitals-biometrics-form.utils';
 import { pageSize, savePatientVitals } from '../vitals.resource';
 import { ConfigObject } from '../../config-schema';
 
-interface VitalsAndBiometricFormProps {
-  isTablet: boolean;
-  patientUuid: string;
-  closeWorkspace(): void;
-}
-
-export interface PatientVitalAndBiometric {
+export interface PatientVitalsAndBiometrics {
   systolicBloodPressure: string;
   diastolicBloodPressure: string;
   pulse: string;
@@ -36,13 +31,15 @@ export interface PatientVitalAndBiometric {
   midUpperArmCircumference?: string;
 }
 
-const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patientUuid, closeWorkspace, isTablet }) => {
+const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace }) => {
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
   const session = useSessionUser();
   const config = useConfig() as ConfigObject;
+  const { mutate } = useSWRConfig();
   const { data: conceptUnits, conceptMetadata } = useVitalsConceptMetadata();
   const biometricsUnitsSymbols = config.biometrics;
-  const [patientVitalAndBiometrics, setPatientVitalAndBiometrics] = useState<PatientVitalAndBiometric>();
+  const [patientVitalAndBiometrics, setPatientVitalAndBiometrics] = useState<PatientVitalsAndBiometrics>();
   const [patientBMI, setPatientBMI] = useState<number>();
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
@@ -168,7 +165,6 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
                   patientVitalAndBiometrics?.diastolicBloodPressure,
                 )
               }
-              isTablet={isTablet}
             />
           </Column>
           <Column>
@@ -193,7 +189,6 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
                 config.concepts['pulseUuid'],
                 patientVitalAndBiometrics?.pulse,
               )}
-              isTablet={isTablet}
             />
           </Column>
           <Column>
@@ -218,7 +213,6 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
                 config.concepts['oxygenSaturationUuid'],
                 patientVitalAndBiometrics?.oxygenSaturation,
               )}
-              isTablet={isTablet}
             />
           </Column>
           <Column>
@@ -243,7 +237,6 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
                 config.concepts['respiratoryRateUuid'],
                 patientVitalAndBiometrics?.respiratoryRate,
               )}
-              isTablet={isTablet}
             />
           </Column>
         </Row>
@@ -270,7 +263,6 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
                 config.concepts['temperatureUuid'],
                 patientVitalAndBiometrics?.temperature,
               )}
-              isTablet={isTablet}
             />
           </Column>
         </Row>
@@ -294,7 +286,6 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
               textFieldWidth="26.375rem"
               placeholder={t('additionalNoteText', 'Type any additional notes here')}
               inputIsNormal={true}
-              isTablet={isTablet}
             />
           </Column>
         </Row>
@@ -323,7 +314,6 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
               ]}
               unitSymbol={conceptUnits.get(config.concepts.weightUuid) ?? ''}
               inputIsNormal={true}
-              isTablet={isTablet}
             />
           </Column>
           <Column>
@@ -344,7 +334,6 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
               ]}
               unitSymbol={conceptUnits.get(config.concepts.heightUuid) ?? ''}
               inputIsNormal={true}
-              isTablet={isTablet}
             />
           </Column>
           <Column>
@@ -361,7 +350,6 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
               unitSymbol={biometricsUnitsSymbols['bmiUnit']}
               disabled={true}
               inputIsNormal={isBMIInNormalRange(patientBMI)}
-              isTablet={isTablet}
             />
           </Column>
           <Column>
@@ -386,7 +374,6 @@ const VitalsAndBiometricForms: React.FC<VitalsAndBiometricFormProps> = ({ patien
                 config.concepts['midUpperArmCircumferenceUuid'],
                 patientVitalAndBiometrics?.midUpperArmCircumference,
               )}
-              isTablet={isTablet}
             />
           </Column>
         </Row>

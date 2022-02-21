@@ -2,6 +2,7 @@ import React, { Fragment, useState } from 'react';
 import { FormLabel, TextArea, TextInput } from 'carbon-components-react';
 import styles from './vitals-biometrics-input.component.scss';
 import { useTranslation } from 'react-i18next';
+import { useLayoutType } from '@openmrs/esm-framework';
 
 interface VitalsBiometricInputProps {
   title: string;
@@ -20,7 +21,6 @@ interface VitalsBiometricInputProps {
   placeholder?: string;
   disabled?: boolean;
   inputIsNormal: boolean;
-  isTablet: boolean;
 }
 
 const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
@@ -33,9 +33,9 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
   placeholder,
   disabled,
   inputIsNormal,
-  isTablet,
 }) => {
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
   const [invalid, setInvalid] = useState<boolean>(false);
 
   function check(value) {

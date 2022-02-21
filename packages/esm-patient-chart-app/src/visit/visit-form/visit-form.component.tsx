@@ -32,13 +32,15 @@ import {
   NewVisitPayload,
   toOmrsIsoString,
   toDateObjectStrict,
+  useLayoutType,
 } from '@openmrs/esm-framework';
 import { amPm, convertTime12to24, DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import VisitTypeOverview from './visit-type-overview.component';
 import styles from './visit-form.component.scss';
 
-const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ isTablet, patientUuid, closeWorkspace }) => {
+const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace }) => {
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
   const locations = useLocations();
   const sessionUser = useSessionUser();
   const [contentSwitcherIndex, setContentSwitcherIndex] = useState(1);
@@ -203,7 +205,6 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ isTablet, patientUuid
                 <Switch name="all" text={t('all', 'All')} />
               </ContentSwitcher>
               <VisitTypeOverview
-                isTablet={isTablet}
                 onChange={(visitType) => {
                   setVisitType(visitType);
                   setIsMissingVisitType(false);

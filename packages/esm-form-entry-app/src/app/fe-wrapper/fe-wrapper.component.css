@@ -60,6 +60,10 @@
   justify-content: space-between;
 }
 
+.button-set {
+  margin: 0 -2rem;
+}
+
 .button-set button {
   height: 4rem;
   align-items: baseline;
@@ -69,6 +73,7 @@
 /* Desktop */
 :host-context(.omrs-breakpoint-gt-tablet) .form-container {
   height: calc(100vh - 6rem);
+  margin: 0 2rem;
 }
 
 :host-context(.omrs-breakpoint-gt-tablet) .button-set {
@@ -78,6 +83,7 @@
 /* Tablet */
 :host-context(.omrs-breakpoint-lt-desktop) .form-container {
   height: calc(100vh - 3rem);
+  margin: 0 2rem;
 }
 
 :host-context(.omrs-breakpoint-lt-desktop) .button-set {

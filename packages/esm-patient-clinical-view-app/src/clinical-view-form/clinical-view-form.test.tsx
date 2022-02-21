@@ -24,7 +24,6 @@ const mockClinicalViews = {
 
 const testProps = {
   patientUuid: 'abc-123',
-  isTablet: true,
   closeWorkspace: jest.fn(),
 };
 

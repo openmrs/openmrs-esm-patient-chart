@@ -1,10 +1,9 @@
 import React from 'react';
-import dayjs from 'dayjs';
 import ImmunizationsForm from './immunizations-form.component';
 import { BrowserRouter } from 'react-router-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { of } from 'rxjs/internal/observable/of';
-import { openmrsObservableFetch, getStartedVisit, VisitItem } from '@openmrs/esm-framework';
+import { openmrsObservableFetch, getStartedVisit, VisitItem, parseDate } from '@openmrs/esm-framework';
 import { savePatientImmunization } from './immunizations.resource';
 import { mockSessionDataResponse } from '../../../../__mocks__/session.mock';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
@@ -343,6 +342,6 @@ function expectImmunization(
 
   expect(immunizationParam.protocolApplied[0].series).toBe(expectedSeries);
   expect(immunizationParam.protocolApplied[0].doseNumberPositiveInt).toBe(sequenceNumber);
-  expect(immunizationParam.occurrenceDateTime.toISOString()).toBe(dayjs('2020-06-15').toISOString());
-  expect(immunizationParam.expirationDate.toISOString()).toBe(dayjs('2020-06-30').toISOString());
+  expect(immunizationParam.occurrenceDateTime.toISOString()).toBe(parseDate('2020-06-15').toISOString());
+  expect(immunizationParam.expirationDate.toISOString()).toBe(parseDate('2020-06-30').toISOString());
 }

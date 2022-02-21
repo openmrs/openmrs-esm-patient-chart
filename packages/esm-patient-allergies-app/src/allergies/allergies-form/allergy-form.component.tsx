@@ -17,7 +17,7 @@ import {
 } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 import { first } from 'rxjs/operators';
-import { mutate } from 'swr';
+import { useSWRConfig } from 'swr';
 import {
   ExtensionSlot,
   FetchResponse,
@@ -25,6 +25,7 @@ import {
   showNotification,
   showToast,
   useConfig,
+  useLayoutType,
 } from '@openmrs/esm-framework';
 import { Allergens, fetchAllergensAndAllergicReactions, saveAllergy, NewAllergy } from './allergy-form.resource';
 import styles from './allergy-form.scss';
@@ -36,8 +37,9 @@ enum AllergenTypes {
   ENVIRONMENT = 'ENVIRONMENT',
 }
 
-const AllergyForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, isTablet, patientUuid }) => {
+const AllergyForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, promptBeforeClosing, patientUuid }) => {
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
   const { concepts } = useConfig();
   const {
     drugAllergenUuid,
@@ -50,6 +52,7 @@ const AllergyForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, isTablet
     otherConceptUuid,
   } = useMemo(() => concepts, [concepts]);
   const patientState = useMemo(() => ({ patientUuid }), [patientUuid]);
+  const { mutate } = useSWRConfig();
   const [allergens, setAllergens] = useState<Allergens>(null);
   const [allergicReactions, setAllergicReactions] = useState<Array<string>>([]);
   const [comment, setComment] = useState('');
@@ -62,6 +65,22 @@ const AllergyForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, isTablet
   const [severityOfWorstReaction, setSeverityOfWorstReaction] = useState('');
   const allergenTypes = [t('drug', 'Drug'), t('food', 'Food'), t('environmental', 'Environmental')];
   const severityLevels = [t('mild', 'Mild'), t('moderate', 'Moderate'), t('severe', 'Severe')];
+
+  useEffect(() => {
+    promptBeforeClosing(() => {
+      return Boolean(
+        nonCodedAllergenType || nonCodedAllergicReaction || onsetDate || selectedAllergen || severityOfWorstReaction,
+      );
+    });
+  }, [
+    promptBeforeClosing,
+    nonCodedAllergenType,
+    nonCodedAllergicReaction,
+    onsetDate,
+    selectedAllergen,
+    selectedAllergenType,
+    severityOfWorstReaction,
+  ]);
 
   useEffect(() => {
     const allergenUuids = [drugAllergenUuid, foodAllergenUuid, environmentalAllergenUuid, allergyReactionUuid];
@@ -111,7 +130,7 @@ const AllergyForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, isTablet
         severity: {
           uuid: severityOfWorstReaction,
         },
-        comment: comment,
+        comment,
         reactions: allergicReactions?.map((reaction) => {
           return reaction === otherConceptUuid
             ? { reaction: { uuid: reaction }, reactionNonCoded: nonCodedAllergicReaction }
@@ -159,6 +178,7 @@ const AllergyForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, isTablet
       nonCodedAllergicReaction,
       closeWorkspace,
       t,
+      mutate,
     ],
   );
 

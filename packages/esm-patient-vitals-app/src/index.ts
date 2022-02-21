@@ -45,6 +45,7 @@ function setupOpenMRS() {
           view: 'vitals',
           title: 'Vitals',
         },
+        order: 1,
         online: { showAddVitals: true },
         offline: { showAddVitals: false },
       },
@@ -52,8 +53,8 @@ function setupOpenMRS() {
         id: 'patient-vitals-info',
         slot: 'patient-info-slot',
         load: getAsyncLifecycle(() => import('./vitals/vitals-header/vitals-header.component'), options),
-        online: { showRecordVitals: true },
-        offline: { showRecordVitals: false },
+        online: { showRecordVitalsButton: true },
+        offline: { showRecordVitalsButton: false },
       },
       {
         id: patientVitalsBiometricsFormWorkspace,

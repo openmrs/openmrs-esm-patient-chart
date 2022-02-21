@@ -1,12 +1,5 @@
 import { registerExtension } from '@openmrs/esm-framework';
-import {
-  cancelOpeningWorkspace,
-  confirmOpeningWorkspace,
-  getWorkspaceStore,
-  launchPatientWorkspace,
-  registerWorkspace,
-  resetWorkspaceStore,
-} from '.';
+import { cancelPrompt, getWorkspaceStore, launchPatientWorkspace, registerWorkspace, resetWorkspaceStore } from '.';
 import { WorkspaceWindowState } from '..';
 
 const mockExtensionRegistry = {};
@@ -20,6 +13,7 @@ jest.mock('@openmrs/esm-framework', () => {
       mockExtensionRegistry[name] = { name, ...ext };
     },
     getExtensionRegistration: (name) => mockExtensionRegistry[name],
+    translateFrom: (module, key, defaultValue, options) => defaultValue,
   };
 });
 
@@ -55,9 +49,9 @@ describe('workspace system', () => {
     launchPatientWorkspace('form-entry', { foo: true });
     expect(store.getState().openWorkspaces.length).toEqual(1);
     expect(store.getState().openWorkspaces[0].name).toBe('conditions');
-    expect(store.getState().workspaceNeedingConfirmationToOpen.name).toBe('form-entry');
-    confirmOpeningWorkspace();
-    expect(store.getState().workspaceNeedingConfirmationToOpen).toBeNull();
+    expect(store.getState().prompt.title).toMatch(/active form open/);
+    store.getState().prompt.onConfirm();
+    expect(store.getState().prompt).toBeNull();
     expect(store.getState().openWorkspaces.length).toEqual(1);
     expect(store.getState().openWorkspaces[0].name).toBe('form-entry');
     expect(store.getState().openWorkspaces[0].additionalProps['foo']).toBe(true);
@@ -72,20 +66,37 @@ describe('workspace system', () => {
     expect(store.getState().openWorkspaces.length).toEqual(2);
     expect(store.getState().openWorkspaces[0].name).toBe('order-meds');
     expect(store.getState().openWorkspaces[1].name).toBe('form-entry');
-    expect(store.getState().workspaceNeedingConfirmationToOpen.name).toBe('conditions');
-    cancelOpeningWorkspace(); // should leave same workspaces intact
+    expect(store.getState().prompt.title).toMatch(/active form open/);
+    cancelPrompt(); // should leave same workspaces intact
     expect(store.getState().openWorkspaces.length).toEqual(2);
     expect(store.getState().openWorkspaces[0].name).toBe('order-meds');
     expect(store.getState().openWorkspaces[1].name).toBe('form-entry');
-    expect(store.getState().workspaceNeedingConfirmationToOpen).toBeNull();
+    expect(store.getState().prompt).toBeNull();
     launchPatientWorkspace('conditions');
-    confirmOpeningWorkspace();
+    store.getState().prompt.onConfirm();
     expect(store.getState().openWorkspaces.length).toEqual(2);
     expect(store.getState().openWorkspaces[0].name).toBe('conditions');
     expect(store.getState().openWorkspaces[1].name).toBe('order-meds');
     store.getState().openWorkspaces[0].closeWorkspace();
     expect(store.getState().openWorkspaces.length).toEqual(1);
     expect(store.getState().openWorkspaces[0].name).toBe('order-meds');
+  });
+
+  test('respects promptBeforeClosing function', () => {
+    const store = getWorkspaceStore();
+    registerWorkspace({ name: 'hiv', title: 'HIV', load: jest.fn() });
+    registerWorkspace({ name: 'diabetes', title: 'Diabetes', load: jest.fn() });
+    launchPatientWorkspace('hiv');
+    store.getState().openWorkspaces[0].promptBeforeClosing(() => false);
+    launchPatientWorkspace('diabetes');
+    expect(store.getState().prompt).toBeNull();
+    expect(store.getState().openWorkspaces[0].name).toBe('diabetes');
+    store.getState().openWorkspaces[0].promptBeforeClosing(() => true);
+    launchPatientWorkspace('hiv');
+    expect(store.getState().openWorkspaces[0].name).toBe('diabetes');
+    expect(store.getState().prompt.title).toMatch(/active form open/);
+    store.getState().prompt.onConfirm();
+    expect(store.getState().openWorkspaces[0].name).toBe('hiv');
   });
 
   test('is compatible with workspaces registered as extensions', () => {
