@@ -7,8 +7,8 @@ import {
   OBSERVATION_INTERPRETATION,
 } from '@openmrs/esm-patient-common-lib';
 
-const PAGE_SIZE = 100;
-const CHUNK_PREFETCH_COUNT = 6;
+const PAGE_SIZE = 300;
+const CHUNK_PREFETCH_COUNT = 1;
 
 const retrieveFromIterator = <T>(iteratorOrIterable: IterableIterator<T>, length: number): Array<T | undefined> => {
   const iterator = iteratorOrIterable[Symbol.iterator]();
