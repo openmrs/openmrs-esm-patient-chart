@@ -31,16 +31,15 @@ export function WorkspaceRenderer({ workspace, patientUuid, active }: WorkspaceR
     };
   }, [workspace]);
 
-  const closeWorkspace = React.useMemo(() => workspace?.closeWorkspace, [workspace]);
   const props = React.useMemo(
     () =>
       workspace && {
-        closeWorkspace,
+        closeWorkspace: workspace.closeWorkspace,
+        promptBeforeClosing: workspace.promptBeforeClosing,
         patientUuid,
-        isTablet,
         ...workspace.additionalProps,
       },
-    [workspace, workspace.additionalProps, isTablet, patientUuid, closeWorkspace],
+    [workspace, workspace.additionalProps, workspace.closeWorkspace, workspace.promptBeforeClosing, patientUuid],
   );
 
   return (

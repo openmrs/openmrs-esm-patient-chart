@@ -6,7 +6,7 @@ import { of } from 'rxjs/internal/observable/of';
 import { throwError } from 'rxjs';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { searchedCondition } from '../../../../__mocks__/conditions.mock';
-import { createErrorHandler, showNotification, showToast } from '@openmrs/esm-framework';
+import { createErrorHandler, showNotification, showToast, useLayoutType } from '@openmrs/esm-framework';
 import { createPatientCondition, searchConditionConcepts } from './conditions.resource';
 import { getByTextWithMarkup, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import ConditionsForm from './conditions-form.component';
@@ -17,7 +17,6 @@ dayjs.extend(utc);
 jest.mock('lodash-es/debounce', () => jest.fn((fn) => fn));
 
 const testProps = {
-  isTablet: false,
   patientUuid: mockPatient.id,
   closeWorkspace: jest.fn(),
 };
@@ -27,6 +26,7 @@ const mockCreatePatientCondition = createPatientCondition as jest.Mock;
 const mockSearchConditionConcepts = searchConditionConcepts as jest.Mock;
 const mockShowNotification = showNotification as jest.Mock;
 const mockShowToast = showToast as jest.Mock;
+const mockUseLayoutType = useLayoutType as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -91,7 +91,7 @@ describe('ConditionsForm: ', () => {
   });
 
   it('renders a light background for the searchbox and date inputs in the tablet viewport ', () => {
-    testProps.isTablet = true;
+    mockUseLayoutType.mockReturnValueOnce('tablet').mockReturnValueOnce('tablet');
 
     renderConditionsForm();
 

@@ -9,7 +9,6 @@ import PastVisitOverview from './past-visit-overview.component';
 const testProps = {
   closeWorkspace: jest.fn(),
   patientUuid: mockPatient.id,
-  isTablet: false,
 };
 
 const mockPastVisits = {

@@ -1,15 +1,15 @@
 import useSWR from 'swr';
 import { PatientVitalsAndBiometrics } from './vitals-biometrics-form/vitals-biometrics-form.component';
-import { openmrsFetch, fhirBaseUrl, useConfig, FHIRResource } from '@openmrs/esm-framework';
+import { openmrsFetch, fhirBaseUrl, useConfig, FHIRResource, parseDate } from '@openmrs/esm-framework';
 import { ConfigObject } from '../config-schema';
+import { calculateBMI } from './vitals-biometrics-form/vitals-biometrics-form.utils';
 
 export const pageSize = 100;
 
 export interface PatientVitals {
   id: string;
-  date: Date;
+  date: string;
   systolic?: number;
-  systolicRange?: any;
   diastolic?: number;
   pulse?: number;
   temperature?: number;
@@ -18,6 +18,7 @@ export interface PatientVitals {
   weight?: number;
   bmi?: number | null;
   respiratoryRate?: number;
+  muac?: number;
 }
 
 interface VitalsFetchResponse {
@@ -38,89 +39,71 @@ interface ObsRecord {
   value: string | number;
 }
 
-type Vitals = Array<FHIRResource['resource']>;
-
-export function useVitals(patientUuid: string) {
+export function useVitals(patientUuid: string, includeBiometrics: boolean = false) {
   const { concepts } = useConfig();
+  const biometricsConcepts = [concepts.heightUuid, concepts.midUpperArmCircumferenceUuid, concepts.weightUuid];
+
+  const conceptUuids = includeBiometrics
+    ? Object.values(concepts).join(',')
+    : Object.values(concepts)
+        .filter((uuid) => !biometricsConcepts.includes(uuid))
+        .join(',');
 
   const { data, error, isValidating } = useSWR<{ data: VitalsFetchResponse }, Error>(
     `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&code=` +
-      Object.values(concepts).join(',') +
+      conceptUuids +
       '&_summary=data&_sort=-date' +
       `&_count=${pageSize}
-  `,
+    `,
     openmrsFetch,
   );
 
-  const filterByConceptUuid = (vitals: Vitals, conceptUuid: string) => {
-    return vitals.filter((obs) => obs.code.coding.some((c) => c.code === conceptUuid));
+  const getVitalSignKey = (conceptUuid: string) => {
+    if (conceptUuid === concepts.systolicBloodPressureUuid) return 'systolic';
+    if (conceptUuid === concepts.diastolicBloodPressureUuid) return 'diastolic';
+    if (conceptUuid === concepts.pulseUuid) return 'pulse';
+    if (conceptUuid === concepts.temperatureUuid) return 'temperature';
+    if (conceptUuid === concepts.oxygenSaturationUuid) return 'oxygenSaturation';
+    if (conceptUuid === concepts.respiratoryRateUuid) return 'respiratoryRate';
+    if (conceptUuid === concepts.heightUuid) return 'height';
+    if (conceptUuid === concepts.weightUuid) return 'weight';
+    if (conceptUuid === concepts.midUpperArmCircumferenceUuid) return 'muac';
+    return;
   };
 
-  const observations: Vitals = data?.data?.entry?.map((entry) => entry.resource) ?? [];
+  const formattedVitals = () => {
+    const vitalsHashTable = new Map<string, Partial<PatientVitals>>([]);
+    data?.data?.entry?.map(({ resource }) => {
+      const issuedDate = new Date(new Date(resource.issued).setSeconds(0, 0)).toISOString();
+      if (vitalsHashTable.has(issuedDate) && vitalsHashTable.get(issuedDate)) {
+        vitalsHashTable.set(issuedDate, {
+          ...vitalsHashTable.get(issuedDate),
+          [getVitalSignKey(resource.code.coding[0].code)]: resource?.valueQuantity?.value,
+        });
+      } else {
+        resource?.valueQuantity?.value &&
+          vitalsHashTable.set(issuedDate, {
+            [getVitalSignKey(resource.code.coding[0].code)]: resource?.valueQuantity?.value,
+          });
+      }
+    });
+
+    return Array.from(vitalsHashTable).map(([date, vital], index) => {
+      return {
+        ...vital,
+        date: date,
+        id: index.toString(),
+        bmi: calculateBMI(vital.weight, vital.height),
+      };
+    });
+  };
 
   return {
-    vitals:
-      data?.data?.total > 0
-        ? formatVitals(
-            filterByConceptUuid(observations, concepts.systolicBloodPressureUuid),
-            filterByConceptUuid(observations, concepts.diastolicBloodPressureUuid),
-            filterByConceptUuid(observations, concepts.pulseUuid),
-            filterByConceptUuid(observations, concepts.temperatureUuid),
-            filterByConceptUuid(observations, concepts.oxygenSaturationUuid),
-            filterByConceptUuid(observations, concepts.respiratoryRateUuid),
-          )
-        : null,
+    vitals: formattedVitals() as Array<PatientVitals>,
     isError: error,
     isLoading: !data && !error,
     isValidating,
   };
-}
-
-function formatVitals(
-  systolicBloodPressure: Vitals,
-  diastolicBloodPressure: Vitals,
-  pulseData: Vitals,
-  temperatureData: Vitals,
-  oxygenSaturationData: Vitals,
-  respiratoryRateData: Vitals,
-): Array<PatientVitals> {
-  const systolicDates = getDatesIssued(systolicBloodPressure);
-  const diastolicDates = getDatesIssued(diastolicBloodPressure);
-  const uniqueDates = Array.from(new Set(systolicDates?.concat(diastolicDates))).sort(latestFirst);
-
-  return uniqueDates.map((date: Date) => {
-    const systolic = systolicBloodPressure.find((systolic) => systolic.issued === date);
-    const diastolic = diastolicBloodPressure.find((diastolic) => diastolic.issued === date);
-    const pulse = pulseData.find((pulse) => pulse.issued === date);
-    const temperature = temperatureData.find((temperature) => temperature.issued === date);
-    const oxygenSaturation = oxygenSaturationData.find((oxygenSaturation) => oxygenSaturation.issued === date);
-    const respiratoryRate = respiratoryRateData.find((respiratoryRate) => respiratoryRate.issued === date);
-    return {
-      id: systolic?.encounter?.reference.replace('Encounter/', ''),
-      date: systolic?.issued,
-      systolic: systolic?.valueQuantity?.value,
-      diastolic: diastolic?.valueQuantity?.value,
-      pulse: pulse?.valueQuantity?.value,
-      temperature: temperature?.valueQuantity?.value,
-      oxygenSaturation: oxygenSaturation?.valueQuantity?.value,
-      respiratoryRate: respiratoryRate?.valueQuantity?.value,
-    };
-  });
-}
-
-function getDatesIssued(vitalsArray: Vitals): Array<Date> {
-  return vitalsArray.map((vitals) => vitals.issued);
-}
-
-function latestFirst(a: Date, b: Date) {
-  return new Date(b).getTime() - new Date(a).getTime();
-}
-
-export function getPatientsLatestVitals(patientUuuid: string, abortController: AbortController) {
-  return openmrsFetch(
-    `/ws/rest/v1/encounter?patient=${patientUuuid}&v=custom:(uuid,encounterDatetime,obs:(uuid,value))`,
-    { signal: abortController.signal },
-  );
 }
 
 export function savePatientVitals(

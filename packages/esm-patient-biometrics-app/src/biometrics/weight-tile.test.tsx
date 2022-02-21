@@ -61,7 +61,7 @@ describe('WeightTile', () => {
     await waitForLoadingToFinish();
 
     expect(screen.getByText(/Weight/i)).toBeInTheDocument();
-    expect(getByTextWithMarkup(/80 kg/i)).toBeInTheDocument();
+    expect(getByTextWithMarkup(/75 kg/i)).toBeInTheDocument();
   });
 });
 
