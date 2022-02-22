@@ -1,0 +1,53 @@
+@import "~@openmrs/esm-styleguide/src/vars";
+@import "~carbon-components/src/globals/scss/vars";
+@import "~carbon-components/src/globals/scss/mixins";
+
+.filterContainer {
+  background-color: $openmrs-background-grey;
+  margin: $spacing-02 0;
+}
+
+.filterContainerActive {
+  border-left: 0.3rem solid var(--brand-01);
+}
+
+.filterNode {
+  padding: 1rem;
+}
+
+.filterItem {
+  padding: 0.5rem 1rem 0.5rem 4rem;
+  border-bottom: 1px solid $ui-03;
+}
+
+.nestedAccordion :global {
+  // extending carbon's accordion to handle nested accordions
+  // accordion content
+  .bx--accordion__content {
+    padding: 0;
+    margin: 0;
+  }
+
+  .bx--accordion__item > .bx--accordion__content {
+    display: none;
+  }
+
+  .bx--accordion__item--active > .bx--accordion__content {
+    display: block;
+  }
+
+  // Chevron transformations
+  .bx--accordion__item > button[aria-expanded="false"] > .bx--accordion__arrow {
+    transform: rotate(90deg);
+}
+
+  .bx--accordion__item--active > .bx--accordion__heading > .bx--accordion__arrow {
+    /*rtl:ignore*/
+    transform: rotate(-90deg);
+    fill: var(--brand-01);
+  }
+
+  .bx--accordion--start > .bx--accordion__item > button[aria-expanded="true"] {
+    background-color: $ui-03;
+  }
+}

@@ -1,10 +1,12 @@
-import * as React from 'react';
+import React, { useContext } from 'react';
 import { InlineLoading } from 'carbon-components-react';
 import useScrollIndicator from './useScroll';
-import { useTimelineData } from './useTimelineData';
+import { usePatientPanels, useTimelineData } from './useTimelineData';
 import { PaddingContainer, TimeSlots, Grid, RowStartCell, GridItems, ShadowBox } from './helpers';
-import { ObsRecord } from '@openmrs/esm-patient-common-lib';
+import { ObsRecord, EmptyState } from '@openmrs/esm-patient-common-lib';
 import styles from './timeline.scss';
+import { RecentResultsGrid } from '../overview/recent-overview.component';
+import FilterContext from '../filter/filter-context';
 
 interface PanelNameCornerProps {
   showShadow: boolean;
@@ -94,8 +96,8 @@ const DataRows: React.FC<DataRowsProps> = ({ timeColumns, rowData, sortedTimes, 
 
 interface TimelineParams {
   patientUuid: string;
-  panelUuid: string;
-  openTrendline: (panelUuid: string, testUuid: string) => void;
+  panelUuid?: string;
+  openTrendline?: (panelUuid: string, testUuid: string) => void;
 }
 
 export const Timeline: React.FC<TimelineParams> = ({
@@ -104,7 +106,6 @@ export const Timeline: React.FC<TimelineParams> = ({
   openTrendline: openTrendlineExternal,
 }) => {
   const [xIsScrolled, yIsScrolled, containerRef] = useScrollIndicator(0, 32);
-
   const timelineData = useTimelineData(patientUuid, panelUuid);
 
   const {
@@ -121,31 +122,58 @@ export const Timeline: React.FC<TimelineParams> = ({
     [panelUuid, openTrendlineExternal],
   );
 
-  if (!loaded) return <InlineLoading description="Loading" />;
+  if (!loaded)
+    return (
+      <RecentResultsGrid>
+        <InlineLoading description="Loading" />
+      </RecentResultsGrid>
+    );
+
+  if (yearColumns && dayColumns && timeColumns)
+    return (
+      <RecentResultsGrid>
+        <PaddingContainer ref={containerRef}>
+          <PanelNameCorner showShadow={xIsScrolled} panelName={panelName} />
+          <DateHeaderGrid
+            {...{
+              timeColumns,
+              yearColumns,
+              dayColumns,
+              showShadow: yIsScrolled,
+            }}
+          />
+          <DataRows
+            {...{
+              timeColumns,
+              rowData,
+              sortedTimes,
+              showShadow: xIsScrolled,
+              panelUuid,
+              openTrendline,
+            }}
+          />
+          <ShadowBox />
+        </PaddingContainer>
+      </RecentResultsGrid>
+    );
+  return <EmptyState displayText={'timeline data'} headerTitle="Data Timeline" />;
+};
+
+export const MultiTimeline = ({ patientUuid }) => {
+  const { data: panels } = usePatientPanels(patientUuid);
+  const { activeTests } = useContext(FilterContext);
+
+  if (activeTests?.length === 0) {
+    return <EmptyState displayText={'timeline data'} headerTitle="Data Timeline" />;
+  }
+
+  const uuids = activeTests.map((test) => panels[test]);
 
   return (
-    <PaddingContainer ref={containerRef}>
-      <PanelNameCorner showShadow={xIsScrolled} panelName={panelName} />
-      <DateHeaderGrid
-        {...{
-          timeColumns,
-          yearColumns,
-          dayColumns,
-          showShadow: yIsScrolled,
-        }}
-      />
-      <DataRows
-        {...{
-          timeColumns,
-          rowData,
-          sortedTimes,
-          showShadow: xIsScrolled,
-          panelUuid,
-          openTrendline,
-        }}
-      />
-      <ShadowBox />
-    </PaddingContainer>
+    <>
+      {activeTests &&
+        activeTests?.map((test) => <Timeline patientUuid={patientUuid} panelUuid={panels[test]} key={test} />)}
+    </>
   );
 };
 

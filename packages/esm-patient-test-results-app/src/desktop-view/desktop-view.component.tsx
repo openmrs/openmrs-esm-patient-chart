@@ -1,6 +1,6 @@
 import React from 'react';
 import { Overview } from '../overview/overview.component';
-import { Timeline } from '../timeline/timeline.component';
+import Timeline from '../timeline';
 import Trendline from '../trendline/trendline.component';
 import { navigateToTimeline, navigateToTrendline } from '../helpers';
 import styles from './desktop-view.scss';
