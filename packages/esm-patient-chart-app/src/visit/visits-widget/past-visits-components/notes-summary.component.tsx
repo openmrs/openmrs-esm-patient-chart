@@ -14,14 +14,13 @@ const NotesSummary: React.FC<NotesSummaryProps> = ({ notes }) => {
   return (
     <React.Fragment>
       {notes.length > 0 ? (
-        notes.map((note: Note, ind) => (
-          <React.Fragment key={ind}>
-            <p className={styles.noteTitle}>{capitalize(note.concept.display)}</p>
+        notes.map((note: Note, i) => (
+          <div className={styles.notesContainer} key={i}>
             <p className={`${styles.noteText} ${styles.bodyLong01}`}>{note.note}</p>
-            <p className={styles.caption01} style={{ color: '#525252' }}>
-              {note.time} &middot; {note.provider.name} &middot; {note.provider.role}
+            <p className={styles.metadata}>
+              {note.time} &middot; {note.provider.name}, {note.provider.role}
             </p>
-          </React.Fragment>
+          </div>
         ))
       ) : (
         <p className={`${styles.bodyLong01} ${styles.text02}`}>{t('noNotesFound', 'No notes found')}</p>
