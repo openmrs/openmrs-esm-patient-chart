@@ -196,7 +196,7 @@ const EncounterList: React.FC<EncounterListProps> = ({ isShowingAllEncounters, e
     );
   }
 
-  return <p className={`${styles.bodyLong01} ${styles.text02}`}>{t('noEncounters', 'No encounters found')}</p>;
+  return <p className={`${styles.bodyLong01} ${styles.text02}`}>{t('noEncountersFound', 'No encounters found')}</p>;
 };
 
 export default EncounterList;
