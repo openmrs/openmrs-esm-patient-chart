@@ -11,7 +11,7 @@ import { dashboardMeta } from './dashboard.meta';
 
 export const hivMeta = {
   name: 'Hiv-care-and-treatment',
-  slot: 'Hiv dashboard',
+  slot: 'hiv-dashboard-slot',
   config: { columns: 1, type: 'grid' },
   title: 'HIV Care and Treatment',
 };
@@ -98,7 +98,7 @@ function setupOpenMRS() {
       },
       {
         name: 'Hiv page',
-        slot: 'Hiv dashboard',
+        slot: hivMeta.slot,
         load: getAsyncLifecycle(() => import('./hiv'), options),
         meta: {
           columnSpan: 4,

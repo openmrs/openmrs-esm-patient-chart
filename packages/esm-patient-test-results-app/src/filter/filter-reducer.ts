@@ -1,9 +1,9 @@
-const computeParents = (initialState, node) => {
+const computeParents = (node) => {
   var parents = {};
   const leaves = [];
   if (node?.subSets?.length) {
     node.subSets.map((subNode) => {
-      const { parents: newParents, leaves: newLeaves } = computeParents(initialState, subNode);
+      const { parents: newParents, leaves: newLeaves } = computeParents(subNode);
       parents = { ...parents, ...newParents };
       leaves.push(...newLeaves);
     });
@@ -18,9 +18,10 @@ const computeParents = (initialState, node) => {
 const reducer = (state, action) => {
   switch (action.type) {
     case 'initialize':
+      const { parents, leaves } = computeParents(action.tree);
       return {
-        checkboxes: action.initialState,
-        parents: computeParents(action.initialState, action.tree).parents,
+        checkboxes: Object.fromEntries(leaves.map((leaf) => [leaf, true])),
+        parents: parents,
       };
     case 'toggleVal':
       return {

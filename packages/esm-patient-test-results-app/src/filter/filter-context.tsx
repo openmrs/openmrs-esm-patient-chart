@@ -45,7 +45,7 @@ const FilterProvider = ({ sortedObs, children }: FilterProviderProps) => {
 
   const actions = useMemo(
     () => ({
-      initialize: (initialState, tree) => dispatch({ type: 'initialize', initialState: initialState, tree: tree }),
+      initialize: (tree) => dispatch({ type: 'initialize', tree: tree }),
       toggleVal: (name) => {
         dispatch({ type: 'toggleVal', name: name });
       },
@@ -62,7 +62,7 @@ const FilterProvider = ({ sortedObs, children }: FilterProviderProps) => {
   useEffect(() => {
     const tests = (sortedObs && Object.keys(sortedObs)) || [];
     if (tests.length && !Object.keys(state?.checkboxes).length) {
-      actions.initialize(Object.fromEntries(tests.map((test) => [test, true])), mockConceptTree);
+      actions.initialize(mockConceptTree);
     }
   }, [sortedObs, actions, state]);
 
