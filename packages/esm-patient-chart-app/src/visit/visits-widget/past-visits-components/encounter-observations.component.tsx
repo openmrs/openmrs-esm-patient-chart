@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
-import styles from '../visit-detail-overview.scss';
 import { useTranslation } from 'react-i18next';
 import { SkeletonText } from 'carbon-components-react';
 import { Observation } from '../visit.resource';
+import styles from '../visit-detail-overview.scss';
 
 interface EncounterObservationsProps {
   observations: Array<Observation>;
@@ -21,21 +21,27 @@ const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observati
     );
   }, [observations]);
 
-  return observationsList ? (
-    observationsList.length > 0 ? (
+  if (!observations) {
+    return <SkeletonText />;
+  }
+
+  if (observationsList?.length) {
+    return (
       <div className={styles.observation}>
-        {observationsList.map((obs, ind) => (
-          <React.Fragment key={ind}>
+        {observationsList.map((obs, i) => (
+          <React.Fragment key={i}>
             <span className={styles.caption01}>{obs.question}: </span>
             <span className={`${styles.bodyShort02} ${styles.text01}`}>{obs.answer}</span>
           </React.Fragment>
         ))}
       </div>
-    ) : (
+    );
+  }
+
+  return (
+    <div className={styles.observationsEmptyState}>
       <p className={styles.caption01}>{t('noObservationsFound', 'No observations found')}</p>
-    )
-  ) : (
-    <SkeletonText />
+    </div>
   );
 };
 

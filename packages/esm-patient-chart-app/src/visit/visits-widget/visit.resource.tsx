@@ -17,7 +17,7 @@ export function useVisits(patientUuid: string) {
   );
 
   return {
-    data: data ? data.data.results : null,
+    visits: data ? data?.data?.results : null,
     isError: error,
     isLoading: !data && !error,
     isValidating,
@@ -119,7 +119,10 @@ export interface Observation {
 export interface Order {
   uuid: string;
   dateActivated: string;
+  dateStopped?: Date | null;
   dose: number;
+  dosingInstructions: string | null;
+  dosingType?: 'org.openmrs.FreeTextDosingInstructions' | 'org.openmrs.SimpleDosingInstructions';
   doseUnits: {
     uuid: string;
     display: string;
@@ -139,6 +142,9 @@ export interface Order {
     display: string;
   };
   numRefills: number;
+  orderNumber: string;
+  orderReason: string | null;
+  orderReasonNonCoded: string | null;
   orderer: {
     uuid: string;
     person: {
@@ -154,6 +160,8 @@ export interface Order {
     uuid: string;
     display: string;
   };
+  quantity: number;
+  quantityUnits: OpenmrsResource;
 }
 
 export interface Note {

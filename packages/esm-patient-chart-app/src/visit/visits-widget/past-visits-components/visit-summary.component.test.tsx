@@ -9,7 +9,6 @@ import {
 import userEvent from '@testing-library/user-event';
 
 const mockEncounter = visitOverviewDetailMockData.data.results[0].encounters.map((encounter) => encounter);
-window.HTMLElement.prototype.scrollIntoView = jest.fn();
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');

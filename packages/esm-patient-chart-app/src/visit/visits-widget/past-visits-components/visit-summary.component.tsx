@@ -4,9 +4,17 @@ import MedicationSummary from './medications-summary.component';
 import NotesSummary from './notes-summary.component';
 import TestsSummary from './tests-summary.component';
 import { useTranslation } from 'react-i18next';
-import { Tab, Tabs } from 'carbon-components-react';
-import { formatTime, OpenmrsResource, parseDate, useConfig } from '@openmrs/esm-framework';
+import { Tab, Tabs, Tag } from 'carbon-components-react';
+import {
+  formatDatetime,
+  formatTime,
+  OpenmrsResource,
+  parseDate,
+  useConfig,
+  useLayoutType,
+} from '@openmrs/esm-framework';
 import { Order, Encounter, Note, Observation, OrderItem } from '../visit.resource';
+import EncounterList from './encounter-list.component';
 
 interface DiagnosisItem {
   diagnosis: string;
@@ -78,18 +86,13 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid }) 
 
   return (
     <div className={styles.summaryContainer}>
-      <p className={styles.productiveHeading01}>{t('diagnoses', 'Diagnoses')}</p>
-      <div className={`${styles.caption01} ${styles.diagnosesList}`}>
+      <p className={styles.diagnosisLabel}>{t('diagnoses', 'Diagnoses')}</p>
+      <div className={styles.diagnosesList}>
         {diagnoses.length > 0 ? (
-          diagnoses.map((d: DiagnosisItem, ind) => (
-            <span
-              key={ind}
-              className={`${styles.diagnosis} ${
-                d.order === 'Primary' ? styles.primaryDiagnose : styles.secondaryDiagnose
-              }`}
-            >
-              {d.diagnosis}
-            </span>
+          diagnoses.map((diagnosis, i) => (
+            <Tag key={i} type={diagnosis.order === 'Primary' ? 'blue' : 'red'}>
+              {diagnosis.diagnosis}
+            </Tag>
           ))
         ) : (
           <span className={`${styles.bodyLong01} ${styles.text02}`} style={{ marginBottom: '0.5rem' }}>
@@ -97,30 +100,40 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid }) 
           </span>
         )}
       </div>
-      <Tabs className={styles.verticalTabs}>
+      <Tabs
+        className={`${styles.verticalTabs} ${useLayoutType() === 'tablet' ? styles.tabletTabs : styles.desktopTabs}`}
+      >
         <Tab
           className={`${styles.tab} ${styles.bodyLong01} ${tabSelected === 0 && styles.selectedTab}`}
-          onClick={() => setSelectedTab(0)}
           id="notes-tab"
+          onClick={() => setSelectedTab(0)}
           label={t('notes', 'Notes')}
         >
           <NotesSummary notes={notes} />
         </Tab>
         <Tab
           className={`${styles.tab} ${tabSelected === 1 && styles.selectedTab}`}
-          onClick={() => setSelectedTab(1)}
           id="tests-tab"
+          onClick={() => setSelectedTab(1)}
           label={t('tests', 'Tests')}
         >
           <TestsSummary patientUuid={patientUuid} encounters={encounters as Array<Encounter>} />
         </Tab>
         <Tab
           className={`${styles.tab} ${tabSelected === 2 && styles.selectedTab}`}
+          id="medications-tab"
           onClick={() => setSelectedTab(2)}
-          id="tab-3"
           label={t('medications', 'Medications')}
         >
           <MedicationSummary medications={medications} />
+        </Tab>
+        <Tab
+          className={`${styles.tab} ${tabSelected === 3 && styles.selectedTab}`}
+          id="encounters-tab"
+          onClick={() => setSelectedTab(3)}
+          label={t('encounters', 'Encounters')}
+        >
+          <EncounterList encounters={mapEncounters(encounters)} isShowingAllEncounters={false} />
         </Tab>
       </Tabs>
     </div>
@@ -128,3 +141,15 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid }) 
 };
 
 export default VisitSummary;
+
+export function mapEncounters(encounters) {
+  return encounters?.map((encounter) => ({
+    id: encounter?.uuid,
+    datetime: formatDatetime(parseDate(encounter?.encounterDatetime)),
+    encounterType: encounter?.encounterType?.display,
+    form: encounter?.form,
+    obs: encounter?.obs,
+    provider:
+      encounter?.encounterProviders?.length > 0 ? encounter.encounterProviders[0].provider?.person?.display : '--',
+  }));
+}
