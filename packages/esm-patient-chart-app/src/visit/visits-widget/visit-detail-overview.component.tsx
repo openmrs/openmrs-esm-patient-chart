@@ -73,7 +73,7 @@ export default VisitDetailOverviewComponent;
 export function mapEncounters(visit) {
   return visit?.encounters?.map((encounter) => ({
     id: encounter?.uuid,
-    datetime: formatDatetime(parseDate(encounter?.encounterDatetime)),
+    datetime: encounter?.encounterDatetime,
     encounterType: encounter?.encounterType?.display,
     form: encounter?.form,
     obs: encounter?.obs,

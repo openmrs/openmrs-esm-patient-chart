@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import EncounterObservations from './encounter-observations.component';
 import {
   DataTable,
@@ -18,15 +18,19 @@ import {
 } from 'carbon-components-react';
 import Edit16 from '@carbon/icons-react/es/edit/16';
 import { useTranslation } from 'react-i18next';
-import { useLayoutType, usePagination, usePatient } from '@openmrs/esm-framework';
 import {
-  EmptyState,
-  formEntrySub,
-  launchPatientWorkspace,
-  PatientChartPagination,
-} from '@openmrs/esm-patient-common-lib';
+  formatDate,
+  formatDatetime,
+  formatTime,
+  parseDate,
+  useLayoutType,
+  usePagination,
+  usePatient,
+} from '@openmrs/esm-framework';
+import { formEntrySub, launchPatientWorkspace, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { FormattedEncounter } from '../visit-detail-overview.component';
 import styles from '../visit-detail-overview.scss';
+import { format } from 'prettier';
 
 interface EncounterListProps {
   encounters: Array<FormattedEncounter>;
@@ -40,10 +44,10 @@ const EncounterList: React.FC<EncounterListProps> = ({ isShowingAllEncounters, e
   const isTablet = useLayoutType() === 'tablet';
   const { results: paginatedEncounters, goTo, currentPage } = usePagination(encounters ?? [], encountersToShowCount);
 
-  const headers = [
+  const tableHeaders = [
     {
       id: 1,
-      header: 'Date & time',
+      header: isShowingAllEncounters ? 'Date & time' : 'Time',
       key: 'datetime',
     },
     {
@@ -59,27 +63,36 @@ const EncounterList: React.FC<EncounterListProps> = ({ isShowingAllEncounters, e
   ];
 
   if (isShowingAllEncounters) {
-    headers.push({
+    tableHeaders.push({
       id: 2,
       header: 'Visit type',
       key: 'visitType',
     });
 
-    headers.sort((a, b) => (a.id > b.id ? 1 : -1));
+    tableHeaders.sort((a, b) => (a.id > b.id ? 1 : -1));
   }
 
-  function launchWorkspace(formUuid: string, visitUuid?: string, encounterUuid?: string) {
+  const launchWorkspace = (formUuid: string, visitUuid?: string, encounterUuid?: string) => {
     formEntrySub.next({ formUuid, patient, visitUuid, encounterUuid });
     launchPatientWorkspace('patient-form-entry-workspace');
-  }
+  };
+
+  const tableRows = React.useMemo(() => {
+    return paginatedEncounters?.map((encounter) => ({
+      ...encounter,
+      datetime: isShowingAllEncounters
+        ? formatDatetime(parseDate(encounter.datetime))
+        : formatTime(parseDate(encounter.datetime)),
+    }));
+  }, [paginatedEncounters, isShowingAllEncounters]);
 
   if (encounters?.length) {
     return (
       <div className={styles.encounterListContainer}>
         <DataTable
           data-floating-menu-container
-          headers={headers}
-          rows={paginatedEncounters}
+          headers={tableHeaders}
+          rows={tableRows}
           overflowMenuOnHover={isTablet ? false : true}
           size={isTablet ? 'normal' : 'short'}
           useZebraStyles
@@ -108,7 +121,34 @@ const EncounterList: React.FC<EncounterListProps> = ({ isShowingAllEncounters, e
                           ))}
                           {isShowingAllEncounters ? (
                             <TableCell className="bx--table-column-menu">
-                              <ActionsMenu />
+                              <OverflowMenu light size="sm" flipped>
+                                <OverflowMenuItem
+                                  className={styles.menuItem}
+                                  id="#editEncounter"
+                                  itemText={t('editThisEncounter', 'Edit this encounter')}
+                                  onClick={() =>
+                                    launchWorkspace(encounters[i].form.uuid, encounters[i].visitUuid, encounters[i].id)
+                                  }
+                                >
+                                  {t('editThisEncounter', 'Edit this encounter')}
+                                </OverflowMenuItem>
+                                <OverflowMenuItem
+                                  className={styles.menuItem}
+                                  id="#goToEncounter"
+                                  itemText={t('goToThisEncounter', 'Go to this encounter')}
+                                >
+                                  {t('editThisEncounter', 'Edit this encounter')}
+                                </OverflowMenuItem>
+                                <OverflowMenuItem
+                                  className={styles.menuItem}
+                                  id="#editEncounter"
+                                  itemText={t('deleteThisEncounter', 'Delete this encounter')}
+                                  hasDivider
+                                  isDelete
+                                >
+                                  itemText={t('deleteThisEncounter', 'Delete this encounter')}
+                                </OverflowMenuItem>
+                              </OverflowMenu>
                             </TableCell>
                           ) : null}
                         </TableExpandRow>
@@ -156,23 +196,7 @@ const EncounterList: React.FC<EncounterListProps> = ({ isShowingAllEncounters, e
     );
   }
 
-  return <EmptyState headerTitle={t('encounters', 'Encounters')} displayText={t('encounters', 'encounters')} />;
+  return <p className={`${styles.bodyLong01} ${styles.text02}`}>{t('noEncounters', 'No encounters found')}</p>;
 };
 
 export default EncounterList;
-
-function ActionsMenu() {
-  const { t } = useTranslation();
-
-  return (
-    <OverflowMenu light size="sm" flipped>
-      <OverflowMenuItem
-        className={styles.menuItem}
-        id="#placeholderMenuItem"
-        itemText={t('placeholderMenuitem', 'Placeholder item')}
-      >
-        {t('placeholderMenuitem', 'Placeholder item')}
-      </OverflowMenuItem>
-    </OverflowMenu>
-  );
-}
