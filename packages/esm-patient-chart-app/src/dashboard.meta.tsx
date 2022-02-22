@@ -6,8 +6,8 @@ export const summaryDashboardMeta = {
 };
 
 export const encountersDashboardMeta = {
-  name: 'encounters',
+  name: 'visits',
   slot: 'patient-chart-encounters-dashboard-slot',
   config: { columns: 1, type: 'grid' },
-  title: 'Encounters',
+  title: 'Visits',
 };

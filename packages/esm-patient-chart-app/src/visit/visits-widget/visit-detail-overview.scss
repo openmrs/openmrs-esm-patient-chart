@@ -3,7 +3,11 @@
 @import "~carbon-components/src/globals/scss/mixins";
 @import "../../root.scss";
 
-// Typography
+.diagnosisLabel {
+  @include carbon--type-style('productive-heading-01');
+  color: $text-02;
+  margin-top: 5px;
+}
 
 .caption01 {
   @include carbon--type-style("caption-01");
@@ -17,6 +21,10 @@
   @include carbon--type-style("productive-heading-01");
 }
 
+.productiveHeading02 {
+  @include carbon--type-style("productive-heading-02");
+}
+
 .productiveHeading03 {
   @include carbon--type-style("productive-heading-03");
 }
@@ -25,45 +33,42 @@
   @include carbon--type-style("body-long-01");
 }
 
-.text02 {
-  color: $text-02;
+.label01 {
+  @include carbon--type-style('label-01');
 }
 
 .text01 {
   color: $ui-05;
 }
 
-.container  {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
+.text02 {
+  color: $text-02;
 }
 
-.encounterHeading {
-  text-align: left;
-  width: 100%;
-  
-  margin: 0 1rem 1.3125rem 1rem;
-  color: $ui-05;
+.visitType {
+  @include carbon--type-style('productive-heading-02');
+  color: $text-02;
+  margin-bottom: 5px;
 }
 
-.visitsDetailWidgetContainer {
+.date {
+  @include carbon--type-style('body-short-01');
+  color: $text-02;
+}
+
+.container {
   background-color: $ui-background;
-  width: 100%;
-  margin: 0 1rem 1.3125rem 1rem;
   border: 1px solid $grey-2;
+  padding: 1rem;
+  margin: 1rem 0rem 1rem;
+  width: 100%;
 }
 
-.visitsDetailHeaderContainer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: $spacing-04 0 $spacing-04 $spacing-05;
-  background-color: $ui-background;
+.tabs > :global(.bx--tab-content) {
+  padding: 1rem 0rem !important;
 }
 
-.visitsDetailHeaderContainer > h4:after {
+.header::after {
   content: "";
   display: block;
   width: 2rem;
@@ -76,28 +81,28 @@
   height: 2.5rem;
 }
 
-.toggle{
+.toggle {
   border: 1px solid #A6C8FF;
 }
 
 .toggle:hover {
-  background-color: #EDF5FF;
+  background-color: $color-blue-10;
 }
 
 .toggle:active, .toggle:focus {
   box-shadow: none;
-  background-color: #EDF5FF;
+  background-color: $color-blue-10;
 }
 
-.toggleActive{
-  background-color: #EDF5FF;
+.toggleActive {
+  background-color: $color-blue-10;
   border: 1px solid $link-01;
 }
 
 .toggleActive:active, .toggleActive:focus {
   box-shadow: none;
   border: 1px solid $link-01;
-  background-color: #EDF5FF;
+  background-color: $color-blue-10;
 }
 
 .toggle:first-of-type {
@@ -129,7 +134,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-gap: 0.5rem;
-  margin: 0.5rem 0;
+  margin: 1rem 1rem 0 0;
 }
 
 .observation > span {
@@ -137,9 +142,10 @@
 }
 
 .summaryContainer {
-  margin-left: 1rem;
+  background-color: $ui-background;
   display: grid;
   grid-template-columns: max-content auto;
+  padding: 1rem 0rem;
 }
 
 .flexSections {
@@ -148,19 +154,31 @@
 
 .verticalTabs {
   margin: 1rem 0;
+
+  &:global(.bx--tabs--scrollable .bx--tabs--scrollable__nav-item+.bx--tabs--scrollable__nav-item) {
+    margin-left: 0rem;
+  }
 }
 
 .verticalTabs > ul {
   flex-direction: column !important;
 }
 
-.tab > button {
-  border-bottom: 0 !important;
-  border-left: 3px solid #e0e0e0 !important;
+.desktopTabs {
+  button {
+    height: 32px;
+  }
 }
 
-tab > button:first {
-  margin-left: 10px;
+.tabletTabs {
+  button {
+    height: 48px;
+  }
+}
+
+.tab > button {
+  border-bottom: 0 !important;
+  border-left: 3px solid $ui-03 !important;
 }
 
 .tab > button, .tab > button:focus, .tab > button:active {
@@ -175,46 +193,36 @@ tab > button:first {
 }
 
 .tabContent {
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid $ui-03;
   padding: 1rem 0;
   width: 70%;
 }
 
-.medicationBlock {
-  background-color: #f4f4f4;
-  padding: 0.625rem 6.75rem 0.75rem 1.063rem;
-  margin-top: 1.5rem;
+.medicationRecord {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  @include carbon--type-style('body-long-01');
+  color: $text-02;
+}
+
+.medicationContainer {
+  background-color: $ui-01;
+  padding: 1rem;
   width: 100% !important;
 }
 
-.medicationBlock:first-child {
-  margin-top: 0;
+.dosage {
+  @include carbon--type-style("productive-heading-01");
+  color: $text-01;
 }
 
 .diagnosesList {
   display: flex;
+  flex-flow: row wrap;
   padding-bottom: 0.5rem;
   margin: 0 1rem;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.diagnosis {
-  border-radius: 12px;
-  height: 1.5rem;
-  display: flex;
-  align-items: center;
-  padding: 0 0.5rem;
-  margin: 0 0.5rem 0.5rem 0;
-}
-
-.primaryDiagnose {
-  background-color: #d0e2ff;
-  color: #0043ce;
-}
-
-.secondaryDiagnose {
-  background-color: #ffd7d9;
-  color:#a2191f;
+  border-bottom: 1px solid $ui-03;
 }
 
 .toggleSwitch {
@@ -223,19 +231,50 @@ tab > button:first {
   justify-content: flex-end;
   margin-bottom: $spacing-02;
 }
+
 .toggleSwitch div {
   width: 30%;
 }
 
-.noteTitle {
-  @extend .productiveHeading01;
-  color: $ui-05;
+.noteText {
+  background-color: $ui-01;
+  padding: 1rem;
+  width: 100% !important;
+}
+
+.metadata {
+  @include carbon--type-style('label-01');
+  color: $text-02;
   margin: $spacing-02 0;
 }
 
-.noteText {
-  background-color: $openmrs-background-grey;
-  padding: 0.625rem 6.75rem 0.75rem 1.063rem;
-  width: 100% !important;
-  margin: $spacing-02 0;
+.tableContainer {
+  padding: 0;
+}
+
+.encounterListContainer {
+  border: 1px solid $ui-03;
+}
+
+.observationsEmptyState {
+  margin-top: 1.5rem;
+}
+
+.tableHeader {
+  > :global(.bx--table-header-label) {
+    @include carbon--type-style('productive-heading-01');
+    color: $text-02;
+  }
+}
+
+.menuItem {
+  max-width: none;
+}
+
+.loader {
+  margin: 0 auto;
+}
+
+.notesContainer {
+  margin-bottom: 2rem;
 }

@@ -33,12 +33,12 @@ describe('VisitDetailOverview', () => {
 
     await waitForLoadingToFinish();
 
-    expect(screen.getByRole('heading', { name: /Encounters/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /encounters/i })).toBeInTheDocument();
     expect(screen.getByTitle(/Empty data illustration/i)).toBeInTheDocument();
     expect(screen.getByText(/There are no encounters to display for this patient/i)).toBeInTheDocument();
   });
 
-  it('renders an error state view if there was a problem fetching encounters data', async () => {
+  it('renders an error state view if there was a problem fetching encounter data', async () => {
     const error = {
       message: 'Unauthorized',
       response: {
@@ -56,41 +56,39 @@ describe('VisitDetailOverview', () => {
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /encounters/i })).toBeInTheDocument();
     expect(screen.getByText(/Error 401: Unauthorized/i)).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        /Sorry, there was a problem displaying this information. You can try to reload this page, or contact the site administrator and quote the error code above/i,
-      ),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Sorry, there was a problem displaying this information/i)).toBeInTheDocument();
   });
 
-  it('renders the visit detail overview component', async () => {
+  it(`renders a summary of the patient's visits and encounters when data is available`, async () => {
     mockOpenmrsFetch.mockReturnValueOnce(visitOverviewDetailMockData);
 
     renderVisitDetailOverview();
 
     await waitForLoadingToFinish();
 
-    const encountersButton = screen.getByRole('button', { name: /Encounters/i });
-    userEvent.click(encountersButton);
+    const allEncountersTab = screen.getByRole('tab', { name: /all encounters/i });
+    const visitSummariesTab = screen.getByRole('tab', { name: /visit summaries/i });
 
-    expect(screen.getByRole('table')).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /ECH 18-Aug-2021/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /encounters/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Visit summary/i })).toBeInTheDocument();
-    expect(screen.getByRole('row', { name: /Vitals/i })).toBeInTheDocument();
+    expect(visitSummariesTab).toBeInTheDocument();
+    expect(allEncountersTab).toBeInTheDocument();
 
-    const tableHeaders = [/Time/i, /Encounter type/i, /Provider/i];
-    tableHeaders.forEach((header) => expect(screen.getByRole('columnheader', { name: header })).toBeInTheDocument());
+    expect(visitSummariesTab).toHaveAttribute('aria-selected', 'true');
+    expect(allEncountersTab).toHaveAttribute('aria-selected', 'false');
+    expect(screen.getByRole('tab', { name: /notes/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /tests/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /medications/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /^encounters$/i })).toBeInTheDocument();
 
-    const visitSummaryButton = screen.getByRole('button', { name: /Expand current row/i });
-    userEvent.click(visitSummaryButton);
+    expect(screen.getByRole('heading', { name: /ech/i })).toBeInTheDocument();
+    expect(screen.getByText(/^diagnoses$/i)).toBeInTheDocument();
+    expect(screen.getByText(/no diagnoses found/i)).toBeInTheDocument();
+    expect(screen.getByText(/no notes found/i)).toBeInTheDocument();
+    expect(screen.getByText(/no medications found/i)).toBeInTheDocument();
 
-    expect(screen.getByRole('button', { name: /Collapse current row/i })).toBeInTheDocument();
-    expect(
-      screen.getByRole('row', {
-        name: /Pulse: 140.0 Arterial blood oxygen saturation \(pulse oximeter\): 89.0 Respiratory rate: 35.0 Systolic: 80.0 Diastolic: 30.0 Temperature \(C\): 40.0 General patient note: Looks very unwell/i,
-      }),
-    ).toBeInTheDocument();
+    userEvent.click(allEncountersTab);
+
+    expect(allEncountersTab).toHaveAttribute('aria-selected', 'true');
+    expect(visitSummariesTab).toHaveAttribute('aria-selected', 'false');
   });
 });
 
