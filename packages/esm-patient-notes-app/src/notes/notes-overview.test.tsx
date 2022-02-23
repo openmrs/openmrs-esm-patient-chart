@@ -1,5 +1,6 @@
 import React from 'react';
 import { screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { openmrsFetch, useConfig, usePagination } from '@openmrs/esm-framework';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { mockVisitNotes, formattedVisitNotes } from '../../../../__mocks__/visit-notes.mock';
@@ -118,6 +119,14 @@ describe('NotesOverview: ', () => {
     );
 
     expect(screen.getAllByRole('row').length).toEqual(6);
+
+    // Expanding a row displays any associated visit notes
+    userEvent.click(screen.getAllByRole('button', { name: /expand current row/i })[0]);
+    expect(screen.getByText(/No visit note to display/i)).toBeInTheDocument();
+
+    // Collapsing the row hides the visit note
+    userEvent.click(screen.getByRole('button', { name: /collapse current row/i }));
+    expect(screen.queryByText(/No visit note to display/i)).not.toBeInTheDocument();
   });
 });
 
