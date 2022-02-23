@@ -87,11 +87,12 @@ const NotesPagination: React.FC<FormsProps> = ({ notes, pageSize, pageUrl, urlLa
                             <div className={styles.copy}>
                               <span className={styles.content}>{tableRows?.[i]?.encounterNote}</span>
                               <span className={styles.metadata}>
-                                {formatTime(new Date(tableRows?.[i]?.encounterNoteRecordedAt))}
+                                {formatTime(new Date(tableRows?.[i]?.encounterNoteRecordedAt))} &middot;{' '}
+                                {tableRows?.[i]?.encounterProvider}, {tableRows?.[i]?.encounterProviderRole}
                               </span>
                             </div>
                           ) : (
-                            <span className={styles.copy}>{t('noVisitNoteToDisplay', 'No Visit Note to display')}</span>
+                            <span className={styles.copy}>{t('noVisitNoteToDisplay', 'No visit note to display')}</span>
                           )}
                         </div>
                       </TableExpandedRow>

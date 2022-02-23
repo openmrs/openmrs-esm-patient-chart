@@ -24,7 +24,14 @@ export function useVisitNotes(patientUuid: string): UseVisitNotes {
   const {
     visitNoteConfig: { encounterNoteTextConceptUuid, problemListConceptUuid, visitDiagnosesConceptUuid },
   } = useConfig();
-  const encountersApiUrl = `/ws/rest/v1/encounter?patient=${patientUuid}&obsConcept=${visitDiagnosesConceptUuid}&v=full`;
+
+  const customRepresentation =
+    'custom:(uuid,display,encounterDatetime,patient,obs,' +
+    'encounterProviders:(uuid,display,' +
+    'encounterRole:(uuid,display),' +
+    'provider:(uuid,person:(uuid,display)))';
+
+  const encountersApiUrl = `/ws/rest/v1/encounter?patient=${patientUuid}&obsConcept=${visitDiagnosesConceptUuid}&v=${customRepresentation}`;
   const { data, error, isValidating } = useSWR<{ data: EncountersFetchResponse }, Error>(
     encountersApiUrl,
     openmrsFetch,
@@ -32,7 +39,6 @@ export function useVisitNotes(patientUuid: string): UseVisitNotes {
 
   const mapNoteProperties = (note: RESTPatientNote, index: number): PatientNote => ({
     id: `${index}`,
-    encounterDate: note.encounterDatetime,
     diagnoses: note.obs
       .map(
         (observation) =>
@@ -40,9 +46,12 @@ export function useVisitNotes(patientUuid: string): UseVisitNotes {
       )
       .filter((val) => val)
       .join(', '),
+    encounterDate: note.encounterDatetime,
     encounterNote: note.obs.find((observation) => observation.concept.uuid === encounterNoteTextConceptUuid)?.value,
     encounterNoteRecordedAt: note.obs.find((observation) => observation.concept.uuid === encounterNoteTextConceptUuid)
       ?.obsDatetime,
+    encounterProvider: note?.encounterProviders[0]?.provider?.person?.display,
+    encounterProviderRole: note?.encounterProviders[0]?.encounterRole?.display,
   });
 
   const formattedVisitNotes = data?.data?.results?.map(mapNoteProperties);

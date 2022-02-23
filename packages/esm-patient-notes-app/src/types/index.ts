@@ -6,8 +6,9 @@ export interface RESTPatientNote {
   uuid: string;
   display: string;
   encounterDatetime: string;
-  location: { uuid: string; display: string; name: string };
   encounterType: { name: string; uuid: string };
+  encounterProviders: [{ encounterRole: { uuid: string; display: string }; provider: { person: { display: string } } }];
+  location: { uuid: string; display: string; name: string };
   auditInfo: {
     creator: any;
     uuid: string;
@@ -17,7 +18,6 @@ export interface RESTPatientNote {
     changedBy?: any;
     dateChanged?: Date;
   };
-  encounterProviders: [{ provider: { person: { display: string } } }];
   obs: Array<ObsData>;
 }
 
@@ -27,6 +27,8 @@ export interface PatientNote {
   encounterDate: string;
   encounterNote: string;
   encounterNoteRecordedAt: string;
+  encounterProvider: string;
+  encounterProviderRole: string;
 }
 
 export interface DiagnosisData {
