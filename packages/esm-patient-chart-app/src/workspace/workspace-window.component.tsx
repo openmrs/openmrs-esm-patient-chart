@@ -52,6 +52,9 @@ const WorkspaceWindow: React.FC<RouteComponentProps<ContextWorkspaceParams>> = (
     ));
   }, [workspaces, patientUuid]);
 
+  const additionalProps = workspaces[0]?.additionalProps as { workspaceTitle: string };
+  const workspaceTitle = additionalProps?.workspaceTitle ? additionalProps.workspaceTitle : workspaces[0]?.title ?? '';
+
   return (
     <aside
       className={`${styles.container} ${maximized ? `${styles.maximized}` : undefined} ${
@@ -65,7 +68,7 @@ const WorkspaceWindow: React.FC<RouteComponentProps<ContextWorkspaceParams>> = (
         aria-label="Workspace Title"
         className={`${styles.header} ${maximized ? `${styles.fullWidth}` : `${styles.dynamicWidth}`}`}
       >
-        <HeaderName prefix="">{workspaces[0]?.title ?? ''}</HeaderName>
+        <HeaderName prefix="">{workspaceTitle}</HeaderName>
         <HeaderGlobalBar>
           <ExtensionSlot extensionSlotName={patientChartWorkspaceHeaderSlot} />
           <Button

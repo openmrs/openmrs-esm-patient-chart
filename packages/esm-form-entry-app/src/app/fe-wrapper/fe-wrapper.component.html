@@ -3,8 +3,6 @@
   <div class="content" (click)="onErrorPanelLostFocus()">
     <div *ngIf="!isLoading" class="form-container">
       <div>
-        <h6 *ngIf="singleSpaProps.encounterUuid" class="encounterHeader">Encounter date time {{encounterDate}} @
-          {{encounterTime}}</h6>
         <form class="bx--form no-padding" *ngIf="formSchema" [formGroup]="form.rootNode.control">
           <form-renderer [labelMap]="labelMap" [node]="form.rootNode"></form-renderer>
         </form>
