@@ -12,7 +12,7 @@ import {
   NewGridItems,
   ShadowBox,
 } from './helpers';
-import { ObsRecord, EmptyState } from '@openmrs/esm-patient-common-lib';
+import { ObsRecord, EmptyState, ObsMetaInfo, OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import styles from './timeline.scss';
 import { RecentResultsGrid } from '../overview/recent-overview.component';
 import FilterContext from '../filter/filter-context';
@@ -102,8 +102,24 @@ const DataRows: React.FC<DataRowsProps> = ({ timeColumns, rowData, sortedTimes, 
     })}
   </Grid>
 );
+
+interface DataEntry {
+  value: number | string;
+  effectiveDateTime: string;
+  interpretation: OBSERVATION_INTERPRETATION;
+}
+
+interface DataRow {
+  [_: string]: {
+    entries: Array<DataEntry>;
+    meta: ObsMetaInfo;
+    name: string;
+    type: string;
+    uuid: string;
+  };
+}
 interface NewDataRowsProps {
-  rowData: { entries: any[]; meta: { units: string; range: string } };
+  rowData: DataRow;
   timeColumns: Array<string>;
   sortedTimes: Array<string>;
   showShadow: boolean;
@@ -112,7 +128,6 @@ interface NewDataRowsProps {
 const NewDataRows: React.FC<NewDataRowsProps> = ({ timeColumns, rowData, sortedTimes, showShadow }) => (
   <Grid dataColumns={timeColumns.length} padding style={{ gridColumn: 'span 2' }}>
     {Object.entries(rowData).map(([title, row], rowCount) => {
-      console.log('row', row);
       const obs = row.entries;
       const { units = '', range = '' } = row.meta;
 

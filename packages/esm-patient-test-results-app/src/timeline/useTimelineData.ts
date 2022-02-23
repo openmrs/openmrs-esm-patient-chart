@@ -110,6 +110,10 @@ const parsePanel = (panelData) => {
     transformedEntries.push({
       value: entry.value,
       effectiveDateTime: entry.effectiveDateTime,
+      interpretation:
+        entry.meta.assessValue && typeof entry.meta.assessValue === 'function'
+          ? entry.meta.assessValue(entry.value)
+          : '--',
     });
   });
   outData.entries = transformedEntries || [];
@@ -132,7 +136,7 @@ export const useManyTimelineData = (patientUuid: string, panelUuids?: string[]) 
   const timelineData = useMemo(() => {
     if (!sortedObs || !loaded || !!error)
       return {
-        data: { parsedTime: {} as ReturnType<typeof parseTime> },
+        data: { parsedTime: {} as ReturnType<typeof parseTime>, rowData: {}, panelName: '' },
         loaded,
         error,
       };

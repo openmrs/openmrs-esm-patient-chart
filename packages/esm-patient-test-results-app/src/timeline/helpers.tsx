@@ -140,8 +140,7 @@ export const NewGridItems = React.memo<{
   <>
     {sortedTimes.map((_, i) => {
       if (!obs[i]) return <TimelineCell key={i} text={''} zebra={zebra} />;
-      const interpretation = 'NORMAL' || obs[i].meta.assessValue(obs[i].value);
-      return <TimelineCell key={i} text={obs[i].value} interpretation={interpretation} zebra={zebra} />;
+      return <TimelineCell key={i} text={obs[i].value} interpretation={obs[i].interpretation} zebra={zebra} />;
     })}
   </>
 ));
