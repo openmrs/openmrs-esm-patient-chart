@@ -1,8 +1,17 @@
 import React, { useContext } from 'react';
 import { InlineLoading } from 'carbon-components-react';
 import useScrollIndicator from './useScroll';
-import { usePatientPanels, useTimelineData } from './useTimelineData';
-import { PaddingContainer, TimeSlots, Grid, RowStartCell, GridItems, ShadowBox } from './helpers';
+import { useManyTimelineData, usePatientPanels, useTimelineData } from './useTimelineData';
+import {
+  PaddingContainer,
+  TimeSlots,
+  Grid,
+  RowStartCell,
+  NewRowStartCell,
+  GridItems,
+  NewGridItems,
+  ShadowBox,
+} from './helpers';
 import { ObsRecord, EmptyState } from '@openmrs/esm-patient-common-lib';
 import styles from './timeline.scss';
 import { RecentResultsGrid } from '../overview/recent-overview.component';
@@ -93,6 +102,36 @@ const DataRows: React.FC<DataRowsProps> = ({ timeColumns, rowData, sortedTimes, 
     })}
   </Grid>
 );
+interface NewDataRowsProps {
+  rowData: { entries: any[]; meta: { units: string; range: string } };
+  timeColumns: Array<string>;
+  sortedTimes: Array<string>;
+  showShadow: boolean;
+}
+
+const NewDataRows: React.FC<NewDataRowsProps> = ({ timeColumns, rowData, sortedTimes, showShadow }) => (
+  <Grid dataColumns={timeColumns.length} padding style={{ gridColumn: 'span 2' }}>
+    {Object.entries(rowData).map(([title, row], rowCount) => {
+      console.log('row', row);
+      const obs = row.entries;
+      const { units = '', range = '' } = row.meta;
+
+      return (
+        <React.Fragment key={rowCount}>
+          <NewRowStartCell
+            {...{
+              units,
+              range,
+              title,
+              shadow: showShadow,
+            }}
+          />
+          <NewGridItems {...{ sortedTimes, obs, zebra: !!(rowCount % 2) }} />
+        </React.Fragment>
+      );
+    })}
+  </Grid>
+);
 
 interface TimelineParams {
   patientUuid: string;
@@ -163,18 +202,49 @@ export const MultiTimeline = ({ patientUuid }) => {
   const { data: panels } = usePatientPanels(patientUuid);
   const { activeTests } = useContext(FilterContext);
 
+  const [xIsScrolled, yIsScrolled, containerRef] = useScrollIndicator(0, 32);
+
+  const uuids = activeTests.map((test) => panels[test]);
+  const timelineData = useManyTimelineData(patientUuid, uuids);
+
+  const {
+    data: {
+      parsedTime: { yearColumns, dayColumns, timeColumns, sortedTimes },
+      rowData,
+      panelName,
+    },
+    loaded,
+  } = timelineData;
+
   if (activeTests?.length === 0) {
     return <EmptyState displayText={'timeline data'} headerTitle="Data Timeline" />;
   }
-
-  const uuids = activeTests.map((test) => panels[test]);
-
-  return (
-    <>
-      {activeTests &&
-        activeTests?.map((test) => <Timeline patientUuid={patientUuid} panelUuid={panels[test]} key={test} />)}
-    </>
-  );
+  if (activeTests && timelineData && loaded) {
+    return (
+      <RecentResultsGrid>
+        <PaddingContainer ref={containerRef}>
+          <PanelNameCorner showShadow={xIsScrolled} panelName={panelName} />
+          <DateHeaderGrid
+            {...{
+              timeColumns,
+              yearColumns,
+              dayColumns,
+              showShadow: yIsScrolled,
+            }}
+          />
+          <NewDataRows
+            {...{
+              timeColumns,
+              rowData,
+              sortedTimes,
+              showShadow: xIsScrolled,
+            }}
+          />
+          <ShadowBox />
+        </PaddingContainer>
+      </RecentResultsGrid>
+    );
+  }
 };
 
 export default Timeline;

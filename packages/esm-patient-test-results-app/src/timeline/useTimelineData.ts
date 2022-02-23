@@ -97,6 +97,78 @@ export const useTimelineData = (patientUuid: string, panelUuid?: string) => {
   return timelineData;
 };
 
+const parsePanel = (panelData) => {
+  const outData = {
+    uuid: panelData.uuid,
+    type: panelData.type,
+    name: panelData.entries[0].name,
+    meta: panelData.entries[0].meta,
+    entries: [],
+  };
+  let transformedEntries = [];
+  panelData.entries.forEach((entry) => {
+    transformedEntries.push({
+      value: entry.value,
+      effectiveDateTime: entry.effectiveDateTime,
+    });
+  });
+  outData.entries = transformedEntries || [];
+  return outData;
+};
+
+/**
+ * Gets all patient sorted obs from usePatientResultsData, filters for panelUuids (if provided),
+ * then transforms data to be used by DataTable
+ *
+ * @param patientUuid - required patient identifier
+ * @param panelUuids - optional panel identifier
+ * @returns object of {data, loaded, error?} where data is formatted for use by the
+ * timeline data table
+ *
+ */
+export const useManyTimelineData = (patientUuid: string, panelUuids?: string[]) => {
+  const { sortedObs, loaded, error } = usePatientResultsData(patientUuid);
+
+  const timelineData = useMemo(() => {
+    if (!sortedObs || !loaded || !!error)
+      return {
+        data: { parsedTime: {} as ReturnType<typeof parseTime> },
+        loaded,
+        error,
+      };
+    // look for the specified panelUuid. If none is specified, just take any obs
+    const panels = Object.entries(sortedObs).filter(([, { uuid }]) => panelUuids.includes(uuid)) || [];
+
+    let rows = {};
+
+    panels?.forEach((panel) => {
+      const [panelName, panelData] = panel;
+      if (panelData) {
+        rows[panelName] = parsePanel(panelData);
+      }
+    });
+
+    const allTimes = [
+      ...new Set(
+        Object.keys(rows)
+          .map((row) => rows[row].entries.map((e) => e.effectiveDateTime))
+          .flat(),
+      ),
+    ];
+    allTimes.sort((a, b) => (new Date(a) < new Date(b) ? 1 : -1));
+    Object.keys(rows).forEach((row) => {
+      const newEntries = allTimes.map((time) => rows[row].entries.find((entry) => entry.effectiveDateTime === time));
+      rows[row].entries = newEntries;
+    });
+    const panelName = 'Timeline';
+    return {
+      data: { parsedTime: parseTime(allTimes), rowData: rows, panelName },
+      loaded: true,
+    };
+  }, [sortedObs, loaded, error, panelUuids]);
+  return timelineData;
+};
+
 /**
  * Very bad way to get panelUuid that for all tests that pertain to a patient
  * Hopefully there's a better endpoint for this
