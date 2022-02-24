@@ -61,6 +61,11 @@ export const configSchema = {
       },
     ],
   },
+  showHtmlFormEntryForms: {
+    _type: Type.Boolean,
+    _default: true,
+    _description: 'Whether HTML Form Entry forms should be included in lists of forms',
+  },
 };
 
 export interface HtmlFormEntryForm {
