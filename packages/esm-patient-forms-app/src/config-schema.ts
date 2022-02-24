@@ -61,10 +61,10 @@ export const configSchema = {
       },
     ],
   },
-  displayPOCForms: {
+  showHtmlFormEntryForms: {
     _type: Type.Boolean,
-    _default: false,
-    _description: 'Determines whether to display POC Forms only filtering out html forms',
+    _default: true,
+    _description: 'Whether HTML Form Entry forms should be included in lists of forms',
   },
 };
 

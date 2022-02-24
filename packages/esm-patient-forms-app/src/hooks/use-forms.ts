@@ -7,7 +7,7 @@ import { isFormFullyCached } from '../offline-forms/offline-form-helpers';
 
 export function useFormEncounters(cachedOfflineFormsOnly = false) {
   const config = useConfig();
-  const url = config.displayPOCForms ? formEncounterUrl.concat('&q=poc') : formEncounterUrl;
+  const url = config.showHtmlFormEntryForms ? formEncounterUrl : formEncounterUrl.concat('&q=poc');
   return useSWR([url, cachedOfflineFormsOnly], async () => {
     const res = await openmrsFetch<ListResponse<FormEncounter>>(url);
     // show published forms and hide component forms
