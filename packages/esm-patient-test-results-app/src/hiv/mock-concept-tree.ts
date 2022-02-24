@@ -57,13 +57,34 @@ const mockConceptTree = {
           display: 'Serum chemistry panel',
           obs: [
             {
-              display: 'Serum chloride',
+              display: 'Alkaline phosphatase',
+            },
+            {
+              display: 'Blood urea nitrogen', //
+            },
+            {
+              display: 'Serum Albumin',
+            },
+            {
+              display: 'Serum calcium',
             },
             {
               display: 'Serum carbon dioxide',
             },
             {
-              display: 'Blood urea nitrogen',
+              display: 'Serum chloride', //
+            },
+            {
+              display: 'Serum creatinine (umol/L)', //
+            },
+            {
+              display: 'Serum carbon dioxide', //
+            },
+            {
+              display: 'Serum sodium', //
+            },
+            {
+              display: 'Serum potassium', //
             },
           ],
         },

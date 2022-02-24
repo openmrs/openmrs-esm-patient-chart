@@ -14,8 +14,11 @@ import {
 } from './helpers';
 import { ObsRecord, EmptyState, ObsMetaInfo, OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import styles from './timeline.scss';
-import { RecentResultsGrid } from '../overview/recent-overview.component';
 import FilterContext from '../filter/filter-context';
+
+const RecentResultsGrid = (props) => {
+  return <div {...props} className={styles['recent-results-grid']} />;
+};
 
 interface PanelNameCornerProps {
   showShadow: boolean;

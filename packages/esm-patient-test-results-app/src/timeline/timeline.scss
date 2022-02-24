@@ -65,22 +65,16 @@
 }
 
 .padding-container {
-  height: fit-content;
-  max-height: 100%;
-  width: fit-content;
-  max-width: 100%;
   padding: 0px 0 0 0;
   box-sizing: border-box;
-  margin: 0;
-  overflow: auto;
 
-  scrollbar-width: none;
   display: grid;
   grid-auto-flow: row;
   column-gap: 1px;
   row-gap: 0px;
   background-color: $color-gray-30;
   grid-template: auto auto / 9em auto;
+  border-collapse: collapse;
 }
 
 .padding-container::-webkit-scrollbar {
@@ -193,4 +187,15 @@
 .shadow-box {
   grid-row: 2 / -1;
   grid-column: 1 / 2;
+}
+
+.recent-results-grid {
+  display: grid;
+  background-color: white;
+  overflow: auto;
+  max-height: calc(100vh - 50px);
+}
+
+.recent-results-grid::-webkit-scrollbar {
+  display: none;
 }
