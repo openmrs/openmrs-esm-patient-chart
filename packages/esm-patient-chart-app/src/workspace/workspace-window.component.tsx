@@ -53,8 +53,7 @@ const WorkspaceWindow: React.FC<RouteComponentProps<ContextWorkspaceParams>> = (
     ));
   }, [workspaces, patientUuid]);
 
-  const additionalProps = workspaces[0]?.additionalProps as { workspaceTitle: string };
-  const workspaceTitle = additionalProps?.workspaceTitle ? additionalProps.workspaceTitle : workspaces[0]?.title ?? '';
+  const workspaceTitle = workspaces[0]?.additionalProps?.['workspaceTitle'] ?? workspaces[0]?.title ?? '';
 
   return (
     <aside
