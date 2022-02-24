@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import usePatientResultsData from '../loadPatientTestData/usePatientResultsData';
 import { ObsRecord } from '@openmrs/esm-patient-common-lib';
 import { formatDate, formatTime, parseDate } from '@openmrs/esm-framework';
+import { exist } from '../loadPatientTestData/helpers';
 
 const parseTime = (sortedTimes: string[]) => {
   const yearColumns: Array<{ year: string; size: number }> = [],
@@ -98,11 +99,17 @@ export const useTimelineData = (patientUuid: string, panelUuid?: string) => {
 };
 
 const parsePanel = (panelData) => {
+  const sample = panelData?.entries?.[0];
   const outData = {
     uuid: panelData.uuid,
     type: panelData.type,
-    name: panelData.entries[0].name,
-    meta: panelData.entries[0].meta,
+    name: sample.name,
+    meta: {
+      ...sample.meta,
+      range: exist(sample?.meta?.lowNormal, sample?.meta?.hiNormal)
+        ? `${sample.meta.lowNormal} – ${sample.meta.hiNormal}`
+        : null,
+    },
     entries: [],
   };
   let transformedEntries = [];

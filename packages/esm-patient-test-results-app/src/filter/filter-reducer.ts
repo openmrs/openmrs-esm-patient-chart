@@ -20,7 +20,7 @@ const reducer = (state, action) => {
     case 'initialize':
       const { parents, leaves } = computeParents(action.tree);
       return {
-        checkboxes: Object.fromEntries(leaves.map((leaf) => [leaf, true])),
+        checkboxes: Object.fromEntries(leaves?.map((leaf) => [leaf, true])) || {},
         parents: parents,
       };
     case 'toggleVal':

@@ -1,6 +1,5 @@
 import React, { createContext, useReducer, useEffect, useMemo } from 'react';
 import reducer from './filter-reducer';
-import mockConceptTree from '../hiv/mock-concept-tree';
 
 const initialState = {
   checkboxes: {},
@@ -35,12 +34,13 @@ interface FilterContextProps {
 
 interface FilterProviderProps {
   sortedObs: any; // this data structure will change later
+  root: any;
   children: React.ReactNode;
 }
 
 const FilterContext = createContext<FilterContextProps>(initialContext);
 
-const FilterProvider = ({ sortedObs, children }: FilterProviderProps) => {
+const FilterProvider = ({ sortedObs, root, children }: FilterProviderProps) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const actions = useMemo(
@@ -62,9 +62,9 @@ const FilterProvider = ({ sortedObs, children }: FilterProviderProps) => {
   useEffect(() => {
     const tests = (sortedObs && Object.keys(sortedObs)) || [];
     if (tests.length && !Object.keys(state?.checkboxes).length) {
-      actions.initialize(mockConceptTree);
+      actions.initialize(root);
     }
-  }, [sortedObs, actions, state]);
+  }, [sortedObs, actions, state, root]);
 
   return (
     <FilterContext.Provider

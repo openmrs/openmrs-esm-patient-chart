@@ -48,7 +48,7 @@ const FilterSet = ({ root, maxNest }: FilterProps) => {
               id={root?.display}
               checked={allChildrenChecked}
               indeterminate={indeterminate}
-              labelText={root?.display}
+              labelText={`${root?.display} (${parents?.[root?.display]?.length})`}
               onChange={() => updateParent(root.display)}
             />
           }
