@@ -193,7 +193,7 @@
   display: grid;
   background-color: white;
   overflow: auto;
-  max-height: calc(100vh - 50px);
+  max-height: calc(100vh - 9rem);
 }
 
 .recent-results-grid::-webkit-scrollbar {
