@@ -1,10 +1,10 @@
 import React from 'react';
 import { screen, render } from '@testing-library/react';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
-import { extensionStore, useAssignedExtensionIds, useExtensionSlotMeta } from '@openmrs/esm-framework';
+import { extensionStore, useAssignedExtensions, useExtensionSlotMeta } from '@openmrs/esm-framework';
 import ChartReview from './chart-review.component';
 
-const mockUseAssignedExtensionIds = useAssignedExtensionIds as jest.Mock;
+const mockUseAssignedExtensions = useAssignedExtensions as jest.Mock;
 const mockUseExtensionSlotMeta = useExtensionSlotMeta as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
@@ -12,7 +12,7 @@ jest.mock('@openmrs/esm-framework', () => {
 
   return {
     ...originalModule,
-    useAssignedExtensionIds: jest.fn(),
+    useAssignedExtensions: jest.fn(),
     useExtensionSlotMeta: jest.fn(),
   };
 });
@@ -81,45 +81,20 @@ describe('ChartReview: ', () => {
     testProps.subview = 'vitals';
     testProps.view = 'vitalsAndBiometrics';
 
-    jest.spyOn(extensionStore, 'getState').mockReturnValue({
-      extensions: {
-        'biometrics-details-widget': {
-          instances: {},
-          load: jest.fn(),
-          meta: { view: 'biometrics', title: 'Biometrics' },
-          moduleName: '@openmrs/esm-patient-biometrics-app',
-          name: 'biometrics-details-widget',
-        },
-        'vitals-details-widget': {
-          instances: {},
-          load: jest.fn(),
-          meta: { view: 'vitals', title: 'Vitals' },
-          moduleName: '@openmrs/esm-patient-vitals-app',
-          name: 'vitals-details-widget',
-        },
+    mockUseAssignedExtensions.mockReturnValue([
+      {
+        id: 'vitals-details-widget',
+        meta: { view: 'vitals', title: 'Vitals' },
+        moduleName: '@openmrs/esm-patient-vitals-app',
+        name: 'vitals-details-widget',
       },
-      slots: {
-        'patient-chart-summary-dashboard-slot': {
-          name: 'patient-chart-summary-dashboard-slot',
-          attachedIds: [
-            'biometrics-overview-widget',
-            'appointments-overview-widget',
-            'forms-widget',
-            'vitals-overview-widget',
-            'immunization-overview-widget',
-            'notes-overview-widget',
-            'active-medications-widget',
-            'conditions-overview-widget',
-            'programs-overview-widget',
-            'allergies-overview-widget',
-            'test-results-summary-widget',
-            'patient-clinical-view-overview',
-          ],
-          instances: {},
-        },
+      {
+        id: 'biometrics-details-widget',
+        meta: { view: 'biometrics', title: 'Biometrics' },
+        moduleName: '@openmrs/esm-patient-biometrics-app',
+        name: 'biometrics-details-widget',
       },
-    });
-    mockUseAssignedExtensionIds.mockReturnValue(['vitals-details-widget', 'biometrics-details-widget']);
+    ]);
     mockUseExtensionSlotMeta.mockReturnValue(tabBasedDashboards);
 
     renderChartReview();

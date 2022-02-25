@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './grid-view.css';
 import { useRouteMatch } from 'react-router-dom';
-import { Extension, ExtensionData, ExtensionSlot, useExtensionStore } from '@openmrs/esm-framework';
+import { Extension, ExtensionData, ExtensionSlot, useExtensionSlotMeta } from '@openmrs/esm-framework';
 import { DashbardGridConfig } from '../config-schemas';
 import { basePath } from '../constants';
 
@@ -19,7 +19,7 @@ export interface GridViewProps {
 }
 
 export default function GridView({ slot, layout, patient, patientUuid }: GridViewProps) {
-  const store = useExtensionStore();
+  const slotMeta = useExtensionSlotMeta(slot);
   const { url } = useRouteMatch(basePath);
 
   const state = React.useMemo(
@@ -33,10 +33,10 @@ export default function GridView({ slot, layout, patient, patientUuid }: GridVie
 
   const wrapItem = React.useCallback(
     (slot: React.ReactNode, extension: ExtensionData) => {
-      const { columnSpan = 1 } = store.extensions[extension.extensionId].meta;
+      const { columnSpan = 1 } = slotMeta[extension.extensionId];
       return <div style={{ gridColumn: `span ${columnSpan}` }}>{slot}</div>;
     },
-    [store.extensions],
+    [slotMeta],
   );
 
   const gridTemplateColumns = getColumnsLayoutStyle(layout);
