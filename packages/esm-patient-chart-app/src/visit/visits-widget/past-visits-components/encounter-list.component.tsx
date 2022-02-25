@@ -72,9 +72,9 @@ const EncounterList: React.FC<EncounterListProps> = ({ isShowingAllEncounters, e
     tableHeaders.sort((a, b) => (a.id > b.id ? 1 : -1));
   }
 
-  const launchWorkspace = (formUuid: string, visitUuid?: string, encounterUuid?: string) => {
+  const launchWorkspace = (formUuid: string, visitUuid?: string, encounterUuid?: string, formName?: string) => {
     formEntrySub.next({ formUuid, patient, visitUuid, encounterUuid });
-    launchPatientWorkspace('patient-form-entry-workspace');
+    launchPatientWorkspace('patient-form-entry-workspace', { workspaceTitle: formName });
   };
 
   const tableRows = React.useMemo(() => {
@@ -127,7 +127,12 @@ const EncounterList: React.FC<EncounterListProps> = ({ isShowingAllEncounters, e
                                   id="#editEncounter"
                                   itemText={t('editThisEncounter', 'Edit this encounter')}
                                   onClick={() =>
-                                    launchWorkspace(encounters[i].form.uuid, encounters[i].visitUuid, encounters[i].id)
+                                    launchWorkspace(
+                                      encounters[i].form.uuid,
+                                      encounters[i].visitUuid,
+                                      encounters[i].id,
+                                      encounters[i].form.display,
+                                    )
                                   }
                                 >
                                   {t('editThisEncounter', 'Edit this encounter')}

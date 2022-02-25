@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import ArrowRight16 from '@carbon/icons-react/es/arrow--right/16';
 import Maximize16 from '@carbon/icons-react/es/maximize/16';
 import Minimize16 from '@carbon/icons-react/es/minimize/16';
+import DownToBottom16 from '@carbon/icons-react/es/down-to-bottom/16';
 import { ExtensionSlot, useBodyScrollLock, useLayoutType } from '@openmrs/esm-framework';
 import { useWorkspaces, useWorkspaceWindowSize, WorkspaceWindowState } from '@openmrs/esm-patient-common-lib';
 import { Button, Header, HeaderGlobalBar, HeaderName } from 'carbon-components-react';
@@ -52,6 +53,8 @@ const WorkspaceWindow: React.FC<RouteComponentProps<ContextWorkspaceParams>> = (
     ));
   }, [workspaces, patientUuid]);
 
+  const workspaceTitle = workspaces[0]?.additionalProps?.['workspaceTitle'] ?? workspaces[0]?.title ?? '';
+
   return (
     <aside
       className={`${styles.container} ${maximized ? `${styles.maximized}` : undefined} ${
@@ -65,26 +68,40 @@ const WorkspaceWindow: React.FC<RouteComponentProps<ContextWorkspaceParams>> = (
         aria-label="Workspace Title"
         className={`${styles.header} ${maximized ? `${styles.fullWidth}` : `${styles.dynamicWidth}`}`}
       >
-        <HeaderName prefix="">{workspaces[0]?.title ?? ''}</HeaderName>
+        <HeaderName prefix="">{workspaceTitle}</HeaderName>
         <HeaderGlobalBar>
           <ExtensionSlot extensionSlotName={patientChartWorkspaceHeaderSlot} />
-          <Button
-            iconDescription={maximized ? t('minimize', 'Minimize') : t('maximize', 'Maximize')}
-            hasIconOnly
-            kind="ghost"
-            onClick={toggleWindowState}
-            renderIcon={maximized ? Minimize16 : Maximize16}
-            tooltipPosition="bottom"
-          />
-          <Button
-            iconDescription={t('hide', 'Hide')}
-            hasIconOnly
-            kind="ghost"
-            onClick={() => updateWindowSize(WorkspaceWindowState.hidden)}
-            renderIcon={ArrowRight16}
-            tooltipPosition="bottom"
-            tooltipAlignment="end"
-          />
+          {layout === 'desktop' && (
+            <>
+              <Button
+                iconDescription={maximized ? t('minimize', 'Minimize') : t('maximize', 'Maximize')}
+                hasIconOnly
+                kind="ghost"
+                onClick={toggleWindowState}
+                renderIcon={maximized ? Minimize16 : Maximize16}
+                tooltipPosition="bottom"
+              />
+              <Button
+                iconDescription={t('hide', 'Hide')}
+                hasIconOnly
+                kind="ghost"
+                onClick={() => updateWindowSize(WorkspaceWindowState.hidden)}
+                renderIcon={ArrowRight16}
+                tooltipPosition="bottom"
+                tooltipAlignment="end"
+              />
+            </>
+          )}
+          {layout === 'tablet' && (
+            <Button
+              iconDescription={t('close', 'Close')}
+              hasIconOnly
+              onClick={workspaces[0]?.closeWorkspace}
+              renderIcon={DownToBottom16}
+              tooltipPosition="bottom"
+              tooltipAlignment="end"
+            />
+          )}
         </HeaderGlobalBar>
       </Header>
       {workspacesToRender}

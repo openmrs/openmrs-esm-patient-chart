@@ -70,7 +70,7 @@
   .container {
     background-color: $ui-01;
     position: fixed;
-    top: 3rem;
+    top: 0;
     left: 0;
     right: 0;
     bottom: 0;
@@ -78,7 +78,20 @@
   }
 
   .header {
-    display: none;
+    top: 0;
+    background-color: var(--brand-02);
+
+    a {
+      color: $ui-02;
+    }
+
+    button {
+      color: $ui-02;
+      background-color: var(--brand-02);
+      &:hover{
+        background-color: var(--brand-03);
+      }
+    }
   }
 
   .fixed {
@@ -88,5 +101,9 @@
 
   .dynamicWidth {
     width: 100%;
+  }
+
+  :global(.bx--header){
+    z-index: 5;
   }
 }

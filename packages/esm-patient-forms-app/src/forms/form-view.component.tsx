@@ -48,11 +48,12 @@ function launchFormEntry(
   patient: fhir.Patient,
   htmlFormEntryForms: Array<HtmlFormEntryForm>,
   encounterUuid?: string,
+  formName?: string,
 ) {
   if (currentVisit) {
     const htmlForm = htmlFormEntryForms.find((form) => form.formUuid === formUuid);
     if (isEmpty(htmlForm)) {
-      launchWorkSpace(formUuid, patient, currentVisit?.uuid, encounterUuid);
+      launchWorkSpace(formUuid, patient, currentVisit?.uuid, encounterUuid, formName);
     } else {
       navigate({
         to: `\${openmrsBase}/htmlformentryui/htmlform/${htmlForm.formUiPage}.page?patientId=${patient.id}&definitionUiResource=referenceapplication:htmlforms/${htmlForm.formAppUrl}.xml`,
@@ -63,9 +64,15 @@ function launchFormEntry(
   }
 }
 
-function launchWorkSpace(formUuid: string, patient: fhir.Patient, visitUuid?: string, encounterUuid?: string) {
+function launchWorkSpace(
+  formUuid: string,
+  patient: fhir.Patient,
+  visitUuid?: string,
+  encounterUuid?: string,
+  formName?: string,
+) {
   formEntrySub.next({ formUuid, visitUuid, patient, encounterUuid });
-  launchPatientWorkspace('patient-form-entry-workspace');
+  launchPatientWorkspace('patient-form-entry-workspace', { workspaceTitle: formName });
 }
 
 interface FormViewProps {
@@ -167,7 +174,16 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
                             <TableCell>{row.cells[0].value ?? t('never', 'Never')}</TableCell>
                             <TableCell className={styles.tableCell}>
                               <label
-                                onClick={() => launchFormEntry(currentVisit, row.id, patient, htmlFormEntryForms)}
+                                onClick={() =>
+                                  launchFormEntry(
+                                    currentVisit,
+                                    row.id,
+                                    patient,
+                                    htmlFormEntryForms,
+                                    '',
+                                    results[index].form.name,
+                                  )
+                                }
                                 role="presentation"
                                 className={styles.formName}
                               >
@@ -183,6 +199,7 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
                                       patient,
                                       htmlFormEntryForms,
                                       first(results[index].associatedEncounters)?.uuid,
+                                      results[index].form.name,
                                     )
                                   }
                                 />
