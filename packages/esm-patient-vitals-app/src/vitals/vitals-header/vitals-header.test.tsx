@@ -1,11 +1,18 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { mockPatient } from '../../../../../__mocks__/patient.mock';
 import { openmrsFetch } from '@openmrs/esm-framework';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { getByTextWithMarkup, swrRender, waitForLoadingToFinish } from '../../../../../tools/test-helpers';
-import { mockFhirVitalsResponse, mockVitalsConfig, mockVitalsSignsConcept } from '../../../../../__mocks__/vitals.mock';
+import { mockPatient } from '../../../../../__mocks__/patient.mock';
+import {
+  mockConceptMetadata,
+  mockFhirVitalsResponse,
+  mockVitalsConfig,
+  mockVitalsSignsConcept,
+} from '../../../../../__mocks__/vitals.mock';
 import VitalsHeader from './vitals-header.component';
+import { patientVitalsBiometricsFormWorkspace } from '../../constants';
 
 const testProps = {
   patientUuid: mockPatient.id,
@@ -17,27 +24,17 @@ const mockConceptUnits = new Map<string, string>(
 );
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
+const mockLaunchWorkspace = launchPatientWorkspace as jest.Mock;
 
 jest.mock('@openmrs/esm-patient-common-lib', () => {
   const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
 
   return {
     ...originalModule,
+    launchPatientWorkspace: jest.fn(),
     useVitalsConceptMetadata: jest.fn().mockImplementation(() => ({
       data: mockConceptUnits,
-      conceptMetadata: [
-        {
-          display: 'Systolic',
-          hiAbsolute: 250,
-          hiCritical: 180,
-          hiNormal: 140,
-          lowAbsolute: 0,
-          lowCritical: 85,
-          lowNormal: 100,
-          units: 'mmHg',
-          uuid: '5085AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-        },
-      ],
+      conceptMetadata: mockConceptMetadata,
     })),
   };
 });
@@ -52,8 +49,20 @@ jest.mock('@openmrs/esm-framework', () => {
 });
 
 describe('VitalsHeader: ', () => {
-  it('renders the vitals header', async () => {
-    mockOpenmrsFetch.mockReturnValueOnce({ data: mockFhirVitalsResponse });
+  it('renders an empty state view when there are no vitals data to show', async () => {
+    mockOpenmrsFetch.mockReturnValueOnce({ data: [] });
+
+    renderVitalsHeader();
+
+    await waitForLoadingToFinish();
+
+    expect(screen.getByText(/vitals and biometrics/i)).toBeInTheDocument();
+    expect(screen.getByText(/no data has been recorded for this patient/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /record vitals/i })).toBeInTheDocument();
+  });
+
+  it('renders the most recently recorded vitals in the vitals header', async () => {
+    mockOpenmrsFetch.mockReturnValue({ data: mockFhirVitalsResponse });
 
     renderVitalsHeader();
 
@@ -76,11 +85,26 @@ describe('VitalsHeader: ', () => {
     expect(getByTextWithMarkup(/BMI\s*-\s*/i)).toBeInTheDocument();
     expect(getByTextWithMarkup(/Weight\s*-\s*/i)).toBeInTheDocument();
 
+    expect(screen.getByRole('img', { name: /warning/i })).toBeInTheDocument();
+    expect(screen.getAllByTitle(/abnormal value/i).length).toEqual(2);
+
     const collapseButton = screen.getByTitle(/ChevronUp/);
     userEvent.click(collapseButton);
 
     expect(screen.queryByText(/Temp/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/BP/i)).not.toBeInTheDocument();
+  });
+
+  it('launches the vitals form when the `record vitals` button gets clicked', async () => {
+    renderVitalsHeader();
+
+    await waitForLoadingToFinish();
+
+    const recordVitalsButton = screen.getByText(/Record vitals/i);
+    userEvent.click(recordVitalsButton);
+
+    expect(mockLaunchWorkspace).toHaveBeenCalledTimes(1);
+    expect(mockLaunchWorkspace).toHaveBeenCalledWith(patientVitalsBiometricsFormWorkspace);
   });
 });
 
