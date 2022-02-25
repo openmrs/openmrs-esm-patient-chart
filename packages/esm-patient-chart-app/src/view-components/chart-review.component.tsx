@@ -72,7 +72,12 @@ const ChartReview: React.FC<ChartReviewProps> = ({ patientUuid, patient, view, s
     return (
       <>
         {dashboard.title && <h1 className={styles.dashboardTitle}>{dashboard.title}</h1>}
-        <ExtensionSlot key={dashboard.slot} extensionSlotName={dashboard.slot} className={styles.dashboard} style={{ gridTemplateColumns }}>
+        <ExtensionSlot
+          key={dashboard.slot}
+          extensionSlotName={dashboard.slot}
+          className={styles.dashboard}
+          style={{ gridTemplateColumns }}
+        >
           <Extension state={state} wrap={wrapItem} />
         </ExtensionSlot>
       </>
