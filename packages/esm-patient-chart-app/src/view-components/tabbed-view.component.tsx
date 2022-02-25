@@ -7,6 +7,7 @@ import {
   useAssignedExtensions,
   translateFrom,
   ExtensionRegistration,
+  AssignedExtension,
 } from '@openmrs/esm-framework';
 import { useRouteMatch } from 'react-router-dom';
 import { DashboardTabConfig } from '../config-schemas';
@@ -86,7 +87,7 @@ const TabbedView: React.FC<TabbedViewProps> = ({ name, slot, patient, patientUui
   );
 };
 
-function getTitle(ext: ExtensionRegistration) {
+function getTitle(ext: AssignedExtension) {
   const title = ext?.meta?.title;
   if (typeof title === 'string') {
     return title;
