@@ -1,13 +1,8 @@
 export * from './test-results';
 export * from './workspace';
 
-export interface DashbardGridConfig {
+export interface DashbardConfig {
   columns: number;
-  type: 'grid';
-}
-
-export interface DashboardTabConfig {
-  type: 'tabs';
 }
 
 export interface DashboardLinkConfig {
@@ -17,5 +12,5 @@ export interface DashboardLinkConfig {
 
 export interface DashboardConfig extends DashboardLinkConfig {
   slot: string;
-  config: DashbardGridConfig | DashboardTabConfig;
+  config: DashbardConfig;
 }

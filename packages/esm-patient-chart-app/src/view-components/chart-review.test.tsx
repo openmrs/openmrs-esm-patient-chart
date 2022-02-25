@@ -34,7 +34,6 @@ const gridBasedDashboards = {
     slot: 'patient-chart-summary-dashboard-slot',
     config: {
       columns: 4,
-      type: 'grid',
     },
     title: 'Patient Summary',
   },
@@ -43,7 +42,6 @@ const gridBasedDashboards = {
     slot: 'patient-chart-test-results-dashboard-slot',
     config: {
       columns: 1,
-      type: 'grid',
     },
     title: 'Test Results',
   },
@@ -57,7 +55,7 @@ const testProps = {
 };
 
 describe('ChartReview: ', () => {
-  test(`renders a grid-based layout if the provided config's layout type value is 'grid'`, () => {
+  test(`renders a grid-based layout`, () => {
     mockUseExtensionSlotMeta.mockReturnValue(gridBasedDashboards);
 
     renderChartReview();
