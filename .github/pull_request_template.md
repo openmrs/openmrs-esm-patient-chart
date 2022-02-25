@@ -2,6 +2,7 @@
 
 - [ ] This PR has a title that briefly describes the work done, including the ticket number if there is a ticket.
 - [ ] My work conforms to the [OpenMRS 3.0 Styleguide](https://om.rs/styleguide).
+- [ ] My work includes tests, or is validated by existing tests.
 
 ## Summary
 <!-- Please describe what problems your PR addresses. -->
