@@ -1,10 +1,7 @@
 import React from 'react';
-import CustomView from './custom-view.component';
-import GridView from './grid-view.component';
-import TabbedView from './tabbed-view.component';
-import { Redirect } from 'react-router-dom';
-import { useExtensionSlotMeta } from '@openmrs/esm-framework';
-import { DashboardConfig } from '../config-schemas';
+import { Redirect, useRouteMatch } from 'react-router-dom';
+import { Extension, ExtensionData, ExtensionSlot, useExtensionSlotMeta } from '@openmrs/esm-framework';
+import { DashbardLayoutConfig, DashboardConfig } from '../config-schemas';
 import { basePath } from '../constants';
 import styles from './chart-review.scss';
 
@@ -22,6 +19,11 @@ function makePath(target: DashboardConfig, params: Record<string, string> = {}) 
   return parts.join('/');
 }
 
+function getColumnsLayoutStyle(layout: DashbardLayoutConfig) {
+  const numberOfColumns = layout?.columns ?? 2;
+  return '1fr '.repeat(numberOfColumns).trimEnd();
+}
+
 interface ChartReviewProps {
   patientUuid: string;
   patient: fhir.Patient;
@@ -34,6 +36,26 @@ const ChartReview: React.FC<ChartReviewProps> = ({ patientUuid, patient, view, s
   const dashboards = Object.values(meta) as Array<DashboardConfig>;
   const defaultDashboard = dashboards[0];
   const dashboard = dashboards.find((dashboard) => dashboard.name === view);
+  const dashboardMeta = useExtensionSlotMeta(dashboard?.slot);
+  const { url } = useRouteMatch(basePath);
+  const gridTemplateColumns = getColumnsLayoutStyle(dashboard?.config);
+
+  const state = React.useMemo(
+    () => ({
+      basePath: url,
+      patient,
+      patientUuid,
+    }),
+    [url, patientUuid, patient],
+  );
+
+  const wrapItem = React.useCallback(
+    (slot: React.ReactNode, extension: ExtensionData) => {
+      const { columnSpan = 1 } = dashboardMeta[extension.extensionId];
+      return <div style={{ gridColumn: `span ${columnSpan}` }}>{slot}</div>;
+    },
+    [dashboardMeta],
+  );
 
   if (!defaultDashboard) {
     return null;
@@ -46,32 +68,15 @@ const ChartReview: React.FC<ChartReviewProps> = ({ patientUuid, patient, view, s
         })}
       />
     );
-  } else if (dashboard.config.type === 'grid') {
+  } else {
     return (
       <>
         {dashboard.title && <h1 className={styles.dashboardTitle}>{dashboard.title}</h1>}
-        <GridView
-          slot={dashboard.slot}
-          layout={dashboard.config}
-          name={dashboard.name}
-          patient={patient}
-          patientUuid={patientUuid}
-        />
+        <ExtensionSlot key={dashboard.slot} extensionSlotName={dashboard.slot} className={styles.dashboard} style={{ gridTemplateColumns }}>
+          <Extension state={state} wrap={wrapItem} />
+        </ExtensionSlot>
       </>
     );
-  } else if (dashboard.config.type === 'tabs') {
-    return (
-      <TabbedView
-        slot={dashboard.slot}
-        layout={dashboard.config}
-        name={dashboard.name}
-        patientUuid={patientUuid}
-        patient={patient}
-        tab={subview}
-      />
-    );
-  } else {
-    return <CustomView slot={dashboard.slot} name={dashboard.name} patientUuid={patientUuid} patient={patient} />;
   }
 };
 

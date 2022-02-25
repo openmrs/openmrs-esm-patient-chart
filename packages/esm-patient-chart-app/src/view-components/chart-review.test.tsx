@@ -1,10 +1,9 @@
 import React from 'react';
 import { screen, render } from '@testing-library/react';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
-import { extensionStore, useAssignedExtensions, useExtensionSlotMeta } from '@openmrs/esm-framework';
+import { useExtensionSlotMeta } from '@openmrs/esm-framework';
 import ChartReview from './chart-review.component';
 
-const mockUseAssignedExtensions = useAssignedExtensions as jest.Mock;
 const mockUseExtensionSlotMeta = useExtensionSlotMeta as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
@@ -28,17 +27,6 @@ jest.mock('react-router-dom', () => {
     }),
   };
 });
-
-const tabBasedDashboards = {
-  'results-summary-dashboard': {
-    name: 'vitalsAndBiometrics',
-    slot: 'patient-chart-results-dashboard-slot',
-    config: {
-      type: 'tabs',
-    },
-    title: 'Vitals & Biometrics',
-  },
-};
 
 const gridBasedDashboards = {
   'charts-summary-dashboard': {
@@ -75,35 +63,6 @@ describe('ChartReview: ', () => {
     renderChartReview();
 
     expect(screen.getByRole('heading').textContent).toMatch(/Patient summary/i);
-  });
-
-  test(`renders a tabs-based layout if the provided config's layout type value is 'tabs'`, () => {
-    testProps.subview = 'vitals';
-    testProps.view = 'vitalsAndBiometrics';
-
-    mockUseAssignedExtensions.mockReturnValue([
-      {
-        id: 'vitals-details-widget',
-        meta: { view: 'vitals', title: 'Vitals' },
-        moduleName: '@openmrs/esm-patient-vitals-app',
-        name: 'vitals-details-widget',
-      },
-      {
-        id: 'biometrics-details-widget',
-        meta: { view: 'biometrics', title: 'Biometrics' },
-        moduleName: '@openmrs/esm-patient-biometrics-app',
-        name: 'biometrics-details-widget',
-      },
-    ]);
-    mockUseExtensionSlotMeta.mockReturnValue(tabBasedDashboards);
-
-    renderChartReview();
-
-    expect(screen.getByRole('navigation')).toBeInTheDocument();
-    expect(screen.getByRole('list')).toBeInTheDocument();
-    expect(screen.getAllByRole('listitem').length).toEqual(2);
-    expect(screen.getByRole('button', { name: /vitals/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /biometrics/i })).toBeInTheDocument();
   });
 });
 
