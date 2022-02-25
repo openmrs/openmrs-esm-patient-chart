@@ -4,6 +4,6 @@
 set -e  # die on error
 
 npx pretty-quick --staged
-npx lerna run lint
+npx lerna run lint --since master
 yarn test
-npx lerna run typescript
+npx lerna run typescript --since master

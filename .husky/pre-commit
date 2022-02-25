@@ -3,4 +3,4 @@
 
 set -e  # die on error
 
-yarn run extract-translations
+npx lerna run extract-translations --since master
