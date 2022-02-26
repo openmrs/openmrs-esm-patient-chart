@@ -1,8 +1,7 @@
 import React from 'react';
-import styles from '../visit-detail-overview.scss';
-import { Note } from '../visit.resource';
 import { useTranslation } from 'react-i18next';
-import capitalize from 'lodash-es/capitalize';
+import { Note } from '../visit.resource';
+import styles from '../visit-detail-overview.scss';
 
 interface NotesSummaryProps {
   notes: Array<Note>;
@@ -13,12 +12,13 @@ const NotesSummary: React.FC<NotesSummaryProps> = ({ notes }) => {
 
   return (
     <React.Fragment>
-      {notes.length > 0 ? (
+      {notes.length ? (
         notes.map((note: Note, i) => (
           <div className={styles.notesContainer} key={i}>
             <p className={`${styles.noteText} ${styles.bodyLong01}`}>{note.note}</p>
             <p className={styles.metadata}>
-              {note.time} &middot; {note.provider.name}, {note.provider.role}
+              {note.time} {note.provider.name ? <span>&middot; {note.provider.name} </span> : null}
+              {note.provider.role ? <span>&middot; {note.provider.role}</span> : null}
             </p>
           </div>
         ))
