@@ -72,7 +72,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
               <WarningFilled20 title={'WarningFilled'} aria-label="Warning" className={styles['warning-icon']} />
             ) : null}
             <span className={styles.heading}>{t('vitalsAndBiometrics', 'Vitals and biometrics')}</span>
-            <span className={`${styles.bodyShort01} ${styles.text02}`}>
+            <span className={styles['body-text']}>
               {t('lastRecorded', 'Last recorded')}: {formatDate(parseDate(latestVitals?.date), { mode: 'wide' })}
             </span>
           </span>
@@ -184,9 +184,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
     <div className={styles['vitals-header']}>
       <span className={styles.container}>
         <span className={styles.heading}>{t('vitalsAndBiometrics', 'Vitals and biometrics')}</span>
-        <span className={styles['empty-state']}>
-          {t('noDataRecorded', 'No data has been recorded for this patient')}
-        </span>
+        <span className={styles['body-text']}>{t('noDataRecorded', 'No data has been recorded for this patient')}</span>
       </span>
 
       <div className={styles.container}>
