@@ -1,44 +1,42 @@
 import { Column, Grid, InlineLoading, Row } from 'carbon-components-react';
-import React, { useContext, useEffect } from 'react';
-import mockConceptTree from './mock-concept-tree';
+import React from 'react';
 import FilterSet from '../filter/filter-set';
-import FilterContext, { FilterProvider } from '../filter/filter-context';
-import usePatientResultsData from '../loadPatientTestData/usePatientResultsData';
-import { usePatient, openmrsFetch } from '@openmrs/esm-framework';
+import { FilterProvider } from '../filter/filter-context';
 import { MultiTimeline } from '../timeline/Timeline';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
-import useSWR from 'swr';
+import useGetObstreeData from '../timeline/useObstreeData';
+
+interface obsShape {
+  [key: string]: any;
+}
 
 const HIVCareAndTreatment = () => {
-  const { patientUuid } = usePatient();
-  const { sortedObs, loaded, error } = usePatientResultsData(patientUuid);
-  // const concept = '5035a431-51de-40f0-8f25-4a98762eb796'; // on openmrs-spa.org this is bloodwork
-  // const { data: result } = useSWR(`/ws/rest/v1/obstree?patient=${patientUuid}&concept=${concept}`, openmrsFetch);
-  // console.log('result', result);
+  const concept = '5035a431-51de-40f0-8f25-4a98762eb796'; // bloodwork
+  const { data: root, error, loading }: obsShape = useGetObstreeData(concept);
 
-  if (!loaded) {
+  if (loading) {
     return <InlineLoading />;
   }
   if (error) {
     return <ErrorState error={error} headerTitle="Data Load Error" />;
   }
-  if (loaded && !error && sortedObs && !!Object.keys(sortedObs).length) {
+  if (!loading && !error && root?.display && root?.subSets?.length) {
     return (
-      <FilterProvider sortedObs={sortedObs} root={mockConceptTree}>
+      <FilterProvider root={root}>
         <Grid>
           <Row>
             <Column sm={16} lg={4}>
-              <FilterSet root={mockConceptTree} />
+              <FilterSet />
             </Column>
             <Column sm={16} lg={8}>
-              <MultiTimeline patientUuid={patientUuid} />
+              <MultiTimeline />
             </Column>
           </Row>
         </Grid>
       </FilterProvider>
     );
   }
-  if (loaded && !error && sortedObs && !Object.keys(sortedObs).length) {
+  if (!loading && !error && root?.display && root?.subSets?.length === 0) {
     return <EmptyState displayText="observations" headerTitle="Data Timeline" />;
   }
   return null;

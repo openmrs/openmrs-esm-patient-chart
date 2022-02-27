@@ -1,15 +1,21 @@
-import React, { createContext, useReducer, useEffect, useMemo } from 'react';
+import React, { createContext, useReducer, useEffect, useMemo, useState } from 'react';
+import { parseTime } from '../timeline/useTimelineData';
 import reducer from './filter-reducer';
 
 const initialState = {
   checkboxes: {},
   parents: {},
+  root: {},
+  tests: {},
 };
 
 const initialContext = {
   state: initialState,
   checkboxes: {},
   parents: {},
+  root: {},
+  tests: {},
+  timelineData: {},
   activeTests: [],
   someChecked: false,
   initialize: () => {},
@@ -20,11 +26,15 @@ const initialContext = {
 interface StateProps {
   checkboxes: { [key: string]: boolean };
   parents: { [key: string]: string[] };
+  root: { [key: string]: any };
 }
 interface FilterContextProps {
   state: StateProps;
   checkboxes: { [key: string]: boolean };
   parents: { [key: string]: string[] };
+  root: { [key: string]: any };
+  tests: { [key: string]: any };
+  timelineData: { [key: string]: any };
   activeTests: string[];
   someChecked: boolean;
   initialize: any;
@@ -33,14 +43,17 @@ interface FilterContextProps {
 }
 
 interface FilterProviderProps {
-  sortedObs: any; // this data structure will change later
   root: any;
   children: React.ReactNode;
 }
 
+interface obsShape {
+  [key: string]: any;
+}
+
 const FilterContext = createContext<FilterContextProps>(initialContext);
 
-const FilterProvider = ({ sortedObs, root, children }: FilterProviderProps) => {
+const FilterProvider = ({ root, children }: FilterProviderProps) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const actions = useMemo(
@@ -56,15 +69,47 @@ const FilterProvider = ({ sortedObs, root, children }: FilterProviderProps) => {
     [dispatch],
   );
 
-  const activeTests = Object.keys(state?.checkboxes)?.filter((key) => state.checkboxes[key]) || [];
+  const activeTests = useMemo(() => {
+    return Object.keys(state?.checkboxes)?.filter((key) => state.checkboxes[key]) || [];
+  }, [state.checkboxes]);
+
   const someChecked = Boolean(activeTests.length);
 
+  const timelineData = useMemo(() => {
+    if (!state?.tests) {
+      return {
+        data: { parsedTime: {} as ReturnType<typeof parseTime>, rowData: {}, panelName: '' },
+        loaded: false,
+      };
+    }
+    const tests: obsShape = Object.fromEntries(
+      Object.entries(state.tests).filter(([name, entry]) => activeTests.includes(name)),
+    );
+    const allTimes = [
+      ...new Set(
+        Object.values(tests)
+          .map((test: obsShape) => test?.obs?.map((entry) => entry.obsDatetime))
+          .flat(),
+      ),
+    ];
+    allTimes.sort((a, b) => (new Date(a) < new Date(b) ? 1 : -1));
+    const rows = {};
+    Object.keys(tests).forEach((test) => {
+      const newEntries = allTimes.map((time: string) => tests[test].obs.find((entry) => entry.obsDatetime === time));
+      rows[test] = { ...tests[test], entries: newEntries };
+    });
+    const panelName = 'timeline';
+    return {
+      data: { parsedTime: parseTime(allTimes), rowData: rows, panelName },
+      loaded: true,
+    };
+  }, [activeTests, state.tests]);
+
   useEffect(() => {
-    const tests = (sortedObs && Object.keys(sortedObs)) || [];
-    if (tests.length && !Object.keys(state?.checkboxes).length) {
+    if (root?.display && !Object.keys(state?.checkboxes).length) {
       actions.initialize(root);
     }
-  }, [sortedObs, actions, state, root]);
+  }, [actions, state, root]);
 
   return (
     <FilterContext.Provider
@@ -72,6 +117,9 @@ const FilterProvider = ({ sortedObs, root, children }: FilterProviderProps) => {
         state,
         checkboxes: state.checkboxes,
         parents: state.parents,
+        root: state.root,
+        tests: state.tests,
+        timelineData,
         activeTests,
         someChecked,
         initialize: actions.initialize,

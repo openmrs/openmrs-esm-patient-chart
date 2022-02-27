@@ -8,12 +8,12 @@ interface Observation {
 }
 interface TreeNode {
   display: string;
+  datatype: string;
   subSets?: TreeNode[];
   obs?: Observation[];
 }
 
 interface FilterProps {
-  root: TreeNode;
   maxNest?: number;
   children?: React.ReactNode;
 }
@@ -32,8 +32,8 @@ const isIndeterminate = (kids, checkboxes) => {
   return kids && !kids?.every((kid) => checkboxes[kid]) && !kids?.every((kid) => !checkboxes[kid]);
 };
 
-const FilterSet = ({ root, maxNest }: FilterProps) => {
-  const { someChecked, parents, checkboxes, updateParent } = useContext(FilterContext);
+const FilterSet = ({ maxNest }: FilterProps) => {
+  const { someChecked, parents, checkboxes, updateParent, root } = useContext(FilterContext);
   const indeterminate = isIndeterminate(parents[root.display], checkboxes);
   const allChildrenChecked = parents[root.display]?.every((kid) => checkboxes[kid]);
 
@@ -53,12 +53,9 @@ const FilterSet = ({ root, maxNest }: FilterProps) => {
             />
           }
         >
-          {root?.subSets?.map((node, index) => (
-            <FilterNode root={node} level={0} maxNest={maxNest} key={index} />
-          ))}
-          {root?.obs?.map((obs, index) => (
-            <FilterLeaf leaf={obs} key={index} />
-          ))}
+          {!root?.subSets?.[0]?.datatype &&
+            root?.subSets?.map((node, index) => <FilterNode root={node} level={0} maxNest={maxNest} key={index} />)}
+          {root?.subSets?.[0]?.datatype && root.subSets?.map((obs, index) => <FilterLeaf leaf={obs} key={index} />)}
         </AccordionItem>
       </Accordion>
     </div>
@@ -69,7 +66,6 @@ const FilterNode = ({ root, level, maxNest = 3 }: FilterNodeProps) => {
   const { checkboxes, parents, updateParent } = useContext(FilterContext);
   const indeterminate = isIndeterminate(parents[root.display], checkboxes);
   const allChildrenChecked = parents[root.display]?.every((kid) => checkboxes[kid]);
-
   return (
     <Accordion>
       <AccordionItem
@@ -84,12 +80,11 @@ const FilterNode = ({ root, level, maxNest = 3 }: FilterNodeProps) => {
         }
         style={{ paddingLeft: level > 0 && level < maxNest ? '1rem' : '0px' }}
       >
-        {root?.subSets?.map((node, index) => (
-          <FilterNode root={node} level={level + 1} maxNest={maxNest} key={index} />
-        ))}
-        {root?.obs?.map((obs, index) => (
-          <FilterLeaf leaf={obs} key={index} />
-        ))}
+        {!root?.subSets?.[0]?.datatype &&
+          root?.subSets?.map((node, index) => (
+            <FilterNode root={node} level={level + 1} maxNest={maxNest} key={index} />
+          ))}
+        {root?.subSets?.[0]?.datatype && root.subSets?.map((obs, index) => <FilterLeaf leaf={obs} key={index} />)}
       </AccordionItem>
     </Accordion>
   );

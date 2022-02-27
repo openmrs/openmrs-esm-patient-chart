@@ -1,27 +1,37 @@
 const computeParents = (node) => {
   var parents = {};
   const leaves = [];
-  if (node?.subSets?.length) {
+  const tests = [];
+  if (node?.subSets?.length && node.subSets[0].datatype) {
+    leaves.push(...node.subSets.map((leaf) => leaf.display));
+    tests.push(
+      ...node.subSets.map((leaf) => {
+        const { display, ...rest } = leaf;
+        return [display, rest];
+      }),
+    );
+  } else if (node?.subSets?.length) {
     node.subSets.map((subNode) => {
-      const { parents: newParents, leaves: newLeaves } = computeParents(subNode);
+      const { parents: newParents, leaves: newLeaves, tests: newTests } = computeParents(subNode);
       parents = { ...parents, ...newParents };
       leaves.push(...newLeaves);
+      tests.push(...newTests);
     });
   }
-  if (node?.obs?.length) {
-    leaves.push(...node.obs.map((leaf) => leaf.display));
-  }
   parents[node.display] = leaves;
-  return { parents: parents, leaves: leaves };
+  return { parents, leaves, tests };
 };
 
 const reducer = (state, action) => {
   switch (action.type) {
     case 'initialize':
-      const { parents, leaves } = computeParents(action.tree);
+      const { parents, leaves, tests } = computeParents(action.tree);
+      const flatTests = Object.fromEntries(tests);
       return {
         checkboxes: Object.fromEntries(leaves?.map((leaf) => [leaf, true])) || {},
         parents: parents,
+        root: action.tree,
+        tests: flatTests,
       };
     case 'toggleVal':
       return {

@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { InlineLoading } from 'carbon-components-react';
 import useScrollIndicator from './useScroll';
-import { useManyTimelineData, usePatientPanels, useTimelineData } from './useTimelineData';
+import { useTimelineData } from './useTimelineData';
 import {
   PaddingContainer,
   TimeSlots,
@@ -115,10 +115,11 @@ interface DataEntry {
 interface DataRow {
   [_: string]: {
     entries: Array<DataEntry>;
-    meta: ObsMetaInfo;
     name: string;
     type: string;
     uuid: string;
+    units: string;
+    range: string;
   };
 }
 interface NewDataRowsProps {
@@ -132,7 +133,7 @@ const NewDataRows: React.FC<NewDataRowsProps> = ({ timeColumns, rowData, sortedT
   <Grid dataColumns={timeColumns.length} padding style={{ gridColumn: 'span 2' }}>
     {Object.entries(rowData).map(([title, row], rowCount) => {
       const obs = row.entries;
-      const { units = '', range = '' } = row.meta;
+      const { units = '', range = '' } = row;
 
       return (
         <React.Fragment key={rowCount}>
@@ -216,14 +217,9 @@ export const Timeline: React.FC<TimelineParams> = ({
   return <EmptyState displayText={'timeline data'} headerTitle="Data Timeline" />;
 };
 
-export const MultiTimeline = ({ patientUuid }) => {
-  const { data: panels } = usePatientPanels(patientUuid);
-  const { activeTests } = useContext(FilterContext);
-
+export const MultiTimeline = () => {
+  const { activeTests, timelineData } = useContext(FilterContext);
   const [xIsScrolled, yIsScrolled, containerRef] = useScrollIndicator(0, 32);
-
-  const uuids = activeTests.map((test) => panels[test]);
-  const timelineData = useManyTimelineData(patientUuid, uuids);
 
   const {
     data: {
@@ -263,6 +259,7 @@ export const MultiTimeline = ({ patientUuid }) => {
       </RecentResultsGrid>
     );
   }
+  return null;
 };
 
 export default Timeline;
