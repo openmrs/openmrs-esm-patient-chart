@@ -1,10 +1,9 @@
 import React from 'react';
 import { screen, render } from '@testing-library/react';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
-import { extensionStore, useAssignedExtensionIds, useExtensionSlotMeta } from '@openmrs/esm-framework';
+import { useExtensionSlotMeta } from '@openmrs/esm-framework';
 import ChartReview from './chart-review.component';
 
-const mockUseAssignedExtensionIds = useAssignedExtensionIds as jest.Mock;
 const mockUseExtensionSlotMeta = useExtensionSlotMeta as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
@@ -12,7 +11,7 @@ jest.mock('@openmrs/esm-framework', () => {
 
   return {
     ...originalModule,
-    useAssignedExtensionIds: jest.fn(),
+    useAssignedExtensions: jest.fn(),
     useExtensionSlotMeta: jest.fn(),
   };
 });
@@ -29,24 +28,12 @@ jest.mock('react-router-dom', () => {
   };
 });
 
-const tabBasedDashboards = {
-  'results-summary-dashboard': {
-    name: 'vitalsAndBiometrics',
-    slot: 'patient-chart-results-dashboard-slot',
-    config: {
-      type: 'tabs',
-    },
-    title: 'Vitals & Biometrics',
-  },
-};
-
 const gridBasedDashboards = {
   'charts-summary-dashboard': {
     name: 'summary',
     slot: 'patient-chart-summary-dashboard-slot',
     config: {
       columns: 4,
-      type: 'grid',
     },
     title: 'Patient Summary',
   },
@@ -55,7 +42,6 @@ const gridBasedDashboards = {
     slot: 'patient-chart-test-results-dashboard-slot',
     config: {
       columns: 1,
-      type: 'grid',
     },
     title: 'Test Results',
   },
@@ -69,66 +55,12 @@ const testProps = {
 };
 
 describe('ChartReview: ', () => {
-  test(`renders a grid-based layout if the provided config's layout type value is 'grid'`, () => {
+  test(`renders a grid-based layout`, () => {
     mockUseExtensionSlotMeta.mockReturnValue(gridBasedDashboards);
 
     renderChartReview();
 
     expect(screen.getByRole('heading').textContent).toMatch(/Patient summary/i);
-  });
-
-  test(`renders a tabs-based layout if the provided config's layout type value is 'tabs'`, () => {
-    testProps.subview = 'vitals';
-    testProps.view = 'vitalsAndBiometrics';
-
-    jest.spyOn(extensionStore, 'getState').mockReturnValue({
-      extensions: {
-        'biometrics-details-widget': {
-          instances: {},
-          load: jest.fn(),
-          meta: { view: 'biometrics', title: 'Biometrics' },
-          moduleName: '@openmrs/esm-patient-biometrics-app',
-          name: 'biometrics-details-widget',
-        },
-        'vitals-details-widget': {
-          instances: {},
-          load: jest.fn(),
-          meta: { view: 'vitals', title: 'Vitals' },
-          moduleName: '@openmrs/esm-patient-vitals-app',
-          name: 'vitals-details-widget',
-        },
-      },
-      slots: {
-        'patient-chart-summary-dashboard-slot': {
-          name: 'patient-chart-summary-dashboard-slot',
-          attachedIds: [
-            'biometrics-overview-widget',
-            'appointments-overview-widget',
-            'forms-widget',
-            'vitals-overview-widget',
-            'immunization-overview-widget',
-            'notes-overview-widget',
-            'active-medications-widget',
-            'conditions-overview-widget',
-            'programs-overview-widget',
-            'allergies-overview-widget',
-            'test-results-summary-widget',
-            'patient-clinical-view-overview',
-          ],
-          instances: {},
-        },
-      },
-    });
-    mockUseAssignedExtensionIds.mockReturnValue(['vitals-details-widget', 'biometrics-details-widget']);
-    mockUseExtensionSlotMeta.mockReturnValue(tabBasedDashboards);
-
-    renderChartReview();
-
-    expect(screen.getByRole('navigation')).toBeInTheDocument();
-    expect(screen.getByRole('list')).toBeInTheDocument();
-    expect(screen.getAllByRole('listitem').length).toEqual(2);
-    expect(screen.getByRole('button', { name: /vitals/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /biometrics/i })).toBeInTheDocument();
   });
 });
 

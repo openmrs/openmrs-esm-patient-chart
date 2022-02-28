@@ -12,7 +12,7 @@ import { dashboardMeta } from './dashboard.meta';
 export const hivMeta = {
   name: 'Hiv-care-and-treatment',
   slot: 'hiv-dashboard-slot',
-  config: { columns: 1, type: 'grid' },
+  config: { columns: 1 },
   title: 'HIV Care and Treatment',
 };
 
