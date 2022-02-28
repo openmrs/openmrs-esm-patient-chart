@@ -38,7 +38,7 @@ To start a dev server for a specific microfrontend, run:
 yarn start --sources 'packages/esm-patient-<insert-package-name>-app'
 ```
 
-This command uses the `openmrs` tooling to fire up a dev server on the default port (`8081`) for the specified microfrontend in addition to `esm-patient-chart-app`.
+This command uses the [openmrs](https://www.npmjs.com/package/openmrs) tooling to fire up a dev server on the default port (`8081`) for the specified microfrontend in addition to `esm-patient-chart-app`.
 
 To start a dev server running all the packages, run:
 
@@ -55,10 +55,16 @@ For example, to work on the vitals and biometrics widgets simultaneously, you co
 ```bash
 yarn start --sources 'packages/esm-patient-vitals-app' --port=8000
 
-yarn start --sources 'packages/esm-patient-biometrics-app' --port=9000
+yarn start --sources 'packages/esm-patient-biometrics-app' --port=9001
 ```
 
 These commands would fire up the vitals app on `http://localhost:8001/openmrs-esm-patient-vitals-app` and the biometrics app on `http://localhost:9001/openmrs-esm-patient-biometrics-app`. You can use these import map URLs to override the import maps in your application's import map overrides panel.
+
+You could also combine multiple `sources` in a single call, like so:
+
+```bash
+yarn start --sources 'packages/esm-patient-vitals-app/' --sources 'packages/esm-patient-biometrics-app/'
+```
 
 ## Layout
 
