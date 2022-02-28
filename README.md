@@ -10,7 +10,6 @@ The `openmrs-esm-patient-chart` is a frontend module for the OpenMRS SPA. It bun
 - [Appointments](packages/esm-patient-appointments-app/README.md)
 - [Attachments](packages/esm-patient-attachments-app/README.md)
 - [Biometrics](packages/esm-patient-biometrics-app/README.md)
-- [Common lib](packages/esm-patient-common-lib/README.md)
 - [Conditions](packages/esm-patient-conditions-app/README.md)
 - [Forms](packages/esm-patient-forms-app/README.md)
 - [Immunizations](packages/esm-patient-immunizations-app/README.md)
@@ -22,11 +21,18 @@ The `openmrs-esm-patient-chart` is a frontend module for the OpenMRS SPA. It bun
 - [Test results](packages/esm-patient-test-results-app/README.md)
 - [Vitals](packages/esm-patient-vitals-app/README.md)
 
+In addition to these widgets, two other microfrontends exist that encapsulate cross-cutting concerns. These are:
+
+- [Common lib](packages/esm-patient-common-lib/README.md)
+- [Patient chart](packages/esm-patient-chart-app/README.md)
+
 ## Setup
 
 Check out the developer documentation [here](http://o3-dev.docs.openmrs.org).
 
-This monorepo uses Yarn and Lerna. To start a dev server for a specific microfrontend, run:
+This monorepo uses [yarn](https://yarnpkg.com) and [lerna](https://github.com/lerna/lerna). 
+
+To start a dev server for a specific microfrontend, run:
 
 ```bash
 yarn start --sources 'packages/esm-patient-<insert-package-name>-app'
@@ -48,9 +54,7 @@ For example, to work on the vitals and biometrics widgets simultaneously, you co
 
 ```bash
 yarn start --sources 'packages/esm-patient-vitals-app' --port=8000
-```
 
-```bash
 yarn start --sources 'packages/esm-patient-biometrics-app' --port=9000
 ```
 
