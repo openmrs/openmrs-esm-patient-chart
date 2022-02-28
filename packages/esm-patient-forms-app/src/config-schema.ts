@@ -12,9 +12,9 @@ export const configSchema = {
         _type: Type.String,
         _description: 'The name of the form',
       },
-      formAppUrl: {
+      formUiResource: {
         _type: Type.String,
-        _description: 'The name of the XML file that defines the form',
+        _description: 'The resource file that defines the form. For example "referenceapplication:htmlforms/vitals.xml"',
       },
       formUiPage: {
         _type: Type.String,
@@ -32,31 +32,31 @@ export const configSchema = {
       {
         formUuid: 'd2c7532c-fb01-11e2-8ff2-fd54ab5fdb2a',
         formName: 'Admission (Simple)',
-        formAppUrl: 'simpleAdmission',
+        formUiResource: 'referenceapplication:htmlforms/simpleAdmission.xml',
         formUiPage: 'enterHtmlFormWithStandardUi',
       },
       {
         formUuid: 'b5f8ffd8-fbde-11e2-8ff2-fd54ab5fdb2a',
         formName: 'Discharge (Simple)',
-        formAppUrl: 'simpleDischarge',
+        formUiResource: 'referenceapplication:htmlforms/simpleDischarge.xml',
         formUiPage: 'enterHtmlFormWithStandardUi',
       },
       {
         formUuid: 'a007bbfe-fbe5-11e2-8ff2-fd54ab5fdb2a',
         formName: 'Transfer Within Hospital (Simple)',
-        formAppUrl: 'simpleTransfer',
+        formUiResource: 'referenceapplication:htmlforms/simpleTransfer.xml',
         formUiPage: 'enterHtmlFormWithStandardUi',
       },
       {
         formUuid: 'c75f120a-04ec-11e3-8780-2b40bef9a44b',
         formName: 'Visit Note',
-        formAppUrl: 'simpleVisitNote',
+        formUiResource: 'referenceapplication:htmlforms/simpleVisitNote.xml',
         formUiPage: 'enterHtmlFormWithStandardUi',
       },
       {
         formUuid: 'a000cb34-9ec1-4344-a1c8-f692232f6edd',
         formName: 'Vitals',
-        formAppUrl: 'vitals',
+        formUiResource: 'referenceapplication:htmlforms/vitals.xml',
         formUiPage: 'enterHtmlFormWithSimpleUi',
       },
     ],
@@ -71,7 +71,7 @@ export const configSchema = {
 export interface HtmlFormEntryForm {
   formUuid: string;
   formName: string;
-  formAppUrl: string;
+  formUiResource: string;
   formUiPage: 'enterHtmlFormWithSimpleUi' | 'enterHtmlFormWithStandardUi';
 }
 
