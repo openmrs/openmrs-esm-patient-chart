@@ -13,11 +13,10 @@ import WorkspaceNotification from '../workspace/workspace-notification.component
 interface PatientChartParams {
   patientUuid: string;
   view: string;
-  subview: string;
 }
 
 const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({ match }) => {
-  const { patientUuid, view, subview } = match.params;
+  const { patientUuid, view } = match.params;
   const { isLoading, patient } = usePatientOrOfflineRegisteredPatient(patientUuid);
   const sessionUser = useSessionUser();
   const state = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);
@@ -47,7 +46,7 @@ const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({ match
             </aside>
             <div className={styles.grid}>
               <div className={styles.chartreview}>
-                <ChartReview {...state} view={view} subview={subview} />
+                <ChartReview {...state} view={view} />
                 <VisitDialog patientUuid={patientUuid} />
                 <WorkspaceNotification />
               </div>
