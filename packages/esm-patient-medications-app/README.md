@@ -7,7 +7,7 @@ The medications widget. It provides a tabular overview of the active and past me
 From the root of the project, run:
 
 ```bash
-yarn run --sources 'packages/esm-patient-medications-app
+yarn run --sources 'packages/esm-patient-medications-app'
 ```
 
-This should fire up a development server on port --8081. You can use `--port` to specify an alternative port.
+This should fire up a development server on port `8081`. You can use `--port` to specify an alternative port.

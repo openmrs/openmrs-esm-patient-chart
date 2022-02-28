@@ -7,7 +7,7 @@ The biometrics widget. It provides tabular and chart-based overviews of the biom
 From the root of the project, run:
 
 ```bash
-yarn run --sources 'packages/esm-patient-biometrics-app
+yarn run --sources 'packages/esm-patient-biometrics-app'
 ```
 
-This should fire up a development server on port --8081. You can use `--port` to specify an alternative port.
+This should fire up a development server on port `8081`. You can use `--port` to specify an alternative port.

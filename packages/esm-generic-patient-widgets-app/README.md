@@ -7,7 +7,7 @@ This is a proof-of-concept for a generic widget that can be added to the patient
 From the root of the project, run:
 
 ```bash
-yarn run --sources 'packages/esm-generic-patient-widgets-app
+yarn run --sources 'packages/esm-generic-patient-widgets-app'
 ```
 
-This should fire up a development server on port --8081. You can use `--port` to specify an alternative port.
+This should fire up a development server on port `8081`. You can use `--port` to specify an alternative port.

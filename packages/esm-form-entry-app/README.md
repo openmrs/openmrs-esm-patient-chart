@@ -7,7 +7,7 @@ This widget encapsulates the form entry capabilities of the AMPATH form engine. 
 From the root of the project, run:
 
 ```bash
-yarn run --sources 'packages/esm-form-entry-app
+yarn run --sources 'packages/esm-form-entry-app'
 ```
 
-This should fire up a development server on port --4200. You can use `--port` to specify an alternative port.
+This should fire up a development server on port `4200`. You can use `--port` to specify an alternative port.

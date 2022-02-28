@@ -7,7 +7,7 @@ The patient banner widget. It provides a banner that displays the patient's name
 From the root of the project, run:
 
 ```bash
-yarn run --sources 'packages/esm-patient-banner-app
+yarn run --sources 'packages/esm-patient-banner-app'
 ```
 
-This should fire up a development server on port --8081. You can use `--port` to specify an alternative port.
+This should fire up a development server on port `8081`. You can use `--port` to specify an alternative port.
