@@ -29,14 +29,13 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useAvailablePrograms, useEnrollments } from './programs.resource';
 
-const programsToShowCount = 5;
-
 interface ProgramsOverviewProps {
   basePath: string;
   patientUuid: string;
 }
 
 const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUuid }) => {
+  const programsCount = 5;
   const { t } = useTranslation();
   const displayText = t('programs', 'Program enrollments');
   const headerTitle = t('carePrograms', 'Care Programs');
@@ -53,7 +52,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
     (program) => !includes(map(enrollments, 'program.uuid'), program.uuid),
   );
 
-  const { results: paginatedEnrollments, goTo, currentPage } = usePagination(enrollments ?? [], programsToShowCount);
+  const { results: paginatedEnrollments, goTo, currentPage } = usePagination(enrollments ?? [], programsCount);
 
   const launchProgramsForm = React.useCallback(() => launchPatientWorkspace('programs-form-workspace'), []);
 
@@ -150,7 +149,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
           currentItems={paginatedEnrollments.length}
           onPageNumberChange={({ page }) => goTo(page)}
           pageNumber={currentPage}
-          pageSize={programsToShowCount}
+          pageSize={programsCount}
           pageUrl={pageUrl}
           totalItems={enrollments.length}
           urlLabel={urlLabel}
