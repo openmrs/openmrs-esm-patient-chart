@@ -21,7 +21,9 @@
 
 .activeMedicationsContainer {
   border: 1px solid $ui-03;
+  border-bottom: none;
 }
+  
 
 .tablet {
   padding: 1.5rem 1rem;
@@ -51,5 +53,15 @@
 :global(.omrs-breakpoint-lt-desktop) {
   .container {
     height: calc(100vh - 6rem);
+  }
+}
+
+.paginationContainer {
+  border: 1px solid $ui-03;
+  border-top: none;
+  overflow-x: hidden;
+
+  & > :global(.bx--pagination) {
+    border: none;
   }
 }

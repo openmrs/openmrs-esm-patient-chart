@@ -3,14 +3,17 @@ import FloatingOrderBasketButton from './floating-order-basket-button.component'
 import MedicationsDetailsTable from '../components/medications-details-table.component';
 import { DataTableSkeleton } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
-import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
+import { usePagination } from '@openmrs/esm-framework';
+import { EmptyState, ErrorState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { usePatientOrders } from '../api/api';
+import styles from './medications-summary.scss';
 
 export interface MedicationsSummaryProps {
   patientUuid: string;
 }
 
 export default function MedicationsSummary({ patientUuid }: MedicationsSummaryProps) {
+  const orderCount = 5;
   const { t } = useTranslation();
 
   const {
@@ -26,6 +29,18 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
     isValidating: isValidatingPastOrders,
   } = usePatientOrders(patientUuid, 'any');
 
+  const {
+    results: paginatedActiveOrders,
+    goTo: goToActiveOrdersPage,
+    currentPage: currentPageActiveOrders,
+  } = usePagination(activeOrders ?? [], orderCount);
+
+  const {
+    results: paginatedPastOrders,
+    goTo: goToPastOrdersPage,
+    currentPage: currentPagePastOrders,
+  } = usePagination(pastOrders ?? [], orderCount);
+
   return (
     <>
       <div style={{ marginBottom: '1.5rem' }}>
@@ -37,15 +52,26 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
           if (isErrorActiveOrders) return <ErrorState error={isErrorActiveOrders} headerTitle={headerTitle} />;
           if (activeOrders?.length) {
             return (
-              <MedicationsDetailsTable
-                isValidating={isValidatingActiveOrders}
-                title={t('activeMedications', 'Active Medications')}
-                medications={activeOrders}
-                showDiscontinueButton={true}
-                showModifyButton={true}
-                showReorderButton={false}
-                showAddNewButton={false}
-              />
+              <>
+                <MedicationsDetailsTable
+                  isValidating={isValidatingActiveOrders}
+                  title={t('activeMedications', 'Active Medications')}
+                  medications={paginatedActiveOrders}
+                  showDiscontinueButton={true}
+                  showModifyButton={true}
+                  showReorderButton={false}
+                  showAddNewButton={false}
+                />
+                <div className={styles.paginationContainer}>
+                  <PatientChartPagination
+                    currentItems={paginatedActiveOrders.length}
+                    onPageNumberChange={({ page }) => goToActiveOrdersPage(page)}
+                    pageNumber={currentPageActiveOrders}
+                    pageSize={orderCount}
+                    totalItems={activeOrders.length}
+                  />
+                </div>
+              </>
             );
           }
           return <EmptyState displayText={displayText} headerTitle={headerTitle} />;
@@ -60,15 +86,26 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
           if (isErrorPastOrders) return <ErrorState error={isErrorPastOrders} headerTitle={headerTitle} />;
           if (pastOrders?.length) {
             return (
-              <MedicationsDetailsTable
-                isValidating={isValidatingPastOrders}
-                title={t('pastMedications', 'Past Medications')}
-                medications={pastOrders}
-                showDiscontinueButton={true}
-                showModifyButton={true}
-                showReorderButton={false}
-                showAddNewButton={false}
-              />
+              <>
+                <MedicationsDetailsTable
+                  isValidating={isValidatingPastOrders}
+                  title={t('pastMedications', 'Past Medications')}
+                  medications={paginatedPastOrders}
+                  showDiscontinueButton={true}
+                  showModifyButton={true}
+                  showReorderButton={false}
+                  showAddNewButton={false}
+                />
+                <div className={styles.paginationContainer}>
+                  <PatientChartPagination
+                    currentItems={paginatedPastOrders.length}
+                    onPageNumberChange={({ page }) => goToPastOrdersPage(page)}
+                    pageNumber={currentPagePastOrders}
+                    pageSize={orderCount}
+                    totalItems={pastOrders.length}
+                  />
+                </div>
+              </>
             );
           }
           return <EmptyState displayText={displayText} headerTitle={headerTitle} />;

@@ -67,6 +67,7 @@
   "searchForAnOrder": "Search for an order above",
   "searchResultsExactMatchesForTerm": "{count} exact match(es) for \"{searchTerm}\"",
   "searchResultsExactMatchesForTerm_plural": "{count} exact match(es) for \"{searchTerm}\"",
+  "seeAll": "See all",
   "signAndClose": "Sign and close",
   "startDate": "Start date",
   "takeAsNeeded": "Take As Needed",

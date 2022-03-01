@@ -2,6 +2,7 @@
 
 .widgetCard {
   border: 1px solid $ui-03;
+  border-bottom: none;
 }
 
 .row {
@@ -49,7 +50,7 @@
 }
 
 .paginationContainer {
-  border-top: 1px solid $ui-03;
+  border: 1px solid $ui-03;
 
   & > :global(.bx--pagination) {
     border: none;

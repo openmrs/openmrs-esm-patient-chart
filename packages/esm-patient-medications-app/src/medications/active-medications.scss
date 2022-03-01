@@ -3,3 +3,8 @@
 .title {
   @extend .productiveHeading03;
 }
+
+.paginationContainer {
+  border: 1px solid $ui-03;
+  border-top: none;
+}

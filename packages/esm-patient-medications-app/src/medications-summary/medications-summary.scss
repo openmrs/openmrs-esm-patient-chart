@@ -1,1 +1,10 @@
 @import "../root.scss";
+
+.paginationContainer {
+  border: 1px solid $ui-03;
+  border-top: none;
+
+  & > :global(.bx--pagination) {
+    border: none;
+  }
+}

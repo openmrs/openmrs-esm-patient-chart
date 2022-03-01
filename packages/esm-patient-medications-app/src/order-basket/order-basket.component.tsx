@@ -7,12 +7,12 @@ import { Button, ButtonSet, DataTableSkeleton, SearchSkeleton } from 'carbon-com
 import { useTranslation } from 'react-i18next';
 import { OrderBasketItem } from '../types/order-basket-item';
 import { getDurationUnits, getPatientEncounterId, usePatientOrders } from '../api/api';
-import { createErrorHandler, showToast, useLayoutType } from '@openmrs/esm-framework';
+import { createErrorHandler, showToast, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { OpenmrsResource } from '../types/openmrs-resource';
 import { orderDrugs } from './drug-ordering';
 import { connect } from 'unistore/react';
 import { OrderBasketStore, OrderBasketStoreActions, orderBasketStoreActions } from '../medications/order-basket-store';
-import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
+import { EmptyState, ErrorState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import styles from './order-basket.scss';
 
 export interface OrderBasketProps {
@@ -24,6 +24,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
   'items',
   orderBasketStoreActions,
 )(({ patientUuid, items, closeWorkspace, setItems }: OrderBasketProps & OrderBasketStore & OrderBasketStoreActions) => {
+  const orderCount = 5;
   const { t } = useTranslation();
   const displayText = t('activeMedications', 'Active medications');
   const headerTitle = t('activeMedications', 'active medications');
@@ -43,6 +44,8 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
     isLoading: isLoadingOrders,
     isValidating,
   } = usePatientOrders(patientUuid, 'ACTIVE');
+
+  const { results: paginatedOrders, goTo, currentPage } = usePagination(activePatientOrders ?? [], orderCount);
 
   useEffect(() => {
     const abortController = new AbortController();
@@ -151,15 +154,26 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
                   if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
                   if (activePatientOrders?.length) {
                     return (
-                      <MedicationsDetailsTable
-                        isValidating={isValidating}
-                        title={t('activeMedications', 'Active Medications')}
-                        medications={activePatientOrders}
-                        showDiscontinueButton={true}
-                        showModifyButton={true}
-                        showReorderButton={false}
-                        showAddNewButton={false}
-                      />
+                      <>
+                        <MedicationsDetailsTable
+                          isValidating={isValidating}
+                          title={t('activeMedications', 'Active Medications')}
+                          medications={activePatientOrders}
+                          showDiscontinueButton={true}
+                          showModifyButton={true}
+                          showReorderButton={false}
+                          showAddNewButton={false}
+                        />
+                        <div className={styles.paginationContainer}>
+                          <PatientChartPagination
+                            currentItems={paginatedOrders.length}
+                            onPageNumberChange={({ page }) => goTo(page)}
+                            pageNumber={currentPage}
+                            pageSize={orderCount}
+                            totalItems={activePatientOrders.length}
+                          />
+                        </div>
+                      </>
                     );
                   }
                   return <EmptyState displayText={displayText} headerTitle={headerTitle} />;

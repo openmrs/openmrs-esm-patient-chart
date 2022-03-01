@@ -9,7 +9,6 @@ import {
   InlineLoading,
   OverflowMenu,
   OverflowMenuItem,
-  Pagination,
   Table,
   TableBody,
   TableCell,
@@ -225,18 +224,6 @@ const MedicationsDetailsTable = connect<
             )}
           </DataTable>
         </TableContainer>
-        <div className={styles.paginationContainer}>
-          <Pagination
-            page={page}
-            pageSize={pageSize}
-            pageSizes={[10, 20, 30, 40, 50]}
-            totalItems={medications.length}
-            onChange={({ page, pageSize }) => {
-              setPage(page);
-              setPageSize(pageSize);
-            }}
-          />
-        </div>
       </div>
     );
   },
