@@ -2,9 +2,9 @@ import { Column, Grid, InlineLoading, Row } from 'carbon-components-react';
 import React from 'react';
 import FilterSet from '../filter/filter-set';
 import { FilterProvider } from '../filter/filter-context';
-import { MultiTimeline } from '../timeline/Timeline';
+import NewTimeline from '../new-timeline/new-timeline';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
-import useGetObstreeData from '../timeline/useObstreeData';
+import useGetObstreeData from '../new-timeline/useObstreeData';
 
 interface obsShape {
   [key: string]: any;
@@ -29,7 +29,7 @@ const HIVCareAndTreatment = () => {
               <FilterSet />
             </Column>
             <Column sm={16} lg={8}>
-              <MultiTimeline />
+              <NewTimeline />
             </Column>
           </Row>
         </Grid>

@@ -1,23 +1,20 @@
 import React, { createContext, useReducer, useEffect, useMemo, useState } from 'react';
 import { parseTime } from '../timeline/useTimelineData';
 import reducer from './filter-reducer';
+import { TreeNode } from './filter-set';
 
 const initialState = {
   checkboxes: {},
   parents: {},
-  root: {},
+  root: { display: '', flatName: '' },
   tests: {},
 };
 
 const initialContext = {
   state: initialState,
-  checkboxes: {},
-  parents: {},
-  root: {},
-  tests: {},
+  ...initialState,
   timelineData: {},
   activeTests: [],
-  someChecked: false,
   initialize: () => {},
   toggleVal: () => {},
   updateParent: () => {},
@@ -32,11 +29,10 @@ interface FilterContextProps {
   state: StateProps;
   checkboxes: { [key: string]: boolean };
   parents: { [key: string]: string[] };
-  root: { [key: string]: any };
+  root: TreeNode;
   tests: { [key: string]: any };
   timelineData: { [key: string]: any };
   activeTests: string[];
-  someChecked: boolean;
   initialize: any;
   toggleVal: any;
   updateParent: any;
@@ -73,8 +69,6 @@ const FilterProvider = ({ root, children }: FilterProviderProps) => {
     return Object.keys(state?.checkboxes)?.filter((key) => state.checkboxes[key]) || [];
   }, [state.checkboxes]);
 
-  const someChecked = Boolean(activeTests.length);
-
   const timelineData = useMemo(() => {
     if (!state?.tests) {
       return {
@@ -82,9 +76,10 @@ const FilterProvider = ({ root, children }: FilterProviderProps) => {
         loaded: false,
       };
     }
-    const tests: obsShape = Object.fromEntries(
-      Object.entries(state.tests).filter(([name, entry]) => activeTests.includes(name)),
-    );
+    const tests: obsShape = activeTests?.length
+      ? Object.fromEntries(Object.entries(state.tests).filter(([name, entry]) => activeTests.includes(name)))
+      : state.tests;
+
     const allTimes = [
       ...new Set(
         Object.values(tests)
@@ -121,7 +116,6 @@ const FilterProvider = ({ root, children }: FilterProviderProps) => {
         tests: state.tests,
         timelineData,
         activeTests,
-        someChecked,
         initialize: actions.initialize,
         toggleVal: actions.toggleVal,
         updateParent: actions.updateParent,

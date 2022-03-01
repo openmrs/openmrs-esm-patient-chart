@@ -1,34 +1,50 @@
-const computeParents = (node) => {
+export const getName = (prefix, name) => {
+  return prefix ? `${prefix}-${name}` : name;
+};
+
+const computeParents = (prefix, node) => {
   var parents = {};
   const leaves = [];
   const tests = [];
-  if (node?.subSets?.length && node.subSets[0].datatype) {
-    leaves.push(...node.subSets.map((leaf) => leaf.display));
-    tests.push(
-      ...node.subSets.map((leaf) => {
-        const { display, ...rest } = leaf;
-        return [display, rest];
-      }),
-    );
+  if (node?.subSets?.length && node.subSets[0].obs) {
+    let activeLeaves = [];
+    node.subSets.forEach((leaf) => {
+      if (leaf.hasData) {
+        activeLeaves.push(leaf.flatName);
+      }
+    });
+    let activeTests = [];
+    node.subSets.forEach((leaf) => {
+      if (leaf.obs.length) {
+        const { flatName, ...rest } = leaf;
+        activeTests.push([flatName, rest]);
+      }
+    });
+    leaves.push(...activeLeaves);
+    tests.push(...activeTests);
   } else if (node?.subSets?.length) {
     node.subSets.map((subNode) => {
-      const { parents: newParents, leaves: newLeaves, tests: newTests } = computeParents(subNode);
+      const {
+        parents: newParents,
+        leaves: newLeaves,
+        tests: newTests,
+      } = computeParents(getName(prefix, node.display), subNode);
       parents = { ...parents, ...newParents };
       leaves.push(...newLeaves);
       tests.push(...newTests);
     });
   }
-  parents[node.display] = leaves;
+  parents[node.flatName] = leaves;
   return { parents, leaves, tests };
 };
 
 const reducer = (state, action) => {
   switch (action.type) {
     case 'initialize':
-      const { parents, leaves, tests } = computeParents(action.tree);
+      const { parents, leaves, tests } = computeParents('', action.tree);
       const flatTests = Object.fromEntries(tests);
       return {
-        checkboxes: Object.fromEntries(leaves?.map((leaf) => [leaf, true])) || {},
+        checkboxes: Object.fromEntries(leaves?.map((leaf) => [leaf, false])) || {},
         parents: parents,
         root: action.tree,
         tests: flatTests,

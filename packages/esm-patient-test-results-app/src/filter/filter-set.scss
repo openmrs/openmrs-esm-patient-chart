@@ -7,7 +7,7 @@
   margin: $spacing-02 0;
 }
 
-.filterContainerActive {
+.filterContainerExpanded {
   border-left: 0.3rem solid var(--brand-01);
 }
 
@@ -18,6 +18,10 @@
 .filterItem {
   padding: 0.5rem 1rem 0.5rem 4rem;
   border-bottom: 1px solid $ui-03;
+}
+
+.nestedAccordion > :global(.bx--accordion--start) > :global(.bx--accordion__item--active) {
+  border-left: 0.3rem solid var(--brand-01);
 }
 
 .nestedAccordion :global {
@@ -53,16 +57,6 @@
     /*rtl:ignore*/
     transform: rotate(-90deg);
     fill: var(--brand-01);
-  }
-
-  /** first node **/
-  .bx--accordion--start > .bx--accordion__item > button[aria-expanded="true"] {
-    background-color: $ui-03;
-  }
-
-  .bx--accordion--start > .bx--accordion__item > button > .bx--accordion__title > .bx--checkbox-wrapper > .bx--checkbox-label {
-    font-size: 110%;
-    font-weight: 700;
   }
 
   .bx--checkbox-label-text {
