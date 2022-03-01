@@ -33,18 +33,14 @@ export interface ImmunizationsOverviewProps {
 
 const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = ({ patient, patientUuid, basePath }) => {
   const { t } = useTranslation();
-  const immunizationsToShowCount = 5;
+  const immunizationsCount = 5;
   const displayText = t('immunizations', 'immunizations');
   const headerTitle = t('immunizations', 'Immunizations');
   const urlLabel = t('seeAll', 'See all');
   const pageUrl = window.spaBase + basePath + '/immunizations';
 
   const { data: immunizations, isError, isLoading, isValidating } = useImmunizations(patientUuid);
-  const {
-    results: paginatedImmunizations,
-    goTo,
-    currentPage,
-  } = usePagination(immunizations ?? [], immunizationsToShowCount);
+  const { results: paginatedImmunizations, goTo, currentPage } = usePagination(immunizations ?? [], immunizationsCount);
 
   const launchImmunizationsForm = React.useCallback(() => launchPatientWorkspace('immunization-form-workspace'), []);
 
@@ -118,7 +114,7 @@ const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = ({ patient, 
           currentItems={paginatedImmunizations.length}
           onPageNumberChange={({ page }) => goTo(page)}
           pageNumber={currentPage}
-          pageSize={immunizationsToShowCount}
+          pageSize={immunizationsCount}
           pageUrl={pageUrl}
           totalItems={immunizations.length}
           urlLabel={urlLabel}

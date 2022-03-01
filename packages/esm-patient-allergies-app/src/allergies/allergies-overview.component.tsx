@@ -22,7 +22,7 @@ import {
   PatientChartPagination,
 } from '@openmrs/esm-patient-common-lib';
 import { usePagination } from '@openmrs/esm-framework';
-import { allergiesToShowCount, patientAllergiesFormWorkspace } from '../constants';
+import { allergiesCount, patientAllergiesFormWorkspace } from '../constants';
 import { useAllergies } from './allergy-intolerance.resource';
 import styles from './allergies-overview.scss';
 
@@ -40,7 +40,7 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient, showAddA
   const pageUrl = window.spaBase + basePath + '/allergies';
 
   const { allergies, isError, isLoading, isValidating } = useAllergies(patient.id);
-  const { results: paginatedAllergies, goTo, currentPage } = usePagination(allergies ?? [], allergiesToShowCount);
+  const { results: paginatedAllergies, goTo, currentPage } = usePagination(allergies ?? [], allergiesCount);
 
   const tableHeaders = [
     {
@@ -113,7 +113,7 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient, showAddA
           currentItems={paginatedAllergies.length}
           onPageNumberChange={({ page }) => goTo(page)}
           pageNumber={currentPage}
-          pageSize={allergiesToShowCount}
+          pageSize={allergiesCount}
           pageUrl={pageUrl}
           totalItems={allergies.length}
           urlLabel={urlLabel}

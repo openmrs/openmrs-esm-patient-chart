@@ -38,11 +38,11 @@ interface EncounterListProps {
 }
 
 const EncounterList: React.FC<EncounterListProps> = ({ isShowingAllEncounters, encounters }) => {
-  const encountersToShowCount = 20;
+  const encountersCount = 20;
   const { t } = useTranslation();
   const { patient } = usePatient();
   const isTablet = useLayoutType() === 'tablet';
-  const { results: paginatedEncounters, goTo, currentPage } = usePagination(encounters ?? [], encountersToShowCount);
+  const { results: paginatedEncounters, goTo, currentPage } = usePagination(encounters ?? [], encountersCount);
 
   const tableHeaders = [
     {
@@ -190,7 +190,7 @@ const EncounterList: React.FC<EncounterListProps> = ({ isShowingAllEncounters, e
                   currentItems={paginatedEncounters.length}
                   onPageNumberChange={({ page }) => goTo(page)}
                   pageNumber={currentPage}
-                  pageSize={encountersToShowCount}
+                  pageSize={encountersCount}
                   totalItems={encounters.length}
                 />
               ) : null}

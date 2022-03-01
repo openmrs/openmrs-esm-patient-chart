@@ -25,14 +25,13 @@ import {
   CardHeader,
 } from '@openmrs/esm-patient-common-lib';
 
-const conditionsToShowCount = 5;
-
 interface ConditionsOverviewProps {
   basePath: string;
   patient: fhir.Patient;
 }
 
 const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient, basePath }) => {
+  const conditionsCount = 5;
   const { t } = useTranslation();
   const displayText = t('conditions', 'Conditions');
   const headerTitle = t('conditions', 'Conditions');
@@ -40,7 +39,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient, basePa
   const pageUrl = window.spaBase + basePath + '/conditions';
 
   const { data: conditions, isError, isLoading, isValidating } = useConditions(patient.id);
-  const { results: paginatedConditions, goTo, currentPage } = usePagination(conditions ?? [], conditionsToShowCount);
+  const { results: paginatedConditions, goTo, currentPage } = usePagination(conditions ?? [], conditionsCount);
 
   const launchConditionsForm = React.useCallback(() => launchPatientWorkspace('conditions-form-workspace'), []);
   const tableHeaders = [
@@ -108,7 +107,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient, basePa
           currentItems={paginatedConditions.length}
           onPageNumberChange={({ page }) => goTo(page)}
           pageNumber={currentPage}
-          pageSize={conditionsToShowCount}
+          pageSize={conditionsCount}
           pageUrl={pageUrl}
           totalItems={conditions.length}
           urlLabel={urlLabel}
