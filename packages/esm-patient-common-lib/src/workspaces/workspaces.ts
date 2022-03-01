@@ -1,4 +1,10 @@
-import { ExtensionRegistration, getExtensionRegistration, getGlobalStore, translateFrom } from '@openmrs/esm-framework';
+import {
+  ExtensionRegistration,
+  getExtensionRegistration,
+  getGlobalStore,
+  navigate,
+  translateFrom,
+} from '@openmrs/esm-framework';
 import _i18n from 'i18next';
 import { WorkspaceWindowState } from '..';
 
@@ -152,6 +158,16 @@ export function launchPatientWorkspace(name: string, additionalProps?: object) {
       });
     }
   }
+}
+
+export function launchPatientChartWithWorkspaceOpen(
+  patientUuid: string,
+  workspaceName: string,
+  additionalProps?: object,
+) {
+  changeWorkspaceContext(patientUuid);
+  launchPatientWorkspace(workspaceName, additionalProps);
+  navigate({ to: '${openmrsSpaBase}/patient/' + `${patientUuid}/chart` });
 }
 
 const promptBeforeClosingFcns = {};
