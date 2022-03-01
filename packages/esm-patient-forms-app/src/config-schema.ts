@@ -14,7 +14,8 @@ export const configSchema = {
       },
       formUiResource: {
         _type: Type.String,
-        _description: 'The resource file that defines the form. For example "referenceapplication:htmlforms/vitals.xml"',
+        _description:
+          'The resource file that defines the form. For example "referenceapplication:htmlforms/vitals.xml"',
       },
       formUiPage: {
         _type: Type.String,
