@@ -53,18 +53,10 @@ The recommended approach for working on multiple microfrontends is to run each o
 For example, to work on the vitals and biometrics widgets simultaneously, you could run:
 
 ```bash
-yarn start --sources 'packages/esm-patient-vitals-app' --port=8000
-
-yarn start --sources 'packages/esm-patient-biometrics-app' --port=9001
+yarn start --sources 'packages/esm-patient-biometrics-app/' --sources 'packages/esm-patient-vitals-app/'
 ```
 
-These commands would fire up the vitals app on `http://localhost:8001/openmrs-esm-patient-vitals-app` and the biometrics app on `http://localhost:9001/openmrs-esm-patient-biometrics-app`. You can use these import map URLs to override the import maps in your application's import map overrides panel.
-
-You could also combine multiple `sources` in a single call, like so:
-
-```bash
-yarn start --sources 'packages/esm-patient-vitals-app/' --sources 'packages/esm-patient-biometrics-app/'
-```
+This command would fire up the biometrics app on `http://localhost:8082/openmrs-esm-patient-biometrics-app.js` and the vitals app on `http://localhost:8083/openmrs-esm-patient-vitals-app.js`. You can use these import map URLs to override the import maps in your application's import map overrides panel.
 
 ## Layout
 
