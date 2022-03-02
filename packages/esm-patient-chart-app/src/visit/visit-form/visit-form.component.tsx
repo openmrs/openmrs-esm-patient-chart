@@ -33,17 +33,22 @@ import {
   toOmrsIsoString,
   toDateObjectStrict,
   useLayoutType,
+  useVisitTypes,
+  useConfig,
 } from '@openmrs/esm-framework';
 import { amPm, convertTime12to24, DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
-import VisitTypeOverview from './visit-type-overview.component';
-import styles from './visit-form.scss';
+import BaseVisitType from './base-visit-type.component';
+import styles from './visit-form.component.scss';
+import RecommendedVisitType from './recommended-visit-type.component';
+import { useActivePatientEnrollment } from '../hooks/usePatientProgramEnrollment';
 
 const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const locations = useLocations();
   const sessionUser = useSessionUser();
-  const [contentSwitcherIndex, setContentSwitcherIndex] = useState(1);
+  const config = useConfig();
+  const [contentSwitcherIndex, setContentSwitcherIndex] = useState(config.displayRecommendedVisitType ? 0 : 1);
   const [isMissingVisitType, setIsMissingVisitType] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState('');
@@ -52,6 +57,8 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
   const [visitTime, setVisitTime] = useState(dayjs(new Date()).format('hh:mm'));
   const [visitType, setVisitType] = useState<string | null>(null);
   const state = useMemo(() => ({ patientUuid }), [patientUuid]);
+  const allVisitTypes = useVisitTypes();
+  const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
 
   useEffect(() => {
     if (locations && sessionUser?.sessionLocation?.uuid) {
@@ -117,7 +124,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
   );
 
   return (
-    <Form onSubmit={handleSubmit} className={styles.form}>
+    <Form className={styles.form}>
       <Grid className={styles.grid}>
         {isTablet && (
           <Row className={styles.headerGridRow}>
@@ -204,12 +211,27 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
                 <Switch name="recommended" text={t('recommended', 'Recommended')} />
                 <Switch name="all" text={t('all', 'All')} />
               </ContentSwitcher>
-              <VisitTypeOverview
-                onChange={(visitType) => {
-                  setVisitType(visitType);
-                  setIsMissingVisitType(false);
-                }}
-              />
+              {contentSwitcherIndex === 0 && !isLoading && (
+                <RecommendedVisitType
+                  onChange={(visitType) => {
+                    setVisitType(visitType);
+                    setIsMissingVisitType(false);
+                  }}
+                  patientUuid={patientUuid}
+                  activePatientEnrollment={activePatientEnrollment}
+                  locationUuid={selectedLocation}
+                />
+              )}
+              {contentSwitcherIndex === 1 && (
+                <BaseVisitType
+                  onChange={(visitType) => {
+                    setVisitType(visitType);
+                    setIsMissingVisitType(false);
+                  }}
+                  visitTypes={allVisitTypes}
+                  patientUuid={patientUuid}
+                />
+              )}
             </Column>
           </Row>
           {isMissingVisitType && (
@@ -231,7 +253,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
         <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
           {t('discard', 'Discard')}
         </Button>
-        <Button className={styles.button} disabled={isSubmitting} kind="primary" type="submit">
+        <Button onClick={handleSubmit} className={styles.button} disabled={isSubmitting} kind="primary" type="submit">
           {t('startVisit', 'Start visit')}
         </Button>
       </ButtonSet>

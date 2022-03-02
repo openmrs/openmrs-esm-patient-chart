@@ -7,14 +7,15 @@ import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { useLayoutType, usePagination, useVisitTypes } from '@openmrs/esm-framework';
 
-interface VisitTypeOverviewProps {
+interface BaseVisitTypeProps {
   onChange: (event) => void;
+  patientUuid: string;
+  visitTypes;
 }
 
-const VisitTypeOverview: React.FC<VisitTypeOverviewProps> = ({ onChange }) => {
+const BaseVisitType: React.FC<BaseVisitTypeProps> = ({ onChange, patientUuid, visitTypes }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const visitTypes = useVisitTypes();
   const [searchTerm, setSearchTerm] = useState<string>('');
 
   const searchResults = useMemo(() => {
@@ -63,4 +64,4 @@ const VisitTypeOverview: React.FC<VisitTypeOverviewProps> = ({ onChange }) => {
   );
 };
 
-export default VisitTypeOverview;
+export default BaseVisitType;
