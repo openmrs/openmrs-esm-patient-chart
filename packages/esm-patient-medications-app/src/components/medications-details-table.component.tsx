@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback } from 'react';
 import Add16 from '@carbon/icons-react/es/add/16';
 import User16 from '@carbon/icons-react/es/user/16';
 import capitalize from 'lodash-es/capitalize';
@@ -9,7 +9,6 @@ import {
   InlineLoading,
   OverflowMenu,
   OverflowMenuItem,
-  Pagination,
   Table,
   TableBody,
   TableCell,
@@ -22,7 +21,6 @@ import {
 import { getDosage } from '../utils/get-dosage';
 import { useTranslation } from 'react-i18next';
 import { compare } from '../utils/compare';
-import { paginate } from '../utils/pagination';
 import { connect } from 'unistore/react';
 import { OrderBasketStore, OrderBasketStoreActions, orderBasketStoreActions } from '../medications/order-basket-store';
 import { Order } from '../types/order';
@@ -62,10 +60,6 @@ const MedicationsDetailsTable = connect<
     setItems,
   }: ActiveMedicationsProps & OrderBasketStore & OrderBasketStoreActions) => {
     const { t } = useTranslation();
-    const [page, setPage] = useState(1);
-    const [pageSize, setPageSize] = useState(10);
-    const [paginatedMedications] = paginate(medications, page, pageSize);
-
     const openOrderBasket = React.useCallback(() => launchPatientWorkspace('order-basket-workspace'), []);
 
     const tableHeaders = [
@@ -83,7 +77,7 @@ const MedicationsDetailsTable = connect<
       },
     ];
 
-    const tableRows = paginatedMedications.map((medication, id) => ({
+    const tableRows = medications?.map((medication, id) => ({
       id: `${id}`,
       details: {
         sortKey: medication.drug?.name,
@@ -174,69 +168,56 @@ const MedicationsDetailsTable = connect<
             </Button>
           )}
         </CardHeader>
-        <TableContainer data-floating-menu-container>
-          <DataTable
-            size="short"
-            headers={tableHeaders}
-            rows={tableRows}
-            isSortable={true}
-            sortRow={sortRow}
-            overflowMenuOnHover={false}
-          >
-            {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
-              <>
-                <Table {...getTableProps()} useZebraStyles>
-                  <TableHead>
-                    <TableRow>
-                      {headers.map((header) => (
-                        <TableHeader
-                          {...getHeaderProps({
-                            header,
-                            isSortable: header.isSortable,
-                          })}
-                        >
-                          {header.header}
-                        </TableHeader>
-                      ))}
-                      <TableHeader />
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {rows.map((row, rowIndex) => (
-                      <TableRow className={styles.row} {...getRowProps({ row })}>
-                        {row.cells.map((cell) => (
-                          <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
-                        ))}
-                        <TableCell className="bx--table-column-menu">
-                          <OrderBasketItemActions
-                            showDiscontinueButton={showDiscontinueButton}
-                            showModifyButton={showModifyButton}
-                            showReorderButton={showReorderButton}
-                            medication={medications[rowIndex]}
-                            items={items}
-                            setItems={setItems}
-                          />
-                        </TableCell>
-                      </TableRow>
+        <DataTable
+          data-floating-menu-container
+          size="short"
+          headers={tableHeaders}
+          rows={tableRows}
+          isSortable={true}
+          sortRow={sortRow}
+          overflowMenuOnHover={false}
+        >
+          {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
+            <TableContainer>
+              <Table {...getTableProps()} useZebraStyles>
+                <TableHead>
+                  <TableRow>
+                    {headers.map((header) => (
+                      <TableHeader
+                        {...getHeaderProps({
+                          header,
+                          isSortable: header.isSortable,
+                        })}
+                      >
+                        {header.header}
+                      </TableHeader>
                     ))}
-                  </TableBody>
-                </Table>
-              </>
-            )}
-          </DataTable>
-        </TableContainer>
-        <div className={styles.paginationContainer}>
-          <Pagination
-            page={page}
-            pageSize={pageSize}
-            pageSizes={[10, 20, 30, 40, 50]}
-            totalItems={medications.length}
-            onChange={({ page, pageSize }) => {
-              setPage(page);
-              setPageSize(pageSize);
-            }}
-          />
-        </div>
+                    <TableHeader />
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {rows.map((row, rowIndex) => (
+                    <TableRow className={styles.row} {...getRowProps({ row })}>
+                      {row.cells.map((cell) => (
+                        <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+                      ))}
+                      <TableCell className="bx--table-column-menu">
+                        <OrderBasketItemActions
+                          showDiscontinueButton={showDiscontinueButton}
+                          showModifyButton={showModifyButton}
+                          showReorderButton={showReorderButton}
+                          medication={medications[rowIndex]}
+                          items={items}
+                          setItems={setItems}
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+        </DataTable>
       </div>
     );
   },

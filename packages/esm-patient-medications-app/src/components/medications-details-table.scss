@@ -47,11 +47,3 @@
 .menuItem {
   max-width: none;
 }
-
-.paginationContainer {
-  border-top: 1px solid $ui-03;
-
-  & > :global(.bx--pagination) {
-    border: none;
-  }
-}
