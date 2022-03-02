@@ -47,6 +47,8 @@
     "@angular/platform-browser-dynamic": "~11.2.14",
     "@angular/router": "~11.2.14",
     "@ng-select/ng-select": "^6.1.0",
+    "@ngx-translate/core": "^13.0.0",
+    "@ngx-translate/http-loader": "^6.0.0",
     "hammerjs": "^2.0.8",
     "jspdf": "^1.5.3",
     "moment": "^2.17.1",

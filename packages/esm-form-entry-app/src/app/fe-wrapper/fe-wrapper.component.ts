@@ -26,6 +26,7 @@ import { PatientPreviousEncounterService } from '../openmrs-api/patient-previous
 
 import { MonthlyScheduleResourceService } from '../services/monthly-scheduled-resource.service';
 import { ConfigResourceService } from '../services/config-resource.service';
+import { TranslateService } from '@ngx-translate/core';
 @Component({
   selector: 'my-app-fe-wrapper',
   templateUrl: './fe-wrapper.component.html',
@@ -85,10 +86,14 @@ export class FeWrapperComponent implements OnInit {
     private patientPreviousEncounter: PatientPreviousEncounterService,
     private monthlyScheduleResourceService: MonthlyScheduleResourceService,
     private configResourceService: ConfigResourceService,
+    private translate: TranslateService,
   ) {}
 
   ngOnInit() {
     this.config = this.configResourceService.getConfig();
+    this.translate.addLangs(['en', 'fr']);
+    this.translate.setDefaultLang('en');
+
     this.launchForm().subscribe(
       (form) => {
         // console.log('Form loaded and rendered', form);
@@ -365,6 +370,10 @@ export class FeWrapperComponent implements OnInit {
       this.setDefaultValues();
     }
     this.setUpPayloadProcessingInformation();
+    this.fetchMockedTranslationsData().then((translationsData: any) => {
+      this.translate.setTranslation('en', translationsData?.en);
+      this.translate.setTranslation('fr', translationsData?.fr);
+    });
   }
 
   private wireDataSources() {
@@ -451,5 +460,27 @@ export class FeWrapperComponent implements OnInit {
     if (dataSources.monthlySchedule) {
       this.dataSources.registerDataSource('monthlyScheduleResourceService', this.monthlyScheduleResourceService);
     }
+  }
+
+  fetchMockedTranslationsData() {
+    const promise = new Promise(function (resolve, reject) {
+      setTimeout(function () {
+        const translationsData = {
+          form: 'fe73e323-7ed5-37a6-899e-ad9c5cc5a94b',
+          en: {
+            '1. Do you think about it even when you don’t mean to?:':
+              '1. Do you think about it even when you don’t mean to? v2',
+          },
+          fr: {
+            'Children Revised Impact Event Scale (CRIES-8)':
+              "Échelle d'impact des événements révisée pour les enfants (CRIES-8)",
+            '1. Do you think about it even when you don’t mean to?':
+              '1. Y pensez-vous même quand vous ne le voulez pas?',
+          },
+        };
+        resolve(translationsData);
+      }, 2000);
+    });
+    return promise;
   }
 }
