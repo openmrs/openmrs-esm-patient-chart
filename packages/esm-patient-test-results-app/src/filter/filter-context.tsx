@@ -8,6 +8,7 @@ const initialState = {
   parents: {},
   root: { display: '', flatName: '' },
   tests: {},
+  lowestParents: [],
 };
 
 const initialContext = {
@@ -15,6 +16,7 @@ const initialContext = {
   ...initialState,
   timelineData: {},
   activeTests: [],
+  someChecked: false,
   initialize: () => {},
   toggleVal: () => {},
   updateParent: () => {},
@@ -31,8 +33,10 @@ interface FilterContextProps {
   parents: { [key: string]: string[] };
   root: TreeNode;
   tests: { [key: string]: any };
+  lowestParents: { display: string; flatName: string }[];
   timelineData: { [key: string]: any };
   activeTests: string[];
+  someChecked: boolean;
   initialize: any;
   toggleVal: any;
   updateParent: any;
@@ -69,10 +73,12 @@ const FilterProvider = ({ root, children }: FilterProviderProps) => {
     return Object.keys(state?.checkboxes)?.filter((key) => state.checkboxes[key]) || [];
   }, [state.checkboxes]);
 
+  const someChecked = Boolean(activeTests.length);
+
   const timelineData = useMemo(() => {
     if (!state?.tests) {
       return {
-        data: { parsedTime: {} as ReturnType<typeof parseTime>, rowData: {}, panelName: '' },
+        data: { parsedTime: {} as ReturnType<typeof parseTime>, rowData: [], panelName: '' },
         loaded: false,
       };
     }
@@ -88,10 +94,10 @@ const FilterProvider = ({ root, children }: FilterProviderProps) => {
       ),
     ];
     allTimes.sort((a, b) => (new Date(a) < new Date(b) ? 1 : -1));
-    const rows = {};
+    const rows = [];
     Object.keys(tests).forEach((test) => {
       const newEntries = allTimes.map((time: string) => tests[test].obs.find((entry) => entry.obsDatetime === time));
-      rows[test] = { ...tests[test], entries: newEntries };
+      rows.push({ ...tests[test], entries: newEntries });
     });
     const panelName = 'timeline';
     return {
@@ -114,8 +120,10 @@ const FilterProvider = ({ root, children }: FilterProviderProps) => {
         parents: state.parents,
         root: state.root,
         tests: state.tests,
+        lowestParents: state.lowestParents,
         timelineData,
         activeTests,
+        someChecked,
         initialize: actions.initialize,
         toggleVal: actions.toggleVal,
         updateParent: actions.updateParent,

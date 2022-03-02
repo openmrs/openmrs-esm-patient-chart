@@ -33,7 +33,7 @@ export const Main: React.FC = () => <main className={styles['padded-main']} />;
 
 export const ShadowBox: React.FC = () => <div className={styles['shadow-box']} />;
 
-const TimelineCell: React.FC<{
+export const TimelineCell: React.FC<{
   text: string;
   interpretation?: OBSERVATION_INTERPRETATION;
   zebra: boolean;
@@ -95,20 +95,6 @@ export const RowStartCell = ({ title, range, units, shadow = false, openTrendlin
   </div>
 );
 
-export const NewRowStartCell = ({ title, range, units, shadow = false }) => (
-  <div
-    className={styles['row-start-cell']}
-    style={{
-      boxShadow: shadow ? '8px 0 20px 0 rgba(0,0,0,0.15)' : undefined,
-    }}
-  >
-    <span className={styles['trendline-link']}>{title}</span>
-    <span className={styles['range-units']}>
-      {range} {units}
-    </span>
-  </div>
-);
-
 export const TimeSlots: React.FC<{
   style?: React.CSSProperties;
   className?: string;
@@ -128,19 +114,6 @@ export const GridItems = React.memo<{
       if (!obs[i]) return <TimelineCell key={i} text={'--'} zebra={zebra} />;
       const interpretation = obs[i].meta.assessValue(obs[i].value);
       return <TimelineCell key={i} text={obs[i].value} interpretation={interpretation} zebra={zebra} />;
-    })}
-  </>
-));
-
-export const NewGridItems = React.memo<{
-  sortedTimes: Array<string>;
-  obs: any;
-  zebra: boolean;
-}>(({ sortedTimes, obs, zebra }) => (
-  <>
-    {sortedTimes.map((_, i) => {
-      if (!obs[i]) return <TimelineCell key={i} text={''} zebra={zebra} />;
-      return <TimelineCell key={i} text={obs[i].value} interpretation={obs[i].interpretation} zebra={zebra} />;
     })}
   </>
 ));

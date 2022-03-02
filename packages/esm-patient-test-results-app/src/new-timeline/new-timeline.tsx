@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import useScrollIndicator from '../timeline/useScroll';
-import { PaddingContainer, Grid, NewGridItems, ShadowBox } from '../timeline/helpers';
+import { PaddingContainer, Grid, ShadowBox } from '../timeline/helpers';
 import { EmptyState, OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import FilterContext from '../filter/filter-context';
 import styles from './new-timeline.scss';
@@ -9,20 +9,13 @@ const RecentResultsGrid = (props) => {
   return <div {...props} className={styles['recent-results-grid']} />;
 };
 
-const TimeSlotsInner: React.FC<{
+const TimeSlots: React.FC<{
   style?: React.CSSProperties;
   className?: string;
-}> = ({ className, ...props }) => (
-  <div className={styles['time-slot-inner'] + (className ? ' ' + className : '')} {...props} />
-);
-
-export const TimeSlots: React.FC<{
-  style?: React.CSSProperties;
-  className?: string;
-}> = ({ children = undefined, ...props }) => (
-  <TimeSlotsInner {...props}>
+}> = ({ children = undefined, className, ...props }) => (
+  <div className={styles['time-slot-inner'] + (className ? ' ' + className : '')} {...props}>
     <div>{children}</div>
-  </TimeSlotsInner>
+  </div>
 );
 
 interface PanelNameCornerProps {
@@ -43,18 +36,16 @@ interface DataEntry {
 }
 
 interface DataRow {
-  [_: string]: {
-    entries: Array<DataEntry>;
-    display: string;
-    name: string;
-    type: string;
-    uuid: string;
-    units: string;
-    range: string;
-  };
+  entries: Array<DataEntry>;
+  display: string;
+  name: string;
+  type: string;
+  uuid: string;
+  units: string;
+  range: string;
 }
 
-export const NewRowStartCell = ({ title, range, units, shadow = false }) => (
+const NewRowStartCell = ({ title, range, units, shadow = false }) => (
   <div
     className={styles['row-start-cell']}
     style={{
@@ -68,22 +59,64 @@ export const NewRowStartCell = ({ title, range, units, shadow = false }) => (
   </div>
 );
 
+const interpretationToCSS = {
+  OFF_SCALE_HIGH: 'off-scale-high',
+  CRITICALLY_HIGH: 'critically-high',
+  HIGH: 'high',
+  OFF_SCALE_LOW: 'off-scale-low',
+  CRITICALLY_LOW: 'critically-low',
+  LOW: 'low',
+  NORMAL: '',
+};
+
+const TimelineCell: React.FC<{
+  text: string;
+  interpretation?: OBSERVATION_INTERPRETATION;
+  zebra: boolean;
+}> = ({ text, interpretation = 'NORMAL', zebra }) => {
+  const additionalClassname: string = interpretationToCSS[interpretation]
+    ? styles[interpretationToCSS[interpretation]]
+    : '';
+
+  return (
+    <div
+      className={`${styles['timeline-data-cell']} ${zebra ? styles['timeline-cell-zebra'] : ''} ${additionalClassname}`}
+    >
+      <p>{text}</p>
+    </div>
+  );
+};
+
+const NewGridItems = React.memo<{
+  sortedTimes: Array<string>;
+  obs: any;
+  zebra: boolean;
+}>(({ sortedTimes, obs, zebra }) => (
+  <>
+    {sortedTimes.map((_, i) => {
+      if (!obs[i]) return <TimelineCell key={i} text={''} zebra={zebra} />;
+      return <TimelineCell key={i} text={obs[i].value} interpretation={obs[i].interpretation} zebra={zebra} />;
+    })}
+  </>
+));
+
 interface NewDataRowsProps {
-  rowData: DataRow;
+  rowData: DataRow[];
   timeColumns: Array<string>;
   sortedTimes: Array<string>;
   showShadow: boolean;
 }
 
 const NewDataRows: React.FC<NewDataRowsProps> = ({ timeColumns, rowData, sortedTimes, showShadow }) => {
+  console.log('rowData??', rowData);
   return (
     <Grid dataColumns={timeColumns.length} padding style={{ gridColumn: 'span 2' }}>
-      {Object.values(rowData).map((row, rowCount) => {
+      {rowData.map((row, index) => {
         const obs = row.entries;
         const { units = '', range = '' } = row;
-
+        console.log('this should print?');
         return (
-          <React.Fragment key={rowCount}>
+          <React.Fragment key={index}>
             <NewRowStartCell
               {...{
                 units,
@@ -92,7 +125,7 @@ const NewDataRows: React.FC<NewDataRowsProps> = ({ timeColumns, rowData, sortedT
                 shadow: showShadow,
               }}
             />
-            <NewGridItems {...{ sortedTimes, obs, zebra: !!(rowCount % 2) }} />
+            <NewGridItems {...{ sortedTimes, obs, zebra: !!(index % 2) }} />
           </React.Fragment>
         );
       })}
@@ -143,7 +176,7 @@ const DateHeaderGrid: React.FC<DateHeaderGridProps> = ({ timeColumns, yearColumn
 );
 
 export const NewTimeline = () => {
-  const { activeTests, timelineData } = useContext(FilterContext);
+  const { activeTests, timelineData, parents, checkboxes, someChecked, lowestParents } = useContext(FilterContext);
   const [xIsScrolled, yIsScrolled, containerRef] = useScrollIndicator(0, 32);
 
   const {
@@ -155,7 +188,7 @@ export const NewTimeline = () => {
     loaded,
   } = timelineData;
 
-  if (rowData && Object.keys(rowData)?.length === 0) {
+  if (rowData && rowData?.length === 0) {
     return <EmptyState displayText={'timeline data'} headerTitle="Data Timeline" />;
   }
   if (activeTests && timelineData && loaded) {
@@ -171,14 +204,36 @@ export const NewTimeline = () => {
               showShadow: yIsScrolled,
             }}
           />
-          <NewDataRows
+          {lowestParents.map((parent) => {
+            if (parents[parent.flatName].some((kid) => checkboxes[kid]) || !someChecked) {
+              const subRows = someChecked
+                ? rowData?.filter((row) => parents[parent.flatName].includes(row.flatName) && checkboxes[row.flatName])
+                : rowData?.filter((row) => parents[parent.flatName].includes(row.flatName));
+
+              // show kid rows
+              return (
+                <>
+                  <div>{parent.display}</div>
+                  <NewDataRows
+                    {...{
+                      timeColumns,
+                      rowData: subRows,
+                      sortedTimes,
+                      showShadow: xIsScrolled,
+                    }}
+                  />
+                </>
+              );
+            } else return null;
+          })}
+          {/* <NewDataRows
             {...{
               timeColumns,
               rowData,
               sortedTimes,
               showShadow: xIsScrolled,
             }}
-          />
+          /> */}
           <ShadowBox />
         </PaddingContainer>
       </RecentResultsGrid>
