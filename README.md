@@ -38,7 +38,7 @@ To start a dev server for a specific microfrontend, run:
 yarn start --sources 'packages/esm-patient-<insert-package-name>-app'
 ```
 
-This command uses the [openmrs](https://www.npmjs.com/package/openmrs) tooling to fire up a dev server on the default port (`8081`) for the specified microfrontend in addition to `esm-patient-chart-app`.
+This command uses the [openmrs](https://www.npmjs.com/package/openmrs) tooling to fire up a dev server running `esm-patient-chart` as well as the specified microfrontend.
 
 To start a dev server running all the packages, run:
 
@@ -48,15 +48,15 @@ yarn start-all
 
 Note that this is very resource-intensive. 
 
-The recommended approach for working on multiple microfrontends is to run each one separately on a different port and then use [import map overrides](http://o3-dev.docs.openmrs.org/#/getting_started/setup?id=import-map-overrides). 
+There are two approaches for working on multiple microfrontends simultaneously.
 
-For example, to work on the vitals and biometrics widgets simultaneously, you could run:
+You could run `yarn start` with as many `sources` arguments as you require. For example, to run the biometrics and vitals microfrontends simultaneously, you'd use:
 
 ```bash
-yarn start --sources 'packages/esm-patient-biometrics-app/' --sources 'packages/esm-patient-vitals-app/'
+yarn start --sources 'packages/esm-patient-biometrics-app' --sources 'packages/esm-patient-vitals-app'
 ```
 
-This command would fire up the biometrics app on `http://localhost:8082/openmrs-esm-patient-biometrics-app.js` and the vitals app on `http://localhost:8083/openmrs-esm-patient-vitals-app.js`. You can use these import map URLs to override the import maps in your application's import map overrides panel.
+Alternatively, you could run `yarn serve` from within the individual packages and then use [import map overrides](http://o3-dev.docs.openmrs.org/#/getting_started/setup?id=import-map-overrides).
 
 ## Layout
 
