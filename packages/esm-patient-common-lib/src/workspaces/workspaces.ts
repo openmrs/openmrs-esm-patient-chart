@@ -160,14 +160,20 @@ export function launchPatientWorkspace(name: string, additionalProps?: object) {
   }
 }
 
-export function launchPatientChartWithWorkspaceOpen(
-  patientUuid: string,
-  workspaceName: string,
-  additionalProps?: object,
-) {
+export function launchPatientChartWithWorkspaceOpen({
+  patientUuid,
+  workspaceName,
+  dashboardName,
+  additionalProps,
+}: {
+  patientUuid: string;
+  workspaceName: string;
+  dashboardName?: string;
+  additionalProps?: object;
+}) {
   changeWorkspaceContext(patientUuid);
   launchPatientWorkspace(workspaceName, additionalProps);
-  navigate({ to: '${openmrsSpaBase}/patient/' + `${patientUuid}/chart` });
+  navigate({ to: '${openmrsSpaBase}/patient/' + `${patientUuid}/chart` + (dashboardName ? `/${dashboardName}` : '') });
 }
 
 const promptBeforeClosingFcns = {};
