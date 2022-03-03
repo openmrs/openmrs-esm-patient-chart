@@ -36,11 +36,15 @@ import {
   useVisitTypes,
   useConfig,
 } from '@openmrs/esm-framework';
-import { amPm, convertTime12to24, DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import {
+  amPm,
+  convertTime12to24,
+  DefaultWorkspaceProps,
+  useActivePatientEnrollment,
+} from '@openmrs/esm-patient-common-lib';
 import BaseVisitType from './base-visit-type.component';
 import styles from './visit-form.component.scss';
 import RecommendedVisitType from './recommended-visit-type.component';
-import { useActivePatientEnrollment } from '../hooks/usePatientProgramEnrollment';
 
 const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace }) => {
   const { t } = useTranslation();
@@ -48,7 +52,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
   const locations = useLocations();
   const sessionUser = useSessionUser();
   const config = useConfig();
-  const [contentSwitcherIndex, setContentSwitcherIndex] = useState(config.displayRecommendedVisitType ? 0 : 1);
+  const [contentSwitcherIndex, setContentSwitcherIndex] = useState(config.showRecommendedVisitType ? 0 : 1);
   const [isMissingVisitType, setIsMissingVisitType] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState('');
@@ -56,6 +60,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
   const [visitDate, setVisitDate] = useState(new Date());
   const [visitTime, setVisitTime] = useState(dayjs(new Date()).format('hh:mm'));
   const [visitType, setVisitType] = useState<string | null>(null);
+  const [programUuid, setProgramUuid] = useState<string>();
   const state = useMemo(() => ({ patientUuid }), [patientUuid]);
   const allVisitTypes = useVisitTypes();
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
@@ -220,6 +225,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
                   patientUuid={patientUuid}
                   activePatientEnrollment={activePatientEnrollment}
                   locationUuid={selectedLocation}
+                  onProgramUuidChange={setProgramUuid}
                 />
               )}
               {contentSwitcherIndex === 1 && (

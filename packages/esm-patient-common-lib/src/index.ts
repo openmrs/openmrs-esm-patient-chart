@@ -9,3 +9,4 @@ export * from './time-helper';
 export * from './useVitalsConceptMetadata';
 export * from './form-entry/form-entry';
 export * from './workspaces';
+export * from './programs/usePatientProgramEnrollment';

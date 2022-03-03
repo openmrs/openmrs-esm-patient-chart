@@ -67,6 +67,11 @@ export const configSchema = {
     _default: true,
     _description: 'Whether HTML Form Entry forms should be included in lists of forms',
   },
+  showRecommendedFormsTab: {
+    _type: Type.Boolean,
+    _description: 'Whether to display recommended forms tab',
+    _default: false,
+  },
 };
 
 export interface HtmlFormEntryForm {
@@ -78,4 +83,5 @@ export interface HtmlFormEntryForm {
 
 export interface ConfigObject {
   htmlFormEntryForms: Array<HtmlFormEntryForm>;
+  showRecommendedFormsTab: boolean;
 }

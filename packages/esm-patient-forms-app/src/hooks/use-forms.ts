@@ -48,6 +48,7 @@ export function useForms(patientUuid: string, startDate?: Date, endDate?: Date, 
     data,
     error: allFormsRes.error,
     isValidating: allFormsRes.isValidating || encountersRes.isValidating,
+    allForms: allFormsRes.data,
   };
 }
 
