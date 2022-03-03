@@ -2,6 +2,22 @@
 @import "~carbon-components/src/globals/scss/vars";
 @import "~carbon-components/src/globals/scss/mixins";
 
+.floatingRightButton {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  z-index: 9;
+}
+.expandButton {
+  background-color: white;
+  border: 1px solid black;
+}
+
+.floatingRightButton > .expandButton > svg {
+  margin: 0;
+}
+
+
 .filterContainer {
   background-color: $openmrs-background-grey;
   margin: $spacing-02 0;
@@ -62,3 +78,4 @@
     padding: 0 0 0 .75rem;
   }
 }
+

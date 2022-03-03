@@ -19,6 +19,7 @@ export interface TreeNode {
 interface FilterNodeProps {
   root: TreeNode;
   level: number;
+  open?: boolean;
 }
 
 interface FilterLeafProps {
@@ -34,12 +35,12 @@ const FilterSet = () => {
 
   return (
     <div className={`${styles.filterContainer} ${styles.nestedAccordion}`}>
-      <FilterNode root={root} level={0} />
+      <FilterNode root={root} level={0} open />
     </div>
   );
 };
 
-const FilterNode = ({ root, level }: FilterNodeProps) => {
+const FilterNode = ({ root, level, open }: FilterNodeProps) => {
   const { checkboxes, parents, updateParent } = useContext(FilterContext);
   const indeterminate = isIndeterminate(parents[root.flatName], checkboxes);
   const allChildrenChecked = parents[root.flatName]?.every((kid) => checkboxes[kid]);
@@ -56,6 +57,7 @@ const FilterNode = ({ root, level }: FilterNodeProps) => {
           />
         }
         style={{ paddingLeft: `${level > 0 ? 1 : 0}rem` }}
+        open={open ?? false}
       >
         {!root?.subSets?.[0]?.obs &&
           root?.subSets?.map((node, index) => <FilterNode root={node} level={level + 1} key={index} />)}

@@ -108,13 +108,11 @@ interface NewDataRowsProps {
 }
 
 const NewDataRows: React.FC<NewDataRowsProps> = ({ timeColumns, rowData, sortedTimes, showShadow }) => {
-  console.log('rowData??', rowData);
   return (
     <Grid dataColumns={timeColumns.length} padding style={{ gridColumn: 'span 2' }}>
       {rowData.map((row, index) => {
         const obs = row.entries;
         const { units = '', range = '' } = row;
-        console.log('this should print?');
         return (
           <React.Fragment key={index}>
             <NewRowStartCell
