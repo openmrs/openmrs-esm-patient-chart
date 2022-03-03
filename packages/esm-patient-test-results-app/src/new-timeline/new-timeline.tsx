@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import useScrollIndicator from '../timeline/useScroll';
 import { PaddingContainer, Grid, ShadowBox } from '../timeline/helpers';
 import { EmptyState, OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
@@ -176,6 +176,7 @@ const DateHeaderGrid: React.FC<DateHeaderGridProps> = ({ timeColumns, yearColumn
 export const NewTimeline = () => {
   const { activeTests, timelineData, parents, checkboxes, someChecked, lowestParents } = useContext(FilterContext);
   const [xIsScrolled, yIsScrolled, containerRef] = useScrollIndicator(0, 32);
+  const [currentPanel, setCurrentPanel] = useState(lowestParents?.[0]?.display || 'Timeline');
 
   const {
     data: {
@@ -191,17 +192,23 @@ export const NewTimeline = () => {
   }
   if (activeTests && timelineData && loaded) {
     return (
-      <RecentResultsGrid>
-        <PaddingContainer ref={containerRef}>
-          <PanelNameCorner showShadow={xIsScrolled} panelName={panelName} />
-          <DateHeaderGrid
-            {...{
-              timeColumns,
-              yearColumns,
-              dayColumns,
-              showShadow: yIsScrolled,
-            }}
-          />
+      <>
+        <div>
+          <RecentResultsGrid>
+            <PaddingContainer ref={containerRef}>
+              <PanelNameCorner showShadow={xIsScrolled} panelName={currentPanel} />
+              <DateHeaderGrid
+                {...{
+                  timeColumns,
+                  yearColumns,
+                  dayColumns,
+                  showShadow: yIsScrolled,
+                }}
+              />
+            </PaddingContainer>
+          </RecentResultsGrid>
+        </div>
+        <div>
           {lowestParents.map((parent) => {
             if (parents[parent.flatName].some((kid) => checkboxes[kid]) || !someChecked) {
               const subRows = someChecked
@@ -211,30 +218,29 @@ export const NewTimeline = () => {
               // show kid rows
               return (
                 <>
-                  <div>{parent.display}</div>
-                  <NewDataRows
-                    {...{
-                      timeColumns,
-                      rowData: subRows,
-                      sortedTimes,
-                      showShadow: xIsScrolled,
-                    }}
-                  />
+                  <RecentResultsGrid>
+                    <PaddingContainer ref={containerRef}>
+                      <div style={{ backgroundColor: 'lightgray' }}>
+                        <h6>{parent.display}</h6>
+                      </div>
+                      <NewDataRows
+                        {...{
+                          timeColumns,
+                          rowData: subRows,
+                          sortedTimes,
+                          showShadow: xIsScrolled,
+                        }}
+                      />
+                      <ShadowBox />
+                    </PaddingContainer>
+                  </RecentResultsGrid>
+                  <div style={{ height: '2em' }}></div>
                 </>
               );
             } else return null;
           })}
-          {/* <NewDataRows
-            {...{
-              timeColumns,
-              rowData,
-              sortedTimes,
-              showShadow: xIsScrolled,
-            }}
-          /> */}
-          <ShadowBox />
-        </PaddingContainer>
-      </RecentResultsGrid>
+        </div>
+      </>
     );
   }
   return null;
