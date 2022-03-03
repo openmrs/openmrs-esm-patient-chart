@@ -5,7 +5,7 @@ import { basePath } from '../../constants';
 import { DashboardView, DashboardConfig } from './dashboard-view.component';
 
 function makePath(target: DashboardConfig, params: Record<string, string> = {}) {
-  const parts = `${basePath}/${target.name}/:subview?`.split('/');
+  const parts = `${basePath}/${target.name}`.split('/');
 
   Object.keys(params).forEach((key) => {
     for (let i = 0; i < parts.length; i++) {
@@ -37,7 +37,6 @@ const ChartReview: React.FC<ChartReviewProps> = ({ patientUuid, patient, view })
       <Redirect
         to={makePath(defaultDashboard, {
           patientUuid,
-          subview: '',
         })}
       />
     );

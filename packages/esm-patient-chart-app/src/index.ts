@@ -23,7 +23,7 @@ function setupOpenMRS() {
       parent: `${window.spaBase}/home`,
     },
     {
-      path: `${spaBasePath}/:view/:subview?`,
+      path: `${spaBasePath}/:view`,
       title: ([_, key]) => `${capitalize(key)} Dashboard`,
       parent: spaBasePath,
     },

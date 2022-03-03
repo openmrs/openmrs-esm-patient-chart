@@ -50,7 +50,6 @@ const gridBasedDashboards = {
 const testProps = {
   patient: mockPatient,
   patientUuid: mockPatient.id,
-  subview: undefined,
   view: 'summary',
 };
 
