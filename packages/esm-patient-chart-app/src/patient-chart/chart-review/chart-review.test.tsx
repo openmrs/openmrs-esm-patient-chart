@@ -1,6 +1,6 @@
 import React from 'react';
 import { screen, render } from '@testing-library/react';
-import { mockPatient } from '../../../../__mocks__/patient.mock';
+import { mockPatient } from '../../../../../__mocks__/patient.mock';
 import { useExtensionSlotMeta } from '@openmrs/esm-framework';
 import ChartReview from './chart-review.component';
 

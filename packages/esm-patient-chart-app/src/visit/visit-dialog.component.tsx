@@ -1,5 +1,5 @@
 import React from 'react';
-import { useVisitDialog } from '../hooks/useVisitDialog';
+import { useVisitDialog } from './useVisitDialog';
 import StartVisitPrompt from './visit-prompt/start-visit.component';
 import EndVisitPrompt from './visit-prompt/end-visit.component';
 

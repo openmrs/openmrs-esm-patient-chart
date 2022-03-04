@@ -1,13 +1,23 @@
 import React from 'react';
 import { Extension, ExtensionData, ExtensionSlot, useExtensionSlotMeta } from '@openmrs/esm-framework';
 import { useRouteMatch } from 'react-router-dom';
-import { DashbardLayoutConfig, DashboardConfig } from '../config-schemas';
-import { basePath } from '../constants';
+import { basePath } from '../../constants';
 import styles from './dashboard-view.scss';
 
 function getColumnsLayoutStyle(layout: DashbardLayoutConfig) {
   const numberOfColumns = layout?.columns ?? 2;
   return '1fr '.repeat(numberOfColumns).trimEnd();
+}
+
+export interface DashbardLayoutConfig {
+  columns: number;
+}
+
+export interface DashboardConfig {
+  name: string;
+  slot: string;
+  title: string;
+  config: DashbardLayoutConfig;
 }
 
 interface DashboardViewProps {

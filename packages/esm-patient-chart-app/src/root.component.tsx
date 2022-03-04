@@ -1,7 +1,7 @@
 import React from 'react';
 import WorkspaceWindow from './workspace/workspace-window.component';
-import PatientChart from './ui-components/patient-chart.component';
-import SideMenu from './view-components/side-menu.component';
+import PatientChart from './patient-chart/patient-chart.component';
+import SideMenu from './side-nav/side-menu.component';
 import { BrowserRouter, Route } from 'react-router-dom';
 import { basePath, dashboardPath, spaRoot } from './constants';
 import styles from './root.scss';

@@ -2,7 +2,7 @@ import React from 'react';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { useVisitDialog } from '../hooks/useVisitDialog';
+import { useVisitDialog } from '../visit/useVisitDialog';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { mockVisits } from '../../../../__mocks__/visits.mock';
 import VisitDialog from './visit-dialog.component';
@@ -12,7 +12,7 @@ const testProps = { patientUuid: mockPatient.id };
 const mockVisitDialog = useVisitDialog as jest.Mock;
 const mockGetStartedVisitGetter = jest.fn();
 
-jest.mock('../hooks/useVisitDialog', () => ({
+jest.mock('../visit/useVisitDialog', () => ({
   useVisitDialog: jest.fn(),
 }));
 
