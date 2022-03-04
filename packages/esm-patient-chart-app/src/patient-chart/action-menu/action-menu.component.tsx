@@ -6,8 +6,8 @@ import { useWorkspaceWindowSize, useWorkspaces, WorkspaceWindowState } from '@op
 import { Button, HeaderPanel } from 'carbon-components-react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { isDesktop } from '../utils';
-import styles from './action-menu.component.scss';
+import { isDesktop } from '../../utils';
+import styles from './action-menu.scss';
 
 interface ActionMenuInterface {
   open: boolean;

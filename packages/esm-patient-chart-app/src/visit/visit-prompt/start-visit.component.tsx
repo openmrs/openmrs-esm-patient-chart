@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ComposedModal, Button, ModalBody, ModalHeader, ModalFooter } from 'carbon-components-react';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import styles from './start-visit.component.scss';
+import styles from './start-visit.scss';
 
 interface StartVisitPromptProps {
   isModalOpen: boolean;

@@ -36,7 +36,7 @@ import {
 } from '@openmrs/esm-framework';
 import { amPm, convertTime12to24, DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import VisitTypeOverview from './visit-type-overview.component';
-import styles from './visit-form.component.scss';
+import styles from './visit-form.scss';
 
 const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace }) => {
   const { t } = useTranslation();

@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './side-menu.component.scss';
+import styles from './side-menu.scss';
 import { SideNav, SideNavProps } from 'carbon-components-react';
 import { ExtensionSlot, useLayoutType } from '@openmrs/esm-framework';
 import { useNavMenu } from './useNavMenu';

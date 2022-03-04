@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import styles from './visit-type-overview.component.scss';
+import styles from './visit-type-overview.scss';
 import debounce from 'lodash-es/debounce';
 import isEmpty from 'lodash-es/isEmpty';
 import { Search, RadioButtonGroup, RadioButton } from 'carbon-components-react';

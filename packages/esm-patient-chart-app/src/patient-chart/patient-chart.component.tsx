@@ -7,7 +7,7 @@ import ChartReview from '../patient-chart/chart-review/chart-review.component';
 import VisitDialog from '../visit/visit-dialog.component';
 import ActionMenu from './action-menu/action-menu.component';
 import Loader from '../loader/loader.component';
-import styles from './patient-chart.component.scss';
+import styles from './patient-chart.scss';
 import WorkspaceNotification from '../workspace/workspace-notification.component';
 
 interface PatientChartParams {
