@@ -101,8 +101,7 @@ describe('workspace system', () => {
 
   test('is compatible with workspaces registered as extensions', () => {
     const store = getWorkspaceStore();
-    registerExtension({
-      name: 'lab-results',
+    registerExtension('lab-results', {
       moduleName: '@openmrs/esm-lab-results-app',
       load: jest.fn(),
       meta: { title: 'Lab Results', screenSize: WorkspaceWindowState.maximized },
