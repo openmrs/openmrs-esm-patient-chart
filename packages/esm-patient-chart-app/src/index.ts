@@ -1,7 +1,7 @@
 import capitalize from 'lodash-es/capitalize';
 import { registerBreadcrumbs, defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
-import { esmPatientChartSchema } from './config-schemas/openmrs-esm-patient-chart-schema';
+import { esmPatientChartSchema } from './config-schema';
 import { moduleName, spaBasePath } from './constants';
 import { setupCacheableRoutes, setupOfflineVisitsSync } from './offline';
 import { summaryDashboardMeta, encountersDashboardMeta } from './dashboard.meta';
@@ -56,7 +56,7 @@ function setupOpenMRS() {
       },
       {
         id: 'patient-chart-nav-items',
-        load: getAsyncLifecycle(() => import('./ui-components/nav.component'), {
+        load: getAsyncLifecycle(() => import('./side-nav/nav.component'), {
           featureName: 'nav-items',
           moduleName,
         }),
@@ -64,7 +64,7 @@ function setupOpenMRS() {
         offline: true,
       },
       {
-        id: 'start-visit-patient-actions-slot',
+        id: 'start-visit-button',
         slot: 'patient-actions-slot',
         load: getAsyncLifecycle(() => import('./actions-buttons/start-visit.component'), {
           featureName: 'patient-actions-slot',
@@ -72,7 +72,7 @@ function setupOpenMRS() {
         }),
       },
       {
-        id: 'stop-visit-patient-actions-slot',
+        id: 'stop-visit-button',
         slot: 'patient-actions-slot',
         load: getAsyncLifecycle(() => import('./actions-buttons/stop-visit.component'), {
           featureName: 'patient-actions-slot',
@@ -80,7 +80,7 @@ function setupOpenMRS() {
         }),
       },
       {
-        id: 'add-past-visit-patient-actions-slot',
+        id: 'add-past-visit-button',
         slot: 'patient-actions-slot',
         load: getAsyncLifecycle(() => import('./actions-buttons/add-past-visit.component'), {
           featureName: 'patient-actions-slot',
@@ -135,7 +135,7 @@ function setupOpenMRS() {
         id: 'patient-details-tile',
         slot: 'visit-form-header-slot',
         order: 1,
-        load: getAsyncLifecycle(() => import('./ui-components/patient-details-tile.component'), {
+        load: getAsyncLifecycle(() => import('./patient-details-tile/patient-details-tile.component'), {
           featureName: 'patient-details-tile',
           moduleName,
         }),

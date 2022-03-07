@@ -7,7 +7,7 @@
   "main": "src/index.ts",
   "source": true,
   "scripts": {
-    "lint": "eslint src --ext tsx",
+    "lint": "eslint src --ext ts,tsx",
     "typescript": "tsc"
   },
   "browserslist": [

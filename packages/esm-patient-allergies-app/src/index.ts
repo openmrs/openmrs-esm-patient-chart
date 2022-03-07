@@ -89,7 +89,7 @@ function setupOpenMRS() {
         slot: 'patient-details-header-slot',
         order: 1,
         load: getAsyncLifecycle(
-          () => import('../../esm-patient-chart-app/src/ui-components/patient-details-tile.component'),
+          () => import('../../esm-patient-chart-app/src/patient-details-tile/patient-details-tile.component'),
           options,
         ),
       },

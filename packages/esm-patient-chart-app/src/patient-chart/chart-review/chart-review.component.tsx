@@ -1,9 +1,8 @@
 import React from 'react';
 import { Redirect } from 'react-router-dom';
 import { useExtensionSlotMeta } from '@openmrs/esm-framework';
-import { DashboardConfig } from '../config-schemas';
-import { basePath } from '../constants';
-import { DashboardView } from './dashboard-view.component';
+import { basePath } from '../../constants';
+import { DashboardView, DashboardConfig } from './dashboard-view.component';
 
 function makePath(target: DashboardConfig, params: Record<string, string> = {}) {
   const parts = `${basePath}/${target.name}/:subview?`.split('/');

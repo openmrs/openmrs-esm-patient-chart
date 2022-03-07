@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './end-visit.component.scss';
+import styles from './end-visit.scss';
 import { ComposedModal, Button, ModalBody, ModalFooter, ModalHeader } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 import { getStartedVisit, parseDate, showNotification, showToast, updateVisit, useVisit } from '@openmrs/esm-framework';

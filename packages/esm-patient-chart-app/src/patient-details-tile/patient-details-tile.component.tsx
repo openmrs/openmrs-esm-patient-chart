@@ -1,7 +1,7 @@
 import React from 'react';
 import { capitalize } from 'lodash';
 import { age, formatDate, usePatient } from '@openmrs/esm-framework';
-import styles from './patient-details-tile.component.scss';
+import styles from './patient-details-tile.scss';
 
 interface PatientDetailsTileInterface {
   patientUuid: string;

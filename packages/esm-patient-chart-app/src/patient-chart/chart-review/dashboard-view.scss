@@ -1,6 +1,6 @@
 @import "~@openmrs/esm-styleguide/src/vars";
 @import "~carbon-components/src/globals/scss/vars";
-@import "../root.scss";
+@import "../../root.scss";
 
 .dashboardTitle {
   @include carbon--type-style("productive-heading-03");

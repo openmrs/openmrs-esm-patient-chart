@@ -3,11 +3,11 @@ import { ExtensionSlot, useSessionUser } from '@openmrs/esm-framework';
 import { changeWorkspaceContext, useWorkspaceWindowSize, WorkspaceWindowState } from '@openmrs/esm-patient-common-lib';
 import { RouteComponentProps } from 'react-router-dom';
 import { useOfflineVisitForPatient, usePatientOrOfflineRegisteredPatient } from '../offline';
-import ChartReview from '../view-components/chart-review.component';
+import ChartReview from '../patient-chart/chart-review/chart-review.component';
 import VisitDialog from '../visit/visit-dialog.component';
-import ActionMenu from './action-menu.component';
-import Loader from './loader.component';
-import styles from './patient-chart.component.scss';
+import ActionMenu from './action-menu/action-menu.component';
+import Loader from '../loader/loader.component';
+import styles from './patient-chart.scss';
 import WorkspaceNotification from '../workspace/workspace-notification.component';
 
 interface PatientChartParams {
