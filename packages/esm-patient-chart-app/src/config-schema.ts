@@ -24,11 +24,17 @@ export const esmPatientChartSchema = {
   },
   showRecommendedVisitType: {
     _type: Type.Boolean,
-    _description: 'Whether start visit form should display recommended visit type tab',
+    _description: 'Whether start visit form should display recommended visit type tab. Requires `visitTypeResourceUrl`',
     _default: false,
+  },
+  visitTypeResourceUrl: {
+    _type: Type.String,
+    _default: '/etl-latest/etl/patient/',
+    _description: 'Custom URL to load resources required for showing recommended visit types',
   },
 };
 
 export interface ChartConfig {
   offlineVisitTypeUuid: string;
+  visitTypeResourceUrl: string;
 }

@@ -49,16 +49,16 @@ const Forms: React.FC<FormsProps> = ({
     : data;
   const { currentVisit } = useVisit(patientUuid);
   const { programConfigs } = useProgramConfig(patientUuid);
-  const [selectedProgram, setSelectedProgram] = useState(activePatientEnrollment[0]);
 
   const recommendedForms = useMemo(
     () =>
       formsToDisplay?.filter(({ form }) =>
-        programConfigs[selectedProgram.program.uuid]?.visitTypes
+        Object.values(programConfigs)
+          .flatMap((programConfig) => programConfig.visitTypes)
           ?.find((visitType) => visitType.uuid === currentVisit?.visitType.uuid)
           ?.encounterTypes.some(({ uuid }) => uuid === form.encounterType.uuid),
       ),
-    [currentVisit?.visitType.uuid, formsToDisplay, programConfigs, selectedProgram.program.uuid],
+    [currentVisit?.visitType.uuid, formsToDisplay, programConfigs],
   );
 
   if (!formsToDisplay && !error) {
@@ -115,28 +115,14 @@ const Forms: React.FC<FormsProps> = ({
           />
         )}
         {formsCategory === FormsCategory.Recommended && (
-          <>
-            {activePatientEnrollment.map((enrollment) => (
-              <Tag
-                onClick={(e) => {
-                  setSelectedProgram(enrollment);
-                  e.preventDefault();
-                }}
-                type={selectedProgram?.uuid === enrollment.uuid ? 'blue' : 'cool-gray'}
-                key={enrollment.uuid}
-              >
-                {enrollment.program['name']}
-              </Tag>
-            ))}
-            <FormView
-              forms={recommendedForms}
-              patientUuid={patientUuid}
-              patient={patient}
-              pageSize={pageSize}
-              pageUrl={pageUrl}
-              urlLabel={urlLabel}
-            />
-          </>
+          <FormView
+            forms={recommendedForms}
+            patientUuid={patientUuid}
+            patient={patient}
+            pageSize={pageSize}
+            pageUrl={pageUrl}
+            urlLabel={urlLabel}
+          />
         )}
       </div>
     </div>

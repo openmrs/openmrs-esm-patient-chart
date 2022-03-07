@@ -3,7 +3,11 @@
 @import "~carbon-components/src/globals/scss/mixins";
 
 .container {
-  margin: 1rem 0;
+  margin: $spacing-05;
+
+  &> section {
+    margin: $spacing-05 0
+  }
 }
 
 .heading {
@@ -11,28 +15,18 @@
   color: $text-01;
   margin: $spacing-05;
 }
-
-.grid {
-  margin: 0rem;
-  padding: 0rem;
-}
-
-.gridRow {
-  margin: $spacing-03 0 $spacing-08 0;
-}
-
-.columnLabel {
+.sectionTitle {
   @include carbon--type-style("productive-heading-02");
   color: $text-02;
+  margin: 0 0 $spacing-03 0;
+}
+
+.radioButton {
+  margin: $spacing-05 0;
 }
 
 .contentSwitcher {
   height: $spacing-09;
-}
-
-.right {
-  display: flex;
-  flex-direction: row;
 }
 
 .headerGridRow {

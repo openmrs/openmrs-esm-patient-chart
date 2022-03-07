@@ -1,5 +1,6 @@
 import useSWR from 'swr';
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
+import { ChartConfig } from '../../config-schema';
 
 export const useRecommendedVisitTypes = (
   patientUuid: string,
@@ -7,11 +8,12 @@ export const useRecommendedVisitTypes = (
   programUuid: string,
   locationUuid: string,
 ) => {
+  const config = useConfig() as ChartConfig;
   const { data, error } = useSWR<{ data: any }>(
     patientUuid &&
       enrollmentUuid &&
       programUuid &&
-      `/etl-latest/etl/patient/${patientUuid}/program/${programUuid}/enrollment/${enrollmentUuid}?intendedLocationUuid=${locationUuid}`,
+      `${config.visitTypeResourceUrl}${patientUuid}/program/${programUuid}/enrollment/${enrollmentUuid}?intendedLocationUuid=${locationUuid}`,
     openmrsFetch,
   );
   const recommendedVisitTypes = data?.data?.visitTypes?.allowed.map(mapToVisitType) ?? [];

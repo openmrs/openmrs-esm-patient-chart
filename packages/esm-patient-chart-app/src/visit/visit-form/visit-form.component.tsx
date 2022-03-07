@@ -3,13 +3,14 @@ import dayjs from 'dayjs';
 import {
   Button,
   ButtonSet,
-  Column,
   ContentSwitcher,
   DatePicker,
   DatePickerInput,
   Form,
-  Grid,
+  FormGroup,
   InlineNotification,
+  RadioButton,
+  RadioButtonGroup,
   Row,
   Select,
   SelectItem,
@@ -41,10 +42,11 @@ import {
   convertTime12to24,
   DefaultWorkspaceProps,
   useActivePatientEnrollment,
+  PatientProgram,
 } from '@openmrs/esm-patient-common-lib';
 import BaseVisitType from './base-visit-type.component';
-import styles from './visit-form.component.scss';
-import RecommendedVisitType from './recommended-visit-type.component';
+import styles from './visit-form.scss';
+import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
 
 const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace }) => {
   const { t } = useTranslation();
@@ -60,10 +62,10 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
   const [visitDate, setVisitDate] = useState(new Date());
   const [visitTime, setVisitTime] = useState(dayjs(new Date()).format('hh:mm'));
   const [visitType, setVisitType] = useState<string | null>(null);
-  const [programUuid, setProgramUuid] = useState<string>();
   const state = useMemo(() => ({ patientUuid }), [patientUuid]);
   const allVisitTypes = useVisitTypes();
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
+  const [enrollment, setEnrollment] = useState<PatientProgram>(activePatientEnrollment[0]);
 
   useEffect(() => {
     if (locations && sessionUser?.sessionLocation?.uuid) {
@@ -130,18 +132,16 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
 
   return (
     <Form className={styles.form}>
-      <Grid className={styles.grid}>
+      <div>
         {isTablet && (
           <Row className={styles.headerGridRow}>
             <ExtensionSlot extensionSlotName="visit-form-header-slot" className={styles.dataGridRow} state={state} />
           </Row>
         )}
         <div className={styles.container}>
-          <Row className={styles.gridRow}>
-            <Column sm={1}>
-              <span className={styles.columnLabel}>{t('dateAndTimeOfVisit', 'Date and time of visit')}</span>
-            </Column>
-            <Column sm={3} style={{ display: 'flex' }}>
+          <section>
+            <div className={styles.sectionTitle}>{t('dateAndTimeOfVisit', 'Date and time of visit')}</div>
+            <div style={{ display: 'flex' }}>
               <DatePicker
                 dateFormat="d/m/Y"
                 datePickerType="single"
@@ -178,83 +178,96 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
                   <SelectItem value="PM" text="PM" />
                 </TimePickerSelect>
               </TimePicker>
-            </Column>
-          </Row>
-          <Row className={styles.gridRow}>
-            <Column sm={1}>
-              <span className={styles.columnLabel}>{t('visitLocation', 'Visit Location')}</span>
-            </Column>
-            <Column sm={3}>
-              <Select
-                labelText={t('selectLocation', 'Select a location')}
-                id="location"
-                invalidText="Required"
-                value={selectedLocation}
-                onChange={(event) => setSelectedLocation(event.target.value)}
-                light={isTablet}
+            </div>
+          </section>
+
+          <section>
+            <div className={styles.sectionTitle}>{t('visitLocation', 'Visit Location')}</div>
+            <Select
+              labelText={t('selectLocation', 'Select a location')}
+              id="location"
+              invalidText="Required"
+              value={selectedLocation}
+              onChange={(event) => setSelectedLocation(event.target.value)}
+              light={isTablet}
+            >
+              {locations?.length > 0 &&
+                locations.map((location) => (
+                  <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
+                    {location.display}
+                  </SelectItem>
+                ))}
+            </Select>
+          </section>
+
+          <section>
+            <div className={styles.sectionTitle}>{t('program', 'Program')}</div>
+            <FormGroup legendText={t('selectProgramType', 'Select program type')}>
+              <RadioButtonGroup
+                defaultSelected={enrollment?.program?.uuid}
+                orientation="vertical"
+                onChange={(uuid) => setEnrollment(activePatientEnrollment.find(({ program }) => program.uuid === uuid))}
+                name="program-type-radio-group"
+                valueSelected="default-selected"
               >
-                {locations?.length > 0 &&
-                  locations.map((location) => (
-                    <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
-                      {location.display}
-                    </SelectItem>
-                  ))}
-              </Select>
-            </Column>
-          </Row>
-          <Row className={styles.gridRow}>
-            <Column sm={1}>
-              <span className={styles.columnLabel}>{t('visitType', 'Visit Type')}</span>
-            </Column>
-            <Column sm={3}>
-              <ContentSwitcher
-                selectedIndex={contentSwitcherIndex}
-                className={styles.contentSwitcher}
-                size="lg"
-                onChange={({ index }) => setContentSwitcherIndex(index)}
-              >
-                <Switch name="recommended" text={t('recommended', 'Recommended')} />
-                <Switch name="all" text={t('all', 'All')} />
-              </ContentSwitcher>
-              {contentSwitcherIndex === 0 && !isLoading && (
-                <RecommendedVisitType
-                  onChange={(visitType) => {
-                    setVisitType(visitType);
-                    setIsMissingVisitType(false);
-                  }}
-                  patientUuid={patientUuid}
-                  activePatientEnrollment={activePatientEnrollment}
-                  locationUuid={selectedLocation}
-                  onProgramUuidChange={setProgramUuid}
-                />
-              )}
-              {contentSwitcherIndex === 1 && (
-                <BaseVisitType
-                  onChange={(visitType) => {
-                    setVisitType(visitType);
-                    setIsMissingVisitType(false);
-                  }}
-                  visitTypes={allVisitTypes}
-                  patientUuid={patientUuid}
-                />
-              )}
-            </Column>
-          </Row>
+                {activePatientEnrollment.map(({ uuid, display, program }) => (
+                  <RadioButton
+                    key={uuid}
+                    className={styles.radioButton}
+                    id={uuid}
+                    labelText={display}
+                    value={program.uuid}
+                  />
+                ))}
+              </RadioButtonGroup>
+            </FormGroup>
+          </section>
+          <section>
+            <div className={styles.sectionTitle}>{t('visitType', 'Visit Type')}</div>
+            <ContentSwitcher
+              selectedIndex={contentSwitcherIndex}
+              className={styles.contentSwitcher}
+              size="lg"
+              onChange={({ index }) => setContentSwitcherIndex(index)}
+            >
+              <Switch name="recommended" text={t('recommended', 'Recommended')} />
+              <Switch name="all" text={t('all', 'All')} />
+            </ContentSwitcher>
+            {contentSwitcherIndex === 0 && !isLoading && (
+              <MemoizedRecommendedVisitType
+                onChange={(visitType) => {
+                  setVisitType(visitType);
+                  setIsMissingVisitType(false);
+                }}
+                patientUuid={patientUuid}
+                patientProgramEnrollment={enrollment}
+                locationUuid={selectedLocation}
+              />
+            )}
+            {contentSwitcherIndex === 1 && (
+              <BaseVisitType
+                onChange={(visitType) => {
+                  setVisitType(visitType);
+                  setIsMissingVisitType(false);
+                }}
+                visitTypes={allVisitTypes}
+                patientUuid={patientUuid}
+              />
+            )}
+          </section>
           {isMissingVisitType && (
-            <Row className={styles.gridRow}>
-              <Column sm={4}>
-                <InlineNotification
-                  style={{ margin: '0', minWidth: '100%' }}
-                  kind="error"
-                  lowContrast={true}
-                  title={t('missingVisitType', 'Missing visit type')}
-                  subtitle={t('selectVisitType', 'Please select a Visit Type')}
-                />
-              </Column>
-            </Row>
+            <section>
+              <InlineNotification
+                style={{ margin: '0', minWidth: '100%' }}
+                kind="error"
+                lowContrast={true}
+                title={t('missingVisitType', 'Missing visit type')}
+                subtitle={t('selectVisitType', 'Please select a Visit Type')}
+              />
+            </section>
           )}
         </div>
-      </Grid>
+      </div>
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
         <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
           {t('discard', 'Discard')}
