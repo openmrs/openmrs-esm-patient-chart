@@ -3,7 +3,7 @@ import { ConfigurableLink } from '@openmrs/esm-framework';
 import { DashboardLinkConfig } from './types';
 
 export const createDashboardLink = (db: DashboardLinkConfig) => {
-  const DashboardLink: React.FC<{ basePath: string }> = ({ basePath }) => {
+  const DashboardLink = ({ basePath }: { basePath: string }) => {
     return (
       <div key={db.name}>
         <ConfigurableLink to={`${basePath}/${db.name}`} className="bx--side-nav__link">

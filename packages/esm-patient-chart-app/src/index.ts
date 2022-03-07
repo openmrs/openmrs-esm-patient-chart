@@ -140,6 +140,13 @@ function setupOpenMRS() {
           moduleName,
         }),
       },
+      {
+        name: 'nav-group',
+        load: getAsyncLifecycle(() => import('./side-nav/generic-nav-group.component'), {
+          featureName: 'Nav group',
+          moduleName,
+        }),
+      },
     ],
   };
 }
