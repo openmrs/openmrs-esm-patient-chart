@@ -293,6 +293,7 @@ function OrderBasketItemActions({
         indication: medication.orderReasonNonCoded,
       },
     ]);
+    launchPatientWorkspace('order-basket-workspace');
   }, [items, setItems, medication]);
 
   const handleModifyClick = useCallback(() => {
@@ -386,6 +387,7 @@ function OrderBasketItemActions({
         indication: medication.orderReasonNonCoded,
       },
     ]);
+    launchPatientWorkspace('order-basket-workspace');
   }, [items, setItems, medication]);
 
   return (

@@ -66,7 +66,7 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
                 medications={pastOrders}
                 showDiscontinueButton={true}
                 showModifyButton={true}
-                showReorderButton={false}
+                showReorderButton={true}
                 showAddNewButton={false}
               />
             );
