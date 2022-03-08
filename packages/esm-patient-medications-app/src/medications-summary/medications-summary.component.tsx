@@ -57,7 +57,7 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
           const headerTitle = t('pastMedicationsHeaderTitle', 'past medications');
 
           if (isLoadingPastOrders) return <DataTableSkeleton role="progressbar" />;
-          if (!isErrorPastOrders) return <ErrorState error={isErrorPastOrders} headerTitle={headerTitle} />;
+          if (isErrorPastOrders) return <ErrorState error={isErrorPastOrders} headerTitle={headerTitle} />;
           if (pastOrders?.length) {
             return (
               <MedicationsDetailsTable
