@@ -53,7 +53,7 @@ function setupOpenMRS() {
   return {
     extensions: [
       {
-        id: 'form-widget',
+        name: 'form-widget',
         slot: 'form-widget-slot',
         load: () => import('./bootstrap'),
         online: true,

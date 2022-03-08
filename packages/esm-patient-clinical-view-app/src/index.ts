@@ -20,7 +20,7 @@ function setupOpenMRS() {
   return {
     extensions: [
       {
-        id: 'patient-clinical-view-overview',
+        name: 'patient-clinical-view-overview',
         slot: 'patient-chart-summary-dashboard-slot',
         order: 11,
         load: getAsyncLifecycle(() => import('./clinical-view-overview/clinical-view-overview.component'), options),
@@ -31,14 +31,14 @@ function setupOpenMRS() {
         offline: true,
       },
       {
-        id: 'patient-clinical-view-details',
+        name: 'patient-clinical-view-details',
         slot: dashboardMeta.slot,
         load: getAsyncLifecycle(() => import('./clinical-view-overview/clinical-view-overview.component'), options),
         online: true,
         offline: true,
       },
       {
-        id: 'patient-clinical-view-form-workspace',
+        name: 'patient-clinical-view-form-workspace',
         load: getAsyncLifecycle(() => import('./clinical-view-form/clinical-view-form.component'), options),
         meta: {
           title: 'Add Clinical View',
@@ -47,7 +47,7 @@ function setupOpenMRS() {
         offline: true,
       },
       {
-        id: 'clinical-view-summary-dashboard',
+        name: 'clinical-view-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
         order: 1,
         load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),

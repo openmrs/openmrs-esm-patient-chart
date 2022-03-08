@@ -21,7 +21,7 @@ function setupOpenMRS() {
   return {
     extensions: [
       {
-        id: 'programs-overview-widget',
+        name: 'programs-overview-widget',
         slot: 'patient-chart-summary-dashboard-slot',
         order: 0,
         load: getAsyncLifecycle(() => import('./programs/programs-overview.component'), options),
@@ -30,7 +30,7 @@ function setupOpenMRS() {
         },
       },
       {
-        id: 'programs-details-widget',
+        name: 'programs-details-widget',
         slot: dashboardMeta.slot,
         load: getAsyncLifecycle(() => import('./programs/programs-detailed-summary.component'), options),
         meta: {
@@ -38,14 +38,14 @@ function setupOpenMRS() {
         },
       },
       {
-        id: 'programs-summary-dashboard',
+        name: 'programs-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
         order: 10,
         load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
         meta: dashboardMeta,
       },
       {
-        id: 'programs-form-workspace',
+        name: 'programs-form-workspace',
         load: getAsyncLifecycle(() => import('./programs/programs-form.component'), options),
         meta: {
           title: 'Record Program enrollment',

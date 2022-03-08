@@ -27,7 +27,7 @@ function setupOpenMRS() {
   return {
     extensions: [
       {
-        id: 'vitals-overview-widget',
+        name: 'vitals-overview-widget',
         slot: 'patient-chart-summary-dashboard-slot',
         order: 4,
         load: getAsyncLifecycle(() => import('./vitals/vitals-summary.component'), options),
@@ -38,7 +38,7 @@ function setupOpenMRS() {
         offline: { showAddVitals: false },
       },
       {
-        id: 'vitals-details-widget',
+        name: 'vitals-details-widget',
         slot: 'patient-chart-vitals-biometrics-dashboard-slot',
         load: getAsyncLifecycle(() => import('./vitals/vitals-main.component'), options),
         meta: {
@@ -50,7 +50,7 @@ function setupOpenMRS() {
         offline: { showAddVitals: false },
       },
       {
-        id: 'patient-vitals-info',
+        name: 'patient-vitals-info',
         slot: 'patient-info-slot',
         load: getAsyncLifecycle(() => import('./vitals/vitals-header/vitals-header.component'), options),
         online: { showRecordVitalsButton: true },

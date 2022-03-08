@@ -31,7 +31,7 @@ function setupOpenMRS() {
   return {
     extensions: [
       {
-        id: 'patient-form-entry-workspace',
+        name: 'patient-form-entry-workspace',
         load: getAsyncLifecycle(() => import('./forms/form-entry.component'), options),
         meta: {
           title: 'Clinical Form',
@@ -40,7 +40,7 @@ function setupOpenMRS() {
         offline: true,
       },
       {
-        id: 'forms-widget',
+        name: 'forms-widget',
         slot: 'patient-chart-summary-dashboard-slot',
         order: 5,
         load: getAsyncLifecycle(() => import('./forms/forms-overview.component'), options),
@@ -55,7 +55,7 @@ function setupOpenMRS() {
         },
       },
       {
-        id: 'patient-form-dashboard',
+        name: 'patient-form-dashboard',
         order: 0,
         slot: dashboardMeta.slot,
         load: getAsyncLifecycle(() => import('./forms/forms-detailed-overview.component'), options),
@@ -67,7 +67,7 @@ function setupOpenMRS() {
         },
       },
       {
-        id: 'forms-summary-dashboard',
+        name: 'forms-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
         order: 12,
         load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
@@ -76,14 +76,14 @@ function setupOpenMRS() {
         offline: true,
       },
       {
-        id: 'offline-tools-dashboard-forms-card',
+        name: 'offline-tools-dashboard-forms-card',
         slot: 'offline-tools-dashboard-cards',
         load: getAsyncLifecycle(() => import('./offline-forms/offline-forms-overview-card.component'), options),
         online: true,
         offline: true,
       },
       {
-        id: 'offline-tools-page-forms-link',
+        name: 'offline-tools-page-forms-link',
         slot: 'offline-tools-page-slot',
         load: getSyncLifecycle(() => OfflineToolsNavLink({ page: 'forms', title: 'Offline forms' }), options),
         meta: {
@@ -94,7 +94,7 @@ function setupOpenMRS() {
         offline: true,
       },
       {
-        id: 'offline-tools-page-forms',
+        name: 'offline-tools-page-forms',
         slot: 'offline-tools-page-forms-slot',
         load: getAsyncLifecycle(() => import('./offline-forms/offline-forms.component'), options),
         online: {

@@ -24,21 +24,21 @@ function setupOpenMRS() {
   return {
     extensions: [
       {
-        id: 'patient-banner',
+        name: 'patient-banner',
         slot: 'patient-header-slot',
         load: getAsyncLifecycle(() => import('./banner/patient-banner.component'), options),
         online: true,
         offline: true,
       },
       {
-        id: 'active-visit-tag',
+        name: 'active-visit-tag',
         slot: 'patient-banner-tags-slot',
         load: getAsyncLifecycle(() => import('./banner-tags/active-visit-tag.component'), options),
         online: true,
         offline: true,
       },
       {
-        id: 'deceased-patient-tag',
+        name: 'deceased-patient-tag',
         slot: 'patient-banner-tags-slot',
         load: getAsyncLifecycle(() => import('./banner-tags/deceased-patient-tag.component'), options),
         online: true,

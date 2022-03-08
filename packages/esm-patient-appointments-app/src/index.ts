@@ -21,7 +21,7 @@ function setupOpenMRS() {
   return {
     extensions: [
       {
-        id: 'appointments-overview-widget',
+        name: 'appointments-overview-widget',
         slot: 'patient-chart-summary-dashboard-slot',
         order: 8,
         load: getAsyncLifecycle(() => import('./appointments/appointments-overview.component'), options),
@@ -30,7 +30,7 @@ function setupOpenMRS() {
         },
       },
       {
-        id: 'appointments-details-widget',
+        name: 'appointments-details-widget',
         slot: dashboardMeta.slot,
         load: getAsyncLifecycle(() => import('./appointments/appointments.component'), options),
         meta: {
@@ -38,14 +38,14 @@ function setupOpenMRS() {
         },
       },
       {
-        id: 'appointments-summary-dashboard',
+        name: 'appointments-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
         order: 11,
         load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
         meta: dashboardMeta,
       },
       {
-        id: 'appointments-form-workspace',
+        name: 'appointments-form-workspace',
         load: getAsyncLifecycle(() => import('./appointments/appointments-form.component'), options),
         meta: {
           title: 'Create appointment',

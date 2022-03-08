@@ -33,7 +33,7 @@ function setupOpenMRS() {
   return {
     extensions: [
       {
-        id: 'notes-overview-widget',
+        name: 'notes-overview-widget',
         slot: 'patient-chart-summary-dashboard-slot',
         order: 7,
         load: getAsyncLifecycle(() => import('./notes/notes-overview.component'), options),
@@ -44,14 +44,14 @@ function setupOpenMRS() {
         offline: { showAddNote: false },
       },
       {
-        id: 'notes-details-widget',
+        name: 'notes-details-widget',
         slot: 'patient-chart-form-dashboard-slot',
         load: getAsyncLifecycle(() => import('./notes/notes-detailed-summary.component'), options),
         online: { showAddNote: true },
         offline: { showAddNote: false },
       },
       {
-        id: 'visit-notes-form-workspace',
+        name: 'visit-notes-form-workspace',
         load: getAsyncLifecycle(() => import('./notes/visit-notes-form.component'), options),
         meta: {
           title: {

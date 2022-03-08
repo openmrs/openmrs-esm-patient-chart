@@ -39,7 +39,7 @@ function setupOpenMRS() {
   return {
     extensions: [
       {
-        id: 'biometrics-overview-widget',
+        name: 'biometrics-overview-widget',
         slot: 'patient-chart-summary-dashboard-slot',
         order: 3,
         load: getAsyncLifecycle(() => import('./biometrics/biometrics-overview.component'), options),
@@ -50,7 +50,7 @@ function setupOpenMRS() {
         offline: { showAddBiometrics: false },
       },
       {
-        id: 'results-summary-dashboard',
+        name: 'results-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
         order: 2,
         load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
@@ -59,7 +59,7 @@ function setupOpenMRS() {
         offline: true,
       },
       {
-        id: 'biometrics-details-widget',
+        name: 'biometrics-details-widget',
         slot: dashboardMeta.slot,
         load: getAsyncLifecycle(() => import('./biometrics/biometrics-main.component'), options),
         meta: {
@@ -70,7 +70,7 @@ function setupOpenMRS() {
         offline: { showAddBiometrics: false },
       },
       {
-        id: 'weight-tile',
+        name: 'weight-tile',
         order: 2,
         slot: 'visit-form-header-slot',
         load: getAsyncLifecycle(() => import('./biometrics/weight-tile.component'), options),

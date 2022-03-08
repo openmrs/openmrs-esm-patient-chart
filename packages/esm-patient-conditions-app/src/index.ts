@@ -22,7 +22,7 @@ function setupOpenMRS() {
   return {
     extensions: [
       {
-        id: 'conditions-overview-widget',
+        name: 'conditions-overview-widget',
         slot: 'patient-chart-summary-dashboard-slot',
         order: 6,
         load: getAsyncLifecycle(() => import('./conditions/conditions-overview.component'), options),
@@ -31,7 +31,7 @@ function setupOpenMRS() {
         },
       },
       {
-        id: 'conditions-details-widget',
+        name: 'conditions-details-widget',
         slot: dashboardMeta.slot,
         load: getAsyncLifecycle(() => import('./conditions/conditions.component'), options),
         meta: {
@@ -39,14 +39,14 @@ function setupOpenMRS() {
         },
       },
       {
-        id: 'conditions-summary-dashboard',
+        name: 'conditions-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
         order: 7,
         load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
         meta: dashboardMeta,
       },
       {
-        id: 'conditions-form-workspace',
+        name: 'conditions-form-workspace',
         load: getAsyncLifecycle(() => import('./conditions/conditions-form.component'), options),
         meta: {
           title: 'Record a Condition',

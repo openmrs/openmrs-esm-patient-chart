@@ -16,7 +16,7 @@ function setupOpenMRS() {
   return {
     extensions: [
       {
-        id: 'attachments-overview-widget',
+        name: 'attachments-overview-widget',
         slot: dashboardMeta.slot,
         load: getAsyncLifecycle(() => import('./attachments/attachments-overview.component'), {
           featureName: 'patient-attachments',
@@ -27,7 +27,7 @@ function setupOpenMRS() {
         },
       },
       {
-        id: 'capture-photo-widget',
+        name: 'capture-photo-widget',
         slot: 'capture-patient-photo-slot',
         load: getAsyncLifecycle(() => import('./attachments/capture-photo.component'), {
           featureName: 'capture-photo-widget',
@@ -35,7 +35,7 @@ function setupOpenMRS() {
         }),
       },
       {
-        id: 'attachments-results-summary-dashboard',
+        name: 'attachments-results-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
         order: 9,
         load: getSyncLifecycle(createDashboardLink(dashboardMeta), {
@@ -45,7 +45,7 @@ function setupOpenMRS() {
         meta: dashboardMeta,
       },
       {
-        id: 'capture-photo-modal',
+        name: 'capture-photo-modal',
         load: getAsyncLifecycle(() => import('./attachments/camera-upload.component'), {
           featureName: 'capture-photo-modal',
           moduleName,
