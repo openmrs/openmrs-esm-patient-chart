@@ -1,7 +1,7 @@
 {
   "formName": "Form Name (A-Z)",
   "forms": "Forms",
-  "formSearchHint": "Try searching for the form using an alternative name or keyword",
+  
   "goToSummary": "Go to Summary",
   "homeOverviewCardView": "View",
   "lastCompleted": "Last Completed",
@@ -10,7 +10,6 @@
   "never": "Never",
   "noFormsAvailable": "There are no Forms to display for this patient",
   "noFormsFound": "Sorry, no forms have been found",
-  "noRecommendedFormsAvailable": "No recommended forms available at the moment",
   "offlineFormsOverviewCardAvailableOffline": "Available offline",
   "offlineFormsTableFormAvailableOffline": "Offline",
   "offlineFormsTableFormNameHeader": "Form name",

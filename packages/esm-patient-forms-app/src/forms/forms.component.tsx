@@ -6,10 +6,11 @@ import { ContentSwitcher, Switch, DataTableSkeleton, InlineLoading, Tag } from '
 import { CardHeader, ErrorState, PatientProgram } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { useForms } from '../hooks/use-forms';
-import { useConfig, useLayoutType, useVisit } from '@openmrs/esm-framework';
+import { useConfig, useLayoutType, UserHasAccess, useVisit } from '@openmrs/esm-framework';
 import { isValidOfflineFormEncounter } from '../offline-forms/offline-form-helpers';
 import { ConfigObject } from '../config-schema';
 import { useProgramConfig } from '../hooks/use-program-config';
+import dayjs from 'dayjs';
 
 const enum FormsCategory {
   Recommended,
@@ -27,15 +28,7 @@ interface FormsProps {
   activePatientEnrollment?: Array<PatientProgram>;
 }
 
-const Forms: React.FC<FormsProps> = ({
-  patientUuid,
-  patient,
-  pageSize,
-  pageUrl,
-  urlLabel,
-  isOffline,
-  activePatientEnrollment,
-}) => {
+const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, urlLabel, isOffline }) => {
   const { t } = useTranslation();
   const { htmlFormEntryForms, showRecommendedFormsTab } = useConfig() as ConfigObject;
   const headerTitle = t('forms', 'Forms');
@@ -52,12 +45,14 @@ const Forms: React.FC<FormsProps> = ({
 
   const recommendedForms = useMemo(
     () =>
-      formsToDisplay?.filter(({ form }) =>
-        Object.values(programConfigs)
-          .flatMap((programConfig) => programConfig.visitTypes)
-          ?.find((visitType) => visitType.uuid === currentVisit?.visitType.uuid)
-          ?.encounterTypes.some(({ uuid }) => uuid === form.encounterType.uuid),
-      ),
+      formsToDisplay
+        ?.filter(({ form }) =>
+          Object.values(programConfigs)
+            .flatMap((programConfig) => programConfig.visitTypes)
+            ?.find((visitType) => visitType.uuid === currentVisit?.visitType.uuid)
+            ?.encounterTypes.some(({ uuid }) => uuid === form.encounterType.uuid),
+        )
+        .filter(({ lastCompleted }) => (lastCompleted === undefined ? true : !dayjs(lastCompleted).isToday)),
     [currentVisit?.visitType.uuid, formsToDisplay, programConfigs],
   );
 
@@ -96,7 +91,10 @@ const Forms: React.FC<FormsProps> = ({
       <div style={{ width: '100%' }}>
         {formsCategory === FormsCategory.Completed && (
           <FormView
-            forms={formsToDisplay.filter((formInfo) => formInfo.associatedEncounters.length > 0)}
+            forms={formsToDisplay.filter(
+              ({ associatedEncounters, lastCompleted }) =>
+                associatedEncounters.length > 0 && dayjs(lastCompleted).isToday(),
+            )}
             patientUuid={patientUuid}
             patient={patient}
             pageSize={pageSize}
@@ -114,6 +112,7 @@ const Forms: React.FC<FormsProps> = ({
             urlLabel={urlLabel}
           />
         )}
+
         {formsCategory === FormsCategory.Recommended && (
           <FormView
             forms={recommendedForms}

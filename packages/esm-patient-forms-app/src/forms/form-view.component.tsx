@@ -131,6 +131,10 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
     [results],
   );
 
+  const actionText = currentVisit
+    ? 'Try searching for the form using an alternative name or keyword'
+    : 'Please start a visit before filling a form';
+
   return (
     <div className={styles.formContainer}>
       <Search
@@ -224,11 +228,7 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
             />
           </>
         )}
-        {isEmpty(allFormInfos) && (
-          <EmptyFormView
-            action={t('formSearchHint', 'Try searching for the form using an alternative name or keyword')}
-          />
-        )}
+        {isEmpty(allFormInfos) && <EmptyFormView action={t('formSearchHint', actionText)} />}
       </>
     </div>
   );
