@@ -45,7 +45,7 @@ function setupOpenMRS() {
   return {
     extensions: [
       {
-        id: 'allergies-overview-widget',
+        name: 'allergies-overview-widget',
         slot: 'patient-chart-summary-dashboard-slot',
         order: 9,
         load: getAsyncLifecycle(() => import('./allergies/allergies-overview.component'), options),
@@ -56,7 +56,7 @@ function setupOpenMRS() {
         offline: { showAddAllergyButton: false },
       },
       {
-        id: 'allergies-details-widget',
+        name: 'allergies-details-widget',
         slot: dashboardMeta.slot,
         load: getAsyncLifecycle(() => import('./allergies/allergies.component'), options),
         meta: {
@@ -66,7 +66,7 @@ function setupOpenMRS() {
         offline: { showAddAllergyButton: false },
       },
       {
-        id: 'allergies-summary-dashboard',
+        name: 'allergies-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
         order: 6,
         load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
@@ -85,7 +85,7 @@ function setupOpenMRS() {
         },
       },
       {
-        id: 'patient-details-tile',
+        name: 'patient-details-tile',
         slot: 'patient-details-header-slot',
         order: 1,
         load: getAsyncLifecycle(
@@ -94,7 +94,7 @@ function setupOpenMRS() {
         ),
       },
       {
-        id: 'weight-tile',
+        name: 'weight-tile',
         slot: 'patient-details-header-slot',
         order: 2,
         load: getAsyncLifecycle(
@@ -103,7 +103,7 @@ function setupOpenMRS() {
         ),
       },
       {
-        id: 'allergy-tile',
+        name: 'allergy-tile',
         slot: 'patient-details-header-slot',
         order: 3,
         load: getAsyncLifecycle(() => import('./allergies/allergies-tile.component'), options),

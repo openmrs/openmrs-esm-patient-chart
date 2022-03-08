@@ -20,7 +20,7 @@ function setupOpenMRS() {
   return {
     extensions: [
       {
-        id: 'obs-by-encounter-widget',
+        name: 'obs-by-encounter-widget',
         load: getAsyncLifecycle(() => import('./obs-switchable/obs-switchable.component'), options),
         meta: {
           columnSpan: 4,

@@ -21,7 +21,7 @@ function setupOpenMRS() {
   return {
     extensions: [
       {
-        id: 'medications-details-widget',
+        name: 'medications-details-widget',
         slot: dashboardMeta.slot,
         load: getAsyncLifecycle(() => import('./medications/root-medication-summary'), options),
         meta: {
@@ -29,7 +29,7 @@ function setupOpenMRS() {
         },
       },
       {
-        id: 'active-medications-widget',
+        name: 'active-medications-widget',
         slot: 'patient-chart-summary-dashboard-slot',
         order: 1,
         load: getAsyncLifecycle(() => import('./medications/active-medications.component'), options),
@@ -40,7 +40,7 @@ function setupOpenMRS() {
         offline: { showAddMedications: false },
       },
       {
-        id: 'order-basket-workspace',
+        name: 'order-basket-workspace',
         load: getAsyncLifecycle(() => import('./medications/root-order-basket'), options),
         meta: {
           title: {
@@ -51,7 +51,7 @@ function setupOpenMRS() {
         },
       },
       {
-        id: 'medications-summary-dashboard',
+        name: 'medications-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
         order: 3,
         load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),

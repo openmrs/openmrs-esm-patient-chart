@@ -43,7 +43,7 @@ function setupOpenMRS() {
     ],
     extensions: [
       {
-        id: 'charts-summary-dashboard',
+        name: 'charts-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
         order: 0,
         load: getSyncLifecycle(createDashboardLink(summaryDashboardMeta), {
@@ -55,7 +55,7 @@ function setupOpenMRS() {
         offline: true,
       },
       {
-        id: 'patient-chart-nav-items',
+        name: 'patient-chart-nav-items',
         load: getAsyncLifecycle(() => import('./side-nav/nav.component'), {
           featureName: 'nav-items',
           moduleName,
@@ -64,7 +64,7 @@ function setupOpenMRS() {
         offline: true,
       },
       {
-        id: 'start-visit-button',
+        name: 'start-visit-button',
         slot: 'patient-actions-slot',
         load: getAsyncLifecycle(() => import('./actions-buttons/start-visit.component'), {
           featureName: 'patient-actions-slot',
@@ -72,7 +72,7 @@ function setupOpenMRS() {
         }),
       },
       {
-        id: 'stop-visit-button',
+        name: 'stop-visit-button',
         slot: 'patient-actions-slot',
         load: getAsyncLifecycle(() => import('./actions-buttons/stop-visit.component'), {
           featureName: 'patient-actions-slot',
@@ -80,7 +80,7 @@ function setupOpenMRS() {
         }),
       },
       {
-        id: 'add-past-visit-button',
+        name: 'add-past-visit-button',
         slot: 'patient-actions-slot',
         load: getAsyncLifecycle(() => import('./actions-buttons/add-past-visit.component'), {
           featureName: 'patient-actions-slot',
@@ -88,7 +88,7 @@ function setupOpenMRS() {
         }),
       },
       {
-        id: 'encounters-summary-dashboard',
+        name: 'encounters-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
         order: 5,
         load: getSyncLifecycle(createDashboardLink(encountersDashboardMeta), { featureName: 'encounter', moduleName }),
@@ -97,7 +97,7 @@ function setupOpenMRS() {
         offline: true,
       },
       {
-        id: 'past-visits-detail-overview',
+        name: 'past-visits-detail-overview',
         order: 1,
         slot: 'patient-chart-encounters-dashboard-slot',
         load: getAsyncLifecycle(() => import('./visit/visits-widget/visit-detail-overview.component'), {
@@ -111,7 +111,7 @@ function setupOpenMRS() {
       },
       ,
       {
-        id: 'past-visits-overview',
+        name: 'past-visits-overview',
         load: getAsyncLifecycle(() => import('./visit/past-visit-overview.component'), {
           featureName: 'past-visits-overview',
           moduleName,
@@ -122,7 +122,7 @@ function setupOpenMRS() {
         },
       },
       {
-        id: 'start-visit-workspace-form',
+        name: 'start-visit-workspace-form',
         load: getAsyncLifecycle(() => import('./visit/visit-form/visit-form.component'), {
           featureName: 'start-visit-form',
           moduleName,
@@ -132,7 +132,7 @@ function setupOpenMRS() {
         },
       },
       {
-        id: 'patient-details-tile',
+        name: 'patient-details-tile',
         slot: 'visit-form-header-slot',
         order: 1,
         load: getAsyncLifecycle(() => import('./patient-details-tile/patient-details-tile.component'), {

@@ -23,7 +23,7 @@ function setupOpenMRS() {
   return {
     extensions: [
       {
-        id: 'immunization-overview-widget',
+        name: 'immunization-overview-widget',
         slot: 'patient-chart-summary-dashboard-slot',
         order: 10,
         load: getAsyncLifecycle(() => import('./immunizations/immunizations-overview.component'), options),
@@ -32,7 +32,7 @@ function setupOpenMRS() {
         },
       },
       {
-        id: 'immunization-details-widget',
+        name: 'immunization-details-widget',
         slot: dashboardMeta.slot,
         load: getAsyncLifecycle(() => import('./immunizations/immunizations-detailed-summary.component'), options),
         meta: {
@@ -40,14 +40,14 @@ function setupOpenMRS() {
         },
       },
       {
-        id: 'immunization-summary-dashboard',
+        name: 'immunization-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
         order: 8,
         load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
         meta: dashboardMeta,
       },
       {
-        id: 'immunization-form-workspace',
+        name: 'immunization-form-workspace',
         load: getAsyncLifecycle(() => import('./immunizations/immunizations-form.component'), options),
         meta: {
           title: 'Immunization Form',
