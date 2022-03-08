@@ -30,8 +30,8 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
     <>
       <div style={{ marginBottom: '1.5rem' }}>
         {(() => {
-          const displayText = t('activeMedications', 'Active medications');
-          const headerTitle = t('activeMedications', 'active medications');
+          const displayText = t('activeMedicationsDisplayText', 'Active medications');
+          const headerTitle = t('activeMedicationsHeaderTitle', 'active medications');
 
           if (isLoadingActiveOrders) return <DataTableSkeleton role="progressbar" />;
           if (isErrorActiveOrders) return <ErrorState error={isErrorActiveOrders} headerTitle={headerTitle} />;
@@ -39,7 +39,7 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
             return (
               <MedicationsDetailsTable
                 isValidating={isValidatingActiveOrders}
-                title={t('activeMedications', 'Active Medications')}
+                title={t('activeMedicationsTableTitle', 'Active Medications')}
                 medications={activeOrders}
                 showDiscontinueButton={true}
                 showModifyButton={true}
@@ -53,16 +53,16 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
       </div>
       <div style={{ marginTop: '1.5rem' }}>
         {(() => {
-          const displayText = t('pastMedications', 'Past medications');
-          const headerTitle = t('pastMedications', 'past medications');
+          const displayText = t('pastMedicationsDisplayText', 'Past medications');
+          const headerTitle = t('pastMedicationsHeaderTitle', 'past medications');
 
           if (isLoadingPastOrders) return <DataTableSkeleton role="progressbar" />;
-          if (isErrorPastOrders) return <ErrorState error={isErrorPastOrders} headerTitle={headerTitle} />;
+          if (!isErrorPastOrders) return <ErrorState error={isErrorPastOrders} headerTitle={headerTitle} />;
           if (pastOrders?.length) {
             return (
               <MedicationsDetailsTable
                 isValidating={isValidatingPastOrders}
-                title={t('pastMedications', 'Past Medications')}
+                title={t('pastMedicationsTableTitle', 'Past Medications')}
                 medications={pastOrders}
                 showDiscontinueButton={true}
                 showModifyButton={true}
