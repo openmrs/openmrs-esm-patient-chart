@@ -6,7 +6,7 @@ import { ContentSwitcher, Switch, DataTableSkeleton, InlineLoading, Tag } from '
 import { CardHeader, ErrorState, PatientProgram } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { useForms } from '../hooks/use-forms';
-import { useConfig, useLayoutType, UserHasAccess, useVisit } from '@openmrs/esm-framework';
+import { useConfig, useLayoutType, useVisit } from '@openmrs/esm-framework';
 import { isValidOfflineFormEncounter } from '../offline-forms/offline-form-helpers';
 import { ConfigObject } from '../config-schema';
 import { useProgramConfig } from '../hooks/use-program-config';
@@ -41,7 +41,7 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
     ? data?.filter((formInfo) => isValidOfflineFormEncounter(formInfo.form, htmlFormEntryForms))
     : data;
   const { currentVisit } = useVisit(patientUuid);
-  const { programConfigs } = useProgramConfig(patientUuid);
+  const { programConfigs } = useProgramConfig(patientUuid, showRecommendedFormsTab);
 
   const recommendedForms = useMemo(
     () =>
@@ -52,7 +52,7 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
             ?.find((visitType) => visitType.uuid === currentVisit?.visitType.uuid)
             ?.encounterTypes.some(({ uuid }) => uuid === form.encounterType.uuid),
         )
-        .filter(({ lastCompleted }) => (lastCompleted === undefined ? true : !dayjs(lastCompleted).isToday)),
+        .filter(({ lastCompleted }) => (lastCompleted === undefined ? true : !dayjs(lastCompleted).isToday())),
     [currentVisit?.visitType.uuid, formsToDisplay, programConfigs],
   );
 

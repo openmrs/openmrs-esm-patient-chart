@@ -47,14 +47,15 @@ import {
 import BaseVisitType from './base-visit-type.component';
 import styles from './visit-form.scss';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
+import { ChartConfig } from '../../config-schema';
 
 const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const locations = useLocations();
   const sessionUser = useSessionUser();
-  const config = useConfig();
-  const [contentSwitcherIndex, setContentSwitcherIndex] = useState(config.showRecommendedVisitType ? 0 : 1);
+  const config = useConfig() as ChartConfig;
+  const [contentSwitcherIndex, setContentSwitcherIndex] = useState(config.showRecommendedVisitTypeTab ? 0 : 1);
   const [isMissingVisitType, setIsMissingVisitType] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState('');
@@ -200,28 +201,32 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
             </Select>
           </section>
 
-          <section>
-            <div className={styles.sectionTitle}>{t('program', 'Program')}</div>
-            <FormGroup legendText={t('selectProgramType', 'Select program type')}>
-              <RadioButtonGroup
-                defaultSelected={enrollment?.program?.uuid}
-                orientation="vertical"
-                onChange={(uuid) => setEnrollment(activePatientEnrollment.find(({ program }) => program.uuid === uuid))}
-                name="program-type-radio-group"
-                valueSelected="default-selected"
-              >
-                {activePatientEnrollment.map(({ uuid, display, program }) => (
-                  <RadioButton
-                    key={uuid}
-                    className={styles.radioButton}
-                    id={uuid}
-                    labelText={display}
-                    value={program.uuid}
-                  />
-                ))}
-              </RadioButtonGroup>
-            </FormGroup>
-          </section>
+          {config.showRecommendedVisitTypeTab && (
+            <section>
+              <div className={styles.sectionTitle}>{t('program', 'Program')}</div>
+              <FormGroup legendText={t('selectProgramType', 'Select program type')}>
+                <RadioButtonGroup
+                  defaultSelected={enrollment?.program?.uuid}
+                  orientation="vertical"
+                  onChange={(uuid) =>
+                    setEnrollment(activePatientEnrollment.find(({ program }) => program.uuid === uuid))
+                  }
+                  name="program-type-radio-group"
+                  valueSelected="default-selected"
+                >
+                  {activePatientEnrollment.map(({ uuid, display, program }) => (
+                    <RadioButton
+                      key={uuid}
+                      className={styles.radioButton}
+                      id={uuid}
+                      labelText={display}
+                      value={program.uuid}
+                    />
+                  ))}
+                </RadioButtonGroup>
+              </FormGroup>
+            </section>
+          )}
           <section>
             <div className={styles.sectionTitle}>{t('visitType', 'Visit Type')}</div>
             <ContentSwitcher

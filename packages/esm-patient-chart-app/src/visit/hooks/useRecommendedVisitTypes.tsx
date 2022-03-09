@@ -1,6 +1,15 @@
 import useSWR from 'swr';
 import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import { ChartConfig } from '../../config-schema';
+import { useMemo } from 'react';
+
+interface EnrollmentVisitType {
+  dataDependencies: Array<string>;
+  enrollmentOptions: object;
+  incompatibleWith: Array<string>;
+  name: string;
+  visitTypes: { allowed: Array<EnrollmentVisitType>; disallowed: Array<EnrollmentVisitType> };
+}
 
 export const useRecommendedVisitTypes = (
   patientUuid: string,
@@ -8,16 +17,18 @@ export const useRecommendedVisitTypes = (
   programUuid: string,
   locationUuid: string,
 ) => {
-  const config = useConfig() as ChartConfig;
-  const { data, error } = useSWR<{ data: any }>(
-    patientUuid &&
+  const { visitTypeResourceUrl, showRecommendedVisitTypeTab } = useConfig() as ChartConfig;
+  const { data, error } = useSWR<{ data: EnrollmentVisitType }>(
+    showRecommendedVisitTypeTab &&
+      patientUuid &&
       enrollmentUuid &&
       programUuid &&
-      `${config.visitTypeResourceUrl}${patientUuid}/program/${programUuid}/enrollment/${enrollmentUuid}?intendedLocationUuid=${locationUuid}`,
+      `${visitTypeResourceUrl}${patientUuid}/program/${programUuid}/enrollment/${enrollmentUuid}?intendedLocationUuid=${locationUuid}`,
     openmrsFetch,
   );
-  const recommendedVisitTypes = data?.data?.visitTypes?.allowed.map(mapToVisitType) ?? [];
-  return { recommendedVisitTypes, error, isLoading: !recommendedVisitTypes && !error };
+
+  const recommendedVisitTypes = useMemo(() => data?.data?.visitTypes?.allowed.map(mapToVisitType) ?? [], [data]);
+  return { recommendedVisitTypes, error, isLoading: !data && !error };
 };
 
 const mapToVisitType = (visitType) => {

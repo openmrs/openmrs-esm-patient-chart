@@ -2,6 +2,7 @@ import React from 'react';
 import { useRecommendedVisitTypes } from '../hooks/useRecommendedVisitTypes';
 import BaseVisitType from './base-visit-type.component';
 import { PatientProgram } from '@openmrs/esm-patient-common-lib';
+import { StructuredListSkeleton } from 'carbon-components-react';
 
 interface RecommendedVisitTypeProp {
   patientUuid: string;
@@ -16,7 +17,7 @@ const RecommendedVisitType: React.FC<RecommendedVisitTypeProp> = ({
   onChange,
   locationUuid,
 }) => {
-  const { recommendedVisitTypes, error } = useRecommendedVisitTypes(
+  const { recommendedVisitTypes, error, isLoading } = useRecommendedVisitTypes(
     patientUuid,
     patientProgramEnrollment?.uuid,
     patientProgramEnrollment?.program?.uuid,
@@ -25,7 +26,11 @@ const RecommendedVisitType: React.FC<RecommendedVisitTypeProp> = ({
 
   return (
     <div style={{ marginTop: '0.625rem' }}>
-      <BaseVisitType onChange={onChange} visitTypes={recommendedVisitTypes} patientUuid={patientUuid} />
+      {isLoading ? (
+        <StructuredListSkeleton />
+      ) : (
+        <BaseVisitType onChange={onChange} visitTypes={recommendedVisitTypes} patientUuid={patientUuid} />
+      )}
     </div>
   );
 };

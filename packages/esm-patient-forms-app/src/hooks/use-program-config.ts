@@ -2,16 +2,20 @@ import { useMemo } from 'react';
 import useSWR from 'swr';
 import { openmrsFetch, OpenmrsResource, Visit } from '@openmrs/esm-framework';
 
-interface ProgramConfig {
-  programUuid: Record<
-    string,
-    { name: string; dataDependencies: Array<string>; enrollmentAllowed: boolean; visitTypes: Array<OpenmrsResource> }
-  >;
+interface ProgramConfigObj {
+  name: string;
+  dataDependencies: Array<string>;
+  enrollmentAllowed: boolean;
+  visitTypes: Array<OpenmrsResource>;
 }
 
-export const useProgramConfig = (patientUuid: string) => {
+interface ProgramConfig {
+  programUuid: Record<string, ProgramConfigObj>;
+}
+
+export const useProgramConfig = (patientUuid: string, loadProgramConfig: boolean = false) => {
   const { data, error } = useSWR<{ data: ProgramConfig }>(
-    `/etl-latest/etl/patient-program-config?patientUuid=${patientUuid}`,
+    loadProgramConfig && `/etl-latest/etl/patient-program-config?patientUuid=${patientUuid}`,
     openmrsFetch,
   );
 
