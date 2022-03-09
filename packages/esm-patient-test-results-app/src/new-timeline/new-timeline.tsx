@@ -1,13 +1,9 @@
-import React, { useContext, useState } from 'react';
-import useScrollIndicator from '../timeline/useScroll';
-import { PaddingContainer, Grid, ShadowBox } from '../timeline/helpers';
+import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import { Grid, ShadowBox } from '../timeline/helpers';
 import { EmptyState, OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import FilterContext from '../filter/filter-context';
 import styles from './new-timeline.scss';
-
-const RecentResultsGrid = (props) => {
-  return <div {...props} className={styles['recent-results-grid']} />;
-};
+import { makeThrottled } from '../helpers';
 
 const TimeSlots: React.FC<{
   style?: React.CSSProperties;
@@ -136,53 +132,139 @@ interface DateHeaderGridProps {
   yearColumns: Array<Record<string, number | string>>;
   dayColumns: Array<Record<string, number | string>>;
   showShadow: boolean;
+  xScroll: number;
+  setXScroll: any;
 }
 
-const DateHeaderGrid: React.FC<DateHeaderGridProps> = ({ timeColumns, yearColumns, dayColumns, showShadow }) => (
-  <Grid
-    dataColumns={timeColumns.length}
-    style={{
-      gridTemplateRows: 'repeat(3, 24px)',
-      position: 'sticky',
-      top: '0px',
-      zIndex: 2,
-      boxShadow: showShadow ? '8px 0 20px 0 rgba(0,0,0,0.15)' : undefined,
-    }}
-  >
-    {yearColumns.map(({ year, size }) => {
-      return (
-        <TimeSlots key={year} className={styles['year-column']} style={{ gridColumn: `${size} span` }}>
-          {year}
-        </TimeSlots>
-      );
-    })}
-    {dayColumns.map(({ day, year, size }) => {
-      return (
-        <TimeSlots key={`${day} - ${year}`} className={styles['day-column']} style={{ gridColumn: `${size} span` }}>
-          {day}
-        </TimeSlots>
-      );
-    })}
-    {timeColumns.map((time, i) => {
-      return (
-        <TimeSlots key={time + i} className={styles['time-column']}>
-          {time}
-        </TimeSlots>
-      );
-    })}
-  </Grid>
-);
+const DateHeaderGrid: React.FC<DateHeaderGridProps> = ({
+  timeColumns,
+  yearColumns,
+  dayColumns,
+  showShadow,
+  xScroll,
+  setXScroll,
+}) => {
+  const ref = useRef();
+  const el: HTMLElement | null = ref.current;
+
+  if (el) {
+    el.scrollLeft = xScroll;
+  }
+
+  const handleScroll = useCallback(
+    (e) => {
+      setXScroll(e.target.scrollLeft);
+    },
+    [setXScroll],
+  );
+
+  useEffect(() => {
+    const div: HTMLElement | null = ref.current;
+    if (div) {
+      div.addEventListener('scroll', handleScroll);
+      return () => div.removeEventListener('scroll', handleScroll);
+    }
+  }, [handleScroll]);
+
+  return (
+    <div ref={ref} style={{ overflowX: 'scroll' }}>
+      <Grid
+        dataColumns={timeColumns.length}
+        style={{
+          gridTemplateRows: 'repeat(3, 24px)',
+          //position: 'sticky',
+          //top: '0px',
+          zIndex: 2,
+          boxShadow: showShadow ? '8px 0 20px 0 rgba(0,0,0,0.15)' : undefined,
+        }}
+      >
+        {yearColumns.map(({ year, size }) => {
+          return (
+            <TimeSlots key={year} className={styles['year-column']} style={{ gridColumn: `${size} span` }}>
+              {year}
+            </TimeSlots>
+          );
+        })}
+        {dayColumns.map(({ day, year, size }) => {
+          return (
+            <TimeSlots key={`${day} - ${year}`} className={styles['day-column']} style={{ gridColumn: `${size} span` }}>
+              {day}
+            </TimeSlots>
+          );
+        })}
+        {timeColumns.map((time, i) => {
+          return (
+            <TimeSlots key={time + i} className={styles['time-column']}>
+              {time}
+            </TimeSlots>
+          );
+        })}
+      </Grid>
+    </div>
+  );
+};
+
+const TimelineDataGroup = ({ parent, subRows, xScroll, setXScroll }) => {
+  const { timelineData } = useContext(FilterContext);
+  const {
+    data: {
+      parsedTime: { timeColumns, sortedTimes },
+      rowData,
+    },
+  } = timelineData;
+
+  const ref = useRef();
+
+  const el: HTMLElement | null = ref.current;
+
+  if (el) {
+    el.scrollLeft = xScroll;
+  }
+
+  const handleScroll = makeThrottled((e) => {
+    setXScroll(e.target.scrollLeft);
+  }, 200);
+
+  useEffect(() => {
+    const div: HTMLElement | null = ref.current;
+    if (div) {
+      div.addEventListener('scroll', handleScroll);
+      return () => div.removeEventListener('scroll', handleScroll);
+    }
+  }, [handleScroll]);
+
+  return (
+    <>
+      <div className={styles['recent-results-grid']} ref={ref}>
+        <div className={styles['grid-container']}>
+          <div className={styles['row-header']}>
+            <h6 style={{ position: 'sticky', left: 0, padding: '0.2rem' }}>{parent.display}</h6>
+          </div>
+          <NewDataRows
+            {...{
+              timeColumns,
+              rowData: subRows,
+              sortedTimes,
+              showShadow: Boolean(xScroll),
+            }}
+          />
+          <ShadowBox />
+        </div>
+      </div>
+      <div style={{ height: '2em' }}></div>
+    </>
+  );
+};
 
 export const NewTimeline = () => {
   const { activeTests, timelineData, parents, checkboxes, someChecked, lowestParents } = useContext(FilterContext);
-  const [xIsScrolled, yIsScrolled, containerRef] = useScrollIndicator(0, 32);
   const [currentPanel, setCurrentPanel] = useState(lowestParents?.[0]?.display || 'Timeline');
+  const [xScroll, setXScroll] = useState(0);
 
   const {
     data: {
-      parsedTime: { yearColumns, dayColumns, timeColumns, sortedTimes },
+      parsedTime: { yearColumns, dayColumns, timeColumns },
       rowData,
-      panelName,
     },
     loaded,
   } = timelineData;
@@ -192,24 +274,24 @@ export const NewTimeline = () => {
   }
   if (activeTests && timelineData && loaded) {
     return (
-      <>
-        <div>
-          <RecentResultsGrid>
-            <PaddingContainer ref={containerRef}>
-              <PanelNameCorner showShadow={xIsScrolled} panelName={currentPanel} />
-              <DateHeaderGrid
-                {...{
-                  timeColumns,
-                  yearColumns,
-                  dayColumns,
-                  showShadow: yIsScrolled,
-                }}
-              />
-            </PaddingContainer>
-          </RecentResultsGrid>
+      <div>
+        <div className={styles['date-header']}>
+          <div className={styles['date-header-container']}>
+            <PanelNameCorner showShadow={true} panelName={currentPanel} />
+            <DateHeaderGrid
+              {...{
+                timeColumns,
+                yearColumns,
+                dayColumns,
+                showShadow: true,
+                xScroll,
+                setXScroll,
+              }}
+            />
+          </div>
         </div>
         <div>
-          {lowestParents.map((parent) => {
+          {lowestParents?.map((parent, index) => {
             if (parents[parent.flatName].some((kid) => checkboxes[kid]) || !someChecked) {
               const subRows = someChecked
                 ? rowData?.filter((row) => parents[parent.flatName].includes(row.flatName) && checkboxes[row.flatName])
@@ -217,30 +299,18 @@ export const NewTimeline = () => {
 
               // show kid rows
               return (
-                <>
-                  <RecentResultsGrid>
-                    <PaddingContainer ref={containerRef}>
-                      <div style={{ backgroundColor: 'lightgray' }}>
-                        <h6>{parent.display}</h6>
-                      </div>
-                      <NewDataRows
-                        {...{
-                          timeColumns,
-                          rowData: subRows,
-                          sortedTimes,
-                          showShadow: xIsScrolled,
-                        }}
-                      />
-                      <ShadowBox />
-                    </PaddingContainer>
-                  </RecentResultsGrid>
-                  <div style={{ height: '2em' }}></div>
-                </>
+                <TimelineDataGroup
+                  parent={parent}
+                  subRows={subRows}
+                  key={index}
+                  xScroll={xScroll}
+                  setXScroll={setXScroll}
+                />
               );
             } else return null;
           })}
         </div>
-      </>
+      </div>
     );
   }
   return null;
