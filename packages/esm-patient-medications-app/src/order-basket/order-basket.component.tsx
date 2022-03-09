@@ -25,8 +25,8 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
   orderBasketStoreActions,
 )(({ patientUuid, items, closeWorkspace, setItems }: OrderBasketProps & OrderBasketStore & OrderBasketStoreActions) => {
   const { t } = useTranslation();
-  const displayText = t('activeMedications', 'Active medications');
-  const headerTitle = t('activeMedications', 'active medications');
+  const displayText = t('activeMedicationsDisplayText', 'Active medications');
+  const headerTitle = t('activeMedicationsHeaderTitle', 'active medications');
   const isTablet = useLayoutType() === 'tablet';
 
   const [durationUnits, setDurationUnits] = useState<Array<OpenmrsResource>>([]);
@@ -153,7 +153,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
                     return (
                       <MedicationsDetailsTable
                         isValidating={isValidating}
-                        title={t('activeMedications', 'Active Medications')}
+                        title={t('activeMedicationsTableTitle', 'Active Medications')}
                         medications={activePatientOrders}
                         showDiscontinueButton={true}
                         showModifyButton={true}
