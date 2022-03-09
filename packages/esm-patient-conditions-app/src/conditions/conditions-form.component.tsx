@@ -1,5 +1,6 @@
 import React, { SyntheticEvent } from 'react';
 import dayjs from 'dayjs';
+import 'dayjs/plugin/utc';
 import debounce from 'lodash-es/debounce';
 import { useSWRConfig } from 'swr';
 import styles from './conditions-form.scss';

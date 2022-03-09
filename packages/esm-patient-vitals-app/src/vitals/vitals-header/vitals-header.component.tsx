@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import dayjs from 'dayjs';
+import 'dayjs/plugin/isToday';
 import { useTranslation } from 'react-i18next';
 import { Button } from 'carbon-components-react';
 import ChevronDown16 from '@carbon/icons-react/es/chevron--down/16';
