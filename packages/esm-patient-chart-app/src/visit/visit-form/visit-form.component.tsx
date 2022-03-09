@@ -142,12 +142,13 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
         <div className={styles.container}>
           <section>
             <div className={styles.sectionTitle}>{t('dateAndTimeOfVisit', 'Date and time of visit')}</div>
-            <div style={{ display: 'flex' }}>
+            <div className={styles.dateTimeSection}>
               <DatePicker
                 dateFormat="d/m/Y"
-                datePickerType="single"
+                datePickerType="simple"
                 id="visitDate"
                 light={isTablet}
+                style={{ paddingBottom: '1rem' }}
                 maxDate={new Date().toISOString()}
                 onChange={([date]) => setVisitDate(date)}
                 value={visitDate}
