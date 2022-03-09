@@ -73,9 +73,8 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
                 className={styles.flexRow}
               />
             </div>
-            {
-              !hideActionsOverflow && (
-                <div ref={overFlowMenuRef}>
+            {!hideActionsOverflow && (
+              <div ref={overFlowMenuRef}>
                 <CustomOverflowMenuComponent
                   menuTitle={
                     <>
@@ -92,9 +91,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
                   />
                 </CustomOverflowMenuComponent>
               </div>
-              )
-            }
-            
+            )}
           </div>
           <div className={styles.demographics}>
             <span>{capitalize(patient.gender)}</span> &middot; <span>{age(patient.birthDate)}</span> &middot;{' '}
