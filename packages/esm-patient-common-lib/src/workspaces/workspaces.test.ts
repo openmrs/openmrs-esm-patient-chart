@@ -1,6 +1,5 @@
 import { registerExtension } from '@openmrs/esm-framework';
 import { cancelPrompt, getWorkspaceStore, launchPatientWorkspace, registerWorkspace, resetWorkspaceStore } from '.';
-import { WorkspaceWindowState } from '..';
 
 const mockExtensionRegistry = {};
 
@@ -9,8 +8,8 @@ jest.mock('@openmrs/esm-framework', () => {
 
   return {
     ...originalModule,
-    registerExtension: (name, ext) => {
-      mockExtensionRegistry[name] = { name, ...ext };
+    registerExtension: (ext) => {
+      mockExtensionRegistry[ext.name] = ext;
     },
     getExtensionRegistration: (name) => mockExtensionRegistry[name],
     translateFrom: (module, key, defaultValue, options) => defaultValue,
@@ -105,7 +104,7 @@ describe('workspace system', () => {
       name: 'lab-results',
       moduleName: '@openmrs/esm-lab-results-app',
       load: jest.fn(),
-      meta: { title: 'Lab Results', screenSize: WorkspaceWindowState.maximized },
+      meta: { title: 'Lab Results', screenSize: 'maximized' },
     });
     launchPatientWorkspace('lab-results', { foo: true });
     expect(store.getState().openWorkspaces.length).toEqual(1);
@@ -113,7 +112,7 @@ describe('workspace system', () => {
     expect(workspace.name).toEqual('lab-results');
     expect(workspace.additionalProps['foo']).toBe(true);
     expect(workspace.title).toBe('Lab Results');
-    expect(workspace.preferredWindowSize).toBe(WorkspaceWindowState.maximized);
+    expect(workspace.preferredWindowSize).toBe('maximized');
   });
 
   test('launching unregistered workspace throws an error', () => {

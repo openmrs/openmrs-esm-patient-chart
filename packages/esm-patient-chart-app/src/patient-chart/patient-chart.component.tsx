@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
 import { ExtensionSlot, useSessionUser } from '@openmrs/esm-framework';
-import { changeWorkspaceContext, useWorkspaceWindowSize, WorkspaceWindowState } from '@openmrs/esm-patient-common-lib';
+import { changeWorkspaceContext, useWorkspaceWindowSize } from '@openmrs/esm-patient-common-lib';
 import { RouteComponentProps } from 'react-router-dom';
 import { useOfflineVisitForPatient, usePatientOrOfflineRegisteredPatient } from '../offline';
 import ChartReview from '../patient-chart/chart-review/chart-review.component';
@@ -36,7 +36,7 @@ const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({ match
         <>
           <div
             className={`${styles.innerChartContainer} ${
-              windowSize.size === WorkspaceWindowState.normal && active ? styles.closeWorkspace : styles.activeWorkspace
+              windowSize.size === 'normal' && active ? styles.closeWorkspace : styles.activeWorkspace
             }`}
           >
             <ExtensionSlot extensionSlotName="breadcrumbs-slot" />

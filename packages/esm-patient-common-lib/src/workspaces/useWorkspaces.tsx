@@ -24,7 +24,7 @@ export function useWorkspaces(): WorkspacesInfo {
 
   const windowState = useMemo(() => {
     if (workspaces.length === 0) {
-      return WorkspaceWindowState.hidden;
+      return 'hidden';
     } else {
       return workspaces[0].preferredWindowSize;
     }

@@ -4,7 +4,7 @@ import Maximize16 from '@carbon/icons-react/es/maximize/16';
 import Minimize16 from '@carbon/icons-react/es/minimize/16';
 import DownToBottom16 from '@carbon/icons-react/es/down-to-bottom/16';
 import { ExtensionSlot, useBodyScrollLock, useLayoutType } from '@openmrs/esm-framework';
-import { useWorkspaces, useWorkspaceWindowSize, WorkspaceWindowState } from '@openmrs/esm-patient-common-lib';
+import { useWorkspaces, useWorkspaceWindowSize } from '@openmrs/esm-patient-common-lib';
 import { Button, Header, HeaderGlobalBar, HeaderName } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 import { RouteComponentProps } from 'react-router-dom';
@@ -25,9 +25,9 @@ const WorkspaceWindow: React.FC<RouteComponentProps<ContextWorkspaceParams>> = (
   const { active, workspaces } = useWorkspaces();
   const { windowSize, updateWindowSize } = useWorkspaceWindowSize();
 
-  const hidden = windowSize.size === WorkspaceWindowState.hidden;
-  const maximized = windowSize.size === WorkspaceWindowState.maximized;
-  const normal = windowSize.size === WorkspaceWindowState.normal;
+  const hidden = windowSize.size === 'hidden';
+  const maximized = windowSize.size === 'maximized';
+  const normal = windowSize.size === 'normal';
 
   const [isWorkspaceWindowOpen, setIsWorkspaceWindowOpen] = useState(false);
 
@@ -44,7 +44,7 @@ const WorkspaceWindow: React.FC<RouteComponentProps<ContextWorkspaceParams>> = (
   useBodyScrollLock(active && !isDesktop(layout));
 
   const toggleWindowState = () => {
-    maximized ? updateWindowSize(WorkspaceWindowState.minimized) : updateWindowSize(WorkspaceWindowState.maximized);
+    maximized ? updateWindowSize('minimized') : updateWindowSize('maximized');
   };
 
   const workspacesToRender = useMemo(() => {
@@ -85,7 +85,7 @@ const WorkspaceWindow: React.FC<RouteComponentProps<ContextWorkspaceParams>> = (
                 iconDescription={t('hide', 'Hide')}
                 hasIconOnly
                 kind="ghost"
-                onClick={() => updateWindowSize(WorkspaceWindowState.hidden)}
+                onClick={() => updateWindowSize('hidden')}
                 renderIcon={ArrowRight16}
                 tooltipPosition="bottom"
                 tooltipAlignment="end"
