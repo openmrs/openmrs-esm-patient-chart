@@ -1,14 +1,16 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import FormView from './form-view.component';
 import styles from './forms.component.scss';
 import EmptyFormView from './empty-form.component';
-import { ContentSwitcher, Switch, DataTableSkeleton, InlineLoading } from 'carbon-components-react';
-import { CardHeader, ErrorState } from '@openmrs/esm-patient-common-lib';
+import { ContentSwitcher, Switch, DataTableSkeleton, InlineLoading, Tag } from 'carbon-components-react';
+import { CardHeader, ErrorState, PatientProgram } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { useForms } from '../hooks/use-forms';
-import { useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { useConfig, useLayoutType, useVisit } from '@openmrs/esm-framework';
 import { isValidOfflineFormEncounter } from '../offline-forms/offline-form-helpers';
 import { ConfigObject } from '../config-schema';
+import { useProgramConfig } from '../hooks/use-program-config';
+import dayjs from 'dayjs';
 
 const enum FormsCategory {
   Recommended,
@@ -23,18 +25,36 @@ interface FormsProps {
   pageUrl: string;
   urlLabel: string;
   isOffline: boolean;
+  activePatientEnrollment?: Array<PatientProgram>;
 }
 
 const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, urlLabel, isOffline }) => {
   const { t } = useTranslation();
-  const config = useConfig() as ConfigObject;
+  const { htmlFormEntryForms, showRecommendedFormsTab } = useConfig() as ConfigObject;
   const headerTitle = t('forms', 'Forms');
   const isTablet = useLayoutType() === 'tablet';
-  const [formsCategory, setFormsCategory] = useState(FormsCategory.All);
+  const [formsCategory, setFormsCategory] = useState(
+    showRecommendedFormsTab ? FormsCategory.Recommended : FormsCategory.All,
+  );
   const { isValidating, data, error } = useForms(patientUuid, undefined, undefined, isOffline);
   const formsToDisplay = isOffline
-    ? data?.filter((formInfo) => isValidOfflineFormEncounter(formInfo.form, config.htmlFormEntryForms))
+    ? data?.filter((formInfo) => isValidOfflineFormEncounter(formInfo.form, htmlFormEntryForms))
     : data;
+  const { currentVisit } = useVisit(patientUuid);
+  const { programConfigs } = useProgramConfig(patientUuid, showRecommendedFormsTab);
+
+  const recommendedForms = useMemo(
+    () =>
+      formsToDisplay
+        ?.filter(({ form }) =>
+          Object.values(programConfigs)
+            .flatMap((programConfig) => programConfig.visitTypes)
+            ?.find((visitType) => visitType.uuid === currentVisit?.visitType.uuid)
+            ?.encounterTypes.some(({ uuid }) => uuid === form.encounterType.uuid),
+        )
+        .filter(({ lastCompleted }) => (lastCompleted === undefined ? true : !dayjs(lastCompleted).isToday())),
+    [currentVisit?.visitType.uuid, formsToDisplay, programConfigs],
+  );
 
   if (!formsToDisplay && !error) {
     return <DataTableSkeleton role="progressbar" rowCount={5} />;
@@ -71,7 +91,10 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
       <div style={{ width: '100%' }}>
         {formsCategory === FormsCategory.Completed && (
           <FormView
-            forms={formsToDisplay.filter((formInfo) => formInfo.associatedEncounters.length > 0)}
+            forms={formsToDisplay.filter(
+              ({ associatedEncounters, lastCompleted }) =>
+                associatedEncounters.length > 0 && dayjs(lastCompleted).isToday(),
+            )}
             patientUuid={patientUuid}
             patient={patient}
             pageSize={pageSize}
@@ -89,8 +112,16 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
             urlLabel={urlLabel}
           />
         )}
+
         {formsCategory === FormsCategory.Recommended && (
-          <EmptyFormView action={t('noRecommendedFormsAvailable', 'No recommended forms available at the moment')} />
+          <FormView
+            forms={recommendedForms}
+            patientUuid={patientUuid}
+            patient={patient}
+            pageSize={pageSize}
+            pageUrl={pageUrl}
+            urlLabel={urlLabel}
+          />
         )}
       </div>
     </div>
