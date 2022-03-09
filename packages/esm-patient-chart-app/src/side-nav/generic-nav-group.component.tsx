@@ -1,8 +1,14 @@
-import { useConfig } from '@openmrs/esm-framework';
-import { AccordionExtension } from '@openmrs/esm-patient-common-lib';
 import React from 'react';
+import { useConfig } from '@openmrs/esm-framework';
+import { DashboardGroupExtension } from '@openmrs/esm-patient-common-lib';
 
-export default function GenericNavGroup() {
+interface GenericNavGroupProps {
+  basePath: string;
+}
+
+export default function GenericNavGroup({ basePath }: GenericNavGroupProps) {
   const config = useConfig();
-  return <AccordionExtension title={config.navGroup.title} slotName={config.navGroup.slotName} />;
+  return (
+    <DashboardGroupExtension title={config.navGroup.title} slotName={config.navGroup.slotName} basePath={basePath} />
+  );
 }

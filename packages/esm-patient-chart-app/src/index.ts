@@ -55,15 +55,6 @@ function setupOpenMRS() {
         offline: true,
       },
       {
-        name: 'patient-chart-nav-items',
-        load: getAsyncLifecycle(() => import('./side-nav/nav.component'), {
-          featureName: 'nav-items',
-          moduleName,
-        }),
-        online: true,
-        offline: true,
-      },
-      {
         name: 'start-visit-button',
         slot: 'patient-actions-slot',
         load: getAsyncLifecycle(() => import('./actions-buttons/start-visit.component'), {
