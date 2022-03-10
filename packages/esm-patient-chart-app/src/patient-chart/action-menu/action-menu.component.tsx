@@ -1,11 +1,10 @@
-import Edit20 from '@carbon/icons-react/es/edit/20';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Pen20 from '@carbon/icons-react/es/pen/20';
 import WarningFilled16 from '@carbon/icons-react/es/warning--filled/16';
 import { ExtensionSlot, useLayoutType } from '@openmrs/esm-framework';
 import { useWorkspaceWindowSize, useWorkspaces } from '@openmrs/esm-patient-common-lib';
 import { Button, HeaderPanel } from 'carbon-components-react';
-import React from 'react';
-import { useTranslation } from 'react-i18next';
 import { isDesktop } from '../../utils';
 import styles from './action-menu.scss';
 
@@ -49,13 +48,7 @@ export const ActionMenu: React.FC<ActionMenuInterface> = ({ open }) => {
       </Button>
     </aside>
   ) : (
-    <Button className={styles.actionBtn}>
-      <div>
-        <Edit20 />
-        {windowSize.size === 'hidden' && <WarningFilled16 className={styles.warningButton} />}
-      </div>
-      <span>{t('careActivities', 'Care Activities')}</span>
-    </Button>
+    <ExtensionSlot className={styles.extensionStyles} extensionSlotName={'action-menu-items-slot'} />
   );
 
   return (

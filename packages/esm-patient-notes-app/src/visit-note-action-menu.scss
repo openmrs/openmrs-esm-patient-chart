@@ -2,17 +2,14 @@
 @import "~carbon-components/src/globals/scss/vars";
 @import "~carbon-components/src/globals/scss/mixins";
 
-.button {
-  height: 4rem;
-  display: flex;
-  align-content: flex-start;
-  align-items: baseline;
-  min-width: 50%;
-}
-
-.container {
+.visitNoteNavContainer {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  height: calc(100vh - 6rem);
+  justify-content: center;
+  align-items: center;
+  &>span {
+    margin-top: $spacing-02;
+    @include carbon--type-style("body-short-01");
+    color: $text-02;
+  }
 }

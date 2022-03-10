@@ -57,6 +57,12 @@ function setupOpenMRS() {
         load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
         meta: dashboardMeta,
       },
+      {
+        name: 'order-navigation-button',
+        slot: 'action-menu-items-slot',
+        load: getAsyncLifecycle(() => import('./medications-summary/medication-order-action-menu.component'), options),
+        order: 0,
+      },
     ],
   };
 }

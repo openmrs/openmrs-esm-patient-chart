@@ -1,5 +1,4 @@
 import React from 'react';
-import FloatingOrderBasketButton from './floating-order-basket-button.component';
 import MedicationsDetailsTable from '../components/medications-details-table.component';
 import { DataTableSkeleton } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
@@ -74,7 +73,6 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
           return <EmptyState displayText={displayText} headerTitle={headerTitle} />;
         })()}
       </div>
-      <FloatingOrderBasketButton />
     </>
   );
 }

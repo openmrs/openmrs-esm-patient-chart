@@ -1,0 +1,37 @@
+@import "~@openmrs/esm-styleguide/src/vars";
+@import "~carbon-components/src/globals/scss/vars";
+@import "~carbon-components/src/globals/scss/mixins";
+
+.elementContainer {
+  display: flex;
+  align-items: center;
+  position: relative;
+
+  svg {
+    margin: auto 10px auto 20px;
+  }
+
+  .countTag {
+    position: absolute;
+    transform: scale(0.7);
+    min-width: initial;
+    min-height: initial;
+    background-color: $carbon--red-50;
+    color: white;
+    right: -10px;
+    top: -15px;
+  }
+}
+
+.orderNavButtonContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  &>span {
+    margin-top: $spacing-02;
+    @include carbon--type-style("body-short-01");
+    color: $text-02;
+  }
+}

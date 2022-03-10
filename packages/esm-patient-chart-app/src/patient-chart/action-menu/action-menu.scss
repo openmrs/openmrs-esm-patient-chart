@@ -30,7 +30,7 @@ $actionPanelOffset: 48px;
   background-color: $ui-02;
 }
 
-.actionBtn :global(.bx--btn.bx--btn--icon-only.bx--tooltip__trigger:focus){
+.actionBtn :global(.bx--btn.bx--btn--icon-only.bx--tooltip__trigger:focus) {
   border-color: var(--brand-03);
 }
 
@@ -56,10 +56,10 @@ $actionPanelOffset: 48px;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  
+
 }
 
-.actionBtn > div {
+.actionBtn>div {
   margin-right: 0.25rem;
   height: 40px;
   width: 36px;
@@ -67,7 +67,7 @@ $actionPanelOffset: 48px;
   position: relative;
 }
 
-.actionBtn > span {
+.actionBtn>span {
   @extend .productiveHeading01;
 }
 
@@ -96,4 +96,50 @@ $actionPanelOffset: 48px;
 :global(.omrs-breakpoint-lt-desktop) .warningButton [data-icon-path="inner-path"] {
   fill: $ui-02 !important;
   opacity: 1;
+}
+
+.section {
+  display: flex;
+  background-color: $ui-02;
+  width: 100%;
+  position: fixed;
+  bottom: 0;
+  height: $spacing-10;
+  border-top: $spacing-01 solid $ui-03;
+  z-index: 3000;
+
+
+  &>div {
+    width: 25%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+    &>span {
+      margin-top: $spacing-02;
+      @include carbon--type-style("body-short-01");
+      color: $text-02;
+    }
+  }
+}
+
+.extensionStyles {
+  display: flex;
+  background-color: $ui-02;
+  width: 100%;
+  position: fixed !important;
+  bottom: 0;
+  height: $spacing-10;
+  border-top: $spacing-01 solid $ui-03;
+
+  &>div {
+    width: 25%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
 }
