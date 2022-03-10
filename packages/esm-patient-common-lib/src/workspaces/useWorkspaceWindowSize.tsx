@@ -12,18 +12,18 @@ interface WorkspaceWindowSizeContext {
   active: boolean;
 }
 
-const reducer = (state: WorkspaceWindowSize, action: WorkspaceWindowState) => {
+function reducer(state: WorkspaceWindowSize, action: WorkspaceWindowState): WorkspaceWindowSize {
   switch (action) {
-    case WorkspaceWindowState.minimized:
-    case WorkspaceWindowState.reopened:
-      return { size: WorkspaceWindowState.normal };
+    case 'minimized':
+    case 'reopened':
+      return { size: 'normal' };
     default:
       return { size: action };
   }
-};
+}
 
 const WorkspaceWindowSizeContext = createContext<WorkspaceWindowSizeContext>({
-  windowSize: { size: WorkspaceWindowState.normal },
+  windowSize: { size: 'normal' },
   active: false,
 });
 
@@ -33,15 +33,15 @@ export const useWorkspaceWindowSize = () => {
 };
 
 export const WorkspaceWindowSizeProvider: React.FC = ({ children }) => {
-  const initialValue: WorkspaceWindowSize = { size: WorkspaceWindowState.normal };
+  const initialValue: WorkspaceWindowSize = { size: 'normal' };
   const [contextWorkspaceWindowSize, updateContextWorkspaceWindowSize] = React.useReducer(reducer, initialValue);
   const { workspaces, windowState, active } = useWorkspaces();
 
   useEffect(() => {
-    if (workspaces.length > 0 && windowState === WorkspaceWindowState.maximized) {
-      updateContextWorkspaceWindowSize(WorkspaceWindowState.maximized);
+    if (workspaces.length > 0 && windowState === 'maximized') {
+      updateContextWorkspaceWindowSize('maximized');
     } else {
-      updateContextWorkspaceWindowSize(WorkspaceWindowState.reopened);
+      updateContextWorkspaceWindowSize('reopened');
     }
   }, [workspaces.length, windowState]);
 

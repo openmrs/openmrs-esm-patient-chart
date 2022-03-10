@@ -2,7 +2,7 @@ import Edit20 from '@carbon/icons-react/es/edit/20';
 import Pen20 from '@carbon/icons-react/es/pen/20';
 import WarningFilled16 from '@carbon/icons-react/es/warning--filled/16';
 import { ExtensionSlot, useLayoutType } from '@openmrs/esm-framework';
-import { useWorkspaceWindowSize, useWorkspaces, WorkspaceWindowState } from '@openmrs/esm-patient-common-lib';
+import { useWorkspaceWindowSize, useWorkspaces } from '@openmrs/esm-patient-common-lib';
 import { Button, HeaderPanel } from 'carbon-components-react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -21,10 +21,10 @@ export const ActionMenu: React.FC<ActionMenuInterface> = ({ open }) => {
 
   const toggleViewMode = () => {
     if (active) {
-      if (windowSize.size === WorkspaceWindowState.maximized) {
-        updateWindowSize(WorkspaceWindowState.hidden);
-      } else if (windowSize.size === WorkspaceWindowState.normal) {
-        updateWindowSize(WorkspaceWindowState.hidden);
+      if (windowSize.size === 'maximized') {
+        updateWindowSize('hidden');
+      } else if (windowSize.size === 'normal') {
+        updateWindowSize('hidden');
       } else {
         updateWindowSize(windowState);
       }
@@ -44,8 +44,7 @@ export const ActionMenu: React.FC<ActionMenuInterface> = ({ open }) => {
         tooltipAlignment="end"
       >
         <>
-          <Pen20 />{' '}
-          {windowSize.size === WorkspaceWindowState.hidden && <WarningFilled16 className={styles.warningButton} />}
+          <Pen20 /> {windowSize.size === 'hidden' && <WarningFilled16 className={styles.warningButton} />}
         </>
       </Button>
     </aside>
@@ -53,7 +52,7 @@ export const ActionMenu: React.FC<ActionMenuInterface> = ({ open }) => {
     <Button className={styles.actionBtn}>
       <div>
         <Edit20 />
-        {windowSize.size === WorkspaceWindowState.hidden && <WarningFilled16 className={styles.warningButton} />}
+        {windowSize.size === 'hidden' && <WarningFilled16 className={styles.warningButton} />}
       </div>
       <span>{t('careActivities', 'Care Activities')}</span>
     </Button>

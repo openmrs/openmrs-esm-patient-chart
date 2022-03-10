@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Redirect } from 'react-router-dom';
-import { useExtensionSlotMeta } from '@openmrs/esm-framework';
+import { useExtensionSlotMeta, useExtensionStore } from '@openmrs/esm-framework';
+import { useNavGroups } from '@openmrs/esm-patient-common-lib';
 import { basePath } from '../../constants';
 import { DashboardView, DashboardConfig } from './dashboard-view.component';
 
@@ -25,8 +26,17 @@ interface ChartReviewProps {
 }
 
 const ChartReview: React.FC<ChartReviewProps> = ({ patientUuid, patient, view }) => {
-  const meta = useExtensionSlotMeta('patient-chart-dashboard-slot');
-  const dashboards = Object.values(meta) as Array<DashboardConfig>;
+  const extensionStore = useExtensionStore();
+  const { navGroups } = useNavGroups();
+
+  const ungroupedDashboards = extensionStore.slots['patient-chart-dashboard-slot'].assignedExtensions.map(
+    (e) => e.meta,
+  );
+  const groupedDashboards = navGroups
+    .map((slotName) => extensionStore.slots[slotName].assignedExtensions.map((e) => e.meta))
+    .flat();
+  const dashboards = ungroupedDashboards.concat(groupedDashboards) as Array<DashboardConfig>;
+
   const defaultDashboard = dashboards[0];
   const dashboard = dashboards.find((dashboard) => dashboard.name === view);
 

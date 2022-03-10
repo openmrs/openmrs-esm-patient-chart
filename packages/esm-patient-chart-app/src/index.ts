@@ -55,15 +55,6 @@ function setupOpenMRS() {
         offline: true,
       },
       {
-        name: 'patient-chart-nav-items',
-        load: getAsyncLifecycle(() => import('./side-nav/nav.component'), {
-          featureName: 'nav-items',
-          moduleName,
-        }),
-        online: true,
-        offline: true,
-      },
-      {
         name: 'start-visit-button',
         slot: 'patient-actions-slot',
         load: getAsyncLifecycle(() => import('./actions-buttons/start-visit.component'), {
@@ -137,6 +128,13 @@ function setupOpenMRS() {
         order: 1,
         load: getAsyncLifecycle(() => import('./patient-details-tile/patient-details-tile.component'), {
           featureName: 'patient-details-tile',
+          moduleName,
+        }),
+      },
+      {
+        name: 'nav-group',
+        load: getAsyncLifecycle(() => import('./side-nav/generic-nav-group.component'), {
+          featureName: 'Nav group',
           moduleName,
         }),
       },
