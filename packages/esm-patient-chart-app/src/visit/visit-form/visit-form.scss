@@ -21,6 +21,10 @@
   margin: 0 0 $spacing-03 0;
 }
 
+.dateTimeSection {
+  display: flex;
+}
+
 .radioButton {
   margin: $spacing-05 0;
 }
@@ -75,5 +79,11 @@
 :global(.omrs-breakpoint-lt-desktop) {
   .form {
     height: calc(100vh - 3rem);
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .dateTimeSection {
+    flex-direction: column;
   }
 }
