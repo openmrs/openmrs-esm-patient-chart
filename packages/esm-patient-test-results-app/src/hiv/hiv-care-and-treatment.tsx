@@ -7,6 +7,7 @@ import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { useGetManyObstreeData } from '../new-timeline/useObstreeData';
 import styles from '../new-timeline/new-timeline.scss';
 import { useConfig } from '@openmrs/esm-framework';
+import DesktopView from '../desktop-view/desktop-view.component';
 
 export interface ConfigObject {
   title: string;
@@ -21,10 +22,6 @@ export interface ConfigObject {
   };
 }
 
-interface obsShape {
-  [key: string]: any;
-}
-
 const HIVCareAndTreatment = () => {
   const config = useConfig();
   const conceptUuids = config.concepts.map((c) => c.conceptUuid);
@@ -32,6 +29,7 @@ const HIVCareAndTreatment = () => {
   const { roots, loading, errors } = useGetManyObstreeData(conceptUuids);
 
   const [view, setView] = useState<string>('split');
+  const [leftContent, setLeftContent] = useState<string>('tree');
 
   const expanded = view === 'full';
 
@@ -50,7 +48,7 @@ const HIVCareAndTreatment = () => {
               <div style={{ display: 'flex' }}>
                 <h4 style={{ flexGrow: 1 }}>Results</h4>
                 <div style={{ minWidth: '10rem' }}>
-                  <ContentSwitcher>
+                  <ContentSwitcher selectedIndex={1} onChange={(e) => setLeftContent(`${e.name}`)}>
                     <Switch name="panel" text="Panel" />
                     <Switch name="tree" text="Tree" />
                   </ContentSwitcher>
@@ -68,7 +66,8 @@ const HIVCareAndTreatment = () => {
           </Row>
           <Row style={{ height: '100%' }}>
             <Column sm={16} lg={expanded ? 0 : 6} className={styles['column-panel']}>
-              <FilterSet />
+              {leftContent === 'tree' && <FilterSet />}
+              {leftContent === 'panel' && <DesktopView />}
             </Column>
             <Column sm={16} lg={expanded ? 12 : 6} className={styles['column-panel']}>
               <NewTimeline />
