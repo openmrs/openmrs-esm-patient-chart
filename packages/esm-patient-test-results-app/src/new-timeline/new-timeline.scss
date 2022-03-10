@@ -3,6 +3,32 @@
 @import "~carbon-components/src/globals/scss/vars";
 @import "~carbon-components/src/globals/scss/mixins";
 
+.results-header {
+  padding: 0.8rem 0;
+  //position: sticky;
+  //top: 45px;
+  z-index: 10;
+  background-color: $openmrs-background-grey;
+}
+
+.column-panel {
+  overflow-y: scroll;
+  height: calc(100vh - 9rem)
+}
+
+.date-header {
+  position: sticky;
+  top: 0px;
+  display: grid;
+  background-color: white;
+  overflow-x: auto;
+  z-index: 9;
+}
+
+.date-header::-webkit-scrollbar {
+  display: none;
+}
+
 .grid {
   width: fit-content;
   background-color: $color-gray-30;
@@ -49,26 +75,30 @@
   }
 }
 
-.recent-results-grid {
-  display: grid;
-  background-color: white;
-  overflow-x: auto;
-  position: sticky;
-  top: 0;
-}
 
-.recent-results-grid::-webkit-scrollbar {
-  display: none;
+.grid-container {
+  padding: 0;
+  box-sizing: border-box;
+  display: grid;
+  grid-auto-flow: row;
+  column-gap: 1px;
+  row-gap: 0px;
+  background-color: $color-gray-30;
+  grid-template: auto auto / 9em auto;
+  border-collapse: collapse;
+  overflow-x: auto;
+  width: 100%;
+  background-color: white;
 }
 
 
 .row-header {
-  @extend .timeline-cell;
-  justify-items: baseline;
-  align-items: center;
-  background-color: $color-gray-30;
-  grid-column: span 2 / auto;
+  overflow: hidden;
+  align-self: flex-start;
+  background-color: $ui-03;
+  padding: 0.6rem 1rem;
 }
+
 
 .row-start-cell {
   @extend .timeline-cell;
@@ -88,18 +118,6 @@
   background-color: $ui-03;
 }
 
-.date-header {
-  position: sticky;
-  top: 45px;
-  display: grid;
-  background-color: white;
-  overflow-x: auto;
-  z-index: 9;
-}
-
-.date-header::-webkit-scrollbar {
-  display: none;
-}
 
 .date-header-container {
   position: sticky;
@@ -115,19 +133,17 @@
   border-collapse: collapse;
 }
 
-.grid-container {
-  padding: 0;
-  box-sizing: border-box;
-
-  display: grid;
-  grid-auto-flow: row;
-  column-gap: 1px;
-  row-gap: 0px;
-  background-color: $color-gray-30;
-  grid-template: auto auto / 9em auto;
-  border-collapse: collapse;
+.date-header-inner {
+  overflow-x: auto;
+}
+.date-header-inner::-webkit-scrollbar {
+  display: none;
 }
 
+
+.date-header::-webkit-scrollbar {
+  display: none;
+}
 .date-header-container::-webkit-scrollbar {
   display: none;
 }

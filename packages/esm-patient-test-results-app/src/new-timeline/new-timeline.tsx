@@ -167,7 +167,7 @@ const DateHeaderGrid: React.FC<DateHeaderGridProps> = ({
   }, [handleScroll]);
 
   return (
-    <div ref={ref} style={{ overflowX: 'scroll' }}>
+    <div ref={ref} style={{ overflowX: 'auto' }} className={styles['date-header-inner']}>
       <Grid
         dataColumns={timeColumns.length}
         style={{
@@ -204,7 +204,7 @@ const DateHeaderGrid: React.FC<DateHeaderGridProps> = ({
   );
 };
 
-const TimelineDataGroup = ({ parent, subRows, xScroll, setXScroll }) => {
+const TimelineDataGroup = ({ parent, subRows, xScroll, setXScroll, panelName, setPanelName, groupNumber }) => {
   const { timelineData } = useContext(FilterContext);
   const {
     data: {
@@ -214,8 +214,12 @@ const TimelineDataGroup = ({ parent, subRows, xScroll, setXScroll }) => {
   } = timelineData;
 
   const ref = useRef();
+  const titleRef = useRef();
 
   const el: HTMLElement | null = ref.current;
+  if (groupNumber === 1 && panelName === '') {
+    setPanelName(parent.display);
+  }
 
   if (el) {
     el.scrollLeft = xScroll;
@@ -233,13 +237,31 @@ const TimelineDataGroup = ({ parent, subRows, xScroll, setXScroll }) => {
     }
   }, [handleScroll]);
 
+  const onIntersect = (entries, observer) => {
+    entries.forEach((entry) => {
+      if (entry.intersectionRatio > 0.5) {
+        //setPanelName(parent.display);
+      }
+    });
+  };
+
+  const observer = new IntersectionObserver(onIntersect, {
+    root: null,
+    threshold: 0.5,
+  });
+  if (titleRef.current) {
+    observer.observe(titleRef.current);
+  }
+
   return (
     <>
-      <div className={styles['recent-results-grid']} ref={ref}>
-        <div className={styles['grid-container']}>
+      <div>
+        {groupNumber > 1 && (
           <div className={styles['row-header']}>
-            <h6 style={{ position: 'sticky', left: 0, padding: '0.2rem' }}>{parent.display}</h6>
+            <h6 ref={titleRef}>{parent.display}</h6>
           </div>
+        )}
+        <div className={styles['grid-container']} ref={ref}>
           <NewDataRows
             {...{
               timeColumns,
@@ -258,8 +280,9 @@ const TimelineDataGroup = ({ parent, subRows, xScroll, setXScroll }) => {
 
 export const NewTimeline = () => {
   const { activeTests, timelineData, parents, checkboxes, someChecked, lowestParents } = useContext(FilterContext);
-  const [currentPanel, setCurrentPanel] = useState(lowestParents?.[0]?.display || 'Timeline');
+  const [panelName, setPanelName] = useState('');
   const [xScroll, setXScroll] = useState(0);
+  let shownGroups = 0;
 
   const {
     data: {
@@ -269,15 +292,19 @@ export const NewTimeline = () => {
     loaded,
   } = timelineData;
 
+  useEffect(() => {
+    setPanelName('');
+  }, [rowData]);
+
   if (rowData && rowData?.length === 0) {
     return <EmptyState displayText={'timeline data'} headerTitle="Data Timeline" />;
   }
   if (activeTests && timelineData && loaded) {
     return (
-      <div>
+      <>
         <div className={styles['date-header']}>
           <div className={styles['date-header-container']}>
-            <PanelNameCorner showShadow={true} panelName={currentPanel} />
+            <PanelNameCorner showShadow={true} panelName={panelName} />
             <DateHeaderGrid
               {...{
                 timeColumns,
@@ -293,6 +320,7 @@ export const NewTimeline = () => {
         <div>
           {lowestParents?.map((parent, index) => {
             if (parents[parent.flatName].some((kid) => checkboxes[kid]) || !someChecked) {
+              shownGroups += 1;
               const subRows = someChecked
                 ? rowData?.filter((row) => parents[parent.flatName].includes(row.flatName) && checkboxes[row.flatName])
                 : rowData?.filter((row) => parents[parent.flatName].includes(row.flatName));
@@ -305,12 +333,15 @@ export const NewTimeline = () => {
                   key={index}
                   xScroll={xScroll}
                   setXScroll={setXScroll}
+                  panelName={panelName}
+                  setPanelName={setPanelName}
+                  groupNumber={shownGroups}
                 />
               );
             } else return null;
           })}
         </div>
-      </div>
+      </>
     );
   }
   return null;

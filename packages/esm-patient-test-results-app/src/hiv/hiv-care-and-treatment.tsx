@@ -5,6 +5,7 @@ import { FilterProvider } from '../filter/filter-context';
 import NewTimeline from '../new-timeline/new-timeline';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import useGetObstreeData from '../new-timeline/useObstreeData';
+import styles from '../new-timeline/new-timeline.scss';
 
 interface obsShape {
   [key: string]: any;
@@ -28,7 +29,7 @@ const HIVCareAndTreatment = () => {
     return (
       <FilterProvider root={root}>
         <div style={{ padding: 0 }}>
-          <Row style={{ padding: '1rem 0' }}>
+          <Row className={styles['results-header']}>
             <Column sm={16} lg={expanded ? 0 : 6}>
               <div style={{ display: 'flex' }}>
                 <h4 style={{ flexGrow: 1 }}>Results</h4>
@@ -49,11 +50,11 @@ const HIVCareAndTreatment = () => {
               </div>
             </Column>
           </Row>
-          <Row>
-            <Column sm={16} lg={expanded ? 0 : 6}>
+          <Row style={{ height: '100%' }}>
+            <Column sm={16} lg={expanded ? 0 : 6} className={styles['column-panel']}>
               <FilterSet />
             </Column>
-            <Column sm={16} lg={expanded ? 12 : 6}>
+            <Column sm={16} lg={expanded ? 12 : 6} className={styles['column-panel']}>
               <NewTimeline />
             </Column>
           </Row>
