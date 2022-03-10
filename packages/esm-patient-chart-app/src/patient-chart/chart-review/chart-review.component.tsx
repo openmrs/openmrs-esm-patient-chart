@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Redirect } from 'react-router-dom';
-import { useExtensionSlotMeta, useExtensionStore } from '@openmrs/esm-framework';
+import { useExtensionStore } from '@openmrs/esm-framework';
 import { useNavGroups } from '@openmrs/esm-patient-common-lib';
 import { basePath } from '../../constants';
 import { DashboardView, DashboardConfig } from './dashboard-view.component';
