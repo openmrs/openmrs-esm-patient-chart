@@ -23,10 +23,6 @@
   margin: $spacing-02 0;
 }
 
-.filterContainerExpanded {
-  border-left: 0.3rem solid var(--brand-01);
-}
-
 .filterNode {
   padding: 1rem;
 }
@@ -37,6 +33,7 @@
 
 .nestedAccordion > :global(.bx--accordion--start) > :global(.bx--accordion__item--active) {
   border-left: 0.3rem solid var(--brand-01);
+  margin: 1.5rem 0;
 }
 
 .nestedAccordion :global {

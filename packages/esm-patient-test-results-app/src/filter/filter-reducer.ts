@@ -45,12 +45,28 @@ const computeParents = (prefix, node) => {
 const reducer = (state, action) => {
   switch (action.type) {
     case 'initialize':
-      const { parents, leaves, tests, lowestParents } = computeParents('', action.tree);
+      let parents = {},
+        leaves = [],
+        tests = [],
+        lowestParents = [];
+      action.trees?.forEach((tree) => {
+        // if anyone knows a shorthand for this i'm stoked to learn it :)
+        const {
+          parents: newParents,
+          leaves: newLeaves,
+          tests: newTests,
+          lowestParents: newLP,
+        } = computeParents('', tree);
+        parents = { ...parents, ...newParents };
+        leaves = [...leaves, ...newLeaves];
+        tests = [...tests, ...newTests];
+        lowestParents = [...lowestParents, ...newLP];
+      });
       const flatTests = Object.fromEntries(tests);
       return {
         checkboxes: Object.fromEntries(leaves?.map((leaf) => [leaf, false])) || {},
         parents: parents,
-        root: action.tree,
+        roots: action.trees,
         tests: flatTests,
         lowestParents: lowestParents,
       };

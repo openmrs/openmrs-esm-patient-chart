@@ -1,6 +1,7 @@
 import { usePatient, openmrsFetch } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
 import useSWR from 'swr';
+import useSWRInfinite from 'swr/infinite';
 import { assessValue, exist } from '../loadPatientTestData/helpers';
 
 export const getName = (prefix, name) => {
@@ -45,4 +46,44 @@ const useGetObstreeData = (conceptUuid) => {
   return result;
 };
 
+const useGetManyObstreeData = (uuidArray) => {
+  const { patientUuid } = usePatient();
+  const getObstreeUrl = (index) => {
+    if (index < uuidArray.length && patientUuid) {
+      return `/ws/rest/v1/obstree?patient=${patientUuid}&concept=${uuidArray[index]}`;
+    } else return null;
+  };
+  const { data } = useSWRInfinite(getObstreeUrl, openmrsFetch, { initialSize: uuidArray.length });
+
+  const result = useMemo(() => {
+    return (
+      data?.map((resp) => {
+        if (resp?.data) {
+          const { data, ...rest } = resp;
+          const newData = augmentObstreeData(data, '');
+          return { ...rest, loading: false, data: newData };
+        } else {
+          return {
+            data: {},
+            error: false,
+            loading: true,
+          };
+        }
+      }) || [
+        {
+          data: {},
+          error: false,
+          loading: true,
+        },
+      ]
+    );
+  }, [data]);
+  const roots = result.map((item) => item.data);
+  const loading = result.some((item) => item.loading);
+  const errors = result.filter((item) => item.error)?.map((item) => item.error) || [];
+
+  return { roots, loading, errors };
+};
+
 export default useGetObstreeData;
+export { useGetManyObstreeData };

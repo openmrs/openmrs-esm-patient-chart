@@ -6,7 +6,7 @@ import { TreeNode } from './filter-set';
 const initialState = {
   checkboxes: {},
   parents: {},
-  root: { display: '', flatName: '' },
+  roots: [{ display: '', flatName: '' }],
   tests: {},
   lowestParents: [],
 };
@@ -25,13 +25,13 @@ const initialContext = {
 interface StateProps {
   checkboxes: { [key: string]: boolean };
   parents: { [key: string]: string[] };
-  root: { [key: string]: any };
+  roots: { [key: string]: any }[];
 }
 interface FilterContextProps {
   state: StateProps;
   checkboxes: { [key: string]: boolean };
   parents: { [key: string]: string[] };
-  root: TreeNode;
+  roots: TreeNode[];
   tests: { [key: string]: any };
   lowestParents: { display: string; flatName: string }[];
   timelineData: { [key: string]: any };
@@ -43,7 +43,7 @@ interface FilterContextProps {
 }
 
 interface FilterProviderProps {
-  root: any;
+  roots: any[];
   children: React.ReactNode;
 }
 
@@ -53,12 +53,12 @@ interface obsShape {
 
 const FilterContext = createContext<FilterContextProps>(initialContext);
 
-const FilterProvider = ({ root, children }: FilterProviderProps) => {
+const FilterProvider = ({ roots, children }: FilterProviderProps) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const actions = useMemo(
     () => ({
-      initialize: (tree) => dispatch({ type: 'initialize', tree: tree }),
+      initialize: (trees) => dispatch({ type: 'initialize', trees: trees }),
       toggleVal: (name) => {
         dispatch({ type: 'toggleVal', name: name });
       },
@@ -107,10 +107,10 @@ const FilterProvider = ({ root, children }: FilterProviderProps) => {
   }, [activeTests, state.tests]);
 
   useEffect(() => {
-    if (root?.display && !Object.keys(state?.checkboxes).length) {
-      actions.initialize(root);
+    if (roots?.length && !Object.keys(state?.checkboxes).length) {
+      actions.initialize(roots);
     }
-  }, [actions, state, root]);
+  }, [actions, state, roots]);
 
   return (
     <FilterContext.Provider
@@ -118,7 +118,7 @@ const FilterProvider = ({ root, children }: FilterProviderProps) => {
         state,
         checkboxes: state.checkboxes,
         parents: state.parents,
-        root: state.root,
+        roots: state.roots,
         tests: state.tests,
         lowestParents: state.lowestParents,
         timelineData,

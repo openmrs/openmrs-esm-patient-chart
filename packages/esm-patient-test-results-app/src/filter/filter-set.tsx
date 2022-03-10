@@ -1,7 +1,8 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import styles from './filter-set.scss';
 import { Accordion, AccordionItem, Checkbox } from 'carbon-components-react';
 import FilterContext from './filter-context';
+import { useConfig } from '@openmrs/esm-framework';
 
 interface Observation {
   display: string;
@@ -31,12 +32,17 @@ const isIndeterminate = (kids, checkboxes) => {
 };
 
 const FilterSet = () => {
-  const { root } = useContext(FilterContext);
+  const { roots } = useContext(FilterContext);
+  const config = useConfig();
 
   return (
-    <div className={`${styles.filterContainer} ${styles.nestedAccordion}`}>
-      <FilterNode root={root} level={0} open />
-    </div>
+    <>
+      {roots?.map((root, index) => (
+        <div className={`${styles.filterContainer} ${styles.nestedAccordion}`}>
+          <FilterNode root={root} level={0} open={config.concepts[index].defaultOpen} />
+        </div>
+      ))}
+    </>
   );
 };
 
@@ -49,7 +55,7 @@ const FilterNode = ({ root, level, open }: FilterNodeProps) => {
       <AccordionItem
         title={
           <Checkbox
-            id={root?.display}
+            id={root?.flatName}
             checked={allChildrenChecked}
             indeterminate={indeterminate}
             labelText={`${root?.display} (${parents?.[root?.flatName]?.length})`}
