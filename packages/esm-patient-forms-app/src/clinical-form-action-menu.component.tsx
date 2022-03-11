@@ -11,7 +11,7 @@ const ClinicalFormActionMenu: React.FC = () => {
 
   if (layout === 'tablet')
     return (
-      <Button kind="ghost" className={styles.clinicalFormActionMenuContainer} onClick={() => {}}>
+      <Button kind="ghost" className={styles.container} onClick={() => {}}>
         <Document20 />
         <span>{t('clinicalForm', 'Clinical form')}</span>
       </Button>
@@ -19,6 +19,7 @@ const ClinicalFormActionMenu: React.FC = () => {
 
   return (
     <Button
+      className={styles.container}
       kind="ghost"
       renderIcon={Document20}
       hasIconOnly

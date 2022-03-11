@@ -2,14 +2,14 @@
 @import "~carbon-components/src/globals/scss/vars";
 @import "~carbon-components/src/globals/scss/mixins";
 
-.clinicalFormActionMenuContainer {
+.container {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   height: 100%;
   width: 100%;
-  color: $text-02;
+  color: $ui-05;
   max-width: none;
 
   &:hover {
@@ -21,6 +21,10 @@
     @include carbon--type-style("body-short-01");
     color: $text-02;
   }
+
+  & svg {
+    transform: scale(1.25);
+  }
 }
 
 /* Desktop */
@@ -29,9 +33,15 @@
     border: $spacing-02 solid;
     @include brand-03(border-color);
     border-radius: 50%;
+    background-color: $ui-02;
 
-    :focus {
-      @include brand-03(border-color);
+    &:focus {
+      border-color: var(--brand-03) !important;
+    }
+  }
+  .container {
+    & svg {
+      transform: scale(1.25);
     }
   }
 }

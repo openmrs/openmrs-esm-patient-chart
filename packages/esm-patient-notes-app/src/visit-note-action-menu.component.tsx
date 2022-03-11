@@ -19,7 +19,7 @@ const VisitNoteActionMenu: React.FC<VisitNoteActionMenuProps> = () => {
     return (
       <Button
         kind="ghost"
-        className={`${styles.visitNoteNavContainer} ${isActive ? styles.active : ''}`}
+        className={`${styles.container} ${isActive ? styles.active : ''}`}
         role="button"
         tabIndex={0}
         onClick={handleClick}
@@ -30,7 +30,7 @@ const VisitNoteActionMenu: React.FC<VisitNoteActionMenuProps> = () => {
     );
   return (
     <Button
-      className={isActive && styles.active}
+      className={`${styles.container} ${isActive && styles.active}`}
       onClick={handleClick}
       kind="ghost"
       renderIcon={Pen20}

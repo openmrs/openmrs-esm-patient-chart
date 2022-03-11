@@ -22,7 +22,7 @@ const MedicationOrderActionMenu: React.FC<MedicationActionMenuProps> = () => {
     return (
       <Button
         kind="ghost"
-        className={`${styles.orderNavButtonContainer} ${isActive ? styles.active : ''}`}
+        className={`${styles.container} ${isActive ? styles.active : ''}`}
         role="button"
         tabIndex={0}
         onClick={launchOrdersWorkspace}
