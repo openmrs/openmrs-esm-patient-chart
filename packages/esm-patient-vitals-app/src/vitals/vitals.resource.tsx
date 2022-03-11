@@ -1,6 +1,6 @@
 import useSWR from 'swr';
 import { PatientVitalsAndBiometrics } from './vitals-biometrics-form/vitals-biometrics-form.component';
-import { openmrsFetch, fhirBaseUrl, useConfig, FHIRResource, parseDate } from '@openmrs/esm-framework';
+import { openmrsFetch, fhirBaseUrl, useConfig, FHIRResource } from '@openmrs/esm-framework';
 import { ConfigObject } from '../config-schema';
 import { calculateBMI } from './vitals-biometrics-form/vitals-biometrics-form.utils';
 
