@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import ClinicalViewOverview from './clinical-view-overview.component';
+import { ExtensionSlot } from '@openmrs/esm-framework';
 
 const testProps = {
   patientUuid: mockPatient.id,
@@ -44,6 +45,9 @@ describe('ClinicalViewOverview: ', () => {
     mockClinicalViews.map((clinicalView) =>
       expect(screen.getByRole('tab', { name: clinicalView.slot })).toBeInTheDocument(),
     );
+    const breadCrampCheck = screen.getByRole('tab', { name: 'Breadcrumbs' });
+    userEvent.click(breadCrampCheck);
+    expect(screen.getByText('Edit Views')).toBeTruthy();
   });
 
   it('clicking the add button launches the `Add clinical views` form', () => {
