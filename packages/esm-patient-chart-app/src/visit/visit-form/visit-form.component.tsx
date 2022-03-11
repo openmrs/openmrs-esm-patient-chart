@@ -21,14 +21,11 @@ import {
 import { useTranslation } from 'react-i18next';
 import { first } from 'rxjs/operators';
 import {
-  getStartedVisit,
   saveVisit,
   showNotification,
   showToast,
   useLocations,
   useSessionUser,
-  VisitMode,
-  VisitStatus,
   ExtensionSlot,
   NewVisitPayload,
   toOmrsIsoString,
@@ -36,6 +33,7 @@ import {
   useLayoutType,
   useVisitTypes,
   useConfig,
+  useVisit,
 } from '@openmrs/esm-framework';
 import {
   amPm,
@@ -67,6 +65,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
   const allVisitTypes = useVisitTypes();
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
   const [enrollment, setEnrollment] = useState<PatientProgram>(activePatientEnrollment[0]);
+  const { mutate } = useVisit(patientUuid);
 
   useEffect(() => {
     if (locations && sessionUser?.sessionLocation?.uuid) {
@@ -105,13 +104,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
           (response) => {
             if (response.status === 201) {
               closeWorkspace();
-
-              getStartedVisit.next({
-                mode: VisitMode?.NEWVISIT,
-                visitData: response.data,
-                status: VisitStatus?.ONGOING,
-              });
-
+              mutate();
               showToast({
                 kind: 'success',
                 description: t('startVisitSuccessfully', 'Visit started successfully'),
@@ -145,7 +138,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
             <div className={styles.dateTimeSection}>
               <DatePicker
                 dateFormat="d/m/Y"
-                datePickerType="simple"
+                datePickerType="single"
                 id="visitDate"
                 light={isTablet}
                 style={{ paddingBottom: '1rem' }}
