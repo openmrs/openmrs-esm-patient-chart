@@ -7,17 +7,13 @@
   align-items: center;
   position: relative;
 
-  svg {
-    margin: auto 10px auto 20px;
-  }
-
   .countTag {
     position: absolute;
     transform: scale(0.7);
     min-width: initial;
     min-height: initial;
     background-color: $carbon--red-50;
-    color: white;
+    color: $ui-02;
     right: -10px;
     top: -15px;
   }
@@ -30,6 +26,12 @@
   align-items: center;
   height: 100%;
   width: 100%;
+  color: $text-02;
+  max-width: none;
+
+  &:hover {
+    color: $text-02;
+  }
 
   & > span {
     margin-top: $spacing-02;
@@ -38,12 +40,37 @@
   }
 }
 
-.active {
-  background-color: $color-blue-10;
-  color: $interactive-01;
+/* Desktop */
+:global(.omrs-breakpoint-gt-tablet) {
+  .active {
+    border: $spacing-02 solid;
+    @include brand-03(border-color);
+    border-radius: 50%;
+    background-color: $ui-02;
 
-  & > span {
+    &:focus {
+      border-color: var(--brand-03) !important;
+    }
+  }
+
+  .elementContainer {
+    color: $text-02;
+  }
+}
+
+/* Tablet */
+:global(.omrs-breakpoint-lt-desktop) {
+  .active {
+    background-color: $color-blue-10;
     color: $interactive-01;
-    @include carbon--type-style("productive-heading-01");
+
+    &:hover {
+      color: $interactive-01;
+    }
+
+    & > span {
+      color: $interactive-01;
+      @include carbon--type-style("productive-heading-01");
+    }
   }
 }

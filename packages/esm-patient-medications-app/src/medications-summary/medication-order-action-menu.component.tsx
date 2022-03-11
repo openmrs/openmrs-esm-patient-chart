@@ -1,37 +1,55 @@
-import React from 'react';
-import { launchPatientWorkspace, OpenWorkspace } from '@openmrs/esm-patient-common-lib';
-import ShoppingCart16 from '@carbon/icons-react/es/shopping--cart/16';
+import React, { useCallback } from 'react';
+import { launchPatientWorkspace, useWorkspaces } from '@openmrs/esm-patient-common-lib';
+import ShoppingCart20 from '@carbon/icons-react/es/shopping--cart/20';
 import styles from './medication-order-action-menu.scss';
-import { Tag } from 'carbon-components-react';
+import { Button, Tag } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 import { orderBasketStore } from '../medications/order-basket-store';
 import { useLayoutType, useStore } from '@openmrs/esm-framework';
 
-interface MedicationActionMenuProps {
-  workspaces: Array<OpenWorkspace>;
-}
+interface MedicationActionMenuProps {}
 
-const MedicationOrderActionMenu: React.FC<MedicationActionMenuProps> = ({ workspaces = [] }) => {
+const MedicationOrderActionMenu: React.FC<MedicationActionMenuProps> = () => {
   const { items } = useStore(orderBasketStore);
   const { t } = useTranslation();
-  const isTablet = useLayoutType() === 'tablet';
+  const layout = useLayoutType();
+  const { workspaces } = useWorkspaces();
   const isActive = workspaces.find(({ name }) => name.includes('order-basket'));
+
+  const launchOrdersWorkspace = useCallback(() => launchPatientWorkspace('order-basket-workspace'), []);
+
+  if (layout === 'tablet')
+    return (
+      <Button
+        kind="ghost"
+        className={`${styles.orderNavButtonContainer} ${isActive ? styles.active : ''}`}
+        role="button"
+        tabIndex={0}
+        onClick={launchOrdersWorkspace}
+      >
+        <div className={styles.elementContainer}>
+          <ShoppingCart20 /> {items?.length > 0 && <Tag className={styles.countTag}>{items?.length}</Tag>}
+        </div>
+        <span>{t('orderBasket', 'Order Basket')}</span>
+      </Button>
+    );
 
   return (
     <>
-      {isTablet && (
-        <div
-          className={`${styles.orderNavButtonContainer} ${isActive ? styles.active : ''}`}
-          role="button"
-          tabIndex={0}
-          onClick={() => launchPatientWorkspace('order-basket-workspace')}
-        >
+      <Button
+        className={isActive && styles.active}
+        kind="ghost"
+        renderIcon={() => (
           <div className={styles.elementContainer}>
-            <ShoppingCart16 /> {items?.length > 0 && <Tag className={styles.countTag}>{items?.length}</Tag>}
+            <ShoppingCart20 /> {items?.length > 0 && <Tag className={styles.countTag}>{items?.length}</Tag>}
           </div>
-          <span>{t('orderBasket', 'Order Basket')}</span>
-        </div>
-      )}
+        )}
+        hasIconOnly
+        iconDescription={t('orders', 'Orders')}
+        tooltipAlignment="end"
+        tooltipPosition="bottom"
+        onClick={launchOrdersWorkspace}
+      />
     </>
   );
 };

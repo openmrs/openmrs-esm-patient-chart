@@ -1,144 +1,59 @@
 @import "~@openmrs/esm-styleguide/src/vars";
 @import "~carbon-components/src/globals/scss/vars";
-@import "../../root.scss";
+@import "~carbon-components/src/globals/scss/mixins";
 
 $icon-button-size: 48px;
 $actionPanelOffset: 48px;
 
-.rightSideNav {
-  position: fixed;
-  align-self: flex-end;
-  background: #ededed;
-  flex-direction: column;
-  display: flex;
-  height: 100%;
-  right: 0;
-  z-index: 1001;
-}
-
-.iconButton {
-  width: $icon-button-size;
-  height: $icon-button-size;
-  color: $ui-05;
-}
-
-.activeIconButton {
-  padding: 0.625rem;
-  border-radius: 24px;
-  border-radius: 50%;
-  border: solid 4px var(--brand-03);
-  background-color: $ui-02;
-}
-
-.actionBtn :global(.bx--btn.bx--btn--icon-only.bx--tooltip__trigger:focus) {
-  border-color: var(--brand-03);
-}
-
-.actionBtn {
-  bottom: 3rem;
-  right: 2rem;
-
-  width: fit-content;
-  padding: 0.625rem;
-  height: 3rem;
-  border-radius: 1.75rem;
-  border-color: transparent;
-
-  color: $ui-02;
-  background: var(--brand-01);
-  transition: all 0.11s;
-  z-index: 9000;
-  padding-top: 0.325rem;
-  cursor: pointer;
-  position: fixed;
-
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.actionBtn > div {
-  margin-right: 0.25rem;
-  height: 40px;
-  width: 36px;
-  padding: 0.625rem;
-  position: relative;
-}
-
-.actionBtn > span {
-  @extend .productiveHeading01;
-}
-
 /* Desktop */
-:global(.omrs-breakpoint-gt-tablet) .actionPanel {
-  right: $actionPanelOffset;
-  background: $ui-02;
-  z-index: auto;
-}
-
-:global(.omrs-breakpoint-gt-tablet) .warningButton {
-  position: absolute;
-  top: 0;
-  right: 0;
-  fill: $danger !important;
-}
-
-/* Tablet */
-:global(.omrs-breakpoint-lt-desktop) .warningButton {
-  position: absolute;
-  top: 0;
-  right: 0;
-  fill: $danger !important;
-}
-
-:global(.omrs-breakpoint-lt-desktop) .warningButton [data-icon-path="inner-path"] {
-  fill: $ui-02 !important;
-  opacity: 1;
-}
-
-.section {
-  display: flex;
-  background-color: $ui-02;
-  width: 100%;
-  position: fixed;
-  bottom: 0;
-  height: $spacing-10;
-  border-top: $spacing-01 solid $ui-03;
-  z-index: 3000;
-
-  & > div {
-    width: 25%;
-    display: flex;
+:global(.omrs-breakpoint-gt-tablet) {
+  .sideRail {
+    position: fixed;
+    align-self: flex-end;
+    background: #ededed;
     flex-direction: column;
+    display: flex;
+    height: 100%;
+    right: 0;
+    z-index: 1000;
+    width: $icon-button-size;
     align-items: center;
-    justify-content: center;
-    cursor: pointer;
+    border-left: 1px solid $text-03;
 
-    & > span {
-      margin-top: $spacing-02;
-      @include carbon--type-style("body-short-01");
-      color: $text-02;
+    & div {
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+
+      & button {
+        width: $icon-button-size;
+        height: $icon-button-size;
+        justify-content: center;
+        margin-top: $spacing-02;
+      }
     }
   }
 }
 
-.extensionStyles {
-  display: flex;
-  background-color: $ui-02;
-  width: 100%;
-  position: fixed !important;
-  bottom: 0;
-  height: $spacing-10;
-  border-top: $spacing-01 solid $ui-03;
-
-  & > div {
-    flex: 1 1 auto;
+/* Tablet */
+:global(.omrs-breakpoint-lt-desktop) {
+  .extensionStyles {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
+    background-color: $ui-02;
+    width: 100%;
+    position: fixed !important;
+    bottom: 0;
+    height: $spacing-10;
+    border-top: $spacing-01 solid $ui-03;
+    z-index: 9000;
+
+    & > div {
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
   }
 }
-

@@ -9,6 +9,12 @@
   align-items: center;
   height: 100%;
   width: 100%;
+  color: $text-02;
+  max-width: none;
+
+  &:hover {
+    color: $text-02;
+  }
 
   & > span {
     margin-top: $spacing-02;
@@ -16,13 +22,33 @@
     color: $text-02;
   }
 }
+/* Desktop */
+:global(.omrs-breakpoint-gt-tablet) {
+  .active {
+    border: $spacing-02 solid;
+    @include brand-03(border-color);
+    border-radius: 50%;
+    background-color: $ui-02;
 
-.active {
-  background-color: $color-blue-10;
-  color: $interactive-01;
+    &:focus {
+      border-color: var(--brand-03) !important;
+    }
+  }
+}
 
-  & > span {
+/* Tablet */
+:global(.omrs-breakpoint-lt-desktop) {
+  .active {
+    background-color: $color-blue-10;
     color: $interactive-01;
-    @include carbon--type-style("productive-heading-01");
+
+    &:hover {
+      color: $interactive-01;
+    }
+
+    & > span {
+      color: $interactive-01;
+      @include carbon--type-style("productive-heading-01");
+    }
   }
 }

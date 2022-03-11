@@ -1,21 +1,31 @@
 import React from 'react';
-import Document16 from '@carbon/icons-react/es/document/16';
+import Document20 from '@carbon/icons-react/es/document/20';
 import styles from './clinical-form-action-menu.scss';
 import { useTranslation } from 'react-i18next';
 import { useLayoutType } from '@openmrs/esm-framework';
+import { Button } from 'carbon-components-react';
 
 const ClinicalFormActionMenu: React.FC = () => {
   const { t } = useTranslation();
-  const isTablet = useLayoutType() === 'tablet';
+  const layout = useLayoutType();
+
+  if (layout === 'tablet')
+    return (
+      <Button kind="ghost" className={styles.clinicalFormActionMenuContainer} onClick={() => {}}>
+        <Document20 />
+        <span>{t('clinicalForm', 'Clinical form')}</span>
+      </Button>
+    );
+
   return (
-    <>
-      {isTablet && (
-        <div className={styles.clinicalFormActionMenuContainer} role="button" tabIndex={0} onClick={() => {}}>
-          <Document16 />
-          <span>{t('clinicalForm', 'Clinical form')}</span>
-        </div>
-      )}
-    </>
+    <Button
+      kind="ghost"
+      renderIcon={Document20}
+      hasIconOnly
+      iconDescription={t('form', 'Form')}
+      tooltipAlignment="end"
+      tooltipPosition="bottom"
+    />
   );
 };
 
