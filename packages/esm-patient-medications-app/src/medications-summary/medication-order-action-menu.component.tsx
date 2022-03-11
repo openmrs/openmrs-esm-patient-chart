@@ -1,24 +1,27 @@
-import React, { useState } from 'react';
-import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import React from 'react';
+import { launchPatientWorkspace, OpenWorkspace } from '@openmrs/esm-patient-common-lib';
 import ShoppingCart16 from '@carbon/icons-react/es/shopping--cart/16';
 import styles from './medication-order-action-menu.scss';
 import { Tag } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 import { orderBasketStore } from '../medications/order-basket-store';
-import { useLayoutType } from '@openmrs/esm-framework';
+import { useLayoutType, useStore } from '@openmrs/esm-framework';
 
-interface MedicationActionMenuProps {}
+interface MedicationActionMenuProps {
+  workspaces: Array<OpenWorkspace>;
+}
 
-const MedicationOrderActionMenu: React.FC<MedicationActionMenuProps> = () => {
-  const [items, setItems] = useState([]);
-  orderBasketStore.subscribe(({ items }) => setItems(items));
+const MedicationOrderActionMenu: React.FC<MedicationActionMenuProps> = ({ workspaces = [] }) => {
+  const { items } = useStore(orderBasketStore);
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
+  const isActive = workspaces.find(({ name }) => name.includes('order-basket'));
+
   return (
     <>
       {isTablet && (
         <div
-          className={styles.orderNavButtonContainer}
+          className={`${styles.orderNavButtonContainer} ${isActive ? styles.active : ''}`}
           role="button"
           tabIndex={0}
           onClick={() => launchPatientWorkspace('order-basket-workspace')}

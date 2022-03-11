@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import Pen20 from '@carbon/icons-react/es/pen/20';
 import WarningFilled16 from '@carbon/icons-react/es/warning--filled/16';
@@ -15,9 +15,11 @@ interface ActionMenuInterface {
 export const ActionMenu: React.FC<ActionMenuInterface> = ({ open }) => {
   const { t } = useTranslation();
   const layout = useLayoutType();
-  const { windowState, active } = useWorkspaces();
+  const { windowState, active, workspaces } = useWorkspaces();
   const { updateWindowSize, windowSize } = useWorkspaceWindowSize();
-
+  const state = useMemo(() => {
+    return { workspaces: workspaces };
+  }, [workspaces]);
   const toggleViewMode = () => {
     if (active) {
       if (windowSize.size === 'maximized') {
@@ -48,7 +50,7 @@ export const ActionMenu: React.FC<ActionMenuInterface> = ({ open }) => {
       </Button>
     </aside>
   ) : (
-    <ExtensionSlot className={styles.extensionStyles} extensionSlotName={'action-menu-items-slot'} />
+    <ExtensionSlot state={state} className={styles.extensionStyles} extensionSlotName={'action-menu-items-slot'} />
   );
 
   return (

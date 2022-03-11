@@ -7,9 +7,22 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  &>span {
+  height: 100%;
+  width: 100%;
+
+  & > span {
     margin-top: $spacing-02;
     @include carbon--type-style("body-short-01");
     color: $text-02;
+  }
+}
+
+.active {
+  background-color: $color-blue-10;
+  color: $interactive-01;
+
+  & > span {
+    color: $interactive-01;
+    @include carbon--type-style("productive-heading-01");
   }
 }
