@@ -47,7 +47,7 @@ describe('ClinicalViewOverview: ', () => {
     );
     const breadCrampCheck = screen.getByRole('tab', { name: 'Breadcrumbs' });
     userEvent.click(breadCrampCheck);
-    expect(screen.getByText('Edit Views')).toBeTruthy();
+    expect(screen.getByText('Edit View')).toBeTruthy();
   });
 
   it('clicking the add button launches the `Add clinical views` form', () => {
