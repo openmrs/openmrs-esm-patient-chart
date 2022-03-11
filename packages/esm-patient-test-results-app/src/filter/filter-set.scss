@@ -2,13 +2,25 @@
 @import "~carbon-components/src/globals/scss/vars";
 @import "~carbon-components/src/globals/scss/mixins";
 
+.floatingRightButton {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  z-index: 9;
+}
+.expandButton {
+  background-color: white;
+  border: 1px solid black;
+}
+
+.floatingRightButton > .expandButton > svg {
+  margin: 0;
+}
+
+
 .filterContainer {
   background-color: $openmrs-background-grey;
   margin: $spacing-02 0;
-}
-
-.filterContainerActive {
-  border-left: 0.3rem solid var(--brand-01);
 }
 
 .filterNode {
@@ -17,7 +29,11 @@
 
 .filterItem {
   padding: 0.5rem 1rem 0.5rem 4rem;
-  border-bottom: 1px solid $ui-03;
+}
+
+.nestedAccordion > :global(.bx--accordion--start) > :global(.bx--accordion__item--active) {
+  border-left: 0.3rem solid var(--brand-01);
+  margin: 1.5rem 0;
 }
 
 .nestedAccordion :global {
@@ -36,6 +52,14 @@
     display: block;
   }
 
+  .bx--accordion__title {
+    margin: 0 0 0 0.8rem;
+  }
+
+  .bx--accordion__arrow {
+    margin: 0.4rem 0 0 1rem;
+  }
+
   // Chevron transformations
   .bx--accordion__item > button[aria-expanded="false"] > .bx--accordion__arrow {
     transform: rotate(90deg);
@@ -47,7 +71,8 @@
     fill: var(--brand-01);
   }
 
-  .bx--accordion--start > .bx--accordion__item > button[aria-expanded="true"] {
-    background-color: $ui-03;
+  .bx--checkbox-label-text {
+    padding: 0 0 0 .75rem;
   }
 }
+

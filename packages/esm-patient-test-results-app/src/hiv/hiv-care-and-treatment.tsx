@@ -1,40 +1,81 @@
-import { Column, Grid, InlineLoading, Row } from 'carbon-components-react';
-import React, { useContext, useEffect } from 'react';
-import mockConceptTree from './mock-concept-tree';
+import { Column, ContentSwitcher, InlineLoading, Row, Switch } from 'carbon-components-react';
+import React, { useState } from 'react';
 import FilterSet from '../filter/filter-set';
-import FilterContext, { FilterProvider } from '../filter/filter-context';
-import usePatientResultsData from '../loadPatientTestData/usePatientResultsData';
-import { usePatient } from '@openmrs/esm-framework';
-import { MultiTimeline } from '../timeline/Timeline';
-import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
+import { FilterProvider } from '../filter/filter-context';
+import NewTimeline from '../new-timeline/new-timeline';
+import { ErrorState } from '@openmrs/esm-patient-common-lib';
+import { useGetManyObstreeData } from '../new-timeline/useObstreeData';
+import styles from '../new-timeline/new-timeline.scss';
+import { useConfig } from '@openmrs/esm-framework';
+import DesktopView from '../desktop-view/desktop-view.component';
+
+export interface ConfigObject {
+  title: string;
+  resultsName: string;
+  data: Array<{
+    concept: string;
+    label: string;
+    color: string;
+  }>;
+  table: {
+    pageSize: number;
+  };
+}
 
 const HIVCareAndTreatment = () => {
-  const { patientUuid } = usePatient();
-  const { sortedObs, loaded, error } = usePatientResultsData(patientUuid);
-  if (!loaded) {
+  const config = useConfig();
+  const conceptUuids = config.concepts.map((c) => c.conceptUuid);
+  // const { data: root, error, loading }: obsShape = useGetObstreeData(conceptUuids[0]);
+  const { roots, loading, errors } = useGetManyObstreeData(conceptUuids);
+
+  const [view, setView] = useState<string>('split');
+  const [leftContent, setLeftContent] = useState<string>('tree');
+
+  const expanded = view === 'full';
+
+  if (loading) {
     return <InlineLoading />;
   }
-  if (error) {
-    return <ErrorState error={error} headerTitle="Data Load Error" />;
+  if (errors.length) {
+    return <ErrorState error={errors[0]} headerTitle="Data Load Error" />;
   }
-  if (loaded && !error && sortedObs && !!Object.keys(sortedObs).length) {
+  if (!loading && !errors.length && roots?.length) {
     return (
-      <FilterProvider sortedObs={sortedObs}>
-        <Grid>
-          <Row>
-            <Column sm={16} lg={4}>
-              <FilterSet root={mockConceptTree} />
+      <FilterProvider roots={roots}>
+        <div style={{ padding: 0 }}>
+          <Row className={styles['results-header']}>
+            <Column sm={16} lg={expanded ? 0 : 6}>
+              <div style={{ display: 'flex' }}>
+                <h4 style={{ flexGrow: 1 }}>Results</h4>
+                <div style={{ minWidth: '10rem' }}>
+                  <ContentSwitcher selectedIndex={1} onChange={(e) => setLeftContent(`${e.name}`)}>
+                    <Switch name="panel" text="Panel" />
+                    <Switch name="tree" text="Tree" />
+                  </ContentSwitcher>
+                </div>
+              </div>
             </Column>
-            <Column sm={16} lg={8}>
-              <MultiTimeline patientUuid={patientUuid} />
+            <Column sm={16} lg={expanded ? 12 : 6} style={{ border: expanded ? null : '0 0 0 1px solid gray' }}>
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <ContentSwitcher style={{ maxWidth: '10rem' }} onChange={(e) => setView(`${e.name}`)}>
+                  <Switch name="split" text="Split" />
+                  <Switch name="full" text="Full" />
+                </ContentSwitcher>
+              </div>
             </Column>
           </Row>
-        </Grid>
+          <Row style={{ height: '100%' }}>
+            <Column sm={16} lg={expanded ? 0 : 6} className={styles['column-panel']}>
+              {leftContent === 'tree' && <FilterSet />}
+              {leftContent === 'panel' && <DesktopView />}
+            </Column>
+            <Column sm={16} lg={expanded ? 12 : 6} className={styles['column-panel']}>
+              <NewTimeline />
+            </Column>
+          </Row>
+        </div>
       </FilterProvider>
     );
-  }
-  if (loaded && !error && sortedObs && !Object.keys(sortedObs).length) {
-    return <EmptyState displayText="observations" headerTitle="Data Timeline" />;
   }
   return null;
 };

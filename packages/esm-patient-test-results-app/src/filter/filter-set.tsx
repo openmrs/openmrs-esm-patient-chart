@@ -1,27 +1,26 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import styles from './filter-set.scss';
 import { Accordion, AccordionItem, Checkbox } from 'carbon-components-react';
 import FilterContext from './filter-context';
+import { useConfig } from '@openmrs/esm-framework';
 
 interface Observation {
   display: string;
+  flatName: string;
+  hasData?: boolean;
 }
-interface TreeNode {
+export interface TreeNode {
   display: string;
+  datatype?: string;
   subSets?: TreeNode[];
   obs?: Observation[];
-}
-
-interface FilterProps {
-  root: TreeNode;
-  maxNest?: number;
-  children?: React.ReactNode;
+  flatName: string;
 }
 
 interface FilterNodeProps {
   root: TreeNode;
   level: number;
-  maxNest?: number;
+  open?: boolean;
 }
 
 interface FilterLeafProps {
@@ -32,64 +31,43 @@ const isIndeterminate = (kids, checkboxes) => {
   return kids && !kids?.every((kid) => checkboxes[kid]) && !kids?.every((kid) => !checkboxes[kid]);
 };
 
-const FilterSet = ({ root, maxNest }: FilterProps) => {
-  const { someChecked, parents, checkboxes, updateParent } = useContext(FilterContext);
-  const indeterminate = isIndeterminate(parents[root.display], checkboxes);
-  const allChildrenChecked = parents[root.display]?.every((kid) => checkboxes[kid]);
+const FilterSet = () => {
+  const { roots } = useContext(FilterContext);
+  const config = useConfig();
 
   return (
-    <div
-      className={`${styles.filterContainer} ${someChecked && styles.filterContainerActive} ${styles.nestedAccordion}`}
-    >
-      <Accordion align="start">
-        <AccordionItem
-          title={
-            <Checkbox
-              id={root?.display}
-              checked={allChildrenChecked}
-              indeterminate={indeterminate}
-              labelText={root?.display}
-              onChange={() => updateParent(root.display)}
-            />
-          }
-        >
-          {root?.subSets?.map((node, index) => (
-            <FilterNode root={node} level={0} maxNest={maxNest} key={index} />
-          ))}
-          {root?.obs?.map((obs, index) => (
-            <FilterLeaf leaf={obs} key={index} />
-          ))}
-        </AccordionItem>
-      </Accordion>
-    </div>
+    <>
+      {roots?.map((root, index) => (
+        <div className={`${styles.filterContainer} ${styles.nestedAccordion}`}>
+          <FilterNode root={root} level={0} open={config.concepts[index].defaultOpen} />
+        </div>
+      ))}
+    </>
   );
 };
 
-const FilterNode = ({ root, level, maxNest = 3 }: FilterNodeProps) => {
+const FilterNode = ({ root, level, open }: FilterNodeProps) => {
   const { checkboxes, parents, updateParent } = useContext(FilterContext);
-  const indeterminate = isIndeterminate(parents[root.display], checkboxes);
-  const allChildrenChecked = parents[root.display]?.every((kid) => checkboxes[kid]);
-
+  const indeterminate = isIndeterminate(parents[root.flatName], checkboxes);
+  const allChildrenChecked = parents[root.flatName]?.every((kid) => checkboxes[kid]);
   return (
-    <Accordion>
+    <Accordion align="start">
       <AccordionItem
         title={
           <Checkbox
-            id={root?.display}
+            id={root?.flatName}
             checked={allChildrenChecked}
             indeterminate={indeterminate}
-            labelText={`${root?.display} (${parents?.[root?.display]?.length})`}
-            onChange={() => updateParent(root.display)}
+            labelText={`${root?.display} (${parents?.[root?.flatName]?.length})`}
+            onChange={() => updateParent(root.flatName)}
           />
         }
-        style={{ paddingLeft: level > 0 && level < maxNest ? '1rem' : '0px' }}
+        style={{ paddingLeft: `${level > 0 ? 1 : 0}rem` }}
+        open={open ?? false}
       >
-        {root?.subSets?.map((node, index) => (
-          <FilterNode root={node} level={level + 1} maxNest={maxNest} key={index} />
-        ))}
-        {root?.obs?.map((obs, index) => (
-          <FilterLeaf leaf={obs} key={index} />
-        ))}
+        {!root?.subSets?.[0]?.obs &&
+          root?.subSets?.map((node, index) => <FilterNode root={node} level={level + 1} key={index} />)}
+        {root?.subSets?.[0]?.obs && root.subSets?.map((obs, index) => <FilterLeaf leaf={obs} key={index} />)}
       </AccordionItem>
     </Accordion>
   );
@@ -102,8 +80,9 @@ const FilterLeaf = ({ leaf }: FilterLeafProps) => {
       <Checkbox
         id={leaf?.display}
         labelText={leaf?.display}
-        checked={checkboxes?.[leaf?.display]}
-        onChange={() => toggleVal(leaf?.display)}
+        checked={checkboxes?.[leaf.flatName]}
+        onChange={() => toggleVal(leaf.flatName)}
+        disabled={!leaf.hasData}
       />
     </div>
   );
