@@ -1,15 +1,13 @@
 import React, { useCallback } from 'react';
 import { launchPatientWorkspace, useWorkspaces } from '@openmrs/esm-patient-common-lib';
 import ShoppingCart20 from '@carbon/icons-react/es/shopping--cart/20';
-import styles from './medication-order-action-menu.scss';
+import styles from './order-basket-action-button.scss';
 import { Button, Tag } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 import { orderBasketStore } from '../medications/order-basket-store';
 import { useLayoutType, useStore } from '@openmrs/esm-framework';
 
-interface MedicationActionMenuProps {}
-
-const MedicationOrderActionMenu: React.FC<MedicationActionMenuProps> = () => {
+const OrderBasketActionButton: React.FC = () => {
   const { items } = useStore(orderBasketStore);
   const { t } = useTranslation();
   const layout = useLayoutType();
@@ -54,4 +52,4 @@ const MedicationOrderActionMenu: React.FC<MedicationActionMenuProps> = () => {
   );
 };
 
-export default MedicationOrderActionMenu;
+export default OrderBasketActionButton;

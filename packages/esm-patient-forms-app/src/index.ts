@@ -107,7 +107,7 @@ function setupOpenMRS() {
       {
         name: 'clinical-form-action-menu-item',
         slot: 'action-menu-items-slot',
-        load: getAsyncLifecycle(() => import('./clinical-form-action-menu.component'), options),
+        load: getAsyncLifecycle(() => import('./clinical-form-action-button.component'), options),
         order: 2,
       },
     ],

@@ -1,14 +1,12 @@
 import React, { useCallback } from 'react';
 import Pen20 from '@carbon/icons-react/es/pen/20';
 import { launchPatientWorkspace, useWorkspaces } from '@openmrs/esm-patient-common-lib';
-import styles from './visit-note-action-menu.scss';
+import styles from './visit-note-action-button.scss';
 import { useTranslation } from 'react-i18next';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { Button } from 'carbon-components-react';
 
-interface VisitNoteActionMenuProps {}
-
-const VisitNoteActionMenu: React.FC<VisitNoteActionMenuProps> = () => {
+const VisitNoteActionButton: React.FC = () => {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const { workspaces } = useWorkspaces();
@@ -42,4 +40,4 @@ const VisitNoteActionMenu: React.FC<VisitNoteActionMenuProps> = () => {
   );
 };
 
-export default VisitNoteActionMenu;
+export default VisitNoteActionButton;

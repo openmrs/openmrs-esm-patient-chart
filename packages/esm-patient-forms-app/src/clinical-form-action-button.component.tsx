@@ -1,17 +1,17 @@
 import React from 'react';
 import Document20 from '@carbon/icons-react/es/document/20';
-import styles from './clinical-form-action-menu.scss';
+import styles from './clinical-form-action-button.scss';
 import { useTranslation } from 'react-i18next';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { Button } from 'carbon-components-react';
 
-const ClinicalFormActionMenu: React.FC = () => {
+const ClinicalFormActionButton: React.FC = () => {
   const { t } = useTranslation();
   const layout = useLayoutType();
 
   if (layout === 'tablet')
     return (
-      <Button kind="ghost" className={styles.container} onClick={() => {}}>
+      <Button kind="ghost" className={styles.container}>
         <Document20 />
         <span>{t('clinicalForm', 'Clinical form')}</span>
       </Button>
@@ -30,4 +30,4 @@ const ClinicalFormActionMenu: React.FC = () => {
   );
 };
 
-export default ClinicalFormActionMenu;
+export default ClinicalFormActionButton;

@@ -53,7 +53,7 @@ function setupOpenMRS() {
       {
         name: 'visit-note-nav-button',
         slot: 'action-menu-items-slot',
-        load: getAsyncLifecycle(() => import('./visit-note-action-menu.component'), options),
+        load: getAsyncLifecycle(() => import('./visit-note-action-button.component'), options),
         order: 1,
       },
       {
