@@ -73,7 +73,6 @@
     top: 0;
     left: 0;
     right: 0;
-    bottom: 0;
     z-index: 1000;
   }
 
@@ -96,6 +95,7 @@
 
   .fixed {
     top: 3rem;
+    bottom: $spacing-10;
     background-color: $ui-01;
   }
 
