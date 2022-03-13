@@ -35,13 +35,13 @@ describe('<OrderBasketActionButton/>', () => {
     mockedUseStore.mockReturnValueOnce({ items: [] });
     render(<OrderBasketActionButton />);
 
-    const visitNoteButton = screen.getByRole('button', { name: /Order Basket/i });
-    expect(visitNoteButton).toBeInTheDocument();
-    expect(visitNoteButton).toHaveClass('container');
-    userEvent.click(visitNoteButton);
+    const orderBasketButton = screen.getByRole('button', { name: /Order Basket/i });
+    expect(orderBasketButton).toBeInTheDocument();
+    expect(orderBasketButton).toHaveClass('container');
+    userEvent.click(orderBasketButton);
 
     expect(launchPatientWorkspace).toHaveBeenCalledWith('order-basket-workspace');
-    expect(visitNoteButton).toHaveClass('active');
+    expect(orderBasketButton).toHaveClass('active');
   });
 
   it('should display desktop view action button', () => {
@@ -49,12 +49,12 @@ describe('<OrderBasketActionButton/>', () => {
     mockedUseStore.mockReturnValueOnce({ items: [] });
     render(<OrderBasketActionButton />);
 
-    const visitNoteButton = screen.getByRole('button', { name: /Orders/i });
-    expect(visitNoteButton).toBeInTheDocument();
-    userEvent.click(visitNoteButton);
+    const orderBasketButton = screen.getByRole('button', { name: /Orders/i });
+    expect(orderBasketButton).toBeInTheDocument();
+    userEvent.click(orderBasketButton);
 
     expect(launchPatientWorkspace).toHaveBeenCalledWith('order-basket-workspace');
-    expect(visitNoteButton).toHaveClass('active');
+    expect(orderBasketButton).toHaveClass('active');
   });
 
   it('should display the count Tag if order are present on desktop view', () => {
@@ -62,8 +62,8 @@ describe('<OrderBasketActionButton/>', () => {
     mockedUseStore.mockReturnValueOnce({ items: [{ name: 'order-01', uuid: 'some-uuid' }] });
     render(<OrderBasketActionButton />);
 
-    const visitNoteButton = screen.getByRole('button', { name: /Order/i });
-    expect(visitNoteButton).toHaveTextContent(1);
+    const orderBasketButton = screen.getByRole('button', { name: /Order/i });
+    expect(orderBasketButton).toHaveTextContent(1);
   });
 
   it('should display the count Tag if order are present on tablet view', () => {
@@ -71,7 +71,7 @@ describe('<OrderBasketActionButton/>', () => {
     mockedUseStore.mockReturnValueOnce({ items: [{ name: 'order-01', uuid: 'some-uuid' }] });
     render(<OrderBasketActionButton />);
 
-    const visitNoteButton = screen.getByRole('button', { name: /Order/i });
-    expect(visitNoteButton).toHaveTextContent(1);
+    const orderBasketButton = screen.getByRole('button', { name: /Order/i });
+    expect(orderBasketButton).toHaveTextContent(1);
   });
 });

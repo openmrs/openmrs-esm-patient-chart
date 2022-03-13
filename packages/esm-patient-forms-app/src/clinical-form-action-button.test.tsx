@@ -4,20 +4,22 @@ import { render, screen } from '@testing-library/react';
 import * as mockEsmFramework from '@openmrs/esm-framework';
 
 describe('<ClinicalFormActionButton/>', () => {
-  it('should display clinical form action button on tablet view', () => {
+  test('should display clinical form action button on tablet view', () => {
     spyOn(mockEsmFramework, 'useLayoutType').and.returnValue('tablet');
     render(<ClinicalFormActionButton />);
     const clinicalActionButton = screen.getByRole('button', { name: /Clinical form/ });
 
+    expect(clinicalActionButton).toHaveTextContent('Clinical form');
     expect(clinicalActionButton).toBeInTheDocument();
     expect(clinicalActionButton).toHaveClass('container');
   });
 
-  it('should display clinical form action button on tablet view', () => {
+  test('should display clinical form action button on desktop view', () => {
     spyOn(mockEsmFramework, 'useLayoutType').and.returnValue('desktop');
     render(<ClinicalFormActionButton />);
     const clinicalActionButton = screen.getByRole('button', { name: /Form/ });
 
+    expect(clinicalActionButton).not.toHaveTextContent('Clinical form');
     expect(clinicalActionButton).toBeInTheDocument();
     expect(clinicalActionButton).toHaveClass('container');
   });
