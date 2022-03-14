@@ -78,7 +78,7 @@ const FilterLeaf = ({ leaf }: FilterLeafProps) => {
   return (
     <div className={styles.filterItem}>
       <Checkbox
-        id={leaf?.display}
+        id={leaf?.flatName}
         labelText={leaf?.display}
         checked={checkboxes?.[leaf.flatName]}
         onChange={() => toggleVal(leaf.flatName)}
