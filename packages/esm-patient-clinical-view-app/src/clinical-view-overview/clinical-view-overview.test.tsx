@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import ClinicalViewOverview from './clinical-view-overview.component';
+import { ExtensionSlot } from '@openmrs/esm-framework';
 
 const testProps = {
   patientUuid: mockPatient.id,
@@ -40,10 +41,15 @@ describe('ClinicalViewOverview: ', () => {
 
     expect(screen.getByRole('tablist')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Add view/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Edit view/i })).not.toBeInTheDocument();
 
     mockClinicalViews.map((clinicalView) =>
       expect(screen.getByRole('tab', { name: clinicalView.slot })).toBeInTheDocument(),
     );
+    userEvent.click(screen.getByRole('tab', { name: /breadcrumbs/i }));
+
+    expect(screen.getByRole('button', { name: /Edit view/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Add view/i })).not.toBeInTheDocument();
   });
 
   it('clicking the add button launches the `Add clinical views` form', () => {
