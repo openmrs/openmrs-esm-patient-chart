@@ -41,13 +41,15 @@ describe('ClinicalViewOverview: ', () => {
 
     expect(screen.getByRole('tablist')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Add view/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Edit view/i })).not.toBeInTheDocument();
 
     mockClinicalViews.map((clinicalView) =>
       expect(screen.getByRole('tab', { name: clinicalView.slot })).toBeInTheDocument(),
     );
-    const breadCrampCheck = screen.getByRole('tab', { name: 'Breadcrumbs' });
-    userEvent.click(breadCrampCheck);
-    expect(screen.getByText('Edit View')).toBeTruthy();
+    userEvent.click(screen.getByRole('tab', { name: /breadcrumbs/i }));
+
+    expect(screen.getByRole('button', { name: /Edit view/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Add view/i })).not.toBeInTheDocument();
   });
 
   it('clicking the add button launches the `Add clinical views` form', () => {
