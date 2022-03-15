@@ -48,6 +48,7 @@ const WorkspaceWindow: React.FC<RouteComponentProps<ContextWorkspaceParams>> = (
   };
 
   const workspacesToRender = useMemo(() => {
+    windowSize.size === 'hidden' && updateWindowSize('reopened');
     return workspaces.map((w, idx) => (
       <WorkspaceRenderer key={w.name} workspace={w} patientUuid={patientUuid} active={idx === 0} />
     ));
