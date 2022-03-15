@@ -1,12 +1,6 @@
-import Edit20 from '@carbon/icons-react/es/edit/20';
-import Pen20 from '@carbon/icons-react/es/pen/20';
-import WarningFilled16 from '@carbon/icons-react/es/warning--filled/16';
-import { ExtensionSlot, useLayoutType } from '@openmrs/esm-framework';
-import { useWorkspaceWindowSize, useWorkspaces } from '@openmrs/esm-patient-common-lib';
-import { Button, HeaderPanel } from 'carbon-components-react';
 import React from 'react';
-import { useTranslation } from 'react-i18next';
-import { isDesktop } from '../../utils';
+import { ExtensionSlot } from '@openmrs/esm-framework';
+import { HeaderPanel } from 'carbon-components-react';
 import styles from './action-menu.scss';
 
 interface ActionMenuInterface {
@@ -14,53 +8,11 @@ interface ActionMenuInterface {
 }
 
 export const ActionMenu: React.FC<ActionMenuInterface> = ({ open }) => {
-  const { t } = useTranslation();
-  const layout = useLayoutType();
-  const { windowState, active } = useWorkspaces();
-  const { updateWindowSize, windowSize } = useWorkspaceWindowSize();
-
-  const toggleViewMode = () => {
-    if (active) {
-      if (windowSize.size === 'maximized') {
-        updateWindowSize('hidden');
-      } else if (windowSize.size === 'normal') {
-        updateWindowSize('hidden');
-      } else {
-        updateWindowSize(windowState);
-      }
-    }
-  };
-
-  const menu = isDesktop(layout) ? (
-    <aside className={styles.rightSideNav}>
-      <ExtensionSlot extensionSlotName={'action-menu-items-slot'} />
-      <Button
-        onClick={toggleViewMode}
-        iconDescription={t('workspaceItems', 'Workspace items')}
-        className={`${styles.iconButton} ${active && styles.activeIconButton} `}
-        kind="ghost"
-        hasIconOnly
-        tooltipPosition="bottom"
-        tooltipAlignment="end"
-      >
-        <>
-          <Pen20 /> {windowSize.size === 'hidden' && <WarningFilled16 className={styles.warningButton} />}
-        </>
-      </Button>
-    </aside>
-  ) : (
-    <Button className={styles.actionBtn}>
-      <div>
-        <Edit20 />
-        {windowSize.size === 'hidden' && <WarningFilled16 className={styles.warningButton} />}
-      </div>
-      <span>{t('careActivities', 'Care Activities')}</span>
-    </Button>
-  );
-
   return (
     <>
-      {menu}
+      <aside className={styles.sideRail}>
+        <ExtensionSlot className={styles.extensionStyles} extensionSlotName={'action-menu-items-slot'} />
+      </aside>
       <HeaderPanel className={styles.actionPanel} expanded={open} aria-label="Drawer">
         <ExtensionSlot extensionSlotName={'drawer-slot'} />
       </HeaderPanel>

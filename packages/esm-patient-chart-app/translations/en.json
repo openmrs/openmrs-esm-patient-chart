@@ -5,7 +5,6 @@
   "all": "All",
   "allEncounters": "All Encounters",
   "cancel": "Cancel",
-  "careActivities": "Care Activities",
   "close": "Close",
   "confirm": "Confirm",
   "date": "Date",
@@ -66,6 +65,5 @@
   "visitLocation": "Visit Location",
   "visitSummaries": "Visit summaries",
   "visitType": "Visit type",
-  "workspaceItems": "Workspace items",
   "workspaceModalText": "Launching a new form in the workspace could cause you to lose unsaved work on the {formName} form."
 }

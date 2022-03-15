@@ -1,16 +1,20 @@
-import React, { createContext, useReducer, useEffect, useMemo } from 'react';
+import React, { createContext, useReducer, useEffect, useMemo, useState } from 'react';
+import { parseTime } from '../timeline/useTimelineData';
 import reducer from './filter-reducer';
-import mockConceptTree from '../hiv/mock-concept-tree';
+import { TreeNode } from './filter-set';
 
 const initialState = {
   checkboxes: {},
   parents: {},
+  roots: [{ display: '', flatName: '' }],
+  tests: {},
+  lowestParents: [],
 };
 
 const initialContext = {
   state: initialState,
-  checkboxes: {},
-  parents: {},
+  ...initialState,
+  timelineData: {},
   activeTests: [],
   someChecked: false,
   initialize: () => {},
@@ -21,11 +25,16 @@ const initialContext = {
 interface StateProps {
   checkboxes: { [key: string]: boolean };
   parents: { [key: string]: string[] };
+  roots: { [key: string]: any }[];
 }
 interface FilterContextProps {
   state: StateProps;
   checkboxes: { [key: string]: boolean };
   parents: { [key: string]: string[] };
+  roots: TreeNode[];
+  tests: { [key: string]: any };
+  lowestParents: { display: string; flatName: string }[];
+  timelineData: { [key: string]: any };
   activeTests: string[];
   someChecked: boolean;
   initialize: any;
@@ -34,18 +43,22 @@ interface FilterContextProps {
 }
 
 interface FilterProviderProps {
-  sortedObs: any; // this data structure will change later
+  roots: any[];
   children: React.ReactNode;
+}
+
+interface obsShape {
+  [key: string]: any;
 }
 
 const FilterContext = createContext<FilterContextProps>(initialContext);
 
-const FilterProvider = ({ sortedObs, children }: FilterProviderProps) => {
+const FilterProvider = ({ roots, children }: FilterProviderProps) => {
   const [state, dispatch] = useReducer(reducer, initialState);
 
   const actions = useMemo(
     () => ({
-      initialize: (tree) => dispatch({ type: 'initialize', tree: tree }),
+      initialize: (trees) => dispatch({ type: 'initialize', trees: trees }),
       toggleVal: (name) => {
         dispatch({ type: 'toggleVal', name: name });
       },
@@ -56,15 +69,48 @@ const FilterProvider = ({ sortedObs, children }: FilterProviderProps) => {
     [dispatch],
   );
 
-  const activeTests = Object.keys(state?.checkboxes)?.filter((key) => state.checkboxes[key]) || [];
+  const activeTests = useMemo(() => {
+    return Object.keys(state?.checkboxes)?.filter((key) => state.checkboxes[key]) || [];
+  }, [state.checkboxes]);
+
   const someChecked = Boolean(activeTests.length);
 
-  useEffect(() => {
-    const tests = (sortedObs && Object.keys(sortedObs)) || [];
-    if (tests.length && !Object.keys(state?.checkboxes).length) {
-      actions.initialize(mockConceptTree);
+  const timelineData = useMemo(() => {
+    if (!state?.tests) {
+      return {
+        data: { parsedTime: {} as ReturnType<typeof parseTime>, rowData: [], panelName: '' },
+        loaded: false,
+      };
     }
-  }, [sortedObs, actions, state]);
+    const tests: obsShape = activeTests?.length
+      ? Object.fromEntries(Object.entries(state.tests).filter(([name, entry]) => activeTests.includes(name)))
+      : state.tests;
+
+    const allTimes = [
+      ...new Set(
+        Object.values(tests)
+          .map((test: obsShape) => test?.obs?.map((entry) => entry.obsDatetime))
+          .flat(),
+      ),
+    ];
+    allTimes.sort((a, b) => (new Date(a) < new Date(b) ? 1 : -1));
+    const rows = [];
+    Object.keys(tests).forEach((test) => {
+      const newEntries = allTimes.map((time: string) => tests[test].obs.find((entry) => entry.obsDatetime === time));
+      rows.push({ ...tests[test], entries: newEntries });
+    });
+    const panelName = 'timeline';
+    return {
+      data: { parsedTime: parseTime(allTimes), rowData: rows, panelName },
+      loaded: true,
+    };
+  }, [activeTests, state.tests]);
+
+  useEffect(() => {
+    if (roots?.length && !Object.keys(state?.checkboxes).length) {
+      actions.initialize(roots);
+    }
+  }, [actions, state, roots]);
 
   return (
     <FilterContext.Provider
@@ -72,6 +118,10 @@ const FilterProvider = ({ sortedObs, children }: FilterProviderProps) => {
         state,
         checkboxes: state.checkboxes,
         parents: state.parents,
+        roots: state.roots,
+        tests: state.tests,
+        lowestParents: state.lowestParents,
+        timelineData,
         activeTests,
         someChecked,
         initialize: actions.initialize,

@@ -1,6 +1,32 @@
+
 @import "~@openmrs/esm-styleguide/src/vars";
 @import "~carbon-components/src/globals/scss/vars";
 @import "~carbon-components/src/globals/scss/mixins";
+
+.results-header {
+  padding: 0.8rem 0;
+  z-index: 10;
+  background-color: $openmrs-background-grey;
+}
+
+.column-panel {
+  overflow-y: scroll;
+  height: calc(100vh - 9rem)
+}
+
+.date-header {
+  position: sticky;
+  top: 0px;
+  display: grid;
+  background-color: white;
+  overflow-x: auto;
+  z-index: 9;
+  scrollbar-width: none;
+}
+
+.date-header::-webkit-scrollbar {
+  display: none;
+}
 
 .grid {
   width: fit-content;
@@ -48,10 +74,43 @@
   }
 }
 
+
+.grid-container {
+  padding: 0;
+  box-sizing: border-box;
+  display: grid;
+  grid-auto-flow: row;
+  column-gap: 1px;
+  row-gap: 0px;
+  background-color: $color-gray-30;
+  grid-template: auto auto / 9em auto;
+  border-collapse: collapse;
+  overflow-x: auto;
+  width: 100%;
+  background-color: white;
+  scrollbar-width: none;
+}
+
+.grid-container::-webkit-scrollbar {
+  display: none;
+}
+
+
+
+.row-header {
+  overflow: hidden;
+  align-self: flex-start;
+  background-color: $ui-03;
+  padding: 0.6rem 1rem;
+}
+
+
 .row-start-cell {
   @extend .timeline-cell;
+  position: -webkit-sticky; /* Safari */
   position: sticky;
   left: 0;
+  top: auto;
   display: grid;
   grid-auto-flow: row;
   gap: 0.5px;
@@ -64,10 +123,12 @@
   background-color: $ui-03;
 }
 
-.padding-container {
-  padding: 0px 0 0 0;
-  box-sizing: border-box;
 
+.date-header-container {
+  position: sticky;
+  top: 0;
+  padding: 0;
+  box-sizing: border-box;
   display: grid;
   grid-auto-flow: row;
   column-gap: 1px;
@@ -75,9 +136,18 @@
   background-color: $color-gray-30;
   grid-template: auto auto / 9em auto;
   border-collapse: collapse;
+  scrollbar-width: none;
 }
 
-.padding-container::-webkit-scrollbar {
+.date-header-container::-webkit-scrollbar {
+  display: none;
+}
+
+.date-header-inner {
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.date-header-inner::-webkit-scrollbar {
   display: none;
 }
 
@@ -108,6 +178,8 @@
     @include carbon--type-style('productive-heading-01');
     color: $text-01;
     left: 0;
+    width: 100%;
+    word-wrap: normal;
   }
 }
 
@@ -189,13 +261,3 @@
   grid-column: 1 / 2;
 }
 
-.recent-results-grid {
-  display: grid;
-  background-color: white;
-  overflow: auto;
-  max-height: calc(100vh - 9rem);
-}
-
-.recent-results-grid::-webkit-scrollbar {
-  display: none;
-}

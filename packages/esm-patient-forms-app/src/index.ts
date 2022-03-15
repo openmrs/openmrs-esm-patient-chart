@@ -104,6 +104,12 @@ function setupOpenMRS() {
           canMarkFormsAsOffline: false,
         },
       },
+      {
+        name: 'clinical-form-action-menu-item',
+        slot: 'action-menu-items-slot',
+        load: getAsyncLifecycle(() => import('./clinical-form-action-button.component'), options),
+        order: 2,
+      },
     ],
   };
 }

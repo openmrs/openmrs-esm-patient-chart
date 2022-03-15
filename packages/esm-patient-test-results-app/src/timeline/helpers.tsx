@@ -33,7 +33,7 @@ export const Main: React.FC = () => <main className={styles['padded-main']} />;
 
 export const ShadowBox: React.FC = () => <div className={styles['shadow-box']} />;
 
-const TimelineCell: React.FC<{
+export const TimelineCell: React.FC<{
   text: string;
   interpretation?: OBSERVATION_INTERPRETATION;
   zebra: boolean;

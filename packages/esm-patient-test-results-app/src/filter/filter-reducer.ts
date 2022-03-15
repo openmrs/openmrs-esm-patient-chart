@@ -1,27 +1,74 @@
-const computeParents = (node) => {
+export const getName = (prefix, name) => {
+  return prefix ? `${prefix}-${name}` : name;
+};
+
+const computeParents = (prefix, node) => {
   var parents = {};
-  const leaves = [];
-  if (node?.subSets?.length) {
+  var leaves = [];
+  var tests = [];
+  var lowestParents = [];
+  if (node?.subSets?.length && node.subSets[0].obs) {
+    // lowest parent
+    let activeLeaves = [];
+    node.subSets.forEach((leaf) => {
+      if (leaf.hasData) {
+        activeLeaves.push(leaf.flatName);
+      }
+    });
+    let activeTests = [];
+    node.subSets.forEach((leaf) => {
+      if (leaf.obs.length) {
+        activeTests.push([leaf.flatName, leaf]);
+      }
+    });
+    leaves.push(...activeLeaves);
+    tests.push(...activeTests);
+    lowestParents.push({ flatName: node.flatName, display: node.display });
+  } else if (node?.subSets?.length) {
     node.subSets.map((subNode) => {
-      const { parents: newParents, leaves: newLeaves } = computeParents(subNode);
+      const {
+        parents: newParents,
+        leaves: newLeaves,
+        tests: newTests,
+        lowestParents: newLowestParents,
+      } = computeParents(getName(prefix, node.display), subNode);
       parents = { ...parents, ...newParents };
       leaves.push(...newLeaves);
+      tests.push(...newTests);
+      lowestParents.push(...newLowestParents);
     });
   }
-  if (node?.obs?.length) {
-    leaves.push(...node.obs.map((leaf) => leaf.display));
-  }
-  parents[node.display] = leaves;
-  return { parents: parents, leaves: leaves };
+  parents[node.flatName] = leaves;
+  return { parents, leaves, tests, lowestParents };
 };
 
 const reducer = (state, action) => {
   switch (action.type) {
     case 'initialize':
-      const { parents, leaves } = computeParents(action.tree);
+      let parents = {},
+        leaves = [],
+        tests = [],
+        lowestParents = [];
+      action.trees?.forEach((tree) => {
+        // if anyone knows a shorthand for this i'm stoked to learn it :)
+        const {
+          parents: newParents,
+          leaves: newLeaves,
+          tests: newTests,
+          lowestParents: newLP,
+        } = computeParents('', tree);
+        parents = { ...parents, ...newParents };
+        leaves = [...leaves, ...newLeaves];
+        tests = [...tests, ...newTests];
+        lowestParents = [...lowestParents, ...newLP];
+      });
+      const flatTests = Object.fromEntries(tests);
       return {
-        checkboxes: Object.fromEntries(leaves.map((leaf) => [leaf, true])),
+        checkboxes: Object.fromEntries(leaves?.map((leaf) => [leaf, false])) || {},
         parents: parents,
+        roots: action.trees,
+        tests: flatTests,
+        lowestParents: lowestParents,
       };
     case 'toggleVal':
       return {

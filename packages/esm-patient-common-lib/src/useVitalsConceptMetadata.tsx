@@ -1,14 +1,13 @@
-import useSWR from 'swr';
+import useSWRImmutable from 'swr/immutable';
 import { openmrsFetch } from '@openmrs/esm-framework';
 
 export function useVitalsConceptMetadata() {
   const customRepresentation =
     'custom:(setMembers:(uuid,display,hiNormal,hiAbsolute,hiCritical,lowNormal,lowAbsolute,lowCritical,units))';
 
-  const { data, error } = useSWR<{ data: VitalsConceptMetadataResponse }, Error>(
-    `/ws/rest/v1/concept/?q=VITALS SIGNS&v=${customRepresentation}`,
-    openmrsFetch,
-  );
+  const apiUrl = `/ws/rest/v1/concept/?q=VITALS SIGNS&v=${customRepresentation}`;
+
+  const { data, error } = useSWRImmutable<{ data: VitalsConceptMetadataResponse }, Error>(apiUrl, openmrsFetch);
 
   const conceptMetadata = data?.data?.results[0]?.setMembers;
 

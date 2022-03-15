@@ -57,6 +57,12 @@ function setupOpenMRS() {
         load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
         meta: dashboardMeta,
       },
+      {
+        name: 'order-basket-action-menu',
+        slot: 'action-menu-items-slot',
+        load: getAsyncLifecycle(() => import('./medications-summary/order--basket-action-button.component'), options),
+        order: 0,
+      },
     ],
   };
 }

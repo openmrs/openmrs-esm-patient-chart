@@ -14,7 +14,7 @@ interface EndVisitPromptProps {
 const EndVisitPrompt: React.FC<EndVisitPromptProps> = ({ patientUuid, isModalOpen, closeModal }) => {
   const { t, i18n } = useTranslation();
   const locale = i18n.language.toLowerCase().replace('_', '-');
-  const { currentVisit } = useVisit(patientUuid);
+  const { currentVisit, mutate } = useVisit(patientUuid);
 
   const endCurrentVisit = () => {
     const endVisitPayload = {
@@ -30,7 +30,7 @@ const EndVisitPrompt: React.FC<EndVisitPromptProps> = ({ patientUuid, isModalOpe
       .subscribe(
         (response) => {
           if (response.status === 200) {
-            getStartedVisit.next(null);
+            mutate();
             closeModal();
 
             showToast({

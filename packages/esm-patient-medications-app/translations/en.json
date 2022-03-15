@@ -45,6 +45,7 @@
   "orderCompleted": "Order placed",
   "orderCompletedSuccessText": "Your order is complete. The items will now appear on the Orders page.",
   "orderForm": "Order Form",
+  "orders": "Orders",
   "ordersAlreadyInBasketWithCount_one": "{count} item(s) already in your basket",
   "ordersAlreadyInBasketWithCount_other": "{count} item(s) already in your basket",
   "pastMedicationsDisplayText": "Past medications",
