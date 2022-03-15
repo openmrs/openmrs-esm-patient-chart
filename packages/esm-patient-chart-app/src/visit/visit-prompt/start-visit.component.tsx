@@ -3,15 +3,19 @@ import { useTranslation } from 'react-i18next';
 import { ComposedModal, Button, ModalBody, ModalHeader, ModalFooter } from 'carbon-components-react';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import styles from './start-visit.scss';
+import { useVisitDialog } from '../useVisitDialog';
 
-interface StartVisitPromptProps {
-  isModalOpen: boolean;
-  closeModal: () => void;
-  state: any;
+interface StartVisitProps {
+  patientUuid: string;
 }
 
-const StartVisitPrompt: React.FC<StartVisitPromptProps> = ({ isModalOpen, closeModal, state }) => {
+const StartVisit: React.FC<StartVisitProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
+  const { type, state } = useVisitDialog(patientUuid);
+  const closeModal = useCallback(
+    () => window.dispatchEvent(new CustomEvent('visit-dialog', { detail: { type: 'close' } })),
+    [],
+  );
 
   const handleEditPastVisit = useCallback(() => {
     launchPatientWorkspace('past-visits-overview');
@@ -38,7 +42,7 @@ const StartVisitPrompt: React.FC<StartVisitPromptProps> = ({ isModalOpen, closeM
         );
 
   return (
-    <ComposedModal open={isModalOpen} onClose={closeModal}>
+    <ComposedModal open={type === 'prompt'} onClose={closeModal}>
       <ModalHeader>
         <span className={styles.header}>{modalHeaderText}</span>
       </ModalHeader>
@@ -60,4 +64,4 @@ const StartVisitPrompt: React.FC<StartVisitPromptProps> = ({ isModalOpen, closeM
   );
 };
 
-export default StartVisitPrompt;
+export default StartVisit;

@@ -74,6 +74,7 @@ export const mockCurrentVisit = {
     stopDatetime: null,
   },
   status: VisitStatus.ONGOING,
+  uuid:'some-uuid'
 };
 
 export const visitOverviewDetailMockData = {

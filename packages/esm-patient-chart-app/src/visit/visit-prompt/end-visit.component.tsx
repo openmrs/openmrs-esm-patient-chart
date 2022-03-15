@@ -1,21 +1,24 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import styles from './end-visit.scss';
 import { ComposedModal, Button, ModalBody, ModalFooter, ModalHeader } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
-import { getStartedVisit, parseDate, showNotification, showToast, updateVisit, useVisit } from '@openmrs/esm-framework';
+import { parseDate, showNotification, showToast, updateVisit, useVisit } from '@openmrs/esm-framework';
 import { first } from 'rxjs/operators';
+import { useVisitDialog } from '../useVisitDialog';
 
-interface EndVisitPromptProps {
+interface EndVisitProps {
   patientUuid: string;
-  isModalOpen: boolean;
-  closeModal: () => void;
 }
 
-const EndVisitPrompt: React.FC<EndVisitPromptProps> = ({ patientUuid, isModalOpen, closeModal }) => {
-  const { t, i18n } = useTranslation();
-  const locale = i18n.language.toLowerCase().replace('_', '-');
+const EndVisit: React.FC<EndVisitProps> = ({ patientUuid }) => {
+  const { t } = useTranslation();
   const { currentVisit, mutate } = useVisit(patientUuid);
+  const { type } = useVisitDialog(patientUuid);
 
+  const closeModal = useCallback(
+    () => window.dispatchEvent(new CustomEvent('visit-dialog', { detail: { type: 'close' } })),
+    [],
+  );
   const endCurrentVisit = () => {
     const endVisitPayload = {
       location: currentVisit.location.uuid,
@@ -51,20 +54,14 @@ const EndVisitPrompt: React.FC<EndVisitPromptProps> = ({ patientUuid, isModalOpe
   };
 
   return (
-    <ComposedModal open={isModalOpen} onClose={closeModal}>
-      <ModalHeader>
-        <span className={styles.header}>{t('endActiveVisit', 'End active visit')}</span>
-      </ModalHeader>
-      <ModalBody className={styles.body}>
-        <p className={styles.customLabel}>
-          <span>{t('startDate', 'Start Date')}</span>
-          <span>{new Date(currentVisit?.startDatetime).toLocaleDateString(locale, { dateStyle: 'medium' })}</span>
-        </p>
-        <p className={styles.customLabel}>
-          <span>{t('visitType', 'Visit Type')}</span> <span>{currentVisit?.visitType?.display}</span>
-        </p>
-        <p className={styles.customLabel}>
-          <span>{t('visitLocation', 'Visit Location')}</span> <span>{currentVisit?.location?.display}</span>
+    <ComposedModal open={type === 'end'} onClose={closeModal}>
+      <ModalHeader label={t('visit', 'Visit')} title={t('endActiveVisit', 'End active visit')} />
+      <ModalBody>
+        <p className={styles.bodyShort02}>
+          {t(
+            'endVisitWarningMessage',
+            'Ending this visit, will not allow you to fill another encounter form for this patient',
+          )}
         </p>
       </ModalBody>
       <ModalFooter>
@@ -79,4 +76,4 @@ const EndVisitPrompt: React.FC<EndVisitPromptProps> = ({ patientUuid, isModalOpe
   );
 };
 
-export default EndVisitPrompt;
+export default EndVisit;

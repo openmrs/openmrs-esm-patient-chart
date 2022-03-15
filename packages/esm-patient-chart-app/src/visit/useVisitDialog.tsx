@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 
 interface VisitDialogType {
-  type: 'start' | 'prompt' | 'end' | 'close';
-  state?: {};
+  type: 'start' | 'prompt' | 'end' | 'close' | 'cancel';
+  state?: { type: string };
 }
 
 export function useVisitDialog(patientUuid: string) {
-  const [visitDialogType, setVisitDialogType] = useState<VisitDialogType>({ type: 'close', state: {} });
+  const [visitDialogType, setVisitDialogType] = useState<VisitDialogType>({ type: 'close', state: { type: '' } });
 
   React.useEffect(() => {
     const handler = (ev: CustomEvent) => {
