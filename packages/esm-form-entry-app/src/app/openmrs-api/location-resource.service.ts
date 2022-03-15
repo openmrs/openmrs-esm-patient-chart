@@ -5,7 +5,7 @@ import { map, catchError } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
 import { WindowRef } from '../window-ref';
-import { GetLocation, ListResult } from './types';
+import { Location, ListResult } from '../types';
 
 @Injectable()
 export class LocationResourceService {
@@ -13,16 +13,16 @@ export class LocationResourceService {
 
   constructor(protected http: HttpClient, protected windowRef: WindowRef) {}
 
-  public getLocationByUuid(uuid: string): Observable<GetLocation | undefined> {
+  public getLocationByUuid(uuid: string): Observable<Location | undefined> {
     const url = this.getUrl(uuid);
-    return this.http.get<GetLocation>(url).pipe(catchError(() => this.getLocationByUuidFallback(uuid)));
+    return this.http.get<Location>(url).pipe(catchError(() => this.getLocationByUuidFallback(uuid)));
   }
 
-  private getLocationByUuidFallback(uuid: string): Observable<GetLocation | undefined> {
+  private getLocationByUuidFallback(uuid: string): Observable<Location | undefined> {
     return this.getAllLocations().pipe(map((locations) => locations.find((location) => location.uuid === uuid)));
   }
 
-  public searchLocation(searchText: string): Observable<Array<GetLocation>> {
+  public searchLocation(searchText: string): Observable<Array<Location>> {
     return this.getAllLocations().pipe(
       map((locations) =>
         locations.filter((location) => location.display.toLowerCase().includes(searchText.toLowerCase())),
@@ -30,9 +30,9 @@ export class LocationResourceService {
     );
   }
 
-  private getAllLocations(): Observable<Array<GetLocation>> {
+  private getAllLocations(): Observable<Array<Location>> {
     const url = this.getUrl();
-    return this.http.get<ListResult<GetLocation>>(url).pipe(map((r) => r.results));
+    return this.http.get<ListResult<Location>>(url).pipe(map((r) => r.results));
   }
 
   public getUrl(uuid?: string) {

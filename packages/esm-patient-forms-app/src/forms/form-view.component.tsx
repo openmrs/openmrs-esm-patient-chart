@@ -4,15 +4,7 @@ import EmptyFormView from './empty-form.component';
 import isEmpty from 'lodash-es/isEmpty';
 import first from 'lodash-es/first';
 import debounce from 'lodash-es/debounce';
-import {
-  formatDatetime,
-  navigate,
-  useConfig,
-  useLayoutType,
-  usePagination,
-  useVisit,
-  Visit,
-} from '@openmrs/esm-framework';
+import { formatDatetime, useConfig, useLayoutType, usePagination, useVisit, Visit } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
@@ -27,53 +19,11 @@ import {
   DataTableHeader,
   DataTableRow,
 } from 'carbon-components-react';
-import { PatientChartPagination, launchPatientWorkspace, formEntrySub } from '@openmrs/esm-patient-common-lib';
+import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { CompletedFormInfo } from '../types';
 import Edit20 from '@carbon/icons-react/es/edit/20';
-import { ConfigObject, HtmlFormEntryForm } from '../config-schema';
-
-function startVisitPrompt() {
-  window.dispatchEvent(
-    new CustomEvent('visit-dialog', {
-      detail: {
-        type: 'prompt',
-      },
-    }),
-  );
-}
-
-function launchFormEntry(
-  currentVisit: Visit | undefined,
-  formUuid: string,
-  patient: fhir.Patient,
-  htmlFormEntryForms: Array<HtmlFormEntryForm>,
-  encounterUuid?: string,
-  formName?: string,
-) {
-  if (currentVisit) {
-    const htmlForm = htmlFormEntryForms.find((form) => form.formUuid === formUuid);
-    if (isEmpty(htmlForm)) {
-      launchWorkSpace(formUuid, patient, currentVisit?.uuid, encounterUuid, formName);
-    } else {
-      navigate({
-        to: `\${openmrsBase}/htmlformentryui/htmlform/${htmlForm.formUiPage}.page?patientId=${patient.id}&visitId=${currentVisit.uuid}&definitionUiResource=${htmlForm.formUiResource}`,
-      });
-    }
-  } else {
-    startVisitPrompt();
-  }
-}
-
-function launchWorkSpace(
-  formUuid: string,
-  patient: fhir.Patient,
-  visitUuid?: string,
-  encounterUuid?: string,
-  formName?: string,
-) {
-  formEntrySub.next({ formUuid, visitUuid, patient, encounterUuid });
-  launchPatientWorkspace('patient-form-entry-workspace', { workspaceTitle: formName });
-}
+import { ConfigObject } from '../config-schema';
+import { launchFormEntryOrHtmlForms } from '../form-entry-interop';
 
 interface FormViewProps {
   forms: Array<CompletedFormInfo>;
@@ -175,7 +125,7 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
                             <TableCell className={styles.tableCell}>
                               <label
                                 onClick={() =>
-                                  launchFormEntry(
+                                  launchFormEntryOrHtmlForms(
                                     currentVisit,
                                     row.id,
                                     patient,
@@ -193,7 +143,7 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
                                 <Edit20
                                   description="Edit form"
                                   onClick={() =>
-                                    launchFormEntry(
+                                    launchFormEntryOrHtmlForms(
                                       currentVisit,
                                       row.id,
                                       patient,
