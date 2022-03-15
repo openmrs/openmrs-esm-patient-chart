@@ -26,6 +26,8 @@ import { PatientPreviousEncounterService } from '../openmrs-api/patient-previous
 
 import { MonthlyScheduleResourceService } from '../services/monthly-scheduled-resource.service';
 import { ConfigResourceService } from '../services/config-resource.service';
+import { ConceptService } from '../services/concept.service';
+
 @Component({
   selector: 'my-app-fe-wrapper',
   templateUrl: './fe-wrapper.component.html',
@@ -55,7 +57,8 @@ export class FeWrapperComponent implements OnInit {
   isLoading: boolean = true;
   config: FormEntryConfig;
   isSubmitting: boolean = false;
-  labelMap: Array<Object> = [];
+  labelMap: {};
+  language: string = (window as any).i18next.language.substring(0, 2).toLowerCase();
 
   public get encounterDate(): string {
     return formatDate(new Date(this.encounter?.encounterDatetime), { time: false });
@@ -85,6 +88,7 @@ export class FeWrapperComponent implements OnInit {
     private patientPreviousEncounter: PatientPreviousEncounterService,
     private monthlyScheduleResourceService: MonthlyScheduleResourceService,
     private configResourceService: ConfigResourceService,
+    private conceptService: ConceptService,
   ) {}
 
   ngOnInit() {
@@ -365,6 +369,16 @@ export class FeWrapperComponent implements OnInit {
       this.setDefaultValues();
     }
     this.setUpPayloadProcessingInformation();
+
+    const unlabeledConcepts = this.formSchemaService.getUnlabeledConcepts(this.form);
+
+    // Fetch concept labels from server
+    this.conceptService.searchBulkConceptByUUID(unlabeledConcepts, this.language).subscribe((conceptData) => {
+      this.labelMap = {};
+      conceptData.forEach((concept: any) => {
+        this.labelMap[concept.extId] = concept.display;
+      });
+    });
   }
 
   private wireDataSources() {
