@@ -3,19 +3,7 @@ import OrderBasketActionButton from './order--basket-action-button.component';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { useLayoutType, useStore } from '@openmrs/esm-framework';
-
-const mockedUseStore = useStore as jest.Mock;
-const mockedLayoutType = useLayoutType as jest.Mock;
-
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-    useStore: jest.fn(),
-  };
-});
+import * as esmFramework from '@openmrs/esm-framework/mock';
 
 jest.mock('@openmrs/esm-patient-common-lib', () => {
   const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
@@ -31,13 +19,11 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
 
 describe('<OrderBasketActionButton/>', () => {
   it('should display tablet view action button', () => {
-    mockedLayoutType.mockReturnValueOnce('tablet');
-    mockedUseStore.mockReturnValueOnce({ items: [] });
+    spyOn(esmFramework, 'useLayoutType').and.returnValue('tablet');
     render(<OrderBasketActionButton />);
 
     const orderBasketButton = screen.getByRole('button', { name: /Order Basket/i });
     expect(orderBasketButton).toBeInTheDocument();
-    expect(orderBasketButton).toHaveClass('container');
     userEvent.click(orderBasketButton);
 
     expect(launchPatientWorkspace).toHaveBeenCalledWith('order-basket-workspace');
@@ -45,8 +31,7 @@ describe('<OrderBasketActionButton/>', () => {
   });
 
   it('should display desktop view action button', () => {
-    mockedLayoutType.mockReturnValueOnce('desktop');
-    mockedUseStore.mockReturnValueOnce({ items: [] });
+    spyOn(esmFramework, 'useLayoutType').and.returnValue('desktop');
     render(<OrderBasketActionButton />);
 
     const orderBasketButton = screen.getByRole('button', { name: /Orders/i });
@@ -58,8 +43,8 @@ describe('<OrderBasketActionButton/>', () => {
   });
 
   it('should display the count Tag if order are present on desktop view', () => {
-    mockedLayoutType.mockReturnValueOnce('desktop');
-    mockedUseStore.mockReturnValueOnce({ items: [{ name: 'order-01', uuid: 'some-uuid' }] });
+    spyOn(esmFramework, 'useLayoutType').and.returnValue('desktop');
+    spyOn(esmFramework, 'useStore').and.returnValue({ items: [{ name: 'order-01', uuid: 'some-uuid' }] });
     render(<OrderBasketActionButton />);
 
     const orderBasketButton = screen.getByRole('button', { name: /Order/i });
@@ -67,8 +52,8 @@ describe('<OrderBasketActionButton/>', () => {
   });
 
   it('should display the count Tag if order are present on tablet view', () => {
-    mockedLayoutType.mockReturnValueOnce('tablet');
-    mockedUseStore.mockReturnValueOnce({ items: [{ name: 'order-01', uuid: 'some-uuid' }] });
+    spyOn(esmFramework, 'useLayoutType').and.returnValue('tablet');
+    spyOn(esmFramework, 'useStore').and.returnValue({ items: [{ name: 'order-01', uuid: 'some-uuid' }] });
     render(<OrderBasketActionButton />);
 
     const orderBasketButton = screen.getByRole('button', { name: /Order/i });

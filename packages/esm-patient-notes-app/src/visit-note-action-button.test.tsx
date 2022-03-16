@@ -1,7 +1,7 @@
 import React from 'react';
 import VisitNoteActionButton from './visit-note-action-button.component';
 import { screen, render } from '@testing-library/react';
-import * as openmrsEsmFramework from '@openmrs/esm-framework';
+import * as openmrsEsmFramework from '@openmrs/esm-framework/mock';
 import userEvent from '@testing-library/user-event';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 
@@ -24,7 +24,6 @@ describe('<VisitNoteActionButton/>', () => {
 
     const visitNoteButton = screen.getByRole('button', { name: /Visit note/i });
     expect(visitNoteButton).toBeInTheDocument();
-    expect(visitNoteButton).toHaveClass('container');
     userEvent.click(visitNoteButton);
 
     expect(launchPatientWorkspace).toHaveBeenCalledWith('visit-notes-form-workspace');
@@ -37,7 +36,6 @@ describe('<VisitNoteActionButton/>', () => {
 
     const visitNoteButton = screen.getByRole('button', { name: /Note/i });
     expect(visitNoteButton).toBeInTheDocument();
-    expect(visitNoteButton).toHaveClass('container');
     userEvent.click(visitNoteButton);
 
     expect(launchPatientWorkspace).toHaveBeenCalledWith('visit-notes-form-workspace');
