@@ -15,16 +15,14 @@ jest.mock('@openmrs/esm-framework', () => ({
 describe('ActiveVisitBannerTag: ', () => {
   it('renders an active visit tag in the patient banner when an active visit is ongoing', () => {
     mockUseVisit.mockReturnValue({
-      currentVisit: mockCurrentVisit.visitData,
+      currentVisit: mockCurrentVisit,
       error: null,
     });
     const patient = { ...mockPatient, deceasedDateTime: null };
     render(<ActiveVisitBannerTag patientUuid={mockPatient.id} patient={patient} />);
 
     const visitMetadata =
-      mockCurrentVisit.visitData.visitType.name +
-      ' Started: ' +
-      formatDatetime(mockCurrentVisit.visitData.startDatetime, { mode: 'wide' });
+      mockCurrentVisit.visitType.name + ' Started: ' + formatDatetime(mockCurrentVisit.startDatetime, { mode: 'wide' });
 
     expect(
       screen.getByRole('tooltip', {
@@ -36,16 +34,14 @@ describe('ActiveVisitBannerTag: ', () => {
 
   it('should not render active visit tag if patient is dead', () => {
     mockUseVisit.mockReturnValue({
-      currentVisit: mockCurrentVisit.visitData,
+      currentVisit: mockCurrentVisit,
       error: null,
     });
     const patient = { ...mockPatient, deceasedDateTime: '2002-04-04' };
     render(<ActiveVisitBannerTag patientUuid={mockPatient.id} patient={patient} />);
 
     const visitMetadata =
-      mockCurrentVisit.visitData.visitType.name +
-      ' Started: ' +
-      formatDatetime(mockCurrentVisit.visitData.startDatetime, { mode: 'wide' });
+      mockCurrentVisit.visitType.name + ' Started: ' + formatDatetime(mockCurrentVisit.startDatetime, { mode: 'wide' });
 
     expect(
       screen.queryByRole('tooltip', {
