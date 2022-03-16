@@ -2,16 +2,16 @@ import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ComposedModal, Button, ModalBody, ModalHeader, ModalFooter } from 'carbon-components-react';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import styles from './start-visit.scss';
+import styles from './start-visit-dialog.scss';
 import { useVisitDialog } from '../useVisitDialog';
 
-interface StartVisitProps {
+interface StartVisitDialogProps {
   patientUuid: string;
 }
 
-const StartVisit: React.FC<StartVisitProps> = ({ patientUuid }) => {
+const StartVisitDialog: React.FC<StartVisitDialogProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const { type, state } = useVisitDialog(patientUuid);
+  const { state } = useVisitDialog(patientUuid);
   const closeModal = useCallback(
     () => window.dispatchEvent(new CustomEvent('visit-dialog', { detail: { type: 'close' } })),
     [],
@@ -42,7 +42,7 @@ const StartVisit: React.FC<StartVisitProps> = ({ patientUuid }) => {
         );
 
   return (
-    <ComposedModal open={type === 'prompt'} onClose={closeModal}>
+    <ComposedModal open onClose={closeModal}>
       <ModalHeader>
         <span className={styles.header}>{modalHeaderText}</span>
       </ModalHeader>
@@ -64,4 +64,4 @@ const StartVisit: React.FC<StartVisitProps> = ({ patientUuid }) => {
   );
 };
 
-export default StartVisit;
+export default StartVisitDialog;

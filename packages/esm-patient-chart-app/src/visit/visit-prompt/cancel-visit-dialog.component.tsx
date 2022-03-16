@@ -1,17 +1,16 @@
 import React, { useCallback, useState } from 'react';
 import { useVisit, openmrsFetch, showToast, showNotification } from '@openmrs/esm-framework';
-import styles from './cancel-visit.scss';
+import styles from './cancel-visit-dialog.scss';
 import { Button, ComposedModal, InlineLoading, ModalBody, ModalFooter, ModalHeader } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 import { useVisitDialog } from '../useVisitDialog';
 
-interface CancelVisitProps {
+interface CancelVisitDialogProps {
   patientUuid: string;
 }
 
-const CancelVisit: React.FC<CancelVisitProps> = ({ patientUuid }) => {
+const CancelVisitDialog: React.FC<CancelVisitDialogProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
-  const { type } = useVisitDialog(patientUuid);
   const { currentVisit, mutate } = useVisit(patientUuid);
   const [submitting, setSubmitting] = useState(false);
 
@@ -50,10 +49,10 @@ const CancelVisit: React.FC<CancelVisitProps> = ({ patientUuid }) => {
         setSubmitting(false);
       },
     );
-  }, [currentVisit]);
+  }, []);
 
   return (
-    <ComposedModal open={type === 'cancel'} onClose={closeModal}>
+    <ComposedModal open={true} onClose={closeModal}>
       <ModalHeader label={t('visit', 'Visit')} title={t('cancelActiveVisit', 'Cancel active visit')} />
       <ModalBody>
         <p className={styles.bodyShort02}>
@@ -72,4 +71,4 @@ const CancelVisit: React.FC<CancelVisitProps> = ({ patientUuid }) => {
   );
 };
 
-export default CancelVisit;
+export default CancelVisitDialog;

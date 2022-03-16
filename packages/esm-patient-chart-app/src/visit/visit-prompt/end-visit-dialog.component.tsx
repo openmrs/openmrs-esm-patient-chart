@@ -1,19 +1,18 @@
 import React, { useCallback } from 'react';
-import styles from './end-visit.scss';
+import styles from './end-visit-dialog.scss';
 import { ComposedModal, Button, ModalBody, ModalFooter, ModalHeader } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 import { parseDate, showNotification, showToast, updateVisit, useVisit } from '@openmrs/esm-framework';
 import { first } from 'rxjs/operators';
 import { useVisitDialog } from '../useVisitDialog';
 
-interface EndVisitProps {
+interface EndVisitDialogProps {
   patientUuid: string;
 }
 
-const EndVisit: React.FC<EndVisitProps> = ({ patientUuid }) => {
+const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const { currentVisit, mutate } = useVisit(patientUuid);
-  const { type } = useVisitDialog(patientUuid);
 
   const closeModal = useCallback(
     () => window.dispatchEvent(new CustomEvent('visit-dialog', { detail: { type: 'close' } })),
@@ -54,7 +53,7 @@ const EndVisit: React.FC<EndVisitProps> = ({ patientUuid }) => {
   };
 
   return (
-    <ComposedModal open={type === 'end'} onClose={closeModal}>
+    <ComposedModal open={true} onClose={closeModal}>
       <ModalHeader label={t('visit', 'Visit')} title={t('endActiveVisit', 'End active visit')} />
       <ModalBody>
         <p className={styles.bodyShort02}>
@@ -76,4 +75,4 @@ const EndVisit: React.FC<EndVisitProps> = ({ patientUuid }) => {
   );
 };
 
-export default EndVisit;
+export default EndVisitDialog;

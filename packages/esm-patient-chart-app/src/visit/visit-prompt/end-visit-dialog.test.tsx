@@ -1,5 +1,5 @@
 import React from 'react';
-import EndVisit from './end-visit.component';
+import EndVisitDialog from './end-visit-dialog.component';
 import { screen, render, waitFor } from '@testing-library/react';
 import { showNotification, showToast, updateVisit, useVisit } from '@openmrs/esm-framework';
 import { mockCurrentVisit } from '../../../../../__mocks__/visits.mock';
@@ -39,7 +39,7 @@ describe('EndVisit', () => {
     spyOn(mockUseVisitDialog, 'useVisitDialog').and.returnValue({ type: 'end' });
     mockUseVisit.mockReturnValue({ currentVisit: mockCurrentVisit, mutate: mockMutate });
     mockUpdateVisit.mockReturnValueOnce(of({ status: 200 }));
-    render(<EndVisit patientUuid="some-patient-uuid" />);
+    render(<EndVisitDialog patientUuid="some-patient-uuid" />);
 
     expect(screen.getByRole('heading', { name: /End active visit/ })).toBeInTheDocument();
     expect(
@@ -64,7 +64,7 @@ describe('EndVisit', () => {
     spyOn(mockUseVisitDialog, 'useVisitDialog').and.returnValue({ type: 'end' });
     mockUseVisit.mockReturnValue({ currentVisit: mockCurrentVisit, mutate: mockMutate });
     mockUpdateVisit.mockReturnValueOnce(throwError(new Error('Internal error message')));
-    render(<EndVisit patientUuid="some-patient-uuid" />);
+    render(<EndVisitDialog patientUuid="some-patient-uuid" />);
 
     expect(screen.getByRole('heading', { name: /End active visit/ })).toBeInTheDocument();
     expect(

@@ -1,5 +1,5 @@
 import React from 'react';
-import StartVisit from './start-visit.component';
+import StartVisitDialog from './start-visit-dialog.component';
 import { render, screen } from '@testing-library/react';
 import * as mockUseVisitDialog from '../useVisitDialog';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
@@ -21,7 +21,7 @@ describe('StartVisit', () => {
 
   test('should launch start visit form', () => {
     spyOn(mockUseVisitDialog, 'useVisitDialog').and.returnValue({ type: 'prompt' });
-    render(<StartVisit patientUuid="some-uuid" />);
+    render(<StartVisitDialog patientUuid="some-uuid" />);
 
     expect(
       screen.getByText(
@@ -37,7 +37,7 @@ describe('StartVisit', () => {
 
   test('should launch edit past visit form', () => {
     spyOn(mockUseVisitDialog, 'useVisitDialog').and.returnValue({ type: 'prompt', state: { type: 'past' } });
-    render(<StartVisit patientUuid="some-uuid" />);
+    render(<StartVisitDialog patientUuid="some-uuid" />);
 
     expect(
       screen.getByText(
