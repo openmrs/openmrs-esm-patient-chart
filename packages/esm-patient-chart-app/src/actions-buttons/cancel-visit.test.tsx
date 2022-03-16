@@ -14,7 +14,7 @@ jest.mock('@openmrs/esm-framework', () => {
 });
 
 describe('CancelVisitOverflowMenuItem', () => {
-  it('should launch cance visit dialog box', () => {
+  it('should launch cancel visit dialog box', () => {
     mockUseVisit.mockReturnValueOnce({ currentVisit: mockCurrentVisit });
     render(<CancelVisitOverflowMenuItem patientUuid="some-uuid" />);
 

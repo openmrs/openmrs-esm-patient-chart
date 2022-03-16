@@ -13,7 +13,7 @@ const CancelVisit: React.FC<CancelVisitProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const { type } = useVisitDialog(patientUuid);
   const { currentVisit, mutate } = useVisit(patientUuid);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const closeModal = useCallback(
     () => window.dispatchEvent(new CustomEvent('visit-dialog', { detail: { type: 'close' } })),
@@ -21,7 +21,8 @@ const CancelVisit: React.FC<CancelVisitProps> = ({ patientUuid }) => {
   );
 
   const cancelActiveVisit = useCallback(() => {
-    setIsSubmitting(true);
+    // TO DO expand updateVisit function in esm-api to support this request
+    setSubmitting(true);
     openmrsFetch(`/ws/rest/v1/visit/${currentVisit.uuid}`, {
       headers: {
         'Content-type': 'application/json',
@@ -37,7 +38,7 @@ const CancelVisit: React.FC<CancelVisitProps> = ({ patientUuid }) => {
           description: t('visitCanceled', 'Canceled active visit successfully'),
         });
         closeModal();
-        setIsSubmitting(false);
+        setSubmitting(false);
       },
       (error) => {
         showNotification({
@@ -46,7 +47,7 @@ const CancelVisit: React.FC<CancelVisitProps> = ({ patientUuid }) => {
           critical: true,
           description: error?.message,
         });
-        setIsSubmitting(false);
+        setSubmitting(false);
       },
     );
   }, [currentVisit]);
@@ -63,8 +64,8 @@ const CancelVisit: React.FC<CancelVisitProps> = ({ patientUuid }) => {
         <Button kind="secondary" onClick={closeModal}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button disabled={isSubmitting} kind="danger" onClick={cancelActiveVisit}>
-          {isSubmitting ? <InlineLoading description={t('loading', 'Loading...')} /> : t('cancelVisit', 'Cancel Visit')}
+        <Button disabled={submitting} kind="danger" onClick={cancelActiveVisit}>
+          {submitting ? <InlineLoading description={t('loading', 'Loading...')} /> : t('cancelVisit', 'Cancel Visit')}
         </Button>
       </ModalFooter>
     </ComposedModal>

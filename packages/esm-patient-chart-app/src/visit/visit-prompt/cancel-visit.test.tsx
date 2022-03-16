@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen, render } from '@testing-library/react';
+import { screen, render, waitFor } from '@testing-library/react';
 import CancelVisit from './cancel-visit.component';
 import userEvent from '@testing-library/user-event';
 import { useVisit, openmrsFetch, showNotification, showToast } from '@openmrs/esm-framework';
@@ -38,19 +38,18 @@ describe('Cancel Visit', () => {
     const cancelVisitButton = screen.getByRole('button', { name: /Cancel Visit/i, exact: true });
 
     userEvent.click(cancelVisitButton);
-    expect(mockOpenmrsFetch).toHaveBeenCalledWith('/ws/rest/v1/visit/some-uuid', {
+    expect(mockOpenmrsFetch).toHaveBeenCalledWith('/ws/rest/v1/visit/17f512b4-d264-4113-a6fe-160cb38cb46e', {
       body: { voided: true },
       headers: { 'Content-type': 'application/json' },
       method: 'POST',
     });
 
-    const closeModalButton = await screen.findByRole('button', { name: 'Cancel', exact: true });
-    userEvent.click(closeModalButton);
-
-    expect(mockShowToast).toHaveBeenCalledWith({
-      kind: 'success',
-      title: 'Cancel visit',
-      description: 'Canceled active visit successfully',
+    await waitFor(() => {
+      expect(mockShowToast).toHaveBeenCalledWith({
+        kind: 'success',
+        title: 'Cancel visit',
+        description: 'Canceled active visit successfully',
+      });
     });
   });
 
@@ -66,19 +65,19 @@ describe('Cancel Visit', () => {
     const cancelVisitButton = screen.getByRole('button', { name: /Cancel Visit/i, exact: true });
 
     userEvent.click(cancelVisitButton);
-    expect(mockOpenmrsFetch).toHaveBeenCalledWith('/ws/rest/v1/visit/some-uuid', {
+    expect(mockOpenmrsFetch).toHaveBeenCalledWith('/ws/rest/v1/visit/17f512b4-d264-4113-a6fe-160cb38cb46e', {
       body: { voided: true },
       headers: { 'Content-type': 'application/json' },
       method: 'POST',
     });
 
-    const closeModalButton = await screen.findByRole('button', { name: 'Cancel', exact: true });
-    userEvent.click(closeModalButton);
-    expect(mockShowNotification).toHaveBeenCalledWith({
-      critical: true,
-      description: 'Internal server error',
-      kind: 'error',
-      title: 'Error canceling active visit',
+    await waitFor(() => {
+      expect(mockShowNotification).toHaveBeenCalledWith({
+        critical: true,
+        description: 'Internal server error',
+        kind: 'error',
+        title: 'Error canceling active visit',
+      });
     });
   });
 });

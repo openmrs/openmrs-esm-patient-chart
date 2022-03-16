@@ -54,27 +54,22 @@ export const mockVisits = {
 };
 
 export const mockCurrentVisit = {
-  mode: VisitMode.LOADING,
-  visitData: {
-    uuid: '17f512b4-d264-4113-a6fe-160cb38cb46e',
-    encounters: [],
-    patient: { uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e' },
-    visitType: {
-      uuid: '7b0f5697-27e3-40c4-8bae-f4049abfb4ed',
-      name: 'Facility Visit',
-      display: 'Facility Visit',
-    },
-    attributes: [],
-    location: {
-      uuid: '6351fcf4-e311-4a19-90f9-35667d99a8af',
-      name: 'Registration Desk',
-      display: 'Registration Desk',
-    },
-    startDatetime: new Date('2021-03-16T08:16:00.000+0000'),
-    stopDatetime: null,
+  uuid: '17f512b4-d264-4113-a6fe-160cb38cb46e',
+  encounters: [],
+  patient: { uuid: '8673ee4f-e2ab-4077-ba55-4980f408773e' },
+  visitType: {
+    uuid: '7b0f5697-27e3-40c4-8bae-f4049abfb4ed',
+    name: 'Facility Visit',
+    display: 'Facility Visit',
   },
-  status: VisitStatus.ONGOING,
-  uuid:'some-uuid'
+  attributes: [],
+  startDatetime: new Date('2021-03-16T08:16:00.000+0000'),
+  stopDatetime: null,
+  location: {
+    uuid: '6351fcf4-e311-4a19-90f9-35667d99a8af',
+    name: 'Registration Desk',
+    display: 'Registration Desk',
+  },
 };
 
 export const visitOverviewDetailMockData = {

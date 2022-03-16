@@ -20,12 +20,12 @@ const StartVisit: React.FC<StartVisitProps> = ({ patientUuid }) => {
   const handleEditPastVisit = useCallback(() => {
     launchPatientWorkspace('past-visits-overview');
     closeModal();
-  }, [closeModal]);
+  }, []);
 
   const handleStartNewVisit = useCallback(() => {
     launchPatientWorkspace('start-visit-workspace-form');
     closeModal();
-  }, [closeModal]);
+  }, []);
 
   const modalHeaderText =
     state?.type === 'past' ? t('addPastVisit', 'Add a past visit') : t('noActiveVisit', 'No active visit');

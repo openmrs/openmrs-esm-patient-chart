@@ -19,7 +19,7 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
   };
 });
 
-fdescribe('VisitDialog', () => {
+describe('VisitDialog', () => {
   beforeEach(() => {
     spyOn(mockEsmOpenmrsFramwork, 'useVisit').and.returnValue({ currentVisit: mockCurrentVisit });
   });
