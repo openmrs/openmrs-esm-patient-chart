@@ -2,20 +2,14 @@ import 'systemjs-webpack-interop/resource-query-public-path?systemjsModuleName=@
 import 'zone.js/dist/zone';
 import 'reflect-metadata';
 import { messageOmrsServiceWorker, defineConfigSchema } from '@openmrs/esm-framework';
-import {
-  setupOfflineEncounterSync,
-  setupEncounterRequestInterceptors,
-  setupOfflineDataSourcePrecaching,
-} from './offline';
 import { configSchema } from './config-schema';
+import { setupOfflineDataSourcePrecaching } from './app/offline/caching';
 
 const backendDependencies = { 'webservices.rest': '^2.24.0' };
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 const moduleName = '@openmrs/esm-form-entry-app';
 
 function setupOpenMRS() {
-  setupEncounterRequestInterceptors();
-  setupOfflineEncounterSync();
   setupOfflineDataSourcePrecaching();
 
   messageOmrsServiceWorker({
@@ -56,8 +50,12 @@ function setupOpenMRS() {
         name: 'form-widget',
         slot: 'form-widget-slot',
         load: () => import('./bootstrap'),
-        online: true,
-        offline: true,
+        online: {
+          isOffline: false,
+        },
+        offline: {
+          isOffline: true,
+        },
       },
     ],
   };

@@ -1,252 +1,188 @@
 import { Injectable } from '@angular/core';
 
-import { throwError as observableThrowError, forkJoin, Observable, Subject, of } from 'rxjs';
-import { catchError, first } from 'rxjs/operators';
+import { forkJoin, Observable, of, from } from 'rxjs';
+import { catchError, map, mergeMap } from 'rxjs/operators';
 import { EncounterAdapter, PersonAttribuAdapter, Form } from '@ampath-kenya/ngx-formentry';
 import { EncounterResourceService } from '../openmrs-api/encounter-resource.service';
 import { PersonResourceService } from '../openmrs-api/person-resource.service';
 import { FormDataSourceService } from '../form-data-source/form-data-source.service';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Person, PersonUpdate, EncounterCreate, Encounter } from '../types';
+import {
+  findQueuedPatientFormSyncItemByContentId,
+  PatientFormSyncItemContent,
+  queuePatientFormSyncItem,
+} from '../offline/sync';
+import isEmpty from 'lodash-es/isEmpty';
+import cloneDeep from 'lodash-es/cloneDeep';
+import { mutateEncounterCreateToPartialEncounter } from '../offline/syncItemMutation';
+import { SingleSpaPropsService } from '../single-spa-props/single-spa-props.service';
+import { v4 } from 'uuid';
+import { NodeBase } from '@ampath-kenya/ngx-formentry/form-entry/form-factory/form-node';
+
+/**
+ * The result of submitting a form via the {@link FormSubmissionService.submitPayload} function.
+ */
+interface FormSubmissionResult {
+  encounter: Encounter;
+}
 
 @Injectable()
 export class FormSubmissionService {
-  private payloadTypes: Array<string> = ['encounter', 'personAttribute'];
-
   constructor(
-    private encounterAdapter: EncounterAdapter,
-    private personAttributeAdapter: PersonAttribuAdapter,
-    private encounterResourceService: EncounterResourceService,
-    private personResourceService: PersonResourceService,
-    private formDataSourceService: FormDataSourceService,
+    private readonly encounterAdapter: EncounterAdapter,
+    private readonly personAttributeAdapter: PersonAttribuAdapter,
+    private readonly encounterResourceService: EncounterResourceService,
+    private readonly personResourceService: PersonResourceService,
+    private readonly formDataSourceService: FormDataSourceService,
+    private readonly singleSpaPropsService: SingleSpaPropsService,
   ) {}
 
-  public submitPayload(form: Form, payloadTypes: Array<string> = this.payloadTypes): Observable<any> {
-    // create payload batch to be submitted on concurrently
-    const payloadBatch: Array<Observable<any>> = this.createPayloadBatch(form, payloadTypes);
-    return Observable.create((observer: Subject<any>) => {
-      return forkJoin(payloadBatch).subscribe(
-        (responses: Array<any>) => {
-          if (responses) {
-            const response: any = this.processFormSubmissionResponse(responses);
-            response.hasError ? observer.error(response) : observer.next(response);
-          }
-        },
-        (err) => {
-          // all error at this point have been catched, unless it's a typo
-          console.error('An unknown error occurred, please try again---->', err);
-        },
-      );
-    }).pipe(first());
-  }
+  public submitPayload(form: Form): Observable<FormSubmissionResult> {
+    const isOffline = this.singleSpaPropsService.getProp('isOffline', false);
+    const encounterOrSyncItemIdToEdit = this.singleSpaPropsService.getProp('encounterUuid');
+    const existingSyncItem = from(findQueuedPatientFormSyncItemByContentId(encounterOrSyncItemIdToEdit));
 
-  private createPayloadBatch(form: Form, payloadTypes: Array<string>): Array<Observable<any>> {
-    const payloadBatch: Array<Observable<any>> = [];
-    if (Array.isArray(payloadTypes) && payloadTypes.length > 0) {
-      payloadTypes.forEach((payloadType: any, key) => {
-        switch (payloadType) {
-          case 'encounter':
-            const providers = this.formDataSourceService.getCachedProviderSearchResults();
+    return existingSyncItem.pipe(
+      mergeMap((syncItem) => {
+        const isOfflineSubmission = isOffline || !!syncItem;
 
-            if (providers && providers.length > 0 && !form.valueProcessingInfo.providerUuid) {
-              const providerUuid = this.getProviderUuid(providers, form);
-              form = this.setProviderUuid(form, providerUuid);
-            }
-
-            const encounterPayload: any = this.encounterAdapter.generateFormPayload(form);
-            if (!this.isEmpty(encounterPayload)) {
-              payloadBatch.push(
-                this.submitEncounterPayload(form, encounterPayload).pipe(
-                  catchError((res: any) =>
-                    of({
-                      hasError: true,
-                      payloadType: [payloadType],
-                      response: res,
-                      errorMessages: this.processFormSubmissionErrors(res, payloadType, encounterPayload),
-                    }),
-                  ),
-                ),
-              );
-            }
-            break;
-          case 'personAttribute':
-            const personAttrPayload: Array<any> = this.personAttributeAdapter.generateFormPayload(form);
-            if (!this.isEmpty(personAttrPayload)) {
-              // this should be > 0
-              payloadBatch.push(
-                this.submitPersonAttributePayload(form, personAttrPayload).pipe(
-                  catchError((res: any) =>
-                    of({
-                      hasError: true,
-                      payloadType: [payloadType],
-                      response: res,
-                      errorMessages: this.processFormSubmissionErrors(res, payloadType, personAttrPayload),
-                    }),
-                  ),
-                ),
-              );
-            }
-            break;
-          default:
-            console.error('Invalid Payload Type, Please register');
+        if (isOfflineSubmission) {
+          this.deepClearInitialNodeValues(form.rootNode);
         }
-      });
-    }
-    return payloadBatch;
+
+        const encounterCreate = this.buildEncounterPayload(form);
+        const personUpdate = this.buildPersonUpdatePayload(form);
+
+        return isOfflineSubmission
+          ? this.submitPayloadOffline(form, encounterCreate, personUpdate, syncItem?.content._id)
+          : this.submitPayloadOnline(encounterCreate, personUpdate);
+      }),
+    );
   }
 
-  private submitEncounterPayload(form: Form, encounterPayload: any): Observable<any> {
-    if (encounterPayload.uuid) {
-      // editting existing form
-      return this.encounterResourceService.updateEncounter(encounterPayload.uuid, encounterPayload);
-    } else {
-      // creating new form
-      return this.encounterResourceService.saveEncounter(encounterPayload);
+  /**
+   * Recursively clears all `initialValue` attributes of the given form node and of all its children.
+   * This ensures that the form node returns the final entities (e.g. encounters) in the "Create" format
+   * (and not the diffed "Update" format).
+   * @param node The form node whose `initialValue` attributes should be cleared (recursively, i.e. including
+   * all of the nodes children).
+   */
+  private deepClearInitialNodeValues(node: NodeBase) {
+    node.initialValue = undefined;
+
+    if (node.children && typeof node.children === 'object') {
+      for (const child of Object.values(node.children)) {
+        this.deepClearInitialNodeValues(child as NodeBase);
+      }
     }
   }
 
-  private submitPersonAttributePayload(form: Form, payload: any): Observable<any> {
-    const personAttributePayload: any = {
-      attributes: payload,
+  private submitPayloadOffline(
+    form: Form,
+    encounterCreate: EncounterCreate,
+    personUpdate: PersonUpdate,
+    syncItemIdToEdit: string | undefined,
+  ): Observable<FormSubmissionResult> {
+    const encounter = mutateEncounterCreateToPartialEncounter(cloneDeep(encounterCreate));
+    const result: FormSubmissionResult = { encounter: encounter as any };
+    const syncItem: PatientFormSyncItemContent = {
+      _id: syncItemIdToEdit ?? v4(),
+      formSchemaUuid: form.schema.uuid,
+      encounter,
+      _payloads: {
+        encounterCreate,
+        personUpdate,
+      },
     };
-    if (form.valueProcessingInfo.personUuid) {
-      return this.personResourceService.saveUpdatePerson(form.valueProcessingInfo.personUuid, personAttributePayload);
-    } else {
-      return observableThrowError('Form does not have: form.valueProcessingInfo.personUuid');
-    }
+
+    return from(queuePatientFormSyncItem(syncItem).then(() => result));
   }
 
-  private processFormSubmissionResponse(responses: Array<any>): any {
-    const arrayOfErrors: Array<any> = [];
-    responses.forEach((response: any, key) => {
-      if (response && response.hasError) {
-        arrayOfErrors.push(response);
-      }
+  private submitPayloadOnline(
+    encounterCreate: EncounterCreate,
+    personUpdate: PersonUpdate,
+  ): Observable<FormSubmissionResult> {
+    return forkJoin({
+      encounter: this.submitEncounter(encounterCreate),
+      person: this.submitPersonUpdate(personUpdate),
     });
-    if (arrayOfErrors.length > 1) {
-      // all payloads failed
-      const responseObject: any = {
-        hasError: true,
-        payloadType: this.payloadTypes,
-        response: responses,
-        errorMessages: [],
-      };
-      arrayOfErrors.forEach((response: any, key) => {
-        if (response !== undefined) {
-          if (response.hasError) {
-            responseObject.errorMessages.push.apply(responseObject.errorMessages, response.errorMessages);
-          }
-        }
-      });
-      return responseObject;
-    } else if (arrayOfErrors.length === 1) {
-      // only one payload failed
-      const response: any = arrayOfErrors[0];
-      return response;
+  }
+
+  private submitEncounter(encounterCreate: EncounterCreate): Observable<Encounter | undefined> {
+    if (!encounterCreate) {
+      return of(undefined);
+    }
+
+    if (encounterCreate.uuid) {
+      return this.encounterResourceService
+        .updateEncounter(encounterCreate.uuid, encounterCreate)
+        .pipe(catchError((res) => this.throwUserFriendlyError(res)));
     } else {
-      // none of the payloads failed to save : success
-      return responses;
+      return this.encounterResourceService
+        .saveEncounter(encounterCreate)
+        .pipe(catchError((res) => this.throwUserFriendlyError(res)));
     }
   }
 
-  private processFormSubmissionErrors(response: any, payloadType: string, payload: any): Array<any> {
-    const errors: Array<any> = [];
-    switch (payloadType) {
-      case 'encounter':
-        errors.push('Encounter Error: ' + this.generateUserFriendlyErrorMessage(response));
-        break;
-      case 'personAttribute':
-        errors.push('Person Attribute Error: ' + this.generateUserFriendlyErrorMessage(response));
-        break;
-      default:
-        errors.push('Unknown Payload: ' + this.generateUserFriendlyErrorMessage(response));
-    }
-    return errors;
-  }
-  private logFormError(errorObj: object): void {
-    // this.errorLogResourceService.postFormError(errorObj).subscribe(
-    //   (responses: Array<any>) => {
-    //     if (responses) {
-    //       console.log('Form submission error logged to server successfully', responses);
-    //     }
-    //   },
-    //   (err) => {
-    //     console.error('An error occurred, while logging error to etl server', err);
-    //   }
-    // );
-  }
-
-  private generateUserFriendlyErrorMessage(response: any): string {
-    let message = 'An error occurred, please try again';
-    if (this.isEmpty(response.error)) {
-      message = 'Please check your internet connection, you seem to be offline.';
-    } else {
-      if (!this.isEmpty(response.error?.error?.fieldErrors)) {
-        // handle field errors
-        const arrayErrors: Array<any> = [];
-        for (const o in response.error.error.fieldErrors) {
-          if (response.error.error.fieldErrors.hasOwnProperty(o)) {
-            const fieldErrors = response.error.error.fieldErrors[o];
-            fieldErrors.forEach((error: any) => {
-              arrayErrors.push(error.message);
-            });
-          }
-        }
-        message = JSON.stringify(arrayErrors);
-      } else if (!this.isEmpty(response.error?.message)) {
-        message = response.error.message;
-      }
+  private submitPersonUpdate(personUpdate: PersonUpdate): Observable<Person | undefined> {
+    if (!personUpdate) {
+      return of(undefined);
     }
 
-    return message;
+    return this.personResourceService
+      .saveUpdatePerson(personUpdate.uuid!, personUpdate)
+      .pipe(catchError((res) => this.throwUserFriendlyError(res)));
   }
 
-  private getProviderUuid(providers, form: Form): string {
+  private buildEncounterPayload(form: Form): EncounterCreate | undefined {
+    const providers = this.formDataSourceService.getCachedProviderSearchResults();
+
+    if (providers?.length && !form.valueProcessingInfo.providerUuid) {
+      const providerUuid = this.findProviderUuidFormForm(providers, form);
+      form.valueProcessingInfo.providerUuid = providerUuid;
+    }
+
+    const encounterPayload = this.encounterAdapter.generateFormPayload(form) as unknown as EncounterCreate;
+    return isEmpty(encounterPayload) ? undefined : encounterPayload;
+  }
+
+  private findProviderUuidFormForm(providers: Array<any>, form: Form): string | undefined {
     const encounterProvider = form.searchNodeByQuestionId('provider');
-    let personUuid: string = null;
-    if (encounterProvider.length > 0) {
-      personUuid = encounterProvider[0].control.value;
-    }
-
-    const filtered = providers.filter((p: any) => {
-      if (p.id === personUuid) {
-        return true;
-      } else {
-        return false;
-      }
-    });
-    if (filtered.length > 0) {
-      return filtered[0].providerUuid;
-    }
-    return personUuid;
+    const personUuid = encounterProvider[0]?.control.value;
+    const providerUuid = providers.find((provider) => provider.id === personUuid)?.providerUuid;
+    return providerUuid ?? personUuid;
   }
 
-  private setProviderUuid(form: Form, providerUuid: string): Form {
-    form.valueProcessingInfo.providerUuid = providerUuid;
-    return form;
+  private buildPersonUpdatePayload(form: Form): PersonUpdate | undefined {
+    if (!form.valueProcessingInfo.personUuid) {
+      throw new Error(
+        'The form is missing a required value for submitting person updates: form.valueProcessingInfo.personUuid',
+      );
+    }
+
+    const attributes = this.personAttributeAdapter.generateFormPayload(form);
+    if (isEmpty(attributes)) {
+      return undefined;
+    }
+
+    return { uuid: form.valueProcessingInfo.personUuid, attributes: attributes };
   }
 
-  private isEmpty(obj): boolean {
-    if (Array.isArray(obj)) {
-      if (obj.length === 0) {
-        return true;
-      }
+  // TODO: Should this function be extracted?
+  // This type of general HTTP/REST API error handling is most likely also useful elsewhere.
+  private throwUserFriendlyError(error: string | HttpErrorResponse): never {
+    if (typeof error === 'object') {
+      const fieldErrors: Array<any> = Object.values(error.error?.error?.fieldErrors ?? {});
+      const fieldErrorMessages = fieldErrors
+        .flatMap((fieldErrors) => fieldErrors)
+        .map((fieldError) => fieldError.message);
+      const message = fieldErrorMessages.length > 0 ? fieldErrorMessages.join(' ') : error.message;
+      throw new Error(message);
+    } else if (typeof error === 'string') {
+      throw new Error(error);
     } else {
-      if (obj === null || obj === undefined) {
-        return true;
-      }
-      if (typeof obj === 'string' && obj.trim().length === 0) {
-        return true;
-      }
-      return this.isObjectEmpty(obj);
+      throw new Error(`An unknown error occured: ${error}.`);
     }
-    return false;
-  }
-
-  private isObjectEmpty(obj) {
-    for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        return false;
-      }
-    }
-    return true;
   }
 }

@@ -10,18 +10,17 @@ export class LocalStorageService {
     window.localStorage.setItem(keyName, value);
   }
 
-  public getObject(keyName: string): any {
+  public getObject<T = any>(keyName: string): T | null {
     const stored = window.localStorage.getItem(keyName);
     try {
-      const object = JSON.parse(stored);
-      return object;
+      return JSON.parse(stored);
     } catch (error) {
       console.error(error);
       return null;
     }
   }
 
-  public setObject(keyName: string, value: any) {
+  public setObject(keyName: string, value: unknown) {
     window.localStorage.setItem(keyName, JSON.stringify(value));
   }
 

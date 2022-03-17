@@ -10,14 +10,6 @@ import { PersonResourceService } from '../openmrs-api/person-resource.service';
 import { FormDataSourceService } from '../form-data-source/form-data-source.service';
 import { LocalStorageService } from '../local-storage/local-storage.service';
 
-class FakeCacheStorageService {
-  constructor(a, b) {}
-
-  public ready() {
-    return true;
-  }
-}
-
 describe('Service: FormSubmissionService', () => {
   // sample field error
   const sampleFieldError: any = {

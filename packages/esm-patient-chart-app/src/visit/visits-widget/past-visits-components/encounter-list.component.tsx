@@ -73,7 +73,7 @@ const EncounterList: React.FC<EncounterListProps> = ({ isShowingAllEncounters, e
   }
 
   const launchWorkspace = (formUuid: string, visitUuid?: string, encounterUuid?: string, formName?: string) => {
-    formEntrySub.next({ formUuid, patient, visitUuid, encounterUuid });
+    formEntrySub.next({ formUuid, visitUuid, encounterUuid });
     launchPatientWorkspace('patient-form-entry-workspace', { workspaceTitle: formName });
   };
 
