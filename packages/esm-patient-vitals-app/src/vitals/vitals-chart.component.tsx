@@ -32,6 +32,7 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
   const chartData = useMemo(() => {
     return patientVitals
       .filter((vitals) => vitals[selectedVitalSign.value])
+      .splice(0, 10)
       .map((vitals) => {
         return (
           vitals[selectedVitalSign.value] && {
