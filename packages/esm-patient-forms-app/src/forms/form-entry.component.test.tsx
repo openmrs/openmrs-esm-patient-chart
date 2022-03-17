@@ -3,12 +3,19 @@ import FormEntry from './form-entry.component';
 import { screen, render } from '@testing-library/react';
 import { BehaviorSubject } from 'rxjs';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
-import { useConnectivity, useVisit } from '@openmrs/esm-framework';
+import { usePatient, useVisit } from '@openmrs/esm-framework';
 import { mockCurrentVisit } from '../../../../__mocks__/visits.mock';
+
+const testProp = {
+  patient: mockPatient,
+  closeWorkspace: jest.fn(),
+  promptBeforeClosing: jest.fn(),
+  patientUuid: mockPatient.id,
+};
 
 const mockFormEntrySub = jest.fn();
 const mockUseVisit = useVisit as jest.Mock;
-const mockUseConnectivity = useConnectivity as jest.Mock;
+const mockUsePatient = usePatient as jest.Mock;
 
 jest.mock('@openmrs/esm-patient-common-lib', () => ({
   get formEntrySub() {
@@ -19,17 +26,17 @@ jest.mock('@openmrs/esm-patient-common-lib', () => ({
 jest.mock('@openmrs/esm-framework', () => ({
   ExtensionSlot: jest.fn().mockImplementation((ext) => ext.extensionSlotName),
   useVisit: jest.fn(),
-  useConnectivity: jest.fn(),
+  usePatient: jest.fn(),
 }));
 
 describe('FormEntry', () => {
   const renderFormEntry = () => {
-    mockUseConnectivity.mockReturnValue(true);
+    mockUsePatient.mockReturnValue({ patient: mockPatient });
     mockUseVisit.mockReturnValue({ currentVisit: mockCurrentVisit });
     mockFormEntrySub.mockReturnValue(
       new BehaviorSubject({ encounterUuid: null, formUuid: 'some-form-uuid', patient: mockPatient }),
     );
-    return render(<FormEntry patient={mockPatient} patientUuid={mockPatient.id} />);
+    return render(<FormEntry {...testProp} />);
   };
 
   it('should render form entry extension', () => {
