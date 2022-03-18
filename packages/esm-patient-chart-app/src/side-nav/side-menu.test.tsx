@@ -2,6 +2,13 @@ import React from 'react';
 import SideMenu from './side-menu.component';
 import { render } from '@testing-library/react';
 import { ExtensionSlot, useLayoutType } from '@openmrs/esm-framework';
+global.window.matchMedia = jest.fn().mockImplementation(() => {
+  return {
+    matches: false,
+    addListener: function () {},
+    removeListener: function () {},
+  };
+});
 
 const mockExtensionSlot = ExtensionSlot as jest.Mock;
 mockExtensionSlot.mockImplementation(() => <div>rendered</div>);

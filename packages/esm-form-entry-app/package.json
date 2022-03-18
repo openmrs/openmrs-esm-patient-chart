@@ -35,7 +35,7 @@
     "url": "https://github.com/openmrs/openmrs-esm-patient-chart/issues"
   },
   "dependencies": {
-    "@ampath-kenya/ngx-formentry": "^3.0.0-alpha16.0",
+    "@ampath-kenya/ngx-formentry": "^3.0.0-alpha17",
     "@angular-extensions/elements": "11.0.1",
     "@angular/animations": "~11.2.14",
     "@angular/cdk": "~11.2.13",

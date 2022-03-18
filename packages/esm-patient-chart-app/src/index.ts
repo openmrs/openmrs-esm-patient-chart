@@ -71,6 +71,14 @@ function setupOpenMRS() {
         }),
       },
       {
+        name: 'cancel-visit-button',
+        slot: 'patient-actions-slot',
+        load: getAsyncLifecycle(() => import('./actions-buttons/cancel-visit.component'), {
+          featureName: 'patient-actions-slot',
+          moduleName,
+        }),
+      },
+      {
         name: 'add-past-visit-button',
         slot: 'patient-actions-slot',
         load: getAsyncLifecycle(() => import('./actions-buttons/add-past-visit.component'), {
