@@ -2,7 +2,7 @@ import React, { useCallback, useContext, useEffect, useRef, useState } from 'rea
 import { Grid, ShadowBox } from '../timeline/helpers';
 import { EmptyState, OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import FilterContext from '../filter/filter-context';
-import styles from './new-timeline.scss';
+import styles from './grouped-timeline.styles.scss';
 import { makeThrottled } from '../helpers';
 
 const TimeSlots: React.FC<{
@@ -278,7 +278,7 @@ const TimelineDataGroup = ({ parent, subRows, xScroll, setXScroll, panelName, se
   );
 };
 
-export const NewTimeline = () => {
+export const GroupedTimeline = () => {
   const { activeTests, timelineData, parents, checkboxes, someChecked, lowestParents } = useContext(FilterContext);
   const [panelName, setPanelName] = useState('');
   const [xScroll, setXScroll] = useState(0);
@@ -347,4 +347,4 @@ export const NewTimeline = () => {
   return null;
 };
 
-export default NewTimeline;
+export default GroupedTimeline;
