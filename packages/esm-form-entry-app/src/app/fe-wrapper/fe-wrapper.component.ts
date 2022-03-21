@@ -71,6 +71,15 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
         (form) => {
           this.formState = 'ready';
           this.form = form;
+
+          const unlabeledConcepts = this.formSchemaService.getUnlabeledConcepts(this.form);
+          // Fetch concept labels from server
+          this.conceptService.searchBulkConceptByUUID(unlabeledConcepts, this.language).subscribe((conceptData) => {
+            this.labelMap = {};
+            conceptData.forEach((concept: any) => {
+              this.labelMap[concept.extId] = concept.display;
+            });
+          });
         },
         (err) => {
           // TODO: Improve error handling.
@@ -79,16 +88,6 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
           console.error('Error rendering form', err);
         },
       );
-
-    const unlabeledConcepts = this.formSchemaService.getUnlabeledConcepts(this.form);
-
-    // Fetch concept labels from server
-    this.conceptService.searchBulkConceptByUUID(unlabeledConcepts, this.language).subscribe((conceptData) => {
-      this.labelMap = {};
-      conceptData.forEach((concept: any) => {
-        this.labelMap[concept.extId] = concept.display;
-      });
-    });
   }
 
   private loadAllFormDependencies(): Observable<CreateFormParams> {
