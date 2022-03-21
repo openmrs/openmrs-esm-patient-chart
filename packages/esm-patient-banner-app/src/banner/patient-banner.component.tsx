@@ -15,9 +15,16 @@ interface PatientBannerProps {
   patientUuid: string;
   onClick?: (patientUuid: string) => void;
   onTransition?: () => void;
+  hideActionsOverflow?: boolean;
 }
 
-const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, onClick, onTransition }) => {
+const PatientBanner: React.FC<PatientBannerProps> = ({
+  patient,
+  patientUuid,
+  onClick,
+  onTransition,
+  hideActionsOverflow,
+}) => {
   const { t } = useTranslation();
   const overFlowMenuRef = React.useRef(null);
 
@@ -66,23 +73,25 @@ const PatientBanner: React.FC<PatientBannerProps> = ({ patient, patientUuid, onC
                 className={styles.flexRow}
               />
             </div>
-            <div ref={overFlowMenuRef}>
-              <CustomOverflowMenuComponent
-                menuTitle={
-                  <>
-                    <span className={styles.actionsButtonText}>{t('actions', 'Actions')}</span>{' '}
-                    <OverflowMenuVertical16 style={{ marginLeft: '0.5rem' }} />
-                  </>
-                }
-              >
-                <ExtensionSlot
-                  extensionSlotName="patient-actions-slot"
-                  key="patient-actions-slot"
-                  className={styles.overflowMenuItemList}
-                  state={patientActionsSlotState}
-                />
-              </CustomOverflowMenuComponent>
-            </div>
+            {!hideActionsOverflow && (
+              <div ref={overFlowMenuRef}>
+                <CustomOverflowMenuComponent
+                  menuTitle={
+                    <>
+                      <span className={styles.actionsButtonText}>{t('actions', 'Actions')}</span>{' '}
+                      <OverflowMenuVertical16 style={{ marginLeft: '0.5rem' }} />
+                    </>
+                  }
+                >
+                  <ExtensionSlot
+                    extensionSlotName="patient-actions-slot"
+                    key="patient-actions-slot"
+                    className={styles.overflowMenuItemList}
+                    state={patientActionsSlotState}
+                  />
+                </CustomOverflowMenuComponent>
+              </div>
+            )}
           </div>
           <div className={styles.demographics}>
             <span>{capitalize(patient.gender)}</span> &middot; <span>{age(patient.birthDate)}</span> &middot;{' '}

@@ -4,8 +4,6 @@ import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { of as observableOf, Observable } from 'rxjs';
 import { map, flatMap, catchError } from 'rxjs/operators';
 import { WindowRef } from '../window-ref';
-import { getOfflineEncounterForForm } from '../../offline';
-import { generateOfflineUuid } from '@openmrs/esm-framework';
 import { Encounter } from '../types';
 
 @Injectable()
@@ -18,6 +16,7 @@ export class EncounterResourceService {
     'location:ref,encounterType:ref,encounterProviders:(uuid,display,provider:(uuid,display)))';
 
   constructor(protected http: HttpClient, protected windoRef: WindowRef) {}
+
   public getUrl(): string {
     return this.windoRef.openmrsRestBase;
   }
@@ -70,7 +69,7 @@ export class EncounterResourceService {
       'obs:(uuid,obsDatetime,concept:(uuid,uuid,name:(display)),value:ref,groupMembers))';
     const params = new HttpParams().set('v', customDefaultRep);
     const url = this.getUrl() + 'encounter/' + uuid;
-    return this.http.get(url, { params }).pipe(catchError(() => getOfflineEncounterForForm(uuid)));
+    return this.http.get<Encounter>(url, { params });
   }
 
   public getEncounterTypes(v: string) {
@@ -85,33 +84,25 @@ export class EncounterResourceService {
     );
   }
 
-  public saveEncounter(payload) {
+  public saveEncounter(payload): Observable<Encounter> {
     if (!payload) {
       return null;
     }
     const url = this.getUrl() + 'encounter';
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'x-omrs-offline-response-status': '200',
-      'x-omrs-offline-response-body': JSON.stringify({ uuid: generateOfflineUuid() }),
-    });
-    return this.http.post(url, JSON.stringify(payload), { headers });
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post<Encounter>(url, JSON.stringify(payload), { headers });
   }
 
-  public updateEncounter(uuid, payload) {
+  public updateEncounter(uuid, payload): Observable<Encounter> {
     if (!payload || !uuid) {
       return null;
     }
     const url = this.getUrl() + 'encounter/' + uuid;
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json',
-      'x-omrs-offline-response-status': '200',
-      'x-omrs-offline-response-body': JSON.stringify({ uuid }),
-    });
-    return this.http.post(url, JSON.stringify(payload), { headers });
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post<Encounter>(url, JSON.stringify(payload), { headers });
   }
 
-  public voidEncounter(uuid) {
+  public voidEncounter(uuid): Observable<any> {
     if (!uuid) {
       return null;
     }

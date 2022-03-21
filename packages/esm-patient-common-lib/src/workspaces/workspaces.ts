@@ -49,7 +49,7 @@ let registeredWorkspaces: Record<string, WorkspaceRegistration> = {};
 export function registerWorkspace(workspace: WorkspaceRegistration) {
   registeredWorkspaces[workspace.name] = {
     ...workspace,
-    preferredWindowSize: workspace.preferredWindowSize ?? WorkspaceWindowState.normal,
+    preferredWindowSize: workspace.preferredWindowSize ?? 'normal',
     type: workspace.type ?? 'form',
   };
 }
@@ -69,7 +69,7 @@ function getWorkspaceRegistration(name: string): WorkspaceRegistration {
       return {
         name: workspaceExtension.name,
         title: getTitleFromExtension(workspaceExtension),
-        preferredWindowSize: workspaceExtension.meta?.screenSize ?? WorkspaceWindowState.normal,
+        preferredWindowSize: workspaceExtension.meta?.screenSize ?? 'normal',
         load: workspaceExtension.load,
         type: workspaceExtension.meta?.type ?? 'form',
       };

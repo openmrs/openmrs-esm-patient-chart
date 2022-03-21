@@ -3,7 +3,7 @@ import usePatientResultsData from '../loadPatientTestData/usePatientResultsData'
 import { ObsRecord } from '@openmrs/esm-patient-common-lib';
 import { formatDate, formatTime, parseDate } from '@openmrs/esm-framework';
 
-const parseTime = (sortedTimes: string[]) => {
+export const parseTime = (sortedTimes: string[]) => {
   const yearColumns: Array<{ year: string; size: number }> = [],
     dayColumns: Array<{ year: string; day: string; size: number }> = [],
     timeColumns: string[] = [];
@@ -95,32 +95,4 @@ export const useTimelineData = (patientUuid: string, panelUuid?: string) => {
     };
   }, [sortedObs, loaded, error, panelUuid]);
   return timelineData;
-};
-
-/**
- * Very bad way to get panelUuid that for all tests that pertain to a patient
- * Hopefully there's a better endpoint for this
- *
- * @param patientUuid - required patient identifier
- * @returns Object of {data, loaded, error} where data is an object in format
- * "PanelName": panelUuid
- *
- */
-export const usePatientPanels = (patientUuid: string) => {
-  const { sortedObs, loaded, error } = usePatientResultsData(patientUuid);
-
-  const panels = useMemo(() => {
-    if (!sortedObs || !loaded || !!error)
-      return {
-        data: [{ parsedTime: {} as ReturnType<typeof parseTime> }],
-        loaded,
-        error,
-      };
-
-    const outData = {};
-    Object.entries(sortedObs).forEach(([key, value]) => (outData[key] = value.uuid));
-    return { loaded: true, data: outData };
-  }, [sortedObs, loaded, error]);
-
-  return panels;
 };

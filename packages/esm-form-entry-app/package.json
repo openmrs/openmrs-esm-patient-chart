@@ -35,7 +35,7 @@
     "url": "https://github.com/openmrs/openmrs-esm-patient-chart/issues"
   },
   "dependencies": {
-    "@ampath-kenya/ngx-formentry": "^3.0.0-alpha16.0",
+    "@ampath-kenya/ngx-formentry": "^3.0.0-alpha17",
     "@angular-extensions/elements": "11.0.1",
     "@angular/animations": "~11.2.14",
     "@angular/cdk": "~11.2.13",
@@ -59,6 +59,7 @@
     "systemjs-webpack-interop": "^2.3.7",
     "tree-model": "^1.0.5",
     "tslib": "^2.0.0",
+    "uuid": "^8.3.2",
     "zone.js": "~0.10.2"
   },
   "peerDependencies": {

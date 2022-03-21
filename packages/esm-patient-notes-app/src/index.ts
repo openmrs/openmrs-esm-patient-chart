@@ -51,6 +51,12 @@ function setupOpenMRS() {
         offline: { showAddNote: false },
       },
       {
+        name: 'visit-note-nav-button',
+        slot: 'action-menu-items-slot',
+        load: getAsyncLifecycle(() => import('./visit-note-action-button.component'), options),
+        order: 1,
+      },
+      {
         name: 'visit-notes-form-workspace',
         load: getAsyncLifecycle(() => import('./notes/visit-notes-form.component'), options),
         meta: {
@@ -58,6 +64,7 @@ function setupOpenMRS() {
             key: 'visitNote',
             default: 'Visit Note',
           },
+          type: 'visit-note',
         },
       },
     ],

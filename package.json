@@ -13,8 +13,8 @@
     "verify": "lerna run lint && lerna run test && lerna run typescript",
     "prettier": "prettier --config prettier.config.js --write \"packages/**/*.{ts,tsx}\"",
     "prepare": "husky install",
-    "test": "TZ=UTC jest --config jest.config.json --verbose false --passWithNoTests",
-    "test-watch": "TZ=UTC jest --watch --config jest.config.json",
+    "test": "cross-env TZ=UTC jest --config jest.config.json --verbose false --passWithNoTests",
+    "test-watch": "cross-env TZ=UTC jest --watch --config jest.config.json",
     "coverage": "yarn test --coverage"
   },
   "devDependencies": {
@@ -44,6 +44,7 @@
     "babel-jest": "^26.3.0",
     "babel-preset-minify": "^0.5.1",
     "concurrently": "^6.5.1",
+    "cross-env": "^7.0.3",
     "css-loader": "^6.6.0",
     "d3-selection": "^3.0.0",
     "dayjs": "^1.8.36",

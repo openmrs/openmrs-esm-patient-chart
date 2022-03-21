@@ -1,36 +1,11 @@
 import { Form } from '@ampath-kenya/ngx-formentry';
 
-export interface Encounter {
-  uuid: string;
-  encounterDatetime: string;
-  encounterProviders: Array<{
-    uuid: string;
-    display: string;
-    encounterRole: {
-      uuid: string;
-      display: string;
-    };
-    provider: {
-      uuid: string;
-      person: {
-        uuid: string;
-        display: string;
-      };
-    };
-  }>;
-  encounterType: {
-    uuid: string;
-    display: string;
-  };
-  obs: Array<Observation>;
-  orders: Array<Order>;
-}
-
 interface OpenMRSResource {
   display: string;
   uuid: string;
   links?: Array<{ rel: string; uri: string }>;
 }
+
 export interface EncounterProvider {
   uuid: string;
   display: string;
@@ -191,4 +166,146 @@ export interface FormEntryConfig {
     monthlySchedule: boolean;
   };
   appointmentsResourceUrl: string;
+}
+
+export interface ListResult<T> {
+  results: Array<T>;
+}
+
+export interface Location {
+  uuid: string;
+  display: string;
+}
+
+export interface Provider {
+  uuid: string;
+  display: string;
+  person?: {
+    uuid: string;
+  };
+}
+
+export interface Concept {
+  uuid: string;
+  name: {
+    display: string;
+  };
+  conceptClass: {
+    uuid: string;
+  };
+  answers: Array<Concept>;
+  setMembers: Array<Concept>;
+}
+
+export interface Encounter {
+  uuid: string;
+  encounterDatetime: string;
+  encounterProviders: Array<{
+    uuid: string;
+    display: string;
+    encounterRole: {
+      uuid: string;
+      display: string;
+    };
+    provider: {
+      uuid: string;
+      person: {
+        uuid: string;
+        display: string;
+      };
+    };
+  }>;
+  encounterType: {
+    uuid: string;
+    display: string;
+  };
+  obs: Array<Observation>;
+  orders: Array<Order>;
+}
+
+/** https://rest.openmrs.org/?shell#create-an-encounter */
+export interface EncounterCreate {
+  uuid?: string;
+  encounterDatetime: string;
+  patient: string;
+  encounterType: string;
+  location: string;
+  encounterProviders?: Array<ProviderCreate>;
+  obs?: Array<ObsCreate>;
+  orders?: Array<OrderCreate>;
+  form?: string;
+  visit?: string;
+}
+
+export interface ProviderCreate {
+  uuid?: string;
+  person: string;
+  provider: string;
+}
+
+export interface ObsCreate {
+  uuid?: string;
+  person: string;
+  obsDateTime: Date | string;
+  concept: string;
+  location?: string;
+  order?: string;
+  encounter?: string;
+  accessionNumber?: string;
+  groupMembers?: Array<ObsCreate>;
+  comment?: string;
+  value: string;
+  status?: 'PRELIMINARY' | 'FINAL' | 'AMENDED';
+  valueCodedName?: string;
+  interpretation?:
+    | 'NORMAL'
+    | 'ABNORMAL'
+    | 'CRITICALLY_ABNORMAL'
+    | 'NEGATIVE'
+    | 'POSITIVE'
+    | 'CRITICALLY_LOW'
+    | 'LOW'
+    | 'HIGH'
+    | 'CRITICALLY_HIGH'
+    | 'VERY_SUSCEPTIBLE'
+    | 'SUSCEPTIBLE'
+    | 'INTERMEDIATE'
+    | 'RESISTANT'
+    | 'SIGNIFICANT_CHANGE_DOWN'
+    | 'SIGNIFICANT_CHANGE_UP'
+    | 'OFF_SCALE_LOW'
+    | 'OFF_SCALE_HIGH';
+  voided?: boolean;
+}
+
+export interface OrderCreate {
+  uuid?: string;
+  encounter: string;
+  orderType: string;
+  action: 'NEW' | 'REVISE' | 'DISCONTINUE' | 'RENEW';
+  accessionNumber?: string;
+  patient: string;
+  concept: string;
+  careSetting: string;
+  previousNumber?: string;
+  instructions: string;
+  urgency: 'ROUTINE' | 'STAT' | 'ON_SCHEDULED_DATE';
+  dateActivated?: Date | string;
+  dateStopped?: Date | string;
+  // TODO: Fill as required.
+}
+
+export interface Person {
+  uuid: string;
+  attributes: Array<PersonAttribute>;
+}
+
+export interface PersonAttribute {
+  attributeType: string;
+  value: string;
+}
+
+export interface PersonUpdate {
+  uuid?: string;
+  attributes: Array<PersonAttribute>;
 }

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import dayjs from 'dayjs';
+import isToday from 'dayjs/plugin/isToday';
 import { useTranslation } from 'react-i18next';
 import { Button } from 'carbon-components-react';
 import ChevronDown16 from '@carbon/icons-react/es/chevron--down/16';
@@ -18,6 +19,8 @@ import { patientVitalsBiometricsFormWorkspace } from '../../constants';
 import { PatientVitals, useVitals } from '../vitals.resource';
 import VitalsHeaderItem from './vitals-header-item.component';
 import styles from './vitals-header.scss';
+
+dayjs.extend(isToday);
 
 export enum ObservationInterpretation {
   CRITICALLY_LOW = 'critically_low',

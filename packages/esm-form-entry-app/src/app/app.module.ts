@@ -16,6 +16,8 @@ import { FormSubmissionService } from './form-submission/form-submission.service
 import { MonthlyScheduleResourceService } from './services/monthly-scheduled-resource.service';
 import { ConfigResourceService } from './services/config-resource.service';
 import { LoaderComponent } from './loader/loader.component';
+import { SingleSpaPropsService } from './single-spa-props/single-spa-props.service';
+import { FormCreationService } from './form-creation/form-creation.service';
 
 @NgModule({
   declarations: [AppComponent, EmptyRouteComponent, FeWrapperComponent, LoaderComponent],
@@ -25,8 +27,10 @@ import { LoaderComponent } from './loader/loader.component';
     LocalStorageService,
     FormDataSourceService,
     FormSubmissionService,
+    FormCreationService,
     MonthlyScheduleResourceService,
     ConfigResourceService,
+    SingleSpaPropsService,
   ],
   bootstrap: [AppComponent],
 })

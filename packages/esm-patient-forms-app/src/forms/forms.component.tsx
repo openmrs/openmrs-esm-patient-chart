@@ -11,6 +11,7 @@ import { isValidOfflineFormEncounter } from '../offline-forms/offline-form-helpe
 import { ConfigObject } from '../config-schema';
 import { useProgramConfig } from '../hooks/use-program-config';
 import dayjs from 'dayjs';
+import 'dayjs/plugin/isToday';
 
 const enum FormsCategory {
   Recommended,

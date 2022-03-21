@@ -1,14 +1,27 @@
 import React from 'react';
 import SideMenu from './side-menu.component';
 import { render } from '@testing-library/react';
-import { useLayoutType } from '@openmrs/esm-framework';
+import { ExtensionSlot, useLayoutType } from '@openmrs/esm-framework';
+global.window.matchMedia = jest.fn().mockImplementation(() => {
+  return {
+    matches: false,
+    addListener: function () {},
+    removeListener: function () {},
+  };
+});
 
-jest.mock('@openmrs/esm-framework', () => ({
-  useLayoutType: jest.fn(() => 'tablet'),
-  ExtensionSlot: jest.fn(() => <div>rendered</div>),
-  attach: jest.fn(),
-  detach: jest.fn(),
-}));
+const mockExtensionSlot = ExtensionSlot as jest.Mock;
+mockExtensionSlot.mockImplementation(() => <div>rendered</div>);
+
+jest.mock('@openmrs/esm-framework', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-framework');
+
+  return {
+    ...originalModule,
+    useLayoutType: jest.fn(() => 'tablet'),
+    ExtensionSlot: jest.fn(() => <div>rendered</div>),
+  };
+});
 
 jest.mock('./side-menu.component.scss', () => ({}));
 

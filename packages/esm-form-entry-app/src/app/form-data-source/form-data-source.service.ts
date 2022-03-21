@@ -8,7 +8,7 @@ import { ProviderResourceService } from '../openmrs-api/provider-resource.servic
 import { LocationResourceService } from '../openmrs-api/location-resource.service';
 import { ConceptResourceService } from '../openmrs-api/concept-resource.service';
 import { LocalStorageService } from '../local-storage/local-storage.service';
-import { GetConcept, GetLocation, GetProvider } from '../openmrs-api/types';
+import { Concept, Location, Provider } from '../types';
 
 @Injectable()
 export class FormDataSourceService {
@@ -98,7 +98,7 @@ export class FormDataSourceService {
     return this.providerResourceService.getProviderByUuid(uuid).pipe(map(this.mapProvider));
   }
 
-  private mapProvider(provider?: GetProvider) {
+  private mapProvider(provider?: Provider) {
     return (
       provider && {
         label: provider.display,
@@ -119,7 +119,7 @@ export class FormDataSourceService {
     return this.locationResourceService.getLocationByUuid(uuid).pipe(map(this.mapLocation));
   }
 
-  private mapLocation(location?: GetLocation) {
+  private mapLocation(location?: Location) {
     return (
       location && {
         label: location.display,
@@ -176,7 +176,7 @@ export class FormDataSourceService {
       );
   }
 
-  public mapConcept(concept?: GetConcept) {
+  public mapConcept(concept?: Concept) {
     return (
       concept && {
         value: concept.uuid,
@@ -185,9 +185,9 @@ export class FormDataSourceService {
     );
   }
 
-  public getCachedProviderSearchResults(): any {
+  public getCachedProviderSearchResults() {
     const sourcekey = 'cachedproviders';
-    return this.localStorageService.getObject(sourcekey);
+    return this.localStorageService.getObject<Array<object>>(sourcekey);
   }
 
   private setCachedProviderSearchResults(searchProviderResults): void {

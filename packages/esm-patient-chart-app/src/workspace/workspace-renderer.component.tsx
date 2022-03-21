@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useLayoutType } from '@openmrs/esm-framework';
-import { OpenWorkspace, useWorkspaceWindowSize, WorkspaceWindowState } from '@openmrs/esm-patient-common-lib';
+import { OpenWorkspace, useWorkspaceWindowSize } from '@openmrs/esm-patient-common-lib';
 import { mountRootParcel } from 'single-spa';
 import Parcel from 'single-spa-react/parcel';
 import Loader from '../loader/loader.component';
@@ -16,7 +16,7 @@ export function WorkspaceRenderer({ workspace, patientUuid, active }: WorkspaceR
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
   const { windowSize } = useWorkspaceWindowSize();
-  const maximized = windowSize.size === WorkspaceWindowState.maximized;
+  const maximized = windowSize.size === 'maximized';
   const [lifecycle, setLifecycle] = useState();
 
   useEffect(() => {

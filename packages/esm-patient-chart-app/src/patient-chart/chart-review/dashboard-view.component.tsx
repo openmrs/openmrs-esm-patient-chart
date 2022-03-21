@@ -1,5 +1,11 @@
 import React from 'react';
-import { Extension, ExtensionData, ExtensionSlot, useExtensionSlotMeta } from '@openmrs/esm-framework';
+import {
+  Extension,
+  ExtensionData,
+  ExtensionSlot,
+  getExtensionNameFromId,
+  useExtensionSlotMeta,
+} from '@openmrs/esm-framework';
 import { useRouteMatch } from 'react-router-dom';
 import { basePath } from '../../constants';
 import styles from './dashboard-view.scss';
@@ -42,7 +48,7 @@ export function DashboardView({ dashboard, patientUuid, patient }: DashboardView
 
   const wrapItem = React.useCallback(
     (slot: React.ReactNode, extension: ExtensionData) => {
-      const { columnSpan = 1 } = dashboardMeta[extension.extensionId];
+      const { columnSpan = 1 } = dashboardMeta[getExtensionNameFromId(extension.extensionId)];
       return <div style={{ gridColumn: `span ${columnSpan}` }}>{slot}</div>;
     },
     [dashboardMeta],

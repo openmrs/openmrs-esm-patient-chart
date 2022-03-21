@@ -1,23 +1,23 @@
 <div class="error-text">{{ loadingError }}</div>
-<div *ngIf="!formSubmitted" [ngClass]="{'error': hasValidationErrors}">
-  <div class="content" (click)="onErrorPanelLostFocus()">
-    <div *ngIf="!isLoading" class="form-container">
+<div *ngIf="formState !== 'submitted'" [ngClass]="{'error': formState === 'readyWithValidationErrors'}">
+  <div class="content">
+    <div *ngIf="formState === 'ready' || formState === 'readyWithValidationErrors' || formState === 'submitting' || formState === 'submissionError'" class="form-container">
       <div>
-        <form class="bx--form no-padding" *ngIf="formSchema" [formGroup]="form.rootNode.control">
+        <form class="bx--form no-padding" *ngIf="form" [formGroup]="form.rootNode.control">
           <form-renderer [labelMap]="labelMap" [node]="form.rootNode"></form-renderer>
         </form>
       </div>
       <div class="bx-btn--set button-set">
         <button class="bx--btn bx--btn--secondary" (click)="closeForm()" type="button">Discard</button>
-        <button [disabled]="isSubmitting" class="bx--btn bx--btn--primary" (click)="onSubmit($event)" type="submit">
-          <span *ngIf="!isSubmitting">Save and close</span>
-          <loader *ngIf="isSubmitting" loadingMessage="Submitting"></loader>
+        <button [disabled]="formState === 'submitting'" class="bx--btn bx--btn--primary" (click)="onSubmit()" type="submit">
+          <span *ngIf="formState !== 'submitting'">Save and close</span>
+          <loader *ngIf="formState === 'submitting'" loadingMessage="Submitting"></loader>
         </button>
       </div>
     </div>
   </div>
 </div>
 
-<div *ngIf="isLoading" class="loader-container">
+<div *ngIf="formState === 'loading'" class="loader-container">
   <loader class="loader" loadingMessage="Loading..."></loader>
 </div>

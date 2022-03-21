@@ -2,6 +2,7 @@ import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, registerBreadc
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
+import { setupPatientFormSync } from './offline';
 import OfflineToolsNavLink from './offline-forms/offline-tools-nav-link.component';
 
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
@@ -27,6 +28,8 @@ function setupOpenMRS() {
       parent: `${window.spaBase}/offline-tools`,
     },
   ]);
+
+  setupPatientFormSync();
 
   return {
     extensions: [
@@ -103,6 +106,12 @@ function setupOpenMRS() {
         offline: {
           canMarkFormsAsOffline: false,
         },
+      },
+      {
+        name: 'clinical-form-action-menu-item',
+        slot: 'action-menu-items-slot',
+        load: getAsyncLifecycle(() => import('./clinical-form-action-button.component'), options),
+        order: 2,
       },
     ],
   };

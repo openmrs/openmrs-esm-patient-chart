@@ -5,7 +5,6 @@ export interface FormEntryProps {
   encounterUuid?: string;
   visitUuid?: string;
   formUuid: string;
-  patient: fhir.Patient;
 }
 
 export const formEntrySub = new BehaviorSubject<FormEntryProps | null>(null);

@@ -8,7 +8,7 @@ export const convertTime12to24 = (time12h, timeFormat: amPm) => {
   }
 
   if (timeFormat === 'PM') {
-    hours = parseInt(hours, 10) + 12;
+    hours = hours === '12' ? hours : parseInt(hours, 10) + 12;
   }
 
   return [hours, minutes];
