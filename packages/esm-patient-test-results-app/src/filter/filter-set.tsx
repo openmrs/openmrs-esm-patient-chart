@@ -3,7 +3,7 @@ import styles from './filter-set.styles.scss';
 import { Accordion, AccordionItem, Checkbox } from 'carbon-components-react';
 import FilterContext from './filter-context';
 import { useConfig, useLayoutType } from '@openmrs/esm-framework';
-import { FilterNodeProps, FilterLeafProps } from './filter.types';
+import type { FilterNodeProps, FilterLeafProps } from './filter-types';
 
 const isIndeterminate = (kids, checkboxes) => {
   return kids && !kids?.every((kid) => checkboxes[kid]) && !kids?.every((kid) => !checkboxes[kid]);

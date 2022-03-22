@@ -1,7 +1,7 @@
 import React, { createContext, useReducer, useEffect, useMemo } from 'react';
 import { parseTime } from '../timeline/useTimelineData';
 import reducer from './filter-reducer';
-import { TreeNode, FilterContextProps, FilterProviderProps, obsShape } from './filter.types';
+import type { TreeNode, FilterContextProps, FilterProviderProps, obsShape } from './filter-types';
 
 const initialState = {
   checkboxes: {},
@@ -29,7 +29,7 @@ const FilterProvider = ({ roots, children }: FilterProviderProps) => {
 
   const actions = useMemo(
     () => ({
-      initialize: (trees: TreeNode[]) => dispatch({ type: 'initialize', trees: trees }),
+      initialize: (trees: Array<TreeNode>) => dispatch({ type: 'initialize', trees: trees }),
       toggleVal: (name: string) => {
         dispatch({ type: 'toggleVal', name: name });
       },

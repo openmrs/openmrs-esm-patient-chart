@@ -4,7 +4,12 @@ import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import FilterContext from '../filter/filter-context';
 import styles from './grouped-timeline.styles.scss';
 import { makeThrottled } from '../helpers';
-import { DateHeaderGridProps, PanelNameCornerProps, TimelineCellProps, DataRowsProps } from './grouped-timeline.types';
+import type {
+  DateHeaderGridProps,
+  PanelNameCornerProps,
+  TimelineCellProps,
+  DataRowsProps,
+} from './grouped-timeline-types';
 
 const TimeSlots: React.FC<{
   style?: React.CSSProperties;
