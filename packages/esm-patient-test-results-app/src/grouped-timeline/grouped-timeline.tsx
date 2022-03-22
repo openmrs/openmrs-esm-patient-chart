@@ -255,7 +255,7 @@ export const GroupedTimeline = () => {
   }, [rowData]);
 
   if (rowData && rowData?.length === 0) {
-    return <EmptyState displayText={'data'} headerTitle="Data Timeline" />;
+    return <EmptyState displayText="data" headerTitle="Data Timeline" />;
   }
   if (activeTests && timelineData && loaded) {
     return (
@@ -280,8 +280,11 @@ export const GroupedTimeline = () => {
             if (parents[parent.flatName].some((kid) => checkboxes[kid]) || !someChecked) {
               shownGroups += 1;
               const subRows = someChecked
-                ? rowData?.filter((row) => parents[parent.flatName].includes(row.flatName) && checkboxes[row.flatName])
-                : rowData?.filter((row) => parents[parent.flatName].includes(row.flatName));
+                ? rowData?.filter(
+                    (row: { flatName: string }) =>
+                      parents[parent.flatName].includes(row.flatName) && checkboxes[row.flatName],
+                  )
+                : rowData?.filter((row: { flatName: string }) => parents[parent.flatName].includes(row.flatName));
 
               // show kid rows
               return (
