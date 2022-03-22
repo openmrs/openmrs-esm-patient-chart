@@ -8,18 +8,16 @@ describe('Service : ConceptResourceService Unit Tests', () => {
   let conceptResourceService: ConceptResourceService;
   let httpMock: HttpTestingController;
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule, OpenmrsApiModule],
-        declarations: [],
-        providers: [],
-      });
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule, OpenmrsApiModule],
+      declarations: [],
+      providers: [],
+    });
 
-      conceptResourceService = TestBed.get(ConceptResourceService);
-      httpMock = TestBed.get(HttpTestingController);
-    }),
-  );
+    conceptResourceService = TestBed.get(ConceptResourceService);
+    httpMock = TestBed.get(HttpTestingController);
+  }));
   afterEach(() => {
     httpMock.verify();
     TestBed.resetTestingModule();

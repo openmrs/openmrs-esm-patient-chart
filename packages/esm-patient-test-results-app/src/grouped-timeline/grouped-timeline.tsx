@@ -1,9 +1,15 @@
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { Grid, ShadowBox } from '../timeline/helpers';
-import { EmptyState, OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
+import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import FilterContext from '../filter/filter-context';
-import styles from './new-timeline.scss';
+import styles from './grouped-timeline.styles.scss';
 import { makeThrottled } from '../helpers';
+import type {
+  DateHeaderGridProps,
+  PanelNameCornerProps,
+  TimelineCellProps,
+  DataRowsProps,
+} from './grouped-timeline-types';
 
 const TimeSlots: React.FC<{
   style?: React.CSSProperties;
@@ -14,32 +20,11 @@ const TimeSlots: React.FC<{
   </div>
 );
 
-interface PanelNameCornerProps {
-  showShadow: boolean;
-  panelName: string;
-}
-
 const PanelNameCorner: React.FC<PanelNameCornerProps> = ({ showShadow, panelName }) => (
   <TimeSlots className={`${styles['corner-grid-element']} ${showShadow ? `${styles.shadow}` : ''}`}>
     {panelName}
   </TimeSlots>
 );
-
-interface DataEntry {
-  value: number | string;
-  effectiveDateTime: string;
-  interpretation: OBSERVATION_INTERPRETATION;
-}
-
-interface DataRow {
-  entries: Array<DataEntry>;
-  display: string;
-  name: string;
-  type: string;
-  uuid: string;
-  units: string;
-  range: string;
-}
 
 const NewRowStartCell = ({ title, range, units, shadow = false }) => (
   <div
@@ -65,11 +50,7 @@ const interpretationToCSS = {
   NORMAL: '',
 };
 
-const TimelineCell: React.FC<{
-  text: string;
-  interpretation?: OBSERVATION_INTERPRETATION;
-  zebra: boolean;
-}> = ({ text, interpretation = 'NORMAL', zebra }) => {
+const TimelineCell: React.FC<TimelineCellProps> = ({ text, interpretation = 'NORMAL', zebra }) => {
   const additionalClassname: string = interpretationToCSS[interpretation]
     ? styles[interpretationToCSS[interpretation]]
     : '';
@@ -83,7 +64,7 @@ const TimelineCell: React.FC<{
   );
 };
 
-const NewGridItems = React.memo<{
+const GridItems = React.memo<{
   sortedTimes: Array<string>;
   obs: any;
   zebra: boolean;
@@ -96,14 +77,7 @@ const NewGridItems = React.memo<{
   </>
 ));
 
-interface NewDataRowsProps {
-  rowData: DataRow[];
-  timeColumns: Array<string>;
-  sortedTimes: Array<string>;
-  showShadow: boolean;
-}
-
-const NewDataRows: React.FC<NewDataRowsProps> = ({ timeColumns, rowData, sortedTimes, showShadow }) => {
+const DataRows: React.FC<DataRowsProps> = ({ timeColumns, rowData, sortedTimes, showShadow }) => {
   return (
     <Grid dataColumns={timeColumns.length} padding style={{ gridColumn: 'span 2' }}>
       {rowData.map((row, index) => {
@@ -119,22 +93,13 @@ const NewDataRows: React.FC<NewDataRowsProps> = ({ timeColumns, rowData, sortedT
                 shadow: showShadow,
               }}
             />
-            <NewGridItems {...{ sortedTimes, obs, zebra: !!(index % 2) }} />
+            <GridItems {...{ sortedTimes, obs, zebra: !!(index % 2) }} />
           </React.Fragment>
         );
       })}
     </Grid>
   );
 };
-
-interface DateHeaderGridProps {
-  timeColumns: Array<string>;
-  yearColumns: Array<Record<string, number | string>>;
-  dayColumns: Array<Record<string, number | string>>;
-  showShadow: boolean;
-  xScroll: number;
-  setXScroll: any;
-}
 
 const DateHeaderGrid: React.FC<DateHeaderGridProps> = ({
   timeColumns,
@@ -172,8 +137,6 @@ const DateHeaderGrid: React.FC<DateHeaderGridProps> = ({
         dataColumns={timeColumns.length}
         style={{
           gridTemplateRows: 'repeat(3, 24px)',
-          //position: 'sticky',
-          //top: '0px',
           zIndex: 2,
           boxShadow: showShadow ? '8px 0 20px 0 rgba(0,0,0,0.15)' : undefined,
         }}
@@ -262,7 +225,7 @@ const TimelineDataGroup = ({ parent, subRows, xScroll, setXScroll, panelName, se
           </div>
         )}
         <div className={styles['grid-container']} ref={ref}>
-          <NewDataRows
+          <DataRows
             {...{
               timeColumns,
               rowData: subRows,
@@ -278,7 +241,7 @@ const TimelineDataGroup = ({ parent, subRows, xScroll, setXScroll, panelName, se
   );
 };
 
-export const NewTimeline = () => {
+export const GroupedTimeline = () => {
   const { activeTests, timelineData, parents, checkboxes, someChecked, lowestParents } = useContext(FilterContext);
   const [panelName, setPanelName] = useState('');
   const [xScroll, setXScroll] = useState(0);
@@ -297,13 +260,13 @@ export const NewTimeline = () => {
   }, [rowData]);
 
   if (rowData && rowData?.length === 0) {
-    return <EmptyState displayText={'timeline data'} headerTitle="Data Timeline" />;
+    return <EmptyState displayText="data" headerTitle="Data Timeline" />;
   }
   if (activeTests && timelineData && loaded) {
     return (
       <>
-        <div className={styles['date-header']}>
-          <div className={styles['date-header-container']}>
+        <div className={styles.timelineHeader}>
+          <div className={styles.dateHeaderContainer}>
             <PanelNameCorner showShadow={true} panelName={panelName} />
             <DateHeaderGrid
               {...{
@@ -322,8 +285,11 @@ export const NewTimeline = () => {
             if (parents[parent.flatName].some((kid) => checkboxes[kid]) || !someChecked) {
               shownGroups += 1;
               const subRows = someChecked
-                ? rowData?.filter((row) => parents[parent.flatName].includes(row.flatName) && checkboxes[row.flatName])
-                : rowData?.filter((row) => parents[parent.flatName].includes(row.flatName));
+                ? rowData?.filter(
+                    (row: { flatName: string }) =>
+                      parents[parent.flatName].includes(row.flatName) && checkboxes[row.flatName],
+                  )
+                : rowData?.filter((row: { flatName: string }) => parents[parent.flatName].includes(row.flatName));
 
               // show kid rows
               return (
@@ -347,4 +313,4 @@ export const NewTimeline = () => {
   return null;
 };
 
-export default NewTimeline;
+export default GroupedTimeline;
