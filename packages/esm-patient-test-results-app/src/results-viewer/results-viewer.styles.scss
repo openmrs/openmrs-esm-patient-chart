@@ -1,0 +1,21 @@
+
+@import "~@openmrs/esm-styleguide/src/vars";
+
+.resultsContainer {
+  padding: 0;
+  width: calc(100vw - 48px - 2.6rem);
+  @media (min-width: $breakpoint-desktop-min) {
+    width: calc(100vw - 16rem - 48px - 2.6rem);
+  }
+}
+
+.resultsHeader {
+  padding: 0.8rem 0;
+  z-index: 10;
+  background-color: $openmrs-background-grey;
+}
+
+.columnPanel {
+  overflow-y: scroll;
+  height: calc(100vh - 9rem)
+}

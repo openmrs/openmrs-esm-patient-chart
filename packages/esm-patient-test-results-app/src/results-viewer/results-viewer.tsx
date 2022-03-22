@@ -1,33 +1,18 @@
-import { Column, ContentSwitcher, Grid, InlineLoading, Row, Switch } from 'carbon-components-react';
 import React, { useState } from 'react';
-import FilterSet from '../filter/filter-set';
-import { FilterProvider } from '../filter/filter-context';
-import NewTimeline from '../grouped-timeline/grouped-timeline';
+import { Column, ContentSwitcher, Grid, InlineLoading, Row, Switch } from 'carbon-components-react';
+import FilterSet, { FilterProvider } from '../filter';
+import GroupedTimeline, { useGetManyObstreeData } from '../grouped-timeline';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
-import { useGetManyObstreeData } from '../grouped-timeline/useObstreeData';
-import { styles } from '../grouped-timeline';
 import { useConfig, useLayoutType } from '@openmrs/esm-framework';
 import DesktopView from '../desktop-view/desktop-view.component';
-
-export interface ConfigObject {
-  title: string;
-  resultsName: string;
-  data: Array<{
-    concept: string;
-    label: string;
-    color: string;
-  }>;
-  table: {
-    pageSize: number;
-  };
-}
+import styles from './results-viewer.styles.scss';
 
 type viewOpts = 'split' | 'full';
 type panelOpts = 'tree' | 'panel';
 
 const ResultsViewer = () => {
   const config = useConfig();
-  const conceptUuids = config.concepts.map((c) => c.conceptUuid);
+  const conceptUuids = config?.concepts?.map((c) => c.conceptUuid) ?? [];
   const isTablet = useLayoutType() === 'tablet';
   const { roots, loading, errors } = useGetManyObstreeData(conceptUuids);
 
@@ -45,13 +30,8 @@ const ResultsViewer = () => {
   if (!loading && !errors.length && roots?.length) {
     return (
       <FilterProvider roots={roots}>
-        <Grid
-          style={{
-            padding: 0,
-            width: isTablet ? 'calc(100vw - 48px - 2.6rem)' : 'calc(100vw - 16rem - 48px - 2.6rem)',
-          }}
-        >
-          <Row className={styles['results-header']}>
+        <Grid className={styles.resultsContainer}>
+          <Row className={styles.resultsHeader}>
             <Column sm={16} lg={expanded ? 0 : 6}>
               <div style={{ display: 'flex' }}>
                 <h4 style={{ flexGrow: 1 }}>Results</h4>
@@ -73,12 +53,12 @@ const ResultsViewer = () => {
             </Column>
           </Row>
           <Row style={{ height: '100%' }}>
-            <Column sm={16} lg={expanded ? 0 : 6} className={styles['column-panel']}>
+            <Column sm={16} lg={expanded ? 0 : 6} className={styles.columnPanel}>
               {leftContent === 'tree' && <FilterSet />}
               {leftContent === 'panel' && <DesktopView />}
             </Column>
-            <Column sm={16} lg={expanded ? 12 : 6} className={styles['column-panel']}>
-              <NewTimeline />
+            <Column sm={16} lg={expanded ? 12 : 6} className={styles.columnPanel}>
+              <GroupedTimeline />
             </Column>
           </Row>
         </Grid>

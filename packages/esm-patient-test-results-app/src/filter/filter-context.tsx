@@ -106,4 +106,4 @@ const FilterProvider = ({ roots, children }: FilterProviderProps) => {
 };
 
 export default FilterContext;
-export { FilterProvider };
+export { FilterProvider, FilterContext };
