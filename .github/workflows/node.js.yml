@@ -20,10 +20,10 @@ jobs:
         with:
           node-version: "14.x"
       - run: npx lerna bootstrap
-      - run: npx lerna run lint
-      - run: npx lerna run typescript
+      - run: npx turbo run lint
+      - run: npx turbo run typescript
       - run: npm run test
-      - run: npx lerna run build
+      - run: npx turbo run build
       - name: Upload Artifacts
         uses: actions/upload-artifact@v2
         with:
@@ -760,7 +760,7 @@ jobs:
           node-version: "14.x"
           registry-url: "https://registry.npmjs.org"
       - run: npx lerna bootstrap
-      - run: npx lerna run build
+      - run: npx turbo run build
       - run: npx lerna version patch --no-git-tag-version --no-push --yes
       - run: npx lerna version "$(node -e "console.log(require('./lerna.json').version)")-pre.${{ github.run_number }}" --no-git-tag-version --yes
       - run: git config user.email "info@openmrs.org" && git config user.name "OpenMRS CI"
@@ -784,7 +784,7 @@ jobs:
           node-version: "14.x"
           registry-url: "https://registry.npmjs.org"
       - run: npx lerna bootstrap
-      - run: npx lerna run build
+      - run: npx turbo run build
       - run: npm run ci:publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}

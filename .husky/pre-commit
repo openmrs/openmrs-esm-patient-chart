@@ -3,4 +3,4 @@
 
 set -e  # die on error
 
-npx lerna run extract-translations --since master
+npx turbo run extract-translations
