@@ -3,7 +3,6 @@
 
 set -e  # die on error
 
-npx pretty-quick --staged
-npx turbo run lint
+yarn pretty-quick --staged
+yarn turbo run lint typescript
 yarn test
-npx turbo run typescript

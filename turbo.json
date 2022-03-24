@@ -4,16 +4,18 @@
   "pipeline": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**"]
+      "outputs": ["dist/**"]  
     },
     "test": {
-      "dependsOn": ["^build"],
+      "dependsOn": [],
       "outputs": []
     },
     "lint": {
+      "dependsOn": ["^lint"],
       "outputs": []
     },
     "typescript": {
+      "dependsOn": ["^typescript"],
       "outputs": []
     },
     "extract-translations": {
