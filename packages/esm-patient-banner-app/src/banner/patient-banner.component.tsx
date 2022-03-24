@@ -34,7 +34,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
   );
 
   const patientName = `${patient.name?.[0].given?.join(' ')} ${patient?.name?.[0].family}`;
-  const patientPhotoSlotState = React.useMemo(() => ({ patientUuid, patientName }), [patientUuid]);
+  const patientPhotoSlotState = React.useMemo(() => ({ patientUuid, patientName }), [patientName, patientUuid]);
 
   const [showContactDetails, setShowContactDetails] = React.useState(false);
   const toggleContactDetails = React.useCallback((event: MouseEvent) => {
