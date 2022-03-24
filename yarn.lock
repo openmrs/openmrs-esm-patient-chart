@@ -3202,36 +3202,20 @@
   dependencies:
     "@octokit/openapi-types" "^11.2.0"
 
-<<<<<<< HEAD
 "@openmrs/esm-api@^3.2.1-pre.1053":
   version "3.2.1-pre.1053"
   resolved "https://registry.yarnpkg.com/@openmrs/esm-api/-/esm-api-3.2.1-pre.1053.tgz#a90c7ac2dcbd09d9d050247db8ab56b49bc0a8d8"
   integrity sha512-gzP+RGaAssDdQ9F4Rs8i9N76zwRFZ4faUjczaINsmwTyGYhzpYB4rgXqar0SQ4JiueTj9peL8uV478jVabtYFQ==
-=======
-"@openmrs/esm-api@^3.2.1-pre.1047", "@openmrs/esm-api@^3.2.1-pre.1048":
-  version "3.2.1-pre.1048"
-  resolved "https://registry.yarnpkg.com/@openmrs/esm-api/-/esm-api-3.2.1-pre.1048.tgz#d5ceaa7ea7dd7ec6723707b43397048b6ca0dc7c"
-  integrity sha512-IVuNPStAHgK949aHq5r8JBfbeJbWE3tpA0S14DYmwdc3N/ckNDT5fESIvf7sko3x8oxSZNc/DVTJD2FM0ASpeg==
->>>>>>> 0104072 (Add Turborepo)
   dependencies:
     fhir.js "0.0.22"
     lodash-es "^4.17.21"
 
-<<<<<<< HEAD
 "@openmrs/esm-app-shell@3.2.1-pre.1053":
   version "3.2.1-pre.1053"
   resolved "https://registry.yarnpkg.com/@openmrs/esm-app-shell/-/esm-app-shell-3.2.1-pre.1053.tgz#aa1b2d0a1d5a8ef6d4480a899903a5ae58ed9a35"
   integrity sha512-j/MJ7OB1C6FuyOx9t4KXFZOucnjTbT5aYeHS+7aAimiYB7Osp8EWlGnUEdjcQUT6yaEOuEMbwufFLkXSKKMA2w==
   dependencies:
     "@openmrs/esm-framework" "^3.2.1-pre.1053"
-=======
-"@openmrs/esm-app-shell@3.2.1-pre.1047":
-  version "3.2.1-pre.1047"
-  resolved "https://registry.yarnpkg.com/@openmrs/esm-app-shell/-/esm-app-shell-3.2.1-pre.1047.tgz#9bba204cf743e718bc715c6f6a20e8770005d96b"
-  integrity sha512-prrdYhREotqnuGdd0UMexZ/yMfk0MnYUinrlhEhRAL1kAYmowGNyP7/KlGQ6Q5dw2Yjvzc4s1C0Xlo1lX02xuQ==
-  dependencies:
-    "@openmrs/esm-framework" "^3.2.1-pre.1047"
->>>>>>> 0104072 (Add Turborepo)
     carbon-components "10.31.0"
     carbon-icons "7.0.7"
     dayjs "^1.10.4"
@@ -3254,7 +3238,6 @@
     workbox-strategies "^6.1.5"
     workbox-window "^6.1.5"
 
-<<<<<<< HEAD
 "@openmrs/esm-breadcrumbs@^3.2.1-pre.1053":
   version "3.2.1-pre.1053"
   resolved "https://registry.yarnpkg.com/@openmrs/esm-breadcrumbs/-/esm-breadcrumbs-3.2.1-pre.1053.tgz#fe42cc2f81e20c187a9516c337246ce286e3e672"
@@ -3308,102 +3291,21 @@
   version "3.2.1-pre.1053"
   resolved "https://registry.yarnpkg.com/@openmrs/esm-offline/-/esm-offline-3.2.1-pre.1053.tgz#65e1fd02588401ed0cefd96721d93fd5b425f0ef"
   integrity sha512-vCLf9ZUPAdwNniPW1ayWob2FTGvqjE3KBKpgXamSFa8PIdZFOtTrqTZYH4jgxJOldq955XIWzECZ7YsRQRxwLg==
-=======
-"@openmrs/esm-breadcrumbs@^3.2.1-pre.1047", "@openmrs/esm-breadcrumbs@^3.2.1-pre.1048":
-  version "3.2.1-pre.1048"
-  resolved "https://registry.yarnpkg.com/@openmrs/esm-breadcrumbs/-/esm-breadcrumbs-3.2.1-pre.1048.tgz#a6b7fd3be3e570a97d47bc2df46f1b39ba4352e7"
-  integrity sha512-2JMLq2Bfmt5dEai/E/HIPqSZZ3cKUjVM6RhdAtPAtWQUFnofvdy2rt3JwEEJR60L1p2Pp5bqTy9xc6Fg8KkjGQ==
-  dependencies:
-    path-to-regexp "6.1.0"
-
-"@openmrs/esm-config@^3.2.1-pre.1047", "@openmrs/esm-config@^3.2.1-pre.1048":
-  version "3.2.1-pre.1048"
-  resolved "https://registry.yarnpkg.com/@openmrs/esm-config/-/esm-config-3.2.1-pre.1048.tgz#521b398261a64f076e92be63de963c0079013a3a"
-  integrity sha512-9997wsoz6ltZP4/iXVX06DLKSSPNBjIyx/iDsFMsCJ6v0IKgFJvN+aNuXssIZaAxSWoH5a7po/0J8BOTfC8S1g==
-  dependencies:
-    ramda "^0.26.1"
-
-"@openmrs/esm-error-handling@^3.2.1-pre.1047", "@openmrs/esm-error-handling@^3.2.1-pre.1048":
-  version "3.2.1-pre.1048"
-  resolved "https://registry.yarnpkg.com/@openmrs/esm-error-handling/-/esm-error-handling-3.2.1-pre.1048.tgz#e884c7b3067911f4c80268c4ff2534309b47c07e"
-  integrity sha512-UjCXxPhsT/ClZYDQikwsZs6xROIwahWcUVD3ooTcKqN80Au0PYBGyrw5vAbF1R7Kir4PCMKwKzfaZjXLgL9igQ==
-
-"@openmrs/esm-extensions@^3.2.1-pre.1047", "@openmrs/esm-extensions@^3.2.1-pre.1048":
-  version "3.2.1-pre.1048"
-  resolved "https://registry.yarnpkg.com/@openmrs/esm-extensions/-/esm-extensions-3.2.1-pre.1048.tgz#92e8f531ff395850245fa2b0d25626e1d20143fe"
-  integrity sha512-8mjkvSvL4cWJ79zVH4wlN6RM/D4PhwlxDBQfpA4iIHCI6NUYabRJl29Q7k/m2nmzFYNj3pBff2jUw5GppRESag==
-  dependencies:
-    lodash-es "^4.17.21"
-
-"@openmrs/esm-framework@^3.2.1-pre.1047":
-  version "3.2.1-pre.1048"
-  resolved "https://registry.yarnpkg.com/@openmrs/esm-framework/-/esm-framework-3.2.1-pre.1048.tgz#7f0ddf918de2ea97ae95c529c810ae4bfed37078"
-  integrity sha512-LfusF97dp5S5UEdvMjlcMvused3rvI3WtOTuxVlLNgH6bW+xG1wk7b+pB6QpSxGgO8GEkJAVoMvxCFS3BuefjA==
-  dependencies:
-    "@openmrs/esm-api" "^3.2.1-pre.1048"
-    "@openmrs/esm-breadcrumbs" "^3.2.1-pre.1048"
-    "@openmrs/esm-config" "^3.2.1-pre.1048"
-    "@openmrs/esm-error-handling" "^3.2.1-pre.1048"
-    "@openmrs/esm-extensions" "^3.2.1-pre.1048"
-    "@openmrs/esm-globals" "^3.2.1-pre.1048"
-    "@openmrs/esm-offline" "^3.2.1-pre.1048"
-    "@openmrs/esm-react-utils" "^3.2.1-pre.1048"
-    "@openmrs/esm-state" "^3.2.1-pre.1048"
-    "@openmrs/esm-styleguide" "^3.2.1-pre.1048"
-    "@openmrs/esm-utils" "^3.2.1-pre.1048"
-    dayjs "^1.10.7"
-
-"@openmrs/esm-framework@next":
-  version "3.2.1-pre.1047"
-  resolved "https://registry.yarnpkg.com/@openmrs/esm-framework/-/esm-framework-3.2.1-pre.1047.tgz#836637b9f365e881f589fe3bef4ba693d1e76127"
-  integrity sha512-KsUnKLsyZYK/oW8RdlfF+CEH6pIQv/gTunuNwbB9yQKTfIolmz/b+aPgB13011nrbABDjo4YNsdI8rzkNcgEcA==
-  dependencies:
-    "@openmrs/esm-api" "^3.2.1-pre.1047"
-    "@openmrs/esm-breadcrumbs" "^3.2.1-pre.1047"
-    "@openmrs/esm-config" "^3.2.1-pre.1047"
-    "@openmrs/esm-error-handling" "^3.2.1-pre.1047"
-    "@openmrs/esm-extensions" "^3.2.1-pre.1047"
-    "@openmrs/esm-globals" "^3.2.1-pre.1047"
-    "@openmrs/esm-offline" "^3.2.1-pre.1047"
-    "@openmrs/esm-react-utils" "^3.2.1-pre.1047"
-    "@openmrs/esm-state" "^3.2.1-pre.1047"
-    "@openmrs/esm-styleguide" "^3.2.1-pre.1047"
-    "@openmrs/esm-utils" "^3.2.1-pre.1047"
-    dayjs "^1.10.7"
-
-"@openmrs/esm-globals@^3.2.1-pre.1047", "@openmrs/esm-globals@^3.2.1-pre.1048":
-  version "3.2.1-pre.1048"
-  resolved "https://registry.yarnpkg.com/@openmrs/esm-globals/-/esm-globals-3.2.1-pre.1048.tgz#019867a2891aa9b76bcbe74d0ee5310f0dd9d640"
-  integrity sha512-WFExcMP9tbOw8zfqfOtsSxUqnOugWal2ytV7DPI69IogTUVMtPgbivd1iUTSS2wY2yQba04MiBuoI/+LeE8UTQ==
-
-"@openmrs/esm-offline@^3.2.1-pre.1047", "@openmrs/esm-offline@^3.2.1-pre.1048":
-  version "3.2.1-pre.1048"
-  resolved "https://registry.yarnpkg.com/@openmrs/esm-offline/-/esm-offline-3.2.1-pre.1048.tgz#2b5d3190ffa87bcdb23032e8364b4f00f2642dc6"
-  integrity sha512-/mOk2D65SRWjFY66Biql36kYBwwEiuBk8amb50D+78EelfgKW4JTKchf0H2xJYkQxtc87KKPNa1DyZRdtQhIXQ==
->>>>>>> 0104072 (Add Turborepo)
   dependencies:
     dexie "^3.0.3"
     lodash-es "4.17.21"
     uuid "^8.3.2"
     workbox-window "^6.1.5"
 
-<<<<<<< HEAD
 "@openmrs/esm-react-utils@^3.2.1-pre.1053":
   version "3.2.1-pre.1053"
   resolved "https://registry.yarnpkg.com/@openmrs/esm-react-utils/-/esm-react-utils-3.2.1-pre.1053.tgz#ffde9a6ed3c33681be7d1ad3dc2b3ad91abb5d3e"
   integrity sha512-nMZKiRiaOUQkpxovvsFQvgEt7kp2VxpE10BDqoArzQZcWpo8XUqsoCuJZC6I2f7XU2mMynoM8ad27XkLR0P7ZQ==
-=======
-"@openmrs/esm-react-utils@^3.2.1-pre.1047", "@openmrs/esm-react-utils@^3.2.1-pre.1048":
-  version "3.2.1-pre.1048"
-  resolved "https://registry.yarnpkg.com/@openmrs/esm-react-utils/-/esm-react-utils-3.2.1-pre.1048.tgz#bc5de79856aaba55a436659c9079ed0b42f48fbb"
-  integrity sha512-oiaoROKWxJEW6U6j4daCBmZ9rQcslboS7+MHoMpFt1ohGMwmlWaXf5k3wLSQpi7q1zr/2IyIKuVhvJIcug4pCA==
->>>>>>> 0104072 (Add Turborepo)
   dependencies:
     lodash-es "^4.17.21"
     single-spa-react "^4.1.1"
     swr "^1.2.2"
 
-<<<<<<< HEAD
 "@openmrs/esm-state@^3.2.1-pre.1053":
   version "3.2.1-pre.1053"
   resolved "https://registry.yarnpkg.com/@openmrs/esm-state/-/esm-state-3.2.1-pre.1053.tgz#8d40cd0f2c28299cfcb309089d20f43753ba9b74"
@@ -3415,25 +3317,11 @@
   version "3.2.1-pre.1053"
   resolved "https://registry.yarnpkg.com/@openmrs/esm-styleguide/-/esm-styleguide-3.2.1-pre.1053.tgz#da9e9def70523f5f72fdeec06bc32be321b0bedb"
   integrity sha512-cHcwgQiIgxK2aOOGZOb1b0YznSC27JoBBA+cgL3eBuj8Yh4/Wd3b3m2GDPrNU/fx8LYeJKA1kAeRFsyXeSm/ww==
-=======
-"@openmrs/esm-state@^3.2.1-pre.1047", "@openmrs/esm-state@^3.2.1-pre.1048":
-  version "3.2.1-pre.1048"
-  resolved "https://registry.yarnpkg.com/@openmrs/esm-state/-/esm-state-3.2.1-pre.1048.tgz#588293d3cd94f2b25aeb034c1c2a31fc1fe79424"
-  integrity sha512-olLt1YHqTdH1iyY/jtISHDQ9nrloY6jXwV5kz6bkNVtgQZT/uOTTelusEF5+phyC3FDXDdFobflqWFEKYzGf3w==
-  dependencies:
-    unistore "^3.5.2"
-
-"@openmrs/esm-styleguide@^3.2.1-pre.1047", "@openmrs/esm-styleguide@^3.2.1-pre.1048":
-  version "3.2.1-pre.1048"
-  resolved "https://registry.yarnpkg.com/@openmrs/esm-styleguide/-/esm-styleguide-3.2.1-pre.1048.tgz#548b7ae9d1a1ec1b64bb16b728a0e06851cb3ace"
-  integrity sha512-Ed8l2JU7va/059K70861Q+u6IzyN7Ht1JsMTtf7sy/dPpjblT0ry7HK3wkvP00y29fr9e5+8Nbo7ilSxo9podg==
->>>>>>> 0104072 (Add Turborepo)
   dependencies:
     "@carbon/charts" "^0.41.57"
     carbon-components-react "7.31.0"
     lodash-es "^4.17.21"
 
-<<<<<<< HEAD
 "@openmrs/esm-utils@^3.2.1-pre.1053":
   version "3.2.1-pre.1053"
   resolved "https://registry.yarnpkg.com/@openmrs/esm-utils/-/esm-utils-3.2.1-pre.1053.tgz#cb6062bffb140d087e282e8d1f82545f56165c42"
@@ -3445,19 +3333,6 @@
   version "3.2.1-pre.1053"
   resolved "https://registry.yarnpkg.com/@openmrs/webpack-config/-/webpack-config-3.2.1-pre.1053.tgz#427de72ce850dd4f6203a41f3a8535af2a38ca74"
   integrity sha512-LTEuMSlwz+d0ZJ8j0OjC7Ais7OlkIwHI1SFztDgO5U0/fGGl70wbIQCy0Owlc9+7iYnmHuhr7T0kWQB04bxzLg==
-=======
-"@openmrs/esm-utils@^3.2.1-pre.1047", "@openmrs/esm-utils@^3.2.1-pre.1048":
-  version "3.2.1-pre.1048"
-  resolved "https://registry.yarnpkg.com/@openmrs/esm-utils/-/esm-utils-3.2.1-pre.1048.tgz#51153b90d93e037430f00b54ff290c741961fd51"
-  integrity sha512-GpxTTzVm+QKzzzUNqUd1YT+5YaegCURc3BgfJTUnIDVVOCtoiX40m2wlc90lR0qPgvdRTpG45+e81wAC9xZqqg==
-  dependencies:
-    semver "^7.3.2"
-
-"@openmrs/webpack-config@^3.2.1-pre.1047":
-  version "3.2.1-pre.1048"
-  resolved "https://registry.yarnpkg.com/@openmrs/webpack-config/-/webpack-config-3.2.1-pre.1048.tgz#8ca075828bfb53e83b021b0bf88ad680f0aa4909"
-  integrity sha512-gFznNO1NHHc6atF1bSO1Ys1rfXuHiyM4aTLqdAugS3mmJAo23bMBoOo1nSqyzGCEzva2uQAZ57wBwWr/aQ+zIA==
->>>>>>> 0104072 (Add Turborepo)
   dependencies:
     "@babel/core" "^7.11.4"
     "@babel/preset-env" "^7.11.0"
@@ -13294,21 +13169,12 @@ opener@^1.5.2:
   integrity sha512-ur5UIdyw5Y7yEj9wLzhqXiy6GZ3Mwx0yGI+5sMn2r0N0v3cKJvUmFH5yPP+WXh9e0xfyzyJX95D8l088DNFj7A==
 
 openmrs@next:
-<<<<<<< HEAD
   version "3.2.1-pre.1053"
   resolved "https://registry.yarnpkg.com/openmrs/-/openmrs-3.2.1-pre.1053.tgz#9f7e383275909c4a54e5d57366f5b63f2f4cd8f3"
   integrity sha512-OBMJrW4TdPuSeHBS01P01gWL18w1ORBBY7ox5x8+wGTxiQ+CUnRrM1Ja+jVCJTwkyNbrby9NkyygigUd5wrK6A==
   dependencies:
     "@openmrs/esm-app-shell" "3.2.1-pre.1053"
     "@openmrs/webpack-config" "^3.2.1-pre.1053"
-=======
-  version "3.2.1-pre.1047"
-  resolved "https://registry.yarnpkg.com/openmrs/-/openmrs-3.2.1-pre.1047.tgz#1d287db3d1dd88f2def4393d97bd84baf080d0a2"
-  integrity sha512-wFvy/Vb9G7qKw2xbbFLzKYVMtn4o2w7Y86f5qw64mAfQuqDRhUZts9xH/kQDJA0DssjLP53cOx3i+Ltenij86Q==
-  dependencies:
-    "@openmrs/esm-app-shell" "3.2.1-pre.1047"
-    "@openmrs/webpack-config" "^3.2.1-pre.1047"
->>>>>>> 0104072 (Add Turborepo)
     "@types/react" "^16.9.46"
     "@types/systemjs" "^6.1.0"
     autoprefixer "^10.4.2"
@@ -17011,83 +16877,83 @@ tunnel-agent@^0.6.0:
   dependencies:
     safe-buffer "^5.0.1"
 
-turbo-darwin-64@1.1.9:
-  version "1.1.9"
-  resolved "https://registry.yarnpkg.com/turbo-darwin-64/-/turbo-darwin-64-1.1.9.tgz#5c642fec610d26d7acb7bbe51020804e1ff9bc73"
-  integrity sha512-DAeQkBXvIVMwdlT/OvJYKNbhijUJQr4ug/sLJpNMEMPVW2Fs1aVZpr+ea4W+Xo90nOk+Ac0oCbv4nx3v8UZ1iQ==
+turbo-darwin-64@1.1.10:
+  version "1.1.10"
+  resolved "https://registry.yarnpkg.com/turbo-darwin-64/-/turbo-darwin-64-1.1.10.tgz#926bb5ddbd6be8c400f4a183b5a9b33ccba37d12"
+  integrity sha512-MY/1mHg+tS/GaZKG805e5JSGNS8A4j/M2GzLwCbNL+lwGMfneNASri1vAd80ss3T2MgMsfsFMVyIQJljqpDBvA==
 
-turbo-darwin-arm64@1.1.9:
-  version "1.1.9"
-  resolved "https://registry.yarnpkg.com/turbo-darwin-arm64/-/turbo-darwin-arm64-1.1.9.tgz#c3a7ad58d39af375fab6b944558da29cd2ac0e01"
-  integrity sha512-15WTOOngcUALX1Pso6tG/vot8ksi1l5/Sljv4sXjfpFup9Xkc2m6AE6QlKllextL10SD4x52K2z01ClV7YIKEQ==
+turbo-darwin-arm64@1.1.10:
+  version "1.1.10"
+  resolved "https://registry.yarnpkg.com/turbo-darwin-arm64/-/turbo-darwin-arm64-1.1.10.tgz#f4c0a9dd9a2108ce5c6d04d6fea8260902a758da"
+  integrity sha512-gMPLseYqGKwdy6UHVWKMLA433ZTfQRV5FlYz5n4XVtx30cF6ajOqq12ykeCUUX/lZkH4Uq5zT0tNEYpUhUw7mA==
 
-turbo-freebsd-64@1.1.9:
-  version "1.1.9"
-  resolved "https://registry.yarnpkg.com/turbo-freebsd-64/-/turbo-freebsd-64-1.1.9.tgz#88bf9eff412f6277e75cec6aadbb554c78a469f0"
-  integrity sha512-DqDt4o79guYef7MlYQChHMOMxJNbvE+SVuBP0+CxG4WreSUnsT+D4+/+KBs9e/o2p1xHRoDOtuKbDai8tWgKaQ==
+turbo-freebsd-64@1.1.10:
+  version "1.1.10"
+  resolved "https://registry.yarnpkg.com/turbo-freebsd-64/-/turbo-freebsd-64-1.1.10.tgz#3e460c3a58b61b1f7e15acc219764a07cc54e439"
+  integrity sha512-wra27mvakr5ZFceQnCCSR8gHQtKV8Q0EhtzO/wEdyhEssw0wVaNtMHUOOdvFN0HLmjQmmLZgmfZbURc83UDuZQ==
 
-turbo-freebsd-arm64@1.1.9:
-  version "1.1.9"
-  resolved "https://registry.yarnpkg.com/turbo-freebsd-arm64/-/turbo-freebsd-arm64-1.1.9.tgz#a2bf29386b0bcf5ee43ce5a1cbf39e3d0550d7a0"
-  integrity sha512-tiudLNRsOmmWD9guqWEoW63x3F0YKtkQis0DRrFqJBVcnMDfKYtMWIr6kP7DhK9PxKwnJY4Y1WIawXPIWl66EQ==
+turbo-freebsd-arm64@1.1.10:
+  version "1.1.10"
+  resolved "https://registry.yarnpkg.com/turbo-freebsd-arm64/-/turbo-freebsd-arm64-1.1.10.tgz#b96fd519cbd09a721936ead72ab9ec591f6488dc"
+  integrity sha512-J2I76pTwtrEVjHt1+zWY/s/Y0YIGdWHBIWOjhCXi1E8dav98oGw+WUaiFwzAkcksAblOhNpDL3qhnrnm7kHqrg==
 
-turbo-linux-32@1.1.9:
-  version "1.1.9"
-  resolved "https://registry.yarnpkg.com/turbo-linux-32/-/turbo-linux-32-1.1.9.tgz#6fae00fffc171ebf990b28f9e1635da8800bc3ef"
-  integrity sha512-u0VI41gqxRqGR41+nVmWvNZ6d2AS/KYfrfDeFbw8mRVsuAR2OP6emsbt7cUN++0ZzH9qsRgGcBR/k2Ge/EEx5g==
+turbo-linux-32@1.1.10:
+  version "1.1.10"
+  resolved "https://registry.yarnpkg.com/turbo-linux-32/-/turbo-linux-32-1.1.10.tgz#f69dfcd972b5879832c4f4b9b151d3497d0f6115"
+  integrity sha512-d1ILhEv2B/lOtpH4niFUKGb8YMU6G7gNCQCY6wG+SXARWJtDti+KiNWESechD5DycCIMgtE40XNy/c1US+LI5g==
 
-turbo-linux-64@1.1.9:
-  version "1.1.9"
-  resolved "https://registry.yarnpkg.com/turbo-linux-64/-/turbo-linux-64-1.1.9.tgz#3d608908c2e5dfab18316a07427dd5f4369b8eab"
-  integrity sha512-BU3ulyNivyrDwGVA2NnMcqUH9o4njk59DgantoF7rRSWNeyt5abneOG7CVAdaAy03JIc1gzErjVV+QSQ25H9ug==
+turbo-linux-64@1.1.10:
+  version "1.1.10"
+  resolved "https://registry.yarnpkg.com/turbo-linux-64/-/turbo-linux-64-1.1.10.tgz#cf1e1ff4a52f9ceaf49393e83c1e8927bc5d991d"
+  integrity sha512-8VEOiNJFNfUMZOyrN32wOcdT1Ik1nlIuTwkO4UeonAJhuWjTvdDLPCQkz0SECTu60q90l6nXCnNYtoZA6LrZzA==
 
-turbo-linux-arm64@1.1.9:
-  version "1.1.9"
-  resolved "https://registry.yarnpkg.com/turbo-linux-arm64/-/turbo-linux-arm64-1.1.9.tgz#7b7350c155c1ec3cea6be00840837ca020a8bcca"
-  integrity sha512-bVD+8n8qDDlZxG6Z8rn58m50BjczIV4zCgjDQDIN2E6H9FjWuLOpKXk3mdTgM31w1Om8HYZgkbvla/jQSwWHrQ==
+turbo-linux-arm64@1.1.10:
+  version "1.1.10"
+  resolved "https://registry.yarnpkg.com/turbo-linux-arm64/-/turbo-linux-arm64-1.1.10.tgz#2d1e927655536fb220bb09bacb9b61135c399b57"
+  integrity sha512-ng3dEEL4SbBudF/UZzsOrfyJh8DLtTHawTepeS30FdtvYuVBXdCPc5BAhbawGoau/2AV4vrN3qzh9e3LCqD6Qg==
 
-turbo-linux-arm@1.1.9:
-  version "1.1.9"
-  resolved "https://registry.yarnpkg.com/turbo-linux-arm/-/turbo-linux-arm-1.1.9.tgz#6f71462f3e3becf73cd1e2ded0936260b531075e"
-  integrity sha512-sAI2BqkipyvH6fQhhnOGhY9C9z9AMUdTizOm0Luj6gmEMZhUmjfk5K8BsX3uKzY6cWx5+twaTPXFd1EGV/o7Pg==
+turbo-linux-arm@1.1.10:
+  version "1.1.10"
+  resolved "https://registry.yarnpkg.com/turbo-linux-arm/-/turbo-linux-arm-1.1.10.tgz#04d4c80b2b17b612481166eb33db56123e9882d8"
+  integrity sha512-qJ50K/s5MjpHjam+UdnK3GniEIv5XOBCZOGslgMMyz8V/q43vhB9BU9HQODclM89uQgsKxhs8Fue6ytOY4vIpg==
 
-turbo-linux-mips64le@1.1.9:
-  version "1.1.9"
-  resolved "https://registry.yarnpkg.com/turbo-linux-mips64le/-/turbo-linux-mips64le-1.1.9.tgz#a3e08850bdf022720bef5b9d5d8a3111ba65851d"
-  integrity sha512-/34pGwWKRes3FYAUpZn+s8rKIbi76ZHuGxvXWx7clIfmLwNw1dN04c7cXU/t2PwDv4CzsGkqPgVNMGitnLxeUQ==
+turbo-linux-mips64le@1.1.10:
+  version "1.1.10"
+  resolved "https://registry.yarnpkg.com/turbo-linux-mips64le/-/turbo-linux-mips64le-1.1.10.tgz#60b832615e980fd4d215e39adf33818dd25c8021"
+  integrity sha512-Jd4yH7ZEXCo0xmdJWZ6YsyqcNLyL5vRU3j5ZT+1W97YJCT+g+1on3/nd3rBVPzVz52lb8JIqgGtrBrnOO0AWJg==
 
-turbo-linux-ppc64le@1.1.9:
-  version "1.1.9"
-  resolved "https://registry.yarnpkg.com/turbo-linux-ppc64le/-/turbo-linux-ppc64le-1.1.9.tgz#fd8740b87bbabcd363268040bdae6a9643d77b2a"
-  integrity sha512-5yR59wLf+HTV2Zb7ycPHXloTgYql22F4lhL6H7cWBVmbDFzrWR3N1d/sPaNLHtaDEE4l6UtTOFd/WQCfPDq/Hw==
+turbo-linux-ppc64le@1.1.10:
+  version "1.1.10"
+  resolved "https://registry.yarnpkg.com/turbo-linux-ppc64le/-/turbo-linux-ppc64le-1.1.10.tgz#9b7bbe1ccd7fdc655f5c5bbea79f6762b35723e5"
+  integrity sha512-YF8+Oi53glqY29O1A7KJsHZxBzeVBobYFnPEXMt8vm+ouuo8kkbxXxShOP4h+33YGEkesTw/CTXtfDC1Xj1hDw==
 
-turbo-windows-32@1.1.9:
-  version "1.1.9"
-  resolved "https://registry.yarnpkg.com/turbo-windows-32/-/turbo-windows-32-1.1.9.tgz#ddfd8c83cbd6693e89df6fe099ae3ba2b34c4b8f"
-  integrity sha512-dVwjFWg/SsW+pVk1iOnfovXSzsMsIgiEQvkAEnN3+XNEkjtYhLQ73bntZhP/mO4IKpDEkPoBcOlV/092uwadOg==
+turbo-windows-32@1.1.10:
+  version "1.1.10"
+  resolved "https://registry.yarnpkg.com/turbo-windows-32/-/turbo-windows-32-1.1.10.tgz#769ea82701f8c50d2f104c97cf49dbae1b531c6a"
+  integrity sha512-IO92tVTCtWVPPgcCjf8J7AmBEcwnjv1zPq7t9GFdqZ/6QA06atgPJNzQ/QvyzbzJgUsJUN2ByzwT04o4QUbrBQ==
 
-turbo-windows-64@1.1.9:
-  version "1.1.9"
-  resolved "https://registry.yarnpkg.com/turbo-windows-64/-/turbo-windows-64-1.1.9.tgz#2ed9fbad8ab5384ce14bd0e87f4fa2fd2117f3e0"
-  integrity sha512-fzjO2D9lzhrBNjnuqaFTBpRU9DjYMhhgFgvD3ynwNWiBgm4wcer58DpRMDEzjq51Q+0HwFIrsKzEMyVK4Ubu/Q==
+turbo-windows-64@1.1.10:
+  version "1.1.10"
+  resolved "https://registry.yarnpkg.com/turbo-windows-64/-/turbo-windows-64-1.1.10.tgz#f30fb122a0241a328e1f935e2f581816896230b9"
+  integrity sha512-g/RIXaVDaOgliHEJuOsuB6Tefwue9fXBH1/iIH9dmT3Z7lL0banGh+C10RW6Jd6PBPMoPBWir9PLYuzxoPcCNQ==
 
 turbo@^1.1.9:
-  version "1.1.9"
-  resolved "https://registry.yarnpkg.com/turbo/-/turbo-1.1.9.tgz#cbff85b927558e4f7b731ee17b3739471dca0fae"
-  integrity sha512-xFtKZ9EFEkENhRxn89RQWmgMKCnUvKWPwiOXz60ztp4HEKXAdOBgEmgCOhyn5osfgQYOiaOI6gBIjSf/UMorQQ==
+  version "1.1.10"
+  resolved "https://registry.yarnpkg.com/turbo/-/turbo-1.1.10.tgz#caf01501cf4e8dabd0c1b40c6569b83935cee945"
+  integrity sha512-y8vx8uIyBRFI3aFjZ3PeGaOvYtNk6t7xNLzRsPY+xtnknTeqdBad56ElS8z+j0RyVwKCvI+wgvTHGkEle4VnJA==
   optionalDependencies:
-    turbo-darwin-64 "1.1.9"
-    turbo-darwin-arm64 "1.1.9"
-    turbo-freebsd-64 "1.1.9"
-    turbo-freebsd-arm64 "1.1.9"
-    turbo-linux-32 "1.1.9"
-    turbo-linux-64 "1.1.9"
-    turbo-linux-arm "1.1.9"
-    turbo-linux-arm64 "1.1.9"
-    turbo-linux-mips64le "1.1.9"
-    turbo-linux-ppc64le "1.1.9"
-    turbo-windows-32 "1.1.9"
-    turbo-windows-64 "1.1.9"
+    turbo-darwin-64 "1.1.10"
+    turbo-darwin-arm64 "1.1.10"
+    turbo-freebsd-64 "1.1.10"
+    turbo-freebsd-arm64 "1.1.10"
+    turbo-linux-32 "1.1.10"
+    turbo-linux-64 "1.1.10"
+    turbo-linux-arm "1.1.10"
+    turbo-linux-arm64 "1.1.10"
+    turbo-linux-mips64le "1.1.10"
+    turbo-linux-ppc64le "1.1.10"
+    turbo-windows-32 "1.1.10"
+    turbo-windows-64 "1.1.10"
 
 tweetnacl@^0.14.3, tweetnacl@~0.14.0:
   version "0.14.5"

@@ -4,5 +4,4 @@
 set -e  # die on error
 
 yarn pretty-quick --staged
-yarn turbo run lint typescript
-yarn test
+yarn run verify

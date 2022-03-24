@@ -12,6 +12,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
 
     steps:
       - uses: actions/checkout@v2
@@ -19,15 +21,19 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: "14.x"
+      - name: Download build artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: download-build-artifacts
+          path: dist
       - run: npx lerna bootstrap
       - name: TurboRepo local cache server
         uses: felixmosh/turborepo-gh-artifacts@v1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           server-token: ${{ secrets.TURBO_SERVER_TOKEN }}
-      - run: yarn turbo run lint typescript 
+      - run: yarn run verify 
       - run: yarn turbo run build --api="http://127.0.0.1:9080" --token="${{ secrets.TURBO_SERVER_TOKEN }}" --team="foo"
-      - run: yarn run test
       - name: Upload Artifacts
         uses: actions/upload-artifact@v2
         with:
