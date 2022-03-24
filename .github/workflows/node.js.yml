@@ -20,7 +20,13 @@ jobs:
         with:
           node-version: "14.x"
       - run: npx lerna bootstrap
-      - run: yarn turbo run lint typescript build
+      - name: TurboRepo local cache server
+        uses: felixmosh/turborepo-gh-artifacts@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          server-token: ${{ secrets.TURBO_SERVER_TOKEN }}
+      - run: yarn turbo run lint typescript 
+      - run: yarn build --api="http://127.0.0.1:9080" --token="${{ secrets.TURBO_SERVER_TOKEN }}" --team="foo"
       - run: yarn run test
       - name: Upload Artifacts
         uses: actions/upload-artifact@v2
