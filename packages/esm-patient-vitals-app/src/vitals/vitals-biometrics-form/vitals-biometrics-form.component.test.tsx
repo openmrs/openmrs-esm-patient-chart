@@ -108,7 +108,6 @@ describe('VitalsBiometricsForm: ', () => {
       jest.useFakeTimers('modern');
       // @ts-ignore
       jest.setSystemTime(1638682781000); // 5 Dec 2021 05:39:41 GMT
-      // mockOpenmrsFetch.mockReturnValueOnce({ data: mockUseAppointmentServiceData });
 
       renderForm();
 
@@ -119,13 +118,12 @@ describe('VitalsBiometricsForm: ', () => {
       pulse = screen.getByRole('spinbutton', { name: /pulse/i });
       oxygenSaturation = screen.getByRole('spinbutton', { name: /oxygen saturation/i });
       respirationRate = screen.getByRole('spinbutton', { name: /respiration rate/i });
-
       temperature = screen.getByRole('spinbutton', { name: /temperature/i });
       notes = screen.getByPlaceholderText(/type any additional notes here/i);
       muac = screen.getByRole('spinbutton', { name: /muac/i });
       saveButton = screen.getByRole('button', { name: /Save and close/i });
     });
-    it('renders a success toast notification upon successfully scheduling an appointment', async () => {
+    it('renders a success toast notification upon saving vital biometrics', async () => {
       const promise = Promise.resolve();
       mockSavePatientVitals.mockResolvedValueOnce({ status: 201, statusText: 'Ok' });
 
@@ -198,7 +196,7 @@ describe('VitalsBiometricsForm: ', () => {
         }),
       );
     });
-    it('renders an error notification if there was a problem scheduling an appointment', async () => {
+    it('renders an error notification if there was a problem saving a vital biometrics', async () => {
       const promise = Promise.resolve();
 
       const error = {
