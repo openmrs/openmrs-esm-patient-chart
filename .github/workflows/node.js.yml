@@ -21,11 +21,6 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: "14.x"
-      - name: Download build artifacts
-        uses: actions/download-artifact@v2
-        with:
-          name: download-build-artifacts
-          path: dist
       - run: npx lerna bootstrap
       - name: TurboRepo local cache server
         uses: felixmosh/turborepo-gh-artifacts@v1
