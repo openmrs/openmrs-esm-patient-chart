@@ -20,8 +20,12 @@ const patientFormSyncItem = 'patient-form';
 export async function setupPatientFormSync() {
   setupOfflineSync<PatientFormSyncItemContent>(patientFormSyncItem, ['visit'], syncPatientForm, {
     onBeginEditSyncItem(syncItem) {
-      // @ts-ignore
-      launchFormEntry(syncItem.content.formSchemaUuid, undefined, syncItem.content._id, 'Mock Form Name');
+      launchFormEntry(
+        syncItem.content.formSchemaUuid,
+        syncItem.descriptor.patientUuid,
+        syncItem.content._id,
+        'Form Entry',
+      );
     },
   });
 }

@@ -14,7 +14,7 @@ export function launchFormEntryOrHtmlForms(
   if (currentVisit) {
     const htmlForm = htmlFormEntryForms.find((form) => form.formUuid === formUuid);
     if (isEmpty(htmlForm)) {
-      launchFormEntry(formUuid, undefined, encounterUuid, formName);
+      launchFormEntry(formUuid, patient.id, encounterUuid, formName);
     } else {
       navigate({
         to: `\${openmrsBase}/htmlformentryui/htmlform/${htmlForm.formUiPage}.page?patientId=${patient.id}&visitId=${currentVisit.uuid}&definitionUiResource=${htmlForm.formUiResource}`,
@@ -25,9 +25,10 @@ export function launchFormEntryOrHtmlForms(
   }
 }
 
-export function launchFormEntry(formUuid: string, visitUuid?: string, encounterUuid?: string, formName?: string) {
+export function launchFormEntry(formUuid: string, patientUuid: string, encounterUuid?: string, formName?: string) {
   formEntrySub.next({ formUuid, encounterUuid });
   launchPatientWorkspace('patient-form-entry-workspace', { workspaceTitle: formName });
+  navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/chart` });
 }
 
 function startVisitPrompt() {
