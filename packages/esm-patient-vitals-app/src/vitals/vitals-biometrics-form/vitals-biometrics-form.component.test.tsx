@@ -123,7 +123,7 @@ describe('VitalsBiometricsForm: ', () => {
       muac = screen.getByRole('spinbutton', { name: /muac/i });
       saveButton = screen.getByRole('button', { name: /Save and close/i });
     });
-    it('renders a success toast notification upon saving vital biometrics', async () => {
+    it('renders a success toast notification upon clicking the save button', async () => {
       const promise = Promise.resolve();
       mockSavePatientVitals.mockResolvedValueOnce({ status: 201, statusText: 'Ok' });
 
@@ -196,7 +196,7 @@ describe('VitalsBiometricsForm: ', () => {
         }),
       );
     });
-    it('renders an error notification if there was a problem saving a vital biometrics', async () => {
+    it('renders an error notification if there was a problem saving vital biometrics', async () => {
       const promise = Promise.resolve();
 
       const error = {
