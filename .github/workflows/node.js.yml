@@ -764,7 +764,7 @@ jobs:
         with:
           node-version: "14.x"
           registry-url: "https://registry.npmjs.org"
-      - run: yarn lerna bootstrap
+      - run: npx lerna bootstrap
       - run: yarn turbo run build
       - run: yarn lerna version patch --no-git-tag-version --no-push --yes
       - run: yarn lerna version "$(node -e "console.log(require('./lerna.json').version)")-pre.${{ github.run_number }}" --no-git-tag-version --yes
@@ -788,7 +788,7 @@ jobs:
         with:
           node-version: "14.x"
           registry-url: "https://registry.npmjs.org"
-      - run: yarn lerna bootstrap
+      - run: npx lerna bootstrap
       - run: yarn turbo run build
       - run: yarn run ci:publish
         env:
