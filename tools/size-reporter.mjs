@@ -2,7 +2,7 @@ import { reportFileSizeImpact, readGitHubWorkflowEnv } from '@jsenv/file-size-im
 
 await reportFileSizeImpact({
   ...readGitHubWorkflowEnv(),
-  buildCommand: 'npx turbo run build',
+  buildCommand: 'npx lerna run build',
   installCommand: 'npx lerna bootstrap',
   fileSizeReportModulePath: './tools/size-generator.mjs#fileSizeReport',
 });
