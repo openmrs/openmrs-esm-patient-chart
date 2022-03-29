@@ -2,8 +2,9 @@ import uniqBy from 'lodash-es/uniqBy';
 import { getDrugByName } from '../api/api';
 import { getCommonMedicationByUuid } from '../api/common-medication';
 import { OrderBasketItem } from '../types/order-basket-item';
-import { daysDurationUnit } from '../constants';
 import { Drug } from '../types/order';
+import { useConfig } from '@openmrs/esm-framework';
+import { ConfigObject } from '../config-schema';
 
 // Note:
 // There's currently no backend API available for the data in `common-medication.json`.
@@ -20,7 +21,7 @@ import { Drug } from '../types/order';
 //
 // This method certainly isn't perfect, but again, since the common medication data is only available to us, it's kind of
 // the best thing we can do here.
-
+const config = useConfig() as ConfigObject;
 export async function searchMedications(searchTerm: string, encounterUuid: string, abortController: AbortController) {
   const allSearchTerms = searchTerm.match(/\S+/g);
   const drugs = await searchDrugsInBackend(allSearchTerms, abortController);
@@ -70,7 +71,7 @@ function* explodeDrugResultWithCommonMedicationData(drug: Drug, encounterUuid: s
             asNeededCondition: '',
             startDate: new Date(),
             duration: null,
-            durationUnit: daysDurationUnit,
+            durationUnit: config.daysDurationUnit,
             pillsDispensed: 0,
             numRefills: 0,
             freeTextDosage: '',
