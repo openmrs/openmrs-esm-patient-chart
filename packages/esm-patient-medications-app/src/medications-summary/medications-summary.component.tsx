@@ -2,10 +2,8 @@ import React from 'react';
 import MedicationsDetailsTable from '../components/medications-details-table.component';
 import { DataTableSkeleton } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
-import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
+import { EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { usePatientOrders } from '../api/api';
-import { useConfig } from '@openmrs/esm-framework';
-import { ConfigObject } from '../config-schema';
 
 export interface MedicationsSummaryProps {
   patientUuid: string;
@@ -13,20 +11,20 @@ export interface MedicationsSummaryProps {
 
 export default function MedicationsSummary({ patientUuid }: MedicationsSummaryProps) {
   const { t } = useTranslation();
-  const config = useConfig() as ConfigObject;
+  const launchOrderBasket = React.useCallback(() => launchPatientWorkspace('order-basket-workspace'), []);
 
   const {
     data: activeOrders,
     isError: isErrorActiveOrders,
     isLoading: isLoadingActiveOrders,
     isValidating: isValidatingActiveOrders,
-  } = usePatientOrders(patientUuid, 'ACTIVE', config.careSettingUuid);
+  } = usePatientOrders(patientUuid, 'ACTIVE');
   const {
     data: pastOrders,
     isError: isErrorPastOrders,
     isLoading: isLoadingPastOrders,
     isValidating: isValidatingPastOrders,
-  } = usePatientOrders(patientUuid, 'any', config.careSettingUuid);
+  } = usePatientOrders(patientUuid, 'any');
 
   return (
     <>
@@ -46,11 +44,11 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
                 showDiscontinueButton={true}
                 showModifyButton={true}
                 showReorderButton={false}
-                showAddNewButton={false}
+                showAddNewButton={true}
               />
             );
           }
-          return <EmptyState displayText={displayText} headerTitle={headerTitle} />;
+          return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchOrderBasket} />;
         })()}
       </div>
       <div style={{ marginTop: '1.5rem' }}>
@@ -69,11 +67,11 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
                 showDiscontinueButton={true}
                 showModifyButton={true}
                 showReorderButton={true}
-                showAddNewButton={false}
+                showAddNewButton={true}
               />
             );
           }
-          return <EmptyState displayText={displayText} headerTitle={headerTitle} />;
+          return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchOrderBasket} />;
         })()}
       </div>
     </>
