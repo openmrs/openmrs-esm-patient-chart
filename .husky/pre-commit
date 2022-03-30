@@ -3,4 +3,4 @@
 
 set -e  # die on error
 
-yarn turbo run extract-translations
+npx turbo run extract-translations
