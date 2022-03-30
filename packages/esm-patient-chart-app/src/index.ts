@@ -140,6 +140,14 @@ function setupOpenMRS() {
         }),
       },
       {
+        name: 'side-navigation',
+        slot: 'patient-chart-dashboard-slot',
+        load: getAsyncLifecycle(() => import('./side-nav/side-menu.component'), {
+          featureName: 'side-navigation',
+          moduleName,
+        }),
+      },
+      {
         name: 'nav-group',
         load: getAsyncLifecycle(() => import('./side-nav/generic-nav-group.component'), {
           featureName: 'Nav group',
