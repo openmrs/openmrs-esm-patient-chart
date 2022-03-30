@@ -66,3 +66,4 @@ dist
 .idea/
 
 .DS_Store
+.turbo

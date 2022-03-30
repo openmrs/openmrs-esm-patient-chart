@@ -9,17 +9,19 @@ describe('LocationResourceService:', () => {
   let httpMock: HttpTestingController;
   let windowRef: WindowRef;
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      imports: [OpenmrsApiModule, HttpClientTestingModule],
-      declarations: [],
-      providers: [WindowRef],
-    });
+  beforeEach(
+    waitForAsync(() => {
+      TestBed.configureTestingModule({
+        imports: [OpenmrsApiModule, HttpClientTestingModule],
+        declarations: [],
+        providers: [WindowRef],
+      });
 
-    service = TestBed.get(LocationResourceService);
-    httpMock = TestBed.get(HttpTestingController);
-    windowRef = TestBed.get(WindowRef);
-  }));
+      service = TestBed.get(LocationResourceService);
+      httpMock = TestBed.get(HttpTestingController);
+      windowRef = TestBed.get(WindowRef);
+    }),
+  );
 
   afterEach(() => {
     httpMock.verify();
