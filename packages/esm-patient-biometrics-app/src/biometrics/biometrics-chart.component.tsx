@@ -35,6 +35,7 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
     () =>
       patientBiometrics
         .filter((biometric) => biometric[selectedBiometrics.value])
+        .splice(0, 10)
         .map((biometric) => {
           return (
             biometric[selectedBiometrics.value] && {
