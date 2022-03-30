@@ -3,8 +3,6 @@ import { getDrugByName } from '../api/api';
 import { getCommonMedicationByUuid } from '../api/common-medication';
 import { OrderBasketItem } from '../types/order-basket-item';
 import { Drug } from '../types/order';
-import { useConfig } from '@openmrs/esm-framework';
-import { ConfigObject } from '../config-schema';
 
 // Note:
 // There's currently no backend API available for the data in `common-medication.json`.
@@ -21,12 +19,21 @@ import { ConfigObject } from '../config-schema';
 //
 // This method certainly isn't perfect, but again, since the common medication data is only available to us, it's kind of
 // the best thing we can do here.
+interface daysDurationUnit {
+  uuid: string;
+  display: string;
+}
 
-export async function searchMedications(searchTerm: string, encounterUuid: string, abortController: AbortController) {
+export async function searchMedications(
+  searchTerm: string,
+  encounterUuid: string,
+  abortController: AbortController,
+  configDaysDurationUnit: daysDurationUnit,
+) {
   const allSearchTerms = searchTerm.match(/\S+/g);
   const drugs = await searchDrugsInBackend(allSearchTerms, abortController);
   const explodedSearchResults = drugs.flatMap((drug) => [
-    ...explodeDrugResultWithCommonMedicationData(drug, encounterUuid),
+    ...explodeDrugResultWithCommonMedicationData(drug, encounterUuid, configDaysDurationUnit),
   ]);
   return filterExplodedResultsBySearchTerm(allSearchTerms, explodedSearchResults);
 }
@@ -42,9 +49,11 @@ async function searchDrugsInBackend(allSearchTerms: Array<string>, abortControll
   return uniqBy(results, 'uuid');
 }
 
-function* explodeDrugResultWithCommonMedicationData(drug: Drug, encounterUuid: string): Generator<OrderBasketItem> {
-  const config = useConfig() as ConfigObject;
-  
+function* explodeDrugResultWithCommonMedicationData(
+  drug: Drug,
+  encounterUuid: string,
+  configDaysDurationUnit: daysDurationUnit,
+): Generator<OrderBasketItem> {
   const commonMedication = getCommonMedicationByUuid(drug.uuid);
 
   // If no common medication entry exists for the current drug, there is no point in displaying it in the search results,
@@ -73,7 +82,7 @@ function* explodeDrugResultWithCommonMedicationData(drug: Drug, encounterUuid: s
             asNeededCondition: '',
             startDate: new Date(),
             duration: null,
-            durationUnit: config.daysDurationUnit,
+            durationUnit: configDaysDurationUnit,
             pillsDispensed: 0,
             numRefills: 0,
             freeTextDosage: '',
