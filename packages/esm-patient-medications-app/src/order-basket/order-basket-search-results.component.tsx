@@ -28,9 +28,9 @@ export default function OrderBasketSearchResults({
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [currentSearchResultPage] = paginate(searchResults, page, pageSize);
+  const config = useConfig() as ConfigObject;
 
   useEffect(() => {
-    const config = useConfig() as ConfigObject;
     const abortController = new AbortController();
     searchMedications(searchTerm, encounterUuid, abortController, config.daysDurationUnit).then(
       setSearchResults,
