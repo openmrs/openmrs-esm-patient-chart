@@ -23,10 +23,11 @@ import { ConfigObject } from '../config-schema';
 // the best thing we can do here.
 
 export async function searchMedications(searchTerm: string, encounterUuid: string, abortController: AbortController) {
+  const config = useConfig() as ConfigObject;
   const allSearchTerms = searchTerm.match(/\S+/g);
   const drugs = await searchDrugsInBackend(allSearchTerms, abortController);
   const explodedSearchResults = drugs.flatMap((drug) => [
-    ...explodeDrugResultWithCommonMedicationData(drug, encounterUuid),
+    ...explodeDrugResultWithCommonMedicationData(drug, encounterUuid, config.daysDurationUnit),
   ]);
   return filterExplodedResultsBySearchTerm(allSearchTerms, explodedSearchResults);
 }
@@ -42,8 +43,9 @@ async function searchDrugsInBackend(allSearchTerms: Array<string>, abortControll
   return uniqBy(results, 'uuid');
 }
 
-function* explodeDrugResultWithCommonMedicationData(drug: Drug, encounterUuid: string): Generator<OrderBasketItem> {
-  const config = useConfig() as ConfigObject;
+function* explodeDrugResultWithCommonMedicationData(drug: Drug, encounterUuid: string, configeredDaysDurationUnit): Generator<OrderBasketItem> {
+ 
+
   const commonMedication = getCommonMedicationByUuid(drug.uuid);
 
   // If no common medication entry exists for the current drug, there is no point in displaying it in the search results,
@@ -72,7 +74,7 @@ function* explodeDrugResultWithCommonMedicationData(drug: Drug, encounterUuid: s
             asNeededCondition: '',
             startDate: new Date(),
             duration: null,
-            durationUnit: config.daysDurationUnit,
+            durationUnit: configeredDaysDurationUnit,
             pillsDispensed: 0,
             numRefills: 0,
             freeTextDosage: '',
