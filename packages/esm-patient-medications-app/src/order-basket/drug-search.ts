@@ -21,7 +21,7 @@ import { ConfigObject } from '../config-schema';
 //
 // This method certainly isn't perfect, but again, since the common medication data is only available to us, it's kind of
 // the best thing we can do here.
-const config = useConfig() as ConfigObject;
+
 export async function searchMedications(searchTerm: string, encounterUuid: string, abortController: AbortController) {
   const allSearchTerms = searchTerm.match(/\S+/g);
   const drugs = await searchDrugsInBackend(allSearchTerms, abortController);
@@ -43,6 +43,7 @@ async function searchDrugsInBackend(allSearchTerms: Array<string>, abortControll
 }
 
 function* explodeDrugResultWithCommonMedicationData(drug: Drug, encounterUuid: string): Generator<OrderBasketItem> {
+  const config = useConfig() as ConfigObject;
   const commonMedication = getCommonMedicationByUuid(drug.uuid);
 
   // If no common medication entry exists for the current drug, there is no point in displaying it in the search results,

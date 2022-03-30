@@ -46,8 +46,9 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
   } = usePatientOrders(patientUuid, 'ACTIVE', config.careSettingUuid);
 
   useEffect(() => {
+    const durationUnitsConcept = config.durationUnitsConcept;
     const abortController = new AbortController();
-    const durationUnitsRequest = getDurationUnits(abortController, config.durationUnitsConcept).then(
+    const durationUnitsRequest = getDurationUnits(abortController, durationUnitsConcept).then(
       (res) => setDurationUnits(res.data.answers),
       createErrorHandler,
     );
