@@ -32,8 +32,8 @@
   display: none;
 }
 
-@media (max-height: $breakpoint-tablet-min){
+@media (max-width: $breakpoint-tablet-max){
   .frameContent {
-    width: 70%;
+    width: 65%;
   }  
 }
