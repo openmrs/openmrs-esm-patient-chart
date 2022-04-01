@@ -9,13 +9,6 @@ import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
 
-export const hivMeta = {
-  name: 'Hiv-care-and-treatment',
-  slot: 'hiv-dashboard-slot',
-  config: { columns: 1 },
-  title: 'HIV Care and Treatment',
-};
-
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 const backendDependencies = {
