@@ -9,13 +9,6 @@ import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
 
-export const hivMeta = {
-  name: 'Hiv-care-and-treatment',
-  slot: 'hiv-dashboard-slot',
-  config: { columns: 1 },
-  title: 'HIV Care and Treatment',
-};
-
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 const backendDependencies = {
@@ -52,27 +45,11 @@ function setupOpenMRS() {
         offline: true,
       },
       {
-        name: 'test-results-dashboard-widget',
-        slot: dashboardMeta.slot,
-        load: getAsyncLifecycle(() => import('./desktop-view/index'), options),
-        online: true,
-        offline: true,
-      },
-      {
         name: 'test-results-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
         order: 4,
         load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
         meta: dashboardMeta,
-        online: true,
-        offline: true,
-      },
-      {
-        name: 'hiv-care-and-treatment',
-        slot: 'patient-chart-dashboard-slot',
-        order: 5,
-        load: getSyncLifecycle(createDashboardLink(hivMeta), options),
-        meta: hivMeta,
         online: true,
         offline: true,
       },
@@ -97,9 +74,9 @@ function setupOpenMRS() {
         offline: true,
       },
       {
-        name: 'Hiv page',
-        slot: hivMeta.slot,
-        load: getAsyncLifecycle(() => import('./hiv'), options),
+        name: 'results-viewer',
+        slots: ['patient-chart-results-viewer-slot', dashboardMeta.slot],
+        load: getAsyncLifecycle(() => import('./results-viewer'), options),
         meta: {
           columnSpan: 4,
         },
