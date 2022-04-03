@@ -28,12 +28,12 @@ export async function searchMedications(
   searchTerm: string,
   encounterUuid: string,
   abortController: AbortController,
-  DaysDurationUnit: daysDurationUnit,
+  daysDurationUnit: daysDurationUnit,
 ) {
   const allSearchTerms = searchTerm.match(/\S+/g);
   const drugs = await searchDrugsInBackend(allSearchTerms, abortController);
   const explodedSearchResults = drugs.flatMap((drug) => [
-    ...explodeDrugResultWithCommonMedicationData(drug, encounterUuid, DaysDurationUnit),
+    ...explodeDrugResultWithCommonMedicationData(drug, encounterUuid, daysDurationUnit),
   ]);
   return filterExplodedResultsBySearchTerm(allSearchTerms, explodedSearchResults);
 }
@@ -52,7 +52,7 @@ async function searchDrugsInBackend(allSearchTerms: Array<string>, abortControll
 function* explodeDrugResultWithCommonMedicationData(
   drug: Drug,
   encounterUuid: string,
-  DaysDurationUnit: daysDurationUnit,
+  daysDurationUnit: daysDurationUnit,
 ): Generator<OrderBasketItem> {
   const commonMedication = getCommonMedicationByUuid(drug.uuid);
 
@@ -82,7 +82,7 @@ function* explodeDrugResultWithCommonMedicationData(
             asNeededCondition: '',
             startDate: new Date(),
             duration: null,
-            durationUnit: DaysDurationUnit,
+            durationUnit: daysDurationUnit,
             pillsDispensed: 0,
             numRefills: 0,
             freeTextDosage: '',
