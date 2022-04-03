@@ -19,7 +19,7 @@ import { Drug } from '../types/order';
 //
 // This method certainly isn't perfect, but again, since the common medication data is only available to us, it's kind of
 // the best thing we can do here.
-interface daysDurationUnit {
+interface DaysDurationUnit {
   uuid: string;
   display: string;
 }
@@ -28,7 +28,7 @@ export async function searchMedications(
   searchTerm: string,
   encounterUuid: string,
   abortController: AbortController,
-  daysDurationUnit: daysDurationUnit,
+  daysDurationUnit: DaysDurationUnit,
 ) {
   const allSearchTerms = searchTerm.match(/\S+/g);
   const drugs = await searchDrugsInBackend(allSearchTerms, abortController);
@@ -52,7 +52,7 @@ async function searchDrugsInBackend(allSearchTerms: Array<string>, abortControll
 function* explodeDrugResultWithCommonMedicationData(
   drug: Drug,
   encounterUuid: string,
-  daysDurationUnit: daysDurationUnit,
+  daysDurationUnit: DaysDurationUnit,
 ): Generator<OrderBasketItem> {
   const commonMedication = getCommonMedicationByUuid(drug.uuid);
 
