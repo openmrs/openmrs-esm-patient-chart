@@ -2,24 +2,24 @@ import { Type } from '@openmrs/esm-framework';
 
 export const configSchema = {
   durationUnitsConcept: {
-    _type: Type.String,
-    _description: 'Concept for duration units',
+    _type: Type.ConceptUuid,
+    _description: 'the concept for duration units',
     _default: '1732AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   },
   careSettingUuid: {
-    _type: Type.String,
-    _description: 'Uuid setting',
+    _type: Type.UUID,
+    _description: 'the care setting uuid',
     _default: '6f0c9a92-6f24-11e3-af88-005056821db0',
   },
   daysDurationUnit: {
     uuid: {
-      _type: Type.String,
-      _description: 'Uuid',
+      _type: Type.UUID,
+      _description: 'the uuid for days duration unit',
       _default: '1072AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
     display: {
       _type: Type.String,
-      _description: 'Uuid setting',
+      _description: 'the display for days duration unit',
       _default: 'Days',
     },
   },
