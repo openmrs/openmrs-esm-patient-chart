@@ -1,6 +1,7 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render } from '@testing-library/react';
+import { useConfig } from '@openmrs/esm-framework';
 import { mockConceptMetadata, mockVitalsConfig, mockVitalsSignsConcept } from '../../../../../__mocks__/vitals.mock';
 import { mockPatient } from '../../../../../__mocks__/patient.mock';
 import VitalsAndBiometricsForm from './vitals-biometrics-form.component';
@@ -8,6 +9,8 @@ import VitalsAndBiometricsForm from './vitals-biometrics-form.component';
 const mockConceptUnits = new Map<string, string>(
   mockVitalsSignsConcept.data.results[0].setMembers.map((concept) => [concept.uuid, concept.units]),
 );
+
+const mockedUseConfig = useConfig as jest.Mock;
 
 jest.mock('@openmrs/esm-patient-common-lib', () => {
   const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
@@ -21,25 +24,19 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
   };
 });
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-    useConfig: jest.fn(() => mockVitalsConfig),
-  };
-});
-
 jest.mock('../vitals.resource', () => ({
   savePatientVitals: jest.fn(),
 }));
 
 const testProps = {
-  patientUuid: mockPatient.id,
   closeWorkspace: () => {},
+  patientUuid: mockPatient.id,
+  promptBeforeClosing: () => {},
 };
 
 describe('VitalsBiometricsForm: ', () => {
+  beforeEach(() => mockedUseConfig.mockReturnValue(mockVitalsConfig));
+
   it('renders the vitals and biometrics form', async () => {
     renderForm();
 

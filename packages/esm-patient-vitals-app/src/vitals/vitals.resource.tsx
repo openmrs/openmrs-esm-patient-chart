@@ -49,14 +49,14 @@ export function useVitals(patientUuid: string, includeBiometrics: boolean = fals
         .filter((uuid) => !biometricsConcepts.includes(uuid))
         .join(',');
 
-  const { data, error, isValidating } = useSWR<{ data: VitalsFetchResponse }, Error>(
+  const apiUrl =
     `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&code=` +
-      conceptUuids +
-      '&_summary=data&_sort=-date' +
-      `&_count=${pageSize}
-    `,
-    openmrsFetch,
-  );
+    conceptUuids +
+    '&_summary=data&_sort=-date' +
+    `&_count=${pageSize}
+        `;
+
+  const { data, error, isValidating } = useSWR<{ data: VitalsFetchResponse }, Error>(apiUrl, openmrsFetch);
 
   const getVitalSignKey = (conceptUuid: string) => {
     if (conceptUuid === concepts.systolicBloodPressureUuid) return 'systolic';
