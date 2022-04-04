@@ -10,7 +10,7 @@
     "ci:publish": "lerna publish from-package --yes",
     "ci:prepublish": "lerna publish from-package --no-git-reset --yes --dist-tag next",
     "release": "lerna version --no-git-tag-version",
-    "verify": "lerna run lint && lerna run test && lerna run typescript",
+    "verify": "turbo run lint && turbo run typescript && yarn run test",
     "prettier": "prettier --config prettier.config.js --write \"packages/**/*.{ts,tsx}\"",
     "prepare": "husky install",
     "test": "cross-env TZ=UTC jest --config jest.config.json --verbose false --passWithNoTests",
@@ -70,6 +70,7 @@
     "rxjs": "^6.6.3",
     "sass": "^1.29.0",
     "systemjs-webpack-interop": "^2.3.7",
+    "turbo": "^1.1.9",
     "typescript": "^4.0.3",
     "webpack": "^5.36.2",
     "webpack-cli": "^4.7.0"

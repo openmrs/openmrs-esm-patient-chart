@@ -1,7 +1,7 @@
-import React, { createContext, useReducer, useEffect, useMemo, useState } from 'react';
+import React, { createContext, useReducer, useEffect, useMemo } from 'react';
 import { parseTime } from '../timeline/useTimelineData';
 import reducer from './filter-reducer';
-import { TreeNode } from './filter-set';
+import type { TreeNode, FilterContextProps, FilterProviderProps, obsShape } from './filter-types';
 
 const initialState = {
   checkboxes: {},
@@ -22,35 +22,6 @@ const initialContext = {
   updateParent: () => {},
 };
 
-interface StateProps {
-  checkboxes: { [key: string]: boolean };
-  parents: { [key: string]: string[] };
-  roots: { [key: string]: any }[];
-}
-interface FilterContextProps {
-  state: StateProps;
-  checkboxes: { [key: string]: boolean };
-  parents: { [key: string]: string[] };
-  roots: TreeNode[];
-  tests: { [key: string]: any };
-  lowestParents: { display: string; flatName: string }[];
-  timelineData: { [key: string]: any };
-  activeTests: string[];
-  someChecked: boolean;
-  initialize: any;
-  toggleVal: any;
-  updateParent: any;
-}
-
-interface FilterProviderProps {
-  roots: any[];
-  children: React.ReactNode;
-}
-
-interface obsShape {
-  [key: string]: any;
-}
-
 const FilterContext = createContext<FilterContextProps>(initialContext);
 
 const FilterProvider = ({ roots, children }: FilterProviderProps) => {
@@ -58,11 +29,11 @@ const FilterProvider = ({ roots, children }: FilterProviderProps) => {
 
   const actions = useMemo(
     () => ({
-      initialize: (trees) => dispatch({ type: 'initialize', trees: trees }),
-      toggleVal: (name) => {
+      initialize: (trees: Array<TreeNode>) => dispatch({ type: 'initialize', trees: trees }),
+      toggleVal: (name: string) => {
         dispatch({ type: 'toggleVal', name: name });
       },
-      updateParent: (name) => {
+      updateParent: (name: string) => {
         dispatch({ type: 'updateParent', name: name });
       },
     }),
@@ -135,4 +106,4 @@ const FilterProvider = ({ roots, children }: FilterProviderProps) => {
 };
 
 export default FilterContext;
-export { FilterProvider };
+export { FilterProvider, FilterContext };

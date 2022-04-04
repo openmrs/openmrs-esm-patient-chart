@@ -12,18 +12,23 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
 
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
-          node-version: "14.x"
+          node-version: '14'
       - run: npx lerna bootstrap
-      - run: npx lerna run lint
-      - run: npx lerna run typescript
-      - run: npm run test
-      - run: npx lerna run build
+      - name: TurboRepo local cache server
+        uses: felixmosh/turborepo-gh-artifacts@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          server-token: ${{ secrets.TURBO_SERVER_TOKEN }}
+      - run: yarn run test
+      - run: yarn turbo run lint typescript build --api="http://127.0.0.1:9080" --token="${{ secrets.TURBO_SERVER_TOKEN }}" --team="${{ github.repository_owner }}"
       - name: Upload Artifacts
         uses: actions/upload-artifact@v2
         with:
@@ -755,17 +760,17 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
-          node-version: "14.x"
+          node-version: '14'
           registry-url: "https://registry.npmjs.org"
       - run: npx lerna bootstrap
-      - run: npx lerna run build
-      - run: npx lerna version patch --no-git-tag-version --no-push --yes
-      - run: npx lerna version "$(node -e "console.log(require('./lerna.json').version)")-pre.${{ github.run_number }}" --no-git-tag-version --yes
+      - run: yarn turbo run build
+      - run: yarn lerna version patch --no-git-tag-version --no-push --yes
+      - run: yarn lerna version "$(node -e "console.log(require('./lerna.json').version)")-pre.${{ github.run_number }}" --no-git-tag-version --yes
       - run: git config user.email "info@openmrs.org" && git config user.name "OpenMRS CI"
       - run: git add . && git commit -m "Prerelease version" --no-verify
-      - run: npm run ci:prepublish
+      - run: yarn run ci:prepublish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
@@ -779,12 +784,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
-          node-version: "14.x"
+          node-version: '14'
           registry-url: "https://registry.npmjs.org"
       - run: npx lerna bootstrap
-      - run: npx lerna run build
-      - run: npm run ci:publish
+      - run: yarn turbo run build
+      - run: yarn run ci:publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}

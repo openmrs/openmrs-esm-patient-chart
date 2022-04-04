@@ -3,29 +3,22 @@
 @import "~carbon-components/src/globals/scss/vars";
 @import "~carbon-components/src/globals/scss/mixins";
 
-.results-header {
-  padding: 0.8rem 0;
-  z-index: 10;
-  background-color: $openmrs-background-grey;
-}
-
-.column-panel {
-  overflow-y: scroll;
-  height: calc(100vh - 9rem)
-}
-
-.date-header {
+.timelineHeader {
   position: sticky;
   top: 0px;
-  display: grid;
-  background-color: white;
-  overflow-x: auto;
   z-index: 9;
-  scrollbar-width: none;
 }
 
-.date-header::-webkit-scrollbar {
-  display: none;
+.dateHeaderContainer {
+  padding: 0;
+  box-sizing: border-box;
+  display: grid;
+  grid-auto-flow: row;
+  column-gap: 1px;
+  row-gap: 0px;
+  background-color: $color-gray-30;
+  grid-template: auto auto / 9em auto;
+  border-collapse: collapse;
 }
 
 .grid {
@@ -89,12 +82,11 @@
   width: 100%;
   background-color: white;
   scrollbar-width: none;
+  &::-webkit-scrollbar {
+    // needed for Chrome, Edge, Opera, Safari
+    display: none;
+  }
 }
-
-.grid-container::-webkit-scrollbar {
-  display: none;
-}
-
 
 
 .row-header {
@@ -124,31 +116,14 @@
 }
 
 
-.date-header-container {
-  position: sticky;
-  top: 0;
-  padding: 0;
-  box-sizing: border-box;
-  display: grid;
-  grid-auto-flow: row;
-  column-gap: 1px;
-  row-gap: 0px;
-  background-color: $color-gray-30;
-  grid-template: auto auto / 9em auto;
-  border-collapse: collapse;
-  scrollbar-width: none;
-}
 
-.date-header-container::-webkit-scrollbar {
-  display: none;
-}
 
 .date-header-inner {
   overflow-x: auto;
   scrollbar-width: none;
-}
-.date-header-inner::-webkit-scrollbar {
-  display: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .time-slot-inner {

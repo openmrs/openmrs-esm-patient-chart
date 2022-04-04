@@ -65,21 +65,23 @@ The patient chart consists of the following parts:
 - Navigation menu
 - Breadcrumbs menu
 - Patient header
-- Chart review 
+- Chart review / Dashboards
 - Workspace
 - Side menu
 
-The navigation menu lives on the left side of the screen and provides links to dashboard pages for various widgets in the patient chart.
+The **navigation menu** lives on the left side of the screen and provides links to dashboards in the patient chart.
 
-The breadcrumbs menu gets shown at the top of the page under the navigation bar. It shows the user their current location relative to the information architecture and helps them quickly navigate to a parent level or previous step.
+The **breadcrumbs menu** gets shown at the top of the page under the navigation bar. It shows the user their current location relative to the information architecture and helps them quickly navigate to a parent level or previous step.
 
-The patient header contains the [patient banner](packages/esm-patient-banner-app/README.md). Uninvasive notifications also appear in this area following actions such as form submissions.
+The **patient header** contains the [patient banner](packages/esm-patient-banner-app/README.md). Uninvasive notifications also appear in this area following actions such as form submissions.
 
-The chart review area is the main part of the screen. It displays all of the widget cards in an easy-to-read layout that is configurable.
+The **chart review** area is the main part of the screen. It displays whatever dashboard is active.
 
-The workspace is where data entry takes place. On mobile devices it covers the screen; on desktop it appears in a sidebar.
+A **dashboard** is a collection of widgets.
 
-The side menu provides access to features that do not have their own pages, such as the notifications menu.
+The **workspace** is where data entry takes place. On mobile devices it covers the screen; on desktop it appears in a sidebar.
+
+The **side menu** provides access to features that do not have their own pages, such as the notifications menu.
 
 ## Configuration
 
