@@ -16,6 +16,7 @@ const closeWorkspace = jest.fn();
 const testProps = {
   closeWorkspace,
   patientUuid: mockPatient.id,
+  promptBeforeClosing: jest.fn(),
 };
 
 const mockCreateAppointment = createAppointment as jest.Mock;
