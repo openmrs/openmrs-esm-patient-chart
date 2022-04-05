@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { SyntheticEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
 import {
@@ -48,7 +48,8 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
     return value >= 18.5 && value <= 24.9;
   };
 
-  const savePatientVitalsAndBiometrics = () => {
+  const savePatientVitalsAndBiometrics = (event: SyntheticEvent) => {
+    event.preventDefault();
     setIsSubmitting(true);
     const ac = new AbortController();
     savePatientVitals(
