@@ -1,6 +1,7 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render, act } from '@testing-library/react';
+import { useConfig } from '@openmrs/esm-framework';
 import { mockConceptMetadata, mockVitalsConfig, mockVitalsSignsConcept } from '../../../../../__mocks__/vitals.mock';
 import { mockPatient } from '../../../../../__mocks__/patient.mock';
 import VitalsAndBiometricsForm from './vitals-biometrics-form.component';
@@ -119,6 +120,7 @@ describe('VitalsBiometricsForm: ', () => {
       muac = screen.getByRole('spinbutton', { name: /muac/i });
       saveButton = screen.getByRole('button', { name: /Save and close/i });
     });
+    
     it('renders a success toast notification upon clicking the save button', async () => {
       const promise = Promise.resolve();
       mockSavePatientVitals.mockResolvedValueOnce({ status: 201, statusText: 'Ok' });
@@ -132,22 +134,19 @@ describe('VitalsBiometricsForm: ', () => {
       userEvent.type(temperature, '37');
       userEvent.type(notes, 'patient on MDR treatment');
       userEvent.type(muac, '23');
-
+      
       expect(bmiInput).toHaveValue(19.1);
       expect(systolic).toHaveValue(120);
-
       expect(pulse).toHaveValue(80);
       expect(oxygenSaturation).toHaveValue(100);
       expect(respirationRate).toHaveValue(16);
-
       expect(temperature).toHaveValue(37);
-
       expect(notes).toHaveValue('patient on MDR treatment');
-
       expect(muac).toHaveValue(23);
+      
       userEvent.click(saveButton);
+      
       expect(mockSavePatientVitals).toHaveBeenCalledTimes(1);
-
       expect(mockSavePatientVitals).toHaveBeenCalledWith(
         '67a71486-1a54-468f-ac3e-7091a9a79584',
         'a000cb34-9ec1-4344-a1c8-f692232f6edd',
@@ -192,6 +191,7 @@ describe('VitalsBiometricsForm: ', () => {
         }),
       );
     });
+    
     it('renders an error notification if there was a problem saving vital biometrics', async () => {
       const promise = Promise.resolve();
 
@@ -203,6 +203,7 @@ describe('VitalsBiometricsForm: ', () => {
         },
       };
       mockSavePatientVitals.mockRejectedValueOnce(error);
+      
       userEvent.clear(muac);
       userEvent.type(muac, 'on going');
       userEvent.clear(weightInput);
@@ -210,6 +211,7 @@ describe('VitalsBiometricsForm: ', () => {
       userEvent.click(saveButton);
 
       await act(() => promise);
+      
       expect(mockShowNotification).toHaveBeenCalledTimes(1);
       expect(mockShowNotification).toHaveBeenCalledWith({
         critical: true,
