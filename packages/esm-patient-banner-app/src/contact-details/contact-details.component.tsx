@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { InlineLoading } from 'carbon-components-react';
 import { useRelationships } from './relationships.resource';
 import styles from './contact-details.scss';
-import { usePatientContactAttribute } from '../hooks/usePatientAttributes';
+import { usePatientContactAttributes } from '../hooks/usePatientAttributes';
 
 interface ContactDetailsProps {
   address: Array<fhir.Address>;
@@ -36,21 +36,22 @@ const Address: React.FC<{ address?: fhir.Address }> = ({ address }) => {
 const Contact: React.FC<{ telecom: Array<fhir.ContactPoint>; patientUuid: string }> = ({ telecom, patientUuid }) => {
   const { t } = useTranslation();
   const value = telecom?.length ? telecom[0].value : '--';
-  const { isLoading, contactDetails } = usePatientContactAttribute(patientUuid);
-
-  if (isLoading) return <InlineLoading description={t('loading', 'Loading...')} />;
+  const { isLoading, contactAttributes } = usePatientContactAttributes(patientUuid);
 
   return (
     <>
       <p className={styles.heading}>{t('contactDetails', 'Contact Details')}</p>
       <ul>
         <li>{value}</li>
-        {contactDetails.length > 0 &&
-          contactDetails.map((contact) => (
-            <li>
-              {contact.attributeType.display} : {contact.value}
+        {isLoading ? (
+          <InlineLoading description={t('loading', 'Loading...')} />
+        ) : (
+          contactAttributes?.map(({ attributeType, value, uuid }) => (
+            <li key={uuid}>
+              {attributeType.display} : {value}
             </li>
-          ))}
+          ))
+        )}
       </ul>
     </>
   );

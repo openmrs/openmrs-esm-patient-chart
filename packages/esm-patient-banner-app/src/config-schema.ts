@@ -4,7 +4,7 @@ export const configSchema = {
   contactAttributeType: {
     _type: Type.UUID,
     _description:
-      'The Uuids of patient attribute type that captures contact information `e.g Next of kin contact details`',
+      'The Uuids of person attribute-type that captures contact information `e.g Next of kin contact details`',
     _default: [],
   },
 };

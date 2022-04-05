@@ -28,16 +28,16 @@ export const usePatientAttributes = (patientUuid: string) => {
  *  React hook that takes patientUuid {@link string} and return contact details
  *  derived from patient-attributes using configured attributeTypes
  * @param patientUuid Unique patient identifier {@type string}
- * @returns Object containing `contactDetails` {@link Attribute} loading status
+ * @returns Object containing `contactAttribute` {@link Attribute} loading status
  */
-export const usePatientContactAttribute = (patientUuid: string) => {
+export const usePatientContactAttributes = (patientUuid: string) => {
   const { contactAttributeType } = useConfig() as ConfigObject;
   const { attributes, isLoading } = usePatientAttributes(patientUuid);
-  const contactDetails = attributes.filter(({ attributeType }) =>
+  const contactAttributes = attributes.filter(({ attributeType }) =>
     contactAttributeType?.some((uuid) => attributeType.uuid === uuid),
   );
   return {
-    contactDetails: contactDetails ?? [],
+    contactAttributes: contactAttributes ?? [],
     isLoading,
   };
 };
