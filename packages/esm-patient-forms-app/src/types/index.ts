@@ -34,6 +34,8 @@ export interface EncounterWithFormRef {
 export interface EncounterType {
   uuid: string;
   name: string;
+  viewPrivilege: string;
+  editPrivilege: string;
 }
 
 export interface ListResponse<T> {
