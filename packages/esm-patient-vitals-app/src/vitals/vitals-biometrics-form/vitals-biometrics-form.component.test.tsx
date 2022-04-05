@@ -1,6 +1,7 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render, act } from '@testing-library/react';
+import { useConfig } from '@openmrs/esm-framework';
 import { mockConceptMetadata, mockVitalsConfig, mockVitalsSignsConcept } from '../../../../../__mocks__/vitals.mock';
 import { mockPatient } from '../../../../../__mocks__/patient.mock';
 import VitalsAndBiometricsForm from './vitals-biometrics-form.component';
@@ -15,6 +16,8 @@ const mockConceptUnits = new Map<string, string>(
   mockVitalsSignsConcept.data.results[0].setMembers.map((concept) => [concept.uuid, concept.units]),
 );
 
+const mockedUseConfig = useConfig as jest.Mock;
+
 jest.mock('@openmrs/esm-patient-common-lib', () => {
   const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
 
@@ -27,25 +30,19 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
   };
 });
 
-jest.mock('@openmrs/esm-framework', () => {
-  const originalModule = jest.requireActual('@openmrs/esm-framework');
-
-  return {
-    ...originalModule,
-    useConfig: jest.fn(() => mockVitalsConfig),
-  };
-});
-
 jest.mock('../vitals.resource', () => ({
   savePatientVitals: jest.fn(),
 }));
 
 const testProps = {
-  patientUuid: mockPatient.id,
   closeWorkspace: () => {},
+  patientUuid: mockPatient.id,
+  promptBeforeClosing: () => {},
 };
 
 describe('VitalsBiometricsForm: ', () => {
+  beforeEach(() => mockedUseConfig.mockReturnValue(mockVitalsConfig));
+
   it('renders the vitals and biometrics form', async () => {
     renderForm();
 
@@ -129,26 +126,26 @@ describe('VitalsBiometricsForm: ', () => {
 
       userEvent.type(heightInput, '180');
       userEvent.type(weightInput, '62');
-      userEvent.type(systolic, '180');
-      userEvent.type(pulse, '180');
-      userEvent.type(oxygenSaturation, '180');
-      userEvent.type(respirationRate, '180');
-      userEvent.type(temperature, '180');
+      userEvent.type(systolic, '120');
+      userEvent.type(pulse, '80');
+      userEvent.type(oxygenSaturation, '100');
+      userEvent.type(respirationRate, '16');
+      userEvent.type(temperature, '37');
       userEvent.type(notes, 'patient on MDR treatment');
-      userEvent.type(muac, '180');
+      userEvent.type(muac, '23');
 
       expect(bmiInput).toHaveValue(19.1);
-      expect(systolic).toHaveValue(180);
+      expect(systolic).toHaveValue(120);
 
-      expect(pulse).toHaveValue(180);
-      expect(oxygenSaturation).toHaveValue(180);
-      expect(respirationRate).toHaveValue(180);
+      expect(pulse).toHaveValue(80);
+      expect(oxygenSaturation).toHaveValue(100);
+      expect(respirationRate).toHaveValue(16);
 
-      expect(temperature).toHaveValue(180);
+      expect(temperature).toHaveValue(37);
 
       expect(notes).toHaveValue('patient on MDR treatment');
 
-      expect(muac).toHaveValue(180);
+      expect(muac).toHaveValue(23);
       userEvent.click(saveButton);
       expect(mockSavePatientVitals).toHaveBeenCalledTimes(1);
 
@@ -171,12 +168,12 @@ describe('VitalsBiometricsForm: ', () => {
         {
           generalPatientNote: 'patient on MDR treatment',
           height: '180',
-          midUpperArmCircumference: '180',
-          oxygenSaturation: '180',
-          pulse: '180',
-          respiratoryRate: '180',
-          systolicBloodPressure: '180',
-          temperature: '180',
+          midUpperArmCircumference: '23',
+          oxygenSaturation: '100',
+          pulse: '80',
+          respiratoryRate: '16',
+          systolicBloodPressure: '120',
+          temperature: '37',
           weight: '62',
         },
         new Date('2021-12-05T05:39:41.000Z'),
