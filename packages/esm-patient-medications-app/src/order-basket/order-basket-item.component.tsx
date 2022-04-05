@@ -9,11 +9,11 @@ import { useLayoutType } from '@openmrs/esm-framework';
 
 export interface OrderBasketItemTileProps {
   orderBasketItem: OrderBasketItem;
-  onClick: () => void;
+  onItemClick: () => void;
   onRemoveClick: () => void;
 }
 
-export default function OrderBasketItemTile({ orderBasketItem, onClick, onRemoveClick }: OrderBasketItemTileProps) {
+export default function OrderBasketItemTile({ orderBasketItem, onItemClick, onRemoveClick }: OrderBasketItemTileProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
 
@@ -91,7 +91,7 @@ export default function OrderBasketItemTile({ orderBasketItem, onClick, onRemove
     <ClickableTile
       role="listitem"
       className={isTablet ? styles.clickableTileTablet : styles.clickableTileDesktop}
-      handleClick={() => shouldOnClickBeCalled.current && onClick()}
+      onClick={() => shouldOnClickBeCalled.current && onItemClick()}
     >
       {tileContent}
     </ClickableTile>
