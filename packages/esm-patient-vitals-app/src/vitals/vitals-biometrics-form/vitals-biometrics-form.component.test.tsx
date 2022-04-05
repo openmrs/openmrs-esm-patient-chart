@@ -1,11 +1,10 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render, act } from '@testing-library/react';
-import { useConfig } from '@openmrs/esm-framework';
 import { mockConceptMetadata, mockVitalsConfig, mockVitalsSignsConcept } from '../../../../../__mocks__/vitals.mock';
 import { mockPatient } from '../../../../../__mocks__/patient.mock';
 import VitalsAndBiometricsForm from './vitals-biometrics-form.component';
-import { showNotification, showToast } from '@openmrs/esm-framework';
+import { showNotification, showToast, useConfig } from '@openmrs/esm-framework';
 import { savePatientVitals } from '../vitals.resource';
 
 const mockShowToast = showToast as jest.Mock;
