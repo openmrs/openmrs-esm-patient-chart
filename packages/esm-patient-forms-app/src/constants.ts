@@ -3,3 +3,4 @@ export const customFormRepresentation =
 export const customEncounterRepresentation = `custom:(uuid,encounterDatetime,encounterType:(uuid,name,viewPrivilege,editPrivilege),form:${customFormRepresentation}`;
 
 export const formEncounterUrl = `/ws/rest/v1/form?v=custom:${customFormRepresentation}`;
+export const formEncounterUrlPoc = `/ws/rest/v1/form?v=custom:${customFormRepresentation}&q=poc`;

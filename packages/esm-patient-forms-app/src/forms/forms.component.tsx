@@ -3,7 +3,7 @@ import FormView from './form-view.component';
 import styles from './forms.component.scss';
 import EmptyFormView from './empty-form.component';
 import { ContentSwitcher, Switch, DataTableSkeleton, InlineLoading, Tag } from 'carbon-components-react';
-import { CardHeader, ErrorState, PatientProgram } from '@openmrs/esm-patient-common-lib';
+import { CardHeader, ErrorState, PatientProgram, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { useForms } from '../hooks/use-forms';
 import { useConfig, useLayoutType, useVisit, useSessionUser, userHasAccess } from '@openmrs/esm-framework';
@@ -45,8 +45,7 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
   formsToDisplay = formsToDisplay?.filter((formInfo) =>
     userHasAccess(formInfo.form.encounterType.editPrivilege, session.user as any),
   );
-
-  const { currentVisit } = useVisit(patientUuid);
+  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const { programConfigs } = useProgramConfig(patientUuid, showRecommendedFormsTab);
 
   const recommendedForms = useMemo(
