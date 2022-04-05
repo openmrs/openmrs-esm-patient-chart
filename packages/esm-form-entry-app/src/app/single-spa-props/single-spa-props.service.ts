@@ -32,11 +32,9 @@ export class SingleSpaPropsService implements OnDestroy {
 
     if (value === undefined) {
       const error = new Error(
-        `The module is missing the required Single SPA property "${name}". This is a development error likely caused by another microfrontend module. (The following properties are available right now: ${JSON.stringify(
-          this.lastProps,
-        )}).`,
+        `The module is missing the required Single SPA property "${name}". This is a development error likely caused by another microfrontend module. See the associated console log for details.`,
       );
-      console.error(error);
+      console.error(error, this.lastProps);
       throw error;
     }
 
