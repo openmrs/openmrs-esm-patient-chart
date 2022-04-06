@@ -2,6 +2,7 @@ import React from 'react';
 import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import {
   formattedVitals,
@@ -12,7 +13,6 @@ import {
 } from '../../../../__mocks__/vitals.mock';
 import { swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import VitalsOverview from './vitals-overview.component';
-import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 
 const testProps = {
   patientUuid: mockPatient.id,

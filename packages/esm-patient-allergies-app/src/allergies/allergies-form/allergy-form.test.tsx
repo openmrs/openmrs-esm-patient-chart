@@ -1,6 +1,6 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { screen, render, act } from '@testing-library/react';
+import { screen, render, waitFor } from '@testing-library/react';
 import { of } from 'rxjs/internal/observable/of';
 import { showNotification, showToast, useConfig } from '@openmrs/esm-framework';
 import { mockPatient } from '../../../../../__mocks__/patient.mock';
@@ -19,8 +19,8 @@ jest.mock('./allergy-form.resource', () => ({
   saveAllergy: jest.fn(),
 }));
 
-describe('AllergiesForm: ', () => {
-  it('renders the Record Allergy form', () => {
+describe('AllergyForm ', () => {
+  it('renders the allergy form with all the expected fields and values', () => {
     mockFetchAllergensAndAllergicReactions.mockReturnValueOnce(of(mockAllergensAndAllergicReactions));
 
     renderAllergyForm();
@@ -49,11 +49,8 @@ describe('AllergiesForm: ', () => {
 
   describe('Form submission: ', () => {
     it('renders a success notification after successful submission', async () => {
-      const promise = Promise.resolve();
       mockFetchAllergensAndAllergicReactions.mockReturnValueOnce(of(mockAllergensAndAllergicReactions));
-      mockSaveAllergy.mockReturnValueOnce(
-        Promise.resolve({ data: mockAllergyResult, status: 201, statusText: 'Created' }),
-      );
+      mockSaveAllergy.mockResolvedValueOnce({ data: mockAllergyResult, status: 201, statusText: 'Created' });
 
       renderAllergyForm();
 
@@ -61,9 +58,8 @@ describe('AllergiesForm: ', () => {
       userEvent.click(screen.getByRole('checkbox', { name: /cough/i }));
       userEvent.click(screen.getByRole('radio', { name: /moderate/i }));
       userEvent.type(screen.getByRole('textbox', { name: /date of first onset/i }), '02/01/2022');
-      userEvent.click(screen.getByRole('button', { name: /save and close/i }));
 
-      await act(() => promise);
+      await waitFor(() => userEvent.click(screen.getByRole('button', { name: /save and close/i })));
 
       expect(mockShowToast).toHaveBeenCalledTimes(1);
       expect(mockShowToast).toHaveBeenCalledWith({
@@ -75,7 +71,6 @@ describe('AllergiesForm: ', () => {
     });
 
     it('renders an error notification upon an invalid submission', async () => {
-      const promise = Promise.resolve();
       mockFetchAllergensAndAllergicReactions.mockReturnValueOnce(of(mockAllergensAndAllergicReactions));
       mockSaveAllergy.mockRejectedValueOnce({
         message: 'Internal Server Error',
@@ -91,9 +86,8 @@ describe('AllergiesForm: ', () => {
       userEvent.click(screen.getByRole('checkbox', { name: /cough/i }));
       userEvent.click(screen.getByRole('radio', { name: /moderate/i }));
       userEvent.type(screen.getByRole('textbox', { name: /date of first onset/i }), '02/01/2022');
-      userEvent.click(screen.getByRole('button', { name: /save and close/i }));
 
-      await act(() => promise);
+      await waitFor(() => userEvent.click(screen.getByRole('button', { name: /save and close/i })));
 
       expect(mockShowNotification).toHaveBeenCalledTimes(1);
       expect(mockShowNotification).toHaveBeenCalledWith({
@@ -108,7 +102,7 @@ describe('AllergiesForm: ', () => {
 
 const testProps = {
   closeWorkspace: () => {},
-  promptBeforeClosing: (testFcn) => {},
+  promptBeforeClosing: () => {},
   patient: mockPatient,
   patientUuid: mockPatient.id,
 };
