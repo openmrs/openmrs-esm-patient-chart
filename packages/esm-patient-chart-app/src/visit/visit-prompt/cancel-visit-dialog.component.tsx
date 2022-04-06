@@ -7,17 +7,13 @@ import { useVisitDialog } from '../useVisitDialog';
 
 interface CancelVisitDialogProps {
   patientUuid: string;
+  closeModal: () => void;
 }
 
-const CancelVisitDialog: React.FC<CancelVisitDialogProps> = ({ patientUuid }) => {
+const CancelVisitDialog: React.FC<CancelVisitDialogProps> = ({ patientUuid, closeModal }) => {
   const { t } = useTranslation();
   const { currentVisit, mutate } = useVisit(patientUuid);
   const [submitting, setSubmitting] = useState(false);
-
-  const closeModal = useCallback(
-    () => window.dispatchEvent(new CustomEvent('visit-dialog', { detail: { type: 'close' } })),
-    [],
-  );
 
   const cancelActiveVisit = useCallback(() => {
     // TO DO expand updateVisit function in esm-api to support this request
@@ -52,8 +48,12 @@ const CancelVisitDialog: React.FC<CancelVisitDialogProps> = ({ patientUuid }) =>
   }, []);
 
   return (
-    <ComposedModal open={true} onClose={closeModal}>
-      <ModalHeader label={t('visit', 'Visit')} title={t('cancelActiveVisit', 'Cancel active visit')} />
+    <div>
+      <ModalHeader
+        closeModal={closeModal}
+        label={t('visit', 'Visit')}
+        title={t('cancelActiveVisit', 'Cancel active visit')}
+      />
       <ModalBody>
         <p className={styles.bodyShort02}>
           {t('cancelVisitWarningMessage', 'Canceling this visit will delete all associated encounter(s)')}
@@ -67,7 +67,7 @@ const CancelVisitDialog: React.FC<CancelVisitDialogProps> = ({ patientUuid }) =>
           {submitting ? <InlineLoading description={t('loading', 'Loading...')} /> : t('cancelVisit', 'Cancel Visit')}
         </Button>
       </ModalFooter>
-    </ComposedModal>
+    </div>
   );
 };
 

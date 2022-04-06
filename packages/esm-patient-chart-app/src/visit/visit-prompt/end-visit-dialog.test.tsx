@@ -19,6 +19,7 @@ const mockUpdateVisit = updateVisit as jest.Mock;
 const mockShowToast = showToast as jest.Mock;
 const mockShowNotification = showNotification as jest.Mock;
 const mockMutate = jest.fn();
+const mockCloseModal = jest.fn();
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -39,7 +40,7 @@ describe('EndVisit', () => {
     spyOn(mockUseVisitDialog, 'useVisitDialog').and.returnValue({ type: 'end' });
     mockUseVisit.mockReturnValue({ currentVisit: mockCurrentVisit, mutate: mockMutate });
     mockUpdateVisit.mockReturnValueOnce(of({ status: 200 }));
-    render(<EndVisitDialog patientUuid="some-patient-uuid" />);
+    render(<EndVisitDialog patientUuid="some-patient-uuid" closeModal={mockCloseModal} />);
 
     expect(screen.getByRole('heading', { name: /End active visit/ })).toBeInTheDocument();
     expect(
@@ -64,7 +65,7 @@ describe('EndVisit', () => {
     spyOn(mockUseVisitDialog, 'useVisitDialog').and.returnValue({ type: 'end' });
     mockUseVisit.mockReturnValue({ currentVisit: mockCurrentVisit, mutate: mockMutate });
     mockUpdateVisit.mockReturnValueOnce(throwError(new Error('Internal error message')));
-    render(<EndVisitDialog patientUuid="some-patient-uuid" />);
+    render(<EndVisitDialog patientUuid="some-patient-uuid" closeModal={mockCloseModal} />);
 
     expect(screen.getByRole('heading', { name: /End active visit/ })).toBeInTheDocument();
     expect(

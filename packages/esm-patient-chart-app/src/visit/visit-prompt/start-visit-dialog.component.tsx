@@ -1,37 +1,34 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ComposedModal, Button, ModalBody, ModalHeader, ModalFooter } from 'carbon-components-react';
+import { Button, ModalBody, ModalHeader, ModalFooter } from 'carbon-components-react';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import styles from './start-visit-dialog.scss';
 import { useVisitDialog } from '../useVisitDialog';
 
 interface StartVisitDialogProps {
   patientUuid: string;
+  closeModal: () => void;
+  visitType: string;
 }
 
-const StartVisitDialog: React.FC<StartVisitDialogProps> = ({ patientUuid }) => {
+const StartVisitDialog: React.FC<StartVisitDialogProps> = ({ patientUuid, closeModal, visitType }) => {
   const { t } = useTranslation();
-  const { state } = useVisitDialog(patientUuid);
-  const closeModal = useCallback(
-    () => window.dispatchEvent(new CustomEvent('visit-dialog', { detail: { type: 'close' } })),
-    [],
-  );
 
   const handleEditPastVisit = useCallback(() => {
     launchPatientWorkspace('past-visits-overview');
     closeModal();
-  }, []);
+  }, [closeModal]);
 
   const handleStartNewVisit = useCallback(() => {
     launchPatientWorkspace('start-visit-workspace-form');
     closeModal();
-  }, []);
+  }, [closeModal]);
 
   const modalHeaderText =
-    state?.type === 'past' ? t('addPastVisit', 'Add a past visit') : t('noActiveVisit', 'No active visit');
+    visitType === 'past' ? t('addPastVisit', 'Add a past visit') : t('noActiveVisit', 'No active visit');
 
   const modalBodyText =
-    state?.type === 'past'
+    visitType === 'past'
       ? t(
           'addPastVisitText',
           'You can add a new past visit or update an old one. Choose from one of the options below to continue.',
@@ -42,14 +39,14 @@ const StartVisitDialog: React.FC<StartVisitDialogProps> = ({ patientUuid }) => {
         );
 
   return (
-    <ComposedModal open onClose={closeModal}>
-      <ModalHeader>
+    <div>
+      <ModalHeader closeModal={closeModal}>
         <span className={styles.header}>{modalHeaderText}</span>
       </ModalHeader>
       <ModalBody>
         <p className={styles.body}>{modalBodyText}</p>
       </ModalBody>
-      <ModalFooter className={styles.footer}>
+      <ModalFooter>
         <Button kind="secondary" onClick={closeModal}>
           {t('cancel', 'Cancel')}
         </Button>
@@ -60,7 +57,7 @@ const StartVisitDialog: React.FC<StartVisitDialogProps> = ({ patientUuid }) => {
           {t('startNewVisit', 'Start new visit')}
         </Button>
       </ModalFooter>
-    </ComposedModal>
+    </div>
   );
 };
 
