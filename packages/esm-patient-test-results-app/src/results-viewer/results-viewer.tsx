@@ -46,7 +46,10 @@ const ResultsViewer = () => {
               </div>
             </Column>
             <Column sm={12} lg={expanded || tablet ? 12 : 6}>
-              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <div
+                className={styles.viewOptsContentSwitcherContainer}
+                style={{ display: 'flex', justifyContent: 'flex-end' }}
+              >
                 <ContentSwitcher style={{ maxWidth: '10rem' }} onChange={(e) => setView(e.name as viewOpts)}>
                   <Switch name="split" text={t('split', 'Split')} />
                   <Switch name="full" text={t('full', 'Full')} />

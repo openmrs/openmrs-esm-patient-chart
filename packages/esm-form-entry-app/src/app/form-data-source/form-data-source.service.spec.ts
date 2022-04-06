@@ -102,29 +102,23 @@ describe('Service: FormDataSourceService', () => {
     }),
   ));
 
-  it(
-    'should find location by uuid',
-    waitForAsync((done) => {
-      const service: FormDataSourceService = TestBed.get(FormDataSourceService);
-      const result = service.getLocationByUuid('test');
+  it('should find location by uuid', waitForAsync((done) => {
+    const service: FormDataSourceService = TestBed.get(FormDataSourceService);
+    const result = service.getLocationByUuid('test');
 
-      result.subscribe((results) => {
-        expect(results).toBeTruthy();
-        done();
-      });
-    }),
-  );
+    result.subscribe((results) => {
+      expect(results).toBeTruthy();
+      done();
+    });
+  }));
 
-  it(
-    'should call resolveConcept',
-    waitForAsync((done) => {
-      const service: FormDataSourceService = TestBed.get(FormDataSourceService);
-      const result = service.resolveConcept('test');
+  it('should call resolveConcept', waitForAsync((done) => {
+    const service: FormDataSourceService = TestBed.get(FormDataSourceService);
+    const result = service.resolveConcept('test');
 
-      result.subscribe((results) => {
-        expect(results).toBeTruthy();
-        done();
-      });
-    }),
-  );
+    result.subscribe((results) => {
+      expect(results).toBeTruthy();
+      done();
+    });
+  }));
 });
