@@ -3,7 +3,6 @@ import EndVisitDialog from './end-visit-dialog.component';
 import { screen, render, waitFor } from '@testing-library/react';
 import { showNotification, showToast, updateVisit, useVisit } from '@openmrs/esm-framework';
 import { mockCurrentVisit } from '../../../../../__mocks__/visits.mock';
-import * as mockUseVisitDialog from '../useVisitDialog';
 import userEvent from '@testing-library/user-event';
 import { of, throwError } from 'rxjs';
 
@@ -37,7 +36,6 @@ describe('EndVisit', () => {
   });
 
   test('should end an active visit and display toast message', async () => {
-    spyOn(mockUseVisitDialog, 'useVisitDialog').and.returnValue({ type: 'end' });
     mockUseVisit.mockReturnValue({ currentVisit: mockCurrentVisit, mutate: mockMutate });
     mockUpdateVisit.mockReturnValueOnce(of({ status: 200 }));
     render(<EndVisitDialog patientUuid="some-patient-uuid" closeModal={mockCloseModal} />);
@@ -62,7 +60,6 @@ describe('EndVisit', () => {
   });
 
   test('should display error message when rest api call to end visit fails', async () => {
-    spyOn(mockUseVisitDialog, 'useVisitDialog').and.returnValue({ type: 'end' });
     mockUseVisit.mockReturnValue({ currentVisit: mockCurrentVisit, mutate: mockMutate });
     mockUpdateVisit.mockReturnValueOnce(throwError(new Error('Internal error message')));
     render(<EndVisitDialog patientUuid="some-patient-uuid" closeModal={mockCloseModal} />);
