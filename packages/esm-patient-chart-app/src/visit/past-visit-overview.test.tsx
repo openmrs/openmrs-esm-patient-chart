@@ -3,7 +3,7 @@ import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import PastVisitOverview from './past-visit-overview.component';
 
 const testProps = {
@@ -73,5 +73,5 @@ describe('PastVisitOverview', () => {
 });
 
 function renderPastVisitOverview() {
-  swrRender(<PastVisitOverview {...testProps} />);
+  renderWithSwr(<PastVisitOverview {...testProps} />);
 }

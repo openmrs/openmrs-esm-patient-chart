@@ -3,7 +3,7 @@ import { openmrsFetch } from '@openmrs/esm-framework';
 import { screen, within } from '@testing-library/react';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { mockDrugOrders } from '../../../../__mocks__/medication.mock';
-import { swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import ActiveMedications from './active-medications.component';
 
 const testProps = {
@@ -78,5 +78,5 @@ describe('ActiveMedications: ', () => {
 });
 
 function renderActiveMedications() {
-  swrRender(<ActiveMedications {...testProps} />);
+  renderWithSwr(<ActiveMedications {...testProps} />);
 }

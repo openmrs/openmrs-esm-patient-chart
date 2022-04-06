@@ -3,7 +3,7 @@ import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { getByTextWithMarkup, swrRender, waitForLoadingToFinish } from '../../../../../tools/test-helpers';
+import { getByTextWithMarkup, renderWithSwr, waitForLoadingToFinish } from '../../../../../tools/test-helpers';
 import { mockPatient } from '../../../../../__mocks__/patient.mock';
 import {
   mockConceptMetadata,
@@ -109,5 +109,5 @@ describe('VitalsHeader: ', () => {
 });
 
 function renderVitalsHeader() {
-  swrRender(<VitalsHeader {...testProps} />);
+  renderWithSwr(<VitalsHeader {...testProps} />);
 }
