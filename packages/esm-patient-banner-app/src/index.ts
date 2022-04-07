@@ -1,4 +1,5 @@
 import { defineConfigSchema, getAsyncLifecycle, messageOmrsServiceWorker } from '@openmrs/esm-framework';
+import { configSchema } from './config-schema';
 
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -19,7 +20,7 @@ function setupOpenMRS() {
     moduleName,
   };
 
-  defineConfigSchema(moduleName, {});
+  defineConfigSchema(moduleName, configSchema);
 
   return {
     extensions: [

@@ -1,22 +1,22 @@
-import React, { useEffect, useState } from 'react';
-import VitalsBiometricInput from './vitals-biometrics-input.component';
-import styles from './vitals-biometrics-form.component.scss';
+import React, { SyntheticEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
 import {
-  useConfig,
   createErrorHandler,
-  useSessionUser,
+  fhirBaseUrl,
   showToast,
   showNotification,
-  fhirBaseUrl,
+  useConfig,
   useLayoutType,
+  useSessionUser,
 } from '@openmrs/esm-framework';
 import { DefaultWorkspaceProps, useVitalsConceptMetadata } from '@openmrs/esm-patient-common-lib';
 import { Column, Grid, Row, Button, ButtonSet, Form } from 'carbon-components-react';
 import { calculateBMI, isInNormalRange } from './vitals-biometrics-form.utils';
-import { pageSize, savePatientVitals } from '../vitals.resource';
+import { savePatientVitals } from '../vitals.resource';
 import { ConfigObject } from '../../config-schema';
+import styles from './vitals-biometrics-form.component.scss';
+import VitalsBiometricInput from './vitals-biometrics-input.component';
 
 export interface PatientVitalsAndBiometrics {
   systolicBloodPressure: string;
@@ -36,30 +36,20 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
   const isTablet = useLayoutType() === 'tablet';
   const session = useSessionUser();
   const config = useConfig() as ConfigObject;
-  const { mutate } = useSWRConfig();
+  const { cache, mutate }: { cache: any; mutate: Function } = useSWRConfig();
   const { data: conceptUnits, conceptMetadata } = useVitalsConceptMetadata();
   const biometricsUnitsSymbols = config.biometrics;
   const [patientVitalAndBiometrics, setPatientVitalAndBiometrics] = useState<PatientVitalsAndBiometrics>();
   const [patientBMI, setPatientBMI] = useState<number>();
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  const vitalsConcepts = {
-    systolicBloodPressure: config.concepts.systolicBloodPressureUuid,
-    diastolicBloodPressure: config.concepts.diastolicBloodPressureUuid,
-    pulse: config.concepts.pulseUuid,
-    temperature: config.concepts.temperatureUuid,
-    oxygenSaturation: config.concepts.oxygenSaturationUuid,
-    height: config.concepts.heightUuid,
-    weight: config.concepts.weightUuid,
-    respiratoryRate: config.concepts.respiratoryRateUuid,
-  };
-
   const isBMIInNormalRange = (value: number | undefined | string) => {
     if (value === undefined || value === '') return true;
     return value >= 18.5 && value <= 24.9;
   };
 
-  const savePatientVitalsAndBiometrics = () => {
+  const savePatientVitalsAndBiometrics = (event: SyntheticEvent) => {
+    event.preventDefault();
     setIsSubmitting(true);
     const ac = new AbortController();
     savePatientVitals(
@@ -83,12 +73,14 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
             description: t('vitalsAndBiometricsNowAvailable', 'They are now visible on the Vitals and Biometrics page'),
           });
 
-          mutate(
-            `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&code=` +
-              Object.values(vitalsConcepts).join(',') +
-              '&_summary=data&_sort=-date' +
-              `&_count=${pageSize}`,
+          const apiUrlPattern = new RegExp(
+            fhirBaseUrl + '\\/Observation\\?subject\\:Patient\\=' + patientUuid + '\\&code\\=',
           );
+
+          // Find matching keys from SWR's cache and broadcast a revalidation message to their pre-bound SWR hooks
+          Array.from(cache.keys())
+            .filter((url: string) => apiUrlPattern.test(url))
+            .forEach((url: string) => mutate(url));
         }
       })
       .catch((err) => {

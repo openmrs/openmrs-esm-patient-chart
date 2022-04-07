@@ -3,10 +3,10 @@ import FormView from './form-view.component';
 import styles from './forms.component.scss';
 import EmptyFormView from './empty-form.component';
 import { ContentSwitcher, Switch, DataTableSkeleton, InlineLoading, Tag } from 'carbon-components-react';
-import { CardHeader, ErrorState, PatientProgram } from '@openmrs/esm-patient-common-lib';
+import { CardHeader, ErrorState, PatientProgram, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { useForms } from '../hooks/use-forms';
-import { useConfig, useLayoutType, useVisit } from '@openmrs/esm-framework';
+import { useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { isValidOfflineFormEncounter } from '../offline-forms/offline-form-helpers';
 import { ConfigObject } from '../config-schema';
 import { useProgramConfig } from '../hooks/use-program-config';
@@ -41,7 +41,7 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
   const formsToDisplay = isOffline
     ? data?.filter((formInfo) => isValidOfflineFormEncounter(formInfo.form, htmlFormEntryForms))
     : data;
-  const { currentVisit } = useVisit(patientUuid);
+  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const { programConfigs } = useProgramConfig(patientUuid, showRecommendedFormsTab);
 
   const recommendedForms = useMemo(

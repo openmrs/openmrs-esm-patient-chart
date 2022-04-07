@@ -2,12 +2,13 @@ import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import { ListResponse, FormEncounter, EncounterWithFormRef, CompletedFormInfo } from '../types';
-import { customEncounterRepresentation, formEncounterUrl } from '../constants';
+import { customEncounterRepresentation, formEncounterUrl, formEncounterUrlPoc } from '../constants';
 import { isFormFullyCached } from '../offline-forms/offline-form-helpers';
 
 export function useFormEncounters(cachedOfflineFormsOnly = false) {
   const config = useConfig();
-  const url = config.showHtmlFormEntryForms ? formEncounterUrl : formEncounterUrl.concat('&q=poc');
+  const url = config.showHtmlFormEntryForms ? formEncounterUrl : formEncounterUrlPoc;
+
   return useSWR([url, cachedOfflineFormsOnly], async () => {
     const res = await openmrsFetch<ListResponse<FormEncounter>>(url);
     // show published forms and hide component forms

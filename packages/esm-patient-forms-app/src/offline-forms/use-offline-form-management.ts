@@ -1,7 +1,12 @@
 import { useLocalStorage } from '../hooks/use-local-storage';
 import { FormEncounter } from '../types';
 import useSWR from 'swr';
-import { addFormToCache, isFormFullyCached } from './offline-form-helpers';
+import {
+  addFormToCache,
+  isFormFullyCached,
+  OfflineFormsStorageItem,
+  offlineFormsStorageKey,
+} from './offline-form-helpers';
 
 export function useOfflineFormManagement(form: FormEncounter) {
   const isFormFullyCachedSwr = useSWR(`offlineFormInfo/${form.uuid}`, () => isFormFullyCached(form));
@@ -29,8 +34,8 @@ export function useOfflineFormManagement(form: FormEncounter) {
 }
 
 function useOfflineFormsLocalStorage() {
-  const [formsMarkedAsOffline, setFormsMarkedAsOffline] = useLocalStorage<Array<{ uuid: string }>>(
-    '@openmrs/esm-patient-forms-app:offline-forms',
+  const [formsMarkedAsOffline, setFormsMarkedAsOffline] = useLocalStorage<Array<OfflineFormsStorageItem>>(
+    offlineFormsStorageKey,
     [],
   );
 

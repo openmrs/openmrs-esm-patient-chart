@@ -53,7 +53,7 @@ export default function OrderBasketItemList({
             <OrderBasketItemTile
               key={index}
               orderBasketItem={order}
-              onClick={() => onItemClicked(order)}
+              onItemClick={() => onItemClicked(order)}
               onRemoveClick={() => onItemRemoveClicked(order)}
             />
           ))}
@@ -71,7 +71,7 @@ export default function OrderBasketItemList({
             <OrderBasketItemTile
               key={index}
               orderBasketItem={item}
-              onClick={() => onItemClicked(item)}
+              onItemClick={() => onItemClicked(item)}
               onRemoveClick={() => onItemRemoveClicked(item)}
             />
           ))}
@@ -89,7 +89,7 @@ export default function OrderBasketItemList({
             <OrderBasketItemTile
               key={index}
               orderBasketItem={item}
-              onClick={() => onItemClicked(item)}
+              onItemClick={() => onItemClicked(item)}
               onRemoveClick={() => onItemRemoveClicked(item)}
             />
           ))}
@@ -107,7 +107,7 @@ export default function OrderBasketItemList({
             <OrderBasketItemTile
               key={index}
               orderBasketItem={item}
-              onClick={() => onItemClicked(item)}
+              onItemClick={() => onItemClicked(item)}
               onRemoveClick={() => onItemRemoveClicked(item)}
             />
           ))}

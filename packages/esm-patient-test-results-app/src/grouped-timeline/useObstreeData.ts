@@ -85,5 +85,5 @@ const useGetManyObstreeData = (uuidArray) => {
   return { roots, loading, errors };
 };
 
-export default useGetObstreeData;
-export { useGetManyObstreeData };
+export default useGetManyObstreeData;
+export { useGetManyObstreeData, useGetObstreeData };

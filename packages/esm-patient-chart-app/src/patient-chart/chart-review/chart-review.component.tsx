@@ -29,6 +29,10 @@ const ChartReview: React.FC<ChartReviewProps> = ({ patientUuid, patient, view })
   const extensionStore = useExtensionStore();
   const { navGroups } = useNavGroups();
 
+  if (!('patient-chart-dashboard-slot' in extensionStore.slots)) {
+    return null;
+  }
+
   const ungroupedDashboards = extensionStore.slots['patient-chart-dashboard-slot'].assignedExtensions.map(
     (e) => e.meta,
   );

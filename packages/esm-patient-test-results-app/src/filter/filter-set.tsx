@@ -1,31 +1,9 @@
 import React, { useContext } from 'react';
-import styles from './filter-set.scss';
+import styles from './filter-set.styles.scss';
 import { Accordion, AccordionItem, Checkbox } from 'carbon-components-react';
 import FilterContext from './filter-context';
-import { useConfig } from '@openmrs/esm-framework';
-
-interface Observation {
-  display: string;
-  flatName: string;
-  hasData?: boolean;
-}
-export interface TreeNode {
-  display: string;
-  datatype?: string;
-  subSets?: TreeNode[];
-  obs?: Observation[];
-  flatName: string;
-}
-
-interface FilterNodeProps {
-  root: TreeNode;
-  level: number;
-  open?: boolean;
-}
-
-interface FilterLeafProps {
-  leaf: Observation;
-}
+import { useConfig, useLayoutType } from '@openmrs/esm-framework';
+import type { FilterNodeProps, FilterLeafProps } from './filter-types';
 
 const isIndeterminate = (kids, checkboxes) => {
   return kids && !kids?.every((kid) => checkboxes[kid]) && !kids?.every((kid) => !checkboxes[kid]);
@@ -38,7 +16,7 @@ const FilterSet = () => {
   return (
     <>
       {roots?.map((root, index) => (
-        <div className={`${styles.filterContainer} ${styles.nestedAccordion}`}>
+        <div className={styles.nestedAccordion}>
           <FilterNode root={root} level={0} open={config.concepts[index].defaultOpen} />
         </div>
       ))}
@@ -47,11 +25,12 @@ const FilterSet = () => {
 };
 
 const FilterNode = ({ root, level, open }: FilterNodeProps) => {
+  const tablet = useLayoutType() === 'tablet';
   const { checkboxes, parents, updateParent } = useContext(FilterContext);
   const indeterminate = isIndeterminate(parents[root.flatName], checkboxes);
   const allChildrenChecked = parents[root.flatName]?.every((kid) => checkboxes[kid]);
   return (
-    <Accordion align="start">
+    <Accordion align="start" size={tablet ? 'md' : 'sm'}>
       <AccordionItem
         title={
           <Checkbox
