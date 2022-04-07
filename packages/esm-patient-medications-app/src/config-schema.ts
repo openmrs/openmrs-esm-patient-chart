@@ -12,7 +12,7 @@ export const configSchema = {
     _default: '6f0c9a92-6f24-11e3-af88-005056821db0',
   },
   daysDurationUnit: {
-    _description: 'The default medication duration unit is days. The concept for that medication duration unit is specified here.'
+    _description: 'The default medication duration unit is days. The concept for that medication duration unit is specified here.',
     uuid: {
       _type: Type.UUID,
       _default: '1072AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
