@@ -3,12 +3,12 @@ import { Type } from '@openmrs/esm-framework';
 export const configSchema = {
   durationUnitsConcept: {
     _type: Type.ConceptUuid,
-    _description: 'the concept for duration units',
+    _description: 'The units used to specify the duration for which the medication will be given.',
     _default: '1732AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   },
   careSettingUuid: {
     _type: Type.UUID,
-    _description: 'the care setting uuid',
+    _description: 'Only orders corresponding to this care setting will be displayed.',
     _default: '6f0c9a92-6f24-11e3-af88-005056821db0',
   },
   daysDurationUnit: {
