@@ -6,6 +6,8 @@ import { EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-pat
 import MedicationsDetailsTable from '../components/medications-details-table.component';
 import { orderBasketStore } from './order-basket-store';
 import { usePatientOrders } from '../api/api';
+import { useConfig } from '@openmrs/esm-framework';
+import { ConfigObject } from '../config-schema';
 
 interface ActiveMedicationsProps {
   patientUuid: string;
@@ -14,10 +16,16 @@ interface ActiveMedicationsProps {
 
 const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patientUuid, showAddMedications }) => {
   const { t } = useTranslation();
+  const config = useConfig() as ConfigObject;
   const displayText = t('activeMedicationsDisplayText', 'Active medications');
   const headerTitle = t('activeMedicationsHeaderTitle', 'active medications');
 
-  const { data: activePatientOrders, isError, isLoading, isValidating } = usePatientOrders(patientUuid, 'ACTIVE');
+  const {
+    data: activePatientOrders,
+    isError,
+    isLoading,
+    isValidating,
+  } = usePatientOrders(patientUuid, 'ACTIVE', config.careSettingUuid);
 
   const launchOrderBasket = React.useCallback(() => {
     launchPatientWorkspace('order-basket-workspace');
