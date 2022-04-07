@@ -38,8 +38,12 @@ jobs:
 
   file_size_impact:
     runs_on: ubuntu-latest
+    permissions:
+      actions: read
 
     needs: build
+
+    if: ${{ github.event_name == 'push' }}
 
     steps:
       - name: Setup git
