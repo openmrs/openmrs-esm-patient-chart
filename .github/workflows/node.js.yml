@@ -42,6 +42,8 @@ jobs:
 
     needs: build
 
+    if: ${{ github.event_name == 'push' }}
+
     steps:
       - name: Setup git
         uses: actions/checkout@v2
@@ -49,6 +51,8 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: "16.6.1"
+      - name: Setup npm
+        run: npm install
       - name: Download packages
         uses: actions/download-artifact@v3
         with:
