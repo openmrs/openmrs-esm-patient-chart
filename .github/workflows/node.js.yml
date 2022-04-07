@@ -37,13 +37,10 @@ jobs:
             packages/**/dist
 
   file_size_impact:
+    name: file size impact
     runs-on: ubuntu-latest
-    permissions:
-      actions: read
 
     needs: build
-
-    if: ${{ github.event_name == 'push' }}
 
     steps:
       - name: Setup git
@@ -56,8 +53,8 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: packages
-      - name: Report changes
-      - run: node ./tools/size-reporter.mjs
+      - name: Report file size impact
+        run: node ./tools/size-reporter.mjs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
