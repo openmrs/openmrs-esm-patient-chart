@@ -37,7 +37,7 @@ jobs:
             packages/**/dist
 
   file_size_impact:
-    runs_on: ubuntu-latest
+    runs-on: ubuntu-latest
     permissions:
       actions: read
 
@@ -52,11 +52,12 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: "16.6.1"
-      - name: actions/download-artifact@v3
+      - name: Download packages
+        uses: actions/download-artifact@v3
         with:
           name: packages
       - name: Report changes
-        run: node ./tools/size-reporter.mjs
+      - run: node ./tools/size-reporter.mjs
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
