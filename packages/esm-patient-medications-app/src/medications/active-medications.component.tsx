@@ -1,10 +1,10 @@
 import React from 'react';
-import MedicationsDetailsTable from '../components/medications-details-table.component';
 import { useTranslation } from 'react-i18next';
-import { Provider } from 'unistore/react';
-import { orderBasketStore } from './order-basket-store';
 import { DataTableSkeleton } from 'carbon-components-react';
+import { Provider } from 'unistore/react';
 import { EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import MedicationsDetailsTable from '../components/medications-details-table.component';
+import { orderBasketStore } from './order-basket-store';
 import { usePatientOrders } from '../api/api';
 import { useConfig } from '@openmrs/esm-framework';
 import { ConfigObject } from '../config-schema';

@@ -115,7 +115,7 @@ describe('NotesDetailedSummary: ', () => {
       expect(within(table).getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument(),
     );
 
-    expect(screen.getAllByRole('row').length).toEqual(6);
+    expect(screen.getAllByRole('row').length).toEqual(11);
   });
 });
 

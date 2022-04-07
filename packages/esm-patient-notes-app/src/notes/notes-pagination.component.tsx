@@ -97,7 +97,7 @@ const NotesPagination: React.FC<FormsProps> = ({ notes, pageSize, pageUrl, urlLa
                         </div>
                       </TableExpandedRow>
                     ) : (
-                      <div />
+                      <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
                     )}
                   </React.Fragment>
                 ))}
