@@ -36,6 +36,27 @@ jobs:
           path: |
             packages/**/dist
 
+  file_size_impact:
+    runs_on: ubuntu-latest
+
+    needs: build
+
+    steps:
+      - name: Setup git
+        uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@v1
+        with:
+          node-version: "16.6.1"
+      - name: actions/download-artifact@v3
+        with:
+          name: packages
+      - name: Report changes
+        run: node ./tools/size-reporter.mjs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
   deploy_form_entry_app:
     runs-on: ubuntu-latest
 
