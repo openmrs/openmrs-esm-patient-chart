@@ -3,7 +3,7 @@ import { Type } from '@openmrs/esm-framework';
 export const configSchema = {
   durationUnitsConcept: {
     _type: Type.ConceptUuid,
-    _description: 'The units used to specify the duration for which the medication will be given.',
+    _description: 'A concept which has Answers that are medication duration units (for example, days, weeks, or months).',
     _default: '1732AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   },
   careSettingUuid: {
@@ -12,14 +12,14 @@ export const configSchema = {
     _default: '6f0c9a92-6f24-11e3-af88-005056821db0',
   },
   daysDurationUnit: {
+    _description: 'The default medication duration unit is days. The concept for that medication duration unit is specified here.'
     uuid: {
       _type: Type.UUID,
-      _description: 'the uuid for days duration unit',
       _default: '1072AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
     display: {
       _type: Type.String,
-      _description: 'the display for days duration unit',
+      _description: 'The text to display in the medication duration units menu for the "days" unit.',
       _default: 'Days',
     },
   },
