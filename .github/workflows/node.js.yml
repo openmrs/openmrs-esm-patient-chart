@@ -48,12 +48,14 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: "16.6.1"
-      - name: Setup npm
+      - name: Install dependencies
         run: npx lerna bootstrap
       - name: Download packages
         uses: actions/download-artifact@v3
         with:
           name: packages
+          path: |
+            packages/**/dist
       - name: Report file size impact
         run: node ./tools/size-reporter.mjs
         env:
