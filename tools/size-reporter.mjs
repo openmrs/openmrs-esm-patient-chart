@@ -4,6 +4,6 @@ await reportFileSizeImpact({
   ...readGitHubWorkflowEnv(),
   logLevel: 'debug',
   buildCommand: null,
-  installCommand: 'npx lerna bootstrap',
+  installCommand: null,
   fileSizeReportModulePath: './tools/size-generator.mjs#fileSizeReport',
 });
