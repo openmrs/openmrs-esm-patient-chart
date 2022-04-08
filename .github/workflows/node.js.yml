@@ -50,7 +50,7 @@ jobs:
           node-version: "16.6.1"
       - name: Install dependencies
         run: npx lerna bootstrap
-      - name: Download packages
+      - name: Download artifacts from build job
         uses: actions/download-artifact@v3
         with:
           name: packages
