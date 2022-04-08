@@ -49,7 +49,7 @@ jobs:
         with:
           node-version: "16.6.1"
       - name: Setup npm
-        run: npm install
+        run: npx lerna bootstrap
       - name: Download packages
         uses: actions/download-artifact@v3
         with:
