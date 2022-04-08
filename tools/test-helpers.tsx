@@ -16,7 +16,7 @@ const swrWrapper = ({ children }) => {
   );
 };
 
-export const swrRender = (ui, options?) => render(ui, { wrapper: swrWrapper, ...options });
+export const renderWithSwr = (ui, options?) => render(ui, { wrapper: swrWrapper, ...options });
 
 // Custom matcher that queries elements split up by multiple HTML elements by text
 export function getByTextWithMarkup(text: RegExp | string) {

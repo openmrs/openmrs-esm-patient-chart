@@ -4,7 +4,7 @@ import {
   mockPatientImmunizationsSearchResponse,
   mockPaginatedImmunizations,
 } from '../../../../__mocks__/immunizations.mock';
-import { patientChartBasePath, swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { patientChartBasePath, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
 import ImmunizationsOverview from './immunizations-overview.component';
@@ -102,5 +102,5 @@ describe('ImmunizationOverview: ', () => {
 });
 
 function renderImmunizationsOverview() {
-  swrRender(<ImmunizationsOverview {...testProps} />);
+  renderWithSwr(<ImmunizationsOverview {...testProps} />);
 }

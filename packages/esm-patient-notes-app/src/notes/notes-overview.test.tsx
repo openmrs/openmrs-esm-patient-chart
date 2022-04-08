@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { openmrsFetch, useConfig, usePagination } from '@openmrs/esm-framework';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { mockVisitNotes, formattedVisitNotes } from '../../../../__mocks__/visit-notes.mock';
-import { patientChartBasePath, swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { patientChartBasePath, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import { ConfigMock } from '../../../../__mocks__/chart-widgets-config.mock';
 import NotesOverview from './notes-overview.component';
 
@@ -129,5 +129,5 @@ describe('NotesOverview: ', () => {
 });
 
 function renderNotesOverview() {
-  swrRender(<NotesOverview {...testProps} />);
+  renderWithSwr(<NotesOverview {...testProps} />);
 }
