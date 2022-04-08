@@ -37,12 +37,9 @@ jobs:
             packages/**/dist
 
   file_size_impact:
+    needs: build
     name: file size impact
     runs-on: ubuntu-latest
-
-    needs: build
-
-    if: ${{ github.event_name == 'push' }}
 
     steps:
       - name: Setup git
