@@ -10,18 +10,16 @@ describe('PersonResourceService', () => {
   let service: PersonResourceService;
   let httpMock: HttpTestingController;
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule, OpenmrsApiModule],
-        declarations: [],
-        providers: [],
-      });
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule, OpenmrsApiModule],
+      declarations: [],
+      providers: [],
+    });
 
-      service = TestBed.get(PersonResourceService);
-      httpMock = TestBed.get(HttpTestingController);
-    }),
-  );
+    service = TestBed.get(PersonResourceService);
+    httpMock = TestBed.get(HttpTestingController);
+  }));
 
   afterEach(() => {
     httpMock.verify();
