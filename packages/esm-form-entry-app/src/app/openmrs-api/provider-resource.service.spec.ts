@@ -8,18 +8,16 @@ describe('Service : ProviderResourceService Unit Tests', () => {
   let providerResourceService: ProviderResourceService;
   let httpMock: HttpTestingController;
 
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule, OpenmrsApiModule],
-        declarations: [],
-        providers: [],
-      });
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule, OpenmrsApiModule],
+      declarations: [],
+      providers: [],
+    });
 
-      providerResourceService = TestBed.get(ProviderResourceService);
-      httpMock = TestBed.get(HttpTestingController);
-    }),
-  );
+    providerResourceService = TestBed.get(ProviderResourceService);
+    httpMock = TestBed.get(HttpTestingController);
+  }));
 
   afterEach(() => {
     httpMock.verify();
