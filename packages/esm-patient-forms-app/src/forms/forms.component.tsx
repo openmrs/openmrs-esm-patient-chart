@@ -6,7 +6,7 @@ import { ContentSwitcher, Switch, DataTableSkeleton, InlineLoading, Tag } from '
 import { CardHeader, ErrorState, PatientProgram, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { useForms } from '../hooks/use-forms';
-import { useConfig, useLayoutType, useVisit, useSessionUser, userHasAccess } from '@openmrs/esm-framework';
+import { useConfig, useLayoutType, useSession, userHasAccess } from '@openmrs/esm-framework';
 import { isValidOfflineFormEncounter } from '../offline-forms/offline-form-helpers';
 import { ConfigObject } from '../config-schema';
 import { useProgramConfig } from '../hooks/use-program-config';
@@ -38,12 +38,12 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
     showRecommendedFormsTab ? FormsCategory.Recommended : FormsCategory.All,
   );
   const { isValidating, data, error } = useForms(patientUuid, undefined, undefined, isOffline);
-  const session = useSessionUser();
+  const session = useSession();
   let formsToDisplay = isOffline
     ? data?.filter((formInfo) => isValidOfflineFormEncounter(formInfo.form, htmlFormEntryForms))
     : data;
   formsToDisplay = formsToDisplay?.filter((formInfo) =>
-    userHasAccess(formInfo.form.encounterType.editPrivilege, session.user as any),
+    userHasAccess(formInfo.form.encounterType.editPrivilege, session.user),
   );
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const { programConfigs } = useProgramConfig(patientUuid, showRecommendedFormsTab);
