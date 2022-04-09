@@ -7,7 +7,7 @@ import {
   mockBiometricsResponse,
   mockConceptMetadata,
 } from '../../../../__mocks__/biometrics.mock';
-import { patientChartBasePath, swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { patientChartBasePath, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import BiometricsOverview from './biometrics-overview.component';
 import { mockVitalsSignsConcept } from '../../../../__mocks__/vitals.mock';
 
@@ -129,5 +129,5 @@ describe('BiometricsOverview: ', () => {
 });
 
 function renderBiometricsOverview() {
-  swrRender(<BiometricsOverview {...testProps} />);
+  renderWithSwr(<BiometricsOverview {...testProps} />);
 }

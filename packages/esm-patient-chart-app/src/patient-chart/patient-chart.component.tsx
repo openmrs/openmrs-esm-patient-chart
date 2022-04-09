@@ -23,9 +23,8 @@ interface PatientChartParams {
 const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({ match }) => {
   const { patientUuid, view } = match.params;
   const { isLoading: isLoadingPatient, patient } = usePatientOrOfflineRegisteredPatient(patientUuid);
-  const visitSwr = useVisitOrOfflineVisit(patientUuid);
   const { windowSize, active } = useWorkspaceWindowSize();
-  const state = useMemo(() => ({ patient, patientUuid, activeVisit: visitSwr }), [patient, patientUuid, visitSwr]);
+  const state = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);
   const { offlineVisitTypeUuid } = useConfig();
 
   // We are responsible for creating a new offline visit while in offline mode.

@@ -2,14 +2,15 @@ import React from 'react';
 import styles from './active-visit-tag.scss';
 import { useTranslation } from 'react-i18next';
 import { Tag, TooltipDefinition } from 'carbon-components-react';
-import { formatDatetime, parseDate, useVisit } from '@openmrs/esm-framework';
+import { formatDatetime, parseDate } from '@openmrs/esm-framework';
+import { useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 interface ActiveVisitBannerTagProps {
   patientUuid: string;
   patient: fhir.Patient;
 }
 const ActiveVisitBannerTag: React.FC<ActiveVisitBannerTagProps> = ({ patientUuid, patient }) => {
   const { t } = useTranslation();
-  const { currentVisit } = useVisit(patientUuid);
+  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const deceasedBoolean = patient.deceasedDateTime ? false : true;
   return (
     currentVisit &&

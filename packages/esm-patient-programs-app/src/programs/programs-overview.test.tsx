@@ -5,7 +5,7 @@ import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { mockEnrolledProgramsResponse } from '../../../../__mocks__/programs.mock';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
-import { swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import ProgramsOverview from './programs-overview.component';
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
@@ -109,5 +109,5 @@ describe('ProgramsOverview', () => {
 });
 
 function renderProgramsOverview() {
-  swrRender(<ProgramsOverview {...testProps} />);
+  renderWithSwr(<ProgramsOverview {...testProps} />);
 }

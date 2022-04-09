@@ -3,10 +3,11 @@ import ShoppingCart16 from '@carbon/icons-react/es/shopping--cart/16';
 import styles from './order-basket-search-results.scss';
 import { Button, Link, Pagination, ClickableTile } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
-import { createErrorHandler, useLayoutType } from '@openmrs/esm-framework';
+import { createErrorHandler, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { searchMedications } from './drug-search';
 import { OrderBasketItem } from '../types/order-basket-item';
 import { paginate } from '../utils/pagination';
+import { ConfigObject } from '../config-schema';
 
 export interface OrderBasketSearchResultsProps {
   searchTerm: string;
@@ -27,10 +28,14 @@ export default function OrderBasketSearchResults({
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [currentSearchResultPage] = paginate(searchResults, page, pageSize);
+  const config = useConfig() as ConfigObject;
 
   useEffect(() => {
     const abortController = new AbortController();
-    searchMedications(searchTerm, encounterUuid, abortController).then(setSearchResults, createErrorHandler);
+    searchMedications(searchTerm, encounterUuid, abortController, config.daysDurationUnit).then(
+      setSearchResults,
+      createErrorHandler,
+    );
     return () => abortController.abort();
   }, [searchTerm, encounterUuid]);
 

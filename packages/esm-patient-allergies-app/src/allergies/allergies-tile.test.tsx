@@ -1,7 +1,7 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { mockFhirAllergyIntoleranceResponse } from '../../../../__mocks__/allergies.mock';
 import AllergiesTile from './allergies-tile.component';
@@ -35,5 +35,5 @@ describe('AllergiesTile', () => {
 });
 
 function renderAllergiesTile() {
-  swrRender(<AllergiesTile {...testProps} />);
+  renderWithSwr(<AllergiesTile {...testProps} />);
 }
