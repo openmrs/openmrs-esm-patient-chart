@@ -3,7 +3,7 @@ import { Grid, ShadowBox } from '../timeline/helpers';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import FilterContext from '../filter/filter-context';
 import styles from './grouped-timeline.styles.scss';
-import { makeThrottled, navigateToTrendline } from '../helpers';
+import { makeThrottled, testResultsBasePath } from '../helpers';
 import type {
   DateHeaderGridProps,
   PanelNameCornerProps,
@@ -11,6 +11,7 @@ import type {
   DataRowsProps,
 } from './grouped-timeline-types';
 import { useTranslation } from 'react-i18next';
+import { ConfigurableLink } from '@openmrs/esm-framework';
 
 const TimeSlots: React.FC<{
   style?: React.CSSProperties;
@@ -25,19 +26,28 @@ const PanelNameCorner: React.FC<PanelNameCornerProps> = ({ showShadow, panelName
   <TimeSlots className={`${styles.cornerGridElement} ${showShadow ? styles.shadow : ''}`}>{panelName}</TimeSlots>
 );
 
-const NewRowStartCell = ({ title, range, units, shadow = false }) => (
-  <div
-    className={styles.rowStartCell}
-    style={{
-      boxShadow: shadow ? '8px 0 20px 0 rgba(0,0,0,0.15)' : undefined,
-    }}
-  >
-    <span className={styles.trendlineLink}>{title}</span>
-    <span className={styles.rangeUnits}>
-      {range} {units}
-    </span>
-  </div>
-);
+const NewRowStartCell = ({ title, range, units, conceptUuid, shadow = false }) => {
+  const { basePath } = useContext(FilterContext);
+
+  return (
+    <div
+      className={styles.rowStartCell}
+      style={{
+        boxShadow: shadow ? '8px 0 20px 0 rgba(0,0,0,0.15)' : undefined,
+      }}
+    >
+      <ConfigurableLink
+        to={`${testResultsBasePath(basePath)}/trendline/${conceptUuid}`}
+        className={styles.trendlineLink}
+      >
+        {title}
+      </ConfigurableLink>
+      <span className={styles.rangeUnits}>
+        {range} {units}
+      </span>
+    </div>
+  );
+};
 
 const interpretationToCSS = {
   OFF_SCALE_HIGH: 'offScaleHigh',
@@ -88,6 +98,7 @@ const DataRows: React.FC<DataRowsProps> = ({ timeColumns, rowData, sortedTimes, 
                 range,
                 title: row.display,
                 shadow: showShadow,
+                conceptUuid: row.conceptUuid,
               }}
             />
             <GridItems {...{ sortedTimes, obs, zebra: !!(index % 2) }} />
@@ -239,7 +250,8 @@ const TimelineDataGroup = ({ parent, subRows, xScroll, setXScroll, panelName, se
 };
 
 export const GroupedTimeline = () => {
-  const { activeTests, timelineData, parents, checkboxes, someChecked, lowestParents } = useContext(FilterContext);
+  const { activeTests, timelineData, parents, checkboxes, someChecked, lowestParents, trendlineData } =
+    useContext(FilterContext);
   const [panelName, setPanelName] = useState('');
   const [xScroll, setXScroll] = useState(0);
   const { t } = useTranslation();

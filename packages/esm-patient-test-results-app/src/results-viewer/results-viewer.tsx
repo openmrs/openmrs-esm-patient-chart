@@ -3,15 +3,26 @@ import { Column, ContentSwitcher, Grid, InlineLoading, Row, Switch } from 'carbo
 import FilterSet, { FilterProvider } from '../filter';
 import GroupedTimeline, { useGetManyObstreeData } from '../grouped-timeline';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
-import { useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { navigate, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import DesktopView from '../desktop-view/desktop-view.component';
 import styles from './results-viewer.styles.scss';
 import { useTranslation } from 'react-i18next';
+import { Route } from 'react-router-dom';
+import { testResultsBasePath } from '../helpers';
+import Trendline from '../trendline-new/trendline.component';
 
 type viewOpts = 'split' | 'full';
 type panelOpts = 'tree' | 'panel';
 
-const ResultsViewer = () => {
+interface ResultsViewerProps {
+  basePath: string;
+  type: string;
+  panelUuid: string;
+  testUuid: string;
+  patientUuid: string;
+}
+
+const ResultsViewer: React.FC<ResultsViewerProps> = ({ basePath, type, testUuid }) => {
   const config = useConfig();
   const conceptUuids = config?.concepts?.map((c) => c.conceptUuid) ?? [];
   const { t } = useTranslation();
@@ -22,6 +33,7 @@ const ResultsViewer = () => {
   const [leftContent, setLeftContent] = useState<panelOpts>('tree');
 
   const expanded = view === 'full';
+  const openTimeline = React.useCallback(() => navigate({ to: testResultsBasePath(basePath) }), [basePath, navigate]);
 
   if (loading) {
     return <InlineLoading />;
@@ -31,7 +43,7 @@ const ResultsViewer = () => {
   }
   if (!loading && !errors.length && roots?.length) {
     return (
-      <FilterProvider roots={roots}>
+      <FilterProvider roots={roots} testUuid={testUuid} type={type} basePath={basePath}>
         <Grid className={styles.resultsContainer}>
           <Row className={styles.resultsHeader}>
             <Column sm={12} lg={expanded || tablet ? 0 : 6}>
@@ -63,7 +75,7 @@ const ResultsViewer = () => {
               {leftContent === 'panel' && <DesktopView />}
             </Column>
             <Column sm={16} lg={expanded ? 12 : 6} className={styles.columnPanel}>
-              <GroupedTimeline />
+              {testUuid && type === 'trendline' ? <Trendline /> : <GroupedTimeline />}
             </Column>
           </Row>
         </Grid>

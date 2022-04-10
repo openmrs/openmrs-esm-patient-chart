@@ -1,0 +1,81 @@
+@import "~@carbon/charts/styles.css";
+@import "~@carbon/colors/scss/index.scss";
+@import "~@openmrs/esm-styleguide/src/vars";
+@import "carbon-components/scss/globals/scss/typography.scss";
+
+.ui-shell-header-modal-bar-default {
+  height: 3rem;
+  object-fit: contain;
+  background-color: #005d5d;
+  color: white;
+  padding-top: 1rem;
+  padding-left: 0.938rem;
+  display: flex;
+}
+
+.content {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  width: calc(100% - 22rem);
+}
+
+.title {
+  @include carbon--type-style('productive-heading-02');
+  color: $text-02;
+  margin-right: 4px;
+}
+
+.reference-range {
+  @include carbon--type-style('helper-text-01');
+  color: $text-05;
+}
+
+:global(.bx--cc--area path.area) {
+  stroke: none !important;
+  fill: #a7f0ba !important;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  background: white;
+  border-bottom: 1px solid $ui-03;
+}
+
+.back-button {
+  align-items: center;
+  display: flex;
+  justify-content: flex-start;
+
+  button {
+    display: flex;
+
+    svg {
+      order: 1;
+      margin-right: 0.5rem;
+    }  
+
+    span {
+      order: 2;
+    }
+  }
+}
+
+.Background {
+  width: 100%;
+  // height: 20.125rem;
+  // margin: 3rem 12rem 1rem;
+  padding: 2.375rem 5.688rem 2.188rem 1rem;
+  background: white;
+}
+
+.Actions-Navigation-arrow--left-16 {
+  width: 1.25rem;
+  height: 1.25rem;
+  background-color: var(--open-mrs-background-gray);
+}
+
+.range-tabs :global(.bx--tabs--scrollable__nav-link) {
+  width: 7rem;
+}

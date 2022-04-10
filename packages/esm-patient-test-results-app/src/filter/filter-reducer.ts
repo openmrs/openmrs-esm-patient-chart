@@ -1,3 +1,5 @@
+import { ReducerAction, ReducerState, ReducerActionType } from './filter-types';
+
 export const getName = (prefix, name) => {
   return prefix ? `${prefix}-${name}` : name;
 };
@@ -42,9 +44,9 @@ const computeParents = (prefix, node) => {
   return { parents, leaves, tests, lowestParents };
 };
 
-const reducer = (state, action) => {
+function reducer(state: ReducerState, action: ReducerAction): ReducerState {
   switch (action.type) {
-    case 'initialize':
+    case ReducerActionType.INITIALIZE:
       let parents = {},
         leaves = [],
         tests = [],
@@ -69,8 +71,9 @@ const reducer = (state, action) => {
         roots: action.trees,
         tests: flatTests,
         lowestParents: lowestParents,
+        basePath: action.basePath,
       };
-    case 'toggleVal':
+    case ReducerActionType.TOGGLEVAL:
       return {
         ...state,
         checkboxes: {
@@ -78,7 +81,7 @@ const reducer = (state, action) => {
           [action.name]: !state.checkboxes[action.name],
         },
       };
-    case 'updateParent':
+    case ReducerActionType.UDPATEPARENT:
       const affectedLeaves = state.parents[action.name];
       let checkboxes = JSON.parse(JSON.stringify(state.checkboxes));
       const allChecked = affectedLeaves.every((leaf) => checkboxes[leaf]);
@@ -87,9 +90,14 @@ const reducer = (state, action) => {
         ...state,
         checkboxes: checkboxes,
       };
+    case ReducerActionType.UPDATEBASEPATH:
+      return {
+        ...state,
+        basePath: action.basePath,
+      };
     default:
       return state;
   }
-};
+}
 
 export default reducer;
