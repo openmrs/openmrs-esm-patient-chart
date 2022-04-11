@@ -18,7 +18,6 @@
     "coverage": "yarn test --coverage"
   },
   "devDependencies": {
-    "@babel/runtime": "^7.12.13",
     "@jsenv/file-size-impact": "12.1.1",
     "@openmrs/esm-framework": "next",
     "@swc/cli": "^0.1.57",
