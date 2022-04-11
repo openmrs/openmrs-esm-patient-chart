@@ -106,6 +106,69 @@ describe('VitalsHeader: ', () => {
     expect(mockLaunchWorkspace).toHaveBeenCalledTimes(1);
     expect(mockLaunchWorkspace).toHaveBeenCalledWith(patientVitalsBiometricsFormWorkspace);
   });
+
+  it('renders a normal header when all the values fall within normal range', async () => {
+    mockFhirVitalsResponse.entry[3].resource.valueQuantity.value = 79;
+    mockFhirVitalsResponse.entry[4].resource.valueQuantity.value = 119;
+    mockFhirVitalsResponse.entry[0].resource.valueQuantity.value = 69;
+    mockFhirVitalsResponse.entry[11].resource.valueQuantity.value = 36;
+    mockOpenmrsFetch.mockReturnValue({ data: mockFhirVitalsResponse });
+
+    renderVitalsHeader();
+
+    await waitForLoadingToFinish();
+
+    const expandButton = screen.getByTitle(/ChevronDown/);
+    userEvent.click(expandButton);
+
+    expect(screen.queryByTitle(/abnormal value/i)).not.toBeInTheDocument();
+  });
+
+  it('renders a header with a pink backgroung when the diastolic value falls below the configured low normal range', async () => {
+    mockFhirVitalsResponse.entry[3].resource.valueQuantity.value = 69;
+
+    mockOpenmrsFetch.mockReturnValue({ data: mockFhirVitalsResponse });
+
+    renderVitalsHeader();
+
+    await waitForLoadingToFinish();
+
+    const expandButton = screen.getByTitle(/ChevronDown/);
+    userEvent.click(expandButton);
+
+    expect(getByTextWithMarkup(/BP\s*119 \/ 69\s*mmHg/i)).toBeInTheDocument();
+    expect(screen.queryByTitle(/abnormal value/i)).toBeInTheDocument();
+  });
+
+  it('renders a header with a pink background when the diastolic value is less than the set critical low range', async () => {
+    mockVitalsSignsConcept.data.results[0].setMembers[1].lowCritical = 50;
+    mockFhirVitalsResponse.entry[3].resource.valueQuantity.value = 49;
+    mockOpenmrsFetch.mockReturnValue({ data: mockFhirVitalsResponse });
+
+    renderVitalsHeader();
+
+    await waitForLoadingToFinish();
+
+    const expandButton = screen.getByTitle(/ChevronDown/);
+    userEvent.click(expandButton);
+
+    expect(screen.queryByTitle(/abnormal value/i)).toBeInTheDocument();
+  });
+
+  it('renders a header with a pink backgruond when either the diastolic or systolic values are equal or less than the set high critical range', async () => {
+    mockVitalsSignsConcept.data.results[0].setMembers[1].hiCritical = 145;
+    mockFhirVitalsResponse.entry[3].resource.valueQuantity.value = 150;
+    mockOpenmrsFetch.mockReturnValue({ data: mockFhirVitalsResponse });
+
+    renderVitalsHeader();
+
+    await waitForLoadingToFinish();
+
+    const expandButton = screen.getByTitle(/ChevronDown/);
+    userEvent.click(expandButton);
+
+    expect(screen.queryByTitle(/abnormal value/i)).toBeInTheDocument();
+  });
 });
 
 function renderVitalsHeader() {
