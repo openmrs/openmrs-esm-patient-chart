@@ -4,8 +4,6 @@ import { patientVitalsBiometricsFormWorkspace } from './constants';
 
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
-console.log('test');
-
 const backendDependencies = {
   'webservices.rest': '^2.2.0',
   fhir2: '^1.2.0',
