@@ -11,7 +11,7 @@ import {
   mockVitalsConfig,
   mockVitalsSignsConcept,
 } from '../../../../__mocks__/vitals.mock';
-import { swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import VitalsOverview from './vitals-overview.component';
 
 const testProps = {
@@ -182,5 +182,5 @@ describe('VitalsOverview: ', () => {
 });
 
 function renderVitalsOverview() {
-  swrRender(<VitalsOverview {...testProps} />);
+  renderWithSwr(<VitalsOverview {...testProps} />);
 }

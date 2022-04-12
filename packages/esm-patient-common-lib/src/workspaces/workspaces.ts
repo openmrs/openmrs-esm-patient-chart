@@ -1,10 +1,5 @@
-import {
-  ExtensionRegistration,
-  getExtensionRegistration,
-  getGlobalStore,
-  navigate,
-  translateFrom,
-} from '@openmrs/esm-framework';
+import { ExtensionRegistration, getGlobalStore, navigate, translateFrom } from '@openmrs/esm-framework';
+import { getExtensionRegistration } from '@openmrs/esm-framework/src/internal';
 import _i18n from 'i18next';
 import { WorkspaceWindowState } from '..';
 

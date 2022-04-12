@@ -7,7 +7,7 @@ import { mockLocations, mockLocationsDataResponse } from '../../../../__mocks__/
 import { openmrsFetch, showNotification, showToast } from '@openmrs/esm-framework';
 import { mockSessionDataResponse } from '../../../../__mocks__/session.mock';
 import { mockAppointmentsData, mockUseAppointmentServiceData } from '../../../../__mocks__/appointments.mock';
-import { swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import { createAppointment } from './appointments.resource';
 import AppointmentForm from './appointments-form.component';
 
@@ -191,5 +191,5 @@ describe('AppointmentForm', () => {
 });
 
 function renderAppointmentsForm() {
-  swrRender(<AppointmentForm {...testProps} />);
+  renderWithSwr(<AppointmentForm {...testProps} />);
 }

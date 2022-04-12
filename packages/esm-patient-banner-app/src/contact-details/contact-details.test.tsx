@@ -1,7 +1,7 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import ContactDetails from './contact-details.component';
 import * as usePatientContactAttributeMock from '../hooks/usePatientAttributes';
 
@@ -103,7 +103,7 @@ describe('ContactDetails: ', () => {
   });
 
   it('renders an empty state view when address and contact details is not available', () => {
-    swrRender(<ContactDetails address={null} telecom={null} patientId={'some-uuid'} />);
+    renderWithSwr(<ContactDetails address={null} telecom={null} patientId={'some-uuid'} />);
     spyOn(usePatientContactAttributeMock, 'usePatientContactAttributes').and.returnValue({
       isLoading: false,
       contactAttributes: [],
@@ -117,5 +117,5 @@ describe('ContactDetails: ', () => {
 });
 
 function renderContactDetails() {
-  swrRender(<ContactDetails {...testProps} />);
+  renderWithSwr(<ContactDetails {...testProps} />);
 }
