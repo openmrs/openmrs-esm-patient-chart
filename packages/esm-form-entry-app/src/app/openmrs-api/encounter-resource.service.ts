@@ -30,7 +30,7 @@ export class EncounterResourceService {
       return null;
     }
     const url = this.getUrl() + 'encounter';
-    let params = new HttpParams().set('patient', patientUuid).set('v', this.v).set('s', 'default');
+    let params = new HttpParams().set('patient', patientUuid).set('v', this.v);
 
     return this.http
       .get(url, {
