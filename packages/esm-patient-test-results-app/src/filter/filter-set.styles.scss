@@ -2,6 +2,11 @@
 @import "~carbon-components/src/globals/scss/vars";
 @import "~carbon-components/src/globals/scss/mixins";
 
+.stickyFilterSet {
+  position: sticky;
+  top: 6.5rem;
+}
+
 // background of filter, and spacing between containers
 .nestedAccordion {
   background-color: $openmrs-background-grey;

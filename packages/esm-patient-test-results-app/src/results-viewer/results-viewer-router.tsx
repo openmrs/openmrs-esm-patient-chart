@@ -1,20 +1,17 @@
-import * as React from 'react';
+import React from 'react';
 import { Switch, Route, BrowserRouter } from 'react-router-dom';
 import { testResultsBasePath } from '../helpers';
-import ResultsViewer from './results-viewer';
-
-const RoutedDesktopView = ({ match, ...props }) => {
-  return <ResultsViewer {...props} {...match.params} />;
-};
+import RoutedResultsViewer from './results-viewer';
 
 const DashboardRoot = ({ basePath, patientUuid }) => {
-  console.log(basePath, patientUuid);
   return (
     <BrowserRouter basename={testResultsBasePath(basePath)}>
       <Switch>
         <Route
           path="/:type?/:testUuid?"
-          component={(props) => <RoutedDesktopView {...props} patientUuid={patientUuid} basePath={basePath} />}
+          component={(props) => (
+            <RoutedResultsViewer {...props} {...props.match.params} patientUuid={patientUuid} basePath={basePath} />
+          )}
         />
       </Switch>
     </BrowserRouter>

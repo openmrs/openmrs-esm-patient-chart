@@ -12,15 +12,16 @@ const isIndeterminate = (kids, checkboxes) => {
 const FilterSet = () => {
   const { roots } = useContext(FilterContext);
   const config = useConfig();
+  const tablet = useLayoutType() === 'tablet';
 
   return (
-    <>
+    <div className={!tablet ? styles.stickyFilterSet : ''}>
       {roots?.map((root, index) => (
         <div className={styles.nestedAccordion}>
           <FilterNode root={root} level={0} open={config.concepts[index].defaultOpen} />
         </div>
       ))}
-    </>
+    </div>
   );
 };
 

@@ -1,15 +1,16 @@
-import React, { useState } from 'react';
-import { Column, ContentSwitcher, Grid, InlineLoading, Row, Switch } from 'carbon-components-react';
-import FilterSet, { FilterProvider } from '../filter';
+import React, { useContext, useState } from 'react';
+import { Button, Column, ContentSwitcher, Grid, InlineLoading, Row, Switch } from 'carbon-components-react';
+import FilterSet, { FilterContext, FilterProvider } from '../filter';
 import GroupedTimeline, { useGetManyObstreeData } from '../grouped-timeline';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
 import { navigate, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import DesktopView from '../desktop-view/desktop-view.component';
 import styles from './results-viewer.styles.scss';
 import { useTranslation } from 'react-i18next';
-import { Route } from 'react-router-dom';
 import { testResultsBasePath } from '../helpers';
 import Trendline from '../trendline-new/trendline.component';
+import TabletOverlay from '../tablet-overlay';
+import { TreeViewAlt16 } from '@carbon/icons-react';
 
 type viewOpts = 'split' | 'full';
 type panelOpts = 'tree' | 'panel';
@@ -17,23 +18,15 @@ type panelOpts = 'tree' | 'panel';
 interface ResultsViewerProps {
   basePath: string;
   type: string;
-  panelUuid: string;
   testUuid: string;
-  patientUuid: string;
+  patientUuid?: string;
 }
 
-const ResultsViewer: React.FC<ResultsViewerProps> = ({ basePath, type, testUuid }) => {
+const RoutedResultsViewer: React.FC<ResultsViewerProps> = ({ type, basePath, testUuid }) => {
   const config = useConfig();
   const conceptUuids = config?.concepts?.map((c) => c.conceptUuid) ?? [];
-  const { t } = useTranslation();
-  const tablet = useLayoutType() === 'tablet';
   const { roots, loading, errors } = useGetManyObstreeData(conceptUuids);
-
-  const [view, setView] = useState<viewOpts>('split');
-  const [leftContent, setLeftContent] = useState<panelOpts>('tree');
-
-  const expanded = view === 'full';
-  const openTimeline = React.useCallback(() => navigate({ to: testResultsBasePath(basePath) }), [basePath, navigate]);
+  const { t } = useTranslation();
 
   if (loading) {
     return <InlineLoading />;
@@ -44,20 +37,52 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ basePath, type, testUuid 
   if (!loading && !errors.length && roots?.length) {
     return (
       <FilterProvider roots={roots} testUuid={testUuid} type={type} basePath={basePath}>
-        <Grid className={styles.resultsContainer}>
-          <Row className={styles.resultsHeader}>
-            <Column sm={12} lg={expanded || tablet ? 0 : 6}>
-              <div style={{ display: 'flex' }}>
-                <h4 style={{ flexGrow: 1 }}>{t('results', 'Results')}</h4>
-                <div style={{ minWidth: '10rem' }}>
-                  <ContentSwitcher selectedIndex={1} onChange={(e) => setLeftContent(e.name as panelOpts)}>
-                    <Switch name="panel" text={t('panel', 'Panel')} />
-                    <Switch name="tree" text={t('tree', 'Tree')} />
-                  </ContentSwitcher>
-                </div>
+        <ResultsViewer testUuid={testUuid} type={type} basePath={basePath} />
+      </FilterProvider>
+    );
+  }
+  return null;
+};
+
+const ResultsViewer: React.FC<ResultsViewerProps> = ({ basePath, type, testUuid }) => {
+  const { t } = useTranslation();
+  const tablet = useLayoutType() === 'tablet';
+  const [view, setView] = useState<viewOpts>('split');
+  const [leftContent, setLeftContent] = useState<panelOpts>('tree');
+  const [showTreeOverlay, setShowTreeOverlay] = useState<boolean>(false);
+  const expanded = view === 'full';
+  const { resetTree, trendlineData } = useContext(FilterContext);
+
+  return (
+    <>
+      <Grid className={styles.resultsContainer}>
+        <Row className={styles.resultsHeader}>
+          <Column sm={12} lg={expanded || tablet ? 0 : 5}>
+            <div className={styles.leftHeader}>
+              <h4 style={{ flexGrow: 1 }}>{t('results', 'Results')}</h4>
+              <div className={styles.leftHeaderActions}>
+                {tablet && (
+                  <Button
+                    size="sm"
+                    kind="ghost"
+                    renderIcon={TreeViewAlt16}
+                    onClick={() => setShowTreeOverlay(true)}
+                    style={{
+                      marginRight: '1rem',
+                    }}
+                  >
+                    {t('showTreeButtonText', 'Show tree')}
+                  </Button>
+                )}
+                <ContentSwitcher selectedIndex={1} onChange={(e) => setLeftContent(e.name as panelOpts)}>
+                  <Switch name="panel" text={t('panel', 'Panel')} />
+                  <Switch name="tree" text={t('tree', 'Tree')} />
+                </ContentSwitcher>
               </div>
-            </Column>
-            <Column sm={12} lg={expanded || tablet ? 12 : 6}>
+            </div>
+          </Column>
+          {!tablet && (
+            <Column sm={12} lg={expanded || tablet ? 0 : 7}>
               <div
                 className={styles.viewOptsContentSwitcherContainer}
                 style={{ display: 'flex', justifyContent: 'flex-end' }}
@@ -68,22 +93,59 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ basePath, type, testUuid 
                 </ContentSwitcher>
               </div>
             </Column>
-          </Row>
-          <Row style={{ height: '100%' }}>
-            <Column sm={16} lg={expanded ? 0 : 6} className={styles.columnPanel}>
+          )}
+        </Row>
+        <Row className={styles.resultsViewer}>
+          {!tablet && (
+            <Column sm={16} lg={tablet || expanded ? 0 : 5} className={`${styles.columnPanel} ${styles.treeColumn}`}>
               {leftContent === 'tree' && <FilterSet />}
               {leftContent === 'panel' && <DesktopView />}
             </Column>
-            <Column sm={16} lg={expanded ? 12 : 6} className={styles.columnPanel}>
-              {testUuid && type === 'trendline' ? <Trendline /> : <GroupedTimeline />}
-            </Column>
-          </Row>
-        </Grid>
-      </FilterProvider>
-    );
-  }
-  return null;
+          )}
+          <Column sm={16} lg={tablet || expanded ? 12 : 7} className={`${styles.columnPanel}`}>
+            {!tablet && testUuid && type === 'trendline' ? <Trendline /> : <GroupedTimeline />}
+          </Column>
+        </Row>
+      </Grid>
+      {tablet && showTreeOverlay && (
+        <TabletOverlay
+          headerText={t('tree', 'Tree')}
+          close={() => setShowTreeOverlay(false)}
+          buttonsGroup={
+            <>
+              <Button kind="secondary" size="lg" onClick={resetTree}>
+                {t('resetTreeText', 'Reset tree')}
+              </Button>
+              <Button kind="primary" size="lg" onClick={() => setShowTreeOverlay(false)}>
+                {t('viewTreeChangeResults', 'View results')}
+              </Button>
+            </>
+          }
+        >
+          <FilterSet />
+        </TabletOverlay>
+      )}
+      {tablet && testUuid && type === 'trendline' && (
+        <TabletOverlay
+          headerText={
+            trendlineData?.isLoading ? (
+              t('trendline', 'Trendline')
+            ) : (
+              <div className={styles.trendlineOverlayHeader}>
+                <span className={styles.trendlineOverlayHeaderTitle}>{trendlineData?.title}</span>
+                <span className={styles.trendlineOverlayHeaderReferenceRange}>{trendlineData?.referenceRange}</span>
+              </div>
+            )
+          }
+          close={() => navigate({ to: testResultsBasePath(basePath) })}
+          buttonsGroup={<></>}
+        >
+          <Trendline hideTrendlineHeader />
+        </TabletOverlay>
+      )}
+    </>
+  );
 };
 
-export default ResultsViewer;
+export default RoutedResultsViewer;
 export { ResultsViewer };

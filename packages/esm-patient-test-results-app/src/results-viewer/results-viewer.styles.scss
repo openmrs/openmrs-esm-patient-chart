@@ -1,25 +1,62 @@
 
 @import "~@openmrs/esm-styleguide/src/vars";
+@import "carbon-components/scss/globals/scss/typography.scss";
+
 
 .resultsContainer {
   padding: 0;
-  width: calc(100vw - 48px - 2.6rem);
-  @media (min-width: $breakpoint-desktop-min) {
-    width: calc(100vw - 16rem - 48px - 2.6rem);
-  }
+  width: 100%;
+  position: relative;
 }
 
 .resultsHeader {
-  padding: 0.8rem 0;
+  padding: 0.5rem 0;
   z-index: 10;
   background-color: $openmrs-background-grey;
+  position: sticky;
+  top: 3rem;
 }
 
-.columnPanel {
-  overflow-y: auto;
-  height: calc(100vh - 9rem)
-}
+// .columnPanel {
+//   // overflow-y: auto;
+//   height: calc(100vh - 9rem)
+// }
 
 .viewOptsContentSwitcherContainer {
   margin-left: auto;
 }
+
+.leftHeader {
+  display: flex;
+  align-items: center;
+}
+
+.leftHeaderActions {
+  display: flex;
+  min-width: 2.5rem;
+}
+
+.leftHeaderActions > :global(.bx--content-switcher) {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: max-content;
+  justify-content: flex-start;
+}
+
+.trendlineOverlayHeader {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+
+  .trendlineOverlayHeaderTitle {
+  @include carbon--type-style('productive-heading-02');
+  // color: $text-02;
+  margin-right: 4px;
+}
+
+.trendlineOverlayHeaderReferenceRange {
+  @include carbon--type-style('helper-text-01');
+  // color: $text-05;
+}
+}
+

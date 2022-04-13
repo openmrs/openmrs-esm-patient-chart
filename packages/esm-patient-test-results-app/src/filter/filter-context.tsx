@@ -31,6 +31,7 @@ const initialContext = {
   initialize: () => {},
   toggleVal: () => {},
   updateParent: () => {},
+  resetTree: () => {},
 };
 
 const FilterContext = createContext<FilterContextProps>(initialContext);
@@ -57,6 +58,7 @@ const FilterProvider = ({ roots, children, type, testUuid, basePath }: FilterPro
         dispatch({ type: ReducerActionType.UDPATEPARENT, name: name });
       },
       updateBasePath: (basePath: string) => dispatch({ type: ReducerActionType.UPDATEBASEPATH, basePath }),
+      resetTree: () => dispatch({ type: ReducerActionType.RESET_TREE }),
     }),
     [dispatch],
   );
@@ -114,8 +116,6 @@ const FilterProvider = ({ roots, children, type, testUuid, basePath }: FilterPro
       };
     }
 
-    console.log(test);
-
     return {
       isLoading: false,
       hiNormal: test?.hiNormal,
@@ -127,8 +127,6 @@ const FilterProvider = ({ roots, children, type, testUuid, basePath }: FilterPro
       referenceRange: test?.range,
     };
   }, [t, type, testUuid, state.tests]);
-
-  console.log(trendlineData);
 
   useEffect(() => {
     if (roots?.length && !Object.keys(state?.checkboxes).length) {
@@ -153,6 +151,7 @@ const FilterProvider = ({ roots, children, type, testUuid, basePath }: FilterPro
         initialize: actions.initialize,
         toggleVal: actions.toggleVal,
         updateParent: actions.updateParent,
+        resetTree: actions.resetTree,
       }}
     >
       {children}

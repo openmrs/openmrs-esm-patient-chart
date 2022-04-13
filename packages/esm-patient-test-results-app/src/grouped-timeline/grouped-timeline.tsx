@@ -274,7 +274,7 @@ export const GroupedTimeline = () => {
   }
   if (activeTests && timelineData && loaded) {
     return (
-      <>
+      <div>
         <div className={styles.timelineHeader}>
           <div className={styles.dateHeaderContainer}>
             <PanelNameCorner showShadow={true} panelName={panelName} />
@@ -317,7 +317,7 @@ export const GroupedTimeline = () => {
             } else return null;
           })}
         </div>
-      </>
+      </div>
     );
   }
   return null;

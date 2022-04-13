@@ -5,7 +5,7 @@
 
 .timelineHeader {
   position: sticky;
-  top: 0px;
+  top: 6.5rem;
   z-index: 9;
 }
 
@@ -163,6 +163,7 @@
   @include carbon--type-style('body-short-01');
   color: $interactive-01;
   cursor: pointer;
+  text-decoration: none;
 }
 
 .rangeUnits {

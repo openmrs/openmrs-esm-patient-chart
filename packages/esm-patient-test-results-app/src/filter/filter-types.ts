@@ -37,6 +37,7 @@ export enum ReducerActionType {
   TOGGLEVAL = 'toggleVal',
   UDPATEPARENT = 'updateParent',
   UPDATEBASEPATH = 'updateBasePath',
+  RESET_TREE = 'resetTree',
 }
 
 export interface ReducerAction {
@@ -103,6 +104,7 @@ export interface FilterContextProps extends ReducerState {
   toggleVal: any;
   updateParent: any;
   basePath: string;
+  resetTree: () => void;
 }
 
 export interface obsShape {

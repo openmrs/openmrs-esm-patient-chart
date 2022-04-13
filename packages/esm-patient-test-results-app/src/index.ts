@@ -76,7 +76,7 @@ function setupOpenMRS() {
       {
         name: 'results-viewer',
         slots: ['patient-chart-results-viewer-slot', dashboardMeta.slot],
-        load: getAsyncLifecycle(() => import('./results-viewer/results-viewer-router'), options),
+        load: getAsyncLifecycle(() => import('./results-viewer'), options),
         meta: {
           columnSpan: 4,
         },

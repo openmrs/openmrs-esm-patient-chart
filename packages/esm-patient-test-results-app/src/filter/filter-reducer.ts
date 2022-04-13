@@ -95,6 +95,11 @@ function reducer(state: ReducerState, action: ReducerAction): ReducerState {
         ...state,
         basePath: action.basePath,
       };
+    case ReducerActionType.RESET_TREE:
+      return {
+        ...state,
+        checkboxes: Object.fromEntries(Object.keys(state?.checkboxes)?.map((leaf) => [leaf, false])),
+      };
     default:
       return state;
   }

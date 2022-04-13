@@ -1,19 +1,17 @@
 import React, { useContext } from 'react';
 import RangeSelector from './range-selector.component';
-import usePatientResultsData from '../loadPatientTestData/usePatientResultsData';
 import { Button } from 'carbon-components-react';
 import ArrowLeft24 from '@carbon/icons-react/es/arrow--left/24';
 import LineChart from '@carbon/charts-react/line-chart';
 import { ScaleTypes, LineChartOptions, TickRotations } from '@carbon/charts/interfaces';
 import { formatDate, formatTime, parseDate, ConfigurableLink } from '@openmrs/esm-framework';
-import { ObsRecord, OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
+import { OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import CommonDataTable from '../overview/common-datatable.component';
-import { exist } from '../loadPatientTestData/helpers';
 import { useTranslation } from 'react-i18next';
 import styles from './trendline.scss';
 import '@carbon/charts/styles.css';
 import { FilterContext } from '../filter/filter-context';
-import { makeThrottled, testResultsBasePath } from '../helpers';
+import { testResultsBasePath } from '../helpers';
 
 // const useTrendlineData = ({
 //   patientUuid,
@@ -77,7 +75,11 @@ const TrendlineHeader = ({ basePath, title, referenceRange }) => {
   );
 };
 
-const Trendline: React.FC = () => {
+interface TrendlineProps {
+  hideTrendlineHeader?: boolean;
+}
+
+const Trendline: React.FC<TrendlineProps> = ({ hideTrendlineHeader = false }) => {
   const { trendlineData, basePath } = useContext(FilterContext);
   const { t } = useTranslation();
 
@@ -231,7 +233,7 @@ const Trendline: React.FC = () => {
 
   return (
     <>
-      <TrendlineHeader basePath={basePath} title={dataset} referenceRange={referenceRange} />
+      {!hideTrendlineHeader && <TrendlineHeader basePath={basePath} title={dataset} referenceRange={referenceRange} />}
       <TrendLineBackground>
         <RangeSelector setLowerRange={setLowerRange} upperRange={upperRange} />
         <LineChart data={data} options={options} />
