@@ -18,14 +18,11 @@
     "coverage": "yarn test --coverage"
   },
   "devDependencies": {
-    "@babel/core": "^7.11.6",
-    "@babel/plugin-proposal-class-properties": "^7.12.1",
-    "@babel/preset-env": "^7.11.5",
-    "@babel/preset-react": "^7.10.4",
-    "@babel/preset-typescript": "^7.10.4",
-    "@babel/runtime": "^7.12.13",
     "@jsenv/file-size-impact": "12.1.1",
     "@openmrs/esm-framework": "next",
+    "@swc/cli": "^0.1.57",
+    "@swc/core": "^1.2.165",
+    "@swc/jest": "^0.2.20",
     "@testing-library/dom": "^7.20.0",
     "@testing-library/jest-dom": "^5.11.0",
     "@testing-library/react": "^10.4.3",
@@ -39,9 +36,7 @@
     "@types/testing-library__jest-dom": "^5.14.1",
     "@types/webpack-env": "^1.16.0",
     "@typescript-eslint/eslint-plugin": "^4.15.1",
-    "@typescript-eslint/parser": "^4.15.1",
-    "babel-eslint": "^10.1.0",
-    "babel-jest": "^26.3.0",
+    "@typescript-eslint/parser": "^5.18.0",
     "babel-preset-minify": "^0.5.1",
     "concurrently": "^6.5.1",
     "cross-env": "^7.0.3",
@@ -69,13 +64,15 @@
     "react-router-dom": "^5.0.0",
     "rxjs": "^6.6.3",
     "sass": "^1.29.0",
+    "swc-loader": "^0.1.15",
+    "swr": "^1.1.2",
     "systemjs-webpack-interop": "^2.3.7",
     "turbo": "^1.1.10",
     "typescript": "^4.0.3",
     "webpack": "^5.36.2",
     "webpack-cli": "^4.7.0"
   },
-  "dependencies": {
-    "swr": "^1.1.2"
+  "resolutions": {
+    "**/@types/react": "^16.14.5"
   }
 }
