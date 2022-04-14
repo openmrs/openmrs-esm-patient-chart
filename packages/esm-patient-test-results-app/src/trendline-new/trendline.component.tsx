@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState, useCallback, useMemo, useLayoutEffect } from 'react';
 import RangeSelector from './range-selector.component';
 import { Button } from 'carbon-components-react';
 import ArrowLeft24 from '@carbon/icons-react/es/arrow--left/24';
@@ -13,50 +13,7 @@ import '@carbon/charts/styles.css';
 import { FilterContext } from '../filter/filter-context';
 import { testResultsBasePath } from '../helpers';
 
-// const useTrendlineData = ({
-//   patientUuid,
-//   panelUuid,
-//   testUuid,
-// }: {
-//   patientUuid: string;
-//   panelUuid: string;
-//   testUuid: string;
-// }): [string, Array<ObsRecord>, string | undefined] | null => {
-//   const { sortedObs, loaded, error } = usePatientResultsData(patientUuid);
-
-//   if (!loaded || error) {
-//     return null;
-//   }
-
-//   const panel = Object.entries(sortedObs).find(([, { uuid }]) => uuid === panelUuid);
-
-//   switch (panel[1].type) {
-//     case 'LabSet':
-//       const data = panel[1].entries
-//         .flatMap((x) => x.members.filter((y) => y.conceptClass === testUuid))
-//         .sort((ent1, ent2) => Date.parse(ent2.effectiveDateTime) - Date.parse(ent1.effectiveDateTime));
-//       return [data[0].name, data, panel[0]];
-//     case 'Test':
-//       return [
-//         panel[0],
-//         panel[1].entries.sort((ent1, ent2) => Date.parse(ent2.effectiveDateTime) - Date.parse(ent1.effectiveDateTime)),
-//         undefined,
-//       ];
-//   }
-// };
-
 const TrendLineBackground = ({ ...props }) => <div {...props} className={styles['Background']} />;
-
-// const withPatientData =
-//   (WrappedComponent) =>
-//   ({ patientUuid, panelUuid, testUuid, openTimeline: openTimelineExternal }) => {
-//     const patientData = useTrendlineData({ patientUuid, panelUuid, testUuid });
-//     const openTimeline = React.useCallback(() => openTimelineExternal(panelUuid), [panelUuid, openTimelineExternal]);
-
-//     if (!patientData) return <div>Loading...</div>;
-
-//     return <WrappedComponent patientData={patientData} openTimeline={openTimeline} />;
-//   };
 
 const TrendlineHeader = ({ basePath, title, referenceRange }) => {
   const { t } = useTranslation();
@@ -94,21 +51,16 @@ const Trendline: React.FC<TrendlineProps> = ({ hideTrendlineHeader = false }) =>
     referenceRange,
   } = trendlineData;
 
-  if (isLoading) {
-    <p>Loading...</p>;
-  }
+  const [range, setRange] = useState<[Date, Date]>();
 
-  if (!obs.length) {
-    return <p>No results found</p>;
-  }
-
-  const [range, setRange] = React.useState<[Date, Date]>();
-
-  const [upperRange, lowerRange] = React.useMemo(() => {
+  const [upperRange, lowerRange] = useMemo(() => {
+    if (obs.length === 0) {
+      return [new Date(), new Date()];
+    }
     return [new Date(), new Date(Date.parse(obs[obs.length - 1].obsDatetime))];
-  }, [obs]);
+  }, [obs, Date]);
 
-  const setLowerRange = React.useCallback(
+  const setLowerRange = useCallback(
     (selectedLowerRange: Date) => {
       setRange([selectedLowerRange > lowerRange ? selectedLowerRange : lowerRange, upperRange]);
     },
@@ -118,7 +70,7 @@ const Trendline: React.FC<TrendlineProps> = ({ hideTrendlineHeader = false }) =>
   /**
    * reorder svg element to bring line in front of the area
    */
-  React.useLayoutEffect(() => {
+  useLayoutEffect(() => {
     const graph = document.querySelector('g.bx--cc--area')?.parentElement;
     if (obs && obs.length && graph) {
       graph.insertBefore(graph.children[3], graph.childNodes[2]);
@@ -166,7 +118,7 @@ const Trendline: React.FC<TrendlineProps> = ({ hideTrendlineHeader = false }) =>
     });
   });
 
-  const options = React.useMemo<LineChartOptions>(
+  const options = useMemo<LineChartOptions>(
     () => ({
       bounds: {
         lowerBoundMapsTo: 'min',
@@ -213,7 +165,7 @@ const Trendline: React.FC<TrendlineProps> = ({ hideTrendlineHeader = false }) =>
     [bottomAxisTitle, leftAxisTitle, range, chartTitle, ScaleTypes, TickRotations, formatDate],
   );
 
-  const tableHeaderData = React.useMemo(
+  const tableHeaderData = useMemo(
     () => [
       {
         header: t('date', 'Date'),
@@ -231,6 +183,10 @@ const Trendline: React.FC<TrendlineProps> = ({ hideTrendlineHeader = false }) =>
     [leftAxisTitle, t],
   );
 
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
+
   return (
     <>
       {!hideTrendlineHeader && <TrendlineHeader basePath={basePath} title={dataset} referenceRange={referenceRange} />}
@@ -238,7 +194,6 @@ const Trendline: React.FC<TrendlineProps> = ({ hideTrendlineHeader = false }) =>
         <RangeSelector setLowerRange={setLowerRange} upperRange={upperRange} />
         <LineChart data={data} options={options} />
       </TrendLineBackground>
-
       <DrawTable {...{ tableData, tableHeaderData }} />
     </>
   );
