@@ -1,16 +1,17 @@
 import React from 'react';
 import { ConfigurableLink } from '@openmrs/esm-framework';
 
+console.log("check");
+
 export interface DashboardExtensionProps {
-  name: string;
   title: string;
   basePath: string;
 }
 
-export const DashboardExtension = ({ name, title, basePath }: DashboardExtensionProps) => {
+export const DashboardExtension = ({ title, basePath }: DashboardExtensionProps) => {
   return (
-    <div key={name}>
-      <ConfigurableLink to={`${basePath}/${name}`} className="bx--side-nav__link">
+    <div key={title}>
+      <ConfigurableLink to={`${basePath}/${encodeURIComponent(title)}`} className="bx--side-nav__link">
         {title}
       </ConfigurableLink>
     </div>
