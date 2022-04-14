@@ -11,7 +11,7 @@ import type {
   DataRowsProps,
 } from './grouped-timeline-types';
 import { useTranslation } from 'react-i18next';
-import { ConfigurableLink } from '@openmrs/esm-framework';
+import { ConfigurableLink, useLayoutType } from '@openmrs/esm-framework';
 
 const TimeSlots: React.FC<{
   style?: React.CSSProperties;
@@ -211,7 +211,7 @@ const TimelineDataGroup = ({ parent, subRows, xScroll, setXScroll, panelName, se
   const onIntersect = (entries, observer) => {
     entries.forEach((entry) => {
       if (entry.intersectionRatio > 0.5) {
-        //setPanelName(parent.display);
+        // setPanelName(parent.display);
       }
     });
   };
@@ -256,6 +256,7 @@ export const GroupedTimeline = () => {
   const [xScroll, setXScroll] = useState(0);
   const { t } = useTranslation();
   let shownGroups = 0;
+  const tablet = useLayoutType() === 'tablet';
 
   const {
     data: {
@@ -274,8 +275,8 @@ export const GroupedTimeline = () => {
   }
   if (activeTests && timelineData && loaded) {
     return (
-      <div>
-        <div className={styles.timelineHeader}>
+      <div className={styles.timelineHeader} style={{ top: tablet ? '7rem' : '6.5rem' }}>
+        <div className={styles.timelineHeader} style={{ top: tablet ? '7rem' : '6.5rem' }}>
           <div className={styles.dateHeaderContainer}>
             <PanelNameCorner showShadow={true} panelName={panelName} />
             <DateHeaderGrid

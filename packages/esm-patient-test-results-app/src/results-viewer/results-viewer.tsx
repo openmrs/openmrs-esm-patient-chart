@@ -51,19 +51,21 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ basePath, type, testUuid 
   const [leftContent, setLeftContent] = useState<panelOpts>('tree');
   const [showTreeOverlay, setShowTreeOverlay] = useState<boolean>(false);
   const expanded = view === 'full';
-  const { resetTree, trendlineData } = useContext(FilterContext);
+  const { resetTree, trendlineData, timelineData, totalResultsCount } = useContext(FilterContext);
 
   return (
     <>
       <Grid className={styles.resultsContainer}>
         <Row className={styles.resultsHeader}>
-          <Column sm={12} lg={expanded || tablet ? 0 : 5}>
+          <Column sm={12} lg={!tablet ? 5 : 12}>
             <div className={styles.leftHeader}>
-              <h4 style={{ flexGrow: 1 }}>{t('results', 'Results')}</h4>
+              <h4 style={{ flexGrow: 1 }}>{`${t('results', 'Results')} ${
+                totalResultsCount ? `(${totalResultsCount})` : ''
+              }`}</h4>
               <div className={styles.leftHeaderActions}>
                 {tablet && (
                   <Button
-                    size="sm"
+                    size={tablet ? 'md' : 'sm'}
                     kind="ghost"
                     renderIcon={TreeViewAlt16}
                     onClick={() => setShowTreeOverlay(true)}
@@ -74,20 +76,30 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ basePath, type, testUuid 
                     {t('showTreeButtonText', 'Show tree')}
                   </Button>
                 )}
-                <ContentSwitcher selectedIndex={1} onChange={(e) => setLeftContent(e.name as panelOpts)}>
-                  <Switch name="panel" text={t('panel', 'Panel')} />
-                  <Switch name="tree" text={t('tree', 'Tree')} />
-                </ContentSwitcher>
+                {!expanded && (
+                  <ContentSwitcher
+                    size={tablet ? 'lg' : 'md'}
+                    selectedIndex={1}
+                    onChange={(e) => setLeftContent(e.name as panelOpts)}
+                  >
+                    <Switch name="panel" text={t('panel', 'Panel')} />
+                    <Switch name="tree" text={t('tree', 'Tree')} />
+                  </ContentSwitcher>
+                )}
               </div>
             </div>
           </Column>
           {!tablet && (
-            <Column sm={12} lg={expanded || tablet ? 0 : 7}>
+            <Column sm={12} lg={7}>
               <div
                 className={styles.viewOptsContentSwitcherContainer}
                 style={{ display: 'flex', justifyContent: 'flex-end' }}
               >
-                <ContentSwitcher style={{ maxWidth: '10rem' }} onChange={(e) => setView(e.name as viewOpts)}>
+                <ContentSwitcher
+                  size={tablet ? 'lg' : 'md'}
+                  style={{ maxWidth: '10rem' }}
+                  onChange={(e) => setView(e.name as viewOpts)}
+                >
                   <Switch name="split" text={t('split', 'Split')} />
                   <Switch name="full" text={t('full', 'Full')} />
                 </ContentSwitcher>
@@ -117,12 +129,15 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ basePath, type, testUuid 
                 {t('resetTreeText', 'Reset tree')}
               </Button>
               <Button kind="primary" size="lg" onClick={() => setShowTreeOverlay(false)}>
-                {t('viewTreeChangeResults', 'View results')}
+                {`${t('view', 'View')} ${timelineData?.loaded ? timelineData?.data?.rowData?.length : ''} ${t(
+                  'resultsText',
+                  'results',
+                )}`}
               </Button>
             </>
           }
         >
-          <FilterSet />
+          <FilterSet hideFilterSetHeader />
         </TabletOverlay>
       )}
       {tablet && testUuid && type === 'trendline' && (

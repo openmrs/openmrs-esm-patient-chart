@@ -78,6 +78,28 @@ export interface TestData {
   [x: string]: any;
 }
 
+export interface ParsedTimeType {
+  yearColumns: Array<{
+    year: string;
+    size: number;
+  }>;
+  dayColumns: Array<{
+    year: string;
+    day: string;
+    size: number;
+  }>;
+  timeColumns: Array<string>;
+  sortedTimes: Array<string>;
+}
+export interface TimelineData {
+  loaded: boolean;
+  data: {
+    parsedTime: ParsedTimeType;
+    rowData: Array<RowData>;
+    panelName: string;
+  };
+}
+
 export interface TrendlineData {
   isLoading: boolean;
   hiNormal: number;
@@ -90,23 +112,28 @@ export interface TrendlineData {
 }
 
 export interface FilterContextProps extends ReducerState {
-  state: ReducerState;
-  checkboxes: { [key: string]: boolean };
-  parents: { [key: string]: string[] };
-  roots: TreeNode[];
-  tests: { [key: string]: TestData };
-  lowestParents: { display: string; flatName: string }[];
-  timelineData: { [key: string]: any };
+  timelineData: TimelineData;
   trendlineData: TrendlineData;
   activeTests: string[];
   someChecked: boolean;
+  totalResultsCount: number;
   initialize: any;
   toggleVal: any;
   updateParent: any;
-  basePath: string;
   resetTree: () => void;
 }
 
 export interface obsShape {
   [key: string]: any;
+}
+
+interface RowData extends TestData {
+  entries: Array<
+    | {
+        obsDatetime: string;
+        value: string;
+        interpretation: Interpretation;
+      }
+    | undefined
+  >;
 }

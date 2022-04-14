@@ -9,6 +9,7 @@ import {
   ReducerAction,
   ReducerActionType,
   TrendlineData,
+  TimelineData,
 } from './filter-types';
 import { ScaleTypes, LineChartOptions, TickRotations } from '@carbon/charts/interfaces';
 
@@ -24,10 +25,11 @@ const initialState = {
 const initialContext = {
   state: initialState,
   ...initialState,
-  timelineData: {},
+  timelineData: null,
   trendlineData: null,
   activeTests: [],
   someChecked: false,
+  totalResultsCount: 0,
   initialize: () => {},
   toggleVal: () => {},
   updateParent: () => {},
@@ -69,7 +71,7 @@ const FilterProvider = ({ roots, children, type, testUuid, basePath }: FilterPro
 
   const someChecked = Boolean(activeTests.length);
 
-  const timelineData = useMemo(() => {
+  const timelineData: TimelineData = useMemo(() => {
     if (!state?.tests) {
       return {
         data: { parsedTime: {} as ReturnType<typeof parseTime>, rowData: [], panelName: '' },
@@ -134,20 +136,24 @@ const FilterProvider = ({ roots, children, type, testUuid, basePath }: FilterPro
     }
   }, [actions, state, roots, basePath]);
 
+  const totalResultsCount: number = useMemo(() => {
+    let count = 0;
+    if (!state?.tests || state?.tests === {}) return 0;
+    Object.values(state?.tests).forEach((testData) => {
+      count += testData.obs.length;
+    });
+    return count;
+  }, [state?.tests]);
+
   return (
     <FilterContext.Provider
       value={{
-        state,
-        basePath,
-        checkboxes: state.checkboxes,
-        parents: state.parents,
-        roots: state.roots,
-        tests: state.tests,
-        lowestParents: state.lowestParents,
+        ...state,
         timelineData,
         trendlineData,
         activeTests,
         someChecked,
+        totalResultsCount,
         initialize: actions.initialize,
         toggleVal: actions.toggleVal,
         updateParent: actions.updateParent,
