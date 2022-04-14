@@ -1,9 +1,6 @@
 import useSWR from 'swr';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { OrderPost, PatientMedicationFetchResponse } from '../types/order';
-import { careSettingUuid } from '../constants';
-
-const durationUnitsConcept = '1732AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
 
 /**
  * Fast, lighweight, reusable data fetcher with built-in cache invalidation that
@@ -11,7 +8,7 @@ const durationUnitsConcept = '1732AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA';
  * @param patientUuid The UUID of the patient whose orders should be fetched.
  * @param status The status/the kind of orders to be fetched.
  */
-export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any') {
+export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any', careSettingUuid: string) {
   const customRepresentation =
     'custom:(uuid,dosingType,orderNumber,accessionNumber,' +
     'patient:ref,action,careSetting:ref,previousOrder:ref,dateActivated,scheduledDate,dateStopped,autoExpireDate,' +
@@ -52,7 +49,7 @@ export function getDrugByName(drugName: string, abortController?: AbortControlle
   );
 }
 
-export function getDurationUnits(abortController: AbortController) {
+export function getDurationUnits(abortController: AbortController, durationUnitsConcept) {
   return openmrsFetch(`/ws/rest/v1/concept/${durationUnitsConcept}?v=custom:(answers:(uuid,display))`, abortController);
 }
 

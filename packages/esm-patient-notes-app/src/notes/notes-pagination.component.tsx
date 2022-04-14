@@ -51,7 +51,7 @@ const NotesPagination: React.FC<FormsProps> = ({ notes, pageSize, pageUrl, urlLa
   );
 
   return (
-    <div>
+    <>
       <DataTable rows={tableRows} headers={tableHeaders} isSortable size="short" useZebraStyles>
         {({ rows, headers, getTableProps, getTableContainerProps, getHeaderProps, getRowProps }) => (
           <TableContainer {...getTableContainerProps}>
@@ -97,7 +97,7 @@ const NotesPagination: React.FC<FormsProps> = ({ notes, pageSize, pageUrl, urlLa
                         </div>
                       </TableExpandedRow>
                     ) : (
-                      <div />
+                      <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
                     )}
                   </React.Fragment>
                 ))}
@@ -106,18 +106,16 @@ const NotesPagination: React.FC<FormsProps> = ({ notes, pageSize, pageUrl, urlLa
           </TableContainer>
         )}
       </DataTable>
-      <div className={styles.pagination}>
-        <PatientChartPagination
-          pageNumber={currentPage}
-          totalItems={notes.length}
-          currentItems={paginatedNotes.length}
-          pageUrl={pageUrl}
-          pageSize={pageSize}
-          onPageNumberChange={({ page }) => goTo(page)}
-          urlLabel={urlLabel}
-        />
-      </div>
-    </div>
+      <PatientChartPagination
+        pageNumber={currentPage}
+        totalItems={notes.length}
+        currentItems={paginatedNotes.length}
+        pageUrl={pageUrl}
+        pageSize={pageSize}
+        onPageNumberChange={({ page }) => goTo(page)}
+        urlLabel={urlLabel}
+      />
+    </>
   );
 };
 

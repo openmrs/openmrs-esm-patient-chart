@@ -1,9 +1,9 @@
 import React from 'react';
-import OrderBasketActionButton from './order--basket-action-button.component';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import * as esmFramework from '@openmrs/esm-framework/mock';
+import OrderBasketActionButton from './order-basket-action-button.component';
 
 jest.mock('@openmrs/esm-patient-common-lib', () => {
   const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
@@ -47,8 +47,7 @@ describe('<OrderBasketActionButton/>', () => {
     spyOn(esmFramework, 'useStore').and.returnValue({ items: [{ name: 'order-01', uuid: 'some-uuid' }] });
     render(<OrderBasketActionButton />);
 
-    const orderBasketButton = screen.getByRole('button', { name: /Order/i });
-    expect(orderBasketButton).toHaveTextContent(1);
+    expect(screen.getByRole('button', { name: /orders 1/i })).toBeInTheDocument();
   });
 
   it('should display the count Tag if order are present on tablet view', () => {
@@ -56,7 +55,6 @@ describe('<OrderBasketActionButton/>', () => {
     spyOn(esmFramework, 'useStore').and.returnValue({ items: [{ name: 'order-01', uuid: 'some-uuid' }] });
     render(<OrderBasketActionButton />);
 
-    const orderBasketButton = screen.getByRole('button', { name: /Order/i });
-    expect(orderBasketButton).toHaveTextContent(1);
+    expect(screen.getByRole('button', { name: /1 order basket/i })).toBeInTheDocument();
   });
 });

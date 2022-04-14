@@ -2,19 +2,20 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import ActiveVisitBannerTag from './active-visit-tag.component';
-import { formatDatetime, useVisit } from '@openmrs/esm-framework';
+import { formatDatetime } from '@openmrs/esm-framework';
 import { mockCurrentVisit } from '../../../../__mocks__/visits.mock';
+import { useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 
-const mockUseVisit = useVisit as jest.Mock;
+const mockUseVisitOrOfflineVisit = useVisitOrOfflineVisit as jest.Mock;
 
-jest.mock('@openmrs/esm-framework', () => ({
-  ...(jest.requireActual('@openmrs/esm-framework') as any),
-  useVisit: jest.fn(),
+jest.mock('@openmrs/esm-patient-common-lib', () => ({
+  ...(jest.requireActual('@openmrs/esm-patient-common-lib') as any),
+  useVisitOrOfflineVisit: jest.fn(),
 }));
 
 describe('ActiveVisitBannerTag: ', () => {
   it('renders an active visit tag in the patient banner when an active visit is ongoing', () => {
-    mockUseVisit.mockReturnValue({
+    mockUseVisitOrOfflineVisit.mockReturnValue({
       currentVisit: mockCurrentVisit,
       error: null,
     });
@@ -33,7 +34,7 @@ describe('ActiveVisitBannerTag: ', () => {
   });
 
   it('should not render active visit tag if patient is dead', () => {
-    mockUseVisit.mockReturnValue({
+    mockUseVisitOrOfflineVisit.mockReturnValue({
       currentVisit: mockCurrentVisit,
       error: null,
     });

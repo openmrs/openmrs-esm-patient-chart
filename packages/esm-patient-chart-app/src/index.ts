@@ -1,10 +1,18 @@
-import capitalize from 'lodash-es/capitalize';
-import { registerBreadcrumbs, defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
+import {
+  registerBreadcrumbs,
+  defineConfigSchema,
+  getAsyncLifecycle,
+  getSyncLifecycle,
+  defineExtensionConfigSchema,
+} from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
+import { capitalize } from 'lodash-es';
 import { esmPatientChartSchema } from './config-schema';
 import { moduleName, spaBasePath } from './constants';
 import { setupCacheableRoutes, setupOfflineVisitsSync } from './offline';
 import { summaryDashboardMeta, encountersDashboardMeta } from './dashboard.meta';
+import { genericDashboardConfigSchema } from './side-nav/generic-dashboard.component';
+import { genericNavGroupConfigSchema } from './side-nav/generic-nav-group.component';
 
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -15,6 +23,8 @@ function setupOpenMRS() {
   setupCacheableRoutes();
 
   defineConfigSchema(moduleName, esmPatientChartSchema);
+  defineExtensionConfigSchema('nav-group', genericNavGroupConfigSchema);
+  defineExtensionConfigSchema('dashboard', genericDashboardConfigSchema);
 
   registerBreadcrumbs([
     {
@@ -24,7 +34,7 @@ function setupOpenMRS() {
     },
     {
       path: `${spaBasePath}/:view`,
-      title: ([_, key]) => `${capitalize(key)} Dashboard`,
+      title: ([_, key]) => `${capitalize(key).replace(/_/g, ' ')} dashboard`,
       parent: spaBasePath,
     },
   ]);
@@ -108,7 +118,6 @@ function setupOpenMRS() {
           view: 'visits',
         },
       },
-      ,
       {
         name: 'past-visits-overview',
         load: getAsyncLifecycle(() => import('./visit/past-visit-overview.component'), {
@@ -143,6 +152,13 @@ function setupOpenMRS() {
         name: 'nav-group',
         load: getAsyncLifecycle(() => import('./side-nav/generic-nav-group.component'), {
           featureName: 'Nav group',
+          moduleName,
+        }),
+      },
+      {
+        name: 'dashboard',
+        load: getAsyncLifecycle(() => import('./side-nav/generic-dashboard.component'), {
+          featureName: 'Dashboard',
           moduleName,
         }),
       },

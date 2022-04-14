@@ -1,21 +1,20 @@
 import React from 'react';
 import dayjs from 'dayjs';
-import { act, screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { mockLocations, mockLocationsDataResponse } from '../../../../__mocks__/location.mock';
 import { openmrsFetch, showNotification, showToast } from '@openmrs/esm-framework';
 import { mockSessionDataResponse } from '../../../../__mocks__/session.mock';
 import { mockAppointmentsData, mockUseAppointmentServiceData } from '../../../../__mocks__/appointments.mock';
-import { swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import { createAppointment } from './appointments.resource';
 import AppointmentForm from './appointments-form.component';
 
-const closeWorkspace = jest.fn();
-
 const testProps = {
-  closeWorkspace,
+  closeWorkspace: jest.fn(),
   patientUuid: mockPatient.id,
+  promptBeforeClosing: jest.fn(),
 };
 
 const mockCreateAppointment = createAppointment as jest.Mock;
@@ -28,9 +27,9 @@ jest.mock('@openmrs/esm-framework', () => {
 
   return {
     ...originalModule,
+    showToast: jest.fn(),
     useLocations: jest.fn().mockImplementation(() => mockLocations),
     useSessionUser: jest.fn().mockImplementation(() => mockSessionDataResponse.data),
-    showToast: jest.fn(),
   };
 });
 
@@ -44,10 +43,6 @@ jest.mock('./appointments.resource', () => {
 });
 
 describe('AppointmentForm', () => {
-  beforeEach(() => {
-    closeWorkspace.mockReset();
-  });
-
   it('renders the appointments form showing all the relevant fields and values', async () => {
     mockOpenmrsFetch.mockReturnValueOnce(mockUseAppointmentServiceData);
 
@@ -86,7 +81,7 @@ describe('AppointmentForm', () => {
     const cancelButton = screen.getByRole('button', { name: /Discard/i });
     userEvent.click(cancelButton);
 
-    expect(closeWorkspace).toHaveBeenCalledTimes(1);
+    expect(testProps.closeWorkspace).toHaveBeenCalledTimes(1);
   });
 
   describe('Form submission', () => {
@@ -119,7 +114,6 @@ describe('AppointmentForm', () => {
     });
 
     it('renders a success toast notification upon successfully scheduling an appointment', async () => {
-      const promise = Promise.resolve();
       mockCreateAppointment.mockResolvedValueOnce({ status: 200, statusText: 'Ok' });
 
       expect(saveButton).toBeDisabled();
@@ -135,7 +129,7 @@ describe('AppointmentForm', () => {
 
       expect(saveButton).not.toBeDisabled();
 
-      userEvent.click(saveButton);
+      await waitFor(() => userEvent.click(saveButton));
 
       expect(mockCreateAppointment).toHaveBeenCalledTimes(1);
       expect(mockCreateAppointment).toHaveBeenCalledWith(
@@ -152,8 +146,6 @@ describe('AppointmentForm', () => {
         new AbortController(),
       );
 
-      await act(() => promise);
-
       expect(mockShowToast).toHaveBeenCalledTimes(1);
       expect(mockShowToast).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -166,8 +158,6 @@ describe('AppointmentForm', () => {
     });
 
     it('renders an error notification if there was a problem scheduling an appointment', async () => {
-      const promise = Promise.resolve();
-
       const error = {
         message: 'Internal Server Error',
         response: {
@@ -186,9 +176,8 @@ describe('AppointmentForm', () => {
       userEvent.selectOptions(serviceSelect, ['Outpatient']);
       userEvent.selectOptions(serviceTypeSelect, ['Chemotherapy']);
       userEvent.selectOptions(appointmentTypeSelect, ['Scheduled']);
-      userEvent.click(saveButton);
 
-      await act(() => promise);
+      await waitFor(() => userEvent.click(saveButton));
 
       expect(mockShowNotification).toHaveBeenCalledTimes(1);
       expect(mockShowNotification).toHaveBeenCalledWith({
@@ -202,5 +191,5 @@ describe('AppointmentForm', () => {
 });
 
 function renderAppointmentsForm() {
-  swrRender(<AppointmentForm {...testProps} />);
+  renderWithSwr(<AppointmentForm {...testProps} />);
 }

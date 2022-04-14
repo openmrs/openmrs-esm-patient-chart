@@ -2,9 +2,6 @@ import React from 'react';
 import Add16 from '@carbon/icons-react/es/add/16';
 import ChartLineSmooth16 from '@carbon/icons-react/es/chart--line-smooth/16';
 import Table16 from '@carbon/icons-react/es/table/16';
-import styles from './vitals-overview.scss';
-import VitalsChart from './vitals-chart.component';
-import VitalsPagination from './vitals-pagination.component';
 import { DataTableSkeleton, Button, InlineLoading } from 'carbon-components-react';
 import {
   CardHeader,
@@ -14,11 +11,14 @@ import {
   useVitalsConceptMetadata,
   withUnit,
 } from '@openmrs/esm-patient-common-lib';
+import { formatDate, parseDate, useConfig } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { patientVitalsBiometricsFormWorkspace } from '../constants';
-import { useVitals } from './vitals.resource';
 import { ConfigObject } from '../config-schema';
-import { formatDate, parseDate, useConfig } from '@openmrs/esm-framework';
+import { useVitals } from './vitals.resource';
+import styles from './vitals-overview.scss';
+import VitalsChart from './vitals-chart.component';
+import VitalsPagination from './vitals-pagination.component';
 
 interface VitalsOverviewProps {
   patientUuid: string;

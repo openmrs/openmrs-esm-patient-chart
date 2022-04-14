@@ -4,7 +4,6 @@ import filter from 'lodash-es/filter';
 import includes from 'lodash-es/includes';
 import map from 'lodash-es/map';
 import { useSWRConfig } from 'swr';
-import styles from './programs-form.scss';
 import { useTranslation } from 'react-i18next';
 import {
   createErrorHandler,
@@ -31,6 +30,7 @@ import {
   customRepresentation,
 } from './programs.resource';
 import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import styles from './programs-form.scss';
 
 const ProgramsForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patientUuid }) => {
   const { t } = useTranslation();
