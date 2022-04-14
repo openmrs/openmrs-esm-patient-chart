@@ -10,17 +10,19 @@ describe('FormResourceService Unit Tests', () => {
   let httpMock: HttpTestingController;
   let winRef: WindowRef;
 
-  beforeEach(waitForAsync(() => {
-    TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      declarations: [],
-      providers: [FormResourceService, LocalStorageService, WindowRef],
-    });
+  beforeEach(
+    waitForAsync(() => {
+      TestBed.configureTestingModule({
+        imports: [HttpClientTestingModule],
+        declarations: [],
+        providers: [FormResourceService, LocalStorageService, WindowRef],
+      });
 
-    formsResourceService = TestBed.get(FormResourceService);
-    httpMock = TestBed.get(HttpTestingController);
-    winRef = TestBed.get(WindowRef);
-  }));
+      formsResourceService = TestBed.get(FormResourceService);
+      httpMock = TestBed.get(HttpTestingController);
+      winRef = TestBed.get(WindowRef);
+    }),
+  );
 
   afterEach(() => {
     httpMock.verify();
