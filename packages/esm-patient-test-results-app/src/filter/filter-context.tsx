@@ -78,7 +78,7 @@ const FilterProvider = ({ roots, children }: FilterProviderProps) => {
   }, [activeTests, state.tests]);
 
   useEffect(() => {
-    if (roots?.length && !Object.keys(state?.checkboxes).length) {
+    if (roots?.length && !Object.keys(state?.parents).length) {
       actions.initialize(roots);
     }
   }, [actions, state, roots]);
