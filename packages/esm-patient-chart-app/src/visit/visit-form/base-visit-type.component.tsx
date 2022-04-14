@@ -55,7 +55,6 @@ const BaseVisitType: React.FC<BaseVisitTypeProps> = ({ onChange, visitTypes }) =
           <div className={styles.paginationContainer}>
             <PatientChartPagination
               pageNumber={currentPage}
-              pageUrl={null}
               totalItems={visitTypes?.length}
               currentItems={results.length}
               pageSize={5}
