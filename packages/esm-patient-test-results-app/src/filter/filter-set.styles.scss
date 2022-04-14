@@ -5,6 +5,7 @@
 .stickyFilterSet {
   position: sticky;
   top: 6.5rem;
+  overflow-y: hidden;
 }
 
 .filterSetHeader {
@@ -12,6 +13,10 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: $spacing-03;
+  background-color: $openmrs-background-grey;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 
   h4 {
     @include carbon--type-style("productive-heading-02");
@@ -23,6 +28,11 @@
     justify-content: flex-end;
     align-items: center;
   }
+}
+
+.filterSetContent {
+  max-height: calc(100vh - 9.5rem);
+  overflow-y: auto;
 }
 
 // background of filter, and spacing between containers

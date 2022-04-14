@@ -38,11 +38,13 @@ const FilterSet: React.FC<FilterSetProps> = ({ hideFilterSetHeader = false }) =>
           </div>
         </div>
       )}
-      {roots?.map((root, index) => (
-        <div className={styles.nestedAccordion}>
-          <FilterNode root={root} level={0} open={config.concepts[index].defaultOpen} />
-        </div>
-      ))}
+      <div className={styles.filterSetContent}>
+        {roots?.map((root, index) => (
+          <div className={styles.nestedAccordion}>
+            <FilterNode root={root} level={0} open={config.concepts[index].defaultOpen} />
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
