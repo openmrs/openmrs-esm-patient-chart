@@ -62,7 +62,7 @@ const FilterProvider = ({ roots, children, type, testUuid, basePath }: FilterPro
       updateBasePath: (basePath: string) => dispatch({ type: ReducerActionType.UPDATEBASEPATH, basePath }),
       resetTree: () => dispatch({ type: ReducerActionType.RESET_TREE }),
     }),
-    [dispatch],
+    [dispatch, basePath],
   );
 
   const activeTests = useMemo(() => {

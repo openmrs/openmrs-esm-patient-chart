@@ -58,7 +58,7 @@ const Trendline: React.FC<TrendlineProps> = ({ hideTrendlineHeader = false }) =>
       return [new Date(), new Date()];
     }
     return [new Date(), new Date(Date.parse(obs[obs.length - 1].obsDatetime))];
-  }, [obs, Date]);
+  }, [obs]);
 
   const setLowerRange = useCallback(
     (selectedLowerRange: Date) => {
@@ -75,7 +75,7 @@ const Trendline: React.FC<TrendlineProps> = ({ hideTrendlineHeader = false }) =>
     if (obs && obs.length && graph) {
       graph.insertBefore(graph.children[3], graph.childNodes[2]);
     }
-  }, [obs, document]);
+  }, [obs]);
 
   const data: Array<{
     date: Date;
@@ -162,7 +162,7 @@ const Trendline: React.FC<TrendlineProps> = ({ hideTrendlineHeader = false }) =>
           <span style="color: #c6c6c6; font-size: 0.75rem; font-weight:400">${formatDate(date)}</span></div>`,
       },
     }),
-    [bottomAxisTitle, leftAxisTitle, range, chartTitle, ScaleTypes, TickRotations, formatDate],
+    [bottomAxisTitle, leftAxisTitle, range, chartTitle],
   );
 
   const tableHeaderData = useMemo(
