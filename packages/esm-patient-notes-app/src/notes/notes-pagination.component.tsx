@@ -110,10 +110,10 @@ const NotesPagination: React.FC<FormsProps> = ({ notes, pageSize, pageUrl, urlLa
         pageNumber={currentPage}
         totalItems={notes.length}
         currentItems={paginatedNotes.length}
-        pageUrl={pageUrl}
         pageSize={pageSize}
         onPageNumberChange={({ page }) => goTo(page)}
-        urlLabel={urlLabel}
+        dashboardLinkUrl={pageUrl}
+        dashboardLinkLabel={urlLabel}
       />
     </>
   );

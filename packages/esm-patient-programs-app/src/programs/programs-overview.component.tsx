@@ -150,9 +150,9 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
           onPageNumberChange={({ page }) => goTo(page)}
           pageNumber={currentPage}
           pageSize={programsCount}
-          pageUrl={pageUrl}
           totalItems={enrollments.length}
-          urlLabel={urlLabel}
+          dashboardLinkUrl={pageUrl}
+          dashboardLinkLabel={urlLabel}
         />
       </div>
     );
