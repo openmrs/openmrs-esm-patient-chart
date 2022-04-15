@@ -1,8 +1,6 @@
 import React from 'react';
 import { ConfigurableLink } from '@openmrs/esm-framework';
 
-console.log("check");
-
 export interface DashboardExtensionProps {
   title: string;
   basePath: string;
