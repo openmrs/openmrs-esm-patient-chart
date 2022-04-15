@@ -21,7 +21,8 @@ interface PatientChartParams {
 }
 
 const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({ match }) => {
-  const { patientUuid, view } = match.params;
+  const { patientUuid, view: encodedView } = match.params;
+  const view = decodeURIComponent(encodedView);
   const { isLoading: isLoadingPatient, patient } = usePatientOrOfflineRegisteredPatient(patientUuid);
   const { windowSize, active } = useWorkspaceWindowSize();
   const state = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);

@@ -34,7 +34,7 @@ function setupOpenMRS() {
     },
     {
       path: `${spaBasePath}/:view`,
-      title: ([_, key]) => `${capitalize(key).replace(/_/g, ' ')} dashboard`,
+      title: ([_, key]) => `${decodeURIComponent(key)} dashboard`,
       parent: spaBasePath,
     },
   ]);
