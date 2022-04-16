@@ -120,6 +120,7 @@ export function launchPatientWorkspace(name: string, additionalProps?: object) {
     if (existingIdx >= 0) {
       const restOfWorkspaces = [...state.openWorkspaces];
       restOfWorkspaces.splice(existingIdx, 1);
+      state.openWorkspaces[existingIdx].additionalProps = newWorkspace.additionalProps;
       const openWorkspaces = [state.openWorkspaces[existingIdx], ...restOfWorkspaces];
       store.setState({ ...state, openWorkspaces });
     } else if (!promptCheckFcn || promptCheckFcn()) {
