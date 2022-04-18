@@ -32,19 +32,6 @@ export const esmPatientChartSchema = {
     _default: '/etl-latest/etl/patient/',
     _description: 'Custom URL to load resources required for showing recommended visit types',
   },
-  navGroup: {
-    _description: 'Only for the nav group extension.',
-    title: {
-      _type: Type.String,
-      _description: 'The title of the nav group.',
-      _default: 'My Group',
-    },
-    slotName: {
-      _type: Type.String,
-      _description: 'The name of the slot to create, which links can be added to.',
-      _default: 'my-group-nav-slot',
-    },
-  },
 };
 
 export interface ChartConfig {

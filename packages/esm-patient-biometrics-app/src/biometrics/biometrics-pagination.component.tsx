@@ -69,10 +69,10 @@ const BiometricsPagination: React.FC<BiometricsPaginationProps> = ({
         pageNumber={currentPage}
         totalItems={tableRows.length}
         currentItems={paginatedBiometrics.length}
-        pageUrl={pageUrl}
         pageSize={pageSize}
         onPageNumberChange={({ page }) => goTo(page)}
-        urlLabel={urlLabel}
+        dashboardLinkUrl={pageUrl}
+        dashboardLinkLabel={urlLabel}
       />
     </div>
   );

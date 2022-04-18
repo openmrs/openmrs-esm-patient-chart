@@ -8,7 +8,6 @@ export interface DashbardConfig {
 }
 
 export interface DashboardLinkConfig {
-  name: string;
   title: string;
 }
 
