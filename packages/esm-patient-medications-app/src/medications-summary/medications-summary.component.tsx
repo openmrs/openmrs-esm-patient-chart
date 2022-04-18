@@ -4,6 +4,8 @@ import { DataTableSkeleton } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { usePatientOrders } from '../api/api';
+import { useConfig } from '@openmrs/esm-framework';
+import { ConfigObject } from '../config-schema';
 
 export interface MedicationsSummaryProps {
   patientUuid: string;
@@ -11,19 +13,20 @@ export interface MedicationsSummaryProps {
 
 export default function MedicationsSummary({ patientUuid }: MedicationsSummaryProps) {
   const { t } = useTranslation();
+  const config = useConfig() as ConfigObject;
 
   const {
     data: activeOrders,
     isError: isErrorActiveOrders,
     isLoading: isLoadingActiveOrders,
     isValidating: isValidatingActiveOrders,
-  } = usePatientOrders(patientUuid, 'ACTIVE');
+  } = usePatientOrders(patientUuid, 'ACTIVE', config.careSettingUuid);
   const {
     data: pastOrders,
     isError: isErrorPastOrders,
     isLoading: isLoadingPastOrders,
     isValidating: isValidatingPastOrders,
-  } = usePatientOrders(patientUuid, 'any');
+  } = usePatientOrders(patientUuid, 'any', config.careSettingUuid);
 
   return (
     <>

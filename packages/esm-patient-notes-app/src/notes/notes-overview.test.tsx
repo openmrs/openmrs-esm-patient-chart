@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { openmrsFetch, useConfig, usePagination } from '@openmrs/esm-framework';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { mockVisitNotes, formattedVisitNotes } from '../../../../__mocks__/visit-notes.mock';
-import { patientChartBasePath, swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { patientChartBasePath, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import { ConfigMock } from '../../../../__mocks__/chart-widgets-config.mock';
 import NotesOverview from './notes-overview.component';
 
@@ -118,8 +118,6 @@ describe('NotesOverview: ', () => {
       expect(within(table).getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument(),
     );
 
-    expect(screen.getAllByRole('row').length).toEqual(6);
-
     // Expanding a row displays any associated visit notes
     userEvent.click(screen.getAllByRole('button', { name: /expand current row/i })[0]);
     expect(screen.getByText(/No visit note to display/i)).toBeInTheDocument();
@@ -131,5 +129,5 @@ describe('NotesOverview: ', () => {
 });
 
 function renderNotesOverview() {
-  swrRender(<NotesOverview {...testProps} />);
+  renderWithSwr(<NotesOverview {...testProps} />);
 }

@@ -20,7 +20,6 @@ export interface DashbardLayoutConfig {
 }
 
 export interface DashboardConfig {
-  name: string;
   slot: string;
   title: string;
   config: DashbardLayoutConfig;

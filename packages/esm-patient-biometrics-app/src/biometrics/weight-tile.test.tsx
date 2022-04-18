@@ -1,7 +1,7 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { getByTextWithMarkup, swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { getByTextWithMarkup, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { mockBiometricsResponse, mockConceptMetadata } from '../../../../__mocks__/biometrics.mock';
 import WeightTile from './weight-tile.component';
@@ -66,5 +66,5 @@ describe('WeightTile', () => {
 });
 
 function renderWeightTile() {
-  swrRender(<WeightTile {...testProps} />);
+  renderWithSwr(<WeightTile {...testProps} />);
 }

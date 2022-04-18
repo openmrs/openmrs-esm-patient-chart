@@ -1,5 +1,6 @@
 import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
+import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
 
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
@@ -16,7 +17,7 @@ function setupOpenMRS() {
     moduleName,
   };
 
-  defineConfigSchema(moduleName, {});
+  defineConfigSchema(moduleName, configSchema);
 
   return {
     extensions: [
@@ -60,7 +61,7 @@ function setupOpenMRS() {
       {
         name: 'order-basket-action-menu',
         slot: 'action-menu-items-slot',
-        load: getAsyncLifecycle(() => import('./medications-summary/order--basket-action-button.component'), options),
+        load: getAsyncLifecycle(() => import('./medications-summary/order-basket-action-button.component'), options),
         order: 0,
       },
     ],

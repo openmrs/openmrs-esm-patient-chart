@@ -1,6 +1,6 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { screen, render, act } from '@testing-library/react';
+import { screen, render, waitFor } from '@testing-library/react';
 import { of } from 'rxjs/internal/observable/of';
 import { createErrorHandler, showNotification, showToast, useConfig, useSessionUser } from '@openmrs/esm-framework';
 import { fetchDiagnosisByName, fetchLocationByUuid, fetchProviderByUuid, saveVisitNote } from './visit-notes.resource';
@@ -18,6 +18,7 @@ import VisitNotesForm from './visit-notes-form.component';
 const testProps = {
   patientUuid: mockPatient.id,
   closeWorkspace: jest.fn(),
+  promptBeforeClosing: jest.fn(),
 };
 
 const mockCreateErrorHandler = createErrorHandler as jest.Mock;
@@ -119,7 +120,6 @@ describe('Visit notes form: ', () => {
 
   describe('Form Submission: ', () => {
     it('renders a success toast notification upon successfully recording a visit note', async () => {
-      const promise = Promise.resolve();
       const successPayload = {
         encounterProviders: jasmine.arrayContaining([
           {
@@ -147,7 +147,8 @@ describe('Visit notes form: ', () => {
       userEvent.type(searchbox, 'Diabetes Mellitus');
       const targetSearchResult = screen.getByText(/^Diabetes Mellitus$/);
       expect(targetSearchResult).toBeInTheDocument();
-      userEvent.click(targetSearchResult);
+
+      await waitFor(() => userEvent.click(targetSearchResult));
 
       const clinicalNote = screen.getByRole('textbox', { name: /Write an additional note/i });
       userEvent.clear(clinicalNote);
@@ -155,16 +156,15 @@ describe('Visit notes form: ', () => {
       expect(clinicalNote).toHaveValue('Sample clinical note');
 
       const submitButton = screen.getByRole('button', { name: /Save and close/i });
-      userEvent.click(submitButton);
 
-      await act(() => promise);
+      await waitFor(() => userEvent.click(submitButton));
+
       expect(mockSaveVisitNote).toHaveBeenCalledTimes(1);
       expect(mockSaveVisitNote).toHaveBeenCalledWith(new AbortController(), jasmine.objectContaining(successPayload));
     });
   });
 
   it('renders an error notification if there was a problem recording a condition', async () => {
-    const promise = Promise.resolve();
     const error = {
       message: 'Internal Server Error',
       response: {
@@ -181,7 +181,8 @@ describe('Visit notes form: ', () => {
     userEvent.type(searchbox, 'Diabetes Mellitus');
     const targetSearchResult = screen.getByText(/^Diabetes Mellitus$/);
     expect(targetSearchResult).toBeInTheDocument();
-    userEvent.click(targetSearchResult);
+
+    await waitFor(() => userEvent.click(targetSearchResult));
 
     const clinicalNote = screen.getByRole('textbox', { name: /Write an additional note/i });
     userEvent.clear(clinicalNote);
@@ -189,9 +190,8 @@ describe('Visit notes form: ', () => {
     expect(clinicalNote).toHaveValue('Sample clinical note');
 
     const submitButton = screen.getByRole('button', { name: /Save and close/i });
-    userEvent.click(submitButton);
 
-    await act(() => promise);
+    await waitFor(() => userEvent.click(submitButton));
 
     expect(mockCreateErrorHandler).toHaveBeenCalledTimes(1);
     expect(mockShowNotification).toHaveBeenCalledTimes(1);

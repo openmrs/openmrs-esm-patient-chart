@@ -3,7 +3,7 @@ import { screen, within } from '@testing-library/react';
 import { openmrsFetch, useConfig, usePagination } from '@openmrs/esm-framework';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { mockVisitNotes, formattedVisitNotes } from '../../../../__mocks__/visit-notes.mock';
-import { patientChartBasePath, swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { patientChartBasePath, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import NotesDetailedSummary from './notes-detailed-summary.component';
 import { ConfigMock } from '../../../../__mocks__/chart-widgets-config.mock';
 
@@ -115,10 +115,10 @@ describe('NotesDetailedSummary: ', () => {
       expect(within(table).getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument(),
     );
 
-    expect(screen.getAllByRole('row').length).toEqual(6);
+    expect(screen.getAllByRole('row').length).toEqual(11);
   });
 });
 
 function renderNotesDetailedSummary() {
-  swrRender(<NotesDetailedSummary {...testProps} />);
+  renderWithSwr(<NotesDetailedSummary {...testProps} />);
 }

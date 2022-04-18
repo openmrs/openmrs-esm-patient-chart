@@ -1,10 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { ExtensionSlot, usePatient, useVisit } from '@openmrs/esm-framework';
-import { DefaultWorkspaceProps, FormEntryProps, formEntrySub } from '@openmrs/esm-patient-common-lib';
+import { ExtensionSlot, usePatient } from '@openmrs/esm-framework';
+import {
+  DefaultWorkspaceProps,
+  FormEntryProps,
+  formEntrySub,
+  usePatientOrOfflineRegisteredPatient,
+  useVisitOrOfflineVisit,
+} from '@openmrs/esm-patient-common-lib';
 
 const FormEntry: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace }) => {
-  const { patient } = usePatient(patientUuid);
-  const { currentVisit } = useVisit(patientUuid);
+  const { patient } = usePatientOrOfflineRegisteredPatient(patientUuid);
+  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const [selectedForm, setSelectedForm] = useState<FormEntryProps>(null);
 
   useEffect(() => {

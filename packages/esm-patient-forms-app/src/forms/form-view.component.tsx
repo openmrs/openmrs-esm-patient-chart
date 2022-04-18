@@ -4,7 +4,7 @@ import EmptyFormView from './empty-form.component';
 import isEmpty from 'lodash-es/isEmpty';
 import first from 'lodash-es/first';
 import debounce from 'lodash-es/debounce';
-import { formatDatetime, useConfig, useLayoutType, usePagination, useVisit, Visit } from '@openmrs/esm-framework';
+import { formatDatetime, useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
@@ -19,7 +19,7 @@ import {
   DataTableHeader,
   DataTableRow,
 } from 'carbon-components-react';
-import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
+import { PatientChartPagination, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import { CompletedFormInfo } from '../types';
 import Edit20 from '@carbon/icons-react/es/edit/20';
 import { ConfigObject } from '../config-schema';
@@ -39,7 +39,7 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
   const config = useConfig() as ConfigObject;
   const htmlFormEntryForms = config.htmlFormEntryForms;
   const isDesktop = useLayoutType() === 'desktop';
-  const { currentVisit } = useVisit(patientUuid);
+  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const [searchTerm, setSearchTerm] = useState<string>(null);
   const [allFormInfos, setAllFormInfos] = useState<Array<CompletedFormInfo>>(forms);
   const { results, goTo, currentPage } = usePagination(
@@ -167,10 +167,10 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
               pageNumber={currentPage}
               totalItems={allFormInfos.length}
               currentItems={results.length}
-              pageUrl={pageUrl}
               pageSize={pageSize}
               onPageNumberChange={({ page }) => goTo(page)}
-              urlLabel={urlLabel}
+              dashboardLinkUrl={pageUrl}
+              dashboardLinkLabel={urlLabel}
             />
           </>
         )}

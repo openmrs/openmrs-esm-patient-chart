@@ -38,7 +38,7 @@ jest.mock('react-router-dom', () => {
 const testProps = {
   patient: mockPatient,
   patientUuid: mockPatient.id,
-  view: 'summary',
+  view: 'Patient Summary',
 };
 
 function slotMetaFromStore(store, slotName) {
@@ -58,7 +58,6 @@ describe('ChartReview: ', () => {
             {
               name: 'charts-summary-dashboard',
               meta: {
-                name: 'summary',
                 slot: 'patient-chart-summary-dashboard-slot',
                 config: {
                   columns: 4,
@@ -69,7 +68,6 @@ describe('ChartReview: ', () => {
             {
               name: 'test-results-summary-dashboard',
               meta: {
-                name: 'test-results',
                 slot: 'patient-chart-test-results-dashboard-slot',
                 config: {
                   columns: 1,

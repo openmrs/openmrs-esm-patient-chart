@@ -1,8 +1,15 @@
-import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
+import {
+  defineConfigSchema,
+  getAsyncLifecycle,
+  getSyncLifecycle,
+  registerBreadcrumbs,
+  subscribePrecacheStaticDependencies,
+} from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
 import { setupPatientFormSync } from './offline';
+import { precacheAllOfflineForms } from './offline-forms/offline-form-helpers';
 import OfflineToolsNavLink from './offline-forms/offline-tools-nav-link.component';
 
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
@@ -30,6 +37,8 @@ function setupOpenMRS() {
   ]);
 
   setupPatientFormSync();
+
+  subscribePrecacheStaticDependencies(precacheAllOfflineForms);
 
   return {
     extensions: [

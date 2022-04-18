@@ -3,7 +3,7 @@ import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
 import { mockEnrolledProgramsResponse } from '../../../../__mocks__/programs.mock';
-import { swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import ProgramsDetailedSummary from './programs-detailed-summary.component';
 
@@ -100,5 +100,5 @@ describe('ProgramsDetailedSummary ', () => {
 });
 
 function renderProgramsOverview() {
-  swrRender(<ProgramsDetailedSummary />);
+  renderWithSwr(<ProgramsDetailedSummary />);
 }
