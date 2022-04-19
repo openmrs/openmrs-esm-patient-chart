@@ -72,12 +72,12 @@ const CameraUpload: React.FC<CameraUploadProps> = ({ onSavePhoto, onTakePhoto, c
           <>
             {!error && <Camera onTakePhoto={handleTakePhoto} onCameraStart={setMediaStream} onCameraError={setError} />}
             <div>
-              <label htmlFor="uploadPhoto" className={styles.choosePhoto}>
-                {t('selectPhoto', 'Select local photo instead')}
+              <label htmlFor="uploadPhotoOrPdf" className={styles.choosePhotoOrPdf}>
+                {t('selectPhotoOrPdf', 'Select local photo or Pdf instead')}
               </label>
               <input
                 type="file"
-                id="uploadPhoto"
+                id="uploadPhotoOrPdf"
                 accept="image/*, application/pdf"
                 className={styles.uploadFile}
                 onChange={upload}
