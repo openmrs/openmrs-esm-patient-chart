@@ -53,7 +53,7 @@ const CameraUpload: React.FC<CameraUploadProps> = ({ onSavePhoto, onTakePhoto, c
     };
   }, []);
 
-  const willSaveImage = useCallback(
+  const willSaveImageOrPdf = useCallback(
     (dataUri: string, caption: string) => onSavePhoto?.(dataUri, caption),
     [onSavePhoto],
   );
@@ -65,7 +65,7 @@ const CameraUpload: React.FC<CameraUploadProps> = ({ onSavePhoto, onTakePhoto, c
           <ImagePreview
             content={dataUri}
             onCancelCapture={clearCamera}
-            onSaveImage={willSaveImage}
+            onSaveImageOrPdf={willSaveImageOrPdf}
             collectCaption={collectCaption}
           />
         ) : (
