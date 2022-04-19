@@ -53,7 +53,7 @@ const CameraUpload: React.FC<CameraUploadProps> = ({ onSavePhoto, onTakePhoto, c
     };
   }, []);
 
-  const willSaveImageOrPdf = useCallback(
+  const willSaveAttachment = useCallback(
     (dataUri: string, caption: string) => onSavePhoto?.(dataUri, caption),
     [onSavePhoto],
   );
@@ -65,19 +65,19 @@ const CameraUpload: React.FC<CameraUploadProps> = ({ onSavePhoto, onTakePhoto, c
           <ImagePreview
             content={dataUri}
             onCancelCapture={clearCamera}
-            onSaveImageOrPdf={willSaveImageOrPdf}
+            onSaveImageOrPdf={willSaveAttachment}
             collectCaption={collectCaption}
           />
         ) : (
           <>
             {!error && <Camera onTakePhoto={handleTakePhoto} onCameraStart={setMediaStream} onCameraError={setError} />}
             <div>
-              <label htmlFor="uploadPhotoOrPdf" className={styles.choosePhotoOrPdf}>
-                {t('selectPhotoOrPdf', 'Select local photo or Pdf instead')}
+              <label htmlFor="uploadFile" className={styles.choosePhotoOrPdf}>
+                {t('selectFile', 'Select local File instead')}
               </label>
               <input
                 type="file"
-                id="uploadPhotoOrPdf"
+                id="uploadFile"
                 accept="image/*, application/pdf"
                 className={styles.uploadFile}
                 onChange={upload}

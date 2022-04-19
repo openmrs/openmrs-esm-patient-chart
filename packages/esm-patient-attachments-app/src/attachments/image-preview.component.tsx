@@ -4,14 +4,14 @@ import { UserHasAccess } from '@openmrs/esm-framework';
 import { Button, ButtonSet, TextInput } from 'carbon-components-react';
 import styles from './image-preview.scss';
 
-interface ImageOrPdfPreviewProps {
+interface FilePreviewProps {
   content: string;
   collectCaption: boolean;
   onSaveImageOrPdf?(dataUri: string, caption: string): void;
   onCancelCapture?(): void;
 }
 
-export default function ImagePreview(props: ImageOrPdfPreviewProps) {
+export default function FilePreview(props: FilePreviewProps) {
   const [saving, setSaving] = useState(false);
   const [caption, setCaption] = useState('');
   const { t } = useTranslation();

@@ -9,6 +9,6 @@
   "delete": "Delete",
   "deleteSelected": "Delete selected",
   "save": "Save",
-  "selectPhoto": "Select local photo instead",
+  "selectFile": "Select local file instead",
   "webcamPreview": "Webcam preview"
 }
