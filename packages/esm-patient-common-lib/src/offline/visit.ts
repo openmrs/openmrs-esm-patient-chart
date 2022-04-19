@@ -4,7 +4,7 @@ import {
   QueueItemDescriptor,
   queueSynchronizationItem,
   useConnectivity,
-  useSessionUser,
+  useSession,
   useVisit,
   Visit,
 } from '@openmrs/esm-framework';
@@ -67,7 +67,7 @@ export function useOfflineVisit(patientUuid: string): ReturnType<typeof useVisit
  */
 export function useAutoCreatedOfflineVisit(patientUuid: string, offlineVisitTypeUuid: string) {
   const isOnline = useConnectivity();
-  const location = useSessionUser()?.sessionLocation?.uuid;
+  const location = useSession()?.sessionLocation?.uuid;
   const { currentVisit, isValidating, error, mutate } = useOfflineVisit(patientUuid);
 
   useEffect(() => {

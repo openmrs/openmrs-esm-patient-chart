@@ -9,7 +9,7 @@ import {
   createErrorHandler,
   showNotification,
   showToast,
-  useSessionUser,
+  useSession,
   useLocations,
   useLayoutType,
 } from '@openmrs/esm-framework';
@@ -35,7 +35,7 @@ import styles from './programs-form.scss';
 const ProgramsForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patientUuid }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const session = useSessionUser();
+  const session = useSession();
   const availableLocations = useLocations();
   const { mutate } = useSWRConfig();
 

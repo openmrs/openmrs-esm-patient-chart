@@ -1,6 +1,6 @@
 import React, { SyntheticEvent, useEffect, useState } from 'react';
 import styles from './immunizations-form.scss';
-import { showNotification, showToast, useSessionUser, useVisit, useLayoutType } from '@openmrs/esm-framework';
+import { showNotification, showToast, useSession, useVisit, useLayoutType } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { savePatientImmunization } from './immunizations.resource';
 import { mapToFHIRImmunizationResource } from './immunization-mapper';
@@ -53,7 +53,7 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
     setFormState((state) => ({ ...state, [name]: value }));
 
   const { t } = useTranslation();
-  const currentUser = useSessionUser();
+  const currentUser = useSession();
   const { currentVisit } = useVisit(patientUuid);
   const isTablet = useLayoutType() === 'tablet';
 
