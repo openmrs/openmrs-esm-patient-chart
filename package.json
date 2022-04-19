@@ -19,7 +19,7 @@
   },
   "devDependencies": {
     "@jsenv/file-size-impact": "12.1.1",
-    "@openmrs/esm-framework": "^3.2.1-pre.1134",
+    "@openmrs/esm-framework": "next",
     "@swc/cli": "^0.1.57",
     "@swc/core": "^1.2.165",
     "@swc/jest": "^0.2.20",
