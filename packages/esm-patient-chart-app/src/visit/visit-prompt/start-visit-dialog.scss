@@ -3,16 +3,11 @@
 @import "~carbon-components/src/globals/scss/mixins";
 
 .header {
-  @include carbon--type-style('productive-heading-03');
+  @include carbon--type-style("productive-heading-03");
   color: $text-01;
 }
 
 .body {
-  @include carbon--type-style('body-long-01');
+  @include carbon--type-style("body-long-01");
   color: $text-01;
-}
-
-.footer {
-  width: 75%;
-  justify-self: flex-end;
 }

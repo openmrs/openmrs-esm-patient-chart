@@ -162,6 +162,27 @@ function setupOpenMRS() {
           moduleName,
         }),
       },
+      {
+        name: 'cancel-visit-dialog',
+        load: getAsyncLifecycle(() => import('./visit/visit-prompt/cancel-visit-dialog.component'), {
+          featureName: 'cancel visit',
+          moduleName,
+        }),
+      },
+      {
+        name: 'start-visit-dialog',
+        load: getAsyncLifecycle(() => import('./visit/visit-prompt/start-visit-dialog.component'), {
+          featureName: 'start visit',
+          moduleName,
+        }),
+      },
+      {
+        id: 'end-visit-dialog',
+        load: getAsyncLifecycle(() => import('./visit/visit-prompt/end-visit-dialog.component'), {
+          featureName: 'end visit',
+          moduleName,
+        }),
+      },
     ],
   };
 }

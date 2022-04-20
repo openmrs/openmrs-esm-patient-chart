@@ -2,8 +2,15 @@ import React from 'react';
 import AddPastVisitOverflowMenuItem from './add-past-visit.component';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { showModal } from '@openmrs/esm-framework';
 
-const mockDispatchEvent = jest.spyOn(window, 'dispatchEvent');
+const mockShowModal = showModal as jest.Mock;
+
+jest.mock('@openmrs/esm-framework', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-framework');
+  return { originalModule, showModal: jest.fn() };
+});
+
 describe('AddPastVisitOverflowMenuItem', () => {
   it('should launch past visit prompt', () => {
     render(<AddPastVisitOverflowMenuItem />);
@@ -13,7 +20,6 @@ describe('AddPastVisitOverflowMenuItem', () => {
 
     // should launch the form
     userEvent.click(addPastVisitButton);
-
-    expect(mockDispatchEvent).toHaveBeenCalledTimes(1);
+    expect(mockShowModal).toHaveBeenCalled();
   });
 });
