@@ -4,12 +4,13 @@ import { Tab, Tabs } from 'carbon-components-react';
 import { LineChart } from '@carbon/charts-react';
 import { LineChartOptions } from '@carbon/charts/interfaces/charts';
 import { ScaleTypes } from '@carbon/charts/interfaces/enums';
-import { formatDate } from '@openmrs/esm-framework';
+import { formatDate, parseDate } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { ConfigObject } from '../config-schema';
+import { PatientBiometrics } from './biometrics.resource';
 
 interface BiometricsChartProps {
-  patientBiometrics: Array<any>;
+  patientBiometrics: Array<PatientBiometrics>;
   conceptUnits: Map<string, string>;
   config: ConfigObject;
 }
@@ -36,12 +37,14 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
       patientBiometrics
         .filter((biometric) => biometric[selectedBiometrics.value])
         .splice(0, 10)
+        .sort((BiometricA, BiometricB) => new Date(BiometricA.date).getTime() - new Date(BiometricB.date).getTime())
         .map((biometric) => {
           return (
             biometric[selectedBiometrics.value] && {
               group: selectedBiometrics.groupName,
               key: formatDate(new Date(biometric.date), { mode: 'wide', year: false, time: false }),
               value: biometric[selectedBiometrics.value],
+              date: biometric.date,
             }
           );
         }),
@@ -69,6 +72,14 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
       color: {
         scale: chartColors,
       },
+      tooltip: {
+        customHTML: ([{ value, date }]) =>
+          `<div class="bx--tooltip bx--tooltip--shown" style="min-width: max-content; font-weight:600">${formatDate(
+            parseDate(date),
+            { year: true },
+          )} - 
+          <span style="color: #c6c6c6; font-size: 1rem; font-weight:400">${value}</span></div>`,
+      },
     };
   }, [selectedBiometrics]);
   return (
@@ -84,6 +95,7 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
             { id: 'bmi', label: `BMI (${bmiUnit})` },
           ].map(({ id, label }) => (
             <Tab
+              key={id}
               className={`${styles.tab} ${styles.bodyLong01} ${
                 selectedBiometrics.title === label && styles.selectedTab
               }`}
