@@ -68,10 +68,10 @@ const VitalsPagination: React.FC<VitalsPaginationProps> = ({
         pageNumber={currentPage}
         totalItems={tableRows.length}
         currentItems={paginatedVitals.length}
-        pageUrl={pageUrl}
         pageSize={pageSize}
         onPageNumberChange={({ page }) => goTo(page)}
-        urlLabel={urlLabel}
+        dashboardLinkUrl={pageUrl}
+        dashboardLinkLabel={urlLabel}
       />
     </div>
   );

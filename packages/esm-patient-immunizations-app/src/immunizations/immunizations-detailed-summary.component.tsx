@@ -167,9 +167,9 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
         pageSize={10}
         onPageNumberChange={({ page }) => goTo(page)}
         pageNumber={currentPage}
-        pageUrl={pageUrl}
         currentItems={paginatedImmunizations?.length}
-        urlLabel={urlLabel}
+        dashboardLinkUrl={pageUrl}
+        dashboardLinkLabel={urlLabel}
       />
     </div>;
   }

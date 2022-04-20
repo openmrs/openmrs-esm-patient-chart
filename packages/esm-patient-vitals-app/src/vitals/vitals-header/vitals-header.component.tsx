@@ -39,7 +39,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
   const config = useConfig() as ConfigObject;
   const { t } = useTranslation();
   const { data: conceptUnits, conceptMetadata } = useVitalsConceptMetadata();
-  const { vitals, isLoading } = useVitals(patientUuid, true);
+  const { vitals, isLoading, isValidating } = useVitals(patientUuid, true);
   const latestVitals = vitals?.[0];
   const [showDetailsPanel, setShowDetailsPanel] = useState(false);
   const toggleDetailsPanel = () => setShowDetailsPanel(!showDetailsPanel);
@@ -79,6 +79,9 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
               {t('lastRecorded', 'Last recorded')}: {formatDate(parseDate(latestVitals?.date), { mode: 'wide' })}
             </span>
           </span>
+          <div className={styles.backgroundDataFetchingIndicator}>
+            <span>{isValidating ? <InlineLoading /> : null}</span>
+          </div>
           <div className={styles['button-container']}>
             <Button
               className={styles['record-vitals']}

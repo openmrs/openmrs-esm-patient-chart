@@ -5,7 +5,7 @@ import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { mockConditions, mockFhirConditionsResponse } from '../../../../__mocks__/conditions.mock';
-import { patientChartBasePath, swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { patientChartBasePath, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import ConditionsOverview from './conditions-overview.component';
 
 const testProps = {
@@ -128,5 +128,5 @@ describe('ConditionsOverview: ', () => {
 });
 
 function renderConditionsOverview() {
-  swrRender(<ConditionsOverview {...testProps} />);
+  renderWithSwr(<ConditionsOverview {...testProps} />);
 }

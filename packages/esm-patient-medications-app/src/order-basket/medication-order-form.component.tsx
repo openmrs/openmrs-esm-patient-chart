@@ -20,11 +20,11 @@ import {
 } from 'carbon-components-react';
 import ArrowLeft24 from '@carbon/icons-react/es/arrow--left/24';
 import { useTranslation } from 'react-i18next';
-import { useLayoutType } from '@openmrs/esm-framework';
+import { useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { OrderBasketItem } from '../types/order-basket-item';
-import { daysDurationUnit } from '../constants';
 import { getCommonMedicationByUuid } from '../api/common-medication';
 import { OpenmrsResource } from '../types/openmrs-resource';
+import { ConfigObject } from '../config-schema';
 
 export interface MedicationOrderFormProps {
   initialOrderBasketItem: OrderBasketItem;
@@ -44,7 +44,7 @@ export default function MedicationOrderForm({
   const isTablet = useLayoutType() === 'tablet';
   const [orderBasketItem, setOrderBasketItem] = useState(initialOrderBasketItem);
   const commonMedication = getCommonMedicationByUuid(orderBasketItem.drug.uuid);
-
+  const config = useConfig() as ConfigObject;
   return (
     <>
       <div className={styles.medicationDetailsHeader}>
@@ -334,7 +334,7 @@ export default function MedicationOrderForm({
                         })
                       : setOrderBasketItem({
                           ...orderBasketItem,
-                          durationUnit: daysDurationUnit,
+                          durationUnit: config.daysDurationUnit,
                         })
                   }
                 />

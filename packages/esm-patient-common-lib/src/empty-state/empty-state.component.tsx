@@ -31,7 +31,9 @@ export const EmptyState: React.FC<EmptyStateProps> = (props) => {
           <span>
             {' '}
             <Link onClick={() => props.launchForm()}>
-              {t('record', 'Record')} {props.displayText.toLowerCase()}
+              <>
+                {t('record', 'Record')} {props.displayText.toLowerCase()}
+              </>
             </Link>
           </span>
         )}

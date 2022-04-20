@@ -3,7 +3,7 @@ import { screen } from '@testing-library/react';
 import { within } from '@testing-library/dom';
 import userEvent from '@testing-library/user-event';
 import { openmrsFetch, useConfig, usePagination } from '@openmrs/esm-framework';
-import { swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import ObsSwitchable from './obs-switchable.component';
 import { ConfigObject } from '../config-schema';
 import { mockWeightAndViralLoadResult } from '../../../../__mocks__/generic-widgets.mock';
@@ -130,5 +130,5 @@ describe('Switchable obs viewer: ', () => {
 });
 
 function renderObsSwitchable() {
-  swrRender(<ObsSwitchable patientUuid={'foo-patient-123'} />);
+  renderWithSwr(<ObsSwitchable patientUuid={'foo-patient-123'} />);
 }

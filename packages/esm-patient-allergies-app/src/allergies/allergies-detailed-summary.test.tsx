@@ -3,7 +3,7 @@ import { screen } from '@testing-library/react';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { mockFhirAllergyIntoleranceResponse } from '../../../../__mocks__/allergies.mock';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
-import { swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import AllergiesDetailedSummary from './allergies-detailed-summary.component';
 
 const testProps = {
@@ -78,5 +78,5 @@ describe('AllergiesDetailedSummary: ', () => {
 });
 
 function renderAllergiesDetailedSummary() {
-  swrRender(<AllergiesDetailedSummary {...testProps} />);
+  renderWithSwr(<AllergiesDetailedSummary {...testProps} />);
 }

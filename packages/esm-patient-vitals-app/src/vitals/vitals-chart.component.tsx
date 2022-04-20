@@ -6,10 +6,10 @@ import { PatientVitals } from './vitals.resource';
 import { LineChart } from '@carbon/charts-react';
 import { LineChartOptions } from '@carbon/charts/interfaces/charts';
 import { ScaleTypes } from '@carbon/charts/interfaces/enums';
+import { formatDate, parseDate } from '@openmrs/esm-framework';
 import { withUnit } from '@openmrs/esm-patient-common-lib';
 import '@carbon/charts/styles.css';
 import { ConfigObject } from '../config-schema';
-import { formatDate, parseDate } from '@openmrs/esm-framework';
 
 interface vitalsChartData {
   title: string;

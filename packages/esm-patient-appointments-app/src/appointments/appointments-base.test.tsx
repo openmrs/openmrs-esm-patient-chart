@@ -4,7 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { mockAppointmentsData } from '../../../../__mocks__/appointments.mock';
-import { patientChartBasePath, swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { patientChartBasePath, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import AppointmentsBase from './appointments-base.component';
 
 const testProps = {
@@ -105,5 +105,5 @@ describe('AppointmensOverview', () => {
 });
 
 function renderAppointments() {
-  swrRender(<AppointmentsBase {...testProps} />);
+  renderWithSwr(<AppointmentsBase {...testProps} />);
 }

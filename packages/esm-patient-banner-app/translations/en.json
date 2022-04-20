@@ -4,6 +4,7 @@
   "address": "Address",
   "contactDetails": "Contact Details",
   "deceased": "Deceased",
+  "loading": "Loading...",
   "relationships": "Relationships",
   "showAllDetails": "Show all details",
   "showLess": "Show less",

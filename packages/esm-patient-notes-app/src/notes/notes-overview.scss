@@ -35,8 +35,7 @@
   margin: 0.5rem 0;
 }
 
-.pagination {
-  :first-child {
-    border-top: none;
-  }
+
+.hiddenRow {
+  display: none;
 }

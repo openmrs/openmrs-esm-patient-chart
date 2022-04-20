@@ -1,8 +1,9 @@
 import React from 'react';
 import { screen } from '@testing-library/react';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import ContactDetails from './contact-details.component';
+import * as usePatientContactAttributeMock from '../hooks/usePatientAttributes';
 
 const testProps = {
   address: [
@@ -49,10 +50,26 @@ const mockRelationships = [
   },
 ];
 
+const personAttributeMock = [
+  {
+    display: 'Next of Kin Contact Phone Number = 0000000000',
+    uuid: '1de1ac71-68e8-4a08-a7e2-5042093d4e46',
+    value: '0700-000-000',
+    attributeType: {
+      uuid: 'a657a4f1-9c0f-444b-a1fd-445bb91dd12d',
+      display: 'Next of Kin Contact Phone Number',
+    },
+  },
+];
+
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 
 describe('ContactDetails: ', () => {
   it('renders an empty state view when relationships data is not available', async () => {
+    spyOn(usePatientContactAttributeMock, 'usePatientContactAttributes').and.returnValue({
+      isLoading: false,
+      contactAttributes: personAttributeMock,
+    });
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
 
     renderContactDetails();
@@ -65,6 +82,10 @@ describe('ContactDetails: ', () => {
   });
 
   it("renders the patient's address, contact details and relationships when available", async () => {
+    spyOn(usePatientContactAttributeMock, 'usePatientContactAttributes').and.returnValue({
+      isLoading: false,
+      contactAttributes: personAttributeMock,
+    });
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockRelationships } });
 
     renderContactDetails();
@@ -77,10 +98,16 @@ describe('ContactDetails: ', () => {
     expect(screen.getByText(/Amanda Robinson/)).toBeInTheDocument();
     expect(screen.getByText(/Sibling/i)).toBeInTheDocument();
     expect(screen.getByText(/24 yrs/i)).toBeInTheDocument();
+    expect(screen.getByText(/Next of Kin Contact Phone Number/i)).toBeInTheDocument();
+    expect(screen.getByText(/0700-000-000/)).toBeInTheDocument();
   });
 
   it('renders an empty state view when address and contact details is not available', () => {
-    swrRender(<ContactDetails address={null} telecom={null} patientId={'some-uuid'} />);
+    renderWithSwr(<ContactDetails address={null} telecom={null} patientId={'some-uuid'} />);
+    spyOn(usePatientContactAttributeMock, 'usePatientContactAttributes').and.returnValue({
+      isLoading: false,
+      contactAttributes: [],
+    });
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
 
     expect(screen.getByText('Address')).toBeInTheDocument();
@@ -90,5 +117,5 @@ describe('ContactDetails: ', () => {
 });
 
 function renderContactDetails() {
-  swrRender(<ContactDetails {...testProps} />);
+  renderWithSwr(<ContactDetails {...testProps} />);
 }

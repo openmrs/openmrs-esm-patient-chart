@@ -7,6 +7,7 @@ import { FormResourceService } from '../openmrs-api/form-resource.service';
 import { FormSchemaCompiler } from '@ampath-kenya/ngx-formentry';
 import { LocalStorageService } from '../local-storage/local-storage.service';
 import { FormSchema } from '../types';
+import { Form } from '@ampath-kenya/ngx-formentry/form-entry/form-factory/form';
 
 @Injectable()
 export class FormSchemaService {
@@ -55,6 +56,10 @@ export class FormSchemaService {
       );
     }
     return formSchema;
+  }
+
+  public getUnlabeledConcepts(form: Form): any {
+    return this.traverseForUnlabeledConcepts(form.rootNode);
   }
 
   private getCachedCompiledSchemaByUuid(formUuid: string): any {
@@ -186,5 +191,55 @@ export class FormSchemaService {
       formUuids.push(value.ref.uuid);
     });
     return formUuids;
+  }
+
+  private traverseForUnlabeledConcepts(o, type?) {
+    let concepts = [];
+    if (o.children) {
+      if (o.children instanceof Array) {
+        const returned = this.traverseRepeatingGroupForUnlabeledConcepts(o.children);
+        return returned;
+      }
+      if (o.children instanceof Object) {
+        for (const key in o.children) {
+          if (o.children.hasOwnProperty(key)) {
+            const question = o.children[key].question;
+            switch (question.renderingType) {
+              case 'page':
+              case 'section':
+              case 'group':
+                const childrenConcepts = this.traverseForUnlabeledConcepts(o.children[key]);
+                concepts = concepts.concat(childrenConcepts);
+                break;
+              case 'repeating':
+                const repeatingConcepts = this.traverseRepeatingGroupForUnlabeledConcepts(o.children[key].children);
+                concepts = concepts.concat(repeatingConcepts);
+                break;
+              default:
+                if (!question.label && question.extras.questionOptions?.concept) {
+                  concepts.push(question.extras.questionOptions.concept);
+                }
+                if (question.extras.questionOptions.answers) {
+                  question.extras.questionOptions.answers.forEach((answer) => {
+                    if (!answer.label) {
+                      concepts.push(answer.concept);
+                    }
+                  });
+                }
+                break;
+            }
+          }
+        }
+      }
+    }
+    return concepts;
+  }
+
+  private traverseRepeatingGroupForUnlabeledConcepts(nodes) {
+    const toReturn = [];
+    for (const node of nodes) {
+      toReturn.push(this.traverseForUnlabeledConcepts(node));
+    }
+    return toReturn;
   }
 }

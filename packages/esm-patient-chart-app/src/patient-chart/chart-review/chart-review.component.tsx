@@ -6,7 +6,7 @@ import { basePath } from '../../constants';
 import { DashboardView, DashboardConfig } from './dashboard-view.component';
 
 function makePath(target: DashboardConfig, params: Record<string, string> = {}) {
-  const parts = `${basePath}/${target.name}`.split('/');
+  const parts = `${basePath}/${encodeURIComponent(target.title)}`.split('/');
 
   Object.keys(params).forEach((key) => {
     for (let i = 0; i < parts.length; i++) {
@@ -17,6 +17,10 @@ function makePath(target: DashboardConfig, params: Record<string, string> = {}) 
   });
 
   return parts.join('/');
+}
+
+function getDashboardDefinition(meta, config) {
+  return { ...meta, ...config };
 }
 
 interface ChartReviewProps {
@@ -33,16 +37,18 @@ const ChartReview: React.FC<ChartReviewProps> = ({ patientUuid, patient, view })
     return null;
   }
 
-  const ungroupedDashboards = extensionStore.slots['patient-chart-dashboard-slot'].assignedExtensions.map(
-    (e) => e.meta,
+  const ungroupedDashboards = extensionStore.slots['patient-chart-dashboard-slot'].assignedExtensions.map((e) =>
+    getDashboardDefinition(e.meta, e.config),
   );
   const groupedDashboards = navGroups
-    .map((slotName) => extensionStore.slots[slotName].assignedExtensions.map((e) => e.meta))
+    .map((slotName) =>
+      extensionStore.slots[slotName].assignedExtensions.map((e) => getDashboardDefinition(e.meta, e.config)),
+    )
     .flat();
   const dashboards = ungroupedDashboards.concat(groupedDashboards) as Array<DashboardConfig>;
 
   const defaultDashboard = dashboards[0];
-  const dashboard = dashboards.find((dashboard) => dashboard.name === view);
+  const dashboard = dashboards.find((dashboard) => dashboard.title === view);
 
   if (!defaultDashboard) {
     return null;

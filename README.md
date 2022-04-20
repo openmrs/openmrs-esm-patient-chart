@@ -85,7 +85,7 @@ The **side menu** provides access to features that do not have their own pages, 
 
 ## Configuration
 
-Please see the [Implementer Documentation](https://wiki.openmrs.org/display/projects/Frontend+3.0+Documentation+for+Implementers#Frontend3.0DocumentationforImplementers-Configuringtheapplication)
+Please see the [Implementer Documentation](https://wiki.openmrs.org/display/projects/3.x+Implementer+Documentation#id-3.xImplementerDocumentation-Part2:ConfigureYourO3Application)
 for information about configuring modules.
 
 ## Deployment

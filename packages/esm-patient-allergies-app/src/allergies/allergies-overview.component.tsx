@@ -114,9 +114,9 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient, showAddA
           onPageNumberChange={({ page }) => goTo(page)}
           pageNumber={currentPage}
           pageSize={allergiesCount}
-          pageUrl={pageUrl}
+          dashboardLinkUrl={pageUrl}
+          dashboardLinkLabel={urlLabel}
           totalItems={allergies.length}
-          urlLabel={urlLabel}
         />
       </div>
     );

@@ -5,7 +5,7 @@ import { attach, openmrsFetch } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { mockFhirConditionsResponse } from '../../../../__mocks__/conditions.mock';
-import { swrRender, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import ConditionsDetailedSummary from './conditions-detailed-summary.component';
 
 const mockAttach = attach as jest.Mock;
@@ -101,5 +101,5 @@ it('clicking the Add button or Record Conditions link launches the conditions fo
 });
 
 function renderConditionsDetailedSummary() {
-  swrRender(<ConditionsDetailedSummary />);
+  renderWithSwr(<ConditionsDetailedSummary />);
 }

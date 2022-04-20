@@ -12,6 +12,7 @@ import { EncounterResourceService } from './encounter-resource.service';
 import { PatientService } from './patient-service';
 import { PatientResourceService } from './patient-resource.service';
 import { PatientPreviousEncounterService } from './patient-previous-encounter.service';
+import { ConceptService } from '../services/concept.service';
 
 @NgModule({
   declarations: [],
@@ -27,6 +28,7 @@ import { PatientPreviousEncounterService } from './patient-previous-encounter.se
     PatientService,
     PatientResourceService,
     PatientPreviousEncounterService,
+    ConceptService,
   ],
 })
 export class OpenmrsApiModule {}
