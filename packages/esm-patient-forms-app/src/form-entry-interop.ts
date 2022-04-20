@@ -1,4 +1,4 @@
-import { navigate, Visit } from '@openmrs/esm-framework';
+import { navigate, showModal, Visit } from '@openmrs/esm-framework';
 import { HtmlFormEntryForm } from './config-schema';
 import isEmpty from 'lodash-es/isEmpty';
 import { formEntrySub, launchPatientWorkspace, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
