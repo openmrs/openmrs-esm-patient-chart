@@ -50,3 +50,4 @@ function setupOpenMRS() {
 }
 
 export { backendDependencies, importTranslation, setupOpenMRS };
+export { default as PatientBanner } from './banner/patient-banner.component';

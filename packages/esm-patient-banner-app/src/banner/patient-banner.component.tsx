@@ -15,7 +15,7 @@ interface PatientBannerProps {
   patientUuid: string;
   onClick?: (patientUuid: string) => void;
   onTransition?: () => void;
-  hideActionsOverflow?: boolean;
+  showActionsMenu: boolean;
 }
 
 const PatientBanner: React.FC<PatientBannerProps> = ({
@@ -23,7 +23,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
   patientUuid,
   onClick,
   onTransition,
-  hideActionsOverflow,
+  showActionsMenu = true,
 }) => {
   const { t } = useTranslation();
   const overFlowMenuRef = React.useRef(null);
@@ -73,7 +73,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
                 className={styles.flexRow}
               />
             </div>
-            {!hideActionsOverflow && (
+            {showActionsMenu && (
               <div ref={overFlowMenuRef}>
                 <CustomOverflowMenuComponent
                   menuTitle={
