@@ -1,11 +1,8 @@
 import React from 'react';
 import Add16 from '@carbon/icons-react/es/add/16';
-import NotesPagination from './notes-pagination.component';
-import styles from './notes-overview.scss';
 import { useTranslation } from 'react-i18next';
 import { Button, DataTableSkeleton, InlineLoading } from 'carbon-components-react';
 import { useVisit } from '@openmrs/esm-framework';
-import { useVisitNotes } from './visit-notes.resource';
 import {
   CardHeader,
   EmptyState,
@@ -13,6 +10,9 @@ import {
   launchPatientWorkspace,
   launchStartVisitPrompt,
 } from '@openmrs/esm-patient-common-lib';
+import { useVisitNotes } from './visit-notes.resource';
+import PaginatedNotes from './paginated-notes.component';
+import styles from './notes-overview.scss';
 
 interface NotesOverviewProps {
   patientUuid: string;
@@ -58,7 +58,7 @@ const NotesMain: React.FC<NotesOverviewProps> = ({ patientUuid, showAddNote, pag
                   </Button>
                 )}
               </CardHeader>
-              <NotesPagination notes={visitNotes} pageSize={pageSize} urlLabel={urlLabel} pageUrl={pageUrl} />
+              <PaginatedNotes notes={visitNotes} pageSize={pageSize} urlLabel={urlLabel} pageUrl={pageUrl} />
             </div>
           );
         return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchVisitNoteForm} />;

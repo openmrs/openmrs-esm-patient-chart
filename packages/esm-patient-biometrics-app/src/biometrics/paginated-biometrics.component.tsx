@@ -14,7 +14,7 @@ import { usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { PatientBiometrics } from './biometrics.resource';
 
-interface BiometricsPaginationProps {
+interface PaginatedBiometricsProps {
   tableRows: Array<PatientBiometrics>;
   pageSize: number;
   pageUrl: string;
@@ -22,7 +22,7 @@ interface BiometricsPaginationProps {
   tableHeaders: Array<{ key: string; header: string }>;
 }
 
-const BiometricsPagination: React.FC<BiometricsPaginationProps> = ({
+const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
   tableRows,
   pageSize,
   pageUrl,
@@ -78,4 +78,4 @@ const BiometricsPagination: React.FC<BiometricsPaginationProps> = ({
   );
 };
 
-export default BiometricsPagination;
+export default PaginatedBiometrics;

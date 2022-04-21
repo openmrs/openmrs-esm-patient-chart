@@ -18,14 +18,14 @@ import { useTranslation } from 'react-i18next';
 import { PatientNote } from '../types';
 import styles from './notes-overview.scss';
 
-interface FormsProps {
+interface PaginatedNotes {
   notes: Array<PatientNote>;
   pageSize: number;
   pageUrl: string;
   urlLabel: string;
 }
 
-const NotesPagination: React.FC<FormsProps> = ({ notes, pageSize, pageUrl, urlLabel }) => {
+const PaginatedNotes: React.FC<PaginatedNotes> = ({ notes, pageSize, pageUrl, urlLabel }) => {
   const { t } = useTranslation();
   const { results: paginatedNotes, goTo, currentPage } = usePagination(notes, pageSize);
 
@@ -119,4 +119,4 @@ const NotesPagination: React.FC<FormsProps> = ({ notes, pageSize, pageUrl, urlLa
   );
 };
 
-export default NotesPagination;
+export default PaginatedNotes;
