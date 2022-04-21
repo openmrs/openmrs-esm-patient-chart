@@ -8,15 +8,15 @@ import {
   showNotification,
   useConfig,
   useLayoutType,
-  useSessionUser,
+  useSession,
 } from '@openmrs/esm-framework';
 import { DefaultWorkspaceProps, useVitalsConceptMetadata } from '@openmrs/esm-patient-common-lib';
 import { Column, Grid, Row, Button, ButtonSet, Form } from 'carbon-components-react';
 import { calculateBMI, isInNormalRange } from './vitals-biometrics-form.utils';
 import { savePatientVitals } from '../vitals.resource';
 import { ConfigObject } from '../../config-schema';
-import styles from './vitals-biometrics-form.component.scss';
 import VitalsBiometricInput from './vitals-biometrics-input.component';
+import styles from './vitals-biometrics-form.component.scss';
 
 export interface PatientVitalsAndBiometrics {
   systolicBloodPressure: string;
@@ -34,7 +34,7 @@ export interface PatientVitalsAndBiometrics {
 const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const session = useSessionUser();
+  const session = useSession();
   const config = useConfig() as ConfigObject;
   const { cache, mutate }: { cache: any; mutate: Function } = useSWRConfig();
   const { data: conceptUnits, conceptMetadata } = useVitalsConceptMetadata();

@@ -11,7 +11,7 @@ import {
   showNotification,
   showToast,
   useLayoutType,
-  useSessionUser,
+  useSession,
 } from '@openmrs/esm-framework';
 import {
   Tile,
@@ -34,7 +34,7 @@ const searchTimeoutInMs = 500;
 const ConditionsForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patientUuid }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const session = useSessionUser();
+  const session = useSession();
   const { mutate } = useSWRConfig();
   const [clinicalStatus, setClinicalStatus] = React.useState('active');
   const [endDate, setEndDate] = React.useState(null);

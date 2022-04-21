@@ -26,7 +26,7 @@ import {
   showToast,
   useConfig,
   useLayoutType,
-  useSessionUser,
+  useSession,
 } from '@openmrs/esm-framework';
 import { convertToObsPayload } from './visit-note.util';
 import { fetchDiagnosisByName, fetchLocationByUuid, fetchProviderByUuid, saveVisitNote } from './visit-notes.resource';
@@ -46,7 +46,7 @@ const encountersCustomRepresentation =
 const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patientUuid }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const session = useSessionUser();
+  const session = useSession();
   const { mutate } = useSWRConfig();
   const config = useConfig() as ConfigObject;
   const { clinicianEncounterRole, encounterNoteTextConceptUuid, encounterTypeUuid, formConceptUuid } =
