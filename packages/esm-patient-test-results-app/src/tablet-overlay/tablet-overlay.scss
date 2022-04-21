@@ -2,14 +2,13 @@
 @import "~carbon-components/src/globals/scss/vendor/@carbon/layout/scss/generated/spacing";
 @import "~@openmrs/esm-styleguide/src/vars";
 
-
 .tabletOverlay {
   position: fixed;
   top: 0;
   bottom: 0;
   left: 0;
   right: 0;
-  z-index: 9999;
+  z-index: 99;
   background-color: $ui-02;
   overflow: hidden;
   padding-top: $spacing-09;
@@ -19,7 +18,7 @@
 
 .tabletOverlayHeader {
   button {
-    background-color: $brand-01 !important;
+    background-color: $brand-01;
   }
   .headerContent {
     color: $ui-02;
@@ -42,9 +41,8 @@
   align-self: end;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  // padding: $spacing-07 $spacing-05;
 }
 
 .buttonsGroup button {
-  max-width: unset !important;
+  max-width: unset;
 }

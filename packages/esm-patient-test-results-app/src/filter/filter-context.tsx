@@ -12,6 +12,7 @@ import {
   TimelineData,
 } from './filter-types';
 import { ScaleTypes, LineChartOptions, TickRotations } from '@carbon/charts/interfaces';
+import isObject from 'lodash/isObject';
 
 const initialState = {
   checkboxes: {},
@@ -138,7 +139,7 @@ const FilterProvider = ({ roots, children, type, testUuid, basePath }: FilterPro
 
   const totalResultsCount: number = useMemo(() => {
     let count = 0;
-    if (!state?.tests || state?.tests === {}) return 0;
+    if (!state?.tests || !(isObject(state) && isObject(state.tests)) || state?.tests === {}) return 0;
     Object.values(state?.tests).forEach((testData) => {
       count += testData.obs.length;
     });

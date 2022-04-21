@@ -32,8 +32,8 @@
 }
 
 :global(.bx--cc--area path.area) {
-  stroke: none !important;
-  fill: #a7f0ba !important;
+  stroke: none;
+  fill: #a7f0ba;
 }
 
 .header {
@@ -63,18 +63,10 @@
   }
 }
 
-.Background {
+.background {
   width: 100%;
-  // height: 20.125rem;
-  // margin: 3rem 12rem 1rem;
   padding: 2.375rem 5.688rem 2.188rem 1rem;
   background: white;
-}
-
-.Actions-Navigation-arrow--left-16 {
-  width: 1.25rem;
-  height: 1.25rem;
-  background-color: var(--open-mrs-background-gray);
 }
 
 .range-tabs :global(.bx--tabs--scrollable__nav-link) {

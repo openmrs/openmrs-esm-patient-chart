@@ -3,7 +3,7 @@ import { Switch, Route, BrowserRouter } from 'react-router-dom';
 import { testResultsBasePath } from '../helpers';
 import RoutedResultsViewer from './results-viewer';
 
-const DashboardRoot = ({ basePath, patientUuid }) => {
+const ResultsView = ({ basePath, patientUuid }) => {
   return (
     <BrowserRouter basename={testResultsBasePath(basePath)}>
       <Switch>
@@ -18,4 +18,4 @@ const DashboardRoot = ({ basePath, patientUuid }) => {
   );
 };
 
-export default DashboardRoot;
+export default ResultsView;

@@ -13,14 +13,14 @@ import '@carbon/charts/styles.css';
 import { FilterContext } from '../filter/filter-context';
 import { testResultsBasePath } from '../helpers';
 
-const TrendLineBackground = ({ ...props }) => <div {...props} className={styles['Background']} />;
+const TrendLineBackground = ({ ...props }) => <div {...props} className={styles.background} />;
 
 const TrendlineHeader = ({ basePath, title, referenceRange }) => {
   const { t } = useTranslation();
   return (
     <div className={styles['header']}>
       <ConfigurableLink to={testResultsBasePath(basePath)} className={styles['back-button']}>
-        <Button kind="ghost" renderIcon={ArrowLeft24} iconDescription="Return to timeline">
+        <Button kind="ghost" renderIcon={ArrowLeft24} iconDescription={t('returnToTimeline', 'Return to timeline')}>
           <span>{t('backToTimeline', 'Back to timeline')}</span>
         </Button>
       </ConfigurableLink>
