@@ -32,7 +32,7 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
     return patientVitals
       .filter((vitals) => vitals[selectedVitalSign.value])
       .splice(0, 10)
-      .sort((VitalA, VitalB) => new Date(VitalA.date).getTime() - new Date(VitalB.date).getTime())
+      .sort((vitalA, vitalB) => new Date(vitalA.date).getTime() - new Date(vitalB.date).getTime())
       .map((vitals) => {
         return (
           vitals[selectedVitalSign.value] && {

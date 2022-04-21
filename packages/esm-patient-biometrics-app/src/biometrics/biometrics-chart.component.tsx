@@ -35,9 +35,9 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
   const chartData = React.useMemo(
     () =>
       patientBiometrics
-        .filter((biometric) => biometric[selectedBiometrics.value])
+        .filter((biometrics) => biometrics[selectedBiometrics.value])
         .splice(0, 10)
-        .sort((BiometricA, BiometricB) => new Date(BiometricA.date).getTime() - new Date(BiometricB.date).getTime())
+        .sort((biometricA, biometricB) => new Date(biometricA.date).getTime() - new Date(biometricB.date).getTime())
         .map((biometric) => {
           return (
             biometric[selectedBiometrics.value] && {
