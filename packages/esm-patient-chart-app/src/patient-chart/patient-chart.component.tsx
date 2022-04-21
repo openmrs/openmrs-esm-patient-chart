@@ -4,7 +4,6 @@ import {
   changeWorkspaceContext,
   useAutoCreatedOfflineVisit,
   usePatientOrOfflineRegisteredPatient,
-  useVisitOrOfflineVisit,
   useWorkspaceWindowSize,
 } from '@openmrs/esm-patient-common-lib';
 import { RouteComponentProps } from 'react-router-dom';

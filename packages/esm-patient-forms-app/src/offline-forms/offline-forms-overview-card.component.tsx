@@ -8,16 +8,6 @@ import { useValidOfflineFormEncounters } from './use-offline-form-encounters';
 import useSWR from 'swr';
 import { isFormFullyCached } from './offline-form-helpers';
 
-function useCountOfFormsAvailableOffline() {
-  const { data: forms } = useValidOfflineFormEncounters();
-  const key = forms ? ['offlineForms', 'count', ...forms.map((form) => form.uuid).sort()] : null;
-
-  return useSWR(forms ? 'foo' : null, async () => {
-    const isFormCachedResults = await Promise.all(forms.map((form) => isFormFullyCached(form)));
-    return isFormCachedResults.filter(Boolean).length;
-  });
-}
-
 const OfflineFormsOverviewCard: React.FC = () => {
   const { t } = useTranslation();
   const { data: availableFormsCount, error } = useCountOfFormsAvailableOffline();
@@ -61,5 +51,15 @@ const HeaderedQuickInfo: React.FC<HeaderedQuickInfoProps> = ({ header, children,
     </div>
   );
 };
+
+function useCountOfFormsAvailableOffline() {
+  const { data: forms } = useValidOfflineFormEncounters();
+  const key = forms ? ['offlineForms', 'count', ...forms.map((form) => form.uuid).sort()] : null;
+
+  return useSWR(key, async () => {
+    const isFormCachedResults = await Promise.all(forms.map((form) => isFormFullyCached(form)));
+    return isFormCachedResults.filter(Boolean).length;
+  });
+}
 
 export default OfflineFormsOverviewCard;
