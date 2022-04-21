@@ -6,7 +6,6 @@ import { mockDrugOrders } from '../../../../__mocks__/medication.mock';
 import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import ActiveMedications from './active-medications.component';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import * as esmFramework from '@openmrs/esm-framework/mock';
 
 const testProps = {
   patientUuid: mockPatient.id,
@@ -91,7 +90,7 @@ describe('ActiveMedications: ', () => {
   });
 });
 
-test('clicking the Add button, opens the order basket form', async () => {
+test('clicking the Record active medications link or the Add button opens the order basket form', async () => {
   mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
   renderActiveMedications();
   await waitForLoadingToFinish();
