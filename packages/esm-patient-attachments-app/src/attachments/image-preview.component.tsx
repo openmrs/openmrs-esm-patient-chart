@@ -7,7 +7,7 @@ import styles from './image-preview.scss';
 interface FilePreviewProps {
   content: string;
   collectCaption: boolean;
-  onSaveImageOrPdf?(dataUri: string, caption: string): void;
+  onSaveFile?(dataUri: string, caption: string): void;
   onCancelCapture?(): void;
 }
 
@@ -20,11 +20,11 @@ export default function FilePreview(props: FilePreviewProps) {
     (e: SyntheticEvent) => {
       if (!saving) {
         e.preventDefault();
-        props.onSaveImageOrPdf?.(props.content, caption);
+        props.onSaveFile?.(props.content, caption);
         setSaving(true);
       }
     },
-    [props.onSaveImageOrPdf, saving],
+    [props.onSaveFile, saving],
   );
 
   const cancelCapture = useCallback(

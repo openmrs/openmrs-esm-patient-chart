@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
-import ImagePreview from './image-preview.component';
+import FilePreview from './image-preview.component';
 import styles from './camera-upload.scss';
 import Camera from 'react-html5-camera-photo';
 import { showToast } from '@openmrs/esm-framework';
@@ -62,10 +62,10 @@ const CameraUpload: React.FC<CameraUploadProps> = ({ onSavePhoto, onTakePhoto, c
     <div className={styles.cameraSection}>
       <div className={styles.frameContent}>
         {dataUri ? (
-          <ImagePreview
+          <FilePreview
             content={dataUri}
             onCancelCapture={clearCamera}
-            onSaveImageOrPdf={willSaveAttachment}
+            onSaveFile={willSaveAttachment}
             collectCaption={collectCaption}
           />
         ) : (
