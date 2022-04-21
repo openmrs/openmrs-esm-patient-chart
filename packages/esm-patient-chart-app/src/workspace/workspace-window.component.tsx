@@ -41,6 +41,12 @@ const WorkspaceWindow: React.FC<RouteComponentProps<ContextWorkspaceParams>> = (
     }
   }, [workspaces.length, active, hidden, maximized, normal]);
 
+  useEffect(() => {
+    if (active && hidden) {
+      updateWindowSize('normal');
+    }
+  }, [workspaces]);
+
   useBodyScrollLock(active && !isDesktop(layout));
 
   const toggleWindowState = () => {
