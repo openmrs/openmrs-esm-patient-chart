@@ -50,8 +50,8 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ basePath, type, testUuid 
   const [view, setView] = useState<viewOpts>('split');
   const [leftContent, setLeftContent] = useState<panelOpts>('tree');
   const [showTreeOverlay, setShowTreeOverlay] = useState<boolean>(false);
-  const expanded = view === 'full';
   const { resetTree, trendlineData, timelineData, totalResultsCount } = useContext(FilterContext);
+  const expanded = view === 'full';
 
   return (
     <>
@@ -99,6 +99,7 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ basePath, type, testUuid 
                   size={tablet ? 'lg' : 'md'}
                   style={{ maxWidth: '10rem' }}
                   onChange={(e) => setView(e.name as viewOpts)}
+                  selectedIndex={expanded ? 1 : 0}
                 >
                   <Switch name="split" text={t('split', 'Split')} />
                   <Switch name="full" text={t('full', 'Full')} />
