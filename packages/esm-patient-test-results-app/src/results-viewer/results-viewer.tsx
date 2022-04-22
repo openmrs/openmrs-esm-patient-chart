@@ -50,7 +50,7 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, ty
   const [view, setView] = useState<viewOpts>('split');
   const [leftContent, setLeftContent] = useState<panelOpts>('tree');
   const [showTreeOverlay, setShowTreeOverlay] = useState<boolean>(false);
-  const { resetTree, trendlineData, timelineData, totalResultsCount } = useContext(FilterContext);
+  const { resetTree, timelineData, totalResultsCount } = useContext(FilterContext);
   const expanded = view === 'full';
 
   return (

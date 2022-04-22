@@ -250,8 +250,7 @@ const TimelineDataGroup = ({ parent, subRows, xScroll, setXScroll, panelName, se
 };
 
 export const GroupedTimeline = () => {
-  const { activeTests, timelineData, parents, checkboxes, someChecked, lowestParents, trendlineData } =
-    useContext(FilterContext);
+  const { activeTests, timelineData, parents, checkboxes, someChecked, lowestParents } = useContext(FilterContext);
   const [panelName, setPanelName] = useState('');
   const [xScroll, setXScroll] = useState(0);
   const { t } = useTranslation();

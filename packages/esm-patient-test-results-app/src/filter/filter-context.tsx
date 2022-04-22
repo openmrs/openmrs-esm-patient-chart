@@ -2,16 +2,7 @@ import React, { createContext, useReducer, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { parseTime } from '../timeline/useTimelineData';
 import reducer from './filter-reducer';
-import {
-  TreeNode,
-  FilterContextProps,
-  ReducerState,
-  ReducerAction,
-  ReducerActionType,
-  TrendlineData,
-  TimelineData,
-} from './filter-types';
-import { ScaleTypes, LineChartOptions, TickRotations } from '@carbon/charts/interfaces';
+import { TreeNode, FilterContextProps, ReducerState, ReducerActionType, TimelineData } from './filter-types';
 import isObject from 'lodash/isObject';
 
 const initialState = {
@@ -103,34 +94,6 @@ const FilterProvider = ({ roots, children, type, testUuid, basePath }: FilterPro
     };
   }, [activeTests, state.tests]);
 
-  const trendlineData: TrendlineData = useMemo(() => {
-    const test = Object.values(state.tests).find((testObj) => testObj?.conceptUuid === testUuid);
-
-    if (!test || type !== 'trendline' || !testUuid) {
-      return {
-        isLoading: true,
-        hiNormal: null,
-        lowNormal: null,
-        obs: [],
-        title: '',
-        bottomAxisTitle: '',
-        leftAxisTitle: '',
-        referenceRange: '',
-      };
-    }
-
-    return {
-      isLoading: false,
-      hiNormal: test?.hiNormal,
-      lowNormal: test?.lowNormal,
-      obs: test?.obs,
-      title: test?.display,
-      bottomAxisTitle: t('date', 'Date'),
-      leftAxisTitle: test?.units,
-      referenceRange: test?.range,
-    };
-  }, [t, type, testUuid, state.tests]);
-
   useEffect(() => {
     if (roots?.length && !Object.keys(state?.checkboxes).length) {
       actions.initialize(roots);
@@ -151,7 +114,6 @@ const FilterProvider = ({ roots, children, type, testUuid, basePath }: FilterPro
       value={{
         ...state,
         timelineData,
-        trendlineData,
         activeTests,
         someChecked,
         totalResultsCount,

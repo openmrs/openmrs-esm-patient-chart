@@ -90,20 +90,8 @@ export interface TimelineData {
   };
 }
 
-export interface TrendlineData {
-  isLoading: boolean;
-  hiNormal: number;
-  lowNormal: number;
-  obs: Array<ObservationData>;
-  title: string;
-  bottomAxisTitle: string;
-  leftAxisTitle: string;
-  referenceRange: string;
-}
-
 export interface FilterContextProps extends ReducerState {
   timelineData: TimelineData;
-  trendlineData: TrendlineData;
   activeTests: string[];
   someChecked: boolean;
   totalResultsCount: number;
