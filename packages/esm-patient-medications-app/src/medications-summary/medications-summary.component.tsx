@@ -29,7 +29,6 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
     isValidating: isValidatingPastOrders,
   } = usePatientOrders(patientUuid, 'any', config.careSettingUuid);
 
-
   return (
     <>
       <div style={{ marginBottom: '1.5rem' }}>
