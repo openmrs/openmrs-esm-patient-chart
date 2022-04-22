@@ -1,7 +1,8 @@
 import { defineConfigSchema, getAsyncLifecycle, messageOmrsServiceWorker } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
+import { requireContext } from './require-context-polyfill';
 
-const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
+const importTranslation = requireContext('../translations', false, /.json$/);
 
 const backendDependencies = {
   'webservices.rest': '^2.2.0',
