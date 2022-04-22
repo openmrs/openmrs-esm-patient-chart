@@ -1,56 +1,61 @@
-import React, { useContext, useState, useCallback, useMemo, useLayoutEffect } from 'react';
+import React, { useState, useCallback, useMemo, useLayoutEffect } from 'react';
 import RangeSelector from './range-selector.component';
-import { Button } from 'carbon-components-react';
+import { Button, InlineLoading, SkeletonText } from 'carbon-components-react';
 import ArrowLeft24 from '@carbon/icons-react/es/arrow--left/24';
 import LineChart from '@carbon/charts-react/line-chart';
 import { ScaleTypes, LineChartOptions, TickRotations } from '@carbon/charts/interfaces';
 import { formatDate, formatTime, parseDate, ConfigurableLink } from '@openmrs/esm-framework';
-import { OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
+import { EmptyState, OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import CommonDataTable from '../overview/common-datatable.component';
 import { useTranslation } from 'react-i18next';
 import styles from './trendline.scss';
 import '@carbon/charts/styles.css';
-import { FilterContext } from '../filter/filter-context';
 import { testResultsBasePath } from '../helpers';
+import { useObstreeData } from './trendline-resource';
 
 const TrendLineBackground = ({ ...props }) => <div {...props} className={styles.background} />;
 
-const TrendlineHeader = ({ basePath, title, referenceRange }) => {
+const TrendlineHeader = ({ basePath, title, referenceRange, isValidating, showBackToTimelineButton }) => {
   const { t } = useTranslation();
   return (
-    <div className={styles['header']}>
-      <ConfigurableLink to={testResultsBasePath(basePath)} className={styles['back-button']}>
-        <Button kind="ghost" renderIcon={ArrowLeft24} iconDescription={t('returnToTimeline', 'Return to timeline')}>
-          <span>{t('backToTimeline', 'Back to timeline')}</span>
-        </Button>
-      </ConfigurableLink>
-      <div className={styles['content']}>
-        <span className={styles['title']}>{title}</span>
-        <span className={styles['reference-range']}>{referenceRange}</span>
+    <div className={styles.header}>
+      <div className={styles.backButton}>
+        {showBackToTimelineButton && (
+          <ConfigurableLink to={testResultsBasePath(basePath)}>
+            <Button kind="ghost" renderIcon={ArrowLeft24} iconDescription={t('returnToTimeline', 'Return to timeline')}>
+              <span>{t('backToTimeline', 'Back to timeline')}</span>
+            </Button>
+          </ConfigurableLink>
+        )}
       </div>
+      <div className={styles.content}>
+        <span className={styles.title}>{title}</span>
+        <span className={styles.referenceange}>{referenceRange}</span>
+      </div>
+      <div className={styles.inlineLoader}>{isValidating && <InlineLoading />}</div>
     </div>
   );
 };
 
 interface TrendlineProps {
+  patientUuid: string;
+  conceptUuid: string;
+  basePath: string;
   hideTrendlineHeader?: boolean;
+  showBackToTimelineButton?: boolean;
 }
 
-const Trendline: React.FC<TrendlineProps> = ({ hideTrendlineHeader = false }) => {
-  const { trendlineData, basePath } = useContext(FilterContext);
+const Trendline: React.FC<TrendlineProps> = ({
+  patientUuid,
+  conceptUuid,
+  basePath,
+  hideTrendlineHeader = false,
+  showBackToTimelineButton = false,
+}) => {
+  const { trendlineData, isLoading, isValidating } = useObstreeData(patientUuid, conceptUuid);
   const { t } = useTranslation();
-
-  const {
-    isLoading,
-    obs,
-    title: chartTitle,
-    hiNormal,
-    lowNormal,
-    bottomAxisTitle,
-    leftAxisTitle,
-    referenceRange,
-  } = trendlineData;
-
+  const { obs, display: chartTitle, hiNormal, lowNormal, units: leftAxisTitle, range: referenceRange } = trendlineData;
+  const bottomAxisTitle = t('date', 'Date');
   const [range, setRange] = useState<[Date, Date]>();
 
   const [upperRange, lowerRange] = useMemo(() => {
@@ -184,12 +189,24 @@ const Trendline: React.FC<TrendlineProps> = ({ hideTrendlineHeader = false }) =>
   );
 
   if (isLoading) {
-    return <p>Loading...</p>;
+    return <SkeletonText />;
+  }
+
+  if (obs.length === 0) {
+    return <EmptyState displayText={t('observationsDisplayText', 'observations')} headerTitle={chartTitle} />;
   }
 
   return (
     <>
-      {!hideTrendlineHeader && <TrendlineHeader basePath={basePath} title={dataset} referenceRange={referenceRange} />}
+      {!hideTrendlineHeader && (
+        <TrendlineHeader
+          showBackToTimelineButton={showBackToTimelineButton}
+          isValidating={isValidating}
+          basePath={basePath}
+          title={dataset}
+          referenceRange={referenceRange}
+        />
+      )}
       <TrendLineBackground>
         <RangeSelector setLowerRange={setLowerRange} upperRange={upperRange} />
         <LineChart data={data} options={options} />

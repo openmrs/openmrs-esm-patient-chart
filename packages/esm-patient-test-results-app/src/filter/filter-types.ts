@@ -1,5 +1,4 @@
-import { ScaleTypes, LineChartOptions, TickRotations } from '@carbon/charts/interfaces';
-
+import { OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 interface Observation {
   display: string;
   flatName: string;
@@ -47,19 +46,10 @@ export interface ReducerAction {
   basePath?: string;
 }
 
-enum Interpretation {
-  OFF_SCALE_HIGH = 'OFF_SCALE_HIGH',
-  CRITICALLY_HIGH = 'CRITICALLY_HIGH',
-  HIGH = 'HIGH',
-  OFF_SCALE_LOW = 'OFF_SCALE_LOW',
-  CRITICALLY_LOW = 'CRITICALLY_LOW',
-  LOW = 'LOW',
-  NORMAL = 'NORMAL',
-}
 export interface ObservationData {
   obsDatetime: string;
   value: number;
-  interpretation: Interpretation;
+  interpretation: OBSERVATION_INTERPRETATION;
 }
 export interface TestData {
   conceptUuid: string;
@@ -132,7 +122,7 @@ interface RowData extends TestData {
     | {
         obsDatetime: string;
         value: string;
-        interpretation: Interpretation;
+        interpretation: OBSERVATION_INTERPRETATION;
       }
     | undefined
   >;

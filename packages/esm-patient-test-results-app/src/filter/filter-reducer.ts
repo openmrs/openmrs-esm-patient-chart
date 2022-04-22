@@ -27,7 +27,7 @@ const computeParents = (prefix, node) => {
     tests.push(...activeTests);
     lowestParents.push({ flatName: node.flatName, display: node.display });
   } else if (node?.subSets?.length) {
-    node.subSets.map((subNode) => {
+    node.subSets.forEach((subNode) => {
       const {
         parents: newParents,
         leaves: newLeaves,

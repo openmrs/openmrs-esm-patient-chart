@@ -22,7 +22,7 @@ interface ResultsViewerProps {
   patientUuid?: string;
 }
 
-const RoutedResultsViewer: React.FC<ResultsViewerProps> = ({ type, basePath, testUuid }) => {
+const RoutedResultsViewer: React.FC<ResultsViewerProps> = ({ type, basePath, testUuid, patientUuid }) => {
   const config = useConfig();
   const conceptUuids = config?.concepts?.map((c) => c.conceptUuid) ?? [];
   const { roots, loading, errors } = useGetManyObstreeData(conceptUuids);
@@ -37,14 +37,14 @@ const RoutedResultsViewer: React.FC<ResultsViewerProps> = ({ type, basePath, tes
   if (!loading && !errors.length && roots?.length) {
     return (
       <FilterProvider roots={roots} testUuid={testUuid} type={type} basePath={basePath}>
-        <ResultsViewer testUuid={testUuid} type={type} basePath={basePath} />
+        <ResultsViewer patientUuid={patientUuid} testUuid={testUuid} type={type} basePath={basePath} />
       </FilterProvider>
     );
   }
   return null;
 };
 
-const ResultsViewer: React.FC<ResultsViewerProps> = ({ basePath, type, testUuid }) => {
+const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, type, testUuid }) => {
   const { t } = useTranslation();
   const tablet = useLayoutType() === 'tablet';
   const [view, setView] = useState<viewOpts>('split');
@@ -116,7 +116,16 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ basePath, type, testUuid 
             </Column>
           )}
           <Column sm={16} lg={tablet || expanded ? 12 : 7} className={`${styles.columnPanel}`}>
-            {!tablet && testUuid && type === 'trendline' ? <Trendline /> : <GroupedTimeline />}
+            {!tablet && testUuid && type === 'trendline' ? (
+              <Trendline
+                patientUuid={patientUuid}
+                conceptUuid={testUuid}
+                basePath={basePath}
+                showBackToTimelineButton
+              />
+            ) : (
+              <GroupedTimeline />
+            )}
           </Column>
         </Row>
       </Grid>
@@ -143,20 +152,11 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ basePath, type, testUuid 
       )}
       {tablet && testUuid && type === 'trendline' && (
         <TabletOverlay
-          headerText={
-            trendlineData?.isLoading ? (
-              t('trendline', 'Trendline')
-            ) : (
-              <div className={styles.trendlineOverlayHeader}>
-                <span className={styles.trendlineOverlayHeaderTitle}>{trendlineData?.title}</span>
-                <span className={styles.trendlineOverlayHeaderReferenceRange}>{trendlineData?.referenceRange}</span>
-              </div>
-            )
-          }
+          headerText={t('trendline', 'Trendline')}
           close={() => navigate({ to: testResultsBasePath(basePath) })}
           buttonsGroup={<></>}
         >
-          <Trendline hideTrendlineHeader />
+          <Trendline patientUuid={patientUuid} conceptUuid={testUuid} basePath={basePath} />
         </TabletOverlay>
       )}
     </>

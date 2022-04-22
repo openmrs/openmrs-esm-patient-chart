@@ -17,7 +17,7 @@
   display: flex;
   justify-content: center;
   align-items: baseline;
-  width: calc(100% - 22rem);
+  flex-grow: 1;
 }
 
 .title {
@@ -37,13 +37,14 @@
 }
 
 .header {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
   align-items: center;
   background: white;
   border-bottom: 1px solid $ui-03;
 }
 
-.back-button {
+.backButton {
   align-items: center;
   display: flex;
   justify-content: flex-start;
@@ -61,6 +62,12 @@
       order: 2;
     }
   }
+}
+
+.inlineLoader {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 }
 
 .background {
