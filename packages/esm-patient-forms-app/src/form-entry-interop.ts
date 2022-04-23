@@ -1,7 +1,7 @@
 import { navigate, Visit } from '@openmrs/esm-framework';
 import { HtmlFormEntryForm } from './config-schema';
 import isEmpty from 'lodash-es/isEmpty';
-import { formEntrySub, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { formEntrySub, launchPatientWorkspace, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
 
 export function launchFormEntryOrHtmlForms(
   currentVisit: Visit | undefined,
@@ -21,7 +21,7 @@ export function launchFormEntryOrHtmlForms(
       });
     }
   } else {
-    startVisitPrompt();
+    launchStartVisitPrompt();
   }
 }
 
@@ -29,14 +29,4 @@ export function launchFormEntry(formUuid: string, patientUuid: string, encounter
   formEntrySub.next({ formUuid, encounterUuid });
   launchPatientWorkspace('patient-form-entry-workspace', { workspaceTitle: formName });
   navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/chart` });
-}
-
-function startVisitPrompt() {
-  window.dispatchEvent(
-    new CustomEvent('visit-dialog', {
-      detail: {
-        type: 'prompt',
-      },
-    }),
-  );
 }

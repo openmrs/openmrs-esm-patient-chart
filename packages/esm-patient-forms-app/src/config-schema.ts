@@ -65,11 +65,11 @@ export const configSchema = {
   showHtmlFormEntryForms: {
     _type: Type.Boolean,
     _default: true,
-    _description: 'Whether HTML Form Entry forms should be included in lists of forms',
+    _description: 'Whether HTML Form Entry forms should be included in lists of forms.',
   },
   showRecommendedFormsTab: {
     _type: Type.Boolean,
-    _description: 'Whether to display recommended forms tab',
+    _description: 'Whether to display recommended forms tab. Requires AMPATH ETL.',
     _default: false,
   },
 };
