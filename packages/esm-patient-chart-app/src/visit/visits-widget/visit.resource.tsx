@@ -113,7 +113,7 @@ export interface Observation {
     };
   }>;
   value: any;
-  obsDatetime: string;
+  obsDatetime?: string;
 }
 
 export interface Order {

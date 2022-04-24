@@ -1,5 +1,5 @@
-import React from 'react';
-import EncounterObservations from './encounter-observations.component';
+import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   DataTable,
   TableContainer,
@@ -15,34 +15,47 @@ import {
   Button,
   OverflowMenu,
   OverflowMenuItem,
+  TableToolbar,
+  TableToolbarContent,
+  TableToolbarSearch,
+  DataTableHeader,
+  Dropdown,
 } from 'carbon-components-react';
 import Edit16 from '@carbon/icons-react/es/edit/16';
-import { useTranslation } from 'react-i18next';
-import {
-  formatDate,
-  formatDatetime,
-  formatTime,
-  parseDate,
-  useLayoutType,
-  usePagination,
-  usePatient,
-} from '@openmrs/esm-framework';
+import { formatDatetime, formatTime, parseDate, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { formEntrySub, launchPatientWorkspace, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
-import { FormattedEncounter } from '../visit-detail-overview.component';
-import styles from '../visit-detail-overview.scss';
-import { format } from 'prettier';
+import { MappedEncounter } from './visit-summary.component';
+import EncounterObservations from './encounter-observations.component';
+import styles from './encounter-list.scss';
 
 interface EncounterListProps {
-  encounters: Array<FormattedEncounter>;
+  encounters: Array<MappedEncounter>;
   isShowingAllEncounters?: boolean;
 }
+
+type FilterProps = {
+  rowIds: Array<string>;
+  headers: Array<DataTableHeader>;
+  cellsById: any;
+  inputValue: string;
+  getCellId: (row, key) => string;
+};
 
 const EncounterList: React.FC<EncounterListProps> = ({ isShowingAllEncounters, encounters }) => {
   const encountersCount = 20;
   const { t } = useTranslation();
-  const { patient } = usePatient();
-  const isTablet = useLayoutType() === 'tablet';
+  const encounterTypes = [...new Set(encounters.map((encounter) => encounter.encounterType))];
   const { results: paginatedEncounters, goTo, currentPage } = usePagination(encounters ?? [], encountersCount);
+  const isTablet = useLayoutType() === 'tablet';
+  const [filteredRows, setFilteredRows] = useState<Array<MappedEncounter>>([]);
+  const [filter, setFilter] = useState('');
+
+  useEffect(() => {
+    if (filter) {
+      setFilteredRows(encounters?.filter((encounter) => encounter.encounterType === filter));
+      setFilter('');
+    }
+  }, [filter, filteredRows, encounters]);
 
   const tableHeaders = [
     {
@@ -78,28 +91,69 @@ const EncounterList: React.FC<EncounterListProps> = ({ isShowingAllEncounters, e
   };
 
   const tableRows = React.useMemo(() => {
-    return paginatedEncounters?.map((encounter) => ({
+    return (filteredRows.length ? filteredRows : paginatedEncounters)?.map((encounter) => ({
       ...encounter,
       datetime: isShowingAllEncounters
         ? formatDatetime(parseDate(encounter.datetime))
         : formatTime(parseDate(encounter.datetime)),
     }));
-  }, [paginatedEncounters, isShowingAllEncounters]);
+  }, [filteredRows, isShowingAllEncounters, paginatedEncounters]);
+
+  const handleEncounterTypeChange = ({ selectedItem }) => {
+    setFilter(selectedItem);
+  };
+
+  const handleFilter = ({ rowIds, headers, cellsById, inputValue, getCellId }: FilterProps): Array<string> => {
+    return rowIds.filter((rowId) =>
+      headers.some(({ key }) => {
+        const cellId = getCellId(rowId, key);
+        const filterableValue = cellsById[cellId].value;
+        const filterTerm = inputValue.toLowerCase();
+
+        return ('' + filterableValue).toLowerCase().includes(filterTerm);
+      }),
+    );
+  };
 
   if (encounters?.length) {
     return (
-      <div className={styles.encounterListContainer}>
+      <div>
         <DataTable
           data-floating-menu-container
+          filterRows={handleFilter}
           headers={tableHeaders}
           rows={tableRows}
           overflowMenuOnHover={isTablet ? false : true}
           size={isTablet ? 'normal' : 'short'}
           useZebraStyles
         >
-          {({ rows, headers, getHeaderProps, getRowProps, getTableProps }) => (
+          {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getToolbarProps, onInputChange }) => (
             <div>
               <TableContainer className={styles.tableContainer}>
+                <TableToolbar {...getToolbarProps()}>
+                  <TableToolbarContent>
+                    <div className={styles.filterContainer}>
+                      <Dropdown
+                        id="serviceFilter"
+                        initialSelectedItem={'All'}
+                        label=""
+                        titleText={t('filterByEncounterType', 'Filter by encounter type') + ':'}
+                        type="inline"
+                        items={['All', ...encounterTypes]}
+                        onChange={handleEncounterTypeChange}
+                        size="sm"
+                      />
+                    </div>
+                    <TableToolbarSearch
+                      className={styles.search}
+                      expanded
+                      light
+                      onChange={onInputChange}
+                      placeholder={t('searchThisList', 'Search this list')}
+                      size="sm"
+                    />
+                  </TableToolbarContent>
+                </TableToolbar>
                 <Table {...getTableProps()}>
                   <TableHead>
                     <TableRow>
@@ -168,7 +222,11 @@ const EncounterList: React.FC<EncounterListProps> = ({ isShowingAllEncounters, e
                               <Button
                                 kind="ghost"
                                 onClick={() =>
-                                  launchWorkspace(encounters[i].form.uuid, encounters[i].visitUuid, encounters[i].id)
+                                  launchWorkspace(
+                                    encounters[i]?.form?.uuid,
+                                    encounters[i]?.visitUuid,
+                                    encounters[i]?.id,
+                                  )
                                 }
                                 renderIcon={Edit16}
                                 style={{ marginLeft: '-1rem', marginTop: '0.5rem' }}
@@ -178,7 +236,7 @@ const EncounterList: React.FC<EncounterListProps> = ({ isShowingAllEncounters, e
                             </div>
                           </TableExpandedRow>
                         ) : (
-                          <div />
+                          <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
                         )}
                       </React.Fragment>
                     ))}

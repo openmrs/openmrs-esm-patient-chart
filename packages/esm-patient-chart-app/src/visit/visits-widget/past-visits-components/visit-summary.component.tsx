@@ -26,6 +26,16 @@ interface VisitSummaryProps {
   patientUuid: string;
 }
 
+export interface MappedEncounter {
+  id: string;
+  datetime: string;
+  encounterType: string;
+  form: OpenmrsResource;
+  obs: Array<Observation>;
+  provider: string;
+  visitUuid?: string;
+}
+
 const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid }) => {
   const config = useConfig();
   const { t } = useTranslation();
