@@ -5,10 +5,10 @@ import RoutedResultsViewer from './results-viewer';
 
 const ResultsView = ({ basePath, patientUuid }) => {
   return (
-    <BrowserRouter basename={testResultsBasePath(basePath)}>
+    <BrowserRouter>
       <Switch>
         <Route
-          path="/:type?/:testUuid?"
+          path={`${testResultsBasePath(basePath)}/:type?/:testUuid?`}
           component={(props) => (
             <RoutedResultsViewer {...props} {...props.match.params} patientUuid={patientUuid} basePath={basePath} />
           )}

@@ -91,6 +91,7 @@ const Trendline: React.FC<TrendlineProps> = ({
   }> = [];
 
   const tableData: Array<{
+    id: string;
     date: string;
     time: string;
     value: number;
@@ -99,7 +100,7 @@ const Trendline: React.FC<TrendlineProps> = ({
 
   const dataset = chartTitle;
 
-  obs.forEach((obs) => {
+  obs.forEach((obs, idx) => {
     const range =
       hiNormal && lowNormal
         ? {
@@ -116,6 +117,7 @@ const Trendline: React.FC<TrendlineProps> = ({
     });
 
     tableData.push({
+      id: `${idx}`,
       date: formatDate(parseDate(obs.obsDatetime)),
       time: formatTime(parseDate(obs.obsDatetime)),
       value: obs.value,
