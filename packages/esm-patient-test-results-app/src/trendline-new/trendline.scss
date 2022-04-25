@@ -48,7 +48,10 @@
   align-items: center;
   display: flex;
   justify-content: flex-start;
-  text-decoration: none;
+
+  a {
+    text-decoration: none;
+  }
 
   button {
     display: flex;

@@ -71,7 +71,6 @@ function reducer(state: ReducerState, action: ReducerAction): ReducerState {
         roots: action.trees,
         tests: flatTests,
         lowestParents: lowestParents,
-        basePath: action.basePath,
       };
     case ReducerActionType.TOGGLEVAL:
       return {
@@ -89,11 +88,6 @@ function reducer(state: ReducerState, action: ReducerAction): ReducerState {
       return {
         ...state,
         checkboxes: checkboxes,
-      };
-    case ReducerActionType.UPDATEBASEPATH:
-      return {
-        ...state,
-        basePath: action.basePath,
       };
     case ReducerActionType.RESET_TREE:
       return {

@@ -30,6 +30,7 @@ interface ResultsViewerProps {
   type: string;
   testUuid: string;
   patientUuid?: string;
+  loading?: boolean;
 }
 
 const RoutedResultsViewer: React.FC<ResultsViewerProps> = ({ type, basePath, testUuid, patientUuid }) => {
@@ -38,17 +39,13 @@ const RoutedResultsViewer: React.FC<ResultsViewerProps> = ({ type, basePath, tes
   const { roots, loading, errors } = useGetManyObstreeData(conceptUuids);
   const { t } = useTranslation();
 
-  if (loading) {
-    return <LoadingResultsViewer patientUuid={patientUuid} testUuid={testUuid} type={type} basePath={basePath} />;
-  }
-
   if (errors.length) {
     return <ErrorState error={errors[0]} headerTitle={t('dataLoadError', 'Data Load Error')} />;
   }
 
-  if (!loading && !errors.length && roots?.length) {
+  if (roots?.length) {
     return (
-      <FilterProvider roots={roots} testUuid={testUuid} type={type} basePath={basePath}>
+      <FilterProvider roots={!loading ? roots : []}>
         <ResultsViewer patientUuid={patientUuid} testUuid={testUuid} type={type} basePath={basePath} />
       </FilterProvider>
     );
@@ -56,7 +53,7 @@ const RoutedResultsViewer: React.FC<ResultsViewerProps> = ({ type, basePath, tes
   return null;
 };
 
-const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, type, testUuid }) => {
+const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, type, testUuid, loading }) => {
   const { t } = useTranslation();
   const tablet = useLayoutType() === 'tablet';
   const [view, setView] = useState<viewOpts>('split');
@@ -94,8 +91,8 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, ty
                     selectedIndex={1}
                     onChange={(e) => setLeftContent(e.name as panelOpts)}
                   >
-                    <Switch name="panel" text={t('panel', 'Panel')} />
-                    <Switch name="tree" text={t('tree', 'Tree')} />
+                    <Switch name="panel" text={t('panel', 'Panel')} disabled={loading} />
+                    <Switch name="tree" text={t('tree', 'Tree')} disabled={loading} />
                   </ContentSwitcher>
                 )}
               </div>
@@ -113,8 +110,8 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, ty
                   onChange={(e) => setView(e.name as viewOpts)}
                   selectedIndex={expanded ? 1 : 0}
                 >
-                  <Switch name="split" text={t('split', 'Split')} />
-                  <Switch name="full" text={t('full', 'Full')} />
+                  <Switch name="split" text={t('split', 'Split')} disabled={loading} />
+                  <Switch name="full" text={t('full', 'Full')} disabled={loading} />
                 </ContentSwitcher>
               </div>
             </Column>
@@ -123,7 +120,7 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, ty
         <Row className={styles.resultsViewer}>
           {!tablet && (
             <Column sm={16} lg={tablet || expanded ? 0 : 5} className={`${styles.columnPanel} ${styles.treeColumn}`}>
-              {leftContent === 'tree' && <FilterSet />}
+              {leftContent === 'tree' && !loading ? <FilterSet /> : <AccordionSkeleton open count={4} align="start" />}
               {leftContent === 'panel' && <DesktopView />}
             </Column>
           )}
@@ -135,122 +132,8 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, ty
                 basePath={basePath}
                 showBackToTimelineButton
               />
-            ) : (
+            ) : !loading ? (
               <GroupedTimeline />
-            )}
-          </Column>
-        </Row>
-      </Grid>
-      {tablet && showTreeOverlay && (
-        <TabletOverlay
-          headerText={t('tree', 'Tree')}
-          close={() => setShowTreeOverlay(false)}
-          buttonsGroup={
-            <>
-              <Button kind="secondary" size="lg" onClick={resetTree}>
-                {t('resetTreeText', 'Reset tree')}
-              </Button>
-              <Button kind="primary" size="lg" onClick={() => setShowTreeOverlay(false)}>
-                {`${t('view', 'View')} ${timelineData?.loaded ? timelineData?.data?.rowData?.length : ''} ${t(
-                  'resultsText',
-                  'results',
-                )}`}
-              </Button>
-            </>
-          }
-        >
-          <FilterSet hideFilterSetHeader />
-        </TabletOverlay>
-      )}
-      {tablet && testUuid && type === 'trendline' && (
-        <TabletOverlay
-          headerText={t('trendline', 'Trendline')}
-          close={() => navigate({ to: testResultsBasePath(basePath) })}
-          buttonsGroup={<></>}
-        >
-          <Trendline patientUuid={patientUuid} conceptUuid={testUuid} basePath={basePath} />
-        </TabletOverlay>
-      )}
-    </>
-  );
-};
-
-const LoadingResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, type, testUuid }) => {
-  const { t } = useTranslation();
-  const tablet = useLayoutType() === 'tablet';
-  const [view, setView] = useState<viewOpts>('split');
-  const [leftContent, setLeftContent] = useState<panelOpts>('tree');
-  const [showTreeOverlay, setShowTreeOverlay] = useState<boolean>(false);
-  const expanded = view === 'full';
-
-  return (
-    <>
-      <Grid className={styles.resultsContainer}>
-        <Row className={styles.resultsHeader}>
-          <Column sm={12} lg={!tablet ? 5 : 12}>
-            <div className={styles.leftHeader}>
-              <h4 style={{ flexGrow: 1 }}>{t('results', 'Results')}</h4>
-              <div className={styles.leftHeaderActions}>
-                {tablet && (
-                  <Button
-                    size={tablet ? 'md' : 'sm'}
-                    kind="ghost"
-                    renderIcon={TreeViewAlt16}
-                    onClick={() => setShowTreeOverlay(true)}
-                    style={{
-                      marginRight: '1rem',
-                    }}
-                  >
-                    {t('showTreeButtonText', 'Show tree')}
-                  </Button>
-                )}
-                {!expanded && (
-                  <ContentSwitcher
-                    size={tablet ? 'lg' : 'md'}
-                    selectedIndex={1}
-                    onChange={(e) => setLeftContent(e.name as panelOpts)}
-                  >
-                    <Switch name="panel" text={t('panel', 'Panel')} />
-                    <Switch name="tree" text={t('tree', 'Tree')} />
-                  </ContentSwitcher>
-                )}
-              </div>
-            </div>
-          </Column>
-          {!tablet && (
-            <Column sm={12} lg={7}>
-              <div
-                className={styles.viewOptsContentSwitcherContainer}
-                style={{ display: 'flex', justifyContent: 'flex-end' }}
-              >
-                <ContentSwitcher
-                  size={tablet ? 'lg' : 'md'}
-                  style={{ maxWidth: '10rem' }}
-                  onChange={(e) => setView(e.name as viewOpts)}
-                  selectedIndex={expanded ? 1 : 0}
-                >
-                  <Switch name="split" text={t('split', 'Split')} />
-                  <Switch name="full" text={t('full', 'Full')} />
-                </ContentSwitcher>
-              </div>
-            </Column>
-          )}
-        </Row>
-        <Row className={styles.resultsViewer}>
-          {!tablet && (
-            <Column sm={16} lg={tablet || expanded ? 0 : 5} className={`${styles.columnPanel} ${styles.treeColumn}`}>
-              {leftContent === 'tree' && <AccordionSkeleton open count={4} align="start" />}
-              {leftContent === 'panel' && <DataTableSkeleton />}
-            </Column>
-          )}
-          <Column sm={16} lg={tablet || expanded ? 12 : 7} className={`${styles.columnPanel}`}>
-            {!tablet && testUuid && type === 'trendline' ? (
-              <Trendline
-                patientUuid={patientUuid}
-                conceptUuid={testUuid}
-                basePath={basePath}
-                showBackToTimelineButton
-              />
             ) : (
               <DataTableSkeleton />
             )}
@@ -263,16 +146,18 @@ const LoadingResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, baseP
           close={() => setShowTreeOverlay(false)}
           buttonsGroup={
             <>
-              <Button kind="secondary" size="lg" disabled>
+              <Button kind="secondary" size="lg" onClick={resetTree} disabled={loading}>
                 {t('resetTreeText', 'Reset tree')}
               </Button>
-              <Button kind="primary" size="lg" disabled>
-                {`${t('view', 'View')} ${t('resultsText', 'results')}`}
+              <Button kind="primary" size="lg" onClick={() => setShowTreeOverlay(false)} disabled={loading}>
+                {`${t('view', 'View')} ${
+                  !loading && timelineData?.loaded ? timelineData?.data?.rowData?.length : ''
+                } ${t('resultsText', 'results')}`}
               </Button>
             </>
           }
         >
-          <AccordionSkeleton open count={4} align="start" />
+          {!loading ? <FilterSet hideFilterSetHeader /> : <AccordionSkeleton open count={4} align="start" />}
         </TabletOverlay>
       )}
       {tablet && testUuid && type === 'trendline' && (
@@ -289,4 +174,3 @@ const LoadingResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, baseP
 };
 
 export default RoutedResultsViewer;
-export { ResultsViewer };

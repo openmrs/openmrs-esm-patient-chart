@@ -28,7 +28,6 @@ export interface ReducerState {
   roots: Array<TreeNode>;
   tests: { [key: string]: TestData };
   lowestParents: { display: string; flatName: string }[];
-  basePath?: string;
 }
 
 export enum ReducerActionType {

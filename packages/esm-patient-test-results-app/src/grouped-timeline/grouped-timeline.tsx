@@ -11,7 +11,8 @@ import type {
   DataRowsProps,
 } from './grouped-timeline-types';
 import { useTranslation } from 'react-i18next';
-import { ConfigurableLink, useLayoutType } from '@openmrs/esm-framework';
+import { ConfigurableLink, useLayoutType, usePatient } from '@openmrs/esm-framework';
+import { dashboardMeta } from '../dashboard.meta';
 
 const TimeSlots: React.FC<{
   style?: React.CSSProperties;
@@ -27,7 +28,7 @@ const PanelNameCorner: React.FC<PanelNameCornerProps> = ({ showShadow, panelName
 );
 
 const NewRowStartCell = ({ title, range, units, conceptUuid, shadow = false }) => {
-  const { basePath } = useContext(FilterContext);
+  const { patientUuid } = usePatient();
 
   return (
     <div
@@ -37,7 +38,7 @@ const NewRowStartCell = ({ title, range, units, conceptUuid, shadow = false }) =
       }}
     >
       <ConfigurableLink
-        to={`${testResultsBasePath(basePath)}/trendline/${conceptUuid}`}
+        to={`${testResultsBasePath(`${patientUuid}/${dashboardMeta.title}`)}/trendline/${conceptUuid}`}
         className={styles.trendlineLink}
       >
         {title}

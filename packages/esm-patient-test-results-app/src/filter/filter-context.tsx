@@ -11,7 +11,6 @@ const initialState = {
   roots: [{ display: '', flatName: '' }],
   tests: {},
   lowestParents: [],
-  basePath: '',
 };
 
 const initialContext = {
@@ -33,28 +32,24 @@ const FilterContext = createContext<FilterContextProps>(initialContext);
 export interface FilterProviderProps {
   roots: any[];
   children: React.ReactNode;
-  type: string;
-  testUuid: string;
-  basePath: string;
 }
 
-const FilterProvider = ({ roots, children, type, testUuid, basePath }: FilterProviderProps) => {
+const FilterProvider = ({ roots, children }: FilterProviderProps) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { t } = useTranslation();
 
   const actions = useMemo(
     () => ({
-      initialize: (trees: Array<TreeNode>) => dispatch({ type: ReducerActionType.INITIALIZE, trees: trees, basePath }),
+      initialize: (trees: Array<TreeNode>) => dispatch({ type: ReducerActionType.INITIALIZE, trees: trees }),
       toggleVal: (name: string) => {
         dispatch({ type: ReducerActionType.TOGGLEVAL, name: name });
       },
       updateParent: (name: string) => {
         dispatch({ type: ReducerActionType.UDPATEPARENT, name: name });
       },
-      updateBasePath: (basePath: string) => dispatch({ type: ReducerActionType.UPDATEBASEPATH, basePath }),
       resetTree: () => dispatch({ type: ReducerActionType.RESET_TREE }),
     }),
-    [dispatch, basePath],
+    [dispatch],
   );
 
   const activeTests = useMemo(() => {
@@ -98,7 +93,7 @@ const FilterProvider = ({ roots, children, type, testUuid, basePath }: FilterPro
     if (roots?.length && !Object.keys(state?.parents).length) {
       actions.initialize(roots);
     }
-  }, [actions, state, roots, basePath]);
+  }, [actions, state, roots]);
 
   const totalResultsCount: number = useMemo(() => {
     let count = 0;
