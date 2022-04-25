@@ -59,7 +59,7 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
             ))}
           </Tab>
           <Tab id="all-encounters-tab" label={t('allEncounters', 'All encounters')}>
-            <EncounterList encounters={encounters} isShowingAllEncounters />
+            <EncounterList encounters={encounters} showAllEncounters />
           </Tab>
         </Tabs>
       </div>

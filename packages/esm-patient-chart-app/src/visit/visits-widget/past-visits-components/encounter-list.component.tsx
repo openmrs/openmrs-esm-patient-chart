@@ -30,7 +30,7 @@ import styles from './encounter-list.scss';
 
 interface EncounterListProps {
   encounters: Array<MappedEncounter>;
-  isShowingAllEncounters?: boolean;
+  showAllEncounters?: boolean;
 }
 
 type FilterProps = {
@@ -41,7 +41,7 @@ type FilterProps = {
   getCellId: (row, key) => string;
 };
 
-const EncounterList: React.FC<EncounterListProps> = ({ isShowingAllEncounters, encounters }) => {
+const EncounterList: React.FC<EncounterListProps> = ({ showAllEncounters, encounters }) => {
   const encountersCount = 20;
   const { t } = useTranslation();
   const encounterTypes = [...new Set(encounters.map((encounter) => encounter.encounterType))];
@@ -60,7 +60,7 @@ const EncounterList: React.FC<EncounterListProps> = ({ isShowingAllEncounters, e
   const tableHeaders = [
     {
       id: 1,
-      header: isShowingAllEncounters ? 'Date & time' : 'Time',
+      header: showAllEncounters ? 'Date & time' : 'Time',
       key: 'datetime',
     },
     {
@@ -75,7 +75,7 @@ const EncounterList: React.FC<EncounterListProps> = ({ isShowingAllEncounters, e
     },
   ];
 
-  if (isShowingAllEncounters) {
+  if (showAllEncounters) {
     tableHeaders.push({
       id: 2,
       header: 'Visit type',
@@ -93,11 +93,11 @@ const EncounterList: React.FC<EncounterListProps> = ({ isShowingAllEncounters, e
   const tableRows = React.useMemo(() => {
     return (filteredRows.length ? filteredRows : paginatedEncounters)?.map((encounter) => ({
       ...encounter,
-      datetime: isShowingAllEncounters
+      datetime: showAllEncounters
         ? formatDatetime(parseDate(encounter.datetime))
         : formatTime(parseDate(encounter.datetime)),
     }));
-  }, [filteredRows, isShowingAllEncounters, paginatedEncounters]);
+  }, [filteredRows, showAllEncounters, paginatedEncounters]);
 
   const handleEncounterTypeChange = ({ selectedItem }) => {
     setFilter(selectedItem);
@@ -128,7 +128,7 @@ const EncounterList: React.FC<EncounterListProps> = ({ isShowingAllEncounters, e
           useZebraStyles
         >
           {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getToolbarProps, onInputChange }) => (
-            <div>
+            <>
               <TableContainer className={styles.tableContainer}>
                 <TableToolbar {...getToolbarProps()}>
                   <TableToolbarContent>
@@ -163,7 +163,7 @@ const EncounterList: React.FC<EncounterListProps> = ({ isShowingAllEncounters, e
                           {header.header}
                         </TableHeader>
                       ))}
-                      {isShowingAllEncounters ? <TableExpandHeader /> : null}
+                      {showAllEncounters ? <TableExpandHeader /> : null}
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -173,7 +173,7 @@ const EncounterList: React.FC<EncounterListProps> = ({ isShowingAllEncounters, e
                           {row.cells.map((cell) => (
                             <TableCell key={cell.id}>{cell.value}</TableCell>
                           ))}
-                          {isShowingAllEncounters ? (
+                          {showAllEncounters ? (
                             <TableCell className="bx--table-column-menu">
                               <OverflowMenu light size="sm" flipped>
                                 <OverflowMenuItem
@@ -217,23 +217,19 @@ const EncounterList: React.FC<EncounterListProps> = ({ isShowingAllEncounters, e
                             style={{ paddingLeft: isTablet ? '4rem' : '3rem' }}
                             colSpan={headers.length + 2}
                           >
-                            <div>
+                            <>
                               <EncounterObservations observations={encounters[i].obs} />
                               <Button
                                 kind="ghost"
                                 onClick={() =>
-                                  launchWorkspace(
-                                    encounters[i]?.form?.uuid,
-                                    encounters[i]?.visitUuid,
-                                    encounters[i]?.id,
-                                  )
+                                  launchWorkspace(encounters[i].form.uuid, encounters[i].visitUuid, encounters[i].id)
                                 }
                                 renderIcon={Edit16}
                                 style={{ marginLeft: '-1rem', marginTop: '0.5rem' }}
                               >
                                 {t('editEncounter', 'Edit encounter')}
                               </Button>
-                            </div>
+                            </>
                           </TableExpandedRow>
                         ) : (
                           <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
@@ -243,7 +239,7 @@ const EncounterList: React.FC<EncounterListProps> = ({ isShowingAllEncounters, e
                   </TableBody>
                 </Table>
               </TableContainer>
-              {isShowingAllEncounters ? (
+              {showAllEncounters ? (
                 <PatientChartPagination
                   currentItems={paginatedEncounters.length}
                   onPageNumberChange={({ page }) => goTo(page)}
@@ -252,7 +248,7 @@ const EncounterList: React.FC<EncounterListProps> = ({ isShowingAllEncounters, e
                   totalItems={encounters.length}
                 />
               ) : null}
-            </div>
+            </>
           )}
         </DataTable>
       </div>

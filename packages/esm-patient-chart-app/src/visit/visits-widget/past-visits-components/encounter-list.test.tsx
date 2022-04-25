@@ -7,7 +7,7 @@ import { mockEncounters } from '../../../../../../__mocks__/visits.mock';
 import EncounterList from './encounter-list.component';
 
 const testProps = {
-  isShowingAllEncounters: true,
+  showAllEncounters: true,
   encounters: mockEncounters,
 };
 

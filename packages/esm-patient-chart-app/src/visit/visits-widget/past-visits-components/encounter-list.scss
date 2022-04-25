@@ -54,7 +54,7 @@
 
 .tableHeader {
   > :global(.bx--table-header-label) {
-    @include carbon--type-style('productive-heading-01');
+    @extend .productiveHeading01;
     color: $text-02;
   }
 }
@@ -75,14 +75,6 @@
   > div {
     background-color: $ui-02;
   }
-}
-
-.bodyLong01 {
-  @include carbon--type-style("body-long-01");
-}
-
-.text02 {
-  color: $text-02;
 }
 
 .hiddenRow {
