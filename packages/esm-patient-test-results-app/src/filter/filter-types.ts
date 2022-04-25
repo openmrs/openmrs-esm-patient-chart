@@ -10,8 +10,8 @@ export interface TreeNode {
   subSets?: TreeNode[];
   obs?: Observation[];
   flatName: string;
+  hasData?: boolean;
 }
-
 export interface FilterNodeProps {
   root: TreeNode;
   level: number;

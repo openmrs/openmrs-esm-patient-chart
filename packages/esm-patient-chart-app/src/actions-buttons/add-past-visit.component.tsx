@@ -1,19 +1,16 @@
-import React from 'react';
+import { showModal } from '@openmrs/esm-framework';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface AddPastVisitOverflowMenuItemProps {}
 
 const AddPastVisitOverflowMenuItem: React.FC<AddPastVisitOverflowMenuItemProps> = () => {
   const { t } = useTranslation();
-  const handleClick = React.useCallback(() => {
-    window.dispatchEvent(
-      new CustomEvent('visit-dialog', {
-        detail: {
-          type: 'prompt',
-          state: { type: 'past' },
-        },
-      }),
-    );
+
+  const openModal = useCallback(() => {
+    const dispose = showModal('start-visit-dialog', {
+      closeModal: () => dispose(),
+    });
   }, []);
 
   return (
@@ -23,7 +20,7 @@ const AddPastVisitOverflowMenuItem: React.FC<AddPastVisitOverflowMenuItemProps> 
         role="menuitem"
         title={t('addPastVisit', 'Add Past Visit')}
         data-floating-menu-primary-focus
-        onClick={handleClick}
+        onClick={openModal}
         style={{
           maxWidth: '100vw',
         }}

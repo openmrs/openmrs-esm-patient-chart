@@ -60,10 +60,11 @@ const FilterNode = ({ root, level, open }: FilterNodeProps) => {
         title={
           <Checkbox
             id={root?.flatName}
-            checked={allChildrenChecked}
+            checked={root.hasData && allChildrenChecked}
             indeterminate={indeterminate}
             labelText={`${root?.display} (${parents?.[root?.flatName]?.length})`}
             onChange={() => updateParent(root.flatName)}
+            disabled={!root.hasData}
           />
         }
         style={{ paddingLeft: `${level > 0 ? 1 : 0}rem` }}

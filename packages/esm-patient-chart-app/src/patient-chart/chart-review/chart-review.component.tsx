@@ -6,7 +6,7 @@ import { basePath } from '../../constants';
 import { DashboardView, DashboardConfig } from './dashboard-view.component';
 
 function makePath(target: DashboardConfig, params: Record<string, string> = {}) {
-  const parts = `${basePath}/${target.name}`.split('/');
+  const parts = `${basePath}/${encodeURIComponent(target.title)}`.split('/');
 
   Object.keys(params).forEach((key) => {
     for (let i = 0; i < parts.length; i++) {
@@ -48,7 +48,7 @@ const ChartReview: React.FC<ChartReviewProps> = ({ patientUuid, patient, view })
   const dashboards = ungroupedDashboards.concat(groupedDashboards) as Array<DashboardConfig>;
 
   const defaultDashboard = dashboards[0];
-  const dashboard = dashboards.find((dashboard) => dashboard.name === view);
+  const dashboard = dashboards.find((dashboard) => dashboard.title === view);
 
   if (!defaultDashboard) {
     return null;

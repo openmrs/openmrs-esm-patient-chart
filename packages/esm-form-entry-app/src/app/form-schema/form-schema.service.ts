@@ -216,7 +216,7 @@ export class FormSchemaService {
                 concepts = concepts.concat(repeatingConcepts);
                 break;
               default:
-                if (!question.label && question.extras.questionOptions) {
+                if (!question.label && question.extras.questionOptions?.concept) {
                   concepts.push(question.extras.questionOptions.concept);
                 }
                 if (question.extras.questionOptions.answers) {

@@ -34,7 +34,7 @@ function setupOpenMRS() {
     },
     {
       path: `${spaBasePath}/:view`,
-      title: ([_, key]) => `${capitalize(key).replace(/_/g, ' ')} dashboard`,
+      title: ([_, key]) => `${decodeURIComponent(key)} dashboard`,
       parent: spaBasePath,
     },
   ]);
@@ -159,6 +159,27 @@ function setupOpenMRS() {
         name: 'dashboard',
         load: getAsyncLifecycle(() => import('./side-nav/generic-dashboard.component'), {
           featureName: 'Dashboard',
+          moduleName,
+        }),
+      },
+      {
+        name: 'cancel-visit-dialog',
+        load: getAsyncLifecycle(() => import('./visit/visit-prompt/cancel-visit-dialog.component'), {
+          featureName: 'cancel visit',
+          moduleName,
+        }),
+      },
+      {
+        name: 'start-visit-dialog',
+        load: getAsyncLifecycle(() => import('./visit/visit-prompt/start-visit-dialog.component'), {
+          featureName: 'start visit',
+          moduleName,
+        }),
+      },
+      {
+        id: 'end-visit-dialog',
+        load: getAsyncLifecycle(() => import('./visit/visit-prompt/end-visit-dialog.component'), {
+          featureName: 'end visit',
           moduleName,
         }),
       },

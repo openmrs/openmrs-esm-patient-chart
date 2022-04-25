@@ -1,9 +1,7 @@
+import { showModal } from '@openmrs/esm-framework';
+
 export function launchStartVisitPrompt() {
-  window.dispatchEvent(
-    new CustomEvent('visit-dialog', {
-      detail: {
-        type: 'prompt',
-      },
-    }),
-  );
+  const dispose = showModal('start-visit-dialog', {
+    closeModal: () => dispose(),
+  });
 }

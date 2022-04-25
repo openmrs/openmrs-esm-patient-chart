@@ -18,7 +18,7 @@ import { ConfigObject } from '../config-schema';
 import { useVitals } from './vitals.resource';
 import styles from './vitals-overview.scss';
 import VitalsChart from './vitals-chart.component';
-import VitalsPagination from './vitals-pagination.component';
+import PaginatedVitals from './paginated-vitals.component';
 
 interface VitalsOverviewProps {
   patientUuid: string;
@@ -129,7 +129,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
               {chartView ? (
                 <VitalsChart patientVitals={vitals} conceptUnits={conceptUnits} config={config} />
               ) : (
-                <VitalsPagination
+                <PaginatedVitals
                   tableRows={tableRows}
                   pageSize={pageSize}
                   urlLabel={urlLabel}

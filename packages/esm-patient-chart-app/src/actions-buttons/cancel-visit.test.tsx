@@ -1,16 +1,16 @@
 import React from 'react';
 import CancelVisitOverflowMenuItem from './cancel-visit.component';
 import { screen, render } from '@testing-library/react';
-import { useVisit } from '@openmrs/esm-framework';
+import { showModal, useVisit } from '@openmrs/esm-framework';
 import { mockCurrentVisit } from '../../../../__mocks__/visits.mock';
 import userEvent from '@testing-library/user-event';
-const mockDispatchEvent = jest.spyOn(window, 'dispatchEvent');
 
 const mockUseVisit = useVisit as jest.Mock;
+const mockShowModal = showModal as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
-  return { ...originalModule, useVisit: jest.fn() };
+  return { ...originalModule, useVisit: jest.fn(), showModal: jest.fn() };
 });
 
 describe('CancelVisitOverflowMenuItem', () => {
@@ -23,6 +23,6 @@ describe('CancelVisitOverflowMenuItem', () => {
 
     userEvent.click(cancelVisitButton);
 
-    expect(mockDispatchEvent).toHaveBeenCalledTimes(1);
+    expect(mockShowModal).toHaveBeenCalledTimes(1);
   });
 });

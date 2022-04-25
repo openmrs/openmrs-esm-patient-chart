@@ -108,9 +108,9 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient, basePa
           onPageNumberChange={({ page }) => goTo(page)}
           pageNumber={currentPage}
           pageSize={conditionsCount}
-          pageUrl={pageUrl}
           totalItems={conditions.length}
-          urlLabel={urlLabel}
+          dashboardLinkUrl={pageUrl}
+          dashboardLinkLabel={urlLabel}
         />
       </div>
     );
