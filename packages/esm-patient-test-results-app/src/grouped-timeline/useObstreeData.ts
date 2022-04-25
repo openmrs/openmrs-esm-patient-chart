@@ -11,8 +11,11 @@ export const getName = (prefix, name) => {
 const augmentObstreeData = (node, prefix) => {
   const outData = JSON.parse(JSON.stringify(node));
   outData.flatName = getName(prefix, node.display);
+  outData.hasData = false;
+
   if (outData?.subSets?.length) {
     outData.subSets = outData.subSets.map((subNode) => augmentObstreeData(subNode, getName(prefix, node?.display)));
+    outData.hasData = outData.subSets.some((subNode) => subNode.hasData);
   }
   if (exist(outData?.hiNormal, outData?.lowNormal)) {
     outData.range = `${outData.lowNormal} – ${outData.hiNormal}`;
@@ -21,9 +24,8 @@ const augmentObstreeData = (node, prefix) => {
     const assess = assessValue(outData);
     outData.obs = outData.obs.map((ob) => ({ ...ob, interpretation: assess(ob.value) }));
     outData.hasData = true;
-  } else {
-    outData.hasData = false;
   }
+
   return { ...outData };
 };
 

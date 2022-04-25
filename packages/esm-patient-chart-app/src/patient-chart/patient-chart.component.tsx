@@ -4,12 +4,10 @@ import {
   changeWorkspaceContext,
   useAutoCreatedOfflineVisit,
   usePatientOrOfflineRegisteredPatient,
-  useVisitOrOfflineVisit,
   useWorkspaceWindowSize,
 } from '@openmrs/esm-patient-common-lib';
 import { RouteComponentProps } from 'react-router-dom';
 import ChartReview from '../patient-chart/chart-review/chart-review.component';
-import VisitDialog from '../visit/visit-dialog.component';
 import ActionMenu from './action-menu/action-menu.component';
 import Loader from '../loader/loader.component';
 import styles from './patient-chart.scss';
@@ -21,7 +19,8 @@ interface PatientChartParams {
 }
 
 const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({ match }) => {
-  const { patientUuid, view } = match.params;
+  const { patientUuid, view: encodedView } = match.params;
+  const view = decodeURIComponent(encodedView);
   const { isLoading: isLoadingPatient, patient } = usePatientOrOfflineRegisteredPatient(patientUuid);
   const { windowSize, active } = useWorkspaceWindowSize();
   const state = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);
@@ -56,7 +55,7 @@ const PatientChart: React.FC<RouteComponentProps<PatientChartParams>> = ({ match
             <div className={styles.grid}>
               <div className={styles.chartreview}>
                 <ChartReview {...state} view={view} />
-                <VisitDialog patientUuid={patientUuid} />
+
                 <WorkspaceNotification />
               </div>
             </div>

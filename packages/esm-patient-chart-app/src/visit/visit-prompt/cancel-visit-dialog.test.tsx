@@ -3,13 +3,13 @@ import { screen, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useVisit, openmrsFetch, showNotification, showToast } from '@openmrs/esm-framework';
 import { mockCurrentVisit } from '../../../../../__mocks__/visits.mock';
-import * as mockuseVisitDialog from '../useVisitDialog';
 import CancelVisitDialog from './cancel-visit-dialog.component';
 
 const mockUseVisit = useVisit as jest.Mock;
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockShowNotification = showNotification as jest.Mock;
 const mockShowToast = showToast as jest.Mock;
+const mockCloseModal = jest.fn();
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -29,8 +29,7 @@ describe('Cancel Visit', () => {
   it('should cancel an active visit and void all associated encounters', async () => {
     mockUseVisit.mockReturnValue({ currentVisit: mockCurrentVisit, mutate: jest.fn() });
     mockOpenmrsFetch.mockReturnValueOnce(Promise.resolve({ status: 200 }));
-    spyOn(mockuseVisitDialog, 'useVisitDialog').and.returnValue({ type: 'cancel' });
-    render(<CancelVisitDialog patientUuid="some-uuid" />);
+    render(<CancelVisitDialog patientUuid="some-uuid" closeModal={mockCloseModal} />);
 
     expect(screen.getByRole('heading', { name: /Cancel active visit/ })).toBeInTheDocument();
     expect(screen.getByText('Canceling this visit will delete all associated encounter(s)')).toBeInTheDocument();
@@ -56,8 +55,7 @@ describe('Cancel Visit', () => {
   it('should display an error message when canceling a visit fails', async () => {
     mockUseVisit.mockReturnValue({ currentVisit: mockCurrentVisit, mutate: jest.fn() });
     mockOpenmrsFetch.mockReturnValueOnce(Promise.reject({ status: 500, message: 'Internal server error' }));
-    spyOn(mockuseVisitDialog, 'useVisitDialog').and.returnValue({ type: 'cancel' });
-    render(<CancelVisitDialog patientUuid="some-uuid" />);
+    render(<CancelVisitDialog patientUuid="some-uuid" closeModal={mockCloseModal} />);
 
     expect(screen.getByRole('heading', { name: /Cancel active visit/ })).toBeInTheDocument();
     expect(screen.getByText('Canceling this visit will delete all associated encounter(s)')).toBeInTheDocument();

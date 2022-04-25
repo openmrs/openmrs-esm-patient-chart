@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './biometrics-overview.scss';
+import styles from './vitals-overview.scss';
 import {
   DataTable,
   Table,
@@ -12,31 +12,24 @@ import {
 } from 'carbon-components-react';
 import { usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
-import { PatientBiometrics } from './biometrics.resource';
 
-interface BiometricsPaginationProps {
-  tableRows: Array<PatientBiometrics>;
+interface PaginatedVitalsProps {
+  tableRows: Array<any>;
   pageSize: number;
   pageUrl: string;
   urlLabel: string;
-  tableHeaders: Array<{ key: string; header: string }>;
+  tableHeaders: Array<any>;
 }
 
-const BiometricsPagination: React.FC<BiometricsPaginationProps> = ({
-  tableRows,
-  pageSize,
-  pageUrl,
-  urlLabel,
-  tableHeaders,
-}) => {
-  const { results: paginatedBiometrics, goTo, currentPage } = usePagination(tableRows, pageSize);
+const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({ tableRows, pageSize, pageUrl, urlLabel, tableHeaders }) => {
+  const { results: paginatedVitals, goTo, currentPage } = usePagination(tableRows, pageSize);
 
   return (
     <div>
       <TableContainer>
-        <DataTable rows={paginatedBiometrics} headers={tableHeaders} isSortable size="short">
+        <DataTable rows={paginatedVitals} headers={tableHeaders} isSortable={true} size="short">
           {({ rows, headers, getHeaderProps, getTableProps }) => (
-            <Table {...getTableProps()} useZebraStyles>
+            <Table {...getTableProps()} useZebraStyles className={styles.customRow}>
               <TableHead>
                 <TableRow>
                   {headers.map((header) => (
@@ -68,14 +61,14 @@ const BiometricsPagination: React.FC<BiometricsPaginationProps> = ({
       <PatientChartPagination
         pageNumber={currentPage}
         totalItems={tableRows.length}
-        currentItems={paginatedBiometrics.length}
-        pageUrl={pageUrl}
+        currentItems={paginatedVitals.length}
         pageSize={pageSize}
         onPageNumberChange={({ page }) => goTo(page)}
-        urlLabel={urlLabel}
+        dashboardLinkUrl={pageUrl}
+        dashboardLinkLabel={urlLabel}
       />
     </div>
   );
 };
 
-export default BiometricsPagination;
+export default PaginatedVitals;

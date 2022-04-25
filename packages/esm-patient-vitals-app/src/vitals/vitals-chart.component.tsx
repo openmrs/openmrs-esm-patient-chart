@@ -4,8 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Tab, Tabs } from 'carbon-components-react';
 import { PatientVitals } from './vitals.resource';
 import { LineChart } from '@carbon/charts-react';
-import { LineChartOptions } from '@carbon/charts/interfaces/charts';
-import { ScaleTypes } from '@carbon/charts/interfaces/enums';
+import { ScaleTypes, LineChartOptions } from '@carbon/charts/interfaces';
 import { formatDate, parseDate } from '@openmrs/esm-framework';
 import { withUnit } from '@openmrs/esm-patient-common-lib';
 import '@carbon/charts/styles.css';
@@ -33,12 +32,14 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
     return patientVitals
       .filter((vitals) => vitals[selectedVitalSign.value])
       .splice(0, 10)
+      .sort((vitalA, vitalB) => new Date(vitalA.date).getTime() - new Date(vitalB.date).getTime())
       .map((vitals) => {
         return (
           vitals[selectedVitalSign.value] && {
             group: 'vitalsChartData',
             key: formatDate(parseDate(vitals.date.toString()), { year: false }),
             value: vitals[selectedVitalSign.value],
+            date: vitals.date,
           }
         );
       });
@@ -71,6 +72,14 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
     },
     color: {
       scale: chartColors,
+    },
+    tooltip: {
+      customHTML: ([{ value, date }]) =>
+        `<div class="bx--tooltip bx--tooltip--shown" style="min-width: max-content; font-weight:600">${formatDate(
+          parseDate(date),
+          { year: true },
+        )} - 
+        <span style="color: #c6c6c6; font-size: 1rem; font-weight:400">${value}</span></div>`,
     },
   };
 

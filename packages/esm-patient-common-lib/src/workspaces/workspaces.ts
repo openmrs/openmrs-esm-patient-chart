@@ -1,4 +1,5 @@
 import { ExtensionRegistration, getGlobalStore, navigate, translateFrom } from '@openmrs/esm-framework';
+// FIXME We should not rely on internals here
 import { getExtensionRegistration } from '@openmrs/esm-framework/src/internal';
 import _i18n from 'i18next';
 import { WorkspaceWindowState } from '..';
@@ -119,6 +120,7 @@ export function launchPatientWorkspace(name: string, additionalProps?: object) {
     if (existingIdx >= 0) {
       const restOfWorkspaces = [...state.openWorkspaces];
       restOfWorkspaces.splice(existingIdx, 1);
+      state.openWorkspaces[existingIdx].additionalProps = newWorkspace.additionalProps;
       const openWorkspaces = [state.openWorkspaces[existingIdx], ...restOfWorkspaces];
       store.setState({ ...state, openWorkspaces });
     } else if (!promptCheckFcn || promptCheckFcn()) {

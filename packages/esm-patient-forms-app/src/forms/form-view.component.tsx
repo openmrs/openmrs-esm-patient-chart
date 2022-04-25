@@ -167,10 +167,10 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
               pageNumber={currentPage}
               totalItems={allFormInfos.length}
               currentItems={results.length}
-              pageUrl={pageUrl}
               pageSize={pageSize}
               onPageNumberChange={({ page }) => goTo(page)}
-              urlLabel={urlLabel}
+              dashboardLinkUrl={pageUrl}
+              dashboardLinkLabel={urlLabel}
             />
           </>
         )}
