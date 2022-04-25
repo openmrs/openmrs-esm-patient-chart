@@ -38,7 +38,7 @@ const NewRowStartCell = ({ title, range, units, conceptUuid, shadow = false }) =
       }}
     >
       <ConfigurableLink
-        to={`${testResultsBasePath(`${patientUuid}/${dashboardMeta.title}`)}/trendline/${conceptUuid}`}
+        to={`${testResultsBasePath(`/patient/${patientUuid}/chart`)}/trendline/${conceptUuid}`}
         className={styles.trendlineLink}
       >
         {title}

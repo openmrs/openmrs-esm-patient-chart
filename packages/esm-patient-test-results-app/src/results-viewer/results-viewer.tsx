@@ -6,7 +6,6 @@ import {
   ContentSwitcher,
   DataTableSkeleton,
   Grid,
-  InlineLoading,
   Row,
   Switch,
 } from 'carbon-components-react';
@@ -18,7 +17,7 @@ import DesktopView from '../desktop-view/desktop-view.component';
 import styles from './results-viewer.styles.scss';
 import { useTranslation } from 'react-i18next';
 import { testResultsBasePath } from '../helpers';
-import Trendline from '../trendline-new/trendline.component';
+import Trendline from '../trendline/trendline.component';
 import TabletOverlay from '../tablet-overlay';
 import { TreeViewAlt16 } from '@carbon/icons-react';
 
@@ -46,7 +45,13 @@ const RoutedResultsViewer: React.FC<ResultsViewerProps> = ({ type, basePath, tes
   if (roots?.length) {
     return (
       <FilterProvider roots={!loading ? roots : []}>
-        <ResultsViewer patientUuid={patientUuid} testUuid={testUuid} type={type} basePath={basePath} />
+        <ResultsViewer
+          patientUuid={patientUuid}
+          testUuid={testUuid}
+          type={type}
+          basePath={basePath}
+          loading={loading}
+        />
       </FilterProvider>
     );
   }
@@ -120,7 +125,8 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, ty
         <Row className={styles.resultsViewer}>
           {!tablet && (
             <Column sm={16} lg={tablet || expanded ? 0 : 5} className={`${styles.columnPanel} ${styles.treeColumn}`}>
-              {leftContent === 'tree' && !loading ? <FilterSet /> : <AccordionSkeleton open count={4} align="start" />}
+              {leftContent === 'tree' &&
+                (!loading ? <FilterSet /> : <AccordionSkeleton open count={4} align="start" />)}
               {leftContent === 'panel' && <DesktopView />}
             </Column>
           )}
