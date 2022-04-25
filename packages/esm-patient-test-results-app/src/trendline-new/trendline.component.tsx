@@ -90,12 +90,18 @@ const Trendline: React.FC<TrendlineProps> = ({
     max?: number;
   }> = [];
 
+  //
+
   const tableData: Array<{
     id: string;
     date: string;
     time: string;
-    value: number;
-    interpretation?: OBSERVATION_INTERPRETATION;
+    value:
+      | number
+      | {
+          value: number;
+          interpretation: OBSERVATION_INTERPRETATION;
+        };
   }> = [];
 
   const dataset = chartTitle;
@@ -120,8 +126,10 @@ const Trendline: React.FC<TrendlineProps> = ({
       id: `${idx}`,
       date: formatDate(parseDate(obs.obsDatetime)),
       time: formatTime(parseDate(obs.obsDatetime)),
-      value: obs.value,
-      interpretation: obs.interpretation,
+      value: {
+        value: obs.value,
+        interpretation: obs.interpretation,
+      },
     });
   });
 
@@ -179,12 +187,12 @@ const Trendline: React.FC<TrendlineProps> = ({
         key: 'date',
       },
       {
-        header: t('value', 'Value') + ` (${leftAxisTitle})`,
-        key: 'value',
-      },
-      {
         header: t('timeOfTest', 'Time of Test'),
         key: 'time',
+      },
+      {
+        header: `${t('value', 'Value')} (${leftAxisTitle})`,
+        key: 'value',
       },
     ],
     [leftAxisTitle, t],
