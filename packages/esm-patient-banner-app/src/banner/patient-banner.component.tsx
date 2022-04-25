@@ -53,6 +53,11 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
       !(overFlowMenuRef?.current && overFlowMenuRef?.current.contains(event.target)) && onClick(patientUuid);
     }
   };
+  const [showDropdown, setShowDropdown] = React.useState(false);
+  const diappear = React.useCallback((event: MouseEvent) => {
+    event.stopPropagation();
+    setShowDropdown((value) => !value);
+  }, []);
 
   return (
     <div className={styles.container} role="banner">
@@ -82,8 +87,10 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
                       <OverflowMenuVertical16 style={{ marginLeft: '0.5rem' }} />
                     </>
                   }
+                  dropDown={showDropdown}
                 >
                   <ExtensionSlot
+                    onClick={diappear}
                     extensionSlotName="patient-actions-slot"
                     key="patient-actions-slot"
                     className={styles.overflowMenuItemList}
