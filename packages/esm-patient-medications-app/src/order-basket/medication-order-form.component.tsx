@@ -25,6 +25,7 @@ import { OrderBasketItem } from '../types/order-basket-item';
 import { getCommonMedicationByUuid } from '../api/common-medication';
 import { OpenmrsResource } from '../types/openmrs-resource';
 import { ConfigObject } from '../config-schema';
+import dayjs from 'dayjs';
 
 export interface MedicationOrderFormProps {
   initialOrderBasketItem: OrderBasketItem;
@@ -272,7 +273,7 @@ export default function MedicationOrderForm({
               <DatePicker
                 light={isTablet}
                 datePickerType="single"
-                maxDate={new Date()}
+                maxDate={dayjs(new Date()).format('MM/DD/YYYY')}
                 value={[orderBasketItem.startDate]}
                 onChange={([newStartDate]) =>
                   setOrderBasketItem({
