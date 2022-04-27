@@ -115,9 +115,9 @@ const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = ({ patient, 
           onPageNumberChange={({ page }) => goTo(page)}
           pageNumber={currentPage}
           pageSize={immunizationsCount}
-          pageUrl={pageUrl}
           totalItems={immunizations.length}
-          urlLabel={urlLabel}
+          dashboardLinkUrl={pageUrl}
+          dashboardLinkLabel={urlLabel}
         />
       </div>
     );

@@ -4,7 +4,7 @@ import {
   QueueItemDescriptor,
   queueSynchronizationItem,
   useConnectivity,
-  useSessionUser,
+  useSession,
   useVisit,
   Visit,
 } from '@openmrs/esm-framework';
@@ -38,16 +38,14 @@ export function useVisitOrOfflineVisit(patientUuid: string) {
 }
 
 /**
- * Returns the patient's current offline visit
+ * Returns the patient's current offline visit.
  * @param patientUuid The UUID of the patient.
  */
 export function useOfflineVisit(patientUuid: string): ReturnType<typeof useVisit> {
-  const isOnline = useConnectivity();
-  const canProvideOfflineVisit = isOnline && patientUuid;
-  const swrKey = canProvideOfflineVisit ? null : `offlineVisit/${patientUuid}`;
+  const swrKey = patientUuid ? `offlineVisit/${patientUuid}` : null;
   const offlineVisitSwr = useSWR<Visit>(swrKey, async () => {
     const offlineVisit = await getOfflineVisitForPatient(patientUuid);
-    return offlineVisit ? offlineVisitToVisit(offlineVisit) : null;
+    return offlineVisit ? offlineVisitToVisit(offlineVisit) : undefined;
   });
 
   return {
@@ -67,7 +65,7 @@ export function useOfflineVisit(patientUuid: string): ReturnType<typeof useVisit
  */
 export function useAutoCreatedOfflineVisit(patientUuid: string, offlineVisitTypeUuid: string) {
   const isOnline = useConnectivity();
-  const location = useSessionUser()?.sessionLocation?.uuid;
+  const location = useSession()?.sessionLocation?.uuid;
   const { currentVisit, isValidating, error, mutate } = useOfflineVisit(patientUuid);
 
   useEffect(() => {

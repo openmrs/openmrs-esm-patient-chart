@@ -5,6 +5,7 @@ export interface FormEncounter {
   uuid: string;
   encounterType?: EncounterType;
   name: string;
+  display: string;
   version: string;
   published: boolean;
   retired: boolean;

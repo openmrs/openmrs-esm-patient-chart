@@ -73,7 +73,7 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
         return {
           id: formInfo.form.uuid,
           lastCompleted: formInfo.lastCompleted ? formatDatetime(formInfo.lastCompleted) : undefined,
-          formName: formInfo.form.name,
+          formName: formInfo.form.display ?? formInfo.form.name,
           formUuid: formInfo.form.uuid,
           encounterUuid: formInfo?.associatedEncounters[0]?.uuid,
         };
@@ -131,7 +131,7 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
                                     patient,
                                     htmlFormEntryForms,
                                     '',
-                                    results[index].form.name,
+                                    results[index].form.display ?? results[index].form.name,
                                   )
                                 }
                                 role="presentation"
@@ -149,7 +149,7 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
                                       patient,
                                       htmlFormEntryForms,
                                       first(results[index].associatedEncounters)?.uuid,
-                                      results[index].form.name,
+                                      results[index].form.display ?? results[index].form.name,
                                     )
                                   }
                                 />
@@ -167,10 +167,10 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
               pageNumber={currentPage}
               totalItems={allFormInfos.length}
               currentItems={results.length}
-              pageUrl={pageUrl}
               pageSize={pageSize}
               onPageNumberChange={({ page }) => goTo(page)}
-              urlLabel={urlLabel}
+              dashboardLinkUrl={pageUrl}
+              dashboardLinkLabel={urlLabel}
             />
           </>
         )}

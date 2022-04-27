@@ -3,7 +3,6 @@ import EndVisitDialog from './end-visit-dialog.component';
 import { screen, render, waitFor } from '@testing-library/react';
 import { showNotification, showToast, updateVisit, useVisit } from '@openmrs/esm-framework';
 import { mockCurrentVisit } from '../../../../../__mocks__/visits.mock';
-import * as mockUseVisitDialog from '../useVisitDialog';
 import userEvent from '@testing-library/user-event';
 import { of, throwError } from 'rxjs';
 
@@ -19,6 +18,7 @@ const mockUpdateVisit = updateVisit as jest.Mock;
 const mockShowToast = showToast as jest.Mock;
 const mockShowNotification = showNotification as jest.Mock;
 const mockMutate = jest.fn();
+const mockCloseModal = jest.fn();
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -36,10 +36,9 @@ describe('EndVisit', () => {
   });
 
   test('should end an active visit and display toast message', async () => {
-    spyOn(mockUseVisitDialog, 'useVisitDialog').and.returnValue({ type: 'end' });
     mockUseVisit.mockReturnValue({ currentVisit: mockCurrentVisit, mutate: mockMutate });
     mockUpdateVisit.mockReturnValueOnce(of({ status: 200 }));
-    render(<EndVisitDialog patientUuid="some-patient-uuid" />);
+    render(<EndVisitDialog patientUuid="some-patient-uuid" closeModal={mockCloseModal} />);
 
     expect(screen.getByRole('heading', { name: /End active visit/ })).toBeInTheDocument();
     expect(
@@ -61,10 +60,9 @@ describe('EndVisit', () => {
   });
 
   test('should display error message when rest api call to end visit fails', async () => {
-    spyOn(mockUseVisitDialog, 'useVisitDialog').and.returnValue({ type: 'end' });
     mockUseVisit.mockReturnValue({ currentVisit: mockCurrentVisit, mutate: mockMutate });
     mockUpdateVisit.mockReturnValueOnce(throwError(new Error('Internal error message')));
-    render(<EndVisitDialog patientUuid="some-patient-uuid" />);
+    render(<EndVisitDialog patientUuid="some-patient-uuid" closeModal={mockCloseModal} />);
 
     expect(screen.getByRole('heading', { name: /End active visit/ })).toBeInTheDocument();
     expect(

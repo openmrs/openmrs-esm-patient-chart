@@ -32,6 +32,26 @@ describe('workspace system', () => {
     allergies.closeWorkspace();
     expect(store.getState().openWorkspaces.length).toEqual(0);
   });
+  test('updates workspace title when provided with `workspaceTitle` prop', () => {
+    const store = getWorkspaceStore();
+    registerWorkspace({ name: 'POC HIV Form', title: 'Clinical Form', load: jest.fn() });
+    launchPatientWorkspace('POC HIV Form', { workspaceTitle: 'POC HIV Form' });
+
+    expect(store.getState().openWorkspaces.length).toEqual(1);
+
+    const POCHIVForm = store.getState().openWorkspaces[0];
+    expect(POCHIVForm.name).toBe('POC HIV Form');
+    expect(POCHIVForm.additionalProps['workspaceTitle']).toBe('POC HIV Form');
+
+    launchPatientWorkspace('POC HIV Form', { workspaceTitle: 'POC HIV Form Updated' });
+
+    expect(POCHIVForm.additionalProps['workspaceTitle']).toBe('POC HIV Form Updated');
+    expect(store.getState().openWorkspaces.length).toEqual(1);
+
+    POCHIVForm.closeWorkspace();
+
+    expect(store.getState().openWorkspaces.length).toEqual(0);
+  });
 
   test('coexisting and non-coexisting workspaces', () => {
     const store = getWorkspaceStore();

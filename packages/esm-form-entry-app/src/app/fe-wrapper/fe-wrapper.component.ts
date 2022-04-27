@@ -14,6 +14,7 @@ import { PatientPreviousEncounterService } from '../openmrs-api/patient-previous
 import { patientFormSyncItem, PatientFormSyncItemContent } from '../offline/sync';
 import { SingleSpaPropsService } from '../single-spa-props/single-spa-props.service';
 import { CreateFormParams, FormCreationService } from '../form-creation/form-creation.service';
+import { ConceptService } from '../services/concept.service';
 
 type FormState =
   | 'initial'
@@ -35,8 +36,9 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
 
   public form: Form;
   public loadingError?: string;
-  public labelMap: Array<Object> = [];
+  public labelMap: {};
   public formState: FormState = 'initial';
+  public language: string = (window as any).i18next.language.substring(0, 2).toLowerCase();
 
   public constructor(
     private readonly openmrsApi: OpenmrsEsmApiService,
@@ -46,6 +48,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
     private readonly patientPreviousEncounter: PatientPreviousEncounterService,
     private readonly formCreationService: FormCreationService,
     private readonly singleSpaPropsService: SingleSpaPropsService,
+    private conceptService: ConceptService,
   ) {}
 
   public ngOnInit() {
@@ -68,6 +71,17 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
         (form) => {
           this.formState = 'ready';
           this.form = form;
+
+          const unlabeledConcepts = this.formSchemaService.getUnlabeledConcepts(this.form);
+          // Fetch concept labels from server
+          unlabeledConcepts.length > 0
+            ? this.conceptService.searchBulkConceptByUUID(unlabeledConcepts, this.language).subscribe((conceptData) => {
+                this.labelMap = {};
+                conceptData.forEach((concept: any) => {
+                  this.labelMap[concept.extId] = concept.display;
+                });
+              })
+            : (this.labelMap = []);
         },
         (err) => {
           // TODO: Improve error handling.
