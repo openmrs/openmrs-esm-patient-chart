@@ -5,7 +5,11 @@ interface CustomOverflowMenuComponentProps {
   dropDownMenu: boolean;
 }
 
-const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = ({ dropDownMenu, menuTitle, children }) => {
+const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = ({
+  dropDownMenu,
+  menuTitle,
+  children,
+}) => {
   const [showMenu, setShowMenu] = useState(false);
   const wrapperRef = useRef(null);
 
