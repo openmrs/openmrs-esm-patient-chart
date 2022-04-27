@@ -55,7 +55,7 @@ function setupOpenMRS() {
         name: 'forms-widget',
         slot: 'patient-chart-summary-dashboard-slot',
         order: 5,
-        load: getAsyncLifecycle(() => import('./forms/forms-overview.component'), options),
+        load: getAsyncLifecycle(() => import('./forms/forms-summary-dashboard.component'), options),
         meta: {
           columnSpan: 4,
         },
