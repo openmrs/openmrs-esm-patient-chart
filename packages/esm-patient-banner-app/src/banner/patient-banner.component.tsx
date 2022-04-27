@@ -54,7 +54,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
     }
   };
   const [showDropdown, setShowDropdown] = React.useState(false);
-  const diappear = React.useCallback((event: MouseEvent) => {
+  const closeDropdownMenu = React.useCallback((event: MouseEvent) => {
     event.stopPropagation();
     setShowDropdown((value) => !value);
   }, []);
@@ -90,7 +90,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
                   dropDown={showDropdown}
                 >
                   <ExtensionSlot
-                    onClick={diappear}
+                    onClick={closeDropdownMenu}
                     extensionSlotName="patient-actions-slot"
                     key="patient-actions-slot"
                     className={styles.overflowMenuItemList}
