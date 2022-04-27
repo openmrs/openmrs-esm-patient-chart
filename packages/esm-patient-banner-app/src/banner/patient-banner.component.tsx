@@ -87,7 +87,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
                       <OverflowMenuVertical16 style={{ marginLeft: '0.5rem' }} />
                     </>
                   }
-                  dropDown={showDropdown}
+                  dropDownMenu={showDropdown}
                 >
                   <ExtensionSlot
                     onClick={closeDropdownMenu}

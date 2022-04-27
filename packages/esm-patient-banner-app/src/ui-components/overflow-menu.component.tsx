@@ -2,24 +2,20 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 
 interface CustomOverflowMenuComponentProps {
   menuTitle: React.ReactNode;
-  dropDownmenu: boolean;
+  dropDownMenu: boolean;
 }
 
-const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = ({
-  dropDownmenu,
-  menuTitle,
-  children,
-}) => {
+const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = ({ dropDownMenu, menuTitle, children }) => {
   const [showMenu, setShowMenu] = useState(false);
   const wrapperRef = useRef(null);
 
   useEffect(() => {
-    if (!dropDownmenu) {
+    if (!dropDownMenu) {
       setShowMenu((state) => state);
     }
 
     setShowMenu(() => false);
-  }, [dropDownmenu]);
+  }, [dropDownMenu]);
   const toggleShowMenu = useCallback(() => setShowMenu((state) => !state), []);
 
   useEffect(() => {
