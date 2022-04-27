@@ -26,6 +26,16 @@ interface CommonDataTableProps {
 }
 
 const CommonDataTable: React.FC<CommonDataTableProps> = ({ title, data, description, toolbar, tableHeaders }) => {
+  const interpretationToCSS = {
+    OFF_SCALE_HIGH: 'offScaleHigh',
+    CRITICALLY_HIGH: 'criticallyHigh',
+    HIGH: 'high',
+    OFF_SCALE_LOW: 'offScaleLow',
+    CRITICALLY_LOW: 'criticallyLow',
+    LOW: 'low',
+    NORMAL: '',
+  };
+
   const isTablet = useLayoutType() === 'tablet';
 
   return (
@@ -56,9 +66,18 @@ const CommonDataTable: React.FC<CommonDataTableProps> = ({ title, data, descript
             <TableBody>
               {rows.map((row, i) => (
                 <TypedTableRow key={row.id} interpretation={data[i]?.interpretation} {...getRowProps({ row })}>
-                  {row.cells.map((cell) => (
-                    <TableCell key={cell.id}>{cell.value}</TableCell>
-                  ))}
+                  {row.cells.map((cell) => {
+                    return (
+                      <TableCell
+                        className={
+                          cell.value?.interpretation ? styles[interpretationToCSS[cell.value.interpretation]] : ''
+                        }
+                        key={cell.id}
+                      >
+                        {cell.value?.value ?? cell.value}
+                      </TableCell>
+                    );
+                  })}
                 </TypedTableRow>
               ))}
             </TableBody>

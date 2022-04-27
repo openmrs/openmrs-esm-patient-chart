@@ -83,3 +83,47 @@ tr {
     }
   }
 }
+
+.offScaleHigh,
+.offScaleLow,
+.criticallyHigh,
+.criticallyLow,
+.high,
+.low {
+    @include carbon--type-style('productive-heading-01');
+    color: $text-01;
+}
+
+.high,
+.low {
+  box-shadow: 0 0 0 1px #000000;
+}
+
+.criticallyHigh,
+.criticallyLow {
+  box-shadow: 0 0 0 1px $danger, inset 0 0 0 1px $danger;
+}
+
+.offScaleLow::after {
+  content: " ↓↓↓";
+}
+
+.offScaleHigh::after {
+  content: " ↑↑↑";
+}
+
+.criticallyLow::after {
+  content: " ↓↓";
+}
+
+.criticallyHigh::after {
+  content: " ↑↑";
+}
+
+.low::after {
+  content: " ↓";
+}
+
+.high::after {
+  content: " ↑";
+}
