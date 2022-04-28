@@ -1,4 +1,5 @@
 import { navigate } from '@openmrs/esm-framework';
+import { dashboardMeta } from './dashboard.meta';
 
 export const makeThrottled = <T extends (...args: any[]) => any>(
   func: T,
@@ -38,4 +39,4 @@ export const navigateToTrendline = (basePath: string, panelUuid: string, testUui
 
 export const navigateToResults = (basePath: string) => navigate({ to: `${testResultsBasePath(basePath)}` });
 
-export const testResultsBasePath = (basePath: string) => `${window.spaBase}${basePath}/test-results`;
+export const testResultsBasePath = (basePath: string) => `${window.spaBase}${basePath}/${dashboardMeta.title}`;

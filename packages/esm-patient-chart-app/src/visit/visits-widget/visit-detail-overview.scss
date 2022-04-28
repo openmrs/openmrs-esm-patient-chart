@@ -3,48 +3,6 @@
 @import "~carbon-components/src/globals/scss/mixins";
 @import "../../root.scss";
 
-.diagnosisLabel {
-  @include carbon--type-style('productive-heading-01');
-  color: $text-02;
-  margin-top: 5px;
-}
-
-.caption01 {
-  @include carbon--type-style("caption-01");
-}
-
-.bodyShort02 {
-  @include carbon--type-style("body-short-02");
-}
-
-.productiveHeading01 {
-  @include carbon--type-style("productive-heading-01");
-}
-
-.productiveHeading02 {
-  @include carbon--type-style("productive-heading-02");
-}
-
-.productiveHeading03 {
-  @include carbon--type-style("productive-heading-03");
-}
-
-.bodyLong01 {
-  @include carbon--type-style("body-long-01");
-}
-
-.label01 {
-  @include carbon--type-style('label-01');
-}
-
-.text01 {
-  color: $ui-05;
-}
-
-.text02 {
-  color: $text-02;
-}
-
 .visitType {
   @include carbon--type-style('productive-heading-02');
   color: $text-02;
@@ -83,51 +41,37 @@
 
 .toggle {
   border: 1px solid #A6C8FF;
-}
 
-.toggle:hover {
-  background-color: $color-blue-10;
-}
+  &:hover {
+    background-color: $color-blue-10;
+  }
 
-.toggle:active, .toggle:focus {
-  box-shadow: none;
-  background-color: $color-blue-10;
+  &:active, &:focus {
+    box-shadow: none;
+    background-color: $color-blue-10;
+  }
+
+  &:first-of-type {
+    border-radius: $spacing-02 0 0 $spacing-02;
+  }
+
+  &:last-of-type {
+    border-radius: 0 $spacing-02 $spacing-02 0;
+  }
 }
 
 .toggleActive {
   background-color: $color-blue-10;
   border: 1px solid $link-01;
-}
 
-.toggleActive:active, .toggleActive:focus {
-  box-shadow: none;
-  border: 1px solid $link-01;
-  background-color: $color-blue-10;
-}
-
-.toggle:first-of-type {
-  border-radius: $spacing-02 0 0 $spacing-02;
-}
-
-.toggle:last-of-type {
-  border-radius: 0 $spacing-02 $spacing-02 0;
+  &:active, &:focus {
+    box-shadow: none;
+  }
 }
 
 .encounterEmptyState {
   text-align: center;
   margin: 0 1rem 1rem 1rem; 
-}
-
-.expandedRow > td {
-  padding: inherit !important
-}
-
-.expandedRow > td > div {
-  max-height: max-content !important;
-}
-
-.expandedRow > div {
-  background-color: $ui-02;
 }
 
 .observation {
@@ -141,27 +85,8 @@
   align-self: center;
 }
 
-.summaryContainer {
-  background-color: $ui-background;
-  display: grid;
-  grid-template-columns: max-content auto;
-  padding: 1rem 0rem;
-}
-
 .flexSections {
   display: flex;
-}
-
-.verticalTabs {
-  margin: 1rem 0;
-
-  &:global(.bx--tabs--scrollable .bx--tabs--scrollable__nav-item+.bx--tabs--scrollable__nav-item) {
-    margin-left: 0rem;
-  }
-}
-
-.verticalTabs > ul {
-  flex-direction: column !important;
 }
 
 .desktopTabs {
@@ -174,22 +99,6 @@
   button {
     height: 48px;
   }
-}
-
-.tab > button {
-  border-bottom: 0 !important;
-  border-left: 3px solid $ui-03 !important;
-}
-
-.tab > button, .tab > button:focus, .tab > button:active {
-  outline: 0 !important;
-  outline-offset: 0 !important;
-}
-
-.selectedTab > button {
-  border-left: 3px solid var(--brand-03) !important;
-  border-bottom: 0 !important;
-  font-weight: 600 !important;
 }
 
 .tabContent {
@@ -217,14 +126,6 @@
   color: $text-01;
 }
 
-.diagnosesList {
-  display: flex;
-  flex-flow: row wrap;
-  padding-bottom: 0.5rem;
-  margin: 0 1rem;
-  border-bottom: 1px solid $ui-03;
-}
-
 .toggleSwitch {
   display: flex;
   flex-direction: row;
@@ -248,27 +149,8 @@
   margin: $spacing-02 0;
 }
 
-.tableContainer {
-  padding: 0;
-}
-
-.encounterListContainer {
-  border: 1px solid $ui-03;
-}
-
 .observationsEmptyState {
   margin-top: 1.5rem;
-}
-
-.tableHeader {
-  > :global(.bx--table-header-label) {
-    @include carbon--type-style('productive-heading-01');
-    color: $text-02;
-  }
-}
-
-.menuItem {
-  max-width: none;
 }
 
 .loader {

@@ -27,9 +27,8 @@ jest.mock('@openmrs/esm-framework', () => {
 
   return {
     ...originalModule,
-    showToast: jest.fn(),
     useLocations: jest.fn().mockImplementation(() => mockLocations),
-    useSessionUser: jest.fn().mockImplementation(() => mockSessionDataResponse.data),
+    useSession: jest.fn().mockImplementation(() => mockSessionDataResponse.data),
   };
 });
 

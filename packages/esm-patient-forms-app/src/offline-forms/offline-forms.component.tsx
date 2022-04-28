@@ -21,6 +21,7 @@ import { FormEncounter } from '../types';
 import { useOfflineFormManagement } from './use-offline-form-management';
 import styles from './offline-forms.styles.scss';
 import { useValidOfflineFormEncounters } from './use-offline-form-encounters';
+import { mutate } from 'swr';
 
 export interface OfflineFormsProps {
   canMarkFormsAsOffline: boolean;
@@ -107,6 +108,8 @@ function OfflineFormToggle({ form, disabled }: { form: FormEncounter; disabled: 
     } else {
       unregisterFormAsOffline();
     }
+
+    mutate('offlineForms');
   };
 
   if (isFormFullyCachedSwr.data === undefined) {

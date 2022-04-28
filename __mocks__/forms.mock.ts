@@ -1,32 +1,45 @@
-import { Form } from '../packages/esm-patient-forms-app/src/types';
-
-export const mockForms: Array<Form> = [
+export const mockForms = [
   {
-    encounterTypeName: 'Vitals',
-    encounterTypeUuid: '67a71486-1a54-468f-ac3e-7091a9a79584',
-    name: 'Biometrics',
-    published: false,
-    retired: false,
-    uuid: '1dfe36b9-7a85-429a-b71d-008a6afca574',
-    lastCompleted: null,
-  },
-  {
-    encounterTypeName: 'Admission',
-    encounterTypeUuid: 'e22e39fd-7db2-45e7-80f1-60fa0d5a4378',
-    name: 'Admission (Simple)',
-    published: false,
-    retired: false,
-    uuid: 'd2c7532c-fb01-11e2-8ff2-fd54ab5fdb2a',
-    lastCompleted: null,
-  },
-  {
-    encounterTypeName: 'Vitals',
-    encounterTypeUuid: '67a71486-1a54-468f-ac3e-7091a9a79584',
-    name: 'POC Vitals v1.0',
-    published: true,
-    retired: false,
-    uuid: 'c51b0cbe-32d8-4ea5-81d2-8f3ade30c2de',
-    lastCompleted: null,
+    form: {
+      uuid: '0a9fc16e-4c00-4842-a1e4-e4bafeb6e226',
+      name: 'POC COVID 19 Assessment Form v1.1',
+      encounterType: { uuid: '466d6707-8429-4e61-b5a0-d63444f5ad35', name: 'COVIDSCREENING' },
+      version: '1.1',
+      published: true,
+      retired: false,
+      resources: [
+        {
+          uuid: '44ef6954-c6f1-4cac-90b9-66b4b4c55c3a',
+          name: 'JSON schema',
+          dataType: 'AmpathJsonSchema',
+          valueReference: '2e6295c6-3022-48d5-abd7-725dd3e22b6a',
+        },
+      ],
+    },
+    associatedEncounters: [
+      {
+        uuid: '30726a13-ac53-4b51-a1cb-91c410a70960',
+        encounterDatetime: '2022-04-08T09:21:48.000+0300',
+        encounterType: { uuid: '466d6707-8429-4e61-b5a0-d63444f5ad35', name: 'COVIDSCREENING' },
+        form: {
+          uuid: '0a9fc16e-4c00-4842-a1e4-e4bafeb6e226',
+          name: 'AMPATH POC COVID 19 Assessment Form v1.1',
+          encounterType: { uuid: '466d6707-8429-4e61-b5a0-d63444f5ad35', name: 'COVIDSCREENING' },
+          version: '1.1',
+          published: true,
+          retired: false,
+          resources: [
+            {
+              uuid: '44ef6954-c6f1-4cac-90b9-66b4b4c55c3a',
+              name: 'JSON schema',
+              dataType: 'AmpathJsonSchema',
+              valueReference: '2e6295c6-3022-48d5-abd7-725dd3e22b6a',
+            },
+          ],
+        },
+      },
+    ],
+    lastCompleted: new Date('2022-04-08T06:21:48.000Z'),
   },
 ];
 

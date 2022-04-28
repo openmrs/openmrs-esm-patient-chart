@@ -13,7 +13,7 @@ import {
 import { usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 
-interface VitalsPaginationProps {
+interface PaginatedVitalsProps {
   tableRows: Array<any>;
   pageSize: number;
   pageUrl: string;
@@ -21,13 +21,7 @@ interface VitalsPaginationProps {
   tableHeaders: Array<any>;
 }
 
-const VitalsPagination: React.FC<VitalsPaginationProps> = ({
-  tableRows,
-  pageSize,
-  pageUrl,
-  urlLabel,
-  tableHeaders,
-}) => {
+const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({ tableRows, pageSize, pageUrl, urlLabel, tableHeaders }) => {
   const { results: paginatedVitals, goTo, currentPage } = usePagination(tableRows, pageSize);
 
   return (
@@ -77,4 +71,4 @@ const VitalsPagination: React.FC<VitalsPaginationProps> = ({
   );
 };
 
-export default VitalsPagination;
+export default PaginatedVitals;

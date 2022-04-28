@@ -3,49 +3,59 @@ import { Grid, ShadowBox } from '../timeline/helpers';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import FilterContext from '../filter/filter-context';
 import styles from './grouped-timeline.styles.scss';
-import { makeThrottled } from '../helpers';
+import { makeThrottled, testResultsBasePath } from '../helpers';
 import type {
   DateHeaderGridProps,
   PanelNameCornerProps,
   TimelineCellProps,
   DataRowsProps,
 } from './grouped-timeline-types';
+import { useTranslation } from 'react-i18next';
+import { ConfigurableLink, useLayoutType, usePatient } from '@openmrs/esm-framework';
+import { dashboardMeta } from '../dashboard.meta';
 
 const TimeSlots: React.FC<{
   style?: React.CSSProperties;
   className?: string;
 }> = ({ children = undefined, className, ...props }) => (
-  <div className={styles['time-slot-inner'] + (className ? ' ' + className : '')} {...props}>
+  <div className={`${styles.timeSlotInner} ${className ? className : ''}`} {...props}>
     <div>{children}</div>
   </div>
 );
 
 const PanelNameCorner: React.FC<PanelNameCornerProps> = ({ showShadow, panelName }) => (
-  <TimeSlots className={`${styles['corner-grid-element']} ${showShadow ? `${styles.shadow}` : ''}`}>
-    {panelName}
-  </TimeSlots>
+  <TimeSlots className={`${styles.cornerGridElement} ${showShadow ? styles.shadow : ''}`}>{panelName}</TimeSlots>
 );
 
-const NewRowStartCell = ({ title, range, units, shadow = false }) => (
-  <div
-    className={styles['row-start-cell']}
-    style={{
-      boxShadow: shadow ? '8px 0 20px 0 rgba(0,0,0,0.15)' : undefined,
-    }}
-  >
-    <span className={styles['trendline-link']}>{title}</span>
-    <span className={styles['range-units']}>
-      {range} {units}
-    </span>
-  </div>
-);
+const NewRowStartCell = ({ title, range, units, conceptUuid, shadow = false }) => {
+  const { patientUuid } = usePatient();
+
+  return (
+    <div
+      className={styles.rowStartCell}
+      style={{
+        boxShadow: shadow ? '8px 0 20px 0 rgba(0,0,0,0.15)' : undefined,
+      }}
+    >
+      <ConfigurableLink
+        to={`${testResultsBasePath(`/patient/${patientUuid}/chart`)}/trendline/${conceptUuid}`}
+        className={styles.trendlineLink}
+      >
+        {title}
+      </ConfigurableLink>
+      <span className={styles.rangeUnits}>
+        {range} {units}
+      </span>
+    </div>
+  );
+};
 
 const interpretationToCSS = {
-  OFF_SCALE_HIGH: 'off-scale-high',
-  CRITICALLY_HIGH: 'critically-high',
+  OFF_SCALE_HIGH: 'offScaleHigh',
+  CRITICALLY_HIGH: 'criticallyHigh',
   HIGH: 'high',
-  OFF_SCALE_LOW: 'off-scale-low',
-  CRITICALLY_LOW: 'critically-low',
+  OFF_SCALE_LOW: 'offScaleLow',
+  CRITICALLY_LOW: 'criticallyLow',
   LOW: 'low',
   NORMAL: '',
 };
@@ -56,9 +66,7 @@ const TimelineCell: React.FC<TimelineCellProps> = ({ text, interpretation = 'NOR
     : '';
 
   return (
-    <div
-      className={`${styles['timeline-data-cell']} ${zebra ? styles['timeline-cell-zebra'] : ''} ${additionalClassname}`}
-    >
+    <div className={`${styles.timelineDataCell} ${zebra ? styles.timelineCellZebra : ''} ${additionalClassname}`}>
       <p>{text}</p>
     </div>
   );
@@ -91,6 +99,7 @@ const DataRows: React.FC<DataRowsProps> = ({ timeColumns, rowData, sortedTimes, 
                 range,
                 title: row.display,
                 shadow: showShadow,
+                conceptUuid: row.conceptUuid,
               }}
             />
             <GridItems {...{ sortedTimes, obs, zebra: !!(index % 2) }} />
@@ -132,7 +141,7 @@ const DateHeaderGrid: React.FC<DateHeaderGridProps> = ({
   }, [handleScroll]);
 
   return (
-    <div ref={ref} style={{ overflowX: 'auto' }} className={styles['date-header-inner']}>
+    <div ref={ref} style={{ overflowX: 'auto' }} className={styles.dateHeaderInner}>
       <Grid
         dataColumns={timeColumns.length}
         style={{
@@ -143,21 +152,21 @@ const DateHeaderGrid: React.FC<DateHeaderGridProps> = ({
       >
         {yearColumns.map(({ year, size }) => {
           return (
-            <TimeSlots key={year} className={styles['year-column']} style={{ gridColumn: `${size} span` }}>
+            <TimeSlots key={year} className={styles.yearColumn} style={{ gridColumn: `${size} span` }}>
               {year}
             </TimeSlots>
           );
         })}
         {dayColumns.map(({ day, year, size }) => {
           return (
-            <TimeSlots key={`${day} - ${year}`} className={styles['day-column']} style={{ gridColumn: `${size} span` }}>
+            <TimeSlots key={`${day} - ${year}`} className={styles.dayColumn} style={{ gridColumn: `${size} span` }}>
               {day}
             </TimeSlots>
           );
         })}
         {timeColumns.map((time, i) => {
           return (
-            <TimeSlots key={time + i} className={styles['time-column']}>
+            <TimeSlots key={time + i} className={styles.timeColumn}>
               {time}
             </TimeSlots>
           );
@@ -203,7 +212,7 @@ const TimelineDataGroup = ({ parent, subRows, xScroll, setXScroll, panelName, se
   const onIntersect = (entries, observer) => {
     entries.forEach((entry) => {
       if (entry.intersectionRatio > 0.5) {
-        //setPanelName(parent.display);
+        // setPanelName(parent.display);
       }
     });
   };
@@ -220,11 +229,11 @@ const TimelineDataGroup = ({ parent, subRows, xScroll, setXScroll, panelName, se
     <>
       <div>
         {groupNumber > 1 && (
-          <div className={styles['row-header']}>
+          <div className={styles.rowHeader}>
             <h6 ref={titleRef}>{parent.display}</h6>
           </div>
         )}
-        <div className={styles['grid-container']} ref={ref}>
+        <div className={styles.gridContainer} ref={ref}>
           <DataRows
             {...{
               timeColumns,
@@ -245,7 +254,9 @@ export const GroupedTimeline = () => {
   const { activeTests, timelineData, parents, checkboxes, someChecked, lowestParents } = useContext(FilterContext);
   const [panelName, setPanelName] = useState('');
   const [xScroll, setXScroll] = useState(0);
+  const { t } = useTranslation();
   let shownGroups = 0;
+  const tablet = useLayoutType() === 'tablet';
 
   const {
     data: {
@@ -260,12 +271,12 @@ export const GroupedTimeline = () => {
   }, [rowData]);
 
   if (rowData && rowData?.length === 0) {
-    return <EmptyState displayText="data" headerTitle="Data Timeline" />;
+    return <EmptyState displayText={t('data', 'data')} headerTitle={t('dataTimelineText', 'Data Timeline')} />;
   }
   if (activeTests && timelineData && loaded) {
     return (
-      <>
-        <div className={styles.timelineHeader}>
+      <div className={styles.timelineHeader} style={{ top: tablet ? '7rem' : '6.5rem' }}>
+        <div className={styles.timelineHeader} style={{ top: tablet ? '7rem' : '6.5rem' }}>
           <div className={styles.dateHeaderContainer}>
             <PanelNameCorner showShadow={true} panelName={panelName} />
             <DateHeaderGrid
@@ -307,7 +318,7 @@ export const GroupedTimeline = () => {
             } else return null;
           })}
         </div>
-      </>
+      </div>
     );
   }
   return null;

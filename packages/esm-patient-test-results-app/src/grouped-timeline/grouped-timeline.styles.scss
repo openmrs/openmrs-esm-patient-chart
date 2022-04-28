@@ -5,8 +5,8 @@
 
 .timelineHeader {
   position: sticky;
-  top: 0px;
-  z-index: 9;
+  top: 6.5rem;
+  z-index: 1;
 }
 
 .dateHeaderContainer {
@@ -31,23 +31,23 @@
   align-items: center;
 }
 
-.day-column, .year-column {
+.dayColumn, .yearColumn {
   @include carbon--type-style('productive-heading-01');
   color: $text-02;
 }
 
-.time-column {
+.timeColumn {
   @include carbon--type-style('body-short-01');
   color: $text-02;
   scroll-snap-align: start;
 }
 
-.padded-main {
+.paddedMain {
   box-sizing: border-box;
   padding: 20px;
 }
 
-.timeline-cell {
+.timelineCell {
   background-color: white;
   width: 100%;
   height: 100%;
@@ -57,8 +57,8 @@
   padding: 0.5rem;
 }
 
-.timeline-data-cell {
-  @extend .timeline-cell;
+.timelineDataCell {
+  @extend .timelineCell;
   justify-items: first baseline;
 
   p {
@@ -68,7 +68,7 @@
 }
 
 
-.grid-container {
+.gridContainer {
   padding: 0;
   box-sizing: border-box;
   display: grid;
@@ -89,7 +89,7 @@
 }
 
 
-.row-header {
+.rowHeader {
   overflow: hidden;
   align-self: flex-start;
   background-color: $ui-03;
@@ -97,8 +97,8 @@
 }
 
 
-.row-start-cell {
-  @extend .timeline-cell;
+.rowStartCell {
+  @extend .timelineCell;
   position: -webkit-sticky; /* Safari */
   position: sticky;
   left: 0;
@@ -111,14 +111,11 @@
   padding: 1rem;
 }
 
-.timeline-cell-zebra {
+.timelineCellZebra {
   background-color: $ui-03;
 }
 
-
-
-
-.date-header-inner {
+.dateHeaderInner {
   overflow-x: auto;
   scrollbar-width: none;
   &::-webkit-scrollbar {
@@ -126,7 +123,7 @@
   }
 }
 
-.time-slot-inner {
+.timeSlotInner {
   background-color: $ui-03;
   padding: 3px 10px;
   justify-self: stretch;
@@ -141,7 +138,7 @@
   }
 }
 
-.corner-grid-element {
+.cornerGridElement {
   grid-row: span 1;
   position: sticky;
   left: 0px;
@@ -162,21 +159,22 @@
   box-shadow: 8px 0 20px 0 rgba(0, 0, 0 , 0.15);
 }
 
-.trendline-link {
+.trendlineLink {
   @include carbon--type-style('body-short-01');
   color: $interactive-01;
   cursor: pointer;
+  text-decoration: none;
 }
 
-.range-units {
+.rangeUnits {
   @include carbon--type-style('helper-text-01');
   color: $text-05;
 }
 
-.off-scale-high,
-.off-scale-low,
-.critically-high,
-.critically-low,
+.offScaleHigh,
+.offScaleLow,
+.criticallyHigh,
+.criticallyLow,
 .high,
 .low {
   p {
@@ -190,30 +188,30 @@
   box-shadow: 0 0 0 1px #000000;
 }
 
-.critically-high,
-.critically-low {
+.criticallyHigh,
+.criticallyLow {
   box-shadow: 0 0 0 1px $danger, inset 0 0 0 1px $danger;
 }
 
-.off-scale-low {
+.offScaleLow {
   p::after {
     content: " ↓↓↓";
   }
 }
 
-.off-scale-high {
+.offScaleHigh {
   p::after {
     content: " ↑↑↑";
   }
 }
 
-.critically-low {
+.criticallyLow {
   p::after {
     content: " ↓↓";
   }
 }
 
-.critically-high {
+.criticallyHigh {
   p::after {
     content: " ↑↑";
   }
@@ -231,8 +229,7 @@
   }
 }
 
-.shadow-box {
+.shadowBox {
   grid-row: 2 / -1;
   grid-column: 1 / 2;
 }
-

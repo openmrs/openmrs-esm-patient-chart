@@ -1,95 +1,71 @@
-import * as React from 'react';
+import React, { useState, useCallback, useMemo, useLayoutEffect } from 'react';
 import RangeSelector from './range-selector.component';
-import usePatientResultsData from '../loadPatientTestData/usePatientResultsData';
-import { Button } from 'carbon-components-react';
+import { Button, InlineLoading, SkeletonText } from 'carbon-components-react';
 import ArrowLeft24 from '@carbon/icons-react/es/arrow--left/24';
 import LineChart from '@carbon/charts-react/line-chart';
 import { ScaleTypes, LineChartOptions, TickRotations } from '@carbon/charts/interfaces';
-import { formatDate, formatTime, parseDate } from '@openmrs/esm-framework';
-import { ObsRecord, OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
+import { formatDate, formatTime, parseDate, ConfigurableLink } from '@openmrs/esm-framework';
+import { EmptyState, OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import CommonDataTable from '../overview/common-datatable.component';
-import { exist } from '../loadPatientTestData/helpers';
 import { useTranslation } from 'react-i18next';
 import styles from './trendline.scss';
 import '@carbon/charts/styles.css';
+import { testResultsBasePath } from '../helpers';
+import { useObstreeData } from './trendline-resource';
 
-const useTrendlineData = ({
-  patientUuid,
-  panelUuid,
-  testUuid,
-}: {
-  patientUuid: string;
-  panelUuid: string;
-  testUuid: string;
-}): [string, Array<ObsRecord>, string | undefined] | null => {
-  const { sortedObs, loaded, error } = usePatientResultsData(patientUuid);
+const TrendLineBackground = ({ ...props }) => <div {...props} className={styles.background} />;
 
-  if (!loaded || error) {
-    return null;
-  }
-
-  const panel = Object.entries(sortedObs).find(([, { uuid }]) => uuid === panelUuid);
-
-  switch (panel[1].type) {
-    case 'LabSet':
-      const data = panel[1].entries
-        .flatMap((x) => x.members.filter((y) => y.conceptClass === testUuid))
-        .sort((ent1, ent2) => Date.parse(ent2.effectiveDateTime) - Date.parse(ent1.effectiveDateTime));
-      return [data[0].name, data, panel[0]];
-    case 'Test':
-      return [
-        panel[0],
-        panel[1].entries.sort((ent1, ent2) => Date.parse(ent2.effectiveDateTime) - Date.parse(ent1.effectiveDateTime)),
-        undefined,
-      ];
-  }
-};
-
-const TrendLineBackground = ({ ...props }) => <div {...props} className={styles['Background']} />;
-
-const withPatientData =
-  (WrappedComponent) =>
-  ({ patientUuid, panelUuid, testUuid, openTimeline: openTimelineExternal }) => {
-    const patientData = useTrendlineData({ patientUuid, panelUuid, testUuid });
-    const openTimeline = React.useCallback(() => openTimelineExternal(panelUuid), [panelUuid, openTimelineExternal]);
-
-    if (!patientData) return <div>Loading...</div>;
-
-    return <WrappedComponent patientData={patientData} openTimeline={openTimeline} />;
-  };
-
-const TrendlineHeader = ({ openTimeline, title, referenceRange }) => {
+const TrendlineHeader = ({ basePath, title, referenceRange, isValidating, showBackToTimelineButton }) => {
   const { t } = useTranslation();
   return (
-    <div className={styles['header']}>
-      <div className={styles['back-button']}>
-        <Button kind="ghost" renderIcon={ArrowLeft24} iconDescription="Return to timeline" onClick={openTimeline}>
-          <span>{t('backToTimeline', 'Back to timeline')}</span>
-        </Button>
+    <div className={styles.header}>
+      <div className={styles.backButton}>
+        {showBackToTimelineButton && (
+          <ConfigurableLink to={testResultsBasePath(basePath)}>
+            <Button kind="ghost" renderIcon={ArrowLeft24} iconDescription={t('returnToTimeline', 'Return to timeline')}>
+              <span>{t('backToTimeline', 'Back to timeline')}</span>
+            </Button>
+          </ConfigurableLink>
+        )}
       </div>
-      <div className={styles['content']}>
-        <span className={styles['title']}>{title}</span>
-        <span className={styles['reference-range']}>{referenceRange}</span>
+      <div className={styles.content}>
+        <span className={styles.title}>{title}</span>
+        <span className={styles.referenceange}>{referenceRange}</span>
       </div>
+      <div>{isValidating && <InlineLoading className={styles.inlineLoader} />}</div>
     </div>
   );
 };
 
-const Trendline: React.FC<{
-  patientData: ReturnType<typeof useTrendlineData>;
-  openTimeline: () => void;
-}> = ({ patientData, openTimeline }) => {
+interface TrendlineProps {
+  patientUuid: string;
+  conceptUuid: string;
+  basePath: string;
+  hideTrendlineHeader?: boolean;
+  showBackToTimelineButton?: boolean;
+}
+
+const Trendline: React.FC<TrendlineProps> = ({
+  patientUuid,
+  conceptUuid,
+  basePath,
+  hideTrendlineHeader = false,
+  showBackToTimelineButton = false,
+}) => {
+  const { trendlineData, isLoading, isValidating } = useObstreeData(patientUuid, conceptUuid);
   const { t } = useTranslation();
+  const { obs, display: chartTitle, hiNormal, lowNormal, units: leftAxisTitle, range: referenceRange } = trendlineData;
+  const bottomAxisTitle = t('date', 'Date');
+  const [range, setRange] = useState<[Date, Date]>();
 
-  const leftAxisLabel = patientData?.[1]?.[0]?.meta?.units ?? '';
-  const [range, setRange] = React.useState<[Date, Date]>();
+  const [upperRange, lowerRange] = useMemo(() => {
+    if (obs.length === 0) {
+      return [new Date(), new Date()];
+    }
+    return [new Date(), new Date(Date.parse(obs[obs.length - 1].obsDatetime))];
+  }, [obs]);
 
-  const [upperRange, lowerRange] = React.useMemo(() => {
-    const dates = patientData[1].map((entry) => new Date(Date.parse(entry.effectiveDateTime)));
-    return [new Date(), dates[dates.length - 1]];
-  }, [patientData]);
-
-  const setLowerRange = React.useCallback(
+  const setLowerRange = useCallback(
     (selectedLowerRange: Date) => {
       setRange([selectedLowerRange > lowerRange ? selectedLowerRange : lowerRange, upperRange]);
     },
@@ -99,60 +75,65 @@ const Trendline: React.FC<{
   /**
    * reorder svg element to bring line in front of the area
    */
-  React.useLayoutEffect(() => {
+  useLayoutEffect(() => {
     const graph = document.querySelector('g.bx--cc--area')?.parentElement;
-    if (patientData && graph) {
+    if (obs && obs.length && graph) {
       graph.insertBefore(graph.children[3], graph.childNodes[2]);
     }
-  }, [patientData]);
+  }, [obs]);
 
   const data: Array<{
     date: Date;
     value: number;
     group: string;
-    id: string;
     min?: number;
     max?: number;
   }> = [];
 
+  //
+
   const tableData: Array<{
+    id: string;
     date: string;
     time: string;
-    value: number;
-    id: string;
-    interpretation?: OBSERVATION_INTERPRETATION;
+    value:
+      | number
+      | {
+          value: number;
+          interpretation: OBSERVATION_INTERPRETATION;
+        };
   }> = [];
 
-  const dataset = patientData[0];
-  const referenceRange = patientData[1][0]?.meta?.range;
+  const dataset = chartTitle;
 
-  patientData[1].forEach((entry) => {
+  obs.forEach((obs, idx) => {
     const range =
-      exist(entry?.meta?.hiNormal) && exist(entry?.meta?.lowNormal)
+      hiNormal && lowNormal
         ? {
-            max: entry.meta.hiNormal,
-            min: entry.meta.lowNormal,
+            max: hiNormal,
+            min: lowNormal,
           }
         : {};
 
     data.push({
-      date: new Date(Date.parse(entry.effectiveDateTime)),
-      value: entry.value,
-      group: dataset,
-      id: entry.id,
+      date: new Date(Date.parse(obs.obsDatetime)),
+      value: obs.value,
+      group: chartTitle,
       ...range,
     });
 
     tableData.push({
-      date: formatDate(parseDate(entry.effectiveDateTime)),
-      time: formatTime(parseDate(entry.effectiveDateTime)),
-      value: entry.value,
-      id: entry.id,
-      interpretation: entry.meta.assessValue?.(entry.value),
+      id: `${idx}`,
+      date: formatDate(parseDate(obs.obsDatetime)),
+      time: formatTime(parseDate(obs.obsDatetime)),
+      value: {
+        value: obs.value,
+        interpretation: obs.interpretation,
+      },
     });
   });
 
-  const options = React.useMemo<LineChartOptions>(
+  const options = useMemo<LineChartOptions>(
     () => ({
       bounds: {
         lowerBoundMapsTo: 'min',
@@ -160,7 +141,7 @@ const Trendline: React.FC<{
       },
       axes: {
         bottom: {
-          title: 'Date',
+          title: bottomAxisTitle,
           mapsTo: 'date',
           scaleType: ScaleTypes.TIME,
           ticks: {
@@ -171,7 +152,7 @@ const Trendline: React.FC<{
         },
         left: {
           mapsTo: 'value',
-          title: leftAxisLabel,
+          title: leftAxisTitle,
           scaleType: ScaleTypes.LINEAR,
           includeZero: false,
         },
@@ -180,7 +161,7 @@ const Trendline: React.FC<{
 
       color: {
         scale: {
-          [dataset]: '#6929c4',
+          [chartTitle]: '#6929c4',
         },
       },
       points: {
@@ -192,39 +173,54 @@ const Trendline: React.FC<{
       },
       tooltip: {
         customHTML: ([{ date, value }]) =>
-          `<div class="bx--tooltip bx--tooltip--shown" style="min-width: max-content; font-weight:600">${value} ${leftAxisLabel}<br>
+          `<div class="bx--tooltip bx--tooltip--shown" style="min-width: max-content; font-weight:600">${value} ${leftAxisTitle}<br>
           <span style="color: #c6c6c6; font-size: 0.75rem; font-weight:400">${formatDate(date)}</span></div>`,
       },
     }),
-    [leftAxisLabel, range, dataset],
+    [bottomAxisTitle, leftAxisTitle, range, chartTitle],
   );
 
-  const tableHeaderData = React.useMemo(
+  const tableHeaderData = useMemo(
     () => [
       {
         header: t('date', 'Date'),
         key: 'date',
       },
       {
-        header: t('value', 'Value') + ` (${leftAxisLabel})`,
-        key: 'value',
-      },
-      {
         header: t('timeOfTest', 'Time of Test'),
         key: 'time',
       },
+      {
+        header: `${t('value', 'Value')} (${leftAxisTitle})`,
+        key: 'value',
+      },
     ],
-    [leftAxisLabel, t],
+    [leftAxisTitle, t],
   );
+
+  if (isLoading) {
+    return <SkeletonText />;
+  }
+
+  if (obs.length === 0) {
+    return <EmptyState displayText={t('observationsDisplayText', 'observations')} headerTitle={chartTitle} />;
+  }
 
   return (
     <>
-      <TrendlineHeader openTimeline={openTimeline} title={dataset} referenceRange={referenceRange} />
+      {!hideTrendlineHeader && (
+        <TrendlineHeader
+          showBackToTimelineButton={showBackToTimelineButton}
+          isValidating={isValidating}
+          basePath={basePath}
+          title={dataset}
+          referenceRange={referenceRange}
+        />
+      )}
       <TrendLineBackground>
         <RangeSelector setLowerRange={setLowerRange} upperRange={upperRange} />
         <LineChart data={data} options={options} />
       </TrendLineBackground>
-
       <DrawTable {...{ tableData, tableHeaderData }} />
     </>
   );
@@ -234,4 +230,4 @@ const DrawTable = React.memo<{ tableData; tableHeaderData }>(({ tableData, table
   return <CommonDataTable data={tableData} tableHeaders={tableHeaderData} />;
 });
 
-export default React.memo(withPatientData(Trendline));
+export default Trendline;

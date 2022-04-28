@@ -1,3 +1,4 @@
+import { OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 interface Observation {
   display: string;
   flatName: string;
@@ -21,32 +22,95 @@ export interface FilterLeafProps {
   leaf: Observation;
 }
 
-interface StateProps {
+export interface ReducerState {
   checkboxes: { [key: string]: boolean };
   parents: { [key: string]: string[] };
-  roots: { [key: string]: any }[];
+  roots: Array<TreeNode>;
+  tests: { [key: string]: TestData };
+  lowestParents: { display: string; flatName: string }[];
 }
 
-export interface FilterContextProps {
-  state: StateProps;
-  checkboxes: { [key: string]: boolean };
-  parents: { [key: string]: string[] };
-  roots: TreeNode[];
-  tests: { [key: string]: any };
-  lowestParents: { display: string; flatName: string }[];
-  timelineData: { [key: string]: any };
+export enum ReducerActionType {
+  INITIALIZE = 'initialize',
+  TOGGLEVAL = 'toggleVal',
+  UDPATEPARENT = 'updateParent',
+  UPDATEBASEPATH = 'updateBasePath',
+  RESET_TREE = 'resetTree',
+}
+
+export interface ReducerAction {
+  type: ReducerActionType;
+  name?: string;
+  trees?: Array<TreeNode>;
+  basePath?: string;
+}
+
+export interface ObservationData {
+  obsDatetime: string;
+  value: number;
+  interpretation: OBSERVATION_INTERPRETATION;
+}
+export interface TestData {
+  conceptUuid: string;
+  datatype: string;
+  display: string;
+  flatName: string;
+  hasData: true;
+  hiCritical?: number;
+  hiNormal?: number;
+  lowAbsolute?: number;
+  lowCritical?: number;
+  lowNormal?: number;
+  obs: Array<ObservationData>;
+  units: string;
+  range: string;
+  [x: string]: any;
+}
+
+export interface ParsedTimeType {
+  yearColumns: Array<{
+    year: string;
+    size: number;
+  }>;
+  dayColumns: Array<{
+    year: string;
+    day: string;
+    size: number;
+  }>;
+  timeColumns: Array<string>;
+  sortedTimes: Array<string>;
+}
+export interface TimelineData {
+  loaded: boolean;
+  data: {
+    parsedTime: ParsedTimeType;
+    rowData: Array<RowData>;
+    panelName: string;
+  };
+}
+
+export interface FilterContextProps extends ReducerState {
+  timelineData: TimelineData;
   activeTests: string[];
   someChecked: boolean;
+  totalResultsCount: number;
   initialize: any;
   toggleVal: any;
   updateParent: any;
-}
-
-export interface FilterProviderProps {
-  roots: any[];
-  children: React.ReactNode;
+  resetTree: () => void;
 }
 
 export interface obsShape {
   [key: string]: any;
+}
+
+interface RowData extends TestData {
+  entries: Array<
+    | {
+        obsDatetime: string;
+        value: string;
+        interpretation: OBSERVATION_INTERPRETATION;
+      }
+    | undefined
+  >;
 }
