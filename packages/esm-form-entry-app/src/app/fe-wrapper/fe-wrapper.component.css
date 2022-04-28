@@ -2,6 +2,64 @@
   color: var(--omrs-color-danger);
 }
 
+.error-tile {
+  width: 60%;
+  margin: 1.25rem auto;
+  display: flex;
+  flex-flow: column wrap;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 0 1.75rem;
+}
+
+/* Tablet */
+:host-context(.omrs-breakpoint-lt-desktop) .error-tile {
+  background-color: white;
+}
+
+.heading {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #161616;
+}
+
+.helperText {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  letter-spacing: 0.16px;
+  color: #525252;
+}
+
+.separator {
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  color: #525252;
+  width: 12rem;
+  margin: 1rem auto;
+  overflow: hidden;
+  text-align: center;
+}
+
+.separator::before, .separator::after {
+  background-color: #a8a8a8;
+  content: "";
+  display: inline-block;
+  height: 1px;
+  position: relative;
+  vertical-align: middle;
+  width: 50%;
+}
+
+.separator::before {
+  right: 1rem;
+  margin-left: -50%;
+}
+
+.separator::after {
+  left: 1rem;
+  margin-right: -50%;
+}
+
 .title-icon-size {
   height: 0.8rem;
   width: 0.8rem;

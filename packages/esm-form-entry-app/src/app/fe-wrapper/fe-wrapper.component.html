@@ -1,4 +1,15 @@
-<div class="error-text">{{ loadingError }}</div>
+<div *ngIf="loadingError" class="form-container">
+  <div class="bx--tile error-tile">
+    <h4 class="heading">There was an error with this form</h4>
+    <p class="helperText">
+      Try opening another form
+    </p>
+    <p class="separator">or</p>
+    <button class="bx--btn bx--btn--sm bx--btn--ghost" (click)="closeForm()">
+      Close this panel
+    </button>
+  </div>
+</div>
 <div *ngIf="formState !== 'submitted'" [ngClass]="{'error': formState === 'readyWithValidationErrors'}">
   <div class="content">
     <div *ngIf="formState === 'ready' || formState === 'readyWithValidationErrors' || formState === 'submitting' || formState === 'submissionError'" class="form-container">
