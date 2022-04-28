@@ -3,7 +3,7 @@ import WorkspaceWindow from './workspace/workspace-window.component';
 import PatientChart from './patient-chart/patient-chart.component';
 import SideMenu from './side-nav/side-menu.component';
 import { BrowserRouter, Route } from 'react-router-dom';
-import { dashboardPath, spaRoot, spaBasePath } from './constants';
+import { dashboardPath, spaRoot, spaBasePath, basePath } from './constants';
 import styles from './root.scss';
 import { WorkspaceWindowSizeProvider } from '@openmrs/esm-patient-common-lib';
 import { SWRConfig } from 'swr';
@@ -16,11 +16,11 @@ const swrConfiguration = {
 
 export default function Root() {
   const { patientUuid } = usePatient();
-  const basePath = useMemo(() => spaBasePath.replace(':patientUuid', patientUuid), [patientUuid]);
+  const leftNavBasePath = useMemo(() => spaBasePath.replace(':patientUuid', patientUuid), [patientUuid]);
   useEffect(() => {
-    setLeftNav({ name: 'patient-chart-dashboard-slot', basePath });
+    setLeftNav({ name: 'patient-chart-dashboard-slot', basePath: leftNavBasePath });
     return () => unsetLeftNav('patient-chart-dashboard-slot');
-  }, [basePath]);
+  }, [leftNavBasePath]);
 
   return (
     <SWRConfig value={swrConfiguration}>
