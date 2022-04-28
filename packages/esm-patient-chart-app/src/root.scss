@@ -7,6 +7,10 @@
   position: relative;
 }
 
+.caption01 {
+  @include carbon--type-style("caption-01");
+}
+
 .productiveHeading01 {
   @include carbon--type-style("productive-heading-01");
 }
@@ -25,4 +29,16 @@
 
 .bodyLong01 {
   @include carbon--type-style("body-long-01");
+}
+
+.bodyShort02 {
+  @include carbon--type-style("body-short-02");
+}
+
+.text01 {
+  color: $ui-05;
+}
+
+.text02 {
+  color: $text-02;
 }
