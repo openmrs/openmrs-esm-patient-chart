@@ -60,17 +60,17 @@ const EncounterList: React.FC<EncounterListProps> = ({ showAllEncounters, encoun
   const tableHeaders = [
     {
       id: 1,
-      header: showAllEncounters ? 'Date & time' : 'Time',
+      header: showAllEncounters ? t('dateAndTime', 'Date & time') : t('time', 'Time'),
       key: 'datetime',
     },
     {
       id: 3,
-      header: 'Encounter type',
+      header: t('encounterType', 'Encounter type'),
       key: 'encounterType',
     },
     {
       id: 4,
-      header: 'Provider',
+      header: t('provider', 'Provider'),
       key: 'provider',
     },
   ];
@@ -78,7 +78,7 @@ const EncounterList: React.FC<EncounterListProps> = ({ showAllEncounters, encoun
   if (showAllEncounters) {
     tableHeaders.push({
       id: 2,
-      header: 'Visit type',
+      header: t('visitType', 'Visit type'),
       key: 'visitType',
     });
 
