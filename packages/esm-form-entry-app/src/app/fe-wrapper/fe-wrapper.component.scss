@@ -1,3 +1,7 @@
+@import "~@openmrs/esm-styleguide/src/vars";
+@import "~carbon-components/src/globals/scss/vars";
+@import "~carbon-components/src/globals/scss/mixins";
+
 .error-tile {
   width: 60%;
   margin: 1.25rem auto;
@@ -10,34 +14,31 @@
 
 /* Tablet */
 :host-context(.omrs-breakpoint-lt-desktop) .error-tile {
-  background-color: white;
+  background-color: $ui-02;
 }
 
 .heading {
-  font-size: 1rem;
-  font-weight: 600;
-  color: #161616;
+  @include carbon--type-style('productive-heading-02');
+  color: $text-01;
 }
 
 .helperText {
   margin-top: 0.5rem;
-  font-size: 0.875rem;
-  letter-spacing: 0.16px;
-  color: #525252;
+  @include carbon--type-style('body-long-01');
+  color: $text-02;
 }
 
 .separator {
-  font-size: 0.875rem;
-  line-height: 1.25rem;
-  color: #525252;
+  @include carbon--type-style('body-short-01');
+  color: $text-02;
   width: 12rem;
-  margin: 1rem auto;
+  margin: 1.375rem auto;
   overflow: hidden;
   text-align: center;
 }
 
 .separator::before, .separator::after {
-  background-color: #a8a8a8;
+  background-color: $text-03;
   content: "";
   display: inline-block;
   height: 1px;
@@ -142,7 +143,7 @@
 
 :host-context(.omrs-breakpoint-lt-desktop) .button-set {
   padding: 1.5rem 1rem;
-  background-color: white;
+  background-color: $ui-02;
 }
 
 .loader-container {
