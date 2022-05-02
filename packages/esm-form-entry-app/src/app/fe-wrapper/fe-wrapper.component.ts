@@ -29,7 +29,7 @@ type FormState =
 @Component({
   selector: 'my-app-fe-wrapper',
   templateUrl: './fe-wrapper.component.html',
-  styleUrls: ['./fe-wrapper.component.css'],
+  styleUrls: ['./fe-wrapper.component.scss'],
 })
 export class FeWrapperComponent implements OnInit, OnDestroy {
   private launchFormSubscription?: Subscription;

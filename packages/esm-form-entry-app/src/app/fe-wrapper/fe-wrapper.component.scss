@@ -1,5 +1,60 @@
-.error-text {
-  color: var(--omrs-color-danger);
+@import "~@openmrs/esm-styleguide/src/vars";
+@import "~carbon-components/src/globals/scss/vars";
+@import "~carbon-components/src/globals/scss/mixins";
+
+.error-tile {
+  width: 60%;
+  margin: 1.25rem auto;
+  display: flex;
+  flex-flow: column wrap;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 0 1.75rem;
+}
+
+/* Tablet */
+:host-context(.omrs-breakpoint-lt-desktop) .error-tile {
+  background-color: $ui-02;
+}
+
+.heading {
+  @include carbon--type-style('productive-heading-02');
+  color: $text-01;
+}
+
+.helperText {
+  margin-top: 0.5rem;
+  @include carbon--type-style('body-long-01');
+  color: $text-02;
+}
+
+.separator {
+  @include carbon--type-style('body-short-01');
+  color: $text-02;
+  width: 12rem;
+  margin: 1.375rem auto;
+  overflow: hidden;
+  text-align: center;
+}
+
+.separator::before, .separator::after {
+  background-color: $text-03;
+  content: "";
+  display: inline-block;
+  height: 1px;
+  position: relative;
+  vertical-align: middle;
+  width: 50%;
+}
+
+.separator::before {
+  right: 1rem;
+  margin-left: -50%;
+}
+
+.separator::after {
+  left: 1rem;
+  margin-right: -50%;
 }
 
 .title-icon-size {
@@ -88,7 +143,7 @@
 
 :host-context(.omrs-breakpoint-lt-desktop) .button-set {
   padding: 1.5rem 1rem;
-  background-color: white;
+  background-color: $ui-02;
 }
 
 .loader-container {
