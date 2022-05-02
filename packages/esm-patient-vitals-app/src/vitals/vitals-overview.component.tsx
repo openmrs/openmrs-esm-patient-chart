@@ -7,6 +7,7 @@ import {
   CardHeader,
   EmptyState,
   ErrorState,
+  formEntrySub,
   launchPatientWorkspace,
   useVitalsConceptMetadata,
   withUnit,
@@ -28,6 +29,11 @@ interface VitalsOverviewProps {
   pageUrl: string;
 }
 
+export function launchFormEntry(formUuid: string, encounterUuid?: string, formName?: string) {
+  formEntrySub.next({ formUuid, encounterUuid });
+  launchPatientWorkspace('patient-form-entry-workspace', { workspaceTitle: formName });
+}
+
 const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVitals, pageSize, urlLabel, pageUrl }) => {
   const { t } = useTranslation();
   const config = useConfig() as ConfigObject;
@@ -38,10 +44,13 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
   const { vitals, isError, isLoading, isValidating } = useVitals(patientUuid);
   const { data: conceptUnits } = useVitalsConceptMetadata();
 
-  const launchVitalsBiometricsForm = React.useCallback(
-    () => launchPatientWorkspace(patientVitalsBiometricsFormWorkspace),
-    [],
-  );
+  const launchVitalsBiometricsForm = React.useCallback(() => {
+    if (config.vitals.useFormEngine) {
+      launchFormEntry(config.vitals.formUuid, '', config.vitals.formName);
+    } else {
+      launchPatientWorkspace(patientVitalsBiometricsFormWorkspace);
+    }
+  }, []);
 
   const tableHeaders = [
     { key: 'date', header: 'Date and time', isSortable: true },
