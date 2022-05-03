@@ -90,4 +90,4 @@ for information about configuring modules.
 
 ## Deployment
 
-See the [Frontend Implementer Documentation](https://wiki.openmrs.org/display/projects/Frontend+3.0+Documentation+for+Implementers) for information about adding microfrontends to a distribution.
+See [Creating a Distribution](http://o3-dev.docs.openmrs.org/#/main/distribution?id=creating-a-distribution) for information about adding microfrontends to a distribution.
