@@ -18,10 +18,25 @@ import { ConfigResourceService } from './services/config-resource.service';
 import { LoaderComponent } from './loader/loader.component';
 import { SingleSpaPropsService } from './single-spa-props/single-spa-props.service';
 import { FormCreationService } from './form-creation/form-creation.service';
+import * as ngTranslate from '@ngx-translate/core';
+import { AmpathTranslationsLoader } from './ampathTranslationsLoader/AmpathTranslationsLoader';
 
 @NgModule({
   declarations: [AppComponent, EmptyRouteComponent, FeWrapperComponent, LoaderComponent],
-  imports: [BrowserModule, FormEntryModule, ReactiveFormsModule, BrowserAnimationsModule, OpenmrsApiModule],
+  imports: [
+    BrowserModule,
+    FormEntryModule,
+    ReactiveFormsModule,
+    BrowserAnimationsModule,
+    OpenmrsApiModule,
+    ngTranslate.TranslateModule.forRoot({
+      loader: {
+        provide: ngTranslate.TranslateLoader,
+        useClass: AmpathTranslationsLoader,
+      },
+      defaultLanguage: 'en',
+    }),
+  ],
   providers: [
     FormSchemaService,
     LocalStorageService,
@@ -31,6 +46,7 @@ import { FormCreationService } from './form-creation/form-creation.service';
     MonthlyScheduleResourceService,
     ConfigResourceService,
     SingleSpaPropsService,
+    ngTranslate.TranslateService,
   ],
   bootstrap: [AppComponent],
 })

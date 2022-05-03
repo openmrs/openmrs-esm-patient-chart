@@ -15,6 +15,7 @@ import { patientFormSyncItem, PatientFormSyncItemContent } from '../offline/sync
 import { SingleSpaPropsService } from '../single-spa-props/single-spa-props.service';
 import { CreateFormParams, FormCreationService } from '../form-creation/form-creation.service';
 import { ConceptService } from '../services/concept.service';
+import { TranslateService } from '@ngx-translate/core';
 
 type FormState =
   | 'initial'
@@ -49,10 +50,19 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
     private readonly formCreationService: FormCreationService,
     private readonly singleSpaPropsService: SingleSpaPropsService,
     private conceptService: ConceptService,
+    private translate: TranslateService,
   ) {}
 
   public ngOnInit() {
     this.launchForm();
+
+    console.warn(this.translate);
+    // this.translate.addLangs(['en', 'fr']);
+    // this.translate.setDefaultLang('en');
+    // this.fetchMockedTranslationsData().then((translationsData: any) => {
+    //   this.translate.setTranslation('en', translationsData?.en);
+    //   this.translate.setTranslation('fr', translationsData?.fr);
+    // });
   }
 
   public ngOnDestroy() {
@@ -228,6 +238,28 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
         description: orders,
       });
     }
+  }
+
+  fetchMockedTranslationsData() {
+    const promise = new Promise(function (resolve, reject) {
+      setTimeout(function () {
+        const translationsData = {
+          form: 'fe73e323-7ed5-37a6-899e-ad9c5cc5a94b',
+          en: {
+            '1. Do you think about it even when you don’t mean to?:':
+              '1. Do you think about it even when you don’t mean to? v2',
+          },
+          fr: {
+            'Children Revised Impact Event Scale (CRIES-8)':
+              "Échelle d'impact des événements révisée pour les enfants (CRIES-8)",
+            '1. Do you think about it even when you don’t mean to?':
+              '1. Y pensez-vous même quand vous ne le voulez pas?',
+          },
+        };
+        resolve(translationsData);
+      }, 2000);
+    });
+    return promise;
   }
 
   public closeForm() {
