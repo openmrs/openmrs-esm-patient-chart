@@ -47,6 +47,65 @@ describe('AllergyForm ', () => {
     expect(screen.getByRole('button', { name: /save and close/i })).toBeDisabled();
   });
 
+  it('can toggle between selecting or unselecting the allergic reaction when the allergic reaction radio button is clicked', async () => {
+    mockFetchAllergensAndAllergicReactions.mockReturnValueOnce(of(mockAllergensAndAllergicReactions));
+
+    renderAllergyForm();
+
+    userEvent.click(screen.getByRole('checkbox', { name: /cough/i }));
+
+    expect(screen.getByRole('checkbox', { name: /cough/i })).toBeChecked;
+
+    userEvent.click(screen.getByRole('checkbox', { name: /cough/i }));
+
+    expect(screen.getByRole('checkbox', { name: /cough/i })).not.toBeChecked;
+  });
+
+  it('renders a textbox when the other radio button is selected from the alergic reaction dropdown', async () => {
+    mockFetchAllergensAndAllergicReactions.mockReturnValueOnce(of(mockAllergensAndAllergicReactions));
+
+    renderAllergyForm();
+
+    await waitFor(() => userEvent.click(screen.getByRole('checkbox', { name: /Other/i })));
+
+    expect(screen.getByTitle(/Please type in the name of the allergic reaction/i)).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: /Other non-coded allergic reaction/i }));
+
+    userEvent.type(screen.getByRole('textbox', { name: /Other non-coded allergic reaction/i }), 'fatigue');
+    userEvent.type(screen.getByRole('textbox', { name: /Comments/i }), 'Painful joints');
+
+    expect(screen.getByDisplayValue('fatigue')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('Painful joints')).toBeInTheDocument();
+  });
+
+  it('renders a textbox when the other radio button in clicked on the allergens dropdown', async () => {
+    mockFetchAllergensAndAllergicReactions.mockReturnValueOnce(of(mockAllergensAndAllergicReactions));
+
+    renderAllergyForm();
+
+    await waitFor(() => userEvent.click(screen.getByRole('radio', { name: /Other Other Other/i })));
+
+    expect(screen.getByRole('textbox', { name: /Other non-coded allergen/i }));
+    expect(screen.getByTitle(/Please type in the name of the allergen/i)).toBeInTheDocument();
+
+    userEvent.type(screen.getByRole('textbox', { name: /Other non-coded allergen/i }), 'plastics');
+    expect(screen.getByDisplayValue('plastics')).toBeInTheDocument();
+  });
+
+  it('dsiplays an allergen type details when the tab is clicked', () => {
+    mockFetchAllergensAndAllergicReactions.mockReturnValueOnce(of(mockAllergensAndAllergicReactions));
+
+    renderAllergyForm();
+
+    const tabNames = [/drug/i, /food/i, /environmental/i];
+    tabNames.map((tabName) => {
+      userEvent.click(screen.getByRole('tab', { name: tabName }));
+      expect(screen.getByRole('tab', { name: tabName })).toBeChecked;
+    });
+    userEvent.click(screen.getByRole('tab', { name: /drug/i }));
+    expect(screen.getByRole('tab', { name: /drug/i })).toBeChecked;
+  });
+
   describe('Form submission: ', () => {
     it('renders a success notification after successful submission', async () => {
       mockFetchAllergensAndAllergicReactions.mockReturnValueOnce(of(mockAllergensAndAllergicReactions));
