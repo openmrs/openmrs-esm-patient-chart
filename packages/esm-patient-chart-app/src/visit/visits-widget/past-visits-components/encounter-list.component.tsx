@@ -46,7 +46,7 @@ type FilterProps = {
 const EncounterList: React.FC<EncounterListProps> = ({ showAllEncounters, encounters }) => {
   const encountersCount = 20;
   const { t } = useTranslation();
-  const encounterTypes = [...new Set(encounters.map((encounter) => encounter.encounterType))];
+  const encounterTypes = [...new Set(encounters.map((encounter) => encounter.encounterType))].sort();
   const { results: paginatedEncounters, goTo, currentPage } = usePagination(encounters ?? [], encountersCount);
   const isTablet = useLayoutType() === 'tablet';
   const [filteredRows, setFilteredRows] = useState<Array<MappedEncounter>>([]);
