@@ -95,6 +95,12 @@ describe('EncounterList', () => {
 
     expect(screen.getByText(/dennis/i)).toBeInTheDocument();
     expect(screen.queryByText(/user one/i)).not.toBeInTheDocument();
+
+    userEvent.clear(searchbox);
+    userEvent.type(searchbox, 'luke skywalker');
+
+    expect(screen.getByText(/no patients to display/i)).toBeInTheDocument();
+    expect(screen.getByText(/check the filters above/i)).toBeInTheDocument();
   });
 });
 

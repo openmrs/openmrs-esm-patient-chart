@@ -1,26 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  DataTable,
-  TableContainer,
-  Table,
-  TableHead,
-  TableExpandHeader,
-  TableRow,
-  TableHeader,
-  TableBody,
-  TableExpandRow,
-  TableCell,
-  TableExpandedRow,
   Button,
+  DataTable,
+  DataTableHeader,
+  Dropdown,
   OverflowMenu,
   OverflowMenuItem,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableExpandedRow,
+  TableExpandHeader,
+  TableExpandRow,
+  TableHead,
+  TableHeader,
+  TableRow,
   TableToolbar,
   TableToolbarContent,
   TableToolbarSearch,
-  DataTableHeader,
-  Dropdown,
+  Tile,
 } from 'carbon-components-react';
+import Add16 from '@carbon/icons-react/es/add/16';
 import Edit16 from '@carbon/icons-react/es/edit/16';
 import { formatDatetime, formatTime, parseDate, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { formEntrySub, launchPatientWorkspace, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
@@ -239,6 +241,16 @@ const EncounterList: React.FC<EncounterListProps> = ({ showAllEncounters, encoun
                   </TableBody>
                 </Table>
               </TableContainer>
+              {rows.length === 0 ? (
+                <div className={styles.tileContainer}>
+                  <Tile className={styles.tile}>
+                    <div className={styles.tileContent}>
+                      <p className={styles.content}>{t('noPatientsToDisplay', 'No patients to display')}</p>
+                      <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
+                    </div>
+                  </Tile>
+                </div>
+              ) : null}
               {showAllEncounters ? (
                 <PatientChartPagination
                   currentItems={paginatedEncounters.length}
