@@ -30,7 +30,7 @@ jobs:
       - name: Test
         run: yarn run test
       - name: Lint & Typecheck
-        run: yarn turbo run lint typescript --api="http://127.0.0.1:9080" --token="${{ secrets.TURBO_SERVER_TOKEN }}" --team="${{ github.repository_owner }}
+        run: yarn turbo run lint typescript --api="http://127.0.0.1:9080" --token="${{ secrets.TURBO_SERVER_TOKEN }}" --team="${{ github.repository_owner }}"
       - name: Build
         run: yarn turbo run build --api="http://127.0.0.1:9080" --token="${{ secrets.TURBO_SERVER_TOKEN }}" --team="${{ github.repository_owner }}"
       - name: Upload Artifacts
