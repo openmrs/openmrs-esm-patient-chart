@@ -33,8 +33,8 @@ describe('AllergyForm ', () => {
     expect(screen.getByRole('heading', { name: /date and comments/i })).toBeInTheDocument();
 
     const tabNames = [/drug/i, /food/i, /environmental/i];
-    tabNames.map((tabName) =>{
-      expect(screen.getByRole('tab', { name: tabName })).toBeInTheDocument()
+    tabNames.map((tabName) => {
+      expect(screen.getByRole('tab', { name: tabName })).toBeInTheDocument();
       userEvent.click(screen.getByRole('tab', { name: tabName }));
       expect(screen.getByRole('tab', { name: tabName })).toBeChecked;
     });
@@ -58,25 +58,23 @@ describe('AllergyForm ', () => {
     userEvent.click(screen.getByRole('checkbox', { name: /cough/i }));
     expect(screen.getByRole('checkbox', { name: /cough/i })).not.toBeChecked;
 
-    await waitFor(() => 
-    userEvent.click(screen.getByRole('checkbox', { name: /Other/i })));
+    await waitFor(() => userEvent.click(screen.getByRole('checkbox', { name: /Other/i })));
     expect(screen.getByTitle(/Please type in the name of the allergic reaction/i)).toBeInTheDocument();
-    expect(screen.getByRole('textbox', { name: /Other non-coded allergic reaction/i })); 
+    expect(screen.getByRole('textbox', { name: /Other non-coded allergic reaction/i }));
 
     userEvent.type(screen.getByRole('textbox', { name: /Other non-coded allergic reaction/i }), 'fatigue');
     expect(screen.getByDisplayValue('fatigue')).toBeInTheDocument();
-    
-    userEvent.type(screen.getByRole('textbox', { name: /Comments/i }), 'Painful joints');  
+
+    userEvent.type(screen.getByRole('textbox', { name: /Comments/i }), 'Painful joints');
     expect(screen.getByDisplayValue('Painful joints')).toBeInTheDocument();
 
     await waitFor(() => userEvent.click(screen.getByRole('radio', { name: /Other Other Other/i })));
     expect(screen.getByRole('textbox', { name: /Other non-coded allergen/i }));
     expect(screen.getByTitle(/Please type in the name of the allergen/i)).toBeInTheDocument();
-    
+
     userEvent.type(screen.getByRole('textbox', { name: /Other non-coded allergen/i }), 'plastics');
     expect(screen.getByDisplayValue('plastics')).toBeInTheDocument();
   });
-
 
   describe('Form submission: ', () => {
     it('renders a success notification after successful submission', async () => {
