@@ -12,9 +12,9 @@ jobs:
       - name: Setup git
         uses: actions/checkout@v2
       - name: Setup node
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
-          node-version: "16.6.1"
+          node-version: "16"
       - run: npx lerna bootstrap
       - name: Report changes
         run: node ./tools/size-reporter.mjs

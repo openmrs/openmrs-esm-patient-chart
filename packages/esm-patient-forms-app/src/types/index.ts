@@ -5,6 +5,7 @@ export interface FormEncounter {
   uuid: string;
   encounterType?: EncounterType;
   name: string;
+  display: string;
   version: string;
   published: boolean;
   retired: boolean;
@@ -30,10 +31,17 @@ export interface EncounterWithFormRef {
   encounterDatetime: string;
   form?: FormEncounter;
 }
-
+export interface Privilege {
+  uuid: string;
+  name: string;
+  display?: string;
+  description?: string;
+}
 export interface EncounterType {
   uuid: string;
   name: string;
+  viewPrivilege: Privilege;
+  editPrivilege: Privilege;
 }
 
 export interface ListResponse<T> {

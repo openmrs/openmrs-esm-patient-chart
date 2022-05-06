@@ -1,71 +1,86 @@
-import React from 'react';
-import EncounterObservations from './encounter-observations.component';
-import {
-  DataTable,
-  TableContainer,
-  Table,
-  TableHead,
-  TableExpandHeader,
-  TableRow,
-  TableHeader,
-  TableBody,
-  TableExpandRow,
-  TableCell,
-  TableExpandedRow,
-  Button,
-  OverflowMenu,
-  OverflowMenuItem,
-} from 'carbon-components-react';
-import Edit16 from '@carbon/icons-react/es/edit/16';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
-  formatDate,
-  formatDatetime,
-  formatTime,
-  parseDate,
-  useLayoutType,
-  usePagination,
-  usePatient,
-} from '@openmrs/esm-framework';
+  Button,
+  DataTable,
+  DataTableHeader,
+  Dropdown,
+  OverflowMenu,
+  OverflowMenuItem,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableExpandedRow,
+  TableExpandHeader,
+  TableExpandRow,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TableToolbar,
+  TableToolbarContent,
+  TableToolbarSearch,
+  Tile,
+} from 'carbon-components-react';
+import Add16 from '@carbon/icons-react/es/add/16';
+import Edit16 from '@carbon/icons-react/es/edit/16';
+import { formatDatetime, formatTime, parseDate, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { formEntrySub, launchPatientWorkspace, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
-import { FormattedEncounter } from '../visit-detail-overview.component';
-import styles from '../visit-detail-overview.scss';
-import { format } from 'prettier';
+import { MappedEncounter } from './visit-summary.component';
+import EncounterObservations from './encounter-observations.component';
+import styles from './encounter-list.scss';
 
 interface EncounterListProps {
-  encounters: Array<FormattedEncounter>;
-  isShowingAllEncounters?: boolean;
+  encounters: Array<MappedEncounter>;
+  showAllEncounters?: boolean;
 }
 
-const EncounterList: React.FC<EncounterListProps> = ({ isShowingAllEncounters, encounters }) => {
+type FilterProps = {
+  rowIds: Array<string>;
+  headers: Array<DataTableHeader>;
+  cellsById: any;
+  inputValue: string;
+  getCellId: (row, key) => string;
+};
+
+const EncounterList: React.FC<EncounterListProps> = ({ showAllEncounters, encounters }) => {
   const encountersCount = 20;
   const { t } = useTranslation();
-  const { patient } = usePatient();
-  const isTablet = useLayoutType() === 'tablet';
+  const encounterTypes = [...new Set(encounters.map((encounter) => encounter.encounterType))].sort();
   const { results: paginatedEncounters, goTo, currentPage } = usePagination(encounters ?? [], encountersCount);
+  const isTablet = useLayoutType() === 'tablet';
+  const [filteredRows, setFilteredRows] = useState<Array<MappedEncounter>>([]);
+  const [filter, setFilter] = useState('');
+
+  useEffect(() => {
+    if (filter) {
+      setFilteredRows(encounters?.filter((encounter) => encounter.encounterType === filter));
+      setFilter('');
+    }
+  }, [filter, filteredRows, encounters]);
 
   const tableHeaders = [
     {
       id: 1,
-      header: isShowingAllEncounters ? 'Date & time' : 'Time',
+      header: showAllEncounters ? t('dateAndTime', 'Date & time') : t('time', 'Time'),
       key: 'datetime',
     },
     {
       id: 3,
-      header: 'Encounter type',
+      header: t('encounterType', 'Encounter type'),
       key: 'encounterType',
     },
     {
       id: 4,
-      header: 'Provider',
+      header: t('provider', 'Provider'),
       key: 'provider',
     },
   ];
 
-  if (isShowingAllEncounters) {
+  if (showAllEncounters) {
     tableHeaders.push({
       id: 2,
-      header: 'Visit type',
+      header: t('visitType', 'Visit type'),
       key: 'visitType',
     });
 
@@ -78,28 +93,69 @@ const EncounterList: React.FC<EncounterListProps> = ({ isShowingAllEncounters, e
   };
 
   const tableRows = React.useMemo(() => {
-    return paginatedEncounters?.map((encounter) => ({
+    return (filteredRows.length ? filteredRows : paginatedEncounters)?.map((encounter) => ({
       ...encounter,
-      datetime: isShowingAllEncounters
+      datetime: showAllEncounters
         ? formatDatetime(parseDate(encounter.datetime))
         : formatTime(parseDate(encounter.datetime)),
     }));
-  }, [paginatedEncounters, isShowingAllEncounters]);
+  }, [filteredRows, showAllEncounters, paginatedEncounters]);
+
+  const handleEncounterTypeChange = ({ selectedItem }) => {
+    setFilter(selectedItem);
+  };
+
+  const handleFilter = ({ rowIds, headers, cellsById, inputValue, getCellId }: FilterProps): Array<string> => {
+    return rowIds.filter((rowId) =>
+      headers.some(({ key }) => {
+        const cellId = getCellId(rowId, key);
+        const filterableValue = cellsById[cellId].value;
+        const filterTerm = inputValue.toLowerCase();
+
+        return ('' + filterableValue).toLowerCase().includes(filterTerm);
+      }),
+    );
+  };
 
   if (encounters?.length) {
     return (
-      <div className={styles.encounterListContainer}>
+      <div>
         <DataTable
           data-floating-menu-container
+          filterRows={handleFilter}
           headers={tableHeaders}
           rows={tableRows}
           overflowMenuOnHover={isTablet ? false : true}
           size={isTablet ? 'normal' : 'short'}
           useZebraStyles
         >
-          {({ rows, headers, getHeaderProps, getRowProps, getTableProps }) => (
-            <div>
+          {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getToolbarProps, onInputChange }) => (
+            <>
               <TableContainer className={styles.tableContainer}>
+                <TableToolbar {...getToolbarProps()}>
+                  <TableToolbarContent>
+                    <div className={styles.filterContainer}>
+                      <Dropdown
+                        id="serviceFilter"
+                        initialSelectedItem={'All'}
+                        label=""
+                        titleText={t('filterByEncounterType', 'Filter by encounter type') + ':'}
+                        type="inline"
+                        items={['All', ...encounterTypes]}
+                        onChange={handleEncounterTypeChange}
+                        size="sm"
+                      />
+                    </div>
+                    <TableToolbarSearch
+                      className={styles.search}
+                      expanded
+                      light
+                      onChange={onInputChange}
+                      placeholder={t('searchThisList', 'Search this list')}
+                      size="sm"
+                    />
+                  </TableToolbarContent>
+                </TableToolbar>
                 <Table {...getTableProps()}>
                   <TableHead>
                     <TableRow>
@@ -109,7 +165,7 @@ const EncounterList: React.FC<EncounterListProps> = ({ isShowingAllEncounters, e
                           {header.header}
                         </TableHeader>
                       ))}
-                      {isShowingAllEncounters ? <TableExpandHeader /> : null}
+                      {showAllEncounters ? <TableExpandHeader /> : null}
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -119,7 +175,7 @@ const EncounterList: React.FC<EncounterListProps> = ({ isShowingAllEncounters, e
                           {row.cells.map((cell) => (
                             <TableCell key={cell.id}>{cell.value}</TableCell>
                           ))}
-                          {isShowingAllEncounters ? (
+                          {showAllEncounters ? (
                             <TableCell className="bx--table-column-menu">
                               <OverflowMenu light size="sm" flipped>
                                 <OverflowMenuItem
@@ -163,7 +219,7 @@ const EncounterList: React.FC<EncounterListProps> = ({ isShowingAllEncounters, e
                             style={{ paddingLeft: isTablet ? '4rem' : '3rem' }}
                             colSpan={headers.length + 2}
                           >
-                            <div>
+                            <>
                               <EncounterObservations observations={encounters[i].obs} />
                               <Button
                                 kind="ghost"
@@ -175,17 +231,27 @@ const EncounterList: React.FC<EncounterListProps> = ({ isShowingAllEncounters, e
                               >
                                 {t('editEncounter', 'Edit encounter')}
                               </Button>
-                            </div>
+                            </>
                           </TableExpandedRow>
                         ) : (
-                          <div />
+                          <TableExpandedRow className={styles.hiddenRow} colSpan={headers.length + 2} />
                         )}
                       </React.Fragment>
                     ))}
                   </TableBody>
                 </Table>
               </TableContainer>
-              {isShowingAllEncounters ? (
+              {rows.length === 0 ? (
+                <div className={styles.tileContainer}>
+                  <Tile className={styles.tile}>
+                    <div className={styles.tileContent}>
+                      <p className={styles.content}>{t('noPatientsToDisplay', 'No patients to display')}</p>
+                      <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
+                    </div>
+                  </Tile>
+                </div>
+              ) : null}
+              {showAllEncounters ? (
                 <PatientChartPagination
                   currentItems={paginatedEncounters.length}
                   onPageNumberChange={({ page }) => goTo(page)}
@@ -194,7 +260,7 @@ const EncounterList: React.FC<EncounterListProps> = ({ isShowingAllEncounters, e
                   totalItems={encounters.length}
                 />
               ) : null}
-            </div>
+            </>
           )}
         </DataTable>
       </div>

@@ -2,8 +2,9 @@ import { useMemo } from 'react';
 import usePatientResultsData from '../loadPatientTestData/usePatientResultsData';
 import { ObsRecord } from '@openmrs/esm-patient-common-lib';
 import { formatDate, formatTime, parseDate } from '@openmrs/esm-framework';
+import { ParsedTimeType } from '../filter/filter-types';
 
-export const parseTime = (sortedTimes: string[]) => {
+export const parseTime: (sortedTimes: Array<string>) => ParsedTimeType = (sortedTimes) => {
   const yearColumns: Array<{ year: string; size: number }> = [],
     dayColumns: Array<{ year: string; day: string; size: number }> = [],
     timeColumns: string[] = [];

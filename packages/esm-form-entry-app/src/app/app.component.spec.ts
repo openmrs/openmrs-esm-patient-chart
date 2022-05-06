@@ -12,15 +12,13 @@ import { FormSubmissionService } from './form-submission/form-submission.service
 import { FormSubmittedComponent } from './form-submitted/form-submitted.component';
 
 describe('AppComponent', () => {
-  beforeEach(
-    waitForAsync(() => {
-      TestBed.configureTestingModule({
-        imports: [RouterTestingModule, FormEntryModule, ReactiveFormsModule, OpenmrsApiModule],
-        declarations: [AppComponent, FeWrapperComponent, FormSubmittedComponent],
-        providers: [FormSchemaService, LocalStorageService, FormDataSourceService, FormSubmissionService],
-      }).compileComponents();
-    }),
-  );
+  beforeEach(waitForAsync(() => {
+    TestBed.configureTestingModule({
+      imports: [RouterTestingModule, FormEntryModule, ReactiveFormsModule, OpenmrsApiModule],
+      declarations: [AppComponent, FeWrapperComponent, FormSubmittedComponent],
+      providers: [FormSchemaService, LocalStorageService, FormDataSourceService, FormSubmissionService],
+    }).compileComponents();
+  }));
 
   it('should create the app', () => {
     const fixture = TestBed.createComponent(AppComponent);

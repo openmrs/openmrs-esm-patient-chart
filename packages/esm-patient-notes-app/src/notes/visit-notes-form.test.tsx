@@ -2,7 +2,7 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render, waitFor } from '@testing-library/react';
 import { of } from 'rxjs/internal/observable/of';
-import { createErrorHandler, showNotification, showToast, useConfig, useSessionUser } from '@openmrs/esm-framework';
+import { createErrorHandler, showNotification, showToast, useConfig, useSession } from '@openmrs/esm-framework';
 import { fetchDiagnosisByName, fetchLocationByUuid, fetchProviderByUuid, saveVisitNote } from './visit-notes.resource';
 import { ConfigMock } from '../../../../__mocks__/chart-widgets-config.mock';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
@@ -29,7 +29,7 @@ const mockSaveVisitNote = saveVisitNote as jest.Mock;
 const mockShowNotification = showNotification as jest.Mock;
 const mockShowToast = showToast as jest.Mock;
 const mockUseConfig = useConfig as jest.Mock;
-const mockUseSessionUser = useSessionUser as jest.Mock;
+const mockUseSession = useSession as jest.Mock;
 
 jest.mock('lodash-es/debounce', () => jest.fn((fn) => fn));
 
@@ -58,7 +58,7 @@ describe('Visit notes form: ', () => {
     mockFetchProviderByUuid.mockResolvedValue(mockFetchProviderByUuidResponse);
     mockFetchDiagnosisByName.mockReturnValue(of(diagnosisSearchResponse.results));
     mockUseConfig.mockReturnValue(ConfigMock);
-    mockUseSessionUser.mockReturnValue(mockSessionDataResponse);
+    mockUseSession.mockReturnValue(mockSessionDataResponse);
   });
 
   it('renders the visit notes form with all the relevant fields and values', () => {

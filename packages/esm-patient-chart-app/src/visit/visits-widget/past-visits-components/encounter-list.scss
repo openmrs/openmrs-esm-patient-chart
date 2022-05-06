@@ -1,0 +1,110 @@
+@import "~@openmrs/esm-styleguide/src/vars";
+@import "~carbon-components/src/globals/scss/vars";
+@import "~carbon-components/src/globals/scss/mixins";
+@import "../../../root.scss";
+
+.tableContainer {
+  padding: 0;
+
+  :global(.bx--data-table-content) {
+    border: 1px solid $ui-03;
+    border-bottom: none;
+    overflow: visible;
+  }
+
+  :global(.bx--data-table-header) {
+    padding: 0;
+  }
+
+  :global(.bx--table-toolbar) {
+    position: relative;
+    height: 2rem;
+    overflow: visible;
+    top: 0;
+  }
+
+  &:global(.bx--data-table-container) {
+    background: none !important;
+  }
+
+  :global(.bx--toolbar-content),
+  :global(.bx--toolbar-search-container-expandable) {
+    height: 2rem;
+    margin-bottom: 0.25rem;
+  }
+}
+
+.filterContainer {
+  :global(.bx--dropdown__wrapper--inline) {
+    gap: 0;
+  }
+
+  :global(.bx--list-box__menu-icon) {
+    height: 1rem;
+  }
+}
+
+.search {
+  max-width: 16rem;
+
+  input {
+    background-color: $ui-02 !important;
+  }
+}
+
+.tableHeader {
+  > :global(.bx--table-header-label) {
+    @extend .productiveHeading01;
+    color: $text-02;
+  }
+}
+
+.menuItem {
+  max-width: none;
+}
+
+.expandedRow {
+  > td {
+    padding: inherit !important;
+
+    > div {
+      max-height: max-content !important;
+    }
+  }
+
+  > div {
+    background-color: $ui-02;
+  }
+}
+
+.hiddenRow {
+  display: none;
+}
+
+.content {
+  @include carbon--type-style('productive-heading-02');
+  color: $text-02;
+  margin-bottom: 0.5rem;
+}
+
+.tileContainer {
+  background-color: $ui-02;
+  border-top: 1px solid $ui-03;
+  padding: 5rem 0;
+}
+
+.tile {
+  margin: auto;
+  width: fit-content;
+}
+
+.tileContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.helper {
+  @include carbon--type-style('body-short-01');
+  color: $text-02;
+}

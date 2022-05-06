@@ -25,7 +25,7 @@ import {
   showNotification,
   showToast,
   useLocations,
-  useSessionUser,
+  useSession,
   ExtensionSlot,
   NewVisitPayload,
   toOmrsIsoString,
@@ -51,7 +51,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const locations = useLocations();
-  const sessionUser = useSessionUser();
+  const sessionUser = useSession();
   const config = useConfig() as ChartConfig;
   const [contentSwitcherIndex, setContentSwitcherIndex] = useState(config.showRecommendedVisitTypeTab ? 0 : 1);
   const [isMissingVisitType, setIsMissingVisitType] = useState(false);

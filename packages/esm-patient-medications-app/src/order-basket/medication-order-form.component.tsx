@@ -134,6 +134,7 @@ export default function MedicationOrderForm({
                       id: orderBasketItem.dosage.dosage,
                       text: orderBasketItem.dosage.dosage,
                     }}
+                    // @ts-ignore
                     placeholder={t('editDoseComboBoxPlaceholder', 'Dose')}
                     titleText={t('editDoseComboBoxTitle', 'Enter Dose')}
                     itemToString={(item) => item?.text}
@@ -161,6 +162,7 @@ export default function MedicationOrderForm({
                       id: orderBasketItem.frequency.conceptUuid,
                       text: orderBasketItem.frequency.name,
                     }}
+                    // @ts-ignore
                     placeholder={t('editFrequencyComboBoxPlaceholder', 'Frequency')}
                     titleText={t('editFrequencyComboBoxTitle', 'Enter Frequency')}
                     itemToString={(item) => item?.text}
@@ -190,6 +192,7 @@ export default function MedicationOrderForm({
                       id: orderBasketItem.route.conceptUuid,
                       text: orderBasketItem.route.name,
                     }}
+                    // @ts-ignore
                     placeholder={t('editRouteComboBoxPlaceholder', 'Route')}
                     titleText={t('editRouteComboBoxTitle', 'Enter Route')}
                     itemToString={(item) => item?.text}
@@ -322,6 +325,7 @@ export default function MedicationOrderForm({
                     text: unit.display,
                   }))}
                   itemToString={(item) => item?.text}
+                  // @ts-ignore
                   placeholder={t('durationUnitPlaceholder', 'Duration Unit')}
                   onChange={({ selectedItem }) =>
                     !!selectedItem

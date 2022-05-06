@@ -29,7 +29,7 @@ type FormState =
 @Component({
   selector: 'my-app-fe-wrapper',
   templateUrl: './fe-wrapper.component.html',
-  styleUrls: ['./fe-wrapper.component.css'],
+  styleUrls: ['./fe-wrapper.component.scss'],
 })
 export class FeWrapperComponent implements OnInit, OnDestroy {
   private launchFormSubscription?: Subscription;
@@ -74,12 +74,14 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
 
           const unlabeledConcepts = this.formSchemaService.getUnlabeledConcepts(this.form);
           // Fetch concept labels from server
-          this.conceptService.searchBulkConceptByUUID(unlabeledConcepts, this.language).subscribe((conceptData) => {
-            this.labelMap = {};
-            conceptData.forEach((concept: any) => {
-              this.labelMap[concept.extId] = concept.display;
-            });
-          });
+          unlabeledConcepts.length > 0
+            ? this.conceptService.searchBulkConceptByUUID(unlabeledConcepts, this.language).subscribe((conceptData) => {
+                this.labelMap = {};
+                conceptData.forEach((concept: any) => {
+                  this.labelMap[concept.extId] = concept.display;
+                });
+              })
+            : (this.labelMap = []);
         },
         (err) => {
           // TODO: Improve error handling.

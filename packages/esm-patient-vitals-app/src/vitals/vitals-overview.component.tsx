@@ -7,6 +7,7 @@ import {
   CardHeader,
   EmptyState,
   ErrorState,
+  formEntrySub,
   launchPatientWorkspace,
   useVitalsConceptMetadata,
   withUnit,
@@ -18,7 +19,7 @@ import { ConfigObject } from '../config-schema';
 import { useVitals } from './vitals.resource';
 import styles from './vitals-overview.scss';
 import VitalsChart from './vitals-chart.component';
-import VitalsPagination from './vitals-pagination.component';
+import PaginatedVitals from './paginated-vitals.component';
 
 interface VitalsOverviewProps {
   patientUuid: string;
@@ -26,6 +27,11 @@ interface VitalsOverviewProps {
   pageSize: number;
   urlLabel: string;
   pageUrl: string;
+}
+
+export function launchFormEntry(formUuid: string, encounterUuid?: string, formName?: string) {
+  formEntrySub.next({ formUuid, encounterUuid });
+  launchPatientWorkspace('patient-form-entry-workspace', { workspaceTitle: formName });
 }
 
 const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVitals, pageSize, urlLabel, pageUrl }) => {
@@ -38,10 +44,13 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
   const { vitals, isError, isLoading, isValidating } = useVitals(patientUuid);
   const { data: conceptUnits } = useVitalsConceptMetadata();
 
-  const launchVitalsBiometricsForm = React.useCallback(
-    () => launchPatientWorkspace(patientVitalsBiometricsFormWorkspace),
-    [],
-  );
+  const launchVitalsBiometricsForm = React.useCallback(() => {
+    if (config.vitals.useFormEngine) {
+      launchFormEntry(config.vitals.formUuid, '', config.vitals.formName);
+    } else {
+      launchPatientWorkspace(patientVitalsBiometricsFormWorkspace);
+    }
+  }, []);
 
   const tableHeaders = [
     { key: 'date', header: 'Date and time', isSortable: true },
@@ -129,7 +138,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
               {chartView ? (
                 <VitalsChart patientVitals={vitals} conceptUnits={conceptUnits} config={config} />
               ) : (
-                <VitalsPagination
+                <PaginatedVitals
                   tableRows={tableRows}
                   pageSize={pageSize}
                   urlLabel={urlLabel}

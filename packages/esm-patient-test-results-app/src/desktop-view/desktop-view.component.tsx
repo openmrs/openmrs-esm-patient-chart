@@ -75,14 +75,7 @@ const DesktopView: React.FC<Record<string, any>> = ({ patientUuid, panelUuid, te
               );
 
             case 'trendline':
-              return (
-                <Trendline
-                  patientUuid={patientUuid}
-                  panelUuid={viewState.panelUuid}
-                  testUuid={viewState.testUuid}
-                  openTimeline={openTimeline}
-                />
-              );
+              return <Trendline patientUuid={patientUuid} conceptUuid={viewState.testUuid} basePath={basePath} />;
 
             case 'none':
             default:

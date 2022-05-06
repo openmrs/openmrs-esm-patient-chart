@@ -1,13 +1,10 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import Add16 from '@carbon/icons-react/es/add/16';
+import { Button, DataTableSkeleton, InlineLoading } from 'carbon-components-react';
 import ChartLineSmooth16 from '@carbon/icons-react/es/chart--line-smooth/16';
 import Table16 from '@carbon/icons-react/es/table/16';
-import BiometricsChart from './biometrics-chart.component';
-import BiometricsPagination from './biometrics-pagination.component';
-import { Button, DataTableSkeleton, InlineLoading } from 'carbon-components-react';
-import { useTranslation } from 'react-i18next';
 import { formatDatetime, parseDate, useConfig } from '@openmrs/esm-framework';
-import { useBiometrics } from './biometrics.resource';
 import {
   CardHeader,
   EmptyState,
@@ -18,7 +15,10 @@ import {
 } from '@openmrs/esm-patient-common-lib';
 import { ConfigObject } from '../config-schema';
 import { patientVitalsBiometricsFormWorkspace } from '../constants';
+import { useBiometrics } from './biometrics.resource';
 import styles from './biometrics-overview.scss';
+import BiometricsChart from './biometrics-chart.component';
+import PaginatedBiometrics from './paginated-biometrics.component';
 
 interface BiometricsBaseProps {
   patientUuid: string;
@@ -112,7 +112,7 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({
         {chartView ? (
           <BiometricsChart patientBiometrics={biometrics} conceptUnits={conceptUnits} config={config} />
         ) : (
-          <BiometricsPagination
+          <PaginatedBiometrics
             tableRows={tableRows}
             pageSize={pageSize}
             urlLabel={urlLabel}
