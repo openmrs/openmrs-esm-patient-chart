@@ -6,7 +6,14 @@ import { BehaviorSubject, of, throwError } from 'rxjs';
 import { mockPatient } from '../../../../../__mocks__/patient.mock';
 import { mockLocations } from '../../../../../__mocks__/location.mock';
 import { mockCurrentVisit, mockVisitTypes } from '../../../../../__mocks__/visits.mock';
-import { saveVisit, showNotification, showToast, toOmrsIsoString, toDateObjectStrict } from '@openmrs/esm-framework';
+import {
+  saveVisit,
+  showNotification,
+  showToast,
+  toOmrsIsoString,
+  toDateObjectStrict,
+  showModal,
+} from '@openmrs/esm-framework';
 import { getByTextWithMarkup } from '../../../../../tools/test-helpers';
 import StartVisitForm from './visit-form.component';
 
@@ -16,6 +23,7 @@ const mockDateTimeStampInSeconds = 1638682781000;
 const testProps = {
   patientUuid: mockPatient.id,
   closeWorkspace: jest.fn(),
+  promptBeforeClosing: jest.fn(),
 };
 
 const mockSaveVisit = saveVisit as jest.Mock;
@@ -151,6 +159,15 @@ describe('VisitForm: ', () => {
           title: 'Error starting visit',
         }),
       );
+    });
+
+    test('should display unsaved-changes modal, when form has unsaved changes', () => {
+      userEvent.click(screen.getByLabelText(/Outpatient visit/i));
+
+      const closeButton = screen.getByRole('button', { name: /Discard/ });
+      userEvent.click(closeButton);
+
+      expect(showModal).toHaveBeenCalledWith('unsaved-changes-dialog', jasmine.anything());
     });
   });
 });

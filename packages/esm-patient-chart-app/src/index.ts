@@ -183,6 +183,13 @@ function setupOpenMRS() {
           moduleName,
         }),
       },
+      {
+        id: 'unsaved-changes-dialog',
+        load: getAsyncLifecycle(() => import('./visit/visit-form/unsaved-changes-modal.component'), {
+          featureName: 'unsaved changes',
+          moduleName,
+        }),
+      },
     ],
   };
 }

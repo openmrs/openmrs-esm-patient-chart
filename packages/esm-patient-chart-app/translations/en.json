@@ -73,6 +73,8 @@
   "tests": "Tests",
   "time": "Time",
   "type": "Type",
+  "unsavedChanges": "Unsaved changes",
+  "unsavedChangesText": "You have unsaved changes in the side panel. Do you want to discard these changes?",
   "visit": "Visit",
   "visitCanceled": "Canceled active visit successfully",
   "visitEndSuccessfully": "Ended current visit successfully",
