@@ -34,24 +34,33 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
       .splice(0, 10)
       .sort((vitalA, vitalB) => new Date(vitalA.date).getTime() - new Date(vitalB.date).getTime())
       .map((vitals) => {
-        return (
-          vitals[selectedVitalSign.value] && {
-            group: 'vitalsChartData',
-            key: formatDate(parseDate(vitals.date.toString()), { year: false }),
-            value: vitals[selectedVitalSign.value],
-            date: vitals.date,
+        if (vitals[selectedVitalSign.value]) {
+          if (selectedVitalSign.value === 'systolic') {
+            return [
+              {
+                group: 'systolic',
+                key: formatDate(parseDate(vitals.date.toString()), { year: false }),
+                value: vitals.systolic,
+                date: vitals.date,
+              },
+              {
+                group: 'diastolic',
+                key: formatDate(parseDate(vitals.date.toString()), { year: false }),
+                value: vitals.diastolic,
+                date: vitals.date,
+              },
+            ];
+          } else {
+            return {
+              group: selectedVitalSign.title,
+              key: formatDate(parseDate(vitals.date.toString()), { year: false }),
+              value: vitals[selectedVitalSign.value],
+              date: vitals.date,
+            };
           }
-        );
+        }
       });
   }, [patientVitals, selectedVitalSign]);
-
-  const chartColors = {
-    'Blood Pressure': '#6929c4',
-    'Oxygen Saturation': '#6929c4',
-    Temperature: '#6929c4',
-    'Respiratory Rate': '#6929c4',
-    Pulse: '#6929c4',
-  };
 
   const chartOptions: LineChartOptions = {
     axes: {
@@ -71,15 +80,16 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
       enabled: false,
     },
     color: {
-      scale: chartColors,
+      scale: {
+        [selectedVitalSign.title]: '#6929c4',
+      },
     },
     tooltip: {
-      customHTML: ([{ value, date }]) =>
-        `<div class="bx--tooltip bx--tooltip--shown" style="min-width: max-content; font-weight:600">${formatDate(
-          parseDate(date),
-          { year: true },
-        )} - 
-        <span style="color: #c6c6c6; font-size: 1rem; font-weight:400">${value}</span></div>`,
+      customHTML: ([{ value, group, key }]) =>
+        `<div class="bx--tooltip bx--tooltip--shown" style="min-width: max-content; font-weight:600">${value} - ${String(
+          group,
+        ).toUpperCase()}
+        <span style="color: #c6c6c6; font-size: 1rem; font-weight:600">${key}</span></div>`,
     },
   };
 
@@ -138,7 +148,7 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
         </Tabs>
       </div>
       <div className={styles.vitalsChartArea} style={{ flex: 4 }}>
-        <LineChart data={chartData} options={chartOptions} />
+        <LineChart data={chartData.flat()} options={chartOptions} />
       </div>
     </div>
   );
