@@ -191,8 +191,26 @@ export function cancelPrompt() {
 
 export function closeWorkspace(name: string) {
   const store = getWorkspaceStore();
-  const state = store.getState();
-  store.setState({ ...state, openWorkspaces: state.openWorkspaces.filter((w) => w.name != name) });
+  const promptCheckFcn = getPromptBeforeClosingFcn(name);
+  if (promptCheckFcn && promptCheckFcn()) {
+    const prompt: Prompt = {
+      title: translateFrom('@openmrs/esm-patient-chart-app', 'unsavedChangesTitleText', 'Unsaved Changes'),
+      body: translateFrom(
+        '@openmrs/esm-patient-chart-app',
+        'unsavedChangeText',
+        `You have unsaved changes in the side panel. Do you want to discard these changes?`,
+      ),
+      onConfirm: () => {
+        const state = store.getState();
+        store.setState({ ...state, prompt: null, openWorkspaces: state.openWorkspaces.filter((w) => w.name != name) });
+      },
+      confirmText: translateFrom('@openmrs/esm-patient-chart-app', 'discard', 'Discard'),
+    };
+    store.setState({ ...store.getState(), prompt });
+  } else {
+    const state = store.getState();
+    store.setState({ ...state, openWorkspaces: state.openWorkspaces.filter((w) => w.name != name) });
+  }
 }
 
 export function closeAllWorkspaces() {

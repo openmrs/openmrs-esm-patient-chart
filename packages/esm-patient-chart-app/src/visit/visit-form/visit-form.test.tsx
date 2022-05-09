@@ -6,24 +6,19 @@ import { BehaviorSubject, of, throwError } from 'rxjs';
 import { mockPatient } from '../../../../../__mocks__/patient.mock';
 import { mockLocations } from '../../../../../__mocks__/location.mock';
 import { mockCurrentVisit, mockVisitTypes } from '../../../../../__mocks__/visits.mock';
-import {
-  saveVisit,
-  showNotification,
-  showToast,
-  toOmrsIsoString,
-  toDateObjectStrict,
-  showModal,
-} from '@openmrs/esm-framework';
+import { saveVisit, showNotification, showToast, toOmrsIsoString, toDateObjectStrict } from '@openmrs/esm-framework';
 import { getByTextWithMarkup } from '../../../../../tools/test-helpers';
 import StartVisitForm from './visit-form.component';
 
 const isoFormat = 'YYYY-MM-DDTHH:mm:ss.SSSZZ';
 const mockDateTimeStampInSeconds = 1638682781000;
+const mockCloseWorkspace = jest.fn();
+const mockPromptBeforeClosing = jest.fn();
 
 const testProps = {
   patientUuid: mockPatient.id,
-  closeWorkspace: jest.fn(),
-  promptBeforeClosing: jest.fn(),
+  closeWorkspace: mockCloseWorkspace,
+  promptBeforeClosing: mockPromptBeforeClosing,
 };
 
 const mockSaveVisit = saveVisit as jest.Mock;
@@ -167,7 +162,7 @@ describe('VisitForm: ', () => {
       const closeButton = screen.getByRole('button', { name: /Discard/ });
       userEvent.click(closeButton);
 
-      expect(showModal).toHaveBeenCalledWith('unsaved-changes-dialog', jasmine.anything());
+      expect(mockCloseWorkspace).toHaveBeenCalled();
     });
   });
 });
