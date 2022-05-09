@@ -12,7 +12,7 @@ import { ConfigObject } from '../config-schema';
 
 interface vitalsChartData {
   title: string;
-  value: number | string;
+  value: string;
 }
 
 interface VitalsChartProps {
@@ -35,7 +35,7 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
       .sort((vitalA, vitalB) => new Date(vitalA.date).getTime() - new Date(vitalB.date).getTime())
       .map((vitals) => {
         if (vitals[selectedVitalSign.value]) {
-          if (selectedVitalSign.value === 'systolic') {
+          if (['systolic', 'diastolic'].includes(selectedVitalSign.value)) {
             return [
               {
                 group: 'systolic',
