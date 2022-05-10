@@ -40,8 +40,7 @@ export class ConceptService {
             return { ...concept, extId: conceptUuid };
           }),
           catchError((error: Response) => {
-            console.error(error.status);
-            return observableOf(error.json());
+            return observableOf({ extId: conceptUuid, display: conceptUuid });
           }),
         ),
       );
