@@ -44,7 +44,7 @@ export default function FilePreview(props: FilePreviewProps) {
 
   return (
     <form className={styles.overview} onSubmit={saveImageOrPdf}>
-      <img src={props.content} alt={t('webcamPreview', 'Webcam preview')} />
+      <embed src={props.content} />
       {props.collectCaption && (
         <div className={styles.captionFrame}>
           <TextInput
