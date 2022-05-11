@@ -29,7 +29,6 @@ export function createGalleryEntry(data: any) {
   return {
     id: `${data.uuid}`,
     src: `${window.openmrsBase}${attachmentUrl}/${data.uuid}/bytes`,
-    // thumbnail: `${window.openmrsBase}${attachmentUrl}/${data.uuid}/bytes?view=complexdata.view.thumbnail`,
     thumbnail: `${window.openmrsBase}${attachmentUrl}/${data.uuid}/bytes`,
     // thumbnailWidth: 320,
     // thumbnailHeight: 212,

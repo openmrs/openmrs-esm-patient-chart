@@ -28,7 +28,6 @@ function PdfThumbnail(props: ImageProps) {
   return (
     <div className={styles.pdfThumbnail} onClick={handleClick} role="button" tabIndex={0}>
       <embed src={props.src} style={{ ...props.style, pointerEvents: 'none', width: '100%' }} />
-      {/* <img src={props.src} alt={props.title} style={props.style} /> */}
     </div>
   );
 }
