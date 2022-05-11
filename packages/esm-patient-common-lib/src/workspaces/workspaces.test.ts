@@ -1,6 +1,5 @@
 import { registerExtension } from '@openmrs/esm-framework';
 import { cancelPrompt, getWorkspaceStore, launchPatientWorkspace, registerWorkspace, resetWorkspaceStore } from '.';
-import { closeWorkspace } from '..';
 
 const mockExtensionRegistry = {};
 
@@ -146,7 +145,7 @@ describe('workspace system', () => {
     registerWorkspace({ name: 'hiv', title: 'HIV', load: jest.fn() });
     launchPatientWorkspace('hiv');
     store.getState().openWorkspaces[0].promptBeforeClosing(() => true);
-    store.getState().openWorkspaces[0].closeWorkspace();
+    store.getState().openWorkspaces[0].closeWorkspace(false);
     expect(store.getState().prompt.title).toBe('Unsaved Changes');
     expect(store.getState().prompt.body).toBe(
       'You have unsaved changes in the side panel. Do you want to discard these changes?',

@@ -251,7 +251,7 @@ const ConditionsForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
         )}
       </div>
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-        <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
+        <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
           {t('cancel', 'Cancel')}
         </Button>
         <Button className={styles.button} disabled={!selectedCondition} kind="primary" type="submit">

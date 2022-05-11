@@ -22,6 +22,7 @@ export interface WorkspaceStoreState {
 
 export interface OpenWorkspace extends WorkspaceRegistration {
   additionalProps: object;
+  closeWorkspace(promptBeforeClosing?: boolean): void;
   closeWorkspace(): void;
   promptBeforeClosing(testFcn: () => boolean): void;
 }
@@ -107,7 +108,7 @@ export function launchPatientWorkspace(name: string, additionalProps?: object) {
   const workspace = getWorkspaceRegistration(name);
   const newWorkspace = {
     ...workspace,
-    closeWorkspace: () => closeWorkspace(name),
+    closeWorkspace: (ignoreChanges = true) => closeWorkspace(name, ignoreChanges),
     promptBeforeClosing: (testFcn) => promptBeforeClosing(name, testFcn),
     additionalProps,
   };
@@ -189,10 +190,10 @@ export function cancelPrompt() {
   store.setState({ ...state, prompt: null });
 }
 
-export function closeWorkspace(name: string) {
+export function closeWorkspace(name: string, ignoreChanges: boolean) {
   const store = getWorkspaceStore();
   const promptCheckFcn = getPromptBeforeClosingFcn(name);
-  if (promptCheckFcn && promptCheckFcn()) {
+  if (!ignoreChanges && promptCheckFcn && promptCheckFcn()) {
     const prompt: Prompt = {
       title: translateFrom('@openmrs/esm-patient-chart-app', 'unsavedChangesTitleText', 'Unsaved Changes'),
       body: translateFrom(

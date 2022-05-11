@@ -175,7 +175,7 @@ const ProgramsForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patient
         </FormGroup>
       </div>
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-        <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
+        <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
           {t('cancel', 'Cancel')}
         </Button>
         <Button className={styles.button} kind="primary" disabled={!selectedProgram} type="submit">
