@@ -718,7 +718,7 @@ jobs:
 
     needs: build
 
-    # if: ${{ github.event_name == 'push' }}
+    if: ${{ github.event_name == 'push' }}
 
     steps:
       - name: Download built artifacts
@@ -732,9 +732,9 @@ jobs:
       - run: npx lerna bootstrap
       - run: yarn lerna version patch --no-git-tag-version --no-push --yes
       - run: yarn lerna version "$(node -e "console.log(require('./lerna.json').version)")-pre.${{ github.run_number }}" --no-git-tag-version --yes
-      # - run: git config user.email "info@openmrs.org" && git config user.name "OpenMRS CI"
-      # - run: git add . && git commit -m "Prerelease version" --no-verify
-      # - run: yarn run ci:prepublish
+      - run: git config user.email "info@openmrs.org" && git config user.name "OpenMRS CI"
+      - run: git add . && git commit -m "Prerelease version" --no-verify
+      - run: yarn run ci:prepublish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
@@ -743,7 +743,7 @@ jobs:
 
     needs: build
 
-    #if: ${{ github.event_name == 'release' }}
+    if: ${{ github.event_name == 'release' }}
 
     steps:
       - name: Download built artifacts
@@ -755,6 +755,6 @@ jobs:
           node-version: '16'
           registry-url: "https://registry.npmjs.org"
       - run: npx lerna bootstrap
-      # - run: yarn run ci:publish
+      - run: yarn run ci:publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
