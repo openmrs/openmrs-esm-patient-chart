@@ -21,19 +21,20 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '16'
-      - run: npx lerna bootstrap
-      - name: TurboRepo local cache server
+      - name: Install dependencies
+        run: npx lerna bootstrap
+      - name: Setup a local cache server for Turborepo
         uses: felixmosh/turborepo-gh-artifacts@v1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           server-token: ${{ secrets.TURBO_SERVER_TOKEN }}
-      - name: Test
+      - name: Run tests
         run: yarn run test
-      - name: Lint & Typecheck
+      - name: Run lint and typecheck
         run: yarn turbo run lint typescript --color --api="http://127.0.0.1:9080" --token="${{ secrets.TURBO_SERVER_TOKEN }}" --team="${{ github.repository_owner }}"
-      - name: Build
+      - name: Run build
         run: yarn turbo run build --color --api="http://127.0.0.1:9080" --token="${{ secrets.TURBO_SERVER_TOKEN }}" --team="${{ github.repository_owner }}"
-      - name: Upload Artifacts
+      - name: Upload build artifacts
         uses: actions/upload-artifact@v2
         with:
           name: packages
