@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
-import ImagePreview from './image-preview.component';
+import FilePreview from './image-preview.component';
 import styles from './camera-upload.scss';
 import Camera from 'react-html5-camera-photo';
 import { showToast } from '@openmrs/esm-framework';
@@ -53,7 +53,7 @@ const CameraUpload: React.FC<CameraUploadProps> = ({ onSavePhoto, onTakePhoto, c
     };
   }, []);
 
-  const willSaveImage = useCallback(
+  const willSaveAttachment = useCallback(
     (dataUri: string, caption: string) => onSavePhoto?.(dataUri, caption),
     [onSavePhoto],
   );
@@ -62,20 +62,26 @@ const CameraUpload: React.FC<CameraUploadProps> = ({ onSavePhoto, onTakePhoto, c
     <div className={styles.cameraSection}>
       <div className={styles.frameContent}>
         {dataUri ? (
-          <ImagePreview
+          <FilePreview
             content={dataUri}
             onCancelCapture={clearCamera}
-            onSaveImage={willSaveImage}
+            onSaveFile={willSaveAttachment}
             collectCaption={collectCaption}
           />
         ) : (
           <>
             {!error && <Camera onTakePhoto={handleTakePhoto} onCameraStart={setMediaStream} onCameraError={setError} />}
             <div>
-              <label htmlFor="uploadPhoto" className={styles.choosePhoto}>
-                {t('selectPhoto', 'Select local photo instead')}
+              <label htmlFor="uploadFile" className={styles.choosePhotoOrPdf}>
+                {t('selectFile', 'Select local File instead')}
               </label>
-              <input type="file" id="uploadPhoto" accept="image/*" className={styles.uploadFile} onChange={upload} />
+              <input
+                type="file"
+                id="uploadFile"
+                accept="image/*, application/pdf"
+                className={styles.uploadFile}
+                onChange={upload}
+              />
             </div>
           </>
         )}

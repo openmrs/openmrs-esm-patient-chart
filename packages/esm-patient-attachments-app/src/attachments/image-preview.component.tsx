@@ -4,27 +4,27 @@ import { UserHasAccess } from '@openmrs/esm-framework';
 import { Button, ButtonSet, TextInput } from 'carbon-components-react';
 import styles from './image-preview.scss';
 
-interface ImagePreviewProps {
+interface FilePreviewProps {
   content: string;
   collectCaption: boolean;
-  onSaveImage?(dataUri: string, caption: string): void;
+  onSaveFile?(dataUri: string, caption: string): void;
   onCancelCapture?(): void;
 }
 
-export default function ImagePreview(props: ImagePreviewProps) {
+export default function FilePreview(props: FilePreviewProps) {
   const [saving, setSaving] = useState(false);
   const [caption, setCaption] = useState('');
   const { t } = useTranslation();
 
-  const saveImage = useCallback(
+  const saveImageOrPdf = useCallback(
     (e: SyntheticEvent) => {
       if (!saving) {
         e.preventDefault();
-        props.onSaveImage?.(props.content, caption);
+        props.onSaveFile?.(props.content, caption);
         setSaving(true);
       }
     },
-    [props.onSaveImage, saving],
+    [props.onSaveFile, saving],
   );
 
   const cancelCapture = useCallback(
@@ -43,8 +43,8 @@ export default function ImagePreview(props: ImagePreviewProps) {
   }, []);
 
   return (
-    <form className={styles.overview} onSubmit={saveImage}>
-      <img src={props.content} alt={t('webcamPreview', 'Webcam preview')} />
+    <form className={styles.overview} onSubmit={saveImageOrPdf}>
+      <embed src={props.content} />
       {props.collectCaption && (
         <div className={styles.captionFrame}>
           <TextInput
@@ -59,7 +59,7 @@ export default function ImagePreview(props: ImagePreviewProps) {
       )}
       <UserHasAccess privilege="Create Attachment">
         <ButtonSet className={styles.buttonSetOverrides}>
-          <Button size="small" onClick={saveImage} disabled={saving}>
+          <Button size="small" onClick={saveImageOrPdf} disabled={saving}>
             {t('save', 'Save')}
           </Button>
           <Button kind="danger" size="small" onClick={cancelCapture} disabled={saving}>
