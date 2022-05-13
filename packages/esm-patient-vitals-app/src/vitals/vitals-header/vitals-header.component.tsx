@@ -114,8 +114,8 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
             <div className={styles.row}>
               <VitalsHeaderItem
                 unitName={t('temperatureAbbreviated', 'Temp')}
-                unitSymbol={conceptUnits.get(config.concepts.temperatureUuid) ?? ''}
-                value={latestVitals?.temperature}
+                unitSymbol={(latestVitals?.temperature && conceptUnits.get(config.concepts.temperatureUuid)) ?? ''}
+                value={latestVitals?.temperature ?? '--'}
               />
               <VitalsHeaderItem
                 interpretation={interpretBloodPressure(
@@ -125,8 +125,10 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
                   conceptMetadata,
                 )}
                 unitName={t('bp', 'BP')}
-                unitSymbol={conceptUnits.get(config.concepts.systolicBloodPressureUuid) ?? ''}
-                value={`${latestVitals?.systolic ?? '-'} / ${latestVitals?.diastolic ?? '-'}`}
+                unitSymbol={
+                  (latestVitals?.systolic && conceptUnits.get(config.concepts.systolicBloodPressureUuid)) ?? ''
+                }
+                value={`${latestVitals?.systolic ?? '--'} / ${latestVitals?.diastolic ?? '--'}`}
               />
               <VitalsHeaderItem
                 interpretation={assessValue(
@@ -134,8 +136,8 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
                   getReferenceRangesForConcept(config.concepts.pulseUuid, conceptMetadata),
                 )}
                 unitName={t('heartRate', 'Heart rate')}
-                unitSymbol={conceptUnits.get(config.concepts.pulseUuid) ?? ''}
-                value={latestVitals?.pulse}
+                unitSymbol={(latestVitals?.pulse && conceptUnits.get(config.concepts.pulseUuid)) ?? ''}
+                value={latestVitals?.pulse ?? '--'}
               />
               <VitalsHeaderItem
                 interpretation={assessValue(
@@ -144,7 +146,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
                 )}
                 unitName={t('spo2', 'SpO2')}
                 unitSymbol={conceptUnits.get(config.concepts.oxygenSaturationUuid) ?? ''}
-                value={latestVitals?.spo2}
+                value={latestVitals?.spo2 ?? '--'}
               />
             </div>
             <div className={styles.row}>
@@ -153,24 +155,24 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
                   latestVitals?.respiratoryRate,
                   getReferenceRangesForConcept(config.concepts.respiratoryRateUuid, conceptMetadata),
                 )}
-                unitName={t('respiratoryRate', 'R. Rate')}
+                unitName={latestVitals?.respiratoryRate && t('respiratoryRate', 'R. Rate')}
                 unitSymbol={conceptUnits.get(config.concepts.respiratoryRateUuid) ?? ''}
-                value={latestVitals?.respiratoryRate}
+                value={latestVitals?.respiratoryRate ?? '--'}
               />
               <VitalsHeaderItem
                 unitName={t('height', 'Height')}
-                unitSymbol={conceptUnits.get(config.concepts.heightUuid) ?? ''}
-                value={latestVitals?.height}
+                unitSymbol={(latestVitals?.height && conceptUnits.get(config.concepts.heightUuid)) ?? ''}
+                value={latestVitals?.height ?? '--'}
               />
               <VitalsHeaderItem
                 unitName={t('bmi', 'BMI')}
-                unitSymbol={config.biometrics['bmiUnit']}
-                value={latestVitals?.bmi}
+                unitSymbol={latestVitals?.bmi && config.biometrics['bmiUnit']}
+                value={latestVitals?.bmi ?? '--'}
               />
               <VitalsHeaderItem
                 unitName={t('weight', 'Weight')}
-                unitSymbol={conceptUnits.get(config.concepts.weightUuid) ?? ''}
-                value={latestVitals?.weight}
+                unitSymbol={(latestVitals?.weight && conceptUnits.get(config.concepts.weightUuid)) ?? ''}
+                value={latestVitals?.weight ?? '--'}
               />
             </div>
           </div>
