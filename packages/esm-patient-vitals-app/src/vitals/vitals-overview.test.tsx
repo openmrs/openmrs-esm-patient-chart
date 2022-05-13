@@ -1,6 +1,6 @@
 import React from 'react';
-import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { screen } from '@testing-library/react';
 import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
@@ -47,8 +47,6 @@ jest.mock('@openmrs/esm-framework', () => {
 
   return {
     ...originalModule,
-    attach: jest.fn(),
-    openmrsFetch: jest.fn(),
     useConfig: jest.fn(() => mockVitalsConfig),
     usePagination: jest.fn().mockImplementation(() => ({
       currentPage: 1,
@@ -96,7 +94,7 @@ describe('VitalsOverview: ', () => {
     ).toBeInTheDocument();
   });
 
-  it("renders an overview of the patient's vital signs", async () => {
+  it("renders a tabular overview of the patient's vital signs", async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: mockFhirVitalsResponse });
     mockUsePagination.mockReturnValueOnce({
       results: formattedVitals.slice(0, 5),
