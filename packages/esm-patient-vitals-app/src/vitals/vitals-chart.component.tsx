@@ -2,13 +2,13 @@ import React, { useMemo } from 'react';
 import styles from './vitals-chart.component.scss';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs } from 'carbon-components-react';
-import { PatientVitals } from './vitals.resource';
+import '@carbon/charts/styles.css';
 import { LineChart } from '@carbon/charts-react';
 import { ScaleTypes, LineChartOptions } from '@carbon/charts/interfaces';
 import { formatDate, parseDate } from '@openmrs/esm-framework';
 import { withUnit } from '@openmrs/esm-patient-common-lib';
-import '@carbon/charts/styles.css';
 import { ConfigObject } from '../config-schema';
+import { PatientVitals } from './vitals.resource';
 
 interface vitalsChartData {
   title: string;
@@ -102,7 +102,7 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
     {
       id: 'oxygenSaturation',
       title: withUnit('SPO2', conceptUnits.get(config.concepts.oxygenSaturationUuid) ?? '-'),
-      value: 'oxygenSaturation',
+      value: 'spo2',
     },
     {
       id: 'temperature',

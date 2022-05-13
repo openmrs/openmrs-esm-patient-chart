@@ -3,6 +3,7 @@ import isNumber from 'lodash/isNumber';
 import { ConceptMetadata } from '@openmrs/esm-patient-common-lib';
 
 export function calculateBMI(weight: number, height: number): number {
+  if (!weight && !height) return;
   if (weight > 0 && height > 0) {
     return Number((weight / (height / 100) ** 2).toFixed(1));
   }
