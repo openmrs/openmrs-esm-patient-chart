@@ -17,7 +17,9 @@ export function launchFormEntryOrHtmlForms(
       launchFormEntry(formUuid, patient.id, encounterUuid, formName);
     } else {
       navigate({
-        to: `\${openmrsBase}/htmlformentryui/htmlform/${htmlForm.formUiPage}.page?patientId=${patient.id}&visitId=${currentVisit.uuid}&definitionUiResource=${htmlForm.formUiResource}`,
+        to:
+          `\${openmrsBase}/htmlformentryui/htmlform/${htmlForm.formUiPage}.page?patientId=${patient.id}&visitId=${currentVisit.uuid}&definitionUiResource=${htmlForm.formUiResource}&returnUrl=` +
+          window.location.href,
       });
     }
   } else {
