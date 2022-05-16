@@ -754,7 +754,7 @@ jobs:
         run: npx lerna bootstrap
       
       - name: Build
-        run: yarn turbo run build
+        run: yarn turbo run build --color
 
       - name: Patch
         run: yarn lerna version patch --no-git-tag-version --no-push --yes
