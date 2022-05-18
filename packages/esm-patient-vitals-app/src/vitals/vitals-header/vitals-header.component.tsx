@@ -145,7 +145,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
                   getReferenceRangesForConcept(config.concepts.oxygenSaturationUuid, conceptMetadata),
                 )}
                 unitName={t('spo2', 'SpO2')}
-                unitSymbol={conceptUnits.get(config.concepts.oxygenSaturationUuid) ?? ''}
+                unitSymbol={(latestVitals?.spo2 && conceptUnits.get(config.concepts.oxygenSaturationUuid)) ?? ''}
                 value={latestVitals?.spo2 ?? '--'}
               />
             </div>
@@ -155,8 +155,10 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
                   latestVitals?.respiratoryRate,
                   getReferenceRangesForConcept(config.concepts.respiratoryRateUuid, conceptMetadata),
                 )}
-                unitName={latestVitals?.respiratoryRate && t('respiratoryRate', 'R. Rate')}
-                unitSymbol={conceptUnits.get(config.concepts.respiratoryRateUuid) ?? ''}
+                unitName={t('respiratoryRate', 'R. Rate')}
+                unitSymbol={
+                  (latestVitals?.respiratoryRate && conceptUnits.get(config.concepts.respiratoryRateUuid)) ?? ''
+                }
                 value={latestVitals?.respiratoryRate ?? '--'}
               />
               <VitalsHeaderItem

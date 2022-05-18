@@ -209,30 +209,20 @@ export function editPatientVitals(
   });
 }
 
-export function exists(...args: any[]): boolean {
-  for (const y of args) {
-    if (y === null || y === undefined) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
 export function assessValue(value: number, range: ObsMetaInfo): ObservationInterpretation {
-  if (exists(range?.hiCritical) && value >= range.hiCritical) {
+  if (range?.hiCritical && value >= range.hiCritical) {
     return 'critically_high';
   }
 
-  if (exists(range?.hiNormal) && value > range.hiNormal) {
+  if (range?.hiNormal && value > range.hiNormal) {
     return 'high';
   }
 
-  if (exists(range?.lowCritical) && value <= range.lowCritical) {
+  if (range?.lowCritical && value <= range.lowCritical) {
     return 'critically_low';
   }
 
-  if (exists(range?.lowNormal) && value < range.lowNormal) {
+  if (range?.lowNormal && value < range.lowNormal) {
     return 'low';
   }
 
