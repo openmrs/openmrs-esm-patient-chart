@@ -139,4 +139,19 @@ describe('workspace system', () => {
     const store = getWorkspaceStore();
     expect(() => launchPatientWorkspace('test-results')).toThrowError(/test-results.*registered/i);
   });
+
+  test('respects promptBeforeClosing function before closing workspace, with unsaved changes', () => {
+    const store = getWorkspaceStore();
+    registerWorkspace({ name: 'hiv', title: 'HIV', load: jest.fn() });
+    launchPatientWorkspace('hiv');
+    store.getState().openWorkspaces[0].promptBeforeClosing(() => true);
+    store.getState().openWorkspaces[0].closeWorkspace(false);
+    expect(store.getState().prompt.title).toBe('Unsaved Changes');
+    expect(store.getState().prompt.body).toBe(
+      'You have unsaved changes in the side panel. Do you want to discard these changes?',
+    );
+    expect(store.getState().prompt.confirmText).toBe('Discard');
+    store.getState().prompt.onConfirm();
+    expect(store.getState().openWorkspaces.length).toBe(0);
+  });
 });
