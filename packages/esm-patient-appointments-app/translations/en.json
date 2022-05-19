@@ -22,6 +22,7 @@
   "selectAppointmentType": "Select the type of appointment",
   "selectLocation": "Select a location",
   "selectService": "Select service",
+  "searchService": "Search for a service",
   "service": "Service",
   "serviceType": "Service type",
   "time": "Time",

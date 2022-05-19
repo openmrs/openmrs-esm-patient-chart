@@ -110,7 +110,7 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
 
   if (isLoading) return <SearchSkeleton role="progressbar" />;
   return (
-    <div className={styles.formWrapper}>
+    <div className={`${styles.form} ${isTablet ? styles.tablet : styles.desktop}`}>
       <section className={styles.formGroup}>
         <span>{t('location', 'Location')}</span>
         <Select
@@ -179,7 +179,7 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
           onChange={(event) => setSelectedService(event.target.value)}
           value={selectedServiceType}
         >
-          {!selectedService ? <SelectItem text={t('chooseService', 'Select service')} value="" /> : null}
+          {!selectedService ? <SelectItem text={t('searchService', 'Search for a service')} value="" /> : null}
           {services?.length > 0 &&
             services.map((service) => (
               <SelectItem key={service.uuid} text={service.name} value={service.name}>

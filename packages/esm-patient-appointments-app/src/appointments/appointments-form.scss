@@ -67,4 +67,18 @@ $openmrs-background-grey: #ededed;
   height: $spacing-10;
   align-items: flex-start;
 }
+.tablet {
+  padding: 1.5rem 1rem;
+  background-color: $ui-02;
+}
 
+.desktop {
+  padding: 0rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: calc(100vh - 6rem);
+}
