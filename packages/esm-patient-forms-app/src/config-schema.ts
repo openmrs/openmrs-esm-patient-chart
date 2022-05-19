@@ -60,12 +60,6 @@ export const configSchema = {
         formUiResource: 'referenceapplication:htmlforms/vitals.xml',
         formUiPage: 'enterHtmlFormWithSimpleUi',
       },
-      {
-        formUuid: '63f2c012-a169-421d-86a5-67984fcb6d74',
-        formName: 'HCD Baseline',
-        formUiResource: 'file:htmlforms/hcd/hcdBaseline.xml',
-        formUiPage: 'enterHtmlFormWithStandardUi',
-      },
     ],
   },
   showHtmlFormEntryForms: {
