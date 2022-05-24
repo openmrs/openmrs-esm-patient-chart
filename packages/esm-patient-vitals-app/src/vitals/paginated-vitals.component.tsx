@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   DataTable,
+  DataTableRow,
   Table,
   TableCell,
   TableContainer,
@@ -14,7 +15,7 @@ import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import styles from './paginated-vitals.scss';
 
 interface PaginatedVitalsProps {
-  tableRows: Array<any>;
+  tableRows: Array<DataTableRow>;
   pageSize: number;
   pageUrl: string;
   urlLabel: string;
