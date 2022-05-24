@@ -43,7 +43,7 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
     ? data?.filter((formInfo) => isValidOfflineFormEncounter(formInfo.form, htmlFormEntryForms))
     : data;
   formsToDisplay = formsToDisplay?.filter((formInfo) =>
-    userHasAccess(formInfo.form.encounterType.editPrivilege?.display, session?.user),
+    userHasAccess(formInfo?.form?.encounterType?.editPrivilege?.display, session?.user),
   );
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const { programConfigs } = useProgramConfig(patientUuid, showRecommendedFormsTab);
