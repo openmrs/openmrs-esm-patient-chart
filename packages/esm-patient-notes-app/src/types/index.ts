@@ -32,29 +32,33 @@ export interface PatientNote {
 }
 
 export interface DiagnosisData {
-  word: null;
-  conceptName: {
-    id: number;
+  uuid: string;
+  display: string;
+  name: {
     uuid: string;
     conceptNameType: string;
     name: string;
   };
-  concept: {
-    id: number;
+  conceptClass: {
     uuid: string;
-    conceptMappings: Array<ConceptMapping>;
-    preferredName: string;
+    name: string;
+    description: string;
   };
+  names: Array<conceptNames>;
+  mappings: Array<ConceptMapping>;
 }
-
+export interface conceptNames {
+  uuid: string;
+  name: string;
+  conceptNameType: string;
+}
 export interface ConceptMapping {
-  conceptMapType: string;
+  conceptMapType: {
+    uuid: string;
+    display: string;
+  };
   conceptReferenceTerm: {
-    code: string;
-    name: null | string;
-    conceptSource: {
-      name: string;
-    };
+    display: string;
   };
 }
 

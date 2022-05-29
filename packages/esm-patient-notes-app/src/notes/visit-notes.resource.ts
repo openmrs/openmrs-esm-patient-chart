@@ -77,8 +77,8 @@ export function fetchProviderByUuid(abortController: AbortController, providerUu
 }
 
 export function fetchDiagnosisByName(searchTerm: string) {
-  return openmrsObservableFetch<Array<DiagnosisData>>(`/coreapps/diagnoses/search.action?&term=${searchTerm}`).pipe(
-    map(({ data }) => data),
+  return openmrsObservableFetch<Array<DiagnosisData>>(`/ws/rest/v1/concept?q=${searchTerm}&v=full`).pipe(
+    map(({ data }) => data['results']),
     map((data: Array<DiagnosisData>) => formatDiagnoses(data)),
   );
 }
@@ -89,8 +89,8 @@ function formatDiagnoses(diagnoses: Array<DiagnosisData>): Array<Diagnosis> {
 
 function mapDiagnosisProperties(diagnosis: DiagnosisData): Diagnosis {
   return {
-    concept: diagnosis.concept,
-    conceptReferenceTermCode: getConceptReferenceTermCode(diagnosis.concept.conceptMappings).conceptReferenceTerm.code,
+    concept: diagnosis.name,
+    conceptReferenceTermCode: getConceptReferenceTermCode(diagnosis.mappings).conceptReferenceTerm.display,
     primary: false,
     confirmed: false,
   };
@@ -108,5 +108,5 @@ export function saveVisitNote(abortController: AbortController, payload: VisitNo
 }
 
 function getConceptReferenceTermCode(conceptMapping: Array<ConceptMapping>): ConceptMapping {
-  return conceptMapping.find((concept) => concept.conceptReferenceTerm.conceptSource.name === 'ICD-10-WHO');
+  return conceptMapping.find((concept) => concept.conceptReferenceTerm.display);
 }
