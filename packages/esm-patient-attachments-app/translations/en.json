@@ -9,5 +9,8 @@
   "delete": "Delete",
   "deleteSelected": "Delete selected",
   "save": "Save",
-  "selectFile": "Select local file instead"
+  "selectFile": "Select local file instead",
+  "fileTooLarge": "File uploaded is not supported",
+  "errorUploading": "Error uploading a file"
+
 }

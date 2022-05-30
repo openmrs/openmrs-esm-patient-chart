@@ -5,7 +5,7 @@ import styles from './attachments-overview.scss';
 import Add16 from '@carbon/icons-react/es/add/16';
 import { useTranslation } from 'react-i18next';
 import { Button } from 'carbon-components-react';
-import { LayoutType, showModal, useLayoutType, usePagination, UserHasAccess } from '@openmrs/esm-framework';
+import { LayoutType, showModal, showToast, useLayoutType, usePagination, UserHasAccess } from '@openmrs/esm-framework';
 import { PatientChartPagination, EmptyState, CardHeader } from '@openmrs/esm-patient-common-lib';
 import { getAttachments, createAttachment, deleteAttachment, getAttachmentByUuid } from './attachments.resource';
 import { createGalleryEntry, readFileAsString } from './utils';
@@ -49,6 +49,7 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
   const layOutType = useLayoutType();
   const pageSize = getPageSize(layOutType);
   const pagination = usePagination(attachments, pageSize);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     if (patientUuid) {
@@ -59,6 +60,20 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
       return () => abortController.abort();
     }
   }, [patientUuid]);
+
+  useEffect(() => {
+    if (error) {
+      if (error === true) {
+        showToast({
+          critical: true,
+          kind: 'error',
+          description: t('fileTooLarge', 'File uploaded is not supported'),
+          title: t('errorUploading', 'Error uploading a file'),
+        });
+        setError(false);
+      }
+    }
+  }, [error]);
 
   const pushAttachments = useCallback(async (items: Array<any>, abortController: AbortController) => {
     const newAttachments = await Promise.all(
@@ -86,6 +101,13 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
     const close = showModal('capture-photo-modal', {
       onSavePhoto(dataUri: string, caption: string) {
         const abortController = new AbortController();
+        var extension = dataUri.split(';')[0].split('/')[1];
+        var sizeInBytes = 4 * Math.ceil(dataUri.length / 3) * 0.5624896334383812;
+        if (sizeInBytes > 500000 || extension.includes('svg')) {
+          setError(true);
+          close();
+          showCam();
+        }
         createAttachment(patientUuid, dataUri, caption, abortController).then((res) => {
           pushAttachments([res.data], new AbortController());
           close();
