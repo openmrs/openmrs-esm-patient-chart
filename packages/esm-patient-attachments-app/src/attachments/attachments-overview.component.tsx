@@ -62,16 +62,14 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
   }, [patientUuid]);
 
   useEffect(() => {
-    if (error) {
-      if (error === true) {
-        showToast({
-          critical: true,
-          kind: 'error',
-          description: t('fileTooLarge', 'File uploaded is not supported'),
-          title: t('errorUploading', 'Error uploading a file'),
-        });
-        setError(false);
-      }
+    if (error === true) {
+      showToast({
+        critical: true,
+        kind: 'error',
+        description: t('fileUnsupported', 'File uploaded is not supported'),
+        title: t('errorUploading', 'Error uploading a file'),
+      });
+      setError(false);
     }
   }, [error]);
 

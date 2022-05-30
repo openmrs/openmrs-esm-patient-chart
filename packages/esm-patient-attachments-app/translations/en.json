@@ -8,9 +8,8 @@
   "changeImage": "Change image",
   "delete": "Delete",
   "deleteSelected": "Delete selected",
+  "errorUploading": "Error uploading a file",
+  "fileUnsupported": "File uploaded is not supported",
   "save": "Save",
-  "selectFile": "Select local file instead",
-  "fileTooLarge": "File uploaded is not supported",
-  "errorUploading": "Error uploading a file"
-
+  "selectFile": "Select local file instead"
 }
