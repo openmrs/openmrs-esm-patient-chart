@@ -1,4 +1,12 @@
-import { openmrsFetch, setupOfflineSync, SyncProcessOptions, Visit } from '@openmrs/esm-framework';
+import {
+  messageOmrsServiceWorker,
+  omrsOfflineCachingStrategyHttpHeaderName,
+  openmrsFetch,
+  setupDynamicOfflineDataHandler,
+  setupOfflineSync,
+  SyncProcessOptions,
+  Visit,
+} from '@openmrs/esm-framework';
 import { launchFormEntry } from './form-entry-interop';
 
 // General note on the following imports and this file in general:
@@ -14,6 +22,10 @@ import { launchFormEntry } from './form-entry-interop';
 // from `esm-form-entry-app` and/or directly migrate this file's content to the appropriate location.
 import type { PatientFormSyncItemContent } from '../../esm-form-entry-app/src/app/offline/sync';
 import type { EncounterCreate } from '../../esm-form-entry-app/src/app/types';
+import { FormEncounter } from './types';
+import { isFormJsonSchema } from './offline-forms/offline-form-helpers';
+import { formEncounterUrl, formEncounterUrlPoc } from './constants';
+import escapeRegExp from 'lodash-es/escapeRegExp';
 
 const patientFormSyncItem = 'patient-form';
 
@@ -72,4 +84,62 @@ async function syncPersonUpdate(personUuid?: string, personUpdate?: any) {
     method: 'POST',
     body: personUpdate,
   });
+}
+
+export async function setupDynamicFormDataHandler() {
+  setupDynamicOfflineDataHandler({
+    id: 'esm-patient-forms-app:form',
+    type: 'form',
+    displayName: 'Patient forms',
+    async isSynced(identifier) {
+      const expectedUrls = await getCacheableFormUrls(identifier);
+      const cache = await caches.open('omrs-spa-cache-v1');
+      const keys = await cache.keys();
+      return expectedUrls.every((expectedUrl) =>
+        keys.some((key) => new RegExp(escapeRegExp(expectedUrl)).test(key.url)),
+      );
+    },
+    async sync(identifier) {
+      const urlsToCache = await getCacheableFormUrls(identifier);
+      const cacheResults = await Promise.allSettled(
+        urlsToCache.map(async (urlToCache) => {
+          await messageOmrsServiceWorker({
+            type: 'registerDynamicRoute',
+            pattern: escapeRegExp(urlToCache),
+            strategy: 'network-first',
+          });
+
+          await openmrsFetch(urlToCache, {
+            headers: {
+              [omrsOfflineCachingStrategyHttpHeaderName]: 'network-first',
+            },
+          });
+        }),
+      );
+
+      if (cacheResults.some((x) => x.status === 'rejected')) {
+        throw new Error(`Some form data could not be properly downloaded. (Form UUID: ${identifier})`);
+      }
+    },
+  });
+}
+
+async function getCacheableFormUrls(formUuid: string) {
+  const getFormRes = await openmrsFetch<FormEncounter>(`/ws/rest/v1/form/${formUuid}?v=full`);
+  const form = getFormRes.data;
+
+  if (!form) {
+    throw new Error(`The form data could not be loaded from the server. (Form UUID: ${formUuid})`);
+  }
+
+  // TODO: Enhance with URLs that are required for offline form-entry to work (on a per-form basis).
+  // "Global" data (i.e. data shared by forms) may or may not be added depending on how frequently it is updated.
+  // Doing so doesn't hurt though.
+  const clobDataResource = form.resources?.find(isFormJsonSchema);
+  return [
+    formEncounterUrl,
+    formEncounterUrlPoc,
+    `/ws/rest/v1/form/${form.uuid}?v=full`,
+    clobDataResource ? `/ws/rest/v1/clobdata/${clobDataResource.valueReference}?v=full` : null,
+  ].filter(Boolean);
 }

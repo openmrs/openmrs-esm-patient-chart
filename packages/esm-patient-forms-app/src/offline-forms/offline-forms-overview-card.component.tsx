@@ -1,4 +1,4 @@
-import { navigate } from '@openmrs/esm-framework';
+import { getDynamicOfflineDataEntries, getDynamicOfflineDataHandlers, navigate } from '@openmrs/esm-framework';
 import { Tile, Button, SkeletonText } from 'carbon-components-react';
 import React, { ReactNode } from 'react';
 import styles from './offline-forms-overview-card.styles.scss';
@@ -6,7 +6,6 @@ import ArrowRight16 from '@carbon/icons-react/es/arrow--right/16';
 import { useTranslation } from 'react-i18next';
 import { useValidOfflineFormEncounters } from './use-offline-form-encounters';
 import useSWR from 'swr';
-import { isFormFullyCached } from './offline-form-helpers';
 
 const OfflineFormsOverviewCard: React.FC = () => {
   const { t } = useTranslation();
@@ -57,8 +56,18 @@ function useCountOfFormsAvailableOffline() {
   const key = forms ? ['offlineForms', 'count', ...forms.map((form) => form.uuid).sort()] : null;
 
   return useSWR(key, async () => {
-    const isFormCachedResults = await Promise.all(forms.map((form) => isFormFullyCached(form)));
-    return isFormCachedResults.filter(Boolean).length;
+    const requiredHandlers = getDynamicOfflineDataHandlers().filter((handler) => handler.type === 'form');
+    const isFormSyncedPromises = forms.map(async (form) => {
+      for (const handler of requiredHandlers) {
+        if (!(await handler.isSynced(form.uuid))) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+
+    return (await Promise.all(isFormSyncedPromises)).filter(Boolean).length;
   });
 }
 

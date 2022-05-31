@@ -1,4 +1,11 @@
-import { useLayoutType } from '@openmrs/esm-framework';
+import {
+  getDynamicOfflineDataEntries,
+  getDynamicOfflineDataHandlers,
+  putDynamicOfflineData,
+  removeDynamicOfflineData,
+  syncDynamicOfflineData,
+  useLayoutType,
+} from '@openmrs/esm-framework';
 import {
   DataTable,
   TableContainer,
@@ -15,13 +22,12 @@ import {
   Toggle,
   SkeletonPlaceholder,
 } from 'carbon-components-react';
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FormEncounter } from '../types';
-import { useOfflineFormManagement } from './use-offline-form-management';
 import styles from './offline-forms.styles.scss';
 import { useValidOfflineFormEncounters } from './use-offline-form-encounters';
-import { mutate } from 'swr';
+import useSWR, { mutate } from 'swr';
 
 export interface OfflineFormsProps {
   canMarkFormsAsOffline: boolean;
@@ -99,20 +105,27 @@ const OfflineForms: React.FC<OfflineFormsProps> = ({ canMarkFormsAsOffline }) =>
 };
 
 function OfflineFormToggle({ form, disabled }: { form: FormEncounter; disabled: boolean }) {
-  const { isFormFullyCachedSwr, isFormMarkedAsOffline, registerFormAsOffline, unregisterFormAsOffline } =
-    useOfflineFormManagement(form);
+  const [isUpdating, setIsUpdating] = useState(false);
+  const dynamicFormEntriesSwr = useSWR('dynamicFormEntries', () => getDynamicOfflineDataEntries('form'));
+  const isMarkedAsOffline = dynamicFormEntriesSwr.data?.some((entry) => entry.identifier === form.uuid);
 
-  const handleToggled = (checked: boolean) => {
-    if (checked) {
-      registerFormAsOffline();
-    } else {
-      unregisterFormAsOffline();
+  const handleToggled = async (checked: boolean) => {
+    setIsUpdating(true);
+
+    try {
+      if (checked) {
+        await putDynamicOfflineData('form', form.uuid);
+        await syncDynamicOfflineData('form', form.uuid);
+      } else {
+        await removeDynamicOfflineData('form', form.uuid);
+      }
+    } finally {
+      setIsUpdating(false);
+      dynamicFormEntriesSwr.mutate();
     }
-
-    mutate('offlineForms');
   };
 
-  if (isFormFullyCachedSwr.data === undefined) {
+  if (dynamicFormEntriesSwr.isValidating) {
     // ^ Using an explicit undefined check since 'data' is a bool. We want to handle false separately.
     return <SkeletonPlaceholder className={styles.availableOfflineToggleSkeleton} />;
   }
@@ -125,8 +138,8 @@ function OfflineFormToggle({ form, disabled }: { form: FormEncounter; disabled: 
         labelA=""
         labelB=""
         size="sm"
-        toggled={isFormMarkedAsOffline}
-        disabled={disabled || isFormFullyCachedSwr.isValidating}
+        toggled={isMarkedAsOffline}
+        disabled={disabled || isUpdating || dynamicFormEntriesSwr.isValidating}
         onToggle={handleToggled}
       />
     </div>
