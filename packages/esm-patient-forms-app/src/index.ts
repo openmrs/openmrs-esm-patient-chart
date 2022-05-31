@@ -1,4 +1,11 @@
-import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle, registerBreadcrumbs } from '@openmrs/esm-framework';
+import {
+  defineConfigSchema,
+  getAsyncLifecycle,
+  getSyncLifecycle,
+  registerBreadcrumbs,
+  subscribePrecacheStaticDependencies,
+  syncAllDynamicOfflineData,
+} from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
@@ -31,6 +38,7 @@ function setupOpenMRS() {
 
   setupPatientFormSync();
   setupDynamicFormDataHandler();
+  subscribePrecacheStaticDependencies(() => syncAllDynamicOfflineData('form'));
 
   return {
     extensions: [
