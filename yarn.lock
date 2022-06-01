@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@ampath-kenya/ngx-formentry@^3.0.0-alpha17":
-  version "3.0.0-alpha18"
-  resolved "https://registry.yarnpkg.com/@ampath-kenya/ngx-formentry/-/ngx-formentry-3.0.0-alpha18.tgz#833eeb5910693752ef23cffecb46e1a5a170d090"
-  integrity sha512-glcoAgl4WRsVTqPRCIYadtzp2hJLdMInJ6oZD9WxsOuyRPUtFaWfMTuxVXUPCapjw3Rfr8Uo7DgAqSoWjf+2Tw==
+"@ampath-kenya/ngx-formentry@next":
+  version "3.0.0-alpha19"
+  resolved "https://registry.yarnpkg.com/@ampath-kenya/ngx-formentry/-/ngx-formentry-3.0.0-alpha19.tgz#c0921f75f300328f4341c167bdae3b679b8f2e62"
+  integrity sha512-5XpgyalQ6kH8CX7ZIGi9GApYunqMqyC3Xoe3IfyODPXa7Lw7mtUEWXUstPqywQDtG1fgjKX4LwCpZpXU2Db3DA==
   dependencies:
     tslib "^2.0.0"
 
