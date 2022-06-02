@@ -4,10 +4,11 @@ import { concat, first } from 'rxjs/operators';
 
 // import { FormSchemaCompiler } from 'ngx-openmrs-formentry';
 import { FormResourceService } from '../openmrs-api/form-resource.service';
-import { FormSchemaCompiler } from '@ampath-kenya/ngx-formentry';
+import { FormSchemaCompiler, QuestionGroup } from '@ampath-kenya/ngx-formentry';
 import { LocalStorageService } from '../local-storage/local-storage.service';
-import { FormSchema } from '../types';
+import { FormSchema, Questions } from '../types';
 import { Form } from '@ampath-kenya/ngx-formentry/form-entry/form-factory/form';
+import { GroupNode } from '@ampath-kenya/ngx-formentry/form-entry/form-factory/form-node';
 
 @Injectable()
 export class FormSchemaService {
@@ -24,15 +25,15 @@ export class FormSchemaService {
       formSchema.next(cachedCompiledSchema);
     } else {
       this.getFormSchemaByUuidFromServer(formUuid).subscribe(
-        (unCompiledSchema: any) => {
-          const form: any = unCompiledSchema.form;
+        (unCompiledSchema) => {
+          const formSchema: any = unCompiledSchema.form;
           const referencedComponents: any = unCompiledSchema.referencedComponents;
           // add from metadata to the uncompiled schema
           this.formsResourceService.getFormMetaDataByUuid(formUuid).subscribe(
             (formMetadataObject: any) => {
-              formMetadataObject.pages = form.pages || [];
-              formMetadataObject.referencedForms = form.referencedForms || [];
-              formMetadataObject.processor = form.processor;
+              formMetadataObject.pages = formSchema.pages || [];
+              formMetadataObject.referencedForms = formSchema.referencedForms || [];
+              formMetadataObject.processor = formSchema.processor;
               // compile schema
               const compiledSchema: any = this.formSchemaCompiler.compileFormSchema(
                 formMetadataObject,
@@ -58,10 +59,6 @@ export class FormSchemaService {
     return formSchema;
   }
 
-  public getUnlabeledConcepts(form: Form): any {
-    return this.traverseForUnlabeledConcepts(form.rootNode);
-  }
-
   private getCachedCompiledSchemaByUuid(formUuid: string): any {
     return this.localStorage.getObject(formUuid);
   }
@@ -70,7 +67,7 @@ export class FormSchemaService {
     this.localStorage.setObject(formUuid, schema);
   }
 
-  private getFormSchemaByUuidFromServer(formUuid: string): ReplaySubject<object> {
+  private getFormSchemaByUuidFromServer(formUuid: string) {
     const formSchema: ReplaySubject<any> = new ReplaySubject(1);
     this.fetchFormSchemaUsingFormMetadata(formUuid).subscribe(
       (schema: any) => {
@@ -193,53 +190,36 @@ export class FormSchemaService {
     return formUuids;
   }
 
-  private traverseForUnlabeledConcepts(o, type?) {
-    let concepts = [];
-    if (o.children) {
-      if (o.children instanceof Array) {
-        const returned = this.traverseRepeatingGroupForUnlabeledConcepts(o.children);
-        return returned;
-      }
-      if (o.children instanceof Object) {
-        for (const key in o.children) {
-          if (o.children.hasOwnProperty(key)) {
-            const question = o.children[key].question;
-            switch (question.renderingType) {
-              case 'page':
-              case 'section':
-              case 'group':
-                const childrenConcepts = this.traverseForUnlabeledConcepts(o.children[key]);
-                concepts = concepts.concat(childrenConcepts);
-                break;
-              case 'repeating':
-                const repeatingConcepts = this.traverseRepeatingGroupForUnlabeledConcepts(o.children[key].children);
-                concepts = concepts.concat(repeatingConcepts);
-                break;
-              default:
-                if (!question.label && question.extras.questionOptions?.concept) {
-                  concepts.push(question.extras.questionOptions.concept);
-                }
-                if (question.extras.questionOptions.answers) {
-                  question.extras.questionOptions.answers.forEach((answer) => {
-                    if (!answer.label) {
-                      concepts.push(answer.concept);
-                    }
-                  });
-                }
-                break;
-            }
+  public static getUnlabeledConceptUuidsFromSchema(form: FormSchema): Array<string> {
+    const results = new Set<string>();
+    const walkQuestions = (questions: Array<Questions>) => {
+      for (const question of questions) {
+        if (typeof question.concept === 'string') {
+          results.add(question.concept);
+        }
+
+        if (typeof question.questionOptions?.concept === 'string') {
+          results.add(question.questionOptions.concept);
+        }
+
+        for (const answer of question.questionOptions?.answers ?? []) {
+          if (typeof answer.concept === 'string') {
+            results.add(answer.concept);
           }
         }
+
+        if (Array.isArray(question.questions)) {
+          walkQuestions(question.questions);
+        }
+      }
+    };
+
+    for (const page of form.pages ?? []) {
+      for (const section of page.sections ?? []) {
+        walkQuestions(section.questions ?? []);
       }
     }
-    return concepts;
-  }
 
-  private traverseRepeatingGroupForUnlabeledConcepts(nodes) {
-    const toReturn = [];
-    for (const node of nodes) {
-      toReturn.push(this.traverseForUnlabeledConcepts(node));
-    }
-    return toReturn;
+    return [...results];
   }
 }

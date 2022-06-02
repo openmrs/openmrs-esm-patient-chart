@@ -36,7 +36,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
 
   public form: Form;
   public loadingError?: string;
-  public labelMap: {};
+  public labelMap: {} = {};
   public formState: FormState = 'initial';
   public language: string = (window as any).i18next.language.substring(0, 2).toLowerCase();
 
@@ -66,22 +66,21 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
       .pipe(
         take(1),
         map((createFormParams) => this.formCreationService.initAndCreateForm(createFormParams)),
+        mergeMap((form) => {
+          const unlabeledConcepts = FormSchemaService.getUnlabeledConceptUuidsFromSchema(form.schema);
+          return this.conceptService
+            .searchBulkConceptByUUID(unlabeledConcepts, this.language)
+            .pipe(map((concepts) => ({ form, concepts })));
+        }),
       )
       .subscribe(
-        (form) => {
+        ({ form, concepts }) => {
           this.formState = 'ready';
           this.form = form;
-
-          const unlabeledConcepts = this.formSchemaService.getUnlabeledConcepts(this.form);
-          // Fetch concept labels from server
-          unlabeledConcepts.length > 0
-            ? this.conceptService.searchBulkConceptByUUID(unlabeledConcepts, this.language).subscribe((conceptData) => {
-                this.labelMap = {};
-                conceptData.forEach((concept: any) => {
-                  this.labelMap[concept.extId] = concept.display;
-                });
-              })
-            : (this.labelMap = []);
+          this.labelMap = concepts.reduce((acc, current) => {
+            acc[current.extId] = current.display;
+            return acc;
+          }, {});
         },
         (err) => {
           // TODO: Improve error handling.

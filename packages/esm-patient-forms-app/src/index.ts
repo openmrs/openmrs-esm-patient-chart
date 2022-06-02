@@ -20,7 +20,6 @@ const backendDependencies = {
 
 function setupOpenMRS() {
   const moduleName = '@openmrs/esm-patient-forms-app';
-
   const options = {
     featureName: 'patient-forms',
     moduleName,

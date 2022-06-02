@@ -1,4 +1,5 @@
 import {
+  makeUrl,
   messageOmrsServiceWorker,
   omrsOfflineCachingStrategyHttpHeaderName,
   openmrsFetch,
@@ -8,6 +9,10 @@ import {
   Visit,
 } from '@openmrs/esm-framework';
 import { launchFormEntry } from './form-entry-interop';
+import { FormEncounter } from './types';
+import { isFormJsonSchema } from './offline-forms/offline-form-helpers';
+import { formEncounterUrl, formEncounterUrlPoc } from './constants';
+import escapeRegExp from 'lodash-es/escapeRegExp';
 
 // General note on the following imports and this file in general:
 // Yes, the imports below are super super dirty.
@@ -22,10 +27,6 @@ import { launchFormEntry } from './form-entry-interop';
 // from `esm-form-entry-app` and/or directly migrate this file's content to the appropriate location.
 import type { PatientFormSyncItemContent } from '../../esm-form-entry-app/src/app/offline/sync';
 import type { EncounterCreate } from '../../esm-form-entry-app/src/app/types';
-import { FormEncounter } from './types';
-import { isFormJsonSchema } from './offline-forms/offline-form-helpers';
-import { formEncounterUrl, formEncounterUrlPoc } from './constants';
-import escapeRegExp from 'lodash-es/escapeRegExp';
 
 const patientFormSyncItem = 'patient-form';
 
@@ -94,10 +95,8 @@ export async function setupDynamicFormDataHandler() {
     async isSynced(identifier) {
       const expectedUrls = await getCacheableFormUrls(identifier);
       const cache = await caches.open('omrs-spa-cache-v1');
-      const keys = await cache.keys();
-      return expectedUrls.every((expectedUrl) =>
-        keys.some((key) => new RegExp(escapeRegExp(expectedUrl)).test(key.url)),
-      );
+      const keys = (await cache.keys()).map((r) => r.url);
+      return expectedUrls.every((url) => keys.includes(url));
     },
     async sync(identifier) {
       const urlsToCache = await getCacheableFormUrls(identifier);
@@ -132,14 +131,5 @@ async function getCacheableFormUrls(formUuid: string) {
     throw new Error(`The form data could not be loaded from the server. (Form UUID: ${formUuid})`);
   }
 
-  // TODO: Enhance with URLs that are required for offline form-entry to work (on a per-form basis).
-  // "Global" data (i.e. data shared by forms) may or may not be added depending on how frequently it is updated.
-  // Doing so doesn't hurt though.
-  const clobDataResource = form.resources?.find(isFormJsonSchema);
-  return [
-    formEncounterUrl,
-    formEncounterUrlPoc,
-    `/ws/rest/v1/form/${form.uuid}?v=full`,
-    clobDataResource ? `/ws/rest/v1/clobdata/${clobDataResource.valueReference}?v=full` : null,
-  ].filter(Boolean);
+  return [formEncounterUrl, formEncounterUrlPoc].filter(Boolean);
 }
