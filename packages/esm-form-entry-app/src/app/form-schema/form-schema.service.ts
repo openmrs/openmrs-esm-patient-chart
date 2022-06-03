@@ -1,14 +1,11 @@
 import { Injectable } from '@angular/core';
-import { ReplaySubject, Observable, Subject } from 'rxjs';
-import { concat, first } from 'rxjs/operators';
+import { ReplaySubject, Observable, Subject, of, forkJoin } from 'rxjs';
+import { concat, first, map, take, tap } from 'rxjs/operators';
 
-// import { FormSchemaCompiler } from 'ngx-openmrs-formentry';
 import { FormResourceService } from '../openmrs-api/form-resource.service';
-import { FormSchemaCompiler, QuestionGroup } from '@ampath-kenya/ngx-formentry';
+import { FormSchemaCompiler } from '@ampath-kenya/ngx-formentry';
 import { LocalStorageService } from '../local-storage/local-storage.service';
 import { FormSchema, Questions } from '../types';
-import { Form } from '@ampath-kenya/ngx-formentry/form-entry/form-factory/form';
-import { GroupNode } from '@ampath-kenya/ngx-formentry/form-entry/form-factory/form-node';
 
 @Injectable()
 export class FormSchemaService {
@@ -18,45 +15,31 @@ export class FormSchemaService {
     private formSchemaCompiler: FormSchemaCompiler,
   ) {}
 
-  public getFormSchemaByUuid(formUuid: string, cached: boolean = true): ReplaySubject<FormSchema> {
-    const formSchema: ReplaySubject<any> = new ReplaySubject(1);
-    const cachedCompiledSchema: any = this.getCachedCompiledSchemaByUuid(formUuid);
-    if (cachedCompiledSchema && cached === true) {
-      formSchema.next(cachedCompiledSchema);
-    } else {
-      this.getFormSchemaByUuidFromServer(formUuid).subscribe(
-        (unCompiledSchema) => {
-          const formSchema: any = unCompiledSchema.form;
-          const referencedComponents: any = unCompiledSchema.referencedComponents;
-          // add from metadata to the uncompiled schema
-          this.formsResourceService.getFormMetaDataByUuid(formUuid).subscribe(
-            (formMetadataObject: any) => {
-              formMetadataObject.pages = formSchema.pages || [];
-              formMetadataObject.referencedForms = formSchema.referencedForms || [];
-              formMetadataObject.processor = formSchema.processor;
-              // compile schema
-              const compiledSchema: any = this.formSchemaCompiler.compileFormSchema(
-                formMetadataObject,
-                referencedComponents,
-              );
-              // now cache the compiled schema
-              this.cacheCompiledSchemaByUuid(formUuid, compiledSchema);
-              // return the compiled schema
-              formSchema.next(compiledSchema);
-            },
-            (err) => {
-              console.error(err);
-              formSchema.error(err);
-            },
-          );
-        },
-        (err) => {
-          console.error(err);
-          formSchema.error(err);
-        },
-      );
+  public getFormSchemaByUuid(formUuid: string, cached: boolean = true): Observable<FormSchema> {
+    const cachedCompiledSchema = this.getCachedCompiledSchemaByUuid(formUuid);
+    if (cachedCompiledSchema && cached) {
+      return of(cachedCompiledSchema);
     }
-    return formSchema;
+
+    return forkJoin({
+      unCompiledSchema: this.getFormSchemaByUuidFromServer(formUuid).pipe(take(1)),
+      formMetadataObject: this.formsResourceService.getFormMetaDataByUuid(formUuid).pipe(take(1)),
+    }).pipe(
+      map(({ unCompiledSchema, formMetadataObject }) => {
+        const formSchema: any = unCompiledSchema.form;
+        const referencedComponents: any = unCompiledSchema.referencedComponents;
+
+        formMetadataObject.pages = formSchema.pages || [];
+        formMetadataObject.referencedForms = formSchema.referencedForms || [];
+        formMetadataObject.processor = formSchema.processor;
+
+        return this.formSchemaCompiler.compileFormSchema(
+          formMetadataObject,
+          referencedComponents,
+        ) as unknown as FormSchema;
+      }),
+      tap((compiledSchema) => this.cacheCompiledSchemaByUuid(formUuid, compiledSchema)),
+    );
   }
 
   private getCachedCompiledSchemaByUuid(formUuid: string): any {
