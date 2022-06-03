@@ -94,9 +94,10 @@ export async function setupDynamicFormDataHandler() {
     displayName: 'Patient forms',
     async isSynced(identifier) {
       const expectedUrls = await getCacheableFormUrls(identifier);
+      const absoluteExpectedUrls = expectedUrls.map((url) => window.origin + makeUrl(url));
       const cache = await caches.open('omrs-spa-cache-v1');
       const keys = (await cache.keys()).map((r) => r.url);
-      return expectedUrls.every((url) => keys.includes(url));
+      return absoluteExpectedUrls.every((url) => keys.includes(url));
     },
     async sync(identifier) {
       const urlsToCache = await getCacheableFormUrls(identifier);

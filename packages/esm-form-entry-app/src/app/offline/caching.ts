@@ -1,5 +1,6 @@
 import { FormSchemaCompiler } from '@ampath-kenya/ngx-formentry';
 import {
+  makeUrl,
   messageOmrsServiceWorker,
   omrsOfflineCachingStrategyHttpHeaderName,
   openmrsFetch,
@@ -36,11 +37,10 @@ export function setupDynamicOfflineFormDataHandler() {
     displayName: 'Form entry',
     async isSynced(identifier) {
       const expectedUrls = await getCacheableFormUrls(identifier);
+      const absoluteExpectedUrls = expectedUrls.map((url) => window.origin + makeUrl(url));
       const cache = await caches.open('omrs-spa-cache-v1');
-      const keys = await cache.keys();
-      return expectedUrls.every((expectedUrl) =>
-        keys.some((key) => new RegExp(escapeRegExp(expectedUrl)).test(key.url)),
-      );
+      const keys = (await cache.keys()).map((r) => r.url);
+      return absoluteExpectedUrls.every((url) => keys.includes(url));
     },
     async sync(identifier) {
       const urlsToCache = await getCacheableFormUrls(identifier);

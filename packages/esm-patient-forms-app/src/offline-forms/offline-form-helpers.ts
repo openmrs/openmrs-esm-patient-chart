@@ -1,5 +1,7 @@
 import { FormEncounter, FormEncounterResource } from '../types';
 import { HtmlFormEntryForm } from '../config-schema';
+import useSWR from 'swr';
+import { getDynamicOfflineDataEntries } from '@openmrs/esm-framework';
 
 /**
  * Returns whether the given form encounter is valid for offline mode and can be cached.
@@ -18,4 +20,8 @@ export function isValidOfflineFormEncounter(form: FormEncounter, htmlFormEntryFo
  */
 export function isFormJsonSchema(formResource: FormEncounterResource) {
   return formResource.dataType === 'AmpathJsonSchema' || formResource.name === 'JSON schema';
+}
+
+export function useDynamicFormDataEntries() {
+  return useSWR('dynamicFormEntries', () => getDynamicOfflineDataEntries('form'));
 }

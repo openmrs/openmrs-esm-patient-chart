@@ -27,7 +27,7 @@ import { useTranslation } from 'react-i18next';
 import { FormEncounter } from '../types';
 import styles from './offline-forms.styles.scss';
 import { useValidOfflineFormEncounters } from './use-offline-form-encounters';
-import useSWR, { mutate } from 'swr';
+import { useDynamicFormDataEntries } from './offline-form-helpers';
 
 export interface OfflineFormsProps {
   canMarkFormsAsOffline: boolean;
@@ -106,7 +106,7 @@ const OfflineForms: React.FC<OfflineFormsProps> = ({ canMarkFormsAsOffline }) =>
 
 function OfflineFormToggle({ form, disabled }: { form: FormEncounter; disabled: boolean }) {
   const [isUpdating, setIsUpdating] = useState(false);
-  const dynamicFormEntriesSwr = useSWR('dynamicFormEntries', () => getDynamicOfflineDataEntries('form'));
+  const dynamicFormEntriesSwr = useDynamicFormDataEntries();
   const isMarkedAsOffline = dynamicFormEntriesSwr.data?.some((entry) => entry.identifier === form.uuid);
 
   const handleToggled = async (checked: boolean) => {
