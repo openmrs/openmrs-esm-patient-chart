@@ -88,8 +88,9 @@ async function getCacheableFormUrls(formUuid: string) {
     [],
   ) as FormSchema;
 
+  const conceptLang = (window as any).i18next?.language?.substring(0, 2).toLowerCase() || 'en';
   const requiredConceptUuids = FormSchemaService.getUnlabeledConceptUuidsFromSchema(formSchema);
-  const conceptUrls = requiredConceptUuids.map((uuid) => `/ws/rest/v1/concept/${uuid}?v=full&lang=en`);
+  const conceptUrls = requiredConceptUuids.map((uuid) => `/ws/rest/v1/concept/${uuid}?v=full&lang=${conceptLang}`);
 
   return [
     // Required by:
@@ -102,6 +103,9 @@ async function getCacheableFormUrls(formUuid: string) {
     // - https://github.com/openmrs/openmrs-esm-patient-chart/blob/415790e1ad9b8bdbd1201958d21a06fa93ec7237/packages/esm-form-entry-app/src/app/openmrs-api/form-resource.service.ts#L10
     // - https://github.com/openmrs/openmrs-esm-patient-chart/blob/415790e1ad9b8bdbd1201958d21a06fa93ec7237/packages/esm-form-entry-app/src/app/form-schema/form-schema.service.ts#L167
     `/ws/rest/v1/clobdata/${form.resources[0].valueReference}?v=full`,
+
+    // Required by:
+    // - https://github.com/openmrs/openmrs-esm-patient-chart/blob/cb020d4083f564fcda8864dff2897bc3fb9cc8a5/packages/esm-form-entry-app/src/app/services/concept.service.ts#L23
     ...conceptUrls,
   ].filter(Boolean);
 }
