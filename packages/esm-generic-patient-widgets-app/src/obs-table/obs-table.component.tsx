@@ -41,7 +41,8 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
           date: formatDatetime(new Date(obss[0].issued), { mode: 'wide' }),
         };
         for (let obs of obss) {
-          rowData[obs.conceptUuid] = obs.valueQuantity.value;
+          const obsValue = obs?.valueQuantity?.value ?? obs.valueCodeableConcept?.coding[0]?.display ?? obs.valueString;
+          rowData[obs.conceptUuid] = obsValue;
         }
         return rowData;
       }),
@@ -75,7 +76,7 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
                 {rows.map((row) => (
                   <TableRow key={row.id}>
                     {row.cells.map((cell) => (
-                      <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+                      <TableCell key={cell.id}>{cell.value?.content ?? cell.value ?? '--'}</TableCell>
                     ))}
                   </TableRow>
                 ))}

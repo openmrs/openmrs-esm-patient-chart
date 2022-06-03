@@ -88,7 +88,7 @@ describe('Switchable obs viewer: ', () => {
       expect(within(table).getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument(),
     );
 
-    const expectedTableRows = [/2\d — Oct — 2021, \d\d:\d\d PM 180/, /1\d — Oct — 2021, \d\d:\d\d AM 198 200/];
+    const expectedTableRows = [/2\d — Oct — 2021, \d\d:\d\d PM -- 180/, /1\d — Oct — 2021, \d\d:\d\d AM 198 200/];
 
     expectedTableRows.map((row) =>
       expect(within(table).getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument(),
