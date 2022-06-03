@@ -96,7 +96,7 @@ export async function setupDynamicFormDataHandler() {
       const expectedUrls = await getCacheableFormUrls(identifier);
       const absoluteExpectedUrls = expectedUrls.map((url) => window.origin + makeUrl(url));
       const cache = await caches.open('omrs-spa-cache-v1');
-      const keys = (await cache.keys()).map((r) => r.url);
+      const keys = (await cache.keys()).map((key) => key.url);
       return absoluteExpectedUrls.every((url) => keys.includes(url));
     },
     async sync(identifier) {
