@@ -19,6 +19,7 @@
   flex-direction: column;
   height: auto;
   width: 100%;
+  margin-top: $spacing-07
 }
 
 .formContainer input[type="text"] {
@@ -54,6 +55,16 @@
       visibility: visible;
     }
   }
+
+  .formSearchInput {
+    width: 50%;
+  }
+
+  .filterContainer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
 }
 
 .formName {
@@ -77,4 +88,24 @@
   &:global(.bx--data-table tr) {
     height: $spacing-09;
   }
+
+  .formSearchInput {
+    width: 100%;
+  }
+
+  .filterContainer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
+}
+
+:global(.bx--dropdown__wrapper--inline) {
+  display: grid;
+  grid-gap: 0;
+  height: $spacing-09;
+}
+
+.filterDropdownMenu {
+  color: $ui-05;
 }

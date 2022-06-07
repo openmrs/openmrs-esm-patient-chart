@@ -12,6 +12,7 @@ const mockUseVisitOrOfflineVisit = useVisitOrOfflineVisit as jest.Mock;
 const mockShowModal = showModal as jest.Mock;
 const mockUseConfig = useConfig as jest.Mock;
 const mockLaunchPatientWorkspace = launchPatientWorkspace as jest.Mock;
+const mockLaunchForm = jest.fn();
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -48,6 +49,7 @@ describe('FormView', () => {
         pageUrl={'/some-url'}
         patient={mockPatient}
         urlLabel="some-url-label"
+        launchForm={mockLaunchForm}
       />,
     );
 
@@ -55,32 +57,9 @@ describe('FormView', () => {
     expect(pocForm).toBeInTheDocument();
 
     userEvent.click(pocForm);
-    expect(mockShowModal).toHaveBeenCalledWith('start-visit-dialog', { closeModal: jasmine.anything() });
-  });
-
-  test('should launch form-entry patient-workspace window when visit is started', async () => {
-    mockUseConfig.mockReturnValue({ htmlFormEntryForms: [] });
-    mockUseVisitOrOfflineVisit.mockReturnValue({
-      currentVisit: mockCurrentVisit,
-      error: null,
-    });
-    render(
-      <FormView
-        patientUuid={mockPatient.id}
-        forms={mockForms}
-        pageSize={5}
-        pageUrl={'/some-url'}
-        patient={mockPatient}
-        urlLabel="some-url-label"
-      />,
-    );
-
-    const pocForm = await screen.findByText('POC COVID 19 Assessment Form v1.1');
-    expect(pocForm).toBeInTheDocument();
-
-    userEvent.click(pocForm);
-    expect(mockLaunchPatientWorkspace).toHaveBeenCalledWith('patient-form-entry-workspace', {
-      workspaceTitle: 'POC COVID 19 Assessment Form v1.1',
+    expect(mockLaunchForm).toHaveBeenLastCalledWith({
+      formUuid: '0a9fc16e-4c00-4842-a1e4-e4bafeb6e226',
+      encounterUuid: '',
     });
   });
 });

@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './empty-form.component.scss';
+import styles from './empty-form.scss';
 import { useTranslation } from 'react-i18next';
 import { Tile } from 'carbon-components-react';
 import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';

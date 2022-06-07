@@ -43,47 +43,11 @@ function setupOpenMRS() {
   return {
     extensions: [
       {
-        name: 'patient-form-entry-workspace',
-        load: getAsyncLifecycle(() => import('./forms/form-entry.component'), options),
+        name: 'patient-form-workspace',
+        load: getAsyncLifecycle(() => import('./forms/clinical-form.component'), options),
         meta: {
           title: 'Clinical Form',
         },
-        online: true,
-        offline: true,
-      },
-      {
-        name: 'forms-widget',
-        slot: 'patient-chart-summary-dashboard-slot',
-        order: 5,
-        load: getAsyncLifecycle(() => import('./forms/forms-summary-dashboard.component'), options),
-        meta: {
-          columnSpan: 4,
-        },
-        online: {
-          isOffline: false,
-        },
-        offline: {
-          isOffline: true,
-        },
-      },
-      {
-        name: 'patient-form-dashboard',
-        order: 0,
-        slot: dashboardMeta.slot,
-        load: getAsyncLifecycle(() => import('./forms/forms-detailed-overview.component'), options),
-        online: {
-          isOffline: false,
-        },
-        offline: {
-          isOffline: true,
-        },
-      },
-      {
-        name: 'forms-summary-dashboard',
-        slot: 'patient-chart-dashboard-slot',
-        order: 12,
-        load: getSyncLifecycle(createDashboardLink(dashboardMeta), options),
-        meta: dashboardMeta,
         online: true,
         offline: true,
       },

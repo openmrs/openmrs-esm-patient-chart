@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import styles from './form-view.component.scss';
+import styles from './form-view.scss';
 import EmptyFormView from './empty-form.component';
 import isEmpty from 'lodash-es/isEmpty';
 import first from 'lodash-es/first';
@@ -18,12 +18,12 @@ import {
   TableRow,
   DataTableHeader,
   DataTableRow,
+  Dropdown,
 } from 'carbon-components-react';
-import { PatientChartPagination, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
+import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { CompletedFormInfo } from '../types';
 import Edit20 from '@carbon/icons-react/es/edit/20';
 import { ConfigObject } from '../config-schema';
-import { launchFormEntryOrHtmlForms } from '../form-entry-interop';
 
 interface FormViewProps {
   forms: Array<CompletedFormInfo>;
@@ -32,18 +32,19 @@ interface FormViewProps {
   pageSize: number;
   pageUrl: string;
   urlLabel: string;
+  changeFormCategory: (formCategory) => void;
+  launchForm: (form) => void;
 }
 
-const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSize, pageUrl, urlLabel }) => {
+const FormView: React.FC<FormViewProps> = ({ forms, pageSize, pageUrl, urlLabel, changeFormCategory, launchForm }) => {
   const { t } = useTranslation();
   const config = useConfig() as ConfigObject;
-  const htmlFormEntryForms = config.htmlFormEntryForms;
   const isDesktop = useLayoutType() === 'desktop';
-  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
+
   const [searchTerm, setSearchTerm] = useState<string>(null);
   const [allFormInfos, setAllFormInfos] = useState<Array<CompletedFormInfo>>(forms);
   const { results, goTo, currentPage } = usePagination(
-    allFormInfos.sort((a, b) => (b.lastCompleted?.getTime() ?? 0) - (a.lastCompleted?.getTime() ?? 0)),
+    allFormInfos?.sort((a, b) => (b.lastCompleted?.getTime() ?? 0) - (a.lastCompleted?.getTime() ?? 0)),
     pageSize,
   );
 
@@ -58,11 +59,11 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
 
   const tableHeaders: Array<DataTableHeader> = useMemo(
     () => [
+      { key: 'formName', header: t('formName', 'Form Name (A-Z)') },
       {
         key: 'lastCompleted',
         header: t('lastCompleted', 'Last Completed'),
       },
-      { key: 'formName', header: t('formName', 'Form Name (A-Z)') },
     ],
     [t],
   );
@@ -83,19 +84,26 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
 
   return (
     <div className={styles.formContainer}>
-      <Search
-        id="searchInput"
-        labelText=""
-        className={styles.formSearchInput}
-        placeholder={t('searchForForm', 'Search for a form')}
-        onChange={(e) => handleSearch(e.target.value)}
-      />
+      <div className={styles.filterContainer}>
+        <Dropdown
+          ariaLabel="filter"
+          id="formCategory"
+          items={['All', 'Completed', 'Recommended']}
+          label={config.showRecommendedFormsTab ? 'Recommend' : 'All'}
+          titleText={t('filter', 'Filter:')}
+          type="inline"
+          onChange={({ selectedItem }) => changeFormCategory(selectedItem)}
+          className={styles.filterDropdownMenu}
+        />
+        <Search
+          id="searchInput"
+          labelText=""
+          className={styles.formSearchInput}
+          placeholder={t('searchForForm', 'Search for a form')}
+          onChange={(e) => handleSearch(e.target.value)}
+        />
+      </div>
       <>
-        {searchTerm?.length > 0 && allFormInfos?.length > 0 && (
-          <p className={styles.formResultsLabel}>
-            {allFormInfos.length} {t('matchesFound', 'match(es) found')}
-          </p>
-        )}
         {allFormInfos?.length > 0 && (
           <>
             <DataTable size={isDesktop ? 'sm' : 'lg'} rows={tableRows} headers={tableHeaders} isSortable={true}>
@@ -121,39 +129,30 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
                       {rows.map((row, index) => {
                         return (
                           <TableRow key={row.id}>
-                            <TableCell>{row.cells[0].value ?? t('never', 'Never')}</TableCell>
                             <TableCell className={styles.tableCell}>
                               <label
-                                onClick={() =>
-                                  launchFormEntryOrHtmlForms(
-                                    currentVisit,
-                                    row.id,
-                                    patient,
-                                    htmlFormEntryForms,
-                                    '',
-                                    results[index].form.display ?? results[index].form.name,
-                                  )
-                                }
+                                onClick={() => launchForm({ formUuid: row.id, encounterUuid: '' })}
                                 role="presentation"
                                 className={styles.formName}
                               >
-                                {row.cells[1].value}
+                                {row.cells[0].value}
                               </label>
-                              {row.cells[0].value && (
-                                <Edit20
-                                  description="Edit form"
-                                  onClick={() =>
-                                    launchFormEntryOrHtmlForms(
-                                      currentVisit,
-                                      row.id,
-                                      patient,
-                                      htmlFormEntryForms,
-                                      first(results[index].associatedEncounters)?.uuid,
-                                      results[index].form.display ?? results[index].form.name,
-                                    )
-                                  }
-                                />
-                              )}
+                            </TableCell>
+                            <TableCell>
+                              <span className={styles.tableCell}>
+                                {row.cells[1].value ?? t('never', 'Never')}{' '}
+                                {row.cells[1].value && (
+                                  <Edit20
+                                    description="Edit form"
+                                    onClick={() => {
+                                      launchForm({
+                                        formUuid: row.id,
+                                        encounterUuid: first(results[index].associatedEncounters)?.uuid,
+                                      });
+                                    }}
+                                  />
+                                )}
+                              </span>
                             </TableCell>
                           </TableRow>
                         );
