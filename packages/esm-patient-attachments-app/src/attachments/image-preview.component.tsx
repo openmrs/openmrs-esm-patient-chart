@@ -24,7 +24,7 @@ export default function FilePreview(props: FilePreviewProps) {
         setSaving(true);
       }
     },
-    [props.onSaveFile, saving],
+    [props.onSaveFile, saving, caption],
   );
 
   const cancelCapture = useCallback(
@@ -50,7 +50,8 @@ export default function FilePreview(props: FilePreviewProps) {
           <TextInput
             id="caption"
             autoFocus
-            labelText={null}
+            labelText={``}
+            autoComplete="off"
             readOnly={saving}
             placeholder={t('attachmentCaptionInstruction', 'Enter caption')}
             onChange={updateCaption}
