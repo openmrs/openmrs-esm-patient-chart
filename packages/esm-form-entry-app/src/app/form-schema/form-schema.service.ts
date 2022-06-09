@@ -193,6 +193,21 @@ export class FormSchemaService {
     return formUuids;
   }
 
+  private processQuestionForUnlabeledConcepts(question) {
+    let concepts = [];
+    if (!question.label && question.extras.questionOptions?.concept) {
+      concepts.push(question.extras.questionOptions.concept);
+    }
+    if (question.extras.questionOptions.answers) {
+      question.extras.questionOptions.answers.forEach((answer) => {
+        if (!answer.label) {
+          concepts.push(answer.concept);
+        }
+      });
+    }
+    return concepts;
+  }
+
   private traverseForUnlabeledConcepts(o, type?) {
     let concepts = [];
     if (o.children) {
@@ -212,20 +227,12 @@ export class FormSchemaService {
                 concepts = concepts.concat(childrenConcepts);
                 break;
               case 'repeating':
-                const repeatingConcepts = this.traverseRepeatingGroupForUnlabeledConcepts(o.children[key].children);
-                concepts = concepts.concat(repeatingConcepts);
+                for (const question of o.children[key].question.questions) {
+                  concepts = concepts.concat(this.processQuestionForUnlabeledConcepts(question));
+                }
                 break;
               default:
-                if (!question.label && question.extras.questionOptions?.concept) {
-                  concepts.push(question.extras.questionOptions.concept);
-                }
-                if (question.extras.questionOptions.answers) {
-                  question.extras.questionOptions.answers.forEach((answer) => {
-                    if (!answer.label) {
-                      concepts.push(answer.concept);
-                    }
-                  });
-                }
+                concepts = concepts.concat(this.processQuestionForUnlabeledConcepts(question));
                 break;
             }
           }

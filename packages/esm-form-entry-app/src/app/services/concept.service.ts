@@ -41,7 +41,7 @@ export class ConceptService {
           }),
           catchError((error: Response) => {
             console.error(error.status);
-            return observableOf(error.json());
+            return observableOf({ extId: conceptUuid, display: conceptUuid });
           }),
         ),
       );
