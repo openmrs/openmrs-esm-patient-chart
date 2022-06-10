@@ -1,11 +1,11 @@
 import React, { useContext } from 'react';
-import styles from './filter-set.styles.scss';
-import { Accordion, AccordionItem, Checkbox, Button } from 'carbon-components-react';
-import FilterContext from './filter-context';
+import { useTranslation } from 'react-i18next';
+import { Accordion, AccordionItem, Checkbox, Button } from '@carbon/react';
+import { TreeViewAlt, Search } from '@carbon/react/icons';
 import { useConfig, useLayoutType } from '@openmrs/esm-framework';
 import type { FilterNodeProps, FilterLeafProps } from './filter-types';
-import { useTranslation } from 'react-i18next';
-import { TreeViewAlt16, Search16 } from '@carbon/icons-react';
+import FilterContext from './filter-context';
+import styles from './filter-set.styles.scss';
 
 const isIndeterminate = (kids, checkboxes) => {
   return kids && !kids?.every((kid) => checkboxes[kid]) && !kids?.every((kid) => !checkboxes[kid]);
@@ -28,11 +28,16 @@ const FilterSet: React.FC<FilterSetProps> = ({ hideFilterSetHeader = false }) =>
         <div className={styles.filterSetHeader}>
           <h4>{t('tree', 'Tree')}</h4>
           <div className={styles.filterSetActions}>
-            <Button kind="ghost" size="sm" renderIcon={Search16}>
+            <Button kind="ghost" size="sm" renderIcon={(props) => <Search size={16} {...props} />}>
               {t('search', 'Search')}
             </Button>
 
-            <Button kind="ghost" size="sm" onClick={resetTree} renderIcon={TreeViewAlt16}>
+            <Button
+              kind="ghost"
+              size="sm"
+              onClick={resetTree}
+              renderIcon={(props) => <TreeViewAlt size={16} {...props} />}
+            >
               {t('resetTreeText', 'Reset tree')}
             </Button>
           </div>

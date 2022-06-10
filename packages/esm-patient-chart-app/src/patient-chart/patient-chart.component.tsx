@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
+import { RouteComponentProps } from 'react-router-dom';
 import { ExtensionSlot, useConfig } from '@openmrs/esm-framework';
 import {
   changeWorkspaceContext,
@@ -6,12 +7,11 @@ import {
   usePatientOrOfflineRegisteredPatient,
   useWorkspaceWindowSize,
 } from '@openmrs/esm-patient-common-lib';
-import { RouteComponentProps } from 'react-router-dom';
 import ChartReview from '../patient-chart/chart-review/chart-review.component';
 import ActionMenu from './action-menu/action-menu.component';
 import Loader from '../loader/loader.component';
-import styles from './patient-chart.scss';
 import WorkspaceNotification from '../workspace/workspace-notification.component';
+import styles from './patient-chart.scss';
 
 interface PatientChartParams {
   patientUuid: string;

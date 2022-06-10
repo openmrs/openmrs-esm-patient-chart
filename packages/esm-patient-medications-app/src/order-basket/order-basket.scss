@@ -1,22 +1,23 @@
+@use '@carbon/styles/scss/spacing';
 @import "../root";
 
 .container {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: calc(100vh - 9rem);  
+  height: calc(100vh - 9rem);
 }
 
 .orderBasketContainer {
-  margin: $spacing-05;
+  margin: spacing.$spacing-05;
 }
 
-.orderBasketContainer :global(.bx--btn-set .bx--btn) {
+.orderBasketContainer :global(.cds--btn-set .cds--btn) {
   max-width: 50%;
   height: 4rem;
 }
 
-.spinner :global(.bx--loading__stroke) {
+.spinner :global(.cds--loading__stroke) {
   stroke: var(--brand-03);
 }
 

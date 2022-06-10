@@ -1,10 +1,13 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
 @import "../root.scss";
 
 .pageHeaderContainer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 0 $spacing-05 $spacing-05 $spacing-05;
+  margin: 0 spacing.$spacing-05 spacing.$spacing-05 spacing.$spacing-05;
 
   .pageHeader {
     @extend .productiveHeading03;
@@ -15,7 +18,7 @@
 }
 
 .contentContainer {
-  margin: 0 $spacing-05;
+  margin: 0 spacing.$spacing-05;
 }
 
 .tableContainer {
@@ -40,7 +43,7 @@
   }
 }
 
-.availableOfflineToggle :global(.bx--toggle__switch) {
+.availableOfflineToggle :global(.cds--toggle__switch) {
   /*
   Carbon's Toggle component always has a margin-top value, despite no label being used.
   Per designs, this is unintended.
@@ -49,6 +52,6 @@
 }
 
 .availableOfflineToggleSkeleton {
-  width: $spacing-07;
-  height: $spacing-05;
+  width: spacing.$spacing-07;
+  height: spacing.$spacing-05;
 }

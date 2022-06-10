@@ -1,4 +1,5 @@
 import React from 'react';
+import { useRouteMatch } from 'react-router-dom';
 import {
   Extension,
   ExtensionData,
@@ -6,7 +7,6 @@ import {
   getExtensionNameFromId,
   useExtensionSlotMeta,
 } from '@openmrs/esm-framework';
-import { useRouteMatch } from 'react-router-dom';
 import { basePath } from '../../constants';
 import styles from './dashboard-view.scss';
 

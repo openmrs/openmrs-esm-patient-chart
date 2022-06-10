@@ -1,6 +1,5 @@
 import React from 'react';
-import Add16 from '@carbon/icons-react/es/add/16';
-import styles from './immunizations-overview.scss';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
   DataTableSkeleton,
@@ -13,7 +12,8 @@ import {
   TableHeader,
   TableRow,
   InlineLoading,
-} from 'carbon-components-react';
+} from '@carbon/react';
+import { Add } from '@carbon/react/icons';
 import {
   CardHeader,
   EmptyState,
@@ -21,9 +21,9 @@ import {
   launchPatientWorkspace,
   PatientChartPagination,
 } from '@openmrs/esm-patient-common-lib';
-import { useTranslation } from 'react-i18next';
 import { useImmunizations } from './immunizations.resource';
 import { formatDate, parseDate, usePagination } from '@openmrs/esm-framework';
+import styles from './immunizations-overview.scss';
 
 export interface ImmunizationsOverviewProps {
   basePath: string;
@@ -74,12 +74,17 @@ const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = ({ patient, 
       <div className={styles.widgetCard}>
         <CardHeader title={headerTitle}>
           <span>{isValidating ? <InlineLoading /> : null}</span>
-          <Button kind="ghost" renderIcon={Add16} iconDescription="Add immunizations" onClick={launchImmunizationsForm}>
+          <Button
+            kind="ghost"
+            renderIcon={(props) => <Add size={16} {...props} />}
+            iconDescription="Add immunizations"
+            onClick={launchImmunizationsForm}
+          >
             {t('add', 'Add')}
           </Button>
         </CardHeader>
         <TableContainer>
-          <DataTable headers={tableHeaders} rows={tableRows} isSortable={true} size="short">
+          <DataTable headers={tableHeaders} rows={tableRows} isSortable={true} size="sm">
             {({ rows, headers, getHeaderProps, getTableProps }) => (
               <Table {...getTableProps()} useZebraStyles>
                 <TableHead>

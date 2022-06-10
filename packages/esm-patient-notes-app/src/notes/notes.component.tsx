@@ -1,6 +1,6 @@
 import React from 'react';
-import NotesDetailedSummary from './notes-detailed-summary.component';
 import { Switch, Route, BrowserRouter } from 'react-router-dom';
+import NotesDetailedSummary from './notes-detailed-summary.component';
 import { NotesContext } from './notes.context';
 
 interface NotesProps {

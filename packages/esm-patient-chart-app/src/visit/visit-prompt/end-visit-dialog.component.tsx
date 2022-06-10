@@ -1,9 +1,9 @@
-import React, { useCallback } from 'react';
-import styles from './end-visit-dialog.scss';
-import { Button, ModalBody, ModalFooter, ModalHeader } from 'carbon-components-react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { parseDate, showNotification, showToast, updateVisit, useVisit } from '@openmrs/esm-framework';
 import { first } from 'rxjs/operators';
+import styles from './end-visit-dialog.scss';
 
 interface EndVisitDialogProps {
   patientUuid: string;

@@ -19,9 +19,9 @@ const StopVisitOverflowMenuItem: React.FC<StopVisitOverflowMenuItemProps> = ({ p
 
   return (
     currentVisit && (
-      <li className="bx--overflow-menu-options__option">
+      <li className="cds--overflow-menu-options__option">
         <button
-          className="bx--overflow-menu-options__btn"
+          className="cds--overflow-menu-options__btn"
           role="menuitem"
           title={t('endVisit', 'End Visit')}
           data-floating-menu-primary-focus
@@ -30,7 +30,7 @@ const StopVisitOverflowMenuItem: React.FC<StopVisitOverflowMenuItemProps> = ({ p
             maxWidth: '100vw',
           }}
         >
-          <span className="bx--overflow-menu-options__option-content">{t('endVisit', 'End Visit')}</span>
+          <span className="cds--overflow-menu-options__option-content">{t('endVisit', 'End Visit')}</span>
         </button>
       </li>
     )

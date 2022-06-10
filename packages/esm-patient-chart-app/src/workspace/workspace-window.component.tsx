@@ -1,11 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import ArrowRight16 from '@carbon/icons-react/es/arrow--right/16';
-import Maximize16 from '@carbon/icons-react/es/maximize/16';
-import Minimize16 from '@carbon/icons-react/es/minimize/16';
-import DownToBottom16 from '@carbon/icons-react/es/down-to-bottom/16';
 import { ExtensionSlot, useBodyScrollLock, useLayoutType } from '@openmrs/esm-framework';
 import { useWorkspaces, useWorkspaceWindowSize } from '@openmrs/esm-patient-common-lib';
-import { Button, Header, HeaderGlobalBar, HeaderName } from 'carbon-components-react';
+import { Button, Header, HeaderGlobalBar, HeaderName } from '@carbon/react';
+import { ArrowRight, DownToBottom, Maximize, Minimize } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { RouteComponentProps } from 'react-router-dom';
 import { patientChartWorkspaceHeaderSlot } from '../constants';
@@ -84,7 +81,9 @@ const WorkspaceWindow: React.FC<RouteComponentProps<ContextWorkspaceParams>> = (
                 hasIconOnly
                 kind="ghost"
                 onClick={toggleWindowState}
-                renderIcon={maximized ? Minimize16 : Maximize16}
+                renderIcon={(props) =>
+                  maximized ? <Minimize size={16} {...props} /> : <Maximize size={16} {...props} />
+                }
                 tooltipPosition="bottom"
               />
               <Button
@@ -92,7 +91,7 @@ const WorkspaceWindow: React.FC<RouteComponentProps<ContextWorkspaceParams>> = (
                 hasIconOnly
                 kind="ghost"
                 onClick={() => updateWindowSize('hidden')}
-                renderIcon={ArrowRight16}
+                renderIcon={(props) => <ArrowRight size={16} {...props} />}
                 tooltipPosition="bottom"
                 tooltipAlignment="end"
               />
@@ -103,7 +102,7 @@ const WorkspaceWindow: React.FC<RouteComponentProps<ContextWorkspaceParams>> = (
               iconDescription={t('close', 'Close')}
               hasIconOnly
               onClick={() => workspaces[0]?.closeWorkspace()}
-              renderIcon={DownToBottom16}
+              renderIcon={(props) => <DownToBottom size={16} {...props} />}
               tooltipPosition="bottom"
               tooltipAlignment="end"
             />

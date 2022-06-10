@@ -1,17 +1,17 @@
 import React, { useState, useCallback, useMemo, useLayoutEffect } from 'react';
-import RangeSelector from './range-selector.component';
-import { Button, InlineLoading, SkeletonText } from 'carbon-components-react';
-import ArrowLeft24 from '@carbon/icons-react/es/arrow--left/24';
-import LineChart from '@carbon/charts-react/line-chart';
+import { useTranslation } from 'react-i18next';
+import { Button, InlineLoading, SkeletonText } from '@carbon/react';
+import { ArrowLeft } from '@carbon/react/icons';
 import { ScaleTypes, LineChartOptions, TickRotations } from '@carbon/charts/interfaces';
+import LineChart from '@carbon/charts-react/line-chart';
 import { formatDate, formatTime, parseDate, ConfigurableLink } from '@openmrs/esm-framework';
 import { EmptyState, OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import CommonDataTable from '../overview/common-datatable.component';
-import { useTranslation } from 'react-i18next';
+import { testResultsBasePath } from '../helpers';
+import RangeSelector from './range-selector.component';
+import { useObstreeData } from './trendline-resource';
 import styles from './trendline.scss';
 import '@carbon/charts/styles.css';
-import { testResultsBasePath } from '../helpers';
-import { useObstreeData } from './trendline-resource';
 
 const TrendLineBackground = ({ ...props }) => <div {...props} className={styles.background} />;
 
@@ -22,7 +22,11 @@ const TrendlineHeader = ({ basePath, title, referenceRange, isValidating, showBa
       <div className={styles.backButton}>
         {showBackToTimelineButton && (
           <ConfigurableLink to={testResultsBasePath(basePath)}>
-            <Button kind="ghost" renderIcon={ArrowLeft24} iconDescription={t('returnToTimeline', 'Return to timeline')}>
+            <Button
+              kind="ghost"
+              renderIcon={(props) => <ArrowLeft {...props} size={24} />}
+              iconDescription={t('returnToTimeline', 'Return to timeline')}
+            >
               <span>{t('backToTimeline', 'Back to timeline')}</span>
             </Button>
           </ConfigurableLink>
@@ -76,7 +80,7 @@ const Trendline: React.FC<TrendlineProps> = ({
    * reorder svg element to bring line in front of the area
    */
   useLayoutEffect(() => {
-    const graph = document.querySelector('g.bx--cc--area')?.parentElement;
+    const graph = document.querySelector('g.cds--cc--area')?.parentElement;
     if (obs && obs.length && graph) {
       graph.insertBefore(graph.children[3], graph.childNodes[2]);
     }
@@ -173,7 +177,7 @@ const Trendline: React.FC<TrendlineProps> = ({
       },
       tooltip: {
         customHTML: ([{ date, value }]) =>
-          `<div class="bx--tooltip bx--tooltip--shown" style="min-width: max-content; font-weight:600">${value} ${leftAxisTitle}<br>
+          `<div class="cds--tooltip cds--tooltip--shown" style="min-width: max-content; font-weight:600">${value} ${leftAxisTitle}<br>
           <span style="color: #c6c6c6; font-size: 0.75rem; font-weight:400">${formatDate(date)}</span></div>`,
       },
     }),

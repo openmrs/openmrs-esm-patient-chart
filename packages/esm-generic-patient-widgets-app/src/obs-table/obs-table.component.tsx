@@ -1,5 +1,4 @@
 import React from 'react';
-import styles from './obs-table.scss';
 import {
   DataTable,
   Table,
@@ -9,10 +8,11 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from 'carbon-components-react';
+} from '@carbon/react';
 import { usePagination, useConfig, formatDatetime } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { useObs } from '../resources/useObs';
+import styles from './obs-table.scss';
 
 interface ObsTableProps {
   patientUuid: string;
@@ -79,7 +79,7 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
   return (
     <div>
       <TableContainer>
-        <DataTable rows={results} headers={tableHeaders} isSortable={true} size="short">
+        <DataTable rows={results} headers={tableHeaders} isSortable={true} size="sm">
           {({ rows, headers, getHeaderProps, getTableProps }) => (
             <Table {...getTableProps()} useZebraStyles className={styles.customRow}>
               <TableHead>

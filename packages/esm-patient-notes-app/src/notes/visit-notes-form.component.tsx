@@ -12,14 +12,15 @@ import {
   DatePickerInput,
   Form,
   FormGroup,
+  Layer,
   Search,
   SearchSkeleton,
   Tag,
   TextArea,
   Tile,
   ButtonSet,
-} from 'carbon-components-react';
-import Add16 from '@carbon/icons-react/es/add/16';
+} from '@carbon/react';
+import { Add } from '@carbon/react/icons';
 import {
   createErrorHandler,
   showNotification,
@@ -257,7 +258,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
             <FormGroup legendText={t('searchForDiagnosis', 'Search for a diagnosis')}>
               <Search
                 light={isTablet}
-                size="xl"
+                size="lg"
                 id="diagnosisSearch"
                 labelText={t('enterDiagnoses', 'Enter diagnoses')}
                 placeholder={t(
@@ -274,9 +275,13 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
               />
               <div>
                 {(() => {
-                  if (!searchTerm) return null;
-                  if (isSearching) return <SearchSkeleton />;
-                  if (searchResults && searchResults.length && !isSearching)
+                  if (!searchTerm) {
+                    return null;
+                  }
+                  if (isSearching) {
+                    return <SearchSkeleton />;
+                  }
+                  if (searchResults && searchResults.length && !isSearching) {
                     return (
                       <ul className={styles.diagnosisList}>
                         {searchResults.map((diagnosis, index) => (
@@ -291,12 +296,25 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
                         ))}
                       </ul>
                     );
+                  }
                   return (
-                    <Tile light={isTablet} className={styles.emptyResults}>
-                      <span>
-                        {t('noMatchingDiagnoses', 'No diagnoses found matching')} <strong>"{searchTerm}"</strong>
-                      </span>
-                    </Tile>
+                    <>
+                      {isTablet ? (
+                        <Layer>
+                          <Tile className={styles.emptyResults}>
+                            <span>
+                              {t('noMatchingDiagnoses', 'No diagnoses found matching')} <strong>"{searchTerm}"</strong>
+                            </span>
+                          </Tile>
+                        </Layer>
+                      ) : (
+                        <Tile className={styles.emptyResults}>
+                          <span>
+                            {t('noMatchingDiagnoses', 'No diagnoses found matching')} <strong>"{searchTerm}"</strong>
+                          </span>
+                        </Tile>
+                      )}
+                    </>
                   );
                 })()}
               </div>
@@ -326,7 +344,12 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
               <p className={styles.imgUploadHelperText}>
                 {t('imageUploadHelperText', "Upload an image or use this device's camera to capture an image")}
               </p>
-              <Button style={{ marginTop: '1rem' }} kind="tertiary" onClick={() => {}} renderIcon={Add16}>
+              <Button
+                style={{ marginTop: '1rem' }}
+                kind="tertiary"
+                onClick={() => {}}
+                renderIcon={(props) => <Add size={16} {...props} />}
+              >
                 {t('addImage', 'Add image')}
               </Button>
             </FormGroup>

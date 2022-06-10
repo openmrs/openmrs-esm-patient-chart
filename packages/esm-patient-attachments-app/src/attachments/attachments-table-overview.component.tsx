@@ -1,16 +1,16 @@
 import {
   DataTable,
-  TableContainer,
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  TableHeader,
   DataTableSkeleton,
   OverflowMenu,
   OverflowMenuItem,
-} from 'carbon-components-react';
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@carbon/react';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Attachment } from './attachments-types';

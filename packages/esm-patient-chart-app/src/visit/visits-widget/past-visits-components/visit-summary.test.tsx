@@ -1,12 +1,12 @@
 import React from 'react';
-import VisitSummary from './visit-summary.component';
 import { screen, render } from '@testing-library/react';
-import { mockPatient } from '../../../../../../__mocks__/patient.mock';
+import userEvent from '@testing-library/user-event';
+import VisitSummary from './visit-summary.component';
 import {
   visitOverviewDetailMockData,
   visitOverviewDetailMockDataNotEmpty,
 } from '../../../../../../__mocks__/visits.mock';
-import userEvent from '@testing-library/user-event';
+import { mockPatient } from '../../../../../../__mocks__/patient.mock';
 
 const mockEncounter = visitOverviewDetailMockData.data.results[0].encounters.map((encounter) => encounter);
 
@@ -28,11 +28,7 @@ jest.mock('@openmrs/esm-framework', () => {
 });
 
 describe('VisitSummary', () => {
-  const renderVisitSummary = () => {
-    render(<VisitSummary patientUuid={mockPatient.id} encounters={mockEncounter} />);
-  };
-
-  it('should display empty state for notes , test and medication summary', () => {
+  it('should display empty state for notes, test and medication summary', () => {
     renderVisitSummary();
 
     expect(screen.getByText(/^Diagnoses$/i)).toBeInTheDocument();
@@ -90,3 +86,7 @@ describe('VisitSummary', () => {
     expect(screen.getByText(/test-results-filtered-overview/)).toBeInTheDocument();
   });
 });
+
+function renderVisitSummary() {
+  render(<VisitSummary patientUuid={mockPatient.id} encounters={mockEncounter} />);
+}

@@ -1,3 +1,4 @@
+@import '~@openmrs/esm-styleguide/src/vars';
 @import '../root.scss';
 
 .cameraSection {
@@ -27,7 +28,7 @@
 }
 
 .tabs {
-  .bx--tab-content {
+  .cds--tab-content {
     display: none;
   }
 }

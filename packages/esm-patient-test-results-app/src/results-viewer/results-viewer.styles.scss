@@ -1,7 +1,6 @@
-
-@import "~@openmrs/esm-styleguide/src/vars";
-@import "carbon-components/scss/globals/scss/typography.scss";
-
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
 
 .resultsContainer {
   padding: 0;
@@ -31,7 +30,7 @@
   min-width: 2.5rem;
 }
 
-.leftHeaderActions > :global(.bx--content-switcher) {
+.leftHeaderActions > :global(.cds--content-switcher) {
   display: grid;
   grid-template-columns: 1fr 1fr;
   width: max-content;
@@ -44,12 +43,12 @@
   align-items: baseline;
 
   .trendlineOverlayHeaderTitle {
-    @include carbon--type-style('productive-heading-02');
+    @include type.type-style('heading-compact-02');
     margin-right: 4px;
   }
 
   .trendlineOverlayHeaderReferenceRange {
-    @include carbon--type-style('helper-text-01');
+    @include type.type-style('helper-text-01');
   }
 }
 

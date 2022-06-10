@@ -1,30 +1,30 @@
 import React, { useState } from 'react';
-import styles from './medication-order-form.scss';
 import capitalize from 'lodash-es/capitalize';
 import {
   Button,
   ButtonSet,
   Checkbox,
+  Column,
+  ComboBox,
   DatePicker,
   DatePickerInput,
-  NumberInput,
-  TextInput,
-  TextArea,
-  ComboBox,
-  ToggleSmall,
   Form,
   FormGroup,
   Grid,
+  NumberInput,
   Row,
-  Column,
-} from 'carbon-components-react';
-import ArrowLeft24 from '@carbon/icons-react/es/arrow--left/24';
+  TextArea,
+  TextInput,
+  Toggle,
+} from '@carbon/react';
+import { ArrowLeft } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { OrderBasketItem } from '../types/order-basket-item';
 import { getCommonMedicationByUuid } from '../api/common-medication';
 import { OpenmrsResource } from '../types/openmrs-resource';
 import { ConfigObject } from '../config-schema';
+import styles from './medication-order-form.scss';
 
 export interface MedicationOrderFormProps {
   initialOrderBasketItem: OrderBasketItem;
@@ -71,7 +71,7 @@ export default function MedicationOrderForm({
             <div className={styles.backButton}>
               <Button
                 kind="ghost"
-                renderIcon={ArrowLeft24}
+                renderIcon={(props) => <ArrowLeft size={24} {...props} />}
                 iconDescription="Return to order basket"
                 size="sm"
                 onClick={onCancel}
@@ -86,7 +86,8 @@ export default function MedicationOrderForm({
               <h3 className={styles.productiveHeading02}>{t('dosageInstructions', '1. Dosage Instructions')}</h3>
             </Column>
             <Column className={styles.pullColumnContentRight}>
-              <ToggleSmall
+              <Toggle
+                size="sm"
                 id="freeTextDosageToggle"
                 aria-label={t('freeTextDosage', 'Free Text Dosage')}
                 labelText={t('freeTextDosage', 'Free Text Dosage')}

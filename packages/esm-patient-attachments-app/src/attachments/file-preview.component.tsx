@@ -1,10 +1,10 @@
-import React, { SyntheticEvent, useCallback, useEffect, useMemo, useState } from 'react';
+import React, { SyntheticEvent, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Button, ButtonSet, TextArea, TextInput } from '@carbon/react';
 import { UserHasAccess } from '@openmrs/esm-framework';
-import { Button, ButtonSet, TextArea, TextInput } from 'carbon-components-react';
-import styles from './image-preview.scss';
-import { UploadedFile } from './attachments-types';
 import FileRegular from '../assets/file-regular.svg';
+import { UploadedFile } from './attachments-types';
+import styles from './image-preview.scss';
 
 export interface FilePreviewContainerProps {
   uploadedFiles: Array<UploadedFile>;

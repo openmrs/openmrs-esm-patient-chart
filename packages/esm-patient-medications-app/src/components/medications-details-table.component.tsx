@@ -1,11 +1,10 @@
 import React, { useCallback } from 'react';
-import Add16 from '@carbon/icons-react/es/add/16';
-import User16 from '@carbon/icons-react/es/user/16';
+import dayjs from 'dayjs';
 import capitalize from 'lodash-es/capitalize';
-import styles from './medications-details-table.scss';
 import {
   DataTable,
   Button,
+  IconButton,
   InlineLoading,
   OverflowMenu,
   OverflowMenuItem,
@@ -16,8 +15,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  TooltipIcon,
-} from 'carbon-components-react';
+} from '@carbon/react';
+import { Add, User } from '@carbon/react/icons';
+import { formatDate } from '@openmrs/esm-framework';
+import { CardHeader, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { getDosage } from '../utils/get-dosage';
 import { useTranslation } from 'react-i18next';
 import { compare } from '../utils/compare';
@@ -25,9 +26,7 @@ import { connect } from 'unistore/react';
 import { OrderBasketStore, OrderBasketStoreActions, orderBasketStoreActions } from '../medications/order-basket-store';
 import { Order } from '../types/order';
 import { OrderBasketItem } from '../types/order-basket-item';
-import { CardHeader, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { formatDate } from '@openmrs/esm-framework';
-import dayjs from 'dayjs';
+import styles from './medications-details-table.scss';
 
 export interface ActiveMedicationsProps {
   isValidating?: boolean;
@@ -163,14 +162,19 @@ const MedicationsDetailsTable = connect<
             </span>
           ) : null}
           {showAddNewButton && (
-            <Button kind="ghost" renderIcon={Add16} iconDescription="Launch order basket" onClick={openOrderBasket}>
+            <Button
+              kind="ghost"
+              renderIcon={(props) => <Add size={16} {...props} />}
+              iconDescription="Launch order basket"
+              onClick={openOrderBasket}
+            >
               {t('add', 'Add')}
             </Button>
           )}
         </CardHeader>
         <DataTable
           data-floating-menu-container
-          size="short"
+          size="sm"
           headers={tableHeaders}
           rows={tableRows}
           isSortable={true}
@@ -201,7 +205,7 @@ const MedicationsDetailsTable = connect<
                       {row.cells.map((cell) => (
                         <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                       ))}
-                      <TableCell className="bx--table-column-menu">
+                      <TableCell className="cds--table-column-menu">
                         <OrderBasketItemActions
                           showDiscontinueButton={showDiscontinueButton}
                           showModifyButton={showModifyButton}
@@ -225,9 +229,15 @@ const MedicationsDetailsTable = connect<
 
 function InfoTooltip({ orderer }) {
   return (
-    <TooltipIcon className={styles.tooltip} align="start" direction="top" tooltipText={orderer} renderIcon={User16}>
+    <IconButton
+      className={styles.tooltip}
+      align="bottom-left"
+      direction="top"
+      label={orderer}
+      renderIcon={(props) => <User size={16} {...props} />}
+    >
       {orderer}
-    </TooltipIcon>
+    </IconButton>
   );
 }
 
@@ -391,7 +401,7 @@ function OrderBasketItemActions({
   }, [items, setItems, medication]);
 
   return (
-    <OverflowMenu selectorPrimaryFocus={'#modify'} flipped>
+    <OverflowMenu aria-label="Actions menu" selectorPrimaryFocus={'#modify'} flipped>
       {showModifyButton && (
         <OverflowMenuItem
           className={styles.menuItem}

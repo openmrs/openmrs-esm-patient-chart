@@ -31,7 +31,7 @@ const store = createGlobalStore('ampath-form-state', {});
 @Component({
   selector: 'my-app-fe-wrapper',
   templateUrl: './fe-wrapper.component.html',
-  styleUrls: ['./fe-wrapper.component.scss'],
+  styleUrls: ['./fe-wrapper.scss'],
 })
 export class FeWrapperComponent implements OnInit, OnDestroy {
   private launchFormSubscription?: Subscription;

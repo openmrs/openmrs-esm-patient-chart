@@ -1,6 +1,6 @@
-import { showModal } from '@openmrs/esm-framework';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { showModal } from '@openmrs/esm-framework';
 
 interface AddPastVisitOverflowMenuItemProps {
   patientUuid?: string;
@@ -22,9 +22,9 @@ const AddPastVisitOverflowMenuItem: React.FC<AddPastVisitOverflowMenuItemProps> 
   }, [patientUuid, launchPatientChart]);
 
   return (
-    <li className="bx--overflow-menu-options__option">
+    <li className="cds--overflow-menu-options__option">
       <button
-        className="bx--overflow-menu-options__btn"
+        className="cds--overflow-menu-options__btn"
         role="menuitem"
         title={t('addPastVisit', 'Add Past Visit')}
         data-floating-menu-primary-focus
@@ -33,7 +33,7 @@ const AddPastVisitOverflowMenuItem: React.FC<AddPastVisitOverflowMenuItemProps> 
           maxWidth: '100vw',
         }}
       >
-        <span className="bx--overflow-menu-options__option-content">{t('addPastVisit', 'Add past visit')}</span>
+        <span className="cds--overflow-menu-options__option-content">{t('addPastVisit', 'Add past visit')}</span>
       </button>
     </li>
   );

@@ -1,24 +1,24 @@
-@import "~@openmrs/esm-styleguide/src/vars";
-@import "~carbon-components/src/globals/scss/vars";
-@import "~carbon-components/src/globals/scss/mixins";
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
 
 .container {
-  margin: $spacing-05;
+  margin: spacing.$spacing-05;
 
   & section {
-    margin: $spacing-05 0;
+    margin: spacing.$spacing-05 0;
   }
 }
 
 .heading {
-  @include carbon--type-style("productive-heading-03");
-  color: $text-01;
-  margin: $spacing-05;
+  @include type.type-style("heading-03");
+  
+  margin: spacing.$spacing-05;
 }
 .sectionTitle {
-  @include carbon--type-style("productive-heading-02");
+  @include type.type-style("heading-compact-02");
   color: $text-02;
-  margin: 0 0 $spacing-03 0;
+  margin: 0 0 spacing.$spacing-03 0;
 }
 
 .dateTimeSection {
@@ -26,11 +26,11 @@
 }
 
 .radioButton {
-  margin: $spacing-05 0;
+  margin: spacing.$spacing-05 0;
 }
 
 .contentSwitcher {
-  height: $spacing-09;
+  height: spacing.$spacing-09;
 }
 
 .headerGridRow {

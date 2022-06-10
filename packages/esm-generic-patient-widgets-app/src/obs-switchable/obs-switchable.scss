@@ -1,6 +1,5 @@
-@import "~@openmrs/esm-styleguide/src/vars";
-@import "~carbon-components/src/globals/scss/vars";
-@import "~carbon-components/src/globals/scss/mixins";
+@use '@carbon/styles/scss/spacing';
+@import '~@openmrs/esm-styleguide/src/vars';
 
 .widgetContainer {
   background-color: $ui-background;
@@ -11,7 +10,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: $spacing-04 0 $spacing-04 $spacing-05;
+  padding: spacing.$spacing-04 0 spacing.$spacing-04 spacing.$spacing-05;
 }
 
 .divider {
@@ -23,7 +22,7 @@
 
 .toggleButtons {
   width: fit-content;
-  margin: 0 $spacing-03;
+  margin: 0 spacing.$spacing-03;
 }
 
 .toggle {
@@ -31,52 +30,52 @@
   color: $interactive-01;
   min-height: 0px;
 
-  &:global(.bx--btn--tertiary) {
+  &:global(.cds--btn--tertiary) {
     border-color: $interactive-01;
   }
 
-  &:global(.bx--tooltip__trigger:active:not([disabled])) {
+  &:global(.cds--tooltip__trigger:active:not([disabled])) {
     border-color: $interactive-01;
   }
 
-  &:global(.bx--btn--tertiary:active) {
+  &:global(.cds--btn--tertiary:active) {
     border-color: $interactive-01;
     background-color: #edf5ff;
     color: #edf5ff;
   }
 
-  &:global(.bx--btn--tertiary:focus) {
+  &:global(.cds--btn--tertiary:focus) {
     background-color: $interactive-01;
     color: $ui-background;
   }
 
-  &:global(.bx--btn--tertiary:hover) {
+  &:global(.cds--btn--tertiary:hover) {
     color: $ui-background;
     background-color: $interactive-01;
   }
 
-  &:global(.bx--btn--ghost) {
+  &:global(.cds--btn--ghost) {
     border-color: #a6c8ff;
   }
 
-  &:global(.bx--btn--ghost:hover) {
+  &:global(.cds--btn--ghost:hover) {
     color:  #000;
     background-color: $ui-01;
   }
 }
 
 .toggle:first-of-type {
-  border-radius: $spacing-02 0 0 $spacing-02;
+  border-radius: spacing.$spacing-02 0 0 spacing.$spacing-02;
 
-  &:global(.bx--btn--ghost) {
+  &:global(.cds--btn--ghost) {
     border-right: 0;
   }
 }
 
 .toggle:last-of-type {
-  border-radius: 0 $spacing-02 $spacing-02 0;
+  border-radius: 0 spacing.$spacing-02 spacing.$spacing-02 0;
 
-  &:global(.bx--btn--ghost) {
+  &:global(.cds--btn--ghost) {
     border-left: 0rem;
   }
 }

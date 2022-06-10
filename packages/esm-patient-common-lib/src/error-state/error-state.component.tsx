@@ -1,8 +1,8 @@
 import React from 'react';
-import styles from './error-state.scss';
-import { Tile } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
+import { Tile } from '@carbon/react';
 import { useLayoutType } from '@openmrs/esm-framework';
+import styles from './error-state.scss';
 
 export interface ErrorStateProps {
   error: any;
@@ -14,7 +14,7 @@ export const ErrorState: React.FC<ErrorStateProps> = ({ error, headerTitle }) =>
   const isTablet = useLayoutType() === 'tablet';
 
   return (
-    <Tile light className={styles.tile}>
+    <Tile className={styles.tile}>
       <div className={isTablet ? styles.tabletHeading : styles.desktopHeading}>
         <h4>{headerTitle}</h4>
       </div>

@@ -1,6 +1,7 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useVisit, showModal } from '@openmrs/esm-framework';
+
 interface CancelVisitOverflowMenuItemProps {
   patientUuid: string;
 }
@@ -18,9 +19,9 @@ const CancelVisitOverflowMenuItem: React.FC<CancelVisitOverflowMenuItemProps> = 
 
   return (
     currentVisit && (
-      <li className="bx--overflow-menu-options__option">
+      <li className="cds--overflow-menu-options__option">
         <button
-          className="bx--overflow-menu-options__btn"
+          className="cds--overflow-menu-options__btn"
           role="menuitem"
           title={t('cancelVisit', 'Cancel visit')}
           data-floating-menu-primary-focus
@@ -29,7 +30,7 @@ const CancelVisitOverflowMenuItem: React.FC<CancelVisitOverflowMenuItemProps> = 
             maxWidth: '100vw',
           }}
         >
-          <span className="bx--overflow-menu-options__option-content">{t('cancelVisit', 'Cancel visit')}</span>
+          <span className="cds--overflow-menu-options__option-content">{t('cancelVisit', 'Cancel visit')}</span>
         </button>
       </li>
     )

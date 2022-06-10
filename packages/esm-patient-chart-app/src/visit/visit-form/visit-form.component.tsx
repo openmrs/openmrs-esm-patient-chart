@@ -17,7 +17,7 @@ import {
   Switch,
   TimePicker,
   TimePickerSelect,
-} from 'carbon-components-react';
+} from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { first } from 'rxjs/operators';
 import {
@@ -122,7 +122,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
           },
         );
     },
-    [closeWorkspace, patientUuid, selectedLocation, t, timeFormat, visitDate, visitTime, visitType, mutate],
+    [closeWorkspace, mutate, patientUuid, selectedLocation, t, timeFormat, visitDate, visitTime, visitType],
   );
 
   const handleOnChange = () => {
@@ -263,6 +263,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
           {isMissingVisitType && (
             <section>
               <InlineNotification
+                role="alert"
                 style={{ margin: '0', minWidth: '100%' }}
                 kind="error"
                 lowContrast={true}

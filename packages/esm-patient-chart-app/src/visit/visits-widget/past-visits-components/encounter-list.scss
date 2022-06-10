@@ -1,45 +1,45 @@
-@import "~@openmrs/esm-styleguide/src/vars";
-@import "~carbon-components/src/globals/scss/vars";
-@import "~carbon-components/src/globals/scss/mixins";
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
 @import "../../../root.scss";
 
 .tableContainer {
   padding: 0;
 
-  :global(.bx--data-table-content) {
+  :global(.cds--data-table-content) {
     border: 1px solid $ui-03;
     border-bottom: none;
     overflow: visible;
   }
 
-  :global(.bx--data-table-header) {
+  :global(.cds--data-table-header) {
     padding: 0;
   }
 
-  :global(.bx--table-toolbar) {
+  :global(.cds--table-toolbar) {
     position: relative;
     height: 2rem;
     overflow: visible;
     top: 0;
   }
 
-  &:global(.bx--data-table-container) {
+  &:global(.cds--data-table-container) {
     background: none !important;
   }
 
-  :global(.bx--toolbar-content),
-  :global(.bx--toolbar-search-container-expandable) {
+  :global(.cds--toolbar-content),
+  :global(.cds--toolbar-search-container-expandable) {
     height: 2rem;
     margin-bottom: 0.25rem;
   }
 }
 
 .filterContainer {
-  :global(.bx--dropdown__wrapper--inline) {
+  :global(.cds--dropdown__wrapper--inline) {
     gap: 0;
   }
 
-  :global(.bx--list-box__menu-icon) {
+  :global(.cds--list-box__menu-icon) {
     height: 1rem;
   }
 }
@@ -53,7 +53,7 @@
 }
 
 .tableHeader {
-  > :global(.bx--table-header-label) {
+  > :global(.cds--table-header-label) {
     @extend .productiveHeading01;
     color: $text-02;
   }
@@ -82,7 +82,7 @@
 }
 
 .content {
-  @include carbon--type-style('productive-heading-02');
+  @include type.type-style('heading-compact-02');
   color: $text-02;
   margin-bottom: 0.5rem;
 }
@@ -105,6 +105,6 @@
 }
 
 .helper {
-  @include carbon--type-style('body-short-01');
+  @include type.type-style('body-compact-01');
   color: $text-02;
 }

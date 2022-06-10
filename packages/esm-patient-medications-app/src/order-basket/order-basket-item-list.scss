@@ -1,23 +1,26 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
 @import "../root";
 
 .actionText {
-  @include carbon--type-style("body-short-01");
+  @include type.type-style("body-compact-01");
   color: $text-02;
   margin-bottom: 1rem;
 }
 
 .content {
-  @include carbon--type-style("productive-heading-01");
+  @include type.type-style("heading-compact-01");
   color: $text-02;
-  margin-top: $spacing-05;
-  margin-bottom: $spacing-03;
+  margin-top: spacing.$spacing-05;
+  margin-bottom: spacing.$spacing-03;
 }
 
 .heading {
   text-align: left;
   text-transform: capitalize;
   margin-bottom: 1rem;
-  @include carbon--type-style("productive-heading-03");
+  @include type.type-style("heading-03");
   color: $text-02;
 }
 
@@ -32,7 +35,7 @@
 .orderCategoryHeading {
   @extend .bodyShort01;
   color: $text-02;
-  margin: $spacing-05 0;
+  margin: spacing.$spacing-05 0;
 }
 
 .desktopTile {
@@ -48,7 +51,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: $spacing-04 0 0 $spacing-05;
+  padding: spacing.$spacing-04 0 0 spacing.$spacing-05;
   background-color: $ui-background;
 }
 

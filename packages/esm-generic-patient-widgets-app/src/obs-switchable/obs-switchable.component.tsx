@@ -1,15 +1,14 @@
 import React from 'react';
-import ChartLineSmooth16 from '@carbon/icons-react/es/chart--line-smooth/16';
-import Table16 from '@carbon/icons-react/es/table/16';
-import styles from './obs-switchable.scss';
+import { useTranslation } from 'react-i18next';
+import { DataTableSkeleton, Button, InlineLoading } from '@carbon/react';
+import { ChartLineSmooth, Table } from '@carbon/react/icons';
+import { CardHeader, EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
+import { useConfig } from '@openmrs/esm-framework';
+import { useObs } from '../resources/useObs';
+import { ConfigObject } from '../config-schema';
 import ObsGraph from '../obs-graph/obs-graph.component';
 import ObsTable from '../obs-table/obs-table.component';
-import { DataTableSkeleton, Button, InlineLoading } from 'carbon-components-react';
-import { CardHeader, EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
-import { useTranslation } from 'react-i18next';
-import { useObs } from '../resources/useObs';
-import { useConfig } from '@openmrs/esm-framework';
-import { ConfigObject } from '../config-schema';
+import styles from './obs-switchable.scss';
 
 interface ObsSwitchableProps {
   patientUuid: string;
@@ -41,19 +40,19 @@ const ObsSwitchable: React.FC<ObsSwitchableProps> = ({ patientUuid }) => {
                     <div className={styles.toggleButtons}>
                       <Button
                         className={styles.toggle}
-                        size="field"
+                        size="md"
                         kind={chartView ? 'ghost' : 'tertiary'}
                         hasIconOnly
-                        renderIcon={Table16}
+                        renderIcon={(props) => <Table size={16} {...props} />}
                         iconDescription={t('tableView', 'Table View')}
                         onClick={() => setChartView(false)}
                       />
                       <Button
                         className={styles.toggle}
-                        size="field"
+                        size="md"
                         kind={chartView ? 'tertiary' : 'ghost'}
                         hasIconOnly
-                        renderIcon={ChartLineSmooth16}
+                        renderIcon={(props) => <ChartLineSmooth size={16} {...props} />}
                         iconDescription={t('chartView', 'Chart View')}
                         onClick={() => setChartView(true)}
                       />

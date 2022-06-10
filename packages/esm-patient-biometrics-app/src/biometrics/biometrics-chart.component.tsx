@@ -1,18 +1,25 @@
 import React from 'react';
-import styles from './biometrics-chart.component.scss';
-import { Tab, Tabs } from 'carbon-components-react';
-import { LineChart } from '@carbon/charts-react';
-import { LineChartOptions } from '@carbon/charts/interfaces/charts';
-import { ScaleTypes } from '@carbon/charts/interfaces/enums';
-import { formatDate, parseDate } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
+import { Tab, Tabs, TabList } from '@carbon/react';
+import { LineChart } from '@carbon/charts-react';
+import { formatDate, parseDate } from '@openmrs/esm-framework';
 import { ConfigObject } from '../config-schema';
 import { PatientBiometrics } from './biometrics.resource';
+import styles from './biometrics-chart.scss';
+import '@carbon/charts/styles.css';
+
+export enum ScaleTypes {
+  LABELS = 'labels',
+  LABELS_RATIO = 'labels-ratio',
+  LINEAR = 'linear',
+  LOG = 'log',
+  TIME = 'time',
+}
 
 interface BiometricsChartProps {
-  patientBiometrics: Array<PatientBiometrics>;
   conceptUnits: Map<string, string>;
   config: ConfigObject;
+  patientBiometrics: Array<PatientBiometrics>;
 }
 
 interface BiometricChartData {
@@ -51,7 +58,7 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
     [patientBiometrics, selectedBiometrics.groupName, selectedBiometrics.value],
   );
 
-  const chartOptions: LineChartOptions = React.useMemo(() => {
+  const chartOptions = React.useMemo(() => {
     return {
       axes: {
         bottom: {
@@ -74,7 +81,7 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
       },
       tooltip: {
         customHTML: ([{ value, date }]) =>
-          `<div class="bx--tooltip bx--tooltip--shown" style="min-width: max-content; font-weight:600">${formatDate(
+          `<div class="cds--tooltip cds--tooltip--shown" style="min-width: max-content; font-weight:600">${formatDate(
             parseDate(date),
             { year: true },
           )} - 
@@ -89,26 +96,29 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
           {t('biometricDisplayed', 'Biometric Displayed')}
         </label>
         <Tabs className={styles.verticalTabs} type="default">
-          {[
-            { id: 'weight', label: `Weight (${conceptUnits.get(config.concepts.weightUuid) ?? ''})` },
-            { id: 'height', label: `Height (${conceptUnits.get(config.concepts.heightUuid) ?? ''})` },
-            { id: 'bmi', label: `BMI (${bmiUnit})` },
-          ].map(({ id, label }) => (
-            <Tab
-              key={id}
-              className={`${styles.tab} ${styles.bodyLong01} ${
-                selectedBiometrics.title === label && styles.selectedTab
-              }`}
-              onClick={() =>
-                setSelectedBiometrics({
-                  title: label,
-                  value: id,
-                  groupName: id,
-                })
-              }
-              label={label}
-            />
-          ))}
+          <TabList aria-label="Biometrics tabs">
+            {[
+              { id: 'weight', label: `Weight (${conceptUnits.get(config.concepts.weightUuid) ?? ''})` },
+              { id: 'height', label: `Height (${conceptUnits.get(config.concepts.heightUuid) ?? ''})` },
+              { id: 'bmi', label: `BMI (${bmiUnit})` },
+            ].map(({ id, label }) => (
+              <Tab
+                key={id}
+                className={`${styles.tab} ${styles.bodyLong01} ${
+                  selectedBiometrics.title === label && styles.selectedTab
+                }`}
+                onClick={() =>
+                  setSelectedBiometrics({
+                    title: label,
+                    value: id,
+                    groupName: id,
+                  })
+                }
+              >
+                {label}
+              </Tab>
+            ))}
+          </TabList>
         </Tabs>
       </div>
       <div className={styles.biometricChartArea}>

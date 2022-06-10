@@ -1,15 +1,15 @@
-@import "~@openmrs/esm-styleguide/src/vars";
-@import "~carbon-components/src/globals/scss/vars";
-@import "~carbon-components/src/globals/scss/mixins";
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
 
 .heading {
-  @include carbon--type-style("productive-heading-03");
-  color: $text-01;
+  @include type.type-style("heading-03");
+  
   margin: 1rem;
 }
 
 .columnLabel {
-  @include carbon--type-style("productive-heading-02");
+  @include type.type-style("heading-compact-02");
   color: $text-02;
 }
 
@@ -30,18 +30,18 @@
 }
 
 .diagnosesText {
-  @include carbon--type-style("body-short-01");
+  @include type.type-style("body-compact-01");
   color: $text-02;
 }
 
 .emptyResults {
-  @include carbon--type-style("body-short-01");
+  @include type.type-style("body-compact-01");
   color: $text-02;
   min-height: 1rem;
 }
 
 .imgUploadHelperText {
-  @include carbon--type-style("body-short-01");
+  @include type.type-style("body-compact-01");
   color: $text-02;
 }
 

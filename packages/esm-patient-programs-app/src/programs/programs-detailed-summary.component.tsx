@@ -1,34 +1,28 @@
 import React from 'react';
-import Add16 from '@carbon/icons-react/es/add/16';
-import Edit16 from '@carbon/icons-react/es/edit/16';
-import filter from 'lodash-es/filter';
-import includes from 'lodash-es/includes';
-import map from 'lodash-es/map';
-import styles from './programs-detailed-summary.scss';
-import { CardHeader, EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
-import { useAvailablePrograms, useEnrollments, usePrograms } from './programs.resource';
+import capitalize from 'lodash-es/capitalize';
 import {
   Button,
   DataTable,
+  DataTableHeader,
   DataTableSkeleton,
   InlineLoading,
+  InlineNotification,
   Table,
+  TableBody,
   TableCell,
   TableContainer,
-  TableBody,
   TableHead,
   TableHeader,
   TableRow,
-  DataTableHeader,
-  DataTableRow,
-  InlineNotification,
-} from 'carbon-components-react';
-import { formatDate, formatDatetime, useConfig, usePagination } from '@openmrs/esm-framework';
-import { ConfigObject } from '../config-schema';
+} from '@carbon/react';
+import { Add, Edit } from '@carbon/react/icons';
+import { formatDate, formatDatetime, useConfig, usePagination, ConfigObject } from '@openmrs/esm-framework';
+import { CardHeader, EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { useAvailablePrograms, useEnrollments, usePrograms } from './programs.resource';
 import { ConfigurableProgram } from '../types';
-import capitalize from 'lodash-es/capitalize';
 import ProgramActionButton from './program-action-button/program-action-button.component';
+import styles from './programs-detailed-summary.scss';
 
 interface ProgramsDetailedSummaryProps {
   patientUuid: string;
@@ -107,7 +101,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
           <span>{isValidating ? <InlineLoading /> : null}</span>
           <Button
             kind="ghost"
-            renderIcon={Add16}
+            renderIcon={(props) => <Add size={16} {...props} />}
             iconDescription="Add programs"
             onClick={launchProgramsForm}
             disabled={availablePrograms?.length && eligiblePrograms?.length === 0}
@@ -125,7 +119,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
               title={t('fullyEnrolled', 'Enrolled in all programs')}
             />
           )}
-          <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="short">
+          <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="sm">
             {({ rows, headers, getHeaderProps, getTableProps }) => (
               <Table {...getTableProps()} useZebraStyles>
                 <TableHead>
@@ -175,7 +169,7 @@ function ProgramEditButton({ programEnrollmentId }: ProgramEditButtonProps) {
   return (
     <Button
       kind="ghost"
-      renderIcon={Edit16}
+      renderIcon={(props) => <Edit size={16} {...props} />}
       iconDescription="Edit Program"
       onClick={launchEditProgramsForm}
       hasIconOnly

@@ -9,7 +9,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from 'carbon-components-react';
+} from '@carbon/react';
 import { usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import styles from './paginated-vitals.scss';
@@ -43,7 +43,7 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({ tableRows, pageSize, 
   return (
     <div>
       <TableContainer>
-        <DataTable rows={paginatedVitals} headers={tableHeaders} isSortable={true} size="short">
+        <DataTable rows={paginatedVitals} headers={tableHeaders} isSortable={true} size="sm">
           {({ rows, headers, getHeaderProps, getTableProps }) => (
             <Table {...getTableProps()} className={styles.customRow} useZebraStyles>
               <TableHead>

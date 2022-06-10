@@ -1,17 +1,17 @@
 import React, { useCallback } from 'react';
-import { launchPatientWorkspace, useWorkspaces } from '@openmrs/esm-patient-common-lib';
-import ShoppingCart20 from '@carbon/icons-react/es/shopping--cart/20';
-import styles from './order-basket-action-button.scss';
-import { Button, Tag } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
-import { orderBasketStore } from '../medications/order-basket-store';
+import { Button, Tag } from '@carbon/react';
+import { ShoppingCart } from '@carbon/react/icons';
 import { useLayoutType, useStore } from '@openmrs/esm-framework';
+import { launchPatientWorkspace, useWorkspaces } from '@openmrs/esm-patient-common-lib';
+import { orderBasketStore } from '../medications/order-basket-store';
+import styles from './order-basket-action-button.scss';
 
 const OrderBasketActionButton: React.FC = () => {
-  const { items } = useStore(orderBasketStore);
   const { t } = useTranslation();
   const layout = useLayoutType();
   const { workspaces } = useWorkspaces();
+  const { items } = useStore(orderBasketStore);
   const isActive = workspaces.find(({ name }) => name.includes('order-basket'));
 
   const launchOrdersWorkspace = useCallback(() => launchPatientWorkspace('order-basket-workspace'), []);
@@ -26,7 +26,7 @@ const OrderBasketActionButton: React.FC = () => {
         onClick={launchOrdersWorkspace}
       >
         <div className={styles.elementContainer}>
-          <ShoppingCart20 /> {items?.length > 0 && <Tag className={styles.countTag}>{items?.length}</Tag>}
+          <ShoppingCart size={20} /> {items?.length > 0 && <Tag className={styles.countTag}>{items?.length}</Tag>}
         </div>
         <span>{t('orderBasket', 'Order Basket')}</span>
       </Button>
@@ -37,9 +37,10 @@ const OrderBasketActionButton: React.FC = () => {
       <Button
         className={isActive && styles.active}
         kind="ghost"
-        renderIcon={() => (
+        renderIcon={(props) => (
           <div className={styles.elementContainer}>
-            <ShoppingCart20 /> {items?.length > 0 && <Tag className={styles.countTag}>{items?.length}</Tag>}
+            <ShoppingCart size={20} {...props} />{' '}
+            {items?.length > 0 && <Tag className={styles.countTag}>{items?.length}</Tag>}
           </div>
         )}
         hasIconOnly

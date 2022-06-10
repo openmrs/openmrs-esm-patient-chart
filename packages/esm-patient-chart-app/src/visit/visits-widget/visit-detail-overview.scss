@@ -1,16 +1,16 @@
-@import "~@openmrs/esm-styleguide/src/vars";
-@import "~carbon-components/src/globals/scss/vars";
-@import "~carbon-components/src/globals/scss/mixins";
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
 @import "../../root.scss";
 
 .visitType {
-  @include carbon--type-style('productive-heading-02');
+  @include type.type-style('heading-compact-02');
   color: $text-02;
   margin-bottom: 5px;
 }
 
 .date {
-  @include carbon--type-style('body-short-01');
+  @include type.type-style('body-compact-01');
   color: $text-02;
 }
 
@@ -22,7 +22,7 @@
   width: 100%;
 }
 
-.tabs > :global(.bx--tab-content) {
+.tabs > :global(.cds--tab-content) {
   padding: 1rem 0rem !important;
 }
 
@@ -52,17 +52,17 @@
   }
 
   &:first-of-type {
-    border-radius: $spacing-02 0 0 $spacing-02;
+    border-radius: spacing.$spacing-02 0 0 spacing.$spacing-02;
   }
 
   &:last-of-type {
-    border-radius: 0 $spacing-02 $spacing-02 0;
+    border-radius: 0 spacing.$spacing-02 spacing.$spacing-02 0;
   }
 }
 
 .toggleActive {
   background-color: $color-blue-10;
-  border: 1px solid $link-01;
+  // border: 1px solid $link-01; // FIX
 
   &:active, &:focus {
     box-shadow: none;
@@ -111,7 +111,7 @@
   display: flex;
   flex-flow: row wrap;
   align-items: center;
-  @include carbon--type-style('body-long-01');
+  @include type.type-style('body-01');
   color: $text-02;
 }
 
@@ -122,15 +122,14 @@
 }
 
 .dosage {
-  @include carbon--type-style("productive-heading-01");
-  color: $text-01;
+  @include type.type-style("heading-compact-01");
 }
 
 .toggleSwitch {
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
-  margin-bottom: $spacing-02;
+  margin-bottom: spacing.$spacing-02;
 }
 
 .toggleSwitch div {
@@ -144,9 +143,9 @@
 }
 
 .metadata {
-  @include carbon--type-style('label-01');
+  @include type.type-style('label-01');
   color: $text-02;
-  margin: $spacing-02 0;
+  margin: spacing.$spacing-02 0;
 }
 
 .observationsEmptyState {

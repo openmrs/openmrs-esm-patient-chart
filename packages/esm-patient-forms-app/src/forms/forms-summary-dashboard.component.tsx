@@ -1,8 +1,8 @@
-import React, { FunctionComponent } from 'react';
-import Forms from './forms.component';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { InlineLoading } from 'carbon-components-react';
+import { InlineLoading } from '@carbon/react';
 import { useActivePatientEnrollment } from '@openmrs/esm-patient-common-lib';
+import Forms from './forms.component';
 
 interface FormsProps {
   patientUuid: string;
@@ -10,7 +10,7 @@ interface FormsProps {
   isOffline: boolean;
 }
 
-const FormsSummaryDashboard: FunctionComponent<FormsProps> = ({ patientUuid, patient, isOffline }) => {
+const FormsSummaryDashboard: React.FC<FormsProps> = ({ patientUuid, patient, isOffline }) => {
   const pageSize: number = 5;
   const { t } = useTranslation();
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);

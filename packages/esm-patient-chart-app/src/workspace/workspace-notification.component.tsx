@@ -1,6 +1,6 @@
 import React from 'react';
 import { cancelPrompt, useWorkspaces } from '@openmrs/esm-patient-common-lib';
-import { Button, ComposedModal, ModalBody, ModalFooter, ModalHeader } from 'carbon-components-react';
+import { Button, ComposedModal, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import styles from './workspace-notification.scss';
 

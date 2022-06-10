@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   DataTable,
   DataTableSkeleton,
@@ -11,12 +12,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from 'carbon-components-react';
-import Add16 from '@carbon/icons-react/es/add/16';
-import styles from './conditions-overview.scss';
+} from '@carbon/react';
 import { formatDate, parseDate, usePagination } from '@openmrs/esm-framework';
-import { useTranslation } from 'react-i18next';
-import { useConditions } from './conditions.resource';
 import {
   EmptyState,
   ErrorState,
@@ -24,6 +21,9 @@ import {
   launchPatientWorkspace,
   CardHeader,
 } from '@openmrs/esm-patient-common-lib';
+import { Add } from '@carbon/react/icons';
+import { useConditions } from './conditions.resource';
+import styles from './conditions-overview.scss';
 
 interface ConditionsOverviewProps {
   basePath: string;
@@ -67,12 +67,17 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient, basePa
       <div className={styles.widgetCard}>
         <CardHeader title={headerTitle}>
           <span>{isValidating ? <InlineLoading /> : null}</span>
-          <Button kind="ghost" renderIcon={Add16} iconDescription="Add conditions" onClick={launchConditionsForm}>
+          <Button
+            kind="ghost"
+            renderIcon={(props) => <Add size={16} {...props} />}
+            iconDescription="Add conditions"
+            onClick={launchConditionsForm}
+          >
             {t('add', 'Add')}
           </Button>
         </CardHeader>
         <TableContainer>
-          <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="short">
+          <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="sm">
             {({ rows, headers, getHeaderProps, getTableProps }) => (
               <Table {...getTableProps()} useZebraStyles>
                 <TableHead>

@@ -1,11 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import styles from './form-view.component.scss';
-import EmptyFormView from './empty-form.component';
+import { useTranslation } from 'react-i18next';
 import isEmpty from 'lodash-es/isEmpty';
 import first from 'lodash-es/first';
 import debounce from 'lodash-es/debounce';
-import { formatDatetime, useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
-import { useTranslation } from 'react-i18next';
 import {
   DataTable,
   Search,
@@ -18,12 +15,15 @@ import {
   TableRow,
   DataTableHeader,
   DataTableRow,
-} from 'carbon-components-react';
+} from '@carbon/react';
 import { PatientChartPagination, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
-import { CompletedFormInfo } from '../types';
-import Edit20 from '@carbon/icons-react/es/edit/20';
+import { formatDatetime, useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { Edit } from '@carbon/react/icons';
+import EmptyFormView from './empty-form.component';
 import { ConfigObject } from '../config-schema';
+import { CompletedFormInfo } from '../types';
 import { launchFormEntryOrHtmlForms } from '../form-entry-interop';
+import styles from './form-view.scss';
 
 interface FormViewProps {
   forms: Array<CompletedFormInfo>;
@@ -140,7 +140,8 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
                                 {row.cells[1].value}
                               </label>
                               {row.cells[0].value && (
-                                <Edit20
+                                <Edit
+                                  size={20}
                                   description="Edit form"
                                   onClick={() =>
                                     launchFormEntryOrHtmlForms(

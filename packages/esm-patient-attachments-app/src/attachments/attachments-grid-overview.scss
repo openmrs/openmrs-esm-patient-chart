@@ -1,11 +1,12 @@
+@use '@carbon/styles/scss/spacing';
 @import "../root.scss";
 
 .galleryContainer {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
   align-items: center;
-  grid-gap: $spacing-05;
-  padding: 0 $spacing-05 $spacing-05 $spacing-05;
+  grid-gap: spacing.$spacing-05;
+  padding: 0 spacing.$spacing-05 spacing.$spacing-05 spacing.$spacing-05;
 }
 
 .attachmentThumbnailSkeleton {
@@ -36,7 +37,7 @@
 
 .rightPanel {
   background-color: $carbon--gray-80;
-  padding: $spacing-05;
+  padding: spacing.$spacing-05;
   color: $ui-01;
 }
 
@@ -70,5 +71,5 @@
 }
 
 .imageDescription {
-  margin-top: $spacing-03;
+  margin-top: spacing.$spacing-03;
 }
