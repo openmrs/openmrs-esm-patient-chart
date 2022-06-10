@@ -26,7 +26,7 @@ export function convertToObsPayload(diagnosisArray: Array<Diagnosis>): Array<Obs
           },
           {
             concept: PROBLEM_LIST_CONCEPT,
-            value: diagnosis.concept.uuid,
+            value: diagnosis.uuid,
           },
         ],
       };
@@ -45,7 +45,7 @@ export function convertToObsPayload(diagnosisArray: Array<Diagnosis>): Array<Obs
           },
           {
             concept: PROBLEM_LIST_CONCEPT,
-            value: diagnosis.concept.uuid,
+            value: diagnosis.uuid,
           },
         ],
       };
@@ -64,7 +64,7 @@ export function convertToObsPayload(diagnosisArray: Array<Diagnosis>): Array<Obs
           },
           {
             concept: PROBLEM_LIST_CONCEPT,
-            value: diagnosis.concept.uuid,
+            value: diagnosis.uuid,
           },
         ],
       };
@@ -83,7 +83,7 @@ export function convertToObsPayload(diagnosisArray: Array<Diagnosis>): Array<Obs
           },
           {
             concept: PROBLEM_LIST_CONCEPT,
-            value: diagnosis.concept.uuid,
+            value: diagnosis.uuid,
           },
         ],
       };

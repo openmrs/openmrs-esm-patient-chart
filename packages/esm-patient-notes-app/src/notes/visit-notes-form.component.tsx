@@ -147,17 +147,15 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
   const handleRemoveDiagnosis = (diagnosisToRemove: Diagnosis, searchInputField: string) => {
     if (searchInputField == 'primaryInputSearch') {
       setSelectedPrimaryDiagnoses(
-        selectedPrimaryDiagnoses.filter((diagnosis) => diagnosis.concept.uuid !== diagnosisToRemove.concept.uuid),
+        selectedPrimaryDiagnoses.filter((diagnosis) => diagnosis.uuid !== diagnosisToRemove.uuid),
       );
     } else if (searchInputField == 'secondaryInputSearch') {
       setSelectedSecondaryDiagnoses(
-        selectedSecondaryDiagnoses.filter((diagnosis) => diagnosis.concept.uuid !== diagnosisToRemove.concept.uuid),
+        selectedSecondaryDiagnoses.filter((diagnosis) => diagnosis.uuid !== diagnosisToRemove.uuid),
       );
     }
     setCombinedPrimarySecondaryDiagnosis(
-      combinedPrimarySecondaryDiagnosis.filter(
-        (diagnosis) => diagnosis.concept.uuid !== diagnosisToRemove.concept.uuid,
-      ),
+      combinedPrimarySecondaryDiagnosis.filter((diagnosis) => diagnosis.uuid !== diagnosisToRemove.uuid),
     );
   };
 

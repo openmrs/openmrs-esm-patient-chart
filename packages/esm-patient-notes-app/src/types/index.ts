@@ -152,6 +152,7 @@ export interface ObsData {
 }
 
 export interface Diagnosis {
+  uuid: string;
   concept: any;
   conceptReferenceTermCode: string;
   primary: boolean;

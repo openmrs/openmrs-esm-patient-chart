@@ -89,10 +89,11 @@ function formatDiagnoses(diagnoses: Array<DiagnosisData>): Array<Diagnosis> {
 
 function mapDiagnosisProperties(diagnosis: DiagnosisData): Diagnosis {
   return {
+    uuid: diagnosis.uuid,
     concept: diagnosis.name,
     conceptReferenceTermCode: getConceptReferenceTermCode(diagnosis.mappings).conceptReferenceTerm.display,
     primary: false,
-    confirmed: false,
+    confirmed: true,
   };
 }
 
