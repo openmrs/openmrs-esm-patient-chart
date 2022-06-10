@@ -1,4 +1,4 @@
-/** import React from 'react';
+import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render, waitFor } from '@testing-library/react';
 import { of } from 'rxjs/internal/observable/of';
@@ -66,7 +66,7 @@ describe('Visit notes form: ', () => {
 
     expect(screen.getByRole('textbox', { name: /Visit date/i })).toBeInTheDocument();
     expect(screen.getByRole('textbox', { name: /Write an additional note/i })).toBeInTheDocument();
-    expect(screen.getByRole('group', { name: /Search for a diagnosis/i })).toBeInTheDocument();
+    expect(screen.getByRole('group', { name: /Search for a primary diagnosis/i })).toBeInTheDocument();
     expect(screen.getByRole('group', { name: /Add an image to this visit/i })).toBeInTheDocument();
     expect(screen.getByRole('search', { name: /Enter diagnoses/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Add image/i })).toBeInTheDocument();
@@ -77,7 +77,7 @@ describe('Visit notes form: ', () => {
   it('typing in the diagnosis search input triggers a search', () => {
     renderVisitNotesForm();
 
-    const searchbox = screen.getByRole('searchbox');
+    const searchbox = screen.getByPlaceholderText('Choose a primary diagnosis');
     userEvent.type(searchbox, 'Diabetes Mellitus');
     const targetSearchResult = screen.getByText(/^Diabetes Mellitus$/);
     expect(targetSearchResult).toBeInTheDocument();
@@ -104,7 +104,7 @@ describe('Visit notes form: ', () => {
 
     renderVisitNotesForm();
 
-    const searchbox = screen.getByRole('searchbox');
+    const searchbox = screen.getByPlaceholderText('Choose a primary diagnosis');
     userEvent.type(searchbox, 'COVID-21');
     expect(getByTextWithMarkup('No diagnoses found matching "COVID-21"')).toBeInTheDocument();
   });
@@ -143,7 +143,7 @@ describe('Visit notes form: ', () => {
 
       renderVisitNotesForm();
 
-      const searchbox = screen.getByRole('searchbox');
+      const searchbox = screen.getByPlaceholderText('Choose a primary diagnosis');
       userEvent.type(searchbox, 'Diabetes Mellitus');
       const targetSearchResult = screen.getByText(/^Diabetes Mellitus$/);
       expect(targetSearchResult).toBeInTheDocument();
@@ -177,7 +177,7 @@ describe('Visit notes form: ', () => {
 
     renderVisitNotesForm();
 
-    const searchbox = screen.getByRole('searchbox');
+    const searchbox = screen.getByPlaceholderText('Choose a primary diagnosis');
     userEvent.type(searchbox, 'Diabetes Mellitus');
     const targetSearchResult = screen.getByText(/^Diabetes Mellitus$/);
     expect(targetSearchResult).toBeInTheDocument();
@@ -207,4 +207,3 @@ describe('Visit notes form: ', () => {
 function renderVisitNotesForm() {
   render(<VisitNotesForm {...testProps} />);
 }
- **/
