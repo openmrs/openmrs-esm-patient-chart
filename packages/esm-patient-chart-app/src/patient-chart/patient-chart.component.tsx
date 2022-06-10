@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
+import { RouteComponentProps } from 'react-router-dom';
 import { ExtensionSlot, useConfig } from '@openmrs/esm-framework';
 import { useParams } from 'react-router-dom';
 import {

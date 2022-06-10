@@ -1,7 +1,6 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
 @import '~@openmrs/esm-styleguide/src/vars';
-@import '../root.scss';
 
 .productiveHeading01 {
   @include type.type-style("heading-compact-01");
@@ -34,7 +33,8 @@
   margin: spacing.$spacing-05;
 }
 
-// Desktop viewport
+// Desktop view
+
 :global(.omrs-breakpoint-gt-tablet) {
   .tableCell {
     display: flex;
@@ -42,15 +42,15 @@
     cursor: pointer;
     align-items: center;
 
-    & > svg {
+    &>svg {
       visibility: hidden;
     }
 
-    & > label {
+    &>label {
       cursor: pointer;
     }
 
-    &:hover > svg {
+    &:hover>svg {
       visibility: visible;
     }
   }
@@ -60,7 +60,8 @@
   color: $interactive-01;
 }
 
-// Tablet viewport
+// Tablet view port
+
 :global(.omrs-breakpoint-lt-desktop) .tableCell {
   display: flex;
   justify-content: space-between;
@@ -69,29 +70,11 @@
   align-items: center;
 
 
-  & > label {
+  &>label {
     cursor: pointer;
   }
 
   &:global(.cds--data-table tr) {
     height: spacing.$spacing-09;
   }
-}
-
-.tile {
-  text-align: center;
-  margin-top: 0.25rem;
-}
-
-.content {
-  @include type.type-style("heading-compact-01");
-  color: $text-02;
-  margin-top: spacing.$spacing-05;
-  margin-bottom: spacing.$spacing-03;
-}
-
-.helper {
-  @extend .bodyLong01;
-  color: $color-gray-70;
-  margin: 0.5rem 0;
 }

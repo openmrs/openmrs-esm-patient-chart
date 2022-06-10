@@ -11,85 +11,81 @@
 }
 
 .vitalsChartContainer {
+  border: 1px solid $ui-03;
   display: flex;
-  margin: 0rem spacing.$spacing-05;
+  text-align: left;
+  margin: 0 spacing.$spacing-03;
   flex-direction: row;
   justify-content: space-between;
 }
 
 .vitalSignsArea {
-  flex-grow: 1;
   margin: spacing.$spacing-03 0;
+  padding: 0rem;
+  width: 8.938rem;
+  border-right: 0.063rem solid $ui-03;
   padding-right: spacing.$spacing-05;
+  height: 13.875rem;
 }
 
 .vitalsChartArea {
-  flex-grow: 4;
-  padding: 0 spacing.$spacing-05 spacing.$spacing-09;
-
-  :global(.cds--cc--layout-row) {
-    height: 0;
-  }
-  
-  :global(.layout-child) {
-    margin-top: 0.5rem;
-  }
+  padding: spacing.$spacing-03 spacing.$spacing-05;
+  width: 100%;
+  height: 17.875rem;
 }
 
-.vitalsSignLabel {
+.vitalsSign {
   @extend .label01;
-  margin-bottom: 1rem;
-  display: inline-block;
+  color: $color-gray-70;
+  width: 7.063rem;
 }
 
 .verticalTabs {
   margin: 1rem 0;
   scroll-behavior: smooth;
-  
-  > ul {
-    flex-direction: column !important;
-  }
-  
-  :global(.cds--tabs--scrollable .cds--tabs--scrollable__nav-item+.cds--tabs--scrollable__nav-item) {
-    margin-left: 0rem;
-  }
-  
-  :global(.cds--tabs--scrollable .cds--tabs--scrollable__nav-link) {
-    border-bottom: 0 !important;
-    border-left: 2px solid $color-gray-30;
-  }
 }
 
-.tab {
-  outline: 0;
-  outline-offset: 0;
-
-  &:active, &:focus {
-    outline: 2px solid var(--brand-03) !important;
-  }
-
-  &[aria-selected="true"] {
-    border-left: 3px solid var(--brand-03);
-    border-bottom: none;
-    font-weight: 600;
-    margin-left: 0rem !important;
-  }
-
-  &[aria-selected="false"] {
-    border-bottom: none;
-    border-left: 2px solid $ui-03;
-    margin-left: 0rem !important;
-  }
+.verticalTabs > ul {
+  flex-direction: column !important;
 }
 
-.tablist {
-  :global(.cds--tab--list) {
-    flex-direction: column;
-    max-height: fit-content;
-    overflow-x: visible;
-  }
-  
-  > button :global(.cds--tabs .cds--tabs__nav-link) {
-    border-bottom: none;
-  }
+.verticalTabs :global(.cds--tabs--scrollable .cds--tabs--scrollable__nav-item+.cds--tabs--scrollable__nav-item) {
+  margin-left: 0rem;
+}
+
+.verticalTabs :global(.cds--tabs--scrollable .cds--tabs--scrollable__nav-link) {
+  border-bottom: 0 !important;
+  border-left: 2px solid $color-gray-30;
+}
+
+.tab:hover {
+  border-bottom: none !important;
+}
+
+.tab > button:first {
+  text-indent: 5rem;
+}
+
+.tab > button, 
+.tab > button:focus, 
+.tab > button:active {
+  outline: 0 !important;
+  outline-offset: 0 !important;
+}
+
+.selectedTab > button {
+  border-left: 2px solid var(--brand-03) !important;
+  border-bottom: 0 !important;
+  font-weight: 600 !important;
+}
+
+.tabContent {
+  border-top: 1px solid $ui-03;
+  padding: 1rem 0;
+  width: 10rem;
+}
+
+.tablist :global(.cds--tab--list) {
+  flex-direction: column;
+  height: 100%;
 }

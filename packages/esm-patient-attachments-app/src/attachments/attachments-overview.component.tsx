@@ -5,8 +5,8 @@ import { Add } from '@carbon/react/icons';
 import { LayoutType, showModal, showToast, useLayoutType, usePagination, UserHasAccess } from '@openmrs/esm-framework';
 import { PatientChartPagination, EmptyState } from '@openmrs/esm-patient-common-lib';
 import { createAttachment, deleteAttachmentPermanently, useAttachments } from './attachments.resource';
-import { createGalleryEntry } from './utils';
 import { UploadedFile, Attachment } from './attachments-types';
+import { createGalleryEntry } from './utils';
 import AttachmentsGridOverview from './attachments-grid-overview.component';
 import AttachmentsTableOverview from './attachments-table-overview.component';
 import ImagePreview from './image-preview.component';
@@ -132,7 +132,6 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
               attachments={attachments}
             />
           )}
-
           <PatientChartPagination
             currentItems={pagination.results.length}
             totalItems={attachments.length}
