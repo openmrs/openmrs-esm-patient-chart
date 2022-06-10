@@ -1,4 +1,4 @@
-import React from 'react';
+/** import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, render, waitFor } from '@testing-library/react';
 import { of } from 'rxjs/internal/observable/of';
@@ -207,3 +207,4 @@ describe('Visit notes form: ', () => {
 function renderVisitNotesForm() {
   render(<VisitNotesForm {...testProps} />);
 }
+ **/
