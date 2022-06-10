@@ -145,7 +145,7 @@ describe('Visit notes form: ', () => {
 
       const searchbox = screen.getByPlaceholderText('Choose a primary diagnosis');
       userEvent.type(searchbox, 'Diabetes Mellitus');
-      const targetSearchResult = screen.getByText(/^Diabetes Mellitus$/);
+      const targetSearchResult = screen.getByText('Diabetes Mellitus');
       expect(targetSearchResult).toBeInTheDocument();
 
       await waitFor(() => userEvent.click(targetSearchResult));
@@ -179,7 +179,7 @@ describe('Visit notes form: ', () => {
 
     const searchbox = screen.getByPlaceholderText('Choose a primary diagnosis');
     userEvent.type(searchbox, 'Diabetes Mellitus');
-    const targetSearchResult = screen.getByText(/^Diabetes Mellitus$/);
+    const targetSearchResult = screen.getByText('Diabetes Mellitus');
     expect(targetSearchResult).toBeInTheDocument();
 
     await waitFor(() => userEvent.click(targetSearchResult));
