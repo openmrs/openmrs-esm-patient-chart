@@ -79,7 +79,7 @@ describe('Visit notes form: ', () => {
 
     const searchbox = screen.getByPlaceholderText('Choose a primary diagnosis');
     userEvent.type(searchbox, 'Diabetes Mellitus');
-    const targetSearchResult = screen.getByText(/^Diabetes Mellitus$/);
+    const targetSearchResult = screen.getByText('Diabetes Mellitus');
     expect(targetSearchResult).toBeInTheDocument();
     expect(screen.getByText('Diabetes Mellitus, Type II')).toBeInTheDocument();
 
