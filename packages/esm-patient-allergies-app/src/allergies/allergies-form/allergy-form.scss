@@ -1,3 +1,6 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
 @import '../../root.scss';
 
 .header {
@@ -26,8 +29,8 @@
 }
 
 .heading {
-  @include carbon--type-style("productive-heading-03");
-  color: $text-01;
+  @include type.type-style("heading-03");
+  
   margin: 1rem 1rem 0.5rem;
 }
 
@@ -47,13 +50,13 @@
   width: 100%;
 }
 
-.wrapperContainer :global(.bx--radio-button__label) {
+.wrapperContainer :global(.cds--radio-button__label) {
   justify-content: flex-start;
 }
 
 .sectionHeading {
-  @include carbon--type-style('productive-heading-02');  
-  color: $text-01;
+  @include type.type-style('heading-compact-02');  
+  
   margin: 1rem 1rem 0.5rem;
 }
 

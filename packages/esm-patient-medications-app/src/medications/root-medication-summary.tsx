@@ -1,8 +1,8 @@
 import React from 'react';
-import MedicationsSummary from '../medications-summary/medications-summary.component';
-import styles from '../root.scss';
 import { Provider } from 'unistore/react';
+import MedicationsSummary from '../medications-summary/medications-summary.component';
 import { orderBasketStore } from './order-basket-store';
+import styles from '../root.scss';
 
 export interface RootMedicationSummaryProps {
   patientUuid: string;

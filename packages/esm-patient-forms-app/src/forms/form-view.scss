@@ -1,17 +1,17 @@
-@import "~@openmrs/esm-styleguide/src/vars";
-@import "~carbon-components/src/globals/scss/vars";
-@import "~carbon-components/src/globals/scss/mixins";
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
 
 .productiveHeading01 {
-  @include carbon--type-style("productive-heading-01");
+  @include type.type-style("heading-compact-01");
 }
 
 .bodyShort01 {
-  @include carbon--type-style("body-short-01");
+  @include type.type-style("body-compact-01");
 }
 
 .bodyLong01 {
-  @include carbon--type-style("body-long-01");
+  @include type.type-style("body-01");
 }
 
 .formContainer {
@@ -30,7 +30,7 @@
 }
 
 .formResultsLabel {
-  margin: $spacing-05;
+  margin: spacing.$spacing-05;
 }
 
 // Desktop view
@@ -66,7 +66,7 @@
   display: flex;
   justify-content: space-between;
   cursor: pointer;
-  height: $spacing-09;
+  height: spacing.$spacing-09;
   align-items: center;
 
 
@@ -74,7 +74,7 @@
     cursor: pointer;
   }
 
-  &:global(.bx--data-table tr) {
-    height: $spacing-09;
+  &:global(.cds--data-table tr) {
+    height: spacing.$spacing-09;
   }
 }

@@ -87,7 +87,7 @@ describe('Visit notes form: ', () => {
     userEvent.click(targetSearchResult);
     expect(screen.getByTitle('Diabetes Mellitus')).toBeInTheDocument();
     const diabetesMellitusTag = screen.getByLabelText('Clear filter Diabetes Mellitus');
-    expect(diabetesMellitusTag).toHaveAttribute('class', expect.stringContaining('bx--tag--red')); // primary diagnosis tags have a red background
+    expect(diabetesMellitusTag).toHaveAttribute('class', expect.stringContaining('cds--tag--red')); // primary diagnosis tags have a red background
 
     const closeTagButton = screen.getByRole('button', {
       name: 'Clear filter Diabetes Mellitus',

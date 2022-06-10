@@ -1,7 +1,7 @@
 import React from 'react';
 import useOverviewData from './useOverviewData';
 import CommonOverview from './common-overview.component';
-import { DataTableSkeleton } from 'carbon-components-react';
+import { DataTableSkeleton } from '@carbon/react';
 import { navigate } from '@openmrs/esm-framework';
 
 const defaultOpenTimeline = (patientUuid, panelUuid) => {

@@ -1,10 +1,10 @@
 import React from 'react';
-import { Tile } from 'carbon-components-react/es/components/Tile';
-import OrderBasketItemTile from './order-basket-item.component';
-import styles from './order-basket-item-list.scss';
 import { useTranslation } from 'react-i18next';
-import { OrderBasketItem } from '../types/order-basket-item';
 import { useLayoutType } from '@openmrs/esm-framework';
+import { Tile } from '@carbon/react';
+import OrderBasketItemTile from './order-basket-item.component';
+import { OrderBasketItem } from '../types/order-basket-item';
+import styles from './order-basket-item-list.scss';
 
 export interface OrderBasketItemListProps {
   orderBasketItems: Array<OrderBasketItem>;
@@ -27,7 +27,7 @@ export default function OrderBasketItemList({
   return (
     <div className={isTablet ? `${styles.orderBasketContainerTablet}` : `${styles.orderBasketContainerDesktop}`}>
       {orderBasketItems.length === 0 && (
-        <Tile light className={isTablet ? `${styles.tabletTile}` : `${styles.desktopTile}`}>
+        <Tile className={isTablet ? `${styles.tabletTile}` : `${styles.desktopTile}`}>
           <h3 className={styles.heading}>{t('orderBasket', 'Order Basket')}</h3>
           <p className={styles.content}>{t('emptyOrderBasket', 'Your basket is empty')}</p>
           <p className={styles.actionText}>{t('searchForAnOrder', 'Search for an order above')}</p>

@@ -12,9 +12,12 @@ import {
   Row,
   Tab,
   Tabs,
+  TabList,
+  TabPanel,
+  TabPanels,
   TextArea,
   TextInput,
-} from 'carbon-components-react';
+} from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { first } from 'rxjs/operators';
 import { useSWRConfig } from 'swr';
@@ -28,8 +31,8 @@ import {
   useLayoutType,
 } from '@openmrs/esm-framework';
 import { Allergens, fetchAllergensAndAllergicReactions, saveAllergy, NewAllergy } from './allergy-form.resource';
-import styles from './allergy-form.scss';
 import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import styles from './allergy-form.scss';
 
 enum AllergenTypes {
   FOOD = 'FOOD',
@@ -208,31 +211,43 @@ const AllergyForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, promptBe
           <section className={styles.section}>
             <h2 className={styles.sectionHeading}>{t('selectAllergens', 'Select the allergens')}</h2>
             <Tabs onSelectionChange={handleTabChange}>
-              {allergenTypes.map((allergenType, index) => {
-                const allergenCategory = allergenType.toLowerCase() + 'Allergens';
-                return (
-                  <Tab id={`tab-${index + 1}`} key={index} label={allergenType}>
-                    <div className={isTablet ? styles.wrapperContainer : undefined}>
-                      <RadioButtonGroup
-                        name={`allergen-type-${index + 1}`}
-                        orientation="vertical"
-                        onChange={(event) => setSelectedAllergen(event.toString())}
-                        valueSelected={selectedAllergen}
-                      >
-                        {allergens?.[allergenCategory]?.map((allergen) => (
-                          <RadioButton
-                            className={styles.radio}
-                            id={allergen.display}
-                            key={allergen.uuid}
-                            labelText={allergen.display}
-                            value={allergen.uuid}
-                          />
-                        ))}
-                      </RadioButtonGroup>
-                    </div>
-                  </Tab>
-                );
-              })}
+              <TabList aria-label="Allergen tabs">
+                {allergenTypes.map((allergenType, index) => {
+                  return (
+                    <Tab id={`tab-${index + 1}`} key={`allergen-tab-${index}`}>
+                      {allergenType}
+                    </Tab>
+                  );
+                })}
+              </TabList>
+              <TabPanels>
+                {allergenTypes.map((allergenType, index) => {
+                  const allergenCategory = allergenType.toLowerCase() + 'Allergens';
+                  return (
+                    <TabPanel key={`allergen-tab-panel-${index}`}>
+                      <div className={isTablet ? styles.wrapperContainer : undefined}>
+                        <RadioButtonGroup
+                          name={`allergen-type-${index + 1}`}
+                          key={allergenCategory}
+                          orientation="vertical"
+                          onChange={(event) => setSelectedAllergen(event.toString())}
+                          valueSelected={selectedAllergen}
+                        >
+                          {allergens?.[allergenCategory]?.map((allergen, index) => (
+                            <RadioButton
+                              key={`allergen-${index}`}
+                              className={styles.radio}
+                              id={allergen.display}
+                              labelText={allergen.display}
+                              value={allergen.uuid}
+                            />
+                          ))}
+                        </RadioButtonGroup>
+                      </div>
+                    </TabPanel>
+                  );
+                })}
+              </TabPanels>
             </Tabs>
             {selectedAllergen === otherConceptUuid ? (
               <div className={styles.input}>
@@ -286,7 +301,7 @@ const AllergyForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, promptBe
                 {severityLevels.map((severity, index) => (
                   <RadioButton
                     id={severity.toLowerCase() + 'Severity'}
-                    key={index}
+                    key={`severity-${index}`}
                     labelText={severity}
                     value={(() => {
                       switch (severity.toLowerCase()) {

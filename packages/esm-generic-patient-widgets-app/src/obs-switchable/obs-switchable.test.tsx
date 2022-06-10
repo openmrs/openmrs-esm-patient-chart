@@ -4,9 +4,9 @@ import { within } from '@testing-library/dom';
 import userEvent from '@testing-library/user-event';
 import { openmrsFetch, useConfig, usePagination } from '@openmrs/esm-framework';
 import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
-import ObsSwitchable from './obs-switchable.component';
-import { ConfigObject } from '../config-schema';
 import { mockWeightAndViralLoadResult } from '../../../../__mocks__/generic-widgets.mock';
+import { ConfigObject } from '../config-schema';
+import ObsSwitchable from './obs-switchable.component';
 
 const mockedUseConfig = useConfig as jest.Mock;
 const mockedOpenmrsFetch = openmrsFetch as jest.Mock;

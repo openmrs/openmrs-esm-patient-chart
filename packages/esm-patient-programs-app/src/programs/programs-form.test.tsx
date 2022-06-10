@@ -130,15 +130,6 @@ describe('ProgramsForm: ', () => {
     expect(testProps.closeWorkspace).toHaveBeenCalledTimes(1);
   });
 
-  it('renders a light background for date inputs in the tablet viewport ', () => {
-    mockUseLayoutType.mockReturnValueOnce('tablet').mockReturnValueOnce('tablet');
-
-    renderProgramsForm();
-
-    expect(screen.getAllByPlaceholderText('dd/mm/yyyy')[0]).toHaveClass('bx--date-picker--light', { exact: false });
-    expect(screen.getAllByPlaceholderText('dd/mm/yyyy')[1]).toHaveClass('bx--date-picker--light', { exact: false });
-  });
-
   describe('Form submission: ', () => {
     const inpatientWardUuid = 'b1a8b05e-3542-4037-bbd3-998ee9c40574';
     const oncologyScreeningProgramUuid = '11b129ca-a5e7-4025-84bf-b92a173e20de';

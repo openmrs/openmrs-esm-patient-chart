@@ -1,6 +1,6 @@
-@import "~@openmrs/esm-styleguide/src/vars";
-@import "~carbon-components/src/globals/scss/vars";
-@import "~carbon-components/src/globals/scss/mixins";
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
 
 .error-tile {
   width: 60%;
@@ -18,18 +18,17 @@
 }
 
 .heading {
-  @include carbon--type-style('productive-heading-02');
-  color: $text-01;
+  @include type.type-style('heading-compact-02');
 }
 
 .helperText {
   margin-top: 0.5rem;
-  @include carbon--type-style('body-long-01');
+  @include type.type-style('body-01');
   color: $text-02;
 }
 
 .separator {
-  @include carbon--type-style('body-short-01');
+  @include type.type-style('body-compact-01');
   color: $text-02;
   width: 12rem;
   margin: 1.375rem auto;

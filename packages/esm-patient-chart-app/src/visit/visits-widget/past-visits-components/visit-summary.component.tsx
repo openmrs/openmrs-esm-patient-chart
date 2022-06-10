@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
-
 import { useTranslation } from 'react-i18next';
-import { Tab, Tabs, Tag } from 'carbon-components-react';
+import { Tab, Tabs, TabList, TabPanel, TabPanels, Tag } from '@carbon/react';
 import {
   formatDatetime,
   formatTime,
@@ -114,38 +113,50 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid }) 
       <Tabs
         className={`${styles.verticalTabs} ${useLayoutType() === 'tablet' ? styles.tabletTabs : styles.desktopTabs}`}
       >
-        <Tab
-          className={`${styles.tab} ${styles.bodyLong01} ${selectedTab === 0 && styles.selectedTab}`}
-          id="notes-tab"
-          onClick={() => setSelectedTab(0)}
-          label={t('notes', 'Notes')}
-        >
-          <NotesSummary notes={notes} />
-        </Tab>
-        <Tab
-          className={`${styles.tab} ${selectedTab === 1 && styles.selectedTab}`}
-          id="tests-tab"
-          onClick={() => setSelectedTab(1)}
-          label={t('tests', 'Tests')}
-        >
-          <TestsSummary patientUuid={patientUuid} encounters={encounters as Array<Encounter>} />
-        </Tab>
-        <Tab
-          className={`${styles.tab} ${selectedTab === 2 && styles.selectedTab}`}
-          id="medications-tab"
-          onClick={() => setSelectedTab(2)}
-          label={t('medications', 'Medications')}
-        >
-          <MedicationSummary medications={medications} />
-        </Tab>
-        <Tab
-          className={`${styles.tab} ${selectedTab === 3 && styles.selectedTab}`}
-          id="encounters-tab"
-          onClick={() => setSelectedTab(3)}
-          label={t('encounters', 'Encounters')}
-        >
-          <EncounterList encounters={mapEncounters(encounters)} showAllEncounters={false} />
-        </Tab>
+        <TabList aria-label="Visit summary tabs">
+          <Tab
+            className={`${styles.tab} ${styles.bodyLong01} ${selectedTab === 0 && styles.selectedTab}`}
+            id="notes-tab"
+            onClick={() => setSelectedTab(0)}
+          >
+            {t('notes', 'Notes')}
+          </Tab>
+          <Tab
+            className={`${styles.tab} ${selectedTab === 1 && styles.selectedTab}`}
+            id="tests-tab"
+            onClick={() => setSelectedTab(1)}
+          >
+            {t('tests', 'Tests')}
+          </Tab>
+          <Tab
+            className={`${styles.tab} ${selectedTab === 2 && styles.selectedTab}`}
+            id="medications-tab"
+            onClick={() => setSelectedTab(2)}
+          >
+            {t('medications', 'Medications')}
+          </Tab>
+          <Tab
+            className={`${styles.tab} ${selectedTab === 3 && styles.selectedTab}`}
+            id="encounters-tab"
+            onClick={() => setSelectedTab(3)}
+          >
+            {t('encounters', 'Encounters')}
+          </Tab>
+        </TabList>
+        <TabPanels>
+          <TabPanel>
+            <NotesSummary notes={notes} />
+          </TabPanel>
+          <TabPanel>
+            <TestsSummary patientUuid={patientUuid} encounters={encounters as Array<Encounter>} />
+          </TabPanel>
+          <TabPanel>
+            <MedicationSummary medications={medications} />
+          </TabPanel>
+          <TabPanel>
+            <EncounterList encounters={mapEncounters(encounters)} showAllEncounters={false} />
+          </TabPanel>
+        </TabPanels>
       </Tabs>
     </div>
   );

@@ -1,18 +1,9 @@
 import React, { useMemo, useCallback } from 'react';
-import isEmpty from 'lodash-es/isEmpty';
-import ImmunizationsForm from './immunizations-form.component';
-import {
-  Button,
-  DataTable,
-  Table,
-  TableHead,
-  TableRow,
-  TableHeader,
-  TableBody,
-  TableCell,
-} from 'carbon-components-react';
-import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
+import isEmpty from 'lodash-es/isEmpty';
+import { Button, DataTable, Table, TableHead, TableRow, TableHeader, TableBody, TableCell } from '@carbon/react';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import ImmunizationsForm from './immunizations-form.component';
 import { ExistingDoses, Immunization } from '../types';
 
 interface SequenceTableProps {

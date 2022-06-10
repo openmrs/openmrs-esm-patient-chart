@@ -59,7 +59,7 @@ describe('VisitDetailOverview', () => {
     expect(screen.getByText(/Sorry, there was a problem displaying this information/i)).toBeInTheDocument();
   });
 
-  it(`renders a summary of the patient's visits and encounters when data is available`, async () => {
+  it.only(`renders a summary of the patient's visits and encounters when data is available`, async () => {
     mockOpenmrsFetch.mockReturnValueOnce(visitOverviewDetailMockData);
 
     renderVisitDetailOverview();
@@ -71,7 +71,6 @@ describe('VisitDetailOverview', () => {
 
     expect(visitSummariesTab).toBeInTheDocument();
     expect(allEncountersTab).toBeInTheDocument();
-
     expect(visitSummariesTab).toHaveAttribute('aria-selected', 'true');
     expect(allEncountersTab).toHaveAttribute('aria-selected', 'false');
     expect(screen.getByRole('tab', { name: /notes/i })).toBeInTheDocument();

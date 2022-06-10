@@ -1,6 +1,6 @@
 import React from 'react';
-import ConditionsDetailedSummary from './conditions-detailed-summary.component';
 import { Switch, Route, BrowserRouter } from 'react-router-dom';
+import ConditionsDetailedSummary from './conditions-detailed-summary.component';
 import { ConditionsContext } from './conditions.context';
 
 interface ConditionsProps {

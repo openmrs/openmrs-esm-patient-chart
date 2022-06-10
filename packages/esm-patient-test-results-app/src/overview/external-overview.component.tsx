@@ -1,13 +1,13 @@
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import styles from './external-overview.component.scss';
 import { EmptyState, ExternalOverviewProps, PanelFilterProps } from '@openmrs/esm-patient-common-lib';
 import { parseSingleEntry, OverviewPanelEntry } from './useOverviewData';
 import usePatientResultsData from '../loadPatientTestData/usePatientResultsData';
 import CommonOverview from './common-overview.component';
 import { navigate } from '@openmrs/esm-framework';
-import { Button, DataTableSkeleton } from 'carbon-components-react';
-import ArrowRight16 from '@carbon/icons-react/es/arrow--right/16';
+import { Button, DataTableSkeleton } from '@carbon/react';
+import { ArrowRight } from '@carbon/react/icons';
+import styles from './external-overview.scss';
 
 const resultsToShow = 3;
 
@@ -57,7 +57,7 @@ const ExternalOverview: React.FC<ExternalOverviewProps> = ({ patientUuid, filter
                     <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>{cardTitle}</h4>
                     <Button
                       kind="ghost"
-                      renderIcon={ArrowRight16}
+                      renderIcon={(props) => <ArrowRight size={16} {...props} />}
                       iconDescription="See all results"
                       onClick={handleSeeAll}
                     >

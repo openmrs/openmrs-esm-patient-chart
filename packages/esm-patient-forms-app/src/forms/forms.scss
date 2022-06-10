@@ -1,9 +1,8 @@
-@import "~@openmrs/esm-styleguide/src/vars";
-@import "~carbon-components/src/globals/scss/vars";
-@import "~carbon-components/src/globals/scss/mixins";
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
 
 .bodyShort01 {
-  @include carbon--type-style("body-short-01");
+  @include type.type-style("body-compact-01");
 }
 
 .widgetCard {

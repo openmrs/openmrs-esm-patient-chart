@@ -8,7 +8,7 @@ import {
   TableRow,
   TableCell,
   TableBody,
-} from 'carbon-components-react';
+} from '@carbon/react';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import { OverviewPanelData } from '../overview/useOverviewData';
@@ -39,7 +39,7 @@ const CommonDataTable: React.FC<CommonDataTableProps> = ({ title, data, descript
   const isTablet = useLayoutType() === 'tablet';
 
   return (
-    <DataTable rows={data} headers={tableHeaders} size="short">
+    <DataTable rows={data} headers={tableHeaders} size="sm">
       {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getTableContainerProps }) => (
         <TableContainer
           className={`${styles.tableContainer} ${isTablet ? `${styles.tablet}` : `${styles.desktop}`}`}

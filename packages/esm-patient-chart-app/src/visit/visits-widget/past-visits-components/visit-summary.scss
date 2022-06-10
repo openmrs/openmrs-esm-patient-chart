@@ -1,10 +1,9 @@
-@import "~@openmrs/esm-styleguide/src/vars";
-@import "~carbon-components/src/globals/scss/vars";
-@import "~carbon-components/src/globals/scss/mixins";
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
 @import "../../../root.scss";
 
 .diagnosisLabel {
-  @include carbon--type-style('productive-heading-01');
+  @include type.type-style('heading-compact-01');
   color: $text-02;
   margin-top: 5px;
 }
@@ -27,7 +26,7 @@
 .verticalTabs {
   margin: 1rem 0;
 
-  &:global(.bx--tabs--scrollable .bx--tabs--scrollable__nav-item+.bx--tabs--scrollable__nav-item) {
+  &:global(.cds--tabs--scrollable .cds--tabs--scrollable__nav-item+.cds--tabs--scrollable__nav-item) {
     margin-left: 0rem;
   }
   

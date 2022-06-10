@@ -1,13 +1,23 @@
 import React, { useCallback, useEffect, useState, useRef, Dispatch, SetStateAction } from 'react';
+import Camera from 'react-html5-camera-photo';
+import 'react-html5-camera-photo/build/css/index.css';
+import {
+  Button,
+  ButtonSet,
+  FileUploaderDropContainer,
+  FileUploaderItem,
+  Tab,
+  TabList,
+  TabPanel,
+  TabPanels,
+  Tabs,
+} from '@carbon/react';
+import { useTranslation } from 'react-i18next';
+import { showToast, FetchResponse } from '@openmrs/esm-framework';
+import { readFileAsString } from './utils';
+import { UploadedFile } from './attachments-types';
 import FilePreview from './file-preview.component';
 import styles from './camera-upload.scss';
-import Camera from 'react-html5-camera-photo';
-import { showToast, FetchResponse } from '@openmrs/esm-framework';
-import { useTranslation } from 'react-i18next';
-import { readFileAsString } from './utils';
-import 'react-html5-camera-photo/build/css/index.css';
-import { Tab, Tabs, FileUploaderDropContainer, FileUploaderItem, ButtonSet, Button } from 'carbon-components-react';
-import { UploadedFile } from './attachments-types';
 
 export interface CameraUploadProps {
   collectCaption?: boolean;
@@ -106,27 +116,31 @@ const CameraUpload: React.FC<CameraUploadProps> = ({ saveFile, closeModal, onCom
     <div className={styles.cameraSection}>
       <h3 className={styles.paddedProductiveHeading03}>{t('addAttachment', 'Add Attachment')}</h3>
       <Tabs className={styles.tabs}>
-        <Tab label={t('uploadMedia', 'Upload media')}>
-          <div className="cds--file__container">
-            <p className="cds--label-description">
-              {t('fileUploadTypes', 'Only images and pdf files. 500kb max file size')}
-            </p>
-            <div className={styles.uploadFile}>
-              <FileUploaderDropContainer
-                accept={['image/*', 'application/pdf']}
-                labelText={t('fileUploadInstructions', 'Drag and drop files here or click to upload')}
-                tabIndex={0}
-                multiple
-                onAddFiles={(evt, { addedFiles }) => {
-                  upload(addedFiles);
-                }}
-              />
+        <TabList aria-label="Attachment upload options">
+          <Tab>{t('uploadMedia', 'Upload media')}</Tab>
+          <Tab>{t('webcam', 'Webcam')}</Tab>
+        </TabList>
+        <TabPanels>
+          <TabPanel>
+            <div className="cds--file__container">
+              <p className="cds--label-description"></p>
+              <div className={styles.uploadFile}>
+                <FileUploaderDropContainer
+                  accept={['image/*', 'application/pdf']}
+                  labelText={t('fileUploadInstructions', 'Drag and drop files here or click to upload')}
+                  tabIndex={0}
+                  multiple
+                  onAddFiles={(evt, { addedFiles }) => {
+                    upload(addedFiles);
+                  }}
+                />
+              </div>
             </div>
-          </div>
-        </Tab>
-        <Tab label={t('webcam', 'Webcam')}>
-          <CameraComponent handleTakePhoto={handleTakePhoto} setError={setError} />
-        </Tab>
+          </TabPanel>
+          <TabPanel>
+            <CameraComponent handleTakePhoto={handleTakePhoto} setError={setError} />
+          </TabPanel>
+        </TabPanels>
       </Tabs>
     </div>
   );

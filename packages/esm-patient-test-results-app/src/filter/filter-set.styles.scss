@@ -1,6 +1,6 @@
-@import "~@openmrs/esm-styleguide/src/vars";
-@import "~carbon-components/src/globals/scss/vars";
-@import "~carbon-components/src/globals/scss/mixins";
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
 
 .stickyFilterSet {
   position: sticky;
@@ -12,14 +12,14 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: $spacing-03;
+  margin-bottom: spacing.$spacing-03;
   background-color: $openmrs-background-grey;
   position: sticky;
   top: 0;
   z-index: 1;
 
   h4 {
-    @include carbon--type-style("productive-heading-02");
+    @include type.type-style("heading-compact-02");
     color: $text-02;
   }
 
@@ -38,14 +38,14 @@
 // background of filter, and spacing between containers
 .nestedAccordion {
   background-color: $openmrs-background-grey;
-  margin: $spacing-02 0;
+  margin: spacing.$spacing-02 0;
   @media (min-width: $breakpoint-desktop-min) {
     background-color: $ui-background;
   }
 }
 
 // our special accordion rules
-.nestedAccordion > :global(.bx--accordion--start) > :global(.bx--accordion__item--active) {
+.nestedAccordion > :global(.cds--accordion--start) > :global(.cds--accordion__item--active) {
   border-left: 0.3rem solid var(--brand-01);
   @media (max-width: $breakpoint-tablet-max) {
     margin: 1.5rem 0;
@@ -55,27 +55,27 @@
 .nestedAccordion :global {
   // extending carbon's accordion to handle nested accordions
   // accordion content
-  .bx--accordion__content {
+  .cds--accordion__content {
     padding: 0;
     margin: 0;
   }
 
-  .bx--accordion__item > .bx--accordion__content {
+  .cds--accordion__item > .cds--accordion__content {
     display: none;
   }
 
-  .bx--accordion__item--active > .bx--accordion__content {
+  .cds--accordion__item--active > .cds--accordion__content {
     display: block;
   }
 
-  .bx--accordion__title {
+  .cds--accordion__title {
     margin: 0 0 0 0.8rem;
     @media (min-width: $breakpoint-desktop-min) {
       margin: 0 0 0 0.5rem;
     }
   }
 
-  .bx--accordion__arrow {
+  .cds--accordion__arrow {
     margin: 0.4rem 0 0 1rem;
     @media (min-width: $breakpoint-desktop-min) {
       margin: 0.4rem 0 0 0.6rem;
@@ -83,23 +83,23 @@
   }
 
   @media (min-width: $breakpoint-desktop-min) {
-    .bx--accordion__item > button {
+    .cds--accordion__item > button {
       padding: 0;
     }
   }
 
   // Chevron transformations
-  .bx--accordion__item > button[aria-expanded="false"] > .bx--accordion__arrow {
+  .cds--accordion__item > button[aria-expanded="false"] > .cds--accordion__arrow {
     transform: rotate(90deg);
 }
 
-  .bx--accordion__item--active > .bx--accordion__heading > .bx--accordion__arrow {
+  .cds--accordion__item--active > .cds--accordion__heading > .cds--accordion__arrow {
     /*rtl:ignore*/
     transform: rotate(-90deg);
     fill: var(--brand-01);
   }
 
-  .bx--checkbox-label-text {
+  .cds--checkbox-label-text {
     padding: 0 0 0 .75rem;
   }
 }

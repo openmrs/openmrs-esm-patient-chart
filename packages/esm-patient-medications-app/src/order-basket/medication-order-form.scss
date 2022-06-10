@@ -1,9 +1,11 @@
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
 @import "../root";
 
 .medicationDetailsHeader {
   position: sticky;
   background-color: var(--brand-02);
-  color: $inverse-01;
+  // color: $inverse-01; // FIX
   border: 0;
   top: 0rem;
   padding: 1rem;
@@ -17,8 +19,8 @@
 }
 
 .heading {
-  @include carbon--type-style("productive-heading-03");
-  color: $text-01;
+  @include type.type-style("heading-03");
+  
   margin: 0.5rem 1rem;
 }
 
@@ -27,16 +29,16 @@
 }
 
 .fullWidthDatePickerContainer {
-  :global .bx--date-picker {
+  :global .cds--date-picker {
     width: 100%;
 
-    :global .bx--date-picker-container {
+    :global .cds--date-picker-container {
       width: 100%;
 
-      :global .bx--date-picker-input__wrapper {
+      :global .cds--date-picker-input__wrapper {
         width: 100%;
 
-        :global .bx--date-picker__input {
+        :global .cds--date-picker__input {
           width: 100%;
         }
       }
@@ -45,17 +47,17 @@
 }
 
 .fullHeightTextAreaContainer {
-  :global .bx--form-item {
+  :global .cds--form-item {
     height: 100%;
 
-    :global .bx--text-area__wrapper {
+    :global .cds--text-area__wrapper {
       height: 100%;
     }
   }
 }
 
 .dosageInfo {
-  @include carbon--type-style("productive-heading-01");
+  @include type.type-style("heading-compact-01");
 }
 
 .backButton {
@@ -79,7 +81,7 @@
   }
 }
 
-.orderForm :global(.bx--btn-set .bx--btn) {
+.orderForm :global(.cds--btn-set .cds--btn) {
   max-width: 50%;
   height: 4rem;
 }

@@ -1,6 +1,5 @@
 import React from 'react';
-import Add16 from '@carbon/icons-react/es/add/16';
-import styles from './programs-overview.scss';
+import { useTranslation } from 'react-i18next';
 import { formatDate, formatDatetime, usePagination } from '@openmrs/esm-framework';
 import {
   DataTable,
@@ -15,7 +14,8 @@ import {
   TableHeader,
   TableRow,
   InlineNotification,
-} from 'carbon-components-react';
+} from '@carbon/react';
+import { Add } from '@carbon/react/icons';
 import filter from 'lodash-es/filter';
 import includes from 'lodash-es/includes';
 import map from 'lodash-es/map';
@@ -26,8 +26,8 @@ import {
   PatientChartPagination,
   launchPatientWorkspace,
 } from '@openmrs/esm-patient-common-lib';
-import { useTranslation } from 'react-i18next';
 import { useAvailablePrograms, useEnrollments } from './programs.resource';
+import styles from './programs-overview.scss';
 
 interface ProgramsOverviewProps {
   basePath: string;
@@ -96,7 +96,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
           <span>{isValidating ? <InlineLoading /> : null}</span>
           <Button
             kind="ghost"
-            renderIcon={Add16}
+            renderIcon={(props) => <Add size={16} {...props} />}
             iconDescription="Add programs"
             onClick={launchProgramsForm}
             disabled={availablePrograms?.length && eligiblePrograms?.length === 0}
@@ -114,7 +114,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
               title={t('fullyEnrolled', 'Enrolled in all programs')}
             />
           )}
-          <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="short">
+          <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="sm">
             {({ rows, headers, getHeaderProps, getTableProps }) => (
               <Table {...getTableProps()} useZebraStyles>
                 <TableHead>

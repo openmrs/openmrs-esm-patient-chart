@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
-import Add16 from '@carbon/icons-react/es/add/16';
 import { CardHeader, EmptyDataIllustration, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { Button, DataTableSkeleton, ContentSwitcher, InlineLoading, Switch, Tile } from 'carbon-components-react';
+import { Button, DataTableSkeleton, ContentSwitcher, InlineLoading, Switch, Tile } from '@carbon/react';
+import { Add } from '@carbon/react/icons';
 import { useAppointments } from './appointments.resource';
-import styles from './appointments-base.component.scss';
 import AppointmentsTable from './appointments-table.component';
+import styles from './appointments-base.scss';
 
 interface AppointmentsBaseProps {
   basePath?: string;
@@ -52,7 +52,12 @@ const AppointmentsBase: React.FC<AppointmentsBaseProps> = ({ patientUuid }) => {
               <Switch name={'past'} text={t('past', 'Past')} />
             </ContentSwitcher>
             <div className={styles.divider}></div>
-            <Button kind="ghost" renderIcon={Add16} iconDescription="Add Appointments" onClick={launchAppointmentsForm}>
+            <Button
+              kind="ghost"
+              renderIcon={(props) => <Add size={16} {...props} />}
+              iconDescription="Add Appointments"
+              onClick={launchAppointmentsForm}
+            >
               {t('add', 'Add')}
             </Button>
           </div>
@@ -63,7 +68,7 @@ const AppointmentsBase: React.FC<AppointmentsBaseProps> = ({ patientUuid }) => {
               return <AppointmentsTable patientAppointments={appointmentsData?.upcomingAppointments} />;
             }
             return (
-              <Tile light className={styles.tile}>
+              <Tile className={styles.tile}>
                 <EmptyDataIllustration />
                 <p className={styles.content}>
                   {t('noUpcomingAppointments', 'There are no upcoming appointments to display for this patient')}
@@ -76,7 +81,7 @@ const AppointmentsBase: React.FC<AppointmentsBaseProps> = ({ patientUuid }) => {
               return <AppointmentsTable patientAppointments={appointmentsData?.pastAppointments} />;
             }
             return (
-              <Tile light className={styles.tile}>
+              <Tile className={styles.tile}>
                 <EmptyDataIllustration />
                 <p className={styles.content}>
                   {t('noPastAppointments', 'There are no past appointments to display for this patient')}

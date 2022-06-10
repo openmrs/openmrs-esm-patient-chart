@@ -1,5 +1,4 @@
 import React from 'react';
-import Add16 from '@carbon/icons-react/es/add/16';
 import {
   DataTableSkeleton,
   DataTable,
@@ -12,8 +11,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from 'carbon-components-react';
+} from '@carbon/react';
+import { Add } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
+import { usePagination } from '@openmrs/esm-framework';
 import {
   CardHeader,
   EmptyState,
@@ -21,7 +22,6 @@ import {
   launchPatientWorkspace,
   PatientChartPagination,
 } from '@openmrs/esm-patient-common-lib';
-import { usePagination } from '@openmrs/esm-framework';
 import { allergiesCount, patientAllergiesFormWorkspace } from '../constants';
 import { useAllergies } from './allergy-intolerance.resource';
 import styles from './allergies-overview.scss';
@@ -72,13 +72,18 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient, showAddA
         <CardHeader title={headerTitle}>
           <span>{isValidating ? <InlineLoading /> : null}</span>
           {showAddAllergyButton && (
-            <Button kind="ghost" renderIcon={Add16} iconDescription="Add allergies" onClick={launchAllergiesForm}>
+            <Button
+              kind="ghost"
+              renderIcon={(props) => <Add size={16} {...props} />}
+              iconDescription="Add allergies"
+              onClick={launchAllergiesForm}
+            >
               {t('add', 'Add')}
             </Button>
           )}
         </CardHeader>
         <TableContainer>
-          <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="short">
+          <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="sm">
             {({ rows, headers, getHeaderProps, getTableProps }) => (
               <Table {...getTableProps()} useZebraStyles>
                 <TableHead>

@@ -2,8 +2,11 @@ import React from 'react';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { useLayoutType, useStore } from '@openmrs/esm-framework/mock';
+import { useLayoutType, useStore } from '@openmrs/esm-framework';
 import OrderBasketActionButton from './order-basket-action-button.component';
+
+const mockedUseLayoutType = useLayoutType as jest.Mock;
+const mockedUseStore = useStore as jest.Mock;
 
 jest.mock('@openmrs/esm-framework/mock', () => ({
   ...Object(jest.requireActual('@openmrs/esm-framework/mock')),
@@ -23,11 +26,11 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
   };
 });
 
-useStore.mockImplementation(() => ({ items: [{ name: 'order-01', uuid: 'some-uuid' }] }));
+mockedUseStore.mockImplementation(() => ({ items: [{ name: 'order-01', uuid: 'some-uuid' }] }));
 
 describe('<OrderBasketActionButton/>', () => {
   it('should display tablet view action button', () => {
-    useLayoutType.mockImplementation(() => 'tablet');
+    mockedUseLayoutType.mockImplementation(() => 'tablet');
     render(<OrderBasketActionButton />);
 
     const orderBasketButton = screen.getByRole('button', { name: /Order Basket/i });
@@ -39,7 +42,7 @@ describe('<OrderBasketActionButton/>', () => {
   });
 
   it('should display desktop view action button', () => {
-    useLayoutType.mockImplementation(() => 'desktop');
+    mockedUseLayoutType.mockImplementation(() => 'desktop');
     render(<OrderBasketActionButton />);
 
     const orderBasketButton = screen.getByRole('button', { name: /Orders/i });
@@ -51,15 +54,16 @@ describe('<OrderBasketActionButton/>', () => {
   });
 
   it('should display the count Tag if order are present on desktop view', () => {
-    useLayoutType.mockImplementation(() => 'desktop');
+    mockedUseLayoutType.mockImplementation(() => 'desktop');
     // @ts-ignore
     render(<OrderBasketActionButton />);
 
-    expect(screen.getByRole('button', { name: /orders 1/i })).toBeInTheDocument();
+    expect(screen.getByText(/orders/i)).toBeInTheDocument();
+    expect(screen.getByText(/1/i)).toBeInTheDocument();
   });
 
   it('should display the count Tag if order are present on tablet view', () => {
-    useLayoutType.mockImplementation(() => 'tablet');
+    mockedUseLayoutType.mockImplementation(() => 'tablet');
     // @ts-ignore
     render(<OrderBasketActionButton />);
 

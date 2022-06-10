@@ -1,7 +1,5 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { CardHeader, EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import Add16 from '@carbon/icons-react/es/add/16';
 import {
   Button,
   DataTable,
@@ -14,11 +12,13 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from 'carbon-components-react';
-import styles from './allergies-detailed-summary.scss';
+} from '@carbon/react';
+import { Add } from '@carbon/react/icons';
+import { formatDate, parseDate } from '@openmrs/esm-framework';
+import { CardHeader, EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { useAllergies } from './allergy-intolerance.resource';
 import { patientAllergiesFormWorkspace } from '../constants';
-import { formatDate, parseDate } from '@openmrs/esm-framework';
+import styles from './allergies-detailed-summary.scss';
 
 interface AllergiesDetailedSummaryProps {
   patient: fhir.Patient;
@@ -87,7 +87,12 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
         <CardHeader title={headerTitle}>
           <span>{isValidating ? <InlineLoading /> : null}</span>
           {showAddAllergyButton && (
-            <Button kind="ghost" renderIcon={Add16} iconDescription="Add allergies" onClick={launchAllergiesForm}>
+            <Button
+              kind="ghost"
+              renderIcon={(props) => <Add size={16} {...props} />}
+              iconDescription="Add allergies"
+              onClick={launchAllergiesForm}
+            >
               {t('add', 'Add')}
             </Button>
           )}

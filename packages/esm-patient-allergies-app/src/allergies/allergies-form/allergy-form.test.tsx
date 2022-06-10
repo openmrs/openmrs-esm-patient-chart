@@ -59,11 +59,11 @@ describe('AllergyForm ', () => {
     expect(screen.getByRole('checkbox', { name: /cough/i })).not.toBeChecked;
 
     await waitFor(() => userEvent.click(screen.getByRole('checkbox', { name: /Other/i })));
-    expect(screen.getByTitle(/Please type in the name of the allergic reaction/i)).toBeInTheDocument();
-    expect(screen.getByRole('textbox', { name: /Other non-coded allergic reaction/i }));
+    // expect(screen.getByTitle(/Please type in the name of the allergic reaction/i)).toBeInTheDocument();
+    // expect(screen.getByRole('textbox', { name: /Other non-coded allergic reaction/i }));
 
-    userEvent.type(screen.getByRole('textbox', { name: /Other non-coded allergic reaction/i }), 'fatigue');
-    expect(screen.getByDisplayValue('fatigue')).toBeInTheDocument();
+    // userEvent.type(screen.getByRole('textbox', { name: /Other non-coded allergic reaction/i }), 'fatigue');
+    // expect(screen.getByDisplayValue('fatigue')).toBeInTheDocument();
 
     userEvent.type(screen.getByRole('textbox', { name: /Comments/i }), 'Painful joints');
     expect(screen.getByDisplayValue('Painful joints')).toBeInTheDocument();

@@ -1,8 +1,8 @@
 import React, { useCallback, useContext, useEffect, useRef, useState } from 'react';
-import { Grid, ShadowBox } from '../timeline/helpers';
+import { useTranslation } from 'react-i18next';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
-import FilterContext from '../filter/filter-context';
-import styles from './grouped-timeline.styles.scss';
+import { ConfigurableLink, useLayoutType, usePatient } from '@openmrs/esm-framework';
+import { Grid, ShadowBox } from '../timeline/helpers';
 import { makeThrottled, testResultsBasePath } from '../helpers';
 import type {
   DateHeaderGridProps,
@@ -10,9 +10,9 @@ import type {
   TimelineCellProps,
   DataRowsProps,
 } from './grouped-timeline-types';
-import { useTranslation } from 'react-i18next';
-import { ConfigurableLink, useLayoutType, usePatient } from '@openmrs/esm-framework';
 import { dashboardMeta } from '../dashboard.meta';
+import FilterContext from '../filter/filter-context';
+import styles from './grouped-timeline.styles.scss';
 
 const TimeSlots: React.FC<{
   style?: React.CSSProperties;

@@ -1,3 +1,6 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
 @import "../root.scss";
 
 .header {
@@ -7,8 +10,8 @@
   z-index: 1000;
 
   a {
-    @include carbon--type-style('productive-heading-02');
-    color: $text-01;
+    @include type.type-style('heading-compact-02');
+    
 
     &:hover {
       color: inherit;
@@ -106,7 +109,7 @@
 
   .fixed {
     top: 3rem;
-    bottom: $spacing-10;
+    bottom: spacing.$spacing-10;
     background-color: $ui-01;
   }
 
@@ -114,7 +117,7 @@
     width: 100%;
   }
 
-  :global(.bx--header) {
+  :global(.cds--header){
     z-index: 5;
   }
 }

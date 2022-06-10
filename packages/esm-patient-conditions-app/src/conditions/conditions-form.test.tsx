@@ -19,6 +19,7 @@ jest.mock('lodash-es/debounce', () => jest.fn((fn) => fn));
 const testProps = {
   patientUuid: mockPatient.id,
   closeWorkspace: jest.fn(),
+  promptBeforeClosing: jest.fn(),
 };
 
 const mockCreateErrorHandler = createErrorHandler as jest.Mock;
@@ -88,20 +89,6 @@ describe('ConditionsForm: ', () => {
     fireEvent.click(screen.getByRole('radio', { name: /Inactive/i }));
 
     expect(screen.getByLabelText(/End date/i)).toBeInTheDocument();
-  });
-
-  it('renders a light background for the searchbox and date inputs in the tablet viewport ', () => {
-    mockUseLayoutType.mockReturnValueOnce('tablet').mockReturnValueOnce('tablet').mockReturnValueOnce('tablet');
-
-    renderConditionsForm();
-
-    expect(screen.getByRole('search', { name: /Enter condition/i })).toHaveClass('bx--search--light', { exact: false });
-
-    // Enable 'End date' field
-    fireEvent.click(screen.getByRole('radio', { name: /Inactive/i }));
-
-    expect(screen.getAllByPlaceholderText('dd/mm/yyyy')[0]).toHaveClass('bx--date-picker--light', { exact: false });
-    expect(screen.getAllByPlaceholderText('dd/mm/yyyy')[1]).toHaveClass('bx--date-picker--light', { exact: false });
   });
 
   describe('Conditions search: ', () => {

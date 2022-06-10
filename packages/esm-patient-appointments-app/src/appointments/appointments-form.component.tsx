@@ -12,7 +12,7 @@ import {
   TextArea,
   TimePickerSelect,
   TimePicker,
-} from 'carbon-components-react';
+} from '@carbon/react';
 import { amPm, convertTime12to24, DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import { useLocations, useSession, showToast, showNotification, useLayoutType } from '@openmrs/esm-framework';
 import { appointmentsSearchUrl, createAppointment, useAppointmentService } from './appointments.resource';

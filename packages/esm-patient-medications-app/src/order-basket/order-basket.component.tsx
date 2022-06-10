@@ -3,7 +3,7 @@ import OrderBasketSearch from './order-basket-search.component';
 import MedicationOrderForm from './medication-order-form.component';
 import OrderBasketItemList from './order-basket-item-list.component';
 import MedicationsDetailsTable from '../components/medications-details-table.component';
-import { Button, ButtonSet, DataTableSkeleton, SearchSkeleton } from 'carbon-components-react';
+import { Button, ButtonSet, DataTableSkeleton, SearchSkeleton } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { OrderBasketItem } from '../types/order-basket-item';
 import { getDurationUnits, getPatientEncounterId, usePatientOrders } from '../api/api';
@@ -13,8 +13,8 @@ import { orderDrugs } from './drug-ordering';
 import { connect } from 'unistore/react';
 import { OrderBasketStore, OrderBasketStoreActions, orderBasketStoreActions } from '../medications/order-basket-store';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
-import styles from './order-basket.scss';
 import { ConfigObject } from '../config-schema';
+import styles from './order-basket.scss';
 
 export interface OrderBasketProps {
   closeWorkspace(): void;

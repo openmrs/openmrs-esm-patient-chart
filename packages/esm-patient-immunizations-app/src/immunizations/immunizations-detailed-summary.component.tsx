@@ -1,21 +1,9 @@
 import React, { useMemo } from 'react';
-import Add16 from '@carbon/icons-react/es/add/16';
-import SequenceTable from './immunizations-sequence-table';
 import get from 'lodash-es/get';
 import first from 'lodash-es/first';
 import isEmpty from 'lodash-es/isEmpty';
 import orderBy from 'lodash-es/orderBy';
-import styles from './immunizations-detailed-summary.scss';
-import {
-  CardHeader,
-  EmptyState,
-  ErrorState,
-  launchPatientWorkspace,
-  PatientChartPagination,
-} from '@openmrs/esm-patient-common-lib';
-import { useConfig, usePagination } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import { useImmunizations, useImmunizationsConceptSet } from './immunizations.resource';
 import {
   Button,
   DataTable,
@@ -30,10 +18,22 @@ import {
   TableCell,
   TableExpandedRow,
   InlineLoading,
-} from 'carbon-components-react';
-import { ExistingDoses, Sequence } from '../types';
+} from '@carbon/react';
+import { Add } from '@carbon/react/icons';
+import {
+  CardHeader,
+  EmptyState,
+  ErrorState,
+  launchPatientWorkspace,
+  PatientChartPagination,
+} from '@openmrs/esm-patient-common-lib';
+import { useConfig, usePagination } from '@openmrs/esm-framework';
+import { useImmunizations, useImmunizationsConceptSet } from './immunizations.resource';
 import { findConfiguredSequences, findExistingDoses, latestFirst } from './utils';
+import { ExistingDoses, Sequence } from '../types';
 import { immunizationFormSub } from './immunization-utils';
+import SequenceTable from './immunizations-sequence-table';
+import styles from './immunizations-detailed-summary.scss';
 
 interface ImmunizationsDetailedSummaryProps {
   patientUuid: string;
@@ -92,7 +92,7 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
           add: (
             <Button
               kind="ghost"
-              renderIcon={Add16}
+              renderIcon={(props) => <Add size={16} {...props} />}
               iconDescription="Add"
               onClick={() => {
                 immunizationFormSub.next({
@@ -128,7 +128,12 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
     <div className={styles.widgetCard}>
       <CardHeader title={headerTitle}>
         <span>{isValidating ? <InlineLoading /> : null}</span>
-        <Button kind="ghost" renderIcon={Add16} iconDescription="Add immunizations" onClick={launchImmunizationsForm}>
+        <Button
+          kind="ghost"
+          renderIcon={(props) => <Add size={16} {...props} />}
+          iconDescription="Add immunizations"
+          onClick={launchImmunizationsForm}
+        >
           {t('add', 'Add')}
         </Button>
       </CardHeader>

@@ -1,16 +1,13 @@
-@import "~@openmrs/esm-styleguide/src/vars";
-@import "~carbon-components/src/globals/scss/vars";
-@import "~carbon-components/src/globals/scss/mixins";
-@import "~carbon-components/scss/globals/scss/vendor/@carbon/elements/scss/type/styles";
-@import "~carbon-components/src/globals/scss/vendor/@carbon/layout/scss/generated/spacing";
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
 
 .productiveHeading02 {
   color: $color-gray-70;
-  @include carbon--type-style("productive-heading-02");
+  @include type.type-style("heading-compact-02");
 }
 
 $openmrs-background-grey: #ededed;
-
 
 :global(.omrs-breakpoint-lt-desktop) .formWrapper {
   background-color: $openmrs-background-grey;
@@ -22,8 +19,8 @@ $openmrs-background-grey: #ededed;
 
 .formGroup {
   display: flex;
-  margin-bottom: $spacing-02;
-  padding: $spacing-05;
+  margin-bottom: spacing.$spacing-02;
+  padding: spacing.$spacing-05;
 }
 
 :global(.omrs-breakpoint-lt-desktop) .formGroup > span{
@@ -57,14 +54,14 @@ $openmrs-background-grey: #ededed;
 }
 
 :global(.omrs-breakpoint-lt-desktop) .buttonGroup {
-  padding: $spacing-05 $spacing-06;
+  padding: spacing.$spacing-05 spacing.$spacing-06;
   background-color: $ui-02;
 }
 
 .buttonGroup button {
   max-width: none;
   width: 50%;
-  height: $spacing-10;
+  height: spacing.$spacing-10;
   align-items: flex-start;
 }
 

@@ -1,6 +1,5 @@
-@import "~@openmrs/esm-styleguide/src/vars";
-@import "~carbon-components/src/globals/scss/vars";
-@import "~carbon-components/src/globals/scss/mixins";
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
 
 .container:after {
 	content: '';
@@ -15,11 +14,11 @@
 
 .details {
 	margin-top: 5px;
-	@include carbon--type-style('body-short-01');
+	@include type.type-style('body-compact-01');
 	color: $text-02;
 }
 
 .name {
-	@include carbon--type-style('body-short-02');
-	color: $text-01;
+	@include type.type-style('body-compact-02');
+	
 }

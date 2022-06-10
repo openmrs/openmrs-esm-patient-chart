@@ -1,4 +1,5 @@
-@import "~carbon-components/src/globals/scss/vendor/@carbon/layout/scss/generated/spacing";
+@use '@carbon/styles/scss/spacing';
+@import '~@openmrs/esm-styleguide/src/vars';
 
 $actionNavOffset: 45px;
 $actionPanelOffset: 256px;
@@ -17,7 +18,7 @@ $actionPanelExpandedOffset: $actionNavOffset+$actionPanelOffset;
   grid-column: 1;
   align-self: start;
   height: 90%;
-  padding-bottom: $spacing-10;
+  padding-bottom: spacing.$spacing-10;
 }
 
 .chartContainer {
@@ -25,7 +26,7 @@ $actionPanelExpandedOffset: $actionNavOffset+$actionPanelOffset;
   display: flex;
   align-items: flex-start;
   flex-direction: column;
-  padding-right: $spacing-01;
+  padding-right: spacing.$spacing-01;
 }
 
 :global(.omrs-breakpoint-gt-tablet) .chartContainer {

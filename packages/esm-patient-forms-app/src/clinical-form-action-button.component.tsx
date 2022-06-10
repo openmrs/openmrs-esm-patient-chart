@@ -1,9 +1,9 @@
 import React from 'react';
-import Document20 from '@carbon/icons-react/es/document/20';
-import styles from './clinical-form-action-button.scss';
+import { Button } from '@carbon/react';
+import { Document } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { useLayoutType } from '@openmrs/esm-framework';
-import { Button } from 'carbon-components-react';
+import styles from './clinical-form-action-button.scss';
 
 const ClinicalFormActionButton: React.FC = () => {
   const { t } = useTranslation();
@@ -12,7 +12,7 @@ const ClinicalFormActionButton: React.FC = () => {
   if (layout === 'tablet')
     return (
       <Button kind="ghost" className={styles.container}>
-        <Document20 />
+        <Document size={20} />
         <span>{t('clinicalForm', 'Clinical form')}</span>
       </Button>
     );
@@ -21,7 +21,7 @@ const ClinicalFormActionButton: React.FC = () => {
     <Button
       className={styles.container}
       kind="ghost"
-      renderIcon={Document20}
+      renderIcon={(props) => <Document size={20} {...props} />}
       hasIconOnly
       iconDescription={t('form', 'Form')}
       tooltipAlignment="start"

@@ -8,7 +8,8 @@ import {
   Grid,
   Row,
   Switch,
-} from 'carbon-components-react';
+} from '@carbon/react';
+import { TreeViewAlt } from '@carbon/react/icons';
 import FilterSet, { FilterContext, FilterProvider } from '../filter';
 import GroupedTimeline, { useGetManyObstreeData } from '../grouped-timeline';
 import { ErrorState } from '@openmrs/esm-patient-common-lib';
@@ -19,7 +20,6 @@ import { useTranslation } from 'react-i18next';
 import { testResultsBasePath } from '../helpers';
 import Trendline from '../trendline/trendline.component';
 import TabletOverlay from '../tablet-overlay';
-import { TreeViewAlt16 } from '@carbon/icons-react';
 
 type viewOpts = 'split' | 'full';
 type panelOpts = 'tree' | 'panel';
@@ -81,7 +81,7 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, ty
                   <Button
                     size={tablet ? 'md' : 'sm'}
                     kind="ghost"
-                    renderIcon={TreeViewAlt16}
+                    renderIcon={(props) => <TreeViewAlt {...props} size={16} />}
                     onClick={() => setShowTreeOverlay(true)}
                     style={{
                       marginRight: '1rem',

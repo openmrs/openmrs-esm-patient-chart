@@ -21,9 +21,8 @@ import {
   TableToolbarContent,
   TableToolbarSearch,
   Tile,
-} from 'carbon-components-react';
-import Add16 from '@carbon/icons-react/es/add/16';
-import Edit16 from '@carbon/icons-react/es/edit/16';
+} from '@carbon/react';
+import { Edit } from '@carbon/react/icons';
 import { formatDatetime, formatTime, parseDate, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { formEntrySub, launchPatientWorkspace, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { MappedEncounter } from './visit-summary.component';
@@ -126,7 +125,7 @@ const EncounterList: React.FC<EncounterListProps> = ({ showAllEncounters, encoun
           headers={tableHeaders}
           rows={tableRows}
           overflowMenuOnHover={isTablet ? false : true}
-          size={isTablet ? 'normal' : 'short'}
+          size={isTablet ? 'lg' : 'xs'}
           useZebraStyles
         >
           {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getToolbarProps, onInputChange }) => (
@@ -176,8 +175,8 @@ const EncounterList: React.FC<EncounterListProps> = ({ showAllEncounters, encoun
                             <TableCell key={cell.id}>{cell.value}</TableCell>
                           ))}
                           {showAllEncounters ? (
-                            <TableCell className="bx--table-column-menu">
-                              <OverflowMenu light size="sm" flipped>
+                            <TableCell className="cds--table-column-menu">
+                              <OverflowMenu aria-label="Actions menu" light size="sm" flipped>
                                 <OverflowMenuItem
                                   className={styles.menuItem}
                                   id="#editEncounter"
@@ -226,7 +225,7 @@ const EncounterList: React.FC<EncounterListProps> = ({ showAllEncounters, encoun
                                 onClick={() =>
                                   launchWorkspace(encounters[i].form.uuid, encounters[i].visitUuid, encounters[i].id)
                                 }
-                                renderIcon={Edit16}
+                                renderIcon={(props) => <Edit size={16} {...props} />}
                                 style={{ marginLeft: '-1rem', marginTop: '0.5rem' }}
                               >
                                 {t('editEncounter', 'Edit encounter')}

@@ -1,8 +1,8 @@
 import React from 'react';
-import styles from './attachments-grid-overview.scss';
+import { SkeletonPlaceholder } from '@carbon/react';
 import { Attachment } from './attachments-types';
 import AttachmentThumbnail from './attachment-thumbnail.component';
-import { SkeletonPlaceholder } from 'carbon-components-react';
+import styles from './attachments-grid-overview.scss';
 
 interface AttachmentsGridOverviewProps {
   isLoading: boolean;

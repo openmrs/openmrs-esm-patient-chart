@@ -1,10 +1,10 @@
 import React, { useCallback } from 'react';
-import Pen20 from '@carbon/icons-react/es/pen/20';
+import { useTranslation } from 'react-i18next';
+import { Button } from '@carbon/react';
+import { Pen } from '@carbon/react/icons';
+import { useLayoutType } from '@openmrs/esm-framework';
 import { launchPatientWorkspace, useWorkspaces } from '@openmrs/esm-patient-common-lib';
 import styles from './visit-note-action-button.scss';
-import { useTranslation } from 'react-i18next';
-import { useLayoutType } from '@openmrs/esm-framework';
-import { Button } from 'carbon-components-react';
 
 const VisitNoteActionButton: React.FC = () => {
   const { t } = useTranslation();
@@ -22,7 +22,7 @@ const VisitNoteActionButton: React.FC = () => {
         tabIndex={0}
         onClick={handleClick}
       >
-        <Pen20 />
+        <Pen size={20} />
         <span>{t('visitNote', 'Visit note')}</span>
       </Button>
     );
@@ -30,9 +30,9 @@ const VisitNoteActionButton: React.FC = () => {
     <Button
       className={`${styles.container} ${isActive && styles.active}`}
       onClick={handleClick}
-      kind="ghost"
-      renderIcon={Pen20}
       hasIconOnly
+      kind="ghost"
+      renderIcon={(props) => <Pen size={20} {...props} />}
       iconDescription={t('note', 'Note')}
       tooltipAlignment="start"
       tooltipPosition="left"

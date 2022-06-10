@@ -1,6 +1,6 @@
 import React from 'react';
-import { ArrowLeft16, Close16 } from '@carbon/icons-react';
-import { Button, Header } from 'carbon-components-react';
+import { Button, Header } from '@carbon/react';
+import { ArrowLeft, Close } from '@carbon/react/icons';
 import styles from './tablet-overlay.scss';
 
 interface OverlayProps {
@@ -13,7 +13,7 @@ const Overlay: React.FC<OverlayProps> = ({ close, children, headerText, buttonsG
   <div className={styles.tabletOverlay}>
     <Header className={styles.tabletOverlayHeader}>
       <Button onClick={close} hasIconOnly>
-        <ArrowLeft16 onClick={close} />
+        <ArrowLeft size={16} onClick={close} />
       </Button>
       <div className={styles.headerContent}>{headerText}</div>
     </Header>

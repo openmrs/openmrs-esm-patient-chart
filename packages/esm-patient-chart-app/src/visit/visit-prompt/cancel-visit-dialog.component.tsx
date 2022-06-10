@@ -1,8 +1,8 @@
 import React, { useCallback, useState } from 'react';
+import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { useVisit, openmrsFetch, showToast, showNotification } from '@openmrs/esm-framework';
-import styles from './cancel-visit-dialog.scss';
-import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
+import styles from './cancel-visit-dialog.scss';
 
 interface CancelVisitDialogProps {
   patientUuid: string;

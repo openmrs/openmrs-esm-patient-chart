@@ -1,13 +1,13 @@
 import React, { useMemo } from 'react';
-import styles from './obs-graph.scss';
 import { useTranslation } from 'react-i18next';
-import { Tab, Tabs } from 'carbon-components-react';
+import { Tab, Tabs, TabList } from '@carbon/react';
 import { LineChart } from '@carbon/charts-react';
 import { LineChartOptions } from '@carbon/charts/interfaces/charts';
 import { ScaleTypes } from '@carbon/charts/interfaces/enums';
 import '@carbon/charts/styles.css';
 import { formatDate, useConfig } from '@openmrs/esm-framework';
 import { useObs } from '../resources/useObs';
+import styles from './obs-graph.scss';
 
 interface ConceptDescriptor {
   label: string;
@@ -71,23 +71,26 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
           {t('displaying', 'Displaying')}
         </label>
         <Tabs id="concept-tab-group" className={styles.verticalTabs} type="default">
-          {config.data.map(({ concept, label }, index) => {
-            return (
-              <Tab
-                key={index}
-                className={`${styles.tab} ${styles.bodyLong01} ${
-                  selectedConcept.label === label && styles.selectedTab
-                }`}
-                onClick={() =>
-                  setSelectedConcept({
-                    label,
-                    uuid: concept,
-                  })
-                }
-                label={label}
-              />
-            );
-          })}
+          <TabList aria-label="Obs tabs">
+            {config.data.map(({ concept, label }, index) => {
+              return (
+                <Tab
+                  key={index}
+                  className={`${styles.tab} ${styles.bodyLong01} ${
+                    selectedConcept.label === label && styles.selectedTab
+                  }`}
+                  onClick={() =>
+                    setSelectedConcept({
+                      label,
+                      uuid: concept,
+                    })
+                  }
+                >
+                  {label}
+                </Tab>
+              );
+            })}
+          </TabList>
         </Tabs>
       </div>
       <div className={styles.lineChartContainer} style={{ flex: 4 }}>

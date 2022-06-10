@@ -1,11 +1,6 @@
-import {
-  getDynamicOfflineDataEntries,
-  getDynamicOfflineDataHandlers,
-  putDynamicOfflineData,
-  removeDynamicOfflineData,
-  syncDynamicOfflineData,
-  useLayoutType,
-} from '@openmrs/esm-framework';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { mutate } from 'swr';
 import {
   DataTable,
   TableContainer,
@@ -21,13 +16,19 @@ import {
   DataTableRow,
   Toggle,
   SkeletonPlaceholder,
-} from 'carbon-components-react';
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { FormEncounter } from '../types';
-import styles from './offline-forms.styles.scss';
-import { useValidOfflineFormEncounters } from './use-offline-form-encounters';
+} from '@carbon/react';
+import {
+  isDesktop,
+  // putDynamicOfflineData,
+  // removeDynamicOfflineData,
+  // syncDynamicOfflineData,
+  useLayoutType,
+} from '@openmrs/esm-framework';
 import { useDynamicFormDataEntries } from './offline-form-helpers';
+import { FormEncounter } from '../types';
+// import { useOfflineFormManagement } from './use-offline-form-management';
+import { useValidOfflineFormEncounters } from './use-offline-form-encounters';
+import styles from './offline-forms.styles.scss';
 
 export interface OfflineFormsProps {
   canMarkFormsAsOffline: boolean;
@@ -37,7 +38,7 @@ const OfflineForms: React.FC<OfflineFormsProps> = ({ canMarkFormsAsOffline }) =>
   const { t } = useTranslation();
   const forms = useValidOfflineFormEncounters();
   const layout = useLayoutType();
-  const toolbarItemSize = layout === 'desktop' ? 'sm' : undefined;
+  const toolbarItemSize = isDesktop(layout) ? 'sm' : undefined;
   const headers: Array<DataTableHeader> = [
     { key: 'formName', header: t('offlineFormsTableFormNameHeader', 'Form name') },
     { key: 'availableOffline', header: t('offlineFormsTableFormAvailableOffline', 'Offline') },
@@ -112,17 +113,17 @@ function OfflineFormToggle({ form, disabled }: { form: FormEncounter; disabled: 
   const handleToggled = async (checked: boolean) => {
     setIsUpdating(true);
 
-    try {
-      if (checked) {
-        await putDynamicOfflineData('form', form.uuid);
-        await syncDynamicOfflineData('form', form.uuid);
-      } else {
-        await removeDynamicOfflineData('form', form.uuid);
-      }
-    } finally {
-      setIsUpdating(false);
-      dynamicFormEntriesSwr.mutate();
-    }
+    // try {
+    //   if (checked) {
+    //     await putDynamicOfflineData('form', form.uuid);
+    //     await syncDynamicOfflineData('form', form.uuid);
+    //   } else {
+    //     await removeDynamicOfflineData('form', form.uuid);
+    //   }
+    // } finally {
+    //   setIsUpdating(false);
+    //   dynamicFormEntriesSwr.mutate();
+    // }
   };
 
   if (dynamicFormEntriesSwr.isValidating) {
