@@ -3,9 +3,9 @@
 
 
 "@ampath-kenya/ngx-formentry@next":
-  version "3.0.0-alpha19"
-  resolved "https://registry.yarnpkg.com/@ampath-kenya/ngx-formentry/-/ngx-formentry-3.0.0-alpha19.tgz#c0921f75f300328f4341c167bdae3b679b8f2e62"
-  integrity sha512-5XpgyalQ6kH8CX7ZIGi9GApYunqMqyC3Xoe3IfyODPXa7Lw7mtUEWXUstPqywQDtG1fgjKX4LwCpZpXU2Db3DA==
+  version "3.0.0-alpha21"
+  resolved "https://registry.yarnpkg.com/@ampath-kenya/ngx-formentry/-/ngx-formentry-3.0.0-alpha21.tgz#760e3babbb7724e87fbac6d7f883e052d3ee36a0"
+  integrity sha512-tmDCmXmTsACAGo6P4+KSAwXVkf5i6oTvJ0OpUcN1IHE3V05csz4pbPOlysNKdk/R85SWplbKLpS+KzJ2uSBN4g==
   dependencies:
     tslib "^2.0.0"
 
