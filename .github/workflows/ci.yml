@@ -796,7 +796,7 @@ jobs:
         run: npx lerna bootstrap
 
       - name: Build
-        run: yarn turbo run build
+        run: yarn turbo run build --color --concurrency=5
       
       - name: Publish
         run: yarn run ci:publish
