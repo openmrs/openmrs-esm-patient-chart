@@ -24,21 +24,22 @@ import {
   DatePicker,
 } from 'carbon-components-react';
 import { createPatientCondition, searchConditionConcepts, CodedCondition } from './conditions.resource';
+import { BehaviorSubject } from 'rxjs';
 
 const searchTimeoutInMs = 500;
 
 interface ConditionsWidgetProps {
   patientUuid: string;
-  isSubmitting: boolean;
   closeWorkspace?: () => void;
   setHasSubmissibleValue?: (value: boolean) => void;
+  submissionNotifier: BehaviorSubject<{ isSubmitting: boolean }>;
 }
 
 const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   patientUuid,
-  isSubmitting,
   closeWorkspace,
   setHasSubmissibleValue,
+  submissionNotifier,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -57,12 +58,6 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
       setHasSubmissibleValue(!!selectedCondition);
     }
   }, [selectedCondition, setHasSubmissibleValue]);
-
-  useEffect(() => {
-    if (isSubmitting) {
-      handleSubmit();
-    }
-  }, [isSubmitting]);
 
   const handleSearchChange = (event) => {
     setSelectedCondition(null);
@@ -99,7 +94,9 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   }, []);
 
   const handleSubmit = React.useCallback(() => {
-    if (!selectedCondition) return;
+    if (!selectedCondition) {
+      return;
+    }
 
     const payload = {
       resourceType: 'Condition',
@@ -171,6 +168,17 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     session?.user?.uuid,
     t,
   ]);
+
+  useEffect(() => {
+    const subscription = submissionNotifier?.subscribe(({ isSubmitting }) => {
+      if (isSubmitting) {
+        handleSubmit();
+      }
+    });
+    return () => {
+      subscription?.unsubscribe();
+    };
+  }, [handleSubmit, submissionNotifier]);
 
   return (
     <div className={styles.formContainer}>
