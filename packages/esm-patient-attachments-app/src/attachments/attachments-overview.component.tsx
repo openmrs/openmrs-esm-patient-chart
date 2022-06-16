@@ -99,8 +99,8 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
     const close = showModal('capture-photo-modal', {
       onSavePhoto(dataUri: string, caption: string) {
         const abortController = new AbortController();
-        var extension = dataUri.split(';')[0].split('/')[1];
-        var sizeInBytes = 4 * Math.ceil(dataUri.length / 3) * 0.5624896334383812;
+        const extension = dataUri.split(';')[0].split('/')[1];
+        const sizeInBytes = 4 * Math.ceil(dataUri.length / 3) * 0.5624896334383812;
         if (sizeInBytes > 500000 || extension.includes('svg')) {
           setError(true);
           close();
