@@ -46,7 +46,7 @@ jobs:
         run: yarn turbo run lint typescript --color --api="http://127.0.0.1:9080" --token="${{ secrets.TURBO_SERVER_TOKEN }}" --team="${{ github.repository_owner }}"
       
       - name: Run build
-        run: yarn turbo run build --color --api="http://127.0.0.1:9080" --token="${{ secrets.TURBO_SERVER_TOKEN }}" --team="${{ github.repository_owner }}"
+        run: yarn turbo run build --color --concurrency=5 --api="http://127.0.0.1:9080" --token="${{ secrets.TURBO_SERVER_TOKEN }}" --team="${{ github.repository_owner }}"
       
       - name: Upload build artifacts
         uses: actions/upload-artifact@v2
@@ -754,7 +754,7 @@ jobs:
         run: npx lerna bootstrap
       
       - name: Build
-        run: yarn turbo run build --color
+        run: yarn turbo run build --color --concurrency=5
 
       - name: Patch
         run: yarn lerna version patch --no-git-tag-version --no-push --yes
@@ -796,7 +796,7 @@ jobs:
         run: npx lerna bootstrap
 
       - name: Build
-        run: yarn turbo run build
+        run: yarn turbo run build --color --concurrency=5
       
       - name: Publish
         run: yarn run ci:publish
