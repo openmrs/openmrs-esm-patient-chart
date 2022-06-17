@@ -7,11 +7,19 @@
   outline: none;
   color: $ui-05;
   border-left: 4px solid var(--brand-01);
+}
 
-  a {
-    color: $ui-05 !important;
-    outline: none !important;
-  }
+:global(.omrs-breakpoint-gt-tablet) .activeNavItem a:nth-child(1) {
+  height: 2rem;
+  color: $ui-05;
+  outline: none;
+  padding: 0 0 0 1rem;
+}
+
+:global(.omrs-breakpoint-gt-tablet) .notActive a:nth-child(1) {
+  height: 2rem;
+  color: $ui-04;
+  padding: 0 0 0 1rem;
 }
 
 .notActive {
