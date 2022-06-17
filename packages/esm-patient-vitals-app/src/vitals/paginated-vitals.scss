@@ -1,0 +1,83 @@
+@import "~@openmrs/esm-styleguide/src/vars";
+@import "~carbon-components/src/globals/scss/vars";
+@import "~carbon-components/src/globals/scss/mixins";
+
+td {
+  &.criticallyLow, &.criticallyHigh, &.low, &.high {
+    td:nth-child(2) {
+      @include carbon--type-style("productive-heading-01");
+      color: $text-01;
+    }
+  }
+
+  &.criticallyLow, &.criticallyHigh {
+    outline: 2px solid $danger;
+    outline-offset: -1px;
+  }
+
+  &.low, &.high {
+    outline: 1px solid black;
+  }
+
+  &.criticallyLow {
+    td:nth-child(2)::after {
+      content: " ↓↓";
+    }
+  }
+  
+  &.criticallyHigh {
+    td:nth-child(2)::after {
+      content: " ↑↑";
+    }
+  }
+
+  &.low {
+    td:nth-child(2)::after {
+      content: " ↓";
+    }
+  }
+
+  &.high {
+    td:nth-child(2)::after {
+      content: " ↑";
+    }
+  }
+
+  &.off-scale-low {
+    td:nth-child(2)::after {
+      content: " ↓↓↓";
+    }
+  }
+
+  &.off-scale-high {
+    td:nth-child(2)::after {
+      content: " ↑↑↑";
+    }
+  }
+}
+
+.offScaleHigh,
+.offScaleLow,
+.criticallyHigh,
+.criticallyLow,
+.high,
+.low {
+  @include carbon--type-style('productive-heading-01');
+  color: $text-01;
+}
+
+.criticallyLow::after {
+  content: " ↓↓";
+}
+
+.criticallyHigh::after {
+  content: " ↑↑";
+}
+
+.low::after {
+  content: " ↓";
+}
+
+.high::after {
+  content: " ↑";
+}

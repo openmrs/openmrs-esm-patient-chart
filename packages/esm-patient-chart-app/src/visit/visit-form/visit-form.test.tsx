@@ -12,10 +12,13 @@ import StartVisitForm from './visit-form.component';
 
 const isoFormat = 'YYYY-MM-DDTHH:mm:ss.SSSZZ';
 const mockDateTimeStampInSeconds = 1638682781000;
+const mockCloseWorkspace = jest.fn();
+const mockPromptBeforeClosing = jest.fn();
 
 const testProps = {
   patientUuid: mockPatient.id,
-  closeWorkspace: jest.fn(),
+  closeWorkspace: mockCloseWorkspace,
+  promptBeforeClosing: mockPromptBeforeClosing,
 };
 
 const mockSaveVisit = saveVisit as jest.Mock;
@@ -151,6 +154,15 @@ describe('VisitForm: ', () => {
           title: 'Error starting visit',
         }),
       );
+    });
+
+    test('should display unsaved-changes modal, when form has unsaved changes', () => {
+      userEvent.click(screen.getByLabelText(/Outpatient visit/i));
+
+      const closeButton = screen.getByRole('button', { name: /Discard/ });
+      userEvent.click(closeButton);
+
+      expect(mockCloseWorkspace).toHaveBeenCalled();
     });
   });
 });

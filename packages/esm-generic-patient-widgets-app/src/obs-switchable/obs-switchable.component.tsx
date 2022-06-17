@@ -20,6 +20,12 @@ const ObsSwitchable: React.FC<ObsSwitchableProps> = ({ patientUuid }) => {
   const config = useConfig() as ConfigObject;
   const [chartView, setChartView] = React.useState<boolean>();
   const { data, error, isLoading, isValidating } = useObs(patientUuid);
+  const isChartButtonVisible =
+    data.filter(
+      (obs) =>
+        typeof (obs?.valueQuantity?.value ?? obs.valueCodeableConcept?.coding[0]?.display ?? obs.valueString) !==
+        'number',
+    ).length > 0;
 
   return (
     <>
@@ -44,15 +50,17 @@ const ObsSwitchable: React.FC<ObsSwitchableProps> = ({ patientUuid }) => {
                       iconDescription={t('tableView', 'Table View')}
                       onClick={() => setChartView(false)}
                     />
-                    <Button
-                      className={styles.toggle}
-                      size="field"
-                      kind={chartView ? 'tertiary' : 'ghost'}
-                      hasIconOnly
-                      renderIcon={ChartLineSmooth16}
-                      iconDescription={t('chartView', 'Chart View')}
-                      onClick={() => setChartView(true)}
-                    />
+                    {!isChartButtonVisible && (
+                      <Button
+                        className={styles.toggle}
+                        size="field"
+                        kind={chartView ? 'tertiary' : 'ghost'}
+                        hasIconOnly
+                        renderIcon={ChartLineSmooth16}
+                        iconDescription={t('chartView', 'Chart View')}
+                        onClick={() => setChartView(true)}
+                      />
+                    )}
                   </div>
                 </div>
               </CardHeader>

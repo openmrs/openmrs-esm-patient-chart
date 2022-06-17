@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { openmrsFetch, fhirBaseUrl, useConfig, FHIRResource } from '@openmrs/esm-framework';
+import { openmrsFetch, fhirBaseUrl, useConfig, FHIRResource, OpenmrsResource } from '@openmrs/esm-framework';
 
 export const pageSize = 100;
 
@@ -54,7 +54,13 @@ export interface UseObsResult {
 
 type ObsResult = FHIRResource['resource'] & {
   conceptUuid: string;
+  valueCodeableConcept?: CodeableConcept;
+  valueString?: string;
 };
+
+interface CodeableConcept {
+  coding: Array<OpenmrsResource>;
+}
 
 function isUuid(input: string) {
   return input.length === 36;

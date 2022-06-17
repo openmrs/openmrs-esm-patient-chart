@@ -47,7 +47,7 @@ import styles from './visit-form.scss';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
 import { ChartConfig } from '../../config-schema';
 
-const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace }) => {
+const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace, promptBeforeClosing }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const locations = useLocations();
@@ -66,6 +66,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
   const [enrollment, setEnrollment] = useState<PatientProgram>(activePatientEnrollment[0]);
   const { mutate } = useVisit(patientUuid);
+  const [ignoreChanges, setIgnoreChanges] = useState(true);
 
   useEffect(() => {
     if (locations && sessionUser?.sessionLocation?.uuid) {
@@ -124,8 +125,13 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
     [closeWorkspace, patientUuid, selectedLocation, t, timeFormat, visitDate, visitTime, visitType],
   );
 
+  const handleOnChange = () => {
+    setIgnoreChanges((prevState) => !prevState);
+    promptBeforeClosing(() => true);
+  };
+
   return (
-    <Form className={styles.form}>
+    <Form className={styles.form} onChange={handleOnChange}>
       <div>
         {isTablet && (
           <Row className={styles.headerGridRow}>
@@ -268,7 +274,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
         </div>
       </div>
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-        <Button className={styles.button} kind="secondary" onClick={closeWorkspace}>
+        <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace(ignoreChanges)}>
           {t('discard', 'Discard')}
         </Button>
         <Button onClick={handleSubmit} className={styles.button} disabled={isSubmitting} kind="primary" type="submit">

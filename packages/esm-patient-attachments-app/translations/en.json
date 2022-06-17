@@ -8,7 +8,8 @@
   "changeImage": "Change image",
   "delete": "Delete",
   "deleteSelected": "Delete selected",
+  "errorUploading": "Error uploading a file",
+  "fileUnsupported": "File uploaded is not supported",
   "save": "Save",
-  "selectPhoto": "Select local photo instead",
-  "webcamPreview": "Webcam preview"
+  "selectFile": "Select local file instead"
 }
