@@ -23,12 +23,8 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
   const config = useConfig();
   const { data: obss, error, isLoading, isValidating } = useObs(patientUuid);
 
-  console.log('ObsGraph obss', obss);
-  console.log('ObsGraph config', config);
-
   const [selectedConcept, setSelectedConcept] = React.useState<ConceptDescriptor>({
     label: config.data[0]?.label,
-
     uuid: config.data[0]?.concept,
   });
 
@@ -39,7 +35,7 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
         .map((obs) => ({
           group: selectedConcept.label,
           key: formatDate(new Date(obs.issued), { year: false, time: false }),
-          value: obs?.valueQuantity?.value,
+          value: obs.valueQuantity.value,
         })),
     [obss, selectedConcept.uuid],
   );

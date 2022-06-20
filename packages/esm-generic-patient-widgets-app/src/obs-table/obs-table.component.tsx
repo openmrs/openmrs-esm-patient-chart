@@ -44,15 +44,15 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
         for (let obs of obss) {
           switch (obs.dataType) {
             case 'Text':
-              rowData[obs.conceptUuid] = obs?.valueString;
+              rowData[obs.conceptUuid] = obs.valueString;
               break;
 
             case 'Number':
-              rowData[obs.conceptUuid] = obs?.valueQuantity?.value;
+              rowData[obs.conceptUuid] = obs.valueQuantity?.value;
               break;
 
             case 'Coded':
-              rowData[obs.conceptUuid] = obs?.valueCodeableConcept?.coding[0]?.display;
+              rowData[obs.conceptUuid] = obs.valueCodeableConcept?.coding[0]?.display;
               break;
           }
         }

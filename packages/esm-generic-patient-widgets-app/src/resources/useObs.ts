@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { openmrsFetch, fhirBaseUrl, useConfig, FHIRResource } from '@openmrs/esm-framework';
+import { openmrsFetch, fhirBaseUrl, useConfig, FHIRResource, FHIRCode } from '@openmrs/esm-framework';
 
 export const pageSize = 100;
 
@@ -19,39 +19,26 @@ export function useObs(patientUuid: string): UseObsResult {
     openmrsFetch,
   );
 
-  //Buscar conceito para a resposta
-
   const observations =
     result?.data?.entry?.map((entry) => {
-      let dataEntry: any = {};
+      const observation: ObsResult = {
+        ...entry.resource,
+        conceptUuid: entry.resource.code.coding.filter((c) => isUuid(c.code))[0]?.code,
+      };
 
-      switch (true) {
-        case entry.resource.hasOwnProperty('valueString'):
-          dataEntry = {
-            ...entry.resource,
-            conceptUuid: entry.resource.code.coding.filter((c) => isUuid(c.code))[0]?.code,
-            dataType: 'Text',
-          };
-          break;
-
-        case entry.resource.hasOwnProperty('valueQuantity'):
-          dataEntry = {
-            ...entry.resource,
-            conceptUuid: entry.resource.code.coding.filter((c) => isUuid(c.code))[0]?.code,
-            dataType: 'Number',
-          };
-          break;
-
-        case entry.resource.hasOwnProperty('valueCodeableConcept'):
-          dataEntry = {
-            ...entry.resource,
-            conceptUuid: entry.resource.code.coding.filter((c) => isUuid(c.code))[0]?.code,
-            dataType: 'Coded',
-          };
-          break;
+      if (entry.resource.hasOwnProperty('valueString')) {
+        observation.dataType = 'Text';
       }
 
-      return dataEntry;
+      if (entry.resource.hasOwnProperty('valueQuantity')) {
+        observation.dataType = 'Number';
+      }
+
+      if (entry.resource.hasOwnProperty('valueCodeableConcept')) {
+        observation.dataType = 'Coded';
+      }
+
+      return observation;
     }) ?? [];
 
   return {
@@ -84,18 +71,7 @@ export interface UseObsResult {
 
 type ObsResult = FHIRResource['resource'] & {
   conceptUuid: string;
-  dataType: string;
-  valueString?: string;
-  valueCodeableConcept?: ObsCodedData;
-};
-
-type ObsCodedData = {
-  coding: Array<ObsCodedCodingData>;
-};
-
-type ObsCodedCodingData = {
-  code: string;
-  display: string;
+  dataType?: string;
 };
 
 function isUuid(input: string) {
