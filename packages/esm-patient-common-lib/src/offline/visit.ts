@@ -41,7 +41,7 @@ export function useVisitOrOfflineVisit(patientUuid: string) {
  * Returns the patient's current offline visit.
  * @param patientUuid The UUID of the patient.
  */
-export function useOfflineVisit(patientUuid: string): ReturnType<typeof useVisit> {
+export function useOfflineVisit(patientUuid: string): Omit<ReturnType<typeof useVisit>, 'isLoading'> {
   const swrKey = patientUuid ? `offlineVisit/${patientUuid}` : null;
   const offlineVisitSwr = useSWR<Visit>(swrKey, async () => {
     const offlineVisit = await getOfflineVisitForPatient(patientUuid);
