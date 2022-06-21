@@ -89,8 +89,10 @@ async function getCacheableFormUrls(formUuid: string) {
   ) as FormSchema;
 
   const conceptLang = (window as any).i18next?.language?.substring(0, 2).toLowerCase() || 'en';
-  const requiredConceptUuids = FormSchemaService.getUnlabeledConceptUuidsFromSchema(formSchema);
-  const conceptUrls = requiredConceptUuids.map((uuid) => `/ws/rest/v1/concept/${uuid}?v=full&lang=${conceptLang}`);
+  const requiredConceptIdentifiers = FormSchemaService.getUnlabeledConceptIdentifiersFromSchema(formSchema);
+  const conceptUrls = requiredConceptIdentifiers.map(
+    (identifier) => `/ws/rest/v1/concept/${identifier}?v=full&lang=${conceptLang}`,
+  );
 
   return [
     // Required by:

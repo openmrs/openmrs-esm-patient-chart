@@ -173,7 +173,7 @@ export class FormSchemaService {
     return formUuids;
   }
 
-  public static getUnlabeledConceptUuidsFromSchema(form: FormSchema): Array<string> {
+  public static getUnlabeledConceptIdentifiersFromSchema(form: FormSchema): Array<string> {
     const results = new Set<string>();
     const walkQuestions = (questions: Array<Questions>) => {
       for (const question of questions) {
