@@ -1,4 +1,4 @@
-import { defineConfigSchema, getAsyncLifecycle } from '@openmrs/esm-framework';
+import { defineConfigSchema, fhirBaseUrl, getAsyncLifecycle, messageOmrsServiceWorker } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
@@ -8,6 +8,11 @@ const backendDependencies = {
 };
 
 function setupOpenMRS() {
+  messageOmrsServiceWorker({
+    type: 'registerDynamicRoute',
+    pattern: `${fhirBaseUrl}/Observation.+`,
+  });
+
   const moduleName = '@openmrs/esm-generic-patient-widgets-app';
 
   const options = {
@@ -25,6 +30,7 @@ function setupOpenMRS() {
         meta: {
           columnSpan: 4,
         },
+        offline: { showRecordVitalsButton: true },
       },
     ],
   };
