@@ -4,12 +4,12 @@ import {
   getSyncLifecycle,
   registerBreadcrumbs,
   subscribePrecacheStaticDependencies,
+  syncAllDynamicOfflineData,
 } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
-import { setupPatientFormSync } from './offline';
-import { precacheAllOfflineForms } from './offline-forms/offline-form-helpers';
+import { setupDynamicFormDataHandler, setupPatientFormSync } from './offline';
 import OfflineToolsNavLink from './offline-forms/offline-tools-nav-link.component';
 
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
@@ -20,7 +20,6 @@ const backendDependencies = {
 
 function setupOpenMRS() {
   const moduleName = '@openmrs/esm-patient-forms-app';
-
   const options = {
     featureName: 'patient-forms',
     moduleName,
@@ -37,8 +36,8 @@ function setupOpenMRS() {
   ]);
 
   setupPatientFormSync();
-
-  subscribePrecacheStaticDependencies(precacheAllOfflineForms);
+  setupDynamicFormDataHandler();
+  subscribePrecacheStaticDependencies(() => syncAllDynamicOfflineData('form'));
 
   return {
     extensions: [
