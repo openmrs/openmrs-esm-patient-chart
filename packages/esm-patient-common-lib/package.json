@@ -7,7 +7,6 @@
   "main": "src/index.ts",
   "source": true,
   "scripts": {
-    "build": "webpack --mode production",
     "lint": "eslint src --ext ts,tsx",
     "typescript": "tsc"
   },
