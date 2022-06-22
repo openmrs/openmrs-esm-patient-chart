@@ -7,16 +7,17 @@ export interface DashboardGroupExtensionProps {
   title: string;
   slotName?: string;
   basePath: string;
+  isExpanded?: boolean;
 }
 
-export const DashboardGroupExtension = ({ title, slotName, basePath }: DashboardGroupExtensionProps) => {
+export const DashboardGroupExtension = ({ title, slotName, basePath, isExpanded }: DashboardGroupExtensionProps) => {
   useEffect(() => {
     registerNavGroup(slotName);
   }, [slotName]);
 
   return (
     <Accordion>
-      <AccordionItem open title={title} style={{ border: 'none' }}>
+      <AccordionItem open={isExpanded ?? true} title={title} style={{ border: 'none' }}>
         <ExtensionSlot extensionSlotName={slotName ?? title} state={{ basePath }} />
       </AccordionItem>
     </Accordion>

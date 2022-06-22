@@ -4,13 +4,11 @@ import React, { ReactNode } from 'react';
 import styles from './offline-forms-overview-card.styles.scss';
 import ArrowRight16 from '@carbon/icons-react/es/arrow--right/16';
 import { useTranslation } from 'react-i18next';
-import { useValidOfflineFormEncounters } from './use-offline-form-encounters';
-import useSWR from 'swr';
-import { isFormFullyCached } from './offline-form-helpers';
+import { useDynamicFormDataEntries } from './offline-form-helpers';
 
 const OfflineFormsOverviewCard: React.FC = () => {
   const { t } = useTranslation();
-  const { data: availableFormsCount, error } = useCountOfFormsAvailableOffline();
+  const { data, error } = useDynamicFormDataEntries();
 
   return (
     <Tile light className={`${styles.overviewCard}`}>
@@ -28,9 +26,9 @@ const OfflineFormsOverviewCard: React.FC = () => {
       <div className={styles.contentContainer}>
         <HeaderedQuickInfo
           header={t('offlineFormsOverviewCardAvailableOffline', 'Available offline')}
-          isLoading={!error && (availableFormsCount === undefined || availableFormsCount === null)}
+          isLoading={!error && !data}
         >
-          {error ? 'Unknown' : availableFormsCount}
+          {error ? 'Unknown' : data?.length}
         </HeaderedQuickInfo>
       </div>
     </Tile>
@@ -51,15 +49,5 @@ const HeaderedQuickInfo: React.FC<HeaderedQuickInfoProps> = ({ header, children,
     </div>
   );
 };
-
-function useCountOfFormsAvailableOffline() {
-  const { data: forms } = useValidOfflineFormEncounters();
-  const key = forms ? ['offlineForms', 'count', ...forms.map((form) => form.uuid).sort()] : null;
-
-  return useSWR(key, async () => {
-    const isFormCachedResults = await Promise.all(forms.map((form) => isFormFullyCached(form)));
-    return isFormCachedResults.filter(Boolean).length;
-  });
-}
 
 export default OfflineFormsOverviewCard;

@@ -89,7 +89,7 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
                 {rows.map((row) => (
                   <TableRow key={row.id}>
                     {row.cells.map((cell) => (
-                      <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+                      <TableCell key={cell.id}>{cell.value?.content ?? cell.value ?? '--'}</TableCell>
                     ))}
                   </TableRow>
                 ))}

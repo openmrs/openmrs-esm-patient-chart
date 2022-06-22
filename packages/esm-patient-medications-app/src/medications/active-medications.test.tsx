@@ -1,15 +1,28 @@
 import React from 'react';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { screen, within } from '@testing-library/react';
+import { fireEvent, screen, within } from '@testing-library/react';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { mockDrugOrders } from '../../../../__mocks__/medication.mock';
 import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import ActiveMedications from './active-medications.component';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 
 const testProps = {
   patientUuid: mockPatient.id,
   showAddMedications: true,
 };
+
+jest.mock('@openmrs/esm-patient-common-lib', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
+
+  return {
+    ...originalModule,
+    launchPatientWorkspace: jest.fn(),
+    useWorkspaces: jest.fn(() => {
+      return { workspaces: [{ name: 'order-basket' }] };
+    }),
+  };
+});
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 
@@ -75,6 +88,22 @@ describe('ActiveMedications: ', () => {
       expect(within(table).getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument(),
     );
   });
+});
+
+test('clicking the Record active medications link or the Add button opens the order basket form', async () => {
+  mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
+  renderActiveMedications();
+  await waitForLoadingToFinish();
+  const orderLink = await screen.getByText('Record active medications');
+  fireEvent.click(orderLink);
+  expect(launchPatientWorkspace).toHaveBeenCalledWith('order-basket-workspace');
+
+  mockOpenmrsFetch.mockReturnValueOnce(mockDrugOrders);
+  renderActiveMedications();
+  await waitForLoadingToFinish();
+  const button = await screen.getByRole('button', { name: /Add/i });
+  fireEvent.click(button);
+  expect(launchPatientWorkspace).toHaveBeenCalledWith('order-basket-workspace');
 });
 
 function renderActiveMedications() {

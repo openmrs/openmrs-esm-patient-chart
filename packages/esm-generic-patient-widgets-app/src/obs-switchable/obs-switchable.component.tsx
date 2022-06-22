@@ -19,9 +19,11 @@ const ObsSwitchable: React.FC<ObsSwitchableProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const config = useConfig() as ConfigObject;
   const [chartView, setChartView] = React.useState<boolean>();
+
   const { data: obss, error, isLoading, isValidating } = useObs(patientUuid);
 
   const hasNumberType = obss.find((obs) => obs.dataType === 'Number');
+
 
   return (
     <>
