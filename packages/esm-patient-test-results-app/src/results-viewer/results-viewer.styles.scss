@@ -53,3 +53,17 @@
   }
 }
 
+.columnPanel {
+  position: relative;
+}
+ 
+.dragHandler {
+  width: 3px;
+  height: 100%;
+  background-color: transparent;
+  position: absolute;
+  top: 0;
+  left: 100%;
+  cursor: col-resize;
+  z-index: 100;
+}
