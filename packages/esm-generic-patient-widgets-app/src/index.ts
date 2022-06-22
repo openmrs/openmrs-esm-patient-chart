@@ -30,7 +30,7 @@ function setupOpenMRS() {
         meta: {
           columnSpan: 4,
         },
-        offline: { showRecordVitalsButton: true },
+        offline: true,
       },
     ],
   };
