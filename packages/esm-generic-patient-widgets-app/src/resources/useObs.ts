@@ -1,7 +1,6 @@
 import useSWR from 'swr';
 import { openmrsFetch, fhirBaseUrl, useConfig, FHIRResource, FHIRCode } from '@openmrs/esm-framework';
 
-
 export const pageSize = 100;
 
 export function useObs(patientUuid: string): UseObsResult {
@@ -13,9 +12,9 @@ export function useObs(patientUuid: string): UseObsResult {
     isValidating,
   } = useSWR<{ data: ObsFetchResponse }, Error>(
     `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&code=` +
-      data.map((d) => d.concept).join(',') +
-      '&_summary=data&_sort=-date' +
-      `&_count=${pageSize}
+    data.map((d) => d.concept).join(',') +
+    '&_summary=data&_sort=-date' +
+    `&_count=${pageSize}
   `,
     openmrsFetch,
   );
@@ -74,10 +73,6 @@ type ObsResult = FHIRResource['resource'] & {
   conceptUuid: string;
   dataType?: string;
 };
-
-interface CodeableConcept {
-  coding: Array<OpenmrsResource>;
-}
 
 function isUuid(input: string) {
   return input.length === 36;
