@@ -12,9 +12,9 @@ export function useObs(patientUuid: string): UseObsResult {
     isValidating,
   } = useSWR<{ data: ObsFetchResponse }, Error>(
     `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&code=` +
-    data.map((d) => d.concept).join(',') +
-    '&_summary=data&_sort=-date' +
-    `&_count=${pageSize}
+      data.map((d) => d.concept).join(',') +
+      '&_summary=data&_sort=-date' +
+      `&_count=${pageSize}
   `,
     openmrsFetch,
   );
