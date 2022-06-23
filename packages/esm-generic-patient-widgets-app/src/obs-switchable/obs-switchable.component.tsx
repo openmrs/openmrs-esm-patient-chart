@@ -24,7 +24,6 @@ const ObsSwitchable: React.FC<ObsSwitchableProps> = ({ patientUuid }) => {
 
   const hasNumberType = obss.find((obs) => obs.dataType === 'Number');
 
-
   return (
     <>
       {(() => {
