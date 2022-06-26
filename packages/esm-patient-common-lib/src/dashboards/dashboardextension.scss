@@ -2,27 +2,13 @@
 @import "~carbon-components/src/globals/scss/vars";
 @import "~carbon-components/src/globals/scss/mixins";
 
-.activeNavItem {
+:global(.active-left-nav-link) {
   background-color: $ui-03;
   outline: none;
   color: $ui-05;
   border-left: 4px solid var(--brand-01);
+  .link:nth-child(1) {
+    color: $ui-05;
+    padding: 1.2rem 0 1.2rem 1.2rem;
+  }
 }
-
-:global(.omrs-breakpoint-gt-tablet) .activeNavItem a:nth-child(1) {
-  height: 2rem;
-  color: $ui-05;
-  outline: none;
-  padding: 0 0 0 1rem;
-}
-
-:global(.omrs-breakpoint-gt-tablet) .notActive a:nth-child(1) {
-  height: 2rem;
-  color: $ui-04;
-  padding: 0 0 0 1rem;
-}
-
-.notActive {
-  background-color: white;
-}
-
