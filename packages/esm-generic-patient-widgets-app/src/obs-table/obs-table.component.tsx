@@ -40,10 +40,23 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
           id: `${index}`,
           date: formatDatetime(new Date(obss[0].issued), { mode: 'wide' }),
         };
+
         for (let obs of obss) {
-          const obsValue = obs?.valueQuantity?.value ?? obs.valueCodeableConcept?.coding[0]?.display ?? obs.valueString;
-          rowData[obs.conceptUuid] = obsValue;
+          switch (obs.dataType) {
+            case 'Text':
+              rowData[obs.conceptUuid] = obs.valueString;
+              break;
+
+            case 'Number':
+              rowData[obs.conceptUuid] = obs.valueQuantity?.value;
+              break;
+
+            case 'Coded':
+              rowData[obs.conceptUuid] = obs.valueCodeableConcept?.coding[0]?.display;
+              break;
+          }
         }
+
         return rowData;
       }),
     [obssByDate],
@@ -61,7 +74,7 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
                 <TableRow>
                   {headers.map((header) => (
                     <TableHeader
-                      className={`${styles.productiveHeading01} ${styles.text02}`}
+                      className={`${styles.tableHeader}`}
                       {...getHeaderProps({
                         header,
                         isSortable: header.isSortable,
