@@ -2,13 +2,7 @@
 @import "~carbon-components/src/globals/scss/vars";
 @import "~carbon-components/src/globals/scss/mixins";
 
-:global(.active-left-nav-link) {
-  background-color: $ui-03;
-  outline: none;
+:global(.active-left-nav-link) .link:nth-child(1) {
   color: $ui-05;
-  border-left: 4px solid var(--brand-01);
-  .link:nth-child(1) {
-    color: $ui-05;
-    padding: 1.2rem 0 1.2rem 1.2rem;
-  }
+  padding: 1.2rem 0 1.2rem 1.2rem;
 }
