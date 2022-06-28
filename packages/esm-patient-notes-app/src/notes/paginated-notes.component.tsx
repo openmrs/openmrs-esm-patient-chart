@@ -46,6 +46,7 @@ const PaginatedNotes: React.FC<PaginatedNotes> = ({ notes, pageSize, pageUrl, ur
         ...note,
         id: `${note.id}`,
         encounterDate: formatDate(parseDate(note.encounterDate), { mode: 'wide' }),
+        diagnoses: note.diagnoses,
       })),
     [paginatedNotes],
   );

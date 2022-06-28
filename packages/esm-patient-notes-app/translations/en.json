@@ -10,6 +10,8 @@
   "discard": "Discard",
   "emptyDiagnosisText": "No diagnosis selected — Enter a diagnosis below",
   "enterDiagnoses": "Enter diagnoses",
+  "enterPrimaryDiagnoses": "Enter Primary diagnosis",
+  "enterSecondaryDiagnoses": "Enter Secondary diagnosis",
   "goToSummary": "Go to Summary",
   "image": "Image",
   "imageUploadHelperText": "Upload an image or use this device's camera to capture an image",

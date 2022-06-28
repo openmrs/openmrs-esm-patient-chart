@@ -11,6 +11,7 @@ import {
   Location,
   Provider,
   VisitNotePayload,
+  DiagnosisPayload,
 } from '../types';
 
 interface UseVisitNotes {
@@ -29,9 +30,9 @@ export function useVisitNotes(patientUuid: string): UseVisitNotes {
     'custom:(uuid,display,encounterDatetime,patient,obs,' +
     'encounterProviders:(uuid,display,' +
     'encounterRole:(uuid,display),' +
-    'provider:(uuid,person:(uuid,display)))';
+    'provider:(uuid,person:(uuid,display))),diagnoses';
 
-  const encountersApiUrl = `/ws/rest/v1/encounter?patient=${patientUuid}&obsConcept=${visitDiagnosesConceptUuid}&v=${customRepresentation}`;
+  const encountersApiUrl = `/ws/rest/v1/encounter?patient=${patientUuid}&obs=${visitDiagnosesConceptUuid}&v=${customRepresentation}`;
   const { data, error, isValidating } = useSWR<{ data: EncountersFetchResponse }, Error>(
     encountersApiUrl,
     openmrsFetch,
@@ -39,11 +40,8 @@ export function useVisitNotes(patientUuid: string): UseVisitNotes {
 
   const mapNoteProperties = (note: RESTPatientNote, index: number): PatientNote => ({
     id: `${index}`,
-    diagnoses: note.obs
-      .map(
-        (observation) =>
-          observation.groupMembers?.find((mem) => mem.concept.uuid === problemListConceptUuid)?.value?.display,
-      )
+    diagnoses: note.diagnoses
+      .map((diagnosisData) => diagnosisData.display)
       .filter((val) => val)
       .join(', '),
     encounterDate: note.encounterDatetime,
@@ -105,6 +103,15 @@ export function saveVisitNote(abortController: AbortController, payload: VisitNo
     method: 'POST',
     body: payload,
     signal: abortController.signal,
+  });
+}
+export function savePatientDiagnoses(abortController: AbortController, payload: DiagnosisPayload) {
+  return openmrsFetch(`/ws/rest/v1/patientdiagnoses`, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    method: 'POST',
+    body: payload,
   });
 }
 

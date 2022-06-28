@@ -28,10 +28,16 @@ import {
   useLayoutType,
   useSession,
 } from '@openmrs/esm-framework';
-import { convertToObsPayload } from './visit-note.util';
-import { fetchDiagnosisByName, fetchLocationByUuid, fetchProviderByUuid, saveVisitNote } from './visit-notes.resource';
+import { formatDiagnosisPayload } from './visit-note.util';
+import {
+  fetchDiagnosisByName,
+  fetchLocationByUuid,
+  fetchProviderByUuid,
+  savePatientDiagnoses,
+  saveVisitNote,
+} from './visit-notes.resource';
 import { ConfigObject } from '../config-schema';
-import { Diagnosis, VisitNotePayload } from '../types';
+import { Diagnosis, DiagnosisPayload, VisitNotePayload } from '../types';
 import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import styles from './visit-notes-form.scss';
 
@@ -164,20 +170,22 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
       event.preventDefault();
 
       if (!selectedPrimaryDiagnoses.length) return;
-      let obs = convertToObsPayload(combinedPrimarySecondaryDiagnosis);
 
+      let formatDiagnoses = formatDiagnosisPayload(combinedPrimarySecondaryDiagnosis);
+
+      let obs;
       if (clinicalNote) {
         obs = [
           {
             concept: encounterNoteTextConceptUuid,
             value: clinicalNote,
           },
-          ...obs,
         ];
       }
 
       let visitNotePayload: VisitNotePayload = {
         encounterDatetime: dayjs(visitDateTime).format(),
+        form: formConceptUuid,
         patient: patientUuid,
         location: locationUuid,
         encounterProviders: [
@@ -187,7 +195,6 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
           },
         ],
         encounterType: encounterTypeUuid,
-        form: formConceptUuid,
         obs: obs,
       };
 
@@ -195,16 +202,35 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
       saveVisitNote(abortController, visitNotePayload)
         .then((response) => {
           if (response.status === 201) {
-            closeWorkspace();
-
-            showToast({
-              critical: true,
-              description: t('visitNoteNowVisible', 'It is now visible on the Encounters page'),
-              kind: 'success',
-              title: t('visitNoteSaved', 'Visit note saved'),
+            formatDiagnoses.map((diagnosis, position: number) => {
+              let diagnosisPayload: DiagnosisPayload = {
+                encounter: response.data.uuid,
+                patient: patientUuid,
+                condition: null,
+                diagnosis: {
+                  coded: diagnosis.diagnosis.coded,
+                },
+                certainty: diagnosis.certainty,
+                rank: diagnosis.rank,
+              };
+              savePatientDiagnoses(abortController, diagnosisPayload).then((response) => {
+                if (response.status == 201) {
+                  if (position > -1) {
+                    formatDiagnoses.splice(position, 1);
+                  }
+                  if (formatDiagnoses.length == 0) {
+                    closeWorkspace();
+                    showToast({
+                      critical: true,
+                      description: t('visitNoteNowVisible', 'It is now visible on the Encounters page'),
+                      kind: 'success',
+                      title: t('visitNoteSaved', 'Visit note saved'),
+                    });
+                  }
+                  mutate(`/ws/rest/v1/encounter?patient=${patientUuid}&v=${encountersCustomRepresentation}`);
+                }
+              });
             });
-
-            mutate(`/ws/rest/v1/encounter?patient=${patientUuid}&v=${encountersCustomRepresentation}`);
           }
         })
         .catch((err) => {
@@ -292,7 +318,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
                 light={isTablet}
                 size="xl"
                 id="diagnosisPrimarySearch"
-                labelText={t('enterDiagnoses', 'Enter diagnoses')}
+                labelText={t('enterPrimaryDiagnoses', 'Enter Primary diagnosis')}
                 placeholder={t('primaryDiagnosisInputPlaceholder', 'Choose a primary diagnosis')}
                 onChange={handlePrimarySearchChange}
                 value={(() => {
@@ -362,7 +388,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
                 light={isTablet}
                 size="xl"
                 id="diagnosisSecondarySearch"
-                labelText={t('enterDiagnoses', 'Enter diagnoses')}
+                labelText={t('enterSecondaryDiagnoses', 'Enter Secondary diagnosis')}
                 placeholder={t('secondaryDiagnosisInputPlaceholder', 'Choose a secondary diagnose')}
                 onChange={handleSecondarySearchChange}
                 value={(() => {

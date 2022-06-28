@@ -19,6 +19,7 @@ export interface RESTPatientNote {
     dateChanged?: Date;
   };
   obs: Array<ObsData>;
+  diagnoses: Array<DiagnosisData>;
 }
 
 export interface PatientNote {
@@ -157,6 +158,44 @@ export interface Diagnosis {
   conceptReferenceTermCode: string;
   primary: boolean;
   confirmed: boolean;
+}
+export interface FormatDiagnosis {
+  diagnosis: {
+    coded: string;
+  };
+  certainty: string;
+  rank: number;
+}
+
+export interface DiagnosisPayload {
+  encounter: string;
+  patient: string;
+  condition: null;
+  diagnosis: {
+    coded: string;
+  };
+  certainty: string;
+  rank: number;
+}
+
+export interface DiagnosisData {
+  uuid: string;
+  diagnosis: {
+    coded: {
+      uuid: string;
+      display: string;
+    };
+  };
+  condition: null;
+  encounter: {
+    uuid: string;
+    display: string;
+  };
+  certainty: string;
+  rank: number;
+  voided: boolean;
+  display: string;
+  links: Links;
 }
 
 export interface VisitNotePayload {
