@@ -7,7 +7,6 @@ import styles from './dashboardextension.scss';
 export interface DashboardExtensionProps {
   title: string;
   basePath: string;
-  currentPath?: string;
 }
 
 export const DashboardExtension = ({ title, basePath, currentPath }: DashboardExtensionProps) => {
