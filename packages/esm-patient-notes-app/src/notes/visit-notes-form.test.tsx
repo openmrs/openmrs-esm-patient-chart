@@ -67,7 +67,8 @@ describe('Visit notes form: ', () => {
     expect(screen.getByRole('textbox', { name: /Visit date/i })).toBeInTheDocument();
     expect(screen.getByRole('textbox', { name: /Write an additional note/i })).toBeInTheDocument();
     expect(screen.getByRole('search', { name: /Enter Primary diagnosis/i })).toBeInTheDocument();
-    expect(screen.getByRole('search', { name: /Enter Secondary diagnosis/i })).toBeInTheDocument(); expect(screen.getByRole('group', { name: /Add an image to this visit/i })).toBeInTheDocument();
+    expect(screen.getByRole('search', { name: /Enter Secondary diagnosis/i })).toBeInTheDocument();
+    expect(screen.getByRole('group', { name: /Add an image to this visit/i })).toBeInTheDocument();
     expect(screen.getByRole('search', { name: /Enter diagnoses/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Add image/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Discard/i })).toBeInTheDocument();
