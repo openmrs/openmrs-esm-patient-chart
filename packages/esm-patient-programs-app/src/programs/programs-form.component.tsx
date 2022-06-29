@@ -32,7 +32,11 @@ import {
 import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import styles from './programs-form.scss';
 
-const ProgramsForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patientUuid }) => {
+interface ProgramsFormProps extends DefaultWorkspaceProps {
+  programEnrollmentId?: string
+}
+
+const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid, programEnrollmentId }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
@@ -41,16 +45,17 @@ const ProgramsForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patient
 
   const { data: availablePrograms } = useAvailablePrograms();
   const { data: enrollments } = useEnrollments(patientUuid);
+  const  currentEnrollment = programEnrollmentId && enrollments.filter((e) => e.uuid == programEnrollmentId  ) [0];
 
-  const eligiblePrograms = filter(
+  const eligiblePrograms = currentEnrollment ? [currentEnrollment.program] : filter(
     availablePrograms,
     (program) => !includes(map(enrollments, 'program.uuid'), program.uuid),
   );
-
-  const [completionDate, setCompletionDate] = React.useState(null);
-  const [enrollmentDate, setEnrollmentDate] = React.useState(new Date());
-  const [selectedProgram, setSelectedProgram] = React.useState<string>('');
-  const [userLocation, setUserLocation] = React.useState('');
+    console.log("ppppp" , currentEnrollment,  eligiblePrograms)
+  const [completionDate, setCompletionDate] = React.useState(currentEnrollment?.dateCompleted);
+  const [enrollmentDate, setEnrollmentDate] = React.useState(currentEnrollment?.dateEnrolled ?? new Date());
+  const [selectedProgram, setSelectedProgram] = React.useState(currentEnrollment?.program.uuid ?? '');
+  const [userLocation, setUserLocation] = React.useState(currentEnrollment?.location.uuid ?? '');
 
   if (!userLocation && session?.sessionLocation?.uuid) {
     setUserLocation(session?.sessionLocation?.uuid);

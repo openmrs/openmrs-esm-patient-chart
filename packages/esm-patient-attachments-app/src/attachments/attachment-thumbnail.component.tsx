@@ -3,9 +3,14 @@ import styles from './attachment-thumbnail.scss';
 import regularFile from '../assets/file-regular.svg';
 
 export default function AttachmentThumbnail(props: AttachmentThumbnailProps) {
+
+  console.log("==================" , props)
   return (
     <div className={styles.thumbnail}>
-      <Thumbnail {...props} />
+      {/* <Thumbnail {...props} /> */}
+      {
+        props.imageProps.title
+      }
     </div>
   );
 }

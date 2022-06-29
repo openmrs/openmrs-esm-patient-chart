@@ -76,11 +76,11 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
   const pushAttachments = useCallback(async (items: Array<any>, abortController: AbortController) => {
     const newAttachments = await Promise.all(
       items.map(async (item) => {
-        if (!item.bytesContentFamily) {
+       // if (!item.bytesContentFamily) {
           const { data } = await getAttachmentByUuid(item.uuid, abortController);
           item.bytesContentFamily = data.bytesContentFamily;
-        }
-
+        //}
+        
         return {
           ...createGalleryEntry(item),
           customOverlay: item.comment && (
