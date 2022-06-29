@@ -4,7 +4,7 @@
 
 # OpenMRS ESM Patient Chart
 
-The `openmrs-esm-patient-chart` is a frontend module for the OpenMRS SPA. It bundles together various microfrontends that constitute widgets in a patient dashboard. These widgets include:
+The `openmrs-esm-patient-chart` is a frontend module for the OpenMRS SPA. It contains various microfrontends that constitute widgets in a patient dashboard. These widgets include:
 
 - [Allergies](packages/esm-patient-allergies-app/README.md)
 - [Appointments](packages/esm-patient-appointments-app/README.md)

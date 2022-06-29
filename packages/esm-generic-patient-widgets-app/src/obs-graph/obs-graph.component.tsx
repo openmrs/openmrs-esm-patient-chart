@@ -31,7 +31,7 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
   const chartData = useMemo(
     () =>
       obss
-        .filter((obs) => obs.conceptUuid === selectedConcept.uuid)
+        .filter((obs) => obs.conceptUuid === selectedConcept.uuid && obs.dataType === 'Number')
         .map((obs) => ({
           group: selectedConcept.label,
           key: formatDate(new Date(obs.issued), { year: false, time: false }),

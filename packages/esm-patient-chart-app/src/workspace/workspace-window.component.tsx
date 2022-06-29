@@ -75,7 +75,7 @@ const WorkspaceWindow: React.FC<RouteComponentProps<ContextWorkspaceParams>> = (
         className={`${styles.header} ${maximized ? `${styles.fullWidth}` : `${styles.dynamicWidth}`}`}
       >
         <HeaderName prefix="">{workspaceTitle}</HeaderName>
-        <HeaderGlobalBar>
+        <HeaderGlobalBar className={styles.headerGlobalBar}>
           <ExtensionSlot extensionSlotName={patientChartWorkspaceHeaderSlot} />
           {layout === 'desktop' && (
             <>
