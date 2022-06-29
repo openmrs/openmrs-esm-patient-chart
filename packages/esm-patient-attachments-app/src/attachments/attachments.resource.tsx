@@ -9,7 +9,7 @@ export function getAttachmentByUuid(attachmentUuid: string, abortController: Abo
 }
 
 export function getAttachments(patientUuid: string, includeEncounterless: boolean, abortController: AbortController) {
-  return openmrsFetch(`${attachmentUrl}?patient=${patientUuid}&includeEncounterless=${includeEncounterless}&v=full`, {
+  return openmrsFetch(`${attachmentUrl}?patient=${patientUuid}&includeEncounterless=${includeEncounterless}`, {
     signal: abortController.signal,
   });
 }

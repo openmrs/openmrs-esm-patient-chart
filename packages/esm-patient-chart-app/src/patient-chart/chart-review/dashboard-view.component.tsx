@@ -47,7 +47,7 @@ export function DashboardView({ dashboard, patientUuid, patient }: DashboardView
 
   const wrapItem = React.useCallback(
     (slot: React.ReactNode, extension: ExtensionData) => {
-      const { columnSpan = 2 } = dashboardMeta[getExtensionNameFromId(extension.extensionId)];
+      const { columnSpan = 1 } = dashboardMeta[getExtensionNameFromId(extension.extensionId)];
       return <div style={{ gridColumn: `span ${columnSpan}` }}>{slot}</div>;
     },
     [dashboardMeta],
