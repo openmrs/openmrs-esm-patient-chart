@@ -102,7 +102,9 @@ describe('ProgramsDetailedSummary ', () => {
 
     // Clicking the edit button launches the edit form in a workspace
     userEvent.click(editButton);
-    expect(launchPatientWorkspace).toHaveBeenCalledWith('programs-form-workspace', { programEnrollmentId: mockEnrolledProgramsResponse[0].uuid })
+    expect(launchPatientWorkspace).toHaveBeenCalledWith('programs-form-workspace', {
+      programEnrollmentId: mockEnrolledProgramsResponse[0].uuid,
+    });
   });
 });
 

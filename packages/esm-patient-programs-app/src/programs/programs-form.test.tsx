@@ -3,7 +3,15 @@ import { throwError } from 'rxjs';
 import { of } from 'rxjs/internal/observable/of';
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createErrorHandler, formatDate, openmrsFetch, parseDate, showNotification, showToast, useLayoutType } from '@openmrs/esm-framework';
+import {
+  createErrorHandler,
+  formatDate,
+  openmrsFetch,
+  parseDate,
+  showNotification,
+  showToast,
+  useLayoutType,
+} from '@openmrs/esm-framework';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import {
   mockCareProgramsResponse,
@@ -52,15 +60,15 @@ jest.mock('./programs.resource', () => {
 
 mockOpenmrsFetch.mockImplementation((url) => {
   if (/programenrollment/.test(url)) {
-    return { data: { results: mockEnrolledProgramsResponse } }
+    return { data: { results: mockEnrolledProgramsResponse } };
   } else if (/program/.test(url)) {
-    return { data: { results: mockCareProgramsResponse } }
+    return { data: { results: mockCareProgramsResponse } };
   } else {
     return null;
-  }});
+  }
+});
 
 describe('ProgramsForm: ', () => {
-  
   it('renders the programs form with all the relevant fields and values', async () => {
     renderProgramsForm();
 
@@ -134,10 +142,10 @@ describe('ProgramsForm: ', () => {
   describe('Form submission: ', () => {
     const inpatientWardUuid = 'b1a8b05e-3542-4037-bbd3-998ee9c40574';
     const oncologyScreeningProgramUuid = '11b129ca-a5e7-4025-84bf-b92a173e20de';
-    
-  beforeEach(() => {
-    mockShowToast.mockReset();
-  })
+
+    beforeEach(() => {
+      mockShowToast.mockReset();
+    });
 
     it('creates a program enrollment', async () => {
       renderProgramsForm();

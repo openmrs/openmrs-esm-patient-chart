@@ -78,7 +78,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
         status: program.dateCompleted
           ? `${t('completedOn', 'Completed On')} ${formatDate(new Date(program.dateCompleted))}`
           : t('active', 'Active'),
-        actions: <ProgramEditButton programEnrollmentId={program.uuid} />
+        actions: <ProgramEditButton programEnrollmentId={program.uuid} />,
       };
     });
   }, [enrollments, t]);
@@ -150,21 +150,24 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
 };
 
 interface ProgramEditButtonProps {
-  programEnrollmentId: string
+  programEnrollmentId: string;
 }
 
-function ProgramEditButton ({programEnrollmentId}: ProgramEditButtonProps){
+function ProgramEditButton({ programEnrollmentId }: ProgramEditButtonProps) {
+  const launchEditProgramsForm = React.useCallback(
+    () => launchPatientWorkspace('programs-form-workspace', { programEnrollmentId }),
+    [],
+  );
 
-  const launchEditProgramsForm = React.useCallback(() => launchPatientWorkspace('programs-form-workspace', {programEnrollmentId}), []);
-
-  return <Button 
-    kind="ghost"
-    renderIcon={Edit16}
-    iconDescription="Edit Program"
-    onClick={launchEditProgramsForm}
-    hasIconOnly
+  return (
+    <Button
+      kind="ghost"
+      renderIcon={Edit16}
+      iconDescription="Edit Program"
+      onClick={launchEditProgramsForm}
+      hasIconOnly
     />
+  );
 }
-
 
 export default ProgramsDetailedSummary;

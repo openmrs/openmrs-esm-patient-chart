@@ -35,7 +35,7 @@ import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import styles from './programs-form.scss';
 
 interface ProgramsFormProps extends DefaultWorkspaceProps {
-  programEnrollmentId?: string
+  programEnrollmentId?: string;
 }
 
 const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid, programEnrollmentId }) => {
@@ -47,18 +47,23 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
 
   const { data: availablePrograms } = useAvailablePrograms();
   const { data: enrollments } = useEnrollments(patientUuid);
-  const  currentEnrollment = programEnrollmentId && enrollments.filter((e) => e.uuid == programEnrollmentId  ) [0];
-  const currentProgram = currentEnrollment ? {
-    display: currentEnrollment.program.name,
-    ...currentEnrollment.program
-  } : null;
+  const currentEnrollment = programEnrollmentId && enrollments.filter((e) => e.uuid == programEnrollmentId)[0];
+  const currentProgram = currentEnrollment
+    ? {
+        display: currentEnrollment.program.name,
+        ...currentEnrollment.program,
+      }
+    : null;
 
-  const eligiblePrograms = currentProgram ? [currentProgram] : filter(
-    availablePrograms,
-    (program) => !includes(map(enrollments, 'program.uuid'), program.uuid),
+  const eligiblePrograms = currentProgram
+    ? [currentProgram]
+    : filter(availablePrograms, (program) => !includes(map(enrollments, 'program.uuid'), program.uuid));
+  const [completionDate, setCompletionDate] = React.useState<Date>(
+    currentEnrollment?.dateCompleted ? parseDate(currentEnrollment.dateCompleted) : null,
   );
-  const [completionDate, setCompletionDate] = React.useState<Date>(currentEnrollment?.dateCompleted ? parseDate(currentEnrollment.dateCompleted) : null);
-  const [enrollmentDate, setEnrollmentDate] = React.useState<Date>(currentEnrollment?.dateEnrolled ? parseDate(currentEnrollment.dateEnrolled) : new Date());
+  const [enrollmentDate, setEnrollmentDate] = React.useState<Date>(
+    currentEnrollment?.dateEnrolled ? parseDate(currentEnrollment.dateEnrolled) : new Date(),
+  );
   const [selectedProgram, setSelectedProgram] = React.useState<string>(currentEnrollment?.program.uuid ?? '');
   const [userLocation, setUserLocation] = React.useState<string>(currentEnrollment?.location.uuid ?? '');
 
@@ -81,59 +86,62 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
       };
 
       const abortController = new AbortController();
-      const sub = currentEnrollment ?
-       updateProgramEnrollment(currentEnrollment.uuid, payload, abortController).subscribe(
-        (response) => {
-          if (response.status === 200) {
-            closeWorkspace();
+      const sub = currentEnrollment
+        ? updateProgramEnrollment(currentEnrollment.uuid, payload, abortController).subscribe(
+            (response) => {
+              if (response.status === 200) {
+                closeWorkspace();
 
-            showToast({
-              critical: true,
-              kind: 'success',
-              description: t('enrollmentUpdatesNowVisible', 'Changes to the program are now visible in the Programs table'),
-              title: t('enrollmentUpdated', 'Program enrollment updated'),
-            });
+                showToast({
+                  critical: true,
+                  kind: 'success',
+                  description: t(
+                    'enrollmentUpdatesNowVisible',
+                    'Changes to the program are now visible in the Programs table',
+                  ),
+                  title: t('enrollmentUpdated', 'Program enrollment updated'),
+                });
 
-            mutate(`/ws/rest/v1/programenrollment?patient=${patientUuid}&v=${customRepresentation}`);
-          }
-        },
-        (err) => {
-          createErrorHandler();
+                mutate(`/ws/rest/v1/programenrollment?patient=${patientUuid}&v=${customRepresentation}`);
+              }
+            },
+            (err) => {
+              createErrorHandler();
 
-          showNotification({
-            title: t('programEnrollmentSaveError', 'Error saving program enrollment'),
-            kind: 'error',
-            critical: true,
-            description: err?.message,
-          });
-        },
-      )
-      : createProgramEnrollment(payload, abortController).subscribe(
-        (response) => {
-          if (response.status === 201) {
-            closeWorkspace();
+              showNotification({
+                title: t('programEnrollmentSaveError', 'Error saving program enrollment'),
+                kind: 'error',
+                critical: true,
+                description: err?.message,
+              });
+            },
+          )
+        : createProgramEnrollment(payload, abortController).subscribe(
+            (response) => {
+              if (response.status === 201) {
+                closeWorkspace();
 
-            showToast({
-              critical: true,
-              kind: 'success',
-              description: t('enrollmentNowVisible', 'It is now visible in the Programs table'),
-              title: t('enrollmentSaved', 'Program enrollment saved'),
-            });
+                showToast({
+                  critical: true,
+                  kind: 'success',
+                  description: t('enrollmentNowVisible', 'It is now visible in the Programs table'),
+                  title: t('enrollmentSaved', 'Program enrollment saved'),
+                });
 
-            mutate(`/ws/rest/v1/programenrollment?patient=${patientUuid}&v=${customRepresentation}`);
-          }
-        },
-        (err) => {
-          createErrorHandler();
+                mutate(`/ws/rest/v1/programenrollment?patient=${patientUuid}&v=${customRepresentation}`);
+              }
+            },
+            (err) => {
+              createErrorHandler();
 
-          showNotification({
-            title: t('programEnrollmentSaveError', 'Error saving program enrollment'),
-            kind: 'error',
-            critical: true,
-            description: err?.message,
-          });
-        },
-      );
+              showNotification({
+                title: t('programEnrollmentSaveError', 'Error saving program enrollment'),
+                kind: 'error',
+                critical: true,
+                description: err?.message,
+              });
+            },
+          );
       return () => {
         sub.unsubscribe();
       };
