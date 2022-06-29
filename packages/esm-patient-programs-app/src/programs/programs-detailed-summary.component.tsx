@@ -1,5 +1,6 @@
 import React from 'react';
 import Add16 from '@carbon/icons-react/es/add/16';
+import Edit16 from '@carbon/icons-react/es/edit/16';
 import filter from 'lodash-es/filter';
 import includes from 'lodash-es/includes';
 import map from 'lodash-es/map';
@@ -59,6 +60,10 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
         key: 'status',
         header: t('status', 'Status'),
       },
+      {
+        key: 'actions',
+        header: t('actions', 'Actions'),
+      },
     ],
     [t],
   );
@@ -73,6 +78,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
         status: program.dateCompleted
           ? `${t('completedOn', 'Completed On')} ${formatDate(new Date(program.dateCompleted))}`
           : t('active', 'Active'),
+        actions: <ProgramEditButton programEnrollmentId={program.uuid} />,
       };
     });
   }, [enrollments, t]);
@@ -142,5 +148,26 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
   }
   return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchProgramsForm} />;
 };
+
+interface ProgramEditButtonProps {
+  programEnrollmentId: string;
+}
+
+function ProgramEditButton({ programEnrollmentId }: ProgramEditButtonProps) {
+  const launchEditProgramsForm = React.useCallback(
+    () => launchPatientWorkspace('programs-form-workspace', { programEnrollmentId }),
+    [],
+  );
+
+  return (
+    <Button
+      kind="ghost"
+      renderIcon={Edit16}
+      iconDescription="Edit Program"
+      onClick={launchEditProgramsForm}
+      hasIconOnly
+    />
+  );
+}
 
 export default ProgramsDetailedSummary;

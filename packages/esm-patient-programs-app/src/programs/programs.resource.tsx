@@ -59,12 +59,12 @@ export function createProgramEnrollment(payload, abortController) {
   });
 }
 
-export function updateProgramEnrollment(payload, abortController) {
+export function updateProgramEnrollment(programEnrollmentUuid: string, payload, abortController) {
   if (!payload && !payload.program) {
     return null;
   }
   const { program, dateEnrolled, dateCompleted, location } = payload;
-  return openmrsObservableFetch(`/ws/rest/v1/programenrollment/${program}`, {
+  return openmrsObservableFetch(`/ws/rest/v1/programenrollment/${programEnrollmentUuid}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
