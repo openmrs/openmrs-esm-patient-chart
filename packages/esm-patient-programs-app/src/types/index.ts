@@ -15,11 +15,15 @@ export interface PatientProgram {
       states: Array<{}>;
       links?: Links;
     }>;
+    concept: {
+      display: string;
+      uuid: string;
+    };
     links: Links;
   };
   display: string;
-  dateEnrolled: Date;
-  dateCompleted: Date | null;
+  dateEnrolled: string;
+  dateCompleted: string | null;
   location?: {
     uuid: string;
     display: string;

@@ -12,6 +12,7 @@ import {
   useSession,
   useLocations,
   useLayoutType,
+  parseDate,
 } from '@openmrs/esm-framework';
 import {
   Button,
@@ -28,6 +29,7 @@ import {
   useAvailablePrograms,
   useEnrollments,
   customRepresentation,
+  updateProgramEnrollment,
 } from './programs.resource';
 import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import styles from './programs-form.scss';
@@ -46,16 +48,19 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
   const { data: availablePrograms } = useAvailablePrograms();
   const { data: enrollments } = useEnrollments(patientUuid);
   const  currentEnrollment = programEnrollmentId && enrollments.filter((e) => e.uuid == programEnrollmentId  ) [0];
+  const currentProgram = currentEnrollment ? {
+    display: currentEnrollment.program.name,
+    ...currentEnrollment.program
+  } : null;
 
-  const eligiblePrograms = currentEnrollment ? [currentEnrollment.program] : filter(
+  const eligiblePrograms = currentProgram ? [currentProgram] : filter(
     availablePrograms,
     (program) => !includes(map(enrollments, 'program.uuid'), program.uuid),
   );
-    console.log("ppppp" , currentEnrollment,  eligiblePrograms)
-  const [completionDate, setCompletionDate] = React.useState(currentEnrollment?.dateCompleted);
-  const [enrollmentDate, setEnrollmentDate] = React.useState(currentEnrollment?.dateEnrolled ?? new Date());
-  const [selectedProgram, setSelectedProgram] = React.useState(currentEnrollment?.program.uuid ?? '');
-  const [userLocation, setUserLocation] = React.useState(currentEnrollment?.location.uuid ?? '');
+  const [completionDate, setCompletionDate] = React.useState<Date>(currentEnrollment?.dateCompleted ? parseDate(currentEnrollment.dateCompleted) : null);
+  const [enrollmentDate, setEnrollmentDate] = React.useState<Date>(currentEnrollment?.dateEnrolled ? parseDate(currentEnrollment.dateEnrolled) : new Date());
+  const [selectedProgram, setSelectedProgram] = React.useState<string>(currentEnrollment?.program.uuid ?? '');
+  const [userLocation, setUserLocation] = React.useState<string>(currentEnrollment?.location.uuid ?? '');
 
   if (!userLocation && session?.sessionLocation?.uuid) {
     setUserLocation(session?.sessionLocation?.uuid);
@@ -76,7 +81,34 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
       };
 
       const abortController = new AbortController();
-      const sub = createProgramEnrollment(payload, abortController).subscribe(
+      const sub = currentEnrollment ?
+       updateProgramEnrollment(currentEnrollment.uuid, payload, abortController).subscribe(
+        (response) => {
+          if (response.status === 200) {
+            closeWorkspace();
+
+            showToast({
+              critical: true,
+              kind: 'success',
+              description: t('enrollmentUpdatesNowVisible', 'Changes to the program are now visible in the Programs table'),
+              title: t('enrollmentUpdated', 'Program enrollment updated'),
+            });
+
+            mutate(`/ws/rest/v1/programenrollment?patient=${patientUuid}&v=${customRepresentation}`);
+          }
+        },
+        (err) => {
+          createErrorHandler();
+
+          showNotification({
+            title: t('programEnrollmentSaveError', 'Error saving program enrollment'),
+            kind: 'error',
+            critical: true,
+            description: err?.message,
+          });
+        },
+      )
+      : createProgramEnrollment(payload, abortController).subscribe(
         (response) => {
           if (response.status === 201) {
             closeWorkspace();
@@ -84,7 +116,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
             showToast({
               critical: true,
               kind: 'success',
-              description: t('enrollmentNowVisible', 'It is now visible on the Programs page'),
+              description: t('enrollmentNowVisible', 'It is now visible in the Programs table'),
               title: t('enrollmentSaved', 'Program enrollment saved'),
             });
 
