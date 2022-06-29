@@ -158,11 +158,12 @@ function ProgramEditButton ({programEnrollmentId}: ProgramEditButtonProps){
   const launchEditProgramsForm = React.useCallback(() => launchPatientWorkspace('programs-form-workspace', {programEnrollmentId}), []);
 
   return <Button 
-  kind="ghost"
-  renderIcon={Edit16}
-  iconDescription="Edit Program"
-  onClick={launchEditProgramsForm}
-  />
+    kind="ghost"
+    renderIcon={Edit16}
+    iconDescription="Edit Program"
+    onClick={launchEditProgramsForm}
+    hasIconOnly
+    />
 }
 
 
