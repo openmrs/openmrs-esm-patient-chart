@@ -16,7 +16,7 @@ export interface Attachment {
   thumbnail: string;
   thumbnailWidth: number;
   thumbnailHeight: number;
-  caption: string;
+  thumbnailCaption: string;
   isSelected: boolean;
   dateTime?: string;
   bytesMimeType?: string;

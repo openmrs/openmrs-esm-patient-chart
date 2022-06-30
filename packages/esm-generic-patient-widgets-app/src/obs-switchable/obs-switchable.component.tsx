@@ -19,38 +19,35 @@ const ObsSwitchable: React.FC<ObsSwitchableProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const config = useConfig() as ConfigObject;
   const [chartView, setChartView] = React.useState<boolean>();
-  const { data, error, isLoading, isValidating } = useObs(patientUuid);
-  const isChartButtonVisible =
-    data.filter(
-      (obs) =>
-        typeof (obs?.valueQuantity?.value ?? obs.valueCodeableConcept?.coding[0]?.display ?? obs.valueString) !==
-        'number',
-    ).length > 0;
+
+  const { data: obss, error, isLoading, isValidating } = useObs(patientUuid);
+
+  const hasNumberType = obss.find((obs) => obs.dataType === 'Number');
 
   return (
     <>
       {(() => {
         if (isLoading) return <DataTableSkeleton role="progressbar" />;
         if (error) return <ErrorState error={error} headerTitle={config.title} />;
-        if (data?.length) {
+        if (obss?.length) {
           return (
             <div className={styles.widgetContainer}>
               <CardHeader title={config.title}>
                 <div className={styles.backgroundDataFetchingIndicator}>
                   <span>{isValidating ? <InlineLoading /> : null}</span>
                 </div>
-                <div className={styles.headerActionItems}>
-                  <div className={styles.toggleButtons}>
-                    <Button
-                      className={styles.toggle}
-                      size="field"
-                      kind={chartView ? 'ghost' : 'tertiary'}
-                      hasIconOnly
-                      renderIcon={Table16}
-                      iconDescription={t('tableView', 'Table View')}
-                      onClick={() => setChartView(false)}
-                    />
-                    {!isChartButtonVisible && (
+                {hasNumberType ? (
+                  <div className={styles.headerActionItems}>
+                    <div className={styles.toggleButtons}>
+                      <Button
+                        className={styles.toggle}
+                        size="field"
+                        kind={chartView ? 'ghost' : 'tertiary'}
+                        hasIconOnly
+                        renderIcon={Table16}
+                        iconDescription={t('tableView', 'Table View')}
+                        onClick={() => setChartView(false)}
+                      />
                       <Button
                         className={styles.toggle}
                         size="field"
@@ -60,9 +57,9 @@ const ObsSwitchable: React.FC<ObsSwitchableProps> = ({ patientUuid }) => {
                         iconDescription={t('chartView', 'Chart View')}
                         onClick={() => setChartView(true)}
                       />
-                    )}
+                    </div>
                   </div>
-                </div>
+                ) : null}
               </CardHeader>
               {chartView ? <ObsGraph patientUuid={patientUuid} /> : <ObsTable patientUuid={patientUuid} />}
             </div>
