@@ -55,3 +55,7 @@ _Note2: if you don't already have all the "children" concepts, e.g. CBC, Serum E
 ### 4. Check your work
 Review your concepts to see that the hierarchy all looks right in the Dictionary/Collection. In the above example (which was created using the OpenMRS Dictionary Manager), you can see that _Bloodwork_ now correctly contains _Hematology_ and _Chemistry_.
 <img width="1173" alt="image" src="https://user-images.githubusercontent.com/67400059/161008455-edbd31d1-00ca-4236-9309-bc41763a6f0a.png">
+
+### 5. Update the config-schema file with your ConvSet codes
+Go here to add the UUIDs for each of your ConvSet concepts which you want to show up in the Lab Results filters: 
+https://github.com/openmrs/openmrs-esm-patient-chart/blob/master/packages/esm-patient-test-results-app/src/config-schema.ts#L3
