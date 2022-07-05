@@ -8,7 +8,7 @@ import { orderBasketStore } from '../medications/order-basket-store';
 import { useLayoutType, useStore } from '@openmrs/esm-framework';
 
 const OrderBasketActionButton: React.FC = () => {
-  const { items } = useStore(orderBasketStore);
+  const { items, changed } = useStore(orderBasketStore);
   const { t } = useTranslation();
   const layout = useLayoutType();
   const { workspaces } = useWorkspaces();
@@ -26,7 +26,9 @@ const OrderBasketActionButton: React.FC = () => {
         onClick={launchOrdersWorkspace}
       >
         <div className={styles.elementContainer}>
-          <ShoppingCart20 /> {items?.length > 0 && <Tag className={styles.countTag}>{items?.length}</Tag>}
+          <ShoppingCart20 />
+          {workspaces.length > 0 && items?.length > 0 && <Tag className={styles.countTag}>{items?.length}</Tag>}
+          {workspaces.length === 0 && changed === true && <Tag className={styles.countTag}>!</Tag>}{' '}
         </div>
         <span>{t('orderBasket', 'Order Basket')}</span>
       </Button>
@@ -39,7 +41,9 @@ const OrderBasketActionButton: React.FC = () => {
         kind="ghost"
         renderIcon={() => (
           <div className={styles.elementContainer}>
-            <ShoppingCart20 /> {items?.length > 0 && <Tag className={styles.countTag}>{items?.length}</Tag>}
+            <ShoppingCart20 />
+            {workspaces.length > 0 && items?.length > 0 && <Tag className={styles.countTag}>{items?.length}</Tag>}
+            {workspaces.length === 0 && changed === true && <Tag className={styles.countTag}>!</Tag>}
           </div>
         )}
         hasIconOnly
