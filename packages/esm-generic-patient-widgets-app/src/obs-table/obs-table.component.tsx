@@ -48,7 +48,19 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
               break;
 
             case 'Number':
-              rowData[obs.conceptUuid] = obs.valueQuantity?.value;
+              let decimalPlaces: number = config.data.find(
+                (ele: any) => ele.concept === obs.conceptUuid,
+              )?.decimalPlaces;
+
+              if (obs.valueQuantity?.value % 1 !== 0) {
+                if (decimalPlaces > 0) {
+                  rowData[obs.conceptUuid] = obs.valueQuantity?.value.toFixed(decimalPlaces);
+                } else {
+                  rowData[obs.conceptUuid] = obs.valueQuantity?.value.toFixed(2);
+                }
+              } else {
+                rowData[obs.conceptUuid] = obs.valueQuantity?.value;
+              }
               break;
 
             case 'Coded':
@@ -59,7 +71,7 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
 
         return rowData;
       }),
-    [obssByDate],
+    [config.data, obssByDate],
   );
 
   const { results, goTo, currentPage } = usePagination(tableRows, config.table.pageSize);

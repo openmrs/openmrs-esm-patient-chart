@@ -23,6 +23,9 @@ export const configSchema = {
       color: {
         _type: Type.String,
       },
+      decimalPlaces: {
+        _type: Type.Number,
+      },
     },
     _default: [
       {
