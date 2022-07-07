@@ -39,6 +39,11 @@ function setupOpenMRS() {
         },
       },
       {
+        name: 'conditions-widget',
+        load: getAsyncLifecycle(() => import('./conditions/conditions-widget.component'), options),
+        meta: {},
+      },
+      {
         name: 'conditions-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
         order: 7,
