@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 
 import { take, map, tap } from 'rxjs/operators';
 import { Observable, Subject } from 'rxjs';
-import { age } from '@openmrs/esm-framework';
 
 import { ProviderResourceService } from '../openmrs-api/provider-resource.service';
 import { LocationResourceService } from '../openmrs-api/location-resource.service';
@@ -199,7 +198,7 @@ export class FormDataSourceService {
     const model: object = {};
     model['sex'] = patient?.gender === 'male' ? 'M' : 'F';
     model['birthdate'] = new Date(patient?.birthDate);
-    model['age'] = parseInt(age(patient?.birthDate).match(/\d+/g).join(''));
+    model['age'] = this.calculateAge(patient?.birthDate);
 
     // define gender based constant:
     if (patient?.gender === 'female') {
@@ -210,5 +209,11 @@ export class FormDataSourceService {
     }
 
     return model;
+  }
+
+  private calculateAge(birthday) {
+    const ageDifMs = Date.now() - new Date(birthday).getTime();
+    const ageDate = new Date(ageDifMs);
+    return Math.abs(ageDate.getUTCFullYear() - 1970);
   }
 }
