@@ -20,7 +20,7 @@ export const orderBasketStoreActions = {
   setItems(_: OrderBasketStore, value: Array<OrderBasketItem> | (() => Array<OrderBasketItem>)) {
     return { items: typeof value === 'function' ? value() : value };
   },
-  
+
   isChanged(_: OrderBasketStore, status: boolean) {
     return { changed: status };
   },

@@ -26,7 +26,7 @@ const OrderBasketActionButton: React.FC = () => {
         onClick={launchOrdersWorkspace}
       >
         <div className={styles.elementContainer}>
-          <ShoppingCart20 /> 
+          <ShoppingCart20 />
           {workspaces.length > 0 && items?.length > 0 && <Tag className={styles.countTag}>{items?.length}</Tag>}
           {workspaces.length === 0 && changed === true && <Tag className={styles.countTag}>!</Tag>}
         </div>
@@ -41,9 +41,10 @@ const OrderBasketActionButton: React.FC = () => {
         kind="ghost"
         renderIcon={() => (
           <div className={styles.elementContainer}>
-            <ShoppingCart20 /> 
+            <ShoppingCart20 />
             {workspaces.length > 0 && items?.length > 0 && <Tag className={styles.countTag}>{items?.length}</Tag>}
-            {workspaces.length === 0 && changed === true && <Tag className={styles.countTag}>!</Tag>}          </div>
+            {workspaces.length === 0 && changed === true && <Tag className={styles.countTag}>!</Tag>}{' '}
+          </div>
         )}
         hasIconOnly
         iconDescription={t('orders', 'Orders')}
