@@ -91,7 +91,7 @@ const WorkspaceWindow: React.FC<RouteComponentProps<ContextWorkspaceParams>> = (
                 iconDescription={t('hide', 'Hide')}
                 hasIconOnly
                 kind="ghost"
-                onClick={() => updateWindowSize('hidden')}
+                onClick={() => workspaces[0]?.closeWorkspace()}
                 renderIcon={ArrowRight16}
                 tooltipPosition="bottom"
                 tooltipAlignment="end"
