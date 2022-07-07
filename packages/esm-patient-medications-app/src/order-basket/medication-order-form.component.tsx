@@ -31,6 +31,7 @@ export interface MedicationOrderFormProps {
   durationUnits: Array<OpenmrsResource>;
   onSign: (finalizedOrder: OrderBasketItem) => void;
   onCancel: () => void;
+  changed: (changed: boolean) => void;
 }
 
 export default function MedicationOrderForm({
@@ -38,6 +39,7 @@ export default function MedicationOrderForm({
   durationUnits,
   onSign,
   onCancel,
+  changed,
 }: MedicationOrderFormProps) {
   const { t } = useTranslation();
   const isDesktop = useLayoutType() === 'desktop';
@@ -92,12 +94,14 @@ export default function MedicationOrderForm({
                 labelText={t('freeTextDosage', 'Free Text Dosage')}
                 toggled={orderBasketItem.isFreeTextDosage}
                 onChange={() => {} /* Required by the typings, but we don't need it. */}
-                onToggle={(value) =>
+                onToggle={(value) =>{
+                  changed(true);
                   setOrderBasketItem({
                     ...orderBasketItem,
                     isFreeTextDosage: value,
                   })
                 }
+              }
               />
             </Column>
           </Row>
@@ -141,6 +145,7 @@ export default function MedicationOrderForm({
                     invalid={!orderBasketItem.dosage && !orderBasketItem.isFreeTextDosage}
                     invalidText={t('validationNoItemSelected', 'Please select one of the available items.')}
                     onChange={({ selectedItem }) => {
+                      changed(true);
                       setOrderBasketItem({
                         ...orderBasketItem,
                         dosage: !!selectedItem?.id
@@ -169,6 +174,7 @@ export default function MedicationOrderForm({
                     invalid={!orderBasketItem.frequency && !orderBasketItem.isFreeTextDosage}
                     invalidText={t('validationNoItemSelected', 'Please select one of the available items.')}
                     onChange={({ selectedItem }) => {
+                      changed(true);
                       setOrderBasketItem({
                         ...orderBasketItem,
                         frequency: !!selectedItem?.id
@@ -220,12 +226,14 @@ export default function MedicationOrderForm({
                     )}
                     maxLength={65535}
                     value={orderBasketItem.patientInstructions}
-                    onChange={(e) =>
+                    onChange={(e) =>{
+                      changed(true);
                       setOrderBasketItem({
                         ...orderBasketItem,
                         patientInstructions: e.target.value,
                       })
                     }
+                  }
                   />
                 </Column>
                 <Column>
@@ -234,12 +242,14 @@ export default function MedicationOrderForm({
                       id="prn"
                       labelText={t('takeAsNeeded', 'Take As Needed')}
                       checked={orderBasketItem.asNeeded}
-                      onChange={(newValue) =>
+                      onChange={(newValue) =>{
+                        changed(true);
                         setOrderBasketItem({
                           ...orderBasketItem,
                           asNeeded: newValue,
                         })
                       }
+                    }
                     />
                   </FormGroup>
                   <div
@@ -277,12 +287,14 @@ export default function MedicationOrderForm({
                 datePickerType="single"
                 maxDate={new Date()}
                 value={[orderBasketItem.startDate]}
-                onChange={([newStartDate]) =>
+                onChange={([newStartDate]) =>{
+                  changed(true);
                   setOrderBasketItem({
                     ...orderBasketItem,
                     startDate: newStartDate,
                   })
                 }
+              }
               >
                 <DatePickerInput
                   id="startDatePicker"
@@ -302,6 +314,7 @@ export default function MedicationOrderForm({
                 allowEmpty={true}
                 helperText={t('noDurationHint', 'An empty field indicates an indefinite duration.')}
                 onChange={(e) => {
+                  changed(true);
                   // @ts-ignore
                   const newValue = e.imaginaryTarget.value === '' ? null : +e.imaginaryTarget.value;
                   setOrderBasketItem({
@@ -327,7 +340,8 @@ export default function MedicationOrderForm({
                   itemToString={(item) => item?.text}
                   // @ts-ignore
                   placeholder={t('durationUnitPlaceholder', 'Duration Unit')}
-                  onChange={({ selectedItem }) =>
+                  onChange={({ selectedItem }) =>{
+                    changed(true);
                     !!selectedItem
                       ? setOrderBasketItem({
                           ...orderBasketItem,
@@ -341,6 +355,7 @@ export default function MedicationOrderForm({
                           durationUnit: config.daysDurationUnit,
                         })
                   }
+                }
                 />
               </FormGroup>
             </Column>
@@ -360,6 +375,7 @@ export default function MedicationOrderForm({
                   value={orderBasketItem.pillsDispensed}
                   min={0}
                   onChange={(e) => {
+                    changed(true);
                     setOrderBasketItem({
                       ...orderBasketItem,
                       // @ts-ignore
@@ -376,13 +392,16 @@ export default function MedicationOrderForm({
                   id="prescriptionRefills"
                   min={0}
                   value={orderBasketItem.numRefills}
-                  onChange={(e) =>
+                  onChange={(e) =>{
+                    changed(true);
                     setOrderBasketItem({
                       ...orderBasketItem,
                       // @ts-ignore
                       numRefills: +e.imaginaryTarget.value,
                     })
                   }
+                }
+                  
                 />
               </FormGroup>
             </Column>
@@ -395,12 +414,14 @@ export default function MedicationOrderForm({
                 labelText={t('indication', 'Indication')}
                 placeholder={t('indicationPlaceholder', 'e.g. "Hypertension"')}
                 value={orderBasketItem.indication}
-                onChange={(e) =>
+                onChange={(e) =>{
+                  changed(true);
                   setOrderBasketItem({
                     ...orderBasketItem,
                     indication: e.target.value,
                   })
                 }
+              }
                 required
                 maxLength={150}
               />

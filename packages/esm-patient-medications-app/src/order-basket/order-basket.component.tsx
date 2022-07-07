@@ -22,9 +22,9 @@ export interface OrderBasketProps {
 }
 
 const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBasketStore, {}>(
-  'items',
+  ['items', 'changed'],
   orderBasketStoreActions,
-)(({ patientUuid, items, closeWorkspace, setItems }: OrderBasketProps & OrderBasketStore & OrderBasketStoreActions) => {
+)(({ patientUuid, items, closeWorkspace, setItems, isChanged, }: OrderBasketProps & OrderBasketStore & OrderBasketStoreActions) => {
   const { t } = useTranslation();
   const displayText = t('activeMedicationsDisplayText', 'Active medications');
   const headerTitle = t('activeMedicationsHeaderTitle', 'active medications');
@@ -120,6 +120,10 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
     );
   };
 
+  const touched = (formState) => {
+    isChanged(formState);
+  };
+
   return (
     <>
       {(() => {
@@ -131,6 +135,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
               initialOrderBasketItem={medicationOrderFormItem}
               onSign={onMedicationOrderFormSigned}
               onCancel={() => setIsMedicationOrderFormVisible(false)}
+              changed={touched}
             />
           );
         }
