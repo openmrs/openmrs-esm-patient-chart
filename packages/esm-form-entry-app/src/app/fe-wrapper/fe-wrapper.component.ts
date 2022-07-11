@@ -160,6 +160,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
     this.formState = 'submitting';
     this.formSubmissionService.submitPayload(this.form).subscribe(
       ({ encounter }) => {
+        this.onPostResponse(encounter);
         const isOffline = this.singleSpaPropsService.getProp('isOffline', false);
         this.formState = 'submitted';
 
@@ -232,5 +233,10 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
   public closeForm() {
     const closeWorkspace = this.singleSpaPropsService.getPropOrThrow('closeWorkspace');
     closeWorkspace();
+  }
+
+  public onPostResponse(encounter: Encounter | undefined) {
+    const handlePostResponse = this.singleSpaPropsService.getProp('handlePostResponse');
+    if (handlePostResponse && typeof handlePostResponse === 'function') handlePostResponse(encounter);
   }
 }
