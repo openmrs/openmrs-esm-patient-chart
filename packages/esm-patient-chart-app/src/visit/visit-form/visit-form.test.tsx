@@ -1,17 +1,13 @@
 import React from 'react';
-import dayjs from 'dayjs';
-import { screen, render, fireEvent } from '@testing-library/react';
+import { of, throwError } from 'rxjs';
+import { screen, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { BehaviorSubject, of, throwError } from 'rxjs';
+import { saveVisit, showNotification, showToast } from '@openmrs/esm-framework';
 import { mockPatient } from '../../../../../__mocks__/patient.mock';
 import { mockLocations } from '../../../../../__mocks__/location.mock';
-import { mockCurrentVisit, mockVisitTypes } from '../../../../../__mocks__/visits.mock';
-import { saveVisit, showNotification, showToast, toOmrsIsoString, toDateObjectStrict } from '@openmrs/esm-framework';
-import { getByTextWithMarkup } from '../../../../../tools/test-helpers';
+import { mockVisitTypes } from '../../../../../__mocks__/visits.mock';
 import StartVisitForm from './visit-form.component';
 
-const isoFormat = 'YYYY-MM-DDTHH:mm:ss.SSSZZ';
-const mockDateTimeStampInSeconds = 1638682781000;
 const mockCloseWorkspace = jest.fn();
 const mockPromptBeforeClosing = jest.fn();
 
@@ -23,8 +19,6 @@ const testProps = {
 
 const mockSaveVisit = saveVisit as jest.Mock;
 const mockGetStartedVisitGetter = jest.fn();
-const mockToOmrsIsoString = toOmrsIsoString as jest.Mock;
-const mockToDateObjectStrict = toDateObjectStrict as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -48,13 +42,7 @@ jest.mock('@openmrs/esm-framework', () => {
   };
 });
 
-describe('VisitForm: ', () => {
-  beforeEach(() => {
-    // @ts-ignore
-    jest.useFakeTimers('modern');
-    // @ts-ignore
-    jest.setSystemTime(mockDateTimeStampInSeconds);
-  });
+describe('VisitForm', () => {
   it('renders the Start Visit form with all the relevant fields and values', () => {
     renderVisitForm();
 
@@ -74,96 +62,92 @@ describe('VisitForm: ', () => {
     expect(screen.getByRole('button', { name: /Discard/i })).toBeInTheDocument();
   });
 
-  describe('Form submission: ', () => {
-    let saveButton: HTMLElement;
+  it('renders an error message if a Visit Type is not selected', async () => {
+    const user = userEvent.setup();
 
-    beforeEach(() => {
-      // @ts-ignore
-      jest.useFakeTimers('modern');
-      // @ts-ignore
-      jest.setSystemTime(1638682781000); // 5 Dec 2021 05:39:41 GMT
-    });
+    renderVisitForm();
 
-    beforeEach(() => {
-      mockToDateObjectStrict.mockImplementation((date) => dayjs(date, isoFormat).toDate());
-      mockToOmrsIsoString.mockImplementation((date) => dayjs(date).format(isoFormat));
-      mockGetStartedVisitGetter.mockReturnValueOnce(new BehaviorSubject(mockCurrentVisit));
+    const saveButton = screen.getByRole('button', { name: /Start Visit/i });
 
-      renderVisitForm();
-      saveButton = screen.getByRole('button', { name: /Start Visit/i });
-    });
+    await waitFor(() => user.click(saveButton));
 
-    it('renders an error message if a Visit Type is not selected', () => {
-      userEvent.click(saveButton);
+    const errorAlert = screen.getByRole('alert');
+    expect(errorAlert).toBeInTheDocument();
+    expect(screen.getByText(/Missing visit type/i)).toBeInTheDocument();
+    expect(screen.getByText(/Please select a visit type/i)).toBeInTheDocument();
 
-      const errorAlert = screen.getByRole('alert');
-      expect(errorAlert).toBeInTheDocument();
-      expect(getByTextWithMarkup(/Missing visit type/i)).toBeInTheDocument();
-      expect(getByTextWithMarkup(/Please select a visit type/i)).toBeInTheDocument();
+    await waitFor(() => user.click(screen.getByLabelText(/Outpatient visit/i)));
 
-      userEvent.click(screen.getByLabelText(/Outpatient visit/i));
+    expect(errorAlert).not.toBeInTheDocument();
+  });
 
-      expect(errorAlert).not.toBeInTheDocument();
-    });
+  it('starts a new visit upon successful submission', async () => {
+    const user = userEvent.setup();
 
-    it('starts a new visit upon successful submission', () => {
-      // Set time
-      const timePicker = screen.getByRole('textbox', { name: /Time/i });
+    renderVisitForm();
 
-      // Set time format
-      const timeFormat = screen.getByRole('combobox', { name: /Time/i });
-      userEvent.selectOptions(timeFormat, 'AM');
-      fireEvent.change(timePicker, { target: { value: '08:15' } });
+    const saveButton = screen.getByRole('button', { name: /Start visit/i });
 
-      // Set visit type
-      userEvent.click(screen.getByLabelText(/Outpatient visit/i));
+    // Set visit type
+    await waitFor(() => user.click(screen.getByLabelText(/Outpatient visit/i)));
 
-      // Set location
-      const locationOptions = screen.getByRole('combobox', { name: /Select a location/i });
-      userEvent.selectOptions(locationOptions, 'b1a8b05e-3542-4037-bbd3-998ee9c40574');
+    // Set location
+    const locationOptions = screen.getByRole('combobox', { name: /Select a location/i });
 
-      mockSaveVisit.mockReturnValueOnce(of({ status: 201 }));
+    await waitFor(() => user.selectOptions(locationOptions, 'b1a8b05e-3542-4037-bbd3-998ee9c40574'));
 
-      userEvent.click(saveButton);
+    mockSaveVisit.mockReturnValueOnce(of({ status: 201 }));
 
-      expect(mockSaveVisit).toHaveBeenCalledTimes(1);
-      expect(mockSaveVisit).toHaveBeenCalledWith(
-        expect.objectContaining({
-          location: mockLocations[1].uuid,
-          patient: mockPatient.id,
-          visitType: 'some-uuid1',
-        }),
-        new AbortController(),
-      );
+    await waitFor(() => user.click(saveButton));
 
-      expect(showToast).toHaveBeenCalledTimes(1);
-      expect(showToast).toHaveBeenCalledWith({ description: 'Visit started successfully', kind: 'success' });
-    });
+    expect(mockSaveVisit).toHaveBeenCalledTimes(1);
+    expect(mockSaveVisit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        location: mockLocations[1].uuid,
+        patient: mockPatient.id,
+        visitType: 'some-uuid1',
+      }),
+      new AbortController(),
+    );
 
-    it('renders an error message if there was a problem starting a new visit', () => {
-      userEvent.click(screen.getByLabelText(/Outpatient visit/i));
+    expect(showToast).toHaveBeenCalledTimes(1);
+    expect(showToast).toHaveBeenCalledWith({ description: 'Visit started successfully', kind: 'success' });
+  });
 
-      mockSaveVisit.mockReturnValueOnce(throwError({ status: 500, statusText: 'Internal server error' }));
+  it('renders an error message if there was a problem starting a new visit', async () => {
+    mockSaveVisit.mockReturnValueOnce(throwError({ status: 500, statusText: 'Internal server error' }));
 
-      userEvent.click(saveButton);
+    const user = userEvent.setup();
 
-      expect(showNotification).toHaveBeenCalledTimes(1);
-      expect(showNotification).toHaveBeenCalledWith(
-        expect.objectContaining({
-          kind: 'error',
-          title: 'Error starting visit',
-        }),
-      );
-    });
+    renderVisitForm();
 
-    test('should display unsaved-changes modal, when form has unsaved changes', () => {
-      userEvent.click(screen.getByLabelText(/Outpatient visit/i));
+    await waitFor(() => user.click(screen.getByLabelText(/Outpatient visit/i)));
 
-      const closeButton = screen.getByRole('button', { name: /Discard/ });
-      userEvent.click(closeButton);
+    const saveButton = screen.getByRole('button', { name: /Start Visit/i });
 
-      expect(mockCloseWorkspace).toHaveBeenCalled();
-    });
+    await waitFor(() => user.click(saveButton));
+
+    expect(showNotification).toHaveBeenCalledTimes(1);
+    expect(showNotification).toHaveBeenCalledWith(
+      expect.objectContaining({
+        kind: 'error',
+        title: 'Error starting visit',
+      }),
+    );
+  });
+
+  it('displays the unsaved change modal when a form has unsaved changes', async () => {
+    const user = userEvent.setup();
+
+    renderVisitForm();
+
+    await waitFor(() => user.click(screen.getByLabelText(/Outpatient visit/i)));
+
+    const closeButton = screen.getByRole('button', { name: /Discard/i });
+
+    await waitFor(() => user.click(closeButton));
+
+    expect(mockCloseWorkspace).toHaveBeenCalled();
   });
 });
 

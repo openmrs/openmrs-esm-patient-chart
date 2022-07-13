@@ -1,10 +1,11 @@
 import React from 'react';
-import { screen, within } from '@testing-library/react';
+import { screen, within, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { mockEnrolledProgramsResponse } from '../../../../__mocks__/programs.mock';
 import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
-import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import ProgramsDetailedSummary from './programs-detailed-summary.component';
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
@@ -70,6 +71,8 @@ describe('ProgramsDetailedSummary ', () => {
   });
 
   it("renders a detailed tabular summary of the patient's program enrollments", async () => {
+    const user = userEvent.setup();
+
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockEnrolledProgramsResponse } });
     mockUsePagination.mockImplementation(() => ({
       currentPage: 1,
@@ -97,11 +100,13 @@ describe('ProgramsDetailedSummary ', () => {
     expect(editButton).toBeInTheDocument();
 
     // Clicking "Add" launches the programs form in a workspace
-    userEvent.click(addButton);
+    await waitFor(() => user.click(addButton));
+
     expect(launchPatientWorkspace).toHaveBeenCalledWith('programs-form-workspace');
 
     // Clicking the edit button launches the edit form in a workspace
-    userEvent.click(editButton);
+    await waitFor(() => user.click(editButton));
+
     expect(launchPatientWorkspace).toHaveBeenCalledWith('programs-form-workspace', {
       programEnrollmentId: mockEnrolledProgramsResponse[0].uuid,
     });
@@ -109,5 +114,8 @@ describe('ProgramsDetailedSummary ', () => {
 });
 
 function renderProgramsOverview() {
-  renderWithSwr(<ProgramsDetailedSummary />);
+  const testProps = {
+    patientUuid: mockPatient.id,
+  };
+  renderWithSwr(<ProgramsDetailedSummary {...testProps} />);
 }

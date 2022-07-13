@@ -28,12 +28,13 @@
     "url": "https://github.com/openmrs/openmrs-esm-patient-chart/issues"
   },
   "dependencies": {
+    "@carbon/react": "^1.6.0",
     "lodash-es": "^4.17.15",
     "uuid": "^8.3.2"
   },
   "peerDependencies": {
     "@openmrs/esm-framework": "3.x",
-    "react": "16.x",
+    "react": "^18.2.0",
     "single-spa": "5.x"
   }
 }

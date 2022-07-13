@@ -29,7 +29,7 @@
 .tabletHeader {  
   height: 4.5rem;
   h4 {
-    @include type.type-style('productive-heading-03');
+    @include type.type-style('heading-03');
     color: $text-02;
   }
 }

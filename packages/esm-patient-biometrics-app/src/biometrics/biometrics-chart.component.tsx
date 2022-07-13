@@ -89,6 +89,7 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
       },
     };
   }, [selectedBiometrics]);
+
   return (
     <div className={styles.biometricChartContainer}>
       <div className={styles.biometricSignsArea}>
@@ -96,7 +97,7 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
           {t('biometricDisplayed', 'Biometric Displayed')}
         </label>
         <Tabs className={styles.verticalTabs} type="default">
-          <TabList aria-label="Biometrics tabs">
+          <TabList className={styles.tablist} aria-label="Biometrics tabs">
             {[
               { id: 'weight', label: `Weight (${conceptUnits.get(config.concepts.weightUuid) ?? ''})` },
               { id: 'height', label: `Height (${conceptUnits.get(config.concepts.heightUuid) ?? ''})` },

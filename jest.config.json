@@ -6,7 +6,8 @@
   "moduleNameMapper": {
     "\\.(s?css)$": "identity-obj-proxy",
     "@openmrs/esm-framework": "@openmrs/esm-framework/mock",
-    "^lodash-es/(.*)$": "lodash/$1"
+    "^lodash-es/(.*)$": "lodash/$1",
+    "^uuid$": "<rootDir>/node_modules/uuid/dist/index.js"
   },
   "collectCoverageFrom": [
     "**/src/**/*.component.tsx",
@@ -28,5 +29,9 @@
   ],
   "testPathIgnorePatterns": [
     "<rootDir>/packages/esm-form-entry-app"
-  ]
+  ],
+  "testEnvironment": "jsdom",
+  "testEnvironmentOptions": {
+    "url": "http://localhost/"
+  }
 }

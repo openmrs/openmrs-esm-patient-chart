@@ -4,6 +4,7 @@ import { Tab, Tabs, TabList, TabPanel, TabPanels, Tag } from '@carbon/react';
 import {
   formatDatetime,
   formatTime,
+  isDesktop,
   OpenmrsResource,
   parseDate,
   useConfig,
@@ -40,6 +41,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid }) 
   const config = useConfig();
   const { t } = useTranslation();
   const [selectedTab, setSelectedTab] = useState(0);
+  const layout = useLayoutType();
 
   const [diagnoses, notes, medications]: [Array<DiagnosisItem>, Array<Note>, Array<OrderItem>] = useMemo(() => {
     // Medication Tab
@@ -110,10 +112,8 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid }) 
           </span>
         )}
       </div>
-      <Tabs
-        className={`${styles.verticalTabs} ${useLayoutType() === 'tablet' ? styles.tabletTabs : styles.desktopTabs}`}
-      >
-        <TabList aria-label="Visit summary tabs">
+      <Tabs className={`${styles.verticalTabs} ${layout === 'tablet' ? styles.tabletTabs : styles.desktopTabs}`}>
+        <TabList aria-label="Visit summary tabs" className={styles.tablist}>
           <Tab
             className={`${styles.tab} ${styles.bodyLong01} ${selectedTab === 0 && styles.selectedTab}`}
             id="notes-tab"

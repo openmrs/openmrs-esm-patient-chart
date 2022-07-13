@@ -25,30 +25,45 @@
 
 .verticalTabs {
   margin: 1rem 0;
-
-  &:global(.cds--tabs--scrollable .cds--tabs--scrollable__nav-item+.cds--tabs--scrollable__nav-item) {
-    margin-left: 0rem;
-  }
-  
-  > ul {
-    flex-direction: column !important;
-  }
+  scroll-behavior: smooth;
 }
 
-.tab > {
-  button {
-    border-bottom: 0 !important;
-    border-left: 3px solid $ui-03 !important;
-  }
-  
-  button, button:focus, button:active {
-    outline: 0 !important;
-    outline-offset: 0 !important;
-  }
+.verticalTabs > ul {
+  flex-direction: column !important;
+}
+
+.verticalTabs :global(.cds--tabs--scrollable .cds--tabs--scrollable__nav-item+.cds--tabs--scrollable__nav-item) {
+  margin-left: 0rem;
+}
+
+.verticalTabs :global(.cds--tabs--scrollable .cds--tabs--scrollable__nav-link) {
+  border-bottom: 0 !important;
+  border-left: 2px solid $color-gray-30;
+}
+
+.tab:hover {
+  border-bottom: none !important;
+}
+
+.tab > button:first {
+  text-indent: 5rem;
+}
+
+.tab > button, 
+.tab > button:focus, 
+.tab > button:active {
+  outline: 0 !important;
+  outline-offset: 0 !important;
 }
 
 .selectedTab > button {
   border-left: 3px solid var(--brand-03) !important;
   border-bottom: 0 !important;
   font-weight: 600 !important;
+}
+
+.tablist :global(.cds--tab--list) {
+  flex-direction: column;
+  max-height: 100%;
+  overflow-x: visible;
 }

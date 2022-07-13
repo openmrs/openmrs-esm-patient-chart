@@ -89,7 +89,7 @@ const PastVisitOverview: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
                         <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                       ))}
                       <TableCell className="cds--table-column-menu">
-                        <OverflowMenu aria-label="Actions menu" flipped selectorPrimaryFocus="option-two">
+                        <OverflowMenu ariaLabel="Actions menu" flipped selectorPrimaryFocus="option-two">
                           <OverflowMenuItem onClick={handleOpenVisitForm} itemText={t('edit', 'Edit')} />
                           <OverflowMenuItem
                             onClick={() => {

@@ -25,7 +25,7 @@ interface PaginatedVitalsProps {
 const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({ tableRows, pageSize, pageUrl, urlLabel, tableHeaders }) => {
   const { results: paginatedVitals, goTo, currentPage } = usePagination(tableRows, pageSize);
 
-  const StyledTableCell = ({ interpretation, children }) => {
+  const StyledTableCell = ({ interpretation, children }: { interpretation: string; children: React.ReactNode }) => {
     switch (interpretation) {
       case 'critically_high':
         return <TableCell className={styles.criticallyHigh}>{children}</TableCell>;

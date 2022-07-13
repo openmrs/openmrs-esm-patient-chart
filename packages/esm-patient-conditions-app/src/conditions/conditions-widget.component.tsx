@@ -1,18 +1,10 @@
-import React, { SyntheticEvent, useEffect } from 'react';
+import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import 'dayjs/plugin/utc';
 import debounce from 'lodash-es/debounce';
+import { BehaviorSubject } from 'rxjs';
 import { useSWRConfig } from 'swr';
-import styles from './conditions-form.scss';
-import { useTranslation } from 'react-i18next';
-import {
-  createErrorHandler,
-  fhirBaseUrl,
-  showNotification,
-  showToast,
-  useLayoutType,
-  useSession,
-} from '@openmrs/esm-framework';
 import {
   Tile,
   SearchSkeleton,
@@ -22,11 +14,17 @@ import {
   FormGroup,
   DatePickerInput,
   DatePicker,
-} from 'carbon-components-react';
+} from '@carbon/react';
+import {
+  createErrorHandler,
+  fhirBaseUrl,
+  showNotification,
+  showToast,
+  useLayoutType,
+  useSession,
+} from '@openmrs/esm-framework';
 import { createPatientCondition, searchConditionConcepts, CodedCondition } from './conditions.resource';
-import { BehaviorSubject } from 'rxjs';
-
-const searchTimeoutInMs = 500;
+import styles from './conditions-form.scss';
 
 interface ConditionsWidgetProps {
   patientUuid: string;
@@ -41,6 +39,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   setHasSubmissibleValue,
   submissionNotifier,
 }) => {
+  const searchTimeoutInMs = 500;
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
@@ -185,7 +184,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
       <FormGroup legendText={t('condition', 'Condition')}>
         <Search
           light={isTablet}
-          size="xl"
+          size="lg"
           id="conditionsSearch"
           labelText={t('enterCondition', 'Enter condition')}
           placeholder={t('searchConditions', 'Search conditions')}

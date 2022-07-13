@@ -30,13 +30,15 @@
 .orderActionNewLabel {
   margin-bottom: 0.5625rem;
   @extend .label01;
-  // color: $support-01; // FIX
+  // FIX
+  // color: $support-01; 
 }
 
 .orderActionRenewLabel {
   margin-bottom: 0.5625rem;
   @extend .label01;
-  // color: $support-01; // FIX
+  // FIX
+  // color: $support-01;
 }
 
 .orderActionRevisedLabel {

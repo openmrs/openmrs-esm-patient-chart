@@ -87,7 +87,7 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
   }
 
   if (formsToDisplay.length === 0) {
-    return <EmptyFormView action={t('noFormsAvailable', 'There are no Forms to display for this patient')} />;
+    return <EmptyFormView content={t('noFormsAvailable', 'There are no forms to display for this patient')} />;
   }
 
   return (

@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
@@ -62,6 +62,8 @@ describe('VitalsHeader: ', () => {
   });
 
   it('renders the most recently recorded vitals in the vitals header', async () => {
+    const user = userEvent.setup();
+
     mockOpenmrsFetch.mockReturnValue({ data: mockFhirVitalsResponse });
 
     renderVitalsHeader();
@@ -74,7 +76,8 @@ describe('VitalsHeader: ', () => {
     expect(screen.getByText(/Record vitals/i)).toBeInTheDocument();
 
     const expandButton = screen.getByTitle(/ChevronDown/);
-    userEvent.click(expandButton);
+
+    await waitFor(() => user.click(expandButton));
 
     expect(getByTextWithMarkup(/Temp\s*37\s*DEG C/i)).toBeInTheDocument();
     expect(getByTextWithMarkup(/BP\s*121 \/ 89\s*mmHg/i)).toBeInTheDocument();
@@ -89,25 +92,31 @@ describe('VitalsHeader: ', () => {
     expect(screen.getAllByTitle(/abnormal value/i).length).toEqual(2);
 
     const collapseButton = screen.getByTitle(/ChevronUp/);
-    userEvent.click(collapseButton);
+
+    await waitFor(() => user.click(collapseButton));
 
     expect(screen.queryByText(/Temp/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/BP/i)).not.toBeInTheDocument();
   });
 
   it('launches the vitals form when the `record vitals` button gets clicked', async () => {
+    const user = userEvent.setup();
+
     renderVitalsHeader();
 
     await waitForLoadingToFinish();
 
     const recordVitalsButton = screen.getByText(/Record vitals/i);
-    userEvent.click(recordVitalsButton);
+
+    await waitFor(() => user.click(recordVitalsButton));
 
     expect(mockLaunchWorkspace).toHaveBeenCalledTimes(1);
     expect(mockLaunchWorkspace).toHaveBeenCalledWith(patientVitalsBiometricsFormWorkspace);
   });
 
   it('does not flag normal values that lie within the provided reference ranges', async () => {
+    const user = userEvent.setup();
+
     mockFhirVitalsResponse.entry[3].resource.valueQuantity.value = 79;
     mockFhirVitalsResponse.entry[4].resource.valueQuantity.value = 119;
     mockFhirVitalsResponse.entry[0].resource.valueQuantity.value = 69;
@@ -117,12 +126,15 @@ describe('VitalsHeader: ', () => {
     renderVitalsHeader();
     await waitForLoadingToFinish();
     const expandButton = screen.getByTitle(/ChevronDown/);
-    userEvent.click(expandButton);
+
+    await waitFor(() => user.click(expandButton));
 
     expect(screen.queryByTitle(/abnormal value/i)).not.toBeInTheDocument();
   });
 
   it('flags abnormal values that lie outside of the provided reference ranges', async () => {
+    const user = userEvent.setup();
+
     mockVitalsSignsConcept.data.results[0].setMembers[0].lowCritical = 50;
     mockFhirVitalsResponse.entry[4].resource.valueQuantity.value = 49;
     mockOpenmrsFetch.mockReturnValue({ data: mockFhirVitalsResponse });
@@ -130,9 +142,11 @@ describe('VitalsHeader: ', () => {
     mockFhirVitalsResponse.entry[3].resource.valueQuantity.value = 150;
 
     renderVitalsHeader();
+
     await waitForLoadingToFinish();
     const expandButton = screen.getByTitle(/ChevronDown/);
-    userEvent.click(expandButton);
+
+    await waitFor(() => user.click(expandButton));
 
     expect(screen.queryByTitle(/abnormal value/i)).toBeInTheDocument();
   });

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from 'react';
 import { SWRConfig } from 'swr';
-import { BrowserRouter, Route } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { WorkspaceWindowSizeProvider } from '@openmrs/esm-patient-common-lib';
 import { setLeftNav, unsetLeftNav, usePatient } from '@openmrs/esm-framework';
 import { dashboardPath, spaRoot, spaBasePath, basePath } from './constants';
@@ -28,8 +28,11 @@ export default function Root() {
         <WorkspaceWindowSizeProvider>
           <div className={styles.patientChartWrapper}>
             <SideMenu />
-            <Route path={dashboardPath} component={PatientChart} />
-            <Route path={basePath} component={WorkspaceWindow} />
+            <Routes>
+              <Route path={basePath} element={<PatientChart />} />
+              <Route path={dashboardPath} element={<PatientChart />} />
+            </Routes>
+            <WorkspaceWindow patientUuid={patientUuid} />
           </div>
         </WorkspaceWindowSizeProvider>
       </BrowserRouter>

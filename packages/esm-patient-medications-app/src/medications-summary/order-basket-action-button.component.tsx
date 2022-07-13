@@ -33,23 +33,21 @@ const OrderBasketActionButton: React.FC = () => {
     );
 
   return (
-    <>
-      <Button
-        className={isActive && styles.active}
-        kind="ghost"
-        renderIcon={(props) => (
-          <div className={styles.elementContainer}>
-            <ShoppingCart size={20} {...props} />{' '}
-            {items?.length > 0 && <Tag className={styles.countTag}>{items?.length}</Tag>}
-          </div>
-        )}
-        hasIconOnly
-        iconDescription={t('orders', 'Orders')}
-        tooltipAlignment="start"
-        tooltipPosition="left"
-        onClick={launchOrdersWorkspace}
-      />
-    </>
+    <Button
+      className={isActive && styles.active}
+      kind="ghost"
+      renderIcon={(props) => (
+        <div className={styles.elementContainer}>
+          <ShoppingCart size={20} {...props} />{' '}
+          {items?.length > 0 && <Tag className={styles.countTag}>{items?.length}</Tag>}
+        </div>
+      )}
+      hasIconOnly
+      iconDescription={t('orders', 'Orders')}
+      tooltipAlignment="start"
+      tooltipPosition="left"
+      onClick={launchOrdersWorkspace}
+    />
   );
 };
 

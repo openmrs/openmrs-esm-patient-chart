@@ -15,6 +15,7 @@ import FilterContext from '../filter/filter-context';
 import styles from './grouped-timeline.styles.scss';
 
 const TimeSlots: React.FC<{
+  children?: React.ReactNode;
   style?: React.CSSProperties;
   className?: string;
 }> = ({ children = undefined, className, ...props }) => (

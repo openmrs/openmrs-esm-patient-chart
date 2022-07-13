@@ -62,7 +62,8 @@
 
 .toggleActive {
   background-color: $color-blue-10;
-  // border: 1px solid $link-01; // FIX
+  // FIX
+  // border: 1px solid $link-01;
 
   &:active, &:focus {
     box-shadow: none;

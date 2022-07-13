@@ -1,5 +1,5 @@
 import React from 'react';
-import { useRouteMatch } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import {
   Extension,
   ExtensionData,
@@ -7,7 +7,7 @@ import {
   getExtensionNameFromId,
   useExtensionSlotMeta,
 } from '@openmrs/esm-framework';
-import { basePath } from '../../constants';
+import { basePath, spaRoot } from '../../constants';
 import styles from './dashboard-view.scss';
 
 function getColumnsLayoutStyle(dashboard: DashboardConfig) {
@@ -29,16 +29,17 @@ interface DashboardViewProps {
 
 export function DashboardView({ dashboard, patientUuid, patient }: DashboardViewProps) {
   const widgetMetas = useExtensionSlotMeta(dashboard.slot);
-  const { url } = useRouteMatch(basePath);
+  const dashboardMeta = useExtensionSlotMeta(dashboard.slot);
+  const { view } = useParams();
   const gridTemplateColumns = getColumnsLayoutStyle(dashboard);
 
   const state = React.useMemo(
     () => ({
-      basePath: url,
+      basePath: `/openmrs/spa${basePath}/${view}`,
       patient,
       patientUuid,
     }),
-    [url, patientUuid, patient],
+    [view, patientUuid, patient],
   );
 
   const wrapItem = React.useCallback(

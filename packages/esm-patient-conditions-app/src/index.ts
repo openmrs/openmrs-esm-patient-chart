@@ -33,7 +33,7 @@ function setupOpenMRS() {
       {
         name: 'conditions-details-widget',
         slot: dashboardMeta.slot,
-        load: getAsyncLifecycle(() => import('./conditions/conditions.component'), options),
+        load: getAsyncLifecycle(() => import('./conditions/conditions-detailed-summary.component'), options),
         meta: {
           columnSpan: 4,
         },

@@ -401,7 +401,7 @@ function OrderBasketItemActions({
   }, [items, setItems, medication]);
 
   return (
-    <OverflowMenu aria-label="Actions menu" selectorPrimaryFocus={'#modify'} flipped>
+    <OverflowMenu ariaLabel="Actions menu" selectorPrimaryFocus={'#modify'} flipped>
       {showModifyButton && (
         <OverflowMenuItem
           className={styles.menuItem}

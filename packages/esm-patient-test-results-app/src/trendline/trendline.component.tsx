@@ -2,7 +2,7 @@ import React, { useState, useCallback, useMemo, useLayoutEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, InlineLoading, SkeletonText } from '@carbon/react';
 import { ArrowLeft } from '@carbon/react/icons';
-import { ScaleTypes, LineChartOptions, TickRotations } from '@carbon/charts/interfaces';
+// import { ScaleTypes, LineChartOptions, TickRotations } from '@carbon/charts/interfaces';
 import LineChart from '@carbon/charts-react/line-chart';
 import { formatDate, formatTime, parseDate, ConfigurableLink } from '@openmrs/esm-framework';
 import { EmptyState, OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
@@ -11,7 +11,20 @@ import { testResultsBasePath } from '../helpers';
 import RangeSelector from './range-selector.component';
 import { useObstreeData } from './trendline-resource';
 import styles from './trendline.scss';
-import '@carbon/charts/styles.css';
+// import '@carbon/charts/styles.css';
+
+enum ScaleTypes {
+  TIME = 'time',
+  LINEAR = 'linear',
+  LOG = 'log',
+  LABELS = 'labels',
+}
+
+enum TickRotations {
+  ALWAYS = 'always',
+  AUTO = 'auto',
+  NEVER = 'never',
+}
 
 const TrendLineBackground = ({ ...props }) => <div {...props} className={styles.background} />;
 
@@ -137,7 +150,7 @@ const Trendline: React.FC<TrendlineProps> = ({
     });
   });
 
-  const options = useMemo<LineChartOptions>(
+  const chartOptions = useMemo(
     () => ({
       bounds: {
         lowerBoundMapsTo: 'min',
@@ -223,7 +236,7 @@ const Trendline: React.FC<TrendlineProps> = ({
       )}
       <TrendLineBackground>
         <RangeSelector setLowerRange={setLowerRange} upperRange={upperRange} />
-        <LineChart data={data} options={options} />
+        <LineChart data={data} options={chartOptions} />
       </TrendLineBackground>
       <DrawTable {...{ tableData, tableHeaderData }} />
     </>

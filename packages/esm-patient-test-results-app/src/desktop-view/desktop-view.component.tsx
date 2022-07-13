@@ -5,9 +5,11 @@ import Trendline from '../trendline/trendline.component';
 import { navigateToTimeline, navigateToTrendline } from '../helpers';
 import styles from './desktop-view.scss';
 
-const Grid: React.FC<{}> = ({ children }) => <div className={styles.grid}>{children}</div>;
+const Grid: React.FC<{ children: React.ReactNode }> = ({ children }) => <div className={styles.grid}>{children}</div>;
 
-const OverflowBorder: React.FC<{}> = ({ children }) => <div className={styles['overflow-border']}>{children}</div>;
+const OverflowBorder: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <div className={styles['overflow-border']}>{children}</div>
+);
 
 interface NoneViewState {
   type: 'none';

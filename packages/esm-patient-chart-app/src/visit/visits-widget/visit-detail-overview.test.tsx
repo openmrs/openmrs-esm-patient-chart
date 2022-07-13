@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { renderWithSwr, waitForLoadingToFinish } from '../../../../../tools/test-helpers';
@@ -59,7 +59,9 @@ describe('VisitDetailOverview', () => {
     expect(screen.getByText(/Sorry, there was a problem displaying this information/i)).toBeInTheDocument();
   });
 
-  it.only(`renders a summary of the patient's visits and encounters when data is available`, async () => {
+  it(`renders a summary of the patient's visits and encounters when data is available`, async () => {
+    const user = userEvent.setup();
+
     mockOpenmrsFetch.mockReturnValueOnce(visitOverviewDetailMockData);
 
     renderVisitDetailOverview();
@@ -84,7 +86,7 @@ describe('VisitDetailOverview', () => {
     expect(screen.getByText(/no notes found/i)).toBeInTheDocument();
     expect(screen.getByText(/no medications found/i)).toBeInTheDocument();
 
-    userEvent.click(allEncountersTab);
+    await waitFor(() => user.click(allEncountersTab));
 
     expect(allEncountersTab).toHaveAttribute('aria-selected', 'true');
     expect(visitSummariesTab).toHaveAttribute('aria-selected', 'false');

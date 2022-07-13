@@ -24,14 +24,17 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
 });
 
 describe('StartVisitOverflowMenuItem', () => {
-  it('should launch start visit form', () => {
+  it('should launch start visit form', async () => {
+    const user = userEvent.setup();
+
     mockUseVisit.mockReturnValue({ currentVisit: null });
+
     render(<StartVisitOverflowMenuItem patientUuid="some-patient-uuid" />);
 
     const startVisitButton = screen.getByRole('menuitem', { name: /Start visit/ });
     expect(startVisitButton).toBeInTheDocument();
 
-    userEvent.click(startVisitButton);
+    await user.click(startVisitButton);
 
     expect(launchPatientWorkspace).toHaveBeenCalledTimes(1);
     expect(launchPatientWorkspace).toHaveBeenCalledWith('start-visit-workspace-form');

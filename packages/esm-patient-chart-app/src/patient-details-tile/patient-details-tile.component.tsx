@@ -1,5 +1,5 @@
 import React from 'react';
-import { capitalize } from 'lodash';
+import capitalize from 'lodash-es/capitalize';
 import { age, formatDate, usePatient } from '@openmrs/esm-framework';
 import styles from './patient-details-tile.scss';
 

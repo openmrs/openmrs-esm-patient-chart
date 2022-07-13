@@ -19,7 +19,7 @@ import {
 } from '@carbon/react';
 import { ArrowLeft } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
-import { useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { isDesktop, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { OrderBasketItem } from '../types/order-basket-item';
 import { getCommonMedicationByUuid } from '../api/common-medication';
 import { OpenmrsResource } from '../types/openmrs-resource';
@@ -40,7 +40,7 @@ export default function MedicationOrderForm({
   onCancel,
 }: MedicationOrderFormProps) {
   const { t } = useTranslation();
-  const isDesktop = useLayoutType() === 'desktop';
+  const layout = useLayoutType();
   const isTablet = useLayoutType() === 'tablet';
   const [orderBasketItem, setOrderBasketItem] = useState(initialOrderBasketItem);
   const commonMedication = getCommonMedicationByUuid(orderBasketItem.drug.uuid);
@@ -67,7 +67,7 @@ export default function MedicationOrderForm({
       </div>
       <Form className={styles.orderForm} onSubmit={() => onSign(orderBasketItem)}>
         <Grid className={styles.grid}>
-          {isDesktop ? (
+          {isDesktop(layout) ? (
             <div className={styles.backButton}>
               <Button
                 kind="ghost"

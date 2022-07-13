@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { InlineLoading } from '@carbon/react';
+import { DataTableSkeleton, InlineLoading } from '@carbon/react';
 import { useActivePatientEnrollment } from '@openmrs/esm-patient-common-lib';
 import Forms from './forms.component';
 
@@ -19,19 +19,15 @@ const FormsSummaryDashboard: React.FC<FormsProps> = ({ patientUuid, patient, isO
 
   return (
     <>
-      {isLoading ? (
-        <InlineLoading description={t('loading', 'Loading...')} />
-      ) : (
-        <Forms
-          patientUuid={patientUuid}
-          patient={patient}
-          pageSize={pageSize}
-          urlLabel={urlLabel}
-          pageUrl={pageUrl}
-          isOffline={isOffline}
-          activePatientEnrollment={activePatientEnrollment}
-        />
-      )}
+      <Forms
+        patientUuid={patientUuid}
+        patient={patient}
+        pageSize={pageSize}
+        urlLabel={urlLabel}
+        pageUrl={pageUrl}
+        isOffline={isOffline}
+        activePatientEnrollment={activePatientEnrollment}
+      />
     </>
   );
 };

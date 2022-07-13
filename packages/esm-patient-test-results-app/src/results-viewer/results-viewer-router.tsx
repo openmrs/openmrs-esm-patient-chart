@@ -1,19 +1,20 @@
 import React from 'react';
-import { Switch, Route, BrowserRouter } from 'react-router-dom';
+import { Routes, Route, BrowserRouter } from 'react-router-dom';
 import { testResultsBasePath } from '../helpers';
 import RoutedResultsViewer from './results-viewer';
 
 const ResultsView = ({ basePath, patientUuid }) => {
   return (
     <BrowserRouter>
-      <Switch>
+      <Routes>
         <Route
           path={`${testResultsBasePath(basePath)}/:type?/:testUuid?`}
-          component={(props) => (
-            <RoutedResultsViewer {...props} {...props.match.params} patientUuid={patientUuid} basePath={basePath} />
-          )}
+          element={
+            <p>Something to render</p>
+            // <RoutedResultsViewer basePath={basePath} patientUuid={patientUuid} />
+          }
         />
-      </Switch>
+      </Routes>
     </BrowserRouter>
   );
 };

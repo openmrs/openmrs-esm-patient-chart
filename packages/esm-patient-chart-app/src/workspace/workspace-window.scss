@@ -69,7 +69,7 @@
 
   .headerGlobalBar {
     &>button {
-      min-height: $spacing-08;
+      min-height: spacing.$spacing-08;
       background-color: $ui-02;
       border-color: $color-gray-30;
       border-style: solid;

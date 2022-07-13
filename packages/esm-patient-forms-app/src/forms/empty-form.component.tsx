@@ -1,22 +1,28 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tile } from '@carbon/react';
+import { Layer, Tile } from '@carbon/react';
+import { isDesktop, useLayoutType } from '@openmrs/esm-framework';
 import { EmptyDataIllustration } from '@openmrs/esm-patient-common-lib';
 import styles from './empty-form.scss';
 
 interface EmptyFormViewProps {
-  action: string;
+  content: string;
 }
 
-const EmptyFormView: React.FC<EmptyFormViewProps> = ({ action }) => {
+const EmptyFormView: React.FC<EmptyFormViewProps> = ({ content }) => {
   const { t } = useTranslation();
+  const layout = useLayoutType();
 
   return (
-    <Tile className={styles.tile}>
-      <EmptyDataIllustration />
-      <p className={styles.content}>{t('noFormsFound', 'Sorry, no forms have been found')}</p>
-      <p className={styles.action}>{action}</p>
-    </Tile>
+    <Layer>
+      <Tile className={styles.tile}>
+        <div className={isDesktop(layout) ? styles.desktopHeading : styles.tabletHeading}>
+          <h4>{t('forms', 'forms')}</h4>
+        </div>
+        <EmptyDataIllustration />
+        <p className={styles.content}>{content}</p>
+      </Tile>
+    </Layer>
   );
 };
 

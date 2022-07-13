@@ -11,6 +11,7 @@ export interface RootMedicationSummaryProps {
 export default function RootMedicationSummary({ patientUuid }: RootMedicationSummaryProps) {
   return (
     <div>
+      {/* @ts-ignore */}
       <Provider store={orderBasketStore}>
         <MedicationsSummary patientUuid={patientUuid} />
       </Provider>

@@ -3,7 +3,7 @@ import OrderBasketSearch from './order-basket-search.component';
 import MedicationOrderForm from './medication-order-form.component';
 import OrderBasketItemList from './order-basket-item-list.component';
 import MedicationsDetailsTable from '../components/medications-details-table.component';
-import { Button, ButtonSet, DataTableSkeleton, SearchSkeleton } from '@carbon/react';
+import { Button, ButtonSet, DataTableSkeleton, InlineLoading } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { OrderBasketItem } from '../types/order-basket-item';
 import { getDurationUnits, getPatientEncounterId, usePatientOrders } from '../api/api';
@@ -123,7 +123,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
   return (
     <>
       {(() => {
-        if (isLoading) return <SearchSkeleton />;
+        if (isLoading) return <InlineLoading className={styles.loader} description={t('loading', 'Loading...')} />;
         if (isMedicationOrderFormVisible) {
           return (
             <MedicationOrderForm

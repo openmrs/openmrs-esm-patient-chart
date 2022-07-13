@@ -30,17 +30,12 @@
 
 .heading {
   @include type.type-style("heading-03");
-  
   margin: 1rem 1rem 0.5rem;
 }
 
 .section {
   &:not(:first-of-type) {
     margin-bottom: 2rem;
-  }
-
-  &:last-of-type {
-    margin-top: 2rem;
   }
 }
 
@@ -54,10 +49,18 @@
   justify-content: flex-start;
 }
 
+.tab {
+  min-width: 33%;
+}
+
 .sectionHeading {
   @include type.type-style('heading-compact-02');  
-  
   margin: 1rem 1rem 0.5rem;
+}
+
+.midSectionHeading {
+  @include type.type-style('heading-compact-02');  
+  margin: 0rem 1rem 0.5rem;
 }
 
 .radio {
@@ -70,8 +73,7 @@
 
 .checkbox {
   &:not(:first-child) {
-    // subtract default checkbox wrapper margins
-    margin: calc(1rem - 0.1875rem - 0.25rem) 0rem;
+    margin: 0.3rem 0rem;
   }
 }
 
@@ -141,11 +143,23 @@
   .form {
     height: calc(100vh - 6rem);
   }
+
+  .section {
+    &:last-of-type {
+      margin-top: 2rem;
+    }
+  }
 }
 
 /* Tablet */
 :global(.omrs-breakpoint-lt-desktop) {
   .form {
     height: calc(100vh - 9rem);
+  }
+
+  .section {
+    &:last-of-type {
+      margin-top: 0rem;
+    }
   }
 }
