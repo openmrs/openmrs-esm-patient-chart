@@ -9,7 +9,7 @@ import { PatientVitals } from './vitals.resource';
 import styles from './vitals-chart.scss';
 import '@carbon/charts/styles.css';
 
-export enum ScaleTypes {
+enum ScaleTypes {
   LABELS = 'labels',
   LABELS_RATIO = 'labels-ratio',
   LINEAR = 'linear',
@@ -34,6 +34,34 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
     title: `BP (${conceptUnits.get(config.concepts.systolicBloodPressureUuid)})`,
     value: 'systolic',
   });
+
+  const vitalSigns = [
+    {
+      id: 'bloodPressure',
+      title: withUnit('BP', conceptUnits.get(config.concepts.systolicBloodPressureUuid) ?? '-'),
+      value: 'systolic',
+    },
+    {
+      id: 'oxygenSaturation',
+      title: withUnit('SPO2', conceptUnits.get(config.concepts.oxygenSaturationUuid) ?? '-'),
+      value: 'spo2',
+    },
+    {
+      id: 'temperature',
+      title: withUnit('Temp', conceptUnits.get(config.concepts.temperatureUuid) ?? '-'),
+      value: 'temperature',
+    },
+    {
+      id: 'Respiratory Rate',
+      title: withUnit('R. Rate', conceptUnits.get(config.concepts.respiratoryRateUuid) ?? '-'),
+      value: 'respiratoryRate',
+    },
+    {
+      id: 'pulse',
+      title: withUnit('Pulse', conceptUnits.get(config.concepts.pulseUuid) ?? '-'),
+      value: 'pulse',
+    },
+  ];
 
   const chartData = useMemo(() => {
     return patientVitals
@@ -99,34 +127,6 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
         <span style="color: #c6c6c6; font-size: 1rem; font-weight:600">${key}</span></div>`,
     },
   };
-
-  const vitalSigns = [
-    {
-      id: 'bloodPressure',
-      title: withUnit('BP', conceptUnits.get(config.concepts.systolicBloodPressureUuid) ?? '-'),
-      value: 'systolic',
-    },
-    {
-      id: 'oxygenSaturation',
-      title: withUnit('SPO2', conceptUnits.get(config.concepts.oxygenSaturationUuid) ?? '-'),
-      value: 'spo2',
-    },
-    {
-      id: 'temperature',
-      title: withUnit('Temp', conceptUnits.get(config.concepts.temperatureUuid) ?? '-'),
-      value: 'temperature',
-    },
-    {
-      id: 'Respiratory Rate',
-      title: withUnit('R. Rate', conceptUnits.get(config.concepts.respiratoryRateUuid) ?? '-'),
-      value: 'respiratoryRate',
-    },
-    {
-      id: 'pulse',
-      title: withUnit('Pulse', conceptUnits.get(config.concepts.pulseUuid) ?? '-'),
-      value: 'pulse',
-    },
-  ];
 
   return (
     <div className={styles.vitalsChartContainer}>

@@ -1,7 +1,7 @@
 import React from 'react';
-import { usePagination, useVisitTypes } from '@openmrs/esm-framework';
-import { screen, render } from '@testing-library/react';
+import { screen, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { usePagination, useVisitTypes } from '@openmrs/esm-framework';
 import { mockVisitTypes } from '../../../../../__mocks__/visits.mock';
 import BaseVisitType from './base-visit-type.component';
 
@@ -29,7 +29,9 @@ describe('VisitTypeOverview', () => {
     render(<BaseVisitType onChange={mockHandleChange} visitTypes={mockVisitTypes} patientUuid="some-patient-uuid" />);
   };
 
-  it('should be able to search for a visit type', () => {
+  it('should be able to search for a visit type', async () => {
+    const user = userEvent.setup();
+
     renderVisitTypeOverview();
 
     const hivVisit = screen.getByRole('radio', { name: /HIV Return Visit/i });
@@ -39,7 +41,7 @@ describe('VisitTypeOverview', () => {
     expect(hivVisit).toBeInTheDocument();
 
     const searchInput = screen.getByRole('searchbox');
-    userEvent.type(searchInput, 'HIV');
+    await waitFor(() => user.type(searchInput, 'HIV'));
 
     expect(outpatientVisit).toBeEmptyDOMElement();
     expect(hivVisit).toBeInTheDocument();

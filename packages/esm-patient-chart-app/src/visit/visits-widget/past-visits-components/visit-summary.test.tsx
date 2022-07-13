@@ -1,12 +1,12 @@
 import React from 'react';
-import { screen, render } from '@testing-library/react';
+import { screen, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import VisitSummary from './visit-summary.component';
 import {
   visitOverviewDetailMockData,
   visitOverviewDetailMockDataNotEmpty,
 } from '../../../../../../__mocks__/visits.mock';
 import { mockPatient } from '../../../../../../__mocks__/patient.mock';
+import VisitSummary from './visit-summary.component';
 
 const mockEncounter = visitOverviewDetailMockData.data.results[0].encounters.map((encounter) => encounter);
 
@@ -28,7 +28,9 @@ jest.mock('@openmrs/esm-framework', () => {
 });
 
 describe('VisitSummary', () => {
-  it('should display empty state for notes, test and medication summary', () => {
+  it('should display empty state for notes, test and medication summary', async () => {
+    const user = userEvent.setup();
+
     renderVisitSummary();
 
     expect(screen.getByText(/^Diagnoses$/i)).toBeInTheDocument();
@@ -39,25 +41,31 @@ describe('VisitSummary', () => {
 
     //should display notes tab panel
     const notesTab = screen.getByRole('tab', { name: /Notes/i });
-    userEvent.click(notesTab);
+
+    await waitFor(() => user.click(notesTab));
 
     expect(screen.getByText(/^No notes found$/)).toBeInTheDocument();
 
     // should display medication panel
     const medicationTab = screen.getByRole('tab', { name: /Medication/i });
-    userEvent.click(medicationTab);
+
+    await waitFor(() => user.click(medicationTab));
 
     expect(screen.getByText(/^No medications found$/)).toBeInTheDocument();
 
     // should display tests panel with test panel extension
     const testsTab = screen.getByRole('tab', { name: /Tests/i });
-    userEvent.click(testsTab);
+
+    await waitFor(() => user.click(testsTab));
 
     expect(screen.getByText(/test-results-filtered-overview/)).toBeInTheDocument();
   });
 
-  it('should display notes, tests and medication summary', () => {
+  it('should display notes, tests and medication summary', async () => {
+    const user = userEvent.setup();
+
     const mockEncounter = visitOverviewDetailMockDataNotEmpty.data.results[0].encounters.map((encounter) => encounter);
+
     render(<VisitSummary patientUuid={mockPatient.id} encounters={mockEncounter} />);
 
     expect(screen.getByText(/^Diagnoses$/i)).toBeInTheDocument();
@@ -69,7 +77,7 @@ describe('VisitSummary', () => {
 
     //should display notes tab panel
     const notesTab = screen.getByRole('tab', { name: /Notes/i });
-    userEvent.click(notesTab);
+    await waitFor(() => user.click(notesTab));
 
     expect(screen.getAllByText(/Dr James Cook/i)[0]).toBeInTheDocument();
     expect(screen.getAllByText(/Admin/i)[0]).toBeInTheDocument();
@@ -77,11 +85,11 @@ describe('VisitSummary', () => {
 
     // should display medication panel
     const medicationTab = screen.getByRole('tab', { name: /Medication/i });
-    userEvent.click(medicationTab);
+    await waitFor(() => user.click(medicationTab));
 
     // should display tests panel with test panel extension
     const testsTab = screen.getByRole('tab', { name: /Tests/i });
-    userEvent.click(testsTab);
+    await waitFor(() => user.click(testsTab));
 
     expect(screen.getByText(/test-results-filtered-overview/)).toBeInTheDocument();
   });

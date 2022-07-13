@@ -5,8 +5,8 @@ import { Add } from '@carbon/react/icons';
 import { LayoutType, showModal, showToast, useLayoutType, usePagination, UserHasAccess } from '@openmrs/esm-framework';
 import { PatientChartPagination, EmptyState } from '@openmrs/esm-patient-common-lib';
 import { createAttachment, deleteAttachmentPermanently, useAttachments } from './attachments.resource';
-import { UploadedFile, Attachment } from './attachments-types';
 import { createGalleryEntry } from './utils';
+import { UploadedFile, Attachment } from './attachments-types';
 import AttachmentsGridOverview from './attachments-grid-overview.component';
 import AttachmentsTableOverview from './attachments-table-overview.component';
 import ImagePreview from './image-preview.component';
@@ -18,11 +18,8 @@ function getPageSize(layoutType: LayoutType) {
       return 9;
     case 'phone':
       return 3;
-    case 'small-desktop':
+    case 'desktop':
       return 25;
-    // TODO: Add page size case for large desktop
-    // case 'large-desktop':
-    //   return ;
     default:
       return 8;
   }
@@ -132,6 +129,7 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
               attachments={attachments}
             />
           )}
+
           <PatientChartPagination
             currentItems={pagination.results.length}
             totalItems={attachments.length}

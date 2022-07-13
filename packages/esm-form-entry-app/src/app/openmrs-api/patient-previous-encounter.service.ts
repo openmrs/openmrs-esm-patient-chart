@@ -1,8 +1,7 @@
 import { take } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
-import * as _ from 'lodash';
+import find from 'lodash-es/find';
 import { EncounterResourceService } from './encounter-resource.service';
-import { PatientService } from './patient-service';
 import { Encounter } from '../types';
 
 @Injectable()
@@ -17,7 +16,7 @@ export class PatientPreviousEncounterService {
             const sortedEncounters = encounters.sort((a, b) => {
               return new Date(b.encounterDatetime).getTime() - new Date(a.encounterDatetime).getTime();
             });
-            const search = _.find(sortedEncounters, (e) => {
+            const search = find(sortedEncounters, (e) => {
               return e.encounterType.uuid === encounterType;
             });
 

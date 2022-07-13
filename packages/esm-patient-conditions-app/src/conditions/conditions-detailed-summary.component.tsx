@@ -18,12 +18,10 @@ import { Add } from '@carbon/react/icons';
 import { formatDate, parseDate } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { Condition, useConditions } from './conditions.resource';
-import { useConditionsContext } from './conditions.context';
 import styles from './conditions-detailed-summary.scss';
 
-const ConditionsDetailedSummary: React.FC = () => {
+function ConditionsDetailedSummary({ patient }) {
   const { t } = useTranslation();
-  const { patient } = useConditionsContext();
   const displayText = t('conditions', 'Conditions');
   const headerTitle = t('conditions', 'Conditions');
   const { data: conditions, isError, isLoading, isValidating } = useConditions(patient.id);
@@ -111,7 +109,8 @@ const ConditionsDetailedSummary: React.FC = () => {
       </div>
     );
   }
+
   return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchConditionsForm} />;
-};
+}
 
 export default ConditionsDetailedSummary;

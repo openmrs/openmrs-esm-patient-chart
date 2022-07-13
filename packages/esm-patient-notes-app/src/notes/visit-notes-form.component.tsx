@@ -1,28 +1,29 @@
-import React, { SyntheticEvent } from 'react';
+import React, { SyntheticEvent, useMemo } from 'react';
 import dayjs from 'dayjs';
 import { useSWRConfig } from 'swr';
 import { useTranslation } from 'react-i18next';
 import debounce from 'lodash-es/debounce';
 import {
-  Column,
-  Grid,
-  Row,
   Button,
+  ButtonSet,
+  Column,
   DatePicker,
   DatePickerInput,
   Form,
   FormGroup,
   Layer,
+  Row,
   Search,
   SearchSkeleton,
+  Stack,
   Tag,
   TextArea,
   Tile,
-  ButtonSet,
 } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
 import {
   createErrorHandler,
+  ExtensionSlot,
   showNotification,
   showToast,
   useConfig,
@@ -50,6 +51,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
   const session = useSession();
   const { mutate } = useSWRConfig();
   const config = useConfig() as ConfigObject;
+  const state = useMemo(() => ({ patientUuid }), [patientUuid]);
   const { clinicianEncounterRole, encounterNoteTextConceptUuid, encounterTypeUuid, formConceptUuid } =
     config.visitNoteConfig;
   const [clinicalNote, setClinicalNote] = React.useState('');
@@ -82,7 +84,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
     }
   }, [currentSessionLocationUuid, currentSessionProviderUuid]);
 
-  const handleSearchChange = (event) => {
+  const handleSearchTermChange = (event) => {
     setIsSearching(true);
     const query = event.target.value;
     setSearchTerm(query);
@@ -208,7 +210,12 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
 
   return (
     <Form className={styles.form}>
-      <Grid className={styles.grid}>
+      {isTablet && (
+        <Row className={styles.headerGridRow}>
+          <ExtensionSlot extensionSlotName="visit-form-header-slot" className={styles.dataGridRow} state={state} />
+        </Row>
+      )}
+      <Stack className={styles.formContainer} gap={2}>
         {isTablet ? <h2 className={styles.heading}>{t('addVisitNote', 'Add a visit note')}</h2> : null}
         <Row className={styles.row}>
           <Column sm={1}>
@@ -265,7 +272,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
                   'diagnosisInputPlaceholder',
                   'Choose a primary diagnosis first, then secondary diagnoses',
                 )}
-                onChange={handleSearchChange}
+                onChange={handleSearchTermChange}
                 value={(() => {
                   if (searchTerm) {
                     return searchTerm;
@@ -346,7 +353,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
               </p>
               <Button
                 style={{ marginTop: '1rem' }}
-                kind="tertiary"
+                kind={isTablet ? 'ghost' : 'tertiary'}
                 onClick={() => {}}
                 renderIcon={(props) => <Add size={16} {...props} />}
               >
@@ -355,7 +362,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
             </FormGroup>
           </Column>
         </Row>
-      </Grid>
+      </Stack>
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
         <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
           {t('discard', 'Discard')}

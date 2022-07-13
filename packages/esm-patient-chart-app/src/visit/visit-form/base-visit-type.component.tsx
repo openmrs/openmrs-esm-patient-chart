@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import debounce from 'lodash-es/debounce';
 import isEmpty from 'lodash-es/isEmpty';
-import { Search, RadioButtonGroup, RadioButton } from '@carbon/react';
+import { Search, RadioButtonGroup, RadioButton, StructuredListSkeleton } from '@carbon/react';
 import { EmptyState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { useLayoutType, usePagination } from '@openmrs/esm-framework';
 import styles from './visit-type-overview.scss';
@@ -32,39 +32,44 @@ const BaseVisitType: React.FC<BaseVisitTypeProps> = ({ onChange, visitTypes }) =
 
   return (
     <div className={`${styles.visitTypeOverviewWrapper} ${isTablet ? styles.tablet : styles.desktop}`}>
-      {results.length ? (
-        <>
-          <Search
-            onChange={(event) => handleSearch(event.target.value)}
-            placeholder={t('searchForAVisitType', 'Search for a visit type')}
-            labelText=""
-            light={isTablet}
-          />
-          <RadioButtonGroup
-            className={styles.radioButtonGroup}
-            defaultSelected="default-selected"
-            orientation="vertical"
-            onChange={onChange}
-            name="radio-button-group"
-            valueSelected="default-selected"
-          >
-            {results.map(({ uuid, display, name }) => (
-              <RadioButton key={uuid} className={styles.radioButton} id={name} labelText={display} value={uuid} />
-            ))}
-          </RadioButtonGroup>
-          <div className={styles.paginationContainer}>
-            <PatientChartPagination
-              pageNumber={currentPage}
-              totalItems={visitTypes?.length}
-              currentItems={results.length}
-              pageSize={5}
-              onPageNumberChange={({ page }) => goTo(page)}
+      {
+        visitTypes.length ? (
+          <>
+            <Search
+              onChange={(event) => handleSearch(event.target.value)}
+              placeholder={t('searchForAVisitType', 'Search for a visit type')}
+              labelText=""
+              light={isTablet}
             />
-          </div>
-        </>
-      ) : (
-        <EmptyState displayText={t('visitType', 'Visit type')} headerTitle={t('visitType', 'Visit type')} />
-      )}
+            <RadioButtonGroup
+              className={styles.radioButtonGroup}
+              defaultSelected="default-selected"
+              orientation="vertical"
+              onChange={onChange}
+              name="radio-button-group"
+              valueSelected="default-selected"
+            >
+              {results.map(({ uuid, display, name }) => (
+                <RadioButton key={uuid} className={styles.radioButton} id={name} labelText={display} value={uuid} />
+              ))}
+            </RadioButtonGroup>
+            <div className={styles.paginationContainer}>
+              <PatientChartPagination
+                pageNumber={currentPage}
+                totalItems={visitTypes?.length}
+                currentItems={results.length}
+                pageSize={5}
+                onPageNumberChange={({ page }) => goTo(page)}
+              />
+            </div>
+          </>
+        ) : (
+          <StructuredListSkeleton />
+        )
+        // : (
+        //   <EmptyState displayText={t('visitType', 'Visit type')} headerTitle={t('visitType', 'Visit type')} />
+        // )
+      }
     </div>
   );
 };

@@ -1,28 +1,48 @@
 import React from 'react';
-import SideMenu from './side-menu.component';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { LeftNavMenu, useLayoutType } from '@openmrs/esm-framework';
-global.window.matchMedia = jest.fn().mockImplementation(() => {
+import SideMenu from './side-menu.component';
+
+jest.mock('@openmrs/esm-framework', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-framework');
+
   return {
-    matches: false,
-    addListener: function () {},
-    removeListener: function () {},
+    ...originalModule,
+    isDesktop: jest.fn().mockImplementation((layout) => layout === 'small-desktop' || layout === 'large-desktop'),
   };
 });
 
-const mockUseLayoutType = useLayoutType as jest.Mock;
-const mockLeftNavMenu = LeftNavMenu as any as jest.Mock;
+global.window.matchMedia = jest.fn().mockImplementation(() => {
+  return {
+    matches: false,
+    addListener: () => {},
+    removeListener: () => {},
+  };
+});
 
-mockLeftNavMenu.mockReturnValue('left nav menu');
+const mockedLeftNavMenu = LeftNavMenu as any as jest.Mock;
+const mockedUseLayoutType = useLayoutType as jest.Mock;
+
+mockedLeftNavMenu.mockReturnValue('left nav menu');
 
 describe('sidemenu', () => {
   it('is rendered when viewport != tablet', () => {
-    mockUseLayoutType.mockImplementationOnce(() => 'desktop');
-    expect(render(<SideMenu />).getByText(/left nav menu/)).toBeTruthy();
+    mockedUseLayoutType.mockImplementationOnce(() => 'small-desktop');
+
+    renderSideMenu();
+
+    expect(screen.getByText(/left nav menu/)).toBeTruthy();
   });
 
   it('is not rendered when viewport == tablet', () => {
-    mockUseLayoutType.mockImplementationOnce(() => 'tablet');
-    expect(render(<SideMenu />).queryAllByText(/left nav menu/)).toHaveLength(0);
+    mockedUseLayoutType.mockImplementationOnce(() => 'tablet');
+
+    renderSideMenu();
+
+    expect(screen.queryByText(/left nav menu/)).not.toBeInTheDocument();
   });
 });
+
+function renderSideMenu() {
+  return render(<SideMenu />);
+}

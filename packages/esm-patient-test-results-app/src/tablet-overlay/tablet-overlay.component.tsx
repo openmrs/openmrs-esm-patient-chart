@@ -4,6 +4,7 @@ import { ArrowLeft, Close } from '@carbon/react/icons';
 import styles from './tablet-overlay.scss';
 
 interface OverlayProps {
+  children?: React.ReactNode;
   close: () => void;
   headerText: string | React.ReactElement;
   buttonsGroup?: React.ReactElement;

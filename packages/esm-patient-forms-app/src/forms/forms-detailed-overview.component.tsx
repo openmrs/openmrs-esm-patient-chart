@@ -19,19 +19,15 @@ const FormsDetailedOverView: React.FC<FormsProps> = ({ patientUuid, patient, isO
 
   return (
     <>
-      {isLoading ? (
-        <InlineLoading description={t('loading', 'Loading...')} />
-      ) : (
-        <Forms
-          patientUuid={patientUuid}
-          patient={patient}
-          pageSize={pageSize}
-          urlLabel={urlLabel}
-          pageUrl={pageUrl}
-          isOffline={isOffline}
-          activePatientEnrollment={activePatientEnrollment}
-        />
-      )}
+      <Forms
+        patientUuid={patientUuid}
+        patient={patient}
+        pageSize={pageSize}
+        urlLabel={urlLabel}
+        pageUrl={pageUrl}
+        isOffline={isOffline}
+        activePatientEnrollment={activePatientEnrollment}
+      />
     </>
   );
 };

@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
@@ -67,14 +67,12 @@ describe('ProgramsOverview', () => {
     await waitForLoadingToFinish();
 
     expect(screen.getByText(/Care Programs/i)).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        /Sorry, there was a problem displaying this information. You can try to reload this page, or contact the site administrator and quote the error code above./,
-      ),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Sorry, there was a problem displaying this information./)).toBeInTheDocument();
   });
 
   it("renders a tabular overview of the patient's active program enrollments when available", async () => {
+    const user = userEvent.setup();
+
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockEnrolledProgramsResponse } });
     mockUsePagination.mockImplementation(() => ({
       currentPage: 1,
@@ -103,7 +101,8 @@ describe('ProgramsOverview', () => {
     expect(screen.getByRole('row', { name: /HIV Care and Treatment/i })).toBeInTheDocument();
 
     // Clicking "Add" launches the programs form in a workspace
-    userEvent.click(addButton);
+    await waitFor(() => user.click(addButton));
+
     expect(launchPatientWorkspace).toHaveBeenCalledWith('programs-form-workspace');
   });
 });

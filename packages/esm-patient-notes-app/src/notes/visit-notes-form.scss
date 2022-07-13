@@ -4,8 +4,7 @@
 
 .heading {
   @include type.type-style("heading-03");
-  
-  margin: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .columnLabel {
@@ -60,6 +59,22 @@
 
 .desktop {
   padding: 0rem;
+}
+
+.headerGridRow {
+  border-bottom: 0.0625rem solid $grey-2;
+  margin: 0;
+}
+
+.dataGridRow {
+  display: grid;
+  grid-template-columns: 50% 10% 1fr;
+  margin: 0.5rem 1rem;
+  width: 100%;
+}
+
+.formContainer {
+  margin: 1rem;
 }
 
 .form {

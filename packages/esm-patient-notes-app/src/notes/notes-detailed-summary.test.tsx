@@ -32,12 +32,6 @@ jest.mock('@openmrs/esm-framework', () => {
   };
 });
 
-jest.mock('./notes.context', () => ({
-  useNotesContext: jest.fn().mockReturnValue({
-    patientUuid: mockPatient.id,
-  }),
-}));
-
 describe('NotesDetailedSummary: ', () => {
   beforeEach(() => {
     mockUseConfig.mockReturnValue(ConfigMock);

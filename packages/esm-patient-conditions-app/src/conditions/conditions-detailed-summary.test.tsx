@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { attach, openmrsFetch } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
@@ -8,7 +8,6 @@ import { mockFhirConditionsResponse } from '../../../../__mocks__/conditions.moc
 import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import ConditionsDetailedSummary from './conditions-detailed-summary.component';
 
-const mockAttach = attach as jest.Mock;
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 
 jest.mock('@openmrs/esm-patient-common-lib', () => {
@@ -19,12 +18,6 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
     launchPatientWorkspace: jest.fn(),
   };
 });
-
-jest.mock('./conditions.context', () => ({
-  useConditionsContext: jest.fn().mockReturnValue({
-    patient: mockPatient,
-  }),
-}));
 
 it('renders an empty state view if conditions data is unavailable', async () => {
   mockOpenmrsFetch.mockReturnValueOnce({ data: [] });
@@ -87,6 +80,8 @@ it("renders a detailed summary of the patient's conditions when present", async 
 });
 
 it('clicking the Add button or Record Conditions link launches the conditions form', async () => {
+  const user = userEvent.setup();
+
   mockOpenmrsFetch.mockReturnValueOnce({ data: [] });
 
   renderConditionsDetailedSummary();
@@ -94,12 +89,15 @@ it('clicking the Add button or Record Conditions link launches the conditions fo
   await waitForLoadingToFinish();
 
   const recordConditionsLink = screen.getByText(/record conditions/i);
-  userEvent.click(recordConditionsLink);
+
+  await waitFor(() => user.click(recordConditionsLink));
 
   expect(launchPatientWorkspace).toHaveBeenCalledTimes(1);
   expect(launchPatientWorkspace).toHaveBeenCalledWith('conditions-form-workspace');
 });
 
 function renderConditionsDetailedSummary() {
-  renderWithSwr(<ConditionsDetailedSummary />);
+  const testProps = { patient: mockPatient };
+
+  renderWithSwr(<ConditionsDetailedSummary {...testProps} />);
 }

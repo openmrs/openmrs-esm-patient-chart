@@ -32,7 +32,7 @@ function setupOpenMRS() {
       {
         name: 'appointments-details-widget',
         slot: dashboardMeta.slot,
-        load: getAsyncLifecycle(() => import('./appointments/appointments.component'), options),
+        load: getAsyncLifecycle(() => import('./appointments/appointments-detailed-summary.component'), options),
         meta: {
           columnSpan: 1,
         },

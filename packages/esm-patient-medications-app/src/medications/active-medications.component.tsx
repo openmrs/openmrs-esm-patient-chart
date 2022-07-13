@@ -35,6 +35,8 @@ const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patientUuid, show
   if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
   if (activePatientOrders?.length) {
     return (
+      // FIX
+      // @ts-ignore
       <Provider store={orderBasketStore}>
         <MedicationsDetailsTable
           isValidating={isValidating}

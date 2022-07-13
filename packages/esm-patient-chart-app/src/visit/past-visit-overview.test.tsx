@@ -9,6 +9,7 @@ import PastVisitOverview from './past-visit-overview.component';
 const testProps = {
   closeWorkspace: jest.fn(),
   patientUuid: mockPatient.id,
+  promptBeforeClosing: jest.fn(),
 };
 
 const mockPastVisits = {
@@ -45,10 +46,9 @@ const mockPastVisits = {
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 
 describe('PastVisitOverview', () => {
-  beforeEach(() => {
-    testProps.closeWorkspace.mockReset();
-  });
   it(`renders a tabular overview view of the patient's past visits data`, async () => {
+    const user = userEvent.setup();
+
     mockOpenmrsFetch.mockReturnValueOnce(mockPastVisits);
 
     renderPastVisitOverview();
@@ -66,7 +66,8 @@ describe('PastVisitOverview', () => {
     tableRows.forEach((header) => expect(screen.getByRole('row', { name: header })).toBeInTheDocument());
 
     const cancelButton = screen.getByRole('button', { name: /Cancel/i });
-    userEvent.click(cancelButton);
+
+    await user.click(cancelButton);
 
     expect(testProps.closeWorkspace).toHaveBeenCalledTimes(1);
   });

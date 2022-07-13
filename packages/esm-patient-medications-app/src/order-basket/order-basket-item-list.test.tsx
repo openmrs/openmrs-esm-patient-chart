@@ -1,14 +1,16 @@
 import React from 'react';
-import { screen, render } from '@testing-library/react';
+import { screen, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import OrderBasketItemList from './order-basket-item-list.component';
 import { getByTextWithMarkup } from '../../../../tools/test-helpers';
+import { mockMedicationOrderSearchResults } from '../../../../__mocks__/medication.mock';
+import OrderBasketItemList from './order-basket-item-list.component';
 
+const mockOnItemClicked = jest.fn();
 const mockOnItemRemoved = jest.fn();
 
 const testProps = {
   orderBasketItems: [],
-  onItemClicked: jest.fn(),
+  onItemClicked: mockOnItemClicked,
   onItemRemoveClicked: mockOnItemRemoved,
 };
 
@@ -21,103 +23,10 @@ describe('OrderBasketItemList: ', () => {
     expect(screen.getByText(/Search for an order above/i)).toBeInTheDocument();
   });
 
-  test('renders a tile-based layout of newly added orders when available', () => {
-    testProps.orderBasketItems = [
-      {
-        action: 'NEW',
-        drug: {
-          uuid: '18f43c99-2329-426e-97b5-c3356e6afe54',
-          name: 'aspirin',
-          strength: '81mg',
-          dosageForm: {
-            display: 'Tablet',
-            uuid: '1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-          },
-          concept: {
-            uuid: '71617AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-            display: 'Aspirin',
-            name: {
-              display: 'Aspirin',
-              uuid: '124912BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
-              name: 'Aspirin',
-              locale: 'en',
-              localePreferred: true,
-              conceptNameType: null,
-              resourceVersion: '1.9',
-            },
-            datatype: {
-              uuid: '8d4a4c94-c2cc-11de-8d13-0010c6dffd0f',
-              display: 'N/A',
-            },
-            conceptClass: {
-              uuid: '8d490dfc-c2cc-11de-8d13-0010c6dffd0f',
-              display: 'Drug',
-            },
-            set: false,
-            version: null,
-            retired: false,
-            descriptions: [
-              {
-                uuid: '2729FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF',
-                display: 'dawa ya kupunguza maumivu',
-                links: [
-                  {
-                    rel: 'self',
-                    uri: 'https://openmrs-spa.org/openmrs/ws/rest/v1/concept/71617AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/description/2729FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF',
-                  },
-                ],
-              },
-              {
-                uuid: '16090FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF',
-                display: 'Name of a drug which is used as anti inflammatory and analgesic',
-                links: [
-                  {
-                    rel: 'self',
-                    uri: 'https://openmrs-spa.org/openmrs/ws/rest/v1/concept/71617AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/description/16090FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF',
-                  },
-                ],
-              },
-            ],
-            resourceVersion: '2.0',
-          },
-        },
-        dosage: {
-          dosage: '81 mg',
-          numberOfPills: 1,
-        },
-        dosageUnit: {
-          uuid: '1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-          name: 'Tablet',
-          selected: true,
-        },
-        frequency: {
-          name: 'Once daily',
-          conceptUuid: '160862AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-          selected: true,
-        },
-        route: {
-          name: 'Oral',
-          conceptUuid: '160240AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-          selected: true,
-        },
-        encounterUuid: '8450ae45-8702-4edd-9541-4f9a75263eab',
-        commonMedicationName: 'Aspirin',
-        isFreeTextDosage: false,
-        patientInstructions: '',
-        asNeeded: false,
-        asNeededCondition: '',
-        startDate: '2021-09-07T17:51:25.313Z',
-        duration: null,
-        durationUnit: {
-          uuid: '1072AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-          display: 'Days',
-        },
-        pillsDispensed: 0,
-        numRefills: 0,
-        freeTextDosage: '',
-        indication: '',
-      },
-    ];
+  test('renders a tile-based layout of newly added orders when available', async () => {
+    const user = userEvent.setup();
+
+    testProps.orderBasketItems = mockMedicationOrderSearchResults.slice(0, 1);
 
     renderOrderBasketItemList();
 
@@ -130,7 +39,8 @@ describe('OrderBasketItemList: ', () => {
     const removeFromBasketButton = screen.getByRole('button', { name: /remove from basket/i });
     expect(removeFromBasketButton).toBeInTheDocument();
 
-    userEvent.click(removeFromBasketButton);
+    await waitFor(() => user.click(removeFromBasketButton));
+
     expect(mockOnItemRemoved).toHaveBeenCalledTimes(1);
     expect(mockOnItemRemoved).toHaveBeenCalledWith(testProps.orderBasketItems[0]);
   });

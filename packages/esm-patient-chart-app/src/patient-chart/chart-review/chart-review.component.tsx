@@ -1,5 +1,5 @@
 import React from 'react';
-import { Redirect } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { useExtensionStore } from '@openmrs/esm-framework';
 import { useNavGroups } from '@openmrs/esm-patient-common-lib';
 import { DashboardView, DashboardConfig } from './dashboard-view.component';
@@ -54,7 +54,7 @@ const ChartReview: React.FC<ChartReviewProps> = ({ patientUuid, patient, view })
     return null;
   } else if (!dashboard) {
     return (
-      <Redirect
+      <Navigate
         to={makePath(defaultDashboard, {
           patientUuid,
         })}

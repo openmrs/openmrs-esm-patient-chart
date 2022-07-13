@@ -176,7 +176,7 @@ const EncounterList: React.FC<EncounterListProps> = ({ showAllEncounters, encoun
                           ))}
                           {showAllEncounters ? (
                             <TableCell className="cds--table-column-menu">
-                              <OverflowMenu aria-label="Actions menu" light size="sm" flipped>
+                              <OverflowMenu ariaLabel="Actions menu" light size="sm" flipped>
                                 <OverflowMenuItem
                                   className={styles.menuItem}
                                   id="#editEncounter"

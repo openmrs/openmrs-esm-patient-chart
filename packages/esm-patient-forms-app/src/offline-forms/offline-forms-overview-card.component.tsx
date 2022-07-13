@@ -1,15 +1,10 @@
 import React, { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import useSWR from 'swr';
 import { Tile, Button, SkeletonText } from '@carbon/react';
 import { ArrowRight } from '@carbon/react/icons';
 import { navigate } from '@openmrs/esm-framework';
-import { useValidOfflineFormEncounters } from './use-offline-form-encounters';
-import {
-  // isFormFullyCached,
-  useDynamicFormDataEntries,
-} from './offline-form-helpers';
-import styles from './offline-forms-overview-card.styles.scss';
+import { useDynamicFormDataEntries } from './offline-form-helpers';
+import styles from './offline-forms-overview-card.scss';
 
 const OfflineFormsOverviewCard: React.FC = () => {
   const { t } = useTranslation();

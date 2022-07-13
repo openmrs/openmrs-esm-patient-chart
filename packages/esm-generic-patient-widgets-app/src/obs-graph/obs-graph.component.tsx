@@ -2,12 +2,16 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabList } from '@carbon/react';
 import { LineChart } from '@carbon/charts-react';
-import { LineChartOptions } from '@carbon/charts/interfaces/charts';
-import { ScaleTypes } from '@carbon/charts/interfaces/enums';
-import '@carbon/charts/styles.css';
 import { formatDate, useConfig } from '@openmrs/esm-framework';
 import { useObs } from '../resources/useObs';
 import styles from './obs-graph.scss';
+
+enum ScaleTypes {
+  LABELS = 'labels',
+  LINEAR = 'linear',
+  LOG = 'log',
+  TIME = 'time',
+}
 
 interface ConceptDescriptor {
   label: string;
@@ -42,7 +46,7 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
 
   const chartColors = Object.fromEntries(config.data.map((d) => [d.label, d.color]));
 
-  const chartOptions: LineChartOptions = {
+  const chartOptions = {
     axes: {
       bottom: {
         title: 'Date',
@@ -94,7 +98,7 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
         </Tabs>
       </div>
       <div className={styles.lineChartContainer} style={{ flex: 4 }}>
-        <LineChart data={chartData} options={chartOptions} />
+        <LineChart data={chartData.flat()} options={chartOptions} />
       </div>
     </div>
   );

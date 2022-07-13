@@ -19,14 +19,13 @@ import {
 } from '@carbon/react';
 import {
   isDesktop,
-  // putDynamicOfflineData,
-  // removeDynamicOfflineData,
-  // syncDynamicOfflineData,
+  putDynamicOfflineData,
+  removeDynamicOfflineData,
+  syncDynamicOfflineData,
   useLayoutType,
 } from '@openmrs/esm-framework';
 import { useDynamicFormDataEntries } from './offline-form-helpers';
 import { FormEncounter } from '../types';
-// import { useOfflineFormManagement } from './use-offline-form-management';
 import { useValidOfflineFormEncounters } from './use-offline-form-encounters';
 import styles from './offline-forms.styles.scss';
 
@@ -113,17 +112,17 @@ function OfflineFormToggle({ form, disabled }: { form: FormEncounter; disabled: 
   const handleToggled = async (checked: boolean) => {
     setIsUpdating(true);
 
-    // try {
-    //   if (checked) {
-    //     await putDynamicOfflineData('form', form.uuid);
-    //     await syncDynamicOfflineData('form', form.uuid);
-    //   } else {
-    //     await removeDynamicOfflineData('form', form.uuid);
-    //   }
-    // } finally {
-    //   setIsUpdating(false);
-    //   dynamicFormEntriesSwr.mutate();
-    // }
+    try {
+      if (checked) {
+        await putDynamicOfflineData('form', form.uuid);
+        await syncDynamicOfflineData('form', form.uuid);
+      } else {
+        await removeDynamicOfflineData('form', form.uuid);
+      }
+    } finally {
+      setIsUpdating(false);
+      dynamicFormEntriesSwr.mutate();
+    }
   };
 
   if (dynamicFormEntriesSwr.isValidating) {

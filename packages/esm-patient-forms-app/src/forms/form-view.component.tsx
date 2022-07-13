@@ -16,9 +16,9 @@ import {
   DataTableHeader,
   DataTableRow,
 } from '@carbon/react';
-import { PatientChartPagination, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
-import { formatDatetime, useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { Edit } from '@carbon/react/icons';
+import { PatientChartPagination, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
+import { isDesktop, formatDatetime, useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import EmptyFormView from './empty-form.component';
 import { ConfigObject } from '../config-schema';
 import { CompletedFormInfo } from '../types';
@@ -38,7 +38,7 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
   const { t } = useTranslation();
   const config = useConfig() as ConfigObject;
   const htmlFormEntryForms = config.htmlFormEntryForms;
-  const isDesktop = useLayoutType() === 'desktop';
+  const layout = useLayoutType();
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const [searchTerm, setSearchTerm] = useState<string>(null);
   const [allFormInfos, setAllFormInfos] = useState<Array<CompletedFormInfo>>(forms);
@@ -98,7 +98,7 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
         )}
         {allFormInfos?.length > 0 && (
           <>
-            <DataTable size={isDesktop ? 'sm' : 'lg'} rows={tableRows} headers={tableHeaders} isSortable={true}>
+            <DataTable size={isDesktop(layout) ? 'sm' : 'lg'} rows={tableRows} headers={tableHeaders} isSortable={true}>
               {({ rows, headers, getHeaderProps, getTableProps }) => (
                 <TableContainer className={styles.tableContainer}>
                   <Table {...getTableProps()} useZebraStyles>
@@ -177,7 +177,7 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
         )}
         {isEmpty(allFormInfos) && (
           <EmptyFormView
-            action={t('formSearchHint', 'Try searching for the form using an alternative name or keyword')}
+            content={t('formSearchHint', 'Try searching for the form using an alternative name or keyword')}
           />
         )}
       </>

@@ -3,6 +3,7 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 interface CustomOverflowMenuComponentProps {
   menuTitle: React.ReactNode;
   dropDownMenu: boolean;
+  children: React.ReactNode;
 }
 
 const CustomOverflowMenuComponent: React.FC<CustomOverflowMenuComponentProps> = ({
