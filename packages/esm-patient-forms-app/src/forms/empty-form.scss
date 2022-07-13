@@ -1,25 +1,53 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
 @import "../root.scss";
 @import '~@openmrs/esm-styleguide/src/vars';
 
 .tile {
-  display: flex;
-  flex-direction: column;
   text-align: center;
-  min-height: 15.25rem;
-  justify-content: flex-end;
-  align-items: center;
+  border: 1px solid $ui-03;
 }
 
 .content {
   @extend .productiveHeading01;
   color: $color-gray-70;
-  width: 13.438rem;
-  margin: 1rem 0.938rem 0.313rem 0.875rem;
+  margin-top: spacing.$spacing-05;
+  margin-bottom: spacing.$spacing-03;
 }
 
-.action {
-  @extend .bodyLong01;
-  color: $color-gray-70;
-  width: 15.25rem;
-  margin: 0.313rem 0 0;
+
+.desktopHeading {
+  h4 {
+    @include type.type-style('heading-compact-02');
+    color: $text-02;
+  }
+}
+
+.tabletHeading {
+  h4 {
+    @include type.type-style('heading-03');
+    color: $text-02;
+  }
+}
+
+.desktopHeading, .tabletHeading {
+  text-align: left;
+  text-transform: capitalize;
+  margin-bottom: spacing.$spacing-05;
+  
+  h4:after {
+    content: "";
+    display: block;
+    width: 2rem;
+    padding-top: 0.188rem;
+    border-bottom: 0.375rem solid var(--brand-03);
+  }
+}
+
+.heading:after {
+  content: "";
+  display: block;
+  width: 2rem;
+  padding-top: 0.188rem;
+  border-bottom: 0.375rem solid var(--brand-03);
 }

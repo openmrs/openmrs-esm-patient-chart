@@ -113,17 +113,17 @@ function OfflineFormToggle({ form, disabled }: { form: FormEncounter; disabled: 
   const handleToggled = async (checked: boolean) => {
     setIsUpdating(true);
 
-    // try {
-    //   if (checked) {
-    //     await putDynamicOfflineData('form', form.uuid);
-    //     await syncDynamicOfflineData('form', form.uuid);
-    //   } else {
-    //     await removeDynamicOfflineData('form', form.uuid);
-    //   }
-    // } finally {
-    //   setIsUpdating(false);
-    //   dynamicFormEntriesSwr.mutate();
-    // }
+    try {
+      if (checked) {
+        await putDynamicOfflineData('form', form.uuid);
+        await syncDynamicOfflineData('form', form.uuid);
+      } else {
+        await removeDynamicOfflineData('form', form.uuid);
+      }
+    } finally {
+      setIsUpdating(false);
+      dynamicFormEntriesSwr.mutate();
+    }
   };
 
   if (dynamicFormEntriesSwr.isValidating) {

@@ -77,6 +77,11 @@
   width: 10rem;
 }
 
+.tablist :global(.cds--tab--list) {
+  flex-direction: column;
+  height: 100%;
+}
+
 .verticalTabs :global(.cds--tabs--scrollable .cds--tabs--scrollable__nav-item+.cds--tabs--scrollable__nav-item) {
   margin-left: 0rem;
 }
