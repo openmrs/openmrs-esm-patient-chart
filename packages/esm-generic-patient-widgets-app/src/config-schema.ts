@@ -3,12 +3,12 @@ import { Type, validators } from '@openmrs/esm-framework';
 export const configSchema = {
   title: {
     _type: Type.String,
-    _description: 'Displayed at the top of the widget',
+    _description: 'Displayed at the top of the widget.',
     _default: 'Vitals',
   },
   resultsName: {
     _type: Type.String,
-    _description: 'Displayed in messages about this data',
+    _description: 'Displayed in messages about this data.',
     _default: 'results',
   },
   graphOldestFirst: {
@@ -24,9 +24,13 @@ export const configSchema = {
       },
       label: {
         _type: Type.String,
+        _default: null,
+        _description: 'The text to display. Defaults to the concept display name.',
       },
       color: {
         _type: Type.String,
+        _default: 'blue',
+        _description: 'The color of the line to display in the line graph.',
       },
       decimalPlaces: {
         _type: Type.Number,
