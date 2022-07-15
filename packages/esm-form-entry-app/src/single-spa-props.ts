@@ -17,4 +17,5 @@ export type SingleSpaProps = AppProps & {
   isOffline: boolean;
   patientUuid: string;
   handlePostResponse?: (encounter: Encounter) => void;
+  showDiscardSubmitButtons?: boolean;
 };

@@ -38,6 +38,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
   public loadingError?: string;
   public labelMap: {} = {};
   public formState: FormState = 'initial';
+  public showDiscardSubmitButtons: boolean = true;
   public language: string = (window as any).i18next.language.substring(0, 2).toLowerCase();
 
   public constructor(
@@ -61,6 +62,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
 
   public launchForm() {
     this.formState = 'loading';
+    this.showDiscardSubmitButtons = this.singleSpaPropsService.getProp('showDiscardSubmitButtons') ?? true;
     this.launchFormSubscription?.unsubscribe();
     this.launchFormSubscription = this.loadAllFormDependencies()
       .pipe(
