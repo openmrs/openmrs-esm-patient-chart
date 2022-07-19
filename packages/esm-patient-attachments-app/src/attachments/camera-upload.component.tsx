@@ -1,34 +1,40 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
-import FilePreview from './image-preview.component';
+import FilePreview, { FilePreviewContainerProps } from './file-preview.component';
 import styles from './camera-upload.scss';
 import Camera from 'react-html5-camera-photo';
-import { showToast } from '@openmrs/esm-framework';
+import { showToast, showModal } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { readFileAsString } from './utils';
 import 'react-html5-camera-photo/build/css/index.css';
 import { Button, Tab, TabContent, Tabs } from 'carbon-components-react';
+import { UploadedFile } from './attachments-types';
 
 export interface CameraUploadProps {
   collectCaption?: boolean;
-  onTakePhoto?(dataUri: string): void;
-  onSavePhoto?(dataUri: string, caption: string): void;
+  onTakePhoto?(file: string): void;
+  onSavePhoto?(file: string, caption: string): void;
 }
 
-const CameraUpload: React.FC<CameraUploadProps> = ({ onSavePhoto, onTakePhoto, collectCaption = true }) => {
+const CameraUpload: React.FC<CameraUploadProps> = ({ onSavePhoto, onTakePhoto }) => {
   const mediaStream = useRef<MediaStream | undefined>();
   const [tab, setTab] = useState<'webcam' | 'upload'>('webcam');
   const [error, setError] = useState<Error>(undefined);
-  const [dataUri, setDataUri] = useState([]);
+  const [uploadedFiles, setUploadedFiles] = useState<Array<UploadedFile>>([]);
   const { t } = useTranslation();
 
-  console.log(dataUri);
-
-  const clearCamera = useCallback(() => setDataUri([]), []);
+  const clearCamera = useCallback(() => setUploadedFiles([]), []);
 
   const handleTakePhoto = useCallback(
-    (dataUri: string) => {
-      setDataUri([dataUri]);
-      onTakePhoto?.(dataUri);
+    (file: string) => {
+      setUploadedFiles([
+        {
+          fileContent: file,
+          fileName: 'Image taken from camera',
+          fileType: 'image',
+          fileDescription: '',
+        },
+      ]);
+      onTakePhoto?.(file);
     },
     [onTakePhoto],
   );
@@ -36,12 +42,20 @@ const CameraUpload: React.FC<CameraUploadProps> = ({ onSavePhoto, onTakePhoto, c
   const upload = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       Object.values(e.target.files)?.forEach((file) =>
-        readFileAsString(file).then((file) => {
-          setDataUri((uriData) => [...uriData, file]);
+        readFileAsString(file).then((fileContent) => {
+          setUploadedFiles((uriData) => [
+            ...uriData,
+            {
+              fileContent,
+              fileName: file.name,
+              fileType: file.type === 'application/pdf' ? 'pdf' : 'image',
+              fileDescription: '',
+            },
+          ]);
         }),
       );
     },
-    [setDataUri],
+    [setUploadedFiles],
   );
 
   const setMediaStream = useCallback((ms: MediaStream) => {
@@ -56,7 +70,7 @@ const CameraUpload: React.FC<CameraUploadProps> = ({ onSavePhoto, onTakePhoto, c
         title: t('cameraError', 'Camera Error'),
       });
     }
-  }, [error]);
+  }, [error, t]);
 
   useEffect(() => {
     return () => {
@@ -65,17 +79,23 @@ const CameraUpload: React.FC<CameraUploadProps> = ({ onSavePhoto, onTakePhoto, c
   }, []);
 
   const willSaveAttachment = useCallback(
-    (dataUri: string, caption: string) => onSavePhoto?.(dataUri, caption),
+    (data: Array<UploadedFile>) => {
+      // onSavePhoto?.(file, caption),
+    },
     [onSavePhoto],
   );
 
-  if (dataUri.length) {
+  if (uploadedFiles.length) {
     return (
       <FilePreview
-        content={dataUri}
-        onCancelCapture={clearCamera}
-        onSaveFile={willSaveAttachment}
-        collectCaption={collectCaption}
+        onCancelCapture={() => {
+          clearCamera();
+        }}
+        onSaveFile={(data: Array<UploadedFile>) => {
+          willSaveAttachment(data);
+          clearCamera();
+        }}
+        uploadedFiles={uploadedFiles}
       />
     );
   }

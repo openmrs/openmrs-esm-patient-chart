@@ -22,9 +22,6 @@ function setupOpenMRS() {
           featureName: 'patient-attachments',
           moduleName,
         }),
-        meta: {
-          columnSpan: 1,
-        },
       },
       {
         name: 'capture-photo-widget',
@@ -48,6 +45,15 @@ function setupOpenMRS() {
         name: 'capture-photo-modal',
         load: getAsyncLifecycle(() => import('./attachments/camera-upload.component'), {
           featureName: 'capture-photo-modal',
+          moduleName,
+        }),
+        online: true,
+        offline: true,
+      },
+      {
+        name: 'files-preview-modal',
+        load: getAsyncLifecycle(() => import('./attachments/file-preview.component'), {
+          featureName: 'files-preview-modal',
           moduleName,
         }),
         online: true,
