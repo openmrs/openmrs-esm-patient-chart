@@ -6,7 +6,7 @@ import { showToast, showModal } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { readFileAsString } from './utils';
 import 'react-html5-camera-photo/build/css/index.css';
-import { Button, Tab, TabContent, Tabs } from 'carbon-components-react';
+import { Button, Tab, TabContent, Tabs, FileUploaderDropContainer } from 'carbon-components-react';
 import { UploadedFile } from './attachments-types';
 
 export interface CameraUploadProps {
@@ -40,8 +40,8 @@ const CameraUpload: React.FC<CameraUploadProps> = ({ onSavePhoto, onTakePhoto })
   );
 
   const upload = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      Object.values(e.target.files)?.forEach((file) =>
+    (files: Array<File>) => {
+      files.forEach((file) =>
         readFileAsString(file).then((fileContent) => {
           setUploadedFiles((uriData) => [
             ...uriData,
@@ -112,17 +112,21 @@ const CameraUpload: React.FC<CameraUploadProps> = ({ onSavePhoto, onTakePhoto })
           !error && <Camera onTakePhoto={handleTakePhoto} onCameraStart={setMediaStream} onCameraError={setError} />
         ) : (
           <div>
-            <label htmlFor="uploadFile" className={styles.choosePhotoOrPdf}>
-              {t('selectFile', 'Select local File instead')}
-            </label>
-            <input
-              type="file"
-              id="uploadFile"
-              accept="image/*, application/pdf"
-              className={styles.uploadFile}
-              onChange={upload}
-              multiple
-            />
+            <div className="cds--file__container">
+              <strong className="cds--file--label">Account photo</strong>
+              <p className="cds--label-description">Only .jpg and .png files. 500kb max file size</p>
+              <div className={styles.uploadFile}>
+                <FileUploaderDropContainer
+                  accept={['image/*', 'application/pdf']}
+                  labelText={t('fileUploadInstructions', 'Drag and drop files here or click to upload')}
+                  tabIndex={0}
+                  multiple
+                  onAddFiles={(evt, { addedFiles }) => {
+                    upload(addedFiles);
+                  }}
+                />
+              </div>
+            </div>
           </div>
         )}
       </div>
