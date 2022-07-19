@@ -8,6 +8,12 @@
   @include carbon--type-style("productive-heading-03");
 }
 
+.paddedProductiveHeading03 {
+  @include carbon--type-style("productive-heading-03");
+  padding: $spacing-05
+}
+
+
 .bodyShort01 {
   @include carbon--type-style("body-short-01");
 }

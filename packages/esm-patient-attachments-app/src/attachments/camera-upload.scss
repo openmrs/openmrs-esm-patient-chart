@@ -1,7 +1,8 @@
-@import "~@openmrs/esm-styleguide/src/vars";
+@import '../root.scss';
 
 .cameraSection {
-  padding: 10px;
+  width: inherit;
+  background-color: $ui-02;
 }
 
 :global(.react-html5-camera-photo) {
@@ -10,26 +11,32 @@
   }
 }
 
-.frameContent {
-  margin: auto;
-  padding: 2rem;
-  width: 80%;
-}
-
-.choosePhoto {
+.choosePhotoOrPdf {
   float: right;
   color: #0f62fe;
   cursor: pointer;
   margin: 1rem 0;
+  padding: 1rem;
 
   &:hover {
     color: #000;
     text-decoration: none;
+    background-color: #e5e5e5;
   }
 }
 
 .uploadFile {
   display: none;
+}
+
+.tabs {
+  .bx--tab-content {
+    display: none;
+  }
+}
+
+.tabContent {
+  padding: $spacing-05
 }
 
 @media (max-width: $breakpoint-tablet-max){

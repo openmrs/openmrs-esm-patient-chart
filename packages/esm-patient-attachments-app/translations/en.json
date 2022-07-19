@@ -1,5 +1,6 @@
 {
   "add": "Add",
+  "addAttachment": "Add attachment",
   "addImage": "Add image +",
   "attachmentCaptionInstruction": "Enter a caption for the image",
   "attachments": "Attachments",
@@ -10,6 +11,9 @@
   "deleteSelected": "Delete selected",
   "errorUploading": "Error uploading a file",
   "fileUnsupported": "File uploaded is not supported",
-  "save": "Save",
-  "selectFile": "Select local file instead"
+  "imageDescription": "Image description",
+  "imageName": "Image name",
+  "selectFile": "Select local file instead",
+  "uploadMedia": "Upload media",
+  "webcam": "Webcam"
 }
