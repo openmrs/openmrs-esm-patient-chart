@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useState, useRef } from 'react';
-import FilePreview, { FilePreviewContainerProps } from './file-preview.component';
+import FilePreview from './file-preview.component';
 import styles from './camera-upload.scss';
 import Camera from 'react-html5-camera-photo';
-import { showToast, showModal } from '@openmrs/esm-framework';
+import { showToast } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { readFileAsString } from './utils';
 import 'react-html5-camera-photo/build/css/index.css';
-import { Button, Tab, TabContent, Tabs, FileUploaderDropContainer } from 'carbon-components-react';
+import { Tab, Tabs, FileUploaderDropContainer } from 'carbon-components-react';
 import { UploadedFile } from './attachments-types';
 
 export interface CameraUploadProps {
@@ -17,10 +17,10 @@ export interface CameraUploadProps {
 
 const CameraUpload: React.FC<CameraUploadProps> = ({ onSavePhoto, onTakePhoto }) => {
   const mediaStream = useRef<MediaStream | undefined>();
-  const [tab, setTab] = useState<'webcam' | 'upload'>('webcam');
   const [error, setError] = useState<Error>(undefined);
   const [uploadedFiles, setUploadedFiles] = useState<Array<UploadedFile>>([]);
   const { t } = useTranslation();
+  const [cameraTabOpen, setCameraTabOpen] = useState(true);
 
   const clearCamera = useCallback(() => setUploadedFiles([]), []);
 
@@ -73,10 +73,13 @@ const CameraUpload: React.FC<CameraUploadProps> = ({ onSavePhoto, onTakePhoto })
   }, [error, t]);
 
   useEffect(() => {
-    return () => {
-      mediaStream.current?.getTracks().forEach((t) => t.stop());
-    };
-  }, []);
+    if (!cameraTabOpen) {
+      return () => {
+        mediaStream.current?.getTracks().forEach((t) => t.stop());
+      };
+    } else {
+    }
+  }, [cameraTabOpen]);
 
   const willSaveAttachment = useCallback(
     (data: Array<UploadedFile>) => {
@@ -104,32 +107,28 @@ const CameraUpload: React.FC<CameraUploadProps> = ({ onSavePhoto, onTakePhoto })
     <div className={styles.cameraSection}>
       <h3 className={styles.paddedProductiveHeading03}>{t('addAttachment', 'Add Attachment')}</h3>
       <Tabs className={styles.tabs}>
-        <Tab label={t('webcam', 'Webcam')} onClick={() => setTab('webcam')} />
-        <Tab label={t('uploadMedia', 'Upload media')} onClick={() => setTab('upload')} />
-      </Tabs>
-      <div className={styles.tabContent}>
-        {tab === 'webcam' ? (
-          !error && <Camera onTakePhoto={handleTakePhoto} onCameraStart={setMediaStream} onCameraError={setError} />
-        ) : (
-          <div>
-            <div className="cds--file__container">
-              <strong className="cds--file--label">Account photo</strong>
-              <p className="cds--label-description">Only .jpg and .png files. 500kb max file size</p>
-              <div className={styles.uploadFile}>
-                <FileUploaderDropContainer
-                  accept={['image/*', 'application/pdf']}
-                  labelText={t('fileUploadInstructions', 'Drag and drop files here or click to upload')}
-                  tabIndex={0}
-                  multiple
-                  onAddFiles={(evt, { addedFiles }) => {
-                    upload(addedFiles);
-                  }}
-                />
-              </div>
+        <Tab label={t('webcam', 'Webcam')} onClick={() => setCameraTabOpen(true)}>
+          <Camera onTakePhoto={handleTakePhoto} onCameraError={setError} />
+        </Tab>
+        <Tab label={t('uploadMedia', 'Upload media')} onClick={() => setCameraTabOpen(false)}>
+          <div className="cds--file__container">
+            <p className="cds--label-description">
+              {t('fileUploadTypes', 'Only images and pdf files. 500kb max file size')}
+            </p>
+            <div className={styles.uploadFile}>
+              <FileUploaderDropContainer
+                accept={['image/*', 'application/pdf']}
+                labelText={t('fileUploadInstructions', 'Drag and drop files here or click to upload')}
+                tabIndex={0}
+                multiple
+                onAddFiles={(evt, { addedFiles }) => {
+                  upload(addedFiles);
+                }}
+              />
             </div>
           </div>
-        )}
-      </div>
+        </Tab>
+      </Tabs>
     </div>
   );
 };

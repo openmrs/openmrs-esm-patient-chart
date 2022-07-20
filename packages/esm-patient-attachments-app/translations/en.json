@@ -12,9 +12,9 @@
   "errorUploading": "Error uploading a file",
   "fieldRequired": "This field is required",
   "fileUnsupported": "File uploaded is not supported",
+  "fileUploadInstructions": "Drag and drop files here or click to upload",
   "imageDescription": "Image description",
   "imageName": "Image name",
-  "selectFile": "Select local file instead",
   "uploadMedia": "Upload media",
   "webcam": "Webcam"
 }
