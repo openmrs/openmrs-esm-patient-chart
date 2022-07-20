@@ -6,38 +6,32 @@ import { showToast } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { readFileAsString } from './utils';
 import 'react-html5-camera-photo/build/css/index.css';
-import { Tab, Tabs, FileUploaderDropContainer } from 'carbon-components-react';
+import { Tab, Tabs, FileUploaderDropContainer, FileUploaderItem } from 'carbon-components-react';
 import { UploadedFile } from './attachments-types';
 
 export interface CameraUploadProps {
   collectCaption?: boolean;
-  onTakePhoto?(file: string): void;
-  onSavePhoto?(file: string, caption: string): void;
+  saveFile: (file: UploadedFile) => void;
 }
 
-const CameraUpload: React.FC<CameraUploadProps> = ({ onSavePhoto, onTakePhoto }) => {
-  const mediaStream = useRef<MediaStream | undefined>();
+const CameraUpload: React.FC<CameraUploadProps> = ({ saveFile }) => {
   const [error, setError] = useState<Error>(undefined);
   const [uploadedFiles, setUploadedFiles] = useState<Array<UploadedFile>>([]);
+  const [uploadingFiles, setUploadingFiles] = useState(false);
   const { t } = useTranslation();
-  const [cameraTabOpen, setCameraTabOpen] = useState(true);
 
   const clearCamera = useCallback(() => setUploadedFiles([]), []);
 
-  const handleTakePhoto = useCallback(
-    (file: string) => {
-      setUploadedFiles([
-        {
-          fileContent: file,
-          fileName: 'Image taken from camera',
-          fileType: 'image',
-          fileDescription: '',
-        },
-      ]);
-      onTakePhoto?.(file);
-    },
-    [onTakePhoto],
-  );
+  const handleTakePhoto = useCallback((file: string) => {
+    setUploadedFiles([
+      {
+        fileContent: file,
+        fileName: 'Image taken from camera',
+        fileType: 'image',
+        fileDescription: '',
+      },
+    ]);
+  }, []);
 
   const upload = useCallback(
     (files: Array<File>) => {
@@ -58,10 +52,6 @@ const CameraUpload: React.FC<CameraUploadProps> = ({ onSavePhoto, onTakePhoto })
     [setUploadedFiles],
   );
 
-  const setMediaStream = useCallback((ms: MediaStream) => {
-    mediaStream.current = ms;
-  }, []);
-
   useEffect(() => {
     if (error) {
       showToast({
@@ -72,21 +62,19 @@ const CameraUpload: React.FC<CameraUploadProps> = ({ onSavePhoto, onTakePhoto })
     }
   }, [error, t]);
 
-  useEffect(() => {
-    if (!cameraTabOpen) {
-      return () => {
-        mediaStream.current?.getTracks().forEach((t) => t.stop());
-      };
-    } else {
-    }
-  }, [cameraTabOpen]);
-
   const willSaveAttachment = useCallback(
-    (data: Array<UploadedFile>) => {
-      // onSavePhoto?.(file, caption),
+    (uploadedFiles: Array<UploadedFile>) => {
+      console.log('saving Files', uploadedFiles);
+      setUploadedFiles(uploadedFiles);
+      setUploadingFiles(true);
+      uploadedFiles.forEach((file) => saveFile(file));
     },
-    [onSavePhoto],
+    [saveFile],
   );
+
+  if (uploadingFiles) {
+    return <FileUploadingComponent uploadedFiles={uploadedFiles} />;
+  }
 
   if (uploadedFiles.length) {
     return (
@@ -96,7 +84,6 @@ const CameraUpload: React.FC<CameraUploadProps> = ({ onSavePhoto, onTakePhoto })
         }}
         onSaveFile={(data: Array<UploadedFile>) => {
           willSaveAttachment(data);
-          clearCamera();
         }}
         uploadedFiles={uploadedFiles}
       />
@@ -107,10 +94,10 @@ const CameraUpload: React.FC<CameraUploadProps> = ({ onSavePhoto, onTakePhoto })
     <div className={styles.cameraSection}>
       <h3 className={styles.paddedProductiveHeading03}>{t('addAttachment', 'Add Attachment')}</h3>
       <Tabs className={styles.tabs}>
-        <Tab label={t('webcam', 'Webcam')} onClick={() => setCameraTabOpen(true)}>
-          <Camera onTakePhoto={handleTakePhoto} onCameraError={setError} />
+        <Tab label={t('webcam', 'Webcam')}>
+          <CameraComponent handleTakePhoto={handleTakePhoto} setError={setError} />
         </Tab>
-        <Tab label={t('uploadMedia', 'Upload media')} onClick={() => setCameraTabOpen(false)}>
+        <Tab label={t('uploadMedia', 'Upload media')}>
           <div className="cds--file__container">
             <p className="cds--label-description">
               {t('fileUploadTypes', 'Only images and pdf files. 500kb max file size')}
@@ -133,4 +120,34 @@ const CameraUpload: React.FC<CameraUploadProps> = ({ onSavePhoto, onTakePhoto })
   );
 };
 
+const CameraComponent = ({ handleTakePhoto, setError }) => {
+  const mediaStream = useRef<MediaStream | undefined>();
+  useEffect(() => {
+    return () => {
+      mediaStream.current?.getTracks().forEach((t) => t.stop());
+    };
+  }, [mediaStream]);
+  const setMediaStream = useCallback((ms: MediaStream) => {
+    mediaStream.current = ms;
+  }, []);
+  return <Camera onTakePhoto={handleTakePhoto} onCameraStart={setMediaStream} onCameraError={setError} />;
+};
+
 export default CameraUpload;
+
+interface FileUploadingComponentProps {
+  uploadedFiles: Array<UploadedFile>;
+}
+
+export const FileUploadingComponent: React.FC<FileUploadingComponentProps> = ({ uploadedFiles }) => {
+  const { t } = useTranslation();
+  console.log(uploadedFiles);
+  return (
+    <div className={styles.cameraSection}>
+      <h3 className={styles.paddedProductiveHeading03}>{t('addAttachment', 'Add Attachment')}</h3>
+      {uploadedFiles.map((file, indx) => (
+        <FileUploaderItem key={indx} name={file.fileName} status="uploading" />
+      ))}
+    </div>
+  );
+};

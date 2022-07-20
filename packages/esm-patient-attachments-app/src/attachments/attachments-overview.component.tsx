@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, Dispatch, SetStateAction } from 'react';
 import AttachmentThumbnail from './attachment-thumbnail.component';
 import Gallery from 'react-grid-gallery';
 import styles from './attachments-overview.scss';
@@ -9,6 +9,7 @@ import { LayoutType, showModal, showToast, useLayoutType, usePagination, UserHas
 import { PatientChartPagination, EmptyState, CardHeader } from '@openmrs/esm-patient-common-lib';
 import { getAttachments, createAttachment, deleteAttachment, getAttachmentByUuid } from './attachments.resource';
 import { createGalleryEntry, readFileAsString } from './utils';
+import { UploadedFile } from './attachments-types';
 
 export interface Attachment {
   id: string;
@@ -36,11 +37,11 @@ function getPageSize(layoutType: LayoutType) {
   }
 }
 
-function handleDragOver(e: React.DragEvent) {
-  e.preventDefault();
-  e.stopPropagation();
-  e.dataTransfer.dropEffect = 'copy';
-}
+// function handleDragOver(e: React.DragEvent) {
+//   e.preventDefault();
+//   e.stopPropagation();
+//   e.dataTransfer.dropEffect = 'copy';
+// }
 
 const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
   const { t } = useTranslation();
@@ -97,46 +98,38 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
 
   const showCam = useCallback(() => {
     const close = showModal('capture-photo-modal', {
-      onSavePhoto(dataUri: string, caption: string) {
-        const abortController = new AbortController();
-        const extension = dataUri.split(';')[0].split('/')[1];
-        const sizeInBytes = 4 * Math.ceil(dataUri.length / 3) * 0.5624896334383812;
-        if (sizeInBytes > 500000 || extension.includes('svg')) {
-          setError(true);
-          close();
-          showCam();
-        }
-        createAttachment(patientUuid, dataUri, caption, abortController).then((res) => {
-          pushAttachments([res.data], new AbortController());
-          close();
-        });
+      saveFile: (file: UploadedFile) => {
+        console.log('saving file');
+        createAttachment(patientUuid, file);
       },
-      collectCaption: true,
+      closeModal: () => {
+        close();
+      },
     });
   }, [patientUuid]);
 
-  const handleUpload = useCallback((e: React.SyntheticEvent, files: FileList | null) => {
-    e.preventDefault();
-    e.stopPropagation();
+  // const handleUpload = useCallback((e: React.SyntheticEvent, files: FileList | null) => {
+  //   e.preventDefault();
+  //   e.stopPropagation();
 
-    if (files) {
-      const abortController = new AbortController();
+  //   if (files) {
+  //     const abortController = new AbortController();
 
-      Promise.all<Attachment>(
-        Array.prototype.map.call(files, (file) =>
-          readFileAsString(file).then(
-            (content) =>
-              content &&
-              createAttachment(patientUuid, content, file.name, abortController).then((res) =>
-                pushAttachments([res.data], abortController),
-              ),
-          ),
-        ),
-      )
-        .then((newAttachments) => newAttachments.filter(Boolean))
-        .then((newAttachments) => setAttachments((attachments) => [...attachments, ...newAttachments]));
-    }
-  }, []);
+  //     Promise.all<Attachment>(
+  //       Array.prototype.map.call(files, (file) =>
+  //         readFileAsString(file).then(
+  //           (content) =>
+  //             content &&
+  //             createAttachment(patientUuid, content, file.name, abortController).then((res) =>
+  //               pushAttachments([res.data], abortController),
+  //             ),
+  //         ),
+  //       ),
+  //     )
+  //       .then((newAttachments) => newAttachments.filter(Boolean))
+  //       .then((newAttachments) => setAttachments((attachments) => [...attachments, ...newAttachments]));
+  //   }
+  // }, []);
 
   const handleImageSelect = useCallback((index: number) => {
     setAttachments((attachments) =>
@@ -172,12 +165,7 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
 
   return (
     <UserHasAccess privilege="View Attachments">
-      <div
-        className={styles.overview}
-        onPaste={(e) => handleUpload(e, e.clipboardData.files)}
-        onDrop={(e) => handleUpload(e, e.dataTransfer.files)}
-        onDragOver={handleDragOver}
-      >
+      <div className={styles.overview}>
         {attachments.some((m) => m.isSelected) && (
           <UserHasAccess privilege="Delete Attachment">
             <div className={styles.actions}>
