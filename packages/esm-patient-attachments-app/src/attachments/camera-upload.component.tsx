@@ -13,9 +13,10 @@ export interface CameraUploadProps {
   collectCaption?: boolean;
   saveFile: (file: UploadedFile) => Promise<FetchResponse<any>>;
   closeModal: () => void;
+  onCompletion?: () => void;
 }
 
-const CameraUpload: React.FC<CameraUploadProps> = ({ saveFile, closeModal }) => {
+const CameraUpload: React.FC<CameraUploadProps> = ({ saveFile, closeModal, onCompletion }) => {
   const [error, setError] = useState<Error>(undefined);
   const [uploadedFiles, setUploadedFiles] = useState<Array<UploadedFile>>([]);
   const [uploadingFiles, setUploadingFiles] = useState(false);
@@ -86,6 +87,7 @@ const CameraUpload: React.FC<CameraUploadProps> = ({ saveFile, closeModal }) => 
         setUploadedFiles={setUploadedFiles}
         clearCamera={clearCamera}
         closeModal={closeModal}
+        onCompletion={onCompletion}
       />
     );
   }
@@ -108,9 +110,6 @@ const CameraUpload: React.FC<CameraUploadProps> = ({ saveFile, closeModal }) => 
     <div className={styles.cameraSection}>
       <h3 className={styles.paddedProductiveHeading03}>{t('addAttachment', 'Add Attachment')}</h3>
       <Tabs className={styles.tabs}>
-        <Tab label={t('webcam', 'Webcam')}>
-          <CameraComponent handleTakePhoto={handleTakePhoto} setError={setError} />
-        </Tab>
         <Tab label={t('uploadMedia', 'Upload media')}>
           <div className="cds--file__container">
             <p className="cds--label-description">
@@ -128,6 +127,9 @@ const CameraUpload: React.FC<CameraUploadProps> = ({ saveFile, closeModal }) => 
               />
             </div>
           </div>
+        </Tab>
+        <Tab label={t('webcam', 'Webcam')}>
+          <CameraComponent handleTakePhoto={handleTakePhoto} setError={setError} />
         </Tab>
       </Tabs>
     </div>
@@ -155,6 +157,7 @@ interface FileUploadingComponentProps {
   setUploadedFiles: Dispatch<SetStateAction<Array<UploadedFile>>>;
   closeModal: () => void;
   clearCamera: () => void;
+  onCompletion?: () => void;
 }
 
 export const FileUploadingComponent: React.FC<FileUploadingComponentProps> = ({
@@ -163,6 +166,7 @@ export const FileUploadingComponent: React.FC<FileUploadingComponentProps> = ({
   setUploadedFiles,
   closeModal,
   clearCamera,
+  onCompletion,
 }) => {
   const { t } = useTranslation();
   const [uploadingCompleted, setUploadingComplete] = useState(false);
@@ -189,7 +193,10 @@ export const FileUploadingComponent: React.FC<FileUploadingComponentProps> = ({
           );
         }),
       ),
-    ).then(() => setUploadingComplete(true));
+    ).then(() => {
+      setUploadingComplete(true);
+      onCompletion?.();
+    });
   }, []);
   return (
     <div className={styles.cameraSection}>

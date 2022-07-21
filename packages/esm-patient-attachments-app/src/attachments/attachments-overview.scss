@@ -8,7 +8,7 @@
   display: grid;
   grid-template-columns: 2fr 1fr 1fr auto;
   align-items: center;
-  padding: $spacing-03 $spacing-05;
+  padding: $spacing-03 0 $spacing-03 $spacing-05;
 }
 
 .attachmentsHeader > h4:after {

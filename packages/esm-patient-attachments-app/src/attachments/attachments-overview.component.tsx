@@ -100,6 +100,7 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
       closeModal: () => {
         close();
       },
+      onCompletion: () => mutate(),
     });
   }, [patientUuid]);
 
@@ -164,7 +165,7 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
 
   return (
     <UserHasAccess privilege="View Attachments">
-      <div className={styles.overview}>
+      <div onDragOverCapture={showCam} className={styles.overview}>
         <div id="container">
           <div className={styles.attachmentsHeader}>
             <h4 className={styles.productiveheading02}>{t('attachments', 'Attachments')}</h4>
