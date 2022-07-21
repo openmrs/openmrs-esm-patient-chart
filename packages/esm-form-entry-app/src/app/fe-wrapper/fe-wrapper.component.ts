@@ -8,7 +8,7 @@ import { FormSubmissionService } from '../form-submission/form-submission.servic
 import { EncounterResourceService } from '../openmrs-api/encounter-resource.service';
 import { Encounter, FormSchema, Order } from '../types';
 // @ts-ignore
-import { showToast, showNotification, getSynchronizationItems } from '@openmrs/esm-framework';
+import { showToast, showNotification, getSynchronizationItems, createGlobalStore } from '@openmrs/esm-framework';
 import { PatientPreviousEncounterService } from '../openmrs-api/patient-previous-encounter.service';
 
 import { patientFormSyncItem, PatientFormSyncItemContent } from '../offline/sync';
@@ -25,6 +25,8 @@ type FormState =
   | 'submitting'
   | 'submitted'
   | 'submissionError';
+
+const store = createGlobalStore('ampath-form-state', {});
 
 @Component({
   selector: 'my-app-fe-wrapper',
@@ -260,6 +262,6 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
   private changeState = (state) => {
     const formUuid = this.singleSpaPropsService.getPropOrThrow('formUuid');
     this.formState = state;
-    window.dispatchEvent(new CustomEvent('ampath-form-state', { detail: { formUuid, state } }));
+    store.setState({ [formUuid]: state });
   };
 }
