@@ -3,7 +3,7 @@ import AttachmentThumbnail from './attachment-thumbnail.component';
 import styles from './attachments-overview.scss';
 import Add16 from '@carbon/icons-react/es/add/16';
 import { useTranslation } from 'react-i18next';
-import { Button } from 'carbon-components-react';
+import { Button, ContentSwitcher, Loading, Switch } from 'carbon-components-react';
 import {
   formatDate,
   LayoutType,
@@ -17,6 +17,8 @@ import { PatientChartPagination, EmptyState } from '@openmrs/esm-patient-common-
 import { createAttachment, useAttachments } from './attachments.resource';
 import { createGalleryEntry } from './utils';
 import { UploadedFile } from './attachments-types';
+import AttachmentsGridOverview from './attachments-grid-overview.component';
+import AttachmentsTableOverview from './attachments-table-overview.component';
 
 function getPageSize(layoutType: LayoutType) {
   switch (layoutType) {
@@ -46,6 +48,7 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
   const attachments = useMemo(() => data.map((item) => createGalleryEntry(item)), [data]);
   const pagination = usePagination(attachments, pageSize);
   const [error, setError] = useState(false);
+  const [view, setView] = useState('grid');
 
   // useEffect(() => {
   //   if (patientUuid) {
@@ -162,60 +165,23 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
   return (
     <UserHasAccess privilege="View Attachments">
       <div className={styles.overview}>
-        {/* {attachments.some((m) => m.isSelected) && (
-          <UserHasAccess privilege="Delete Attachment">
-            <div className={styles.actions}>
-              <Button kind="danger" onClick={deleteSelected}>
-                {t('deleteSelected', 'Delete selected')}
-              </Button>
-            </div>
-          </UserHasAccess>
-        )} */}
         <div id="container">
           <div className={styles.attachmentsHeader}>
             <h4 className={styles.productiveheading02}>{t('attachments', 'Attachments')}</h4>
+            <div>{isValidating && <Loading withOverlay={false} small />}</div>
+            <ContentSwitcher onChange={(evt) => setView(`${evt.name}`)}>
+              <Switch name="grid" text="Grid" selected={view === 'grid'} />
+              <Switch name="tabular" text="Table" selected={view === 'tabular'} />
+            </ContentSwitcher>
             <Button kind="ghost" renderIcon={Add16} iconDescription="Add attachment" onClick={showCam}>
               {t('add', 'Add')}
             </Button>
           </div>
-          <div className={styles.galleryContainer}>
-            {attachments.map((attachment) => {
-              const imageProps = {
-                src: attachment.src,
-                title: attachment.title,
-                style: {},
-              };
-              const item = {
-                id: attachment.id,
-                dateTime: attachment.dateTime,
-                bytesMimeType: attachment.bytesMimeType,
-                bytesContentFamily: attachment.bytesContentFamily,
-              };
-              return (
-                <div>
-                  <AttachmentThumbnail imageProps={imageProps} item={item} />
-                  <p className={styles.bodyLong01}>{attachment.title}</p>
-                  <p className={`${styles.bodyLong01} ${styles.muted}`}>
-                    {formatDate(new Date(attachment.dateTime), {
-                      mode: 'wide',
-                    })}
-                  </p>
-                </div>
-              );
-            })}
-            {/* <Gallery
-                images={attachments}
-                currentImageWillChange={setCurrentImage}
-                customControls={[
-                  <Button kind="danger" onClick={handleDelete} className={styles.btnOverrides}>
-                    {t('delete', 'Delete')}
-                  </Button>,
-                ]}
-                onSelectImage={handleImageSelect}
-                thumbnailImageComponent={AttachmentThumbnail}
-                margin={3}
-              /> */}
-          </div>
+          {view === 'grid' ? (
+            <AttachmentsGridOverview attachments={attachments} />
+          ) : (
+            <AttachmentsTableOverview attachments={attachments} />
+          )}
 
           <PatientChartPagination
             currentItems={pagination.results.length}
