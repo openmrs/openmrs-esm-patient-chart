@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { Form } from '@ampath-kenya/ngx-formentry';
 import { Observable, forkJoin, from, throwError, of, Subscription } from 'rxjs';
 import { catchError, map, mergeMap, take } from 'rxjs/operators';
@@ -53,6 +53,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
   ) {}
 
   public ngOnInit() {
+    this.changeState('initial');
     this.launchForm();
   }
 
@@ -61,7 +62,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
   }
 
   public launchForm() {
-    this.formState = 'loading';
+    this.changeState('loading');
     this.showDiscardSubmitButtons = this.singleSpaPropsService.getProp('showDiscardSubmitButtons') ?? true;
     this.launchFormSubscription?.unsubscribe();
     this.launchFormSubscription = this.loadAllFormDependencies()
@@ -77,7 +78,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
       )
       .subscribe(
         ({ form, concepts }) => {
-          this.formState = 'ready';
+          this.changeState('ready');
           this.form = form;
           this.labelMap = concepts.reduce((acc, current) => {
             acc[current.extId] = current.display;
@@ -87,7 +88,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
         (err) => {
           // TODO: Improve error handling.
           this.loadingError = 'Error loading form';
-          this.formState = 'loadingError';
+          this.changeState('loadingError');
           console.error('Error rendering form', err);
         },
       );
@@ -159,12 +160,12 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.formState = 'submitting';
+    this.changeState('submitting');
     this.formSubmissionService.submitPayload(this.form).subscribe(
       ({ encounter }) => {
         this.onPostResponse(encounter);
         const isOffline = this.singleSpaPropsService.getProp('isOffline', false);
-        this.formState = 'submitted';
+        this.changeState('submitted');
 
         if (!isOffline && encounter?.uuid) {
           this.encounterResourceService
@@ -188,7 +189,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
         this.closeForm();
       },
       (error: Error) => {
-        this.formState = 'submissionError';
+        this.changeState('submissionError');
         showToast({
           critical: true,
           kind: 'error',
@@ -212,7 +213,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
     if (!this.form.valid) {
       this.form.markInvalidControls(this.form.rootNode);
       this.form.showErrors = true;
-      this.formState = 'readyWithValidationErrors';
+      this.changeState('readyWithValidationErrors');
     }
 
     return this.form.valid;
@@ -241,4 +242,24 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
     const handlePostResponse = this.singleSpaPropsService.getProp('handlePostResponse');
     if (handlePostResponse && typeof handlePostResponse === 'function') handlePostResponse(encounter);
   }
+
+  @HostListener('window:ampath-form-action', ['$event'])
+  onFormAction(event) {
+    const formUuid = this.singleSpaPropsService.getPropOrThrow('formUuid');
+    if (event.detail?.formUuid === formUuid) {
+      switch (event.detail?.action) {
+        case 'onSubmit':
+          this.onSubmit();
+          break;
+        default:
+          break;
+      }
+    }
+  }
+
+  private changeState = (state) => {
+    const formUuid = this.singleSpaPropsService.getPropOrThrow('formUuid');
+    this.formState = state;
+    window.dispatchEvent(new CustomEvent('ampath-form-state', { detail: { formUuid, state } }));
+  };
 }
