@@ -3,4 +3,5 @@ export interface UploadedFile {
   fileName: string;
   fileType: 'image' | 'pdf';
   fileDescription: string;
+  status?: 'uploading' | 'complete';
 }

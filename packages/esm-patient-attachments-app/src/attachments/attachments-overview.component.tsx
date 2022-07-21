@@ -98,10 +98,7 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
 
   const showCam = useCallback(() => {
     const close = showModal('capture-photo-modal', {
-      saveFile: (file: UploadedFile) => {
-        console.log('saving file');
-        createAttachment(patientUuid, file);
-      },
+      saveFile: (file: UploadedFile) => createAttachment(patientUuid, file),
       closeModal: () => {
         close();
       },

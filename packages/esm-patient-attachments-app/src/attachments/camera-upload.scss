@@ -55,3 +55,23 @@
     width: 65%;
   }  
 }
+
+.uploadingFilesSection {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: $spacing-05;
+  height: 25rem;
+  overflow-y: auto;
+  border: 1px dashed #8d8d8d;
+}
+
+.buttonSet {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  button{
+    max-width: unset !important;
+  }
+}
