@@ -1,4 +1,5 @@
 {
+  "actions": "Actions",
   "active": "Active",
   "activePrograms": "Active programs",
   "add": "Add",
@@ -10,8 +11,10 @@
   "dateCompleted": "Date completed",
   "dateEnrolled": "Date enrolled",
   "enrollmentLocation": "Enrollment location",
-  "enrollmentNowVisible": "It is now visible on the Programs page",
+  "enrollmentNowVisible": "It is now visible in the Programs table",
   "enrollmentSaved": "Program enrollment saved",
+  "enrollmentUpdated": "Program enrollment updated",
+  "enrollmentUpdatesNowVisible": "Changes to the program are now visible in the Programs table",
   "fullyEnrolled": "Enrolled in all programs",
   "location": "Location",
   "noEligibleEnrollments": "There are no more programs left to enroll this patient in",

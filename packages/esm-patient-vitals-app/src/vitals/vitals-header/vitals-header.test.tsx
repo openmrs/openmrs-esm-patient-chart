@@ -106,6 +106,36 @@ describe('VitalsHeader: ', () => {
     expect(mockLaunchWorkspace).toHaveBeenCalledTimes(1);
     expect(mockLaunchWorkspace).toHaveBeenCalledWith(patientVitalsBiometricsFormWorkspace);
   });
+
+  it('does not flag normal values that lie within the provided reference ranges', async () => {
+    mockFhirVitalsResponse.entry[3].resource.valueQuantity.value = 79;
+    mockFhirVitalsResponse.entry[4].resource.valueQuantity.value = 119;
+    mockFhirVitalsResponse.entry[0].resource.valueQuantity.value = 69;
+    mockFhirVitalsResponse.entry[11].resource.valueQuantity.value = 36;
+    mockOpenmrsFetch.mockReturnValue({ data: mockFhirVitalsResponse });
+
+    renderVitalsHeader();
+    await waitForLoadingToFinish();
+    const expandButton = screen.getByTitle(/ChevronDown/);
+    userEvent.click(expandButton);
+
+    expect(screen.queryByTitle(/abnormal value/i)).not.toBeInTheDocument();
+  });
+
+  it('flags abnormal values that lie outside of the provided reference ranges', async () => {
+    mockVitalsSignsConcept.data.results[0].setMembers[0].lowCritical = 50;
+    mockFhirVitalsResponse.entry[4].resource.valueQuantity.value = 49;
+    mockOpenmrsFetch.mockReturnValue({ data: mockFhirVitalsResponse });
+    mockVitalsSignsConcept.data.results[0].setMembers[1].hiCritical = 145;
+    mockFhirVitalsResponse.entry[3].resource.valueQuantity.value = 150;
+
+    renderVitalsHeader();
+    await waitForLoadingToFinish();
+    const expandButton = screen.getByTitle(/ChevronDown/);
+    userEvent.click(expandButton);
+
+    expect(screen.queryByTitle(/abnormal value/i)).toBeInTheDocument();
+  });
 });
 
 function renderVitalsHeader() {

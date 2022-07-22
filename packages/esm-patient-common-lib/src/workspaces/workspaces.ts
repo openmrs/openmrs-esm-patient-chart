@@ -22,6 +22,7 @@ export interface WorkspaceStoreState {
 
 export interface OpenWorkspace extends WorkspaceRegistration {
   additionalProps: object;
+  closeWorkspace(promptBeforeClosing?: boolean): void;
   closeWorkspace(): void;
   promptBeforeClosing(testFcn: () => boolean): void;
 }
@@ -107,7 +108,7 @@ export function launchPatientWorkspace(name: string, additionalProps?: object) {
   const workspace = getWorkspaceRegistration(name);
   const newWorkspace = {
     ...workspace,
-    closeWorkspace: () => closeWorkspace(name),
+    closeWorkspace: (ignoreChanges = true) => closeWorkspace(name, ignoreChanges),
     promptBeforeClosing: (testFcn) => promptBeforeClosing(name, testFcn),
     additionalProps,
   };
@@ -189,10 +190,28 @@ export function cancelPrompt() {
   store.setState({ ...state, prompt: null });
 }
 
-export function closeWorkspace(name: string) {
+export function closeWorkspace(name: string, ignoreChanges: boolean) {
   const store = getWorkspaceStore();
-  const state = store.getState();
-  store.setState({ ...state, openWorkspaces: state.openWorkspaces.filter((w) => w.name != name) });
+  const promptCheckFcn = getPromptBeforeClosingFcn(name);
+  if (!ignoreChanges && promptCheckFcn && promptCheckFcn()) {
+    const prompt: Prompt = {
+      title: translateFrom('@openmrs/esm-patient-chart-app', 'unsavedChangesTitleText', 'Unsaved Changes'),
+      body: translateFrom(
+        '@openmrs/esm-patient-chart-app',
+        'unsavedChangeText',
+        `You have unsaved changes in the side panel. Do you want to discard these changes?`,
+      ),
+      onConfirm: () => {
+        const state = store.getState();
+        store.setState({ ...state, prompt: null, openWorkspaces: state.openWorkspaces.filter((w) => w.name != name) });
+      },
+      confirmText: translateFrom('@openmrs/esm-patient-chart-app', 'discard', 'Discard'),
+    };
+    store.setState({ ...store.getState(), prompt });
+  } else {
+    const state = store.getState();
+    store.setState({ ...state, openWorkspaces: state.openWorkspaces.filter((w) => w.name != name) });
+  }
 }
 
 export function closeAllWorkspaces() {

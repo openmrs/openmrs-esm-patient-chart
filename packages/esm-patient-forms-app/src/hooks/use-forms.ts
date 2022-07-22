@@ -1,9 +1,8 @@
 import dayjs from 'dayjs';
 import useSWR from 'swr';
-import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
+import { getDynamicOfflineDataEntries, openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import { ListResponse, FormEncounter, EncounterWithFormRef, CompletedFormInfo } from '../types';
 import { customEncounterRepresentation, formEncounterUrl, formEncounterUrlPoc } from '../constants';
-import { isFormFullyCached } from '../offline-forms/offline-form-helpers';
 
 export function useFormEncounters(cachedOfflineFormsOnly = false) {
   const config = useConfig();
@@ -18,8 +17,8 @@ export function useFormEncounters(cachedOfflineFormsOnly = false) {
       return forms;
     }
 
-    const offlineForms = await Promise.all(forms.map(async (form) => ((await isFormFullyCached(form)) ? form : null)));
-    return offlineForms.filter(Boolean);
+    const dynamicFormData = await getDynamicOfflineDataEntries('form');
+    return forms.filter((form) => dynamicFormData.some((entry) => entry.identifier === form.uuid));
   });
 }
 

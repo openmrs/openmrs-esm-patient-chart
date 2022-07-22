@@ -1,7 +1,7 @@
 import React from 'react';
-import styles from './biometrics-overview.scss';
 import {
   DataTable,
+  DataTableRow,
   Table,
   TableCell,
   TableContainer,
@@ -12,10 +12,10 @@ import {
 } from 'carbon-components-react';
 import { usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
-import { PatientBiometrics } from './biometrics.resource';
+import styles from './biometrics-overview.scss';
 
 interface PaginatedBiometricsProps {
-  tableRows: Array<PatientBiometrics>;
+  tableRows: Array<DataTableRow>;
   pageSize: number;
   pageUrl: string;
   urlLabel: string;

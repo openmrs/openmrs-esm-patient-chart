@@ -1,4 +1,4 @@
-name: Node.js CI
+name: OpenMRS CI
 
 on:
   push:
@@ -16,20 +16,39 @@ jobs:
       actions: read
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '16'
-      - run: npx lerna bootstrap
-      - name: TurboRepo local cache server
+      
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+      
+      - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npx lerna bootstrap
+      
+      - name: Setup a local cache server for Turborepo
         uses: felixmosh/turborepo-gh-artifacts@v1
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           server-token: ${{ secrets.TURBO_SERVER_TOKEN }}
-      - run: yarn run test
-      - run: yarn turbo run lint typescript build --api="http://127.0.0.1:9080" --token="${{ secrets.TURBO_SERVER_TOKEN }}" --team="${{ github.repository_owner }}"
-      - name: Upload Artifacts
+      
+      - name: Run tests
+        run: yarn run test
+      
+      - name: Run lint and typecheck
+        run: yarn turbo run lint typescript --color --api="http://127.0.0.1:9080" --token="${{ secrets.TURBO_SERVER_TOKEN }}" --team="${{ github.repository_owner }}"
+      
+      - name: Run build
+        run: yarn turbo run build --color --concurrency=5 --api="http://127.0.0.1:9080" --token="${{ secrets.TURBO_SERVER_TOKEN }}" --team="${{ github.repository_owner }}"
+      
+      - name: Upload build artifacts
         uses: actions/upload-artifact@v2
         with:
           name: packages
@@ -75,7 +94,7 @@ jobs:
           method: "PATCH"
           username: ${{ secrets.DEPLOYER_USERNAME }}
           password: ${{ secrets.DEPLOYER_PASSWORD }}
-          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
+          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.cdn.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
           customHeaders: '{ "Accept": "application/json", "Content-Type": "application/json" }'
 
   deploy_generic_patient_widgets_app:
@@ -117,7 +136,7 @@ jobs:
           method: "PATCH"
           username: ${{ secrets.DEPLOYER_USERNAME }}
           password: ${{ secrets.DEPLOYER_PASSWORD }}
-          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
+          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.cdn.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
           customHeaders: '{ "Accept": "application/json", "Content-Type": "application/json" }'
 
   deploy_patient_allergies_app:
@@ -159,7 +178,7 @@ jobs:
           method: "PATCH"
           username: ${{ secrets.DEPLOYER_USERNAME }}
           password: ${{ secrets.DEPLOYER_PASSWORD }}
-          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
+          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.cdn.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
           customHeaders: '{ "Accept": "application/json", "Content-Type": "application/json" }'
 
   deploy_patient_appointments_app:
@@ -201,7 +220,7 @@ jobs:
           method: "PATCH"
           username: ${{ secrets.DEPLOYER_USERNAME }}
           password: ${{ secrets.DEPLOYER_PASSWORD }}
-          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
+          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.cdn.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
           customHeaders: '{ "Accept": "application/json", "Content-Type": "application/json" }'
 
   deploy_patient_attachments_app:
@@ -243,7 +262,7 @@ jobs:
           method: "PATCH"
           username: ${{ secrets.DEPLOYER_USERNAME }}
           password: ${{ secrets.DEPLOYER_PASSWORD }}
-          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
+          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.cdn.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
           customHeaders: '{ "Accept": "application/json", "Content-Type": "application/json" }'
 
   deploy_patient_banner_app:
@@ -285,7 +304,7 @@ jobs:
           method: "PATCH"
           username: ${{ secrets.DEPLOYER_USERNAME }}
           password: ${{ secrets.DEPLOYER_PASSWORD }}
-          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
+          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.cdn.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
           customHeaders: '{ "Accept": "application/json", "Content-Type": "application/json" }'
 
   deploy_patient_biometrics_app:
@@ -327,7 +346,7 @@ jobs:
           method: "PATCH"
           username: ${{ secrets.DEPLOYER_USERNAME }}
           password: ${{ secrets.DEPLOYER_PASSWORD }}
-          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
+          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.cdn.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
           customHeaders: '{ "Accept": "application/json", "Content-Type": "application/json" }'
 
   deploy_patient_chart_app:
@@ -369,7 +388,7 @@ jobs:
           method: "PATCH"
           username: ${{ secrets.DEPLOYER_USERNAME }}
           password: ${{ secrets.DEPLOYER_PASSWORD }}
-          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
+          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.cdn.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
           customHeaders: '{ "Accept": "application/json", "Content-Type": "application/json" }'
 
   deploy_patient_conditions_app:
@@ -411,7 +430,7 @@ jobs:
           method: "PATCH"
           username: ${{ secrets.DEPLOYER_USERNAME }}
           password: ${{ secrets.DEPLOYER_PASSWORD }}
-          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
+          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.cdn.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
           customHeaders: '{ "Accept": "application/json", "Content-Type": "application/json" }'
 
   deploy_patient_forms_app:
@@ -453,7 +472,7 @@ jobs:
           method: "PATCH"
           username: ${{ secrets.DEPLOYER_USERNAME }}
           password: ${{ secrets.DEPLOYER_PASSWORD }}
-          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
+          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.cdn.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
           customHeaders: '{ "Accept": "application/json", "Content-Type": "application/json" }'
 
   deploy_patient_immunizations_app:
@@ -495,7 +514,7 @@ jobs:
           method: "PATCH"
           username: ${{ secrets.DEPLOYER_USERNAME }}
           password: ${{ secrets.DEPLOYER_PASSWORD }}
-          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
+          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.cdn.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
           customHeaders: '{ "Accept": "application/json", "Content-Type": "application/json" }'
 
   deploy_patient_medications_app:
@@ -537,7 +556,7 @@ jobs:
           method: "PATCH"
           username: ${{ secrets.DEPLOYER_USERNAME }}
           password: ${{ secrets.DEPLOYER_PASSWORD }}
-          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
+          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.cdn.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
           customHeaders: '{ "Accept": "application/json", "Content-Type": "application/json" }'
 
   deploy_patient_notes_app:
@@ -579,7 +598,7 @@ jobs:
           method: "PATCH"
           username: ${{ secrets.DEPLOYER_USERNAME }}
           password: ${{ secrets.DEPLOYER_PASSWORD }}
-          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
+          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.cdn.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
           customHeaders: '{ "Accept": "application/json", "Content-Type": "application/json" }'
 
   deploy_patient_programs_app:
@@ -621,7 +640,7 @@ jobs:
           method: "PATCH"
           username: ${{ secrets.DEPLOYER_USERNAME }}
           password: ${{ secrets.DEPLOYER_PASSWORD }}
-          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
+          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.cdn.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
           customHeaders: '{ "Accept": "application/json", "Content-Type": "application/json" }'
 
   deploy_patient_test_results_app:
@@ -663,7 +682,7 @@ jobs:
           method: "PATCH"
           username: ${{ secrets.DEPLOYER_USERNAME }}
           password: ${{ secrets.DEPLOYER_PASSWORD }}
-          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
+          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.cdn.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
           customHeaders: '{ "Accept": "application/json", "Content-Type": "application/json" }'
 
   deploy_patient_vitals_app:
@@ -705,7 +724,7 @@ jobs:
           method: "PATCH"
           username: ${{ secrets.DEPLOYER_USERNAME }}
           password: ${{ secrets.DEPLOYER_PASSWORD }}
-          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
+          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.cdn.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
           customHeaders: '{ "Accept": "application/json", "Content-Type": "application/json" }'
 
   pre_release:
@@ -716,19 +735,37 @@ jobs:
     if: ${{ github.event_name == 'push' }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '16'
           registry-url: "https://registry.npmjs.org"
-      - run: npx lerna bootstrap
-      - run: yarn turbo run build
-      - run: yarn lerna version patch --no-git-tag-version --no-push --yes
-      - run: yarn lerna version "$(node -e "console.log(require('./lerna.json').version)")-pre.${{ github.run_number }}" --no-git-tag-version --yes
+      
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npx lerna bootstrap
+      
+      - name: Build
+        run: yarn turbo run build --color --concurrency=5
+
+      - name: Patch
+        run: yarn lerna version patch --no-git-tag-version --no-push --yes
+      
+      - name: Version
+        run: yarn lerna version "$(node -e "console.log(require('./lerna.json').version)")-pre.${{ github.run_number }}" --no-git-tag-version --yes
       - run: git config user.email "info@openmrs.org" && git config user.name "OpenMRS CI"
       - run: git add . && git commit -m "Prerelease version" --no-verify
-      - run: yarn run ci:prepublish
+      
+      - name: Pre-release
+        run: yarn run ci:prepublish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
@@ -740,14 +777,28 @@ jobs:
     if: ${{ github.event_name == 'release' }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Use Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '16'
           registry-url: "https://registry.npmjs.org"
-      - run: npx lerna bootstrap
-      - run: yarn turbo run build
-      - run: yarn run ci:publish
+      
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npx lerna bootstrap
+
+      - name: Build
+        run: yarn turbo run build --color --concurrency=5
+      
+      - name: Publish
+        run: yarn run ci:publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}

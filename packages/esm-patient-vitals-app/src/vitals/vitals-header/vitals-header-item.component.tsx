@@ -1,6 +1,6 @@
 import React from 'react';
 import Circle16 from '@carbon/icons-react/es/circle--solid/16';
-import { ObservationInterpretation } from './vitals-header.component';
+import { ObservationInterpretation } from '../vitals.resource';
 import styles from './vitals-header-item.scss';
 
 interface VitalsHeaderItemProps {
@@ -11,7 +11,7 @@ interface VitalsHeaderItemProps {
 }
 
 const VitalsHeaderItem: React.FC<VitalsHeaderItemProps> = ({ interpretation, value, unitName, unitSymbol }) => {
-  const flaggedAbnormal = interpretation && interpretation !== ObservationInterpretation.NORMAL;
+  const flaggedAbnormal = interpretation && interpretation !== 'normal';
 
   return (
     <div className={`${styles.container} ${flaggedAbnormal ? styles['abnormal-value'] : ''}`}>
@@ -24,14 +24,10 @@ const VitalsHeaderItem: React.FC<VitalsHeaderItemProps> = ({ interpretation, val
           <span className={styles.value}>{value || '-'} </span>
           <span className={styles.units}>{value && unitSymbol}</span>
         </label>
-        {interpretation === ObservationInterpretation.HIGH ? <span className={styles.high}></span> : null}
-        {interpretation === ObservationInterpretation.CRITICALLY_HIGH ? (
-          <span className={styles['critically-high']}></span>
-        ) : null}
-        {interpretation === ObservationInterpretation.LOW ? <span className={styles.low}></span> : null}
-        {interpretation === ObservationInterpretation.CRITICALLY_LOW ? (
-          <span className={styles['critically-low']}></span>
-        ) : null}
+        {interpretation === 'high' ? <span className={styles.high}></span> : null}
+        {interpretation === 'critically_high' ? <span className={styles['critically-high']}></span> : null}
+        {interpretation === 'low' ? <span className={styles.low}></span> : null}
+        {interpretation === 'critically_low' ? <span className={styles['critically-low']}></span> : null}
       </div>
     </div>
   );

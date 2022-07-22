@@ -3,6 +3,7 @@ export type WorkspaceWindowState = 'minimized' | 'maximized' | 'hidden' | 'reope
 
 /** The default parameters received by all workspaces */
 export interface DefaultWorkspaceProps {
+  closeWorkspace(ignoreChanges: boolean): void;
   closeWorkspace(): void;
   /**
    * Call this with a no-args function that returns true if the user should be prompted before
@@ -10,4 +11,5 @@ export interface DefaultWorkspaceProps {
    */
   promptBeforeClosing(testFcn: () => boolean): void;
   patientUuid: string;
+  handlePostResponse?(): void;
 }

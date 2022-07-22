@@ -17,7 +17,7 @@ export function launchFormEntryOrHtmlForms(
       launchFormEntry(formUuid, patient.id, encounterUuid, formName);
     } else {
       navigate({
-        to: `\${openmrsBase}/htmlformentryui/htmlform/${htmlForm.formUiPage}.page?patientId=${patient.id}&visitId=${currentVisit.uuid}&definitionUiResource=${htmlForm.formUiResource}`,
+        to: `\${openmrsBase}/htmlformentryui/htmlform/${htmlForm.formUiPage}.page?patientId=${patient.id}&visitId=${currentVisit.uuid}&definitionUiResource=${htmlForm.formUiResource}&returnUrl=${window.location.href}`,
       });
     }
   } else {
@@ -28,5 +28,4 @@ export function launchFormEntryOrHtmlForms(
 export function launchFormEntry(formUuid: string, patientUuid: string, encounterUuid?: string, formName?: string) {
   formEntrySub.next({ formUuid, encounterUuid });
   launchPatientWorkspace('patient-form-entry-workspace', { workspaceTitle: formName });
-  navigate({ to: `\${openmrsSpaBase}/patient/${patientUuid}/chart` });
 }

@@ -75,7 +75,7 @@ const WorkspaceWindow: React.FC<RouteComponentProps<ContextWorkspaceParams>> = (
         className={`${styles.header} ${maximized ? `${styles.fullWidth}` : `${styles.dynamicWidth}`}`}
       >
         <HeaderName prefix="">{workspaceTitle}</HeaderName>
-        <HeaderGlobalBar>
+        <HeaderGlobalBar className={styles.headerGlobalBar}>
           <ExtensionSlot extensionSlotName={patientChartWorkspaceHeaderSlot} />
           {layout === 'desktop' && (
             <>
@@ -102,7 +102,7 @@ const WorkspaceWindow: React.FC<RouteComponentProps<ContextWorkspaceParams>> = (
             <Button
               iconDescription={t('close', 'Close')}
               hasIconOnly
-              onClick={workspaces[0]?.closeWorkspace}
+              onClick={() => workspaces[0]?.closeWorkspace()}
               renderIcon={DownToBottom16}
               tooltipPosition="bottom"
               tooltipAlignment="end"
