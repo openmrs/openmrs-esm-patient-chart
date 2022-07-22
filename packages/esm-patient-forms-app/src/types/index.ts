@@ -30,6 +30,7 @@ export interface Form {
   retired: boolean;
   resources: Array<FormEncounterResource>;
   formCategory?: string;
+  translations: Array<string>;
 }
 
 /**
