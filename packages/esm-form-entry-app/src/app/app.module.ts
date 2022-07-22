@@ -19,24 +19,10 @@ import { LoaderComponent } from './loader/loader.component';
 import { SingleSpaPropsService } from './single-spa-props/single-spa-props.service';
 import { FormCreationService } from './form-creation/form-creation.service';
 import * as ngTranslate from '@ngx-translate/core';
-import { AmpathTranslationsLoader } from './ampathTranslationsLoader/AmpathTranslationsLoader';
 
 @NgModule({
   declarations: [AppComponent, EmptyRouteComponent, FeWrapperComponent, LoaderComponent],
-  imports: [
-    BrowserModule,
-    FormEntryModule,
-    ReactiveFormsModule,
-    BrowserAnimationsModule,
-    OpenmrsApiModule,
-    ngTranslate.TranslateModule.forRoot({
-      loader: {
-        provide: ngTranslate.TranslateLoader,
-        useClass: AmpathTranslationsLoader,
-      },
-      defaultLanguage: 'en',
-    }),
-  ],
+  imports: [BrowserModule, FormEntryModule, ReactiveFormsModule, BrowserAnimationsModule, OpenmrsApiModule],
   providers: [
     FormSchemaService,
     LocalStorageService,
