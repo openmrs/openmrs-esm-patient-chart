@@ -133,6 +133,7 @@ export interface FormSchema {
   retired: boolean;
   uuid: string;
   version: string;
+  translations: Array<string>;
 }
 
 interface Sections {

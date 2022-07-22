@@ -6,6 +6,7 @@ import { FormResourceService } from '../openmrs-api/form-resource.service';
 import { FormSchemaCompiler } from '@ampath-kenya/ngx-formentry';
 import { LocalStorageService } from '../local-storage/local-storage.service';
 import { FormSchema, Questions } from '../types';
+import * as ngxTranslate from '@ngx-translate/core';
 
 @Injectable()
 export class FormSchemaService {
@@ -13,11 +14,23 @@ export class FormSchemaService {
     private formsResourceService: FormResourceService,
     private localStorage: LocalStorageService,
     private formSchemaCompiler: FormSchemaCompiler,
+    private translate: ngxTranslate.TranslateService,
   ) {}
 
   public getFormSchemaByUuid(formUuid: string, cached: boolean = true): Observable<FormSchema> {
     const cachedCompiledSchema = this.getCachedCompiledSchemaByUuid(formUuid);
+    const currentLang = this.localStorage.getItem('i18nextLng') || 'en';
+    this.translate.setDefaultLang(currentLang);
+
     if (cachedCompiledSchema && cached) {
+      if (cachedCompiledSchema?.translations) {
+        cachedCompiledSchema.translations.forEach((translationResourceUuid: string) => {
+          let translationResource = this.getCachedTranslationsByUuid(translationResourceUuid);
+          if (translationResource) {
+            this.translate.setTranslation(translationResource.language, translationResource.translations, true);
+          }
+        });
+      }
       return of(cachedCompiledSchema);
     }
 
@@ -27,11 +40,26 @@ export class FormSchemaService {
     }).pipe(
       map(({ unCompiledSchema, formMetadataObject }) => {
         const formSchema: any = unCompiledSchema.form;
+
+        if (formSchema?.translations) {
+          formSchema.translations.forEach((translationUuid: string) => {
+            this.getFormTranslationResourceByUuidFromServer(translationUuid)
+              .then((result) => {
+                this.cacheTranslationsByUuid(translationUuid, result);
+                this.translate.setTranslation(result.language, result.translations, true);
+              })
+              .catch((error) => {
+                console.error(`Error getting AMPATH translation resource ${JSON.stringify(error)}.`);
+              });
+          });
+        }
+
         const referencedComponents: any = unCompiledSchema.referencedComponents;
 
         formMetadataObject.pages = formSchema.pages || [];
         formMetadataObject.referencedForms = formSchema.referencedForms || [];
         formMetadataObject.processor = formSchema.processor;
+        formMetadataObject.translations = formSchema.translations;
 
         return this.formSchemaCompiler.compileFormSchema(
           formMetadataObject,
@@ -78,6 +106,10 @@ export class FormSchemaService {
       },
     );
     return formSchema;
+  }
+
+  private getFormTranslationResourceByUuidFromServer(translationResourceUuid: string) {
+    return this.formsResourceService.getFormClobDataByUuid(translationResourceUuid).toPromise();
   }
 
   private getFormSchemaWithReferences(schema: any): ReplaySubject<any> {
@@ -206,5 +238,13 @@ export class FormSchemaService {
     }
 
     return [...results];
+  }
+
+  private getCachedTranslationsByUuid(translationUuid: string): any {
+    return this.localStorage.getObject(translationUuid);
+  }
+
+  private cacheTranslationsByUuid(translationUuid, schema): void {
+    this.localStorage.setObject(translationUuid, schema);
   }
 }
