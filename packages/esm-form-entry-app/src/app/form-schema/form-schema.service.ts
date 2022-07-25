@@ -144,15 +144,17 @@ export class FormSchemaService {
       return this.formsResourceService.getFormMetaDataByUuid(formUuid).subscribe(
         (formMetadataObject: any) => {
           if (formMetadataObject.resources.length > 0) {
-            this.formsResourceService.getFormClobDataByUuid(formMetadataObject.resources[0].valueReference).subscribe(
-              (clobData: any) => {
-                observer.next(clobData);
-              },
-              (err) => {
-                console.error(err);
-                observer.error(err);
-              },
-            );
+            formMetadataObject.resources.map((resource: any) => {
+              this.formsResourceService.getFormClobDataByUuid(resource.valueReference).subscribe(
+                (clobData: any) => {
+                  observer.next(clobData);
+                },
+                (err) => {
+                  console.error(err);
+                  observer.error(err);
+                },
+              );
+            });
           } else {
             observer.error(formMetadataObject.display + ':This formMetadataObject has no resource');
           }
