@@ -9,16 +9,19 @@ import {
   TableRow,
   TableCell,
   TableHeader,
+  DataTableSkeleton,
 } from 'carbon-components-react';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Attachment } from './attachments-types';
+import styles from './attachments-table-overview.scss';
 
 interface AttachmentsTableOverviewProps {
+  isLoading: boolean;
   attachments: Array<Attachment>;
 }
 
-const AttachmentsTableOverview: React.FC<AttachmentsTableOverviewProps> = ({ attachments }) => {
+const AttachmentsTableOverview: React.FC<AttachmentsTableOverviewProps> = ({ attachments, isLoading }) => {
   const { t } = useTranslation();
 
   const rows = useMemo(
@@ -49,6 +52,15 @@ const AttachmentsTableOverview: React.FC<AttachmentsTableOverviewProps> = ({ att
     ],
     [],
   );
+
+  if (isLoading) {
+    return (
+      <div className={styles.attachmentTable}>
+        <DataTableSkeleton className={styles.dataTableSkeleton} />
+      </div>
+    );
+  }
+
   return (
     <TableContainer>
       <DataTable rows={rows} headers={headers} size="sm">

@@ -5,9 +5,37 @@
   grid-template-columns: 1fr 1fr 1fr 1fr;
   align-items: center;
   grid-gap: $spacing-05;
-  padding: 0 $spacing-05;
+  padding: 0 $spacing-05 $spacing-05 $spacing-05;
+}
+
+.attachmentThumbnailSkeleton {
+  width: 100% !important;
 }
 
 .galleryContainer img {
   object-fit: cover;
+}
+
+.imagePreview {
+  display: grid;
+  grid-template-columns: 1fr 16rem;
+  grid-gap: $spacing-05;
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+}
+
+.leftPanel {
+  background-color: #262626;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: start;
+}
+
+.rightPanel {
+  background-color: #393939;
+  padding: $spacing-05
 }

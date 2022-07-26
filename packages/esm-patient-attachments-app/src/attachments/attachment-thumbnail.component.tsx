@@ -13,7 +13,7 @@ export default function AttachmentThumbnail(props: AttachmentThumbnailProps) {
 function ImageThumbnail(props: ImageProps) {
   return (
     <div className={styles.imageThumbnail} role="button" tabIndex={0}>
-      <img src={props.src} alt={props.title} style={props.style} />
+      <img src={props.src} alt={props.title} style={props.style} onClick={props?.onClick} />
     </div>
   );
 }
@@ -56,6 +56,7 @@ function Thumbnail(props: AttachmentThumbnailProps) {
     src: props.imageProps.src,
     title: props.imageProps.title,
     style: props.imageProps.style,
+    onClick: props.imageProps?.onClick,
   };
 
   if (contentType === 'IMAGE') {
@@ -76,6 +77,7 @@ type ImageProps = {
   src: string;
   title: string;
   style: Object;
+  onClick?: () => void;
 };
 
 type ItemProps = {
