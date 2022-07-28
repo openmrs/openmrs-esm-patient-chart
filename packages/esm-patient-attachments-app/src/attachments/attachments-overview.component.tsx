@@ -7,10 +7,9 @@ import { LayoutType, showModal, showToast, useLayoutType, usePagination, UserHas
 import { PatientChartPagination, EmptyState } from '@openmrs/esm-patient-common-lib';
 import { createAttachment, deleteAttachmentPermanently, useAttachments } from './attachments.resource';
 import { createGalleryEntry } from './utils';
-import { UploadedFile } from './attachments-types';
+import { UploadedFile, Attachment } from './attachments-types';
 import AttachmentsGridOverview from './attachments-grid-overview.component';
 import AttachmentsTableOverview from './attachments-table-overview.component';
-import { Attachment } from './attachments-types';
 import ImagePreview from './image-preview.component';
 
 function getPageSize(layoutType: LayoutType) {
@@ -47,7 +46,7 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
       });
       setError(false);
     }
-  }, [error]);
+  }, [error, t]);
 
   const showCam = useCallback(() => {
     const close = showModal('capture-photo-modal', {
@@ -57,7 +56,7 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
       },
       onCompletion: () => mutate(),
     });
-  }, [patientUuid]);
+  }, [patientUuid, mutate]);
 
   const deleteAttachment = useCallback(
     (attachment: Attachment) => {
@@ -79,7 +78,7 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
           });
         });
     },
-    [mutate, showToast, t, setImageSelected],
+    [mutate, t, setImageSelected],
   );
 
   const deleteAttachmentModal = useCallback(
@@ -93,7 +92,7 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
         },
       });
     },
-    [showModal, deleteAttachment],
+    [deleteAttachment],
   );
 
   if (!attachments.length) {

@@ -70,14 +70,10 @@ const CameraUpload: React.FC<CameraUploadProps> = ({ saveFile, closeModal, onCom
     }
   }, [error, t]);
 
-  const willSaveAttachment = useCallback(
-    (uploadedFiles: Array<UploadedFile>) => {
-      console.log('saving Files', uploadedFiles);
-      setUploadedFiles(uploadedFiles);
-      setUploadingFiles(true);
-    },
-    [saveFile],
-  );
+  const willSaveAttachment = useCallback((uploadedFiles: Array<UploadedFile>) => {
+    setUploadedFiles(uploadedFiles);
+    setUploadingFiles(true);
+  }, []);
 
   if (uploadingFiles) {
     return (
@@ -170,7 +166,6 @@ export const FileUploadingComponent: React.FC<FileUploadingComponentProps> = ({
 }) => {
   const { t } = useTranslation();
   const [uploadingCompleted, setUploadingComplete] = useState(false);
-  console.log(uploadedFiles);
 
   useEffect(() => {
     Promise.all(
@@ -197,7 +192,7 @@ export const FileUploadingComponent: React.FC<FileUploadingComponentProps> = ({
       setUploadingComplete(true);
       onCompletion?.();
     });
-  }, []);
+  }, [onCompletion, saveFile, setUploadedFiles, t, uploadedFiles]);
   return (
     <div className={styles.cameraSection}>
       <h3 className={styles.paddedProductiveHeading03}>{t('addAttachment', 'Add Attachment')}</h3>

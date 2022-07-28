@@ -35,7 +35,6 @@ const AttachmentsGridOverview: React.FC<AttachmentsGridOverviewProps> = ({
           title: attachment.title,
           style: {},
           onClick: () => {
-            console.log('clicked');
             onAttachmentSelect(attachment);
           },
         };

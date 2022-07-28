@@ -12,8 +12,8 @@ export default function AttachmentThumbnail(props: AttachmentThumbnailProps) {
 
 function ImageThumbnail(props: ImageProps) {
   return (
-    <div className={styles.imageThumbnail} role="button" tabIndex={0}>
-      <img src={props.src} alt={props.title} style={props.style} onClick={props?.onClick} />
+    <div className={styles.imageThumbnail} role="button" tabIndex={0} onClick={props?.onClick}>
+      <img src={props.src} alt={props.title} style={props.style} />
     </div>
   );
 }

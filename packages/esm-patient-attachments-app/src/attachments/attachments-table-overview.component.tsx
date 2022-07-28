@@ -1,7 +1,5 @@
-import { attach, formatDate } from '@openmrs/esm-framework';
 import {
   DataTable,
-  Filename,
   TableContainer,
   Table,
   TableHead,
@@ -17,7 +15,6 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Attachment } from './attachments-types';
 import styles from './attachments-table-overview.scss';
-import { attachmentUrl } from './attachments.resource';
 
 interface AttachmentsTableOverviewProps {
   isLoading: boolean;
@@ -39,7 +36,9 @@ const AttachmentsTableOverview: React.FC<AttachmentsTableOverviewProps> = ({
       attachments.map((attachment) => ({
         id: attachment.id,
         fileName: (
-          <a
+          <span
+            role="button"
+            tabIndex={0}
             className={styles.link}
             onClick={() => {
               if (attachment.bytesContentFamily === 'IMAGE') {
@@ -50,12 +49,12 @@ const AttachmentsTableOverview: React.FC<AttachmentsTableOverviewProps> = ({
             }}
           >
             {attachment.title}
-          </a>
+          </span>
         ),
         type: attachment.bytesContentFamily,
         dateUploaded: attachment.dateTime,
       })),
-    [attachments],
+    [attachments, onAttachmentSelect],
   );
 
   const headers = useMemo(
@@ -76,7 +75,7 @@ const AttachmentsTableOverview: React.FC<AttachmentsTableOverviewProps> = ({
         colSpan: 2,
       },
     ],
-    [],
+    [t],
   );
 
   if (isLoading) {
