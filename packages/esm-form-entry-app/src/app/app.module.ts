@@ -18,7 +18,7 @@ import { ConfigResourceService } from './services/config-resource.service';
 import { LoaderComponent } from './loader/loader.component';
 import { SingleSpaPropsService } from './single-spa-props/single-spa-props.service';
 import { FormCreationService } from './form-creation/form-creation.service';
-import * as ngTranslate from '@ngx-translate/core';
+import { TranslateService } from '@ngx-translate/core';
 
 @NgModule({
   declarations: [AppComponent, EmptyRouteComponent, FeWrapperComponent, LoaderComponent],
@@ -32,7 +32,7 @@ import * as ngTranslate from '@ngx-translate/core';
     MonthlyScheduleResourceService,
     ConfigResourceService,
     SingleSpaPropsService,
-    ngTranslate.TranslateService,
+    TranslateService,
   ],
   bootstrap: [AppComponent],
 })
