@@ -59,6 +59,15 @@ function setupOpenMRS() {
         online: true,
         offline: true,
       },
+      {
+        name: 'delete-attachment-modal',
+        load: getAsyncLifecycle(() => import('./attachments/delete-attachment-confirmation-modal.component'), {
+          featureName: 'delete-attachment-modal',
+          moduleName,
+        }),
+        online: true,
+        offline: true,
+      },
     ],
   };
 }

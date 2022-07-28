@@ -1,4 +1,4 @@
-import { formatDate } from '@openmrs/esm-framework';
+import { attach, formatDate } from '@openmrs/esm-framework';
 import {
   DataTable,
   Filename,
@@ -17,20 +17,41 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Attachment } from './attachments-types';
 import styles from './attachments-table-overview.scss';
+import { attachmentUrl } from './attachments.resource';
 
 interface AttachmentsTableOverviewProps {
   isLoading: boolean;
   attachments: Array<Attachment>;
+  deleteAttachment: (attachment: Attachment) => void;
+  onAttachmentSelect: (attachment: Attachment) => void;
 }
 
-const AttachmentsTableOverview: React.FC<AttachmentsTableOverviewProps> = ({ attachments, isLoading }) => {
+const AttachmentsTableOverview: React.FC<AttachmentsTableOverviewProps> = ({
+  attachments,
+  isLoading,
+  deleteAttachment,
+  onAttachmentSelect,
+}) => {
   const { t } = useTranslation();
 
   const rows = useMemo(
     () =>
       attachments.map((attachment) => ({
         id: attachment.id,
-        fileName: attachment.title,
+        fileName: (
+          <a
+            className={styles.link}
+            onClick={() => {
+              if (attachment.bytesContentFamily === 'IMAGE') {
+                onAttachmentSelect(attachment);
+              } else {
+                window.open(attachment.src, '_blank');
+              }
+            }}
+          >
+            {attachment.title}
+          </a>
+        ),
         type: attachment.bytesContentFamily,
         dateUploaded: attachment.dateTime,
       })),
@@ -42,14 +63,17 @@ const AttachmentsTableOverview: React.FC<AttachmentsTableOverviewProps> = ({ att
       {
         key: 'fileName',
         header: t('fileName', 'File name'),
+        colSpan: 1,
       },
       {
         key: 'type',
         header: t('type', 'Type'),
+        colSpan: 1,
       },
       {
         key: 'dateUploaded',
         header: t('dateUploaded', 'Date uploaded'),
+        colSpan: 2,
       },
     ],
     [],
@@ -75,6 +99,7 @@ const AttachmentsTableOverview: React.FC<AttachmentsTableOverviewProps> = ({ att
                     {...getHeaderProps({
                       header,
                       isSortable: header.isSortable,
+                      colSpan: header.colSpan,
                     })}
                   >
                     {header.header?.content ?? header.header}
@@ -83,14 +108,18 @@ const AttachmentsTableOverview: React.FC<AttachmentsTableOverviewProps> = ({ att
               </TableRow>
             </TableHead>
             <TableBody>
-              {rows.map((row) => (
+              {rows.map((row, indx) => (
                 <TableRow key={row.id}>
                   {row.cells.map((cell) => (
                     <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                   ))}
-                  <TableCell>
-                    <OverflowMenu>
-                      <OverflowMenuItem itemText="Check" />
+                  <TableCell className="cds--table-column-menu">
+                    <OverflowMenu size="sm" flipped>
+                      <OverflowMenuItem
+                        itemText={t('delete', 'Delete')}
+                        isDelete
+                        onClick={() => deleteAttachment(attachments[indx])}
+                      />
                     </OverflowMenu>
                   </TableCell>
                 </TableRow>

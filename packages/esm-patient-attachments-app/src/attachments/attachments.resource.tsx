@@ -55,7 +55,7 @@ export function createAttachment(patientUuid: string, file: UploadedFile) {
   });
 }
 
-export function deleteAttachment(attachmentUuid: string, abortController: AbortController) {
+export function deleteAttachmentPermanently(attachmentUuid: string, abortController: AbortController) {
   return openmrsFetch(`${attachmentUrl}/${attachmentUuid}`, {
     method: 'DELETE',
     signal: abortController.signal,

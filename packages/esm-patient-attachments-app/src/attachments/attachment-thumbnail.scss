@@ -17,11 +17,15 @@
   img {
     width: 100% !important;
     margin: auto !important;
+    height: 10rem;
   }
 }
 
 .pdfThumbnail {
   cursor: pointer;
+  embed {
+    height: 10rem;
+  }
 }
 
 .captionText {
