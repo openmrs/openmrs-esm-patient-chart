@@ -6,7 +6,7 @@ import { FormResourceService } from '../openmrs-api/form-resource.service';
 import { FormSchemaCompiler } from '@ampath-kenya/ngx-formentry';
 import { LocalStorageService } from '../local-storage/local-storage.service';
 import { FormSchema, Questions } from '../types';
-import * as ngxTranslate from '@ngx-translate/core';
+import { TranslateService } from '@ngx-translate/core';
 
 @Injectable()
 export class FormSchemaService {
@@ -14,18 +14,18 @@ export class FormSchemaService {
     private formsResourceService: FormResourceService,
     private localStorage: LocalStorageService,
     private formSchemaCompiler: FormSchemaCompiler,
-    private translate: ngxTranslate.TranslateService,
+    private translate: TranslateService,
   ) {}
 
   public getFormSchemaByUuid(formUuid: string, cached: boolean = true): Observable<FormSchema> {
     const cachedCompiledSchema = this.getCachedCompiledSchemaByUuid(formUuid);
-    const currentLang = this.localStorage.getItem('i18nextLng') || 'en';
+    const currentLang: string = (window as any).i18next.language.substring(0, 2).toLowerCase() || 'en';
     this.translate.setDefaultLang(currentLang);
 
     if (cachedCompiledSchema && cached) {
       if (cachedCompiledSchema?.translations) {
         cachedCompiledSchema.translations.forEach((translationResourceUuid: string) => {
-          let translationResource = this.getCachedTranslationsByUuid(translationResourceUuid);
+          const translationResource = this.getCachedTranslationsByUuid(translationResourceUuid);
           if (translationResource) {
             this.translate.setTranslation(translationResource.language, translationResource.translations, true);
           }
@@ -49,7 +49,7 @@ export class FormSchemaService {
                 this.translate.setTranslation(result.language, result.translations, true);
               })
               .catch((error) => {
-                console.error(`Error getting AMPATH translation resource ${JSON.stringify(error)}.`);
+                console.error(`Error getting AMPATH translation resource: ${error.display}.`);
               });
           });
         }
