@@ -10,6 +10,8 @@ import {
   TableCell,
   TableHeader,
   DataTableSkeleton,
+  OverflowMenu,
+  OverflowMenuItem,
 } from 'carbon-components-react';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -86,6 +88,11 @@ const AttachmentsTableOverview: React.FC<AttachmentsTableOverviewProps> = ({ att
                   {row.cells.map((cell) => (
                     <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                   ))}
+                  <TableCell>
+                    <OverflowMenu>
+                      <OverflowMenuItem itemText="Check" />
+                    </OverflowMenu>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>

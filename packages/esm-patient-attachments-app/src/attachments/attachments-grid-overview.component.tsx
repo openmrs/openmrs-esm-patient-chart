@@ -4,6 +4,7 @@ import { Attachment } from './attachments-types';
 import AttachmentThumbnail from './attachment-thumbnail.component';
 import { Button, OverflowMenu, OverflowMenuItem, SkeletonPlaceholder } from 'carbon-components-react';
 import Close from '@carbon/icons-react/es/close/24';
+import { useTranslation } from 'react-i18next';
 interface AttachmentsGridOverviewProps {
   isLoading: boolean;
   attachments: Array<Attachment>;
@@ -20,10 +21,6 @@ const AttachmentsGridOverview: React.FC<AttachmentsGridOverviewProps> = ({ attac
         <SkeletonPlaceholder className={styles.attachmentThumbnailSkeleton} />
       </div>
     );
-  }
-
-  if (imageSelected) {
-    return <ImagePreview closePreview={() => setImageSelected(null)} imageSelected={imageSelected} />;
   }
 
   return (
@@ -52,6 +49,7 @@ const AttachmentsGridOverview: React.FC<AttachmentsGridOverviewProps> = ({ attac
           </div>
         );
       })}
+      {imageSelected && <ImagePreview closePreview={() => setImageSelected(null)} imageSelected={imageSelected} />}
     </div>
   );
 };
@@ -62,7 +60,7 @@ interface ImagePreviewProps {
 }
 
 const ImagePreview: React.FC<ImagePreviewProps> = ({ closePreview, imageSelected }) => {
-  console.log('in');
+  const { t } = useTranslation();
 
   return (
     <div className={styles.imagePreview}>
@@ -74,14 +72,18 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ closePreview, imageSelected
           renderIcon={Close}
           onClick={closePreview}
         />
-        <img className={styles.attachmentImage} src={imageSelected.src} alt={imageSelected.title} />
-        <OverflowMenu className={styles.imagePreviewActions} flipped>
-          <OverflowMenuItem itemText={'Delete'} isDelete />
-        </OverflowMenu>
+        <div className={styles.attachmentImage}>
+          <img src={imageSelected.src} alt={imageSelected.title} />
+        </div>
+        <div className={styles.overflowMenu}>
+          <OverflowMenu flipped>
+            <OverflowMenuItem itemText={t('deleteImage', 'Delete')} isDelete />
+          </OverflowMenu>
+        </div>
       </div>
       <div className={styles.rightPanel}>
-        <p className={styles.productiveheading02}>{imageSelected.title}</p>
-        <p className={styles.bodyLong01}>Description</p>
+        <h4 className={styles.productiveHeading02}>{imageSelected.title}</h4>
+        <p className={`${styles.bodyLong01} ${styles.imageDescription}`}>Description</p>
       </div>
     </div>
   );
