@@ -91,7 +91,7 @@ describe('ConditionsForm: ', () => {
   });
 
   it('renders a light background for the searchbox and date inputs in the tablet viewport ', () => {
-    mockUseLayoutType.mockReturnValueOnce('tablet').mockReturnValueOnce('tablet');
+    mockUseLayoutType.mockReturnValueOnce('tablet').mockReturnValueOnce('tablet').mockReturnValueOnce('tablet');
 
     renderConditionsForm();
 

@@ -46,7 +46,7 @@ jobs:
         run: yarn turbo run lint typescript --color --api="http://127.0.0.1:9080" --token="${{ secrets.TURBO_SERVER_TOKEN }}" --team="${{ github.repository_owner }}"
       
       - name: Run build
-        run: yarn turbo run build --color --api="http://127.0.0.1:9080" --token="${{ secrets.TURBO_SERVER_TOKEN }}" --team="${{ github.repository_owner }}"
+        run: yarn turbo run build --color --concurrency=5 --api="http://127.0.0.1:9080" --token="${{ secrets.TURBO_SERVER_TOKEN }}" --team="${{ github.repository_owner }}"
       
       - name: Upload build artifacts
         uses: actions/upload-artifact@v2
@@ -94,7 +94,7 @@ jobs:
           method: "PATCH"
           username: ${{ secrets.DEPLOYER_USERNAME }}
           password: ${{ secrets.DEPLOYER_PASSWORD }}
-          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
+          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.cdn.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
           customHeaders: '{ "Accept": "application/json", "Content-Type": "application/json" }'
 
   deploy_generic_patient_widgets_app:
@@ -136,7 +136,7 @@ jobs:
           method: "PATCH"
           username: ${{ secrets.DEPLOYER_USERNAME }}
           password: ${{ secrets.DEPLOYER_PASSWORD }}
-          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
+          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.cdn.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
           customHeaders: '{ "Accept": "application/json", "Content-Type": "application/json" }'
 
   deploy_patient_allergies_app:
@@ -178,7 +178,7 @@ jobs:
           method: "PATCH"
           username: ${{ secrets.DEPLOYER_USERNAME }}
           password: ${{ secrets.DEPLOYER_PASSWORD }}
-          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
+          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.cdn.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
           customHeaders: '{ "Accept": "application/json", "Content-Type": "application/json" }'
 
   deploy_patient_appointments_app:
@@ -220,7 +220,7 @@ jobs:
           method: "PATCH"
           username: ${{ secrets.DEPLOYER_USERNAME }}
           password: ${{ secrets.DEPLOYER_PASSWORD }}
-          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
+          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.cdn.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
           customHeaders: '{ "Accept": "application/json", "Content-Type": "application/json" }'
 
   deploy_patient_attachments_app:
@@ -262,7 +262,7 @@ jobs:
           method: "PATCH"
           username: ${{ secrets.DEPLOYER_USERNAME }}
           password: ${{ secrets.DEPLOYER_PASSWORD }}
-          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
+          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.cdn.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
           customHeaders: '{ "Accept": "application/json", "Content-Type": "application/json" }'
 
   deploy_patient_banner_app:
@@ -304,7 +304,7 @@ jobs:
           method: "PATCH"
           username: ${{ secrets.DEPLOYER_USERNAME }}
           password: ${{ secrets.DEPLOYER_PASSWORD }}
-          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
+          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.cdn.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
           customHeaders: '{ "Accept": "application/json", "Content-Type": "application/json" }'
 
   deploy_patient_biometrics_app:
@@ -346,7 +346,7 @@ jobs:
           method: "PATCH"
           username: ${{ secrets.DEPLOYER_USERNAME }}
           password: ${{ secrets.DEPLOYER_PASSWORD }}
-          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
+          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.cdn.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
           customHeaders: '{ "Accept": "application/json", "Content-Type": "application/json" }'
 
   deploy_patient_chart_app:
@@ -388,7 +388,7 @@ jobs:
           method: "PATCH"
           username: ${{ secrets.DEPLOYER_USERNAME }}
           password: ${{ secrets.DEPLOYER_PASSWORD }}
-          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
+          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.cdn.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
           customHeaders: '{ "Accept": "application/json", "Content-Type": "application/json" }'
 
   deploy_patient_conditions_app:
@@ -430,7 +430,7 @@ jobs:
           method: "PATCH"
           username: ${{ secrets.DEPLOYER_USERNAME }}
           password: ${{ secrets.DEPLOYER_PASSWORD }}
-          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
+          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.cdn.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
           customHeaders: '{ "Accept": "application/json", "Content-Type": "application/json" }'
 
   deploy_patient_forms_app:
@@ -472,7 +472,7 @@ jobs:
           method: "PATCH"
           username: ${{ secrets.DEPLOYER_USERNAME }}
           password: ${{ secrets.DEPLOYER_PASSWORD }}
-          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
+          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.cdn.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
           customHeaders: '{ "Accept": "application/json", "Content-Type": "application/json" }'
 
   deploy_patient_immunizations_app:
@@ -514,7 +514,7 @@ jobs:
           method: "PATCH"
           username: ${{ secrets.DEPLOYER_USERNAME }}
           password: ${{ secrets.DEPLOYER_PASSWORD }}
-          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
+          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.cdn.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
           customHeaders: '{ "Accept": "application/json", "Content-Type": "application/json" }'
 
   deploy_patient_medications_app:
@@ -556,7 +556,7 @@ jobs:
           method: "PATCH"
           username: ${{ secrets.DEPLOYER_USERNAME }}
           password: ${{ secrets.DEPLOYER_PASSWORD }}
-          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
+          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.cdn.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
           customHeaders: '{ "Accept": "application/json", "Content-Type": "application/json" }'
 
   deploy_patient_notes_app:
@@ -598,7 +598,7 @@ jobs:
           method: "PATCH"
           username: ${{ secrets.DEPLOYER_USERNAME }}
           password: ${{ secrets.DEPLOYER_PASSWORD }}
-          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
+          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.cdn.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
           customHeaders: '{ "Accept": "application/json", "Content-Type": "application/json" }'
 
   deploy_patient_programs_app:
@@ -640,7 +640,7 @@ jobs:
           method: "PATCH"
           username: ${{ secrets.DEPLOYER_USERNAME }}
           password: ${{ secrets.DEPLOYER_PASSWORD }}
-          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
+          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.cdn.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
           customHeaders: '{ "Accept": "application/json", "Content-Type": "application/json" }'
 
   deploy_patient_test_results_app:
@@ -682,7 +682,7 @@ jobs:
           method: "PATCH"
           username: ${{ secrets.DEPLOYER_USERNAME }}
           password: ${{ secrets.DEPLOYER_PASSWORD }}
-          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
+          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.cdn.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
           customHeaders: '{ "Accept": "application/json", "Content-Type": "application/json" }'
 
   deploy_patient_vitals_app:
@@ -724,7 +724,7 @@ jobs:
           method: "PATCH"
           username: ${{ secrets.DEPLOYER_USERNAME }}
           password: ${{ secrets.DEPLOYER_PASSWORD }}
-          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
+          data: '{ "service":"${{ env.ESM_NAME }}","url":"https://spa-modules.nyc3.cdn.digitaloceanspaces.com/${{ env.ESM_NAME }}/${{ env.TIMESTAMP }}_${{ github.sha }}/${{ env.JS_NAME }}" }'
           customHeaders: '{ "Accept": "application/json", "Content-Type": "application/json" }'
 
   pre_release:
@@ -754,7 +754,7 @@ jobs:
         run: npx lerna bootstrap
       
       - name: Build
-        run: yarn turbo run build --color
+        run: yarn turbo run build --color --concurrency=5
 
       - name: Patch
         run: yarn lerna version patch --no-git-tag-version --no-push --yes
@@ -796,7 +796,7 @@ jobs:
         run: npx lerna bootstrap
 
       - name: Build
-        run: yarn turbo run build
+        run: yarn turbo run build --color --concurrency=5
       
       - name: Publish
         run: yarn run ci:publish

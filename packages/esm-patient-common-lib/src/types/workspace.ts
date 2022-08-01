@@ -11,4 +11,5 @@ export interface DefaultWorkspaceProps {
    */
   promptBeforeClosing(testFcn: () => boolean): void;
   patientUuid: string;
+  handlePostResponse?(): void;
 }
