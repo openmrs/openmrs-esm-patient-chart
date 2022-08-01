@@ -12,6 +12,7 @@ import { ConfigObject } from '../config-schema';
 import { useProgramConfig } from '../hooks/use-program-config';
 import dayjs from 'dayjs';
 import 'dayjs/plugin/isToday';
+import ConfigurableForms from './configurable-forms.component';
 
 const enum FormsCategory {
   Recommended,
@@ -31,7 +32,7 @@ interface FormsProps {
 
 const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, urlLabel, isOffline }) => {
   const { t } = useTranslation();
-  const { htmlFormEntryForms, showRecommendedFormsTab } = useConfig() as ConfigObject;
+  const { htmlFormEntryForms, showRecommendedFormsTab, showConfigurableForms } = useConfig() as ConfigObject;
   const headerTitle = t('forms', 'Forms');
   const isTablet = useLayoutType() === 'tablet';
   const [formsCategory, setFormsCategory] = useState(
@@ -60,6 +61,22 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
         .filter(({ lastCompleted }) => (lastCompleted === undefined ? true : !dayjs(lastCompleted).isToday())),
     [currentVisit?.visitType.uuid, formsToDisplay, programConfigs],
   );
+
+  if (showConfigurableForms) {
+    return (
+      <ConfigurableForms
+        formsToDisplay={formsToDisplay}
+        headerTitle={headerTitle}
+        isValidating={isValidating}
+        patientUuid={patientUuid}
+        patient={patient}
+        pageSize={pageSize}
+        pageUrl={pageUrl}
+        urlLabel={urlLabel}
+        error={error}
+      />
+    );
+  }
 
   if (!formsToDisplay && !error) {
     return <DataTableSkeleton role="progressbar" rowCount={5} />;

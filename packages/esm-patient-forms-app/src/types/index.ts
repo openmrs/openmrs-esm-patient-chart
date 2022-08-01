@@ -10,6 +10,7 @@ export interface FormEncounter {
   published: boolean;
   retired: boolean;
   resources: Array<FormEncounterResource>;
+  formCategory?: string;
 }
 
 /**
