@@ -32,23 +32,24 @@ export interface PatientNote {
   encounterProviderRole: string;
 }
 
+export interface Concept {
+  display: string;
+  uuid: string;
+}
+
 export interface DiagnosisData {
   uuid: string;
   display: string;
-  name: {
-    uuid: string;
-    conceptNameType: string;
-    name: string;
-  };
   conceptClass: {
     uuid: string;
     name: string;
     description: string;
   };
-  names: Array<conceptNames>;
+  names: Array<ConceptNames>;
   mappings: Array<ConceptMapping>;
 }
-export interface conceptNames {
+
+export interface ConceptNames {
   uuid: string;
   name: string;
   conceptNameType: string;
@@ -140,25 +141,22 @@ export interface Location {
 }
 
 export interface ObsData {
-  concept: {
-    display: string;
-    uuid: string;
-  };
+  concept: Concept;
   value?: string | any;
   groupMembers?: Array<{
-    concept: { uuid: string; display: string };
+    concept: Concept;
     value?: string | any;
   }>;
   obsDatetime: string;
 }
 
 export interface Diagnosis {
-  uuid: string;
-  concept: any;
-  conceptReferenceTermCode: string;
+  uuid?: string;
+  concept: Concept;
   primary: boolean;
-  confirmed: boolean;
+  confirmed?: boolean;
 }
+
 export interface FormatDiagnosis {
   diagnosis: {
     coded: string;
@@ -186,7 +184,6 @@ export interface DiagnosisData {
       display: string;
     };
   };
-  condition: null;
   encounter: {
     uuid: string;
     display: string;
@@ -211,10 +208,10 @@ export interface VisitNotePayload {
 }
 
 export interface ObsPayload {
-  concept: string;
+  concept: Concept;
   value?: string;
   groupMembers?: Array<{
-    concept: string;
+    concept: Concept;
     value: string;
   }>;
 }

@@ -30,14 +30,14 @@ import {
 } from '@openmrs/esm-framework';
 import { formatDiagnosisPayload } from './visit-note.util';
 import {
-  fetchDiagnosisByName,
+  fetchConceptDiagnosisByName,
   fetchLocationByUuid,
   fetchProviderByUuid,
   savePatientDiagnoses,
   saveVisitNote,
 } from './visit-notes.resource';
 import { ConfigObject } from '../config-schema';
-import { Diagnosis, DiagnosisPayload, VisitNotePayload } from '../types';
+import { Concept, Diagnosis, DiagnosisPayload, VisitNotePayload } from '../types';
 import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import styles from './visit-notes-form.scss';
 
@@ -68,11 +68,9 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
   const [secondarySearchTerm, setSecondarySearchTerm] = React.useState<string | null>('');
   const [selectedPrimaryDiagnoses, setSelectedPrimaryDiagnoses] = React.useState<Array<Diagnosis>>([]);
   const [selectedSecondaryDiagnoses, setSelectedSecondaryDiagnoses] = React.useState<Array<Diagnosis>>([]);
-  const [searchPrimaryResults, setSearchPrimaryResults] = React.useState<null | Array<Diagnosis>>(null);
-  const [searchSecondaryResults, setSearchSecondaryResults] = React.useState<null | Array<Diagnosis>>(null);
-  const [combinedPrimarySecondaryDiagnosis, setCombinedPrimarySecondaryDiagnosis] = React.useState<Array<Diagnosis>>(
-    [],
-  );
+  const [searchPrimaryResults, setSearchPrimaryResults] = React.useState<null | Array<Concept>>(null);
+  const [searchSecondaryResults, setSearchSecondaryResults] = React.useState<null | Array<Concept>>(null);
+  const [combinedDiagnosis, setCombinedDiagnosis] = React.useState<Array<Diagnosis>>([]);
   const [visitDateTime, setVisitDateTime] = React.useState(new Date());
 
   React.useEffect(() => {
@@ -116,13 +114,13 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
     () =>
       debounce((searchTerm, searchInputField) => {
         if (searchTerm) {
-          const sub = fetchDiagnosisByName(searchTerm).subscribe(
-            (matchingDiagnoses: Array<Diagnosis>) => {
+          const sub = fetchConceptDiagnosisByName(searchTerm).subscribe(
+            (matchingConceptDiagnoses: Array<Concept>) => {
               if (searchInputField == 'primaryInputSearch') {
-                setSearchPrimaryResults(matchingDiagnoses);
+                setSearchPrimaryResults(matchingConceptDiagnoses);
                 setIsPrimarySearching(false);
               } else if (searchInputField == 'secondaryInputSearch') {
-                setSearchSecondaryResults(matchingDiagnoses);
+                setSearchSecondaryResults(matchingConceptDiagnoses);
                 setIsSecondarySearching(false);
               }
             },
@@ -136,18 +134,19 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
     [],
   );
 
-  const handleAddDiagnosis = (diagnosisToAdd: Diagnosis, searchInputField: string) => {
+  const handleAddDiagnosis = (diagnosisToAdd: Concept, searchInputField: string) => {
+    let newDiagnosis: Diagnosis = { concept: diagnosisToAdd, primary: false, confirmed: true };
     if (searchInputField == 'primaryInputSearch') {
-      diagnosisToAdd.primary = true;
+      newDiagnosis.primary = true;
       setPrimarySearchTerm('');
       setSearchPrimaryResults(null);
-      setSelectedPrimaryDiagnoses((selectedDiagnoses) => [...selectedDiagnoses, diagnosisToAdd]);
+      setSelectedPrimaryDiagnoses((selectedDiagnoses) => [...selectedDiagnoses, newDiagnosis]);
     } else if (searchInputField == 'secondaryInputSearch') {
       setSecondarySearchTerm('');
       setSearchSecondaryResults(null);
-      setSelectedSecondaryDiagnoses((selectedDiagnoses) => [...selectedDiagnoses, diagnosisToAdd]);
+      setSelectedSecondaryDiagnoses((selectedDiagnoses) => [...selectedDiagnoses, newDiagnosis]);
     }
-    setCombinedPrimarySecondaryDiagnosis((diagnosisCombined) => [...diagnosisCombined, diagnosisToAdd]);
+    setCombinedDiagnosis((diagnosisCombined) => [...diagnosisCombined, newDiagnosis]);
   };
 
   const handleRemoveDiagnosis = (diagnosisToRemove: Diagnosis, searchInputField: string) => {
@@ -160,9 +159,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
         selectedSecondaryDiagnoses.filter((diagnosis) => diagnosis.uuid !== diagnosisToRemove.uuid),
       );
     }
-    setCombinedPrimarySecondaryDiagnosis(
-      combinedPrimarySecondaryDiagnosis.filter((diagnosis) => diagnosis.uuid !== diagnosisToRemove.uuid),
-    );
+    setCombinedDiagnosis(combinedDiagnosis.filter((diagnosis) => diagnosis.uuid !== diagnosisToRemove.uuid));
   };
 
   const handleSubmit = React.useCallback(
@@ -171,7 +168,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
 
       if (!selectedPrimaryDiagnoses.length) return;
 
-      let formatDiagnoses = formatDiagnosisPayload(combinedPrimarySecondaryDiagnosis);
+      let formatDiagnoses = formatDiagnosisPayload(combinedDiagnosis);
 
       let obs;
       if (clinicalNote) {
@@ -258,7 +255,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
       mutate,
       patientUuid,
       providerUuid,
-      combinedPrimarySecondaryDiagnosis,
+      combinedDiagnosis,
       t,
       visitDateTime,
     ],
@@ -291,7 +288,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
         </Row>
         <Row className={styles.row}>
           <Column sm={1}>
-            <span className={styles.columnLabel}>{t('primaryDiagnosis', 'Primary Diagnosis')}</span>
+            <span className={styles.columnLabel}>{t('diagnosis', 'Diagnosis')}</span>
           </Column>
           <Column sm={3}>
             <div className={styles.diagnosesText} style={{ marginBottom: '1.188rem' }}>
@@ -303,14 +300,39 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
                       key={index}
                       onClose={() => handleRemoveDiagnosis(diagnosis, 'primaryInputSearch')}
                       style={{ marginRight: '0.5rem' }}
-                      type={index === 0 ? 'red' : 'blue'}
+                      type={'red'}
                     >
                       {diagnosis.concept.display}
                     </Tag>
                   ))}
                 </>
               ) : (
+                <></>
+              )}
+              {selectedSecondaryDiagnoses && selectedSecondaryDiagnoses.length ? (
+                <>
+                  {selectedSecondaryDiagnoses.map((diagnosis, index) => (
+                    <Tag
+                      filter
+                      key={index}
+                      onClose={() => handleRemoveDiagnosis(diagnosis, 'secondaryInputSearch')}
+                      style={{ marginRight: '0.5rem' }}
+                      type={'blue'}
+                    >
+                      {diagnosis.concept.display}
+                    </Tag>
+                  ))}
+                </>
+              ) : (
+                <></>
+              )}
+              {selectedPrimaryDiagnoses &&
+              !selectedPrimaryDiagnoses.length &&
+              selectedSecondaryDiagnoses &&
+              !selectedSecondaryDiagnoses.length ? (
                 <span>{t('emptyDiagnosisText', 'No diagnosis selected — Enter a diagnosis below')}</span>
+              ) : (
+                <></>
               )}
             </div>
             <FormGroup legendText={t('searchForPrimaryDiagnosis', 'Search for a primary diagnosis')}>
@@ -342,7 +364,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
                             key={index}
                             onClick={() => handleAddDiagnosis(diagnosis, 'primaryInputSearch')}
                           >
-                            {diagnosis.concept.display}
+                            {diagnosis.display}
                           </li>
                         ))}
                       </ul>
@@ -360,29 +382,8 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
           </Column>
         </Row>
         <Row className={styles.row}>
-          <Column sm={1}>
-            <span className={styles.columnLabel}>{t('secondaryDiagnosis', 'Secondary Diagnosis')}</span>
-          </Column>
+          <Column sm={1}></Column>
           <Column sm={3}>
-            <div className={styles.diagnosesText} style={{ marginBottom: '1.188rem' }}>
-              {selectedSecondaryDiagnoses && selectedSecondaryDiagnoses.length ? (
-                <>
-                  {selectedSecondaryDiagnoses.map((diagnosis, index) => (
-                    <Tag
-                      filter
-                      key={index}
-                      onClick={() => handleRemoveDiagnosis(diagnosis, 'secondaryInputSearch')}
-                      style={{ marginRight: '0.5rem' }}
-                      type={index === 0 ? 'red' : 'blue'}
-                    >
-                      {diagnosis.concept.display}
-                    </Tag>
-                  ))}
-                </>
-              ) : (
-                <span>{t('emptyDiagnosisText', 'No diagnosis selected — Enter a diagnosis below')}</span>
-              )}
-            </div>
             <FormGroup legendText={t('searchForSecondaryDiagnosis', 'Search for a secondary diagnosis')}>
               <Search
                 light={isTablet}
@@ -412,7 +413,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
                             key={index}
                             onClick={() => handleAddDiagnosis(diagnosis, 'secondaryInputSearch')}
                           >
-                            {diagnosis.concept.display}
+                            {diagnosis.display}
                           </li>
                         ))}
                       </ul>
@@ -468,7 +469,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
           className={styles.button}
           kind="primary"
           onClick={handleSubmit}
-          disabled={!combinedPrimarySecondaryDiagnosis.length}
+          disabled={!selectedPrimaryDiagnoses.length}
           type="submit"
         >
           {t('saveAndClose', 'Save and close')}

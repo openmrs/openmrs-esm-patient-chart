@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { screen, render, waitFor } from '@testing-library/react';
 import { of } from 'rxjs/internal/observable/of';
 import { createErrorHandler, showNotification, showToast, useConfig, useSession } from '@openmrs/esm-framework';
-import { fetchDiagnosisByName, fetchLocationByUuid, fetchProviderByUuid, saveVisitNote } from './visit-notes.resource';
+import { fetchConceptDiagnosisByName, fetchLocationByUuid, fetchProviderByUuid, saveVisitNote } from './visit-notes.resource';
 import { ConfigMock } from '../../../../__mocks__/chart-widgets-config.mock';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import {
@@ -22,7 +22,7 @@ const testProps = {
 };
 
 const mockCreateErrorHandler = createErrorHandler as jest.Mock;
-const mockFetchDiagnosisByName = fetchDiagnosisByName as jest.Mock;
+const mockFetchDiagnosisByName = fetchConceptDiagnosisByName as jest.Mock;
 const mockFetchLocationByUuid = fetchLocationByUuid as jest.Mock;
 const mockFetchProviderByUuid = fetchProviderByUuid as jest.Mock;
 const mockSaveVisitNote = saveVisitNote as jest.Mock;

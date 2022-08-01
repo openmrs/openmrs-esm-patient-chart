@@ -11,7 +11,7 @@ import {
   Location,
   Provider,
   VisitNotePayload,
-  DiagnosisPayload,
+  DiagnosisPayload, Concept,
 } from '../types';
 
 interface UseVisitNotes {
@@ -74,25 +74,10 @@ export function fetchProviderByUuid(abortController: AbortController, providerUu
   });
 }
 
-export function fetchDiagnosisByName(searchTerm: string) {
-  return openmrsObservableFetch<Array<DiagnosisData>>(`/ws/rest/v1/concept?q=${searchTerm}&v=full`).pipe(
-    map(({ data }) => data['results']),
-    map((data: Array<DiagnosisData>) => formatDiagnoses(data)),
-  );
-}
-
-function formatDiagnoses(diagnoses: Array<DiagnosisData>): Array<Diagnosis> {
-  return diagnoses.map(mapDiagnosisProperties);
-}
-
-function mapDiagnosisProperties(diagnosis: DiagnosisData): Diagnosis {
-  return {
-    uuid: diagnosis.uuid,
-    concept: diagnosis.name,
-    conceptReferenceTermCode: getConceptReferenceTermCode(diagnosis.mappings).conceptReferenceTerm.display,
-    primary: false,
-    confirmed: true,
-  };
+export function fetchConceptDiagnosisByName(searchTerm: string) {
+  return openmrsObservableFetch<Array<Concept>>(
+    `/ws/rest/v1/concept?q=${searchTerm}&searchType=fuzzy&class=8d4918b0-c2cc-11de-8d13-0010c6dffd0f&q=&v=custom:(uuid,display)`,
+  ).pipe(map(({ data }) => data['results']));
 }
 
 export function saveVisitNote(abortController: AbortController, payload: VisitNotePayload) {
@@ -113,8 +98,4 @@ export function savePatientDiagnoses(abortController: AbortController, payload: 
     method: 'POST',
     body: payload,
   });
-}
-
-function getConceptReferenceTermCode(conceptMapping: Array<ConceptMapping>): ConceptMapping {
-  return conceptMapping.find((concept) => concept.conceptReferenceTerm.display);
 }
