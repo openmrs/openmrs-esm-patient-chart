@@ -3,7 +3,12 @@ import userEvent from '@testing-library/user-event';
 import { screen, render, waitFor } from '@testing-library/react';
 import { of } from 'rxjs/internal/observable/of';
 import { createErrorHandler, showNotification, showToast, useConfig, useSession } from '@openmrs/esm-framework';
-import { fetchConceptDiagnosisByName, fetchLocationByUuid, fetchProviderByUuid, saveVisitNote } from './visit-notes.resource';
+import {
+  fetchConceptDiagnosisByName,
+  fetchLocationByUuid,
+  fetchProviderByUuid,
+  saveVisitNote,
+} from './visit-notes.resource';
 import { ConfigMock } from '../../../../__mocks__/chart-widgets-config.mock';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import {
