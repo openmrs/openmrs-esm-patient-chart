@@ -80,6 +80,14 @@ function setupOpenMRS() {
         }),
       },
       {
+        name: 'stop-visit-button-patient-search',
+        slot: 'patient-search-actions-slot',
+        load: getAsyncLifecycle(() => import('./actions-buttons/stop-visit.component'), {
+          featureName: 'patient-actions-slot',
+          moduleName,
+        }),
+      },
+      {
         name: 'cancel-visit-button',
         slot: 'patient-actions-slot',
         load: getAsyncLifecycle(() => import('./actions-buttons/cancel-visit.component'), {
@@ -88,8 +96,24 @@ function setupOpenMRS() {
         }),
       },
       {
+        name: 'cancel-visit-button',
+        slot: 'patient-search-actions-slot',
+        load: getAsyncLifecycle(() => import('./actions-buttons/cancel-visit.component'), {
+          featureName: 'patient-actions-slot',
+          moduleName,
+        }),
+      },
+      {
         name: 'add-past-visit-button',
         slot: 'patient-actions-slot',
+        load: getAsyncLifecycle(() => import('./actions-buttons/add-past-visit.component'), {
+          featureName: 'patient-actions-slot',
+          moduleName,
+        }),
+      },
+      {
+        name: 'add-past-visit-button',
+        slot: 'patient-search-actions-slot',
         load: getAsyncLifecycle(() => import('./actions-buttons/add-past-visit.component'), {
           featureName: 'patient-actions-slot',
           moduleName,
