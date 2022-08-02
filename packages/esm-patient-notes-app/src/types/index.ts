@@ -171,25 +171,6 @@ export interface DiagnosisPayload {
   rank: number;
 }
 
-export interface DiagnosisData {
-  uuid: string;
-  diagnosis: {
-    coded: {
-      uuid: string;
-      display: string;
-    };
-  };
-  encounter: {
-    uuid: string;
-    display: string;
-  };
-  certainty: string;
-  rank: number;
-  voided: boolean;
-  display: string;
-  links: Links;
-}
-
 export interface VisitNotePayload {
   encounterDatetime: string; // date and time the encounter was created (ISO8601 Long) (REQUIRED)
   encounterType: string; // uuid of the encounter type - initial visit, return visit etc. (REQUIRED)
