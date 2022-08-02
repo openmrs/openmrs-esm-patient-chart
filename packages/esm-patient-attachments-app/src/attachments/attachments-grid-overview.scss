@@ -9,7 +9,7 @@
 }
 
 .attachmentThumbnailSkeleton {
-  width: 100% !important;
+  width: 100%;
 }
 
 .galleryContainer img {
@@ -25,7 +25,7 @@
   top: 0;
   left: 0;
   z-index: 999;
-  background-color: #262626;
+  background-color: $carbon--gray-90;
 }
 
 .leftPanel {
@@ -35,7 +35,7 @@
 }
 
 .rightPanel {
-  background-color: #393939;
+  background-color: $carbon--gray-80;
   padding: $spacing-05;
   color: $ui-01;
 }
