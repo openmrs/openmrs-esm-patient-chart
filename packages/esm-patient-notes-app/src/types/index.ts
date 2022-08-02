@@ -151,18 +151,13 @@ export interface ObsData {
 }
 
 export interface Diagnosis {
-  uuid?: string;
-  concept: Concept;
-  primary: boolean;
-  confirmed?: boolean;
-}
-
-export interface FormatDiagnosis {
+  patient: string;
   diagnosis: {
     coded: string;
   };
   certainty: string;
   rank: number;
+  display: string;
 }
 
 export interface DiagnosisPayload {

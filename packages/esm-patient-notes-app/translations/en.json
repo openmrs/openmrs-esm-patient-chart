@@ -7,6 +7,7 @@
   "clinicalNotePlaceholder": "Write any additional points here",
   "date": "Date",
   "diagnoses": "Diagnoses",
+  "diagnosis": "Diagnosis",
   "discard": "Discard",
   "emptyDiagnosisText": "No diagnosis selected — Enter a diagnosis below",
   "enterPrimaryDiagnoses": "Enter Primary diagnosis",

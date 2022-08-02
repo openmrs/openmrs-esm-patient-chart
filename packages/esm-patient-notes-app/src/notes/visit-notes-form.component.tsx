@@ -28,7 +28,6 @@ import {
   useLayoutType,
   useSession,
 } from '@openmrs/esm-framework';
-import { formatDiagnosisPayload } from './visit-note.util';
 import {
   fetchConceptDiagnosisByName,
   fetchLocationByUuid,
@@ -62,6 +61,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
   const [currentSessionLocationUuid, setCurrentSessionLocationUuid] = React.useState('');
   const [isPrimarySearching, setIsPrimarySearching] = React.useState(false);
   const [isSecondarySearching, setIsSecondarySearching] = React.useState(false);
+  const [isHandlingSubmit, setIsHandlingSubmit] = React.useState(false);
   const [locationUuid, setLocationUuid] = React.useState<string | null>(null);
   const [providerUuid, setProviderUuid] = React.useState<string | null>(null);
   const [primarySearchTerm, setPrimarySearchTerm] = React.useState<string | null>('');
@@ -134,10 +134,10 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
     [],
   );
 
-  const handleAddDiagnosis = (diagnosisToAdd: Concept, searchInputField: string) => {
-    let newDiagnosis: Diagnosis = { concept: diagnosisToAdd, primary: false, confirmed: true };
+  const handleAddDiagnosis = (conceptDiagnosisToAdd: Concept, searchInputField: string) => {
+    let newDiagnosis = createDiagnosis(conceptDiagnosisToAdd);
     if (searchInputField == 'primaryInputSearch') {
-      newDiagnosis.primary = true;
+      newDiagnosis.rank = 1;
       setPrimarySearchTerm('');
       setSearchPrimaryResults(null);
       setSelectedPrimaryDiagnoses((selectedDiagnoses) => [...selectedDiagnoses, newDiagnosis]);
@@ -152,23 +152,41 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
   const handleRemoveDiagnosis = (diagnosisToRemove: Diagnosis, searchInputField: string) => {
     if (searchInputField == 'primaryInputSearch') {
       setSelectedPrimaryDiagnoses(
-        selectedPrimaryDiagnoses.filter((diagnosis) => diagnosis.uuid !== diagnosisToRemove.uuid),
+        selectedPrimaryDiagnoses.filter((diagnosis) => diagnosis.diagnosis.coded !== diagnosisToRemove.diagnosis.coded),
       );
     } else if (searchInputField == 'secondaryInputSearch') {
       setSelectedSecondaryDiagnoses(
-        selectedSecondaryDiagnoses.filter((diagnosis) => diagnosis.uuid !== diagnosisToRemove.uuid),
+        selectedSecondaryDiagnoses.filter(
+          (diagnosis) => diagnosis.diagnosis.coded !== diagnosisToRemove.diagnosis.coded,
+        ),
       );
     }
-    setCombinedDiagnosis(combinedDiagnosis.filter((diagnosis) => diagnosis.uuid !== diagnosisToRemove.uuid));
+    setCombinedDiagnosis(
+      combinedDiagnosis.filter((diagnosis) => diagnosis.diagnosis.coded !== diagnosisToRemove.diagnosis.coded),
+    );
+  };
+
+  const createDiagnosis = (concept: Concept) => {
+    return {
+      patient: patientUuid,
+      diagnosis: {
+        coded: concept.uuid,
+      },
+      rank: 2,
+      certainty: 'CONFIRMED',
+      display: concept.display,
+    };
   };
 
   const handleSubmit = React.useCallback(
     (event: SyntheticEvent) => {
+      setIsHandlingSubmit(true);
       event.preventDefault();
 
-      if (!selectedPrimaryDiagnoses.length) return;
-
-      let formatDiagnoses = formatDiagnosisPayload(combinedDiagnosis);
+      if (!selectedPrimaryDiagnoses.length) {
+        setIsHandlingSubmit(false);
+        return;
+      }
 
       let obs;
       if (clinicalNote) {
@@ -199,7 +217,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
       saveVisitNote(abortController, visitNotePayload)
         .then((response) => {
           if (response.status === 201) {
-            formatDiagnoses.map((diagnosis, position: number) => {
+            combinedDiagnosis.map((diagnosis, position: number) => {
               let diagnosisPayload: DiagnosisPayload = {
                 encounter: response.data.uuid,
                 patient: patientUuid,
@@ -213,9 +231,9 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
               savePatientDiagnoses(abortController, diagnosisPayload).then((response) => {
                 if (response.status == 201) {
                   if (position > -1) {
-                    formatDiagnoses.splice(position, 1);
+                    combinedDiagnosis.splice(position, 1);
                   }
-                  if (formatDiagnoses.length == 0) {
+                  if (combinedDiagnosis.length == 0) {
                     closeWorkspace();
                     showToast({
                       critical: true,
@@ -241,6 +259,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
           });
         })
         .finally(() => {
+          setIsHandlingSubmit(false);
           abortController.abort();
         });
     },
@@ -302,7 +321,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
                       style={{ marginRight: '0.5rem' }}
                       type={'red'}
                     >
-                      {diagnosis.concept.display}
+                      {diagnosis.display}
                     </Tag>
                   ))}
                 </>
@@ -319,7 +338,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
                       style={{ marginRight: '0.5rem' }}
                       type={'blue'}
                     >
-                      {diagnosis.concept.display}
+                      {diagnosis.display}
                     </Tag>
                   ))}
                 </>
@@ -469,7 +488,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
           className={styles.button}
           kind="primary"
           onClick={handleSubmit}
-          disabled={!selectedPrimaryDiagnoses.length}
+          disabled={!selectedPrimaryDiagnoses.length || isHandlingSubmit}
           type="submit"
         >
           {t('saveAndClose', 'Save and close')}
