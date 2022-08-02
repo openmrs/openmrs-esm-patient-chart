@@ -1,7 +1,7 @@
 import React from 'react';
 import Add16 from '@carbon/icons-react/es/add/16';
 import styles from './programs-overview.scss';
-import { formatDate, formatDatetime, usePagination } from '@openmrs/esm-framework';
+import { formatDate, formatDatetime, useConfig, usePagination } from '@openmrs/esm-framework';
 import {
   DataTable,
   DataTableSkeleton,
@@ -16,9 +16,6 @@ import {
   TableRow,
   InlineNotification,
 } from 'carbon-components-react';
-import filter from 'lodash-es/filter';
-import includes from 'lodash-es/includes';
-import map from 'lodash-es/map';
 import {
   CardHeader,
   EmptyState,
@@ -27,7 +24,11 @@ import {
   launchPatientWorkspace,
 } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
-import { useAvailablePrograms, useEnrollments } from './programs.resource';
+import { usePrograms } from './programs.resource';
+import { ConfigObject } from '../config-schema';
+import { capitalize } from 'lodash';
+import ProgramActionButton from './program-action-button/program-action-button.component';
+import { ConfigurableProgram } from '../types';
 
 interface ProgramsOverviewProps {
   basePath: string;
@@ -36,23 +37,30 @@ interface ProgramsOverviewProps {
 
 const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUuid }) => {
   const programsCount = 5;
+  const config = useConfig() as ConfigObject;
   const { t } = useTranslation();
   const displayText = t('programs', 'Program enrollments');
   const headerTitle = t('carePrograms', 'Care Programs');
   const urlLabel = t('seeAll', 'See all');
   const pageUrl = window.spaBase + basePath + '/programs';
+  const isConfigurable = config.customUrl ? true : false;
 
-  const { data: enrollments, isError, isLoading, isValidating } = useEnrollments(patientUuid);
-  const activeEnrollments = enrollments?.filter((enrollment) => !enrollment.dateCompleted);
-
-  const { data: availablePrograms } = useAvailablePrograms();
-
-  const eligiblePrograms = filter(
+  const {
+    enrollments,
+    isLoading,
+    isError,
+    activeEnrollments,
+    isValidating,
     availablePrograms,
-    (program) => !includes(map(enrollments, 'program.uuid'), program.uuid),
-  );
+    eligiblePrograms,
+    configurablePrograms,
+  } = usePrograms(patientUuid);
 
-  const { results: paginatedEnrollments, goTo, currentPage } = usePagination(enrollments ?? [], programsCount);
+  const {
+    results: paginatedEnrollments,
+    goTo,
+    currentPage,
+  } = usePagination(isConfigurable ? configurablePrograms : enrollments ?? [], programsCount);
 
   const launchProgramsForm = React.useCallback(() => launchPatientWorkspace('programs-form-workspace'), []);
 
@@ -73,23 +81,30 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
       key: 'status',
       header: t('status', 'Status'),
     },
+    {
+      key: 'actions',
+      header: t('actions', 'Actions'),
+    },
   ];
 
   const tableRows = React.useMemo(() => {
-    return paginatedEnrollments?.map((enrollment) => ({
+    return paginatedEnrollments?.map((enrollment: ConfigurableProgram) => ({
       id: enrollment.uuid,
       display: enrollment.display,
       location: enrollment.location?.display,
-      dateEnrolled: formatDatetime(new Date(enrollment.dateEnrolled)),
-      status: enrollment.dateCompleted
+      dateEnrolled: enrollment.dateEnrolled ? formatDatetime(new Date(enrollment.dateEnrolled)) : '--',
+      status: isConfigurable
+        ? capitalize(enrollment.enrollmentStatus)
+        : enrollment.dateCompleted
         ? `${t('completedOn', 'Completed On')} ${formatDate(new Date(enrollment.dateCompleted))}`
         : t('active', 'Active'),
+      actions: <ProgramActionButton enrollment={enrollment} />,
     }));
-  }, [paginatedEnrollments, t]);
+  }, [isConfigurable, paginatedEnrollments, t]);
 
   if (isLoading) return <DataTableSkeleton role="progressbar" />;
   if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
-  if (activeEnrollments?.length) {
+  if (isConfigurable ? configurablePrograms.length : activeEnrollments?.length) {
     return (
       <div className={styles.widgetCard}>
         <CardHeader title={headerTitle}>
@@ -114,7 +129,12 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
               title={t('fullyEnrolled', 'Enrolled in all programs')}
             />
           )}
-          <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="short">
+          <DataTable
+            rows={tableRows}
+            headers={isConfigurable ? tableHeaders : tableHeaders.filter((header) => header.key !== 'actions')}
+            isSortable={true}
+            size="short"
+          >
             {({ rows, headers, getHeaderProps, getTableProps }) => (
               <Table {...getTableProps()} useZebraStyles>
                 <TableHead>
@@ -150,7 +170,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
           onPageNumberChange={({ page }) => goTo(page)}
           pageNumber={currentPage}
           pageSize={programsCount}
-          totalItems={enrollments.length}
+          totalItems={isConfigurable ? configurablePrograms.length : enrollments?.length}
           dashboardLinkUrl={pageUrl}
           dashboardLinkLabel={urlLabel}
         />
