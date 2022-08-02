@@ -5,13 +5,11 @@ import {
   EncountersFetchResponse,
   RESTPatientNote,
   PatientNote,
-  ConceptMapping,
-  Diagnosis,
-  DiagnosisData,
   Location,
   Provider,
   VisitNotePayload,
-  DiagnosisPayload, Concept,
+  DiagnosisPayload,
+  Concept,
 } from '../types';
 
 interface UseVisitNotes {
