@@ -182,6 +182,14 @@ function setupOpenMRS() {
           moduleName,
         }),
       },
+      {
+        id: 'start-visit-button-patient-search',
+        slot: 'start-visit-button-slot',
+        load: getAsyncLifecycle(() => import('./visit/start-visit-button.component'), {
+          featureName: 'start-visit-button-patient-search',
+          moduleName,
+        }),
+      },
     ],
   };
 }
