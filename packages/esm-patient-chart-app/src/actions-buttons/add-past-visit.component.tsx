@@ -19,7 +19,7 @@ const AddPastVisitOverflowMenuItem: React.FC<AddPastVisitOverflowMenuItemProps> 
       launchPatientChart,
       closeModal: () => dispose(),
     });
-  }, [patientUuid]);
+  }, [patientUuid, launchPatientChart]);
 
   return (
     <li className="bx--overflow-menu-options__option">

@@ -19,7 +19,7 @@ const StartVisitButton = ({ patientUuid }) => {
     navigate({
       to: `\${openmrsSpaBase}/patient/${patientUuid}/chart`,
     });
-  }, [patientUuid, navigate]);
+  }, [patientUuid]);
 
   return (
     <Button kind="primary" onClick={handleStartVisit}>

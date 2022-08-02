@@ -44,7 +44,7 @@ const CancelVisitDialog: React.FC<CancelVisitDialogProps> = ({ patientUuid, clos
         setSubmitting(false);
       },
     );
-  }, []);
+  }, [closeModal, currentVisit.uuid, mutate, t]);
 
   return (
     <div>
