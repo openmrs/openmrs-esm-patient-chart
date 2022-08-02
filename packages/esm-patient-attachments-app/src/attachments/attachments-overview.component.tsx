@@ -5,11 +5,12 @@ import { useTranslation } from 'react-i18next';
 import { Button, ContentSwitcher, Loading, Switch } from 'carbon-components-react';
 import { LayoutType, showModal, showToast, useLayoutType, usePagination, UserHasAccess } from '@openmrs/esm-framework';
 import { PatientChartPagination, EmptyState } from '@openmrs/esm-patient-common-lib';
-import { createAttachment, useAttachments } from './attachments.resource';
+import { createAttachment, deleteAttachmentPermanently, useAttachments } from './attachments.resource';
 import { createGalleryEntry } from './utils';
-import { UploadedFile } from './attachments-types';
+import { UploadedFile, Attachment } from './attachments-types';
 import AttachmentsGridOverview from './attachments-grid-overview.component';
 import AttachmentsTableOverview from './attachments-table-overview.component';
+import ImagePreview from './image-preview.component';
 
 function getPageSize(layoutType: LayoutType) {
   switch (layoutType) {
@@ -27,7 +28,7 @@ function getPageSize(layoutType: LayoutType) {
 const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const { data, mutate, isValidating, isLoading } = useAttachments(patientUuid, true);
-  const [currentImage, setCurrentImage] = useState(0);
+  const [imageSelected, setImageSelected] = useState<Attachment>(null);
   const layOutType = useLayoutType();
   const pageSize = getPageSize(layOutType);
   const attachments = useMemo(() => data.map((item) => createGalleryEntry(item)), [data]);
@@ -45,7 +46,7 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
       });
       setError(false);
     }
-  }, [error]);
+  }, [error, t]);
 
   const showCam = useCallback(() => {
     const close = showModal('capture-photo-modal', {
@@ -55,9 +56,44 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
       },
       onCompletion: () => mutate(),
     });
-  }, [patientUuid]);
+  }, [patientUuid, mutate]);
 
-  const handleImageSelect = useCallback((index: number) => {}, []);
+  const deleteAttachment = useCallback(
+    (attachment: Attachment) => {
+      deleteAttachmentPermanently(attachment.id, new AbortController())
+        .then(() => {
+          showToast({
+            title: t('fileDeleted', 'File deleted'),
+            description: `${attachment.title} ${t('successfullyDeleted', 'successfully deleted')}`,
+            kind: 'success',
+          });
+          setImageSelected(null);
+          mutate();
+        })
+        .catch((error) => {
+          showToast({
+            title: t('error', 'Error'),
+            description: `${attachment.title} ${t('failedDeleting', "couldn't be deleted")}`,
+            kind: 'error',
+          });
+        });
+    },
+    [mutate, t, setImageSelected],
+  );
+
+  const deleteAttachmentModal = useCallback(
+    (attachment: Attachment) => {
+      const close = showModal('delete-attachment-modal', {
+        attachment: attachment,
+        close: () => close(),
+        onConfirmation: (attachment) => {
+          deleteAttachment(attachment);
+          close();
+        },
+      });
+    },
+    [deleteAttachment],
+  );
 
   if (!attachments.length) {
     return <EmptyState displayText={'attachments'} headerTitle="Attachments" launchForm={showCam} />;
@@ -79,9 +115,19 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
             </Button>
           </div>
           {view === 'grid' ? (
-            <AttachmentsGridOverview isLoading={isLoading} attachments={attachments} />
+            <AttachmentsGridOverview
+              onAttachmentSelect={setImageSelected}
+              deleteAttachment={deleteAttachmentModal}
+              isLoading={isLoading}
+              attachments={attachments}
+            />
           ) : (
-            <AttachmentsTableOverview isLoading={isLoading} attachments={attachments} />
+            <AttachmentsTableOverview
+              onAttachmentSelect={setImageSelected}
+              deleteAttachment={deleteAttachmentModal}
+              isLoading={isLoading}
+              attachments={attachments}
+            />
           )}
 
           <PatientChartPagination
@@ -93,6 +139,13 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
           />
         </div>
       </div>
+      {imageSelected && (
+        <ImagePreview
+          closePreview={() => setImageSelected(null)}
+          imageSelected={imageSelected}
+          deleteAttachment={deleteAttachmentModal}
+        />
+      )}
     </UserHasAccess>
   );
 };

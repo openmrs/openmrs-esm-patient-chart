@@ -26,14 +26,13 @@ const FilePreviewContainer: React.FC<FilePreviewContainerProps> = ({ uploadedFil
   const handleSave = useCallback(
     (dataUri: UploadedFile) => {
       if (currentFile === uploadedFiles.length) {
-        console.log('Saving files');
         onSaveFile([...selectedAttachments, dataUri]);
       } else {
         setSelectedAttachments((selectedAttachments) => [...selectedAttachments, dataUri]);
         moveToNextFile();
       }
     },
-    [moveToNextFile, setSelectedAttachments, uploadedFiles, selectedAttachments, currentFile],
+    [moveToNextFile, setSelectedAttachments, uploadedFiles, selectedAttachments, currentFile, onSaveFile],
   );
 
   return (

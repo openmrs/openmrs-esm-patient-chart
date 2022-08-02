@@ -12,13 +12,10 @@ export function getAttachmentByUuid(attachmentUuid: string, abortController: Abo
 }
 
 export function useAttachments(patientUuid: string, includeEncounterless: boolean) {
-  console.log('fetching', `${attachmentUrl}?patient=${patientUuid}&includeEncounterless=${includeEncounterless}`);
   const { data, error, mutate, isValidating } = useSWR<FetchResponse<{ results: Array<AttachmentResponse> }>>(
     `${attachmentUrl}?patient=${patientUuid}&includeEncounterless=${includeEncounterless}`,
     openmrsFetch,
   );
-
-  console.log(data);
 
   const results = useMemo(
     () => ({
@@ -47,7 +44,6 @@ export function createAttachment(patientUuid: string, file: UploadedFile) {
   formData.append('patient', patientUuid);
   formData.append('file', emptyFile);
   formData.append('base64Content', file.fileContent);
-  console.log('saving file', file);
 
   return openmrsFetch(`${attachmentUrl}`, {
     method: 'POST',
@@ -55,7 +51,7 @@ export function createAttachment(patientUuid: string, file: UploadedFile) {
   });
 }
 
-export function deleteAttachment(attachmentUuid: string, abortController: AbortController) {
+export function deleteAttachmentPermanently(attachmentUuid: string, abortController: AbortController) {
   return openmrsFetch(`${attachmentUrl}/${attachmentUuid}`, {
     method: 'DELETE',
     signal: abortController.signal,
