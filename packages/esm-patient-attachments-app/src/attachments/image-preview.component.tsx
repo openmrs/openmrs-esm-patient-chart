@@ -28,7 +28,7 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ closePreview, imageSelected
           <img src={imageSelected.src} alt={imageSelected.title} />
         </div>
         <div className={styles.overflowMenu}>
-          <Button kind="danger--ghost" onClick={() => deleteAttachment(imageSelected)}>
+          <Button kind="danger" onClick={() => deleteAttachment(imageSelected)}>
             {t('deleteImage', 'Delete image')}
           </Button>
         </div>

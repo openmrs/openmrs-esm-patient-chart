@@ -11,22 +11,8 @@
   }
 }
 
-.choosePhotoOrPdf {
-  float: right;
-  color: #0f62fe;
-  cursor: pointer;
-  margin: 1rem 0;
-  padding: 1rem;
-
-  &:hover {
-    color: #000;
-    text-decoration: none;
-    background-color: #e5e5e5;
-  }
-}
-
 .uploadFile {
-  color: #fff;
+  color: $ui-02;
   
   label {
     max-width: unset;
@@ -64,7 +50,7 @@
   margin: $spacing-05;
   height: 25rem;
   overflow-y: auto;
-  border: 1px dashed #8d8d8d;
+  border: 1px dashed $ui-04;
 }
 
 .buttonSet {

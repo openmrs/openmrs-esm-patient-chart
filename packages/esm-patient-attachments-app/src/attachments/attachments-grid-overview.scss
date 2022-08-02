@@ -40,11 +40,11 @@
   color: $ui-01;
 }
 
-.closePreviewButton svg path {
+.closePreviewButton > svg > path {
   fill: $ui-01 !important;
 }
 
-.closePreviewButton:hover svg path {
+.closePreviewButton:hover > svg > path {
   fill: $ui-05 !important;
 }
 
