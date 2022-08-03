@@ -1,41 +1,64 @@
-import React, { useCallback, useEffect, useState, useRef } from 'react';
-import FilePreview from './image-preview.component';
+import React, { useCallback, useEffect, useState, useRef, Dispatch, SetStateAction } from 'react';
+import FilePreview from './file-preview.component';
 import styles from './camera-upload.scss';
 import Camera from 'react-html5-camera-photo';
-import { showToast } from '@openmrs/esm-framework';
+import { showToast, FetchResponse } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { readFileAsString } from './utils';
 import 'react-html5-camera-photo/build/css/index.css';
+import { Tab, Tabs, FileUploaderDropContainer, FileUploaderItem, ButtonSet, Button } from 'carbon-components-react';
+import { UploadedFile } from './attachments-types';
 
 export interface CameraUploadProps {
   collectCaption?: boolean;
-  onTakePhoto?(dataUri: string): void;
-  onSavePhoto?(dataUri: string, caption: string): void;
+  saveFile: (file: UploadedFile) => Promise<FetchResponse<any>>;
+  closeModal: () => void;
+  onCompletion?: () => void;
 }
 
-const CameraUpload: React.FC<CameraUploadProps> = ({ onSavePhoto, onTakePhoto, collectCaption = true }) => {
-  const mediaStream = useRef<MediaStream | undefined>();
+const CameraUpload: React.FC<CameraUploadProps> = ({ saveFile, closeModal, onCompletion }) => {
   const [error, setError] = useState<Error>(undefined);
-  const [dataUri, setDataUri] = useState('');
+  const [uploadedFiles, setUploadedFiles] = useState<Array<UploadedFile>>([]);
+  const [uploadingFiles, setUploadingFiles] = useState(false);
   const { t } = useTranslation();
 
-  const clearCamera = useCallback(() => setDataUri(''), []);
+  const clearCamera = useCallback(() => {
+    setUploadedFiles([]);
+    setUploadingFiles(false);
+    setError(undefined);
+  }, [setUploadedFiles, setUploadingFiles]);
 
-  const handleTakePhoto = useCallback(
-    (dataUri: string) => {
-      setDataUri(dataUri);
-      onTakePhoto?.(dataUri);
+  const handleTakePhoto = useCallback((file: string) => {
+    setUploadedFiles([
+      {
+        fileContent: file,
+        fileName: 'Image taken from camera',
+        fileType: 'image',
+        fileDescription: '',
+        status: 'uploading',
+      },
+    ]);
+  }, []);
+
+  const upload = useCallback(
+    (files: Array<File>) => {
+      files.forEach((file) =>
+        readFileAsString(file).then((fileContent) => {
+          setUploadedFiles((uriData) => [
+            ...uriData,
+            {
+              fileContent,
+              fileName: file.name,
+              fileType: file.type === 'application/pdf' ? 'pdf' : 'image',
+              fileDescription: '',
+              status: 'uploading',
+            },
+          ]);
+        }),
+      );
     },
-    [onTakePhoto],
+    [setUploadedFiles],
   );
-
-  const upload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    readFileAsString(e.target.files[0]).then(setDataUri);
-  }, []);
-
-  const setMediaStream = useCallback((ms: MediaStream) => {
-    mediaStream.current = ms;
-  }, []);
 
   useEffect(() => {
     if (error) {
@@ -45,49 +68,149 @@ const CameraUpload: React.FC<CameraUploadProps> = ({ onSavePhoto, onTakePhoto, c
         title: t('cameraError', 'Camera Error'),
       });
     }
-  }, [error]);
+  }, [error, t]);
 
-  useEffect(() => {
-    return () => {
-      mediaStream.current?.getTracks().forEach((t) => t.stop());
-    };
+  const willSaveAttachment = useCallback((uploadedFiles: Array<UploadedFile>) => {
+    setUploadedFiles(uploadedFiles);
+    setUploadingFiles(true);
   }, []);
 
-  const willSaveAttachment = useCallback(
-    (dataUri: string, caption: string) => onSavePhoto?.(dataUri, caption),
-    [onSavePhoto],
-  );
+  if (uploadingFiles) {
+    return (
+      <FileUploadingComponent
+        uploadedFiles={uploadedFiles}
+        saveFile={saveFile}
+        setUploadedFiles={setUploadedFiles}
+        clearCamera={clearCamera}
+        closeModal={closeModal}
+        onCompletion={onCompletion}
+      />
+    );
+  }
+
+  if (uploadedFiles.length) {
+    return (
+      <FilePreview
+        onCancelCapture={() => {
+          clearCamera();
+        }}
+        onSaveFile={(data: Array<UploadedFile>) => {
+          willSaveAttachment(data);
+        }}
+        uploadedFiles={uploadedFiles}
+      />
+    );
+  }
 
   return (
     <div className={styles.cameraSection}>
-      <div className={styles.frameContent}>
-        {dataUri ? (
-          <FilePreview
-            content={dataUri}
-            onCancelCapture={clearCamera}
-            onSaveFile={willSaveAttachment}
-            collectCaption={collectCaption}
-          />
-        ) : (
-          <>
-            {!error && <Camera onTakePhoto={handleTakePhoto} onCameraStart={setMediaStream} onCameraError={setError} />}
-            <div>
-              <label htmlFor="uploadFile" className={styles.choosePhotoOrPdf}>
-                {t('selectFile', 'Select local File instead')}
-              </label>
-              <input
-                type="file"
-                id="uploadFile"
-                accept="image/*, application/pdf"
-                className={styles.uploadFile}
-                onChange={upload}
+      <h3 className={styles.paddedProductiveHeading03}>{t('addAttachment', 'Add Attachment')}</h3>
+      <Tabs className={styles.tabs}>
+        <Tab label={t('uploadMedia', 'Upload media')}>
+          <div className="cds--file__container">
+            <p className="cds--label-description">
+              {t('fileUploadTypes', 'Only images and pdf files. 500kb max file size')}
+            </p>
+            <div className={styles.uploadFile}>
+              <FileUploaderDropContainer
+                accept={['image/*', 'application/pdf']}
+                labelText={t('fileUploadInstructions', 'Drag and drop files here or click to upload')}
+                tabIndex={0}
+                multiple
+                onAddFiles={(evt, { addedFiles }) => {
+                  upload(addedFiles);
+                }}
               />
             </div>
-          </>
-        )}
-      </div>
+          </div>
+        </Tab>
+        <Tab label={t('webcam', 'Webcam')}>
+          <CameraComponent handleTakePhoto={handleTakePhoto} setError={setError} />
+        </Tab>
+      </Tabs>
     </div>
   );
 };
 
+const CameraComponent = ({ handleTakePhoto, setError }) => {
+  const mediaStream = useRef<MediaStream | undefined>();
+  useEffect(() => {
+    return () => {
+      mediaStream.current?.getTracks().forEach((t) => t.stop());
+    };
+  }, [mediaStream]);
+  const setMediaStream = useCallback((ms: MediaStream) => {
+    mediaStream.current = ms;
+  }, []);
+  return <Camera onTakePhoto={handleTakePhoto} onCameraStart={setMediaStream} onCameraError={setError} />;
+};
+
 export default CameraUpload;
+
+interface FileUploadingComponentProps {
+  uploadedFiles: Array<UploadedFile>;
+  saveFile: (file: UploadedFile) => Promise<FetchResponse<any>>;
+  setUploadedFiles: Dispatch<SetStateAction<Array<UploadedFile>>>;
+  closeModal: () => void;
+  clearCamera: () => void;
+  onCompletion?: () => void;
+}
+
+export const FileUploadingComponent: React.FC<FileUploadingComponentProps> = ({
+  uploadedFiles,
+  saveFile,
+  setUploadedFiles,
+  closeModal,
+  clearCamera,
+  onCompletion,
+}) => {
+  const { t } = useTranslation();
+  const [uploadingCompleted, setUploadingComplete] = useState(false);
+
+  useEffect(() => {
+    Promise.all(
+      uploadedFiles.map((file, indx) =>
+        saveFile(file).then(() => {
+          showToast({
+            title: t('uploadComplete', 'Upload complete'),
+            description: `${file.fileName} ${t('uploadedSuccessfully', 'uploaded successfully')}`,
+            kind: 'success',
+          });
+          setUploadedFiles((uploadedFiles) =>
+            uploadedFiles.map((file, ind) =>
+              ind === indx
+                ? {
+                    ...file,
+                    status: 'complete',
+                  }
+                : file,
+            ),
+          );
+        }),
+      ),
+    ).then(() => {
+      setUploadingComplete(true);
+      onCompletion?.();
+    });
+  }, [onCompletion, saveFile, setUploadedFiles, t, uploadedFiles]);
+  return (
+    <div className={styles.cameraSection}>
+      <h3 className={styles.paddedProductiveHeading03}>{t('addAttachment', 'Add Attachment')}</h3>
+      <div className={styles.uploadingFilesSection}>
+        {uploadedFiles.map((file) => (
+          <FileUploaderItem name={file.fileName} status={file.status} />
+        ))}
+      </div>
+      {uploadingCompleted && (
+        <ButtonSet className={styles.buttonSet}>
+          <Button size="lg" kind="secondary" onClick={clearCamera}>
+            {t('addMoreAttachments', 'Add more attachments')}
+          </Button>
+          <Button size="lg" kind="primary" onClick={closeModal}>
+            {t('closeModal', 'Close')}
+          </Button>
+        </ButtonSet>
+      )}
+    </div>
+  );
+};

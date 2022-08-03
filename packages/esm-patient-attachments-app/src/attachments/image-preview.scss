@@ -1,18 +1,33 @@
-.overview img {
-  max-width: 100%;
-  max-height: 500px;
-  margin: auto;
-  display: block;
+@import "../root.scss";
+
+.filePreviewContainer {
+  background-color: $ui-02;
+}
+
+.overview {
+  padding: $spacing-05;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+ img {
+    width: 100%;
+    max-height: 200px;
+    display: block;
+  }
+
+  .imageDetails {
+    margin-left: 1rem;
+  }
 }
 
 .buttonSetOverrides {
-  justify-content: center;
-  margin: auto;
-  width: 50%;
-}
+  margin: $spacing-05 auto 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
 
-.buttonSetOverrides button {
-  max-width: 20rem !important;
+  & > button {
+    max-width: unset;
+  }
 }
 
 .captionFrame {

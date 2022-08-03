@@ -1,21 +1,15 @@
 @import "../root.scss";
 
-.upload input[type="file"] {
-  display: none;
-}
-
-.uploadLabel {
-  display: inline-block;
-  padding: 6px 12px;
-  cursor: pointer;
+.overview {
+  background-color: $ui-02;
 }
 
 .attachmentsHeader {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr auto;
+  grid-gap: $spacing-05;
   align-items: center;
-  padding: $spacing-04 0 $spacing-04 $spacing-05;
-  background-color: $ui-background;
+  padding: $spacing-03 0 $spacing-03 $spacing-05;
 }
 
 .attachmentsHeader > h4:after {
@@ -26,67 +20,8 @@
   border-bottom: 0.375rem solid var(--brand-03);
 }
 
-.galleryContainer {
-  position: relative;
-  display: grid;
-  grid-template-rows: auto auto auto;
-  overflow: hidden;
-}
 
-.mobileLayout {
-  width: 90vw;
-}
-
-.galleryContainer img {
-  object-fit: cover;
-}
-
-.overview {
-  height: 100vh;
-}
 
 .btnOverrides {
   bottom: 0.7rem;
-}
-
-.thumbnailOverlay {
-  background-color: rgba(0, 0, 0, 0.6);
-  overflow: hidden;
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  color: white;
-  padding: 0.5em;
-  font-size: 90%;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-}
-
-.actions {
-  margin-bottom: 0.5rem;
-}
-
-:global(#ReactGridGallery) {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 5px;
-
-  :global(.ReactGridGallery_tile) {
-    overflow: hidden;
-
-    :global(.ReactGridGallery_tile-viewport) {
-      width: 100% !important;
-
-      img {
-        width: 100% !important;
-        margin: auto !important;
-      }
-    }
-  }
-}
-
-:global(#lightboxBackdrop) {
-  z-index: 10000;
 }
