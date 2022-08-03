@@ -209,19 +209,21 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
       saveVisitNote(abortController, visitNotePayload)
         .then((response) => {
           if (response.status === 201) {
-            combinedDiagnoses.map((diagnosis, position: number) => {
-              let diagnosisPayload: DiagnosisPayload = {
-                encounter: response.data.uuid,
-                patient: patientUuid,
-                condition: null,
-                diagnosis: {
-                  coded: diagnosis.diagnosis.coded,
-                },
-                certainty: diagnosis.certainty,
-                rank: diagnosis.rank,
-              };
-              savePatientDiagnoses(abortController, diagnosisPayload);
-            });
+            return Promise.all(
+              combinedDiagnoses.map((diagnosis, position: number) => {
+                let diagnosisPayload: DiagnosisPayload = {
+                  encounter: response.data.uuid,
+                  patient: patientUuid,
+                  condition: null,
+                  diagnosis: {
+                    coded: diagnosis.diagnosis.coded,
+                  },
+                  certainty: diagnosis.certainty,
+                  rank: diagnosis.rank,
+                };
+                return savePatientDiagnoses(abortController, diagnosisPayload);
+              }),
+            );
           }
         })
         .then(() => {
