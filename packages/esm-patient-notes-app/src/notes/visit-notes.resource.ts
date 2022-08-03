@@ -25,10 +25,10 @@ export function useVisitNotes(patientUuid: string): UseVisitNotes {
   } = useConfig();
 
   const customRepresentation =
-    'custom:(uuid,display,encounterDatetime,patient,obs,' +
+    'custom:(uuid,display,encounterDatetime,patient,obs,diagnoses' +
     'encounterProviders:(uuid,display,' +
     'encounterRole:(uuid,display),' +
-    'provider:(uuid,person:(uuid,display))),diagnoses';
+    'provider:(uuid,person:(uuid,display)))';
 
   const encountersApiUrl = `/ws/rest/v1/encounter?patient=${patientUuid}&obs=${visitDiagnosesConceptUuid}&v=${customRepresentation}`;
   const { data, error, isValidating } = useSWR<{ data: EncountersFetchResponse }, Error>(
