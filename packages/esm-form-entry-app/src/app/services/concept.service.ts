@@ -1,10 +1,15 @@
-import { forkJoin as observableForkJoin, Observable, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
 
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { WindowRef } from '../window-ref';
-import { Concept } from '../types';
+import { ListResult } from '../types';
+import { map } from 'rxjs/operators';
+
+interface ConceptMetadata {
+  uuid: string;
+  display: string;
+}
 
 @Injectable()
 export class ConceptService {
@@ -24,26 +29,11 @@ export class ConceptService {
     });
   }
 
-  public searchBulkConceptByUUID(
-    conceptUuids: Array<string>,
-    lang: string,
-  ): Observable<Array<Concept & { extId: string }>> {
-    const observablesArray = [];
-
-    for (const conceptUuid of conceptUuids) {
-      observablesArray.push(
-        this.searchConceptByUUID(conceptUuid, lang).pipe(
-          map((concept) => {
-            return { ...concept, extId: conceptUuid };
-          }),
-          catchError((error: Response) => {
-            console.error(error.status);
-            return of({ extId: conceptUuid, display: 'Failed to load concept label' });
-          }),
-        ),
-      );
-    }
-
-    return observableForkJoin(observablesArray) as Observable<Array<Concept & { extId: string }>>;
+  public searchBulkConceptByUUID(conceptUuids: Array<string>, lang: string): Observable<Array<ConceptMetadata>> {
+    return this.http
+      .get<ListResult<ConceptMetadata>>(this.getUrl() + `?references=` + conceptUuids.join(','), {
+        headers: this.headers,
+      })
+      .pipe(map((r) => r.results));
   }
 }
