@@ -173,7 +173,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
         coded: concept.uuid,
       },
       rank: 2,
-      certainty: 'CONFIRMED',
+      certainty: 'PROVISIONAL',
       display: concept.display,
     };
   };
