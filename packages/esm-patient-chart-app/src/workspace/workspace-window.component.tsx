@@ -45,7 +45,7 @@ const WorkspaceWindow: React.FC<RouteComponentProps<ContextWorkspaceParams>> = (
     if (active && hidden) {
       updateWindowSize('normal');
     }
-  }, [workspaces]);
+  }, [workspaces, active, hidden, updateWindowSize]);
 
   useBodyScrollLock(active && !isDesktop(layout));
 
