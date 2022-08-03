@@ -70,7 +70,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
   const [selectedSecondaryDiagnoses, setSelectedSecondaryDiagnoses] = React.useState<Array<Diagnosis>>([]);
   const [searchPrimaryResults, setSearchPrimaryResults] = React.useState<null | Array<Concept>>(null);
   const [searchSecondaryResults, setSearchSecondaryResults] = React.useState<null | Array<Concept>>(null);
-  const [combinedDiagnosis, setCombinedDiagnosis] = React.useState<Array<Diagnosis>>([]);
+  const [combinedDiagnoses, setCombinedDiagnoses] = React.useState<Array<Diagnosis>>([]);
   const [visitDateTime, setVisitDateTime] = React.useState(new Date());
 
   React.useEffect(() => {
@@ -146,7 +146,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
       setSearchSecondaryResults(null);
       setSelectedSecondaryDiagnoses((selectedDiagnoses) => [...selectedDiagnoses, newDiagnosis]);
     }
-    setCombinedDiagnosis((diagnosisCombined) => [...diagnosisCombined, newDiagnosis]);
+    setCombinedDiagnoses((diagnosisCombined) => [...diagnosisCombined, newDiagnosis]);
   };
 
   const handleRemoveDiagnosis = (diagnosisToRemove: Diagnosis, searchInputField: string) => {
@@ -161,8 +161,8 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
         ),
       );
     }
-    setCombinedDiagnosis(
-      combinedDiagnosis.filter((diagnosis) => diagnosis.diagnosis.coded !== diagnosisToRemove.diagnosis.coded),
+    setCombinedDiagnoses(
+      combinedDiagnoses.filter((diagnosis) => diagnosis.diagnosis.coded !== diagnosisToRemove.diagnosis.coded),
     );
   };
 
@@ -188,16 +188,6 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
         return;
       }
 
-      let obs;
-      if (clinicalNote) {
-        obs = [
-          {
-            concept: encounterNoteTextConceptUuid,
-            value: clinicalNote,
-          },
-        ];
-      }
-
       let visitNotePayload: VisitNotePayload = {
         encounterDatetime: dayjs(visitDateTime).format(),
         form: formConceptUuid,
@@ -210,14 +200,16 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
           },
         ],
         encounterType: encounterTypeUuid,
-        obs: obs,
+        obs: clinicalNote
+          ? [{ concept: { uuid: encounterNoteTextConceptUuid, display: '' }, value: clinicalNote }]
+          : [],
       };
 
       const abortController = new AbortController();
       saveVisitNote(abortController, visitNotePayload)
         .then((response) => {
           if (response.status === 201) {
-            combinedDiagnosis.map((diagnosis, position: number) => {
+            combinedDiagnoses.map((diagnosis, position: number) => {
               let diagnosisPayload: DiagnosisPayload = {
                 encounter: response.data.uuid,
                 patient: patientUuid,
@@ -228,25 +220,19 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
                 certainty: diagnosis.certainty,
                 rank: diagnosis.rank,
               };
-              savePatientDiagnoses(abortController, diagnosisPayload).then((response) => {
-                if (response.status == 201) {
-                  if (position > -1) {
-                    combinedDiagnosis.splice(position, 1);
-                  }
-                  if (combinedDiagnosis.length == 0) {
-                    closeWorkspace();
-                    showToast({
-                      critical: true,
-                      description: t('visitNoteNowVisible', 'It is now visible on the Encounters page'),
-                      kind: 'success',
-                      title: t('visitNoteSaved', 'Visit note saved'),
-                    });
-                  }
-                  mutate(`/ws/rest/v1/encounter?patient=${patientUuid}&v=${encountersCustomRepresentation}`);
-                }
-              });
+              savePatientDiagnoses(abortController, diagnosisPayload);
             });
           }
+        })
+        .then(() => {
+          closeWorkspace();
+          showToast({
+            critical: true,
+            description: t('visitNoteNowVisible', 'It is now visible on the Encounters     page'),
+            kind: 'success',
+            title: t('visitNoteSaved', 'Visit note saved'),
+          });
+          mutate(`/ws/rest/v1/encounter?patient=${patientUuid}&v=${encountersCustomRepresentation}`);
         })
         .catch((err) => {
           createErrorHandler();
@@ -274,7 +260,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
       mutate,
       patientUuid,
       providerUuid,
-      combinedDiagnosis,
+      combinedDiagnoses,
       t,
       visitDateTime,
     ],
