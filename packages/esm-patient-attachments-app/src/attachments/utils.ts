@@ -1,6 +1,5 @@
-import { AttachmentResponse, Attachment } from './attachments-types';
+import { formatDatetime } from '@openmrs/esm-framework';
 import { attachmentUrl } from './attachments.resource';
-import { formatDate } from '@openmrs/esm-framework';
 
 export function readFileAsString(file: File) {
   return new Promise<string>((resolve) => {
@@ -26,14 +25,19 @@ export function readFileAsString(file: File) {
   });
 }
 
-export function createGalleryEntry(data: AttachmentResponse): Attachment {
+export function createGalleryEntry(data: any) {
   return {
-    id: data.uuid,
+    id: `${data.uuid}`,
     src: `${window.openmrsBase}${attachmentUrl}/${data.uuid}/bytes`,
-    title: data.comment,
-    dateTime: formatDate(new Date(data.dateTime), {
-      mode: 'wide',
-    }),
+    thumbnail: `${window.openmrsBase}${attachmentUrl}/${data.uuid}/bytes`,
+    // thumbnailWidth: 320,
+    // thumbnailHeight: 212,
+    thumbnailWidth: 170,
+    thumbnailHeight: 130,
+    thumbnailCaption: '',
+    tags: [{ value: formatDatetime(new Date(data.dateTime)), title: formatDatetime(new Date(data.dateTime)) }],
+    isSelected: false,
+    dateTime: formatDatetime(new Date(data.dateTime)),
     bytesMimeType: data.bytesMimeType,
     bytesContentFamily: data.bytesContentFamily,
   };

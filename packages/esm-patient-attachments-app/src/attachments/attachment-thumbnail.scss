@@ -6,26 +6,17 @@
   backdrop-filter: blur(20px);
 }
 
-.thumbnail {
-  height: 10rem;
-}
-
 .imageThumbnail {
   width: 100%;
-  cursor: pointer;
 
   img {
     width: 100% !important;
     margin: auto !important;
-    height: 10rem;
   }
 }
 
 .pdfThumbnail {
   cursor: pointer;
-  embed {
-    height: 10rem;
-  }
 }
 
 .captionText {

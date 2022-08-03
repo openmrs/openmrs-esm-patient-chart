@@ -1,8 +1,7 @@
-@import '../root.scss';
+@import "~@openmrs/esm-styleguide/src/vars";
 
 .cameraSection {
-  width: inherit;
-  background-color: $ui-02;
+  padding: 10px;
 }
 
 :global(.react-html5-camera-photo) {
@@ -11,53 +10,30 @@
   }
 }
 
+.frameContent {
+  margin: auto;
+  padding: 2rem;
+  width: 80%;
+}
+
+.choosePhoto {
+  float: right;
+  color: #0f62fe;
+  cursor: pointer;
+  margin: 1rem 0;
+
+  &:hover {
+    color: #000;
+    text-decoration: none;
+  }
+}
+
 .uploadFile {
-  color: $ui-02;
-  
-  label {
-    max-width: unset;
-  }
-
-  label > div {
-    height: 25rem;
-    justify-content: center;
-    align-items: center;
-  }
-
-}
-
-.tabs {
-  .bx--tab-content {
-    display: none;
-  }
-}
-
-.tabContent {
-  padding: $spacing-05
+  display: none;
 }
 
 @media (max-width: $breakpoint-tablet-max){
   .frameContent {
     width: 65%;
   }  
-}
-
-.uploadingFilesSection {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  margin: $spacing-05;
-  height: 25rem;
-  overflow-y: auto;
-  border: 1px dashed $ui-04;
-}
-
-.buttonSet {
-  width: 100%;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  button{
-    max-width: unset !important;
-  }
 }
