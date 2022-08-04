@@ -37,7 +37,7 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
           key: formatDate(new Date(obs.issued), { year: false, time: false }),
           value: obs.valueQuantity.value,
         })),
-    [obss, selectedConcept.uuid],
+    [obss, selectedConcept.uuid, selectedConcept.label],
   );
 
   const chartColors = Object.fromEntries(config.data.map((d) => [d.label, d.color]));

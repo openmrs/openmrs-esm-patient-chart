@@ -146,7 +146,17 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
         sub.unsubscribe();
       };
     },
-    [closeWorkspace, completionDate, enrollmentDate, mutate, patientUuid, selectedProgram, t, userLocation],
+    [
+      closeWorkspace,
+      completionDate,
+      enrollmentDate,
+      mutate,
+      patientUuid,
+      selectedProgram,
+      t,
+      userLocation,
+      currentEnrollment,
+    ],
   );
 
   return (

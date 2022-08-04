@@ -11,9 +11,12 @@ interface AllergyFormTabProps {
 }
 
 const AllergyFormTab: React.FC<AllergyFormTabProps> = ({ allergens, selectedAllergen, handleChange, name }) => {
-  const handleOnChange = React.useCallback((event) => {
-    handleChange(event);
-  }, []);
+  const handleOnChange = React.useCallback(
+    (event) => {
+      handleChange(event);
+    },
+    [handleChange],
+  );
   return (
     <RadioButtonGroup
       className={styles.radioButtonWrapper}

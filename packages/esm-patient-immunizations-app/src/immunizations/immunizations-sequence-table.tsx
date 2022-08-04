@@ -48,7 +48,7 @@ const SequenceTable: React.FC<SequenceTableProps> = ({ immunizations }) => {
       //   vaccinationDate: existingDoses?.occurrenceDateTime,
       // });
     },
-    [t],
+    [],
   );
 
   const tableHeader = useMemo(

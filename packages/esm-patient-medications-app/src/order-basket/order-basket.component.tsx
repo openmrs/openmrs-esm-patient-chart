@@ -59,7 +59,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
 
     Promise.all([durationUnitsRequest, patientEncounterRequest]).finally(() => setIsLoading(false));
     return () => abortController.abort();
-  }, [patientUuid]);
+  }, [patientUuid, config.durationUnitsConcept]);
 
   const handleSearchResultClicked = (searchResult: OrderBasketItem, directlyAddToBasket: boolean) => {
     if (directlyAddToBasket) {

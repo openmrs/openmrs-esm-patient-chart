@@ -104,7 +104,15 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
       );
       return () => abortController.abort();
     },
-    [closeWorkspace, formState, patientUuid],
+    [
+      currentUser?.sessionLocation?.uuid,
+      closeWorkspace,
+      formState,
+      patientUuid,
+      currentUser?.currentProvider?.uuid,
+      currentVisit?.uuid,
+      t,
+    ],
   );
 
   function isNumber(value) {
