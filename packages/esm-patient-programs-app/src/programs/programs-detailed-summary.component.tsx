@@ -156,7 +156,7 @@ interface ProgramEditButtonProps {
 function ProgramEditButton({ programEnrollmentId }: ProgramEditButtonProps) {
   const launchEditProgramsForm = React.useCallback(
     () => launchPatientWorkspace('programs-form-workspace', { programEnrollmentId }),
-    [],
+    [programEnrollmentId],
   );
 
   return (

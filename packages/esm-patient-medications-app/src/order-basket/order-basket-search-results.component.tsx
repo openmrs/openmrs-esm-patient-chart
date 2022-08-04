@@ -37,7 +37,7 @@ export default function OrderBasketSearchResults({
       createErrorHandler,
     );
     return () => abortController.abort();
-  }, [searchTerm, encounterUuid]);
+  }, [searchTerm, encounterUuid, config.daysDurationUnit]);
 
   const handleSearchResultClicked = (searchResult: OrderBasketItem, directlyAddToBasket: boolean) => {
     setSearchTerm('');
