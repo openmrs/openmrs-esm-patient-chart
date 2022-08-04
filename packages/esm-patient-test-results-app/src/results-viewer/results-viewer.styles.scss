@@ -1,3 +1,4 @@
+@use '@carbon/styles/scss/grid/_flexbox';
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
 @import '~@openmrs/esm-styleguide/src/vars';
@@ -6,6 +7,7 @@
   padding: 0;
   width: 100%;
   position: relative;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
 }
 
 .resultsHeader {

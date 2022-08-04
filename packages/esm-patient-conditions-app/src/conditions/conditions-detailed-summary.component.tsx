@@ -74,10 +74,10 @@ function ConditionsDetailedSummary({ patient }) {
             {t('add', 'Add')}
           </Button>
         </CardHeader>
-        <TableContainer>
-          <DataTable rows={tableRows} headers={headers} isSortable={true} size="sm">
-            {({ rows, headers, getHeaderProps, getTableProps }) => (
-              <Table {...getTableProps()} useZebraStyles>
+        <DataTable rows={tableRows} headers={headers} isSortable size="sm" useZebraStyles>
+          {({ rows, headers, getHeaderProps, getTableProps }) => (
+            <TableContainer>
+              <Table {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
@@ -103,9 +103,9 @@ function ConditionsDetailedSummary({ patient }) {
                   ))}
                 </TableBody>
               </Table>
-            )}
-          </DataTable>
-        </TableContainer>
+            </TableContainer>
+          )}
+        </DataTable>
       </div>
     );
   }

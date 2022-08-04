@@ -48,9 +48,8 @@ const PatientChart: React.FC = () => {
               <ExtensionSlot extensionSlotName="patient-info-slot" state={state} />
             </aside>
             <div className={styles.grid}>
-              <div className={styles.chartreview}>
+              <div className={styles.chartReview}>
                 <ChartReview {...state} view={view} />
-
                 <WorkspaceNotification />
               </div>
             </div>

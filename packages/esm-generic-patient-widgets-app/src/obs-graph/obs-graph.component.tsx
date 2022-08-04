@@ -2,16 +2,10 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabList } from '@carbon/react';
 import { LineChart } from '@carbon/charts-react';
+import { ScaleTypes } from '@carbon/charts/interfaces';
 import { formatDate, useConfig } from '@openmrs/esm-framework';
 import { useObs } from '../resources/useObs';
 import styles from './obs-graph.scss';
-
-enum ScaleTypes {
-  LABELS = 'labels',
-  LINEAR = 'linear',
-  LOG = 'log',
-  TIME = 'time',
-}
 
 interface ConceptDescriptor {
   label: string;
@@ -66,16 +60,17 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
     color: {
       scale: chartColors,
     },
+    height: '400px',
   };
 
   return (
     <div className={styles.graphContainer}>
-      <div className={styles.conceptPickerTabs} style={{ flex: 1 }}>
+      <div className={styles.conceptPickerTabs}>
         <label className={styles.conceptLabel} htmlFor="concept-tab-group">
           {t('displaying', 'Displaying')}
         </label>
         <Tabs id="concept-tab-group" className={styles.verticalTabs} type="default">
-          <TabList aria-label="Obs tabs">
+          <TabList className={styles.tablist} aria-label="Obs tabs">
             {config.data.map(({ concept, label }, index) => {
               return (
                 <Tab
@@ -97,7 +92,7 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
           </TabList>
         </Tabs>
       </div>
-      <div className={styles.lineChartContainer} style={{ flex: 4 }}>
+      <div className={styles.lineChartContainer}>
         <LineChart data={chartData.flat()} options={chartOptions} />
       </div>
     </div>

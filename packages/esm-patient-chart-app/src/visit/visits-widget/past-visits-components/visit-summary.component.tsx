@@ -1,15 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabList, TabPanel, TabPanels, Tag } from '@carbon/react';
-import {
-  formatDatetime,
-  formatTime,
-  isDesktop,
-  OpenmrsResource,
-  parseDate,
-  useConfig,
-  useLayoutType,
-} from '@openmrs/esm-framework';
+import { formatTime, OpenmrsResource, parseDate, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { Order, Encounter, Note, Observation, OrderItem } from '../visit.resource';
 import EncounterList from './encounter-list.component';
 import MedicationSummary from './medications-summary.component';
@@ -107,39 +99,23 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid }) 
             </Tag>
           ))
         ) : (
-          <span className={`${styles.bodyLong01} ${styles.text02}`} style={{ marginBottom: '0.5rem' }}>
+          <p className={`${styles.bodyLong01} ${styles.text02}`} style={{ marginBottom: '0.5rem' }}>
             {t('noDiagnosesFound', 'No diagnoses found')}
-          </span>
+          </p>
         )}
       </div>
       <Tabs className={`${styles.verticalTabs} ${layout === 'tablet' ? styles.tabletTabs : styles.desktopTabs}`}>
         <TabList aria-label="Visit summary tabs" className={styles.tablist}>
-          <Tab
-            className={`${styles.tab} ${styles.bodyLong01} ${selectedTab === 0 && styles.selectedTab}`}
-            id="notes-tab"
-            onClick={() => setSelectedTab(0)}
-          >
+          <Tab className={`${styles.tab} ${styles.bodyLong01}`} id="notes-tab" onClick={() => setSelectedTab(0)}>
             {t('notes', 'Notes')}
           </Tab>
-          <Tab
-            className={`${styles.tab} ${selectedTab === 1 && styles.selectedTab}`}
-            id="tests-tab"
-            onClick={() => setSelectedTab(1)}
-          >
+          <Tab className={styles.tab} id="tests-tab" onClick={() => setSelectedTab(1)}>
             {t('tests', 'Tests')}
           </Tab>
-          <Tab
-            className={`${styles.tab} ${selectedTab === 2 && styles.selectedTab}`}
-            id="medications-tab"
-            onClick={() => setSelectedTab(2)}
-          >
+          <Tab className={styles.tab} id="medications-tab" onClick={() => setSelectedTab(2)}>
             {t('medications', 'Medications')}
           </Tab>
-          <Tab
-            className={`${styles.tab} ${selectedTab === 3 && styles.selectedTab}`}
-            id="encounters-tab"
-            onClick={() => setSelectedTab(3)}
-          >
+          <Tab className={styles.tab} id="encounters-tab" onClick={() => setSelectedTab(3)}>
             {t('encounters', 'Encounters')}
           </Tab>
         </TabList>
@@ -167,7 +143,7 @@ export default VisitSummary;
 export function mapEncounters(encounters) {
   return encounters?.map((encounter) => ({
     id: encounter?.uuid,
-    datetime: formatDatetime(parseDate(encounter?.encounterDatetime)),
+    datetime: encounter?.encounterDatetime,
     encounterType: encounter?.encounterType?.display,
     form: encounter?.form,
     obs: encounter?.obs,

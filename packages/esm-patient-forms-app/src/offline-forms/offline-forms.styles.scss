@@ -21,10 +21,6 @@
   margin: 0 spacing.$spacing-05;
 }
 
-.tableContainer {
-  background-color: transparent;
-}
-
 .tableHeaderContainer {
   display: grid;
   grid-template-columns: 1fr 50%;
@@ -43,12 +39,18 @@
   }
 }
 
-.availableOfflineToggle :global(.cds--toggle__switch) {
-  /*
-  Carbon's Toggle component always has a margin-top value, despite no label being used.
-  Per designs, this is unintended.
-  */
-  margin-top: 0 !important;
+.availableOfflineToggle {
+  :global(.cds--toggle__switch) {
+    /*
+    Carbon's Toggle component always has a margin-top value, despite no label being used.
+    Per designs, this is unintended.
+    */
+    margin-top: 0 !important;
+  }
+
+  :global(.cds--toggle__label-text) {
+    display: none;
+  }
 }
 
 .availableOfflineToggleSkeleton {

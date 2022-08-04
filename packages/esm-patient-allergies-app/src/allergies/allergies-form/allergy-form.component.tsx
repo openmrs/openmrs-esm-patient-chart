@@ -196,7 +196,7 @@ function AllergyForm({ closeWorkspace, promptBeforeClosing, patientUuid }: Defau
           <section className={styles.section}>
             <h2 className={styles.sectionHeading}>{t('selectAllergens', 'Select the allergens')}</h2>
             <Tabs onSelectionChange={handleTabChange}>
-              <TabList aria-label="Allergen tabs">
+              <TabList aria-label="Allergen tabs" className={styles.tablist}>
                 {allergenTypes.map((allergenType, index) => {
                   return (
                     <Tab className={styles.tab} id={`tab-${index + 1}`} key={`allergen-tab-${index}`}>

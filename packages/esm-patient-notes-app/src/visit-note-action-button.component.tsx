@@ -34,8 +34,8 @@ const VisitNoteActionButton: React.FC = () => {
       kind="ghost"
       renderIcon={(props) => <Pen size={20} {...props} />}
       iconDescription={t('note', 'Note')}
-      tooltipAlignment="start"
-      tooltipPosition="left"
+      tooltipAlignment="end"
+      tooltipPosition="bottom"
     />
   );
 };

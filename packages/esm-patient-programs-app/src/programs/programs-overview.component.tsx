@@ -128,7 +128,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
               title={t('fullyEnrolled', 'Enrolled in all programs')}
             />
           )}
-          <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="short">
+          <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="sm">
             {({ rows, headers, getHeaderProps, getTableProps }) => (
               <Table {...getTableProps()} useZebraStyles>
                 <TableHead>

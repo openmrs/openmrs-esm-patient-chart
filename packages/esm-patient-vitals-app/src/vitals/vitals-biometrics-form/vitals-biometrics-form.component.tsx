@@ -11,7 +11,7 @@ import {
   useSession,
 } from '@openmrs/esm-framework';
 import { DefaultWorkspaceProps, useVitalsConceptMetadata } from '@openmrs/esm-patient-common-lib';
-import { Button, ButtonSet, Column, FlexGrid, Form, FormGroup, Row, Stack } from '@carbon/react';
+import { Button, ButtonSet, Column, Form, Row, Stack } from '@carbon/react';
 import { calculateBMI, isInNormalRange } from './vitals-biometrics-form.utils';
 import { savePatientVitals } from '../vitals.resource';
 import { ConfigObject } from '../../config-schema';

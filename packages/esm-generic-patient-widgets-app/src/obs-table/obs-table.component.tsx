@@ -78,10 +78,10 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
 
   return (
     <div>
-      <TableContainer>
-        <DataTable rows={results} headers={tableHeaders} isSortable={true} size="sm">
-          {({ rows, headers, getHeaderProps, getTableProps }) => (
-            <Table {...getTableProps()} useZebraStyles className={styles.customRow}>
+      <DataTable rows={results} headers={tableHeaders} isSortable size="sm" useZebraStyles>
+        {({ rows, headers, getHeaderProps, getTableProps }) => (
+          <TableContainer>
+            <Table {...getTableProps()} className={styles.customRow}>
               <TableHead>
                 <TableRow>
                   {headers.map((header) => (
@@ -107,9 +107,9 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
                 ))}
               </TableBody>
             </Table>
-          )}
-        </DataTable>
-      </TableContainer>
+          </TableContainer>
+        )}
+      </DataTable>
       <PatientChartPagination
         pageNumber={currentPage}
         totalItems={tableRows.length}

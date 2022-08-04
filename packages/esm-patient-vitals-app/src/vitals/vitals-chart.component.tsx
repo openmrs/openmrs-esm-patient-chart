@@ -2,20 +2,12 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabList } from '@carbon/react';
 import { LineChart } from '@carbon/charts-react';
+import { ScaleTypes } from '@carbon/charts/interfaces';
 import { formatDate, parseDate } from '@openmrs/esm-framework';
 import { withUnit } from '@openmrs/esm-patient-common-lib';
 import { ConfigObject } from '../config-schema';
 import { PatientVitals } from './vitals.resource';
 import styles from './vitals-chart.scss';
-import '@carbon/charts/styles.css';
-
-enum ScaleTypes {
-  LABELS = 'labels',
-  LABELS_RATIO = 'labels-ratio',
-  LINEAR = 'linear',
-  LOG = 'log',
-  TIME = 'time',
-}
 
 interface VitalsChartProps {
   conceptUnits: Map<string, string>;
@@ -52,7 +44,7 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
       value: 'temperature',
     },
     {
-      id: 'Respiratory Rate',
+      id: 'respiratoryRate',
       title: withUnit('R. Rate', conceptUnits.get(config.concepts.respiratoryRateUuid) ?? '-'),
       value: 'respiratoryRate',
     },
@@ -73,13 +65,13 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
           if (['systolic', 'diastolic'].includes(selectedVitalSign.value)) {
             return [
               {
-                group: 'systolic',
+                group: 'Systolic blood pressure',
                 key: formatDate(parseDate(vitals.date.toString()), { year: false }),
                 value: vitals.systolic,
                 date: vitals.date,
               },
               {
-                group: 'diastolic',
+                group: 'Diastolic blood pressure',
                 key: formatDate(parseDate(vitals.date.toString()), { year: false }),
                 value: vitals.diastolic,
                 date: vitals.date,
@@ -126,13 +118,14 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
         ).toUpperCase()}
         <span style="color: #c6c6c6; font-size: 1rem; font-weight:600">${key}</span></div>`,
     },
+    height: '400px',
   };
 
   return (
     <div className={styles.vitalsChartContainer}>
-      <div className={styles.vitalSignsArea} style={{ flex: 1 }}>
-        <label className={styles.vitalsSign} htmlFor="vitals-chart-tab-group">
-          {t('vitalSignDisplayed', 'Vital Sign Displayed')}
+      <div className={styles.vitalSignsArea}>
+        <label className={styles.vitalsSignLabel} htmlFor="vitals-chart-tab-group">
+          {t('vitalSignDisplayed', 'Vital sign displayed')}
         </label>
         <Tabs className={styles.verticalTabs} type="default">
           <TabList className={styles.tablist} aria-label="Vitals signs">
@@ -157,7 +150,7 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
           </TabList>
         </Tabs>
       </div>
-      <div className={styles.vitalsChartArea} style={{ flex: 4 }}>
+      <div className={styles.vitalsChartArea}>
         <LineChart data={chartData.flat()} options={chartOptions} />
       </div>
     </div>

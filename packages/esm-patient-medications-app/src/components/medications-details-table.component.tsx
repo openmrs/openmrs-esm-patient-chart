@@ -177,13 +177,14 @@ const MedicationsDetailsTable = connect<
           size="sm"
           headers={tableHeaders}
           rows={tableRows}
-          isSortable={true}
+          isSortable
           sortRow={sortRow}
           overflowMenuOnHover={false}
+          useZebraStyles
         >
           {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
             <TableContainer>
-              <Table {...getTableProps()} useZebraStyles>
+              <Table {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (

@@ -30,7 +30,7 @@ const StopVisitOverflowMenuItem: React.FC<StopVisitOverflowMenuItemProps> = ({ p
             maxWidth: '100vw',
           }}
         >
-          <span className="cds--overflow-menu-options__option-content">{t('endVisit', 'End Visit')}</span>
+          <span className="cds--overflow-menu-options__option-content">{t('endVisit', 'End visit')}</span>
         </button>
       </li>
     )

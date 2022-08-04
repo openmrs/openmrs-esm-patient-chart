@@ -45,7 +45,7 @@ const FilterSet: React.FC<FilterSetProps> = ({ hideFilterSetHeader = false }) =>
       )}
       <div className={styles.filterSetContent}>
         {roots?.map((root, index) => (
-          <div className={styles.nestedAccordion}>
+          <div className={styles.nestedAccordion} key={`filter-node-${index}`}>
             <FilterNode root={root} level={0} open={config.concepts[index].defaultOpen} />
           </div>
         ))}

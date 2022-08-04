@@ -3,13 +3,6 @@
 @import '@carbon/colors';
 @import '~@openmrs/esm-styleguide/src/vars';
 
-
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap');
-
-* {
-  font-family: "IBM Plex Sans"
-}
-
 .productiveHeading03 {
   @include type.type-style("heading-03");
 }

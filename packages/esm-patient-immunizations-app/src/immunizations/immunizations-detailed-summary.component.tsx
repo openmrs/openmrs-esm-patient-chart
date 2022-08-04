@@ -137,9 +137,9 @@ const ImmunizationsDetailedSummary: React.FC<ImmunizationsDetailedSummaryProps> 
           {t('add', 'Add')}
         </Button>
       </CardHeader>
-      <DataTable rows={paginatedImmunizations} headers={tableHeader}>
+      <DataTable rows={paginatedImmunizations} headers={tableHeader} useZebraStyles>
         {({ rows, headers, getHeaderProps, getRowProps, getTableProps }) => (
-          <Table {...getTableProps()} useZebraStyles>
+          <Table {...getTableProps()}>
             <TableHead>
               <TableRow>
                 <TableExpandHeader />

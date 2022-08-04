@@ -5,6 +5,7 @@ import {
   Button,
   DataTable,
   DataTableHeader,
+  DataTableRow,
   DataTableSkeleton,
   InlineLoading,
   InlineNotification,
@@ -71,24 +72,20 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
     [t],
   );
 
-  const tableRows = React.useMemo(() => {
-    return paginatedEnrollments?.map((enrollment: ConfigurableProgram) => ({
-      id: enrollment.uuid,
-      display: enrollment.display,
-      location: enrollment.location?.display,
-      dateEnrolled: enrollment.dateEnrolled ? formatDatetime(new Date(enrollment.dateEnrolled)) : '--',
-      status: isConfigurable
-        ? capitalize(enrollment.enrollmentStatus)
-        : enrollment.dateCompleted
-        ? `${t('completedOn', 'Completed On')} ${formatDate(new Date(enrollment.dateCompleted))}`
-        : t('active', 'Active'),
-      actions: isConfigurable ? (
-        <ProgramActionButton enrollment={enrollment} />
-      ) : (
-        <ProgramEditButton programEnrollmentId={enrollment.uuid} />
-      ),
-    }));
-  }, [isConfigurable, paginatedEnrollments, t]);
+  const tableRows: Array<DataTableRow> = React.useMemo(() => {
+    return enrollments?.map((program) => {
+      return {
+        id: program.uuid,
+        display: program.display,
+        location: program.location?.display,
+        dateEnrolled: formatDatetime(new Date(program.dateEnrolled)),
+        status: program.dateCompleted
+          ? `${t('completedOn', 'Completed On')} ${formatDate(new Date(program.dateCompleted))}`
+          : t('active', 'Active'),
+        actions: <ProgramEditButton programEnrollmentId={program.uuid} />,
+      };
+    });
+  }, [enrollments, t]);
 
   const launchProgramsForm = React.useCallback(() => launchPatientWorkspace('programs-form-workspace'), []);
 
@@ -109,19 +106,19 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
             {t('add', 'Add')}
           </Button>
         </CardHeader>
-        <TableContainer>
-          {availablePrograms?.length && eligiblePrograms?.length === 0 && (
-            <InlineNotification
-              style={{ minWidth: '100%', margin: '0rem', padding: '0rem' }}
-              kind={'info'}
-              lowContrast
-              subtitle={t('noEligibleEnrollments', 'There are no more programs left to enroll this patient in')}
-              title={t('fullyEnrolled', 'Enrolled in all programs')}
-            />
-          )}
-          <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="sm">
-            {({ rows, headers, getHeaderProps, getTableProps }) => (
-              <Table {...getTableProps()} useZebraStyles>
+        {availablePrograms?.length && eligiblePrograms?.length === 0 ? (
+          <InlineNotification
+            style={{ minWidth: '100%', margin: '0rem', padding: '0rem' }}
+            kind={'info'}
+            lowContrast
+            subtitle={t('noEligibleEnrollments', 'There are no more programs left to enroll this patient in')}
+            title={t('fullyEnrolled', 'Enrolled in all programs')}
+          />
+        ) : null}
+        <DataTable rows={tableRows} headers={tableHeaders} isSortable size="xs" useZebraStyles>
+          {({ rows, headers, getHeaderProps, getTableProps }) => (
+            <TableContainer>
+              <Table {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
@@ -147,9 +144,9 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
                   ))}
                 </TableBody>
               </Table>
-            )}
-          </DataTable>
-        </TableContainer>
+            </TableContainer>
+          )}
+        </DataTable>
       </div>
     );
   }

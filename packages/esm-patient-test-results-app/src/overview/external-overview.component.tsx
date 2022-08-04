@@ -1,37 +1,39 @@
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { EmptyState, ExternalOverviewProps, PanelFilterProps } from '@openmrs/esm-patient-common-lib';
+import { Button, DataTableSkeleton } from '@carbon/react';
+import { ArrowRight } from '@carbon/react/icons';
+import { navigate } from '@openmrs/esm-framework';
+import { EmptyState, ExternalOverviewProps, PanelFilterProps, PatientData } from '@openmrs/esm-patient-common-lib';
 import { parseSingleEntry, OverviewPanelEntry } from './useOverviewData';
 import usePatientResultsData from '../loadPatientTestData/usePatientResultsData';
 import CommonOverview from './common-overview.component';
-import { navigate } from '@openmrs/esm-framework';
-import { Button, DataTableSkeleton } from '@carbon/react';
-import { ArrowRight } from '@carbon/react/icons';
 import styles from './external-overview.scss';
 
 const resultsToShow = 3;
 
+function getFilteredOverviewData(sortedObs: PatientData, filter) {
+  return Object.entries(sortedObs)
+    .flatMap(([panelName, { entries, type, uuid }]) => {
+      return entries.map((e) => [e, uuid, type, panelName] as PanelFilterProps);
+    })
+    .filter(filter)
+    .map(([entry, uuid, type, panelName]: PanelFilterProps): OverviewPanelEntry => {
+      return [
+        panelName,
+        type,
+        parseSingleEntry(entry, type, panelName),
+        new Date(entry.effectiveDateTime),
+        new Date(entry.issued),
+        uuid,
+      ];
+    })
+    .sort(([, , , date1], [, , , date2]) => date2.getTime() - date1.getTime());
+}
+
 function useFilteredOverviewData(patientUuid: string, filter: (filterProps: PanelFilterProps) => boolean = () => true) {
   const { sortedObs, loaded, error } = usePatientResultsData(patientUuid);
 
-  const overviewData = useMemo(() => {
-    return Object.entries(sortedObs)
-      .flatMap(([panelName, { entries, type, uuid }]) => {
-        return entries.map((e) => [e, uuid, type, panelName] as PanelFilterProps);
-      })
-      .filter(filter)
-      .map(([entry, uuid, type, panelName]: PanelFilterProps): OverviewPanelEntry => {
-        return [
-          panelName,
-          type,
-          parseSingleEntry(entry, type, panelName),
-          new Date(entry.effectiveDateTime),
-          new Date(entry.issued),
-          uuid,
-        ];
-      })
-      .sort(([, , , date1], [, , , date2]) => date2.getTime() - date1.getTime());
-  }, [filter, sortedObs]);
+  const overviewData = useMemo(() => getFilteredOverviewData(sortedObs, filter), [filter, sortedObs]);
 
   return { overviewData, loaded, error };
 }

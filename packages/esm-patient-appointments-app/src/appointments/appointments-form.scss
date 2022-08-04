@@ -9,6 +9,13 @@
 
 $openmrs-background-grey: #ededed;
 
+.formWrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: calc(100vh - 6rem);
+}
+
 :global(.omrs-breakpoint-lt-desktop) .formWrapper {
   background-color: $openmrs-background-grey;
 }
@@ -23,15 +30,17 @@ $openmrs-background-grey: #ededed;
   padding: spacing.$spacing-05;
 }
 
-:global(.omrs-breakpoint-lt-desktop) .formGroup > span{
-  flex: 1
+:global(.omrs-breakpoint-lt-desktop) .formGroup > span {
+  flex: 1;
 }
-:global(.omrs-breakpoint-lt-desktop) .formGroup > div{
+
+:global(.omrs-breakpoint-lt-desktop) .formGroup > div {
   flex: 3;
 }
 
 .formGroup span {
   @extend .productiveHeading02;
+  margin-bottom: spacing.$spacing-03;
 }
 
 .datePickerControl {
@@ -46,22 +55,27 @@ $openmrs-background-grey: #ededed;
   flex-direction: column;
 }
 
-.buttonGroup {
+.button {
+  height: 4rem;
   display: flex;
-  position: sticky;
-  bottom: 0;
-  width: 100%;
+  align-content: flex-start;
+  align-items: baseline;
+  min-width: 50%;
 }
 
-:global(.omrs-breakpoint-lt-desktop) .buttonGroup {
-  padding: spacing.$spacing-05 spacing.$spacing-06;
+.loader {
+  display: flex;
+  background-color: $openmrs-background-grey;
+  justify-content: center;
+  min-height: spacing.$spacing-09;
+  height: 100vh;
+}
+
+.tablet {
+  padding: 1.5rem 1rem;
   background-color: $ui-02;
 }
 
-.buttonGroup button {
-  max-width: none;
-  width: 50%;
-  height: spacing.$spacing-10;
-  align-items: flex-start;
+.desktop {
+  padding: 0rem;
 }
-

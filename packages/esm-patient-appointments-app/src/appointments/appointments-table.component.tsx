@@ -53,9 +53,9 @@ const AppointmentsTable: React.FC<AppointmentTableProps> = ({ patientAppointment
 
   return (
     <div>
-      <TableContainer>
-        <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="sm">
-          {({ rows, headers, getHeaderProps, getTableProps }) => (
+      <DataTable rows={tableRows} headers={tableHeaders} isSortable size="sm">
+        {({ rows, headers, getHeaderProps, getTableProps }) => (
+          <TableContainer>
             <Table {...getTableProps()} useZebraStyles>
               <TableHead>
                 <TableRow>
@@ -82,9 +82,9 @@ const AppointmentsTable: React.FC<AppointmentTableProps> = ({ patientAppointment
                 ))}
               </TableBody>
             </Table>
-          )}
-        </DataTable>
-      </TableContainer>
+          </TableContainer>
+        )}
+      </DataTable>
       <PatientChartPagination
         currentItems={paginatedAppointments.length}
         totalItems={patientAppointments.length}
