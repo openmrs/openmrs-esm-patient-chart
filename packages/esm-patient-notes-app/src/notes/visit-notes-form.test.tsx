@@ -51,22 +51,16 @@ jest.mock('@openmrs/esm-framework', () => {
 });
 
 jest.mock('./visit-notes.resource', () => ({
-  fetchDiagnosisByName: jest.fn(),
+  fetchConceptDiagnosisByName: jest.fn(),
   fetchLocationByUuid: jest.fn(),
   fetchProviderByUuid: jest.fn(),
   saveVisitNote: jest.fn(),
 }));
 
 describe('Visit notes form: ', () => {
-  beforeEach(() => {
-    mockFetchLocationByUuid.mockResolvedValue(mockFetchLocationByUuidResponse);
-    mockFetchProviderByUuid.mockResolvedValue(mockFetchProviderByUuidResponse);
-    mockFetchDiagnosisByName.mockReturnValue(of(diagnosisSearchResponse.results));
-    mockUseConfig.mockReturnValue(ConfigMock);
-    mockUseSession.mockReturnValue(mockSessionDataResponse);
-  });
+  test('renders the visit notes form with all the relevant fields and values', () => {
+    mockFetchDiagnosisByName.mockReturnValue(of([]));
 
-  test.skip('renders the visit notes form with all the relevant fields and values', () => {
     renderVisitNotesForm();
 
     expect(screen.getByRole('textbox', { name: /Visit date/i })).toBeInTheDocument();
@@ -74,13 +68,14 @@ describe('Visit notes form: ', () => {
     expect(screen.getByRole('search', { name: /Enter Primary diagnosis/i })).toBeInTheDocument();
     expect(screen.getByRole('search', { name: /Enter Secondary diagnosis/i })).toBeInTheDocument();
     expect(screen.getByRole('group', { name: /Add an image to this visit/i })).toBeInTheDocument();
-    expect(screen.getByRole('search', { name: /Enter diagnoses/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Add image/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Discard/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Save and close/i })).toBeInTheDocument();
   });
 
-  test.skip('typing in the diagnosis search input triggers a search', () => {
+  test('typing in the diagnosis search input triggers a search', () => {
+    mockFetchDiagnosisByName.mockReturnValue(of(diagnosisSearchResponse.results));
+
     renderVisitNotesForm();
 
     const searchbox = screen.getByPlaceholderText('Choose a primary diagnosis');
@@ -104,18 +99,17 @@ describe('Visit notes form: ', () => {
     expect(screen.getByText(/No diagnosis selected — Enter a diagnosis below/i)).toBeInTheDocument();
   });
 
-  test.skip('renders an error message when no matching diagnoses are found', () => {
-    mockFetchDiagnosisByName.mockClear();
+  test.only('renders an error message when no matching diagnoses are found', () => {
     mockFetchDiagnosisByName.mockReturnValue(of([]));
-
     renderVisitNotesForm();
 
     const searchbox = screen.getByPlaceholderText('Choose a primary diagnosis');
     userEvent.type(searchbox, 'COVID-21');
-    expect(getByTextWithMarkup('No diagnoses found matching "COVID-21"')).toBeInTheDocument();
+
+    expect(screen.getByText(/No diagnoses found matching"/i)).toBeInTheDocument();
   });
 
-  test.skip('closes the form and the workspace when the cancel button is clicked', () => {
+  test('closes the form and the workspace when the cancel button is clicked', () => {
     renderVisitNotesForm();
 
     const cancelButton = screen.getByRole('button', { name: /Discard/i });
@@ -125,7 +119,7 @@ describe('Visit notes form: ', () => {
   });
 
   describe('Form Submission: ', () => {
-    test.skip('renders a success toast notification upon successfully recording a visit note', async () => {
+    test('renders a success toast notification upon successfully recording a visit note', async () => {
       const successPayload = {
         encounterProviders: jasmine.arrayContaining([
           {
@@ -170,7 +164,7 @@ describe('Visit notes form: ', () => {
     });
   });
 
-  test.skip('renders an error notification if there was a problem recording a condition', async () => {
+  test('renders an error notification if there was a problem recording a condition', async () => {
     const error = {
       message: 'Internal Server Error',
       response: {
@@ -211,5 +205,9 @@ describe('Visit notes form: ', () => {
 });
 
 function renderVisitNotesForm() {
+  mockFetchLocationByUuid.mockResolvedValue(mockFetchLocationByUuidResponse);
+  mockFetchProviderByUuid.mockResolvedValue(mockFetchProviderByUuidResponse);
+  mockUseConfig.mockReturnValue(ConfigMock);
+  mockUseSession.mockReturnValue(mockSessionDataResponse);
   render(<VisitNotesForm {...testProps} />);
 }
