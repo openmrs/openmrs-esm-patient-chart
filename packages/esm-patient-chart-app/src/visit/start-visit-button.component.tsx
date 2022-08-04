@@ -1,8 +1,8 @@
-import { navigate } from '@openmrs/esm-framework';
-import { launchPatientChartWithWorkspaceOpen } from '@openmrs/esm-patient-common-lib';
-import { Button } from 'carbon-components-react';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@carbon/react';
+import { launchPatientChartWithWorkspaceOpen } from '@openmrs/esm-patient-common-lib';
+import { navigate } from '@openmrs/esm-framework';
 
 interface StartVisitButtonProps {
   patientUuid: string;
