@@ -3,7 +3,12 @@ import { screen } from '@testing-library/react';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import ContactDetails from './contact-details.component';
-import * as usePatientContactAttributeMock from '../hooks/usePatientAttributes';
+import { usePatientContactAttributes } from '../hooks/usePatientAttributes';
+
+jest.mock('../hooks/usePatientAttributes', () => ({
+  ...Object(jest.requireActual('../hooks/usePatientAttributes')),
+  usePatientContactAttributes: jest.fn(),
+}));
 
 const testProps = {
   address: [
@@ -66,10 +71,11 @@ const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 
 describe('ContactDetails: ', () => {
   it('renders an empty state view when relationships data is not available', async () => {
-    spyOn(usePatientContactAttributeMock, 'usePatientContactAttributes').and.returnValue({
+    // @ts-ignore
+    usePatientContactAttributes.mockImplementation(() => ({
       isLoading: false,
       contactAttributes: personAttributeMock,
-    });
+    }));
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
 
     renderContactDetails();
@@ -82,10 +88,11 @@ describe('ContactDetails: ', () => {
   });
 
   it("renders the patient's address, contact details and relationships when available", async () => {
-    spyOn(usePatientContactAttributeMock, 'usePatientContactAttributes').and.returnValue({
+    // @ts-ignore
+    usePatientContactAttributes.mockImplementation(() => ({
       isLoading: false,
       contactAttributes: personAttributeMock,
-    });
+    }));
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockRelationships } });
 
     renderContactDetails();
@@ -104,10 +111,11 @@ describe('ContactDetails: ', () => {
 
   it('renders an empty state view when address and contact details is not available', () => {
     renderWithSwr(<ContactDetails address={null} telecom={null} patientId={'some-uuid'} />);
-    spyOn(usePatientContactAttributeMock, 'usePatientContactAttributes').and.returnValue({
+    // @ts-ignore
+    usePatientContactAttributes.mockImplementation(() => ({
       isLoading: false,
       contactAttributes: [],
-    });
+    }));
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
 
     expect(screen.getByText('Address')).toBeInTheDocument();

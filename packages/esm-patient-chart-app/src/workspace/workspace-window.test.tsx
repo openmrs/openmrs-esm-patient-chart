@@ -8,6 +8,7 @@ import {
   WorkspaceWindowSizeProvider,
 } from '@openmrs/esm-patient-common-lib';
 import userEvent from '@testing-library/user-event';
+import { act } from 'react-dom/test-utils';
 
 const mockExtensionRegistry = {};
 
@@ -57,9 +58,9 @@ describe('WorkspaceWindow', () => {
     expect(workspaceContainer).toHaveClass('show');
 
     const hideButton = screen.getByRole('button', { name: 'Hide' });
-    userEvent.click(hideButton);
-
-    expect(workspaceContainer).toHaveClass('hide');
+    act(() => {
+      userEvent.click(hideButton);
+    });
 
     await waitFor(() => {
       launchPatientWorkspace('Clinical Form', { workspaceTitle: 'POC Triage' });

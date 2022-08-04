@@ -1,7 +1,7 @@
 import React from 'react';
 import VisitNoteActionButton from './visit-note-action-button.component';
 import { screen, render } from '@testing-library/react';
-import * as openmrsEsmFramework from '@openmrs/esm-framework/mock';
+import { useLayoutType } from '@openmrs/esm-framework/mock';
 import userEvent from '@testing-library/user-event';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 
@@ -19,7 +19,7 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
 
 describe('<VisitNoteActionButton/>', () => {
   it('should display tablet view', () => {
-    spyOn(openmrsEsmFramework, 'useLayoutType').and.returnValue('tablet');
+    useLayoutType.mockImplementation(() => 'tablet');
     render(<VisitNoteActionButton />);
 
     const visitNoteButton = screen.getByRole('button', { name: /Visit note/i });
@@ -31,7 +31,7 @@ describe('<VisitNoteActionButton/>', () => {
   });
 
   it('should display desktop view', () => {
-    spyOn(openmrsEsmFramework, 'useLayoutType').and.returnValue('desktop');
+    useLayoutType.mockImplementation(() => 'desktop');
     render(<VisitNoteActionButton />);
 
     const visitNoteButton = screen.getByRole('button', { name: /Note/i });
