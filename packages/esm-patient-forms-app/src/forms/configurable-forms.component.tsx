@@ -1,9 +1,9 @@
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { CardHeader, ErrorState } from '@openmrs/esm-patient-common-lib';
-import { ContentSwitcher, DataTableSkeleton, InlineLoading, Switch } from 'carbon-components-react';
+import { ContentSwitcher, DataTableSkeleton, InlineLoading, Switch } from '@carbon/react';
 import capitalize from 'lodash-es/capitalize';
-import React, { useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { groupBy } from '../helpers';
 import { CompletedFormInfo } from '../types';
 import EmptyFormView from './empty-form.component';
@@ -53,7 +53,7 @@ const ConfigurableForms: React.FC<ConfigurableFormsProps> = ({
   }
 
   if (formsToDisplay.length === 0) {
-    return <EmptyFormView action={t('noFormsAvailable', 'There are no Forms to display for this patient')} />;
+    return <EmptyFormView content={t('noFormsAvailable', 'There are no forms to display for this patient')} />;
   }
   return (
     <div className={styles.widgetCard}>

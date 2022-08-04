@@ -18,8 +18,11 @@ function getPageSize(layoutType: LayoutType) {
       return 9;
     case 'phone':
       return 3;
-    case 'desktop':
+    case 'small-desktop':
       return 25;
+    // TODO: Add case for the 'large-desktop' layout
+    // case 'large-desktop':
+    //   return 25;
     default:
       return 8;
   }
