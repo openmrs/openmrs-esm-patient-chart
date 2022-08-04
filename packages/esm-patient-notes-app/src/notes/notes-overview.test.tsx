@@ -46,7 +46,7 @@ describe('NotesOverview: ', () => {
     mockUseConfig.mockReturnValue(ConfigMock);
   });
 
-  test.skip('renders an empty state view if visit note data is unavailable', async () => {
+  test('renders an empty state view if visit note data is unavailable', async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
 
     renderNotesOverview();
@@ -59,7 +59,7 @@ describe('NotesOverview: ', () => {
     expect(screen.getByText(/Record visit notes/i)).toBeInTheDocument();
   });
 
-  test.skip('renders an error state view if there is a problem fetching visit note data', async () => {
+  test('renders an error state view if there is a problem fetching visit note data', async () => {
     const error = {
       message: 'You are not logged in',
       response: {
@@ -84,7 +84,7 @@ describe('NotesOverview: ', () => {
     ).toBeInTheDocument();
   });
 
-  test.skip("renders a tabular overview of the patient's visit notes when present", async () => {
+  test("renders a tabular overview of the patient's visit notes when present", async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockVisitNotesRequest } });
     mockUsePagination.mockReturnValueOnce({
       results: formattedVisitNotes.slice(0, 10),
