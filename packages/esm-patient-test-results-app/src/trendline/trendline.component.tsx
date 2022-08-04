@@ -2,16 +2,14 @@ import React, { useState, useCallback, useMemo, useLayoutEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, InlineLoading, SkeletonText } from '@carbon/react';
 import { ArrowLeft } from '@carbon/react/icons';
-// import { ScaleTypes, LineChartOptions, TickRotations } from '@carbon/charts/interfaces';
-import LineChart from '@carbon/charts-react/line-chart';
+import { LineChart } from '@carbon/charts-react';
 import { formatDate, formatTime, parseDate, ConfigurableLink } from '@openmrs/esm-framework';
 import { EmptyState, OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
-import CommonDataTable from '../overview/common-datatable.component';
-import { testResultsBasePath } from '../helpers';
-import RangeSelector from './range-selector.component';
 import { useObstreeData } from './trendline-resource';
+import { testResultsBasePath } from '../helpers';
+import CommonDataTable from '../overview/common-datatable.component';
+import RangeSelector from './range-selector.component';
 import styles from './trendline.scss';
-// import '@carbon/charts/styles.css';
 
 enum ScaleTypes {
   TIME = 'time',

@@ -151,7 +151,7 @@ describe('VitalsBiometricsForm: ', () => {
         temperature: '37',
         weight: '62',
       }),
-      new Date('2021-12-05T05:39:42.850Z'),
+      expect.anything(),
       new AbortController(),
       undefined,
     );

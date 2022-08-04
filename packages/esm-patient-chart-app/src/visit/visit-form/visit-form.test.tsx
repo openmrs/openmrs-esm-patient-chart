@@ -42,7 +42,7 @@ jest.mock('@openmrs/esm-framework', () => {
   };
 });
 
-describe('VisitForm', () => {
+describe('Visit Form', () => {
   it('renders the Start Visit form with all the relevant fields and values', () => {
     renderVisitForm();
 
@@ -62,7 +62,7 @@ describe('VisitForm', () => {
     expect(screen.getByRole('button', { name: /Discard/i })).toBeInTheDocument();
   });
 
-  it('renders an error message if a Visit Type is not selected', async () => {
+  it('renders an error message when a visit type has not been selected', async () => {
     const user = userEvent.setup();
 
     renderVisitForm();
@@ -81,7 +81,7 @@ describe('VisitForm', () => {
     expect(errorAlert).not.toBeInTheDocument();
   });
 
-  it('starts a new visit upon successful submission', async () => {
+  it('starts a new visit upon successful submission of the', async () => {
     const user = userEvent.setup();
 
     renderVisitForm();
@@ -96,7 +96,16 @@ describe('VisitForm', () => {
 
     await waitFor(() => user.selectOptions(locationOptions, 'b1a8b05e-3542-4037-bbd3-998ee9c40574'));
 
-    mockSaveVisit.mockReturnValueOnce(of({ status: 201 }));
+    mockSaveVisit.mockReturnValueOnce(
+      of({
+        status: 201,
+        data: {
+          visitType: {
+            display: 'Facility Visit',
+          },
+        },
+      }),
+    );
 
     await waitFor(() => user.click(saveButton));
 
@@ -111,7 +120,12 @@ describe('VisitForm', () => {
     );
 
     expect(showToast).toHaveBeenCalledTimes(1);
-    expect(showToast).toHaveBeenCalledWith({ description: 'Visit started successfully', kind: 'success' });
+    expect(showToast).toHaveBeenCalledWith({
+      critical: true,
+      description: 'Facility Visit started successfully',
+      kind: 'success',
+      title: 'Visit started',
+    });
   });
 
   it('renders an error message if there was a problem starting a new visit', async () => {

@@ -2,11 +2,18 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabList } from '@carbon/react';
 import { LineChart } from '@carbon/charts-react';
-import { ScaleTypes } from '@carbon/charts/interfaces';
 import { formatDate, parseDate } from '@openmrs/esm-framework';
 import { ConfigObject } from '../config-schema';
 import { PatientBiometrics } from './biometrics.resource';
 import styles from './biometrics-chart.scss';
+
+enum ScaleTypes {
+  TIME = 'time',
+  LINEAR = 'linear',
+  LOG = 'log',
+  LABELS = 'labels',
+  LABELS_RATIO = 'labels-ratio',
+}
 
 interface BiometricsChartProps {
   conceptUnits: Map<string, string>;

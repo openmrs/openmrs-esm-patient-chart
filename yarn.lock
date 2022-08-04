@@ -1595,33 +1595,6 @@
     wicg-inert "^3.1.1"
     window-or-global "^1.0.1"
 
-"@carbon/react@^1.6.0":
-  version "1.6.0"
-  resolved "https://registry.yarnpkg.com/@carbon/react/-/react-1.6.0.tgz#67e07ea708a4225242b8338d907cec630885c9de"
-  integrity sha512-TT09BHEqBZgh7rjNrBrr3U8eNmoROIUWplkrn41YQjIQvxObL7q//CnEQiRFQ7C2RGeapFwtxqEy4XEQJA7/+w==
-  dependencies:
-    "@babel/runtime" "^7.18.3"
-    "@carbon/feature-flags" "^0.8.0"
-    "@carbon/icons-react" "^11.5.0"
-    "@carbon/layout" "^11.3.0"
-    "@carbon/styles" "^1.6.0"
-    "@carbon/telemetry" "0.1.0"
-    classnames "2.3.1"
-    copy-to-clipboard "^3.3.1"
-    downshift "5.2.1"
-    flatpickr "4.6.9"
-    invariant "^2.2.3"
-    lodash.debounce "^4.0.8"
-    lodash.findlast "^4.5.0"
-    lodash.isequal "^4.5.0"
-    lodash.omit "^4.5.0"
-    lodash.throttle "^4.1.1"
-    prop-types "^15.7.2"
-    react-is "^17.0.2"
-    use-resize-observer "^6.0.0"
-    wicg-inert "^3.1.1"
-    window-or-global "^1.0.1"
-
 "@carbon/react@^1.8.0":
   version "1.8.0"
   resolved "https://registry.yarnpkg.com/@carbon/react/-/react-1.8.0.tgz#5c5090cf56cf308615a3eb4686f932740cc40df2"
@@ -5983,7 +5956,7 @@ canvg@1.5.3:
     stackblur-canvas "^1.4.1"
     xmldom "^0.1.22"
 
-carbon-components@10.56.0, carbon-components@^10.56.0:
+carbon-components@10.56.0:
   version "10.56.0"
   resolved "https://registry.yarnpkg.com/carbon-components/-/carbon-components-10.56.0.tgz#bb5890f00f81cebcddfa2dbae4794477deb539f4"
   integrity sha512-GPLqHiu2SWvMxcQOi/CcgA/XA3aX/5HiEPSQjLwzjKAJsnkpzq043Jf7QwgLOVbTBzGSjFbFkJnE2lc73I2WBw==
