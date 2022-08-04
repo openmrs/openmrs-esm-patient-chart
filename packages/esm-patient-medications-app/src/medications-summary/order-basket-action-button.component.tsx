@@ -44,8 +44,8 @@ const OrderBasketActionButton: React.FC = () => {
       )}
       hasIconOnly
       iconDescription={t('orders', 'Orders')}
-      tooltipAlignment="start"
-      tooltipPosition="left"
+      tooltipAlignment="end"
+      tooltipPosition="bottom"
       onClick={launchOrdersWorkspace}
     />
   );

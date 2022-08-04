@@ -63,10 +63,10 @@ const PastVisitOverview: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
   if (pastVisits?.length) {
     return (
       <div className={styles.container}>
-        <DataTable headers={headerData} rows={rowData}>
+        <DataTable headers={headerData} rows={rowData} useZebraStyles>
           {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
             <TableContainer title={t('pastVisits', 'Past Visits')}>
-              <Table {...getTableProps()} useZebraStyles>
+              <Table {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (

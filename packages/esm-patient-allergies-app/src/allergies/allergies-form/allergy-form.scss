@@ -49,8 +49,15 @@
   justify-content: flex-start;
 }
 
+.tablist {
+  :global(.cds--tab--list) {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
 .tab {
-  min-width: 33%;
+  flex-grow: 1;
 }
 
 .sectionHeading {

@@ -46,10 +46,6 @@
 
 .search {
   max-width: 16rem;
-
-  input {
-    background-color: $ui-02 !important;
-  }
 }
 
 .tableHeader {
@@ -107,4 +103,18 @@
 .helper {
   @include type.type-style('body-compact-01');
   color: $text-02;
+}
+
+/* Desktop */
+:global(.omrs-breakpoint-gt-tablet) {
+  :global(.cds--table-toolbar) {
+    min-height: 2rem;
+  }
+}
+
+/* Mobile */
+:global(.omrs-breakpoint-lt-desktop) {
+  :global(.cds--table-toolbar) {
+    min-height: 2.5rem;
+  }
 }

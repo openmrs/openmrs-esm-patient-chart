@@ -34,10 +34,10 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
 
   return (
     <div>
-      <TableContainer>
-        <DataTable rows={paginatedBiometrics} headers={tableHeaders} isSortable size="sm">
-          {({ rows, headers, getHeaderProps, getTableProps }) => (
-            <Table {...getTableProps()} useZebraStyles>
+      <DataTable rows={paginatedBiometrics} headers={tableHeaders} isSortable size="sm" useZebraStyles>
+        {({ rows, headers, getHeaderProps, getTableProps }) => (
+          <TableContainer>
+            <Table {...getTableProps()}>
               <TableHead>
                 <TableRow>
                   {headers.map((header) => (
@@ -63,9 +63,9 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
                 ))}
               </TableBody>
             </Table>
-          )}
-        </DataTable>
-      </TableContainer>
+          </TableContainer>
+        )}
+      </DataTable>
       <PatientChartPagination
         pageNumber={currentPage}
         totalItems={tableRows.length}

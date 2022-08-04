@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
-import { CardHeader, EmptyDataIllustration, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { Button, DataTableSkeleton, ContentSwitcher, InlineLoading, Switch, Tile } from '@carbon/react';
+import { Button, DataTableSkeleton, ContentSwitcher, InlineLoading, Layer, Switch, Tile } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
+import { CardHeader, EmptyDataIllustration, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { useAppointments } from './appointments.resource';
 import AppointmentsTable from './appointments-table.component';
 import styles from './appointments-base.scss';
@@ -68,12 +68,14 @@ const AppointmentsBase: React.FC<AppointmentsBaseProps> = ({ patientUuid }) => {
               return <AppointmentsTable patientAppointments={appointmentsData?.upcomingAppointments} />;
             }
             return (
-              <Tile className={styles.tile}>
-                <EmptyDataIllustration />
-                <p className={styles.content}>
-                  {t('noUpcomingAppointments', 'There are no upcoming appointments to display for this patient')}
-                </p>
-              </Tile>
+              <Layer>
+                <Tile className={styles.tile}>
+                  <EmptyDataIllustration />
+                  <p className={styles.content}>
+                    {t('noUpcomingAppointments', 'There are no upcoming appointments to display for this patient')}
+                  </p>
+                </Tile>
+              </Layer>
             );
           }
           if (contentSwitcherValue === AppointmentTypes.PAST) {
@@ -81,12 +83,14 @@ const AppointmentsBase: React.FC<AppointmentsBaseProps> = ({ patientUuid }) => {
               return <AppointmentsTable patientAppointments={appointmentsData?.pastAppointments} />;
             }
             return (
-              <Tile className={styles.tile}>
-                <EmptyDataIllustration />
-                <p className={styles.content}>
-                  {t('noPastAppointments', 'There are no past appointments to display for this patient')}
-                </p>
-              </Tile>
+              <Layer>
+                <Tile className={styles.tile}>
+                  <EmptyDataIllustration />
+                  <p className={styles.content}>
+                    {t('noPastAppointments', 'There are no past appointments to display for this patient')}
+                  </p>
+                </Tile>
+              </Layer>
             );
           }
         })()}

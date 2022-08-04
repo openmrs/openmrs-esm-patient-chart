@@ -2,7 +2,7 @@ import React, { SyntheticEvent, useMemo } from 'react';
 import 'dayjs/plugin/utc';
 import { useTranslation } from 'react-i18next';
 import { BehaviorSubject } from 'rxjs';
-import { Button, Form, ButtonSet } from '@carbon/react';
+import { Button, ButtonSet, Form } from '@carbon/react';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import ConditionsWidget from './conditions-widget.component';

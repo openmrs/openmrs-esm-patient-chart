@@ -15,6 +15,7 @@
   
   margin: spacing.$spacing-05;
 }
+
 .sectionTitle {
   @include type.type-style("heading-compact-02");
   color: $text-02;
@@ -27,10 +28,6 @@
 
 .radioButton {
   margin: spacing.$spacing-05 0;
-}
-
-.contentSwitcher {
-  height: spacing.$spacing-09;
 }
 
 .headerGridRow {

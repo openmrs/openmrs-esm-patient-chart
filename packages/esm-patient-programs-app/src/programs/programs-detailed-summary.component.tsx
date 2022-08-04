@@ -6,18 +6,17 @@ import map from 'lodash-es/map';
 import {
   Button,
   DataTable,
+  DataTableHeader,
   DataTableSkeleton,
   InlineLoading,
+  InlineNotification,
   Table,
+  TableBody,
   TableCell,
   TableContainer,
-  TableBody,
   TableHead,
   TableHeader,
   TableRow,
-  DataTableHeader,
-  DataTableRow,
-  InlineNotification,
 } from '@carbon/react';
 import { Add, Edit } from '@carbon/react/icons';
 import { formatDate, formatDatetime } from '@openmrs/esm-framework';
@@ -67,7 +66,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
     [t],
   );
 
-  const tableRows: Array<DataTableRow> = React.useMemo(() => {
+  const tableRows = React.useMemo(() => {
     return enrollments?.map((program) => {
       return {
         id: program.uuid,
@@ -101,19 +100,19 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
             {t('add', 'Add')}
           </Button>
         </CardHeader>
-        <TableContainer>
-          {availablePrograms?.length && eligiblePrograms?.length === 0 && (
-            <InlineNotification
-              style={{ minWidth: '100%', margin: '0rem', padding: '0rem' }}
-              kind={'info'}
-              lowContrast
-              subtitle={t('noEligibleEnrollments', 'There are no more programs left to enroll this patient in')}
-              title={t('fullyEnrolled', 'Enrolled in all programs')}
-            />
-          )}
-          <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="sm">
-            {({ rows, headers, getHeaderProps, getTableProps }) => (
-              <Table {...getTableProps()} useZebraStyles>
+        {availablePrograms?.length && eligiblePrograms?.length === 0 ? (
+          <InlineNotification
+            style={{ minWidth: '100%', margin: '0rem', padding: '0rem' }}
+            kind={'info'}
+            lowContrast
+            subtitle={t('noEligibleEnrollments', 'There are no more programs left to enroll this patient in')}
+            title={t('fullyEnrolled', 'Enrolled in all programs')}
+          />
+        ) : null}
+        <DataTable rows={tableRows} headers={tableHeaders} isSortable size="xs" useZebraStyles>
+          {({ rows, headers, getHeaderProps, getTableProps }) => (
+            <TableContainer>
+              <Table {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
@@ -139,9 +138,9 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
                   ))}
                 </TableBody>
               </Table>
-            )}
-          </DataTable>
-        </TableContainer>
+            </TableContainer>
+          )}
+        </DataTable>
       </div>
     );
   }

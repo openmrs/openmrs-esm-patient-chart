@@ -42,10 +42,10 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({ tableRows, pageSize, 
 
   return (
     <div>
-      <TableContainer>
-        <DataTable rows={paginatedVitals} headers={tableHeaders} isSortable={true} size="sm">
-          {({ rows, headers, getHeaderProps, getTableProps }) => (
-            <Table {...getTableProps()} className={styles.customRow} useZebraStyles>
+      <DataTable rows={paginatedVitals} headers={tableHeaders} isSortable size="sm" useZebraStyles>
+        {({ rows, headers, getHeaderProps, getTableProps }) => (
+          <TableContainer>
+            <Table {...getTableProps()} className={styles.customRow}>
               <TableHead>
                 <TableRow>
                   {headers.map((header) => (
@@ -77,9 +77,9 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({ tableRows, pageSize, 
                 ))}
               </TableBody>
             </Table>
-          )}
-        </DataTable>
-      </TableContainer>
+          </TableContainer>
+        )}
+      </DataTable>
       <PatientChartPagination
         pageNumber={currentPage}
         totalItems={tableRows.length}

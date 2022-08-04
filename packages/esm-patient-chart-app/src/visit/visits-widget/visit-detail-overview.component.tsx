@@ -46,10 +46,14 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
 
     return (
       <div className={styles.tabs}>
-        <Tabs type="container">
-          <TabList aria-label="Visit detail tabs">
-            <Tab id="visit-summaries-tab">{t('visitSummaries', 'Visit summaries')}</Tab>
-            <Tab id="all-encounters-tab">{t('allEncounters', 'All encounters')}</Tab>
+        <Tabs>
+          <TabList aria-label="Visit detail tabs" contained>
+            <Tab className={styles.tab} id="visit-summaries-tab">
+              {t('visitSummaries', 'Visit summaries')}
+            </Tab>
+            <Tab className={styles.tab} id="all-encounters-tab">
+              {t('allEncounters', 'All encounters')}
+            </Tab>
           </TabList>
           <TabPanels>
             <TabPanel>

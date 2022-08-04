@@ -54,6 +54,7 @@
     "ngx-bootstrap": "5.6.x",
     "ngx-file-uploader": "0.0.18",
     "ngx-webcam": "^0.2.2",
+    "openmrs": "^4.0.0-pre.1",
     "reflect-metadata": "^0.1.13",
     "single-spa-angular": "^4.9.2",
     "slick-carousel": "^1.6.0",
@@ -64,7 +65,7 @@
     "zone.js": "~0.10.2"
   },
   "peerDependencies": {
-    "@openmrs/esm-framework": "3.x",
+    "@openmrs/esm-framework": "4.x",
     "rxjs": "6.x",
     "single-spa": "5.x",
     "systemjs": "6.x"
@@ -78,6 +79,7 @@
     "@angular/localize": "~11.2.14",
     "@types/jasmine": "~3.6.0",
     "@types/jasminewd2": "~2.0.3",
+    "@types/webpack-env": "^1.17.0",
     "codelyzer": "^6.0.0",
     "jasmine-core": "~3.6.0",
     "jasmine-spec-reporter": "~5.0.0",

@@ -55,7 +55,7 @@ const OfflineForms: React.FC<OfflineFormsProps> = ({ canMarkFormsAsOffline }) =>
         <h1 className={styles.pageHeader}>{t('offlineFormsTitle', 'Offline forms')}</h1>
       </header>
       <main className={styles.contentContainer}>
-        <DataTable rows={rows} headers={headers}>
+        <DataTable rows={rows} headers={headers} size="sm" useZebraStyles>
           {({
             rows,
             headers,
@@ -65,7 +65,7 @@ const OfflineForms: React.FC<OfflineFormsProps> = ({ canMarkFormsAsOffline }) =>
             getTableContainerProps,
             onInputChange,
           }: DataTableCustomRenderProps) => (
-            <TableContainer className={styles.tableContainer} {...getTableContainerProps()}>
+            <TableContainer {...getTableContainerProps()}>
               <div className={styles.tableHeaderContainer}>
                 <Search
                   className={styles.tableSearch}
@@ -105,6 +105,7 @@ const OfflineForms: React.FC<OfflineFormsProps> = ({ canMarkFormsAsOffline }) =>
 };
 
 function OfflineFormToggle({ form, disabled }: { form: FormEncounter; disabled: boolean }) {
+  const { t } = useTranslation();
   const [isUpdating, setIsUpdating] = useState(false);
   const dynamicFormEntriesSwr = useDynamicFormDataEntries();
   const isMarkedAsOffline = dynamicFormEntriesSwr.data?.some((entry) => entry.identifier === form.uuid);
@@ -133,10 +134,12 @@ function OfflineFormToggle({ form, disabled }: { form: FormEncounter; disabled: 
   return (
     <div>
       <Toggle
+        aria-label={t('offlineToggle', 'Offline toggle')}
         id={`${form.uuid}-offline-toggle`}
         className={styles.availableOfflineToggle}
         labelA=""
         labelB=""
+        labelText=""
         size="sm"
         toggled={isMarkedAsOffline}
         disabled={disabled || isUpdating || dynamicFormEntriesSwr.isValidating}

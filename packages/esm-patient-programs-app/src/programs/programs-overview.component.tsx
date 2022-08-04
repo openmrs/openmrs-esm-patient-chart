@@ -104,19 +104,19 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
             {t('add', 'Add')}
           </Button>
         </CardHeader>
-        <TableContainer>
-          {availablePrograms?.length && eligiblePrograms?.length === 0 && (
-            <InlineNotification
-              style={{ minWidth: '100%', margin: '0rem', padding: '0rem' }}
-              kind={'info'}
-              lowContrast
-              subtitle={t('noEligibleEnrollments', 'There are no more programs left to enroll this patient in')}
-              title={t('fullyEnrolled', 'Enrolled in all programs')}
-            />
-          )}
-          <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="sm">
-            {({ rows, headers, getHeaderProps, getTableProps }) => (
-              <Table {...getTableProps()} useZebraStyles>
+        {availablePrograms?.length && eligiblePrograms?.length === 0 && (
+          <InlineNotification
+            style={{ minWidth: '100%', margin: '0rem', padding: '0rem' }}
+            kind={'info'}
+            lowContrast
+            subtitle={t('noEligibleEnrollments', 'There are no more programs left to enroll this patient in')}
+            title={t('fullyEnrolled', 'Enrolled in all programs')}
+          />
+        )}
+        <DataTable rows={tableRows} headers={tableHeaders} isSortable size="sm" useZebraStyles>
+          {({ rows, headers, getHeaderProps, getTableProps }) => (
+            <TableContainer>
+              <Table {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
@@ -142,9 +142,9 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
                   ))}
                 </TableBody>
               </Table>
-            )}
-          </DataTable>
-        </TableContainer>
+            </TableContainer>
+          )}
+        </DataTable>
         <PatientChartPagination
           currentItems={paginatedEnrollments.length}
           onPageNumberChange={({ page }) => goTo(page)}

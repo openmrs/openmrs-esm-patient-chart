@@ -32,8 +32,10 @@ const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal
             closeModal();
 
             showToast({
+              critical: true,
               kind: 'success',
-              description: t('visitEndSuccessfully', 'Ended active visit successfully'),
+              description: t('visitEndSuccessfully', `${response?.data?.visitType?.display} ended successfully`),
+              title: t('visitEnded', 'Visit ended'),
             });
           }
         },
@@ -59,7 +61,7 @@ const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal
         <p className={styles.bodyShort02}>
           {t(
             'endVisitWarningMessage',
-            'Ending this visit, will not allow you to fill another encounter form for this patient',
+            'Ending this visit will not allow you to fill another encounter form for this patient',
           )}
         </p>
       </ModalBody>

@@ -39,7 +39,7 @@ const CommonDataTable: React.FC<CommonDataTableProps> = ({ title, data, descript
   const isTablet = useLayoutType() === 'tablet';
 
   return (
-    <DataTable rows={data} headers={tableHeaders} size="sm">
+    <DataTable rows={data} headers={tableHeaders} size="sm" useZebraStyles>
       {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getTableContainerProps }) => (
         <TableContainer
           className={`${styles.tableContainer} ${isTablet ? `${styles.tablet}` : `${styles.desktop}`}`}
@@ -48,7 +48,7 @@ const CommonDataTable: React.FC<CommonDataTableProps> = ({ title, data, descript
           {...getTableContainerProps()}
         >
           {toolbar}
-          <Table {...getTableProps()} isSortable useZebraStyles>
+          <Table {...getTableProps()} isSortable>
             <colgroup className={styles.columns}>
               <col span={1} />
               <col span={1} />

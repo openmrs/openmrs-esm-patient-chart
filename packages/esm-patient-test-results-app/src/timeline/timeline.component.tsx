@@ -1,5 +1,5 @@
 import React from 'react';
-import { InlineLoading } from '@carbon/react';
+import { DataTableSkeleton } from '@carbon/react';
 import { useTimelineData } from './useTimelineData';
 import { PaddingContainer, TimeSlots, Grid, RowStartCell, GridItems, ShadowBox } from './helpers';
 import { ObsRecord, EmptyState, OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
@@ -127,7 +127,7 @@ export const Timeline: React.FC<TimelineParams> = ({
   if (!loaded)
     return (
       <RecentResultsGrid>
-        <InlineLoading description="Loading" />
+        <DataTableSkeleton role="progressbar" />
       </RecentResultsGrid>
     );
 

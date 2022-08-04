@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import 'dayjs/plugin/isToday';
-import { ContentSwitcher, Switch, DataTableSkeleton, InlineLoading, Tag } from '@carbon/react';
+import { ContentSwitcher, Switch, DataTableSkeleton, InlineLoading } from '@carbon/react';
 import { CardHeader, ErrorState, PatientProgram, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import { useConfig, useLayoutType, useSession, userHasAccess } from '@openmrs/esm-framework';
 import { isValidOfflineFormEncounter } from '../offline-forms/offline-form-helpers';
@@ -134,7 +134,6 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
             urlLabel={urlLabel}
           />
         )}
-
         {formsCategory === FormsCategory.Recommended && (
           <FormView
             forms={recommendedForms}

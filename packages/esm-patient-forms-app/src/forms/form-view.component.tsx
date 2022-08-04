@@ -5,21 +5,22 @@ import first from 'lodash-es/first';
 import debounce from 'lodash-es/debounce';
 import {
   DataTable,
+  DataTableHeader,
+  DataTableRow,
+  Layer,
   Search,
   Table,
+  TableBody,
   TableCell,
   TableContainer,
-  TableBody,
   TableHead,
   TableHeader,
   TableRow,
-  DataTableHeader,
-  DataTableRow,
+  Tile,
 } from '@carbon/react';
 import { Edit } from '@carbon/react/icons';
-import { PatientChartPagination, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
+import { EmptyDataIllustration, PatientChartPagination, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import { isDesktop, formatDatetime, useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
-import EmptyFormView from './empty-form.component';
 import { ConfigObject } from '../config-schema';
 import { CompletedFormInfo } from '../types';
 import { launchFormEntryOrHtmlForms } from '../form-entry-interop';
@@ -98,10 +99,16 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
         )}
         {allFormInfos?.length > 0 && (
           <>
-            <DataTable size={isDesktop(layout) ? 'sm' : 'lg'} rows={tableRows} headers={tableHeaders} isSortable={true}>
+            <DataTable
+              size={isDesktop(layout) ? 'sm' : 'lg'}
+              rows={tableRows}
+              headers={tableHeaders}
+              isSortable
+              useZebraStyles
+            >
               {({ rows, headers, getHeaderProps, getTableProps }) => (
                 <TableContainer className={styles.tableContainer}>
-                  <Table {...getTableProps()} useZebraStyles>
+                  <Table {...getTableProps()}>
                     <TableHead>
                       <TableRow>
                         {headers.map((header) => (
@@ -175,11 +182,17 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
             />
           </>
         )}
-        {isEmpty(allFormInfos) && (
-          <EmptyFormView
-            content={t('formSearchHint', 'Try searching for the form using an alternative name or keyword')}
-          />
-        )}
+        {isEmpty(allFormInfos) ? (
+          <Layer>
+            <Tile className={styles.tile}>
+              <EmptyDataIllustration />
+              <p className={styles.content}>{t('noFormsAvailable', 'There are no matching forms to display')}</p>
+              <p className={styles.helper}>
+                {t('formSearchHint', 'Try searching for the form using an alternative name or keyword')}
+              </p>
+            </Tile>
+          </Layer>
+        ) : null}
       </>
     </div>
   );

@@ -68,9 +68,9 @@ const SequenceTable: React.FC<SequenceTableProps> = ({ immunizations }) => {
 
   return (
     tableRows.length > 0 && (
-      <DataTable rows={tableRows} headers={tableHeader}>
+      <DataTable rows={tableRows} headers={tableHeader} useZebraStyles>
         {({ rows, headers, getHeaderProps, getTableProps }) => (
-          <Table {...getTableProps()} useZebraStyles>
+          <Table {...getTableProps()}>
             <TableHead>
               <TableRow>
                 {headers.map((header) => (

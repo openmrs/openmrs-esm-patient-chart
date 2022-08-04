@@ -24,8 +24,8 @@ const ClinicalFormActionButton: React.FC = () => {
       renderIcon={(props) => <Document size={20} {...props} />}
       hasIconOnly
       iconDescription={t('form', 'Form')}
-      tooltipAlignment="start"
-      tooltipPosition="left"
+      tooltipAlignment="end"
+      tooltipPosition="bottom"
     />
   );
 };
