@@ -1,7 +1,6 @@
 import React from 'react';
 import { Layer, Tile } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { Tile } from '@carbon/react';
 import { useLayoutType } from '@openmrs/esm-framework';
 import styles from './error-state.scss';
 

@@ -72,7 +72,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
     [t],
   );
 
-  const tableRows: Array<DataTableRow> = React.useMemo(() => {
+  const tableRows = React.useMemo(() => {
     return enrollments?.map((program) => {
       return {
         id: program.uuid,
