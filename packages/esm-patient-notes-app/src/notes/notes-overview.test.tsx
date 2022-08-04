@@ -3,7 +3,7 @@ import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { openmrsFetch, useConfig, usePagination } from '@openmrs/esm-framework';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
-import { mockVisitNotes, formattedVisitNotes } from '../../../../__mocks__/visit-notes.mock';
+import { mockVisitNotesRequest, formattedVisitNotes } from '../../../../__mocks__/visit-notes.mock';
 import { patientChartBasePath, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import { ConfigMock } from '../../../../__mocks__/chart-widgets-config.mock';
 import NotesOverview from './notes-overview.component';
@@ -85,7 +85,7 @@ describe('NotesOverview: ', () => {
   });
 
   test.skip("renders a tabular overview of the patient's visit notes when present", async () => {
-    mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockVisitNotes } });
+    mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockVisitNotesRequest } });
     mockUsePagination.mockReturnValueOnce({
       results: formattedVisitNotes.slice(0, 10),
       goTo: () => {},

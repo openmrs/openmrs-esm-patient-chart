@@ -1,21 +1,22 @@
 import React from 'react';
 import { screen, within } from '@testing-library/react';
-import { openmrsFetch, useConfig, usePagination } from '@openmrs/esm-framework';
+import { usePagination } from '@openmrs/esm-framework';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { mockVisitNotes, formattedVisitNotes } from '../../../../__mocks__/visit-notes.mock';
-import { patientChartBasePath, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
-import NotesDetailedSummary from './notes-detailed-summary.component';
-import { ConfigMock } from '../../../../__mocks__/chart-widgets-config.mock';
+import { patientChartBasePath, renderWithSwr } from '../../../../tools/test-helpers';
+import NotesMain from './notes-main.component';
+import { useVisitNotes } from './visit-notes.resource';
 
 const testProps = {
-  basePath: patientChartBasePath,
   patientUuid: mockPatient.id,
   showAddNote: false,
+  pageSize: 10,
+  urlLabel: window.spaBase + patientChartBasePath + '/summary',
+  pageUrl: 'Go to Summary',
 };
 
-const mockOpenmrsFetch = openmrsFetch as jest.Mock;
+const mockUseVisitNotes = useVisitNotes as jest.Mock;
 const mockUsePagination = usePagination as jest.Mock;
-const mockUseConfig = useConfig as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -32,31 +33,29 @@ jest.mock('@openmrs/esm-framework', () => {
   };
 });
 
+jest.mock('./visit-notes.resource', () => {
+  return { useVisitNotes: jest.fn().mockReturnValue([{}]) };
+});
+
 jest.mock('./notes.context', () => ({
   useNotesContext: jest.fn().mockReturnValue({
     patientUuid: mockPatient.id,
   }),
 }));
 
-describe('NotesDetailedSummary: ', () => {
-  beforeEach(() => {
-    mockUseConfig.mockReturnValue(ConfigMock);
-  });
+describe('NotesMain: ', () => {
+  test('renders an empty state view if encounter data is unavailable', async () => {
+    mockUseVisitNotes.mockReturnValueOnce({ data: { results: [] } });
 
-  test.skip('renders an empty state view if encounter data is unavailable', async () => {
-    mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
+    renderNotesMain();
 
-    renderNotesDetailedSummary();
-
-    await waitForLoadingToFinish();
-
-    expect(screen.getByRole('heading', { name: /visit notes/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Visit notes/i })).toBeInTheDocument();
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
     expect(screen.getByText(/There are no visit notes to display for this patient/i)).toBeInTheDocument();
     expect(screen.getByText(/Record visit notes/i)).toBeInTheDocument();
   });
 
-  test.skip('renders an error state view if there is a problem fetching encounter data', async () => {
+  test('renders an error state view if there is a problem fetching encounter data', async () => {
     const error = {
       message: 'You are not logged in',
       response: {
@@ -64,15 +63,12 @@ describe('NotesDetailedSummary: ', () => {
         statusText: 'Unauthorized',
       },
     };
+    mockUseVisitNotes.mockReturnValueOnce({ isError: error });
 
-    mockOpenmrsFetch.mockRejectedValueOnce(error);
-
-    renderNotesDetailedSummary();
-
-    await waitForLoadingToFinish();
+    renderNotesMain();
 
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /notes/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Visit notes/i })).toBeInTheDocument();
     expect(screen.getByText(/Error 401: Unauthorized/i)).toBeInTheDocument();
     expect(
       screen.getByText(
@@ -81,20 +77,18 @@ describe('NotesDetailedSummary: ', () => {
     ).toBeInTheDocument();
   });
 
-  test.skip("renders a tabular overview of the patient's encounters when present", async () => {
-    mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockVisitNotes } });
+  test("renders a tabular overview of the patient's encounters when present", async () => {
+    mockUseVisitNotes.mockReturnValueOnce({ visitNotes: mockVisitNotes });
     mockUsePagination.mockReturnValueOnce({
       results: formattedVisitNotes.slice(0, 10),
       goTo: () => {},
       currentPage: 1,
     });
 
-    renderNotesDetailedSummary();
-
-    await waitForLoadingToFinish();
+    renderNotesMain();
 
     expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /notes/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /visit notes/i })).toBeInTheDocument();
 
     const table = screen.getByRole('table');
 
@@ -119,6 +113,8 @@ describe('NotesDetailedSummary: ', () => {
   });
 });
 
-function renderNotesDetailedSummary() {
-  renderWithSwr(<NotesDetailedSummary {...testProps} />);
+function renderNotesMain() {
+  renderWithSwr(<NotesMain {...testProps} />);
 }
+
+
