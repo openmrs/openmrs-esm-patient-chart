@@ -2,10 +2,17 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabList } from '@carbon/react';
 import { LineChart } from '@carbon/charts-react';
-import { ScaleTypes } from '@carbon/charts/interfaces';
 import { formatDate, useConfig } from '@openmrs/esm-framework';
 import { useObs } from '../resources/useObs';
 import styles from './obs-graph.scss';
+
+enum ScaleTypes {
+  TIME = 'time',
+  LINEAR = 'linear',
+  LOG = 'log',
+  LABELS = 'labels',
+  LABELS_RATIO = 'labels-ratio',
+}
 
 interface ConceptDescriptor {
   label: string;

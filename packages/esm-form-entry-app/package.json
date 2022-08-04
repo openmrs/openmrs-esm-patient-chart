@@ -47,7 +47,6 @@
     "@angular/platform-browser-dynamic": "~11.2.14",
     "@angular/router": "~11.2.14",
     "@ng-select/ng-select": "^6.1.0",
-    "carbon-components": "^10.56.0",
     "hammerjs": "^2.0.8",
     "jspdf": "^1.5.3",
     "moment": "^2.17.1",
@@ -65,7 +64,8 @@
     "zone.js": "~0.10.2"
   },
   "peerDependencies": {
-    "@openmrs/esm-framework": "4.x",
+    "@openmrs/esm-framework": "3.x",
+    "carbon-components": "10.x",
     "rxjs": "6.x",
     "single-spa": "5.x",
     "systemjs": "6.x"

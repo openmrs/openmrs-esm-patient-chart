@@ -7,7 +7,7 @@ import {
   getExtensionNameFromId,
   useExtensionSlotMeta,
 } from '@openmrs/esm-framework';
-import { dashboardPath } from '../../constants';
+import { basePath, dashboardPath } from '../../constants';
 import styles from './dashboard-view.scss';
 
 function getColumnsLayoutStyle(dashboard: DashboardConfig) {
@@ -29,17 +29,18 @@ interface DashboardViewProps {
 
 export function DashboardView({ dashboard, patientUuid, patient }: DashboardViewProps) {
   const widgetMetas = useExtensionSlotMeta(dashboard.slot);
-  const dashboardMeta = useExtensionSlotMeta(dashboard.slot);
-  const { params } = useMatch(dashboardPath);
+  const {
+    params: { view },
+  } = useMatch(dashboardPath);
   const gridTemplateColumns = getColumnsLayoutStyle(dashboard);
 
   const state = React.useMemo(
     () => ({
-      basePath: params?.view,
+      basePath: view,
       patient,
       patientUuid,
     }),
-    [params.view, patientUuid, patient],
+    [patient, patientUuid, view],
   );
 
   const wrapItem = React.useCallback(

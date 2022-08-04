@@ -8,7 +8,7 @@ import { groupBy } from '../helpers';
 import { CompletedFormInfo } from '../types';
 import EmptyFormView from './empty-form.component';
 import FormView from './form-view.component';
-import styles from './forms.component.scss';
+import styles from './forms.scss';
 
 interface ConfigurableFormsProps {
   formsToDisplay: Array<CompletedFormInfo>;
