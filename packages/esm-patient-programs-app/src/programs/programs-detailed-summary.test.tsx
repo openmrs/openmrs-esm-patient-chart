@@ -8,6 +8,8 @@ import { mockEnrolledProgramsResponse } from '../../../../__mocks__/programs.moc
 import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import ProgramsDetailedSummary from './programs-detailed-summary.component';
 
+jest.setTimeout(20000);
+
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockUsePagination = usePagination as jest.Mock;
 

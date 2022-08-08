@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
-import Close from '@carbon/react/icons';
+import { Close } from '@carbon/react/icons';
 import { Attachment } from './attachments-types';
 import styles from './attachments-grid-overview.scss';
 

@@ -8,7 +8,7 @@
 .attachmentsHeader {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr auto;
-  grid-gap: $spacing-05;
+  grid-gap: spacing.$spacing-05;
   align-items: center;
   padding: spacing.$spacing-04 0 spacing.$spacing-04 spacing.$spacing-05;
   background-color: $ui-background;

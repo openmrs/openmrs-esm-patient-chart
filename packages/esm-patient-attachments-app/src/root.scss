@@ -7,11 +7,11 @@
 }
 
 .productiveHeading02 {
-  @include carbon--type-style("productive-heading-02");
+  @include type.type-style("productive-heading-02");
 }
 
 .bodyLong01 {
-  @include carbon--type-style("body-long-01");
+  @include type.type-style("body-long-01");
 }
 
 .muted {
@@ -19,8 +19,8 @@
 }
 
 .paddedProductiveHeading03 {
-  @include carbon--type-style("productive-heading-03");
-  padding: $spacing-05
+  @include type.type-style("productive-heading-03");
+  padding: spacing.$spacing-05
 }
 
 

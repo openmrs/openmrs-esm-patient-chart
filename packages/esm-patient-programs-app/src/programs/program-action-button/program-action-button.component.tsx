@@ -1,7 +1,7 @@
 import React from 'react';
-import { Button } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
-import TaskAdd20 from '@carbon/icons-react/es/task--add/20';
+import { Button } from '@carbon/react';
+import { TaskAdd } from '@carbon/react/icons';
 import { formEntrySub, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { ConfigurableProgram } from '../../types';
 
@@ -24,7 +24,7 @@ const ProgramActionButton: React.FC<ProgramActionButton> = ({ enrollment }) => {
     return (
       <Button
         onClick={() => launchEnrollmentForm(t('enrollment', 'Enrollment'))}
-        renderIcon={TaskAdd20}
+        renderIcon={(props) => <TaskAdd size={20} {...props} />}
         kind="tertiary"
         size="small"
       >
@@ -35,7 +35,7 @@ const ProgramActionButton: React.FC<ProgramActionButton> = ({ enrollment }) => {
   return (
     <Button
       onClick={() => launchEnrollmentForm(t('discontinue', 'Discontinue'))}
-      renderIcon={TaskAdd20}
+      renderIcon={(props) => <TaskAdd size={20} {...props} />}
       kind="danger--ghost"
       size="small"
     >

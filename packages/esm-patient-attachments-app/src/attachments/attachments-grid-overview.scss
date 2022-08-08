@@ -1,5 +1,6 @@
 @use '@carbon/styles/scss/spacing';
-@import "../root.scss";
+@use '~@carbon/styles/scss/colors';
+@import '../root.scss';
 
 .galleryContainer {
   display: grid;
@@ -26,7 +27,7 @@
   top: 0;
   left: 0;
   z-index: 8001;
-  background-color: $carbon--gray-90;
+  background-color: colors.$gray-90;
 }
 
 .leftPanel {
@@ -36,7 +37,7 @@
 }
 
 .rightPanel {
-  background-color: $carbon--gray-80;
+  background-color: colors.$gray-80;
   padding: spacing.$spacing-05;
   color: $ui-01;
 }
