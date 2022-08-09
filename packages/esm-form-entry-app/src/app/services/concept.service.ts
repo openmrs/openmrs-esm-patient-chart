@@ -30,7 +30,7 @@ export class ConceptService {
   }
 
   public searchBulkConceptByUUID(conceptUuids: Array<string>, lang: string): Observable<Array<ConceptMetadata>> {
-    const chunkSize = 50;
+    const chunkSize = 100;
     const observablesArray = [];
     const slicedConceptUuids = conceptUuids.reduceRight((acc, currentValue, i, array) => [...acc, array.splice(0, chunkSize)], []);
 
