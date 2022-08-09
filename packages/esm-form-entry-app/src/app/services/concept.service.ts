@@ -1,4 +1,4 @@
-import { forkJoin, Observable, of } from 'rxjs';
+import { forkJoin, Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
 
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -32,7 +32,10 @@ export class ConceptService {
   public searchBulkConceptByUUID(conceptUuids: Array<string>, lang: string): Observable<Array<ConceptMetadata>> {
     const chunkSize = 100;
     const observablesArray = [];
-    const slicedConceptUuids = conceptUuids.reduceRight((acc, currentValue, i, array) => [...acc, array.splice(0, chunkSize)], []);
+    const slicedConceptUuids = conceptUuids.reduceRight(
+      (acc, currentValue, i, array) => [...acc, array.splice(0, chunkSize)],
+      [],
+    );
 
     for (const conceptUuidsChunk of slicedConceptUuids) {
       observablesArray.push(
