@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './attachments-grid-overview.scss';
-import { Attachment } from './attachments-types';
+import { Attachment } from '../attachments-types';
 import { Button, OverflowMenu, OverflowMenuItem } from 'carbon-components-react';
 import Close from '@carbon/icons-react/es/close/24';
 import { useTranslation } from 'react-i18next';

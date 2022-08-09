@@ -26,7 +26,7 @@ function setupOpenMRS() {
       {
         name: 'capture-photo-widget',
         slot: 'capture-patient-photo-slot',
-        load: getAsyncLifecycle(() => import('./attachments/capture-photo.component'), {
+        load: getAsyncLifecycle(() => import('./camera-media-uploader/capture-photo.component'), {
           featureName: 'capture-photo-widget',
           moduleName,
         }),
@@ -43,7 +43,7 @@ function setupOpenMRS() {
       },
       {
         name: 'capture-photo-modal',
-        load: getAsyncLifecycle(() => import('./attachments/camera-upload.component'), {
+        load: getAsyncLifecycle(() => import('./camera-media-uploader/camera-media-uploader.component'), {
           featureName: 'capture-photo-modal',
           moduleName,
         }),
@@ -52,7 +52,7 @@ function setupOpenMRS() {
       },
       {
         name: 'files-preview-modal',
-        load: getAsyncLifecycle(() => import('./attachments/file-preview.component'), {
+        load: getAsyncLifecycle(() => import('./camera-media-uploader/file-preview.component'), {
           featureName: 'files-preview-modal',
           moduleName,
         }),

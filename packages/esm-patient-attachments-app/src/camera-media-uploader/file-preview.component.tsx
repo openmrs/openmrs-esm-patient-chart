@@ -1,52 +1,49 @@
-import React, { SyntheticEvent, useCallback, useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import React, { useContext, useState, useEffect, useCallback, SyntheticEvent } from 'react';
 import { UserHasAccess } from '@openmrs/esm-framework';
 import { Button, ButtonSet, TextArea, TextInput } from 'carbon-components-react';
-import styles from './image-preview.scss';
-import { UploadedFile } from './attachments-types';
+import styles from './file-preview.scss';
+import { UploadedFile } from '../attachments-types';
 import FileRegular from '../assets/file-regular.svg';
+import CameraMediaUploaderContext from './camera-media-uploader-context.resources';
+import { useTranslation } from 'react-i18next';
 
 export interface FilePreviewContainerProps {
-  uploadedFiles: Array<UploadedFile>;
-  onSaveFile?: (dataUri: Array<UploadedFile>) => void;
-  onCancelCapture?(): void;
+  onCompletion: () => void;
 }
 
-const FilePreviewContainer: React.FC<FilePreviewContainerProps> = ({ uploadedFiles, onSaveFile, onCancelCapture }) => {
+const FilePreviewContainer: React.FC<FilePreviewContainerProps> = ({ onCompletion }) => {
+  const { filesToUpload, clearData, setFilesToUpload } = useContext(CameraMediaUploaderContext);
   const { t } = useTranslation();
   const [currentFile, setCurrentFile] = useState(1);
-  const [selectedAttachments, setSelectedAttachments] = useState<Array<UploadedFile>>([]);
 
   const moveToNextFile = useCallback(() => {
-    if (currentFile < uploadedFiles.length) {
+    if (currentFile < filesToUpload.length) {
       setCurrentFile(currentFile + 1);
+    } else {
+      onCompletion();
     }
-  }, [setCurrentFile, currentFile, uploadedFiles]);
+  }, [setCurrentFile, currentFile, filesToUpload]);
 
   const handleSave = useCallback(
-    (dataUri: UploadedFile) => {
-      if (currentFile === uploadedFiles.length) {
-        onSaveFile([...selectedAttachments, dataUri]);
-      } else {
-        setSelectedAttachments((selectedAttachments) => [...selectedAttachments, dataUri]);
-        moveToNextFile();
-      }
+    (updatedFile: UploadedFile) => {
+      setFilesToUpload((filesToUpload) => [...filesToUpload, updatedFile]);
+      moveToNextFile();
     },
-    [moveToNextFile, setSelectedAttachments, uploadedFiles, selectedAttachments, currentFile, onSaveFile],
+    [moveToNextFile, setFilesToUpload, filesToUpload, currentFile, onCompletion],
   );
 
   return (
     <div className={styles.filePreviewContainer}>
       <h3 className={styles.paddedProductiveHeading03}>
         {t('addAttachment', 'Add Attachment')}{' '}
-        {uploadedFiles.length > 1 && `(${currentFile} of ${uploadedFiles.length})`}
+        {filesToUpload.length > 1 && `(${currentFile} of ${filesToUpload.length})`}
       </h3>
       <FilePreview
-        uploadedFile={uploadedFiles[currentFile - 1]}
-        onCancelCapture={onCancelCapture}
+        uploadedFile={filesToUpload[currentFile - 1]}
+        clearData={clearData}
         onSaveFile={handleSave}
         moveToNextFile={moveToNextFile}
-        collectDescription={uploadedFiles[currentFile - 1].fileType === 'image'}
+        collectDescription={filesToUpload[currentFile - 1].fileType === 'image'}
       />
     </div>
   );
@@ -56,11 +53,11 @@ interface FilePreviewProps {
   uploadedFile: UploadedFile;
   collectDescription?: boolean;
   onSaveFile: (dataUri: UploadedFile) => void;
-  onCancelCapture?(): void;
+  clearData?(): void;
   moveToNextFile: () => void;
 }
 
-const FilePreview: React.FC<FilePreviewProps> = ({ uploadedFile, collectDescription, onSaveFile, onCancelCapture }) => {
+const FilePreview: React.FC<FilePreviewProps> = ({ uploadedFile, collectDescription, onSaveFile, clearData }) => {
   const [fileName, setFileName] = useState('');
   const [fileDescription, setFileDescription] = useState('');
   const { t } = useTranslation();
@@ -86,9 +83,9 @@ const FilePreview: React.FC<FilePreviewProps> = ({ uploadedFile, collectDescript
   const cancelCapture = useCallback(
     (e: SyntheticEvent) => {
       e.preventDefault();
-      onCancelCapture?.();
+      clearData?.();
     },
-    [onCancelCapture],
+    [clearData],
   );
 
   const updateFileName = useCallback(

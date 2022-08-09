@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './attachments-grid-overview.scss';
-import { Attachment } from './attachments-types';
+import { Attachment } from '../attachments-types';
 import AttachmentThumbnail from './attachment-thumbnail.component';
 import { SkeletonPlaceholder } from 'carbon-components-react';
 
