@@ -39,7 +39,7 @@ const UploadingStatusComponent: React.FC<UploadingStatusComponentProps> = () => 
       setUploadingComplete(true);
       onCompletion?.();
     });
-  }, [onCompletion, saveFile, filesToUpload, t, filesToUpload]);
+  }, [onCompletion, saveFile, filesToUpload, t, setFilesToUpload]);
 
   return (
     <div className={styles.cameraSection}>

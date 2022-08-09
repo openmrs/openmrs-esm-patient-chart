@@ -97,7 +97,7 @@ const CameraMediaUploaderModal: React.FC<CameraMediaUploaderModalProps> = ({
 
   const startUploadingToServer = useCallback(() => {
     setUploadFilesToServer(true);
-  }, [setUploadFilesToServer, setFilesToUpload]);
+  }, [setUploadFilesToServer]);
 
   // If the files are uploaded on the frontend, then the file preview modal should open up.
   if (!uploadFilesToServer && filesToUpload.length) {

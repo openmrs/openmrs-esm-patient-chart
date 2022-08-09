@@ -22,14 +22,14 @@ const FilePreviewContainer: React.FC<FilePreviewContainerProps> = ({ onCompletio
     } else {
       onCompletion();
     }
-  }, [setCurrentFile, currentFile, filesToUpload]);
+  }, [setCurrentFile, currentFile, filesToUpload, onCompletion]);
 
   const handleSave = useCallback(
     (updatedFile: UploadedFile) => {
       setFilesToUpload((filesToUpload) => [...filesToUpload, updatedFile]);
       moveToNextFile();
     },
-    [moveToNextFile, setFilesToUpload, filesToUpload, currentFile, onCompletion],
+    [moveToNextFile, setFilesToUpload],
   );
 
   return (
