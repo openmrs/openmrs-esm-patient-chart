@@ -1,4 +1,4 @@
-import {forkJoin, forkJoin as observableForkJoin, Observable, of} from 'rxjs';
+import { forkJoin, Observable, of } from 'rxjs';
 import { Injectable } from '@angular/core';
 
 import { HttpClient, HttpHeaders } from '@angular/common/http';
