@@ -113,6 +113,7 @@ export function launchPatientWorkspace(name: string, additionalProps?: object) {
     additionalProps,
   };
   const existingWorkspaces = state.openWorkspaces.filter((w) => w.type == newWorkspace.type);
+
   if (existingWorkspaces.length == 0) {
     store.setState({ ...state, openWorkspaces: [newWorkspace, ...state.openWorkspaces] });
   } else {

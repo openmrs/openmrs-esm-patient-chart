@@ -1,11 +1,11 @@
 import React from 'react';
-import { screen, render } from '@testing-library/react';
-import { mockMedicationOrderSearchResults } from '../../../../__mocks__/medication.mock';
-import OrderBasketSearchResults from './order-basket-search-results.component';
-import { searchMedications } from './drug-search';
-import { paginate } from '../utils/pagination';
-import { getByTextWithMarkup } from '../../../../tools/test-helpers';
+import { screen, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { getByTextWithMarkup } from '../../../../tools/test-helpers';
+import { mockMedicationOrderSearchResults } from '../../../../__mocks__/medication.mock';
+import { paginate } from '../utils/pagination';
+import { searchMedications } from './drug-search';
+import OrderBasketSearchResults from './order-basket-search-results.component';
 
 const mockPaginate = paginate as jest.Mock;
 const mockSearchMedications = searchMedications as jest.Mock;
@@ -29,8 +29,10 @@ jest.mock('../utils/pagination', () => ({
   paginate: jest.fn(),
 }));
 
-describe('OrderBasketSearchResults: ', () => {
+describe('OrderBasketSearchResults', () => {
   test('renders matching orders as clickable tiles after searching for a drug order', async () => {
+    const user = userEvent.setup();
+
     mockSearchMedications.mockResolvedValue(mockMedicationOrderSearchResults);
     mockPaginate.mockReturnValue([mockMedicationOrderSearchResults]);
 
@@ -43,7 +45,8 @@ describe('OrderBasketSearchResults: ', () => {
     expect(getByTextWithMarkup(/Aspirin — 243 mg — Tablet\s*Once daily — Oral/i)).toBeInTheDocument();
     expect(screen.getAllByRole('button', { name: /Immediately add to basket/i }).length).toEqual(3);
 
-    userEvent.click(screen.getAllByRole('listitem')[0]);
+    await waitFor(() => user.click(screen.getAllByRole('listitem')[0]));
+
     expect(testProps.onSearchResultClicked).toHaveBeenCalledWith(mockMedicationOrderSearchResults[0], false);
   });
 });

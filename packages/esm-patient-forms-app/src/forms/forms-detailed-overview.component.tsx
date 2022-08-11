@@ -1,8 +1,7 @@
 import React from 'react';
-import Forms from './forms.component';
 import { useTranslation } from 'react-i18next';
 import { useActivePatientEnrollment } from '@openmrs/esm-patient-common-lib';
-import { InlineLoading } from 'carbon-components-react';
+import Forms from './forms.component';
 
 interface FormsProps {
   patientUuid: string;
@@ -19,19 +18,15 @@ const FormsDetailedOverView: React.FC<FormsProps> = ({ patientUuid, patient, isO
 
   return (
     <>
-      {isLoading ? (
-        <InlineLoading description={t('loading', 'Loading...')} />
-      ) : (
-        <Forms
-          patientUuid={patientUuid}
-          patient={patient}
-          pageSize={pageSize}
-          urlLabel={urlLabel}
-          pageUrl={pageUrl}
-          isOffline={isOffline}
-          activePatientEnrollment={activePatientEnrollment}
-        />
-      )}
+      <Forms
+        patientUuid={patientUuid}
+        patient={patient}
+        pageSize={pageSize}
+        urlLabel={urlLabel}
+        pageUrl={pageUrl}
+        isOffline={isOffline}
+        activePatientEnrollment={activePatientEnrollment}
+      />
     </>
   );
 };

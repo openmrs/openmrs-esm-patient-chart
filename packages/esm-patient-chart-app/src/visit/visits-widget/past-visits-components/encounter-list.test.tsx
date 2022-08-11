@@ -1,10 +1,12 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import { usePagination } from '@openmrs/esm-framework';
 import { renderWithSwr } from '../../../../../../tools/test-helpers';
 import { mockEncounters } from '../../../../../../__mocks__/visits.mock';
 import EncounterList from './encounter-list.component';
+
+jest.setTimeout(10000);
 
 const testProps = {
   showAllEncounters: true,
@@ -42,7 +44,9 @@ describe('EncounterList', () => {
     expect(screen.getByText(/no encounters found/i)).toBeInTheDocument();
   });
 
-  it("renders a tabular overview of the patient's clinical encounters", () => {
+  it("renders a tabular overview of the patient's clinical encounters", async () => {
+    const user = userEvent.setup();
+
     testProps.encounters = mockEncounters;
 
     mockedUsePagination.mockImplementationOnce(() => ({
@@ -77,27 +81,27 @@ describe('EncounterList', () => {
 
     // filter table to show only `Admission` encounters
     const encounterTypeFilter = screen.getByRole('button', { name: /filter by encounter type/i });
-    userEvent.click(encounterTypeFilter);
-    userEvent.click(screen.getByRole('option', { name: /Admission/i }));
+
+    await waitFor(() => user.click(encounterTypeFilter));
+    await waitFor(() => user.click(screen.getByRole('option', { name: /Admission/i })));
 
     expect(screen.queryByRole('cell', { name: /visit note/i })).not.toBeInTheDocument();
     expect(screen.getByRole('cell', { name: /admission/i })).toBeInTheDocument();
 
     // show all encounter types
-    userEvent.click(encounterTypeFilter);
-    userEvent.click(screen.getByRole('option', { name: /all/i }));
+    await waitFor(() => user.click(encounterTypeFilter));
+    await waitFor(() => user.click(screen.getByRole('option', { name: /all/i })));
 
-    expect(screen.getByText(/admission/i)).toBeInTheDocument();
     expect(screen.getAllByText(/visit note/i).length).toEqual(2);
 
     // filter table by typing in the searchbox
-    userEvent.type(searchbox, 'Dennis');
+    await waitFor(() => user.type(searchbox, 'Dennis'));
 
     expect(screen.getByText(/dennis/i)).toBeInTheDocument();
     expect(screen.queryByText(/user one/i)).not.toBeInTheDocument();
 
-    userEvent.clear(searchbox);
-    userEvent.type(searchbox, 'luke skywalker');
+    await waitFor(() => user.clear(searchbox));
+    await waitFor(() => user.type(searchbox, 'luke skywalker'));
 
     expect(screen.getByText(/no patients to display/i)).toBeInTheDocument();
     expect(screen.getByText(/check the filters above/i)).toBeInTheDocument();

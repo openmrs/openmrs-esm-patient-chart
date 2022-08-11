@@ -1,6 +1,6 @@
 import React from 'react';
-import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 import { SWRConfig } from 'swr';
+import { render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 import { mockPatient } from '../__mocks__/patient.mock';
 
 const swrWrapper = ({ children }) => {

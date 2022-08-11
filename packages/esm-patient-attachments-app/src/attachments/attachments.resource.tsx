@@ -1,6 +1,6 @@
-import { FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
 import useSWR from 'swr';
+import { FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
 import { AttachmentResponse, UploadedFile } from './attachments-types';
 
 export const attachmentUrl = '/ws/rest/v1/attachment';

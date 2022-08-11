@@ -1,9 +1,9 @@
 import React from 'react';
-import { Redirect } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import { useExtensionStore } from '@openmrs/esm-framework';
 import { useNavGroups } from '@openmrs/esm-patient-common-lib';
-import { basePath } from '../../constants';
 import { DashboardView, DashboardConfig } from './dashboard-view.component';
+import { basePath } from '../../constants';
 
 function makePath(target: DashboardConfig, params: Record<string, string> = {}) {
   const parts = `${basePath}/${encodeURIComponent(target.title)}`.split('/');
@@ -54,7 +54,7 @@ const ChartReview: React.FC<ChartReviewProps> = ({ patientUuid, patient, view })
     return null;
   } else if (!dashboard) {
     return (
-      <Redirect
+      <Navigate
         to={makePath(defaultDashboard, {
           patientUuid,
         })}

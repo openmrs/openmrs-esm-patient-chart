@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import ShoppingCart16 from '@carbon/icons-react/es/shopping--cart/16';
-import styles from './order-basket-search-results.scss';
-import { Button, Link, Pagination, ClickableTile } from 'carbon-components-react';
+import { Button, Link, Pagination, ClickableTile } from '@carbon/react';
+import { ShoppingCart } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { createErrorHandler, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { searchMedications } from './drug-search';
 import { OrderBasketItem } from '../types/order-basket-item';
 import { paginate } from '../utils/pagination';
 import { ConfigObject } from '../config-schema';
+import styles from './order-basket-search-results.scss';
 
 export interface OrderBasketSearchResultsProps {
   searchTerm: string;
@@ -80,7 +80,7 @@ export default function OrderBasketSearchResults({
                   className={styles.addToBasketButton}
                   kind="ghost"
                   hasIconOnly={true}
-                  renderIcon={() => <ShoppingCart16 />}
+                  renderIcon={(props) => <ShoppingCart size={16} {...props} />}
                   iconDescription={t('directlyAddToBasket', 'Immediately add to basket')}
                   onClick={() => handleSearchResultClicked(result, true)}
                 />

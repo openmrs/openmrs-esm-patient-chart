@@ -1,14 +1,12 @@
 import React, { MouseEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 import capitalize from 'lodash-es/capitalize';
-import ChevronDown16 from '@carbon/icons-react/es/chevron--down/16';
-import ChevronUp16 from '@carbon/icons-react/es/chevron--up/16';
-import OverflowMenuVertical16 from '@carbon/icons-react/es/overflow-menu--vertical/16';
+import { Button } from '@carbon/react';
+import { ChevronDown, ChevronUp, OverflowMenuVertical } from '@carbon/react/icons';
+import { ExtensionSlot, age, formatDate, parseDate } from '@openmrs/esm-framework';
 import ContactDetails from '../contact-details/contact-details.component';
 import CustomOverflowMenuComponent from '../ui-components/overflow-menu.component';
 import styles from './patient-banner.scss';
-import { useTranslation } from 'react-i18next';
-import { Button } from 'carbon-components-react';
-import { ExtensionSlot, age, formatDate, parseDate } from '@openmrs/esm-framework';
 
 interface PatientBannerProps {
   patient: fhir.Patient;
@@ -84,7 +82,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
                   menuTitle={
                     <>
                       <span className={styles.actionsButtonText}>{t('actions', 'Actions')}</span>{' '}
-                      <OverflowMenuVertical16 style={{ marginLeft: '0.5rem' }} />
+                      <OverflowMenuVertical size={16} style={{ marginLeft: '0.5rem' }} />
                     </>
                   }
                   dropDownMenu={showDropdown}
@@ -110,7 +108,9 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
             </span>
             <Button
               kind="ghost"
-              renderIcon={showContactDetails ? ChevronUp16 : ChevronDown16}
+              renderIcon={(props) =>
+                showContactDetails ? <ChevronUp size={16} {...props} /> : <ChevronDown size={16} {...props} />
+              }
               iconDescription="Toggle contact details"
               onClick={toggleContactDetails}
               style={{ marginTop: '-0.25rem' }}

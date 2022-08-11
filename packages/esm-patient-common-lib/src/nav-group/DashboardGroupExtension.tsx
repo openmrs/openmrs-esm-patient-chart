@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { ExtensionSlot } from '@openmrs/esm-framework';
-import { Accordion, AccordionItem } from 'carbon-components-react';
+import { Accordion, AccordionItem } from '@carbon/react';
 import { registerNavGroup } from '..';
 
 export interface DashboardGroupExtensionProps {

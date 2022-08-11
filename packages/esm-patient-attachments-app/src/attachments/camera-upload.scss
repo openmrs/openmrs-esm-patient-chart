@@ -1,3 +1,5 @@
+@use '@carbon/styles/scss/spacing';
+@import '~@openmrs/esm-styleguide/src/vars';
 @import '../root.scss';
 
 .cameraSection {
@@ -27,13 +29,13 @@
 }
 
 .tabs {
-  .bx--tab-content {
+  .cds--tab-content {
     display: none;
   }
 }
 
 .tabContent {
-  padding: $spacing-05
+  padding: spacing.$spacing-05
 }
 
 @media (max-width: $breakpoint-tablet-max){
@@ -47,7 +49,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  margin: $spacing-05;
+  margin: spacing.$spacing-05;
   height: 25rem;
   overflow-y: auto;
   border: 1px dashed $ui-04;

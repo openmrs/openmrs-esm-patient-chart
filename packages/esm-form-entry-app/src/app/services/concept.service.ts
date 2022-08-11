@@ -29,7 +29,7 @@ export class ConceptService {
     });
   }
 
-  public searchBulkConceptByUUID(conceptUuids: Array<string>, lang: string): Observable<Array<ConceptMetadata>> {
+  public searchBulkConceptsByUUID(conceptUuids: Array<string>, lang: string): Observable<Array<ConceptMetadata>> {
     const observablesArray = [];
     const relativeConceptLabelUrls = ConceptService.getRelativeConceptLabelUrls(conceptUuids, lang);
 

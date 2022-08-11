@@ -1,10 +1,22 @@
-import React, { SyntheticEvent, useEffect } from 'react';
+import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import 'dayjs/plugin/utc';
 import debounce from 'lodash-es/debounce';
+import { BehaviorSubject } from 'rxjs';
 import { useSWRConfig } from 'swr';
-import styles from './conditions-form.scss';
-import { useTranslation } from 'react-i18next';
+import {
+  DatePicker,
+  DatePickerInput,
+  FormGroup,
+  Layer,
+  RadioButton,
+  RadioButtonGroup,
+  Search,
+  SearchSkeleton,
+  Stack,
+  Tile,
+} from '@carbon/react';
 import {
   createErrorHandler,
   fhirBaseUrl,
@@ -13,20 +25,8 @@ import {
   useLayoutType,
   useSession,
 } from '@openmrs/esm-framework';
-import {
-  Tile,
-  SearchSkeleton,
-  Search,
-  RadioButtonGroup,
-  RadioButton,
-  FormGroup,
-  DatePickerInput,
-  DatePicker,
-} from 'carbon-components-react';
 import { createPatientCondition, searchConditionConcepts, CodedCondition } from './conditions.resource';
-import { BehaviorSubject } from 'rxjs';
-
-const searchTimeoutInMs = 500;
+import styles from './conditions-form.scss';
 
 interface ConditionsWidgetProps {
   patientUuid: string;
@@ -41,6 +41,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   setHasSubmissibleValue,
   submissionNotifier,
 }) => {
+  const searchTimeoutInMs = 500;
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
@@ -182,95 +183,117 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
 
   return (
     <div className={styles.formContainer}>
-      <FormGroup legendText={t('condition', 'Condition')}>
-        <Search
-          light={isTablet}
-          size="xl"
-          id="conditionsSearch"
-          labelText={t('enterCondition', 'Enter condition')}
-          placeholder={t('searchConditions', 'Search conditions')}
-          onChange={handleSearchChange}
-          value={(() => {
-            if (searchTerm) {
-              return searchTerm;
-            }
-            if (selectedCondition && !isSearching) {
-              return selectedCondition.display;
-            }
-            return '';
-          })()}
-        />
-        <div>
-          {(() => {
-            if (!searchTerm || selectedCondition) return null;
-            if (isSearching) return <SearchSkeleton role="progressbar" />;
-            if (searchResults && searchResults.length) {
+      <Stack gap={7}>
+        <FormGroup legendText={t('condition', 'Condition')}>
+          {isTablet ? (
+            <Layer>
+              <Search
+                size="lg"
+                id="conditionsSearch"
+                labelText={t('enterCondition', 'Enter condition')}
+                placeholder={t('searchConditions', 'Search conditions')}
+                onChange={handleSearchChange}
+                value={(() => {
+                  if (searchTerm) {
+                    return searchTerm;
+                  }
+                  if (selectedCondition && !isSearching) {
+                    return selectedCondition.display;
+                  }
+                  return '';
+                })()}
+              />
+            </Layer>
+          ) : (
+            <Search
+              size="lg"
+              id="conditionsSearch"
+              labelText={t('enterCondition', 'Enter condition')}
+              placeholder={t('searchConditions', 'Search conditions')}
+              onChange={handleSearchChange}
+              value={(() => {
+                if (searchTerm) {
+                  return searchTerm;
+                }
+                if (selectedCondition && !isSearching) {
+                  return selectedCondition.display;
+                }
+                return '';
+              })()}
+            />
+          )}
+          <div>
+            {(() => {
+              if (!searchTerm || selectedCondition) return null;
+              if (isSearching) return <SearchSkeleton role="progressbar" />;
+              if (searchResults && searchResults.length) {
+                return (
+                  <ul className={styles.conditionsList}>
+                    {searchResults.map((condition, index) => (
+                      <li
+                        role="menuitem"
+                        className={styles.condition}
+                        key={index}
+                        onClick={() => handleConditionChange(condition)}
+                      >
+                        {condition.display}
+                      </li>
+                    ))}
+                  </ul>
+                );
+              }
               return (
-                <ul className={styles.conditionsList}>
-                  {searchResults.map((condition, index) => (
-                    <li
-                      role="menuitem"
-                      className={styles.condition}
-                      key={index}
-                      onClick={() => handleConditionChange(condition)}
-                    >
-                      {condition.display}
-                    </li>
-                  ))}
-                </ul>
+                <Tile light={isTablet} className={styles.emptyResults}>
+                  <span>
+                    {t('noResultsFor', 'No results for')} <strong>"{searchTerm}"</strong>
+                  </span>
+                </Tile>
               );
-            }
-            return (
-              <Tile light={isTablet} className={styles.emptyResults}>
-                <span>
-                  {t('noResultsFor', 'No results for')} <strong>"{searchTerm}"</strong>
-                </span>
-              </Tile>
-            );
-          })()}
-        </div>
-      </FormGroup>
-      <FormGroup legendText={t('onsetDate', 'Onset date')}>
-        <DatePicker
-          id="onsetDate"
-          datePickerType="single"
-          dateFormat="d/m/Y"
-          maxDate={new Date().toISOString()}
-          placeholder="dd/mm/yyyy"
-          onChange={([date]) => setOnsetDate(date)}
-          value={onsetDate}
-          light={isTablet}
-        >
-          <DatePickerInput id="onsetDateInput" labelText="" />
-        </DatePicker>
-      </FormGroup>
-      <FormGroup legendText={t('currentStatus', 'Current status')}>
-        <RadioButtonGroup
-          defaultSelected="active"
-          name="clinicalStatus"
-          valueSelected="active"
-          orientation="vertical"
-          onChange={(status) => setClinicalStatus(status.toString())}
-        >
-          <RadioButton id="active" labelText="Active" value="active" />
-          <RadioButton id="inactive" labelText="Inactive" value="inactive" />
-        </RadioButtonGroup>
-      </FormGroup>
-      {clinicalStatus === 'inactive' && (
-        <DatePicker
-          id="endDate"
-          datePickerType="single"
-          dateFormat="d/m/Y"
-          minDate={new Date(onsetDate).toISOString()}
-          maxDate={dayjs().utc().format()}
-          placeholder="dd/mm/yyyy"
-          onChange={([date]) => setEndDate(date)}
-          value={endDate}
-          light={isTablet}
-        >
-          <DatePickerInput id="endDateInput" labelText={t('endDate', 'End date')} />
-        </DatePicker>
-      )}
+            })()}
+          </div>
+        </FormGroup>
+        <FormGroup legendText={t('onsetDate', 'Onset date')}>
+          <DatePicker
+            id="onsetDate"
+            datePickerType="single"
+            dateFormat="d/m/Y"
+            maxDate={new Date().toISOString()}
+            placeholder="dd/mm/yyyy"
+            onChange={([date]) => setOnsetDate(date)}
+            value={onsetDate}
+            light={isTablet}
+          >
+            <DatePickerInput id="onsetDateInput" labelText="" />
+          </DatePicker>
+        </FormGroup>
+        <FormGroup legendText={t('currentStatus', 'Current status')}>
+          <RadioButtonGroup
+            defaultSelected="active"
+            name="clinicalStatus"
+            valueSelected="active"
+            orientation="vertical"
+            onChange={(status) => setClinicalStatus(status.toString())}
+          >
+            <RadioButton id="active" labelText="Active" value="active" />
+            <RadioButton id="inactive" labelText="Inactive" value="inactive" />
+          </RadioButtonGroup>
+        </FormGroup>
+        {clinicalStatus === 'inactive' && (
+          <DatePicker
+            id="endDate"
+            datePickerType="single"
+            dateFormat="d/m/Y"
+            minDate={new Date(onsetDate).toISOString()}
+            maxDate={dayjs().utc().format()}
+            placeholder="dd/mm/yyyy"
+            onChange={([date]) => setEndDate(date)}
+            value={endDate}
+            light={isTablet}
+          >
+            <DatePickerInput id="endDateInput" labelText={t('endDate', 'End date')} />
+          </DatePicker>
+        )}
+      </Stack>
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import React from 'react';
-import Circle16 from '@carbon/icons-react/es/circle--solid/16';
+import { CircleSolid } from '@carbon/react/icons';
 import { ObservationInterpretation } from '../vitals.resource';
 import styles from './vitals-header-item.scss';
 
@@ -17,7 +17,7 @@ const VitalsHeaderItem: React.FC<VitalsHeaderItemProps> = ({ interpretation, val
     <div className={`${styles.container} ${flaggedAbnormal ? styles['abnormal-value'] : ''}`}>
       <div className={styles['label-container']}>
         <label className={styles.label}>{unitName}</label>
-        {flaggedAbnormal ? <Circle16 title="abnormal value" className={styles['danger-icon']} /> : null}
+        {flaggedAbnormal ? <CircleSolid size={16} title="abnormal value" className={styles['danger-icon']} /> : null}
       </div>
       <div className={styles['value-container']}>
         <label className={styles['pad-right']}>

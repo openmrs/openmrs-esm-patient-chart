@@ -1,5 +1,4 @@
 import React from 'react';
-import dayjs from 'dayjs';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
@@ -71,6 +70,8 @@ describe('AppointmentForm', () => {
   });
 
   it('closes the form and the workspace when the cancel button is clicked', async () => {
+    const user = userEvent.setup();
+
     mockOpenmrsFetch.mockReturnValueOnce(mockAppointmentsData);
 
     renderAppointmentsForm();
@@ -78,113 +79,110 @@ describe('AppointmentForm', () => {
     await waitForLoadingToFinish();
 
     const cancelButton = screen.getByRole('button', { name: /Discard/i });
-    userEvent.click(cancelButton);
+    await waitFor(() => user.click(cancelButton));
 
     expect(testProps.closeWorkspace).toHaveBeenCalledTimes(1);
   });
 
-  describe('Form submission', () => {
-    let discardButton: HTMLElement;
-    let saveButton: HTMLElement;
-    let dateInput: HTMLElement;
-    let timeInput: HTMLElement;
-    let timeFormat: HTMLElement;
-    let serviceSelect: HTMLElement;
-    let serviceTypeSelect: HTMLElement;
-    let appointmentTypeSelect: HTMLElement;
-    let noteTextbox: HTMLElement;
+  it('renders a success toast notification upon successfully scheduling an appointment', async () => {
+    const user = userEvent.setup();
 
-    beforeEach(async () => {
-      mockOpenmrsFetch.mockReturnValueOnce({ data: mockUseAppointmentServiceData });
+    mockOpenmrsFetch.mockReturnValueOnce({ data: mockUseAppointmentServiceData });
+    mockCreateAppointment.mockResolvedValueOnce({ status: 200, statusText: 'Ok' });
 
-      renderAppointmentsForm();
+    renderAppointmentsForm();
 
-      await waitForLoadingToFinish();
+    await waitForLoadingToFinish();
 
-      discardButton = screen.getByRole('button', { name: /Discard/i });
-      saveButton = screen.getByRole('button', { name: /Save and close/i });
-      dateInput = screen.getByRole('textbox', { name: /Date/i });
-      timeInput = screen.getByRole('textbox', { name: /Time/i });
-      timeFormat = screen.getByRole('combobox', { name: /Time/i });
-      serviceSelect = screen.getByRole('combobox', { name: /Select a service/i });
-      serviceTypeSelect = screen.getByRole('combobox', { name: /Select the type of service/i });
-      appointmentTypeSelect = screen.getByRole('combobox', { name: /Select the type of appointment/i });
-      noteTextbox = screen.getByRole('textbox', { name: /Write an additional note/i });
-    });
+    const saveButton = screen.getByRole('button', { name: /Save and close/i });
+    const dateInput = screen.getByRole('textbox', { name: /Date/i });
+    const timeInput = screen.getByRole('textbox', { name: /Time/i });
+    const timeFormat = screen.getByRole('combobox', { name: /Time/i });
+    const serviceSelect = screen.getByRole('combobox', { name: /Select a service/i });
+    const serviceTypeSelect = screen.getByRole('combobox', { name: /Select the type of service/i });
+    const appointmentTypeSelect = screen.getByRole('combobox', { name: /Select the type of appointment/i });
 
-    it('renders a success toast notification upon successfully scheduling an appointment', async () => {
-      mockCreateAppointment.mockResolvedValueOnce({ status: 200, statusText: 'Ok' });
+    expect(saveButton).toBeDisabled();
 
-      expect(saveButton).toBeDisabled();
+    await waitFor(() => user.clear(dateInput));
+    await waitFor(() => user.type(dateInput, '4/4/2021'));
+    await waitFor(() => user.clear(timeInput));
+    await waitFor(() => user.type(timeInput, '09:30'));
+    await waitFor(() => user.selectOptions(timeFormat, 'AM'));
+    await waitFor(() => user.selectOptions(serviceSelect, ['Outpatient']));
+    await waitFor(() => user.selectOptions(serviceTypeSelect, ['Chemotherapy']));
+    await waitFor(() => user.selectOptions(appointmentTypeSelect, ['Scheduled']));
 
-      userEvent.clear(dateInput);
-      userEvent.type(dateInput, '4/4/2021');
-      userEvent.clear(timeInput);
-      userEvent.type(timeInput, '09:30');
-      userEvent.selectOptions(timeFormat, 'AM');
-      userEvent.selectOptions(serviceSelect, ['Outpatient']);
-      userEvent.selectOptions(serviceTypeSelect, ['Chemotherapy']);
-      userEvent.selectOptions(appointmentTypeSelect, ['Scheduled']);
+    expect(saveButton).not.toBeDisabled();
 
-      expect(saveButton).not.toBeDisabled();
+    await waitFor(() => user.click(saveButton));
 
-      await waitFor(() => userEvent.click(saveButton));
+    expect(mockCreateAppointment).toHaveBeenCalledTimes(1);
+    expect(mockCreateAppointment).toHaveBeenCalledWith(
+      expect.objectContaining({
+        appointmentKind: 'Scheduled',
+        serviceUuid: mockUseAppointmentServiceData[0].uuid,
+        providerUuid: mockSessionDataResponse.data.currentProvider.uuid,
+        providers: [{ uuid: mockSessionDataResponse.data.currentProvider.uuid, comments: '' }],
+        locationUuid: mockLocationsDataResponse.data.results[1].uuid,
+        patientUuid: mockPatient.id,
+      }),
+      new AbortController(),
+    );
 
-      expect(mockCreateAppointment).toHaveBeenCalledTimes(1);
-      expect(mockCreateAppointment).toHaveBeenCalledWith(
-        expect.objectContaining({
-          appointmentKind: 'Scheduled',
-          serviceUuid: mockUseAppointmentServiceData[0].uuid,
-          startDateTime: dayjs(new Date('2021-04-04T09:30:00')).format(),
-          endDateTime: dayjs(new Date('2021-04-04T09:45:00')).format(),
-          providerUuid: mockSessionDataResponse.data.currentProvider.uuid,
-          providers: [{ uuid: mockSessionDataResponse.data.currentProvider.uuid, comments: '' }],
-          locationUuid: mockLocationsDataResponse.data.results[1].uuid,
-          patientUuid: mockPatient.id,
-        }),
-        new AbortController(),
-      );
-
-      expect(mockShowToast).toHaveBeenCalledTimes(1);
-      expect(mockShowToast).toHaveBeenCalledWith(
-        expect.objectContaining({
-          critical: true,
-          description: 'It is now visible on the Appointments page',
-          kind: 'success',
-          title: 'Appointment scheduled',
-        }),
-      );
-    });
-
-    it('renders an error notification if there was a problem scheduling an appointment', async () => {
-      const error = {
-        message: 'Internal Server Error',
-        response: {
-          status: 500,
-          statusText: 'Internal Server Error',
-        },
-      };
-
-      mockCreateAppointment.mockRejectedValueOnce(error);
-
-      userEvent.clear(dateInput);
-      userEvent.type(dateInput, '4/4/2021');
-      userEvent.clear(timeInput);
-      userEvent.type(timeInput, '09:30');
-      userEvent.selectOptions(timeFormat, 'AM');
-      userEvent.selectOptions(serviceSelect, ['Outpatient']);
-      userEvent.selectOptions(serviceTypeSelect, ['Chemotherapy']);
-      userEvent.selectOptions(appointmentTypeSelect, ['Scheduled']);
-
-      await waitFor(() => userEvent.click(saveButton));
-
-      expect(mockShowNotification).toHaveBeenCalledTimes(1);
-      expect(mockShowNotification).toHaveBeenCalledWith({
+    expect(mockShowToast).toHaveBeenCalledTimes(1);
+    expect(mockShowToast).toHaveBeenCalledWith(
+      expect.objectContaining({
         critical: true,
-        description: 'Internal Server Error',
-        kind: 'error',
-        title: 'Error scheduling appointment',
-      });
+        description: 'It is now visible on the Appointments page',
+        kind: 'success',
+        title: 'Appointment scheduled',
+      }),
+    );
+  });
+
+  it('renders an error notification if there was a problem scheduling an appointment', async () => {
+    const user = userEvent.setup();
+
+    const error = {
+      message: 'Internal Server Error',
+      response: {
+        status: 500,
+        statusText: 'Internal Server Error',
+      },
+    };
+
+    mockOpenmrsFetch.mockReturnValueOnce({ data: mockUseAppointmentServiceData });
+    mockCreateAppointment.mockRejectedValueOnce(error);
+
+    renderAppointmentsForm();
+
+    await waitForLoadingToFinish();
+
+    const saveButton = screen.getByRole('button', { name: /Save and close/i });
+    const dateInput = screen.getByRole('textbox', { name: /Date/i });
+    const timeInput = screen.getByRole('textbox', { name: /Time/i });
+    const timeFormat = screen.getByRole('combobox', { name: /Time/i });
+    const serviceSelect = screen.getByRole('combobox', { name: /Select a service/i });
+    const serviceTypeSelect = screen.getByRole('combobox', { name: /Select the type of service/i });
+    const appointmentTypeSelect = screen.getByRole('combobox', { name: /Select the type of appointment/i });
+
+    await waitFor(() => user.clear(dateInput));
+    await waitFor(() => user.type(dateInput, '4/4/2021'));
+    await waitFor(() => user.clear(timeInput));
+    await waitFor(() => user.type(timeInput, '09:30'));
+    await waitFor(() => user.selectOptions(timeFormat, 'AM'));
+    await waitFor(() => user.selectOptions(serviceSelect, ['Outpatient']));
+    await waitFor(() => user.selectOptions(serviceTypeSelect, ['Chemotherapy']));
+    await waitFor(() => user.selectOptions(appointmentTypeSelect, ['Scheduled']));
+    await waitFor(() => user.click(saveButton));
+
+    expect(mockShowNotification).toHaveBeenCalledTimes(1);
+    expect(mockShowNotification).toHaveBeenCalledWith({
+      critical: true,
+      description: 'Internal Server Error',
+      kind: 'error',
+      title: 'Error scheduling appointment',
     });
   });
 });

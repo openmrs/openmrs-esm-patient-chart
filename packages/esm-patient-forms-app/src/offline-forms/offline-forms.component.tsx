@@ -1,11 +1,6 @@
-import {
-  getDynamicOfflineDataEntries,
-  getDynamicOfflineDataHandlers,
-  putDynamicOfflineData,
-  removeDynamicOfflineData,
-  syncDynamicOfflineData,
-  useLayoutType,
-} from '@openmrs/esm-framework';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { mutate } from 'swr';
 import {
   DataTable,
   TableContainer,
@@ -21,13 +16,18 @@ import {
   DataTableRow,
   Toggle,
   SkeletonPlaceholder,
-} from 'carbon-components-react';
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { FormEncounter } from '../types';
-import styles from './offline-forms.styles.scss';
-import { useValidOfflineFormEncounters } from './use-offline-form-encounters';
+} from '@carbon/react';
+import {
+  isDesktop,
+  putDynamicOfflineData,
+  removeDynamicOfflineData,
+  syncDynamicOfflineData,
+  useLayoutType,
+} from '@openmrs/esm-framework';
 import { useDynamicFormDataEntries } from './offline-form-helpers';
+import { FormEncounter } from '../types';
+import { useValidOfflineFormEncounters } from './use-offline-form-encounters';
+import styles from './offline-forms.styles.scss';
 
 export interface OfflineFormsProps {
   canMarkFormsAsOffline: boolean;
@@ -37,7 +37,7 @@ const OfflineForms: React.FC<OfflineFormsProps> = ({ canMarkFormsAsOffline }) =>
   const { t } = useTranslation();
   const forms = useValidOfflineFormEncounters();
   const layout = useLayoutType();
-  const toolbarItemSize = layout === 'desktop' ? 'sm' : undefined;
+  const toolbarItemSize = isDesktop(layout) ? 'sm' : undefined;
   const headers: Array<DataTableHeader> = [
     { key: 'formName', header: t('offlineFormsTableFormNameHeader', 'Form name') },
     { key: 'availableOffline', header: t('offlineFormsTableFormAvailableOffline', 'Offline') },
@@ -55,7 +55,7 @@ const OfflineForms: React.FC<OfflineFormsProps> = ({ canMarkFormsAsOffline }) =>
         <h1 className={styles.pageHeader}>{t('offlineFormsTitle', 'Offline forms')}</h1>
       </header>
       <main className={styles.contentContainer}>
-        <DataTable rows={rows} headers={headers}>
+        <DataTable rows={rows} headers={headers} size="sm" useZebraStyles>
           {({
             rows,
             headers,
@@ -65,7 +65,7 @@ const OfflineForms: React.FC<OfflineFormsProps> = ({ canMarkFormsAsOffline }) =>
             getTableContainerProps,
             onInputChange,
           }: DataTableCustomRenderProps) => (
-            <TableContainer className={styles.tableContainer} {...getTableContainerProps()}>
+            <TableContainer {...getTableContainerProps()}>
               <div className={styles.tableHeaderContainer}>
                 <Search
                   className={styles.tableSearch}
@@ -105,6 +105,7 @@ const OfflineForms: React.FC<OfflineFormsProps> = ({ canMarkFormsAsOffline }) =>
 };
 
 function OfflineFormToggle({ form, disabled }: { form: FormEncounter; disabled: boolean }) {
+  const { t } = useTranslation();
   const [isUpdating, setIsUpdating] = useState(false);
   const dynamicFormEntriesSwr = useDynamicFormDataEntries();
   const isMarkedAsOffline = dynamicFormEntriesSwr.data?.some((entry) => entry.identifier === form.uuid);
@@ -133,10 +134,12 @@ function OfflineFormToggle({ form, disabled }: { form: FormEncounter; disabled: 
   return (
     <div>
       <Toggle
+        aria-label={t('offlineToggle', 'Offline toggle')}
         id={`${form.uuid}-offline-toggle`}
         className={styles.availableOfflineToggle}
         labelA=""
         labelB=""
+        labelText=""
         size="sm"
         toggled={isMarkedAsOffline}
         disabled={disabled || isUpdating || dynamicFormEntriesSwr.isValidating}

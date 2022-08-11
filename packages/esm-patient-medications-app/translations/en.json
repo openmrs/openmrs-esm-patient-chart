@@ -30,6 +30,7 @@
   "freeTextDosage": "Free Text Dosage",
   "indication": "Indication",
   "indicationPlaceholder": "e.g. \"Hypertension\"",
+  "loading": "Loading...",
   "medicationDurationAndUnit": "for {duration} {durationUnit}",
   "medicationIndefiniteDuration": "Indefinite duration",
   "modify": "Modify",

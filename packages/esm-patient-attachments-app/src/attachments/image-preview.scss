@@ -1,11 +1,12 @@
-@import "../root.scss";
+@use '@carbon/styles/scss/spacing';
+@import '../root.scss';
 
 .filePreviewContainer {
   background-color: $ui-02;
 }
 
 .overview {
-  padding: $spacing-05;
+  padding: spacing.$spacing-05;
   display: grid;
   grid-template-columns: 1fr 1fr;
 
@@ -21,7 +22,7 @@
 }
 
 .buttonSetOverrides {
-  margin: $spacing-05 auto 0;
+  margin: spacing.$spacing-05 auto 0;
   display: grid;
   grid-template-columns: 1fr 1fr;
 

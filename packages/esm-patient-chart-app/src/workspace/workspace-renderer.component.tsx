@@ -18,7 +18,6 @@ export function WorkspaceRenderer({ workspace, patientUuid, active }: WorkspaceR
   const { windowSize } = useWorkspaceWindowSize();
   const maximized = windowSize.size === 'maximized';
   const [lifecycle, setLifecycle] = useState();
-
   useEffect(() => {
     let active = true;
     workspace.load().then(({ default: result, ...lifecycle }) => {
