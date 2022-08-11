@@ -1,17 +1,17 @@
 import React, { useContext, useState, useEffect, useCallback, SyntheticEvent } from 'react';
 import { UserHasAccess } from '@openmrs/esm-framework';
 import { Button, ButtonSet, TextArea, TextInput } from 'carbon-components-react';
-import styles from './file-preview.scss';
+import styles from './file-review.scss';
 import { UploadedFile } from '../attachments-types';
 import FileRegular from '../assets/file-regular.svg';
 import CameraMediaUploaderContext from './camera-media-uploader-context.resources';
 import { useTranslation } from 'react-i18next';
 
-export interface FilePreviewContainerProps {
+export interface FileReviewContainerProps {
   onCompletion: () => void;
 }
 
-const FilePreviewContainer: React.FC<FilePreviewContainerProps> = ({ onCompletion }) => {
+const FileReviewContainer: React.FC<FileReviewContainerProps> = ({ onCompletion }) => {
   const { filesToUpload, clearData, setFilesToUpload } = useContext(CameraMediaUploaderContext);
   const { t } = useTranslation();
   const [currentFile, setCurrentFile] = useState(1);
@@ -26,14 +26,16 @@ const FilePreviewContainer: React.FC<FilePreviewContainerProps> = ({ onCompletio
 
   const handleSave = useCallback(
     (updatedFile: UploadedFile) => {
-      setFilesToUpload((filesToUpload) => [...filesToUpload, updatedFile]);
+      setFilesToUpload((filesToUpload) =>
+        filesToUpload.map((file, indx) => (indx === currentFile ? updatedFile : file)),
+      );
       moveToNextFile();
     },
-    [moveToNextFile, setFilesToUpload],
+    [moveToNextFile, setFilesToUpload, currentFile],
   );
 
   return (
-    <div className={styles.filePreviewContainer}>
+    <div className={styles.fileReviewContainer}>
       <h3 className={styles.paddedProductiveHeading03}>
         {t('addAttachment', 'Add Attachment')}{' '}
         {filesToUpload.length > 1 && `(${currentFile} of ${filesToUpload.length})`}
@@ -154,4 +156,4 @@ const FilePreview: React.FC<FilePreviewProps> = ({ uploadedFile, collectDescript
   );
 };
 
-export default FilePreviewContainer;
+export default FileReviewContainer;

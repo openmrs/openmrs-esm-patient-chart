@@ -9,8 +9,8 @@ export interface CameraMediaUploaderContextType {
   onCompletion?: () => void;
   filesToUpload?: Array<UploadedFile>;
   setFilesToUpload?: React.Dispatch<React.SetStateAction<UploadedFile[]>>;
-  filesUploading?: boolean;
-  setFilesUploading?: React.Dispatch<React.SetStateAction<boolean>>;
+  uploadFilesToServer?: boolean;
+  setUploadFilesToServer?: React.Dispatch<React.SetStateAction<boolean>>;
   clearData?: () => void;
   handleTakePhoto?: (fileBlob: string) => void;
   cameraOnly?: boolean;

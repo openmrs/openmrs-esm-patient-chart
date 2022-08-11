@@ -7,7 +7,7 @@ import CameraComponent from './camera.component';
 import styles from './camera-media-uploader.scss';
 import { Tabs, Tab } from 'carbon-components-react';
 import MediaUploaderComponent from './media-uploader.component';
-import FilePreviewContainer from './file-preview.component';
+import FileReviewContainer from './file-review.component';
 import UploadingStatusComponent from './uploading-status.component';
 
 interface CameraMediaUploaderModalProps {
@@ -60,73 +60,25 @@ const CameraMediaUploaderModal: React.FC<CameraMediaUploaderModalProps> = ({
     setError(undefined);
   }, [setFilesToUpload, setUploadFilesToServer]);
 
-  const contextValue = useMemo(
-    () => ({
-      multipleFiles,
-      cameraOnly,
-      collectCaption,
-      saveFile,
-      closeModal,
-      onCompletion,
-      filesToUpload,
-      setFilesToUpload,
-      uploadFilesToServer,
-      setUploadFilesToServer,
-      clearData,
-      handleTakePhoto,
-      error,
-      setError,
-    }),
-    [
-      multipleFiles,
-      cameraOnly,
-      collectCaption,
-      saveFile,
-      closeModal,
-      onCompletion,
-      filesToUpload,
-      setFilesToUpload,
-      uploadFilesToServer,
-      setUploadFilesToServer,
-      clearData,
-      handleTakePhoto,
-      error,
-      setError,
-    ],
-  );
-
   const startUploadingToServer = useCallback(() => {
     setUploadFilesToServer(true);
   }, [setUploadFilesToServer]);
 
-  // If the files are uploaded on the frontend, then the file preview modal should open up.
-  if (!uploadFilesToServer && filesToUpload.length) {
-    return (
-      <CameraMediaUploaderContext.Provider value={contextValue}>
-        <FilePreviewContainer onCompletion={startUploadingToServer} />
-      </CameraMediaUploaderContext.Provider>
-    );
-  }
+  const returnComponent = useMemo(() => {
+    // If the files are all set to upload, then filesUploader is visible on the screen.
+    if (uploadFilesToServer) {
+      return <UploadingStatusComponent />;
+    }
 
-  // If the files are all set to upload, then filesUploader is visible on the screen.
-  if (uploadFilesToServer) {
-    return (
-      <CameraMediaUploaderContext.Provider value={contextValue}>
-        <UploadingStatusComponent />
-      </CameraMediaUploaderContext.Provider>
-    );
-  }
+    if (filesToUpload.length) {
+      return <FileReviewContainer onCompletion={startUploadingToServer} />;
+    }
 
-  if (cameraOnly) {
-    return (
-      <CameraMediaUploaderContext.Provider value={contextValue}>
-        <CameraComponent />
-      </CameraMediaUploaderContext.Provider>
-    );
-  }
+    if (cameraOnly) {
+      return <CameraComponent />;
+    }
 
-  return (
-    <CameraMediaUploaderContext.Provider value={contextValue}>
+    return (
       <div className={styles.cameraSection}>
         <h3 className={styles.paddedProductiveHeading03}>{t('addAttachment', 'Add Attachment')}</h3>
         <Tabs className={styles.tabs}>
@@ -138,6 +90,29 @@ const CameraMediaUploaderModal: React.FC<CameraMediaUploaderModalProps> = ({
           </Tab>
         </Tabs>
       </div>
+    );
+  }, [uploadFilesToServer, filesToUpload, cameraOnly, t]);
+
+  return (
+    <CameraMediaUploaderContext.Provider
+      value={{
+        multipleFiles,
+        cameraOnly,
+        collectCaption,
+        saveFile,
+        closeModal,
+        onCompletion,
+        filesToUpload,
+        setFilesToUpload,
+        uploadFilesToServer,
+        setUploadFilesToServer,
+        clearData,
+        handleTakePhoto,
+        error,
+        setError,
+      }}
+    >
+      {returnComponent}
     </CameraMediaUploaderContext.Provider>
   );
 };

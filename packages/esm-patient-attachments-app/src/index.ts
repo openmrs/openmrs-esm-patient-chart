@@ -51,15 +51,6 @@ function setupOpenMRS() {
         offline: true,
       },
       {
-        name: 'files-preview-modal',
-        load: getAsyncLifecycle(() => import('./camera-media-uploader/file-preview.component'), {
-          featureName: 'files-preview-modal',
-          moduleName,
-        }),
-        online: true,
-        offline: true,
-      },
-      {
         name: 'delete-attachment-modal',
         load: getAsyncLifecycle(() => import('./attachments/delete-attachment-confirmation-modal.component'), {
           featureName: 'delete-attachment-modal',

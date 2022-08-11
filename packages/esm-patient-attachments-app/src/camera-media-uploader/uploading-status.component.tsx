@@ -11,8 +11,19 @@ interface UploadingStatusComponentProps {}
 const UploadingStatusComponent: React.FC<UploadingStatusComponentProps> = () => {
   const { t } = useTranslation();
   const [uploadingCompleted, setUploadingComplete] = useState(false);
-  const { filesToUpload, saveFile, setFilesToUpload, closeModal, clearData, onCompletion } =
-    useContext(CameraMediaUploaderContext);
+  const { filesToUpload, saveFile, closeModal, clearData, onCompletion } = useContext(CameraMediaUploaderContext);
+  const [filesUploading, setFilesUploading] = useState([]);
+
+  useEffect(() => {
+    if (filesToUpload) {
+      setFilesUploading(
+        filesToUpload.map((file) => ({
+          ...file,
+          status: 'uploading',
+        })),
+      );
+    }
+  }, [filesToUpload, setFilesUploading]);
 
   useEffect(() => {
     Promise.all(
@@ -23,7 +34,7 @@ const UploadingStatusComponent: React.FC<UploadingStatusComponentProps> = () => 
             description: `${file.fileName} ${t('uploadedSuccessfully', 'uploaded successfully')}`,
             kind: 'success',
           });
-          setFilesToUpload((prevfilesToUpload) =>
+          setFilesUploading((prevfilesToUpload) =>
             prevfilesToUpload.map((file, ind) =>
               ind === indx
                 ? {
@@ -39,13 +50,13 @@ const UploadingStatusComponent: React.FC<UploadingStatusComponentProps> = () => 
       setUploadingComplete(true);
       onCompletion?.();
     });
-  }, [onCompletion, saveFile, filesToUpload, t, setFilesToUpload]);
+  }, [onCompletion, saveFile, filesToUpload, t, setFilesUploading]);
 
   return (
     <div className={styles.cameraSection}>
       <h3 className={styles.paddedProductiveHeading03}>{t('addAttachment', 'Add Attachment')}</h3>
       <div className={styles.uploadingFilesSection}>
-        {filesToUpload.map((file) => (
+        {filesUploading.map((file) => (
           <FileUploaderItem name={file.fileName} status={file.status} size="lg" />
         ))}
       </div>
