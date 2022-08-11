@@ -2,16 +2,24 @@ import { showModal } from '@openmrs/esm-framework';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
-interface AddPastVisitOverflowMenuItemProps {}
+interface AddPastVisitOverflowMenuItemProps {
+  patientUuid?: string;
+  launchPatientChart?: boolean;
+}
 
-const AddPastVisitOverflowMenuItem: React.FC<AddPastVisitOverflowMenuItemProps> = () => {
+const AddPastVisitOverflowMenuItem: React.FC<AddPastVisitOverflowMenuItemProps> = ({
+  patientUuid,
+  launchPatientChart,
+}) => {
   const { t } = useTranslation();
 
   const openModal = useCallback(() => {
     const dispose = showModal('start-visit-dialog', {
+      patientUuid,
+      launchPatientChart,
       closeModal: () => dispose(),
     });
-  }, []);
+  }, [patientUuid, launchPatientChart]);
 
   return (
     <li className="bx--overflow-menu-options__option">

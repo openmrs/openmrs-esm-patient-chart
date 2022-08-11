@@ -7,9 +7,17 @@
   position: relative;
 }
 
-.patientChartWrapper > nav {
-  overflow-y: scroll;
-  padding-bottom: 3rem;
+.patientChartWrapper {
+  &>nav {
+    overflow-y: scroll;
+    padding-bottom: 3rem;
+    scrollbar-width: none; 
+  }
+
+  ::-webkit-scrollbar {
+    width: 0px;
+    background-color: transparent
+  }
 }
 
 .caption01 {

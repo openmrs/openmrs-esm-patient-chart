@@ -10,19 +10,15 @@ import { useRouteMatch } from 'react-router-dom';
 import { basePath } from '../../constants';
 import styles from './dashboard-view.scss';
 
-function getColumnsLayoutStyle(layout: DashbardLayoutConfig) {
-  const numberOfColumns = layout?.columns ?? 2;
+function getColumnsLayoutStyle(dashboard: DashboardConfig) {
+  const numberOfColumns = dashboard.columns ?? 2;
   return '1fr '.repeat(numberOfColumns).trimEnd();
-}
-
-export interface DashbardLayoutConfig {
-  columns: number;
 }
 
 export interface DashboardConfig {
   slot: string;
   title: string;
-  config: DashbardLayoutConfig;
+  columns: number;
 }
 
 interface DashboardViewProps {
@@ -32,9 +28,9 @@ interface DashboardViewProps {
 }
 
 export function DashboardView({ dashboard, patientUuid, patient }: DashboardViewProps) {
-  const dashboardMeta = useExtensionSlotMeta(dashboard.slot);
+  const widgetMetas = useExtensionSlotMeta(dashboard.slot);
   const { url } = useRouteMatch(basePath);
-  const gridTemplateColumns = getColumnsLayoutStyle(dashboard.config);
+  const gridTemplateColumns = getColumnsLayoutStyle(dashboard);
 
   const state = React.useMemo(
     () => ({
@@ -47,15 +43,16 @@ export function DashboardView({ dashboard, patientUuid, patient }: DashboardView
 
   const wrapItem = React.useCallback(
     (slot: React.ReactNode, extension: ExtensionData) => {
-      const { columnSpan = 1 } = dashboardMeta[getExtensionNameFromId(extension.extensionId)];
+      const { columnSpan = 1 } = widgetMetas[getExtensionNameFromId(extension.extensionId)];
       return <div style={{ gridColumn: `span ${columnSpan}` }}>{slot}</div>;
     },
-    [dashboardMeta],
+    [widgetMetas],
   );
 
   return (
     <>
       {dashboard.title && <h1 className={styles.dashboardTitle}>{dashboard.title}</h1>}
+      <ExtensionSlot state={state} extensionSlotName="top-of-all-patient-dashboards-slot" />
       <ExtensionSlot
         key={dashboard.slot}
         extensionSlotName={dashboard.slot}

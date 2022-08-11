@@ -122,7 +122,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
           },
         );
     },
-    [closeWorkspace, patientUuid, selectedLocation, t, timeFormat, visitDate, visitTime, visitType],
+    [closeWorkspace, patientUuid, selectedLocation, t, timeFormat, visitDate, visitTime, visitType, mutate],
   );
 
   const handleOnChange = () => {

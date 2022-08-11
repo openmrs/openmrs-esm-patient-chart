@@ -72,6 +72,16 @@ export const configSchema = {
     _description: 'Whether to display recommended forms tab. Requires AMPATH ETL.',
     _default: false,
   },
+  showConfigurableForms: {
+    _type: Type.Boolean,
+    _description: 'Whether to use customURL to fetch forms, works with `customFormsUrl`',
+    _default: false,
+  },
+  customFormsUrl: {
+    _type: Type.String,
+    _description: 'Custom forms endpoint to fetch forms using a custom url need `showConfigurableForms`',
+    _default: '',
+  },
 };
 
 export interface HtmlFormEntryForm {
@@ -84,4 +94,7 @@ export interface HtmlFormEntryForm {
 export interface ConfigObject {
   htmlFormEntryForms: Array<HtmlFormEntryForm>;
   showRecommendedFormsTab: boolean;
+  customFormsUrl: string;
+  showConfigurableForms: boolean;
+  showHtmlFormEntryForms: boolean;
 }

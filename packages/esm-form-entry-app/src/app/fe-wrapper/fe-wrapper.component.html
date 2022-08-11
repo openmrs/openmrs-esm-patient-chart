@@ -18,7 +18,7 @@
           <form-renderer [labelMap]="labelMap" [node]="form.rootNode"></form-renderer>
         </form>
       </div>
-      <div class="bx-btn--set button-set">
+      <div *ngIf="showDiscardSubmitButtons" class="bx-btn--set button-set">
         <button class="bx--btn bx--btn--secondary" (click)="closeForm()" type="button">Discard</button>
         <button [disabled]="formState === 'submitting'" class="bx--btn bx--btn--primary" (click)="onSubmit()" type="submit">
           <span *ngIf="formState !== 'submitting'">Save and close</span>

@@ -7,8 +7,7 @@
   "main": "src/index.ts",
   "source": true,
   "scripts": {
-    "build": "webpack --mode production",
-    "lint": "eslint src --ext ts,tsx",
+    "lint": "eslint src --ext tsx,ts --fix --max-warnings=0",
     "typescript": "tsc"
   },
   "browserslist": [

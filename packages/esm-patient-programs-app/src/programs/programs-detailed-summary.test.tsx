@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
 import { mockEnrolledProgramsResponse } from '../../../../__mocks__/programs.mock';
@@ -89,13 +89,22 @@ describe('ProgramsDetailedSummary ', () => {
 
     const addButton = screen.getByRole('button', { name: /Add/ });
     expect(addButton).toBeInTheDocument();
-    expect(screen.getByRole('row', { name: /hiv care and treatment/i })).toBeInTheDocument();
-    expect(screen.getByRole('row', { name: /16-Jan-2020/i })).toBeInTheDocument();
-    expect(screen.getByRole('row', { name: /active$/i })).toBeInTheDocument();
+    const row = screen.getByRole('row', { name: /hiv care and treatment/i });
+    expect(row).toBeInTheDocument();
+    expect(within(row).getByRole('cell', { name: /16-Jan-2020/i })).toBeInTheDocument();
+    expect(within(row).getByRole('cell', { name: /active$/i })).toBeInTheDocument();
+    const editButton = within(row).getByRole('button', { name: /Edit Program$/i });
+    expect(editButton).toBeInTheDocument();
 
     // Clicking "Add" launches the programs form in a workspace
     userEvent.click(addButton);
     expect(launchPatientWorkspace).toHaveBeenCalledWith('programs-form-workspace');
+
+    // Clicking the edit button launches the edit form in a workspace
+    userEvent.click(editButton);
+    expect(launchPatientWorkspace).toHaveBeenCalledWith('programs-form-workspace', {
+      programEnrollmentId: mockEnrolledProgramsResponse[0].uuid,
+    });
   });
 });
 

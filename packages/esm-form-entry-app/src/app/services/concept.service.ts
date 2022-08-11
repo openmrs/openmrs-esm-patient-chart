@@ -1,10 +1,15 @@
-import { forkJoin as observableForkJoin, of as observableOf, Observable } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { forkJoin, Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
 
-import * as _ from 'lodash';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { WindowRef } from '../window-ref';
+import { ListResult } from '../types';
+import { map } from 'rxjs/operators';
+
+interface ConceptMetadata {
+  uuid: string;
+  display: string;
+}
 
 @Injectable()
 export class ConceptService {
@@ -19,33 +24,37 @@ export class ConceptService {
   }
 
   public searchConceptByUUID(conceptUUID: string, lang: string): Observable<any> {
-    return this.http
-      .get(this.getUrl() + `/${conceptUUID}?v=full&lang=${lang}`, {
-        headers: this.headers,
-      })
-      .pipe(
-        catchError((error: Response) => {
-          console.error(error.status);
-          return observableOf(error.json());
-        }),
-      );
+    return this.http.get(this.getUrl() + `/${conceptUUID}?v=full&lang=${lang}`, {
+      headers: this.headers,
+    });
   }
 
-  public searchBulkConceptByUUID(conceptUuids: any, lang: string) {
+  public searchBulkConceptByUUID(conceptUuids: Array<string>, lang: string): Observable<Array<ConceptMetadata>> {
+    const chunkSize = 100;
     const observablesArray = [];
-    _.each(conceptUuids, (conceptUuid) => {
+    const slicedConceptUuids = conceptUuids.reduceRight(
+      (acc, currentValue, i, array) => [...acc, array.splice(0, chunkSize)],
+      [],
+    );
+
+    for (const conceptUuidsChunk of slicedConceptUuids) {
       observablesArray.push(
-        this.searchConceptByUUID(conceptUuid, lang).pipe(
-          map((concept) => {
-            return { ...concept, extId: conceptUuid };
-          }),
-          catchError((error: Response) => {
-            console.error(error.status);
-            return observableOf(error.json());
-          }),
-        ),
+        this.http
+          .get<ListResult<ConceptMetadata>>(this.getUrl() + `?references=` + conceptUuidsChunk.join(','), {
+            headers: this.headers,
+          })
+          .pipe(
+            map((r) => {
+              return r.results;
+            }),
+          ),
       );
-    });
-    return observableForkJoin(observablesArray);
+    }
+
+    return forkJoin(observablesArray).pipe(
+      map((response) => {
+        return response.flat() as Array<ConceptMetadata>;
+      }),
+    );
   }
 }

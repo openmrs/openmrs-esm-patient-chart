@@ -1,12 +1,13 @@
 import React from 'react';
 import Add16 from '@carbon/icons-react/es/add/16';
+import Edit16 from '@carbon/icons-react/es/edit/16';
 import filter from 'lodash-es/filter';
 import includes from 'lodash-es/includes';
 import map from 'lodash-es/map';
 import styles from './programs-detailed-summary.scss';
 import { CardHeader, EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
-import { useAvailablePrograms, useEnrollments } from './programs.resource';
+import { useAvailablePrograms, useEnrollments, usePrograms } from './programs.resource';
 import {
   Button,
   DataTable,
@@ -23,7 +24,11 @@ import {
   DataTableRow,
   InlineNotification,
 } from 'carbon-components-react';
-import { formatDate, formatDatetime } from '@openmrs/esm-framework';
+import { formatDate, formatDatetime, useConfig, usePagination } from '@openmrs/esm-framework';
+import { ConfigObject } from '../config-schema';
+import { ConfigurableProgram } from '../types';
+import capitalize from 'lodash-es/capitalize';
+import ProgramActionButton from './program-action-button/program-action-button.component';
 
 interface ProgramsDetailedSummaryProps {
   patientUuid: string;
@@ -33,13 +38,18 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
   const { t } = useTranslation();
   const displayText = t('programEnrollments', 'Program enrollments');
   const headerTitle = t('carePrograms', 'Care Programs');
+  const config = useConfig() as ConfigObject;
+  const programsCount = 5;
+  const isConfigurable = config.customUrl ? true : false;
 
-  const { data: enrollments, isError, isLoading, isValidating } = useEnrollments(patientUuid);
-  const { data: availablePrograms } = useAvailablePrograms();
-  const eligiblePrograms = filter(
-    availablePrograms,
-    (program) => !includes(map(enrollments, 'program.uuid'), program.uuid),
-  );
+  const { enrollments, isLoading, isError, isValidating, availablePrograms, eligiblePrograms, configurablePrograms } =
+    usePrograms(patientUuid);
+
+  const {
+    results: paginatedEnrollments,
+    goTo,
+    currentPage,
+  } = usePagination(isConfigurable ? configurablePrograms : enrollments ?? [], programsCount);
 
   const tableHeaders: Array<DataTableHeader> = React.useMemo(
     () => [
@@ -59,23 +69,32 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
         key: 'status',
         header: t('status', 'Status'),
       },
+      {
+        key: 'actions',
+        header: t('actions', 'Actions'),
+      },
     ],
     [t],
   );
 
-  const tableRows: Array<DataTableRow> = React.useMemo(() => {
-    return enrollments?.map((program) => {
-      return {
-        id: program.uuid,
-        display: program.display,
-        location: program.location?.display,
-        dateEnrolled: formatDatetime(new Date(program.dateEnrolled)),
-        status: program.dateCompleted
-          ? `${t('completedOn', 'Completed On')} ${formatDate(new Date(program.dateCompleted))}`
-          : t('active', 'Active'),
-      };
-    });
-  }, [enrollments, t]);
+  const tableRows = React.useMemo(() => {
+    return paginatedEnrollments?.map((enrollment: ConfigurableProgram) => ({
+      id: enrollment.uuid,
+      display: enrollment.display,
+      location: enrollment.location?.display,
+      dateEnrolled: enrollment.dateEnrolled ? formatDatetime(new Date(enrollment.dateEnrolled)) : '--',
+      status: isConfigurable
+        ? capitalize(enrollment.enrollmentStatus)
+        : enrollment.dateCompleted
+        ? `${t('completedOn', 'Completed On')} ${formatDate(new Date(enrollment.dateCompleted))}`
+        : t('active', 'Active'),
+      actions: isConfigurable ? (
+        <ProgramActionButton enrollment={enrollment} />
+      ) : (
+        <ProgramEditButton programEnrollmentId={enrollment.uuid} />
+      ),
+    }));
+  }, [isConfigurable, paginatedEnrollments, t]);
 
   const launchProgramsForm = React.useCallback(() => launchPatientWorkspace('programs-form-workspace'), []);
 
@@ -142,5 +161,26 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
   }
   return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchProgramsForm} />;
 };
+
+interface ProgramEditButtonProps {
+  programEnrollmentId: string;
+}
+
+function ProgramEditButton({ programEnrollmentId }: ProgramEditButtonProps) {
+  const launchEditProgramsForm = React.useCallback(
+    () => launchPatientWorkspace('programs-form-workspace', { programEnrollmentId }),
+    [programEnrollmentId],
+  );
+
+  return (
+    <Button
+      kind="ghost"
+      renderIcon={Edit16}
+      iconDescription="Edit Program"
+      onClick={launchEditProgramsForm}
+      hasIconOnly
+    />
+  );
+}
 
 export default ProgramsDetailedSummary;

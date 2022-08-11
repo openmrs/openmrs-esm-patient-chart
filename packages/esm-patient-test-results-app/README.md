@@ -2,6 +2,10 @@
 
 The test results widget. It provides tabular and chart-based overviews of the test results available for a patient. 
 
+IMPORTANT NOTE: To have data show up in this view, your concepts just need to have "Type: Test" or "Type: LabSet". 
+If you are seeing strange things showing up, like Temperature, in the Test Results viewer, then you probably just need to change the Type for your Temperature concept to something other than "Test", like finding. 
+
+
 ## How to Configure the Lab Filter View
 The Lab Filter feature enables you to set up custom filter views - eg based on standard medical hierarchies, or even based on your own custom ideas (e.g. "Our Favorite HIV-Related Tests"), like this:
 
@@ -51,3 +55,7 @@ _Note2: if you don't already have all the "children" concepts, e.g. CBC, Serum E
 ### 4. Check your work
 Review your concepts to see that the hierarchy all looks right in the Dictionary/Collection. In the above example (which was created using the OpenMRS Dictionary Manager), you can see that _Bloodwork_ now correctly contains _Hematology_ and _Chemistry_.
 <img width="1173" alt="image" src="https://user-images.githubusercontent.com/67400059/161008455-edbd31d1-00ca-4236-9309-bc41763a6f0a.png">
+
+### 5. Update the config-schema file with your ConvSet codes
+Go here to add the UUIDs for each of your ConvSet concepts which you want to show up in the Lab Results filters: 
+https://github.com/openmrs/openmrs-esm-patient-chart/blob/master/packages/esm-patient-test-results-app/src/config-schema.ts#L3

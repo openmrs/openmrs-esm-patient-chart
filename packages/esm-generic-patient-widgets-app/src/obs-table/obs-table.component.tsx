@@ -40,13 +40,38 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
           id: `${index}`,
           date: formatDatetime(new Date(obss[0].issued), { mode: 'wide' }),
         };
+
         for (let obs of obss) {
-          const obsValue = obs?.valueQuantity?.value ?? obs.valueCodeableConcept?.coding[0]?.display ?? obs.valueString;
-          rowData[obs.conceptUuid] = obsValue;
+          switch (obs.dataType) {
+            case 'Text':
+              rowData[obs.conceptUuid] = obs.valueString;
+              break;
+
+            case 'Number':
+              let decimalPlaces: number | undefined = config.data.find(
+                (ele: any) => ele.concept === obs.conceptUuid,
+              )?.decimalPlaces;
+
+              if (obs.valueQuantity?.value % 1 !== 0) {
+                if (decimalPlaces > 0) {
+                  rowData[obs.conceptUuid] = obs.valueQuantity?.value.toFixed(decimalPlaces);
+                } else {
+                  rowData[obs.conceptUuid] = obs.valueQuantity?.value.toFixed(2);
+                }
+              } else {
+                rowData[obs.conceptUuid] = obs.valueQuantity?.value;
+              }
+              break;
+
+            case 'Coded':
+              rowData[obs.conceptUuid] = obs.valueCodeableConcept?.coding[0]?.display;
+              break;
+          }
         }
+
         return rowData;
       }),
-    [obssByDate],
+    [config.data, obssByDate],
   );
 
   const { results, goTo, currentPage } = usePagination(tableRows, config.table.pageSize);
@@ -61,7 +86,7 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
                 <TableRow>
                   {headers.map((header) => (
                     <TableHeader
-                      className={`${styles.productiveHeading01} ${styles.text02}`}
+                      className={`${styles.tableHeader}`}
                       {...getHeaderProps({
                         header,
                         isSortable: header.isSortable,

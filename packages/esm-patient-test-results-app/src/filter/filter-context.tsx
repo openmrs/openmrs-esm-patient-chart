@@ -97,7 +97,7 @@ const FilterProvider = ({ roots, children }: FilterProviderProps) => {
 
   const totalResultsCount: number = useMemo(() => {
     let count = 0;
-    if (!state?.tests || !(isObject(state) && isObject(state.tests)) || state?.tests === {}) return 0;
+    if (!state?.tests || !isObject(state?.tests) || state?.tests === {}) return 0;
     Object.values(state?.tests).forEach((testData) => {
       count += testData.obs.length;
     });

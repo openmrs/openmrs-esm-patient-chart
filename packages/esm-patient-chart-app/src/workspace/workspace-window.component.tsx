@@ -45,7 +45,7 @@ const WorkspaceWindow: React.FC<RouteComponentProps<ContextWorkspaceParams>> = (
     if (active && hidden) {
       updateWindowSize('normal');
     }
-  }, [workspaces]);
+  }, [workspaces, active, hidden, updateWindowSize]);
 
   useBodyScrollLock(active && !isDesktop(layout));
 
@@ -75,7 +75,7 @@ const WorkspaceWindow: React.FC<RouteComponentProps<ContextWorkspaceParams>> = (
         className={`${styles.header} ${maximized ? `${styles.fullWidth}` : `${styles.dynamicWidth}`}`}
       >
         <HeaderName prefix="">{workspaceTitle}</HeaderName>
-        <HeaderGlobalBar>
+        <HeaderGlobalBar className={styles.headerGlobalBar}>
           <ExtensionSlot extensionSlotName={patientChartWorkspaceHeaderSlot} />
           {layout === 'desktop' && (
             <>

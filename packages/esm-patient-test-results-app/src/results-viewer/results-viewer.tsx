@@ -35,11 +35,11 @@ interface ResultsViewerProps {
 const RoutedResultsViewer: React.FC<ResultsViewerProps> = ({ type, basePath, testUuid, patientUuid }) => {
   const config = useConfig();
   const conceptUuids = config?.concepts?.map((c) => c.conceptUuid) ?? [];
-  const { roots, loading, errors } = useGetManyObstreeData(conceptUuids);
+  const { roots, loading, error } = useGetManyObstreeData(conceptUuids);
   const { t } = useTranslation();
 
-  if (errors.length) {
-    return <ErrorState error={errors[0]} headerTitle={t('dataLoadError', 'Data Load Error')} />;
+  if (error) {
+    return <ErrorState error={error} headerTitle={t('dataLoadError', 'Data Load Error')} />;
   }
 
   if (roots?.length) {
