@@ -28,23 +28,31 @@ const UploadingStatusComponent: React.FC<UploadingStatusComponentProps> = () => 
   useEffect(() => {
     Promise.all(
       filesToUpload.map((file, indx) =>
-        saveFile(file).then(() => {
-          showToast({
-            title: t('uploadComplete', 'Upload complete'),
-            description: `${file.fileName} ${t('uploadedSuccessfully', 'uploaded successfully')}`,
-            kind: 'success',
-          });
-          setFilesUploading((prevfilesToUpload) =>
-            prevfilesToUpload.map((file, ind) =>
-              ind === indx
-                ? {
-                    ...file,
-                    status: 'complete',
-                  }
-                : file,
-            ),
-          );
-        }),
+        saveFile(file)
+          .then(() => {
+            showToast({
+              title: t('uploadComplete', 'Upload complete'),
+              description: `${file.fileName} ${t('uploadedSuccessfully', 'uploaded successfully')}`,
+              kind: 'success',
+            });
+            setFilesUploading((prevfilesToUpload) =>
+              prevfilesToUpload.map((file, ind) =>
+                ind === indx
+                  ? {
+                      ...file,
+                      status: 'complete',
+                    }
+                  : file,
+              ),
+            );
+          })
+          .catch(() => {
+            showToast({
+              title: t('uploadFailed', 'Upload failed'),
+              description: `${t('uploading', 'Uploading')} ${file.fileName} ${t('failed', 'failed')}`,
+              kind: 'error',
+            });
+          }),
       ),
     ).then(() => {
       setUploadingComplete(true);
