@@ -91,7 +91,7 @@ const CameraMediaUploaderModal: React.FC<CameraMediaUploaderModalProps> = ({
         </Tabs>
       </div>
     );
-  }, [uploadFilesToServer, filesToUpload, cameraOnly, t]);
+  }, [uploadFilesToServer, filesToUpload, cameraOnly, t, startUploadingToServer]);
 
   return (
     <CameraMediaUploaderContext.Provider
