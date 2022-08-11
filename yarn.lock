@@ -2000,6 +2000,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@carbon/charts-react@npm:^1.5.1":
+  version: 1.5.2
+  resolution: "@carbon/charts-react@npm:1.5.2"
+  dependencies:
+    "@carbon/charts": ^1.5.2
+    "@carbon/icons-react": ^10.49.0
+    "@carbon/telemetry": 0.1.0
+  peerDependencies:
+    react: ^16.0.0 || ^17.0.0 || ^18.0.0
+    react-dom: ^16.0.0 || ^17.0.0 || ^18.0.0
+  checksum: eba3820e5a5830da3bda80bb630d57b1526dfec36f2a4e025b9601840fe00f0c09d563fd8eae4f17c835096c635cb48e385809de8a109876e0100d605148a415
+  languageName: node
+  linkType: hard
+
 "@carbon/charts@npm:^1.5.0, @carbon/charts@npm:^1.5.1":
   version: 1.5.1
   resolution: "@carbon/charts@npm:1.5.1"
@@ -2016,6 +2030,25 @@ __metadata:
   peerDependencies:
     d3: 7.x
   checksum: e39ad4a0727254a59a6bc1b1bbb6e729d42086e23c387084ac2e7267bcdb48a51c6b3f69e011eaf9cbc3c3bb397695853f6a15d839c36c37d2749ace863f1a04
+  languageName: node
+  linkType: hard
+
+"@carbon/charts@npm:^1.5.2":
+  version: 1.5.2
+  resolution: "@carbon/charts@npm:1.5.2"
+  dependencies:
+    "@carbon/styles": ^1.4.0
+    "@carbon/telemetry": 0.1.0
+    "@carbon/utils-position": 1.1.1
+    carbon-components: 10.56.0
+    d3-cloud: 1.2.5
+    d3-sankey: 0.12.3
+    date-fns: 2.8.1
+    lodash-es: 4.17.21
+    resize-observer-polyfill: 1.5.0
+  peerDependencies:
+    d3: 7.x
+  checksum: 6b5e59a78743c20464da1e1b1227202456255ce9d862bc9c7bb17d70cb5362536a5f00a1b8f5cfa306b9d47e0cecba227cb1c7c3ca8483a7a444e9fdc7f92ee3
   languageName: node
   linkType: hard
 
@@ -4856,10 +4889,10 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-test-results-app@workspace:packages/esm-patient-test-results-app"
   dependencies:
-    "@carbon/charts-react": ^1.3.2
+    "@carbon/charts-react": ^1.5.1
     "@carbon/react": ^1.8.0
     "@openmrs/esm-patient-common-lib": ^4.0.0
-    d3: ^7.0.3
+    d3: ^7.6.1
     lodash-es: ^4.17.15
   peerDependencies:
     "@openmrs/esm-framework": 3.x

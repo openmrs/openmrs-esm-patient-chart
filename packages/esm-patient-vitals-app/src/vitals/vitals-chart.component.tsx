@@ -134,7 +134,7 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
         <label className={styles.vitalsSignLabel} htmlFor="vitals-chart-tab-group">
           {t('vitalSignDisplayed', 'Vital sign displayed')}
         </label>
-        <Tabs className={styles.verticalTabs} type="default">
+        <Tabs className={styles.verticalTabs}>
           <TabList className={styles.tablist} aria-label="Vitals signs">
             {vitalSigns.map(({ id, title, value }) => {
               return (

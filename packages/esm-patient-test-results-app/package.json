@@ -2,7 +2,7 @@
   "name": "@openmrs/esm-patient-test-results-app",
   "version": "4.0.0",
   "license": "MPL-2.0",
-  "description": "Patient notes microfrontend for the OpenMRS SPA",
+  "description": "Patient test results microfrontend for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-patient-test-results-app.js",
   "main": "src/index.ts",
   "source": true,
@@ -34,10 +34,10 @@
     "url": "https://github.com/openmrs/openmrs-esm-patient-chart/issues"
   },
   "dependencies": {
-    "@carbon/charts-react": "^1.3.2",
+    "@carbon/charts-react": "^1.5.1",
     "@carbon/react": "^1.8.0",
     "@openmrs/esm-patient-common-lib": "^4.0.0",
-    "d3": "^7.0.3",
+    "d3": "^7.6.1",
     "lodash-es": "^4.17.15"
   },
   "peerDependencies": {

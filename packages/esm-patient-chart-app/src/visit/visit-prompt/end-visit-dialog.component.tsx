@@ -63,6 +63,7 @@ const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal
             'endVisitWarningMessage',
             'Ending this visit will not allow you to fill another encounter form for this patient',
           )}
+          .
         </p>
       </ModalBody>
       <ModalFooter>

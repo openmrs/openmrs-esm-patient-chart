@@ -26,7 +26,7 @@ const ProgramActionButton: React.FC<ProgramActionButton> = ({ enrollment }) => {
         onClick={() => launchEnrollmentForm(t('enrollment', 'Enrollment'))}
         renderIcon={(props) => <TaskAdd size={20} {...props} />}
         kind="tertiary"
-        size="small"
+        size="sm"
       >
         {t('enroll', 'Enroll')}
       </Button>
@@ -37,7 +37,7 @@ const ProgramActionButton: React.FC<ProgramActionButton> = ({ enrollment }) => {
       onClick={() => launchEnrollmentForm(t('discontinue', 'Discontinue'))}
       renderIcon={(props) => <TaskAdd size={20} {...props} />}
       kind="danger--ghost"
-      size="small"
+      size="sm"
     >
       {t('discontinue', 'Discontinue')}
     </Button>
