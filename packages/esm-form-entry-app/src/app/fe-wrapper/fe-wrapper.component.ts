@@ -1,7 +1,7 @@
 import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { Form } from '@ampath-kenya/ngx-formentry';
 import { Observable, forkJoin, from, throwError, of, Subscription } from 'rxjs';
-import { catchError, map, mergeMap, take } from 'rxjs/operators';
+import { catchError, concatAll, map, mergeMap, take } from 'rxjs/operators';
 import { OpenmrsEsmApiService } from '../openmrs-api/openmrs-esm-api.service';
 import { FormSchemaService } from '../form-schema/form-schema.service';
 import { FormSubmissionService } from '../form-submission/form-submission.service';
@@ -70,7 +70,8 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
     this.launchFormSubscription = this.loadAllFormDependencies()
       .pipe(
         take(1),
-        map((createFormParams) => this.formCreationService.initAndCreateForm(createFormParams)),
+        map((createFormParams) => from(this.formCreationService.initAndCreateForm(createFormParams))),
+        concatAll(),
         mergeMap((form) => {
           const unlabeledConcepts = FormSchemaService.getUnlabeledConceptIdentifiersFromSchema(form.schema);
           return this.conceptService
