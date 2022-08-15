@@ -1,13 +1,13 @@
-@import "~@openmrs/esm-styleguide/src/vars";
-@import "~carbon-components/src/globals/scss/vars";
-@import "~carbon-components/src/globals/scss/mixins";
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
 
 .vitals-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: $spacing-09;
-  padding: $spacing-05;
+  height: spacing.$spacing-09;
+  padding: spacing.$spacing-05;
   outline: none;
   pointer-events: visibleFill;
 }
@@ -42,7 +42,7 @@
   display: flex;
   background-color: $openmrs-background-grey;
   justify-content: center;
-  min-height: $spacing-09;
+  min-height: spacing.$spacing-09;
 }
 
 .default-border {
@@ -57,7 +57,7 @@
   display: flex;
   align-self: center;
   fill: $inverse-support-03;
-  margin-right: $spacing-05;
+  margin-right: spacing.$spacing-05;
 }
 
 .warning-icon [data-icon-path="inner-path"] {
@@ -80,16 +80,16 @@
 }
 
 .heading {
-  @include carbon--type-style("productive-heading-02");
-  margin-right: $spacing-03;
+  @include type.type-style("heading-compact-02");
+  margin-right: spacing.$spacing-03;
   color: $text-02;
 }
 
 .record-vitals {
-  @include carbon--type-style('body-short-01');
+  @include type.type-style('body-compact-01');
 }
 
 .body-text {
-  @include carbon--type-style('body-short-01');
+  @include type.type-style('body-compact-01');
   color: $text-02;
 }

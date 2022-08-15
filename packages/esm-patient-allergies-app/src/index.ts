@@ -58,7 +58,7 @@ function setupOpenMRS() {
       {
         name: 'allergies-details-widget',
         slot: dashboardMeta.slot,
-        load: getAsyncLifecycle(() => import('./allergies/allergies.component'), options),
+        load: getAsyncLifecycle(() => import('./allergies/allergies-detailed-summary.component'), options),
         meta: {
           columnSpan: 1,
         },

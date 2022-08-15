@@ -1,9 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, DataTableSkeleton, InlineLoading } from 'carbon-components-react';
-import Add16 from '@carbon/icons-react/es/add/16';
-import ChartLineSmooth16 from '@carbon/icons-react/es/chart--line-smooth/16';
-import Table16 from '@carbon/icons-react/es/table/16';
+import { Button, DataTableSkeleton, InlineLoading } from '@carbon/react';
+import { Add, ChartLineSmooth, Table } from '@carbon/react/icons';
 import { formatDatetime, parseDate, useConfig } from '@openmrs/esm-framework';
 import {
   CardHeader,
@@ -86,27 +84,32 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({
           <div className={styles.biometricsHeaderActionItems}>
             <div className={styles.toggleButtons}>
               <Button
-                className={styles.toggle}
-                size="field"
+                className={styles.tableViewToggle}
+                size="sm"
                 hasIconOnly
                 kind={chartView ? 'ghost' : 'tertiary'}
-                renderIcon={Table16}
+                renderIcon={(props) => <Table size={16} {...props} />}
                 iconDescription={t('tableView', 'Table View')}
                 onClick={() => setChartView(false)}
               />
               <Button
-                className={styles.toggle}
-                size="field"
+                className={styles.chartViewToggle}
+                size="sm"
                 kind={chartView ? 'tertiary' : 'ghost'}
                 hasIconOnly
-                renderIcon={ChartLineSmooth16}
+                renderIcon={(props) => <ChartLineSmooth size={16} {...props} />}
                 iconDescription={t('chartView', 'Chart View')}
                 onClick={() => setChartView(true)}
               />
             </div>
             <span className={styles.divider}>|</span>
             {showAddBiometrics && (
-              <Button kind="ghost" renderIcon={Add16} iconDescription="Add biometrics" onClick={launchBiometricsForm}>
+              <Button
+                kind="ghost"
+                renderIcon={(props) => <Add size={16} {...props} />}
+                iconDescription="Add biometrics"
+                onClick={launchBiometricsForm}
+              >
                 {t('add', 'Add')}
               </Button>
             )}

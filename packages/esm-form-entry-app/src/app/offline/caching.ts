@@ -10,6 +10,7 @@ import {
 import escapeRegExp from 'lodash-es/escapeRegExp';
 import { FormSchemaService } from '../form-schema/form-schema.service';
 import { FormEncounter, FormSchema } from '../types';
+import { ConceptService } from '../services/concept.service';
 
 export function setupStaticDataOfflinePrecaching() {
   subscribePrecacheStaticDependencies(async () => {
@@ -90,8 +91,8 @@ async function getCacheableFormUrls(formUuid: string) {
 
   const conceptLang = (window as any).i18next?.language?.substring(0, 2).toLowerCase() || 'en';
   const requiredConceptIdentifiers = FormSchemaService.getUnlabeledConceptIdentifiersFromSchema(formSchema);
-  const conceptUrls = requiredConceptIdentifiers.map(
-    (identifier) => `/ws/rest/v1/concept/${identifier}?v=full&lang=${conceptLang}`,
+  const conceptUrls = ConceptService.getRelativeConceptLabelUrls(requiredConceptIdentifiers, conceptLang).map(
+    (relativeUrl) => `/ws/rest/v1/${relativeUrl}`,
   );
 
   return [

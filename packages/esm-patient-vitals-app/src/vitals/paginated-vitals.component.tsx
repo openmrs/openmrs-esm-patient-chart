@@ -9,7 +9,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from 'carbon-components-react';
+} from '@carbon/react';
 import { usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import styles from './paginated-vitals.scss';
@@ -25,7 +25,7 @@ interface PaginatedVitalsProps {
 const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({ tableRows, pageSize, pageUrl, urlLabel, tableHeaders }) => {
   const { results: paginatedVitals, goTo, currentPage } = usePagination(tableRows, pageSize);
 
-  const StyledTableCell = ({ interpretation, children }) => {
+  const StyledTableCell = ({ interpretation, children }: { interpretation: string; children: React.ReactNode }) => {
     switch (interpretation) {
       case 'critically_high':
         return <TableCell className={styles.criticallyHigh}>{children}</TableCell>;
@@ -42,10 +42,10 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({ tableRows, pageSize, 
 
   return (
     <div>
-      <TableContainer>
-        <DataTable rows={paginatedVitals} headers={tableHeaders} isSortable={true} size="short">
-          {({ rows, headers, getHeaderProps, getTableProps }) => (
-            <Table {...getTableProps()} className={styles.customRow} useZebraStyles>
+      <DataTable rows={paginatedVitals} headers={tableHeaders} isSortable size="sm" useZebraStyles>
+        {({ rows, headers, getHeaderProps, getTableProps }) => (
+          <TableContainer>
+            <Table {...getTableProps()} className={styles.customRow}>
               <TableHead>
                 <TableRow>
                   {headers.map((header) => (
@@ -77,9 +77,9 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({ tableRows, pageSize, 
                 ))}
               </TableBody>
             </Table>
-          )}
-        </DataTable>
-      </TableContainer>
+          </TableContainer>
+        )}
+      </DataTable>
       <PatientChartPagination
         pageNumber={currentPage}
         totalItems={tableRows.length}

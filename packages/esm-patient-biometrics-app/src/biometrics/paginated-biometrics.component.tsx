@@ -9,9 +9,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from 'carbon-components-react';
+} from '@carbon/react';
 import { usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
+import { PatientBiometrics } from './biometrics.resource';
 import styles from './biometrics-overview.scss';
 
 interface PaginatedBiometricsProps {
@@ -33,10 +34,10 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
 
   return (
     <div>
-      <TableContainer>
-        <DataTable rows={paginatedBiometrics} headers={tableHeaders} isSortable size="short">
-          {({ rows, headers, getHeaderProps, getTableProps }) => (
-            <Table {...getTableProps()} useZebraStyles>
+      <DataTable rows={paginatedBiometrics} headers={tableHeaders} isSortable size="sm" useZebraStyles>
+        {({ rows, headers, getHeaderProps, getTableProps }) => (
+          <TableContainer>
+            <Table {...getTableProps()}>
               <TableHead>
                 <TableRow>
                   {headers.map((header) => (
@@ -62,9 +63,9 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
                 ))}
               </TableBody>
             </Table>
-          )}
-        </DataTable>
-      </TableContainer>
+          </TableContainer>
+        )}
+      </DataTable>
       <PatientChartPagination
         pageNumber={currentPage}
         totalItems={tableRows.length}

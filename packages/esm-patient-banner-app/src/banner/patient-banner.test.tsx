@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import PatientBanner from './patient-banner.component';
@@ -18,7 +18,7 @@ jest.mock('@openmrs/esm-framework', () => ({
 }));
 
 describe('PatientBanner: ', () => {
-  it('renders patient-related information in a banner at the top of the page', () => {
+  it('renders information about a patient in a banner above the patient chart', () => {
     renderPatientBanner();
 
     expect(screen.getByRole('banner')).toBeInTheDocument();
@@ -30,14 +30,16 @@ describe('PatientBanner: ', () => {
     expect(screen.getByRole('button', { name: /^Show all details$/i })).toBeInTheDocument();
   });
 
-  it("can toggle between showing or hiding the patient's contact details", () => {
+  it("can toggle between showing or hiding the patient's contact details", async () => {
+    const user = userEvent.setup();
+
     renderPatientBanner();
 
     const showContactDetailsBtn = screen.getByRole('button', {
       name: /^Show all details$/i,
     });
 
-    userEvent.click(showContactDetailsBtn);
+    await waitFor(() => user.click(showContactDetailsBtn));
 
     const showLessBtn = screen.getByRole('button', {
       name: /^Show less$/i,
@@ -46,17 +48,20 @@ describe('PatientBanner: ', () => {
     expect(screen.getByText('Address')).toBeInTheDocument();
     expect(screen.getByText(/Contact Details/i)).toBeInTheDocument();
 
-    userEvent.click(showLessBtn);
+    await waitFor(() => user.click(showLessBtn));
 
     expect(showContactDetailsBtn).toBeInTheDocument();
   });
 
-  it('should allow navigate to patient-chart on patient-search', () => {
+  it('should allow navigate to patient-chart on patient-search', async () => {
+    const user = userEvent.setup();
+
     const patientBannerSeachPageProps = { ...testProps, onClick: mockNavigateTo };
     render(<PatientBanner {...patientBannerSeachPageProps} />);
 
     const imgAvatar = screen.getByRole('img');
-    userEvent.click(imgAvatar);
+
+    await waitFor(() => user.click(imgAvatar));
 
     expect(mockNavigateTo).toHaveBeenCalled();
     expect(mockNavigateTo).toHaveBeenCalledWith(patientBannerSeachPageProps.patientUuid);
@@ -64,7 +69,8 @@ describe('PatientBanner: ', () => {
     const showContactDetailsBtn = screen.getByRole('button', {
       name: /^Show all details$/i,
     });
-    userEvent.click(showContactDetailsBtn);
+
+    await waitFor(() => user.click(showContactDetailsBtn));
 
     expect(mockNavigateTo).toHaveBeenCalledTimes(1);
 

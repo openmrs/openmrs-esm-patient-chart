@@ -1,0 +1,16 @@
+@use '@carbon/styles/scss/spacing';
+@import "../root.scss";
+
+.container {
+  padding:  spacing.$spacing-05;
+}
+
+.container p {
+  margin-top: spacing.$spacing-05;
+}
+
+.buttonSet {
+  justify-content: flex-end;
+  margin:  spacing.$spacing-05;
+  margin-top: spacing.$spacing-05;
+}

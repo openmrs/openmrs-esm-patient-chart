@@ -6,6 +6,10 @@
   font-size: 80%;
 }
 
-:global(.bx--tooltip--definition .bx--tooltip__trigger){
+.heading {
+  margin-bottom: 0.5rem; 
+}
+
+:global(.cds--tooltip--definition .cds--tooltip__trigger){
   border-bottom: none;
 }

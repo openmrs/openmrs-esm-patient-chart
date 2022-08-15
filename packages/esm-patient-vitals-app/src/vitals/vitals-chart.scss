@@ -1,0 +1,95 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.label01 {
+  @include type.type-style("label-01");
+}
+
+.bodyShort01 {
+  @include type.type-style("body-compact-01");
+}
+
+.vitalsChartContainer {
+  display: flex;
+  margin: 0rem spacing.$spacing-05;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.vitalSignsArea {
+  flex-grow: 1;
+  margin: spacing.$spacing-03 0;
+  padding-right: spacing.$spacing-05;
+}
+
+.vitalsChartArea {
+  flex-grow: 4;
+  padding: 0 spacing.$spacing-05 spacing.$spacing-09;
+
+  :global(.cds--cc--layout-row) {
+    height: 0;
+  }
+  
+  :global(.layout-child) {
+    margin-top: 0.5rem;
+  }
+}
+
+.vitalsSignLabel {
+  @extend .label01;
+  margin-bottom: 1rem;
+  display: inline-block;
+}
+
+.verticalTabs {
+  margin: 1rem 0;
+  scroll-behavior: smooth;
+  
+  > ul {
+    flex-direction: column !important;
+  }
+  
+  :global(.cds--tabs--scrollable .cds--tabs--scrollable__nav-item+.cds--tabs--scrollable__nav-item) {
+    margin-left: 0rem;
+  }
+  
+  :global(.cds--tabs--scrollable .cds--tabs--scrollable__nav-link) {
+    border-bottom: 0 !important;
+    border-left: 2px solid $color-gray-30;
+  }
+}
+
+.tab {
+  outline: 0;
+  outline-offset: 0;
+
+  &:active, &:focus {
+    outline: 2px solid var(--brand-03) !important;
+  }
+
+  &[aria-selected="true"] {
+    border-left: 3px solid var(--brand-03);
+    border-bottom: none;
+    font-weight: 600;
+    margin-left: 0rem !important;
+  }
+
+  &[aria-selected="false"] {
+    border-bottom: none;
+    border-left: 2px solid $ui-03;
+    margin-left: 0rem !important;
+  }
+}
+
+.tablist {
+  :global(.cds--tab--list) {
+    flex-direction: column;
+    max-height: fit-content;
+    overflow-x: visible;
+  }
+  
+  > button :global(.cds--tabs .cds--tabs__nav-link) {
+    border-bottom: none;
+  }
+}

@@ -32,7 +32,7 @@ function setupOpenMRS() {
       {
         name: 'appointments-details-widget',
         slot: dashboardMeta.slot,
-        load: getAsyncLifecycle(() => import('./appointments/appointments.component'), options),
+        load: getAsyncLifecycle(() => import('./appointments/appointments-detailed-summary.component'), options),
         meta: {
           columnSpan: 1,
         },
@@ -48,7 +48,7 @@ function setupOpenMRS() {
         name: 'appointments-form-workspace',
         load: getAsyncLifecycle(() => import('./appointments/appointments-form.component'), options),
         meta: {
-          title: 'Create appointment',
+          title: 'Schedule appointment',
         },
       },
     ],

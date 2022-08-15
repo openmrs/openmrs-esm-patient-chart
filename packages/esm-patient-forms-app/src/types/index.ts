@@ -11,6 +11,7 @@ export interface FormEncounter {
   retired: boolean;
   resources: Array<FormEncounterResource>;
   translations: Array<string>;
+  formCategory?: string;
 }
 
 /**

@@ -1,12 +1,12 @@
 import React, { SyntheticEvent, useMemo } from 'react';
 import 'dayjs/plugin/utc';
-import styles from './conditions-form.scss';
 import { useTranslation } from 'react-i18next';
+import { BehaviorSubject } from 'rxjs';
+import { Button, ButtonSet, Form } from '@carbon/react';
 import { useLayoutType } from '@openmrs/esm-framework';
-import { Button, Form, ButtonSet } from 'carbon-components-react';
 import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import ConditionsWidget from './conditions-widget.component';
-import { BehaviorSubject } from 'rxjs';
+import styles from './conditions-form.scss';
 
 const ConditionsForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patientUuid }) => {
   const { t } = useTranslation();
