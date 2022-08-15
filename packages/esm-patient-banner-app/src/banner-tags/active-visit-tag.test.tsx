@@ -33,7 +33,7 @@ describe('ActiveVisitBannerTag: ', () => {
     expect(screen.getByRole('button', { name: /Active Visit/i })).toBeInTheDocument();
   });
 
-  it('should not render active visit tag if patient is dead', () => {
+  it('should not render active visit tag for deceased patients', () => {
     mockUseVisitOrOfflineVisit.mockReturnValue({
       currentVisit: mockCurrentVisit,
       error: null,

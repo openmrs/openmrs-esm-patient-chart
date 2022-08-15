@@ -1,8 +1,8 @@
 import React from 'react';
+import { StructuredListSkeleton } from '@carbon/react';
+import { PatientProgram } from '@openmrs/esm-patient-common-lib';
 import { useRecommendedVisitTypes } from '../hooks/useRecommendedVisitTypes';
 import BaseVisitType from './base-visit-type.component';
-import { PatientProgram } from '@openmrs/esm-patient-common-lib';
-import { StructuredListSkeleton } from 'carbon-components-react';
 
 interface RecommendedVisitTypeProp {
   patientUuid: string;

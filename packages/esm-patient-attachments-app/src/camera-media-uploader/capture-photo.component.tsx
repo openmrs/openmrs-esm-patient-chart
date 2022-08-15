@@ -1,8 +1,8 @@
 import React, { useCallback, useState } from 'react';
-import placeholder from '../assets/placeholder.svg';
-import { Button } from 'carbon-components-react';
-import { showModal, toOmrsIsoString } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@carbon/react';
+import { showModal, toOmrsIsoString } from '@openmrs/esm-framework';
+import placeholder from '../assets/placeholder.svg';
 
 export interface CapturePhotoProps {
   onCapturePhoto(dataUri: string, photoDateTime: string): void;

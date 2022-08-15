@@ -1,7 +1,6 @@
-import { attach } from '@openmrs/esm-framework';
-import { ButtonSet, Button } from 'carbon-components-react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { ButtonSet, Button } from '@carbon/react';
 import { Attachment } from '../attachments-types';
 import styles from './delete-attachment-confirmation-modal.scss';
 

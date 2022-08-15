@@ -1,11 +1,11 @@
-import React, { useContext, useState, useEffect, useCallback, SyntheticEvent } from 'react';
+import React, { SyntheticEvent, useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Button, ButtonSet, TextArea, TextInput } from '@carbon/react';
 import { UserHasAccess } from '@openmrs/esm-framework';
 import { Button, ButtonSet, TextArea, TextInput } from 'carbon-components-react';
-import styles from './file-review.scss';
-import { UploadedFile } from '../attachments-types';
+import styles from './image-preview.scss';
+import { UploadedFile } from './attachments-types';
 import FileRegular from '../assets/file-regular.svg';
-import CameraMediaUploaderContext from './camera-media-uploader-context.resources';
-import { useTranslation } from 'react-i18next';
 
 export interface FileReviewContainerProps {
   onCompletion: () => void;

@@ -1,15 +1,14 @@
-@import "~@openmrs/esm-styleguide/src/vars";
-@import "~carbon-components/src/globals/scss/vars";
-@import "~carbon-components/src/globals/scss/mixins";
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
 
 .heading {
-  @include carbon--type-style("productive-heading-03");
-  color: $text-01;
-  margin: 1rem;
+  @include type.type-style("heading-03");
+  margin-bottom: 0.5rem;
 }
 
 .columnLabel {
-  @include carbon--type-style("productive-heading-02");
+  @include type.type-style("heading-compact-02");
   color: $text-02;
 }
 
@@ -30,18 +29,18 @@
 }
 
 .diagnosesText {
-  @include carbon--type-style("body-short-01");
+  @include type.type-style("body-compact-01");
   color: $text-02;
 }
 
 .emptyResults {
-  @include carbon--type-style("body-short-01");
+  @include type.type-style("body-compact-01");
   color: $text-02;
   min-height: 1rem;
 }
 
 .imgUploadHelperText {
-  @include carbon--type-style("body-short-01");
+  @include type.type-style("body-compact-01");
   color: $text-02;
 }
 
@@ -60,6 +59,22 @@
 
 .desktop {
   padding: 0rem;
+}
+
+.headerGridRow {
+  border-bottom: 0.0625rem solid $grey-2;
+  margin: 0;
+}
+
+.dataGridRow {
+  display: grid;
+  grid-template-columns: 50% 10% 1fr;
+  margin: 0.5rem 1rem;
+  width: 100%;
+}
+
+.formContainer {
+  margin: 1rem;
 }
 
 .form {

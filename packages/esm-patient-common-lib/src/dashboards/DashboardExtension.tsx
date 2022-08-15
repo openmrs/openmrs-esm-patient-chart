@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import { last } from 'lodash';
+import last from 'lodash-es/last';
 import { ConfigurableLink } from '@openmrs/esm-framework';
 import styles from './dashboardextension.scss';
 
@@ -17,7 +17,10 @@ export const DashboardExtension = ({ title, basePath }: DashboardExtensionProps)
 
   return (
     <div key={title} className={activeClassName}>
-      <ConfigurableLink to={`${basePath}/${encodeURIComponent(title)}`} className={'bx--side-nav__link ' + styles.link}>
+      <ConfigurableLink
+        to={`${basePath}/${encodeURIComponent(title)}`}
+        className={'cds--side-nav__link ' + styles.link}
+      >
         {title}
       </ConfigurableLink>
     </div>

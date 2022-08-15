@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
@@ -41,6 +41,8 @@ describe('AppointmensOverview', () => {
   });
 
   it('renders an error state if there was a problem fetching appointments data', async () => {
+    const user = userEvent.setup();
+
     const error = {
       message: 'Internal server error',
       response: {
@@ -64,6 +66,8 @@ describe('AppointmensOverview', () => {
   });
 
   it(`renders a tabular overview of the patient's appointment schedule if available`, async () => {
+    const user = userEvent.setup();
+
     mockOpenmrsFetch.mockReturnValueOnce(mockAppointmentsData);
     mockUsePagination.mockImplementation(() => ({
       currentPage: 1,
@@ -86,7 +90,7 @@ describe('AppointmensOverview', () => {
     expect(screen.getByTitle(/Empty data illustration/i)).toBeInTheDocument();
     expect(screen.getByText(/There are no upcoming appointments to display for this patient/i)).toBeInTheDocument();
 
-    userEvent.click(pastAppointmentsTab);
+    await waitFor(() => user.click(pastAppointmentsTab));
     expect(screen.getByRole('table')).toBeInTheDocument();
 
     const expectedColumnHeaders = [/date/, /location/, /service/];

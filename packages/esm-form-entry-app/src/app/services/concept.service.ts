@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs';
+import { forkJoin, Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
 
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -29,11 +29,40 @@ export class ConceptService {
     });
   }
 
-  public searchBulkConceptByUUID(conceptUuids: Array<string>, lang: string): Observable<Array<ConceptMetadata>> {
-    return this.http
-      .get<ListResult<ConceptMetadata>>(this.getUrl() + `?references=` + conceptUuids.join(','), {
-        headers: this.headers,
-      })
-      .pipe(map((r) => r.results));
+  public searchBulkConceptsByUUID(conceptUuids: Array<string>, lang: string): Observable<Array<ConceptMetadata>> {
+    const observablesArray = [];
+    const relativeConceptLabelUrls = ConceptService.getRelativeConceptLabelUrls(conceptUuids, lang);
+
+    for (const relativeConceptLabelUrl of relativeConceptLabelUrls) {
+      observablesArray.push(
+        this.http
+          .get<ListResult<ConceptMetadata>>(this.getUrl() + relativeConceptLabelUrl, {
+            headers: this.headers,
+          })
+          .pipe(
+            map((r) => {
+              return r.results;
+            }),
+          ),
+      );
+    }
+
+    return forkJoin(observablesArray).pipe(
+      map((response) => {
+        return response.flat() as Array<ConceptMetadata>;
+      }),
+    );
+  }
+
+  /**
+   * Partitions the given concept UUIDs into relative URLs pointing to the concept
+   * bulk fetching endpoint.
+   * @param conceptUuids The concept UUIDs to be partitioned into bulk fetching URLs.
+   */
+  public static getRelativeConceptLabelUrls(conceptUuids: Array<string>, lang: string) {
+    const chunkSize = 100;
+    return conceptUuids
+      .reduceRight((acc, _, __, array) => [...acc, array.splice(0, chunkSize)], [])
+      .map((uuidPartition) => `concept?references=${uuidPartition.join(',')}`);
   }
 }

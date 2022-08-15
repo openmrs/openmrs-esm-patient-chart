@@ -1,29 +1,29 @@
-@import "~@openmrs/esm-styleguide/src/vars";
-@import "~carbon-components/src/globals/scss/vars";
-@import "~carbon-components/src/globals/scss/mixins";
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
 
 .label01 {
-  @include carbon--type-style("label-01");
+  @include type.type-style("label-01");
 }
 
 .bodyLong01 {
-  @include carbon--type-style("body-long-01");
+  @include type.type-style("body-01");
 }
 
 .productiveHeading04 {
-  @include carbon--type-style("productive-heading-04");
+  @include type.type-style("heading-04");
 }
 
 .inputContainer {
   width: 11.625rem;
   border-bottom: 0.063rem solid $ui-04;
-  margin-bottom: $spacing-05;
+  margin-bottom: spacing.$spacing-05;
 }
 
 .vitalsBiometricInputLabel01 {
   @extend .label01;
   color: $text-02;
-  margin-bottom: $spacing-03;
+  margin-bottom: spacing.$spacing-03;
 }
 
 .textInput {
@@ -41,7 +41,7 @@
   justify-content: center;
   flex-direction: column;
   text-align: center;
-  padding: $spacing-03;
+  padding: spacing.$spacing-03;
   color: $text-02;
   background-color: $ui-02;
 }
@@ -50,10 +50,14 @@
 background-color: $ui-01;
 }
 
-.textArea {
+.textarea {
   border: none;
   @extend .bodyLong01;
   text-align: left;
+
+  textarea {
+    border-bottom: none;
+  }
 }
 
 .centerDiv {
@@ -66,7 +70,7 @@ background-color: $ui-01;
 }
 
 .unitName {
-  margin-bottom: $spacing-03;
+  margin-bottom: spacing.$spacing-03;
 }
 
 .disableInput {

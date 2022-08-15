@@ -1,9 +1,9 @@
 import React from 'react';
-import styles from './attachments-grid-overview.scss';
-import { Attachment } from '../attachments-types';
-import { Button, OverflowMenu, OverflowMenuItem } from 'carbon-components-react';
-import Close from '@carbon/icons-react/es/close/24';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@carbon/react';
+import { Close } from '@carbon/react/icons';
+import { Attachment } from './attachments-types';
+import styles from './attachments-grid-overview.scss';
 
 interface ImagePreviewProps {
   closePreview: any;
@@ -21,7 +21,7 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ closePreview, imageSelected
           kind="ghost"
           className={styles.closePreviewButton}
           hasIconOnly
-          renderIcon={Close}
+          renderIcon={<Close size={16} />}
           onClick={closePreview}
         />
         <div className={styles.attachmentImage}>

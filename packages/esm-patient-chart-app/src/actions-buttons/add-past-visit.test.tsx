@@ -12,14 +12,17 @@ jest.mock('@openmrs/esm-framework', () => {
 });
 
 describe('AddPastVisitOverflowMenuItem', () => {
-  it('should launch past visit prompt', () => {
+  it('should launch past visit prompt', async () => {
+    const user = userEvent.setup();
+
     render(<AddPastVisitOverflowMenuItem />);
 
     const addPastVisitButton = screen.getByRole('menuitem', { name: /Add Past Visit/ });
     expect(addPastVisitButton).toBeInTheDocument();
 
     // should launch the form
-    userEvent.click(addPastVisitButton);
+    await user.click(addPastVisitButton);
+
     expect(mockShowModal).toHaveBeenCalled();
   });
 });

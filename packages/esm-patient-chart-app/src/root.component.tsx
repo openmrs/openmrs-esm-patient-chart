@@ -1,13 +1,13 @@
 import React, { useEffect, useMemo } from 'react';
+import { SWRConfig } from 'swr';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { WorkspaceWindowSizeProvider } from '@openmrs/esm-patient-common-lib';
+import { setLeftNav, unsetLeftNav, usePatient } from '@openmrs/esm-framework';
+import { dashboardPath, spaRoot, spaBasePath, basePath } from './constants';
 import WorkspaceWindow from './workspace/workspace-window.component';
 import PatientChart from './patient-chart/patient-chart.component';
 import SideMenu from './side-nav/side-menu.component';
-import { BrowserRouter, Route } from 'react-router-dom';
-import { dashboardPath, spaRoot, spaBasePath, basePath } from './constants';
 import styles from './root.scss';
-import { WorkspaceWindowSizeProvider } from '@openmrs/esm-patient-common-lib';
-import { SWRConfig } from 'swr';
-import { setLeftNav, unsetLeftNav, usePatient } from '@openmrs/esm-framework';
 
 const swrConfiguration = {
   // Maximum number of retries when the backend returns an error
@@ -28,8 +28,11 @@ export default function Root() {
         <WorkspaceWindowSizeProvider>
           <div className={styles.patientChartWrapper}>
             <SideMenu />
-            <Route path={dashboardPath} component={PatientChart} />
-            <Route path={basePath} component={WorkspaceWindow} />
+            <Routes>
+              <Route path={basePath} element={<PatientChart />} />
+              <Route path={dashboardPath} element={<PatientChart />} />
+            </Routes>
+            <WorkspaceWindow patientUuid={patientUuid} />
           </div>
         </WorkspaceWindowSizeProvider>
       </BrowserRouter>

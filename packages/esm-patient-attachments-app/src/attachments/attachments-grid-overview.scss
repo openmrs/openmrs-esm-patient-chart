@@ -1,11 +1,13 @@
-@import "../root.scss";
+@use '@carbon/styles/scss/spacing';
+@use '~@carbon/styles/scss/colors';
+@import '../root.scss';
 
 .galleryContainer {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
   align-items: center;
-  grid-gap: $spacing-05;
-  padding: 0 $spacing-05 $spacing-05 $spacing-05;
+  grid-gap: spacing.$spacing-05;
+  padding: 0 spacing.$spacing-05 spacing.$spacing-05 spacing.$spacing-05;
 }
 
 .attachmentThumbnailSkeleton {
@@ -25,7 +27,7 @@
   top: 0;
   left: 0;
   z-index: 8001;
-  background-color: $carbon--gray-90;
+  background-color: colors.$gray-90;
 }
 
 .leftPanel {
@@ -35,8 +37,8 @@
 }
 
 .rightPanel {
-  background-color: $carbon--gray-80;
-  padding: $spacing-05;
+  background-color: colors.$gray-80;
+  padding: spacing.$spacing-05;
   color: $ui-01;
 }
 
@@ -70,5 +72,5 @@
 }
 
 .imageDescription {
-  margin-top: $spacing-03;
+  margin-top: spacing.$spacing-03;
 }

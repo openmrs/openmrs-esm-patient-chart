@@ -1,7 +1,6 @@
-
-@import "~@openmrs/esm-styleguide/src/vars";
-@import "~carbon-components/src/globals/scss/vars";
-@import "~carbon-components/src/globals/scss/mixins";
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
 
 .timelineHeader {
   position: sticky;
@@ -32,12 +31,12 @@
 }
 
 .dayColumn, .yearColumn {
-  @include carbon--type-style('productive-heading-01');
+  @include type.type-style('heading-compact-01');
   color: $text-02;
 }
 
 .timeColumn {
-  @include carbon--type-style('body-short-01');
+  @include type.type-style('body-compact-01');
   color: $text-02;
   scroll-snap-align: start;
 }
@@ -62,7 +61,7 @@
   justify-items: first baseline;
 
   p {
-    @include carbon--type-style('body-short-01');
+    @include type.type-style('body-compact-01');
     color: $text-02;
   }
 }
@@ -147,8 +146,8 @@
   padding: 0rem 1rem;
 
   div {
-    @include carbon--type-style('productive-heading-01');
-    color: $text-01;
+    @include type.type-style('heading-compact-01');
+    
     left: 0;
     width: 100%;
     word-wrap: normal;
@@ -160,15 +159,15 @@
 }
 
 .trendlineLink {
-  @include carbon--type-style('body-short-01');
+  @include type.type-style('body-compact-01');
   color: $interactive-01;
   cursor: pointer;
   text-decoration: none;
 }
 
 .rangeUnits {
-  @include carbon--type-style('helper-text-01');
-  color: $text-05;
+  @include type.type-style('helper-text-01');
+ //  color: $text-05; // WIP
 }
 
 .offScaleHigh,
@@ -178,8 +177,8 @@
 .high,
 .low {
   p {
-    @include carbon--type-style('productive-heading-01');
-    color: $text-01;
+    @include type.type-style('heading-compact-01');
+    
   }
 }
 

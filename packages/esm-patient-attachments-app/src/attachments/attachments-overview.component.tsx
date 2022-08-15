@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import styles from './attachments-overview.scss';
-import Add16 from '@carbon/icons-react/es/add/16';
 import { useTranslation } from 'react-i18next';
-import { Button, ContentSwitcher, Loading, Switch } from 'carbon-components-react';
+import { Button, ContentSwitcher, Loading, Switch } from '@carbon/react';
+import { Add } from '@carbon/react/icons';
 import { LayoutType, showModal, showToast, useLayoutType, usePagination, UserHasAccess } from '@openmrs/esm-framework';
 import { PatientChartPagination, EmptyState } from '@openmrs/esm-patient-common-lib';
 import { createAttachment, deleteAttachmentPermanently, useAttachments } from '../attachments.resource';
@@ -11,6 +10,7 @@ import { UploadedFile, Attachment } from '../attachments-types';
 import AttachmentsGridOverview from './attachments-grid-overview.component';
 import AttachmentsTableOverview from './attachments-table-overview.component';
 import ImagePreview from './image-preview.component';
+import styles from './attachments-overview.scss';
 
 function getPageSize(layoutType: LayoutType) {
   switch (layoutType) {
@@ -18,8 +18,11 @@ function getPageSize(layoutType: LayoutType) {
       return 9;
     case 'phone':
       return 3;
-    case 'desktop':
+    case 'small-desktop':
       return 25;
+    // TODO: Add case for the 'large-desktop' layout
+    // case 'large-desktop':
+    //   return 25;
     default:
       return 8;
   }
@@ -110,7 +113,7 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
               <Switch name="grid" text="Grid" selected={view === 'grid'} />
               <Switch name="tabular" text="Table" selected={view === 'tabular'} />
             </ContentSwitcher>
-            <Button kind="ghost" renderIcon={Add16} iconDescription="Add attachment" onClick={showCam}>
+            <Button kind="ghost" renderIcon={<Add size={16} />} iconDescription="Add attachment" onClick={showCam}>
               {t('add', 'Add')}
             </Button>
           </div>

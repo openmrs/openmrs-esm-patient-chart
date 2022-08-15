@@ -3,6 +3,7 @@ import { ObsRecord, OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-comm
 import styles from './timeline.scss';
 
 export const Grid: React.FC<{
+  children?: React.ReactNode;
   style: React.CSSProperties;
   padding?: boolean;
   dataColumns: number;
@@ -96,6 +97,7 @@ export const RowStartCell = ({ title, range, units, shadow = false, openTrendlin
 );
 
 export const TimeSlots: React.FC<{
+  children?: React.ReactNode;
   style?: React.CSSProperties;
   className?: string;
 }> = ({ children = undefined, ...props }) => (

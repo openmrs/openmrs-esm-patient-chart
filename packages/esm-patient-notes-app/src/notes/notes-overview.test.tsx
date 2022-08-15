@@ -1,12 +1,14 @@
 import React from 'react';
-import { screen, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { openmrsFetch, useConfig, usePagination } from '@openmrs/esm-framework';
+import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { mockVisitNotes, formattedVisitNotes } from '../../../../__mocks__/visit-notes.mock';
 import { patientChartBasePath, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import { ConfigMock } from '../../../../__mocks__/chart-widgets-config.mock';
 import NotesOverview from './notes-overview.component';
+
+jest.setTimeout(10000);
 
 const testProps = {
   basePath: patientChartBasePath,
@@ -17,7 +19,6 @@ const testProps = {
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockUsePagination = usePagination as jest.Mock;
-const mockUseConfig = useConfig as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -25,6 +26,7 @@ jest.mock('@openmrs/esm-framework', () => {
   return {
     ...originalModule,
     openmrsFetch: jest.fn(),
+    useConfig: jest.fn().mockImplementation(() => ConfigMock),
     usePagination: jest.fn().mockImplementation(() => ({
       currentPage: 1,
       goTo: () => {},
@@ -34,18 +36,7 @@ jest.mock('@openmrs/esm-framework', () => {
   };
 });
 
-jest.mock('./notes.context', () => ({
-  useNotesContext: jest.fn().mockReturnValue({
-    patient: mockPatient,
-    patientUuid: mockPatient.id,
-  }),
-}));
-
-describe('NotesOverview: ', () => {
-  beforeEach(() => {
-    mockUseConfig.mockReturnValue(ConfigMock);
-  });
-
+describe('NotesOverview', () => {
   it('renders an empty state view if visit note data is unavailable', async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
 
@@ -85,6 +76,8 @@ describe('NotesOverview: ', () => {
   });
 
   it("renders a tabular overview of the patient's visit notes when present", async () => {
+    const user = userEvent.setup();
+
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockVisitNotes } });
     mockUsePagination.mockReturnValueOnce({
       results: formattedVisitNotes.slice(0, 10),
@@ -119,11 +112,13 @@ describe('NotesOverview: ', () => {
     );
 
     // Expanding a row displays any associated visit notes
-    userEvent.click(screen.getAllByRole('button', { name: /expand current row/i })[0]);
+    await waitFor(() => user.click(screen.getAllByRole('button', { name: /expand current row/i })[0]));
+
     expect(screen.getByText(/No visit note to display/i)).toBeInTheDocument();
 
     // Collapsing the row hides the visit note
-    userEvent.click(screen.getByRole('button', { name: /collapse current row/i }));
+    await waitFor(() => user.click(screen.getByRole('button', { name: /collapse current row/i })));
+
     expect(screen.queryByText(/No visit note to display/i)).not.toBeInTheDocument();
   });
 });

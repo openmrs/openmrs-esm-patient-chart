@@ -1,12 +1,12 @@
-@import "~@openmrs/esm-styleguide/src/vars";
-@import "~carbon-components/src/globals/scss/vars";
-@import "~carbon-components/src/globals/scss/mixins";
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
 
 td {
   &.criticallyLow, &.criticallyHigh, &.low, &.high {
     td:nth-child(2) {
-      @include carbon--type-style("productive-heading-01");
-      color: $text-01;
+      @include type.type-style("heading-compact-01");
+      
     }
   }
 
@@ -62,8 +62,7 @@ td {
 .criticallyLow,
 .high,
 .low {
-  @include carbon--type-style('productive-heading-01');
-  color: $text-01;
+  @include type.type-style('heading-compact-01');
 }
 
 .criticallyLow::after {

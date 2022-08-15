@@ -1,10 +1,10 @@
 import React from 'react';
-import MedicationsDetailsTable from '../components/medications-details-table.component';
-import { DataTableSkeleton } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
-import { EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { usePatientOrders } from '../api/api';
+import { DataTableSkeleton } from '@carbon/react';
 import { useConfig } from '@openmrs/esm-framework';
+import { EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import MedicationsDetailsTable from '../components/medications-details-table.component';
+import { usePatientOrders } from '../api/api';
 import { ConfigObject } from '../config-schema';
 
 export interface MedicationsSummaryProps {

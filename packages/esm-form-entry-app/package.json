@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-form-entry-app",
-  "version": "3.2.0",
+  "version": "4.0.0",
   "license": "MPL-2.0",
   "description": "Form engine entry capabilities for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-form-entry-app.js",
@@ -11,7 +11,7 @@
     "serve": "ng serve --port 4200 --live-reload true",
     "debug": "npm run serve",
     "build": "ng build --configuration production",
-    "lint": "eslint src --ext ts"
+    "lint": "eslint src --ext ts --fix --max-warnings=0"
   },
   "openmrs:develop": {
     "command": "npm run serve",
@@ -46,13 +46,15 @@
     "@angular/platform-browser": "~11.2.14",
     "@angular/platform-browser-dynamic": "~11.2.14",
     "@angular/router": "~11.2.14",
+    "@carbon/styles": "^1.8.0",
     "@ng-select/ng-select": "^6.1.0",
     "hammerjs": "^2.0.8",
     "jspdf": "^1.5.3",
     "moment": "^2.17.1",
-    "ngx-bootstrap": "5.6.x",
+    "ngx-bootstrap": "^6.0.0",
     "ngx-file-uploader": "0.0.18",
     "ngx-webcam": "^0.2.2",
+    "openmrs": "^4.0.0-pre.1",
     "reflect-metadata": "^0.1.13",
     "single-spa-angular": "^4.9.2",
     "slick-carousel": "^1.6.0",
@@ -64,7 +66,6 @@
   },
   "peerDependencies": {
     "@openmrs/esm-framework": "3.x",
-    "carbon-components": "10.x",
     "rxjs": "6.x",
     "single-spa": "5.x",
     "systemjs": "6.x"
@@ -78,6 +79,7 @@
     "@angular/localize": "~11.2.14",
     "@types/jasmine": "~3.6.0",
     "@types/jasminewd2": "~2.0.3",
+    "@types/webpack-env": "^1.17.0",
     "codelyzer": "^6.0.0",
     "jasmine-core": "~3.6.0",
     "jasmine-spec-reporter": "~5.0.0",

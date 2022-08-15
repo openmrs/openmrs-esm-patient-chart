@@ -1,27 +1,23 @@
 const { IgnorePlugin, DefinePlugin } = require('webpack');
-const { StatsWriterPlugin } = require("webpack-stats-plugin");
-const { basename } = require("path");
-const singleSpaAngularWebpack = require("single-spa-angular/lib/webpack")
-  .default;
+const { StatsWriterPlugin } = require('webpack-stats-plugin');
+const { basename } = require('path');
+const singleSpaAngularWebpack = require('single-spa-angular/lib/webpack').default;
 
-const packageJson = require("./package.json");
+const packageJson = require('./package.json');
 
 function getFrameworkVersion() {
   try {
-    const { version } = require("@openmrs/esm-framework/package.json");
+    const { version } = require('@openmrs/esm-framework/package.json');
     return `^${version}`;
   } catch {
-    return "3.x";
+    return '3.x';
   }
 }
 
 module.exports = (angularWebpackConfig, options) => {
   const filename = basename(packageJson.browser || packageJson.main);
   const frameworkVersion = getFrameworkVersion();
-  const singleSpaWebpackConfig = singleSpaAngularWebpack(
-    angularWebpackConfig,
-    options
-  );
+  const singleSpaWebpackConfig = singleSpaAngularWebpack(angularWebpackConfig, options);
 
   singleSpaWebpackConfig.output.filename = filename;
 
@@ -32,7 +28,7 @@ module.exports = (angularWebpackConfig, options) => {
   singleSpaWebpackConfig.plugins.push(
     new IgnorePlugin(/^\.\/locale$/, /moment$/),
     new DefinePlugin({
-      "process.env.FRAMEWORK_VERSION": JSON.stringify(frameworkVersion),
+      'process.env.FRAMEWORK_VERSION': JSON.stringify(frameworkVersion),
     }),
     new StatsWriterPlugin({
       filename: `${filename}.buildmanifest.json`,
@@ -40,7 +36,8 @@ module.exports = (angularWebpackConfig, options) => {
         all: false,
         chunks: true,
       },
-    }));
+    }),
+  );
 
   return singleSpaWebpackConfig;
 };

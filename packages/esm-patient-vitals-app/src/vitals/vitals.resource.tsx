@@ -130,8 +130,8 @@ export function useVitals(patientUuid: string, includeBiometrics: boolean = fals
       bmi: calculateBMI(Number(vitalSigns.weight), Number(vitalSigns.height)),
       date: date,
       bloodPressureInterpretation: interpretBloodPressure(
-        vitalSigns.diastolic,
         vitalSigns.systolic,
+        vitalSigns.diastolic,
         concepts,
         conceptMetadata,
       ),

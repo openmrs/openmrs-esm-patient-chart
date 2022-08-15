@@ -1,8 +1,6 @@
-@import "~@openmrs/esm-styleguide/src/vars";
-@import "~carbon-components/src/globals/scss/vars";
-@import "~carbon-components/src/globals/scss/mixins";
-@import "~carbon-components/scss/globals/scss/vendor/@carbon/elements/scss/type/styles";
-@import "~carbon-components/src/globals/scss/vendor/@carbon/layout/scss/generated/spacing";
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
 
 // TO DO Move this styles to style - guide 
 // https://github.com/openmrs/openmrs-esm-core/blob/master/packages/framework/esm-styleguide/src/_vars.scss
@@ -14,7 +12,7 @@ $color-blue-10: #edf5ff;
 }
 
 .productiveHeading01 {
-  @include carbon--type-style("productive-heading-01");
+  @include type.type-style("heading-compact-01");
 }
 
 .contentSwitcherWrapper {
@@ -34,7 +32,7 @@ $color-blue-10: #edf5ff;
   border-bottom: 1px solid $color-blue-30;
   border-left: 1px solid $color-blue-30;
   border-right: none;
-  border-radius: $spacing-02 0 0px $spacing-02;
+  border-radius: spacing.$spacing-02 0 0px spacing.$spacing-02;
 }
 
 .contentSwitcherWrapper > div button:last-child {
@@ -42,7 +40,7 @@ $color-blue-10: #edf5ff;
   border-bottom: 1px solid $color-blue-30;
   border-right: 1px solid $color-blue-30;
   border-left: none;
-  border-radius: 0px $spacing-02 $spacing-02 0px;
+  border-radius: 0px spacing.$spacing-02 spacing.$spacing-02 0px;
 }
 
 .contentSwitcherWrapper > div > button[aria-selected=true], 
@@ -67,15 +65,15 @@ $color-blue-10: #edf5ff;
 
 .divider {
   border-left: 1px solid $ui-03;
-  height: $spacing-05;
-  margin: 0 $spacing-05 0 $spacing-06;
+  height: spacing.$spacing-05;
+  margin: 0 spacing.$spacing-05 0 spacing.$spacing-06;
 }
 
 .content {
-  @include carbon--type-style("productive-heading-01");
+  @include type.type-style("heading-compact-01");
   color: $text-02;
-  margin-top: $spacing-05;
-  margin-bottom: $spacing-03;
+  margin-top: spacing.$spacing-05;
+  margin-bottom: spacing.$spacing-03;
 }
 
 .tile {

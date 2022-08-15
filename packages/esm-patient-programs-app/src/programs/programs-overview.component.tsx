@@ -1,34 +1,33 @@
 import React from 'react';
-import Add16 from '@carbon/icons-react/es/add/16';
-import styles from './programs-overview.scss';
-import { formatDate, formatDatetime, useConfig, usePagination } from '@openmrs/esm-framework';
+import { useTranslation } from 'react-i18next';
+import capitalize from 'lodash-es/capitalize';
 import {
+  Button,
   DataTable,
   DataTableSkeleton,
-  Button,
   InlineLoading,
+  InlineNotification,
   Table,
+  TableBody,
   TableCell,
   TableContainer,
-  TableBody,
   TableHead,
   TableHeader,
   TableRow,
-  InlineNotification,
-} from 'carbon-components-react';
+} from '@carbon/react';
+import { Add } from '@carbon/react/icons';
 import {
+  launchPatientWorkspace,
   CardHeader,
   EmptyState,
   ErrorState,
   PatientChartPagination,
-  launchPatientWorkspace,
 } from '@openmrs/esm-patient-common-lib';
-import { useTranslation } from 'react-i18next';
+import { ConfigObject, formatDate, formatDatetime, useConfig, usePagination } from '@openmrs/esm-framework';
 import { usePrograms } from './programs.resource';
-import { ConfigObject } from '../config-schema';
-import { capitalize } from 'lodash';
 import ProgramActionButton from './program-action-button/program-action-button.component';
 import { ConfigurableProgram } from '../types';
+import styles from './programs-overview.scss';
 
 interface ProgramsOverviewProps {
   basePath: string;
@@ -37,8 +36,8 @@ interface ProgramsOverviewProps {
 
 const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUuid }) => {
   const programsCount = 5;
-  const config = useConfig() as ConfigObject;
   const { t } = useTranslation();
+  const config = useConfig() as ConfigObject;
   const displayText = t('programs', 'Program enrollments');
   const headerTitle = t('carePrograms', 'Care Programs');
   const urlLabel = t('seeAll', 'See all');
@@ -46,14 +45,14 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
   const isConfigurable = config.customUrl ? true : false;
 
   const {
-    enrollments,
-    isLoading,
-    isError,
     activeEnrollments,
-    isValidating,
     availablePrograms,
-    eligiblePrograms,
     configurablePrograms,
+    eligiblePrograms,
+    enrollments,
+    isError,
+    isLoading,
+    isValidating,
   } = usePrograms(patientUuid);
 
   const {
@@ -111,7 +110,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
           <span>{isValidating ? <InlineLoading /> : null}</span>
           <Button
             kind="ghost"
-            renderIcon={Add16}
+            renderIcon={(props) => <Add size={16} {...props} />}
             iconDescription="Add programs"
             onClick={launchProgramsForm}
             disabled={availablePrograms?.length && eligiblePrograms?.length === 0}
@@ -119,24 +118,19 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
             {t('add', 'Add')}
           </Button>
         </CardHeader>
-        <TableContainer>
-          {availablePrograms?.length && eligiblePrograms?.length === 0 && (
-            <InlineNotification
-              style={{ minWidth: '100%', margin: '0rem', padding: '0rem' }}
-              kind={'info'}
-              lowContrast
-              subtitle={t('noEligibleEnrollments', 'There are no more programs left to enroll this patient in')}
-              title={t('fullyEnrolled', 'Enrolled in all programs')}
-            />
-          )}
-          <DataTable
-            rows={tableRows}
-            headers={isConfigurable ? tableHeaders : tableHeaders.filter((header) => header.key !== 'actions')}
-            isSortable={true}
-            size="short"
-          >
-            {({ rows, headers, getHeaderProps, getTableProps }) => (
-              <Table {...getTableProps()} useZebraStyles>
+        {availablePrograms?.length && eligiblePrograms?.length === 0 && (
+          <InlineNotification
+            style={{ minWidth: '100%', margin: '0rem', padding: '0rem' }}
+            kind={'info'}
+            lowContrast
+            subtitle={t('noEligibleEnrollments', 'There are no more programs left to enroll this patient in')}
+            title={t('fullyEnrolled', 'Enrolled in all programs')}
+          />
+        )}
+        <DataTable rows={tableRows} headers={tableHeaders} isSortable size="sm" useZebraStyles>
+          {({ rows, headers, getHeaderProps, getTableProps }) => (
+            <TableContainer>
+              <Table {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
@@ -162,9 +156,9 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
                   ))}
                 </TableBody>
               </Table>
-            )}
-          </DataTable>
-        </TableContainer>
+            </TableContainer>
+          )}
+        </DataTable>
         <PatientChartPagination
           currentItems={paginatedEnrollments.length}
           onPageNumberChange={({ page }) => goTo(page)}
