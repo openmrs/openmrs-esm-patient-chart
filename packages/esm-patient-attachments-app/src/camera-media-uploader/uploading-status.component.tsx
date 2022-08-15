@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { showToast, FetchResponse } from '@openmrs/esm-framework';
 import { UploadedFile } from '../attachments-types';
 import styles from './uploading-status.scss';
-import { FileUploaderItem, Button, ButtonSet } from 'carbon-components-react';
+import { FileUploaderItem, Button, ButtonSet } from '@carbon/react';
 import CameraMediaUploaderContext from './camera-media-uploader-context.resources';
 
 interface UploadingStatusComponentProps {}

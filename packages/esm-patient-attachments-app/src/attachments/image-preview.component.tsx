@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@carbon/react';
 import { Close } from '@carbon/react/icons';
-import { Attachment } from './attachments-types';
+import { Attachment } from '../attachments-types';
 import styles from './attachments-grid-overview.scss';
 
 interface ImagePreviewProps {
@@ -18,10 +18,12 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ closePreview, imageSelected
     <div className={styles.imagePreview}>
       <div className={styles.leftPanel}>
         <Button
+          iconDescription={t('closePreview', 'Close preview')}
+          label={t('closePreview', 'Close preview')}
           kind="ghost"
           className={styles.closePreviewButton}
           hasIconOnly
-          renderIcon={<Close size={16} />}
+          renderIcon={Close}
           onClick={closePreview}
         />
         <div className={styles.attachmentImage}>

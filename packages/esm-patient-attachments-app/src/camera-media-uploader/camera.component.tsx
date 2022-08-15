@@ -1,6 +1,7 @@
 import React, { useRef, useCallback, useEffect, useContext } from 'react';
 import Camera from 'react-html5-camera-photo';
 import CameraMediaUploaderContext from './camera-media-uploader-context.resources';
+import 'react-html5-camera-photo/build/css/index.css';
 
 const CameraComponent: React.FC<{}> = () => {
   const { handleTakePhoto, setError } = useContext(CameraMediaUploaderContext);

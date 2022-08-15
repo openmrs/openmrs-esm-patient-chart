@@ -22,6 +22,7 @@
   "fileName": "File name",
   "fileUnsupported": "File uploaded is not supported",
   "fileUploadInstructions": "Drag and drop files here or click to upload",
+  "fileUploadTypes": "Only images and pdf files. 500kb max file size",
   "imageDescription": "Image description",
   "imageName": "Image name",
   "successfullyDeleted": "successfully deleted",

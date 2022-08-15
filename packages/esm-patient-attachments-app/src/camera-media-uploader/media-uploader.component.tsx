@@ -1,5 +1,5 @@
 import React, { useContext, useCallback } from 'react';
-import { FileUploaderDropContainer } from 'carbon-components-react';
+import { FileUploaderDropContainer } from '@carbon/react';
 import styles from './media-uploader.scss';
 import CameraMediaUploaderContext from './camera-media-uploader-context.resources';
 import { readFileAsString } from '../utils';

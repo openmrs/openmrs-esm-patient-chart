@@ -5,7 +5,7 @@ import CameraMediaUploaderContext from './camera-media-uploader-context.resource
 import { useTranslation } from 'react-i18next';
 import CameraComponent from './camera.component';
 import styles from './camera-media-uploader.scss';
-import { Tabs, Tab } from 'carbon-components-react';
+import { Tabs, Tab, TabList, TabPanels, TabPanel } from '@carbon/react';
 import MediaUploaderComponent from './media-uploader.component';
 import FileReviewContainer from './file-review.component';
 import UploadingStatusComponent from './uploading-status.component';
@@ -82,12 +82,18 @@ const CameraMediaUploaderModal: React.FC<CameraMediaUploaderModalProps> = ({
       <div className={styles.cameraSection}>
         <h3 className={styles.paddedProductiveHeading03}>{t('addAttachment', 'Add Attachment')}</h3>
         <Tabs className={styles.tabs}>
-          <Tab label={t('uploadMedia', 'Upload media')}>
-            <MediaUploaderComponent />
-          </Tab>
-          <Tab label={t('webcam', 'Webcam')}>
-            <CameraComponent />
-          </Tab>
+          <TabList>
+            <Tab>{t('uploadMedia', 'Upload media')}</Tab>
+            <Tab>{t('webcam', 'Webcam')}</Tab>
+          </TabList>
+          <TabPanels>
+            <TabPanel>
+              <MediaUploaderComponent />
+            </TabPanel>
+            <TabPanel>
+              <CameraComponent />
+            </TabPanel>
+          </TabPanels>
         </Tabs>
       </div>
     );

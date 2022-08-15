@@ -113,7 +113,7 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
               <Switch name="grid" text="Grid" selected={view === 'grid'} />
               <Switch name="tabular" text="Table" selected={view === 'tabular'} />
             </ContentSwitcher>
-            <Button kind="ghost" renderIcon={<Add size={16} />} iconDescription="Add attachment" onClick={showCam}>
+            <Button kind="ghost" renderIcon={Add} iconDescription="Add attachment" onClick={showCam}>
               {t('add', 'Add')}
             </Button>
           </div>
