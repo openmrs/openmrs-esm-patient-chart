@@ -33,5 +33,6 @@
   "uploadFailed": "Upload failed",
   "uploading": "Uploading",
   "uploadMedia": "Upload media",
+  "uploadWillContinueInTheBackground": "Files will be uploaded in the background. You can close this window.",
   "webcam": "Webcam"
 }
