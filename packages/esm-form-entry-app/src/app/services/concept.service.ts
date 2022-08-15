@@ -63,6 +63,6 @@ export class ConceptService {
     const chunkSize = 100;
     return conceptUuids
       .reduceRight((acc, _, __, array) => [...acc, array.splice(0, chunkSize)], [])
-      .map((uuidPartition) => `concept?references=${uuidPartition.join(',')}`);
+      .map((uuidPartition) => `?references=${uuidPartition.join(',')}`);
   }
 }
