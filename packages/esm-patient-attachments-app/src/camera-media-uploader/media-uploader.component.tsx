@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 const MediaUploaderComponent = () => {
   const { setFilesToUpload } = useContext(CameraMediaUploaderContext);
   const { t } = useTranslation();
+
   const upload = useCallback(
     (files: Array<File>) => {
       files.forEach((file) =>

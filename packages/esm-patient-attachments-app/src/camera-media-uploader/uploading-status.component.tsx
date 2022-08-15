@@ -9,7 +9,6 @@ interface UploadingStatusComponentProps {}
 
 const UploadingStatusComponent: React.FC<UploadingStatusComponentProps> = () => {
   const { t } = useTranslation();
-  const [uploadingCompleted, setUploadingComplete] = useState(false);
   const { filesToUpload, saveFile, closeModal, clearData, onCompletion } = useContext(CameraMediaUploaderContext);
   const [filesUploading, setFilesUploading] = useState([]);
 
@@ -54,7 +53,7 @@ const UploadingStatusComponent: React.FC<UploadingStatusComponentProps> = () => 
           }),
       ),
     ).then(() => {
-      setUploadingComplete(true);
+      true;
       onCompletion?.();
     });
   }, [onCompletion, saveFile, filesToUpload, t, setFilesUploading]);
@@ -66,7 +65,7 @@ const UploadingStatusComponent: React.FC<UploadingStatusComponentProps> = () => 
         <p className="cds--label-description">
           {t(
             'uploadWillContinueInTheBackground',
-            'Files will be uploaded in the background. You can close this window.',
+            'Files will be uploaded in the background. You can close this modal.',
           )}
         </p>
 

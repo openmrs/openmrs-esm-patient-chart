@@ -10,9 +10,11 @@
   grid-template-columns: 1fr 1fr;
 
  img {
-    width: 100%;
-    max-height: 200px;
+    max-width: 100%;
+    max-height: 25rem;
     display: block;
+    align-self: center;
+    justify-self: center;
   }
 
   .imageDetails {

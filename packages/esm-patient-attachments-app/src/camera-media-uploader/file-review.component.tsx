@@ -27,7 +27,7 @@ const FileReviewContainer: React.FC<FileReviewContainerProps> = ({ onCompletion 
   const handleSave = useCallback(
     (updatedFile: UploadedFile) => {
       setFilesToUpload((filesToUpload) =>
-        filesToUpload.map((file, indx) => (indx === currentFile ? updatedFile : file)),
+        filesToUpload.map((file, indx) => (indx === currentFile - 1 ? updatedFile : file)),
       );
       moveToNextFile();
     },
