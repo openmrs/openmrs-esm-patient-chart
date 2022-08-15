@@ -119,7 +119,10 @@ const FilePreview: React.FC<FilePreviewProps> = ({ uploadedFile, collectDescript
           <div className={styles.captionFrame}>
             <TextInput
               id="caption"
-              labelText={t('imageName', 'Image name')}
+              labelText={`${uploadedFile.fileType === 'image' ? t('image', 'Image') : t('file', 'File')} ${t(
+                'name',
+                'name',
+              )}`}
               autoComplete="off"
               placeholder={t('attachmentCaptionInstruction', 'Enter caption')}
               onChange={updateFileName}

@@ -1,7 +1,7 @@
 export interface UploadedFile {
   fileContent: string;
   fileName: string;
-  fileType: 'image' | 'pdf';
+  fileType: string;
   fileDescription: string;
   status?: 'uploading' | 'complete';
 }

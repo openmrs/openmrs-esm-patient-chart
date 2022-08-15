@@ -16,8 +16,9 @@ const MediaUploaderComponent = () => {
             ...uriData,
             {
               fileContent,
+              file,
               fileName: file.name,
-              fileType: file.type === 'application/pdf' ? 'pdf' : 'image',
+              fileType: file.type.split('/')[0],
               fileDescription: '',
               status: 'uploading',
             },
