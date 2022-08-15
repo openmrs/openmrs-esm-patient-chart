@@ -21,6 +21,10 @@
   }
 }
 
+.captionFrame {
+  margin-bottom: .3rem;
+}
+
 .buttonSetOverrides {
   margin: spacing.$spacing-05 auto 0;
   display: grid;
@@ -29,8 +33,4 @@
   & > button {
     max-width: unset;
   }
-}
-
-.captionFrame {
-  margin-bottom: .3rem;
 }

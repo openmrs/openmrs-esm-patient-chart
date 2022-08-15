@@ -15,12 +15,16 @@ const CapturePhoto: React.FC<CapturePhotoProps> = ({ initialState, onCapturePhot
 
   const showCam = useCallback(() => {
     const close = showModal('capture-photo-modal', {
-      onSavePhoto(dataUri: string) {
+      saveFile(dataUri: string) {
         setDataUri(dataUri);
         onCapturePhoto(dataUri, toOmrsIsoString(new Date()));
         close();
       },
       collectCaption: false,
+      closeModal: () => {
+        close();
+      },
+      cameraOnly: true,
     });
   }, [onCapturePhoto]);
 

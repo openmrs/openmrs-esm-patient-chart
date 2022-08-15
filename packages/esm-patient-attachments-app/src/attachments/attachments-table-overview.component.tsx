@@ -13,7 +13,7 @@ import {
 } from '@carbon/react';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Attachment } from './attachments-types';
+import { Attachment } from '../attachments-types';
 import styles from './attachments-table-overview.scss';
 
 interface AttachmentsTableOverviewProps {

@@ -4,9 +4,9 @@ import { Button, ContentSwitcher, Loading, Switch } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
 import { LayoutType, showModal, showToast, useLayoutType, usePagination, UserHasAccess } from '@openmrs/esm-framework';
 import { PatientChartPagination, EmptyState } from '@openmrs/esm-patient-common-lib';
-import { createAttachment, deleteAttachmentPermanently, useAttachments } from './attachments.resource';
-import { createGalleryEntry } from './utils';
-import { UploadedFile, Attachment } from './attachments-types';
+import { createAttachment, deleteAttachmentPermanently, useAttachments } from '../attachments.resource';
+import { createGalleryEntry } from '../utils';
+import { UploadedFile, Attachment } from '../attachments-types';
 import AttachmentsGridOverview from './attachments-grid-overview.component';
 import AttachmentsTableOverview from './attachments-table-overview.component';
 import ImagePreview from './image-preview.component';
@@ -113,7 +113,7 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
               <Switch name="grid" text="Grid" selected={view === 'grid'} />
               <Switch name="tabular" text="Table" selected={view === 'tabular'} />
             </ContentSwitcher>
-            <Button kind="ghost" renderIcon={<Add size={16} />} iconDescription="Add attachment" onClick={showCam}>
+            <Button kind="ghost" renderIcon={Add} iconDescription="Add attachment" onClick={showCam}>
               {t('add', 'Add')}
             </Button>
           </div>
