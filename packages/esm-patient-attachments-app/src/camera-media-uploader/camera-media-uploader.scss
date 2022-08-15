@@ -28,14 +28,9 @@
 
 }
 
-.tabs {
-  .cds--tab-content {
-    display: none;
-  }
-}
-
-.tabContent {
-  padding: spacing.$spacing-05
+.modalBody {
+  padding: 0;
+  margin: 0;
 }
 
 @media (max-width: $breakpoint-tablet-max){

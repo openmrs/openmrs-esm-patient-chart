@@ -5,7 +5,7 @@ import CameraMediaUploaderContext from './camera-media-uploader-context.resource
 import { useTranslation } from 'react-i18next';
 import CameraComponent from './camera.component';
 import styles from './camera-media-uploader.scss';
-import { Tabs, Tab, TabList, TabPanels, TabPanel } from '@carbon/react';
+import { Tabs, Tab, TabList, TabPanels, TabPanel, ModalHeader, ModalBody } from '@carbon/react';
 import MediaUploaderComponent from './media-uploader.component';
 import FileReviewContainer from './file-review.component';
 import UploadingStatusComponent from './uploading-status.component';
@@ -80,21 +80,23 @@ const CameraMediaUploaderModal: React.FC<CameraMediaUploaderModalProps> = ({
 
     return (
       <div className={styles.cameraSection}>
-        <h3 className={styles.paddedProductiveHeading03}>{t('addAttachment', 'Add Attachment')}</h3>
-        <Tabs className={styles.tabs}>
-          <TabList>
-            <Tab>{t('uploadMedia', 'Upload media')}</Tab>
-            <Tab>{t('webcam', 'Webcam')}</Tab>
-          </TabList>
-          <TabPanels>
-            <TabPanel>
-              <MediaUploaderComponent />
-            </TabPanel>
-            <TabPanel>
-              <CameraComponent />
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
+        <ModalHeader>{t('addAttachment', 'Add Attachment')}</ModalHeader>
+        <ModalBody className={styles.modalBody}>
+          <Tabs className={styles.tabs}>
+            <TabList>
+              <Tab>{t('uploadMedia', 'Upload media')}</Tab>
+              <Tab>{t('webcam', 'Webcam')}</Tab>
+            </TabList>
+            <TabPanels>
+              <TabPanel>
+                <MediaUploaderComponent />
+              </TabPanel>
+              <TabPanel>
+                <CameraComponent />
+              </TabPanel>
+            </TabPanels>
+          </Tabs>
+        </ModalBody>
       </div>
     );
   }, [uploadFilesToServer, filesToUpload, cameraOnly, t, startUploadingToServer]);
