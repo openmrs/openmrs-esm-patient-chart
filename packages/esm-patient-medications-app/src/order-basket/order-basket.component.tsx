@@ -6,9 +6,8 @@ import MedicationsDetailsTable from '../components/medications-details-table.com
 import { Button, ButtonSet, DataTableSkeleton, InlineLoading } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { OrderBasketItem } from '../types/order-basket-item';
-import { getDurationUnits, getPatientEncounterId, usePatientOrders } from '../api/api';
-import { createErrorHandler, showToast, useConfig, useLayoutType } from '@openmrs/esm-framework';
-import { OpenmrsResource } from '../types/openmrs-resource';
+import { createEmptyEncounter, getCurrentOrderBasketEncounter, usePatientOrders } from '../api/api';
+import { createErrorHandler, showToast, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
 import { orderDrugs } from './drug-ordering';
 import { connect } from 'unistore/react';
 import { OrderBasketStore, OrderBasketStoreActions, orderBasketStoreActions } from '../medications/order-basket-store';
@@ -30,7 +29,6 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
   const headerTitle = t('activeMedicationsHeaderTitle', 'active medications');
   const isTablet = useLayoutType() === 'tablet';
 
-  const [durationUnits, setDurationUnits] = useState<Array<OpenmrsResource>>([]);
   const [encounterUuid, setEncounterUuid] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [medicationOrderFormItem, setMedicationOrderFormItem] = useState<OrderBasketItem | null>(null);
@@ -38,6 +36,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
   const [onMedicationOrderFormSigned, setOnMedicationOrderFormSign] =
     useState<(finalizedOrderBasketItem: OrderBasketItem) => void | null>(null);
   const config = useConfig() as ConfigObject;
+  const sessionObject = useSession();
   const {
     data: activePatientOrders,
     isError,
@@ -46,20 +45,31 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
   } = usePatientOrders(patientUuid, 'ACTIVE', config.careSettingUuid);
 
   useEffect(() => {
-    const durationUnitsConcept = config.durationUnitsConcept;
     const abortController = new AbortController();
-    const durationUnitsRequest = getDurationUnits(abortController, durationUnitsConcept).then(
-      (res) => setDurationUnits(res.data.answers),
-      createErrorHandler,
-    );
-    const patientEncounterRequest = getPatientEncounterId(patientUuid, abortController).then(
-      ({ data }) => setEncounterUuid(data.results[0].uuid),
-      createErrorHandler,
-    );
 
-    Promise.all([durationUnitsRequest, patientEncounterRequest]).finally(() => setIsLoading(false));
+    getCurrentOrderBasketEncounter(patientUuid).then(({ data }) => {
+      if (data.results?.length) {
+        setEncounterUuid(data.results[0].uuid);
+        setIsLoading(false);
+      } else {
+        createEmptyEncounter(patientUuid, sessionObject, config, abortController).then(({ data }) => {
+          setEncounterUuid(data?.uuid);
+          setIsLoading(false);
+        }, createErrorHandler);
+      }
+    }, createErrorHandler);
+
     return () => abortController.abort();
   }, [patientUuid, config.durationUnitsConcept]);
+
+  useEffect(() => {
+    if (medicationOrderFormItem) {
+      medicationOrderFormItem.careSetting = config.careSettingUuid;
+      medicationOrderFormItem.orderer = sessionObject.currentProvider?.uuid;
+      medicationOrderFormItem.quantityUnits = config.quantityUnitsUuid;
+      medicationOrderFormItem.encounterUuid = encounterUuid;
+    }
+  }, [medicationOrderFormItem, config, sessionObject, encounterUuid]);
 
   const handleSearchResultClicked = (searchResult: OrderBasketItem, directlyAddToBasket: boolean) => {
     if (directlyAddToBasket) {
@@ -127,7 +137,6 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
         if (isMedicationOrderFormVisible) {
           return (
             <MedicationOrderForm
-              durationUnits={durationUnits}
               initialOrderBasketItem={medicationOrderFormItem}
               onSign={onMedicationOrderFormSigned}
               onCancel={() => setIsMedicationOrderFormVisible(false)}

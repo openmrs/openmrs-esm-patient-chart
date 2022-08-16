@@ -122,3 +122,11 @@
 .spacer {
   margin-top: 3rem;
 }
+
+.dosingWrapper {
+  display: flex;
+}
+
+.dosingWrapper :global(.bx--combo-box) {
+  width: 75% !important;
+}

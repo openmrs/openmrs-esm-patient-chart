@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import capitalize from 'lodash-es/capitalize';
 import {
   Button,
@@ -19,32 +19,113 @@ import {
 } from '@carbon/react';
 import { ArrowLeft } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
-import { isDesktop, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { isDesktop, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
 import { OrderBasketItem } from '../types/order-basket-item';
-import { getCommonMedicationByUuid } from '../api/common-medication';
-import { OpenmrsResource } from '../types/openmrs-resource';
 import { ConfigObject } from '../config-schema';
 import styles from './medication-order-form.scss';
+import { useOrderConfig } from '../api/order-config';
 
 export interface MedicationOrderFormProps {
   initialOrderBasketItem: OrderBasketItem;
-  durationUnits: Array<OpenmrsResource>;
   onSign: (finalizedOrder: OrderBasketItem) => void;
   onCancel: () => void;
 }
 
-export default function MedicationOrderForm({
-  initialOrderBasketItem,
-  durationUnits,
-  onSign,
-  onCancel,
-}: MedicationOrderFormProps) {
+function addIfNotPresent(
+  optionsList: Array<{ id: string; text: string }>,
+  option: { value: any; valueCoded?: string },
+): Array<{ id: string; text: string }> {
+  let ret = optionsList || [];
+  if (!option) return ret;
+  const id = option?.valueCoded ? option?.valueCoded : `${option.value}`;
+  if (!ret.some((x) => x.id == id)) {
+    return [...ret, { id: id, text: `${option.value}` }];
+  }
+  return ret;
+}
+
+export default function MedicationOrderForm({ initialOrderBasketItem, onSign, onCancel }: MedicationOrderFormProps) {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const isTablet = useLayoutType() === 'tablet';
   const [orderBasketItem, setOrderBasketItem] = useState(initialOrderBasketItem);
-  const commonMedication = getCommonMedicationByUuid(orderBasketItem.drug.uuid);
-  const config = useConfig() as ConfigObject;
+  const template = initialOrderBasketItem.template;
+  const { orderConfigObject, isLoading } = useOrderConfig();
+  const [durationUnitOptions, setDurationUnitOptions] = useState([]);
+
+  const doseWithUnitsLabel = template
+    ? `${initialOrderBasketItem?.dosage?.value} ${initialOrderBasketItem?.unit?.value}`
+    : '';
+
+  const [dosingUnitOptions, setDosingUnitOptions] = useState(
+    addIfNotPresent(
+      template?.dosingInstructions?.units?.map((x) => ({
+        id: x.valueCoded,
+        text: x.value,
+      })),
+      initialOrderBasketItem.unit,
+    ),
+  );
+
+  const [dosageOptions, setDosageOptions] = useState(
+    addIfNotPresent(
+      template?.dosingInstructions?.dose?.map((x) => ({
+        id: `${x.value}`,
+        text: `${x.value}`,
+      })),
+      initialOrderBasketItem.dosage,
+    ),
+  );
+
+  const [frequencyOptions, setFrequencyOptions] = useState(
+    addIfNotPresent(
+      template?.dosingInstructions?.frequency?.map((x) => ({
+        id: x.valueCoded,
+        text: x.value,
+      })),
+      initialOrderBasketItem.frequency,
+    ),
+  );
+  const [routeOptions, setRouteOptions] = useState(
+    addIfNotPresent(
+      template?.dosingInstructions?.route?.map((x) => ({
+        id: x.valueCoded,
+        text: x.value,
+      })),
+      initialOrderBasketItem.route,
+    ),
+  );
+
+  useEffect(() => {
+    if (orderConfigObject) {
+      // sync frequency options with what's defined in the order config
+      const availableFrequencies = frequencyOptions.map((x) => x.id);
+      const otherFrequencyOptions = [];
+      orderConfigObject.orderFrequencies.forEach(
+        (x) => availableFrequencies.includes(x.uuid) || otherFrequencyOptions.push({ id: x.uuid, text: x.display }),
+      );
+      setFrequencyOptions([...frequencyOptions, ...otherFrequencyOptions]);
+
+      // sync dosage.unit options with what's defined in the order config
+      const availableDosingUnits = dosingUnitOptions.map((x) => x.id);
+      const otherDosingUnits = [];
+      orderConfigObject.drugDosingUnits.forEach(
+        (x) => availableDosingUnits.includes(x.uuid) || otherDosingUnits.push({ id: x.uuid, text: x.display }),
+      );
+      setDosingUnitOptions([...dosingUnitOptions, ...otherDosingUnits]);
+
+      // sync route options with what's defined in the order config
+      const availableRoutes = routeOptions.map((x) => x.id);
+      const otherRouteOptions = [];
+      orderConfigObject.drugRoutes.forEach(
+        (x) => availableRoutes.includes(x.uuid) || otherRouteOptions.push({ id: x.uuid, text: x.display }),
+      );
+      setRouteOptions([...routeOptions, ...otherRouteOptions]);
+      setDurationUnitOptions(orderConfigObject.durationUnits.map((x) => ({ id: x.uuid, text: x.display })));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [orderConfigObject]);
+
   return (
     <>
       <div className={styles.medicationDetailsHeader}>
@@ -54,13 +135,17 @@ export default function MedicationOrderForm({
           <>
             <span>
               <strong className={styles.dosageInfo}>
-                {capitalize(orderBasketItem.commonMedicationName)} ({orderBasketItem.dosage.dosage})
+                {capitalize(orderBasketItem.commonMedicationName)} {doseWithUnitsLabel && `(${doseWithUnitsLabel})`}
               </strong>{' '}
-              <span className={styles.bodyShort01}>
-                &mdash; {orderBasketItem.route.name} &mdash; {orderBasketItem.dosageUnit.name} &mdash;{' '}
-              </span>
-              <span className={styles.caption01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
-              <strong className={styles.dosageInfo}>{orderBasketItem.dosage.dosage}</strong>
+              {template && (
+                <>
+                  <span className={styles.bodyShort01}>
+                    &mdash; {orderBasketItem.route.value} &mdash; {orderBasketItem.drug.dosageForm.display} &mdash;{' '}
+                  </span>
+                  <span className={styles.caption01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
+                  <strong className={styles.dosageInfo}>{doseWithUnitsLabel}</strong>
+                </>
+              )}
             </span>
           </>
         )}
@@ -102,6 +187,25 @@ export default function MedicationOrderForm({
               />
             </Column>
           </Row>
+          <Row className={styles.row}>
+            <Column md={8}>
+              <TextInput
+                light={isTablet}
+                id="indication"
+                labelText={t('indication', 'Indication')}
+                placeholder={t('indicationPlaceholder', 'e.g. "Hypertension"')}
+                value={orderBasketItem.indication}
+                onChange={(e) =>
+                  setOrderBasketItem({
+                    ...orderBasketItem,
+                    indication: e.target.value,
+                  })
+                }
+                required
+                maxLength={150}
+              />
+            </Column>
+          </Row>
           {orderBasketItem.isFreeTextDosage ? (
             <Row className={styles.row}>
               <Column md={8}>
@@ -124,89 +228,123 @@ export default function MedicationOrderForm({
             <>
               <Row className={styles.row}>
                 <Column md={4}>
-                  <ComboBox
-                    id="doseSelection"
-                    light={isTablet}
-                    items={commonMedication.commonDosages.map((x) => ({
-                      id: x.dosage,
-                      text: x.dosage,
-                    }))}
-                    selectedItem={{
-                      id: orderBasketItem.dosage.dosage,
-                      text: orderBasketItem.dosage.dosage,
-                    }}
-                    // @ts-ignore
-                    placeholder={t('editDoseComboBoxPlaceholder', 'Dose')}
-                    titleText={t('editDoseComboBoxTitle', 'Enter Dose')}
-                    itemToString={(item) => item?.text}
-                    invalid={!orderBasketItem.dosage && !orderBasketItem.isFreeTextDosage}
-                    invalidText={t('validationNoItemSelected', 'Please select one of the available items.')}
-                    onChange={({ selectedItem }) => {
-                      setOrderBasketItem({
-                        ...orderBasketItem,
-                        dosage: !!selectedItem?.id
-                          ? commonMedication.commonDosages.find((x) => x.dosage === selectedItem.id)
-                          : initialOrderBasketItem.dosage,
-                      });
-                    }}
-                  />
+                  <div style={{ display: 'flex' }} className={styles.dosingWrapper}>
+                    <ComboBox
+                      id="doseSelection"
+                      light={isTablet}
+                      items={dosageOptions}
+                      selectedItem={
+                        dosageOptions?.length
+                          ? {
+                              id: `${orderBasketItem.dosage?.value}`,
+                              text: `${orderBasketItem.dosage?.value}`,
+                            }
+                          : null
+                      }
+                      // @ts-ignore
+                      placeholder={t('editDoseComboBoxPlaceholder', 'Dose')}
+                      titleText={t('editDoseComboBoxTitle', 'Enter Dose')}
+                      itemToString={(item) => `${item?.text}`}
+                      onChange={({ selectedItem }) => {
+                        if (selectedItem) {
+                          selectedItem.id = selectedItem.id == 'draft' ? selectedItem.text : selectedItem.text;
+                          setOrderBasketItem({
+                            ...orderBasketItem,
+                            dosage: { value: Number(selectedItem.text) },
+                          });
+                        } else {
+                          setOrderBasketItem({
+                            ...orderBasketItem,
+                            dosage: { value: 0 },
+                          });
+                        }
+                        // cleaup
+                        setDosageOptions(dosageOptions.filter((opt) => opt.id != 'draft'));
+                      }}
+                      onInputChange={(value) => {
+                        const valueExists = value ? dosageOptions.some((opt) => `${opt.text}` == value) : null;
+                        const draftIndex = dosageOptions.findIndex((opt) => opt.id == 'draft');
+                        // validate and clean up
+                        if (draftIndex >= 0 && value) {
+                          dosageOptions[draftIndex].text = value;
+                        } else if (draftIndex >= 0) {
+                          dosageOptions.pop();
+                        }
+                        if (value && !valueExists && draftIndex == -1 && !isNaN(Number(value))) {
+                          dosageOptions.push({ id: 'draft', text: value });
+                        }
+                      }}
+                      required
+                    />
+                    <ComboBox
+                      id="dosingUnits"
+                      light={isTablet}
+                      items={dosingUnitOptions}
+                      placeholder={t('editDosageUnitsPlaceholder', 'Unit')}
+                      titleText={t('editDosageUnitsTitle', 'Dose unit')}
+                      itemToString={(item) => item?.text}
+                      selectedItem={
+                        dosingUnitOptions?.length
+                          ? {
+                              id: `${orderBasketItem.unit?.valueCoded}`,
+                              text: `${orderBasketItem.unit?.value}`,
+                            }
+                          : null
+                      }
+                      required
+                    />
+                  </div>
                 </Column>
-                <Column md={4}>
-                  <ComboBox
-                    id="editFrequency"
-                    light={isTablet}
-                    items={commonMedication.commonFrequencies.map((x) => ({
-                      id: x.conceptUuid,
-                      text: x.name,
-                    }))}
-                    selectedItem={{
-                      id: orderBasketItem.frequency.conceptUuid,
-                      text: orderBasketItem.frequency.name,
-                    }}
-                    // @ts-ignore
-                    placeholder={t('editFrequencyComboBoxPlaceholder', 'Frequency')}
-                    titleText={t('editFrequencyComboBoxTitle', 'Enter Frequency')}
-                    itemToString={(item) => item?.text}
-                    invalid={!orderBasketItem.frequency && !orderBasketItem.isFreeTextDosage}
-                    invalidText={t('validationNoItemSelected', 'Please select one of the available items.')}
-                    onChange={({ selectedItem }) => {
-                      setOrderBasketItem({
-                        ...orderBasketItem,
-                        frequency: !!selectedItem?.id
-                          ? commonMedication.commonFrequencies.find((x) => x.conceptUuid === selectedItem.id)
-                          : initialOrderBasketItem.frequency,
-                      });
-                    }}
-                  />
-                </Column>
-              </Row>
-              <Row className={styles.row}>
                 <Column md={4}>
                   <ComboBox
                     id="editRoute"
                     light={isTablet}
-                    items={commonMedication.route.map((x) => ({
-                      id: x.conceptUuid,
-                      text: x.name,
-                    }))}
+                    items={routeOptions}
                     selectedItem={{
-                      id: orderBasketItem.route.conceptUuid,
-                      text: orderBasketItem.route.name,
+                      id: orderBasketItem.route?.valueCoded,
+                      text: orderBasketItem.route?.value,
                     }}
                     // @ts-ignore
                     placeholder={t('editRouteComboBoxPlaceholder', 'Route')}
                     titleText={t('editRouteComboBoxTitle', 'Enter Route')}
                     itemToString={(item) => item?.text}
-                    invalid={!orderBasketItem.route && !orderBasketItem.isFreeTextDosage}
-                    invalidText={t('validationNoItemSelected', 'Please select one of the available items.')}
                     onChange={({ selectedItem }) => {
                       setOrderBasketItem({
                         ...orderBasketItem,
                         route: !!selectedItem?.id
-                          ? commonMedication.route.find((x) => x.conceptUuid === selectedItem.id)
+                          ? { value: selectedItem.text, valueCoded: selectedItem.id }
                           : initialOrderBasketItem.route,
                       });
                     }}
+                    required
+                  />
+                </Column>
+              </Row>
+              <Row className={styles.row}>
+                <Column md={8}>
+                  <ComboBox
+                    id="editFrequency"
+                    light={isTablet}
+                    items={frequencyOptions}
+                    selectedItem={{
+                      id: orderBasketItem.frequency?.valueCoded,
+                      text: orderBasketItem.frequency?.value,
+                    }}
+                    // @ts-ignore
+                    placeholder={t('editFrequencyComboBoxPlaceholder', 'Frequency')}
+                    titleText={t('editFrequencyComboBoxTitle', 'Enter Frequency')}
+                    itemToString={(item) => item?.text}
+                    // invalid={!orderBasketItem.frequency && !orderBasketItem.isFreeTextDosage}
+                    // invalidText={t('validationNoItemSelected', 'Please select one of the available items.')}
+                    onChange={({ selectedItem }) => {
+                      setOrderBasketItem({
+                        ...orderBasketItem,
+                        frequency: !!selectedItem?.id
+                          ? { value: selectedItem.text, valueCoded: selectedItem.id }
+                          : initialOrderBasketItem.frequency,
+                      });
+                    }}
+                    required
                   />
                 </Column>
               </Row>
@@ -266,147 +404,6 @@ export default function MedicationOrderForm({
               </Row>
             </>
           )}
-          <Row className={`${styles.row} ${styles.spacer}`}>
-            <Column md={8}>
-              <h3 className={styles.productiveHeading02}>{t('prescriptionDuration', '2. Prescription Duration')}</h3>
-            </Column>
-          </Row>
-          <Row className={styles.row}>
-            <Column md={4} className={styles.fullWidthDatePickerContainer}>
-              <DatePicker
-                light={isTablet}
-                datePickerType="single"
-                maxDate={new Date()}
-                value={[orderBasketItem.startDate]}
-                onChange={([newStartDate]) =>
-                  setOrderBasketItem({
-                    ...orderBasketItem,
-                    startDate: newStartDate,
-                  })
-                }
-              >
-                <DatePickerInput
-                  id="startDatePicker"
-                  placeholder="mm/dd/yyyy"
-                  labelText={t('startDate', 'Start date')}
-                />
-              </DatePicker>
-            </Column>
-            <Column md={2}>
-              <NumberInput
-                light={isTablet}
-                id="durationInput"
-                label={t('duration', 'Duration')}
-                min={1}
-                // @ts-ignore Strings are accepted, even though the types don't reflect it.
-                value={orderBasketItem.duration ?? ''}
-                allowEmpty={true}
-                helperText={t('noDurationHint', 'An empty field indicates an indefinite duration.')}
-                onChange={(e) => {
-                  // @ts-ignore
-                  const newValue = e.imaginaryTarget.value === '' ? null : +e.imaginaryTarget.value;
-                  setOrderBasketItem({
-                    ...orderBasketItem,
-                    duration: newValue,
-                  });
-                }}
-              />
-            </Column>
-            <Column md={2}>
-              <FormGroup legendText={t('durationUnit', 'Duration Unit')}>
-                <ComboBox
-                  light={isTablet}
-                  id="durationUnitPlaceholder"
-                  selectedItem={{
-                    id: orderBasketItem.durationUnit.uuid,
-                    text: orderBasketItem.durationUnit.display,
-                  }}
-                  items={durationUnits.map((unit) => ({
-                    id: unit.uuid,
-                    text: unit.display,
-                  }))}
-                  itemToString={(item) => item?.text}
-                  // @ts-ignore
-                  placeholder={t('durationUnitPlaceholder', 'Duration Unit')}
-                  onChange={({ selectedItem }) =>
-                    !!selectedItem
-                      ? setOrderBasketItem({
-                          ...orderBasketItem,
-                          durationUnit: {
-                            uuid: selectedItem.id,
-                            display: selectedItem.text,
-                          },
-                        })
-                      : setOrderBasketItem({
-                          ...orderBasketItem,
-                          durationUnit: config.daysDurationUnit,
-                        })
-                  }
-                />
-              </FormGroup>
-            </Column>
-          </Row>
-          <Row className={`${styles.row} ${styles.spacer}`}>
-            <Column md={8}>
-              <h3 className={styles.productiveHeading02}>{t('dispensingInformation', '3. Dispensing Information')}</h3>
-            </Column>
-          </Row>
-          <Row className={styles.row}>
-            <Column md={3}>
-              <FormGroup legendText={t('quantity', 'Quantity')}>
-                <NumberInput
-                  light={isTablet}
-                  id="quantityDispensed"
-                  helperText={t('pillsToDispense', 'Pills to dispense')}
-                  value={orderBasketItem.pillsDispensed}
-                  min={0}
-                  onChange={(e) => {
-                    setOrderBasketItem({
-                      ...orderBasketItem,
-                      // @ts-ignore
-                      pillsDispensed: +e.imaginaryTarget.value,
-                    });
-                  }}
-                />
-              </FormGroup>
-            </Column>
-            <Column md={3}>
-              <FormGroup legendText={t('prescriptionRefills', 'Prescription Refills')}>
-                <NumberInput
-                  light={isTablet}
-                  id="prescriptionRefills"
-                  min={0}
-                  value={orderBasketItem.numRefills}
-                  onChange={(e) =>
-                    setOrderBasketItem({
-                      ...orderBasketItem,
-                      // @ts-ignore
-                      numRefills: +e.imaginaryTarget.value,
-                    })
-                  }
-                />
-              </FormGroup>
-            </Column>
-          </Row>
-          <Row className={styles.row}>
-            <Column md={8}>
-              <TextInput
-                light={isTablet}
-                id="indication"
-                labelText={t('indication', 'Indication')}
-                placeholder={t('indicationPlaceholder', 'e.g. "Hypertension"')}
-                value={orderBasketItem.indication}
-                onChange={(e) =>
-                  setOrderBasketItem({
-                    ...orderBasketItem,
-                    indication: e.target.value,
-                  })
-                }
-                required
-                maxLength={150}
-              />
-            </Column>
-          </Row>
         </Grid>
         <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
           <Button className={styles.button} kind="secondary" onClick={onCancel}>
