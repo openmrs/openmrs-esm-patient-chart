@@ -1,4 +1,5 @@
 export interface UploadedFile {
+  file?: File;
   fileContent: string;
   fileName: string;
   fileType: string;
@@ -10,6 +11,7 @@ export interface Attachment {
   id: string;
   src: string;
   title: string;
+  description: string;
   dateTime: string;
   bytesMimeType: string;
   bytesContentFamily: string;

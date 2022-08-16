@@ -37,18 +37,30 @@ export function getAttachments(patientUuid: string, includeEncounterless: boolea
   });
 }
 
-export function createAttachment(patientUuid: string, file: UploadedFile) {
+export async function createAttachment(patientUuid: string, file: UploadedFile) {
   const formData = new FormData();
-  const emptyFile = new File([''], file.fileName);
-  formData.append('fileCaption', file.fileName);
-  formData.append('patient', patientUuid);
-  formData.append('file', emptyFile);
-  formData.append('base64Content', file.fileContent);
 
+  formData.append(
+    'fileCaption',
+    JSON.stringify({
+      name: file.fileName,
+      description: file.fileDescription,
+    }),
+  );
+  formData.append('patient', patientUuid);
+
+  if (file.file) {
+    formData.append('file', file.file, file.fileName);
+  } else {
+    formData.append('file', new File([''], file.fileName), file.fileName);
+    formData.append('base64Content', file.fileContent);
+  }
   return openmrsFetch(`${attachmentUrl}`, {
     method: 'POST',
     body: formData,
   });
+
+  // return Promise.resolve(() => console.log(file, emptyFile));
 }
 
 export function deleteAttachmentPermanently(attachmentUuid: string, abortController: AbortController) {

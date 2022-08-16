@@ -37,7 +37,9 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ closePreview, imageSelected
       </div>
       <div className={styles.rightPanel}>
         <h4 className={styles.productiveHeading02}>{imageSelected.title}</h4>
-        <p className={`${styles.bodyLong01} ${styles.imageDescription}`}>Description</p>
+        {imageSelected?.description ? (
+          <p className={`${styles.bodyLong01} ${styles.imageDescription}`}>{imageSelected.description}</p>
+        ) : null}
       </div>
     </div>
   );

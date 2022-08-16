@@ -44,10 +44,10 @@ const UploadingStatusComponent: React.FC<UploadingStatusComponentProps> = () => 
               ),
             );
           })
-          .catch(() => {
+          .catch((err) => {
             showToast({
-              title: t('uploadFailed', 'Upload failed'),
-              description: `${t('uploading', 'Uploading')} ${file.fileName} ${t('failed', 'failed')}`,
+              title: `${t('uploading', 'Uploading')} ${file.fileName} ${t('failed', 'failed')}`,
+              description: err,
               kind: 'error',
             });
           }),
@@ -70,8 +70,8 @@ const UploadingStatusComponent: React.FC<UploadingStatusComponentProps> = () => 
         </p>
 
         <div className={styles.uploadingFilesSection}>
-          {filesUploading.map((file) => (
-            <FileUploaderItem name={file.fileName} status={file.status} size="lg" />
+          {filesUploading.map((file, key) => (
+            <FileUploaderItem key={key} name={file.fileName} status={file.status} size="lg" />
           ))}
         </div>
       </ModalBody>
