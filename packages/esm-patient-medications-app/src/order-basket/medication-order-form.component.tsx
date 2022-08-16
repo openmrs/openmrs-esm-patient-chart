@@ -6,12 +6,9 @@ import {
   Checkbox,
   Column,
   ComboBox,
-  DatePicker,
-  DatePickerInput,
   Form,
   FormGroup,
   Grid,
-  NumberInput,
   Row,
   TextArea,
   TextInput,
@@ -19,9 +16,8 @@ import {
 } from '@carbon/react';
 import { ArrowLeft } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
-import { isDesktop, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
+import { isDesktop, useLayoutType } from '@openmrs/esm-framework';
 import { OrderBasketItem } from '../types/order-basket-item';
-import { ConfigObject } from '../config-schema';
 import styles from './medication-order-form.scss';
 import { useOrderConfig } from '../api/order-config';
 
