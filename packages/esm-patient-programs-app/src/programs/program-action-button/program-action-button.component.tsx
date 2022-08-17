@@ -23,21 +23,24 @@ const ProgramActionButton: React.FC<ProgramActionButton> = ({ enrollment }) => {
   if (enrollment.enrollmentStatus === 'eligible') {
     return (
       <Button
+        iconDescription="Enroll to program"
         onClick={() => launchEnrollmentForm(t('enrollment', 'Enrollment'))}
         renderIcon={(props) => <TaskAdd size={20} {...props} />}
         kind="tertiary"
-        size="small"
+        size="sm"
       >
         {t('enroll', 'Enroll')}
       </Button>
     );
   }
+
   return (
     <Button
+      iconDescription="Discontinue enrollment"
       onClick={() => launchEnrollmentForm(t('discontinue', 'Discontinue'))}
       renderIcon={(props) => <TaskAdd size={20} {...props} />}
       kind="danger--ghost"
-      size="small"
+      size="sm"
     >
       {t('discontinue', 'Discontinue')}
     </Button>

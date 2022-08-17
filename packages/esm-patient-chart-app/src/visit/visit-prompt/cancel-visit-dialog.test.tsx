@@ -23,7 +23,7 @@ jest.mock('@openmrs/esm-framework', () => {
 });
 
 describe('Cancel visit', () => {
-  it('cancels an active visit and void all associated encounters', async () => {
+  it('cancels an active visit and voids all associated encounters', async () => {
     const user = userEvent.setup();
 
     mockUseVisit.mockReturnValue({ currentVisit: mockCurrentVisit, mutate: jest.fn() });
@@ -32,7 +32,7 @@ describe('Cancel visit', () => {
     renderCancelVisitDialog();
 
     expect(screen.getByRole('heading', { name: /Cancel active visit/i })).toBeInTheDocument();
-    expect(screen.getByText('Canceling this visit will delete all associated encounter(s)')).toBeInTheDocument();
+    expect(screen.getByText(/Cancelling this visit will delete all associated encounters/i)).toBeInTheDocument();
 
     const cancelVisitButton = screen.getByRole('button', { name: /Cancel visit/i, exact: true });
 
@@ -51,7 +51,7 @@ describe('Cancel visit', () => {
     });
   });
 
-  it('displays an error message when canceling a visit fails', async () => {
+  it('displays an error message when cancelling a visit fails', async () => {
     const user = userEvent.setup();
 
     mockUseVisit.mockReturnValue({ currentVisit: mockCurrentVisit, mutate: jest.fn() });
@@ -60,7 +60,7 @@ describe('Cancel visit', () => {
     renderCancelVisitDialog();
 
     expect(screen.getByRole('heading', { name: /Cancel active visit/i })).toBeInTheDocument();
-    expect(screen.getByText('Canceling this visit will delete all associated encounter(s)')).toBeInTheDocument();
+    expect(screen.getByText(/Cancelling this visit will delete all associated encounters/i)).toBeInTheDocument();
 
     const cancelVisitButton = screen.getByRole('button', { name: /Cancel visit/i, exact: true });
 
@@ -76,7 +76,7 @@ describe('Cancel visit', () => {
       critical: true,
       description: 'Internal server error',
       kind: 'error',
-      title: 'Error canceling active visit',
+      title: 'Error cancelling active visit',
     });
   });
 });

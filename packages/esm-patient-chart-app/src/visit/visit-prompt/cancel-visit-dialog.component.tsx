@@ -36,7 +36,7 @@ const CancelVisitDialog: React.FC<CancelVisitDialogProps> = ({ patientUuid, clos
       },
       (error) => {
         showNotification({
-          title: t('cancelVisitError', 'Error canceling active visit'),
+          title: t('cancelVisitError', 'Error cancelling active visit'),
           kind: 'error',
           critical: true,
           description: error?.message,
@@ -55,7 +55,7 @@ const CancelVisitDialog: React.FC<CancelVisitDialogProps> = ({ patientUuid, clos
       />
       <ModalBody>
         <p className={styles.bodyShort02}>
-          {t('cancelVisitWarningMessage', 'Canceling this visit will delete all associated encounter(s)')}
+          {t('cancelVisitWarningMessage', 'Cancelling this visit will delete all associated encounters')}.
         </p>
       </ModalBody>
       <ModalFooter>
