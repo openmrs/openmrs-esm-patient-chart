@@ -9,7 +9,6 @@ import {
   Form,
   FormGroup,
   Grid,
-  Row,
   TextArea,
   TextInput,
   Toggle,
@@ -147,7 +146,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
         )}
       </div>
       <Form className={styles.orderForm} onSubmit={() => onSign(orderBasketItem)}>
-        <Grid className={styles.grid}>
+        <div className={styles.grid}>
           {isDesktop(layout) ? (
             <div className={styles.backButton}>
               <Button
@@ -162,11 +161,11 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
             </div>
           ) : null}
           <h2 className={styles.heading}>{t('orderForm', 'Order Form')}</h2>
-          <Row className={styles.row}>
-            <Column>
-              <h3 className={styles.productiveHeading02}>{t('dosageInstructions', '1. Dosage Instructions')}</h3>
+          <div className={styles.flexGrid}>
+            <Column md={4}>
+              <h3 className={styles.dosingInstructionsHeading}>{t('dosageInstructions', '1. Dosage Instructions')}</h3>
             </Column>
-            <Column className={styles.pullColumnContentRight}>
+            <Column className={styles.pullColumnContentRight} md={4}>
               <Toggle
                 size="sm"
                 id="freeTextDosageToggle"
@@ -182,8 +181,8 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                 }
               />
             </Column>
-          </Row>
-          <Row className={styles.row}>
+          </div>
+          <div className={styles.row}>
             <Column md={8}>
               <TextInput
                 light={isTablet}
@@ -201,9 +200,9 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                 maxLength={150}
               />
             </Column>
-          </Row>
+          </div>
           {orderBasketItem.isFreeTextDosage ? (
-            <Row className={styles.row}>
+            <div className={styles.row}>
               <Column md={8}>
                 <TextArea
                   light={isTablet}
@@ -219,79 +218,79 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                   }
                 />
               </Column>
-            </Row>
+            </div>
           ) : (
             <>
-              <Row className={styles.row}>
+              <Grid className={styles.gridRow}>
                 <Column md={4}>
-                  <div style={{ display: 'flex' }} className={styles.dosingWrapper}>
-                    <ComboBox
-                      id="doseSelection"
-                      light={isTablet}
-                      items={dosageOptions}
-                      selectedItem={
-                        dosageOptions?.length
-                          ? {
-                              id: `${orderBasketItem.dosage?.value}`,
-                              text: `${orderBasketItem.dosage?.value}`,
-                            }
-                          : null
+                  <ComboBox
+                    id="doseSelection"
+                    light={isTablet}
+                    items={dosageOptions}
+                    selectedItem={
+                      dosageOptions?.length
+                        ? {
+                            id: `${orderBasketItem.dosage?.value}`,
+                            text: `${orderBasketItem.dosage?.value}`,
+                          }
+                        : null
+                    }
+                    // @ts-ignore
+                    placeholder={t('editDoseComboBoxPlaceholder', 'Dose')}
+                    titleText={t('editDoseComboBoxTitle', 'Enter Dose')}
+                    itemToString={(item) => `${item?.text}`}
+                    onChange={({ selectedItem }) => {
+                      if (selectedItem) {
+                        selectedItem.id = selectedItem.id == 'draft' ? selectedItem.text : selectedItem.text;
+                        setOrderBasketItem({
+                          ...orderBasketItem,
+                          dosage: { value: Number(selectedItem.text) },
+                        });
+                      } else {
+                        setOrderBasketItem({
+                          ...orderBasketItem,
+                          dosage: { value: 0 },
+                        });
                       }
-                      // @ts-ignore
-                      placeholder={t('editDoseComboBoxPlaceholder', 'Dose')}
-                      titleText={t('editDoseComboBoxTitle', 'Enter Dose')}
-                      itemToString={(item) => `${item?.text}`}
-                      onChange={({ selectedItem }) => {
-                        if (selectedItem) {
-                          selectedItem.id = selectedItem.id == 'draft' ? selectedItem.text : selectedItem.text;
-                          setOrderBasketItem({
-                            ...orderBasketItem,
-                            dosage: { value: Number(selectedItem.text) },
-                          });
-                        } else {
-                          setOrderBasketItem({
-                            ...orderBasketItem,
-                            dosage: { value: 0 },
-                          });
-                        }
-                        // cleaup
-                        setDosageOptions(dosageOptions.filter((opt) => opt.id != 'draft'));
-                      }}
-                      onInputChange={(value) => {
-                        const valueExists = value ? dosageOptions.some((opt) => `${opt.text}` == value) : null;
-                        const draftIndex = dosageOptions.findIndex((opt) => opt.id == 'draft');
-                        // validate and clean up
-                        if (draftIndex >= 0 && value) {
-                          dosageOptions[draftIndex].text = value;
-                        } else if (draftIndex >= 0) {
-                          dosageOptions.pop();
-                        }
-                        if (value && !valueExists && draftIndex == -1 && !isNaN(Number(value))) {
-                          dosageOptions.push({ id: 'draft', text: value });
-                        }
-                      }}
-                      required
-                    />
-                    <ComboBox
-                      id="dosingUnits"
-                      light={isTablet}
-                      items={dosingUnitOptions}
-                      placeholder={t('editDosageUnitsPlaceholder', 'Unit')}
-                      titleText={t('editDosageUnitsTitle', 'Dose unit')}
-                      itemToString={(item) => item?.text}
-                      selectedItem={
-                        dosingUnitOptions?.length
-                          ? {
-                              id: `${orderBasketItem.unit?.valueCoded}`,
-                              text: `${orderBasketItem.unit?.value}`,
-                            }
-                          : null
+                      // cleaup
+                      setDosageOptions(dosageOptions.filter((opt) => opt.id != 'draft'));
+                    }}
+                    onInputChange={(value) => {
+                      const valueExists = value ? dosageOptions.some((opt) => `${opt.text}` == value) : null;
+                      const draftIndex = dosageOptions.findIndex((opt) => opt.id == 'draft');
+                      // validate and clean up
+                      if (draftIndex >= 0 && value) {
+                        dosageOptions[draftIndex].text = value;
+                      } else if (draftIndex >= 0) {
+                        dosageOptions.pop();
                       }
-                      required
-                    />
-                  </div>
+                      if (value && !valueExists && draftIndex == -1 && !isNaN(Number(value))) {
+                        dosageOptions.push({ id: 'draft', text: value });
+                      }
+                    }}
+                    required
+                  />
                 </Column>
                 <Column md={4}>
+                  <ComboBox
+                    id="dosingUnits"
+                    light={isTablet}
+                    items={dosingUnitOptions}
+                    placeholder={t('editDosageUnitsPlaceholder', 'Unit')}
+                    titleText={t('editDosageUnitsTitle', 'Dose unit')}
+                    itemToString={(item) => item?.text}
+                    selectedItem={
+                      dosingUnitOptions?.length
+                        ? {
+                            id: `${orderBasketItem.unit?.valueCoded}`,
+                            text: `${orderBasketItem.unit?.value}`,
+                          }
+                        : null
+                    }
+                    required
+                  />
+                </Column>
+                <Column md={8} className={styles.lastGridCell}>
                   <ComboBox
                     id="editRoute"
                     light={isTablet}
@@ -315,8 +314,8 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                     required
                   />
                 </Column>
-              </Row>
-              <Row className={styles.row}>
+              </Grid>
+              <div className={styles.row}>
                 <Column md={8}>
                   <ComboBox
                     id="editFrequency"
@@ -343,9 +342,9 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                     required
                   />
                 </Column>
-              </Row>
-              <Row className={styles.row}>
-                <Column className={styles.fullHeightTextAreaContainer}>
+              </div>
+              <Grid className={styles.gridRow}>
+                <Column md={8} className={`${styles.fullHeightTextAreaContainer} ${styles.patientInstructionsWrapper}`}>
                   <TextArea
                     light={isTablet}
                     labelText={t('patientInstructions', 'Patient Instructions')}
@@ -363,24 +362,21 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                     }
                   />
                 </Column>
-                <Column>
+                <Column md={8} className={styles.lastGridCell}>
                   <FormGroup legendText={t('prn', 'P.R.N.')}>
                     <Checkbox
                       id="prn"
                       labelText={t('takeAsNeeded', 'Take As Needed')}
                       checked={orderBasketItem.asNeeded}
-                      onChange={(newValue) =>
+                      onChange={(e) =>
                         setOrderBasketItem({
                           ...orderBasketItem,
-                          asNeeded: newValue,
+                          asNeeded: e.target.checked,
                         })
                       }
                     />
                   </FormGroup>
-                  <div
-                    className={styles.fullHeightTextAreaContainer}
-                    style={orderBasketItem.asNeeded ? {} : { visibility: 'hidden' }}
-                  >
+                  <div className={styles.prpWrapper} style={orderBasketItem.asNeeded ? {} : { visibility: 'hidden' }}>
                     <TextArea
                       light={isTablet}
                       labelText={t('prnReason', 'P.R.N. Reason')}
@@ -397,10 +393,11 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                     />
                   </div>
                 </Column>
-              </Row>
+              </Grid>
             </>
           )}
-        </Grid>
+        </div>
+
         <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
           <Button className={styles.button} kind="secondary" onClick={onCancel}>
             {t('discard', 'Discard')}

@@ -1,6 +1,5 @@
 import uniqBy from 'lodash-es/uniqBy';
 import { getDrugByName, getOrderTemplatesByDrug } from '../api/api';
-import { getCommonMedicationByUuid } from '../api/common-medication';
 import { OrderBasketItem } from '../types/order-basket-item';
 import { Drug } from '../types/order';
 import { DrugOrderTemplate, OrderTemplate } from '../api/drug-order-template';
