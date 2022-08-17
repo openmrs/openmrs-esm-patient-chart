@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ContentSwitcher, Loading, Switch } from '@carbon/react';
-import { Add } from '@carbon/react/icons';
-import { LayoutType, showModal, showToast, useLayoutType, usePagination, UserHasAccess } from '@openmrs/esm-framework';
-import { PatientChartPagination, EmptyState } from '@openmrs/esm-patient-common-lib';
+import { showModal, showToast, UserHasAccess } from '@openmrs/esm-framework';
+import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { createAttachment, deleteAttachmentPermanently, useAttachments } from '../attachments.resource';
 import { createGalleryEntry } from '../utils';
 import { UploadedFile, Attachment } from '../attachments-types';
@@ -11,31 +10,29 @@ import AttachmentsGridOverview from './attachments-grid-overview.component';
 import AttachmentsTableOverview from './attachments-table-overview.component';
 import AttachmentPreview from './image-preview.component';
 import styles from './attachments-overview.scss';
+import { List, Thumbnail_2, Add } from '@carbon/react/icons';
 
-function getPageSize(layoutType: LayoutType) {
-  switch (layoutType) {
-    case 'tablet':
-      return 9;
-    case 'phone':
-      return 3;
-    case 'small-desktop':
-      return 25;
-    // TODO: Add case for the 'large-desktop' layout
-    // case 'large-desktop':
-    //   return 25;
-    default:
-      return 8;
-  }
-}
+// function getPageSize(layoutType: LayoutType) {
+//   switch (layoutType) {
+//     case 'tablet':
+//       return 9;
+//     case 'phone':
+//       return 3;
+//     case 'small-desktop':
+//       return 25;
+//     // TODO: Add case for the 'large-desktop' layout
+//     // case 'large-desktop':
+//     //   return 25;
+//     default:
+//       return 8;
+//   }
+// }
 
 const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const { data, mutate, isValidating, isLoading } = useAttachments(patientUuid, true);
   const [attachmentToPreview, setAttachmentToPreview] = useState<Attachment>(null);
-  const layOutType = useLayoutType();
-  const pageSize = getPageSize(layOutType);
   const attachments = useMemo(() => data.map((item) => createGalleryEntry(item)), [data]);
-  const pagination = usePagination(attachments, pageSize);
   const [error, setError] = useState(false);
   const [view, setView] = useState('grid');
 
@@ -112,8 +109,12 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
             <h4 className={styles.productiveheading02}>{t('attachments', 'Attachments')}</h4>
             <div>{isValidating && <Loading withOverlay={false} small />}</div>
             <ContentSwitcher onChange={(evt) => setView(`${evt.name}`)}>
-              <Switch name="grid" text="Grid" selected={view === 'grid'} />
-              <Switch name="tabular" text="Table" selected={view === 'tabular'} />
+              <Switch name="grid" selected={view === 'grid'}>
+                <Thumbnail_2 size={16} />
+              </Switch>
+              <Switch name="tabular" selected={view === 'tabular'}>
+                <List size={16} />
+              </Switch>
             </ContentSwitcher>
             <Button kind="ghost" renderIcon={Add} iconDescription="Add attachment" onClick={showCam}>
               {t('add', 'Add')}
@@ -134,14 +135,6 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
               attachments={attachments}
             />
           )}
-
-          <PatientChartPagination
-            currentItems={pagination.results.length}
-            totalItems={attachments.length}
-            onPageNumberChange={(prop) => pagination.goTo(prop.page)}
-            pageNumber={pagination.currentPage}
-            pageSize={pageSize}
-          />
         </div>
       </div>
       {attachmentToPreview && (

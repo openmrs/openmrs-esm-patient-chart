@@ -18,7 +18,8 @@ const MediaUploaderComponent = () => {
               base64Content,
               file,
               fileName: file.name,
-              fileType: file.type.split('/')[0],
+              fileType:
+                file.type.split('/')[0] === 'image' ? 'image' : file.type.split('/')[1] === 'pdf' ? 'pdf' : 'other',
               fileDescription: '',
               status: 'uploading',
             },

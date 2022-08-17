@@ -35,3 +35,18 @@
     max-width: unset;
   }
 }
+
+.filePlaceholder {
+  background-color: $color-gray-30;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50%;
+  margin: 0 auto;
+}
+
+.filePlaceholder::after {
+  content: "";
+  display: block;
+  padding-bottom: 100%;
+}
