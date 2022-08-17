@@ -34,7 +34,7 @@ const MediaUploaderComponent = () => {
       <p className="cds--label-description">{t('fileUploadTypes', 'Only images and pdf files. 500kb max file size')}</p>
       <div className={styles.uploadFile}>
         <FileUploaderDropContainer
-          accept={['image/*', 'application/pdf']}
+          accept={'*'}
           labelText={t('fileUploadInstructions', 'Drag and drop files here or click to upload')}
           tabIndex={0}
           multiple

@@ -9,7 +9,7 @@ import { createGalleryEntry } from '../utils';
 import { UploadedFile, Attachment } from '../attachments-types';
 import AttachmentsGridOverview from './attachments-grid-overview.component';
 import AttachmentsTableOverview from './attachments-table-overview.component';
-import ImagePreview from './image-preview.component';
+import ImagePDFViewer from './image-preview.component';
 import styles from './attachments-overview.scss';
 
 function getPageSize(layoutType: LayoutType) {
@@ -102,6 +102,8 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
     return <EmptyState displayText={'attachments'} headerTitle="Attachments" launchForm={showCam} />;
   }
 
+  const closePreview = useCallback(() => setImageSelected(null), [setImageSelected]);
+
   return (
     <UserHasAccess privilege="View Attachments">
       <div onDragOverCapture={showCam} className={styles.overview}>
@@ -143,8 +145,8 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
         </div>
       </div>
       {imageSelected && (
-        <ImagePreview
-          closePreview={() => setImageSelected(null)}
+        <ImagePDFViewer
+          closePreview={closePreview}
           imageSelected={imageSelected}
           deleteAttachment={deleteAttachmentModal}
         />

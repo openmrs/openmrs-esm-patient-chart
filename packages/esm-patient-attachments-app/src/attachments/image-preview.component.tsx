@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@carbon/react';
+import { Button, OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import { Close } from '@carbon/react/icons';
 import { Attachment } from '../attachments-types';
-import styles from './attachments-grid-overview.scss';
+import styles from './image-preview.scss';
 
 interface ImagePreviewProps {
   closePreview: any;
@@ -13,6 +13,21 @@ interface ImagePreviewProps {
 
 const ImagePreview: React.FC<ImagePreviewProps> = ({ closePreview, imageSelected, deleteAttachment }) => {
   const { t } = useTranslation();
+
+  useEffect(() => {
+    const onKeyDown = (evt) => {
+      console.log(evt.key);
+      if (evt.key == 'Escape') {
+        closePreview();
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [closePreview]);
 
   return (
     <div className={styles.imagePreview}>
@@ -27,12 +42,21 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ closePreview, imageSelected
           onClick={closePreview}
         />
         <div className={styles.attachmentImage}>
-          <img src={imageSelected.src} alt={imageSelected.title} />
+          {imageSelected.bytesContentFamily === 'IMAGE' ? (
+            <img src={imageSelected.src} alt={imageSelected.title} />
+          ) : imageSelected.bytesContentFamily === 'PDF' ? (
+            <iframe className={styles.pdfViewer} src={imageSelected.src} />
+          ) : null}
         </div>
         <div className={styles.overflowMenu}>
-          <Button kind="danger" onClick={() => deleteAttachment(imageSelected)}>
-            {t('deleteImage', 'Delete image')}
-          </Button>
+          <OverflowMenu className={styles.overflowMenu}>
+            <OverflowMenuItem
+              hasDivider
+              isDelete
+              itemText={t('deleteImage', 'Delete image')}
+              onClick={() => deleteAttachment(imageSelected)}
+            />
+          </OverflowMenu>
         </div>
       </div>
       <div className={styles.rightPanel}>

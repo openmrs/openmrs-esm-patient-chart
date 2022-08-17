@@ -19,14 +19,14 @@ function ImageThumbnail(props: ImageProps) {
 }
 
 function PdfThumbnail(props: ImageProps) {
-  function handleClick(e: React.SyntheticEvent) {
-    e.preventDefault();
-    e.stopPropagation();
-    window.open(props.src, '_blank');
-  }
+  // function handleClick(e: React.SyntheticEvent) {
+  //   e.preventDefault();
+  //   e.stopPropagation();
+  //   window.open(props.src, '_blank');
+  // }
 
   return (
-    <div className={styles.pdfThumbnail} onClick={handleClick} role="button" tabIndex={0}>
+    <div className={styles.pdfThumbnail} onClick={props.onClick} role="button" tabIndex={0}>
       <embed src={props.src} style={{ ...props.style, pointerEvents: 'none', width: '100%' }} />
     </div>
   );
