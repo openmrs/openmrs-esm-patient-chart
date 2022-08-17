@@ -34,8 +34,8 @@
     "url": "https://github.com/openmrs/openmrs-esm-patient-chart/issues"
   },
   "dependencies": {
-    "@carbon/charts-react": "^1.5.1",
-    "@carbon/react": "^1.8.0",
+    "@carbon/charts-react": "^1.5.2",
+    "@carbon/react": "^1.9.0",
     "@openmrs/esm-patient-common-lib": "^4.0.0",
     "d3": "^7.6.1",
     "lodash-es": "^4.17.15"
