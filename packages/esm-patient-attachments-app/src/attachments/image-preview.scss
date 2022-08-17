@@ -2,7 +2,7 @@
 @use '~@carbon/styles/scss/colors';
 @import "../root.scss";
 
-.imagePreview {
+.attachmentPreview {
   display: grid;
   grid-template-columns: 1fr 16rem;
   position: fixed;

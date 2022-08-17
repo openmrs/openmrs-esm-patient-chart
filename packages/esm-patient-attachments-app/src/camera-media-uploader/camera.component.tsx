@@ -17,9 +17,12 @@ const CameraComponent: React.FC<CameraComponentProps> = ({ mediaStream, stopCame
     };
   }, [stopCameraStream]);
 
-  const setMediaStream = useCallback((ms: MediaStream) => {
-    mediaStream.current = ms;
-  }, []);
+  const setMediaStream = useCallback(
+    (ms: MediaStream) => {
+      mediaStream.current = ms;
+    },
+    [mediaStream],
+  );
   return (
     <Camera
       onTakePhoto={handleTakePhoto}

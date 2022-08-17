@@ -9,7 +9,7 @@ import { createGalleryEntry } from '../utils';
 import { UploadedFile, Attachment } from '../attachments-types';
 import AttachmentsGridOverview from './attachments-grid-overview.component';
 import AttachmentsTableOverview from './attachments-table-overview.component';
-import ImagePDFViewer from './image-preview.component';
+import AttachmentPreview from './image-preview.component';
 import styles from './attachments-overview.scss';
 
 function getPageSize(layoutType: LayoutType) {
@@ -31,13 +31,15 @@ function getPageSize(layoutType: LayoutType) {
 const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const { data, mutate, isValidating, isLoading } = useAttachments(patientUuid, true);
-  const [imageSelected, setImageSelected] = useState<Attachment>(null);
+  const [attachmentToPreview, setAttachmentToPreview] = useState<Attachment>(null);
   const layOutType = useLayoutType();
   const pageSize = getPageSize(layOutType);
   const attachments = useMemo(() => data.map((item) => createGalleryEntry(item)), [data]);
   const pagination = usePagination(attachments, pageSize);
   const [error, setError] = useState(false);
   const [view, setView] = useState('grid');
+
+  const closeImagePDFPreview = useCallback(() => setAttachmentToPreview(null), [setAttachmentToPreview]);
 
   useEffect(() => {
     if (error === true) {
@@ -70,7 +72,7 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
             description: `${attachment.title} ${t('successfullyDeleted', 'successfully deleted')}`,
             kind: 'success',
           });
-          setImageSelected(null);
+          setAttachmentToPreview(null);
           mutate();
         })
         .catch((error) => {
@@ -81,7 +83,7 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
           });
         });
     },
-    [mutate, t, setImageSelected],
+    [mutate, t, setAttachmentToPreview],
   );
 
   const deleteAttachmentModal = useCallback(
@@ -102,8 +104,6 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
     return <EmptyState displayText={'attachments'} headerTitle="Attachments" launchForm={showCam} />;
   }
 
-  const closePreview = useCallback(() => setImageSelected(null), [setImageSelected]);
-
   return (
     <UserHasAccess privilege="View Attachments">
       <div onDragOverCapture={showCam} className={styles.overview}>
@@ -121,14 +121,14 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
           </div>
           {view === 'grid' ? (
             <AttachmentsGridOverview
-              onAttachmentSelect={setImageSelected}
+              onAttachmentSelect={setAttachmentToPreview}
               deleteAttachment={deleteAttachmentModal}
               isLoading={isLoading}
               attachments={attachments}
             />
           ) : (
             <AttachmentsTableOverview
-              onAttachmentSelect={setImageSelected}
+              onAttachmentSelect={setAttachmentToPreview}
               deleteAttachment={deleteAttachmentModal}
               isLoading={isLoading}
               attachments={attachments}
@@ -144,10 +144,10 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
           />
         </div>
       </div>
-      {imageSelected && (
-        <ImagePDFViewer
-          closePreview={closePreview}
-          imageSelected={imageSelected}
+      {attachmentToPreview && (
+        <AttachmentPreview
+          closePreview={closeImagePDFPreview}
+          attachmentToPreview={attachmentToPreview}
           deleteAttachment={deleteAttachmentModal}
         />
       )}
