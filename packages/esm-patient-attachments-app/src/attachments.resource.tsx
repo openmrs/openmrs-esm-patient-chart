@@ -50,17 +50,15 @@ export async function createAttachment(patientUuid: string, file: UploadedFile) 
   formData.append('patient', patientUuid);
 
   if (file.file) {
-    formData.append('file', file.file, file.fileName);
+    formData.append('file', file.file);
   } else {
     formData.append('file', new File([''], file.fileName), file.fileName);
-    formData.append('base64Content', file.fileContent);
+    formData.append('base64Content', file.base64Content);
   }
   return openmrsFetch(`${attachmentUrl}`, {
     method: 'POST',
     body: formData,
   });
-
-  // return Promise.resolve(() => console.log(file, emptyFile));
 }
 
 export function deleteAttachmentPermanently(attachmentUuid: string, abortController: AbortController) {

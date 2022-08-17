@@ -45,7 +45,7 @@ const CameraMediaUploaderModal: React.FC<CameraMediaUploaderModalProps> = ({
   const handleTakePhoto = useCallback((file: string) => {
     setFilesToUpload([
       {
-        fileContent: file,
+        base64Content: file,
         fileName: 'Image taken from camera',
         fileType: 'image',
         fileDescription: '',

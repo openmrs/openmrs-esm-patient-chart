@@ -114,7 +114,7 @@ const FilePreview: React.FC<FilePreviewProps> = ({ uploadedFile, collectDescript
   return (
     <form onSubmit={saveImageOrPdf}>
       <ModalBody className={styles.overview}>
-        <img src={uploadedFile.fileType === 'image' ? uploadedFile.fileContent : FileRegular} alt="placeholder" />
+        <img src={uploadedFile.fileType === 'image' ? uploadedFile.base64Content : FileRegular} alt="placeholder" />
         <div className={styles.imageDetails}>
           <div className={styles.captionFrame}>
             <TextInput

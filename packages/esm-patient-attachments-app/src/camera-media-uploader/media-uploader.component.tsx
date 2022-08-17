@@ -11,11 +11,11 @@ const MediaUploaderComponent = () => {
   const upload = useCallback(
     (files: Array<File>) => {
       files.forEach((file) =>
-        readFileAsString(file).then((fileContent) => {
+        readFileAsString(file).then((base64Content) => {
           setFilesToUpload((uriData) => [
             ...uriData,
             {
-              fileContent,
+              base64Content,
               file,
               fileName: file.name,
               fileType: file.type.split('/')[0],

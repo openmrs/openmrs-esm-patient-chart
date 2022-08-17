@@ -1,6 +1,6 @@
 export interface UploadedFile {
   file?: File;
-  fileContent: string;
+  base64Content: string;
   fileName: string;
   fileType: string;
   fileDescription: string;
