@@ -116,56 +116,12 @@ export const mockFetchProviderByUuidResponse = {
 export const diagnosisSearchResponse = {
   results: [
     {
-      word: null,
-      conceptName: {
-        id: 19739,
-        uuid: '19739BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
-        conceptNameType: 'FULLY_SPECIFIED',
-        name: 'Diabetes Mellitus',
-      },
-      concept: {
-        id: 119481,
-        uuid: '119481AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-        conceptMappings: [
-          {
-            conceptMapType: 'SAME-AS',
-            conceptReferenceTerm: {
-              code: '73211009',
-              name: null,
-              conceptSource: {
-                name: 'SNOMED CT',
-              },
-            },
-          },
-        ],
-        preferredName: 'Diabetes Mellitus',
-      },
+      uuid: '119481AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      display: 'Diabetes Mellitus',
     },
     {
-      word: null,
-      conceptName: {
-        id: 42200,
-        uuid: '42200BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
-        conceptNameType: 'FULLY_SPECIFIED',
-        name: 'Diabetes Mellitus, Type II',
-      },
-      concept: {
-        id: 142473,
-        uuid: '142473AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-        conceptMappings: [
-          {
-            conceptMapType: 'SAME-AS',
-            conceptReferenceTerm: {
-              code: '6692',
-              name: null,
-              conceptSource: {
-                name: 'PIH',
-              },
-            },
-          },
-        ],
-        preferredName: 'Diabetes Mellitus, Type II',
-      },
+      uuid: '142473AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      display: 'Diabetes Mellitus, Type II',
     },
   ],
 };
