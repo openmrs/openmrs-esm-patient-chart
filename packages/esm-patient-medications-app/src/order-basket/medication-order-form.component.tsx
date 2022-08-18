@@ -45,8 +45,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
   const isTablet = useLayoutType() === 'tablet';
   const [orderBasketItem, setOrderBasketItem] = useState(initialOrderBasketItem);
   const template = initialOrderBasketItem.template;
-  const { orderConfigObject, isLoading } = useOrderConfig();
-  const [durationUnitOptions, setDurationUnitOptions] = useState([]);
+  const { orderConfigObject } = useOrderConfig();
 
   const doseWithUnitsLabel = template
     ? `${initialOrderBasketItem?.dosage?.value} ${initialOrderBasketItem?.unit?.value}`
@@ -116,7 +115,6 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
         (x) => availableRoutes.includes(x.uuid) || otherRouteOptions.push({ id: x.uuid, text: x.display }),
       );
       setRouteOptions([...routeOptions, ...otherRouteOptions]);
-      setDurationUnitOptions(orderConfigObject.durationUnits.map((x) => ({ id: x.uuid, text: x.display })));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderConfigObject]);
@@ -282,8 +280,8 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                     selectedItem={
                       dosingUnitOptions?.length
                         ? {
-                            id: `${orderBasketItem.unit?.valueCoded}`,
-                            text: `${orderBasketItem.unit?.value}`,
+                            id: orderBasketItem.unit?.valueCoded,
+                            text: orderBasketItem.unit?.value,
                           }
                         : null
                     }
