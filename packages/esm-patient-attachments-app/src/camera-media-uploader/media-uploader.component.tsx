@@ -31,7 +31,7 @@ const MediaUploaderComponent = () => {
           });
         } else {
           showToast({
-            title: t('fileLimitExceeded', 'File limit exceeded'),
+            title: t('fileSizeLimitExceededText', 'File size limit exceeded'),
             description: `${file.name} ${t('fileSizeLimitExceeded', 'exceeds the file size of')} ${fileSize} MB`,
             kind: 'error',
           });
