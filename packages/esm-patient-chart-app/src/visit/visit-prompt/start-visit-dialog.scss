@@ -1,13 +1,11 @@
-@import "~@openmrs/esm-styleguide/src/vars";
-@import "~carbon-components/src/globals/scss/vars";
-@import "~carbon-components/src/globals/scss/mixins";
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
+
 
 .header {
-  @include carbon--type-style("productive-heading-03");
-  color: $text-01;
+  @include type.type-style("heading-03");
 }
 
 .body {
-  @include carbon--type-style("body-long-01");
-  color: $text-01;
+  @include type.type-style("body-01");
 }

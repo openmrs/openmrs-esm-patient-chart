@@ -8,8 +8,8 @@ import {
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { esmPatientChartSchema } from './config-schema';
 import { moduleName, spaBasePath } from './constants';
-import { setupCacheableRoutes, setupOfflineVisitsSync } from './offline';
 import { summaryDashboardMeta, encountersDashboardMeta } from './dashboard.meta';
+import { setupOfflineVisitsSync, setupCacheableRoutes } from './offline';
 import { genericDashboardConfigSchema } from './side-nav/generic-dashboard.component';
 import { genericNavGroupConfigSchema } from './side-nav/generic-nav-group.component';
 
@@ -80,6 +80,14 @@ function setupOpenMRS() {
         }),
       },
       {
+        name: 'stop-visit-button-patient-search',
+        slot: 'patient-search-actions-slot',
+        load: getAsyncLifecycle(() => import('./actions-buttons/stop-visit.component'), {
+          featureName: 'patient-actions-slot',
+          moduleName,
+        }),
+      },
+      {
         name: 'cancel-visit-button',
         slot: 'patient-actions-slot',
         load: getAsyncLifecycle(() => import('./actions-buttons/cancel-visit.component'), {
@@ -88,8 +96,24 @@ function setupOpenMRS() {
         }),
       },
       {
+        name: 'cancel-visit-button',
+        slot: 'patient-search-actions-slot',
+        load: getAsyncLifecycle(() => import('./actions-buttons/cancel-visit.component'), {
+          featureName: 'patient-actions-slot',
+          moduleName,
+        }),
+      },
+      {
         name: 'add-past-visit-button',
         slot: 'patient-actions-slot',
+        load: getAsyncLifecycle(() => import('./actions-buttons/add-past-visit.component'), {
+          featureName: 'patient-actions-slot',
+          moduleName,
+        }),
+      },
+      {
+        name: 'add-past-visit-button',
+        slot: 'patient-search-actions-slot',
         load: getAsyncLifecycle(() => import('./actions-buttons/add-past-visit.component'), {
           featureName: 'patient-actions-slot',
           moduleName,
@@ -179,6 +203,14 @@ function setupOpenMRS() {
         id: 'end-visit-dialog',
         load: getAsyncLifecycle(() => import('./visit/visit-prompt/end-visit-dialog.component'), {
           featureName: 'end visit',
+          moduleName,
+        }),
+      },
+      {
+        id: 'start-visit-button-patient-search',
+        slot: 'start-visit-button-slot',
+        load: getAsyncLifecycle(() => import('./visit/start-visit-button.component'), {
+          featureName: 'start-visit-button-patient-search',
           moduleName,
         }),
       },

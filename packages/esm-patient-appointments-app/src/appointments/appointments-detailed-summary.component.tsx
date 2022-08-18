@@ -1,11 +1,11 @@
 import React from 'react';
-import { useAppointmentsContext } from './appointments.context';
 import AppointmentBase from './appointments-base.component';
 
-interface AppointmentsDetailedSummaryProps {}
+interface AppointmentsDetailedSummaryProps {
+  patientUuid: string;
+}
 
-const AppointmentsDetailedSummary: React.FC<AppointmentsDetailedSummaryProps> = () => {
-  const { patientUuid } = useAppointmentsContext();
+const AppointmentsDetailedSummary: React.FC<AppointmentsDetailedSummaryProps> = ({ patientUuid }) => {
   return <AppointmentBase patientUuid={patientUuid} />;
 };
 

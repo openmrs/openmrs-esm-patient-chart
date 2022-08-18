@@ -1,22 +1,13 @@
 import React, { SyntheticEvent, useEffect, useState } from 'react';
-import styles from './immunizations-form.scss';
-import { showNotification, showToast, useSession, useVisit, useLayoutType } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
+import { Button, ButtonSet, DatePicker, DatePickerInput, Form, Select, SelectItem, TextInput } from '@carbon/react';
+import { showNotification, showToast, useSession, useVisit, useLayoutType } from '@openmrs/esm-framework';
+import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import { savePatientImmunization } from './immunizations.resource';
 import { mapToFHIRImmunizationResource } from './immunization-mapper';
 import { ImmunizationFormData, ImmunizationSequence } from './immunization-domain';
-import {
-  Button,
-  ButtonSet,
-  DatePicker,
-  DatePickerInput,
-  Form,
-  Select,
-  SelectItem,
-  TextInput,
-} from 'carbon-components-react';
 import { immunizationFormSub } from './immunization-utils';
-import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import styles from './immunizations-form.scss';
 
 function hasSequences<T>(sequences: Array<T>) {
   return sequences && sequences?.length > 0;
@@ -104,7 +95,15 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
       );
       return () => abortController.abort();
     },
-    [closeWorkspace, formState, patientUuid],
+    [
+      currentUser?.sessionLocation?.uuid,
+      closeWorkspace,
+      formState,
+      patientUuid,
+      currentUser?.currentProvider?.uuid,
+      currentVisit?.uuid,
+      t,
+    ],
   );
 
   function isNumber(value) {

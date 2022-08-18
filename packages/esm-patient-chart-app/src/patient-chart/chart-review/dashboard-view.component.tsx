@@ -1,4 +1,5 @@
 import React from 'react';
+import { useMatch } from 'react-router-dom';
 import {
   Extension,
   ExtensionData,
@@ -6,8 +7,7 @@ import {
   getExtensionNameFromId,
   useExtensionSlotMeta,
 } from '@openmrs/esm-framework';
-import { useRouteMatch } from 'react-router-dom';
-import { basePath } from '../../constants';
+import { basePath, dashboardPath } from '../../constants';
 import styles from './dashboard-view.scss';
 
 function getColumnsLayoutStyle(dashboard: DashboardConfig) {
@@ -29,16 +29,18 @@ interface DashboardViewProps {
 
 export function DashboardView({ dashboard, patientUuid, patient }: DashboardViewProps) {
   const widgetMetas = useExtensionSlotMeta(dashboard.slot);
-  const { url } = useRouteMatch(basePath);
+  const {
+    params: { view },
+  } = useMatch(dashboardPath);
   const gridTemplateColumns = getColumnsLayoutStyle(dashboard);
 
   const state = React.useMemo(
     () => ({
-      basePath: url,
+      basePath: view,
       patient,
       patientUuid,
     }),
-    [url, patientUuid, patient],
+    [patient, patientUuid, view],
   );
 
   const wrapItem = React.useCallback(
@@ -52,6 +54,7 @@ export function DashboardView({ dashboard, patientUuid, patient }: DashboardView
   return (
     <>
       {dashboard.title && <h1 className={styles.dashboardTitle}>{dashboard.title}</h1>}
+      <ExtensionSlot state={state} extensionSlotName="top-of-all-patient-dashboards-slot" />
       <ExtensionSlot
         key={dashboard.slot}
         extensionSlotName={dashboard.slot}

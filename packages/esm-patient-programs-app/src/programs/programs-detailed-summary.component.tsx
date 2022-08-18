@@ -1,30 +1,29 @@
 import React from 'react';
-import Add16 from '@carbon/icons-react/es/add/16';
-import Edit16 from '@carbon/icons-react/es/edit/16';
-import filter from 'lodash-es/filter';
-import includes from 'lodash-es/includes';
-import map from 'lodash-es/map';
-import styles from './programs-detailed-summary.scss';
-import { CardHeader, EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
-import { useAvailablePrograms, useEnrollments } from './programs.resource';
+import capitalize from 'lodash-es/capitalize';
 import {
   Button,
   DataTable,
+  DataTableHeader,
+  DataTableRow,
   DataTableSkeleton,
   InlineLoading,
+  InlineNotification,
   Table,
+  TableBody,
   TableCell,
   TableContainer,
-  TableBody,
   TableHead,
   TableHeader,
   TableRow,
-  DataTableHeader,
-  DataTableRow,
-  InlineNotification,
-} from 'carbon-components-react';
-import { formatDate, formatDatetime } from '@openmrs/esm-framework';
+} from '@carbon/react';
+import { Add, Edit } from '@carbon/react/icons';
+import { formatDate, formatDatetime, useConfig, usePagination, ConfigObject } from '@openmrs/esm-framework';
+import { CardHeader, EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { useAvailablePrograms, useEnrollments, usePrograms } from './programs.resource';
+import { ConfigurableProgram } from '../types';
+import ProgramActionButton from './program-action-button/program-action-button.component';
+import styles from './programs-detailed-summary.scss';
 
 interface ProgramsDetailedSummaryProps {
   patientUuid: string;
@@ -34,13 +33,18 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
   const { t } = useTranslation();
   const displayText = t('programEnrollments', 'Program enrollments');
   const headerTitle = t('carePrograms', 'Care Programs');
+  const config = useConfig() as ConfigObject;
+  const programsCount = 5;
+  const isConfigurable = config.customUrl ? true : false;
 
-  const { data: enrollments, isError, isLoading, isValidating } = useEnrollments(patientUuid);
-  const { data: availablePrograms } = useAvailablePrograms();
-  const eligiblePrograms = filter(
-    availablePrograms,
-    (program) => !includes(map(enrollments, 'program.uuid'), program.uuid),
-  );
+  const { enrollments, isLoading, isError, isValidating, availablePrograms, eligiblePrograms, configurablePrograms } =
+    usePrograms(patientUuid);
+
+  const {
+    results: paginatedEnrollments,
+    goTo,
+    currentPage,
+  } = usePagination(isConfigurable ? configurablePrograms : enrollments ?? [], programsCount);
 
   const tableHeaders: Array<DataTableHeader> = React.useMemo(
     () => [
@@ -68,7 +72,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
     [t],
   );
 
-  const tableRows: Array<DataTableRow> = React.useMemo(() => {
+  const tableRows = React.useMemo(() => {
     return enrollments?.map((program) => {
       return {
         id: program.uuid,
@@ -94,7 +98,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
           <span>{isValidating ? <InlineLoading /> : null}</span>
           <Button
             kind="ghost"
-            renderIcon={Add16}
+            renderIcon={(props) => <Add size={16} {...props} />}
             iconDescription="Add programs"
             onClick={launchProgramsForm}
             disabled={availablePrograms?.length && eligiblePrograms?.length === 0}
@@ -102,19 +106,19 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
             {t('add', 'Add')}
           </Button>
         </CardHeader>
-        <TableContainer>
-          {availablePrograms?.length && eligiblePrograms?.length === 0 && (
-            <InlineNotification
-              style={{ minWidth: '100%', margin: '0rem', padding: '0rem' }}
-              kind={'info'}
-              lowContrast
-              subtitle={t('noEligibleEnrollments', 'There are no more programs left to enroll this patient in')}
-              title={t('fullyEnrolled', 'Enrolled in all programs')}
-            />
-          )}
-          <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="short">
-            {({ rows, headers, getHeaderProps, getTableProps }) => (
-              <Table {...getTableProps()} useZebraStyles>
+        {availablePrograms?.length && eligiblePrograms?.length === 0 ? (
+          <InlineNotification
+            style={{ minWidth: '100%', margin: '0rem', padding: '0rem' }}
+            kind={'info'}
+            lowContrast
+            subtitle={t('noEligibleEnrollments', 'There are no more programs left to enroll this patient in')}
+            title={t('fullyEnrolled', 'Enrolled in all programs')}
+          />
+        ) : null}
+        <DataTable rows={tableRows} headers={tableHeaders} isSortable size="xs" useZebraStyles>
+          {({ rows, headers, getHeaderProps, getTableProps }) => (
+            <TableContainer>
+              <Table {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
@@ -140,9 +144,9 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
                   ))}
                 </TableBody>
               </Table>
-            )}
-          </DataTable>
-        </TableContainer>
+            </TableContainer>
+          )}
+        </DataTable>
       </div>
     );
   }
@@ -156,13 +160,13 @@ interface ProgramEditButtonProps {
 function ProgramEditButton({ programEnrollmentId }: ProgramEditButtonProps) {
   const launchEditProgramsForm = React.useCallback(
     () => launchPatientWorkspace('programs-form-workspace', { programEnrollmentId }),
-    [],
+    [programEnrollmentId],
   );
 
   return (
     <Button
       kind="ghost"
-      renderIcon={Edit16}
+      renderIcon={(props) => <Edit size={16} {...props} />}
       iconDescription="Edit Program"
       onClick={launchEditProgramsForm}
       hasIconOnly

@@ -99,3 +99,13 @@ export interface SessionData {
   retired: false;
   links: Links;
 }
+
+export interface ConfigurableProgram extends PatientProgram {
+  uuid: string;
+  display: string;
+  enrollmentFormUuid: string;
+  discontinuationFormUuid: string;
+  enrollmentStatus: string;
+  dateEnrolled: string;
+  dateCompleted: string;
+}

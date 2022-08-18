@@ -34,13 +34,6 @@ jest.mock('@openmrs/esm-framework', () => {
   };
 });
 
-jest.mock('./notes.context', () => ({
-  useNotesContext: jest.fn().mockReturnValue({
-    patient: mockPatient,
-    patientUuid: mockPatient.id,
-  }),
-}));
-
 describe('NotesOverview: ', () => {
   beforeEach(() => {
     mockUseConfig.mockReturnValue(ConfigMock);
@@ -84,7 +77,7 @@ describe('NotesOverview: ', () => {
     ).toBeInTheDocument();
   });
 
-  test("renders a tabular overview of the patient's visit notes when present", async () => {
+  test.only("renders a tabular overview of the patient's visit notes when present", async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockVisitNotesRequest } });
     mockUsePagination.mockReturnValueOnce({
       results: formattedVisitNotes.slice(0, 10),

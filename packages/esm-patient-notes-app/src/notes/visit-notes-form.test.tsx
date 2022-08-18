@@ -46,7 +46,8 @@ jest.mock('@openmrs/esm-framework', () => {
     createErrorHandler: jest.fn(),
     showNotification: jest.fn(),
     showToast: jest.fn(),
-    useConfig: jest.fn(),
+    useConfig: jest.fn().mockImplementation(() => ConfigMock),
+    useSession: jest.fn().mockImplementation(() => mockSessionDataResponse),
   };
 });
 
@@ -73,12 +74,14 @@ describe('Visit notes form: ', () => {
     expect(screen.getByRole('button', { name: /Save and close/i })).toBeInTheDocument();
   });
 
-  test('typing in the diagnosis search input triggers a search', () => {
+  test.only('typing in the diagnosis search input triggers a search', () => {
+    const user = userEvent.setup();
     mockFetchDiagnosisByName.mockReturnValue(of(diagnosisSearchResponse.results));
 
     renderVisitNotesForm();
 
     const searchbox = screen.getByPlaceholderText('Choose a primary diagnosis');
+    expect(searchbox);
     userEvent.type(searchbox, 'Diabetes Mellitus');
     const targetSearchResult = screen.getByText('Diabetes Mellitus');
     expect(targetSearchResult).toBeInTheDocument();
@@ -99,7 +102,7 @@ describe('Visit notes form: ', () => {
     expect(screen.getByText(/No diagnosis selected — Enter a diagnosis below/i)).toBeInTheDocument();
   });
 
-  test.only('renders an error message when no matching diagnoses are found', () => {
+  test('renders an error message when no matching diagnoses are found', () => {
     mockFetchDiagnosisByName.mockReturnValue(of([]));
     renderVisitNotesForm();
 

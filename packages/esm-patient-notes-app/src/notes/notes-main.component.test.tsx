@@ -37,12 +37,6 @@ jest.mock('./visit-notes.resource', () => {
   return { useVisitNotes: jest.fn().mockReturnValue([{}]) };
 });
 
-jest.mock('./notes.context', () => ({
-  useNotesContext: jest.fn().mockReturnValue({
-    patientUuid: mockPatient.id,
-  }),
-}));
-
 describe('NotesMain: ', () => {
   test('renders an empty state view if encounter data is unavailable', async () => {
     mockUseVisitNotes.mockReturnValueOnce({ data: { results: [] } });

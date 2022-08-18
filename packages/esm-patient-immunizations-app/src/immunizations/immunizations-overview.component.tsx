@@ -1,29 +1,29 @@
 import React from 'react';
-import Add16 from '@carbon/icons-react/es/add/16';
-import styles from './immunizations-overview.scss';
+import { useTranslation } from 'react-i18next';
 import {
   Button,
-  DataTableSkeleton,
   DataTable,
+  DataTableSkeleton,
+  InlineLoading,
   Table,
+  TableBody,
   TableCell,
   TableContainer,
-  TableBody,
   TableHead,
   TableHeader,
   TableRow,
-  InlineLoading,
-} from 'carbon-components-react';
+} from '@carbon/react';
+import { Add } from '@carbon/react/icons';
 import {
+  launchPatientWorkspace,
   CardHeader,
   EmptyState,
   ErrorState,
-  launchPatientWorkspace,
   PatientChartPagination,
 } from '@openmrs/esm-patient-common-lib';
-import { useTranslation } from 'react-i18next';
 import { useImmunizations } from './immunizations.resource';
 import { formatDate, parseDate, usePagination } from '@openmrs/esm-framework';
+import styles from './immunizations-overview.scss';
 
 export interface ImmunizationsOverviewProps {
   basePath: string;
@@ -74,14 +74,19 @@ const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = ({ patient, 
       <div className={styles.widgetCard}>
         <CardHeader title={headerTitle}>
           <span>{isValidating ? <InlineLoading /> : null}</span>
-          <Button kind="ghost" renderIcon={Add16} iconDescription="Add immunizations" onClick={launchImmunizationsForm}>
+          <Button
+            kind="ghost"
+            renderIcon={(props) => <Add size={16} {...props} />}
+            iconDescription="Add immunizations"
+            onClick={launchImmunizationsForm}
+          >
             {t('add', 'Add')}
           </Button>
         </CardHeader>
-        <TableContainer>
-          <DataTable headers={tableHeaders} rows={tableRows} isSortable={true} size="short">
-            {({ rows, headers, getHeaderProps, getTableProps }) => (
-              <Table {...getTableProps()} useZebraStyles>
+        <DataTable headers={tableHeaders} rows={tableRows} isSortable size="sm" useZebraStyles>
+          {({ rows, headers, getHeaderProps, getTableProps }) => (
+            <TableContainer>
+              <Table {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
@@ -107,9 +112,9 @@ const ImmunizationsOverview: React.FC<ImmunizationsOverviewProps> = ({ patient, 
                   ))}
                 </TableBody>
               </Table>
-            )}
-          </DataTable>
-        </TableContainer>
+            </TableContainer>
+          )}
+        </DataTable>
         <PatientChartPagination
           currentItems={paginatedImmunizations.length}
           onPageNumberChange={({ page }) => goTo(page)}

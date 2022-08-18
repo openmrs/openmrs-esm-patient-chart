@@ -1,10 +1,15 @@
-import { forkJoin as observableForkJoin, Observable, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { forkJoin, Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
 
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { WindowRef } from '../window-ref';
-import { Concept } from '../types';
+import { ListResult } from '../types';
+import { map } from 'rxjs/operators';
+
+interface ConceptMetadata {
+  uuid: string;
+  display: string;
+}
 
 @Injectable()
 export class ConceptService {
@@ -24,26 +29,40 @@ export class ConceptService {
     });
   }
 
-  public searchBulkConceptByUUID(
-    conceptUuids: Array<string>,
-    lang: string,
-  ): Observable<Array<Concept & { extId: string }>> {
+  public searchBulkConceptsByUUID(conceptUuids: Array<string>, lang: string): Observable<Array<ConceptMetadata>> {
     const observablesArray = [];
+    const relativeConceptLabelUrls = ConceptService.getRelativeConceptLabelUrls(conceptUuids, lang);
 
-    for (const conceptUuid of conceptUuids) {
+    for (const relativeConceptLabelUrl of relativeConceptLabelUrls) {
       observablesArray.push(
-        this.searchConceptByUUID(conceptUuid, lang).pipe(
-          map((concept) => {
-            return { ...concept, extId: conceptUuid };
-          }),
-          catchError((error: Response) => {
-            console.error(error.status);
-            return of({ extId: conceptUuid, display: 'Failed to load concept label' });
-          }),
-        ),
+        this.http
+          .get<ListResult<ConceptMetadata>>(this.getUrl() + relativeConceptLabelUrl, {
+            headers: this.headers,
+          })
+          .pipe(
+            map((r) => {
+              return r.results;
+            }),
+          ),
       );
     }
 
-    return observableForkJoin(observablesArray) as Observable<Array<Concept & { extId: string }>>;
+    return forkJoin(observablesArray).pipe(
+      map((response) => {
+        return response.flat() as Array<ConceptMetadata>;
+      }),
+    );
+  }
+
+  /**
+   * Partitions the given concept UUIDs into relative URLs pointing to the concept
+   * bulk fetching endpoint.
+   * @param conceptUuids The concept UUIDs to be partitioned into bulk fetching URLs.
+   */
+  public static getRelativeConceptLabelUrls(conceptUuids: Array<string>, lang: string) {
+    const chunkSize = 100;
+    return conceptUuids
+      .reduceRight((acc, _, __, array) => [...acc, array.splice(0, chunkSize)], [])
+      .map((uuidPartition) => `?references=${uuidPartition.join(',')}`);
   }
 }

@@ -1,10 +1,10 @@
 import React, { SyntheticEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import filter from 'lodash-es/filter';
 import includes from 'lodash-es/includes';
 import map from 'lodash-es/map';
 import { useSWRConfig } from 'swr';
-import { useTranslation } from 'react-i18next';
 import {
   createErrorHandler,
   showNotification,
@@ -16,14 +16,15 @@ import {
 } from '@openmrs/esm-framework';
 import {
   Button,
+  ButtonSet,
   DatePicker,
   DatePickerInput,
-  Select,
-  SelectItem,
   Form,
   FormGroup,
-  ButtonSet,
-} from 'carbon-components-react';
+  Select,
+  SelectItem,
+  Stack,
+} from '@carbon/react';
 import {
   createProgramEnrollment,
   useAvailablePrograms,
@@ -146,13 +147,23 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
         sub.unsubscribe();
       };
     },
-    [closeWorkspace, completionDate, enrollmentDate, mutate, patientUuid, selectedProgram, t, userLocation],
+    [
+      closeWorkspace,
+      completionDate,
+      enrollmentDate,
+      mutate,
+      patientUuid,
+      selectedProgram,
+      t,
+      userLocation,
+      currentEnrollment,
+    ],
   );
 
   return (
     <Form className={styles.form} onSubmit={handleSubmit}>
-      <div className={styles.formContainer}>
-        <FormGroup style={{ width: '50%' }} legendText={t('program', 'Program')}>
+      <Stack className={styles.formContainer} gap={7}>
+        <FormGroup style={{ maxWidth: '50%' }} legendText={t('programName', 'Program name')}>
           <div className={styles.selectContainer}>
             <Select
               id="program"
@@ -171,7 +182,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
             </Select>
           </div>
         </FormGroup>
-        <FormGroup legendText={t('dateEnrolled', 'Date enrolled')}>
+        <FormGroup style={{ maxWidth: '50%' }} legendText={t('dateEnrolled', 'Date enrolled')}>
           <DatePicker
             id="enrollmentDate"
             datePickerType="single"
@@ -185,7 +196,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
             <DatePickerInput id="enrollmentDateInput" labelText="" />
           </DatePicker>
         </FormGroup>
-        <FormGroup legendText={t('dateCompleted', 'Date completed')}>
+        <FormGroup style={{ width: '50%' }} legendText={t('dateCompleted', 'Date completed')}>
           <DatePicker
             id="completionDate"
             datePickerType="single"
@@ -218,7 +229,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
               ))}
           </Select>
         </FormGroup>
-      </div>
+      </Stack>
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
         <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
           {t('cancel', 'Cancel')}

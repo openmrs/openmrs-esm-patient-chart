@@ -1,12 +1,12 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { DataTableSkeleton } from 'carbon-components-react';
+import { DataTableSkeleton } from '@carbon/react';
 import { Provider } from 'unistore/react';
+import { useConfig } from '@openmrs/esm-framework';
 import { EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import MedicationsDetailsTable from '../components/medications-details-table.component';
 import { orderBasketStore } from './order-basket-store';
 import { usePatientOrders } from '../api/api';
-import { useConfig } from '@openmrs/esm-framework';
 import { ConfigObject } from '../config-schema';
 
 interface ActiveMedicationsProps {
@@ -35,6 +35,8 @@ const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patientUuid, show
   if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
   if (activePatientOrders?.length) {
     return (
+      // FIX
+      // @ts-ignore
       <Provider store={orderBasketStore}>
         <MedicationsDetailsTable
           isValidating={isValidating}

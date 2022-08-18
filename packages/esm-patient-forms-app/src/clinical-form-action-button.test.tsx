@@ -1,19 +1,25 @@
 import React from 'react';
-import ClinicalFormActionButton from './clinical-form-action-button.component';
 import { render, screen } from '@testing-library/react';
-import * as mockEsmFramework from '@openmrs/esm-framework/mock';
+import { useLayoutType } from '@openmrs/esm-framework';
+import ClinicalFormActionButton from './clinical-form-action-button.component';
+
+const mockedUseLayoutType = useLayoutType as jest.Mock;
 
 describe('<ClinicalFormActionButton/>', () => {
   test('should display clinical form action button on tablet view', () => {
-    spyOn(mockEsmFramework, 'useLayoutType').and.returnValue('tablet');
+    mockedUseLayoutType.mockReturnValue('tablet');
+
     render(<ClinicalFormActionButton />);
-    expect(screen.getByRole('button', { name: /Clinical form/ })).toBeInTheDocument();
+
+    expect(screen.getByRole('button', { name: /Clinical form/i })).toBeInTheDocument();
   });
 
   test('should display clinical form action button on desktop view', () => {
-    spyOn(mockEsmFramework, 'useLayoutType').and.returnValue('desktop');
+    mockedUseLayoutType.mockReturnValue('desktop');
+
     render(<ClinicalFormActionButton />);
-    const clinicalActionButton = screen.getByRole('button', { name: /Form/ });
+
+    const clinicalActionButton = screen.getByRole('button', { name: /Form/i });
     expect(clinicalActionButton).not.toHaveTextContent('Clinical form');
   });
 });

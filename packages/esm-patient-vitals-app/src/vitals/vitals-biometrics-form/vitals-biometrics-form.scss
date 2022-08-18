@@ -1,0 +1,60 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '@carbon/colors';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.productiveHeading03 {
+  @include type.type-style("heading-03");
+}
+
+.vitalsTitle {
+  @extend .productiveHeading03;
+  margin: 0 spacing.$spacing-03 spacing.$spacing-05 0;
+}
+
+.danger {
+  color: $danger;
+}
+
+.button {
+  height: 4rem;
+  display: flex;
+  align-content: flex-start;
+  align-items: baseline;
+  min-width: 50%;
+}
+
+.tablet {
+  padding: 1.5rem 1rem;
+  background-color: $ui-02;
+}
+
+.desktop {
+  padding: 0rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: calc(100vh - 6rem);
+}
+
+.grid {
+  margin: 1rem;
+}
+
+.row {
+  margin: 0.5rem 0rem 0rem;
+  display: flex;
+  flex-flow: row wrap;
+}
+
+.column {
+  flex-grow: 1;
+  flex-basis: 0;
+}
+
+.spacer {
+  margin-top: 3rem;
+}

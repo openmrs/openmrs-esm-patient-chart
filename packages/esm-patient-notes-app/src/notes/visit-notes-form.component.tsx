@@ -1,27 +1,29 @@
-import React, { SyntheticEvent } from 'react';
+import React, { SyntheticEvent, useMemo } from 'react';
 import dayjs from 'dayjs';
 import { useSWRConfig } from 'swr';
 import { useTranslation } from 'react-i18next';
 import debounce from 'lodash-es/debounce';
 import {
-  Column,
-  Grid,
-  Row,
   Button,
+  ButtonSet,
+  Column,
   DatePicker,
   DatePickerInput,
   Form,
   FormGroup,
+  Layer,
+  Row,
   Search,
   SearchSkeleton,
+  Stack,
   Tag,
   TextArea,
   Tile,
-  ButtonSet,
-} from 'carbon-components-react';
-import Add16 from '@carbon/icons-react/es/add/16';
+} from '@carbon/react';
+import { Add } from '@carbon/react/icons';
 import {
   createErrorHandler,
+  ExtensionSlot,
   showNotification,
   showToast,
   useConfig,
@@ -54,6 +56,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
   const session = useSession();
   const { mutate } = useSWRConfig();
   const config = useConfig() as ConfigObject;
+  const state = useMemo(() => ({ patientUuid }), [patientUuid]);
   const { clinicianEncounterRole, encounterNoteTextConceptUuid, encounterTypeUuid, formConceptUuid } =
     config.visitNoteConfig;
   const [clinicalNote, setClinicalNote] = React.useState('');
@@ -270,7 +273,12 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
 
   return (
     <Form className={styles.form}>
-      <Grid className={styles.grid}>
+      {isTablet && (
+        <Row className={styles.headerGridRow}>
+          <ExtensionSlot extensionSlotName="visit-form-header-slot" className={styles.dataGridRow} state={state} />
+        </Row>
+      )}
+      <Stack className={styles.formContainer} gap={2}>
         {isTablet ? <h2 className={styles.heading}>{t('addVisitNote', 'Add a visit note')}</h2> : null}
         <Row className={styles.row}>
           <Column sm={1}>
@@ -344,7 +352,6 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
             </div>
             <FormGroup legendText={t('searchForPrimaryDiagnosis', 'Search for a primary diagnosis')}>
               <Search
-                light={isTablet}
                 size="xl"
                 id="diagnosisPrimarySearch"
                 labelText={t('enterPrimaryDiagnoses', 'Enter Primary diagnosis')}
@@ -361,7 +368,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
                 {(() => {
                   if (!primarySearchTerm) return null;
                   if (isPrimarySearching) return <SearchSkeleton />;
-                  if (searchPrimaryResults && searchPrimaryResults.length && !isPrimarySearching)
+                  if (searchPrimaryResults && searchPrimaryResults.length && !isPrimarySearching) {
                     return (
                       <ul className={styles.diagnosisList}>
                         {searchPrimaryResults.map((diagnosis, index) => (
@@ -376,12 +383,25 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
                         ))}
                       </ul>
                     );
+                  }
                   return (
-                    <Tile light={isTablet} className={styles.emptyResults}>
-                      <span>
-                        {t('noMatchingDiagnoses', 'No diagnoses found matching')} <strong>"{primarySearchTerm}"</strong>
-                      </span>
-                    </Tile>
+                    <>
+                      {isTablet ? (
+                        <Layer>
+                          <Tile className={styles.emptyResults}>
+                            <span>
+                              {t('noMatchingDiagnoses', 'No diagnoses found matching')} <strong>"{primarySearchTerm}"</strong>
+                            </span>
+                          </Tile>
+                        </Layer>
+                      ) : (
+                        <Tile className={styles.emptyResults}>
+                          <span>
+                            {t('noMatchingDiagnoses', 'No diagnoses found matching')} <strong>"{primarySearchTerm}"</strong>
+                          </span>
+                        </Tile>
+                      )}
+                    </>
                   );
                 })()}
               </div>
@@ -393,7 +413,6 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
           <Column sm={3}>
             <FormGroup legendText={t('searchForSecondaryDiagnosis', 'Search for a secondary diagnosis')}>
               <Search
-                light={isTablet}
                 size="xl"
                 id="diagnosisSecondarySearch"
                 labelText={t('enterSecondaryDiagnoses', 'Enter Secondary diagnosis')}
@@ -461,13 +480,18 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
               <p className={styles.imgUploadHelperText}>
                 {t('imageUploadHelperText', "Upload an image or use this device's camera to capture an image")}
               </p>
-              <Button style={{ marginTop: '1rem' }} kind="tertiary" onClick={() => {}} renderIcon={Add16}>
+              <Button
+                style={{ marginTop: '1rem' }}
+                kind={isTablet ? 'ghost' : 'tertiary'}
+                onClick={() => {}}
+                renderIcon={(props) => <Add size={16} {...props} />}
+              >
                 {t('addImage', 'Add image')}
               </Button>
             </FormGroup>
           </Column>
         </Row>
-      </Grid>
+      </Stack>
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
         <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
           {t('discard', 'Discard')}

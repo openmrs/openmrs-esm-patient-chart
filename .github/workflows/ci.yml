@@ -2,9 +2,9 @@ name: OpenMRS CI
 
 on:
   push:
-    branches: [master]
+    branches: [main]
   pull_request:
-    branches: [master]
+    branches: [main]
   release:
     types:
       - created
@@ -31,7 +31,7 @@ jobs:
       
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
-        run: npx lerna bootstrap
+        run: yarn install --immutable
       
       - name: Setup a local cache server for Turborepo
         uses: felixmosh/turborepo-gh-artifacts@v1
@@ -751,7 +751,7 @@ jobs:
 
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
-        run: npx lerna bootstrap
+        run: yarn install --immutable
       
       - name: Build
         run: yarn turbo run build --color --concurrency=5
@@ -793,7 +793,7 @@ jobs:
 
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
-        run: npx lerna bootstrap
+        run: yarn install --immutable
 
       - name: Build
         run: yarn turbo run build --color --concurrency=5

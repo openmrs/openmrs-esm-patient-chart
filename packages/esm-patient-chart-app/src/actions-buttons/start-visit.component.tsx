@@ -14,9 +14,9 @@ const StartVisitOverflowMenuItem: React.FC<StartVisitOverflowMenuItemProps> = ({
 
   return (
     !currentVisit && (
-      <li className="bx--overflow-menu-options__option">
+      <li className="cds--overflow-menu-options__option">
         <button
-          className="bx--overflow-menu-options__btn"
+          className="cds--overflow-menu-options__btn"
           role="menuitem"
           title={t('startVisit', 'Start visit')}
           data-floating-menu-primary-focus
@@ -25,7 +25,7 @@ const StartVisitOverflowMenuItem: React.FC<StartVisitOverflowMenuItemProps> = ({
             maxWidth: '100vw',
           }}
         >
-          <span className="bx--overflow-menu-options__option-content">{t('startVisit', 'Start visit')}</span>
+          <span className="cds--overflow-menu-options__option-content">{t('startVisit', 'Start visit')}</span>
         </button>
       </li>
     )

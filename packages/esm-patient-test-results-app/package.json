@@ -1,8 +1,8 @@
 {
   "name": "@openmrs/esm-patient-test-results-app",
-  "version": "3.2.0",
+  "version": "4.0.0",
   "license": "MPL-2.0",
-  "description": "Patient notes microfrontend for the OpenMRS SPA",
+  "description": "Patient test results microfrontend for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-patient-test-results-app.js",
   "main": "src/index.ts",
   "source": true,
@@ -12,7 +12,7 @@
     "debug": "npm run serve",
     "build": "webpack --mode production",
     "analyze": "webpack --mode=production --env analyze=true",
-    "lint": "eslint src --ext tsx,ts",
+    "lint": "eslint src --ext tsx,ts --fix --max-warnings=0",
     "typescript": "tsc",
     "extract-translations": "i18next 'src/**/*.component.tsx' --config ../../tools/i18next-parser.config.js"
   },
@@ -34,21 +34,18 @@
     "url": "https://github.com/openmrs/openmrs-esm-patient-chart/issues"
   },
   "dependencies": {
-    "@carbon/charts-react": "^0.49.4",
-    "@carbon/icons-react": "^10.18.0",
-    "@openmrs/esm-patient-common-lib": "^3.2.0",
-    "carbon-components-react": "^7.25.0",
-    "d3": "^7.0.3",
+    "@carbon/charts-react": "^1.5.2",
+    "@carbon/react": "^1.9.0",
+    "@openmrs/esm-patient-common-lib": "^4.0.0",
+    "d3": "^7.6.1",
     "lodash-es": "^4.17.15"
   },
   "peerDependencies": {
     "@openmrs/esm-framework": "3.x",
     "@openmrs/esm-patient-common-lib": "3.x",
-    "carbon-components": "10.x",
-    "carbon-icons": "7.x",
-    "react": "16.x",
+    "react": "^18.2.0",
     "react-i18next": "11.x",
-    "react-router-dom": "5.x",
+    "react-router-dom": "6.x",
     "rxjs": "6.x"
   }
 }

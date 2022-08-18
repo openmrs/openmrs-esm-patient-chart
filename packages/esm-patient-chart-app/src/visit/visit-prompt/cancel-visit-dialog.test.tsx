@@ -3,6 +3,7 @@ import { screen, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useVisit, openmrsFetch, showNotification, showToast } from '@openmrs/esm-framework';
 import { mockCurrentVisit } from '../../../../../__mocks__/visits.mock';
+import { mockPatient } from '../../../../../__mocks__/patient.mock';
 import CancelVisitDialog from './cancel-visit-dialog.component';
 
 const mockUseVisit = useVisit as jest.Mock;
@@ -21,61 +22,65 @@ jest.mock('@openmrs/esm-framework', () => {
   };
 });
 
-describe('Cancel Visit', () => {
-  beforeEach(() => {
-    jest.resetAllMocks();
-  });
+describe('Cancel visit', () => {
+  it('cancels an active visit and voids all associated encounters', async () => {
+    const user = userEvent.setup();
 
-  it('should cancel an active visit and void all associated encounters', async () => {
     mockUseVisit.mockReturnValue({ currentVisit: mockCurrentVisit, mutate: jest.fn() });
-    mockOpenmrsFetch.mockReturnValueOnce(Promise.resolve({ status: 200 }));
-    render(<CancelVisitDialog patientUuid="some-uuid" closeModal={mockCloseModal} />);
+    mockOpenmrsFetch.mockResolvedValueOnce({ status: 200 });
 
-    expect(screen.getByRole('heading', { name: /Cancel active visit/ })).toBeInTheDocument();
-    expect(screen.getByText('Canceling this visit will delete all associated encounter(s)')).toBeInTheDocument();
+    renderCancelVisitDialog();
 
-    const cancelVisitButton = screen.getByRole('button', { name: /Cancel Visit/i, exact: true });
+    expect(screen.getByRole('heading', { name: /Cancel active visit/i })).toBeInTheDocument();
+    expect(screen.getByText(/Cancelling this visit will delete all associated encounters/i)).toBeInTheDocument();
 
-    userEvent.click(cancelVisitButton);
+    const cancelVisitButton = screen.getByRole('button', { name: /Cancel visit/i, exact: true });
+
+    await waitFor(() => user.click(cancelVisitButton));
+
     expect(mockOpenmrsFetch).toHaveBeenCalledWith('/ws/rest/v1/visit/17f512b4-d264-4113-a6fe-160cb38cb46e', {
       body: { voided: true },
       headers: { 'Content-type': 'application/json' },
       method: 'POST',
     });
 
-    await waitFor(() => {
-      expect(mockShowToast).toHaveBeenCalledWith({
-        kind: 'success',
-        title: 'Cancel visit',
-        description: 'Canceled active visit successfully',
-      });
+    expect(mockShowToast).toHaveBeenCalledWith({
+      kind: 'success',
+      title: 'Cancel visit',
+      description: 'Canceled active visit successfully',
     });
   });
 
-  it('should display an error message when canceling a visit fails', async () => {
+  it('displays an error message when cancelling a visit fails', async () => {
+    const user = userEvent.setup();
+
     mockUseVisit.mockReturnValue({ currentVisit: mockCurrentVisit, mutate: jest.fn() });
-    mockOpenmrsFetch.mockReturnValueOnce(Promise.reject({ status: 500, message: 'Internal server error' }));
-    render(<CancelVisitDialog patientUuid="some-uuid" closeModal={mockCloseModal} />);
+    mockOpenmrsFetch.mockRejectedValueOnce({ message: 'Internal server error', status: 500 });
 
-    expect(screen.getByRole('heading', { name: /Cancel active visit/ })).toBeInTheDocument();
-    expect(screen.getByText('Canceling this visit will delete all associated encounter(s)')).toBeInTheDocument();
+    renderCancelVisitDialog();
 
-    const cancelVisitButton = screen.getByRole('button', { name: /Cancel Visit/i, exact: true });
+    expect(screen.getByRole('heading', { name: /Cancel active visit/i })).toBeInTheDocument();
+    expect(screen.getByText(/Cancelling this visit will delete all associated encounters/i)).toBeInTheDocument();
 
-    userEvent.click(cancelVisitButton);
+    const cancelVisitButton = screen.getByRole('button', { name: /Cancel visit/i, exact: true });
+
+    await waitFor(() => user.click(cancelVisitButton));
+
     expect(mockOpenmrsFetch).toHaveBeenCalledWith('/ws/rest/v1/visit/17f512b4-d264-4113-a6fe-160cb38cb46e', {
       body: { voided: true },
       headers: { 'Content-type': 'application/json' },
       method: 'POST',
     });
 
-    await waitFor(() => {
-      expect(mockShowNotification).toHaveBeenCalledWith({
-        critical: true,
-        description: 'Internal server error',
-        kind: 'error',
-        title: 'Error canceling active visit',
-      });
+    expect(mockShowNotification).toHaveBeenCalledWith({
+      critical: true,
+      description: 'Internal server error',
+      kind: 'error',
+      title: 'Error cancelling active visit',
     });
   });
 });
+
+function renderCancelVisitDialog() {
+  render(<CancelVisitDialog closeModal={mockCloseModal} patientUuid={mockPatient.id} />);
+}

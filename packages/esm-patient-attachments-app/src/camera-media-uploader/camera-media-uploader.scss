@@ -1,0 +1,46 @@
+@use '@carbon/styles/scss/spacing';
+@import '~@openmrs/esm-styleguide/src/vars';
+@import '../root.scss';
+
+.cameraSection {
+  width: inherit;
+  background-color: $ui-02;
+}
+
+:global(.react-html5-camera-photo) {
+  & > img, & > video {
+    width: 100% !important;
+  }
+}
+
+.uploadFile {
+  color: $ui-02;
+  
+  label {
+    max-width: unset;
+  }
+
+  label > div {
+    height: 25rem;
+    justify-content: center;
+    align-items: center;
+  }
+
+}
+
+.tabs {
+  .cds--tab-content {
+    display: none;
+  }
+}
+
+.tabContent {
+  padding: spacing.$spacing-05
+}
+
+@media (max-width: $breakpoint-tablet-max){
+  .frameContent {
+    width: 65%;
+  }  
+}
+

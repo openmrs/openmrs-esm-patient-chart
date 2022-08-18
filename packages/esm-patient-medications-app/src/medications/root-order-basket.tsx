@@ -6,6 +6,7 @@ import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 
 export default function RootOrderBasket({ patientUuid, closeWorkspace }: DefaultWorkspaceProps) {
   return (
+    // @ts-ignore
     <Provider store={orderBasketStore}>
       <OrderBasket patientUuid={patientUuid} closeWorkspace={closeWorkspace} />
     </Provider>

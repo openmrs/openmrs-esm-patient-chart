@@ -30,6 +30,8 @@ describe('VisitTypeOverview', () => {
   };
 
   it('should be able to search for a visit type', () => {
+    const user = userEvent.setup();
+
     renderVisitTypeOverview();
 
     const hivVisit = screen.getByRole('radio', { name: /HIV Return Visit/i });
@@ -39,7 +41,7 @@ describe('VisitTypeOverview', () => {
     expect(hivVisit).toBeInTheDocument();
 
     const searchInput = screen.getByRole('searchbox');
-    userEvent.type(searchInput, 'HIV');
+    user.type(searchInput, 'HIV');
 
     expect(outpatientVisit).toBeEmptyDOMElement();
     expect(hivVisit).toBeInTheDocument();

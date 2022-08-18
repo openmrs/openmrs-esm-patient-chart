@@ -1,3 +1,5 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
 @import "../root";
 
 .container {
@@ -37,7 +39,7 @@
 }
 
 .searchResultsCount {
-  @include carbon--type-style('body-short-01');
+  @include type.type-style('body-compact-01');
   color: $text-02;
 }
 

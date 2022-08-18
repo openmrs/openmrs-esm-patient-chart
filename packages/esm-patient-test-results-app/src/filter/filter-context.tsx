@@ -1,9 +1,9 @@
 import React, { createContext, useReducer, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { parseTime } from '../timeline/useTimelineData';
-import reducer from './filter-reducer';
-import { TreeNode, FilterContextProps, ReducerState, ReducerActionType, TimelineData } from './filter-types';
 import isObject from 'lodash/isObject';
+import { parseTime } from '../timeline/useTimelineData';
+import { TreeNode, FilterContextProps, ReducerState, ReducerActionType, TimelineData } from './filter-types';
+import reducer from './filter-reducer';
 
 const initialState = {
   checkboxes: {},
@@ -97,7 +97,7 @@ const FilterProvider = ({ roots, children }: FilterProviderProps) => {
 
   const totalResultsCount: number = useMemo(() => {
     let count = 0;
-    if (!state?.tests || !(isObject(state) && isObject(state.tests)) || state?.tests === {}) return 0;
+    if (!state?.tests || !isObject(state?.tests) || state?.tests === {}) return 0;
     Object.values(state?.tests).forEach((testData) => {
       count += testData.obs.length;
     });
