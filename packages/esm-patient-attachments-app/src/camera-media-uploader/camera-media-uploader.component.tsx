@@ -13,19 +13,21 @@ import UploadingStatusComponent from './uploading-status.component';
 interface CameraMediaUploaderModalProps {
   multipleFiles?: boolean;
   cameraOnly?: boolean;
-  collectCaption?: boolean;
+  collectDescription?: boolean;
   saveFile: (file: UploadedFile) => Promise<FetchResponse<any>>;
   closeModal: () => void;
   onCompletion?: () => void;
+  allowedExtensions: Array<string> | null;
 }
 
 const CameraMediaUploaderModal: React.FC<CameraMediaUploaderModalProps> = ({
   cameraOnly,
   multipleFiles,
-  collectCaption,
+  collectDescription,
   saveFile,
   closeModal,
   onCompletion,
+  allowedExtensions,
 }) => {
   const [error, setError] = useState<Error>(undefined);
   const [filesToUpload, setFilesToUpload] = useState<Array<UploadedFile>>([]);
@@ -82,7 +84,7 @@ const CameraMediaUploaderModal: React.FC<CameraMediaUploaderModalProps> = ({
       value={{
         multipleFiles,
         cameraOnly,
-        collectCaption,
+        collectDescription,
         saveFile,
         closeModal,
         onCompletion,
@@ -94,6 +96,7 @@ const CameraMediaUploaderModal: React.FC<CameraMediaUploaderModalProps> = ({
         handleTakePhoto,
         error,
         setError,
+        allowedExtensions,
       }}
     >
       {returnComponent}

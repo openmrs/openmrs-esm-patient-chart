@@ -57,6 +57,8 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
         close();
       },
       onCompletion: () => mutate(),
+      multipleFiles: true,
+      collectDescription: true,
     });
   }, [patientUuid, mutate]);
 

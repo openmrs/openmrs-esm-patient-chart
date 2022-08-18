@@ -20,7 +20,7 @@ const CapturePhoto: React.FC<CapturePhotoProps> = ({ initialState, onCapturePhot
         onCapturePhoto(dataUri, toOmrsIsoString(new Date()));
         close();
       },
-      collectCaption: false,
+      collectDescription: false,
       closeModal: () => {
         close();
       },

@@ -112,7 +112,7 @@ const AttachmentsTableOverview: React.FC<AttachmentsTableOverviewProps> = ({
                   {row.cells.map((cell) => (
                     <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                   ))}
-                  <TableCell className="cds--table-column-menu">
+                  <TableCell>
                     <OverflowMenu size="sm" flipped>
                       <OverflowMenuItem
                         itemText={t('delete', 'Delete')}

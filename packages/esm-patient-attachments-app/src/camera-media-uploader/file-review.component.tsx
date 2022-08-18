@@ -12,7 +12,7 @@ export interface FileReviewContainerProps {
 }
 
 const FileReviewContainer: React.FC<FileReviewContainerProps> = ({ onCompletion }) => {
-  const { filesToUpload, clearData, setFilesToUpload } = useContext(CameraMediaUploaderContext);
+  const { filesToUpload, clearData, setFilesToUpload, collectDescription } = useContext(CameraMediaUploaderContext);
   const { t } = useTranslation();
   const [currentFile, setCurrentFile] = useState(1);
 
@@ -45,7 +45,7 @@ const FileReviewContainer: React.FC<FileReviewContainerProps> = ({ onCompletion 
         clearData={clearData}
         onSaveFile={handleSave}
         moveToNextFile={moveToNextFile}
-        collectDescription={filesToUpload[currentFile - 1].fileType === 'image'}
+        collectDescription={filesToUpload[currentFile - 1].fileType === 'image' && collectDescription}
       />
     </div>
   );
