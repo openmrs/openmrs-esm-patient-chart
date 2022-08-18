@@ -32,7 +32,6 @@ const mockFetchLocationByUuid = fetchLocationByUuid as jest.Mock;
 const mockFetchProviderByUuid = fetchProviderByUuid as jest.Mock;
 const mockSaveVisitNote = saveVisitNote as jest.Mock;
 const mockShowNotification = showNotification as jest.Mock;
-const mockShowToast = showToast as jest.Mock;
 const mockUseConfig = useConfig as jest.Mock;
 const mockUseSession = useSession as jest.Mock;
 
@@ -75,13 +74,11 @@ describe('Visit notes form: ', () => {
   });
 
   test.only('typing in the diagnosis search input triggers a search', () => {
-    const user = userEvent.setup();
     mockFetchDiagnosisByName.mockReturnValue(of(diagnosisSearchResponse.results));
 
     renderVisitNotesForm();
 
     const searchbox = screen.getByPlaceholderText('Choose a primary diagnosis');
-    expect(searchbox);
     userEvent.type(searchbox, 'Diabetes Mellitus');
     const targetSearchResult = screen.getByText('Diabetes Mellitus');
     expect(targetSearchResult).toBeInTheDocument();

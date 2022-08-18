@@ -352,7 +352,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
             </div>
             <FormGroup legendText={t('searchForPrimaryDiagnosis', 'Search for a primary diagnosis')}>
               <Search
-                size="xl"
+                size="lg"
                 id="diagnosisPrimarySearch"
                 labelText={t('enterPrimaryDiagnoses', 'Enter Primary diagnosis')}
                 placeholder={t('primaryDiagnosisInputPlaceholder', 'Choose a primary diagnosis')}
@@ -390,14 +390,16 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
                         <Layer>
                           <Tile className={styles.emptyResults}>
                             <span>
-                              {t('noMatchingDiagnoses', 'No diagnoses found matching')} <strong>"{primarySearchTerm}"</strong>
+                              {t('noMatchingDiagnoses', 'No diagnoses found matching')}{' '}
+                              <strong>"{primarySearchTerm}"</strong>
                             </span>
                           </Tile>
                         </Layer>
                       ) : (
                         <Tile className={styles.emptyResults}>
                           <span>
-                            {t('noMatchingDiagnoses', 'No diagnoses found matching')} <strong>"{primarySearchTerm}"</strong>
+                            {t('noMatchingDiagnoses', 'No diagnoses found matching')}{' '}
+                            <strong>"{primarySearchTerm}"</strong>
                           </span>
                         </Tile>
                       )}
@@ -413,7 +415,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
           <Column sm={3}>
             <FormGroup legendText={t('searchForSecondaryDiagnosis', 'Search for a secondary diagnosis')}>
               <Search
-                size="xl"
+                size="lg"
                 id="diagnosisSecondarySearch"
                 labelText={t('enterSecondaryDiagnoses', 'Enter Secondary diagnosis')}
                 placeholder={t('secondaryDiagnosisInputPlaceholder', 'Choose a secondary diagnose')}

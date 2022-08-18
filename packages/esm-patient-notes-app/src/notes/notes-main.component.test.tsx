@@ -110,5 +110,3 @@ describe('NotesMain: ', () => {
 function renderNotesMain() {
   renderWithSwr(<NotesMain {...testProps} />);
 }
-
-
