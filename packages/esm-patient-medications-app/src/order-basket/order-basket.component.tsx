@@ -60,7 +60,8 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
     }, createErrorHandler);
 
     return () => abortController.abort();
-  }, [patientUuid, config.durationUnitsConcept]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [patientUuid, config.durationUnitsConcept, sessionObject]);
 
   useEffect(() => {
     if (medicationOrderFormItem) {
