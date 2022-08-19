@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Link, Pagination, ClickableTile } from '@carbon/react';
+import { Button, Link, Pagination, ClickableTile, Tile, SkeletonText, SkeletonIcon } from '@carbon/react';
 import { ShoppingCart } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { createErrorHandler, useConfig, useLayoutType } from '@openmrs/esm-framework';
@@ -24,6 +24,7 @@ export default function OrderBasketSearchResults({
 }: OrderBasketSearchResultsProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
+  const [isLoading, setIsLoading] = useState(false);
   const [searchResults, setSearchResults] = useState<Array<OrderBasketItem>>([]);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -32,12 +33,20 @@ export default function OrderBasketSearchResults({
 
   useEffect(() => {
     const abortController = new AbortController();
-    searchMedications(searchTerm, encounterUuid, abortController, config.daysDurationUnit).then(
-      setSearchResults,
-      createErrorHandler,
-    );
+    if (searchTerm) {
+      if (searchTerm.length == 1) {
+        setSearchResults([]);
+        return;
+      }
+      setIsLoading(true);
+      searchMedications(searchTerm, encounterUuid, abortController, config.daysDurationUnit).then((results) => {
+        setIsLoading(false);
+        setSearchResults(results);
+      }, createErrorHandler);
+    }
     return () => abortController.abort();
-  }, [searchTerm, encounterUuid, config.daysDurationUnit]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchTerm]);
 
   const handleSearchResultClicked = (searchResult: OrderBasketItem, directlyAddToBasket: boolean) => {
     setSearchTerm('');
@@ -47,7 +56,13 @@ export default function OrderBasketSearchResults({
 
   return (
     <>
-      {!!searchTerm && (
+      {!!searchTerm && isLoading && (
+        <>
+          <DrugOrderSearchResultSkeleton />
+          <DrugOrderSearchResultSkeleton />
+        </>
+      )}
+      {!!searchTerm && !isLoading && (
         <div className={styles.container}>
           <div className={styles.orderBasketSearchResultsHeader}>
             <span className={styles.searchResultsCount}>
@@ -113,3 +128,14 @@ export default function OrderBasketSearchResults({
     </>
   );
 }
+
+const DrugOrderSearchResultSkeleton = () => {
+  return (
+    <Tile>
+      <div className={styles.searchResultSkeletonWrapper}>
+        <SkeletonIcon style={{ height: '26px', margin: '0px 15px 10px', width: '23px' }} />
+        <SkeletonText lineCount={4} />
+      </div>
+    </Tile>
+  );
+};

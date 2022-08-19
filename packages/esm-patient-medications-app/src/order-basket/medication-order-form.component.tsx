@@ -228,15 +228,15 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                     selectedItem={
                       dosageOptions?.length
                         ? {
-                            id: `${orderBasketItem.dosage?.value}`,
-                            text: `${orderBasketItem.dosage?.value}`,
+                            id: orderBasketItem.dosage ? `${orderBasketItem.dosage?.value}` : null,
+                            text: orderBasketItem.dosage ? `${orderBasketItem.dosage?.value}` : null,
                           }
                         : null
                     }
                     // @ts-ignore
                     placeholder={t('editDoseComboBoxPlaceholder', 'Dose')}
                     titleText={t('editDoseComboBoxTitle', 'Enter Dose')}
-                    itemToString={(item) => `${item?.text}`}
+                    itemToString={(item) => item?.text}
                     onChange={({ selectedItem }) => {
                       if (selectedItem) {
                         selectedItem.id = selectedItem.id == 'draft' ? selectedItem.text : selectedItem.text;
@@ -254,6 +254,9 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                       setDosageOptions(dosageOptions.filter((opt) => opt.id != 'draft'));
                     }}
                     onInputChange={(value) => {
+                      if (value == 'undefined') {
+                        return;
+                      }
                       const valueExists = value ? dosageOptions.some((opt) => `${opt.text}` == value) : null;
                       const draftIndex = dosageOptions.findIndex((opt) => opt.id == 'draft');
                       // validate and clean up
@@ -285,6 +288,14 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                           }
                         : null
                     }
+                    onChange={({ selectedItem }) => {
+                      setOrderBasketItem({
+                        ...orderBasketItem,
+                        unit: !!selectedItem?.id
+                          ? { value: selectedItem.text, valueCoded: selectedItem.id }
+                          : initialOrderBasketItem.route,
+                      });
+                    }}
                     required
                   />
                 </Column>
@@ -327,8 +338,6 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                     placeholder={t('editFrequencyComboBoxPlaceholder', 'Frequency')}
                     titleText={t('editFrequencyComboBoxTitle', 'Enter Frequency')}
                     itemToString={(item) => item?.text}
-                    // invalid={!orderBasketItem.frequency && !orderBasketItem.isFreeTextDosage}
-                    // invalidText={t('validationNoItemSelected', 'Please select one of the available items.')}
                     onChange={({ selectedItem }) => {
                       setOrderBasketItem({
                         ...orderBasketItem,

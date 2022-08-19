@@ -30,27 +30,28 @@
 .orderActionNewLabel {
   margin-bottom: 0.5625rem;
   @extend .label01;
-  // FIX
-  // color: $support-01; 
+  color: $support-02; 
 }
 
 .orderActionRenewLabel {
   margin-bottom: 0.5625rem;
   @extend .label01;
-  // FIX
-  // color: $support-01;
+  color: $support-02;
+  font-weight: 500;
 }
 
 .orderActionRevisedLabel {
   margin-bottom: 0.5625rem;
   @extend .label01;
-  color: $text-02;
+  color: #943d00;
+  font-weight: 500;
 }
 
 .orderActionDiscontinueLabel {
   margin-bottom: 0.5625rem;
   @extend .label01;
-  color: $text-02;
+  color: $danger;
+  font-weight: 500;
 }
 
 .orderErrorText {
@@ -85,5 +86,8 @@
 
 .removeButton {
   flex: 0 0 auto; 
-  color: $danger; 
+}
+
+.removeButton svg {
+  fill: $danger !important;
 }
