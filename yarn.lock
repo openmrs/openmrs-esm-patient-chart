@@ -12,9 +12,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ampath-kenya/ngx-formentry@next":
-  version: 3.0.0-alpha21
-  resolution: "@ampath-kenya/ngx-formentry@npm:3.0.0-alpha21"
+"@ampath-kenya/ngx-formentry@npm:next":
+  version: 3.0.0-alpha22
+  resolution: "@ampath-kenya/ngx-formentry@npm:3.0.0-alpha22"
   dependencies:
     tslib: ^2.0.0
   peerDependencies:
@@ -25,8 +25,8 @@ __metadata:
     "@angular/compiler": ">=11.2.14 <=12.0.4"
     "@angular/core": ">=11.2.14 <=12.0.4"
     "@angular/forms": ">=11.2.14 <=12.0.4"
+    "@carbon/styles": ^1.9.0
     "@ng-select/ng-select": ^6.1.0
-    carbon-components: ^10.36.0
     hammerjs: ^2.0.8
     lodash: ^4.17.4
     moment: ^2.17.1
@@ -36,7 +36,7 @@ __metadata:
     shelljs: ^0.7.0
     slick-carousel: ^1.6.0
     tree-model: ^1.0.5
-  checksum: 2bee74e5550a964ede95d35bb3dbb4462c96df7851f2f05724e53d5e3cda5cfe0fbbbc596a32b5f5499da90007cf7da581f940edc71364584683d3a1901fff6f
+  checksum: 30fc5f89167263b3f9fcbfc89d207268534239a6fb72143a513fd7b32f1bbd965ed3e05a607c54eb13770dfb3065338905d1aea3fc15ecaef51df3c0f98ca93e
   languageName: node
   linkType: hard
 
