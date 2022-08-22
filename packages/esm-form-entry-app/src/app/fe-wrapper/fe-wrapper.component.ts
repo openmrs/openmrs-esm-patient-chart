@@ -7,8 +7,8 @@ import { FormSchemaService } from '../form-schema/form-schema.service';
 import { FormSubmissionService } from '../form-submission/form-submission.service';
 import { EncounterResourceService } from '../openmrs-api/encounter-resource.service';
 import { Encounter, FormSchema, Order } from '../types';
-// @ts-ignore
 import { showToast, showNotification, getSynchronizationItems, createGlobalStore } from '@openmrs/esm-framework';
+import type { Unsubscribe } from 'unistore';
 import { PatientPreviousEncounterService } from '../openmrs-api/patient-previous-encounter.service';
 
 import { patientFormSyncItem, PatientFormSyncItemContent } from '../offline/sync';
@@ -26,7 +26,7 @@ type FormState =
   | 'submitted'
   | 'submissionError';
 
-const store = createGlobalStore('ampath-form-state', {});
+const store = createGlobalStore<Record<string, FormState>>('ampath-form-state', {});
 
 @Component({
   selector: 'my-app-fe-wrapper',
@@ -35,10 +35,12 @@ const store = createGlobalStore('ampath-form-state', {});
 })
 export class FeWrapperComponent implements OnInit, OnDestroy {
   private launchFormSubscription?: Subscription;
+  private unsubscribeStore: Unsubscribe | undefined;
 
+  public formUuid: string;
   public form: Form;
   public loadingError?: string;
-  public labelMap: {} = {};
+  public labelMap: Record<string, string> = {};
   public formState: FormState = 'initial';
   public showDiscardSubmitButtons: boolean = true;
   public language: string = (window as any).i18next.language.substring(0, 2).toLowerCase();
@@ -55,11 +57,15 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
   ) {}
 
   public ngOnInit() {
+    this.unsubscribeStore = store.subscribe((value) => {
+      this.formState = value[this.formUuid];
+    });
     this.changeState('initial');
     this.launchForm();
   }
 
   public ngOnDestroy() {
+    this.unsubscribeStore && this.unsubscribeStore();
     this.launchFormSubscription?.unsubscribe();
   }
 
@@ -80,28 +86,28 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
       )
       .subscribe(
         ({ form, concepts }) => {
-          this.changeState('ready');
           this.form = form;
           this.labelMap = concepts.reduce((acc, current) => {
             acc[current.uuid] = current.display;
             return acc;
           }, {});
+          this.changeState('ready');
         },
         (err) => {
           // TODO: Improve error handling.
           this.loadingError = 'Error loading form';
-          this.changeState('loadingError');
           console.error('Error rendering form', err);
+          this.changeState('loadingError');
         },
       );
   }
 
   private loadAllFormDependencies(): Observable<CreateFormParams> {
-    const formUuid = this.singleSpaPropsService.getPropOrThrow('formUuid');
+    this.formUuid = this.singleSpaPropsService.getPropOrThrow('formUuid');
     const encounterOrSyncItemId = this.singleSpaPropsService.getPropOrThrow('encounterUuid');
 
     return forkJoin({
-      formSchema: this.fetchCompiledFormSchema(formUuid).pipe(take(1)),
+      formSchema: this.fetchCompiledFormSchema(this.formUuid).pipe(take(1)),
       user: this.openmrsApi.getCurrentUserLocation().pipe(take(1)),
       encounter: encounterOrSyncItemId ? this.getEncounterToEdit(encounterOrSyncItemId).pipe(take(1)) : of(null),
     }).pipe(
@@ -259,9 +265,11 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
     }
   }
 
-  private changeState = (state) => {
-    const formUuid = this.singleSpaPropsService.getPropOrThrow('formUuid');
-    this.formState = state;
-    store.setState({ [formUuid]: state });
-  };
+  private changeState(state) {
+    if (state != this.formState) {
+      const obj = {};
+      obj[this.formUuid] = state;
+      store.setState(obj);
+    }
+  }
 }
