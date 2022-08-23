@@ -10,6 +10,10 @@
   @include type.type-style("productive-heading-02");
 }
 
+.productiveHeading03 {
+  @include type.type-style("productive-heading-03");
+}
+
 .bodyLong01 {
   @include type.type-style("body-long-01");
 }
@@ -17,12 +21,6 @@
 .muted {
   color: $text-02;
 }
-
-.paddedProductiveHeading03 {
-  @include type.type-style("productive-heading-03");
-  padding: spacing.$spacing-05
-}
-
 
 .bodyShort01 {
   @include type.type-style("body-compact-01");

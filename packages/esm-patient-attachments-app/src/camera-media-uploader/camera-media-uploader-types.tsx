@@ -3,7 +3,7 @@ import { FetchResponse } from '@openmrs/esm-framework';
 
 export interface CameraMediaUploaderContextType {
   multipleFiles?: boolean;
-  collectCaption?: boolean;
+  collectDescription?: boolean;
   saveFile?: (file: UploadedFile) => Promise<FetchResponse<any>>;
   closeModal?: () => void;
   onCompletion?: () => void;
@@ -16,4 +16,5 @@ export interface CameraMediaUploaderContextType {
   cameraOnly?: boolean;
   error?: Error;
   setError?: React.Dispatch<React.SetStateAction<Error>>;
+  allowedExtensions?: Array<string> | undefined;
 }

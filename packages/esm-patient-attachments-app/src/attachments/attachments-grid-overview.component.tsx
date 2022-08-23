@@ -8,13 +8,13 @@ interface AttachmentsGridOverviewProps {
   isLoading: boolean;
   attachments: Array<Attachment>;
   deleteAttachment: (attachment: Attachment) => void;
-  onAttachmentSelect: (attachment: Attachment) => void;
+  openAttachment: (attachment: Attachment) => void;
 }
 
 const AttachmentsGridOverview: React.FC<AttachmentsGridOverviewProps> = ({
   attachments,
   isLoading,
-  onAttachmentSelect,
+  openAttachment,
 }) => {
   if (isLoading) {
     return (
@@ -35,7 +35,7 @@ const AttachmentsGridOverview: React.FC<AttachmentsGridOverviewProps> = ({
           title: attachment.title,
           style: {},
           onClick: () => {
-            onAttachmentSelect(attachment);
+            openAttachment(attachment);
           },
         };
         const item = {

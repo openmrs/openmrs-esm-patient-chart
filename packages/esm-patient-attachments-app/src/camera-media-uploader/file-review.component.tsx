@@ -1,18 +1,18 @@
 import React, { SyntheticEvent, useCallback, useEffect, useState, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, ButtonSet, TextArea, TextInput } from '@carbon/react';
+import { Button, TextArea, TextInput, ModalHeader, ModalBody, ModalFooter } from '@carbon/react';
 import { UserHasAccess } from '@openmrs/esm-framework';
 import styles from './file-review.scss';
 import { UploadedFile } from '../attachments-types';
-import FileRegular from '../assets/file-regular.svg';
 import CameraMediaUploaderContext from './camera-media-uploader-context.resources';
+import { DocumentPdf, DocumentUnknown } from '@carbon/react/icons';
 
 export interface FileReviewContainerProps {
   onCompletion: () => void;
 }
 
 const FileReviewContainer: React.FC<FileReviewContainerProps> = ({ onCompletion }) => {
-  const { filesToUpload, clearData, setFilesToUpload } = useContext(CameraMediaUploaderContext);
+  const { filesToUpload, clearData, setFilesToUpload, collectDescription } = useContext(CameraMediaUploaderContext);
   const { t } = useTranslation();
   const [currentFile, setCurrentFile] = useState(1);
 
@@ -27,7 +27,7 @@ const FileReviewContainer: React.FC<FileReviewContainerProps> = ({ onCompletion 
   const handleSave = useCallback(
     (updatedFile: UploadedFile) => {
       setFilesToUpload((filesToUpload) =>
-        filesToUpload.map((file, indx) => (indx === currentFile ? updatedFile : file)),
+        filesToUpload.map((file, indx) => (indx === currentFile - 1 ? updatedFile : file)),
       );
       moveToNextFile();
     },
@@ -35,17 +35,17 @@ const FileReviewContainer: React.FC<FileReviewContainerProps> = ({ onCompletion 
   );
 
   return (
-    <div className={styles.fileReviewContainer}>
-      <h3 className={styles.paddedProductiveHeading03}>
+    <div className={styles.filePreviewContainer}>
+      <ModalHeader className={styles.productiveHeading03}>
         {t('addAttachment', 'Add Attachment')}{' '}
         {filesToUpload.length > 1 && `(${currentFile} of ${filesToUpload.length})`}
-      </h3>
+      </ModalHeader>
       <FilePreview
         uploadedFile={filesToUpload[currentFile - 1]}
         clearData={clearData}
         onSaveFile={handleSave}
         moveToNextFile={moveToNextFile}
-        collectDescription={filesToUpload[currentFile - 1].fileType === 'image'}
+        collectDescription={filesToUpload[currentFile - 1].fileType === 'image' && collectDescription}
       />
     </div>
   );
@@ -113,20 +113,33 @@ const FilePreview: React.FC<FilePreviewProps> = ({ uploadedFile, collectDescript
 
   return (
     <form onSubmit={saveImageOrPdf}>
-      <div className={styles.overview}>
-        <img src={uploadedFile.fileType === 'image' ? uploadedFile.fileContent : FileRegular} alt="placeholder" />
+      <ModalBody className={styles.overview}>
+        {uploadedFile.fileType === 'image' ? (
+          <img src={uploadedFile.base64Content} alt="placeholder" />
+        ) : uploadedFile.fileType === 'pdf' ? (
+          <div className={styles.filePlaceholder}>
+            <DocumentPdf size={16} />
+          </div>
+        ) : (
+          <div className={styles.filePlaceholder}>
+            <DocumentUnknown size={16} />
+          </div>
+        )}
         <div className={styles.imageDetails}>
           <div className={styles.captionFrame}>
             <TextInput
               id="caption"
-              autoFocus
-              labelText={t('imageName', 'Image name')}
+              labelText={`${uploadedFile.fileType === 'image' ? t('image', 'Image') : t('file', 'File')} ${t(
+                'name',
+                'name',
+              )}`}
               autoComplete="off"
               placeholder={t('attachmentCaptionInstruction', 'Enter caption')}
               onChange={updateFileName}
               required
               value={fileName}
               invalid={emptyName}
+              autoFocus
               invalidText={emptyName && t('fieldRequired', 'This field is required')}
             />
           </div>
@@ -141,17 +154,17 @@ const FilePreview: React.FC<FilePreviewProps> = ({ uploadedFile, collectDescript
             />
           )}
         </div>
-      </div>
-      <UserHasAccess privilege="Create Attachment">
-        <ButtonSet className={styles.buttonSetOverrides}>
+      </ModalBody>
+      <ModalFooter>
+        <UserHasAccess privilege="Create Attachment">
           <Button kind="secondary" size="lg" onClick={cancelCapture}>
             {t('cancel', 'Cancel')}
           </Button>
           <Button type="submit" size="lg" onClick={saveImageOrPdf} disabled={emptyName}>
             {t('addAttachment', 'Add attachment')}
           </Button>
-        </ButtonSet>
-      </UserHasAccess>
+        </UserHasAccess>
+      </ModalFooter>
     </form>
   );
 };

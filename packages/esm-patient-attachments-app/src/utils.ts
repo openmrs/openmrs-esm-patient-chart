@@ -31,6 +31,7 @@ export function createGalleryEntry(data: AttachmentResponse): Attachment {
     id: data.uuid,
     src: `${window.openmrsBase}${attachmentUrl}/${data.uuid}/bytes`,
     title: data.comment,
+    description: '',
     dateTime: formatDate(new Date(data.dateTime), {
       mode: 'wide',
     }),

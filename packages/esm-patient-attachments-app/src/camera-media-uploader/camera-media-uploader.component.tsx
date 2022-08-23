@@ -1,11 +1,11 @@
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import React, { useState, useCallback, useMemo, useEffect, useRef, useContext } from 'react';
 import { UploadedFile } from '../attachments-types';
 import { FetchResponse, showToast } from '@openmrs/esm-framework';
 import CameraMediaUploaderContext from './camera-media-uploader-context.resources';
 import { useTranslation } from 'react-i18next';
 import CameraComponent from './camera.component';
 import styles from './camera-media-uploader.scss';
-import { Tabs, Tab, TabList, TabPanels, TabPanel } from '@carbon/react';
+import { Tabs, Tab, TabList, TabPanels, TabPanel, ModalHeader, ModalBody } from '@carbon/react';
 import MediaUploaderComponent from './media-uploader.component';
 import FileReviewContainer from './file-review.component';
 import UploadingStatusComponent from './uploading-status.component';
@@ -13,19 +13,21 @@ import UploadingStatusComponent from './uploading-status.component';
 interface CameraMediaUploaderModalProps {
   multipleFiles?: boolean;
   cameraOnly?: boolean;
-  collectCaption?: boolean;
+  collectDescription?: boolean;
   saveFile: (file: UploadedFile) => Promise<FetchResponse<any>>;
   closeModal: () => void;
   onCompletion?: () => void;
+  allowedExtensions: Array<string> | null;
 }
 
 const CameraMediaUploaderModal: React.FC<CameraMediaUploaderModalProps> = ({
   cameraOnly,
   multipleFiles,
-  collectCaption,
+  collectDescription,
   saveFile,
   closeModal,
   onCompletion,
+  allowedExtensions,
 }) => {
   const [error, setError] = useState<Error>(undefined);
   const [filesToUpload, setFilesToUpload] = useState<Array<UploadedFile>>([]);
@@ -45,7 +47,7 @@ const CameraMediaUploaderModal: React.FC<CameraMediaUploaderModalProps> = ({
   const handleTakePhoto = useCallback((file: string) => {
     setFilesToUpload([
       {
-        fileContent: file,
+        base64Content: file,
         fileName: 'Image taken from camera',
         fileType: 'image',
         fileDescription: '',
@@ -74,37 +76,15 @@ const CameraMediaUploaderModal: React.FC<CameraMediaUploaderModalProps> = ({
       return <FileReviewContainer onCompletion={startUploadingToServer} />;
     }
 
-    if (cameraOnly) {
-      return <CameraComponent />;
-    }
-
-    return (
-      <div className={styles.cameraSection}>
-        <h3 className={styles.paddedProductiveHeading03}>{t('addAttachment', 'Add Attachment')}</h3>
-        <Tabs className={styles.tabs}>
-          <TabList>
-            <Tab>{t('uploadMedia', 'Upload media')}</Tab>
-            <Tab>{t('webcam', 'Webcam')}</Tab>
-          </TabList>
-          <TabPanels>
-            <TabPanel>
-              <MediaUploaderComponent />
-            </TabPanel>
-            <TabPanel>
-              <CameraComponent />
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
-      </div>
-    );
-  }, [uploadFilesToServer, filesToUpload, cameraOnly, t, startUploadingToServer]);
+    return <CameraMediaUploadTabs />;
+  }, [uploadFilesToServer, filesToUpload, startUploadingToServer]);
 
   return (
     <CameraMediaUploaderContext.Provider
       value={{
         multipleFiles,
         cameraOnly,
-        collectCaption,
+        collectDescription,
         saveFile,
         closeModal,
         onCompletion,
@@ -116,10 +96,54 @@ const CameraMediaUploaderModal: React.FC<CameraMediaUploaderModalProps> = ({
         handleTakePhoto,
         error,
         setError,
+        allowedExtensions,
       }}
     >
       {returnComponent}
     </CameraMediaUploaderContext.Provider>
+  );
+};
+
+const CameraMediaUploadTabs = () => {
+  const { t } = useTranslation();
+  const [view, setView] = useState('upload');
+  const { cameraOnly } = useContext(CameraMediaUploaderContext);
+  const mediaStream = useRef<MediaStream | undefined>();
+
+  const stopCameraStream = useCallback(() => {
+    mediaStream.current?.getTracks().forEach((t) => t.stop());
+  }, [mediaStream]);
+
+  useEffect(() => {
+    return () => {
+      stopCameraStream();
+    };
+  }, [stopCameraStream]);
+
+  if (cameraOnly) {
+    return <CameraComponent mediaStream={mediaStream} stopCameraStream={stopCameraStream} />;
+  }
+
+  return (
+    <div className={styles.cameraSection}>
+      <ModalHeader>{t('addAttachment', 'Add Attachment')}</ModalHeader>
+      <ModalBody className={styles.modalBody}>
+        <Tabs className={styles.tabs}>
+          <TabList aria-label="Attachments-upload-section">
+            <Tab onClick={() => setView('upload')}>{t('uploadMedia', 'Upload media')}</Tab>
+            <Tab onClick={() => setView('camera')}>{t('webcam', 'Webcam')}</Tab>
+          </TabList>
+          <TabPanels>
+            <TabPanel>
+              <MediaUploaderComponent />
+            </TabPanel>
+            <TabPanel>
+              {view === 'camera' && <CameraComponent mediaStream={mediaStream} stopCameraStream={stopCameraStream} />}
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
+      </ModalBody>
+    </div>
   );
 };
 

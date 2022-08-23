@@ -1,7 +1,8 @@
 export interface UploadedFile {
-  fileContent: string;
+  file?: File;
+  base64Content: string;
   fileName: string;
-  fileType: 'image' | 'pdf';
+  fileType: string;
   fileDescription: string;
   status?: 'uploading' | 'complete';
 }
@@ -10,6 +11,7 @@ export interface Attachment {
   id: string;
   src: string;
   title: string;
+  description: string;
   dateTime: string;
   bytesMimeType: string;
   bytesContentFamily: string;
