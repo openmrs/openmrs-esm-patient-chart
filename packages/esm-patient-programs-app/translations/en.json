@@ -21,6 +21,7 @@
   "fullyEnrolled": "Enrolled in all programs",
   "location": "Location",
   "noEligibleEnrollments": "There are no more programs left to enroll this patient in",
+  "noProgramsConfigured": "No programs configured",
   "programEnrollments": "Program enrollments",
   "programEnrollmentSaveError": "Error saving program enrollment",
   "programName": "Program name",
