@@ -12,22 +12,6 @@ import AttachmentPreview from './image-preview.component';
 import styles from './attachments-overview.scss';
 import { List, Thumbnail_2, Add } from '@carbon/react/icons';
 
-// function getPageSize(layoutType: LayoutType) {
-//   switch (layoutType) {
-//     case 'tablet':
-//       return 9;
-//     case 'phone':
-//       return 3;
-//     case 'small-desktop':
-//       return 25;
-//     // TODO: Add case for the 'large-desktop' layout
-//     // case 'large-desktop':
-//     //   return 25;
-//     default:
-//       return 8;
-//   }
-// }
-
 const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const { data, mutate, isValidating, isLoading } = useAttachments(patientUuid, true);

@@ -19,12 +19,6 @@ function ImageThumbnail(props: ImageProps) {
 }
 
 function PdfThumbnail(props: ImageProps) {
-  // function handleClick(e: React.SyntheticEvent) {
-  //   e.preventDefault();
-  //   e.stopPropagation();
-  //   window.open(props.src, '_blank');
-  // }
-
   return (
     <div className={styles.pdfThumbnail} onClick={props.onClick} role="button" tabIndex={0}>
       <DocumentPdf size={24} />
@@ -33,17 +27,8 @@ function PdfThumbnail(props: ImageProps) {
 }
 
 function OtherThumbnail(props: ImageProps) {
-  function handleClick(e: React.SyntheticEvent) {
-    e.preventDefault();
-    e.stopPropagation();
-    const anchor = document.createElement('a');
-    anchor.setAttribute('href', props.src);
-    anchor.setAttribute('download', 'download');
-    anchor.click();
-  }
-
   return (
-    <div className={styles.pdfThumbnail} onClick={handleClick} role="button" tabIndex={0}>
+    <div className={styles.pdfThumbnail} onClick={props.onClick} role="button" tabIndex={0}>
       <DocumentUnknown size={24} />
     </div>
   );
