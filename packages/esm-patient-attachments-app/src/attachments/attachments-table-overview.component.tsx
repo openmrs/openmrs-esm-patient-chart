@@ -20,14 +20,14 @@ interface AttachmentsTableOverviewProps {
   isLoading: boolean;
   attachments: Array<Attachment>;
   deleteAttachment: (attachment: Attachment) => void;
-  onAttachmentSelect: (attachment: Attachment) => void;
+  openAttachment: (attachment: Attachment) => void;
 }
 
 const AttachmentsTableOverview: React.FC<AttachmentsTableOverviewProps> = ({
   attachments,
   isLoading,
   deleteAttachment,
-  onAttachmentSelect,
+  openAttachment,
 }) => {
   const { t } = useTranslation();
 
@@ -36,25 +36,14 @@ const AttachmentsTableOverview: React.FC<AttachmentsTableOverviewProps> = ({
       attachments.map((attachment) => ({
         id: attachment.id,
         fileName: (
-          <span
-            role="button"
-            tabIndex={0}
-            className={styles.link}
-            onClick={() => {
-              if (attachment.bytesContentFamily === 'IMAGE') {
-                onAttachmentSelect(attachment);
-              } else {
-                window.open(attachment.src, '_blank');
-              }
-            }}
-          >
+          <span role="button" tabIndex={0} className={styles.link} onClick={() => openAttachment(attachment)}>
             {attachment.title}
           </span>
         ),
         type: attachment.bytesContentFamily,
         dateUploaded: attachment.dateTime,
       })),
-    [attachments, onAttachmentSelect],
+    [attachments, openAttachment],
   );
 
   const headers = useMemo(

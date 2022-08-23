@@ -99,6 +99,20 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
     [deleteAttachment],
   );
 
+  const openAttachment = useCallback(
+    (attachment: Attachment) => {
+      if (attachment.bytesContentFamily === 'IMAGE' || attachment.bytesContentFamily === 'PDF') {
+        setAttachmentToPreview(attachment);
+      } else {
+        const anchor = document.createElement('a');
+        anchor.setAttribute('href', attachment.src);
+        anchor.setAttribute('download', attachment.title);
+        anchor.click();
+      }
+    },
+    [setAttachmentToPreview],
+  );
+
   if (!attachments.length) {
     return <EmptyState displayText={'attachments'} headerTitle="Attachments" launchForm={showCam} />;
   }
@@ -111,10 +125,10 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
             <h4 className={styles.productiveheading02}>{t('attachments', 'Attachments')}</h4>
             <div>{isValidating && <Loading withOverlay={false} small />}</div>
             <ContentSwitcher onChange={(evt) => setView(`${evt.name}`)}>
-              <Switch name="grid" selected={view === 'grid'}>
+              <Switch name="grid">
                 <Thumbnail_2 size={16} />
               </Switch>
-              <Switch name="tabular" selected={view === 'tabular'}>
+              <Switch name="tabular">
                 <List size={16} />
               </Switch>
             </ContentSwitcher>
@@ -124,14 +138,14 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
           </div>
           {view === 'grid' ? (
             <AttachmentsGridOverview
-              onAttachmentSelect={setAttachmentToPreview}
+              openAttachment={openAttachment}
               deleteAttachment={deleteAttachmentModal}
               isLoading={isLoading}
               attachments={attachments}
             />
           ) : (
             <AttachmentsTableOverview
-              onAttachmentSelect={setAttachmentToPreview}
+              openAttachment={openAttachment}
               deleteAttachment={deleteAttachmentModal}
               isLoading={isLoading}
               attachments={attachments}

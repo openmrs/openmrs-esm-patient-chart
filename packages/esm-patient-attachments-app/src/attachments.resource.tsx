@@ -37,23 +37,17 @@ export function getAttachments(patientUuid: string, includeEncounterless: boolea
   });
 }
 
-export async function createAttachment(patientUuid: string, file: UploadedFile) {
+export async function createAttachment(patientUuid: string, fileToUpload: UploadedFile) {
   const formData = new FormData();
 
-  formData.append(
-    'fileCaption',
-    JSON.stringify({
-      name: file.fileName,
-      description: file.fileDescription,
-    }),
-  );
+  formData.append('fileCaption', fileToUpload.fileName);
   formData.append('patient', patientUuid);
 
-  if (file.file) {
-    formData.append('file', file.file);
+  if (fileToUpload.file) {
+    formData.append('file', fileToUpload.file);
   } else {
-    formData.append('file', new File([''], file.fileName), file.fileName);
-    formData.append('base64Content', file.base64Content);
+    formData.append('file', new File([''], fileToUpload.fileName), fileToUpload.fileName);
+    formData.append('base64Content', fileToUpload.base64Content);
   }
   return openmrsFetch(`${attachmentUrl}`, {
     method: 'POST',

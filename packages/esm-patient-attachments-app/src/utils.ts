@@ -30,8 +30,8 @@ export function createGalleryEntry(data: AttachmentResponse): Attachment {
   return {
     id: data.uuid,
     src: `${window.openmrsBase}${attachmentUrl}/${data.uuid}/bytes`,
-    title: data.comment?.[0] == '{' ? JSON.parse(data.comment)['name'] : data.comment,
-    description: data.comment?.[0] == '{' ? JSON.parse(data.comment)['description'] : '',
+    title: data.comment,
+    description: '',
     dateTime: formatDate(new Date(data.dateTime), {
       mode: 'wide',
     }),
