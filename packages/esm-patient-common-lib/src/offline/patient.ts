@@ -10,60 +10,50 @@ export const patientRegistrationSyncType = 'patient-registration';
 export function usePatientOrOfflineRegisteredPatient(patientUuid: string): ReturnType<typeof usePatient> {
   const isOnline = useConnectivity();
   const onlinePatientState = usePatient(patientUuid);
-  const [offlinePatientState, setOfflinePatientState] = useState<{ data: fhir.Patient | null; error: Error | null }>({
-    data: null,
-    error: null,
+  const [offlinePatientState, setOfflinePatientState] = useState<{ patient?: fhir.Patient; error?: Error }>({
+    patient: undefined,
+    error: undefined,
   });
 
   useEffect(() => {
     if (isOnline) {
-      setOfflinePatientState({ error: null, data: null });
+      setOfflinePatientState({ error: undefined, patient: undefined });
     } else {
       getOfflineRegisteredPatientAsFhirPatient(patientUuid)
         .then((offlinePatient) => {
-          setOfflinePatientState({ error: null, data: offlinePatient });
+          setOfflinePatientState({ error: undefined, patient: offlinePatient });
         })
         .catch((err) => {
-          setOfflinePatientState({ error: err, data: null });
+          if (err instanceof Error) {
+            setOfflinePatientState({ error: err, patient: undefined });
+          } else {
+            setOfflinePatientState({ error: new Error(JSON.stringify(err)), patient: undefined });
+          }
         });
     }
   }, [patientUuid, isOnline]);
 
   return useMemo(() => {
-    if (onlinePatientState.isLoading || (!offlinePatientState.data && !offlinePatientState.error)) {
+    if (isOnline) {
+      if (onlinePatientState.patient && onlinePatientState.patient.hasOwnProperty('issue')) {
+        const operationOutcome = onlinePatientState.patient as fhir.OperationOutcome;
+        return {
+          ...onlinePatientState,
+          patient: undefined,
+          error: new Error(JSON.stringify(operationOutcome.issue)),
+        };
+      } else {
+        return onlinePatientState;
+      }
+    } else {
       return {
-        isLoading: true,
-        patient: null,
-        patientUuid,
-        error: null,
+        isLoading: !(!!offlinePatientState.patient || !!offlinePatientState.error),
+        patient: offlinePatientState.patient,
+        patientUuid: offlinePatientState.patient?.id,
+        error: offlinePatientState.error,
       };
     }
-
-    if (onlinePatientState.patient && !(onlinePatientState.patient as any).issue) {
-      return {
-        isLoading: false,
-        patient: onlinePatientState.patient,
-        patientUuid,
-        error: null,
-      };
-    }
-
-    if (offlinePatientState.data) {
-      return {
-        isLoading: false,
-        patient: offlinePatientState.data,
-        patientUuid,
-        error: null,
-      };
-    }
-
-    return {
-      isLoading: false,
-      patient: null,
-      patientUuid,
-      error: onlinePatientState.error ?? offlinePatientState.error,
-    };
-  }, [onlinePatientState, offlinePatientState.data, offlinePatientState.error, patientUuid]);
+  }, [isOnline, onlinePatientState, offlinePatientState.patient, offlinePatientState.error]);
 }
 
 async function getOfflineRegisteredPatientAsFhirPatient(patientUuid: string): Promise<fhir.Patient | undefined> {
