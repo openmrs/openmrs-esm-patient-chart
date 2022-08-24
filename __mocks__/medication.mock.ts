@@ -1233,7 +1233,7 @@ export const mockOrderTemplates = [
     uuid: 'cb43930e-3ed2-4099-ba0c-e6c841e22c4d',
     display: 'Aspirin',
     name: 'Aspirin',
-    description: 'Apsirin demo order template',
+    description: 'Aspirin demo order template',
     template: {
       type: 'https://schema.openmrs.org/order/template/drug/simple/v1',
       dosingType: 'org.openmrs.SimpleDosingInstructions',
@@ -1272,7 +1272,7 @@ export const mockOrderTemplates = [
           },
         ],
         asNeeded: false,
-        asNeededCondtion: 'With or without food',
+        asNeededCondition: 'With or without food',
       },
     },
     retired: false,

@@ -89,7 +89,7 @@ function* explodeResultWithOrderTemplates(
         isFreeTextDosage: false,
         patientInstructions: '',
         asNeeded: template.template.dosingInstructions.asNeeded || false,
-        asNeededCondition: template.template.dosingInstructions.asNeededCondtion,
+        asNeededCondition: template.template.dosingInstructions.asNeededCondition,
         startDate: new Date(),
         duration: null,
         durationUnit: daysDurationUnit,

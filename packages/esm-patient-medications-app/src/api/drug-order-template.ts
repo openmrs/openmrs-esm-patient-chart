@@ -19,7 +19,7 @@ export interface DosingInstructions {
   frequency: Array<MedicationFrequency>;
   instructions?: Array<MedicationInstructions>;
   asNeeded?: boolean;
-  asNeededCondtion?: string;
+  asNeededCondition?: string;
 }
 
 export interface MedicationDosage extends Omit<CommonMedicationProps, 'value'> {
