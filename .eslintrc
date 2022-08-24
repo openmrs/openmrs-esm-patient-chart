@@ -11,20 +11,19 @@
         "paths": [
           {
             "name": "lodash",
-            "message": "Import specific methods from `lodash-es`. e.g. `import map from 'lodash-es/map'`"
+            "message": "Import specific methods from `lodash`. e.g. `import map from 'lodash/map'`"
           },
           {
             "name": "lodash-es",
-            "message": "Import specific methods from `lodash-es`. e.g. `import map from 'lodash-es/map'`"
-          }
-        ],
-        "patterns": [
+            "importNames": ["default"],
+            "message": "Import specific methods from `lodash-es`. e.g. `import { map } from 'lodash-es'`"
+          },
           {
-            "group": ["carbon-components-react"],
+            "name": "carbon-components-react",
             "message": "Import from `@carbon/react` directly. e.g. `import { Toggle } from '@carbon/react'`"
           },
           {
-            "group": ["@carbon/icons-react"],
+            "name": "@carbon/icons-react",
             "message": "Import from `@carbon/react/icons`. e.g. `import { ChevronUp } from '@carbon/react/icons'`"
           }
         ]
