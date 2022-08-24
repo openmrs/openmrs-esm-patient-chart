@@ -51,7 +51,7 @@ export class FormSubmissionService {
           this.deepClearInitialNodeValues(form.rootNode);
         }
 
-        const encounterCreate = this.buildEncounterPayload(form);
+        const encounterCreate = this.onEncounterCreate(this.buildEncounterPayload(form));
         const personUpdate = this.buildPersonUpdatePayload(form);
 
         return isOfflineSubmission
@@ -76,6 +76,12 @@ export class FormSubmissionService {
         this.deepClearInitialNodeValues(child as NodeBase);
       }
     }
+  }
+
+  private onEncounterCreate(encounterCreate: EncounterCreate): EncounterCreate {
+    const handleEncounterCreate = this.singleSpaPropsService.getProp('handleEncounterCreate');
+    if (handleEncounterCreate && typeof handleEncounterCreate === 'function') handleEncounterCreate(encounterCreate);
+    return encounterCreate;
   }
 
   private submitPayloadOffline(
