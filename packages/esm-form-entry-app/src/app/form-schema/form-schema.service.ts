@@ -3,7 +3,7 @@ import { ReplaySubject, Observable, Subject, of, forkJoin } from 'rxjs';
 import { concat, first, map, take, tap } from 'rxjs/operators';
 
 import { FormResourceService } from '../openmrs-api/form-resource.service';
-import { FormSchemaCompiler } from '@ampath-kenya/ngx-formentry';
+import { FormSchemaCompiler } from '@openmrs/ngx-formentry';
 import { LocalStorageService } from '../local-storage/local-storage.service';
 import { FormSchema, Questions } from '../types';
 

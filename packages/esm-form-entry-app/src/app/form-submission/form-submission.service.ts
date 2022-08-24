@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 
 import { forkJoin, Observable, of, from } from 'rxjs';
-import { catchError, map, mergeMap } from 'rxjs/operators';
-import { EncounterAdapter, PersonAttribuAdapter, Form } from '@ampath-kenya/ngx-formentry';
+import { catchError, mergeMap } from 'rxjs/operators';
+import { EncounterAdapter, PersonAttribuAdapter, Form } from '@openmrs/ngx-formentry';
+import { NodeBase } from '@openmrs/ngx-formentry/form-entry/form-factory/form-node';
 import { EncounterResourceService } from '../openmrs-api/encounter-resource.service';
 import { PersonResourceService } from '../openmrs-api/person-resource.service';
 import { FormDataSourceService } from '../form-data-source/form-data-source.service';
@@ -18,7 +19,6 @@ import cloneDeep from 'lodash-es/cloneDeep';
 import { mutateEncounterCreateToPartialEncounter } from '../offline/syncItemMutation';
 import { SingleSpaPropsService } from '../single-spa-props/single-spa-props.service';
 import { v4 } from 'uuid';
-import { NodeBase } from '@ampath-kenya/ngx-formentry/form-entry/form-factory/form-node';
 
 /**
  * The result of submitting a form via the {@link FormSubmissionService.submitPayload} function.
