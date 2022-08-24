@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { ExtensionSlot, usePatient } from '@openmrs/esm-framework';
+import React, { useEffect, useMemo, useState } from 'react';
+import { ExtensionSlot } from '@openmrs/esm-framework';
 import {
   DefaultWorkspaceProps,
   FormEntryProps,
@@ -13,6 +13,20 @@ const FormEntry: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspac
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const [selectedForm, setSelectedForm] = useState<FormEntryProps>(null);
 
+  const state = useMemo(
+    () => ({
+      view: 'form',
+      formUuid: selectedForm?.formUuid ?? null,
+      visitUuid: currentVisit.uuid ?? null,
+      visitTypeUuid: currentVisit.visitType?.uuid ?? null,
+      patientUuid: patientUuid ?? null,
+      patient,
+      encounterUuid: selectedForm?.encounterUuid ?? null,
+      closeWorkspace,
+    }),
+    [selectedForm, currentVisit, patientUuid, patient, closeWorkspace],
+  );
+
   useEffect(() => {
     const sub = formEntrySub.subscribe((form) => setSelectedForm(form));
     return () => sub.unsubscribe();
@@ -21,19 +35,7 @@ const FormEntry: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspac
   return (
     <div>
       {selectedForm && patientUuid && patient && currentVisit && (
-        <ExtensionSlot
-          extensionSlotName="form-widget-slot"
-          state={{
-            view: 'form',
-            formUuid: selectedForm.formUuid,
-            visitUuid: currentVisit.uuid,
-            visitTypeUuid: currentVisit.visitType?.uuid,
-            patientUuid,
-            patient,
-            encounterUuid: selectedForm?.encounterUuid ?? null,
-            closeWorkspace,
-          }}
-        />
+        <ExtensionSlot extensionSlotName="form-widget-slot" state={state} />
       )}
     </div>
   );

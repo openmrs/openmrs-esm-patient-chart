@@ -54,7 +54,6 @@
     "ngx-bootstrap": "^6.0.0",
     "ngx-file-uploader": "0.0.18",
     "ngx-webcam": "^0.2.2",
-    "openmrs": "^4.0.0-pre.1",
     "reflect-metadata": "^0.1.13",
     "single-spa-angular": "^4.9.2",
     "slick-carousel": "^1.6.0",
@@ -65,7 +64,7 @@
     "zone.js": "~0.10.2"
   },
   "peerDependencies": {
-    "@openmrs/esm-framework": "3.x",
+    "@openmrs/esm-framework": "4.x",
     "rxjs": "6.x",
     "single-spa": "5.x",
     "systemjs": "6.x"
@@ -88,6 +87,7 @@
     "karma-coverage-istanbul-reporter": "~3.0.2",
     "karma-jasmine": "~4.0.0",
     "karma-jasmine-html-reporter": "^1.5.0",
+    "openmrs": "next",
     "protractor": "~7.0.0",
     "style-loader": "2.x",
     "webpack": "4.44.2"

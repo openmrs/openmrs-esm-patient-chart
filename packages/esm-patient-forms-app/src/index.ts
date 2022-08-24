@@ -6,7 +6,7 @@ import {
   subscribePrecacheStaticDependencies,
   syncAllDynamicOfflineData,
 } from '@openmrs/esm-framework';
-import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
+import { createDashboardLink, registerWorkspace } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
 import { setupDynamicFormDataHandler, setupPatientFormSync } from './offline';
@@ -39,17 +39,14 @@ function setupOpenMRS() {
   setupDynamicFormDataHandler();
   subscribePrecacheStaticDependencies(() => syncAllDynamicOfflineData('form'));
 
+  registerWorkspace({
+    name: 'patient-form-entry-workspace',
+    title: 'Clinical Form',
+    load: getAsyncLifecycle(() => import('./forms/form-entry.component'), options),
+  });
+
   return {
     extensions: [
-      {
-        name: 'patient-form-entry-workspace',
-        load: getAsyncLifecycle(() => import('./forms/form-entry.component'), options),
-        meta: {
-          title: 'Clinical Form',
-        },
-        online: true,
-        offline: true,
-      },
       {
         name: 'forms-widget',
         slot: 'patient-chart-summary-dashboard-slot',
