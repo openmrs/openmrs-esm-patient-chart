@@ -65,7 +65,7 @@
     "zone.js": "~0.10.2"
   },
   "peerDependencies": {
-    "@openmrs/esm-framework": "3.x",
+    "@openmrs/esm-framework": "4.x",
     "rxjs": "6.x",
     "single-spa": "5.x",
     "systemjs": "6.x"
