@@ -4546,10 +4546,10 @@ __metadata:
     d3: ^7.0.3
     lodash-es: ^4.17.15
   peerDependencies:
-    "@openmrs/esm-framework": 3.x
-    "@openmrs/esm-patient-common-lib": 3.x
+    "@openmrs/esm-framework": 4.x
+    "@openmrs/esm-patient-common-lib": 4.x
     dayjs: 1.x
-    react: ^18.2.0
+    react: 18.x
     react-i18next: 11.x
     react-router-dom: 6.x
     rxjs: 6.x
@@ -4567,10 +4567,10 @@ __metadata:
     d3: ^7.4.4
     lodash-es: ^4.17.15
   peerDependencies:
-    "@openmrs/esm-framework": 3.x
-    "@openmrs/esm-patient-common-lib": 3.x
+    "@openmrs/esm-framework": 4.x
+    "@openmrs/esm-patient-common-lib": 4.x
     dayjs: 1.x
-    react: ^18.2.0
+    react: ^18.x
     react-i18next: 11.x
     react-router-dom: 6.x
     rxjs: 6.x
@@ -4581,7 +4581,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-chart-app@workspace:packages/esm-patient-chart-app"
   dependencies:
-    "@carbon/react": ^1.9.0
     "@openmrs/esm-patient-common-lib": ^4.0.0
     "@types/uuid": ^8.3.0
     lodash-es: ^4.17.15
@@ -4589,9 +4588,11 @@ __metadata:
     single-spa-react: ^4.6.1
     uuid: ^8.3.2
   peerDependencies:
-    "@openmrs/esm-framework": 3.x
-    "@openmrs/esm-patient-common-lib": 3.x
+    "@carbon/react": 1.x
+    "@openmrs/esm-framework": 4.x
+    "@openmrs/esm-patient-common-lib": 4.x
     dayjs: 1.x
+    lodash-es: 4.x
     react: 18.x
     react-i18next: 11.x
     react-router-dom: 6.x
@@ -4668,8 +4669,8 @@ __metadata:
     lodash-es: ^4.17.15
     uuid: ^8.3.2
   peerDependencies:
-    "@openmrs/esm-framework": 3.x
-    react: ^18.2.0
+    "@openmrs/esm-framework": 4.x
+    react: 18.x
     single-spa: 5.x
   languageName: unknown
   linkType: soft
@@ -4683,10 +4684,10 @@ __metadata:
     d3: ^7.0.3
     lodash-es: ^4.17.15
   peerDependencies:
-    "@openmrs/esm-framework": 3.x
-    "@openmrs/esm-patient-common-lib": 3.x
+    "@openmrs/esm-framework": 4.x
+    "@openmrs/esm-patient-common-lib": 4.x
     dayjs: 1.x
-    react: ^18.2.0
+    react: 18.x
     react-i18next: 11.x
     react-router-dom: 6.x
     rxjs: 6.x
@@ -4705,7 +4706,7 @@ __metadata:
     "@openmrs/esm-framework": 4.x
     "@openmrs/esm-patient-common-lib": 4.x
     dayjs: 1.x
-    react: ^18.2.0
+    react: 18.x
     react-i18next: 11.x
     react-router-dom: 6.x
     rxjs: 6.x
@@ -4721,10 +4722,10 @@ __metadata:
     d3: ^7.0.3
     lodash-es: ^4.17.15
   peerDependencies:
-    "@openmrs/esm-framework": 3.x
-    "@openmrs/esm-patient-common-lib": 3.x
+    "@openmrs/esm-framework": 4.x
+    "@openmrs/esm-patient-common-lib": 4.x
     dayjs: 1.x
-    react: ^18.2.0
+    react: 4.x
     react-i18next: 11.x
     react-router-dom: 6.x
     rxjs: 6.x
@@ -4740,10 +4741,10 @@ __metadata:
     d3: ^7.0.3
     lodash-es: ^4.17.15
   peerDependencies:
-    "@openmrs/esm-framework": 3.x
-    "@openmrs/esm-patient-common-lib": 3.x
+    "@openmrs/esm-framework": 4.x
+    "@openmrs/esm-patient-common-lib": 4.x
     dayjs: 1.x
-    react: ^18.2.0
+    react: 18.x
     react-i18next: 11.x
     react-router-dom: 6.x
     rxjs: 6.x
@@ -4758,10 +4759,10 @@ __metadata:
     d3: ^7.0.3
     lodash-es: ^4.17.15
   peerDependencies:
-    "@openmrs/esm-framework": 3.x
-    "@openmrs/esm-patient-common-lib": 3.x
+    "@openmrs/esm-framework": 4.x
+    "@openmrs/esm-patient-common-lib": 4.x
     dayjs: 1.x
-    react: ^18.2.0
+    react: 18.x
     react-i18next: 11.x
     react-router-dom: 6.x
     rxjs: 6.x
@@ -4777,10 +4778,10 @@ __metadata:
     d3: ^7.0.3
     lodash-es: ^4.17.15
   peerDependencies:
-    "@openmrs/esm-framework": 3.x
-    "@openmrs/esm-patient-common-lib": 3.x
+    "@openmrs/esm-framework": 4.x
+    "@openmrs/esm-patient-common-lib": 4.x
     dayjs: 1.x
-    react: ^18.2.0
+    react: 18.x
     react-i18next: 11.x
     react-router-dom: 6.x
     rxjs: 6.x
@@ -4797,9 +4798,9 @@ __metadata:
     d3: ^7.6.1
     lodash-es: ^4.17.15
   peerDependencies:
-    "@openmrs/esm-framework": 3.x
-    "@openmrs/esm-patient-common-lib": 3.x
-    react: ^18.2.0
+    "@openmrs/esm-framework": 4.x
+    "@openmrs/esm-patient-common-lib": 4.x
+    react: 18.x
     react-i18next: 11.x
     react-router-dom: 6.x
     rxjs: 6.x
@@ -4816,10 +4817,10 @@ __metadata:
     d3: ^7.6.1
     lodash-es: ^4.17.15
   peerDependencies:
-    "@openmrs/esm-framework": 3.x
-    "@openmrs/esm-patient-common-lib": 3.x
+    "@openmrs/esm-framework": 4.x
+    "@openmrs/esm-patient-common-lib": 4.x
     dayjs: 1.x
-    react: ^18.2.0
+    react: 18.x
     react-i18next: 11.x
     react-router-dom: 6.x
     rxjs: 6.x
