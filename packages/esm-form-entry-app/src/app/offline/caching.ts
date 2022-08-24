@@ -1,4 +1,3 @@
-import { FormSchemaCompiler } from '@ampath-kenya/ngx-formentry';
 import {
   makeUrl,
   messageOmrsServiceWorker,
@@ -7,6 +6,7 @@ import {
   setupDynamicOfflineDataHandler,
   subscribePrecacheStaticDependencies,
 } from '@openmrs/esm-framework';
+import { FormSchemaCompiler } from '@openmrs/ngx-formentry';
 import escapeRegExp from 'lodash-es/escapeRegExp';
 import { FormSchemaService } from '../form-schema/form-schema.service';
 import { FormEncounter, FormSchema } from '../types';

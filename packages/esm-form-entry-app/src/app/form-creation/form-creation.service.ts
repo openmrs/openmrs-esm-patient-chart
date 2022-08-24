@@ -1,4 +1,4 @@
-import { DataSources, EncounterAdapter, Form, FormFactory } from '@ampath-kenya/ngx-formentry';
+import { DataSources, EncounterAdapter, Form, FormFactory } from '@openmrs/ngx-formentry';
 import { Injectable } from '@angular/core';
 import * as moment from 'moment';
 import { FormDataSourceService } from '../form-data-source/form-data-source.service';

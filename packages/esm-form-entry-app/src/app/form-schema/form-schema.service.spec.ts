@@ -1,10 +1,10 @@
-import { TestBed, inject } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { BehaviorSubject } from 'rxjs';
 import { FormSchemaService } from './form-schema.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FormResourceService } from '../openmrs-api/form-resource.service';
 import { LocalStorageService } from '../local-storage/local-storage.service';
-import { FormSchemaCompiler } from '@ampath-kenya/ngx-formentry';
+import { FormSchemaCompiler } from '@openmrs/ngx-formentry';
 
 describe('Service: FormSchemaService', () => {
   let formSchemaService: FormSchemaService;
