@@ -13,6 +13,10 @@ import { setupOfflineVisitsSync, setupCacheableRoutes } from './offline';
 import { genericDashboardConfigSchema } from './side-nav/generic-dashboard.component';
 import { genericNavGroupConfigSchema } from './side-nav/generic-nav-group.component';
 
+declare var __VERSION__: string;
+// __VERSION__ is replaced by Webpack with the version from package.json
+const version = __VERSION__;
+
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 const backendDependencies = {};
@@ -218,4 +222,4 @@ function setupOpenMRS() {
   };
 }
 
-export { backendDependencies, importTranslation, setupOpenMRS };
+export { backendDependencies, importTranslation, setupOpenMRS, version };

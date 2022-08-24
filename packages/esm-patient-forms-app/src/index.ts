@@ -12,6 +12,10 @@ import { dashboardMeta } from './dashboard.meta';
 import { setupDynamicFormDataHandler, setupPatientFormSync } from './offline';
 import OfflineToolsNavLink from './offline-forms/offline-tools-nav-link.component';
 
+declare var __VERSION__: string;
+// __VERSION__ is replaced by Webpack with the version from package.json
+const version = __VERSION__;
+
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 const backendDependencies = {
@@ -122,4 +126,4 @@ function setupOpenMRS() {
   };
 }
 
-export { backendDependencies, importTranslation, setupOpenMRS };
+export { backendDependencies, importTranslation, setupOpenMRS, version };

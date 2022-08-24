@@ -5,6 +5,10 @@ import { defineConfigSchema, messageOmrsServiceWorker } from '@openmrs/esm-frame
 import { configSchema } from './config-schema';
 import { setupDynamicOfflineFormDataHandler, setupStaticDataOfflinePrecaching } from './app/offline/caching';
 
+declare var __VERSION__: string;
+// __VERSION__ is replaced by Webpack with the version from package.json
+const version = __VERSION__;
+
 const backendDependencies = { 'webservices.rest': '^2.24.0' };
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 const moduleName = '@openmrs/esm-form-entry-app';
@@ -62,4 +66,4 @@ function setupOpenMRS() {
   };
 }
 
-export { backendDependencies, importTranslation, setupOpenMRS };
+export { backendDependencies, importTranslation, setupOpenMRS, version };

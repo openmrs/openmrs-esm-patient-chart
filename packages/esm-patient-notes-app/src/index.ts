@@ -1,12 +1,9 @@
-import {
-  defineConfigSchema,
-  getAsyncLifecycle,
-  getSyncLifecycle,
-  messageOmrsServiceWorker,
-} from '@openmrs/esm-framework';
-import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
+import { defineConfigSchema, getAsyncLifecycle, messageOmrsServiceWorker } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
-import { dashboardMeta } from './dashboard.meta';
+
+declare var __VERSION__: string;
+// __VERSION__ is replaced by Webpack with the version from package.json
+const version = __VERSION__;
 
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -71,4 +68,4 @@ function setupOpenMRS() {
   };
 }
 
-export { backendDependencies, importTranslation, setupOpenMRS };
+export { backendDependencies, importTranslation, setupOpenMRS, version };
