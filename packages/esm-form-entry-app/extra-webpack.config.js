@@ -35,7 +35,7 @@ module.exports = (angularWebpackConfig, options) => {
   singleSpaWebpackConfig.plugins.push(
     new IgnorePlugin(/^\.\/locale$/, /moment$/),
     new DefinePlugin({
-      __VERSION__: mode === production ? JSON.stringify(version) : JSON.stringify(inc(version, 'prerelease', 'local')),
+      __VERSION__: mode === "production" ? JSON.stringify(version) : JSON.stringify(inc(version, 'prerelease', 'local')),
       'process.env.FRAMEWORK_VERSION': JSON.stringify(frameworkVersion),
     }),
     new StatsWriterPlugin({
