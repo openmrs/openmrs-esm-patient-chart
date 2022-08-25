@@ -4415,8 +4415,8 @@ __metadata:
     lodash-es: ^4.17.15
     webpack: ^5.74.0
   peerDependencies:
-    "@openmrs/esm-framework": 3.x
-    "@openmrs/esm-patient-common-lib": 3.x
+    "@openmrs/esm-framework": 4.x
+    "@openmrs/esm-patient-common-lib": 4.x
     dayjs: 1.x
     react: ^18.2.0
     react-i18next: 11.x
@@ -4462,8 +4462,8 @@ __metadata:
     lodash-es: ^4.17.15
     webpack: ^5.74.0
   peerDependencies:
-    "@openmrs/esm-framework": 3.x
-    "@openmrs/esm-patient-common-lib": 3.x
+    "@openmrs/esm-framework": 4.x
+    "@openmrs/esm-patient-common-lib": 4.x
     dayjs: 1.x
     react: ^18.2.0
     react-i18next: 11.x
@@ -4481,8 +4481,8 @@ __metadata:
     lodash-es: ^4.17.15
     webpack: ^5.74.0
   peerDependencies:
-    "@openmrs/esm-framework": 3.x
-    "@openmrs/esm-patient-common-lib": 3.x
+    "@openmrs/esm-framework": 4.x
+    "@openmrs/esm-patient-common-lib": 4.x
     dayjs: 1.x
     react: ^18.2.0
     react-i18next: 11.x
@@ -4503,8 +4503,8 @@ __metadata:
     react-html5-camera-photo: ^1.5.4
     webpack: ^5.74.0
   peerDependencies:
-    "@openmrs/esm-framework": 3.x
-    "@openmrs/esm-patient-common-lib": 3.x
+    "@openmrs/esm-framework": 4.x
+    "@openmrs/esm-patient-common-lib": 4.x
     dayjs: 1.x
     react: ^18.2.0
     react-i18next: 11.x
