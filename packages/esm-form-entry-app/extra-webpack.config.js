@@ -19,9 +19,9 @@ function getFrameworkVersion() {
   }
 }
 
-const mode = argv.mode || process.env.NODE_ENV || "development";
-
 module.exports = (angularWebpackConfig, options) => {
+  const mode = options.mode || process.env.NODE_ENV || "development";
+
   const filename = basename(browser || main);
   const frameworkVersion = getFrameworkVersion();
   const singleSpaWebpackConfig = singleSpaAngularWebpack(angularWebpackConfig, options);
