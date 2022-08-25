@@ -48,5 +48,8 @@
     "react-i18next": "11.x",
     "react-router-dom": "6.x",
     "rxjs": "6.x"
+  },
+  "devDependencies": {
+    "webpack": "^5.74.0"
   }
 }

@@ -54,6 +54,7 @@
     "@openmrs/esm-patient-common-lib": "^4.0.0",
     "@types/uuid": "^8.3.0",
     "single-spa": "5",
-    "single-spa-react": "^4.6.1"
+    "single-spa-react": "^4.6.1",
+    "webpack": "^5.74.0"
   }
 }
