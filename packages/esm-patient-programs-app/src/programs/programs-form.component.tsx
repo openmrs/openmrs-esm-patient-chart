@@ -172,7 +172,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
             style={{ minWidth: '100%', margin: '0rem', padding: '0rem' }}
             kind={'error'}
             lowContrast
-            subtitle={t('noProgramsConfigured', 'Please configure programs to continue.')}
+            subtitle={t('configurePrograms', 'Please configure programs to continue.')}
             title={t('noProgramsConfigured', 'No programs configured')}
           />
         ) : null}
