@@ -1,5 +1,6 @@
 const { IgnorePlugin, DefinePlugin } = require('webpack');
 const { StatsWriterPlugin } = require('webpack-stats-plugin');
+const { inc } = require('semver'); 
 const { basename } = require('path');
 const singleSpaAngularWebpack = require('single-spa-angular/lib/webpack').default;
 
