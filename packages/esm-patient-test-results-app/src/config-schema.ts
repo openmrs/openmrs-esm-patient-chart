@@ -23,7 +23,7 @@ export const configSchema = {
         defaultOpen: false,
       },
       {
-        conceptUuid: '12AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        conceptUuid: '21AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
         defaultOpen: false,
       },
     ],
