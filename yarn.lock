@@ -4413,6 +4413,7 @@ __metadata:
     "@openmrs/esm-patient-common-lib": ^4.0.0
     d3: ^7.0.3
     lodash-es: ^4.17.15
+    webpack: ^5.74.0
   peerDependencies:
     "@openmrs/esm-framework": 3.x
     "@openmrs/esm-patient-common-lib": 3.x
@@ -4459,6 +4460,7 @@ __metadata:
     "@openmrs/esm-patient-common-lib": ^4.0.0
     d3: ^7.0.3
     lodash-es: ^4.17.15
+    webpack: ^5.74.0
   peerDependencies:
     "@openmrs/esm-framework": 3.x
     "@openmrs/esm-patient-common-lib": 3.x
@@ -4477,6 +4479,7 @@ __metadata:
     "@openmrs/esm-patient-common-lib": ^4.0.0
     d3: ^7.0.3
     lodash-es: ^4.17.15
+    webpack: ^5.74.0
   peerDependencies:
     "@openmrs/esm-framework": 3.x
     "@openmrs/esm-patient-common-lib": 3.x
@@ -4498,6 +4501,7 @@ __metadata:
     lodash-es: ^4.17.15
     react-grid-gallery: ^0.5.5
     react-html5-camera-photo: ^1.5.4
+    webpack: ^5.74.0
   peerDependencies:
     "@openmrs/esm-framework": 3.x
     "@openmrs/esm-patient-common-lib": 3.x
@@ -4517,6 +4521,7 @@ __metadata:
     "@openmrs/esm-patient-common-lib": ^4.0.0
     d3: ^7.0.3
     lodash-es: ^4.17.15
+    webpack: ^5.74.0
   peerDependencies:
     "@openmrs/esm-framework": 4.x
     "@openmrs/esm-patient-common-lib": 4.x
@@ -4538,6 +4543,7 @@ __metadata:
     "@openmrs/esm-patient-common-lib": ^4.0.0
     d3: ^7.4.4
     lodash-es: ^4.17.15
+    webpack: ^5.74.0
   peerDependencies:
     "@openmrs/esm-framework": 4.x
     "@openmrs/esm-patient-common-lib": 4.x
@@ -4559,6 +4565,7 @@ __metadata:
     single-spa: 5
     single-spa-react: ^4.6.1
     uuid: ^8.3.2
+    webpack: ^5.74.0
   peerDependencies:
     "@carbon/react": 1.x
     "@openmrs/esm-framework": 4.x
@@ -4628,7 +4635,7 @@ __metadata:
     systemjs-webpack-interop: ^2.3.7
     turbo: ^1.1.10
     typescript: ^4.0.3
-    webpack: ^5.36.2
+    webpack: ^5.74.0
     webpack-cli: ^4.7.0
   languageName: unknown
   linkType: soft
@@ -4655,6 +4662,7 @@ __metadata:
     "@openmrs/esm-patient-common-lib": ^4.0.0
     d3: ^7.0.3
     lodash-es: ^4.17.15
+    webpack: ^5.74.0
   peerDependencies:
     "@openmrs/esm-framework": 4.x
     "@openmrs/esm-patient-common-lib": 4.x
@@ -4674,6 +4682,7 @@ __metadata:
     "@openmrs/esm-patient-common-lib": ^4.0.0
     d3: ^7.0.3
     lodash-es: ^4.17.15
+    webpack: ^5.74.0
   peerDependencies:
     "@openmrs/esm-framework": 4.x
     "@openmrs/esm-patient-common-lib": 4.x
@@ -4693,6 +4702,7 @@ __metadata:
     "@openmrs/esm-patient-common-lib": ^4.0.0
     d3: ^7.0.3
     lodash-es: ^4.17.15
+    webpack: ^5.74.0
   peerDependencies:
     "@openmrs/esm-framework": 4.x
     "@openmrs/esm-patient-common-lib": 4.x
@@ -4712,6 +4722,7 @@ __metadata:
     "@openmrs/esm-patient-common-lib": ^4.0.0
     d3: ^7.0.3
     lodash-es: ^4.17.15
+    webpack: ^5.74.0
   peerDependencies:
     "@openmrs/esm-framework": 4.x
     "@openmrs/esm-patient-common-lib": 4.x
@@ -4730,6 +4741,7 @@ __metadata:
     "@openmrs/esm-patient-common-lib": ^4.0.0
     d3: ^7.0.3
     lodash-es: ^4.17.15
+    webpack: ^5.74.0
   peerDependencies:
     "@openmrs/esm-framework": 4.x
     "@openmrs/esm-patient-common-lib": 4.x
@@ -4749,6 +4761,7 @@ __metadata:
     "@openmrs/esm-patient-common-lib": ^4.0.0
     d3: ^7.0.3
     lodash-es: ^4.17.15
+    webpack: ^5.74.0
   peerDependencies:
     "@openmrs/esm-framework": 4.x
     "@openmrs/esm-patient-common-lib": 4.x
@@ -4769,6 +4782,7 @@ __metadata:
     "@openmrs/esm-patient-common-lib": ^4.0.0
     d3: ^7.6.1
     lodash-es: ^4.17.15
+    webpack: ^5.74.0
   peerDependencies:
     "@openmrs/esm-framework": 4.x
     "@openmrs/esm-patient-common-lib": 4.x
@@ -4788,6 +4802,7 @@ __metadata:
     "@openmrs/esm-patient-common-lib": ^4.0.0
     d3: ^7.6.1
     lodash-es: ^4.17.15
+    webpack: ^5.74.0
   peerDependencies:
     "@openmrs/esm-framework": 4.x
     "@openmrs/esm-patient-common-lib": 4.x
@@ -23893,7 +23908,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack@npm:^5.36.2, webpack@npm:^5.64.0, webpack@npm:^5.74.0":
+"webpack@npm:^5.64.0, webpack@npm:^5.74.0":
   version: 5.74.0
   resolution: "webpack@npm:5.74.0"
   dependencies:
