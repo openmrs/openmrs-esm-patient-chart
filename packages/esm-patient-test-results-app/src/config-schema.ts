@@ -15,15 +15,15 @@ export const configSchema = {
     },
     _default: [
       {
-        conceptUuid: '1019AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        conceptUuid: 'ae485e65-2e3f-4297-b35e-c818bbefe894',
         defaultOpen: true,
       },
       {
-        conceptUuid: '856AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        conceptUuid: '8904fa2b-6a8f-437d-89ec-6fce3cd99093',
         defaultOpen: false,
       },
       {
-        conceptUuid: '21AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        conceptUuid: '856AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
         defaultOpen: false,
       },
     ],
