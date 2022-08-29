@@ -52,8 +52,6 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
   }
 
   const handleSubmit = () => {
-    if (!selectedServiceType) return;
-
     const serviceType = serviceTypes.find((service) => service.name === selectedServiceType);
 
     const serviceUuid = services.find((service) => service.name === selectedService)?.uuid;
