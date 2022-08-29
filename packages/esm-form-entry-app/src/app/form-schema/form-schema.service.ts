@@ -144,8 +144,10 @@ export class FormSchemaService {
       return this.formsResourceService.getFormMetaDataByUuid(formUuid).subscribe(
         (formMetadataObject: any) => {
           if (formMetadataObject.resources.length > 0) {
-            formMetadataObject.resources.map((resource: any) => {
-              this.formsResourceService.getFormClobDataByUuid(resource.valueReference).subscribe(
+            const { resources } = formMetadataObject;
+            const valueReferenceUuid = resources?.find(({ name }) => name === 'JSON schema').valueReference;
+            if (valueReferenceUuid) {
+              this.formsResourceService.getFormClobDataByUuid(valueReferenceUuid).subscribe(
                 (clobData: any) => {
                   observer.next(clobData);
                 },
@@ -154,7 +156,9 @@ export class FormSchemaService {
                   observer.error(err);
                 },
               );
-            });
+            } else {
+              observer.next([]);
+            }
           } else {
             observer.error(formMetadataObject.display + ':This formMetadataObject has no resource');
           }
