@@ -33,11 +33,10 @@ export function useVisitOrOfflineVisit(patientUuid: string) {
   const isOnline = useConnectivity();
   const [visit, setVisit] = useState<ReturnType<typeof useVisit> | undefined>();
 
-  useEffect(() => {
-    setVisit((isOnline ? useVisit : useOfflineVisit)(patientUuid));
-  }, [isOnline, patientUuid]);
+  const onlineVisit = useVisit(patientUuid);
+  const offlineVisit = useOfflineVisit(patientUuid);
 
-  return visit;
+  return isOnline ? onlineVisit : offlineVisit;
 }
 
 /**
