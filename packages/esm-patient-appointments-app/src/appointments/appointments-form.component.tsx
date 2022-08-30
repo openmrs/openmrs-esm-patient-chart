@@ -55,6 +55,7 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
     const serviceType = serviceTypes.find((service) => service.name === selectedServiceType);
 
     const serviceUuid = services.find((service) => service.name === selectedService)?.uuid;
+    const serviceDuration = services.find((service) => service.name === selectedService)?.durationMins;
 
     const [hours, minutes] = convertTime12to24(startTime, timeFormat);
 
@@ -69,7 +70,7 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
     const endDatetime = dayjs(
       new Date(dayjs(startDate).year(), dayjs(startDate).month(), dayjs(startDate).date(), hours, minutes),
     )
-      .add(serviceType.duration, 'minutes')
+      .add(serviceDuration, 'minutes')
       .toDate();
 
     const appointmentPayload: AppointmentPayload = {
