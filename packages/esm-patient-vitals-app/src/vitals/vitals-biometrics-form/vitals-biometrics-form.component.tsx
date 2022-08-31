@@ -283,7 +283,7 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
             </Column>
           </Row>
         </Stack>
-        <Stack className={`${styles.spacer} ${styles.grid}`}>
+        <Stack className={styles.spacer}>
           <Column className={styles.column}>
             <p className={styles.vitalsTitle}>{t('recordBiometrics', 'Record biometrics')}</p>
           </Column>
@@ -340,7 +340,7 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                   },
                 ]}
                 unitSymbol={biometricsUnitsSymbols['bmiUnit']}
-                disabled={true}
+                disabled
                 inputIsNormal={isBMIInNormalRange(patientBMI)}
               />
             </Column>
