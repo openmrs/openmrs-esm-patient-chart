@@ -38,7 +38,8 @@ const WorkspaceWindow: React.FC<ContextWorkspaceParams> = ({ patientUuid }) => {
     if (active && hidden) {
       updateWindowSize('normal');
     }
-  }, [workspaces, active, hidden, updateWindowSize]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [workspaces, active]);
 
   useBodyScrollLock(active && !isDesktop(layout));
 
