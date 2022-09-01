@@ -74,6 +74,7 @@ describe('VitalsHeader: ', () => {
     expect(screen.getByText(/Last recorded/i)).toBeInTheDocument();
     expect(screen.getByText(/19 — May — 2021/i)).toBeInTheDocument();
     expect(screen.getByText(/Record vitals/i)).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: /warning/i })).toBeInTheDocument();
 
     const expandButton = screen.getByTitle(/ChevronDown/);
 

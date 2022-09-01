@@ -229,14 +229,12 @@ export function assessValue(value: number, range: ObsMetaInfo): ObservationInter
   return 'normal';
 }
 
-export function assessAllValues(
-  vitals: PatientVitals,
-  config: ConfigObject,
-  conceptMetadata: Array<ConceptMetadata>,
-): Array<ObservationInterpretation> {
-  return Object.entries(vitals).map((key, value) => {
-    return assessValue(value, getReferenceRangesForConcept(config.concepts[`${key[0]}Uuid`], conceptMetadata));
-  });
+export function hasAbnormalValues(vitals: PatientVitals): boolean {
+  const interpretations = Object.entries(vitals)
+    .filter(([key]) => key.match(/interpretation/i))
+    .map(([, value]) => value);
+
+  return interpretations.some((value) => value !== 'normal');
 }
 
 export function getReferenceRangesForConcept(

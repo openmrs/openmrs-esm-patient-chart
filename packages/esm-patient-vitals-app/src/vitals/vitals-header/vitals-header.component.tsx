@@ -9,9 +9,9 @@ import { launchPatientWorkspace, useVitalsConceptMetadata } from '@openmrs/esm-p
 import { ConfigObject } from '../../config-schema';
 import { patientVitalsBiometricsFormWorkspace } from '../../constants';
 import {
-  assessAllValues,
   assessValue,
   getReferenceRangesForConcept,
+  hasAbnormalValues,
   interpretBloodPressure,
   useVitals,
 } from '../vitals.resource';
@@ -47,21 +47,18 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
 
   if (!isLoading && latestVitals && Object.keys(latestVitals).length && conceptMetadata?.length) {
     const isNotRecordedToday = !dayjs(latestVitals?.date).isToday();
-    const hasAbnormalValues = assessAllValues(latestVitals, config, conceptMetadata).some(
-      (value) => value !== 'normal',
-    );
 
     return (
       <div
         className={`${
-          latestVitals && hasAbnormalValues && isNotRecordedToday
+          Object.keys(latestVitals).length && hasAbnormalValues(latestVitals) && isNotRecordedToday
             ? styles['warning-background']
             : styles['default-background']
         }`}
       >
         <div className={styles['vitals-header']} role="button" tabIndex={0} onClick={toggleDetailsPanel}>
           <span className={styles.container}>
-            {hasAbnormalValues && isNotRecordedToday ? (
+            {hasAbnormalValues(latestVitals) && isNotRecordedToday ? (
               <WarningFilled
                 size={20}
                 title={'WarningFilled'}
@@ -107,7 +104,9 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
         {showDetailsPanel ? (
           <div
             className={
-              hasAbnormalValues && isNotRecordedToday ? `${styles['warning-border']}` : `${styles['default-border']}`
+              hasAbnormalValues(latestVitals) && isNotRecordedToday
+                ? `${styles['warning-border']}`
+                : `${styles['default-border']}`
             }
           >
             <div className={styles.row}>
