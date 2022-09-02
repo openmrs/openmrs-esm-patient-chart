@@ -259,7 +259,6 @@ function OrderBasketItemActions({
 }) {
   const { t } = useTranslation();
   const alreadyInBasket = items.some((x) => x.uuid === medication.uuid);
-
   const handleDiscontinueClick = useCallback(() => {
     setItems([
       ...items,
@@ -269,20 +268,20 @@ function OrderBasketItemActions({
         action: 'DISCONTINUE',
         drug: medication.drug,
         dosage: {
-          dosage: getDosage(medication.drug.strength, medication.dose),
-          numberOfPills: medication.dose,
+          value: medication.dose,
+          default: true,
         },
-        dosageUnit: {
-          uuid: medication.doseUnits.uuid,
-          name: medication.doseUnits.display,
+        unit: {
+          value: medication.doseUnits.display,
+          valueCoded: medication.doseUnits.uuid,
         },
         frequency: {
-          conceptUuid: medication.frequency.uuid,
-          name: medication.frequency.display,
+          valueCoded: medication.frequency.uuid,
+          value: medication.frequency.display,
         },
         route: {
-          conceptUuid: medication.route.uuid,
-          name: medication.route.display,
+          valueCoded: medication.route.uuid,
+          value: medication.route.display,
         },
         encounterUuid: medication.encounter.uuid,
         commonMedicationName: medication.drug.name,
@@ -302,6 +301,9 @@ function OrderBasketItemActions({
         pillsDispensed: medication.quantity,
         numRefills: medication.numRefills,
         indication: medication.orderReasonNonCoded,
+        orderer: medication.orderer.uuid,
+        careSetting: medication.careSetting.uuid,
+        quantityUnits: medication.quantityUnits.uuid,
       },
     ]);
     launchPatientWorkspace('order-basket-workspace');
@@ -317,20 +319,20 @@ function OrderBasketItemActions({
         action: 'REVISE',
         drug: medication.drug,
         dosage: {
-          dosage: getDosage(medication.drug.strength, medication.dose),
-          numberOfPills: medication.dose,
+          value: medication.dose,
+          default: true,
         },
-        dosageUnit: {
-          uuid: medication.doseUnits.uuid,
-          name: medication.doseUnits.display,
+        unit: {
+          value: medication.doseUnits.display,
+          valueCoded: medication.doseUnits.uuid,
         },
         frequency: {
-          conceptUuid: medication.frequency.uuid,
-          name: medication.frequency.display,
+          valueCoded: medication.frequency.uuid,
+          value: medication.frequency.display,
         },
         route: {
-          conceptUuid: medication.route.uuid,
-          name: medication.route.display,
+          valueCoded: medication.route.uuid,
+          value: medication.route.display,
         },
         encounterUuid: medication.encounter.uuid,
         commonMedicationName: medication.drug.name,
@@ -349,6 +351,9 @@ function OrderBasketItemActions({
         pillsDispensed: medication.quantity,
         numRefills: medication.numRefills,
         indication: medication.orderReasonNonCoded,
+        orderer: medication.orderer.uuid,
+        careSetting: medication.careSetting.uuid,
+        quantityUnits: medication.quantityUnits.uuid,
       },
     ]);
     launchPatientWorkspace('order-basket-workspace');
@@ -364,20 +369,20 @@ function OrderBasketItemActions({
         action: 'RENEWED',
         drug: medication.drug,
         dosage: {
-          dosage: getDosage(medication.drug.strength, medication.dose),
-          numberOfPills: medication.dose,
+          value: medication.dose,
+          default: true,
         },
-        dosageUnit: {
-          uuid: medication.doseUnits.uuid,
-          name: medication.doseUnits.display,
+        unit: {
+          value: medication.doseUnits.display,
+          valueCoded: medication.doseUnits.uuid,
         },
         frequency: {
-          conceptUuid: medication.frequency.uuid,
-          name: medication.frequency.display,
+          valueCoded: medication.frequency.uuid,
+          value: medication.frequency.display,
         },
         route: {
-          conceptUuid: medication.route.uuid,
-          name: medication.route.display,
+          valueCoded: medication.route.uuid,
+          value: medication.route.display,
         },
         encounterUuid: medication.encounter.uuid,
         commonMedicationName: medication.drug.name,
@@ -396,6 +401,9 @@ function OrderBasketItemActions({
         pillsDispensed: medication.quantity,
         numRefills: medication.numRefills,
         indication: medication.orderReasonNonCoded,
+        orderer: medication.orderer.uuid,
+        careSetting: medication.careSetting.uuid,
+        quantityUnits: medication.quantityUnits.uuid,
       },
     ]);
     launchPatientWorkspace('order-basket-workspace');

@@ -63,3 +63,8 @@
   color: #000;
   flex: 0 0 auto;
 }
+
+.searchResultSkeletonWrapper {
+  @extend .searchResultTile;
+  border-bottom: 1px solid $ui-03;
+}

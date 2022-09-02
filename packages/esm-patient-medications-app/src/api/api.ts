@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { ConfigObject, openmrsFetch, Session } from '@openmrs/esm-framework';
 import { OrderPost, PatientMedicationFetchResponse } from '../types/order';
 
 /**
@@ -60,6 +60,49 @@ export function getMedicationByUuid(abortController: AbortController, orderUuid:
       signal: abortController.signal,
     },
   );
+}
+
+export function getOrderTemplatesByDrug(drugUuid: string, abortController?: AbortController) {
+  return openmrsFetch(`/ws/rest/v1/ordertemplates/orderTemplate?drug=${drugUuid}&retired=${false}`, {
+    signal: abortController?.signal,
+  });
+}
+
+export function getCurrentOrderBasketEncounter(patientUuid: string, abortController?: AbortController) {
+  const [nowDateString] = new Date().toISOString().split('T');
+  return openmrsFetch(`/ws/rest/v1/encounter?patient=${patientUuid}&fromdate=${nowDateString}&limit=1`, {
+    signal: abortController?.signal,
+  });
+}
+
+export function createEmptyEncounter(
+  patientUuid: string,
+  sessionObject: Session,
+  orderBaskestConfig: ConfigObject,
+  abortController?: AbortController,
+) {
+  const emptyEncounter = {
+    patient: patientUuid,
+    location: sessionObject.sessionLocation.uuid,
+    encounterType: orderBaskestConfig.drugOrderEncounterType,
+    encounterDatetime: new Date().toISOString(),
+    encounterProviders: [
+      {
+        provider: sessionObject.currentProvider?.uuid,
+        encounterRole: orderBaskestConfig.clinicianEncounterRole,
+      },
+    ],
+    obs: [],
+  };
+
+  return openmrsFetch('/ws/rest/v1/encounter', {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    method: 'POST',
+    body: emptyEncounter,
+    signal: abortController?.signal,
+  });
 }
 
 export function postOrder(body: OrderPost, abortController?: AbortController) {
