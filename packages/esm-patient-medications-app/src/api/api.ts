@@ -28,8 +28,8 @@ export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any', 
 
   return {
     data: data ? drugOrders : null,
+    error: error,
     isLoading: !data && !error,
-    isError: error,
     isValidating,
   };
 }

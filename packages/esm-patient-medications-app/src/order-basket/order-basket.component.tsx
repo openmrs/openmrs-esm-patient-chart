@@ -41,7 +41,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
   const sessionObject = useSession();
   const {
     data: activePatientOrders,
-    isError,
+    error,
     isLoading: isLoadingOrders,
     isValidating,
   } = usePatientOrders(patientUuid, 'ACTIVE', config.careSettingUuid);
@@ -163,7 +163,9 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
           />
           {(() => {
             if (isLoadingOrders) return <DataTableSkeleton role="progressbar" />;
-            if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
+
+            if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
+
             if (activePatientOrders?.length) {
               return (
                 <MedicationsDetailsTable
@@ -177,6 +179,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
                 />
               );
             }
+
             return <EmptyState displayText={displayText} headerTitle={headerTitle} />;
           })()}
         </div>
