@@ -1,20 +1,20 @@
 import React, { useEffect, useState } from 'react';
-import OrderBasketSearch from './order-basket-search.component';
-import MedicationOrderForm from './medication-order-form.component';
-import OrderBasketItemList from './order-basket-item-list.component';
-import MedicationsDetailsTable from '../components/medications-details-table.component';
-import { Button, ButtonSet, DataTableSkeleton, InlineLoading } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
-import { OrderBasketItem } from '../types/order-basket-item';
-import { createEmptyEncounter, getCurrentOrderBasketEncounter, usePatientOrders } from '../api/api';
-import { createErrorHandler, showToast, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
-import { orderDrugs } from './drug-ordering';
-import { connect } from 'unistore/react';
-import { OrderBasketStore, OrderBasketStoreActions, orderBasketStoreActions } from '../medications/order-basket-store';
-import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
-import { ConfigObject } from '../config-schema';
-import styles from './order-basket.scss';
 import { useSWRConfig } from 'swr';
+import { connect } from 'unistore/react';
+import { Button, ButtonSet, DataTableSkeleton, InlineLoading } from '@carbon/react';
+import { createErrorHandler, showToast, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
+import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
+import { orderDrugs } from './drug-ordering';
+import { ConfigObject } from '../config-schema';
+import { createEmptyEncounter, getCurrentOrderBasketEncounter, usePatientOrders } from '../api/api';
+import { OrderBasketItem } from '../types/order-basket-item';
+import { OrderBasketStore, OrderBasketStoreActions, orderBasketStoreActions } from '../medications/order-basket-store';
+import MedicationOrderForm from './medication-order-form.component';
+import MedicationsDetailsTable from '../components/medications-details-table.component';
+import OrderBasketItemList from './order-basket-item-list.component';
+import OrderBasketSearch from './order-basket-search.component';
+import styles from './order-basket.scss';
 
 export interface OrderBasketProps {
   closeWorkspace(): void;
