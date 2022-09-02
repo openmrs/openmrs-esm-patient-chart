@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "@openmrs/esm-patient-common-lib": "^4.0.0",
-    "d3": "^7.0.3",
+    "d3": "^7.6.1",
     "lodash-es": "^4.17.15"
   },
   "peerDependencies": {

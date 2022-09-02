@@ -2005,7 +2005,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@carbon/grid@npm:^11.2.0, @carbon/grid@npm:^11.5.0":
+"@carbon/grid@npm:^11.5.0":
   version: 11.5.0
   resolution: "@carbon/grid@npm:11.5.0"
   dependencies:
@@ -2061,6 +2061,39 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@carbon/react@npm:^1.12.0":
+  version: 1.12.0
+  resolution: "@carbon/react@npm:1.12.0"
+  dependencies:
+    "@babel/runtime": ^7.18.3
+    "@carbon/feature-flags": ^0.8.0
+    "@carbon/icons-react": ^11.7.0
+    "@carbon/layout": ^11.5.0
+    "@carbon/styles": ^1.12.0
+    "@carbon/telemetry": 0.1.0
+    classnames: 2.3.1
+    copy-to-clipboard: ^3.3.1
+    downshift: 5.2.1
+    flatpickr: 4.6.9
+    invariant: ^2.2.3
+    lodash.debounce: ^4.0.8
+    lodash.findlast: ^4.5.0
+    lodash.isequal: ^4.5.0
+    lodash.omit: ^4.5.0
+    lodash.throttle: ^4.1.1
+    prop-types: ^15.7.2
+    react-is: ^17.0.2
+    use-resize-observer: ^6.0.0
+    wicg-inert: ^3.1.1
+    window-or-global: ^1.0.1
+  peerDependencies:
+    react: ^16.8.6 || ^17.0.1
+    react-dom: ^16.8.6 || ^17.0.1
+    sass: ^1.33.0
+  checksum: ec723fc7f57fc3f03836d302fc22d2fbbb3376d567ee6657b693761e78f21bcaf89c6236d57e141cf7dd53e13df026dbf2bbd68f2d363f30d7a9f1d6733f68ca
+  languageName: node
+  linkType: hard
+
 "@carbon/react@npm:^1.8.0":
   version: 1.11.0
   resolution: "@carbon/react@npm:1.11.0"
@@ -2094,39 +2127,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@carbon/react@npm:^1.9.0":
-  version: 1.9.0
-  resolution: "@carbon/react@npm:1.9.0"
-  dependencies:
-    "@babel/runtime": ^7.18.3
-    "@carbon/feature-flags": ^0.8.0
-    "@carbon/icons-react": ^11.7.0
-    "@carbon/layout": ^11.5.0
-    "@carbon/styles": ^1.9.0
-    "@carbon/telemetry": 0.1.0
-    classnames: 2.3.1
-    copy-to-clipboard: ^3.3.1
-    downshift: 5.2.1
-    flatpickr: 4.6.9
-    invariant: ^2.2.3
-    lodash.debounce: ^4.0.8
-    lodash.findlast: ^4.5.0
-    lodash.isequal: ^4.5.0
-    lodash.omit: ^4.5.0
-    lodash.throttle: ^4.1.1
-    prop-types: ^15.7.2
-    react-is: ^17.0.2
-    use-resize-observer: ^6.0.0
-    wicg-inert: ^3.1.1
-    window-or-global: ^1.0.1
-  peerDependencies:
-    react: ^16.8.6 || ^17.0.1
-    react-dom: ^16.8.6 || ^17.0.1
-    sass: ^1.33.0
-  checksum: de84cdbc8ec8a4abae8ec3446df32e32042c5b71028deb6d8da3c3a5e4b57f0ad5d756cb1f61518a8223abd3e357e37dc11a8446cf3f9a24ccbdbe86c5ef7f62
-  languageName: node
-  linkType: hard
-
 "@carbon/styles@npm:^1.11.0":
   version: 1.11.0
   resolution: "@carbon/styles@npm:1.11.0"
@@ -2145,7 +2145,25 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@carbon/styles@npm:^1.4.0, @carbon/styles@npm:^1.8.0, @carbon/styles@npm:^1.9.0":
+"@carbon/styles@npm:^1.12.0":
+  version: 1.12.0
+  resolution: "@carbon/styles@npm:1.12.0"
+  dependencies:
+    "@carbon/colors": ^11.4.0
+    "@carbon/feature-flags": ^0.8.0
+    "@carbon/grid": ^11.5.0
+    "@carbon/layout": ^11.5.0
+    "@carbon/motion": ^11.3.0
+    "@carbon/themes": ^11.8.0
+    "@carbon/type": ^11.8.0
+    "@ibm/plex": 6.0.0-next.6
+  peerDependencies:
+    sass: ^1.33.0
+  checksum: 382a0284a49f23e2c5fa304b55eccdf53f24420ec9aa527db5b472b4bb25dea7e8f88e755d0635b0b9e432326ef6db1698bddc050219fd3a940c0d1206fdc467
+  languageName: node
+  linkType: hard
+
+"@carbon/styles@npm:^1.4.0, @carbon/styles@npm:^1.8.0":
   version: 1.9.0
   resolution: "@carbon/styles@npm:1.9.0"
   dependencies:
@@ -2196,6 +2214,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@carbon/themes@npm:^11.8.0":
+  version: 11.8.0
+  resolution: "@carbon/themes@npm:11.8.0"
+  dependencies:
+    "@carbon/colors": ^11.4.0
+    "@carbon/layout": ^11.5.0
+    "@carbon/type": ^11.8.0
+    color: ^3.1.2
+  checksum: 99c23eeeeaa8821cffbf820396410c2e7429e5ffdd530ba75e8ef7cddf1cd8ace43dfdf6883d858e188eb5baee4d292019f521ffeab2dd7e4db7722f5416b497
+  languageName: node
+  linkType: hard
+
 "@carbon/type@npm:^11.6.0":
   version: 11.6.0
   resolution: "@carbon/type@npm:11.6.0"
@@ -2211,6 +2241,15 @@ __metadata:
   dependencies:
     "@carbon/grid": ^11.5.0
   checksum: 940a6e0d524b20c68cacd4c105ee3e95087809499c090ff4032823d29a7ffc91f05460d1109d549dadd5881e40de820d14bec60f0cab21aa0cb3b39b09544183
+  languageName: node
+  linkType: hard
+
+"@carbon/type@npm:^11.8.0":
+  version: 11.8.0
+  resolution: "@carbon/type@npm:11.8.0"
+  dependencies:
+    "@carbon/grid": ^11.5.0
+  checksum: 3dcbcff46f1911225b5d5ac76a29e4f475f7f6245f3ba678c2e4ad51f9ca18db5fb63ba5957c51c27aa68618979c02f3147ffa12e1d53d376846944011453d36
   languageName: node
   linkType: hard
 
@@ -4409,9 +4448,9 @@ __metadata:
   resolution: "@openmrs/esm-generic-patient-widgets-app@workspace:packages/esm-generic-patient-widgets-app"
   dependencies:
     "@carbon/charts-react": ^1.5.2
-    "@carbon/react": ^1.9.0
+    "@carbon/react": ^1.12.0
     "@openmrs/esm-patient-common-lib": ^4.0.0
-    d3: ^7.0.3
+    d3: ^7.6.1
     lodash-es: ^4.17.15
     webpack: ^5.74.0
   peerDependencies:
@@ -4456,9 +4495,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-allergies-app@workspace:packages/esm-patient-allergies-app"
   dependencies:
-    "@carbon/react": ^1.9.0
+    "@carbon/react": ^1.12.0
     "@openmrs/esm-patient-common-lib": ^4.0.0
-    d3: ^7.0.3
+    d3: ^7.6.1
     lodash-es: ^4.17.15
     webpack: ^5.74.0
   peerDependencies:
@@ -4477,7 +4516,7 @@ __metadata:
   resolution: "@openmrs/esm-patient-appointments-app@workspace:packages/esm-patient-appointments-app"
   dependencies:
     "@openmrs/esm-patient-common-lib": ^4.0.0
-    d3: ^7.0.3
+    d3: ^7.6.1
     lodash-es: ^4.17.15
     webpack: ^5.74.0
   peerDependencies:
@@ -4495,9 +4534,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-attachments-app@workspace:packages/esm-patient-attachments-app"
   dependencies:
-    "@carbon/react": ^1.9.0
+    "@carbon/react": ^1.12.0
     "@openmrs/esm-patient-common-lib": ^4.0.0
-    d3: ^7.0.3
+    d3: ^7.6.1
     lodash-es: ^4.17.15
     react-grid-gallery: ^0.5.5
     react-html5-camera-photo: ^1.5.4
@@ -4517,9 +4556,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-banner-app@workspace:packages/esm-patient-banner-app"
   dependencies:
-    "@carbon/react": ^1.9.0
+    "@carbon/react": ^1.12.0
     "@openmrs/esm-patient-common-lib": ^4.0.0
-    d3: ^7.0.3
+    d3: ^7.6.1
     lodash-es: ^4.17.15
     webpack: ^5.74.0
   peerDependencies:
@@ -4538,10 +4577,9 @@ __metadata:
   resolution: "@openmrs/esm-patient-biometrics-app@workspace:packages/esm-patient-biometrics-app"
   dependencies:
     "@carbon/charts-react": ^1.5.2
-    "@carbon/grid": ^11.2.0
-    "@carbon/react": ^1.9.0
+    "@carbon/react": ^1.12.0
     "@openmrs/esm-patient-common-lib": ^4.0.0
-    d3: ^7.4.4
+    d3: ^7.6.1
     lodash-es: ^4.17.15
     webpack: ^5.74.0
   peerDependencies:
@@ -4644,7 +4682,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-common-lib@workspace:packages/esm-patient-common-lib"
   dependencies:
-    "@carbon/react": ^1.9.0
+    "@carbon/react": ^1.12.0
     lodash-es: ^4.17.15
     uuid: ^8.3.2
   peerDependencies:
@@ -4658,9 +4696,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-conditions-app@workspace:packages/esm-patient-conditions-app"
   dependencies:
-    "@carbon/react": ^1.9.0
+    "@carbon/react": ^1.12.0
     "@openmrs/esm-patient-common-lib": ^4.0.0
-    d3: ^7.0.3
+    d3: ^7.6.1
     lodash-es: ^4.17.15
     webpack: ^5.74.0
   peerDependencies:
@@ -4678,9 +4716,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-forms-app@workspace:packages/esm-patient-forms-app"
   dependencies:
-    "@carbon/react": ^1.9.0
+    "@carbon/react": ^1.12.0
     "@openmrs/esm-patient-common-lib": ^4.0.0
-    d3: ^7.0.3
+    d3: ^7.6.1
     lodash-es: ^4.17.15
     webpack: ^5.74.0
   peerDependencies:
@@ -4698,9 +4736,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-immunizations-app@workspace:packages/esm-patient-immunizations-app"
   dependencies:
-    "@carbon/react": ^1.9.0
+    "@carbon/react": ^1.12.0
     "@openmrs/esm-patient-common-lib": ^4.0.0
-    d3: ^7.0.3
+    d3: ^7.6.1
     lodash-es: ^4.17.15
     webpack: ^5.74.0
   peerDependencies:
@@ -4718,9 +4756,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-medications-app@workspace:packages/esm-patient-medications-app"
   dependencies:
-    "@carbon/react": ^1.9.0
+    "@carbon/react": ^1.12.0
     "@openmrs/esm-patient-common-lib": ^4.0.0
-    d3: ^7.0.3
+    d3: ^7.6.1
     lodash-es: ^4.17.15
     webpack: ^5.74.0
   peerDependencies:
@@ -4739,7 +4777,7 @@ __metadata:
   resolution: "@openmrs/esm-patient-notes-app@workspace:packages/esm-patient-notes-app"
   dependencies:
     "@openmrs/esm-patient-common-lib": ^4.0.0
-    d3: ^7.0.3
+    d3: ^7.6.1
     lodash-es: ^4.17.15
     webpack: ^5.74.0
   peerDependencies:
@@ -4757,9 +4795,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-programs-app@workspace:packages/esm-patient-programs-app"
   dependencies:
-    "@carbon/react": ^1.9.0
+    "@carbon/react": ^1.12.0
     "@openmrs/esm-patient-common-lib": ^4.0.0
-    d3: ^7.0.3
+    d3: ^7.6.1
     lodash-es: ^4.17.15
     webpack: ^5.74.0
   peerDependencies:
@@ -4778,7 +4816,7 @@ __metadata:
   resolution: "@openmrs/esm-patient-test-results-app@workspace:packages/esm-patient-test-results-app"
   dependencies:
     "@carbon/charts-react": ^1.5.2
-    "@carbon/react": ^1.9.0
+    "@carbon/react": ^1.12.0
     "@openmrs/esm-patient-common-lib": ^4.0.0
     d3: ^7.6.1
     lodash-es: ^4.17.15
@@ -4798,7 +4836,7 @@ __metadata:
   resolution: "@openmrs/esm-patient-vitals-app@workspace:packages/esm-patient-vitals-app"
   dependencies:
     "@carbon/charts-react": ^1.5.2
-    "@carbon/react": ^1.9.0
+    "@carbon/react": ^1.12.0
     "@openmrs/esm-patient-common-lib": ^4.0.0
     d3: ^7.6.1
     lodash-es: ^4.17.15
@@ -10215,7 +10253,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"d3@npm:^7.0.3, d3@npm:^7.4.4, d3@npm:^7.6.1":
+"d3@npm:^7.6.1":
   version: 7.6.1
   resolution: "d3@npm:7.6.1"
   dependencies:
