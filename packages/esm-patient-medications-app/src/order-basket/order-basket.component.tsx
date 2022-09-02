@@ -14,6 +14,7 @@ import { OrderBasketStore, OrderBasketStoreActions, orderBasketStoreActions } fr
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { ConfigObject } from '../config-schema';
 import styles from './order-basket.scss';
+import { useSWRConfig } from 'swr';
 
 export interface OrderBasketProps {
   closeWorkspace(): void;
@@ -25,6 +26,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
   orderBasketStoreActions,
 )(({ patientUuid, items, closeWorkspace, setItems }: OrderBasketProps & OrderBasketStore & OrderBasketStoreActions) => {
   const { t } = useTranslation();
+  const { mutate } = useSWRConfig();
   const displayText = t('activeMedicationsDisplayText', 'Active medications');
   const headerTitle = t('activeMedicationsHeaderTitle', 'active medications');
   const isTablet = useLayoutType() === 'tablet';
@@ -106,6 +108,8 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
             'Your order is complete. The items will now appear on the Orders page.',
           ),
         });
+
+        mutate(`/ws/rest/v1/order`);
       }
     });
     return () => abortController.abort();
@@ -131,64 +135,60 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
     );
   };
 
+  if (isLoading) return <InlineLoading className={styles.loader} description={t('loading', 'Loading...')} />;
+
+  if (isMedicationOrderFormVisible) {
+    return (
+      <MedicationOrderForm
+        initialOrderBasketItem={medicationOrderFormItem}
+        onSign={onMedicationOrderFormSigned}
+        onCancel={() => setIsMedicationOrderFormVisible(false)}
+      />
+    );
+  }
+
   return (
     <>
-      {(() => {
-        if (isLoading) return <InlineLoading className={styles.loader} description={t('loading', 'Loading...')} />;
-        if (isMedicationOrderFormVisible) {
-          return (
-            <MedicationOrderForm
-              initialOrderBasketItem={medicationOrderFormItem}
-              onSign={onMedicationOrderFormSigned}
-              onCancel={() => setIsMedicationOrderFormVisible(false)}
-            />
-          );
-        }
-        return (
-          <>
-            <OrderBasketSearch encounterUuid={encounterUuid} onSearchResultClicked={handleSearchResultClicked} />
-            <div className={styles.container}>
-              <div className={styles.orderBasketContainer}>
-                <OrderBasketItemList
-                  orderBasketItems={items}
-                  onItemClicked={(order) => openMedicationOrderFormForUpdatingExistingOrder(items.indexOf(order))}
-                  onItemRemoveClicked={(order) => {
-                    const newOrders = [...items];
-                    newOrders.splice(items.indexOf(order), 1);
-                    setItems(newOrders);
-                  }}
+      <OrderBasketSearch encounterUuid={encounterUuid} onSearchResultClicked={handleSearchResultClicked} />
+      <div className={styles.container}>
+        <div className={styles.orderBasketContainer}>
+          <OrderBasketItemList
+            orderBasketItems={items}
+            onItemClicked={(order) => openMedicationOrderFormForUpdatingExistingOrder(items.indexOf(order))}
+            onItemRemoveClicked={(order) => {
+              const newOrders = [...items];
+              newOrders.splice(items.indexOf(order), 1);
+              setItems(newOrders);
+            }}
+          />
+          {(() => {
+            if (isLoadingOrders) return <DataTableSkeleton role="progressbar" />;
+            if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
+            if (activePatientOrders?.length) {
+              return (
+                <MedicationsDetailsTable
+                  isValidating={isValidating}
+                  title={t('activeMedicationsTableTitle', 'Active Medications')}
+                  medications={activePatientOrders}
+                  showDiscontinueButton={true}
+                  showModifyButton={true}
+                  showReorderButton={false}
+                  showAddNewButton={false}
                 />
-                {(() => {
-                  if (isLoadingOrders) return <DataTableSkeleton role="progressbar" />;
-                  if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
-                  if (activePatientOrders?.length) {
-                    return (
-                      <MedicationsDetailsTable
-                        isValidating={isValidating}
-                        title={t('activeMedicationsTableTitle', 'Active Medications')}
-                        medications={activePatientOrders}
-                        showDiscontinueButton={true}
-                        showModifyButton={true}
-                        showReorderButton={false}
-                        showAddNewButton={false}
-                      />
-                    );
-                  }
-                  return <EmptyState displayText={displayText} headerTitle={headerTitle} />;
-                })()}
-              </div>
-              <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-                <Button className={styles.button} kind="secondary" onClick={handleCancelClicked}>
-                  {t('cancel', 'Cancel')}
-                </Button>
-                <Button className={styles.button} kind="primary" onClick={handleSaveClicked}>
-                  {t('signAndClose', 'Sign and close')}
-                </Button>
-              </ButtonSet>
-            </div>
-          </>
-        );
-      })()}
+              );
+            }
+            return <EmptyState displayText={displayText} headerTitle={headerTitle} />;
+          })()}
+        </div>
+        <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
+          <Button className={styles.button} kind="secondary" onClick={handleCancelClicked}>
+            {t('cancel', 'Cancel')}
+          </Button>
+          <Button className={styles.button} kind="primary" onClick={handleSaveClicked}>
+            {t('signAndClose', 'Sign and close')}
+          </Button>
+        </ButtonSet>
+      </div>
     </>
   );
 });
