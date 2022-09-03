@@ -99,7 +99,8 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
             )}
           </div>
           <div className={styles.demographics}>
-            <span>{capitalize(patient.gender)}</span> &middot; <span>{age(patient.birthDate)}</span> &middot;{' '}
+            <span>{t('capitalizedGender', capitalize(patient.gender))}</span> &middot;{' '}
+            <span>{age(patient.birthDate)}</span> &middot;{' '}
             <span>{formatDate(parseDate(patient.birthDate), { mode: 'wide', time: false })}</span>
           </div>
           <div className={styles.row}>

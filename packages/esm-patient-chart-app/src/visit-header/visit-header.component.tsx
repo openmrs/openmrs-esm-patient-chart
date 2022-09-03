@@ -20,13 +20,13 @@ import {
   useVisit,
   navigate,
 } from '@openmrs/esm-framework';
-import { launchPatientWorkspace } from './workspaces';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import VisitHeaderSideMenu from './visit-header-side-menu.component';
 import styles from './visit-header.scss';
 
-const PatientInfo = ({ patient, isTabletView }) => {
+const PatientInfo = ({ patient, isTabletView, translate }) => {
   const name = `${patient?.name?.[0].given?.join(' ')} ${patient?.name?.[0].family}`;
-  const info = `${parseInt(age(patient.birthDate))}, ${capitalize(patient.gender)}`;
+  const info = `${parseInt(age(patient.birthDate))}, ${translate('capitalizedGender', capitalize(patient.gender))}`;
   const tooltipText = `${name} ${info}`;
   const truncate = !isTabletView && name.trim().length > 25;
 
@@ -103,7 +103,7 @@ const VisitHeader: React.FC = () => {
             </ConfigurableLink>
             <div className={styles.navDivider} />
             <div className={styles.patientDetails}>
-              <PatientInfo patient={patient} isTabletView={isTabletViewPort} />
+              <PatientInfo patient={patient} isTabletView={isTabletViewPort} translate={t} />
             </div>
             <HeaderGlobalBar>
               {noActiveVisit && (
