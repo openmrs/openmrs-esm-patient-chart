@@ -26,7 +26,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
   orderBasketStoreActions,
 )(({ patientUuid, items, closeWorkspace, setItems }: OrderBasketProps & OrderBasketStore & OrderBasketStoreActions) => {
   const { t } = useTranslation();
-  const { mutate } = useSWRConfig();
+  const { cache, mutate }: { cache: any; mutate: Function } = useSWRConfig();
   const displayText = t('activeMedicationsDisplayText', 'Active medications');
   const headerTitle = t('activeMedicationsHeaderTitle', 'active medications');
   const isTablet = useLayoutType() === 'tablet';
@@ -109,7 +109,14 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
           ),
         });
 
-        mutate(`/ws/rest/v1/order`);
+        const apiUrlPattern = new RegExp(
+          '\\/ws\\/rest\\/v1\\/order\\?patient\\=' + patientUuid + '\\&careSetting=' + config.careSettingUuid,
+        );
+
+        // Find matching keys from SWR's cache and broadcast a revalidation message to their pre-bound SWR hooks
+        Array.from(cache.keys())
+          .filter((url: string) => apiUrlPattern.test(url))
+          .forEach((url: string) => mutate(url));
       }
     });
     return () => abortController.abort();
