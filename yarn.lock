@@ -4497,7 +4497,6 @@ __metadata:
   dependencies:
     "@carbon/react": ^1.12.0
     "@openmrs/esm-patient-common-lib": ^4.0.0
-    d3: ^7.6.1
     lodash-es: ^4.17.15
     webpack: ^5.74.0
   peerDependencies:
@@ -4516,7 +4515,6 @@ __metadata:
   resolution: "@openmrs/esm-patient-appointments-app@workspace:packages/esm-patient-appointments-app"
   dependencies:
     "@openmrs/esm-patient-common-lib": ^4.0.0
-    d3: ^7.6.1
     lodash-es: ^4.17.15
     webpack: ^5.74.0
   peerDependencies:
@@ -4536,7 +4534,6 @@ __metadata:
   dependencies:
     "@carbon/react": ^1.12.0
     "@openmrs/esm-patient-common-lib": ^4.0.0
-    d3: ^7.6.1
     lodash-es: ^4.17.15
     react-grid-gallery: ^0.5.5
     react-html5-camera-photo: ^1.5.4
@@ -4558,7 +4555,6 @@ __metadata:
   dependencies:
     "@carbon/react": ^1.12.0
     "@openmrs/esm-patient-common-lib": ^4.0.0
-    d3: ^7.6.1
     lodash-es: ^4.17.15
     webpack: ^5.74.0
   peerDependencies:
@@ -4698,7 +4694,6 @@ __metadata:
   dependencies:
     "@carbon/react": ^1.12.0
     "@openmrs/esm-patient-common-lib": ^4.0.0
-    d3: ^7.6.1
     lodash-es: ^4.17.15
     webpack: ^5.74.0
   peerDependencies:
@@ -4718,7 +4713,6 @@ __metadata:
   dependencies:
     "@carbon/react": ^1.12.0
     "@openmrs/esm-patient-common-lib": ^4.0.0
-    d3: ^7.6.1
     lodash-es: ^4.17.15
     webpack: ^5.74.0
   peerDependencies:
@@ -4738,7 +4732,6 @@ __metadata:
   dependencies:
     "@carbon/react": ^1.12.0
     "@openmrs/esm-patient-common-lib": ^4.0.0
-    d3: ^7.6.1
     lodash-es: ^4.17.15
     webpack: ^5.74.0
   peerDependencies:
@@ -4758,7 +4751,6 @@ __metadata:
   dependencies:
     "@carbon/react": ^1.12.0
     "@openmrs/esm-patient-common-lib": ^4.0.0
-    d3: ^7.6.1
     lodash-es: ^4.17.15
     webpack: ^5.74.0
   peerDependencies:
@@ -4777,7 +4769,6 @@ __metadata:
   resolution: "@openmrs/esm-patient-notes-app@workspace:packages/esm-patient-notes-app"
   dependencies:
     "@openmrs/esm-patient-common-lib": ^4.0.0
-    d3: ^7.6.1
     lodash-es: ^4.17.15
     webpack: ^5.74.0
   peerDependencies:
@@ -4797,7 +4788,6 @@ __metadata:
   dependencies:
     "@carbon/react": ^1.12.0
     "@openmrs/esm-patient-common-lib": ^4.0.0
-    d3: ^7.6.1
     lodash-es: ^4.17.15
     webpack: ^5.74.0
   peerDependencies:
@@ -4815,6 +4805,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-test-results-app@workspace:packages/esm-patient-test-results-app"
   dependencies:
+    "@carbon/charts": ^1.5.2
     "@carbon/charts-react": ^1.5.2
     "@carbon/react": ^1.12.0
     "@openmrs/esm-patient-common-lib": ^4.0.0
