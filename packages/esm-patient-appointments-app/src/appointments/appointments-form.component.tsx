@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
+import { openmrsFetch } from '@openmrs/esm-framework';
 import dayjs from 'dayjs';
 import {
   Button,
@@ -39,6 +40,7 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
   const [startTime, setStartTime] = useState(dayjs(new Date()).format('hh:mm'));
   const [timeFormat, setTimeFormat] = useState<amPm>(new Date().getHours() >= 12 ? 'PM' : 'AM');
   const [userLocation, setUserLocation] = useState('');
+  const [serviceTypes, setServiceTypes] = useState(Object);
 
   if (!userLocation && session?.sessionLocation?.uuid) {
     setUserLocation(session?.sessionLocation?.uuid);
@@ -46,10 +48,24 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
 
   const { data: services, isLoading } = useAppointmentService();
 
-  let serviceTypes;
-  if (services?.length) {
-    [{ serviceTypes }] = services;
-  }
+  const loadServiceTypes = (event) => {
+    const serviceUuid = services.find((service) => service.name === event.target.value)?.uuid;
+    console.log(serviceUuid);
+    const abortController = new AbortController();
+    openmrsFetch(`/ws/rest/v1/appointmentServiceTypes?uuid=${serviceUuid}`, {
+      signal: abortController.signal,
+    })
+    .then(response => {
+        console.log("Got service types data: " + JSON.stringify(response.data));
+        setSelectedServiceType(null);
+        setServiceTypes(response.data);
+      })
+      .catch(err => {
+        console.error("Got service types error: " + err.status);
+        setSelectedServiceType(null);
+        setServiceTypes(null);
+      });
+  };
 
   const handleSubmit = () => {
     if (!selectedServiceType) return;
@@ -226,8 +242,11 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
             invalidText="Required"
             labelText={t('selectService', 'Select a service')}
             light={isTablet}
-            onChange={(event) => setSelectedService(event.target.value)}
-            value={selectedServiceType}
+            onChange={(event) => {
+              setSelectedService(event.target.value);
+              loadServiceTypes(event);
+            }}
+            value={selectedService}
           >
             {!selectedService ? <SelectItem text={t('chooseService', 'Select service')} value="" /> : null}
             {services?.length > 0 &&
@@ -245,7 +264,9 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
             invalidText="Required"
             labelText="Select the type of service"
             light={isTablet}
-            onChange={(event) => setSelectedServiceType(event.target.value)}
+            onChange={(event) => {
+              setSelectedServiceType(event.target.value)
+            }}
             value={selectedServiceType}
           >
             {!selectedServiceType ? <SelectItem text={t('chooseService', 'Select service type')} value="" /> : null}

@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { AppointmentPayload, AppointmentService, AppointmentsFetchResponse } from '../types';
+import { AppointmentPayload, AppointmentService, AppointmentsFetchResponse, ServiceTypes } from '../types';
 
 export const appointmentsSearchUrl = `/ws/rest/v1/appointments/search`;
 
