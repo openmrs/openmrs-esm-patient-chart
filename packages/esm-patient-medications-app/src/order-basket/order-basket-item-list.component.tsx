@@ -1,9 +1,9 @@
 import React from 'react';
+import { Layer, Tile } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useLayoutType } from '@openmrs/esm-framework';
-import { Tile } from '@carbon/react';
-import OrderBasketItemTile from './order-basket-item.component';
 import { OrderBasketItem } from '../types/order-basket-item';
+import OrderBasketItemTile from './order-basket-item.component';
 import styles from './order-basket-item-list.scss';
 
 export interface OrderBasketItemListProps {
@@ -27,13 +27,15 @@ export default function OrderBasketItemList({
   return (
     <div className={isTablet ? `${styles.orderBasketContainerTablet}` : `${styles.orderBasketContainerDesktop}`}>
       {orderBasketItems.length === 0 && (
-        <Tile className={isTablet ? `${styles.tabletTile}` : `${styles.desktopTile}`}>
-          <div className={isTablet ? styles.tabletHeading : styles.desktopHeading}>
-            <h4>{t('orderBasket', 'Order Basket')}</h4>
-          </div>
-          <p className={styles.content}>{t('emptyOrderBasket', 'Your basket is empty')}</p>
-          <p className={styles.actionText}>{t('searchForAnOrder', 'Search for an order above')}</p>
-        </Tile>
+        <Layer>
+          <Tile className={isTablet ? `${styles.tabletTile}` : `${styles.desktopTile}`}>
+            <div className={isTablet ? styles.tabletHeading : styles.desktopHeading}>
+              <h4>{t('orderBasket', 'Order Basket')}</h4>
+            </div>
+            <p className={styles.content}>{t('emptyOrderBasket', 'Your basket is empty')}</p>
+            <p className={styles.actionText}>{t('searchForAnOrder', 'Search for an order above')}</p>
+          </Tile>
+        </Layer>
       )}
 
       {newOrderBasketItems.length > 0 && (

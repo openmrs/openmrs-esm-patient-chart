@@ -17,8 +17,8 @@ import { ArrowLeft } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { isDesktop, useLayoutType } from '@openmrs/esm-framework';
 import { OrderBasketItem } from '../types/order-basket-item';
-import styles from './medication-order-form.scss';
 import { useOrderConfig } from '../api/order-config';
+import styles from './medication-order-form.scss';
 
 export interface MedicationOrderFormProps {
   initialOrderBasketItem: OrderBasketItem;
