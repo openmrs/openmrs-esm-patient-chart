@@ -11,7 +11,7 @@ import {
   navigate,
 } from '@openmrs/esm-framework';
 import { mockPatient, mockPatientWithLongName } from '../../../../__mocks__/patient.mock';
-import { registerWorkspace, launchPatientWorkspace } from './workspaces';
+import { registerWorkspace, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import VisitHeader from './visit-header.component';
 
 const mockUseAssignedExtensions = useAssignedExtensions as jest.Mock;
@@ -38,8 +38,8 @@ jest.mock('@openmrs/esm-framework', () => {
   };
 });
 
-jest.mock('./workspaces', () => {
-  const originalModule = jest.requireActual('./workspaces');
+jest.mock('@openmrs/esm-patient-common-lib', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
   return {
     ...originalModule,
     launchPatientWorkspace: jest.fn(),
