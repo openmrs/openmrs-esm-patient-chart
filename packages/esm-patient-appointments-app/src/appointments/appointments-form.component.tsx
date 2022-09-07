@@ -55,13 +55,13 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
     openmrsFetch(`/ws/rest/v1/appointmentServiceTypes?uuid=${serviceUuid}`, {
       signal: abortController.signal,
     })
-    .then(response => {
-        console.log("Got service types data: " + JSON.stringify(response.data));
+      .then((response) => {
+        console.log('Got service types data: ' + JSON.stringify(response.data));
         setSelectedServiceType(null);
         setServiceTypes(response.data);
       })
-      .catch(err => {
-        console.error("Got service types error: " + err.status);
+      .catch((err) => {
+        console.error('Got service types error: ' + err.status);
         setSelectedServiceType(null);
         setServiceTypes(null);
       });
@@ -265,7 +265,7 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
             labelText="Select the type of service"
             light={isTablet}
             onChange={(event) => {
-              setSelectedServiceType(event.target.value)
+              setSelectedServiceType(event.target.value);
             }}
             value={selectedServiceType}
           >
