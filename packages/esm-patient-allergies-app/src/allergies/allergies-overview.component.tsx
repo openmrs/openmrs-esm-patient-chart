@@ -37,7 +37,7 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient, showAddA
   const displayText = t('allergyIntolerances', 'allergy intolerances');
   const headerTitle = t('allergies', 'Allergies');
   const urlLabel = t('seeAll', 'See all');
-  const pageUrl = window.spaBase + basePath + '/allergies';
+  const pageUrl = `\${openmrsSpaBase}/patient/${patient.id}/chart/Allergies`;
 
   const { allergies, isError, isLoading, isValidating } = useAllergies(patient.id);
   const { results: paginatedAllergies, goTo, currentPage } = usePagination(allergies ?? [], allergiesCount);

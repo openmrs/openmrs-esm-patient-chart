@@ -41,7 +41,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
   const displayText = t('programs', 'Program enrollments');
   const headerTitle = t('carePrograms', 'Care Programs');
   const urlLabel = t('seeAll', 'See all');
-  const pageUrl = window.spaBase + basePath + '/programs';
+  const pageUrl = `\${openmrsSpaBase}/patient/${patientUuid}/chart/Programs`;
   const isConfigurable = config.customUrl ? true : false;
 
   const {
