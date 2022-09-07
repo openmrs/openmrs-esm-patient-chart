@@ -53,8 +53,8 @@ export function DashboardView({ dashboard, patientUuid, patient }: DashboardView
 
   return (
     <>
-      {dashboard.title && <h1 className={styles.dashboardTitle}>{dashboard.title}</h1>}
       <ExtensionSlot state={state} extensionSlotName="top-of-all-patient-dashboards-slot" />
+      {dashboard.title && <h1 className={styles.dashboardTitle}>{dashboard.title}</h1>}
       <ExtensionSlot
         key={dashboard.slot}
         extensionSlotName={dashboard.slot}
