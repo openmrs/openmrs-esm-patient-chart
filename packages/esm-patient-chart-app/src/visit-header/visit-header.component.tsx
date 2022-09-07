@@ -78,58 +78,58 @@ const VisitHeader: React.FC = () => {
       return null;
     }
 
-    return (
-      <>
-        {Object.keys(patient ?? {}).length > 0 && (
-          <Header aria-label="OpenMRS" className={styles.topNavHeader}>
-            {showHamburger && (
-              <HeaderMenuButton
-                aria-label="Open menu"
-                isCollapsible
-                className={styles.headerMenuButton}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  toggleSideMenu();
-                }}
-                isActive={isSideMenuExpanded}
-              />
-            )}
-            <ConfigurableLink className={styles.navLogo} to="${openmrsSpaBase}/home">
-              <div className={styles.divider}>
-                <svg role="img" width={110} height={40}>
-                  <use xlinkHref="#omrs-logo-white"></use>
-                </svg>
-              </div>
-            </ConfigurableLink>
-            <div className={styles.navDivider} />
-            <div className={styles.patientDetails}>
-              <PatientInfo patient={patient} isTabletView={isTabletViewPort} translate={t} />
+    if (Object.keys(patient ?? {}).length > 0) {
+      return (
+        <Header aria-label="OpenMRS" className={styles.topNavHeader}>
+          {showHamburger && (
+            <HeaderMenuButton
+              aria-label="Open menu"
+              isCollapsible
+              className={styles.headerMenuButton}
+              onClick={(event) => {
+                event.stopPropagation();
+                toggleSideMenu();
+              }}
+              isActive={isSideMenuExpanded}
+            />
+          )}
+          <ConfigurableLink className={styles.navLogo} to="${openmrsSpaBase}/home">
+            <div className={styles.divider}>
+              <svg role="img" width={110} height={40}>
+                <use xlinkHref="#omrs-logo-white"></use>
+              </svg>
             </div>
-            <HeaderGlobalBar>
-              {noActiveVisit && (
-                <HeaderGlobalAction
-                  className={styles.headerGlobalBarButton}
-                  aria-label={t('startVisit', 'Start a visit')}
-                  onClick={launchStartVisitForm}
-                >
-                  <Button as="div" className={styles.startVisitButton}>
-                    {t('startVisit', 'Start a visit')}
-                  </Button>
-                </HeaderGlobalAction>
-              )}
+          </ConfigurableLink>
+          <div className={styles.navDivider} />
+          <div className={styles.patientDetails}>
+            <PatientInfo patient={patient} isTabletView={isTabletViewPort} translate={t} />
+          </div>
+          <HeaderGlobalBar>
+            {noActiveVisit && (
               <HeaderGlobalAction
-                className={styles.headerGlobalBarCloseButton}
-                aria-label={t('close', 'Close')}
-                onClick={onClosePatientChart}
+                className={styles.headerGlobalBarButton}
+                aria-label={t('startVisit', 'Start a visit')}
+                onClick={launchStartVisitForm}
               >
-                <CloseFilled size={20} />
+                <Button as="div" className={styles.startVisitButton}>
+                  {t('startVisit', 'Start a visit')}
+                </Button>
               </HeaderGlobalAction>
-            </HeaderGlobalBar>
-            <VisitHeaderSideMenu isExpanded={isSideMenuExpanded} toggleSideMenu={toggleSideMenu} />
-          </Header>
-        )}
-      </>
-    );
+            )}
+            <HeaderGlobalAction
+              className={styles.headerGlobalBarCloseButton}
+              aria-label={t('close', 'Close')}
+              onClick={onClosePatientChart}
+            >
+              <CloseFilled size={20} />
+            </HeaderGlobalAction>
+          </HeaderGlobalBar>
+          <VisitHeaderSideMenu isExpanded={isSideMenuExpanded} toggleSideMenu={toggleSideMenu} />
+        </Header>
+      );
+    } else {
+      return null;
+    }
   }, [
     launchStartVisitForm,
     isSideMenuExpanded,
