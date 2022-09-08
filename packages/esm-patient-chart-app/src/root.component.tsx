@@ -8,6 +8,7 @@ import WorkspaceWindow from './workspace/workspace-window.component';
 import PatientChart from './patient-chart/patient-chart.component';
 import SideMenu from './side-nav/side-menu.component';
 import styles from './root.scss';
+import VisitHeader from './visit-header/visit-header.component';
 
 const swrConfiguration = {
   // Maximum number of retries when the backend returns an error
@@ -27,6 +28,7 @@ export default function Root() {
       <BrowserRouter basename={spaRoot}>
         <WorkspaceWindowSizeProvider>
           <div className={styles.patientChartWrapper}>
+            <VisitHeader />
             <SideMenu />
             <Routes>
               <Route path={basePath} element={<PatientChart />} />
