@@ -57,6 +57,21 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
     setShowDropdown((value) => !value);
   }, []);
 
+  const getGender = (gender) => {
+    switch (gender) {
+      case 'male':
+        return t('male', 'Male');
+      case 'female':
+        return t('female', 'Female');
+      case 'other':
+        return t('other', 'Other');
+      case 'unknown':
+        return t('unknown', 'Unknown');
+      default:
+        return gender;
+    }
+  };
+
   return (
     <div className={styles.container} role="banner">
       <div
@@ -99,8 +114,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
             )}
           </div>
           <div className={styles.demographics}>
-            <span>{t('capitalizedGender', capitalize(patient.gender))}</span> &middot;{' '}
-            <span>{age(patient.birthDate)}</span> &middot;{' '}
+            <span>{getGender(patient.gender)}</span> &middot; <span>{age(patient.birthDate)}</span> &middot;{' '}
             <span>{formatDate(parseDate(patient.birthDate), { mode: 'wide', time: false })}</span>
           </div>
           <div className={styles.row}>
