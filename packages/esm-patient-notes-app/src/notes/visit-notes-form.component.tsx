@@ -266,6 +266,8 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
       patientUuid,
       providerUuid,
       combinedDiagnoses,
+      selectedPrimaryDiagnoses,
+      selectedSecondaryDiagnoses,
       t,
       visitDateTime,
     ],
