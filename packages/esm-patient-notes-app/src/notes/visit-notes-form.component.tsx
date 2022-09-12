@@ -214,7 +214,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
           if (response.status === 201) {
             return Promise.all(
               combinedDiagnoses.map((diagnosis, position: number) => {
-                let diagnosisPayload: DiagnosisPayload = {
+                const diagnosisPayload: DiagnosisPayload = {
                   encounter: response.data.uuid,
                   patient: patientUuid,
                   condition: null,
