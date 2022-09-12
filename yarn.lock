@@ -4596,8 +4596,6 @@ __metadata:
     "@openmrs/esm-patient-common-lib": ^4.0.0
     "@types/uuid": ^8.3.0
     lodash-es: ^4.17.15
-    single-spa: 5
-    single-spa-react: ^4.6.1
     uuid: ^8.3.2
     webpack: ^5.74.0
   peerDependencies:
@@ -4610,8 +4608,6 @@ __metadata:
     react-i18next: 11.x
     react-router-dom: 6.x
     rxjs: 6.x
-    single-spa: 5.x
-    single-spa-react: 4.x
   languageName: unknown
   linkType: soft
 
@@ -4660,7 +4656,7 @@ __metadata:
     pretty-quick: ^2.0.2
     react: ^18.2.0
     react-dom: ^18.2.0
-    react-i18next: ^11.0.0
+    react-i18next: ^11.18.6
     react-router-dom: ^6.3.0
     rxjs: ^6.6.3
     sass: ^1.54.3
@@ -4738,7 +4734,7 @@ __metadata:
     "@openmrs/esm-framework": 4.x
     "@openmrs/esm-patient-common-lib": 4.x
     dayjs: 1.x
-    react: 4.x
+    react: 18.x
     react-i18next: 11.x
     react-router-dom: 6.x
     rxjs: 6.x
@@ -19534,7 +19530,25 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-i18next@npm:^11.0.0, react-i18next@npm:^11.7.0":
+"react-i18next@npm:^11.18.6":
+  version: 11.18.6
+  resolution: "react-i18next@npm:11.18.6"
+  dependencies:
+    "@babel/runtime": ^7.14.5
+    html-parse-stringify: ^3.0.1
+  peerDependencies:
+    i18next: ">= 19.0.0"
+    react: ">= 16.8.0"
+  peerDependenciesMeta:
+    react-dom:
+      optional: true
+    react-native:
+      optional: true
+  checksum: 624c0a0313fac4e0d18560b83c99a8bd0a83abc02e5db8d01984e0643ac409d178668aa3a4720d01f7a0d9520d38598dcbff801d6f69a970bae67461de6cd852
+  languageName: node
+  linkType: hard
+
+"react-i18next@npm:^11.7.0":
   version: 11.18.3
   resolution: "react-i18next@npm:11.18.3"
   dependencies:
@@ -20978,7 +20992,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"single-spa@npm:5, single-spa@npm:^5.9.2":
+"single-spa@npm:^5.9.2":
   version: 5.9.4
   resolution: "single-spa@npm:5.9.4"
   checksum: 8547b5db3d1c6788f44833b1bf7a89697a72a4ca4b801c3f9ddbf4e2949a40bc1d9e9a24650460c7a16f5a668d4e332fc237acacb84f329031815c19578a5907
