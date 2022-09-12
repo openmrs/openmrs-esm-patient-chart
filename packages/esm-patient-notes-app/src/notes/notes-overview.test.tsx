@@ -111,11 +111,11 @@ describe('NotesOverview: ', () => {
     );
 
     // Expanding a row displays any associated visit notes
-    await userEvent.click(screen.getAllByRole('button', { name: /expand current row/i})[0]);
+    await userEvent.click(screen.getAllByRole('button', { name: /expand current row/i })[0]);
     expect(screen.getByText(/No visit note to display/i)).toBeInTheDocument();
 
     // Collapsing the row hides the visit note
-    await userEvent.click(screen.getByRole('button', { name: /collapse current row/i}));
+    await userEvent.click(screen.getByRole('button', { name: /collapse current row/i }));
     expect(screen.queryByText(/No visit note to display/i)).not.toBeInTheDocument();
   });
 });

@@ -89,7 +89,7 @@ export function saveVisitNote(abortController: AbortController, payload: VisitNo
     signal: abortController.signal,
   });
 }
-export function savePatientDiagnoses(abortController: AbortController, payload: DiagnosisPayload) {
+export function savePatientDiagnosis(abortController: AbortController, payload: DiagnosisPayload) {
   return openmrsFetch(`/ws/rest/v1/patientdiagnoses`, {
     headers: {
       'Content-Type': 'application/json',

@@ -34,7 +34,7 @@ import {
   fetchConceptDiagnosisByName,
   fetchLocationByUuid,
   fetchProviderByUuid,
-  savePatientDiagnoses,
+  savePatientDiagnosis,
   saveVisitNote,
 } from './visit-notes.resource';
 import { ConfigObject } from '../config-schema';
@@ -224,7 +224,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
                   certainty: diagnosis.certainty,
                   rank: diagnosis.rank,
                 };
-                return savePatientDiagnoses(abortController, diagnosisPayload);
+                return savePatientDiagnosis(abortController, diagnosisPayload);
               }),
             );
           }
