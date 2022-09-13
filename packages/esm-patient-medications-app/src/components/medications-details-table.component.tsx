@@ -295,8 +295,8 @@ function OrderBasketItemActions({
         startDate: medication.dateActivated,
         duration: medication.duration,
         durationUnit: {
-          uuid: medication.durationUnits.uuid,
-          display: medication.durationUnits.display,
+          uuid: medication.durationUnits?.uuid,
+          display: medication.durationUnits?.display,
         },
         pillsDispensed: medication.quantity,
         numRefills: medication.numRefills,
@@ -345,8 +345,8 @@ function OrderBasketItemActions({
         asNeededCondition: medication.asNeededCondition,
         duration: medication.duration,
         durationUnit: {
-          uuid: medication.durationUnits.uuid,
-          display: medication.durationUnits.display,
+          uuid: medication.durationUnits?.uuid,
+          display: medication.durationUnits?.display,
         },
         pillsDispensed: medication.quantity,
         numRefills: medication.numRefills,
@@ -395,8 +395,8 @@ function OrderBasketItemActions({
         asNeededCondition: medication.asNeededCondition,
         duration: medication.duration,
         durationUnit: {
-          uuid: medication.durationUnits.uuid,
-          display: medication.durationUnits.display,
+          uuid: medication.durationUnits?.uuid,
+          display: medication.durationUnits?.display,
         },
         pillsDispensed: medication.quantity,
         numRefills: medication.numRefills,
