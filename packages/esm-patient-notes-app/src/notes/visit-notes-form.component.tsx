@@ -31,7 +31,13 @@ import {
   useSession,
 } from '@openmrs/esm-framework';
 import { convertToObsPayload } from './visit-note.util';
-import { fetchDiagnosisByName, fetchLocationByUuid, fetchProviderByUuid, saveVisitNote } from './visit-notes.resource';
+import {
+  CodedDiagnosis,
+  fetchDiagnosisByName,
+  fetchLocationByUuid,
+  fetchProviderByUuid,
+  saveVisitNote,
+} from './visit-notes.resource';
 import { ConfigObject } from '../config-schema';
 import { Diagnosis, VisitNotePayload } from '../types';
 import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
@@ -52,8 +58,12 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
   const { mutate } = useSWRConfig();
   const config = useConfig() as ConfigObject;
   const state = useMemo(() => ({ patientUuid }), [patientUuid]);
-  const { clinicianEncounterRole, encounterNoteTextConceptUuid, encounterTypeUuid, formConceptUuid } =
-    config.visitNoteConfig;
+  const {
+    clinicianEncounterRole,
+    encounterNoteTextConceptUuid,
+    encounterTypeUuid,
+    formConceptUuid,
+  } = config.visitNoteConfig;
   const [clinicalNote, setClinicalNote] = React.useState('');
   const [currentSessionProviderUuid, setCurrentSessionProviderUuid] = React.useState<string | null>('');
   const [currentSessionLocationUuid, setCurrentSessionLocationUuid] = React.useState('');
@@ -62,9 +72,8 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
   const [providerUuid, setProviderUuid] = React.useState<string | null>(null);
   const [searchTerm, setSearchTerm] = React.useState<string | null>('');
   const [selectedDiagnoses, setSelectedDiagnoses] = React.useState<Array<Diagnosis>>([]);
-  const [searchResults, setSearchResults] = React.useState<null | Array<Diagnosis>>(null);
   const [visitDateTime, setVisitDateTime] = React.useState(new Date());
-
+  const [searchResults, setSearchResults] = React.useState<null | Array<CodedDiagnosis>>(null);
   React.useEffect(() => {
     if (session && !currentSessionLocationUuid && !currentSessionProviderUuid) {
       setCurrentSessionLocationUuid(session?.sessionLocation?.uuid);
@@ -85,6 +94,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
   }, [currentSessionLocationUuid, currentSessionProviderUuid]);
 
   const handleSearchTermChange = (event) => {
+    setSelectedDiagnoses(null);
     setIsSearching(true);
     const query = event.target.value;
     setSearchTerm(query);
@@ -92,13 +102,12 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
       debouncedSearch(query);
     }
   };
-
   const debouncedSearch = React.useMemo(
     () =>
       debounce((searchTerm) => {
         if (searchTerm) {
           const sub = fetchDiagnosisByName(searchTerm).subscribe(
-            (matchingDiagnoses: Array<Diagnosis>) => {
+            (matchingDiagnoses: Array<CodedDiagnosis>) => {
               setSearchResults(matchingDiagnoses);
               setIsSearching(false);
             },
@@ -111,11 +120,10 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
       }, searchTimeoutInMs),
     [],
   );
-
-  const handleAddDiagnosis = (diagnosisToAdd: Diagnosis) => {
+  const handleAddDiagnosis = (diagnosisToAdd: CodedDiagnosis) => {
+    setSelectedDiagnoses(selectedDiagnoses);
     setSearchTerm('');
     setSearchResults(null);
-    setSelectedDiagnoses((selectedDiagnoses) => [...selectedDiagnoses, diagnosisToAdd]);
   };
 
   const handleRemoveDiagnosis = (diagnosisToRemove: Diagnosis) => {
@@ -298,7 +306,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
                             key={index}
                             onClick={() => handleAddDiagnosis(diagnosis)}
                           >
-                            {diagnosis.concept.preferredName}
+                            {diagnosis.concept.display}
                           </li>
                         ))}
                       </ul>

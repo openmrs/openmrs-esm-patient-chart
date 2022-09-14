@@ -75,12 +75,12 @@ export function fetchProviderByUuid(abortController: AbortController, providerUu
     signal: abortController.signal,
   });
 }
-
 export function fetchDiagnosisByName(searchTerm: string) {
-  return openmrsObservableFetch<Array<DiagnosisData>>(`/coreapps/diagnoses/search.action?&term=${searchTerm}`).pipe(
-    map(({ data }) => data),
-    map((data: Array<DiagnosisData>) => formatDiagnoses(data)),
-  );
+  const diagnosisConceptClassUuid = '8d4918b0-c2cc-11de-8d13-0010c6dffd0f';
+
+  return openmrsObservableFetch<Array<CodedDiagnosis>>(
+    `/ws/rest/v1/conceptsearch?conceptClasses=${diagnosisConceptClassUuid}&q=${searchTerm}`,
+  ).pipe(map(({ data }) => data['results']));
 }
 
 function formatDiagnoses(diagnoses: Array<DiagnosisData>): Array<Diagnosis> {
@@ -110,3 +110,15 @@ export function saveVisitNote(abortController: AbortController, payload: VisitNo
 function getConceptReferenceTermCode(conceptMapping: Array<ConceptMapping>): ConceptMapping {
   return conceptMapping.find((concept) => concept.conceptReferenceTerm.conceptSource.name === 'ICD-10-WHO');
 }
+
+export type CodedDiagnosis = {
+  concept: {
+    uuid: string;
+    display: string;
+  };
+  conceptName: {
+    uuid: string;
+    display: string;
+  };
+  display: string;
+};
