@@ -18,5 +18,6 @@ export type SingleSpaProps = AppProps & {
   patientUuid: string;
   handleEncounterCreate?: (encounter: EncounterCreate) => void;
   handlePostResponse?: (encounter: Encounter) => void;
+  handleOnValidate?: (valid: boolean) => void;
   showDiscardSubmitButtons?: boolean;
 };

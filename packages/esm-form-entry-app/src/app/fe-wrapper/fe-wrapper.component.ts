@@ -225,6 +225,8 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
       this.changeState('readyWithValidationErrors');
     }
 
+    this.onValidate(this.form.valid);
+
     return this.form.valid;
   }
 
@@ -252,13 +254,22 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
     if (handlePostResponse && typeof handlePostResponse === 'function') handlePostResponse(encounter);
   }
 
+  public onValidate(valid: boolean): void {
+    const handleOnValidate = this.singleSpaPropsService.getProp('handleOnValidate');
+    if (handleOnValidate && typeof handleOnValidate === 'function') handleOnValidate(valid);
+  }
+
   @HostListener('window:ampath-form-action', ['$event'])
   onFormAction(event) {
     const formUuid = this.singleSpaPropsService.getPropOrThrow('formUuid');
-    if (event.detail?.formUuid === formUuid) {
+    const patientUuid = this.singleSpaPropsService.getPropOrThrow('patientUuid');
+    if (event.detail?.formUuid === formUuid && event.detail?.patientUuid === patientUuid) {
       switch (event.detail?.action) {
         case 'onSubmit':
           this.onSubmit();
+          break;
+        case 'validateForm':
+          this.validateForm();
           break;
         default:
           break;
