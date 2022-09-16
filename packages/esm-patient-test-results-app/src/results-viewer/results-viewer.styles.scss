@@ -2,14 +2,13 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
 @import '~@openmrs/esm-styleguide/src/vars';
-
+ 
 .resultsContainer {
   padding: 0;
   width: 100%;
   position: relative;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
 }
-
+ 
 .resultsHeader {
   padding: 0.5rem 0;
   z-index: 10;
@@ -17,40 +16,54 @@
   position: sticky;
   top: 3rem;
 }
-
+ 
 .viewOptsContentSwitcherContainer {
   margin-left: auto;
 }
-
+ 
 .leftHeader {
   display: flex;
   align-items: center;
 }
-
+ 
 .leftHeaderActions {
   display: flex;
   min-width: 2.5rem;
 }
-
+ 
 .leftHeaderActions > :global(.cds--content-switcher) {
   display: grid;
   grid-template-columns: 1fr 1fr;
   width: max-content;
   justify-content: flex-start;
 }
-
+ 
 .trendlineOverlayHeader {
   display: flex;
   justify-content: center;
   align-items: baseline;
-
+ 
   .trendlineOverlayHeaderTitle {
     @include type.type-style('heading-compact-02');
     margin-right: 4px;
   }
-
+ 
   .trendlineOverlayHeaderReferenceRange {
     @include type.type-style('helper-text-01');
   }
 }
-
+ 
+.columnPanel {
+  position: relative;
+}
+ 
+.dragHandler {
+  width: 24px;
+  height: 100%;
+  background-color: $color-gray-30;
+  position: absolute;
+  top: 0;
+  left: 100%;
+  cursor: col-resize;
+  z-index: 100;
+}

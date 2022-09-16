@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AccordionSkeleton, Button, Column, ContentSwitcher, DataTableSkeleton, Grid, Switch } from '@carbon/react';
 import { TreeViewAlt } from '@carbon/react/icons';
@@ -63,6 +63,50 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, ty
   const [showTreeOverlay, setShowTreeOverlay] = useState<boolean>(false);
   const { resetTree, timelineData, totalResultsCount } = useContext(FilterContext);
   const expanded = view === 'full';
+  const [adjustWidth, setAdjustWidth] = useState<number>(5);
+  const shiftLeft = useRef(null);
+  const shiftRight = useRef(null);
+
+  const mouseDownHandler = (event) => {
+    const draggableEl = shiftLeft.current;
+    const rightPanel: HTMLElement = document.querySelector('.rightColumnPanel');
+    const wrappingRow: HTMLElement = document.querySelector('.wrapper-row');
+    console.log('LOG groupedElement', wrappingRow)
+
+    const wrappingRowWidth = window.getComputedStyle(wrappingRow).width;
+
+    rightPanel.style.borderLeft = '1px solid gray';
+    wrappingRow.style.pointerEvents = 'none';
+    document.body.style.cursor = 'col-resize';
+
+    const fullWidth: number = parseInt(wrappingRowWidth);
+    let prevX = event.clientX;
+    document.addEventListener('mouseMove', mouseMoveHandler);
+    document.addEventListener('mouseUp', mouseUpHandler);
+
+    function mouseMoveHandler(ev) {
+      const newX = prevX - ev.clientX;
+      const dragStyles = window.getComputedStyle(draggableEl);
+      const currentLeft = parseInt(dragStyles.left, 10);
+
+      draggableEl.style.left = currentLeft - newX + 'px';
+
+      const colAdjust = parseInt(((fullWidth / 12) * (currentLeft - newX)).toFixed(0));
+      if (colAdjust > 2 && colAdjust < 9) setAdjustWidth(colAdjust);
+      {
+        prevX = ev.clientX;
+      }
+    }
+
+    function mouseUpHandler() {
+      draggableEl.style.left = '100%';
+      rightPanel.style.borderLeft = 'none';
+      wrappingRow.style.pointerEvents = 'auto';
+      document.body.style.cursor = 'default';
+      document.removeEventListener('mousemove', mouseMoveHandler);
+      document.removeEventListener('mouseup', mouseUpHandler);
+    }
+  };
 
   return (
     <>
@@ -118,12 +162,29 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, ty
           </Column>
         )}
         {!tablet && (
-          <Column sm={16} lg={tablet || expanded ? 0 : 5} className={`${styles.columnPanel} ${styles.treeColumn}`}>
-            {leftContent === 'tree' && (!loading ? <FilterSet /> : <AccordionSkeleton open count={4} align="start" />)}
+          <Column
+            sm={16}
+            lg={tablet || expanded ? 0 : adjustWidth}
+            className={`${styles.columnPanel} ${styles.treeColumn} leftColumnPanel`}
+          >
+            <>
+              <FilterSet />
+              <div
+                className={styles.dragHandler}
+                ref={shiftLeft}
+                role="button"
+                tabIndex={0}
+                onMouseDown={mouseDownHandler}
+              />
+            </>
             {leftContent === 'panel' && <DesktopView />}
           </Column>
         )}
-        <Column sm={16} lg={tablet || expanded ? 12 : 7} className={`${styles.columnPanel}`}>
+        <Column
+          sm={16}
+          lg={12 - (expanded ? 0 : adjustWidth)}
+          className={`${styles.columnPanel} ${styles.rightColumnPanel}`}
+        >
           {!tablet && testUuid && type === 'trendline' ? (
             <Trendline patientUuid={patientUuid} conceptUuid={testUuid} basePath={basePath} showBackToTimelineButton />
           ) : !loading ? (
