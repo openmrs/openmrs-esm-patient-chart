@@ -21,7 +21,7 @@ function getFrameworkVersion() {
 }
 
 module.exports = (angularWebpackConfig, options) => {
-  const mode = options.mode || process.env.NODE_ENV || "development";
+  const mode = angularWebpackConfig.mode || process.env.NODE_ENV || "development";
 
   const filename = basename(browser || main);
   const frameworkVersion = getFrameworkVersion();
