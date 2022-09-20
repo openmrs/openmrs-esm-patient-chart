@@ -1,7 +1,7 @@
 import React, { MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import capitalize from 'lodash-es/capitalize';
-import { Button } from '@carbon/react';
+import { Button, Tag } from '@carbon/react';
 import { ChevronDown, ChevronUp, OverflowMenuVertical } from '@carbon/react/icons';
 import { ExtensionSlot, age, formatDate, parseDate } from '@openmrs/esm-framework';
 import ContactDetails from '../contact-details/contact-details.component';
@@ -103,9 +103,19 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
             <span>{formatDate(parseDate(patient.birthDate), { mode: 'wide', time: false })}</span>
           </div>
           <div className={styles.row}>
-            <span className={styles.identifiers}>
-              {patient.identifier?.length ? patient.identifier.map((i) => i.value).join(', ') : '--'}
-            </span>
+            <div className={styles.identifiers}>
+              {patient.identifier?.length
+                ? patient.identifier.map(({ value, type }) => (
+                    <span className={styles.identifierTag}>
+                      <Tag key={value} type="gray" title={type.text}>
+                        {type.text}
+                      </Tag>
+                      {value}
+                      &#183;
+                    </span>
+                  ))
+                : ''}
+            </div>
             <Button
               kind="ghost"
               renderIcon={(props) =>
