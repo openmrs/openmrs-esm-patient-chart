@@ -1,17 +1,23 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Button } from '@carbon/react';
 import { Document } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { useLayoutType } from '@openmrs/esm-framework';
 import styles from './clinical-form-action-button.scss';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 
 const ClinicalFormActionButton: React.FC = () => {
   const { t } = useTranslation();
   const layout = useLayoutType();
+  const handleClick = useCallback(() => launchPatientWorkspace('forms-dashboard-workspace'), []);
 
   if (layout === 'tablet')
     return (
-      <Button kind="ghost" className={styles.container}>
+      <Button
+        kind="ghost"
+        className={styles.container}
+        onClick={handleClick}
+      >
         <Document size={20} />
         <span>{t('clinicalForm', 'Clinical form')}</span>
       </Button>
@@ -26,6 +32,7 @@ const ClinicalFormActionButton: React.FC = () => {
       iconDescription={t('form', 'Form')}
       tooltipAlignment="end"
       tooltipPosition="bottom"
+      onClick={handleClick}
     />
   );
 };
