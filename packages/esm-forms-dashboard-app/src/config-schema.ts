@@ -27,85 +27,7 @@ export const configSchema = {
         },
       },
     },
-    //_default: undefined,
-    _default: [
-      {
-        name: 'ICRC Forms',
-        labelCode: 'icrcForms',
-        forms: [
-          {
-            name: 'Assessment Form',
-            encounterTypeUuid: '0c63150d-ff39-42e1-9048-834mh76p2s72',
-          },
-          {
-            name: 'Follow up Form',
-            encounterTypeUuid: '07a7dd1c-7280-483a-a3bc-01be995293ac',
-          },
-          {
-            name: 'Closure Form',
-            encounterTypeUuid: '95458795-3o06-4l59-9508-c217aa21ea26',
-          },
-        ],
-      },
-      {
-        name: 'Distress Scales',
-        labelCode: 'distressScales',
-        forms: [
-          {
-            name: 'DASS-21',
-            encounterTypeUuid: '790a93a8-bfb6-49ab-b98d-2e9b436f93a8',
-          },
-          {
-            name: 'CRIES-8',
-            encounterTypeUuid: '74c7c0c4-e9e9-fb2a-998e-421f49fc9cc8',
-          },
-          {
-            name: 'CRIES-13',
-            encounterTypeUuid: '74c7c564-b6b6-4b2a-918e-421f45fe9aa8',
-          },
-          {
-            name: 'IES-R',
-            encounterTypeUuid: '790a93a8-fff6-49af-f98d-2e9f436f93a8',
-          },
-        ],
-      },
-      {
-        name: 'Functioning scales',
-        labelCode: 'functioningScales',
-        forms: [
-          {
-            name: 'WHODAS 2.0',
-            encounterTypeUuid: '6c39d93d-73c2-4388-whod-asf80508064b',
-          },
-          {
-            name: 'PROQOL',
-            encounterTypeUuid: '805f55bb-5f5c-475d-bd71-e9553d38bde9',
-          },
-          {
-            name: 'SRQ-20',
-            encounterTypeUuid: '74c7c064-a5a5-4b2a-918e-421f45fc9aa8',
-          },
-          {
-            name: 'Functionality scale - Africa',
-            encounterTypeUuid: '6d9df509-a22f-48aa-8a94-fc72ded71acc',
-          },
-          {
-            name: 'Functionality scale - Asia',
-            encounterTypeUuid: 'c877fdd2-6011-42e6-9474-bf4a9b8e2aba',
-          },
-        ],
-      },
-      {
-        name: 'Coping Scales',
-        labelCode: 'copingScales',
-        forms: [
-          {
-            name: 'BRIEF Cope',
-            encounterTypeUuid: '83458695-3b06-4d59-9508-d217aa21ea26',
-          },
-        ],
-      },
-    ],
+    _default: undefined,
   },
   htmlFormEntryForms: {
     _type: Type.Array,
@@ -191,12 +113,12 @@ export const configSchema = {
   useCurrentVisitDates: {
     _type: Type.Boolean,
     _description: 'Only load encounters inside of the current visits dated.',
-    _default: true,
+    _default: false,
   },
   orderFormsByName: {
     _type: Type.Boolean,
     _description: 'Order the forms alphabetically.',
-    _default: false,
+    _default: true,
   },
 };
 
