@@ -55,7 +55,7 @@ const FormsList: React.FC<FormsListPros> = ({
     (formUuid, encounterUuid, formName) => {
       launchFormEntryOrHtmlForms(visit, formUuid, patient, htmlFormEntryForms, encounterUuid, formName);
     },
-    [launchFormEntryOrHtmlForms, visit, patient, htmlFormEntryForms],
+    [htmlFormEntryForms, patient, visit],
   );
   const headers = [
     {
@@ -78,7 +78,7 @@ const FormsList: React.FC<FormsListPros> = ({
           return formInfo.form.name.toLowerCase().search(searchTerm?.toLowerCase()) !== -1;
         });
     setFormsInfo(entriesToDisplay);
-  }, [searchTerm, formsInfo]);
+  }, [formsInfo, searchTerm]);
 
   const tableRows: Array<DataTableRow> = useMemo(
     () =>
@@ -94,7 +94,7 @@ const FormsList: React.FC<FormsListPros> = ({
     [results],
   );
 
-  if (tableRows?.length > 0) {
+  if (tableRows) {
     return (
       <div className={styles.formsListContainer}>
         <CardHeader title={t(formsSection.labelCode, formsSection.name)} children={undefined} />
@@ -130,8 +130,7 @@ const FormsList: React.FC<FormsListPros> = ({
                             role="presentation"
                             className={styles.formName}
                           >
-                            {/*JSON.stringify(tableRows[i])*/}
-                            {tableRows[i].formName}
+                            {tableRows[i]?.formName}
                           </Link>
                         </TableCell>
                         <TableCell className={styles.editCell}>

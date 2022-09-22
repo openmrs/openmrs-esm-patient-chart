@@ -1,5 +1,4 @@
-import React from 'react';
-import { formatDate } from '@openmrs/esm-framework';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import styles from './forms-dashboard.scss';
 import { EmptyDataIllustration, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
@@ -17,13 +16,13 @@ const FormsDashboard: React.FC<FormsDashboardProps> = ({ patientUuid, patient, i
   const { t } = useTranslation();
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const { isValidating, data, error } = useFormsToDisplay(patientUuid, isOffline);
+  const [searchTerm, setSearchTerm] = useState('');
   patient = { id: patientUuid }; //TODO workaround while isn't offline ready
 
   if (data) {
     return (
       <div className={styles.widgetCard}>
         {data?.map((formsSection, i) => {
-          let searchTerm = ''; //'Assessment';
           let pageSize = undefined;
           return (
             <FormsList {...{ patientUuid, patient, visit: currentVisit, formsSection, searchTerm, pageSize }} key={i} />
