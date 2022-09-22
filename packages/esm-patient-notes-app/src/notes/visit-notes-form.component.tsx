@@ -56,14 +56,9 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
   const { mutate } = useSWRConfig();
-  const config = useConfig() as ConfigObject;
+  const { visitNoteConfig, diagnosisConceptUuid } = useConfig() as ConfigObject;
   const state = useMemo(() => ({ patientUuid }), [patientUuid]);
-  const {
-    clinicianEncounterRole,
-    encounterNoteTextConceptUuid,
-    encounterTypeUuid,
-    formConceptUuid,
-  } = config.visitNoteConfig;
+  const { clinicianEncounterRole, encounterNoteTextConceptUuid, encounterTypeUuid, formConceptUuid } = visitNoteConfig;
   const [clinicalNote, setClinicalNote] = React.useState('');
   const [currentSessionProviderUuid, setCurrentSessionProviderUuid] = React.useState<string | null>('');
   const [currentSessionLocationUuid, setCurrentSessionLocationUuid] = React.useState('');
@@ -106,7 +101,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
     () =>
       debounce((searchTerm) => {
         if (searchTerm) {
-          const sub = fetchDiagnosisByName(searchTerm).subscribe(
+          const sub = fetchDiagnosisByName(searchTerm, diagnosisConceptUuid).subscribe(
             (matchingDiagnoses: Array<CodedDiagnosis>) => {
               setSearchResults(matchingDiagnoses);
               setIsSearching(false);

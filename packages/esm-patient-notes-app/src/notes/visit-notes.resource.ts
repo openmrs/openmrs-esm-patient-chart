@@ -75,9 +75,7 @@ export function fetchProviderByUuid(abortController: AbortController, providerUu
     signal: abortController.signal,
   });
 }
-export function fetchDiagnosisByName(searchTerm: string) {
-  const diagnosisConceptClassUuid = '8d4918b0-c2cc-11de-8d13-0010c6dffd0f';
-
+export function fetchDiagnosisByName(searchTerm: string, diagnosisConceptClassUuid: string) {
   return openmrsObservableFetch<Array<CodedDiagnosis>>(
     `/ws/rest/v1/conceptsearch?conceptClasses=${diagnosisConceptClassUuid}&q=${searchTerm}`,
   ).pipe(map(({ data }) => data['results']));
