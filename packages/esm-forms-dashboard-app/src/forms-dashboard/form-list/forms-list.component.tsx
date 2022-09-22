@@ -130,8 +130,8 @@ const FormsList: React.FC<FormsListPros> = ({
                             role="presentation"
                             className={styles.formName}
                           >
-                            {JSON.stringify(tableRows[i])}
-                            {/*{tableRows[i].formName}*/}
+                            {/*JSON.stringify(tableRows[i])*/}
+                            {tableRows[i].formName}
                           </Link>
                         </TableCell>
                         <TableCell className={styles.editCell}>

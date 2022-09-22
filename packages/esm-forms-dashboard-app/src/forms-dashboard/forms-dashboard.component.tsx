@@ -23,7 +23,7 @@ const FormsDashboard: React.FC<FormsDashboardProps> = ({ patientUuid, patient, i
     return (
       <div className={styles.widgetCard}>
         {data?.map((formsSection, i) => {
-          let searchTerm = 'Assessment';
+          let searchTerm = ''; //'Assessment';
           let pageSize = undefined;
           return (
             <FormsList {...{ patientUuid, patient, visit: currentVisit, formsSection, searchTerm, pageSize }} key={i} />
