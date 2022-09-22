@@ -1,15 +1,72 @@
-@import "~@openmrs/esm-styleguide/src/vars";
-@import "~carbon-components/src/globals/scss/vars";
-@import "~carbon-components/src/globals/scss/mixins";
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
 
 .formsListContainer {
-  //border: 1px solid $ui-03;
-  width: 100%;
-  margin: 10px auto;
-  max-width: 95vw;
-  background-color: $ui-background;
-  overflow: visible;
   display: flex;
   flex-direction: column;
   height: auto;
+  width: 100%;
+}
+
+.formsListContainer input[type="text"] {
+  background-color: $ui-background;
+}
+
+.formsListContainer div:nth-of-type(2) {
+  padding-top: 0;
+}
+
+// Desktop viewport
+:global(.omrs-breakpoint-gt-tablet) {
+  .editCell {
+    display: flex;
+    justify-content: space-between;
+    cursor: pointer;
+    align-items: center;
+
+    & > svg {
+      visibility: hidden;
+    }
+
+    & > label {
+      cursor: pointer;
+    }
+
+    &:hover > svg {
+      visibility: visible;
+    }
+  }
+}
+
+// Tablet viewport
+:global(.omrs-breakpoint-lt-desktop) .editCell {
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+  height: spacing.$spacing-09;
+  align-items: center;
+
+  & > label {
+    cursor: pointer;
+  }
+
+  &:global(.cds--data-table tr) {
+    height: spacing.$spacing-09;
+  }
+}
+
+#wide-table.bx--data-table-container {
+  max-width: 1300px !important;
+  max-height: 600px !important;
+
+  width: 800px !important;
+  height: 400px !important;
+}
+
+.tile {
+  text-align: center;
+  border: 1px solid $ui-03;
+  overflow: scroll;
+  height: 95vh;
 }

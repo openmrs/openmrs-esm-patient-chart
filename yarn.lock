@@ -4351,6 +4351,25 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@openmrs/esm-forms-dashboard-app@workspace:packages/esm-forms-dashboard-app":
+  version: 0.0.0-use.local
+  resolution: "@openmrs/esm-forms-dashboard-app@workspace:packages/esm-forms-dashboard-app"
+  dependencies:
+    "@carbon/react": ^1.12.0
+    "@openmrs/esm-patient-common-lib": ^4.0.0
+    lodash-es: ^4.17.15
+    webpack: ^5.74.0
+  peerDependencies:
+    "@openmrs/esm-framework": 4.x
+    "@openmrs/esm-patient-common-lib": 4.x
+    dayjs: 1.x
+    react: 18.x
+    react-i18next: 11.x
+    react-router-dom: 6.x
+    rxjs: 6.x
+  languageName: unknown
+  linkType: soft
+
 "@openmrs/esm-framework@npm:4.0.1-pre.238, @openmrs/esm-framework@npm:next":
   version: 4.0.1-pre.238
   resolution: "@openmrs/esm-framework@npm:4.0.1-pre.238"

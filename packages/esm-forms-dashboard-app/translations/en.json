@@ -1,4 +1,8 @@
 {
-  "formsDashboard": "Forms Dashboard",
+  "clinicalForm": "Clinical form",
+  "form": "Form",
+  "formName": "Form name (A-Z)",
+  "lastCompleted": "Last completed",
+  "never": "Never",
   "noFormsAvailable": "There are no forms to display"
 }

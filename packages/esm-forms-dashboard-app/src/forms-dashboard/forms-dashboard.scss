@@ -1,15 +1,23 @@
-@import "~@openmrs/esm-styleguide/src/vars";
-@import "~carbon-components/src/globals/scss/vars";
-@import "~carbon-components/src/globals/scss/mixins";
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
 
-.formsWidgetContainer {
+.tile {
+  text-align: center;
   border: 1px solid $ui-03;
-  width: 100%;
-  margin: 10px auto;
-  max-width: 95vw;
+  overflow: scroll;
+  height: 95vh;
+}
+
+.bodyShort01 {
+  @include type.type-style("body-compact-01");
+}
+
+.widgetCard {
   background-color: $ui-background;
-  overflow: visible;
-  display: flex;
-  flex-direction: column;
-  height: auto;
+  border: 1px solid $ui-03;
+  position: relative;
+  padding: 0rem;
+  overflow: scroll;
+  height: 95vh;
 }

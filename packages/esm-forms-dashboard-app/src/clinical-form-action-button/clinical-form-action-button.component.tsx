@@ -2,22 +2,32 @@ import React, { useCallback } from 'react';
 import { Button } from '@carbon/react';
 import { Document } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
-import { useLayoutType } from '@openmrs/esm-framework';
+import { useConfig, useLayoutType, usePatient } from '@openmrs/esm-framework';
 import styles from './clinical-form-action-button.scss';
-import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import {
+  launchPatientWorkspace,
+  launchStartVisitPrompt,
+  useVisitOrOfflineVisit,
+} from '@openmrs/esm-patient-common-lib';
+import { ConfigObject } from '../config-schema';
 
 const ClinicalFormActionButton: React.FC = () => {
   const { t } = useTranslation();
+  const { patientUuid } = usePatient();
+  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
+  const { useCurrentVisitDates } = useConfig() as ConfigObject;
   const layout = useLayoutType();
-  const handleClick = useCallback(() => launchPatientWorkspace('forms-dashboard-workspace'), []);
+  const handleClick = useCallback(() => {
+    if (useCurrentVisitDates && !currentVisit) {
+      launchStartVisitPrompt();
+    } else {
+      launchPatientWorkspace('forms-dashboard-workspace');
+    }
+  }, [currentVisit]);
 
   if (layout === 'tablet')
     return (
-      <Button
-        kind="ghost"
-        className={styles.container}
-        onClick={handleClick}
-      >
+      <Button kind="ghost" className={styles.container} onClick={handleClick}>
         <Document size={20} />
         <span>{t('clinicalForm', 'Clinical form')}</span>
       </Button>
