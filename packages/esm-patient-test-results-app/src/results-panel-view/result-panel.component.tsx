@@ -1,4 +1,4 @@
-import { formatDate } from '@openmrs/esm-framework';
+import { formatDate, usePatient } from '@openmrs/esm-framework';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { RowData } from '../filter/filter-types';
@@ -13,7 +13,8 @@ import {
   TableBody,
   TableCell,
 } from '@carbon/react';
-import { getClass } from './result-panel-helper';
+import { getClass } from './helper';
+import usePanelData from './usePanelData';
 
 interface LabSetPanelProps {
   heading: string;
@@ -21,6 +22,7 @@ interface LabSetPanelProps {
 }
 
 const LabSetPanel: React.FC<LabSetPanelProps> = ({ heading, tests }) => {
+  const observationData = usePanelData();
   const hasData = tests.some((test) => test.hasData);
   const recentObsDateTime = tests?.[0]?.obs?.[0]?.obsDatetime;
   const hasRange = tests.some((test) => test?.range);

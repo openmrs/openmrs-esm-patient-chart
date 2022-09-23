@@ -59,8 +59,6 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
   const expanded = view === 'full';
   const { type, testUuid } = useParams();
 
-  console.log('tablet', tablet);
-
   return (
     <>
       <Grid className={styles.resultsContainer}>
