@@ -3,7 +3,7 @@ import { InlineLoading, Tab, Tabs, TabList, TabPanel, TabPanels } from '@carbon/
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { formatDatetime, OpenmrsResource, parseDate } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import { Observation, useVisits } from './visit.resource';
+import { Observation, useEncounters, useVisits } from './visit.resource';
 import EncounterList from './past-visits-components/encounter-list.component';
 import VisitSummary from './past-visits-components/visit-summary.component';
 import styles from './visit-detail-overview.scss';
@@ -26,6 +26,9 @@ export interface FormattedEncounter {
 function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentProps) {
   const { t } = useTranslation();
   const { visits, isError, isLoading } = useVisits(patientUuid);
+  const { encounters, error, isLoading: encountersLoading } = useEncounters(patientUuid);
+
+  // console.log('encounters', encounters);
 
   if (isLoading) {
     return (
