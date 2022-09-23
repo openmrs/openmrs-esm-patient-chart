@@ -2,15 +2,15 @@ import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, waitFor } from '@testing-library/react';
 import { usePagination } from '@openmrs/esm-framework';
-import { renderWithSwr } from '../../../../../../tools/test-helpers';
-import { mockEncounters } from '../../../../../../__mocks__/visits.mock';
-import EncounterList from './encounter-list.component';
+import { renderWithSwr } from '../../../../../../../tools/test-helpers';
+import { mockEncounters } from '../../../../../../../__mocks__/visits.mock';
+import VisitsTable from './visits-table.component';
 
 jest.setTimeout(10000);
 
 const testProps = {
   showAllEncounters: true,
-  encounters: mockEncounters,
+  visits: mockEncounters,
 };
 
 const mockedUsePagination = usePagination as jest.Mock;
@@ -30,7 +30,7 @@ jest.mock('@openmrs/esm-framework', () => {
 
 describe('EncounterList', () => {
   it('renders an empty state when no encounters are available', () => {
-    testProps.encounters = [];
+    testProps.visits = [];
 
     mockedUsePagination.mockImplementationOnce(() => ({
       currentPage: 1,
@@ -38,7 +38,7 @@ describe('EncounterList', () => {
       results: [],
     }));
 
-    renderEncounterList();
+    renderVisitsTable();
 
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
     expect(screen.getByText(/no encounters found/i)).toBeInTheDocument();
@@ -47,7 +47,7 @@ describe('EncounterList', () => {
   it("renders a tabular overview of the patient's clinical encounters", async () => {
     const user = userEvent.setup();
 
-    testProps.encounters = mockEncounters;
+    testProps.visits = mockEncounters;
 
     mockedUsePagination.mockImplementationOnce(() => ({
       currentPage: 1,
@@ -55,7 +55,7 @@ describe('EncounterList', () => {
       results: mockEncounters,
     }));
 
-    renderEncounterList();
+    renderVisitsTable();
 
     expect(screen.getByRole('table')).toBeInTheDocument();
     const searchbox = screen.getByRole('searchbox', { name: /filter table/i });
@@ -108,6 +108,6 @@ describe('EncounterList', () => {
   });
 });
 
-function renderEncounterList() {
-  renderWithSwr(<EncounterList {...testProps} />);
+function renderVisitsTable() {
+  renderWithSwr(<VisitsTable {...testProps} />);
 }

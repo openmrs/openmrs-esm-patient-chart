@@ -4,7 +4,7 @@ import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { formatDatetime, OpenmrsResource, parseDate } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { Observation, useEncounters, useVisits } from './visit.resource';
-import EncounterList from './past-visits-components/encounter-list.component';
+import EncounterList from './past-visits-components/visits-table';
 import VisitSummary from './past-visits-components/visit-summary.component';
 import styles from './visit-detail-overview.scss';
 
@@ -43,7 +43,7 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
   }
 
   if (visits?.length) {
-    const encounters = visits
+    const visitsWithEncounters = visits
       .filter((visit) => visit.encounters.length)
       .flatMap((visitWithEncounters) => mapEncounters(visitWithEncounters));
 
@@ -55,8 +55,11 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
               {t('visitSummaries', 'Visit summaries')}
             </Tab>
             <Tab className={styles.tab} id="all-encounters-tab">
-              {t('allEncounters', 'All encounters')}
+              {t('allVisits', 'All visits')}
             </Tab>
+            {/* <Tab className={styles.tab} id="all-encounters-tab">
+              {t('allEncounters', 'All encounters')}
+            </Tab> */}
           </TabList>
           <TabPanels>
             <TabPanel>
@@ -71,8 +74,9 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
               ))}
             </TabPanel>
             <TabPanel>
-              <EncounterList encounters={encounters} showAllEncounters />
+              <EncounterList visits={visitsWithEncounters} showAllEncounters />
             </TabPanel>
+            {/* <TabPanel><EncounterList visits={encounters} showAllEncounters /></TabPanel> */}
           </TabPanels>
         </Tabs>
       </div>

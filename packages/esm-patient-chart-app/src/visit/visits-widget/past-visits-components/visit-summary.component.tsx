@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabList, TabPanel, TabPanels, Tag } from '@carbon/react';
 import { formatTime, OpenmrsResource, parseDate, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { Order, Encounter, Note, Observation, OrderItem } from '../visit.resource';
-import EncounterList from './encounter-list.component';
+import VisitsTable from './visits-table/visits-table.component';
 import MedicationSummary from './medications-summary.component';
 import NotesSummary from './notes-summary.component';
 import TestsSummary from './tests-summary.component';
@@ -130,7 +130,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid }) 
             <MedicationSummary medications={medications} />
           </TabPanel>
           <TabPanel>
-            <EncounterList encounters={mapEncounters(encounters)} showAllEncounters={false} />
+            <VisitsTable visits={mapEncounters(encounters)} showAllEncounters={false} />
           </TabPanel>
         </TabPanels>
       </Tabs>
