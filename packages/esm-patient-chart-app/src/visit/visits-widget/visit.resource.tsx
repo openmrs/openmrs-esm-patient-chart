@@ -29,9 +29,10 @@ export function useEncounters(patientUuid: string) {
   // setting this up to make it more generic and usable later
   const params = {
     patient: patientUuid,
-    customRepresentation: 'default',
-    fromDate: '2016-10-08',
+    v: 'default',
     limit: '100',
+    order: 'desc',
+    startIndex: '0',
   };
   const fullRequest =
     endpointUrl +

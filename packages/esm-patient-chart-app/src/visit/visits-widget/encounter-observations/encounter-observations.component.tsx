@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SkeletonText } from '@carbon/react';
 import { Observation } from '../visit.resource';
-import styles from '../visit-detail-overview.scss';
+import styles from './styles.scss';
 
 interface EncounterObservationsProps {
   observations: Array<Observation>;
@@ -39,7 +39,7 @@ const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observati
   }
 
   return (
-    <div className={styles.observationsEmptyState}>
+    <div className={styles.encounterEmptyState}>
       <p className={styles.caption01}>{t('noObservationsFound', 'No observations found')}</p>
     </div>
   );

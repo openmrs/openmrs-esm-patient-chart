@@ -4,9 +4,10 @@ import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { formatDatetime, OpenmrsResource, parseDate } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { Observation, useEncounters, useVisits } from './visit.resource';
-import EncounterList from './past-visits-components/visits-table';
+import VisitsTable from './past-visits-components/visits-table';
 import VisitSummary from './past-visits-components/visit-summary.component';
 import styles from './visit-detail-overview.scss';
+import EncountersTable from './encounters-table';
 
 interface VisitOverviewComponentProps {
   patientUuid: string;
@@ -27,8 +28,6 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
   const { t } = useTranslation();
   const { visits, isError, isLoading } = useVisits(patientUuid);
   const { encounters, error, isLoading: encountersLoading } = useEncounters(patientUuid);
-
-  // console.log('encounters', encounters);
 
   if (isLoading) {
     return (
@@ -57,9 +56,9 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
             <Tab className={styles.tab} id="all-encounters-tab">
               {t('allVisits', 'All visits')}
             </Tab>
-            {/* <Tab className={styles.tab} id="all-encounters-tab">
+            <Tab className={styles.tab} id="all-encounters-tab">
               {t('allEncounters', 'All encounters')}
-            </Tab> */}
+            </Tab>
           </TabList>
           <TabPanels>
             <TabPanel>
@@ -74,9 +73,11 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
               ))}
             </TabPanel>
             <TabPanel>
-              <EncounterList visits={visitsWithEncounters} showAllEncounters />
+              <VisitsTable visits={visitsWithEncounters} showAllEncounters />
             </TabPanel>
-            {/* <TabPanel><EncounterList visits={encounters} showAllEncounters /></TabPanel> */}
+            <TabPanel>
+              <EncountersTable encounters={encounters} showAllEncounters />
+            </TabPanel>
           </TabPanels>
         </Tabs>
       </div>

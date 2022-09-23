@@ -27,8 +27,8 @@ import { Edit } from '@carbon/react/icons';
 import { formatDatetime, formatTime, parseDate, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { formEntrySub, launchPatientWorkspace, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { MappedEncounter } from '../visit-summary.component';
-import EncounterObservations from '../encounter-observations.component';
 import styles from './visits-table.scss';
+import EncounterObservations from '../../encounter-observations';
 
 interface VisitTableProps {
   visits: Array<MappedEncounter>;
