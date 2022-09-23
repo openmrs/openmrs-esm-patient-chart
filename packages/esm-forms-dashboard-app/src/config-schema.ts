@@ -127,7 +127,7 @@ export interface FormsSectionConfig {
   labelCode: string;
   forms?: Array<{
     name: string;
-    encounterTypeUuid: string;
+    uuid: string;
   }>;
 }
 
