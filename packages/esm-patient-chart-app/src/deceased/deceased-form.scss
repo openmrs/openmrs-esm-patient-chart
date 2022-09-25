@@ -1,0 +1,105 @@
+@import "~@openmrs/esm-styleguide/src/vars";
+@import "~carbon-components/src/globals/scss/vars";
+@import "~carbon-components/src/globals/scss/mixins";
+
+.container {
+  margin: $spacing-05;
+
+  & section {
+    margin: $spacing-05 0;
+  }
+}
+
+.heading {
+  @include carbon--type-style("productive-heading-03");
+  color: $text-01;
+  margin: $spacing-05;
+}
+
+.sectionTitle {
+  @include carbon--type-style("productive-heading-02");
+  color: $text-02;
+  margin: 0 0 $spacing-03 0;
+}
+
+.conceptAnswerOverviewWrapper {
+	margin: $spacing-05 0rem;
+	border: 0.0625rem solid $grey-2;
+  background-color: $ui-01;
+}
+
+.conceptAnswerOverviewWrapper div:nth-child(3) > div:nth-child(2) {
+	position: relative;
+}
+
+.conceptAnswerOverviewWrapper div:nth-child(3) span * {
+	display: none;
+}
+
+.radioButtonGroup {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	margin-top: $spacing-03;
+	min-height: $spacing-10;
+	width: 100%;
+	@include carbon--type-style('body-short-01');
+	color: $text-01;
+  background-color: $ui-01;
+}
+
+.radioButton {
+	padding: $spacing-02 $spacing-05;
+	margin: $spacing-03 0;
+}
+
+.contentSwitcher {
+  height: $spacing-09;
+}
+
+.headerGridRow {
+  border-bottom: 0.0625rem solid $grey-2;
+  margin: 0;
+}
+
+.dataGridRow {
+  display: grid;
+  grid-template-columns: 50% 10% 1fr;
+  margin: 0.5rem 1rem;
+  width: 100%;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: calc(100vh - 6rem);
+}
+
+.button {
+  height: 4rem;
+  display: flex;
+  align-content: flex-start;
+  align-items: baseline;
+  min-width: 50%;
+}
+
+.conceptAnswerOverviewWrapperTablet {
+  padding: 1.5rem 1rem;
+  background-color: $ui-02;
+}
+
+.conceptAnswerOverviewWrapperDesktop {
+  padding: 0rem;
+
+  .paginationContainer div {
+		background-color: $ui-01;
+	}
+}
+
+:global(.bx--date-picker-container) {
+  width: 100%;
+}
+:global(.bx--date-picker--simple){
+width: 100%;
+}

@@ -100,6 +100,14 @@ function setupOpenMRS() {
         }),
       },
       {
+        name: 'mark-patient-deceased-button',
+        slot: 'patient-actions-slot',
+        load: getAsyncLifecycle(() => import('./actions-buttons/mark-patient-deceased'), {
+          featureName: 'patient-actions-slot',
+          moduleName,
+        }),
+      },
+      {
         name: 'cancel-visit-button',
         slot: 'patient-search-actions-slot',
         load: getAsyncLifecycle(() => import('./actions-buttons/cancel-visit.component'), {
@@ -164,6 +172,16 @@ function setupOpenMRS() {
         }),
         meta: {
           title: 'Start a visit',
+        },
+      },
+      {
+        name: 'mark-patient-deceased-workspace-form',
+        load: getAsyncLifecycle(() => import('./deceased/deceased-form.component'), {
+          featureName: 'mark-patient-deceased-form',
+          moduleName,
+        }),
+        meta: {
+          title: 'Mark Deceased',
         },
       },
       {
