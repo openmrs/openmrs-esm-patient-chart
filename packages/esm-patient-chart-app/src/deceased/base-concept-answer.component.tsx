@@ -30,7 +30,7 @@ const BaseConceptAnswer: React.FC<BaseConceptAnswerProps> = ({ onChange, isPatie
 
   const handleSearch = React.useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), 300), []);
 
-  const { results, currentPage, goTo } = usePagination(searchResults, 5);
+  const { results, currentPage, goTo } = usePagination(searchResults, 10);
 
   return (
     <div
@@ -38,7 +38,7 @@ const BaseConceptAnswer: React.FC<BaseConceptAnswerProps> = ({ onChange, isPatie
         isTablet ? styles.conceptAnswerOverviewWrapperTablet : styles.conceptAnswerOverviewWrapperDesktop
       }`}
     >
-      {results.length && !isPatientDead ? (
+      {results.length && !isPatientDead && !conceptAnswers ? (
         <>
           <Search
             onChange={(event) => handleSearch(event.target.value)}
@@ -63,7 +63,7 @@ const BaseConceptAnswer: React.FC<BaseConceptAnswerProps> = ({ onChange, isPatie
               pageNumber={currentPage}
               totalItems={conceptAnswers?.length}
               currentItems={results.length}
-              pageSize={5}
+              pageSize={10}
               onPageNumberChange={({ page }) => goTo(page)}
             />
           </div>

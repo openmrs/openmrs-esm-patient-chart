@@ -3,6 +3,7 @@ import { Observable } from 'rxjs';
 import { openmrsObservableFetch } from '@openmrs/esm-api';
 import useSWR from 'swr';
 import dayjs from 'dayjs';
+import React, { useMemo } from 'react';
 
 interface PersonFetchResponse {
   uuid: string;
@@ -11,18 +12,44 @@ interface PersonFetchResponse {
   type: string;
 }
 
-export function usePatientDeceased(patientUuid: string) {
-  const { personObject, isPersonLoading, isPersonError } = usePersonfromPatient(patientUuid);
-  const { conceptAnswers, isConceptLoading, isConceptError } = useConceptAnswers();
+interface CauseOfDeathFetchResponse {
+  uuid: string;
+  value: string;
+}
 
-  return {
+interface ConcentAnswersResponse {
+  answers: Array<{
+    uuid: string;
+    name: string;
+    display: string;
+  }>;
+}
+
+export function usePatientDeceased(patientUuid: string) {
+  const person = usePersonfromPatient(patientUuid);
+  const causeOfDeath = useCauseOfDeathConcept();
+  const conceptAnswers = useConceptAnswers(causeOfDeath.value);
+  const result = useMemo(() => {
+    return {
+      conceptAnswers: conceptAnswers.conceptAnswers,
+      deathDate: person.personObject?.deathDate,
+      personUuid: person.personObject?.uuid,
+      isDead: person.personObject?.dead,
+      isLoading: person.isPersonLoading && causeOfDeath.isCauseOfDeathLoading && causeOfDeath.isCauseOfDeathLoading,
+      isValidating:
+        person.isPersonValidating && conceptAnswers.isConceptAnswerValidating && causeOfDeath.isCauseOfDeathValidating,
+    };
+  }, [
+    causeOfDeath.isCauseOfDeathLoading,
+    causeOfDeath.isCauseOfDeathValidating,
     conceptAnswers,
-    deathDate: personObject.deathDate,
-    personUuid: personObject.uuid,
-    isDead: personObject.dead,
-    isLoading: isPersonLoading && isConceptLoading,
-    isError: { isPersonError, isConceptError },
-  };
+    person.isPersonLoading,
+    person.isPersonValidating,
+    person.personObject?.dead,
+    person.personObject?.deathDate,
+    person.personObject?.uuid,
+  ]);
+  return result;
 }
 
 export function useSetDeceased(deceasedDate, isDead, personUuid, selectedCauseOfDeath) {
@@ -52,15 +79,20 @@ export function setDeceased(payload: any, personUuid: string, abortController: A
   });
 }
 
-export function useConceptAnswers() {
-  const { conceptUuid } = useCauseOfDeathConcept();
-  const { data, error, isValidating } = useSWR(`/ws/rest/v1/concept/${conceptUuid}`, openmrsFetch);
-  return {
-    conceptAnswers: data ? data.data : null,
-    isConceptLoading: !data && !error,
-    isConceptError: error,
-    isValidating,
-  };
+export function useConceptAnswers(conceptUuid: string) {
+  const { data, error, isValidating } = useSWR<{ data: { answers: ConcentAnswersResponse } }, Error>(
+    `/ws/rest/v1/concept/${conceptUuid}`,
+    openmrsFetch,
+  );
+  const result = useMemo(() => {
+    return {
+      conceptAnswers: data ? data?.data?.answers : null,
+      isConceptLoading: !data && !error,
+      conceptError: error,
+      isConceptAnswerValidating: isValidating,
+    };
+  }, [data, error, isValidating]);
+  return result;
 }
 
 export function usePersonfromPatient(patientUuid: string) {
@@ -72,17 +104,29 @@ export function usePersonfromPatient(patientUuid: string) {
   //   const person = res.data.person;
   //   return { uuid: person.uuid, dead: person.dead, deathDate: person.deathDate };
   // });
-  return {
-    personObject: data ? data.data : null,
-    isPersonLoading: !data && !error,
-    isPersonError: error,
-    isValidating,
-  };
+  const result = useMemo(() => {
+    return {
+      personObject: data ? data?.data : null,
+      personError: error,
+      isPersonLoading: !data && !error,
+      isPersonError: error,
+      isPersonValidating: isValidating,
+    };
+  }, [data, error, isValidating]);
+  return result;
 }
 
-function useCauseOfDeathConcept() {
-  const { data } = useSWR<{ data: { value } }, Error>(`/ws/rest/v1/systemsetting/concept.causeOfDeath`, openmrsFetch);
-  return {
-    conceptUuid: data ? data?.data?.value : null,
-  };
+export function useCauseOfDeathConcept() {
+  const { data, error, isValidating } = useSWR<{ data: CauseOfDeathFetchResponse }>(
+    `/ws/rest/v1/systemsetting/concept.causeOfDeath`,
+    openmrsFetch,
+  );
+  const result = useMemo(() => {
+    return {
+      value: data ? data?.data.value : null,
+      isCauseOfDeathLoading: !data && !error,
+      isCauseOfDeathValidating: isValidating,
+    };
+  }, [data, error, isValidating]);
+  return result;
 }
