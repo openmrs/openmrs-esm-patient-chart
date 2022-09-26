@@ -1,14 +1,13 @@
 import React from 'react';
-import { screen, waitFor, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
+import { useConfig, usePagination } from '@openmrs/esm-framework';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
-import { mockVisitNotes, formattedVisitNotes } from '../../../../__mocks__/visit-notes.mock';
+import { formattedVisitNotes, mockVisitNotes } from '../../../../__mocks__/visit-notes.mock';
 import { patientChartBasePath, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import { ConfigMock } from '../../../../__mocks__/chart-widgets-config.mock';
 import NotesOverview from './notes-overview.component';
-
-jest.setTimeout(10000);
+import { useVisitNotes } from './visit-notes.resource';
 
 const testProps = {
   basePath: patientChartBasePath,
@@ -17,8 +16,13 @@ const testProps = {
   showAddNote: false,
 };
 
-const mockOpenmrsFetch = openmrsFetch as jest.Mock;
+const mockUseVisitNotes = useVisitNotes as jest.Mock;
 const mockUsePagination = usePagination as jest.Mock;
+const mockUseConfig = useConfig as jest.Mock;
+
+jest.mock('./visit-notes.resource', () => {
+  return { useVisitNotes: jest.fn().mockReturnValue([{}]) };
+});
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -26,7 +30,6 @@ jest.mock('@openmrs/esm-framework', () => {
   return {
     ...originalModule,
     openmrsFetch: jest.fn(),
-    useConfig: jest.fn().mockImplementation(() => ConfigMock),
     usePagination: jest.fn().mockImplementation(() => ({
       currentPage: 1,
       goTo: () => {},
@@ -36,13 +39,15 @@ jest.mock('@openmrs/esm-framework', () => {
   };
 });
 
-describe('NotesOverview', () => {
-  it('renders an empty state view if visit note data is unavailable', async () => {
-    mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
+describe('NotesOverview: ', () => {
+  beforeEach(() => {
+    mockUseConfig.mockReturnValue(ConfigMock);
+  });
+
+  test('renders an empty state view if visit note data is unavailable', async () => {
+    mockUseVisitNotes.mockReturnValueOnce({ data: { results: [] } });
 
     renderNotesOverview();
-
-    await waitForLoadingToFinish();
 
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /notes/i })).toBeInTheDocument();
@@ -50,7 +55,7 @@ describe('NotesOverview', () => {
     expect(screen.getByText(/Record visit notes/i)).toBeInTheDocument();
   });
 
-  it('renders an error state view if there is a problem fetching visit note data', async () => {
+  test('renders an error state view if there is a problem fetching visit note data', async () => {
     const error = {
       message: 'You are not logged in',
       response: {
@@ -59,11 +64,9 @@ describe('NotesOverview', () => {
       },
     };
 
-    mockOpenmrsFetch.mockRejectedValueOnce(error);
+    mockUseVisitNotes.mockReturnValueOnce({ isError: error });
 
     renderNotesOverview();
-
-    await waitForLoadingToFinish();
 
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /notes/i })).toBeInTheDocument();
@@ -75,10 +78,8 @@ describe('NotesOverview', () => {
     ).toBeInTheDocument();
   });
 
-  it("renders a tabular overview of the patient's visit notes when present", async () => {
-    const user = userEvent.setup();
-
-    mockOpenmrsFetch.mockReturnValueOnce({ data: { results: mockVisitNotes } });
+  test("renders a tabular overview of the patient's visit notes when present", async () => {
+    mockUseVisitNotes.mockReturnValueOnce({ visitNotes: mockVisitNotes });
     mockUsePagination.mockReturnValueOnce({
       results: formattedVisitNotes.slice(0, 10),
       goTo: () => {},
@@ -86,8 +87,6 @@ describe('NotesOverview', () => {
     });
 
     renderNotesOverview();
-
-    await waitForLoadingToFinish();
 
     expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /notes/i })).toBeInTheDocument();
@@ -112,13 +111,11 @@ describe('NotesOverview', () => {
     );
 
     // Expanding a row displays any associated visit notes
-    await waitFor(() => user.click(screen.getAllByRole('button', { name: /expand current row/i })[0]));
-
+    await userEvent.click(screen.getAllByRole('button', { name: /expand current row/i })[0]);
     expect(screen.getByText(/No visit note to display/i)).toBeInTheDocument();
 
     // Collapsing the row hides the visit note
-    await waitFor(() => user.click(screen.getByRole('button', { name: /collapse current row/i })));
-
+    await userEvent.click(screen.getByRole('button', { name: /collapse current row/i }));
     expect(screen.queryByText(/No visit note to display/i)).not.toBeInTheDocument();
   });
 });
