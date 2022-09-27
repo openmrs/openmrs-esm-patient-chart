@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState } from 'react';
+import React, { useContext, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AccordionSkeleton, Button, Column, ContentSwitcher, DataTableSkeleton, Grid, Switch } from '@carbon/react';
 import { TreeViewAlt } from '@carbon/react/icons';
@@ -63,136 +63,119 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, ty
   const [showTreeOverlay, setShowTreeOverlay] = useState<boolean>(false);
   const { resetTree, timelineData, totalResultsCount } = useContext(FilterContext);
   const expanded = view === 'full';
-  const [adjustWidth, setAdjustWidth] = useState<number>(5);
-  const shiftLeft = useRef(null);
-  const shiftRight = useRef(null);
 
-  const mouseDownHandler = (event) => {
-    const draggableEl = shiftLeft.current;
-    const rightPanel: HTMLElement = document.querySelector('.rightColumnPanel');
-    const wrappingRow: HTMLElement = document.querySelector('.wrapper-row');
-    console.log('LOG groupedElement', wrappingRow)
+  const left = useRef(null);
+  const right = useRef(null);
+  const div = useRef(null);
+  let md: any = null;
 
-    const wrappingRowWidth = window.getComputedStyle(wrappingRow).width;
+  const onMouseMove = (e) => {
+    const dx = e.clientX - md.e.clientX;
+    left.current.style.width = md.leftWidth + dx + 'px';
+    right.current.style.width = md.rightWidth - dx + 'px';
+  };
 
-    rightPanel.style.borderLeft = '1px solid gray';
-    wrappingRow.style.pointerEvents = 'none';
-    document.body.style.cursor = 'col-resize';
+  const onMouseDown = (e) => {
+    md = {
+      e: e,
+      leftWidth: left.current?.offsetWidth,
+      rightWidth: right.current?.offsetWidth,
+    };
 
-    const fullWidth: number = parseInt(wrappingRowWidth);
-    let prevX = event.clientX;
-    document.addEventListener('mouseMove', mouseMoveHandler);
-    document.addEventListener('mouseUp', mouseUpHandler);
-
-    function mouseMoveHandler(ev) {
-      const newX = prevX - ev.clientX;
-      const dragStyles = window.getComputedStyle(draggableEl);
-      const currentLeft = parseInt(dragStyles.left, 10);
-
-      draggableEl.style.left = currentLeft - newX + 'px';
-
-      const colAdjust = parseInt(((fullWidth / 12) * (currentLeft - newX)).toFixed(0));
-      if (colAdjust > 2 && colAdjust < 9) setAdjustWidth(colAdjust);
-      {
-        prevX = ev.clientX;
-      }
-    }
-
-    function mouseUpHandler() {
-      draggableEl.style.left = '100%';
-      rightPanel.style.borderLeft = 'none';
-      wrappingRow.style.pointerEvents = 'auto';
-      document.body.style.cursor = 'default';
-      document.removeEventListener('mousemove', mouseMoveHandler);
-      document.removeEventListener('mouseup', mouseUpHandler);
-    }
+    document.onmousemove = (e) => onMouseMove(e);
+    document.onmouseup = () => {
+      document.onmousemove = document.onmouseup = md = null;
+    };
   };
 
   return (
     <>
       <Grid className={styles.resultsContainer}>
-        <Column className={styles.resultsHeader} sm={12} lg={!tablet ? 5 : 12}>
-          <div className={styles.leftHeader}>
-            <h4 style={{ flexGrow: 1 }}>{`${t('results', 'Results')} ${
-              totalResultsCount ? `(${totalResultsCount})` : ''
-            }`}</h4>
-            <div className={styles.leftHeaderActions}>
-              {tablet && (
-                <Button
-                  size={tablet ? 'md' : 'sm'}
-                  kind="ghost"
-                  renderIcon={(props) => <TreeViewAlt {...props} size={16} />}
-                  onClick={() => setShowTreeOverlay(true)}
-                  style={{
-                    marginRight: '1rem',
-                  }}
-                >
-                  {t('showTreeButtonText', 'Show tree')}
-                </Button>
-              )}
-              {!expanded && (
-                <ContentSwitcher
-                  size={tablet ? 'lg' : 'md'}
-                  selectedIndex={1}
-                  onChange={(e) => setLeftContent(e.name as panelOpts)}
-                >
-                  <Switch name="panel" text={t('panel', 'Panel')} disabled={loading} />
-                  <Switch name="tree" text={t('tree', 'Tree')} disabled={loading} />
-                </ContentSwitcher>
-              )}
-            </div>
+        <div className={styles.colContainer}>
+          <div className={styles.colLeft} ref={left}>
+            <Column className={styles.resultsHeader} sm={12} lg={!tablet ? 5 : 12}>
+              <div className={styles.leftHeader}>
+                <h4 style={{ flexGrow: 1 }}>{`${t('results', 'Results')} ${
+                  totalResultsCount ? `(${totalResultsCount})` : ''
+                }`}</h4>
+                <div className={styles.leftHeaderActions}>
+                  {tablet && (
+                    <Button
+                      size={tablet ? 'md' : 'sm'}
+                      kind="ghost"
+                      renderIcon={(props) => <TreeViewAlt {...props} size={16} />}
+                      onClick={() => setShowTreeOverlay(true)}
+                      style={{
+                        marginRight: '1rem',
+                      }}
+                    >
+                      {t('showTreeButtonText', 'Show tree')}
+                    </Button>
+                  )}
+                  {!expanded && (
+                    <ContentSwitcher
+                      size={tablet ? 'lg' : 'md'}
+                      selectedIndex={1}
+                      onChange={(e) => setLeftContent(e.name as panelOpts)}
+                    >
+                      <Switch name="panel" text={t('panel', 'Panel')} disabled={loading} />
+                      <Switch name="tree" text={t('tree', 'Tree')} disabled={loading} />
+                    </ContentSwitcher>
+                  )}
+                </div>
+              </div>
+            </Column>
+            {!tablet && (
+              <Column sm={16} lg={tablet || expanded ? 0 : 5} className={`${styles.columnPanel} ${styles.treeColumn}`}>
+                {leftContent === 'tree' &&
+                  (!loading ? (
+                    <>
+                      <FilterSet />
+                    </>
+                  ) : (
+                    <AccordionSkeleton open count={4} align="start" />
+                  ))}
+                {leftContent === 'panel' && <DesktopView />}
+              </Column>
+            )}
           </div>
-        </Column>
-        {!tablet && (
-          <Column className={styles.resultsHeader} sm={12} lg={7}>
-            <div
-              className={styles.viewOptsContentSwitcherContainer}
-              style={{ display: 'flex', justifyContent: 'flex-end' }}
-            >
-              <ContentSwitcher
-                size={tablet ? 'lg' : 'md'}
-                style={{ maxWidth: '10rem' }}
-                onChange={(e) => setView(e.name as viewOpts)}
-                selectedIndex={expanded ? 1 : 0}
-              >
-                <Switch name="split" text={t('split', 'Split')} disabled={loading} />
-                <Switch name="full" text={t('full', 'Full')} disabled={loading} />
-              </ContentSwitcher>
-            </div>
-          </Column>
-        )}
-        {!tablet && (
-          <Column
-            sm={16}
-            lg={tablet || expanded ? 0 : adjustWidth}
-            className={`${styles.columnPanel} ${styles.treeColumn} leftColumnPanel`}
-          >
-            <>
-              <FilterSet />
-              <div
-                className={styles.dragHandler}
-                ref={shiftLeft}
-                role="button"
-                tabIndex={0}
-                onMouseDown={mouseDownHandler}
-              />
-            </>
-            {leftContent === 'panel' && <DesktopView />}
-          </Column>
-        )}
-        <Column
-          sm={16}
-          lg={12 - (expanded ? 0 : adjustWidth)}
-          className={`${styles.columnPanel} ${styles.rightColumnPanel}`}
-        >
-          {!tablet && testUuid && type === 'trendline' ? (
-            <Trendline patientUuid={patientUuid} conceptUuid={testUuid} basePath={basePath} showBackToTimelineButton />
-          ) : !loading ? (
-            <GroupedTimeline />
-          ) : (
-            <DataTableSkeleton />
-          )}
-        </Column>
+          <div className={styles.dragHandler} ref={div} role="button" tabIndex={0} onMouseDown={onMouseDown}></div>
+          <div className={styles.colRight} ref={right}>
+            {!tablet && (
+              <Column className={styles.resultsHeader} sm={12} lg={7}>
+                <div
+                  className={styles.viewOptsContentSwitcherContainer}
+                  style={{ display: 'flex', justifyContent: 'flex-end' }}
+                >
+                  <ContentSwitcher
+                    size={tablet ? 'lg' : 'md'}
+                    style={{ maxWidth: '10rem' }}
+                    onChange={(e) => setView(e.name as viewOpts)}
+                    selectedIndex={expanded ? 1 : 0}
+                  >
+                    <Switch name="split" text={t('split', 'Split')} disabled={loading} />
+                    <Switch name="full" text={t('full', 'Full')} disabled={loading} />
+                  </ContentSwitcher>
+                </div>
+              </Column>
+            )}
+
+            <Column sm={16} lg={tablet || expanded ? 12 : 7} className={`${styles.columnPanel}`}>
+              {!tablet && testUuid && type === 'trendline' ? (
+                <Trendline
+                  patientUuid={patientUuid}
+                  conceptUuid={testUuid}
+                  basePath={basePath}
+                  showBackToTimelineButton
+                />
+              ) : !loading ? (
+                <GroupedTimeline />
+              ) : (
+                <DataTableSkeleton />
+              )}
+            </Column>
+          </div>
+        </div>
       </Grid>
       {tablet && showTreeOverlay && (
         <TabletOverlay
