@@ -91,90 +91,89 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, ty
   return (
     <>
       <Grid className={styles.resultsContainer}>
-        <div className={styles.colContainer}>
-          <div className={styles.colLeft} ref={left}>
-            <Column className={styles.resultsHeader} sm={12} lg={!tablet ? 5 : 12}>
-              <div className={styles.leftHeader}>
-                <h4 style={{ flexGrow: 1 }}>{`${t('results', 'Results')} ${
-                  totalResultsCount ? `(${totalResultsCount})` : ''
-                }`}</h4>
-                <div className={styles.leftHeaderActions}>
-                  {tablet && (
-                    <Button
-                      size={tablet ? 'md' : 'sm'}
-                      kind="ghost"
-                      renderIcon={(props) => <TreeViewAlt {...props} size={16} />}
-                      onClick={() => setShowTreeOverlay(true)}
-                      style={{
-                        marginRight: '1rem',
-                      }}
-                    >
-                      {t('showTreeButtonText', 'Show tree')}
-                    </Button>
-                  )}
-                  {!expanded && (
-                    <ContentSwitcher
-                      size={tablet ? 'lg' : 'md'}
-                      selectedIndex={1}
-                      onChange={(e) => setLeftContent(e.name as panelOpts)}
-                    >
-                      <Switch name="panel" text={t('panel', 'Panel')} disabled={loading} />
-                      <Switch name="tree" text={t('tree', 'Tree')} disabled={loading} />
-                    </ContentSwitcher>
-                  )}
-                </div>
-              </div>
-            </Column>
-            {!tablet && (
-              <Column sm={16} lg={tablet || expanded ? 0 : 5} className={`${styles.columnPanel} ${styles.treeColumn}`}>
-                {leftContent === 'tree' &&
-                  (!loading ? (
-                    <>
-                      <FilterSet />
-                    </>
-                  ) : (
-                    <AccordionSkeleton open count={4} align="start" />
-                  ))}
-                {leftContent === 'panel' && <DesktopView />}
-              </Column>
-            )}
-          </div>
-          <div className={styles.dragHandler} ref={div} role="button" tabIndex={0} onMouseDown={onMouseDown}></div>
-          <div className={styles.colRight} ref={right}>
-            {!tablet && (
-              <Column className={styles.resultsHeader} sm={12} lg={7}>
-                <div
-                  className={styles.viewOptsContentSwitcherContainer}
-                  style={{ display: 'flex', justifyContent: 'flex-end' }}
-                >
+        <div className={styles.colContainer}></div>
+        <div className={styles.Left} ref={left}>
+          <Column className={styles.resultsHeader} sm={12} lg={!tablet ? 5 : 12}>
+            <div className={styles.leftHeader}>
+              <h4 style={{ flexGrow: 1 }}>{`${t('results', 'Results')} ${
+                totalResultsCount ? `(${totalResultsCount})` : ''
+              }`}</h4>
+              <div className={styles.leftHeaderActions}>
+                {tablet && (
+                  <Button
+                    size={tablet ? 'md' : 'sm'}
+                    kind="ghost"
+                    renderIcon={(props) => <TreeViewAlt {...props} size={16} />}
+                    onClick={() => setShowTreeOverlay(true)}
+                    style={{
+                      marginRight: '1rem',
+                    }}
+                  >
+                    {t('showTreeButtonText', 'Show tree')}
+                  </Button>
+                )}
+                {!expanded && (
                   <ContentSwitcher
                     size={tablet ? 'lg' : 'md'}
-                    style={{ maxWidth: '10rem' }}
-                    onChange={(e) => setView(e.name as viewOpts)}
-                    selectedIndex={expanded ? 1 : 0}
+                    selectedIndex={1}
+                    onChange={(e) => setLeftContent(e.name as panelOpts)}
                   >
-                    <Switch name="split" text={t('split', 'Split')} disabled={loading} />
-                    <Switch name="full" text={t('full', 'Full')} disabled={loading} />
+                    <Switch name="panel" text={t('panel', 'Panel')} disabled={loading} />
+                    <Switch name="tree" text={t('tree', 'Tree')} disabled={loading} />
                   </ContentSwitcher>
-                </div>
-              </Column>
-            )}
-
-            <Column sm={16} lg={tablet || expanded ? 12 : 7} className={`${styles.columnPanel}`}>
-              {!tablet && testUuid && type === 'trendline' ? (
-                <Trendline
-                  patientUuid={patientUuid}
-                  conceptUuid={testUuid}
-                  basePath={basePath}
-                  showBackToTimelineButton
-                />
-              ) : !loading ? (
-                <GroupedTimeline />
-              ) : (
-                <DataTableSkeleton />
-              )}
+                )}
+              </div>
+            </div>
+          </Column>
+          {!tablet && (
+            <Column sm={16} lg={tablet || expanded ? 0 : 5} className={`${styles.columnPanel} ${styles.treeColumn}`}>
+              {leftContent === 'tree' &&
+                (!loading ? (
+                  <>
+                    <FilterSet />
+                  </>
+                ) : (
+                  <AccordionSkeleton open count={4} align="start" />
+                ))}
+              {leftContent === 'panel' && <DesktopView />}
             </Column>
-          </div>
+          )}
+        </div>
+        <div className={styles.dragHandler} ref={div} role="button" tabIndex={0} onMouseDown={onMouseDown}></div>
+        <div className={styles.Right} ref={right}>
+          {!tablet && (
+            <Column className={styles.resultsHeader} sm={12} lg={7}>
+              <div
+                className={styles.viewOptsContentSwitcherContainer}
+                style={{ display: 'flex', justifyContent: 'flex-end' }}
+              >
+                <ContentSwitcher
+                  size={tablet ? 'lg' : 'md'}
+                  style={{ maxWidth: '10rem' }}
+                  onChange={(e) => setView(e.name as viewOpts)}
+                  selectedIndex={expanded ? 1 : 0}
+                >
+                  <Switch name="split" text={t('split', 'Split')} disabled={loading} />
+                  <Switch name="full" text={t('full', 'Full')} disabled={loading} />
+                </ContentSwitcher>
+              </div>
+            </Column>
+          )}
+
+          <Column sm={16} lg={tablet || expanded ? 12 : 7} className={`${styles.columnPanel}`}>
+            {!tablet && testUuid && type === 'trendline' ? (
+              <Trendline
+                patientUuid={patientUuid}
+                conceptUuid={testUuid}
+                basePath={basePath}
+                showBackToTimelineButton
+              />
+            ) : !loading ? (
+              <GroupedTimeline />
+            ) : (
+              <DataTableSkeleton />
+            )}
+          </Column>
         </div>
       </Grid>
       {tablet && showTreeOverlay && (

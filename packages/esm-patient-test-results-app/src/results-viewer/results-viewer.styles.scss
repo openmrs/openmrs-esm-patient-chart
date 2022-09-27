@@ -53,33 +53,32 @@
   }
 }
 
-// col {
-//   height: 100%;
-//   display: flex;
-//   box-sizing: border-box;
-//   min-width: 3rem;
-// }
+col {
+  height: 100%;
+  display: flex;
+  box-sizing: border-box;
+  min-width: 3rem;
+}
 
-// .colLeft {
-//   width: 30%;
-// }
+.colLeft {
+  width: 30%;
+}
 
-// .colRight {
-//   width: 70%;
-// }
+.colRight {
+  width: 70%;
+}
  
 .columnPanel {
-  position: absolute;
+  position: relative;
 }
  
 .dragHandler {
-  width: 1rem;
+  width: 24px;
   height: 100%;
   background-color: $color-gray-30;
-  flex-grow: 1;
-  box-sizing: border-box;
   position: relative;
-  cursor: col-resize;
+  top: 0;
   left: 50%;
+  cursor: col-resize;
+  z-index: 100;
 }
-
