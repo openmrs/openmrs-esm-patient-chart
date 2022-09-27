@@ -12,6 +12,17 @@
 .date {
   @include type.type-style('body-compact-01');
   color: $text-02;
+  padding-right: 10px;
+}
+
+.dateLabel{
+  padding-right: 5px;
+}
+
+.displayFlex{
+  display:flex;
+  align-items: center;
+  justify-content: left;
 }
 
 .container {

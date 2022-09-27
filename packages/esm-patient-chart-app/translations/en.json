@@ -91,5 +91,7 @@
   "visitStartedSuccessfully": "",
   "visitSummaries": "Visit summaries",
   "visitType": "Visit type",
-  "workspaceModalText": "Launching a new form in the workspace could cause you to lose unsaved work on the {formName} form."
+  "workspaceModalText": "Launching a new form in the workspace could cause you to lose unsaved work on the {formName} form.",
+  "start": "Start",
+  "end":"End"
 }
