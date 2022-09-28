@@ -38,14 +38,16 @@ const BaseConceptAnswer: React.FC<BaseConceptAnswerProps> = ({ onChange, isPatie
         isTablet ? styles.conceptAnswerOverviewWrapperTablet : styles.conceptAnswerOverviewWrapperDesktop
       }`}
     >
-      {results.length && !isPatientDead && !conceptAnswers ? (
+      {!isPatientDead && (
+        <Search
+          onChange={(event) => handleSearch(event.target.value)}
+          placeholder={t('searchForCauseOfDeath', 'Search for a cause of death')}
+          labelText=""
+          light={isTablet}
+        />
+      )}
+      {results.length && !isPatientDead ? (
         <>
-          <Search
-            onChange={(event) => handleSearch(event.target.value)}
-            placeholder={t('searchForCauseOfDeath', 'Search for a cause of death')}
-            labelText=""
-            light={isTablet}
-          />
           <RadioButtonGroup
             className={styles.radioButtonGroup}
             defaultSelected="default-selected"
