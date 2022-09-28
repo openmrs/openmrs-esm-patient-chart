@@ -108,6 +108,15 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
     }
   }, [patientVitalAndBiometrics?.weight, patientVitalAndBiometrics?.height]);
 
+  useEffect(() => {
+    if (
+      isInNormalRange(conceptMetadata, config.concepts['weightUuid'], patientVitalAndBiometrics?.weight) == true &&
+      patientVitalAndBiometrics?.weight
+    ) {
+      setIsSubmitting(false);
+    } else setIsSubmitting(true);
+  }, [patientVitalAndBiometrics?.weight]);
+
   return (
     <Form className={styles.form}>
       <div className={styles.grid}>
@@ -287,90 +296,95 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
           <Column className={styles.column}>
             <p className={styles.vitalsTitle}>{t('recordBiometrics', 'Record biometrics')}</p>
           </Column>
-          <Row className={styles.row}>
-            <Column className={styles.column}>
-              <VitalsBiometricInput
-                title={t('weight', 'Weight')}
-                onInputChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                  setPatientVitalAndBiometrics({
-                    ...patientVitalAndBiometrics,
-                    weight: event.target.value,
-                  });
-                }}
-                textFields={[
-                  {
-                    name: t('weight', 'Weight'),
-                    type: 'number',
-                    value: patientVitalAndBiometrics?.weight || '',
-                  },
-                ]}
-                unitSymbol={conceptUnits.get(config.concepts.weightUuid) ?? ''}
-                inputIsNormal={true}
-              />
-            </Column>
-            <Column className={styles.column}>
-              <VitalsBiometricInput
-                title={t('height', 'Height')}
-                onInputChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                  setPatientVitalAndBiometrics({
-                    ...patientVitalAndBiometrics,
-                    height: event.target.value,
-                  });
-                }}
-                textFields={[
-                  {
-                    name: t('height', 'Height'),
-                    type: 'number',
-                    value: patientVitalAndBiometrics?.height || '',
-                  },
-                ]}
-                unitSymbol={conceptUnits.get(config.concepts.heightUuid) ?? ''}
-                inputIsNormal={true}
-              />
-            </Column>
-            <Column className={styles.column}>
-              <VitalsBiometricInput
-                title={t('bmiCalc', 'BMI (calc.)')}
-                onInputChange={() => {}}
-                textFields={[
-                  {
-                    name: t('bmi', 'BMI'),
-                    type: 'number',
-                    value: patientBMI || '',
-                  },
-                ]}
-                unitSymbol={biometricsUnitsSymbols['bmiUnit']}
-                disabled
-                inputIsNormal={isBMIInNormalRange(patientBMI)}
-              />
-            </Column>
-            <Column className={styles.column}>
-              <VitalsBiometricInput
-                title={t('muac', 'MUAC')}
-                onInputChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                  setPatientVitalAndBiometrics({
-                    ...patientVitalAndBiometrics,
-                    midUpperArmCircumference: event.target.value,
-                  });
-                }}
-                textFields={[
-                  {
-                    name: t('muac', 'MUAC'),
-                    type: 'number',
-                    value: patientVitalAndBiometrics?.midUpperArmCircumference || '',
-                  },
-                ]}
-                unitSymbol={conceptUnits.get(config.concepts.midUpperArmCircumferenceUuid) ?? ''}
-                inputIsNormal={isInNormalRange(
-                  conceptMetadata,
-                  config.concepts['midUpperArmCircumferenceUuid'],
-                  patientVitalAndBiometrics?.midUpperArmCircumference,
-                )}
-              />
-            </Column>
-          </Row>
-        </Stack>
-      </div>
+        </Row>
+        <Row className={styles.row}>
+          <Column>
+            <VitalsBiometricInput
+              title={t('weight', 'Weight')}
+              onInputChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                setPatientVitalAndBiometrics({
+                  ...patientVitalAndBiometrics,
+                  weight: event.target.value,
+                });
+              }}
+              textFields={[
+                {
+                  name: t('weight', 'Weight'),
+                  type: 'number',
+                  value: patientVitalAndBiometrics?.weight || '',
+                },
+              ]}
+              unitSymbol={conceptUnits.get(config.concepts.weightUuid) ?? ''}
+              inputIsNormal={isInNormalRange(
+                conceptMetadata,
+                config.concepts['weightUuid'],
+                patientVitalAndBiometrics?.weight,
+              )}
+            />
+          </Column>
+          <Column>
+            <VitalsBiometricInput
+              title={t('height', 'Height')}
+              onInputChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                setPatientVitalAndBiometrics({
+                  ...patientVitalAndBiometrics,
+                  height: event.target.value,
+                });
+              }}
+              textFields={[
+                {
+                  name: t('height', 'Height'),
+                  type: 'number',
+                  value: patientVitalAndBiometrics?.height || '',
+                },
+              ]}
+              unitSymbol={conceptUnits.get(config.concepts.heightUuid) ?? ''}
+              inputIsNormal={true}
+            />
+          </Column>
+          <Column>
+            <VitalsBiometricInput
+              title={t('bmiCalc', 'BMI (calc.)')}
+              onInputChange={() => {}}
+              textFields={[
+                {
+                  name: t('bmi', 'BMI'),
+                  type: 'number',
+                  value: patientBMI || '',
+                },
+              ]}
+              unitSymbol={biometricsUnitsSymbols['bmiUnit']}
+              disabled={true}
+              inputIsNormal={isBMIInNormalRange(patientBMI)}
+            />
+          </Column>
+          <Column>
+            <VitalsBiometricInput
+              title={t('muac', 'MUAC')}
+              onInputChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                setPatientVitalAndBiometrics({
+                  ...patientVitalAndBiometrics,
+                  midUpperArmCircumference: event.target.value,
+                });
+              }}
+              textFields={[
+                {
+                  name: t('muac', 'MUAC'),
+                  type: 'number',
+                  value: patientVitalAndBiometrics?.midUpperArmCircumference || '',
+                },
+              ]}
+              unitSymbol={conceptUnits.get(config.concepts.midUpperArmCircumferenceUuid) ?? ''}
+              inputIsNormal={isInNormalRange(
+                conceptMetadata,
+                config.concepts['midUpperArmCircumferenceUuid'],
+                patientVitalAndBiometrics?.midUpperArmCircumference,
+              )}
+            />
+          </Column>
+        </Row>
+      </Grid>
+      
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
         <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
           {t('discard', 'Discard')}

@@ -103,7 +103,22 @@ describe('VitalsBiometricsForm: ', () => {
 
     mockSavePatientVitals.mockResolvedValueOnce({ status: 201, statusText: 'Ok' });
 
-    renderForm();
+      const error = {
+        message: 'Internal Server Error',
+        response: {
+          status: 500,
+          statusText: 'Internal Server Error',
+        },
+      };
+      mockSavePatientVitals.mockRejectedValueOnce(error);
+      userEvent.type(temperature, '294');
+      userEvent.clear(muac);
+      userEvent.type(muac, 'on going');
+      userEvent.clear(weightInput);
+      userEvent.type(weightInput, '55');
+      userEvent.click(saveButton);
+
+
 
     const heightInput = screen.getByRole('spinbutton', { name: /height/i });
     const weightInput = screen.getByRole('spinbutton', { name: /weight/i });
