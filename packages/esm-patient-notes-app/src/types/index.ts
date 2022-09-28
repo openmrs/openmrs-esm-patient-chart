@@ -19,6 +19,7 @@ export interface RESTPatientNote {
     dateChanged?: Date;
   };
   obs: Array<ObsData>;
+  diagnoses: Array<DiagnosisData>;
 }
 
 export interface PatientNote {
@@ -31,30 +32,35 @@ export interface PatientNote {
   encounterProviderRole: string;
 }
 
-export interface DiagnosisData {
-  word: null;
-  conceptName: {
-    id: number;
-    uuid: string;
-    conceptNameType: string;
-    name: string;
-  };
-  concept: {
-    id: number;
-    uuid: string;
-    conceptMappings: Array<ConceptMapping>;
-    preferredName: string;
-  };
+export interface Concept {
+  display: string;
+  uuid: string;
 }
 
+export interface DiagnosisData {
+  uuid: string;
+  display: string;
+  conceptClass: {
+    uuid: string;
+    name: string;
+    description: string;
+  };
+  names: Array<ConceptNames>;
+  mappings: Array<ConceptMapping>;
+}
+
+export interface ConceptNames {
+  uuid: string;
+  name: string;
+  conceptNameType: string;
+}
 export interface ConceptMapping {
-  conceptMapType: string;
+  conceptMapType: {
+    uuid: string;
+    display: string;
+  };
   conceptReferenceTerm: {
-    code: string;
-    name: null | string;
-    conceptSource: {
-      name: string;
-    };
+    display: string;
   };
 }
 
@@ -135,23 +141,34 @@ export interface Location {
 }
 
 export interface ObsData {
-  concept: {
-    display: string;
-    uuid: string;
-  };
+  concept: Concept;
   value?: string | any;
   groupMembers?: Array<{
-    concept: { uuid: string; display: string };
+    concept: Concept;
     value?: string | any;
   }>;
   obsDatetime: string;
 }
 
 export interface Diagnosis {
-  concept: any;
-  conceptReferenceTermCode: string;
-  primary: boolean;
-  confirmed: boolean;
+  patient: string;
+  diagnosis: {
+    coded: string;
+  };
+  certainty: string;
+  rank: number;
+  display: string;
+}
+
+export interface DiagnosisPayload {
+  encounter: string;
+  patient: string;
+  condition: null;
+  diagnosis: {
+    coded: string;
+  };
+  certainty: string;
+  rank: number;
 }
 
 export interface VisitNotePayload {
@@ -167,10 +184,10 @@ export interface VisitNotePayload {
 }
 
 export interface ObsPayload {
-  concept: string;
+  concept: Concept;
   value?: string;
   groupMembers?: Array<{
-    concept: string;
+    concept: Concept;
     value: string;
   }>;
 }

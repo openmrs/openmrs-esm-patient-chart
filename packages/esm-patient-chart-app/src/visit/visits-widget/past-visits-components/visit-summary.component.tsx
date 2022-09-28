@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabList, TabPanel, TabPanels, Tag } from '@carbon/react';
 import { formatTime, OpenmrsResource, parseDate, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { Order, Encounter, Note, Observation, OrderItem } from '../visit.resource';
-import EncounterList from './encounter-list.component';
+import VisitsTable from './visits-table/visits-table.component';
 import MedicationSummary from './medications-summary.component';
 import NotesSummary from './notes-summary.component';
 import TestsSummary from './tests-summary.component';
@@ -32,7 +32,6 @@ export interface MappedEncounter {
 const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid }) => {
   const config = useConfig();
   const { t } = useTranslation();
-  const [selectedTab, setSelectedTab] = useState(0);
   const layout = useLayoutType();
 
   const [diagnoses, notes, medications]: [Array<DiagnosisItem>, Array<Note>, Array<OrderItem>] = useMemo(() => {
@@ -106,16 +105,16 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid }) 
       </div>
       <Tabs className={`${styles.verticalTabs} ${layout === 'tablet' ? styles.tabletTabs : styles.desktopTabs}`}>
         <TabList aria-label="Visit summary tabs" className={styles.tablist}>
-          <Tab className={`${styles.tab} ${styles.bodyLong01}`} id="notes-tab" onClick={() => setSelectedTab(0)}>
+          <Tab className={`${styles.tab} ${styles.bodyLong01}`} id="notes-tab">
             {t('notes', 'Notes')}
           </Tab>
-          <Tab className={styles.tab} id="tests-tab" onClick={() => setSelectedTab(1)}>
+          <Tab className={styles.tab} id="tests-tab">
             {t('tests', 'Tests')}
           </Tab>
-          <Tab className={styles.tab} id="medications-tab" onClick={() => setSelectedTab(2)}>
+          <Tab className={styles.tab} id="medications-tab">
             {t('medications', 'Medications')}
           </Tab>
-          <Tab className={styles.tab} id="encounters-tab" onClick={() => setSelectedTab(3)}>
+          <Tab className={styles.tab} id="encounters-tab">
             {t('encounters', 'Encounters')}
           </Tab>
         </TabList>
@@ -130,7 +129,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid }) 
             <MedicationSummary medications={medications} />
           </TabPanel>
           <TabPanel>
-            <EncounterList encounters={mapEncounters(encounters)} showAllEncounters={false} />
+            <VisitsTable visits={mapEncounters(encounters)} showAllEncounters={false} />
           </TabPanel>
         </TabPanels>
       </Tabs>

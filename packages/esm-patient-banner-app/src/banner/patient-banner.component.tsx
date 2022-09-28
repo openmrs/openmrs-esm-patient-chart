@@ -31,7 +31,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
     [patientUuid, onClick, onTransition],
   );
 
-  const patientName = `${patient.name?.[0].given?.join(' ')} ${patient?.name?.[0].family}`;
+  const patientName = `${patient?.name?.[0]?.given?.join(' ')} ${patient?.name?.[0].family}`;
   const patientPhotoSlotState = React.useMemo(() => ({ patientUuid, patientName }), [patientUuid, patientName]);
 
   const [showContactDetails, setShowContactDetails] = React.useState(false);
@@ -99,13 +99,13 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
             )}
           </div>
           <div className={styles.demographics}>
-            <span>{capitalize(patient.gender)}</span> &middot; <span>{age(patient.birthDate)}</span> &middot;{' '}
-            <span>{formatDate(parseDate(patient.birthDate), { mode: 'wide', time: false })}</span>
+            <span>{capitalize(patient?.gender)}</span> &middot; <span>{age(patient?.birthDate)}</span> &middot;{' '}
+            <span>{formatDate(parseDate(patient?.birthDate), { mode: 'wide', time: false })}</span>
           </div>
           <div className={styles.row}>
             <div className={styles.identifiers}>
-              {patient.identifier?.length
-                ? patient.identifier.map(({ value, type }) => (
+              {patient?.identifier?.length
+                ? patient?.identifier.map(({ value, type }) => (
                     <span className={styles.identifierTag}>
                       <Tag key={value} type="gray" title={type.text}>
                         {type.text}
@@ -131,7 +131,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
         </div>
       </div>
       {showContactDetails && (
-        <ContactDetails address={patient.address ?? []} telecom={patient.telecom ?? []} patientId={patient.id} />
+        <ContactDetails address={patient?.address ?? []} telecom={patient?.telecom ?? []} patientId={patient?.id} />
       )}
     </div>
   );

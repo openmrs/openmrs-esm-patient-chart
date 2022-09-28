@@ -24,6 +24,36 @@ export function useVisits(patientUuid: string) {
   };
 }
 
+export function useEncounters(patientUuid: string) {
+  const endpointUrl = '/ws/rest/v1/encounter';
+  // setting this up to make it more generic and usable later
+  const params = {
+    patient: patientUuid,
+    v: 'default',
+    limit: '100',
+    order: 'desc',
+    startIndex: '0',
+  };
+  const fullRequest =
+    endpointUrl +
+    '?' +
+    Object.entries(params)
+      .map(([key, value]) => `${key}=${value}`)
+      .join('&');
+
+  const { data, error, isValidating } = useSWR<{ data: { results: Array<Record<string, unknown>> } }, Error>(
+    fullRequest,
+    openmrsFetch,
+  );
+
+  return {
+    encounters: data ? data?.data?.results : null,
+    error,
+    isLoading: !data && !error,
+    isValidating,
+  };
+}
+
 export function usePastVisits(patientUuid: string) {
   const customRepresentation =
     'custom:(uuid,encounters:(uuid,encounterDatetime,' +
