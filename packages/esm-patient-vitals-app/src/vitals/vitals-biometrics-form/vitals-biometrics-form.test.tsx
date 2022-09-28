@@ -202,11 +202,11 @@ describe('VitalsBiometricsForm: ', () => {
         },
       };
       mockSavePatientVitals.mockRejectedValueOnce(error);
-
+      userEvent.type(temperature, '294');
       userEvent.clear(muac);
       userEvent.type(muac, 'on going');
       userEvent.clear(weightInput);
-      userEvent.type(weightInput, 'no record of temperature');
+      userEvent.type(weightInput, '55');
       userEvent.click(saveButton);
 
       await act(() => promise);
