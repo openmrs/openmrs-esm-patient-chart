@@ -5,11 +5,9 @@
   "transformIgnorePatterns": ["/node_modules/(?!@openmrs)"],
   "moduleNameMapper": {
     "\\.(s?css)$": "identity-obj-proxy",
-    "^@carbon/icons-react/es/(.*)$": "@carbon/icons-react/lib/$1",
-    "^@carbon/charts": "identity-obj-proxy",
-    "^carbon-components-react/es/(.*)$": "carbon-components-react/lib/$1",
     "@openmrs/esm-framework": "@openmrs/esm-framework/mock",
-    "^lodash-es/(.*)$": "lodash/$1"
+    "^lodash-es/(.*)$": "lodash/$1",
+    "^uuid$": "<rootDir>/node_modules/uuid/dist/index.js"
   },
   "collectCoverageFrom": [
     "**/src/**/*.component.tsx",
@@ -31,5 +29,9 @@
   ],
   "testPathIgnorePatterns": [
     "<rootDir>/packages/esm-form-entry-app"
-  ]
+  ],
+  "testEnvironment": "jsdom",
+  "testEnvironmentOptions": {
+    "url": "http://localhost/"
+  }
 }

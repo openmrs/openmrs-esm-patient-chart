@@ -1,6 +1,5 @@
-@import "~@openmrs/esm-styleguide/src/vars";
-@import "~carbon-components/src/globals/scss/vars";
-@import "~carbon-components/src/globals/scss/mixins";
+@use '@carbon/styles/scss/spacing';
+@import '~@openmrs/esm-styleguide/src/vars';
 
 $icon-button-size: 48px;
 $actionPanelOffset: 48px;
@@ -29,7 +28,7 @@ $actionPanelOffset: 48px;
         width: $icon-button-size;
         height: $icon-button-size;
         justify-content: center;
-        margin-top: $spacing-02;
+        margin-top: spacing.$spacing-02;
       }
     }
   }
@@ -43,8 +42,8 @@ $actionPanelOffset: 48px;
     width: 100%;
     position: fixed !important;
     bottom: 0;
-    height: $spacing-10;
-    border-top: $spacing-01 solid $ui-03;
+    height: spacing.$spacing-10;
+    border-top: spacing.$spacing-01 solid $ui-03;
     z-index: 9000;
 
     & > div {

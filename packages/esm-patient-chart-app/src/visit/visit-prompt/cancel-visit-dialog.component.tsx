@@ -1,8 +1,8 @@
 import React, { useCallback, useState } from 'react';
+import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { useVisit, openmrsFetch, showToast, showNotification } from '@openmrs/esm-framework';
-import styles from './cancel-visit-dialog.scss';
-import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
+import styles from './cancel-visit-dialog.scss';
 
 interface CancelVisitDialogProps {
   patientUuid: string;
@@ -36,7 +36,7 @@ const CancelVisitDialog: React.FC<CancelVisitDialogProps> = ({ patientUuid, clos
       },
       (error) => {
         showNotification({
-          title: t('cancelVisitError', 'Error canceling active visit'),
+          title: t('cancelVisitError', 'Error cancelling active visit'),
           kind: 'error',
           critical: true,
           description: error?.message,
@@ -44,7 +44,7 @@ const CancelVisitDialog: React.FC<CancelVisitDialogProps> = ({ patientUuid, clos
         setSubmitting(false);
       },
     );
-  }, []);
+  }, [closeModal, currentVisit.uuid, mutate, t]);
 
   return (
     <div>
@@ -55,7 +55,7 @@ const CancelVisitDialog: React.FC<CancelVisitDialogProps> = ({ patientUuid, clos
       />
       <ModalBody>
         <p className={styles.bodyShort02}>
-          {t('cancelVisitWarningMessage', 'Canceling this visit will delete all associated encounter(s)')}
+          {t('cancelVisitWarningMessage', 'Cancelling this visit will delete all associated encounters')}.
         </p>
       </ModalBody>
       <ModalFooter>
@@ -63,7 +63,7 @@ const CancelVisitDialog: React.FC<CancelVisitDialogProps> = ({ patientUuid, clos
           {t('cancel', 'Cancel')}
         </Button>
         <Button disabled={submitting} kind="danger" onClick={cancelActiveVisit}>
-          {submitting ? <InlineLoading description={t('loading', 'Loading...')} /> : t('cancelVisit', 'Cancel Visit')}
+          {submitting ? <InlineLoading description={t('loading', 'Loading...')} /> : t('cancelVisit', 'Cancel visit')}
         </Button>
       </ModalFooter>
     </div>

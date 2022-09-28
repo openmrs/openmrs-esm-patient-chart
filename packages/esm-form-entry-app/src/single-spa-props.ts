@@ -1,5 +1,6 @@
 import { ReplaySubject } from 'rxjs';
 import { AppProps } from 'single-spa';
+import { Encounter, EncounterCreate } from './app/types';
 
 export const singleSpaPropsSubject = new ReplaySubject<SingleSpaProps>(1);
 
@@ -15,4 +16,8 @@ export type SingleSpaProps = AppProps & {
   patient: any;
   isOffline: boolean;
   patientUuid: string;
+  handleEncounterCreate?: (encounter: EncounterCreate) => void;
+  handlePostResponse?: (encounter: Encounter) => void;
+  handleOnValidate?: (valid: boolean) => void;
+  showDiscardSubmitButtons?: boolean;
 };

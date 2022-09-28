@@ -1,27 +1,48 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, ModalBody, ModalHeader, ModalFooter } from 'carbon-components-react';
-import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { Button, ModalBody, ModalHeader, ModalFooter } from '@carbon/react';
+import { launchPatientChartWithWorkspaceOpen, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import styles from './start-visit-dialog.scss';
 
 interface StartVisitDialogProps {
   patientUuid: string;
   closeModal: () => void;
   visitType: string;
+  launchPatientChart?: boolean;
 }
 
-const StartVisitDialog: React.FC<StartVisitDialogProps> = ({ patientUuid, closeModal, visitType }) => {
+const StartVisitDialog: React.FC<StartVisitDialogProps> = ({
+  patientUuid,
+  closeModal,
+  visitType,
+  launchPatientChart,
+}) => {
   const { t } = useTranslation();
 
   const handleEditPastVisit = useCallback(() => {
-    launchPatientWorkspace('past-visits-overview');
+    if (launchPatientChart) {
+      launchPatientChartWithWorkspaceOpen({
+        patientUuid,
+        workspaceName: 'past-visits-overview',
+      });
+    } else {
+      launchPatientWorkspace('past-visits-overview');
+    }
     closeModal();
-  }, [closeModal]);
+  }, [closeModal, patientUuid, launchPatientChart]);
 
   const handleStartNewVisit = useCallback(() => {
-    launchPatientWorkspace('start-visit-workspace-form');
+    if (launchPatientChart) {
+      launchPatientChartWithWorkspaceOpen({
+        patientUuid,
+        workspaceName: 'start-visit-workspace-form',
+      });
+    } else {
+      launchPatientWorkspace('start-visit-workspace-form');
+    }
+
     closeModal();
-  }, [closeModal]);
+  }, [closeModal, patientUuid, launchPatientChart]);
 
   const modalHeaderText =
     visitType === 'past' ? t('addPastVisit', 'Add a past visit') : t('noActiveVisit', 'No active visit');

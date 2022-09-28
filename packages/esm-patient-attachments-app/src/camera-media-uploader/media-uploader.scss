@@ -1,0 +1,16 @@
+@import '../root.scss';
+
+.uploadFile {
+  color: $ui-02;
+  
+  label {
+    max-width: unset;
+  }
+
+  label > div {
+    height: 25rem;
+    justify-content: center;
+    align-items: center;
+  }
+
+}

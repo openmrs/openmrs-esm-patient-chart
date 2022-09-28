@@ -1,4 +1,4 @@
-import { DataSources, EncounterAdapter, Form, FormFactory } from '@ampath-kenya/ngx-formentry';
+import { DataSources, EncounterAdapter, Form, FormFactory } from '@openmrs/ngx-formentry';
 import { Injectable } from '@angular/core';
 import * as moment from 'moment';
 import { FormDataSourceService } from '../form-data-source/form-data-source.service';
@@ -6,9 +6,8 @@ import { ConfigResourceService } from '../services/config-resource.service';
 import { MonthlyScheduleResourceService } from '../services/monthly-scheduled-resource.service';
 import { SingleSpaPropsService } from '../single-spa-props/single-spa-props.service';
 import { Encounter, FormSchema } from '../types';
-import type { NodeBase } from '@ampath-kenya/ngx-formentry/form-entry/form-factory/form-node';
 import { LoggedInUser } from '@openmrs/esm-framework';
-import type { FeWrapperComponent } from '../fe-wrapper/fe-wrapper.component';
+import { isFunction } from 'lodash-es';
 
 /**
  * Data required for creating a {@link Form} instance.
@@ -33,6 +32,8 @@ export interface CreateFormParams {
    */
   previousEncounter?: Encounter;
 }
+
+const loadedCustomDataSources: Record<string, unknown> = {};
 
 /**
  * A service solely created for the {@link FeWrapperComponent}.
@@ -63,10 +64,10 @@ export class FormCreationService {
    * @param createFormParams Data used for building the initial form.
    * @returns The new {@link Form} instance.
    */
-  public initAndCreateForm(createFormParams: CreateFormParams) {
+  public async initAndCreateForm(createFormParams: CreateFormParams) {
     const { formSchema, encounter } = createFormParams;
 
-    this.wireDataSources(createFormParams);
+    await this.wireDataSources(createFormParams);
 
     const form = this.formFactory.createForm(formSchema, this.dataSources.dataSources);
     this.setUpWHOCascading(form);
@@ -111,11 +112,97 @@ export class FormCreationService {
     this.dataSources.registerDataSource('rawPrevEnc', createFormParams.previousEncounter, false);
     this.dataSources.registerDataSource('userLocation', createFormParams.user.sessionLocation);
 
-    // Data sources which are configurable.
-    const configurableDataSources = this.configResourceService.getConfig().dataSources;
-    if (configurableDataSources.monthlySchedule) {
+    // TODO monthlySchedule should be converted to a "standard" configurableDataSource
+    const config = this.configResourceService.getConfig();
+    if (config.dataSources.monthlySchedule) {
       this.dataSources.registerDataSource('monthlyScheduleResourceService', this.monthlyScheduleResourceService);
     }
+
+    // Load configurable data sources which are configurable.
+    return Promise.all([
+      config.customDataSources.map(async ({ name, moduleName, moduleExport }) => {
+        let silent = false;
+        // for now, these data sources are not reloaded between runs
+        if (loadedCustomDataSources.hasOwnProperty(name)) {
+          const module = loadedCustomDataSources[name];
+          if (module) {
+            this.dataSources.registerDataSource(name, loadedCustomDataSources[name]);
+            return Promise.resolve();
+          } else {
+            // if module is not defined at this point, an error would've been logged the first time it was loaded
+            silent = true;
+          }
+        }
+
+        if (moduleName === '') {
+          if (!silent) {
+            console.warn(
+              `A custom data source ${name} has a blank module name. A module name must be provided to register a data source correctly.`,
+            );
+          }
+          loadedCustomDataSources[name] = undefined;
+          return Promise.resolve();
+        }
+
+        const slug = slugify(moduleName);
+        if (window.hasOwnProperty(slug)) {
+          const moduleEntry: Record<string, unknown> = window[slug] as unknown as Record<string, unknown>;
+          if (
+            !(typeof moduleEntry === 'object') ||
+            !moduleEntry.hasOwnProperty('init') ||
+            !isFunction(moduleEntry.init) ||
+            !moduleEntry.hasOwnProperty('get') ||
+            !isFunction(moduleEntry.get)
+          ) {
+            if (!silent) {
+              console.error(
+                `esm-form-app is configured to use the datasource ${name} from the module ${moduleName}, but the version of ${moduleName} loaded is not in the expected format. Please ensure that the version of ${moduleName} you are loading is built as a Webpack module.`,
+              );
+            }
+            loadedCustomDataSources[name] = undefined;
+            return Promise.resolve();
+          }
+
+          try {
+            const factory: () => Record<string, unknown> = await moduleEntry.get('./start');
+            const module = factory();
+
+            if (!(typeof module === 'object') || !module.hasOwnProperty(moduleExport)) {
+              if (!silent) {
+                console.error(
+                  `esm-form-entry-app could not load the module ${moduleName} for the datasource ${name} because the module did not have the expected ${
+                    moduleExport == 'default' ? 'default export' : `export ${moduleExport}`
+                  }.`,
+                );
+              }
+              loadedCustomDataSources[name] = undefined;
+              return Promise.resolve();
+            }
+
+            loadedCustomDataSources[name] = module[moduleExport];
+            this.dataSources.registerDataSource(name, module[moduleExport]);
+            return Promise.resolve();
+          } catch (e) {
+            if (!silent) {
+              console.error(
+                `esm-form-entry-app could not load the datasource ${name} because ${moduleName} did not export the expected entry "./start". Please check the Webpack configuration for ${moduleName}.`,
+                e,
+              );
+            }
+            loadedCustomDataSources[name] = undefined;
+            return Promise.resolve();
+          }
+        } else {
+          if (!silent) {
+            console.error(
+              `esm-form-entry-app is configured to use the datasource ${name}, but the corresponding module ${moduleName} has not been loaded. Most likely, this means that ${moduleName} is not in your importmap or was not loaded prior to ending up here.`,
+            );
+          }
+          loadedCustomDataSources[name] = undefined;
+          return Promise.resolve();
+        }
+      }),
+    ]);
   }
 
   private setUpWHOCascading(form: Form) {
@@ -205,4 +292,8 @@ export class FormCreationService {
       this.encounterAdapter.populateForm(form, encounter);
     }
   }
+}
+
+function slugify(name) {
+  return name.replace(/[\/\-@]/g, '_');
 }

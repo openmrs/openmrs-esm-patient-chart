@@ -1,8 +1,8 @@
 import React, { Fragment, useState } from 'react';
-import { FormLabel, TextArea, TextInput } from 'carbon-components-react';
-import styles from './vitals-biometrics-input.component.scss';
+import { FormLabel, TextArea, TextInput } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { useLayoutType } from '@openmrs/esm-framework';
+import styles from './vitals-biometrics-input.scss';
 
 interface VitalsBiometricInputProps {
   title: string;
@@ -76,7 +76,7 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
               <TextArea
                 key={val.name}
                 style={{ ...textFieldStyles }}
-                className={styles.textArea}
+                className={styles.textarea}
                 id={val.name}
                 name={val.name}
                 labelText={''}

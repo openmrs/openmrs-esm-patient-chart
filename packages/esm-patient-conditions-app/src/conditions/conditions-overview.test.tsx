@@ -1,5 +1,5 @@
 import React from 'react';
-import { screen } from '@testing-library/react';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
@@ -71,14 +71,12 @@ describe('ConditionsOverview: ', () => {
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /conditions/i })).toBeInTheDocument();
     expect(screen.getByText(/Error 401: Unauthorized/i)).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        /Sorry, there was a problem displaying this information. You can try to reload this page, or contact the site administrator and quote the error code above/i,
-      ),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Sorry, there was a problem displaying this information./i)).toBeInTheDocument();
   });
 
   it("renders an overview of the patient's conditions when present", async () => {
+    const user = userEvent.setup();
+
     mockOpenmrsFetch.mockReturnValueOnce({ data: mockFhirConditionsResponse });
     mockUsePagination.mockImplementation(() => ({
       currentPage: 1,
@@ -107,12 +105,15 @@ describe('ConditionsOverview: ', () => {
     expect(screen.getByText(/1–5 of 8 items/i)).toBeInTheDocument();
 
     const nextPageButton = screen.getByRole('button', { name: /next page/i });
-    userEvent.click(nextPageButton);
+
+    await waitFor(() => user.click(nextPageButton));
 
     expect(screen.getAllByRole('row').length).toEqual(6);
   });
 
   it('clicking the Add button or Record Conditions link launches the conditions form', async () => {
+    const user = userEvent.setup();
+
     mockOpenmrsFetch.mockReturnValueOnce({ data: [] });
 
     renderConditionsOverview();
@@ -120,7 +121,8 @@ describe('ConditionsOverview: ', () => {
     await waitForLoadingToFinish();
 
     const recordConditionsLink = screen.getByText(/record conditions/i);
-    userEvent.click(recordConditionsLink);
+
+    await waitFor(() => user.click(recordConditionsLink));
 
     expect(launchPatientWorkspace).toHaveBeenCalledTimes(1);
     expect(launchPatientWorkspace).toHaveBeenCalledWith('conditions-form-workspace');

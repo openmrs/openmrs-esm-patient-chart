@@ -13,6 +13,7 @@
   "date": "Date",
   "dateTime": "Date & Time",
   "discard": "Discard",
+  "loading": "Loading",
   "location": "Location",
   "noPastAppointments": "There are no past appointments to display for this patient",
   "note": "Note",

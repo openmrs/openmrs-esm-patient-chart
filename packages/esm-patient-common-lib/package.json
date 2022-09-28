@@ -1,13 +1,13 @@
 {
   "name": "@openmrs/esm-patient-common-lib",
-  "version": "3.1.0",
+  "version": "4.0.0",
   "license": "MPL-2.0",
   "description": "Library for common patient chart components",
   "browser": "dist/openmrs-esm-patient-common-lib.js",
   "main": "src/index.ts",
   "source": true,
   "scripts": {
-    "lint": "eslint src --ext ts,tsx",
+    "lint": "eslint src --ext tsx,ts --fix --max-warnings=0",
     "typescript": "tsc"
   },
   "browserslist": [
@@ -28,12 +28,13 @@
     "url": "https://github.com/openmrs/openmrs-esm-patient-chart/issues"
   },
   "dependencies": {
+    "@carbon/react": "^1.12.0",
     "lodash-es": "^4.17.15",
     "uuid": "^8.3.2"
   },
   "peerDependencies": {
-    "@openmrs/esm-framework": "3.x",
-    "react": "16.x",
+    "@openmrs/esm-framework": "4.x",
+    "react": "18.x",
     "single-spa": "5.x"
   }
 }

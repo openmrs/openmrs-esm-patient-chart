@@ -52,7 +52,10 @@ export const mockEnrolledProgramsResponse = [
       allWorkflows: [],
     },
     display: 'HIV Care and Treatment',
-    location: { display: 'Location Test' },
+    location: {
+      uuid: 'aff27d58-a15c-49a6-9beb-d30dcfc0c66e',
+      display: 'Amani Hospital'
+    },
     dateEnrolled: '2020-01-16T00:00:00.000+0000',
     dateCompleted: null,
   },

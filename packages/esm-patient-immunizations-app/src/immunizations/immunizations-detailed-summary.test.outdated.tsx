@@ -1,7 +1,7 @@
 import React from 'react';
 import includes from 'lodash-es/includes';
 import { BrowserRouter } from 'react-router-dom';
-import { render, wait, within } from '@testing-library/react';
+import { render, waitFor, within } from '@testing-library/react';
 import { openmrsFetch, getConfig } from '@openmrs/esm-framework';
 import {
   mockImmunizationConfig,
@@ -32,7 +32,7 @@ describe('<ImmunizationsDetailedSummary />', () => {
       </BrowserRouter>,
     );
 
-    await wait(() => {
+    await waitFor(() => {
       const immunizationTable = container.querySelector('.immunizationTable');
       expect(immunizationTable).toBeDefined();
       const rows = immunizationTable.querySelectorAll('tr');
@@ -58,7 +58,7 @@ describe('<ImmunizationsDetailedSummary />', () => {
       </BrowserRouter>,
     );
 
-    await wait(() => {
+    await waitFor(() => {
       expect(getByText('No immunizations are configured.')).toBeTruthy();
     });
   });

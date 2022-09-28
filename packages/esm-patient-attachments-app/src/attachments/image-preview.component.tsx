@@ -1,72 +1,75 @@
-import React, { SyntheticEvent, useCallback, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { UserHasAccess } from '@openmrs/esm-framework';
-import { Button, ButtonSet, TextInput } from 'carbon-components-react';
+import { Button, OverflowMenu, OverflowMenuItem } from '@carbon/react';
+import { Close } from '@carbon/react/icons';
+import { Attachment } from '../attachments-types';
 import styles from './image-preview.scss';
 
-interface FilePreviewProps {
-  content: string;
-  collectCaption: boolean;
-  onSaveFile?(dataUri: string, caption: string): void;
-  onCancelCapture?(): void;
+interface AttachmentPreviewProps {
+  closePreview: any;
+  attachmentToPreview: Attachment;
+  deleteAttachment: (attachment: Attachment) => void;
 }
 
-export default function FilePreview(props: FilePreviewProps) {
-  const [saving, setSaving] = useState(false);
-  const [caption, setCaption] = useState('');
+const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
+  closePreview,
+  attachmentToPreview,
+  deleteAttachment,
+}) => {
   const { t } = useTranslation();
 
-  const saveImageOrPdf = useCallback(
-    (e: SyntheticEvent) => {
-      if (!saving) {
-        e.preventDefault();
-        props.onSaveFile?.(props.content, caption);
-        setSaving(true);
+  useEffect(() => {
+    const closePreviewOnEscape = (evt) => {
+      if (evt.key == 'Escape') {
+        closePreview();
       }
-    },
-    [props.onSaveFile, saving],
-  );
+    };
 
-  const cancelCapture = useCallback(
-    (e: SyntheticEvent) => {
-      if (!saving) {
-        e.preventDefault();
-        props.onCancelCapture?.();
-      }
-    },
-    [props.onCancelCapture, saving],
-  );
+    window.addEventListener('keydown', closePreviewOnEscape);
 
-  const updateCaption = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault();
-    setCaption(e.target.value);
-  }, []);
+    return () => {
+      window.removeEventListener('keydown', closePreviewOnEscape);
+    };
+  }, [closePreview]);
 
   return (
-    <form className={styles.overview} onSubmit={saveImageOrPdf}>
-      <embed src={props.content} />
-      {props.collectCaption && (
-        <div className={styles.captionFrame}>
-          <TextInput
-            id="caption"
-            autoFocus
-            labelText={null}
-            readOnly={saving}
-            placeholder={t('attachmentCaptionInstruction', 'Enter caption')}
-            onChange={updateCaption}
-          />
+    <div className={styles.attachmentPreview}>
+      <div className={styles.leftPanel}>
+        <Button
+          iconDescription={t('closePreview', 'Close preview')}
+          label={t('closePreview', 'Close preview')}
+          kind="ghost"
+          className={styles.closePreviewButton}
+          hasIconOnly
+          renderIcon={Close}
+          onClick={closePreview}
+        />
+        <div className={styles.attachmentImage}>
+          {attachmentToPreview.bytesContentFamily === 'IMAGE' ? (
+            <img src={attachmentToPreview.src} alt={attachmentToPreview.title} />
+          ) : attachmentToPreview.bytesContentFamily === 'PDF' ? (
+            <iframe title="PDFViewer" className={styles.pdfViewer} src={attachmentToPreview.src} />
+          ) : null}
         </div>
-      )}
-      <UserHasAccess privilege="Create Attachment">
-        <ButtonSet className={styles.buttonSetOverrides}>
-          <Button size="small" onClick={saveImageOrPdf} disabled={saving}>
-            {t('save', 'Save')}
-          </Button>
-          <Button kind="danger" size="small" onClick={cancelCapture} disabled={saving}>
-            {t('cancel', 'Cancel')}
-          </Button>
-        </ButtonSet>
-      </UserHasAccess>
-    </form>
+        <div className={styles.overflowMenu}>
+          <OverflowMenu className={styles.overflowMenu}>
+            <OverflowMenuItem
+              hasDivider
+              isDelete
+              itemText={t('deleteImage', 'Delete image')}
+              onClick={() => deleteAttachment(attachmentToPreview)}
+            />
+          </OverflowMenu>
+        </div>
+      </div>
+      <div className={styles.rightPanel}>
+        <h4 className={styles.productiveHeading02}>{attachmentToPreview.title}</h4>
+        {attachmentToPreview?.description ? (
+          <p className={`${styles.bodyLong01} ${styles.imageDescription}`}>{attachmentToPreview.description}</p>
+        ) : null}
+      </div>
+    </div>
   );
-}
+};
+
+export default AttachmentPreview;

@@ -1,3 +1,5 @@
+@import "../root.scss";
+
 .caption {
   position: absolute;
   top: 141px;
@@ -6,17 +8,29 @@
   backdrop-filter: blur(20px);
 }
 
+.thumbnail {
+  height: 10rem;
+}
+
 .imageThumbnail {
   width: 100%;
+  cursor: pointer;
 
   img {
     width: 100% !important;
     margin: auto !important;
+    height: 10rem;
   }
 }
 
 .pdfThumbnail {
   cursor: pointer;
+  background-color: $color-gray-30;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
 }
 
 .captionText {
@@ -67,4 +81,5 @@
 
 .otherThumbnail {
   object-fit: none !important;
+  cursor: pointer;
 }

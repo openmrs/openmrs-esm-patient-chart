@@ -4,13 +4,17 @@ import {
   getSyncLifecycle,
   registerBreadcrumbs,
   subscribePrecacheStaticDependencies,
+  syncAllDynamicOfflineData,
 } from '@openmrs/esm-framework';
-import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
+import { createDashboardLink, registerWorkspace } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
-import { setupPatientFormSync } from './offline';
-import { precacheAllOfflineForms } from './offline-forms/offline-form-helpers';
+import { setupDynamicFormDataHandler, setupPatientFormSync } from './offline';
 import OfflineToolsNavLink from './offline-forms/offline-tools-nav-link.component';
+
+declare var __VERSION__: string;
+// __VERSION__ is replaced by Webpack with the version from package.json
+const version = __VERSION__;
 
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -20,7 +24,6 @@ const backendDependencies = {
 
 function setupOpenMRS() {
   const moduleName = '@openmrs/esm-patient-forms-app';
-
   const options = {
     featureName: 'patient-forms',
     moduleName,
@@ -37,20 +40,17 @@ function setupOpenMRS() {
   ]);
 
   setupPatientFormSync();
+  setupDynamicFormDataHandler();
+  subscribePrecacheStaticDependencies(() => syncAllDynamicOfflineData('form'));
 
-  subscribePrecacheStaticDependencies(precacheAllOfflineForms);
+  registerWorkspace({
+    name: 'patient-form-entry-workspace',
+    title: 'Clinical Form',
+    load: getAsyncLifecycle(() => import('./forms/form-entry.component'), options),
+  });
 
   return {
     extensions: [
-      {
-        name: 'patient-form-entry-workspace',
-        load: getAsyncLifecycle(() => import('./forms/form-entry.component'), options),
-        meta: {
-          title: 'Clinical Form',
-        },
-        online: true,
-        offline: true,
-      },
       {
         name: 'forms-widget',
         slot: 'patient-chart-summary-dashboard-slot',
@@ -126,4 +126,4 @@ function setupOpenMRS() {
   };
 }
 
-export { backendDependencies, importTranslation, setupOpenMRS };
+export { backendDependencies, importTranslation, setupOpenMRS, version };

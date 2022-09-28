@@ -1,9 +1,9 @@
-import React, { useCallback } from 'react';
-import styles from './end-visit-dialog.scss';
-import { Button, ModalBody, ModalFooter, ModalHeader } from 'carbon-components-react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { parseDate, showNotification, showToast, updateVisit, useVisit } from '@openmrs/esm-framework';
 import { first } from 'rxjs/operators';
+import styles from './end-visit-dialog.scss';
 
 interface EndVisitDialogProps {
   patientUuid: string;
@@ -32,8 +32,10 @@ const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal
             closeModal();
 
             showToast({
+              critical: true,
               kind: 'success',
-              description: t('visitEndSuccessfully', 'Ended active visit successfully'),
+              description: t('visitEndSuccessfully', `${response?.data?.visitType?.display} ended successfully`),
+              title: t('visitEnded', 'Visit ended'),
             });
           }
         },
@@ -59,8 +61,9 @@ const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal
         <p className={styles.bodyShort02}>
           {t(
             'endVisitWarningMessage',
-            'Ending this visit, will not allow you to fill another encounter form for this patient',
+            'Ending this visit will not allow you to fill another encounter form for this patient',
           )}
+          .
         </p>
       </ModalBody>
       <ModalFooter>

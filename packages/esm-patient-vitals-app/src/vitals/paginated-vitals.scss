@@ -1,0 +1,82 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+td {
+  &.criticallyLow, &.criticallyHigh, &.low, &.high {
+    td:nth-child(2) {
+      @include type.type-style("heading-compact-01");
+      
+    }
+  }
+
+  &.criticallyLow, &.criticallyHigh {
+    outline: 2px solid $danger;
+    outline-offset: -1px;
+  }
+
+  &.low, &.high {
+    outline: 1px solid black;
+  }
+
+  &.criticallyLow {
+    td:nth-child(2)::after {
+      content: " ↓↓";
+    }
+  }
+  
+  &.criticallyHigh {
+    td:nth-child(2)::after {
+      content: " ↑↑";
+    }
+  }
+
+  &.low {
+    td:nth-child(2)::after {
+      content: " ↓";
+    }
+  }
+
+  &.high {
+    td:nth-child(2)::after {
+      content: " ↑";
+    }
+  }
+
+  &.off-scale-low {
+    td:nth-child(2)::after {
+      content: " ↓↓↓";
+    }
+  }
+
+  &.off-scale-high {
+    td:nth-child(2)::after {
+      content: " ↑↑↑";
+    }
+  }
+}
+
+.offScaleHigh,
+.offScaleLow,
+.criticallyHigh,
+.criticallyLow,
+.high,
+.low {
+  @include type.type-style('heading-compact-01');
+}
+
+.criticallyLow::after {
+  content: " ↓↓";
+}
+
+.criticallyHigh::after {
+  content: " ↑↑";
+}
+
+.low::after {
+  content: " ↓";
+}
+
+.high::after {
+  content: " ↑";
+}

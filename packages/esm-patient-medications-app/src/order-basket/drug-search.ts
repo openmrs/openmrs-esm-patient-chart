@@ -1,8 +1,8 @@
 import uniqBy from 'lodash-es/uniqBy';
-import { getDrugByName } from '../api/api';
-import { getCommonMedicationByUuid } from '../api/common-medication';
+import { getDrugByName, getOrderTemplatesByDrug } from '../api/api';
 import { OrderBasketItem } from '../types/order-basket-item';
 import { Drug } from '../types/order';
+import { DrugOrderTemplate, OrderTemplate } from '../api/drug-order-template';
 
 // Note:
 // There's currently no backend API available for the data in `common-medication.json`.
@@ -32,8 +32,24 @@ export async function searchMedications(
 ) {
   const allSearchTerms = searchTerm.match(/\S+/g);
   const drugs = await searchDrugsInBackend(allSearchTerms, abortController);
-  const explodedSearchResults = drugs.flatMap((drug) => [
-    ...explodeDrugResultWithCommonMedicationData(drug, encounterUuid, daysDurationUnit),
+  const drugToOrderTemplates = (await Promise.all(
+    drugs.map(async (drug) => {
+      const res = await getOrderTemplatesByDrug(drug.uuid);
+      const orderTemplates = res.data.results.map((ot) => {
+        try {
+          ot.template = JSON.parse(ot.template);
+          return ot;
+        } catch (error) {
+          console.error(error);
+          return null;
+        }
+      }) as Array<DrugOrderTemplate>;
+      return { drug: drug, templates: orderTemplates.filter((x) => !!x) };
+    }),
+  )) as any as Array<{ drug: Drug; templates: Array<DrugOrderTemplate> }>;
+
+  const explodedSearchResults = drugToOrderTemplates.flatMap(({ drug, templates }) => [
+    ...explodeResultWithOrderTemplates(drug, templates, encounterUuid, daysDurationUnit),
   ]);
   return filterExplodedResultsBySearchTerm(allSearchTerms, explodedSearchResults);
 }
@@ -49,52 +65,73 @@ async function searchDrugsInBackend(allSearchTerms: Array<string>, abortControll
   return uniqBy(results, 'uuid');
 }
 
-function* explodeDrugResultWithCommonMedicationData(
+function getDefault(template: OrderTemplate, prop: string) {
+  return template.dosingInstructions[prop].filter((x) => x.default)[0] || template.dosingInstructions[prop][0];
+}
+
+function* explodeResultWithOrderTemplates(
   drug: Drug,
+  templates: Array<DrugOrderTemplate>,
   encounterUuid: string,
   daysDurationUnit: DaysDurationUnit,
 ): Generator<OrderBasketItem> {
-  const commonMedication = getCommonMedicationByUuid(drug.uuid);
-
-  // If no common medication entry exists for the current drug, there is no point in displaying it in the search results,
-  // because the user could not enter medication details anyway (the component requires a common medication entry
-  // in order to work correctly).
-  if (!commonMedication) {
-    return;
-  }
-
-  for (const dosageUnit of commonMedication.dosageUnits) {
-    for (const dosage of commonMedication.commonDosages) {
-      for (const frequency of commonMedication.commonFrequencies) {
-        for (const route of commonMedication.route) {
-          yield {
-            action: 'NEW',
-            drug,
-            dosage,
-            dosageUnit,
-            frequency,
-            route,
-            encounterUuid,
-            commonMedicationName: commonMedication.name,
-            isFreeTextDosage: false,
-            patientInstructions: '',
-            asNeeded: false,
-            asNeededCondition: '',
-            startDate: new Date(),
-            duration: null,
-            durationUnit: daysDurationUnit,
-            pillsDispensed: 0,
-            numRefills: 0,
-            freeTextDosage: '',
-            indication: '',
-          };
-        }
-      }
+  if (templates?.length) {
+    for (const template of templates) {
+      yield {
+        action: 'NEW',
+        drug,
+        unit: getDefault(template.template, 'unit'),
+        dosage: getDefault(template.template, 'dose'),
+        frequency: getDefault(template.template, 'frequency'),
+        route: getDefault(template.template, 'route'),
+        encounterUuid,
+        commonMedicationName: drug.name,
+        isFreeTextDosage: false,
+        patientInstructions: '',
+        asNeeded: template.template.dosingInstructions.asNeeded || false,
+        asNeededCondition: template.template.dosingInstructions.asNeededCondition,
+        startDate: new Date(),
+        duration: null,
+        durationUnit: daysDurationUnit,
+        pillsDispensed: 0,
+        numRefills: 0,
+        freeTextDosage: '',
+        indication: '',
+        template: template.template,
+        orderer: null,
+        careSetting: null,
+        quantityUnits: null,
+      };
     }
+  } else {
+    yield {
+      action: 'NEW',
+      drug,
+      unit: null,
+      dosage: null,
+      frequency: null,
+      route: null,
+      encounterUuid,
+      commonMedicationName: drug.name,
+      isFreeTextDosage: false,
+      patientInstructions: '',
+      asNeeded: false,
+      asNeededCondition: null,
+      startDate: new Date(),
+      duration: null,
+      durationUnit: daysDurationUnit,
+      pillsDispensed: 0,
+      numRefills: 0,
+      freeTextDosage: '',
+      indication: '',
+      orderer: null,
+      careSetting: null,
+      quantityUnits: null,
+    };
   }
 }
 
-function filterExplodedResultsBySearchTerm(allSearchTerms: Array<string>, results: Array<OrderBasketItem>) {
+function filterExplodedResultsBySearchTerm(allSearchTerms: Array<string>, results: any) {
   return results.filter((result) =>
     allSearchTerms.every(
       (searchTerm) =>

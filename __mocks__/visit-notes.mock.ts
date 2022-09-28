@@ -116,61 +116,17 @@ export const mockFetchProviderByUuidResponse = {
 export const diagnosisSearchResponse = {
   results: [
     {
-      word: null,
-      conceptName: {
-        id: 19739,
-        uuid: '19739BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
-        conceptNameType: 'FULLY_SPECIFIED',
-        name: 'Diabetes Mellitus',
-      },
-      concept: {
-        id: 119481,
-        uuid: '119481AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-        conceptMappings: [
-          {
-            conceptMapType: 'SAME-AS',
-            conceptReferenceTerm: {
-              code: '73211009',
-              name: null,
-              conceptSource: {
-                name: 'SNOMED CT',
-              },
-            },
-          },
-        ],
-        preferredName: 'Diabetes Mellitus',
-      },
+      uuid: '119481AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      display: 'Diabetes Mellitus',
     },
     {
-      word: null,
-      conceptName: {
-        id: 42200,
-        uuid: '42200BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB',
-        conceptNameType: 'FULLY_SPECIFIED',
-        name: 'Diabetes Mellitus, Type II',
-      },
-      concept: {
-        id: 142473,
-        uuid: '142473AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-        conceptMappings: [
-          {
-            conceptMapType: 'SAME-AS',
-            conceptReferenceTerm: {
-              code: '6692',
-              name: null,
-              conceptSource: {
-                name: 'PIH',
-              },
-            },
-          },
-        ],
-        preferredName: 'Diabetes Mellitus, Type II',
-      },
+      uuid: '142473AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      display: 'Diabetes Mellitus, Type II',
     },
   ],
 };
 
-export const mockVisitNotes = [
+export const mockVisitNotesRequest = [
   {
     uuid: '34b9436f-0744-4c08-9879-81fb4ec1e557',
     display: 'Visit Note 27/01/2022',
@@ -2043,7 +1999,7 @@ export const mockVisitNotes = [
             uri: 'http://localhost:8090/openmrslocalhost:8080/openmrs/ws/rest/v1/latestobs/5cb19a11-6171-4bc6-b00b-8db5c6385539?v=full',
           },
         ],
-        resourceVersion: '1.11',
+        resourceVersion: '1.8',
       },
     ],
     voided: false,
@@ -7205,6 +7161,37 @@ export const mockVisitNotes = [
       },
     ],
     resourceVersion: '1.9',
+  },
+];
+
+export const mockVisitNotes = [
+  {
+    id: '1',
+    diagnoses: 'Malaria, Primary respiratory tuberculosis, confirmed',
+    encounterDate: '2022-01-27T16:51:29.000+0000',
+    encounterNote:
+      'Text of encounter note: Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dignissimos quae maiores dolorem assumenda odit quasi tenetur non optio harum error nam distinctio explicabo, hic veritatis iusto quibusdam architecto. Nulla, ipsum.\nLorem ipsum dolor sit amet, consectetur adipisicing elit. Dignissimos quae maiores dolorem assumenda odit quasi tenetur non optio harum error nam distinctio explicabo, hic veritatis iusto quibusdam architecto. Nulla, ipsum.',
+    encounterNoteRecordedAt: '2022-01-27T16:51:29.000+0000',
+    encounterProvider: 'fcgbnyjyjmy - doc doctor',
+    encounterProviderRole: 'Clinician',
+  },
+  {
+    id: '2',
+    diagnoses: 'Visit Diagnoses: Presumed diagnosis, Malaria, Primary',
+    encounterDate: '2022-01-14T08:46:05.000+0000',
+    encounterNote: '',
+    encounterNoteRecordedAt: '',
+    encounterProvider: 'fcgbnyjyjmy - doc doctor',
+    encounterProviderRole: 'Clinician',
+  },
+  {
+    id: '3',
+    diagnoses: 'Visit Diagnoses: Presumed diagnosis, Hemorrhage in early pregnancy, Primary',
+    encounterDate: '2022-01-14T08:42:22.000+0000',
+    encounterNote: '',
+    encounterNoteRecordedAt: '',
+    encounterProvider: 'fcgbnyjyjmy - doc doctor',
+    encounterProviderRole: 'Clinician',
   },
 ];
 

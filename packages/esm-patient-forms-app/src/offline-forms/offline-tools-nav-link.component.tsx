@@ -1,5 +1,5 @@
-import { ConfigurableLink } from '@openmrs/esm-framework';
 import React from 'react';
+import { ConfigurableLink } from '@openmrs/esm-framework';
 
 interface OfflineToolsNavLinkProps {
   page?: string;
@@ -11,7 +11,7 @@ export default function OfflineToolsNavLink({ page, title }: OfflineToolsNavLink
     <div key={page}>
       <ConfigurableLink
         to={'${openmrsSpaBase}' + '/offline-tools' + (page ? `/${page}` : '')}
-        className="bx--side-nav__link"
+        className="cds--side-nav__link"
       >
         {title}
       </ConfigurableLink>

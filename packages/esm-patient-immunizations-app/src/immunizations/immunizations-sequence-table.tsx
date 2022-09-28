@@ -1,18 +1,9 @@
 import React, { useMemo, useCallback } from 'react';
-import isEmpty from 'lodash-es/isEmpty';
-import ImmunizationsForm from './immunizations-form.component';
-import {
-  Button,
-  DataTable,
-  Table,
-  TableHead,
-  TableRow,
-  TableHeader,
-  TableBody,
-  TableCell,
-} from 'carbon-components-react';
-import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
+import isEmpty from 'lodash-es/isEmpty';
+import { Button, DataTable, Table, TableHead, TableRow, TableHeader, TableBody, TableCell } from '@carbon/react';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import ImmunizationsForm from './immunizations-form.component';
 import { ExistingDoses, Immunization } from '../types';
 
 interface SequenceTableProps {
@@ -48,7 +39,7 @@ const SequenceTable: React.FC<SequenceTableProps> = ({ immunizations }) => {
       //   vaccinationDate: existingDoses?.occurrenceDateTime,
       // });
     },
-    [t],
+    [],
   );
 
   const tableHeader = useMemo(
@@ -77,9 +68,9 @@ const SequenceTable: React.FC<SequenceTableProps> = ({ immunizations }) => {
 
   return (
     tableRows.length > 0 && (
-      <DataTable rows={tableRows} headers={tableHeader}>
+      <DataTable rows={tableRows} headers={tableHeader} useZebraStyles>
         {({ rows, headers, getHeaderProps, getTableProps }) => (
-          <Table {...getTableProps()} useZebraStyles>
+          <Table {...getTableProps()}>
             <TableHead>
               <TableRow>
                 {headers.map((header) => (

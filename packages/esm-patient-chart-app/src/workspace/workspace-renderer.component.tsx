@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useLayoutType } from '@openmrs/esm-framework';
 import { OpenWorkspace, useWorkspaceWindowSize } from '@openmrs/esm-patient-common-lib';
-import { mountRootParcel } from 'single-spa';
+import { mountRootParcel, ParcelConfig } from 'single-spa';
 import Parcel from 'single-spa-react/parcel';
 import Loader from '../loader/loader.component';
 import styles from './workspace-window.scss';
@@ -17,8 +17,7 @@ export function WorkspaceRenderer({ workspace, patientUuid, active }: WorkspaceR
   const isTablet = layout === 'tablet';
   const { windowSize } = useWorkspaceWindowSize();
   const maximized = windowSize.size === 'maximized';
-  const [lifecycle, setLifecycle] = useState();
-
+  const [lifecycle, setLifecycle] = useState<ParcelConfig | undefined>();
   useEffect(() => {
     let active = true;
     workspace.load().then(({ default: result, ...lifecycle }) => {
@@ -31,7 +30,7 @@ export function WorkspaceRenderer({ workspace, patientUuid, active }: WorkspaceR
     };
   }, [workspace]);
 
-  const props = React.useMemo(
+  const props = useMemo(
     () =>
       workspace && {
         closeWorkspace: workspace.closeWorkspace,
@@ -39,7 +38,7 @@ export function WorkspaceRenderer({ workspace, patientUuid, active }: WorkspaceR
         patientUuid,
         ...workspace.additionalProps,
       },
-    [workspace, workspace.additionalProps, workspace.closeWorkspace, workspace.promptBeforeClosing, patientUuid],
+    [workspace, patientUuid],
   );
 
   return (

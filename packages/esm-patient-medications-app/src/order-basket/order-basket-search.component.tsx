@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import styles from './order-basket-search.scss';
-import { Search } from 'carbon-components-react';
+import { useTranslation } from 'react-i18next';
+import { Search } from '@carbon/react';
 import { useLayoutType } from '@openmrs/esm-framework';
 import OrderBasketSearchResults from './order-basket-search-results.component';
-import { useTranslation } from 'react-i18next';
 import { OrderBasketItem } from '../types/order-basket-item';
+import styles from './order-basket-search.scss';
 
 export interface OrderBasketSearchProps {
   encounterUuid: string;
@@ -19,7 +19,7 @@ export default function OrderBasketSearch({ encounterUuid, onSearchResultClicked
   return (
     <div className={styles.searchPopupContainer}>
       <Search
-        size="xl"
+        size="lg"
         light={isTablet}
         value={searchTerm}
         placeholder={t('searchFieldPlaceholder', 'Search for an order (e.g. "Aspirin")')}

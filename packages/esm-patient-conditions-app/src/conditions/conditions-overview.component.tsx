@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   DataTable,
   DataTableSkeleton,
@@ -11,12 +12,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from 'carbon-components-react';
-import Add16 from '@carbon/icons-react/es/add/16';
-import styles from './conditions-overview.scss';
+} from '@carbon/react';
 import { formatDate, parseDate, usePagination } from '@openmrs/esm-framework';
-import { useTranslation } from 'react-i18next';
-import { useConditions } from './conditions.resource';
 import {
   EmptyState,
   ErrorState,
@@ -24,6 +21,9 @@ import {
   launchPatientWorkspace,
   CardHeader,
 } from '@openmrs/esm-patient-common-lib';
+import { Add } from '@carbon/react/icons';
+import { useConditions } from './conditions.resource';
+import styles from './conditions-overview.scss';
 
 interface ConditionsOverviewProps {
   basePath: string;
@@ -36,7 +36,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient, basePa
   const displayText = t('conditions', 'Conditions');
   const headerTitle = t('conditions', 'Conditions');
   const urlLabel = t('seeAll', 'See all');
-  const pageUrl = window.spaBase + basePath + '/conditions';
+  const pageUrl = `\${openmrsSpaBase}/patient/${patient.id}/chart/Conditions`;
 
   const { data: conditions, isError, isLoading, isValidating } = useConditions(patient.id);
   const { results: paginatedConditions, goTo, currentPage } = usePagination(conditions ?? [], conditionsCount);
@@ -67,14 +67,19 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient, basePa
       <div className={styles.widgetCard}>
         <CardHeader title={headerTitle}>
           <span>{isValidating ? <InlineLoading /> : null}</span>
-          <Button kind="ghost" renderIcon={Add16} iconDescription="Add conditions" onClick={launchConditionsForm}>
+          <Button
+            kind="ghost"
+            renderIcon={(props) => <Add size={16} {...props} />}
+            iconDescription="Add conditions"
+            onClick={launchConditionsForm}
+          >
             {t('add', 'Add')}
           </Button>
         </CardHeader>
-        <TableContainer>
-          <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="short">
-            {({ rows, headers, getHeaderProps, getTableProps }) => (
-              <Table {...getTableProps()} useZebraStyles>
+        <DataTable rows={tableRows} headers={tableHeaders} isSortable size="sm" useZebraStyles>
+          {({ rows, headers, getHeaderProps, getTableProps }) => (
+            <TableContainer>
+              <Table {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
@@ -100,9 +105,9 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient, basePa
                   ))}
                 </TableBody>
               </Table>
-            )}
-          </DataTable>
-        </TableContainer>
+            </TableContainer>
+          )}
+        </DataTable>
         <PatientChartPagination
           currentItems={paginatedConditions.length}
           onPageNumberChange={({ page }) => goTo(page)}

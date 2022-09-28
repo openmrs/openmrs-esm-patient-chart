@@ -1,48 +1,47 @@
-@import "~@openmrs/esm-styleguide/src/vars";
-@import "~carbon-components/src/globals/scss/vars";
-@import "~carbon-components/src/globals/scss/mixins";
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars'; 
 
 .productiveHeading01 {
-  @include carbon--type-style("productive-heading-01");
+  @include type.type-style("heading-compact-01");
 }
 
 .productiveHeading02 {
-  @include carbon--type-style("productive-heading-02");
-  
+  @include type.type-style("heading-compact-02");
 }
 
 .productiveHeading03 {
-  @include carbon--type-style("productive-heading-03");
+  @include type.type-style("heading-03");
 }
 
 .productiveHeading04 {
-  @include carbon--type-style("productive-heading-04");
+  @include type.type-style("heading-04");
 }
 
 .productiveHeading05 {
-  @include carbon--type-style("productive-heading-05");
+  @include type.type-style("heading-05");
 }
 
 .productiveHeading06 {
-  @include carbon--type-style("productive-heading-06");
+  @include type.type-style("heading-06");
 }
 
 .bodyShort01 {
-  @include carbon--type-style("body-short-01");
+  @include type.type-style("body-compact-01");
 }
 
 .bodyShort02 {
-  @include carbon--type-style("body-short-02");
+  @include type.type-style("body-compact-02");
 }
 
 .bodyLong01 {
-  @include carbon--type-style("body-long-01");
+  @include type.type-style("body-01");
 }
 
 .bodyLong02 {
-  @include carbon--type-style("body-long-02");
+  @include type.type-style("body-02");
 }
 
 .label01 {
-  @include carbon--type-style("label-01");
+  @include type.type-style("label-01");
 }

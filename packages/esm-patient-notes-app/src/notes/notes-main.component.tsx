@@ -1,7 +1,7 @@
 import React from 'react';
-import Add16 from '@carbon/icons-react/es/add/16';
 import { useTranslation } from 'react-i18next';
-import { Button, DataTableSkeleton, InlineLoading } from 'carbon-components-react';
+import { Button, DataTableSkeleton, InlineLoading } from '@carbon/react';
+import { Add } from '@carbon/react/icons';
 import { useVisit } from '@openmrs/esm-framework';
 import {
   CardHeader,
@@ -50,7 +50,7 @@ const NotesMain: React.FC<NotesOverviewProps> = ({ patientUuid, showAddNote, pag
                 {showAddNote && (
                   <Button
                     kind="ghost"
-                    renderIcon={Add16}
+                    renderIcon={(props) => <Add size={16} {...props} />}
                     iconDescription="Add visit note"
                     onClick={launchVisitNoteForm}
                   >

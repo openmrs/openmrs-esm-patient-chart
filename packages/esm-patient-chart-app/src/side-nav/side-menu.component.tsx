@@ -1,5 +1,5 @@
 import React from 'react';
-import { SideNavProps } from 'carbon-components-react';
+import { SideNavProps } from '@carbon/react';
 import { LeftNavMenu, useLayoutType } from '@openmrs/esm-framework';
 import { isDesktop } from '../utils';
 

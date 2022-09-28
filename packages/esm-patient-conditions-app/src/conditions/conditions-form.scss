@@ -1,6 +1,5 @@
-@import "~@openmrs/esm-styleguide/src/vars";
-@import "~carbon-components/src/globals/scss/vars";
-@import "~carbon-components/src/globals/scss/mixins";
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
 
 .condition {
   padding: 1rem 0.75rem;
@@ -19,7 +18,7 @@
 }
 
 .emptyResults {
-  @include carbon--type-style("body-short-01");
+  @include type.type-style("body-compact-01");
   color: $text-02;
   min-height: 1rem;
 }

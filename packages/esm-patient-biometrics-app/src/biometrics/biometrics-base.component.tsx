@@ -1,9 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import Add16 from '@carbon/icons-react/es/add/16';
-import { Button, DataTableSkeleton, InlineLoading } from 'carbon-components-react';
-import ChartLineSmooth16 from '@carbon/icons-react/es/chart--line-smooth/16';
-import Table16 from '@carbon/icons-react/es/table/16';
+import { Button, DataTableSkeleton, InlineLoading } from '@carbon/react';
+import { Add, ChartLineSmooth, Table } from '@carbon/react/icons';
 import { formatDatetime, parseDate, useConfig } from '@openmrs/esm-framework';
 import {
   CardHeader,
@@ -16,9 +14,9 @@ import {
 import { ConfigObject } from '../config-schema';
 import { patientVitalsBiometricsFormWorkspace } from '../constants';
 import { useBiometrics } from './biometrics.resource';
-import styles from './biometrics-overview.scss';
 import BiometricsChart from './biometrics-chart.component';
 import PaginatedBiometrics from './paginated-biometrics.component';
+import styles from './biometrics-overview.scss';
 
 interface BiometricsBaseProps {
   patientUuid: string;
@@ -43,7 +41,6 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({
   const config = useConfig() as ConfigObject;
   const { bmiUnit } = config.biometrics;
   const { biometrics, isLoading, isError, isValidating } = useBiometrics(patientUuid, config.concepts);
-
   const { data: conceptUnits } = useVitalsConceptMetadata();
 
   const launchBiometricsForm = React.useCallback(
@@ -61,11 +58,15 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({
 
   const tableRows = React.useMemo(
     () =>
-      biometrics?.map((data, index) => {
+      biometrics?.map((biometricsData, index) => {
         return {
-          ...data,
+          ...biometricsData,
           id: `${index}`,
-          date: formatDatetime(parseDate(data.date.toString()), { mode: 'wide' }),
+          date: formatDatetime(parseDate(biometricsData.date.toString()), { mode: 'wide' }),
+          weight: biometricsData.weight ?? '--',
+          height: biometricsData.height ?? '--',
+          bmi: biometricsData.bmi ?? '--',
+          muac: biometricsData.muac ?? '--',
         };
       }),
     [biometrics],
@@ -83,27 +84,32 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({
           <div className={styles.biometricsHeaderActionItems}>
             <div className={styles.toggleButtons}>
               <Button
-                className={styles.toggle}
-                size="field"
+                className={styles.tableViewToggle}
+                size="sm"
                 hasIconOnly
                 kind={chartView ? 'ghost' : 'tertiary'}
-                renderIcon={Table16}
+                renderIcon={(props) => <Table size={16} {...props} />}
                 iconDescription={t('tableView', 'Table View')}
                 onClick={() => setChartView(false)}
               />
               <Button
-                className={styles.toggle}
-                size="field"
+                className={styles.chartViewToggle}
+                size="sm"
                 kind={chartView ? 'tertiary' : 'ghost'}
                 hasIconOnly
-                renderIcon={ChartLineSmooth16}
+                renderIcon={(props) => <ChartLineSmooth size={16} {...props} />}
                 iconDescription={t('chartView', 'Chart View')}
                 onClick={() => setChartView(true)}
               />
             </div>
             <span className={styles.divider}>|</span>
             {showAddBiometrics && (
-              <Button kind="ghost" renderIcon={Add16} iconDescription="Add biometrics" onClick={launchBiometricsForm}>
+              <Button
+                kind="ghost"
+                renderIcon={(props) => <Add size={16} {...props} />}
+                iconDescription="Add biometrics"
+                onClick={launchBiometricsForm}
+              >
                 {t('add', 'Add')}
               </Button>
             )}

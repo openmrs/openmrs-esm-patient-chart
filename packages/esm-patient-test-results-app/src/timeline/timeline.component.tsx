@@ -1,9 +1,9 @@
 import React from 'react';
-import { InlineLoading } from 'carbon-components-react';
-import useScrollIndicator from './useScroll';
+import { DataTableSkeleton } from '@carbon/react';
 import { useTimelineData } from './useTimelineData';
 import { PaddingContainer, TimeSlots, Grid, RowStartCell, GridItems, ShadowBox } from './helpers';
 import { ObsRecord, EmptyState, OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
+import useScrollIndicator from './useScroll';
 import styles from './timeline.scss';
 
 const RecentResultsGrid = (props) => {
@@ -127,7 +127,7 @@ export const Timeline: React.FC<TimelineParams> = ({
   if (!loaded)
     return (
       <RecentResultsGrid>
-        <InlineLoading description="Loading" />
+        <DataTableSkeleton role="progressbar" />
       </RecentResultsGrid>
     );
 

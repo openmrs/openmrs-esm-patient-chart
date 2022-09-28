@@ -1,6 +1,4 @@
 import React from 'react';
-import Add16 from '@carbon/icons-react/es/add/16';
-import styles from './conditions-detailed-summary.scss';
 import capitalize from 'lodash-es/capitalize';
 import { useTranslation } from 'react-i18next';
 import {
@@ -15,15 +13,15 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from 'carbon-components-react';
-import { Condition, useConditions } from './conditions.resource';
-import { CardHeader, EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { useConditionsContext } from './conditions.context';
+} from '@carbon/react';
+import { Add } from '@carbon/react/icons';
 import { formatDate, parseDate } from '@openmrs/esm-framework';
+import { CardHeader, EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { Condition, useConditions } from './conditions.resource';
+import styles from './conditions-detailed-summary.scss';
 
-const ConditionsDetailedSummary: React.FC = () => {
+function ConditionsDetailedSummary({ patient }) {
   const { t } = useTranslation();
-  const { patient } = useConditionsContext();
   const displayText = t('conditions', 'Conditions');
   const headerTitle = t('conditions', 'Conditions');
   const { data: conditions, isError, isLoading, isValidating } = useConditions(patient.id);
@@ -67,14 +65,19 @@ const ConditionsDetailedSummary: React.FC = () => {
       <div className={styles.widgetCard}>
         <CardHeader title={headerTitle}>
           <span>{isValidating ? <InlineLoading /> : null}</span>
-          <Button kind="ghost" renderIcon={Add16} iconDescription="Add conditions" onClick={launchConditionsForm}>
+          <Button
+            kind="ghost"
+            renderIcon={(props) => <Add size={16} {...props} />}
+            iconDescription="Add conditions"
+            onClick={launchConditionsForm}
+          >
             {t('add', 'Add')}
           </Button>
         </CardHeader>
-        <TableContainer>
-          <DataTable rows={tableRows} headers={headers} isSortable={true} size="short">
-            {({ rows, headers, getHeaderProps, getTableProps }) => (
-              <Table {...getTableProps()} useZebraStyles>
+        <DataTable rows={tableRows} headers={headers} isSortable size="sm" useZebraStyles>
+          {({ rows, headers, getHeaderProps, getTableProps }) => (
+            <TableContainer>
+              <Table {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
@@ -100,13 +103,14 @@ const ConditionsDetailedSummary: React.FC = () => {
                   ))}
                 </TableBody>
               </Table>
-            )}
-          </DataTable>
-        </TableContainer>
+            </TableContainer>
+          )}
+        </DataTable>
       </div>
     );
   }
+
   return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchConditionsForm} />;
-};
+}
 
 export default ConditionsDetailedSummary;

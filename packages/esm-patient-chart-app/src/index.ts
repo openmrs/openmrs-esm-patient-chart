@@ -6,13 +6,16 @@ import {
   defineExtensionConfigSchema,
 } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
-import { capitalize } from 'lodash-es';
 import { esmPatientChartSchema } from './config-schema';
 import { moduleName, spaBasePath } from './constants';
-import { setupCacheableRoutes, setupOfflineVisitsSync } from './offline';
 import { summaryDashboardMeta, encountersDashboardMeta } from './dashboard.meta';
+import { setupOfflineVisitsSync, setupCacheableRoutes } from './offline';
 import { genericDashboardConfigSchema } from './side-nav/generic-dashboard.component';
 import { genericNavGroupConfigSchema } from './side-nav/generic-nav-group.component';
+
+declare var __VERSION__: string;
+// __VERSION__ is replaced by Webpack with the version from package.json
+const version = __VERSION__;
 
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -81,6 +84,14 @@ function setupOpenMRS() {
         }),
       },
       {
+        name: 'stop-visit-button-patient-search',
+        slot: 'patient-search-actions-slot',
+        load: getAsyncLifecycle(() => import('./actions-buttons/stop-visit.component'), {
+          featureName: 'patient-actions-slot',
+          moduleName,
+        }),
+      },
+      {
         name: 'cancel-visit-button',
         slot: 'patient-actions-slot',
         load: getAsyncLifecycle(() => import('./actions-buttons/cancel-visit.component'), {
@@ -89,8 +100,24 @@ function setupOpenMRS() {
         }),
       },
       {
+        name: 'cancel-visit-button',
+        slot: 'patient-search-actions-slot',
+        load: getAsyncLifecycle(() => import('./actions-buttons/cancel-visit.component'), {
+          featureName: 'patient-actions-slot',
+          moduleName,
+        }),
+      },
+      {
         name: 'add-past-visit-button',
         slot: 'patient-actions-slot',
+        load: getAsyncLifecycle(() => import('./actions-buttons/add-past-visit.component'), {
+          featureName: 'patient-actions-slot',
+          moduleName,
+        }),
+      },
+      {
+        name: 'add-past-visit-button',
+        slot: 'patient-search-actions-slot',
         load: getAsyncLifecycle(() => import('./actions-buttons/add-past-visit.component'), {
           featureName: 'patient-actions-slot',
           moduleName,
@@ -183,8 +210,16 @@ function setupOpenMRS() {
           moduleName,
         }),
       },
+      {
+        id: 'start-visit-button-patient-search',
+        slot: 'start-visit-button-slot',
+        load: getAsyncLifecycle(() => import('./visit/start-visit-button.component'), {
+          featureName: 'start-visit-button-patient-search',
+          moduleName,
+        }),
+      },
     ],
   };
 }
 
-export { backendDependencies, importTranslation, setupOpenMRS };
+export { backendDependencies, importTranslation, setupOpenMRS, version };

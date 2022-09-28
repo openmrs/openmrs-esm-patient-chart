@@ -1,10 +1,23 @@
 import useSWR from 'swr';
-import { PatientVitalsAndBiometrics } from './vitals-biometrics-form/vitals-biometrics-form.component';
 import { openmrsFetch, fhirBaseUrl, useConfig, FHIRResource } from '@openmrs/esm-framework';
-import { ConfigObject } from '../config-schema';
+import { ObsMetaInfo, ConceptMetadata, useVitalsConceptMetadata } from '@openmrs/esm-patient-common-lib';
+import { PatientVitalsAndBiometrics } from './vitals-biometrics-form/vitals-biometrics-form.component';
 import { calculateBMI } from './vitals-biometrics-form/vitals-biometrics-form.utils';
+import { ConfigObject } from '../config-schema';
 
-export const pageSize = 100;
+interface ObsRecord {
+  concept: string;
+  value: string | number;
+}
+
+export type ObservationInterpretation = 'critically_low' | 'critically_high' | 'high' | 'low' | 'normal';
+
+type MappedVitals = {
+  code: string;
+  interpretation: string;
+  issued: Date;
+  value: number;
+};
 
 export interface PatientVitals {
   id: string;
@@ -13,7 +26,7 @@ export interface PatientVitals {
   diastolic?: number;
   pulse?: number;
   temperature?: number;
-  oxygenSaturation?: number;
+  spo2?: number;
   height?: number;
   weight?: number;
   bmi?: number | null;
@@ -34,13 +47,11 @@ interface VitalsFetchResponse {
   type: string;
 }
 
-interface ObsRecord {
-  concept: string;
-  value: string | number;
-}
+export const pageSize = 100;
 
 export function useVitals(patientUuid: string, includeBiometrics: boolean = false) {
   const { concepts } = useConfig();
+  const { conceptMetadata } = useVitalsConceptMetadata();
   const biometricsConcepts = [concepts.heightUuid, concepts.midUpperArmCircumferenceUuid, concepts.weightUuid];
 
   const conceptUuids = includeBiometrics
@@ -58,48 +69,77 @@ export function useVitals(patientUuid: string, includeBiometrics: boolean = fals
 
   const { data, error, isValidating } = useSWR<{ data: VitalsFetchResponse }, Error>(apiUrl, openmrsFetch);
 
-  const getVitalSignKey = (conceptUuid: string) => {
-    if (conceptUuid === concepts.systolicBloodPressureUuid) return 'systolic';
-    if (conceptUuid === concepts.diastolicBloodPressureUuid) return 'diastolic';
-    if (conceptUuid === concepts.pulseUuid) return 'pulse';
-    if (conceptUuid === concepts.temperatureUuid) return 'temperature';
-    if (conceptUuid === concepts.oxygenSaturationUuid) return 'oxygenSaturation';
-    if (conceptUuid === concepts.respiratoryRateUuid) return 'respiratoryRate';
-    if (conceptUuid === concepts.heightUuid) return 'height';
-    if (conceptUuid === concepts.weightUuid) return 'weight';
-    if (conceptUuid === concepts.midUpperArmCircumferenceUuid) return 'muac';
-    return;
+  const getVitalSignKey = (conceptUuid: string): string => {
+    switch (conceptUuid) {
+      case concepts.systolicBloodPressureUuid:
+        return 'systolic';
+      case concepts.diastolicBloodPressureUuid:
+        return 'diastolic';
+      case concepts.pulseUuid:
+        return 'pulse';
+      case concepts.temperatureUuid:
+        return 'temperature';
+      case concepts.oxygenSaturationUuid:
+        return 'spo2';
+      case concepts.respiratoryRateUuid:
+        return 'respiratoryRate';
+      case concepts.heightUuid:
+        return 'height';
+      case concepts.weightUuid:
+        return 'weight';
+      case concepts.midUpperArmCircumferenceUuid:
+        return 'muac';
+    }
   };
 
-  const formattedVitals = () => {
-    const vitalsHashTable = new Map<string, Partial<PatientVitals>>([]);
-    data?.data?.entry?.map(({ resource }) => {
-      const issuedDate = new Date(new Date(resource.issued).setSeconds(0, 0)).toISOString();
-      if (vitalsHashTable.has(issuedDate) && vitalsHashTable.get(issuedDate)) {
+  const mapVitalsProperties = (resource: FHIRResource['resource']): MappedVitals => ({
+    code: resource?.code?.coding?.[0]?.code,
+    interpretation: assessValue(
+      resource?.valueQuantity?.value,
+      getReferenceRangesForConcept(resource?.code?.coding?.[0]?.code, conceptMetadata),
+    ),
+    issued: resource?.issued,
+    value: resource?.valueQuantity?.value,
+  });
+
+  const vitalsHashTable = new Map<string, Partial<PatientVitals>>();
+  const vitalsResponse = data?.data?.entry?.map((entry) => entry.resource ?? []).map(mapVitalsProperties);
+
+  vitalsResponse?.map((vitalSign) => {
+    const issuedDate = new Date(new Date(vitalSign.issued).setSeconds(0, 0)).toISOString();
+
+    if (vitalsHashTable.has(issuedDate) && vitalsHashTable.get(issuedDate)) {
+      vitalsHashTable.set(issuedDate, {
+        ...vitalsHashTable.get(issuedDate),
+        [getVitalSignKey(vitalSign.code)]: vitalSign.value,
+        [getVitalSignKey(vitalSign.code) + 'Interpretation']: vitalSign.interpretation,
+      });
+    } else {
+      vitalSign.value &&
         vitalsHashTable.set(issuedDate, {
-          ...vitalsHashTable.get(issuedDate),
-          [getVitalSignKey(resource.code.coding[0].code)]: resource?.valueQuantity?.value,
+          [getVitalSignKey(vitalSign.code)]: vitalSign.value,
+          [getVitalSignKey(vitalSign.code) + 'Interpretation']: vitalSign.interpretation,
         });
-      } else {
-        resource?.valueQuantity?.value &&
-          vitalsHashTable.set(issuedDate, {
-            [getVitalSignKey(resource.code.coding[0].code)]: resource?.valueQuantity?.value,
-          });
-      }
-    });
+    }
+  });
 
-    return Array.from(vitalsHashTable).map(([date, vital], index) => {
-      return {
-        ...vital,
-        date: date,
-        id: index.toString(),
-        bmi: calculateBMI(vital.weight, vital.height),
-      };
-    });
-  };
+  const formattedVitals: Array<PatientVitals> = Array.from(vitalsHashTable).map(([date, vitalSigns], index) => {
+    return {
+      ...vitalSigns,
+      id: index.toString(),
+      bmi: calculateBMI(Number(vitalSigns.weight), Number(vitalSigns.height)),
+      date: date,
+      bloodPressureInterpretation: interpretBloodPressure(
+        vitalSigns.systolic,
+        vitalSigns.diastolic,
+        concepts,
+        conceptMetadata,
+      ),
+    };
+  });
 
   return {
-    vitals: formattedVitals() as Array<PatientVitals>,
+    vitals: formattedVitals,
     isError: error,
     isLoading: !data && !error,
     isValidating,
@@ -167,4 +207,71 @@ export function editPatientVitals(
       orders: [],
     },
   });
+}
+
+export function assessValue(value: number, range: ObsMetaInfo): ObservationInterpretation {
+  if (range?.hiCritical && value >= range.hiCritical) {
+    return 'critically_high';
+  }
+
+  if (range?.hiNormal && value > range.hiNormal) {
+    return 'high';
+  }
+
+  if (range?.lowCritical && value <= range.lowCritical) {
+    return 'critically_low';
+  }
+
+  if (range?.lowNormal && value < range.lowNormal) {
+    return 'low';
+  }
+
+  return 'normal';
+}
+
+export function hasAbnormalValues(vitals: PatientVitals): boolean {
+  const interpretations = Object.entries(vitals)
+    .filter(([key]) => key.match(/interpretation/i))
+    .map(([, value]) => value);
+
+  return interpretations.some((value) => value !== 'normal');
+}
+
+export function getReferenceRangesForConcept(
+  conceptUuid: string,
+  conceptMetadata: Array<ConceptMetadata>,
+): ConceptMetadata {
+  if (!conceptUuid || !conceptMetadata?.length) return null;
+
+  return conceptMetadata?.find((metadata) => metadata.uuid === conceptUuid);
+}
+
+export function interpretBloodPressure(systolic, diastolic, concepts, conceptMetadata) {
+  const systolicAssessment = assessValue(
+    systolic,
+    getReferenceRangesForConcept(concepts?.systolicBloodPressureUuid, conceptMetadata),
+  );
+
+  const diastolicAssessment = assessValue(
+    diastolic,
+    getReferenceRangesForConcept(concepts?.diastolicBloodPressureUuid, conceptMetadata),
+  );
+
+  if (systolicAssessment === 'critically_high' || diastolicAssessment === 'critically_high') {
+    return 'critically_high';
+  }
+
+  if (systolicAssessment === 'critically_low' || diastolicAssessment === 'critically_low') {
+    return 'critically_low';
+  }
+
+  if (systolicAssessment === 'high' || diastolicAssessment === 'high') {
+    return 'high';
+  }
+
+  if (systolicAssessment === 'low' || diastolicAssessment === 'low') {
+    return 'low';
+  }
+
+  return 'normal';
 }

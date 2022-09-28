@@ -1,32 +1,66 @@
 import React, { useMemo } from 'react';
-import styles from './vitals-chart.component.scss';
 import { useTranslation } from 'react-i18next';
-import { Tab, Tabs } from 'carbon-components-react';
-import { PatientVitals } from './vitals.resource';
+import { Tab, Tabs, TabList } from '@carbon/react';
 import { LineChart } from '@carbon/charts-react';
-import { ScaleTypes, LineChartOptions } from '@carbon/charts/interfaces';
 import { formatDate, parseDate } from '@openmrs/esm-framework';
 import { withUnit } from '@openmrs/esm-patient-common-lib';
-import '@carbon/charts/styles.css';
 import { ConfigObject } from '../config-schema';
+import { PatientVitals } from './vitals.resource';
+import styles from './vitals-chart.scss';
 
-interface vitalsChartData {
+enum ScaleTypes {
+  TIME = 'time',
+  LINEAR = 'linear',
+  LOG = 'log',
+  LABELS = 'labels',
+  LABELS_RATIO = 'labels-ratio',
+}
+
+interface VitalsChartProps {
+  conceptUnits: Map<string, string>;
+  config: ConfigObject;
+  patientVitals: Array<PatientVitals>;
+}
+
+interface VitalsChartData {
   title: string;
   value: string;
 }
 
-interface VitalsChartProps {
-  patientVitals: Array<PatientVitals>;
-  conceptUnits: Map<string, string>;
-  config: ConfigObject;
-}
-
 const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, config }) => {
   const { t } = useTranslation();
-  const [selectedVitalSign, setSelectedVitalsSign] = React.useState<vitalsChartData>({
+  const [selectedVitalSign, setSelectedVitalsSign] = React.useState<VitalsChartData>({
     title: `BP (${conceptUnits.get(config.concepts.systolicBloodPressureUuid)})`,
     value: 'systolic',
   });
+
+  const vitalSigns = [
+    {
+      id: 'bloodPressure',
+      title: withUnit('BP', conceptUnits.get(config.concepts.systolicBloodPressureUuid) ?? '-'),
+      value: 'systolic',
+    },
+    {
+      id: 'oxygenSaturation',
+      title: withUnit('SPO2', conceptUnits.get(config.concepts.oxygenSaturationUuid) ?? '-'),
+      value: 'spo2',
+    },
+    {
+      id: 'temperature',
+      title: withUnit('Temp', conceptUnits.get(config.concepts.temperatureUuid) ?? '-'),
+      value: 'temperature',
+    },
+    {
+      id: 'respiratoryRate',
+      title: withUnit('R. Rate', conceptUnits.get(config.concepts.respiratoryRateUuid) ?? '-'),
+      value: 'respiratoryRate',
+    },
+    {
+      id: 'pulse',
+      title: withUnit('Pulse', conceptUnits.get(config.concepts.pulseUuid) ?? '-'),
+      value: 'pulse',
+    },
+  ];
 
   const chartData = useMemo(() => {
     return patientVitals
@@ -38,13 +72,13 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
           if (['systolic', 'diastolic'].includes(selectedVitalSign.value)) {
             return [
               {
-                group: 'systolic',
+                group: 'Systolic blood pressure',
                 key: formatDate(parseDate(vitals.date.toString()), { year: false }),
                 value: vitals.systolic,
                 date: vitals.date,
               },
               {
-                group: 'diastolic',
+                group: 'Diastolic blood pressure',
                 key: formatDate(parseDate(vitals.date.toString()), { year: false }),
                 value: vitals.diastolic,
                 date: vitals.date,
@@ -62,7 +96,7 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
       });
   }, [patientVitals, selectedVitalSign]);
 
-  const chartOptions: LineChartOptions = {
+  const chartOptions = {
     axes: {
       bottom: {
         title: 'Date',
@@ -86,68 +120,44 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
     },
     tooltip: {
       customHTML: ([{ value, group, key }]) =>
-        `<div class="bx--tooltip bx--tooltip--shown" style="min-width: max-content; font-weight:600">${value} - ${String(
+        `<div class="cds--tooltip cds--tooltip--shown" style="min-width: max-content; font-weight:600">${value} - ${String(
           group,
         ).toUpperCase()}
         <span style="color: #c6c6c6; font-size: 1rem; font-weight:600">${key}</span></div>`,
     },
+    height: '400px',
   };
-
-  const vitalSigns = [
-    {
-      id: 'bloodPressure',
-      title: withUnit('BP', conceptUnits.get(config.concepts.systolicBloodPressureUuid) ?? '-'),
-      value: 'systolic',
-    },
-    {
-      id: 'oxygenSaturation',
-      title: withUnit('SPO2', conceptUnits.get(config.concepts.oxygenSaturationUuid) ?? '-'),
-      value: 'oxygenSaturation',
-    },
-    {
-      id: 'temperature',
-      title: withUnit('Temp', conceptUnits.get(config.concepts.temperatureUuid) ?? '-'),
-      value: 'temperature',
-    },
-    {
-      id: 'Respiratory Rate',
-      title: withUnit('R. Rate', conceptUnits.get(config.concepts.respiratoryRateUuid) ?? '-'),
-      value: 'respiratoryRate',
-    },
-    {
-      id: 'pulse',
-      title: withUnit('Pulse', conceptUnits.get(config.concepts.pulseUuid) ?? '-'),
-      value: 'pulse',
-    },
-  ];
 
   return (
     <div className={styles.vitalsChartContainer}>
-      <div className={styles.vitalSignsArea} style={{ flex: 1 }}>
-        <label className={styles.vitalsSign} htmlFor="vitals-chart-tab-group">
-          {t('vitalSignDisplayed', 'Vital Sign Displayed')}
+      <div className={styles.vitalSignsArea}>
+        <label className={styles.vitalsSignLabel} htmlFor="vitals-chart-tab-group">
+          {t('vitalSignDisplayed', 'Vital sign displayed')}
         </label>
-        <Tabs className={styles.verticalTabs} type="default">
-          {vitalSigns.map(({ id, title, value }) => {
-            return (
-              <Tab
-                key={id}
-                className={`${styles.tab} ${styles.bodyLong01} ${
-                  selectedVitalSign.title === title && styles.selectedTab
-                }`}
-                onClick={() =>
-                  setSelectedVitalsSign({
-                    title: title,
-                    value: value,
-                  })
-                }
-                label={title}
-              />
-            );
-          })}
+        <Tabs className={styles.verticalTabs}>
+          <TabList className={styles.tablist} aria-label="Vitals signs">
+            {vitalSigns.map(({ id, title, value }) => {
+              return (
+                <Tab
+                  key={id}
+                  className={`${styles.tab} ${styles.bodyLong01} ${
+                    selectedVitalSign.title === title && styles.selectedTab
+                  }`}
+                  onClick={() =>
+                    setSelectedVitalsSign({
+                      title: title,
+                      value: value,
+                    })
+                  }
+                >
+                  {title}
+                </Tab>
+              );
+            })}
+          </TabList>
         </Tabs>
       </div>
-      <div className={styles.vitalsChartArea} style={{ flex: 4 }}>
+      <div className={styles.vitalsChartArea}>
         <LineChart data={chartData.flat()} options={chartOptions} />
       </div>
     </div>
