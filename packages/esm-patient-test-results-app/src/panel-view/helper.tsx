@@ -1,8 +1,8 @@
 import styles from './result-panel.scss';
-import { Concept, ConceptMeta, FHIRObservationResource, FhirResponse, observationInterpretation } from './types';
+import { Concept, ConceptMeta, FHIRObservationResource, observationInterpretation } from './types';
 import { OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 
-export const getConceptUuid = (obs: FHIRObservationResource) => obs.code.coding[0].code;
+export const getConceptUuid = (obs: FHIRObservationResource) => obs?.code.coding[0].code;
 
 export const getClass = (interpretation: OBSERVATION_INTERPRETATION) => {
   switch (interpretation) {

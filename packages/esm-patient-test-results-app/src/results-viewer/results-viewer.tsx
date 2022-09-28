@@ -12,7 +12,8 @@ import TabletOverlay from '../tablet-overlay';
 import Trendline from '../trendline/trendline.component';
 import styles from './results-viewer.styles.scss';
 import { useParams } from 'react-router-dom';
-import PanelView from '../results-panel-view';
+import PanelView from '../panel-view';
+import TreeViewWrapper from '../tree-view';
 
 type viewOpts = 'split' | 'full';
 type panelOpts = 'tree' | 'panel';
@@ -87,8 +88,8 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
                   selectedIndex={1}
                   onChange={(e) => setLeftContent(e.name as panelOpts)}
                 >
-                  <Switch name="panel" text={t('panel', 'Panel')} disabled={loading} />
-                  <Switch name="tree" text={t('tree', 'Tree')} disabled={loading} />
+                  <Switch name="panel" text={t('panel', 'Panel')} />
+                  <Switch name="tree" text={t('tree', 'Tree')} />
                 </ContentSwitcher>
               )}
             </div>
@@ -112,22 +113,19 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
             </div>
           </Column>
         )}
-        {!tablet && (
-          <Column sm={16} lg={tablet || expanded ? 0 : 5} className={`${styles.columnPanel} ${styles.treeColumn}`}>
-            {leftContent === 'tree' && (!loading ? <FilterSet /> : <AccordionSkeleton open count={4} align="start" />)}
-            {leftContent === 'panel' && <PanelView />}
-          </Column>
+        {leftContent === 'tree' ? (
+          <TreeViewWrapper
+            patientUuid={patientUuid}
+            basePath={basePath}
+            type={type}
+            expanded={expanded}
+            testUuid={testUuid}
+          />
+        ) : (
+          <PanelView expanded={expanded} />
         )}
-        <Column sm={16} lg={tablet || expanded ? 12 : 7} className={`${styles.columnPanel}`}>
-          {!tablet && testUuid && type === 'trendline' ? (
-            <Trendline patientUuid={patientUuid} conceptUuid={testUuid} basePath={basePath} showBackToTimelineButton />
-          ) : !loading ? (
-            <GroupedTimeline />
-          ) : (
-            <DataTableSkeleton />
-          )}
-        </Column>
       </Grid>
+
       {tablet && showTreeOverlay && (
         <TabletOverlay
           headerText={t('tree', 'Tree')}

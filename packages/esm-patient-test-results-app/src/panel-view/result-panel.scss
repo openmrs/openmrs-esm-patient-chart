@@ -5,13 +5,21 @@
 
 .labSetPanel {
   width: 100%;
-  background-color: $ui-02;
   margin-bottom: spacing.$spacing-05;
-  border: 1px solid #eeeeee
+  border: 1px solid #eeeeee;
+  cursor: pointer;
+  text-decoration: none;
+  color: $text-02;
+  box-sizing: border-box;
+}
+
+.activePanel {
+  border: 3px solid var(--brand-03);
 }
 
 .panelHeader {
   padding: spacing.$spacing-05 spacing.$spacing-05 spacing.$spacing-03 spacing.$spacing-05;
+  background-color: $ui-02;
 }
 
 .productiveHeading02 {
@@ -38,7 +46,6 @@
 .low {
   p {
     @include type.type-style('heading-compact-01');
-    
   }
 }
 
@@ -49,7 +56,7 @@
 
 .critically-high,
 .critically-low {
-  box-shadow: 0 0 0 3px $danger, inset 0 0 0 3px $danger;
+  border: 3px solid $danger;
 }
 
 .off-scale-low {

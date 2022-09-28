@@ -95,11 +95,12 @@ export interface ConceptMeta {
 }
 
 export interface ObsRecord extends FHIRObservationResource {
-  conceptClass: string;
-  members: Array<any>;
+  conceptUuid: string;
+  relatedObs: Array<ObsRecord>;
   meta: ConceptMeta;
-  value: string | number;
+  value: number;
   name: string;
+  interpretation: OBSERVATION_INTERPRETATION;
 }
 
 export enum observationInterpretation {
@@ -110,4 +111,14 @@ export enum observationInterpretation {
   LOW = 'LOW',
   CRITICALLY_LOW = 'CRITICALLY_LOW',
   OFF_SCALE_LOW = 'OFF_SCALE_LOW',
+}
+
+export interface LabSetRecord {
+  [k: string]: ObservationSet;
+}
+export interface ObservationSet {
+  entries: ObsRecord[];
+  type: string;
+  uuid: string;
+  meta: ConceptMeta;
 }
