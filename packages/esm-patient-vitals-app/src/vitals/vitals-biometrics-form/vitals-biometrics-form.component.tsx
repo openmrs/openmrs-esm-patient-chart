@@ -41,7 +41,7 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
   const biometricsUnitsSymbols = config.biometrics;
   const [patientVitalAndBiometrics, setPatientVitalAndBiometrics] = useState<PatientVitalsAndBiometrics>();
   const [patientBMI, setPatientBMI] = useState<number>();
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(true);
 
   const isBMIInNormalRange = (value: number | undefined | string) => {
     if (value === undefined || value === '') return true;
@@ -108,6 +108,21 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
     }
   }, [patientVitalAndBiometrics?.weight, patientVitalAndBiometrics?.height]);
 
+  useEffect(() => {
+    //disable submit button until a valid weight has been input and issubmitting is true
+    if (
+      isInNormalRange(conceptMetadata, config.concepts['weightUuid'], patientVitalAndBiometrics?.weight) == true &&
+      patientVitalAndBiometrics?.weight
+    ) {
+      setIsSubmitting(false);
+    } else setIsSubmitting(true);
+    console.log('suuuub', isSubmitting);
+    console.log('te weight', patientVitalAndBiometrics?.weight);
+    console.log(
+      'kjhhh',
+      isInNormalRange(conceptMetadata, config.concepts['weightUuid'], patientVitalAndBiometrics?.weight),
+    );
+  }, [patientVitalAndBiometrics?.weight]);
   return (
     <Form className={styles.form}>
       <Grid className={styles.grid}>
@@ -305,7 +320,11 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                 },
               ]}
               unitSymbol={conceptUnits.get(config.concepts.weightUuid) ?? ''}
-              inputIsNormal={true}
+              inputIsNormal={isInNormalRange(
+                conceptMetadata,
+                config.concepts['weightUuid'],
+                patientVitalAndBiometrics?.weight,
+              )}
             />
           </Column>
           <Column>
