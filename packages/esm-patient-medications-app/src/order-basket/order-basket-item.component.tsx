@@ -1,11 +1,10 @@
 import React, { useRef } from 'react';
-import TrashCan16 from '@carbon/icons-react/es/trash-can/16';
-import Warning16 from '@carbon/icons-react/es/warning/16';
-import styles from './order-basket-item.scss';
-import { Button, ClickableTile, Tile } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
+import { Button, ClickableTile, Tile, IconButton } from '@carbon/react';
+import { TrashCan, Warning, Add } from '@carbon/react/icons';
 import { OrderBasketItem } from '../types/order-basket-item';
 import { useLayoutType } from '@openmrs/esm-framework';
+import styles from './order-basket-item.scss';
 
 export interface OrderBasketItemTileProps {
   orderBasketItem: OrderBasketItem;
@@ -40,16 +39,19 @@ export default function OrderBasketItemTile({ orderBasketItem, onItemClick, onRe
             <span className={styles.drugName}>{orderBasketItem.drug.concept.display}</span>
             <span className={styles.dosageInfo}>
               {' '}
-              &mdash; {orderBasketItem.dosage.dosage} &mdash; {orderBasketItem.dosageUnit.name}
+              &mdash; {orderBasketItem.dosage.value} {orderBasketItem.unit.value} &mdash;{' '}
+              {orderBasketItem.drug.dosageForm.display}
             </span>
           </>
         )}
         <br />
         <span className={styles.label01}>
           <span className={styles.doseCaption}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
-          <span className={styles.dosageLabel}>{orderBasketItem.dosage.dosage}</span>{' '}
+          <span className={styles.dosageLabel}>
+            {orderBasketItem.dosage.value} {orderBasketItem.unit.value}
+          </span>{' '}
           <span className={styles.dosageInfo}>
-            &mdash; {orderBasketItem.route.name} &mdash; {orderBasketItem.frequency.name} &mdash;{' '}
+            &mdash; {orderBasketItem.route.value} &mdash; {orderBasketItem.frequency.value} &mdash;{' '}
             {t('refills', 'Refills').toUpperCase()} {orderBasketItem.numRefills}{' '}
             {t('quantity', 'Quantity').toUpperCase()} {orderBasketItem.pillsDispensed}{' '}
           </span>
@@ -64,7 +66,8 @@ export default function OrderBasketItemTile({ orderBasketItem, onItemClick, onRe
             <>
               <br />
               <span className={styles.orderErrorText}>
-                <Warning16 /> &nbsp; <span className={styles.label01}>{t('error', 'Error').toUpperCase()}</span> &nbsp;
+                <Warning size={16} /> &nbsp; <span className={styles.label01}>{t('error', 'Error').toUpperCase()}</span>{' '}
+                &nbsp;
                 {orderBasketItem.orderError.responseBody?.error?.message ?? orderBasketItem.orderError.message}
               </span>
             </>
@@ -75,7 +78,7 @@ export default function OrderBasketItemTile({ orderBasketItem, onItemClick, onRe
         className={styles.removeButton}
         kind="ghost"
         hasIconOnly={true}
-        renderIcon={() => <TrashCan16 />}
+        renderIcon={(props) => <TrashCan size={16} {...props} />}
         iconDescription={t('removeFromBasket', 'Remove from basket')}
         onClick={() => {
           shouldOnClickBeCalled.current = false;

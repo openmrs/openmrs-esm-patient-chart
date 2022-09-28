@@ -8,9 +8,8 @@ import {
   useVisit,
   Visit,
 } from '@openmrs/esm-framework';
-import { useEffect } from 'react';
-import useSWR from 'swr';
-import { v4 } from 'uuid';
+import { useEffect, useState } from 'react';
+import { v4 as uuid } from 'uuid';
 import { patientRegistrationSyncType } from './patient';
 
 /**
@@ -32,8 +31,11 @@ export interface OfflineVisit extends NewVisitPayload {
  */
 export function useVisitOrOfflineVisit(patientUuid: string) {
   const isOnline = useConnectivity();
-  const offlineVisit = useOfflineVisit(patientUuid);
+  const [visit, setVisit] = useState<ReturnType<typeof useVisit> | undefined>();
+
   const onlineVisit = useVisit(patientUuid);
+  const offlineVisit = useOfflineVisit(patientUuid);
+
   return isOnline ? onlineVisit : offlineVisit;
 }
 
@@ -42,17 +44,31 @@ export function useVisitOrOfflineVisit(patientUuid: string) {
  * @param patientUuid The UUID of the patient.
  */
 export function useOfflineVisit(patientUuid: string): ReturnType<typeof useVisit> {
-  const swrKey = patientUuid ? `offlineVisit/${patientUuid}` : null;
-  const offlineVisitSwr = useSWR<Visit>(swrKey, async () => {
-    const offlineVisit = await getOfflineVisitForPatient(patientUuid);
-    return offlineVisit ? offlineVisitToVisit(offlineVisit) : undefined;
-  });
+  const [offlineVisitState, setOfflineVisitState] = useState<{
+    data: Visit | null;
+    error: Error | null;
+    isLoading: boolean;
+  }>({ data: null, error: null, isLoading: true });
+  useEffect(() => {
+    getOfflineVisitForPatient(patientUuid)
+      .then((offlineVisit) => {
+        setOfflineVisitState({
+          error: null,
+          data: offlineVisit ? offlineVisitToVisit(offlineVisit) : null,
+          isLoading: false,
+        });
+      })
+      .catch((err) => {
+        setOfflineVisitState({ error: err, data: null, isLoading: false });
+      });
+  }, [patientUuid]);
 
   return {
-    currentVisit: offlineVisitSwr.data,
-    isValidating: offlineVisitSwr.isValidating,
-    error: offlineVisitSwr.error,
-    mutate: offlineVisitSwr.mutate,
+    currentVisit: offlineVisitState.data,
+    isLoading: offlineVisitState.isLoading,
+    isValidating: false,
+    error: offlineVisitState.error,
+    mutate: () => {},
   };
 }
 
@@ -91,7 +107,7 @@ export async function createOfflineVisitForPatient(
   );
 
   const offlineVisit: OfflineVisit = {
-    uuid: v4(),
+    uuid: uuid(),
     patient: patientUuid,
     startDatetime: new Date(),
     location,

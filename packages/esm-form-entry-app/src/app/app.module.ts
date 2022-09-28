@@ -6,7 +6,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { EmptyRouteComponent } from './empty-route/empty-route.component';
 import { FeWrapperComponent } from './fe-wrapper/fe-wrapper.component';
-import { FormEntryModule } from '@ampath-kenya/ngx-formentry';
+import { FormEntryModule } from '@openmrs/ngx-formentry';
 import { ReactiveFormsModule } from '@angular/forms';
 import { OpenmrsApiModule } from './openmrs-api/openmrs-api.module';
 import { FormSchemaService } from './form-schema/form-schema.service';

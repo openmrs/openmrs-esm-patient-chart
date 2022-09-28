@@ -1,11 +1,11 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { InlineLoading } from 'carbon-components-react';
+import { InlineLoading } from '@carbon/react';
 import { useConfig } from '@openmrs/esm-framework';
 import { useVitalsConceptMetadata } from '@openmrs/esm-patient-common-lib';
 import { useBiometrics } from './biometrics.resource';
-import styles from './weight-tile.component.scss';
 import { ConfigObject } from '../config-schema';
+import styles from './weight-tile.scss';
 
 interface WeightTileInterface {
   patientUuid: string;

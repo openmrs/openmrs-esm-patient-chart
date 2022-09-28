@@ -1,8 +1,7 @@
 import React from 'react';
-import Add16 from '@carbon/icons-react/es/add/16';
-import ChartLineSmooth16 from '@carbon/icons-react/es/chart--line-smooth/16';
-import Table16 from '@carbon/icons-react/es/table/16';
-import { DataTableSkeleton, Button, InlineLoading } from 'carbon-components-react';
+import { useTranslation } from 'react-i18next';
+import { DataTableSkeleton, Button, InlineLoading } from '@carbon/react';
+import { Add, ChartLineSmooth, Table } from '@carbon/react/icons';
 import {
   CardHeader,
   EmptyState,
@@ -13,13 +12,12 @@ import {
   withUnit,
 } from '@openmrs/esm-patient-common-lib';
 import { formatDate, parseDate, useConfig } from '@openmrs/esm-framework';
-import { useTranslation } from 'react-i18next';
 import { patientVitalsBiometricsFormWorkspace } from '../constants';
+import PaginatedVitals from './paginated-vitals.component';
+import VitalsChart from './vitals-chart.component';
 import { ConfigObject } from '../config-schema';
 import { useVitals } from './vitals.resource';
 import styles from './vitals-overview.scss';
-import VitalsChart from './vitals-chart.component';
-import PaginatedVitals from './paginated-vitals.component';
 
 interface VitalsOverviewProps {
   patientUuid: string;
@@ -50,7 +48,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
     } else {
       launchPatientWorkspace(patientVitalsBiometricsFormWorkspace);
     }
-  }, []);
+  }, [config.vitals]);
 
   const tableHeaders = [
     { key: 'date', header: 'Date and time', isSortable: true },
@@ -75,15 +73,16 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
 
   const tableRows = React.useMemo(
     () =>
-      vitals?.map((vital, index) => {
+      vitals?.map((vitalSigns, index) => {
         return {
+          ...vitalSigns,
           id: `${index}`,
-          date: formatDate(parseDate(vital.date.toString()), { mode: 'wide', time: true }),
-          bloodPressure: `${vital.systolic ?? '-'} / ${vital.diastolic ?? '-'}`,
-          pulse: vital.pulse,
-          spo2: vital.oxygenSaturation,
-          temperature: vital.temperature,
-          respiratoryRate: vital.respiratoryRate,
+          date: formatDate(parseDate(vitalSigns.date.toString()), { mode: 'wide', time: true }),
+          bloodPressure: `${vitalSigns.systolic ?? '--'} / ${vitalSigns.diastolic ?? '--'}`,
+          pulse: vitalSigns.pulse ?? '--',
+          spo2: vitalSigns.spo2 ?? '--',
+          temperature: vitalSigns.temperature ?? '--',
+          respiratoryRate: vitalSigns.respiratoryRate ?? '--',
         };
       }),
     [vitals],
@@ -104,20 +103,20 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
                 <div className={styles.vitalsHeaderActionItems}>
                   <div className={styles.toggleButtons}>
                     <Button
-                      className={styles.toggle}
-                      size="field"
+                      className={styles.tableViewToggle}
+                      size="sm"
                       kind={chartView ? 'ghost' : 'tertiary'}
                       hasIconOnly
-                      renderIcon={Table16}
+                      renderIcon={(props) => <Table {...props} size={16} />}
                       iconDescription={t('tableView', 'Table View')}
                       onClick={() => setChartView(false)}
                     />
                     <Button
-                      className={styles.toggle}
-                      size="field"
+                      className={styles.chartViewToggle}
+                      size="sm"
                       kind={chartView ? 'tertiary' : 'ghost'}
                       hasIconOnly
-                      renderIcon={ChartLineSmooth16}
+                      renderIcon={(props) => <ChartLineSmooth {...props} size={16} />}
                       iconDescription={t('chartView', 'Chart View')}
                       onClick={() => setChartView(true)}
                     />
@@ -126,7 +125,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
                   {showAddVitals && (
                     <Button
                       kind="ghost"
-                      renderIcon={Add16}
+                      renderIcon={(props) => <Add {...props} size={16} />}
                       iconDescription="Add vitals"
                       onClick={launchVitalsBiometricsForm}
                     >

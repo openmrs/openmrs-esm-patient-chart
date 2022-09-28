@@ -1,3 +1,5 @@
+import { OrderBasketItem } from '../packages/esm-patient-medications-app/src/types/order-basket-item';
+
 export const mockDrugSearchResults = {
   data: {
     results: [
@@ -326,23 +328,20 @@ export const mockMedicationOrderSearchResults = [
       },
     },
     dosage: {
-      dosage: '81 mg',
-      numberOfPills: 1,
+      value: 81,
+      default: true,
     },
-    dosageUnit: {
-      uuid: '1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-      name: 'Tablet',
-      selected: true,
+    unit: {
+      valueCoded: '3013AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      value: 'mg',
     },
     frequency: {
-      name: 'Once daily',
-      conceptUuid: '160862AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-      selected: true,
+      value: 'Once daily',
+      valueCoded: '160862AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
     route: {
-      name: 'Oral',
-      conceptUuid: '160240AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-      selected: true,
+      value: 'Oral',
+      valueCoded: '160240AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
     encounterUuid: '8450ae45-8702-4edd-9541-4f9a75263eab',
     commonMedicationName: 'Aspirin',
@@ -365,8 +364,8 @@ export const mockMedicationOrderSearchResults = [
     action: 'NEW',
     drug: {
       uuid: '18f43c99-2329-426e-97b5-c3356e6afe54',
-      name: 'aspirin',
-      strength: '81mg',
+      name: 'Aspirin 125mg',
+      strength: '125mg',
       dosageForm: {
         display: 'Tablet',
         uuid: '1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
@@ -439,8 +438,11 @@ export const mockMedicationOrderSearchResults = [
       },
     },
     dosage: {
-      dosage: '162 mg',
-      numberOfPills: 2,
+      value: 162,
+    },
+    unit: {
+      valueCoded: '3013AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      value: 'mg',
     },
     dosageUnit: {
       uuid: '1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
@@ -448,14 +450,12 @@ export const mockMedicationOrderSearchResults = [
       selected: true,
     },
     frequency: {
-      name: 'Once daily',
-      conceptUuid: '160862AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-      selected: true,
+      value: 'Once daily',
+      valueCoded: '160862AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
     route: {
-      name: 'Oral',
-      conceptUuid: '160240AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-      selected: true,
+      value: 'Oral',
+      valueCoded: '160240AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
     encounterUuid: '8450ae45-8702-4edd-9541-4f9a75263eab',
     commonMedicationName: 'Aspirin',
@@ -478,8 +478,8 @@ export const mockMedicationOrderSearchResults = [
     action: 'NEW',
     drug: {
       uuid: '18f43c99-2329-426e-97b5-c3356e6afe54',
-      name: 'aspirin',
-      strength: '81mg',
+      name: 'Aspirin 243mg',
+      strength: '243mg',
       dosageForm: {
         display: 'Tablet',
         uuid: '1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
@@ -562,9 +562,11 @@ export const mockMedicationOrderSearchResults = [
       },
     },
     dosage: {
-      dosage: '243 mg',
-      numberOfPills: 3,
-      selected: true,
+      value: 243,
+    },
+    unit: {
+      valueCoded: '3013AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      value: 'mg',
     },
     dosageUnit: {
       uuid: '1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
@@ -572,14 +574,12 @@ export const mockMedicationOrderSearchResults = [
       selected: true,
     },
     frequency: {
-      name: 'Once daily',
-      conceptUuid: '160862AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-      selected: true,
+      value: 'Once daily',
+      valueCoded: '160862AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
     route: {
-      name: 'Oral',
-      conceptUuid: '160240AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-      selected: true,
+      value: 'Oral',
+      valueCoded: '160240AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     },
     encounterUuid: '8450ae45-8702-4edd-9541-4f9a75263eab',
     commonMedicationName: 'Aspirin',
@@ -1227,3 +1227,62 @@ export const mockDrugOrders = {
     ],
   },
 };
+
+export const mockOrderTemplates = [
+  {
+    uuid: 'cb43930e-3ed2-4099-ba0c-e6c841e22c4d',
+    display: 'Aspirin',
+    name: 'Aspirin',
+    description: 'Aspirin demo order template',
+    template: {
+      type: 'https://schema.openmrs.org/order/template/drug/simple/v1',
+      dosingType: 'org.openmrs.SimpleDosingInstructions',
+      dosingInstructions: {
+        dose: [
+          {
+            value: 81,
+            default: true,
+          },
+        ],
+        unit: [
+          {
+            value: 'mg',
+            valueCoded: '3013AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+            default: true,
+          },
+        ],
+        route: [
+          {
+            value: 'Oral',
+            valueCoded: '160240AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+            default: true,
+          },
+        ],
+        frequency: [
+          {
+            value: 'Once daily',
+            valueCoded: '160862AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+            default: true,
+          },
+        ],
+        instructions: [
+          {
+            value: 'Taken after meals',
+            default: true,
+          },
+        ],
+        asNeeded: false,
+        asNeededCondition: 'With or without food',
+      },
+    },
+    retired: false,
+    drug: {
+      uuid: '18f43c99-2329-426e-97b5-c3356e6afe54',
+      display: 'Aspirin',
+    },
+    concept: {
+      uuid: '1074AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      display: 'Abacavir sulfate',
+    },
+  },
+];

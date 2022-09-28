@@ -10,6 +10,7 @@ export interface FormEncounter {
   published: boolean;
   retired: boolean;
   resources: Array<FormEncounterResource>;
+  formCategory?: string;
 }
 
 /**
@@ -31,12 +32,14 @@ export interface EncounterWithFormRef {
   encounterDatetime: string;
   form?: FormEncounter;
 }
+
 export interface Privilege {
   uuid: string;
   name: string;
   display?: string;
   description?: string;
 }
+
 export interface EncounterType {
   uuid: string;
   name: string;

@@ -1,5 +1,4 @@
 import React from 'react';
-import Add16 from '@carbon/icons-react/es/add/16';
 import {
   DataTableSkeleton,
   DataTable,
@@ -12,8 +11,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from 'carbon-components-react';
+} from '@carbon/react';
+import { Add } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
+import { usePagination } from '@openmrs/esm-framework';
 import {
   CardHeader,
   EmptyState,
@@ -21,7 +22,6 @@ import {
   launchPatientWorkspace,
   PatientChartPagination,
 } from '@openmrs/esm-patient-common-lib';
-import { usePagination } from '@openmrs/esm-framework';
 import { allergiesCount, patientAllergiesFormWorkspace } from '../constants';
 import { useAllergies } from './allergy-intolerance.resource';
 import styles from './allergies-overview.scss';
@@ -37,7 +37,7 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient, showAddA
   const displayText = t('allergyIntolerances', 'allergy intolerances');
   const headerTitle = t('allergies', 'Allergies');
   const urlLabel = t('seeAll', 'See all');
-  const pageUrl = window.spaBase + basePath + '/allergies';
+  const pageUrl = `\${openmrsSpaBase}/patient/${patient.id}/chart/Allergies`;
 
   const { allergies, isError, isLoading, isValidating } = useAllergies(patient.id);
   const { results: paginatedAllergies, goTo, currentPage } = usePagination(allergies ?? [], allergiesCount);
@@ -72,15 +72,20 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient, showAddA
         <CardHeader title={headerTitle}>
           <span>{isValidating ? <InlineLoading /> : null}</span>
           {showAddAllergyButton && (
-            <Button kind="ghost" renderIcon={Add16} iconDescription="Add allergies" onClick={launchAllergiesForm}>
+            <Button
+              kind="ghost"
+              renderIcon={(props) => <Add size={16} {...props} />}
+              iconDescription="Add allergies"
+              onClick={launchAllergiesForm}
+            >
               {t('add', 'Add')}
             </Button>
           )}
         </CardHeader>
-        <TableContainer>
-          <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="short">
-            {({ rows, headers, getHeaderProps, getTableProps }) => (
-              <Table {...getTableProps()} useZebraStyles>
+        <DataTable rows={tableRows} headers={tableHeaders} isSortable size="sm" useZebraStyles>
+          {({ rows, headers, getHeaderProps, getTableProps }) => (
+            <TableContainer>
+              <Table {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
@@ -106,9 +111,9 @@ const AllergiesOverview: React.FC<AllergiesOverviewProps> = ({ patient, showAddA
                   ))}
                 </TableBody>
               </Table>
-            )}
-          </DataTable>
-        </TableContainer>
+            </TableContainer>
+          )}
+        </DataTable>
         <PatientChartPagination
           currentItems={paginatedAllergies.length}
           onPageNumberChange={({ page }) => goTo(page)}

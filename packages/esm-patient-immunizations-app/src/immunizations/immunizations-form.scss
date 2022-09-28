@@ -1,9 +1,9 @@
-@import "~carbon-components/src/globals/scss/vars";
-@import "~carbon-components/src/globals/scss/mixins";
-@import "~@openmrs/esm-styleguide/src/vars";
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
 
 .immunizationSequenceSelect{
-  margin: $spacing-05 $spacing-07 $spacing-05;
+  margin: spacing.$spacing-05 spacing.$spacing-07 spacing.$spacing-05;
 }
 
 .form {

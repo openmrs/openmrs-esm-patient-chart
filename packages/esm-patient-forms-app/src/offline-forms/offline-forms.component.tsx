@@ -1,4 +1,6 @@
-import { useLayoutType } from '@openmrs/esm-framework';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { mutate } from 'swr';
 import {
   DataTable,
   TableContainer,
@@ -14,14 +16,18 @@ import {
   DataTableRow,
   Toggle,
   SkeletonPlaceholder,
-} from 'carbon-components-react';
-import React from 'react';
-import { useTranslation } from 'react-i18next';
+} from '@carbon/react';
+import {
+  isDesktop,
+  putDynamicOfflineData,
+  removeDynamicOfflineData,
+  syncDynamicOfflineData,
+  useLayoutType,
+} from '@openmrs/esm-framework';
+import { useDynamicFormDataEntries } from './offline-form-helpers';
 import { FormEncounter } from '../types';
-import { useOfflineFormManagement } from './use-offline-form-management';
-import styles from './offline-forms.styles.scss';
 import { useValidOfflineFormEncounters } from './use-offline-form-encounters';
-import { mutate } from 'swr';
+import styles from './offline-forms.styles.scss';
 
 export interface OfflineFormsProps {
   canMarkFormsAsOffline: boolean;
@@ -31,7 +37,7 @@ const OfflineForms: React.FC<OfflineFormsProps> = ({ canMarkFormsAsOffline }) =>
   const { t } = useTranslation();
   const forms = useValidOfflineFormEncounters();
   const layout = useLayoutType();
-  const toolbarItemSize = layout === 'desktop' ? 'sm' : undefined;
+  const toolbarItemSize = isDesktop(layout) ? 'sm' : undefined;
   const headers: Array<DataTableHeader> = [
     { key: 'formName', header: t('offlineFormsTableFormNameHeader', 'Form name') },
     { key: 'availableOffline', header: t('offlineFormsTableFormAvailableOffline', 'Offline') },
@@ -49,7 +55,7 @@ const OfflineForms: React.FC<OfflineFormsProps> = ({ canMarkFormsAsOffline }) =>
         <h1 className={styles.pageHeader}>{t('offlineFormsTitle', 'Offline forms')}</h1>
       </header>
       <main className={styles.contentContainer}>
-        <DataTable rows={rows} headers={headers}>
+        <DataTable rows={rows} headers={headers} size="sm" useZebraStyles>
           {({
             rows,
             headers,
@@ -59,7 +65,7 @@ const OfflineForms: React.FC<OfflineFormsProps> = ({ canMarkFormsAsOffline }) =>
             getTableContainerProps,
             onInputChange,
           }: DataTableCustomRenderProps) => (
-            <TableContainer className={styles.tableContainer} {...getTableContainerProps()}>
+            <TableContainer {...getTableContainerProps()}>
               <div className={styles.tableHeaderContainer}>
                 <Search
                   className={styles.tableSearch}
@@ -99,20 +105,28 @@ const OfflineForms: React.FC<OfflineFormsProps> = ({ canMarkFormsAsOffline }) =>
 };
 
 function OfflineFormToggle({ form, disabled }: { form: FormEncounter; disabled: boolean }) {
-  const { isFormFullyCachedSwr, isFormMarkedAsOffline, registerFormAsOffline, unregisterFormAsOffline } =
-    useOfflineFormManagement(form);
+  const { t } = useTranslation();
+  const [isUpdating, setIsUpdating] = useState(false);
+  const dynamicFormEntriesSwr = useDynamicFormDataEntries();
+  const isMarkedAsOffline = dynamicFormEntriesSwr.data?.some((entry) => entry.identifier === form.uuid);
 
-  const handleToggled = (checked: boolean) => {
-    if (checked) {
-      registerFormAsOffline();
-    } else {
-      unregisterFormAsOffline();
+  const handleToggled = async (checked: boolean) => {
+    setIsUpdating(true);
+
+    try {
+      if (checked) {
+        await putDynamicOfflineData('form', form.uuid);
+        await syncDynamicOfflineData('form', form.uuid);
+      } else {
+        await removeDynamicOfflineData('form', form.uuid);
+      }
+    } finally {
+      setIsUpdating(false);
+      dynamicFormEntriesSwr.mutate();
     }
-
-    mutate('offlineForms');
   };
 
-  if (isFormFullyCachedSwr.data === undefined) {
+  if (dynamicFormEntriesSwr.isValidating) {
     // ^ Using an explicit undefined check since 'data' is a bool. We want to handle false separately.
     return <SkeletonPlaceholder className={styles.availableOfflineToggleSkeleton} />;
   }
@@ -120,13 +134,15 @@ function OfflineFormToggle({ form, disabled }: { form: FormEncounter; disabled: 
   return (
     <div>
       <Toggle
+        aria-label={t('offlineToggle', 'Offline toggle')}
         id={`${form.uuid}-offline-toggle`}
         className={styles.availableOfflineToggle}
         labelA=""
         labelB=""
+        labelText=""
         size="sm"
-        toggled={isFormMarkedAsOffline}
-        disabled={disabled || isFormFullyCachedSwr.isValidating}
+        toggled={isMarkedAsOffline}
+        disabled={disabled || isUpdating || dynamicFormEntriesSwr.isValidating}
         onToggle={handleToggled}
       />
     </div>

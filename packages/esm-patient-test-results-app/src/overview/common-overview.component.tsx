@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react';
-import Table16 from '@carbon/icons-react/es/table/16';
-import ChartLine16 from '@carbon/icons-react/es/chart--line/16';
-import { Button, TableToolbarContent, TableToolbar, Tooltip } from 'carbon-components-react';
+import { Button, TableToolbarContent, TableToolbar, Toggletip, ToggletipButton, ToggletipContent } from '@carbon/react';
+import { ChartLine, Information, Table } from '@carbon/react/icons';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { OverviewPanelEntry } from './useOverviewData';
 import { useTranslation } from 'react-i18next';
@@ -94,7 +93,7 @@ const CommonOverview: React.FC<CommonOverviewProps> = ({
                       {type === 'Test' && (
                         <Button
                           kind="ghost"
-                          renderIcon={ChartLine16}
+                          renderIcon={(props) => <ChartLine size={16} {...props} />}
                           onClick={() => {
                             setActiveCardUuid(uuid);
                             openTrendline(uuid, uuid);
@@ -105,7 +104,7 @@ const CommonOverview: React.FC<CommonOverviewProps> = ({
                       )}
                       <Button
                         kind="ghost"
-                        renderIcon={Table16}
+                        renderIcon={(props) => <Table size={16} {...props} />}
                         onClick={() => {
                           setActiveCardUuid(uuid);
                           openTimeline(uuid);
@@ -148,19 +147,24 @@ const Separator = ({ ...props }) => <div {...props} className={styles.separator}
 const InfoTooltip = ({ effectiveDateTime, issuedDateTime }) => {
   const { t } = useTranslation();
   return (
-    <Tooltip align="start">
-      <div className={styles.tooltip}>
-        <p>{t('dateCollected', 'Displaying date collected')}</p>
-        <p>
-          <span className={styles.label}>{t('resulted', 'Resulted')}: </span>{' '}
-          {formatDatetime(issuedDateTime, { mode: 'wide' })}
-        </p>
-        <p>
-          <span className={styles.label}>{t('ordered', 'Ordered')}: </span>{' '}
-          {formatDatetime(effectiveDateTime, { mode: 'wide' })}
-        </p>
-      </div>
-    </Tooltip>
+    <Toggletip align="bottom">
+      <ToggletipButton label="Additional information">
+        <Information />
+      </ToggletipButton>
+      <ToggletipContent>
+        <div className={styles.tooltip}>
+          <p>{t('dateCollected', 'Displaying date collected')}</p>
+          <p>
+            <span className={styles.label}>{t('resulted', 'Resulted')}: </span>{' '}
+            {formatDatetime(issuedDateTime, { mode: 'wide' })}
+          </p>
+          <p>
+            <span className={styles.label}>{t('ordered', 'Ordered')}: </span>{' '}
+            {formatDatetime(effectiveDateTime, { mode: 'wide' })}
+          </p>
+        </div>
+      </ToggletipContent>
+    </Toggletip>
   );
 };
 

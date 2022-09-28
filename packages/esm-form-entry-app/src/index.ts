@@ -1,16 +1,21 @@
 import 'systemjs-webpack-interop/resource-query-public-path?systemjsModuleName=@openmrs/esm-form-entry-app';
 import 'zone.js/dist/zone';
 import 'reflect-metadata';
-import { messageOmrsServiceWorker, defineConfigSchema } from '@openmrs/esm-framework';
+import { defineConfigSchema, messageOmrsServiceWorker } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
-import { setupOfflineDataSourcePrecaching } from './app/offline/caching';
+import { setupDynamicOfflineFormDataHandler, setupStaticDataOfflinePrecaching } from './app/offline/caching';
+
+declare var __VERSION__: string;
+// __VERSION__ is replaced by Webpack with the version from package.json
+const version = __VERSION__;
 
 const backendDependencies = { 'webservices.rest': '^2.24.0' };
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 const moduleName = '@openmrs/esm-form-entry-app';
 
 function setupOpenMRS() {
-  setupOfflineDataSourcePrecaching();
+  setupStaticDataOfflinePrecaching();
+  setupDynamicOfflineFormDataHandler();
 
   messageOmrsServiceWorker({
     type: 'registerDynamicRoute',
@@ -61,4 +66,4 @@ function setupOpenMRS() {
   };
 }
 
-export { backendDependencies, importTranslation, setupOpenMRS };
+export { backendDependencies, importTranslation, setupOpenMRS, version };

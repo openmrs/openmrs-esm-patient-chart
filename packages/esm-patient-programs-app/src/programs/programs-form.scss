@@ -1,18 +1,10 @@
-@import "~@openmrs/esm-styleguide/src/vars";
-@import "~carbon-components/src/globals/scss/vars";
-@import "~carbon-components/src/globals/scss/mixins";
-
-.selectContainer {
-  display: flex;
-  align-items: center;
-}
+@import '~@openmrs/esm-styleguide/src/vars';
 
 .loading {
   margin-left: 1rem;
   width: 2rem;
   min-height: 2.5rem;
 }
-
 
 .button {
   height: 4rem;

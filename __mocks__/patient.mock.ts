@@ -16,12 +16,14 @@ export const mockPatient = {
       id: '1f0ad7a1-430f-4397-b571-59ea654a52db',
       use: 'secondary',
       system: 'Old Identification Number',
+      type: { text: 'Old Identification Number' },
       value: '100732HE',
     },
     {
       id: '1f0ad7a1-430f-4397-b571-59ea654a52db',
       use: 'usual',
       system: 'OpenMRS ID',
+      type: { text: 'OpenMRS ID' },
       value: '100GEJ',
     },
   ],
@@ -52,6 +54,18 @@ export const mockPatient = {
     {
       system: 'Mobile',
       value: '+25467388299499',
+    },
+  ],
+};
+
+export const mockPatientWithLongName = {
+  ...mockPatient,
+  name: [
+    {
+      id: 'efdb246f-4142-4c12-a27a-9be60b9592e9',
+      use: 'usual',
+      family: 'family name',
+      given: ['Some very long given name'],
     },
   ],
 };

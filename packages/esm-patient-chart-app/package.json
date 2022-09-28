@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-chart-app",
-  "version": "3.1.0",
+  "version": "4.0.0",
   "license": "MPL-2.0",
   "description": "Patient dashboard microfrontend for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-patient-chart-app.js",
@@ -12,7 +12,7 @@
     "debug": "npm run serve",
     "build": "webpack --mode production",
     "analyze": "webpack --mode=production --env analyze=true",
-    "lint": "eslint src --ext tsx,ts",
+    "lint": "eslint src --ext tsx,ts --fix --max-warnings=0",
     "typescript": "tsc",
     "extract-translations": "i18next 'src/**/*.component.tsx' --config ../../tools/i18next-parser.config.js"
   },
@@ -34,28 +34,23 @@
     "url": "https://github.com/openmrs/openmrs-esm-patient-chart/issues"
   },
   "dependencies": {
-    "@carbon/icons-react": "^10.18.0",
-    "carbon-components-react": "^7.25.0",
     "lodash-es": "^4.17.15",
     "uuid": "^8.3.2"
   },
   "peerDependencies": {
-    "@openmrs/esm-framework": "3.x",
-    "@openmrs/esm-patient-common-lib": "3.x",
-    "carbon-components": "10.x",
-    "carbon-icons": "7.x",
+    "@carbon/react": "1.x",
+    "@openmrs/esm-framework": "4.x",
+    "@openmrs/esm-patient-common-lib": "4.x",
     "dayjs": "1.x",
-    "react": "16.x",
+    "lodash-es": "4.x",
+    "react": "18.x",
     "react-i18next": "11.x",
-    "react-router-dom": "5.x",
-    "rxjs": "6.x",
-    "single-spa": "5.x",
-    "single-spa-react": "4.x"
+    "react-router-dom": "6.x",
+    "rxjs": "6.x"
   },
   "devDependencies": {
-    "@openmrs/esm-patient-common-lib": "^3.1.0",
+    "@openmrs/esm-patient-common-lib": "^4.0.0",
     "@types/uuid": "^8.3.0",
-    "single-spa": "5",
-    "single-spa-react": "^4.6.1"
+    "webpack": "^5.74.0"
   }
 }

@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableCell,
   DataTableHeader,
-} from 'carbon-components-react';
+} from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { DefaultWorkspaceProps, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { getStartedVisit, VisitMode, VisitStatus } from '@openmrs/esm-framework';
@@ -63,10 +63,10 @@ const PastVisitOverview: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
   if (pastVisits?.length) {
     return (
       <div className={styles.container}>
-        <DataTable headers={headerData} rows={rowData}>
+        <DataTable headers={headerData} rows={rowData} useZebraStyles>
           {({ rows, headers, getTableProps, getHeaderProps, getRowProps }) => (
             <TableContainer title={t('pastVisits', 'Past Visits')}>
-              <Table {...getTableProps()} useZebraStyles>
+              <Table {...getTableProps()}>
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
@@ -88,8 +88,8 @@ const PastVisitOverview: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
                       {row.cells.map((cell) => (
                         <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                       ))}
-                      <TableCell className="bx--table-column-menu">
-                        <OverflowMenu flipped selectorPrimaryFocus="option-two">
+                      <TableCell className="cds--table-column-menu">
+                        <OverflowMenu ariaLabel="Actions menu" flipped selectorPrimaryFocus="option-two">
                           <OverflowMenuItem onClick={handleOpenVisitForm} itemText={t('edit', 'Edit')} />
                           <OverflowMenuItem
                             onClick={() => {

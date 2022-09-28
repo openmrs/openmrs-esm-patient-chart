@@ -1,25 +1,31 @@
 import dayjs from 'dayjs';
 import useSWR from 'swr';
-import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
+import { getDynamicOfflineDataEntries, openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import { ListResponse, FormEncounter, EncounterWithFormRef, CompletedFormInfo } from '../types';
 import { customEncounterRepresentation, formEncounterUrl, formEncounterUrlPoc } from '../constants';
-import { isFormFullyCached } from '../offline-forms/offline-form-helpers';
+import { ConfigObject } from '../config-schema';
 
-export function useFormEncounters(cachedOfflineFormsOnly = false) {
-  const config = useConfig();
-  const url = config.showHtmlFormEntryForms ? formEncounterUrl : formEncounterUrlPoc;
+export function useFormEncounters(cachedOfflineFormsOnly = false, patientUuid: string = '') {
+  const { showConfigurableForms, customFormsUrl, showHtmlFormEntryForms } = useConfig() as ConfigObject;
+  const url = showConfigurableForms
+    ? customFormsUrl.concat(`?patientUuid=${patientUuid}`)
+    : showHtmlFormEntryForms
+    ? formEncounterUrl
+    : formEncounterUrlPoc;
 
   return useSWR([url, cachedOfflineFormsOnly], async () => {
     const res = await openmrsFetch<ListResponse<FormEncounter>>(url);
     // show published forms and hide component forms
-    const forms = res.data?.results?.filter((form) => form.published && !/component/i.test(form.name)) ?? [];
+    const forms = showConfigurableForms
+      ? res?.data.results
+      : res.data?.results?.filter((form) => form.published && !/component/i.test(form.name)) ?? [];
 
     if (!cachedOfflineFormsOnly) {
       return forms;
     }
 
-    const offlineForms = await Promise.all(forms.map(async (form) => ((await isFormFullyCached(form)) ? form : null)));
-    return offlineForms.filter(Boolean);
+    const dynamicFormData = await getDynamicOfflineDataEntries('form');
+    return forms.filter((form) => dynamicFormData.some((entry) => entry.identifier === form.uuid));
   });
 }
 
@@ -33,7 +39,7 @@ export function useEncountersWithFormRef(
 }
 
 export function useForms(patientUuid: string, startDate?: Date, endDate?: Date, cachedOfflineFormsOnly = false) {
-  const allFormsRes = useFormEncounters(cachedOfflineFormsOnly);
+  const allFormsRes = useFormEncounters(cachedOfflineFormsOnly, patientUuid);
   const encountersRes = useEncountersWithFormRef(patientUuid, startDate, endDate);
   const pastEncounters = encountersRes.data?.data?.results ?? [];
   const data = allFormsRes.data ? mapToFormCompletedInfo(allFormsRes.data, pastEncounters) : undefined;

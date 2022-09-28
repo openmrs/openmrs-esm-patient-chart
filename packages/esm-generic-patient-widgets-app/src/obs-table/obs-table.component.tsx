@@ -1,5 +1,4 @@
 import React from 'react';
-import styles from './obs-table.scss';
 import {
   DataTable,
   Table,
@@ -9,10 +8,11 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from 'carbon-components-react';
+} from '@carbon/react';
 import { usePagination, useConfig, formatDatetime } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { useObs } from '../resources/useObs';
+import styles from './obs-table.scss';
 
 interface ObsTableProps {
   patientUuid: string;
@@ -40,27 +40,53 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
           id: `${index}`,
           date: formatDatetime(new Date(obss[0].issued), { mode: 'wide' }),
         };
+
         for (let obs of obss) {
-          rowData[obs.conceptUuid] = obs.valueQuantity.value;
+          switch (obs.dataType) {
+            case 'Text':
+              rowData[obs.conceptUuid] = obs.valueString;
+              break;
+
+            case 'Number':
+              let decimalPlaces: number | undefined = config.data.find(
+                (ele: any) => ele.concept === obs.conceptUuid,
+              )?.decimalPlaces;
+
+              if (obs.valueQuantity?.value % 1 !== 0) {
+                if (decimalPlaces > 0) {
+                  rowData[obs.conceptUuid] = obs.valueQuantity?.value.toFixed(decimalPlaces);
+                } else {
+                  rowData[obs.conceptUuid] = obs.valueQuantity?.value.toFixed(2);
+                }
+              } else {
+                rowData[obs.conceptUuid] = obs.valueQuantity?.value;
+              }
+              break;
+
+            case 'Coded':
+              rowData[obs.conceptUuid] = obs.valueCodeableConcept?.coding[0]?.display;
+              break;
+          }
         }
+
         return rowData;
       }),
-    [obssByDate],
+    [config.data, obssByDate],
   );
 
   const { results, goTo, currentPage } = usePagination(tableRows, config.table.pageSize);
 
   return (
     <div>
-      <TableContainer>
-        <DataTable rows={results} headers={tableHeaders} isSortable={true} size="short">
-          {({ rows, headers, getHeaderProps, getTableProps }) => (
-            <Table {...getTableProps()} useZebraStyles className={styles.customRow}>
+      <DataTable rows={results} headers={tableHeaders} isSortable size="sm" useZebraStyles>
+        {({ rows, headers, getHeaderProps, getTableProps }) => (
+          <TableContainer>
+            <Table {...getTableProps()} className={styles.customRow}>
               <TableHead>
                 <TableRow>
                   {headers.map((header) => (
                     <TableHeader
-                      className={`${styles.productiveHeading01} ${styles.text02}`}
+                      className={`${styles.tableHeader}`}
                       {...getHeaderProps({
                         header,
                         isSortable: header.isSortable,
@@ -75,15 +101,15 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
                 {rows.map((row) => (
                   <TableRow key={row.id}>
                     {row.cells.map((cell) => (
-                      <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+                      <TableCell key={cell.id}>{cell.value?.content ?? cell.value ?? '--'}</TableCell>
                     ))}
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
-          )}
-        </DataTable>
-      </TableContainer>
+          </TableContainer>
+        )}
+      </DataTable>
       <PatientChartPagination
         pageNumber={currentPage}
         totalItems={tableRows.length}

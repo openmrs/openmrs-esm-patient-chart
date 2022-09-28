@@ -1,17 +1,18 @@
 import React, { useMemo, useState } from 'react';
-import FormView from './form-view.component';
-import styles from './forms.component.scss';
-import EmptyFormView from './empty-form.component';
-import { ContentSwitcher, Switch, DataTableSkeleton, InlineLoading, Tag } from 'carbon-components-react';
-import { CardHeader, ErrorState, PatientProgram, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
-import { useForms } from '../hooks/use-forms';
-import { useConfig, useLayoutType, useSession, userHasAccess } from '@openmrs/esm-framework';
-import { isValidOfflineFormEncounter } from '../offline-forms/offline-form-helpers';
-import { ConfigObject } from '../config-schema';
-import { useProgramConfig } from '../hooks/use-program-config';
 import dayjs from 'dayjs';
 import 'dayjs/plugin/isToday';
+import { ContentSwitcher, Switch, DataTableSkeleton, InlineLoading } from '@carbon/react';
+import { CardHeader, ErrorState, PatientProgram, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
+import { useConfig, useLayoutType, useSession, userHasAccess } from '@openmrs/esm-framework';
+import { isValidOfflineFormEncounter } from '../offline-forms/offline-form-helpers';
+import { useProgramConfig } from '../hooks/use-program-config';
+import { useForms } from '../hooks/use-forms';
+import { ConfigObject } from '../config-schema';
+import ConfigurableForms from './configurable-forms.component';
+import EmptyFormView from './empty-form.component';
+import FormView from './form-view.component';
+import styles from './forms.scss';
 
 const enum FormsCategory {
   Recommended,
@@ -31,7 +32,7 @@ interface FormsProps {
 
 const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, urlLabel, isOffline }) => {
   const { t } = useTranslation();
-  const { htmlFormEntryForms, showRecommendedFormsTab } = useConfig() as ConfigObject;
+  const { htmlFormEntryForms, showRecommendedFormsTab, showConfigurableForms } = useConfig() as ConfigObject;
   const headerTitle = t('forms', 'Forms');
   const isTablet = useLayoutType() === 'tablet';
   const [formsCategory, setFormsCategory] = useState(
@@ -43,7 +44,7 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
     ? data?.filter((formInfo) => isValidOfflineFormEncounter(formInfo.form, htmlFormEntryForms))
     : data;
   formsToDisplay = formsToDisplay?.filter((formInfo) =>
-    userHasAccess(formInfo.form.encounterType.editPrivilege?.display, session?.user),
+    userHasAccess(formInfo?.form?.encounterType?.editPrivilege?.display, session?.user),
   );
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const { programConfigs } = useProgramConfig(patientUuid, showRecommendedFormsTab);
@@ -61,6 +62,22 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
     [currentVisit?.visitType.uuid, formsToDisplay, programConfigs],
   );
 
+  if (showConfigurableForms) {
+    return (
+      <ConfigurableForms
+        formsToDisplay={formsToDisplay}
+        headerTitle={headerTitle}
+        isValidating={isValidating}
+        patientUuid={patientUuid}
+        patient={patient}
+        pageSize={pageSize}
+        pageUrl={pageUrl}
+        urlLabel={urlLabel}
+        error={error}
+      />
+    );
+  }
+
   if (!formsToDisplay && !error) {
     return <DataTableSkeleton role="progressbar" rowCount={5} />;
   }
@@ -70,7 +87,7 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
   }
 
   if (formsToDisplay.length === 0) {
-    return <EmptyFormView action={t('noFormsAvailable', 'There are no Forms to display for this patient')} />;
+    return <EmptyFormView content={t('noFormsAvailable', 'There are no forms to display for this patient')} />;
   }
 
   return (
@@ -117,7 +134,6 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
             urlLabel={urlLabel}
           />
         )}
-
         {formsCategory === FormsCategory.Recommended && (
           <FormView
             forms={recommendedForms}

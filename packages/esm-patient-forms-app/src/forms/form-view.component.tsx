@@ -1,29 +1,30 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import styles from './form-view.component.scss';
-import EmptyFormView from './empty-form.component';
+import { useTranslation } from 'react-i18next';
 import isEmpty from 'lodash-es/isEmpty';
 import first from 'lodash-es/first';
 import debounce from 'lodash-es/debounce';
-import { formatDatetime, useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
-import { useTranslation } from 'react-i18next';
 import {
   DataTable,
+  DataTableHeader,
+  DataTableRow,
+  Layer,
   Search,
   Table,
+  TableBody,
   TableCell,
   TableContainer,
-  TableBody,
   TableHead,
   TableHeader,
   TableRow,
-  DataTableHeader,
-  DataTableRow,
-} from 'carbon-components-react';
-import { PatientChartPagination, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
-import { CompletedFormInfo } from '../types';
-import Edit20 from '@carbon/icons-react/es/edit/20';
+  Tile,
+} from '@carbon/react';
+import { Edit } from '@carbon/react/icons';
+import { EmptyDataIllustration, PatientChartPagination, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
+import { isDesktop, formatDatetime, useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { ConfigObject } from '../config-schema';
+import { CompletedFormInfo } from '../types';
 import { launchFormEntryOrHtmlForms } from '../form-entry-interop';
+import styles from './form-view.scss';
 
 interface FormViewProps {
   forms: Array<CompletedFormInfo>;
@@ -38,7 +39,7 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
   const { t } = useTranslation();
   const config = useConfig() as ConfigObject;
   const htmlFormEntryForms = config.htmlFormEntryForms;
-  const isDesktop = useLayoutType() === 'desktop';
+  const layout = useLayoutType();
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const [searchTerm, setSearchTerm] = useState<string>(null);
   const [allFormInfos, setAllFormInfos] = useState<Array<CompletedFormInfo>>(forms);
@@ -98,10 +99,16 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
         )}
         {allFormInfos?.length > 0 && (
           <>
-            <DataTable size={isDesktop ? 'sm' : 'lg'} rows={tableRows} headers={tableHeaders} isSortable={true}>
+            <DataTable
+              size={isDesktop(layout) ? 'sm' : 'lg'}
+              rows={tableRows}
+              headers={tableHeaders}
+              isSortable
+              useZebraStyles
+            >
               {({ rows, headers, getHeaderProps, getTableProps }) => (
                 <TableContainer className={styles.tableContainer}>
-                  <Table {...getTableProps()} useZebraStyles>
+                  <Table {...getTableProps()}>
                     <TableHead>
                       <TableRow>
                         {headers.map((header) => (
@@ -140,7 +147,8 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
                                 {row.cells[1].value}
                               </label>
                               {row.cells[0].value && (
-                                <Edit20
+                                <Edit
+                                  size={20}
                                   description="Edit form"
                                   onClick={() =>
                                     launchFormEntryOrHtmlForms(
@@ -174,11 +182,17 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
             />
           </>
         )}
-        {isEmpty(allFormInfos) && (
-          <EmptyFormView
-            action={t('formSearchHint', 'Try searching for the form using an alternative name or keyword')}
-          />
-        )}
+        {isEmpty(allFormInfos) ? (
+          <Layer>
+            <Tile className={styles.tile}>
+              <EmptyDataIllustration />
+              <p className={styles.content}>{t('noFormsAvailable', 'There are no matching forms to display')}</p>
+              <p className={styles.helper}>
+                {t('formSearchHint', 'Try searching for the form using an alternative name or keyword')}
+              </p>
+            </Tile>
+          </Layer>
+        ) : null}
       </>
     </div>
   );

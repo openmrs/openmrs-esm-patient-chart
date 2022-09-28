@@ -11,7 +11,7 @@ interface NotesDetailedSummaryProps {
 const NotesDetailedSummary: React.FC<NotesDetailedSummaryProps> = ({ patientUuid, showAddNote, basePath }) => {
   const pageSize = 10;
   const { t } = useTranslation();
-  const pageUrl = window.spaBase + basePath + '/summary';
+  const pageUrl: string = `$\{openmrsSpaBase}/patient/${patientUuid}/chart`;
   const urlLabel = t('goToSummary', 'Go to Summary');
 
   return (

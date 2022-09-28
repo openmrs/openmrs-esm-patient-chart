@@ -15,11 +15,15 @@ export interface PatientProgram {
       states: Array<{}>;
       links?: Links;
     }>;
+    concept: {
+      display: string;
+      uuid: string;
+    };
     links: Links;
   };
   display: string;
-  dateEnrolled: Date;
-  dateCompleted: Date | null;
+  dateEnrolled: string;
+  dateCompleted: string | null;
   location?: {
     uuid: string;
     display: string;
@@ -94,4 +98,14 @@ export interface SessionData {
   roles: Array<DisplayMetadata>;
   retired: false;
   links: Links;
+}
+
+export interface ConfigurableProgram extends PatientProgram {
+  uuid: string;
+  display: string;
+  enrollmentFormUuid: string;
+  discontinuationFormUuid: string;
+  enrollmentStatus: string;
+  dateEnrolled: string;
+  dateCompleted: string;
 }

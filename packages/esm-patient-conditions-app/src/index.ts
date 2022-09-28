@@ -2,6 +2,10 @@ import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmr
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { dashboardMeta } from './dashboard.meta';
 
+declare var __VERSION__: string;
+// __VERSION__ is replaced by Webpack with the version from package.json
+const version = __VERSION__;
+
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 const backendDependencies = {
@@ -33,10 +37,15 @@ function setupOpenMRS() {
       {
         name: 'conditions-details-widget',
         slot: dashboardMeta.slot,
-        load: getAsyncLifecycle(() => import('./conditions/conditions.component'), options),
+        load: getAsyncLifecycle(() => import('./conditions/conditions-detailed-summary.component'), options),
         meta: {
           columnSpan: 4,
         },
+      },
+      {
+        name: 'conditions-widget',
+        load: getAsyncLifecycle(() => import('./conditions/conditions-widget.component'), options),
+        meta: {},
       },
       {
         name: 'conditions-summary-dashboard',
@@ -56,4 +65,4 @@ function setupOpenMRS() {
   };
 }
 
-export { backendDependencies, importTranslation, setupOpenMRS };
+export { backendDependencies, importTranslation, setupOpenMRS, version };

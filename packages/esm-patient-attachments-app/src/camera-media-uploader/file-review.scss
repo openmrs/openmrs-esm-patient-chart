@@ -1,0 +1,52 @@
+@use '@carbon/styles/scss/spacing';
+@import '../root.scss';
+
+.filePreviewContainer {
+  background-color: $ui-02;
+}
+
+.overview {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+ img {
+    max-width: 100%;
+    max-height: 20rem;
+    display: block;
+    align-self: center;
+    justify-self: center;
+  }
+
+  .imageDetails {
+    margin-left: 1rem;
+  }
+}
+
+.captionFrame {
+  margin-bottom: .3rem;
+}
+
+.buttonSetOverrides {
+  margin: spacing.$spacing-05 auto 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  & > button {
+    max-width: unset;
+  }
+}
+
+.filePlaceholder {
+  background-color: $color-gray-30;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 50%;
+  margin: 0 auto;
+}
+
+.filePlaceholder::after {
+  content: "";
+  display: block;
+  padding-bottom: 100%;
+}

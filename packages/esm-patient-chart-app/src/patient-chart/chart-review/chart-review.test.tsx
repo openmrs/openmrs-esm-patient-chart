@@ -1,4 +1,5 @@
 import React from 'react';
+import { BrowserRouter } from 'react-router-dom';
 import { screen, render } from '@testing-library/react';
 import { mockPatient } from '../../../../../__mocks__/patient.mock';
 import { useExtensionSlotMeta, useExtensionStore } from '@openmrs/esm-framework';
@@ -29,8 +30,11 @@ jest.mock('react-router-dom', () => {
   return {
     ...originalModule,
     Redirect: jest.fn(),
-    useRouteMatch: jest.fn().mockReturnValue({
-      url: '/patient/8673ee4f-e2ab-4077-ba55-4980f408773e/chart',
+    useMatch: jest.fn().mockReturnValue({
+      params: {
+        url: '/patient/8673ee4f-e2ab-4077-ba55-4980f408773e/chart',
+        view: 'Patient Summary',
+      },
     }),
   };
 });
@@ -92,5 +96,9 @@ describe('ChartReview: ', () => {
 });
 
 function renderChartReview() {
-  render(<ChartReview {...testProps} />);
+  render(
+    <BrowserRouter>
+      <ChartReview {...testProps} />
+    </BrowserRouter>,
+  );
 }

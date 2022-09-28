@@ -1,6 +1,11 @@
 import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
+import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
+
+declare var __VERSION__: string;
+// __VERSION__ is replaced by Webpack with the version from package.json
+const version = __VERSION__;
 
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -16,7 +21,7 @@ function setupOpenMRS() {
     moduleName,
   };
 
-  defineConfigSchema(moduleName, {});
+  defineConfigSchema(moduleName, configSchema);
 
   return {
     extensions: [
@@ -48,11 +53,11 @@ function setupOpenMRS() {
         name: 'programs-form-workspace',
         load: getAsyncLifecycle(() => import('./programs/programs-form.component'), options),
         meta: {
-          title: 'Record Program enrollment',
+          title: 'Record program enrollment',
         },
       },
     ],
   };
 }
 
-export { backendDependencies, importTranslation, setupOpenMRS };
+export { backendDependencies, importTranslation, setupOpenMRS, version };

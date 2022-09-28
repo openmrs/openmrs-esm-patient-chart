@@ -1,8 +1,8 @@
-@import "~@openmrs/esm-styleguide/src/vars";
-@import "~carbon-components/src/globals/scss/vars";
-@import "~carbon-components/src/globals/scss/mixins";
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
 
-.tableContainer :global(.bx--data-table-header) {
+.tableContainer :global(.cds--data-table-header) {
   padding: 0.75rem 1rem 0.25rem 1rem;
 
   *:not(:first-child) {
@@ -10,18 +10,12 @@
   }
 
   h4 {
-    @include carbon--type-style("productive-heading-02");
+    @include type.type-style("heading-compact-02");
     max-width: 50%;
   }
 }
 
 .tableContainer {
-  &.tablet {
-    h4 {
-      color: $text-01;
-    }
-  }
-
   &.desktop {
     h4 {
       color: $text-02;
@@ -32,7 +26,7 @@
 tr {
   &.critically-low, &.critically-high, &.low, &.high {
     td:nth-child(2) {
-      @include carbon--type-style("productive-heading-01");
+      @include type.type-style("heading-compact-01");
       color: $ui-05;
     }
   }
@@ -90,9 +84,8 @@ tr {
 .criticallyLow,
 .high,
 .low {
-    @include carbon--type-style('productive-heading-01');
-    color: $text-01;
-}
+    @include type.type-style('heading-compact-01');
+  }
 
 .high,
 .low {

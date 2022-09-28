@@ -55,7 +55,7 @@ const useGetManyObstreeData = (uuidArray) => {
       return `/ws/rest/v1/obstree?patient=${patientUuid}&concept=${uuidArray[index]}`;
     } else return null;
   };
-  const { data } = useSWRInfinite(getObstreeUrl, openmrsFetch, { initialSize: uuidArray.length });
+  const { data, error } = useSWRInfinite(getObstreeUrl, openmrsFetch, { initialSize: uuidArray.length });
 
   const result = useMemo(() => {
     return (
@@ -82,9 +82,8 @@ const useGetManyObstreeData = (uuidArray) => {
   }, [data]);
   const roots = result.map((item) => item.data);
   const loading = result.some((item) => item.loading);
-  const errors = result.filter((item) => item.error)?.map((item) => item.error) || [];
 
-  return { roots, loading, errors };
+  return { roots, loading, error };
 };
 
 export default useGetManyObstreeData;

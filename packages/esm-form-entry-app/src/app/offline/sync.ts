@@ -1,5 +1,5 @@
-import { deleteSynchronizationItem, getOfflineDb, queueSynchronizationItem, SyncItem } from '@openmrs/esm-framework';
-import { Encounter, EncounterCreate, Person, PersonUpdate } from '../types';
+import { getFullSynchronizationItems, queueSynchronizationItem, SyncItem } from '@openmrs/esm-framework';
+import { Encounter, EncounterCreate, PersonUpdate } from '../types';
 
 // General note:
 // The synchronization handler which actually synchronizes the queued items has been moved to `esm-patient-forms-app`.
@@ -35,13 +35,6 @@ export async function queuePatientFormSyncItem(content: PatientFormSyncItemConte
 export async function findQueuedPatientFormSyncItemByContentId(
   id: string,
 ): Promise<SyncItem<PatientFormSyncItemContent> | undefined> {
-  // TODO: This direct sync queue interaction should ideally not happen.
-  // We should add a dedicated API to esm-offline here instead.
-  // What's missing: A function like `getSynchronizationItems` which returns the *full* item,
-  // not just `SyncItem.content`. Then we can leverage the existing API to delete the previous item.
-  return (
-    await getOfflineDb()
-      .syncQueue.filter((syncItem) => syncItem.type === patientFormSyncItem && syncItem.content._id === id)
-      .toArray()
-  )[0];
+  const syncItems = await getFullSynchronizationItems<PatientFormSyncItemContent>(patientFormSyncItem);
+  return syncItems.find((item) => item.content._id === id);
 }

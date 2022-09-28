@@ -1,9 +1,28 @@
-import { Form } from '@ampath-kenya/ngx-formentry';
+import { Form } from '@openmrs/ngx-formentry';
 
 interface OpenMRSResource {
   display: string;
   uuid: string;
   links?: Array<{ rel: string; uri: string }>;
+}
+/**
+ * The form encounter as it is fetched from the REST API.
+ */
+export interface FormEncounter {
+  uuid: string;
+  name: string;
+  display: string;
+  version: string;
+  published: boolean;
+  retired: boolean;
+  resources: Array<FormEncounterResource>;
+}
+
+export interface FormEncounterResource {
+  uuid: string;
+  name: string;
+  dataType: string;
+  valueReference: string;
 }
 
 export interface EncounterProvider {
@@ -106,7 +125,7 @@ export interface FormSchema {
   encounterType: OpenMRSResource;
   formField: Array<unknown>;
   name: string;
-  pages: Array<{ label: string; sections: Sections }>;
+  pages: Array<{ label: string; sections: Array<Sections> }>;
   processor: string;
   published: boolean;
   referencedForms: Form;
@@ -122,21 +141,31 @@ interface Sections {
   questions: Array<Questions>;
 }
 
-interface Questions {
-  default: string;
+export interface Questions {
   id: string;
-  questionOptions: QuestionOptions;
+  default: string;
+  questionOptions?: QuestionOptions;
   required: boolean;
   type: string;
   validators: Array<Validators>;
-}
-
-interface Validators {
-  type: string;
+  label?: string;
+  concept?: string;
+  questions?: Array<Questions>;
 }
 
 interface QuestionOptions {
   rendering: string;
+  concept?: string;
+  answers?: Array<QuestionOptionsAnswer>;
+}
+
+interface QuestionOptionsAnswer {
+  concept?: string;
+  label?: string;
+}
+
+interface Validators {
+  type: string;
 }
 
 export interface LoggedInUser {
@@ -162,9 +191,16 @@ export interface MonthlyScheduleParams {
 }
 
 export interface FormEntryConfig {
+  /** @deprecated use customDataSources instead */
   dataSources: {
+    /** @deprecated should be converted to customDataSource */
     monthlySchedule: boolean;
   };
+  customDataSources: {
+    name: string;
+    moduleName: string;
+    moduleExport: 'default' | string;
+  }[];
   appointmentsResourceUrl: string;
 }
 
@@ -195,6 +231,7 @@ export interface Concept {
   };
   answers: Array<Concept>;
   setMembers: Array<Concept>;
+  display: string;
 }
 
 export interface Encounter {

@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './attachment-thumbnail.scss';
-import regularFile from '../assets/file-regular.svg';
+import { DocumentPdf, DocumentUnknown } from '@carbon/react/icons';
 
 export default function AttachmentThumbnail(props: AttachmentThumbnailProps) {
   return (
@@ -12,39 +12,24 @@ export default function AttachmentThumbnail(props: AttachmentThumbnailProps) {
 
 function ImageThumbnail(props: ImageProps) {
   return (
-    <div className={styles.imageThumbnail} role="button" tabIndex={0}>
+    <div className={styles.imageThumbnail} role="button" tabIndex={0} onClick={props?.onClick}>
       <img src={props.src} alt={props.title} style={props.style} />
     </div>
   );
 }
 
 function PdfThumbnail(props: ImageProps) {
-  function handleClick(e: React.SyntheticEvent) {
-    e.preventDefault();
-    e.stopPropagation();
-    window.open(props.src, '_blank');
-  }
-
   return (
-    <div className={styles.pdfThumbnail} onClick={handleClick} role="button" tabIndex={0}>
-      <embed src={props.src} style={{ ...props.style, pointerEvents: 'none', width: '100%' }} />
+    <div className={styles.pdfThumbnail} onClick={props.onClick} role="button" tabIndex={0}>
+      <DocumentPdf size={24} />
     </div>
   );
 }
 
 function OtherThumbnail(props: ImageProps) {
-  function handleClick(e: React.SyntheticEvent) {
-    e.preventDefault();
-    e.stopPropagation();
-    const anchor = document.createElement('a');
-    anchor.setAttribute('href', props.src);
-    anchor.setAttribute('download', 'download');
-    anchor.click();
-  }
-
   return (
-    <div className={styles.otherThumbnail} onClick={handleClick} role="button" tabIndex={0}>
-      <img src={regularFile} alt={props.title} style={props.style} className={styles.otherThumbnail} />
+    <div className={styles.pdfThumbnail} onClick={props.onClick} role="button" tabIndex={0}>
+      <DocumentUnknown size={24} />
     </div>
   );
 }
@@ -56,6 +41,7 @@ function Thumbnail(props: AttachmentThumbnailProps) {
     src: props.imageProps.src,
     title: props.imageProps.title,
     style: props.imageProps.style,
+    onClick: props.imageProps?.onClick,
   };
 
   if (contentType === 'IMAGE') {
@@ -76,6 +62,7 @@ type ImageProps = {
   src: string;
   title: string;
   style: Object;
+  onClick?: () => void;
 };
 
 type ItemProps = {
