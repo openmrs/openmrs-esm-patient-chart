@@ -109,19 +109,12 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
   }, [patientVitalAndBiometrics?.weight, patientVitalAndBiometrics?.height]);
 
   useEffect(() => {
-    //disable submit button until a valid weight has been input and issubmitting is true
     if (
       isInNormalRange(conceptMetadata, config.concepts['weightUuid'], patientVitalAndBiometrics?.weight) == true &&
       patientVitalAndBiometrics?.weight
     ) {
       setIsSubmitting(false);
     } else setIsSubmitting(true);
-    console.log('suuuub', isSubmitting);
-    console.log('te weight', patientVitalAndBiometrics?.weight);
-    console.log(
-      'kjhhh',
-      isInNormalRange(conceptMetadata, config.concepts['weightUuid'], patientVitalAndBiometrics?.weight),
-    );
   }, [patientVitalAndBiometrics?.weight]);
   return (
     <Form className={styles.form}>
