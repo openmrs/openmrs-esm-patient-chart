@@ -107,16 +107,18 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
     return (
       <div className={styles.widgetCard}>
         <CardHeader title={headerTitle}>
+          {config.hideAddProgramButton ? null : (
+            <Button
+              kind="ghost"
+              renderIcon={(props) => <Add size={16} {...props} />}
+              iconDescription="Add programs"
+              onClick={launchProgramsForm}
+              disabled={availablePrograms?.length && eligiblePrograms?.length === 0}
+            >
+              {t('add', 'Add')}
+            </Button>
+          )}
           <span>{isValidating ? <InlineLoading /> : null}</span>
-          <Button
-            kind="ghost"
-            renderIcon={(props) => <Add size={16} {...props} />}
-            iconDescription="Add programs"
-            onClick={launchProgramsForm}
-            disabled={availablePrograms?.length && eligiblePrograms?.length === 0}
-          >
-            {t('add', 'Add')}
-          </Button>
         </CardHeader>
         {availablePrograms?.length && eligiblePrograms?.length === 0 && (
           <InlineNotification
