@@ -1,4 +1,4 @@
-import { openmrsFetch, toOmrsIsoString, toDateObjectStrict } from '@openmrs/esm-framework';
+import { openmrsFetch, showToast, toOmrsIsoString, toDateObjectStrict, showNotification } from '@openmrs/esm-framework';
 import { Observable } from 'rxjs';
 import { openmrsObservableFetch } from '@openmrs/esm-api';
 import useSWR from 'swr';
@@ -6,10 +6,7 @@ import dayjs from 'dayjs';
 import React, { useMemo } from 'react';
 
 interface PersonFetchResponse {
-  uuid: string;
-  dead: boolean;
-  deathDate: Date;
-  type: string;
+  person: { uuid: string; dead: boolean; deathDate: Date; type: string };
 }
 
 interface CauseOfDeathFetchResponse {
@@ -52,7 +49,13 @@ export function usePatientDeceased(patientUuid: string) {
   return result;
 }
 
-export function useSetDeceased(deceasedDate, isDead, personUuid, selectedCauseOfDeath) {
+export function useSetDeceased(
+  deceasedDate: Date,
+  isDead: boolean,
+  personUuid: string,
+  selectedCauseOfDeathValue: string,
+  abortController: AbortController,
+) {
   const patientPayload = {
     deathDate: null,
     causeOfDeath: null,
@@ -62,20 +65,17 @@ export function useSetDeceased(deceasedDate, isDead, personUuid, selectedCauseOf
     deathDate: toDateObjectStrict(
       toOmrsIsoString(new Date(dayjs(deceasedDate).year(), dayjs(deceasedDate).month(), dayjs(deceasedDate).date())),
     ),
-    causeOfDeath: selectedCauseOfDeath,
+    causeOfDeath: selectedCauseOfDeathValue,
     dead: true,
   };
-  return setDeceased(isDead ? patientPayload : newPatientPayLoad, personUuid, new AbortController());
-}
-
-export function setDeceased(payload: any, personUuid: string, abortController: AbortController): Observable<any> {
-  return openmrsObservableFetch(`/ws/rest/v1/person/${personUuid}`, {
-    signal: abortController.signal,
-    method: 'POST',
+  const payload = isDead ? patientPayload : newPatientPayLoad;
+  return openmrsFetch(`/ws/rest/v1/person/${personUuid}`, {
     headers: {
       'Content-type': 'application/json',
     },
+    method: 'POST',
     body: payload,
+    signal: abortController.signal,
   });
 }
 
@@ -100,13 +100,9 @@ export function usePersonfromPatient(patientUuid: string) {
     `/ws/rest/v1/patient/${patientUuid}`,
     openmrsFetch,
   );
-  // .then((res) => {
-  //   const person = res.data.person;
-  //   return { uuid: person.uuid, dead: person.dead, deathDate: person.deathDate };
-  // });
   const result = useMemo(() => {
     return {
-      personObject: data ? data?.data : null,
+      personObject: data ? data?.data?.person : null,
       personError: error,
       isPersonLoading: !data && !error,
       isPersonError: error,
