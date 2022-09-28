@@ -116,7 +116,7 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
       setIsSubmitting(false);
     } else setIsSubmitting(true);
   }, [patientVitalAndBiometrics?.weight]);
-  
+
   return (
     <Form className={styles.form}>
       <Grid className={styles.grid}>
