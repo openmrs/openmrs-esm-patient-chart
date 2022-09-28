@@ -42,11 +42,11 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
         value: obs.valueQuantity.value,
       }));
 
-    if (config?.dateAxisReverse) {
+    if (config?.graphOldestFirst) {
       chartRecords.reverse();
     }
     return chartRecords;
-  }, [obss, config.dateAxisReverse, selectedConcept.uuid, selectedConcept.label]);
+  }, [obss, config.graphOldestFirst, selectedConcept.uuid, selectedConcept.label]);
 
   const chartColors = Object.fromEntries(config.data.map((d) => [d.label, d.color]));
 
