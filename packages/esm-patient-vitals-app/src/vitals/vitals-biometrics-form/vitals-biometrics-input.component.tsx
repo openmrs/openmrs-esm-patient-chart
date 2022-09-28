@@ -93,7 +93,9 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
         <p className={styles.unitName}>{unitSymbol}</p>
       </div>
       {!inputIsNormal || invalid ? (
-        <FormLabel className={styles.danger}>{t('numericInputError', 'Must be a number')}</FormLabel>
+        <FormLabel className={styles.danger}>
+          {t('numericInputError', 'Must be a number within acceptable ranges')}
+        </FormLabel>
       ) : null}
     </div>
   );
