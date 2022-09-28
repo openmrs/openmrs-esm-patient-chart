@@ -108,6 +108,14 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
     }
   }, [patientVitalAndBiometrics?.weight, patientVitalAndBiometrics?.height]);
 
+  useEffect(() => {
+    if (
+      isInNormalRange(conceptMetadata, config.concepts['weightUuid'], patientVitalAndBiometrics?.weight) == true &&
+      patientVitalAndBiometrics?.weight
+    ) {
+      setIsSubmitting(false);
+    } else setIsSubmitting(true);
+  }, [patientVitalAndBiometrics?.weight]);
   return (
     <Form className={styles.form}>
       <Grid className={styles.grid}>
@@ -305,7 +313,11 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                 },
               ]}
               unitSymbol={conceptUnits.get(config.concepts.weightUuid) ?? ''}
-              inputIsNormal={true}
+              inputIsNormal={isInNormalRange(
+                conceptMetadata,
+                config.concepts['weightUuid'],
+                patientVitalAndBiometrics?.weight,
+              )}
             />
           </Column>
           <Column>
