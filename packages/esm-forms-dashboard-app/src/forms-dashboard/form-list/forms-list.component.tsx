@@ -20,9 +20,10 @@ import {
 } from '@carbon/react';
 import { Edit } from '@carbon/react/icons';
 import { CompletedFormInfo, FormsSection } from '../../types';
-import { ConfigObject, HtmlFormEntryForm } from '../../config-schema';
+import { ConfigObject } from '../../config-schema';
 import { defaultPaginationSize } from '../../constants';
 import { launchFormEntryOrHtmlForms } from '@openmrs/esm-patient-forms-app/src/form-entry-interop';
+import { HtmlFormEntryForm } from '@openmrs/esm-patient-forms-app/src/config-schema';
 
 export interface FormsListPros {
   patientUuid: string;
@@ -31,6 +32,7 @@ export interface FormsListPros {
   formsSection: FormsSection;
   searchTerm: string;
   pageSize: number;
+  htmlFormEntryForms: Array<HtmlFormEntryForm>;
 }
 
 const FormsList: React.FC<FormsListPros> = ({
@@ -40,9 +42,10 @@ const FormsList: React.FC<FormsListPros> = ({
   formsSection,
   searchTerm,
   pageSize = defaultPaginationSize,
+  htmlFormEntryForms,
 }: FormsListPros) => {
   const { t } = useTranslation();
-  const { htmlFormEntryForms, orderFormsByName } = useConfig() as ConfigObject;
+  const { orderFormsByName } = useConfig() as ConfigObject;
   const layout = useLayoutType();
   const [formsInfo, setFormsInfo] = useState<Array<CompletedFormInfo>>(formsSection.completedFromsInfo);
   const { results, goTo, currentPage } = usePagination(
