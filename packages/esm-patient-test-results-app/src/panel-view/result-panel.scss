@@ -14,7 +14,7 @@
 }
 
 .activePanel {
-  border: 3px solid var(--brand-03);
+  border: 2px solid var(--brand-03);
 }
 
 .panelHeader {
@@ -51,12 +51,12 @@
 
 .high,
 .low {
-  box-shadow: 0 0 0 3px #000000;
+    border: 2px solid black !important;
 }
 
 .critically-high,
 .critically-low {
-  border: 3px solid $danger;
+  border: 2px solid $danger !important;
 }
 
 .off-scale-low {

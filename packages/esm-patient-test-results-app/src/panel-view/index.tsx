@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import LabSetPanel from './panel.component';
 import usePanelData from './usePanelData';
-import { Column, DataTableSkeleton } from '@carbon/react';
-import styles from '../results-viewer/results-viewer.styles.scss';
+import { Column, DataTableSkeleton, Button } from '@carbon/react';
+import { Search as SearchIcon } from '@carbon/react/icons';
+import styles from './panel-view.scss';
 import { useLayoutType } from '@openmrs/esm-framework';
 import PanelTimelineComponent from './timeline.component';
 import { ObsRecord } from './types';
+import { useTranslation } from 'react-i18next';
 
 interface PanelViewProps {
   expanded: boolean;
@@ -25,25 +27,44 @@ const PanelView: React.FC<PanelViewProps> = ({ expanded }) => {
   return (
     <>
       {!tablet && (
-        <Column sm={16} lg={tablet || expanded ? 0 : 5} className={`${styles.columnPanel} ${styles.treeColumn}`}>
-          {!isLoading ? (
-            panels.map((panel) => (
-              <LabSetPanel
-                panel={panel}
-                observations={[panel, ...panel.relatedObs]}
-                setActivePanel={setActivePanel}
-                activePanel={activePanel}
-              />
-            ))
-          ) : (
-            <DataTableSkeleton columns={3} />
-          )}
+        <Column sm={16} lg={tablet || expanded ? 0 : 5}>
+          <>
+            <PanelViewHeader tablet={tablet} />
+            {!isLoading ? (
+              panels.map((panel) => (
+                <LabSetPanel
+                  panel={panel}
+                  observations={[panel, ...panel.relatedObs]}
+                  setActivePanel={setActivePanel}
+                  activePanel={activePanel}
+                />
+              ))
+            ) : (
+              <DataTableSkeleton columns={3} />
+            )}
+          </>
         </Column>
       )}
-      <Column sm={16} lg={tablet || expanded ? 12 : 7} className={`${styles.columnPanel}`}>
+      <Column sm={16} lg={tablet || expanded ? 12 : 7}>
         <PanelTimelineComponent activePanel={activePanel} />
       </Column>
     </>
+  );
+};
+
+interface PanelViewHeaderProps {
+  tablet: boolean;
+}
+
+const PanelViewHeader: React.FC<PanelViewHeaderProps> = ({ tablet }) => {
+  const { t } = useTranslation();
+  return (
+    <div className={styles.panelViewHeader}>
+      <h4 className={styles.productiveHeading02}>{t('panel', 'Panel')}</h4>
+      <Button kind="ghost" size={tablet ? 'md' : 'sm'} renderIcon={SearchIcon}>
+        {t('search', 'Search')}
+      </Button>
+    </div>
   );
 };
 

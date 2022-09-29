@@ -54,3 +54,24 @@
   }
 }
 
+.filterSetHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: spacing.$spacing-03;
+  background-color: $openmrs-background-grey;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+
+  h4 {
+    @include type.type-style("heading-compact-02");
+    color: $text-02;
+  }
+
+  .filterSetActions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
+}

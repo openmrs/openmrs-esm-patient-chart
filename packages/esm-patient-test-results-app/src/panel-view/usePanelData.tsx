@@ -11,6 +11,9 @@ export function useObservations() {
       if (prevPageData && !prevPageData?.data?.link.some(({ relation }) => relation === 'next')) {
         return null;
       }
+      if (!patientUuid) {
+        return null;
+      }
       let url = '/ws/fhir2/R4/Observation';
       url += '?category=laboratory';
       url += `&patient=${patientUuid}`;
@@ -39,6 +42,7 @@ export function useObservations() {
   }, [size, setSize, data]);
 
   const results = useMemo(() => {
+    console.log(data);
     const observations: Array<FHIRObservationResource> = data
       ? []
           .concat(...data?.map((resp) => resp.data?.entry?.map((e) => e.resource)))
@@ -83,6 +87,9 @@ function useconcepts(conceptUuids: Array<string>) {
 export default function usePanelData() {
   const { observations: fhirObservations, conceptUuids, isLoading: isLoadingObservations } = useObservations();
   const { isLoading: isLoadingConcepts, concepts } = useconcepts(conceptUuids);
+
+  console.log('obs', fhirObservations, isLoadingObservations);
+  console.log('concepts', concepts, isLoadingConcepts);
 
   const conceptData: Record<string, ConceptMeta> = useMemo(
     () =>
@@ -180,6 +187,8 @@ export default function usePanelData() {
     });
     return latestPanels;
   }, [individualObservations, setObservations]);
+
+  console.log(panels);
 
   return {
     panels,
