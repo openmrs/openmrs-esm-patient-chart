@@ -23,7 +23,7 @@ const ClinicalFormActionButton: React.FC = () => {
     } else {
       launchPatientWorkspace('forms-dashboard-workspace');
     }
-  }, [currentVisit]);
+  }, [currentVisit, useCurrentVisitDates]);
 
   if (layout === 'tablet')
     return (
