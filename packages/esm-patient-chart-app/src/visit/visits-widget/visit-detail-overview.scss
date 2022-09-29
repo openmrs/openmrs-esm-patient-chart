@@ -12,11 +12,11 @@
 .date {
   @include type.type-style('body-compact-01');
   color: $text-02;
-  padding-right: 10px;
+  padding-right: 0.625rem;
 }
 
 .dateLabel{
-  padding-right: 5px;
+  padding-right: 0.313rem;
 }
 
 .displayFlex{
