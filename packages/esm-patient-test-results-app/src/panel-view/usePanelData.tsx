@@ -45,7 +45,7 @@ export function useObservations() {
     console.log(data);
     const observations: Array<FHIRObservationResource> = data
       ? []
-          .concat(...data?.map((resp) => resp.data?.entry?.map((e) => e.resource)))
+          .concat(...data?.map((resp) => resp.data?.entry?.map((e) => e.resource) ?? []))
           .sort((obs1, obs2) => Date.parse(obs2.effectiveDateTime) - Date.parse(obs1.effectiveDateTime))
       : null;
     return {
@@ -77,9 +77,10 @@ function useconcepts(conceptUuids: Array<string>) {
       concepts: concepts
         ? concepts.filter((c) => c.conceptClass.display === 'Test' || c.conceptClass.display === 'LabSet')
         : null,
-      isLoading: !data && !error,
+      // If there are no observations, hence no concept UUIDS, then it should return isLoading as false
+      isLoading: conceptUuids?.length === 0 ? false : !data && !error,
     };
-  }, [data, error]);
+  }, [data, error, conceptUuids]);
 
   return results;
 }

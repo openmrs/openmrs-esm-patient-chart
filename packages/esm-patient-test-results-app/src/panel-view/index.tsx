@@ -8,6 +8,7 @@ import { useLayoutType } from '@openmrs/esm-framework';
 import PanelTimelineComponent from './timeline.component';
 import { ObsRecord } from './types';
 import { useTranslation } from 'react-i18next';
+import { EmptyState } from '@openmrs/esm-patient-common-lib';
 
 interface PanelViewProps {
   expanded: boolean;
@@ -17,6 +18,7 @@ const PanelView: React.FC<PanelViewProps> = ({ expanded }) => {
   const tablet = useLayoutType() === 'tablet';
   const { panels, isLoading, groupedObservations } = usePanelData();
   const [activePanel, setActivePanel] = useState<ObsRecord>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (!activePanel && panels) {
@@ -31,14 +33,18 @@ const PanelView: React.FC<PanelViewProps> = ({ expanded }) => {
           <>
             <PanelViewHeader tablet={tablet} />
             {!isLoading ? (
-              panels.map((panel) => (
-                <LabSetPanel
-                  panel={panel}
-                  observations={[panel, ...panel.relatedObs]}
-                  setActivePanel={setActivePanel}
-                  activePanel={activePanel}
-                />
-              ))
+              panels.length > 0 ? (
+                panels.map((panel) => (
+                  <LabSetPanel
+                    panel={panel}
+                    observations={[panel, ...panel.relatedObs]}
+                    setActivePanel={setActivePanel}
+                    activePanel={activePanel}
+                  />
+                ))
+              ) : (
+                <EmptyState displayText={t('panels', 'panels')} headerTitle={t('noPanelsFound', 'No panels found')} />
+              )
             ) : (
               <DataTableSkeleton columns={3} />
             )}

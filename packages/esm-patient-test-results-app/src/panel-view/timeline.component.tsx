@@ -10,19 +10,26 @@ interface PanelTimelineComponentProps {
 const PanelTimelineComponent: React.FC<PanelTimelineComponentProps> = ({ activePanel }) => {
   const { t } = useTranslation();
   const { groupedObservations, conceptData } = usePanelData();
-  const panelConcepts: Array<ObsRecord> = activePanel ? [activePanel, ...activePanel?.relatedObs] : [];
+  const panelObservations: Array<ObsRecord> = activePanel ? [activePanel, ...activePanel?.relatedObs] : [];
+  const rowData = panelObservations.map((obs) => ({
+    ...obs,
+    allObservations: groupedObservations[obs.conceptUuid],
+  }));
+  console.log(rowData);
   const mappedObservations = Object.fromEntries(
-    panelConcepts.map((concept) => [concept.conceptUuid, groupedObservations[concept.conceptUuid]]),
+    panelObservations.map((concept) => [concept.conceptUuid, groupedObservations[concept.conceptUuid]]),
   );
   const allTimes = [].concat(
     ...Object.values(mappedObservations).map((obsRecords) => obsRecords.map((obs) => obs.effectiveDateTime)),
   );
+
+  console.log();
   if (!activePanel) {
     return <p>{t('panelTimelineInstructions', 'Select a panel to view the timeline')}</p>;
   }
   return (
     <>
-      {panelConcepts.map((panel) => (
+      {panelObservations.map((panel) => (
         <>
           <p>{panel.conceptUuid}</p>
           {mappedObservations[panel.conceptUuid].map((obs) => (
