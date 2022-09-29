@@ -66,7 +66,20 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
                 <div className={styles.container} key={i}>
                   <div className={styles.header}>
                     <h4 className={styles.visitType}>{visit?.visitType?.display}</h4>
-                    <p className={styles.date}>{formatDatetime(parseDate(visit?.startDatetime))}</p>
+
+                    <div className={styles.displayFlex}>
+                      <h6 className={styles.dateLabel}>{t('start', 'Start')}:</h6>
+                      <span className={styles.date}>{formatDatetime(parseDate(visit?.startDatetime))}</span>
+
+                      {visit?.stopDatetime ? (
+                        <>
+                          <h6 className={styles.dateLabel}>{t('end', 'End')}:</h6>
+                          <span className={styles.date}>{formatDatetime(parseDate(visit?.stopDatetime))}</span>
+                        </>
+                      ) : null}
+                    </div>
+
+                    {/* <p>{JSON.stringify(visit)}</p> */}
                   </div>
                   <VisitSummary encounters={visit.encounters} patientUuid={patientUuid} />
                 </div>
