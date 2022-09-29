@@ -32,6 +32,11 @@ export const esmPatientChartSchema = {
     _default: '/etl-latest/etl/patient/',
     _description: 'Custom URL to load resources required for showing recommended visit types',
   },
+  disableEmptyTabs: {
+    _type: Type.Boolean,
+    _default: false,
+    _description: 'Disable notes/tests/medications/encounters tabs when empty',
+  },
 };
 
 export interface ChartConfig {

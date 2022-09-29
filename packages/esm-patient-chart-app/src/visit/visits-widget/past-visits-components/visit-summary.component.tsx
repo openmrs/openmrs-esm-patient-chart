@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabList, TabPanel, TabPanels, Tag } from '@carbon/react';
 import { formatTime, OpenmrsResource, parseDate, useConfig, useLayoutType } from '@openmrs/esm-framework';
@@ -87,6 +87,13 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid }) 
     encounters,
   ]);
 
+  const testsFilter = useCallback(() => {
+    const encounterIds = encounters.map((e) => `Encounter/${e.uuid}`);
+    return ([entry]) => {
+      return encounterIds.includes(entry.encounter?.reference);
+    };
+  }, [encounters]);
+
   return (
     <div className={styles.summaryContainer}>
       <p className={styles.diagnosisLabel}>{t('diagnoses', 'Diagnoses')}</p>
@@ -105,16 +112,24 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid }) 
       </div>
       <Tabs className={`${styles.verticalTabs} ${layout === 'tablet' ? styles.tabletTabs : styles.desktopTabs}`}>
         <TabList aria-label="Visit summary tabs" className={styles.tablist}>
-          <Tab className={`${styles.tab} ${styles.bodyLong01}`} id="notes-tab">
+          <Tab
+            className={`${styles.tab} ${styles.bodyLong01}`}
+            id="notes-tab"
+            disabled={notes.length <= 0 && config.disableEmptyTabs}
+          >
             {t('notes', 'Notes')}
           </Tab>
-          <Tab className={styles.tab} id="tests-tab">
+          <Tab className={styles.tab} id="tests-tab" disabled={testsFilter.length <= 0 && config.disableEmptyTabs}>
             {t('tests', 'Tests')}
           </Tab>
-          <Tab className={styles.tab} id="medications-tab">
+          <Tab
+            className={styles.tab}
+            id="medications-tab"
+            disabled={medications.length <= 0 && config.disableEmptyTabs}
+          >
             {t('medications', 'Medications')}
           </Tab>
-          <Tab className={styles.tab} id="encounters-tab">
+          <Tab className={styles.tab} id="encounters-tab" disabled={encounters.length <= 0 && config.disableEmptyTabs}>
             {t('encounters', 'Encounters')}
           </Tab>
         </TabList>
