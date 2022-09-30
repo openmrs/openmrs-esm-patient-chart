@@ -3,10 +3,11 @@ import { InlineLoading, Tab, Tabs, TabList, TabPanel, TabPanels } from '@carbon/
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { formatDatetime, OpenmrsResource, parseDate } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import { Observation, useVisits } from './visit.resource';
-import EncounterList from './past-visits-components/encounter-list.component';
+import { Observation, useEncounters, useVisits } from './visit.resource';
+import VisitsTable from './past-visits-components/visits-table';
 import VisitSummary from './past-visits-components/visit-summary.component';
 import styles from './visit-detail-overview.scss';
+import EncountersTable from './encounters-table';
 
 interface VisitOverviewComponentProps {
   patientUuid: string;
@@ -26,6 +27,7 @@ export interface FormattedEncounter {
 function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentProps) {
   const { t } = useTranslation();
   const { visits, isError, isLoading } = useVisits(patientUuid);
+  const { encounters, error, isLoading: encountersLoading } = useEncounters(patientUuid);
 
   if (isLoading) {
     return (
@@ -40,7 +42,7 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
   }
 
   if (visits?.length) {
-    const encounters = visits
+    const visitsWithEncounters = visits
       .filter((visit) => visit.encounters.length)
       .flatMap((visitWithEncounters) => mapEncounters(visitWithEncounters));
 
@@ -52,6 +54,9 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
               {t('visitSummaries', 'Visit summaries')}
             </Tab>
             <Tab className={styles.tab} id="all-encounters-tab">
+              {t('allVisits', 'All visits')}
+            </Tab>
+            <Tab className={styles.tab} id="all-encounters-tab">
               {t('allEncounters', 'All encounters')}
             </Tab>
           </TabList>
@@ -61,14 +66,30 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
                 <div className={styles.container} key={i}>
                   <div className={styles.header}>
                     <h4 className={styles.visitType}>{visit?.visitType?.display}</h4>
-                    <p className={styles.date}>{formatDatetime(parseDate(visit?.startDatetime))}</p>
+
+                    <div className={styles.displayFlex}>
+                      <h6 className={styles.dateLabel}>{t('start', 'Start')}:</h6>
+                      <span className={styles.date}>{formatDatetime(parseDate(visit?.startDatetime))}</span>
+
+                      {visit?.stopDatetime ? (
+                        <>
+                          <h6 className={styles.dateLabel}>{t('end', 'End')}:</h6>
+                          <span className={styles.date}>{formatDatetime(parseDate(visit?.stopDatetime))}</span>
+                        </>
+                      ) : null}
+                    </div>
+
+                    {/* <p>{JSON.stringify(visit)}</p> */}
                   </div>
                   <VisitSummary encounters={visit.encounters} patientUuid={patientUuid} />
                 </div>
               ))}
             </TabPanel>
             <TabPanel>
-              <EncounterList encounters={encounters} showAllEncounters />
+              <VisitsTable visits={visitsWithEncounters} showAllEncounters />
+            </TabPanel>
+            <TabPanel>
+              <EncountersTable encounters={encounters} showAllEncounters />
             </TabPanel>
           </TabPanels>
         </Tabs>

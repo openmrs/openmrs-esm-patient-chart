@@ -36,7 +36,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient, basePa
   const displayText = t('conditions', 'Conditions');
   const headerTitle = t('conditions', 'Conditions');
   const urlLabel = t('seeAll', 'See all');
-  const pageUrl = window.spaBase + basePath + '/conditions';
+  const pageUrl = `\${openmrsSpaBase}/patient/${patient.id}/chart/Conditions`;
 
   const { data: conditions, isError, isLoading, isValidating } = useConditions(patient.id);
   const { results: paginatedConditions, goTo, currentPage } = usePagination(conditions ?? [], conditionsCount);

@@ -26,7 +26,10 @@ describe('PatientBanner: ', () => {
     expect(screen.getByText(/John Wilson/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /^Actions$/i })).toBeInTheDocument();
     expect(screen.getByText(/04 — Apr — 1972/i)).toBeInTheDocument();
-    expect(screen.getByText(/100732HE, 100GEJ/i)).toBeInTheDocument();
+    expect(screen.getByText(/100GEJ/i)).toBeInTheDocument();
+    expect(screen.getByText(/100732HE/i)).toBeInTheDocument();
+    expect(screen.getByText(/OpenMRS ID/i)).toBeInTheDocument();
+    expect(screen.getByText(/Old Identification Number/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /^Show all details$/i })).toBeInTheDocument();
   });
 

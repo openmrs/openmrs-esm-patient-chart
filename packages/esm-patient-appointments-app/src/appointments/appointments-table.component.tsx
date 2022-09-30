@@ -44,7 +44,7 @@ const AppointmentsTable: React.FC<AppointmentTableProps> = ({ patientAppointment
         return {
           id: appointment.uuid,
           date: formatDatetime(parseDate(appointment.startDateTime), { mode: 'wide' }),
-          location: appointment.location.name,
+          location: appointment?.location?.name ?? '--',
           service: appointment.service.name,
         };
       }),
