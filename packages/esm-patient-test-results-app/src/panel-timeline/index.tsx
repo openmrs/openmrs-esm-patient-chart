@@ -30,7 +30,13 @@ const PanelTimelineComponent: React.FC<PanelTimelineComponentProps> = ({ activeP
   }
 
   return (
-    <Timeline rowData={timelineData} parsedTime={parsedTime} panelName={activePanel?.name} sortedTimes={allTimes} />
+    <Timeline
+      rowData={timelineData}
+      parsedTime={parsedTime}
+      panelName={activePanel?.name}
+      sortedTimes={allTimes}
+      testUuid={activePanel.conceptUuid}
+    />
   );
 };
 

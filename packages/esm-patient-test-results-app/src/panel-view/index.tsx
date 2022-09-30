@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import LabSetPanel from './panel.component';
 import usePanelData from './usePanelData';
 import { Column, DataTableSkeleton, Button } from '@carbon/react';
@@ -9,18 +9,24 @@ import PanelTimelineComponent from '../panel-timeline';
 import { ObsRecord } from './types';
 import { useTranslation } from 'react-i18next';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
+import Trendline from '../trendline/trendline.component';
 
 interface PanelViewProps {
   expanded: boolean;
+  testUuid: string;
+  type: string;
+  basePath: string;
+  patientUuid: string;
 }
 
-const PanelView: React.FC<PanelViewProps> = ({ expanded }) => {
+const PanelView: React.FC<PanelViewProps> = ({ expanded, testUuid, basePath, type, patientUuid }) => {
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
   const { panels, isLoading, groupedObservations } = usePanelData();
   const [activePanel, setActivePanel] = useState<ObsRecord>(null);
   const { t } = useTranslation();
   const fullWidthPanels = expanded || !activePanel;
+  const trendlineView = testUuid && type === 'trendline';
 
   useEffect(() => {
     if (layout === 'large-desktop' && !activePanel && panels) {
@@ -60,6 +66,8 @@ const PanelView: React.FC<PanelViewProps> = ({ expanded }) => {
       >
         {isLoading ? (
           <DataTableSkeleton columns={3} />
+        ) : trendlineView ? (
+          <Trendline patientUuid={patientUuid} conceptUuid={testUuid} basePath={basePath} showBackToTimelineButton />
         ) : activePanel ? (
           <PanelTimelineComponent groupedObservations={groupedObservations} activePanel={activePanel} />
         ) : (

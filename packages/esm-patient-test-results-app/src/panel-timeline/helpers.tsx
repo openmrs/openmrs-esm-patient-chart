@@ -2,8 +2,16 @@ import * as React from 'react';
 import { OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import { ObsRecord } from '../panel-view/types';
 import styles from './timeline.scss';
-import { formatDate, formatTime, parseDate } from '@openmrs/esm-framework';
+import { ConfigurableLink, formatDate, formatTime, parseDate, usePatient } from '@openmrs/esm-framework';
 import { ParsedTimeType } from '../filter/filter-types';
+import { testResultsBasePath } from '../helpers';
+
+function getPatientUuidFromUrl(): string {
+  const match = /\/patient\/([a-zA-Z0-9\-]+)\/?/.exec(location.pathname);
+  return match && match[1];
+}
+
+const patientUuid = getPatientUuidFromUrl();
 
 export const parseTime: (sortedTimes: Array<string>) => ParsedTimeType = (sortedTimes) => {
   const yearColumns: Array<{ year: string; size: number }> = [],
@@ -108,15 +116,17 @@ export const TimelineCell: React.FC<{
   );
 };
 
-export const RowStartCell = ({ title, range, units, shadow = false, openTrendline }) => (
+export const RowStartCell = ({ title, range, units, shadow = false, testUuid }) => (
   <div
     className={styles['row-start-cell']}
     style={{
       boxShadow: shadow ? '8px 0 20px 0 rgba(0,0,0,0.15)' : undefined,
     }}
   >
-    <span className={styles['trendline-link']} onClick={openTrendline} role={'link'} tabIndex={0}>
-      {title}
+    <span className={styles['trendline-link']}>
+      <ConfigurableLink to={`${testResultsBasePath(`/patient/${patientUuid}/chart`)}/trendline/${testUuid}`}>
+        {title}
+      </ConfigurableLink>
     </span>
     <span className={styles['range-units']}>
       {range} {units}

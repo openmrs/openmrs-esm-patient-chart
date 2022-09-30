@@ -121,7 +121,13 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
             testUuid={testUuid}
           />
         ) : (
-          <PanelView expanded={expanded} />
+          <PanelView
+            expanded={expanded}
+            patientUuid={patientUuid}
+            basePath={basePath}
+            type={type}
+            testUuid={testUuid}
+          />
         )}
       </Grid>
 

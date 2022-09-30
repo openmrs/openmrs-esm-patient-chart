@@ -68,10 +68,10 @@ interface DataRowsProps {
   timeColumns: Array<string>;
   sortedTimes: Array<string>;
   showShadow: boolean;
-  openTrendline: (testUuid: string) => void;
+  testUuid: string;
 }
 
-const DataRows: React.FC<DataRowsProps> = ({ timeColumns, rowData, sortedTimes, showShadow, openTrendline }) => (
+const DataRows: React.FC<DataRowsProps> = ({ timeColumns, rowData, sortedTimes, showShadow, testUuid }) => (
   <Grid dataColumns={timeColumns.length} padding style={{ gridColumn: 'span 2' }}>
     {Object.entries(rowData).map(([title, obs], rowCount) => {
       const { meta, conceptUuid } = obs.find((x) => !!x);
@@ -85,7 +85,7 @@ const DataRows: React.FC<DataRowsProps> = ({ timeColumns, rowData, sortedTimes, 
               range,
               title,
               shadow: showShadow,
-              openTrendline: () => openTrendline(conceptUuid),
+              testUuid,
             }}
           />
           <GridItems {...{ sortedTimes, obs, zebra: !!(rowCount % 2) }} />
@@ -96,20 +96,14 @@ const DataRows: React.FC<DataRowsProps> = ({ timeColumns, rowData, sortedTimes, 
 );
 
 interface TimelineParams {
-  openTrendline?: (panelUuid: string, testUuid: string) => void;
   parsedTime: ParsedTimeType;
   rowData: Record<string, Array<ObsRecord>>;
   panelName: string;
   sortedTimes: Array<string>;
+  testUuid: string;
 }
 
-export const Timeline: React.FC<TimelineParams> = ({
-  openTrendline: openTrendlineExternal,
-  parsedTime,
-  rowData,
-  panelName,
-  sortedTimes,
-}) => {
+export const Timeline: React.FC<TimelineParams> = ({ parsedTime, rowData, panelName, sortedTimes, testUuid }) => {
   const [xIsScrolled, yIsScrolled, containerRef] = useScrollIndicator(0, 32);
   const { yearColumns, dayColumns, timeColumns } = parsedTime;
 
@@ -133,7 +127,7 @@ export const Timeline: React.FC<TimelineParams> = ({
               sortedTimes,
               showShadow: xIsScrolled,
               panelUuid: '',
-              openTrendline: (testUuid) => {},
+              testUuid,
             }}
           />
           <ShadowBox />
