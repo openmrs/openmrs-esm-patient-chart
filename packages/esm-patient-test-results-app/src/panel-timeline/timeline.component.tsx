@@ -1,11 +1,8 @@
 import React from 'react';
-import { DataTableSkeleton } from '@carbon/react';
-// import { useTimelineData } from './useTimelineData';
 import { PaddingContainer, TimeSlots, Grid, RowStartCell, GridItems, ShadowBox } from './helpers';
-import { EmptyState, OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
+import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import useScrollIndicator from './useScroll';
 import styles from './timeline.scss';
-import { TimelineData } from './types';
 import { ParsedTimeType } from '../filter/filter-types';
 import { ObsRecord } from '../panel-view/types';
 
@@ -77,10 +74,9 @@ interface DataRowsProps {
 const DataRows: React.FC<DataRowsProps> = ({ timeColumns, rowData, sortedTimes, showShadow, openTrendline }) => (
   <Grid dataColumns={timeColumns.length} padding style={{ gridColumn: 'span 2' }}>
     {Object.entries(rowData).map(([title, obs], rowCount) => {
-      const {
-        meta: { units = '', range = '' },
-        conceptUuid,
-      } = obs.find((x) => !!x);
+      const { meta, conceptUuid } = obs.find((x) => !!x);
+      const range = meta?.range ?? '';
+      const units = meta?.units ?? '';
       return (
         <React.Fragment key={conceptUuid}>
           <RowStartCell
@@ -116,12 +112,6 @@ export const Timeline: React.FC<TimelineParams> = ({
 }) => {
   const [xIsScrolled, yIsScrolled, containerRef] = useScrollIndicator(0, 32);
   const { yearColumns, dayColumns, timeColumns } = parsedTime;
-  // if (!loaded)
-  //   return (
-  //     <RecentResultsGrid>
-  //       <DataTableSkeleton role="progressbar" />
-  //     </RecentResultsGrid>
-  //   );
 
   if (yearColumns && dayColumns && timeColumns)
     return (

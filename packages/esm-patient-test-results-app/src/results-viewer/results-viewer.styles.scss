@@ -8,6 +8,7 @@
   width: 100%;
   position: relative;
   grid-template-columns: repeat(12, minmax(0, 1fr));
+  background-color: $ui-01;
 }
 
 .resultsHeader {

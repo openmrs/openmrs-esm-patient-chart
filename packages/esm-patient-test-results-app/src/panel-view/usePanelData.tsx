@@ -116,7 +116,7 @@ export default function usePanelData() {
     const meta = conceptData[conceptUuid];
     const interpretation = meta?.getInterpretation(value);
 
-    const name = conceptData[conceptUuid]?.display;
+    const name = observation?.code.coding[0].display;
     return {
       ...observation,
       conceptUuid,
@@ -187,7 +187,7 @@ export default function usePanelData() {
 
   return {
     panels,
-    isLoading: isLoadingConcepts || isLoadingObservations,
+    isLoading: isLoadingObservations || isLoadingConcepts,
     groupedObservations,
     conceptData,
   };

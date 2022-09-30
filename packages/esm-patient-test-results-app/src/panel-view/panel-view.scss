@@ -7,7 +7,6 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: $text-03;
   position: sticky;
   top: 6rem;
   background-color: $ui-01;
@@ -17,4 +16,17 @@
 
 .productiveHeading02 {
   @include type.type-style('heading-compact-02');
+}
+
+.headerMargin, .headerMarginTablet {
+  position: sticky;
+  top: 3rem;
+}
+
+.headerMargin {
+  margin-top: spacing.$spacing-09;
+}
+
+.headerMarginTablet {
+  margin-top: 4rem;
 }

@@ -84,7 +84,7 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
               {!expanded && (
                 <ContentSwitcher
                   size={tablet ? 'lg' : 'md'}
-                  selectedIndex={1}
+                  selectedIndex={['panel', 'tree'].indexOf(leftContent)}
                   onChange={(e) => setLeftContent(e.name as panelOpts)}
                 >
                   <Switch name="panel" text={t('panel', 'Panel')} />

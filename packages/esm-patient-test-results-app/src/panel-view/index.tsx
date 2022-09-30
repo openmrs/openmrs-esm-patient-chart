@@ -15,23 +15,25 @@ interface PanelViewProps {
 }
 
 const PanelView: React.FC<PanelViewProps> = ({ expanded }) => {
-  const tablet = useLayoutType() === 'tablet';
+  const layout = useLayoutType();
+  const isTablet = layout === 'tablet';
   const { panels, isLoading, groupedObservations } = usePanelData();
   const [activePanel, setActivePanel] = useState<ObsRecord>(null);
   const { t } = useTranslation();
+  const fullWidthPanels = expanded || !activePanel;
 
   useEffect(() => {
-    if (!activePanel && panels) {
+    if (layout === 'large-desktop' && !activePanel && panels) {
       setActivePanel(panels?.[0]);
     }
-  }, [panels, activePanel]);
+  }, [panels, activePanel, layout]);
 
   return (
     <>
-      {!tablet && (
-        <Column sm={16} lg={tablet || expanded ? 0 : 5}>
+      {!isTablet && (
+        <Column sm={16} lg={fullWidthPanels ? 12 : 5}>
           <>
-            <PanelViewHeader tablet={tablet} />
+            <PanelViewHeader isTablet={isTablet} />
             {!isLoading ? (
               panels.length > 0 ? (
                 panels.map((panel) => (
@@ -51,8 +53,11 @@ const PanelView: React.FC<PanelViewProps> = ({ expanded }) => {
           </>
         </Column>
       )}
-      <Column sm={16} lg={tablet || expanded ? 12 : 7}>
-        <PanelViewHeader tablet={tablet} />
+      <Column
+        sm={16}
+        lg={fullWidthPanels ? 0 : 7}
+        className={isTablet ? styles.headerMarginTablet : styles.headerMargin}
+      >
         {isLoading ? (
           <DataTableSkeleton columns={3} />
         ) : activePanel ? (
@@ -69,15 +74,15 @@ const PanelView: React.FC<PanelViewProps> = ({ expanded }) => {
 };
 
 interface PanelViewHeaderProps {
-  tablet: boolean;
+  isTablet: boolean;
 }
 
-const PanelViewHeader: React.FC<PanelViewHeaderProps> = ({ tablet }) => {
+const PanelViewHeader: React.FC<PanelViewHeaderProps> = ({ isTablet }) => {
   const { t } = useTranslation();
   return (
     <div className={styles.panelViewHeader}>
       <h4 className={styles.productiveHeading02}>{t('panel', 'Panel')}</h4>
-      <Button kind="ghost" size={tablet ? 'md' : 'sm'} renderIcon={SearchIcon}>
+      <Button kind="ghost" size={isTablet ? 'md' : 'sm'} renderIcon={SearchIcon}>
         {t('search', 'Search')}
       </Button>
     </div>

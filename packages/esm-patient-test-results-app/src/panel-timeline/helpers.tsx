@@ -130,7 +130,7 @@ export const TimeSlots: React.FC<{
   className?: string;
 }> = ({ children = undefined, ...props }) => (
   <TimeSlotsInner {...props}>
-    <div>{children}</div>
+    <span>{children}</span>
   </TimeSlotsInner>
 );
 
