@@ -7,7 +7,6 @@ import { isDesktop, navigate, useConfig, useLayoutType } from '@openmrs/esm-fram
 import { testResultsBasePath } from '../helpers';
 import FilterSet, { FilterContext, FilterProvider } from '../filter';
 import GroupedTimeline, { useGetManyObstreeData } from '../grouped-timeline';
-import DesktopView from '../desktop-view/desktop-view.component';
 import TabletOverlay from '../tablet-overlay';
 import Trendline from '../trendline/trendline.component';
 import styles from './results-viewer.styles.scss';

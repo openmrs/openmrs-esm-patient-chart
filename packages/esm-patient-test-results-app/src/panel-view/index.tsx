@@ -5,7 +5,7 @@ import { Column, DataTableSkeleton, Button } from '@carbon/react';
 import { Search as SearchIcon } from '@carbon/react/icons';
 import styles from './panel-view.scss';
 import { useLayoutType } from '@openmrs/esm-framework';
-import PanelTimelineComponent from './timeline.component';
+import PanelTimelineComponent from '../panel-timeline';
 import { ObsRecord } from './types';
 import { useTranslation } from 'react-i18next';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
@@ -52,7 +52,17 @@ const PanelView: React.FC<PanelViewProps> = ({ expanded }) => {
         </Column>
       )}
       <Column sm={16} lg={tablet || expanded ? 12 : 7}>
-        <PanelTimelineComponent activePanel={activePanel} />
+        <PanelViewHeader tablet={tablet} />
+        {isLoading ? (
+          <DataTableSkeleton columns={3} />
+        ) : activePanel ? (
+          <PanelTimelineComponent groupedObservations={groupedObservations} activePanel={activePanel} />
+        ) : (
+          <EmptyState
+            headerTitle={t('noPanelSelected', 'No panel selected')}
+            displayText={t('observations', 'Observations')}
+          />
+        )}
       </Column>
     </>
   );

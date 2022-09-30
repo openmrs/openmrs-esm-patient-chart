@@ -63,7 +63,7 @@ const LabSetPanel: React.FC<LabSetPanelProps> = ({ panel, observations, activePa
               header: t('value', 'Value'),
             },
           ],
-    [t],
+    [t, hasRange],
   );
 
   const rowsData = useMemo(
@@ -100,6 +100,8 @@ const LabSetPanel: React.FC<LabSetPanelProps> = ({ panel, observations, activePa
   return (
     <Layer>
       <div
+        role="button"
+        tabIndex={0}
         onClick={() => setActivePanel(panel)}
         className={`${styles.labSetPanel} ${activePanel?.conceptUuid === panel.conceptUuid && styles.activePanel}`}
       >

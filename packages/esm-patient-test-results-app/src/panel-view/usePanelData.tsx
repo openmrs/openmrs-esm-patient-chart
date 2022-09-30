@@ -42,7 +42,6 @@ export function useObservations() {
   }, [size, setSize, data]);
 
   const results = useMemo(() => {
-    console.log(data);
     const observations: Array<FHIRObservationResource> = data
       ? []
           .concat(...data?.map((resp) => resp.data?.entry?.map((e) => e.resource) ?? []))
@@ -58,7 +57,7 @@ export function useObservations() {
   return results;
 }
 
-function useconcepts(conceptUuids: Array<string>) {
+function useConcepts(conceptUuids: Array<string>) {
   const getUrl = (index) => {
     if (conceptUuids && index < conceptUuids.length) {
       return `/ws/rest/v1/concept/${conceptUuids[index]}?v=full`;
@@ -87,10 +86,7 @@ function useconcepts(conceptUuids: Array<string>) {
 
 export default function usePanelData() {
   const { observations: fhirObservations, conceptUuids, isLoading: isLoadingObservations } = useObservations();
-  const { isLoading: isLoadingConcepts, concepts } = useconcepts(conceptUuids);
-
-  console.log('obs', fhirObservations, isLoadingObservations);
-  console.log('concepts', concepts, isLoadingConcepts);
+  const { isLoading: isLoadingConcepts, concepts } = useConcepts(conceptUuids);
 
   const conceptData: Record<string, ConceptMeta> = useMemo(
     () =>
@@ -188,8 +184,6 @@ export default function usePanelData() {
     });
     return latestPanels;
   }, [individualObservations, setObservations]);
-
-  console.log(panels);
 
   return {
     panels,

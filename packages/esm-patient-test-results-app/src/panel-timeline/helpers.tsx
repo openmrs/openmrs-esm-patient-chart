@@ -1,6 +1,34 @@
 import * as React from 'react';
-import { ObsRecord, OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
+import { OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
+import { ObsRecord } from '../panel-view/types';
 import styles from './timeline.scss';
+import { formatDate, formatTime, parseDate } from '@openmrs/esm-framework';
+import { ParsedTimeType } from '../filter/filter-types';
+
+export const parseTime: (sortedTimes: Array<string>) => ParsedTimeType = (sortedTimes) => {
+  const yearColumns: Array<{ year: string; size: number }> = [],
+    dayColumns: Array<{ year: string; day: string; size: number }> = [],
+    timeColumns: string[] = [];
+
+  sortedTimes.forEach((datetime) => {
+    const parsedDate = parseDate(datetime);
+    const year = parsedDate.getFullYear().toString();
+    const date = formatDate(parsedDate, { mode: 'wide', year: false });
+    const time = formatTime(parsedDate);
+
+    const yearColumn = yearColumns.find(({ year: innerYear }) => year === innerYear);
+    if (yearColumn) yearColumn.size++;
+    else yearColumns.push({ year, size: 1 });
+
+    const dayColumn = dayColumns.find(({ year: innerYear, day: innerDay }) => date === innerDay && year === innerYear);
+    if (dayColumn) dayColumn.size++;
+    else dayColumns.push({ day: date, year, size: 1 });
+
+    timeColumns.push(time);
+  });
+
+  return { yearColumns, dayColumns, timeColumns, sortedTimes };
+};
 
 export const Grid: React.FC<{
   children?: React.ReactNode;
@@ -114,8 +142,8 @@ export const GridItems = React.memo<{
   <>
     {sortedTimes.map((_, i) => {
       if (!obs[i]) return <TimelineCell key={i} text={'--'} zebra={zebra} />;
-      const interpretation = obs[i].meta.assessValue(obs[i].value);
-      return <TimelineCell key={i} text={obs[i].value} interpretation={interpretation} zebra={zebra} />;
+      const interpretation = obs[i].interpretation;
+      return <TimelineCell key={i} text={`${obs[i].value}`} interpretation={interpretation} zebra={zebra} />;
     })}
   </>
 ));
