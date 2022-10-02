@@ -104,7 +104,7 @@ export interface obsShape {
   [key: string]: any;
 }
 
-interface RowData extends TestData {
+export interface RowData extends TestData {
   entries: Array<
     | {
         obsDatetime: string;

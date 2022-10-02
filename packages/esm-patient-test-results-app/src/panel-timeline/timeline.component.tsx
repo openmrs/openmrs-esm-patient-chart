@@ -1,10 +1,10 @@
 import React from 'react';
-import { DataTableSkeleton } from '@carbon/react';
-import { useTimelineData } from './useTimelineData';
 import { PaddingContainer, TimeSlots, Grid, RowStartCell, GridItems, ShadowBox } from './helpers';
-import { ObsRecord, EmptyState, OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
+import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import useScrollIndicator from './useScroll';
 import styles from './timeline.scss';
+import { ParsedTimeType } from '../filter/filter-types';
+import { ObsRecord } from '../panel-view/types';
 
 const RecentResultsGrid = (props) => {
   return <div {...props} className={styles['recent-results-grid']} />;
@@ -68,25 +68,24 @@ interface DataRowsProps {
   timeColumns: Array<string>;
   sortedTimes: Array<string>;
   showShadow: boolean;
-  openTrendline: (testUuid: string) => void;
+  testUuid: string;
 }
 
-const DataRows: React.FC<DataRowsProps> = ({ timeColumns, rowData, sortedTimes, showShadow, openTrendline }) => (
+const DataRows: React.FC<DataRowsProps> = ({ timeColumns, rowData, sortedTimes, showShadow, testUuid }) => (
   <Grid dataColumns={timeColumns.length} padding style={{ gridColumn: 'span 2' }}>
     {Object.entries(rowData).map(([title, obs], rowCount) => {
-      const {
-        meta: { units = '', range = '' },
-        conceptClass,
-      } = obs.find((x) => !!x);
+      const { meta, conceptUuid } = obs.find((x) => !!x);
+      const range = meta?.range ?? '';
+      const units = meta?.units ?? '';
       return (
-        <React.Fragment key={conceptClass}>
+        <React.Fragment key={conceptUuid}>
           <RowStartCell
             {...{
               units,
               range,
               title,
               shadow: showShadow,
-              openTrendline: () => openTrendline(conceptClass),
+              testUuid,
             }}
           />
           <GridItems {...{ sortedTimes, obs, zebra: !!(rowCount % 2) }} />
@@ -97,39 +96,16 @@ const DataRows: React.FC<DataRowsProps> = ({ timeColumns, rowData, sortedTimes, 
 );
 
 interface TimelineParams {
-  patientUuid: string;
-  panelUuid?: string;
-  openTrendline?: (panelUuid: string, testUuid: string) => void;
+  parsedTime: ParsedTimeType;
+  rowData: Record<string, Array<ObsRecord>>;
+  panelName: string;
+  sortedTimes: Array<string>;
+  testUuid: string;
 }
 
-export const Timeline: React.FC<TimelineParams> = ({
-  patientUuid,
-  panelUuid,
-  openTrendline: openTrendlineExternal,
-}) => {
+export const Timeline: React.FC<TimelineParams> = ({ parsedTime, rowData, panelName, sortedTimes, testUuid }) => {
   const [xIsScrolled, yIsScrolled, containerRef] = useScrollIndicator(0, 32);
-  const timelineData = useTimelineData(patientUuid, panelUuid);
-
-  const {
-    data: {
-      parsedTime: { yearColumns, dayColumns, timeColumns, sortedTimes },
-      rowData,
-      panelName,
-    },
-    loaded,
-  } = timelineData;
-
-  const openTrendline = React.useCallback(
-    (testUuid: string) => openTrendlineExternal(panelUuid, testUuid),
-    [panelUuid, openTrendlineExternal],
-  );
-
-  if (!loaded)
-    return (
-      <RecentResultsGrid>
-        <DataTableSkeleton role="progressbar" />
-      </RecentResultsGrid>
-    );
+  const { yearColumns, dayColumns, timeColumns } = parsedTime;
 
   if (yearColumns && dayColumns && timeColumns)
     return (
@@ -150,8 +126,8 @@ export const Timeline: React.FC<TimelineParams> = ({
               rowData,
               sortedTimes,
               showShadow: xIsScrolled,
-              panelUuid,
-              openTrendline,
+              panelUuid: '',
+              testUuid,
             }}
           />
           <ShadowBox />

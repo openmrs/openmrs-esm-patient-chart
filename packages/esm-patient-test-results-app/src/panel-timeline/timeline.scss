@@ -89,7 +89,7 @@
   display: grid;
   align-items: center;
 
-  div {
+  span {
     position: sticky;
     left: calc(10em + 10px);
     width: max-content;
@@ -104,9 +104,9 @@
   z-index: 3;
   padding: 0rem 1rem;
 
-  div {
+  span {
     @include type.type-style('heading-compact-01');
-    
+    width: auto;
     left: 0;
   }
 }
