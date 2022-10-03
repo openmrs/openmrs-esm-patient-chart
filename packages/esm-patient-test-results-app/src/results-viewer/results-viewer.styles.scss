@@ -7,8 +7,35 @@
   padding: 0;
   width: 100%;
   position: relative;
+  box-sizing: border-box;
+  display:flex;
 }
- 
+.col{
+  height: 100%;
+  display: flex;
+  box-sizing: border-box;
+  min-width: 5rem;
+}
+.Left{
+  width:50%;
+  min-width:20%;
+  display: flex;
+  flex-direction: column;
+}
+.Right{
+  width:50%;
+  min-width:20%;
+  display: flex;
+  flex-direction: column;
+}
+.dragHandler {
+  width: 10px;
+  height: 100%;
+  min-height: 100vh;
+  background-color: $color-gray-30;
+  cursor: col-resize;
+  top: 0;
+}
 .resultsHeader {
   padding: 0.5rem 0;
   z-index: 10;
@@ -51,34 +78,4 @@
   .trendlineOverlayHeaderReferenceRange {
     @include type.type-style('helper-text-01');
   }
-}
-
-col {
-  height: 100%;
-  display: flex;
-  box-sizing: border-box;
-  min-width: 3rem;
-}
-
-.colLeft {
-  width: 30%;
-}
-
-.colRight {
-  width: 70%;
-}
- 
-.columnPanel {
-  position: relative;
-}
- 
-.dragHandler {
-  width: 24px;
-  height: 100%;
-  background-color: $color-gray-30;
-  position: relative;
-  top: 0;
-  left: 50%;
-  cursor: col-resize;
-  z-index: 100;
 }
