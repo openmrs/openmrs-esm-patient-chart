@@ -125,7 +125,7 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, ty
           </div>
           <div className={`${styles.columnPanel} ${styles.treeColumn}`}>
             {leftContent === 'tree' && (!loading ? <FilterSet /> : <AccordionSkeleton open count={4} align="start" />)}
-            {leftContent === 'panel' && 'isDesktop'}
+            {leftContent === 'panel' && 'DesktopView'}
           </div>
         </div>
         <div className={styles.dragHandler} ref={div} role="button" tabIndex={0} onMouseDown={onMouseDown}></div>
