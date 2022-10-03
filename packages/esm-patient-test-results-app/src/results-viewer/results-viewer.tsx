@@ -1,6 +1,6 @@
 import React, { useContext, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AccordionSkeleton, Button, ContentSwitcher, Column, DataTableSkeleton, Grid, Switch } from '@carbon/react';
+import { AccordionSkeleton, Button, ContentSwitcher, DataTableSkeleton, Switch } from '@carbon/react';
 import { TreeViewAlt } from '@carbon/react/icons';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { navigate, useConfig, useLayoutType } from '@openmrs/esm-framework';
@@ -11,10 +11,10 @@ import DesktopView from '../desktop-view/desktop-view.component';
 import TabletOverlay from '../tablet-overlay';
 import Trendline from '../trendline/trendline.component';
 import styles from './results-viewer.styles.scss';
-
+ 
 type viewOpts = 'split' | 'full';
 type panelOpts = 'tree' | 'panel';
-
+ 
 interface ResultsViewerProps {
   basePath: string;
   type?: string;
@@ -22,17 +22,17 @@ interface ResultsViewerProps {
   patientUuid?: string;
   loading?: boolean;
 }
-
+ 
 const RoutedResultsViewer: React.FC<ResultsViewerProps> = ({ type, basePath, testUuid, patientUuid }) => {
   const config = useConfig();
   const conceptUuids = config?.concepts?.map((c) => c.conceptUuid) ?? [];
   const { roots, loading, error } = useGetManyObstreeData(conceptUuids);
   const { t } = useTranslation();
-
+ 
   if (error) {
     return <ErrorState error={error} headerTitle={t('dataLoadError', 'Data Load Error')} />;
   }
-
+ 
   if (roots?.length) {
     return (
       <FilterProvider roots={!loading ? roots : []}>
@@ -46,7 +46,7 @@ const RoutedResultsViewer: React.FC<ResultsViewerProps> = ({ type, basePath, tes
       </FilterProvider>
     );
   }
-
+ 
   return (
     <EmptyState
       headerTitle={t('testResults', 'Test Results')}
@@ -54,7 +54,7 @@ const RoutedResultsViewer: React.FC<ResultsViewerProps> = ({ type, basePath, tes
     />
   );
 };
-
+ 
 const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, type, testUuid, loading }) => {
   const { t } = useTranslation();
   const tablet = useLayoutType() === 'tablet';
@@ -63,31 +63,31 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, ty
   const [showTreeOverlay, setShowTreeOverlay] = useState<boolean>(false);
   const { resetTree, timelineData, totalResultsCount } = useContext(FilterContext);
   const expanded = view === 'full';
-
+ 
   const left = useRef(null);
   const right = useRef(null);
   const div = useRef(null);
   let md = null;
-
+ 
   const onMouseMove = (e) => {
     const dx = e.clientX - md.e.clientX;
     left.current.style.width = md.leftWidth + dx + 'px';
     right.current.style.width = md.rightWidth - dx + 'px';
   };
-
+ 
   const onMouseDown = (e) => {
     md = {
       e: e,
       leftWidth: left.current?.offsetWidth,
       rightWidth: right.current?.offsetWidth,
     };
-
+ 
     document.onmousemove = (e) => onMouseMove(e);
     document.onmouseup = () => {
       document.onmousemove = document.onmouseup = md = null;
     };
   };
-
+ 
   return (
     <>
       <div className={styles.resultsContainer}>
@@ -195,5 +195,5 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, ty
     </>
   );
 };
-
+ 
 export default RoutedResultsViewer;
