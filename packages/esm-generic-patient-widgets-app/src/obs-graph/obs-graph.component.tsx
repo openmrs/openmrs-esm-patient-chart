@@ -34,7 +34,7 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
   });
 
   const chartData = useMemo(() => {
-    let chartRecords = obss
+    const chartRecords = obss
       .filter((obs) => obs.conceptUuid === selectedConcept.uuid && obs.dataType === 'Number')
       .map((obs) => ({
         group: selectedConcept.label,
@@ -42,7 +42,7 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
         value: obs.valueQuantity.value,
       }));
 
-    if (config?.graphOldestFirst) {
+    if (config.graphOldestFirst) {
       chartRecords.reverse();
     }
     return chartRecords;
