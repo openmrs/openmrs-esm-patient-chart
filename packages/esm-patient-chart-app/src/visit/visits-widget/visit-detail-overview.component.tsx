@@ -1,7 +1,7 @@
 import React from 'react';
 import { InlineLoading, Tab, Tabs, TabList, TabPanel, TabPanels } from '@carbon/react';
-import { EmptyState } from '@openmrs/esm-patient-common-lib';
-import { formatDatetime, OpenmrsResource, parseDate, ErrorState, useConfig } from '@openmrs/esm-framework';
+import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
+import { formatDatetime, OpenmrsResource, parseDate, useConfig } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { Observation, useVisits } from './visit.resource';
 import VisitsTable from './past-visits-components/visits-table';
