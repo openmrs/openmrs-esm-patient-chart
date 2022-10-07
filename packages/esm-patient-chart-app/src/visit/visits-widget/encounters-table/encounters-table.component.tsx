@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import {
   DataTable,
   DataTableHeader,
+  Dropdown,
   Table,
   TableBody,
   TableCell,
@@ -17,13 +18,11 @@ import {
   TableToolbarContent,
   TableToolbarSearch,
   Tile,
-  InlineLoading,
 } from '@carbon/react';
-import { formatDatetime, parseDate, useLayoutType, usePagination } from '@openmrs/esm-framework';
-import { ErrorState, EmptyState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
+import { formatDatetime, formatTime, parseDate, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import styles from './encounters-table.scss';
 import EncounterObservations from '../encounter-observations';
-import { useEncounters } from '../visit.resource';
 
 interface Encounter {
   datetime?: string;
@@ -163,24 +162,4 @@ const EncountersTable: React.FC<EncountersTableProps> = ({ showAllEncounters, en
   );
 };
 
-const EncountersTableLifecycle = ({ patientUuid }) => {
-  const { t } = useTranslation();
-  const { encounters, error, isLoading } = useEncounters(patientUuid);
-
-  if (isLoading) {
-    return <InlineLoading description={t('loading', 'Loading...')} role="progressbar" />;
-  }
-
-  if (error) {
-    return <ErrorState headerTitle={t('encounters', 'encounters')} error={error} />;
-  }
-
-  if (!encounters?.length) {
-    return <EmptyState headerTitle={t('encounters', 'encounters')} displayText={t('Encounters', 'Encounters')} />;
-  }
-
-  return <EncountersTable encounters={encounters} showAllEncounters />;
-};
-
 export default EncountersTable;
-export { EncountersTableLifecycle };

@@ -33,9 +33,9 @@ describe('VisitDetailOverview', () => {
 
     await waitForLoadingToFinish();
 
-    expect(screen.getByRole('heading', { name: /visits/i })).toBeInTheDocument();
-    expect(screen.getAllByTitle(/Empty data illustration/i)[0]).toBeInTheDocument();
-    expect(screen.getAllByText(/There are no visits to display for this patient/i)[0]).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /encounters/i })).toBeInTheDocument();
+    expect(screen.getByTitle(/Empty data illustration/i)).toBeInTheDocument();
+    expect(screen.getByText(/There are no encounters to display for this patient/i)).toBeInTheDocument();
   });
 
   it('renders an error state view if there was a problem fetching encounter data', async () => {
@@ -54,9 +54,9 @@ describe('VisitDetailOverview', () => {
     await waitForLoadingToFinish();
 
     expect(screen.queryByRole('table')).not.toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: /visits/i })).toBeInTheDocument();
-    expect(screen.getAllByText(/Error 401: Unauthorized/i)[0]).toBeInTheDocument();
-    expect(screen.getAllByText(/Sorry, there was a problem displaying this information/i)[0]).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /encounters/i })).toBeInTheDocument();
+    expect(screen.getByText(/Error 401: Unauthorized/i)).toBeInTheDocument();
+    expect(screen.getByText(/Sorry, there was a problem displaying this information/i)).toBeInTheDocument();
   });
 
   it(`renders a summary of the patient's visits and encounters when data is available`, async () => {
@@ -68,13 +68,13 @@ describe('VisitDetailOverview', () => {
 
     await waitForLoadingToFinish();
 
-    const allVisitsTab = screen.getByRole('tab', { name: /all visits/i });
+    const allEncountersTab = screen.getByRole('tab', { name: /all encounters/i });
     const visitSummariesTab = screen.getByRole('tab', { name: /visit summaries/i });
 
     expect(visitSummariesTab).toBeInTheDocument();
-    expect(allVisitsTab).toBeInTheDocument();
+    expect(allEncountersTab).toBeInTheDocument();
     expect(visitSummariesTab).toHaveAttribute('aria-selected', 'true');
-    expect(allVisitsTab).toHaveAttribute('aria-selected', 'false');
+    expect(allEncountersTab).toHaveAttribute('aria-selected', 'false');
     expect(screen.getByRole('tab', { name: /notes/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /tests/i })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: /medications/i })).toBeInTheDocument();
@@ -86,9 +86,9 @@ describe('VisitDetailOverview', () => {
     expect(screen.getByText(/no notes found/i)).toBeInTheDocument();
     expect(screen.getByText(/no medications found/i)).toBeInTheDocument();
 
-    await waitFor(() => user.click(allVisitsTab));
+    await waitFor(() => user.click(allEncountersTab));
 
-    expect(allVisitsTab).toHaveAttribute('aria-selected', 'true');
+    expect(allEncountersTab).toHaveAttribute('aria-selected', 'true');
     expect(visitSummariesTab).toHaveAttribute('aria-selected', 'false');
   });
 });

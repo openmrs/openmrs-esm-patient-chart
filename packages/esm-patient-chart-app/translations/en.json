@@ -28,9 +28,7 @@
   "editPastVisit": "Edit Past Visit",
   "editThisEncounter": "Edit this encounter",
   "encounters": "Encounters",
-  "Encounters": "Encounters",
   "encounterType": "Encounter type",
-  "end": "End",
   "endActiveVisit": "End active visit",
   "endDate": "End date",
   "endVisit": "End Visit",
@@ -78,7 +76,6 @@
   "selectVisitType": "Please select a Visit Type",
   "showAllDetails": "Show all details",
   "showLess": "Show less",
-  "start": "Start",
   "startDate": "Start date",
   "startNewVisit": "Start new visit",
   "startVisit": "Start visit",
@@ -92,11 +89,11 @@
   "visitEnded": "Visit ended",
   "visitEndSuccessfully": "Ended current visit successfully",
   "visitLocation": "Visit Location",
-  "visits": "visits",
-  "Visits": "Visits",
   "visitStarted": "Visit started",
   "visitStartedSuccessfully": "",
   "visitSummaries": "Visit summaries",
   "visitType": "Visit type",
-  "workspaceModalText": "Launching a new form in the workspace could cause you to lose unsaved work on the {formName} form."
+  "workspaceModalText": "Launching a new form in the workspace could cause you to lose unsaved work on the {formName} form.",
+  "start": "Start",
+  "end":"End"
 }
