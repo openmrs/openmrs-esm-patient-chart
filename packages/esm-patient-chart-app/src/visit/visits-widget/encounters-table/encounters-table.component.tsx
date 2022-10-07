@@ -19,8 +19,8 @@ import {
   Tile,
   InlineLoading,
 } from '@carbon/react';
-import { formatDatetime, parseDate, useLayoutType, usePagination, ErrorState } from '@openmrs/esm-framework';
-import { EmptyState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
+import { formatDatetime, parseDate, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { ErrorState, EmptyState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import styles from './encounters-table.scss';
 import EncounterObservations from '../encounter-observations';
 import { useEncounters } from '../visit.resource';
