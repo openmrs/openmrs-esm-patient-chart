@@ -1,13 +1,13 @@
 import React from 'react';
 import { InlineLoading, Tab, Tabs, TabList, TabPanel, TabPanels } from '@carbon/react';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
-import { formatDatetime, OpenmrsResource, parseDate, ErrorState } from '@openmrs/esm-framework';
+import { formatDatetime, OpenmrsResource, parseDate, ErrorState, useConfig } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import { Observation, useEncounters, useVisits } from './visit.resource';
+import { Observation, useVisits } from './visit.resource';
 import VisitsTable from './past-visits-components/visits-table';
 import VisitSummary from './past-visits-components/visit-summary.component';
 import styles from './visit-detail-overview.scss';
-import EncountersTable from './encounters-table';
+import { EncountersTableLifecycle } from './encounters-table/encounters-table.component';
 
 interface VisitOverviewComponentProps {
   patientUuid: string;
@@ -27,7 +27,7 @@ export interface FormattedEncounter {
 function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentProps) {
   const { t } = useTranslation();
   const { visits, isError, isLoading } = useVisits(patientUuid);
-  const { encounters, error: encountersError, isLoading: encountersLoading } = useEncounters(patientUuid);
+  const { showAllEncountersTab } = useConfig();
 
   const visitsWithEncounters = visits
     ?.filter((visit) => visit.encounters.length)
@@ -43,9 +43,13 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
           <Tab className={styles.tab} id="all-encounters-tab">
             {t('allVisits', 'All visits')}
           </Tab>
-          <Tab className={styles.tab} id="all-encounters-tab">
-            {t('allEncounters', 'All encounters')}
-          </Tab>
+          {showAllEncountersTab ? (
+            <Tab className={styles.tab} id="all-encounters-tab">
+              {t('allEncounters', 'All encounters')}
+            </Tab>
+          ) : (
+            <></>
+          )}
         </TabList>
         <TabPanels>
           <TabPanel>
@@ -62,7 +66,6 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
                     <div className={styles.displayFlex}>
                       <h6 className={styles.dateLabel}>{t('start', 'Start')}:</h6>
                       <span className={styles.date}>{formatDatetime(parseDate(visit?.startDatetime))}</span>
-
                       {visit?.stopDatetime ? (
                         <>
                           <h6 className={styles.dateLabel}>{t('end', 'End')}:</h6>
@@ -70,8 +73,6 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
                         </>
                       ) : null}
                     </div>
-
-                    {/* <p>{JSON.stringify(visit)}</p> */}
                   </div>
                   <VisitSummary encounters={visit.encounters} patientUuid={patientUuid} />
                 </div>
@@ -91,17 +92,13 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
               <EmptyState headerTitle={t('visits', 'visits')} displayText={t('Visits', 'Visits')} />
             )}
           </TabPanel>
-          <TabPanel>
-            {encountersLoading ? (
-              <InlineLoading description={t('loading', 'Loading...')} role="progressbar" />
-            ) : encountersError ? (
-              <ErrorState headerTitle={t('encounters', 'encounters')} error={encountersError} />
-            ) : encounters?.length ? (
-              <EncountersTable encounters={encounters} showAllEncounters />
-            ) : (
-              <EmptyState headerTitle={t('encounters', 'encounters')} displayText={t('Encounters', 'Encounters')} />
-            )}
-          </TabPanel>
+          {showAllEncountersTab ? (
+            <TabPanel>
+              <EncountersTableLifecycle patientUuid={patientUuid} />
+            </TabPanel>
+          ) : (
+            <></>
+          )}
         </TabPanels>
       </Tabs>
     </div>
