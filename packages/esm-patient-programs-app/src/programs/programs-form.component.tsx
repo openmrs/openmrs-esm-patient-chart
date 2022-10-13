@@ -163,7 +163,22 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
       currentEnrollment,
     ],
   );
-
+  const ProgramSelect = () => (
+    <Select
+    id="program"
+    invalidText={t('required', 'Required')}
+    labelText=""
+    onChange={(event) => setSelectedProgram(event.target.value)}
+  >
+    {!selectedProgram ? <SelectItem text={t('chooseProgram', 'Choose a program')} value="" /> : null}
+    {eligiblePrograms?.length > 0 &&
+      eligiblePrograms.map((program) => (
+        <SelectItem key={program.uuid} text={program.display} value={program.uuid}>
+          {program.display}
+        </SelectItem>
+      ))}
+  </Select>
+  );
   return (
     <Form className={styles.form} onSubmit={handleSubmit}>
       <Stack className={styles.formContainer} gap={7}>
@@ -179,37 +194,11 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
         <FormGroup style={{ maxWidth: '50%' }} legendText={t('programName', 'Program name')}>
           <div className={styles.selectContainer}>
             {isTablet ? (
-              <Layer>
-                <Select
-                  id="program"
-                  invalidText={t('required', 'Required')}
-                  labelText=""
-                  onChange={(event) => setSelectedProgram(event.target.value)}
-                >
-                  {!selectedProgram ? <SelectItem text={t('chooseProgram', 'Choose a program')} value="" /> : null}
-                  {eligiblePrograms?.length > 0 &&
-                    eligiblePrograms.map((program) => (
-                      <SelectItem key={program.uuid} text={program.display} value={program.uuid}>
-                        {program.display}
-                      </SelectItem>
-                    ))}
-                </Select>
+              <Layer>   
+                <ProgramSelect />           
               </Layer>
             ) : (
-              <Select
-                id="program"
-                invalidText={t('required', 'Required')}
-                labelText=""
-                onChange={(event) => setSelectedProgram(event.target.value)}
-              >
-                {!selectedProgram ? <SelectItem text={t('chooseProgram', 'Choose a program')} value="" /> : null}
-                {eligiblePrograms?.length > 0 &&
-                  eligiblePrograms.map((program) => (
-                    <SelectItem key={program.uuid} text={program.display} value={program.uuid}>
-                      {program.display}
-                    </SelectItem>
-                  ))}
-              </Select>
+              <ProgramSelect />
             )}
           </div>
         </FormGroup>
