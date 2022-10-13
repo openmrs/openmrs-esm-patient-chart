@@ -84,6 +84,14 @@ function setupOpenMRS() {
         }),
       },
       {
+        name: 'mark-alive-button',
+        slot: 'patient-actions-slot',
+        load: getAsyncLifecycle(() => import('./actions-buttons/mark-patient-alive.component'), {
+          featureName: 'patient-actions-slot',
+          moduleName,
+        }),
+      },
+      {
         name: 'stop-visit-button-patient-search',
         slot: 'patient-search-actions-slot',
         load: getAsyncLifecycle(() => import('./actions-buttons/stop-visit.component'), {
@@ -225,6 +233,20 @@ function setupOpenMRS() {
         id: 'end-visit-dialog',
         load: getAsyncLifecycle(() => import('./visit/visit-prompt/end-visit-dialog.component'), {
           featureName: 'end visit',
+          moduleName,
+        }),
+      },
+      {
+        name: 'confirm-deaceased-dialog',
+        load: getAsyncLifecycle(() => import('./deceased/confirmation-dialog.component'), {
+          featureName: 'confirm death',
+          moduleName,
+        }),
+      },
+      {
+        name: 'confirm-alive-modal',
+        load: getAsyncLifecycle(() => import('./deceased/mark-alive-modal.component'), {
+          featureName: 'confirm alive',
           moduleName,
         }),
       },
