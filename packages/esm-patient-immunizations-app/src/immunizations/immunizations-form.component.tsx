@@ -1,6 +1,18 @@
 import React, { SyntheticEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, ButtonSet, DatePicker, DatePickerInput, Form, Select, SelectItem, TextInput } from '@carbon/react';
+import {
+  Button,
+  ButtonSet,
+  DatePicker,
+  DatePickerInput,
+  Form,
+  Select,
+  SelectItem,
+  TextInput,
+  Stack,
+  FormGroup,
+  Layer,
+} from '@carbon/react';
 import { showNotification, showToast, useSession, useVisit, useLayoutType } from '@openmrs/esm-framework';
 import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import { savePatientImmunization } from './immunizations.resource';
@@ -8,6 +20,7 @@ import { mapToFHIRImmunizationResource } from './immunization-mapper';
 import { ImmunizationFormData, ImmunizationSequence } from './immunization-domain';
 import { immunizationFormSub } from './immunization-utils';
 import styles from './immunizations-form.scss';
+import { mockPaginatedImmunizations } from '../../../../__mocks__/immunizations.mock';
 
 function hasSequences<T>(sequences: Array<T>) {
   return sequences && sequences?.length > 0;
@@ -119,14 +132,40 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
     updateSingle('currentDose', currentDose);
   };
 
+  const vaccines = mockPaginatedImmunizations;
+  const VaccineSelect = () => (
+    <Select
+      id="vaccine"
+      invalidText="Required"
+      labelText=""
+      onChange={(event) => updateSingle('vaccineName', event.target.value)}
+      value={formState.vaccineName}
+    >
+      {!formState.vaccineName ? <SelectItem text={t('chooseVaccine', 'Choose a vaccine')} value="" /> : null}
+      {vaccines?.length > 0 &&
+        vaccines.map((vaccine) => (
+          <SelectItem key={vaccine.vaccineUuid} text={vaccine.vaccineName} value={vaccine.vaccineUuid}>
+            {vaccine.vaccineName}
+          </SelectItem>
+        ))}
+    </Select>
+  );
+
   return (
-    <Form className={styles.form} onSubmit={handleFormSubmit} data-testid="immunization-form">
-      <div>
-        <h4 className={styles.immunizationSequenceSelect}>
-          {`${t('vaccine', 'Vaccine')} : ${formState?.vaccineName}`}{' '}
-        </h4>
+    <Form className={styles.form} onSubmit={handleFormSubmit}>
+      <Stack gap={4}>
+        <section className={styles.immunizationSequenceSelect}>
+          <span>{t('vaccine', 'vaccine')}</span>
+          {isTablet ? (
+            <Layer>
+              <VaccineSelect />
+            </Layer>
+          ) : (
+            <VaccineSelect />
+          )}
+        </section>
         {hasSequences(formState.sequences) && (
-          <div className={styles.immunizationSequenceSelect}>
+          <section className={styles.immunizationSequenceSelect}>
             <Select
               id="sequence"
               name="sequence"
@@ -146,9 +185,9 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
                 );
               })}
             </Select>
-          </div>
+          </section>
         )}
-        <div className={styles.immunizationSequenceSelect}>
+        <section className={styles.immunizationSequenceSelect}>
           <DatePicker
             id="vaccinationDate"
             className="vaccinationDate"
@@ -165,8 +204,8 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
               type="text"
             />
           </DatePicker>
-        </div>
-        <div className={styles.immunizationSequenceSelect}>
+        </section>
+        <section className={styles.immunizationSequenceSelect}>
           <DatePicker
             id="vaccinationExpiration"
             className="vaccinationExpiration"
@@ -183,8 +222,8 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
               type="text"
             />
           </DatePicker>
-        </div>
-        <div className={styles.immunizationSequenceSelect}>
+        </section>
+        <section className={styles.immunizationSequenceSelect}>
           <TextInput
             type="text"
             id="lotNumber"
@@ -192,8 +231,8 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
             value={formState.lotNumber}
             onChange={(evt) => updateSingle('lotNumber', evt.target.value)}
           />
-        </div>
-        <div className={styles.immunizationSequenceSelect}>
+        </section>
+        <section className={styles.immunizationSequenceSelect}>
           <TextInput
             type="text"
             id="manufacturer"
@@ -201,18 +240,14 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
             value={formState.manufacturer}
             onChange={(evt) => updateSingle('manufacturer', evt.target.value)}
           />
-        </div>
-      </div>
+        </section>
+      </Stack>
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
         <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button
-          className={styles.button}
-          kind="primary"
-          disabled={isViewEditMode ? !enableEditButtons : !enableCreateButtons}
-        >
-          {t('save', 'Save')}
+        <Button className={styles.button} kind="primary" disabled={!formState.vaccineName} type="submit">
+          {t('saveAndClose', 'Save and close')}
         </Button>
       </ButtonSet>
     </Form>
