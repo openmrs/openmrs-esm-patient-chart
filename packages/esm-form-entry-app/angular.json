@@ -24,7 +24,7 @@
             "index": "",
             "main": "src/index.ts",
             "tsConfig": "tsconfig.app.json",
-            "aot": false,
+            "aot": true,
             "assets": [
               "src/assets"
             ],
