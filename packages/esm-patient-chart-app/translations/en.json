@@ -17,6 +17,7 @@
   "close": "Close",
   "confirm": "Confirm",
   "confirmDeceased": "Confirm Deceased",
+  "confirmMarkAsAlive": "Are you sure, you want to mark patient as alive?",
   "contactDetails": "Contact Details",
   "date": "Date",
   "dateAndTime": "Date & time",

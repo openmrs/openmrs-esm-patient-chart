@@ -44,7 +44,7 @@ const MarkPatientAsAlive: React.FC<ConfirmationDialogProps> = ({ closeDialog, pa
   return (
     <div>
       <ModalHeader closeModal={closeDialog} title={t('markAsAlive', 'Mark As Alive')} />
-      <ModalBody>{t('markAsAlive', 'Are you sure, you want to mark patient as alive?')}</ModalBody>
+      <ModalBody>{t('confirmMarkAsAlive', 'Are you sure, you want to mark patient as alive?')}</ModalBody>
       <ModalFooter>
         <Button kind="secondary" onClick={closeDialog}>
           {t('no', 'No')}
