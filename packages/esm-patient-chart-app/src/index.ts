@@ -237,7 +237,7 @@ function setupOpenMRS() {
         }),
       },
       {
-        name: 'confirm-deaceased-dialog',
+        name: 'confirm-deceased-dialog',
         load: getAsyncLifecycle(() => import('./deceased/confirmation-dialog.component'), {
           featureName: 'confirm death',
           moduleName,
