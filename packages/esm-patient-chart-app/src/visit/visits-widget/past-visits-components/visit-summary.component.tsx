@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabList, TabPanel, TabPanels, Tag } from '@carbon/react';
 import { formatTime, OpenmrsResource, parseDate, useConfig, useLayoutType } from '@openmrs/esm-framework';
@@ -8,6 +8,7 @@ import MedicationSummary from './medications-summary.component';
 import NotesSummary from './notes-summary.component';
 import TestsSummary from './tests-summary.component';
 import styles from './visit-summary.scss';
+import { ExternalOverviewProps } from '@openmrs/esm-patient-common-lib';
 
 interface DiagnosisItem {
   diagnosis: string;
@@ -87,7 +88,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid }) 
     encounters,
   ]);
 
-  const testsFilter = useCallback(() => {
+  const testsFilter = useMemo<ExternalOverviewProps['filter']>(() => {
     const encounterIds = encounters.map((e) => `Encounter/${e.uuid}`);
     return ([entry]) => {
       return encounterIds.includes(entry.encounter?.reference);
