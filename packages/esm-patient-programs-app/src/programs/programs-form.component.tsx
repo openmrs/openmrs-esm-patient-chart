@@ -163,7 +163,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
       currentEnrollment,
     ],
   );
-  const ProgramSelect = () => (
+  const programSelect = (
     <Select
       id="program"
       invalidText={t('required', 'Required')}
@@ -192,15 +192,7 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({ closeWorkspace, patientUuid
           />
         ) : null}
         <FormGroup style={{ maxWidth: '50%' }} legendText={t('programName', 'Program name')}>
-          <div className={styles.selectContainer}>
-            {isTablet ? (
-              <Layer>
-                <ProgramSelect />
-              </Layer>
-            ) : (
-              <ProgramSelect />
-            )}
-          </div>
+          <div className={styles.selectContainer}>{isTablet ? <Layer>{programSelect}</Layer> : programSelect}</div>
         </FormGroup>
         <FormGroup style={{ maxWidth: '50%' }} legendText={t('dateEnrolled', 'Date enrolled')}>
           {isTablet ? (
