@@ -43,13 +43,13 @@ export async function getImmunizationsConceptSet(
   return result;
 }
 
-export function useImmunizationsConceptSet() {
+export function useImmunizationsConceptSet(customRepresentation = 'full') {
   const { immunizationsConfig } = useConfig();
   const conceptSetSearchTerm = immunizationsConfig?.vaccinesConceptSet;
   const [source, code] = conceptSetSearchTerm.split(':');
 
-  const conceptSetMappingUrl = `/ws/rest/v1/concept?source=${source}&code=${code}&v=full`;
-  const conceptSetUuidUrl = `/ws/rest/v1/concept/${conceptSetSearchTerm}?v=full`;
+  const conceptSetMappingUrl = `/ws/rest/v1/concept?source=${source}&code=${code}&v=${customRepresentation}`;
+  const conceptSetUuidUrl = `/ws/rest/v1/concept/${conceptSetSearchTerm}?v=${customRepresentation}`;
 
   const { data, error } = useSWR<{ data: { results: Array<OpenmrsConcept> } }, Error>(
     isConceptMapping(conceptSetSearchTerm) ? conceptSetMappingUrl : conceptSetUuidUrl,

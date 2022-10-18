@@ -2,6 +2,7 @@ export type OpenmrsConcept = {
   uuid: string;
   display: string;
   setMembers?: Array<OpenmrsConcept>;
+  answers?: Array<OpenmrsConcept>;
 };
 
 export type Code = {
