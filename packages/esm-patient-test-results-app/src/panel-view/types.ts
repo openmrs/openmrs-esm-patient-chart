@@ -28,17 +28,27 @@ export interface FHIRObservationResource {
     }>;
     text: string;
   };
-  encounter: {
+  encounter?: {
     reference: string;
     type: string;
   };
   effectiveDateTime: string;
   issued: string;
-  valueQuantity: {
+  valueString?: string;
+  valueQuantity?: {
     value: number;
     unit: string;
     system: string;
     code: string;
+  };
+  valueCodeableConcept?: {
+    coding: [
+      {
+        code: string;
+        display: string;
+      },
+    ];
+    text: string;
   };
   referenceRange: Array<{
     low?: {
@@ -90,7 +100,7 @@ export interface ConceptMeta {
   lowAbsolute: number;
   lowCritical: number;
   units: string;
-  getInterpretation: (value: number) => OBSERVATION_INTERPRETATION;
+  getInterpretation: (value: string) => OBSERVATION_INTERPRETATION;
   range: string;
 }
 
@@ -98,7 +108,7 @@ export interface ObsRecord extends FHIRObservationResource {
   conceptUuid: string;
   relatedObs: Array<ObsRecord>;
   meta: ConceptMeta;
-  value: number;
+  value: string;
   name: string;
   interpretation: OBSERVATION_INTERPRETATION;
 }
