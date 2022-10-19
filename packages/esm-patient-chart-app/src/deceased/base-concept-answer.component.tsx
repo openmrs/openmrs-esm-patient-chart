@@ -28,7 +28,7 @@ const BaseConceptAnswer: React.FC<BaseConceptAnswerProps> = ({ onChange, isPatie
     }
   }, [searchTerm, conceptAnswers]);
 
-  const handleSearch = React.useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), 300), []);
+  const handleSearch = React.useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), 300), [setSearchTerm]);
 
   const { results, currentPage, goTo } = usePagination(searchResults, 10);
 
@@ -38,15 +38,14 @@ const BaseConceptAnswer: React.FC<BaseConceptAnswerProps> = ({ onChange, isPatie
         isTablet ? styles.conceptAnswerOverviewWrapperTablet : styles.conceptAnswerOverviewWrapperDesktop
       }`}
     >
-      {!isPatientDead && (
-        <Search
-          onChange={(event) => handleSearch(event.target.value)}
-          placeholder={t('searchForCauseOfDeath', 'Search for a cause of death')}
-          labelText=""
-          light={isTablet}
-        />
-      )}
-      {results.length && !isPatientDead ? (
+      <Search
+        onChange={(event) => handleSearch(event.target.value)}
+        placeholder={t('searchForCauseOfDeath', 'Search for a cause of death')}
+        labelText=""
+        light={isTablet}
+      />
+
+      {results.length ? (
         <>
           <RadioButtonGroup
             className={styles.radioButtonGroup}
@@ -56,7 +55,7 @@ const BaseConceptAnswer: React.FC<BaseConceptAnswerProps> = ({ onChange, isPatie
             name="radio-button-group"
             valueSelected="default-selected"
           >
-            {results.map(({ uuid, display, name }) => (
+            {results?.map(({ uuid, display, name }) => (
               <RadioButton key={uuid} className={styles.radioButton} id={name} labelText={display} value={uuid} />
             ))}
           </RadioButtonGroup>
@@ -73,7 +72,7 @@ const BaseConceptAnswer: React.FC<BaseConceptAnswerProps> = ({ onChange, isPatie
       ) : (
         <EmptyState
           displayText={t('causeOfDeath', 'Cause of Death')}
-          headerTitle={t('causeOfDeath', 'cause of death')}
+          headerTitle={t('causeOfDeath', 'Cause of death')}
         />
       )}
     </div>

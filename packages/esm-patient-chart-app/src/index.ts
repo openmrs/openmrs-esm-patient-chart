@@ -111,7 +111,7 @@ function setupOpenMRS() {
         name: 'mark-patient-deceased-button',
         slot: 'patient-actions-slot',
         load: getAsyncLifecycle(() => import('./actions-buttons/mark-patient-deceased'), {
-          featureName: 'patient-actions-slot',
+          featureName: 'patient-actions-slot-deceased-button',
           moduleName,
         }),
       },
@@ -119,7 +119,7 @@ function setupOpenMRS() {
         name: 'cancel-visit-button',
         slot: 'patient-search-actions-slot',
         load: getAsyncLifecycle(() => import('./actions-buttons/cancel-visit.component'), {
-          featureName: 'patient-actions-slot',
+          featureName: 'patient-actions-slot-cancel-visit-button',
           moduleName,
         }),
       },
@@ -127,7 +127,7 @@ function setupOpenMRS() {
         name: 'add-past-visit-button',
         slot: 'patient-actions-slot',
         load: getAsyncLifecycle(() => import('./actions-buttons/add-past-visit.component'), {
-          featureName: 'patient-actions-slot',
+          featureName: 'patient-actions-slot-add-past-visit-button',
           moduleName,
         }),
       },
@@ -135,7 +135,7 @@ function setupOpenMRS() {
         name: 'add-past-visit-button',
         slot: 'patient-search-actions-slot',
         load: getAsyncLifecycle(() => import('./actions-buttons/add-past-visit.component'), {
-          featureName: 'patient-actions-slot',
+          featureName: 'patient-search-actions-slot-add-past-visit-button',
           moduleName,
         }),
       },

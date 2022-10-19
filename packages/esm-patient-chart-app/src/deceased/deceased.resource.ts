@@ -94,7 +94,7 @@ export function useConceptAnswers(conceptUuid: string) {
   );
   const result = useMemo(() => {
     return {
-      conceptAnswers: data ? data?.data?.answers : null,
+      conceptAnswers: data?.data?.answers ?? null,
       isConceptLoading: !data && !error,
       conceptError: error,
       isConceptAnswerValidating: isValidating,

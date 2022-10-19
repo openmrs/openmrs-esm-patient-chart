@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { OverflowMenuItem } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';

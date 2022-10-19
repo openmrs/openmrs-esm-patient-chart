@@ -1,10 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSWRConfig } from 'swr';
 
-import { showToast, showNotification, fhirBaseUrl } from '@openmrs/esm-framework';
+import { showToast, showNotification } from '@openmrs/esm-framework';
 import { Button, ModalFooter, ModalHeader, ModalBody } from '@carbon/react';
-import { markPatientAlive } from './deceased.resource';
+import { markPatientAlive, usePersonfromPatient } from './deceased.resource';
 
 interface ConfirmationDialogProps {
   closeDialog: () => void;
@@ -13,7 +12,7 @@ interface ConfirmationDialogProps {
 
 const MarkPatientAsAlive: React.FC<ConfirmationDialogProps> = ({ closeDialog, patientUuid }) => {
   const { t } = useTranslation();
-  const { mutate } = useSWRConfig();
+  const { mutate } = usePersonfromPatient(patientUuid);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -28,7 +27,7 @@ const MarkPatientAsAlive: React.FC<ConfirmationDialogProps> = ({ closeDialog, pa
             title: t('markAsAlive', 'Mark As Alive'),
             description: t('setAliveSuccessfully', 'Patient has been marked alive successfully'),
           });
-          mutate(`${fhirBaseUrl}/patient/${patientUuid}`);
+          mutate();
         }
       })
       .catch((error) => {

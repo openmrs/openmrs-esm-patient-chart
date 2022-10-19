@@ -1,7 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import dayjs from 'dayjs';
 import { useTranslation } from 'react-i18next';
-import { useSWRConfig } from 'swr';
 import {
   Button,
   ButtonSet,
@@ -14,15 +13,7 @@ import {
 } from '@carbon/react';
 import { WarningFilled } from '@carbon/react/icons';
 import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
-import {
-  ExtensionSlot,
-  useLayoutType,
-  showNotification,
-  showToast,
-  showModal,
-  fhirBaseUrl,
-} from '@openmrs/esm-framework';
-
+import { ExtensionSlot, useLayoutType, showNotification, showToast, showModal } from '@openmrs/esm-framework';
 import { markPatientDeceased, usePatientDeceased } from './deceased.resource';
 import BaseConceptAnswer from './base-concept-answer.component';
 
@@ -30,7 +21,6 @@ import styles from './deceased-form.scss';
 
 const MarkPatientDeceasedForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace }) => {
   const { t } = useTranslation();
-  const { mutate } = useSWRConfig();
   const isTablet = useLayoutType() === 'tablet';
   const state = useMemo(() => ({ patientUuid }), [patientUuid]);
   const [selectedCauseOfDeath, setSelectedCauseOfDeath] = useState('');
@@ -51,7 +41,6 @@ const MarkPatientDeceasedForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
             description: t('setDeceasedSuccessfully', 'Patient has been marked dead successfully'),
           });
           refetchPatient();
-          mutate(`${fhirBaseUrl}/patient/${patientUuid}`);
           closeWorkspace();
         }
       })

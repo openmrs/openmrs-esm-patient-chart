@@ -1,7 +1,10 @@
+import { useMemo } from 'react';
+import useSWR from 'swr';
+
 import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import useSWRImmutable from 'swr/immutable';
 import { ConfigObject } from '../config-schema';
-import { Patient } from '../types';
+import { Patient, PersonFetchResponse } from '../types';
 
 const customRepresentation =
   'custom:(uuid,display,identifiers:(identifier,uuid,preferred,location:(uuid,name),identifierType:(uuid,name,format,formatDescription,validator)),person:(uuid,display,gender,birthdate,dead,age,deathDate,birthdateEstimated,causeOfDeath,preferredName:(uuid,preferred,givenName,middleName,familyName),attributes,preferredAddress:(uuid,preferred,address1,address2,cityVillage,longitude,stateProvince,latitude,country,postalCode,countyDistrict,address3,address4,address5,address6,address7)))';
@@ -20,6 +23,7 @@ export const usePatientAttributes = (patientUuid: string) => {
   return {
     isLoading: !data && !error,
     attributes: data?.data?.person?.attributes ?? [],
+    person: data?.data?.person ?? null,
     error: error,
   };
 };
@@ -41,3 +45,21 @@ export const usePatientContactAttributes = (patientUuid: string) => {
     isLoading,
   };
 };
+
+export function useOmrRestPatient(patientUuid: string) {
+  const { data, error, isValidating, mutate } = useSWR<{ data: PersonFetchResponse }, Error>(
+    `/ws/rest/v1/patient/${patientUuid}`,
+    openmrsFetch,
+  );
+  const result = useMemo(() => {
+    return {
+      person: data?.data?.person ?? null,
+      personError: error,
+      isPersonLoading: !data && !error,
+      isPersonError: error,
+      isPersonValidating: isValidating,
+      mutate,
+    };
+  }, [data, error, isValidating, mutate]);
+  return result;
+}
