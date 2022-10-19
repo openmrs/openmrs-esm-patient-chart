@@ -76,7 +76,7 @@ const LabSetPanel: React.FC<LabSetPanelProps> = ({ panel, observations, activePa
               content: <span>{`${test.value} ${test.meta?.units}`}</span>,
             },
             interpretation: test.interpretation,
-            range: `${test.meta?.range} ${test.meta?.units}` ?? '--',
+            range: test.meta.range ? `${test.meta?.range} ${test.meta?.units}` : '--',
           }))
         : observations.map((test) => ({
             id: test.id,
