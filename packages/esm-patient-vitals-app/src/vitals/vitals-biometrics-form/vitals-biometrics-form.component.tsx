@@ -50,52 +50,70 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
 
   const savePatientVitalsAndBiometrics = (event: SyntheticEvent) => {
     event.preventDefault();
-    setIsSubmitting(true);
-    const ac = new AbortController();
-    savePatientVitals(
-      config.vitals.encounterTypeUuid,
-      config.vitals.formUuid,
-      config.concepts,
-      patientUuid,
-      patientVitalAndBiometrics,
-      new Date(),
-      ac,
-      session?.sessionLocation?.uuid,
-    )
-      .then((response) => {
-        if (response.status === 201) {
-          closeWorkspace();
-
-          showToast({
-            critical: true,
-            kind: 'success',
-            title: t('vitalsAndBiometricsRecorded', 'Vitals and Biometrics saved'),
-            description: t('vitalsAndBiometricsNowAvailable', 'They are now visible on the Vitals and Biometrics page'),
-          });
-
-          const apiUrlPattern = new RegExp(
-            fhirBaseUrl + '\\/Observation\\?subject\\:Patient\\=' + patientUuid + '\\&code\\=',
-          );
-
-          // Find matching keys from SWR's cache and broadcast a revalidation message to their pre-bound SWR hooks
-          Array.from(cache.keys())
-            .filter((url: string) => apiUrlPattern.test(url))
-            .forEach((url: string) => mutate(url));
-        }
-      })
-      .catch((err) => {
-        createErrorHandler();
-
+    let isFieldValid = true;
+    for (let key in patientVitalAndBiometrics) {
+      if (isInNormalRange(conceptMetadata, config.concepts[key + 'Uuid'], patientVitalAndBiometrics[key]) == false) {
+        isFieldValid = false;
         showNotification({
           title: t('vitalsAndBiometricsSaveError', 'Error saving vitals and biometrics'),
           kind: 'error',
           critical: true,
-          description: err?.message,
+          description: t('checkForValidity', 'Some of the values entered are invalid'),
         });
-      })
-      .finally(() => {
-        ac.abort();
-      });
+        break;
+      }
+    }
+    if (isFieldValid) {
+      setIsSubmitting(true);
+      const ac = new AbortController();
+      savePatientVitals(
+        config.vitals.encounterTypeUuid,
+        config.vitals.formUuid,
+        config.concepts,
+        patientUuid,
+        patientVitalAndBiometrics,
+        new Date(),
+        ac,
+        session?.sessionLocation?.uuid,
+      )
+        .then((response) => {
+          if (response.status === 201) {
+            closeWorkspace();
+
+            showToast({
+              critical: true,
+              kind: 'success',
+              title: t('vitalsAndBiometricsRecorded', 'Vitals and Biometrics saved'),
+              description: t(
+                'vitalsAndBiometricsNowAvailable',
+                'They are now visible on the Vitals and Biometrics page',
+              ),
+            });
+
+            const apiUrlPattern = new RegExp(
+              fhirBaseUrl + '\\/Observation\\?subject\\:Patient\\=' + patientUuid + '\\&code\\=',
+            );
+
+            // Find matching keys from SWR's cache and broadcast a revalidation message to their pre-bound SWR hooks
+            Array.from(cache.keys())
+              .filter((url: string) => apiUrlPattern.test(url))
+              .forEach((url: string) => mutate(url));
+          }
+        })
+        .catch((err) => {
+          createErrorHandler();
+
+          showNotification({
+            title: t('vitalsAndBiometricsSaveError', 'Error saving vitals and biometrics'),
+            kind: 'error',
+            critical: true,
+            description: err?.message,
+          });
+        })
+        .finally(() => {
+          ac.abort();
+        });
+    }
   };
 
   useEffect(() => {
@@ -305,7 +323,11 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                   },
                 ]}
                 unitSymbol={conceptUnits.get(config.concepts.weightUuid) ?? ''}
-                inputIsNormal={true}
+                inputIsNormal={isInNormalRange(
+                  conceptMetadata,
+                  config.concepts['weightUuid'],
+                  patientVitalAndBiometrics?.weight,
+                )}
               />
             </Column>
             <Column className={styles.column}>
