@@ -40,30 +40,34 @@ export function exist(...args: any[]): boolean {
   return true;
 }
 
-export const assessValue: (any) => (value: number) => OBSERVATION_INTERPRETATION =
+export const assessValue: (any) => (value: string) => OBSERVATION_INTERPRETATION =
   (meta) =>
-  (value: number): observationInterpretation => {
-    if (exist(meta.hiAbsolute) && value > meta.hiAbsolute) {
+  (value: string): observationInterpretation => {
+    const valueQuantity = parseFloat(value);
+    if (isNaN(valueQuantity)) {
+      return observationInterpretation.NORMAL;
+    }
+    if (exist(meta.hiAbsolute) && valueQuantity > meta.hiAbsolute) {
       return observationInterpretation.OFF_SCALE_HIGH;
     }
 
-    if (exist(meta.hiCritical) && value > meta.hiCritical) {
+    if (exist(meta.hiCritical) && valueQuantity > meta.hiCritical) {
       return observationInterpretation.CRITICALLY_HIGH;
     }
 
-    if (exist(meta.hiNormal) && value > meta.hiNormal) {
+    if (exist(meta.hiNormal) && valueQuantity > meta.hiNormal) {
       return observationInterpretation.HIGH;
     }
 
-    if (exist(meta.lowAbsolute) && value < meta.lowAbsolute) {
+    if (exist(meta.lowAbsolute) && valueQuantity < meta.lowAbsolute) {
       return observationInterpretation.OFF_SCALE_LOW;
     }
 
-    if (exist(meta.lowCritical) && value < meta.lowCritical) {
+    if (exist(meta.lowCritical) && valueQuantity < meta.lowCritical) {
       return observationInterpretation.CRITICALLY_LOW;
     }
 
-    if (exist(meta.lowNormal) && value < meta.lowNormal) {
+    if (exist(meta.lowNormal) && valueQuantity < meta.lowNormal) {
       return observationInterpretation.LOW;
     }
 
