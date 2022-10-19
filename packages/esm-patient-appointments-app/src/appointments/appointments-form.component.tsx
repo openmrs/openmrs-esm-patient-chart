@@ -132,6 +132,28 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
         ))}
     </Select>
   );
+
+  const timePicker = (
+    <TimePicker
+      pattern="([\d]+:[\d]{2})"
+      onChange={(event) => setStartTime(event.target.value)}
+      value={startTime}
+      style={{ marginLeft: '0.125rem', flex: 'none' }}
+      labelText={t('time', 'Time')}
+      id="time-picker"
+    >
+      <TimePickerSelect
+        id="time-picker-select-1"
+        onChange={(event) => setTimeFormat(event.target.value as amPm)}
+        value={timeFormat}
+        labelText={t('time', 'Time')}
+        aria-label={t('time', 'Time')}
+      >
+        <SelectItem value="AM" text="AM" />
+        <SelectItem value="PM" text="PM" />
+      </TimePickerSelect>
+    </TimePicker>
+  );
   return (
     <Form className={styles.formWrapper}>
       <Stack gap={4}>
@@ -156,49 +178,7 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
                 placeholder="dd/mm/yyyy"
               />
             </DatePicker>
-            {isTablet ? (
-              <Layer>
-                <TimePicker
-                  pattern="([\d]+:[\d]{2})"
-                  onChange={(event) => setStartTime(event.target.value)}
-                  value={startTime}
-                  style={{ marginLeft: '0.125rem', flex: 'none' }}
-                  labelText={t('time', 'Time')}
-                  id="time-picker"
-                >
-                  <TimePickerSelect
-                    id="time-picker-select-1"
-                    onChange={(event) => setTimeFormat(event.target.value as amPm)}
-                    value={timeFormat}
-                    labelText={t('time', 'Time')}
-                    aria-label={t('time', 'Time')}
-                  >
-                    <SelectItem value="AM" text="AM" />
-                    <SelectItem value="PM" text="PM" />
-                  </TimePickerSelect>
-                </TimePicker>
-              </Layer>
-            ) : (
-              <TimePicker
-                pattern="([\d]+:[\d]{2})"
-                onChange={(event) => setStartTime(event.target.value)}
-                value={startTime}
-                style={{ marginLeft: '0.125rem', flex: 'none' }}
-                labelText={t('time', 'Time')}
-                id="time-picker"
-              >
-                <TimePickerSelect
-                  id="time-picker-select-1"
-                  onChange={(event) => setTimeFormat(event.target.value as amPm)}
-                  value={timeFormat}
-                  labelText={t('time', 'Time')}
-                  aria-label={t('time', 'Time')}
-                >
-                  <SelectItem value="AM" text="AM" />
-                  <SelectItem value="PM" text="PM" />
-                </TimePickerSelect>
-              </TimePicker>
-            )}
+            {isTablet ? <Layer> {timePicker} </Layer> : timePicker}
           </div>
         </section>
         <section className={styles.formGroup}>
