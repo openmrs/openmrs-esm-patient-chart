@@ -178,7 +178,7 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
                 placeholder="dd/mm/yyyy"
               />
             </DatePicker>
-            {isTablet ? <Layer> {timePicker} </Layer> : timePicker}
+            {isTablet ? <Layer>{timePicker}</Layer> : timePicker}
           </div>
         </section>
         <section className={styles.formGroup}>
