@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tag, DefinitionTooltip } from '@carbon/react';
 import { formatDatetime, parseDate } from '@openmrs/esm-framework';
-import { useOmrRestPatient } from '../hooks/usePatientAttributes';
+import { useOmrsRestPatient } from '../hooks/usePatientAttributes';
 import styles from './deceased-patient-tag.scss';
 
 interface DeceasedPatientBannerTagProps {
@@ -11,7 +11,7 @@ interface DeceasedPatientBannerTagProps {
 }
 const DeceasedPatientBannerTag: React.FC<DeceasedPatientBannerTagProps> = ({ patient, patientUuid }) => {
   const { t } = useTranslation();
-  const { person } = useOmrRestPatient(patientUuid);
+  const { person } = useOmrsRestPatient(patientUuid);
 
   const isDeceased = person?.dead || patient.deceasedDateTime;
 
