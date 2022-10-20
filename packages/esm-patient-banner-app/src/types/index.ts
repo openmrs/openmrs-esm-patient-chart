@@ -27,6 +27,9 @@ export interface Person {
   display: string;
   preferredAddress: OpenmrsResource;
   uuid: string;
+  dead?: boolean;
+  deathDate?: Date;
+  type?: string;
 }
 
 export interface Attribute {
@@ -34,4 +37,8 @@ export interface Attribute {
   display: string;
   uuid: string;
   value: string | number;
+}
+
+export interface PersonFetchResponse {
+  person: { uuid: string; dead: boolean; deathDate: Date; type: string };
 }
