@@ -1,7 +1,7 @@
-import { FormEncounter, FormEncounterResource } from '../types';
-import { HtmlFormEntryForm } from '../config-schema';
 import useSWR from 'swr';
 import { getDynamicOfflineDataEntries } from '@openmrs/esm-framework';
+import { FormEncounter, FormEncounterResource } from '../types';
+import { HtmlFormEntryForm } from '../config-schema';
 
 /**
  * Returns whether the given form encounter is valid for offline mode and can be cached.

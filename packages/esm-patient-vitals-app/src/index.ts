@@ -2,6 +2,10 @@ import { defineConfigSchema, fhirBaseUrl, getAsyncLifecycle, messageOmrsServiceW
 import { configSchema } from './config-schema';
 import { patientVitalsBiometricsFormWorkspace } from './constants';
 
+declare var __VERSION__: string;
+// __VERSION__ is replaced by Webpack with the version from package.json
+const version = __VERSION__;
+
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 const backendDependencies = {
@@ -73,4 +77,4 @@ function setupOpenMRS() {
   };
 }
 
-export { backendDependencies, importTranslation, setupOpenMRS };
+export { backendDependencies, importTranslation, setupOpenMRS, version };

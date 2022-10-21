@@ -32,10 +32,28 @@ export const esmPatientChartSchema = {
     _default: '/etl-latest/etl/patient/',
     _description: 'Custom URL to load resources required for showing recommended visit types',
   },
+  showAllEncountersTab: {
+    _type: Type.Boolean,
+    _description: 'Shows the All Encounters Tab of Patient Visits section in Patient Chart',
+    _default: false,
+  },
 };
 
 export interface ChartConfig {
   offlineVisitTypeUuid: string;
   visitTypeResourceUrl: string;
   showRecommendedVisitTypeTab: boolean;
+}
+
+export const configSchema = {
+  contactAttributeType: {
+    _type: Type.UUID,
+    _description:
+      'The Uuids of person attribute-type that captures contact information `e.g Next of kin contact details`',
+    _default: [],
+  },
+};
+
+export interface ConfigObject {
+  contactAttributeType: Array<string>;
 }

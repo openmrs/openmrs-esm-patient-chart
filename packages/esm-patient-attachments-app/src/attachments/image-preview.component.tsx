@@ -1,23 +1,43 @@
-import React from 'react';
-import styles from './attachments-grid-overview.scss';
-import { Attachment } from './attachments-types';
-import { Button, OverflowMenu, OverflowMenuItem } from 'carbon-components-react';
-import Close from '@carbon/icons-react/es/close/24';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Button, OverflowMenu, OverflowMenuItem } from '@carbon/react';
+import { Close } from '@carbon/react/icons';
+import { Attachment } from '../attachments-types';
+import styles from './image-preview.scss';
 
-interface ImagePreviewProps {
+interface AttachmentPreviewProps {
   closePreview: any;
-  imageSelected: Attachment;
+  attachmentToPreview: Attachment;
   deleteAttachment: (attachment: Attachment) => void;
 }
 
-const ImagePreview: React.FC<ImagePreviewProps> = ({ closePreview, imageSelected, deleteAttachment }) => {
+const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
+  closePreview,
+  attachmentToPreview,
+  deleteAttachment,
+}) => {
   const { t } = useTranslation();
 
+  useEffect(() => {
+    const closePreviewOnEscape = (evt) => {
+      if (evt.key == 'Escape') {
+        closePreview();
+      }
+    };
+
+    window.addEventListener('keydown', closePreviewOnEscape);
+
+    return () => {
+      window.removeEventListener('keydown', closePreviewOnEscape);
+    };
+  }, [closePreview]);
+
   return (
-    <div className={styles.imagePreview}>
+    <div className={styles.attachmentPreview}>
       <div className={styles.leftPanel}>
         <Button
+          iconDescription={t('closePreview', 'Close preview')}
+          label={t('closePreview', 'Close preview')}
           kind="ghost"
           className={styles.closePreviewButton}
           hasIconOnly
@@ -25,20 +45,31 @@ const ImagePreview: React.FC<ImagePreviewProps> = ({ closePreview, imageSelected
           onClick={closePreview}
         />
         <div className={styles.attachmentImage}>
-          <img src={imageSelected.src} alt={imageSelected.title} />
+          {attachmentToPreview.bytesContentFamily === 'IMAGE' ? (
+            <img src={attachmentToPreview.src} alt={attachmentToPreview.title} />
+          ) : attachmentToPreview.bytesContentFamily === 'PDF' ? (
+            <iframe title="PDFViewer" className={styles.pdfViewer} src={attachmentToPreview.src} />
+          ) : null}
         </div>
         <div className={styles.overflowMenu}>
-          <Button kind="danger" onClick={() => deleteAttachment(imageSelected)}>
-            {t('deleteImage', 'Delete image')}
-          </Button>
+          <OverflowMenu className={styles.overflowMenu}>
+            <OverflowMenuItem
+              hasDivider
+              isDelete
+              itemText={t('deleteImage', 'Delete image')}
+              onClick={() => deleteAttachment(attachmentToPreview)}
+            />
+          </OverflowMenu>
         </div>
       </div>
       <div className={styles.rightPanel}>
-        <h4 className={styles.productiveHeading02}>{imageSelected.title}</h4>
-        <p className={`${styles.bodyLong01} ${styles.imageDescription}`}>Description</p>
+        <h4 className={styles.productiveHeading02}>{attachmentToPreview.title}</h4>
+        {attachmentToPreview?.description ? (
+          <p className={`${styles.bodyLong01} ${styles.imageDescription}`}>{attachmentToPreview.description}</p>
+        ) : null}
       </div>
     </div>
   );
 };
 
-export default ImagePreview;
+export default AttachmentPreview;

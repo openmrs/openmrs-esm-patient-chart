@@ -1,4 +1,4 @@
-import { Form } from '@ampath-kenya/ngx-formentry';
+import { Form } from '@openmrs/ngx-formentry';
 
 interface OpenMRSResource {
   display: string;
@@ -191,9 +191,16 @@ export interface MonthlyScheduleParams {
 }
 
 export interface FormEntryConfig {
+  /** @deprecated use customDataSources instead */
   dataSources: {
+    /** @deprecated should be converted to customDataSource */
     monthlySchedule: boolean;
   };
+  customDataSources: {
+    name: string;
+    moduleName: string;
+    moduleExport: 'default' | string;
+  }[];
   appointmentsResourceUrl: string;
 }
 

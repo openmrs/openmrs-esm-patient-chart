@@ -1,33 +1,33 @@
 import {
   DataTable,
-  TableContainer,
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  TableHeader,
   DataTableSkeleton,
   OverflowMenu,
   OverflowMenuItem,
-} from 'carbon-components-react';
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@carbon/react';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Attachment } from './attachments-types';
+import { Attachment } from '../attachments-types';
 import styles from './attachments-table-overview.scss';
 
 interface AttachmentsTableOverviewProps {
   isLoading: boolean;
   attachments: Array<Attachment>;
   deleteAttachment: (attachment: Attachment) => void;
-  onAttachmentSelect: (attachment: Attachment) => void;
+  openAttachment: (attachment: Attachment) => void;
 }
 
 const AttachmentsTableOverview: React.FC<AttachmentsTableOverviewProps> = ({
   attachments,
   isLoading,
   deleteAttachment,
-  onAttachmentSelect,
+  openAttachment,
 }) => {
   const { t } = useTranslation();
 
@@ -36,25 +36,14 @@ const AttachmentsTableOverview: React.FC<AttachmentsTableOverviewProps> = ({
       attachments.map((attachment) => ({
         id: attachment.id,
         fileName: (
-          <span
-            role="button"
-            tabIndex={0}
-            className={styles.link}
-            onClick={() => {
-              if (attachment.bytesContentFamily === 'IMAGE') {
-                onAttachmentSelect(attachment);
-              } else {
-                window.open(attachment.src, '_blank');
-              }
-            }}
-          >
+          <span role="button" tabIndex={0} className={styles.link} onClick={() => openAttachment(attachment)}>
             {attachment.title}
           </span>
         ),
         type: attachment.bytesContentFamily,
         dateUploaded: attachment.dateTime,
       })),
-    [attachments, onAttachmentSelect],
+    [attachments, openAttachment],
   );
 
   const headers = useMemo(
@@ -112,7 +101,7 @@ const AttachmentsTableOverview: React.FC<AttachmentsTableOverviewProps> = ({
                   {row.cells.map((cell) => (
                     <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                   ))}
-                  <TableCell className="cds--table-column-menu">
+                  <TableCell>
                     <OverflowMenu size="sm" flipped>
                       <OverflowMenuItem
                         itemText={t('delete', 'Delete')}

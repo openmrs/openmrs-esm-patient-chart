@@ -3,7 +3,6 @@ import dayjs from 'dayjs';
 const utc = require('dayjs/plugin/utc');
 dayjs.extend(utc);
 import { useTranslation } from 'react-i18next';
-import { Appointment } from '../types';
 import {
   DataTable,
   Table,
@@ -14,10 +13,11 @@ import {
   TableHeader,
   TableRow,
   DataTableHeader,
-} from 'carbon-components-react';
+} from '@carbon/react';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { formatDatetime, parseDate, usePagination } from '@openmrs/esm-framework';
-import styles from './appointments-table.component.scss';
+import { Appointment } from '../types';
+import styles from './appointments-table.scss';
 
 const pageSize = 5;
 
@@ -44,7 +44,7 @@ const AppointmentsTable: React.FC<AppointmentTableProps> = ({ patientAppointment
         return {
           id: appointment.uuid,
           date: formatDatetime(parseDate(appointment.startDateTime), { mode: 'wide' }),
-          location: appointment.location.name,
+          location: appointment?.location?.name ?? '--',
           service: appointment.service.name,
         };
       }),
@@ -53,9 +53,9 @@ const AppointmentsTable: React.FC<AppointmentTableProps> = ({ patientAppointment
 
   return (
     <div>
-      <TableContainer>
-        <DataTable rows={tableRows} headers={tableHeaders} isSortable={true} size="short">
-          {({ rows, headers, getHeaderProps, getTableProps }) => (
+      <DataTable rows={tableRows} headers={tableHeaders} isSortable size="sm">
+        {({ rows, headers, getHeaderProps, getTableProps }) => (
+          <TableContainer>
             <Table {...getTableProps()} useZebraStyles>
               <TableHead>
                 <TableRow>
@@ -82,9 +82,9 @@ const AppointmentsTable: React.FC<AppointmentTableProps> = ({ patientAppointment
                 ))}
               </TableBody>
             </Table>
-          )}
-        </DataTable>
-      </TableContainer>
+          </TableContainer>
+        )}
+      </DataTable>
       <PatientChartPagination
         currentItems={paginatedAppointments.length}
         totalItems={patientAppointments.length}

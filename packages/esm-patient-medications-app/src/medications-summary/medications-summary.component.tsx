@@ -1,10 +1,10 @@
 import React from 'react';
-import MedicationsDetailsTable from '../components/medications-details-table.component';
-import { DataTableSkeleton } from 'carbon-components-react';
 import { useTranslation } from 'react-i18next';
-import { EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { usePatientOrders } from '../api/api';
+import { DataTableSkeleton } from '@carbon/react';
 import { useConfig } from '@openmrs/esm-framework';
+import { EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import MedicationsDetailsTable from '../components/medications-details-table.component';
+import { usePatientOrders } from '../api/api';
 import { ConfigObject } from '../config-schema';
 
 export interface MedicationsSummaryProps {
@@ -18,13 +18,14 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
 
   const {
     data: activeOrders,
-    isError: isErrorActiveOrders,
+    error: activeOrdersError,
     isLoading: isLoadingActiveOrders,
     isValidating: isValidatingActiveOrders,
   } = usePatientOrders(patientUuid, 'ACTIVE', config.careSettingUuid);
+
   const {
     data: pastOrders,
-    isError: isErrorPastOrders,
+    error: pastOrdersError,
     isLoading: isLoadingPastOrders,
     isValidating: isValidatingPastOrders,
   } = usePatientOrders(patientUuid, 'any', config.careSettingUuid);
@@ -37,7 +38,9 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
           const headerTitle = t('activeMedicationsHeaderTitle', 'active medications');
 
           if (isLoadingActiveOrders) return <DataTableSkeleton role="progressbar" />;
-          if (isErrorActiveOrders) return <ErrorState error={isErrorActiveOrders} headerTitle={headerTitle} />;
+
+          if (activeOrdersError) return <ErrorState error={activeOrdersError} headerTitle={headerTitle} />;
+
           if (activeOrders?.length) {
             return (
               <MedicationsDetailsTable
@@ -51,6 +54,7 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
               />
             );
           }
+
           return <EmptyState displayText={displayText} headerTitle={headerTitle} />;
         })()}
       </div>
@@ -60,7 +64,9 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
           const headerTitle = t('pastMedicationsHeaderTitle', 'past medications');
 
           if (isLoadingPastOrders) return <DataTableSkeleton role="progressbar" />;
-          if (isErrorPastOrders) return <ErrorState error={isErrorPastOrders} headerTitle={headerTitle} />;
+
+          if (pastOrdersError) return <ErrorState error={pastOrdersError} headerTitle={headerTitle} />;
+
           if (pastOrders?.length) {
             return (
               <MedicationsDetailsTable
@@ -74,6 +80,7 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
               />
             );
           }
+
           return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchOrderBasket} />;
         })()}
       </div>

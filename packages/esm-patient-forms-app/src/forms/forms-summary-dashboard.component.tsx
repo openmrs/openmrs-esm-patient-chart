@@ -1,8 +1,7 @@
-import React, { FunctionComponent } from 'react';
-import Forms from './forms.component';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { InlineLoading } from 'carbon-components-react';
 import { useActivePatientEnrollment } from '@openmrs/esm-patient-common-lib';
+import Forms from './forms.component';
 
 interface FormsProps {
   patientUuid: string;
@@ -10,28 +9,24 @@ interface FormsProps {
   isOffline: boolean;
 }
 
-const FormsSummaryDashboard: FunctionComponent<FormsProps> = ({ patientUuid, patient, isOffline }) => {
+const FormsSummaryDashboard: React.FC<FormsProps> = ({ patientUuid, patient, isOffline }) => {
   const pageSize: number = 5;
   const { t } = useTranslation();
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
   const urlLabel: string = t('seeAll', 'See all');
-  const pageUrl: string = `$\{openmrsSpaBase}/patient/${patientUuid}/chart/forms`;
+  const pageUrl: string = `$\{openmrsSpaBase}/patient/${patientUuid}/chart/Forms & Notes`;
 
   return (
     <>
-      {isLoading ? (
-        <InlineLoading description={t('loading', 'Loading...')} />
-      ) : (
-        <Forms
-          patientUuid={patientUuid}
-          patient={patient}
-          pageSize={pageSize}
-          urlLabel={urlLabel}
-          pageUrl={pageUrl}
-          isOffline={isOffline}
-          activePatientEnrollment={activePatientEnrollment}
-        />
-      )}
+      <Forms
+        patientUuid={patientUuid}
+        patient={patient}
+        pageSize={pageSize}
+        urlLabel={urlLabel}
+        pageUrl={pageUrl}
+        isOffline={isOffline}
+        activePatientEnrollment={activePatientEnrollment}
+      />
     </>
   );
 };

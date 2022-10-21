@@ -1,8 +1,7 @@
-import { attach } from '@openmrs/esm-framework';
-import { ButtonSet, Button } from 'carbon-components-react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Attachment } from './attachments-types';
+import { Button, ModalHeader, ModalBody, ModalFooter } from '@carbon/react';
+import { Attachment } from '../attachments-types';
 import styles from './delete-attachment-confirmation-modal.scss';
 
 interface DeleteAttachmentConfirmationProps {
@@ -19,25 +18,27 @@ const DeleteAttachmentConfirmation: React.FC<DeleteAttachmentConfirmationProps> 
   const { t } = useTranslation();
 
   return (
-    <div className={styles.container}>
-      <h3 className={styles.productiveHeading03}>
+    <>
+      <ModalHeader className={styles.productiveHeading03}>
         {t('delete', 'Delete')} {attachment.bytesContentFamily.toLowerCase()} ?
-      </h3>
-      <p className={styles.bodyLong01}>
-        {t(
-          'deleteAttachmentConfirmationText',
-          `Are you sure you want to delete this ${attachment.bytesContentFamily.toLowerCase()}? This action can't be undone.`,
-        )}
-      </p>
-      <ButtonSet className={styles.buttonSet}>
+      </ModalHeader>
+      <ModalBody>
+        <p className={styles.bodyLong01}>
+          {t(
+            'deleteAttachmentConfirmationText',
+            `Are you sure you want to delete this ${attachment.bytesContentFamily.toLowerCase()}? This action can't be undone.`,
+          )}
+        </p>
+      </ModalBody>
+      <ModalFooter>
         <Button size="lg" kind="secondary" onClick={() => close()}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button size="lg" kind="danger" onClick={() => onConfirmation?.(attachment)}>
+        <Button size="lg" kind="danger" onClick={() => onConfirmation?.(attachment)} autoFocus>
           {t('delete', 'Delete')}
         </Button>
-      </ButtonSet>
-    </div>
+      </ModalFooter>
+    </>
   );
 };
 

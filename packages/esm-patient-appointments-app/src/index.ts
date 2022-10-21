@@ -2,6 +2,10 @@ import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmr
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { dashboardMeta } from './dashboard.meta';
 
+declare var __VERSION__: string;
+// __VERSION__ is replaced by Webpack with the version from package.json
+const version = __VERSION__;
+
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 const backendDependencies = {
@@ -32,7 +36,7 @@ function setupOpenMRS() {
       {
         name: 'appointments-details-widget',
         slot: dashboardMeta.slot,
-        load: getAsyncLifecycle(() => import('./appointments/appointments.component'), options),
+        load: getAsyncLifecycle(() => import('./appointments/appointments-detailed-summary.component'), options),
         meta: {
           columnSpan: 1,
         },
@@ -48,11 +52,11 @@ function setupOpenMRS() {
         name: 'appointments-form-workspace',
         load: getAsyncLifecycle(() => import('./appointments/appointments-form.component'), options),
         meta: {
-          title: 'Create appointment',
+          title: 'Schedule appointment',
         },
       },
     ],
   };
 }
 
-export { backendDependencies, importTranslation, setupOpenMRS };
+export { backendDependencies, importTranslation, setupOpenMRS, version };

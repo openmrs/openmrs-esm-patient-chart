@@ -1,10 +1,10 @@
 import React from 'react';
-import EndVisitDialog from './end-visit-dialog.component';
-import { screen, render, waitFor } from '@testing-library/react';
+import { of, throwError } from 'rxjs';
+import { screen, render } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { showNotification, showToast, updateVisit, useVisit } from '@openmrs/esm-framework';
 import { mockCurrentVisit } from '../../../../../__mocks__/visits.mock';
-import userEvent from '@testing-library/user-event';
-import { of, throwError } from 'rxjs';
+import EndVisitDialog from './end-visit-dialog.component';
 
 const endVisitPayload = {
   location: '6351fcf4-e311-4a19-90f9-35667d99a8af',
@@ -30,25 +30,33 @@ jest.mock('@openmrs/esm-framework', () => {
   };
 });
 
-describe('EndVisit', () => {
-  beforeEach(() => {
-    jest.resetAllMocks();
-  });
-
+describe('End Visit', () => {
   test('should end an active visit and display toast message', async () => {
+    const user = userEvent.setup();
+
     mockUseVisit.mockReturnValue({ currentVisit: mockCurrentVisit, mutate: mockMutate });
-    mockUpdateVisit.mockReturnValueOnce(of({ status: 200 }));
-    render(<EndVisitDialog patientUuid="some-patient-uuid" closeModal={mockCloseModal} />);
+    mockUpdateVisit.mockReturnValueOnce(
+      of({
+        status: 200,
+        data: {
+          visitType: {
+            display: 'Facility Visit',
+          },
+        },
+      }),
+    );
+
+    renderEndVisitDialog();
 
     expect(screen.getByRole('heading', { name: /End active visit/ })).toBeInTheDocument();
     expect(
-      screen.getByText('Ending this visit, will not allow you to fill another encounter form for this patient'),
+      screen.getByText(/Ending this visit will not allow you to fill another encounter form for this patient/i),
     ).toBeInTheDocument();
 
     const endVisitButton = await screen.findByRole('button', { name: /End Visit/i });
     expect(endVisitButton).toBeInTheDocument();
 
-    userEvent.click(endVisitButton);
+    await user.click(endVisitButton);
 
     expect(updateVisit).toHaveBeenCalledWith(
       '17f512b4-d264-4113-a6fe-160cb38cb46e',
@@ -56,23 +64,31 @@ describe('EndVisit', () => {
       expect.anything(),
     );
 
-    expect(mockShowToast).toHaveBeenCalledWith({ description: 'Ended active visit successfully', kind: 'success' });
+    expect(mockShowToast).toHaveBeenCalledWith({
+      critical: true,
+      description: 'Facility Visit ended successfully',
+      kind: 'success',
+      title: 'Visit ended',
+    });
   });
 
   test('should display error message when rest api call to end visit fails', async () => {
+    const user = userEvent.setup();
+
     mockUseVisit.mockReturnValue({ currentVisit: mockCurrentVisit, mutate: mockMutate });
     mockUpdateVisit.mockReturnValueOnce(throwError(new Error('Internal error message')));
-    render(<EndVisitDialog patientUuid="some-patient-uuid" closeModal={mockCloseModal} />);
+
+    renderEndVisitDialog();
 
     expect(screen.getByRole('heading', { name: /End active visit/ })).toBeInTheDocument();
     expect(
-      screen.getByText('Ending this visit, will not allow you to fill another encounter form for this patient'),
+      screen.getByText(/Ending this visit will not allow you to fill another encounter form for this patient/i),
     ).toBeInTheDocument();
 
     const endVisitButton = await screen.findByRole('button', { name: /End Visit/i });
     expect(endVisitButton).toBeInTheDocument();
 
-    userEvent.click(endVisitButton);
+    await user.click(endVisitButton);
 
     expect(updateVisit).toHaveBeenCalledWith(
       '17f512b4-d264-4113-a6fe-160cb38cb46e',
@@ -88,3 +104,7 @@ describe('EndVisit', () => {
     });
   });
 });
+
+function renderEndVisitDialog() {
+  render(<EndVisitDialog patientUuid="some-patient-uuid" closeModal={mockCloseModal} />);
+}

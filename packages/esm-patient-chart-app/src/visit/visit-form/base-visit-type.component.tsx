@@ -1,11 +1,11 @@
 import React, { useState, useMemo } from 'react';
-import styles from './visit-type-overview.scss';
+import { useTranslation } from 'react-i18next';
 import debounce from 'lodash-es/debounce';
 import isEmpty from 'lodash-es/isEmpty';
-import { Search, RadioButtonGroup, RadioButton } from 'carbon-components-react';
+import { Layer, RadioButtonGroup, RadioButton, Search, StructuredListSkeleton } from '@carbon/react';
 import { EmptyState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
-import { useTranslation } from 'react-i18next';
 import { useLayoutType, usePagination } from '@openmrs/esm-framework';
+import styles from './visit-type-overview.scss';
 
 interface BaseVisitTypeProps {
   onChange: (event) => void;
@@ -32,14 +32,26 @@ const BaseVisitType: React.FC<BaseVisitTypeProps> = ({ onChange, visitTypes }) =
 
   return (
     <div className={`${styles.visitTypeOverviewWrapper} ${isTablet ? styles.tablet : styles.desktop}`}>
-      {results.length ? (
+      {visitTypes.length ? (
         <>
-          <Search
-            onChange={(event) => handleSearch(event.target.value)}
-            placeholder={t('searchForAVisitType', 'Search for a visit type')}
-            labelText=""
-            light={isTablet}
-          />
+          {isTablet ? (
+            <Layer>
+              <Search
+                onChange={(event) => handleSearch(event.target.value)}
+                placeholder={t('searchForAVisitType', 'Search for a visit type')}
+                labelText=""
+                light={isTablet}
+              />
+            </Layer>
+          ) : (
+            <Search
+              onChange={(event) => handleSearch(event.target.value)}
+              placeholder={t('searchForAVisitType', 'Search for a visit type')}
+              labelText=""
+              light={isTablet}
+            />
+          )}
+
           <RadioButtonGroup
             className={styles.radioButtonGroup}
             defaultSelected="default-selected"
@@ -63,7 +75,7 @@ const BaseVisitType: React.FC<BaseVisitTypeProps> = ({ onChange, visitTypes }) =
           </div>
         </>
       ) : (
-        <EmptyState displayText={t('visitType', 'Visit type')} headerTitle={t('visitType', 'Visit type')} />
+        <StructuredListSkeleton />
       )}
     </div>
   );

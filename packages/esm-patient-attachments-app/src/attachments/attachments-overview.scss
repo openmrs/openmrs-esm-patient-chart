@@ -1,3 +1,4 @@
+@use '@carbon/styles/scss/spacing';
 @import "../root.scss";
 
 .overview {
@@ -6,10 +7,11 @@
 
 .attachmentsHeader {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr auto;
-  grid-gap: $spacing-05;
+  grid-template-columns: 2fr 1fr auto auto;
+  grid-gap: spacing.$spacing-05;
   align-items: center;
-  padding: $spacing-03 0 $spacing-03 $spacing-05;
+  padding: spacing.$spacing-04 0 spacing.$spacing-04 spacing.$spacing-05;
+  background-color: $ui-background;
 }
 
 .attachmentsHeader > h4:after {
@@ -19,8 +21,6 @@
   padding-top: 0.188rem;
   border-bottom: 0.375rem solid var(--brand-03);
 }
-
-
 
 .btnOverrides {
   bottom: 0.7rem;

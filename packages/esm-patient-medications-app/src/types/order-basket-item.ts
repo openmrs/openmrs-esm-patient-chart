@@ -1,9 +1,10 @@
 import {
-  CommonMedicationDosage,
-  CommonMedicationDosageUnit,
-  CommonMedicationFrequency,
-  CommonMedicationRoute,
-} from '../api/common-medication';
+  DosingUnit,
+  MedicationDosage,
+  MedicationFrequency,
+  MedicationRoute,
+  OrderTemplate,
+} from '../api/drug-order-template';
 import { OpenmrsResource } from './openmrs-resource';
 import { Drug } from './order';
 
@@ -11,12 +12,15 @@ export interface OrderBasketItem {
   uuid?: string;
   action: 'NEW' | 'REVISE' | 'DISCONTINUE' | 'RENEWED' | undefined;
   drug: Drug;
+  unit: DosingUnit;
   commonMedicationName: string;
-  dosage: CommonMedicationDosage;
-  dosageUnit: CommonMedicationDosageUnit;
-  frequency: CommonMedicationFrequency;
-  route: CommonMedicationRoute;
+  dosage: MedicationDosage;
+  frequency: MedicationFrequency;
+  route: MedicationRoute;
   encounterUuid: string;
+  orderer: string;
+  careSetting: string;
+  quantityUnits: string;
   patientInstructions: string;
   asNeeded: boolean;
   asNeededCondition: string;
@@ -38,4 +42,5 @@ export interface OrderBasketItem {
       };
     };
   };
+  template?: OrderTemplate;
 }

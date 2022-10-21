@@ -6,6 +6,10 @@ interface WorkspaceWindowSize {
   size: WorkspaceWindowState;
 }
 
+interface WorkspaceWindowSizeProviderProps {
+  children?: React.ReactNode;
+}
+
 interface WorkspaceWindowSizeContext {
   windowSize: WorkspaceWindowSize;
   updateWindowSize?(value: WorkspaceWindowState): any;
@@ -32,7 +36,7 @@ export const useWorkspaceWindowSize = () => {
   return value;
 };
 
-export const WorkspaceWindowSizeProvider: React.FC = ({ children }) => {
+export const WorkspaceWindowSizeProvider: React.FC<WorkspaceWindowSizeProviderProps> = ({ children }) => {
   const initialValue: WorkspaceWindowSize = { size: 'normal' };
   const [contextWorkspaceWindowSize, updateContextWorkspaceWindowSize] = React.useReducer(reducer, initialValue);
   const { workspaces, windowState, active } = useWorkspaces();

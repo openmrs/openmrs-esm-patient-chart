@@ -1,40 +1,26 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import styles from './attachments-overview.scss';
-import Add16 from '@carbon/icons-react/es/add/16';
 import { useTranslation } from 'react-i18next';
-import { Button, ContentSwitcher, Loading, Switch } from 'carbon-components-react';
-import { LayoutType, showModal, showToast, useLayoutType, usePagination, UserHasAccess } from '@openmrs/esm-framework';
-import { PatientChartPagination, EmptyState } from '@openmrs/esm-patient-common-lib';
-import { createAttachment, deleteAttachmentPermanently, useAttachments } from './attachments.resource';
-import { createGalleryEntry } from './utils';
-import { UploadedFile, Attachment } from './attachments-types';
+import { Button, ContentSwitcher, Loading, Switch } from '@carbon/react';
+import { showModal, showToast, UserHasAccess } from '@openmrs/esm-framework';
+import { EmptyState } from '@openmrs/esm-patient-common-lib';
+import { createAttachment, deleteAttachmentPermanently, useAttachments } from '../attachments.resource';
+import { createGalleryEntry } from '../utils';
+import { UploadedFile, Attachment } from '../attachments-types';
 import AttachmentsGridOverview from './attachments-grid-overview.component';
 import AttachmentsTableOverview from './attachments-table-overview.component';
-import ImagePreview from './image-preview.component';
-
-function getPageSize(layoutType: LayoutType) {
-  switch (layoutType) {
-    case 'tablet':
-      return 9;
-    case 'phone':
-      return 3;
-    case 'desktop':
-      return 25;
-    default:
-      return 8;
-  }
-}
+import AttachmentPreview from './image-preview.component';
+import styles from './attachments-overview.scss';
+import { List, Thumbnail_2, Add } from '@carbon/react/icons';
 
 const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const { data, mutate, isValidating, isLoading } = useAttachments(patientUuid, true);
-  const [imageSelected, setImageSelected] = useState<Attachment>(null);
-  const layOutType = useLayoutType();
-  const pageSize = getPageSize(layOutType);
+  const [attachmentToPreview, setAttachmentToPreview] = useState<Attachment>(null);
   const attachments = useMemo(() => data.map((item) => createGalleryEntry(item)), [data]);
-  const pagination = usePagination(attachments, pageSize);
   const [error, setError] = useState(false);
   const [view, setView] = useState('grid');
+
+  const closeImagePDFPreview = useCallback(() => setAttachmentToPreview(null), [setAttachmentToPreview]);
 
   useEffect(() => {
     if (error === true) {
@@ -55,6 +41,8 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
         close();
       },
       onCompletion: () => mutate(),
+      multipleFiles: true,
+      collectDescription: true,
     });
   }, [patientUuid, mutate]);
 
@@ -67,7 +55,7 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
             description: `${attachment.title} ${t('successfullyDeleted', 'successfully deleted')}`,
             kind: 'success',
           });
-          setImageSelected(null);
+          setAttachmentToPreview(null);
           mutate();
         })
         .catch((error) => {
@@ -78,7 +66,7 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
           });
         });
     },
-    [mutate, t, setImageSelected],
+    [mutate, t, setAttachmentToPreview],
   );
 
   const deleteAttachmentModal = useCallback(
@@ -95,6 +83,20 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
     [deleteAttachment],
   );
 
+  const openAttachment = useCallback(
+    (attachment: Attachment) => {
+      if (attachment.bytesContentFamily === 'IMAGE' || attachment.bytesContentFamily === 'PDF') {
+        setAttachmentToPreview(attachment);
+      } else {
+        const anchor = document.createElement('a');
+        anchor.setAttribute('href', attachment.src);
+        anchor.setAttribute('download', attachment.title);
+        anchor.click();
+      }
+    },
+    [setAttachmentToPreview],
+  );
+
   if (!attachments.length) {
     return <EmptyState displayText={'attachments'} headerTitle="Attachments" launchForm={showCam} />;
   }
@@ -107,42 +109,38 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
             <h4 className={styles.productiveheading02}>{t('attachments', 'Attachments')}</h4>
             <div>{isValidating && <Loading withOverlay={false} small />}</div>
             <ContentSwitcher onChange={(evt) => setView(`${evt.name}`)}>
-              <Switch name="grid" text="Grid" selected={view === 'grid'} />
-              <Switch name="tabular" text="Table" selected={view === 'tabular'} />
+              <Switch name="grid">
+                <Thumbnail_2 size={16} />
+              </Switch>
+              <Switch name="tabular">
+                <List size={16} />
+              </Switch>
             </ContentSwitcher>
-            <Button kind="ghost" renderIcon={Add16} iconDescription="Add attachment" onClick={showCam}>
+            <Button kind="ghost" renderIcon={Add} iconDescription="Add attachment" onClick={showCam}>
               {t('add', 'Add')}
             </Button>
           </div>
           {view === 'grid' ? (
             <AttachmentsGridOverview
-              onAttachmentSelect={setImageSelected}
+              openAttachment={openAttachment}
               deleteAttachment={deleteAttachmentModal}
               isLoading={isLoading}
               attachments={attachments}
             />
           ) : (
             <AttachmentsTableOverview
-              onAttachmentSelect={setImageSelected}
+              openAttachment={openAttachment}
               deleteAttachment={deleteAttachmentModal}
               isLoading={isLoading}
               attachments={attachments}
             />
           )}
-
-          <PatientChartPagination
-            currentItems={pagination.results.length}
-            totalItems={attachments.length}
-            onPageNumberChange={(prop) => pagination.goTo(prop.page)}
-            pageNumber={pagination.currentPage}
-            pageSize={pageSize}
-          />
         </div>
       </div>
-      {imageSelected && (
-        <ImagePreview
-          closePreview={() => setImageSelected(null)}
-          imageSelected={imageSelected}
+      {attachmentToPreview && (
+        <AttachmentPreview
+          closePreview={closeImagePDFPreview}
+          attachmentToPreview={attachmentToPreview}
           deleteAttachment={deleteAttachmentModal}
         />
       )}

@@ -2,19 +2,16 @@ import React, { useState } from 'react';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
 import { useTranslation } from 'react-i18next';
-import { Button } from 'carbon-components-react';
-import InlineLoading from 'carbon-components-react/es/components/InlineLoading';
-import ChevronDown16 from '@carbon/icons-react/es/chevron--down/16';
-import ChevronUp16 from '@carbon/icons-react/es/chevron--up/16';
-import WarningFilled20 from '@carbon/icons-react/es/warning--filled/20';
+import { Button, InlineLoading } from '@carbon/react';
+import { ChevronDown, ChevronUp, WarningFilled } from '@carbon/react/icons';
 import { formatDate, parseDate, useConfig } from '@openmrs/esm-framework';
 import { launchPatientWorkspace, useVitalsConceptMetadata } from '@openmrs/esm-patient-common-lib';
 import { ConfigObject } from '../../config-schema';
 import { patientVitalsBiometricsFormWorkspace } from '../../constants';
 import {
-  assessAllValues,
   assessValue,
   getReferenceRangesForConcept,
+  hasAbnormalValues,
   interpretBloodPressure,
   useVitals,
 } from '../vitals.resource';
@@ -50,22 +47,24 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
 
   if (!isLoading && latestVitals && Object.keys(latestVitals).length && conceptMetadata?.length) {
     const isNotRecordedToday = !dayjs(latestVitals?.date).isToday();
-    const hasAbnormalValues = assessAllValues(latestVitals, config, conceptMetadata).some(
-      (value) => value !== 'normal',
-    );
 
     return (
       <div
         className={`${
-          latestVitals && hasAbnormalValues && isNotRecordedToday
+          Object.keys(latestVitals).length && hasAbnormalValues(latestVitals) && isNotRecordedToday
             ? styles['warning-background']
             : styles['default-background']
         }`}
       >
         <div className={styles['vitals-header']} role="button" tabIndex={0} onClick={toggleDetailsPanel}>
           <span className={styles.container}>
-            {hasAbnormalValues && isNotRecordedToday ? (
-              <WarningFilled20 title={'WarningFilled'} aria-label="Warning" className={styles['warning-icon']} />
+            {hasAbnormalValues(latestVitals) && isNotRecordedToday ? (
+              <WarningFilled
+                size={20}
+                title={'WarningFilled'}
+                aria-label="Warning"
+                className={styles['warning-icon']}
+              />
             ) : null}
             <span className={styles.heading}>{t('vitalsAndBiometrics', 'Vitals and biometrics')}</span>
             <span className={styles['body-text']}>
@@ -76,16 +75,12 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
             <span>{isValidating ? <InlineLoading /> : null}</span>
           </div>
           <div className={styles['button-container']}>
-            <Button
-              className={styles['record-vitals']}
-              kind="ghost"
-              size="small"
-              onClick={launchVitalsAndBiometricsForm}
-            >
+            <Button className={styles['record-vitals']} kind="ghost" size="sm" onClick={launchVitalsAndBiometricsForm}>
               {t('recordVitals', 'Record vitals')}
             </Button>
             {showDetailsPanel ? (
-              <ChevronUp16
+              <ChevronUp
+                size={16}
                 className={styles['collapse-button']}
                 title={'ChevronUp'}
                 onClick={(e) => {
@@ -94,7 +89,8 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
                 }}
               />
             ) : (
-              <ChevronDown16
+              <ChevronDown
+                size={16}
                 className={styles['expand-button']}
                 title={'ChevronDown'}
                 onClick={(e) => {
@@ -108,7 +104,9 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
         {showDetailsPanel ? (
           <div
             className={
-              hasAbnormalValues && isNotRecordedToday ? `${styles['warning-border']}` : `${styles['default-border']}`
+              hasAbnormalValues(latestVitals) && isNotRecordedToday
+                ? `${styles['warning-border']}`
+                : `${styles['default-border']}`
             }
           >
             <div className={styles.row}>
@@ -191,7 +189,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
       </span>
 
       <div className={styles.container}>
-        <Button className={styles['button-text']} onClick={launchVitalsAndBiometricsForm} kind="ghost" size="small">
+        <Button className={styles['button-text']} onClick={launchVitalsAndBiometricsForm} kind="ghost" size="sm">
           {t('recordVitals', 'Record vitals')}
         </Button>
       </div>

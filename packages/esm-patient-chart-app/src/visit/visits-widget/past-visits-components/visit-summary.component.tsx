@@ -1,17 +1,9 @@
 import React, { useState, useMemo } from 'react';
-
 import { useTranslation } from 'react-i18next';
-import { Tab, Tabs, Tag } from 'carbon-components-react';
-import {
-  formatDatetime,
-  formatTime,
-  OpenmrsResource,
-  parseDate,
-  useConfig,
-  useLayoutType,
-} from '@openmrs/esm-framework';
+import { Tab, Tabs, TabList, TabPanel, TabPanels, Tag } from '@carbon/react';
+import { formatTime, OpenmrsResource, parseDate, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { Order, Encounter, Note, Observation, OrderItem } from '../visit.resource';
-import EncounterList from './encounter-list.component';
+import VisitsTable from './visits-table/visits-table.component';
 import MedicationSummary from './medications-summary.component';
 import NotesSummary from './notes-summary.component';
 import TestsSummary from './tests-summary.component';
@@ -40,7 +32,7 @@ export interface MappedEncounter {
 const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid }) => {
   const config = useConfig();
   const { t } = useTranslation();
-  const [selectedTab, setSelectedTab] = useState(0);
+  const layout = useLayoutType();
 
   const [diagnoses, notes, medications]: [Array<DiagnosisItem>, Array<Note>, Array<OrderItem>] = useMemo(() => {
     // Medication Tab
@@ -106,46 +98,40 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid }) 
             </Tag>
           ))
         ) : (
-          <span className={`${styles.bodyLong01} ${styles.text02}`} style={{ marginBottom: '0.5rem' }}>
+          <p className={`${styles.bodyLong01} ${styles.text02}`} style={{ marginBottom: '0.5rem' }}>
             {t('noDiagnosesFound', 'No diagnoses found')}
-          </span>
+          </p>
         )}
       </div>
-      <Tabs
-        className={`${styles.verticalTabs} ${useLayoutType() === 'tablet' ? styles.tabletTabs : styles.desktopTabs}`}
-      >
-        <Tab
-          className={`${styles.tab} ${styles.bodyLong01} ${selectedTab === 0 && styles.selectedTab}`}
-          id="notes-tab"
-          onClick={() => setSelectedTab(0)}
-          label={t('notes', 'Notes')}
-        >
-          <NotesSummary notes={notes} />
-        </Tab>
-        <Tab
-          className={`${styles.tab} ${selectedTab === 1 && styles.selectedTab}`}
-          id="tests-tab"
-          onClick={() => setSelectedTab(1)}
-          label={t('tests', 'Tests')}
-        >
-          <TestsSummary patientUuid={patientUuid} encounters={encounters as Array<Encounter>} />
-        </Tab>
-        <Tab
-          className={`${styles.tab} ${selectedTab === 2 && styles.selectedTab}`}
-          id="medications-tab"
-          onClick={() => setSelectedTab(2)}
-          label={t('medications', 'Medications')}
-        >
-          <MedicationSummary medications={medications} />
-        </Tab>
-        <Tab
-          className={`${styles.tab} ${selectedTab === 3 && styles.selectedTab}`}
-          id="encounters-tab"
-          onClick={() => setSelectedTab(3)}
-          label={t('encounters', 'Encounters')}
-        >
-          <EncounterList encounters={mapEncounters(encounters)} showAllEncounters={false} />
-        </Tab>
+      <Tabs className={`${styles.verticalTabs} ${layout === 'tablet' ? styles.tabletTabs : styles.desktopTabs}`}>
+        <TabList aria-label="Visit summary tabs" className={styles.tablist}>
+          <Tab className={`${styles.tab} ${styles.bodyLong01}`} id="notes-tab">
+            {t('notes', 'Notes')}
+          </Tab>
+          <Tab className={styles.tab} id="tests-tab">
+            {t('tests', 'Tests')}
+          </Tab>
+          <Tab className={styles.tab} id="medications-tab">
+            {t('medications', 'Medications')}
+          </Tab>
+          <Tab className={styles.tab} id="encounters-tab">
+            {t('encounters', 'Encounters')}
+          </Tab>
+        </TabList>
+        <TabPanels>
+          <TabPanel>
+            <NotesSummary notes={notes} />
+          </TabPanel>
+          <TabPanel>
+            <TestsSummary patientUuid={patientUuid} encounters={encounters as Array<Encounter>} />
+          </TabPanel>
+          <TabPanel>
+            <MedicationSummary medications={medications} />
+          </TabPanel>
+          <TabPanel>
+            <VisitsTable visits={mapEncounters(encounters)} showAllEncounters={false} />
+          </TabPanel>
+        </TabPanels>
       </Tabs>
     </div>
   );
@@ -156,7 +142,7 @@ export default VisitSummary;
 export function mapEncounters(encounters) {
   return encounters?.map((encounter) => ({
     id: encounter?.uuid,
-    datetime: formatDatetime(parseDate(encounter?.encounterDatetime)),
+    datetime: encounter?.encounterDatetime,
     encounterType: encounter?.encounterType?.display,
     form: encounter?.form,
     obs: encounter?.obs,

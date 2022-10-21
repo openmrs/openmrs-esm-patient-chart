@@ -11,7 +11,7 @@ import {
   TableExpandHeader,
   TableExpandRow,
   TableExpandedRow,
-} from 'carbon-components-react';
+} from '@carbon/react';
 import { formatDate, formatTime, parseDate, usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
@@ -46,13 +46,14 @@ const PaginatedNotes: React.FC<PaginatedNotes> = ({ notes, pageSize, pageUrl, ur
         ...note,
         id: `${note.id}`,
         encounterDate: formatDate(parseDate(note.encounterDate), { mode: 'wide' }),
+        diagnoses: note.diagnoses,
       })),
     [paginatedNotes],
   );
 
   return (
     <>
-      <DataTable rows={tableRows} headers={tableHeaders} isSortable size="short" useZebraStyles>
+      <DataTable rows={tableRows} headers={tableHeaders} isSortable size="sm" useZebraStyles>
         {({ rows, headers, getTableProps, getTableContainerProps, getHeaderProps, getRowProps }) => (
           <TableContainer {...getTableContainerProps}>
             <Table {...getTableProps()}>

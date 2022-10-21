@@ -10,6 +10,10 @@ import { configSchema } from './config-schema';
 import { patientAllergiesFormWorkspace } from './constants';
 import { dashboardMeta } from './dashboard.meta';
 
+declare var __VERSION__: string;
+// __VERSION__ is replaced by Webpack with the version from package.json
+const version = __VERSION__;
+
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
 const backendDependencies = {
@@ -58,7 +62,7 @@ function setupOpenMRS() {
       {
         name: 'allergies-details-widget',
         slot: dashboardMeta.slot,
-        load: getAsyncLifecycle(() => import('./allergies/allergies.component'), options),
+        load: getAsyncLifecycle(() => import('./allergies/allergies-detailed-summary.component'), options),
         meta: {
           columnSpan: 1,
         },
@@ -112,4 +116,4 @@ function setupOpenMRS() {
   };
 }
 
-export { backendDependencies, importTranslation, setupOpenMRS };
+export { backendDependencies, importTranslation, setupOpenMRS, version };
