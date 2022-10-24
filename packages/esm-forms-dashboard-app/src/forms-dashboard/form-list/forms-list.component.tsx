@@ -25,7 +25,7 @@ import { defaultPaginationSize } from '../../constants';
 import { launchFormEntryOrHtmlForms } from '@openmrs/esm-patient-forms-app/src/form-entry-interop';
 import { HtmlFormEntryForm } from '@openmrs/esm-patient-forms-app/src/config-schema';
 
-export interface FormsListPros {
+export interface FormsListProps {
   patientUuid: string;
   patient: fhir.Patient;
   visit: Visit;
@@ -35,7 +35,7 @@ export interface FormsListPros {
   htmlFormEntryForms: Array<HtmlFormEntryForm>;
 }
 
-const FormsList: React.FC<FormsListPros> = ({
+const FormsList: React.FC<FormsListProps> = ({
   patientUuid,
   patient,
   visit,
@@ -43,7 +43,7 @@ const FormsList: React.FC<FormsListPros> = ({
   searchTerm,
   pageSize = defaultPaginationSize,
   htmlFormEntryForms,
-}: FormsListPros) => {
+}) => {
   const { t } = useTranslation();
   const { orderFormsByName } = useConfig() as ConfigObject;
   const layout = useLayoutType();
