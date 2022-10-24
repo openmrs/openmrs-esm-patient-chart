@@ -4,6 +4,7 @@ import styles from './forms-list.scss';
 import isEmpty from 'lodash-es/isEmpty';
 import { CardHeader, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { useConfig, usePagination, Visit, formatDatetime, isDesktop, useLayoutType } from '@openmrs/esm-framework';
+import { launchFormEntryOrHtmlForms } from '../../form-entry-interop';
 import {
   Layer,
   Tile,
@@ -22,7 +23,6 @@ import { Edit } from '@carbon/react/icons';
 import { CompletedFormInfo, FormsSection } from '../../types';
 import { ConfigObject } from '../../config-schema';
 import { defaultPaginationSize } from '../../constants';
-import { launchFormEntryOrHtmlForms } from '@openmrs/esm-patient-forms-app/src/form-entry-interop';
 import { HtmlFormEntryForm } from '@openmrs/esm-patient-forms-app/src/config-schema';
 
 export interface FormsListProps {
