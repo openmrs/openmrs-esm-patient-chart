@@ -2,7 +2,7 @@
   "name": "@openmrs/esm-forms-workspace-app",
   "version": "4.0.0",
   "license": "MPL-2.0",
-  "description": "esm-forms-workspace-app",
+  "description": "Widget to open forms from the workspace on the patient chart",
   "browser": "dist/openmrs-esm-forms-workspace-app.js",
   "main": "src/index.ts",
   "source": true,
