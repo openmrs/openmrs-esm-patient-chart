@@ -1,9 +1,9 @@
 {
-  "name": "@openmrs/esm-forms-dashboard-app",
+  "name": "@openmrs/esm-forms-workspace-app",
   "version": "4.0.0",
   "license": "MPL-2.0",
   "description": "esm-forms-workspace-app",
-  "browser": "dist/openmrs-esm-forms-dashboard-app.js",
+  "browser": "dist/openmrs-esm-forms-workspace-app.js",
   "main": "src/index.ts",
   "source": true,
   "scripts": {

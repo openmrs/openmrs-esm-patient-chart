@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { getConfig } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
-import styles from './forms-dashboard.scss';
+import styles from './forms-workspace.scss';
 import { EmptyDataIllustration, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import FormsList from './form-list/forms-list.component';
 import { useFormsToDisplay } from '../hooks/use-forms';

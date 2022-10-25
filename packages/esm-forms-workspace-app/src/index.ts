@@ -13,18 +13,18 @@ const backendDependencies = {
 };
 
 function setupOpenMRS() {
-  const moduleName = '@openmrs/esm-forms-dashboard-app';
+  const moduleName = '@openmrs/esm-forms-workspace-app';
   const options = {
-    featureName: 'forms-dashboard',
+    featureName: 'forms-workspace',
     moduleName,
   };
 
   defineConfigSchema(moduleName, configSchema);
 
   registerWorkspace({
-    name: 'forms-dashboard-workspace',
+    name: 'forms-workspace',
     title: 'Forms dashboard',
-    load: getAsyncLifecycle(() => import('./forms-dashboard/forms-dashboard.component'), options),
+    load: getAsyncLifecycle(() => import('./forms-workspace/forms-workspace.component'), options),
   });
 
   return {

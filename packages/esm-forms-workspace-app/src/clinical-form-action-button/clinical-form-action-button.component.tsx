@@ -21,7 +21,7 @@ const ClinicalFormActionButton: React.FC = () => {
     if (useCurrentVisitDates && !currentVisit) {
       launchStartVisitPrompt();
     } else {
-      launchPatientWorkspace('forms-dashboard-workspace');
+      launchPatientWorkspace('forms-workspace');
     }
   }, [currentVisit, useCurrentVisitDates]);
 
