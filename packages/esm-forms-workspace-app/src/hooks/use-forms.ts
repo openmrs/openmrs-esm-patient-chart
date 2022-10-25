@@ -1,6 +1,12 @@
 import dayjs from 'dayjs';
 import useSWR from 'swr';
-import { getDynamicOfflineDataEntries, openmrsFetch, useConfig, useVisit } from '@openmrs/esm-framework';
+import {
+  getDynamicOfflineDataEntries,
+  openmrsFetch,
+  useConfig,
+  useVisit,
+  interpolateUrl,
+} from '@openmrs/esm-framework';
 import { ListResponse, Form, EncounterWithFormRef, CompletedFormInfo, FormsSection } from '../types';
 import { customEncounterRepresentation, formEncounterUrl, formEncounterUrlPoc } from '../constants';
 import { ConfigObject, FormsSectionConfig } from '../config-schema';
@@ -8,7 +14,7 @@ import { ConfigObject, FormsSectionConfig } from '../config-schema';
 export function useForms(cachedOfflineFormsOnly = false, patientUuid: string = '') {
   const { showConfigurableForms, customFormsUrl, showHtmlFormEntryForms } = useConfig() as ConfigObject;
   const url = showConfigurableForms
-    ? customFormsUrl.concat(`?patientUuid=${patientUuid}`)
+    ? interpolateUrl('${customFormsUrl}?${patientUuid}', { customFormsUrl: customFormsUrl, patientUuid: patientUuid })
     : showHtmlFormEntryForms
     ? formEncounterUrl
     : formEncounterUrlPoc;
