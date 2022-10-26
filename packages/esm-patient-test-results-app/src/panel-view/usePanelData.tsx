@@ -3,6 +3,7 @@ import { FetchResponse, openmrsFetch, usePatient } from '@openmrs/esm-framework'
 import useSWRInfinite from 'swr/infinite';
 import { extractMetaInformation, getConceptUuid } from './helper';
 import { Concept, ConceptMeta, FHIRObservationResource, FhirResponse, LabSetRecord, ObsRecord } from './types';
+import { observationData } from './check';
 
 export function useObservations() {
   const { patientUuid } = usePatient();
@@ -25,21 +26,24 @@ export function useObservations() {
     },
     [patientUuid],
   );
-  const { data, error, size, setSize } = useSWRInfinite<FetchResponse<FhirResponse<FHIRObservationResource>>, Error>(
-    getUrl,
-    openmrsFetch,
-    {
-      revalidateIfStale: false,
-      revalidateOnFocus: false,
-    },
-  );
+  // const { data, error, size, setSize } = useSWRInfinite<FetchResponse<FhirResponse<FHIRObservationResource>>, Error>(
+  //   getUrl,
+  //   openmrsFetch,
+  //   {
+  //     revalidateIfStale: false,
+  //     revalidateOnFocus: false,
+  //   },
+  // );
 
-  useEffect(() => {
-    // Infinitely fetching all the data
-    if (data && data?.length === size && data?.[data.length - 1]?.data?.link?.some((x) => x.relation === 'next')) {
-      setSize(size + 1);
-    }
-  }, [size, setSize, data]);
+  const data = observationData;
+  const error = null;
+
+  // useEffect(() => {
+  //   // Infinitely fetching all the data
+  //   if (data && data?.length === size && data?.[data.length - 1]?.data?.link?.some((x) => x.relation === 'next')) {
+  //     setSize(size + 1);
+  //   }
+  // }, [size, setSize, data]);
 
   const results = useMemo(() => {
     const observations: Array<FHIRObservationResource> = data
@@ -183,7 +187,7 @@ export default function usePanelData() {
 
   return {
     panels,
-    isLoading: isLoadingObservations || isLoadingConcepts,
+    isLoading: isLoadingObservations,
     groupedObservations,
     conceptData,
   };

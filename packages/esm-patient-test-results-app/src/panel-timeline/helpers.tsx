@@ -5,6 +5,7 @@ import styles from './timeline.scss';
 import { ConfigurableLink, formatDate, formatTime, parseDate, usePatient } from '@openmrs/esm-framework';
 import { ParsedTimeType } from '../filter/filter-types';
 import { testResultsBasePath } from '../helpers';
+import { getShorterText } from '../panel-view/helper';
 
 function getPatientUuidFromUrl(): string {
   const match = /\/patient\/([a-zA-Z0-9\-]+)\/?/.exec(location.pathname);
@@ -111,23 +112,28 @@ export const TimelineCell: React.FC<{
     <div
       className={`${styles['timeline-data-cell']} ${zebra ? styles['timeline-cell-zebra'] : ''} ${additionalClassname}`}
     >
-      <p>{text}</p>
+      <p>{getShorterText(text)}</p>
     </div>
   );
 };
 
-export const RowStartCell = ({ title, range, units, shadow = false, testUuid }) => (
+export const RowStartCell = ({ title, range, units, shadow = false, testUuid, value }) => (
   <div
     className={styles['row-start-cell']}
     style={{
       boxShadow: shadow ? '8px 0 20px 0 rgba(0,0,0,0.15)' : undefined,
     }}
   >
-    <span className={styles['trendline-link']}>
-      <ConfigurableLink to={`${testResultsBasePath(`/patient/${patientUuid}/chart`)}/trendline/${testUuid}`}>
-        {title}
-      </ConfigurableLink>
-    </span>
+    {/* If the value of the observation is not a numeric value, then it shouldn't be allowed to navigate to the trendline view. */}
+    {!isNaN(parseFloat(value)) ? (
+      <span className={styles['trendline-link']}>
+        <ConfigurableLink to={`${testResultsBasePath(`/patient/${patientUuid}/chart`)}/trendline/${testUuid}`}>
+          {title}
+        </ConfigurableLink>
+      </span>
+    ) : (
+      <span>{title}</span>
+    )}
     <span className={styles['range-units']}>
       {range} {units}
     </span>

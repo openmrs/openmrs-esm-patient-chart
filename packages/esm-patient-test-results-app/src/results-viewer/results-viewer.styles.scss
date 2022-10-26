@@ -76,3 +76,13 @@
     align-items: center;
   }
 }
+
+.floatingTreeButton {
+  position: fixed;
+  bottom: 5rem;
+  right: spacing.$spacing-05;
+  padding: spacing.$spacing-03;
+  border-radius: 50%;
+  z-index: 99;
+  background-color: $brand-01;
+}

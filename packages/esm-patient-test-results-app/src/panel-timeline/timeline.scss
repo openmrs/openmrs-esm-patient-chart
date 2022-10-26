@@ -49,6 +49,7 @@
 }
 
 .row-start-cell {
+  @include type.type-style('body-compact-01');
   @extend .timeline-cell;
   position: sticky;
   left: 0;

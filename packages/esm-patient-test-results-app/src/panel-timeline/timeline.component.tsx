@@ -74,7 +74,7 @@ interface DataRowsProps {
 const DataRows: React.FC<DataRowsProps> = ({ timeColumns, rowData, sortedTimes, showShadow, testUuid }) => (
   <Grid dataColumns={timeColumns.length} padding style={{ gridColumn: 'span 2' }}>
     {Object.entries(rowData).map(([title, obs], rowCount) => {
-      const { meta, conceptUuid } = obs.find((x) => !!x);
+      const { meta, conceptUuid, value } = obs.find((x) => !!x);
       const range = meta?.range ?? '';
       const units = meta?.units ?? '';
       return (
@@ -86,6 +86,7 @@ const DataRows: React.FC<DataRowsProps> = ({ timeColumns, rowData, sortedTimes, 
               title,
               shadow: showShadow,
               testUuid,
+              value,
             }}
           />
           <GridItems {...{ sortedTimes, obs, zebra: !!(rowCount % 2) }} />

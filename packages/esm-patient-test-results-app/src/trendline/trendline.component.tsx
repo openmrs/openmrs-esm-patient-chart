@@ -3,13 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { Button, InlineLoading, SkeletonText } from '@carbon/react';
 import { ArrowLeft } from '@carbon/react/icons';
 import { LineChart } from '@carbon/charts-react';
-import { formatDate, formatTime, parseDate, ConfigurableLink } from '@openmrs/esm-framework';
+import { formatDate, formatTime, parseDate, ConfigurableLink, navigate } from '@openmrs/esm-framework';
 import { EmptyState, OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import { useObstreeData } from './trendline-resource';
 import { testResultsBasePath } from '../helpers';
 import CommonDataTable from '../overview/common-datatable.component';
 import RangeSelector from './range-selector.component';
 import styles from './trendline.scss';
+import { FilterEmptyState } from '../ui-components/resetFiltersEmptyState';
 
 enum ScaleTypes {
   TIME = 'time',
@@ -213,12 +214,18 @@ const Trendline: React.FC<TrendlineProps> = ({
     [leftAxisTitle, t],
   );
 
+  const navigateToTimelineView = useCallback(() => {
+    navigate({
+      to: testResultsBasePath(`/patient/${patientUuid}/chart`),
+    });
+  }, [patientUuid]);
+
   if (isLoading) {
     return <SkeletonText />;
   }
 
   if (obs.length === 0) {
-    return <EmptyState displayText={t('observationsDisplayText', 'observations')} headerTitle={chartTitle} />;
+    return <EmptyState launchForm={navigateToTimelineView} displayText={t('data', 'Data')} headerTitle={dataset} />;
   }
 
   return (

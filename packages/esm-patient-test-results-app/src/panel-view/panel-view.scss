@@ -4,9 +4,6 @@
 @import '~@openmrs/esm-styleguide/src/vars';
 
 .panelViewHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   position: sticky;
   top: 6rem;
   background-color: $ui-01;
@@ -14,13 +11,23 @@
   padding: spacing.$spacing-03 0;
 }
 
-.productiveHeading02 {
-  @include type.type-style('heading-compact-02');
+.panelViewHeaderText {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.headerMargin, .headerMarginTablet {
-  position: sticky;
-  top: 3rem;
+.panelViewHeaderSearch {
+  display: flex;
+  align-items: center
+}
+
+:global(.omrs-breakpoint-lt-desktop) .panelViewHeaderSearch {
+  margin: - spacing.$spacing-05
+}
+
+.productiveHeading02 {
+  @include type.type-style('heading-compact-02');
 }
 
 .headerMargin {
@@ -29,4 +36,24 @@
 
 .headerMarginTablet {
   margin-top: 4rem;
+}
+
+.stickyTop {
+  position: sticky;
+  top: 7rem;
+}
+
+.searchForm {
+  display: flex;
+  flex: 1;
+  align-items: center;
+
+  .searchBar {
+    flex: 1;
+  }
+}
+
+.headerText {
+  display: flex;
+  align-items: center;
 }

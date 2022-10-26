@@ -60,55 +60,55 @@
 }
 
 .off-scale-low {
-  span {
+  span.result {
     font-weight: 600;
   }
-  span::after {
+  span.result::after {
     content: " ↓↓↓";
   }
 }
 
 .off-scale-high {
-  span {
+  span.result {
     font-weight: 600;
   }
-  span::after {
+  span.result::after {
     content: " ↑↑↑";
   }
 }
 
 .critically-low {
-  span {
+  span.result {
     font-weight: 600;
   }
-  span::after {
+  span.result::after {
     content: " ↓↓";
   }
 }
 
 .critically-high {
-  span {
+  span.result {
     font-weight: 600;
   }
-  span::after {
+  span.result::after {
     content: " ↑↑";
   }
 }
 
 .low {
-  span {
+  span.result {
     font-weight: 600;
   }
-  span::after {
+  span.result::after {
     content: " ↓";
   }
 }
 
 .high {
-  span {
+  span.result {
     font-weight: 600;
   }
-  span::after {
+  span.result::after {
     content: " ↑";
   }
 }

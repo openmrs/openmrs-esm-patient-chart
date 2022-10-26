@@ -1,6 +1,8 @@
+import React from 'react';
 import styles from './result-panel.scss';
 import { Concept, ConceptMeta, FHIRObservationResource, observationInterpretation } from './types';
 import { OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
+import { DefinitionTooltip } from '@carbon/react';
 
 export const getConceptUuid = (obs: FHIRObservationResource) => obs?.code.coding[0].code;
 
@@ -105,4 +107,19 @@ export function extractMetaInformation(concept: Concept): ConceptMeta {
     range,
     getInterpretation,
   };
+}
+
+export function getShorterText(text: string) {
+  // IF the string is a numeric value
+  if (!isNaN(parseFloat(text))) {
+    return text;
+  }
+  if (text.length > 30) {
+    return (
+      <DefinitionTooltip align="bottom" definition={text} tabIndex={0} triggerText={text.slice(0, 25) + '...'}>
+        {text.slice(0, 30) + '...'}
+      </DefinitionTooltip>
+    );
+  }
+  return text;
 }

@@ -1,12 +1,11 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AccordionSkeleton, Button, Column, ContentSwitcher, DataTableSkeleton, Grid, Switch } from '@carbon/react';
-import { TreeViewAlt } from '@carbon/react/icons';
+import { Column, ContentSwitcher, Grid, Switch } from '@carbon/react';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
-import { isDesktop, navigate, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { navigate, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { testResultsBasePath } from '../helpers';
-import FilterSet, { FilterContext, FilterProvider } from '../filter';
-import GroupedTimeline, { useGetManyObstreeData } from '../grouped-timeline';
+import { FilterContext, FilterProvider } from '../filter';
+import { useGetManyObstreeData } from '../grouped-timeline';
 import TabletOverlay from '../tablet-overlay';
 import Trendline from '../trendline/trendline.component';
 import styles from './results-viewer.styles.scss';
@@ -53,66 +52,38 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
   const { t } = useTranslation();
   const tablet = useLayoutType() === 'tablet';
   const [view, setView] = useState<viewOpts>('split');
-  const [leftContent, setLeftContent] = useState<panelOpts>('tree');
-  const [showTreeOverlay, setShowTreeOverlay] = useState<boolean>(false);
-  const { resetTree, timelineData, totalResultsCount } = useContext(FilterContext);
+  const [selectedSection, setSelectedSection] = useState<panelOpts>('panel');
+  const { totalResultsCount } = useContext(FilterContext);
   const expanded = view === 'full';
   const { type, testUuid } = useParams();
+  const trendlineView = testUuid && type === 'trendline';
 
-  return (
-    <>
-      <Grid className={styles.resultsContainer}>
-        <Column className={styles.resultsHeader} sm={12} lg={!tablet ? 5 : 12}>
+  const navigateBackFromTrendlineView = useCallback(() => {
+    navigate({
+      to: testResultsBasePath(`/patient/${patientUuid}/chart`),
+    });
+  }, [patientUuid]);
+
+  if (tablet) {
+    return (
+      <div className={styles.resultsContainer}>
+        <div className={styles.resultsHeader}>
           <div className={styles.leftHeader}>
             <h4 style={{ flexGrow: 1 }}>{`${t('results', 'Results')} ${
               totalResultsCount ? `(${totalResultsCount})` : ''
             }`}</h4>
             <div className={styles.leftHeaderActions}>
-              {tablet && (
-                <Button
-                  size={tablet ? 'md' : 'sm'}
-                  kind="ghost"
-                  renderIcon={(props) => <TreeViewAlt {...props} size={16} />}
-                  onClick={() => setShowTreeOverlay(true)}
-                  style={{
-                    marginRight: '1rem',
-                  }}
-                >
-                  {t('showTreeButtonText', 'Show tree')}
-                </Button>
-              )}
-              {!expanded && (
-                <ContentSwitcher
-                  size={tablet ? 'lg' : 'md'}
-                  selectedIndex={['panel', 'tree'].indexOf(leftContent)}
-                  onChange={(e) => setLeftContent(e.name as panelOpts)}
-                >
-                  <Switch name="panel" text={t('panel', 'Panel')} />
-                  <Switch name="tree" text={t('tree', 'Tree')} />
-                </ContentSwitcher>
-              )}
-            </div>
-          </div>
-        </Column>
-        {!tablet && (
-          <Column className={styles.resultsHeader} sm={12} lg={7}>
-            <div
-              className={styles.viewOptsContentSwitcherContainer}
-              style={{ display: 'flex', justifyContent: 'flex-end' }}
-            >
               <ContentSwitcher
-                size={tablet ? 'lg' : 'md'}
-                style={{ maxWidth: '10rem' }}
-                onChange={(e) => setView(e.name as viewOpts)}
-                selectedIndex={expanded ? 1 : 0}
+                selectedIndex={['panel', 'tree'].indexOf(selectedSection)}
+                onChange={(e) => setSelectedSection(e.name as panelOpts)}
               >
-                <Switch name="split" text={t('split', 'Split')} disabled={loading} />
-                <Switch name="full" text={t('full', 'Full')} disabled={loading} />
+                <Switch name="panel" text={t('panel', 'Panel')} />
+                <Switch name="tree" text={t('tree', 'Tree')} />
               </ContentSwitcher>
             </div>
-          </Column>
-        )}
-        {leftContent === 'tree' ? (
+          </div>
+        </div>
+        {selectedSection === 'tree' ? (
           <TreeViewWrapper
             patientUuid={patientUuid}
             basePath={basePath}
@@ -120,7 +91,7 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
             expanded={expanded}
             testUuid={testUuid}
           />
-        ) : (
+        ) : selectedSection === 'panel' ? (
           <PanelView
             expanded={expanded}
             patientUuid={patientUuid}
@@ -128,39 +99,69 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
             type={type}
             testUuid={testUuid}
           />
+        ) : null}
+        {trendlineView && (
+          <TabletOverlay
+            headerText={t('trendline', 'Trendline')}
+            close={navigateBackFromTrendlineView}
+            buttonsGroup={<></>}
+          >
+            <Trendline patientUuid={patientUuid} conceptUuid={testUuid} basePath={basePath} />
+          </TabletOverlay>
         )}
-      </Grid>
+      </div>
+    );
+  }
 
-      {tablet && showTreeOverlay && (
-        <TabletOverlay
-          headerText={t('tree', 'Tree')}
-          close={() => setShowTreeOverlay(false)}
-          buttonsGroup={
-            <>
-              <Button kind="secondary" size="lg" onClick={resetTree} disabled={loading}>
-                {t('resetTreeText', 'Reset tree')}
-              </Button>
-              <Button kind="primary" size="lg" onClick={() => setShowTreeOverlay(false)} disabled={loading}>
-                {`${t('view', 'View')} ${
-                  !loading && timelineData?.loaded ? timelineData?.data?.rowData?.length : ''
-                } ${t('resultsText', 'results')}`}
-              </Button>
-            </>
-          }
+  return (
+    <Grid className={styles.resultsContainer}>
+      <Column className={styles.resultsHeader} sm={12} lg={!tablet ? 5 : 12}>
+        <div className={styles.leftHeader}>
+          <h4 style={{ flexGrow: 1 }}>{`${t('results', 'Results')} ${
+            totalResultsCount ? `(${totalResultsCount})` : ''
+          }`}</h4>
+          <div className={styles.leftHeaderActions}>
+            {!expanded && (
+              <ContentSwitcher
+                size={tablet ? 'lg' : 'md'}
+                selectedIndex={['panel', 'tree'].indexOf(selectedSection)}
+                onChange={(e) => setSelectedSection(e.name as panelOpts)}
+              >
+                <Switch name="panel" text={t('panel', 'Panel')} />
+                <Switch name="tree" text={t('tree', 'Tree')} />
+              </ContentSwitcher>
+            )}
+          </div>
+        </div>
+      </Column>
+      <Column className={styles.resultsHeader} sm={12} lg={!tablet ? 7 : 0}>
+        <div
+          className={styles.viewOptsContentSwitcherContainer}
+          style={{ display: 'flex', justifyContent: 'flex-end' }}
         >
-          {!loading ? <FilterSet hideFilterSetHeader /> : <AccordionSkeleton open count={4} align="start" />}
-        </TabletOverlay>
-      )}
-      {tablet && testUuid && type === 'trendline' && (
-        <TabletOverlay
-          headerText={t('trendline', 'Trendline')}
-          close={() => navigate({ to: testResultsBasePath(basePath) })}
-          buttonsGroup={<></>}
-        >
-          <Trendline patientUuid={patientUuid} conceptUuid={testUuid} basePath={basePath} />
-        </TabletOverlay>
-      )}
-    </>
+          <ContentSwitcher
+            size={tablet ? 'lg' : 'md'}
+            style={{ maxWidth: '10rem' }}
+            onChange={(e) => setView(e.name as viewOpts)}
+            selectedIndex={expanded ? 1 : 0}
+          >
+            <Switch name="split" text={t('split', 'Split')} disabled={loading} />
+            <Switch name="full" text={t('full', 'Full')} disabled={loading} />
+          </ContentSwitcher>
+        </div>
+      </Column>
+      {selectedSection === 'tree' ? (
+        <TreeViewWrapper
+          patientUuid={patientUuid}
+          basePath={basePath}
+          type={type}
+          expanded={expanded}
+          testUuid={testUuid}
+        />
+      ) : selectedSection === 'panel' ? (
+        <PanelView expanded={expanded} patientUuid={patientUuid} basePath={basePath} type={type} testUuid={testUuid} />
+      ) : null}
+    </Grid>
   );
 };
 

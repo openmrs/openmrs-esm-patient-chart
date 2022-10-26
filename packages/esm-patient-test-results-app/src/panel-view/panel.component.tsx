@@ -13,7 +13,7 @@ import {
   TableCell,
   Layer,
 } from '@carbon/react';
-import { getClass } from './helper';
+import { getClass, getShorterText } from './helper';
 import { ObsRecord } from './types';
 import { formatDate, isDesktop, useLayoutType, usePatient } from '@openmrs/esm-framework';
 
@@ -39,16 +39,19 @@ const LabSetPanel: React.FC<LabSetPanelProps> = ({ panel, observations, activePa
               id: 'testName',
               key: 'testName',
               header: t('testName', 'Test name'),
+              colSpan: 1,
             },
             {
               id: 'value',
               key: 'value',
               header: t('value', 'Value'),
+              colSpan: 1,
             },
             {
               id: 'range',
               key: 'range',
               header: t('referenceRange', 'Reference range'),
+              colSpan: 1,
             },
           ]
         : [
@@ -56,11 +59,13 @@ const LabSetPanel: React.FC<LabSetPanelProps> = ({ panel, observations, activePa
               id: 'testName',
               key: 'testName',
               header: t('testName', 'Test name'),
+              colSpan: 1,
             },
             {
               id: 'value',
               key: 'value',
               header: t('value', 'Value'),
+              colSpan: 1,
             },
           ],
     [t, hasRange],
@@ -71,18 +76,26 @@ const LabSetPanel: React.FC<LabSetPanelProps> = ({ panel, observations, activePa
       hasRange
         ? observations.map((test) => ({
             id: test.id,
-            testName: test.name,
+            testName: getShorterText(test.name),
             value: {
-              content: <span>{`${test.value} ${test.meta?.units}`}</span>,
+              content: !isNaN(parseFloat(test.value)) ? (
+                <span className={styles.result}>{`${test.value} ${test?.meta?.units ?? ''}`}</span>
+              ) : (
+                getShorterText(test.value)
+              ),
             },
             interpretation: test.interpretation,
-            range: test.meta.range ? `${test.meta?.range} ${test.meta?.units}` : '--',
+            range: test?.meta.range ? `${test?.meta?.range} ${test?.meta?.units ?? ''}` : '--',
           }))
         : observations.map((test) => ({
             id: test.id,
-            testName: test.name,
+            testName: getShorterText(test.name),
             value: {
-              content: <span>{`${test.value} ${test.meta?.units}`}</span>,
+              content: !isNaN(parseFloat(test.value)) ? (
+                <span className={styles.result}>{`${test.value} ${test?.meta?.units ?? ''}`}</span>
+              ) : (
+                getShorterText(test.value)
+              ),
             },
             interpretation: test.interpretation,
           })),
@@ -113,7 +126,9 @@ const LabSetPanel: React.FC<LabSetPanelProps> = ({ panel, observations, activePa
                 <TableHead>
                   <TableRow>
                     {headers.map((header) => (
-                      <TableHeader {...getHeaderProps({ header })}>{header.header}</TableHeader>
+                      <TableHeader {...getHeaderProps({ header, colSpan: header.colSpan })}>
+                        {header.header}
+                      </TableHeader>
                     ))}
                   </TableRow>
                 </TableHead>

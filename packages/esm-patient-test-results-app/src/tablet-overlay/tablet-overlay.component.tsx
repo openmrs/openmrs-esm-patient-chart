@@ -8,9 +8,10 @@ interface OverlayProps {
   close: () => void;
   headerText: string | React.ReactElement;
   buttonsGroup?: React.ReactElement;
+  light?: boolean;
 }
 
-const Overlay: React.FC<OverlayProps> = ({ close, children, headerText, buttonsGroup }) => (
+const Overlay: React.FC<OverlayProps> = ({ close, children, headerText, buttonsGroup, light = true }) => (
   <div className={styles.tabletOverlay}>
     <Header className={styles.tabletOverlayHeader}>
       <Button onClick={close} hasIconOnly>
