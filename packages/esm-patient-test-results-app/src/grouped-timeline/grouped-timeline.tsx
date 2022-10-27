@@ -2,7 +2,7 @@ import React, { useCallback, useContext, useEffect, useRef, useState } from 'rea
 import { useTranslation } from 'react-i18next';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { ConfigurableLink, useLayoutType, usePatient } from '@openmrs/esm-framework';
-import { Grid, ShadowBox } from '../timeline/helpers';
+import { Grid, ShadowBox } from '../panel-timeline/helpers';
 import { makeThrottled, testResultsBasePath } from '../helpers';
 import type {
   DateHeaderGridProps,

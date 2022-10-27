@@ -30,6 +30,15 @@
   }
 }
 
+.filterTreeSearchHeader {
+  display: flex;
+  margin-bottom: spacing.$spacing-03;
+  background-color: $openmrs-background-grey;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
 .filterSetContent {
   max-height: calc(100vh - 9.5rem);
   overflow-y: auto;

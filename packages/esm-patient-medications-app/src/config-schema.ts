@@ -27,8 +27,8 @@ export const configSchema = {
   quantityUnitsUuid: {
     _type: Type.ConceptUuid,
     _description:
-      'Concept to be used as order quantity units default value. This is necessary because this datapoint is capture in the dispensing form but the datamodel requires this attribute to issue an order',
-    _default: '3c6a70ed-a762-41b9-8163-352c9bb36f20',
+      "Concept to be used as order quantity units default value. This is necessary because this datapoint isn't captured on the dispensing form but the datamodel requires this attribute to issue an order",
+    _default: '162399AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   },
   clinicianEncounterRole: {
     _type: Type.UUID,

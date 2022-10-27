@@ -1,6 +1,42 @@
 import * as React from 'react';
-import { ObsRecord, OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
+import { OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
+import { ObsRecord } from '../panel-view/types';
 import styles from './timeline.scss';
+import { ConfigurableLink, formatDate, formatTime, parseDate, usePatient } from '@openmrs/esm-framework';
+import { ParsedTimeType } from '../filter/filter-types';
+import { testResultsBasePath } from '../helpers';
+
+function getPatientUuidFromUrl(): string {
+  const match = /\/patient\/([a-zA-Z0-9\-]+)\/?/.exec(location.pathname);
+  return match && match[1];
+}
+
+const patientUuid = getPatientUuidFromUrl();
+
+export const parseTime: (sortedTimes: Array<string>) => ParsedTimeType = (sortedTimes) => {
+  const yearColumns: Array<{ year: string; size: number }> = [],
+    dayColumns: Array<{ year: string; day: string; size: number }> = [],
+    timeColumns: string[] = [];
+
+  sortedTimes.forEach((datetime) => {
+    const parsedDate = parseDate(datetime);
+    const year = parsedDate.getFullYear().toString();
+    const date = formatDate(parsedDate, { mode: 'wide', year: false });
+    const time = formatTime(parsedDate);
+
+    const yearColumn = yearColumns.find(({ year: innerYear }) => year === innerYear);
+    if (yearColumn) yearColumn.size++;
+    else yearColumns.push({ year, size: 1 });
+
+    const dayColumn = dayColumns.find(({ year: innerYear, day: innerDay }) => date === innerDay && year === innerYear);
+    if (dayColumn) dayColumn.size++;
+    else dayColumns.push({ day: date, year, size: 1 });
+
+    timeColumns.push(time);
+  });
+
+  return { yearColumns, dayColumns, timeColumns, sortedTimes };
+};
 
 export const Grid: React.FC<{
   children?: React.ReactNode;
@@ -80,15 +116,17 @@ export const TimelineCell: React.FC<{
   );
 };
 
-export const RowStartCell = ({ title, range, units, shadow = false, openTrendline }) => (
+export const RowStartCell = ({ title, range, units, shadow = false, testUuid }) => (
   <div
     className={styles['row-start-cell']}
     style={{
       boxShadow: shadow ? '8px 0 20px 0 rgba(0,0,0,0.15)' : undefined,
     }}
   >
-    <span className={styles['trendline-link']} onClick={openTrendline} role={'link'} tabIndex={0}>
-      {title}
+    <span className={styles['trendline-link']}>
+      <ConfigurableLink to={`${testResultsBasePath(`/patient/${patientUuid}/chart`)}/trendline/${testUuid}`}>
+        {title}
+      </ConfigurableLink>
     </span>
     <span className={styles['range-units']}>
       {range} {units}
@@ -102,7 +140,7 @@ export const TimeSlots: React.FC<{
   className?: string;
 }> = ({ children = undefined, ...props }) => (
   <TimeSlotsInner {...props}>
-    <div>{children}</div>
+    <span>{children}</span>
   </TimeSlotsInner>
 );
 
@@ -114,8 +152,8 @@ export const GridItems = React.memo<{
   <>
     {sortedTimes.map((_, i) => {
       if (!obs[i]) return <TimelineCell key={i} text={'--'} zebra={zebra} />;
-      const interpretation = obs[i].meta.assessValue(obs[i].value);
-      return <TimelineCell key={i} text={obs[i].value} interpretation={interpretation} zebra={zebra} />;
+      const interpretation = obs[i].interpretation;
+      return <TimelineCell key={i} text={`${obs[i].value}`} interpretation={interpretation} zebra={zebra} />;
     })}
   </>
 ));
