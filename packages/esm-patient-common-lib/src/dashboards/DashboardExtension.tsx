@@ -10,7 +10,7 @@ export interface DashboardExtensionProps {
 }
 
 export const DashboardExtension = ({ title, basePath }: DashboardExtensionProps) => {
-  const location = window.location ?? { pathname: '' };
+  const location = useLocation();
   const navLink = useMemo(() => decodeURIComponent(last(location.pathname.split('/'))), [location.pathname]);
 
   const activeClassName = title === navLink ? 'active-left-nav-link' : 'non-active';
