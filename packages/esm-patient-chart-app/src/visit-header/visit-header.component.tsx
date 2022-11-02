@@ -72,13 +72,15 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
     });
   }, [currentVisit?.uuid, patientUuid, visitQueueEntries]);
 
-  return truncate ? (
-    <DefinitionTooltip className={styles.tooltip} align="bottom-left" direction="bottom" definition={tooltipText}>
-      <span className={styles.patientName}>{name.slice(0, 25) + '...'}</span>
-    </DefinitionTooltip>
-  ) : (
+  return (
     <>
-      <span className={styles.patientName}>{name} </span>
+      {truncate ? (
+        <DefinitionTooltip className={styles.tooltip} align="bottom-left" direction="bottom" definition={tooltipText}>
+          <span className={styles.patientName}>{name.slice(0, 25) + '...'}</span>
+        </DefinitionTooltip>
+      ) : (
+        <span className={styles.patientName}>{name} </span>
+      )}
       <span className={styles.patientInfo}>
         {parseInt(age(patient.birthDate))}, {capitalize(patient.gender)}
       </span>
