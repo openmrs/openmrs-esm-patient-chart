@@ -73,14 +73,15 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
   }, [vaccines, isLoading]);
 
   const isViewEditMode = !!formState.immunizationObsUuid;
-  const enableCreateButtons = !isViewEditMode && !!formState.vaccinationDate;
-  const enableEditButtons = isViewEditMode && formState.formChanged;
-  const disableSaveButton =
-    !formState.vaccineUuid ||
-    !formState.vaccinationDate ||
-    !formState.expirationDate ||
-    !formState.lotNumber ||
-    !formState.manufacturer;
+  const enableEditButton = isViewEditMode && formState.formChanged;
+  const enableCreateButton =
+    !isViewEditMode &&
+    !!formState.vaccinationDate &&
+    !!formState.vaccineUuid &&
+    !!formState.expirationDate &&
+    !!formState.vaccinationDate &&
+    !!formState.lotNumber &&
+    !!formState.manufacturer;
 
   useEffect(() => {
     const sub = immunizationFormSub.subscribe((props) => props && setFormState(props));
@@ -249,7 +250,12 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
         <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button className={styles.button} kind="primary" disabled={disableSaveButton} type="submit">
+        <Button
+          className={styles.button}
+          kind="primary"
+          disabled={isViewEditMode ? !enableEditButton : !enableCreateButton}
+          type="submit"
+        >
           {t('saveAndClose', 'Save and close')}
         </Button>
       </ButtonSet>
