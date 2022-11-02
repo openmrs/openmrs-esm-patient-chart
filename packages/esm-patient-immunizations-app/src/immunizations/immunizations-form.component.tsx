@@ -56,8 +56,6 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
   const onChangeComboBox = (event) => {
     if (event.selectedItem) {
       updateSingle('vaccineUuid', event.selectedItem.uuid);
-    } else {
-      console.log('error');
     }
   };
 
