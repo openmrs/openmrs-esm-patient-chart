@@ -56,6 +56,8 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
   const onChangeComboBox = (event) => {
     if (event.selectedItem) {
       updateSingle('vaccineUuid', event.selectedItem.uuid);
+    } else {
+      updateSingle('vaccineUuid', '');
     }
   };
 
@@ -149,8 +151,9 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
     updateSingle('currentDose', currentDose);
   };
 
-  if (isLoading || vaccineState === undefined)
+  if (isLoading || vaccineState === undefined) {
     return <span className={styles.vaccineLoader}>{`${t('loadingVaccine', 'Loading Vaccine')} ...`} </span>;
+  }
 
   return (
     <Form className={styles.form} onSubmit={handleFormSubmit}>
@@ -158,7 +161,7 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
         {vaccines?.length ? (
           <section className={styles.immunizationSequenceSelect}>
             <ComboBox
-              titleText="Vaccines"
+              titleText={t('vaccineComboBoxTitle', 'Vaccines')}
               items={vaccineState}
               itemToString={(item) => item?.display ?? ''}
               onChange={(event) => {
@@ -169,7 +172,7 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
         ) : null}
 
         {hasSequences(formState.sequences) && (
-          <section className={styles.immunizationSequenceSelect}>
+          <div className={styles.immunizationSequenceSelect}>
             <Select
               id="sequence"
               name="sequence"
@@ -189,9 +192,9 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
                 );
               })}
             </Select>
-          </section>
+          </div>
         )}
-        <section className={styles.immunizationSequenceSelect}>
+        <div className={styles.immunizationSequenceSelect}>
           <DatePicker
             id="vaccinationDate"
             className="vaccinationDate"
@@ -208,8 +211,8 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
               type="text"
             />
           </DatePicker>
-        </section>
-        <section className={styles.immunizationSequenceSelect}>
+        </div>
+        <div className={styles.immunizationSequenceSelect}>
           <DatePicker
             id="vaccinationExpiration"
             className="vaccinationExpiration"
@@ -226,8 +229,8 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
               type="text"
             />
           </DatePicker>
-        </section>
-        <section className={styles.immunizationSequenceSelect}>
+        </div>
+        <div className={styles.immunizationSequenceSelect}>
           <TextInput
             type="text"
             id="lotNumber"
@@ -235,8 +238,8 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
             value={formState.lotNumber}
             onChange={(evt) => updateSingle('lotNumber', evt.target.value)}
           />
-        </section>
-        <section className={styles.immunizationSequenceSelect}>
+        </div>
+        <div className={styles.immunizationSequenceSelect}>
           <TextInput
             type="text"
             id="manufacturer"
@@ -244,7 +247,7 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
             value={formState.manufacturer}
             onChange={(evt) => updateSingle('manufacturer', evt.target.value)}
           />
-        </section>
+        </div>
       </Stack>
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
         <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace()}>
