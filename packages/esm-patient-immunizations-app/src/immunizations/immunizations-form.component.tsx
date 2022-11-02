@@ -3,16 +3,14 @@ import { useTranslation } from 'react-i18next';
 import {
   Button,
   ButtonSet,
+  ComboBox,
   DatePicker,
   DatePickerInput,
   Form,
-  InlineLoading,
   Select,
   SelectItem,
   TextInput,
   Stack,
-  FormGroup,
-  Layer,
 } from '@carbon/react';
 import { showNotification, showToast, useSession, useVisit, useLayoutType } from '@openmrs/esm-framework';
 import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
@@ -55,6 +53,13 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
   const [formState, setFormState] = useState(initialState);
   const updateSingle = <T extends keyof ImmunizationFormState>(name: T, value: typeof formState[T]) =>
     setFormState((state) => ({ ...state, [name]: value }));
+  const onChangeComboBox = (event) => {
+    if (event.selectedItem) {
+      updateSingle('vaccineUuid', event.selectedItem.uuid);
+    } else {
+      console.log('error');
+    }
+  };
 
   const { t } = useTranslation();
   const currentUser = useSession();
@@ -62,6 +67,12 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
   const isTablet = useLayoutType() === 'tablet';
   const { data, isLoading } = useImmunizationsConceptSet('custom:(display,answers:(uuid,display))');
   const vaccines = data?.answers;
+  const [vaccineState, setVaccineState] = useState(vaccines || []);
+  useEffect(() => {
+    if (!isLoading && vaccines?.length) {
+      setVaccineState(vaccines);
+    }
+  }, [vaccines, isLoading]);
 
   const isViewEditMode = !!formState.immunizationObsUuid;
   const enableCreateButtons = !isViewEditMode && !!formState.vaccinationDate;
@@ -139,35 +150,25 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
     updateSingle('currentDose', currentDose);
   };
 
-  if (isLoading)
+  if (isLoading || vaccineState === undefined)
     return <span className={styles.vaccineLoader}>{`${t('loadingVaccine', 'Loading Vaccine')} ...`} </span>;
-
-  const vaccineSelect = (
-    <Select
-      id="Vaccine"
-      invalidText="Required"
-      labelText={t('vaccine', 'Vaccine')}
-      onChange={(event) => updateSingle('vaccineUuid', event.target.value)}
-      value={formState.vaccineUuid}
-    >
-      {!formState.vaccineName ? <SelectItem text={t('chooseVaccine', 'Choose a vaccine')} value="" /> : null}
-      {vaccines?.length > 0 &&
-        vaccines.map((vaccine) => (
-          <SelectItem key={vaccine.uuid} text={vaccine.display} value={vaccine.uuid}>
-            {vaccine.display}
-          </SelectItem>
-        ))}
-    </Select>
-  );
 
   return (
     <Form className={styles.form} onSubmit={handleFormSubmit}>
       <Stack gap={4}>
         {vaccines?.length ? (
           <section className={styles.immunizationSequenceSelect}>
-            {isTablet ? <Layer>{vaccineSelect}</Layer> : vaccineSelect}
+            <ComboBox
+              titleText="Vaccines"
+              items={vaccineState}
+              itemToString={(item) => item?.display ?? ''}
+              onChange={(event) => {
+                onChangeComboBox(event);
+              }}
+            />{' '}
           </section>
         ) : null}
+
         {hasSequences(formState.sequences) && (
           <section className={styles.immunizationSequenceSelect}>
             <Select
