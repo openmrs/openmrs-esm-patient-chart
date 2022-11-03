@@ -4,7 +4,9 @@ import { openmrsFetch, fhirBaseUrl, useConfig, FHIRResource, FHIRCode } from '@o
 export const pageSize = 100;
 
 export function useObs(patientUuid: string): UseObsResult {
-  const { data } = useConfig();
+  const { encounterTypes, data } = useConfig();
+
+  const UrlEncounterTypes: string = encounterTypes.length ? `&encounter.type=${encounterTypes.toString()}` : '';
 
   const {
     data: result,
@@ -14,8 +16,8 @@ export function useObs(patientUuid: string): UseObsResult {
     `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&code=` +
       data.map((d) => d.concept).join(',') +
       '&_summary=data&_sort=-date' +
-      `&_count=${pageSize}
-  `,
+      `&_count=${pageSize}` +
+      UrlEncounterTypes,
     openmrsFetch,
   );
 

@@ -47,6 +47,18 @@ export const configSchema = {
       _default: 5,
     },
   },
+  showGraphByDefault: {
+    _type: Type.Boolean,
+    _description: 'Displayed graph by default',
+    _default: true,
+  },
+  encounterTypes: {
+    _type: Type.Array,
+    _elements: {
+      _type: Type.String,
+    },
+    _default: [],
+  },
 };
 
 export interface ConfigObject {
@@ -60,4 +72,6 @@ export interface ConfigObject {
   table: {
     pageSize: number;
   };
+  showGraphByDefault: boolean;
+  encounterTypes: Array<string>;
 }
