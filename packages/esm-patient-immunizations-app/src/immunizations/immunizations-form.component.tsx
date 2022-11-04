@@ -1,4 +1,4 @@
-import React, { SyntheticEvent, useEffect, useState } from 'react';
+import React, { SyntheticEvent, useEffect, useState, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -51,15 +51,20 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
     formChanged: false,
   };
   const [formState, setFormState] = useState(initialState);
-  const updateSingle = <T extends keyof ImmunizationFormState>(name: T, value: typeof formState[T]) =>
+  const updateSingle = useCallback(<T extends keyof ImmunizationFormState>(name: T, value: typeof formState[T]) => {
     setFormState((state) => ({ ...state, [name]: value }));
-  const onChangeComboBox = (event) => {
-    if (event.selectedItem) {
-      updateSingle('vaccineUuid', event.selectedItem.uuid);
-    } else {
-      updateSingle('vaccineUuid', '');
-    }
-  };
+  }, []);
+
+  const onChangeComboBox = useCallback(
+    (event) => {
+      if (event.selectedItem) {
+        updateSingle('vaccineUuid', event.selectedItem.uuid);
+      } else {
+        updateSingle('vaccineUuid', null);
+      }
+    },
+    [updateSingle],
+  );
 
   const { t } = useTranslation();
   const currentUser = useSession();
@@ -164,9 +169,7 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
               titleText={t('vaccineComboBoxTitle', 'Vaccines')}
               items={vaccineState}
               itemToString={(item) => item?.display ?? ''}
-              onChange={(event) => {
-                onChangeComboBox(event);
-              }}
+              onChange={onChangeComboBox}
             />{' '}
           </section>
         ) : null}
@@ -267,3 +270,6 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
 };
 
 export default ImmunizationsForm;
+function setFormState(arg0: (state: any) => any) {
+  throw new Error('Function not implemented.');
+}
