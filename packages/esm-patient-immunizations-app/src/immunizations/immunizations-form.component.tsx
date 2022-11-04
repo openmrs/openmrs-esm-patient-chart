@@ -1,4 +1,4 @@
-import React, { SyntheticEvent, useEffect, useState, useCallback, useMemo } from 'react';
+import React, { SyntheticEvent, useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
