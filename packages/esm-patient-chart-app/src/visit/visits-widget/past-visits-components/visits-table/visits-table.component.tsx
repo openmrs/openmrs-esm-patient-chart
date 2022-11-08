@@ -95,7 +95,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits }) =>
   const tableRows = React.useMemo(() => {
     return (filteredRows.length ? filteredRows : paginatedEncounters)?.map((encounter) => ({
       ...encounter,
-      datetime: formatDatetime(parseDate(encounter?.datetime))
+      datetime: formatDatetime(parseDate(encounter?.datetime)),
     }));
   }, [filteredRows, showAllEncounters, paginatedEncounters]);
 
