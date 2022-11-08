@@ -62,7 +62,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits }) =>
   const tableHeaders = [
     {
       id: 1,
-      header: showAllEncounters ? t('dateAndTime', 'Date & time') : t('time', 'Time'),
+      header: t('dateAndTime', 'Date & time'),
       key: 'datetime',
     },
     {
@@ -95,9 +95,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits }) =>
   const tableRows = React.useMemo(() => {
     return (filteredRows.length ? filteredRows : paginatedEncounters)?.map((encounter) => ({
       ...encounter,
-      datetime: showAllEncounters
-        ? formatDatetime(parseDate(encounter?.datetime))
-        : formatTime(parseDate(encounter?.datetime)),
+      datetime: formatDatetime(parseDate(encounter?.datetime))
     }));
   }, [filteredRows, showAllEncounters, paginatedEncounters]);
 
