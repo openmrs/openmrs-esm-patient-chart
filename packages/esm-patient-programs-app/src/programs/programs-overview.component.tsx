@@ -107,6 +107,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
     return (
       <div className={styles.widgetCard}>
         <CardHeader title={headerTitle}>
+          <span>{isValidating ? <InlineLoading /> : null}</span>
           {config.hideAddProgramButton ? null : (
             <Button
               kind="ghost"
@@ -118,7 +119,6 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
               {t('add', 'Add')}
             </Button>
           )}
-          <span>{isValidating ? <InlineLoading /> : null}</span>
         </CardHeader>
         {availablePrograms?.length && eligiblePrograms?.length === 0 && (
           <InlineNotification
