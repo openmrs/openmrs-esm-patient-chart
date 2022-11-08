@@ -97,7 +97,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits }) =>
       ...encounter,
       datetime: formatDatetime(parseDate(encounter?.datetime)),
     }));
-  }, [filteredRows, showAllEncounters, paginatedEncounters]);
+  }, [filteredRows, paginatedEncounters]);
 
   const handleEncounterTypeChange = ({ selectedItem }) => {
     setFilter(selectedItem);
