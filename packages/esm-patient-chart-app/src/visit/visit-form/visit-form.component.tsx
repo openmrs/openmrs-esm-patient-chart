@@ -175,23 +175,23 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
 
   const timePicker = (
     <TimePicker
-    id="visitStartTime"
-    labelText={t('time', 'Time')}
-    onChange={(event) => setVisitTime(event.target.value as amPm)}
-    pattern="^(1[0-2]|0?[1-9]):([0-5]?[0-9])$"
-    style={{ marginLeft: '0.125rem', flex: 'none' }}
-    value={visitTime}
-  >
-    <TimePickerSelect
-      id="visitStartTimeSelect"
-      onChange={(event) => setTimeFormat(event.target.value as amPm)}
-      value={timeFormat}
-      aria-label={t('time', 'Time')}
+      id="visitStartTime"
+      labelText={t('time', 'Time')}
+      onChange={(event) => setVisitTime(event.target.value as amPm)}
+      pattern="^(1[0-2]|0?[1-9]):([0-5]?[0-9])$"
+      style={{ marginLeft: '0.125rem', flex: 'none' }}
+      value={visitTime}
     >
-      <SelectItem value="AM" text="AM" />
-      <SelectItem value="PM" text="PM" />
-    </TimePickerSelect>
-  </TimePicker>
+      <TimePickerSelect
+        id="visitStartTimeSelect"
+        onChange={(event) => setTimeFormat(event.target.value as amPm)}
+        value={timeFormat}
+        aria-label={t('time', 'Time')}
+      >
+        <SelectItem value="AM" text="AM" />
+        <SelectItem value="PM" text="PM" />
+      </TimePickerSelect>
+    </TimePicker>
   );
 
   return (
@@ -206,16 +206,14 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
           <section className={styles.section}>
             <div className={styles.sectionTitle}>{t('dateAndTimeOfVisit', 'Date and time of visit')}</div>
             <div className={styles.dateTimeSection}>
-            {isTablet ? <Layer>{datePicker}</Layer> : datePicker}
-            {isTablet ? <Layer>{timePicker}</Layer> : timePicker}
+              {isTablet ? <Layer>{datePicker}</Layer> : datePicker}
+              {isTablet ? <Layer>{timePicker}</Layer> : timePicker}
             </div>
           </section>
 
           <section>
             <div className={styles.sectionTitle}>{t('visitLocation', 'Visit Location')}</div>
-            <div className={styles.selectContainer}>
-              {isTablet ? <Layer>{locationSelect}
-              </Layer> : locationSelect}</div>
+            <div className={styles.selectContainer}>{isTablet ? <Layer>{locationSelect}</Layer> : locationSelect}</div>
           </section>
           {config.showRecommendedVisitTypeTab && (
             <section>
@@ -301,4 +299,3 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
 };
 
 export default StartVisitForm;
-
