@@ -90,7 +90,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
     return paginatedEnrollments?.map((enrollment: ConfigurableProgram) => ({
       id: enrollment.uuid,
       display: enrollment.display,
-      location: enrollment.location?.display,
+      location: enrollment.location?.display ?? '--',
       dateEnrolled: enrollment.dateEnrolled ? formatDatetime(new Date(enrollment.dateEnrolled)) : '--',
       status: isConfigurable
         ? capitalize(enrollment.enrollmentStatus)
