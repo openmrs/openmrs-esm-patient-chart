@@ -400,10 +400,10 @@ export const mockEncounters = [
   {
     id: 'ff9a0035-8698-47dc-b608-bd6ec2646e5c',
     datetime: '2021-07-05T10:07:18.000+0000',
-    encounterType: 'Visit Note',
+    encounterType: 'Consultation',
     form: {
-      uuid: 'c75f120a-04ec-11e3-8780-2b40bef9a44b',
-      display: 'Visit Note',
+      uuid: '9e1a0c68-ca19-3482-9ffb-0a6b4e591c2a',
+      display: 'Covid 19',
     },
     obs: [],
     provider: 'Dennis The Doctor',

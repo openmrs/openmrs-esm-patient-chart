@@ -4,10 +4,10 @@ import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { formatDatetime, OpenmrsResource, parseDate, useConfig } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { Observation, useVisits } from './visit.resource';
+import { EncountersTableLifecycle } from './encounters-table/encounters-table.component';
 import VisitsTable from './past-visits-components/visits-table';
 import VisitSummary from './past-visits-components/visit-summary.component';
 import styles from './visit-detail-overview.scss';
-import { EncountersTableLifecycle } from './encounters-table/encounters-table.component';
 
 interface VisitOverviewComponentProps {
   patientUuid: string;

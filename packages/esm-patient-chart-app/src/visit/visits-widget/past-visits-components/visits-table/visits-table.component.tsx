@@ -27,8 +27,8 @@ import { Edit } from '@carbon/react/icons';
 import { formatDatetime, formatTime, parseDate, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { formEntrySub, launchPatientWorkspace, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { MappedEncounter } from '../visit-summary.component';
-import styles from './visits-table.scss';
 import EncounterObservations from '../../encounter-observations';
+import styles from './visits-table.scss';
 
 interface VisitTableProps {
   visits: Array<MappedEncounter>;
@@ -244,7 +244,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits }) =>
             <div className={styles.tileContainer}>
               <Tile className={styles.tile}>
                 <div className={styles.tileContent}>
-                  <p className={styles.content}>{t('noPatientsToDisplay', 'No patients to display')}</p>
+                  <p className={styles.content}>{t('noEncountersToDisplay', 'No encounters to display')}</p>
                   <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
                 </div>
               </Tile>
