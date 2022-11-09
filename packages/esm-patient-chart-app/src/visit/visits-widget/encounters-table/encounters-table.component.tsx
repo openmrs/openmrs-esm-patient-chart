@@ -142,7 +142,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({ showAllEncounters, en
             <div className={styles.tileContainer}>
               <Tile className={styles.tile}>
                 <div className={styles.tileContent}>
-                  <p className={styles.content}>{t('noPatientsToDisplay', 'No patients to display')}</p>
+                  <p className={styles.content}>{t('noEncountersToDisplay', 'No encounters to display')}</p>
                   <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
                 </div>
               </Tile>

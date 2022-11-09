@@ -65,6 +65,7 @@
   "noActiveVisitText": "You can't add data to the patient chart without an active visit. Choose from one of the options below to continue.",
   "noDiagnosesFound": "No diagnoses found",
   "noEncountersFound": "No encounters found",
+  "noEncountersToDisplay": "No encounters to display",
   "noMedicationsFound": "No medications found",
   "noNotesFound": "No notes found",
   "noObservationsFound": "No observations found",
