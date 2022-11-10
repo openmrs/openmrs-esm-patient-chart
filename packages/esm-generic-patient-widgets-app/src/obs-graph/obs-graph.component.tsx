@@ -33,17 +33,20 @@ const ObsGraph: React.FC<ObsGraphProps> = ({ patientUuid }) => {
     uuid: config.data[0]?.concept,
   });
 
-  const chartData = useMemo(
-    () =>
-      obss
-        .filter((obs) => obs.conceptUuid === selectedConcept.uuid && obs.dataType === 'Number')
-        .map((obs) => ({
-          group: selectedConcept.label,
-          key: formatDate(new Date(obs.issued), { year: false, time: false }),
-          value: obs.valueQuantity.value,
-        })),
-    [obss, selectedConcept.uuid, selectedConcept.label],
-  );
+  const chartData = useMemo(() => {
+    const chartRecords = obss
+      .filter((obs) => obs.conceptUuid === selectedConcept.uuid && obs.dataType === 'Number')
+      .map((obs) => ({
+        group: selectedConcept.label,
+        key: formatDate(new Date(obs.issued), { year: false, time: false }),
+        value: obs.valueQuantity.value,
+      }));
+
+    if (config.graphOldestFirst) {
+      chartRecords.reverse();
+    }
+    return chartRecords;
+  }, [obss, config.graphOldestFirst, selectedConcept.uuid, selectedConcept.label]);
 
   const chartColors = Object.fromEntries(config.data.map((d) => [d.label, d.color]));
 
