@@ -60,7 +60,7 @@ Alternatively, you could run `yarn serve` from within the individual packages an
 
 ## Troubleshooting
 
-If you notice that your local version of the application is not working or that there's a mismatch between what you see locally versus what's in the reference application, you likely have outdated versions of core libraries. To update core libraries, run the following commands:
+If you notice that your local version of the application is not working or that there's a mismatch between what you see locally versus what's in [dev3](https://dev3.openmrs.org/openmrs/spa), you likely have outdated versions of core libraries. To update core libraries, run the following commands:
 
 ```bash
 # Upgrade core libraries
