@@ -33,7 +33,7 @@ describe('OrderBasketItemList: ', () => {
     const orderBasketItem = screen.getByRole('listitem');
     expect(orderBasketItem).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: /item\(s\) already in your basket/i })).toBeInTheDocument();
-    expect(getByTextWithMarkup(/New\s*Aspirin — 81 mg — Tablet/)).toBeInTheDocument();
+    expect(getByTextWithMarkup(/New\s*Aspirin — 81mg — Tablet/)).toBeInTheDocument();
     expect(getByTextWithMarkup(/DOSE 81 mg — Oral — Once daily — REFILLS 0 QUANTITY 0/)).toBeInTheDocument();
 
     const removeFromBasketButton = screen.getByRole('button', { name: /remove from basket/i });
@@ -51,7 +51,7 @@ describe('OrderBasketItemList: ', () => {
     renderOrderBasketItemList();
 
     expect(screen.getByRole('heading', { name: /order\(s\) being renewed/i })).toBeInTheDocument();
-    expect(getByTextWithMarkup(/Renew\s*Aspirin — 81 mg — Tablet/)).toBeInTheDocument();
+    expect(getByTextWithMarkup(/Renew\s*Aspirin — 81mg — Tablet/)).toBeInTheDocument();
     expect(getByTextWithMarkup(/DOSE 81 mg — Oral — Once daily — REFILLS 0 QUANTITY 0/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /remove from basket/i })).toBeInTheDocument();
   });
@@ -62,7 +62,7 @@ describe('OrderBasketItemList: ', () => {
     renderOrderBasketItemList();
 
     expect(screen.getByRole('heading', { name: /order\(s\) being modified \(revised\)/i })).toBeInTheDocument();
-    expect(getByTextWithMarkup(/Modify\s*Aspirin — 81 mg — Tablet/)).toBeInTheDocument();
+    expect(getByTextWithMarkup(/Modify\s*Aspirin — 81mg — Tablet/)).toBeInTheDocument();
     expect(getByTextWithMarkup(/DOSE 81 mg — Oral — Once daily — REFILLS 0 QUANTITY 0/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /remove from basket/i })).toBeInTheDocument();
   });
@@ -73,7 +73,7 @@ describe('OrderBasketItemList: ', () => {
     renderOrderBasketItemList();
 
     expect(screen.getByRole('heading', { name: /discontinued order\(s\)/i })).toBeInTheDocument();
-    expect(getByTextWithMarkup(/Discontinue\s*Aspirin — 81 mg — Tablet/)).toBeInTheDocument();
+    expect(getByTextWithMarkup(/Discontinue\s*Aspirin — 81mg — Tablet/)).toBeInTheDocument();
     expect(getByTextWithMarkup(/DOSE 81 mg — Oral — Once daily — REFILLS 0 QUANTITY 0/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /remove from basket/i })).toBeInTheDocument();
   });
