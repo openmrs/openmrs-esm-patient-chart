@@ -35,6 +35,11 @@ export const configSchema = {
     _description: 'Encounter role required by clinician to dispense medication(s)',
     _default: '240b26f9-dd88-4172-823d-4a8bfeb7841f',
   },
+  drugOrderTypeUUID: {
+    _type: Type.UUID,
+    _description: "UUID for the 'Drug' order type to fetch medications",
+    _default: '131168f4-15f5-102d-96e4-000c29c2a5d7',
+  },
 };
 
 export interface ConfigObject {
@@ -47,4 +52,5 @@ export interface ConfigObject {
     uuid: string;
     display: string;
   };
+  drugOrderTypeUUID: string;
 }
