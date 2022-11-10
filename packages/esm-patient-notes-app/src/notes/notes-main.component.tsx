@@ -37,6 +37,10 @@ const NotesMain: React.FC<NotesOverviewProps> = ({ patientUuid, showAddNote, pag
     }
   }, [currentVisit]);
 
+  const sortedNotes = visitNotes?.sort(
+    (noteA, noteB) => new Date(noteB.encounterDate).getTime() - new Date(noteA.encounterDate).getTime(),
+  );
+
   return (
     <>
       {(() => {
@@ -58,7 +62,7 @@ const NotesMain: React.FC<NotesOverviewProps> = ({ patientUuid, showAddNote, pag
                   </Button>
                 )}
               </CardHeader>
-              <PaginatedNotes notes={visitNotes} pageSize={pageSize} urlLabel={urlLabel} pageUrl={pageUrl} />
+              <PaginatedNotes notes={sortedNotes} pageSize={pageSize} urlLabel={urlLabel} pageUrl={pageUrl} />
             </div>
           );
         return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchVisitNoteForm} />;
