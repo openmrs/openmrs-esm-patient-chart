@@ -106,11 +106,7 @@ export default function usePanelData() {
 
   const observations: Array<ObsRecord> = fhirObservations?.map((observation) => {
     const conceptUuid = getConceptUuid(observation);
-    let value: number;
-    if (observation?.valueQuantity) {
-      value = observation.valueQuantity?.value;
-      // delete observation.valueQuantity;
-    }
+    const value = getObservationValue(observation);
 
     // is a singe test
     const meta = conceptData[conceptUuid];
@@ -192,3 +188,12 @@ export default function usePanelData() {
     conceptData,
   };
 }
+
+const getObservationValue = (observation: FHIRObservationResource) => {
+  if (observation?.valueQuantity) {
+    return `${observation?.valueQuantity?.value}`;
+  } else if (observation?.valueCodeableConcept) {
+    return observation.valueCodeableConcept.text;
+  }
+  return observation.valueString;
+};
