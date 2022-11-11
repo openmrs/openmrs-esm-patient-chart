@@ -9,6 +9,7 @@ import {
   usePatient,
   useVisit,
   navigate,
+  useConfig,
 } from '@openmrs/esm-framework';
 import { mockPatient, mockPatientWithLongName } from '../../../../__mocks__/patient.mock';
 import { registerWorkspace, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
@@ -19,6 +20,7 @@ const mockUsePatient = usePatient as jest.Mock;
 const mockUseVisit = useVisit as jest.Mock;
 const mockUseLayoutType = useLayoutType as jest.Mock;
 const mockExtensionRegistry = {};
+const mockUseConfig = useConfig as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -35,6 +37,7 @@ jest.mock('@openmrs/esm-framework', () => {
     getExtensionRegistration: (name) => mockExtensionRegistry[name],
     translateFrom: (module, key, defaultValue, options) => defaultValue,
     useOnClickOutside: jest.fn(),
+    useConfig: jest.fn(),
   };
 });
 
@@ -50,6 +53,7 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
 describe('Visit Header', () => {
   test('should display visit header and left nav bar hamburger icon', async () => {
     const user = userEvent.setup();
+    mockUseConfig.mockReturnValue({ startVisitLabel: '' });
 
     registerWorkspace({ name: 'start-visit-workspace-form', title: 'Start visit', load: jest.fn() });
     mockUseAssignedExtensions.mockReturnValue([{ id: 'someId' }]);

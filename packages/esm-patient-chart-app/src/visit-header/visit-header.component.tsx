@@ -20,6 +20,7 @@ import {
   usePatient,
   useVisit,
   navigate,
+  useConfig,
 } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import VisitHeaderSideMenu from './visit-header-side-menu.component';
@@ -110,6 +111,7 @@ const VisitHeader: React.FC = () => {
   const [showVisitHeader, setShowVisitHeader] = useState<boolean>(true);
   const [isSideMenuExpanded, setIsSideMenuExpanded] = useState(false);
   const navMenuItems = useAssignedExtensions('patient-chart-dashboard-slot').map((extension) => extension.id);
+  const { startVisitLabel } = useConfig();
 
   const { currentVisit, isValidating } = useVisit(patient?.id);
   const launchStartVisitForm = React.useCallback(() => launchPatientWorkspace('start-visit-workspace-form'), []);
@@ -167,11 +169,11 @@ const VisitHeader: React.FC = () => {
             {noActiveVisit && (
               <HeaderGlobalAction
                 className={styles.headerGlobalBarButton}
-                aria-label={t('startVisit', 'Start a visit')}
+                aria-label={!startVisitLabel ? <>{t('startVisit', 'Start a visit')}</> : startVisitLabel}
                 onClick={launchStartVisitForm}
               >
                 <Button as="div" className={styles.startVisitButton}>
-                  {t('startVisit', 'Start a visit')}
+                  {!startVisitLabel ? <>{t('startVisit', 'Start a visit')}</> : startVisitLabel}
                 </Button>
               </HeaderGlobalAction>
             )}
@@ -190,15 +192,16 @@ const VisitHeader: React.FC = () => {
       return null;
     }
   }, [
-    launchStartVisitForm,
-    isSideMenuExpanded,
-    noActiveVisit,
+    showVisitHeader,
     patient,
     showHamburger,
-    showVisitHeader,
+    isSideMenuExpanded,
+    noActiveVisit,
     t,
-    toggleSideMenu,
+    startVisitLabel,
+    launchStartVisitForm,
     onClosePatientChart,
+    toggleSideMenu,
   ]);
 
   return <HeaderContainer render={render} />;
