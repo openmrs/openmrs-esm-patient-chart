@@ -23,6 +23,8 @@ import {
   removeDynamicOfflineData,
   syncDynamicOfflineData,
   useLayoutType,
+  userHasAccess,
+  useSession,
 } from '@openmrs/esm-framework';
 import { useDynamicFormDataEntries } from './offline-form-helpers';
 import { FormEncounter } from '../types';
@@ -35,6 +37,7 @@ export interface OfflineFormsProps {
 
 const OfflineForms: React.FC<OfflineFormsProps> = ({ canMarkFormsAsOffline }) => {
   const { t } = useTranslation();
+  const session = useSession();
   const forms = useValidOfflineFormEncounters();
   const layout = useLayoutType();
   const toolbarItemSize = isDesktop(layout) ? 'sm' : undefined;
@@ -42,12 +45,15 @@ const OfflineForms: React.FC<OfflineFormsProps> = ({ canMarkFormsAsOffline }) =>
     { key: 'formName', header: t('offlineFormsTableFormNameHeader', 'Form name') },
     { key: 'availableOffline', header: t('offlineFormsTableFormAvailableOffline', 'Offline') },
   ];
+
   const rows: Array<DataTableRow & Record<string, unknown>> =
-    forms.data?.map((form) => ({
-      id: form.uuid,
-      formName: form.name,
-      availableOffline: <OfflineFormToggle form={form} disabled={!canMarkFormsAsOffline} />,
-    })) ?? [];
+    forms.data
+      ?.filter((formInfo) => userHasAccess(formInfo?.encounterType?.editPrivilege?.display, session?.user))
+      .map((form) => ({
+        id: form.uuid,
+        formName: form.name,
+        availableOffline: <OfflineFormToggle form={form} disabled={!canMarkFormsAsOffline} />,
+      })) ?? [];
 
   return (
     <>
