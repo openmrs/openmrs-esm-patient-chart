@@ -15,7 +15,7 @@
   "discard": "Discard",
   "loading": "Loading",
   "location": "Location",
-  "noCurrentAppointments": "There are current appointments to display for this patient",
+  "noCurrentAppointments": "There are no appointments scheduled for today to display for this patient",
   "noPastAppointments": "There are no past appointments to display for this patient",
   "note": "Note",
   "noUpcomingAppointments": "There are no upcoming appointments to display for this patient",
@@ -25,6 +25,11 @@
   "selectLocation": "Select a location",
   "selectService": "Select service",
   "service": "Service",
+<<<<<<< HEAD
+=======
+  "serviceType": "Service type",
+  "status": "Status",
+>>>>>>> 7059ddd (code review)
   "time": "Time",
   "today": "Today",
   "upcoming": "Upcoming"

@@ -34,6 +34,7 @@ const AppointmentsTable: React.FC<AppointmentTableProps> = ({ patientAppointment
       { key: 'date', header: t('date', 'Date') },
       { key: 'location', header: t('location', 'Location') },
       { key: 'service', header: t('service', 'Service') },
+      { key: 'status', header: t('status', 'Status') },
     ],
     [t],
   );
@@ -46,6 +47,7 @@ const AppointmentsTable: React.FC<AppointmentTableProps> = ({ patientAppointment
           date: formatDatetime(parseDate(appointment.startDateTime), { mode: 'wide' }),
           location: appointment?.location?.name ?? '--',
           service: appointment.service.name,
+          status: appointment.status,
         };
       }),
     [paginatedAppointments],
