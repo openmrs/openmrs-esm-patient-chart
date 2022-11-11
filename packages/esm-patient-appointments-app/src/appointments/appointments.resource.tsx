@@ -2,6 +2,8 @@ import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { AppointmentPayload, AppointmentService, AppointmentsFetchResponse } from '../types';
+import isToday from 'dayjs/plugin/isToday';
+dayjs.extend(isToday);
 
 export const appointmentsSearchUrl = `/ws/rest/v1/appointments/search`;
 
@@ -29,16 +31,20 @@ export function useAppointments(patientUuid: string, startDate: string, abortCon
     ? data.data.sort((a, b) => (b.startDateTime > a.startDateTime ? 1 : -1))
     : null;
 
-  const pastAppointments = appointments?.filter((appointment) =>
-    dayjs((appointment.startDateTime / 1000) * 1000).isBefore(dayjs()),
+  const pastAppointments = appointments?.filter(({ startDateTime }) =>
+    dayjs(new Date(startDateTime).toLocaleDateString()).isBefore(new Date().setHours(0, 0, 0, 0)),
   );
 
-  const upcomingAppointments = appointments?.filter((appointment) =>
-    dayjs((appointment.startDateTime / 1000) * 1000).isAfter(dayjs()),
+  const upcomingAppointments = appointments?.filter(({ startDateTime }) =>
+    dayjs(new Date(startDateTime).toLocaleDateString()).isAfter(new Date()),
+  );
+
+  const todaysAppointments = appointments?.filter(({ startDateTime }) =>
+    dayjs(new Date(startDateTime).toLocaleDateString()).isToday(),
   );
 
   return {
-    data: data ? { pastAppointments, upcomingAppointments } : null,
+    data: data ? { pastAppointments, upcomingAppointments, todaysAppointments } : null,
     isError: error,
     isLoading: !data && !error,
     isValidating,
