@@ -3,7 +3,7 @@ import { openmrsFetch, OpenmrsResource, Visit } from '@openmrs/esm-framework';
 
 export function useVisits(patientUuid: string) {
   const customRepresentation =
-    'custom:(uuid,encounters:(uuid,form:(uuid,display),encounterDatetime,' +
+    'custom:(uuid,encounters:(uuid,diagnoses:(uuid,display,rank,diagnosis),form:(uuid,display),encounterDatetime,' +
     'orders:full,' +
     'obs:(uuid,concept:(uuid,display,conceptClass:(uuid,display)),' +
     'display,groupMembers:(uuid,concept:(uuid,display),' +
@@ -78,6 +78,7 @@ export function usePastVisits(patientUuid: string) {
 
 export interface Encounter {
   uuid: string;
+  diagnoses: Array<Diagnosis>;
   encounterDatetime: string;
   encounterProviders: Array<{
     uuid: string;
@@ -209,6 +210,24 @@ export interface OrderItem {
   provider: {
     name: string;
     role: string;
+  };
+}
+
+export interface Diagnosis {
+  certainty: string;
+  display: string;
+  encounter: OpenmrsResource;
+  links: Array<any>;
+  patient: OpenmrsResource;
+  rank: number;
+  resourceVersion: string;
+  uuid: string;
+  voided: boolean;
+  diagnosis: {
+    coded: {
+      display: string;
+      links: Array<any>;
+    };
   };
 }
 
