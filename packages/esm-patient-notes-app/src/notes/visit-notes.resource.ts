@@ -51,7 +51,9 @@ export function useVisitNotes(patientUuid: string): UseVisitNotes {
     encounterProviderRole: note?.encounterProviders[0]?.encounterRole?.display,
   });
 
-  const formattedVisitNotes = data?.data?.results?.map(mapNoteProperties);
+  const formattedVisitNotes = data?.data?.results
+    ?.map(mapNoteProperties)
+    ?.sort((noteA, noteB) => new Date(noteB.encounterDate).getTime() - new Date(noteA.encounterDate).getTime());
 
   return {
     visitNotes: data ? formattedVisitNotes : null,
