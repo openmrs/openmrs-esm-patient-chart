@@ -6,7 +6,7 @@ export const pageSize = 100;
 export function useObs(patientUuid: string): UseObsResult {
   const { encounterTypes, data } = useConfig();
 
-  const UrlEncounterTypes: string = encounterTypes.length ? `&encounter.type=${encounterTypes.toString()}` : '';
+  const urlEncounterTypes: string = encounterTypes.length ? `&encounter.type=${encounterTypes.toString()}` : '';
 
   const {
     data: result,
@@ -17,7 +17,7 @@ export function useObs(patientUuid: string): UseObsResult {
       data.map((d) => d.concept).join(',') +
       '&_summary=data&_sort=-date' +
       `&_count=${pageSize}` +
-      UrlEncounterTypes,
+      urlEncounterTypes,
     openmrsFetch,
   );
 

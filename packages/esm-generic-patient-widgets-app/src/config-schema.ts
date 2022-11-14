@@ -54,6 +54,7 @@ export const configSchema = {
   },
   encounterTypes: {
     _type: Type.Array,
+    _description: 'Encounter types used to filter the requests',
     _elements: {
       _type: Type.String,
     },

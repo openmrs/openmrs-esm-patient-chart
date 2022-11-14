@@ -91,7 +91,7 @@ describe('Switchable obs viewer ', () => {
     await waitForLoadingToFinish();
 
     expect(screen.getByRole('heading', { name: /Black bile/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /chart view/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Chart View/i })).toBeInTheDocument();
 
     const table = screen.getByRole('table');
 
