@@ -232,13 +232,12 @@ function InfoTooltip({ orderer }) {
   return (
     <IconButton
       className={styles.tooltip}
-      align="bottom-left"
+      align="top-left"
       direction="top"
       label={orderer}
       renderIcon={(props) => <User size={16} {...props} />}
-    >
-      {orderer}
-    </IconButton>
+      kind="ghost"
+    />
   );
 }
 
