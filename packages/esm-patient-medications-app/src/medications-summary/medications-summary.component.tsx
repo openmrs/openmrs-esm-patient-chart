@@ -55,7 +55,7 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
             );
           }
 
-          return <EmptyState displayText={displayText} headerTitle={headerTitle} />;
+          return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchOrderBasket} />;
         })()}
       </div>
       <div style={{ marginTop: '1.5rem' }}>
@@ -81,7 +81,7 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
             );
           }
 
-          return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchOrderBasket} />;
+          return <EmptyState displayText={displayText} headerTitle={headerTitle} />;
         })()}
       </div>
     </>
