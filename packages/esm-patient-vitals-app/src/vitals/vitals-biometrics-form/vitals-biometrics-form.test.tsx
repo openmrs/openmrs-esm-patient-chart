@@ -174,7 +174,7 @@ describe('VitalsBiometricsForm: ', () => {
       message: 'Internal Server Error',
       response: {
         status: 500,
-        statusText: 'Some of the values entered are invalid',
+        statusText: t('checkForValidity', 'Some of the values entered are invalid'),
       },
     };
 
