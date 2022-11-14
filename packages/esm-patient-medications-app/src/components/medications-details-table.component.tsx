@@ -83,8 +83,8 @@ const MedicationsDetailsTable = connect<
           <div className={styles.medicationRecord}>
             <div>
               <p className={styles.bodyLong01}>
-                <strong>{capitalize(medication.drug?.name)}</strong> &mdash; {medication.drug?.strength.toLowerCase()}{' '}
-                &mdash; {medication.doseUnits?.display.toLowerCase()}
+                <strong>{capitalize(medication.drug?.concept?.display)}</strong> &mdash;{' '}
+                {medication.drug?.strength.toLowerCase()} &mdash; {medication.drug.dosageForm.display.toLowerCase()}
               </p>
               <p className={styles.bodyLong01}>
                 <span className={styles.label01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
@@ -231,13 +231,13 @@ function InfoTooltip({ orderer }) {
   return (
     <IconButton
       className={styles.tooltip}
-      align="bottom-left"
+      align="top-left"
       direction="top"
       label={orderer}
       renderIcon={(props) => <User size={16} {...props} />}
-    >
-      {orderer}
-    </IconButton>
+      kind="ghost"
+      size="sm"
+    />
   );
 }
 
