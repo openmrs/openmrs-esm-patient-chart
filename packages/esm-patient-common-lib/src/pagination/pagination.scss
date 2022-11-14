@@ -9,7 +9,6 @@
 .desktop, .tablet {
   @include type.type-style('body-compact-01');
   display: flex;
-  border-top: 1px solid #e0e0e0;
   justify-content: space-between;
   color: $text-02;
   background-color: $ui-02;
