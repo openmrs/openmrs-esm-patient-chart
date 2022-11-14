@@ -19,7 +19,6 @@ import {
 import { Add, User } from '@carbon/react/icons';
 import { formatDate } from '@openmrs/esm-framework';
 import { CardHeader, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { getDosage } from '../utils/get-dosage';
 import { useTranslation } from 'react-i18next';
 import { compare } from '../utils/compare';
 import { connect } from 'unistore/react';

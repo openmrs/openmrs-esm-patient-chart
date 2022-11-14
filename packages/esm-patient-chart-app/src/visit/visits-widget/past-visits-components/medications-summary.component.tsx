@@ -1,7 +1,7 @@
 import React from 'react';
 import capitalize from 'lodash-es/capitalize';
 import { useTranslation } from 'react-i18next';
-import { OrderItem, getDosage } from '../visit.resource';
+import { OrderItem } from '../visit.resource';
 import { formatDate, formatTime, parseDate } from '@openmrs/esm-framework';
 import styles from '../visit-detail-overview.scss';
 
@@ -29,7 +29,7 @@ const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) =>
                       <span className={styles.label01}> {t('dose', 'Dose').toUpperCase()} </span>{' '}
                     </span>
                     <span className={styles.dosage}>
-                      {getDosage(medication.order.drug?.strength, medication.order?.dose)?.toLowerCase()}
+                      {medication.order.dose} {medication.order.doseUnits.display.toLowerCase()}
                     </span>{' '}
                     &mdash; {medication.order.route?.display?.toLowerCase()} &mdash;{' '}
                     {medication.order.frequency?.display?.toLowerCase()} &mdash;{' '}
