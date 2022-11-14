@@ -11,6 +11,11 @@ export const configSchema = {
     _description: 'Displayed in messages about this data',
     _default: 'results',
   },
+  graphOldestFirst: {
+    _type: Type.Boolean,
+    _description: 'Show graph values from most oldest to recent',
+    _default: false,
+  },
   data: {
     _type: Type.Array,
     _elements: {
@@ -52,6 +57,7 @@ export const configSchema = {
 export interface ConfigObject {
   title: string;
   resultsName: string;
+  graphOldestFirst: boolean;
   data: Array<{
     concept: string;
     label: string;

@@ -37,6 +37,11 @@ export const esmPatientChartSchema = {
     _description: 'Shows the All Encounters Tab of Patient Visits section in Patient Chart',
     _default: false,
   },
+  startVisitLabel: {
+    _type: Type.String,
+    _description: 'Custom label to use on the start visit actions',
+    _default: '',
+  },
 };
 
 export interface ChartConfig {

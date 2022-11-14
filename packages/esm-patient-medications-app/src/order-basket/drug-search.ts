@@ -34,8 +34,14 @@ export async function searchMedications(
   const drugs = await searchDrugsInBackend(allSearchTerms, abortController);
   const drugToOrderTemplates = (await Promise.all(
     drugs.map(async (drug) => {
-      const res = await getOrderTemplatesByDrug(drug.uuid);
-      const orderTemplates = res.data.results.map((ot) => {
+      let response: any = null;
+      try {
+        response = await getOrderTemplatesByDrug(drug.uuid);
+      } catch (error) {
+        // most likely there is no `Order Template` backend support
+        response = { data: { results: [] } }; // empty response
+      }
+      const orderTemplates = response.data.results.map((ot) => {
         try {
           ot.template = JSON.parse(ot.template);
           return ot;
@@ -47,7 +53,6 @@ export async function searchMedications(
       return { drug: drug, templates: orderTemplates.filter((x) => !!x) };
     }),
   )) as any as Array<{ drug: Drug; templates: Array<DrugOrderTemplate> }>;
-
   const explodedSearchResults = drugToOrderTemplates.flatMap(({ drug, templates }) => [
     ...explodeResultWithOrderTemplates(drug, templates, encounterUuid, daysDurationUnit),
   ]);
