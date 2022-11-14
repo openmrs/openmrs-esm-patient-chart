@@ -42,12 +42,33 @@ export const esmPatientChartSchema = {
     _description: 'Custom label to use on the start visit actions',
     _default: '',
   },
+  showServiceQueueFields: {
+    _type: Type.Boolean,
+    _description: 'Whether start visit form should display service queue fields`',
+    _default: true,
+  },
+  priorityConceptSetUuid: {
+    _type: Type.ConceptUuid,
+    _default: '9e123c90-76ac-4eaa-8d40-35577781eb46',
+  },
+  serviceConceptSetUuid: {
+    _type: Type.ConceptUuid,
+    _default: '952c329c-c195-44c7-8662-85b1e82bc4ad',
+  },
+  statusConceptSetUuid: {
+    _type: Type.ConceptUuid,
+    _default: '13c9b9fb-3396-4139-98e1-59938d544168',
+  },
 };
 
 export interface ChartConfig {
   offlineVisitTypeUuid: string;
   visitTypeResourceUrl: string;
   showRecommendedVisitTypeTab: boolean;
+  showServiceQueueFields: boolean;
+  priorityConceptSetUuid: string;
+  serviceConceptSetUuid: string;
+  statusConceptSetUuid: string;
 }
 
 export const configSchema = {
