@@ -19,7 +19,6 @@ import {
 import { Add, User } from '@carbon/react/icons';
 import { formatDate } from '@openmrs/esm-framework';
 import { CardHeader, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { getDosage } from '../utils/get-dosage';
 import { useTranslation } from 'react-i18next';
 import { compare } from '../utils/compare';
 import { connect } from 'unistore/react';
@@ -90,7 +89,7 @@ const MedicationsDetailsTable = connect<
               <p className={styles.bodyLong01}>
                 <span className={styles.label01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
                 <span className={styles.dosage}>
-                  {getDosage(medication.drug?.strength, medication.dose).toLowerCase()}
+                  {medication.dose} {medication.doseUnits.display.toLowerCase()}
                 </span>{' '}
                 &mdash; {medication.route?.display.toLowerCase()} &mdash; {medication.frequency?.display.toLowerCase()}{' '}
                 &mdash;{' '}
