@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { ConfigObject, openmrsFetch, Session, useConfig } from '@openmrs/esm-framework';
+import { ConfigObject, openmrsFetch, Session } from '@openmrs/esm-framework';
 import { OrderPost, PatientMedicationFetchResponse } from '../types/order';
 
 /**
@@ -9,8 +9,6 @@ import { OrderPost, PatientMedicationFetchResponse } from '../types/order';
  * @param status The status/the kind of orders to be fetched.
  */
 export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any', careSettingUuid: string) {
-  const config = useConfig() as ConfigObject;
-  const { drugOrderTypeUUID } = config;
   const customRepresentation =
     'custom:(uuid,dosingType,orderNumber,accessionNumber,' +
     'patient:ref,action,careSetting:ref,previousOrder:ref,dateActivated,scheduledDate,dateStopped,autoExpireDate,' +
