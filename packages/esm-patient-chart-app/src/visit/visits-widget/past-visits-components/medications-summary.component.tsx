@@ -29,7 +29,7 @@ const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) =>
                       <span className={styles.label01}> {t('dose', 'Dose').toUpperCase()} </span>{' '}
                     </span>
                     <span className={styles.dosage}>
-                      {medication.order.dose} {medication.order.doseUnits.display.toLowerCase()}
+                      {medication.order?.dose} {medication.order?.doseUnits.display.toLowerCase()}
                     </span>{' '}
                     &mdash; {medication.order.route?.display?.toLowerCase()} &mdash;{' '}
                     {medication.order.frequency?.display?.toLowerCase()} &mdash;{' '}
