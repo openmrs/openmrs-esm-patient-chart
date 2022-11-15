@@ -60,6 +60,20 @@
 .identifiers {
   @include type.type-style("body-compact-02");
   color: $ui-04;
+  display: flex;
+
+  span:not(:first-child) {
+    margin: 0rem 0.75rem;
+  }
+}
+
+.identifierTag {
+  display: flex;
+  align-items: center;
+}
+
+.tag {
+  margin: 0.25rem 0.25rem 0.25rem 0rem;
 }
 
 .tooltipPadding {

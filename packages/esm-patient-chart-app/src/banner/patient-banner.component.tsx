@@ -6,6 +6,7 @@ import { ExtensionSlot, age, formatDate, parseDate } from '@openmrs/esm-framewor
 import ContactDetails from './contact-details/contact-details.component';
 import CustomOverflowMenuComponent from './ui-components/overflow-menu.component';
 import styles from './patient-banner.scss';
+
 interface PatientBannerProps {
   patient: fhir.Patient;
   patientUuid: string;
@@ -120,11 +121,10 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
               {patient?.identifier?.length
                 ? patient?.identifier.map(({ value, type }) => (
                     <span className={styles.identifierTag}>
-                      <Tag key={value} type="gray" title={type.text}>
+                      <Tag key={value} className={styles.tag} type="gray" title={type.text}>
                         {type.text}
                       </Tag>
                       {value}
-                      &#183;
                     </span>
                   ))
                 : ''}
