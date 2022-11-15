@@ -6,6 +6,7 @@
   "bmiCalc": "BMI (calc.)",
   "bp": "BP",
   "chartView": "Chart View",
+  "checkForValidity": "Some of the values entered are invalid",
   "diastolic": "diastolic",
   "discard": "Discard",
   "goToSummary": "Go to Summary",
@@ -38,6 +39,5 @@
   "vitalsAndBiometricsSaveError": "Error saving vitals and biometrics",
   "vitalSignDisplayed": "Vital Sign Displayed",
   "vitalSigns": "Vital signs",
-  "weight": "Weight",
-  "checkForValidity": "Some of the values entered are invalid"
+  "weight": "Weight"
 }
