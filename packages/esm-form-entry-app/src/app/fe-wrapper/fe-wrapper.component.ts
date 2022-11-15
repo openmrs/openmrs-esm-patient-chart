@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { ApplicationRef, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { Form } from '@openmrs/ngx-formentry';
 import { Observable, forkJoin, from, throwError, of, Subscription } from 'rxjs';
 import { catchError, concatAll, map, mergeMap, take } from 'rxjs/operators';
@@ -54,6 +54,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
     private readonly formCreationService: FormCreationService,
     private readonly singleSpaPropsService: SingleSpaPropsService,
     private conceptService: ConceptService,
+    private applicationRef: ApplicationRef,
   ) {}
 
   public ngOnInit() {
@@ -274,6 +275,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
         default:
           break;
       }
+      this.applicationRef.tick();
     }
   }
 
