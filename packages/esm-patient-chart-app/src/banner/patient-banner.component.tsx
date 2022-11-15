@@ -121,7 +121,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
               {patient?.identifier?.length
                 ? patient?.identifier.map(({ value, type }) => (
                     <span className={styles.identifierTag}>
-                      <Tag className={styles.tag} key={value} type="gray" title={type.text}>
+                      <Tag key={value} className={styles.tag} type="gray" title={type.text}>
                         {type.text}
                       </Tag>
                       {value}
