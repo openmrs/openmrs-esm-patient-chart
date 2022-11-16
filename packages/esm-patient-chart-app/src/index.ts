@@ -251,6 +251,13 @@ function setupOpenMRS() {
         }),
       },
       {
+        name: 'confirm-closing-patient-chart-modal',
+        load: getAsyncLifecycle(() => import('./visit-header/confirmation-modal.component'), {
+          featureName: 'confirm closing patient chart',
+          moduleName,
+        }),
+      },
+      {
         id: 'start-visit-button-patient-search',
         slot: 'start-visit-button-slot',
         load: getAsyncLifecycle(() => import('./visit/start-visit-button.component'), {
