@@ -1,9 +1,9 @@
-import React, { useContext, useState, useEffect, useRef } from 'react';
+import React, { useContext, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AccordionSkeleton, Button, ContentSwitcher, DataTableSkeleton, Switch } from '@carbon/react';
 import { TreeViewAlt } from '@carbon/react/icons';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
-import { isDesktop, navigate, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { navigate, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { testResultsBasePath } from '../helpers';
 import FilterSet, { FilterContext, FilterProvider } from '../filter';
 import GroupedTimeline, { useGetManyObstreeData } from '../grouped-timeline';
