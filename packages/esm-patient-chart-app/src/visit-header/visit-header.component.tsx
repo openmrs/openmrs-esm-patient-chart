@@ -22,7 +22,6 @@ import {
   navigate,
   useConfig,
   showModal,
-  // getGlobalStore,
 } from '@openmrs/esm-framework';
 import { launchPatientWorkspace, getWorkspaceStore } from '@openmrs/esm-patient-common-lib';
 import VisitHeaderSideMenu from './visit-header-side-menu.component';
@@ -115,16 +114,14 @@ const VisitHeader: React.FC = () => {
   const navMenuItems = useAssignedExtensions('patient-chart-dashboard-slot').map((extension) => extension.id);
   const { startVisitLabel } = useConfig();
 
-  // I thought this would tell when a form is updated
-  // const globalFormStore = getGlobalStore('ampath-form-state', {}).getState();
-
-  // const hasFormChanges = Object.values(globalFormStore).includes('ready');
-  // console.log(hasFormChanges, 'gloable-----', globalFormStore)
-
   const store = getWorkspaceStore();
   const state = store.getState();
-  const hasOpenForm = state.openWorkspaces?.[0]?.type === 'form';
   const workSpaceProps = state.openWorkspaces?.[0];
+
+  const formWorkspace = state.openWorkspaces?.find((workspace) => workspace.type === 'form');
+  const orderWorkspace = state.openWorkspaces?.find((workspace) => workspace.type === 'order');
+  const visitNoteWorkspace = state.openWorkspaces?.find((workspace) => workspace.type === 'visit-note');
+  const hasOpenForm = formWorkspace || orderWorkspace || visitNoteWorkspace;
 
   const { currentVisit, isValidating } = useVisit(patient?.id);
   const launchStartVisitForm = React.useCallback(() => launchPatientWorkspace('start-visit-workspace-form'), []);

@@ -6,40 +6,51 @@ import { useTranslation } from 'react-i18next';
 interface ConfirmationDialogProps {
   closeDialog: () => void;
   leavePatientChart: (e: any) => void;
-  props: any;
+  props: {
+    type?: string;
+    title?: string;
+    additionalProps?: {
+      workspaceTitle?: string;
+    };
+  };
 }
 
 const ConfirmLeavingPatientChart: React.FC<ConfirmationDialogProps> = ({ closeDialog, leavePatientChart, props }) => {
   const { t } = useTranslation();
   const { type = '', title = '', additionalProps = {} } = props;
-  const workspaceTitle = additionalProps && additionalProps?.workspaceTitle;
-
-  const unifiedTitle = title.includes('Form') ? title : `${title} Form`;
+  const workspaceTitle = additionalProps?.workspaceTitle;
 
   return (
     <div>
       <ModalHeader
         closeModal={closeDialog}
-        title={
-          type === 'form'
-            ? t('openFormWarningHeader', "You haven't saved the {formTitle}", { formTitle: unifiedTitle })
-            : t('openWorkspaceWarningHeader', "You haven't saved this workspace")
-        }
+        title={t('openWorkspaceWarningHeader', "You haven't saved the {formTitle}", { formTitle: title })}
       />
       <ModalBody>
-        {type === 'form' && workspaceTitle
+        {type === 'form'
           ? workspaceTitle
             ? t(
                 'openFormSpecificWarningText',
-                'The {workspaceTitle} form will not be saved if you exit the patient chart now.',
+                'The {workspaceTitle} form will not be saved if you exit the patient chart now, please or discard the form before you exit.',
                 { workspaceTitle },
               )
-            : t('openFormWarningText', 'The form will not be saved if you exit the patient chart now.')
-          : t('openWorkspaceWarningText', 'The workspace will not be saved if you exit the patient chart now.')}
+            : t(
+                'openFormWarningText',
+                'The form will not be saved if you exit the patient chart now, please or discard the form before you exit.',
+              )
+          : type === 'order'
+          ? t(
+              'openOrderBasketWarningText',
+              'The orders will not be saved if you exit the patient chart now, please or discard the form before you exit.',
+            )
+          : t(
+              'openVisitNoteWarningText',
+              'The visit note will not be saved if you exit the patient chart now, please or discard the note before you exit.',
+            )}
       </ModalBody>
       <ModalFooter>
         <Button kind="secondary" onClick={closeDialog}>
-          {t('no', 'No')}
+          {t('returnToPatientChart', 'Return to patient chart')}
         </Button>
         <Button
           kind="danger"
@@ -48,7 +59,7 @@ const ConfirmLeavingPatientChart: React.FC<ConfirmationDialogProps> = ({ closeDi
             leavePatientChart(e);
           }}
         >
-          {t('delete', 'Delete')}
+          {t('closePatientChart', 'Close patient chart')}
         </Button>
       </ModalFooter>
     </div>
