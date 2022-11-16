@@ -128,7 +128,7 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, ty
             {leftContent === 'panel' && 'isDesktop'}
           </div>
         </div>
-        <div className={styles.dragHandler} ref={div} tabIndex={0} onMouseDown={onMouseDown}></div>
+        <div className={styles.dragHandler} ref={div} role="button" tabIndex={0} onMouseDown={onMouseDown}></div>
         <div className={styles.Right + ' ' + styles.col} ref={right}>
           {!tablet && (
             <div
