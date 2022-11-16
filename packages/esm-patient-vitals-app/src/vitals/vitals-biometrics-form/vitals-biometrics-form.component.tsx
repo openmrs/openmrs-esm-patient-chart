@@ -9,6 +9,9 @@ import {
   useConfig,
   useLayoutType,
   useSession,
+  ExtensionSlot,
+  usePatient,
+  useVisit,
 } from '@openmrs/esm-framework';
 import { DefaultWorkspaceProps, useVitalsConceptMetadata } from '@openmrs/esm-patient-common-lib';
 import { Button, ButtonSet, Column, Form, Row, Stack } from '@carbon/react';
@@ -35,6 +38,8 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
+  const patient = usePatient(patientUuid);
+  const { currentVisit } = useVisit(patientUuid);
   const config = useConfig() as ConfigObject;
   const { cache, mutate }: { cache: any; mutate: Function } = useSWRConfig();
   const { data: conceptUnits, conceptMetadata } = useVitalsConceptMetadata();
@@ -42,6 +47,7 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
   const [patientVitalAndBiometrics, setPatientVitalAndBiometrics] = useState<PatientVitalsAndBiometrics>();
   const [patientBMI, setPatientBMI] = useState<number>();
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const encounterUuid = currentVisit?.encounters?.find((enc) => enc?.form?.uuid === config.vitals.formUuid)?.uuid;
 
   const isBMIInNormalRange = (value: number | undefined | string) => {
     if (value === undefined || value === '') return true;
@@ -125,6 +131,24 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
       setPatientBMI(calculatedBmi);
     }
   }, [patientVitalAndBiometrics?.weight, patientVitalAndBiometrics?.height]);
+
+  if (config.vitals.useFormEngine) {
+    return (
+      <ExtensionSlot
+        extensionSlotName="form-widget-slot"
+        state={{
+          view: 'form',
+          formUuid: config.vitals.formUuid,
+          visitUuid: currentVisit?.uuid,
+          visitTypeUuid: currentVisit?.visitType?.uuid,
+          patientUuid: patientUuid ?? null,
+          patient,
+          encounterUuid,
+          closeWorkspace,
+        }}
+      />
+    );
+  }
 
   return (
     <Form className={styles.form}>
