@@ -48,7 +48,7 @@ import BaseVisitType from './base-visit-type.component';
 import styles from './visit-form.scss';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
 import { ChartConfig } from '../../config-schema';
-import { QueueEntryPayload, saveQueueEntry, usePriority, useServices, useStatus } from '../hooks/useServiceQueue';
+import { QueueEntryPayload, saveQueueEntry, usePriorities, useServices, useStatuses } from '../hooks/useServiceQueue';
 
 const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace, promptBeforeClosing }) => {
   const { t } = useTranslation();
@@ -71,10 +71,11 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
   const { mutate } = useVisit(patientUuid);
   const [ignoreChanges, setIgnoreChanges] = useState(true);
   const [priority, setPriority] = useState('');
-  const { priorities } = usePriority();
-  const { statuses } = useStatus();
-  const { allServices } = useServices(selectedLocation);
-  const [service, setSelectedService] = useState('');
+  const { priorities } = usePriorities();
+  const { statuses } = useStatuses();
+  const { services } = useServices(selectedLocation);
+  const [selectedService, setSelectedService] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('');
 
   useEffect(() => {
     if (locations && sessionUser?.sessionLocation?.uuid) {
@@ -113,21 +114,21 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
           (response) => {
             if (response.status === 201) {
               if (config.showServiceQueueFields) {
-                const status = statuses.find((data) => data.display.toLowerCase() === 'waiting').uuid;
-                const defaultPriority = priorities.find((data) => data.display.toLowerCase() === 'not urgent').uuid;
+                const defaultStatus = config.defaultStatusConceptUuid;
+                const defaultPriority = config.defaultPriorityConceptUuid;
                 const queuePayload: QueueEntryPayload = {
                   visit: {
                     uuid: response.data.uuid,
                   },
                   queueEntry: {
                     status: {
-                      uuid: status,
+                      uuid: selectedStatus ? selectedStatus : defaultStatus,
                     },
                     priority: {
                       uuid: priority ? priority : defaultPriority,
                     },
                     queue: {
-                      uuid: service,
+                      uuid: selectedService,
                     },
                     patient: {
                       uuid: patientUuid,
@@ -143,10 +144,10 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
                       if (response.status === 201) {
                         showToast({
                           kind: 'success',
-                          title: t('startVisit', 'Start a visit'),
+                          title: t('visitStarted', 'Visit started'),
                           description: t(
-                            'startVisitQueueSuccessfully',
-                            'Patient has been added to active visits list and queue.',
+                            'queueAddedSuccessfully',
+                            `Patient has been added to the queue successfully.`,
                             `${hours} : ${minutes}`,
                           ),
                         });
@@ -188,14 +189,15 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
     },
     [
       closeWorkspace,
+      config.defaultPriorityConceptUuid,
+      config.defaultStatusConceptUuid,
       config.showServiceQueueFields,
       mutate,
       patientUuid,
-      priorities,
       priority,
       selectedLocation,
-      service,
-      statuses,
+      selectedService,
+      selectedStatus,
       t,
       timeFormat,
       visitDate,
@@ -360,45 +362,89 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
           {config.showServiceQueueFields && (
             <>
               <section className={styles.section}>
-                <div className={styles.sectionTitle}>{t('service', 'Service')}</div>
-                <Select
-                  labelText={t('selectService', 'Select a service')}
-                  id="service"
-                  invalidText="Required"
-                  value={service}
-                  onChange={(event) => setSelectedService(event.target.value)}
-                >
-                  {!service ? <SelectItem text={t('chooseService', 'Select a service')} value="" /> : null}
-                  {allServices?.length > 0 &&
-                    allServices.map((service) => (
-                      <SelectItem key={service.uuid} text={service.display} value={service.uuid}>
-                        {service.display}
-                      </SelectItem>
-                    ))}
-                </Select>
-              </section>
-
-              <section className={styles.section}>
-                <div className={styles.sectionTitle}>{t('priority', 'Priority')}</div>
-                <ContentSwitcher
-                  size="sm"
-                  selectionMode="manual"
-                  onChange={(event) => {
-                    setPriority(event.name as any);
-                  }}
-                >
-                  {priorities?.length > 0 ? (
-                    priorities.map(({ uuid, display }) => {
-                      return <Switch name={uuid} text={display} value={uuid} index={uuid} />;
-                    })
-                  ) : (
-                    <Switch
-                      name={t('noPriorityFound', 'No priority found')}
-                      text={t('noPriorityFound', 'No priority found')}
-                      value={null}
+                <div className={styles.queueSection}>
+                  <div className={styles.sectionTitle}>{t('service', 'Service')}</div>
+                  {!services?.length ? (
+                    <InlineNotification
+                      className={styles.inlineNotification}
+                      kind={'error'}
+                      lowContrast
+                      subtitle={t('configureServices', 'Please configure services to continue.')}
+                      title={t('noServicesConfigured', 'No services configured')}
                     />
+                  ) : (
+                    <Select
+                      labelText={t('selectService', 'Select a service')}
+                      id="service"
+                      invalidText="Required"
+                      value={selectedService}
+                      onChange={(event) => setSelectedService(event.target.value)}
+                    >
+                      {!selectedService ? <SelectItem text={t('chooseService', 'Select a service')} value="" /> : null}
+                      {services?.length > 0 &&
+                        services.map((service) => (
+                          <SelectItem key={service.uuid} text={service.display} value={service.uuid}>
+                            {service.display}
+                          </SelectItem>
+                        ))}
+                    </Select>
                   )}
-                </ContentSwitcher>
+                </div>
+
+                <div className={styles.queueSection}>
+                  <div className={styles.sectionTitle}>{t('status', 'Status')}</div>
+                  {!statuses?.length ? (
+                    <InlineNotification
+                      className={styles.inlineNotification}
+                      kind={'error'}
+                      lowContrast
+                      subtitle={t('configureStatuses', 'Please configure statuses to continue.')}
+                      title={t('noStatusesConfigured', 'No statuses configured')}
+                    />
+                  ) : (
+                    <Select
+                      labelText={t('selectStatus', 'Select a status')}
+                      id="status"
+                      invalidText="Required"
+                      value={selectedStatus}
+                      onChange={(event) => setSelectedStatus(event.target.value)}
+                    >
+                      {!selectedStatus ? <SelectItem text={t('chooseStatus', 'Select a status')} value="" /> : null}
+                      {statuses?.length > 0 &&
+                        statuses.map((service) => (
+                          <SelectItem key={service.uuid} text={service.display} value={service.uuid}>
+                            {service.display}
+                          </SelectItem>
+                        ))}
+                    </Select>
+                  )}
+                </div>
+
+                <div className={styles.queueSection}>
+                  <div className={styles.sectionTitle}>{t('priority', 'Priority')}</div>
+                  {!priorities?.length ? (
+                    <InlineNotification
+                      className={styles.inlineNotification}
+                      kind={'error'}
+                      lowContrast
+                      subtitle={t('configurePriorities', 'Please configure priorities to continue.')}
+                      title={t('noPrioritiesConfigured', 'No priorities configured')}
+                    />
+                  ) : (
+                    <ContentSwitcher
+                      size="sm"
+                      selectionMode="manual"
+                      onChange={(event) => {
+                        setPriority(event.name as any);
+                      }}
+                    >
+                      {priorities?.length > 0 &&
+                        priorities.map(({ uuid, display }) => {
+                          return <Switch name={uuid} text={display} value={uuid} index={uuid} />;
+                        })}
+                    </ContentSwitcher>
+                  )}
+                </div>
               </section>
             </>
           )}

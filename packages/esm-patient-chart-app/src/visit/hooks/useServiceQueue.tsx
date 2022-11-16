@@ -22,20 +22,24 @@ export interface QueueEntryPayload {
 }
 
 export function useServices(location: string) {
+  const config = useConfig() as ChartConfig;
   const apiUrl = `/ws/rest/v1/queue?location=${location}`;
-  const { data } = useSWRImmutable<{ data: { results: Array<QueueServiceInfo> } }, Error>(apiUrl, openmrsFetch);
+  const { data } = useSWRImmutable<{ data: { results: Array<QueueServiceInfo> } }, Error>(
+    config.showServiceQueueFields && location ? apiUrl : null,
+    openmrsFetch,
+  );
 
   return {
-    allServices: data ? data?.data.results : [],
+    services: data ? data?.data.results : [],
   };
 }
 
-export function useStatus() {
+export function useStatuses() {
   const config = useConfig() as ChartConfig;
   const statusConceptSetUuid = config.statusConceptSetUuid;
 
   const apiUrl = `/ws/rest/v1/concept/${statusConceptSetUuid}`;
-  const { data, error } = useSWRImmutable<FetchResponse>(apiUrl, openmrsFetch);
+  const { data, error } = useSWRImmutable<FetchResponse>(config.showServiceQueueFields ? apiUrl : null, openmrsFetch);
 
   return {
     statuses: data ? data?.data?.setMembers : [],
@@ -43,12 +47,12 @@ export function useStatus() {
   };
 }
 
-export function usePriority() {
+export function usePriorities() {
   const config = useConfig() as ChartConfig;
   const priorityConceptSetUuid = config.priorityConceptSetUuid;
 
   const apiUrl = `/ws/rest/v1/concept/${priorityConceptSetUuid}`;
-  const { data } = useSWRImmutable<FetchResponse>(apiUrl, openmrsFetch);
+  const { data } = useSWRImmutable<FetchResponse>(config.showServiceQueueFields ? apiUrl : null, openmrsFetch);
 
   return {
     priorities: data ? data?.data?.setMembers : [],
