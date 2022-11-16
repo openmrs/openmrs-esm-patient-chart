@@ -16,10 +16,10 @@ type panelOpts = 'tree' | 'panel';
 
 interface ResultsViewerProps {
   basePath: string;
-  type?: string;
-  testUuid?: string;
   patientUuid?: string;
   loading?: boolean;
+  testUuid?: string;
+  type?: string;
 }
 
 const RoutedResultsViewer: React.FC<ResultsViewerProps> = ({ type, basePath, testUuid, patientUuid }) => {
@@ -90,7 +90,7 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, ty
   return (
     <>
       <div className={styles.resultsContainer}>
-        <div className={styles.Left + ' ' + styles.col} ref={left}>
+        <div className={styles.left + ' ' + styles.col} ref={left}>
           <div className={styles.resultsHeader}>
             <div className={styles.leftHeader}>
               <h4 style={{ flexGrow: 1 }}>{`${t('results', 'Results')} ${
@@ -128,8 +128,8 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, ty
             {leftContent === 'panel' && 'DesktopView'}
           </div>
         </div>
-        <div className={styles.dragHandler} ref={div} role="button" tabIndex={0} onMouseDown={onMouseDown}></div>
-        <div className={styles.Right + ' ' + styles.col} ref={right}>
+        <button className={styles.dragHandler} ref={div} tabIndex={0} onMouseDown={onMouseDown}></button>
+        <div className={styles.right + ' ' + styles.col} ref={right}>
           {!tablet && (
             <div
               className={styles.viewOptsContentSwitcherContainer}
@@ -194,5 +194,4 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, ty
     </>
   );
 };
-
 export default RoutedResultsViewer;

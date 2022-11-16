@@ -7,27 +7,33 @@
   padding: 0;
   width: 100%;
   position: relative;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  background-color: $ui-01;
   box-sizing: border-box;
   display:flex;
 }
-.col{
+​
+.col {
   height: 100%;
   display: flex;
   box-sizing: border-box;
   min-width: 5rem;
 }
-.Left{
+​
+.left {
   width:50%;
   min-width:20%;
   display: flex;
   flex-direction: column;
 }
-.Right{
+​
+.right {
   width:50%;
   min-width:20%;
   display: flex;
   flex-direction: column;
 }
+​
 .dragHandler {
   width: 10px;
   height: 100%;
@@ -36,6 +42,7 @@
   cursor: col-resize;
   top: 0;
 }
+​
 .resultsHeader {
   padding: 0.5rem 0;
   z-index: 10;
@@ -77,27 +84,5 @@
  
   .trendlineOverlayHeaderReferenceRange {
     @include type.type-style('helper-text-01');
-  }
-}
- 
-.filterSetHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: spacing.$spacing-03;
-  background-color: $openmrs-background-grey;
-  position: sticky;
-  top: 0;
-  z-index: 1;
- 
-  h4 {
-    @include type.type-style("heading-compact-02");
-    color: $text-02;
-  }
- 
-  .filterSetActions {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
   }
 }
