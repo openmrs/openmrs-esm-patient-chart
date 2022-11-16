@@ -25,8 +25,8 @@ const ConfirmLeavingPatientChart: React.FC<ConfirmationDialogProps> = ({ closeDi
 
   return (
     <div>
-      <ModalHeader closeModal={closeDialog} title={t('openWorkspaceWarning', `${confirmationHeading}`)} />
-      <ModalBody>{t('closePatientChartText', `${confirmationText}`)}</ModalBody>
+      <ModalHeader closeModal={closeDialog} title={t('openWorkspaceWarning', { confirmationHeading })} />
+      <ModalBody>{t('closePatientChartText', { confirmationText })}</ModalBody>
       <ModalFooter>
         <Button kind="secondary" onClick={closeDialog}>
           {t('no', 'No')}
