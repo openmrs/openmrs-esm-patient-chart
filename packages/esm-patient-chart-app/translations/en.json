@@ -48,6 +48,7 @@
   "endVisitError": "Error ending current visit",
   "endVisitWarningMessage": "Ending this visit, will not allow you to fill another encounter form for this patient",
   "female": "Female",
+  "fieldRequired": "This field is required",
   "filterByEncounterType": "Filter by encounter type",
   "goToThisEncounter": "Go to this encounter",
   "hide": "Hide",
