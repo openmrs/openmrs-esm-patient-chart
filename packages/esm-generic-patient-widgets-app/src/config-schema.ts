@@ -61,6 +61,14 @@ export const configSchema = {
     _description: 'Displayed graph by default',
     _default: true,
   },
+  encounterTypes: {
+    _type: Type.Array,
+    _description: 'Encounter types used to filter the requests',
+    _elements: {
+      _type: Type.String,
+    },
+    _default: [],
+  },
 };
 
 export interface ConfigObject {
@@ -76,4 +84,5 @@ export interface ConfigObject {
     pageSize: number;
   };
   showGraphByDefault: boolean;
+  encounterTypes: Array<string>;
 }

@@ -27,7 +27,16 @@ jest.mock('@openmrs/esm-framework', () => {
 describe('Switchable obs viewer ', () => {
   it('renders an empty state view if data is unavailable', async () => {
     mockedOpenmrsFetch.mockResolvedValue({ data: [] });
-    mockedUseConfig.mockReturnValue({ title: 'Blood', resultsName: 'blood data', data: [] } as ConfigObject);
+    mockedUseConfig.mockReturnValue({
+      title: 'Blood',
+      resultsName: 'blood data',
+      data: [] as Array<{
+        concept: string;
+        label: string;
+        color: string;
+      }>,
+      encounterTypes: [] as Array<string>,
+    } as ConfigObject);
 
     renderObsSwitchable();
 
@@ -39,7 +48,11 @@ describe('Switchable obs viewer ', () => {
   });
 
   it('renders an error state view if there is a problem fetching data', async () => {
-    mockedUseConfig.mockReturnValue({ title: 'Yellow bile', data: [] } as ConfigObject);
+    mockedUseConfig.mockReturnValue({
+      title: 'Yellow bile',
+      data: [] as Array<{ concept: string; label: string; color: string }>,
+      encounterTypes: [] as Array<string>,
+    } as ConfigObject);
 
     const error = {
       message: 'You are not logged in',
@@ -68,6 +81,7 @@ describe('Switchable obs viewer ', () => {
         { concept: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', label: 'Weight', color: 'brown' },
         { concept: '856AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', label: 'Viral Load', color: 'green' },
       ],
+      encounterTypes: ['790a93a8-bfb6-49ab-b98d-2e9b436f93a8', '74c7c0c4-e9e9-fb2a-998e-421f49fc9cc8'],
       table: { pageSize: 5 },
     } as ConfigObject);
     mockedOpenmrsFetch.mockResolvedValue({ data: mockWeightAndViralLoadResult });
@@ -77,7 +91,7 @@ describe('Switchable obs viewer ', () => {
     await waitForLoadingToFinish();
 
     expect(screen.getByRole('heading', { name: /Black bile/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /chart view/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Chart View/i })).toBeInTheDocument();
 
     const table = screen.getByRole('table');
 
@@ -87,7 +101,7 @@ describe('Switchable obs viewer ', () => {
       expect(within(table).getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument(),
     );
 
-    const expectedTableRows = [/2\d — Oct — 2021, \d\d:\d\d PM -- 180/, /1\d — Oct — 2021, \d\d:\d\d AM 198 200/];
+    const expectedTableRows = [/2\d — Oct — 2021, \d\d:\d\d AM -- 180/, /1\d — Oct — 2021, \d\d:\d\d AM 198 200/];
 
     expectedTableRows.map((row) =>
       expect(within(table).getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument(),
@@ -103,6 +117,7 @@ describe('Switchable obs viewer ', () => {
         { concept: '5089AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', label: 'Weight', color: 'brown' },
         { concept: '856AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', label: 'Viral Load', color: 'green' },
       ],
+      encounterTypes: ['790a93a8-bfb6-49ab-b98d-2e9b436f93a8', '74c7c0c4-e9e9-fb2a-998e-421f49fc9cc8'],
       table: { pageSize: 5 },
     } as ConfigObject);
     mockedOpenmrsFetch.mockResolvedValue({ data: mockWeightAndViralLoadResult });

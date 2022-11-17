@@ -19,7 +19,7 @@ export const mockWeightAndViralLoadResult = {
         },
         encounter: { reference: 'Encounter/3a2bddf8-3779-41b9-8144-89f31e805ef7', type: 'Encounter' },
         effectiveDateTime: '2021-10-13T16:56:48+00:00',
-        issued: '2021-10-28T23:57:12.000+00:00',
+        issued: '2021-10-28T09:57:12.000+00:00',
         valueQuantity: { value: 180.0, unit: 'copies/ml' },
         referenceRange: [
           {
