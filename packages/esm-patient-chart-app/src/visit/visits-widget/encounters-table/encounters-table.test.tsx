@@ -45,8 +45,6 @@ describe('EncounterList', () => {
   });
 
   it("renders a tabular overview of the patient's clinical encounters", async () => {
-    const user = userEvent.setup();
-
     testProps.encounters = mockEncounters2;
 
     mockedUsePagination.mockImplementationOnce(() => ({
@@ -58,6 +56,29 @@ describe('EncounterList', () => {
     renderEncountersTable();
 
     expect(screen.getByRole('table')).toBeInTheDocument();
+  });
+
+  it('filters the encounter list when a user types into the searchbox', async () => {
+    const user = userEvent.setup();
+
+    mockedUsePagination.mockImplementationOnce(() => ({
+      currentPage: 1,
+      goTo: () => {},
+      results: mockEncounters2,
+    }));
+
+    renderEncountersTable();
+
+    const searchbox = screen.getByRole('searchbox');
+    expect(searchbox).toBeInTheDocument();
+
+    await user.type(searchbox, 'Consultation');
+    expect(screen.getByText(/consultation/i)).toBeInTheDocument();
+
+    await user.type(searchbox, 'Triage');
+
+    expect(screen.getByText(/no encounters to display/i)).toBeInTheDocument();
+    expect(screen.getByText(/check the filters above/i)).toBeInTheDocument();
   });
 });
 

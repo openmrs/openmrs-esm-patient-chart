@@ -12,7 +12,7 @@ interface NotesOverviewProps {
 const NotesOverview: React.FC<NotesOverviewProps> = ({ patientUuid, patient, showAddNote, basePath }) => {
   const pageSize = 5;
   const { t } = useTranslation();
-  const pageUrl = window.spaBase + basePath + '/forms';
+  const pageUrl = `\${openmrsSpaBase}/patient/${patient.id}/chart/Forms & Notes`;
   const urlLabel = t('seeAll', 'See all');
 
   return (

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   DataTable,
@@ -21,9 +21,9 @@ import {
 } from '@carbon/react';
 import { formatDatetime, parseDate, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { ErrorState, EmptyState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
-import styles from './encounters-table.scss';
 import EncounterObservations from '../encounter-observations';
 import { useEncounters } from '../visit.resource';
+import styles from './encounters-table.scss';
 
 interface Encounter {
   datetime?: string;
@@ -142,7 +142,7 @@ const EncountersTable: React.FC<EncountersTableProps> = ({ showAllEncounters, en
             <div className={styles.tileContainer}>
               <Tile className={styles.tile}>
                 <div className={styles.tileContent}>
-                  <p className={styles.content}>{t('noPatientsToDisplay', 'No patients to display')}</p>
+                  <p className={styles.content}>{t('noEncountersToDisplay', 'No encounters to display')}</p>
                   <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
                 </div>
               </Tile>
