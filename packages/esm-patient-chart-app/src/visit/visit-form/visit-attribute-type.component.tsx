@@ -17,6 +17,7 @@ import {
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import styles from './visit-attribute-type.scss';
+import dayjs from 'dayjs';
 
 interface VisitAttributeTypeFieldsProps {
   setVisitAttributes: React.Dispatch<
@@ -115,7 +116,7 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({ attributeType, 
               id="date-picker-default-id"
               placeholder="mm/dd/yyyy"
               labelText={labelText}
-              onChange={(e) => console.log(e)}
+              onChange={([date]) => setVisitAttribute(dayjs(date).format('mm-dd-YYYY'))}
               type="text"
             />
           </DatePicker>
