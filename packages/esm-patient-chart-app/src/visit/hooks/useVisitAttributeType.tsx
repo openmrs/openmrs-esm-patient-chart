@@ -1,19 +1,19 @@
 import { FetchResponse, openmrsFetch, showNotification } from '@openmrs/esm-framework';
-import { useMemo } from 'react';
-import useSWR from 'swr';
+import { useEffect, useMemo } from 'react';
+import useSWRImmutable from 'swr/immutable';
 
 interface VisitAttributeType {
   uuid: string;
-  display: 'Insurance Type';
-  name: 'Insurance Type';
+  display: string;
+  name: string;
   description: string | null;
   datatypeClassname:
     | 'org.openmrs.customdatatype.datatype.ConceptDatatype'
     | 'org.openmrs.customdatatype.datatype.FloatDatatype'
-    | 'Boolean'
-    | 'Long Free Text'
-    | 'Free Text'
-    | 'Date';
+    | 'org.openmrs.customdatatype.datatype.BooleanDatatype'
+    | 'org.openmrs.customdatatype.datatype.LongFreeTextDatatype'
+    | 'org.openmrs.customdatatype.datatype.FreeTextDatatype'
+    | 'org.openmrs.customdatatype.datatype.DateDatatype';
   datatypeConfig: string;
   preferredHandlerClassname: any;
   retired: boolean;
@@ -35,18 +35,20 @@ const visitAttributeTypeCustomRepresentation =
   'custom:(uuid,display,name,description,datatypeClassname,datatypeConfig)';
 
 export function useVisitAttributeType(uuid) {
-  const { data, error } = useSWR<FetchResponse<VisitAttributeType>, Error>(
+  const { data, error } = useSWRImmutable<FetchResponse<VisitAttributeType>, Error>(
     `/ws/rest/v1/visitattributetype/${uuid}?v=${visitAttributeTypeCustomRepresentation}`,
     openmrsFetch,
   );
 
-  if (error) {
-    showNotification({
-      title: error?.name,
-      description: error?.message,
-      kind: 'error',
-    });
-  }
+  useEffect(() => {
+    if (error) {
+      showNotification({
+        title: error?.name,
+        description: error?.message,
+        kind: 'error',
+      });
+    }
+  }, [error]);
 
   const results = useMemo(() => {
     return {
@@ -60,18 +62,20 @@ export function useVisitAttributeType(uuid) {
 }
 
 export function useConceptAnswersForVisitAttributeType(conceptUuid) {
-  const { data, error } = useSWR<FetchResponse<Concept>, Error>(
+  const { data, error } = useSWRImmutable<FetchResponse<Concept>, Error>(
     conceptUuid ? `/ws/rest/v1/concept/${conceptUuid}` : null,
     openmrsFetch,
   );
 
-  if (error) {
-    showNotification({
-      title: error?.name,
-      description: error?.message,
-      kind: 'error',
-    });
-  }
+  useEffect(() => {
+    if (error) {
+      showNotification({
+        title: error?.name,
+        description: error?.message,
+        kind: 'error',
+      });
+    }
+  }, [error]);
 
   const results = useMemo(() => {
     return {

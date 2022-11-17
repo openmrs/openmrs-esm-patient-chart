@@ -71,7 +71,8 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
   const [enrollment, setEnrollment] = useState<PatientProgram>(activePatientEnrollment[0]);
   const { mutate } = useVisit(patientUuid);
   const [ignoreChanges, setIgnoreChanges] = useState(true);
-  const [visitAttributes, setVisitAttributes] = useState<{ [uuid: string]: string | boolean | number }>({});
+  const [visitAttributes, setVisitAttributes] = useState<{ [uuid: string]: string }>({});
+  const [isMissingRequiredAttributes, setIsMissingRequiredAttributes] = useState(false);
   const [priority, setPriority] = useState('');
   const { priorities } = usePriorities();
   const { statuses } = useStatuses();
@@ -88,6 +89,11 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
   const handleSubmit = useCallback(
     (event) => {
       event.preventDefault();
+
+      if (config.visitAttributeTypes?.find(({ uuid, required }) => required && !visitAttributes[uuid])) {
+        setIsMissingRequiredAttributes(true);
+        return;
+      }
 
       if (!visitType) {
         setIsMissingVisitType(true);
@@ -197,6 +203,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
     },
     [
       closeWorkspace,
+      config.visitAttributeTypes,
       config.defaultPriorityConceptUuid,
       config.defaultStatusConceptUuid,
       config.showServiceQueueFields,
@@ -212,6 +219,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
       visitTime,
       visitType,
       visitAttributes,
+      setIsMissingRequiredAttributes,
     ],
   );
 
@@ -368,7 +376,11 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
             </section>
           )}
           <section>
-            <VisitAttributeTypeFields setVisitAttributes={setVisitAttributes} />
+            <VisitAttributeTypeFields
+              setVisitAttributes={setVisitAttributes}
+              isMissingRequiredAttributes={isMissingRequiredAttributes}
+              visitAttributes={visitAttributes}
+            />
           </section>
 
           {config.showServiceQueueFields && (

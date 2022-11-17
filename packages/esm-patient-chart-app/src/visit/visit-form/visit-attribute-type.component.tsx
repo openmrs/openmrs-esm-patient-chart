@@ -1,5 +1,5 @@
 import { useConfig } from '@openmrs/esm-framework';
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { ChartConfig } from '../../config-schema';
 import { useConceptAnswersForVisitAttributeType, useVisitAttributeType } from '../hooks/useVisitAttributeType';
 import {
@@ -19,31 +19,43 @@ import { useTranslation } from 'react-i18next';
 import styles from './visit-attribute-type.scss';
 import dayjs from 'dayjs';
 
-interface VisitAttributeTypeFieldsProps {
-  setVisitAttributes: React.Dispatch<
-    React.SetStateAction<{
-      [uuid: string]: string | number | boolean;
-    }>
-  >;
+interface VisitAttributes {
+  [uuid: string]: string;
 }
 
-const VisitAttributeTypeFields: React.FC<VisitAttributeTypeFieldsProps> = ({ setVisitAttributes }) => {
+interface VisitAttributeTypeFieldsProps {
+  setVisitAttributes: React.Dispatch<React.SetStateAction<VisitAttributes>>;
+  isMissingRequiredAttributes: boolean;
+  visitAttributes: VisitAttributes;
+}
+
+const VisitAttributeTypeFields: React.FC<VisitAttributeTypeFieldsProps> = ({
+  setVisitAttributes,
+  isMissingRequiredAttributes,
+  visitAttributes,
+}) => {
   const { visitAttributeTypes } = useConfig() as ChartConfig;
 
-  const setAttributeValue = (uuid, value) => {
-    setVisitAttributes((prevState) => ({
-      ...prevState,
-      [uuid]: value,
-    }));
-  };
+  const setAttributeValue = useCallback(
+    (uuid, value) => {
+      setVisitAttributes((prevState) => ({
+        ...prevState,
+        [uuid]: value,
+      }));
+    },
+    [setVisitAttributes],
+  );
 
   if (visitAttributeTypes?.length) {
     return (
       <>
-        {visitAttributeTypes.map((attributeType) => (
+        {visitAttributeTypes.map((attributeType, indx) => (
           <AttributeTypeField
+            key={indx}
             attributeType={attributeType}
             setVisitAttribute={(val) => setAttributeValue(attributeType.uuid, val)}
+            isMissingRequiredAttributes={isMissingRequiredAttributes}
+            visitAttributes={visitAttributes}
           />
         ))}
       </>
@@ -59,26 +71,39 @@ interface AttributeTypeFieldProps {
     required: boolean;
   };
   setVisitAttribute: (val: string | boolean | number) => void;
+  isMissingRequiredAttributes: boolean;
+  visitAttributes: VisitAttributes;
 }
 
-const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({ attributeType, setVisitAttribute }) => {
+const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
+  attributeType,
+  setVisitAttribute,
+  isMissingRequiredAttributes,
+  visitAttributes,
+}) => {
   const { uuid, required } = attributeType;
   const { data, isLoading } = useVisitAttributeType(uuid);
   const { answers, isLoading: isLoadingAnswers } = useConceptAnswersForVisitAttributeType(data?.datatypeConfig);
   const { t } = useTranslation();
   const labelText = !required ? `${data?.name} (${t('optional', 'optional')})` : data?.name;
 
-  const getField = () => {
+  const field = useMemo(() => {
     if (isLoading) {
       return <></>;
     }
     switch (data.datatypeClassname) {
       case 'org.openmrs.customdatatype.datatype.ConceptDatatype':
         return !isLoadingAnswers ? (
-          <Select labelText={labelText} onChange={(e) => setVisitAttribute(e.target.value)}>
+          <Select
+            labelText={labelText}
+            onChange={(e) => setVisitAttribute(e.target.value)}
+            required={required}
+            invalid={required && isMissingRequiredAttributes && !visitAttributes[uuid]}
+            invalidText={t('fieldRequired', 'This field is required')}
+          >
             <SelectItem text={t('selectAnOption', 'Select an option')} value={null} />
-            {answers.map((ans) => (
-              <SelectItem text={ans.display} value={ans.uuid} />
+            {answers.map((ans, indx) => (
+              <SelectItem key={indx} text={ans.display} value={ans.uuid} />
             ))}
           </Select>
         ) : (
@@ -90,34 +115,56 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({ attributeType, 
             label={labelText}
             required={required}
             hideSteppers
-            onChange={(e) => setVisitAttribute(parseInt(e.target.value))}
+            onChange={(e) => setVisitAttribute(e.target.value?.toString())}
+            invalid={required && isMissingRequiredAttributes && !visitAttributes[uuid]}
+            invalidText={t('fieldRequired', 'This field is required')}
           />
         );
-      case 'Free Text':
+      case 'org.openmrs.customdatatype.datatype.FreeTextDatatype':
         return (
-          <TextInput labelText={labelText} required={required} onChange={(e) => setVisitAttribute(e.target.value)} />
+          <TextInput
+            labelText={labelText}
+            required={required}
+            onChange={(e) => setVisitAttribute(e.target.value)}
+            invalid={required && isMissingRequiredAttributes && !visitAttributes[uuid]}
+            invalidText={t('fieldRequired', 'This field is required')}
+          />
         );
-      case 'Long Free Text':
+      case 'org.openmrs.customdatatype.datatype.LongFreeTextDatatype':
         return (
-          <TextArea labelText={labelText} required={required} onChange={(e) => setVisitAttribute(e.target.value)} />
+          <TextArea
+            labelText={labelText}
+            required={required}
+            onChange={(e) => setVisitAttribute(e.target.value)}
+            invalid={required && isMissingRequiredAttributes && !visitAttributes[uuid]}
+            invalidText={t('fieldRequired', 'This field is required')}
+          />
         );
-      case 'Boolean':
+      case 'org.openmrs.customdatatype.datatype.BooleanDatatype':
         return (
           <Checkbox
             labelText={labelText}
             required={required}
-            onChange={(e, { checked }) => setVisitAttribute(checked)}
+            onChange={(e, { checked }) => setVisitAttribute(checked.toString())}
+            invalid={required && isMissingRequiredAttributes && !visitAttributes[uuid]}
+            invalidText={t('fieldRequired', 'This field is required')}
           />
         );
-      case 'Date':
+      case 'org.openmrs.customdatatype.datatype.DateDatatype':
         return (
-          <DatePicker dateFormat="m/d/Y" datePickerType="single">
+          <DatePicker
+            dateFormat="d/m/Y"
+            datePickerType="single"
+            onChange={([date]) => setVisitAttribute(dayjs(date).format('YYYY-MM-DD'))}
+            required={required}
+          >
             <DatePickerInput
               id="date-picker-default-id"
-              placeholder="mm/dd/yyyy"
+              placeholder="dd/mm/yyyy"
               labelText={labelText}
-              onChange={([date]) => setVisitAttribute(dayjs(date).format('mm-dd-YYYY'))}
               type="text"
+              invalid={required && isMissingRequiredAttributes && !visitAttributes[uuid]}
+              invalidText={t('fieldRequired', 'This field is required')}
             />
           </DatePicker>
         );
@@ -126,7 +173,19 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({ attributeType, 
           <TextInput labelText={labelText} required={required} onChange={(e) => setVisitAttribute(e.target.value)} />
         );
     }
-  };
+  }, [
+    answers,
+    data.datatypeClassname,
+    isLoading,
+    isLoadingAnswers,
+    isMissingRequiredAttributes,
+    labelText,
+    required,
+    setVisitAttribute,
+    t,
+    uuid,
+    visitAttributes,
+  ]);
 
   if (isLoading) {
     return (
@@ -136,6 +195,6 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({ attributeType, 
     );
   }
 
-  return <div className={styles.visitAttributeField}>{getField()}</div>;
+  return <div className={styles.visitAttributeField}>{field}</div>;
 };
 export default VisitAttributeTypeFields;
