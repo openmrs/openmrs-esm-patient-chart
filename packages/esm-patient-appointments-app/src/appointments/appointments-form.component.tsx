@@ -34,7 +34,6 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
   const [appointmentNote, setAppointmentNote] = useState('');
   const [selectedAppointmentType, setSelectedAppointmentType] = useState('');
   const [selectedService, setSelectedService] = useState('');
-  const [selectedServiceType, setSelectedServiceType] = useState('');
   const [startDate, setStartDate] = useState(new Date());
   const [startTime, setStartTime] = useState(dayjs(new Date()).format('hh:mm'));
   const [timeFormat, setTimeFormat] = useState<amPm>(new Date().getHours() >= 12 ? 'PM' : 'AM');
@@ -46,14 +45,7 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
 
   const { data: services, isLoading } = useAppointmentService();
 
-  let serviceTypes;
-  if (services?.length) {
-    [{ serviceTypes }] = services;
-  }
-
   const handleSubmit = () => {
-    const serviceType = serviceTypes.find((service) => service.name === selectedServiceType);
-
     const serviceUuid = services.find((service) => service.name === selectedService)?.uuid;
     const serviceDuration = services.find((service) => service.name === selectedService)?.durationMins;
 
@@ -189,32 +181,13 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
             labelText={t('selectService', 'Select a service')}
             light={isTablet}
             onChange={(event) => setSelectedService(event.target.value)}
-            value={selectedServiceType}
+            value={selectedService}
           >
             {!selectedService ? <SelectItem text={t('chooseService', 'Select service')} value="" /> : null}
             {services?.length > 0 &&
               services.map((service) => (
                 <SelectItem key={service.uuid} text={service.name} value={service.name}>
                   {service.name}
-                </SelectItem>
-              ))}
-          </Select>
-        </section>
-        <section className={styles.formGroup}>
-          <span>{t('serviceType', 'Service Type')}</span>
-          <Select
-            id="serviceType"
-            invalidText="Required"
-            labelText="Select the type of service"
-            light={isTablet}
-            onChange={(event) => setSelectedServiceType(event.target.value)}
-            value={selectedServiceType}
-          >
-            {!selectedServiceType ? <SelectItem text={t('chooseService', 'Select service type')} value="" /> : null}
-            {serviceTypes?.length > 0 &&
-              serviceTypes.map((serviceType) => (
-                <SelectItem key={serviceType.uuid} text={serviceType.name} value={serviceType.name}>
-                  {serviceType.name}
                 </SelectItem>
               ))}
           </Select>
