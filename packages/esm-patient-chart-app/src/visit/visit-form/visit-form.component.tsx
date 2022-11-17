@@ -48,6 +48,7 @@ import BaseVisitType from './base-visit-type.component';
 import styles from './visit-form.scss';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
 import { ChartConfig } from '../../config-schema';
+import VisitAttributeTypeFields from './visit-attribute-type.component';
 
 const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace, promptBeforeClosing }) => {
   const { t } = useTranslation();
@@ -69,6 +70,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
   const [enrollment, setEnrollment] = useState<PatientProgram>(activePatientEnrollment[0]);
   const { mutate } = useVisit(patientUuid);
   const [ignoreChanges, setIgnoreChanges] = useState(true);
+  const [visitAttributes, setVisitAttributes] = useState<{ [uuid: string]: string | boolean | number }>({});
 
   useEffect(() => {
     if (locations && sessionUser?.sessionLocation?.uuid) {
@@ -98,6 +100,12 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
         ),
         visitType: visitType,
         location: selectedLocation,
+        attributes: Object.entries(visitAttributes)
+          .filter(([key, value]) => !!value)
+          .map(([key, value]) => ({
+            attributeType: key,
+            value,
+          })),
       };
 
       const abortController = new AbortController();
@@ -129,7 +137,18 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
           },
         );
     },
-    [closeWorkspace, mutate, patientUuid, selectedLocation, t, timeFormat, visitDate, visitTime, visitType],
+    [
+      closeWorkspace,
+      mutate,
+      patientUuid,
+      selectedLocation,
+      t,
+      timeFormat,
+      visitDate,
+      visitTime,
+      visitType,
+      visitAttributes,
+    ],
   );
 
   const handleOnChange = () => {
@@ -202,7 +221,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
             <ExtensionSlot extensionSlotName="visit-form-header-slot" className={styles.dataGridRow} state={state} />
           </Row>
         )}
-        <Stack gap={8} className={styles.container}>
+        <Stack gap={1} className={styles.container}>
           <section className={styles.section}>
             <div className={styles.sectionTitle}>{t('dateAndTimeOfVisit', 'Date and time of visit')}</div>
             <div className={styles.dateTimeSection}>
@@ -284,6 +303,9 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
               />
             </section>
           )}
+          <section>
+            <VisitAttributeTypeFields setVisitAttributes={setVisitAttributes} />
+          </section>
         </Stack>
       </div>
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>

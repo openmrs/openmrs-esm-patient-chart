@@ -58,3 +58,7 @@
 .text02 {
   color: $text-02;
 }
+
+.label01 {
+  @include type.type-style("label-01")
+}
