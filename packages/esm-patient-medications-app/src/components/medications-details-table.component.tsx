@@ -19,7 +19,6 @@ import {
 import { Add, User } from '@carbon/react/icons';
 import { formatDate } from '@openmrs/esm-framework';
 import { CardHeader, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { getDosage } from '../utils/get-dosage';
 import { useTranslation } from 'react-i18next';
 import { compare } from '../utils/compare';
 import { connect } from 'unistore/react';
@@ -84,13 +83,13 @@ const MedicationsDetailsTable = connect<
           <div className={styles.medicationRecord}>
             <div>
               <p className={styles.bodyLong01}>
-                <strong>{capitalize(medication.drug?.name)}</strong> &mdash; {medication.drug?.strength.toLowerCase()}{' '}
-                &mdash; {medication.doseUnits?.display.toLowerCase()}
+                <strong>{capitalize(medication.drug?.concept?.display)}</strong> &mdash;{' '}
+                {medication.drug?.strength.toLowerCase()} &mdash; {medication.drug.dosageForm.display.toLowerCase()}
               </p>
               <p className={styles.bodyLong01}>
                 <span className={styles.label01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
                 <span className={styles.dosage}>
-                  {getDosage(medication.drug?.strength, medication.dose).toLowerCase()}
+                  {medication.dose} {medication.doseUnits.display.toLowerCase()}
                 </span>{' '}
                 &mdash; {medication.route?.display.toLowerCase()} &mdash; {medication.frequency?.display.toLowerCase()}{' '}
                 &mdash;{' '}
@@ -232,13 +231,13 @@ function InfoTooltip({ orderer }) {
   return (
     <IconButton
       className={styles.tooltip}
-      align="bottom-left"
+      align="top-left"
       direction="top"
       label={orderer}
       renderIcon={(props) => <User size={16} {...props} />}
-    >
-      {orderer}
-    </IconButton>
+      kind="ghost"
+      size="sm"
+    />
   );
 }
 

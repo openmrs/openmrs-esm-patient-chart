@@ -1,6 +1,7 @@
 import useSWR from 'swr';
-import { ConfigObject, openmrsFetch, Session } from '@openmrs/esm-framework';
+import { openmrsFetch, Session, useConfig } from '@openmrs/esm-framework';
 import { OrderPost, PatientMedicationFetchResponse } from '../types/order';
+import { ConfigObject } from '../config-schema';
 
 /**
  * Fast, lighweight, reusable data fetcher with built-in cache invalidation that
@@ -9,6 +10,7 @@ import { OrderPost, PatientMedicationFetchResponse } from '../types/order';
  * @param status The status/the kind of orders to be fetched.
  */
 export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any', careSettingUuid: string) {
+  const { drugOrderTypeUUID } = useConfig() as ConfigObject;
   const customRepresentation =
     'custom:(uuid,dosingType,orderNumber,accessionNumber,' +
     'patient:ref,action,careSetting:ref,previousOrder:ref,dateActivated,scheduledDate,dateStopped,autoExpireDate,' +
@@ -18,7 +20,7 @@ export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any', 
     'duration,durationUnits:ref,route:ref,brandName,dispenseAsWritten)';
 
   const { data, error, isValidating } = useSWR<{ data: PatientMedicationFetchResponse }, Error>(
-    `/ws/rest/v1/order?patient=${patientUuid}&careSetting=${careSettingUuid}&status=${status}&v=${customRepresentation}`,
+    `/ws/rest/v1/order?patient=${patientUuid}&careSetting=${careSettingUuid}&status=${status}&orderType=${drugOrderTypeUUID}&v=${customRepresentation}`,
     openmrsFetch,
   );
 

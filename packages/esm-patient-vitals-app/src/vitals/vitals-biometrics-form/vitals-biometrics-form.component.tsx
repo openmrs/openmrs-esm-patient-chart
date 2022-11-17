@@ -9,6 +9,9 @@ import {
   useConfig,
   useLayoutType,
   useSession,
+  ExtensionSlot,
+  usePatient,
+  useVisit,
 } from '@openmrs/esm-framework';
 import { DefaultWorkspaceProps, useVitalsConceptMetadata } from '@openmrs/esm-patient-common-lib';
 import { Button, ButtonSet, Column, Form, Row, Stack } from '@carbon/react';
@@ -35,6 +38,8 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
+  const patient = usePatient(patientUuid);
+  const { currentVisit } = useVisit(patientUuid);
   const config = useConfig() as ConfigObject;
   const { cache, mutate }: { cache: any; mutate: Function } = useSWRConfig();
   const { data: conceptUnits, conceptMetadata } = useVitalsConceptMetadata();
@@ -42,6 +47,7 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
   const [patientVitalAndBiometrics, setPatientVitalAndBiometrics] = useState<PatientVitalsAndBiometrics>();
   const [patientBMI, setPatientBMI] = useState<number>();
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const encounterUuid = currentVisit?.encounters?.find((enc) => enc?.form?.uuid === config.vitals.formUuid)?.uuid;
 
   const isBMIInNormalRange = (value: number | undefined | string) => {
     if (value === undefined || value === '') return true;
@@ -50,52 +56,70 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
 
   const savePatientVitalsAndBiometrics = (event: SyntheticEvent) => {
     event.preventDefault();
-    setIsSubmitting(true);
-    const ac = new AbortController();
-    savePatientVitals(
-      config.vitals.encounterTypeUuid,
-      config.vitals.formUuid,
-      config.concepts,
-      patientUuid,
-      patientVitalAndBiometrics,
-      new Date(),
-      ac,
-      session?.sessionLocation?.uuid,
-    )
-      .then((response) => {
-        if (response.status === 201) {
-          closeWorkspace();
-
-          showToast({
-            critical: true,
-            kind: 'success',
-            title: t('vitalsAndBiometricsRecorded', 'Vitals and Biometrics saved'),
-            description: t('vitalsAndBiometricsNowAvailable', 'They are now visible on the Vitals and Biometrics page'),
-          });
-
-          const apiUrlPattern = new RegExp(
-            fhirBaseUrl + '\\/Observation\\?subject\\:Patient\\=' + patientUuid + '\\&code\\=',
-          );
-
-          // Find matching keys from SWR's cache and broadcast a revalidation message to their pre-bound SWR hooks
-          Array.from(cache.keys())
-            .filter((url: string) => apiUrlPattern.test(url))
-            .forEach((url: string) => mutate(url));
-        }
-      })
-      .catch((err) => {
-        createErrorHandler();
-
+    let isFieldValid = true;
+    for (let key in patientVitalAndBiometrics) {
+      if (isInNormalRange(conceptMetadata, config.concepts[key + 'Uuid'], patientVitalAndBiometrics[key]) == false) {
+        isFieldValid = false;
         showNotification({
           title: t('vitalsAndBiometricsSaveError', 'Error saving vitals and biometrics'),
           kind: 'error',
           critical: true,
-          description: err?.message,
+          description: t('checkForValidity', 'Some of the values entered are invalid'),
         });
-      })
-      .finally(() => {
-        ac.abort();
-      });
+        break;
+      }
+    }
+    if (isFieldValid) {
+      setIsSubmitting(true);
+      const ac = new AbortController();
+      savePatientVitals(
+        config.vitals.encounterTypeUuid,
+        config.vitals.formUuid,
+        config.concepts,
+        patientUuid,
+        patientVitalAndBiometrics,
+        new Date(),
+        ac,
+        session?.sessionLocation?.uuid,
+      )
+        .then((response) => {
+          if (response.status === 201) {
+            closeWorkspace();
+
+            showToast({
+              critical: true,
+              kind: 'success',
+              title: t('vitalsAndBiometricsRecorded', 'Vitals and Biometrics saved'),
+              description: t(
+                'vitalsAndBiometricsNowAvailable',
+                'They are now visible on the Vitals and Biometrics page',
+              ),
+            });
+
+            const apiUrlPattern = new RegExp(
+              fhirBaseUrl + '\\/Observation\\?subject\\:Patient\\=' + patientUuid + '\\&code\\=',
+            );
+
+            // Find matching keys from SWR's cache and broadcast a revalidation message to their pre-bound SWR hooks
+            Array.from(cache.keys())
+              .filter((url: string) => apiUrlPattern.test(url))
+              .forEach((url: string) => mutate(url));
+          }
+        })
+        .catch((err) => {
+          createErrorHandler();
+
+          showNotification({
+            title: t('vitalsAndBiometricsSaveError', 'Error saving vitals and biometrics'),
+            kind: 'error',
+            critical: true,
+            description: err?.message,
+          });
+        })
+        .finally(() => {
+          ac.abort();
+        });
+    }
   };
 
   useEffect(() => {
@@ -107,6 +131,24 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
       setPatientBMI(calculatedBmi);
     }
   }, [patientVitalAndBiometrics?.weight, patientVitalAndBiometrics?.height]);
+
+  if (config.vitals.useFormEngine) {
+    return (
+      <ExtensionSlot
+        extensionSlotName="form-widget-slot"
+        state={{
+          view: 'form',
+          formUuid: config.vitals.formUuid,
+          visitUuid: currentVisit?.uuid,
+          visitTypeUuid: currentVisit?.visitType?.uuid,
+          patientUuid: patientUuid ?? null,
+          patient,
+          encounterUuid,
+          closeWorkspace,
+        }}
+      />
+    );
+  }
 
   return (
     <Form className={styles.form}>
@@ -305,7 +347,11 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                   },
                 ]}
                 unitSymbol={conceptUnits.get(config.concepts.weightUuid) ?? ''}
-                inputIsNormal={true}
+                inputIsNormal={isInNormalRange(
+                  conceptMetadata,
+                  config.concepts['weightUuid'],
+                  patientVitalAndBiometrics?.weight,
+                )}
               />
             </Column>
             <Column className={styles.column}>

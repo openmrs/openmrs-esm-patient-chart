@@ -1,8 +1,9 @@
 name: Report bundle size
 
 on:
-  pull_request_target:
-    branches: [main]
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
@@ -13,5 +14,5 @@ jobs:
       - uses: preactjs/compressed-size-action@v2
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
-          minimum-change-threshold: 5 # bytes
+          minimum-change-threshold: 10000 # 10 KB
           build-script: "turbo run build --color"

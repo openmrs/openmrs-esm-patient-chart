@@ -26,13 +26,13 @@ enum TickRotations {
 
 const TrendLineBackground = ({ ...props }) => <div {...props} className={styles.background} />;
 
-const TrendlineHeader = ({ basePath, title, referenceRange, isValidating, showBackToTimelineButton }) => {
+const TrendlineHeader = ({ patientUuid, title, referenceRange, isValidating, showBackToTimelineButton }) => {
   const { t } = useTranslation();
   return (
     <div className={styles.header}>
       <div className={styles.backButton}>
         {showBackToTimelineButton && (
-          <ConfigurableLink to={testResultsBasePath(basePath)}>
+          <ConfigurableLink to={testResultsBasePath(`/patient/${patientUuid}/chart`)}>
             <Button
               kind="ghost"
               renderIcon={(props) => <ArrowLeft {...props} size={24} />}
@@ -227,7 +227,7 @@ const Trendline: React.FC<TrendlineProps> = ({
         <TrendlineHeader
           showBackToTimelineButton={showBackToTimelineButton}
           isValidating={isValidating}
-          basePath={basePath}
+          patientUuid={patientUuid}
           title={dataset}
           referenceRange={referenceRange}
         />

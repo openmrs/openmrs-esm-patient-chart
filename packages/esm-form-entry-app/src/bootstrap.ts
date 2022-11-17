@@ -1,6 +1,5 @@
 import { enableProdMode, NgZone } from '@angular/core';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
-import { ɵAnimationEngine as AnimationEngine } from '@angular/animations/browser';
 import { singleSpaAngular, getSingleSpaExtraProviders } from 'single-spa-angular';
 import { AppModule } from './app/app.module';
 import { environment } from './environments/environment';
@@ -17,7 +16,6 @@ const lifecycles = singleSpaAngular({
   },
   template: '<my-app-root />',
   NgZone,
-  AnimationEngine,
 });
 
 export const bootstrap = lifecycles.bootstrap;

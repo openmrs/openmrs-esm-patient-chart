@@ -48,6 +48,7 @@ import BaseVisitType from './base-visit-type.component';
 import styles from './visit-form.scss';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
 import { ChartConfig } from '../../config-schema';
+import { QueueEntryPayload, saveQueueEntry, usePriorities, useServices, useStatuses } from '../hooks/useServiceQueue';
 
 const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace, promptBeforeClosing }) => {
   const { t } = useTranslation();
@@ -69,6 +70,12 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
   const [enrollment, setEnrollment] = useState<PatientProgram>(activePatientEnrollment[0]);
   const { mutate } = useVisit(patientUuid);
   const [ignoreChanges, setIgnoreChanges] = useState(true);
+  const [priority, setPriority] = useState('');
+  const { priorities } = usePriorities();
+  const { statuses } = useStatuses();
+  const { services } = useServices(selectedLocation);
+  const [selectedService, setSelectedService] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('');
 
   useEffect(() => {
     if (locations && sessionUser?.sessionLocation?.uuid) {
@@ -106,6 +113,57 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
         .subscribe(
           (response) => {
             if (response.status === 201) {
+              if (config.showServiceQueueFields) {
+                const defaultStatus = config.defaultStatusConceptUuid;
+                const defaultPriority = config.defaultPriorityConceptUuid;
+                const queuePayload: QueueEntryPayload = {
+                  visit: {
+                    uuid: response.data.uuid,
+                  },
+                  queueEntry: {
+                    status: {
+                      uuid: selectedStatus ? selectedStatus : defaultStatus,
+                    },
+                    priority: {
+                      uuid: priority ? priority : defaultPriority,
+                    },
+                    queue: {
+                      uuid: selectedService,
+                    },
+                    patient: {
+                      uuid: patientUuid,
+                    },
+                    startedAt: toDateObjectStrict(toOmrsIsoString(new Date())),
+                  },
+                };
+
+                saveQueueEntry(queuePayload, abortController)
+                  .pipe(first())
+                  .subscribe(
+                    (response) => {
+                      if (response.status === 201) {
+                        showToast({
+                          kind: 'success',
+                          title: t('visitStarted', 'Visit started'),
+                          description: t(
+                            'queueAddedSuccessfully',
+                            `Patient has been added to the queue successfully.`,
+                            `${hours} : ${minutes}`,
+                          ),
+                        });
+                        mutate();
+                      }
+                    },
+                    (error) => {
+                      showNotification({
+                        title: t('queueEntryError', 'Error adding patient to the queue'),
+                        kind: 'error',
+                        critical: true,
+                        description: error?.message,
+                      });
+                    },
+                  );
+              }
               closeWorkspace();
               mutate();
               showToast({
@@ -129,13 +187,86 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
           },
         );
     },
-    [closeWorkspace, mutate, patientUuid, selectedLocation, t, timeFormat, visitDate, visitTime, visitType],
+    [
+      closeWorkspace,
+      config.defaultPriorityConceptUuid,
+      config.defaultStatusConceptUuid,
+      config.showServiceQueueFields,
+      mutate,
+      patientUuid,
+      priority,
+      selectedLocation,
+      selectedService,
+      selectedStatus,
+      t,
+      timeFormat,
+      visitDate,
+      visitTime,
+      visitType,
+    ],
   );
 
   const handleOnChange = () => {
     setIgnoreChanges((prevState) => !prevState);
     promptBeforeClosing(() => true);
   };
+
+  const locationSelect = (
+    <Select
+      labelText={t('selectLocation', 'Select a location')}
+      id="location"
+      invalidText="Required"
+      value={selectedLocation}
+      onChange={(event) => setSelectedLocation(event.target.value)}
+    >
+      {locations?.length > 0 &&
+        locations.map((location) => (
+          <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
+            {location.display}
+          </SelectItem>
+        ))}
+    </Select>
+  );
+
+  const datePicker = (
+    <DatePicker
+      dateFormat="d/m/Y"
+      datePickerType="single"
+      id="visitDate"
+      style={{ paddingBottom: '1rem' }}
+      maxDate={new Date().toISOString()}
+      onChange={([date]) => setVisitDate(date)}
+      value={visitDate}
+    >
+      <DatePickerInput
+        id="visitStartDateInput"
+        labelText={t('date', 'Date')}
+        placeholder="dd/mm/yyyy"
+        style={{ width: '100%' }}
+      />
+    </DatePicker>
+  );
+
+  const timePicker = (
+    <TimePicker
+      id="visitStartTime"
+      labelText={t('time', 'Time')}
+      onChange={(event) => setVisitTime(event.target.value as amPm)}
+      pattern="^(1[0-2]|0?[1-9]):([0-5]?[0-9])$"
+      style={{ marginLeft: '0.125rem', flex: 'none' }}
+      value={visitTime}
+    >
+      <TimePickerSelect
+        id="visitStartTimeSelect"
+        onChange={(event) => setTimeFormat(event.target.value as amPm)}
+        value={timeFormat}
+        aria-label={t('time', 'Time')}
+      >
+        <SelectItem value="AM" text="AM" />
+        <SelectItem value="PM" text="PM" />
+      </TimePickerSelect>
+    </TimePicker>
+  );
 
   return (
     <Form className={styles.form} onChange={handleOnChange}>
@@ -149,122 +280,14 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
           <section className={styles.section}>
             <div className={styles.sectionTitle}>{t('dateAndTimeOfVisit', 'Date and time of visit')}</div>
             <div className={styles.dateTimeSection}>
-              {isTablet ? (
-                <Layer>
-                  <DatePicker
-                    dateFormat="d/m/Y"
-                    datePickerType="single"
-                    id="visitDate"
-                    style={{ paddingBottom: '1rem' }}
-                    maxDate={new Date().toISOString()}
-                    onChange={([date]) => setVisitDate(date)}
-                    value={visitDate}
-                  >
-                    <DatePickerInput
-                      id="visitStartDateInput"
-                      labelText={t('date', 'Date')}
-                      placeholder="dd/mm/yyyy"
-                      style={{ width: '100%' }}
-                    />
-                  </DatePicker>
-                </Layer>
-              ) : (
-                <DatePicker
-                  dateFormat="d/m/Y"
-                  datePickerType="single"
-                  id="visitDate"
-                  style={{ paddingBottom: '1rem' }}
-                  maxDate={new Date().toISOString()}
-                  onChange={([date]) => setVisitDate(date)}
-                  value={visitDate}
-                >
-                  <DatePickerInput
-                    id="visitStartDateInput"
-                    labelText={t('date', 'Date')}
-                    placeholder="dd/mm/yyyy"
-                    style={{ width: '100%' }}
-                  />
-                </DatePicker>
-              )}
-              {isTablet ? (
-                <Layer>
-                  <TimePicker
-                    id="visitStartTime"
-                    labelText={t('time', 'Time')}
-                    onChange={(event) => setVisitTime(event.target.value as amPm)}
-                    pattern="^(1[0-2]|0?[1-9]):([0-5]?[0-9])$"
-                    style={{ marginLeft: '0.125rem', flex: 'none' }}
-                    value={visitTime}
-                  >
-                    <TimePickerSelect
-                      id="visitStartTimeSelect"
-                      onChange={(event) => setTimeFormat(event.target.value as amPm)}
-                      value={timeFormat}
-                      aria-label={t('time', 'Time')}
-                    >
-                      <SelectItem value="AM" text="AM" />
-                      <SelectItem value="PM" text="PM" />
-                    </TimePickerSelect>
-                  </TimePicker>
-                </Layer>
-              ) : (
-                <TimePicker
-                  id="visitStartTime"
-                  labelText={t('time', 'Time')}
-                  onChange={(event) => setVisitTime(event.target.value as amPm)}
-                  pattern="^(1[0-2]|0?[1-9]):([0-5]?[0-9])$"
-                  style={{ marginLeft: '0.125rem', flex: 'none' }}
-                  value={visitTime}
-                >
-                  <TimePickerSelect
-                    id="visitStartTimeSelect"
-                    onChange={(event) => setTimeFormat(event.target.value as amPm)}
-                    value={timeFormat}
-                    aria-label={t('time', 'Time')}
-                  >
-                    <SelectItem value="AM" text="AM" />
-                    <SelectItem value="PM" text="PM" />
-                  </TimePickerSelect>
-                </TimePicker>
-              )}
+              {isTablet ? <Layer>{datePicker}</Layer> : datePicker}
+              {isTablet ? <Layer>{timePicker}</Layer> : timePicker}
             </div>
           </section>
 
           <section>
             <div className={styles.sectionTitle}>{t('visitLocation', 'Visit Location')}</div>
-            {isTablet ? (
-              <Layer>
-                <Select
-                  labelText={t('selectLocation', 'Select a location')}
-                  id="location"
-                  invalidText="Required"
-                  value={selectedLocation}
-                  onChange={(event) => setSelectedLocation(event.target.value)}
-                >
-                  {locations?.length > 0 &&
-                    locations.map((location) => (
-                      <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
-                        {location.display}
-                      </SelectItem>
-                    ))}
-                </Select>
-              </Layer>
-            ) : (
-              <Select
-                labelText={t('selectLocation', 'Select a location')}
-                id="location"
-                invalidText="Required"
-                value={selectedLocation}
-                onChange={(event) => setSelectedLocation(event.target.value)}
-              >
-                {locations?.length > 0 &&
-                  locations.map((location) => (
-                    <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
-                      {location.display}
-                    </SelectItem>
-                  ))}
-              </Select>
-            )}
+            <div className={styles.selectContainer}>{isTablet ? <Layer>{locationSelect}</Layer> : locationSelect}</div>
           </section>
           {config.showRecommendedVisitTypeTab && (
             <section>
@@ -334,6 +357,96 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
                 subtitle={t('selectVisitType', 'Please select a Visit Type')}
               />
             </section>
+          )}
+
+          {config.showServiceQueueFields && (
+            <>
+              <section className={styles.section}>
+                <div className={styles.queueSection}>
+                  <div className={styles.sectionTitle}>{t('service', 'Service')}</div>
+                  {!services?.length ? (
+                    <InlineNotification
+                      className={styles.inlineNotification}
+                      kind={'error'}
+                      lowContrast
+                      subtitle={t('configureServices', 'Please configure services to continue.')}
+                      title={t('noServicesConfigured', 'No services configured')}
+                    />
+                  ) : (
+                    <Select
+                      labelText={t('selectService', 'Select a service')}
+                      id="service"
+                      invalidText="Required"
+                      value={selectedService}
+                      onChange={(event) => setSelectedService(event.target.value)}
+                    >
+                      {!selectedService ? <SelectItem text={t('chooseService', 'Select a service')} value="" /> : null}
+                      {services?.length > 0 &&
+                        services.map((service) => (
+                          <SelectItem key={service.uuid} text={service.display} value={service.uuid}>
+                            {service.display}
+                          </SelectItem>
+                        ))}
+                    </Select>
+                  )}
+                </div>
+
+                <div className={styles.queueSection}>
+                  <div className={styles.sectionTitle}>{t('status', 'Status')}</div>
+                  {!statuses?.length ? (
+                    <InlineNotification
+                      className={styles.inlineNotification}
+                      kind={'error'}
+                      lowContrast
+                      subtitle={t('configureStatuses', 'Please configure statuses to continue.')}
+                      title={t('noStatusesConfigured', 'No statuses configured')}
+                    />
+                  ) : (
+                    <Select
+                      labelText={t('selectStatus', 'Select a status')}
+                      id="status"
+                      invalidText="Required"
+                      value={selectedStatus}
+                      onChange={(event) => setSelectedStatus(event.target.value)}
+                    >
+                      {!selectedStatus ? <SelectItem text={t('chooseStatus', 'Select a status')} value="" /> : null}
+                      {statuses?.length > 0 &&
+                        statuses.map((service) => (
+                          <SelectItem key={service.uuid} text={service.display} value={service.uuid}>
+                            {service.display}
+                          </SelectItem>
+                        ))}
+                    </Select>
+                  )}
+                </div>
+
+                <div className={styles.queueSection}>
+                  <div className={styles.sectionTitle}>{t('priority', 'Priority')}</div>
+                  {!priorities?.length ? (
+                    <InlineNotification
+                      className={styles.inlineNotification}
+                      kind={'error'}
+                      lowContrast
+                      subtitle={t('configurePriorities', 'Please configure priorities to continue.')}
+                      title={t('noPrioritiesConfigured', 'No priorities configured')}
+                    />
+                  ) : (
+                    <ContentSwitcher
+                      size="sm"
+                      selectionMode="manual"
+                      onChange={(event) => {
+                        setPriority(event.name as any);
+                      }}
+                    >
+                      {priorities?.length > 0 &&
+                        priorities.map(({ uuid, display }) => {
+                          return <Switch name={uuid} text={display} value={uuid} index={uuid} />;
+                        })}
+                    </ContentSwitcher>
+                  )}
+                </div>
+              </section>
+            </>
           )}
         </Stack>
       </div>

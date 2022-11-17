@@ -27,13 +27,18 @@ export const configSchema = {
   quantityUnitsUuid: {
     _type: Type.ConceptUuid,
     _description:
-      'Concept to be used as order quantity units default value. This is necessary because this datapoint is capture in the dispensing form but the datamodel requires this attribute to issue an order',
-    _default: '3c6a70ed-a762-41b9-8163-352c9bb36f20',
+      "Concept to be used as order quantity units default value. This is necessary because this datapoint isn't captured on the dispensing form but the datamodel requires this attribute to issue an order",
+    _default: '162399AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   },
   clinicianEncounterRole: {
     _type: Type.UUID,
     _description: 'Encounter role required by clinician to dispense medication(s)',
     _default: '240b26f9-dd88-4172-823d-4a8bfeb7841f',
+  },
+  drugOrderTypeUUID: {
+    _type: Type.UUID,
+    _description: "UUID for the 'Drug' order type to fetch medications",
+    _default: '131168f4-15f5-102d-96e4-000c29c2a5d7',
   },
 };
 
@@ -47,4 +52,5 @@ export interface ConfigObject {
     uuid: string;
     display: string;
   };
+  drugOrderTypeUUID: string;
 }

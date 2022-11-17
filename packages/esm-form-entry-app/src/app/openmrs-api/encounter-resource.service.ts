@@ -66,7 +66,7 @@ export class EncounterResourceService {
       'visit:(uuid,visitType,display,startDatetime,stopDatetime),' +
       'location:ref,encounterType:ref,' +
       'encounterProviders:(uuid,display,provider:(uuid,display)),orders:full,' +
-      'obs:(uuid,obsDatetime,concept:(uuid,uuid,name:(display)),value:ref,groupMembers))';
+      'obs:(uuid,obsDatetime,formFieldNamespace,formFieldPath,concept:(uuid,uuid,name:(display)),value:ref,groupMembers))';
     const params = new HttpParams().set('v', customDefaultRep);
     const url = this.getUrl() + 'encounter/' + uuid;
     return this.http.get<Encounter>(url, { params });

@@ -68,16 +68,6 @@ function setupOpenMRS() {
         offline: true,
       },
       {
-        name: 'test-results-timeline',
-        slots: ['patient-chart-summary-dashboard-slot', 'Test results timeline'],
-        load: getAsyncLifecycle(() => import('./timeline'), options),
-        meta: {
-          columnSpan: 4,
-        },
-        online: true,
-        offline: true,
-      },
-      {
         name: 'results-viewer',
         slots: ['patient-chart-results-viewer-slot', dashboardMeta.slot],
         load: getAsyncLifecycle(() => import('./results-viewer'), options),
