@@ -51,7 +51,6 @@ describe('AppointmentForm', () => {
     expect(screen.getByLabelText(/Select a location/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Date/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Select a service/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Select the type of service/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Select the type of appointment/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Write an additional note/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/Write any additional points here/i)).toBeInTheDocument();
@@ -99,7 +98,6 @@ describe('AppointmentForm', () => {
     const timeInput = screen.getByRole('textbox', { name: /Time/i });
     const timeFormat = screen.getByRole('combobox', { name: /Time/i });
     const serviceSelect = screen.getByRole('combobox', { name: /Select a service/i });
-    const serviceTypeSelect = screen.getByRole('combobox', { name: /Select the type of service/i });
     const appointmentTypeSelect = screen.getByRole('combobox', { name: /Select the type of appointment/i });
 
     expect(saveButton).toBeDisabled();
@@ -110,7 +108,6 @@ describe('AppointmentForm', () => {
     await waitFor(() => user.type(timeInput, '09:30'));
     await waitFor(() => user.selectOptions(timeFormat, 'AM'));
     await waitFor(() => user.selectOptions(serviceSelect, ['Outpatient']));
-    await waitFor(() => user.selectOptions(serviceTypeSelect, ['Chemotherapy']));
     await waitFor(() => user.selectOptions(appointmentTypeSelect, ['Scheduled']));
 
     expect(saveButton).not.toBeDisabled();
@@ -164,7 +161,6 @@ describe('AppointmentForm', () => {
     const timeInput = screen.getByRole('textbox', { name: /Time/i });
     const timeFormat = screen.getByRole('combobox', { name: /Time/i });
     const serviceSelect = screen.getByRole('combobox', { name: /Select a service/i });
-    const serviceTypeSelect = screen.getByRole('combobox', { name: /Select the type of service/i });
     const appointmentTypeSelect = screen.getByRole('combobox', { name: /Select the type of appointment/i });
 
     await waitFor(() => user.clear(dateInput));
@@ -173,7 +169,6 @@ describe('AppointmentForm', () => {
     await waitFor(() => user.type(timeInput, '09:30'));
     await waitFor(() => user.selectOptions(timeFormat, 'AM'));
     await waitFor(() => user.selectOptions(serviceSelect, ['Outpatient']));
-    await waitFor(() => user.selectOptions(serviceTypeSelect, ['Chemotherapy']));
     await waitFor(() => user.selectOptions(appointmentTypeSelect, ['Scheduled']));
     await waitFor(() => user.click(saveButton));
 
