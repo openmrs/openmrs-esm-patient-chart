@@ -37,7 +37,7 @@ const VisitAttributeTypeFields: React.FC<VisitAttributeTypeFieldsProps> = ({ set
     }));
   };
 
-  if (visitAttributeTypes.length) {
+  if (visitAttributeTypes?.length) {
     return (
       <>
         {visitAttributeTypes.map((attributeType) => (
