@@ -52,7 +52,7 @@ export interface MappedVisitQueueEntry {
   patientUuid: string;
   priority: MappedQueuePriority;
   priorityUuid: string;
-  service: QueueService;
+  service: string;
   status: QueueStatus;
   statusUuid: string;
   visitUuid: string;
@@ -84,7 +84,7 @@ export function useVisitQueueEntries(): UseVisitQueueEntries {
         ? 'Priority'
         : visitQueueEntry.queueEntry.priority.display,
     priorityUuid: visitQueueEntry.queueEntry.priority.uuid,
-    service: visitQueueEntry.queueEntry.queue.service.display,
+    service: visitQueueEntry.queueEntry.queue?.display,
     status: visitQueueEntry.queueEntry.status.display,
     statusUuid: visitQueueEntry.queueEntry.status.uuid,
     visitUuid: visitQueueEntry.visit?.uuid,
