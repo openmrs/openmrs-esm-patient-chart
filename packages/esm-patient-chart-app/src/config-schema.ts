@@ -36,6 +36,7 @@ export const esmPatientChartSchema = {
     _type: Type.Boolean,
     _default: false,
     _description: 'Disable notes/tests/medications/encounters tabs when empty',
+  },
     showAllEncountersTab: {
       _type: Type.Boolean,
       _description: 'Shows the All Encounters Tab of Patient Visits section in Patient Chart',
