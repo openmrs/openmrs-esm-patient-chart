@@ -22,7 +22,7 @@ import {
   navigate,
   useConfig,
 } from '@openmrs/esm-framework';
-import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { launchPatientWorkspace, useWorkspaces } from '@openmrs/esm-patient-common-lib';
 import VisitHeaderSideMenu from './visit-header-side-menu.component';
 import styles from './visit-header.scss';
 import { MappedQueuePriority, MappedVisitQueueEntry, useVisitQueueEntries } from '../visit/queue-entry/queue.resource';
@@ -128,11 +128,16 @@ const VisitHeader: React.FC = () => {
 
   const originPage = localStorage.getItem('fromPage');
 
-  const onClosePatientChart = useCallback(() => {
+  const { workspaces } = useWorkspaces();
+
+  const onClosePatientChart = React.useCallback(() => {
     originPage ? navigate({ to: `${window.spaBase}/${originPage}` }) : navigate({ to: `${window.spaBase}/home` });
     setShowVisitHeader((prevState) => !prevState);
     localStorage.removeItem('fromPage');
-  }, [originPage]);
+    workspaces.forEach((workspace) => {
+      workspace.closeWorkspace();
+    });
+  }, [originPage, workspaces]);
 
   const render = useCallback(() => {
     if (!showVisitHeader) {
