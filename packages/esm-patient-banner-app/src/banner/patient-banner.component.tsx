@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import capitalize from 'lodash-es/capitalize';
 import { Button, Tag } from '@carbon/react';
 import { ChevronDown, ChevronUp, OverflowMenuVertical } from '@carbon/react/icons';
-import { ExtensionSlot, age, formatDate, parseDate } from '@openmrs/esm-framework';
+import { ExtensionSlot, age, formatDate, parseDate, ConfigObject, useConfig } from '@openmrs/esm-framework';
 import ContactDetails from '../contact-details/contact-details.component';
 import CustomOverflowMenuComponent from '../ui-components/overflow-menu.component';
 import styles from './patient-banner.scss';
@@ -33,7 +33,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
 
   const patientName = `${patient?.name?.[0]?.given?.join(' ')} ${patient?.name?.[0].family}`;
   const patientPhotoSlotState = React.useMemo(() => ({ patientUuid, patientName }), [patientUuid, patientName]);
-
+  const { defaultPatientIdentifier } = useConfig() as ConfigObject;
   const [showContactDetails, setShowContactDetails] = React.useState(false);
   const toggleContactDetails = React.useCallback((event: MouseEvent) => {
     event.stopPropagation();
@@ -56,7 +56,9 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
     event.stopPropagation();
     setShowDropdown((value) => !value);
   }, []);
-
+  const filterPatientIdentifier = defaultPatientIdentifier.length
+    ? patient.identifier?.filter(({ type }) => defaultPatientIdentifier.includes(type.text))
+    : patient.identifier;
   return (
     <div className={styles.container} role="banner">
       <div
@@ -104,8 +106,8 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
           </div>
           <div className={styles.row}>
             <div className={styles.identifiers}>
-              {patient?.identifier?.length
-                ? patient?.identifier.map(({ value, type }) => (
+              {filterPatientIdentifier?.length
+                ? filterPatientIdentifier.map(({ value, type }) => (
                     <span className={styles.identifierTag}>
                       <Tag key={value} type="gray" title={type.text}>
                         {type.text}

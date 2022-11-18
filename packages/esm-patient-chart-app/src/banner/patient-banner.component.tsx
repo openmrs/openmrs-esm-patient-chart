@@ -2,10 +2,11 @@ import React, { MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Tag } from '@carbon/react';
 import { ChevronDown, ChevronUp, OverflowMenuVertical } from '@carbon/react/icons';
-import { ExtensionSlot, age, formatDate, parseDate } from '@openmrs/esm-framework';
+import { ExtensionSlot, age, formatDate, parseDate, useConfig } from '@openmrs/esm-framework';
 import ContactDetails from './contact-details/contact-details.component';
 import CustomOverflowMenuComponent from './ui-components/overflow-menu.component';
 import styles from './patient-banner.scss';
+import { ConfigObject } from '../config-schema';
 
 interface PatientBannerProps {
   patient: fhir.Patient;
@@ -44,7 +45,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
       <ExtensionSlot extensionSlotName="patient-photo-slot" state={patientPhotoSlotState} />
     </div>
   );
-
+  const { defaultPatientIdentifier } = useConfig() as ConfigObject;
   const handleNavigateToPatientChart = (event: MouseEvent) => {
     if (onClick) {
       !(overFlowMenuRef?.current && overFlowMenuRef?.current.contains(event.target)) && onClick(patientUuid);
@@ -71,6 +72,9 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
     }
   };
 
+  const filterPatientIdentifier = defaultPatientIdentifier.length
+    ? patient.identifier?.filter(({ type }) => defaultPatientIdentifier.includes(type.text))
+    : patient.identifier;
   return (
     <div className={styles.container} role="banner">
       <div
@@ -118,8 +122,8 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
           </div>
           <div className={styles.row}>
             <div className={styles.identifiers}>
-              {patient?.identifier?.length
-                ? patient?.identifier.map(({ value, type }) => (
+              {filterPatientIdentifier?.length
+                ? filterPatientIdentifier.map(({ value, type }) => (
                     <span className={styles.identifierTag}>
                       <Tag key={value} className={styles.tag} type="gray" title={type.text}>
                         {type.text}
