@@ -15,6 +15,7 @@
   "discard": "Discard",
   "loading": "Loading",
   "location": "Location",
+  "noCurrentAppointments": "There are no appointments scheduled for today to display for this patient",
   "noPastAppointments": "There are no past appointments to display for this patient",
   "note": "Note",
   "noUpcomingAppointments": "There are no upcoming appointments to display for this patient",
@@ -24,6 +25,9 @@
   "selectLocation": "Select a location",
   "selectService": "Select service",
   "service": "Service",
+  "serviceType": "Service type",
+  "status": "Status",
   "time": "Time",
+  "today": "Today",
   "upcoming": "Upcoming"
 }
