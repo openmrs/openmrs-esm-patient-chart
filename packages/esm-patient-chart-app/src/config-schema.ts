@@ -49,9 +49,11 @@ export const esmPatientChartSchema = {
     _elements: {
       uuid: {
         _type: Type.UUID,
+        _description: 'UUID of the visit attribute type',
       },
       required: {
         _type: Type.Boolean,
+        _description: 'Either the attribute type field is required or not',
       },
     },
   },

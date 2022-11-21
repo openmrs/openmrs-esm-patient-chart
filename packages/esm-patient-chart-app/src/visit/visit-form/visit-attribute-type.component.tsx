@@ -37,7 +37,7 @@ const VisitAttributeTypeFields: React.FC<VisitAttributeTypeFieldsProps> = ({
   const { visitAttributeTypes } = useConfig() as ChartConfig;
 
   const setAttributeValue = useCallback(
-    (uuid, value) => {
+    (uuid: string, value: string) => {
       setVisitAttributes((prevState) => ({
         ...prevState,
         [uuid]: value,
@@ -53,7 +53,7 @@ const VisitAttributeTypeFields: React.FC<VisitAttributeTypeFieldsProps> = ({
           <AttributeTypeField
             key={indx}
             attributeType={attributeType}
-            setVisitAttribute={(val) => setAttributeValue(attributeType.uuid, val)}
+            setVisitAttribute={(val: string) => setAttributeValue(attributeType.uuid, val)}
             isMissingRequiredAttributes={isMissingRequiredAttributes}
             visitAttributes={visitAttributes}
           />
@@ -70,7 +70,7 @@ interface AttributeTypeFieldProps {
     uuid: string;
     required: boolean;
   };
-  setVisitAttribute: (val: string | boolean | number) => void;
+  setVisitAttribute: (val: string) => void;
   isMissingRequiredAttributes: boolean;
   visitAttributes: VisitAttributes;
 }
