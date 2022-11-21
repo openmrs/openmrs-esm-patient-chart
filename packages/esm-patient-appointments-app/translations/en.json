@@ -25,11 +25,8 @@
   "selectLocation": "Select a location",
   "selectService": "Select service",
   "service": "Service",
-<<<<<<< HEAD
-=======
   "serviceType": "Service type",
   "status": "Status",
->>>>>>> 7059ddd (code review)
   "time": "Time",
   "today": "Today",
   "upcoming": "Upcoming"
