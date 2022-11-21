@@ -19,7 +19,7 @@ function setupOpenMRS() {
     moduleName,
   };
 
-  defineExtensionConfigSchema('obs-by-encounter-widget', configSchema);
+  defineExtensionConfigSchema(moduleName, configSchema);
 
   return {
     extensions: [
