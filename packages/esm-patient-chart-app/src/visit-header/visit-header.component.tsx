@@ -26,7 +26,6 @@ import { launchPatientWorkspace, getWorkspaceStore, resetWorkspaceStore } from '
 import VisitHeaderSideMenu from './visit-header-side-menu.component';
 import { MappedQueuePriority, MappedVisitQueueEntry, useVisitQueueEntries } from '../visit/queue-entry/queue.resource';
 import { EditQueueEntry } from '../visit/queue-entry/edit-queue-entry.component';
-import { renderTitle, renderTextBody } from './promptMessages';
 
 import styles from './visit-header.scss';
 
@@ -157,12 +156,34 @@ const VisitHeader: React.FC = () => {
   const { type = '', title = '', additionalProps } = workSpaceProps;
   const workspaceTitle = additionalProps?.workspaceTitle;
 
+  const bodyText =
+    type === 'form'
+      ? workspaceTitle
+        ? t(
+            'openFormSpecificWarningText',
+            'The {workspaceTitle} form will not be saved if you exit the patient chart now, please or discard the form before you exit.',
+            { workspaceTitle },
+          )
+        : t(
+            'openFormWarningText',
+            'The form will not be saved if you exit the patient chart now, please or discard the form before you exit.',
+          )
+      : type === 'order'
+      ? t(
+          'openOrderBasketWarningText',
+          'The orders will not be saved if you exit the patient chart now, please or discard the form before you exit.',
+        )
+      : t(
+          'openVisitNoteWarningText',
+          'The visit note will not be saved if you exit the patient chart now, please or discard the note before you exit.',
+        );
+
   const promptBeforeClosingWorkspace = useCallback(() => {
     store.setState({
       ...state,
       prompt: {
-        title: renderTitle(t, title),
-        body: renderTextBody(t, type, workspaceTitle),
+        title: t('openWorkspaceWarningHeader', "You haven't saved the {formTitle}", { formTitle: title }),
+        body: bodyText,
         cancelText: t('returnToPatientChart', 'Return to patient chart'),
         confirmText: t('closePatientChart', 'Close patient chart'),
         onConfirm: () => {
@@ -171,7 +192,7 @@ const VisitHeader: React.FC = () => {
         },
       },
     });
-  }, [t, type, onClosePatientChart, title, workspaceTitle, state, store]);
+  }, [t, onClosePatientChart, title, state, store, bodyText]);
 
   const render = useCallback(() => {
     if (!showVisitHeader) {
