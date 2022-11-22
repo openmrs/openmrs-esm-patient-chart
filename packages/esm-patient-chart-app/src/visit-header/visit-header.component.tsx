@@ -21,17 +21,27 @@ import {
   useVisit,
   navigate,
   useConfig,
-  showModal,
 } from '@openmrs/esm-framework';
-import { launchPatientWorkspace, getWorkspaceStore } from '@openmrs/esm-patient-common-lib';
+import { launchPatientWorkspace, getWorkspaceStore, resetWorkspaceStore } from '@openmrs/esm-patient-common-lib';
 import VisitHeaderSideMenu from './visit-header-side-menu.component';
-import styles from './visit-header.scss';
 import { MappedQueuePriority, MappedVisitQueueEntry, useVisitQueueEntries } from '../visit/queue-entry/queue.resource';
 import { EditQueueEntry } from '../visit/queue-entry/edit-queue-entry.component';
+import { renderTitle, renderTextBody } from './promptMessages';
+
+import styles from './visit-header.scss';
 
 interface PatientInfoProps {
   patient: fhir.Patient;
 }
+
+interface workspaceProps {
+  type?: string;
+  title?: string;
+  additionalProps?: {
+    workspaceTitle?: string | undefined;
+  };
+}
+
 const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -116,7 +126,7 @@ const VisitHeader: React.FC = () => {
 
   const store = getWorkspaceStore();
   const state = store.getState();
-  const workSpaceProps = state.openWorkspaces?.[0];
+  const workSpaceProps: workspaceProps = state.openWorkspaces?.[0] || {};
 
   const formWorkspace = state.openWorkspaces?.find((workspace) => workspace.type === 'form');
   const orderWorkspace = state.openWorkspaces?.find((workspace) => workspace.type === 'order');
@@ -144,13 +154,24 @@ const VisitHeader: React.FC = () => {
     localStorage.removeItem('fromPage');
   }, [originPage]);
 
-  const openModal = useCallback(() => {
-    const dispose = showModal('confirm-closing-patient-chart-modal', {
-      props: workSpaceProps,
-      closeDialog: () => dispose(),
-      leavePatientChart: onClosePatientChart,
+  const { type = '', title = '', additionalProps } = workSpaceProps;
+  const workspaceTitle = additionalProps?.workspaceTitle;
+
+  const promptBeforeClosingWorkspace = useCallback(() => {
+    store.setState({
+      ...state,
+      prompt: {
+        title: renderTitle(t, title),
+        body: renderTextBody(t, type, workspaceTitle),
+        cancelText: t('returnToPatientChart', 'Return to patient chart'),
+        confirmText: t('closePatientChart', 'Close patient chart'),
+        onConfirm: () => {
+          onClosePatientChart();
+          resetWorkspaceStore();
+        },
+      },
     });
-  }, [onClosePatientChart, workSpaceProps]);
+  }, [t, type, onClosePatientChart, title, workspaceTitle, state, store]);
 
   const render = useCallback(() => {
     if (!showVisitHeader) {
@@ -198,7 +219,7 @@ const VisitHeader: React.FC = () => {
             <HeaderGlobalAction
               className={styles.headerGlobalBarCloseButton}
               aria-label={t('close', 'Close')}
-              onClick={hasOpenForm ? openModal : onClosePatientChart}
+              onClick={hasOpenForm ? promptBeforeClosingWorkspace : onClosePatientChart}
             >
               <CloseFilled size={20} />
             </HeaderGlobalAction>
@@ -220,8 +241,8 @@ const VisitHeader: React.FC = () => {
     launchStartVisitForm,
     onClosePatientChart,
     toggleSideMenu,
-    openModal,
     hasOpenForm,
+    promptBeforeClosingWorkspace,
   ]);
 
   return <HeaderContainer render={render} />;
