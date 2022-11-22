@@ -47,6 +47,21 @@ export const esmPatientChartSchema = {
     _description: 'Custom label to use on the start visit actions',
     _default: '',
   },
+  visitAttributeTypes: {
+    _type: Type.Array,
+    _description: 'List of visit attribute types to be shown when filling visit form',
+    _default: [],
+    _elements: {
+      uuid: {
+        _type: Type.UUID,
+        _description: 'UUID of the visit attribute type',
+      },
+      required: {
+        _type: Type.Boolean,
+        _description: 'Either the attribute type field is required or not',
+      },
+    },
+  },
   showServiceQueueFields: {
     _type: Type.Boolean,
     _description: 'Whether start visit form should display service queue fields`',
@@ -83,6 +98,10 @@ export interface ChartConfig {
   offlineVisitTypeUuid: string;
   visitTypeResourceUrl: string;
   showRecommendedVisitTypeTab: boolean;
+  visitAttributeTypes: Array<{
+    uuid: string;
+    required: boolean;
+  }>;
   showServiceQueueFields: boolean;
   priorityConceptSetUuid: string;
   defaultPriorityConceptUuid: string;

@@ -1,0 +1,7 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '../../root.scss';
+
+.visitAttributeField {
+  margin-bottom: spacing.$spacing-05;
+}

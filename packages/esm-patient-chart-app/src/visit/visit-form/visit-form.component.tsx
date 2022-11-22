@@ -48,6 +48,7 @@ import BaseVisitType from './base-visit-type.component';
 import styles from './visit-form.scss';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
 import { ChartConfig } from '../../config-schema';
+import VisitAttributeTypeFields from './visit-attribute-type.component';
 import { QueueEntryPayload, saveQueueEntry, usePriorities, useServices, useStatuses } from '../hooks/useServiceQueue';
 
 const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace, promptBeforeClosing }) => {
@@ -70,6 +71,8 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
   const [enrollment, setEnrollment] = useState<PatientProgram>(activePatientEnrollment[0]);
   const { mutate } = useVisit(patientUuid);
   const [ignoreChanges, setIgnoreChanges] = useState(true);
+  const [visitAttributes, setVisitAttributes] = useState<{ [uuid: string]: string }>({});
+  const [isMissingRequiredAttributes, setIsMissingRequiredAttributes] = useState(false);
   const [priority, setPriority] = useState('');
   const { priorities } = usePriorities();
   const { statuses } = useStatuses();
@@ -86,6 +89,11 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
   const handleSubmit = useCallback(
     (event) => {
       event.preventDefault();
+
+      if (config.visitAttributeTypes?.find(({ uuid, required }) => required && !visitAttributes[uuid])) {
+        setIsMissingRequiredAttributes(true);
+        return;
+      }
 
       if (!visitType) {
         setIsMissingVisitType(true);
@@ -105,6 +113,12 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
         ),
         visitType: visitType,
         location: selectedLocation,
+        attributes: Object.entries(visitAttributes)
+          .filter(([key, value]) => !!value)
+          .map(([key, value]) => ({
+            attributeType: key,
+            value,
+          })),
       };
 
       const abortController = new AbortController();
@@ -189,6 +203,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
     },
     [
       closeWorkspace,
+      config.visitAttributeTypes,
       config.defaultPriorityConceptUuid,
       config.defaultStatusConceptUuid,
       config.showServiceQueueFields,
@@ -203,6 +218,8 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
       visitDate,
       visitTime,
       visitType,
+      visitAttributes,
+      setIsMissingRequiredAttributes,
     ],
   );
 
@@ -276,7 +293,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
             <ExtensionSlot extensionSlotName="visit-form-header-slot" className={styles.dataGridRow} state={state} />
           </Row>
         )}
-        <Stack gap={8} className={styles.container}>
+        <Stack gap={1} className={styles.container}>
           <section className={styles.section}>
             <div className={styles.sectionTitle}>{t('dateAndTimeOfVisit', 'Date and time of visit')}</div>
             <div className={styles.dateTimeSection}>
@@ -358,6 +375,13 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
               />
             </section>
           )}
+          <section>
+            <VisitAttributeTypeFields
+              setVisitAttributes={setVisitAttributes}
+              isMissingRequiredAttributes={isMissingRequiredAttributes}
+              visitAttributes={visitAttributes}
+            />
+          </section>
 
           {config.showServiceQueueFields && (
             <>
