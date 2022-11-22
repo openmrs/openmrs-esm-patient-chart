@@ -29,7 +29,7 @@ interface PaginatedNotes {
 const PaginatedNotes: React.FC<PaginatedNotes> = ({ notes, pageSize, pageUrl, urlLabel }) => {
   const { t } = useTranslation();
 
-  const [sortings, setSortings] = useState({ key: '', order: 'none' });
+  const [sortParams, setSortParams] = useState({ key: '', order: 'none' });
 
   const tableHeaders = [
     {
@@ -47,7 +47,7 @@ const PaginatedNotes: React.FC<PaginatedNotes> = ({ notes, pageSize, pageUrl, ur
       ? orderBy(myArray, [(obj) => new Date(obj.encounterDate).getTime()], ['desc'])
       : orderBy(myArray, [(obj) => new Date(obj.encounterDate).getTime()], ['asc']);
 
-  const { key, order } = sortings;
+  const { key, order } = sortParams;
 
   const sortedData =
     key === 'encounterDate'
@@ -58,7 +58,7 @@ const PaginatedNotes: React.FC<PaginatedNotes> = ({ notes, pageSize, pageUrl, ur
 
   function customSortRow(noteA, noteB, { sortDirection, sortStates, ...props }) {
     const { key } = props;
-    setSortings({ key, order: sortDirection });
+    setSortParams({ key, order: sortDirection });
   }
 
   const { results: paginatedNotes, goTo, currentPage } = usePagination(sortedData, pageSize);
