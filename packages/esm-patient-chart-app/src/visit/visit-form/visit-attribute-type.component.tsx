@@ -4,7 +4,6 @@ import { ChartConfig } from '../../config-schema';
 import { useConceptAnswersForVisitAttributeType, useVisitAttributeType } from '../hooks/useVisitAttributeType';
 import {
   TextInput,
-  SkeletonText,
   TextInputSkeleton,
   TextArea,
   NumberInput,
@@ -175,7 +174,7 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
     }
   }, [
     answers,
-    data.datatypeClassname,
+    data,
     isLoading,
     isLoadingAnswers,
     isMissingRequiredAttributes,
