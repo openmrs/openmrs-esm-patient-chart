@@ -258,6 +258,14 @@ function setupOpenMRS() {
           moduleName,
         }),
       },
+      {
+        id: 'visit-attribute-tags',
+        slot: 'patient-banner-tags-slot',
+        load: getAsyncLifecycle(() => import('./patient-banner-tags/visit-attribute-tags.component'), {
+          featureName: 'visit-attribute-tags',
+          moduleName,
+        }),
+      },
     ],
   };
 }
