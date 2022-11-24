@@ -1,6 +1,7 @@
 import React from 'react';
 import { Tag } from '@carbon/react';
-import { formatDate } from '@openmrs/esm-framework';
+import { formatDate, useConfig } from '@openmrs/esm-framework';
+import { ChartConfig } from '../config-schema';
 import { useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 
 interface VisitAttributeTagsProps {
@@ -10,7 +11,7 @@ interface VisitAttributeTagsProps {
 const getAttributeValue = (attributeType, value) => {
   switch (attributeType?.datatypeClassname) {
     case 'org.openmrs.customdatatype.datatype.ConceptDatatype':
-      return value;
+      return value?.display;
     case 'org.openmrs.customdatatype.datatype.FloatDatatype':
       return value;
     case 'org.openmrs.customdatatype.datatype.FreeTextDatatype':
@@ -30,14 +31,22 @@ const getAttributeValue = (attributeType, value) => {
 
 const VisitAttributeTags: React.FC<VisitAttributeTagsProps> = ({ patientUuid }) => {
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
+  const { visitAttributeTypes } = useConfig() as ChartConfig;
+
+  console.log(currentVisit?.attributes, visitAttributeTypes);
   return (
     <>
-      {currentVisit?.attributes?.map((attribute) => (
-        <Tag type="gray">{`${attribute.attributeType?.name}: ${getAttributeValue(
-          attribute?.attributeType,
-          attribute?.value,
-        )}`}</Tag>
-      ))}
+      {currentVisit?.attributes
+        ?.filter(
+          (attribute) =>
+            visitAttributeTypes.find(({ uuid }) => attribute?.attributeType?.uuid === uuid)?.displayInThePatientBanner,
+        )
+        .map((attribute) => (
+          <Tag type="gray">{`${attribute.attributeType?.name}: ${getAttributeValue(
+            attribute?.attributeType,
+            attribute?.value,
+          )}`}</Tag>
+        ))}
     </>
   );
 };
