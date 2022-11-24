@@ -33,7 +33,6 @@ const VisitAttributeTags: React.FC<VisitAttributeTagsProps> = ({ patientUuid }) 
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const { visitAttributeTypes } = useConfig() as ChartConfig;
 
-  console.log(currentVisit?.attributes, visitAttributeTypes);
   return (
     <>
       {currentVisit?.attributes
