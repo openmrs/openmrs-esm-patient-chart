@@ -4903,6 +4903,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ngx-translate/core@npm:13.0.0":
+  version: 13.0.0
+  resolution: "@ngx-translate/core@npm:13.0.0"
+  dependencies:
+    tslib: ^2.0.0
+  peerDependencies:
+    "@angular/core": ">=10.0.0"
+    rxjs: ">=6.5.3"
+  checksum: ef7df7870dddc53d483b5c70093174844a5bd231568e36a18271bcaf71209bbedb66c82005d76088392df2bde1d82136fb7f79afb44975e2f7426cc8824e0288
+  languageName: node
+  linkType: hard
+
 "@nodelib/fs.scandir@npm:2.1.5":
   version: 2.1.5
   resolution: "@nodelib/fs.scandir@npm:2.1.5"
@@ -5361,6 +5373,7 @@ __metadata:
     "@angular/router": ~12.2.16
     "@carbon/styles": ~1.14.0
     "@ng-select/ng-select": ^6.1.0
+    "@ngx-translate/core": 13.0.0
     "@openmrs/ngx-formentry": next
     "@types/jasmine": ~3.6.0
     "@types/jasminewd2": ~2.0.3
