@@ -3,13 +3,13 @@ import { openmrsFetch, OpenmrsResource, Visit } from '@openmrs/esm-framework';
 
 export function useVisits(patientUuid: string) {
   const customRepresentation =
-    'custom:(uuid,encounters:(uuid,form:(uuid,display),encounterDatetime,' +
+    'custom:(uuid,encounters:(uuid,diagnoses:(uuid,display,rank,diagnosis),form:(uuid,display),encounterDatetime,' +
     'orders:full,' +
     'obs:(uuid,concept:(uuid,display,conceptClass:(uuid,display)),' +
     'display,groupMembers:(uuid,concept:(uuid,display),' +
     'value:(uuid,display)),value),encounterType:(uuid,display),' +
     'encounterProviders:(uuid,display,encounterRole:(uuid,display),' +
-    'provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime,patient';
+    'provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime,stopDatetime,patient';
 
   const { data, error, isValidating } = useSWR<{ data: { results: Array<Visit> } }, Error>(
     `/ws/rest/v1/visit?patient=${patientUuid}&v=${customRepresentation}`,
@@ -19,6 +19,36 @@ export function useVisits(patientUuid: string) {
   return {
     visits: data ? data?.data?.results : null,
     isError: error,
+    isLoading: !data && !error,
+    isValidating,
+  };
+}
+
+export function useEncounters(patientUuid: string) {
+  const endpointUrl = '/ws/rest/v1/encounter';
+  // setting this up to make it more generic and usable later
+  const params = {
+    patient: patientUuid,
+    v: 'default',
+    limit: '100',
+    order: 'desc',
+    startIndex: '0',
+  };
+  const fullRequest =
+    endpointUrl +
+    '?' +
+    Object.entries(params)
+      .map(([key, value]) => `${key}=${value}`)
+      .join('&');
+
+  const { data, error, isValidating } = useSWR<{ data: { results: Array<Record<string, unknown>> } }, Error>(
+    fullRequest,
+    openmrsFetch,
+  );
+
+  return {
+    encounters: data ? data?.data?.results : null,
+    error,
     isLoading: !data && !error,
     isValidating,
   };
@@ -48,6 +78,7 @@ export function usePastVisits(patientUuid: string) {
 
 export interface Encounter {
   uuid: string;
+  diagnoses: Array<Diagnosis>;
   encounterDatetime: string;
   encounterProviders: Array<{
     uuid: string;
@@ -181,28 +212,20 @@ export interface OrderItem {
     role: string;
   };
 }
-
-export function getDosage(strength: string, doseNumber: number) {
-  if (!strength || !doseNumber) {
-    return '';
-  }
-
-  const i = strength.search(/\D/);
-  const strengthQuantity = parseInt(strength.substring(0, i));
-
-  const concentrationStartIndex = strength.search(/\//);
-
-  let strengthUnits = strength.substring(i);
-
-  if (concentrationStartIndex >= 0) {
-    strengthUnits = strength.substring(i, concentrationStartIndex);
-    const j = strength.substring(concentrationStartIndex + 1).search(/\D/);
-    const concentrationQuantity = parseInt(strength.substr(concentrationStartIndex + 1, j));
-    const concentrationUnits = strength.substring(concentrationStartIndex + 1 + j);
-    return `${doseNumber} ${strengthUnits} (${
-      (doseNumber / strengthQuantity) * concentrationQuantity
-    } ${concentrationUnits})`;
-  } else {
-    return `${strengthQuantity * doseNumber} ${strengthUnits}`;
-  }
+export interface Diagnosis {
+  certainty: string;
+  display: string;
+  encounter: OpenmrsResource;
+  links: Array<any>;
+  patient: OpenmrsResource;
+  rank: number;
+  resourceVersion: string;
+  uuid: string;
+  voided: boolean;
+  diagnosis: {
+    coded: {
+      display: string;
+      links: Array<any>;
+    };
+  };
 }

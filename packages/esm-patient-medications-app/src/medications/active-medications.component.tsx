@@ -22,7 +22,7 @@ const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patientUuid, show
 
   const {
     data: activePatientOrders,
-    isError,
+    error,
     isLoading,
     isValidating,
   } = usePatientOrders(patientUuid, 'ACTIVE', config.careSettingUuid);
@@ -32,7 +32,9 @@ const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patientUuid, show
   }, []);
 
   if (isLoading) return <DataTableSkeleton role="progressbar" />;
-  if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
+
+  if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
+
   if (activePatientOrders?.length) {
     return (
       // FIX
@@ -50,6 +52,7 @@ const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patientUuid, show
       </Provider>
     );
   }
+
   return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchOrderBasket} />;
 };
 

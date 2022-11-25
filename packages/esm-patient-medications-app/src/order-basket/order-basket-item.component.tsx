@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, ClickableTile, Tile } from '@carbon/react';
-import { TrashCan, Warning } from '@carbon/react/icons';
+import { Button, ClickableTile, Tile, IconButton } from '@carbon/react';
+import { TrashCan, Warning, Add } from '@carbon/react/icons';
 import { OrderBasketItem } from '../types/order-basket-item';
 import { useLayoutType } from '@openmrs/esm-framework';
 import styles from './order-basket-item.scss';
@@ -39,16 +39,18 @@ export default function OrderBasketItemTile({ orderBasketItem, onItemClick, onRe
             <span className={styles.drugName}>{orderBasketItem.drug.concept.display}</span>
             <span className={styles.dosageInfo}>
               {' '}
-              &mdash; {orderBasketItem.dosage.dosage} &mdash; {orderBasketItem.dosageUnit.name}
+              &mdash; {orderBasketItem.drug.strength} &mdash; {orderBasketItem.drug.dosageForm.display}
             </span>
           </>
         )}
         <br />
         <span className={styles.label01}>
           <span className={styles.doseCaption}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
-          <span className={styles.dosageLabel}>{orderBasketItem.dosage.dosage}</span>{' '}
+          <span className={styles.dosageLabel}>
+            {orderBasketItem.dosage.value} {orderBasketItem.unit.value}
+          </span>{' '}
           <span className={styles.dosageInfo}>
-            &mdash; {orderBasketItem.route.name} &mdash; {orderBasketItem.frequency.name} &mdash;{' '}
+            &mdash; {orderBasketItem.route.value} &mdash; {orderBasketItem.frequency.value} &mdash;{' '}
             {t('refills', 'Refills').toUpperCase()} {orderBasketItem.numRefills}{' '}
             {t('quantity', 'Quantity').toUpperCase()} {orderBasketItem.pillsDispensed}{' '}
           </span>

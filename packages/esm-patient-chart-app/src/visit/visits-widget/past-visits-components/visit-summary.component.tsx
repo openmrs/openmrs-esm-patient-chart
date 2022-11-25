@@ -2,8 +2,8 @@ import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Tab, Tabs, TabList, TabPanel, TabPanels, Tag } from '@carbon/react';
 import { formatTime, OpenmrsResource, parseDate, useConfig, useLayoutType } from '@openmrs/esm-framework';
-import { Order, Encounter, Note, Observation, OrderItem } from '../visit.resource';
-import EncounterList from './encounter-list.component';
+import { Order, Encounter, Note, Observation, OrderItem, Diagnosis } from '../visit.resource';
+import VisitsTable from './visits-table/visits-table.component';
 import MedicationSummary from './medications-summary.component';
 import NotesSummary from './notes-summary.component';
 import TestsSummary from './tests-summary.component';
@@ -32,7 +32,6 @@ export interface MappedEncounter {
 const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid }) => {
   const config = useConfig();
   const { t } = useTranslation();
-  const [selectedTab, setSelectedTab] = useState(0);
   const layout = useLayoutType();
 
   const [diagnoses, notes, medications]: [Array<DiagnosisItem>, Array<Note>, Array<OrderItem>] = useMemo(() => {
@@ -56,16 +55,22 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid }) 
         })),
       );
 
+      //Check if there is a diagnosis associated with this encounter
+      if (enc.hasOwnProperty('diagnoses')) {
+        if (enc.diagnoses.length > 0) {
+          enc.diagnoses.forEach((diagnosis: Diagnosis) => {
+            // Putting all the diagnoses in a single array.
+            diagnoses.push({
+              diagnosis: diagnosis.display,
+              order: diagnosis.rank === 1 ? 'Primary' : 'Secondary',
+            });
+          });
+        }
+      }
+
       // Check for Visit Diagnoses and Notes
       enc.obs.forEach((obs: Observation) => {
-        if (obs.concept.uuid === config.visitDiagnosisConceptUuid) {
-          // Putting all the diagnoses in a single array.
-          diagnoses.push({
-            diagnosis: obs.groupMembers?.find((mem) => mem.concept.uuid === config.problemListConceptUuid).value
-              .display,
-            order: obs.groupMembers?.find((mem) => mem.concept.uuid === config.diagnosisOrderConceptUuid).value.display,
-          });
-        } else if (config.notesConceptUuids?.includes(obs.concept.uuid)) {
+        if (config.notesConceptUuids?.includes(obs.concept.uuid)) {
           // Putting all notes in a single array.
           notes.push({
             note: obs.value,
@@ -79,14 +84,9 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid }) 
         }
       });
     });
+
     return [diagnoses, notes, medications];
-  }, [
-    config.diagnosisOrderConceptUuid,
-    config.notesConceptUuids,
-    config.problemListConceptUuid,
-    config.visitDiagnosisConceptUuid,
-    encounters,
-  ]);
+  }, [config.notesConceptUuids, encounters]);
 
   return (
     <div className={styles.summaryContainer}>
@@ -94,7 +94,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid }) 
       <div className={styles.diagnosesList}>
         {diagnoses.length > 0 ? (
           diagnoses.map((diagnosis, i) => (
-            <Tag key={i} type={diagnosis.order === 'Primary' ? 'blue' : 'red'}>
+            <Tag key={i} type={diagnosis.order === 'Primary' ? 'red' : 'blue'}>
               {diagnosis.diagnosis}
             </Tag>
           ))
@@ -106,16 +106,16 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid }) 
       </div>
       <Tabs className={`${styles.verticalTabs} ${layout === 'tablet' ? styles.tabletTabs : styles.desktopTabs}`}>
         <TabList aria-label="Visit summary tabs" className={styles.tablist}>
-          <Tab className={`${styles.tab} ${styles.bodyLong01}`} id="notes-tab" onClick={() => setSelectedTab(0)}>
+          <Tab className={`${styles.tab} ${styles.bodyLong01}`} id="notes-tab">
             {t('notes', 'Notes')}
           </Tab>
-          <Tab className={styles.tab} id="tests-tab" onClick={() => setSelectedTab(1)}>
+          <Tab className={styles.tab} id="tests-tab">
             {t('tests', 'Tests')}
           </Tab>
-          <Tab className={styles.tab} id="medications-tab" onClick={() => setSelectedTab(2)}>
+          <Tab className={styles.tab} id="medications-tab">
             {t('medications', 'Medications')}
           </Tab>
-          <Tab className={styles.tab} id="encounters-tab" onClick={() => setSelectedTab(3)}>
+          <Tab className={styles.tab} id="encounters-tab">
             {t('encounters', 'Encounters')}
           </Tab>
         </TabList>
@@ -130,7 +130,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid }) 
             <MedicationSummary medications={medications} />
           </TabPanel>
           <TabPanel>
-            <EncounterList encounters={mapEncounters(encounters)} showAllEncounters={false} />
+            <VisitsTable visits={mapEncounters(encounters)} showAllEncounters={false} />
           </TabPanel>
         </TabPanels>
       </Tabs>

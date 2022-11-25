@@ -31,7 +31,7 @@ export interface AppointmentService {
   color: string;
   creatorName: string;
   description: string;
-  durationMins: string;
+  durationMins: number;
   endTime: string;
   initialAppointmentStatus: string;
   location: OpenmrsResource;

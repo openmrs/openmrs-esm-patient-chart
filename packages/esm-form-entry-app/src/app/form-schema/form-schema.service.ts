@@ -3,7 +3,7 @@ import { ReplaySubject, Observable, Subject, of, forkJoin } from 'rxjs';
 import { concat, first, map, take, tap } from 'rxjs/operators';
 
 import { FormResourceService } from '../openmrs-api/form-resource.service';
-import { FormSchemaCompiler } from '@ampath-kenya/ngx-formentry';
+import { FormSchemaCompiler } from '@openmrs/ngx-formentry';
 import { LocalStorageService } from '../local-storage/local-storage.service';
 import { FormSchema, Questions } from '../types';
 import { TranslateService } from '@ngx-translate/core';
@@ -176,8 +176,10 @@ export class FormSchemaService {
       return this.formsResourceService.getFormMetaDataByUuid(formUuid).subscribe(
         (formMetadataObject: any) => {
           if (formMetadataObject.resources.length > 0) {
-            formMetadataObject.resources.map((resource: any) => {
-              this.formsResourceService.getFormClobDataByUuid(resource.valueReference).subscribe(
+            const { resources } = formMetadataObject;
+            const valueReferenceUuid = resources?.find(({ name }) => name === 'JSON schema').valueReference;
+            if (valueReferenceUuid) {
+              this.formsResourceService.getFormClobDataByUuid(valueReferenceUuid).subscribe(
                 (clobData: any) => {
                   observer.next(clobData);
                 },
@@ -186,7 +188,9 @@ export class FormSchemaService {
                   observer.error(err);
                 },
               );
-            });
+            } else {
+              observer.next([]);
+            }
           } else {
             observer.error(formMetadataObject.display + ':This formMetadataObject has no resource');
           }

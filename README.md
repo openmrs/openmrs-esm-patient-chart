@@ -58,6 +58,21 @@ yarn start --sources 'packages/esm-patient-biometrics-app' --sources 'packages/e
 
 Alternatively, you could run `yarn serve` from within the individual packages and then use [import map overrides](http://o3-dev.docs.openmrs.org/#/getting_started/setup?id=import-map-overrides).
 
+## Troubleshooting
+
+If you notice that your local version of the application is not working or that there's a mismatch between what you see locally versus what's in [dev3](https://dev3.openmrs.org/openmrs/spa), you likely have outdated versions of core libraries. To update core libraries, run the following commands:
+
+```bash
+# Upgrade core libraries
+yarn up openmrs @openmrs/esm-framework
+
+# Reset version specifiers to `next`. Don't commit actual version numbers.
+git checkout package.json
+
+# Run `yarn` to recreate the lockfile
+yarn
+```
+
 ## Layout
 
 The patient chart consists of the following parts:

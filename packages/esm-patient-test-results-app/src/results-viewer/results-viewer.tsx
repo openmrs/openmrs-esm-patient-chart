@@ -1,29 +1,29 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AccordionSkeleton, Button, Column, ContentSwitcher, DataTableSkeleton, Grid, Switch } from '@carbon/react';
 import { TreeViewAlt } from '@carbon/react/icons';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
-import { navigate, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { isDesktop, navigate, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { testResultsBasePath } from '../helpers';
 import FilterSet, { FilterContext, FilterProvider } from '../filter';
 import GroupedTimeline, { useGetManyObstreeData } from '../grouped-timeline';
-import DesktopView from '../desktop-view/desktop-view.component';
 import TabletOverlay from '../tablet-overlay';
 import Trendline from '../trendline/trendline.component';
 import styles from './results-viewer.styles.scss';
+import { useParams } from 'react-router-dom';
+import PanelView from '../panel-view';
+import TreeViewWrapper from '../tree-view';
 
 type viewOpts = 'split' | 'full';
 type panelOpts = 'tree' | 'panel';
 
 interface ResultsViewerProps {
   basePath: string;
-  type?: string;
-  testUuid?: string;
   patientUuid?: string;
   loading?: boolean;
 }
 
-const RoutedResultsViewer: React.FC<ResultsViewerProps> = ({ type, basePath, testUuid, patientUuid }) => {
+const RoutedResultsViewer: React.FC<ResultsViewerProps> = ({ basePath, patientUuid }) => {
   const config = useConfig();
   const conceptUuids = config?.concepts?.map((c) => c.conceptUuid) ?? [];
   const { roots, loading, error } = useGetManyObstreeData(conceptUuids);
@@ -36,13 +36,7 @@ const RoutedResultsViewer: React.FC<ResultsViewerProps> = ({ type, basePath, tes
   if (roots?.length) {
     return (
       <FilterProvider roots={!loading ? roots : []}>
-        <ResultsViewer
-          patientUuid={patientUuid}
-          testUuid={testUuid}
-          type={type}
-          basePath={basePath}
-          loading={loading}
-        />
+        <ResultsViewer patientUuid={patientUuid} basePath={basePath} loading={loading} />
       </FilterProvider>
     );
   }
@@ -55,7 +49,7 @@ const RoutedResultsViewer: React.FC<ResultsViewerProps> = ({ type, basePath, tes
   );
 };
 
-const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, type, testUuid, loading }) => {
+const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, loading }) => {
   const { t } = useTranslation();
   const tablet = useLayoutType() === 'tablet';
   const [view, setView] = useState<viewOpts>('split');
@@ -63,6 +57,7 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, ty
   const [showTreeOverlay, setShowTreeOverlay] = useState<boolean>(false);
   const { resetTree, timelineData, totalResultsCount } = useContext(FilterContext);
   const expanded = view === 'full';
+  const { type, testUuid } = useParams();
 
   return (
     <>
@@ -89,11 +84,11 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, ty
               {!expanded && (
                 <ContentSwitcher
                   size={tablet ? 'lg' : 'md'}
-                  selectedIndex={1}
+                  selectedIndex={['panel', 'tree'].indexOf(leftContent)}
                   onChange={(e) => setLeftContent(e.name as panelOpts)}
                 >
-                  <Switch name="panel" text={t('panel', 'Panel')} disabled={loading} />
-                  <Switch name="tree" text={t('tree', 'Tree')} disabled={loading} />
+                  <Switch name="panel" text={t('panel', 'Panel')} />
+                  <Switch name="tree" text={t('tree', 'Tree')} />
                 </ContentSwitcher>
               )}
             </div>
@@ -117,22 +112,25 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, ty
             </div>
           </Column>
         )}
-        {!tablet && (
-          <Column sm={16} lg={tablet || expanded ? 0 : 5} className={`${styles.columnPanel} ${styles.treeColumn}`}>
-            {leftContent === 'tree' && (!loading ? <FilterSet /> : <AccordionSkeleton open count={4} align="start" />)}
-            {leftContent === 'panel' && <DesktopView />}
-          </Column>
+        {leftContent === 'tree' ? (
+          <TreeViewWrapper
+            patientUuid={patientUuid}
+            basePath={basePath}
+            type={type}
+            expanded={expanded}
+            testUuid={testUuid}
+          />
+        ) : (
+          <PanelView
+            expanded={expanded}
+            patientUuid={patientUuid}
+            basePath={basePath}
+            type={type}
+            testUuid={testUuid}
+          />
         )}
-        <Column sm={16} lg={tablet || expanded ? 12 : 7} className={`${styles.columnPanel}`}>
-          {!tablet && testUuid && type === 'trendline' ? (
-            <Trendline patientUuid={patientUuid} conceptUuid={testUuid} basePath={basePath} showBackToTimelineButton />
-          ) : !loading ? (
-            <GroupedTimeline />
-          ) : (
-            <DataTableSkeleton />
-          )}
-        </Column>
       </Grid>
+
       {tablet && showTreeOverlay && (
         <TabletOverlay
           headerText={t('tree', 'Tree')}

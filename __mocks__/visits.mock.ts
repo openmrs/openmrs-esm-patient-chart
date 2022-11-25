@@ -252,34 +252,19 @@ export const visitOverviewDetailMockDataNotEmpty = {
             uuid: '95f6471b-9a65-4dc3-b6ab-0d8bd3299ff0',
             encounterDatetime: '2021-09-08T03:09:37.000+0000',
             orders: [],
-            obs: [
+            diagnoses: [
               {
+                display: 'Malaria, confirmed',
+                rank: 1,
                 uuid: 'ec5bd62a-38c6-4d03-b51c-4554468f3169',
-                concept: {
-                  uuid: '159947AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-                  display: 'Visit Diagnoses',
-                  conceptClass: { uuid: '8d492594-c2cc-11de-8d13-0010c6dffd0f', display: 'ConvSet' },
-                },
-                display: 'Visit Diagnoses: Primary, Presumed diagnosis, Malaria, confirmed',
-                groupMembers: [
-                  {
-                    uuid: '3d12c806-bb89-4c16-a54e-77a29493ebc5',
-                    concept: { uuid: '159946AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Diagnosis order' },
-                    value: { uuid: '159943AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Primary' },
-                  },
-                  {
-                    uuid: '604b4f8e-f13b-4b90-b78d-79b75cf9c29a',
-                    concept: { uuid: '159394AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Diagnosis certainty' },
-                    value: { uuid: '159393AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Presumed diagnosis' },
-                  },
-                  {
-                    uuid: 'db7e1d38-a22a-486f-b7d9-31ef9c87f58e',
-                    concept: { uuid: '1284AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'PROBLEM LIST' },
-                    value: { uuid: '160148AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Malaria, confirmed' },
-                  },
-                ],
-                value: null,
               },
+              {
+                display: 'HUMAN IMMUNODEFICIENCY VIRUS (HIV) DISEASE',
+                rank: 2,
+                uuid: 'f1381ba6-f876-4ca8-96c8-309127372b95',
+              },
+            ],
+            obs: [
               {
                 uuid: '70fb26b6-78bf-4bb7-bea1-9d371a918759',
                 concept: {
@@ -290,36 +275,6 @@ export const visitOverviewDetailMockDataNotEmpty = {
                 display: 'Text of encounter note: Patient seems very unwell\r\n',
                 groupMembers: null,
                 value: 'Patient seems very unwell\r\n',
-              },
-              {
-                uuid: 'f1381ba6-f876-4ca8-96c8-309127372b95',
-                concept: {
-                  uuid: '159947AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-                  display: 'Visit Diagnoses',
-                  conceptClass: { uuid: '8d492594-c2cc-11de-8d13-0010c6dffd0f', display: 'ConvSet' },
-                },
-                display: 'Visit Diagnoses: Secondary, HUMAN IMMUNODEFICIENCY VIRUS (HIV) DISEASE, Presumed diagnosis',
-                groupMembers: [
-                  {
-                    uuid: 'c4e3a836-d188-4145-a1bc-67a4fe46cf5c',
-                    concept: { uuid: '159946AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Diagnosis order' },
-                    value: { uuid: '159944AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Secondary' },
-                  },
-                  {
-                    uuid: '692f513a-c744-4ced-bca1-d01e4186b7f5',
-                    concept: { uuid: '1284AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'PROBLEM LIST' },
-                    value: {
-                      uuid: '138405AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-                      display: 'HUMAN IMMUNODEFICIENCY VIRUS (HIV) DISEASE',
-                    },
-                  },
-                  {
-                    uuid: '4bc57d87-8271-477d-93f7-f6f2493b9e7b',
-                    concept: { uuid: '159394AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Diagnosis certainty' },
-                    value: { uuid: '159393AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', display: 'Presumed diagnosis' },
-                  },
-                ],
-                value: null,
               },
             ],
             encounterType: { uuid: 'd7151f82-c1f3-4152-a605-2f9ea7414a79', display: 'Visit Note' },
@@ -400,14 +355,98 @@ export const mockEncounters = [
   {
     id: 'ff9a0035-8698-47dc-b608-bd6ec2646e5c',
     datetime: '2021-07-05T10:07:18.000+0000',
-    encounterType: 'Visit Note',
+    encounterType: 'Consultation',
     form: {
-      uuid: 'c75f120a-04ec-11e3-8780-2b40bef9a44b',
-      display: 'Visit Note',
+      uuid: '9e1a0c68-ca19-3482-9ffb-0a6b4e591c2a',
+      display: 'Covid 19',
     },
     obs: [],
     provider: 'Dennis The Doctor',
     visitUuid: '7b0f5697-27e3-40c4-8bae-f4049abfb4ed',
     visitType: 'Facility Visit',
+  },
+];
+
+export const mockEncounters2 = [
+  {
+    uuid: '3b4daf81-7372-475c-ba5d-13c9c21d8ab1',
+    display: 'Consultation 09/23/2022',
+    encounterDatetime: '2022-09-23T13:11:06.000+0000',
+    patient: {
+      uuid: 'b835eff8-98c9-4988-887b-d93da7fbd542',
+      display: '100019A - George Roberts',
+      links: [
+        {
+          rel: 'self',
+          uri: 'http://backend:8080/openmrs/ws/rest/v1/patient/b835eff8-98c9-4988-887b-d93da7fbd542',
+          resourceAlias: 'patient',
+        },
+      ],
+    },
+    location: null,
+    form: {
+      uuid: '9e1a0c68-ca19-3482-9ffb-0a6b4e591c2a',
+      display: 'Covid 19',
+      links: [
+        {
+          rel: 'self',
+          uri: 'http://backend:8080/openmrs/ws/rest/v1/form/9e1a0c68-ca19-3482-9ffb-0a6b4e591c2a',
+          resourceAlias: 'form',
+        },
+      ],
+    },
+    encounterType: {
+      uuid: 'dd528487-82a5-4082-9c72-ed246bd49591',
+      display: 'Consultation',
+      links: [
+        {
+          rel: 'self',
+          uri: 'http://backend:8080/openmrs/ws/rest/v1/encountertype/dd528487-82a5-4082-9c72-ed246bd49591',
+          resourceAlias: 'encountertype',
+        },
+      ],
+    },
+    obs: [
+      {
+        uuid: '04d7d2a2-8ffd-418c-9a0c-1d20dec50231',
+        display: 'Covid 19 Signs and Symptom Set: Fever, Congestion, Loss of taste',
+        links: [
+          {
+            rel: 'self',
+            uri: 'http://backend:8080/openmrs/ws/rest/v1/obs/04d7d2a2-8ffd-418c-9a0c-1d20dec50231',
+            resourceAlias: 'obs',
+          },
+        ],
+      },
+      {
+        uuid: '5ca0c815-2c47-4cda-8c46-1e118b593ea8',
+        display: 'Covid 19 Test Set: Positive, No, Respiratory PCR',
+        links: [
+          {
+            rel: 'self',
+            uri: 'http://backend:8080/openmrs/ws/rest/v1/obs/5ca0c815-2c47-4cda-8c46-1e118b593ea8',
+            resourceAlias: 'obs',
+          },
+        ],
+      },
+    ],
+    orders: [],
+    voided: false,
+    visit: null,
+    encounterProviders: [],
+    diagnoses: [],
+    links: [
+      {
+        rel: 'self',
+        uri: 'http://backend:8080/openmrs/ws/rest/v1/encounter/3b4daf81-7372-475c-ba5d-13c9c21d8ab1',
+        resourceAlias: 'encounter',
+      },
+      {
+        rel: 'full',
+        uri: 'http://backend:8080/openmrs/ws/rest/v1/encounter/3b4daf81-7372-475c-ba5d-13c9c21d8ab1?v=full',
+        resourceAlias: 'encounter',
+      },
+    ],
+    resourceVersion: '2.2',
   },
 ];

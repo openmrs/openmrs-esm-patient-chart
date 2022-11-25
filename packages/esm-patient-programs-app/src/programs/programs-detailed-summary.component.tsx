@@ -77,7 +77,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
       return {
         id: program.uuid,
         display: program.display,
-        location: program.location?.display,
+        location: program.location?.display ?? '--',
         dateEnrolled: formatDatetime(new Date(program.dateEnrolled)),
         status: program.dateCompleted
           ? `${t('completedOn', 'Completed On')} ${formatDate(new Date(program.dateCompleted))}`
@@ -96,15 +96,17 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
       <div className={styles.widgetCard}>
         <CardHeader title={headerTitle}>
           <span>{isValidating ? <InlineLoading /> : null}</span>
-          <Button
-            kind="ghost"
-            renderIcon={(props) => <Add size={16} {...props} />}
-            iconDescription="Add programs"
-            onClick={launchProgramsForm}
-            disabled={availablePrograms?.length && eligiblePrograms?.length === 0}
-          >
-            {t('add', 'Add')}
-          </Button>
+          {config.hideAddProgramButton ? null : (
+            <Button
+              kind="ghost"
+              renderIcon={(props) => <Add size={16} {...props} />}
+              iconDescription="Add programs"
+              onClick={launchProgramsForm}
+              disabled={availablePrograms?.length && eligiblePrograms?.length === 0}
+            >
+              {t('add', 'Add')}
+            </Button>
+          )}
         </CardHeader>
         {availablePrograms?.length && eligiblePrograms?.length === 0 ? (
           <InlineNotification

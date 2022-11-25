@@ -1,5 +1,7 @@
+@use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
 @import '~@openmrs/esm-styleguide/src/vars';
+
 
 .container {
   border-top: 0.063rem solid $ui-03;
@@ -60,6 +62,14 @@
 .identifiers {
   @include type.type-style("body-compact-02");
   color: $ui-04;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.identifierTag {
+  display: flex;
+  align-items: center;
+  padding: spacing.$spacing-01;
 }
 
 .tooltipPadding {

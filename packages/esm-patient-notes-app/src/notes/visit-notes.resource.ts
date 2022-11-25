@@ -5,12 +5,11 @@ import {
   EncountersFetchResponse,
   RESTPatientNote,
   PatientNote,
-  ConceptMapping,
-  Diagnosis,
-  DiagnosisData,
   Location,
   Provider,
   VisitNotePayload,
+  DiagnosisPayload,
+  Concept,
 } from '../types';
 
 interface UseVisitNotes {
@@ -29,9 +28,10 @@ export function useVisitNotes(patientUuid: string): UseVisitNotes {
     'custom:(uuid,display,encounterDatetime,patient,obs,' +
     'encounterProviders:(uuid,display,' +
     'encounterRole:(uuid,display),' +
-    'provider:(uuid,person:(uuid,display)))';
+    'provider:(uuid,person:(uuid,display))),' +
+    'diagnoses';
 
-  const encountersApiUrl = `/ws/rest/v1/encounter?patient=${patientUuid}&obsConcept=${visitDiagnosesConceptUuid}&v=${customRepresentation}`;
+  const encountersApiUrl = `/ws/rest/v1/encounter?patient=${patientUuid}&obs=${visitDiagnosesConceptUuid}&v=${customRepresentation}`;
   const { data, error, isValidating } = useSWR<{ data: EncountersFetchResponse }, Error>(
     encountersApiUrl,
     openmrsFetch,
@@ -39,11 +39,8 @@ export function useVisitNotes(patientUuid: string): UseVisitNotes {
 
   const mapNoteProperties = (note: RESTPatientNote, index: number): PatientNote => ({
     id: `${index}`,
-    diagnoses: note.obs
-      .map(
-        (observation) =>
-          observation.groupMembers?.find((mem) => mem.concept.uuid === problemListConceptUuid)?.value?.display,
-      )
+    diagnoses: note.diagnoses
+      .map((diagnosisData) => diagnosisData.display)
       .filter((val) => val)
       .join(', '),
     encounterDate: note.encounterDatetime,
@@ -54,7 +51,9 @@ export function useVisitNotes(patientUuid: string): UseVisitNotes {
     encounterProviderRole: note?.encounterProviders[0]?.encounterRole?.display,
   });
 
-  const formattedVisitNotes = data?.data?.results?.map(mapNoteProperties);
+  const formattedVisitNotes = data?.data?.results
+    ?.map(mapNoteProperties)
+    ?.sort((noteA, noteB) => new Date(noteB.encounterDate).getTime() - new Date(noteA.encounterDate).getTime());
 
   return {
     visitNotes: data ? formattedVisitNotes : null,
@@ -76,24 +75,10 @@ export function fetchProviderByUuid(abortController: AbortController, providerUu
   });
 }
 
-export function fetchDiagnosisByName(searchTerm: string) {
-  return openmrsObservableFetch<Array<DiagnosisData>>(`/coreapps/diagnoses/search.action?&term=${searchTerm}`).pipe(
-    map(({ data }) => data),
-    map((data: Array<DiagnosisData>) => formatDiagnoses(data)),
-  );
-}
-
-function formatDiagnoses(diagnoses: Array<DiagnosisData>): Array<Diagnosis> {
-  return diagnoses.map(mapDiagnosisProperties);
-}
-
-function mapDiagnosisProperties(diagnosis: DiagnosisData): Diagnosis {
-  return {
-    concept: diagnosis.concept,
-    conceptReferenceTermCode: getConceptReferenceTermCode(diagnosis.concept.conceptMappings).conceptReferenceTerm.code,
-    primary: false,
-    confirmed: false,
-  };
+export function fetchConceptDiagnosisByName(searchTerm: string) {
+  return openmrsObservableFetch<Array<Concept>>(
+    `/ws/rest/v1/concept?q=${searchTerm}&searchType=fuzzy&class=8d4918b0-c2cc-11de-8d13-0010c6dffd0f&q=&v=custom:(uuid,display)`,
+  ).pipe(map(({ data }) => data['results']));
 }
 
 export function saveVisitNote(abortController: AbortController, payload: VisitNotePayload) {
@@ -106,7 +91,12 @@ export function saveVisitNote(abortController: AbortController, payload: VisitNo
     signal: abortController.signal,
   });
 }
-
-function getConceptReferenceTermCode(conceptMapping: Array<ConceptMapping>): ConceptMapping {
-  return conceptMapping.find((concept) => concept.conceptReferenceTerm.conceptSource.name === 'ICD-10-WHO');
+export function savePatientDiagnosis(abortController: AbortController, payload: DiagnosisPayload) {
+  return openmrsFetch(`/ws/rest/v1/patientdiagnoses`, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    method: 'POST',
+    body: payload,
+  });
 }

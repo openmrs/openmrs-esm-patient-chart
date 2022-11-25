@@ -1,6 +1,7 @@
 import useSWR from 'swr';
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch, Session, useConfig } from '@openmrs/esm-framework';
 import { OrderPost, PatientMedicationFetchResponse } from '../types/order';
+import { ConfigObject } from '../config-schema';
 
 /**
  * Fast, lighweight, reusable data fetcher with built-in cache invalidation that
@@ -9,6 +10,7 @@ import { OrderPost, PatientMedicationFetchResponse } from '../types/order';
  * @param status The status/the kind of orders to be fetched.
  */
 export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any', careSettingUuid: string) {
+  const { drugOrderTypeUUID } = useConfig() as ConfigObject;
   const customRepresentation =
     'custom:(uuid,dosingType,orderNumber,accessionNumber,' +
     'patient:ref,action,careSetting:ref,previousOrder:ref,dateActivated,scheduledDate,dateStopped,autoExpireDate,' +
@@ -18,7 +20,7 @@ export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any', 
     'duration,durationUnits:ref,route:ref,brandName,dispenseAsWritten)';
 
   const { data, error, isValidating } = useSWR<{ data: PatientMedicationFetchResponse }, Error>(
-    `/ws/rest/v1/order?patient=${patientUuid}&careSetting=${careSettingUuid}&status=${status}&v=${customRepresentation}`,
+    `/ws/rest/v1/order?patient=${patientUuid}&careSetting=${careSettingUuid}&status=${status}&orderType=${drugOrderTypeUUID}&v=${customRepresentation}`,
     openmrsFetch,
   );
 
@@ -28,8 +30,8 @@ export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any', 
 
   return {
     data: data ? drugOrders : null,
+    error: error,
     isLoading: !data && !error,
-    isError: error,
     isValidating,
   };
 }
@@ -60,6 +62,49 @@ export function getMedicationByUuid(abortController: AbortController, orderUuid:
       signal: abortController.signal,
     },
   );
+}
+
+export function getOrderTemplatesByDrug(drugUuid: string, abortController?: AbortController) {
+  return openmrsFetch(`/ws/rest/v1/ordertemplates/orderTemplate?drug=${drugUuid}&retired=${false}`, {
+    signal: abortController?.signal,
+  });
+}
+
+export function getCurrentOrderBasketEncounter(patientUuid: string, abortController?: AbortController) {
+  const [nowDateString] = new Date().toISOString().split('T');
+  return openmrsFetch(`/ws/rest/v1/encounter?patient=${patientUuid}&fromdate=${nowDateString}&limit=1`, {
+    signal: abortController?.signal,
+  });
+}
+
+export function createEmptyEncounter(
+  patientUuid: string,
+  sessionObject: Session,
+  orderBaskestConfig: ConfigObject,
+  abortController?: AbortController,
+) {
+  const emptyEncounter = {
+    patient: patientUuid,
+    location: sessionObject.sessionLocation.uuid,
+    encounterType: orderBaskestConfig.drugOrderEncounterType,
+    encounterDatetime: new Date().toISOString(),
+    encounterProviders: [
+      {
+        provider: sessionObject.currentProvider?.uuid,
+        encounterRole: orderBaskestConfig.clinicianEncounterRole,
+      },
+    ],
+    obs: [],
+  };
+
+  return openmrsFetch('/ws/rest/v1/encounter', {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    method: 'POST',
+    body: emptyEncounter,
+    signal: abortController?.signal,
+  });
 }
 
 export function postOrder(body: OrderPost, abortController?: AbortController) {

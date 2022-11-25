@@ -4,14 +4,12 @@ import RoutedResultsViewer from './results-viewer';
 
 const ResultsView = ({ basePath, patientUuid }) => {
   return (
-    <BrowserRouter>
+    <BrowserRouter
+      basename={`${window['getOpenmrsSpaBase']()}patient/${patientUuid}/chart/${encodeURIComponent(basePath)}`}
+    >
       <Routes>
-        <Route path="*" element={<RoutedResultsViewer basePath={basePath} patientUuid={patientUuid} />} />
-        <Route path={basePath} element={<RoutedResultsViewer basePath={basePath} patientUuid={patientUuid} />} />
-        <Route
-          path={`${basePath}/:type/:testUuid`}
-          element={<RoutedResultsViewer basePath={basePath} patientUuid={patientUuid} />}
-        />
+        <Route path="" element={<RoutedResultsViewer basePath={basePath} patientUuid={patientUuid} />} />
+        <Route path=":type/:testUuid" element={<RoutedResultsViewer basePath={basePath} patientUuid={patientUuid} />} />
       </Routes>
     </BrowserRouter>
   );

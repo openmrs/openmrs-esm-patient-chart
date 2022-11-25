@@ -18,6 +18,7 @@ const ActiveVisitBannerTag: React.FC<ActiveVisitBannerTagProps> = ({ patientUuid
     currentVisit &&
     deceasedBoolean && (
       <DefinitionTooltip
+        className={styles.definitionToolTip}
         align="bottom-left"
         definition={
           <div role="tooltip" className={styles.tooltipPadding}>

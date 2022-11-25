@@ -17,7 +17,7 @@ interface ObsSwitchableProps {
 const ObsSwitchable: React.FC<ObsSwitchableProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const config = useConfig() as ConfigObject;
-  const [chartView, setChartView] = React.useState<boolean>();
+  const [chartView, setChartView] = React.useState<boolean>(config.showGraphByDefault);
 
   const { data: obss, error, isLoading, isValidating } = useObs(patientUuid);
 

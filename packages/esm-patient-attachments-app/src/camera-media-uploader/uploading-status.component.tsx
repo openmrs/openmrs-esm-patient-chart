@@ -1,16 +1,14 @@
-import React, { useState, useCallback, useEffect, Dispatch, SetStateAction, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
-import { showToast, FetchResponse } from '@openmrs/esm-framework';
-import { UploadedFile } from '../attachments-types';
+import { showToast } from '@openmrs/esm-framework';
 import styles from './uploading-status.scss';
-import { FileUploaderItem, Button, ButtonSet } from '@carbon/react';
+import { FileUploaderItem, Button, ButtonSet, ModalHeader, ModalBody, ModalFooter } from '@carbon/react';
 import CameraMediaUploaderContext from './camera-media-uploader-context.resources';
 
 interface UploadingStatusComponentProps {}
 
 const UploadingStatusComponent: React.FC<UploadingStatusComponentProps> = () => {
   const { t } = useTranslation();
-  const [uploadingCompleted, setUploadingComplete] = useState(false);
   const { filesToUpload, saveFile, closeModal, clearData, onCompletion } = useContext(CameraMediaUploaderContext);
   const [filesUploading, setFilesUploading] = useState([]);
 
@@ -46,29 +44,38 @@ const UploadingStatusComponent: React.FC<UploadingStatusComponentProps> = () => 
               ),
             );
           })
-          .catch(() => {
+          .catch((err) => {
             showToast({
-              title: t('uploadFailed', 'Upload failed'),
-              description: `${t('uploading', 'Uploading')} ${file.fileName} ${t('failed', 'failed')}`,
+              title: `${t('uploading', 'Uploading')} ${file.fileName} ${t('failed', 'failed')}`,
+              description: err,
               kind: 'error',
             });
           }),
       ),
     ).then(() => {
-      setUploadingComplete(true);
+      true;
       onCompletion?.();
     });
   }, [onCompletion, saveFile, filesToUpload, t, setFilesUploading]);
 
   return (
     <div className={styles.cameraSection}>
-      <h3 className={styles.paddedProductiveHeading03}>{t('addAttachment', 'Add Attachment')}</h3>
-      <div className={styles.uploadingFilesSection}>
-        {filesUploading.map((file) => (
-          <FileUploaderItem name={file.fileName} status={file.status} size="lg" />
-        ))}
-      </div>
-      {uploadingCompleted && (
+      <ModalHeader className={styles.productiveHeading03}>{t('addAttachment', 'Add Attachment')}</ModalHeader>
+      <ModalBody>
+        <p className="cds--label-description">
+          {t(
+            'uploadWillContinueInTheBackground',
+            'Files will be uploaded in the background. You can close this modal.',
+          )}
+        </p>
+
+        <div className={styles.uploadingFilesSection}>
+          {filesUploading.map((file, key) => (
+            <FileUploaderItem key={key} name={file.fileName} status={file.status} size="lg" />
+          ))}
+        </div>
+      </ModalBody>
+      <ModalFooter>
         <ButtonSet className={styles.buttonSet}>
           <Button size="lg" kind="secondary" onClick={clearData}>
             {t('addMoreAttachments', 'Add more attachments')}
@@ -77,7 +84,7 @@ const UploadingStatusComponent: React.FC<UploadingStatusComponentProps> = () => 
             {t('closeModal', 'Close')}
           </Button>
         </ButtonSet>
-      )}
+      </ModalFooter>
     </div>
   );
 };

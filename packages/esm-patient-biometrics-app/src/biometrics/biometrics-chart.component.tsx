@@ -96,7 +96,7 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
         <label className={styles.biometricLabel} htmlFor="biometrics-chart-radio-group">
           {t('biometricDisplayed', 'Biometric displayed')}
         </label>
-        <Tabs className={styles.verticalTabs} type="default">
+        <Tabs className={styles.verticalTabs}>
           <TabList className={styles.tablist} aria-label="Biometrics tabs">
             {[
               { id: 'weight', label: `Weight (${conceptUnits.get(config.concepts.weightUuid) ?? ''})` },
@@ -122,7 +122,7 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
           </TabList>
         </Tabs>
       </div>
-      <div className={styles.biometricChartArea}>
+      <div className={styles.biometricsChartArea}>
         <LineChart data={chartData} options={chartOptions} />
       </div>
     </div>

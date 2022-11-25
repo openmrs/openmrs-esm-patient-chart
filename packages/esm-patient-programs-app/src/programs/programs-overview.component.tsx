@@ -41,7 +41,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
   const displayText = t('programs', 'Program enrollments');
   const headerTitle = t('carePrograms', 'Care Programs');
   const urlLabel = t('seeAll', 'See all');
-  const pageUrl = window.spaBase + basePath + '/programs';
+  const pageUrl = `\${openmrsSpaBase}/patient/${patientUuid}/chart/Programs`;
   const isConfigurable = config.customUrl ? true : false;
 
   const {
@@ -90,7 +90,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
     return paginatedEnrollments?.map((enrollment: ConfigurableProgram) => ({
       id: enrollment.uuid,
       display: enrollment.display,
-      location: enrollment.location?.display,
+      location: enrollment.location?.display ?? '--',
       dateEnrolled: enrollment.dateEnrolled ? formatDatetime(new Date(enrollment.dateEnrolled)) : '--',
       status: isConfigurable
         ? capitalize(enrollment.enrollmentStatus)
@@ -108,15 +108,17 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
       <div className={styles.widgetCard}>
         <CardHeader title={headerTitle}>
           <span>{isValidating ? <InlineLoading /> : null}</span>
-          <Button
-            kind="ghost"
-            renderIcon={(props) => <Add size={16} {...props} />}
-            iconDescription="Add programs"
-            onClick={launchProgramsForm}
-            disabled={availablePrograms?.length && eligiblePrograms?.length === 0}
-          >
-            {t('add', 'Add')}
-          </Button>
+          {config.hideAddProgramButton ? null : (
+            <Button
+              kind="ghost"
+              renderIcon={(props) => <Add size={16} {...props} />}
+              iconDescription="Add programs"
+              onClick={launchProgramsForm}
+              disabled={availablePrograms?.length && eligiblePrograms?.length === 0}
+            >
+              {t('add', 'Add')}
+            </Button>
+          )}
         </CardHeader>
         {availablePrograms?.length && eligiblePrograms?.length === 0 && (
           <InlineNotification

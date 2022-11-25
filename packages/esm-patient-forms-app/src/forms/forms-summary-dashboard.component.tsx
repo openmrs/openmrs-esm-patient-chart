@@ -14,7 +14,7 @@ const FormsSummaryDashboard: React.FC<FormsProps> = ({ patientUuid, patient, isO
   const { t } = useTranslation();
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
   const urlLabel: string = t('seeAll', 'See all');
-  const pageUrl: string = `$\{openmrsSpaBase}/patient/${patientUuid}/chart/forms`;
+  const pageUrl: string = `$\{openmrsSpaBase}/patient/${patientUuid}/chart/Forms & Notes`;
 
   return (
     <>

@@ -1,6 +1,11 @@
 import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
 import { dashboardMeta } from './dashboard.meta';
+import { attachmentsConfigSchema } from './attachments-config-schema';
+
+declare var __VERSION__: string;
+// __VERSION__ is replaced by Webpack with the version from package.json
+const version = __VERSION__;
 
 const importTranslation = require.context('../translations', false, /.json$/, 'lazy');
 
@@ -11,7 +16,7 @@ const backendDependencies = {
 function setupOpenMRS() {
   const moduleName = '@openmrs/esm-patient-attachments-app';
 
-  defineConfigSchema(moduleName, {});
+  defineConfigSchema(moduleName, attachmentsConfigSchema);
 
   return {
     extensions: [
@@ -63,4 +68,4 @@ function setupOpenMRS() {
   };
 }
 
-export { backendDependencies, importTranslation, setupOpenMRS };
+export { backendDependencies, importTranslation, setupOpenMRS, version };

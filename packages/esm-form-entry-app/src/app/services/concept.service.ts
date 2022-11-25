@@ -36,7 +36,7 @@ export class ConceptService {
     for (const relativeConceptLabelUrl of relativeConceptLabelUrls) {
       observablesArray.push(
         this.http
-          .get<ListResult<ConceptMetadata>>(this.getUrl() + relativeConceptLabelUrl, {
+          .get<ListResult<ConceptMetadata>>(this.windowRef.openmrsRestBase + relativeConceptLabelUrl, {
             headers: this.headers,
           })
           .pipe(
@@ -61,7 +61,7 @@ export class ConceptService {
    */
   public static getRelativeConceptLabelUrls(conceptUuids: Array<string>, lang: string) {
     const chunkSize = 100;
-    return conceptUuids
+    return [...new Set(conceptUuids)]
       .reduceRight((acc, _, __, array) => [...acc, array.splice(0, chunkSize)], [])
       .map((uuidPartition) => `concept?references=${uuidPartition.join(',')}`);
   }
