@@ -3,7 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
 import { connect } from 'unistore/react';
 import { Button, ButtonSet, DataTableSkeleton, InlineLoading } from '@carbon/react';
-import { createErrorHandler, showToast, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
+import {
+  createErrorHandler,
+  showToast,
+  useConfig,
+  useLayoutType,
+  useSession,
+  showNotification,
+} from '@openmrs/esm-framework';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { orderDrugs } from './drug-ordering';
 import { ConfigObject } from '../config-schema';
@@ -46,6 +53,29 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
     isValidating,
   } = usePatientOrders(patientUuid, 'ACTIVE', config.careSettingUuid);
 
+  const encounterCreation = () => {
+    const abortController = new AbortController();
+    createEmptyEncounter(patientUuid, sessionObject, config, abortController).then(
+      ({ data }) => {
+        if (data) {
+          setEncounterUuid(data?.uuid);
+          setIsLoading(false);
+        }
+      },
+      (error) => {
+        const apiError = error.responseBody.error.message;
+        const noProviderError = "[could not execute statement => Column 'provider_id' cannot be null]";
+        setIsLoading(false);
+        showNotification({
+          title: t('noProviderError', 'Error creating an encounter'),
+          kind: 'error',
+          critical: true,
+          description: apiError === noProviderError ? t('errorDescription', 'Provider not found') : error.message,
+        });
+      },
+    );
+  };
+
   useEffect(() => {
     const abortController = new AbortController();
 
@@ -54,10 +84,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
         setEncounterUuid(data.results[0].uuid);
         setIsLoading(false);
       } else {
-        createEmptyEncounter(patientUuid, sessionObject, config, abortController).then(({ data }) => {
-          setEncounterUuid(data?.uuid);
-          setIsLoading(false);
-        }, createErrorHandler);
+        encounterCreation();
       }
     }, createErrorHandler);
 
