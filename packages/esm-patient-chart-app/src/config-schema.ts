@@ -49,7 +49,7 @@ export const esmPatientChartSchema = {
   },
   visitAttributeTypes: {
     _type: Type.Array,
-    _description: 'List of visit attribute types to be shown when filling visit form',
+    _description: 'List of visit attribute types shown when filling the visit form',
     _elements: {
       uuid: {
         _type: Type.UUID,
