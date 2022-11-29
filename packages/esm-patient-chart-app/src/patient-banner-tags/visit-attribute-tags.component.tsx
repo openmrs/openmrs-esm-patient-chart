@@ -13,11 +13,8 @@ const getAttributeValue = (attributeType, value) => {
     case 'org.openmrs.customdatatype.datatype.ConceptDatatype':
       return value?.display;
     case 'org.openmrs.customdatatype.datatype.FloatDatatype':
-      return value;
     case 'org.openmrs.customdatatype.datatype.FreeTextDatatype':
-      return value;
     case 'org.openmrs.customdatatype.datatype.LongFreeTextDatatype':
-      return value;
     case 'org.openmrs.customdatatype.datatype.BooleanDatatype':
       return value;
     case 'org.openmrs.customdatatype.datatype.DateDatatype':
