@@ -49,8 +49,7 @@ export const esmPatientChartSchema = {
   },
   visitAttributeTypes: {
     _type: Type.Array,
-    _description: 'List of visit attribute types to be shown when filling visit form',
-    _default: [],
+    _description: 'List of visit attribute types shown when filling the visit form',
     _elements: {
       uuid: {
         _type: Type.UUID,
@@ -58,9 +57,27 @@ export const esmPatientChartSchema = {
       },
       required: {
         _type: Type.Boolean,
-        _description: 'Either the attribute type field is required or not',
+        _description: 'Whether the attribute type field is required or not',
+        _default: false,
+      },
+      displayInThePatientBanner: {
+        _type: Type.Boolean,
+        _description: "Whether we should show this visit attribute's value in the patient banner",
+        _default: true,
       },
     },
+    _default: [
+      {
+        uuid: '57ea0cbb-064f-4d09-8cf4-e8228700491c',
+        required: false,
+        displayInThePatientBanner: true,
+      },
+      {
+        uuid: 'aac48226-d143-4274-80e0-264db4e368ee',
+        required: false,
+        displayInThePatientBanner: true,
+      },
+    ],
   },
   showServiceQueueFields: {
     _type: Type.Boolean,
@@ -101,6 +118,7 @@ export interface ChartConfig {
   visitAttributeTypes: Array<{
     uuid: string;
     required: boolean;
+    displayInThePatientBanner: boolean;
   }>;
   showServiceQueueFields: boolean;
   priorityConceptSetUuid: string;
