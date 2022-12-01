@@ -14,6 +14,12 @@
   padding: spacing.$spacing-03 0;
 }
 
+.flex {
+  display: flex;
+  flex: 1;
+  align-items: center
+}
+
 .productiveHeading02 {
   @include type.type-style('heading-compact-02');
 }
