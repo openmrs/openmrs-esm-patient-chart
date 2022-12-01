@@ -131,7 +131,7 @@ export function useCurrentOrderBasketEncounter(patientUuid: string) {
     }
 
     return () => abortController.abort();
-  }, [data, mutate]);
+  }, [data, mutate, config, patientUuid, sessionObject]);
 
   const results = useMemo(
     () => ({
