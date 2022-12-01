@@ -276,8 +276,8 @@ export const GroupedTimeline = () => {
   }
   if (activeTests && timelineData && loaded) {
     return (
-      <div className={styles.timelineHeader} style={{ top: tablet ? '7rem' : '6.5rem' }}>
-        <div className={styles.timelineHeader} style={{ top: tablet ? '7rem' : '6.5rem' }}>
+      <div className={styles.timelineHeader} style={{ top: '6.5rem' }}>
+        <div className={styles.timelineHeader} style={{ top: '6.5rem' }}>
           <div className={styles.dateHeaderContainer}>
             <PanelNameCorner showShadow={true} panelName={panelName} />
             <DateHeaderGrid

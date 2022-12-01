@@ -11,6 +11,12 @@
   background-color: $ui-01;
 }
 
+.resultsHeaderTablet {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
 .resultsHeader {
   padding: 0.5rem 0;
   z-index: 10;
@@ -74,5 +80,19 @@
     display: flex;
     justify-content: flex-end;
     align-items: center;
+  }
+}
+
+.floatingTreeButton {
+  position: fixed;
+  bottom: 5rem;
+  right: spacing.$spacing-05;
+  padding: spacing.$spacing-03;
+  border-radius: 50%;
+  z-index: 99;
+  background-color: $brand-01;
+
+  svg {
+    fill: $ui-01 !important;
   }
 }
