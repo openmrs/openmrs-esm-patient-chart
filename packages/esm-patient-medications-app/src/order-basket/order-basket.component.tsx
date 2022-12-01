@@ -3,11 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
 import { connect } from 'unistore/react';
 import { Button, ButtonSet, DataTableSkeleton, InlineLoading } from '@carbon/react';
-import { createErrorHandler, showToast, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
+import { showToast, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import { orderDrugs } from './drug-ordering';
 import { ConfigObject } from '../config-schema';
-import { createEmptyEncounter, getCurrentOrderBasketEncounter, usePatientOrders } from '../api/api';
+import { useCurrentOrderBasketEncounter, useDurationUnits, usePatientOrders } from '../api/api';
 import { OrderBasketItem } from '../types/order-basket-item';
 import { OrderBasketStore, OrderBasketStoreActions, orderBasketStoreActions } from '../medications/order-basket-store';
 import MedicationOrderForm from './medication-order-form.component';
@@ -30,14 +30,16 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
   const displayText = t('activeMedicationsDisplayText', 'Active medications');
   const headerTitle = t('activeMedicationsHeaderTitle', 'active medications');
   const isTablet = useLayoutType() === 'tablet';
+  const config = useConfig() as ConfigObject;
 
-  const [encounterUuid, setEncounterUuid] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
+  const { currentEncounterUuid: encounterUuid, isLoadingEncounterUuid } = useCurrentOrderBasketEncounter(patientUuid);
+  const { isLoadingDurationUnits, durationUnits } = useDurationUnits(config.durationUnitsConcept);
+
+  const isLoading = isLoadingDurationUnits || isLoadingEncounterUuid;
   const [medicationOrderFormItem, setMedicationOrderFormItem] = useState<OrderBasketItem | null>(null);
   const [isMedicationOrderFormVisible, setIsMedicationOrderFormVisible] = useState(false);
   const [onMedicationOrderFormSigned, setOnMedicationOrderFormSign] =
     useState<(finalizedOrderBasketItem: OrderBasketItem) => void | null>(null);
-  const config = useConfig() as ConfigObject;
   const sessionObject = useSession();
   const {
     data: activePatientOrders,
@@ -46,24 +48,30 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
     isValidating,
   } = usePatientOrders(patientUuid, 'ACTIVE', config.careSettingUuid);
 
-  useEffect(() => {
-    const abortController = new AbortController();
+  // useEffect(() => {
+  //   const abortController = new AbortController();
 
-    getCurrentOrderBasketEncounter(patientUuid).then(({ data }) => {
-      if (data.results?.length) {
-        setEncounterUuid(data.results[0].uuid);
-        setIsLoading(false);
-      } else {
-        createEmptyEncounter(patientUuid, sessionObject, config, abortController).then(({ data }) => {
-          setEncounterUuid(data?.uuid);
-          setIsLoading(false);
-        }, createErrorHandler);
-      }
-    }, createErrorHandler);
+  //   const durationUnitsConcept = config.durationUnitsConcept;
+  //   const durationUnitsRequest = getDurationUnits(abortController, durationUnitsConcept).then(
+  //     (res) => setDurationUnits(res.data.answers),
+  //     createErrorHandler,
+  //   );
 
-    return () => abortController.abort();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [patientUuid, config.durationUnitsConcept, sessionObject]);
+  //   getCurrentOrderBasketEncounter(patientUuid).then(({ data }) => {
+  //     if (data.results?.length) {
+  //       setEncounterUuid(data.results[0].uuid);
+  //       setIsLoading(false);
+  //     } else {
+  //       createEmptyEncounter(patientUuid, sessionObject, config, abortController).then(({ data }) => {
+  //         setEncounterUuid(data?.uuid);
+  //         setIsLoading(false);
+  //       }, createErrorHandler);
+  //     }
+  //   }, createErrorHandler);
+
+  //   return () => abortController.abort();
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [patientUuid, config.durationUnitsConcept, sessionObject]);
 
   useEffect(() => {
     if (medicationOrderFormItem) {
@@ -147,6 +155,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
   if (isMedicationOrderFormVisible) {
     return (
       <MedicationOrderForm
+        durationUnits={durationUnits}
         initialOrderBasketItem={medicationOrderFormItem}
         onSign={onMedicationOrderFormSigned}
         onCancel={() => setIsMedicationOrderFormVisible(false)}

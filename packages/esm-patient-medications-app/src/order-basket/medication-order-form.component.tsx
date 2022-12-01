@@ -12,10 +12,13 @@ import {
   TextArea,
   TextInput,
   Toggle,
+  NumberInput,
+  DatePicker,
+  DatePickerInput,
 } from '@carbon/react';
 import { ArrowLeft } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
-import { isDesktop, useLayoutType } from '@openmrs/esm-framework';
+import { isDesktop, OpenmrsResource, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { OrderBasketItem } from '../types/order-basket-item';
 import { useOrderConfig } from '../api/order-config';
 import styles from './medication-order-form.scss';
@@ -24,6 +27,7 @@ export interface MedicationOrderFormProps {
   initialOrderBasketItem: OrderBasketItem;
   onSign: (finalizedOrder: OrderBasketItem) => void;
   onCancel: () => void;
+  durationUnits: Array<OpenmrsResource>;
 }
 
 function addIfNotPresent(
@@ -39,13 +43,19 @@ function addIfNotPresent(
   return ret;
 }
 
-export default function MedicationOrderForm({ initialOrderBasketItem, onSign, onCancel }: MedicationOrderFormProps) {
+export default function MedicationOrderForm({
+  initialOrderBasketItem,
+  onSign,
+  onCancel,
+  durationUnits,
+}: MedicationOrderFormProps) {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const isTablet = useLayoutType() === 'tablet';
   const [orderBasketItem, setOrderBasketItem] = useState(initialOrderBasketItem);
   const template = initialOrderBasketItem.template;
   const { orderConfigObject } = useOrderConfig();
+  const config = useConfig();
 
   const doseWithUnitsLabel = template
     ? `${initialOrderBasketItem?.dosage?.value} ${initialOrderBasketItem?.unit?.value}`
@@ -404,6 +414,145 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
             </>
           )}
         </div>
+
+        <Grid className={`${styles.gridRow} ${styles.spacer}`}>
+          <Column md={8}>
+            <h3 className={styles.productiveHeading02}>{t('prescriptionDuration', '2. Prescription Duration')}</h3>
+          </Column>
+        </Grid>
+        <Grid className={styles.gridRow}>
+          <Column md={8} className={styles.fullWidthDatePickerContainer}>
+            <DatePicker
+              light={isTablet}
+              datePickerType="single"
+              maxDate={new Date()}
+              value={[orderBasketItem.startDate]}
+              onChange={([newStartDate]) =>
+                setOrderBasketItem({
+                  ...orderBasketItem,
+                  startDate: newStartDate,
+                })
+              }
+            >
+              <DatePickerInput id="startDatePicker" placeholder="mm/dd/yyyy" labelText={t('startDate', 'Start date')} />
+            </DatePicker>
+          </Column>
+          <Column md={8} className={styles.lastGridCell}>
+            <NumberInput
+              light={isTablet}
+              id="durationInput"
+              label={t('duration', 'Duration')}
+              min={1}
+              value={orderBasketItem.duration ?? ''}
+              helperText={t('noDurationHint', 'An empty field indicates an indefinite duration.')}
+              step={1}
+              onChange={(e, { value }) => {
+                setOrderBasketItem({
+                  ...orderBasketItem,
+                  duration: value ? parseFloat(value) : 0,
+                });
+              }}
+              hideSteppers
+              allowEmpty
+            />
+          </Column>
+        </Grid>
+        <div className={styles.gridRow}>
+          <Column>
+            <FormGroup legendText={t('durationUnit', 'Duration Unit')}>
+              <ComboBox
+                light={isTablet}
+                id="durationUnitPlaceholder"
+                selectedItem={{
+                  id: orderBasketItem.durationUnit.uuid,
+                  text: orderBasketItem.durationUnit.display,
+                }}
+                items={durationUnits?.map((unit) => ({
+                  id: unit.uuid,
+                  text: unit.display,
+                }))}
+                itemToString={(item) => item?.text}
+                // @ts-ignore
+                placeholder={t('durationUnitPlaceholder', 'Duration Unit')}
+                onChange={({ selectedItem }) =>
+                  !!selectedItem
+                    ? setOrderBasketItem({
+                        ...orderBasketItem,
+                        durationUnit: {
+                          uuid: selectedItem.id,
+                          display: selectedItem.text,
+                        },
+                      })
+                    : setOrderBasketItem({
+                        ...orderBasketItem,
+                        durationUnit: config.daysDurationUnit,
+                      })
+                }
+              />
+            </FormGroup>
+          </Column>
+        </div>
+        <Grid className={`${styles.gridRow} ${styles.spacer}`}>
+          <Column md={8}>
+            <h3 className={styles.productiveHeading02}>{t('dispensingInformation', '3. Dispensing Information')}</h3>
+          </Column>
+        </Grid>
+        <Grid className={styles.gridRow}>
+          <Column md={8}>
+            <FormGroup legendText={t('quantity', 'Quantity')}>
+              <NumberInput
+                light={isTablet}
+                id="quantityDispensed"
+                helperText={t('pillsToDispense', 'Pills to dispense')}
+                value={orderBasketItem.pillsDispensed}
+                min={0}
+                onChange={(e, { value }) => {
+                  setOrderBasketItem({
+                    ...orderBasketItem,
+                    pillsDispensed: value ? parseFloat(value) : 0,
+                  });
+                }}
+                hideSteppers
+              />
+            </FormGroup>
+          </Column>
+          <Column md={8} className={styles.lastGridCell}>
+            <FormGroup legendText={t('prescriptionRefills', 'Prescription Refills')}>
+              <NumberInput
+                light={isTablet}
+                id="prescriptionRefills"
+                min={0}
+                value={orderBasketItem.numRefills}
+                onChange={(e, { value }) => {
+                  setOrderBasketItem({
+                    ...orderBasketItem,
+                    numRefills: value ? parseFloat(value) : 0,
+                  });
+                }}
+                hideSteppers
+              />
+            </FormGroup>
+          </Column>
+        </Grid>
+        <Grid className={styles.gridRow}>
+          <Column md={8}>
+            <TextInput
+              light={isTablet}
+              id="indication"
+              labelText={t('indication', 'Indication')}
+              placeholder={t('indicationPlaceholder', 'e.g. "Hypertension"')}
+              value={orderBasketItem.indication}
+              onChange={(e) =>
+                setOrderBasketItem({
+                  ...orderBasketItem,
+                  indication: e.target.value,
+                })
+              }
+              required
+              maxLength={150}
+            />
+          </Column>
+        </Grid>
 
         <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
           <Button className={styles.button} kind="secondary" onClick={onCancel}>
