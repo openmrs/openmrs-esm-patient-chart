@@ -30,7 +30,12 @@ const TreeView: React.FC<TreeViewProps> = ({ patientUuid, basePath, testUuid, lo
       <>
         <div>{!loading ? <GroupedTimeline /> : <DataTableSkeleton />}</div>
         <div className={styles.floatingTreeButton}>
-          <Button kind="ghost" renderIcon={TreeViewAlt} hasIconOnly onClick={() => setShowTreeOverlay(true)} />
+          <Button
+            renderIcon={TreeViewAlt}
+            hasIconOnly
+            onClick={() => setShowTreeOverlay(true)}
+            iconDescription={t('showTree', 'Show tree')}
+          />
         </div>
         {showTreeOverlay && (
           <TabletOverlay

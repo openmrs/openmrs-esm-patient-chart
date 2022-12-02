@@ -87,10 +87,13 @@
   position: fixed;
   bottom: 5rem;
   right: spacing.$spacing-05;
-  padding: spacing.$spacing-03;
-  border-radius: 50%;
   z-index: 99;
-  background-color: $brand-01;
+
+  button {
+    background-color: $brand-01 !important;
+    padding: spacing.$spacing-05;
+    border-radius: 50%;
+  }
 
   svg {
     fill: $ui-01 !important;
