@@ -40,13 +40,6 @@ yarn start --sources 'packages/esm-patient-<insert-package-name>-app'
 
 This command uses the [openmrs](https://www.npmjs.com/package/openmrs) tooling to fire up a dev server running `esm-patient-chart` as well as the specified microfrontend.
 
-To start a dev server running all the packages, run:
-
-```bash
-yarn start-all
-```
-
-Note that this is very resource-intensive. 
 
 There are two approaches for working on multiple microfrontends simultaneously.
 
