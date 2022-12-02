@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Button, InlineLoading } from '@carbon/react';
 import { ChevronDown, ChevronUp, WarningFilled } from '@carbon/react/icons';
 import { formatDate, parseDate, useConfig } from '@openmrs/esm-framework';
-import { launchPatientWorkspace, useVitalsConceptMetadata } from '@openmrs/esm-patient-common-lib';
+import { formEntrySub, launchPatientWorkspace, useVitalsConceptMetadata } from '@openmrs/esm-patient-common-lib';
 import { ConfigObject } from '../../config-schema';
 import { patientVitalsBiometricsFormWorkspace } from '../../constants';
 import {
@@ -25,6 +25,11 @@ interface VitalsHeaderProps {
   showRecordVitalsButton: boolean;
 }
 
+export function launchFormEntry(formUuid: string, encounterUuid?: string, formName?: string) {
+  formEntrySub.next({ formUuid, encounterUuid });
+  launchPatientWorkspace('patient-form-entry-workspace', { workspaceTitle: formName });
+}
+
 const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVitalsButton }) => {
   const config = useConfig() as ConfigObject;
   const { t } = useTranslation();
@@ -34,10 +39,17 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
   const [showDetailsPanel, setShowDetailsPanel] = useState(false);
   const toggleDetailsPanel = () => setShowDetailsPanel(!showDetailsPanel);
 
-  const launchVitalsAndBiometricsForm = React.useCallback((e) => {
-    e.stopPropagation();
-    launchPatientWorkspace(patientVitalsBiometricsFormWorkspace);
-  }, []);
+  const launchVitalsAndBiometricsForm = React.useCallback(
+    (e) => {
+      e.stopPropagation();
+      if (config.vitals.useFormEngine) {
+        launchFormEntry(config.vitals.formUuid, '', config.vitals.formName);
+      } else {
+        launchPatientWorkspace(patientVitalsBiometricsFormWorkspace);
+      }
+    },
+    [config.vitals],
+  );
 
   if (isLoading) {
     return (
