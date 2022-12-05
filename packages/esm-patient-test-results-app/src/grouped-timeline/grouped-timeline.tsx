@@ -28,8 +28,22 @@ const PanelNameCorner: React.FC<PanelNameCornerProps> = ({ showShadow, panelName
   <TimeSlots className={`${styles.cornerGridElement} ${showShadow ? styles.shadow : ''}`}>{panelName}</TimeSlots>
 );
 
-const NewRowStartCell = ({ title, range, units, conceptUuid, shadow = false }) => {
+const NewRowStartCell = ({ title, range, units, conceptUuid, shadow = false, isString = false }) => {
   const { patientUuid } = usePatient();
+
+  if (isString) {
+    <div
+      className={styles.rowStartCell}
+      style={{
+        boxShadow: shadow ? '8px 0 20px 0 rgba(0,0,0,0.15)' : undefined,
+      }}
+    >
+      <span className={styles.trendlineLink}>{title}</span>
+      <span className={styles.rangeUnits}>
+        {range} {units}
+      </span>
+    </div>;
+  }
 
   return (
     <div
@@ -91,7 +105,8 @@ const DataRows: React.FC<DataRowsProps> = ({ timeColumns, rowData, sortedTimes, 
     <Grid dataColumns={timeColumns.length} padding style={{ gridColumn: 'span 2' }}>
       {rowData.map((row, index) => {
         const obs = row.entries;
-        const { units = '', range = '' } = row;
+        const { units = '', range = '', obs: values } = row;
+        const isString = isNaN(parseFloat(values?.[0]?.value));
         return (
           <React.Fragment key={index}>
             <NewRowStartCell
@@ -101,6 +116,7 @@ const DataRows: React.FC<DataRowsProps> = ({ timeColumns, rowData, sortedTimes, 
                 title: row.display,
                 shadow: showShadow,
                 conceptUuid: row.conceptUuid,
+                isString,
               }}
             />
             <GridItems {...{ sortedTimes, obs, zebra: !!(index % 2) }} />
