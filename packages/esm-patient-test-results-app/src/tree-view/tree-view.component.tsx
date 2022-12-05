@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { AccordionSkeleton, Column, DataTableSkeleton, Button } from '@carbon/react';
+import { AccordionSkeleton, DataTableSkeleton, Button } from '@carbon/react';
 import { TreeViewAlt } from '@carbon/react/icons';
 import { useLayoutType } from '@openmrs/esm-framework';
 import FilterSet, { FilterContext } from '../filter';
@@ -64,11 +64,11 @@ const TreeView: React.FC<TreeViewProps> = ({ patientUuid, basePath, testUuid, lo
   return (
     <>
       {!tablet && (
-        <Column sm={16} lg={tablet || expanded ? 0 : 5} className={`${styles.columnPanel} ${styles.treeColumn}`}>
+        <div className={styles.leftSection}>
           {!loading ? <FilterSet /> : <AccordionSkeleton open count={4} align="start" />}
-        </Column>
+        </div>
       )}
-      <Column sm={16} lg={tablet || expanded ? 12 : 7} className={`${styles.columnPanel}`}>
+      <div className={`${styles.rightSection}`}>
         {!tablet && testUuid && type === 'trendline' ? (
           <Trendline patientUuid={patientUuid} conceptUuid={testUuid} basePath={basePath} showBackToTimelineButton />
         ) : !loading ? (
@@ -76,7 +76,7 @@ const TreeView: React.FC<TreeViewProps> = ({ patientUuid, basePath, testUuid, lo
         ) : (
           <DataTableSkeleton />
         )}
-      </Column>
+      </div>
     </>
   );
 };

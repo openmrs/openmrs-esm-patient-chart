@@ -80,7 +80,7 @@ const PanelView: React.FC<PanelViewProps> = ({ expanded, testUuid, basePath, typ
 
   return (
     <>
-      <Column sm={16} lg={fullWidthPanels ? 12 : 5}>
+      <div className={styles.leftSection}>
         <>
           <PanelViewHeader isTablet={isTablet} />
           {!isLoading ? (
@@ -100,25 +100,23 @@ const PanelView: React.FC<PanelViewProps> = ({ expanded, testUuid, basePath, typ
             <DataTableSkeleton columns={3} />
           )}
         </>
-      </Column>
-      <Column
-        sm={16}
-        lg={fullWidthPanels ? 0 : 7}
-        className={isTablet ? styles.headerMarginTablet : styles.headerMargin}
-      >
-        {isLoading ? (
-          <DataTableSkeleton columns={3} />
-        ) : trendlineView ? (
-          <Trendline patientUuid={patientUuid} conceptUuid={testUuid} basePath={basePath} showBackToTimelineButton />
-        ) : activePanel ? (
-          <PanelTimelineComponent groupedObservations={groupedObservations} activePanel={activePanel} />
-        ) : (
-          <EmptyState
-            headerTitle={t('noPanelSelected', 'No panel selected')}
-            displayText={t('observations', 'Observations')}
-          />
-        )}
-      </Column>
+      </div>
+      <div className={`${styles.headerMargin} ${styles.rightSection}`}>
+        <div className={styles.stickySection}>
+          {isLoading ? (
+            <DataTableSkeleton columns={3} />
+          ) : trendlineView ? (
+            <Trendline patientUuid={patientUuid} conceptUuid={testUuid} basePath={basePath} showBackToTimelineButton />
+          ) : activePanel ? (
+            <PanelTimelineComponent groupedObservations={groupedObservations} activePanel={activePanel} />
+          ) : (
+            <EmptyState
+              headerTitle={t('noPanelSelected', 'No panel selected')}
+              displayText={t('observations', 'Observations')}
+            />
+          )}
+        </div>
+      </div>
     </>
   );
 };

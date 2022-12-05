@@ -1,12 +1,11 @@
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AccordionSkeleton, Button, Column, ContentSwitcher, DataTableSkeleton, Grid, Switch } from '@carbon/react';
-import { TreeViewAlt } from '@carbon/react/icons';
+import { ContentSwitcher, Switch } from '@carbon/react';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
-import { isDesktop, navigate, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { navigate, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { testResultsBasePath } from '../helpers';
-import FilterSet, { FilterContext, FilterProvider } from '../filter';
-import GroupedTimeline, { useGetManyObstreeData } from '../grouped-timeline';
+import { FilterContext, FilterProvider } from '../filter';
+import { useGetManyObstreeData } from '../grouped-timeline';
 import TabletOverlay from '../tablet-overlay';
 import Trendline from '../trendline/trendline.component';
 import styles from './results-viewer.styles.scss';
@@ -70,19 +69,17 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
     return (
       <div className={styles.resultsContainer}>
         <div className={styles.resultsHeader}>
-          <div className={styles.leftHeader}>
-            <h4 style={{ flexGrow: 1 }}>{`${t('results', 'Results')} ${
-              totalResultsCount ? `(${totalResultsCount})` : ''
-            }`}</h4>
-            <div className={styles.leftHeaderActions}>
-              <ContentSwitcher
-                selectedIndex={['panel', 'tree'].indexOf(selectedSection)}
-                onChange={(e) => setSelectedSection(e.name as panelOpts)}
-              >
-                <Switch name="panel" text={t('panel', 'Panel')} />
-                <Switch name="tree" text={t('tree', 'Tree')} />
-              </ContentSwitcher>
-            </div>
+          <h4 style={{ flexGrow: 1 }}>{`${t('results', 'Results')} ${
+            totalResultsCount ? `(${totalResultsCount})` : ''
+          }`}</h4>
+          <div className={styles.leftHeaderActions}>
+            <ContentSwitcher
+              selectedIndex={['panel', 'tree'].indexOf(selectedSection)}
+              onChange={(e) => setSelectedSection(e.name as panelOpts)}
+            >
+              <Switch name="panel" text={t('panel', 'Panel')} />
+              <Switch name="tree" text={t('tree', 'Tree')} />
+            </ContentSwitcher>
           </div>
         </div>
         {selectedSection === 'tree' ? (
@@ -116,9 +113,9 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
   }
 
   return (
-    <Grid className={styles.resultsContainer}>
-      <Column className={styles.resultsHeader} sm={12} lg={!tablet ? 5 : 12}>
-        <div className={styles.leftHeader}>
+    <div className={styles.resultsContainer}>
+      <div className={styles.resultsHeader}>
+        <div className={`${styles.leftSection} ${styles.leftHeaderSection}`}>
           <h4 style={{ flexGrow: 1 }}>{`${t('results', 'Results')} ${
             totalResultsCount ? `(${totalResultsCount})` : ''
           }`}</h4>
@@ -135,35 +132,41 @@ const ResultsViewer: React.FC<ResultsViewerProps> = ({ patientUuid, basePath, lo
             )}
           </div>
         </div>
-      </Column>
-      <Column className={styles.resultsHeader} sm={12} lg={!tablet ? 7 : 0}>
-        <div
-          className={styles.viewOptsContentSwitcherContainer}
-          style={{ display: 'flex', justifyContent: 'flex-end' }}
-        >
-          <ContentSwitcher
-            size={tablet ? 'lg' : 'md'}
-            style={{ maxWidth: '10rem' }}
-            onChange={(e) => setView(e.name as viewOpts)}
-            selectedIndex={expanded ? 1 : 0}
-          >
-            <Switch name="split" text={t('split', 'Split')} disabled={loading} />
-            <Switch name="full" text={t('full', 'Full')} disabled={loading} />
-          </ContentSwitcher>
+        <div className={styles.rightSectionHeader}>
+          <div className={styles.viewOptsContentSwitcherContainer}>
+            <ContentSwitcher
+              size={tablet ? 'lg' : 'md'}
+              style={{ maxWidth: '10rem' }}
+              onChange={(e) => setView(e.name as viewOpts)}
+              selectedIndex={expanded ? 1 : 0}
+            >
+              <Switch name="split" text={t('split', 'Split')} disabled={loading} />
+              <Switch name="full" text={t('full', 'Full')} disabled={loading} />
+            </ContentSwitcher>
+          </div>
         </div>
-      </Column>
-      {selectedSection === 'tree' ? (
-        <TreeViewWrapper
-          patientUuid={patientUuid}
-          basePath={basePath}
-          type={type}
-          expanded={expanded}
-          testUuid={testUuid}
-        />
-      ) : selectedSection === 'panel' ? (
-        <PanelView expanded={expanded} patientUuid={patientUuid} basePath={basePath} type={type} testUuid={testUuid} />
-      ) : null}
-    </Grid>
+      </div>
+
+      <div className={styles.flex}>
+        {selectedSection === 'tree' ? (
+          <TreeViewWrapper
+            patientUuid={patientUuid}
+            basePath={basePath}
+            type={type}
+            expanded={expanded}
+            testUuid={testUuid}
+          />
+        ) : selectedSection === 'panel' ? (
+          <PanelView
+            expanded={expanded}
+            patientUuid={patientUuid}
+            basePath={basePath}
+            type={type}
+            testUuid={testUuid}
+          />
+        ) : null}
+      </div>
+    </div>
   );
 };
 

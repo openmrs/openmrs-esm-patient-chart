@@ -11,6 +11,11 @@
   background-color: $ui-01;
 }
 
+.flex {
+  display: flex;
+  flex: 1;
+}
+
 .resultsHeaderTablet {
   display: flex;
   justify-content: space-between;
@@ -23,15 +28,33 @@
   background-color: $openmrs-background-grey;
   position: sticky;
   top: 3rem;
+  display: flex;
+}
+
+.leftHeaderSection {
+  display: flex;
+  align-items: center;
 }
 
 .viewOptsContentSwitcherContainer {
   margin-left: auto;
 }
 
-.leftHeader {
+.leftSection {
+  width: 45%;
+  margin-right: spacing.$spacing-05;
+}
+
+.rightSection, .rightSectionHeader {
+  width: 55%;
+}
+
+.rightSectionHeader {
   display: flex;
-  align-items: center;
+} 
+
+.rightSection :global(.cds--skeleton) {
+  width: 100%;
 }
 
 .leftHeaderActions {
@@ -39,7 +62,8 @@
   min-width: 2.5rem;
 }
 
-.leftHeaderActions > :global(.cds--content-switcher) {
+.leftHeaderActions > :global(.cds--content-switcher), 
+.viewOptsContentSwitcherContainer :global(.cds--content-switcher) {
   display: grid;
   grid-template-columns: 1fr 1fr;
   width: max-content;
