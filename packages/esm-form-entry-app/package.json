@@ -9,12 +9,12 @@
   "scripts": {
     "start": "openmrs develop",
     "serve": "ng serve --port 4200 --live-reload true",
-    "debug": "npm run serve",
+    "debug": "yarn run serve",
     "build": "ng build --configuration production",
     "lint": "eslint src --ext ts --fix --max-warnings=0"
   },
   "openmrs:develop": {
-    "command": "npm run serve",
+    "command": "yarn run serve",
     "url": "http://localhost:4200/openmrs-esm-form-entry-app.js"
   },
   "browserslist": [
