@@ -20,9 +20,9 @@ export const configSchema = {
             _type: Type.String,
             _description: 'Name of form.',
           },
-          encounterTypeUuid: {
+          uuid: {
             _type: Type.String,
-            _description: 'Uuid fo the encounter type.',
+            _description: 'Uuid of the form.',
           },
         },
       },

@@ -104,9 +104,9 @@ function mapToFormCompletedInfo(
   allForms: Array<Form>,
   encounters: Array<EncounterWithFormRef>,
 ): Array<CompletedFormInfo> {
-  return formsSectionConfig.forms.map((encounterTypeConfig) => {
+  return formsSectionConfig.forms.map((formConfig) => {
     const form: Form = allForms.find((form) => {
-      return form.uuid === encounterTypeConfig.uuid;
+      return form.uuid === formConfig.uuid;
     });
     const associatedEncounters = getAssociatedEncounters(form.uuid, encounters);
     const lastCompleted = getLastCompletedDate(associatedEncounters);
