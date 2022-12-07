@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { NgZone, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { Form } from '@openmrs/ngx-formentry';
 import { Observable, forkJoin, from, throwError, of, Subscription } from 'rxjs';
 import { catchError, concatAll, map, mergeMap, take } from 'rxjs/operators';
@@ -54,6 +54,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
     private readonly formCreationService: FormCreationService,
     private readonly singleSpaPropsService: SingleSpaPropsService,
     private conceptService: ConceptService,
+    private ngZone: NgZone,
   ) {}
 
   public ngOnInit() {
@@ -261,20 +262,22 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
 
   @HostListener('window:ampath-form-action', ['$event'])
   onFormAction(event) {
-    const formUuid = this.singleSpaPropsService.getPropOrThrow('formUuid');
-    const patientUuid = this.singleSpaPropsService.getPropOrThrow('patientUuid');
-    if (event.detail?.formUuid === formUuid && event.detail?.patientUuid === patientUuid) {
-      switch (event.detail?.action) {
-        case 'onSubmit':
-          this.onSubmit();
-          break;
-        case 'validateForm':
-          this.validateForm();
-          break;
-        default:
-          break;
+    this.ngZone.run(() => {
+      const formUuid = this.singleSpaPropsService.getPropOrThrow('formUuid');
+      const patientUuid = this.singleSpaPropsService.getPropOrThrow('patientUuid');
+      if (event.detail?.formUuid === formUuid && event.detail?.patientUuid === patientUuid) {
+        switch (event.detail?.action) {
+          case 'onSubmit':
+            this.onSubmit();
+            break;
+          case 'validateForm':
+            this.validateForm();
+            break;
+          default:
+            break;
+        }
       }
-    }
+    });
   }
 
   private changeState(state) {
