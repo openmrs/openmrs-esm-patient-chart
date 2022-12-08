@@ -13,17 +13,13 @@ export interface OrderTemplate {
 }
 
 export interface DosingInstructions {
-  dose: Array<MedicationDosage>;
+  dose: number;
   units: Array<DosingUnit>;
   route: Array<MedicationRoute>;
   frequency: Array<MedicationFrequency>;
   instructions?: Array<MedicationInstructions>;
   asNeeded?: boolean;
   asNeededCondition?: string;
-}
-
-export interface MedicationDosage extends Omit<CommonMedicationProps, 'value'> {
-  value: number;
 }
 
 export type MedicationFrequency = CommonMedicationValueCoded;

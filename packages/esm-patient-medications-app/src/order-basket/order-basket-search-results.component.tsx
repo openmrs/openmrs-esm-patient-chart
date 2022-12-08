@@ -87,7 +87,7 @@ export default function OrderBasketSearchResults({
                     <strong>{result.template ? result.drug.concept.display : result.drug.name}</strong>{' '}
                     {result.template && (
                       <>
-                        &mdash; {result.dosage?.value} {result.unit?.value} &mdash; {result.drug.dosageForm.display}
+                        &mdash; {result.dosage} {result.unit?.value} &mdash; {result.drug.dosageForm.display}
                         <br />
                         <span className={styles.label01}>{result.frequency?.value}</span> &mdash;{' '}
                         <span className={styles.label01}>{result.route?.value}</span>
