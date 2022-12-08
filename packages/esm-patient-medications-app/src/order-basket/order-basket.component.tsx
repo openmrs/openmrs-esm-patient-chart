@@ -48,31 +48,6 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
     isValidating,
   } = usePatientOrders(patientUuid, 'ACTIVE', config.careSettingUuid);
 
-  // useEffect(() => {
-  //   const abortController = new AbortController();
-
-  //   const durationUnitsConcept = config.durationUnitsConcept;
-  //   const durationUnitsRequest = getDurationUnits(abortController, durationUnitsConcept).then(
-  //     (res) => setDurationUnits(res.data.answers),
-  //     createErrorHandler,
-  //   );
-
-  //   getCurrentOrderBasketEncounter(patientUuid).then(({ data }) => {
-  //     if (data.results?.length) {
-  //       setEncounterUuid(data.results[0].uuid);
-  //       setIsLoading(false);
-  //     } else {
-  //       createEmptyEncounter(patientUuid, sessionObject, config, abortController).then(({ data }) => {
-  //         setEncounterUuid(data?.uuid);
-  //         setIsLoading(false);
-  //       }, createErrorHandler);
-  //     }
-  //   }, createErrorHandler);
-
-  //   return () => abortController.abort();
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [patientUuid, config.durationUnitsConcept, sessionObject]);
-
   useEffect(() => {
     if (medicationOrderFormItem) {
       medicationOrderFormItem.careSetting = config.careSettingUuid;

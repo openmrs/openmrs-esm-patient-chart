@@ -152,8 +152,8 @@ export function createEmptyEncounter(
 ) {
   const emptyEncounter = {
     patient: patientUuid,
-    location: sessionObject.sessionLocation.uuid,
-    encounterType: orderBaskestConfig.drugOrderEncounterType,
+    location: sessionObject?.sessionLocation?.uuid,
+    encounterType: orderBaskestConfig?.drugOrderEncounterType,
     encounterDatetime: new Date().toISOString(),
     encounterProviders: [
       {
