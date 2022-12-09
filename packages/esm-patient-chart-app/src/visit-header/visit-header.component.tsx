@@ -126,13 +126,12 @@ const VisitHeader: React.FC = () => {
 
   const noActiveVisit = !isLoading && visitNotLoaded;
 
-  const originPage = localStorage.getItem('fromPage');
-
   const onClosePatientChart = useCallback(() => {
-    originPage ? navigate({ to: `${window.spaBase}/${originPage}` }) : navigate({ to: `${window.spaBase}/home` });
+    const originPage = window.localStorage.getItem('patient-chart-origin-page');
+    originPage ? navigate({ to: `${window.spaBase}${originPage}` }) : navigate({ to: `${window.spaBase}/home` });
     setShowVisitHeader((prevState) => !prevState);
     localStorage.removeItem('fromPage');
-  }, [originPage]);
+  }, [navigate]);
 
   const render = useCallback(() => {
     if (!showVisitHeader) {
