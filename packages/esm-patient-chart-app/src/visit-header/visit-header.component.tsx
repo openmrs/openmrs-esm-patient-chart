@@ -131,7 +131,7 @@ const VisitHeader: React.FC = () => {
     originPage ? navigate({ to: `${window.spaBase}${originPage}` }) : navigate({ to: `${window.spaBase}/home` });
     setShowVisitHeader((prevState) => !prevState);
     localStorage.removeItem('fromPage');
-  }, [navigate]);
+  }, []);
 
   const render = useCallback(() => {
     if (!showVisitHeader) {
