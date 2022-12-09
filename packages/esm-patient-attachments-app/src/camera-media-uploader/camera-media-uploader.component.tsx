@@ -107,7 +107,7 @@ const CameraMediaUploaderModal: React.FC<CameraMediaUploaderModalProps> = ({
 const CameraMediaUploadTabs = () => {
   const { t } = useTranslation();
   const [view, setView] = useState('upload');
-  const { cameraOnly } = useContext(CameraMediaUploaderContext);
+  const { cameraOnly, closeModal } = useContext(CameraMediaUploaderContext);
   const mediaStream = useRef<MediaStream | undefined>();
 
   const stopCameraStream = useCallback(() => {
@@ -126,7 +126,7 @@ const CameraMediaUploadTabs = () => {
 
   return (
     <div className={styles.cameraSection}>
-      <ModalHeader>{t('addAttachment', 'Add Attachment')}</ModalHeader>
+      <ModalHeader closeModal={closeModal} title={t('addAttachment', 'Add Attachment')} />
       <ModalBody className={styles.modalBody}>
         <Tabs className={styles.tabs}>
           <TabList aria-label="Attachments-upload-section">
