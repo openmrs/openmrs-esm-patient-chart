@@ -140,9 +140,13 @@ export const RowStartCell = ({ title, range, units, shadow = false, testUuid, is
       }}
     >
       <span className={styles['trendline-link']}>
-        <ConfigurableLink to={`${testResultsBasePath(`/patient/${patientUuid}/chart`)}/trendline/${testUuid}`}>
-          {title}
-        </ConfigurableLink>
+        {!isString ? (
+          <ConfigurableLink to={`${testResultsBasePath(`/patient/${patientUuid}/chart`)}/trendline/${testUuid}`}>
+            {title}
+          </ConfigurableLink>
+        ) : (
+          title
+        )}
       </span>
       <span className={styles['range-units']}>
         {range} {units}

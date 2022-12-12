@@ -10,7 +10,6 @@ import type {
   TimelineCellProps,
   DataRowsProps,
 } from './grouped-timeline-types';
-import { dashboardMeta } from '../dashboard.meta';
 import FilterContext from '../filter/filter-context';
 import styles from './grouped-timeline.styles.scss';
 
@@ -31,20 +30,6 @@ const PanelNameCorner: React.FC<PanelNameCornerProps> = ({ showShadow, panelName
 const NewRowStartCell = ({ title, range, units, conceptUuid, shadow = false, isString = false }) => {
   const { patientUuid } = usePatient();
 
-  if (isString) {
-    <div
-      className={styles.rowStartCell}
-      style={{
-        boxShadow: shadow ? '8px 0 20px 0 rgba(0,0,0,0.15)' : undefined,
-      }}
-    >
-      <span className={styles.trendlineLink}>{title}</span>
-      <span className={styles.rangeUnits}>
-        {range} {units}
-      </span>
-    </div>;
-  }
-
   return (
     <div
       className={styles.rowStartCell}
@@ -52,12 +37,16 @@ const NewRowStartCell = ({ title, range, units, conceptUuid, shadow = false, isS
         boxShadow: shadow ? '8px 0 20px 0 rgba(0,0,0,0.15)' : undefined,
       }}
     >
-      <ConfigurableLink
-        to={`${testResultsBasePath(`/patient/${patientUuid}/chart`)}/trendline/${conceptUuid}`}
-        className={styles.trendlineLink}
-      >
-        {title}
-      </ConfigurableLink>
+      {!isString ? (
+        <ConfigurableLink
+          to={`${testResultsBasePath(`/patient/${patientUuid}/chart`)}/trendline/${conceptUuid}`}
+          className={styles.trendlineLink}
+        >
+          {title}
+        </ConfigurableLink>
+      ) : (
+        <span className={styles.trendlineLink}>{title}</span>
+      )}
       <span className={styles.rangeUnits}>
         {range} {units}
       </span>
