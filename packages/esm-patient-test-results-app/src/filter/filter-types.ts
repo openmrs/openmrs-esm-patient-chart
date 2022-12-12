@@ -47,7 +47,7 @@ export interface ReducerAction {
 
 export interface ObservationData {
   obsDatetime: string;
-  value: number;
+  value: string;
   interpretation: OBSERVATION_INTERPRETATION;
 }
 export interface TestData {

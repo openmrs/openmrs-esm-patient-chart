@@ -2,6 +2,7 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
 @import '~@openmrs/esm-styleguide/src/vars';
+@import '../results-viewer/results-viewer.styles.scss';
 
 .panelViewHeader {
   display: flex;
@@ -18,9 +19,9 @@
   @include type.type-style('heading-compact-02');
 }
 
-.headerMargin, .headerMarginTablet {
+.stickySection {
+  top: 9rem;
   position: sticky;
-  top: 3rem;
 }
 
 .headerMargin {
