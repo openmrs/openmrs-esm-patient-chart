@@ -42,7 +42,6 @@ export function useObservations() {
   }, [size, setSize, data]);
 
   const results = useMemo(() => {
-    console.log('checking For resetting data in useObservations');
     const observations: Array<FHIRObservationResource> = data
       ? []
           .concat(...data?.map((resp) => resp.data?.entry?.map((e) => e.resource) ?? []))
