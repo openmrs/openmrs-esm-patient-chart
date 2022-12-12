@@ -187,6 +187,10 @@ export class FormSchemaService {
           results.add(question.concept);
         }
 
+        if (!question.label && typeof question.questionOptions?.concept === 'string') {
+          results.add(question.questionOptions.concept);
+        }
+
         for (const answer of question.questionOptions?.answers ?? []) {
           if (!answer.label && typeof answer.concept === 'string') {
             results.add(answer.concept);
