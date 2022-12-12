@@ -183,7 +183,7 @@ export default function usePanelData() {
 
   return {
     panels,
-    isLoading: isLoadingObservations || isLoadingConcepts,
+    isLoading: isLoadingObservations,
     groupedObservations,
     conceptData,
   };

@@ -116,23 +116,29 @@ export const TimelineCell: React.FC<{
   );
 };
 
-export const RowStartCell = ({ title, range, units, shadow = false, testUuid }) => (
-  <div
-    className={styles['row-start-cell']}
-    style={{
-      boxShadow: shadow ? '8px 0 20px 0 rgba(0,0,0,0.15)' : undefined,
-    }}
-  >
-    <span className={styles['trendline-link']}>
-      <ConfigurableLink to={`${testResultsBasePath(`/patient/${patientUuid}/chart`)}/trendline/${testUuid}`}>
-        {title}
-      </ConfigurableLink>
-    </span>
-    <span className={styles['range-units']}>
-      {range} {units}
-    </span>
-  </div>
-);
+export const RowStartCell = ({ title, range, units, shadow = false, testUuid, isString = false }) => {
+  return (
+    <div
+      className={styles['row-start-cell']}
+      style={{
+        boxShadow: shadow ? '8px 0 20px 0 rgba(0,0,0,0.15)' : undefined,
+      }}
+    >
+      <span className={styles['trendline-link']}>
+        {!isString ? (
+          <ConfigurableLink to={`${testResultsBasePath(`/patient/${patientUuid}/chart`)}/trendline/${testUuid}`}>
+            {title}
+          </ConfigurableLink>
+        ) : (
+          title
+        )}
+      </span>
+      <span className={styles['range-units']}>
+        {range} {units}
+      </span>
+    </div>
+  );
+};
 
 export const TimeSlots: React.FC<{
   children?: React.ReactNode;

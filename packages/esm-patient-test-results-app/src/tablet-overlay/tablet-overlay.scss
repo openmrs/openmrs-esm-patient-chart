@@ -43,6 +43,9 @@
   grid-template-columns: 1fr 1fr;
 }
 
-.buttonsGroup button {
-  max-width: unset;
+.buttonsGroup {
+  button{
+    max-width: unset;
+    width: 100%;
+  }
 }

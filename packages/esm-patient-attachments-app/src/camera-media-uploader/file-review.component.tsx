@@ -12,7 +12,7 @@ export interface FileReviewContainerProps {
 }
 
 const FileReviewContainer: React.FC<FileReviewContainerProps> = ({ onCompletion }) => {
-  const { filesToUpload, clearData, setFilesToUpload, collectDescription } = useContext(CameraMediaUploaderContext);
+  const { filesToUpload, clearData, setFilesToUpload, closeModal, collectDescription } = useContext(CameraMediaUploaderContext);
   const { t } = useTranslation();
   const [currentFile, setCurrentFile] = useState(1);
 
@@ -36,7 +36,7 @@ const FileReviewContainer: React.FC<FileReviewContainerProps> = ({ onCompletion 
 
   return (
     <div className={styles.filePreviewContainer}>
-      <ModalHeader className={styles.productiveHeading03}>
+      <ModalHeader closeModal={closeModal} className={styles.productiveHeading03}>
         {t('addAttachment', 'Add Attachment')}{' '}
         {filesToUpload.length > 1 && `(${currentFile} of ${filesToUpload.length})`}
       </ModalHeader>
