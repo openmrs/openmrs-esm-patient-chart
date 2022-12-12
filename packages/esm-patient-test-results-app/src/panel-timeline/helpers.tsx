@@ -117,21 +117,6 @@ export const TimelineCell: React.FC<{
 };
 
 export const RowStartCell = ({ title, range, units, shadow = false, testUuid, isString = false }) => {
-  if (isString) {
-    return (
-      <div
-        className={styles['row-start-cell']}
-        style={{
-          boxShadow: shadow ? '8px 0 20px 0 rgba(0,0,0,0.15)' : undefined,
-        }}
-      >
-        <span className={styles['trendline-link']}>{title}</span>
-        <span className={styles['range-units']}>
-          {range} {units}
-        </span>
-      </div>
-    );
-  }
   return (
     <div
       className={styles['row-start-cell']}
