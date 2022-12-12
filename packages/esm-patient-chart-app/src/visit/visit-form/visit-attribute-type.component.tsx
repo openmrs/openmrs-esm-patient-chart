@@ -84,7 +84,7 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
   const { data, isLoading } = useVisitAttributeType(uuid);
   const { answers, isLoading: isLoadingAnswers } = useConceptAnswersForVisitAttributeType(data?.datatypeConfig);
   const { t } = useTranslation();
-  const labelText = !required ? `${data?.name} (${t('optional', 'optional')})` : data?.name;
+  const labelText = !required ? `${data?.display} (${t('optional', 'optional')})` : data?.display;
 
   const field = useMemo(() => {
     if (isLoading) {
