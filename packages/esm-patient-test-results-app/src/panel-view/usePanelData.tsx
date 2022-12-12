@@ -42,6 +42,7 @@ export function useObservations() {
   }, [size, setSize, data]);
 
   const results = useMemo(() => {
+    console.log('checking For resetting data in useObservations');
     const observations: Array<FHIRObservationResource> = data
       ? []
           .concat(...data?.map((resp) => resp.data?.entry?.map((e) => e.resource) ?? []))
@@ -58,16 +59,20 @@ export function useObservations() {
 }
 
 function useConcepts(conceptUuids: Array<string>) {
-  const getUrl = (index) => {
-    if (conceptUuids && index < conceptUuids.length) {
-      return `/ws/rest/v1/concept/${conceptUuids[index]}?v=full`;
-    }
-    return null;
-  };
+  const getUrl = useCallback(
+    (index) => {
+      if (conceptUuids && index < conceptUuids.length) {
+        return `/ws/rest/v1/concept/${conceptUuids[index]}?v=full`;
+      }
+      return null;
+    },
+    [conceptUuids],
+  );
   const { data, error } = useSWRInfinite<FetchResponse<Concept>>(getUrl, openmrsFetch, {
     initialSize: conceptUuids?.length ?? 1,
     revalidateIfStale: false,
     revalidateOnFocus: false,
+    revalidateOnReconnect: false,
   });
 
   const results = useMemo(() => {
@@ -104,25 +109,29 @@ export default function usePanelData() {
     [concepts],
   );
 
-  const observations: Array<ObsRecord> = fhirObservations?.map((observation) => {
-    const conceptUuid = getConceptUuid(observation);
-    const value = getObservationValue(observation);
+  const observations: Array<ObsRecord> = useMemo(
+    () =>
+      fhirObservations?.map((observation) => {
+        const conceptUuid = getConceptUuid(observation);
+        const value = getObservationValue(observation);
 
-    // is a singe test
-    const meta = conceptData[conceptUuid];
-    const interpretation = meta?.getInterpretation(value);
+        // is a singe test
+        const meta = conceptData[conceptUuid];
+        const interpretation = meta?.getInterpretation(value);
 
-    const name = observation?.code.coding[0].display;
-    return {
-      ...observation,
-      conceptUuid,
-      value,
-      meta,
-      interpretation,
-      name,
-      relatedObs: [],
-    };
-  });
+        const name = observation?.code.coding[0].display;
+        return {
+          ...observation,
+          conceptUuid,
+          value,
+          meta,
+          interpretation,
+          name,
+          relatedObs: [],
+        };
+      }),
+    [fhirObservations, conceptData],
+  );
 
   const groupedObservations: Record<string, Array<ObsRecord>> = useMemo(() => {
     const groups = {};
@@ -181,12 +190,17 @@ export default function usePanelData() {
     return latestPanels;
   }, [individualObservations, setObservations]);
 
-  return {
-    panels,
-    isLoading: isLoadingObservations,
-    groupedObservations,
-    conceptData,
-  };
+  const panelsData = useMemo(
+    () => ({
+      panels,
+      isLoading: isLoadingObservations,
+      groupedObservations,
+      conceptData,
+    }),
+    [panels, isLoadingObservations, groupedObservations, conceptData],
+  );
+
+  return panelsData;
 }
 
 const getObservationValue = (observation: FHIRObservationResource) => {
