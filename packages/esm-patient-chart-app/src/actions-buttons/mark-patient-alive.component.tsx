@@ -12,7 +12,7 @@ interface MarkPatientAliveOverflowMenuItemProps {
 const MarkPatientAliveOverflowMenuItem: React.FC<MarkPatientAliveOverflowMenuItemProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
 
-  const { isDead } = usePatientDeceased(patientUuid);
+  const { isDead, isLoading: isPatientLoading } = usePatientDeceased(patientUuid);
 
   const openModal = useCallback(() => {
     const dispose = showModal('confirm-alive-modal', {
@@ -22,6 +22,7 @@ const MarkPatientAliveOverflowMenuItem: React.FC<MarkPatientAliveOverflowMenuIte
   }, [patientUuid]);
 
   return (
+    !isPatientLoading &&
     isDead && (
       <OverflowMenuItem
         itemText={t('markAlive', 'Mark Alive')}
