@@ -29,6 +29,15 @@ export class ConceptResourceService {
       );
   }
 
+  public getAllConcepts(): Observable<any[]> {
+    let url = this.getUrl();
+    return this.http.get<any>(url).pipe(
+      map((response) => {
+        return response.results;
+      }),
+    );
+  }
+
   public getConceptByUuid(uuid: string, cached: boolean = false, v: string = this.v): Observable<any> {
     let url = this.getUrl();
     url += '/' + uuid;
