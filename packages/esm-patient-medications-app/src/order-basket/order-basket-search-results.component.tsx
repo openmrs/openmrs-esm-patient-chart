@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Link, Pagination, ClickableTile, Tile, SkeletonText, SkeletonIcon } from '@carbon/react';
+import { Button, Pagination, ClickableTile, Tile, SkeletonText, SkeletonIcon } from '@carbon/react';
 import { ShoppingCart } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { createErrorHandler, useConfig, useLayoutType } from '@openmrs/esm-framework';
@@ -71,7 +71,9 @@ export default function OrderBasketSearchResults({
                 searchTerm,
               })}
             </span>
-            <Link onClick={() => setSearchTerm('')}>{t('clearSearchResults', 'Clear Results')}</Link>
+            <Button kind="ghost" onClick={() => setSearchTerm('')} size={isTablet ? 'md' : 'sm'}>
+              {t('clearSearchResults', 'Clear Results')}
+            </Button>
           </div>
           {currentSearchResultPage.map((result, index) => (
             <ClickableTile
@@ -84,7 +86,10 @@ export default function OrderBasketSearchResults({
               <div className={styles.searchResultTile}>
                 <div className={styles.searchResultTileContent}>
                   <p>
-                    <strong>{result.template ? result.drug.concept.display : result.drug.name}</strong>{' '}
+                    <span>
+                      <strong>{result.drug?.concept?.display}</strong> &mdash; {result?.drug?.strength} &mdash;{' '}
+                      {result?.drug?.dosageForm?.display}
+                    </span>
                     {result.template && (
                       <>
                         &mdash; {result.dosage?.value} {result.unit?.value} &mdash; {result.drug.dosageForm.display}
