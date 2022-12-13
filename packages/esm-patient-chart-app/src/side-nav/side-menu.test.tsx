@@ -26,15 +26,15 @@ const mockedUseLayoutType = useLayoutType as jest.Mock;
 mockedLeftNavMenu.mockReturnValue('left nav menu');
 
 describe('sidemenu', () => {
-  it('is rendered when viewport != tablet', () => {
-    mockedUseLayoutType.mockImplementationOnce(() => 'small-desktop');
+  it('is rendered when viewport == large-desktop', () => {
+    mockedUseLayoutType.mockImplementationOnce(() => 'large-desktop');
 
     renderSideMenu();
 
     expect(screen.getByText(/left nav menu/)).toBeTruthy();
   });
 
-  it('is not rendered when viewport == tablet', () => {
+  it('is not rendered when viewport == tablet or viewport == small-desktop', () => {
     mockedUseLayoutType.mockImplementationOnce(() => 'tablet');
 
     renderSideMenu();
