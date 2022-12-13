@@ -77,7 +77,6 @@ export default function OrderBasketSearchResults({
           </div>
           {currentSearchResultPage.map((result, index) => (
             <ClickableTile
-              light={isTablet}
               role="listitem"
               key={index}
               className={isTablet ? `${styles.tabletSearchResultTile}` : `${styles.desktopSearchResultTile}`}
@@ -86,14 +85,11 @@ export default function OrderBasketSearchResults({
               <div className={styles.searchResultTile}>
                 <div className={styles.searchResultTileContent}>
                   <p>
-                    <span>
-                      <strong>{result.drug?.concept?.display}</strong> &mdash; {result?.drug?.strength} &mdash;{' '}
-                      {result?.drug?.dosageForm?.display}
-                    </span>
+                    {/* prettier-ignore */}
+                    <strong>{result.drug?.concept?.display}</strong> &mdash; {result?.drug?.strength} &mdash;{' '}
+                    {result?.drug?.dosageForm?.display}
                     {result.template && (
                       <>
-                        &mdash; {result.dosage?.value} {result.unit?.value} &mdash; {result.drug.dosageForm.display}
-                        <br />
                         <span className={styles.label01}>{result.frequency?.value}</span> &mdash;{' '}
                         <span className={styles.label01}>{result.route?.value}</span>
                       </>
