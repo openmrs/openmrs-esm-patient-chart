@@ -29,7 +29,7 @@ $actionPanelExpandedOffset: $actionNavOffset+$actionPanelOffset;
   padding-right: spacing.$spacing-01;
 }
 
-:global(.omrs-breakpoint-gt-tablet) .chartContainer {
+:global(.omrs-breakpoint-gt-small-desktop) .chartContainer {
   margin-left: var(--omrs-sidenav-width);
 }
 
