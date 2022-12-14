@@ -45,7 +45,6 @@ describe('OrderBasketSearchResults', () => {
     // Anotates results with dosing info if an order-template was found.
     expect(getByTextWithMarkup(/Aspirin — 81mg — Tablet\s*Once daily — Oral/i)).toBeInTheDocument();
     // Only displays drug name for results without a matching order template
-    // expect(getByTextWithMarkup(/Aspirin\s*-\s*125mg\s*-\s*Tablet/i)).toBeInTheDocument();
     expect(getByTextWithMarkup(/Aspirin — 125mg — Tablet/i)).toBeInTheDocument();
     expect(getByTextWithMarkup(/Aspirin — 243mg — Tablet/i)).toBeInTheDocument();
     expect(screen.getAllByRole('button', { name: /Immediately add to basket/i }).length).toEqual(3);
