@@ -10,7 +10,7 @@ interface ConceptReferencesResult {
 }
 
 interface ConceptMetadata {
-  uuid: string;
+  identifier: string;
   display: string;
 }
 
@@ -26,19 +26,19 @@ export class ConceptService {
     return of(...ConceptService.getConceptReferenceUrls(conceptIdentifiers)).pipe(
       map((referenceUrl) =>
         this.http
-          .get<ConceptReferencesResult>(this.windowRef.openmrsRestBase + referenceUrl + '?v=custom:(uuid,display)', {
+          .get<ConceptReferencesResult>(this.windowRef.openmrsRestBase + referenceUrl, {
             headers: this.headers,
           })
           .pipe(
             map((result) =>
               Object.entries(result).reduce((acc, reference) => {
                 acc.push({
-                  uuid: reference[0],
+                  identifier: reference[0],
                   display: reference[1].display,
                 });
 
                 return acc;
-              }, [] as ConceptMetadata[]),
+              }, [] as Array<ConceptMetadata>),
             ),
           ),
       ),
@@ -55,6 +55,6 @@ export class ConceptService {
     const chunkSize = 100;
     return [...new Set(conceptIdentifiers)]
       .reduceRight((acc, _, __, array) => [...acc, array.splice(0, chunkSize)], [])
-      .map((partition) => `conceptreferences?references=${partition.join(',')}`);
+      .map((partition) => `conceptreferences?references=${partition.join(',')}&v=custom:(uuid,display)`);
   }
 }
