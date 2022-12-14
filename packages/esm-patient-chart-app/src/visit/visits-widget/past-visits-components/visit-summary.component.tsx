@@ -18,6 +18,8 @@ interface DiagnosisItem {
 interface VisitSummaryProps {
   encounters: Array<Encounter | OpenmrsResource>;
   patientUuid: string;
+  visitUuid: string;
+  visitTypeUuid: string;
 }
 
 export interface MappedEncounter {
@@ -27,10 +29,11 @@ export interface MappedEncounter {
   form: OpenmrsResource;
   obs: Array<Observation>;
   provider: string;
-  visitUuid?: string;
+  visitUuid: string;
+  visitTypeUuid: string;
 }
 
-const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid }) => {
+const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid, visitUuid, visitTypeUuid }) => {
   const config = useConfig();
   const { t } = useTranslation();
   const layout = useLayoutType();
@@ -146,7 +149,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid }) 
             <MedicationSummary medications={medications} />
           </TabPanel>
           <TabPanel>
-            <VisitsTable visits={mapEncounters(encounters)} showAllEncounters={false} />
+            <VisitsTable visits={mapEncounters(encounters, visitUuid, visitTypeUuid)} showAllEncounters={false} />
           </TabPanel>
         </TabPanels>
       </Tabs>
@@ -156,13 +159,15 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid }) 
 
 export default VisitSummary;
 
-export function mapEncounters(encounters) {
+export function mapEncounters(encounters, visitUuid, visitTypeUuid) {
   return encounters?.map((encounter) => ({
     id: encounter?.uuid,
     datetime: encounter?.encounterDatetime,
     encounterType: encounter?.encounterType?.display,
     form: encounter?.form,
     obs: encounter?.obs,
+    visitUuid: visitUuid,
+    visitTypeUuid: visitTypeUuid,
     provider:
       encounter?.encounterProviders?.length > 0 ? encounter.encounterProviders[0].provider?.person?.display : '--',
   }));

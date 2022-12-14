@@ -87,8 +87,14 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits }) =>
     tableHeaders.sort((a, b) => (a.id > b.id ? 1 : -1));
   }
 
-  const launchWorkspace = (formUuid: string, visitUuid?: string, encounterUuid?: string, formName?: string) => {
-    formEntrySub.next({ formUuid, visitUuid, encounterUuid });
+  const launchWorkspace = (
+    formUuid: string,
+    visitUuid?: string,
+    encounterUuid?: string,
+    formName?: string,
+    visitTypeUuid?: string,
+  ) => {
+    formEntrySub.next({ formUuid, visitUuid, encounterUuid, visitTypeUuid });
     launchPatientWorkspace('patient-form-entry-workspace', { workspaceTitle: formName });
   };
 
@@ -188,6 +194,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits }) =>
                                     visits[i].visitUuid,
                                     visits[i].id,
                                     visits[i].form.display,
+                                    visits[i].visitTypeUuid,
                                   )
                                 }
                               >
@@ -224,7 +231,15 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits }) =>
                           <EncounterObservations observations={visits[i].obs} />
                           <Button
                             kind="ghost"
-                            onClick={() => launchWorkspace(visits[i].form.uuid, visits[i].visitUuid, visits[i].id)}
+                            onClick={() =>
+                              launchWorkspace(
+                                visits[i].form.uuid,
+                                visits[i].visitUuid,
+                                visits[i].id,
+                                visits[i].form.display,
+                                visits[i].visitTypeUuid,
+                              )
+                            }
                             renderIcon={(props) => <Edit size={16} {...props} />}
                             style={{ marginLeft: '-1rem', marginTop: '0.5rem' }}
                           >
