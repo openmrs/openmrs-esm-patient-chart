@@ -90,8 +90,6 @@ export class FormCreationService {
   private wireDataSources(createFormParams: CreateFormParams) {
     const visitTypeUuid = this.singleSpaPropsService.getPropOrThrow('visitTypeUuid');
     const patient = this.singleSpaPropsService.getPropOrThrow('patient');
-    const patientUuid = this.singleSpaPropsService.getPropOrThrow('patientUuid');
-    const date = new Date().toISOString();
 
     // Clear any previously configured data sources.
     // Reason: If a config value changes in between two invocations, that data source would otherwise stick
@@ -115,7 +113,7 @@ export class FormCreationService {
     this.dataSources.registerDataSource('userLocation', createFormParams.user.sessionLocation);
     this.dataSources.registerDataSource(
       'mostRecentObsValue',
-      this.formDataSourceService.getMostRecentObsValueBefore(date, patientUuid),
+      this.formDataSourceService.getDataSources().mostRecentObsValue,
     );
 
     // TODO monthlySchedule should be converted to a "standard" configurableDataSource

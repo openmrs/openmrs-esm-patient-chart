@@ -3,7 +3,6 @@ import { Injectable } from '@angular/core';
 import { take, map, tap } from 'rxjs/operators';
 import { Observable, Subject } from 'rxjs';
 
-import { FHIRResource } from '@openmrs/esm-framework';
 import { ProviderResourceService } from '../openmrs-api/provider-resource.service';
 import { LocationResourceService } from '../openmrs-api/location-resource.service';
 import { ConceptResourceService } from '../openmrs-api/concept-resource.service';
@@ -40,6 +39,9 @@ export class FormDataSourceService {
         searchOptions: this.findProblem.bind(this),
       },
       conceptAnswers: this.getWhoStagingCriteriaDataSource(),
+      mostRecentObsValue: {
+        resolveSelectedValue: this.getMostRecentObsValueBefore.bind(this),
+      },
     };
   }
 
@@ -117,54 +119,9 @@ export class FormDataSourceService {
     );
   }
 
-  public getMostRecentObsValueBefore(date: string, patientUuid: string) {
-    type ObsResult = FHIRResource['resource'] & {
-      conceptUuid: string;
-      dataType?: string;
-    };
-
-    function isUuid(input: string) {
-      return input.length === 36;
-    }
-
-    const dataSource = {
-      obsValues: [],
-    };
-
-    const concepts = this.conceptResourceService.getAllConcepts();
-    concepts.subscribe((concepts) => {
-      const uuids = concepts.map((c) => c.uuid).join(',');
-
-      return this.observationResourceService.getMostRecentObsValues(date, uuids, patientUuid).subscribe((data) => {
-        const observations =
-          data?.entry?.map((entry) => {
-            const observation: ObsResult = {
-              ...entry.resource,
-              conceptUuid: entry.resource.code.coding.filter((c) => isUuid(c.code))[0]?.code,
-            };
-
-            if (entry.resource.hasOwnProperty('valueString')) {
-              observation.dataType = 'Text';
-            }
-
-            if (entry.resource.hasOwnProperty('valueQuantity')) {
-              observation.dataType = 'Number';
-            }
-
-            if (entry.resource.hasOwnProperty('valueCodeableConcept')) {
-              observation.dataType = 'Coded';
-            }
-
-            return observation;
-          }) ?? [];
-
-        const mostRecentObsBefore = observations.filter(
-          (observation) => new Date(observation.effectiveDateTime).getTime() > new Date(date).getTime(),
-        );
-        dataSource.obsValues = mostRecentObsBefore;
-      });
-    });
-    return dataSource.obsValues;
+  public getMostRecentObsValueBefore(date: Date, patientUuid: string, concepts: string[]) {
+    const uuids = concepts.map((c) => c).join(',');
+    return this.observationResourceService.getMostRecentObsValues(date, uuids, patientUuid).subscribe((data) => data);
   }
 
   public getLocationByUuid(uuid: string) {
