@@ -79,18 +79,22 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
         take(1),
         map((createFormParams) => from(this.formCreationService.initAndCreateForm(createFormParams))),
         concatAll(),
-        mergeMap((form) => {
+        mergeMap(async (form) => {
           const unlabeledConcepts = FormSchemaService.getUnlabeledConceptIdentifiersFromSchema(form.schema);
-          return this.conceptService
-            .searchBulkConceptsByUUID(unlabeledConcepts, this.language)
-            .pipe(map((concepts) => ({ form, concepts })));
+          return {
+            form,
+            concepts: await this.conceptService.searchConceptsByIdentifiers(unlabeledConcepts).toPromise(),
+          };
         }),
       )
       .subscribe(
         ({ form, concepts }) => {
           this.form = form;
           this.labelMap = concepts.reduce((acc, current) => {
-            acc[current.uuid] = current.display;
+            if (Boolean(current)) {
+              acc[current.identifier] = current.display;
+            }
+
             return acc;
           }, {});
           this.changeState('ready');
