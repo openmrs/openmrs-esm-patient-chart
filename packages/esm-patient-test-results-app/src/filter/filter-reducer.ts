@@ -19,7 +19,7 @@ const computeParents = (prefix, node) => {
     });
     let activeTests = [];
     node.subSets.forEach((leaf) => {
-      if (leaf.obs.length) {
+      if (leaf.obs?.length) {
         activeTests.push([leaf.flatName, leaf]);
       }
     });
