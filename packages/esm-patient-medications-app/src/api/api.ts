@@ -1,7 +1,17 @@
 import useSWR from 'swr';
-import { openmrsFetch, Session, useConfig } from '@openmrs/esm-framework';
+import useSWRImmutable from 'swr/immutable';
+import {
+  FetchResponse,
+  openmrsFetch,
+  Session,
+  useConfig,
+  OpenmrsResource,
+  showNotification,
+  useSession,
+} from '@openmrs/esm-framework';
 import { OrderPost, PatientMedicationFetchResponse } from '../types/order';
 import { ConfigObject } from '../config-schema';
+import { useEffect, useMemo } from 'react';
 
 /**
  * Fast, lighweight, reusable data fetcher with built-in cache invalidation that
@@ -51,8 +61,23 @@ export function getDrugByName(drugName: string, abortController?: AbortControlle
   );
 }
 
-export function getDurationUnits(abortController: AbortController, durationUnitsConcept) {
-  return openmrsFetch(`/ws/rest/v1/concept/${durationUnitsConcept}?v=custom:(answers:(uuid,display))`, abortController);
+export function useDurationUnits(durationUnitsConcept) {
+  const url = `/ws/rest/v1/concept/${durationUnitsConcept}?v=custom:(answers:(uuid,display))`;
+  const { data, error } = useSWRImmutable<FetchResponse<{ answers: Array<OpenmrsResource> }>, Error>(
+    durationUnitsConcept ? url : null,
+    openmrsFetch,
+  );
+
+  const results = useMemo(
+    () => ({
+      isLoadingDurationUnits: !data && !error,
+      durationUnits: data?.data?.answers,
+      error,
+    }),
+    [data, error],
+  );
+
+  return results;
 }
 
 export function getMedicationByUuid(abortController: AbortController, orderUuid: string) {
@@ -70,11 +95,37 @@ export function getOrderTemplatesByDrug(drugUuid: string, abortController?: Abor
   });
 }
 
-export function getCurrentOrderBasketEncounter(patientUuid: string, abortController?: AbortController) {
+export function useCurrentOrderBasketEncounter(patientUuid: string) {
   const [nowDateString] = new Date().toISOString().split('T');
-  return openmrsFetch(`/ws/rest/v1/encounter?patient=${patientUuid}&fromdate=${nowDateString}&limit=1`, {
-    signal: abortController?.signal,
-  });
+  const sessionObject = useSession();
+  const config = useConfig() as ConfigObject;
+  const url = `/ws/rest/v1/encounter?patient=${patientUuid}&fromdate=${nowDateString}&limit=1`;
+  const { data, error, mutate } = useSWR<FetchResponse<{ results: Array<any> }>, Error>(
+    patientUuid ? url : null,
+    openmrsFetch,
+  );
+
+  useEffect(() => {
+    const abortController = new AbortController();
+    if (!data?.data?.results?.length) {
+      createEmptyEncounter(patientUuid, sessionObject, config, abortController).then((res) => {
+        mutate();
+      });
+    }
+
+    return () => abortController.abort();
+  }, [data, mutate, config, patientUuid, sessionObject]);
+
+  const results = useMemo(
+    () => ({
+      isLoadingEncounterUuid: (!data && !error) || !data?.data?.results?.length,
+      encounterUuid: data?.data?.results?.[0],
+      error,
+    }),
+    [data, error],
+  );
+
+  return results;
 }
 
 export function createEmptyEncounter(
@@ -85,8 +136,8 @@ export function createEmptyEncounter(
 ) {
   const emptyEncounter = {
     patient: patientUuid,
-    location: sessionObject.sessionLocation.uuid,
-    encounterType: orderBaskestConfig.drugOrderEncounterType,
+    location: sessionObject?.sessionLocation?.uuid,
+    encounterType: orderBaskestConfig?.drugOrderEncounterType,
     encounterDatetime: new Date().toISOString(),
     encounterProviders: [
       {
