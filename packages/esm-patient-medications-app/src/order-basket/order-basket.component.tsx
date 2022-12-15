@@ -32,7 +32,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
   const isTablet = useLayoutType() === 'tablet';
   const config = useConfig() as ConfigObject;
 
-  const { currentEncounterUuid: encounterUuid, isLoadingEncounterUuid } = useCurrentOrderBasketEncounter(patientUuid);
+  const { encounterUuid, isLoadingEncounterUuid } = useCurrentOrderBasketEncounter(patientUuid);
 
   const isLoading = isLoadingEncounterUuid;
   const [medicationOrderFormItem, setMedicationOrderFormItem] = useState<OrderBasketItem | null>(null);

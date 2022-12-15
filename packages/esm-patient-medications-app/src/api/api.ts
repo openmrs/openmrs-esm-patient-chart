@@ -119,7 +119,7 @@ export function useCurrentOrderBasketEncounter(patientUuid: string) {
   const results = useMemo(
     () => ({
       isLoadingEncounterUuid: (!data && !error) || !data?.data?.results?.length,
-      currentEncounterUuid: data?.data?.results?.[0],
+      encounterUuid: data?.data?.results?.[0],
       error,
     }),
     [data, error],
