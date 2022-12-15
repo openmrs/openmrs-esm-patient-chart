@@ -4903,6 +4903,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ngx-translate/core@npm:^14.0.0":
+  version: 14.0.0
+  resolution: "@ngx-translate/core@npm:14.0.0"
+  dependencies:
+    tslib: ^2.3.0
+  peerDependencies:
+    "@angular/core": ">=13.0.0"
+    rxjs: ^6.5.3 || ^7.4.0
+  checksum: d1afc35e7b729caf776e78c10badc0853b63252bdf2fa129f1b95a271cd15cf6f22ffecc52922ffbe1c3aca7d8e08351669e8bae18727664aba66b5d405f05e1
+  languageName: node
+  linkType: hard
+
 "@nodelib/fs.scandir@npm:2.1.5":
   version: 2.1.5
   resolution: "@nodelib/fs.scandir@npm:2.1.5"
@@ -5591,6 +5603,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-chart@workspace:."
   dependencies:
+    "@ngx-translate/core": ^14.0.0
     "@openmrs/esm-framework": next
     "@swc/cli": ^0.1.57
     "@swc/core": ^1.2.165
