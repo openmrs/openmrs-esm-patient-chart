@@ -111,10 +111,7 @@ export class FormCreationService {
     this.dataSources.registerDataSource('patient', this.formDataSourceService.getPatientObject(patient), true);
     this.dataSources.registerDataSource('rawPrevEnc', createFormParams.previousEncounter, false);
     this.dataSources.registerDataSource('userLocation', createFormParams.user.sessionLocation);
-    this.dataSources.registerDataSource(
-      'mostRecentObsValue',
-      this.formDataSourceService.getDataSources().mostRecentObsValue,
-    );
+    this.dataSources.registerDataSource('recentObs', this.formDataSourceService.getDataSources().recentObs);
 
     // TODO monthlySchedule should be converted to a "standard" configurableDataSource
     const config = this.configResourceService.getConfig();

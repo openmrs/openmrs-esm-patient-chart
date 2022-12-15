@@ -39,8 +39,8 @@ export class FormDataSourceService {
         searchOptions: this.findProblem.bind(this),
       },
       conceptAnswers: this.getWhoStagingCriteriaDataSource(),
-      mostRecentObsValue: {
-        resolveSelectedValue: this.getMostRecentObsValueBefore.bind(this),
+      recentObs: {
+        fetchMostRecentObs: this.getMostRecentObsValueBefore.bind(this),
       },
     };
   }
