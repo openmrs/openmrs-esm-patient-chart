@@ -147,7 +147,7 @@ const Separator = ({ ...props }) => <div {...props} className={styles.separator}
 const InfoTooltip = ({ effectiveDateTime, issuedDateTime }) => {
   const { t } = useTranslation();
   return (
-    <Toggletip align="bottom">
+    <Toggletip align="bottom" className={styles.tooltipContainer}>
       <ToggletipButton label="Additional information">
         <Information />
       </ToggletipButton>
