@@ -29,6 +29,8 @@
   "emptyOrderBasket": "Your basket is empty",
   "endDate": "End date",
   "error": "Error",
+  "errorFetchingDurationUnits": "Error occured when fetching duration units",
+  "fetchingDurationUnits": "Fetching duration units...",
   "freeTextDosage": "Free Text Dosage",
   "indication": "Indication",
   "indicationPlaceholder": "e.g. \"Hypertension\"",
@@ -77,5 +79,6 @@
   "searchResultsExactMatchesForTerm_other": "{count} exact match(es) for \"{searchTerm}\"",
   "signAndClose": "Sign and close",
   "startDate": "Start date",
-  "takeAsNeeded": "Take As Needed"
+  "takeAsNeeded": "Take As Needed",
+  "tryReopeningTheForm": "Please try launching the form again"
 }

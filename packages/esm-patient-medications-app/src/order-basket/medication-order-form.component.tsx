@@ -15,6 +15,7 @@ import {
   NumberInput,
   DatePicker,
   DatePickerInput,
+  InlineNotification,
 } from '@carbon/react';
 import { ArrowLeft } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
@@ -22,12 +23,12 @@ import { isDesktop, OpenmrsResource, useConfig, useLayoutType } from '@openmrs/e
 import { OrderBasketItem } from '../types/order-basket-item';
 import { useOrderConfig } from '../api/order-config';
 import styles from './medication-order-form.scss';
+import { useDurationUnits } from '../api/api';
 
 export interface MedicationOrderFormProps {
   initialOrderBasketItem: OrderBasketItem;
   onSign: (finalizedOrder: OrderBasketItem) => void;
   onCancel: () => void;
-  durationUnits: Array<OpenmrsResource>;
 }
 
 function addIfNotPresent(
@@ -43,12 +44,7 @@ function addIfNotPresent(
   return ret;
 }
 
-export default function MedicationOrderForm({
-  initialOrderBasketItem,
-  onSign,
-  onCancel,
-  durationUnits,
-}: MedicationOrderFormProps) {
+export default function MedicationOrderForm({ initialOrderBasketItem, onSign, onCancel }: MedicationOrderFormProps) {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const isTablet = useLayoutType() === 'tablet';
@@ -56,6 +52,11 @@ export default function MedicationOrderForm({
   const template = initialOrderBasketItem.template;
   const { orderConfigObject } = useOrderConfig();
   const config = useConfig();
+  const {
+    isLoadingDurationUnits,
+    durationUnits,
+    error: fetchingDurationUnitsError,
+  } = useDurationUnits(config.durationUnitsConcept);
 
   const doseWithUnitsLabel = template
     ? `${initialOrderBasketItem?.dosage?.value} ${initialOrderBasketItem?.unit?.value}`
@@ -463,17 +464,24 @@ export default function MedicationOrderForm({
               <ComboBox
                 light={isTablet}
                 id="durationUnitPlaceholder"
-                selectedItem={{
-                  id: orderBasketItem.durationUnit.uuid,
-                  text: orderBasketItem.durationUnit.display,
-                }}
-                items={durationUnits?.map((unit) => ({
-                  id: unit.uuid,
-                  text: unit.display,
-                }))}
+                selectedItem={
+                  orderBasketItem.durationUnit?.uuid
+                    ? {
+                        id: orderBasketItem.durationUnit.uuid,
+                        text: orderBasketItem.durationUnit.display,
+                      }
+                    : null
+                }
+                items={
+                  durationUnits?.map((unit) => ({
+                    id: unit.uuid,
+                    text: unit.display,
+                  })) ?? []
+                }
                 itemToString={(item) => item?.text}
                 // @ts-ignore
                 placeholder={t('durationUnitPlaceholder', 'Duration Unit')}
+                helperText={isLoadingDurationUnits && t('fetchingDurationUnits', 'Fetching duration units...')}
                 onChange={({ selectedItem }) =>
                   !!selectedItem
                     ? setOrderBasketItem({
@@ -490,6 +498,15 @@ export default function MedicationOrderForm({
                 }
               />
             </FormGroup>
+            {fetchingDurationUnitsError && (
+              <InlineNotification
+                hideCloseButton
+                kind="error"
+                lowContrast
+                title={t('errorFetchingDurationUnits', 'Error occured when fetching duration units')}
+                subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
+              />
+            )}
           </Column>
         </div>
         <Grid className={`${styles.gridRow} ${styles.spacer}`}>

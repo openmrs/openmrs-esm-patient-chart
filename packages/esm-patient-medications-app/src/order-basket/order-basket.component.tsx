@@ -33,9 +33,8 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
   const config = useConfig() as ConfigObject;
 
   const { currentEncounterUuid: encounterUuid, isLoadingEncounterUuid } = useCurrentOrderBasketEncounter(patientUuid);
-  const { isLoadingDurationUnits, durationUnits } = useDurationUnits(config.durationUnitsConcept);
 
-  const isLoading = isLoadingDurationUnits || isLoadingEncounterUuid;
+  const isLoading = isLoadingEncounterUuid;
   const [medicationOrderFormItem, setMedicationOrderFormItem] = useState<OrderBasketItem | null>(null);
   const [isMedicationOrderFormVisible, setIsMedicationOrderFormVisible] = useState(false);
   const [onMedicationOrderFormSigned, setOnMedicationOrderFormSign] =
@@ -130,7 +129,6 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
   if (isMedicationOrderFormVisible) {
     return (
       <MedicationOrderForm
-        durationUnits={durationUnits}
         initialOrderBasketItem={medicationOrderFormItem}
         onSign={onMedicationOrderFormSigned}
         onCancel={() => setIsMedicationOrderFormVisible(false)}

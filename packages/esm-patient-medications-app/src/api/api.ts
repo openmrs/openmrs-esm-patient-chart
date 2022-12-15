@@ -62,25 +62,17 @@ export function getDrugByName(drugName: string, abortController?: AbortControlle
 }
 
 export function useDurationUnits(durationUnitsConcept) {
+  const url = `/ws/rest/v1/concept/${durationUnitsConcept}?v=custom:(answers:(uuid,display))`;
   const { data, error } = useSWRImmutable<FetchResponse<{ answers: Array<OpenmrsResource> }>, Error>(
-    `/ws/rest/v1/concept/${durationUnitsConcept}?v=custom:(answers:(uuid,display))`,
+    durationUnitsConcept ? url : null,
     openmrsFetch,
   );
-
-  useEffect(() => {
-    if (error) {
-      showNotification({
-        title: error.name,
-        description: error.message,
-        kind: 'error',
-      });
-    }
-  }, [error]);
 
   const results = useMemo(
     () => ({
       isLoadingDurationUnits: !data && !error,
       durationUnits: data?.data?.answers,
+      error,
     }),
     [data, error],
   );
@@ -107,20 +99,11 @@ export function useCurrentOrderBasketEncounter(patientUuid: string) {
   const [nowDateString] = new Date().toISOString().split('T');
   const sessionObject = useSession();
   const config = useConfig() as ConfigObject;
+  const url = `/ws/rest/v1/encounter?patient=${patientUuid}&fromdate=${nowDateString}&limit=1`;
   const { data, error, mutate } = useSWR<FetchResponse<{ results: Array<any> }>, Error>(
-    `/ws/rest/v1/encounter?patient=${patientUuid}&fromdate=${nowDateString}&limit=1`,
+    patientUuid ? url : null,
     openmrsFetch,
   );
-
-  useEffect(() => {
-    if (error) {
-      showNotification({
-        title: error.name,
-        description: error.message,
-        kind: 'error',
-      });
-    }
-  }, [error]);
 
   useEffect(() => {
     const abortController = new AbortController();
@@ -137,6 +120,7 @@ export function useCurrentOrderBasketEncounter(patientUuid: string) {
     () => ({
       isLoadingEncounterUuid: (!data && !error) || !data?.data?.results?.length,
       currentEncounterUuid: data?.data?.results?.[0],
+      error,
     }),
     [data, error],
   );
