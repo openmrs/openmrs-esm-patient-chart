@@ -64,7 +64,7 @@ export const configSchema = {
   showGraphByDefault: {
     _type: Type.Boolean,
     _description: 'Displayed graph by default',
-    _default: true,
+    _default: false,
   },
   encounterTypes: {
     _type: Type.Array,
