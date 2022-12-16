@@ -91,7 +91,7 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
         ({ form, concepts }) => {
           this.form = form;
           if (concepts) {
-            this.labelMap = concepts?.reduce((acc, current) => {
+            this.labelMap = concepts.reduce((acc, current) => {
               if (Boolean(current)) {
                 acc[current.identifier] = current.display;
               }
