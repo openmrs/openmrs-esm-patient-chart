@@ -3,13 +3,13 @@ import { Injectable } from '@angular/core';
 import { take, map, tap } from 'rxjs/operators';
 import { Observable, Subject } from 'rxjs';
 
+import { fhirBaseUrl, FHIRResource, openmrsObservableFetch } from '@openmrs/esm-framework';
+
 import { ProviderResourceService } from '../openmrs-api/provider-resource.service';
 import { LocationResourceService } from '../openmrs-api/location-resource.service';
 import { ConceptResourceService } from '../openmrs-api/concept-resource.service';
-import { ObservationResourceService } from '../openmrs-api/obs-resource.service';
 import { LocalStorageService } from '../local-storage/local-storage.service';
 import { Concept, Location, Provider } from '../types';
-
 @Injectable()
 export class FormDataSourceService {
   constructor(
@@ -17,7 +17,6 @@ export class FormDataSourceService {
     private locationResourceService: LocationResourceService,
     private conceptResourceService: ConceptResourceService,
     private localStorageService: LocalStorageService,
-    private observationResourceService: ObservationResourceService,
   ) {}
 
   public getDataSources() {
@@ -40,7 +39,7 @@ export class FormDataSourceService {
       },
       conceptAnswers: this.getWhoStagingCriteriaDataSource(),
       recentObs: {
-        fetchMostRecentObs: this.getMostRecentObsValueBefore.bind(this),
+        fetchMostRecentObs: this.fetchMostRecentObsValue.bind(this),
       },
     };
   }
@@ -119,9 +118,67 @@ export class FormDataSourceService {
     );
   }
 
-  public getMostRecentObsValueBefore(date: Date, patientUuid: string, concepts: string[]) {
-    const uuids = concepts.map((c) => c).join(',');
-    return this.observationResourceService.getMostRecentObsValues(date, uuids, patientUuid).subscribe((data) => data);
+  public fetchMostRecentObsValue(patient: string, concepts: string | Array<string>) {
+    if (!patient) {
+      throw new Error('patient must be provided in call to fetchMostRecentObsValue');
+    }
+
+    if (!concepts) {
+      throw new Error('at least one concept must be provided in call to fetchMostRecentObsValue');
+    }
+
+    if (typeof concepts === 'string') {
+      concepts = [concepts];
+    }
+
+    if (!Array.isArray(concepts)) {
+      throw new Error(
+        `concepts must be supplied to fetchMostRecentObsValue as either a string or array or strings. Instead, we got ${JSON.stringify(
+          concepts,
+        )}`,
+      );
+    }
+
+    const urlParams = new URLSearchParams({
+      patient,
+      code: concepts.join(','),
+      max: '1',
+      _summary: 'data',
+    });
+
+    return openmrsObservableFetch<{ entry: Array<FHIRResource> }>(
+      `${fhirBaseUrl}/Observation/$lastn?${urlParams.toString()}`,
+    ).pipe(
+      map((response) =>
+        response.ok
+          ? response.data.entry?.reduce<Record<string, string | number>>((acc, entry) => {
+              if (entry.resource && entry.resource.code) {
+                const code = entry.resource.code.coding.find((c) => !Boolean(c.system))?.code;
+                let value: string | number;
+                if (typeof entry.resource.valueString !== 'undefined' && entry.resource.valueString !== null) {
+                  value = entry.resource.valueString;
+                } else if (
+                  typeof entry.resource.valueQuantity?.value !== 'undefined' &&
+                  entry.resource.valueQuantity?.value !== null
+                ) {
+                  value = entry.resource.valueQuantity.value;
+                } else {
+                  const coding = entry.resource.valueCodeableConcept?.coding?.find((c) => !Boolean(c.system))?.code;
+                  if (typeof coding !== 'undefined' && coding !== null) {
+                    value = coding;
+                  }
+                }
+
+                if (typeof code !== 'undefined' && code !== null && typeof value !== 'undefined') {
+                  acc[code] = value;
+                }
+              }
+
+              return acc;
+            }, {})
+          : {},
+      ),
+    );
   }
 
   public getLocationByUuid(uuid: string) {
