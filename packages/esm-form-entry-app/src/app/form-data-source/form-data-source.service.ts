@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { take, map, tap } from 'rxjs/operators';
 import { Observable, Subject } from 'rxjs';
 
-import { fhirBaseUrl, FHIRResource, openmrsObservableFetch } from '@openmrs/esm-framework';
+import { FetchResponse, fhirBaseUrl, FHIRResource, openmrsObservableFetch } from '@openmrs/esm-framework';
 
 import { ProviderResourceService } from '../openmrs-api/provider-resource.service';
 import { LocationResourceService } from '../openmrs-api/location-resource.service';
@@ -149,7 +149,7 @@ export class FormDataSourceService {
     return openmrsObservableFetch<{ entry: Array<FHIRResource> }>(
       `${fhirBaseUrl}/Observation/$lastn?${urlParams.toString()}`,
     ).pipe(
-      map((response) =>
+      map((response: FetchResponse<{ entry: Array<FHIRResource> }>) =>
         response.ok
           ? response.data.entry?.reduce<Record<string, string | number>>((acc, entry) => {
               if (entry.resource && entry.resource.code) {
