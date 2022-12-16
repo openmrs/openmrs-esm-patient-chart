@@ -17,7 +17,6 @@ export interface OrderBasketItem {
   dosage: MedicationDosage;
   frequency: MedicationFrequency;
   route: MedicationRoute;
-  encounterUuid: string;
   orderer: string;
   careSetting: string;
   quantityUnits: string;

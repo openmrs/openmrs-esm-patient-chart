@@ -17,8 +17,8 @@ import {
   TableRow,
 } from '@carbon/react';
 import { Add, User } from '@carbon/react/icons';
-import { formatDate } from '@openmrs/esm-framework';
-import { CardHeader, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { formatDate, showModal } from '@openmrs/esm-framework';
+import { CardHeader, launchPatientWorkspace, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { compare } from '../utils/compare';
 import { connect } from 'unistore/react';
@@ -35,6 +35,7 @@ export interface ActiveMedicationsProps {
   showDiscontinueButton: boolean;
   showModifyButton: boolean;
   showReorderButton: boolean;
+  patientUuid: string;
 }
 
 const MedicationsDetailsTable = connect<
@@ -56,9 +57,20 @@ const MedicationsDetailsTable = connect<
     showAddNewButton,
     items,
     setItems,
+    patientUuid,
   }: ActiveMedicationsProps & OrderBasketStore & OrderBasketStoreActions) => {
     const { t } = useTranslation();
-    const openOrderBasket = React.useCallback(() => launchPatientWorkspace('order-basket-workspace'), []);
+    const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
+    const openOrderBasket = () => {
+      if (currentVisit) {
+        launchPatientWorkspace('order-basket-workspace');
+      } else {
+        const dispose = showModal('start-visit-dialog', {
+          patientUuid,
+          closeModal: () => dispose(),
+        });
+      }
+    };
 
     const tableHeaders = [
       {
@@ -282,7 +294,6 @@ function OrderBasketItemActions({
           valueCoded: medication.route.uuid,
           value: medication.route.display,
         },
-        encounterUuid: medication.encounter.uuid,
         commonMedicationName: medication.drug.name,
         isFreeTextDosage: medication.dosingType === 'org.openmrs.FreeTextDosingInstructions',
         freeTextDosage:
@@ -333,7 +344,6 @@ function OrderBasketItemActions({
           valueCoded: medication.route.uuid,
           value: medication.route.display,
         },
-        encounterUuid: medication.encounter.uuid,
         commonMedicationName: medication.drug.name,
         isFreeTextDosage: medication.dosingType === 'org.openmrs.FreeTextDosingInstructions',
         freeTextDosage:
@@ -383,7 +393,6 @@ function OrderBasketItemActions({
           valueCoded: medication.route.uuid,
           value: medication.route.display,
         },
-        encounterUuid: medication.encounter.uuid,
         commonMedicationName: medication.drug.name,
         isFreeTextDosage: medication.dosingType === 'org.openmrs.FreeTextDosingInstructions',
         freeTextDosage:

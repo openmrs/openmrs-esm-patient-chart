@@ -1,17 +1,9 @@
 import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
-import {
-  FetchResponse,
-  openmrsFetch,
-  Session,
-  useConfig,
-  OpenmrsResource,
-  showNotification,
-  useSession,
-} from '@openmrs/esm-framework';
+import { FetchResponse, openmrsFetch, Session, useConfig, OpenmrsResource } from '@openmrs/esm-framework';
 import { OrderPost, PatientMedicationFetchResponse } from '../types/order';
 import { ConfigObject } from '../config-schema';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 
 /**
  * Fast, lighweight, reusable data fetcher with built-in cache invalidation that
@@ -95,45 +87,18 @@ export function getOrderTemplatesByDrug(drugUuid: string, abortController?: Abor
   });
 }
 
-export function useCurrentOrderBasketEncounter(patientUuid: string) {
-  const [nowDateString] = new Date().toISOString().split('T');
-  const sessionObject = useSession();
-  const config = useConfig() as ConfigObject;
-  const url = `/ws/rest/v1/encounter?patient=${patientUuid}&fromdate=${nowDateString}&limit=1`;
-  const { data, error, mutate } = useSWR<FetchResponse<{ results: Array<any> }>, Error>(
-    patientUuid ? url : null,
-    openmrsFetch,
-  );
-
-  useEffect(() => {
-    const abortController = new AbortController();
-    if (!data?.data?.results?.length) {
-      createEmptyEncounter(patientUuid, sessionObject, config, abortController).then((res) => {
-        mutate();
-      });
-    }
-
-    return () => abortController.abort();
-  }, [data, mutate, config, patientUuid, sessionObject]);
-
-  const results = useMemo(
-    () => ({
-      isLoadingEncounterUuid: (!data && !error) || !data?.data?.results?.length,
-      encounterUuid: data?.data?.results?.[0],
-      error,
-    }),
-    [data, error],
-  );
-
-  return results;
-}
-
 export function createEmptyEncounter(
   patientUuid: string,
   sessionObject: Session,
   orderBaskestConfig: ConfigObject,
+  currentVisitUuid: string,
+  currentEncounterUuid: string,
   abortController?: AbortController,
 ) {
+  if (currentEncounterUuid) {
+    return Promise.resolve(currentEncounterUuid);
+  }
+
   const emptyEncounter = {
     patient: patientUuid,
     location: sessionObject?.sessionLocation?.uuid,
@@ -145,17 +110,18 @@ export function createEmptyEncounter(
         encounterRole: orderBaskestConfig.clinicianEncounterRole,
       },
     ],
+    visit: currentVisitUuid,
     obs: [],
   };
 
-  return openmrsFetch('/ws/rest/v1/encounter', {
+  return openmrsFetch<OpenmrsResource>('/ws/rest/v1/encouter', {
     headers: {
       'Content-Type': 'application/json',
     },
     method: 'POST',
     body: emptyEncounter,
     signal: abortController?.signal,
-  });
+  }).then((res) => res?.data?.uuid);
 }
 
 export function postOrder(body: OrderPost, abortController?: AbortController) {

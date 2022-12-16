@@ -51,6 +51,7 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
                 showModifyButton={true}
                 showReorderButton={false}
                 showAddNewButton={true}
+                patientUuid={patientUuid}
               />
             );
           }
@@ -77,6 +78,7 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
                 showModifyButton={true}
                 showReorderButton={true}
                 showAddNewButton={true}
+                patientUuid={patientUuid}
               />
             );
           }

@@ -7,9 +7,10 @@ import { OrderPost } from '../types/order';
 export async function orderDrugs(
   orderBasketItems: Array<OrderBasketItem>,
   patientUuid: string,
+  encounterUuid: string,
   abortController: AbortController,
 ) {
-  const dtos = medicationOrderToApiDto(orderBasketItems, patientUuid);
+  const dtos = medicationOrderToApiDto(orderBasketItems, patientUuid, encounterUuid);
   const erroredItems: Array<OrderBasketItem> = [];
 
   for (let i = 0; i < dtos.length; i++) {
@@ -26,7 +27,11 @@ export async function orderDrugs(
   return erroredItems;
 }
 
-function medicationOrderToApiDto(orderBasketItems: Array<OrderBasketItem>, patientUuid: string): Array<OrderPost> {
+function medicationOrderToApiDto(
+  orderBasketItems: Array<OrderBasketItem>,
+  patientUuid: string,
+  encounterUuid: string,
+): Array<OrderPost> {
   return orderBasketItems.map((order) => {
     if (order.action === 'NEW' || order.action === 'RENEWED') {
       return {
@@ -35,7 +40,7 @@ function medicationOrderToApiDto(orderBasketItems: Array<OrderBasketItem>, patie
         type: 'drugorder',
         careSetting: order.careSetting,
         orderer: order.orderer,
-        encounter: order.encounterUuid,
+        encounter: encounterUuid,
         drug: order.drug.uuid,
         dose: order.dosage.value,
         doseUnits: order.unit.valueCoded,
@@ -54,7 +59,7 @@ function medicationOrderToApiDto(orderBasketItems: Array<OrderBasketItem>, patie
         dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
         concept: order.drug.concept.uuid,
         orderReasonNonCoded: order.indication,
-        dateActivated: toOmrsIsoString(order.startDate),
+        dateActivated: toOmrsIsoString(new Date()),
       };
     } else if (order.action === 'REVISE') {
       return {
@@ -64,7 +69,7 @@ function medicationOrderToApiDto(orderBasketItems: Array<OrderBasketItem>, patie
         previousOrder: order.previousOrder,
         careSetting: order.careSetting,
         orderer: order.orderer,
-        encounter: order.encounterUuid,
+        encounter: encounterUuid,
         drug: order.drug.uuid,
         dose: order.dosage.value,
         doseUnits: order.unit.valueCoded,
@@ -83,7 +88,7 @@ function medicationOrderToApiDto(orderBasketItems: Array<OrderBasketItem>, patie
         dosingInstructions: order.isFreeTextDosage ? order.freeTextDosage : order.patientInstructions,
         concept: order.drug.concept.uuid,
         orderReasonNonCoded: order.indication,
-        dateActivated: toOmrsIsoString(order.startDate),
+        dateActivated: toOmrsIsoString(new Date()),
       };
     } else if (order.action === 'DISCONTINUE') {
       return {
@@ -92,7 +97,7 @@ function medicationOrderToApiDto(orderBasketItems: Array<OrderBasketItem>, patie
         previousOrder: order.previousOrder,
         patient: patientUuid,
         careSetting: order.careSetting,
-        encounter: order.encounterUuid,
+        encounter: encounterUuid,
         orderer: order.orderer,
         concept: order.drug.concept.uuid,
         drug: order.drug.uuid,

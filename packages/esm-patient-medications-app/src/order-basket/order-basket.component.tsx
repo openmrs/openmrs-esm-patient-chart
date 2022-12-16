@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
 import { connect } from 'unistore/react';
-import { Button, ButtonSet, DataTableSkeleton, InlineLoading } from '@carbon/react';
+import { Button, ButtonSet, DataTableSkeleton, InlineNotification } from '@carbon/react';
 import { showToast, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
-import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
+import { EmptyState, ErrorState, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import { orderDrugs } from './drug-ordering';
 import { ConfigObject } from '../config-schema';
-import { useCurrentOrderBasketEncounter, useDurationUnits, usePatientOrders } from '../api/api';
+import { createEmptyEncounter, usePatientOrders } from '../api/api';
 import { OrderBasketItem } from '../types/order-basket-item';
 import { OrderBasketStore, OrderBasketStoreActions, orderBasketStoreActions } from '../medications/order-basket-store';
 import MedicationOrderForm from './medication-order-form.component';
@@ -31,10 +31,9 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
   const headerTitle = t('activeMedicationsHeaderTitle', 'active medications');
   const isTablet = useLayoutType() === 'tablet';
   const config = useConfig() as ConfigObject;
-
-  const { encounterUuid, isLoadingEncounterUuid } = useCurrentOrderBasketEncounter(patientUuid);
-
-  const isLoading = isLoadingEncounterUuid;
+  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
+  const [currentEncounterUuid, setEncounterUuid] = useState<string>(null);
+  const [fetchingEncounterError, setFetchingEncounterError] = useState<Error>(null);
   const [medicationOrderFormItem, setMedicationOrderFormItem] = useState<OrderBasketItem | null>(null);
   const [isMedicationOrderFormVisible, setIsMedicationOrderFormVisible] = useState(false);
   const [onMedicationOrderFormSigned, setOnMedicationOrderFormSign] =
@@ -52,9 +51,8 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
       medicationOrderFormItem.careSetting = config.careSettingUuid;
       medicationOrderFormItem.orderer = sessionObject.currentProvider?.uuid;
       medicationOrderFormItem.quantityUnits = config.quantityUnitsUuid;
-      medicationOrderFormItem.encounterUuid = encounterUuid;
     }
-  }, [medicationOrderFormItem, config, sessionObject, encounterUuid]);
+  }, [medicationOrderFormItem, config, sessionObject]);
 
   const handleSearchResultClicked = (searchResult: OrderBasketItem, directlyAddToBasket: boolean) => {
     if (directlyAddToBasket) {
@@ -76,31 +74,51 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
 
   const handleSaveClicked = () => {
     const abortController = new AbortController();
-    orderDrugs(items, patientUuid, abortController).then((erroredItems) => {
-      setItems(erroredItems);
-      if (erroredItems.length == 0) {
-        closeWorkspace();
 
-        showToast({
-          critical: true,
-          kind: 'success',
-          title: t('orderCompleted', 'Order placed'),
-          description: t(
-            'orderCompletedSuccessText',
-            'Your order is complete. The items will now appear on the Orders page.',
-          ),
+    /*
+      When making an order, we should make a new encounter mapped to the current visit and use the same encounter for the 
+      orders.
+      If when saving an order an error occurs, we shouldn't make another encounter for re-trying and hence we are saving 
+      the first fetched encounter's uuid so that we can use the same encounter when retrying to save the order.
+    */
+
+    setFetchingEncounterError(null);
+
+    createEmptyEncounter(patientUuid, sessionObject, config, currentVisit?.uuid, currentEncounterUuid, abortController)
+      .then((encounterUuid: string) => {
+        if (encounterUuid !== currentEncounterUuid) {
+          setEncounterUuid(encounterUuid);
+        }
+
+        orderDrugs(items, patientUuid, encounterUuid, abortController).then((erroredItems) => {
+          setItems(erroredItems);
+
+          if (erroredItems.length == 0) {
+            closeWorkspace();
+
+            showToast({
+              critical: true,
+              kind: 'success',
+              title: t('orderCompleted', 'Order placed'),
+              description: t(
+                'orderCompletedSuccessText',
+                'Your order is complete. The items will now appear on the Orders page.',
+              ),
+            });
+
+            const apiUrlPattern = new RegExp(
+              '\\/ws\\/rest\\/v1\\/order\\?patient\\=' + patientUuid + '\\&careSetting=' + config.careSettingUuid,
+            );
+
+            // Find matching keys from SWR's cache and broadcast a revalidation message to their pre-bound SWR hooks
+            Array.from(cache.keys())
+              .filter((url: string) => apiUrlPattern.test(url))
+              .forEach((url: string) => mutate(url));
+          }
         });
+      })
+      .catch((err: Error) => setFetchingEncounterError(err));
 
-        const apiUrlPattern = new RegExp(
-          '\\/ws\\/rest\\/v1\\/order\\?patient\\=' + patientUuid + '\\&careSetting=' + config.careSettingUuid,
-        );
-
-        // Find matching keys from SWR's cache and broadcast a revalidation message to their pre-bound SWR hooks
-        Array.from(cache.keys())
-          .filter((url: string) => apiUrlPattern.test(url))
-          .forEach((url: string) => mutate(url));
-      }
-    });
     return () => abortController.abort();
   };
 
@@ -124,8 +142,6 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
     );
   };
 
-  if (isLoading) return <InlineLoading className={styles.loader} description={t('loading', 'Loading...')} />;
-
   if (isMedicationOrderFormVisible) {
     return (
       <MedicationOrderForm
@@ -138,7 +154,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
 
   return (
     <>
-      <OrderBasketSearch encounterUuid={encounterUuid} onSearchResultClicked={handleSearchResultClicked} />
+      <OrderBasketSearch onSearchResultClicked={handleSearchResultClicked} />
       <div className={styles.container}>
         <div className={styles.orderBasketContainer}>
           <OrderBasketItemList
@@ -165,6 +181,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
                   showModifyButton={true}
                   showReorderButton={false}
                   showAddNewButton={false}
+                  patientUuid={patientUuid}
                 />
               );
             }
@@ -172,14 +189,26 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
             return <EmptyState displayText={displayText} headerTitle={headerTitle} />;
           })()}
         </div>
-        <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-          <Button className={styles.button} kind="secondary" onClick={handleCancelClicked}>
-            {t('cancel', 'Cancel')}
-          </Button>
-          <Button className={styles.button} kind="primary" onClick={handleSaveClicked}>
-            {t('signAndClose', 'Sign and close')}
-          </Button>
-        </ButtonSet>
+
+        <div>
+          {fetchingEncounterError && (
+            <InlineNotification
+              kind="error"
+              title={t('errorCreatingAnEncounter', 'Error when creating an encounter')}
+              subtitle={t('tryReopeningTheWorkspaceAgain', 'Please try launching the workspace again')}
+              lowContrast={true}
+              className={styles.inlineNotification}
+            />
+          )}
+          <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
+            <Button className={styles.button} kind="secondary" onClick={handleCancelClicked}>
+              {t('cancel', 'Cancel')}
+            </Button>
+            <Button className={styles.button} kind="primary" onClick={handleSaveClicked} disabled={!items.length}>
+              {t('signAndClose', 'Sign and close')}
+            </Button>
+          </ButtonSet>
+        </div>
       </div>
     </>
   );
