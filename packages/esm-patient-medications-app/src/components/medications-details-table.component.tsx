@@ -247,6 +247,7 @@ function InfoTooltip({ orderer }) {
       direction="top"
       label={orderer}
       renderIcon={(props) => <User size={16} {...props} />}
+      iconDescription={orderer}
       kind="ghost"
       size="sm"
     />
