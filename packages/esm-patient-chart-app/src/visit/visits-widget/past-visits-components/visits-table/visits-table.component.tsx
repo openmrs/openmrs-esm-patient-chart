@@ -23,11 +23,12 @@ import {
   TableToolbarSearch,
   Tile,
 } from '@carbon/react';
-import { Edit } from '@carbon/react/icons';
-import { formatDatetime, formatTime, parseDate, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { Edit, TrashCan } from '@carbon/react/icons';
+import { formatDatetime, parseDate, showModal, showToast, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { formEntrySub, launchPatientWorkspace, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { MappedEncounter } from '../visit-summary.component';
 import EncounterObservations from '../../encounter-observations';
+import { deleteEncounter } from './visits-table.resource';
 import styles from './visits-table.scss';
 
 interface VisitTableProps {
@@ -102,6 +103,37 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits }) =>
   const handleEncounterTypeChange = ({ selectedItem }) => {
     setFilter(selectedItem);
   };
+
+  const handleDeleteEncounter = React.useCallback(
+    (encounterUuid: string, encounterTypeName?: string) => {
+      const close = showModal('delete-encounter-modal', {
+        close: () => close(),
+        encounterTypeName: encounterTypeName || '',
+        onConfirmation: () => {
+          const abortController = new AbortController();
+          deleteEncounter(encounterUuid, abortController)
+            .then(() => {
+              showToast({
+                title: t('deleteEncounter', 'Delete Encounter', { encounter: encounterTypeName }),
+                description: `Encounter ${t('successfullyDeleted', 'successfully deleted')}`,
+                kind: 'success',
+              });
+
+              setFilteredRows(visits?.filter((encounter) => encounter.id !== encounterUuid));
+            })
+            .catch((error) => {
+              showToast({
+                title: t('error', 'Error'),
+                description: `Encounter ${t('failedDeleting', "couldn't be deleted")}`,
+                kind: 'error',
+              });
+            });
+          close();
+        },
+      });
+    },
+    [t, visits],
+  );
 
   const handleFilter = ({ rowIds, headers, cellsById, inputValue, getCellId }: FilterProps): Array<string> => {
     return rowIds.filter((rowId) =>
@@ -202,8 +234,9 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits }) =>
                               </OverflowMenuItem>
                               <OverflowMenuItem
                                 className={styles.menuItem}
-                                id="#editEncounter"
+                                id="#deleteEncounter"
                                 itemText={t('deleteThisEncounter', 'Delete this encounter')}
+                                onClick={() => handleDeleteEncounter(visits[i].id, visits[i].form.display)}
                                 hasDivider
                                 isDelete
                               >
@@ -229,6 +262,14 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits }) =>
                             style={{ marginLeft: '-1rem', marginTop: '0.5rem' }}
                           >
                             {t('editEncounter', 'Edit encounter')}
+                          </Button>
+                          <Button
+                            kind="danger--ghost"
+                            onClick={() => handleDeleteEncounter(visits[i].id, visits[i].form.display)}
+                            renderIcon={(props) => <TrashCan size={16} {...props} />}
+                            style={{ marginLeft: '-1rem', marginTop: '0.5rem' }}
+                          >
+                            {t('deleteThisEncounter', 'Delete this encounter')}
                           </Button>
                         </>
                       </TableExpandedRow>
