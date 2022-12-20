@@ -1,5 +1,5 @@
 import type { OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
-import { TestData } from '../filter/filter-types';
+import { TreeNode } from '../filter/filter-types';
 
 export interface PanelNameCornerProps {
   showShadow: boolean;
@@ -21,7 +21,7 @@ interface DataEntry {
   interpretation: OBSERVATION_INTERPRETATION;
 }
 
-interface DataRow extends TestData {
+interface DataRow extends TreeNode {
   entries: Array<DataEntry>;
   display: string;
   name: string;

@@ -5,12 +5,20 @@ interface Observation {
   hasData?: boolean;
 }
 export interface TreeNode {
-  display: string;
+  conceptUuid?: string;
   datatype?: string;
-  subSets?: TreeNode[];
-  obs?: Observation[];
+  display: string;
   flatName: string;
-  hasData?: boolean;
+  hasData?: true;
+  hiCritical?: number;
+  hiNormal?: number;
+  lowAbsolute?: number;
+  lowCritical?: number;
+  lowNormal?: number;
+  obs?: Array<ObservationData>;
+  units?: string;
+  range?: string;
+  [x: string]: any;
 }
 export interface FilterNodeProps {
   root: TreeNode;
@@ -22,12 +30,29 @@ export interface FilterLeafProps {
   leaf: Observation;
 }
 
+export interface TreeParents {
+  [key: string]: Array<string>;
+}
+
+export interface TreeCheckboxes {
+  [key: string]: boolean;
+}
+
+export interface TreeTests {
+  [key: string]: TreeNode;
+}
+
+export interface TreeNode {
+  display: string;
+  flatName: string;
+}
+
 export interface ReducerState {
-  checkboxes: { [key: string]: boolean };
-  parents: { [key: string]: string[] };
+  checkboxes: TreeCheckboxes;
+  parents: TreeParents;
   roots: Array<TreeNode>;
-  tests: { [key: string]: TestData };
-  lowestParents: { display: string; flatName: string }[];
+  tests: TreeTests;
+  lowestParents: Array<TreeNode>;
 }
 
 export enum ReducerActionType {
@@ -49,22 +74,6 @@ export interface ObservationData {
   obsDatetime: string;
   value: string;
   interpretation: OBSERVATION_INTERPRETATION;
-}
-export interface TestData {
-  conceptUuid: string;
-  datatype: string;
-  display: string;
-  flatName: string;
-  hasData: true;
-  hiCritical?: number;
-  hiNormal?: number;
-  lowAbsolute?: number;
-  lowCritical?: number;
-  lowNormal?: number;
-  obs: Array<ObservationData>;
-  units: string;
-  range: string;
-  [x: string]: any;
 }
 
 export interface ParsedTimeType {
@@ -104,7 +113,7 @@ export interface obsShape {
   [key: string]: any;
 }
 
-export interface RowData extends TestData {
+export interface RowData extends TreeNode {
   entries: Array<
     | {
         obsDatetime: string;

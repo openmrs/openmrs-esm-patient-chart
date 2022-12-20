@@ -5,7 +5,7 @@ import { parseTime } from '../panel-timeline/helpers';
 import { TreeNode, FilterContextProps, ReducerState, ReducerActionType, TimelineData } from './filter-types';
 import reducer from './filter-reducer';
 
-const initialState = {
+const initialState: ReducerState = {
   checkboxes: {},
   parents: {},
   roots: [{ display: '', flatName: '' }],
@@ -36,6 +36,7 @@ export interface FilterProviderProps {
 
 const FilterProvider = ({ roots, children }: FilterProviderProps) => {
   const [state, dispatch] = useReducer(reducer, initialState);
+  console.log('state', state);
   const { t } = useTranslation();
 
   const actions = useMemo(
