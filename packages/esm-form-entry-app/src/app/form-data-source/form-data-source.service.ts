@@ -3,11 +3,13 @@ import { Injectable } from '@angular/core';
 import { take, map, tap } from 'rxjs/operators';
 import { Observable, Subject } from 'rxjs';
 
+import { FetchResponse, fhirBaseUrl, FHIRResource, openmrsFetch } from '@openmrs/esm-framework';
+
 import { ProviderResourceService } from '../openmrs-api/provider-resource.service';
 import { LocationResourceService } from '../openmrs-api/location-resource.service';
 import { ConceptResourceService } from '../openmrs-api/concept-resource.service';
 import { LocalStorageService } from '../local-storage/local-storage.service';
-import { Concept, Location, Provider } from '../types';
+import type { Concept, FormSchema, Location, Observation, Provider, Questions } from '../types';
 
 @Injectable()
 export class FormDataSourceService {
@@ -18,7 +20,7 @@ export class FormDataSourceService {
     private localStorageService: LocalStorageService,
   ) {}
 
-  public getDataSources() {
+  public getDataSources(formSchema: FormSchema) {
     return {
       location: {
         resolveSelectedValue: this.getLocationByUuid.bind(this),
@@ -37,6 +39,7 @@ export class FormDataSourceService {
         searchOptions: this.findProblem.bind(this),
       },
       conceptAnswers: this.getWhoStagingCriteriaDataSource(),
+      recentObs: this.getMostRecentObsDataSource(formSchema),
     };
   }
 
@@ -86,6 +89,40 @@ export class FormDataSourceService {
     return datasource;
   }
 
+  private getMostRecentObsDataSource(formSchema: FormSchema) {
+    const conceptIdentifiers: Set<string> = new Set();
+    for (const page of formSchema.pages) {
+      for (const section of page.sections) {
+        this.extractMostRecentObsConceptIds(section.questions, conceptIdentifiers);
+      }
+    }
+
+    return (patient: string) => {
+      return this.fetchMostRecentObsValue(patient, [...conceptIdentifiers]);
+    };
+  }
+
+  private extractMostRecentObsConceptIds(questions: Array<Questions>, concepts: Set<string>) {
+    for (const question of questions) {
+      const useMostRecentValue = question.questionOptions?.useMostRecentValue ?? false;
+      if (useMostRecentValue === 'true' || (typeof useMostRecentValue === 'boolean' && useMostRecentValue)) {
+        if (typeof question.concept === 'string') {
+          concepts.add(question.concept);
+          continue;
+        }
+
+        if (typeof question.questionOptions?.concept === 'string') {
+          concepts.add(question.questionOptions.concept);
+          continue;
+        }
+
+        if (Array.isArray(question.questions)) {
+          this.extractMostRecentObsConceptIds(question.questions, concepts);
+        }
+      }
+    }
+  }
+
   public findProvider(searchText): Observable<any[]> {
     return this.providerResourceService.searchProvider(searchText).pipe(
       map((providers) => providers.filter((p) => !!p.person).map(this.mapProvider)),
@@ -111,6 +148,76 @@ export class FormDataSourceService {
     return this.locationResourceService.searchLocation(searchText).pipe(
       map((locations) => locations.map(this.mapLocation)),
       take(10),
+    );
+  }
+
+  private fetchMostRecentObsValue(patient: string, concepts: string | Array<string>) {
+    if (!patient) {
+      throw new Error('patient must be provided in call to fetchMostRecentObsValue');
+    }
+
+    if (!concepts) {
+      throw new Error('at least one concept must be provided in call to fetchMostRecentObsValue');
+    }
+
+    if (typeof concepts === 'string') {
+      concepts = [concepts];
+    }
+
+    if (!Array.isArray(concepts)) {
+      throw new Error(
+        `concepts must be supplied to fetchMostRecentObsValue as either a string or array or strings. Instead, we got ${JSON.stringify(
+          concepts,
+        )}`,
+      );
+    }
+
+    const urlParams = new URLSearchParams({
+      patient,
+      code: concepts.join(','),
+      max: '1',
+      _summary: 'data',
+    });
+
+    return openmrsFetch<{ entry: Array<FHIRResource> }>(
+      `${fhirBaseUrl}/Observation/$lastn?${urlParams.toString()}`,
+      // TODO: Why do we need the duplicate type signature here?
+    ).then((response: FetchResponse<{ entry: Array<FHIRResource> }>) =>
+      response.ok
+        ? // The output of this reduce() call is intended to be an object similar to an OpenMRS REST Encounter
+          // This allows it to be consumed by the historical data source
+          response.data.entry?.reduce<{ obs: Array<Partial<Observation>> }>(
+            (acc, entry) => {
+              if (entry.resource && entry.resource.resourceType === 'Observation' && entry.resource.code) {
+                const code = entry.resource.code.coding.find((c) => !Boolean(c.system))?.code;
+                let value: string | number | { uuid: string };
+                if (typeof entry.resource.valueString !== 'undefined' && entry.resource.valueString !== null) {
+                  value = entry.resource.valueString;
+                } else if (
+                  typeof entry.resource.valueQuantity?.value !== 'undefined' &&
+                  entry.resource.valueQuantity?.value !== null
+                ) {
+                  value = entry.resource.valueQuantity.value;
+                } else {
+                  const coding = entry.resource.valueCodeableConcept?.coding?.find((c) => !Boolean(c.system))?.code;
+                  if (typeof coding !== 'undefined' && coding !== null) {
+                    value = { uuid: coding };
+                  }
+                }
+
+                if (typeof code !== 'undefined' && code !== null && typeof value !== 'undefined') {
+                  acc.obs.push({
+                    concept: { uuid: code, display: null, conceptClass: null },
+                    value,
+                  });
+                }
+              }
+
+              return acc;
+            },
+            { obs: [] },
+          )
+        : { obs: [] },
     );
   }
 

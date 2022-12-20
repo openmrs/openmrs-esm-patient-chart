@@ -157,6 +157,7 @@ interface QuestionOptions {
   rendering: string;
   concept?: string;
   answers?: Array<QuestionOptionsAnswer>;
+  useMostRecentValue: boolean | 'true';
 }
 
 interface QuestionOptionsAnswer {
