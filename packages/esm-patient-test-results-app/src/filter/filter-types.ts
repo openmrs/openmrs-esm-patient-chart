@@ -43,15 +43,12 @@ export interface TreeTests {
   [key: string]: TreeNode;
 }
 
-export interface TreeNode {
-  display: string;
-  flatName: string;
-}
+export type LowestNode = Pick<TreeNode, 'display' | 'flatName'>;
 
 export interface ReducerState {
   checkboxes: TreeCheckboxes;
   parents: TreeParents;
-  roots: Array<TreeNode>;
+  roots: Array<LowestNode>;
   tests: TreeTests;
   lowestParents: Array<TreeNode>;
 }

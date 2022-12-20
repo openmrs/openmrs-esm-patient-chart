@@ -1,4 +1,4 @@
-import { ReducerAction, ReducerState, ReducerActionType, TreeParents, TreeNode } from './filter-types';
+import { ReducerAction, ReducerState, ReducerActionType, TreeParents, TreeNode, LowestNode } from './filter-types';
 
 export const getName = (prefix, name) => {
   return prefix ? `${prefix}-${name}` : name;
@@ -11,12 +11,12 @@ const computeParents = (
   parents: TreeParents;
   leaves: Array<string>;
   tests: Array<[string, TreeNode]>;
-  lowestParents: Array<TreeNode>;
+  lowestParents: Array<LowestNode>;
 } => {
   let parents: TreeParents = {};
   const leaves: Array<string> = [];
   const tests: Array<[string, TreeNode]> = [];
-  const lowestParents: Array<TreeNode> = [];
+  const lowestParents: Array<LowestNode> = [];
   if (node?.subSets?.length && node.subSets[0].obs) {
     // lowest parent
     const activeLeaves: Array<string> = [];
@@ -33,7 +33,7 @@ const computeParents = (
     });
     leaves.push(...activeLeaves);
     tests.push(...activeTests);
-    lowestParents.push({ flatName: node.flatName, display: node.display, ...node });
+    lowestParents.push({ flatName: node.flatName, display: node.display });
   } else if (node?.subSets?.length) {
     node.subSets.forEach((subNode) => {
       const {
@@ -58,7 +58,7 @@ function reducer(state: ReducerState, action: ReducerAction): ReducerState {
       let parents: TreeParents = {},
         leaves: Array<string> = [],
         tests: Array<[string, TreeNode]> = [],
-        lowestParents: Array<TreeNode> = [];
+        lowestParents: Array<LowestNode> = [];
       action.trees?.forEach((tree) => {
         // if anyone knows a shorthand for this i'm stoked to learn it :)
         const {
