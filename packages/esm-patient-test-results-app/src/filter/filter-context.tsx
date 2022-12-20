@@ -36,7 +36,6 @@ export interface FilterProviderProps {
 
 const FilterProvider = ({ roots, children }: FilterProviderProps) => {
   const [state, dispatch] = useReducer(reducer, initialState);
-  console.log('state', state);
   const { t } = useTranslation();
 
   const actions = useMemo(

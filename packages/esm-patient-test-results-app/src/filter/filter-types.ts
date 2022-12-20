@@ -9,6 +9,7 @@ export interface TreeNode {
   datatype?: string;
   display: string;
   flatName: string;
+  subSets?: Array<TreeNode>;
   hasData?: true;
   hiCritical?: number;
   hiNormal?: number;

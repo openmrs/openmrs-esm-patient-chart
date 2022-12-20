@@ -4,22 +4,30 @@ export const getName = (prefix, name) => {
   return prefix ? `${prefix}-${name}` : name;
 };
 
-const computeParents = (prefix: string, node: TreeNode) => {
+const computeParents = (
+  prefix: string,
+  node: TreeNode,
+): {
+  parents: TreeParents;
+  leaves: Array<string>;
+  tests: Array<[string, TreeNode]>;
+  lowestParents: Array<TreeNode>;
+} => {
   let parents: TreeParents = {};
-  let leaves: Array<string> = [];
-  let tests: Array<[string, TreeNode]> = [];
-  let lowestParents: Array<TreeNode> = [];
+  const leaves: Array<string> = [];
+  const tests: Array<[string, TreeNode]> = [];
+  const lowestParents: Array<TreeNode> = [];
   if (node?.subSets?.length && node.subSets[0].obs) {
     // lowest parent
-    let activeLeaves: Array<string> = [];
+    const activeLeaves: Array<string> = [];
     node.subSets.forEach((leaf) => {
       if (leaf.hasData) {
         activeLeaves.push(leaf.flatName);
       }
     });
-    let activeTests: Array<[string, TreeNode]> = [];
+    const activeTests: Array<[string, TreeNode]> = [];
     node.subSets.forEach((leaf) => {
-      if (leaf.obs?.length) {
+      if (Array.isArray(leaf?.obs) && leaf.obs.length > 0) {
         activeTests.push([leaf.flatName, leaf]);
       }
     });
@@ -82,7 +90,7 @@ function reducer(state: ReducerState, action: ReducerAction): ReducerState {
       };
     case ReducerActionType.UDPATEPARENT:
       const affectedLeaves = state.parents[action.name];
-      let checkboxes = JSON.parse(JSON.stringify(state.checkboxes));
+      const checkboxes = JSON.parse(JSON.stringify(state.checkboxes));
       const allChecked = affectedLeaves.every((leaf) => checkboxes[leaf]);
       affectedLeaves.forEach((leaf) => (checkboxes[leaf] = !allChecked));
       return {
