@@ -22,10 +22,6 @@ export interface CreateFormParams {
    */
   user: LoggedInUser;
   /**
-   * The uuid of the current patient
-   */
-  patientUuid: string;
-  /**
    * An optional encounter.
    * If provided, this encounter will be edited by the form.
    * This can be an offline encounter form the sync queue which hasn't been synchronized yet.
@@ -115,7 +111,8 @@ export class FormCreationService {
     this.dataSources.registerDataSource('patient', { visitTypeUuid }, true);
     this.dataSources.registerDataSource('patient', dataSources, true);
     this.dataSources.registerDataSource('rawPrevEnc', createFormParams.previousEncounter, false);
-    this.dataSources.registerDataSource('rawPrevObs', await dataSources.recentObs(createFormParams.patientUuid), false);
+    const rawPrevObs = await dataSources.recentObs(patient.id);
+    this.dataSources.registerDataSource('rawPrevObs', rawPrevObs, false);
     this.dataSources.registerDataSource('userLocation', createFormParams.user.sessionLocation);
 
     // TODO monthlySchedule should be converted to a "standard" configurableDataSource

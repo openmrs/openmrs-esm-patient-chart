@@ -59,7 +59,7 @@
     "slick-carousel": "^1.6.0",
     "systemjs-webpack-interop": "^2.3.7",
     "tree-model": "^1.0.5",
-    "tslib": "^2.0.0",
+    "tslib": "^2.4.1",
     "uuid": "^8.3.2",
     "zone.js": "~0.11.8"
   },

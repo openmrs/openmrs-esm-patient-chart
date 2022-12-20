@@ -111,7 +111,6 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
     return forkJoin({
       formSchema: this.fetchCompiledFormSchema(this.formUuid).pipe(take(1)),
       user: this.openmrsApi.getCurrentUserLocation().pipe(take(1)),
-      patientUuid: this.singleSpaPropsService.getProp('patientUuid'),
       encounter: encounterOrSyncItemId ? this.getEncounterToEdit(encounterOrSyncItemId).pipe(take(1)) : of(null),
     }).pipe(
       mergeMap((result) =>
