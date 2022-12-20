@@ -47,10 +47,10 @@ jobs:
         run: yarn run test
       
       - name: Run lint and typecheck
-        run: yarn turbo run lint typescript --color"
+        run: yarn turbo run lint typescript --color
       
       - name: Run build
-        run: yarn turbo run build --color --concurrency=5"
+        run: yarn turbo run build --color --concurrency=5
   
   pre_release:
     runs-on: ubuntu-latest
