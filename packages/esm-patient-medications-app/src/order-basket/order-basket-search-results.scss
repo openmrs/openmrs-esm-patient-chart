@@ -3,7 +3,7 @@
 @import "../root";
 
 .container {
-  margin: 1rem 1rem 0.5rem;
+  margin: spacing.$spacing-03 1rem spacing.$spacing-03;
 }
 
 .desktopSearchResultTile {
@@ -11,7 +11,7 @@
   border-left: 4px solid var(--brand-03);
 
   &:not(:last-of-type) {
-    margin-bottom: 0.5rem;
+    margin-bottom: spacing.$spacing-03;
   }
 }
 
@@ -31,11 +31,11 @@
 }
 
 .desktopDivider {
-  margin: 3rem auto;
+  margin: spacing.$spacing-07 auto spacing.$spacing-05;
 }
 
 .tabletDivider {
-  margin: 2.5rem auto;
+  margin: spacing.$spacing-08 auto spacing.$spacing-06;
 }
 
 .searchResultsCount {
@@ -46,7 +46,8 @@
 .orderBasketSearchResultsHeader {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 0.875rem;
+  margin-bottom: spacing.$spacing-03;
+  align-items: center;
 }
 
 .searchResultTile {

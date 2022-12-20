@@ -183,16 +183,16 @@ export class FormSchemaService {
     const results = new Set<string>();
     const walkQuestions = (questions: Array<Questions>) => {
       for (const question of questions) {
-        if (typeof question.concept === 'string') {
+        if (!question.label && typeof question.concept === 'string') {
           results.add(question.concept);
         }
 
-        if (typeof question.questionOptions?.concept === 'string') {
+        if (!question.label && typeof question.questionOptions?.concept === 'string') {
           results.add(question.questionOptions.concept);
         }
 
         for (const answer of question.questionOptions?.answers ?? []) {
-          if (typeof answer.concept === 'string') {
+          if (!answer.label && typeof answer.concept === 'string') {
             results.add(answer.concept);
           }
         }

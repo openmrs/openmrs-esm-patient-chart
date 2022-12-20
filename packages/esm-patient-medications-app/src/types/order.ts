@@ -1,4 +1,4 @@
-import { OpenmrsResource } from './openmrs-resource';
+import { OpenmrsResource } from '@openmrs/esm-framework';
 
 export interface PatientMedicationFetchResponse {
   results: Array<Order>;

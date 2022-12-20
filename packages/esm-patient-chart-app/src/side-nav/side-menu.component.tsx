@@ -8,7 +8,7 @@ interface SideMenuPanelProps extends SideNavProps {}
 const SideMenuPanel: React.FC<SideMenuPanelProps> = () => {
   const layout = useLayoutType();
 
-  return isDesktop(layout) && <LeftNavMenu />;
+  return layout === 'large-desktop' && <LeftNavMenu />;
 };
 
 export default SideMenuPanel;

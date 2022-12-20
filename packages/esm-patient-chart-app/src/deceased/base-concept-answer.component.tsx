@@ -6,6 +6,7 @@ import { Search, RadioButtonGroup, RadioButton } from '@carbon/react';
 import { EmptyState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { ConceptAnswer } from './deceased.resource';
 
 interface BaseConceptAnswerProps {
   onChange: (event) => void;
@@ -30,7 +31,7 @@ const BaseConceptAnswer: React.FC<BaseConceptAnswerProps> = ({ onChange, isPatie
 
   const handleSearch = React.useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), 300), [setSearchTerm]);
 
-  const { results, currentPage, goTo } = usePagination(searchResults, 10);
+  const { results, currentPage, goTo } = usePagination<ConceptAnswer>(searchResults, 10);
 
   return (
     <div

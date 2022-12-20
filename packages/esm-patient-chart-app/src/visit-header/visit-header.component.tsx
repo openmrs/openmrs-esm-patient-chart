@@ -107,7 +107,6 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
 const VisitHeader: React.FC = () => {
   const { t } = useTranslation();
   const { patient } = usePatient();
-  const isTabletViewPort = useLayoutType() === 'tablet';
   const [showVisitHeader, setShowVisitHeader] = useState<boolean>(true);
   const [isSideMenuExpanded, setIsSideMenuExpanded] = useState(false);
   const navMenuItems = useAssignedExtensions('patient-chart-dashboard-slot').map((extension) => extension.id);
@@ -115,10 +114,7 @@ const VisitHeader: React.FC = () => {
 
   const { currentVisit, isValidating } = useVisit(patient?.id);
   const launchStartVisitForm = React.useCallback(() => launchPatientWorkspace('start-visit-workspace-form'), []);
-  const showHamburger = useMemo(
-    () => isTabletViewPort && navMenuItems.length > 0,
-    [navMenuItems.length, isTabletViewPort],
-  );
+  const showHamburger = useLayoutType() !== 'large-desktop' && navMenuItems.length > 0;
 
   const isLoading = isValidating && currentVisit === null;
   const visitNotLoaded = !isValidating && currentVisit === null;

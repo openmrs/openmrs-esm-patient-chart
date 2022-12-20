@@ -14,7 +14,7 @@ import {
 import { WarningFilled } from '@carbon/react/icons';
 import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import { ExtensionSlot, useLayoutType, showNotification, showToast, showModal } from '@openmrs/esm-framework';
-import { markPatientDeceased, usePatientDeceased } from './deceased.resource';
+import { markPatientDeceased, usePatientDeathConcepts, usePatientDeceased } from './deceased.resource';
 import BaseConceptAnswer from './base-concept-answer.component';
 
 import styles from './deceased-form.scss';
@@ -24,14 +24,15 @@ const MarkPatientDeceasedForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
   const isTablet = useLayoutType() === 'tablet';
   const state = useMemo(() => ({ patientUuid }), [patientUuid]);
   const [selectedCauseOfDeath, setSelectedCauseOfDeath] = useState('');
-  const { conceptAnswers, personUuid, deathDate, isDead, isLoading, refetchPatient } = usePatientDeceased(patientUuid);
+  const { conceptAnswers } = usePatientDeathConcepts();
+  const { deathDate, isDead, isLoading } = usePatientDeceased(patientUuid);
   const [newDeceasedDate, setNewDeceasedDate] = useState<Date>(
     isDead ? new Date(dayjs(deathDate).year(), dayjs(deathDate).month(), dayjs(deathDate).date() - 1) : new Date(),
   );
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    markPatientDeceased(newDeceasedDate, personUuid, selectedCauseOfDeath, new AbortController())
+    markPatientDeceased(newDeceasedDate, patientUuid, selectedCauseOfDeath, new AbortController())
       .then((response) => {
         if (response.ok) {
           showToast({
@@ -40,7 +41,6 @@ const MarkPatientDeceasedForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
             title: t('confirmDeceased', 'Confirm Deceased'),
             description: t('setDeceasedSuccessfully', 'Patient has been marked dead successfully'),
           });
-          refetchPatient();
           closeWorkspace();
         }
       })

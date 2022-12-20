@@ -5,7 +5,7 @@ import {
   MedicationRoute,
   OrderTemplate,
 } from '../api/drug-order-template';
-import { OpenmrsResource } from './openmrs-resource';
+import { OpenmrsResource } from '@openmrs/esm-framework';
 import { Drug } from './order';
 
 export interface OrderBasketItem {
