@@ -26,13 +26,15 @@ const WorkspaceWindow: React.FC<ContextWorkspaceParams> = ({ patientUuid }) => {
 
   useEffect(() => {
     if (windowSize.size == 'normal') {
+      workspaces.map((result) => {
+        result.additionalProps = undefined;
+      });
     } else if (windowSize.size == 'hidden') {
       workspaces.map((result) => {
         result.additionalProps = { windowsize: 'hidden' };
       });
     }
-  }, [windowSize]);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [windowSize, workspaces]);
 
   useEffect(() => {
     if (active && (maximized || normal)) {
