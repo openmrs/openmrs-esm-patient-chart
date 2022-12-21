@@ -31,7 +31,7 @@ const WorkspaceWindow: React.FC<ContextWorkspaceParams> = ({ patientUuid }) => {
         result.additionalProps = { windowsize: 'hidden' };
       });
     }
-  }, [windowSize]);
+  }, [windowSize, workspaces]);
 
   useEffect(() => {
     if (active && (maximized || normal)) {
