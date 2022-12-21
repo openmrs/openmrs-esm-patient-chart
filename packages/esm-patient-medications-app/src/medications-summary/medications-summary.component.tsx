@@ -29,7 +29,7 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
         closeModal: () => dispose(),
       });
     }
-  }, [currentVisit]);
+  }, [currentVisit, patientUuid]);
 
   const {
     data: activeOrders,

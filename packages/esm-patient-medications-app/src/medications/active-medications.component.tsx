@@ -44,7 +44,7 @@ const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patientUuid, show
       });
     }
     ('order-basket-workspace');
-  }, []);
+  }, [currentVisit, patientUuid]);
 
   if (isLoading) return <DataTableSkeleton role="progressbar" />;
 

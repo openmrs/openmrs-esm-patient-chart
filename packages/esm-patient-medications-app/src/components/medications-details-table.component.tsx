@@ -70,7 +70,7 @@ const MedicationsDetailsTable = connect<
           closeModal: () => dispose(),
         });
       }
-    }, [currentVisit]);
+    }, [currentVisit, patientUuid]);
 
     const tableHeaders = [
       {
