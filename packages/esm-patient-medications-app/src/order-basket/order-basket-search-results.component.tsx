@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Pagination, ClickableTile, Tile, SkeletonText, SkeletonIcon } from '@carbon/react';
+import { Button, ClickableTile, Tile, SkeletonText, SkeletonIcon } from '@carbon/react';
 import { ShoppingCart } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { createErrorHandler, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { searchMedications } from './drug-search';
 import { OrderBasketItem } from '../types/order-basket-item';
-import { paginate } from '../utils/pagination';
 import { ConfigObject } from '../config-schema';
 import styles from './order-basket-search-results.scss';
 
@@ -26,9 +25,6 @@ export default function OrderBasketSearchResults({
   const isTablet = useLayoutType() === 'tablet';
   const [isLoading, setIsLoading] = useState(false);
   const [searchResults, setSearchResults] = useState<Array<OrderBasketItem>>([]);
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [currentSearchResultPage] = paginate(searchResults, page, pageSize);
   const config = useConfig() as ConfigObject;
 
   useEffect(() => {
@@ -39,6 +35,7 @@ export default function OrderBasketSearchResults({
         return;
       }
       setIsLoading(true);
+
       searchMedications(searchTerm, encounterUuid, abortController, config.daysDurationUnit).then((results) => {
         setIsLoading(false);
         setSearchResults(results);
@@ -56,12 +53,7 @@ export default function OrderBasketSearchResults({
 
   return (
     <>
-      {!!searchTerm && isLoading && (
-        <>
-          <DrugOrderSearchResultSkeleton />
-          <DrugOrderSearchResultSkeleton />
-        </>
-      )}
+      {!!searchTerm && isLoading && <Skeleton />}
       {!!searchTerm && !isLoading && (
         <div className={styles.container}>
           <div className={styles.orderBasketSearchResultsHeader}>
@@ -72,10 +64,10 @@ export default function OrderBasketSearchResults({
               })}
             </span>
             <Button kind="ghost" onClick={() => setSearchTerm('')} size={isTablet ? 'md' : 'sm'}>
-              {t('clearSearchResults', 'Clear Results')}
+              {t('clearSearchResults', 'Clear results')}
             </Button>
           </div>
-          {currentSearchResultPage.map((result, index) => (
+          {searchResults?.map((result, index) => (
             <ClickableTile
               role="listitem"
               key={index}
@@ -108,21 +100,7 @@ export default function OrderBasketSearchResults({
             </ClickableTile>
           ))}
           {searchResults.length > 0 && (
-            <>
-              <Pagination
-                page={page}
-                pageSize={pageSize}
-                pageSizes={[10, 20, 30, 40, 50]}
-                totalItems={searchResults.length}
-                onChange={({ page, pageSize }) => {
-                  setPage(page);
-                  setPageSize(pageSize);
-                }}
-              />
-              <hr
-                className={`${styles.divider} ${isTablet ? `${styles.tabletDivider}` : `${styles.desktopDivider}`}`}
-              />
-            </>
+            <hr className={`${styles.divider} ${isTablet ? `${styles.tabletDivider}` : `${styles.desktopDivider}`}`} />
           )}
         </div>
       )}
@@ -130,11 +108,15 @@ export default function OrderBasketSearchResults({
   );
 }
 
-const DrugOrderSearchResultSkeleton = () => {
+const Skeleton = () => {
   return (
-    <Tile>
-      <div className={styles.searchResultSkeletonWrapper}>
-        <SkeletonIcon style={{ height: '26px', margin: '0px 15px 10px', width: '23px' }} />
+    <Tile className={styles.searchResultSkeletonWrapper}>
+      <div>
+        <SkeletonIcon className={styles.skeletonIcon} />
+        <SkeletonText lineCount={4} />
+      </div>
+      <div>
+        <SkeletonIcon className={styles.skeletonIcon} />
         <SkeletonText lineCount={4} />
       </div>
     </Tile>

@@ -108,12 +108,10 @@ export function useCurrentOrderBasketEncounter(patientUuid: string) {
   useEffect(() => {
     const abortController = new AbortController();
     if (!data?.data?.results?.length) {
-      createEmptyEncounter(patientUuid, sessionObject, config, abortController).then((res) => {
-        mutate();
-      });
+      createEmptyEncounter(patientUuid, sessionObject, config, abortController)
+        .then(() => mutate())
+        .catch((error) => console.error('Error creating empty encounter', error));
     }
-
-    return () => abortController.abort();
   }, [data, mutate, config, patientUuid, sessionObject]);
 
   const results = useMemo(

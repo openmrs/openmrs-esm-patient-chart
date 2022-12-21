@@ -140,7 +140,7 @@ const MedicationsDetailsTable = connect<
         content: (
           <div className={styles.startDateColumn}>
             <span>{formatDate(new Date(medication.dateActivated))}</span>
-            <InfoTooltip orderer={medication.orderer?.person?.display ?? '--'} />
+            <InfoTooltip orderer={medication.orderer?.person?.display ?? '--'} t={t} />
           </div>
         ),
       },
@@ -227,13 +227,14 @@ const MedicationsDetailsTable = connect<
   },
 );
 
-function InfoTooltip({ orderer }) {
+function InfoTooltip({ orderer, t }) {
   return (
     <IconButton
       className={styles.tooltip}
       align="top-left"
       direction="top"
       label={orderer}
+      iconDescription={t('orderer', 'Orderer')}
       renderIcon={(props) => <User size={16} {...props} />}
       kind="ghost"
       size="sm"

@@ -66,6 +66,24 @@
 }
 
 .searchResultSkeletonWrapper {
-  @extend .searchResultTile;
-  border-bottom: 1px solid $ui-03;
+  display: flex;
+  flex-direction: column;
+
+  > div {
+    padding-bottom: 0.5rem;
+    display: flex;
+  
+    &:first-of-type {
+      border-bottom: 1px solid $ui-03;
+    }
+
+    &:last-of-type {
+      margin-top: 1rem;
+    }
+  }
+}
+
+.skeletonIcon {
+  margin: 0 1rem 0.5rem;
+  width: 1.5rem;
 }
