@@ -7,7 +7,7 @@ import { showToast, useConfig, useLayoutType, useSession } from '@openmrs/esm-fr
 import { EmptyState, ErrorState, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import { orderDrugs } from './drug-ordering';
 import { ConfigObject } from '../config-schema';
-import { createEmptyEncounter, usePatientOrders } from '../api/api';
+import { useCurrentOrderBasketEncounter, usePatientOrders } from '../api/api';
 import { OrderBasketItem } from '../types/order-basket-item';
 import { OrderBasketStore, OrderBasketStoreActions, orderBasketStoreActions } from '../medications/order-basket-store';
 import MedicationOrderForm from './medication-order-form.component';
@@ -31,9 +31,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
   const headerTitle = t('activeMedicationsHeaderTitle', 'active medications');
   const isTablet = useLayoutType() === 'tablet';
   const config = useConfig() as ConfigObject;
-  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
-  const [currentEncounterUuid, setEncounterUuid] = useState<string>(null);
-  const [fetchingEncounterError, setFetchingEncounterError] = useState<Error>(null);
+  const { encounterUuid, creatingEncounterError } = useCurrentOrderBasketEncounter(patientUuid);
   const [medicationOrderFormItem, setMedicationOrderFormItem] = useState<OrderBasketItem | null>(null);
   const [isMedicationOrderFormVisible, setIsMedicationOrderFormVisible] = useState(false);
   const [onMedicationOrderFormSigned, setOnMedicationOrderFormSign] =
@@ -75,49 +73,32 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
   const handleSaveClicked = () => {
     const abortController = new AbortController();
 
-    /*
-      When making an order, we should make a new encounter mapped to the current visit and use the same encounter for the 
-      orders.
-      If when saving an order an error occurs, we shouldn't make another encounter for re-trying and hence we are saving 
-      the first fetched encounter's uuid so that we can use the same encounter when retrying to save the order.
-    */
+    orderDrugs(items, patientUuid, encounterUuid, abortController).then((erroredItems) => {
+      setItems(erroredItems);
 
-    setFetchingEncounterError(null);
+      if (erroredItems.length == 0) {
+        closeWorkspace();
 
-    createEmptyEncounter(patientUuid, sessionObject, config, currentVisit?.uuid, currentEncounterUuid, abortController)
-      .then((encounterUuid: string) => {
-        if (encounterUuid !== currentEncounterUuid) {
-          setEncounterUuid(encounterUuid);
-        }
-
-        orderDrugs(items, patientUuid, encounterUuid, abortController).then((erroredItems) => {
-          setItems(erroredItems);
-
-          if (erroredItems.length == 0) {
-            closeWorkspace();
-
-            showToast({
-              critical: true,
-              kind: 'success',
-              title: t('orderCompleted', 'Order placed'),
-              description: t(
-                'orderCompletedSuccessText',
-                'Your order is complete. The items will now appear on the Orders page.',
-              ),
-            });
-
-            const apiUrlPattern = new RegExp(
-              '\\/ws\\/rest\\/v1\\/order\\?patient\\=' + patientUuid + '\\&careSetting=' + config.careSettingUuid,
-            );
-
-            // Find matching keys from SWR's cache and broadcast a revalidation message to their pre-bound SWR hooks
-            Array.from(cache.keys())
-              .filter((url: string) => apiUrlPattern.test(url))
-              .forEach((url: string) => mutate(url));
-          }
+        showToast({
+          critical: true,
+          kind: 'success',
+          title: t('orderCompleted', 'Order placed'),
+          description: t(
+            'orderCompletedSuccessText',
+            'Your order is complete. The items will now appear on the Orders page.',
+          ),
         });
-      })
-      .catch((err: Error) => setFetchingEncounterError(err));
+
+        const apiUrlPattern = new RegExp(
+          '\\/ws\\/rest\\/v1\\/order\\?patient\\=' + patientUuid + '\\&careSetting=' + config.careSettingUuid,
+        );
+
+        // Find matching keys from SWR's cache and broadcast a revalidation message to their pre-bound SWR hooks
+        Array.from(cache.keys())
+          .filter((url: string) => apiUrlPattern.test(url))
+          .forEach((url: string) => mutate(url));
+      }
+    });
 
     return () => abortController.abort();
   };
@@ -191,7 +172,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
         </div>
 
         <div>
-          {fetchingEncounterError && (
+          {creatingEncounterError && (
             <InlineNotification
               kind="error"
               title={t('errorCreatingAnEncounter', 'Error when creating an encounter')}
@@ -204,7 +185,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
             <Button className={styles.button} kind="secondary" onClick={handleCancelClicked}>
               {t('cancel', 'Cancel')}
             </Button>
-            <Button className={styles.button} kind="primary" onClick={handleSaveClicked} disabled={!items.length}>
+            <Button className={styles.button} kind="primary" onClick={handleSaveClicked} disabled={!encounterUuid}>
               {t('signAndClose', 'Sign and close')}
             </Button>
           </ButtonSet>

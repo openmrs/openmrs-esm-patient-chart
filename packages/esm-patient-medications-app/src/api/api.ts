@@ -1,9 +1,10 @@
 import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
-import { FetchResponse, openmrsFetch, Session, useConfig, OpenmrsResource } from '@openmrs/esm-framework';
+import { FetchResponse, openmrsFetch, useConfig, OpenmrsResource, useSession } from '@openmrs/esm-framework';
 import { OrderPost, PatientMedicationFetchResponse } from '../types/order';
 import { ConfigObject } from '../config-schema';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 
 /**
  * Fast, lighweight, reusable data fetcher with built-in cache invalidation that
@@ -46,7 +47,7 @@ export function getPatientEncounterId(patientUuid: string, abortController: Abor
 
 export function getDrugByName(drugName: string, abortController?: AbortController) {
   return openmrsFetch(
-    `/ws/rest/v1/drug?q=${drugName}&v=custom:(uuid,name,strength,dosageForm:(display,uuid),concept)`,
+    `/ws/rest/v1/drug?q=${drugName}&v=custom:(uuid,display,name,strength,dosageForm:(display,uuid),concept)`,
     {
       signal: abortController?.signal,
     },
@@ -87,34 +88,89 @@ export function getOrderTemplatesByDrug(drugUuid: string, abortController?: Abor
   });
 }
 
+export function useCurrentOrderBasketEncounter(patientUuid: string) {
+  const { currentVisit, mutate: mutateVisit } = useVisitOrOfflineVisit(patientUuid);
+  const currentVisitUuid = currentVisit?.uuid;
+  const { drugOrderEncounterType, clinicianEncounterRole } = useConfig() as ConfigObject;
+  const encounterUuid = useMemo(
+    () => currentVisit?.encounters?.find((enc) => enc.encounterType.uuid === drugOrderEncounterType)?.uuid,
+    [currentVisit, drugOrderEncounterType],
+  );
+  const [creatingEncounterError, setCreatingEncounterError] = useState(null);
+  const {
+    sessionLocation: { uuid: sessionLocationUuid },
+    currentProvider: { uuid: currentProviderUuid },
+  } = useSession();
+
+  useEffect(() => {
+    const abortController = new AbortController();
+    if (!encounterUuid && currentVisit) {
+      createEmptyEncounter(
+        patientUuid,
+        drugOrderEncounterType,
+        currentVisitUuid,
+        sessionLocationUuid,
+        currentProviderUuid,
+        clinicianEncounterRole,
+        abortController,
+      )
+        .then((res) => {
+          mutateVisit();
+        })
+        .catch((err: Error) => {
+          setCreatingEncounterError(err?.message);
+        });
+    }
+  }, [
+    encounterUuid,
+    currentVisit,
+    mutateVisit,
+    setCreatingEncounterError,
+    clinicianEncounterRole,
+    currentProviderUuid,
+    currentVisitUuid,
+    drugOrderEncounterType,
+    patientUuid,
+    sessionLocationUuid,
+  ]);
+
+  const results = useMemo(
+    () => ({
+      encounterUuid,
+      isLoadingEncounterUuid: !encounterUuid && !creatingEncounterError,
+      creatingEncounterError,
+    }),
+    [encounterUuid, creatingEncounterError],
+  );
+
+  return results;
+}
+
 export function createEmptyEncounter(
   patientUuid: string,
-  sessionObject: Session,
-  orderBaskestConfig: ConfigObject,
+  drugOrderEncounterType: string,
   currentVisitUuid: string,
-  currentEncounterUuid: string,
+  sessionLocationUuid: string,
+  currentProviderUuid: string,
+  clinicianEncounterRole: string,
   abortController?: AbortController,
 ) {
-  if (currentEncounterUuid) {
-    return Promise.resolve(currentEncounterUuid);
-  }
-
   const emptyEncounter = {
     patient: patientUuid,
-    location: sessionObject?.sessionLocation?.uuid,
-    encounterType: orderBaskestConfig?.drugOrderEncounterType,
+    location: sessionLocationUuid,
+    encounterType: drugOrderEncounterType,
     encounterDatetime: new Date().toISOString(),
     encounterProviders: [
       {
-        provider: sessionObject.currentProvider?.uuid,
-        encounterRole: orderBaskestConfig.clinicianEncounterRole,
+        provider: currentProviderUuid,
+        encounterRole: clinicianEncounterRole,
       },
     ],
     visit: currentVisitUuid,
     obs: [],
   };
 
-  return openmrsFetch<OpenmrsResource>('/ws/rest/v1/encouter', {
+  return openmrsFetch<OpenmrsResource>('/ws/rest/v1/encounter', {
     headers: {
       'Content-Type': 'application/json',
     },
