@@ -12,7 +12,7 @@ export function useDrugSearch(query): {
 } {
   const { data, error } = useSWRImmutable<FetchResponse<{ results: Array<Drug> }>, Error>(
     query
-      ? `/ws/rest/v1/drug?q=${query}&v=custom:(uuid,display,name,strength,dosageForm:(display,uuid),concept)`
+      ? `/ws/rest/v1/drug?q=${query}&v=custom:(uuid,display,name,strength,dosageForm:(display,uuid),concept:(display,uuid))`
       : null,
     openmrsFetch,
   );
@@ -37,6 +37,7 @@ export function useDrugTemplate(drugUuid: string): {
   const { data, error } = useSWRImmutable<
     FetchResponse<{
       results: Array<{
+        uuid: string;
         drug: Drug;
         name: string;
         template: string;

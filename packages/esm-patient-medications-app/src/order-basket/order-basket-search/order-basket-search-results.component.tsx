@@ -61,6 +61,75 @@ export default function OrderBasketSearchResults({
   ) : null;
 }
 
+interface DrugSearchResultItemProps {
+  drug: Drug;
+  onSearchResultClicked: (searchResult: OrderBasketItem, directlyAddToBasket: boolean) => void;
+}
+
+const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, onSearchResultClicked }) => {
+  const isTablet = useLayoutType() === 'tablet';
+  const {
+    templates,
+    isLoading: isLoadingTemplates,
+    error: fetchingDrugOrderTemplatesError,
+  } = useDrugTemplate(drug?.uuid);
+  const { t } = useTranslation();
+  const config = useConfig() as ConfigObject;
+  const orderItems: Array<OrderBasketItem> = useMemo(
+    () =>
+      templates?.length
+        ? templates.map((template) => getTemplateOrderBasketItem(drug, config?.daysDurationUnit, template))
+        : [getTemplateOrderBasketItem(drug, config?.daysDurationUnit)],
+    [templates, drug, config?.daysDurationUnit],
+  );
+
+  const handleSearchResultClicked = (searchResult: OrderBasketItem, directlyAddToBasket: boolean) => {
+    onSearchResultClicked(searchResult, directlyAddToBasket);
+  };
+
+  return (
+    <>
+      {orderItems.map((orderItem, indx) => (
+        <ClickableTile
+          key={templates?.length ? templates[indx]?.uuid : drug?.uuid}
+          role="listitem"
+          className={isTablet ? `${styles.tabletSearchResultTile}` : `${styles.desktopSearchResultTile}`}
+          onClick={() => handleSearchResultClicked(orderItem, false)}
+        >
+          <div className={styles.searchResultTile}>
+            <div className={styles.searchResultTileContent}>
+              <p>
+                <strong>{drug?.display}</strong> {drug?.strength && <>&mdash; {drug?.strength}</>}{' '}
+                {drug?.dosageForm?.display && <>&mdash; {drug?.dosageForm?.display}</>}
+              </p>
+              {fetchingDrugOrderTemplatesError ? (
+                <p>
+                  <span className={styles.errorLabel}>
+                    {t('errorFetchingDrugOrderTemplates', 'Error fetching drug order templates')}
+                  </span>
+                </p>
+              ) : (
+                <p>
+                  {orderItem?.frequency?.value && <span className={styles.label01}>{orderItem?.frequency?.value}</span>}
+                  {orderItem?.route?.value && <span className={styles.label01}>&mdash; {orderItem?.route?.value}</span>}
+                </p>
+              )}
+            </div>
+            <Button
+              className={styles.addToBasketButton}
+              kind="ghost"
+              hasIconOnly={true}
+              renderIcon={(props) => <ShoppingCart size={16} {...props} />}
+              iconDescription={t('directlyAddToBasket', 'Immediately add to basket')}
+              onClick={() => handleSearchResultClicked(orderItem, true)}
+            />
+          </div>
+        </ClickableTile>
+      ))}
+    </>
+  );
+};
+
 const Skeleton = () => {
   const isTablet = useLayoutType() === 'tablet';
   return (
@@ -104,73 +173,5 @@ const Skeleton = () => {
       </Tile>
       <hr className={`${styles.divider} ${isTablet ? `${styles.tabletDivider}` : `${styles.desktopDivider}`}`} />
     </div>
-  );
-};
-
-interface DrugSearchResultItemProps {
-  drug: Drug;
-  onSearchResultClicked: (searchResult: OrderBasketItem, directlyAddToBasket: boolean) => void;
-}
-
-const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, onSearchResultClicked }) => {
-  const isTablet = useLayoutType() === 'tablet';
-  const {
-    templates,
-    isLoading: isLoadingTemplates,
-    error: fetchingDrugOrderTemplatesError,
-  } = useDrugTemplate(drug?.uuid);
-  const { t } = useTranslation();
-  const config = useConfig() as ConfigObject;
-  const orderItems: Array<OrderBasketItem> = useMemo(
-    () =>
-      templates?.length
-        ? templates.map((template) => getTemplateOrderBasketItem(drug, config?.daysDurationUnit, template))
-        : [getTemplateOrderBasketItem(drug, config?.daysDurationUnit)],
-    [templates, drug, config?.daysDurationUnit],
-  );
-
-  const handleSearchResultClicked = (searchResult: OrderBasketItem, directlyAddToBasket: boolean) => {
-    onSearchResultClicked(searchResult, directlyAddToBasket);
-  };
-
-  return (
-    <>
-      {orderItems.map((orderItem) => (
-        <ClickableTile
-          role="listitem"
-          className={isTablet ? `${styles.tabletSearchResultTile}` : `${styles.desktopSearchResultTile}`}
-          onClick={() => handleSearchResultClicked(orderItem, false)}
-        >
-          <div className={styles.searchResultTile}>
-            <div className={styles.searchResultTileContent}>
-              <p>
-                <strong>{drug?.display}</strong> {drug?.strength && <>&mdash; {drug?.strength}</>}{' '}
-                {drug?.dosageForm?.display && <>&mdash; {drug?.dosageForm?.display}</>}
-              </p>
-              {fetchingDrugOrderTemplatesError ? (
-                <p>
-                  <span className={styles.errorLabel}>
-                    {t('errorFetchingDrugOrderTemplates', 'Error fetching drug order templates')}
-                  </span>
-                </p>
-              ) : (
-                <p>
-                  {orderItem?.frequency?.value && <span className={styles.label01}>{orderItem?.frequency?.value}</span>}
-                  {orderItem?.route?.value && <span className={styles.label01}>&mdash; {orderItem?.route?.value}</span>}
-                </p>
-              )}
-            </div>
-            <Button
-              className={styles.addToBasketButton}
-              kind="ghost"
-              hasIconOnly={true}
-              renderIcon={(props) => <ShoppingCart size={16} {...props} />}
-              iconDescription={t('directlyAddToBasket', 'Immediately add to basket')}
-              onClick={() => handleSearchResultClicked(orderItem, true)}
-            />
-          </div>
-        </ClickableTile>
-      ))}
-    </>
   );
 };
