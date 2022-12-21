@@ -1,6 +1,6 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
-@import "../root";
+@import "../../root";
 
 .container {
   margin: spacing.$spacing-03 1rem spacing.$spacing-03;
@@ -18,6 +18,7 @@
 .tabletSearchResultTile {
   margin-top: 5px;
   border-left: 2px solid var(--brand-03);
+  background-color: $ui-02;
 
   &:not(:last-of-type) {
     margin-bottom: 1rem;
@@ -65,7 +66,25 @@
   flex: 0 0 auto;
 }
 
-.searchResultSkeletonWrapper {
-  @extend .searchResultTile;
-  border-bottom: 1px solid $ui-03;
+.errorLabel {
+  @extend .label01;
+  color: $danger;
 }
+
+.searchResultSkeletonWrapper {
+  margin: spacing.$spacing-03 1rem spacing.$spacing-03;
+  
+  :global(.cds--skeleton__text) {
+    margin: 0;
+  }
+
+  .searchResultCntSkeleton {
+    margin-right: spacing.$spacing-07;
+  }
+
+  .skeletonTile {
+    display: flex;
+    align-items: center;
+  }
+}
+

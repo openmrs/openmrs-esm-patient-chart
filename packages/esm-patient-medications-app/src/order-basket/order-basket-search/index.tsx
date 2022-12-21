@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Search } from '@carbon/react';
 import { useLayoutType } from '@openmrs/esm-framework';
 import OrderBasketSearchResults from './order-basket-search-results.component';
-import { OrderBasketItem } from '../types/order-basket-item';
+import { OrderBasketItem } from '../../types/order-basket-item';
 import styles from './order-basket-search.scss';
 
 export interface OrderBasketSearchProps {

@@ -5,7 +5,7 @@ import { getByTextWithMarkup } from '../../../../tools/test-helpers';
 import { mockMedicationOrderSearchResults, mockOrderTemplates } from '../../../../__mocks__/medication.mock';
 import { paginate } from '../utils/pagination';
 import { searchMedications } from './drug-search';
-import OrderBasketSearchResults from './order-basket-search-results.component';
+import OrderBasketSearchResults from './order-basket-search/order-basket-search-results.component';
 
 const mockPaginate = paginate as jest.Mock;
 const mockSearchMedications = searchMedications as jest.Mock;

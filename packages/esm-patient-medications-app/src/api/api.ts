@@ -1,14 +1,6 @@
 import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
-import {
-  FetchResponse,
-  openmrsFetch,
-  Session,
-  useConfig,
-  OpenmrsResource,
-  showNotification,
-  useSession,
-} from '@openmrs/esm-framework';
+import { FetchResponse, openmrsFetch, Session, useConfig, OpenmrsResource, useSession } from '@openmrs/esm-framework';
 import { OrderPost, PatientMedicationFetchResponse } from '../types/order';
 import { ConfigObject } from '../config-schema';
 import { useEffect, useMemo } from 'react';
