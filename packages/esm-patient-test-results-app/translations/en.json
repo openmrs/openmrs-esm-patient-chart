@@ -8,13 +8,17 @@
   "recentResults": "Recent Results",
   "recentTestResults": "recent test results",
   "referenceRange": "Reference range",
+  "resetTreeText": "Reset tree",
   "resulted": "Resulted",
+  "resultsText": "results",
   "returnToTimeline": "Return to timeline",
   "seeAllResults": "See all results",
+  "showTree": "Show tree",
   "testName": "Test name",
   "testResults": "test results",
   "timeline": "Timeline",
   "timeOfTest": "Time of Test",
+  "tree": "Tree",
   "trend": "Trend",
   "trendlineRangeSelector1Day": "1 day",
   "trendlineRangeSelector1Month": "1 month",
@@ -23,5 +27,6 @@
   "trendlineRangeSelector5Years": "5 years",
   "trendlineRangeSelectorAll": "All",
   "trendlineRangeSelectorMonths": "6 months",
-  "value": "Value"
+  "value": "Value",
+  "view": "View"
 }

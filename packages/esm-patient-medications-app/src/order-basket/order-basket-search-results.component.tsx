@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Button, Link, Pagination, ClickableTile, Tile, SkeletonText, SkeletonIcon } from '@carbon/react';
+import { Button, Pagination, ClickableTile, Tile, SkeletonText, SkeletonIcon } from '@carbon/react';
 import { ShoppingCart } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { createErrorHandler, useConfig, useLayoutType } from '@openmrs/esm-framework';
@@ -71,11 +71,12 @@ export default function OrderBasketSearchResults({
                 searchTerm,
               })}
             </span>
-            <Link onClick={() => setSearchTerm('')}>{t('clearSearchResults', 'Clear Results')}</Link>
+            <Button kind="ghost" onClick={() => setSearchTerm('')} size={isTablet ? 'md' : 'sm'}>
+              {t('clearSearchResults', 'Clear Results')}
+            </Button>
           </div>
           {currentSearchResultPage.map((result, index) => (
             <ClickableTile
-              light={isTablet}
               role="listitem"
               key={index}
               className={isTablet ? `${styles.tabletSearchResultTile}` : `${styles.desktopSearchResultTile}`}
@@ -84,11 +85,11 @@ export default function OrderBasketSearchResults({
               <div className={styles.searchResultTile}>
                 <div className={styles.searchResultTileContent}>
                   <p>
-                    <strong>{result.template ? result.drug.concept.display : result.drug.name}</strong>{' '}
+                    <strong>{result.drug?.display}</strong>{' '}
+                    {result?.drug?.strength && <>&mdash; {result?.drug?.strength}</>}{' '}
+                    {result?.drug?.dosageForm?.display && <>&mdash; {result?.drug?.dosageForm?.display}</>}
                     {result.template && (
                       <>
-                        &mdash; {result.dosage} {result.unit?.value} &mdash; {result.drug.dosageForm.display}
-                        <br />
                         <span className={styles.label01}>{result.frequency?.value}</span> &mdash;{' '}
                         <span className={styles.label01}>{result.route?.value}</span>
                       </>

@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { RowData } from '../filter/filter-types';
 import styles from './result-panel.scss';
 import {
   DataTable,
@@ -15,7 +14,7 @@ import {
 } from '@carbon/react';
 import { getClass } from './helper';
 import { ObsRecord } from './types';
-import { formatDate, isDesktop, useLayoutType, usePatient } from '@openmrs/esm-framework';
+import { formatDate, isDesktop, useLayoutType } from '@openmrs/esm-framework';
 
 interface LabSetPanelProps {
   panel: ObsRecord;
@@ -82,7 +81,7 @@ const LabSetPanel: React.FC<LabSetPanelProps> = ({ panel, observations, activePa
             id: test.id,
             testName: test.name,
             value: {
-              content: <span>{`${test.value} ${test.meta?.units}`}</span>,
+              content: <span>{`${test.value} ${test.meta?.units ?? ''}`}</span>,
             },
             interpretation: test.interpretation,
           })),

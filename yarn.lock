@@ -4903,6 +4903,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ngx-translate/core@npm:^14.0.0":
+  version: 14.0.0
+  resolution: "@ngx-translate/core@npm:14.0.0"
+  dependencies:
+    tslib: ^2.3.0
+  peerDependencies:
+    "@angular/core": ">=13.0.0"
+    rxjs: ^6.5.3 || ^7.4.0
+  checksum: d1afc35e7b729caf776e78c10badc0853b63252bdf2fa129f1b95a271cd15cf6f22ffecc52922ffbe1c3aca7d8e08351669e8bae18727664aba66b5d405f05e1
+  languageName: node
+  linkType: hard
+
 "@nodelib/fs.scandir@npm:2.1.5":
   version: 2.1.5
   resolution: "@nodelib/fs.scandir@npm:2.1.5"
@@ -5387,7 +5399,7 @@ __metadata:
     style-loader: 2.x
     systemjs-webpack-interop: ^2.3.7
     tree-model: ^1.0.5
-    tslib: ^2.0.0
+    tslib: ^2.4.1
     uuid: ^8.3.2
     webpack: ~5.74.0
     zone.js: ~0.11.8
@@ -5591,6 +5603,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-chart@workspace:."
   dependencies:
+    "@ngx-translate/core": ^14.0.0
     "@openmrs/esm-framework": next
     "@swc/cli": ^0.1.57
     "@swc/core": ^1.2.165
@@ -5875,8 +5888,8 @@ __metadata:
   linkType: hard
 
 "@openmrs/ngx-formentry@npm:next":
-  version: 3.0.1-pre.68
-  resolution: "@openmrs/ngx-formentry@npm:3.0.1-pre.68"
+  version: 3.0.1-pre.89
+  resolution: "@openmrs/ngx-formentry@npm:3.0.1-pre.89"
   dependencies:
     tslib: ^2.2.0
   peerDependencies:
@@ -5898,7 +5911,7 @@ __metadata:
     shelljs: ^0.7.0
     slick-carousel: ^1.6.0
     tree-model: ^1.0.5
-  checksum: de87e83957ccd3b0ca80021b9673020a60eca055f9e5b946eda2782b468a74a037bd56eabc7077326e428bde3b079b9104978ca5edf9ca128207dc997c457da5
+  checksum: da06b0a54118dabc1b37286f792184d3c07185422b776272a7e072f98afd7dd5fe1849a594368737a191e67249621540aec859347d5274fd00b194e6e729c0db
   languageName: node
   linkType: hard
 
@@ -24146,7 +24159,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:^2.1.0, tslib@npm:^2.2.0, tslib@npm:^2.3.0":
+"tslib@npm:^2.1.0, tslib@npm:^2.2.0, tslib@npm:^2.3.0, tslib@npm:^2.4.1":
   version: 2.4.1
   resolution: "tslib@npm:2.4.1"
   checksum: 19480d6e0313292bd6505d4efe096a6b31c70e21cf08b5febf4da62e95c265c8f571f7b36fcc3d1a17e068032f59c269fab3459d6cd3ed6949eafecf64315fca

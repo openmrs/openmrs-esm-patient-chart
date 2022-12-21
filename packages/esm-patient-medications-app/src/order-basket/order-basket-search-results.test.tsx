@@ -43,10 +43,10 @@ describe('OrderBasketSearchResults', () => {
     await screen.findAllByRole('listitem');
     expect(screen.getAllByRole('listitem').length).toEqual(3);
     // Anotates results with dosing info if an order-template was found.
-    expect(getByTextWithMarkup(/Aspirin — 81 mg — Tablet\s*Once daily — Oral/i)).toBeInTheDocument();
+    expect(getByTextWithMarkup(/Aspirin — 81mg — Tablet\s*Once daily — Oral/i)).toBeInTheDocument();
     // Only displays drug name for results without a matching order template
-    expect(getByTextWithMarkup(/Aspirin 125mg/i)).toBeInTheDocument();
-    expect(getByTextWithMarkup(/Aspirin 243mg/i)).toBeInTheDocument();
+    expect(getByTextWithMarkup(/Aspirin — 125mg — Tablet/i)).toBeInTheDocument();
+    expect(getByTextWithMarkup(/Aspirin — 243mg — Tablet/i)).toBeInTheDocument();
     expect(screen.getAllByRole('button', { name: /Immediately add to basket/i }).length).toEqual(3);
 
     await waitFor(() => user.click(screen.getAllByRole('listitem')[0]));

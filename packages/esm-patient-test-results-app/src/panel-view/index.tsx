@@ -1,15 +1,18 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import LabSetPanel from './panel.component';
 import usePanelData from './usePanelData';
-import { Column, DataTableSkeleton, Button } from '@carbon/react';
-import { Search as SearchIcon } from '@carbon/react/icons';
+import { DataTableSkeleton, Button, Search, Form } from '@carbon/react';
+import { Search as SearchIcon, Close } from '@carbon/react/icons';
 import styles from './panel-view.scss';
-import { useLayoutType } from '@openmrs/esm-framework';
+import { navigate, useLayoutType } from '@openmrs/esm-framework';
 import PanelTimelineComponent from '../panel-timeline';
 import { ObsRecord } from './types';
 import { useTranslation } from 'react-i18next';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import Trendline from '../trendline/trendline.component';
+import Overlay from '../tablet-overlay/tablet-overlay.component';
+import { testResultsBasePath } from '../helpers';
+import { FilterEmptyState } from '../ui-elements/resetFiltersEmptyState';
 
 interface PanelViewProps {
   expanded: boolean;
@@ -25,24 +28,47 @@ const PanelView: React.FC<PanelViewProps> = ({ expanded, testUuid, basePath, typ
   const { panels, isLoading, groupedObservations } = usePanelData();
   const [activePanel, setActivePanel] = useState<ObsRecord>(null);
   const { t } = useTranslation();
-  const fullWidthPanels = expanded || !activePanel;
   const trendlineView = testUuid && type === 'trendline';
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredPanels = useMemo(() => {
+    if (!searchTerm) {
+      return panels;
+    }
+    return panels?.filter(
+      (panel) =>
+        panel.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        panel.relatedObs.some((ob) => ob.name.toLowerCase().includes(searchTerm.toLowerCase())),
+    );
+  }, [panels, searchTerm]);
 
   useEffect(() => {
-    if (layout === 'large-desktop' && !activePanel && panels) {
-      setActivePanel(panels?.[0]);
+    // Selecting the active panel should not occur in small-desktop
+    if (layout !== 'tablet' && filteredPanels) {
+      setActivePanel(filteredPanels?.[0]);
     }
-  }, [panels, activePanel, layout]);
+  }, [filteredPanels, layout]);
 
-  return (
-    <>
-      {!isTablet && (
-        <Column sm={16} lg={fullWidthPanels ? 12 : 5}>
-          <>
-            <PanelViewHeader isTablet={isTablet} />
-            {!isLoading ? (
-              panels.length > 0 ? (
-                panels.map((panel) => (
+  const navigateBackFromTrendlineView = useCallback(() => {
+    navigate({
+      to: testResultsBasePath(`/patient/${patientUuid}/chart`),
+    });
+  }, [patientUuid]);
+
+  if (isTablet) {
+    return (
+      <>
+        <div>
+          <PanelViewHeader
+            isTablet={isTablet}
+            setSearchTerm={setSearchTerm}
+            searchTerm={searchTerm}
+            totalSearchResults={filteredPanels?.length ?? 0}
+          />
+          {!isLoading ? (
+            panels.length > 0 ? (
+              filteredPanels.length ? (
+                filteredPanels.map((panel) => (
                   <LabSetPanel
                     panel={panel}
                     observations={[panel, ...panel.relatedObs]}
@@ -51,48 +77,168 @@ const PanelView: React.FC<PanelViewProps> = ({ expanded, testUuid, basePath, typ
                   />
                 ))
               ) : (
-                <EmptyState displayText={t('panels', 'panels')} headerTitle={t('noPanelsFound', 'No panels found')} />
+                <FilterEmptyState clearFilter={() => setSearchTerm('')} />
               )
             ) : (
-              <DataTableSkeleton columns={3} />
-            )}
-          </>
-        </Column>
-      )}
-      <Column
-        sm={16}
-        lg={fullWidthPanels ? 0 : 7}
-        className={isTablet ? styles.headerMarginTablet : styles.headerMargin}
-      >
-        {isLoading ? (
-          <DataTableSkeleton columns={3} />
-        ) : trendlineView ? (
-          <Trendline patientUuid={patientUuid} conceptUuid={testUuid} basePath={basePath} showBackToTimelineButton />
-        ) : activePanel ? (
-          <PanelTimelineComponent groupedObservations={groupedObservations} activePanel={activePanel} />
-        ) : (
-          <EmptyState
-            headerTitle={t('noPanelSelected', 'No panel selected')}
-            displayText={t('observations', 'Observations')}
+              <EmptyState displayText={t('panels', 'panels')} headerTitle={t('noPanelsFound', 'No panels found')} />
+            )
+          ) : (
+            <DataTableSkeleton columns={3} />
+          )}
+        </div>
+        {activePanel ? (
+          <Overlay close={() => setActivePanel(null)} headerText={activePanel?.name}>
+            <PanelTimelineComponent groupedObservations={groupedObservations} activePanel={activePanel} />
+          </Overlay>
+        ) : null}
+        {trendlineView ? (
+          <Overlay close={navigateBackFromTrendlineView} headerText={activePanel?.name}>
+            <Trendline patientUuid={patientUuid} conceptUuid={testUuid} basePath={basePath} />
+          </Overlay>
+        ) : null}
+      </>
+    );
+  }
+
+  return (
+    <>
+      <div className={styles.leftSection}>
+        <>
+          <PanelViewHeader
+            isTablet={isTablet}
+            setSearchTerm={setSearchTerm}
+            searchTerm={searchTerm}
+            totalSearchResults={filteredPanels?.length ?? 0}
           />
-        )}
-      </Column>
+          {!isLoading ? (
+            panels.length > 0 ? (
+              filteredPanels.length ? (
+                filteredPanels.map((panel) => (
+                  <LabSetPanel
+                    panel={panel}
+                    observations={[panel, ...panel.relatedObs]}
+                    setActivePanel={setActivePanel}
+                    activePanel={activePanel}
+                  />
+                ))
+              ) : (
+                <FilterEmptyState clearFilter={() => setSearchTerm('')} />
+              )
+            ) : (
+              <EmptyState displayText={t('panels', 'panels')} headerTitle={t('noPanelsFound', 'No panels found')} />
+            )
+          ) : (
+            <DataTableSkeleton columns={3} />
+          )}
+        </>
+      </div>
+      <div className={`${styles.headerMargin} ${styles.rightSection}`}>
+        <div className={styles.stickySection}>
+          {isLoading ? (
+            <DataTableSkeleton columns={3} />
+          ) : trendlineView ? (
+            <Trendline patientUuid={patientUuid} conceptUuid={testUuid} basePath={basePath} showBackToTimelineButton />
+          ) : activePanel ? (
+            <PanelTimelineComponent groupedObservations={groupedObservations} activePanel={activePanel} />
+          ) : null}
+        </div>
+      </div>
     </>
   );
 };
 
 interface PanelViewHeaderProps {
   isTablet: boolean;
+  searchTerm: string;
+  setSearchTerm: React.Dispatch<React.SetStateAction<string>>;
+  totalSearchResults: number;
 }
 
-const PanelViewHeader: React.FC<PanelViewHeaderProps> = ({ isTablet }) => {
+const PanelViewHeader: React.FC<PanelViewHeaderProps> = ({
+  isTablet,
+  searchTerm,
+  setSearchTerm,
+  totalSearchResults,
+}) => {
   const { t } = useTranslation();
+  const [showSearchFields, setShowSearchFields] = useState(false);
+  const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm);
+
+  const handleToggleSearchFields = useCallback(() => {
+    setShowSearchFields((prev) => !prev);
+  }, [setShowSearchFields]);
+
+  const handleSearchTerm = () => {
+    setSearchTerm(localSearchTerm);
+    handleToggleSearchFields();
+  };
+
+  const handleClear = useCallback(() => {
+    setSearchTerm('');
+    setLocalSearchTerm('');
+  }, [setSearchTerm, setLocalSearchTerm]);
+
   return (
     <div className={styles.panelViewHeader}>
-      <h4 className={styles.productiveHeading02}>{t('panel', 'Panel')}</h4>
-      <Button kind="ghost" size={isTablet ? 'md' : 'sm'} renderIcon={SearchIcon}>
-        {t('search', 'Search')}
-      </Button>
+      {!showSearchFields ? (
+        <>
+          <div className={styles.flex}>
+            <h4 className={styles.productiveHeading02}>
+              {!searchTerm
+                ? t('panel', 'Panel')
+                : `${totalSearchResults} ${t('searchResultsTextFor', 'search results for')} "${searchTerm}"`}
+            </h4>
+            {searchTerm ? (
+              <Button kind="ghost" size={isTablet ? 'md' : 'sm'} onClick={handleClear}>
+                {t('clear', 'Clear')}
+              </Button>
+            ) : null}
+          </div>
+          <Button kind="ghost" size={isTablet ? 'md' : 'sm'} renderIcon={SearchIcon} onClick={handleToggleSearchFields}>
+            {t('search', 'Search')}
+          </Button>
+        </>
+      ) : !isTablet ? (
+        <>
+          <Form onSubmit={handleSearchTerm} className={styles.flex}>
+            <Search
+              size="sm"
+              value={localSearchTerm}
+              onChange={(e) => setLocalSearchTerm(e.target.value)}
+              placeholder={t('searchByTestName', 'Search by test name')}
+              autoFocus={true}
+            />
+            <Button kind="secondary" size="sm" onClick={handleSearchTerm}>
+              {t('search', 'Search')}
+            </Button>
+          </Form>
+          <Button
+            hasIconOnly
+            renderIcon={Close}
+            iconDescription={t('closeSearchBar', 'Close search')}
+            onClick={handleToggleSearchFields}
+            size="sm"
+            kind="ghost"
+          />
+        </>
+      ) : (
+        <>
+          <Overlay close={handleToggleSearchFields} headerText={t('search', 'Search')}>
+            <Form onSubmit={handleSearchTerm} className={`${styles.flex} ${styles.tabletSearch}`}>
+              <Search
+                value={localSearchTerm}
+                onChange={(e) => setLocalSearchTerm(e.target.value)}
+                placeholder={t('searchByTestName', 'Search by test name')}
+                autoFocus={true}
+                size="lg"
+              />
+              <Button kind="secondary" onClick={handleSearchTerm}>
+                {t('search', 'Search')}
+              </Button>
+            </Form>
+          </Overlay>
+        </>
+      )}
     </div>
   );
 };

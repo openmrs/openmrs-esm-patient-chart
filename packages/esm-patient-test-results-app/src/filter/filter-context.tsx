@@ -5,7 +5,7 @@ import { parseTime } from '../panel-timeline/helpers';
 import { TreeNode, FilterContextProps, ReducerState, ReducerActionType, TimelineData } from './filter-types';
 import reducer from './filter-reducer';
 
-const initialState = {
+const initialState: ReducerState = {
   checkboxes: {},
   parents: {},
   roots: [{ display: '', flatName: '' }],

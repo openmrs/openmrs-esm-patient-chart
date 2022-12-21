@@ -1,6 +1,12 @@
 import { Type } from '@openmrs/esm-framework';
 
 export const configSchema = {
+  durationUnitsConcept: {
+    _type: Type.ConceptUuid,
+    _description:
+      'A concept which has Answers that are medication duration units (for example, days, weeks, or months).',
+    _default: '1732AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+  },
   daysDurationUnit: {
     _description:
       'The default medication duration unit is days. The concept for that medication duration unit is specified here.',

@@ -6,7 +6,6 @@
   ],
   "scripts": {
     "start": "openmrs develop --sources packages/esm-patient-chart-app/",
-    "start-all": "openmrs develop --sources 'packages/esm-*-app/'",
     "ci:publish": "lerna publish from-package --yes",
     "ci:prepublish": "lerna publish from-package --no-git-reset --yes --dist-tag next",
     "release": "lerna version --no-git-tag-version",
@@ -70,5 +69,8 @@
   "resolutions": {
     "sass": "^1.54.3"
   },
-  "packageManager": "yarn@3.2.2"
+  "packageManager": "yarn@3.2.2",
+  "dependencies": {
+    "@ngx-translate/core": "^14.0.0"
+  }
 }

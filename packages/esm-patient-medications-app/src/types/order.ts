@@ -1,4 +1,4 @@
-import { OpenmrsResource } from './openmrs-resource';
+import { OpenmrsResource } from '@openmrs/esm-framework';
 
 export interface PatientMedicationFetchResponse {
   results: Array<Order>;
@@ -61,6 +61,7 @@ export interface Drug {
   strength: string;
   concept: OpenmrsResource;
   dosageForm: OpenmrsResource;
+  display: string;
 }
 
 export interface OrderPost {

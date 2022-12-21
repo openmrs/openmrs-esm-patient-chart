@@ -132,7 +132,7 @@ const Trendline: React.FC<TrendlineProps> = ({
 
     data.push({
       date: new Date(Date.parse(obs.obsDatetime)),
-      value: obs.value,
+      value: parseFloat(obs.value),
       group: chartTitle,
       ...range,
     });
@@ -142,7 +142,7 @@ const Trendline: React.FC<TrendlineProps> = ({
       date: formatDate(parseDate(obs.obsDatetime)),
       time: formatTime(parseDate(obs.obsDatetime)),
       value: {
-        value: obs.value,
+        value: parseFloat(obs.value),
         interpretation: obs.interpretation,
       },
     });

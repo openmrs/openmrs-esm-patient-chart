@@ -60,7 +60,11 @@ const ObsSwitchable: React.FC<ObsSwitchableProps> = ({ patientUuid }) => {
                   </div>
                 ) : null}
               </CardHeader>
-              {chartView ? <ObsGraph patientUuid={patientUuid} /> : <ObsTable patientUuid={patientUuid} />}
+              {chartView && hasNumberType ? (
+                <ObsGraph patientUuid={patientUuid} />
+              ) : (
+                <ObsTable patientUuid={patientUuid} />
+              )}
             </div>
           );
         }

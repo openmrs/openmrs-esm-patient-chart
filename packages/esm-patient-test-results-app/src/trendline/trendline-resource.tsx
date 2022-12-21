@@ -3,26 +3,21 @@ import { OBSERVATION_INTERPRETATION } from '@openmrs/esm-patient-common-lib';
 import { assessValue } from '../loadPatientTestData/helpers';
 import { useMemo } from 'react';
 import { FetchResponse, openmrsFetch, showNotification } from '@openmrs/esm-framework';
-import { TestData } from '../filter/filter-types';
+import { TreeNode } from '../filter/filter-types';
 
-interface TreeNode {
-  display: string;
-  subSets: Array<TreeNode | TestData>;
-}
-
-function computeTrendlineData(treeNode: TreeNode): Array<TestData> {
-  const tests: Array<TestData> = [];
+function computeTrendlineData(treeNode: TreeNode): Array<TreeNode> {
+  const tests: Array<TreeNode> = [];
   if (!treeNode) {
     return tests;
   }
   treeNode?.subSets.forEach((subNode) => {
-    if ((subNode as TestData)?.obs) {
-      const testData = subNode as TestData;
-      const assess = assessValue(testData.obs);
+    if ((subNode as TreeNode)?.obs) {
+      const TreeNode = subNode as TreeNode;
+      const assess = assessValue(TreeNode.obs);
       tests.push({
-        ...testData,
-        range: testData.hiNormal && testData.lowNormal ? `${testData.lowNormal} - ${testData.hiNormal}` : '',
-        obs: testData.obs.map((ob) => ({ ...ob, interpretation: assess(ob.value) })),
+        ...TreeNode,
+        range: TreeNode.hiNormal && TreeNode.lowNormal ? `${TreeNode.lowNormal} - ${TreeNode.hiNormal}` : '',
+        obs: TreeNode.obs.map((ob) => ({ ...ob, interpretation: assess(ob.value) })),
       });
     } else if (subNode?.subSets) {
       const subTreesTests = computeTrendlineData(subNode as TreeNode); // recursion
@@ -37,7 +32,7 @@ export function useObstreeData(
   conceptUuid: string,
 ): {
   isLoading: boolean;
-  trendlineData: TestData;
+  trendlineData: TreeNode;
   isValidating: boolean;
 } {
   const { data, error, isValidating } = useSWR<FetchResponse<TreeNode>, Error>(
@@ -64,7 +59,7 @@ export function useObstreeData(
           lowNormal: 0,
           units: '',
           range: '',
-        } as TestData),
+        } as TreeNode),
       isValidating,
     }),
     [data, error, isValidating],
