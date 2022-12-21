@@ -32,6 +32,7 @@ const WorkspaceWindow: React.FC<ContextWorkspaceParams> = ({ patientUuid }) => {
       });
     }
   }, [windowSize]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (active && (maximized || normal)) {
