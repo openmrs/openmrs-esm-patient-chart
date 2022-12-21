@@ -54,7 +54,7 @@ export function getPatientEncounterId(patientUuid: string, abortController: Abor
 
 export function getDrugByName(drugName: string, abortController?: AbortController) {
   return openmrsFetch(
-    `/ws/rest/v1/drug?q=${drugName}&v=custom:(uuid,name,strength,dosageForm:(display,uuid),concept)`,
+    `/ws/rest/v1/drug?q=${drugName}&v=custom:(uuid,display,name,strength,dosageForm:(display,uuid),concept)`,
     {
       signal: abortController?.signal,
     },

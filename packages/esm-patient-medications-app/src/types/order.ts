@@ -61,6 +61,7 @@ export interface Drug {
   strength: string;
   concept: OpenmrsResource;
   dosageForm: OpenmrsResource;
+  display: string;
 }
 
 export interface OrderPost {
