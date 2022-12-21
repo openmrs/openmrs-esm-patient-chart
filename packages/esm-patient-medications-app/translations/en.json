@@ -29,6 +29,8 @@
   "emptyOrderBasket": "Your basket is empty",
   "endDate": "End date",
   "error": "Error",
+  "errorFetchingDrugOrderTemplates": "Error fetching drug order templates",
+  "errorFetchingDrugResults": "Error fetching medications",
   "errorFetchingDurationUnits": "Error occured when fetching duration units",
   "fetchingDurationUnits": "Fetching duration units...",
   "freeTextDosage": "Free Text Dosage",
@@ -73,12 +75,12 @@
   "revisedOrders_one": "{count} order(s) being modified (revised)",
   "revisedOrders_other": "{count} order(s) being modified (revised)",
   "saveOrder": "Save order",
-  "searchFieldPlaceholder": "Search for an order (e.g. \"Aspirin\")",
   "searchForAnOrder": "Search for an order above",
   "searchResultsExactMatchesForTerm_one": "{count} exact match(es) for \"{searchTerm}\"",
   "searchResultsExactMatchesForTerm_other": "{count} exact match(es) for \"{searchTerm}\"",
   "signAndClose": "Sign and close",
   "startDate": "Start date",
   "takeAsNeeded": "Take As Needed",
-  "tryReopeningTheForm": "Please try launching the form again"
+  "tryReopeningTheForm": "Please try launching the form again",
+  "trySearchingDrugsAgain": "Please try searching again"
 }

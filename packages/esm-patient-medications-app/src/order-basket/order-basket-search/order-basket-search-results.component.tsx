@@ -52,7 +52,7 @@ export default function OrderBasketSearchResults({
         <InlineNotification
           kind="error"
           lowContrast={true}
-          title={t('errorFetchingDrugResults', 'Error fetching medications')}
+          title={t('errorFetchingDrugResults', 'Error fetching drugs')}
           subtitle={t('trySearchingDrugsAgain', 'Please try searching again')}
           caption={error?.message}
         />
