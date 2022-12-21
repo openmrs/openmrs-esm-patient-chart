@@ -135,6 +135,10 @@
 .gridRow {
   @extend .row;
   padding: 0px;
+
+  :global(.cds--number) {
+    display: inline-block;
+  }
 }
 
 .lastGridCell {
