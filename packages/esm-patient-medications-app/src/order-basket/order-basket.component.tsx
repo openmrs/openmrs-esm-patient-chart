@@ -147,7 +147,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
       } else {
         setMinimised(true);
       }
-    });
+    }, [currentWindowSize]);
 
     useEffect(() => {
       if (minimised && medicationOrderFormItem && !orderFormSigned) {
@@ -155,7 +155,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
       } else if (orderFormSigned && minimised && !orderFormSaved) {
         isPending(true);
       } else isPending(false);
-    }, [minimised, medicationOrderFormItem]);
+    }, [minimised, medicationOrderFormItem, isPending, orderFormSaved, orderFormSigned]);
 
     if (isLoading) return <InlineLoading className={styles.loader} description={t('loading', 'Loading...')} />;
 
