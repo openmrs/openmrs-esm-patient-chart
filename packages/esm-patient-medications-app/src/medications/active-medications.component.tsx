@@ -2,8 +2,13 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { DataTableSkeleton } from '@carbon/react';
 import { Provider } from 'unistore/react';
-import { useConfig } from '@openmrs/esm-framework';
-import { EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { showModal, useConfig } from '@openmrs/esm-framework';
+import {
+  EmptyState,
+  ErrorState,
+  launchPatientWorkspace,
+  useVisitOrOfflineVisit,
+} from '@openmrs/esm-patient-common-lib';
 import MedicationsDetailsTable from '../components/medications-details-table.component';
 import { orderBasketStore } from './order-basket-store';
 import { usePatientOrders } from '../api/api';
@@ -27,8 +32,18 @@ const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patientUuid, show
     isValidating,
   } = usePatientOrders(patientUuid, 'ACTIVE', config.careSettingUuid);
 
+  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
+
   const launchOrderBasket = React.useCallback(() => {
-    launchPatientWorkspace('order-basket-workspace');
+    if (currentVisit) {
+      launchPatientWorkspace('order-basket-workspace');
+    } else {
+      const dispose = showModal('start-visit-dialog', {
+        patientUuid,
+        closeModal: () => dispose(),
+      });
+    }
+    ('order-basket-workspace');
   }, []);
 
   if (isLoading) return <DataTableSkeleton role="progressbar" />;

@@ -61,7 +61,7 @@ const MedicationsDetailsTable = connect<
   }: ActiveMedicationsProps & OrderBasketStore & OrderBasketStoreActions) => {
     const { t } = useTranslation();
     const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
-    const openOrderBasket = () => {
+    const openOrderBasket = useCallback(() => {
       if (currentVisit) {
         launchPatientWorkspace('order-basket-workspace');
       } else {
@@ -70,7 +70,7 @@ const MedicationsDetailsTable = connect<
           closeModal: () => dispose(),
         });
       }
-    };
+    }, [currentVisit]);
 
     const tableHeaders = [
       {
@@ -225,6 +225,7 @@ const MedicationsDetailsTable = connect<
                           medication={medications[rowIndex]}
                           items={items}
                           setItems={setItems}
+                          openOrderBasket={openOrderBasket}
                         />
                       </TableCell>
                     </TableRow>
@@ -261,6 +262,7 @@ function OrderBasketItemActions({
   medication,
   items,
   setItems,
+  openOrderBasket,
 }: {
   showDiscontinueButton: boolean;
   showModifyButton: boolean;
@@ -268,6 +270,7 @@ function OrderBasketItemActions({
   medication: Order;
   items: Array<OrderBasketItem>;
   setItems: (items: Array<OrderBasketItem>) => void;
+  openOrderBasket: () => void;
 }) {
   const { t } = useTranslation();
   const alreadyInBasket = items.some((x) => x.uuid === medication.uuid);
@@ -317,8 +320,8 @@ function OrderBasketItemActions({
         quantityUnits: medication.quantityUnits.uuid,
       },
     ]);
-    launchPatientWorkspace('order-basket-workspace');
-  }, [items, setItems, medication]);
+    openOrderBasket();
+  }, [items, setItems, medication, openOrderBasket]);
 
   const handleModifyClick = useCallback(() => {
     setItems([
@@ -366,8 +369,8 @@ function OrderBasketItemActions({
         quantityUnits: medication.quantityUnits.uuid,
       },
     ]);
-    launchPatientWorkspace('order-basket-workspace');
-  }, [items, setItems, medication]);
+    openOrderBasket();
+  }, [items, setItems, medication, openOrderBasket]);
 
   const handleReorderClick = useCallback(() => {
     setItems([
@@ -415,8 +418,8 @@ function OrderBasketItemActions({
         quantityUnits: medication.quantityUnits.uuid,
       },
     ]);
-    launchPatientWorkspace('order-basket-workspace');
-  }, [items, setItems, medication]);
+    openOrderBasket();
+  }, [items, setItems, medication, openOrderBasket]);
 
   return (
     <OverflowMenu ariaLabel="Actions menu" selectorPrimaryFocus={'#modify'} flipped>
