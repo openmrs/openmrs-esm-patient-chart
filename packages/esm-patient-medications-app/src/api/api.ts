@@ -98,7 +98,7 @@ export function useCurrentOrderBasketEncounter(patientUuid: string) {
   );
   const [creatingEncounterError, setCreatingEncounterError] = useState(null);
   const {
-    sessionLocation: { uuid: sessionLocationUuid },
+    sessionLocation,
     currentProvider: { uuid: currentProviderUuid },
   } = useSession();
 
@@ -109,7 +109,7 @@ export function useCurrentOrderBasketEncounter(patientUuid: string) {
         patientUuid,
         drugOrderEncounterType,
         currentVisitUuid,
-        sessionLocationUuid,
+        sessionLocation?.uuid,
         currentProviderUuid,
         clinicianEncounterRole,
         abortController,
@@ -131,7 +131,7 @@ export function useCurrentOrderBasketEncounter(patientUuid: string) {
     currentVisitUuid,
     drugOrderEncounterType,
     patientUuid,
-    sessionLocationUuid,
+    sessionLocation,
   ]);
 
   const results = useMemo(

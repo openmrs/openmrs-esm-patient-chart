@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
 import { connect } from 'unistore/react';
-import { Button, ButtonSet, DataTableSkeleton, InlineNotification } from '@carbon/react';
-import { showToast, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
+import { Button, ButtonSet, DataTableSkeleton, InlineNotification, ActionableNotification } from '@carbon/react';
+import { showModal, showToast, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
 import { EmptyState, ErrorState, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import { orderDrugs } from './drug-ordering';
 import { ConfigObject } from '../config-schema';
@@ -31,6 +31,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
   const headerTitle = t('activeMedicationsHeaderTitle', 'active medications');
   const isTablet = useLayoutType() === 'tablet';
   const config = useConfig() as ConfigObject;
+  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const { encounterUuid, creatingEncounterError } = useCurrentOrderBasketEncounter(patientUuid);
   const [medicationOrderFormItem, setMedicationOrderFormItem] = useState<OrderBasketItem | null>(null);
   const [isMedicationOrderFormVisible, setIsMedicationOrderFormVisible] = useState(false);
@@ -43,6 +44,13 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
     isLoading: isLoadingOrders,
     isValidating,
   } = usePatientOrders(patientUuid, 'ACTIVE', config.careSettingUuid);
+
+  const openStartVisitDialog = useCallback(() => {
+    const dispose = showModal('start-visit-dialog', {
+      patientUuid,
+      closeModal: () => dispose(),
+    });
+  }, [patientUuid]);
 
   useEffect(() => {
     if (medicationOrderFormItem) {
@@ -179,6 +187,20 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
               subtitle={t('tryReopeningTheWorkspaceAgain', 'Please try launching the workspace again')}
               lowContrast={true}
               className={styles.inlineNotification}
+              inline
+            />
+          )}
+          {!currentVisit && (
+            <ActionableNotification
+              kind="error"
+              actionButtonLabel={t('startVisit', 'Start visit')}
+              onActionButtonClick={openStartVisitDialog}
+              title={t('startAVisitToRecordOrders', 'Start a visit to order')}
+              subtitle={t('activeVisitRequired', 'An active visit is required to make orders')}
+              lowContrast={true}
+              inline
+              className={styles.actionNotification}
+              hasFocus
             />
           )}
           <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
