@@ -2,6 +2,7 @@
   "activeMedicationsDisplayText": "Active medications",
   "activeMedicationsHeaderTitle": "active medications",
   "activeMedicationsTableTitle": "Active Medications",
+  "activeVisitRequired": "An active visit is required to make orders",
   "add": "Add",
   "backToOrderBasket": "Back to order basket",
   "cancel": "Cancel",
@@ -78,7 +79,9 @@
   "searchResultsExactMatchesForTerm_one": "{count} exact match(es) for \"{searchTerm}\"",
   "searchResultsExactMatchesForTerm_other": "{count} exact match(es) for \"{searchTerm}\"",
   "signAndClose": "Sign and close",
+  "startAVisitToRecordOrders": "Start a visit to order",
   "startDate": "Start date",
+  "startVisit": "Start visit",
   "takeAsNeeded": "Take As Needed",
   "tryReopeningTheForm": "Please try launching the form again",
   "tryReopeningTheWorkspaceAgain": "Please try launching the workspace again"
