@@ -5,7 +5,8 @@ export const mockDrugSearchResults = {
     results: [
       {
         uuid: '18f43c99-2329-426e-97b5-c3356e6afe54',
-        name: 'aspirin',
+        name: 'Aspirin',
+        display: 'Aspirin',
         strength: '81mg',
         dosageForm: {
           display: 'Tablet',
@@ -280,7 +281,8 @@ export const mockMedicationOrderSearchResults = [
     action: 'NEW',
     drug: {
       uuid: '18f43c99-2329-426e-97b5-c3356e6afe54',
-      name: 'aspirin',
+      name: 'Aspirin',
+      display: 'Aspirin',
       strength: '81mg',
       dosageForm: {
         display: 'Tablet',
@@ -364,7 +366,8 @@ export const mockMedicationOrderSearchResults = [
     action: 'NEW',
     drug: {
       uuid: '18f43c99-2329-426e-97b5-c3356e6afe54',
-      name: 'Aspirin 125mg',
+      name: 'Aspirin',
+      display: 'Aspirin',
       strength: '125mg',
       dosageForm: {
         display: 'Tablet',
@@ -478,7 +481,8 @@ export const mockMedicationOrderSearchResults = [
     action: 'NEW',
     drug: {
       uuid: '18f43c99-2329-426e-97b5-c3356e6afe54',
-      name: 'Aspirin 243mg',
+      name: 'Aspirin',
+      display: 'Aspirin',
       strength: '243mg',
       dosageForm: {
         display: 'Tablet',
@@ -682,7 +686,7 @@ export const mockDrugOrders = {
         commentToFulfiller: null,
         drug: {
           uuid: '18f43c99-2329-426e-97b5-c3356e6afe54',
-          name: 'aspirin',
+          name: 'Aspirin',
           strength: '81mg',
           dosageForm: {
             display: 'Tablet',
