@@ -266,10 +266,7 @@ function OrderBasketItemActions({
         previousOrder: null,
         action: 'DISCONTINUE',
         drug: medication.drug,
-        dosage: {
-          value: medication.dose,
-          default: true,
-        },
+        dosage: medication.dose,
         unit: {
           value: medication.doseUnits.display,
           valueCoded: medication.doseUnits.uuid,
@@ -317,10 +314,7 @@ function OrderBasketItemActions({
         startDate: new Date(),
         action: 'REVISE',
         drug: medication.drug,
-        dosage: {
-          value: medication.dose,
-          default: true,
-        },
+        dosage: medication.dose,
         unit: {
           value: medication.doseUnits.display,
           valueCoded: medication.doseUnits.uuid,
@@ -367,10 +361,7 @@ function OrderBasketItemActions({
         startDate: new Date(),
         action: 'RENEWED',
         drug: medication.drug,
-        dosage: {
-          value: medication.dose,
-          default: true,
-        },
+        dosage: medication.dose,
         unit: {
           value: medication.doseUnits.display,
           valueCoded: medication.doseUnits.uuid,
