@@ -1,12 +1,12 @@
-import React, { useMemo, useState } from 'react';
-import { Button, ClickableTile, Tile, SkeletonText, Loading, InlineNotification, ButtonSkeleton } from '@carbon/react';
+import React, { useMemo } from 'react';
+import { Button, ClickableTile, Tile, SkeletonText, InlineNotification, ButtonSkeleton } from '@carbon/react';
 import { ShoppingCart } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
-import { useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { OrderBasketItem } from '../../types/order-basket-item';
 import { ConfigObject } from '../../config-schema';
 import styles from './order-basket-search-results.scss';
-import { getDefault, getTemplateOrderBasketItem, useDrugSearch, useDrugTemplate } from './drug-search.resource';
+import { getTemplateOrderBasketItem, useDrugSearch, useDrugTemplate } from './drug-search.resource';
 import { Drug } from '../../types/order';
 
 export interface OrderBasketSearchResultsProps {
@@ -26,11 +26,29 @@ export default function OrderBasketSearchResults({
   const isTablet = useLayoutType() === 'tablet';
   const { drugs, isLoading, error } = useDrugSearch(searchTerm);
 
-  return searchTerm ? (
+  if (!searchTerm) {
+    return null;
+  }
+
+  if (isLoading) {
+    return <DrugSearchSkeleton />;
+  }
+
+  if (error) {
+    return (
+      <InlineNotification
+        kind="error"
+        lowContrast={true}
+        title={t('errorFetchingDrugResults', 'Error fetching drugs')}
+        subtitle={t('trySearchingDrugsAgain', 'Please try searching again')}
+        caption={error?.message}
+      />
+    );
+  }
+
+  return (
     <>
-      {isLoading ? (
-        <Skeleton />
-      ) : drugs?.length ? (
+      {drugs?.length ? (
         <div className={styles.container}>
           <div className={styles.orderBasketSearchResultsHeader}>
             <span className={styles.searchResultsCount}>
@@ -46,19 +64,28 @@ export default function OrderBasketSearchResults({
           {drugs.map((drug) => (
             <DrugSearchResultItem key={drug.uuid} drug={drug} onSearchResultClicked={onSearchResultClicked} />
           ))}
-          <hr className={`${styles.divider} ${isTablet ? `${styles.tabletDivider}` : `${styles.desktopDivider}`}`} />
         </div>
       ) : (
-        <InlineNotification
-          kind="error"
-          lowContrast={true}
-          title={t('errorFetchingDrugResults', 'Error fetching drugs')}
-          subtitle={t('trySearchingDrugsAgain', 'Please try searching again')}
-          caption={error?.message}
-        />
+        <div className={styles.emptyState}>
+          <div>
+            <h4 className={styles.productiveHeading01}>
+              {t('noResultsForDrugSearch', 'No results to display for "{searchTerm}"', {
+                searchTerm,
+              })}
+            </h4>
+            <p className={styles.bodyShort01}>
+              <span>{t('tryTo', 'Try to')}</span>{' '}
+              <span className={styles.link} role="link" tabIndex={0} onClick={() => setSearchTerm('')}>
+                {t('searchAgain', 'search again')}
+              </span>{' '}
+              <span>{t('usingADifferentTerm', 'using a different term')}</span>
+            </p>
+          </div>
+        </div>
       )}
+      <hr className={`${styles.divider} ${isTablet ? `${styles.tabletDivider}` : `${styles.desktopDivider}`}`} />
     </>
-  ) : null;
+  );
 }
 
 interface DrugSearchResultItemProps {
@@ -130,7 +157,7 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, onSea
   );
 };
 
-const Skeleton = () => {
+const DrugSearchSkeleton = () => {
   const isTablet = useLayoutType() === 'tablet';
   const tileClassName = `${isTablet ? `${styles.tabletSearchResultTile}` : `${styles.desktopSearchResultTile}`} ${
     styles.skeletonTile
@@ -141,17 +168,17 @@ const Skeleton = () => {
         <SkeletonText className={styles.searchResultCntSkeleton} />
         <ButtonSkeleton size={isTablet ? 'md' : 'sm'} />
       </div>
-      <Tile className={tileClassName} onClick={() => {}}>
+      <Tile className={tileClassName}>
         <SkeletonText />
       </Tile>
 
-      <Tile className={tileClassName} onClick={() => {}}>
+      <Tile className={tileClassName}>
         <SkeletonText />
       </Tile>
-      <Tile className={tileClassName} onClick={() => {}}>
+      <Tile className={tileClassName}>
         <SkeletonText />
       </Tile>
-      <Tile className={tileClassName} onClick={() => {}}>
+      <Tile className={tileClassName}>
         <SkeletonText />
       </Tile>
       <hr className={`${styles.divider} ${isTablet ? `${styles.tabletDivider}` : `${styles.desktopDivider}`}`} />

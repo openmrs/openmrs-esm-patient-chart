@@ -3,7 +3,7 @@
 @import "../../root";
 
 .container {
-  margin: spacing.$spacing-03 1rem spacing.$spacing-03;
+  margin: spacing.$spacing-03 spacing.$spacing-05 spacing.$spacing-03;
 }
 
 .desktopSearchResultTile {
@@ -88,3 +88,23 @@
   }
 }
 
+.emptyState {
+  margin: spacing.$spacing-05;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: spacing.$spacing-07;
+  border: 1px solid #e8e8e8;
+  text-align: center;
+  background-color: $ui-01;
+}
+
+:global(.omrs-breakpoint-lt-small-desktop) .emptyState {
+  background-color: $ui-02;
+}
+
+.link {
+  color: $interactive-01;
+  text-decoration: underline;
+  cursor: pointer;
+}
