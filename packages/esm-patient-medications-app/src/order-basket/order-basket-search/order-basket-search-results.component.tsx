@@ -36,13 +36,18 @@ export default function OrderBasketSearchResults({
 
   if (error) {
     return (
-      <InlineNotification
-        kind="error"
-        lowContrast={true}
-        title={t('errorFetchingDrugResults', 'Error fetching drugs')}
-        subtitle={t('trySearchingDrugsAgain', 'Please try searching again')}
-        caption={error?.message}
-      />
+      <Tile className={styles.emptyState}>
+        <div>
+          <h4 className={styles.productiveHeading01}>
+            {t('errorFetchingDrugResults', 'Error fetching results for "{searchTerm}"', {
+              searchTerm,
+            })}
+          </h4>
+          <p className={styles.bodyShort01}>
+            <span>{t('trySearchingAgain', 'Please try searching again')}</span>
+          </p>
+        </div>
+      </Tile>
     );
   }
 
