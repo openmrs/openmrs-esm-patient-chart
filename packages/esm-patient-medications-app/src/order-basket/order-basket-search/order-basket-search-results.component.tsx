@@ -66,7 +66,7 @@ export default function OrderBasketSearchResults({
           ))}
         </div>
       ) : (
-        <div className={styles.emptyState}>
+        <Tile className={styles.emptyState}>
           <div>
             <h4 className={styles.productiveHeading01}>
               {t('noResultsForDrugSearch', 'No results to display for "{searchTerm}"', {
@@ -81,7 +81,7 @@ export default function OrderBasketSearchResults({
               <span>{t('usingADifferentTerm', 'using a different term')}</span>
             </p>
           </div>
-        </div>
+        </Tile>
       )}
       <hr className={`${styles.divider} ${isTablet ? `${styles.tabletDivider}` : `${styles.desktopDivider}`}`} />
     </>
