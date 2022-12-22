@@ -43,6 +43,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   const { t } = useTranslation();
   const session = useSession();
   const { mutate } = useSWRConfig();
+  const isTablet = useLayoutType() === 'tablet';
   const [clinicalStatus, setClinicalStatus] = useState('active');
   const [endDate, setEndDate] = useState(null);
   const [onsetDate, setOnsetDate] = useState(new Date());
@@ -155,25 +156,24 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     <div className={styles.formContainer}>
       <Stack gap={7}>
         <FormGroup legendText={t('condition', 'Condition')}>
-          <ResponsiveWrapper>
-            <Search
-              size="md"
-              id="conditionsSearch"
-              labelText={t('enterCondition', 'Enter condition')}
-              placeholder={t('searchConditions', 'Search conditions')}
-              onChange={handleSearchTermChange}
-              onClear={() => setSelectedCondition(null)}
-              value={(() => {
-                if (conditionToLookup) {
-                  return conditionToLookup;
-                }
-                if (selectedCondition) {
-                  return selectedCondition.display;
-                }
-                return '';
-              })()}
-            />
-          </ResponsiveWrapper>
+          <Search
+            size="md"
+            id="conditionsSearch"
+            labelText={t('enterCondition', 'Enter condition')}
+            light={isTablet}
+            placeholder={t('searchConditions', 'Search conditions')}
+            onChange={handleSearchTermChange}
+            onClear={() => setSelectedCondition(null)}
+            value={(() => {
+              if (conditionToLookup) {
+                return conditionToLookup;
+              }
+              if (selectedCondition) {
+                return selectedCondition.display;
+              }
+              return '';
+            })()}
+          />
           <div>
             {(() => {
               if (!conditionToLookup || selectedCondition) return null;
@@ -197,32 +197,31 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
               }
               return (
                 <>
-                  <ResponsiveWrapper>
+                  <Layer>
                     <Tile className={styles.emptyResults}>
                       <span>
                         {t('noResultsFor', 'No results for')} <strong>"{conditionToLookup}"</strong>
                       </span>
                     </Tile>
-                  </ResponsiveWrapper>
+                  </Layer>
                 </>
               );
             })()}
           </div>
         </FormGroup>
         <FormGroup legendText="">
-          <ResponsiveWrapper>
-            <DatePicker
-              id="onsetDate"
-              datePickerType="single"
-              dateFormat="d/m/Y"
-              maxDate={new Date().toISOString()}
-              placeholder="dd/mm/yyyy"
-              onChange={([date]) => setOnsetDate(date)}
-              value={onsetDate}
-            >
-              <DatePickerInput id="onsetDateInput" labelText={t('onsetDate', 'Onset date')} />
-            </DatePicker>
-          </ResponsiveWrapper>
+          <DatePicker
+            id="onsetDate"
+            datePickerType="single"
+            dateFormat="d/m/Y"
+            light={isTablet}
+            maxDate={new Date().toISOString()}
+            placeholder="dd/mm/yyyy"
+            onChange={([date]) => setOnsetDate(date)}
+            value={onsetDate}
+          >
+            <DatePickerInput id="onsetDateInput" labelText={t('onsetDate', 'Onset date')} />
+          </DatePicker>
         </FormGroup>
         <FormGroup legendText={t('currentStatus', 'Current status')}>
           <RadioButtonGroup
@@ -237,34 +236,23 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
           </RadioButtonGroup>
         </FormGroup>
         {clinicalStatus === 'inactive' && (
-          <ResponsiveWrapper>
-            <DatePicker
-              id="endDate"
-              datePickerType="single"
-              dateFormat="d/m/Y"
-              minDate={new Date(onsetDate).toISOString()}
-              maxDate={dayjs().utc().format()}
-              placeholder="dd/mm/yyyy"
-              onChange={([date]) => setEndDate(date)}
-              value={endDate}
-            >
-              <DatePickerInput id="endDateInput" labelText={t('endDate', 'End date')} />
-            </DatePicker>
-          </ResponsiveWrapper>
+          <DatePicker
+            id="endDate"
+            datePickerType="single"
+            dateFormat="d/m/Y"
+            light={isTablet}
+            minDate={new Date(onsetDate).toISOString()}
+            maxDate={dayjs().utc().format()}
+            placeholder="dd/mm/yyyy"
+            onChange={([date]) => setEndDate(date)}
+            value={endDate}
+          >
+            <DatePickerInput id="endDateInput" labelText={t('endDate', 'End date')} />
+          </DatePicker>
         )}
       </Stack>
     </div>
   );
 };
-
-function ResponsiveWrapper(props: { children: React.ReactNode }) {
-  const isTablet = useLayoutType() === 'tablet';
-
-  if (isTablet) {
-    return <Layer>{props.children}</Layer>;
-  }
-
-  return <>{props.children}</>;
-}
 
 export default ConditionsWidget;
