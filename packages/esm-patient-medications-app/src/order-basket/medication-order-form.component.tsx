@@ -220,20 +220,22 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
             <>
               <Grid className={styles.gridRow}>
                 <Column md={4}>
-                  <NumberInput
-                    id="doseSelection"
-                    light={isTablet}
-                    placeholder={t('editDoseComboBoxPlaceholder', 'Dose')}
-                    label={t('editDoseComboBoxTitle', 'Enter Dose')}
-                    value={orderBasketItem?.dosage ?? 0}
-                    onChange={(e, { value }) => {
-                      setOrderBasketItem({
-                        ...orderBasketItem,
-                        dosage: value ? parseFloat(value) : 0,
-                      });
-                    }}
-                    hideSteppers
-                  />
+                  <div className={styles.numberInput}>
+                    <NumberInput
+                      id="doseSelection"
+                      light={isTablet}
+                      placeholder={t('editDoseComboBoxPlaceholder', 'Dose')}
+                      label={t('editDoseComboBoxTitle', 'Enter Dose')}
+                      value={orderBasketItem?.dosage ?? 0}
+                      onChange={(e, { value }) => {
+                        setOrderBasketItem({
+                          ...orderBasketItem,
+                          dosage: value ? parseFloat(value) : 0,
+                        });
+                      }}
+                      hideSteppers
+                    />
+                  </div>
                 </Column>
                 <Column md={4}>
                   <ComboBox
