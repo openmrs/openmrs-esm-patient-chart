@@ -56,7 +56,9 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient, basePa
   const tableRows = React.useMemo(() => {
     return paginatedConditions?.map((condition) => ({
       ...condition,
-      onsetDateTime: formatDate(parseDate(condition.onsetDateTime), { time: false, day: false }),
+      onsetDateTime: condition.onsetDateTime
+        ? formatDate(parseDate(condition.onsetDateTime), { time: false, day: false })
+        : '--',
     }));
   }, [paginatedConditions]);
 
