@@ -70,7 +70,7 @@ async function searchDrugsInBackend(allSearchTerms: Array<string>, abortControll
 }
 
 function getDefault(template: OrderTemplate, prop: string) {
-  return template.dosingInstructions[prop].filter((x) => x.default)[0] || template.dosingInstructions[prop][0];
+  return template.dosingInstructions[prop].find((x) => x.default) || template.dosingInstructions[prop][0];
 }
 
 function* explodeResultWithOrderTemplates(
@@ -84,7 +84,7 @@ function* explodeResultWithOrderTemplates(
         action: 'NEW',
         drug,
         unit: getDefault(template.template, 'unit'),
-        dosage: getDefault(template.template, 'dose'),
+        dosage: getDefault(template.template, 'dose')?.value,
         frequency: getDefault(template.template, 'frequency'),
         route: getDefault(template.template, 'route'),
         commonMedicationName: drug.name,

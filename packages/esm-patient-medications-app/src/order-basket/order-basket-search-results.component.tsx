@@ -83,8 +83,9 @@ export default function OrderBasketSearchResults({
               <div className={styles.searchResultTile}>
                 <div className={styles.searchResultTileContent}>
                   <p>
-                    <strong>{result.drug?.concept?.display}</strong> &mdash; {result?.drug?.strength} &mdash;{' '}
-                    {result?.drug?.dosageForm?.display}
+                    <strong>{result.drug?.display}</strong>{' '}
+                    {result?.drug?.strength && <>&mdash; {result?.drug?.strength}</>}{' '}
+                    {result?.drug?.dosageForm?.display && <>&mdash; {result?.drug?.dosageForm?.display}</>}
                     {result.template && (
                       <>
                         <span className={styles.label01}>{result.frequency?.value}</span> &mdash;{' '}
