@@ -21,8 +21,8 @@ export default function OrderBasketSearch({ onSearchResultClicked }: OrderBasket
         size="lg"
         light={isTablet}
         value={searchTerm}
-        placeholder={t('searchFieldPlaceholder', 'Search for an order (e.g. "Aspirin")')}
-        labelText={t('searchFieldPlaceholder', 'Search for an order (e.g. "Aspirin")')}
+        placeholder={t('searchFieldPlaceholder', 'Search for a drug or orderset (e.g. "Aspirin")')}
+        labelText={t('searchFieldPlaceholder', 'Search for a drug or orderset (e.g. "Aspirin")')}
         onChange={(e) => setSearchTerm(e.currentTarget?.value ?? '')}
       />
       <OrderBasketSearchResults
