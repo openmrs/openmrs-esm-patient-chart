@@ -42,6 +42,7 @@
   "modify": "Modify",
   "noDurationHint": "An empty field indicates an indefinite duration.",
   "none": "None",
+  "noResultsForDrugSearch": "No results to display for \"{searchTerm}\"",
   "orderActionDiscontinue": "Discontinue",
   "orderActionNew": "New",
   "orderActionRenewed": "Renew",
@@ -75,6 +76,7 @@
   "revisedOrders_one": "{count} order(s) being modified (revised)",
   "revisedOrders_other": "{count} order(s) being modified (revised)",
   "saveOrder": "Save order",
+  "searchAgain": "search again",
   "searchForAnOrder": "Search for an order above",
   "searchResultsExactMatchesForTerm_one": "{count} exact match(es) for \"{searchTerm}\"",
   "searchResultsExactMatchesForTerm_other": "{count} exact match(es) for \"{searchTerm}\"",
@@ -82,5 +84,7 @@
   "startDate": "Start date",
   "takeAsNeeded": "Take As Needed",
   "tryReopeningTheForm": "Please try launching the form again",
-  "trySearchingDrugsAgain": "Please try searching again"
+  "trySearchingDrugsAgain": "Please try searching again",
+  "tryTo": "Try to",
+  "usingADifferentTerm": "using a different term"
 }
