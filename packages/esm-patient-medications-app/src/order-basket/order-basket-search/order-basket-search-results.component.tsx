@@ -132,43 +132,26 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, onSea
 
 const Skeleton = () => {
   const isTablet = useLayoutType() === 'tablet';
+  const tileClassName = `${isTablet ? `${styles.tabletSearchResultTile}` : `${styles.desktopSearchResultTile}`} ${
+    styles.skeletonTile
+  }`;
   return (
     <div className={styles.searchResultSkeletonWrapper}>
       <div className={styles.orderBasketSearchResultsHeader}>
         <SkeletonText className={styles.searchResultCntSkeleton} />
         <ButtonSkeleton size={isTablet ? 'md' : 'sm'} />
       </div>
-      <Tile
-        className={`${isTablet ? `${styles.tabletSearchResultTile}` : `${styles.desktopSearchResultTile}`} ${
-          styles.skeletonTile
-        }`}
-        onClick={() => {}}
-      >
+      <Tile className={tileClassName} onClick={() => {}}>
         <SkeletonText />
       </Tile>
 
-      <Tile
-        className={`${isTablet ? `${styles.tabletSearchResultTile}` : `${styles.desktopSearchResultTile}`} ${
-          styles.skeletonTile
-        }`}
-        onClick={() => {}}
-      >
+      <Tile className={tileClassName} onClick={() => {}}>
         <SkeletonText />
       </Tile>
-      <Tile
-        className={`${isTablet ? `${styles.tabletSearchResultTile}` : `${styles.desktopSearchResultTile}`} ${
-          styles.skeletonTile
-        }`}
-        onClick={() => {}}
-      >
+      <Tile className={tileClassName} onClick={() => {}}>
         <SkeletonText />
       </Tile>
-      <Tile
-        className={`${isTablet ? `${styles.tabletSearchResultTile}` : `${styles.desktopSearchResultTile}`} ${
-          styles.skeletonTile
-        }`}
-        onClick={() => {}}
-      >
+      <Tile className={tileClassName} onClick={() => {}}>
         <SkeletonText />
       </Tile>
       <hr className={`${styles.divider} ${isTablet ? `${styles.tabletDivider}` : `${styles.desktopDivider}`}`} />
