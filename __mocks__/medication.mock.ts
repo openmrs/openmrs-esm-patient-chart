@@ -259,10 +259,7 @@ export const mockMedicationOrderSearchResults = [
         resourceVersion: '2.0',
       },
     },
-    dosage: {
-      value: 81,
-      default: true,
-    },
+    dosage: 81,
     unit: {
       valueCoded: '3013AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
       value: 'mg',
