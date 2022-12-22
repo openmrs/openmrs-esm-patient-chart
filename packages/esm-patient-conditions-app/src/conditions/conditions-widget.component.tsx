@@ -1,19 +1,18 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import 'dayjs/plugin/utc';
-import debounce from 'lodash-es/debounce';
 import { BehaviorSubject } from 'rxjs';
 import { useSWRConfig } from 'swr';
 import {
   DatePicker,
   DatePickerInput,
   FormGroup,
+  InlineLoading,
   Layer,
   RadioButton,
   RadioButtonGroup,
   Search,
-  SearchSkeleton,
   Stack,
   Tile,
 } from '@carbon/react';
@@ -25,7 +24,7 @@ import {
   useLayoutType,
   useSession,
 } from '@openmrs/esm-framework';
-import { createPatientCondition, searchConditionConcepts, CodedCondition } from './conditions.resource';
+import { createPatientCondition, CodedCondition, useConditionsSearch } from './conditions.resource';
 import styles from './conditions-form.scss';
 
 interface ConditionsWidgetProps {
@@ -41,18 +40,17 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   setHasSubmissibleValue,
   submissionNotifier,
 }) => {
-  const searchTimeoutInMs = 500;
   const { t } = useTranslation();
-  const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
   const { mutate } = useSWRConfig();
-  const [clinicalStatus, setClinicalStatus] = React.useState('active');
-  const [endDate, setEndDate] = React.useState(null);
-  const [onsetDate, setOnsetDate] = React.useState(new Date());
-  const [isSearching, setIsSearching] = React.useState(false);
-  const [searchTerm, setSearchTerm] = React.useState<null | string>('');
-  const [searchResults, setSearchResults] = React.useState<null | Array<CodedCondition>>(null);
-  const [selectedCondition, setSelectedCondition] = React.useState(null);
+  const isTablet = useLayoutType() === 'tablet';
+  const [clinicalStatus, setClinicalStatus] = useState('active');
+  const [endDate, setEndDate] = useState(null);
+  const [onsetDate, setOnsetDate] = useState(new Date());
+  const [conditionToLookup, setConditionToLookup] = useState<null | string>('');
+  const [selectedCondition, setSelectedCondition] = useState(null);
+
+  const { conditions, isSearchingConditions } = useConditionsSearch(conditionToLookup);
 
   useEffect(() => {
     if (setHasSubmissibleValue) {
@@ -60,41 +58,14 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     }
   }, [selectedCondition, setHasSubmissibleValue]);
 
-  const handleSearchChange = (event) => {
-    setSelectedCondition(null);
-    setIsSearching(true);
-    const query = event.target.value;
-    setSearchTerm(query);
-    if (query) {
-      debouncedSearch(query);
-    }
-  };
+  const handleSearchTermChange = (event) => setConditionToLookup(event.target.value);
 
-  const debouncedSearch = React.useMemo(
-    () =>
-      debounce((searchTerm) => {
-        if (searchTerm) {
-          const sub = searchConditionConcepts(searchTerm).subscribe(
-            (searchResults: Array<CodedCondition>) => {
-              setSearchResults(searchResults);
-              setIsSearching(false);
-            },
-            () => createErrorHandler(),
-          );
-          return () => {
-            sub.unsubscribe();
-          };
-        }
-      }, searchTimeoutInMs),
-    [],
-  );
-
-  const handleConditionChange = React.useCallback((selectedCondition: CodedCondition) => {
+  const handleConditionChange = useCallback((selectedCondition: CodedCondition) => {
     setSelectedCondition(selectedCondition);
-    setSearchTerm('');
+    setConditionToLookup('');
   }, []);
 
-  const handleSubmit = React.useCallback(() => {
+  const handleSubmit = useCallback(() => {
     if (!selectedCondition) {
       return;
     }
@@ -185,51 +156,33 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     <div className={styles.formContainer}>
       <Stack gap={7}>
         <FormGroup legendText={t('condition', 'Condition')}>
-          {isTablet ? (
-            <Layer>
-              <Search
-                size="lg"
-                id="conditionsSearch"
-                labelText={t('enterCondition', 'Enter condition')}
-                placeholder={t('searchConditions', 'Search conditions')}
-                onChange={handleSearchChange}
-                value={(() => {
-                  if (searchTerm) {
-                    return searchTerm;
-                  }
-                  if (selectedCondition && !isSearching) {
-                    return selectedCondition.display;
-                  }
-                  return '';
-                })()}
-              />
-            </Layer>
-          ) : (
-            <Search
-              size="lg"
-              id="conditionsSearch"
-              labelText={t('enterCondition', 'Enter condition')}
-              placeholder={t('searchConditions', 'Search conditions')}
-              onChange={handleSearchChange}
-              value={(() => {
-                if (searchTerm) {
-                  return searchTerm;
-                }
-                if (selectedCondition && !isSearching) {
-                  return selectedCondition.display;
-                }
-                return '';
-              })()}
-            />
-          )}
+          <Search
+            size="md"
+            id="conditionsSearch"
+            labelText={t('enterCondition', 'Enter condition')}
+            light={isTablet}
+            placeholder={t('searchConditions', 'Search conditions')}
+            onChange={handleSearchTermChange}
+            onClear={() => setSelectedCondition(null)}
+            value={(() => {
+              if (conditionToLookup) {
+                return conditionToLookup;
+              }
+              if (selectedCondition) {
+                return selectedCondition.display;
+              }
+              return '';
+            })()}
+          />
           <div>
             {(() => {
-              if (!searchTerm || selectedCondition) return null;
-              if (isSearching) return <SearchSkeleton role="progressbar" />;
-              if (searchResults && searchResults.length) {
+              if (!conditionToLookup || selectedCondition) return null;
+              if (isSearchingConditions)
+                return <InlineLoading className={styles.loader} description={t('searching', 'Searching') + '...'} />;
+              if (conditions && conditions.length) {
                 return (
                   <ul className={styles.conditionsList}>
-                    {searchResults.map((condition, index) => (
+                    {conditions?.map((condition, index) => (
                       <li
                         role="menuitem"
                         className={styles.condition}
@@ -243,27 +196,31 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
                 );
               }
               return (
-                <Tile light={isTablet} className={styles.emptyResults}>
-                  <span>
-                    {t('noResultsFor', 'No results for')} <strong>"{searchTerm}"</strong>
-                  </span>
-                </Tile>
+                <>
+                  <Layer>
+                    <Tile className={styles.emptyResults}>
+                      <span>
+                        {t('noResultsFor', 'No results for')} <strong>"{conditionToLookup}"</strong>
+                      </span>
+                    </Tile>
+                  </Layer>
+                </>
               );
             })()}
           </div>
         </FormGroup>
-        <FormGroup legendText={t('onsetDate', 'Onset date')}>
+        <FormGroup legendText="">
           <DatePicker
             id="onsetDate"
             datePickerType="single"
             dateFormat="d/m/Y"
+            light={isTablet}
             maxDate={new Date().toISOString()}
             placeholder="dd/mm/yyyy"
             onChange={([date]) => setOnsetDate(date)}
             value={onsetDate}
-            light={isTablet}
           >
-            <DatePickerInput id="onsetDateInput" labelText="" />
+            <DatePickerInput id="onsetDateInput" labelText={t('onsetDate', 'Onset date')} />
           </DatePicker>
         </FormGroup>
         <FormGroup legendText={t('currentStatus', 'Current status')}>
@@ -283,12 +240,12 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
             id="endDate"
             datePickerType="single"
             dateFormat="d/m/Y"
+            light={isTablet}
             minDate={new Date(onsetDate).toISOString()}
             maxDate={dayjs().utc().format()}
             placeholder="dd/mm/yyyy"
             onChange={([date]) => setEndDate(date)}
             value={endDate}
-            light={isTablet}
           >
             <DatePickerInput id="endDateInput" labelText={t('endDate', 'End date')} />
           </DatePicker>

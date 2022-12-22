@@ -9,6 +9,8 @@ import { ConfigMock } from '../../../../__mocks__/chart-widgets-config.mock';
 import NotesOverview from './notes-overview.component';
 import { useVisitNotes } from './visit-notes.resource';
 
+jest.setTimeout(10000);
+
 const testProps = {
   basePath: patientChartBasePath,
   patient: mockPatient,
