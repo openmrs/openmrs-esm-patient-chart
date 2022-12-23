@@ -19,7 +19,7 @@ export class FormSchemaService {
 
   public getFormSchemaByUuid(formUuid: string, cached: boolean = true): Observable<FormSchema> {
     const cachedCompiledSchema = this.getCachedCompiledSchemaByUuid(formUuid);
-    const currentLang: string = (window as any).i18next.language.substring(0, 2).toLowerCase() || 'en';
+    const currentLang = window.i18next?.language.substring(0, 2).toLowerCase() || 'en';
     this.translate.setDefaultLang(currentLang);
 
     if (cachedCompiledSchema && cached) {
@@ -248,7 +248,7 @@ export class FormSchemaService {
     return this.localStorage.getObject(translationUuid);
   }
 
-  private cacheTranslationsByUuid(translationUuid, schema): void {
+  private cacheTranslationsByUuid(translationUuid: string, schema: any): void {
     this.localStorage.setObject(translationUuid, schema);
   }
 }

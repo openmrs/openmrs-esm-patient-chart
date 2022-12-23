@@ -89,7 +89,7 @@
     "karma-coverage-istanbul-reporter": "~3.0.2",
     "karma-jasmine": "~4.0.0",
     "karma-jasmine-html-reporter": "^1.5.0",
-    "openmrs": "4.0.2-pre.336",
+    "openmrs": "next",
     "protractor": "~7.0.0",
     "style-loader": "2.x",
     "webpack": "~5.74.0"
