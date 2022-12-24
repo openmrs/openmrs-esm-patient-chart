@@ -28,7 +28,7 @@ const OrderBasketActionButton: React.FC = () => {
         <div className={styles.elementContainer}>
           <ShoppingCart size={20} />
           {pendingOrders ? (
-            <Tag className={styles.countTag}>!</Tag>
+            <Tag className={styles.errorTag}>!</Tag>
           ) : items?.length > 0 ? (
             <Tag className={styles.countTag}>{items?.length}</Tag>
           ) : null}
@@ -45,7 +45,7 @@ const OrderBasketActionButton: React.FC = () => {
         <div className={styles.elementContainer}>
           <ShoppingCart size={20} {...props} />{' '}
           {pendingOrders ? (
-            <Tag className={styles.countTag}>!</Tag>
+            <Tag className={styles.errorTag}>!</Tag>
           ) : items?.length > 0 ? (
             <Tag className={styles.countTag}>{items?.length}</Tag>
           ) : null}{' '}

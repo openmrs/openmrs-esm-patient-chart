@@ -41,7 +41,6 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
     const { encounterUuid, isLoadingEncounterUuid } = useCurrentOrderBasketEncounter(patientUuid);
 
     const isLoading = isLoadingEncounterUuid;
-    const [orderFormSigned, setOrderFormSigned] = useState(false);
 
     const [orderFormSaved, setOrderFormSaved] = useState(false);
     const [medicationOrderFormItem, setMedicationOrderFormItem] = useState<OrderBasketItem | null>(null);
@@ -77,7 +76,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
     const openMedicationOrderForm = (item: OrderBasketItem, onSigned: (finalizedOrder: OrderBasketItem) => void) => {
       setMedicationOrderFormItem(item);
       setOnMedicationOrderFormSign((_) => (finalizedOrder) => {
-        setOrderFormSigned(true);
+        setOrderFormSaved(true);
         setIsMedicationOrderFormVisible(false);
         setMedicationOrderFormItem(null);
         onSigned(finalizedOrder);
@@ -101,7 +100,6 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
               'Your order is complete. The items will now appear on the Orders page.',
             ),
           });
-          setOrderFormSaved(true);
 
           const apiUrlPattern = new RegExp(
             '\\/ws\\/rest\\/v1\\/order\\?patient\\=' + patientUuid + '\\&careSetting=' + config.careSettingUuid,
@@ -150,12 +148,10 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
     }, [currentWindowSize]);
 
     useEffect(() => {
-      if (minimised && medicationOrderFormItem && !orderFormSigned) {
-        isPending(true);
-      } else if (orderFormSigned && minimised && !orderFormSaved) {
+      if (minimised && medicationOrderFormItem && !orderFormSaved) {
         isPending(true);
       } else isPending(false);
-    }, [minimised, medicationOrderFormItem, isPending, orderFormSaved, orderFormSigned]);
+    }, [minimised, medicationOrderFormItem, isPending, orderFormSaved]);
 
     if (isLoading) return <InlineLoading className={styles.loader} description={t('loading', 'Loading...')} />;
 

@@ -17,6 +17,17 @@
     right: -10px;
     top: -15px;
   }
+  .errorTag {
+    position: absolute;
+    transform: scale(0.7);
+    min-width: initial;
+    min-height: initial;
+    background-color: #ff832b;
+    color: whitesmoke;
+    font-weight: 900;
+    right: -10px;
+    top: -15px;
+  }
 }
 
 .container {
