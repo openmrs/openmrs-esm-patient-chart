@@ -1,7 +1,28 @@
 import useSWR from 'swr';
 import { map } from 'rxjs/operators';
-import { openmrsObservableFetch, fhirBaseUrl, openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsObservableFetch, fhirBaseUrl, openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import { FHIRCondition, FHIRConditionResponse } from '../types';
+
+export type Condition = {
+  clinicalStatus: string;
+  conceptId: string;
+  display: string;
+  onsetDateTime: string;
+  recordedDate: string;
+  id: string;
+};
+
+export type CodedCondition = {
+  concept: {
+    uuid: string;
+    display: string;
+  };
+  conceptName: {
+    uuid: string;
+    display: string;
+  };
+  display: string;
+};
 
 export function useConditions(patientUuid: string) {
   const { data, error, isValidating } = useSWR<{ data: FHIRConditionResponse }, Error>(
@@ -25,12 +46,22 @@ export function useConditions(patientUuid: string) {
   };
 }
 
-export function searchConditionConcepts(searchTerm: string) {
-  const conditionConceptClassUuid = '8d4918b0-c2cc-11de-8d13-0010c6dffd0f';
+export function useConditionsSearch(conditionToLookup: string) {
+  const config = useConfig();
+  const conditionConceptClassUuid = config?.conditionConceptClassUuid;
 
-  return openmrsObservableFetch<Array<CodedCondition>>(
-    `/ws/rest/v1/conceptsearch?conceptClasses=${conditionConceptClassUuid}&q=${searchTerm}`,
-  ).pipe(map(({ data }) => data['results']));
+  const CONDITIONS_SEARCH_URL = `/ws/rest/v1/conceptsearch?conceptClasses=${conditionConceptClassUuid}&q=${conditionToLookup}`;
+
+  const { data, error } = useSWR<{ data: { results: Array<CodedCondition> } }, Error>(
+    conditionToLookup ? CONDITIONS_SEARCH_URL : null,
+    openmrsFetch,
+  );
+
+  return {
+    conditions: data?.data?.results ?? [],
+    error: error,
+    isSearchingConditions: !data && !error,
+  };
 }
 
 export function getConditionByUuid(conditionUuid: string) {
@@ -65,24 +96,3 @@ export function createPatientCondition(payload, abortController) {
 export function updatePatientCondition(patientCondition, patientUuid, abortController) {
   return Promise.resolve({ status: 200, body: 'Ok' });
 }
-
-export type Condition = {
-  clinicalStatus: string;
-  conceptId: string;
-  display: string;
-  onsetDateTime: string;
-  recordedDate: string;
-  id: string;
-};
-
-export type CodedCondition = {
-  concept: {
-    uuid: string;
-    display: string;
-  };
-  conceptName: {
-    uuid: string;
-    display: string;
-  };
-  display: string;
-};

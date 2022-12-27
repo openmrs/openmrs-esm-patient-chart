@@ -67,7 +67,7 @@ export class FormCreationService {
   public async initAndCreateForm(createFormParams: CreateFormParams) {
     const { formSchema, encounter } = createFormParams;
 
-    await this.wireDataSources(createFormParams);
+    await this.wireDataSources(createFormParams, formSchema);
 
     const form = this.formFactory.createForm(formSchema, this.dataSources.dataSources);
     this.setUpWHOCascading(form);
@@ -87,7 +87,7 @@ export class FormCreationService {
     return form;
   }
 
-  private wireDataSources(createFormParams: CreateFormParams) {
+  private async wireDataSources(createFormParams: CreateFormParams, formSchema: FormSchema) {
     const visitTypeUuid = this.singleSpaPropsService.getPropOrThrow('visitTypeUuid');
     const patient = this.singleSpaPropsService.getPropOrThrow('patient');
 
@@ -101,15 +101,18 @@ export class FormCreationService {
     // Fixed data sources which are always required.
     // We re-register them during each form creation flow because props like the logged-in user or patient
     // can change in between.
-    this.dataSources.registerDataSource('location', this.formDataSourceService.getDataSources().location);
-    this.dataSources.registerDataSource('provider', this.formDataSourceService.getDataSources().provider);
-    this.dataSources.registerDataSource('drug', this.formDataSourceService.getDataSources().drug);
-    this.dataSources.registerDataSource('problem', this.formDataSourceService.getDataSources().problem);
-    this.dataSources.registerDataSource('personAttribute', this.formDataSourceService.getDataSources().location);
-    this.dataSources.registerDataSource('conceptAnswers', this.formDataSourceService.getDataSources().conceptAnswers);
+    const dataSources = this.formDataSourceService.getDataSources(formSchema);
+    this.dataSources.registerDataSource('location', dataSources.location);
+    this.dataSources.registerDataSource('provider', dataSources.provider);
+    this.dataSources.registerDataSource('drug', dataSources.drug);
+    this.dataSources.registerDataSource('problem', dataSources.problem);
+    this.dataSources.registerDataSource('personAttribute', dataSources.location);
+    this.dataSources.registerDataSource('conceptAnswers', dataSources.conceptAnswers);
     this.dataSources.registerDataSource('patient', { visitTypeUuid }, true);
-    this.dataSources.registerDataSource('patient', this.formDataSourceService.getPatientObject(patient), true);
+    this.dataSources.registerDataSource('patient', dataSources, true);
     this.dataSources.registerDataSource('rawPrevEnc', createFormParams.previousEncounter, false);
+    const rawPrevObs = await dataSources.recentObs(patient.id);
+    this.dataSources.registerDataSource('rawPrevObs', rawPrevObs, false);
     this.dataSources.registerDataSource('userLocation', createFormParams.user.sessionLocation);
 
     // TODO monthlySchedule should be converted to a "standard" configurableDataSource
