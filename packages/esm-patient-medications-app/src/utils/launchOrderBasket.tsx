@@ -8,14 +8,17 @@ import { useCallback, useMemo } from 'react';
 export function useLaunchOrderBasket(patientUuid) {
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
 
-  const launchOrderBasket = useCallback(() => {
-    if (currentVisit) {
-      launchPatientWorkspace('order-basket-workspace');
-    } else {
-      launchStartVisitPrompt();
-    }
-  }, [currentVisit]);
-
-  const results = useMemo(() => ({ launchOrderBasket }), [launchOrderBasket]);
+  const results = useMemo(
+    () => ({
+      launchOrderBasket: () => {
+        if (currentVisit) {
+          launchPatientWorkspace('order-basket-workspace');
+        } else {
+          launchStartVisitPrompt();
+        }
+      },
+    }),
+    [currentVisit],
+  );
   return results;
 }
