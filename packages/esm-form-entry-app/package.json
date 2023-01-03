@@ -48,7 +48,6 @@
     "@carbon/styles": "~1.14.0",
     "@ng-select/ng-select": "^6.1.0",
     "@ngx-translate/core": "^13.0.0",
-    "@ngx-translate/http-loader": "^6.0.0",
     "@openmrs/ngx-formentry": "next",
     "hammerjs": "^2.0.8",
     "jspdf": "^1.5.3",

@@ -19,7 +19,7 @@ export class FormSchemaService {
 
   public getFormSchemaByUuid(formUuid: string, cached: boolean = true): Observable<FormSchema> {
     const cachedCompiledSchema = this.getCachedCompiledSchemaByUuid(formUuid);
-    const currentLang = window.i18next?.language.substring(0, 2).toLowerCase() || 'en';
+    const currentLang = (window as any).i18next?.language.substring(0, 2).toLowerCase() || 'en';
     this.translate.setDefaultLang(currentLang);
 
     if (cachedCompiledSchema && cached) {
