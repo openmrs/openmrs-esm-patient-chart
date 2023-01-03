@@ -1,8 +1,12 @@
 import React from 'react';
 import { screen, render, waitFor, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { showModal, useLayoutType } from '@openmrs/esm-framework';
-import { launchPatientWorkspace, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
+import { useLayoutType } from '@openmrs/esm-framework';
+import {
+  launchPatientWorkspace,
+  useVisitOrOfflineVisit,
+  launchStartVisitPrompt,
+} from '@openmrs/esm-patient-common-lib';
 import OrderBasketActionButton from './order-basket-action-button.component';
 
 const mockedUseLayoutType = useLayoutType as jest.Mock;
@@ -14,7 +18,6 @@ jest.mock('@openmrs/esm-framework', () => {
     ...originalModule,
     useLayoutType: jest.fn(),
     useStore: jest.fn().mockReturnValue({ items: [{ name: 'order-01', uuid: 'some-uuid' }] }),
-    showModal: jest.fn(),
   };
 });
 
@@ -32,6 +35,7 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
         uuid: '8ef90c91-14be-42dd-a1c0-e67fbf904470',
       },
     })),
+    launchStartVisitPrompt: jest.fn(),
   };
 });
 
@@ -90,22 +94,13 @@ describe('<OrderBasketActionButton/>', () => {
       currentVisit: null,
     }));
 
-    const modalDispose = jest.fn();
-    const closeModal = () => modalDispose()(showModal as jest.Mock).mockImplementation(() => modalDispose);
-
     render(<OrderBasketActionButton />);
-
     const orderBasketButton = screen.getByRole('button', { name: /Orders/i });
     expect(orderBasketButton).toBeInTheDocument();
 
     await waitFor(() => user.click(orderBasketButton));
 
-    expect(showModal).toHaveBeenCalledWith(
-      'start-visit-dialog',
-      expect.objectContaining({
-        patientUuid: null,
-      }),
-    );
+    expect(launchStartVisitPrompt).toHaveBeenCalled();
     expect(launchPatientWorkspace).not.toBeCalled();
     expect(orderBasketButton).toHaveClass('active');
   });
