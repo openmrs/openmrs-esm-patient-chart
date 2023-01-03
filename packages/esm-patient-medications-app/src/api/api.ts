@@ -1,6 +1,6 @@
 import useSWR from 'swr';
 import useSWRImmutable from 'swr/immutable';
-import { FetchResponse, openmrsFetch, useConfig, OpenmrsResource, useSession } from '@openmrs/esm-framework';
+import { FetchResponse, openmrsFetch, Session, useConfig, OpenmrsResource, useSession } from '@openmrs/esm-framework';
 import { OrderPost, PatientMedicationFetchResponse } from '../types/order';
 import { ConfigObject } from '../config-schema';
 import { useEffect, useMemo, useState } from 'react';
@@ -158,12 +158,6 @@ export function createEmptyEncounter(
     location: sessionLocationUuid,
     encounterType: drugOrderEncounterType,
     encounterDatetime: new Date().toISOString(),
-    encounterProviders: [
-      {
-        provider: currentProviderUuid,
-        encounterRole: clinicianEncounterRole,
-      },
-    ],
     visit: currentVisitUuid,
     obs: [],
   };
