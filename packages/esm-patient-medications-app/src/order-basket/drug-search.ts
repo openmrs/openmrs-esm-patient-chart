@@ -26,7 +26,6 @@ interface DaysDurationUnit {
 
 export async function searchMedications(
   searchTerm: string,
-  encounterUuid: string,
   abortController: AbortController,
   daysDurationUnit: DaysDurationUnit,
 ) {
@@ -54,7 +53,7 @@ export async function searchMedications(
     }),
   )) as any as Array<{ drug: Drug; templates: Array<DrugOrderTemplate> }>;
   const explodedSearchResults = drugToOrderTemplates.flatMap(({ drug, templates }) => [
-    ...explodeResultWithOrderTemplates(drug, templates, encounterUuid, daysDurationUnit),
+    ...explodeResultWithOrderTemplates(drug, templates, daysDurationUnit),
   ]);
   return filterExplodedResultsBySearchTerm(allSearchTerms, explodedSearchResults);
 }
@@ -77,7 +76,6 @@ function getDefault(template: OrderTemplate, prop: string) {
 function* explodeResultWithOrderTemplates(
   drug: Drug,
   templates: Array<DrugOrderTemplate>,
-  encounterUuid: string,
   daysDurationUnit: DaysDurationUnit,
 ): Generator<OrderBasketItem> {
   if (templates?.length) {
@@ -89,7 +87,6 @@ function* explodeResultWithOrderTemplates(
         dosage: getDefault(template.template, 'dose')?.value,
         frequency: getDefault(template.template, 'frequency'),
         route: getDefault(template.template, 'route'),
-        encounterUuid,
         commonMedicationName: drug.name,
         isFreeTextDosage: false,
         patientInstructions: '',
@@ -116,7 +113,6 @@ function* explodeResultWithOrderTemplates(
       dosage: null,
       frequency: null,
       route: null,
-      encounterUuid,
       commonMedicationName: drug.name,
       isFreeTextDosage: false,
       patientInstructions: '',

@@ -11,14 +11,12 @@ import styles from './order-basket-search-results.scss';
 
 export interface OrderBasketSearchResultsProps {
   searchTerm: string;
-  encounterUuid: string;
   setSearchTerm: (value: string) => void;
   onSearchResultClicked: (searchResult: OrderBasketItem, directlyAddToBasket: boolean) => void;
 }
 
 export default function OrderBasketSearchResults({
   searchTerm,
-  encounterUuid,
   setSearchTerm,
   onSearchResultClicked,
 }: OrderBasketSearchResultsProps) {
@@ -39,7 +37,7 @@ export default function OrderBasketSearchResults({
         return;
       }
       setIsLoading(true);
-      searchMedications(searchTerm, encounterUuid, abortController, config.daysDurationUnit).then((results) => {
+      searchMedications(searchTerm, abortController, config.daysDurationUnit).then((results) => {
         setIsLoading(false);
         setSearchResults(results);
       }, createErrorHandler);

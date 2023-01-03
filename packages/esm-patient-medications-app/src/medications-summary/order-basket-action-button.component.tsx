@@ -1,11 +1,12 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Tag } from '@carbon/react';
 import { ShoppingCart } from '@carbon/react/icons';
-import { useLayoutType, useStore } from '@openmrs/esm-framework';
-import { launchPatientWorkspace, useWorkspaces } from '@openmrs/esm-patient-common-lib';
+import { useLayoutType, usePatient, useStore } from '@openmrs/esm-framework';
+import { useWorkspaces } from '@openmrs/esm-patient-common-lib';
 import { orderBasketStore } from '../medications/order-basket-store';
 import styles from './order-basket-action-button.scss';
+import { useLaunchOrderBasket } from '../utils/launchOrderBasket';
 
 const OrderBasketActionButton: React.FC = () => {
   const { t } = useTranslation();
@@ -13,8 +14,8 @@ const OrderBasketActionButton: React.FC = () => {
   const { workspaces } = useWorkspaces();
   const { items } = useStore(orderBasketStore);
   const isActive = workspaces.find(({ name }) => name.includes('order-basket'));
-
-  const launchOrdersWorkspace = useCallback(() => launchPatientWorkspace('order-basket-workspace'), []);
+  const { patientUuid } = usePatient();
+  const { launchOrderBasket } = useLaunchOrderBasket(patientUuid);
 
   if (layout === 'tablet')
     return (
@@ -23,7 +24,7 @@ const OrderBasketActionButton: React.FC = () => {
         className={`${styles.container} ${isActive ? styles.active : ''}`}
         role="button"
         tabIndex={0}
-        onClick={launchOrdersWorkspace}
+        onClick={launchOrderBasket}
       >
         <div className={styles.elementContainer}>
           <ShoppingCart size={20} /> {items?.length > 0 && <Tag className={styles.countTag}>{items?.length}</Tag>}
@@ -46,7 +47,7 @@ const OrderBasketActionButton: React.FC = () => {
       iconDescription={t('orders', 'Orders')}
       tooltipAlignment="end"
       tooltipPosition="bottom"
-      onClick={launchOrdersWorkspace}
+      onClick={launchOrderBasket}
     />
   );
 };

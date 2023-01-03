@@ -18,7 +18,7 @@ import {
 } from '@carbon/react';
 import { Add, User } from '@carbon/react/icons';
 import { formatDate } from '@openmrs/esm-framework';
-import { CardHeader, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { CardHeader } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { compare } from '../utils/compare';
 import { connect } from 'unistore/react';
@@ -26,6 +26,7 @@ import { OrderBasketStore, OrderBasketStoreActions, orderBasketStoreActions } fr
 import { Order } from '../types/order';
 import { OrderBasketItem } from '../types/order-basket-item';
 import styles from './medications-details-table.scss';
+import { useLaunchOrderBasket } from '../utils/launchOrderBasket';
 
 export interface ActiveMedicationsProps {
   isValidating?: boolean;
@@ -35,6 +36,7 @@ export interface ActiveMedicationsProps {
   showDiscontinueButton: boolean;
   showModifyButton: boolean;
   showReorderButton: boolean;
+  patientUuid: string;
 }
 
 const MedicationsDetailsTable = connect<
@@ -56,9 +58,10 @@ const MedicationsDetailsTable = connect<
     showAddNewButton,
     items,
     setItems,
+    patientUuid,
   }: ActiveMedicationsProps & OrderBasketStore & OrderBasketStoreActions) => {
     const { t } = useTranslation();
-    const openOrderBasket = React.useCallback(() => launchPatientWorkspace('order-basket-workspace'), []);
+    const { launchOrderBasket } = useLaunchOrderBasket(patientUuid);
 
     const tableHeaders = [
       {
@@ -165,7 +168,7 @@ const MedicationsDetailsTable = connect<
               kind="ghost"
               renderIcon={(props) => <Add size={16} {...props} />}
               iconDescription="Launch order basket"
-              onClick={openOrderBasket}
+              onClick={launchOrderBasket}
             >
               {t('add', 'Add')}
             </Button>
@@ -213,6 +216,7 @@ const MedicationsDetailsTable = connect<
                           medication={medications[rowIndex]}
                           items={items}
                           setItems={setItems}
+                          openOrderBasket={launchOrderBasket}
                         />
                       </TableCell>
                     </TableRow>
@@ -235,6 +239,7 @@ function InfoTooltip({ orderer }) {
       direction="top"
       label={orderer}
       renderIcon={(props) => <User size={16} {...props} />}
+      iconDescription={orderer}
       kind="ghost"
       size="sm"
     />
@@ -248,6 +253,7 @@ function OrderBasketItemActions({
   medication,
   items,
   setItems,
+  openOrderBasket,
 }: {
   showDiscontinueButton: boolean;
   showModifyButton: boolean;
@@ -255,6 +261,7 @@ function OrderBasketItemActions({
   medication: Order;
   items: Array<OrderBasketItem>;
   setItems: (items: Array<OrderBasketItem>) => void;
+  openOrderBasket: () => void;
 }) {
   const { t } = useTranslation();
   const alreadyInBasket = items.some((x) => x.uuid === medication.uuid);
@@ -279,7 +286,6 @@ function OrderBasketItemActions({
           valueCoded: medication.route.uuid,
           value: medication.route.display,
         },
-        encounterUuid: medication.encounter.uuid,
         commonMedicationName: medication.drug.name,
         isFreeTextDosage: medication.dosingType === 'org.openmrs.FreeTextDosingInstructions',
         freeTextDosage:
@@ -302,8 +308,8 @@ function OrderBasketItemActions({
         quantityUnits: medication.quantityUnits.uuid,
       },
     ]);
-    launchPatientWorkspace('order-basket-workspace');
-  }, [items, setItems, medication]);
+    openOrderBasket();
+  }, [items, setItems, medication, openOrderBasket]);
 
   const handleModifyClick = useCallback(() => {
     setItems([
@@ -327,7 +333,6 @@ function OrderBasketItemActions({
           valueCoded: medication.route.uuid,
           value: medication.route.display,
         },
-        encounterUuid: medication.encounter.uuid,
         commonMedicationName: medication.drug.name,
         isFreeTextDosage: medication.dosingType === 'org.openmrs.FreeTextDosingInstructions',
         freeTextDosage:
@@ -349,8 +354,8 @@ function OrderBasketItemActions({
         quantityUnits: medication.quantityUnits.uuid,
       },
     ]);
-    launchPatientWorkspace('order-basket-workspace');
-  }, [items, setItems, medication]);
+    openOrderBasket();
+  }, [items, setItems, medication, openOrderBasket]);
 
   const handleReorderClick = useCallback(() => {
     setItems([
@@ -374,7 +379,6 @@ function OrderBasketItemActions({
           valueCoded: medication.route.uuid,
           value: medication.route.display,
         },
-        encounterUuid: medication.encounter.uuid,
         commonMedicationName: medication.drug.name,
         isFreeTextDosage: medication.dosingType === 'org.openmrs.FreeTextDosingInstructions',
         freeTextDosage:
@@ -396,8 +400,8 @@ function OrderBasketItemActions({
         quantityUnits: medication.quantityUnits.uuid,
       },
     ]);
-    launchPatientWorkspace('order-basket-workspace');
-  }, [items, setItems, medication]);
+    openOrderBasket();
+  }, [items, setItems, medication, openOrderBasket]);
 
   return (
     <OverflowMenu ariaLabel="Actions menu" selectorPrimaryFocus={'#modify'} flipped>
