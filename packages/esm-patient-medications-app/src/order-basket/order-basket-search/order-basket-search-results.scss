@@ -7,7 +7,6 @@
 }
 
 .desktopSearchResultTile {
-  margin-top: 5px;
   border-left: 4px solid var(--brand-03);
 
   &:not(:last-of-type) {
@@ -107,4 +106,18 @@
   color: $interactive-01;
   text-decoration: underline;
   cursor: pointer;
+}
+
+.resultsContainer {
+  max-height: 27.5rem;
+  overflow-y: scroll;
+}
+
+.resultsContainer::-webkit-scrollbar {
+  width: spacing.$spacing-03;
+}
+
+.resultsContainer::-webkit-scrollbar-thumb {
+  background: $ui-04;
+  border-radius: spacing.$spacing-02;
 }

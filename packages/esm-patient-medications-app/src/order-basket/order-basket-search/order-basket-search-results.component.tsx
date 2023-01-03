@@ -55,18 +55,21 @@ export default function OrderBasketSearchResults({
         <div className={styles.container}>
           <div className={styles.orderBasketSearchResultsHeader}>
             <span className={styles.searchResultsCount}>
-              {t('searchResultsExactMatchesForTerm', '{count} exact match(es) for "{searchTerm}"', {
+              {t('searchResultsMatchesForTerm', '{count} result{plural} for "{searchTerm}"', {
                 count: drugs?.length,
                 searchTerm,
+                plural: drugs?.length > 1 ? 's' : '',
               })}
             </span>
             <Button kind="ghost" onClick={() => setSearchTerm('')} size={isTablet ? 'md' : 'sm'}>
               {t('clearSearchResults', 'Clear Results')}
             </Button>
           </div>
-          {drugs.map((drug) => (
-            <DrugSearchResultItem key={drug.uuid} drug={drug} onSearchResultClicked={onSearchResultClicked} />
-          ))}
+          <div className={styles.resultsContainer}>
+            {drugs.map((drug) => (
+              <DrugSearchResultItem key={drug.uuid} drug={drug} onSearchResultClicked={onSearchResultClicked} />
+            ))}
+          </div>
         </div>
       ) : (
         <Tile className={styles.emptyState}>
