@@ -233,6 +233,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                           dosage: value ? parseFloat(value) : 0,
                         });
                       }}
+                      min={0}
                       hideSteppers
                     />
                   </div>

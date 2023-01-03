@@ -13,7 +13,7 @@ import { OrderBasketStore, OrderBasketStoreActions, orderBasketStoreActions } fr
 import MedicationOrderForm from './medication-order-form.component';
 import MedicationsDetailsTable from '../components/medications-details-table.component';
 import OrderBasketItemList from './order-basket-item-list.component';
-import OrderBasketSearch from './order-basket-search.component';
+import OrderBasketSearch from './order-basket-search';
 import styles from './order-basket.scss';
 
 export interface OrderBasketProps {
