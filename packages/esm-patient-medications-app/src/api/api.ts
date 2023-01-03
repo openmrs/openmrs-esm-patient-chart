@@ -143,12 +143,6 @@ export function createEmptyEncounter(
     location: sessionLocationUuid,
     encounterType: drugOrderEncounterType,
     encounterDatetime: new Date().toISOString(),
-    encounterProviders: [
-      {
-        provider: currentProviderUuid,
-        encounterRole: clinicianEncounterRole,
-      },
-    ],
     visit: currentVisitUuid,
     obs: [],
   };
