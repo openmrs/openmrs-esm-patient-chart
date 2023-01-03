@@ -17,8 +17,8 @@ import {
   TableRow,
 } from '@carbon/react';
 import { Add, User } from '@carbon/react/icons';
-import { formatDate, showModal } from '@openmrs/esm-framework';
-import { CardHeader, launchPatientWorkspace, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
+import { formatDate } from '@openmrs/esm-framework';
+import { CardHeader } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { compare } from '../utils/compare';
 import { connect } from 'unistore/react';
@@ -26,6 +26,7 @@ import { OrderBasketStore, OrderBasketStoreActions, orderBasketStoreActions } fr
 import { Order } from '../types/order';
 import { OrderBasketItem } from '../types/order-basket-item';
 import styles from './medications-details-table.scss';
+import { useLaunchOrderBasket } from '../utils/launchOrderBasket';
 
 export interface ActiveMedicationsProps {
   isValidating?: boolean;
@@ -60,17 +61,7 @@ const MedicationsDetailsTable = connect<
     patientUuid,
   }: ActiveMedicationsProps & OrderBasketStore & OrderBasketStoreActions) => {
     const { t } = useTranslation();
-    const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
-    const openOrderBasket = useCallback(() => {
-      if (currentVisit) {
-        launchPatientWorkspace('order-basket-workspace');
-      } else {
-        const dispose = showModal('start-visit-dialog', {
-          patientUuid,
-          closeModal: () => dispose(),
-        });
-      }
-    }, [currentVisit, patientUuid]);
+    const { launchOrderBasket } = useLaunchOrderBasket(patientUuid);
 
     const tableHeaders = [
       {
@@ -177,7 +168,7 @@ const MedicationsDetailsTable = connect<
               kind="ghost"
               renderIcon={(props) => <Add size={16} {...props} />}
               iconDescription="Launch order basket"
-              onClick={openOrderBasket}
+              onClick={launchOrderBasket}
             >
               {t('add', 'Add')}
             </Button>
@@ -225,7 +216,7 @@ const MedicationsDetailsTable = connect<
                           medication={medications[rowIndex]}
                           items={items}
                           setItems={setItems}
-                          openOrderBasket={openOrderBasket}
+                          openOrderBasket={launchOrderBasket}
                         />
                       </TableCell>
                     </TableRow>

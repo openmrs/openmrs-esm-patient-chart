@@ -1,11 +1,12 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Tag } from '@carbon/react';
 import { ShoppingCart } from '@carbon/react/icons';
-import { showModal, useLayoutType, usePatient, useStore } from '@openmrs/esm-framework';
-import { launchPatientWorkspace, useVisitOrOfflineVisit, useWorkspaces } from '@openmrs/esm-patient-common-lib';
+import { useLayoutType, usePatient, useStore } from '@openmrs/esm-framework';
+import { useWorkspaces } from '@openmrs/esm-patient-common-lib';
 import { orderBasketStore } from '../medications/order-basket-store';
 import styles from './order-basket-action-button.scss';
+import { useLaunchOrderBasket } from '../utils/launchOrderBasket';
 
 const OrderBasketActionButton: React.FC = () => {
   const { t } = useTranslation();
@@ -14,18 +15,7 @@ const OrderBasketActionButton: React.FC = () => {
   const { items } = useStore(orderBasketStore);
   const isActive = workspaces.find(({ name }) => name.includes('order-basket'));
   const { patientUuid } = usePatient();
-  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
-
-  const launchOrdersWorkspace = useCallback(() => {
-    if (currentVisit) {
-      launchPatientWorkspace('order-basket-workspace');
-    } else {
-      const dispose = showModal('start-visit-dialog', {
-        patientUuid,
-        closeModal: () => dispose(),
-      });
-    }
-  }, [patientUuid, currentVisit]);
+  const { launchOrderBasket } = useLaunchOrderBasket(patientUuid);
 
   if (layout === 'tablet')
     return (
@@ -34,7 +24,7 @@ const OrderBasketActionButton: React.FC = () => {
         className={`${styles.container} ${isActive ? styles.active : ''}`}
         role="button"
         tabIndex={0}
-        onClick={launchOrdersWorkspace}
+        onClick={launchOrderBasket}
       >
         <div className={styles.elementContainer}>
           <ShoppingCart size={20} /> {items?.length > 0 && <Tag className={styles.countTag}>{items?.length}</Tag>}
@@ -57,7 +47,7 @@ const OrderBasketActionButton: React.FC = () => {
       iconDescription={t('orders', 'Orders')}
       tooltipAlignment="end"
       tooltipPosition="bottom"
-      onClick={launchOrdersWorkspace}
+      onClick={launchOrderBasket}
     />
   );
 };

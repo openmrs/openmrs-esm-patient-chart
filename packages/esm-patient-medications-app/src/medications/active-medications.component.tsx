@@ -2,17 +2,13 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { DataTableSkeleton } from '@carbon/react';
 import { Provider } from 'unistore/react';
-import { showModal, useConfig } from '@openmrs/esm-framework';
-import {
-  EmptyState,
-  ErrorState,
-  launchPatientWorkspace,
-  useVisitOrOfflineVisit,
-} from '@openmrs/esm-patient-common-lib';
+import { useConfig } from '@openmrs/esm-framework';
+import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import MedicationsDetailsTable from '../components/medications-details-table.component';
 import { orderBasketStore } from './order-basket-store';
 import { usePatientOrders } from '../api/api';
 import { ConfigObject } from '../config-schema';
+import { useLaunchOrderBasket } from '../utils/launchOrderBasket';
 
 interface ActiveMedicationsProps {
   patientUuid: string;
@@ -32,19 +28,7 @@ const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patientUuid, show
     isValidating,
   } = usePatientOrders(patientUuid, 'ACTIVE', config.careSettingUuid);
 
-  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
-
-  const launchOrderBasket = React.useCallback(() => {
-    if (currentVisit) {
-      launchPatientWorkspace('order-basket-workspace');
-    } else {
-      const dispose = showModal('start-visit-dialog', {
-        patientUuid,
-        closeModal: () => dispose(),
-      });
-    }
-    ('order-basket-workspace');
-  }, [currentVisit, patientUuid]);
+  const { launchOrderBasket } = useLaunchOrderBasket(patientUuid);
 
   if (isLoading) return <DataTableSkeleton role="progressbar" />;
 

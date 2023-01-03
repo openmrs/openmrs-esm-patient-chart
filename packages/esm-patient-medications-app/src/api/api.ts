@@ -114,9 +114,7 @@ export function useCurrentOrderBasketEncounter(patientUuid: string) {
         clinicianEncounterRole,
         abortController,
       )
-        .then((res) => {
-          mutateVisit();
-        })
+        .then(() => mutateVisit())
         .catch((err: Error) => {
           setCreatingEncounterError(err?.message);
         });
