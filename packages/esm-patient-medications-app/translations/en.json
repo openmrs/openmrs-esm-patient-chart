@@ -30,9 +30,9 @@
   "emptyOrderBasket": "Your basket is empty",
   "endDate": "End date",
   "error": "Error",
+  "errorCreatingAnEncounter": "Error when creating an encounter",
   "errorFetchingDrugOrderTemplates": "Error fetching drug order templates",
   "errorFetchingDrugResults": "Error fetching medications",
-  "errorCreatingAnEncounter": "Error when creating an encounter",
   "errorFetchingDurationUnits": "Error occured when fetching duration units",
   "fetchingDurationUnits": "Fetching duration units...",
   "freeTextDosage": "Free Text Dosage",
@@ -87,8 +87,8 @@
   "startVisit": "Start visit",
   "takeAsNeeded": "Take As Needed",
   "tryReopeningTheForm": "Please try launching the form again",
+  "tryReopeningTheWorkspaceAgain": "Please try launching the workspace again",
   "trySearchingAgain": "Please try searching again",
   "tryTo": "Try to",
-  "usingADifferentTerm": "using a different term",
-  "tryReopeningTheWorkspaceAgain": "Please try launching the workspace again"
+  "usingADifferentTerm": "using a different term"
 }

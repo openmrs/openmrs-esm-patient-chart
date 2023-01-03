@@ -11,14 +11,12 @@ import { Drug } from '../../types/order';
 
 export interface OrderBasketSearchResultsProps {
   searchTerm: string;
-  encounterUuid: string;
   setSearchTerm: (value: string) => void;
   onSearchResultClicked: (searchResult: OrderBasketItem, directlyAddToBasket: boolean) => void;
 }
 
 export default function OrderBasketSearchResults({
   searchTerm,
-  encounterUuid,
   setSearchTerm,
   onSearchResultClicked,
 }: OrderBasketSearchResultsProps) {
@@ -154,6 +152,8 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, onSea
               renderIcon={(props) => <ShoppingCart size={16} {...props} />}
               iconDescription={t('directlyAddToBasket', 'Immediately add to basket')}
               onClick={() => handleSearchResultClicked(orderItem, true)}
+              tooltipPosition="left"
+              tooltipAlignment="end"
             />
           </div>
         </ClickableTile>
@@ -176,7 +176,6 @@ const DrugSearchSkeleton = () => {
       <Tile className={tileClassName}>
         <SkeletonText />
       </Tile>
-
       <Tile className={tileClassName}>
         <SkeletonText />
       </Tile>
