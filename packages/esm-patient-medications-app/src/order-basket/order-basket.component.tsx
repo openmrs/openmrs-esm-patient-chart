@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
 import { connect } from 'unistore/react';
-import { Button, ButtonSet, DataTableSkeleton, InlineLoading } from '@carbon/react';
-import { showToast, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
-import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
+import { Button, ButtonSet, DataTableSkeleton, InlineNotification, ActionableNotification } from '@carbon/react';
+import { showModal, showToast, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
+import { EmptyState, ErrorState, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import { orderDrugs } from './drug-ordering';
 import { ConfigObject } from '../config-schema';
-import { useCurrentOrderBasketEncounter, useDurationUnits, usePatientOrders } from '../api/api';
+import { useCurrentOrderBasketEncounter, usePatientOrders } from '../api/api';
 import { OrderBasketItem } from '../types/order-basket-item';
 import { OrderBasketStore, OrderBasketStoreActions, orderBasketStoreActions } from '../medications/order-basket-store';
 import MedicationOrderForm from './medication-order-form.component';
@@ -31,10 +31,8 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
   const headerTitle = t('activeMedicationsHeaderTitle', 'active medications');
   const isTablet = useLayoutType() === 'tablet';
   const config = useConfig() as ConfigObject;
-
-  const { encounterUuid, isLoadingEncounterUuid } = useCurrentOrderBasketEncounter(patientUuid);
-
-  const isLoading = isLoadingEncounterUuid;
+  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
+  const { encounterUuid, creatingEncounterError } = useCurrentOrderBasketEncounter(patientUuid);
   const [medicationOrderFormItem, setMedicationOrderFormItem] = useState<OrderBasketItem | null>(null);
   const [isMedicationOrderFormVisible, setIsMedicationOrderFormVisible] = useState(false);
   const [onMedicationOrderFormSigned, setOnMedicationOrderFormSign] =
@@ -47,14 +45,20 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
     isValidating,
   } = usePatientOrders(patientUuid, 'ACTIVE', config.careSettingUuid);
 
+  const openStartVisitDialog = useCallback(() => {
+    const dispose = showModal('start-visit-dialog', {
+      patientUuid,
+      closeModal: () => dispose(),
+    });
+  }, [patientUuid]);
+
   useEffect(() => {
     if (medicationOrderFormItem) {
       medicationOrderFormItem.careSetting = config.careSettingUuid;
       medicationOrderFormItem.orderer = sessionObject.currentProvider?.uuid;
       medicationOrderFormItem.quantityUnits = config.quantityUnitsUuid;
-      medicationOrderFormItem.encounterUuid = encounterUuid;
     }
-  }, [medicationOrderFormItem, config, sessionObject, encounterUuid]);
+  }, [medicationOrderFormItem, config, sessionObject]);
 
   const handleSearchResultClicked = (searchResult: OrderBasketItem, directlyAddToBasket: boolean) => {
     if (directlyAddToBasket) {
@@ -76,8 +80,10 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
 
   const handleSaveClicked = () => {
     const abortController = new AbortController();
-    orderDrugs(items, patientUuid, abortController).then((erroredItems) => {
+
+    orderDrugs(items, patientUuid, encounterUuid, abortController).then((erroredItems) => {
       setItems(erroredItems);
+
       if (erroredItems.length == 0) {
         closeWorkspace();
 
@@ -101,6 +107,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
           .forEach((url: string) => mutate(url));
       }
     });
+
     return () => abortController.abort();
   };
 
@@ -124,8 +131,6 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
     );
   };
 
-  if (isLoading) return <InlineLoading className={styles.loader} description={t('loading', 'Loading...')} />;
-
   if (isMedicationOrderFormVisible) {
     return (
       <MedicationOrderForm
@@ -138,7 +143,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
 
   return (
     <>
-      <OrderBasketSearch encounterUuid={encounterUuid} onSearchResultClicked={handleSearchResultClicked} />
+      <OrderBasketSearch onSearchResultClicked={handleSearchResultClicked} />
       <div className={styles.container}>
         <div className={styles.orderBasketContainer}>
           <OrderBasketItemList
@@ -165,6 +170,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
                   showModifyButton={true}
                   showReorderButton={false}
                   showAddNewButton={false}
+                  patientUuid={patientUuid}
                 />
               );
             }
@@ -172,14 +178,45 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
             return <EmptyState displayText={displayText} headerTitle={headerTitle} />;
           })()}
         </div>
-        <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-          <Button className={styles.button} kind="secondary" onClick={handleCancelClicked}>
-            {t('cancel', 'Cancel')}
-          </Button>
-          <Button className={styles.button} kind="primary" onClick={handleSaveClicked}>
-            {t('signAndClose', 'Sign and close')}
-          </Button>
-        </ButtonSet>
+
+        <div>
+          {creatingEncounterError && (
+            <InlineNotification
+              kind="error"
+              title={t('errorCreatingAnEncounter', 'Error when creating an encounter')}
+              subtitle={t('tryReopeningTheWorkspaceAgain', 'Please try launching the workspace again')}
+              lowContrast={true}
+              className={styles.inlineNotification}
+              inline
+            />
+          )}
+          {!currentVisit && (
+            <ActionableNotification
+              kind="error"
+              actionButtonLabel={t('startVisit', 'Start visit')}
+              onActionButtonClick={openStartVisitDialog}
+              title={t('startAVisitToRecordOrders', 'Start a visit to order')}
+              subtitle={t('activeVisitRequired', 'An active visit is required to make orders')}
+              lowContrast={true}
+              inline
+              className={styles.actionNotification}
+              hasFocus
+            />
+          )}
+          <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
+            <Button className={styles.button} kind="secondary" onClick={handleCancelClicked}>
+              {t('cancel', 'Cancel')}
+            </Button>
+            <Button
+              className={styles.button}
+              kind="primary"
+              onClick={handleSaveClicked}
+              disabled={!items?.length || !encounterUuid}
+            >
+              {t('signAndClose', 'Sign and close')}
+            </Button>
+          </ButtonSet>
+        </div>
       </div>
     </>
   );

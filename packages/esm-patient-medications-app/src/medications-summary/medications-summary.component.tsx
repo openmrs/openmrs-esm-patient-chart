@@ -2,10 +2,11 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { DataTableSkeleton } from '@carbon/react';
 import { useConfig } from '@openmrs/esm-framework';
-import { EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import MedicationsDetailsTable from '../components/medications-details-table.component';
 import { usePatientOrders } from '../api/api';
 import { ConfigObject } from '../config-schema';
+import { useLaunchOrderBasket } from '../utils/launchOrderBasket';
 
 export interface MedicationsSummaryProps {
   patientUuid: string;
@@ -14,7 +15,7 @@ export interface MedicationsSummaryProps {
 export default function MedicationsSummary({ patientUuid }: MedicationsSummaryProps) {
   const { t } = useTranslation();
   const config = useConfig() as ConfigObject;
-  const launchOrderBasket = React.useCallback(() => launchPatientWorkspace('order-basket-workspace'), []);
+  const { launchOrderBasket } = useLaunchOrderBasket(patientUuid);
 
   const {
     data: activeOrders,
@@ -51,6 +52,7 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
                 showModifyButton={true}
                 showReorderButton={false}
                 showAddNewButton={true}
+                patientUuid={patientUuid}
               />
             );
           }
@@ -77,6 +79,7 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
                 showModifyButton={true}
                 showReorderButton={true}
                 showAddNewButton={true}
+                patientUuid={patientUuid}
               />
             );
           }
