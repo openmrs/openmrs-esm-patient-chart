@@ -59,12 +59,12 @@ function extractRelationshipDatas(patientIdentifier: string, cohortLists: Array<
   for (const r of cohortLists) {
     if (patientIdentifier === r.uuid) {
       relationshipsData.push({
-        uuid: r.uuid,
+        uuid: r.cohort.uuid,
         display: r.cohort.display,
       });
     } else {
       relationshipsData.push({
-        uuid: r.uuid,
+        uuid: r.cohort.uuid,
         display: r.cohort.display,
       });
     }

@@ -7,6 +7,7 @@ import { useRelationships } from './relationships.resource';
 import { usePatientContactAttributes } from '../hooks/usePatientAttributes';
 import styles from './contact-details.scss';
 import { usePatientLists } from './patientList.resource';
+import { ConfigurableLink } from '@openmrs/esm-framework';
 
 interface ContactDetailsProps {
   address: Array<fhir.Address>;
@@ -104,8 +105,6 @@ const PatientLists: React.FC<{ patientId: string }> = ({ patientId }) => {
     <>
       <p className={styles.heading}>
         {t('patientLists', 'Patient Lists')}({formattedPatientLists?.length})
-      </p>
-      <>
         <Button
           kind="ghost"
           renderIcon={(props) =>
@@ -117,7 +116,8 @@ const PatientLists: React.FC<{ patientId: string }> = ({ patientId }) => {
         >
           {showPatientListDetails ? t('seeLess', 'See less') : t('seeAll', 'See All')}
         </Button>
-
+      </p>
+      <>
         {(() => {
           if (isLoading) return <SkeletonText />;
           if (showPatientListDetails) {
@@ -126,7 +126,10 @@ const PatientLists: React.FC<{ patientId: string }> = ({ patientId }) => {
                 <ul>
                   {formattedPatientLists.map((r) => (
                     <li key={r.uuid} className={styles.relationship}>
-                      <div>{r.display}</div>
+                      <ConfigurableLink className={styles.link} to={`\${openmrsSpaBase}/patient-list/${r?.uuid}`}>
+                        {r.display}
+                      </ConfigurableLink>
+                      {/* <div>{r.display}</div> */}
                     </li>
                   ))}
                 </ul>

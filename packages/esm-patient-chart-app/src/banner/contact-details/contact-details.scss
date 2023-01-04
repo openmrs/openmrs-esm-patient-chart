@@ -7,10 +7,17 @@
   width: 100%;
   border-top: 1px solid $ui-03;
 }
+.link{
+  text-decoration-line: none;
+  text-transform: capitalize;
+}
 
 .heading {
   @include type.type-style("heading-compact-01");
   color: $text-02;
+}
+.heading button {
+  float: right;
 }
 
 .row {
