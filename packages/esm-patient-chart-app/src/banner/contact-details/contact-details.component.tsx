@@ -1,9 +1,12 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { SkeletonText } from '@carbon/react';
+import { SkeletonText, Button } from '@carbon/react';
+import { ChevronDown, ChevronUp, OverflowMenuVertical } from '@carbon/react/icons';
+
 import { useRelationships } from './relationships.resource';
 import { usePatientContactAttributes } from '../hooks/usePatientAttributes';
 import styles from './contact-details.scss';
+import { usePatientLists } from './patientList.resource';
 
 interface ContactDetailsProps {
   address: Array<fhir.Address>;
@@ -41,6 +44,7 @@ const Contact: React.FC<{ telecom: Array<fhir.ContactPoint>; patientUuid: string
   return (
     <>
       <p className={styles.heading}>{t('contactDetails', 'Contact Details')}</p>
+
       <ul>
         <li>{value}</li>
         {isLoading ? (
@@ -87,6 +91,55 @@ const Relationships: React.FC<{ patientId: string }> = ({ patientId }) => {
   );
 };
 
+const PatientLists: React.FC<{ patientId: string }> = ({ patientId }) => {
+  const { t } = useTranslation();
+  const { data: formattedPatientLists, isLoading } = usePatientLists(patientId);
+  const [showPatientListDetails, setShowPatientListDetails] = React.useState(false);
+  const toggleContactDetails = React.useCallback((event: MouseEvent) => {
+    event.stopPropagation();
+    setShowPatientListDetails((value) => !value);
+  }, []);
+
+  return (
+    <>
+      <p className={styles.heading}>
+        {t('patientLists', 'Patient Lists')}({formattedPatientLists?.length})
+      </p>
+      <>
+        <Button
+          kind="ghost"
+          renderIcon={(props) =>
+            showPatientListDetails ? <ChevronUp size={16} {...props} /> : <ChevronDown size={16} {...props} />
+          }
+          iconDescription="Toggle contact details"
+          onClick={toggleContactDetails}
+          style={{ marginTop: '-0.25rem' }}
+        >
+          {showPatientListDetails ? t('seeLess', 'See less') : t('seeAll', 'See All')}
+        </Button>
+
+        {(() => {
+          if (isLoading) return <SkeletonText />;
+          if (showPatientListDetails) {
+            if (formattedPatientLists?.length) {
+              return (
+                <ul>
+                  {formattedPatientLists.map((r) => (
+                    <li key={r.uuid} className={styles.relationship}>
+                      <div>{r.display}</div>
+                    </li>
+                  ))}
+                </ul>
+              );
+            }
+            return <p>--</p>;
+          }
+        })()}
+      </>
+    </>
+  );
+};
+
 const ContactDetails: React.FC<ContactDetailsProps> = ({ address, telecom, patientId }) => {
   const currentAddress = address ? address.find((a) => a.use === 'home') : undefined;
 
@@ -104,7 +157,9 @@ const ContactDetails: React.FC<ContactDetailsProps> = ({ address, telecom, patie
         <div className={styles.col}>
           <Relationships patientId={patientId} />
         </div>
-        <div className={styles.col}>{/* Patient lists go here */}</div>
+        <div className={styles.col}>
+          <PatientLists patientId={patientId} />
+        </div>
       </div>
     </div>
   );
