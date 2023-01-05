@@ -13,6 +13,7 @@ import { usePagination, useConfig, formatDatetime } from '@openmrs/esm-framework
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { useObs } from '../resources/useObs';
 import styles from './obs-table.scss';
+import dayjs from 'dayjs';
 
 interface ObsTableProps {
   patientUuid: string;
@@ -21,7 +22,6 @@ interface ObsTableProps {
 const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
   const config = useConfig();
   const { data: obss, error, isLoading, isValidating } = useObs(patientUuid);
-
   const uniqueDates = [...new Set(obss.map((o) => o.issued))].sort();
   const obssByDate = uniqueDates.map((date) => obss.filter((o) => o.issued === date));
 
@@ -66,12 +66,16 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
             case 'Coded':
               rowData[obs.conceptUuid] = obs.valueCodeableConcept?.coding[0]?.display;
               break;
+
+            case 'DateTime':
+              rowData[obs.conceptUuid] = dayjs(new Date(obs.valueDateTime)).format(config.dateFormat);
+              break;
           }
         }
 
         return rowData;
       }),
-    [config.data, obssByDate],
+    [config.data, config.dateFormat, obssByDate],
   );
 
   const { results, goTo, currentPage } = usePagination(tableRows, config.table.pageSize);

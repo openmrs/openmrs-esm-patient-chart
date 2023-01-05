@@ -74,6 +74,11 @@ export const configSchema = {
     },
     _default: [],
   },
+  dateFormat: {
+    _type: Type.String,
+    _description: 'Date formating string',
+    _default: 'DD/MM/YYY',
+  },
 };
 
 export interface ConfigObject {
@@ -91,4 +96,5 @@ export interface ConfigObject {
   };
   showGraphByDefault: boolean;
   encounterTypes: Array<string>;
+  dateFormat: string;
 }
