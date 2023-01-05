@@ -54,22 +54,22 @@ interface ExtractedList {
   display: string;
 }
 
-function extractRelationshipDatas(patientIdentifier: string, cohortLists: Array<CohortList>): Array<ExtractedList> {
-  const relationshipsData = [];
+function extractPatientListData(patientIdentifier: string, cohortLists: Array<CohortList>): Array<ExtractedList> {
+  const patientListListData = [];
   for (const r of cohortLists) {
     if (patientIdentifier === r.uuid) {
-      relationshipsData.push({
+      patientListListData.push({
         uuid: r.cohort.uuid,
         display: r.cohort.display,
       });
     } else {
-      relationshipsData.push({
+      patientListListData.push({
         uuid: r.cohort.uuid,
         display: r.cohort.display,
       });
     }
   }
-  return relationshipsData;
+  return patientListListData;
 }
 
 export function usePatientLists(patientUuid: string) {
@@ -77,12 +77,12 @@ export function usePatientLists(patientUuid: string) {
     `${cohortUrl}/cohortmember?patient=${patientUuid}&v=default`,
     openmrsFetch,
   );
-  const formattedRelationships = data?.data?.results?.length
-    ? extractRelationshipDatas(patientUuid, data.data.results)
+  const formattedPatientLists = data?.data?.results?.length
+    ? extractPatientListData(patientUuid, data.data.results)
     : null;
 
   return {
-    data: data ? formattedRelationships : null,
+    data: data ? formattedPatientLists : null,
     isError: error,
     isLoading: !data && !error,
     isValidating,

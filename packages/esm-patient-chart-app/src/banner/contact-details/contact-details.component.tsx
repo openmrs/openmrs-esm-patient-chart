@@ -96,7 +96,7 @@ const PatientLists: React.FC<{ patientId: string }> = ({ patientId }) => {
   const { t } = useTranslation();
   const { data: formattedPatientLists, isLoading } = usePatientLists(patientId);
   const [showPatientListDetails, setShowPatientListDetails] = React.useState(false);
-  const toggleContactDetails = React.useCallback((event: MouseEvent) => {
+  const togglePatientListDetails = React.useCallback((event: MouseEvent) => {
     event.stopPropagation();
     setShowPatientListDetails((value) => !value);
   }, []);
@@ -110,8 +110,8 @@ const PatientLists: React.FC<{ patientId: string }> = ({ patientId }) => {
           renderIcon={(props) =>
             showPatientListDetails ? <ChevronUp size={16} {...props} /> : <ChevronDown size={16} {...props} />
           }
-          iconDescription="Toggle contact details"
-          onClick={toggleContactDetails}
+          iconDescription="Toggle patient List Details"
+          onClick={togglePatientListDetails}
           style={{ marginTop: '-0.25rem' }}
         >
           {showPatientListDetails ? t('seeLess', 'See less') : t('seeAll', 'See All')}
@@ -126,10 +126,9 @@ const PatientLists: React.FC<{ patientId: string }> = ({ patientId }) => {
                 <ul>
                   {formattedPatientLists.map((r) => (
                     <li key={r.uuid} className={styles.relationship}>
-                      <ConfigurableLink className={styles.link} to={`\${openmrsSpaBase}/patient-list/${r?.uuid}`}>
+                      <ConfigurableLink className={styles.link} to={`\${openmrsSpaBase}/patient-list/${r.uuid}`}>
                         {r.display}
                       </ConfigurableLink>
-                      {/* <div>{r.display}</div> */}
                     </li>
                   ))}
                 </ul>
