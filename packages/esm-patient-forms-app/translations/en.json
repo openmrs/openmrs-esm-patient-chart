@@ -7,9 +7,10 @@
   "goToSummary": "Go to Summary",
   "homeOverviewCardView": "View",
   "lastCompleted": "Last Completed",
-  "matchesFound": "match(es) found",
   "never": "Never",
-  "noFormsAvailable": "There are no Forms to display for this patient",
+  "noFormsAvailable": "There are no forms to display for this patient",
+  "noMatchingFormsAvailable": "There are no {formCategory} forms to display",
+  "noMatchingFormsToDisplay": "No matching forms to display",
   "offlineFormsOverviewCardAvailableOffline": "Available offline",
   "offlineFormsTableFormAvailableOffline": "Offline",
   "offlineFormsTableFormNameHeader": "Form name",
@@ -17,6 +18,6 @@
   "offlinePatientsTableSearchLabel": "Search this list",
   "offlinePatientsTableSearchPlaceholder": "Search this list",
   "offlineToggle": "Offline toggle",
-  "searchForForm": "Search for a form",
+  "searchThisList": "Search this list",
   "seeAll": "See all"
 }
