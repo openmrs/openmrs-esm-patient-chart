@@ -22,8 +22,8 @@ export default function OrderBasketSearch({ patientUuid, onSearchResultClicked }
         size="lg"
         light={isTablet}
         value={searchTerm}
-        placeholder={t('searchFieldPlaceholder', 'Search for a drug or orderset (e.g. "Aspirin")')}
-        labelText={t('searchFieldPlaceholder', 'Search for a drug or orderset (e.g. "Aspirin")')}
+        placeholder={t('drugSearchFieldPlaceholder', 'Search for a drug or orderset (e.g. "Aspirin")')}
+        labelText={t('drugSearchField', 'Search Field')}
         onChange={(e) => setSearchTerm(e.currentTarget?.value ?? '')}
       />
       <OrderBasketSearchResults
