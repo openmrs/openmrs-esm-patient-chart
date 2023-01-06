@@ -7,11 +7,10 @@ import { OrderBasketItem } from '../../types/order-basket-item';
 import styles from './order-basket-search.scss';
 
 export interface OrderBasketSearchProps {
-  patientUuid: string;
   onSearchResultClicked: (searchResult: OrderBasketItem, directlyAddToBasket: boolean) => void;
 }
 
-export default function OrderBasketSearch({ patientUuid, onSearchResultClicked }: OrderBasketSearchProps) {
+export default function OrderBasketSearch({ onSearchResultClicked }: OrderBasketSearchProps) {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const [searchTerm, setSearchTerm] = useState('');
@@ -27,7 +26,6 @@ export default function OrderBasketSearch({ patientUuid, onSearchResultClicked }
         onChange={(e) => setSearchTerm(e.currentTarget?.value ?? '')}
       />
       <OrderBasketSearchResults
-        patientUuid={patientUuid}
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
         onSearchResultClicked={onSearchResultClicked}

@@ -22,7 +22,12 @@ import { CardHeader } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { compare } from '../utils/compare';
 import { connect } from 'unistore/react';
-import { OrderBasketStore, OrderBasketStoreActions, orderBasketStoreActions } from '../medications/order-basket-store';
+import {
+  getOrderItems,
+  OrderBasketStore,
+  OrderBasketStoreActions,
+  orderBasketStoreActions,
+} from '../medications/order-basket-store';
 import { Order } from '../types/order';
 import { OrderBasketItem } from '../types/order-basket-item';
 import styles from './medications-details-table.scss';
@@ -62,6 +67,7 @@ const MedicationsDetailsTable = connect<
   }: ActiveMedicationsProps & OrderBasketStore & OrderBasketStoreActions) => {
     const { t } = useTranslation();
     const { launchOrderBasket } = useLaunchOrderBasket(patientUuid);
+    const patientOrderItems = getOrderItems(items, patientUuid);
 
     const tableHeaders = [
       {
@@ -214,7 +220,7 @@ const MedicationsDetailsTable = connect<
                           showModifyButton={showModifyButton}
                           showReorderButton={showReorderButton}
                           medication={medications[rowIndex]}
-                          items={items}
+                          items={patientOrderItems}
                           setItems={setItems}
                           openOrderBasket={launchOrderBasket}
                         />

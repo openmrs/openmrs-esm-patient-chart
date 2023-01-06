@@ -66,7 +66,6 @@ export function getDefault(template: OrderTemplate, prop: string) {
 
 export function getTemplateOrderBasketItem(
   drug,
-  patientUuid: string,
   daysDurationUnit,
   template: DrugOrderTemplate = null,
 ): OrderBasketItem {
@@ -78,7 +77,6 @@ export function getTemplateOrderBasketItem(
         dosage: getDefault(template.template, 'dose')?.value,
         frequency: getDefault(template.template, 'frequency'),
         route: getDefault(template.template, 'route'),
-        patient: patientUuid,
         commonMedicationName: drug.name,
         isFreeTextDosage: false,
         patientInstructions: '',
@@ -103,7 +101,6 @@ export function getTemplateOrderBasketItem(
         dosage: null,
         frequency: null,
         route: null,
-        patient: patientUuid,
         commonMedicationName: drug.name,
         isFreeTextDosage: false,
         patientInstructions: '',
