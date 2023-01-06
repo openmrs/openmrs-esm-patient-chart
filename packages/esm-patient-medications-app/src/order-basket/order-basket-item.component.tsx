@@ -39,7 +39,7 @@ export default function OrderBasketItemTile({ orderBasketItem, onItemClick, onRe
             <span className={styles.drugName}>{orderBasketItem.drug?.display}</span>
             <span className={styles.dosageInfo}>
               {' '}
-              &mdash; {orderBasketItem.drug.strength} &mdash; {orderBasketItem.drug.dosageForm.display}
+              &mdash; {orderBasketItem.drug.strength} &mdash; {orderBasketItem.drug?.dosageForm?.display}
             </span>
           </>
         )}

@@ -141,17 +141,19 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
     );
   }
 
+  const patientItems = items.filter((item) => item.patient === patientUuid);
+
   return (
     <>
-      <OrderBasketSearch onSearchResultClicked={handleSearchResultClicked} />
+      <OrderBasketSearch onSearchResultClicked={handleSearchResultClicked} patientUuid={patientUuid} />
       <div className={styles.container}>
         <div className={styles.orderBasketContainer}>
           <OrderBasketItemList
-            orderBasketItems={items}
+            orderBasketItems={patientItems}
             onItemClicked={(order) => openMedicationOrderFormForUpdatingExistingOrder(items.indexOf(order))}
             onItemRemoveClicked={(order) => {
-              const newOrders = [...items];
-              newOrders.splice(items.indexOf(order), 1);
+              const newOrders = [...patientItems];
+              newOrders.splice(patientItems.indexOf(order), 1);
               setItems(newOrders);
             }}
           />

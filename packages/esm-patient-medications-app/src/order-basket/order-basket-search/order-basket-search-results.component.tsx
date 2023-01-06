@@ -11,12 +11,14 @@ import { Drug } from '../../types/order';
 
 export interface OrderBasketSearchResultsProps {
   searchTerm: string;
+  patientUuid: string;
   setSearchTerm: (value: string) => void;
   onSearchResultClicked: (searchResult: OrderBasketItem, directlyAddToBasket: boolean) => void;
 }
 
 export default function OrderBasketSearchResults({
   searchTerm,
+  patientUuid,
   setSearchTerm,
   onSearchResultClicked,
 }: OrderBasketSearchResultsProps) {
@@ -67,7 +69,12 @@ export default function OrderBasketSearchResults({
           </div>
           <div className={styles.resultsContainer}>
             {drugs.map((drug) => (
-              <DrugSearchResultItem key={drug.uuid} drug={drug} onSearchResultClicked={onSearchResultClicked} />
+              <DrugSearchResultItem
+                key={drug.uuid}
+                drug={drug}
+                patientUuid={patientUuid}
+                onSearchResultClicked={onSearchResultClicked}
+              />
             ))}
           </div>
         </div>
@@ -96,10 +103,11 @@ export default function OrderBasketSearchResults({
 
 interface DrugSearchResultItemProps {
   drug: Drug;
+  patientUuid: string;
   onSearchResultClicked: (searchResult: OrderBasketItem, directlyAddToBasket: boolean) => void;
 }
 
-const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, onSearchResultClicked }) => {
+const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, patientUuid, onSearchResultClicked }) => {
   const isTablet = useLayoutType() === 'tablet';
   const {
     templates,
@@ -111,9 +119,9 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, onSea
   const orderItems: Array<OrderBasketItem> = useMemo(
     () =>
       templates?.length
-        ? templates.map((template) => getTemplateOrderBasketItem(drug, config?.daysDurationUnit, template))
-        : [getTemplateOrderBasketItem(drug, config?.daysDurationUnit)],
-    [templates, drug, config?.daysDurationUnit],
+        ? templates.map((template) => getTemplateOrderBasketItem(drug, patientUuid, config?.daysDurationUnit, template))
+        : [getTemplateOrderBasketItem(drug, patientUuid, config?.daysDurationUnit)],
+    [templates, drug, config?.daysDurationUnit, patientUuid],
   );
 
   const handleSearchResultClicked = (searchResult: OrderBasketItem, directlyAddToBasket: boolean) => {

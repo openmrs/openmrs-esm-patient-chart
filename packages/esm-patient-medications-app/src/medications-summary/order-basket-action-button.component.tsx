@@ -13,8 +13,11 @@ const OrderBasketActionButton: React.FC = () => {
   const layout = useLayoutType();
   const { workspaces } = useWorkspaces();
   const { items } = useStore(orderBasketStore);
+
   const isActive = workspaces.find(({ name }) => name.includes('order-basket'));
   const { patientUuid } = usePatient();
+
+  const patientItems = items.filter((item) => item.patient === patientUuid);
   const { launchOrderBasket } = useLaunchOrderBasket(patientUuid);
 
   if (layout === 'tablet')
@@ -27,7 +30,8 @@ const OrderBasketActionButton: React.FC = () => {
         onClick={launchOrderBasket}
       >
         <div className={styles.elementContainer}>
-          <ShoppingCart size={20} /> {items?.length > 0 && <Tag className={styles.countTag}>{items?.length}</Tag>}
+          <ShoppingCart size={20} />{' '}
+          {patientItems?.length > 0 && <Tag className={styles.countTag}>{patientItems?.length}</Tag>}
         </div>
         <span>{t('orderBasket', 'Order Basket')}</span>
       </Button>
@@ -40,7 +44,7 @@ const OrderBasketActionButton: React.FC = () => {
       renderIcon={(props) => (
         <div className={styles.elementContainer}>
           <ShoppingCart size={20} {...props} />{' '}
-          {items?.length > 0 && <Tag className={styles.countTag}>{items?.length}</Tag>}
+          {patientItems?.length > 0 && <Tag className={styles.countTag}>{patientItems?.length}</Tag>}
         </div>
       )}
       hasIconOnly

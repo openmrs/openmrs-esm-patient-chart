@@ -3,13 +3,17 @@ import { ExtensionSlot } from '@openmrs/esm-framework';
 import styles from './action-menu.scss';
 
 interface ActionMenuInterface {
-  open: boolean;
+  patientUuid: string;
 }
 
-export const ActionMenu: React.FC<ActionMenuInterface> = ({ open }) => {
+export const ActionMenu: React.FC<ActionMenuInterface> = ({ patientUuid }) => {
   return (
     <aside className={styles.sideRail}>
-      <ExtensionSlot className={styles.extensionStyles} extensionSlotName={'action-menu-items-slot'} />
+      <ExtensionSlot
+        className={styles.extensionStyles}
+        extensionSlotName={'action-menu-items-slot'}
+        state={{ patientUuid }}
+      />
     </aside>
   );
 };
