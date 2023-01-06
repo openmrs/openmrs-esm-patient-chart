@@ -150,7 +150,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
         <div className={styles.orderBasketContainer}>
           <OrderBasketItemList
             orderBasketItems={patientItems}
-            onItemClicked={(order) => openMedicationOrderFormForUpdatingExistingOrder(items.indexOf(order))}
+            onItemClicked={(order) => openMedicationOrderFormForUpdatingExistingOrder(patientItems.indexOf(order))}
             onItemRemoveClicked={(order) => {
               const newOrders = [...patientItems];
               newOrders.splice(patientItems.indexOf(order), 1);
