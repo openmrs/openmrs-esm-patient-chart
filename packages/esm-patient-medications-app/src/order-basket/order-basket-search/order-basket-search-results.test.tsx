@@ -3,13 +3,11 @@ import { screen, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { getByTextWithMarkup } from '../../../../../tools/test-helpers';
 import { mockDrugOrderTemplates, mockDrugSearchResultItems } from '../../../../../__mocks__/medication.mock';
-import { mockPatient } from '../../../../../__mocks__/patient.mock';
 import { getTemplateOrderBasketItem, useDrugSearch, useDrugTemplate } from './drug-search.resource';
 import OrderBasketSearchResults from './order-basket-search-results.component';
 
 const testProps = {
   encounterUuid: '',
-  patientUuid: mockPatient.id,
   onSearchResultClicked: jest.fn(),
   searchTerm: 'aspirin',
   setSearchTerm: jest.fn(),
@@ -57,7 +55,6 @@ describe('OrderBasketSearchResults', () => {
     expect(testProps.onSearchResultClicked).toHaveBeenCalledWith(
       getTemplateOrderBasketItem(
         mockDrugSearchResultItems[0],
-        mockPatient.id,
         undefined,
         mockDrugOrderTemplates[mockDrugSearchResultItems[0].uuid][0],
       ),

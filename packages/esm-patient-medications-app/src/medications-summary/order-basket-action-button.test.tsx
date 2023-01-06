@@ -20,7 +20,7 @@ jest.mock('@openmrs/esm-framework', () => {
     ...originalModule,
     useLayoutType: jest.fn(),
     useStore: jest.fn().mockReturnValue({
-      items: [{ name: 'order-01', uuid: 'some-uuid', patient: '8673ee4f-e2ab-4077-ba55-4980f408773e' }],
+      items: { '8673ee4f-e2ab-4077-ba55-4980f408773e': [{ name: 'order-01', uuid: 'some-uuid' }] },
     }),
     usePatient: jest.fn(),
   };
@@ -49,7 +49,7 @@ jest.mock('../medications/order-basket-store.ts', () => {
 
   return {
     ...originalModule,
-    orderBasketStore: { items: [{ name: 'order-01', uuid: 'some-uuid', patient: mockPatient.id }] },
+    orderBasketStore: { items: { '8673ee4f-e2ab-4077-ba55-4980f408773e': [{ name: 'order-01', uuid: 'some-uuid' }] } },
   };
 });
 
