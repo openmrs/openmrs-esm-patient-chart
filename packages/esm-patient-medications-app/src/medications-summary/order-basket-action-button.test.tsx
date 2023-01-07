@@ -76,7 +76,7 @@ describe('<OrderBasketActionButton/>', () => {
 
     render(<OrderBasketActionButton />);
 
-    const orderBasketButton = screen.getByRole('button', { name: /Orders/i });
+    const orderBasketButton = screen.getByRole('button', { name: /Medications/i });
     expect(orderBasketButton).toBeInTheDocument();
 
     await waitFor(() => user.click(orderBasketButton));
@@ -95,7 +95,7 @@ describe('<OrderBasketActionButton/>', () => {
     }));
 
     render(<OrderBasketActionButton />);
-    const orderBasketButton = screen.getByRole('button', { name: /Orders/i });
+    const orderBasketButton = screen.getByRole('button', { name: /Medications/i });
     expect(orderBasketButton).toBeInTheDocument();
 
     await waitFor(() => user.click(orderBasketButton));
@@ -110,7 +110,7 @@ describe('<OrderBasketActionButton/>', () => {
 
     render(<OrderBasketActionButton />);
 
-    expect(screen.getByText(/orders/i)).toBeInTheDocument();
+    expect(screen.getByText(/medications/i)).toBeInTheDocument();
     expect(screen.getByText(/1/i)).toBeInTheDocument();
   });
 
