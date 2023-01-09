@@ -13,6 +13,7 @@ import {
   Checkbox,
   DatePicker,
   DatePickerInput,
+  InlineNotification,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import styles from './visit-attribute-type.scss';
@@ -81,8 +82,12 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
   visitAttributes,
 }) => {
   const { uuid, required } = attributeType;
-  const { data, isLoading } = useVisitAttributeType(uuid);
-  const { answers, isLoading: isLoadingAnswers } = useConceptAnswersForVisitAttributeType(data?.datatypeConfig);
+  const { data, isLoading, error: errorFetchingVisitAttributeType } = useVisitAttributeType(uuid);
+  const {
+    answers,
+    isLoading: isLoadingAnswers,
+    error: errorFetchingVisitAttributeAnswers,
+  } = useConceptAnswersForVisitAttributeType(data?.datatypeConfig);
   const { t } = useTranslation();
   const labelText = !required ? `${data?.display} (${t('optional', 'optional')})` : data?.display;
 
@@ -90,9 +95,32 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
     if (isLoading) {
       return <></>;
     }
-    switch (data.datatypeClassname) {
+
+    if (errorFetchingVisitAttributeType) {
+      return null;
+    }
+
+    switch (data?.datatypeClassname) {
       case 'org.openmrs.customdatatype.datatype.ConceptDatatype':
-        return !isLoadingAnswers ? (
+        if (isLoadingAnswers) {
+          return <SelectSkeleton />;
+        }
+
+        if (errorFetchingVisitAttributeAnswers) {
+          return (
+            <InlineNotification
+              kind="error"
+              lowContrast
+              title={`${t('error', 'Error')} ${errorFetchingVisitAttributeAnswers?.response?.status}`}
+              subtitle={t(
+                'errorFetchingVisitAttributeAnswers',
+                'Error occured when fetching answers for visit attribute type',
+              )}
+            />
+          );
+        }
+
+        return (
           <Select
             labelText={labelText}
             onChange={(e) => setVisitAttribute(e.target.value)}
@@ -100,13 +128,11 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
             invalid={required && isMissingRequiredAttributes && !visitAttributes[uuid]}
             invalidText={t('fieldRequired', 'This field is required')}
           >
-            <SelectItem text={t('selectAnOption', 'Select an option')} value={null} />
+            <SelectItem text={t('selectAnOption', 'Select an option')} value={null} disabled={required} />
             {answers.map((ans, indx) => (
               <SelectItem key={indx} text={ans.display} value={ans.uuid} />
             ))}
           </Select>
-        ) : (
-          <SelectSkeleton />
         );
       case 'org.openmrs.customdatatype.datatype.FloatDatatype':
         return (
@@ -184,12 +210,27 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
     t,
     uuid,
     visitAttributes,
+    errorFetchingVisitAttributeType,
+    errorFetchingVisitAttributeAnswers,
   ]);
 
   if (isLoading) {
     return (
       <div className={styles.visitAttributeField}>
         <TextInputSkeleton />
+      </div>
+    );
+  }
+
+  if (errorFetchingVisitAttributeType) {
+    return (
+      <div className={styles.visitAttributeField}>
+        <InlineNotification
+          kind="error"
+          lowContrast
+          title={`${t('error', 'Error')} ${errorFetchingVisitAttributeType?.response?.status}`}
+          subtitle={t('errorFetchingVisitAttributeType', 'Error occured when fetching visit attribute type')}
+        />
       </div>
     );
   }

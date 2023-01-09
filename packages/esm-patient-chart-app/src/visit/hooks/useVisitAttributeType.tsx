@@ -35,20 +35,10 @@ const visitAttributeTypeCustomRepresentation =
   'custom:(uuid,display,name,description,datatypeClassname,datatypeConfig)';
 
 export function useVisitAttributeType(uuid) {
-  const { data, error } = useSWRImmutable<FetchResponse<VisitAttributeType>, Error>(
+  const { data, error } = useSWRImmutable<FetchResponse<VisitAttributeType>, any>(
     `/ws/rest/v1/visitattributetype/${uuid}?v=${visitAttributeTypeCustomRepresentation}`,
     openmrsFetch,
   );
-
-  useEffect(() => {
-    if (error) {
-      showNotification({
-        title: error?.name,
-        description: error?.message,
-        kind: 'error',
-      });
-    }
-  }, [error]);
 
   const results = useMemo(() => {
     return {
@@ -62,20 +52,10 @@ export function useVisitAttributeType(uuid) {
 }
 
 export function useConceptAnswersForVisitAttributeType(conceptUuid) {
-  const { data, error } = useSWRImmutable<FetchResponse<Concept>, Error>(
+  const { data, error } = useSWRImmutable<FetchResponse<Concept>, any>(
     conceptUuid ? `/ws/rest/v1/concept/${conceptUuid}` : null,
     openmrsFetch,
   );
-
-  useEffect(() => {
-    if (error) {
-      showNotification({
-        title: error?.name,
-        description: error?.message,
-        kind: 'error',
-      });
-    }
-  }, [error]);
 
   const results = useMemo(() => {
     return {
