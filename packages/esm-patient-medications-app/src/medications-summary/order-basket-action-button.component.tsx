@@ -49,7 +49,7 @@ const OrderBasketActionButton: React.FC = () => {
         </div>
       )}
       hasIconOnly
-      iconDescription={t('orders', 'Orders')}
+      iconDescription={t('medications', 'Medications')}
       tooltipAlignment="end"
       tooltipPosition="bottom"
       onClick={launchOrderBasket}
