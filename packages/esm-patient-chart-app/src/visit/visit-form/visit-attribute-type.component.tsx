@@ -114,7 +114,10 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
               title={`${t('error', 'Error')} ${errorFetchingVisitAttributeAnswers?.response?.status}`}
               subtitle={t(
                 'errorFetchingVisitAttributeAnswers',
-                'Error occured when fetching answers for visit attribute type',
+                'Error occured when fetching answers for visit attribute type "{visitAttributeTypeName}"',
+                {
+                  visitAttributeTypeName: data?.display,
+                },
               )}
             />
           );

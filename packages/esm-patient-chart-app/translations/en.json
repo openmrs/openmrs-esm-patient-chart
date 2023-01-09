@@ -48,7 +48,7 @@
   "endVisitError": "Error ending current visit",
   "endVisitWarningMessage": "Ending this visit, will not allow you to fill another encounter form for this patient",
   "error": "Error",
-  "errorFetchingVisitAttributeAnswers": "Error occured when fetching answers for visit attribute type",
+  "errorFetchingVisitAttributeAnswers": "Error occured when fetching answers for visit attribute type \"{visitAttributeTypeName}\"",
   "errorFetchingVisitAttributeType": "Error occured when fetching visit attribute type",
   "female": "Female",
   "fieldRequired": "This field is required",
