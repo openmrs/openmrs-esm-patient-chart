@@ -4,7 +4,7 @@ import { Button, Tag } from '@carbon/react';
 import { ShoppingCart } from '@carbon/react/icons';
 import { useLayoutType, usePatient, useStore } from '@openmrs/esm-framework';
 import { useWorkspaces } from '@openmrs/esm-patient-common-lib';
-import { orderBasketStore } from '../medications/order-basket-store';
+import { getOrderItems, orderBasketStore } from '../medications/order-basket-store';
 import styles from './order-basket-action-button.scss';
 import { useLaunchOrderBasket } from '../utils/launchOrderBasket';
 
@@ -13,8 +13,12 @@ const OrderBasketActionButton: React.FC = () => {
   const layout = useLayoutType();
   const { workspaces } = useWorkspaces();
   const { items } = useStore(orderBasketStore);
-  const isActive = workspaces.find(({ name }) => name.includes('order-basket'));
   const { patientUuid } = usePatient();
+
+  const isActive = workspaces.find(({ name }) => name.includes('order-basket'));
+
+  const patientOrderItems = getOrderItems(items, patientUuid);
+
   const { launchOrderBasket } = useLaunchOrderBasket(patientUuid);
 
   if (layout === 'tablet')
@@ -27,7 +31,8 @@ const OrderBasketActionButton: React.FC = () => {
         onClick={launchOrderBasket}
       >
         <div className={styles.elementContainer}>
-          <ShoppingCart size={20} /> {items?.length > 0 && <Tag className={styles.countTag}>{items?.length}</Tag>}
+          <ShoppingCart size={20} />{' '}
+          {patientOrderItems?.length > 0 && <Tag className={styles.countTag}>{patientOrderItems?.length}</Tag>}
         </div>
         <span>{t('orderBasket', 'Order Basket')}</span>
       </Button>
@@ -40,7 +45,7 @@ const OrderBasketActionButton: React.FC = () => {
       renderIcon={(props) => (
         <div className={styles.elementContainer}>
           <ShoppingCart size={20} {...props} />{' '}
-          {items?.length > 0 && <Tag className={styles.countTag}>{items?.length}</Tag>}
+          {patientOrderItems?.length > 0 && <Tag className={styles.countTag}>{patientOrderItems?.length}</Tag>}
         </div>
       )}
       hasIconOnly
