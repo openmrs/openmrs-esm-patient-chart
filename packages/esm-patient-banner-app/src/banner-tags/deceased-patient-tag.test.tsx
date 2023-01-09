@@ -15,7 +15,6 @@ describe('DeceasedPatientTag', () => {
   it('renders a deceased tag in the patient banner for patients who died', () => {
     render(<DeceasedPatientBannerTag patient={mockDeceasedPatient} patientUuid={mockDeceasedPatient.id} />);
 
-    expect(screen.getByRole('tooltip', { name: / 04-Apr-1972, 12:00 AM/i }));
-    expect(screen.getByRole('button', { name: /Deceased/ })).toBeInTheDocument();
+    expect(screen.getByRole('tooltip', { name: /Deceased 04-Apr-1972, 12:00 AM/i }));
   });
 });
