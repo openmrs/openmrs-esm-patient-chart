@@ -127,6 +127,7 @@ const FormView: React.FC<FormViewProps> = ({ category, forms, patientUuid, patie
                 <TableToolbar className={styles.tableToolbar}>
                   <TableToolbarContent>
                     <TableToolbarSearch
+                      className={styles.searchInput}
                       expanded
                       light
                       onChange={onInputChange}

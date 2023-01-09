@@ -106,9 +106,9 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
             onChange={(event) => setFormsCategory(event.name as any)}
             selectedIndex={formsCategory}
           >
-            <Switch name={'Recommended'} text="Recommended" />
-            <Switch name={'Completed'} text="Completed" />
-            <Switch name={'All'} text="All" />
+            <Switch name={'Recommended'} text={t('recommended', 'Recommended')} />
+            <Switch name={'Completed'} text={t('completed', 'Completed')} />
+            <Switch name={'All'} text={t('all', 'All')} />
           </ContentSwitcher>
         </div>
       </CardHeader>
