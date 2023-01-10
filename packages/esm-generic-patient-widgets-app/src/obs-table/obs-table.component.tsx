@@ -9,11 +9,10 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { usePagination, useConfig, formatDatetime } from '@openmrs/esm-framework';
+import { usePagination, useConfig, formatDatetime, formatDate, formatTime } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { useObs } from '../resources/useObs';
 import styles from './obs-table.scss';
-import dayjs from 'dayjs';
 
 interface ObsTableProps {
   patientUuid: string;
@@ -68,14 +67,24 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
               break;
 
             case 'DateTime':
-              rowData[obs.conceptUuid] = dayjs(new Date(obs.valueDateTime)).format(config.dateFormat);
+              if (config?.dateFormat === 'dateTime') {
+                rowData[obs.conceptUuid] = formatDatetime(new Date(obs.valueDateTime), { mode: 'standard' });
+              } else if (config?.dateFormat === 'time') {
+                rowData[obs.conceptUuid] = formatTime(new Date(obs.valueDateTime));
+              } else if (config?.dateFormat === 'date') {
+                rowData[obs.conceptUuid] = formatDate(new Date(obs.valueDateTime), { mode: 'standard' });
+              } else {
+                //maintain the default behavior
+                rowData[obs.conceptUuid] = formatDatetime(new Date(obs.valueDateTime), { mode: 'standard' });
+              }
+
               break;
           }
         }
 
         return rowData;
       }),
-    [config.data, config.dateFormat, obssByDate],
+    [config, obssByDate],
   );
 
   const { results, goTo, currentPage } = usePagination(tableRows, config.table.pageSize);

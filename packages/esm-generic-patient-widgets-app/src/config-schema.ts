@@ -76,8 +76,8 @@ export const configSchema = {
   },
   dateFormat: {
     _type: Type.String,
-    _description: 'Date formating string',
-    _default: 'DD/MM/YYY',
+    _description: 'Type of display for data',
+    _default: 'dateTime',
   },
 };
 
@@ -96,5 +96,5 @@ export interface ConfigObject {
   };
   showGraphByDefault: boolean;
   encounterTypes: Array<string>;
-  dateFormat: string;
+  dateFormat: 'date' | 'time' | 'dateTime';
 }
