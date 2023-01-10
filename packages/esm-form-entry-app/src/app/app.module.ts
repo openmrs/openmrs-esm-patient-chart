@@ -1,8 +1,9 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
+import { HttpClientModule } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
 
-import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { EmptyRouteComponent } from './empty-route/empty-route.component';
 import { FeWrapperComponent } from './fe-wrapper/fe-wrapper.component';
@@ -18,11 +19,22 @@ import { ConfigResourceService } from './services/config-resource.service';
 import { LoaderComponent } from './loader/loader.component';
 import { SingleSpaPropsService } from './single-spa-props/single-spa-props.service';
 import { FormCreationService } from './form-creation/form-creation.service';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateService, TranslateModule } from '@ngx-translate/core';
 
 @NgModule({
   declarations: [AppComponent, EmptyRouteComponent, FeWrapperComponent, LoaderComponent],
-  imports: [BrowserModule, FormEntryModule, ReactiveFormsModule, BrowserAnimationsModule, OpenmrsApiModule],
+  imports: [
+    BrowserModule,
+    FormEntryModule,
+    ReactiveFormsModule,
+    BrowserAnimationsModule,
+    OpenmrsApiModule,
+    HttpClientModule,
+    CommonModule,
+    TranslateModule.forRoot({
+      defaultLanguage: 'en',
+    }),
+  ],
   providers: [
     FormSchemaService,
     LocalStorageService,

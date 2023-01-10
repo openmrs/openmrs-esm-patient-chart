@@ -7,7 +7,13 @@ import { FormSchemaCompiler } from '@openmrs/ngx-formentry';
 import { LocalStorageService } from '../local-storage/local-storage.service';
 import { FormSchema, Questions } from '../types';
 import { TranslateService } from '@ngx-translate/core';
+import { i18n } from 'i18next';
 
+declare global {
+  interface Window {
+    i18next: i18n; // i18n has language in it
+  }
+}
 @Injectable()
 export class FormSchemaService {
   constructor(
@@ -19,7 +25,7 @@ export class FormSchemaService {
 
   public getFormSchemaByUuid(formUuid: string, cached: boolean = true): Observable<FormSchema> {
     const cachedCompiledSchema = this.getCachedCompiledSchemaByUuid(formUuid);
-    const currentLang = (window as any).i18next?.language.substring(0, 2).toLowerCase() || 'en';
+    const currentLang = (window as Window).i18next?.language.substring(0, 2).toLowerCase() || 'en';
     this.translate.setDefaultLang(currentLang);
 
     if (cachedCompiledSchema && cached) {
