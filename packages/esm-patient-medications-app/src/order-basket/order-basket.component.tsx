@@ -211,14 +211,15 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
             />
           )}
           <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-            <Button className={styles.button} kind="secondary" onClick={handleCancelClicked}>
+            <Button className={styles.button} kind="secondary" onClick={handleCancelClicked} size="xl">
               {t('cancel', 'Cancel')}
             </Button>
             <Button
               className={styles.button}
               kind="primary"
               onClick={handleSaveClicked}
-              disabled={!items?.length || !encounterUuid}
+              disabled={!patientOrderItems?.length || !encounterUuid}
+              size="xl"
             >
               {t('signAndClose', 'Sign and close')}
             </Button>

@@ -8,15 +8,9 @@
   background-color: var(--brand-02);
   color: #ffffff;
   border: 0;
+  padding: spacing.$spacing-05;
   top: 0rem;
   z-index: 1;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  .drugFormHeaderText {
-    flex: 1;
-  }
 }
 
 .orderForm {
@@ -117,10 +111,12 @@
 .tablet {
   padding: 1.5rem 1rem;
   background-color: $ui-02;
+  margin: 0 -1rem -1rem;
 }
 
 .desktop {
   padding: 0rem;
+  margin: 0 -1rem -1rem;
 }
 
 /* Desktop */
@@ -174,7 +170,7 @@
 }
 
 .spacer {
-  margin-top: 3rem;
+  margin-top: 2rem;
 }
 
 .dosingWrapper {

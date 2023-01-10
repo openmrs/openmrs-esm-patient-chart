@@ -122,26 +122,26 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
   return (
     <>
       <div className={styles.medicationDetailsHeader}>
-        <div>
-          {orderBasketItem.isFreeTextDosage ? (
-            <strong>{capitalize(orderBasketItem.commonMedicationName)}</strong>
-          ) : (
-            <span>
-              <strong className={styles.dosageInfo}>
-                {capitalize(orderBasketItem.commonMedicationName)} {doseWithUnitsLabel && `(${doseWithUnitsLabel})`}
-              </strong>{' '}
-              {template && (
-                <>
-                  <span className={styles.bodyShort01}>
-                    &mdash; {orderBasketItem.route.value} &mdash; {orderBasketItem.drug.dosageForm.display} &mdash;{' '}
-                  </span>
-                  <span className={styles.caption01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
-                  <strong className={styles.dosageInfo}>{doseWithUnitsLabel}</strong>
-                </>
-              )}
-            </span>
-          )}
-        </div>
+        {orderBasketItem.isFreeTextDosage ? (
+          <strong>{capitalize(orderBasketItem.commonMedicationName)}</strong>
+        ) : (
+          <span>
+            <strong className={styles.dosageInfo}>
+              {capitalize(orderBasketItem.commonMedicationName)} {doseWithUnitsLabel}
+            </strong>{' '}
+            {template && (
+              <>
+                <span className={styles.bodyShort01}>
+                  {orderBasketItem.route.value && <>&mdash; {orderBasketItem.route.value}</>}{' '}
+                  {orderBasketItem.drug.dosageForm.display && <>&mdash; {orderBasketItem.drug.dosageForm.display}</>}{' '}
+                  &mdash;{' '}
+                </span>
+                <span className={styles.caption01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
+                <strong className={styles.dosageInfo}>{doseWithUnitsLabel}</strong>
+              </>
+            )}
+          </span>
+        )}
       </div>
       <Form className={styles.orderForm} onSubmit={() => onSign(orderBasketItem)}>
         <div className={styles.grid}>
@@ -158,6 +158,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
               </Button>
             </div>
           )}
+
           <h2 className={styles.heading}>{t('orderForm', 'Order Form')}</h2>
           <div className={styles.flexGrid}>
             <Column md={4}>
@@ -582,10 +583,10 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
         </Grid>
 
         <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-          <Button className={styles.button} kind="secondary" onClick={onCancel}>
+          <Button className={styles.button} kind="secondary" onClick={onCancel} size="xl">
             {t('discard', 'Discard')}
           </Button>
-          <Button className={styles.button} kind="primary" type="submit">
+          <Button className={styles.button} kind="primary" type="submit" size="xl">
             {t('saveOrder', 'Save order')}
           </Button>
         </ButtonSet>
