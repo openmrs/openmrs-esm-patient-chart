@@ -9,8 +9,14 @@
   color: #ffffff;
   border: 0;
   top: 0rem;
-  padding: 1rem;
   z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  .drugFormHeaderText {
+    flex: 1;
+  }
 }
 
 .orderForm {
@@ -141,7 +147,6 @@
 }
 
 .gridRow {
-  @extend .row;
   padding: 0px;
 
   :global(.cds--number) {
@@ -178,4 +183,8 @@
 
 .dosingWrapper :global(.bx--combo-box) {
   width: 75% !important;
+}
+
+.field {
+  margin-bottom: spacing.$spacing-05;
 }

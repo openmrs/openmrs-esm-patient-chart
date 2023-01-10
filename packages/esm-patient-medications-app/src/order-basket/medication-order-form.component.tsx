@@ -16,10 +16,11 @@ import {
   DatePicker,
   DatePickerInput,
   InlineNotification,
+  Layer,
 } from '@carbon/react';
-import { ArrowLeft } from '@carbon/react/icons';
+import { ArrowLeft, Close } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
-import { isDesktop, OpenmrsResource, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { OrderBasketItem } from '../types/order-basket-item';
 import { useOrderConfig } from '../api/order-config';
 import styles from './medication-order-form.scss';
@@ -121,10 +122,10 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
   return (
     <>
       <div className={styles.medicationDetailsHeader}>
-        {orderBasketItem.isFreeTextDosage ? (
-          <strong>{capitalize(orderBasketItem.commonMedicationName)}</strong>
-        ) : (
-          <>
+        <div>
+          {orderBasketItem.isFreeTextDosage ? (
+            <strong>{capitalize(orderBasketItem.commonMedicationName)}</strong>
+          ) : (
             <span>
               <strong className={styles.dosageInfo}>
                 {capitalize(orderBasketItem.commonMedicationName)} {doseWithUnitsLabel && `(${doseWithUnitsLabel})`}
@@ -139,24 +140,24 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                 </>
               )}
             </span>
-          </>
-        )}
+          )}
+        </div>
       </div>
       <Form className={styles.orderForm} onSubmit={() => onSign(orderBasketItem)}>
         <div className={styles.grid}>
-          {isDesktop(layout) ? (
+          {!isTablet && (
             <div className={styles.backButton}>
               <Button
                 kind="ghost"
                 renderIcon={(props) => <ArrowLeft size={24} {...props} />}
                 iconDescription="Return to order basket"
-                size="sm"
+                size={isTablet ? 'md' : 'sm'}
                 onClick={onCancel}
               >
                 <span>{t('backToOrderBasket', 'Back to order basket')}</span>
               </Button>
             </div>
-          ) : null}
+          )}
           <h2 className={styles.heading}>{t('orderForm', 'Order Form')}</h2>
           <div className={styles.flexGrid}>
             <Column md={4}>
@@ -181,39 +182,46 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
           </div>
           <div className={styles.row}>
             <Column md={8}>
-              <TextInput
-                light={isTablet}
-                id="indication"
-                labelText={t('indication', 'Indication')}
-                placeholder={t('indicationPlaceholder', 'e.g. "Hypertension"')}
-                value={orderBasketItem.indication}
-                onChange={(e) =>
-                  setOrderBasketItem({
-                    ...orderBasketItem,
-                    indication: e.target.value,
-                  })
-                }
-                required
-                maxLength={150}
-              />
+              <Layer level={isTablet ? 1 : 0}>
+                <div className={styles.field}>
+                  <TextInput
+                    size={!isTablet ? 'md' : 'lg'}
+                    id="indication"
+                    labelText={t('indication', 'Indication')}
+                    placeholder={t('indicationPlaceholder', 'e.g. "Hypertension"')}
+                    value={orderBasketItem.indication}
+                    onChange={(e) =>
+                      setOrderBasketItem({
+                        ...orderBasketItem,
+                        indication: e.target.value,
+                      })
+                    }
+                    required
+                    maxLength={150}
+                  />
+                </div>
+              </Layer>
             </Column>
           </div>
           {orderBasketItem.isFreeTextDosage ? (
             <div className={styles.row}>
               <Column md={8}>
-                <TextArea
-                  light={isTablet}
-                  labelText={t('freeTextDosage', 'Free Text Dosage')}
-                  placeholder={t('freeTextDosage', 'Free Text Dosage')}
-                  value={orderBasketItem.freeTextDosage}
-                  maxLength={65535}
-                  onChange={(e) =>
-                    setOrderBasketItem({
-                      ...orderBasketItem,
-                      freeTextDosage: e.target.value,
-                    })
-                  }
-                />
+                <Layer level={isTablet ? 1 : 0}>
+                  <div className={styles.field}>
+                    <TextArea
+                      labelText={t('freeTextDosage', 'Free Text Dosage')}
+                      placeholder={t('freeTextDosage', 'Free Text Dosage')}
+                      value={orderBasketItem.freeTextDosage}
+                      maxLength={65535}
+                      onChange={(e) =>
+                        setOrderBasketItem({
+                          ...orderBasketItem,
+                          freeTextDosage: e.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                </Layer>
               </Column>
             </div>
           ) : (
@@ -221,105 +229,121 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
               <Grid className={styles.gridRow}>
                 <Column md={4}>
                   <div className={styles.numberInput}>
-                    <NumberInput
-                      id="doseSelection"
-                      light={isTablet}
-                      placeholder={t('editDoseComboBoxPlaceholder', 'Dose')}
-                      label={t('editDoseComboBoxTitle', 'Enter Dose')}
-                      value={orderBasketItem?.dosage ?? 0}
-                      onChange={(e, { value }) => {
-                        setOrderBasketItem({
-                          ...orderBasketItem,
-                          dosage: value ? parseFloat(value) : 0,
-                        });
-                      }}
-                      min={0}
-                      hideSteppers
-                    />
+                    <Layer level={isTablet ? 1 : 0}>
+                      <div className={styles.field}>
+                        <NumberInput
+                          size={!isTablet ? 'md' : 'lg'}
+                          id="doseSelection"
+                          placeholder={t('editDoseComboBoxPlaceholder', 'Dose')}
+                          label={t('editDoseComboBoxTitle', 'Enter Dose')}
+                          value={orderBasketItem?.dosage ?? 0}
+                          onChange={(e, { value }) => {
+                            setOrderBasketItem({
+                              ...orderBasketItem,
+                              dosage: value ? parseFloat(value) : 0,
+                            });
+                          }}
+                          min={0}
+                          required
+                          hideSteppers
+                        />
+                      </div>
+                    </Layer>
                   </div>
                 </Column>
                 <Column md={4}>
-                  <ComboBox
-                    id="dosingUnits"
-                    light={isTablet}
-                    items={dosingUnitOptions}
-                    placeholder={t('editDosageUnitsPlaceholder', 'Unit')}
-                    titleText={t('editDosageUnitsTitle', 'Dose unit')}
-                    itemToString={(item) => item?.text}
-                    selectedItem={
-                      dosingUnitOptions?.length
-                        ? {
-                            id: orderBasketItem.unit?.valueCoded,
-                            text: orderBasketItem.unit?.value,
-                          }
-                        : null
-                    }
-                    onChange={({ selectedItem }) => {
-                      setOrderBasketItem({
-                        ...orderBasketItem,
-                        unit: !!selectedItem?.id
-                          ? { value: selectedItem.text, valueCoded: selectedItem.id }
-                          : initialOrderBasketItem.route,
-                      });
-                    }}
-                    required
-                  />
+                  <Layer level={isTablet ? 1 : 0}>
+                    <div className={styles.field}>
+                      <ComboBox
+                        size={!isTablet ? 'md' : 'lg'}
+                        id="dosingUnits"
+                        items={dosingUnitOptions}
+                        placeholder={t('editDosageUnitsPlaceholder', 'Unit')}
+                        titleText={t('editDosageUnitsTitle', 'Dose unit')}
+                        itemToString={(item) => item?.text}
+                        selectedItem={
+                          dosingUnitOptions?.length
+                            ? {
+                                id: orderBasketItem.unit?.valueCoded,
+                                text: orderBasketItem.unit?.value,
+                              }
+                            : null
+                        }
+                        onChange={({ selectedItem }) => {
+                          setOrderBasketItem({
+                            ...orderBasketItem,
+                            unit: !!selectedItem?.id
+                              ? { value: selectedItem.text, valueCoded: selectedItem.id }
+                              : initialOrderBasketItem.route,
+                          });
+                        }}
+                        required
+                      />
+                    </div>
+                  </Layer>
                 </Column>
-                <Column md={8} className={styles.lastGridCell}>
-                  <ComboBox
-                    id="editRoute"
-                    light={isTablet}
-                    items={routeOptions}
-                    selectedItem={{
-                      id: orderBasketItem.route?.valueCoded,
-                      text: orderBasketItem.route?.value,
-                    }}
-                    // @ts-ignore
-                    placeholder={t('editRouteComboBoxPlaceholder', 'Route')}
-                    titleText={t('editRouteComboBoxTitle', 'Enter Route')}
-                    itemToString={(item) => item?.text}
-                    onChange={({ selectedItem }) => {
-                      setOrderBasketItem({
-                        ...orderBasketItem,
-                        route: !!selectedItem?.id
-                          ? { value: selectedItem.text, valueCoded: selectedItem.id }
-                          : initialOrderBasketItem.route,
-                      });
-                    }}
-                    required
-                  />
+                <Column md={8} className={styles.lastGridCell} sm={16}>
+                  <Layer level={isTablet ? 1 : 0}>
+                    <div className={styles.field}>
+                      <ComboBox
+                        size={!isTablet ? 'md' : 'lg'}
+                        id="editRoute"
+                        items={routeOptions}
+                        selectedItem={{
+                          id: orderBasketItem.route?.valueCoded,
+                          text: orderBasketItem.route?.value,
+                        }}
+                        // @ts-ignore
+                        placeholder={t('editRouteComboBoxPlaceholder', 'Route')}
+                        titleText={t('editRouteComboBoxTitle', 'Enter Route')}
+                        itemToString={(item) => item?.text}
+                        onChange={({ selectedItem }) => {
+                          setOrderBasketItem({
+                            ...orderBasketItem,
+                            route: !!selectedItem?.id
+                              ? { value: selectedItem.text, valueCoded: selectedItem.id }
+                              : initialOrderBasketItem.route,
+                          });
+                        }}
+                        required
+                      />
+                    </div>
+                  </Layer>
                 </Column>
               </Grid>
-              <div className={styles.row}>
+              <div className={styles.gridRow}>
                 <Column md={8}>
-                  <ComboBox
-                    id="editFrequency"
-                    light={isTablet}
-                    items={frequencyOptions}
-                    selectedItem={{
-                      id: orderBasketItem.frequency?.valueCoded,
-                      text: orderBasketItem.frequency?.value,
-                    }}
-                    // @ts-ignore
-                    placeholder={t('editFrequencyComboBoxPlaceholder', 'Frequency')}
-                    titleText={t('editFrequencyComboBoxTitle', 'Enter Frequency')}
-                    itemToString={(item) => item?.text}
-                    onChange={({ selectedItem }) => {
-                      setOrderBasketItem({
-                        ...orderBasketItem,
-                        frequency: !!selectedItem?.id
-                          ? { value: selectedItem.text, valueCoded: selectedItem.id }
-                          : initialOrderBasketItem.frequency,
-                      });
-                    }}
-                    required
-                  />
+                  <Layer level={isTablet ? 1 : 0}>
+                    <div className={styles.field}>
+                      <ComboBox
+                        size={!isTablet ? 'md' : 'lg'}
+                        id="editFrequency"
+                        items={frequencyOptions}
+                        selectedItem={{
+                          id: orderBasketItem.frequency?.valueCoded,
+                          text: orderBasketItem.frequency?.value,
+                        }}
+                        // @ts-ignore
+                        placeholder={t('editFrequencyComboBoxPlaceholder', 'Frequency')}
+                        titleText={t('editFrequencyComboBoxTitle', 'Enter Frequency')}
+                        itemToString={(item) => item?.text}
+                        onChange={({ selectedItem }) => {
+                          setOrderBasketItem({
+                            ...orderBasketItem,
+                            frequency: !!selectedItem?.id
+                              ? { value: selectedItem.text, valueCoded: selectedItem.id }
+                              : initialOrderBasketItem.frequency,
+                          });
+                        }}
+                        required
+                      />
+                    </div>
+                  </Layer>
                 </Column>
               </div>
-              <Grid className={styles.gridRow}>
-                <Column md={8} className={`${styles.fullHeightTextAreaContainer} ${styles.patientInstructionsWrapper}`}>
+              <Layer level={isTablet ? 1 : 0}>
+                <div className={styles.field}>
                   <TextArea
-                    light={isTablet}
                     labelText={t('patientInstructions', 'Patient Instructions')}
                     placeholder={t(
                       'patientInstructionsPlaceholder',
@@ -334,24 +358,27 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                       })
                     }
                   />
-                </Column>
-                <Column md={8} className={styles.lastGridCell}>
-                  <FormGroup legendText={t('prn', 'P.R.N.')}>
-                    <Checkbox
-                      id="prn"
-                      labelText={t('takeAsNeeded', 'Take As Needed')}
-                      checked={orderBasketItem.asNeeded}
-                      onChange={(e) =>
-                        setOrderBasketItem({
-                          ...orderBasketItem,
-                          asNeeded: e.target.checked,
-                        })
-                      }
-                    />
-                  </FormGroup>
-                  <div className={styles.prpWrapper} style={orderBasketItem.asNeeded ? {} : { visibility: 'hidden' }}>
+                </div>
+              </Layer>
+              <div className={styles.field}>
+                <FormGroup legendText={t('prn', 'P.R.N.')}>
+                  <Checkbox
+                    id="prn"
+                    labelText={t('takeAsNeeded', 'Take As Needed')}
+                    checked={orderBasketItem.asNeeded}
+                    onChange={(e) =>
+                      setOrderBasketItem({
+                        ...orderBasketItem,
+                        asNeeded: e.target.checked,
+                      })
+                    }
+                  />
+                </FormGroup>
+              </div>
+              {orderBasketItem.asNeeded && (
+                <Layer level={isTablet ? 1 : 0}>
+                  <div className={styles.field}>
                     <TextArea
-                      light={isTablet}
                       labelText={t('prnReason', 'P.R.N. Reason')}
                       placeholder={t('prnReasonPlaceholder', 'Reason to take medicine')}
                       rows={3}
@@ -365,8 +392,8 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                       }
                     />
                   </div>
-                </Column>
-              </Grid>
+                </Layer>
+              )}
             </>
           )}
         </div>
@@ -378,80 +405,96 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
         </Grid>
         <Grid className={styles.gridRow}>
           <Column md={8} className={styles.fullWidthDatePickerContainer}>
-            <DatePicker
-              light={isTablet}
-              datePickerType="single"
-              maxDate={new Date()}
-              value={[orderBasketItem.startDate]}
-              onChange={([newStartDate]) =>
-                setOrderBasketItem({
-                  ...orderBasketItem,
-                  startDate: newStartDate,
-                })
-              }
-            >
-              <DatePickerInput id="startDatePicker" placeholder="mm/dd/yyyy" labelText={t('startDate', 'Start date')} />
-            </DatePicker>
+            <Layer level={isTablet ? 1 : 0}>
+              <div className={styles.field}>
+                <DatePicker
+                  datePickerType="single"
+                  maxDate={new Date()}
+                  value={[orderBasketItem.startDate]}
+                  onChange={([newStartDate]) =>
+                    setOrderBasketItem({
+                      ...orderBasketItem,
+                      startDate: newStartDate,
+                    })
+                  }
+                >
+                  <DatePickerInput
+                    id="startDatePicker"
+                    placeholder="mm/dd/yyyy"
+                    labelText={t('startDate', 'Start date')}
+                    size={!isTablet ? 'md' : 'lg'}
+                  />
+                </DatePicker>
+              </div>
+            </Layer>
           </Column>
           <Column md={8} className={styles.lastGridCell}>
-            <NumberInput
-              light={isTablet}
-              id="durationInput"
-              label={t('duration', 'Duration')}
-              min={1}
-              value={orderBasketItem.duration ?? ''}
-              helperText={t('noDurationHint', 'An empty field indicates an indefinite duration.')}
-              step={1}
-              onChange={(e, { value }) => {
-                setOrderBasketItem({
-                  ...orderBasketItem,
-                  duration: value ? parseFloat(value) : 0,
-                });
-              }}
-              hideSteppers
-              allowEmpty
-            />
+            <Layer level={isTablet ? 1 : 0}>
+              <div className={styles.field}>
+                <NumberInput
+                  size={!isTablet ? 'md' : 'lg'}
+                  id="durationInput"
+                  label={t('duration', 'Duration')}
+                  min={1}
+                  value={orderBasketItem.duration ?? ''}
+                  helperText={t('noDurationHint', 'An empty field indicates an indefinite duration.')}
+                  step={1}
+                  onChange={(e, { value }) => {
+                    setOrderBasketItem({
+                      ...orderBasketItem,
+                      duration: value ? parseFloat(value) : 0,
+                    });
+                  }}
+                  hideSteppers
+                  allowEmpty
+                />
+              </div>
+            </Layer>
           </Column>
         </Grid>
         <div className={styles.gridRow}>
           <Column>
             <FormGroup legendText={t('durationUnit', 'Duration Unit')}>
-              <ComboBox
-                light={isTablet}
-                id="durationUnitPlaceholder"
-                selectedItem={
-                  orderBasketItem.durationUnit?.uuid
-                    ? {
-                        id: orderBasketItem.durationUnit.uuid,
-                        text: orderBasketItem.durationUnit.display,
-                      }
-                    : null
-                }
-                items={
-                  durationUnits?.map((unit) => ({
-                    id: unit.uuid,
-                    text: unit.display,
-                  })) ?? []
-                }
-                itemToString={(item) => item?.text}
-                // @ts-ignore
-                placeholder={t('durationUnitPlaceholder', 'Duration Unit')}
-                helperText={isLoadingDurationUnits && t('fetchingDurationUnits', 'Fetching duration units...')}
-                onChange={({ selectedItem }) =>
-                  !!selectedItem
-                    ? setOrderBasketItem({
-                        ...orderBasketItem,
-                        durationUnit: {
-                          uuid: selectedItem.id,
-                          display: selectedItem.text,
-                        },
-                      })
-                    : setOrderBasketItem({
-                        ...orderBasketItem,
-                        durationUnit: config.daysDurationUnit,
-                      })
-                }
-              />
+              <Layer level={isTablet ? 1 : 0}>
+                <div className={styles.field}>
+                  <ComboBox
+                    size={!isTablet ? 'md' : 'lg'}
+                    id="durationUnitPlaceholder"
+                    selectedItem={
+                      orderBasketItem.durationUnit?.uuid
+                        ? {
+                            id: orderBasketItem.durationUnit.uuid,
+                            text: orderBasketItem.durationUnit.display,
+                          }
+                        : null
+                    }
+                    items={
+                      durationUnits?.map((unit) => ({
+                        id: unit.uuid,
+                        text: unit.display,
+                      })) ?? []
+                    }
+                    itemToString={(item) => item?.text}
+                    // @ts-ignore
+                    placeholder={t('durationUnitPlaceholder', 'Duration Unit')}
+                    helperText={isLoadingDurationUnits && t('fetchingDurationUnits', 'Fetching duration units...')}
+                    onChange={({ selectedItem }) =>
+                      !!selectedItem
+                        ? setOrderBasketItem({
+                            ...orderBasketItem,
+                            durationUnit: {
+                              uuid: selectedItem.id,
+                              display: selectedItem.text,
+                            },
+                          })
+                        : setOrderBasketItem({
+                            ...orderBasketItem,
+                            durationUnit: config.daysDurationUnit,
+                          })
+                    }
+                  />
+                </div>
+              </Layer>
             </FormGroup>
             {fetchingDurationUnitsError && (
               <InlineNotification
@@ -472,57 +515,69 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
         <Grid className={styles.gridRow}>
           <Column md={8}>
             <FormGroup legendText={t('quantity', 'Quantity')}>
-              <NumberInput
-                light={isTablet}
-                id="quantityDispensed"
-                helperText={t('pillsToDispense', 'Pills to dispense')}
-                value={orderBasketItem.pillsDispensed}
-                min={0}
-                onChange={(e, { value }) => {
-                  setOrderBasketItem({
-                    ...orderBasketItem,
-                    pillsDispensed: value ? parseFloat(value) : 0,
-                  });
-                }}
-                hideSteppers
-              />
+              <Layer level={isTablet ? 1 : 0}>
+                <div className={styles.field}>
+                  <NumberInput
+                    size={!isTablet ? 'md' : 'lg'}
+                    id="quantityDispensed"
+                    helperText={t('pillsToDispense', 'Pills to dispense')}
+                    value={orderBasketItem.pillsDispensed}
+                    min={0}
+                    onChange={(e, { value }) => {
+                      setOrderBasketItem({
+                        ...orderBasketItem,
+                        pillsDispensed: value ? parseFloat(value) : 0,
+                      });
+                    }}
+                    hideSteppers
+                  />
+                </div>
+              </Layer>
             </FormGroup>
           </Column>
           <Column md={8} className={styles.lastGridCell}>
             <FormGroup legendText={t('prescriptionRefills', 'Prescription Refills')}>
-              <NumberInput
-                light={isTablet}
-                id="prescriptionRefills"
-                min={0}
-                value={orderBasketItem.numRefills}
-                onChange={(e, { value }) => {
-                  setOrderBasketItem({
-                    ...orderBasketItem,
-                    numRefills: value ? parseFloat(value) : 0,
-                  });
-                }}
-                hideSteppers
-              />
+              <Layer level={isTablet ? 1 : 0}>
+                <div className={styles.field}>
+                  <NumberInput
+                    size={!isTablet ? 'md' : 'lg'}
+                    id="prescriptionRefills"
+                    min={0}
+                    value={orderBasketItem.numRefills}
+                    onChange={(e, { value }) => {
+                      setOrderBasketItem({
+                        ...orderBasketItem,
+                        numRefills: value ? parseFloat(value) : 0,
+                      });
+                    }}
+                    hideSteppers
+                  />
+                </div>
+              </Layer>
             </FormGroup>
           </Column>
         </Grid>
         <Grid className={styles.gridRow}>
           <Column md={8}>
-            <TextInput
-              light={isTablet}
-              id="indication"
-              labelText={t('indication', 'Indication')}
-              placeholder={t('indicationPlaceholder', 'e.g. "Hypertension"')}
-              value={orderBasketItem.indication}
-              onChange={(e) =>
-                setOrderBasketItem({
-                  ...orderBasketItem,
-                  indication: e.target.value,
-                })
-              }
-              required
-              maxLength={150}
-            />
+            <Layer level={isTablet ? 1 : 0}>
+              <div className={styles.field}>
+                <TextInput
+                  size={!isTablet ? 'md' : 'lg'}
+                  id="indication"
+                  labelText={t('indication', 'Indication')}
+                  placeholder={t('indicationPlaceholder', 'e.g. "Hypertension"')}
+                  value={orderBasketItem.indication}
+                  onChange={(e) =>
+                    setOrderBasketItem({
+                      ...orderBasketItem,
+                      indication: e.target.value,
+                    })
+                  }
+                  required
+                  maxLength={150}
+                />
+              </div>
+            </Layer>
           </Column>
         </Grid>
 
