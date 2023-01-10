@@ -234,6 +234,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                         });
                       }}
                       min={0}
+                      required
                       hideSteppers
                     />
                   </div>

@@ -87,21 +87,24 @@ const MedicationsDetailsTable = connect<
     const tableRows = medications?.map((medication, id) => ({
       id: `${id}`,
       details: {
-        sortKey: medication.drug?.name,
+        sortKey: medication.drug?.display,
         content: (
           <div className={styles.medicationRecord}>
             <div>
               <p className={styles.bodyLong01}>
-                <strong>{capitalize(medication.drug?.concept?.display)}</strong> &mdash;{' '}
-                {medication.drug?.strength.toLowerCase()} &mdash; {medication.drug.dosageForm.display.toLowerCase()}
+                <strong>{capitalize(medication.drug?.display)}</strong>{' '}
+                {medication.drug?.strength && <>&mdash; {medication.drug?.strength.toLowerCase()}</>}{' '}
+                {medication.drug?.dosageForm?.display && (
+                  <>&mdash; {medication.drug.dosageForm.display.toLowerCase()}</>
+                )}
               </p>
               <p className={styles.bodyLong01}>
                 <span className={styles.label01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
                 <span className={styles.dosage}>
                   {medication.dose} {medication.doseUnits.display.toLowerCase()}
                 </span>{' '}
-                &mdash; {medication.route?.display.toLowerCase()} &mdash; {medication.frequency?.display.toLowerCase()}{' '}
-                &mdash;{' '}
+                {medication.route?.display && <>&mdash; {medication.route?.display.toLowerCase()}</>}{' '}
+                {medication.frequency?.display && <>&mdash; {medication.frequency?.display.toLowerCase()}</>} &mdash;{' '}
                 {!medication.duration
                   ? t('medicationIndefiniteDuration', 'Indefinite duration').toLowerCase()
                   : t('medicationDurationAndUnit', 'for {duration} {durationUnit}', {
@@ -292,7 +295,7 @@ function OrderBasketItemActions({
           valueCoded: medication.route.uuid,
           value: medication.route.display,
         },
-        commonMedicationName: medication.drug.name,
+        commonMedicationName: medication.drug?.display,
         isFreeTextDosage: medication.dosingType === 'org.openmrs.FreeTextDosingInstructions',
         freeTextDosage:
           medication.dosingType === 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
@@ -339,7 +342,7 @@ function OrderBasketItemActions({
           valueCoded: medication.route.uuid,
           value: medication.route.display,
         },
-        commonMedicationName: medication.drug.name,
+        commonMedicationName: medication.drug?.display,
         isFreeTextDosage: medication.dosingType === 'org.openmrs.FreeTextDosingInstructions',
         freeTextDosage:
           medication.dosingType === 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
@@ -385,7 +388,7 @@ function OrderBasketItemActions({
           valueCoded: medication.route.uuid,
           value: medication.route.display,
         },
-        commonMedicationName: medication.drug.name,
+        commonMedicationName: medication.drug?.display,
         isFreeTextDosage: medication.dosingType === 'org.openmrs.FreeTextDosingInstructions',
         freeTextDosage:
           medication.dosingType === 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
