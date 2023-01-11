@@ -123,7 +123,7 @@ const PatientLists: React.FC<{ patientId: string }> = ({ patientId }) => {
           if (formattedPatientLists?.length && !showPatientListDetails) {
             return (
               <ul>
-                {formattedPatientLists.slice(0, 1).map((r) => (
+                {formattedPatientLists.slice(0, 5).map((r) => (
                   <li key={r.uuid} className={styles.relationship}>
                     <ConfigurableLink className={styles.link} to={`\${openmrsSpaBase}/patient-list/${r.uuid}`}>
                       {r.display}
