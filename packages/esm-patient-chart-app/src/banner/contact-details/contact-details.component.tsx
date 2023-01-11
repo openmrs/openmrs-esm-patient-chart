@@ -132,7 +132,6 @@ const PatientLists: React.FC<{ patientId: string }> = ({ patientId }) => {
                 ))}
               </ul>
             );
-            return <p>--</p>;
           } else if (formattedPatientLists?.length && showPatientListDetails) {
             return (
               <ul>
@@ -145,9 +144,8 @@ const PatientLists: React.FC<{ patientId: string }> = ({ patientId }) => {
                 ))}
               </ul>
             );
-
-            return <p>--</p>;
           }
+          return <p>--</p>;
         })()}
       </>
     </>
