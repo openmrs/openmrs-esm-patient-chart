@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import capitalize from 'lodash-es/capitalize';
 import {
   Button,
-  DefinitionTooltip,
+  Tooltip,
   Header,
   HeaderContainer,
   HeaderGlobalAction,
@@ -31,12 +31,29 @@ import { EditQueueEntry } from '../visit/queue-entry/edit-queue-entry.component'
 interface PatientInfoProps {
   patient: fhir.Patient;
 }
+
 const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
+
+  // Render translated gender
+  const getGender = (gender) => {
+    switch (gender) {
+      case 'male':
+        return t('male', 'Male');
+      case 'female':
+        return t('female', 'Female');
+      case 'other':
+        return t('other', 'Other');
+      case 'unknown':
+        return t('unknown', 'Unknown');
+      default:
+        return gender;
+    }
+  };
   const name = `${patient?.name?.[0].given?.join(' ')} ${patient?.name?.[0].family}`;
   const patientUuid = `${patient?.id}`;
-  const info = `${parseInt(age(patient?.birthDate))}, ${t('capitalizedGender', capitalize(patient?.gender))}`;
+  const info = `${parseInt(age(patient?.birthDate))}, ${getGender(patient?.gender)}`;
   const tooltipText = `${name} ${info}`;
   const truncate = !isTablet && name.trim().length > 25;
   const { visitQueueEntries, isLoading } = useVisitQueueEntries();
@@ -76,14 +93,16 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
   return (
     <>
       {truncate ? (
-        <DefinitionTooltip className={styles.tooltip} align="bottom-left" direction="bottom" definition={tooltipText}>
-          <span className={styles.patientName}>{name.slice(0, 25) + '...'}</span>
-        </DefinitionTooltip>
+        <Tooltip align="bottom" label={tooltipText} tabIndex={0} triggerText="Tooltip label">
+          <button className={styles.longPatientNameBtn} type="button">
+            {name.slice(0, 25) + '...'}
+          </button>
+        </Tooltip>
       ) : (
         <span className={styles.patientName}>{name} </span>
       )}
       <span className={styles.patientInfo}>
-        {parseInt(age(patient.birthDate))}, {capitalize(patient.gender)}
+        {parseInt(age(patient.birthDate))}, {getGender(patient.gender)}
       </span>
       {queueEntry ? (
         <>
