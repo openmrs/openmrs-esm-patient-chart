@@ -1,4 +1,5 @@
 import { openmrsFetch, OpenmrsResource } from '@openmrs/esm-framework';
+import { useMemo } from 'react';
 import useSWR from 'swr';
 
 export const cohortUrl = '/ws/rest/v1/cohortm';
@@ -54,20 +55,13 @@ interface ExtractedList {
   display: string;
 }
 
-function extractPatientListData(patientIdentifier: string, cohortLists: Array<CohortList>): Array<ExtractedList> {
+function extractPatientListData(cohortLists: Array<CohortList>): Array<ExtractedList> {
   const patientListListData = [];
   for (const r of cohortLists) {
-    if (patientIdentifier === r.uuid) {
-      patientListListData.push({
-        uuid: r.cohort.uuid,
-        display: r.cohort.display,
-      });
-    } else {
-      patientListListData.push({
-        uuid: r.cohort.uuid,
-        display: r.cohort.display,
-      });
-    }
+    patientListListData.push({
+      uuid: r.cohort.uuid,
+      display: r.cohort.display,
+    });
   }
   return patientListListData;
 }
@@ -77,9 +71,10 @@ export function usePatientLists(patientUuid: string) {
     `${cohortUrl}/cohortmember?patient=${patientUuid}&v=default`,
     openmrsFetch,
   );
-  const formattedPatientLists = data?.data?.results?.length
-    ? extractPatientListData(patientUuid, data.data.results)
-    : null;
+  const formattedPatientLists = useMemo(
+    () => (data?.data?.results?.length ? extractPatientListData(data.data.results) : null),
+    [data?.data?.results],
+  );
 
   return {
     data: data ? formattedPatientLists : null,
