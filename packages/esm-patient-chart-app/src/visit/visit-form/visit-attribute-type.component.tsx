@@ -1,4 +1,4 @@
-import { useConfig, reportError } from '@openmrs/esm-framework';
+import { useConfig } from '@openmrs/esm-framework';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { ChartConfig } from '../../config-schema';
 import { useConceptAnswersForVisitAttributeType, useVisitAttributeType } from '../hooks/useVisitAttributeType';

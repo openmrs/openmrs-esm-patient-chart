@@ -5,8 +5,3 @@
 .visitAttributeField {
   margin-bottom: spacing.$spacing-05;
 }
-
-.visitAttributeField :global(.cds--inline-notification) {
-  width: 100%;
-  max-width: unset;
-}
