@@ -1,5 +1,5 @@
-import { useConfig } from '@openmrs/esm-framework';
-import React, { useCallback, useMemo } from 'react';
+import { useConfig, reportError } from '@openmrs/esm-framework';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { ChartConfig } from '../../config-schema';
 import { useConceptAnswersForVisitAttributeType, useVisitAttributeType } from '../hooks/useVisitAttributeType';
 import {
@@ -13,7 +13,6 @@ import {
   Checkbox,
   DatePicker,
   DatePickerInput,
-  InlineNotification,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import styles from './visit-attribute-type.scss';
@@ -27,12 +26,14 @@ interface VisitAttributeTypeFieldsProps {
   setVisitAttributes: React.Dispatch<React.SetStateAction<VisitAttributes>>;
   isMissingRequiredAttributes: boolean;
   visitAttributes: VisitAttributes;
+  setErrorFetchingResources: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const VisitAttributeTypeFields: React.FC<VisitAttributeTypeFieldsProps> = ({
   setVisitAttributes,
   isMissingRequiredAttributes,
   visitAttributes,
+  setErrorFetchingResources,
 }) => {
   const { visitAttributeTypes } = useConfig() as ChartConfig;
 
@@ -56,6 +57,7 @@ const VisitAttributeTypeFields: React.FC<VisitAttributeTypeFieldsProps> = ({
             setVisitAttribute={(val: string) => setAttributeValue(attributeType.uuid, val)}
             isMissingRequiredAttributes={isMissingRequiredAttributes}
             visitAttributes={visitAttributes}
+            setErrorFetchingResources={setErrorFetchingResources}
           />
         ))}
       </>
@@ -73,6 +75,7 @@ interface AttributeTypeFieldProps {
   setVisitAttribute: (val: string) => void;
   isMissingRequiredAttributes: boolean;
   visitAttributes: VisitAttributes;
+  setErrorFetchingResources: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
@@ -80,6 +83,7 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
   setVisitAttribute,
   isMissingRequiredAttributes,
   visitAttributes,
+  setErrorFetchingResources,
 }) => {
   const { uuid, required } = attributeType;
   const { data, isLoading, error: errorFetchingVisitAttributeType } = useVisitAttributeType(uuid);
@@ -90,6 +94,12 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
   } = useConceptAnswersForVisitAttributeType(data?.datatypeConfig);
   const { t } = useTranslation();
   const labelText = !required ? `${data?.display} (${t('optional', 'optional')})` : data?.display;
+
+  useEffect(() => {
+    if (required && (errorFetchingVisitAttributeType || errorFetchingVisitAttributeAnswers)) {
+      setErrorFetchingResources(true);
+    }
+  }, [errorFetchingVisitAttributeAnswers, errorFetchingVisitAttributeType, required, setErrorFetchingResources]);
 
   const field = useMemo(() => {
     if (isLoading) {
@@ -107,20 +117,7 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
         }
 
         if (errorFetchingVisitAttributeAnswers) {
-          return (
-            <InlineNotification
-              kind="error"
-              lowContrast
-              title={`${t('error', 'Error')} ${errorFetchingVisitAttributeAnswers?.response?.status}`}
-              subtitle={t(
-                'errorFetchingVisitAttributeAnswers',
-                'Error occured when fetching answers for visit attribute type "{visitAttributeTypeName}"',
-                {
-                  visitAttributeTypeName: data?.display,
-                },
-              )}
-            />
-          );
+          return null;
         }
 
         return (
@@ -226,16 +223,7 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
   }
 
   if (errorFetchingVisitAttributeType) {
-    return (
-      <div className={styles.visitAttributeField}>
-        <InlineNotification
-          kind="error"
-          lowContrast
-          title={`${t('error', 'Error')} ${errorFetchingVisitAttributeType?.response?.status}`}
-          subtitle={t('errorFetchingVisitAttributeType', 'Error occured when fetching visit attribute type')}
-        />
-      </div>
-    );
+    return null;
   }
 
   return <div className={styles.visitAttributeField}>{field}</div>;

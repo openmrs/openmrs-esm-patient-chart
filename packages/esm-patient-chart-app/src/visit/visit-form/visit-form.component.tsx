@@ -79,6 +79,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
   const { services } = useServices(selectedLocation);
   const [selectedService, setSelectedService] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
+  const [errorFetchingResources, setErrorFetchingResources] = useState(false);
 
   useEffect(() => {
     if (locations && sessionUser?.sessionLocation?.uuid) {
@@ -287,6 +288,15 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
 
   return (
     <Form className={styles.form} onChange={handleOnChange}>
+      {errorFetchingResources && (
+        <InlineNotification
+          kind="error"
+          lowContrast
+          className={styles.inlineNotification}
+          title={t('partOfFormDidntLoad', 'Part of the form did not load')}
+          subtitle={t('refreshToTryAgain', 'Please refresh to try again')}
+        />
+      )}
       <div>
         {isTablet && (
           <Row className={styles.headerGridRow}>
@@ -380,6 +390,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
               setVisitAttributes={setVisitAttributes}
               isMissingRequiredAttributes={isMissingRequiredAttributes}
               visitAttributes={visitAttributes}
+              setErrorFetchingResources={setErrorFetchingResources}
             />
           </section>
 
