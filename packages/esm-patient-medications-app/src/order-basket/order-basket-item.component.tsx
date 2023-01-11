@@ -89,7 +89,7 @@ export default function OrderBasketItemTile({ orderBasketItem, onItemClick, onRe
   );
 
   return orderBasketItem.action === 'DISCONTINUE' ? (
-    <Tile>{tileContent}</Tile>
+    <Tile className={isTablet ? styles.clickableTileTablet : styles.clickableTileDesktop}>{tileContent}</Tile>
   ) : (
     <ClickableTile
       role="listitem"
