@@ -93,7 +93,7 @@ const MedicationsDetailsTable = connect<
             <div>
               <p className={styles.bodyLong01}>
                 <strong>{capitalize(medication.drug?.concept?.display)}</strong> &mdash;{' '}
-                {medication.drug?.strength.toLowerCase()} &mdash; {medication.drug.dosageForm.display.toLowerCase()}
+                {medication.drug?.strength.toLowerCase()} &mdash; {medication.drug?.dosageForm?.display.toLowerCase()}
               </p>
               <p className={styles.bodyLong01}>
                 <span className={styles.label01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
