@@ -218,7 +218,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
               className={styles.button}
               kind="primary"
               onClick={handleSaveClicked}
-              disabled={!items?.length || !encounterUuid}
+              disabled={!patientOrderItems?.length || !encounterUuid}
             >
               {t('signAndClose', 'Sign and close')}
             </Button>
