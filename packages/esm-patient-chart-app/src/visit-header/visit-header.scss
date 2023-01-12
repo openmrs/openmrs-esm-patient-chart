@@ -1,3 +1,4 @@
+
 @use '@carbon/styles/scss/colors';
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
@@ -39,7 +40,10 @@
     background-color: colors.$teal-90;
   }
 
-  .patientName {
+  :global(.cds--popover--bottom .cds--popover-content) {
+    text-align: center
+  }
+  .patientName, .longPatientNameBtn {
     @include type.type-style('heading-compact-01');
     margin-right: spacing.$spacing-05;
     color: $ui-02;
@@ -47,6 +51,11 @@
     padding-right: 0.5rem;
   }
 
+  .longPatientNameBtn {
+    background-color: transparent;
+    border: none;
+    outline: none;
+  }
   .patientInfo {
     color: $color-gray-30;
     @include type.type-style('body-compact-01');
