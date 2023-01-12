@@ -16,6 +16,8 @@ import {
   DatePicker,
   DatePickerInput,
   InlineNotification,
+  FlexGrid,
+  Row,
 } from '@carbon/react';
 import { ArrowLeft } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
@@ -24,6 +26,7 @@ import { OrderBasketItem } from '../types/order-basket-item';
 import { useOrderConfig } from '../api/order-config';
 import styles from './medication-order-form.scss';
 import { useDurationUnits } from '../api/api';
+import { InputWrapper } from './order-form-helper.component';
 
 export interface MedicationOrderFormProps {
   initialOrderBasketItem: OrderBasketItem;
@@ -129,108 +132,97 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
 
   return (
     <>
-      <div className={styles.medicationDetailsHeader}>
-        {orderBasketItem.isFreeTextDosage ? (
-          <strong>{capitalize(orderBasketItem.commonMedicationName)}</strong>
-        ) : (
-          <>
-            <span>
-              <strong className={styles.dosageInfo}>
-                {capitalize(orderBasketItem.commonMedicationName)} {doseWithUnitsLabel}
-              </strong>{' '}
-              {template && (
-                <>
-                  <span className={styles.bodyShort01}>
-                    {orderBasketItem.route.value && <>&mdash; {orderBasketItem.route.value}</>}{' '}
-                    {orderBasketItem.drug.dosageForm.display && <>&mdash; {orderBasketItem.drug.dosageForm.display}</>}{' '}
-                    &mdash;{' '}
-                  </span>
-                  <span className={styles.caption01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
-                  <strong className={styles.dosageInfo}>{doseWithUnitsLabel}</strong>
-                </>
-              )}
-            </span>
-          </>
-        )}
-      </div>
       <Form className={styles.orderForm} onSubmit={() => onSign(orderBasketItem)}>
-        <div className={styles.grid}>
-          {isDesktop(layout) ? (
-            <div className={styles.backButton}>
-              <Button
-                kind="ghost"
-                renderIcon={(props) => <ArrowLeft size={24} {...props} />}
-                iconDescription="Return to order basket"
-                size="sm"
-                onClick={onCancel}
-              >
-                <span>{t('backToOrderBasket', 'Back to order basket')}</span>
-              </Button>
-            </div>
-          ) : null}
-          <h2 className={styles.heading}>{t('orderForm', 'Order Form')}</h2>
-          <div className={styles.flexGrid}>
-            <Column md={4}>
-              <h3 className={styles.dosingInstructionsHeading}>{t('dosageInstructions', '1. Dosage Instructions')}</h3>
-            </Column>
-            <Column className={styles.pullColumnContentRight} md={4}>
-              <Toggle
-                size="sm"
-                id="freeTextDosageToggle"
-                aria-label={t('freeTextDosage', 'Free Text Dosage')}
-                labelText={t('freeTextDosage', 'Free Text Dosage')}
-                toggled={orderBasketItem.isFreeTextDosage}
-                onChange={() => {} /* Required by the typings, but we don't need it. */}
-                onToggle={(value) =>
-                  setOrderBasketItem({
-                    ...orderBasketItem,
-                    isFreeTextDosage: value,
-                  })
-                }
-              />
-            </Column>
+        {fetchingDurationUnitsError && (
+          <InlineNotification
+            hideCloseButton
+            kind="error"
+            lowContrast
+            title={t('errorFetchingDurationUnits', 'Error occured when fetching duration units')}
+            subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
+          />
+        )}
+        {!isTablet && (
+          <div className={styles.backButton}>
+            <Button
+              kind="ghost"
+              renderIcon={(props) => <ArrowLeft size={24} {...props} />}
+              iconDescription="Return to order basket"
+              size="sm"
+              onClick={onCancel}
+            >
+              <span>{t('backToOrderBasket', 'Back to order basket')}</span>
+            </Button>
           </div>
+        )}
+        <h1 className={styles.orderFormHeading}>{t('orderForm', 'Order Form')}</h1>
+        <div className={styles.medicationInfo}>
+          <strong className={styles.productiveHeading02}>
+            {orderBasketItem?.drug?.display} {orderBasketItem?.drug?.strength && `(${orderBasketItem.drug?.strength})`}
+          </strong>{' '}
+          <span className={styles.bodyLong01}>
+            {orderBasketItem?.route?.value && <>&mdash; {orderBasketItem?.route?.value}</>}{' '}
+            {orderBasketItem?.drug?.dosageForm?.display && <>&mdash; {orderBasketItem?.drug?.dosageForm?.display}</>}{' '}
+          </span>
+          {orderBasketItem?.dosage && orderBasketItem?.unit?.value ? (
+            <>
+              &mdash; <span className={styles.caption01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
+              <strong>
+                <span className={styles.productiveHeading02}>
+                  {orderBasketItem?.dosage} {orderBasketItem?.unit?.value.toLowerCase()}
+                </span>
+              </strong>
+            </>
+          ) : null}{' '}
+        </div>
+
+        <div className={styles.flexGrid}>
+          <Column md={4}>
+            <h3 className={styles.productiveHeading01}>{t('dosageInstructions', '1. Dosage Instructions')}</h3>
+          </Column>
+          <Column className={styles.pullColumnContentRight} md={4}>
+            <Toggle
+              size="sm"
+              id="freeTextDosageToggle"
+              aria-label={t('freeTextDosage', 'Free Text Dosage')}
+              labelText={t('freeTextDosage', 'Free Text Dosage')}
+              toggled={orderBasketItem.isFreeTextDosage}
+              onChange={() => {} /* Required by the typings, but we don't need it. */}
+              onToggle={(value) =>
+                setOrderBasketItem({
+                  ...orderBasketItem,
+                  isFreeTextDosage: value,
+                })
+              }
+            />
+          </Column>
+        </div>
+        <div className={styles.row}>
+          <Column md={8}></Column>
+        </div>
+        {orderBasketItem.isFreeTextDosage ? (
           <div className={styles.row}>
             <Column md={8}>
-              <TextInput
+              <TextArea
                 light={isTablet}
-                id="indication"
-                labelText={t('indication', 'Indication')}
-                placeholder={t('indicationPlaceholder', 'e.g. "Hypertension"')}
-                value={orderBasketItem.indication}
+                labelText={t('freeTextDosage', 'Free Text Dosage')}
+                placeholder={t('freeTextDosage', 'Free Text Dosage')}
+                value={orderBasketItem.freeTextDosage}
+                maxLength={65535}
                 onChange={(e) =>
                   setOrderBasketItem({
                     ...orderBasketItem,
-                    indication: e.target.value,
+                    freeTextDosage: e.target.value,
                   })
                 }
-                required
-                maxLength={150}
               />
             </Column>
           </div>
-          {orderBasketItem.isFreeTextDosage ? (
-            <div className={styles.row}>
-              <Column md={8}>
-                <TextArea
-                  light={isTablet}
-                  labelText={t('freeTextDosage', 'Free Text Dosage')}
-                  placeholder={t('freeTextDosage', 'Free Text Dosage')}
-                  value={orderBasketItem.freeTextDosage}
-                  maxLength={65535}
-                  onChange={(e) =>
-                    setOrderBasketItem({
-                      ...orderBasketItem,
-                      freeTextDosage: e.target.value,
-                    })
-                  }
-                />
-              </Column>
-            </div>
-          ) : (
-            <>
-              <Grid className={styles.gridRow}>
-                <Column md={4}>
+        ) : (
+          <>
+            <Grid className={styles.gridRow}>
+              <Column md={4}>
+                <InputWrapper>
                   <div className={styles.numberInput}>
                     <NumberInput
                       id="doseSelection"
@@ -249,8 +241,10 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                       hideSteppers
                     />
                   </div>
-                </Column>
-                <Column md={4}>
+                </InputWrapper>
+              </Column>
+              <Column md={4}>
+                <InputWrapper>
                   <ComboBox
                     id="dosingUnits"
                     light={isTablet}
@@ -276,8 +270,10 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                     }}
                     required
                   />
-                </Column>
-                <Column md={8} className={styles.lastGridCell}>
+                </InputWrapper>
+              </Column>
+              <Column md={8}>
+                <InputWrapper>
                   <ComboBox
                     id="editRoute"
                     light={isTablet}
@@ -300,54 +296,72 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                     }}
                     required
                   />
-                </Column>
-              </Grid>
-              <div className={styles.row}>
-                <Column md={8}>
-                  <ComboBox
-                    id="editFrequency"
-                    light={isTablet}
-                    items={frequencyOptions}
-                    selectedItem={{
-                      id: orderBasketItem.frequency?.valueCoded,
-                      text: orderBasketItem.frequency?.value,
-                    }}
-                    // @ts-ignore
-                    placeholder={t('editFrequencyComboBoxPlaceholder', 'Frequency')}
-                    titleText={t('editFrequencyComboBoxTitle', 'Enter Frequency')}
-                    itemToString={(item) => item?.text}
-                    onChange={({ selectedItem }) => {
-                      setOrderBasketItem({
-                        ...orderBasketItem,
-                        frequency: !!selectedItem?.id
-                          ? { value: selectedItem.text, valueCoded: selectedItem.id }
-                          : initialOrderBasketItem.frequency,
-                      });
-                    }}
-                    required
-                  />
-                </Column>
-              </div>
-              <Grid className={styles.gridRow}>
-                <Column md={8} className={`${styles.fullHeightTextAreaContainer} ${styles.patientInstructionsWrapper}`}>
+                </InputWrapper>
+              </Column>
+            </Grid>
+            <InputWrapper>
+              <ComboBox
+                id="editFrequency"
+                light={isTablet}
+                items={frequencyOptions}
+                selectedItem={{
+                  id: orderBasketItem.frequency?.valueCoded,
+                  text: orderBasketItem.frequency?.value,
+                }}
+                // @ts-ignore
+                placeholder={t('editFrequencyComboBoxPlaceholder', 'Frequency')}
+                titleText={t('editFrequencyComboBoxTitle', 'Enter Frequency')}
+                itemToString={(item) => item?.text}
+                onChange={({ selectedItem }) => {
+                  setOrderBasketItem({
+                    ...orderBasketItem,
+                    frequency: !!selectedItem?.id
+                      ? { value: selectedItem.text, valueCoded: selectedItem.id }
+                      : initialOrderBasketItem.frequency,
+                  });
+                }}
+                required
+              />
+            </InputWrapper>
+            <InputWrapper>
+              <TextArea
+                light={isTablet}
+                labelText={t('patientInstructions', 'Patient Instructions')}
+                placeholder={t(
+                  'patientInstructionsPlaceholder',
+                  'Additional dosing instructions (e.g. "Take after eating")',
+                )}
+                maxLength={65535}
+                value={orderBasketItem.patientInstructions}
+                onChange={(e) =>
+                  setOrderBasketItem({
+                    ...orderBasketItem,
+                    patientInstructions: e.target.value,
+                  })
+                }
+              />
+            </InputWrapper>
+            <Grid className={styles.gridRow}>
+              <Column lg={12}>
+                <InputWrapper>
                   <TextArea
                     light={isTablet}
-                    labelText={t('patientInstructions', 'Patient Instructions')}
-                    placeholder={t(
-                      'patientInstructionsPlaceholder',
-                      'Additional dosing instructions (e.g. "Take after eating")',
-                    )}
-                    maxLength={65535}
-                    value={orderBasketItem.patientInstructions}
+                    labelText={t('prnReason', 'P.R.N. Reason')}
+                    placeholder={t('prnReasonPlaceholder', 'Reason to take medicine')}
+                    rows={3}
+                    maxLength={255}
+                    value={orderBasketItem.asNeededCondition}
                     onChange={(e) =>
                       setOrderBasketItem({
                         ...orderBasketItem,
-                        patientInstructions: e.target.value,
+                        asNeededCondition: e.target.value,
                       })
                     }
                   />
-                </Column>
-                <Column md={8} className={styles.lastGridCell}>
+                </InputWrapper>
+              </Column>
+              <Column md={4} className={styles.lastGridCell}>
+                <InputWrapper>
                   <FormGroup legendText={t('prn', 'P.R.N.')}>
                     <Checkbox
                       id="prn"
@@ -361,76 +375,65 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                       }
                     />
                   </FormGroup>
-                  <div className={styles.prpWrapper} style={orderBasketItem.asNeeded ? {} : { visibility: 'hidden' }}>
-                    <TextArea
-                      light={isTablet}
-                      labelText={t('prnReason', 'P.R.N. Reason')}
-                      placeholder={t('prnReasonPlaceholder', 'Reason to take medicine')}
-                      rows={3}
-                      maxLength={255}
-                      value={orderBasketItem.asNeededCondition}
-                      onChange={(e) =>
-                        setOrderBasketItem({
-                          ...orderBasketItem,
-                          asNeededCondition: e.target.value,
-                        })
-                      }
-                    />
-                  </div>
-                </Column>
-              </Grid>
-            </>
-          )}
-        </div>
+                </InputWrapper>
+              </Column>
+            </Grid>
+          </>
+        )}
 
-        <Grid className={`${styles.gridRow} ${styles.spacer}`}>
-          <Column md={8}>
-            <h3 className={styles.productiveHeading02}>{t('prescriptionDuration', '2. Prescription Duration')}</h3>
+        <h3 className={styles.productiveHeading01}>{t('prescriptionDuration', '2. Prescription Duration')}</h3>
+        <Grid className={styles.gridRow}>
+          <Column lg={16}>
+            <InputWrapper>
+              <DatePicker
+                light={isTablet}
+                datePickerType="single"
+                maxDate={new Date()}
+                value={[orderBasketItem.startDate]}
+                onChange={([newStartDate]) =>
+                  setOrderBasketItem({
+                    ...orderBasketItem,
+                    startDate: newStartDate,
+                  })
+                }
+              >
+                <DatePickerInput
+                  id="startDatePicker"
+                  placeholder="mm/dd/yyyy"
+                  labelText={t('startDate', 'Start date')}
+                />
+              </DatePicker>
+            </InputWrapper>
           </Column>
         </Grid>
         <Grid className={styles.gridRow}>
-          <Column md={8} className={styles.fullWidthDatePickerContainer}>
-            <DatePicker
-              light={isTablet}
-              datePickerType="single"
-              maxDate={new Date()}
-              value={[orderBasketItem.startDate]}
-              onChange={([newStartDate]) =>
-                setOrderBasketItem({
-                  ...orderBasketItem,
-                  startDate: newStartDate,
-                })
-              }
-            >
-              <DatePickerInput id="startDatePicker" placeholder="mm/dd/yyyy" labelText={t('startDate', 'Start date')} />
-            </DatePicker>
+          <Column md={8}>
+            <InputWrapper>
+              <NumberInput
+                light={isTablet}
+                id="durationInput"
+                label={t('duration', 'Duration')}
+                min={1}
+                value={orderBasketItem.duration ?? ''}
+                helperText={t('noDurationHint', 'An empty field indicates an indefinite duration.')}
+                step={1}
+                onChange={(e, { value }) => {
+                  setOrderBasketItem({
+                    ...orderBasketItem,
+                    duration: value ? parseFloat(value) : 0,
+                  });
+                }}
+                hideSteppers
+                allowEmpty
+              />
+            </InputWrapper>
           </Column>
-          <Column md={8} className={styles.lastGridCell}>
-            <NumberInput
-              light={isTablet}
-              id="durationInput"
-              label={t('duration', 'Duration')}
-              min={1}
-              value={orderBasketItem.duration ?? ''}
-              helperText={t('noDurationHint', 'An empty field indicates an indefinite duration.')}
-              step={1}
-              onChange={(e, { value }) => {
-                setOrderBasketItem({
-                  ...orderBasketItem,
-                  duration: value ? parseFloat(value) : 0,
-                });
-              }}
-              hideSteppers
-              allowEmpty
-            />
-          </Column>
-        </Grid>
-        <div className={styles.gridRow}>
-          <Column>
-            <FormGroup legendText={t('durationUnit', 'Duration Unit')}>
+          <Column md={8}>
+            <InputWrapper>
               <ComboBox
                 light={isTablet}
                 id="durationUnitPlaceholder"
+                titleText={t('durationUnit', 'Duration Unit')}
                 selectedItem={
                   orderBasketItem.durationUnit?.uuid
                     ? {
@@ -464,31 +467,19 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                       })
                 }
               />
-            </FormGroup>
-            {fetchingDurationUnitsError && (
-              <InlineNotification
-                hideCloseButton
-                kind="error"
-                lowContrast
-                title={t('errorFetchingDurationUnits', 'Error occured when fetching duration units')}
-                subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
-              />
-            )}
-          </Column>
-        </div>
-        <Grid className={`${styles.gridRow} ${styles.spacer}`}>
-          <Column md={8}>
-            <h3 className={styles.productiveHeading02}>{t('dispensingInformation', '3. Dispensing Information')}</h3>
+            </InputWrapper>
           </Column>
         </Grid>
+        <h3 className={styles.productiveHeading01}>{t('dispensingInformation', '3. Dispensing Information')}</h3>
         <Grid className={styles.gridRow}>
           <Column md={8}>
-            <FormGroup legendText={t('quantity', 'Quantity')}>
+            <InputWrapper>
               <NumberInput
                 light={isTablet}
                 id="quantityDispensed"
                 helperText={t('pillsToDispense', 'Pills to dispense')}
                 value={orderBasketItem.pillsDispensed}
+                label={t('quantity', 'Quantity')}
                 min={0}
                 onChange={(e, { value }) => {
                   setOrderBasketItem({
@@ -498,14 +489,15 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                 }}
                 hideSteppers
               />
-            </FormGroup>
+            </InputWrapper>
           </Column>
           <Column md={8} className={styles.lastGridCell}>
-            <FormGroup legendText={t('prescriptionRefills', 'Prescription Refills')}>
+            <InputWrapper>
               <NumberInput
                 light={isTablet}
                 id="prescriptionRefills"
                 min={0}
+                label={t('prescriptionRefills', 'Prescription Refills')}
                 value={orderBasketItem.numRefills}
                 onChange={(e, { value }) => {
                   setOrderBasketItem({
@@ -515,26 +507,27 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                 }}
                 hideSteppers
               />
-            </FormGroup>
+            </InputWrapper>
           </Column>
         </Grid>
         <Grid className={styles.gridRow}>
-          <Column md={8}>
-            <TextInput
-              light={isTablet}
-              id="indication"
-              labelText={t('indication', 'Indication')}
-              placeholder={t('indicationPlaceholder', 'e.g. "Hypertension"')}
-              value={orderBasketItem.indication}
-              onChange={(e) =>
-                setOrderBasketItem({
-                  ...orderBasketItem,
-                  indication: e.target.value,
-                })
-              }
-              required
-              maxLength={150}
-            />
+          <Column lg={16}>
+            <InputWrapper>
+              <TextInput
+                id="indication"
+                labelText={t('indication', 'Indication')}
+                placeholder={t('indicationPlaceholder', 'e.g. "Hypertension"')}
+                value={orderBasketItem.indication}
+                onChange={(e) =>
+                  setOrderBasketItem({
+                    ...orderBasketItem,
+                    indication: e.target.value,
+                  })
+                }
+                required
+                maxLength={150}
+              />
+            </InputWrapper>
           </Column>
         </Grid>
 
