@@ -98,7 +98,7 @@ const MedicationsDetailsTable = connect<
               <p className={styles.bodyLong01}>
                 <span className={styles.label01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
                 <span className={styles.dosage}>
-                  {medication.dose} {medication.doseUnits.display.toLowerCase()}
+                  {medication.dose} {medication.doseUnits?.display.toLowerCase()}
                 </span>{' '}
                 &mdash; {medication.route?.display.toLowerCase()} &mdash; {medication.frequency?.display.toLowerCase()}{' '}
                 &mdash;{' '}
@@ -281,16 +281,16 @@ function OrderBasketItemActions({
         drug: medication.drug,
         dosage: medication.dose,
         unit: {
-          value: medication.doseUnits.display,
-          valueCoded: medication.doseUnits.uuid,
+          value: medication.doseUnits?.display,
+          valueCoded: medication.doseUnits?.uuid,
         },
         frequency: {
-          valueCoded: medication.frequency.uuid,
+          valueCoded: medication.frequency?.uuid,
           value: medication.frequency.display,
         },
         route: {
-          valueCoded: medication.route.uuid,
-          value: medication.route.display,
+          valueCoded: medication.route?.uuid,
+          value: medication.route?.display,
         },
         commonMedicationName: medication.drug.name,
         isFreeTextDosage: medication.dosingType === 'org.openmrs.FreeTextDosingInstructions',
@@ -328,18 +328,18 @@ function OrderBasketItemActions({
         drug: medication.drug,
         dosage: medication.dose,
         unit: {
-          value: medication.doseUnits.display,
-          valueCoded: medication.doseUnits.uuid,
+          value: medication.doseUnits?.display,
+          valueCoded: medication.doseUnits?.uuid,
         },
         frequency: {
-          valueCoded: medication.frequency.uuid,
-          value: medication.frequency.display,
+          valueCoded: medication.frequency?.uuid,
+          value: medication.frequency?.display,
         },
         route: {
-          valueCoded: medication.route.uuid,
-          value: medication.route.display,
+          valueCoded: medication.route?.uuid,
+          value: medication.route?.display,
         },
-        commonMedicationName: medication.drug.name,
+        commonMedicationName: medication.drug?.name,
         isFreeTextDosage: medication.dosingType === 'org.openmrs.FreeTextDosingInstructions',
         freeTextDosage:
           medication.dosingType === 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
@@ -355,9 +355,9 @@ function OrderBasketItemActions({
         pillsDispensed: medication.quantity,
         numRefills: medication.numRefills,
         indication: medication.orderReasonNonCoded,
-        orderer: medication.orderer.uuid,
-        careSetting: medication.careSetting.uuid,
-        quantityUnits: medication.quantityUnits.uuid,
+        orderer: medication.orderer?.uuid,
+        careSetting: medication.careSetting?.uuid,
+        quantityUnits: medication.quantityUnits?.uuid,
       },
     ]);
     openOrderBasket();
@@ -374,18 +374,18 @@ function OrderBasketItemActions({
         drug: medication.drug,
         dosage: medication.dose,
         unit: {
-          value: medication.doseUnits.display,
-          valueCoded: medication.doseUnits.uuid,
+          value: medication.doseUnits?.display,
+          valueCoded: medication.doseUnits?.uuid,
         },
         frequency: {
-          valueCoded: medication.frequency.uuid,
-          value: medication.frequency.display,
+          valueCoded: medication.frequency?.uuid,
+          value: medication.frequency?.display,
         },
         route: {
-          valueCoded: medication.route.uuid,
-          value: medication.route.display,
+          valueCoded: medication.route?.uuid,
+          value: medication.route?.display,
         },
-        commonMedicationName: medication.drug.name,
+        commonMedicationName: medication.drug?.name,
         isFreeTextDosage: medication.dosingType === 'org.openmrs.FreeTextDosingInstructions',
         freeTextDosage:
           medication.dosingType === 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
@@ -401,9 +401,9 @@ function OrderBasketItemActions({
         pillsDispensed: medication.quantity,
         numRefills: medication.numRefills,
         indication: medication.orderReasonNonCoded,
-        orderer: medication.orderer.uuid,
-        careSetting: medication.careSetting.uuid,
-        quantityUnits: medication.quantityUnits.uuid,
+        orderer: medication.orderer?.uuid,
+        careSetting: medication.careSetting?.uuid,
+        quantityUnits: medication.quantityUnits?.uuid,
       },
     ]);
     openOrderBasket();

@@ -91,7 +91,7 @@
       order: 1;
       margin-right: 0.5rem;
       margin-left: 0rem !important;
-    }  
+    }
 
     span {
       order: 2;
@@ -143,6 +143,7 @@
 .gridRow {
   @extend .row;
   padding: 0px;
+  margin-bottom: 0.5rem;
 
   :global(.cds--number) {
     display: inline-block;
