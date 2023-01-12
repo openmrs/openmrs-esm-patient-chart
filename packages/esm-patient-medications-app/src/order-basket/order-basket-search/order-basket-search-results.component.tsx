@@ -132,8 +132,8 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, onSea
           <div className={styles.searchResultTile}>
             <div className={styles.searchResultTileContent}>
               <p>
-                <strong>{drug?.display}</strong> {drug?.strength && <>&mdash; {drug?.strength}</>}{' '}
-                {drug?.dosageForm?.display && <>&mdash; {drug?.dosageForm?.display}</>}
+                <strong>{drug?.display}</strong> {drug?.strength && <>&mdash; {drug?.strength.toLowerCase()}</>}{' '}
+                {drug?.dosageForm?.display && <>&mdash; {drug?.dosageForm?.display.toLowerCase()}</>}
               </p>
               {fetchingDrugOrderTemplatesError ? (
                 <p>
@@ -143,8 +143,12 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, onSea
                 </p>
               ) : (
                 <p>
-                  {orderItem?.frequency?.value && <span className={styles.label01}>{orderItem?.frequency?.value}</span>}
-                  {orderItem?.route?.value && <span className={styles.label01}>&mdash; {orderItem?.route?.value}</span>}
+                  {orderItem?.frequency?.value && (
+                    <span className={styles.label01}>{orderItem?.frequency?.value.toLowerCase()}</span>
+                  )}
+                  {orderItem?.route?.value && (
+                    <span className={styles.label01}>&mdash; {orderItem?.route?.value.toLowerCase()}</span>
+                  )}
                 </p>
               )}
             </div>

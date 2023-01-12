@@ -58,7 +58,16 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
     error: fetchingDurationUnitsError,
   } = useDurationUnits(config.durationUnitsConcept);
 
-  const doseWithUnitsLabel = template ? `${initialOrderBasketItem?.dosage} ${initialOrderBasketItem?.unit?.value}` : '';
+  const doseWithUnitsLabel = template ? (
+    `(${initialOrderBasketItem?.dosage} ${initialOrderBasketItem?.unit?.value})`
+  ) : (
+    <>
+      {initialOrderBasketItem?.drug?.strength && <>&mdash; {initialOrderBasketItem?.drug?.strength.toLowerCase()}</>}{' '}
+      {initialOrderBasketItem?.drug?.dosageForm?.display && (
+        <> &mdash; {initialOrderBasketItem?.drug?.dosageForm?.display.toLowerCase()}</>
+      )}
+    </>
+  );
 
   const [dosingUnitOptions, setDosingUnitOptions] = useState(
     addIfNotPresent(
@@ -127,12 +136,14 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
           <>
             <span>
               <strong className={styles.dosageInfo}>
-                {capitalize(orderBasketItem.commonMedicationName)} {doseWithUnitsLabel && `(${doseWithUnitsLabel})`}
+                {capitalize(orderBasketItem.commonMedicationName)} {doseWithUnitsLabel}
               </strong>{' '}
               {template && (
                 <>
                   <span className={styles.bodyShort01}>
-                    &mdash; {orderBasketItem.route.value} &mdash; {orderBasketItem.drug.dosageForm.display} &mdash;{' '}
+                    {orderBasketItem.route.value && <>&mdash; {orderBasketItem.route.value}</>}{' '}
+                    {orderBasketItem.drug.dosageForm.display && <>&mdash; {orderBasketItem.drug.dosageForm.display}</>}{' '}
+                    &mdash;{' '}
                   </span>
                   <span className={styles.caption01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
                   <strong className={styles.dosageInfo}>{doseWithUnitsLabel}</strong>
@@ -234,6 +245,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                         });
                       }}
                       min={0}
+                      required
                       hideSteppers
                     />
                   </div>

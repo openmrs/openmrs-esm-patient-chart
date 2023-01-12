@@ -31,7 +31,6 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
   orderBasketStoreActions,
 )(({ patientUuid, items, closeWorkspace, setItems }: OrderBasketProps & OrderBasketStore & OrderBasketStoreActions) => {
   const patientOrderItems = getOrderItems(items, patientUuid);
-
   const { t } = useTranslation();
   const { cache, mutate }: { cache: any; mutate: Function } = useSWRConfig();
   const displayText = t('activeMedicationsDisplayText', 'Active medications');
