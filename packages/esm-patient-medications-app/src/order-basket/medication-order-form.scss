@@ -22,7 +22,16 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 0rem 1rem;
+  padding: 0.5rem 0 0 1rem;
+
+  :global(.cds--css-grid-column) {
+    margin: 0 0.5rem !important;
+  }
+
+  :global(.cds--subgrid) {
+    margin: 0 -0.5rem !important;
+  }
+
 }
 
 .orderFormHeading {
@@ -118,10 +127,6 @@
   height: 4rem;
 }
 
-.orderForm :global(.cds--css-grid-column) {
-  margin-left: 0px !important;
-}
-
 .tablet {
   padding: 1.5rem 1rem;
   background-color: $ui-02;
@@ -133,10 +138,7 @@
 
 .gridRow {
   padding: 0px;
-
-  :global(.cds--css-grid-column):last-of-type {
-    margin-right: 0;
-  }
+  margin-left: -0.5rem;
 
   :global(.cds--number) {
     display: inline-block;
@@ -173,8 +175,8 @@
   margin-bottom: spacing.$spacing-05;
 }
 
-.buttonSet{
-  margin: 0 -1rem;
+.buttonSet {
+  margin-left: -1rem;
 }
 
 /* Desktop */

@@ -16,8 +16,6 @@ import {
   DatePicker,
   DatePickerInput,
   InlineNotification,
-  FlexGrid,
-  Row,
 } from '@carbon/react';
 import { ArrowLeft } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
@@ -177,10 +175,10 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
         </div>
         <section className={styles.formSection}>
           <Grid className={styles.gridRow}>
-            <Column lg={12}>
+            <Column lg={12} md={6} sm={4}>
               <h3 className={styles.sectionHeader}>{t('dosageInstructions', '1. Dosage Instructions')}</h3>
             </Column>
-            <Column className={styles.pullColumnContentRight} sm={4}>
+            <Column className={styles.pullColumnContentRight} lg={4} md={2} sm={4}>
               <Toggle
                 size="sm"
                 id="freeTextDosageToggle"
@@ -218,7 +216,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
           ) : (
             <>
               <Grid className={styles.gridRow}>
-                <Column md={4}>
+                <Column lg={4} md={2} sm={4}>
                   <InputWrapper>
                     <div className={styles.numberInput}>
                       <NumberInput
@@ -240,7 +238,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                     </div>
                   </InputWrapper>
                 </Column>
-                <Column md={4}>
+                <Column lg={4} md={2} sm={4}>
                   <InputWrapper>
                     <ComboBox
                       id="dosingUnits"
@@ -269,7 +267,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                     />
                   </InputWrapper>
                 </Column>
-                <Column md={8}>
+                <Column lg={8} md={4} sm={4}>
                   <InputWrapper>
                     <ComboBox
                       id="editRoute"
@@ -296,83 +294,95 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                   </InputWrapper>
                 </Column>
               </Grid>
-              <InputWrapper>
-                <ComboBox
-                  id="editFrequency"
-                  light={isTablet}
-                  items={frequencyOptions}
-                  selectedItem={{
-                    id: orderBasketItem.frequency?.valueCoded,
-                    text: orderBasketItem.frequency?.value,
-                  }}
-                  // @ts-ignore
-                  placeholder={t('editFrequencyComboBoxPlaceholder', 'Frequency')}
-                  titleText={t('editFrequencyComboBoxTitle', 'Enter Frequency')}
-                  itemToString={(item) => item?.text}
-                  onChange={({ selectedItem }) => {
-                    setOrderBasketItem({
-                      ...orderBasketItem,
-                      frequency: !!selectedItem?.id
-                        ? { value: selectedItem.text, valueCoded: selectedItem.id }
-                        : initialOrderBasketItem.frequency,
-                    });
-                  }}
-                  required
-                />
-              </InputWrapper>
-              <InputWrapper>
-                <TextArea
-                  light={isTablet}
-                  labelText={t('patientInstructions', 'Patient Instructions')}
-                  placeholder={t(
-                    'patientInstructionsPlaceholder',
-                    'Additional dosing instructions (e.g. "Take after eating")',
-                  )}
-                  maxLength={65535}
-                  value={orderBasketItem.patientInstructions}
-                  onChange={(e) =>
-                    setOrderBasketItem({
-                      ...orderBasketItem,
-                      patientInstructions: e.target.value,
-                    })
-                  }
-                />
-              </InputWrapper>
               <Grid className={styles.gridRow}>
-                <Column lg={12}>
+                <Column lg={16} md={4} sm={4}>
+                  <InputWrapper>
+                    <ComboBox
+                      id="editFrequency"
+                      light={isTablet}
+                      items={frequencyOptions}
+                      selectedItem={{
+                        id: orderBasketItem.frequency?.valueCoded,
+                        text: orderBasketItem.frequency?.value,
+                      }}
+                      // @ts-ignore
+                      placeholder={t('editFrequencyComboBoxPlaceholder', 'Frequency')}
+                      titleText={t('editFrequencyComboBoxTitle', 'Enter Frequency')}
+                      itemToString={(item) => item?.text}
+                      onChange={({ selectedItem }) => {
+                        setOrderBasketItem({
+                          ...orderBasketItem,
+                          frequency: !!selectedItem?.id
+                            ? { value: selectedItem.text, valueCoded: selectedItem.id }
+                            : initialOrderBasketItem.frequency,
+                        });
+                      }}
+                      required
+                    />
+                  </InputWrapper>
+                </Column>
+              </Grid>
+
+              <Grid className={styles.gridRow}>
+                <Column lg={16} md={4} sm={4}>
                   <InputWrapper>
                     <TextArea
                       light={isTablet}
-                      labelText={t('prnReason', 'P.R.N. Reason')}
-                      placeholder={t('prnReasonPlaceholder', 'Reason to take medicine')}
-                      rows={3}
-                      maxLength={255}
-                      value={orderBasketItem.asNeededCondition}
+                      labelText={t('patientInstructions', 'Patient Instructions')}
+                      placeholder={t(
+                        'patientInstructionsPlaceholder',
+                        'Additional dosing instructions (e.g. "Take after eating")',
+                      )}
+                      maxLength={65535}
+                      value={orderBasketItem.patientInstructions}
                       onChange={(e) =>
                         setOrderBasketItem({
                           ...orderBasketItem,
-                          asNeededCondition: e.target.value,
+                          patientInstructions: e.target.value,
                         })
                       }
                     />
                   </InputWrapper>
                 </Column>
-                <Column md={4} className={styles.lastGridCell}>
-                  <InputWrapper>
-                    <FormGroup legendText={t('prn', 'P.R.N.')}>
-                      <Checkbox
-                        id="prn"
-                        labelText={t('takeAsNeeded', 'Take As Needed')}
-                        checked={orderBasketItem.asNeeded}
-                        onChange={(e) =>
-                          setOrderBasketItem({
-                            ...orderBasketItem,
-                            asNeeded: e.target.checked,
-                          })
-                        }
-                      />
-                    </FormGroup>
-                  </InputWrapper>
+                <Column lg={16} md={4} sm={4}>
+                  <Grid className={styles.gridRow}>
+                    <Column lg={12} md={8} sm={4}>
+                      <InputWrapper>
+                        <TextArea
+                          light={isTablet}
+                          labelText={t('prnReason', 'P.R.N. Reason')}
+                          placeholder={t('prnReasonPlaceholder', 'Reason to take medicine')}
+                          rows={3}
+                          maxLength={255}
+                          value={orderBasketItem.asNeededCondition}
+                          onChange={(e) =>
+                            setOrderBasketItem({
+                              ...orderBasketItem,
+                              asNeededCondition: e.target.value,
+                            })
+                          }
+                        />
+                      </InputWrapper>
+                    </Column>
+
+                    <Column lg={4} md={8} sm={4}>
+                      <InputWrapper>
+                        <FormGroup legendText={t('prn', 'P.R.N.')}>
+                          <Checkbox
+                            id="prn"
+                            labelText={t('takeAsNeeded', 'Take As Needed')}
+                            checked={orderBasketItem.asNeeded}
+                            onChange={(e) =>
+                              setOrderBasketItem({
+                                ...orderBasketItem,
+                                asNeeded: e.target.checked,
+                              })
+                            }
+                          />
+                        </FormGroup>
+                      </InputWrapper>
+                    </Column>
+                  </Grid>
                 </Column>
               </Grid>
             </>
@@ -381,7 +391,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
         <section className={styles.formSection}>
           <h3 className={styles.sectionHeader}>{t('prescriptionDuration', '2. Prescription Duration')}</h3>
           <Grid className={styles.gridRow}>
-            <Column lg={16}>
+            <Column lg={16} md={4} sm={4}>
               <InputWrapper>
                 <DatePicker
                   light={isTablet}
@@ -403,9 +413,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                 </DatePicker>
               </InputWrapper>
             </Column>
-          </Grid>
-          <Grid className={styles.gridRow}>
-            <Column md={8}>
+            <Column lg={8} md={2} sm={4}>
               <InputWrapper>
                 <NumberInput
                   light={isTablet}
@@ -426,7 +434,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                 />
               </InputWrapper>
             </Column>
-            <Column md={8}>
+            <Column lg={8} md={2} sm={4}>
               <InputWrapper>
                 <ComboBox
                   light={isTablet}
@@ -472,14 +480,14 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
         <section className={styles.formSection}>
           <h3 className={styles.sectionHeader}>{t('dispensingInformation', '3. Dispensing Information')}</h3>
           <Grid className={styles.gridRow}>
-            <Column md={8}>
+            <Column lg={8} md={2} sm={4}>
               <InputWrapper>
                 <NumberInput
                   light={isTablet}
                   id="quantityDispensed"
                   helperText={t('pillsToDispense', 'Pills to dispense')}
                   value={orderBasketItem.pillsDispensed}
-                  label={t('quantity', 'Quantity')}
+                  label={t('quantity', 'Quantity dispensed')}
                   min={0}
                   onChange={(e, { value }) => {
                     setOrderBasketItem({
@@ -491,7 +499,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                 />
               </InputWrapper>
             </Column>
-            <Column md={8} className={styles.lastGridCell}>
+            <Column lg={8} md={2} sm={4}>
               <InputWrapper>
                 <NumberInput
                   light={isTablet}
@@ -511,7 +519,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
             </Column>
           </Grid>
           <Grid className={styles.gridRow}>
-            <Column lg={16}>
+            <Column lg={16} md={8} sm={4}>
               <InputWrapper>
                 <TextInput
                   id="indication"
