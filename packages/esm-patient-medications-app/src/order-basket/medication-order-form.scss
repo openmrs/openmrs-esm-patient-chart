@@ -30,6 +30,15 @@
   margin-bottom: 0;
 }
 
+.formSection {
+  margin-bottom: spacing.$spacing-06;
+}
+
+.sectionHeader {
+  @include type.type-style("heading-01");
+  margin-bottom: spacing.$spacing-05;
+}
+
 .flexGrid {
   display: flex;
   flex-direction: column;
@@ -122,23 +131,12 @@
   padding: 0rem;
 }
 
-/* Desktop */
-:global(.omrs-breakpoint-gt-tablet) {
-  .orderForm {
-    height: calc(100vh - 9rem);
-  }
-}
-
-/* Tablet */
-:global(.omrs-breakpoint-lt-desktop) {
-  .orderForm {
-    height: calc(100vh - 6rem);
-  }
-}
-
 .gridRow {
   padding: 0px;
-  margin: 0;
+
+  :global(.cds--css-grid-column):last-of-type {
+    margin-right: 0;
+  }
 
   :global(.cds--number) {
     display: inline-block;
@@ -173,4 +171,28 @@
 
 .field {
   margin-bottom: spacing.$spacing-05;
+}
+
+.buttonSet{
+  margin: 0 -1rem;
+}
+
+/* Desktop */
+:global(.omrs-breakpoint-gt-tablet) {
+  .orderForm {
+    height: calc(100vh - 6rem);
+  }
+
+}
+
+/* Tablet */
+:global(.omrs-breakpoint-lt-desktop) {
+  .orderForm {
+    height: calc(100vh - 6rem);
+  }
+
+  .buttonSet {
+    padding: 1.5rem 1rem;
+  background-color: $ui-02;
+  }
 }
