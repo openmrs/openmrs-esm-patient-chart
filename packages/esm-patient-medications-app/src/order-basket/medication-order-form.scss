@@ -3,30 +3,12 @@
 @import '~@openmrs/esm-styleguide/src/vars';
 @import "../root";
 
-.medicationInfo {
-  border: 0;
-  padding: 1rem;
-  margin-left: -1rem;
-  box-sizing: border-box;
-}
-
-.stickyMedicationInfo {
-  position: sticky;
-  background-color: $interactive-01;
-  color: #ffffff;
-  top: 0;
-  z-index: 1;
-
-  .medicationInfo {
-    margin: 0;
-  }
-}
-
 .orderForm {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   padding: 0.5rem 0 0 1rem;
+  height: calc(100vh - 6rem);
 
   :global(.cds--css-grid-column) {
     margin: 0 0.5rem !important;
@@ -40,6 +22,41 @@
     padding-right: 1rem;
   }
 
+}
+
+.medicationInfo {
+  border: 0;
+  padding: 1rem;
+  margin-left: -1rem;
+  box-sizing: border-box;
+}
+
+.stickyMedicationInfo {
+  position: fixed;
+  background-color: #0072c3;
+  color: #ffffff;
+  top: 6rem;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  width: 100%;
+
+  .medicationInfo {
+    margin: 0;
+  }
+}
+
+.patientHeader {
+  padding: 0.5rem 1rem 1.5rem;
+  background-color: $ui-01;
+  
+  span:first-of-type {
+    margin-right: 0.5rem;
+  }
+  
+  .text02 {
+    color: $text-02;
+  }
 }
 
 .orderFormHeading {
@@ -187,22 +204,19 @@
   margin-left: -1rem;
 }
 
-/* Desktop */
-:global(.omrs-breakpoint-gt-tablet) {
-  .orderForm {
-    height: calc(100vh - 6rem);
-  }
-
-}
-
 /* Tablet */
 :global(.omrs-breakpoint-lt-desktop) {
   .orderForm {
-    height: calc(100vh - 6rem);
+    height: 100%;
+    background-color: #ededed;
+  }
+
+  .stickyMedicationInfo {
+    top: 3rem;
   }
 
   .buttonSet {
     padding: 1.5rem 1rem;
-  background-color: $ui-02;
+    background-color: $ui-02;
   }
 }

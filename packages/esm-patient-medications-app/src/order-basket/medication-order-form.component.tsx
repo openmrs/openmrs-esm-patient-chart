@@ -18,12 +18,13 @@ import {
 } from '@carbon/react';
 import { ArrowLeft } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
-import { useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { useConfig, useLayoutType, usePatient, age, formatDate, parseDate } from '@openmrs/esm-framework';
 import { OrderBasketItem } from '../types/order-basket-item';
 import { useOrderConfig } from '../api/order-config';
 import styles from './medication-order-form.scss';
 import { useDurationUnits } from '../api/api';
 import { InputWrapper } from './order-form-helper.component';
+import capitalize from 'lodash-es/capitalize';
 
 export interface MedicationOrderFormProps {
   initialOrderBasketItem: OrderBasketItem;
@@ -83,6 +84,8 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
     error: fetchingDurationUnitsError,
   } = useDurationUnits(config.durationUnitsConcept);
   const [showStickyMedicationHeader, setShowMedicationHeader] = useState(false);
+  const { patient, isLoading: isLoadingPatientDetails } = usePatient();
+  const patientName = `${patient?.name?.[0]?.given?.join(' ')} ${patient?.name?.[0].family}`;
 
   const doseWithUnitsLabel = template ? (
     `(${initialOrderBasketItem?.dosage} ${initialOrderBasketItem?.unit?.value})`
@@ -178,6 +181,15 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
           <MedicationInfoHeader orderBasketItem={orderBasketItem} />
         </div>
       )}
+      {isTablet && !isLoadingPatientDetails && (
+        <div className={styles.patientHeader}>
+          <span className={styles.bodyShort02}>{patientName}</span>
+          <span className={`${styles.text02} ${styles.bodyShort01}`}>
+            {capitalize(patient?.gender)} &middot; {age(patient?.birthDate)} &middot;{' '}
+            <span>{formatDate(parseDate(patient?.birthDate), { mode: 'wide', time: false })}</span>
+          </span>
+        </div>
+      )}
       <Form className={styles.orderForm} onSubmit={() => onSign(orderBasketItem)}>
         {fetchingDurationUnitsError && (
           <InlineNotification
@@ -188,7 +200,6 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
             subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
           />
         )}
-
         {!isTablet && (
           <div className={styles.backButton}>
             <Button
@@ -202,6 +213,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
             </Button>
           </div>
         )}
+
         <h1 className={styles.orderFormHeading}>{t('orderForm', 'Order Form')}</h1>
         <div ref={medicationInfoHeaderRef}>
           <MedicationInfoHeader orderBasketItem={orderBasketItem} />
@@ -446,6 +458,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                     id="startDatePicker"
                     placeholder="mm/dd/yyyy"
                     labelText={t('startDate', 'Start date')}
+                    size={isTablet ? 'lg' : 'md'}
                   />
                 </DatePicker>
               </InputWrapper>
