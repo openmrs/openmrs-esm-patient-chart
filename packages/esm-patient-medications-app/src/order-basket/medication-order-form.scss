@@ -32,6 +32,10 @@
     margin: 0 -0.5rem !important;
   }
 
+  :global(.cds--number--lg.cds--number input[type=number]) {
+    padding-right: 1rem;
+  }
+
 }
 
 .orderFormHeading {

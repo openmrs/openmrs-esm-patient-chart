@@ -220,6 +220,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                   <InputWrapper>
                     <div className={styles.numberInput}>
                       <NumberInput
+                        size={isTablet ? 'lg' : 'md'}
                         id="doseSelection"
                         light={isTablet}
                         placeholder={t('editDoseComboBoxPlaceholder', 'Dose')}
@@ -241,6 +242,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                 <Column lg={4} md={2} sm={4}>
                   <InputWrapper>
                     <ComboBox
+                      size={isTablet ? 'lg' : 'md'}
                       id="dosingUnits"
                       light={isTablet}
                       items={dosingUnitOptions}
@@ -270,6 +272,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                 <Column lg={8} md={4} sm={4}>
                   <InputWrapper>
                     <ComboBox
+                      size={isTablet ? 'lg' : 'md'}
                       id="editRoute"
                       light={isTablet}
                       items={routeOptions}
@@ -298,6 +301,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                 <Column lg={16} md={4} sm={4}>
                   <InputWrapper>
                     <ComboBox
+                      size={isTablet ? 'lg' : 'md'}
                       id="editFrequency"
                       light={isTablet}
                       items={frequencyOptions}
@@ -416,6 +420,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
             <Column lg={8} md={2} sm={4}>
               <InputWrapper>
                 <NumberInput
+                  size={isTablet ? 'lg' : 'md'}
                   light={isTablet}
                   id="durationInput"
                   label={t('duration', 'Duration')}
@@ -437,6 +442,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
             <Column lg={8} md={2} sm={4}>
               <InputWrapper>
                 <ComboBox
+                  size={isTablet ? 'lg' : 'md'}
                   light={isTablet}
                   id="durationUnitPlaceholder"
                   titleText={t('durationUnit', 'Duration Unit')}
@@ -483,6 +489,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
             <Column lg={8} md={2} sm={4}>
               <InputWrapper>
                 <NumberInput
+                  size={isTablet ? 'lg' : 'md'}
                   light={isTablet}
                   id="quantityDispensed"
                   helperText={t('pillsToDispense', 'Pills to dispense')}
@@ -502,6 +509,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
             <Column lg={8} md={2} sm={4}>
               <InputWrapper>
                 <NumberInput
+                  size={isTablet ? 'lg' : 'md'}
                   light={isTablet}
                   id="prescriptionRefills"
                   min={0}
@@ -522,6 +530,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
             <Column lg={16} md={8} sm={4}>
               <InputWrapper>
                 <TextInput
+                  size={isTablet ? 'lg' : 'md'}
                   id="indication"
                   labelText={t('indication', 'Indication')}
                   placeholder={t('indicationPlaceholder', 'e.g. "Hypertension"')}
