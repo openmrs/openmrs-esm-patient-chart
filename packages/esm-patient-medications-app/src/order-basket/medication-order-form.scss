@@ -4,20 +4,22 @@
 @import "../root";
 
 .medicationInfo {
-  position: sticky;
   border: 0;
-  top: 0rem;
   padding: 1rem;
-  z-index: 1;
-  background-color: $ui-02;
   margin-left: -1rem;
   box-sizing: border-box;
 }
 
 .stickyMedicationInfo {
-  background-color: var(--brand-02);
+  position: sticky;
+  background-color: $interactive-01;
   color: #ffffff;
-  border: 1px solid black;
+  top: 0;
+  z-index: 1;
+
+  .medicationInfo {
+    margin: 0;
+  }
 }
 
 .orderForm {

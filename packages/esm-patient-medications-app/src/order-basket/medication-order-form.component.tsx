@@ -44,6 +44,31 @@ function addIfNotPresent(
   return ret;
 }
 
+function MedicationInfoHeader({ orderBasketItem }: { orderBasketItem: OrderBasketItem }) {
+  const { t } = useTranslation();
+  return (
+    <div className={styles.medicationInfo} id="medicationInfo">
+      <strong className={styles.productiveHeading02}>
+        {orderBasketItem?.drug?.display} {orderBasketItem?.drug?.strength && `(${orderBasketItem.drug?.strength})`}
+      </strong>{' '}
+      <span className={styles.bodyLong01}>
+        {orderBasketItem?.route?.value && <>&mdash; {orderBasketItem?.route?.value}</>}{' '}
+        {orderBasketItem?.drug?.dosageForm?.display && <>&mdash; {orderBasketItem?.drug?.dosageForm?.display}</>}{' '}
+      </span>
+      {orderBasketItem?.dosage && orderBasketItem?.unit?.value ? (
+        <>
+          &mdash; <span className={styles.caption01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
+          <strong>
+            <span className={styles.productiveHeading02}>
+              {orderBasketItem?.dosage} {orderBasketItem?.unit?.value.toLowerCase()}
+            </span>
+          </strong>
+        </>
+      ) : null}{' '}
+    </div>
+  );
+}
+
 export default function MedicationOrderForm({ initialOrderBasketItem, onSign, onCancel }: MedicationOrderFormProps) {
   const { t } = useTranslation();
   const layout = useLayoutType();
@@ -57,6 +82,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
     durationUnits,
     error: fetchingDurationUnitsError,
   } = useDurationUnits(config.durationUnitsConcept);
+  const [showStickyMedicationHeader, setShowMedicationHeader] = useState(false);
 
   const doseWithUnitsLabel = template ? (
     `(${initialOrderBasketItem?.dosage} ${initialOrderBasketItem?.unit?.value})`
@@ -127,8 +153,31 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderConfigObject]);
 
+  const observer = useRef(null);
+  const medicationInfoHeaderRef = useCallback(
+    (node) => {
+      if (observer.current) observer.current.disconnect();
+      observer.current = new IntersectionObserver(
+        ([e]) => {
+          console.log(e.intersectionRatio, e.intersectionRatio < 1);
+          setShowMedicationHeader(e.intersectionRatio < 1);
+        },
+        {
+          threshold: 1,
+        },
+      );
+      if (node) observer.current.observe(node);
+    },
+    [setShowMedicationHeader],
+  );
+
   return (
     <>
+      {showStickyMedicationHeader && (
+        <div className={styles.stickyMedicationInfo}>
+          <MedicationInfoHeader orderBasketItem={orderBasketItem} />
+        </div>
+      )}
       <Form className={styles.orderForm} onSubmit={() => onSign(orderBasketItem)}>
         {fetchingDurationUnitsError && (
           <InlineNotification
@@ -139,6 +188,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
             subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
           />
         )}
+
         {!isTablet && (
           <div className={styles.backButton}>
             <Button
@@ -153,24 +203,8 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
           </div>
         )}
         <h1 className={styles.orderFormHeading}>{t('orderForm', 'Order Form')}</h1>
-        <div className={styles.medicationInfo} id="medicationInfo">
-          <strong className={styles.productiveHeading02}>
-            {orderBasketItem?.drug?.display} {orderBasketItem?.drug?.strength && `(${orderBasketItem.drug?.strength})`}
-          </strong>{' '}
-          <span className={styles.bodyLong01}>
-            {orderBasketItem?.route?.value && <>&mdash; {orderBasketItem?.route?.value}</>}{' '}
-            {orderBasketItem?.drug?.dosageForm?.display && <>&mdash; {orderBasketItem?.drug?.dosageForm?.display}</>}{' '}
-          </span>
-          {orderBasketItem?.dosage && orderBasketItem?.unit?.value ? (
-            <>
-              &mdash; <span className={styles.caption01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
-              <strong>
-                <span className={styles.productiveHeading02}>
-                  {orderBasketItem?.dosage} {orderBasketItem?.unit?.value.toLowerCase()}
-                </span>
-              </strong>
-            </>
-          ) : null}{' '}
+        <div ref={medicationInfoHeaderRef}>
+          <MedicationInfoHeader orderBasketItem={orderBasketItem} />
         </div>
         <section className={styles.formSection}>
           <Grid className={styles.gridRow}>
