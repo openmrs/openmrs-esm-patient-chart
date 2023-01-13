@@ -9,13 +9,15 @@
   top: 0rem;
   padding: 1rem;
   z-index: 1;
-  margin: 0 -1rem 0.5rem;
   background-color: $ui-02;
+  margin-left: -1rem;
+  box-sizing: border-box;
 }
 
 .stickyMedicationInfo {
   background-color: var(--brand-02);
   color: #ffffff;
+  border: 1px solid black;
 }
 
 .orderForm {

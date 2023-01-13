@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import capitalize from 'lodash-es/capitalize';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   Button,
   ButtonSet,
@@ -19,7 +18,7 @@ import {
 } from '@carbon/react';
 import { ArrowLeft } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
-import { isDesktop, OpenmrsResource, useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { OrderBasketItem } from '../types/order-basket-item';
 import { useOrderConfig } from '../api/order-config';
 import styles from './medication-order-form.scss';
@@ -154,7 +153,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
           </div>
         )}
         <h1 className={styles.orderFormHeading}>{t('orderForm', 'Order Form')}</h1>
-        <div className={styles.medicationInfo}>
+        <div className={styles.medicationInfo} id="medicationInfo">
           <strong className={styles.productiveHeading02}>
             {orderBasketItem?.drug?.display} {orderBasketItem?.drug?.strength && `(${orderBasketItem.drug?.strength})`}
           </strong>{' '}
