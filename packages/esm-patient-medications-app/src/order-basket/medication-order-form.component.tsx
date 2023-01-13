@@ -15,6 +15,7 @@ import {
   DatePicker,
   DatePickerInput,
   InlineNotification,
+  Layer,
 } from '@carbon/react';
 import { ArrowLeft } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
@@ -23,7 +24,6 @@ import { OrderBasketItem } from '../types/order-basket-item';
 import { useOrderConfig } from '../api/order-config';
 import styles from './medication-order-form.scss';
 import { useDurationUnits } from '../api/api';
-import { InputWrapper } from './order-form-helper.component';
 import capitalize from 'lodash-es/capitalize';
 
 export interface MedicationOrderFormProps {
@@ -67,6 +67,15 @@ function MedicationInfoHeader({ orderBasketItem }: { orderBasketItem: OrderBaske
         </>
       ) : null}{' '}
     </div>
+  );
+}
+
+function InputWrapper({ children }) {
+  const isTablet = useLayoutType() === 'tablet';
+  return (
+    <Layer level={isTablet ? 1 : 0}>
+      <div className={styles.field}>{children}</div>
+    </Layer>
   );
 }
 
@@ -441,27 +450,29 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
           <h3 className={styles.sectionHeader}>{t('prescriptionDuration', '2. Prescription Duration')}</h3>
           <Grid className={styles.gridRow}>
             <Column lg={16} md={4} sm={4}>
-              <InputWrapper>
-                <DatePicker
-                  light={isTablet}
-                  datePickerType="single"
-                  maxDate={new Date()}
-                  value={[orderBasketItem.startDate]}
-                  onChange={([newStartDate]) =>
-                    setOrderBasketItem({
-                      ...orderBasketItem,
-                      startDate: newStartDate,
-                    })
-                  }
-                >
-                  <DatePickerInput
-                    id="startDatePicker"
-                    placeholder="mm/dd/yyyy"
-                    labelText={t('startDate', 'Start date')}
-                    size={isTablet ? 'lg' : 'md'}
-                  />
-                </DatePicker>
-              </InputWrapper>
+              <div className={styles.fullWidthDatePickerContainer}>
+                <InputWrapper>
+                  <DatePicker
+                    light={isTablet}
+                    datePickerType="single"
+                    maxDate={new Date()}
+                    value={[orderBasketItem.startDate]}
+                    onChange={([newStartDate]) =>
+                      setOrderBasketItem({
+                        ...orderBasketItem,
+                        startDate: newStartDate,
+                      })
+                    }
+                  >
+                    <DatePickerInput
+                      id="startDatePicker"
+                      placeholder="mm/dd/yyyy"
+                      labelText={t('startDate', 'Start date')}
+                      size={isTablet ? 'lg' : 'md'}
+                    />
+                  </DatePicker>
+                </InputWrapper>
+              </div>
             </Column>
             <Column lg={8} md={2} sm={4}>
               <InputWrapper>

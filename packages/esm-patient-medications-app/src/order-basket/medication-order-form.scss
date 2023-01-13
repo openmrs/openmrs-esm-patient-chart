@@ -10,6 +10,10 @@
   padding: 0.5rem 0 0 1rem;
   height: calc(100vh - 6rem);
 
+  :global(.cds--css-grid) {
+    max-width: unset;
+  }
+
   :global(.cds--css-grid-column) {
     margin: 0 0.5rem !important;
   }
@@ -22,6 +26,10 @@
     padding-right: 1rem;
   }
 
+  :global(.cds--btn-set .cds--btn) {
+    max-width: 50%;
+    height: 4rem;
+  }
 }
 
 .medicationInfo {
@@ -73,16 +81,6 @@
   margin-bottom: spacing.$spacing-05;
 }
 
-.flexGrid {
-  display: flex;
-  flex-direction: column;
-}
-
-.dosingInstructionsHeading {
-  @include type.type-style("heading-compact-02");
-  margin-bottom: -1.85rem;
-}
-
 .pullColumnContentRight > div {
   float: right;
 }
@@ -112,20 +110,6 @@
   }
 }
 
-.fullHeightTextAreaContainer {
-  :global .cds--form-item {
-    height: 100%;
-
-    :global .cds--text-area__wrapper {
-      height: 100%;
-    }
-  }
-}
-
-.dosageInfo {
-  @include type.type-style("heading-compact-01");
-}
-
 .backButton {
   align-items: center;
   display: flex;
@@ -147,20 +131,6 @@
   }
 }
 
-.orderForm :global(.cds--btn-set .cds--btn) {
-  max-width: 50%;
-  height: 4rem;
-}
-
-.tablet {
-  padding: 1.5rem 1rem;
-  background-color: $ui-02;
-}
-
-.desktop {
-  padding: 0rem;
-}
-
 .gridRow {
   padding: 0px;
   margin-left: -0.5rem;
@@ -168,32 +138,6 @@
   :global(.cds--number) {
     display: inline-block;
   }
-
-  :global(.cds--date-picker), 
-  :global(.cds--date-picker-container), 
-  :global(.cds--date-picker) :global(.cds--date-picker-container) :global(.cds--date-picker__input) {
-    width: 100%;
-  }
-}
-
-.lastGridCell {
-  margin-right: 0px !important;
-}
-
-.patientInstructionsWrapper {
-  height: 16rem;
-}
-
-.spacer {
-  margin-top: 3rem;
-}
-
-.dosingWrapper {
-  display: flex;
-}
-
-.dosingWrapper :global(.bx--combo-box) {
-  width: 75% !important;
 }
 
 .field {
