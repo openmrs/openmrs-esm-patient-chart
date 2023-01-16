@@ -15,9 +15,11 @@
 .heading {
   @include type.type-style("heading-compact-01");
   color: $text-02;
+  display: flex;
+  justify-content: space-between;
 }
 .heading button {
-  float: right;
+  margin-top: -1.25rem
 }
 
 .row {

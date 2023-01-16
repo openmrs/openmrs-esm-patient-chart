@@ -1,19 +1,12 @@
-import { openmrsFetch, OpenmrsResource } from '@openmrs/esm-framework';
+import { FetchResponse, openmrsFetch, OpenmrsResource } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
-import useSWR from 'swr';
+import useSWRImmutable from 'swr/immutable';
 
 export const cohortUrl = '/ws/rest/v1/cohortm';
 export interface CohortList {
   patient: {
     uuid: string;
     display: string;
-    links: [
-      {
-        rel: string;
-        uri: string;
-        resourceAlias: string;
-      },
-    ];
   };
   startDate: string;
   endDate: string;
@@ -23,26 +16,7 @@ export interface CohortList {
   cohort: {
     uuid: string;
     display: string;
-    links: [
-      {
-        rel: string;
-        uri: string;
-        resourceAlias: string;
-      },
-    ];
   };
-  links: [
-    {
-      rel: string;
-      uri: string;
-      resourceAlias: string;
-    },
-    {
-      rel: string;
-      uri: string;
-      resourceAlias: string;
-    },
-  ];
   resourceVersion: string;
 }
 
@@ -56,18 +30,18 @@ interface ExtractedList {
 }
 
 function extractPatientListData(cohortLists: Array<CohortList>): Array<ExtractedList> {
-  const patientListListData = [];
-  for (const r of cohortLists) {
-    patientListListData.push({
-      uuid: r.cohort.uuid,
-      display: r.cohort.display,
+  const patientListData = [];
+  for (const cohortList of cohortLists) {
+    patientListData.push({
+      uuid: cohortList.cohort.uuid,
+      display: cohortList.cohort.display,
     });
   }
-  return patientListListData;
+  return patientListData;
 }
 
 export function usePatientLists(patientUuid: string) {
-  const { data, error, isValidating } = useSWR<{ data: PatientListResponse }, Error>(
+  const { data, error, isValidating } = useSWRImmutable<FetchResponse<PatientListResponse>, Error>(
     `${cohortUrl}/cohortmember?patient=${patientUuid}&v=default`,
     openmrsFetch,
   );

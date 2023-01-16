@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SkeletonText, Button } from '@carbon/react';
 import { ChevronDown, ChevronUp, OverflowMenuVertical } from '@carbon/react/icons';
@@ -6,8 +6,8 @@ import { ChevronDown, ChevronUp, OverflowMenuVertical } from '@carbon/react/icon
 import { useRelationships } from './relationships.resource';
 import { usePatientContactAttributes } from '../hooks/usePatientAttributes';
 import styles from './contact-details.scss';
-import { usePatientLists } from './patientList.resource';
-import { ConfigurableLink } from '@openmrs/esm-framework';
+import { ConfigurableLink, ErrorState } from '@openmrs/esm-framework';
+import { usePatientLists } from './patient-list.resource';
 
 interface ContactDetailsProps {
   address: Array<fhir.Address>;
@@ -94,12 +94,44 @@ const Relationships: React.FC<{ patientId: string }> = ({ patientId }) => {
 
 const PatientLists: React.FC<{ patientId: string }> = ({ patientId }) => {
   const { t } = useTranslation();
-  const { data: formattedPatientLists, isLoading } = usePatientLists(patientId);
+  const headerTitle = t('contactDetails', 'Contact Details');
+  const { data: formattedPatientLists, isLoading, isError } = usePatientLists(patientId);
   const [showPatientListDetails, setShowPatientListDetails] = React.useState(false);
   const togglePatientListDetails = React.useCallback((event: MouseEvent) => {
     event.stopPropagation();
     setShowPatientListDetails((value) => !value);
   }, []);
+
+  const patientList = useMemo(() => {
+    if (isLoading) return <SkeletonText />;
+    if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
+    if (formattedPatientLists?.length && !showPatientListDetails) {
+      return (
+        <ul>
+          {formattedPatientLists.slice(0, 5).map((r) => (
+            <li key={r.uuid} className={styles.relationship}>
+              <ConfigurableLink className={styles.link} to={`\${openmrsSpaBase}/patient-list/${r.uuid}`}>
+                {r.display}
+              </ConfigurableLink>
+            </li>
+          ))}
+        </ul>
+      );
+    } else if (formattedPatientLists?.length && showPatientListDetails) {
+      return (
+        <ul>
+          {formattedPatientLists.map((r) => (
+            <li key={r.uuid} className={styles.relationship}>
+              <ConfigurableLink className={styles.link} to={`\${openmrsSpaBase}/patient-list/${r.uuid}`}>
+                {r.display}
+              </ConfigurableLink>
+            </li>
+          ))}
+        </ul>
+      );
+    }
+    return <p>--</p>;
+  }, [formattedPatientLists?.length, showPatientListDetails]);
 
   return (
     <>
@@ -110,44 +142,13 @@ const PatientLists: React.FC<{ patientId: string }> = ({ patientId }) => {
           renderIcon={(props) =>
             showPatientListDetails ? <ChevronUp size={16} {...props} /> : <ChevronDown size={16} {...props} />
           }
-          iconDescription="Toggle patient List Details"
+          iconDescription={t('TogglePatientListDetails', 'Toggle patient List Details')}
           onClick={togglePatientListDetails}
-          style={{ marginTop: '-0.25rem' }}
         >
-          {showPatientListDetails ? t('seeLess', 'See less') : t('seeAll', 'See All')}
+          {showPatientListDetails ? t('seeLess', 'See less') : t('seeAll', 'See all')}
         </Button>
       </p>
-      <>
-        {(() => {
-          if (isLoading) return <SkeletonText />;
-          if (formattedPatientLists?.length && !showPatientListDetails) {
-            return (
-              <ul>
-                {formattedPatientLists.slice(0, 5).map((r) => (
-                  <li key={r.uuid} className={styles.relationship}>
-                    <ConfigurableLink className={styles.link} to={`\${openmrsSpaBase}/patient-list/${r.uuid}`}>
-                      {r.display}
-                    </ConfigurableLink>
-                  </li>
-                ))}
-              </ul>
-            );
-          } else if (formattedPatientLists?.length && showPatientListDetails) {
-            return (
-              <ul>
-                {formattedPatientLists.map((r) => (
-                  <li key={r.uuid} className={styles.relationship}>
-                    <ConfigurableLink className={styles.link} to={`\${openmrsSpaBase}/patient-list/${r.uuid}`}>
-                      {r.display}
-                    </ConfigurableLink>
-                  </li>
-                ))}
-              </ul>
-            );
-          }
-          return <p>--</p>;
-        })()}
-      </>
+      <>{patientList}</>
     </>
   );
 };
