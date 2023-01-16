@@ -25,7 +25,6 @@ import { useOrderConfig } from '../api/order-config';
 import styles from './medication-order-form.scss';
 import { useDurationUnits } from '../api/api';
 import capitalize from 'lodash-es/capitalize';
-import { min } from 'lodash';
 
 export interface MedicationOrderFormProps {
   initialOrderBasketItem: OrderBasketItem;
@@ -236,8 +235,8 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
               <Toggle
                 size="sm"
                 id="freeTextDosageToggle"
-                aria-label={t('freeTextDosage', 'Free Text Dosage')}
-                labelText={t('freeTextDosage', 'Free Text Dosage')}
+                aria-label={t('freeTextDosage', 'Free text dosage')}
+                labelText={t('freeTextDosage', 'Free text dosage')}
                 toggled={orderBasketItem.isFreeTextDosage}
                 onChange={() => {} /* Required by the typings, but we don't need it. */}
                 onToggle={(value) =>
@@ -250,7 +249,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
             </Column>
           </Grid>
           {orderBasketItem.isFreeTextDosage ? (
-            <div className={styles.row}>
+            <Grid className={styles.gridRow}>
               <Column md={8}>
                 <TextArea
                   light={isTablet}
@@ -266,7 +265,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                   }
                 />
               </Column>
-            </div>
+            </Grid>
           ) : (
             <>
               <Grid className={styles.gridRow}>
@@ -405,7 +404,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                 </Column>
                 <Column lg={16} md={4} sm={4}>
                   <Grid className={styles.gridRow}>
-                    <Column lg={12} md={8} sm={4}>
+                    <Column lg={12} md={8} sm={4} className={styles.prnTextArea}>
                       <InputWrapper>
                         <TextArea
                           light={isTablet}
@@ -424,12 +423,13 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                       </InputWrapper>
                     </Column>
 
-                    <Column lg={4} md={8} sm={4}>
+                    <Column lg={4} md={8} sm={4} className={styles.prnCheckbox}>
                       <InputWrapper>
                         <FormGroup legendText={t('prn', 'P.R.N.')}>
                           <Checkbox
                             id="prn"
                             labelText={t('takeAsNeeded', 'Take as needed')}
+                            size="lg"
                             checked={orderBasketItem.asNeeded}
                             onChange={(e) =>
                               setOrderBasketItem({

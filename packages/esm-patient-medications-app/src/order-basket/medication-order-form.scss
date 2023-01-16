@@ -156,23 +156,6 @@
   }
 }
 
-/* Tablet */
-:global(.omrs-breakpoint-lt-desktop) {
-  .orderForm {
-    height: 100%;
-    background-color: #ededed;
-  }
-
-  .stickyMedicationInfo {
-    top: spacing.$spacing-09;
-  }
-
-  .buttonSet {
-    padding: spacing.$spacing-06 spacing.$spacing-05;
-    background-color: $ui-02;
-  }
-}
-
 .linkedInput {
   display: flex;
   align-items: center;
@@ -204,5 +187,30 @@
     input {
       text-align: center;
     }
+  }
+}
+
+/* Tablet */
+:global(.omrs-breakpoint-lt-desktop) {
+  .orderForm {
+    height: 100%;
+    background-color: #ededed;
+  }
+
+  .stickyMedicationInfo {
+    top: spacing.$spacing-09;
+  }
+
+  .buttonSet {
+    padding: spacing.$spacing-06 spacing.$spacing-05;
+    background-color: $ui-02;
+  }
+
+  .prnTextArea {
+    grid-row: 2;
+  }
+
+  .prnCheckbox {
+    grid-row: 1;
   }
 }
