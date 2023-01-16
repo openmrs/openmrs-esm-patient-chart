@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -24,7 +24,7 @@ import {
   Tile,
 } from '@carbon/react';
 import { Edit } from '@carbon/react/icons';
-import { formatDatetime, formatTime, parseDate, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { formatDatetime, parseDate, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { formEntrySub, launchPatientWorkspace, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { MappedEncounter } from '../visit-summary.component';
 import EncounterObservations from '../../encounter-observations';
@@ -44,20 +44,31 @@ type FilterProps = {
 };
 
 const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits }) => {
-  const encountersCount = 20;
+  const visitCount = 20;
   const { t } = useTranslation();
-  const encounterTypes = [...new Set(visits.map((encounter) => encounter.encounterType))].sort();
-  const { results: paginatedEncounters, goTo, currentPage } = usePagination(visits ?? [], encountersCount);
   const isTablet = useLayoutType() === 'tablet';
-  const [filteredRows, setFilteredRows] = useState<Array<MappedEncounter>>([]);
+
+  const encounterTypes = [...new Set(visits.map((encounter) => encounter.encounterType))].sort();
+
   const [filter, setFilter] = useState('');
 
-  useEffect(() => {
-    if (filter) {
-      setFilteredRows(visits?.filter((encounter) => encounter.encounterType === filter));
-      setFilter('');
+  const filteredRows = useMemo(() => {
+    if (!filter || filter == 'All') {
+      return visits;
     }
-  }, [filter, filteredRows, visits]);
+
+    if (filter) {
+      return visits?.filter((encounter) => encounter.encounterType === filter);
+    }
+
+    return visits;
+  }, [filter, visits]);
+
+  const {
+    results: paginatedVisits,
+    goTo,
+    currentPage,
+  } = usePagination(filteredRows ? filteredRows : visits ?? [], visitCount);
 
   const tableHeaders = [
     {
@@ -98,16 +109,14 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits }) =>
     launchPatientWorkspace('patient-form-entry-workspace', { workspaceTitle: formName });
   };
 
-  const tableRows = React.useMemo(() => {
-    return (filteredRows.length ? filteredRows : paginatedEncounters)?.map((encounter) => ({
+  const tableRows = useMemo(() => {
+    return paginatedVisits?.map((encounter) => ({
       ...encounter,
       datetime: formatDatetime(parseDate(encounter?.datetime)),
     }));
-  }, [filteredRows, paginatedEncounters]);
+  }, [paginatedVisits]);
 
-  const handleEncounterTypeChange = ({ selectedItem }) => {
-    setFilter(selectedItem);
-  };
+  const handleEncounterTypeChange = ({ selectedItem }) => setFilter(selectedItem);
 
   const handleFilter = ({ rowIds, headers, cellsById, inputValue, getCellId }: FilterProps): Array<string> => {
     return rowIds.filter((rowId) =>
@@ -255,6 +264,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits }) =>
               </TableBody>
             </Table>
           </TableContainer>
+
           {rows.length === 0 ? (
             <div className={styles.tileContainer}>
               <Tile className={styles.tile}>
@@ -265,13 +275,14 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits }) =>
               </Tile>
             </div>
           ) : null}
+
           {showAllEncounters ? (
             <PatientChartPagination
-              currentItems={paginatedEncounters.length}
+              currentItems={paginatedVisits.length}
               onPageNumberChange={({ page }) => goTo(page)}
               pageNumber={currentPage}
-              pageSize={encountersCount}
-              totalItems={visits.length}
+              pageSize={visitCount}
+              totalItems={filteredRows ? filteredRows.length : visits.length}
             />
           ) : null}
         </>
