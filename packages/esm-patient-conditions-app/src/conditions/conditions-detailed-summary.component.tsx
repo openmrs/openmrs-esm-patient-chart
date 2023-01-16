@@ -15,8 +15,14 @@ import {
   TableRow,
 } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { formatDate, parseDate } from '@openmrs/esm-framework';
-import { CardHeader, EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { formatDate, parseDate, usePagination } from '@openmrs/esm-framework';
+import {
+  CardHeader,
+  EmptyState,
+  ErrorState,
+  launchPatientWorkspace,
+  PatientChartPagination,
+} from '@openmrs/esm-patient-common-lib';
 import { Condition, useConditions } from './conditions.resource';
 import styles from './conditions-detailed-summary.scss';
 
@@ -24,7 +30,13 @@ function ConditionsDetailedSummary({ patient }) {
   const { t } = useTranslation();
   const displayText = t('conditions', 'Conditions');
   const headerTitle = t('conditions', 'Conditions');
+
+  const conditionsCount = 10;
+  const urlLabel = t('seeAll', 'See all');
+  const pageUrl = `\${openmrsSpaBase}/patient/${patient.id}/chart/Conditions`;
+
   const { data: conditions, isError, isLoading, isValidating } = useConditions(patient.id);
+  const { results: paginatedConditions, goTo, currentPage } = usePagination(conditions ?? [], conditionsCount);
 
   const headers = React.useMemo(
     () => [
@@ -45,7 +57,7 @@ function ConditionsDetailedSummary({ patient }) {
   );
 
   const tableRows: Array<Condition> = React.useMemo(() => {
-    return conditions?.map((condition) => {
+    return paginatedConditions?.map((condition) => {
       return {
         ...condition,
         id: condition.id,
@@ -54,7 +66,7 @@ function ConditionsDetailedSummary({ patient }) {
         status: capitalize(condition.clinicalStatus),
       };
     });
-  }, [conditions]);
+  }, [paginatedConditions]);
 
   const launchConditionsForm = React.useCallback(() => launchPatientWorkspace('conditions-form-workspace'), []);
 
@@ -106,6 +118,15 @@ function ConditionsDetailedSummary({ patient }) {
             </TableContainer>
           )}
         </DataTable>
+        <PatientChartPagination
+          currentItems={paginatedConditions.length}
+          onPageNumberChange={({ page }) => goTo(page)}
+          pageNumber={currentPage}
+          pageSize={conditionsCount}
+          totalItems={conditions.length}
+          dashboardLinkUrl={pageUrl}
+          dashboardLinkLabel={urlLabel}
+        />
       </div>
     );
   }

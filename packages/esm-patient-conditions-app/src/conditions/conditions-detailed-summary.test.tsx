@@ -1,14 +1,28 @@
 import React from 'react';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { attach, openmrsFetch } from '@openmrs/esm-framework';
+import { attach, openmrsFetch, usePagination } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
-import { mockFhirConditionsResponse } from '../../../../__mocks__/conditions.mock';
+import { mockConditions, mockFhirConditionsResponse } from '../../../../__mocks__/conditions.mock';
 import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import ConditionsDetailedSummary from './conditions-detailed-summary.component';
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
+const mockUsePagination = usePagination as jest.Mock;
+
+jest.mock('@openmrs/esm-framework', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-framework');
+
+  return {
+    ...originalModule,
+    usePagination: jest.fn().mockImplementation(() => ({
+      currentPage: 1,
+      goTo: () => {},
+      results: [],
+    })),
+  };
+});
 
 jest.mock('@openmrs/esm-patient-common-lib', () => {
   const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
@@ -60,6 +74,11 @@ it('renders an error state view if there is a problem fetching conditions data',
 
 it("renders a detailed summary of the patient's conditions when present", async () => {
   mockOpenmrsFetch.mockReturnValueOnce({ data: mockFhirConditionsResponse });
+  mockUsePagination.mockImplementation(() => ({
+    currentPage: 1,
+    goTo: () => {},
+    results: mockConditions,
+  }));
   renderConditionsDetailedSummary();
 
   await waitForLoadingToFinish();
@@ -76,7 +95,7 @@ it("renders a detailed summary of the patient's conditions when present", async 
   expectedTableRows.forEach((row) => {
     expect(screen.getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument();
   });
-  expect(screen.getAllByRole('row').length).toEqual(9);
+  expect(screen.getAllByRole('row').length).toEqual(6);
 });
 
 it('clicking the Add button or Record Conditions link launches the conditions form', async () => {

@@ -26,7 +26,7 @@ export type CodedCondition = {
 
 export function useConditions(patientUuid: string) {
   const { data, error, isValidating } = useSWR<{ data: FHIRConditionResponse }, Error>(
-    `${fhirBaseUrl}/Condition?patient=${patientUuid}`,
+    `${fhirBaseUrl}/Condition?patient=${patientUuid}&_count=500`,
     openmrsFetch,
   );
 
