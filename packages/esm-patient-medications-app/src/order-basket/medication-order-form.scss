@@ -22,8 +22,16 @@
     margin: 0 calc(spacing.$spacing-03 * -1) !important;
   }
 
-  :global(.cds--number--lg.cds--number input[type=number]) {
+  :global(.cds--number--nosteppers.cds--number input[type=number]) {
     padding-right: spacing.$spacing-05;
+  }
+
+  :global(.cds--list-box) {
+    border: none;
+  }
+
+  :global(.cds--number__control-btn) {
+    border: 0;
   }
 }
 
@@ -163,4 +171,22 @@
     padding: spacing.$spacing-06 spacing.$spacing-05;
     background-color: $ui-02;
   }
+}
+
+.linkedInput {
+  display: flex;
+  align-items: center;
+
+  :global(.cds--layer-one), 
+  :global(.cds--layer) {
+    flex: 1;
+  }
+}
+
+.linkedInput::after {
+  content: "";
+  border: 1px solid $text-03;
+  width: spacing.$spacing-05;
+  margin-right: calc(spacing.$spacing-05 * -1);
+  margin-top: spacing.$spacing-05;
 }

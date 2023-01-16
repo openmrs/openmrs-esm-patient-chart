@@ -269,7 +269,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
           ) : (
             <>
               <Grid className={styles.gridRow}>
-                <Column lg={4} md={2} sm={4}>
+                <Column lg={4} md={2} sm={4} className={styles.linkedInput}>
                   <InputWrapper>
                     <div className={styles.numberInput}>
                       <NumberInput
@@ -467,22 +467,21 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                       id="startDatePicker"
                       placeholder="mm/dd/yyyy"
                       labelText={t('startDate', 'Start date')}
-                      size={isTablet ? 'lg' : 'md'}
+                      size="lg"
                     />
                   </DatePicker>
                 </InputWrapper>
               </div>
             </Column>
-            <Column lg={8} md={2} sm={4}>
+            <Column lg={8} md={2} sm={4} className={styles.linkedInput}>
               <InputWrapper>
                 <NumberInput
-                  size={isTablet ? 'lg' : 'md'}
+                  size="lg"
                   light={isTablet}
                   id="durationInput"
                   label={t('duration', 'Duration')}
                   min={1}
                   value={orderBasketItem.duration ?? ''}
-                  helperText={t('noDurationHint', 'An empty field indicates an indefinite duration.')}
                   step={1}
                   onChange={(e, { value }) => {
                     setOrderBasketItem({
@@ -490,7 +489,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                       duration: value ? parseFloat(value) : 0,
                     });
                   }}
-                  hideSteppers
+                  max={99}
                   allowEmpty
                 />
               </InputWrapper>
@@ -498,7 +497,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
             <Column lg={8} md={2} sm={4}>
               <InputWrapper>
                 <ComboBox
-                  size={isTablet ? 'lg' : 'md'}
+                  size="lg"
                   light={isTablet}
                   id="durationUnitPlaceholder"
                   titleText={t('durationUnit', 'Duration Unit')}
@@ -545,7 +544,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
             <Column lg={8} md={3} sm={4}>
               <InputWrapper>
                 <NumberInput
-                  size={isTablet ? 'lg' : 'md'}
+                  size="lg"
                   light={isTablet}
                   id="quantityDispensed"
                   helperText={t('pillsToDispense', 'Pills to dispense')}
@@ -565,7 +564,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
             <Column lg={8} md={3} sm={4}>
               <InputWrapper>
                 <NumberInput
-                  size={isTablet ? 'lg' : 'md'}
+                  size="lg"
                   light={isTablet}
                   id="prescriptionRefills"
                   min={0}
@@ -577,7 +576,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                       numRefills: value ? parseFloat(value) : 0,
                     });
                   }}
-                  hideSteppers
+                  max={99}
                 />
               </InputWrapper>
             </Column>
@@ -586,7 +585,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
             <Column lg={16} md={6} sm={4}>
               <InputWrapper>
                 <TextInput
-                  size={isTablet ? 'lg' : 'md'}
+                  size="lg"
                   id="indication"
                   labelText={t('indication', 'Indication')}
                   placeholder={t('indicationPlaceholder', 'e.g. "Hypertension"')}
