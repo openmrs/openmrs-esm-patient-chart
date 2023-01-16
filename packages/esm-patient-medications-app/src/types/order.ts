@@ -57,10 +57,10 @@ export interface Order {
 
 export interface Drug {
   uuid: string;
-  name: string;
   strength: string;
   concept: OpenmrsResource;
   dosageForm: OpenmrsResource;
+  display: string;
 }
 
 export interface OrderPost {

@@ -1,4 +1,5 @@
 @use '@carbon/styles/scss/type';
+@use '@carbon/styles/scss/spacing';
 @import '~@openmrs/esm-styleguide/src/vars';
 @import "../root";
 
@@ -56,6 +57,13 @@
   }
 }
 
+.numberInput {
+  :global(.cds--number__input-wrapper) input {
+  min-width: unset !important;
+  padding-right: spacing.$spacing-05;
+  }
+}
+
 .fullHeightTextAreaContainer {
   :global .cds--form-item {
     height: 100%;
@@ -83,7 +91,7 @@
       order: 1;
       margin-right: 0.5rem;
       margin-left: 0rem !important;
-    }  
+    }
 
     span {
       order: 2;
@@ -135,6 +143,11 @@
 .gridRow {
   @extend .row;
   padding: 0px;
+  margin-bottom: 0.5rem;
+
+  :global(.cds--number) {
+    display: inline-block;
+  }
 }
 
 .lastGridCell {

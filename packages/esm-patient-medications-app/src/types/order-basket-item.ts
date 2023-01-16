@@ -1,10 +1,4 @@
-import {
-  DosingUnit,
-  MedicationDosage,
-  MedicationFrequency,
-  MedicationRoute,
-  OrderTemplate,
-} from '../api/drug-order-template';
+import { DosingUnit, MedicationFrequency, MedicationRoute, OrderTemplate } from '../api/drug-order-template';
 import { OpenmrsResource } from '@openmrs/esm-framework';
 import { Drug } from './order';
 
@@ -14,10 +8,9 @@ export interface OrderBasketItem {
   drug: Drug;
   unit: DosingUnit;
   commonMedicationName: string;
-  dosage: MedicationDosage;
+  dosage: number;
   frequency: MedicationFrequency;
   route: MedicationRoute;
-  encounterUuid: string;
   orderer: string;
   careSetting: string;
   quantityUnits: string;

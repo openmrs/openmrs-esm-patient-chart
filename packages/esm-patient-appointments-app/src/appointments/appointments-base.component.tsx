@@ -14,8 +14,8 @@ interface AppointmentsBaseProps {
 }
 
 enum AppointmentTypes {
-  TODAY = 0,
-  UPCOMING = 1,
+  UPCOMING = 0,
+  TODAY = 1,
   PAST = 2,
 }
 
@@ -49,8 +49,8 @@ const AppointmentsBase: React.FC<AppointmentsBaseProps> = ({ patientUuid }) => {
           ) : null}
           <div className={styles.contentSwitcherWrapper}>
             <ContentSwitcher size="md" onChange={({ index }) => setContentSwitcherValue(index)}>
-              <Switch name={'today'} text={t('today', 'Today')} />
               <Switch name={'upcoming'} text={t('upcoming', 'Upcoming')} />
+              <Switch name={'today'} text={t('today', 'Today')} />
               <Switch name={'past'} text={t('past', 'Past')} />
             </ContentSwitcher>
             <div className={styles.divider}></div>
@@ -65,6 +65,21 @@ const AppointmentsBase: React.FC<AppointmentsBaseProps> = ({ patientUuid }) => {
           </div>
         </CardHeader>
         {(() => {
+          if (contentSwitcherValue === AppointmentTypes.UPCOMING) {
+            if (appointmentsData.upcomingAppointments?.length) {
+              return <AppointmentsTable patientAppointments={appointmentsData?.upcomingAppointments} />;
+            }
+            return (
+              <Layer>
+                <Tile className={styles.tile}>
+                  <EmptyDataIllustration />
+                  <p className={styles.content}>
+                    {t('noUpcomingAppointments', 'There are no upcoming appointments to display for this patient')}
+                  </p>
+                </Tile>
+              </Layer>
+            );
+          }
           if (contentSwitcherValue === AppointmentTypes.TODAY) {
             if (appointmentsData.todaysAppointments?.length) {
               return <AppointmentsTable patientAppointments={appointmentsData?.todaysAppointments} />;
@@ -83,21 +98,7 @@ const AppointmentsBase: React.FC<AppointmentsBaseProps> = ({ patientUuid }) => {
               </Layer>
             );
           }
-          if (contentSwitcherValue === AppointmentTypes.UPCOMING) {
-            if (appointmentsData.upcomingAppointments?.length) {
-              return <AppointmentsTable patientAppointments={appointmentsData?.upcomingAppointments} />;
-            }
-            return (
-              <Layer>
-                <Tile className={styles.tile}>
-                  <EmptyDataIllustration />
-                  <p className={styles.content}>
-                    {t('noUpcomingAppointments', 'There are no upcoming appointments to display for this patient')}
-                  </p>
-                </Tile>
-              </Layer>
-            );
-          }
+
           if (contentSwitcherValue === AppointmentTypes.PAST) {
             if (appointmentsData.pastAppointments?.length) {
               return <AppointmentsTable patientAppointments={appointmentsData?.pastAppointments} />;

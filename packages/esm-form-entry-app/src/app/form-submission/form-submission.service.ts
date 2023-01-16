@@ -150,6 +150,11 @@ export class FormSubmissionService {
     }
 
     const encounterPayload = this.encounterAdapter.generateFormPayload(form) as unknown as EncounterCreate;
+
+    //Assign location to encounter payload if no location field is present on the form
+    if (!encounterPayload.hasOwnProperty('location') && form.dataSourcesContainer.dataSources?.userLocation?.uuid)
+      encounterPayload.location = form.dataSourcesContainer.dataSources.userLocation.uuid;
+
     return isEmpty(encounterPayload) ? undefined : encounterPayload;
   }
 

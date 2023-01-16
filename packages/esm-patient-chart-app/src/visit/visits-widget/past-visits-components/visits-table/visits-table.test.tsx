@@ -68,9 +68,9 @@ describe('EncounterList', () => {
     });
 
     const expectedTableRows = [
-      /18-Jan-2022, 04:25 PM Facility Visit Admission/,
-      /03-Aug-2021, 12:47 AM Facility Visit Visit Note User One/,
-      /05-Jul-2021, 10:07 AM Facility Visit Consultation Dennis The Doctor/,
+      /18-Jan-2022, 04:25\s+PM Facility Visit Admission/,
+      /03-Aug-2021, 12:47\s+AM Facility Visit Visit Note User One/,
+      /05-Jul-2021, 10:07\s+AM Facility Visit Consultation Dennis The Doctor/,
     ];
     expectedTableRows.forEach((row) => {
       expect(screen.getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument();

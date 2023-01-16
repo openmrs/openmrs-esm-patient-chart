@@ -1,6 +1,7 @@
 import { Drug } from '../types/order';
 
 export interface DrugOrderTemplate {
+  uuid: string;
   name: string;
   drug: Drug;
   template: OrderTemplate;

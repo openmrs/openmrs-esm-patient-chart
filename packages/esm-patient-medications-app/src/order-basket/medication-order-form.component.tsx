@@ -58,9 +58,16 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
     error: fetchingDurationUnitsError,
   } = useDurationUnits(config.durationUnitsConcept);
 
-  const doseWithUnitsLabel = template
-    ? `${initialOrderBasketItem?.dosage?.value} ${initialOrderBasketItem?.unit?.value}`
-    : '';
+  const doseWithUnitsLabel = template ? (
+    `(${initialOrderBasketItem?.dosage} ${initialOrderBasketItem?.unit?.value})`
+  ) : (
+    <>
+      {initialOrderBasketItem?.drug?.strength && <>&mdash; {initialOrderBasketItem?.drug?.strength.toLowerCase()}</>}{' '}
+      {initialOrderBasketItem?.drug?.dosageForm?.display && (
+        <> &mdash; {initialOrderBasketItem?.drug?.dosageForm?.display.toLowerCase()}</>
+      )}
+    </>
+  );
 
   const [dosingUnitOptions, setDosingUnitOptions] = useState(
     addIfNotPresent(
@@ -69,16 +76,6 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
         text: x.value,
       })),
       initialOrderBasketItem.unit,
-    ),
-  );
-
-  const [dosageOptions, setDosageOptions] = useState(
-    addIfNotPresent(
-      template?.dosingInstructions?.dose?.map((x) => ({
-        id: `${x.value}`,
-        text: `${x.value}`,
-      })),
-      initialOrderBasketItem.dosage,
     ),
   );
 
@@ -139,12 +136,14 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
           <>
             <span>
               <strong className={styles.dosageInfo}>
-                {capitalize(orderBasketItem.commonMedicationName)} {doseWithUnitsLabel && `(${doseWithUnitsLabel})`}
+                {capitalize(orderBasketItem.commonMedicationName)} {doseWithUnitsLabel}
               </strong>{' '}
               {template && (
                 <>
                   <span className={styles.bodyShort01}>
-                    &mdash; {orderBasketItem.route.value} &mdash; {orderBasketItem.drug.dosageForm.display} &mdash;{' '}
+                    {orderBasketItem.route.value && <>&mdash; {orderBasketItem.route.value}</>}{' '}
+                    {orderBasketItem.drug.dosageForm.display && <>&mdash; {orderBasketItem.drug.dosageForm.display}</>}{' '}
+                    &mdash;{' '}
                   </span>
                   <span className={styles.caption01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
                   <strong className={styles.dosageInfo}>{doseWithUnitsLabel}</strong>
@@ -232,56 +231,24 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
             <>
               <Grid className={styles.gridRow}>
                 <Column md={4}>
-                  <ComboBox
-                    id="doseSelection"
-                    light={isTablet}
-                    items={dosageOptions}
-                    selectedItem={
-                      dosageOptions?.length
-                        ? {
-                            id: orderBasketItem.dosage ? `${orderBasketItem.dosage?.value}` : null,
-                            text: orderBasketItem.dosage ? `${orderBasketItem.dosage?.value}` : null,
-                          }
-                        : null
-                    }
-                    // @ts-ignore
-                    placeholder={t('editDoseComboBoxPlaceholder', 'Dose')}
-                    titleText={t('editDoseComboBoxTitle', 'Enter Dose')}
-                    itemToString={(item) => item?.text}
-                    onChange={({ selectedItem }) => {
-                      if (selectedItem) {
-                        selectedItem.id = selectedItem.id == 'draft' ? selectedItem.text : selectedItem.text;
+                  <div className={styles.numberInput}>
+                    <NumberInput
+                      id="doseSelection"
+                      light={isTablet}
+                      placeholder={t('editDoseComboBoxPlaceholder', 'Dose')}
+                      label={t('editDoseComboBoxTitle', 'Enter Dose')}
+                      value={orderBasketItem?.dosage ?? 0}
+                      onChange={(e, { value }) => {
                         setOrderBasketItem({
                           ...orderBasketItem,
-                          dosage: { value: Number(selectedItem.text) },
+                          dosage: value ? parseFloat(value) : 0,
                         });
-                      } else {
-                        setOrderBasketItem({
-                          ...orderBasketItem,
-                          dosage: { value: 0 },
-                        });
-                      }
-                      // cleaup
-                      setDosageOptions(dosageOptions.filter((opt) => opt.id != 'draft'));
-                    }}
-                    onInputChange={(value) => {
-                      if (value == 'undefined') {
-                        return;
-                      }
-                      const valueExists = value ? dosageOptions.some((opt) => `${opt.text}` == value) : null;
-                      const draftIndex = dosageOptions.findIndex((opt) => opt.id == 'draft');
-                      // validate and clean up
-                      if (draftIndex >= 0 && value) {
-                        dosageOptions[draftIndex].text = value;
-                      } else if (draftIndex >= 0) {
-                        dosageOptions.pop();
-                      }
-                      if (value && !valueExists && draftIndex == -1 && !isNaN(Number(value))) {
-                        dosageOptions.push({ id: 'draft', text: value });
-                      }
-                    }}
-                    required
-                  />
+                      }}
+                      min={0}
+                      required
+                      hideSteppers
+                    />
+                  </div>
                 </Column>
                 <Column md={4}>
                   <ComboBox
