@@ -190,3 +190,19 @@
   margin-right: calc(spacing.$spacing-05 * -1);
   margin-top: spacing.$spacing-05;
 }
+
+.customNumberInput {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-end;
+
+  :global(.cds--btn) {
+    background-color: #393939;
+  }
+  
+  .customInput {
+    input {
+      text-align: center;
+    }
+  }
+}
