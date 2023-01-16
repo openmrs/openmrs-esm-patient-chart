@@ -7,35 +7,30 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 0.5rem 0 0 1rem;
-  height: calc(100vh - 6rem);
+  padding: spacing.$spacing-03 0 0 spacing.$spacing-05;
+  height: calc(100vh - spacing.$spacing-12);
 
   :global(.cds--css-grid) {
     max-width: unset;
   }
 
   :global(.cds--css-grid-column) {
-    margin: 0 0.5rem !important;
+    margin: 0 spacing.$spacing-03 !important;
   }
 
   :global(.cds--subgrid) {
-    margin: 0 -0.5rem !important;
+    margin: 0 calc(spacing.$spacing-03 * -1) !important;
   }
 
   :global(.cds--number--lg.cds--number input[type=number]) {
-    padding-right: 1rem;
-  }
-
-  :global(.cds--btn-set .cds--btn) {
-    max-width: 50%;
-    height: 4rem;
+    padding-right: spacing.$spacing-05;
   }
 }
 
 .medicationInfo {
   border: 0;
-  padding: 1rem;
-  margin-left: -1rem;
+  padding: spacing.$spacing-05;
+  margin-left: calc(spacing.$spacing-05 * -1);
   box-sizing: border-box;
 }
 
@@ -43,7 +38,7 @@
   position: fixed;
   background-color: #0072c3;
   color: #ffffff;
-  top: 6rem;
+  top: spacing.$spacing-12;
   z-index: 1;
   display: flex;
   align-items: center;
@@ -55,11 +50,11 @@
 }
 
 .patientHeader {
-  padding: 0.5rem 1rem 1.5rem;
+  padding: spacing.$spacing-03 spacing.$spacing-05 spacing.$spacing-06;
   background-color: $ui-01;
   
   span:first-of-type {
-    margin-right: 0.5rem;
+    margin-right: spacing.$spacing-03;
   }
   
   .text02 {
@@ -114,15 +109,15 @@
   align-items: center;
   display: flex;
   justify-content: flex-start;
-  margin: 0.5rem 0rem;
+  margin: spacing.$spacing-03 0;
 
   button {
     display: flex;
    padding-left: 0 !important;
     svg {
       order: 1;
-      margin-right: 0.5rem;
-      margin-left: 0rem !important;
+      margin-right: spacing.$spacing-03;
+      margin-left: 0 !important;
     }
 
     span {
@@ -133,7 +128,7 @@
 
 .gridRow {
   padding: 0px;
-  margin-left: -0.5rem;
+  margin-left: calc(spacing.$spacing-03 * -1);
 
   :global(.cds--number) {
     display: inline-block;
@@ -145,7 +140,12 @@
 }
 
 .buttonSet {
-  margin-left: -1rem;
+  margin-left: calc(spacing.$spacing-05 * -1);
+
+  :global(.cds--btn) {
+    width: 50%;
+    max-width: unset;
+  }
 }
 
 /* Tablet */
@@ -156,11 +156,11 @@
   }
 
   .stickyMedicationInfo {
-    top: 3rem;
+    top: spacing.$spacing-09;
   }
 
   .buttonSet {
-    padding: 1.5rem 1rem;
+    padding: spacing.$spacing-06 spacing.$spacing-05;
     background-color: $ui-02;
   }
 }

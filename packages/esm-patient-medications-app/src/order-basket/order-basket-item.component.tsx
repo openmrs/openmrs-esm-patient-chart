@@ -32,14 +32,16 @@ export default function OrderBasketItemTile({ orderBasketItem, onItemClick, onRe
         {orderBasketItem.isFreeTextDosage ? (
           <>
             <span className={styles.drugName}>{orderBasketItem.drug?.display}</span>
-            <span className={styles.dosageInfo}> &mdash; {orderBasketItem.freeTextDosage}</span>
+            {orderBasketItem.freeTextDosage && (
+              <span className={styles.dosageInfo}> &mdash; {orderBasketItem.freeTextDosage}</span>
+            )}
           </>
         ) : (
           <>
             <span className={styles.drugName}>{orderBasketItem.drug?.display}</span>
             <span className={styles.dosageInfo}>
               {' '}
-              &mdash; {orderBasketItem.drug?.strength}{' '}
+              {orderBasketItem.drug?.strength && <>&mdash; {orderBasketItem.drug?.strength}</>}{' '}
               {orderBasketItem.drug?.dosageForm?.display && <>&mdash; {orderBasketItem.drug.dosageForm?.display}</>}
             </span>
           </>

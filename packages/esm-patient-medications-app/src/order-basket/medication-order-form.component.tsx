@@ -171,6 +171,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
       if (observer.current) observer.current.disconnect();
       observer.current = new IntersectionObserver(
         ([e]) => {
+          console.log(e.intersectionRatio);
           setShowMedicationHeader(e.intersectionRatio < 1);
         },
         {
@@ -198,7 +199,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
           </span>
         </div>
       )}
-      <Form className={styles.orderForm} onSubmit={() => onSign(orderBasketItem)}>
+      <Form className={styles.orderForm} onSubmit={() => onSign(orderBasketItem)} id="drugOrderForm">
         {fetchingDurationUnitsError && (
           <InlineNotification
             hideCloseButton
@@ -542,7 +543,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
         <section className={styles.formSection}>
           <h3 className={styles.sectionHeader}>{t('dispensingInformation', '3. Dispensing Information')}</h3>
           <Grid className={styles.gridRow}>
-            <Column lg={8} md={2} sm={4}>
+            <Column lg={8} md={3} sm={4}>
               <InputWrapper>
                 <NumberInput
                   size={isTablet ? 'lg' : 'md'}
@@ -562,7 +563,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                 />
               </InputWrapper>
             </Column>
-            <Column lg={8} md={2} sm={4}>
+            <Column lg={8} md={3} sm={4}>
               <InputWrapper>
                 <NumberInput
                   size={isTablet ? 'lg' : 'md'}
@@ -583,7 +584,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
             </Column>
           </Grid>
           <Grid className={styles.gridRow}>
-            <Column lg={16} md={8} sm={4}>
+            <Column lg={16} md={6} sm={4}>
               <InputWrapper>
                 <TextInput
                   size={isTablet ? 'lg' : 'md'}
