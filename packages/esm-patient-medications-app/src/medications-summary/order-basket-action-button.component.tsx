@@ -12,13 +12,9 @@ const OrderBasketActionButton: React.FC = () => {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const { workspaces } = useWorkspaces();
-<<<<<<< HEAD
   const { items, pendingOrders } = useStore(orderBasketStore);
-=======
-  const { items } = useStore(orderBasketStore);
   const { patientUuid } = usePatient();
 
->>>>>>> main
   const isActive = workspaces.find(({ name }) => name.includes('order-basket'));
 
   const patientOrderItems = getOrderItems(items, patientUuid);
@@ -35,17 +31,12 @@ const OrderBasketActionButton: React.FC = () => {
         onClick={launchOrderBasket}
       >
         <div className={styles.elementContainer}>
-<<<<<<< HEAD
           <ShoppingCart size={20} />
           {pendingOrders ? (
             <Tag className={styles.errorTag}>!</Tag>
-          ) : items?.length > 0 ? (
-            <Tag className={styles.countTag}>{items?.length}</Tag>
+          ) : patientOrderItems?.length > 0 ? (
+            <Tag className={styles.countTag}>{patientOrderItems?.length}</Tag>
           ) : null}
-=======
-          <ShoppingCart size={20} />{' '}
-          {patientOrderItems?.length > 0 && <Tag className={styles.countTag}>{patientOrderItems?.length}</Tag>}
->>>>>>> main
         </div>
         <span>{t('orderBasket', 'Order Basket')}</span>
       </Button>
@@ -58,15 +49,11 @@ const OrderBasketActionButton: React.FC = () => {
       renderIcon={(props) => (
         <div className={styles.elementContainer}>
           <ShoppingCart size={20} {...props} />{' '}
-<<<<<<< HEAD
           {pendingOrders ? (
             <Tag className={styles.errorTag}>!</Tag>
-          ) : items?.length > 0 ? (
-            <Tag className={styles.countTag}>{items?.length}</Tag>
+          ) : patientOrderItems?.length > 0 ? (
+            <Tag className={styles.countTag}>{patientOrderItems?.length}</Tag>
           ) : null}{' '}
-=======
-          {patientOrderItems?.length > 0 && <Tag className={styles.countTag}>{patientOrderItems?.length}</Tag>}
->>>>>>> main
         </div>
       )}
       hasIconOnly

@@ -6,14 +6,10 @@ function getPatientUuidFromUrl(): string {
   return match && match[1];
 }
 export interface OrderBasketStore {
-<<<<<<< HEAD
-  items: Array<OrderBasketItem>;
   pendingOrders: boolean;
-=======
   items: {
     [patientUuid: string]: [];
   };
->>>>>>> main
 }
 
 export interface OrderBasketStoreActions {
@@ -22,12 +18,8 @@ export interface OrderBasketStoreActions {
 }
 
 export const orderBasketStore = createGlobalStore<OrderBasketStore>('drug-order-basket', {
-<<<<<<< HEAD
-  items: [],
   pendingOrders: false,
-=======
   items: {},
->>>>>>> main
 });
 
 export const orderBasketStoreActions = {
