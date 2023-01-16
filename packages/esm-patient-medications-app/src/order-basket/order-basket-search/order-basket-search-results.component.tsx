@@ -130,9 +130,10 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, onSea
           onClick={() => handleSearchResultClicked(orderItem, false)}
         >
           <div className={styles.searchResultTile}>
-            <div className={styles.searchResultTileContent}>
+            <div className={`${styles.searchResultTileContent} ${styles.text02}`}>
               <p>
-                <strong>{drug?.display}</strong> {drug?.strength && <>&mdash; {drug?.strength.toLowerCase()}</>}{' '}
+                <span className={styles.productiveHeading01}>{drug?.display}</span>{' '}
+                {drug?.strength && <>&mdash; {drug?.strength.toLowerCase()}</>}{' '}
                 {drug?.dosageForm?.display && <>&mdash; {drug?.dosageForm?.display.toLowerCase()}</>}
               </p>
               {fetchingDrugOrderTemplatesError ? (
