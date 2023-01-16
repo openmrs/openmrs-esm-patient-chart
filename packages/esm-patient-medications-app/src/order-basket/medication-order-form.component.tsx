@@ -171,7 +171,6 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
       if (observer.current) observer.current.disconnect();
       observer.current = new IntersectionObserver(
         ([e]) => {
-          console.log(e.intersectionRatio);
           setShowMedicationHeader(e.intersectionRatio < 1);
         },
         {
