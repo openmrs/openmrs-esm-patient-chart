@@ -33,7 +33,7 @@
   "errorFetchingDrugResults": "Error fetching results for \"{searchTerm}\"",
   "errorFetchingDurationUnits": "Error occured when fetching duration units",
   "fetchingDurationUnits": "Fetching duration units...",
-  "freeTextDosage": "Free Text Dosage",
+  "freeTextDosage": "Free text dosage",
   "indication": "Indication",
   "indicationPlaceholder": "e.g. \"Hypertension\"",
   "medicationDurationAndUnit": "for {duration} {durationUnit}",

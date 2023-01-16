@@ -253,8 +253,8 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
               <Column md={8}>
                 <TextArea
                   light={isTablet}
-                  labelText={t('freeTextDosage', 'Free Text Dosage')}
-                  placeholder={t('freeTextDosage', 'Free Text Dosage')}
+                  labelText={t('freeTextDosage', 'Free text dosage')}
+                  placeholder={t('freeTextDosage', 'Free text dosage')}
                   value={orderBasketItem.freeTextDosage}
                   maxLength={65535}
                   onChange={(e) =>
