@@ -125,6 +125,7 @@
   "status": "Status",
   "tests": "Tests",
   "time": "Time",
+  "TogglePatientListDetails": "Toggle patient List Details",
   "type": "Type",
   "unknown": "Unknown",
   "visit": "Visit",

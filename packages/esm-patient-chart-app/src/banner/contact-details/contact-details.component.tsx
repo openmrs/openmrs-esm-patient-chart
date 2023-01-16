@@ -131,7 +131,7 @@ const PatientLists: React.FC<{ patientId: string }> = ({ patientId }) => {
       );
     }
     return <p>--</p>;
-  }, [formattedPatientLists?.length, showPatientListDetails]);
+  }, [formattedPatientLists, showPatientListDetails, headerTitle, isError, isLoading]);
 
   return (
     <>
