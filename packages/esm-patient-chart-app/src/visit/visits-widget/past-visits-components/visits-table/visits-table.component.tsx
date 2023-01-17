@@ -64,11 +64,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits }) =>
     return visits;
   }, [filter, visits]);
 
-  const {
-    results: paginatedVisits,
-    goTo,
-    currentPage,
-  } = usePagination(filteredRows ? filteredRows : visits ?? [], visitCount);
+  const { results: paginatedVisits, goTo, currentPage } = usePagination(filteredRows ?? [], visitCount);
 
   const tableHeaders = [
     {
@@ -282,7 +278,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits }) =>
               onPageNumberChange={({ page }) => goTo(page)}
               pageNumber={currentPage}
               pageSize={visitCount}
-              totalItems={filteredRows ? filteredRows.length : visits.length}
+              totalItems={filteredRows.length}
             />
           ) : null}
         </>
