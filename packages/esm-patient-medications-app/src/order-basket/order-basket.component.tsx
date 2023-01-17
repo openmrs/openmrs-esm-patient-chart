@@ -62,7 +62,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
     if (medicationOrderFormItem) {
       medicationOrderFormItem.careSetting = config.careSettingUuid;
       medicationOrderFormItem.orderer = sessionObject.currentProvider?.uuid;
-      medicationOrderFormItem.quantityUnits = config.quantityUnitsUuid;
+      // medicationOrderFormItem.quantityUnits = config.quantityUnitsUuid;
     }
   }, [medicationOrderFormItem, config, sessionObject]);
 

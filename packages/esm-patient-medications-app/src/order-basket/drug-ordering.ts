@@ -50,7 +50,7 @@ function medicationOrderToApiDto(
         asNeededCondition: order.asNeededCondition,
         numRefills: order.numRefills,
         quantity: order.pillsDispensed,
-        quantityUnits: order.quantityUnits,
+        quantityUnits: order.quantityUnits?.valueCoded,
         duration: order.duration,
         durationUnits: order.durationUnit?.uuid,
         dosingType: order.isFreeTextDosage
@@ -79,7 +79,7 @@ function medicationOrderToApiDto(
         asNeededCondition: order.asNeededCondition,
         numRefills: order.numRefills,
         quantity: order.pillsDispensed,
-        quantityUnits: order.quantityUnits,
+        quantityUnits: order.quantityUnits?.valueCoded,
         duration: order.duration,
         durationUnits: order.durationUnit?.uuid,
         dosingType: order.isFreeTextDosage

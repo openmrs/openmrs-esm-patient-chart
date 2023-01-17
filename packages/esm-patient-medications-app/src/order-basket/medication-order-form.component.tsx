@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Button,
   ButtonSet,
@@ -16,6 +16,7 @@ import {
   DatePickerInput,
   InlineNotification,
   Layer,
+  TextInputSkeleton,
 } from '@carbon/react';
 import { ArrowLeft, Add, Subtract } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
@@ -23,26 +24,13 @@ import { useConfig, useLayoutType, usePatient, age, formatDate, parseDate } from
 import { OrderBasketItem } from '../types/order-basket-item';
 import { useOrderConfig } from '../api/order-config';
 import styles from './medication-order-form.scss';
-import { useDurationUnits } from '../api/api';
 import capitalize from 'lodash-es/capitalize';
+import { ConfigObject } from '../config-schema';
 
 export interface MedicationOrderFormProps {
   initialOrderBasketItem: OrderBasketItem;
   onSign: (finalizedOrder: OrderBasketItem) => void;
   onCancel: () => void;
-}
-
-function addIfNotPresent(
-  optionsList: Array<{ id: string; text: string }>,
-  option: { value: any; valueCoded?: string },
-): Array<{ id: string; text: string }> {
-  let ret = optionsList || [];
-  if (!option) return ret;
-  const id = option?.valueCoded ? option?.valueCoded : `${option.value}`;
-  if (!ret.some((x) => x.id == id)) {
-    return [...ret, { id: id, text: `${option.value}` }];
-  }
-  return ret;
 }
 
 function MedicationInfoHeader({ orderBasketItem }: { orderBasketItem: OrderBasketItem }) {
@@ -85,13 +73,13 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
   const isTablet = useLayoutType() === 'tablet';
   const [orderBasketItem, setOrderBasketItem] = useState(initialOrderBasketItem);
   const template = initialOrderBasketItem.template;
-  const { orderConfigObject } = useOrderConfig();
-  const config = useConfig();
   const {
-    isLoadingDurationUnits,
-    durationUnits,
-    error: fetchingDurationUnitsError,
-  } = useDurationUnits(config.durationUnitsConcept);
+    isLoading: isLoadingOrderConfig,
+    orderConfigObject: { drugRoutes, drugDosingUnits, drugDispensingUnits, orderFrequencies, durationUnits },
+    error: errorFetchingOrderConfig,
+  } = useOrderConfig();
+  const config = useConfig() as ConfigObject;
+
   const [showStickyMedicationHeader, setShowMedicationHeader] = useState(false);
   const { patient, isLoading: isLoadingPatientDetails } = usePatient();
   const patientName = `${patient?.name?.[0]?.given?.join(' ')} ${patient?.name?.[0].family}`;
@@ -106,64 +94,6 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
       )}
     </>
   );
-
-  const [dosingUnitOptions, setDosingUnitOptions] = useState(
-    addIfNotPresent(
-      template?.dosingInstructions?.units?.map((x) => ({
-        id: x.valueCoded,
-        text: x.value,
-      })),
-      initialOrderBasketItem.unit,
-    ),
-  );
-
-  const [frequencyOptions, setFrequencyOptions] = useState(
-    addIfNotPresent(
-      template?.dosingInstructions?.frequency?.map((x) => ({
-        id: x.valueCoded,
-        text: x.value,
-      })),
-      initialOrderBasketItem.frequency,
-    ),
-  );
-  const [routeOptions, setRouteOptions] = useState(
-    addIfNotPresent(
-      template?.dosingInstructions?.route?.map((x) => ({
-        id: x.valueCoded,
-        text: x.value,
-      })),
-      initialOrderBasketItem.route,
-    ),
-  );
-
-  useEffect(() => {
-    if (orderConfigObject) {
-      // sync frequency options with what's defined in the order config
-      const availableFrequencies = frequencyOptions.map((x) => x.id);
-      const otherFrequencyOptions = [];
-      orderConfigObject.orderFrequencies.forEach(
-        (x) => availableFrequencies.includes(x.uuid) || otherFrequencyOptions.push({ id: x.uuid, text: x.display }),
-      );
-      setFrequencyOptions([...frequencyOptions, ...otherFrequencyOptions]);
-
-      // sync dosage.unit options with what's defined in the order config
-      const availableDosingUnits = dosingUnitOptions.map((x) => x.id);
-      const otherDosingUnits = [];
-      orderConfigObject.drugDosingUnits.forEach(
-        (x) => availableDosingUnits.includes(x.uuid) || otherDosingUnits.push({ id: x.uuid, text: x.display }),
-      );
-      setDosingUnitOptions([...dosingUnitOptions, ...otherDosingUnits]);
-
-      // sync route options with what's defined in the order config
-      const availableRoutes = routeOptions.map((x) => x.id);
-      const otherRouteOptions = [];
-      orderConfigObject.drugRoutes.forEach(
-        (x) => availableRoutes.includes(x.uuid) || otherRouteOptions.push({ id: x.uuid, text: x.display }),
-      );
-      setRouteOptions([...routeOptions, ...otherRouteOptions]);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [orderConfigObject]);
 
   const observer = useRef(null);
   const medicationInfoHeaderRef = useCallback(
@@ -199,12 +129,12 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
         </div>
       )}
       <Form className={styles.orderForm} onSubmit={() => onSign(orderBasketItem)} id="drugOrderForm">
-        {fetchingDurationUnitsError && (
+        {errorFetchingOrderConfig && (
           <InlineNotification
             hideCloseButton
             kind="error"
             lowContrast
-            title={t('errorFetchingDurationUnits', 'Error occured when fetching duration units')}
+            title={t('errorFetchingDurationUnits', 'Error occured when fetching Order config')}
             subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
           />
         )}
@@ -294,88 +224,99 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                 </Column>
                 <Column lg={4} md={2} sm={4}>
                   <InputWrapper>
-                    <ComboBox
-                      size={isTablet ? 'lg' : 'md'}
-                      id="dosingUnits"
-                      light={isTablet}
-                      items={dosingUnitOptions}
-                      placeholder={t('editDosageUnitsPlaceholder', 'Unit')}
-                      titleText={t('editDosageUnitsTitle', 'Dose unit')}
-                      itemToString={(item) => item?.text}
-                      selectedItem={
-                        dosingUnitOptions?.length
-                          ? {
-                              id: orderBasketItem.unit?.valueCoded,
-                              text: orderBasketItem.unit?.value,
-                            }
-                          : null
-                      }
-                      onChange={({ selectedItem }) => {
-                        setOrderBasketItem({
-                          ...orderBasketItem,
-                          unit: !!selectedItem?.id
-                            ? { value: selectedItem.text, valueCoded: selectedItem.id }
-                            : initialOrderBasketItem.route,
-                        });
-                      }}
-                      required
-                    />
+                    {!isLoadingOrderConfig && !errorFetchingOrderConfig ? (
+                      <ComboBox
+                        size={isTablet ? 'lg' : 'md'}
+                        id="dosingUnits"
+                        light={isTablet}
+                        items={drugDosingUnits}
+                        placeholder={t('editDosageUnitsPlaceholder', 'Unit')}
+                        titleText={t('editDosageUnitsTitle', 'Dose unit')}
+                        itemToString={(item) => item?.display}
+                        selectedItem={{
+                          uuid: orderBasketItem?.unit?.valueCoded,
+                          display: orderBasketItem?.unit?.value,
+                        }}
+                        onChange={({ selectedItem }) => {
+                          setOrderBasketItem({
+                            ...orderBasketItem,
+                            unit: {
+                              valueCoded: selectedItem?.uuid,
+                              value: selectedItem?.display,
+                            },
+                            // Since the default selection for the quantity units
+                            // should be same as dosing units
+                            quantityUnits: orderBasketItem.quantityUnits ?? {
+                              value: selectedItem?.display,
+                              valueCoded: selectedItem?.uuid,
+                            },
+                          });
+                        }}
+                        required
+                      />
+                    ) : (
+                      <TextInputSkeleton />
+                    )}
                   </InputWrapper>
                 </Column>
                 <Column lg={8} md={4} sm={4}>
                   <InputWrapper>
-                    <ComboBox
-                      size={isTablet ? 'lg' : 'md'}
-                      id="editRoute"
-                      light={isTablet}
-                      items={routeOptions}
-                      selectedItem={{
-                        id: orderBasketItem.route?.valueCoded,
-                        text: orderBasketItem.route?.value,
-                      }}
-                      // @ts-ignore
-                      placeholder={t('editRouteComboBoxTitle', 'Route')}
-                      titleText={t('editRouteComboBoxTitle', 'Route')}
-                      itemToString={(item) => item?.text}
-                      onChange={({ selectedItem }) => {
-                        setOrderBasketItem({
-                          ...orderBasketItem,
-                          route: !!selectedItem?.id
-                            ? { value: selectedItem.text, valueCoded: selectedItem.id }
-                            : initialOrderBasketItem.route,
-                        });
-                      }}
-                      required
-                    />
+                    {!isLoadingOrderConfig && !errorFetchingOrderConfig ? (
+                      <ComboBox
+                        size={isTablet ? 'lg' : 'md'}
+                        id="editRoute"
+                        light={isTablet}
+                        items={drugRoutes}
+                        selectedItem={{
+                          uuid: orderBasketItem.route?.valueCoded,
+                          display: orderBasketItem.route?.value,
+                        }}
+                        // @ts-ignore
+                        placeholder={t('editRouteComboBoxTitle', 'Route')}
+                        titleText={t('editRouteComboBoxTitle', 'Route')}
+                        itemToString={(item) => item?.display}
+                        onChange={({ selectedItem }) => {
+                          setOrderBasketItem({
+                            ...orderBasketItem,
+                            route: { value: selectedItem.display, valueCoded: selectedItem.uuid },
+                          });
+                        }}
+                        required
+                      />
+                    ) : (
+                      <TextInputSkeleton />
+                    )}
                   </InputWrapper>
                 </Column>
               </Grid>
               <Grid className={styles.gridRow}>
                 <Column lg={16} md={4} sm={4}>
                   <InputWrapper>
-                    <ComboBox
-                      size={isTablet ? 'lg' : 'md'}
-                      id="editFrequency"
-                      light={isTablet}
-                      items={frequencyOptions}
-                      selectedItem={{
-                        id: orderBasketItem.frequency?.valueCoded,
-                        text: orderBasketItem.frequency?.value,
-                      }}
-                      // @ts-ignore
-                      placeholder={t('editFrequencyComboBoxTitle', 'Frequency')}
-                      titleText={t('editFrequencyComboBoxTitle', 'Frequency')}
-                      itemToString={(item) => item?.text}
-                      onChange={({ selectedItem }) => {
-                        setOrderBasketItem({
-                          ...orderBasketItem,
-                          frequency: !!selectedItem?.id
-                            ? { value: selectedItem.text, valueCoded: selectedItem.id }
-                            : initialOrderBasketItem.frequency,
-                        });
-                      }}
-                      required
-                    />
+                    {!isLoadingOrderConfig && !errorFetchingOrderConfig ? (
+                      <ComboBox
+                        size={isTablet ? 'lg' : 'md'}
+                        id="editFrequency"
+                        light={isTablet}
+                        items={orderFrequencies}
+                        selectedItem={{
+                          uuid: orderBasketItem.frequency?.valueCoded,
+                          display: orderBasketItem.frequency?.value,
+                        }}
+                        // @ts-ignore
+                        placeholder={t('editFrequencyComboBoxTitle', 'Frequency')}
+                        titleText={t('editFrequencyComboBoxTitle', 'Frequency')}
+                        itemToString={(item) => item?.display}
+                        onChange={({ selectedItem }) => {
+                          setOrderBasketItem({
+                            ...orderBasketItem,
+                            frequency: { value: selectedItem.display, valueCoded: selectedItem.uuid },
+                          });
+                        }}
+                        required
+                      />
+                    ) : (
+                      <TextInputSkeleton />
+                    )}
                   </InputWrapper>
                 </Column>
               </Grid>
@@ -511,44 +452,33 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
             </Column>
             <Column lg={8} md={2} sm={4}>
               <InputWrapper>
-                <ComboBox
-                  size="lg"
-                  light={isTablet}
-                  id="durationUnitPlaceholder"
-                  titleText={t('durationUnit', 'Duration unit')}
-                  selectedItem={
-                    orderBasketItem.durationUnit?.uuid
-                      ? {
-                          id: orderBasketItem.durationUnit.uuid,
-                          text: orderBasketItem.durationUnit.display,
-                        }
-                      : null
-                  }
-                  items={
-                    durationUnits?.map((unit) => ({
-                      id: unit.uuid,
-                      text: unit.display,
-                    })) ?? []
-                  }
-                  itemToString={(item) => item?.text}
-                  // @ts-ignore
-                  placeholder={t('durationUnitPlaceholder', 'Duration Unit')}
-                  helperText={isLoadingDurationUnits && t('fetchingDurationUnits', 'Fetching duration units...')}
-                  onChange={({ selectedItem }) =>
-                    !!selectedItem
-                      ? setOrderBasketItem({
-                          ...orderBasketItem,
-                          durationUnit: {
-                            uuid: selectedItem.id,
-                            display: selectedItem.text,
-                          },
-                        })
-                      : setOrderBasketItem({
-                          ...orderBasketItem,
-                          durationUnit: config.daysDurationUnit,
-                        })
-                  }
-                />
+                {!isLoadingOrderConfig && !errorFetchingOrderConfig ? (
+                  <ComboBox
+                    size="lg"
+                    light={isTablet}
+                    id="durationUnitPlaceholder"
+                    titleText={t('durationUnit', 'Duration unit')}
+                    selectedItem={{
+                      uuid: orderBasketItem.durationUnit?.valueCoded,
+                      display: orderBasketItem.durationUnit?.value,
+                    }}
+                    items={durationUnits}
+                    itemToString={(item) => item?.display}
+                    // @ts-ignore
+                    placeholder={t('durationUnitPlaceholder', 'Duration Unit')}
+                    onChange={({ selectedItem }) =>
+                      setOrderBasketItem({
+                        ...orderBasketItem,
+                        durationUnit: {
+                          uuid: selectedItem.uuid,
+                          display: selectedItem.display,
+                        },
+                      })
+                    }
+                  />
+                ) : (
+                  <TextInputSkeleton />
+                )}
               </InputWrapper>
             </Column>
           </Grid>
@@ -573,6 +503,35 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                   }}
                   hideSteppers
                 />
+              </InputWrapper>
+            </Column>
+            <Column lg={8} md={3} sm={4}>
+              <InputWrapper>
+                {!isLoadingOrderConfig && !errorFetchingOrderConfig ? (
+                  <ComboBox
+                    size="lg"
+                    id="dispensingUnits"
+                    items={drugDispensingUnits}
+                    placeholder={t('editDispensingUnit', 'Quantity unit')}
+                    titleText={t('editDispensingUnit', 'Quantity unit')}
+                    itemToString={(item) => item?.display}
+                    selectedItem={{
+                      uuid: orderBasketItem?.quantityUnits?.valueCoded,
+                      display: orderBasketItem?.quantityUnits?.value,
+                    }}
+                    onChange={({ selectedItem }) => {
+                      setOrderBasketItem({
+                        ...orderBasketItem,
+                        quantityUnits: {
+                          valueCoded: selectedItem?.uuid,
+                          value: selectedItem?.display,
+                        },
+                      });
+                    }}
+                  />
+                ) : (
+                  <TextInputSkeleton />
+                )}
               </InputWrapper>
             </Column>
             <Column lg={8} md={3} sm={4}>

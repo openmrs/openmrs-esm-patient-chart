@@ -19,6 +19,7 @@ export interface DosingInstructions {
   route: Array<MedicationRoute>;
   frequency: Array<MedicationFrequency>;
   instructions?: Array<MedicationInstructions>;
+  quantityUnits?: Array<QuantityUnit>;
   asNeeded?: boolean;
   asNeededCondition?: string;
 }
@@ -34,6 +35,8 @@ export type MedicationRoute = CommonMedicationValueCoded;
 export type MedicationInstructions = CommonMedicationProps;
 
 export type DosingUnit = CommonMedicationValueCoded;
+
+export type QuantityUnit = CommonMedicationValueCoded;
 
 interface CommonMedicationProps {
   value: string;

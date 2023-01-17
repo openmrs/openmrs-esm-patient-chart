@@ -314,7 +314,10 @@ function OrderBasketItemActions({
         indication: medication.orderReasonNonCoded,
         orderer: medication.orderer.uuid,
         careSetting: medication.careSetting.uuid,
-        quantityUnits: medication.quantityUnits.uuid,
+        quantityUnits: {
+          value: medication.quantityUnits.display,
+          valueCoded: medication.quantityUnits.uuid,
+        },
       },
     ]);
     openOrderBasket();
@@ -360,7 +363,10 @@ function OrderBasketItemActions({
         indication: medication.orderReasonNonCoded,
         orderer: medication.orderer?.uuid,
         careSetting: medication.careSetting?.uuid,
-        quantityUnits: medication.quantityUnits?.uuid,
+        quantityUnits: {
+          value: medication.quantityUnits?.display,
+          valueCoded: medication.quantityUnits?.uuid,
+        },
       },
     ]);
     openOrderBasket();
@@ -406,7 +412,10 @@ function OrderBasketItemActions({
         indication: medication.orderReasonNonCoded,
         orderer: medication.orderer?.uuid,
         careSetting: medication.careSetting?.uuid,
-        quantityUnits: medication.quantityUnits?.uuid,
+        quantityUnits: {
+          value: medication.quantityUnits?.display,
+          valueCoded: medication.quantityUnits?.uuid,
+        },
       },
     ]);
     openOrderBasket();
