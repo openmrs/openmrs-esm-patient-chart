@@ -15,6 +15,7 @@ import {
   TableRow,
   Tile,
 } from '@carbon/react';
+import { Add } from '@carbon/react/icons';
 import { formatDate, parseDate, usePagination } from '@openmrs/esm-framework';
 import {
   EmptyState,
@@ -24,7 +25,6 @@ import {
   CardHeader,
 } from '@openmrs/esm-patient-common-lib';
 import { ConditionsActionMenu } from './conditions-action-menu.component';
-import { Add } from '@carbon/react/icons';
 import { useConditions } from './conditions.resource';
 import styles from './conditions-overview.scss';
 
