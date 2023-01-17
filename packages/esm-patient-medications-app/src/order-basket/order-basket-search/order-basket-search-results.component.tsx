@@ -128,7 +128,13 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, onSea
               config?.defaultOrderFrequencyConcept,
             ),
           ],
-    [templates, drug, config?.defaultDurationConcept],
+    [
+      templates,
+      drug,
+      config?.defaultDurationConcept,
+      config?.defaultDrugRouteConcept,
+      config?.defaultOrderFrequencyConcept,
+    ],
   );
 
   const handleSearchResultClicked = (searchResult: OrderBasketItem, directlyAddToBasket: boolean) => {

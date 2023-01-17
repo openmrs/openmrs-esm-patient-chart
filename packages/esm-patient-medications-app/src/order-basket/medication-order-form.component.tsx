@@ -86,7 +86,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
         display: initialOrderBasketItem?.drug?.dosageForm?.display,
       },
     ];
-  }, [orderConfigObject]);
+  }, [orderConfigObject, initialOrderBasketItem?.drug?.dosageForm]);
 
   const drugRoutes = useMemo(() => {
     if (orderConfigObject?.drugRoutes) {
@@ -98,7 +98,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
         display: config?.defaultDrugRouteConcept?.display,
       },
     ];
-  }, [orderConfigObject, initialOrderBasketItem]);
+  }, [orderConfigObject, config?.defaultDrugRouteConcept]);
 
   const drugDispensingUnits = useMemo(() => {
     if (orderConfigObject?.drugDispensingUnits) {
@@ -110,7 +110,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
         display: initialOrderBasketItem?.drug?.dosageForm?.display,
       },
     ];
-  }, [orderConfigObject]);
+  }, [orderConfigObject, initialOrderBasketItem?.drug?.dosageForm]);
 
   const durationUnits = useMemo(() => {
     if (orderConfigObject?.durationUnits) {
@@ -122,7 +122,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
         display: config?.defaultDurationConcept?.display,
       },
     ];
-  }, [orderConfigObject]);
+  }, [orderConfigObject, config?.defaultDurationConcept]);
 
   const orderFrequencies = useMemo(() => {
     if (orderConfigObject?.orderFrequencies) {
@@ -134,7 +134,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
         display: config?.defaultOrderFrequencyConcept?.display,
       },
     ];
-  }, [orderConfigObject]);
+  }, [orderConfigObject, config?.defaultOrderFrequencyConcept]);
 
   const [showStickyMedicationHeader, setShowMedicationHeader] = useState(false);
   const { patient, isLoading: isLoadingPatientDetails } = usePatient();

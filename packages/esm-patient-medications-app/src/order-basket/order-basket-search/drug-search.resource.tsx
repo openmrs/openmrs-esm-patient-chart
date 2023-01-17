@@ -62,7 +62,7 @@ export function useDrugTemplate(drugUuid: string): {
 }
 
 export function getDefault(template: OrderTemplate, prop: string) {
-  return template.dosingInstructions[prop].find((x) => x.default) || template.dosingInstructions[prop][0];
+  return template.dosingInstructions[prop]?.find((x) => x.default) || template.dosingInstructions[prop]?.[0];
 }
 
 export function getTemplateOrderBasketItem(
