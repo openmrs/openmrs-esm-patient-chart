@@ -13,7 +13,6 @@ export interface OrderConfig {
   drugDispensingUnits: Array<CommonConfigProps>;
   durationUnits: Array<CommonConfigProps>;
   orderFrequencies: Array<CommonConfigProps>;
-  quantityUnits: Array<CommonConfigProps>;
 }
 
 export function useOrderConfig() {
@@ -24,14 +23,7 @@ export function useOrderConfig() {
 
   const results = useMemo(
     () => ({
-      orderConfigObject: {
-        drugRoutes: data?.data?.drugRoutes,
-        drugDosingUnits: data?.data?.drugDosingUnits,
-        drugDispensingUnits: data?.data?.drugDispensingUnits,
-        durationUnits: data?.data?.durationUnits,
-        orderFrequencies: data?.data?.orderFrequencies,
-        quantityUnits: data?.data?.quantityUnits,
-      },
+      orderConfigObject: data?.data,
       isLoading: !data && !error,
       error,
     }),

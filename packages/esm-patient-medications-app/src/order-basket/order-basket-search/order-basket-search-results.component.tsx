@@ -111,9 +111,24 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, onSea
   const orderItems: Array<OrderBasketItem> = useMemo(
     () =>
       templates?.length
-        ? templates.map((template) => getTemplateOrderBasketItem(drug, config?.daysDurationUnit, template))
-        : [getTemplateOrderBasketItem(drug, config?.daysDurationUnit)],
-    [templates, drug, config?.daysDurationUnit],
+        ? templates.map((template) =>
+            getTemplateOrderBasketItem(
+              drug,
+              config?.defaultDurationConcept,
+              config?.defaultDrugRouteConcept,
+              config?.defaultOrderFrequencyConcept,
+              template,
+            ),
+          )
+        : [
+            getTemplateOrderBasketItem(
+              drug,
+              config?.defaultDurationConcept,
+              config?.defaultDrugRouteConcept,
+              config?.defaultOrderFrequencyConcept,
+            ),
+          ],
+    [templates, drug, config?.defaultDurationConcept],
   );
 
   const handleSearchResultClicked = (searchResult: OrderBasketItem, directlyAddToBasket: boolean) => {

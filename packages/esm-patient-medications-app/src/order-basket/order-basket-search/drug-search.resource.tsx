@@ -2,6 +2,7 @@ import { FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
 import useSWRImmutable from 'swr/immutable';
 import { DrugOrderTemplate, OrderTemplate } from '../../api/drug-order-template';
+import { ConfigConcept } from '../../config-schema';
 import { Drug } from '../../types/order';
 import { OrderBasketItem } from '../../types/order-basket-item';
 
@@ -65,8 +66,10 @@ export function getDefault(template: OrderTemplate, prop: string) {
 }
 
 export function getTemplateOrderBasketItem(
-  drug,
-  daysDurationUnit,
+  drug: Drug,
+  configDefaultDurationConcept: ConfigConcept,
+  configDefaultDrugRouteConcept: ConfigConcept,
+  configDefaultOrderFrequencyConcept: ConfigConcept,
   template: DrugOrderTemplate = null,
 ): OrderBasketItem {
   return template
@@ -77,14 +80,14 @@ export function getTemplateOrderBasketItem(
         dosage: getDefault(template.template, 'dose')?.value,
         frequency: getDefault(template.template, 'frequency'),
         route: getDefault(template.template, 'route'),
-        commonMedicationName: drug.name,
+        commonMedicationName: drug.display,
         isFreeTextDosage: false,
         patientInstructions: '',
         asNeeded: template.template.dosingInstructions.asNeeded || false,
         asNeededCondition: template.template.dosingInstructions.asNeededCondition,
         startDate: new Date(),
         duration: null,
-        durationUnit: daysDurationUnit,
+        durationUnit: configDefaultDurationConcept,
         pillsDispensed: 0,
         numRefills: 0,
         freeTextDosage: '',
@@ -92,29 +95,41 @@ export function getTemplateOrderBasketItem(
         template: template.template,
         orderer: null,
         careSetting: null,
-        quantityUnits: null,
+        quantityUnits: getDefault(template.template, 'quantityUnits'),
       }
     : {
         action: 'NEW',
         drug,
-        unit: null,
+        unit: {
+          value: drug?.dosageForm?.display,
+          valueCoded: drug?.dosageForm?.uuid,
+        },
         dosage: null,
-        frequency: null,
-        route: null,
-        commonMedicationName: drug.name,
+        frequency: {
+          value: configDefaultOrderFrequencyConcept?.display,
+          valueCoded: configDefaultOrderFrequencyConcept?.uuid,
+        },
+        route: {
+          value: configDefaultDrugRouteConcept?.display,
+          valueCoded: configDefaultDrugRouteConcept?.uuid,
+        },
+        commonMedicationName: drug.display,
         isFreeTextDosage: false,
         patientInstructions: '',
         asNeeded: false,
         asNeededCondition: null,
         startDate: new Date(),
         duration: null,
-        durationUnit: daysDurationUnit,
+        durationUnit: configDefaultDurationConcept,
         pillsDispensed: 0,
         numRefills: 0,
         freeTextDosage: '',
         indication: '',
         orderer: null,
         careSetting: null,
-        quantityUnits: null,
+        quantityUnits: {
+          value: drug?.dosageForm?.display,
+          valueCoded: drug?.dosageForm?.uuid,
+        },
       };
 }
