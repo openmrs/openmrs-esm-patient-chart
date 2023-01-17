@@ -65,6 +65,7 @@ export class FormCreationService {
    * @returns The new {@link Form} instance.
    */
   public async initAndCreateForm(createFormParams: CreateFormParams) {
+    console.log(createFormParams, 'crr--e');
     const { formSchema, encounter } = createFormParams;
 
     await this.wireDataSources(createFormParams, formSchema);
