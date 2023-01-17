@@ -3,36 +3,85 @@
 @import '~@openmrs/esm-styleguide/src/vars';
 @import "../root";
 
-.medicationDetailsHeader {
-  position: sticky;
-  background-color: var(--brand-02);
-  color: #ffffff;
-  border: 0;
-  top: 0rem;
-  padding: 1rem;
-  z-index: 1;
-}
-
 .orderForm {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 0rem 1rem;
+  padding: spacing.$spacing-03 0 0 spacing.$spacing-05;
+  height: calc(100vh - spacing.$spacing-12);
+
+  :global(.cds--css-grid) {
+    max-width: unset;
+  }
+
+  :global(.cds--css-grid-column) {
+    margin: 0 spacing.$spacing-03 !important;
+  }
+
+  :global(.cds--subgrid) {
+    margin: 0 calc(spacing.$spacing-03 * -1) !important;
+  }
+
+  :global(.cds--number--nosteppers.cds--number input[type=number]) {
+    padding-right: spacing.$spacing-05;
+  }
+
+  :global(.cds--list-box) {
+    border: none;
+  }
+
+  :global(.cds--number__control-btn) {
+    border: 0;
+  }
 }
 
-.heading {
-  @include type.type-style("heading-03");
-  margin: 0.5rem 0rem;
+.medicationInfo {
+  border: 0;
+  padding: spacing.$spacing-05;
+  margin-left: calc(spacing.$spacing-05 * -1);
+  box-sizing: border-box;
 }
 
-.flexGrid {
+.stickyMedicationInfo {
+  position: fixed;
+  background-color: #0072c3;
+  color: #ffffff;
+  top: spacing.$spacing-12;
+  z-index: 1;
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  width: 100%;
+
+  .medicationInfo {
+    margin: 0;
+  }
 }
 
-.dosingInstructionsHeading {
-  @include type.type-style("heading-compact-02");
-  margin-bottom: -1.85rem;
+.patientHeader {
+  padding: spacing.$spacing-03 spacing.$spacing-05 spacing.$spacing-06;
+  background-color: $ui-01;
+  
+  span:first-of-type {
+    margin-right: spacing.$spacing-03;
+  }
+  
+  .text02 {
+    color: $text-02;
+  }
+}
+
+.orderFormHeading {
+  @include type.type-style("heading-03");
+  margin-bottom: 0;
+}
+
+.formSection {
+  margin-bottom: spacing.$spacing-06;
+}
+
+.sectionHeader {
+  @include type.type-style("heading-01");
+  margin-bottom: spacing.$spacing-05;
 }
 
 .pullColumnContentRight > div {
@@ -64,33 +113,19 @@
   }
 }
 
-.fullHeightTextAreaContainer {
-  :global .cds--form-item {
-    height: 100%;
-
-    :global .cds--text-area__wrapper {
-      height: 100%;
-    }
-  }
-}
-
-.dosageInfo {
-  @include type.type-style("heading-compact-01");
-}
-
 .backButton {
   align-items: center;
   display: flex;
   justify-content: flex-start;
-  margin: 0.5rem 0rem;
+  margin: spacing.$spacing-03 0;
 
   button {
     display: flex;
    padding-left: 0 !important;
     svg {
       order: 1;
-      margin-right: 0.5rem;
-      margin-left: 0rem !important;
+      margin-right: spacing.$spacing-03;
+      margin-left: 0 !important;
     }
 
     span {
@@ -99,84 +134,83 @@
   }
 }
 
-.orderForm :global(.cds--btn-set .cds--btn) {
-  max-width: 50%;
-  height: 4rem;
-}
-
-.orderForm :global(.cds--css-grid-column) {
-  margin-left: 0px !important;
-}
-
-.tablet {
-  padding: 1.5rem 1rem;
-  background-color: $ui-02;
-}
-
-.desktop {
-  padding: 0rem;
-}
-
-/* Desktop */
-:global(.omrs-breakpoint-gt-tablet) {
-  .orderForm {
-    height: calc(100vh - 9rem);
-  }
-}
-
-/* Tablet */
-:global(.omrs-breakpoint-lt-desktop) {
-  .orderForm {
-    height: calc(100vh - 6rem);
-  }
-}
-
-.grid {
-  margin: 0rem;
-  padding: 0rem;
-}
-
-.row {
-  margin: 0.8rem 0rem 0rem;
-}
-
 .gridRow {
-  @extend .row;
   padding: 0px;
-  margin-bottom: 0.5rem;
+  margin-left: calc(spacing.$spacing-03 * -1);
 
   :global(.cds--number) {
     display: inline-block;
   }
 }
 
-.lastGridCell {
-  margin-right: 0px !important;
+.field {
+  margin-bottom: spacing.$spacing-05;
 }
 
-.patientInstructionsWrapper {
-  height: 16rem;
+.buttonSet {
+  margin-left: calc(spacing.$spacing-05 * -1);
+
+  :global(.cds--btn) {
+    width: 50%;
+    max-width: unset;
+  }
 }
 
-.prpWrapper {
-  :global .cds--form-item {
-    padding-top: 1rem;
-    height: 13rem;
+.linkedInput {
+  display: flex;
+  align-items: center;
 
-    :global .cds--text-area__wrapper {
-      height: 100%;
+  :global(.cds--layer-one), 
+  :global(.cds--layer) {
+    flex: 1;
+  }
+}
+
+.linkedInput::after {
+  content: "";
+  border: 1px solid $text-03;
+  width: spacing.$spacing-05;
+  margin-right: calc(spacing.$spacing-05 * -1);
+  margin-top: spacing.$spacing-05;
+}
+
+.customNumberInput {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-end;
+
+  :global(.cds--btn) {
+    background-color: #393939;
+  }
+  
+  .customInput {
+    input {
+      text-align: center;
     }
   }
 }
 
-.spacer {
-  margin-top: 3rem;
-}
+/* Tablet */
+:global(.omrs-breakpoint-lt-desktop) {
+  .orderForm {
+    height: 100%;
+    background-color: #ededed;
+  }
 
-.dosingWrapper {
-  display: flex;
-}
+  .stickyMedicationInfo {
+    top: spacing.$spacing-09;
+  }
 
-.dosingWrapper :global(.bx--combo-box) {
-  width: 75% !important;
+  .buttonSet {
+    padding: spacing.$spacing-06 spacing.$spacing-05;
+    background-color: $ui-02;
+  }
+
+  .prnTextArea {
+    grid-row: 2;
+  }
+
+  .prnCheckbox {
+    grid-row: 1;
+  }
 }
