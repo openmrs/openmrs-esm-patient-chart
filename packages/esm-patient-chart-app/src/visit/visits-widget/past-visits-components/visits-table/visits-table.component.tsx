@@ -140,7 +140,16 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits }) =>
       size={isTablet ? 'lg' : 'xs'}
       useZebraStyles={visits?.length > 1 ? true : false}
     >
-      {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getToolbarProps, onInputChange }) => (
+      {({
+        rows,
+        headers,
+        getHeaderProps,
+        getRowProps,
+        getExpandHeaderProps,
+        getTableProps,
+        getToolbarProps,
+        onInputChange,
+      }) => (
         <>
           <TableContainer className={styles.tableContainer}>
             <TableToolbar {...getToolbarProps()}>
@@ -169,7 +178,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits }) =>
             <Table {...getTableProps()}>
               <TableHead>
                 <TableRow>
-                  <TableExpandHeader />
+                  <TableExpandHeader enableToggle {...getExpandHeaderProps()} />
                   {headers.map((header, i) => (
                     <TableHeader className={styles.tableHeader} key={i} {...getHeaderProps({ header })}>
                       {header.header}
