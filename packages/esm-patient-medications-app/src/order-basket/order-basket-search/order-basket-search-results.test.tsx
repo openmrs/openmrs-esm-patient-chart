@@ -56,8 +56,6 @@ describe('OrderBasketSearchResults', () => {
       getTemplateOrderBasketItem(
         mockDrugSearchResultItems[0],
         undefined,
-        undefined,
-        undefined,
         mockDrugOrderTemplates[mockDrugSearchResultItems[0].uuid][0],
       ),
       false,

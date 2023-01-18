@@ -16,13 +16,12 @@ import {
   DatePickerInput,
   InlineNotification,
   Layer,
-  TextInputSkeleton,
 } from '@carbon/react';
 import { ArrowLeft, Add, Subtract } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
 import { useConfig, useLayoutType, usePatient, age, formatDate, parseDate } from '@openmrs/esm-framework';
 import { OrderBasketItem } from '../types/order-basket-item';
-import { OrderConfig, useOrderConfig } from '../api/order-config';
+import { useOrderConfig } from '../api/order-config';
 import styles from './medication-order-form.scss';
 import capitalize from 'lodash-es/capitalize';
 import { ConfigObject } from '../config-schema';
@@ -76,65 +75,42 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
   const { isLoading: isLoadingOrderConfig, orderConfigObject, error: errorFetchingOrderConfig } = useOrderConfig();
   const config = useConfig() as ConfigObject;
 
-  const drugDosingUnits = useMemo(() => {
-    if (orderConfigObject?.drugDosingUnits) {
-      return orderConfigObject?.drugDosingUnits;
-    }
-    return [
-      {
-        uuid: initialOrderBasketItem?.drug?.dosageForm?.uuid,
-        display: initialOrderBasketItem?.drug?.dosageForm?.display,
-      },
-    ];
-  }, [orderConfigObject, initialOrderBasketItem?.drug?.dosageForm]);
+  const drugDosingUnits = useMemo(
+    () =>
+      orderConfigObject?.drugDosingUnits ?? [
+        {
+          uuid: initialOrderBasketItem?.drug?.dosageForm?.uuid,
+          display: initialOrderBasketItem?.drug?.dosageForm?.display,
+        },
+      ],
+    [orderConfigObject, initialOrderBasketItem?.drug?.dosageForm],
+  );
 
-  const drugRoutes = useMemo(() => {
-    if (orderConfigObject?.drugRoutes) {
-      return orderConfigObject?.drugRoutes;
-    }
-    return [
-      {
-        uuid: config?.defaultDrugRouteConcept?.uuid,
-        display: config?.defaultDrugRouteConcept?.display,
-      },
-    ];
-  }, [orderConfigObject, config?.defaultDrugRouteConcept]);
+  const drugRoutes = useMemo(() => orderConfigObject?.drugRoutes ?? [], [orderConfigObject]);
 
-  const drugDispensingUnits = useMemo(() => {
-    if (orderConfigObject?.drugDispensingUnits) {
-      return orderConfigObject?.drugDispensingUnits;
-    }
-    return [
-      {
-        uuid: initialOrderBasketItem?.drug?.dosageForm?.uuid,
-        display: initialOrderBasketItem?.drug?.dosageForm?.display,
-      },
-    ];
-  }, [orderConfigObject, initialOrderBasketItem?.drug?.dosageForm]);
+  const drugDispensingUnits = useMemo(
+    () =>
+      orderConfigObject?.drugDispensingUnits ?? [
+        {
+          uuid: initialOrderBasketItem?.drug?.dosageForm?.uuid,
+          display: initialOrderBasketItem?.drug?.dosageForm?.display,
+        },
+      ],
+    [orderConfigObject, initialOrderBasketItem?.drug?.dosageForm],
+  );
 
-  const durationUnits = useMemo(() => {
-    if (orderConfigObject?.durationUnits) {
-      return orderConfigObject?.durationUnits;
-    }
-    return [
-      {
-        uuid: config?.defaultDurationConcept?.uuid,
-        display: config?.defaultDurationConcept?.display,
-      },
-    ];
-  }, [orderConfigObject, config?.defaultDurationConcept]);
+  const durationUnits = useMemo(
+    () =>
+      orderConfigObject?.durationUnits ?? [
+        {
+          uuid: config?.daysDurationUnit?.uuid,
+          display: config?.daysDurationUnit?.display,
+        },
+      ],
+    [orderConfigObject, config?.daysDurationUnit],
+  );
 
-  const orderFrequencies = useMemo(() => {
-    if (orderConfigObject?.orderFrequencies) {
-      return orderConfigObject?.orderFrequencies;
-    }
-    return [
-      {
-        uuid: config?.defaultOrderFrequencyConcept?.uuid,
-        display: config?.defaultOrderFrequencyConcept?.display,
-      },
-    ];
-  }, [orderConfigObject, config?.defaultOrderFrequencyConcept]);
+  const orderFrequencies = useMemo(() => orderConfigObject?.orderFrequencies ?? [], [orderConfigObject]);
 
   const [showStickyMedicationHeader, setShowMedicationHeader] = useState(false);
   const { patient, isLoading: isLoadingPatientDetails } = usePatient();
@@ -184,12 +160,13 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
           </span>
         </div>
       )}
+
       <Form className={styles.orderForm} onSubmit={() => onSign(orderBasketItem)} id="drugOrderForm">
         {errorFetchingOrderConfig && (
           <InlineNotification
-            hideCloseButton
             kind="error"
             lowContrast
+            className={styles.inlineNotification}
             title={t('errorFetchingDurationUnits', 'Error occured when fetching Order config')}
             subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
           />
@@ -567,6 +544,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                       },
                     });
                   }}
+                  required
                 />
               </InputWrapper>
             </Column>
@@ -630,7 +608,13 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
           <Button className={styles.button} kind="secondary" onClick={onCancel} size="xl">
             {t('discard', 'Discard')}
           </Button>
-          <Button className={styles.button} kind="primary" type="submit" size="xl">
+          <Button
+            className={styles.button}
+            kind="primary"
+            type="submit"
+            size="xl"
+            disabled={!!errorFetchingOrderConfig}
+          >
             {t('saveOrder', 'Save order')}
           </Button>
         </ButtonSet>

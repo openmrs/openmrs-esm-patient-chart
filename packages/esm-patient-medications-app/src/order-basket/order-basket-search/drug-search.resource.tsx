@@ -2,7 +2,6 @@ import { FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
 import useSWRImmutable from 'swr/immutable';
 import { DrugOrderTemplate, OrderTemplate } from '../../api/drug-order-template';
-import { ConfigConcept } from '../../config-schema';
 import { Drug } from '../../types/order';
 import { OrderBasketItem } from '../../types/order-basket-item';
 
@@ -67,16 +66,20 @@ export function getDefault(template: OrderTemplate, prop: string) {
 
 export function getTemplateOrderBasketItem(
   drug: Drug,
-  configDefaultDurationConcept: ConfigConcept,
-  configDefaultDrugRouteConcept: ConfigConcept,
-  configDefaultOrderFrequencyConcept: ConfigConcept,
+  configDefaultDurationConcept: {
+    uuid: string;
+    display: string;
+  },
   template: DrugOrderTemplate = null,
 ): OrderBasketItem {
   return template
     ? {
         action: 'NEW',
         drug,
-        unit: getDefault(template.template, 'unit'),
+        unit: getDefault(template.template, 'unit') ?? {
+          value: drug?.dosageForm?.display,
+          valueCoded: drug?.dosageForm?.uuid,
+        },
         dosage: getDefault(template.template, 'dose')?.value,
         frequency: getDefault(template.template, 'frequency'),
         route: getDefault(template.template, 'route'),
@@ -95,7 +98,10 @@ export function getTemplateOrderBasketItem(
         template: template.template,
         orderer: null,
         careSetting: null,
-        quantityUnits: getDefault(template.template, 'quantityUnits'),
+        quantityUnits: getDefault(template.template, 'quantityUnits') ?? {
+          value: drug?.dosageForm?.display,
+          valueCoded: drug?.dosageForm?.uuid,
+        },
       }
     : {
         action: 'NEW',
@@ -105,14 +111,8 @@ export function getTemplateOrderBasketItem(
           valueCoded: drug?.dosageForm?.uuid,
         },
         dosage: null,
-        frequency: {
-          value: configDefaultOrderFrequencyConcept?.display,
-          valueCoded: configDefaultOrderFrequencyConcept?.uuid,
-        },
-        route: {
-          value: configDefaultDrugRouteConcept?.display,
-          valueCoded: configDefaultDrugRouteConcept?.uuid,
-        },
+        frequency: null,
+        route: null,
         commonMedicationName: drug.display,
         isFreeTextDosage: false,
         patientInstructions: '',

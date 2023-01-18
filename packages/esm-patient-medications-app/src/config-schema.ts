@@ -1,15 +1,16 @@
 import { Type } from '@openmrs/esm-framework';
 
 export const configSchema = {
-  defaultDurationConcept: {
+  daysDurationUnit: {
+    _description:
+      'The default medication duration unit is days. The concept for that medication duration unit is specified here.',
     uuid: {
-      _type: Type.ConceptUuid,
+      _type: Type.UUID,
       _default: '1072AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-      _description: 'The concept for that medication duration unit is specified here.',
     },
     display: {
       _type: Type.String,
-      _description: 'The text to display for default duration unit.',
+      _description: 'The text to display in the medication duration units menu for the "days" unit.',
       _default: 'Days',
     },
   },
@@ -33,42 +34,15 @@ export const configSchema = {
     _description: "UUID for the 'Drug' order type to fetch medications",
     _default: '131168f4-15f5-102d-96e4-000c29c2a5d7',
   },
-  defaultOrderFrequencyConcept: {
-    uuid: {
-      _type: Type.ConceptUuid,
-      _default: '160862AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-      _description: 'The concept for that medication frequency unit is specified here.',
-    },
-    display: {
-      _type: Type.String,
-      _description: 'The text to display for default frequency unit.',
-      _default: 'Once daily',
-    },
-  },
-  defaultDrugRouteConcept: {
-    uuid: {
-      _type: Type.ConceptUuid,
-      _default: '160240AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-      _description: 'The concept for that medication route unit is specified here.',
-    },
-    display: {
-      _type: Type.String,
-      _description: 'The text to display for default drug route unit.',
-      _default: 'Oral',
-    },
-  },
 };
 
-export interface ConfigConcept {
-  uuid: string;
-  display: string;
-}
 export interface ConfigObject {
   careSettingUuid: string;
   drugOrderEncounterType: string;
   clinicianEncounterRole: string;
+  daysDurationUnit: {
+    uuid: string;
+    display: string;
+  };
   drugOrderTypeUUID: string;
-  defaultDurationConcept: ConfigConcept;
-  defaultOrderFrequencyConcept: ConfigConcept;
-  defaultDrugRouteConcept: ConfigConcept;
 }

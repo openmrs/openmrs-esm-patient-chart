@@ -132,14 +132,12 @@ const MedicationsDetailsTable = connect<
               {medication.quantity ? (
                 <span>
                   <span className={styles.label01}> &mdash; {t('quantity', 'Quantity').toUpperCase()}</span>{' '}
-                  {medication.quantity}
+                  {medication.quantity} {medication.quantityUnits.display}
                 </span>
               ) : null}
               {medication.dateStopped ? (
-                <span className={styles.bodyShort01}>
-                  <span className={styles.label01}>
-                    {medication.quantity ? ` — ` : ''} {t('endDate', 'End date').toUpperCase()}
-                  </span>{' '}
+                <span>
+                  <span className={styles.label01}> &mdash; {t('endDate', 'End date').toUpperCase()}</span>{' '}
                   {formatDate(new Date(medication.dateStopped))}
                 </span>
               ) : null}
