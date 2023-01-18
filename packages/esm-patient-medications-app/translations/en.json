@@ -32,7 +32,7 @@
   "errorCreatingAnEncounter": "Error when creating an encounter",
   "errorFetchingDrugOrderTemplates": "Error fetching drug order templates",
   "errorFetchingDrugResults": "Error fetching results for \"{searchTerm}\"",
-  "errorFetchingDurationUnits": "Error occured when fetching Order config",
+  "errorFetchingOrderConfig": "Error occured when fetching Order config",
   "freeTextDosage": "Free text dosage",
   "indication": "Indication",
   "indicationPlaceholder": "e.g. \"Hypertension\"",

@@ -167,7 +167,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
             kind="error"
             lowContrast
             className={styles.inlineNotification}
-            title={t('errorFetchingDurationUnits', 'Error occured when fetching Order config')}
+            title={t('errorFetchingOrderConfig', 'Error occured when fetching Order config')}
             subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
           />
         )}
@@ -299,7 +299,6 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                         uuid: orderBasketItem.route?.valueCoded,
                         display: orderBasketItem.route?.value,
                       }}
-                      // @ts-ignore
                       placeholder={t('editRouteComboBoxTitle', 'Route')}
                       titleText={t('editRouteComboBoxTitle', 'Route')}
                       itemToString={(item) => item?.display}
@@ -326,7 +325,6 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                         uuid: orderBasketItem.frequency?.valueCoded,
                         display: orderBasketItem.frequency?.value,
                       }}
-                      // @ts-ignore
                       placeholder={t('editFrequencyComboBoxTitle', 'Frequency')}
                       titleText={t('editFrequencyComboBoxTitle', 'Frequency')}
                       itemToString={(item) => item?.display}
@@ -484,7 +482,6 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                   }}
                   items={durationUnits}
                   itemToString={(item) => item?.display}
-                  // @ts-ignore
                   placeholder={t('durationUnitPlaceholder', 'Duration Unit')}
                   onChange={({ selectedItem }) =>
                     setOrderBasketItem({
