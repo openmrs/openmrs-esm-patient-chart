@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import capitalize from 'lodash-es/capitalize';
 import {
   Button,
   Tooltip,
@@ -27,15 +26,15 @@ import VisitHeaderSideMenu from './visit-header-side-menu.component';
 import styles from './visit-header.scss';
 import { MappedQueuePriority, MappedVisitQueueEntry, useVisitQueueEntries } from '../visit/queue-entry/queue.resource';
 import { EditQueueEntry } from '../visit/queue-entry/edit-queue-entry.component';
-
+ 
 interface PatientInfoProps {
   patient: fhir.Patient;
 }
-
+ 
 const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-
+ 
   // Render translated gender
   const getGender = (gender) => {
     switch (gender) {
@@ -54,7 +53,6 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
   const name = `${patient?.name?.[0].given?.join(' ')} ${patient?.name?.[0].family}`;
   const patientUuid = `${patient?.id}`;
   const info = `${parseInt(age(patient?.birthDate))}, ${getGender(patient?.gender)}`;
-  const tooltipText = `${name} ${info}`;
   const truncate = !isTablet && name.trim().length > 25;
   const { visitQueueEntries, isLoading } = useVisitQueueEntries();
   const [currentService, setCurrentService] = useState('');
@@ -62,7 +60,7 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
   const [priority, setPriority] = useState<MappedQueuePriority>('');
   const [queueEntry, setQueueEntry] = useState<MappedVisitQueueEntry>(null);
   const { currentVisit } = useVisit(patientUuid);
-
+ 
   const getTagType = (priority: string) => {
     switch (priority as MappedQueuePriority) {
       case 'Emergency':
@@ -73,7 +71,7 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
         return 'gray';
     }
   };
-
+ 
   useEffect(() => {
     visitQueueEntries?.forEach((element) => {
       if (element?.patientUuid == patientUuid && currentVisit?.uuid === element.visitUuid) {
@@ -89,11 +87,18 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
       }
     });
   }, [currentVisit?.uuid, patientUuid, visitQueueEntries]);
-
+ 
+  const text = (
+    <>
+      <span className={styles.tooltipPatientName}>{name}</span><br/>
+      <span className={styles.tooltipPatientInfo}>{info}</span>
+    </>
+  )
+ 
   return (
     <>
       {truncate ? (
-        <Tooltip align="bottom" label={tooltipText} tabIndex={0} triggerText="Tooltip label">
+        <Tooltip align="bottom-left" width={100} label={text}  tabIndex={0} triggerText="Tooltip label">
           <button className={styles.longPatientNameBtn} type="button">
             {name.slice(0, 25) + '...'}
           </button>
@@ -122,7 +127,7 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
     </>
   );
 };
-
+ 
 const VisitHeader: React.FC = () => {
   const { t } = useTranslation();
   const { patient } = usePatient();
@@ -130,30 +135,30 @@ const VisitHeader: React.FC = () => {
   const [isSideMenuExpanded, setIsSideMenuExpanded] = useState(false);
   const navMenuItems = useAssignedExtensions('patient-chart-dashboard-slot').map((extension) => extension.id);
   const { startVisitLabel } = useConfig();
-
+ 
   const { currentVisit, isValidating } = useVisit(patient?.id);
   const launchStartVisitForm = React.useCallback(() => launchPatientWorkspace('start-visit-workspace-form'), []);
   const showHamburger = useLayoutType() !== 'large-desktop' && navMenuItems.length > 0;
-
+ 
   const isLoading = isValidating && currentVisit === null;
   const visitNotLoaded = !isValidating && currentVisit === null;
   const toggleSideMenu = useCallback(() => setIsSideMenuExpanded((prevState) => !prevState), []);
-
+ 
   const noActiveVisit = !isLoading && visitNotLoaded;
-
+ 
   const originPage = localStorage.getItem('fromPage');
-
+ 
   const onClosePatientChart = useCallback(() => {
     originPage ? navigate({ to: `${window.spaBase}/${originPage}` }) : navigate({ to: `${window.spaBase}/home` });
     setShowVisitHeader((prevState) => !prevState);
     localStorage.removeItem('fromPage');
   }, [originPage]);
-
+ 
   const render = useCallback(() => {
     if (!showVisitHeader) {
       return null;
     }
-
+ 
     if (Object.keys(patient ?? {}).length > 0) {
       return (
         <Header aria-label="OpenMRS" className={styles.topNavHeader}>
@@ -218,8 +223,8 @@ const VisitHeader: React.FC = () => {
     onClosePatientChart,
     toggleSideMenu,
   ]);
-
+ 
   return <HeaderContainer render={render} />;
 };
-
+ 
 export default VisitHeader;
