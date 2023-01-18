@@ -8,7 +8,7 @@ dayjs.extend(isToday);
 export const appointmentsSearchUrl = `/ws/rest/v1/appointments/search`;
 
 export function useAppointments(patientUuid: string, startDate: string, abortController: AbortController) {
-  /* 
+  /*
     SWR isn't meant to make POST requests for data fetching. This is a consequence of the API only exposing this resource via POST.
     This works but likely isn't recommended.
   */

@@ -74,6 +74,7 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
       providers: [{ uuid: session.currentProvider.uuid, comments: appointmentNote }],
       locationUuid: userLocation,
       patientUuid: patientUuid,
+      comments: appointmentNote,
     };
 
     const abortController = new AbortController();
