@@ -51,10 +51,7 @@
   }
   .tooltipPatientName {
     @include type.type-style('productive-heading-01');
-    font-size: 14px;
-    line-height: 18px;
-    letter-spacing: 0.16px;
-    color: white; 
+    color:$ui-02; 
   }
   .longPatientNameBtn {
     background-color: transparent;
@@ -69,10 +66,8 @@
 }
 .tooltipPatientInfo {
   @include type.type-style('body-short-01');
-  font-size: 14px;
-  line-height: 18px;
-  letter-spacing: 0.16px;
-  color: #c6c6c6;
+  color:$color-gray-30;
+  margin-top:spacing.$spacing-03;
 }
  
 .tooltip :global(.cds--tooltip__trigger.cds--tooltip__trigger--definition) {

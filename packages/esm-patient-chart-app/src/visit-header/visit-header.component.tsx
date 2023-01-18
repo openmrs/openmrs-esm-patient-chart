@@ -26,15 +26,15 @@ import VisitHeaderSideMenu from './visit-header-side-menu.component';
 import styles from './visit-header.scss';
 import { MappedQueuePriority, MappedVisitQueueEntry, useVisitQueueEntries } from '../visit/queue-entry/queue.resource';
 import { EditQueueEntry } from '../visit/queue-entry/edit-queue-entry.component';
- 
+
 interface PatientInfoProps {
   patient: fhir.Patient;
 }
- 
+
 const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
- 
+
   // Render translated gender
   const getGender = (gender) => {
     switch (gender) {
@@ -60,7 +60,7 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
   const [priority, setPriority] = useState<MappedQueuePriority>('');
   const [queueEntry, setQueueEntry] = useState<MappedVisitQueueEntry>(null);
   const { currentVisit } = useVisit(patientUuid);
- 
+
   const getTagType = (priority: string) => {
     switch (priority as MappedQueuePriority) {
       case 'Emergency':
@@ -71,7 +71,7 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
         return 'gray';
     }
   };
- 
+
   useEffect(() => {
     visitQueueEntries?.forEach((element) => {
       if (element?.patientUuid == patientUuid && currentVisit?.uuid === element.visitUuid) {
@@ -87,18 +87,18 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
       }
     });
   }, [currentVisit?.uuid, patientUuid, visitQueueEntries]);
- 
+
   const text = (
     <>
-      <span className={styles.tooltipPatientName}>{name}</span><br/>
-      <span className={styles.tooltipPatientInfo}>{info}</span>
+      <p className={styles.tooltipPatientName}>{name}</p>
+      <p className={styles.tooltipPatientInfo}>{info}</p>
     </>
-  )
- 
+  );
+
   return (
     <>
       {truncate ? (
-        <Tooltip align="bottom-left" width={100} label={text}  tabIndex={0} triggerText="Tooltip label">
+        <Tooltip align="bottom-left" width={100} label={text} tabIndex={0} triggerText="Tooltip label">
           <button className={styles.longPatientNameBtn} type="button">
             {name.slice(0, 25) + '...'}
           </button>
@@ -127,7 +127,7 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
     </>
   );
 };
- 
+
 const VisitHeader: React.FC = () => {
   const { t } = useTranslation();
   const { patient } = usePatient();
@@ -135,30 +135,30 @@ const VisitHeader: React.FC = () => {
   const [isSideMenuExpanded, setIsSideMenuExpanded] = useState(false);
   const navMenuItems = useAssignedExtensions('patient-chart-dashboard-slot').map((extension) => extension.id);
   const { startVisitLabel } = useConfig();
- 
+
   const { currentVisit, isValidating } = useVisit(patient?.id);
   const launchStartVisitForm = React.useCallback(() => launchPatientWorkspace('start-visit-workspace-form'), []);
   const showHamburger = useLayoutType() !== 'large-desktop' && navMenuItems.length > 0;
- 
+
   const isLoading = isValidating && currentVisit === null;
   const visitNotLoaded = !isValidating && currentVisit === null;
   const toggleSideMenu = useCallback(() => setIsSideMenuExpanded((prevState) => !prevState), []);
- 
+
   const noActiveVisit = !isLoading && visitNotLoaded;
- 
+
   const originPage = localStorage.getItem('fromPage');
- 
+
   const onClosePatientChart = useCallback(() => {
     originPage ? navigate({ to: `${window.spaBase}/${originPage}` }) : navigate({ to: `${window.spaBase}/home` });
     setShowVisitHeader((prevState) => !prevState);
     localStorage.removeItem('fromPage');
   }, [originPage]);
- 
+
   const render = useCallback(() => {
     if (!showVisitHeader) {
       return null;
     }
- 
+
     if (Object.keys(patient ?? {}).length > 0) {
       return (
         <Header aria-label="OpenMRS" className={styles.topNavHeader}>
@@ -223,8 +223,8 @@ const VisitHeader: React.FC = () => {
     onClosePatientChart,
     toggleSideMenu,
   ]);
- 
+
   return <HeaderContainer render={render} />;
 };
- 
+
 export default VisitHeader;
