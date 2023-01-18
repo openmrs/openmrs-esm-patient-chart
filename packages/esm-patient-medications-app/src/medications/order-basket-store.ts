@@ -6,7 +6,6 @@ function getPatientUuidFromUrl(): string {
   return match && match[1];
 }
 export interface OrderBasketStore {
-  pendingOrders: boolean;
   items: {
     [patientUuid: string]: [];
   };
@@ -14,11 +13,9 @@ export interface OrderBasketStore {
 
 export interface OrderBasketStoreActions {
   setItems: (value: Array<OrderBasketItem> | (() => Array<OrderBasketItem>)) => void;
-  isPending: (status: boolean) => void;
 }
 
 export const orderBasketStore = createGlobalStore<OrderBasketStore>('drug-order-basket', {
-  pendingOrders: false,
   items: {},
 });
 
@@ -31,9 +28,6 @@ export const orderBasketStoreActions = {
         [patientUuid]: typeof value === 'function' ? value() : value,
       },
     };
-  },
-  isPending(_: OrderBasketStore, status: boolean) {
-    return { pendingOrders: status };
   },
 };
 
