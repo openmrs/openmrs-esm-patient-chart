@@ -18,6 +18,7 @@
   "noCurrentAppointments": "There are no appointments scheduled for today to display for this patient",
   "noPastAppointments": "There are no past appointments to display for this patient",
   "note": "Note",
+  "notes": "Notes",
   "noUpcomingAppointments": "There are no upcoming appointments to display for this patient",
   "past": "Past",
   "saveAndClose": "Save and close",
