@@ -61,15 +61,14 @@
   @include type.type-style("body-compact-02");
   color: $ui-04;
   display: flex;
-
-  span:not(:first-child) {
-    margin: 0rem 0.75rem;
-  }
+  flex-wrap: wrap;
 }
 
 .identifierTag {
   display: flex;
   align-items: center;
+  margin-right: 0.75rem;
+
 }
 
 .tag {
