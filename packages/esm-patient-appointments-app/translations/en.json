@@ -29,5 +29,6 @@
   "status": "Status",
   "time": "Time",
   "today": "Today",
+  "type": "Type",
   "upcoming": "Upcoming"
 }
