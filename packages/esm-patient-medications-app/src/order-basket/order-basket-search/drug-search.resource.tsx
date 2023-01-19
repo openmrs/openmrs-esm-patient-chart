@@ -76,10 +76,13 @@ export function getTemplateOrderBasketItem(
     ? {
         action: 'NEW',
         drug,
-        unit: getDefault(template.template, 'unit') ?? {
-          value: drug?.dosageForm?.display,
-          valueCoded: drug?.dosageForm?.uuid,
-        },
+        unit:
+          getDefault(template.template, 'unit') ?? drug?.dosageForm
+            ? {
+                value: drug?.dosageForm?.display,
+                valueCoded: drug?.dosageForm?.uuid,
+              }
+            : null,
         dosage: getDefault(template.template, 'dose')?.value,
         frequency: getDefault(template.template, 'frequency'),
         route: getDefault(template.template, 'route'),
@@ -90,7 +93,12 @@ export function getTemplateOrderBasketItem(
         asNeededCondition: template.template.dosingInstructions.asNeededCondition,
         startDate: new Date(),
         duration: null,
-        durationUnit: configDefaultDurationConcept,
+        durationUnit: configDefaultDurationConcept
+          ? {
+              value: configDefaultDurationConcept?.display,
+              valueCoded: configDefaultDurationConcept?.uuid,
+            }
+          : null,
         pillsDispensed: 0,
         numRefills: 0,
         freeTextDosage: '',
@@ -98,18 +106,23 @@ export function getTemplateOrderBasketItem(
         template: template.template,
         orderer: null,
         careSetting: null,
-        quantityUnits: getDefault(template.template, 'quantityUnits') ?? {
-          value: drug?.dosageForm?.display,
-          valueCoded: drug?.dosageForm?.uuid,
-        },
+        quantityUnits:
+          getDefault(template.template, 'quantityUnits') ?? drug?.dosageForm
+            ? {
+                value: drug?.dosageForm?.display,
+                valueCoded: drug?.dosageForm?.uuid,
+              }
+            : null,
       }
     : {
         action: 'NEW',
         drug,
-        unit: {
-          value: drug?.dosageForm?.display,
-          valueCoded: drug?.dosageForm?.uuid,
-        },
+        unit: drug?.dosageForm
+          ? {
+              value: drug?.dosageForm?.display,
+              valueCoded: drug?.dosageForm?.uuid,
+            }
+          : null,
         dosage: null,
         frequency: null,
         route: null,
@@ -120,16 +133,23 @@ export function getTemplateOrderBasketItem(
         asNeededCondition: null,
         startDate: new Date(),
         duration: null,
-        durationUnit: configDefaultDurationConcept,
+        durationUnit: configDefaultDurationConcept
+          ? {
+              value: configDefaultDurationConcept?.display,
+              valueCoded: configDefaultDurationConcept?.uuid,
+            }
+          : null,
         pillsDispensed: 0,
         numRefills: 0,
         freeTextDosage: '',
         indication: '',
         orderer: null,
         careSetting: null,
-        quantityUnits: {
-          value: drug?.dosageForm?.display,
-          valueCoded: drug?.dosageForm?.uuid,
-        },
+        quantityUnits: drug?.dosageForm
+          ? {
+              value: drug?.dosageForm?.display,
+              valueCoded: drug?.dosageForm?.uuid,
+            }
+          : null,
       };
 }

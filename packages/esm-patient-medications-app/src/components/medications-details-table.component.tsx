@@ -149,7 +149,7 @@ const MedicationsDetailsTable = connect<
         sortKey: dayjs(medication.dateActivated).toDate(),
         content: (
           <div className={styles.startDateColumn}>
-            <span>{formatDate(new Date(medication.dateActivated))}</span>
+            <p>{formatDate(new Date(medication.dateActivated))}</p>
             <InfoTooltip orderer={medication.orderer?.person?.display ?? '--'} />
           </div>
         ),
@@ -213,7 +213,9 @@ const MedicationsDetailsTable = connect<
                   {rows.map((row, rowIndex) => (
                     <TableRow className={styles.row} {...getRowProps({ row })}>
                       {row.cells.map((cell) => (
-                        <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+                        <TableCell className={styles.tableCell} key={cell.id}>
+                          {cell.value?.content ?? cell.value}
+                        </TableCell>
                       ))}
                       <TableCell className="cds--table-column-menu">
                         <OrderBasketItemActions
@@ -304,8 +306,8 @@ function OrderBasketItemActions({
         startDate: medication.dateActivated,
         duration: medication.duration,
         durationUnit: {
-          uuid: medication.durationUnits?.uuid,
-          display: medication.durationUnits?.display,
+          valueCoded: medication.durationUnits?.uuid,
+          value: medication.durationUnits?.display,
         },
         pillsDispensed: medication.quantity,
         numRefills: medication.numRefills,
@@ -353,8 +355,8 @@ function OrderBasketItemActions({
         asNeededCondition: medication.asNeededCondition,
         duration: medication.duration,
         durationUnit: {
-          uuid: medication.durationUnits?.uuid,
-          display: medication.durationUnits?.display,
+          valueCoded: medication.durationUnits?.uuid,
+          value: medication.durationUnits?.display,
         },
         pillsDispensed: medication.quantity,
         numRefills: medication.numRefills,
@@ -402,8 +404,8 @@ function OrderBasketItemActions({
         asNeededCondition: medication.asNeededCondition,
         duration: medication.duration,
         durationUnit: {
-          uuid: medication.durationUnits?.uuid,
-          display: medication.durationUnits?.display,
+          valueCoded: medication.durationUnits?.uuid,
+          value: medication.durationUnits?.display,
         },
         pillsDispensed: medication.quantity,
         numRefills: medication.numRefills,

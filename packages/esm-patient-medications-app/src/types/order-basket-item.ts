@@ -1,5 +1,6 @@
 import {
   DosingUnit,
+  DurationUnit,
   MedicationFrequency,
   MedicationRoute,
   OrderTemplate,
@@ -24,7 +25,7 @@ export interface OrderBasketItem {
   asNeeded: boolean;
   asNeededCondition: string;
   startDate: Date;
-  durationUnit: OpenmrsResource;
+  durationUnit: DurationUnit;
   duration: number | null;
   pillsDispensed: number;
   numRefills: number;

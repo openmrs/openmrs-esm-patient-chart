@@ -25,6 +25,13 @@ import { useOrderConfig } from '../api/order-config';
 import styles from './medication-order-form.scss';
 import capitalize from 'lodash-es/capitalize';
 import { ConfigObject } from '../config-schema';
+import {
+  DosingUnit,
+  DurationUnit,
+  MedicationFrequency,
+  MedicationRoute,
+  QuantityUnit,
+} from '../api/drug-order-template';
 
 export interface MedicationOrderFormProps {
   initialOrderBasketItem: OrderBasketItem;
@@ -75,42 +82,45 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
   const { isLoading: isLoadingOrderConfig, orderConfigObject, error: errorFetchingOrderConfig } = useOrderConfig();
   const config = useConfig() as ConfigObject;
 
-  const drugDosingUnits = useMemo(
+  const drugDosingUnits: Array<DosingUnit> = useMemo(
     () =>
       orderConfigObject?.drugDosingUnits ?? [
         {
-          uuid: initialOrderBasketItem?.drug?.dosageForm?.uuid,
-          display: initialOrderBasketItem?.drug?.dosageForm?.display,
+          valueCoded: initialOrderBasketItem?.drug?.dosageForm?.uuid,
+          value: initialOrderBasketItem?.drug?.dosageForm?.display,
         },
       ],
     [orderConfigObject, initialOrderBasketItem?.drug?.dosageForm],
   );
 
-  const drugRoutes = useMemo(() => orderConfigObject?.drugRoutes ?? [], [orderConfigObject]);
+  const drugRoutes: Array<MedicationRoute> = useMemo(() => orderConfigObject?.drugRoutes ?? [], [orderConfigObject]);
 
-  const drugDispensingUnits = useMemo(
+  const drugDispensingUnits: Array<QuantityUnit> = useMemo(
     () =>
       orderConfigObject?.drugDispensingUnits ?? [
         {
-          uuid: initialOrderBasketItem?.drug?.dosageForm?.uuid,
-          display: initialOrderBasketItem?.drug?.dosageForm?.display,
+          valueCoded: initialOrderBasketItem?.drug?.dosageForm?.uuid,
+          value: initialOrderBasketItem?.drug?.dosageForm?.display,
         },
       ],
     [orderConfigObject, initialOrderBasketItem?.drug?.dosageForm],
   );
 
-  const durationUnits = useMemo(
+  const durationUnits: Array<DurationUnit> = useMemo(
     () =>
       orderConfigObject?.durationUnits ?? [
         {
-          uuid: config?.daysDurationUnit?.uuid,
-          display: config?.daysDurationUnit?.display,
+          valueCoded: config?.daysDurationUnit?.uuid,
+          value: config?.daysDurationUnit?.display,
         },
       ],
     [orderConfigObject, config?.daysDurationUnit],
   );
 
-  const orderFrequencies = useMemo(() => orderConfigObject?.orderFrequencies ?? [], [orderConfigObject]);
+  const orderFrequencies: Array<MedicationFrequency> = useMemo(
+    () => orderConfigObject?.orderFrequencies ?? [],
+    [orderConfigObject],
+  );
 
   const [showStickyMedicationHeader, setShowMedicationHeader] = useState(false);
   const { patient, isLoading: isLoadingPatientDetails } = usePatient();
@@ -215,7 +225,6 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
             <Grid className={styles.gridRow}>
               <Column md={8}>
                 <TextArea
-                  light={isTablet}
                   labelText={t('freeTextDosage', 'Free text dosage')}
                   placeholder={t('freeTextDosage', 'Free text dosage')}
                   value={orderBasketItem.freeTextDosage}
@@ -238,7 +247,6 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                       <NumberInput
                         size={isTablet ? 'lg' : 'md'}
                         id="doseSelection"
-                        light={isTablet}
                         placeholder={t('editDoseComboBoxPlaceholder', 'Dose')}
                         label={t('editDoseComboBoxTitle', 'Dose')}
                         value={orderBasketItem?.dosage ?? 0}
@@ -260,28 +268,18 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                     <ComboBox
                       size={isTablet ? 'lg' : 'md'}
                       id="dosingUnits"
-                      light={isTablet}
                       items={drugDosingUnits}
                       placeholder={t('editDosageUnitsPlaceholder', 'Unit')}
                       titleText={t('editDosageUnitsTitle', 'Dose unit')}
-                      itemToString={(item) => item?.display}
-                      selectedItem={{
-                        uuid: orderBasketItem?.unit?.valueCoded,
-                        display: orderBasketItem?.unit?.value,
-                      }}
+                      itemToString={(item) => item?.value}
+                      selectedItem={orderBasketItem?.unit}
                       onChange={({ selectedItem }) => {
                         setOrderBasketItem({
                           ...orderBasketItem,
-                          unit: {
-                            valueCoded: selectedItem?.uuid,
-                            value: selectedItem?.display,
-                          },
+                          unit: selectedItem,
                           // Since the default selection for the quantity units
                           // should be same as dosing units
-                          quantityUnits: orderBasketItem.quantityUnits ?? {
-                            value: selectedItem?.display,
-                            valueCoded: selectedItem?.uuid,
-                          },
+                          quantityUnits: orderBasketItem.quantityUnits ?? selectedItem,
                         });
                       }}
                       required
@@ -293,19 +291,15 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                     <ComboBox
                       size={isTablet ? 'lg' : 'md'}
                       id="editRoute"
-                      light={isTablet}
                       items={drugRoutes}
-                      selectedItem={{
-                        uuid: orderBasketItem.route?.valueCoded,
-                        display: orderBasketItem.route?.value,
-                      }}
+                      selectedItem={orderBasketItem?.route}
                       placeholder={t('editRouteComboBoxTitle', 'Route')}
                       titleText={t('editRouteComboBoxTitle', 'Route')}
-                      itemToString={(item) => item?.display}
+                      itemToString={(item) => item?.value}
                       onChange={({ selectedItem }) => {
                         setOrderBasketItem({
                           ...orderBasketItem,
-                          route: { value: selectedItem.display, valueCoded: selectedItem.uuid },
+                          route: selectedItem,
                         });
                       }}
                       required
@@ -319,19 +313,15 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                     <ComboBox
                       size={isTablet ? 'lg' : 'md'}
                       id="editFrequency"
-                      light={isTablet}
                       items={orderFrequencies}
-                      selectedItem={{
-                        uuid: orderBasketItem.frequency?.valueCoded,
-                        display: orderBasketItem.frequency?.value,
-                      }}
+                      selectedItem={orderBasketItem?.frequency}
                       placeholder={t('editFrequencyComboBoxTitle', 'Frequency')}
                       titleText={t('editFrequencyComboBoxTitle', 'Frequency')}
-                      itemToString={(item) => item?.display}
+                      itemToString={(item) => item?.value}
                       onChange={({ selectedItem }) => {
                         setOrderBasketItem({
                           ...orderBasketItem,
-                          frequency: { value: selectedItem.display, valueCoded: selectedItem.uuid },
+                          frequency: selectedItem,
                         });
                       }}
                       required
@@ -344,7 +334,6 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                 <Column lg={16} md={4} sm={4}>
                   <InputWrapper>
                     <TextArea
-                      light={isTablet}
                       labelText={t('patientInstructions', 'Patient instructions')}
                       placeholder={t(
                         'patientInstructionsPlaceholder',
@@ -367,7 +356,6 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                     <Column lg={12} md={8} sm={4} className={styles.prnTextArea}>
                       <InputWrapper>
                         <TextArea
-                          light={isTablet}
                           labelText={t('prnReason', 'P.R.N. reason')}
                           placeholder={t('prnReasonPlaceholder', 'Reason to take medicine')}
                           rows={3}
@@ -414,7 +402,6 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
               <div className={styles.fullWidthDatePickerContainer}>
                 <InputWrapper>
                   <DatePicker
-                    light={isTablet}
                     datePickerType="single"
                     maxDate={new Date()}
                     value={[orderBasketItem.startDate]}
@@ -440,7 +427,6 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                 {!isTablet ? (
                   <NumberInput
                     size="lg"
-                    light={isTablet}
                     id="durationInput"
                     label={t('duration', 'Duration')}
                     min={1}
@@ -473,23 +459,16 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
               <InputWrapper>
                 <ComboBox
                   size="lg"
-                  light={isTablet}
                   id="durationUnitPlaceholder"
                   titleText={t('durationUnit', 'Duration unit')}
-                  selectedItem={{
-                    uuid: orderBasketItem.durationUnit?.uuid,
-                    display: orderBasketItem.durationUnit?.display,
-                  }}
+                  selectedItem={orderBasketItem?.durationUnit}
                   items={durationUnits}
-                  itemToString={(item) => item?.display}
+                  itemToString={(item) => item?.value}
                   placeholder={t('durationUnitPlaceholder', 'Duration Unit')}
                   onChange={({ selectedItem }) =>
                     setOrderBasketItem({
                       ...orderBasketItem,
-                      durationUnit: {
-                        uuid: selectedItem.uuid,
-                        display: selectedItem.display,
-                      },
+                      durationUnit: selectedItem,
                     })
                   }
                 />
@@ -504,7 +483,6 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
               <InputWrapper>
                 <NumberInput
                   size="lg"
-                  light={isTablet}
                   id="quantityDispensed"
                   value={orderBasketItem.pillsDispensed}
                   label={t('quantityToDispense', 'Quantity to dispense')}
@@ -527,18 +505,12 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                   items={drugDispensingUnits}
                   placeholder={t('editDispensingUnit', 'Quantity unit')}
                   titleText={t('editDispensingUnit', 'Quantity unit')}
-                  itemToString={(item) => item?.display}
-                  selectedItem={{
-                    uuid: orderBasketItem?.quantityUnits?.valueCoded,
-                    display: orderBasketItem?.quantityUnits?.value,
-                  }}
+                  itemToString={(item) => item?.value}
+                  selectedItem={orderBasketItem?.quantityUnits}
                   onChange={({ selectedItem }) => {
                     setOrderBasketItem({
                       ...orderBasketItem,
-                      quantityUnits: {
-                        valueCoded: selectedItem?.uuid,
-                        value: selectedItem?.display,
-                      },
+                      quantityUnits: selectedItem,
                     });
                   }}
                   required
@@ -550,7 +522,6 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                 {!isTablet ? (
                   <NumberInput
                     size="lg"
-                    light={isTablet}
                     id="prescriptionRefills"
                     min={0}
                     label={t('prescriptionRefills', 'Prescription refills')}
@@ -628,6 +599,7 @@ interface CustomNumberInputProps {
 }
 
 const CustomNumberInput: React.FC<CustomNumberInputProps> = ({ setValue, value, labelText, inputProps = {} }) => {
+  const { t } = useTranslation();
   const handleChange = (e) => {
     const val = e.target.value.replace(/[^\d]/g, '').slice(0, 2);
     setValue(val ? parseInt(val) : 0);
@@ -645,7 +617,7 @@ const CustomNumberInput: React.FC<CustomNumberInputProps> = ({ setValue, value, 
     <div className={styles.customElement}>
       <span className="cds--label">{labelText}</span>
       <div className={styles.customNumberInput}>
-        <Button hasIconOnly renderIcon={Subtract} onClick={decrement} />
+        <Button hasIconOnly renderIcon={Subtract} onClick={decrement} iconDescription={t('decrement', 'Decrement')} />
         <TextInput
           onChange={handleChange}
           value={value ? value : '--'}
@@ -653,7 +625,7 @@ const CustomNumberInput: React.FC<CustomNumberInputProps> = ({ setValue, value, 
           size="lg"
           className={styles.customInput}
         />
-        <Button hasIconOnly renderIcon={Add} onClick={increment} />
+        <Button hasIconOnly renderIcon={Add} onClick={increment} iconDescription={t('increment', 'Increment')} />
       </div>{' '}
     </div>
   );
