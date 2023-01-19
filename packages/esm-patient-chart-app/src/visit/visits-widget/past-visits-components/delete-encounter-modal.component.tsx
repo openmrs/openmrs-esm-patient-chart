@@ -19,7 +19,7 @@ const DeleteEncounterConfirmation: React.FC<DeleteEncounterConfirmationProps> = 
   return (
     <>
       <ModalHeader closeModal={close} className={styles.productiveHeading03}>
-        {t('deleteEncounter', 'Delete Encounter', { encounter: encounterTypeName })} ?
+        {t('deleteEncounter', 'Delete Encounter')} ?
       </ModalHeader>
       <ModalBody>
         <p className={styles.bodyLong01}>
