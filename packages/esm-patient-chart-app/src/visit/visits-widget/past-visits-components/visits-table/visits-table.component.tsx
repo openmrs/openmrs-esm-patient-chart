@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -45,20 +45,27 @@ type FilterProps = {
 };
 
 const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits }) => {
-  const encountersCount = 20;
+  const visitCount = 20;
   const { t } = useTranslation();
-  const encounterTypes = [...new Set(visits.map((encounter) => encounter.encounterType))].sort();
-  const { results: paginatedEncounters, goTo, currentPage } = usePagination(visits ?? [], encountersCount);
   const isTablet = useLayoutType() === 'tablet';
-  const [filteredRows, setFilteredRows] = useState<Array<MappedEncounter>>([]);
+
+  const encounterTypes = [...new Set(visits.map((encounter) => encounter.encounterType))].sort();
+
   const [filter, setFilter] = useState('');
 
-  useEffect(() => {
-    if (filter) {
-      setFilteredRows(visits?.filter((encounter) => encounter.encounterType === filter));
-      setFilter('');
+  const filteredRows = useMemo(() => {
+    if (!filter || filter == 'All') {
+      return visits;
     }
-  }, [filter, filteredRows, visits]);
+
+    if (filter) {
+      return visits?.filter((encounter) => encounter.encounterType === filter);
+    }
+
+    return visits;
+  }, [filter, visits]);
+
+  const { results: paginatedVisits, goTo, currentPage } = usePagination(filteredRows ?? [], visitCount);
 
   const tableHeaders = [
     {
@@ -88,21 +95,25 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits }) =>
     tableHeaders.sort((a, b) => (a.id > b.id ? 1 : -1));
   }
 
-  const launchWorkspace = (formUuid: string, visitUuid?: string, encounterUuid?: string, formName?: string) => {
-    formEntrySub.next({ formUuid, visitUuid, encounterUuid });
+  const launchWorkspace = (
+    formUuid: string,
+    visitUuid?: string,
+    encounterUuid?: string,
+    formName?: string,
+    visitTypeUuid?: string,
+  ) => {
+    formEntrySub.next({ formUuid, visitUuid, encounterUuid, visitTypeUuid });
     launchPatientWorkspace('patient-form-entry-workspace', { workspaceTitle: formName });
   };
 
-  const tableRows = React.useMemo(() => {
-    return (filteredRows.length ? filteredRows : paginatedEncounters)?.map((encounter) => ({
+  const tableRows = useMemo(() => {
+    return paginatedVisits?.map((encounter) => ({
       ...encounter,
       datetime: formatDatetime(parseDate(encounter?.datetime)),
     }));
-  }, [filteredRows, paginatedEncounters]);
+  }, [paginatedVisits]);
 
-  const handleEncounterTypeChange = ({ selectedItem }) => {
-    setFilter(selectedItem);
-  };
+  const handleEncounterTypeChange = ({ selectedItem }) => setFilter(selectedItem);
 
   const handleDeleteEncounter = React.useCallback(
     (encounterUuid: string, encounterTypeName?: string) => {
@@ -114,12 +125,10 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits }) =>
           deleteEncounter(encounterUuid, abortController)
             .then(() => {
               showToast({
-                title: t('deleteEncounter', 'Delete Encounter', { encounter: encounterTypeName }),
+                title: t('encounterDeleted', 'Encounter deleted'),
                 description: `Encounter ${t('successfullyDeleted', 'successfully deleted')}`,
                 kind: 'success',
               });
-
-              setFilteredRows(visits?.filter((encounter) => encounter.id !== encounterUuid));
             })
             .catch((error) => {
               showToast({
@@ -132,7 +141,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits }) =>
         },
       });
     },
-    [t, visits],
+    [t],
   );
 
   const handleFilter = ({ rowIds, headers, cellsById, inputValue, getCellId }: FilterProps): Array<string> => {
@@ -161,7 +170,16 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits }) =>
       size={isTablet ? 'lg' : 'xs'}
       useZebraStyles={visits?.length > 1 ? true : false}
     >
-      {({ rows, headers, getHeaderProps, getRowProps, getTableProps, getToolbarProps, onInputChange }) => (
+      {({
+        rows,
+        headers,
+        getHeaderProps,
+        getRowProps,
+        getExpandHeaderProps,
+        getTableProps,
+        getToolbarProps,
+        onInputChange,
+      }) => (
         <>
           <TableContainer className={styles.tableContainer}>
             <TableToolbar {...getToolbarProps()}>
@@ -190,7 +208,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits }) =>
             <Table {...getTableProps()}>
               <TableHead>
                 <TableRow>
-                  <TableExpandHeader />
+                  <TableExpandHeader enableToggle {...getExpandHeaderProps()} />
                   {headers.map((header, i) => (
                     <TableHeader className={styles.tableHeader} key={i} {...getHeaderProps({ header })}>
                       {header.header}
@@ -220,6 +238,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits }) =>
                                     visits[i].visitUuid,
                                     visits[i].id,
                                     visits[i].form.display,
+                                    visits[i].visitTypeUuid,
                                   )
                                 }
                               >
@@ -257,7 +276,15 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits }) =>
                           <EncounterObservations observations={visits[i].obs} />
                           <Button
                             kind="ghost"
-                            onClick={() => launchWorkspace(visits[i].form.uuid, visits[i].visitUuid, visits[i].id)}
+                            onClick={() =>
+                              launchWorkspace(
+                                visits[i].form.uuid,
+                                visits[i].visitUuid,
+                                visits[i].id,
+                                visits[i].form.display,
+                                visits[i].visitTypeUuid,
+                              )
+                            }
                             renderIcon={(props) => <Edit size={16} {...props} />}
                             style={{ marginLeft: '-1rem', marginTop: '0.5rem' }}
                           >
@@ -281,6 +308,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits }) =>
               </TableBody>
             </Table>
           </TableContainer>
+
           {rows.length === 0 ? (
             <div className={styles.tileContainer}>
               <Tile className={styles.tile}>
@@ -291,13 +319,14 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits }) =>
               </Tile>
             </div>
           ) : null}
+
           {showAllEncounters ? (
             <PatientChartPagination
-              currentItems={paginatedEncounters.length}
+              currentItems={paginatedVisits.length}
               onPageNumberChange={({ page }) => goTo(page)}
               pageNumber={currentPage}
-              pageSize={encountersCount}
-              totalItems={visits.length}
+              pageSize={visitCount}
+              totalItems={filteredRows.length}
             />
           ) : null}
         </>

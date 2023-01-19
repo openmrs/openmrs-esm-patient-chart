@@ -31,15 +31,18 @@ export default function OrderBasketItemTile({ orderBasketItem, onItemClick, onRe
         <br />
         {orderBasketItem.isFreeTextDosage ? (
           <>
-            <span className={styles.drugName}>{orderBasketItem.drug.concept.display}</span>
-            <span className={styles.dosageInfo}> &mdash; {orderBasketItem.freeTextDosage}</span>
+            <span className={styles.drugName}>{orderBasketItem.drug?.display}</span>
+            {orderBasketItem.freeTextDosage && (
+              <span className={styles.dosageInfo}> &mdash; {orderBasketItem.freeTextDosage}</span>
+            )}
           </>
         ) : (
           <>
-            <span className={styles.drugName}>{orderBasketItem.drug.concept.display}</span>
+            <span className={styles.drugName}>{orderBasketItem.drug?.display}</span>
             <span className={styles.dosageInfo}>
               {' '}
-              &mdash; {orderBasketItem.drug.strength} &mdash; {orderBasketItem.drug.dosageForm.display}
+              {orderBasketItem.drug?.strength && <>&mdash; {orderBasketItem.drug?.strength}</>}{' '}
+              {orderBasketItem.drug?.dosageForm?.display && <>&mdash; {orderBasketItem.drug.dosageForm?.display}</>}
             </span>
           </>
         )}
@@ -47,10 +50,10 @@ export default function OrderBasketItemTile({ orderBasketItem, onItemClick, onRe
         <span className={styles.label01}>
           <span className={styles.doseCaption}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
           <span className={styles.dosageLabel}>
-            {orderBasketItem.dosage} {orderBasketItem.unit.value}
+            {orderBasketItem.dosage} {orderBasketItem.unit?.value}
           </span>{' '}
           <span className={styles.dosageInfo}>
-            &mdash; {orderBasketItem.route.value} &mdash; {orderBasketItem.frequency.value} &mdash;{' '}
+            &mdash; {orderBasketItem.route?.value} &mdash; {orderBasketItem.frequency?.value} &mdash;{' '}
             {t('refills', 'Refills').toUpperCase()} {orderBasketItem.numRefills}{' '}
             {t('quantity', 'Quantity').toUpperCase()} {orderBasketItem.pillsDispensed}{' '}
           </span>

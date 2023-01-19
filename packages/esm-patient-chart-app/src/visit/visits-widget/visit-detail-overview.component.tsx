@@ -74,7 +74,12 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
                       ) : null}
                     </div>
                   </div>
-                  <VisitSummary encounters={visit.encounters} patientUuid={patientUuid} />
+                  <VisitSummary
+                    encounters={visit.encounters}
+                    patientUuid={patientUuid}
+                    visitUuid={visit.uuid}
+                    visitTypeUuid={visit.visitType.uuid}
+                  />
                 </div>
               ))
             ) : (
@@ -116,7 +121,8 @@ export function mapEncounters(visit) {
     obs: encounter?.obs,
     provider:
       encounter?.encounterProviders?.length > 0 ? encounter.encounterProviders[0].provider?.person?.display : '--',
-    visitUuid: visit?.visitType.uuid,
+    visitUuid: visit?.uuid,
     visitType: visit?.visitType?.name,
+    visitTypeUuid: visit?.visitType.uuid,
   }));
 }

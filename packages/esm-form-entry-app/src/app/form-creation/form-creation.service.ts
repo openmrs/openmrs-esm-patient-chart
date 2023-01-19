@@ -109,7 +109,8 @@ export class FormCreationService {
     this.dataSources.registerDataSource('personAttribute', dataSources.location);
     this.dataSources.registerDataSource('conceptAnswers', dataSources.conceptAnswers);
     this.dataSources.registerDataSource('patient', { visitTypeUuid }, true);
-    this.dataSources.registerDataSource('patient', dataSources, true);
+    const patientObj = this.formDataSourceService.getPatientObject(patient);
+    this.dataSources.registerDataSource('patient', patientObj, true);
     this.dataSources.registerDataSource('rawPrevEnc', createFormParams.previousEncounter, false);
     const rawPrevObs = await dataSources.recentObs(patient.id);
     this.dataSources.registerDataSource('rawPrevObs', rawPrevObs, false);

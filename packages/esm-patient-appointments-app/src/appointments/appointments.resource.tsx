@@ -32,15 +32,15 @@ export function useAppointments(patientUuid: string, startDate: string, abortCon
     : null;
 
   const pastAppointments = appointments?.filter(({ startDateTime }) =>
-    dayjs(new Date(startDateTime).toLocaleDateString()).isBefore(new Date().setHours(0, 0, 0, 0)),
+    dayjs(new Date(startDateTime).toISOString()).isBefore(new Date().setHours(0, 0, 0, 0)),
   );
 
   const upcomingAppointments = appointments?.filter(({ startDateTime }) =>
-    dayjs(new Date(startDateTime).toLocaleDateString()).isAfter(new Date()),
+    dayjs(new Date(startDateTime).toISOString()).isAfter(new Date()),
   );
 
   const todaysAppointments = appointments?.filter(({ startDateTime }) =>
-    dayjs(new Date(startDateTime).toLocaleDateString()).isToday(),
+    dayjs(new Date(startDateTime).toISOString()).isToday(),
   );
 
   return {

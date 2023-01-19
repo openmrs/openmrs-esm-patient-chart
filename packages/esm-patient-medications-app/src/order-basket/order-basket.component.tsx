@@ -1,19 +1,24 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
 import { connect } from 'unistore/react';
-import { Button, ButtonSet, DataTableSkeleton, InlineLoading } from '@carbon/react';
-import { showToast, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
-import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
+import { Button, ButtonSet, DataTableSkeleton, InlineNotification, ActionableNotification } from '@carbon/react';
+import { showModal, showToast, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
+import { EmptyState, ErrorState, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import { orderDrugs } from './drug-ordering';
 import { ConfigObject } from '../config-schema';
-import { useCurrentOrderBasketEncounter, useDurationUnits, usePatientOrders } from '../api/api';
+import { useCurrentOrderBasketEncounter, usePatientOrders } from '../api/api';
 import { OrderBasketItem } from '../types/order-basket-item';
-import { OrderBasketStore, OrderBasketStoreActions, orderBasketStoreActions } from '../medications/order-basket-store';
+import {
+  getOrderItems,
+  OrderBasketStore,
+  OrderBasketStoreActions,
+  orderBasketStoreActions,
+} from '../medications/order-basket-store';
 import MedicationOrderForm from './medication-order-form.component';
 import MedicationsDetailsTable from '../components/medications-details-table.component';
 import OrderBasketItemList from './order-basket-item-list.component';
-import OrderBasketSearch from './order-basket-search.component';
+import OrderBasketSearch from './order-basket-search/drug-search.component';
 import styles from './order-basket.scss';
 
 export interface OrderBasketProps {
@@ -25,16 +30,15 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
   'items',
   orderBasketStoreActions,
 )(({ patientUuid, items, closeWorkspace, setItems }: OrderBasketProps & OrderBasketStore & OrderBasketStoreActions) => {
+  const patientOrderItems = getOrderItems(items, patientUuid);
   const { t } = useTranslation();
   const { cache, mutate }: { cache: any; mutate: Function } = useSWRConfig();
   const displayText = t('activeMedicationsDisplayText', 'Active medications');
   const headerTitle = t('activeMedicationsHeaderTitle', 'active medications');
   const isTablet = useLayoutType() === 'tablet';
   const config = useConfig() as ConfigObject;
-
-  const { encounterUuid, isLoadingEncounterUuid } = useCurrentOrderBasketEncounter(patientUuid);
-
-  const isLoading = isLoadingEncounterUuid;
+  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
+  const { encounterUuid, creatingEncounterError } = useCurrentOrderBasketEncounter(patientUuid);
   const [medicationOrderFormItem, setMedicationOrderFormItem] = useState<OrderBasketItem | null>(null);
   const [isMedicationOrderFormVisible, setIsMedicationOrderFormVisible] = useState(false);
   const [onMedicationOrderFormSigned, setOnMedicationOrderFormSign] =
@@ -47,18 +51,24 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
     isValidating,
   } = usePatientOrders(patientUuid, 'ACTIVE', config.careSettingUuid);
 
+  const openStartVisitDialog = useCallback(() => {
+    const dispose = showModal('start-visit-dialog', {
+      patientUuid,
+      closeModal: () => dispose(),
+    });
+  }, [patientUuid]);
+
   useEffect(() => {
     if (medicationOrderFormItem) {
       medicationOrderFormItem.careSetting = config.careSettingUuid;
       medicationOrderFormItem.orderer = sessionObject.currentProvider?.uuid;
       medicationOrderFormItem.quantityUnits = config.quantityUnitsUuid;
-      medicationOrderFormItem.encounterUuid = encounterUuid;
     }
-  }, [medicationOrderFormItem, config, sessionObject, encounterUuid]);
+  }, [medicationOrderFormItem, config, sessionObject]);
 
   const handleSearchResultClicked = (searchResult: OrderBasketItem, directlyAddToBasket: boolean) => {
     if (directlyAddToBasket) {
-      setItems([...items, searchResult]);
+      setItems([...patientOrderItems, searchResult]);
     } else {
       openMedicationOrderFormForAddingNewOrder(searchResult);
     }
@@ -76,8 +86,10 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
 
   const handleSaveClicked = () => {
     const abortController = new AbortController();
-    orderDrugs(items, patientUuid, abortController).then((erroredItems) => {
+
+    orderDrugs(patientOrderItems, patientUuid, encounterUuid, abortController).then((erroredItems) => {
       setItems(erroredItems);
+
       if (erroredItems.length == 0) {
         closeWorkspace();
 
@@ -101,6 +113,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
           .forEach((url: string) => mutate(url));
       }
     });
+
     return () => abortController.abort();
   };
 
@@ -110,21 +123,19 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
   };
 
   const openMedicationOrderFormForAddingNewOrder = (newOrderBasketItem: OrderBasketItem) => {
-    openMedicationOrderForm(newOrderBasketItem, (finalizedOrder) => setItems([...items, finalizedOrder]));
+    openMedicationOrderForm(newOrderBasketItem, (finalizedOrder) => setItems([...patientOrderItems, finalizedOrder]));
   };
 
   const openMedicationOrderFormForUpdatingExistingOrder = (existingOrderIndex: number) => {
-    const order = items[existingOrderIndex];
+    const order = patientOrderItems[existingOrderIndex];
     openMedicationOrderForm(order, (finalizedOrder) =>
       setItems(() => {
-        const newOrders = [...items];
+        const newOrders = [...patientOrderItems];
         newOrders[existingOrderIndex] = finalizedOrder;
         return newOrders;
       }),
     );
   };
-
-  if (isLoading) return <InlineLoading className={styles.loader} description={t('loading', 'Loading...')} />;
 
   if (isMedicationOrderFormVisible) {
     return (
@@ -138,15 +149,15 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
 
   return (
     <>
-      <OrderBasketSearch encounterUuid={encounterUuid} onSearchResultClicked={handleSearchResultClicked} />
+      <OrderBasketSearch onSearchResultClicked={handleSearchResultClicked} />
       <div className={styles.container}>
         <div className={styles.orderBasketContainer}>
           <OrderBasketItemList
-            orderBasketItems={items}
-            onItemClicked={(order) => openMedicationOrderFormForUpdatingExistingOrder(items.indexOf(order))}
+            orderBasketItems={patientOrderItems}
+            onItemClicked={(order) => openMedicationOrderFormForUpdatingExistingOrder(patientOrderItems.indexOf(order))}
             onItemRemoveClicked={(order) => {
-              const newOrders = [...items];
-              newOrders.splice(items.indexOf(order), 1);
+              const newOrders = [...patientOrderItems];
+              newOrders.splice(patientOrderItems.indexOf(order), 1);
               setItems(newOrders);
             }}
           />
@@ -165,6 +176,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
                   showModifyButton={true}
                   showReorderButton={false}
                   showAddNewButton={false}
+                  patientUuid={patientUuid}
                 />
               );
             }
@@ -172,14 +184,45 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
             return <EmptyState displayText={displayText} headerTitle={headerTitle} />;
           })()}
         </div>
-        <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
-          <Button className={styles.button} kind="secondary" onClick={handleCancelClicked}>
-            {t('cancel', 'Cancel')}
-          </Button>
-          <Button className={styles.button} kind="primary" onClick={handleSaveClicked}>
-            {t('signAndClose', 'Sign and close')}
-          </Button>
-        </ButtonSet>
+
+        <div>
+          {creatingEncounterError && (
+            <InlineNotification
+              kind="error"
+              title={t('errorCreatingAnEncounter', 'Error when creating an encounter')}
+              subtitle={t('tryReopeningTheWorkspaceAgain', 'Please try launching the workspace again')}
+              lowContrast={true}
+              className={styles.inlineNotification}
+              inline
+            />
+          )}
+          {!currentVisit && (
+            <ActionableNotification
+              kind="error"
+              actionButtonLabel={t('startVisit', 'Start visit')}
+              onActionButtonClick={openStartVisitDialog}
+              title={t('startAVisitToRecordOrders', 'Start a visit to order')}
+              subtitle={t('activeVisitRequired', 'An active visit is required to make orders')}
+              lowContrast={true}
+              inline
+              className={styles.actionNotification}
+              hasFocus
+            />
+          )}
+          <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
+            <Button className={styles.button} kind="secondary" onClick={handleCancelClicked}>
+              {t('cancel', 'Cancel')}
+            </Button>
+            <Button
+              className={styles.button}
+              kind="primary"
+              onClick={handleSaveClicked}
+              disabled={!patientOrderItems?.length || !encounterUuid}
+            >
+              {t('signAndClose', 'Sign and close')}
+            </Button>
+          </ButtonSet>
+        </div>
       </div>
     </>
   );

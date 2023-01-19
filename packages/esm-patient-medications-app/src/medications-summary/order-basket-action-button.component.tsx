@@ -1,20 +1,25 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Tag } from '@carbon/react';
 import { ShoppingCart } from '@carbon/react/icons';
-import { useLayoutType, useStore } from '@openmrs/esm-framework';
-import { launchPatientWorkspace, useWorkspaces } from '@openmrs/esm-patient-common-lib';
-import { orderBasketStore } from '../medications/order-basket-store';
+import { useLayoutType, usePatient, useStore } from '@openmrs/esm-framework';
+import { useWorkspaces } from '@openmrs/esm-patient-common-lib';
+import { getOrderItems, orderBasketStore } from '../medications/order-basket-store';
 import styles from './order-basket-action-button.scss';
+import { useLaunchOrderBasket } from '../utils/launchOrderBasket';
 
 const OrderBasketActionButton: React.FC = () => {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const { workspaces } = useWorkspaces();
   const { items } = useStore(orderBasketStore);
+  const { patientUuid } = usePatient();
+
   const isActive = workspaces.find(({ name }) => name.includes('order-basket'));
 
-  const launchOrdersWorkspace = useCallback(() => launchPatientWorkspace('order-basket-workspace'), []);
+  const patientOrderItems = getOrderItems(items, patientUuid);
+
+  const { launchOrderBasket } = useLaunchOrderBasket(patientUuid);
 
   if (layout === 'tablet')
     return (
@@ -23,10 +28,11 @@ const OrderBasketActionButton: React.FC = () => {
         className={`${styles.container} ${isActive ? styles.active : ''}`}
         role="button"
         tabIndex={0}
-        onClick={launchOrdersWorkspace}
+        onClick={launchOrderBasket}
       >
         <div className={styles.elementContainer}>
-          <ShoppingCart size={20} /> {items?.length > 0 && <Tag className={styles.countTag}>{items?.length}</Tag>}
+          <ShoppingCart size={20} />{' '}
+          {patientOrderItems?.length > 0 && <Tag className={styles.countTag}>{patientOrderItems?.length}</Tag>}
         </div>
         <span>{t('orderBasket', 'Order Basket')}</span>
       </Button>
@@ -39,14 +45,14 @@ const OrderBasketActionButton: React.FC = () => {
       renderIcon={(props) => (
         <div className={styles.elementContainer}>
           <ShoppingCart size={20} {...props} />{' '}
-          {items?.length > 0 && <Tag className={styles.countTag}>{items?.length}</Tag>}
+          {patientOrderItems?.length > 0 && <Tag className={styles.countTag}>{patientOrderItems?.length}</Tag>}
         </div>
       )}
       hasIconOnly
-      iconDescription={t('orders', 'Orders')}
+      iconDescription={t('medications', 'Medications')}
       tooltipAlignment="end"
       tooltipPosition="bottom"
-      onClick={launchOrdersWorkspace}
+      onClick={launchOrderBasket}
     />
   );
 };

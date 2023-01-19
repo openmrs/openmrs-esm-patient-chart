@@ -17,8 +17,8 @@ const FormEntry: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspac
     () => ({
       view: 'form',
       formUuid: selectedForm?.formUuid ?? null,
-      visitUuid: currentVisit.uuid ?? null,
-      visitTypeUuid: currentVisit.visitType?.uuid ?? null,
+      visitUuid: selectedForm?.visitUuid ?? currentVisit?.uuid ?? null,
+      visitTypeUuid: selectedForm?.visitTypeUuid ?? currentVisit?.visitType?.uuid ?? null,
       patientUuid: patientUuid ?? null,
       patient,
       encounterUuid: selectedForm?.encounterUuid ?? null,
@@ -34,7 +34,7 @@ const FormEntry: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspac
 
   return (
     <div>
-      {selectedForm && patientUuid && patient && currentVisit && (
+      {selectedForm && patientUuid && patient && (
         <ExtensionSlot extensionSlotName="form-widget-slot" state={state} />
       )}
     </div>

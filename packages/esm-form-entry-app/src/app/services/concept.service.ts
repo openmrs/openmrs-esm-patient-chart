@@ -14,6 +14,8 @@ interface ConceptMetadata {
   display: string;
 }
 
+const chunkSize = 100;
+
 @Injectable()
 export class ConceptService {
   private headers = new HttpHeaders({
@@ -52,9 +54,13 @@ export class ConceptService {
    * @param conceptIdentifiers The concept identifiers to be chunked
    */
   public static getConceptReferenceUrls(conceptIdentifiers: Array<string>) {
-    const chunkSize = 100;
-    return [...new Set(conceptIdentifiers)]
-      .reduceRight((acc, _, __, array) => [...acc, array.splice(0, chunkSize)], [])
-      .map((partition) => `conceptreferences?references=${partition.join(',')}&v=custom:(uuid,display)`);
+    const accumulator = [];
+    for (let i = 0; i < conceptIdentifiers.length; i += chunkSize) {
+      accumulator.push(conceptIdentifiers.slice(i, i + chunkSize));
+    }
+
+    return accumulator.map(
+      (partition) => `conceptreferences?references=${partition.join(',')}&v=custom:(uuid,display)`,
+    );
   }
 }
