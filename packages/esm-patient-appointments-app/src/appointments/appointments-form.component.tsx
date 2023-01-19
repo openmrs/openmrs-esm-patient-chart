@@ -71,7 +71,7 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
       startDateTime: dayjs(startDatetime).format(),
       endDateTime: dayjs(endDatetime).format(),
       providerUuid: session?.currentProvider?.uuid,
-      providers: [{ uuid: session.currentProvider.uuid, comments: appointmentNote }],
+      providers: [{ uuid: session.currentProvider.uuid }],
       locationUuid: userLocation,
       patientUuid: patientUuid,
       comments: appointmentNote,
