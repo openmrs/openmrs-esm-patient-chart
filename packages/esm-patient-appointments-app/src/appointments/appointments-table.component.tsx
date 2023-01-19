@@ -35,6 +35,7 @@ const AppointmentsTable: React.FC<AppointmentTableProps> = ({ patientAppointment
       { key: 'location', header: t('location', 'Location') },
       { key: 'service', header: t('service', 'Service') },
       { key: 'status', header: t('status', 'Status') },
+      { key: 'type', header: t('type', 'Type') },
       { key: 'notes', header: t('notes', 'Notes') },
     ],
     [t],
@@ -49,6 +50,7 @@ const AppointmentsTable: React.FC<AppointmentTableProps> = ({ patientAppointment
           location: appointment?.location?.name ?? '—',
           service: appointment.service.name,
           status: appointment.status,
+          type: appointment.appointmentKind ?? '—',
           notes: appointment.comments ?? '—',
         };
       }),
