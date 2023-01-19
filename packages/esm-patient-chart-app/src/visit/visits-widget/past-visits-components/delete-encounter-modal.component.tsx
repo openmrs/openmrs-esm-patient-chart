@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ModalHeader, ModalBody, ModalFooter } from '@carbon/react';
-import styles from './delete-encounter-confirmation-modal.scss';
+import styles from '../../../root.scss';
 
 interface DeleteEncounterConfirmationProps {
   encounterTypeName?: string;
@@ -25,7 +25,7 @@ const DeleteEncounterConfirmation: React.FC<DeleteEncounterConfirmationProps> = 
         <p className={styles.bodyLong01}>
           {t(
             'deleteEncounterConfirmationText',
-            `Are you sure you want to delete this {encounter} encounter? This action can't be undone.`,
+            `Are you sure you want to delete this encounter? This action can't be undone.`,
             { encounter: encounterTypeName },
           )}
         </p>
