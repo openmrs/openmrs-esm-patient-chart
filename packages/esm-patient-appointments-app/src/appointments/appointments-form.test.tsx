@@ -118,9 +118,10 @@ describe('AppointmentForm', () => {
     expect(mockCreateAppointment).toHaveBeenCalledWith(
       expect.objectContaining({
         appointmentKind: 'Scheduled',
+        comments: '',
         serviceUuid: mockUseAppointmentServiceData[0].uuid,
         providerUuid: mockSessionDataResponse.data.currentProvider.uuid,
-        providers: [{ uuid: mockSessionDataResponse.data.currentProvider.uuid, comments: '' }],
+        providers: [{ uuid: mockSessionDataResponse.data.currentProvider.uuid }],
         locationUuid: mockLocationsDataResponse.data.results[1].uuid,
         patientUuid: mockPatient.id,
       }),
