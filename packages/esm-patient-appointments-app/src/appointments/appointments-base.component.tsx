@@ -23,6 +23,8 @@ const AppointmentsBase: React.FC<AppointmentsBaseProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const headerTitle = t('appointments', 'Appointments');
 
+  const [switchedView, setSwitchedView] = useState(false);
+
   const [contentSwitcherValue, setContentSwitcherValue] = useState(0);
   const startDate = dayjs(new Date().toISOString()).subtract(6, 'month').toISOString();
   const {
@@ -48,7 +50,13 @@ const AppointmentsBase: React.FC<AppointmentsBaseProps> = ({ patientUuid }) => {
             </span>
           ) : null}
           <div className={styles.contentSwitcherWrapper}>
-            <ContentSwitcher size="md" onChange={({ index }) => setContentSwitcherValue(index)}>
+            <ContentSwitcher
+              size="md"
+              onChange={({ index }) => {
+                setContentSwitcherValue(index);
+                setSwitchedView(true);
+              }}
+            >
               <Switch name={'upcoming'} text={t('upcoming', 'Upcoming')} />
               <Switch name={'today'} text={t('today', 'Today')} />
               <Switch name={'past'} text={t('past', 'Past')} />
@@ -67,7 +75,13 @@ const AppointmentsBase: React.FC<AppointmentsBaseProps> = ({ patientUuid }) => {
         {(() => {
           if (contentSwitcherValue === AppointmentTypes.UPCOMING) {
             if (appointmentsData.upcomingAppointments?.length) {
-              return <AppointmentsTable patientAppointments={appointmentsData?.upcomingAppointments} />;
+              return (
+                <AppointmentsTable
+                  patientAppointments={appointmentsData?.upcomingAppointments}
+                  switchedView={switchedView}
+                  setSwitchedView={setSwitchedView}
+                />
+              );
             }
             return (
               <Layer>
@@ -82,7 +96,13 @@ const AppointmentsBase: React.FC<AppointmentsBaseProps> = ({ patientUuid }) => {
           }
           if (contentSwitcherValue === AppointmentTypes.TODAY) {
             if (appointmentsData.todaysAppointments?.length) {
-              return <AppointmentsTable patientAppointments={appointmentsData?.todaysAppointments} />;
+              return (
+                <AppointmentsTable
+                  patientAppointments={appointmentsData?.todaysAppointments}
+                  switchedView={switchedView}
+                  setSwitchedView={setSwitchedView}
+                />
+              );
             }
             return (
               <Layer>
@@ -101,7 +121,13 @@ const AppointmentsBase: React.FC<AppointmentsBaseProps> = ({ patientUuid }) => {
 
           if (contentSwitcherValue === AppointmentTypes.PAST) {
             if (appointmentsData.pastAppointments?.length) {
-              return <AppointmentsTable patientAppointments={appointmentsData?.pastAppointments} />;
+              return (
+                <AppointmentsTable
+                  patientAppointments={appointmentsData?.pastAppointments}
+                  switchedView={switchedView}
+                  setSwitchedView={setSwitchedView}
+                />
+              );
             }
             return (
               <Layer>

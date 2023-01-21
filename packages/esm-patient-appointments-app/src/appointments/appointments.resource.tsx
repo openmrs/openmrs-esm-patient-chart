@@ -8,7 +8,7 @@ dayjs.extend(isToday);
 export const appointmentsSearchUrl = `/ws/rest/v1/appointments/search`;
 
 export function useAppointments(patientUuid: string, startDate: string, abortController: AbortController) {
-  /* 
+  /*
     SWR isn't meant to make POST requests for data fetching. This is a consequence of the API only exposing this resource via POST.
     This works but likely isn't recommended.
   */
@@ -27,21 +27,21 @@ export function useAppointments(patientUuid: string, startDate: string, abortCon
 
   const { data, error, isValidating } = useSWR<AppointmentsFetchResponse, Error>(appointmentsSearchUrl, fetcher);
 
-  const appointments = data?.data?.length
-    ? data.data.sort((a, b) => (b.startDateTime > a.startDateTime ? 1 : -1))
-    : null;
+  const appointments = data?.data?.length ? data.data : null;
 
-  const pastAppointments = appointments?.filter(({ startDateTime }) =>
-    dayjs(new Date(startDateTime).toISOString()).isBefore(new Date().setHours(0, 0, 0, 0)),
-  );
+  const pastAppointments = appointments
+    ?.sort((a, b) => (b.startDateTime > a.startDateTime ? 1 : -1))
+    ?.filter(({ startDateTime }) =>
+      dayjs(new Date(startDateTime).toISOString()).isBefore(new Date().setHours(0, 0, 0, 0)),
+    );
 
-  const upcomingAppointments = appointments?.filter(({ startDateTime }) =>
-    dayjs(new Date(startDateTime).toISOString()).isAfter(new Date()),
-  );
+  const upcomingAppointments = appointments
+    ?.sort((a, b) => (a.startDateTime > b.startDateTime ? 1 : -1))
+    ?.filter(({ startDateTime }) => dayjs(new Date(startDateTime).toISOString()).isAfter(new Date()));
 
-  const todaysAppointments = appointments?.filter(({ startDateTime }) =>
-    dayjs(new Date(startDateTime).toISOString()).isToday(),
-  );
+  const todaysAppointments = appointments
+    ?.sort((a, b) => (a.startDateTime > b.startDateTime ? 1 : -1))
+    ?.filter(({ startDateTime }) => dayjs(new Date(startDateTime).toISOString()).isToday());
 
   return {
     data: data ? { pastAppointments, upcomingAppointments, todaysAppointments } : null,
