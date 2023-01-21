@@ -34,9 +34,7 @@ const FormEntry: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspac
 
   return (
     <div>
-      {selectedForm && patientUuid && patient && (
-        <ExtensionSlot extensionSlotName="form-widget-slot" state={state} />
-      )}
+      {selectedForm && patientUuid && patient && <ExtensionSlot extensionSlotName="form-widget-slot" state={state} />}
     </div>
   );
 };
