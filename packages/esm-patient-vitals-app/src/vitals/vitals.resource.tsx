@@ -106,7 +106,7 @@ export function useVitals(patientUuid: string, includeBiometrics: boolean = fals
   const vitalsResponse = data?.data?.entry?.map((entry) => entry.resource ?? []).map(mapVitalsProperties);
 
   vitalsResponse?.map((vitalSign) => {
-    const issuedDate = new Date(new Date(vitalSign.issued).setSeconds(0, 0)).toISOString();
+    const issuedDate = new Date(new Date(vitalSign.issued)).toISOString();
 
     if (vitalsHashTable.has(issuedDate) && vitalsHashTable.get(issuedDate)) {
       vitalsHashTable.set(issuedDate, {

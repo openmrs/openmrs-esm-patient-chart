@@ -58,7 +58,7 @@ export function useBiometrics(patientUuid: string, concepts: Record<string, stri
   const biometricsResponse = data?.data?.entry?.map((entry) => entry.resource ?? []).map(mapBiometricsProperties);
 
   biometricsResponse?.map((biometrics) => {
-    const issuedDate = new Date(new Date(biometrics.issued).setSeconds(0, 0)).toISOString();
+    const issuedDate = new Date(new Date(biometrics.issued)).toISOString();
 
     if (biometricsHashTable.has(issuedDate)) {
       biometricsHashTable.set(issuedDate, {
