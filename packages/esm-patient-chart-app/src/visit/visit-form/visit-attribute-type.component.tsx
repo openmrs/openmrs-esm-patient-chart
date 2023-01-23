@@ -26,7 +26,11 @@ interface VisitAttributeTypeFieldsProps {
   setVisitAttributes: React.Dispatch<React.SetStateAction<VisitAttributes>>;
   isMissingRequiredAttributes: boolean;
   visitAttributes: VisitAttributes;
-  setErrorFetchingResources: React.Dispatch<React.SetStateAction<boolean>>;
+  setErrorFetchingResources: React.Dispatch<
+    React.SetStateAction<{
+      blockSavingForm: boolean;
+    }>
+  >;
 }
 
 const VisitAttributeTypeFields: React.FC<VisitAttributeTypeFieldsProps> = ({
@@ -75,7 +79,11 @@ interface AttributeTypeFieldProps {
   setVisitAttribute: (val: string) => void;
   isMissingRequiredAttributes: boolean;
   visitAttributes: VisitAttributes;
-  setErrorFetchingResources: React.Dispatch<React.SetStateAction<boolean>>;
+  setErrorFetchingResources: React.Dispatch<
+    React.SetStateAction<{
+      blockSavingForm: boolean;
+    }>
+  >;
 }
 
 const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
@@ -96,8 +104,10 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
   const labelText = !required ? `${data?.display} (${t('optional', 'optional')})` : data?.display;
 
   useEffect(() => {
-    if (required && (errorFetchingVisitAttributeType || errorFetchingVisitAttributeAnswers)) {
-      setErrorFetchingResources(true);
+    if (errorFetchingVisitAttributeType || errorFetchingVisitAttributeAnswers) {
+      setErrorFetchingResources((prev) => ({
+        blockSavingForm: prev?.blockSavingForm || required,
+      }));
     }
   }, [errorFetchingVisitAttributeAnswers, errorFetchingVisitAttributeType, required, setErrorFetchingResources]);
 

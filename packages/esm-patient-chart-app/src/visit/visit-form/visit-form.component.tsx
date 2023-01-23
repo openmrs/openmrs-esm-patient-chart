@@ -79,7 +79,9 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
   const { services } = useServices(selectedLocation);
   const [selectedService, setSelectedService] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
-  const [errorFetchingResources, setErrorFetchingResources] = useState(false);
+  const [errorFetchingResources, setErrorFetchingResources] = useState<{
+    blockSavingForm: boolean;
+  }>(null);
 
   useEffect(() => {
     if (locations && sessionUser?.sessionLocation?.uuid) {
@@ -290,7 +292,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
     <Form className={styles.form} onChange={handleOnChange}>
       {errorFetchingResources && (
         <InlineNotification
-          kind="error"
+          kind={errorFetchingResources?.blockSavingForm ? 'error' : 'warning'}
           lowContrast
           className={styles.inlineNotification}
           title={t('partOfFormDidntLoad', 'Part of the form did not load')}
@@ -489,7 +491,13 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
         <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace(ignoreChanges)}>
           {t('discard', 'Discard')}
         </Button>
-        <Button onClick={handleSubmit} className={styles.button} disabled={isSubmitting} kind="primary" type="submit">
+        <Button
+          onClick={handleSubmit}
+          className={styles.button}
+          disabled={isSubmitting || errorFetchingResources?.blockSavingForm}
+          kind="primary"
+          type="submit"
+        >
           {t('startVisit', 'Start visit')}
         </Button>
       </ButtonSet>
