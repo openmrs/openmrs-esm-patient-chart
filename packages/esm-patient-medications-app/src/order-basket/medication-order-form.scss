@@ -42,6 +42,13 @@
   box-sizing: border-box;
 }
 
+.inlineNotification {
+  width: 100%;
+  max-width: unset;
+  margin-top: calc(spacing.$spacing-03 * -1);
+  margin-left: calc(spacing.$spacing-05 * -1);
+}
+
 .stickyMedicationInfo {
   position: fixed;
   background-color: #0072c3;
@@ -161,6 +168,7 @@
   align-items: center;
 
   :global(.cds--layer-one), 
+  :global(.cds--layer-two), 
   :global(.cds--layer) {
     flex: 1;
   }

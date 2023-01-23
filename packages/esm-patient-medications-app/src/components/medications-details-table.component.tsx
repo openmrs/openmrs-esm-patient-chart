@@ -132,14 +132,12 @@ const MedicationsDetailsTable = connect<
               {medication.quantity ? (
                 <span>
                   <span className={styles.label01}> &mdash; {t('quantity', 'Quantity').toUpperCase()}</span>{' '}
-                  {medication.quantity}
+                  {medication.quantity} {medication.quantityUnits.display}
                 </span>
               ) : null}
               {medication.dateStopped ? (
-                <span className={styles.bodyShort01}>
-                  <span className={styles.label01}>
-                    {medication.quantity ? ` — ` : ''} {t('endDate', 'End date').toUpperCase()}
-                  </span>{' '}
+                <span>
+                  <span className={styles.label01}> &mdash; {t('endDate', 'End date').toUpperCase()}</span>{' '}
                   {formatDate(new Date(medication.dateStopped))}
                 </span>
               ) : null}
@@ -151,7 +149,7 @@ const MedicationsDetailsTable = connect<
         sortKey: dayjs(medication.dateActivated).toDate(),
         content: (
           <div className={styles.startDateColumn}>
-            <span>{formatDate(new Date(medication.dateActivated))}</span>
+            <p>{formatDate(new Date(medication.dateActivated))}</p>
             <InfoTooltip orderer={medication.orderer?.person?.display ?? '--'} />
           </div>
         ),
@@ -215,7 +213,9 @@ const MedicationsDetailsTable = connect<
                   {rows.map((row, rowIndex) => (
                     <TableRow className={styles.row} {...getRowProps({ row })}>
                       {row.cells.map((cell) => (
-                        <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+                        <TableCell className={styles.tableCell} key={cell.id}>
+                          {cell.value?.content ?? cell.value}
+                        </TableCell>
                       ))}
                       <TableCell className="cds--table-column-menu">
                         <OrderBasketItemActions
@@ -306,15 +306,18 @@ function OrderBasketItemActions({
         startDate: medication.dateActivated,
         duration: medication.duration,
         durationUnit: {
-          uuid: medication.durationUnits?.uuid,
-          display: medication.durationUnits?.display,
+          valueCoded: medication.durationUnits?.uuid,
+          value: medication.durationUnits?.display,
         },
         pillsDispensed: medication.quantity,
         numRefills: medication.numRefills,
         indication: medication.orderReasonNonCoded,
         orderer: medication.orderer.uuid,
         careSetting: medication.careSetting.uuid,
-        quantityUnits: medication.quantityUnits.uuid,
+        quantityUnits: {
+          value: medication.quantityUnits.display,
+          valueCoded: medication.quantityUnits.uuid,
+        },
       },
     ]);
     openOrderBasket();
@@ -352,15 +355,18 @@ function OrderBasketItemActions({
         asNeededCondition: medication.asNeededCondition,
         duration: medication.duration,
         durationUnit: {
-          uuid: medication.durationUnits?.uuid,
-          display: medication.durationUnits?.display,
+          valueCoded: medication.durationUnits?.uuid,
+          value: medication.durationUnits?.display,
         },
         pillsDispensed: medication.quantity,
         numRefills: medication.numRefills,
         indication: medication.orderReasonNonCoded,
         orderer: medication.orderer?.uuid,
         careSetting: medication.careSetting?.uuid,
-        quantityUnits: medication.quantityUnits?.uuid,
+        quantityUnits: {
+          value: medication.quantityUnits?.display,
+          valueCoded: medication.quantityUnits?.uuid,
+        },
       },
     ]);
     openOrderBasket();
@@ -398,15 +404,18 @@ function OrderBasketItemActions({
         asNeededCondition: medication.asNeededCondition,
         duration: medication.duration,
         durationUnit: {
-          uuid: medication.durationUnits?.uuid,
-          display: medication.durationUnits?.display,
+          valueCoded: medication.durationUnits?.uuid,
+          value: medication.durationUnits?.display,
         },
         pillsDispensed: medication.quantity,
         numRefills: medication.numRefills,
         indication: medication.orderReasonNonCoded,
         orderer: medication.orderer?.uuid,
         careSetting: medication.careSetting?.uuid,
-        quantityUnits: medication.quantityUnits?.uuid,
+        quantityUnits: {
+          value: medication.quantityUnits?.display,
+          valueCoded: medication.quantityUnits?.uuid,
+        },
       },
     ]);
     openOrderBasket();
