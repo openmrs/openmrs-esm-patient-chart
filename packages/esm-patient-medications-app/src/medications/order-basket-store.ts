@@ -1,8 +1,14 @@
 import { createGlobalStore } from '@openmrs/esm-framework';
 import { OrderBasketItem } from '../types/order-basket-item';
 
+function getPatientUuidFromUrl(): string {
+  const match = /\/patient\/([a-zA-Z0-9\-]+)\/?/.exec(location.pathname);
+  return match && match[1];
+}
 export interface OrderBasketStore {
-  items: Array<OrderBasketItem>;
+  items: {
+    [patientUuid: string]: [];
+  };
 }
 
 export interface OrderBasketStoreActions {
@@ -10,11 +16,21 @@ export interface OrderBasketStoreActions {
 }
 
 export const orderBasketStore = createGlobalStore<OrderBasketStore>('drug-order-basket', {
-  items: [],
+  items: {},
 });
 
 export const orderBasketStoreActions = {
-  setItems(_: OrderBasketStore, value: Array<OrderBasketItem> | (() => Array<OrderBasketItem>)) {
-    return { items: typeof value === 'function' ? value() : value };
+  setItems(store: OrderBasketStore, value: Array<OrderBasketItem> | (() => Array<OrderBasketItem>)) {
+    const patientUuid = getPatientUuidFromUrl();
+    return {
+      items: {
+        ...store.items,
+        [patientUuid]: typeof value === 'function' ? value() : value,
+      },
+    };
   },
 };
+
+export function getOrderItems(items: OrderBasketStore['items'], patientUuid: string): Array<OrderBasketItem> {
+  return items?.[patientUuid] ?? [];
+}

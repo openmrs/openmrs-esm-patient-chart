@@ -1,7 +1,7 @@
 import React from 'react';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { attach, openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { mockFhirConditionsResponse } from '../../../../__mocks__/conditions.mock';

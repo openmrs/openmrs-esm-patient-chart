@@ -1,5 +1,4 @@
 import useSWR from 'swr';
-import useSWRImmutable from 'swr/immutable';
 import { FetchResponse, openmrsFetch, useConfig, OpenmrsResource, useSession } from '@openmrs/esm-framework';
 import { OrderPost, PatientMedicationFetchResponse } from '../types/order';
 import { ConfigObject } from '../config-schema';
@@ -18,18 +17,24 @@ export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any', 
     'custom:(uuid,dosingType,orderNumber,accessionNumber,' +
     'patient:ref,action,careSetting:ref,previousOrder:ref,dateActivated,scheduledDate,dateStopped,autoExpireDate,' +
     'orderType:ref,encounter:ref,orderer:(uuid,display,person:(display)),orderReason,orderReasonNonCoded,orderType,urgency,instructions,' +
-    'commentToFulfiller,drug:(uuid,name,strength,dosageForm:(display,uuid),concept),dose,doseUnits:ref,' +
+    'commentToFulfiller,drug:(uuid,display,strength,dosageForm:(display,uuid),concept),dose,doseUnits:ref,' +
     'frequency:ref,asNeeded,asNeededCondition,quantity,quantityUnits:ref,numRefills,dosingInstructions,' +
     'duration,durationUnits:ref,route:ref,brandName,dispenseAsWritten)';
 
-  const { data, error, isValidating } = useSWR<{ data: PatientMedicationFetchResponse }, Error>(
+  const { data, error, isValidating } = useSWR<FetchResponse<PatientMedicationFetchResponse>, Error>(
     `/ws/rest/v1/order?patient=${patientUuid}&careSetting=${careSettingUuid}&status=${status}&orderType=${drugOrderTypeUUID}&v=${customRepresentation}`,
     openmrsFetch,
   );
 
-  const drugOrders = data?.data?.results
-    ? data.data.results.filter((order) => order.orderType.display === 'Drug Order')
-    : null;
+  const drugOrders = useMemo(
+    () =>
+      data?.data?.results
+        ? data.data.results
+            .filter((order) => order.orderType.display === 'Drug Order')
+            ?.sort((order1, order2) => (order2.dateActivated > order1.dateActivated ? 1 : -1))
+        : null,
+    [data],
+  );
 
   return {
     data: data ? drugOrders : null,
@@ -43,25 +48,6 @@ export function getPatientEncounterId(patientUuid: string, abortController: Abor
   return openmrsFetch(`/ws/rest/v1/encounter?patient=${patientUuid}&order=desc&limit=1&v=custom:(uuid)`, {
     signal: abortController.signal,
   });
-}
-
-export function useDurationUnits(durationUnitsConcept) {
-  const url = `/ws/rest/v1/concept/${durationUnitsConcept}?v=custom:(answers:(uuid,display))`;
-  const { data, error } = useSWRImmutable<FetchResponse<{ answers: Array<OpenmrsResource> }>, Error>(
-    durationUnitsConcept ? url : null,
-    openmrsFetch,
-  );
-
-  const results = useMemo(
-    () => ({
-      isLoadingDurationUnits: !data && !error,
-      durationUnits: data?.data?.answers,
-      error,
-    }),
-    [data, error],
-  );
-
-  return results;
 }
 
 export function getMedicationByUuid(abortController: AbortController, orderUuid: string) {

@@ -4,7 +4,6 @@ export const mockDrugSearchResultItems: Array<Drug> = [
   {
     uuid: '09e58895-e7f0-4649-b7c0-e665c5c08e93',
     display: 'Aspirin',
-    name: 'Aspirin',
     strength: '81mg',
     dosageForm: { display: 'Tablet', uuid: '1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
     concept: { display: 'Aspirin', uuid: '71617AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
@@ -12,7 +11,6 @@ export const mockDrugSearchResultItems: Array<Drug> = [
   {
     uuid: '38087db3-7395-431f-88d5-bb25e06e33f1',
     display: 'Aspirin',
-    name: 'Aspirin',
     strength: '325mg',
     dosageForm: { display: 'Tablet', uuid: '1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
     concept: { display: 'Aspirin', uuid: '71617AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
@@ -20,7 +18,6 @@ export const mockDrugSearchResultItems: Array<Drug> = [
   {
     uuid: 'a722710f-403b-451f-804b-09f8624b0838',
     display: 'Aspirin',
-    name: 'Aspirin',
     strength: '162.5mg',
     dosageForm: { display: 'Tablet', uuid: '1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
     concept: { display: 'Aspirin', uuid: '71617AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
@@ -28,7 +25,6 @@ export const mockDrugSearchResultItems: Array<Drug> = [
   {
     uuid: '02dd2a8e-1a8f-49cb-bc06-daf9e1af16ba',
     display: 'Aspirine Co',
-    name: 'Aspirine Co',
     strength: '81mg',
     dosageForm: { display: 'Tablet', uuid: '1513AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
     concept: { display: 'Aspirin', uuid: '71617AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
@@ -613,7 +609,7 @@ export const mockDrugOrders = {
         commentToFulfiller: null,
         drug: {
           uuid: '18f43c99-2329-426e-97b5-c3356e6afe54',
-          name: 'Aspirin',
+          display: 'Aspirin',
           strength: '81mg',
           dosageForm: {
             display: 'Tablet',
@@ -809,7 +805,7 @@ export const mockDrugOrders = {
         commentToFulfiller: null,
         drug: {
           uuid: '9152d395-e821-47f0-b15c-588808585350',
-          name: 'efavirenz',
+          display: 'efavirenz',
           strength: '600mg',
           dosageForm: {
             display: 'Tablet',

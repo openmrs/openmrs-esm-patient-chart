@@ -43,16 +43,16 @@ function medicationOrderToApiDto(
         encounter: encounterUuid,
         drug: order.drug.uuid,
         dose: order.dosage,
-        doseUnits: order.unit.valueCoded,
-        route: order.route.valueCoded,
-        frequency: order.frequency.valueCoded,
+        doseUnits: order.unit?.valueCoded,
+        route: order.route?.valueCoded,
+        frequency: order.frequency?.valueCoded,
         asNeeded: order.asNeeded,
         asNeededCondition: order.asNeededCondition,
         numRefills: order.numRefills,
         quantity: order.pillsDispensed,
-        quantityUnits: order.quantityUnits,
+        quantityUnits: order.quantityUnits?.valueCoded,
         duration: order.duration,
-        durationUnits: order.durationUnit.uuid,
+        durationUnits: order.durationUnit?.valueCoded,
         dosingType: order.isFreeTextDosage
           ? 'org.openmrs.FreeTextDosingInstructions'
           : 'org.openmrs.SimpleDosingInstructions',
@@ -72,16 +72,16 @@ function medicationOrderToApiDto(
         encounter: encounterUuid,
         drug: order.drug.uuid,
         dose: order.dosage,
-        doseUnits: order.unit.valueCoded,
-        route: order.route.valueCoded,
-        frequency: order.frequency.valueCoded,
+        doseUnits: order.unit?.valueCoded,
+        route: order.route?.valueCoded,
+        frequency: order.frequency?.valueCoded,
         asNeeded: order.asNeeded,
         asNeededCondition: order.asNeededCondition,
         numRefills: order.numRefills,
         quantity: order.pillsDispensed,
-        quantityUnits: order.quantityUnits,
+        quantityUnits: order.quantityUnits?.valueCoded,
         duration: order.duration,
-        durationUnits: order.durationUnit.uuid,
+        durationUnits: order.durationUnit?.valueCoded,
         dosingType: order.isFreeTextDosage
           ? 'org.openmrs.FreeTextDosingInstructions'
           : 'org.openmrs.SimpleDosingInstructions',
@@ -110,8 +110,8 @@ function medicationOrderToApiDto(
 }
 
 function calculateEndDate(orderBasketItem: OrderBasketItem) {
-  const dayJsDuration = orderBasketItem.durationUnit.display
-    .substring(0, orderBasketItem.durationUnit.display.lastIndexOf('s'))
+  const dayJsDuration = orderBasketItem.durationUnit?.value
+    .substring(0, orderBasketItem.durationUnit?.value.lastIndexOf('s'))
     .toLowerCase();
 
   return (

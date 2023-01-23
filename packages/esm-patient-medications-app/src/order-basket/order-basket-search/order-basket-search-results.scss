@@ -7,6 +7,7 @@
 }
 
 .desktopSearchResultTile {
+  padding: spacing.$spacing-03 spacing.$spacing-05;
   border-left: 4px solid var(--brand-03);
 
   &:not(:last-of-type) {
@@ -15,6 +16,7 @@
 }
 
 .tabletSearchResultTile {
+  padding: spacing.$spacing-03 spacing.$spacing-05;
   margin-top: 5px;
   border-left: 2px solid var(--brand-03);
   background-color: $ui-02;

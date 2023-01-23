@@ -9,11 +9,16 @@ import { orderDrugs } from './drug-ordering';
 import { ConfigObject } from '../config-schema';
 import { useCurrentOrderBasketEncounter, usePatientOrders } from '../api/api';
 import { OrderBasketItem } from '../types/order-basket-item';
-import { OrderBasketStore, OrderBasketStoreActions, orderBasketStoreActions } from '../medications/order-basket-store';
+import {
+  getOrderItems,
+  OrderBasketStore,
+  OrderBasketStoreActions,
+  orderBasketStoreActions,
+} from '../medications/order-basket-store';
 import MedicationOrderForm from './medication-order-form.component';
 import MedicationsDetailsTable from '../components/medications-details-table.component';
 import OrderBasketItemList from './order-basket-item-list.component';
-import OrderBasketSearch from './order-basket-search';
+import OrderBasketSearch from './order-basket-search/drug-search.component';
 import styles from './order-basket.scss';
 
 export interface OrderBasketProps {
@@ -25,6 +30,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
   'items',
   orderBasketStoreActions,
 )(({ patientUuid, items, closeWorkspace, setItems }: OrderBasketProps & OrderBasketStore & OrderBasketStoreActions) => {
+  const patientOrderItems = getOrderItems(items, patientUuid);
   const { t } = useTranslation();
   const { cache, mutate }: { cache: any; mutate: Function } = useSWRConfig();
   const displayText = t('activeMedicationsDisplayText', 'Active medications');
@@ -56,13 +62,12 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
     if (medicationOrderFormItem) {
       medicationOrderFormItem.careSetting = config.careSettingUuid;
       medicationOrderFormItem.orderer = sessionObject.currentProvider?.uuid;
-      medicationOrderFormItem.quantityUnits = config.quantityUnitsUuid;
     }
   }, [medicationOrderFormItem, config, sessionObject]);
 
   const handleSearchResultClicked = (searchResult: OrderBasketItem, directlyAddToBasket: boolean) => {
     if (directlyAddToBasket) {
-      setItems([...items, searchResult]);
+      setItems([...patientOrderItems, searchResult]);
     } else {
       openMedicationOrderFormForAddingNewOrder(searchResult);
     }
@@ -81,7 +86,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
   const handleSaveClicked = () => {
     const abortController = new AbortController();
 
-    orderDrugs(items, patientUuid, encounterUuid, abortController).then((erroredItems) => {
+    orderDrugs(patientOrderItems, patientUuid, encounterUuid, abortController).then((erroredItems) => {
       setItems(erroredItems);
 
       if (erroredItems.length == 0) {
@@ -117,14 +122,14 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
   };
 
   const openMedicationOrderFormForAddingNewOrder = (newOrderBasketItem: OrderBasketItem) => {
-    openMedicationOrderForm(newOrderBasketItem, (finalizedOrder) => setItems([...items, finalizedOrder]));
+    openMedicationOrderForm(newOrderBasketItem, (finalizedOrder) => setItems([...patientOrderItems, finalizedOrder]));
   };
 
   const openMedicationOrderFormForUpdatingExistingOrder = (existingOrderIndex: number) => {
-    const order = items[existingOrderIndex];
+    const order = patientOrderItems[existingOrderIndex];
     openMedicationOrderForm(order, (finalizedOrder) =>
       setItems(() => {
-        const newOrders = [...items];
+        const newOrders = [...patientOrderItems];
         newOrders[existingOrderIndex] = finalizedOrder;
         return newOrders;
       }),
@@ -147,11 +152,11 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
       <div className={styles.container}>
         <div className={styles.orderBasketContainer}>
           <OrderBasketItemList
-            orderBasketItems={items}
-            onItemClicked={(order) => openMedicationOrderFormForUpdatingExistingOrder(items.indexOf(order))}
+            orderBasketItems={patientOrderItems}
+            onItemClicked={(order) => openMedicationOrderFormForUpdatingExistingOrder(patientOrderItems.indexOf(order))}
             onItemRemoveClicked={(order) => {
-              const newOrders = [...items];
-              newOrders.splice(items.indexOf(order), 1);
+              const newOrders = [...patientOrderItems];
+              newOrders.splice(patientOrderItems.indexOf(order), 1);
               setItems(newOrders);
             }}
           />
@@ -211,7 +216,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
               className={styles.button}
               kind="primary"
               onClick={handleSaveClicked}
-              disabled={!items?.length || !encounterUuid}
+              disabled={!patientOrderItems?.length || !encounterUuid}
             >
               {t('signAndClose', 'Sign and close')}
             </Button>

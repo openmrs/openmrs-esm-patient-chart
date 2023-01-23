@@ -12,7 +12,6 @@
   "cancelVisit": "Cancel Visit",
   "cancelVisitError": "Error cancelling active visit",
   "cancelVisitWarningMessage": "Cancelling this visit will delete all associated encounters",
-  "capitalizedGender": "",
   "causeOfDeath": "Cause of death",
   "checkFilters": "Check the filters above",
   "chooseService": "Select a service",
