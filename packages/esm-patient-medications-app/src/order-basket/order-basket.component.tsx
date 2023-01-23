@@ -7,7 +7,7 @@ import { showModal, showToast, useConfig, useLayoutType, useSession } from '@ope
 import { EmptyState, ErrorState, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import { orderDrugs } from './drug-ordering';
 import { ConfigObject } from '../config-schema';
-import { useCurrentOrderBasketEncounter, usePatientOrders } from '../api/api';
+import { createEmptyEncounter, usePatientOrders } from '../api/api';
 import { OrderBasketItem } from '../types/order-basket-item';
 import {
   getOrderItems,
@@ -37,8 +37,12 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
   const headerTitle = t('activeMedicationsHeaderTitle', 'active medications');
   const isTablet = useLayoutType() === 'tablet';
   const config = useConfig() as ConfigObject;
-  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
-  const { encounterUuid, creatingEncounterError } = useCurrentOrderBasketEncounter(patientUuid);
+  const { currentVisit, mutate: mutateVisit } = useVisitOrOfflineVisit(patientUuid);
+  const session = useSession();
+  const encounterUuid = currentVisit?.encounters?.find(
+    (enc) => enc.encounterType.uuid === config?.drugOrderEncounterType,
+  )?.uuid;
+  const [creatingEncounterError, setCreatingEncounterError] = useState(false);
   const [medicationOrderFormItem, setMedicationOrderFormItem] = useState<OrderBasketItem | null>(null);
   const [isMedicationOrderFormVisible, setIsMedicationOrderFormVisible] = useState(false);
   const [onMedicationOrderFormSigned, setOnMedicationOrderFormSign] =
@@ -84,10 +88,34 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
     setIsMedicationOrderFormVisible(true);
   };
 
-  const handleSaveClicked = () => {
+  const handleSaveClicked = async () => {
     const abortController = new AbortController();
 
-    orderDrugs(patientOrderItems, patientUuid, encounterUuid, abortController).then((erroredItems) => {
+    setCreatingEncounterError(false);
+    let orderEncounterUuid = encounterUuid;
+    if (!orderEncounterUuid) {
+      orderEncounterUuid = await createEmptyEncounter(
+        patientUuid,
+        config?.drugOrderEncounterType,
+        currentVisit?.uuid,
+        session?.sessionLocation?.uuid,
+        abortController,
+      )
+        .then((uuid) => {
+          mutateVisit();
+          return uuid;
+        })
+        .catch((e) => {
+          setCreatingEncounterError(true);
+          return null;
+        });
+    }
+
+    // If there's no encounter present, saving an order will throw an error
+    // Hence returning beforehand, notifying the user.
+    if (!orderEncounterUuid) return;
+
+    orderDrugs(patientOrderItems, patientUuid, orderEncounterUuid, abortController).then((erroredItems) => {
       setItems(erroredItems);
 
       if (erroredItems.length == 0) {
@@ -217,7 +245,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
               className={styles.button}
               kind="primary"
               onClick={handleSaveClicked}
-              disabled={!patientOrderItems?.length || !encounterUuid}
+              disabled={!patientOrderItems?.length}
             >
               {t('signAndClose', 'Sign and close')}
             </Button>
