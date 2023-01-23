@@ -17,6 +17,7 @@ interface UseVisitNotes {
   isError: Error;
   isLoading: boolean;
   isValidating?: boolean;
+  mutateVisitNotes: () => void;
 }
 
 export function useVisitNotes(patientUuid: string): UseVisitNotes {
@@ -30,9 +31,9 @@ export function useVisitNotes(patientUuid: string): UseVisitNotes {
     'encounterRole:(uuid,display),' +
     'provider:(uuid,person:(uuid,display))),' +
     'diagnoses';
-
   const encountersApiUrl = `/ws/rest/v1/encounter?patient=${patientUuid}&obs=${visitDiagnosesConceptUuid}&v=${customRepresentation}`;
-  const { data, error, isLoading, isValidating } = useSWR<{ data: EncountersFetchResponse }, Error>(
+
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: EncountersFetchResponse }, Error>(
     encountersApiUrl,
     openmrsFetch,
   );
@@ -60,19 +61,30 @@ export function useVisitNotes(patientUuid: string): UseVisitNotes {
     isError: error,
     isLoading,
     isValidating,
+    mutateVisitNotes: mutate,
   };
 }
 
-export function fetchLocationByUuid(abortController: AbortController, locationUuid: string) {
-  return openmrsFetch<Location>(`/ws/rest/v1/location/${locationUuid}`, {
-    signal: abortController.signal,
-  });
+export function useLocationUuid(locationUuid: string) {
+  const locationUrl = `/ws/rest/v1/location/${locationUuid}`;
+  const { data, error, isLoading } = useSWR<{ data: Location }, Error>(locationUuid ? locationUrl : null, openmrsFetch);
+
+  return {
+    locationUuid: data?.data?.uuid,
+    errorFetchingLocation: error,
+    isLoadingLocation: isLoading,
+  };
 }
 
-export function fetchProviderByUuid(abortController: AbortController, providerUuid: string) {
-  return openmrsFetch<Provider>(`/ws/rest/v1/provider/${providerUuid}`, {
-    signal: abortController.signal,
-  });
+export function useProviderUuid(providerUuid: string) {
+  const providerUrl = `/ws/rest/v1/provider/${providerUuid}`;
+  const { data, error, isLoading } = useSWR<{ data: Provider }, Error>(providerUuid ? providerUrl : null, openmrsFetch);
+
+  return {
+    providerUuid: data?.data?.uuid,
+    errorFetchingProvider: error,
+    isLoadingProvider: isLoading,
+  };
 }
 
 export function fetchConceptDiagnosisByName(searchTerm: string) {
@@ -91,6 +103,7 @@ export function saveVisitNote(abortController: AbortController, payload: VisitNo
     signal: abortController.signal,
   });
 }
+
 export function savePatientDiagnosis(abortController: AbortController, payload: DiagnosisPayload) {
   return openmrsFetch(`/ws/rest/v1/patientdiagnoses`, {
     headers: {

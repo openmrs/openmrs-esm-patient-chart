@@ -381,7 +381,7 @@ export const mockUseAppointmentServiceData = [
     name: 'Outpatient',
     description: null,
     speciality: {},
-    startTime: '',
+    startDateTime: new Date().toISOString(),
     endTime: '',
     maxAppointmentsLimit: null,
     durationMins: null,

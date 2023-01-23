@@ -5,7 +5,7 @@ import { AppointmentPayload, AppointmentService, AppointmentsFetchResponse } fro
 import isToday from 'dayjs/plugin/isToday';
 dayjs.extend(isToday);
 
-export const appointmentsSearchUrl = `/ws/rest/v1/appointments/search`;
+const appointmentsSearchUrl = `/ws/rest/v1/appointments/search`;
 
 export function useAppointments(patientUuid: string, startDate: string, abortController: AbortController) {
   /*
@@ -25,7 +25,7 @@ export function useAppointments(patientUuid: string, startDate: string, abortCon
       },
     });
 
-  const { data, error, isLoading, isValidating } = useSWR<AppointmentsFetchResponse, Error>(
+  const { data, error, isLoading, isValidating, mutate } = useSWR<AppointmentsFetchResponse, Error>(
     appointmentsSearchUrl,
     fetcher,
   );
@@ -51,6 +51,7 @@ export function useAppointments(patientUuid: string, startDate: string, abortCon
     isError: error,
     isLoading,
     isValidating,
+    mutate,
   };
 }
 

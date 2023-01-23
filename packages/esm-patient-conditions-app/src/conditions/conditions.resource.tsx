@@ -26,7 +26,8 @@ export type CodedCondition = {
 
 export function useConditions(patientUuid: string) {
   const conditionsUrl = `${fhirBaseUrl}/Condition?patient=${patientUuid}&_count=100`;
-  const { data, error, isLoading, isValidating } = useSWR<{ data: FHIRConditionResponse }, Error>(
+
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: FHIRConditionResponse }, Error>(
     patientUuid ? conditionsUrl : null,
     openmrsFetch,
   );
@@ -44,6 +45,7 @@ export function useConditions(patientUuid: string) {
     isError: error,
     isLoading,
     isValidating,
+    mutate,
   };
 }
 

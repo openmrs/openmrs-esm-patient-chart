@@ -1,4 +1,4 @@
-import useSWR from 'swr';
+import useSWR, { mutate } from 'swr';
 import { map as rxjsMap } from 'rxjs/operators';
 import { openmrsFetch, openmrsObservableFetch, useConfig } from '@openmrs/esm-framework';
 import { ConfigurableProgram, PatientProgram, Program, ProgramsFetchResponse } from '../types';
@@ -11,8 +11,9 @@ import { ConfigObject } from '../config-schema';
 export const customRepresentation = `custom:(uuid,display,program,dateEnrolled,dateCompleted,location:(uuid,display))`;
 
 export function useEnrollments(patientUuid: string) {
-  const { data, error, isLoading, isValidating } = useSWR<{ data: ProgramsFetchResponse }, Error>(
-    `/ws/rest/v1/programenrollment?patient=${patientUuid}&v=${customRepresentation}`,
+  const enrollmentsUrl = `/ws/rest/v1/programenrollment?patient=${patientUuid}&v=${customRepresentation}`;
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: ProgramsFetchResponse }, Error>(
+    patientUuid ? enrollmentsUrl : null,
     openmrsFetch,
   );
 
@@ -29,6 +30,7 @@ export function useEnrollments(patientUuid: string) {
     isLoading,
     isValidating,
     activeEnrollments,
+    mutateEnrollments: mutate,
   };
 }
 

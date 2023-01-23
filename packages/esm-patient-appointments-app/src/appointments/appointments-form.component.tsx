@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSWRConfig } from 'swr';
 import dayjs from 'dayjs';
 import {
   Button,
@@ -19,7 +18,7 @@ import {
 } from '@carbon/react';
 import { amPm, convertTime12to24, DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import { useLocations, useSession, showToast, showNotification, useLayoutType } from '@openmrs/esm-framework';
-import { appointmentsSearchUrl, createAppointment, useAppointmentService } from './appointments.resource';
+import { createAppointment, useAppointments, useAppointmentService } from './appointments.resource';
 import { AppointmentPayload } from '../types';
 import styles from './appointments-form.scss';
 
@@ -28,7 +27,6 @@ const appointmentTypes = [{ name: 'Scheduled' }, { name: 'WalkIn' }];
 const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { mutate } = useSWRConfig();
   const locations = useLocations();
   const session = useSession();
   const [appointmentNote, setAppointmentNote] = useState('');
@@ -39,6 +37,8 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
   const [timeFormat, setTimeFormat] = useState<amPm>(new Date().getHours() >= 12 ? 'PM' : 'AM');
   const [userLocation, setUserLocation] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { mutate } = useAppointments(patientUuid, new Date().toUTCString(), new AbortController());
 
   if (!userLocation && session?.sessionLocation?.uuid) {
     setUserLocation(session?.sessionLocation?.uuid);
@@ -85,6 +85,7 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
         if (status === 200) {
           setIsSubmitting(false);
           closeWorkspace();
+          mutate();
 
           showToast({
             critical: true,
@@ -93,8 +94,6 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
             title: t('appointmentScheduled', 'Appointment scheduled'),
           });
         }
-
-        mutate(`${appointmentsSearchUrl}`);
       },
       (error) => {
         setIsSubmitting(false);
@@ -143,7 +142,6 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
         id="time-picker-select-1"
         onChange={(event) => setTimeFormat(event.target.value as amPm)}
         value={timeFormat}
-        labelText={t('time', 'Time')}
         aria-label={t('time', 'Time')}
       >
         <SelectItem value="AM" text="AM" />
@@ -221,13 +219,15 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
         </section>
         <section className={styles.formGroup}>
           <span>{t('note', 'Note')}</span>
-          <TextArea
-            id="appointmentNote"
-            light={isTablet}
-            labelText={t('appointmentNoteLabel', 'Write an additional note')}
-            placeholder={t('appointmentNotePlaceholder', 'Write any additional points here')}
-            onChange={(event) => setAppointmentNote(event.target.value)}
-          />
+          <Layer>
+            <TextArea
+              id="appointmentNote"
+              light={isTablet}
+              labelText={t('appointmentNoteLabel', 'Write an additional note')}
+              placeholder={t('appointmentNotePlaceholder', 'Write any additional points here')}
+              onChange={(event) => setAppointmentNote(event.target.value)}
+            />
+          </Layer>
         </section>
       </Stack>
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>

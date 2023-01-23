@@ -1,6 +1,5 @@
-import React, { SyntheticEvent, useMemo } from 'react';
+import React, { SyntheticEvent, useCallback, useMemo, useState } from 'react';
 import dayjs from 'dayjs';
-import { useSWRConfig } from 'swr';
 import { useTranslation } from 'react-i18next';
 import debounce from 'lodash-es/debounce';
 import {
@@ -32,68 +31,42 @@ import {
 } from '@openmrs/esm-framework';
 import {
   fetchConceptDiagnosisByName,
-  fetchLocationByUuid,
-  fetchProviderByUuid,
+  useLocationUuid,
+  useProviderUuid,
   savePatientDiagnosis,
   saveVisitNote,
+  useVisitNotes,
 } from './visit-notes.resource';
 import { ConfigObject } from '../config-schema';
 import { Concept, Diagnosis, DiagnosisPayload, VisitNotePayload } from '../types';
 import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import styles from './visit-notes-form.scss';
 
-const searchTimeoutInMs = 500;
-const encountersCustomRepresentation =
-  'custom:(uuid,display,encounterDatetime,' +
-  'location:(uuid,display,name),' +
-  'encounterType:(name,uuid),' +
-  'auditInfo:(creator:(display),changedBy:(display)),' +
-  'encounterProviders:(provider:(person:(display))))';
-
 const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patientUuid }) => {
+  const searchTimeoutInMs = 500;
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
-  const { mutate } = useSWRConfig();
   const config = useConfig() as ConfigObject;
   const state = useMemo(() => ({ patientUuid }), [patientUuid]);
   const { clinicianEncounterRole, encounterNoteTextConceptUuid, encounterTypeUuid, formConceptUuid } =
     config.visitNoteConfig;
-  const [clinicalNote, setClinicalNote] = React.useState('');
-  const [currentSessionProviderUuid, setCurrentSessionProviderUuid] = React.useState<string | null>('');
-  const [currentSessionLocationUuid, setCurrentSessionLocationUuid] = React.useState('');
-  const [isPrimarySearching, setIsPrimarySearching] = React.useState(false);
-  const [isSecondarySearching, setIsSecondarySearching] = React.useState(false);
-  const [isHandlingSubmit, setIsHandlingSubmit] = React.useState(false);
-  const [locationUuid, setLocationUuid] = React.useState<string | null>(null);
-  const [providerUuid, setProviderUuid] = React.useState<string | null>(null);
-  const [primarySearchTerm, setPrimarySearchTerm] = React.useState<string | null>('');
-  const [secondarySearchTerm, setSecondarySearchTerm] = React.useState<string | null>('');
-  const [selectedPrimaryDiagnoses, setSelectedPrimaryDiagnoses] = React.useState<Array<Diagnosis>>([]);
-  const [selectedSecondaryDiagnoses, setSelectedSecondaryDiagnoses] = React.useState<Array<Diagnosis>>([]);
-  const [searchPrimaryResults, setSearchPrimaryResults] = React.useState<null | Array<Concept>>(null);
-  const [searchSecondaryResults, setSearchSecondaryResults] = React.useState<null | Array<Concept>>(null);
-  const [combinedDiagnoses, setCombinedDiagnoses] = React.useState<Array<Diagnosis>>([]);
-  const [visitDateTime, setVisitDateTime] = React.useState(new Date());
+  const [clinicalNote, setClinicalNote] = useState('');
+  const [isPrimarySearching, setIsPrimarySearching] = useState(false);
+  const [isSecondarySearching, setIsSecondarySearching] = useState(false);
+  const [isHandlingSubmit, setIsHandlingSubmit] = useState(false);
+  const [primarySearchTerm, setPrimarySearchTerm] = useState<string | null>('');
+  const [secondarySearchTerm, setSecondarySearchTerm] = useState<string | null>('');
+  const [selectedPrimaryDiagnoses, setSelectedPrimaryDiagnoses] = useState<Array<Diagnosis>>([]);
+  const [selectedSecondaryDiagnoses, setSelectedSecondaryDiagnoses] = useState<Array<Diagnosis>>([]);
+  const [searchPrimaryResults, setSearchPrimaryResults] = useState<null | Array<Concept>>(null);
+  const [searchSecondaryResults, setSearchSecondaryResults] = useState<null | Array<Concept>>(null);
+  const [combinedDiagnoses, setCombinedDiagnoses] = useState<Array<Diagnosis>>([]);
+  const [visitDateTime, setVisitDateTime] = useState(new Date());
 
-  React.useEffect(() => {
-    if (session && !currentSessionLocationUuid && !currentSessionProviderUuid) {
-      setCurrentSessionLocationUuid(session?.sessionLocation?.uuid);
-      setCurrentSessionProviderUuid(session?.currentProvider?.uuid);
-    }
-  }, [currentSessionLocationUuid, currentSessionProviderUuid, session]);
-
-  React.useEffect(() => {
-    const ac = new AbortController();
-    if (currentSessionProviderUuid) {
-      fetchProviderByUuid(ac, currentSessionProviderUuid).then(({ data }) => {
-        setProviderUuid(data.uuid);
-      });
-    }
-    if (currentSessionLocationUuid) {
-      fetchLocationByUuid(ac, currentSessionLocationUuid).then(({ data }) => setLocationUuid(data.uuid));
-    }
-  }, [currentSessionLocationUuid, currentSessionProviderUuid]);
+  const { mutateVisitNotes } = useVisitNotes(patientUuid);
+  const { locationUuid } = useLocationUuid(session?.sessionLocation?.uuid);
+  const { providerUuid } = useProviderUuid(session?.currentProvider?.uuid);
 
   const handlePrimarySearchChange = (event) => {
     setIsPrimarySearching(true);
@@ -113,7 +86,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
     }
   };
 
-  const debouncedSearch = React.useMemo(
+  const debouncedSearch = useMemo(
     () =>
       debounce((searchTerm, searchInputField) => {
         if (searchTerm) {
@@ -181,7 +154,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
     };
   };
 
-  const handleSubmit = React.useCallback(
+  const handleSubmit = useCallback(
     (event: SyntheticEvent) => {
       setIsHandlingSubmit(true);
       event.preventDefault();
@@ -230,14 +203,15 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
           }
         })
         .then(() => {
+          mutateVisitNotes();
           closeWorkspace();
+
           showToast({
             critical: true,
             description: t('visitNoteNowVisible', 'It is now visible on the Encounters     page'),
             kind: 'success',
             title: t('visitNoteSaved', 'Visit note saved'),
           });
-          mutate(`/ws/rest/v1/encounter?patient=${patientUuid}&v=${encountersCustomRepresentation}`);
         })
         .catch((err) => {
           createErrorHandler();
@@ -255,20 +229,20 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
         });
     },
     [
-      clinicalNote,
-      clinicianEncounterRole,
-      closeWorkspace,
-      encounterNoteTextConceptUuid,
-      encounterTypeUuid,
-      formConceptUuid,
-      locationUuid,
-      mutate,
-      patientUuid,
-      providerUuid,
-      combinedDiagnoses,
-      selectedPrimaryDiagnoses,
-      t,
+      selectedPrimaryDiagnoses.length,
       visitDateTime,
+      formConceptUuid,
+      patientUuid,
+      locationUuid,
+      clinicianEncounterRole,
+      providerUuid,
+      encounterTypeUuid,
+      clinicalNote,
+      encounterNoteTextConceptUuid,
+      combinedDiagnoses,
+      mutateVisitNotes,
+      closeWorkspace,
+      t,
     ],
   );
 

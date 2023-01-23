@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSWRConfig } from 'swr';
 import { connect } from 'unistore/react';
 import { Button, ButtonSet, DataTableSkeleton, InlineNotification, ActionableNotification } from '@carbon/react';
 import { showModal, showToast, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
@@ -32,7 +31,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
 )(({ patientUuid, items, closeWorkspace, setItems }: OrderBasketProps & OrderBasketStore & OrderBasketStoreActions) => {
   const patientOrderItems = getOrderItems(items, patientUuid);
   const { t } = useTranslation();
-  const { cache, mutate }: { cache: any; mutate: Function } = useSWRConfig();
+  const { mutateOrders } = usePatientOrders(patientUuid, 'ACTIVE');
   const displayText = t('activeMedicationsDisplayText', 'Active medications');
   const headerTitle = t('activeMedicationsHeaderTitle', 'active medications');
   const isTablet = useLayoutType() === 'tablet';
@@ -53,7 +52,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
     error,
     isLoading: isLoadingOrders,
     isValidating,
-  } = usePatientOrders(patientUuid, 'ACTIVE', config.careSettingUuid);
+  } = usePatientOrders(patientUuid, 'ACTIVE');
 
   const openStartVisitDialog = useCallback(() => {
     const dispose = showModal('start-visit-dialog', {
@@ -118,6 +117,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
       setItems(erroredItems);
 
       if (erroredItems.length == 0) {
+        mutateOrders();
         closeWorkspace();
 
         showToast({
@@ -129,15 +129,6 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
             'Your order is complete. The items will now appear on the Orders page.',
           ),
         });
-
-        const apiUrlPattern = new RegExp(
-          '\\/ws\\/rest\\/v1\\/order\\?patient\\=' + patientUuid + '\\&careSetting=' + config.careSettingUuid,
-        );
-
-        // Find matching keys from SWR's cache and broadcast a revalidation message to their pre-bound SWR hooks
-        Array.from(cache.keys())
-          .filter((url: string) => apiUrlPattern.test(url))
-          .forEach((url: string) => mutate(url));
       }
     });
 

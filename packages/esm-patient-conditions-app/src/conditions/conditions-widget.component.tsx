@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import 'dayjs/plugin/utc';
 import { BehaviorSubject } from 'rxjs';
-import { useSWRConfig } from 'swr';
 import {
   DatePicker,
   DatePickerInput,
@@ -16,15 +15,8 @@ import {
   Stack,
   Tile,
 } from '@carbon/react';
-import {
-  createErrorHandler,
-  fhirBaseUrl,
-  showNotification,
-  showToast,
-  useLayoutType,
-  useSession,
-} from '@openmrs/esm-framework';
-import { createPatientCondition, CodedCondition, useConditionsSearch } from './conditions.resource';
+import { createErrorHandler, showNotification, showToast, useLayoutType, useSession } from '@openmrs/esm-framework';
+import { createPatientCondition, CodedCondition, useConditionsSearch, useConditions } from './conditions.resource';
 import styles from './conditions-form.scss';
 
 interface ConditionsWidgetProps {
@@ -42,7 +34,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
 }) => {
   const { t } = useTranslation();
   const session = useSession();
-  const { mutate } = useSWRConfig();
+  const { mutate } = useConditions(patientUuid);
   const isTablet = useLayoutType() === 'tablet';
   const [clinicalStatus, setClinicalStatus] = useState('active');
   const [endDate, setEndDate] = useState(null);
@@ -103,6 +95,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     const sub = createPatientCondition(payload, abortController).subscribe(
       (response) => {
         if (response.status === 201) {
+          mutate();
           closeWorkspace?.();
 
           showToast({
@@ -111,8 +104,6 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
             description: t('conditionNowVisible', 'It is now visible on the Conditions page'),
             title: t('conditionSaved', 'Condition saved'),
           });
-
-          mutate(`${fhirBaseUrl}/Condition?patient=${patientUuid}`);
         }
       },
       (err) => {
