@@ -1,10 +1,8 @@
 import useSWR from 'swr';
-import useSWRImmutable from 'swr/immutable';
 import { FetchResponse, openmrsFetch, useConfig, OpenmrsResource } from '@openmrs/esm-framework';
 import { OrderPost, PatientMedicationFetchResponse } from '../types/order';
 import { ConfigObject } from '../config-schema';
 import { useMemo } from 'react';
-import { useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 
 /**
  * Fast, lighweight, reusable data fetcher with built-in cache invalidation that
@@ -49,25 +47,6 @@ export function getPatientEncounterId(patientUuid: string, abortController: Abor
   return openmrsFetch(`/ws/rest/v1/encounter?patient=${patientUuid}&order=desc&limit=1&v=custom:(uuid)`, {
     signal: abortController.signal,
   });
-}
-
-export function useDurationUnits(durationUnitsConcept) {
-  const url = `/ws/rest/v1/concept/${durationUnitsConcept}?v=custom:(answers:(uuid,display))`;
-  const { data, error } = useSWRImmutable<FetchResponse<{ answers: Array<OpenmrsResource> }>, Error>(
-    durationUnitsConcept ? url : null,
-    openmrsFetch,
-  );
-
-  const results = useMemo(
-    () => ({
-      isLoadingDurationUnits: !data && !error,
-      durationUnits: data?.data?.answers,
-      error,
-    }),
-    [data, error],
-  );
-
-  return results;
 }
 
 export function getMedicationByUuid(abortController: AbortController, orderUuid: string) {
