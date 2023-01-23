@@ -35,7 +35,7 @@ export function useObstreeData(
   trendlineData: TreeNode;
   isValidating: boolean;
 } {
-  const { data, error, isValidating } = useSWR<FetchResponse<TreeNode>, Error>(
+  const { data, error, isLoading, isValidating } = useSWR<FetchResponse<TreeNode>, Error>(
     `/ws/rest/v1/obstree?patient=${patientUuid}&concept=${conceptUuid}`,
     openmrsFetch,
   );
@@ -49,7 +49,7 @@ export function useObstreeData(
 
   const returnValue = useMemo(
     () => ({
-      isLoading: !data && !error,
+      isLoading,
       trendlineData:
         computeTrendlineData(data?.data)?.[0] ??
         ({
@@ -62,7 +62,7 @@ export function useObstreeData(
         } as TreeNode),
       isValidating,
     }),
-    [data, error, isValidating],
+    [data?.data, isLoading, isValidating],
   );
 
   return returnValue;

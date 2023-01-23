@@ -39,11 +39,14 @@ export function useStatuses() {
   const statusConceptSetUuid = config.statusConceptSetUuid;
 
   const apiUrl = `/ws/rest/v1/concept/${statusConceptSetUuid}`;
-  const { data, error } = useSWRImmutable<FetchResponse>(config.showServiceQueueFields ? apiUrl : null, openmrsFetch);
+  const { data, error, isLoading } = useSWRImmutable<FetchResponse>(
+    config.showServiceQueueFields ? apiUrl : null,
+    openmrsFetch,
+  );
 
   return {
     statuses: data ? data?.data?.setMembers : [],
-    isLoading: !data && !error,
+    isLoading,
   };
 }
 

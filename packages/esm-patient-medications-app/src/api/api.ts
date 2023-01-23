@@ -20,7 +20,7 @@ export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any', 
     'frequency:ref,asNeeded,asNeededCondition,quantity,quantityUnits:ref,numRefills,dosingInstructions,' +
     'duration,durationUnits:ref,route:ref,brandName,dispenseAsWritten)';
 
-  const { data, error, isValidating } = useSWR<FetchResponse<PatientMedicationFetchResponse>, Error>(
+  const { data, error, isLoading, isValidating } = useSWR<FetchResponse<PatientMedicationFetchResponse>, Error>(
     `/ws/rest/v1/order?patient=${patientUuid}&careSetting=${careSettingUuid}&status=${status}&orderType=${drugOrderTypeUUID}&v=${customRepresentation}`,
     openmrsFetch,
   );
@@ -38,7 +38,7 @@ export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any', 
   return {
     data: data ? drugOrders : null,
     error: error,
-    isLoading: !data && !error,
+    isLoading,
     isValidating,
   };
 }

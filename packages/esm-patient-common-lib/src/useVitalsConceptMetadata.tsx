@@ -7,7 +7,10 @@ export function useVitalsConceptMetadata() {
 
   const apiUrl = `/ws/rest/v1/concept/?q=VITALS SIGNS&v=${customRepresentation}`;
 
-  const { data, error } = useSWRImmutable<{ data: VitalsConceptMetadataResponse }, Error>(apiUrl, openmrsFetch);
+  const { data, error, isLoading } = useSWRImmutable<{ data: VitalsConceptMetadataResponse }, Error>(
+    apiUrl,
+    openmrsFetch,
+  );
 
   const conceptMetadata = data?.data?.results[0]?.setMembers;
 
@@ -17,7 +20,7 @@ export function useVitalsConceptMetadata() {
   return {
     data: conceptUnits,
     isError: error,
-    isLoading: !data && !error,
+    isLoading,
     conceptMetadata,
   };
 }

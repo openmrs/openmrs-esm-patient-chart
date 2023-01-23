@@ -15,13 +15,13 @@ const customRepresentation =
  * @returns Object containing `patient-attributes`, `isLoading` loading status, `error`
  */
 export const usePatientAttributes = (patientUuid: string) => {
-  const { data, error } = useSWRImmutable<{ data: Patient }>(
+  const { data, error, isLoading } = useSWRImmutable<{ data: Patient }>(
     `/ws/rest/v1/patient/${patientUuid}?v=${customRepresentation}`,
     openmrsFetch,
   );
 
   return {
-    isLoading: !data && !error,
+    isLoading,
     attributes: data?.data?.person?.attributes ?? [],
     person: data?.data?.person ?? null,
     error: error,
@@ -47,7 +47,7 @@ export const usePatientContactAttributes = (patientUuid: string) => {
 };
 
 export function useOmrsRestPatient(patientUuid: string) {
-  const { data, error, isValidating, mutate } = useSWR<{ data: PersonFetchResponse }, Error>(
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: PersonFetchResponse }, Error>(
     `/ws/rest/v1/patient/${patientUuid}`,
     openmrsFetch,
   );
@@ -55,11 +55,11 @@ export function useOmrsRestPatient(patientUuid: string) {
     return {
       person: data?.data?.person ?? null,
       personError: error,
-      isPersonLoading: !data && !error,
+      isPersonLoading: isLoading,
       isPersonError: error,
       isPersonValidating: isValidating,
       mutate,
     };
-  }, [data, error, isValidating, mutate]);
+  }, [data, error, isLoading, isValidating, mutate]);
   return result;
 }

@@ -67,7 +67,7 @@ export function useVitals(patientUuid: string, includeBiometrics: boolean = fals
     `&_count=${pageSize}
         `;
 
-  const { data, error, isValidating } = useSWR<{ data: VitalsFetchResponse }, Error>(apiUrl, openmrsFetch);
+  const { data, error, isLoading, isValidating } = useSWR<{ data: VitalsFetchResponse }, Error>(apiUrl, openmrsFetch);
 
   const getVitalSignKey = (conceptUuid: string): string => {
     switch (conceptUuid) {
@@ -141,7 +141,7 @@ export function useVitals(patientUuid: string, includeBiometrics: boolean = fals
   return {
     vitals: formattedVitals,
     isError: error,
-    isLoading: !data && !error,
+    isLoading,
     isValidating,
   };
 }

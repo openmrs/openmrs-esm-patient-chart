@@ -11,6 +11,7 @@ export function useObs(patientUuid: string): UseObsResult {
   const {
     data: result,
     error,
+    isLoading,
     isValidating,
   } = useSWR<{ data: ObsFetchResponse }, Error>(
     `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&code=` +
@@ -46,7 +47,7 @@ export function useObs(patientUuid: string): UseObsResult {
   return {
     data: observations,
     error: error,
-    isLoading: !result && !error,
+    isLoading,
     isValidating,
   };
 }

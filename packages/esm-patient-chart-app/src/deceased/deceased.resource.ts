@@ -1,7 +1,6 @@
 import { useMemo } from 'react';
-
+import useSWR from 'swr';
 import { openmrsFetch, usePatient } from '@openmrs/esm-framework';
-import useSWR, { SWRConfig } from 'swr';
 
 interface CauseOfDeathFetchResponse {
   uuid: string;
@@ -97,7 +96,7 @@ export function markPatientAlive(personUuid: string, abortController: AbortContr
 }
 
 export function useConceptAnswers(conceptUuid: string) {
-  const { data, error, isValidating } = useSWR<{ data: ConceptAnswersResponse }, Error>(
+  const { data, error, isLoading, isValidating } = useSWR<{ data: ConceptAnswersResponse }, Error>(
     `/ws/rest/v1/concept/${conceptUuid}`,
     (url) => (conceptUuid ? openmrsFetch(url) : undefined),
     {
@@ -109,14 +108,14 @@ export function useConceptAnswers(conceptUuid: string) {
 
   return {
     conceptAnswers: data?.data?.answers ?? ([] as ConceptAnswer[]),
-    isConceptLoading: !data && !error,
+    isConceptLoading: isLoading,
     conceptError: error,
     isConceptAnswerValidating: isValidating,
   };
 }
 
 export function useCauseOfDeathConcept() {
-  const { data, error, isValidating } = useSWR<{ data: CauseOfDeathFetchResponse }>(
+  const { data, error, isLoading, isValidating } = useSWR<{ data: CauseOfDeathFetchResponse }>(
     `/ws/rest/v1/systemsetting/concept.causeOfDeath`,
     openmrsFetch,
     {
@@ -128,9 +127,9 @@ export function useCauseOfDeathConcept() {
   const result = useMemo(() => {
     return {
       value: data?.data?.value ?? undefined,
-      isCauseOfDeathLoading: !data && !error,
+      isCauseOfDeathLoading: isLoading,
       isCauseOfDeathValidating: isValidating,
     };
-  }, [data, error, isValidating]);
+  }, [data, isLoading, isValidating]);
   return result;
 }

@@ -27,7 +27,7 @@ type UseAllergies = {
 };
 
 export function useAllergies(patientUuid: string): UseAllergies {
-  const { data, error, isValidating } = useSWR<{ data: FHIRAllergyResponse }, Error>(
+  const { data, error, isLoading, isValidating } = useSWR<{ data: FHIRAllergyResponse }, Error>(
     `${fhirBaseUrl}/AllergyIntolerance?patient=${patientUuid}`,
     openmrsFetch,
   );
@@ -43,7 +43,7 @@ export function useAllergies(patientUuid: string): UseAllergies {
   return {
     allergies: data ? formattedAllergies : null,
     isError: error,
-    isLoading: !data && !error,
+    isLoading,
     isValidating,
   };
 }

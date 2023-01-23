@@ -32,7 +32,7 @@ export function useVisitNotes(patientUuid: string): UseVisitNotes {
     'diagnoses';
 
   const encountersApiUrl = `/ws/rest/v1/encounter?patient=${patientUuid}&obs=${visitDiagnosesConceptUuid}&v=${customRepresentation}`;
-  const { data, error, isValidating } = useSWR<{ data: EncountersFetchResponse }, Error>(
+  const { data, error, isLoading, isValidating } = useSWR<{ data: EncountersFetchResponse }, Error>(
     encountersApiUrl,
     openmrsFetch,
   );
@@ -58,7 +58,7 @@ export function useVisitNotes(patientUuid: string): UseVisitNotes {
   return {
     visitNotes: data ? formattedVisitNotes : null,
     isError: error,
-    isLoading: !data && !error,
+    isLoading,
     isValidating,
   };
 }

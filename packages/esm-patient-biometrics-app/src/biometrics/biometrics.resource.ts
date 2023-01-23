@@ -35,7 +35,10 @@ export function useBiometrics(patientUuid: string, concepts: Record<string, stri
     `&_count=${pageSize}
   `;
 
-  const { data, error, isValidating } = useSWR<{ data: BiometricsFetchResponse }, Error>(apiUrl, openmrsFetch);
+  const { data, error, isLoading, isValidating } = useSWR<{ data: BiometricsFetchResponse }, Error>(
+    apiUrl,
+    openmrsFetch,
+  );
 
   const getBiometricValueKey = (conceptUuid: string): string => {
     switch (conceptUuid) {
@@ -87,7 +90,7 @@ export function useBiometrics(patientUuid: string, concepts: Record<string, stri
   return {
     biometrics: formattedBiometrics,
     isError: error,
-    isLoading: !data && !error,
+    isLoading,
     isValidating,
   };
 }
