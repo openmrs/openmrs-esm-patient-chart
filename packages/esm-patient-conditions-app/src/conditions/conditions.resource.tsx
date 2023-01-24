@@ -25,7 +25,7 @@ export type CodedCondition = {
 };
 
 export function useConditions(patientUuid: string) {
-  const { data, error, isValidating } = useSWR<{ data: FHIRConditionResponse }, Error>(
+  const { data, error, isLoading, isValidating } = useSWR<{ data: FHIRConditionResponse }, Error>(
     `${fhirBaseUrl}/Condition?patient=${patientUuid}&_count=100`,
     openmrsFetch,
   );
@@ -41,7 +41,7 @@ export function useConditions(patientUuid: string) {
   return {
     data: data ? formattedConditions : null,
     isError: error,
-    isLoading: !data && !error,
+    isLoading,
     isValidating,
   };
 }
@@ -50,17 +50,17 @@ export function useConditionsSearch(conditionToLookup: string) {
   const config = useConfig();
   const conditionConceptClassUuid = config?.conditionConceptClassUuid;
 
-  const CONDITIONS_SEARCH_URL = `/ws/rest/v1/conceptsearch?conceptClasses=${conditionConceptClassUuid}&q=${conditionToLookup}`;
+  const conditionsSearchUrl = `/ws/rest/v1/conceptsearch?conceptClasses=${conditionConceptClassUuid}&q=${conditionToLookup}`;
 
-  const { data, error } = useSWR<{ data: { results: Array<CodedCondition> } }, Error>(
-    conditionToLookup ? CONDITIONS_SEARCH_URL : null,
+  const { data, error, isLoading } = useSWR<{ data: { results: Array<CodedCondition> } }, Error>(
+    conditionToLookup ? conditionsSearchUrl : null,
     openmrsFetch,
   );
 
   return {
     conditions: data?.data?.results ?? [],
     error: error,
-    isSearchingConditions: !data && !error,
+    isSearchingConditions: isLoading,
   };
 }
 

@@ -70,7 +70,7 @@ interface UseVisitQueueEntries {
 
 export function useVisitQueueEntries(): UseVisitQueueEntries {
   const apiUrl = `/ws/rest/v1/visit-queue-entry?v=full`;
-  const { data, error, isValidating } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
+  const { data, error, isLoading, isValidating } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
     apiUrl,
     openmrsFetch,
   );
@@ -97,7 +97,7 @@ export function useVisitQueueEntries(): UseVisitQueueEntries {
 
   return {
     visitQueueEntries: mappedVisitQueueEntries ? mappedVisitQueueEntries : null,
-    isLoading: !data && !error,
+    isLoading,
     isError: error,
     isValidating,
   };

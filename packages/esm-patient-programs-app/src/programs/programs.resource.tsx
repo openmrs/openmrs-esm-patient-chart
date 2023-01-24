@@ -11,7 +11,7 @@ import { ConfigObject } from '../config-schema';
 export const customRepresentation = `custom:(uuid,display,program,dateEnrolled,dateCompleted,location:(uuid,display))`;
 
 export function useEnrollments(patientUuid: string) {
-  const { data, error, isValidating } = useSWR<{ data: ProgramsFetchResponse }, Error>(
+  const { data, error, isLoading, isValidating } = useSWR<{ data: ProgramsFetchResponse }, Error>(
     `/ws/rest/v1/programenrollment?patient=${patientUuid}&v=${customRepresentation}`,
     openmrsFetch,
   );
@@ -26,14 +26,14 @@ export function useEnrollments(patientUuid: string) {
   return {
     data: data ? uniqBy(formattedEnrollments, (program) => program?.program?.uuid) : null,
     isError: error,
-    isLoading: !data && !error,
+    isLoading,
     isValidating,
     activeEnrollments,
   };
 }
 
 export function useAvailablePrograms(enrollments?: Array<PatientProgram>) {
-  const { data, error } = useSWR<{ data: { results: Array<Program> } }, Error>(
+  const { data, error, isLoading } = useSWR<{ data: { results: Array<Program> } }, Error>(
     `/ws/rest/v1/program?v=custom:(uuid,display,allWorkflows,concept:(uuid,display))`,
     openmrsFetch,
   );
@@ -48,7 +48,7 @@ export function useAvailablePrograms(enrollments?: Array<PatientProgram>) {
   return {
     data: availablePrograms,
     isError: error,
-    isLoading: !data && !error,
+    isLoading,
     eligiblePrograms,
   };
 }
@@ -91,14 +91,14 @@ export function updateProgramEnrollment(programEnrollmentUuid: string, payload, 
 
 export const useConfigurableProgram = (patientUuid: string) => {
   const { customUrl } = useConfig() as ConfigObject;
-  const { data, error } = useSWR<{ data: Array<ConfigurableProgram> }>(
+  const { data, error, isLoading } = useSWR<{ data: Array<ConfigurableProgram> }>(
     customUrl ? `${customUrl}${patientUuid}` : null,
     openmrsFetch,
   );
   const configurablePrograms = data?.data ?? [];
   return {
     configurablePrograms,
-    isLoading: !data && !error,
+    isLoading,
     error: error,
   };
 };

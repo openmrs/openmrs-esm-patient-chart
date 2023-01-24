@@ -12,20 +12,19 @@ export function getAttachmentByUuid(attachmentUuid: string, abortController: Abo
 }
 
 export function useAttachments(patientUuid: string, includeEncounterless: boolean) {
-  const { data, error, mutate, isValidating } = useSWR<FetchResponse<{ results: Array<AttachmentResponse> }>>(
-    `${attachmentUrl}?patient=${patientUuid}&includeEncounterless=${includeEncounterless}`,
-    openmrsFetch,
-  );
+  const { data, error, mutate, isLoading, isValidating } = useSWR<
+    FetchResponse<{ results: Array<AttachmentResponse> }>
+  >(`${attachmentUrl}?patient=${patientUuid}&includeEncounterless=${includeEncounterless}`, openmrsFetch);
 
   const results = useMemo(
     () => ({
-      isLoading: !data && !error,
+      isLoading,
       data: data?.data.results ?? [],
       error,
       mutate,
       isValidating,
     }),
-    [isValidating, data, error, mutate],
+    [data, error, isLoading, isValidating, mutate],
   );
 
   return results;

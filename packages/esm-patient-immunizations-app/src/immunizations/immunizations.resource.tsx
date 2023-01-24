@@ -51,7 +51,7 @@ export function useImmunizationsConceptSet() {
   const conceptSetMappingUrl = `/ws/rest/v1/concept?source=${source}&code=${code}&v=full`;
   const conceptSetUuidUrl = `/ws/rest/v1/concept/${conceptSetSearchTerm}?v=full`;
 
-  const { data, error } = useSWR<{ data: { results: Array<OpenmrsConcept> } }, Error>(
+  const { data, error, isLoading } = useSWR<{ data: { results: Array<OpenmrsConcept> } }, Error>(
     isConceptMapping(conceptSetSearchTerm) ? conceptSetMappingUrl : conceptSetUuidUrl,
     openmrsFetch,
   );
@@ -59,21 +59,24 @@ export function useImmunizationsConceptSet() {
   return {
     data: data ? data.data.results[0] : null,
     isError: error,
-    isLoading: !data && !error,
+    isLoading,
   };
 }
 
 export function useImmunizations(patientUuid: string) {
   const immunizationsUrl = `${fhirBaseUrl}/Immunization?patient=${patientUuid}`;
 
-  const { data, error, isValidating } = useSWR<{ data: FHIRImmunizationBundle }, Error>(immunizationsUrl, openmrsFetch);
+  const { data, error, isLoading, isValidating } = useSWR<{ data: FHIRImmunizationBundle }, Error>(
+    immunizationsUrl,
+    openmrsFetch,
+  );
 
   const existingImmunizations = data ? mapFromFHIRImmunizationBundle(data.data) : null;
 
   return {
     data: data ? existingImmunizations : null,
     isError: error,
-    isLoading: !data && !error,
+    isLoading,
     isValidating,
   };
 }
