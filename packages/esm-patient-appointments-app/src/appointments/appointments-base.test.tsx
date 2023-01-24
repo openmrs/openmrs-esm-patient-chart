@@ -98,7 +98,7 @@ describe('AppointmensOverview', () => {
       expect(screen.getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument();
     });
 
-    expect(screen.getAllByRole('row').length).toEqual(11);
+    expect(screen.getAllByRole('row').length).toEqual(13);
 
     const previousPageButton = screen.getByRole('button', { name: /previous page/i });
     const nextPageButton = screen.getByRole('button', { name: /next page/i });

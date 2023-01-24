@@ -38,6 +38,7 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
   const [startTime, setStartTime] = useState(dayjs(new Date()).format('hh:mm'));
   const [timeFormat, setTimeFormat] = useState<amPm>(new Date().getHours() >= 12 ? 'PM' : 'AM');
   const [userLocation, setUserLocation] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (!userLocation && session?.sessionLocation?.uuid) {
     setUserLocation(session?.sessionLocation?.uuid);
@@ -46,6 +47,7 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
   const { data: services, isLoading } = useAppointmentService();
 
   const handleSubmit = () => {
+    setIsSubmitting(true);
     const serviceUuid = services.find((service) => service.name === selectedService)?.uuid;
     const serviceDuration = services.find((service) => service.name === selectedService)?.durationMins;
 
@@ -81,6 +83,7 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
     createAppointment(appointmentPayload, abortController).then(
       ({ status }) => {
         if (status === 200) {
+          setIsSubmitting(false);
           closeWorkspace();
 
           showToast({
@@ -94,6 +97,7 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
         mutate(`${appointmentsSearchUrl}`);
       },
       (error) => {
+        setIsSubmitting(false);
         showNotification({
           title: t('appointmentFormError', 'Error scheduling appointment'),
           kind: 'error',
@@ -230,7 +234,7 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
         <Button className={styles.button} onClick={closeWorkspace} kind="secondary">
           {t('discard', 'Discard')}
         </Button>
-        <Button className={styles.button} disabled={!selectedService} onClick={handleSubmit}>
+        <Button className={styles.button} disabled={!selectedService || isSubmitting} onClick={handleSubmit}>
           {t('saveAndClose', 'Save and close')}
         </Button>
       </ButtonSet>
