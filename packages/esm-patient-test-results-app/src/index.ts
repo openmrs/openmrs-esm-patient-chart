@@ -37,18 +37,6 @@ function setupOpenMRS() {
 
   return {
     extensions: [
-      // Removed this extension with reference to O3-1810
-      // {
-      //   name: 'test-results-summary-widget',
-      //   slot: 'patient-chart-summary-dashboard-slot',
-      //   order: 2,
-      //   load: getAsyncLifecycle(() => import('./overview/recent-overview.component'), options),
-      //   meta: {
-      //     columnSpan: 4,
-      //   },
-      //   online: true,
-      //   offline: true,
-      // },
       {
         name: 'test-results-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
