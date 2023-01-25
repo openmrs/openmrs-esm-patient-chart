@@ -1,5 +1,5 @@
 import useSWR from 'swr';
-import { FetchResponse, openmrsFetch, useConfig, OpenmrsResource } from '@openmrs/esm-framework';
+import { FetchResponse, openmrsFetch, useConfig, OpenmrsResource, useSession } from '@openmrs/esm-framework';
 import { OrderPost, PatientMedicationFetchResponse } from '../types/order';
 import { ConfigObject } from '../config-schema';
 import { useMemo } from 'react';
@@ -41,6 +41,28 @@ export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any', 
     isLoading: !data && !error,
     isValidating,
   };
+}
+
+export function useTodayEncounterUuid(patientUuid) {
+  const [nowDateString] = new Date().toISOString().split('T');
+  const sessionObject = useSession();
+  const url = `/ws/rest/v1/encounter?patient=${patientUuid}&fromdate=${nowDateString}&limit=1`;
+  const { data, error, mutate, isLoading } = useSWR<FetchResponse<{ results: Array<OpenmrsResource> }>, Error>(
+    patientUuid ? url : null,
+    openmrsFetch,
+  );
+
+  const results = useMemo(
+    () => ({
+      isLoading,
+      encounterUuid: data?.data?.results?.[0]?.uuid,
+      error,
+      mutate,
+    }),
+    [data, error, mutate, isLoading],
+  );
+
+  return results;
 }
 
 export function getPatientEncounterId(patientUuid: string, abortController: AbortController) {

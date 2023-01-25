@@ -20,6 +20,7 @@ import MedicationsDetailsTable from '../components/medications-details-table.com
 import OrderBasketItemList from './order-basket-item-list.component';
 import OrderBasketSearch from './order-basket-search/drug-search.component';
 import styles from './order-basket.scss';
+import { useOrderEncounter } from '../hooks/useOrderEncounter';
 
 export interface OrderBasketProps {
   closeWorkspace(): void;
@@ -37,11 +38,14 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
   const headerTitle = t('activeMedicationsHeaderTitle', 'active medications');
   const isTablet = useLayoutType() === 'tablet';
   const config = useConfig() as ConfigObject;
-  const { currentVisit, mutate: mutateVisit } = useVisitOrOfflineVisit(patientUuid);
+  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const session = useSession();
-  const encounterUuid = currentVisit?.encounters?.find(
-    (enc) => enc.encounterType.uuid === config?.drugOrderEncounterType,
-  )?.uuid;
+  const {
+    isLoading: isLoadingEncounterUuid,
+    encounterUuid,
+    error: errorFetchingEncounterUuid,
+    mutate: mutateEncounterUuid,
+  } = useOrderEncounter(patientUuid);
   const [creatingEncounterError, setCreatingEncounterError] = useState(false);
   const [medicationOrderFormItem, setMedicationOrderFormItem] = useState<OrderBasketItem | null>(null);
   const [isMedicationOrderFormVisible, setIsMedicationOrderFormVisible] = useState(false);
@@ -54,6 +58,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
     isLoading: isLoadingOrders,
     isValidating,
   } = usePatientOrders(patientUuid, 'ACTIVE', config.careSettingUuid);
+  const noCurrentVisit = config?.mapOrderEncounterToCurrentVisit && !currentVisit;
 
   const openStartVisitDialog = useCallback(() => {
     const dispose = showModal('start-visit-dialog', {
@@ -96,12 +101,12 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
       orderEncounterUuid = await createEmptyEncounter(
         patientUuid,
         config?.drugOrderEncounterType,
-        currentVisit?.uuid,
+        config?.mapOrderEncounterToCurrentVisit ? currentVisit?.uuid : null,
         session?.sessionLocation?.uuid,
         abortController,
       )
         .then((uuid) => {
-          mutateVisit();
+          mutateEncounterUuid();
           return uuid;
         })
         .catch((e) => {
@@ -213,7 +218,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
         </div>
 
         <div>
-          {creatingEncounterError && (
+          {(creatingEncounterError || errorFetchingEncounterUuid) && (
             <InlineNotification
               kind="error"
               title={t('errorCreatingAnEncounter', 'Error when creating an encounter')}
@@ -223,7 +228,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
               inline
             />
           )}
-          {!currentVisit && (
+          {noCurrentVisit && (
             <ActionableNotification
               kind="error"
               actionButtonLabel={t('startVisit', 'Start visit')}
@@ -244,7 +249,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
               className={styles.button}
               kind="primary"
               onClick={handleSaveClicked}
-              disabled={!patientOrderItems?.length}
+              disabled={!patientOrderItems?.length || isLoadingEncounterUuid || noCurrentVisit}
             >
               {t('signAndClose', 'Sign and close')}
             </Button>
