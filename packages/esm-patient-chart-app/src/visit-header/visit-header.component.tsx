@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import capitalize from 'lodash-es/capitalize';
 import {
   Button,
   Tooltip,
@@ -23,10 +22,10 @@ import {
   useConfig,
 } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import VisitHeaderSideMenu from './visit-header-side-menu.component';
-import styles from './visit-header.scss';
 import { MappedQueuePriority, MappedVisitQueueEntry, useVisitQueueEntries } from '../visit/queue-entry/queue.resource';
 import { EditQueueEntry } from '../visit/queue-entry/edit-queue-entry.component';
+import VisitHeaderSideMenu from './visit-header-side-menu.component';
+import styles from './visit-header.scss';
 
 interface PatientInfoProps {
   patient: fhir.Patient;
@@ -54,7 +53,6 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
   const name = `${patient?.name?.[0].given?.join(' ')} ${patient?.name?.[0].family}`;
   const patientUuid = `${patient?.id}`;
   const info = `${parseInt(age(patient?.birthDate))}, ${getGender(patient?.gender)}`;
-  const tooltipText = `${name} ${info}`;
   const truncate = !isTablet && name.trim().length > 25;
   const { visitQueueEntries, isLoading } = useVisitQueueEntries();
   const [currentService, setCurrentService] = useState('');
@@ -90,10 +88,17 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
     });
   }, [currentVisit?.uuid, patientUuid, visitQueueEntries]);
 
+  const text = (
+    <>
+      <p className={styles.tooltipPatientName}>{name}</p>
+      <p className={styles.tooltipPatientInfo}>{info}</p>
+    </>
+  );
+
   return (
     <>
       {truncate ? (
-        <Tooltip align="bottom" label={tooltipText} tabIndex={0} triggerText="Tooltip label">
+        <Tooltip align="bottom-left" width={100} label={text}>
           <button className={styles.longPatientNameBtn} type="button">
             {name.slice(0, 25) + '...'}
           </button>
@@ -184,7 +189,7 @@ const VisitHeader: React.FC = () => {
             {noActiveVisit && (
               <HeaderGlobalAction
                 className={styles.headerGlobalBarButton}
-                aria-label={!startVisitLabel ? <>{t('startVisit', 'Start a visit')}</> : startVisitLabel}
+                aria-label={startVisitLabel ?? t('startVisit', 'Start a visit')}
                 onClick={launchStartVisitForm}
               >
                 <Button as="div" className={styles.startVisitButton}>
