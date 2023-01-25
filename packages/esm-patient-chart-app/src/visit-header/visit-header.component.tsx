@@ -22,10 +22,10 @@ import {
   useConfig,
 } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import VisitHeaderSideMenu from './visit-header-side-menu.component';
-import styles from './visit-header.scss';
 import { MappedQueuePriority, MappedVisitQueueEntry, useVisitQueueEntries } from '../visit/queue-entry/queue.resource';
 import { EditQueueEntry } from '../visit/queue-entry/edit-queue-entry.component';
+import VisitHeaderSideMenu from './visit-header-side-menu.component';
+import styles from './visit-header.scss';
 
 interface PatientInfoProps {
   patient: fhir.Patient;
@@ -98,7 +98,7 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
   return (
     <>
       {truncate ? (
-        <Tooltip align="bottom-left" width={100} label={text} tabIndex={0} triggerText="Tooltip label">
+        <Tooltip align="bottom-left" width={100} label={text}>
           <button className={styles.longPatientNameBtn} type="button">
             {name.slice(0, 25) + '...'}
           </button>
@@ -189,7 +189,7 @@ const VisitHeader: React.FC = () => {
             {noActiveVisit && (
               <HeaderGlobalAction
                 className={styles.headerGlobalBarButton}
-                aria-label={!startVisitLabel ? <>{t('startVisit', 'Start a visit')}</> : startVisitLabel}
+                aria-label={startVisitLabel ?? t('startVisit', 'Start a visit')}
                 onClick={launchStartVisitForm}
               >
                 <Button as="div" className={styles.startVisitButton}>
