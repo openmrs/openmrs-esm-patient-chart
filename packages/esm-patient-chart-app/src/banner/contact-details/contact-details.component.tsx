@@ -1,13 +1,13 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SkeletonText, Button } from '@carbon/react';
-import { ChevronDown, ChevronUp, OverflowMenuVertical } from '@carbon/react/icons';
-
-import { useRelationships } from './relationships.resource';
-import { usePatientContactAttributes } from '../hooks/usePatientAttributes';
-import styles from './contact-details.scss';
+import { ChevronDown, ChevronUp } from '@carbon/react/icons';
 import { ConfigurableLink, ErrorState } from '@openmrs/esm-framework';
+
+import { usePatientContactAttributes } from '../hooks/usePatientAttributes';
 import { usePatientLists } from './patient-list.resource';
+import { useRelationships } from './relationships.resource';
+import styles from './contact-details.scss';
 
 interface ContactDetailsProps {
   address: Array<fhir.Address>;
@@ -21,43 +21,54 @@ const Address: React.FC<{ address?: fhir.Address }> = ({ address }) => {
   return (
     <>
       <p className={styles.heading}>{t('address', 'Address')}</p>
-      <ul>
-        {address ? (
-          <>
-            <li>{address.postalCode}</li>
-            <li>{address.city}</li>
-            <li>{address.state}</li>
-            <li>{address.country}</li>
-          </>
-        ) : (
-          '--'
-        )}
-      </ul>
+      <div className={styles.listItem}>
+        {(() => {
+          if (Object.keys(address).length) {
+            return (
+              <ul>
+                <li>{address.postalCode}</li>
+                <li>{address.city}</li>
+                <li>{address.state}</li>
+                <li>{address.country}</li>
+              </ul>
+            );
+          }
+
+          if (Object.keys(address).length === 0) {
+            return <p>--</p>;
+          }
+        })()}
+      </div>
     </>
   );
 };
 
 const Contact: React.FC<{ telecom: Array<fhir.ContactPoint>; patientUuid: string }> = ({ telecom, patientUuid }) => {
   const { t } = useTranslation();
-  const value = telecom?.length ? telecom[0].value : '--';
   const { isLoading, contactAttributes } = usePatientContactAttributes(patientUuid);
+  const telecomValue = telecom?.length ? telecom[0].value : '--';
 
   return (
     <>
       <p className={styles.heading}>{t('contactDetails', 'Contact Details')}</p>
+      <div className={styles.listItem}>
+        {(() => {
+          if (isLoading) return <SkeletonText />;
+          if (contactAttributes?.length) {
+            return (
+              <ul>
+                {contactAttributes?.map(({ attributeType, value, uuid }) => (
+                  <li key={uuid}>
+                    {attributeType.display} : {value}
+                  </li>
+                ))}
+              </ul>
+            );
+          }
 
-      <ul>
-        <li>{value}</li>
-        {isLoading ? (
-          <SkeletonText />
-        ) : (
-          contactAttributes?.map(({ attributeType, value, uuid }) => (
-            <li key={uuid}>
-              {attributeType.display} : {value}
-            </li>
-          ))
-        )}
-      </ul>
+          return <p>--</p>;
+        })()}
+      </div>
     </>
   );
 };
@@ -69,7 +80,7 @@ const Relationships: React.FC<{ patientId: string }> = ({ patientId }) => {
   return (
     <>
       <p className={styles.heading}>{t('relationships', 'Relationships')}</p>
-      <>
+      <div className={styles.listItem}>
         {(() => {
           if (isLoading) return <SkeletonText />;
           if (relationships?.length) {
@@ -87,7 +98,7 @@ const Relationships: React.FC<{ patientId: string }> = ({ patientId }) => {
           }
           return <p>--</p>;
         })()}
-      </>
+      </div>
     </>
   );
 };
@@ -102,42 +113,13 @@ const PatientLists: React.FC<{ patientId: string }> = ({ patientId }) => {
     setShowPatientListDetails((value) => !value);
   }, []);
 
-  const patientList = useMemo(() => {
-    if (isLoading) return <SkeletonText />;
-    if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
-    if (formattedPatientLists?.length && !showPatientListDetails) {
-      return (
-        <ul>
-          {formattedPatientLists.slice(0, 5).map((r) => (
-            <li key={r.uuid} className={styles.relationship}>
-              <ConfigurableLink className={styles.link} to={`\${openmrsSpaBase}/patient-list/${r.uuid}`}>
-                {r.display}
-              </ConfigurableLink>
-            </li>
-          ))}
-        </ul>
-      );
-    } else if (formattedPatientLists?.length && showPatientListDetails) {
-      return (
-        <ul>
-          {formattedPatientLists.map((r) => (
-            <li key={r.uuid} className={styles.relationship}>
-              <ConfigurableLink className={styles.link} to={`\${openmrsSpaBase}/patient-list/${r.uuid}`}>
-                {r.display}
-              </ConfigurableLink>
-            </li>
-          ))}
-        </ul>
-      );
-    }
-    return <p>--</p>;
-  }, [formattedPatientLists, showPatientListDetails, headerTitle, isError, isLoading]);
-
   return (
     <>
-      <p className={styles.heading}>
-        {t('patientLists', 'Patient Lists')}({formattedPatientLists?.length})
+      <p className={styles.patientListsHeading}>
+        {t('patientLists', 'Patient Lists')}{' '}
+        {formattedPatientLists?.length ? <span>({formattedPatientLists?.length})</span> : null}
         <Button
+          size="sm"
           kind="ghost"
           renderIcon={(props) =>
             showPatientListDetails ? <ChevronUp size={16} {...props} /> : <ChevronDown size={16} {...props} />
@@ -148,14 +130,44 @@ const PatientLists: React.FC<{ patientId: string }> = ({ patientId }) => {
           {showPatientListDetails ? t('seeLess', 'See less') : t('seeAll', 'See all')}
         </Button>
       </p>
-      <>{patientList}</>
+      <div className={styles.patientLists}>
+        {(() => {
+          if (isLoading) return <SkeletonText />;
+          if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
+          if (formattedPatientLists?.length && !showPatientListDetails) {
+            return (
+              <ul>
+                {formattedPatientLists.slice(0, 5).map((r) => (
+                  <li key={r.uuid} className={styles.relationship}>
+                    <ConfigurableLink className={styles.link} to={`\${openmrsSpaBase}/patient-list/${r.uuid}`}>
+                      {r.display}
+                    </ConfigurableLink>
+                  </li>
+                ))}
+              </ul>
+            );
+          } else if (formattedPatientLists?.length && showPatientListDetails) {
+            return (
+              <ul>
+                {formattedPatientLists.map((r) => (
+                  <li key={r.uuid} className={styles.relationship}>
+                    <ConfigurableLink className={styles.link} to={`\${openmrsSpaBase}/patient-list/${r.uuid}`}>
+                      {r.display}
+                    </ConfigurableLink>
+                  </li>
+                ))}
+              </ul>
+            );
+          }
+          return <p>--</p>;
+        })()}
+      </div>
     </>
   );
 };
 
 const ContactDetails: React.FC<ContactDetailsProps> = ({ address, telecom, patientId }) => {
   const currentAddress = address ? address.find((a) => a.use === 'home') : undefined;
-
   return (
     <div className={styles.contactDetails}>
       <div className={styles.row}>

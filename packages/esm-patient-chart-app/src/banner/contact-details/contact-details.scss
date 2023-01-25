@@ -7,7 +7,8 @@
   width: 100%;
   border-top: 1px solid $ui-03;
 }
-.link{
+
+.link {
   text-decoration-line: none;
   text-transform: capitalize;
 }
@@ -16,10 +17,22 @@
   @include type.type-style("heading-compact-01");
   color: $text-02;
   display: flex;
+  align-items: center;
   justify-content: space-between;
 }
-.heading button {
-  margin-top: -1.25rem
+
+.listItem {
+  margin: 0.5rem 0;
+}
+
+.patientLists {
+  margin: 0.125rem 0;
+}
+
+.patientListsHeading {
+  @extend .heading;
+  margin-top: -0.5rem;
+
 }
 
 .row {
@@ -52,5 +65,3 @@
 .relationship div {
   flex: 1 1;
 }
-
-
