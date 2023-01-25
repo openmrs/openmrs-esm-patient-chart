@@ -45,7 +45,7 @@ function setupOpenMRS() {
       {
         name: 'biometrics-overview-widget',
         slot: 'patient-chart-summary-dashboard-slot',
-        order: 3,
+        order: 1,
         load: getAsyncLifecycle(() => import('./biometrics/biometrics-overview.component'), options),
         meta: {
           columnSpan: 4,

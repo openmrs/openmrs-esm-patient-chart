@@ -29,7 +29,7 @@ function setupOpenMRS() {
       {
         name: 'conditions-overview-widget',
         slot: 'patient-chart-summary-dashboard-slot',
-        order: 6,
+        order: 3,
         load: getAsyncLifecycle(() => import('./conditions/conditions-overview.component'), options),
         meta: {
           columnSpan: 4,
