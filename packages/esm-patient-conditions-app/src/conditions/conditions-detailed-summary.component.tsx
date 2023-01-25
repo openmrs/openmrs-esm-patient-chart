@@ -25,7 +25,7 @@ function ConditionsDetailedSummary({ patient }) {
   const { t } = useTranslation();
   const displayText = t('conditions', 'Conditions');
   const headerTitle = t('conditions', 'Conditions');
-  const [filter, setFilter] = useState('');
+  const [filter, setFilter] = useState<'All' | 'Active' | 'Inactive'>('Active');
 
   const { data: conditions, isError, isLoading, isValidating } = useConditions(patient.id);
 
@@ -88,7 +88,7 @@ function ConditionsDetailedSummary({ patient }) {
             <div className={styles.filterContainer}>
               <Dropdown
                 id="conditionStatusFilter"
-                initialSelectedItem={'All'}
+                initialSelectedItem={t('active', 'Active')}
                 label=""
                 titleText={t('show', 'Show') + ':'}
                 type="inline"

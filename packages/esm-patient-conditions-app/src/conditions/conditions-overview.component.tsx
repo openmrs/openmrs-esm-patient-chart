@@ -95,7 +95,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient }) => {
             <div className={styles.filterContainer}>
               <Dropdown
                 id="conditionStatusFilter"
-                initialSelectedItem={'All'}
+                initialSelectedItem={t('active', 'Active')}
                 label=""
                 titleText={t('show', 'Show') + ':'}
                 type="inline"
