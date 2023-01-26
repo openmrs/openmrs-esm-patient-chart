@@ -25,8 +25,9 @@ export type CodedCondition = {
 };
 
 export function useConditions(patientUuid: string) {
+  const conditionsUrl = `${fhirBaseUrl}/Condition?patient=${patientUuid}&_count=100`;
   const { data, error, isLoading, isValidating } = useSWR<{ data: FHIRConditionResponse }, Error>(
-    `${fhirBaseUrl}/Condition?patient=${patientUuid}&_count=100`,
+    patientUuid ? conditionsUrl : null,
     openmrsFetch,
   );
 
@@ -72,8 +73,9 @@ export function getConditionByUuid(conditionUuid: string) {
 }
 
 function mapConditionProperties(condition: FHIRCondition): Condition {
+  const status = condition?.clinicalStatus?.coding[0]?.code;
   return {
-    clinicalStatus: condition?.clinicalStatus?.coding[0]?.code,
+    clinicalStatus: status ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() : '',
     conceptId: condition?.code?.coding[0]?.code,
     display: condition?.code?.coding[0]?.display,
     onsetDateTime: condition?.onsetDateTime,
