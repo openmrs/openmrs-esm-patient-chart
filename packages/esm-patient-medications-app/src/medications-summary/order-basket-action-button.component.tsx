@@ -15,7 +15,7 @@ const OrderBasketActionButton: React.FC = () => {
   const { items } = useStore(orderBasketStore);
   const { patientUuid } = usePatient();
 
-  const isActive = workspaces.find(({ name }) => name.includes('order-basket'));
+  const isActive = workspaces[0]?.name === 'order-basket-workspace';
 
   const patientOrderItems = getOrderItems(items, patientUuid);
 
