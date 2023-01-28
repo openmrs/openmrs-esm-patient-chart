@@ -117,10 +117,21 @@ function setupOpenMRS() {
         },
       },
       {
-        name: 'clinical-form-action-menu-item',
+        name: 'clinical-form-action-menu',
         slot: 'action-menu-items-slot',
         load: getAsyncLifecycle(() => import('./clinical-form-action-button.component'), options),
         order: 2,
+      },
+      {
+        name: 'clinical-forms-workspace',
+        load: getAsyncLifecycle(() => import('./forms/forms-workspace.component'), options),
+        meta: {
+          title: {
+            key: 'clinicalForm',
+            default: 'Clinical form',
+          },
+          type: 'order',
+        },
       },
     ],
   };

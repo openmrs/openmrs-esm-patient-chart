@@ -61,9 +61,9 @@ const FormView: React.FC<FormViewProps> = ({ category, forms, patientUuid, patie
     () => [
       {
         key: 'lastCompleted',
-        header: t('lastCompleted', 'Last Completed'),
+        header: t('lastCompleted', 'Last completed'),
       },
-      { key: 'formName', header: t('formName', 'Form Name (A-Z)') },
+      { key: 'formName', header: t('formName', 'Form name (A-Z)') },
     ],
     [t],
   );
