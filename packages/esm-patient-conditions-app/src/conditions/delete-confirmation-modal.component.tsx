@@ -4,9 +4,7 @@ import { Button, ModalBody, ModalFooter, ModalHeader, TimePicker } from '@carbon
 import { showNotification, showToast, fhirBaseUrl } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import { useSWRConfig } from 'swr';
-import { Condition, deletePatientCondition } from './conditions.resource';
-
-import styles from './index.scss';
+import { deletePatientCondition } from './conditions.resource';
 
 interface deleteConditionDialogProps {
   closeDeleteModal: () => void;
