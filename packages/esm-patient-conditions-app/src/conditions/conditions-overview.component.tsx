@@ -23,6 +23,7 @@ import {
   launchPatientWorkspace,
   CardHeader,
 } from '@openmrs/esm-patient-common-lib';
+import { ActionMenu } from './conditions-action-menu.component';
 import { Add } from '@carbon/react/icons';
 import { useConditions } from './conditions.resource';
 import styles from './conditions-overview.scss';
@@ -133,6 +134,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient }) => {
                           {header.header?.content ?? header.header}
                         </TableHeader>
                       ))}
+                      <TableHeader />
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -141,6 +143,9 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient }) => {
                         {row.cells.map((cell) => (
                           <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                         ))}
+                        <TableCell className="cds--table-column-menu">
+                          <ActionMenu condition={row} />
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

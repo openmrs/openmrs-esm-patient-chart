@@ -7,8 +7,16 @@ import { useLayoutType } from '@openmrs/esm-framework';
 import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import ConditionsWidget from './conditions-widget.component';
 import styles from './conditions-form.scss';
+import { ApiCondition } from './conditions.resource';
 
-const ConditionsForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patientUuid }) => {
+interface ConditionFormProps {
+  condition?: ApiCondition;
+  patientUuid?: string;
+  context: string;
+  closeWorkspace: () => void;
+}
+
+const ConditionsForm: React.FC<ConditionFormProps> = ({ closeWorkspace, patientUuid, context, condition }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const [hasSubmissibleValue, setHasSubmissibleValue] = React.useState(false);
@@ -26,6 +34,8 @@ const ConditionsForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
       <ConditionsWidget
         patientUuid={patientUuid}
         closeWorkspace={closeWorkspace}
+        condition={condition}
+        context={context}
         setHasSubmissibleValue={setHasSubmissibleValue}
         submissionNotifier={submissionNotifier}
       />

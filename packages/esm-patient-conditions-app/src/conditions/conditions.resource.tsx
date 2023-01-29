@@ -12,6 +12,11 @@ export type Condition = {
   id: string;
 };
 
+export interface ApiCondition {
+  cells: Array<[Condition]>;
+  id: string;
+}
+
 export type CodedCondition = {
   concept: {
     uuid: string;
@@ -92,6 +97,17 @@ export function createPatientCondition(payload, abortController) {
       'Content-Type': 'application/json',
     },
     method: 'POST',
+    body: payload,
+    signal: abortController,
+  });
+}
+
+export function editPatientCondition(conditionId, payload, abortController) {
+  return openmrsObservableFetch(`${fhirBaseUrl}/Condition/${conditionId}`, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    method: 'PUT',
     body: payload,
     signal: abortController,
   });
