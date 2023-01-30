@@ -7,7 +7,7 @@ import { showModal, showToast, useConfig, useLayoutType, useSession } from '@ope
 import { EmptyState, ErrorState, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import { orderDrugs } from './drug-ordering';
 import { ConfigObject } from '../config-schema';
-import { createEmptyEncounter, usePatientOrders } from '../api/api';
+import { createEmptyEncounter, useOrderEncounter, usePatientOrders } from '../api/api';
 import { OrderBasketItem } from '../types/order-basket-item';
 import {
   getOrderItems,
@@ -20,7 +20,6 @@ import MedicationsDetailsTable from '../components/medications-details-table.com
 import OrderBasketItemList from './order-basket-item-list.component';
 import OrderBasketSearch from './order-basket-search/drug-search.component';
 import styles from './order-basket.scss';
-import { useOrderEncounter } from '../hooks/useOrderEncounter';
 
 export interface OrderBasketProps {
   closeWorkspace(): void;
@@ -41,6 +40,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const session = useSession();
   const {
+    activeVisitRequired,
     isLoading: isLoadingEncounterUuid,
     encounterUuid,
     error: errorFetchingEncounterUuid,
@@ -58,7 +58,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
     isLoading: isLoadingOrders,
     isValidating,
   } = usePatientOrders(patientUuid, 'ACTIVE', config.careSettingUuid);
-  const noCurrentVisit = config?.mapOrderEncounterToCurrentVisit && !currentVisit;
+  const noCurrentVisit = activeVisitRequired && !currentVisit;
 
   const openStartVisitDialog = useCallback(() => {
     const dispose = showModal('start-visit-dialog', {
@@ -101,7 +101,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
       orderEncounterUuid = await createEmptyEncounter(
         patientUuid,
         config?.drugOrderEncounterType,
-        config?.mapOrderEncounterToCurrentVisit ? currentVisit?.uuid : null,
+        activeVisitRequired ? currentVisit?.uuid : null,
         session?.sessionLocation?.uuid,
         abortController,
       )
@@ -168,6 +168,12 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
       }),
     );
   };
+
+  useEffect(() => {
+    if (errorFetchingEncounterUuid || createEmptyEncounter) {
+      console.error(errorFetchingEncounterUuid ?? createEmptyEncounter);
+    }
+  }, [errorFetchingEncounterUuid, creatingEncounterError]);
 
   if (isMedicationOrderFormVisible) {
     return (
