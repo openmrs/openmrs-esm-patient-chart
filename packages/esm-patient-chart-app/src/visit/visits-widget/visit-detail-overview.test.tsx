@@ -68,7 +68,7 @@ describe('VisitDetailOverview', () => {
 
     await waitForLoadingToFinish();
 
-    const allVisitsTab = screen.getByRole('tab', { name: /all visits/i });
+    const allVisitsTab = screen.getByRole('tab', { name: /all encounters/i });
     const visitSummariesTab = screen.getByRole('tab', { name: /visit summaries/i });
 
     expect(visitSummariesTab).toBeInTheDocument();

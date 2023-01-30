@@ -41,7 +41,7 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
             {t('visitSummaries', 'Visit summaries')}
           </Tab>
           <Tab className={styles.tab} id="all-encounters-tab">
-            {t('allVisits', 'All visits')}
+            {t('allEncounters', 'All encounters')}
           </Tab>
           {showAllEncountersTab ? (
             <Tab className={styles.tab} id="all-encounters-tab">
