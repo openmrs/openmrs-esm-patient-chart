@@ -22,7 +22,7 @@ describe('StopVisitOverflowMenuItem', () => {
 
     render(<StopVisitOverflowMenuItem patientUuid={mockPatient.id} />);
 
-    const endVisitButton = screen.getByRole('menuitem', { name: /End Visit/ });
+    const endVisitButton = screen.getByRole('menuitem', { name: /End visit/ });
     expect(endVisitButton).toBeInTheDocument();
 
     // should launch the form

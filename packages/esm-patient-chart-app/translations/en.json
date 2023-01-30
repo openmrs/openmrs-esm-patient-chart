@@ -43,7 +43,7 @@
   "end": "End",
   "endActiveVisit": "End active visit",
   "endDate": "End date",
-  "endVisit": "End Visit",
+  "endVisit": "End visit",
   "endVisitError": "Error ending current visit",
   "endVisitWarningMessage": "Ending this visit, will not allow you to fill another encounter form for this patient",
   "female": "Female",
