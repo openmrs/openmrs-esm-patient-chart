@@ -4,13 +4,12 @@ import { useTranslation } from 'react-i18next';
 import { BehaviorSubject } from 'rxjs';
 import { Button, ButtonSet, Form } from '@carbon/react';
 import { useLayoutType } from '@openmrs/esm-framework';
-import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import ConditionsWidget from './conditions-widget.component';
 import styles from './conditions-form.scss';
-import { ApiCondition } from './conditions.resource';
+import { ConditionDataTableRow } from './conditions.resource';
 
 interface ConditionFormProps {
-  condition?: ApiCondition;
+  condition?: ConditionDataTableRow;
   patientUuid?: string;
   context: string;
   closeWorkspace: () => void;

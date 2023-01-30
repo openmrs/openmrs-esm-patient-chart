@@ -12,8 +12,14 @@ export type Condition = {
   id: string;
 };
 
-export interface ApiCondition {
-  cells: Array<[Condition]>;
+export interface ConditionDataTableRow {
+  cells: Array<{
+    id: string;
+    value: string;
+    info: {
+      headers: string;
+    };
+  }>;
   id: string;
 }
 
@@ -111,8 +117,4 @@ export function editPatientCondition(conditionId, payload, abortController) {
     body: payload,
     signal: abortController,
   });
-}
-
-export function updatePatientCondition(patientCondition, patientUuid, abortController) {
-  return Promise.resolve({ status: 200, body: 'Ok' });
 }

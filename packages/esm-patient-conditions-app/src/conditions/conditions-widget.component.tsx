@@ -27,7 +27,7 @@ import {
   createPatientCondition,
   CodedCondition,
   useConditionsSearch,
-  ApiCondition,
+  ConditionDataTableRow,
   editPatientCondition,
   useConditions,
 } from './conditions.resource';
@@ -38,7 +38,7 @@ interface ConditionsWidgetProps {
   closeWorkspace?: () => void;
   setHasSubmissibleValue?: (value: boolean) => void;
   submissionNotifier: BehaviorSubject<{ isSubmitting: boolean }>;
-  condition?: ApiCondition;
+  condition?: ConditionDataTableRow;
   context?: string;
 }
 

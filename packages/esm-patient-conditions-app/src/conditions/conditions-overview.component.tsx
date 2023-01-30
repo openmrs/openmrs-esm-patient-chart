@@ -23,7 +23,7 @@ import {
   launchPatientWorkspace,
   CardHeader,
 } from '@openmrs/esm-patient-common-lib';
-import { ActionMenu } from './conditions-action-menu.component';
+import { ConditionsActionMenu } from './conditions-action-menu.component';
 import { Add } from '@carbon/react/icons';
 import { useConditions } from './conditions.resource';
 import styles from './conditions-overview.scss';
@@ -43,7 +43,10 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient }) => {
 
   const { data: conditions, isError, isLoading, isValidating } = useConditions(patient.id);
   const [filter, setFilter] = useState('');
-  const launchConditionsForm = useCallback(() => launchPatientWorkspace('conditions-form-workspace'), []);
+  const launchConditionsForm = useCallback(
+    () => launchPatientWorkspace('conditions-form-workspace', { workspaceTitle: 'Record a Condition' }),
+    [],
+  );
 
   const filteredConditions = useMemo(() => {
     if (!filter || filter == 'All') {
@@ -144,7 +147,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient }) => {
                           <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                         ))}
                         <TableCell className="cds--table-column-menu">
-                          <ActionMenu condition={row} />
+                          <ConditionsActionMenu condition={row} />
                         </TableCell>
                       </TableRow>
                     ))}
