@@ -63,9 +63,9 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
 
   const getTagType = (priority: string) => {
     switch (priority as MappedQueuePriority) {
-      case 'Emergency':
+      case 'emergency':
         return 'red';
-      case 'Not Urgent':
+      case 'not urgent':
         return 'green';
       default:
         return 'gray';
@@ -75,15 +75,16 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
   useEffect(() => {
     visitQueueEntries?.forEach((element) => {
       if (element?.patientUuid == patientUuid && currentVisit?.uuid === element.visitUuid) {
-        const visitQueueEntriesStatuses = {
-          Waiting: `${element.status} for ${element.service}`,
-          'In Service': `Attending ${element.service}`,
-          'Finished Service': `Finished ${element.service}`,
-        };
-        setCurrentService(visitQueueEntriesStatuses[element.status]);
         setVisitType(element.visitType);
         setPriority(element.priority);
         setQueueEntry(element);
+        if (element.status?.toLocaleLowerCase() === 'waiting') {
+          setCurrentService(`Waiting for ${element.service}`)
+        } else if (element.status?.toLocaleLowerCase() === 'in service') {
+          setCurrentService(`Attending ${element.service}`)
+        } else if (element.status?.toLocaleLowerCase() === 'finished service') {
+          setCurrentService(`Finished ${element.service}`)
+        }
       }
     });
   }, [currentVisit?.uuid, patientUuid, visitQueueEntries]);
@@ -117,7 +118,7 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
           <span className={styles.patientInfo}> {visitType} </span>
           <Tag
             className={priority === 'Priority' ? styles.priorityTag : styles.tag}
-            type={getTagType(priority as string)}
+            type={getTagType(priority?.toLocaleLowerCase() as string)}
           >
             {priority}
           </Tag>
