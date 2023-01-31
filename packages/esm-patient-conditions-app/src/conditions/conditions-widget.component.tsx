@@ -15,14 +15,7 @@ import {
   Stack,
   Tile,
 } from '@carbon/react';
-import {
-  createErrorHandler,
-  fhirBaseUrl,
-  showNotification,
-  showToast,
-  useLayoutType,
-  useSession,
-} from '@openmrs/esm-framework';
+import { createErrorHandler, showNotification, showToast, useLayoutType, useSession } from '@openmrs/esm-framework';
 import {
   createPatientCondition,
   CodedCondition,
@@ -54,15 +47,17 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
 }) => {
   const { t } = useTranslation();
   const session = useSession();
-  const { mutate } = useConditions(patientUuid);
+  const { mutate, data } = useConditions(patientUuid);
   const isTablet = useLayoutType() === 'tablet';
+
+  const onsetDateTime = data?.find((d) => d?.id === condition?.id)?.onsetDateTime;
 
   const [clinicalStatus, setClinicalStatus] = useState(
     context === 'editing' ? getFieldValue(condition?.cells, 'clinicalStatus').toLowerCase() : 'active',
   );
   const [endDate, setEndDate] = useState(null);
   const [onsetDate, setOnsetDate] = useState(
-    context === 'editing' ? new Date(getFieldValue(condition?.cells, 'onsetDateTime')) : new Date(),
+    context !== 'editing' ? new Date() : context === 'editing' && onsetDateTime ? new Date(onsetDateTime) : null,
   );
   const [conditionToLookup, setConditionToLookup] = useState<null | string>(
     context === 'editing' ? getFieldValue(condition?.cells, 'display') : '',

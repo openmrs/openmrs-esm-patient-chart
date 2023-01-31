@@ -22,7 +22,7 @@ export const ConditionsActionMenu = ({ condition }: conditionsActionMenuProps) =
     [condition],
   );
   return (
-    <Layer>
+    <Layer className={styles.conditionsOverflowMenuLayer}>
       <OverflowMenu ariaLabel="condition actions" size="sm" flipped>
         <OverflowMenuItem
           className={styles.menuItem}
