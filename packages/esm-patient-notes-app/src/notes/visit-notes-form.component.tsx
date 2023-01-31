@@ -468,8 +468,8 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
             <TextArea
               id="additionalNote"
               light={isTablet}
-              labelText={t('clinicalNoteLabel', 'Write an additional note')}
-              placeholder={t('clinicalNotePlaceholder', 'Write any additional points here')}
+              labelText={t('clinicalNoteLabel', 'Write your notes')}
+              placeholder={t('clinicalNotePlaceholder', 'Write any notes here')}
               onChange={(event) => setClinicalNote(event.currentTarget.value)}
             />
           </Column>
