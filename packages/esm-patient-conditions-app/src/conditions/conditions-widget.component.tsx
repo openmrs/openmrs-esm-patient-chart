@@ -157,7 +157,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
             title: t('conditionUpdated', 'Condition updated'),
           });
 
-          mutate(`${fhirBaseUrl}/Condition?patient=${patientUuid}`);
+          mutate();
         }
       },
       (err) => {
@@ -174,7 +174,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     return () => {
       sub.unsubscribe();
     };
-  }, [closeWorkspace, mutate, patientUuid, selectedCondition, condition?.id, dataHasChanged, conditionPayload, t]);
+  }, [closeWorkspace, mutate, selectedCondition, condition?.id, dataHasChanged, conditionPayload, t]);
 
   const handleSubmit = useCallback(() => {
     if (!selectedCondition) {
