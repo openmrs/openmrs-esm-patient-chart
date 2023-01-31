@@ -31,8 +31,6 @@ import {
 } from '@openmrs/esm-framework';
 import {
   fetchConceptDiagnosisByName,
-  useLocationUuid,
-  useProviderUuid,
   savePatientDiagnosis,
   saveVisitNote,
   useVisitNotes,
@@ -65,8 +63,8 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
   const [visitDateTime, setVisitDateTime] = useState(new Date());
 
   const { mutateVisitNotes } = useVisitNotes(patientUuid);
-  const { locationUuid } = useLocationUuid(session?.sessionLocation?.uuid);
-  const { providerUuid } = useProviderUuid(session?.currentProvider?.uuid);
+  const locationUuid = session?.sessionLocation?.uuid;
+  const providerUuid = session?.currentProvider?.uuid;
 
   const handlePrimarySearchChange = (event) => {
     setIsPrimarySearching(true);

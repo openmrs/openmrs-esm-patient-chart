@@ -5,8 +5,6 @@ import {
   EncountersFetchResponse,
   RESTPatientNote,
   PatientNote,
-  Location,
-  Provider,
   VisitNotePayload,
   DiagnosisPayload,
   Concept,
@@ -62,28 +60,6 @@ export function useVisitNotes(patientUuid: string): UseVisitNotes {
     isLoading,
     isValidating,
     mutateVisitNotes: mutate,
-  };
-}
-
-export function useLocationUuid(locationUuid: string) {
-  const locationUrl = `/ws/rest/v1/location/${locationUuid}`;
-  const { data, error, isLoading } = useSWR<{ data: Location }, Error>(locationUuid ? locationUrl : null, openmrsFetch);
-
-  return {
-    locationUuid: data?.data?.uuid,
-    errorFetchingLocation: error,
-    isLoadingLocation: isLoading,
-  };
-}
-
-export function useProviderUuid(providerUuid: string) {
-  const providerUrl = `/ws/rest/v1/provider/${providerUuid}`;
-  const { data, error, isLoading } = useSWR<{ data: Provider }, Error>(providerUuid ? providerUrl : null, openmrsFetch);
-
-  return {
-    providerUuid: data?.data?.uuid,
-    errorFetchingProvider: error,
-    isLoadingProvider: isLoading,
   };
 }
 
