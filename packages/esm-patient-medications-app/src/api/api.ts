@@ -10,8 +10,8 @@ import { useMemo } from 'react';
  * @param patientUuid The UUID of the patient whose orders should be fetched.
  * @param status The status/the kind of orders to be fetched.
  */
-export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any', careSettingUuid: string) {
-  const { drugOrderTypeUUID } = useConfig() as ConfigObject;
+export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any') {
+  const { careSettingUuid, drugOrderTypeUUID } = useConfig() as ConfigObject;
   const customRepresentation =
     'custom:(uuid,dosingType,orderNumber,accessionNumber,' +
     'patient:ref,action,careSetting:ref,previousOrder:ref,dateActivated,scheduledDate,dateStopped,autoExpireDate,' +
@@ -19,9 +19,10 @@ export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any', 
     'commentToFulfiller,drug:(uuid,display,strength,dosageForm:(display,uuid),concept),dose,doseUnits:ref,' +
     'frequency:ref,asNeeded,asNeededCondition,quantity,quantityUnits:ref,numRefills,dosingInstructions,' +
     'duration,durationUnits:ref,route:ref,brandName,dispenseAsWritten)';
+  const ordersUrl = `/ws/rest/v1/order?patient=${patientUuid}&careSetting=${careSettingUuid}&status=${status}&orderType=${drugOrderTypeUUID}&v=${customRepresentation}`;
 
-  const { data, error, isLoading, isValidating } = useSWR<FetchResponse<PatientMedicationFetchResponse>, Error>(
-    `/ws/rest/v1/order?patient=${patientUuid}&careSetting=${careSettingUuid}&status=${status}&orderType=${drugOrderTypeUUID}&v=${customRepresentation}`,
+  const { data, error, isLoading, isValidating, mutate } = useSWR<FetchResponse<PatientMedicationFetchResponse>, Error>(
+    patientUuid ? ordersUrl : null,
     openmrsFetch,
   );
 
@@ -40,6 +41,7 @@ export function usePatientOrders(patientUuid: string, status: 'ACTIVE' | 'any', 
     error: error,
     isLoading,
     isValidating,
+    mutateOrders: mutate,
   };
 }
 

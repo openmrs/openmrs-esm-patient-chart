@@ -28,7 +28,6 @@ export const useRecommendedVisitTypes = (
   );
 
   const recommendedVisitTypes = useMemo(() => data?.data?.visitTypes?.allowed.map(mapToVisitType) ?? [], [data]);
-
   return { recommendedVisitTypes, error, isLoading };
 };
 

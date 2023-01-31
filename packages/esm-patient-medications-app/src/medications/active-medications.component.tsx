@@ -21,12 +21,7 @@ const ActiveMedications: React.FC<ActiveMedicationsProps> = ({ patientUuid, show
   const displayText = t('activeMedicationsDisplayText', 'Active medications');
   const headerTitle = t('activeMedicationsHeaderTitle', 'active medications');
 
-  const {
-    data: activePatientOrders,
-    error,
-    isLoading,
-    isValidating,
-  } = usePatientOrders(patientUuid, 'ACTIVE', config.careSettingUuid);
+  const { data: activePatientOrders, error, isLoading, isValidating } = usePatientOrders(patientUuid, 'ACTIVE');
 
   const { launchOrderBasket } = useLaunchOrderBasket(patientUuid);
 

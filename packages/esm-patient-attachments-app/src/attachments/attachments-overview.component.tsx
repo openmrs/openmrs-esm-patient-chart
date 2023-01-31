@@ -50,13 +50,14 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
     (attachment: Attachment) => {
       deleteAttachmentPermanently(attachment.id, new AbortController())
         .then(() => {
+          mutate();
+          setAttachmentToPreview(null);
+
           showToast({
             title: t('fileDeleted', 'File deleted'),
             description: `${attachment.title} ${t('successfullyDeleted', 'successfully deleted')}`,
             kind: 'success',
           });
-          setAttachmentToPreview(null);
-          mutate();
         })
         .catch((error) => {
           showToast({

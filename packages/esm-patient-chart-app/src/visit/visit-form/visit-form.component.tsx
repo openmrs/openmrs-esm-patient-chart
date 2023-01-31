@@ -158,6 +158,8 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
                   .subscribe(
                     (response) => {
                       if (response.status === 201) {
+                        mutate();
+
                         showToast({
                           kind: 'success',
                           title: t('visitStarted', 'Visit started'),
@@ -167,7 +169,6 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
                             `${hours} : ${minutes}`,
                           ),
                         });
-                        mutate();
                       }
                     },
                     (error) => {
@@ -180,8 +181,9 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
                     },
                   );
               }
-              closeWorkspace();
               mutate();
+              closeWorkspace();
+
               showToast({
                 critical: true,
                 kind: 'success',
