@@ -49,7 +49,7 @@ import styles from './visit-form.scss';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
 import { ChartConfig } from '../../config-schema';
 import VisitAttributeTypeFields from './visit-attribute-type.component';
-import { QueueEntryPayload, saveQueueEntry, usePriorities, useServices, useStatuses } from '../hooks/useServiceQueue';
+import { QueueEntryPayload, saveQueueEntry, usePriorities, useQueueLocations, useServices, useStatuses } from '../hooks/useServiceQueue';
 
 const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace, promptBeforeClosing }) => {
   const { t } = useTranslation();
@@ -76,9 +76,11 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
   const [priority, setPriority] = useState('');
   const { priorities } = usePriorities();
   const { statuses } = useStatuses();
-  const { services } = useServices(selectedLocation);
   const [selectedService, setSelectedService] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
+  const [selectedQueueLocation, setSelectedQueueLocation] = useState('');
+  const { services } = useServices(selectedQueueLocation);
+  const { queueLocations } = useQueueLocations();
 
   useEffect(() => {
     if (locations && sessionUser?.sessionLocation?.uuid) {
@@ -386,6 +388,26 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
           {config.showServiceQueueFields && (
             <>
               <section className={styles.section}>
+                <div className={styles.queueSection}>
+                  <div className={styles.sectionTitle}>{t('queueLocation', 'Queue location')}</div>
+                  <Select
+                    labelText={t('selectQueueLocation', 'Select a queue location')}
+                    id="location"
+                    invalidText="Required"
+                    value={selectedQueueLocation}
+                    onChange={(event) => {
+                      setSelectedQueueLocation(event.target.value);
+                    }}>
+                    {!selectedQueueLocation ? <SelectItem text={t('selectQueueLocation', 'Select a queue location')} value="" /> : null}
+                    {queueLocations?.length > 0 &&
+                      queueLocations.map((location) => (
+                        <SelectItem key={location.id} text={location.name} value={location.id}>
+                          {location.name}
+                        </SelectItem>
+                      ))}
+                  </Select>
+                </div>
+
                 <div className={styles.queueSection}>
                   <div className={styles.sectionTitle}>{t('service', 'Service')}</div>
                   {!services?.length ? (
