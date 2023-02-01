@@ -78,6 +78,7 @@ export interface UseObsResult {
 type ObsResult = FHIRResource['resource'] & {
   conceptUuid: string;
   dataType?: string;
+  valueDateTime?: string;
 };
 
 function isUuid(input: string) {
