@@ -125,7 +125,9 @@ describe('ConditionsOverview: ', () => {
     await waitFor(() => user.click(recordConditionsLink));
 
     expect(launchPatientWorkspace).toHaveBeenCalledTimes(1);
-    expect(launchPatientWorkspace).toHaveBeenCalledWith('conditions-form-workspace');
+    expect(launchPatientWorkspace).toHaveBeenCalledWith('conditions-form-workspace', {
+      workspaceTitle: 'Record a Condition',
+    });
   });
 });
 

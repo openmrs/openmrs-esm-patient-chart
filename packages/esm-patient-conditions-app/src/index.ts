@@ -58,9 +58,6 @@ function setupOpenMRS() {
       {
         name: 'conditions-form-workspace',
         load: getAsyncLifecycle(() => import('./conditions/conditions-form.component'), options),
-        meta: {
-          title: 'Record a Condition',
-        },
       },
     ],
   };

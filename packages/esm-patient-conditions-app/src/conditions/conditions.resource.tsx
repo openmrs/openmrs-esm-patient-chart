@@ -12,6 +12,17 @@ export type Condition = {
   id: string;
 };
 
+export interface ConditionDataTableRow {
+  cells: Array<{
+    id: string;
+    value: string;
+    info: {
+      headers: string;
+    };
+  }>;
+  id: string;
+}
+
 export type CodedCondition = {
   concept: {
     uuid: string;
@@ -97,6 +108,13 @@ export function createPatientCondition(payload, abortController) {
   });
 }
 
-export function updatePatientCondition(patientCondition, patientUuid, abortController) {
-  return Promise.resolve({ status: 200, body: 'Ok' });
+export function editPatientCondition(conditionId, payload, abortController) {
+  return openmrsObservableFetch(`${fhirBaseUrl}/Condition/${conditionId}`, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    method: 'PUT',
+    body: payload,
+    signal: abortController,
+  });
 }
