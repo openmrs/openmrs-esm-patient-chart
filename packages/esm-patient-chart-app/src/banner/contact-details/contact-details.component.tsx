@@ -1,9 +1,7 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { SkeletonText, Button } from '@carbon/react';
-import { ChevronDown, ChevronUp } from '@carbon/react/icons';
-import { ConfigurableLink, ErrorState, navigate } from '@openmrs/esm-framework';
-
+import { SkeletonText } from '@carbon/react';
+import { ConfigurableLink, ErrorState } from '@openmrs/esm-framework';
 import { usePatientContactAttributes } from '../hooks/usePatientAttributes';
 import { usePatientLists } from './patient-list.resource';
 import { useRelationships } from './relationships.resource';
