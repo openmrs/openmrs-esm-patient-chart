@@ -64,7 +64,7 @@ test('renders the visit notes form with all the relevant fields and values', () 
   renderVisitNotesForm();
 
   expect(screen.getByRole('textbox', { name: /Visit date/i })).toBeInTheDocument();
-  expect(screen.getByRole('textbox', { name: /Write an additional note/i })).toBeInTheDocument();
+  expect(screen.getByRole('textbox', { name: /Write your notes/i })).toBeInTheDocument();
   expect(screen.getByRole('search', { name: /Enter Primary diagnoses/i })).toBeInTheDocument();
   expect(screen.getByRole('search', { name: /Enter Secondary diagnoses/i })).toBeInTheDocument();
   expect(screen.getByRole('group', { name: /Add an image to this visit/i })).toBeInTheDocument();
@@ -150,7 +150,7 @@ test('renders a success toast notification upon successfully recording a visit n
 
   await userEvent.click(targetSearchResult);
 
-  const clinicalNote = screen.getByRole('textbox', { name: /Write an additional note/i });
+  const clinicalNote = screen.getByRole('textbox', { name: /Write your notes/i });
   await userEvent.clear(clinicalNote);
   await userEvent.type(clinicalNote, 'Sample clinical note');
   expect(clinicalNote).toHaveValue('Sample clinical note');
@@ -184,7 +184,7 @@ test('renders an error notification if there was a problem recording a condition
 
   await userEvent.click(targetSearchResult);
 
-  const clinicalNote = screen.getByRole('textbox', { name: /Write an additional note/i });
+  const clinicalNote = screen.getByRole('textbox', { name: /Write your notes/i });
   await userEvent.clear(clinicalNote);
   await userEvent.type(clinicalNote, 'Sample clinical note');
   expect(clinicalNote).toHaveValue('Sample clinical note');
