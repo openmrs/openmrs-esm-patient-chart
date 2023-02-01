@@ -1,0 +1,44 @@
+import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+
+import { Layer, OverflowMenu, OverflowMenuItem } from '@carbon/react';
+import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { Appointment } from '../types';
+import styles from './appointments-action-menu.scss';
+
+interface appointmentsActionMenuProps {
+  appointment: Appointment;
+}
+
+export const AppointmentsActionMenu = ({ appointment }: appointmentsActionMenuProps) => {
+  const { t } = useTranslation();
+
+  const launchEditAppointmentForm = useCallback(
+    () =>
+      launchPatientWorkspace('appointments-form-workspace', {
+        workspaceTitle: t('editAppointment', 'Edit an appointment'),
+        appointment,
+        context: 'editing',
+      }),
+    [appointment, t],
+  );
+  return (
+    <Layer className={styles.appointmentOverflowMenuLayer}>
+      <OverflowMenu ariaLabel="appointment actions" size="sm" flipped>
+        <OverflowMenuItem
+          className={styles.menuItem}
+          id="editAppointment"
+          onClick={launchEditAppointmentForm}
+          itemText={t('edit', 'Edit')}
+        />
+        <OverflowMenuItem
+          className={styles.menuItem}
+          id="cancelAppointment"
+          itemText={t('cancel', 'Cancel')}
+          isDelete={true}
+          hasDivider
+        />
+      </OverflowMenu>
+    </Layer>
+  );
+};

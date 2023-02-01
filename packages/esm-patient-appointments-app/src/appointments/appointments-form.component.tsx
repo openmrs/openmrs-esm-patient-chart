@@ -16,26 +16,47 @@ import {
   TimePickerSelect,
   TimePicker,
 } from '@carbon/react';
-import { amPm, convertTime12to24, DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import { amPm, convertTime12to24 } from '@openmrs/esm-patient-common-lib';
 import { useLocations, useSession, showToast, showNotification, useLayoutType } from '@openmrs/esm-framework';
-import { createAppointment, useAppointments, useAppointmentService } from './appointments.resource';
-import { AppointmentPayload } from '../types';
+import { saveAppointment, useAppointments, useAppointmentService } from './appointments.resource';
+import { Appointment, AppointmentPayload } from '../types';
 import styles from './appointments-form.scss';
 
 const appointmentTypes = [{ name: 'Scheduled' }, { name: 'WalkIn' }];
 
-const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace }) => {
+interface AppointmentsFormProps {
+  appointment?: Appointment;
+  patientUuid?: string;
+  context?: string;
+  closeWorkspace: () => void;
+}
+
+const AppointmentsForm: React.FC<AppointmentsFormProps> = ({ patientUuid, closeWorkspace, appointment, context }) => {
+  const editedAppointmentTimeFormat = new Date(appointment?.startDateTime).getHours() >= 12 ? 'PM' : 'AM';
+
+  const defaultTimeFormat = appointment?.startDateTime
+    ? editedAppointmentTimeFormat
+    : new Date().getHours() >= 12
+    ? 'PM'
+    : 'AM';
+
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const locations = useLocations();
   const session = useSession();
-  const [appointmentNote, setAppointmentNote] = useState('');
-  const [selectedAppointmentType, setSelectedAppointmentType] = useState('');
-  const [selectedService, setSelectedService] = useState('');
-  const [startDate, setStartDate] = useState(new Date());
-  const [startTime, setStartTime] = useState(dayjs(new Date()).format('hh:mm'));
-  const [timeFormat, setTimeFormat] = useState<amPm>(new Date().getHours() >= 12 ? 'PM' : 'AM');
-  const [userLocation, setUserLocation] = useState('');
+  const [appointmentNote, setAppointmentNote] = useState(appointment?.comments || '');
+  const [selectedAppointmentType, setSelectedAppointmentType] = useState(appointment?.appointmentKind || '');
+  const [selectedService, setSelectedService] = useState(appointment?.service?.name || '');
+  const [startDate, setStartDate] = useState(
+    appointment?.startDateTime ? new Date(appointment?.startDateTime) : new Date(),
+  );
+  const [startTime, setStartTime] = useState(
+    appointment?.startDateTime
+      ? dayjs(new Date(appointment?.startDateTime)).format('hh:mm')
+      : dayjs(new Date()).format('hh:mm'),
+  );
+  const [timeFormat, setTimeFormat] = useState<amPm>(defaultTimeFormat);
+  const [userLocation, setUserLocation] = useState(appointment?.location?.uuid || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { mutate } = useAppointments(patientUuid, new Date().toUTCString(), new AbortController());
@@ -46,10 +67,24 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
 
   const { data: services, isLoading } = useAppointmentService();
 
-  const handleSubmit = () => {
+  const hasChangedFields =
+    appointmentNote !== appointment?.comments ||
+    selectedAppointmentType !== appointment?.appointmentKind ||
+    userLocation !== appointment?.location?.uuid ||
+    startDate !== new Date(appointment?.startDateTime) ||
+    startTime !== dayjs(new Date(appointment?.startDateTime)).format('hh:mm') ||
+    timeFormat !== editedAppointmentTimeFormat ||
+    selectedService !== appointment?.service?.name;
+
+  const hasEditted = context === 'editing' && hasChangedFields;
+
+  // Same for creating and editing
+  const handleSaveAppointment = () => {
     setIsSubmitting(true);
-    const serviceUuid = services.find((service) => service.name === selectedService)?.uuid;
-    const serviceDuration = services.find((service) => service.name === selectedService)?.durationMins;
+
+    // Construct saving payload
+    const serviceUuid = services?.find((service) => service.name === selectedService)?.uuid;
+    const serviceDuration = services?.find((service) => service.name === selectedService)?.durationMins;
 
     const [hours, minutes] = convertTime12to24(startTime, timeFormat);
 
@@ -77,10 +112,11 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
       locationUuid: userLocation,
       patientUuid: patientUuid,
       comments: appointmentNote,
+      uuid: context === 'editing' ? appointment.uuid : undefined,
     };
 
     const abortController = new AbortController();
-    createAppointment(appointmentPayload, abortController).then(
+    saveAppointment(appointmentPayload, abortController).then(
       ({ status }) => {
         if (status === 200) {
           setIsSubmitting(false);
@@ -223,6 +259,7 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
             <TextArea
               id="appointmentNote"
               light={isTablet}
+              value={appointmentNote}
               labelText={t('appointmentNoteLabel', 'Write an additional note')}
               placeholder={t('appointmentNotePlaceholder', 'Write any additional points here')}
               onChange={(event) => setAppointmentNote(event.target.value)}
@@ -234,7 +271,11 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
         <Button className={styles.button} onClick={closeWorkspace} kind="secondary">
           {t('discard', 'Discard')}
         </Button>
-        <Button className={styles.button} disabled={!selectedService || isSubmitting} onClick={handleSubmit}>
+        <Button
+          className={styles.button}
+          disabled={!selectedService || isSubmitting || !hasEditted}
+          onClick={handleSaveAppointment}
+        >
           {t('saveAndClose', 'Save and close')}
         </Button>
       </ButtonSet>

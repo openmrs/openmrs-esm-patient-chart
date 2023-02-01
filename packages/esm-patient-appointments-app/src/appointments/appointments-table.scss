@@ -1,0 +1,6 @@
+.appointmentsBaseTable {
+  :global(tbody tr:not(.cds--parent-row) td:last-child) {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}

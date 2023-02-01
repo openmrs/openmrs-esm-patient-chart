@@ -50,9 +50,6 @@ function setupOpenMRS() {
       {
         name: 'appointments-form-workspace',
         load: getAsyncLifecycle(() => import('./appointments/appointments-form.component'), options),
-        meta: {
-          title: 'Schedule appointment',
-        },
       },
     ],
   };

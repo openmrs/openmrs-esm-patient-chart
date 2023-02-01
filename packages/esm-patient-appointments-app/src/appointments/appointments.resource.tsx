@@ -68,7 +68,7 @@ export function useAppointmentService() {
   };
 }
 
-export function createAppointment(appointment: AppointmentPayload, abortController: AbortController) {
+export function saveAppointment(appointment: AppointmentPayload, abortController: AbortController) {
   return openmrsFetch(`/ws/rest/v1/appointment`, {
     method: 'POST',
     signal: abortController.signal,
@@ -89,8 +89,4 @@ export function getAppointmentService(abortController: AbortController, uuid) {
   return openmrsFetch(`/ws/rest/v1/appointmentService?uuid=` + uuid, {
     signal: abortController.signal,
   });
-}
-
-export function getTimeSlots(abortController: AbortController) {
-  //https://openmrs-spa.org/openmrs/ws/rest/v1/appointment/all?forDate=2020-03-02T21:00:00.000Z
 }

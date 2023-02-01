@@ -1,0 +1,8 @@
+.appointmentOverflowMenuLayer {
+  &:global(.cds--layer-two) {
+    height: 100%;
+  }
+}
+.menuItem {
+  max-width: none;
+}
