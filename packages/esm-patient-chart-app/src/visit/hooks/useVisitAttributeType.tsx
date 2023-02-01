@@ -40,6 +40,12 @@ export function useVisitAttributeType(uuid) {
     openmrsFetch,
   );
 
+  useEffect(() => {
+    if (error) {
+      console.error(error);
+    }
+  }, [error]);
+
   const results = useMemo(() => {
     return {
       isLoading,
@@ -56,6 +62,12 @@ export function useConceptAnswersForVisitAttributeType(conceptUuid) {
     conceptUuid ? `/ws/rest/v1/concept/${conceptUuid}` : null,
     openmrsFetch,
   );
+
+  useEffect(() => {
+    if (error) {
+      console.error(error);
+    }
+  }, [error]);
 
   const results = useMemo(() => {
     return {
