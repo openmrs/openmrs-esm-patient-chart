@@ -1,7 +1,7 @@
 const patientSummaryExtensionOrder: {
   [x: string]: number;
 } = {
-// 0th order is given to Offline tools
+  // 0th order is given to Offline tools
   Vitals: 1,
   Biometrics: 2,
   Conditions: 3,
