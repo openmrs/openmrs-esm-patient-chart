@@ -11,7 +11,7 @@ export function useVisits(patientUuid: string) {
     'encounterProviders:(uuid,display,encounterRole:(uuid,display),' +
     'provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime,stopDatetime,patient';
 
-  const { data, error, isValidating } = useSWR<{ data: { results: Array<Visit> } }, Error>(
+  const { data, error, isLoading, isValidating } = useSWR<{ data: { results: Array<Visit> } }, Error>(
     `/ws/rest/v1/visit?patient=${patientUuid}&v=${customRepresentation}`,
     openmrsFetch,
   );
@@ -19,7 +19,7 @@ export function useVisits(patientUuid: string) {
   return {
     visits: data ? data?.data?.results : null,
     isError: error,
-    isLoading: !data && !error,
+    isLoading,
     isValidating,
   };
 }
@@ -41,7 +41,7 @@ export function useEncounters(patientUuid: string) {
       .map(([key, value]) => `${key}=${value}`)
       .join('&');
 
-  const { data, error, isValidating } = useSWR<{ data: { results: Array<Record<string, unknown>> } }, Error>(
+  const { data, error, isLoading, isValidating } = useSWR<{ data: { results: Array<Record<string, unknown>> } }, Error>(
     fullRequest,
     openmrsFetch,
   );
@@ -49,7 +49,7 @@ export function useEncounters(patientUuid: string) {
   return {
     encounters: data ? data?.data?.results : null,
     error,
-    isLoading: !data && !error,
+    isLoading,
     isValidating,
   };
 }
@@ -63,7 +63,7 @@ export function usePastVisits(patientUuid: string) {
     'visitType:(uuid,name,display),attributes:(uuid,display,value),location:(uuid,name,display),startDatetime,' +
     'stopDatetime)';
 
-  const { data, error, isValidating } = useSWR<{ data: { results: Array<Visit> } }, Error>(
+  const { data, error, isLoading, isValidating } = useSWR<{ data: { results: Array<Visit> } }, Error>(
     `/ws/rest/v1/visit?patient=${patientUuid}&v=${customRepresentation}`,
     openmrsFetch,
   );
@@ -71,7 +71,7 @@ export function usePastVisits(patientUuid: string) {
   return {
     data: data ? data.data.results : null,
     isError: error,
-    isLoading: !data && !error,
+    isLoading,
     isValidating,
   };
 }

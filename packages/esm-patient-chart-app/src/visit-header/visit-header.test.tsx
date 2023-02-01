@@ -14,6 +14,7 @@ import {
 import { mockPatient, mockPatientWithLongName } from '../../../../__mocks__/patient.mock';
 import { registerWorkspace, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import VisitHeader from './visit-header.component';
+import { getByTextWithMarkup } from '../../../../tools/test-helpers';
 
 const mockUseAssignedExtensions = useAssignedExtensions as jest.Mock;
 const mockUsePatient = usePatient as jest.Mock;
@@ -118,7 +119,7 @@ describe('Visit Header', () => {
 
     const longNameText = screen.getByText(/^Some very long given name...$/i);
     expect(longNameText).toBeInTheDocument();
-    expect(screen.getByText(/^Some very long given name family name 20, male$/i)).toBeInTheDocument();
+    expect(getByTextWithMarkup(/Some very long given name family name\s*20, male/i)).toBeInTheDocument();
   });
 });
 

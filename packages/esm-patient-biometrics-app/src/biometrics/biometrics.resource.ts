@@ -21,7 +21,7 @@ export interface PatientBiometrics {
 
 type MappedBiometrics = {
   code: string;
-  issued: Date;
+  recordedDate: Date;
   value: number;
 };
 
@@ -35,7 +35,10 @@ export function useBiometrics(patientUuid: string, concepts: Record<string, stri
     `&_count=${pageSize}
   `;
 
-  const { data, error, isValidating } = useSWR<{ data: BiometricsFetchResponse }, Error>(apiUrl, openmrsFetch);
+  const { data, error, isLoading, isValidating } = useSWR<{ data: BiometricsFetchResponse }, Error>(
+    apiUrl,
+    openmrsFetch,
+  );
 
   const getBiometricValueKey = (conceptUuid: string): string => {
     switch (conceptUuid) {
@@ -50,7 +53,7 @@ export function useBiometrics(patientUuid: string, concepts: Record<string, stri
 
   const mapBiometricsProperties = (resource: FHIRResource['resource']): MappedBiometrics => ({
     code: resource?.code?.coding?.[0]?.code,
-    issued: resource?.issued,
+    recordedDate: resource?.effectiveDateTime,
     value: resource?.valueQuantity?.value,
   });
 
@@ -58,16 +61,16 @@ export function useBiometrics(patientUuid: string, concepts: Record<string, stri
   const biometricsResponse = data?.data?.entry?.map((entry) => entry.resource ?? []).map(mapBiometricsProperties);
 
   biometricsResponse?.map((biometrics) => {
-    const issuedDate = new Date(new Date(biometrics.issued)).toISOString();
+    const recordedDate = new Date(new Date(biometrics.recordedDate)).toISOString();
 
-    if (biometricsHashTable.has(issuedDate)) {
-      biometricsHashTable.set(issuedDate, {
-        ...biometricsHashTable.get(issuedDate),
+    if (biometricsHashTable.has(recordedDate)) {
+      biometricsHashTable.set(recordedDate, {
+        ...biometricsHashTable.get(recordedDate),
         [getBiometricValueKey(biometrics.code)]: biometrics.value,
       });
     } else {
       biometrics.value &&
-        biometricsHashTable.set(issuedDate, {
+        biometricsHashTable.set(recordedDate, {
           [getBiometricValueKey(biometrics.code)]: biometrics.value,
         });
     }
@@ -87,7 +90,7 @@ export function useBiometrics(patientUuid: string, concepts: Record<string, stri
   return {
     biometrics: formattedBiometrics,
     isError: error,
-    isLoading: !data && !error,
+    isLoading,
     isValidating,
   };
 }

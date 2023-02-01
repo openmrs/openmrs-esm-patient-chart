@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSWRConfig } from 'swr';
 import dayjs from 'dayjs';
 import {
   Button,
@@ -19,7 +18,7 @@ import {
 } from '@carbon/react';
 import { amPm, convertTime12to24, DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import { useLocations, useSession, showToast, showNotification, useLayoutType } from '@openmrs/esm-framework';
-import { appointmentsSearchUrl, createAppointment, useAppointmentService } from './appointments.resource';
+import { createAppointment, useAppointments, useAppointmentService } from './appointments.resource';
 import { AppointmentPayload } from '../types';
 import styles from './appointments-form.scss';
 
@@ -28,7 +27,6 @@ const appointmentTypes = [{ name: 'Scheduled' }, { name: 'WalkIn' }];
 const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { mutate } = useSWRConfig();
   const locations = useLocations();
   const session = useSession();
   const [appointmentNote, setAppointmentNote] = useState('');
@@ -38,6 +36,9 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
   const [startTime, setStartTime] = useState(dayjs(new Date()).format('hh:mm'));
   const [timeFormat, setTimeFormat] = useState<amPm>(new Date().getHours() >= 12 ? 'PM' : 'AM');
   const [userLocation, setUserLocation] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { mutate } = useAppointments(patientUuid, new Date().toUTCString(), new AbortController());
 
   if (!userLocation && session?.sessionLocation?.uuid) {
     setUserLocation(session?.sessionLocation?.uuid);
@@ -46,6 +47,7 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
   const { data: services, isLoading } = useAppointmentService();
 
   const handleSubmit = () => {
+    setIsSubmitting(true);
     const serviceUuid = services.find((service) => service.name === selectedService)?.uuid;
     const serviceDuration = services.find((service) => service.name === selectedService)?.durationMins;
 
@@ -81,7 +83,9 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
     createAppointment(appointmentPayload, abortController).then(
       ({ status }) => {
         if (status === 200) {
+          setIsSubmitting(false);
           closeWorkspace();
+          mutate();
 
           showToast({
             critical: true,
@@ -90,10 +94,9 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
             title: t('appointmentScheduled', 'Appointment scheduled'),
           });
         }
-
-        mutate(`${appointmentsSearchUrl}`);
       },
       (error) => {
+        setIsSubmitting(false);
         showNotification({
           title: t('appointmentFormError', 'Error scheduling appointment'),
           kind: 'error',
@@ -139,7 +142,6 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
         id="time-picker-select-1"
         onChange={(event) => setTimeFormat(event.target.value as amPm)}
         value={timeFormat}
-        labelText={t('time', 'Time')}
         aria-label={t('time', 'Time')}
       >
         <SelectItem value="AM" text="AM" />
@@ -217,20 +219,22 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
         </section>
         <section className={styles.formGroup}>
           <span>{t('note', 'Note')}</span>
-          <TextArea
-            id="appointmentNote"
-            light={isTablet}
-            labelText={t('appointmentNoteLabel', 'Write an additional note')}
-            placeholder={t('appointmentNotePlaceholder', 'Write any additional points here')}
-            onChange={(event) => setAppointmentNote(event.target.value)}
-          />
+          <Layer>
+            <TextArea
+              id="appointmentNote"
+              light={isTablet}
+              labelText={t('appointmentNoteLabel', 'Write an additional note')}
+              placeholder={t('appointmentNotePlaceholder', 'Write any additional points here')}
+              onChange={(event) => setAppointmentNote(event.target.value)}
+            />
+          </Layer>
         </section>
       </Stack>
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
         <Button className={styles.button} onClick={closeWorkspace} kind="secondary">
           {t('discard', 'Discard')}
         </Button>
-        <Button className={styles.button} disabled={!selectedService} onClick={handleSubmit}>
+        <Button className={styles.button} disabled={!selectedService || isSubmitting} onClick={handleSubmit}>
           {t('saveAndClose', 'Save and close')}
         </Button>
       </ButtonSet>

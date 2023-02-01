@@ -57,7 +57,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
     error,
     isLoading: isLoadingOrders,
     isValidating,
-  } = usePatientOrders(patientUuid, 'ACTIVE', config.careSettingUuid);
+  } = usePatientOrders(patientUuid, 'ACTIVE');
   const noCurrentVisit = activeVisitRequired && !currentVisit;
 
   const openStartVisitDialog = useCallback(() => {

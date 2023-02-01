@@ -25,8 +25,10 @@ export type CodedCondition = {
 };
 
 export function useConditions(patientUuid: string) {
-  const { data, error, isValidating } = useSWR<{ data: FHIRConditionResponse }, Error>(
-    `${fhirBaseUrl}/Condition?patient=${patientUuid}&_count=100`,
+  const conditionsUrl = `${fhirBaseUrl}/Condition?patient=${patientUuid}&_count=100`;
+
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: FHIRConditionResponse }, Error>(
+    patientUuid ? conditionsUrl : null,
     openmrsFetch,
   );
 
@@ -41,8 +43,9 @@ export function useConditions(patientUuid: string) {
   return {
     data: data ? formattedConditions : null,
     isError: error,
-    isLoading: !data && !error,
+    isLoading,
     isValidating,
+    mutate,
   };
 }
 
@@ -50,17 +53,17 @@ export function useConditionsSearch(conditionToLookup: string) {
   const config = useConfig();
   const conditionConceptClassUuid = config?.conditionConceptClassUuid;
 
-  const CONDITIONS_SEARCH_URL = `/ws/rest/v1/conceptsearch?conceptClasses=${conditionConceptClassUuid}&q=${conditionToLookup}`;
+  const conditionsSearchUrl = `/ws/rest/v1/conceptsearch?conceptClasses=${conditionConceptClassUuid}&q=${conditionToLookup}`;
 
-  const { data, error } = useSWR<{ data: { results: Array<CodedCondition> } }, Error>(
-    conditionToLookup ? CONDITIONS_SEARCH_URL : null,
+  const { data, error, isLoading } = useSWR<{ data: { results: Array<CodedCondition> } }, Error>(
+    conditionToLookup ? conditionsSearchUrl : null,
     openmrsFetch,
   );
 
   return {
     conditions: data?.data?.results ?? [],
     error: error,
-    isSearchingConditions: !data && !error,
+    isSearchingConditions: isLoading,
   };
 }
 
@@ -72,8 +75,9 @@ export function getConditionByUuid(conditionUuid: string) {
 }
 
 function mapConditionProperties(condition: FHIRCondition): Condition {
+  const status = condition?.clinicalStatus?.coding[0]?.code;
   return {
-    clinicalStatus: condition?.clinicalStatus?.coding[0]?.code,
+    clinicalStatus: status ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() : '',
     conceptId: condition?.code?.coding[0]?.code,
     display: condition?.code?.coding[0]?.display,
     onsetDateTime: condition?.onsetDateTime,

@@ -10,7 +10,7 @@ export function useDrugSearch(query): {
   drugs: Array<Drug>;
   error: Error;
 } {
-  const { data, error } = useSWRImmutable<FetchResponse<{ results: Array<Drug> }>, Error>(
+  const { data, error, isLoading } = useSWRImmutable<FetchResponse<{ results: Array<Drug> }>, Error>(
     query
       ? `/ws/rest/v1/drug?q=${query}&v=custom:(uuid,display,name,strength,dosageForm:(display,uuid),concept:(display,uuid))`
       : null,
@@ -19,11 +19,11 @@ export function useDrugSearch(query): {
 
   const results = useMemo(
     () => ({
-      isLoading: !data && !error,
+      isLoading,
       drugs: data?.data?.results,
       error,
     }),
-    [data, error],
+    [data, error, isLoading],
   );
 
   return results;
@@ -34,7 +34,7 @@ export function useDrugTemplate(drugUuid: string): {
   templates: Array<DrugOrderTemplate>;
   error: Error;
 } {
-  const { data, error } = useSWRImmutable<
+  const { data, error, isLoading } = useSWRImmutable<
     FetchResponse<{
       results: Array<{
         uuid: string;
@@ -48,14 +48,14 @@ export function useDrugTemplate(drugUuid: string): {
 
   const results = useMemo(
     () => ({
-      isLoading: !data && !error,
+      isLoading,
       templates: data?.data?.results?.map((drug) => ({
         ...drug,
         template: JSON.parse(drug.template) as OrderTemplate,
       })),
       error: error,
     }),
-    [data, error],
+    [data, error, isLoading],
   );
   return results;
 }
