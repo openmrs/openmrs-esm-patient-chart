@@ -15,11 +15,11 @@ export const ConditionsActionMenu = ({ condition }: conditionsActionMenuProps) =
   const launchEditConditionsForm = useCallback(
     () =>
       launchPatientWorkspace('conditions-form-workspace', {
-        workspaceTitle: 'Edit a condition',
+        workspaceTitle: t('editCondition', 'Edit a Condition'),
         condition,
         context: 'editing',
       }),
-    [condition],
+    [condition, t],
   );
   return (
     <Layer className={styles.conditionsOverflowMenuLayer}>
