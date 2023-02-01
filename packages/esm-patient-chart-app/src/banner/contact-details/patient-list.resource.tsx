@@ -1,8 +1,7 @@
-import { FetchResponse, openmrsFetch, OpenmrsResource } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
 import useSWRImmutable from 'swr/immutable';
+import { FetchResponse, openmrsFetch } from '@openmrs/esm-framework';
 
-export const cohortUrl = '/ws/rest/v1/cohortm';
 export interface CohortList {
   patient: {
     uuid: string;
@@ -41,8 +40,10 @@ function extractPatientListData(cohortLists: Array<CohortList>): Array<Extracted
 }
 
 export function usePatientLists(patientUuid: string) {
-  const { data, error, isValidating } = useSWRImmutable<FetchResponse<PatientListResponse>, Error>(
-    `${cohortUrl}/cohortmember?patient=${patientUuid}&v=default`,
+  const cohortMemberUrl = '/ws/rest/v1/cohortm/cohortmember';
+
+  const { data, error, isLoading, isValidating } = useSWRImmutable<FetchResponse<PatientListResponse>, Error>(
+    `${cohortMemberUrl}?patient=${patientUuid}&v=default`,
     openmrsFetch,
   );
   const formattedPatientLists = useMemo(
@@ -51,9 +52,9 @@ export function usePatientLists(patientUuid: string) {
   );
 
   return {
-    data: data ? formattedPatientLists : null,
+    lists: data ? formattedPatientLists : null,
     isError: error,
-    isLoading: !data && !error,
+    isLoading,
     isValidating,
   };
 }

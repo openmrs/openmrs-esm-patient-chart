@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SkeletonText, Button } from '@carbon/react';
 import { ChevronDown, ChevronUp } from '@carbon/react/icons';
-import { ConfigurableLink, ErrorState } from '@openmrs/esm-framework';
+import { ConfigurableLink, ErrorState, navigate } from '@openmrs/esm-framework';
 
 import { usePatientContactAttributes } from '../hooks/usePatientAttributes';
 import { usePatientLists } from './patient-list.resource';
@@ -105,51 +105,28 @@ const Relationships: React.FC<{ patientId: string }> = ({ patientId }) => {
 
 const PatientLists: React.FC<{ patientId: string }> = ({ patientId }) => {
   const { t } = useTranslation();
+  const { lists, isLoading, isError } = usePatientLists(patientId);
   const headerTitle = t('contactDetails', 'Contact Details');
-  const { data: formattedPatientLists, isLoading, isError } = usePatientLists(patientId);
-  const [showPatientListDetails, setShowPatientListDetails] = React.useState(false);
-  const togglePatientListDetails = React.useCallback((event: MouseEvent) => {
-    event.stopPropagation();
-    setShowPatientListDetails((value) => !value);
-  }, []);
 
   return (
     <>
-      <p className={styles.patientListsHeading}>
-        {t('patientLists', 'Patient Lists')}{' '}
-        {formattedPatientLists?.length ? <span>({formattedPatientLists?.length})</span> : null}
-        <Button
-          size="sm"
-          kind="ghost"
-          renderIcon={(props) =>
-            showPatientListDetails ? <ChevronUp size={16} {...props} /> : <ChevronDown size={16} {...props} />
-          }
-          iconDescription={t('TogglePatientListDetails', 'Toggle patient List Details')}
-          onClick={togglePatientListDetails}
-        >
-          {showPatientListDetails ? t('seeLess', 'See less') : t('seeAll', 'See all')}
-        </Button>
-      </p>
+      <div className={styles.container}>
+        <p className={styles.heading}>
+          <span>{t('patientLists', 'Patient Lists')}</span>
+          {lists?.length ? <span style={{ marginLeft: '0.25rem' }}>({lists?.length})</span> : null}
+        </p>
+        <ConfigurableLink style={{ textDecoration: 'none' }} to={`\${openmrsSpaBase}/patient-list`}>
+          {t('seeAll', 'See all')}
+        </ConfigurableLink>
+      </div>
       <div className={styles.patientLists}>
         {(() => {
           if (isLoading) return <SkeletonText />;
           if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
-          if (formattedPatientLists?.length && !showPatientListDetails) {
+          if (lists?.length) {
             return (
               <ul>
-                {formattedPatientLists.slice(0, 5).map((r) => (
-                  <li key={r.uuid} className={styles.relationship}>
-                    <ConfigurableLink className={styles.link} to={`\${openmrsSpaBase}/patient-list/${r.uuid}`}>
-                      {r.display}
-                    </ConfigurableLink>
-                  </li>
-                ))}
-              </ul>
-            );
-          } else if (formattedPatientLists?.length && showPatientListDetails) {
-            return (
-              <ul>
-                {formattedPatientLists.map((r) => (
+                {lists.slice(0, 5).map((r) => (
                   <li key={r.uuid} className={styles.relationship}>
                     <ConfigurableLink className={styles.link} to={`\${openmrsSpaBase}/patient-list/${r.uuid}`}>
                       {r.display}

@@ -26,13 +26,7 @@
 }
 
 .patientLists {
-  margin: 0.125rem 0;
-}
-
-.patientListsHeading {
-  @extend .heading;
-  margin-top: -0.5rem;
-
+  margin: 0.5rem 0;
 }
 
 .row {
@@ -46,7 +40,7 @@
 
 .row > .col {
   flex: 1;
-  padding: 1rem 1rem;
+  padding: 1rem;
 
   &:nth-of-type(2n + 1) {
     border-right: 1px solid $ui-03;
@@ -64,4 +58,9 @@
 
 .relationship div {
   flex: 1 1;
+}
+
+.container {
+  display: flex;
+  justify-content: space-between;
 }
