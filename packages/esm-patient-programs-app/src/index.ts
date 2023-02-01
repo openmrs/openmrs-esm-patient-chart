@@ -26,6 +26,14 @@ function setupOpenMRS() {
   return {
     extensions: [
       {
+        name: 'programs-overview-widget',
+        order: 0,
+        load: getAsyncLifecycle(() => import('./programs/programs-overview.component'), options),
+        meta: {
+          columnSpan: 4,
+        },
+      },
+      {
         name: 'programs-details-widget',
         slot: dashboardMeta.slot,
         load: getAsyncLifecycle(() => import('./programs/programs-detailed-summary.component'), options),

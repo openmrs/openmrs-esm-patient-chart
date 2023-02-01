@@ -30,6 +30,16 @@ function setupOpenMRS() {
   return {
     extensions: [
       {
+        name: 'notes-overview-widget',
+        order: 7,
+        load: getAsyncLifecycle(() => import('./notes/notes-overview.component'), options),
+        meta: {
+          columnSpan: 4,
+        },
+        online: { showAddNote: true },
+        offline: { showAddNote: false },
+      },
+      {
         name: 'notes-details-widget',
         slot: 'patient-chart-form-dashboard-slot',
         load: getAsyncLifecycle(() => import('./notes/notes-detailed-summary.component'), options),

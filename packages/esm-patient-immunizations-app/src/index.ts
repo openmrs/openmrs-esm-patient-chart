@@ -27,6 +27,13 @@ function setupOpenMRS() {
   return {
     extensions: [
       {
+        name: 'immunization-overview-widget',
+        load: getAsyncLifecycle(() => import('./immunizations/immunizations-overview.component'), options),
+        meta: {
+          columnSpan: 4,
+        },
+      },
+      {
         name: 'immunization-details-widget',
         slot: dashboardMeta.slot,
         load: getAsyncLifecycle(() => import('./immunizations/immunizations-detailed-summary.component'), options),

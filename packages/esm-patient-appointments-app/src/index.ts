@@ -25,6 +25,14 @@ function setupOpenMRS() {
   return {
     extensions: [
       {
+        name: 'appointments-overview-widget',
+        order: 8,
+        load: getAsyncLifecycle(() => import('./appointments/appointments-overview.component'), options),
+        meta: {
+          columnSpan: 4,
+        },
+      },
+      {
         name: 'appointments-details-widget',
         slot: dashboardMeta.slot,
         load: getAsyncLifecycle(() => import('./appointments/appointments-detailed-summary.component'), options),
