@@ -1,4 +1,5 @@
 import { defineConfigSchema, fhirBaseUrl, getAsyncLifecycle, messageOmrsServiceWorker } from '@openmrs/esm-framework';
+import { getPatientSummaryOrder } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { patientVitalsBiometricsFormWorkspace } from './constants';
 
@@ -33,7 +34,7 @@ function setupOpenMRS() {
       {
         name: 'vitals-overview-widget',
         slot: 'patient-chart-summary-dashboard-slot',
-        order: 0,
+        order: getPatientSummaryOrder('Vitals'),
         load: getAsyncLifecycle(() => import('./vitals/vitals-summary.component'), options),
         meta: {
           columnSpan: 4,

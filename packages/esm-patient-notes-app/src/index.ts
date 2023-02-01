@@ -1,4 +1,5 @@
 import { defineConfigSchema, getAsyncLifecycle, messageOmrsServiceWorker } from '@openmrs/esm-framework';
+import { getPatientSummaryOrder } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 
 declare var __VERSION__: string;
@@ -31,7 +32,7 @@ function setupOpenMRS() {
     extensions: [
       {
         name: 'notes-overview-widget',
-        order: 7,
+        order: getPatientSummaryOrder('Notes'),
         load: getAsyncLifecycle(() => import('./notes/notes-overview.component'), options),
         meta: {
           columnSpan: 4,
