@@ -1,5 +1,5 @@
-import { of } from 'rxjs';
-import { concatAll, map } from 'rxjs/operators';
+import {forkJoin, from, of} from 'rxjs';
+import {concat, concatAll, concatMap, map, mergeMap} from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -25,27 +25,29 @@ export class ConceptService {
   constructor(private http: HttpClient, private windowRef: WindowRef) {}
 
   public searchConceptsByIdentifiers(conceptIdentifiers: Array<string>) {
-    return of(...ConceptService.getConceptReferenceUrls(conceptIdentifiers)).pipe(
-      map((referenceUrl) =>
-        this.http
-          .get<ConceptReferencesResult>(this.windowRef.openmrsRestBase + referenceUrl, {
-            headers: this.headers,
-          })
-          .pipe(
-            map((result) =>
-              Object.entries(result).reduce((acc, reference) => {
-                acc.push({
-                  identifier: reference[0],
-                  display: reference[1].display,
-                });
+    return of(ConceptService.getConceptReferenceUrls(conceptIdentifiers)).pipe(
+      mergeMap((referenceUrl) =>
+        forkJoin(...referenceUrl.map(
+          url =>
+            this.http
+              .get<ConceptReferencesResult>(this.windowRef.openmrsRestBase + url, {
+                headers: this.headers,
+              })
+              .pipe(
+                map((result) =>
+                  Object.entries(result).reduce((acc, reference) => {
+                    acc.push({
+                      identifier: reference[0],
+                      display: reference[1].display,
+                    });
 
-                return acc;
-              }, [] as Array<ConceptMetadata>),
-            ),
-          ),
-      ),
-      concatAll(),
-    );
+                    return acc;
+                  }, [] as Array<ConceptMetadata>),
+                ),
+              ).toPromise()
+        ))
+      )
+    ).pipe(map((r) => r.flat()));
   }
 
   /**
