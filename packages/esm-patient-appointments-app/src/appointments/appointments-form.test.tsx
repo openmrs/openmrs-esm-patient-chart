@@ -42,7 +42,7 @@ jest.mock('./appointments.resource', () => {
 
 describe('AppointmentForm', () => {
   it('renders the appointments form showing all the relevant fields and values', async () => {
-    mockOpenmrsFetch.mockReturnValueOnce(mockUseAppointmentServiceData);
+    mockOpenmrsFetch.mockReturnValue(mockUseAppointmentServiceData);
 
     renderAppointmentsForm();
 
@@ -71,7 +71,7 @@ describe('AppointmentForm', () => {
   it('closes the form and the workspace when the cancel button is clicked', async () => {
     const user = userEvent.setup();
 
-    mockOpenmrsFetch.mockReturnValueOnce(mockAppointmentsData);
+    mockOpenmrsFetch.mockReturnValueOnce(mockUseAppointmentServiceData);
 
     renderAppointmentsForm();
 
@@ -86,8 +86,8 @@ describe('AppointmentForm', () => {
   it('renders a success toast notification upon successfully scheduling an appointment', async () => {
     const user = userEvent.setup();
 
-    mockOpenmrsFetch.mockReturnValueOnce({ data: mockUseAppointmentServiceData });
-    mockCreateAppointment.mockResolvedValueOnce({ status: 200, statusText: 'Ok' });
+    mockOpenmrsFetch.mockReturnValue({ data: mockUseAppointmentServiceData });
+    mockCreateAppointment.mockResolvedValue({ status: 200, statusText: 'Ok' });
 
     renderAppointmentsForm();
 

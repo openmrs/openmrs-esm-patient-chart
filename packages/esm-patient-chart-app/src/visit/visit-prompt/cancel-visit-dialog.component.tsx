@@ -26,13 +26,14 @@ const CancelVisitDialog: React.FC<CancelVisitDialogProps> = ({ patientUuid, clos
     }).then(
       () => {
         mutate();
+        closeModal();
+        setSubmitting(false);
+
         showToast({
           title: t('cancelVisit', 'Cancel visit'),
           kind: 'success',
           description: t('visitCanceled', 'Canceled active visit successfully'),
         });
-        closeModal();
-        setSubmitting(false);
       },
       (error) => {
         showNotification({

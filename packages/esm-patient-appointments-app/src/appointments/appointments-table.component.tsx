@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import dayjs from 'dayjs';
 const utc = require('dayjs/plugin/utc');
 dayjs.extend(utc);
@@ -19,15 +19,23 @@ import { formatDatetime, parseDate, usePagination } from '@openmrs/esm-framework
 import { Appointment } from '../types';
 import styles from './appointments-table.scss';
 
-const pageSize = 5;
+const pageSize = 10;
 
 interface AppointmentTableProps {
   patientAppointments: Array<Appointment>;
+  switchedView: boolean;
+  setSwitchedView: (value: boolean) => void;
 }
 
-const AppointmentsTable: React.FC<AppointmentTableProps> = ({ patientAppointments }) => {
+const AppointmentsTable: React.FC<AppointmentTableProps> = ({ patientAppointments, switchedView, setSwitchedView }) => {
   const { t } = useTranslation();
   const { results: paginatedAppointments, currentPage, goTo } = usePagination(patientAppointments, pageSize);
+
+  useEffect(() => {
+    if (switchedView && currentPage !== 1) {
+      goTo(1);
+    }
+  }, [switchedView, goTo, currentPage]);
 
   const tableHeaders: Array<DataTableHeader> = useMemo(
     () => [
@@ -94,7 +102,10 @@ const AppointmentsTable: React.FC<AppointmentTableProps> = ({ patientAppointment
       <PatientChartPagination
         currentItems={paginatedAppointments.length}
         totalItems={patientAppointments.length}
-        onPageNumberChange={({ page }) => goTo(page)}
+        onPageNumberChange={({ page }) => {
+          setSwitchedView(false);
+          goTo(page);
+        }}
         pageNumber={currentPage}
         pageSize={pageSize}
       />

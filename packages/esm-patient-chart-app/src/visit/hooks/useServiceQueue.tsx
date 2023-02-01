@@ -1,7 +1,9 @@
 import useSWRImmutable from 'swr/immutable';
-import { FetchResponse, openmrsFetch, useConfig, openmrsObservableFetch } from '@openmrs/esm-framework';
+import { FetchResponse, openmrsFetch, useConfig, openmrsObservableFetch, fhirBaseUrl } from '@openmrs/esm-framework';
 import { ChartConfig } from '../../config-schema';
 import { Observable } from 'rxjs';
+import { useMemo } from 'react';
+import useSWR from 'swr';
 
 export interface QueueServiceInfo {
   uuid: string;
@@ -19,6 +21,13 @@ export interface QueueEntryPayload {
     patient: { uuid: string };
     startedAt: Date;
   };
+}
+
+interface FHIRResponse {
+  entry: Array<{ resource: fhir.Location }>;
+  total: number;
+  type: string;
+  resourceType: string;
 }
 
 export function useServices(location: string) {
@@ -39,11 +48,14 @@ export function useStatuses() {
   const statusConceptSetUuid = config.statusConceptSetUuid;
 
   const apiUrl = `/ws/rest/v1/concept/${statusConceptSetUuid}`;
-  const { data, error } = useSWRImmutable<FetchResponse>(config.showServiceQueueFields ? apiUrl : null, openmrsFetch);
+  const { data, error, isLoading } = useSWRImmutable<FetchResponse>(
+    config.showServiceQueueFields ? apiUrl : null,
+    openmrsFetch,
+  );
 
   return {
     statuses: data ? data?.data?.setMembers : [],
-    isLoading: !data && !error,
+    isLoading,
   };
 }
 
@@ -72,3 +84,15 @@ export function saveQueueEntry(
     body: payload,
   });
 }
+
+export function useQueueLocations() {
+  const apiUrl = `${fhirBaseUrl}/Location?_summary=data&_tag=queue location`;
+  const { data, error } = useSWR<{ data: FHIRResponse }>(apiUrl, openmrsFetch);
+
+  const queueLocations = useMemo(
+    () => data?.data?.entry?.map((response) => response.resource) ?? [],
+    [data?.data?.entry],
+  );
+  return { queueLocations: queueLocations ? queueLocations : [], isLoading: !data && !error, error };
+}
+

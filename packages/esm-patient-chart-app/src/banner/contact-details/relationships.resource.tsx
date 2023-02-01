@@ -8,7 +8,7 @@ const customRepresentation =
   'relationshipType:(uuid,display,description,aIsToB,bIsToA))';
 
 export function useRelationships(patientUuid: string) {
-  const { data, error, isValidating } = useSWR<{ data: RelationshipsResponse }, Error>(
+  const { data, error, isLoading, isValidating } = useSWR<{ data: RelationshipsResponse }, Error>(
     `/ws/rest/v1/relationship?v=${customRepresentation}&person=${patientUuid}`,
     openmrsFetch,
   );
@@ -20,7 +20,7 @@ export function useRelationships(patientUuid: string) {
   return {
     data: data ? formattedRelationships : null,
     isError: error,
-    isLoading: !data && !error,
+    isLoading,
     isValidating,
   };
 }

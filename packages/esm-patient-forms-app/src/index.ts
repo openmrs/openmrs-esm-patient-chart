@@ -52,21 +52,6 @@ function setupOpenMRS() {
   return {
     extensions: [
       {
-        name: 'forms-widget',
-        slot: 'patient-chart-summary-dashboard-slot',
-        order: 5,
-        load: getAsyncLifecycle(() => import('./forms/forms-summary-dashboard.component'), options),
-        meta: {
-          columnSpan: 4,
-        },
-        online: {
-          isOffline: false,
-        },
-        offline: {
-          isOffline: true,
-        },
-      },
-      {
         name: 'patient-form-dashboard',
         order: 0,
         slot: dashboardMeta.slot,

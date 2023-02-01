@@ -91,7 +91,7 @@ describe('ConditionsOverview: ', () => {
     expect(screen.getByRole('heading', { name: /conditions/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /add/i })).toBeInTheDocument();
 
-    const expectedColumnHeaders = [/active conditions/, /since/];
+    const expectedColumnHeaders = [/condition/, /date of onset/, /status/];
     expectedColumnHeaders.forEach((header) => {
       expect(screen.getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument();
     });

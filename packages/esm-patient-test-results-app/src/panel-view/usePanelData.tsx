@@ -25,14 +25,13 @@ export function useObservations() {
     },
     [patientUuid],
   );
-  const { data, error, size, setSize } = useSWRInfinite<FetchResponse<FhirResponse<FHIRObservationResource>>, Error>(
-    getUrl,
-    openmrsFetch,
-    {
-      revalidateIfStale: false,
-      revalidateOnFocus: false,
-    },
-  );
+  const { data, error, size, setSize, isLoading } = useSWRInfinite<
+    FetchResponse<FhirResponse<FHIRObservationResource>>,
+    Error
+  >(getUrl, openmrsFetch, {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+  });
 
   useEffect(() => {
     // Infinitely fetching all the data
@@ -49,10 +48,10 @@ export function useObservations() {
       : null;
     return {
       observations,
-      isLoading: !data && !error,
+      isLoading,
       conceptUuids: observations ? [...new Set(observations.map((obs) => getConceptUuid(obs)))] : null,
     };
-  }, [data, error]);
+  }, [data, isLoading]);
 
   return results;
 }
@@ -67,7 +66,7 @@ function useConcepts(conceptUuids: Array<string>) {
     },
     [conceptUuids],
   );
-  const { data, error } = useSWRInfinite<FetchResponse<Concept>>(getUrl, openmrsFetch, {
+  const { data, error, isLoading } = useSWRInfinite<FetchResponse<Concept>>(getUrl, openmrsFetch, {
     initialSize: conceptUuids?.length ?? 1,
     revalidateIfStale: false,
     revalidateOnFocus: false,
@@ -81,9 +80,9 @@ function useConcepts(conceptUuids: Array<string>) {
         ? concepts.filter((c) => c.conceptClass.display === 'Test' || c.conceptClass.display === 'LabSet')
         : null,
       // If there are no observations, hence no concept UUIDS, then it should return isLoading as false
-      isLoading: conceptUuids?.length === 0 ? false : !data && !error,
+      isLoading: conceptUuids?.length === 0 ? false : isLoading,
     };
-  }, [data, error, conceptUuids]);
+  }, [data, conceptUuids, isLoading]);
 
   return results;
 }

@@ -1,14 +1,7 @@
 import { openmrsFetch } from '@openmrs/esm-framework';
 import { useMemo } from 'react';
 import useSWRImmutable from 'swr/immutable';
-import {
-  CommonMedicationValueCoded,
-  DosingUnit,
-  DurationUnit,
-  MedicationFrequency,
-  MedicationRoute,
-  QuantityUnit,
-} from './drug-order-template';
+import { DosingUnit, DurationUnit, MedicationFrequency, MedicationRoute, QuantityUnit } from './drug-order-template';
 
 export interface CommonConfigProps {
   uuid: string;
@@ -34,7 +27,7 @@ export function useOrderConfig(): {
     orderFrequencies: Array<MedicationFrequency>;
   };
 } {
-  const { data, error, isValidating } = useSWRImmutable<{ data: OrderConfig }, Error>(
+  const { data, error, isLoading, isValidating } = useSWRImmutable<{ data: OrderConfig }, Error>(
     `/ws/rest/v1/orderentryconfig`,
     openmrsFetch,
   );
@@ -63,10 +56,10 @@ export function useOrderConfig(): {
           value: display,
         })),
       },
-      isLoading: !data && !error,
+      isLoading,
       error,
     }),
-    [data, error],
+    [data, error, isLoading],
   );
 
   return results;

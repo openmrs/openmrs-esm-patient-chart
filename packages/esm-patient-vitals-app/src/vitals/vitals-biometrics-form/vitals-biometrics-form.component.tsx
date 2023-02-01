@@ -1,9 +1,7 @@
 import React, { SyntheticEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSWRConfig } from 'swr';
 import {
   createErrorHandler,
-  fhirBaseUrl,
   showToast,
   showNotification,
   useConfig,
@@ -16,7 +14,7 @@ import {
 import { DefaultWorkspaceProps, useVitalsConceptMetadata } from '@openmrs/esm-patient-common-lib';
 import { Button, ButtonSet, Column, Form, Row, Stack } from '@carbon/react';
 import { calculateBMI, isInNormalRange } from './vitals-biometrics-form.utils';
-import { savePatientVitals } from '../vitals.resource';
+import { savePatientVitals, useVitals } from '../vitals.resource';
 import { ConfigObject } from '../../config-schema';
 import VitalsBiometricInput from './vitals-biometrics-input.component';
 import styles from './vitals-biometrics-form.scss';
@@ -40,8 +38,8 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
   const session = useSession();
   const patient = usePatient(patientUuid);
   const { currentVisit } = useVisit(patientUuid);
+  const { mutate } = useVitals(patientUuid);
   const config = useConfig() as ConfigObject;
-  const { cache, mutate }: { cache: any; mutate: Function } = useSWRConfig();
   const { data: conceptUnits, conceptMetadata } = useVitalsConceptMetadata();
   const biometricsUnitsSymbols = config.biometrics;
   const [patientVitalAndBiometrics, setPatientVitalAndBiometrics] = useState<PatientVitalsAndBiometrics>();
@@ -84,6 +82,7 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
       )
         .then((response) => {
           if (response.status === 201) {
+            mutate();
             closeWorkspace();
 
             showToast({
@@ -95,15 +94,6 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                 'They are now visible on the Vitals and Biometrics page',
               ),
             });
-
-            const apiUrlPattern = new RegExp(
-              fhirBaseUrl + '\\/Observation\\?subject\\:Patient\\=' + patientUuid + '\\&code\\=',
-            );
-
-            // Find matching keys from SWR's cache and broadcast a revalidation message to their pre-bound SWR hooks
-            Array.from(cache.keys())
-              .filter((url: string) => apiUrlPattern.test(url))
-              .forEach((url: string) => mutate(url));
           }
         })
         .catch((err) => {

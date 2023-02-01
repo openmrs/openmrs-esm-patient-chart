@@ -35,36 +35,36 @@ const visitAttributeTypeCustomRepresentation =
   'custom:(uuid,display,name,description,datatypeClassname,datatypeConfig)';
 
 export function useVisitAttributeType(uuid) {
-  const { data, error } = useSWRImmutable<FetchResponse<VisitAttributeType>, any>(
+  const { data, error, isLoading } = useSWRImmutable<FetchResponse<VisitAttributeType>, Error>(
     `/ws/rest/v1/visitattributetype/${uuid}?v=${visitAttributeTypeCustomRepresentation}`,
     openmrsFetch,
   );
 
   const results = useMemo(() => {
     return {
-      isLoading: !data && !error,
+      isLoading,
       error: error,
       data: data?.data,
     };
-  }, [data, error]);
+  }, [data, error, isLoading]);
 
   return results;
 }
 
 export function useConceptAnswersForVisitAttributeType(conceptUuid) {
-  const { data, error } = useSWRImmutable<FetchResponse<Concept>, any>(
+  const { data, error, isLoading } = useSWRImmutable<FetchResponse<Concept>, Error>(
     conceptUuid ? `/ws/rest/v1/concept/${conceptUuid}` : null,
     openmrsFetch,
   );
 
   const results = useMemo(() => {
     return {
-      isLoading: !data && !error,
+      isLoading,
       error: error,
       data: data?.data,
       answers: data?.data?.answers,
     };
-  }, [data, error]);
+  }, [data, error, isLoading]);
 
   return results;
 }
