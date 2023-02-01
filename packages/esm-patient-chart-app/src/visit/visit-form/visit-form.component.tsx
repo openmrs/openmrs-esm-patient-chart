@@ -49,7 +49,14 @@ import styles from './visit-form.scss';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
 import { ChartConfig } from '../../config-schema';
 import VisitAttributeTypeFields from './visit-attribute-type.component';
-import { QueueEntryPayload, saveQueueEntry, usePriorities, useQueueLocations, useServices, useStatuses } from '../hooks/useServiceQueue';
+import {
+  QueueEntryPayload,
+  saveQueueEntry,
+  usePriorities,
+  useQueueLocations,
+  useServices,
+  useStatuses,
+} from '../hooks/useServiceQueue';
 
 const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace, promptBeforeClosing }) => {
   const { t } = useTranslation();
@@ -78,6 +85,9 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
   const { statuses } = useStatuses();
   const [selectedService, setSelectedService] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
+  const [errorFetchingResources, setErrorFetchingResources] = useState<{
+    blockSavingForm: boolean;
+  }>(null);
   const [selectedQueueLocation, setSelectedQueueLocation] = useState('');
   const { services } = useServices(selectedQueueLocation);
   const { queueLocations } = useQueueLocations();
@@ -291,6 +301,15 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
 
   return (
     <Form className={styles.form} onChange={handleOnChange}>
+      {errorFetchingResources && (
+        <InlineNotification
+          kind={errorFetchingResources?.blockSavingForm ? 'error' : 'warning'}
+          lowContrast
+          className={styles.inlineNotification}
+          title={t('partOfFormDidntLoad', 'Part of the form did not load')}
+          subtitle={t('refreshToTryAgain', 'Please refresh to try again')}
+        />
+      )}
       <div>
         {isTablet && (
           <Row className={styles.headerGridRow}>
@@ -384,6 +403,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
               setVisitAttributes={setVisitAttributes}
               isMissingRequiredAttributes={isMissingRequiredAttributes}
               visitAttributes={visitAttributes}
+              setErrorFetchingResources={setErrorFetchingResources}
             />
           </section>
 
@@ -399,8 +419,11 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
                     value={selectedQueueLocation}
                     onChange={(event) => {
                       setSelectedQueueLocation(event.target.value);
-                    }}>
-                    {!selectedQueueLocation ? <SelectItem text={t('selectQueueLocation', 'Select a queue location')} value="" /> : null}
+                    }}
+                  >
+                    {!selectedQueueLocation ? (
+                      <SelectItem text={t('selectQueueLocation', 'Select a queue location')} value="" />
+                    ) : null}
                     {queueLocations?.length > 0 &&
                       queueLocations.map((location) => (
                         <SelectItem key={location.id} text={location.name} value={location.id}>
@@ -502,7 +525,13 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
         <Button className={styles.button} kind="secondary" onClick={() => closeWorkspace(ignoreChanges)}>
           {t('discard', 'Discard')}
         </Button>
-        <Button onClick={handleSubmit} className={styles.button} disabled={isSubmitting} kind="primary" type="submit">
+        <Button
+          onClick={handleSubmit}
+          className={styles.button}
+          disabled={isSubmitting || errorFetchingResources?.blockSavingForm}
+          kind="primary"
+          type="submit"
+        >
           {t('startVisit', 'Start visit')}
         </Button>
       </ButtonSet>
