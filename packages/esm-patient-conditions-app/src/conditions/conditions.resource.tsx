@@ -118,3 +118,9 @@ export function editPatientCondition(conditionId, payload, abortController) {
     signal: abortController,
   });
 }
+
+export function deletePatientCondition(conditionUuid: string) {
+  return openmrsFetch(`${fhirBaseUrl}/Condition/${conditionUuid}`, {
+    method: 'DELETE',
+  });
+}

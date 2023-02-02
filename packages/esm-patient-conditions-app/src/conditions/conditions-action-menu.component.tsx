@@ -31,8 +31,8 @@ export const ConditionsActionMenu = ({ condition }: conditionsActionMenuProps) =
   };
 
   return (
-    <Layer className={styles.conditionsOverflowMenuLayer}>
-      <OverflowMenu ariaLabel="condition actions" size="sm" flipped>
+    <Layer className={styles.layer}>
+      <OverflowMenu ariaLabel="Edit or delete condition" size="sm" flipped>
         <OverflowMenuItem
           className={styles.menuItem}
           id="editCondition"

@@ -61,7 +61,7 @@ function setupOpenMRS() {
       },
       {
         name: 'condition-delete-confirmation-dialog',
-        load: getAsyncLifecycle(() => import('./conditions/delete-confirmation-modal.component'), options),
+        load: getAsyncLifecycle(() => import('./conditions/delete-condition-modal.component'), options),
         online: true,
         offline: false,
       },
