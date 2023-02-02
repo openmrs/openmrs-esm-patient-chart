@@ -1,0 +1,13 @@
+// Desktop
+:global(.omrs-breakpoint-gt-tablet) {
+  .container {
+    margin: 0;
+  }
+}
+
+// Tablet
+:global(.omrs-breakpoint-lt-desktop) {
+  .container {
+    margin: 1rem;
+  }
+}

@@ -58,9 +58,12 @@ function setupOpenMRS() {
       {
         name: 'conditions-form-workspace',
         load: getAsyncLifecycle(() => import('./conditions/conditions-form.component'), options),
-        meta: {
-          title: 'Record a Condition',
-        },
+      },
+      {
+        name: 'condition-delete-confirmation-dialog',
+        load: getAsyncLifecycle(() => import('./conditions/delete-condition-modal.component'), options),
+        online: true,
+        offline: false,
       },
     ],
   };
