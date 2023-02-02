@@ -37,7 +37,7 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
       obssByDate?.map((obss, index) => {
         const rowData = {
           id: `${index}`,
-          date: formatDatetime(new Date(obss[0].issued), { mode: 'wide' }),
+          date: formatDatetime(new Date(obss[0].effectiveDateTime), { mode: 'wide' }),
         };
 
         for (let obs of obss) {
