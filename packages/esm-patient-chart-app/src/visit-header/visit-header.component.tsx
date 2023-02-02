@@ -79,11 +79,11 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
         setPriority(element.priority);
         setQueueEntry(element);
         if (element.status?.toLocaleLowerCase() === 'waiting') {
-          setCurrentService(`Waiting for ${element.service}`)
+          setCurrentService(`Waiting for ${element.service}`);
         } else if (element.status?.toLocaleLowerCase() === 'in service') {
-          setCurrentService(`Attending ${element.service}`)
+          setCurrentService(`Attending ${element.service}`);
         } else if (element.status?.toLocaleLowerCase() === 'finished service') {
-          setCurrentService(`Finished ${element.service}`)
+          setCurrentService(`Finished ${element.service}`);
         }
       }
     });

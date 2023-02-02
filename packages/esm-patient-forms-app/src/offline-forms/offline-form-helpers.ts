@@ -1,13 +1,13 @@
 import useSWR from 'swr';
 import { getDynamicOfflineDataEntries } from '@openmrs/esm-framework';
-import { FormEncounter, FormEncounterResource } from '../types';
+import { Form, FormEncounterResource } from '../types';
 import { HtmlFormEntryForm } from '../config-schema';
 
 /**
  * Returns whether the given form encounter is valid for offline mode and can be cached.
  * @param form The form encounter.
  */
-export function isValidOfflineFormEncounter(form: FormEncounter, htmlFormEntryForms: Array<HtmlFormEntryForm>) {
+export function isValidOfflineFormEncounter(form: Form, htmlFormEntryForms: Array<HtmlFormEntryForm>) {
   const isHtmlForm = htmlFormEntryForms.some((htmlForm) => htmlForm.formUuid === form.uuid);
   const hasJsonSchema = form.resources.some(isFormJsonSchema);
   return !isHtmlForm && hasJsonSchema;

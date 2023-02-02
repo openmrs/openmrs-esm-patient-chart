@@ -42,11 +42,7 @@ export function useVisitAttributeType(uuid) {
 
   useEffect(() => {
     if (error) {
-      showNotification({
-        title: error?.name,
-        description: error?.message,
-        kind: 'error',
-      });
+      console.error(error);
     }
   }, [error]);
 
@@ -69,11 +65,7 @@ export function useConceptAnswersForVisitAttributeType(conceptUuid) {
 
   useEffect(() => {
     if (error) {
-      showNotification({
-        title: error?.name,
-        description: error?.message,
-        kind: 'error',
-      });
+      console.error(error);
     }
   }, [error]);
 

@@ -29,6 +29,10 @@ export function useObs(patientUuid: string): UseObsResult {
         conceptUuid: entry.resource.code.coding.filter((c) => isUuid(c.code))[0]?.code,
       };
 
+      if (entry.resource.hasOwnProperty('valueDateTime')) {
+        observation.dataType = 'DateTime';
+      }
+
       if (entry.resource.hasOwnProperty('valueString')) {
         observation.dataType = 'Text';
       }
@@ -75,6 +79,7 @@ export interface UseObsResult {
 type ObsResult = FHIRResource['resource'] & {
   conceptUuid: string;
   dataType?: string;
+  valueDateTime?: string;
 };
 
 function isUuid(input: string) {

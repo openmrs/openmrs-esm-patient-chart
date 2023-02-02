@@ -1,11 +1,30 @@
 /**
+ * My interfaces
+ */
+export interface FormsDashboardConfig {
+  sections: Array<SectionConfig>;
+}
+
+export interface SectionConfig {
+  name: string;
+  labelCode: string;
+  encounters: Array<{
+    id: string;
+    uuid: string;
+    display: string;
+    lastCompleted: string;
+    formUuid: string;
+  }>;
+}
+
+/**
  * The form encounter as it is fetched from the API.
  */
-export interface FormEncounter {
+export interface Form {
   uuid: string;
   encounterType?: EncounterType;
   name: string;
-  display: string;
+  display?: string;
   version: string;
   published: boolean;
   retired: boolean;
@@ -30,7 +49,7 @@ export interface EncounterWithFormRef {
   uuid: string;
   encounterType?: EncounterType;
   encounterDatetime: string;
-  form?: FormEncounter;
+  form?: Form;
 }
 
 export interface Privilege {
@@ -52,7 +71,13 @@ export interface ListResponse<T> {
 }
 
 export interface CompletedFormInfo {
-  form: FormEncounter;
+  form: Form;
   associatedEncounters: Array<EncounterWithFormRef>;
   lastCompleted?: Date;
+}
+
+export interface FormsSection {
+  name: string;
+  labelCode: string;
+  completedFromsInfo: Array<CompletedFormInfo>;
 }

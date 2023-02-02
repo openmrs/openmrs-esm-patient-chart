@@ -15,6 +15,7 @@ import {
   TableRow,
   Tile,
 } from '@carbon/react';
+import { Add } from '@carbon/react/icons';
 import { formatDate, parseDate, usePagination } from '@openmrs/esm-framework';
 import {
   EmptyState,
@@ -23,7 +24,7 @@ import {
   launchPatientWorkspace,
   CardHeader,
 } from '@openmrs/esm-patient-common-lib';
-import { Add } from '@carbon/react/icons';
+import { ConditionsActionMenu } from './conditions-action-menu.component';
 import { useConditions } from './conditions.resource';
 import styles from './conditions-overview.scss';
 
@@ -42,7 +43,10 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient }) => {
 
   const { data: conditions, isError, isLoading, isValidating } = useConditions(patient.id);
   const [filter, setFilter] = useState('');
-  const launchConditionsForm = useCallback(() => launchPatientWorkspace('conditions-form-workspace'), []);
+  const launchConditionsForm = useCallback(
+    () => launchPatientWorkspace('conditions-form-workspace', { workspaceTitle: 'Record a Condition' }),
+    [],
+  );
 
   const filteredConditions = useMemo(() => {
     if (!filter || filter == 'All') {
@@ -133,6 +137,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient }) => {
                           {header.header?.content ?? header.header}
                         </TableHeader>
                       ))}
+                      <TableHeader />
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -141,6 +146,9 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient }) => {
                         {row.cells.map((cell) => (
                           <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                         ))}
+                        <TableCell className="cds--table-column-menu">
+                          <ConditionsActionMenu condition={row} />
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

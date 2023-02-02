@@ -95,4 +95,3 @@ export function useQueueLocations() {
   );
   return { queueLocations: queueLocations ? queueLocations : [], isLoading: !data && !error, error };
 }
-

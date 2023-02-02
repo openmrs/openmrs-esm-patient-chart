@@ -19,6 +19,7 @@ import { Add } from '@carbon/react/icons';
 import { formatDate, parseDate } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { Condition, useConditions } from './conditions.resource';
+import { ConditionsActionMenu } from './conditions-action-menu.component';
 import styles from './conditions-detailed-summary.scss';
 
 function ConditionsDetailedSummary({ patient }) {
@@ -73,7 +74,10 @@ function ConditionsDetailedSummary({ patient }) {
     });
   }, [filteredConditions]);
 
-  const launchConditionsForm = useCallback(() => launchPatientWorkspace('conditions-form-workspace'), []);
+  const launchConditionsForm = useCallback(
+    () => launchPatientWorkspace('conditions-form-workspace', { workspaceTitle: 'Record a Condition' }),
+    [],
+  );
 
   const handleConditionStatusChange = ({ selectedItem }) => setFilter(selectedItem);
 
@@ -126,6 +130,7 @@ function ConditionsDetailedSummary({ patient }) {
                           {header.header?.content ?? header.header}
                         </TableHeader>
                       ))}
+                      <TableHeader />
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -134,6 +139,9 @@ function ConditionsDetailedSummary({ patient }) {
                         {row.cells.map((cell) => (
                           <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                         ))}
+                        <TableCell className="cds--table-column-menu">
+                          <ConditionsActionMenu condition={row} />
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
