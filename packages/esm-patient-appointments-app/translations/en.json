@@ -1,5 +1,7 @@
 {
   "add": "Add",
+  "appointmentEdited": "Appointment edited",
+  "appointmentEditError": "Error editing appointment",
   "appointmentFormError": "Error scheduling appointment",
   "appointmentNoteLabel": "Write an additional note",
   "appointmentNotePlaceholder": "Write any additional points here",
