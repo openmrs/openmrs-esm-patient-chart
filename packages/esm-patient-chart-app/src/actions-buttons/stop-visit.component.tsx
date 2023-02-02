@@ -23,7 +23,7 @@ const StopVisitOverflowMenuItem: React.FC<StopVisitOverflowMenuItemProps> = ({ p
         <button
           className="cds--overflow-menu-options__btn"
           role="menuitem"
-          title={t('endVisit', 'End Visit')}
+          title={t('endVisit', 'End visit')}
           data-floating-menu-primary-focus
           onClick={openModal}
           style={{
