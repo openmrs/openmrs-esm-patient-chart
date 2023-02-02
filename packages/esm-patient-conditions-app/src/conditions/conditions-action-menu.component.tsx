@@ -2,6 +2,7 @@ import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layer, OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { showModal } from '@openmrs/esm-framework';
 import { Condition } from './conditions.resource';
 import styles from './conditions-action-menu.scss';
 
@@ -21,9 +22,17 @@ export const ConditionsActionMenu = ({ condition }: conditionsActionMenuProps) =
       }),
     [condition, t],
   );
+
+  const launchDeleteConditionDialog = (conditionId: string) => {
+    const dispose = showModal('condition-delete-confirmation-dialog', {
+      closeDeleteModal: () => dispose(),
+      conditionId,
+    });
+  };
+
   return (
-    <Layer className={styles.conditionsOverflowMenuLayer}>
-      <OverflowMenu ariaLabel="condition actions" size="sm" flipped>
+    <Layer className={styles.layer}>
+      <OverflowMenu ariaLabel="Edit or delete condition" size="sm" flipped>
         <OverflowMenuItem
           className={styles.menuItem}
           id="editCondition"
@@ -34,6 +43,7 @@ export const ConditionsActionMenu = ({ condition }: conditionsActionMenuProps) =
           className={styles.menuItem}
           id="deleteCondition"
           itemText={t('delete', 'Delete')}
+          onClick={() => launchDeleteConditionDialog(condition.id)}
           isDelete={true}
           hasDivider
         />
