@@ -7,7 +7,7 @@ import { openmrsFetch, showNotification, showToast } from '@openmrs/esm-framewor
 import { mockSessionDataResponse } from '../../../../__mocks__/session.mock';
 import { mockAppointmentsData, mockUseAppointmentServiceData } from '../../../../__mocks__/appointments.mock';
 import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
-import { createAppointment } from './appointments.resource';
+import { saveAppointment } from './appointments.resource';
 import AppointmentForm from './appointments-form.component';
 
 const testProps = {
@@ -16,7 +16,7 @@ const testProps = {
   promptBeforeClosing: jest.fn(),
 };
 
-const mockCreateAppointment = createAppointment as jest.Mock;
+const mockCreateAppointment = saveAppointment as jest.Mock;
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockShowNotification = showNotification as jest.Mock;
 const mockShowToast = showToast as jest.Mock;

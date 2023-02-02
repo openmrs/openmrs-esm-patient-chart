@@ -67,17 +67,6 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({ patientUuid, closeW
 
   const { data: services, isLoading } = useAppointmentService();
 
-  const hasChangedFields =
-    appointmentNote !== appointment?.comments ||
-    selectedAppointmentType !== appointment?.appointmentKind ||
-    userLocation !== appointment?.location?.uuid ||
-    startDate !== new Date(appointment?.startDateTime) ||
-    startTime !== dayjs(new Date(appointment?.startDateTime)).format('hh:mm') ||
-    timeFormat !== editedAppointmentTimeFormat ||
-    selectedService !== appointment?.service?.name;
-
-  const hasEditted = context === 'editing' && hasChangedFields;
-
   // Same for creating and editing
   const handleSaveAppointment = () => {
     setIsSubmitting(true);
@@ -127,14 +116,20 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({ patientUuid, closeW
             critical: true,
             kind: 'success',
             description: t('appointmentNowVisible', 'It is now visible on the Appointments page'),
-            title: t('appointmentScheduled', 'Appointment scheduled'),
+            title:
+              context === 'editing'
+                ? t('appointmentEdited', 'Appointment edited')
+                : t('appointmentScheduled', 'Appointment scheduled'),
           });
         }
       },
       (error) => {
         setIsSubmitting(false);
         showNotification({
-          title: t('appointmentFormError', 'Error scheduling appointment'),
+          title:
+            context === 'editing'
+              ? t('appointmentEditError', 'Error editing appointment')
+              : t('appointmentFormError', 'Error scheduling appointment'),
           kind: 'error',
           critical: true,
           description: error?.message,
@@ -271,11 +266,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({ patientUuid, closeW
         <Button className={styles.button} onClick={closeWorkspace} kind="secondary">
           {t('discard', 'Discard')}
         </Button>
-        <Button
-          className={styles.button}
-          disabled={!selectedService || isSubmitting || !hasEditted}
-          onClick={handleSaveAppointment}
-        >
+        <Button className={styles.button} disabled={!selectedService || isSubmitting} onClick={handleSaveAppointment}>
           {t('saveAndClose', 'Save and close')}
         </Button>
       </ButtonSet>
