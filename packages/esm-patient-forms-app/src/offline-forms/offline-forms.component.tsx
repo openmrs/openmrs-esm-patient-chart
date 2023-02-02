@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { mutate } from 'swr';
 import {
   DataTable,
   TableContainer,
@@ -27,7 +26,7 @@ import {
   useSession,
 } from '@openmrs/esm-framework';
 import { useDynamicFormDataEntries } from './offline-form-helpers';
-import { FormEncounter } from '../types';
+import { Form } from '../types';
 import { useValidOfflineFormEncounters } from './use-offline-form-encounters';
 import styles from './offline-forms.styles.scss';
 
@@ -110,7 +109,7 @@ const OfflineForms: React.FC<OfflineFormsProps> = ({ canMarkFormsAsOffline }) =>
   );
 };
 
-function OfflineFormToggle({ form, disabled }: { form: FormEncounter; disabled: boolean }) {
+function OfflineFormToggle({ form, disabled }: { form: Form; disabled: boolean }) {
   const { t } = useTranslation();
   const [isUpdating, setIsUpdating] = useState(false);
   const dynamicFormEntriesSwr = useDynamicFormDataEntries();
