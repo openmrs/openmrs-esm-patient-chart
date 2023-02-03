@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { Layer, OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { showModal } from '@openmrs/esm-framework';
 import { Appointment } from '../types';
 import styles from './appointments-action-menu.scss';
 
@@ -22,6 +23,14 @@ export const AppointmentsActionMenu = ({ appointment }: appointmentsActionMenuPr
       }),
     [appointment, t],
   );
+
+  const launchCancelAppointmentDialog = () => {
+    const dispose = showModal('appointment-cancel-confirmation-dialog', {
+      closeCancelModal: () => dispose(),
+      appointmentUuid: appointment.uuid,
+    });
+  };
+
   return (
     <Layer className={styles.appointmentOverflowMenuLayer}>
       <OverflowMenu ariaLabel="appointment actions" size="sm" flipped>
@@ -35,6 +44,7 @@ export const AppointmentsActionMenu = ({ appointment }: appointmentsActionMenuPr
           className={styles.menuItem}
           id="cancelAppointment"
           itemText={t('cancel', 'Cancel')}
+          onClick={launchCancelAppointmentDialog}
           isDelete={true}
           hasDivider
         />

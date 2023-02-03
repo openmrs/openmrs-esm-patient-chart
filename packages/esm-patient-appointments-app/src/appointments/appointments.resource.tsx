@@ -90,3 +90,15 @@ export function getAppointmentService(abortController: AbortController, uuid) {
     signal: abortController.signal,
   });
 }
+
+export const cancelAppointment = async (toStatus: string, appointmentUuid: string, ac: AbortController) => {
+  const omrsDateFormat = 'YYYY-MM-DDTHH:mm:ss.SSSZZ';
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const statusChangeTime = dayjs(new Date()).format(omrsDateFormat);
+  const url = `/ws/rest/v1/appointments/${appointmentUuid}/status-change`;
+  return await openmrsFetch(url, {
+    body: { toStatus, onDate: statusChangeTime, timeZone: timeZone },
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+  });
+};

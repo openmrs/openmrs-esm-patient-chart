@@ -36,7 +36,7 @@ jest.mock('./appointments.resource', () => {
 
   return {
     ...originalModule,
-    createAppointment: jest.fn(),
+    saveAppointment: jest.fn(),
   };
 });
 
