@@ -19,7 +19,7 @@ const CancelAppointmentModal: React.FC<CancelAppointmentModalProps> = ({
   const { mutate } = useAppointments(patientUuid, new Date().toUTCString(), new AbortController());
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async () => {
+  const handleCancel = async () => {
     const abortController = new AbortController();
     setIsSubmitting(true);
 
@@ -54,10 +54,10 @@ const CancelAppointmentModal: React.FC<CancelAppointmentModalProps> = ({
       </ModalBody>
       <ModalFooter>
         <Button kind="secondary" onClick={closeCancelModal}>
-          {t('cancel', 'Cancel')}
+          {t('no', 'No')}
         </Button>
-        <Button kind="danger" onClick={handleSubmit} disabled={isSubmitting}>
-          {t('delete', 'Delete')}
+        <Button kind="danger" onClick={handleCancel} disabled={isSubmitting}>
+          {t('cancel', 'Cancel')}
         </Button>
       </ModalFooter>
     </div>
