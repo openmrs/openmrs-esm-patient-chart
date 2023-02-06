@@ -56,7 +56,7 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
   const { currentVisit } = useVisit(patientUuid);
   const info = `${parseInt(age(patient?.birthDate))}, ${getGender(patient?.gender)}`;
   const truncate = !isTablet && name.trim().length > 25;
-  const { queueEntry, isLoading } = useVisitQueueEntries(patientUuid, currentVisit?.uuid);
+  const { queueEntry, isLoading } = useVisitQueueEntries(patientUuid, currentVisit?.uuid, '');
 
   const visitType = queueEntry?.visitType ?? '';
   const priority = queueEntry?.priority ?? '';

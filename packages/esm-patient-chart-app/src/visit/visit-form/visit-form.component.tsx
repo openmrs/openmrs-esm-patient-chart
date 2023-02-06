@@ -19,6 +19,7 @@ import {
   Switch,
   TimePicker,
   TimePickerSelect,
+  Dropdown,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { first } from 'rxjs/operators';
@@ -55,8 +56,9 @@ import {
   usePriorities,
   useQueueLocations,
   useServices,
-  useStatuses,
 } from '../hooks/useServiceQueue';
+import { generateVisitQueueNumber } from '../../utils';
+import { useVisitQueueEntries } from '../queue-entry/queue.resource';
 
 const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace, promptBeforeClosing }) => {
   const { t } = useTranslation();
@@ -82,15 +84,15 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
   const [isMissingRequiredAttributes, setIsMissingRequiredAttributes] = useState(false);
   const [priority, setPriority] = useState('');
   const { priorities } = usePriorities();
-  const { statuses } = useStatuses();
-  const [selectedStatus, setSelectedStatus] = useState(config.defaultStatusConceptUuid);
+  const [selectedService, setSelectedService] = useState('');
+  const [selectedServiceName, setSelectedServiceName] = useState('');
   const [errorFetchingResources, setErrorFetchingResources] = useState<{
     blockSavingForm: boolean;
   }>(null);
   const { queueLocations } = useQueueLocations();
   const [selectedQueueLocation, setSelectedQueueLocation] = useState(queueLocations[0]?.id);
   const { services, isLoadingServices } = useServices(selectedQueueLocation);
-  const [selectedService, setSelectedService] = useState('');
+  const { visitQueueEntriesCount } = useVisitQueueEntries('', '', selectedServiceName);
 
   useEffect(() => {
     if (!isLoading) {
@@ -105,6 +107,11 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
     }
   }, [allVisitTypes, locations, sessionUser]);
 
+  const handleServiceChange = ({ selectedItem }) => {
+    setSelectedService(selectedItem.uuid);
+    setSelectedServiceName(selectedItem.display);
+  };
+
   const handleSubmit = useCallback(
     (event) => {
       event.preventDefault();
@@ -114,6 +121,10 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
         return;
       }
 
+      const visitQueueEntryNumber =
+        config.generateVisitQueueNumber && config.showServiceQueueFields
+          ? generateVisitQueueNumber(selectedServiceName, visitQueueEntriesCount)
+          : '';
       if (!visitType) {
         setIsMissingVisitType(true);
         return;
@@ -122,7 +133,10 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
       setIsSubmitting(true);
 
       const [hours, minutes] = convertTime12to24(visitTime, timeFormat);
-
+      const visitQueueNumberAttribute = { [config.visitQueueNumberAttributeUuid]: visitQueueEntryNumber };
+      const mergedAttributes = config.generateVisitQueueNumber
+        ? Object.assign(visitAttributes, visitQueueNumberAttribute)
+        : visitAttributes;
       const payload: NewVisitPayload = {
         patient: patientUuid,
         startDatetime: toDateObjectStrict(
@@ -132,7 +146,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
         ),
         visitType: visitType,
         location: selectedLocation,
-        attributes: Object.entries(visitAttributes)
+        attributes: Object.entries(mergedAttributes)
           .filter(([key, value]) => !!value)
           .map(([key, value]) => ({
             attributeType: key,
@@ -149,13 +163,15 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
               if (config.showServiceQueueFields) {
                 const defaultStatus = config.defaultStatusConceptUuid;
                 const defaultPriority = config.defaultPriorityConceptUuid;
+                const emergencyPriorityConceptUuid = config.emergencyPriorityConceptUuid;
+                const sortWeight = priority === emergencyPriorityConceptUuid ? 1.0 : 0.0;
                 const queuePayload: QueueEntryPayload = {
                   visit: {
                     uuid: response.data.uuid,
                   },
                   queueEntry: {
                     status: {
-                      uuid: selectedStatus ? selectedStatus : defaultStatus,
+                      uuid: defaultStatus,
                     },
                     priority: {
                       uuid: priority ? priority : defaultPriority,
@@ -167,6 +183,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
                       uuid: patientUuid,
                     },
                     startedAt: toDateObjectStrict(toOmrsIsoString(new Date())),
+                    sortWeight: sortWeight,
                   },
                 };
 
@@ -228,12 +245,15 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
       config.defaultPriorityConceptUuid,
       config.defaultStatusConceptUuid,
       config.showServiceQueueFields,
+      config.emergencyPriorityConceptUuid,
+      config.generateVisitQueueNumber,
+      config.visitQueueNumberAttributeUuid,
+      selectedServiceName,
       mutate,
       patientUuid,
       priority,
       selectedLocation,
       selectedService,
-      selectedStatus,
       t,
       timeFormat,
       visitDate,
@@ -241,6 +261,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
       visitType,
       visitAttributes,
       setIsMissingRequiredAttributes,
+      visitQueueEntriesCount,
     ],
   );
 
@@ -451,50 +472,15 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
                       title={t('noServicesConfigured', 'No services configured')}
                     />
                   ) : (
-                    <Select
-                      labelText={t('selectService', 'Select a service')}
-                      id="service"
-                      invalidText="Required"
-                      value={selectedService}
-                      onChange={(event) => setSelectedService(event.target.value)}
-                    >
-                      {!selectedService ? <SelectItem text={t('chooseService', 'Select a service')} value="" /> : null}
-                      {services?.length > 0 &&
-                        services.map((service) => (
-                          <SelectItem key={service.uuid} text={service.display} value={service.uuid}>
-                            {service.display}
-                          </SelectItem>
-                        ))}
-                    </Select>
-                  )}
-                </div>
-
-                <div className={styles.queueSection}>
-                  <div className={styles.sectionTitle}>{t('status', 'Status')}</div>
-                  {!statuses?.length ? (
-                    <InlineNotification
-                      className={styles.inlineNotification}
-                      kind={'error'}
-                      lowContrast
-                      subtitle={t('configureStatuses', 'Please configure statuses to continue.')}
-                      title={t('noStatusesConfigured', 'No statuses configured')}
+                    <Dropdown
+                      id="serviceFilter"
+                      label={t('selectService', 'Select a service')}
+                      type="default"
+                      items={services}
+                      itemToString={(item) => (item ? item.display : '')}
+                      onChange={handleServiceChange}
+                      size="md"
                     />
-                  ) : (
-                    <Select
-                      labelText={t('selectStatus', 'Select a status')}
-                      id="status"
-                      invalidText="Required"
-                      value={selectedStatus}
-                      onChange={(event) => setSelectedStatus(event.target.value)}
-                    >
-                      {!selectedStatus ? <SelectItem text={t('chooseStatus', 'Select a status')} value="" /> : null}
-                      {statuses?.length > 0 &&
-                        statuses.map((service) => (
-                          <SelectItem key={service.uuid} text={service.display} value={service.uuid}>
-                            {service.display}
-                          </SelectItem>
-                        ))}
-                    </Select>
                   )}
                 </div>
 

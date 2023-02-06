@@ -64,12 +64,13 @@ export interface MappedVisitQueueEntry {
 
 interface UseVisitQueueEntries {
   queueEntry: MappedVisitQueueEntry | null;
+  visitQueueEntriesCount: number;
   isLoading: boolean;
   isError: Error;
   isValidating?: boolean;
 }
 
-export function useVisitQueueEntries(patientUuid, visitUuid): UseVisitQueueEntries {
+export function useVisitQueueEntries(patientUuid, visitUuid, currServiceName): UseVisitQueueEntries {
   const { queueLocations } = useQueueLocations();
   const queueLocationUuid = queueLocations[0]?.id;
 
@@ -97,15 +98,20 @@ export function useVisitQueueEntries(patientUuid, visitUuid): UseVisitQueueEntri
     queueEntryUuid: visitQueueEntry.queueEntry.uuid,
   });
 
-  const visitQueues = data?.data?.results?.map(mapVisitQueueEntryProperties);
+  let visitQueues = data?.data?.results?.map(mapVisitQueueEntryProperties);
 
-  const mappedVisitQueueEntries =
+  if (currServiceName) {
+    visitQueues.filter((data) => data.service === currServiceName);
+  }
+
+  const mappedPatientsVisitQueueEntries =
     visitQueues?.find(
       (visitQueueEntry) => visitQueueEntry?.patientUuid == patientUuid && visitUuid === visitQueueEntry.visitUuid,
     ) ?? null;
 
   return {
-    queueEntry: mappedVisitQueueEntries,
+    queueEntry: mappedPatientsVisitQueueEntries, // patients current active queue
+    visitQueueEntriesCount: visitQueues ? visitQueues.length : 0, // count of patients in queue
     isLoading,
     isError: error,
     isValidating,

@@ -20,6 +20,7 @@ export interface QueueEntryPayload {
     queue: { uuid: string };
     patient: { uuid: string };
     startedAt: Date;
+    sortWeight: number;
   };
 }
 

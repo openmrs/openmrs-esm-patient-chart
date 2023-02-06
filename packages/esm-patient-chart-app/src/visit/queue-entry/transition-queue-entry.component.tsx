@@ -12,7 +12,7 @@ interface TransitionQueueEntryProps {
 const TransitionQueueEntry: React.FC<TransitionQueueEntryProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const { currentVisit, isValidating } = useVisit(patientUuid);
-  const { queueEntry, isLoading } = useVisitQueueEntries(patientUuid, currentVisit?.uuid);
+  const { queueEntry, isLoading } = useVisitQueueEntries(patientUuid, currentVisit?.uuid, '');
 
   const launchEditPriorityModal = useCallback(() => {
     const dispose = showModal('edit-queue-entry-status-modal', {

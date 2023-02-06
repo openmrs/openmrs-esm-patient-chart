@@ -114,6 +114,21 @@ export const esmPatientChartSchema = {
     _description: 'The UUID of the default status for the queues eg Waiting.',
     _default: '136203AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   },
+  generateVisitQueueNumber: {
+    _type: Type.Boolean,
+    _description: 'Whether to generate a visit queue number on creating a visit',
+    _default: false,
+  },
+  visitQueueNumberAttributeUuid: {
+    _type: Type.ConceptUuid,
+    _description: 'The UUID of the visit attribute that contains the visit queue number.',
+    _default: 'b3ab9fbb-9030-4dec-b08f-262c67090c2d',
+  },
+  emergencyPriorityConceptUuid: {
+    _type: Type.ConceptUuid,
+    _description: 'The UUID of the priority with the highest sort weight for the queues eg Emergency.',
+    _default: '5c2d5f8c-5efb-46d0-8e28-9e707ab7523c',
+  },
 };
 
 export interface ChartConfig {
@@ -131,6 +146,9 @@ export interface ChartConfig {
   serviceConceptSetUuid: string;
   statusConceptSetUuid: string;
   defaultStatusConceptUuid: string;
+  generateVisitQueueNumber: boolean;
+  visitQueueNumberAttributeUuid: string;
+  emergencyPriorityConceptUuid: string;
 }
 
 export const configSchema = {
