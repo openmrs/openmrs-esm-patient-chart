@@ -1,1 +1,12 @@
-{}
+{
+  "actions": "Actions",
+  "activeVisit": "Visite active",
+  "address": "Adresse",
+  "contactDetails": "Coordonnées",
+  "deceased": "Décédé",
+  "loading": "En cours de chargement",
+  "relationships": "Relations",
+  "showAllDetails": "Afficher tous les détails",
+  "showLess": "Montrer moins",
+  "started": "A commencé"
+}
