@@ -102,7 +102,7 @@ describe('ConditionsOverview: ', () => {
     });
 
     expect(screen.getAllByRole('row').length).toEqual(6);
-    expect(screen.getByText(/1–5 of 8 items/i)).toBeInTheDocument();
+    expect(screen.getByText(/1–5 of 7 items/i)).toBeInTheDocument();
 
     const nextPageButton = screen.getByRole('button', { name: /next page/i });
 

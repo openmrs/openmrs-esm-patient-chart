@@ -42,7 +42,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient }) => {
   const pageUrl = `\${openmrsSpaBase}/patient/${patient.id}/chart/Conditions`;
 
   const { data: conditions, isError, isLoading, isValidating } = useConditions(patient.id);
-  const [filter, setFilter] = useState('');
+  const [filter, setFilter] = useState<'All' | 'Active' | 'Inactive'>('Active');
   const launchConditionsForm = useCallback(
     () => launchPatientWorkspace('conditions-form-workspace', { workspaceTitle: 'Record a Condition' }),
     [],
