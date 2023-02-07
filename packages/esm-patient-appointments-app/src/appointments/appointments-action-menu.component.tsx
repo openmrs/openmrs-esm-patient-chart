@@ -32,8 +32,8 @@ export const AppointmentsActionMenu = ({ appointment }: appointmentsActionMenuPr
   };
 
   return (
-    <Layer className={styles.appointmentOverflowMenuLayer}>
-      <OverflowMenu ariaLabel="appointment actions" size="sm" flipped>
+    <Layer className={styles.layer}>
+      <OverflowMenu ariaLabel="Edit or delete appointment" size="sm" flipped>
         <OverflowMenuItem
           className={styles.menuItem}
           id="editAppointment"

@@ -2,6 +2,7 @@
   "add": "Add",
   "appointmentCancelError": "Error cancelling appointment",
   "appointmentCancelled": "Appointment cancelled",
+  "appointmentCancelledSuccessfully": "Appointment cancelled successfully",
   "appointmentEdited": "Appointment edited",
   "appointmentEditError": "Error editing appointment",
   "appointmentFormError": "Error scheduling appointment",

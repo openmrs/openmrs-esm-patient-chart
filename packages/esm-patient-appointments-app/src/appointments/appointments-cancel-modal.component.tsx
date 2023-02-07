@@ -31,7 +31,7 @@ const CancelAppointmentModal: React.FC<CancelAppointmentModalProps> = ({
           showToast({
             critical: true,
             kind: 'success',
-            description: t('appointmentNowVisible', 'It has been cancelled successfully'),
+            description: t('appointmentCancelledSuccessfully', 'Appointment cancelled successfully'),
             title: t('appointmentCancelled', 'Appointment cancelled'),
           });
         }

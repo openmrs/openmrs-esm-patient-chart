@@ -71,7 +71,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({ patientUuid, closeW
   const handleSaveAppointment = () => {
     setIsSubmitting(true);
 
-    // Construct saving payload
+    // Construct payload
     const serviceUuid = services?.find((service) => service.name === selectedService)?.uuid;
     const serviceDuration = services?.find((service) => service.name === selectedService)?.durationMins;
 
@@ -142,50 +142,31 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({ patientUuid, closeW
     return (
       <InlineLoading className={styles.loader} description={`${t('loading', 'Loading')} ...`} role="progressbar" />
     );
-  const locationSelect = (
-    <Select
-      id="location"
-      invalidText="Required"
-      labelText={t('selectLocation', 'Select a location')}
-      onChange={(event) => setUserLocation(event.target.value)}
-      value={userLocation}
-    >
-      {!userLocation ? <SelectItem text={t('chooseLocation', 'Choose a location')} value="" /> : null}
-      {locations?.length > 0 &&
-        locations.map((location) => (
-          <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
-            {location.display}
-          </SelectItem>
-        ))}
-    </Select>
-  );
 
-  const timePicker = (
-    <TimePicker
-      pattern="([\d]+:[\d]{2})"
-      onChange={(event) => setStartTime(event.target.value)}
-      value={startTime}
-      style={{ marginLeft: '0.125rem', flex: 'none' }}
-      labelText={t('time', 'Time')}
-      id="time-picker"
-    >
-      <TimePickerSelect
-        id="time-picker-select-1"
-        onChange={(event) => setTimeFormat(event.target.value as amPm)}
-        value={timeFormat}
-        aria-label={t('time', 'Time')}
-      >
-        <SelectItem value="AM" text="AM" />
-        <SelectItem value="PM" text="PM" />
-      </TimePickerSelect>
-    </TimePicker>
-  );
   return (
     <Form className={styles.formWrapper}>
       <Stack gap={4}>
         <section className={styles.formGroup}>
           <span>{t('location', 'Location')}</span>
-          <div className={styles.selectContainer}>{isTablet ? <Layer>{locationSelect}</Layer> : locationSelect}</div>
+          <div className={styles.selectContainer}>
+            <ResponsiveWrapper isTablet={isTablet}>
+              <Select
+                id="location"
+                invalidText="Required"
+                labelText={t('selectLocation', 'Select a location')}
+                onChange={(event) => setUserLocation(event.target.value)}
+                value={userLocation}
+              >
+                {!userLocation ? <SelectItem text={t('chooseLocation', 'Choose a location')} value="" /> : null}
+                {locations?.length > 0 &&
+                  locations.map((location) => (
+                    <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
+                      {location.display}
+                    </SelectItem>
+                  ))}
+              </Select>
+            </ResponsiveWrapper>
+          </div>
         </section>
         <section className={styles.formGroup}>
           <span>{t('dateTime', 'Date & Time')}</span>
@@ -204,62 +185,82 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({ patientUuid, closeW
                 placeholder="dd/mm/yyyy"
               />
             </DatePicker>
-            {isTablet ? <Layer>{timePicker}</Layer> : timePicker}
+
+            <ResponsiveWrapper isTablet={isTablet}>
+              <TimePicker
+                pattern="([\d]+:[\d]{2})"
+                onChange={(event) => setStartTime(event.target.value)}
+                value={startTime}
+                style={{ marginLeft: '0.125rem', flex: 'none' }}
+                labelText={t('time', 'Time')}
+                id="time-picker"
+              >
+                <TimePickerSelect
+                  id="time-picker-select-1"
+                  onChange={(event) => setTimeFormat(event.target.value as amPm)}
+                  value={timeFormat}
+                  aria-label={t('time', 'Time')}
+                >
+                  <SelectItem value="AM" text="AM" />
+                  <SelectItem value="PM" text="PM" />
+                </TimePickerSelect>
+              </TimePicker>
+            </ResponsiveWrapper>
           </div>
         </section>
         <section className={styles.formGroup}>
           <span>{t('service', 'Service')}</span>
-          <Select
-            id="service"
-            invalidText="Required"
-            labelText={t('selectService', 'Select a service')}
-            light={isTablet}
-            onChange={(event) => setSelectedService(event.target.value)}
-            value={selectedService}
-          >
-            {!selectedService ? <SelectItem text={t('chooseService', 'Select service')} value="" /> : null}
-            {services?.length > 0 &&
-              services.map((service) => (
-                <SelectItem key={service.uuid} text={service.name} value={service.name}>
-                  {service.name}
-                </SelectItem>
-              ))}
-          </Select>
+          <ResponsiveWrapper isTablet={isTablet}>
+            <Select
+              id="service"
+              invalidText="Required"
+              labelText={t('selectService', 'Select a service')}
+              onChange={(event) => setSelectedService(event.target.value)}
+              value={selectedService}
+            >
+              {!selectedService ? <SelectItem text={t('chooseService', 'Select service')} value="" /> : null}
+              {services?.length > 0 &&
+                services.map((service) => (
+                  <SelectItem key={service.uuid} text={service.name} value={service.name}>
+                    {service.name}
+                  </SelectItem>
+                ))}
+            </Select>
+          </ResponsiveWrapper>
         </section>
         <section className={styles.formGroup}>
           <span>{t('appointmentType', 'Appointment Type')}</span>
-          <Select
-            disabled={!appointmentTypes?.length}
-            id="appointmentType"
-            invalidText="Required"
-            labelText={t('selectAppointmentType', 'Select the type of appointment')}
-            light={isTablet}
-            onChange={(event) => setSelectedAppointmentType(event.target.value)}
-            value={selectedAppointmentType}
-          >
-            {!selectedAppointmentType ? (
-              <SelectItem text={t('chooseAppointmentType', 'Choose appointment type')} value="" />
-            ) : null}
-            {appointmentTypes?.length > 0 &&
-              appointmentTypes.map((appointmentType, index) => (
-                <SelectItem key={index} text={appointmentType.name} value={appointmentType.name}>
-                  {appointmentType.name}
-                </SelectItem>
-              ))}
-          </Select>
+          <ResponsiveWrapper isTablet={isTablet}>
+            <Select
+              disabled={!appointmentTypes?.length}
+              id="appointmentType"
+              invalidText="Required"
+              labelText={t('selectAppointmentType', 'Select the type of appointment')}
+              onChange={(event) => setSelectedAppointmentType(event.target.value)}
+              value={selectedAppointmentType}
+            >
+              {!selectedAppointmentType ? (
+                <SelectItem text={t('chooseAppointmentType', 'Choose appointment type')} value="" />
+              ) : null}
+              {appointmentTypes?.length > 0 &&
+                appointmentTypes.map((appointmentType, index) => (
+                  <SelectItem key={index} text={appointmentType.name} value={appointmentType.name}>
+                    {appointmentType.name}
+                  </SelectItem>
+                ))}
+            </Select>
+          </ResponsiveWrapper>
         </section>
         <section className={styles.formGroup}>
           <span>{t('note', 'Note')}</span>
-          <Layer>
-            <TextArea
-              id="appointmentNote"
-              light={isTablet}
-              value={appointmentNote}
-              labelText={t('appointmentNoteLabel', 'Write an additional note')}
-              placeholder={t('appointmentNotePlaceholder', 'Write any additional points here')}
-              onChange={(event) => setAppointmentNote(event.target.value)}
-            />
-          </Layer>
+          <TextArea
+            id="appointmentNote"
+            light={isTablet}
+            value={appointmentNote}
+            labelText={t('appointmentNoteLabel', 'Write an additional note')}
+            placeholder={t('appointmentNotePlaceholder', 'Write any additional points here')}
+            onChange={(event) => setAppointmentNote(event.target.value)}
+          />
         </section>
       </Stack>
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
@@ -273,5 +274,9 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({ patientUuid, closeW
     </Form>
   );
 };
+
+function ResponsiveWrapper({ children, isTablet }) {
+  return isTablet ? <Layer>{children}</Layer> : <div>{children}</div>;
+}
 
 export default AppointmentsForm;
