@@ -53,4 +53,5 @@ export interface AppointmentPayload {
   providers: Array<{ uuid: string; response?: string }>;
   locationUuid: string;
   comments: string;
+  uuid?: string;
 }

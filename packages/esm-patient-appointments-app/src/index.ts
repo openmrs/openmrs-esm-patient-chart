@@ -50,9 +50,12 @@ function setupOpenMRS() {
       {
         name: 'appointments-form-workspace',
         load: getAsyncLifecycle(() => import('./appointments/appointments-form.component'), options),
-        meta: {
-          title: 'Schedule appointment',
-        },
+      },
+      {
+        name: 'appointment-cancel-confirmation-dialog',
+        load: getAsyncLifecycle(() => import('./appointments/appointments-cancel-modal.component'), options),
+        online: true,
+        offline: false,
       },
     ],
   };
