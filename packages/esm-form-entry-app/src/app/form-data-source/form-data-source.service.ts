@@ -38,6 +38,10 @@ export class FormDataSourceService {
         resolveSelectedValue: this.resolveConcept.bind(this),
         searchOptions: this.findProblem.bind(this),
       },
+      diagnoses: {
+        resolveSelectedValue: this.resolveConcept.bind(this),
+        searchOptions: this.findDiagnoses.bind(this),
+      },
       conceptAnswers: this.getWhoStagingCriteriaDataSource(),
       recentObs: this.getMostRecentObsDataSource(formSchema),
     };
@@ -270,6 +274,19 @@ export class FormDataSourceService {
       '8d492954-c2cc-11de-8d13-0010c6dffd0f',
       '8d491a9a-c2cc-11de-8d13-0010c6dffd0f',
     ];
+
+    return this.conceptResourceService
+      .searchConcept(searchText)
+      .pipe(
+        map((concepts) =>
+          concepts
+            .filter((concept) => concept.conceptClass && allowedConceptClasses.includes(concept.conceptClass.uuid))
+            .map(this.mapConcept),
+        ),
+      );
+  }
+  public findDiagnoses(searchText) {
+    const allowedConceptClasses = ['8d4918b0-c2cc-11de-8d13-0010c6dffd0f'];
 
     return this.conceptResourceService
       .searchConcept(searchText)

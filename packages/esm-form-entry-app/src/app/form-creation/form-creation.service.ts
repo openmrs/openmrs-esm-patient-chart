@@ -108,6 +108,7 @@ export class FormCreationService {
     this.dataSources.registerDataSource('problem', dataSources.problem);
     this.dataSources.registerDataSource('personAttribute', dataSources.location);
     this.dataSources.registerDataSource('conceptAnswers', dataSources.conceptAnswers);
+    this.dataSources.registerDataSource('diagnoses', dataSources.diagnoses);
     this.dataSources.registerDataSource('patient', { visitTypeUuid }, true);
     const patientObj = this.formDataSourceService.getPatientObject(patient);
     this.dataSources.registerDataSource('patient', patientObj, true);
