@@ -1,5 +1,5 @@
 import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
-import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
+import { createDashboardLink, getPatientSummaryOrder } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
 
@@ -29,7 +29,7 @@ function setupOpenMRS() {
       {
         name: 'conditions-overview-widget',
         slot: 'patient-chart-summary-dashboard-slot',
-        order: 6,
+        order: getPatientSummaryOrder('Conditions'),
         load: getAsyncLifecycle(() => import('./conditions/conditions-overview.component'), options),
         meta: {
           columnSpan: 4,
@@ -58,9 +58,12 @@ function setupOpenMRS() {
       {
         name: 'conditions-form-workspace',
         load: getAsyncLifecycle(() => import('./conditions/conditions-form.component'), options),
-        meta: {
-          title: 'Record a Condition',
-        },
+      },
+      {
+        name: 'condition-delete-confirmation-dialog',
+        load: getAsyncLifecycle(() => import('./conditions/delete-condition-modal.component'), options),
+        online: true,
+        offline: false,
       },
     ],
   };

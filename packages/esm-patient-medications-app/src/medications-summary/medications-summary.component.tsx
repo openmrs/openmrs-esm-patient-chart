@@ -22,14 +22,14 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
     error: activeOrdersError,
     isLoading: isLoadingActiveOrders,
     isValidating: isValidatingActiveOrders,
-  } = usePatientOrders(patientUuid, 'ACTIVE', config.careSettingUuid);
+  } = usePatientOrders(patientUuid, 'ACTIVE');
 
   const {
     data: pastOrders,
     error: pastOrdersError,
     isLoading: isLoadingPastOrders,
     isValidating: isValidatingPastOrders,
-  } = usePatientOrders(patientUuid, 'any', config.careSettingUuid);
+  } = usePatientOrders(patientUuid, 'any');
 
   return (
     <>

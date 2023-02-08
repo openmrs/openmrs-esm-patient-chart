@@ -17,6 +17,7 @@ import {
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { formatDatetime, parseDate, usePagination } from '@openmrs/esm-framework';
 import { Appointment } from '../types';
+import { AppointmentsActionMenu } from './appointments-action-menu.component';
 import styles from './appointments-table.scss';
 
 const pageSize = 10;
@@ -67,10 +68,10 @@ const AppointmentsTable: React.FC<AppointmentTableProps> = ({ patientAppointment
 
   return (
     <div>
-      <DataTable rows={tableRows} headers={tableHeaders} isSortable size="sm">
+      <DataTable rows={tableRows} headers={tableHeaders} isSortable size="sm" useZebraStyles>
         {({ rows, headers, getHeaderProps, getTableProps }) => (
           <TableContainer>
-            <Table {...getTableProps()} useZebraStyles>
+            <Table {...getTableProps()}>
               <TableHead>
                 <TableRow>
                   {headers.map((header) => (
@@ -84,14 +85,18 @@ const AppointmentsTable: React.FC<AppointmentTableProps> = ({ patientAppointment
                       {header.header?.content ?? header.header}
                     </TableHeader>
                   ))}
+                  <TableHeader />
                 </TableRow>
               </TableHead>
               <TableBody>
-                {rows.map((row) => (
+                {rows.map((row, i) => (
                   <TableRow key={row.id}>
                     {row.cells.map((cell) => (
                       <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                     ))}
+                    <TableCell className="cds--table-column-menu">
+                      <AppointmentsActionMenu appointment={paginatedAppointments[i]} />
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>

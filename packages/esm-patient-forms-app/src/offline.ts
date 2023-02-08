@@ -9,7 +9,7 @@ import {
   Visit,
 } from '@openmrs/esm-framework';
 import { launchFormEntry } from './form-entry-interop';
-import { FormEncounter } from './types';
+import { Form } from './types';
 import { isFormJsonSchema } from './offline-forms/offline-form-helpers';
 import { formEncounterUrl, formEncounterUrlPoc } from './constants';
 import escapeRegExp from 'lodash-es/escapeRegExp';
@@ -125,7 +125,7 @@ export async function setupDynamicFormDataHandler() {
 }
 
 async function getCacheableFormUrls(formUuid: string) {
-  const getFormRes = await openmrsFetch<FormEncounter>(`/ws/rest/v1/form/${formUuid}?v=full`);
+  const getFormRes = await openmrsFetch<Form>(`/ws/rest/v1/form/${formUuid}?v=full`);
   const form = getFormRes.data;
 
   if (!form) {

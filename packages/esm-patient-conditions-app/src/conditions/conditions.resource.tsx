@@ -12,6 +12,17 @@ export type Condition = {
   id: string;
 };
 
+export interface ConditionDataTableRow {
+  cells: Array<{
+    id: string;
+    value: string;
+    info: {
+      headers: string;
+    };
+  }>;
+  id: string;
+}
+
 export type CodedCondition = {
   concept: {
     uuid: string;
@@ -25,8 +36,10 @@ export type CodedCondition = {
 };
 
 export function useConditions(patientUuid: string) {
-  const { data, error, isLoading, isValidating } = useSWR<{ data: FHIRConditionResponse }, Error>(
-    `${fhirBaseUrl}/Condition?patient=${patientUuid}&_count=100`,
+  const conditionsUrl = `${fhirBaseUrl}/Condition?patient=${patientUuid}&_count=100`;
+
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: FHIRConditionResponse }, Error>(
+    patientUuid ? conditionsUrl : null,
     openmrsFetch,
   );
 
@@ -43,6 +56,7 @@ export function useConditions(patientUuid: string) {
     isError: error,
     isLoading,
     isValidating,
+    mutate,
   };
 }
 
@@ -72,8 +86,9 @@ export function getConditionByUuid(conditionUuid: string) {
 }
 
 function mapConditionProperties(condition: FHIRCondition): Condition {
+  const status = condition?.clinicalStatus?.coding[0]?.code;
   return {
-    clinicalStatus: condition?.clinicalStatus?.coding[0]?.code,
+    clinicalStatus: status ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() : '',
     conceptId: condition?.code?.coding[0]?.code,
     display: condition?.code?.coding[0]?.display,
     onsetDateTime: condition?.onsetDateTime,
@@ -93,6 +108,19 @@ export function createPatientCondition(payload, abortController) {
   });
 }
 
-export function updatePatientCondition(patientCondition, patientUuid, abortController) {
-  return Promise.resolve({ status: 200, body: 'Ok' });
+export function editPatientCondition(conditionId, payload, abortController) {
+  return openmrsObservableFetch(`${fhirBaseUrl}/Condition/${conditionId}`, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    method: 'PUT',
+    body: payload,
+    signal: abortController,
+  });
+}
+
+export function deletePatientCondition(conditionUuid: string) {
+  return openmrsFetch(`${fhirBaseUrl}/Condition/${conditionUuid}`, {
+    method: 'DELETE',
+  });
 }

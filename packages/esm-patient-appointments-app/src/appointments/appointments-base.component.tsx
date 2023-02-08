@@ -34,7 +34,10 @@ const AppointmentsBase: React.FC<AppointmentsBaseProps> = ({ patientUuid }) => {
     isValidating,
   } = useAppointments(patientUuid, startDate, new AbortController());
 
-  const launchAppointmentsForm = () => launchPatientWorkspace('appointments-form-workspace');
+  const launchAppointmentsForm = () =>
+    launchPatientWorkspace('appointments-form-workspace', {
+      workspaceTitle: t('scheduleAppointment', 'Schedule appointment'),
+    });
 
   if (isLoading) return <DataTableSkeleton role="progressbar" />;
   if (isError) {

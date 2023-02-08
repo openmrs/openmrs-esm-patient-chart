@@ -91,7 +91,7 @@ describe('ConditionsOverview: ', () => {
     expect(screen.getByRole('heading', { name: /conditions/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /add/i })).toBeInTheDocument();
 
-    const expectedColumnHeaders = [/active conditions/, /since/];
+    const expectedColumnHeaders = [/condition/, /date of onset/, /status/];
     expectedColumnHeaders.forEach((header) => {
       expect(screen.getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument();
     });
@@ -102,7 +102,7 @@ describe('ConditionsOverview: ', () => {
     });
 
     expect(screen.getAllByRole('row').length).toEqual(6);
-    expect(screen.getByText(/1–5 of 8 items/i)).toBeInTheDocument();
+    expect(screen.getByText(/1–5 of 7 items/i)).toBeInTheDocument();
 
     const nextPageButton = screen.getByRole('button', { name: /next page/i });
 
@@ -125,7 +125,9 @@ describe('ConditionsOverview: ', () => {
     await waitFor(() => user.click(recordConditionsLink));
 
     expect(launchPatientWorkspace).toHaveBeenCalledTimes(1);
-    expect(launchPatientWorkspace).toHaveBeenCalledWith('conditions-form-workspace');
+    expect(launchPatientWorkspace).toHaveBeenCalledWith('conditions-form-workspace', {
+      workspaceTitle: 'Record a Condition',
+    });
   });
 });
 

@@ -42,6 +42,9 @@ jest.mock('@openmrs/esm-framework', () => {
 
 jest.mock('./conditions.resource', () => ({
   createPatientCondition: jest.fn(),
+  useConditions: jest.fn().mockImplementation(() => ({
+    mutate: jest.fn(),
+  })),
   useConditionsSearch: jest.fn().mockImplementation(() => ({
     conditions: [],
     error: null,

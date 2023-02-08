@@ -91,6 +91,10 @@ The **workspace** is where data entry takes place. On mobile devices it covers t
 
 The **side menu** provides access to features that do not have their own pages, such as the notifications menu.
 
+## Design Patterns
+
+For documentation about our design patterns, please visit our [design system](https://zeroheight.com/23a080e38/p/880723--introduction) documentation website.
+
 ## Configuration
 
 Please see the [Implementer Documentation](https://wiki.openmrs.org/pages/viewpage.action?pageId=224527013) for information about configuring modules.

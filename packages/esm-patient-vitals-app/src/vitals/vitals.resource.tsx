@@ -15,7 +15,7 @@ export type ObservationInterpretation = 'critically_low' | 'critically_high' | '
 type MappedVitals = {
   code: string;
   interpretation: string;
-  issued: Date;
+  recordedDate: Date;
   value: number;
 };
 
@@ -67,7 +67,10 @@ export function useVitals(patientUuid: string, includeBiometrics: boolean = fals
     `&_count=${pageSize}
         `;
 
-  const { data, error, isLoading, isValidating } = useSWR<{ data: VitalsFetchResponse }, Error>(apiUrl, openmrsFetch);
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: VitalsFetchResponse }, Error>(
+    apiUrl,
+    openmrsFetch,
+  );
 
   const getVitalSignKey = (conceptUuid: string): string => {
     switch (conceptUuid) {
@@ -98,7 +101,7 @@ export function useVitals(patientUuid: string, includeBiometrics: boolean = fals
       resource?.valueQuantity?.value,
       getReferenceRangesForConcept(resource?.code?.coding?.[0]?.code, conceptMetadata),
     ),
-    issued: resource?.issued,
+    recordedDate: resource?.effectiveDateTime,
     value: resource?.valueQuantity?.value,
   });
 
@@ -106,17 +109,17 @@ export function useVitals(patientUuid: string, includeBiometrics: boolean = fals
   const vitalsResponse = data?.data?.entry?.map((entry) => entry.resource ?? []).map(mapVitalsProperties);
 
   vitalsResponse?.map((vitalSign) => {
-    const issuedDate = new Date(new Date(vitalSign.issued)).toISOString();
+    const recordedDate = new Date(new Date(vitalSign.recordedDate)).toISOString();
 
-    if (vitalsHashTable.has(issuedDate) && vitalsHashTable.get(issuedDate)) {
-      vitalsHashTable.set(issuedDate, {
-        ...vitalsHashTable.get(issuedDate),
+    if (vitalsHashTable.has(recordedDate) && vitalsHashTable.get(recordedDate)) {
+      vitalsHashTable.set(recordedDate, {
+        ...vitalsHashTable.get(recordedDate),
         [getVitalSignKey(vitalSign.code)]: vitalSign.value,
         [getVitalSignKey(vitalSign.code) + 'Interpretation']: vitalSign.interpretation,
       });
     } else {
       vitalSign.value &&
-        vitalsHashTable.set(issuedDate, {
+        vitalsHashTable.set(recordedDate, {
           [getVitalSignKey(vitalSign.code)]: vitalSign.value,
           [getVitalSignKey(vitalSign.code) + 'Interpretation']: vitalSign.interpretation,
         });
@@ -143,6 +146,7 @@ export function useVitals(patientUuid: string, includeBiometrics: boolean = fals
     isError: error,
     isLoading,
     isValidating,
+    mutate,
   };
 }
 

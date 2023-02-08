@@ -73,8 +73,8 @@
 }
 
 .inlineNotification {
-  min-width: '100%';
-  margin: spacing.$spacing-02;
+  width: 100%;
+  max-width: unset;
   padding: '0rem';
 }
 

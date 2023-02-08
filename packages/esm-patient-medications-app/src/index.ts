@@ -1,5 +1,5 @@
 import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
-import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
+import { createDashboardLink, getPatientSummaryOrder } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
 
@@ -36,7 +36,7 @@ function setupOpenMRS() {
       {
         name: 'active-medications-widget',
         slot: 'patient-chart-summary-dashboard-slot',
-        order: 1,
+        order: getPatientSummaryOrder('Medications'),
         load: getAsyncLifecycle(() => import('./medications/active-medications.component'), options),
         meta: {
           columnSpan: 4,

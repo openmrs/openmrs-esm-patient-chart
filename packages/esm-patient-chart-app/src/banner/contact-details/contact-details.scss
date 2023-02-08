@@ -8,9 +8,25 @@
   border-top: 1px solid $ui-03;
 }
 
+.link {
+  text-decoration-line: none;
+  text-transform: capitalize;
+}
+
 .heading {
   @include type.type-style("heading-compact-01");
   color: $text-02;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.listItem {
+  margin: 0.5rem 0;
+}
+
+.patientLists {
+  margin: 0.5rem 0;
 }
 
 .row {
@@ -24,7 +40,7 @@
 
 .row > .col {
   flex: 1;
-  padding: 1rem 1rem;
+  padding: 1rem;
 
   &:nth-of-type(2n + 1) {
     border-right: 1px solid $ui-03;
@@ -44,4 +60,7 @@
   flex: 1 1;
 }
 
-
+.container {
+  display: flex;
+  justify-content: space-between;
+}
