@@ -39,11 +39,14 @@
     text-align: center
   }
 
-  .patientName, .longPatientNameBtn {
+  .patientName {
     @include type.type-style('heading-compact-01');
-    margin-right: spacing.$spacing-05;
     color: $ui-02;
-    margin: spacing.$spacing-04 0;
+  }
+
+  .longPatientNameBtn {
+    @extend .patientName;
+    margin-right: spacing.$spacing-05;
     padding-right: 0.5rem;
   }
   
@@ -61,7 +64,7 @@
   .patientInfo {
     color: $color-gray-30;
     @include type.type-style('body-compact-01');
-    margin: 0 spacing.$spacing-05 0;
+    margin-left: spacing.$spacing-03;
   }
 }
 
