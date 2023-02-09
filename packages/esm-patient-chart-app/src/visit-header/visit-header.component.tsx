@@ -149,7 +149,7 @@ const VisitHeader: React.FC = () => {
   const visitNotLoaded = !isValidating && currentVisit === null;
   const toggleSideMenu = useCallback(() => setIsSideMenuExpanded((prevState) => !prevState), []);
 
-  const hasActiveVisit = !isLoading && visitNotLoaded;
+  const hasActiveVisit = !isLoading && !visitNotLoaded;
 
   const originPage = localStorage.getItem('fromPage');
 
@@ -191,7 +191,7 @@ const VisitHeader: React.FC = () => {
             <PatientInfo patient={patient} />
           </div>
           <HeaderGlobalBar>
-            {hasActiveVisit && (
+            {!hasActiveVisit && (
               <Button className={styles.startVisitButton} onClick={launchStartVisitForm} size="lg">
                 {startVisitLabel ? startVisitLabel : t('startVisit', 'Start a visit')}
               </Button>
