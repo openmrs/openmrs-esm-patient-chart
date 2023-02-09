@@ -76,12 +76,20 @@ const PaginatedNotes: React.FC<PaginatedNotes> = ({ notes, pageSize, pageUrl, ur
   return (
     <>
       <DataTable rows={tableRows} sortRow={customSortRow} headers={tableHeaders} isSortable size="sm" useZebraStyles>
-        {({ rows, headers, getTableProps, getTableContainerProps, getHeaderProps, getRowProps }) => (
+        {({
+          rows,
+          headers,
+          getExpandHeaderProps,
+          getTableProps,
+          getTableContainerProps,
+          getHeaderProps,
+          getRowProps,
+        }) => (
           <TableContainer {...getTableContainerProps}>
             <Table {...getTableProps()}>
               <TableHead>
                 <TableRow>
-                  <TableExpandHeader />
+                  <TableExpandHeader enableToggle {...getExpandHeaderProps()} />
                   {headers.map((header, i) => (
                     <TableHeader
                       key={i}
