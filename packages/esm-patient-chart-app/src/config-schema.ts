@@ -47,6 +47,11 @@ export const esmPatientChartSchema = {
     _description: 'Custom label to use on the start visit actions',
     _default: '',
   },
+  endVisitLabel: {
+    _type: Type.String,
+    _description: 'Custom label to use on the end visit actions',
+    _default: '',
+  },
   visitAttributeTypes: {
     _type: Type.Array,
     _description: 'List of visit attribute types shown when filling the visit form',
