@@ -7,6 +7,7 @@ import { MonthlyScheduleResourceService } from '../services/monthly-scheduled-re
 import { SingleSpaPropsService } from '../single-spa-props/single-spa-props.service';
 import { Encounter, FormSchema } from '../types';
 import { LoggedInUser } from '@openmrs/esm-framework';
+import { FormSchemaService } from '../form-schema/form-schema.service';
 import { isFunction } from 'lodash-es';
 
 /**
@@ -56,6 +57,7 @@ export class FormCreationService {
     private readonly encounterAdapter: EncounterAdapter,
     private readonly configResourceService: ConfigResourceService,
     private readonly singleSpaPropsService: SingleSpaPropsService,
+    private readonly formSchemaService: FormSchemaService,
   ) {}
 
   /**
@@ -65,7 +67,6 @@ export class FormCreationService {
    * @returns The new {@link Form} instance.
    */
   public async initAndCreateForm(createFormParams: CreateFormParams) {
-    console.log(createFormParams, 'crr--e');
     const { formSchema, encounter } = createFormParams;
 
     await this.wireDataSources(createFormParams, formSchema);

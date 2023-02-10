@@ -23,58 +23,25 @@ export class FormSchemaService {
     private translate: TranslateService,
   ) {}
 
-  public getFormTranslationsByUuid(formUuid: string, cached: boolean = true) {
-    const cachedCompiledTranslations = this.getCachedTranslationsByUuid(formUuid);
+  public getFormTranslationsByUuid(formUuid: string) {
     const currentLang = (window as Window).i18next?.language.substring(0, 2).toLowerCase() || 'en';
     this.translate.setDefaultLang(currentLang);
 
-    console.log(cachedCompiledTranslations, 'cached');
-    if (cachedCompiledTranslations && cached) {
-      cachedCompiledTranslations.translations.forEach((translationResourceUuid: string) => {
-        const translationResource = this.getCachedTranslationsByUuid(translationResourceUuid);
-        if (translationResource) {
-          this.translate.setTranslation(translationResource.language, translationResource.translations, true);
-        }
-      });
+    const formMetadataObject: any = this.formsResourceService.getFormMetaDataByUuid(formUuid).pipe(take(1));
 
-      return of(cachedCompiledTranslations);
-    }
+    return this.getFormTranslationsByUuidFromServer(formUuid).subscribe(({ form, referencedComponents }) => {
+      if (form?.translations) {
+        this.translate.setTranslation(form?.language, form?.translations, true);
+      }
 
-    return forkJoin({
-      unCompiledTranslations: this.getFormTranslationsByUuidFromServer(formUuid).pipe(take(1)),
-      formMetadataObject: this.formsResourceService.getFormMetaDataByUuid(formUuid).pipe(take(1)),
-    }).pipe(
-      map(({ unCompiledTranslations, formMetadataObject }) => {
-        const formTranslations: any = unCompiledTranslations.form;
-
-        if (formTranslations?.translations) {
-          formTranslations.translations.forEach((translationUuid: string) => {
-            this.getFormTranslationResourceByUuidFromServer(translationUuid)
-              .then((result) => {
-                this.cacheTranslationsByUuid(translationUuid, result);
-                this.translate.setTranslation(result.language, result.translations, true);
-              })
-              .catch((error) => {
-                console.error(`Error getting AMPATH translation resource: ${error.display}.`);
-              });
-          });
-        }
-
-        const referencedComponents: any = unCompiledTranslations.referencedComponents;
-
-        formMetadataObject.pages = formTranslations.pages || [];
-        formMetadataObject.referencedForms = formTranslations.referencedForms || [];
-        formMetadataObject.processor = formTranslations.processor;
-        formMetadataObject.translations = formTranslations.translations;
-
-        return this.formSchemaCompiler.compileFormSchema(
-          formMetadataObject,
-          referencedComponents,
-        ) as unknown as FormSchema;
-      }),
-      tap((compiledSchema) => this.cacheTranslationsByUuid(formUuid, compiledSchema)),
-    );
+      formMetadataObject.translations = form?.translations;
+      return this.formSchemaCompiler.compileFormSchema(
+        formMetadataObject,
+        referencedComponents,
+      ) as unknown as FormSchema;
+    });
   }
+
   public getFormSchemaByUuid(formUuid: string, cached: boolean = true): Observable<FormSchema> {
     const cachedCompiledSchema = this.getCachedCompiledSchemaByUuid(formUuid);
     const currentLang = (window as Window).i18next?.language.substring(0, 2).toLowerCase() || 'en';
@@ -170,7 +137,7 @@ export class FormSchemaService {
     const formTranslations: ReplaySubject<any> = new ReplaySubject(1);
     this.fetchFormTranslationUsingFormMetadata(formUuid).subscribe(
       (translations: any) => {
-        // check whether whether formSchema has references b4 hitting getFormSchemaWithReferences
+        // check whether formSchema has references b4 hitting getFormSchemaWithReferences
         if (translations.referencedForms && translations.referencedForms.length > 0) {
           this.getFormSchemaWithReferences(translations).subscribe(
             (form: object) => {
@@ -204,11 +171,9 @@ export class FormSchemaService {
     return Observable.create((observer: Subject<any>) => {
       return this.formsResourceService.getFormMetaDataByUuid(formUuid).subscribe(
         (formMetadataObject: any) => {
-          console.log(formMetadataObject, 'form--');
           if (formMetadataObject.resources.length > 0) {
             const { resources } = formMetadataObject;
-            console.log(resources, '----reso-tr');
-            const valueReferenceUuid = resources?.find(({ name }) => name === 'translations').valueReference;
+            const valueReferenceUuid = resources?.find(({ name }) => name.includes('translations')).valueReference;
             if (valueReferenceUuid) {
               this.formsResourceService.getFormClobDataByUuid(valueReferenceUuid).subscribe(
                 (clobData: any) => {
@@ -299,7 +264,6 @@ export class FormSchemaService {
         (formMetadataObject: any) => {
           if (formMetadataObject.resources.length > 0) {
             const { resources } = formMetadataObject;
-            console.log(resources, '----reso-sc--');
             const valueReferenceUuid = resources?.find(({ name }) => name === 'JSON schema').valueReference;
             if (valueReferenceUuid) {
               this.formsResourceService.getFormClobDataByUuid(valueReferenceUuid).subscribe(
