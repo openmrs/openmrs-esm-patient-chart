@@ -224,6 +224,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
         <FormGroup legendText={t('condition', 'Condition')}>
           <Search
             size="md"
+            className={styles.conditionSearchInput}
             id="conditionsSearch"
             labelText={t('enterCondition', 'Enter condition')}
             light={isTablet}

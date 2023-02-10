@@ -54,10 +54,10 @@ const CancelAppointmentModal: React.FC<CancelAppointmentModalProps> = ({
       </ModalBody>
       <ModalFooter>
         <Button kind="secondary" onClick={closeCancelModal}>
-          {t('no', 'No')}
+          {t('discard', 'Discard')}
         </Button>
         <Button kind="danger" onClick={handleCancel} disabled={isSubmitting}>
-          {t('cancel', 'Cancel')}
+          {t('cancelAppointment', 'Cancel appointment')}
         </Button>
       </ModalFooter>
     </div>

@@ -30,8 +30,14 @@
   height: calc(100vh - 6rem);
 }
 
-.formContainer { 
+.formContainer {
   margin: 1rem;
+}
+
+.conditionSearchInput {
+  :global(.cds--search-input[disabled]) {
+    color: $text-02;
+  }
 }
 
 .button {
