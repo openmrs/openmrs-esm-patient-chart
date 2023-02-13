@@ -1,5 +1,6 @@
 import useSWR from 'swr';
-import { openmrsFetch, Visit } from '@openmrs/esm-framework';
+import { fhirBaseUrl, openmrsFetch, Visit } from '@openmrs/esm-framework';
+import { useMemo } from 'react';
 export type QueuePriority = 'Emergency' | 'Not Urgent' | 'Priority' | 'Urgent';
 export type MappedQueuePriority = Omit<QueuePriority, 'Urgent'>;
 export type QueueService = 'Clinical consultation' | 'Triage';
@@ -62,14 +63,17 @@ export interface MappedVisitQueueEntry {
 }
 
 interface UseVisitQueueEntries {
-  visitQueueEntries: Array<MappedVisitQueueEntry> | null;
+  queueEntry: MappedVisitQueueEntry | null;
   isLoading: boolean;
   isError: Error;
   isValidating?: boolean;
 }
 
-export function useVisitQueueEntries(): UseVisitQueueEntries {
-  const apiUrl = `/ws/rest/v1/visit-queue-entry?v=full`;
+export function useVisitQueueEntries(patientUuid, visitUuid): UseVisitQueueEntries {
+  const { queueLocations } = useQueueLocations();
+  const queueLocationUuid = queueLocations[0]?.id;
+
+  const apiUrl = `/ws/rest/v1/visit-queue-entry?location=${queueLocationUuid}&v=full`;
   const { data, error, isLoading, isValidating } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
     apiUrl,
     openmrsFetch,
@@ -93,12 +97,34 @@ export function useVisitQueueEntries(): UseVisitQueueEntries {
     queueEntryUuid: visitQueueEntry.queueEntry.uuid,
   });
 
-  const mappedVisitQueueEntries = data?.data?.results?.map(mapVisitQueueEntryProperties);
+  const visitQueues = data?.data?.results?.map(mapVisitQueueEntryProperties);
+
+  const mappedVisitQueueEntries =
+    visitQueues?.find(
+      (visitQueueEntry) => visitQueueEntry?.patientUuid == patientUuid && visitUuid === visitQueueEntry.visitUuid,
+    ) ?? null;
 
   return {
-    visitQueueEntries: mappedVisitQueueEntries ? mappedVisitQueueEntries : null,
+    queueEntry: mappedVisitQueueEntries,
     isLoading,
     isError: error,
     isValidating,
   };
+}
+
+interface FHIRResponse {
+  entry: Array<{ resource: fhir.Location }>;
+  total: number;
+  type: string;
+  resourceType: string;
+}
+export function useQueueLocations() {
+  const apiUrl = `${fhirBaseUrl}/Location?_summary=data&_tag=queue location`;
+  const { data, error } = useSWR<{ data: FHIRResponse }>(apiUrl, openmrsFetch);
+
+  const queueLocations = useMemo(
+    () => data?.data?.entry?.map((response) => response.resource) ?? [],
+    [data?.data?.entry],
+  );
+  return { queueLocations: queueLocations ? queueLocations : [], isLoading: !data && !error, error };
 }

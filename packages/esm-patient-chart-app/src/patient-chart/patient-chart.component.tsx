@@ -13,6 +13,7 @@ import Loader from '../loader/loader.component';
 import WorkspaceNotification from '../workspace/workspace-notification.component';
 import styles from './patient-chart.scss';
 import PatientBanner from '../banner/patient-banner.component';
+import { ChartConfig } from '../config-schema';
 
 const PatientChart: React.FC = () => {
   const { patientUuid, view: encodedView } = useParams();
@@ -21,6 +22,7 @@ const PatientChart: React.FC = () => {
   const { windowSize, active } = useWorkspaceWindowSize();
   const state = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);
   const { offlineVisitTypeUuid } = useConfig();
+  const config = useConfig() as ChartConfig;
 
   // We are responsible for creating a new offline visit while in offline mode.
   // The patient chart widgets assume that this is handled by the chart itself.
@@ -46,6 +48,9 @@ const PatientChart: React.FC = () => {
             <ExtensionSlot extensionSlotName="breadcrumbs-slot" />
             <aside>
               <PatientBanner {...state} />
+              {config.showServiceQueueFields && (
+                <ExtensionSlot extensionSlotName="transition-queue-entry-slot" state={state} />
+              )}
               <ExtensionSlot extensionSlotName="patient-info-slot" state={state} />
             </aside>
             <div className={styles.grid}>
