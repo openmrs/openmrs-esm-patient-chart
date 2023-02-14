@@ -8,10 +8,6 @@
   @include brand-02(background-color);
 }
  
-.headerGlobalBarButton {
-  @include brand-01(background-color);
-}
- 
 .headerGlobalBarCloseButton {
   @include brand-02(background-color);
 }
@@ -26,7 +22,7 @@
 }
  
 .startVisitButton {
-  width: 15rem;
+  @include brand-03(background-color);
 }
  
 .patientDetails {
@@ -42,28 +38,36 @@
   :global(.cds--popover--bottom .cds--popover-content) {
     text-align: center
   }
-  .patientName, .longPatientNameBtn {
+
+  .patientName {
     @include type.type-style('heading-compact-01');
-    margin-right: spacing.$spacing-05;
     color: $ui-02;
-    margin: spacing.$spacing-04 0;
+  }
+
+  .longPatientNameBtn {
+    @extend .patientName;
+    margin-right: spacing.$spacing-05;
     padding-right: 0.5rem;
   }
+  
   .tooltipPatientName {
     @include type.type-style('productive-heading-01');
     color:$ui-02; 
   }
+  
   .longPatientNameBtn {
     background-color: transparent;
     border: none;
     outline: none;
   }
+  
   .patientInfo {
     color: $color-gray-30;
     @include type.type-style('body-compact-01');
-    margin: 0 spacing.$spacing-05 0;
+    margin-left: spacing.$spacing-03;
   }
 }
+
 .tooltipPatientInfo {
   @include type.type-style('body-short-01');
   color:$color-gray-30;

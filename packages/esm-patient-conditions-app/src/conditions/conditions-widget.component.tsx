@@ -230,6 +230,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
             placeholder={t('searchConditions', 'Search conditions')}
             onChange={handleSearchTermChange}
             onClear={() => setSelectedCondition(null)}
+            disabled={context === 'editing'}
             value={(() => {
               if (conditionToLookup) {
                 return conditionToLookup;

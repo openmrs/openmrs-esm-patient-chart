@@ -102,8 +102,8 @@ describe('Switchable obs viewer ', () => {
     );
 
     const expectedTableRows = [
-      /2\d — Oct — 2021, \d{2}:\d{2}\s+AM -- 180/,
-      /1\d — Oct — 2021, \d{2}:\d{2}\s+AM 198 200/,
+      /1\d — Oct — 2021, \d{2}:\d{2}\s+PM -- 180/,
+      /1\d — Oct — 2021, \d{2}:\d{2}\s+PM 198 200/,
     ];
 
     expectedTableRows.map((row) =>
