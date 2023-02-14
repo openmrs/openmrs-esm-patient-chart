@@ -133,7 +133,6 @@ const VisitHeader: React.FC = () => {
   const { currentVisit, isValidating } = useVisit(patient?.id);
   const [showVisitHeader, setShowVisitHeader] = useState<boolean>(true);
   const [isSideMenuExpanded, setIsSideMenuExpanded] = useState(false);
-  const [isActiveVisit, setIsActiveVisit] = useState(false);
   const navMenuItems = useAssignedExtensions('patient-chart-dashboard-slot').map((extension) => extension.id);
   const { startVisitLabel, endVisitLabel } = useConfig();
 

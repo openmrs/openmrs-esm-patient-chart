@@ -13,6 +13,7 @@ import {
 } from '../../../../../__mocks__/vitals.mock';
 import VitalsHeader from './vitals-header.component';
 import { patientVitalsBiometricsFormWorkspace } from '../../constants';
+import { mockCurrentVisit } from '../../../../../__mocks__/visits.mock';
 
 const testProps = {
   patientUuid: mockPatient.id,
@@ -36,6 +37,7 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
       data: mockConceptUnits,
       conceptMetadata: mockConceptMetadata,
     })),
+    useVisitOrOfflineVisit: jest.fn().mockImplementation(() => ({ currentVisit: mockCurrentVisit })),
   };
 });
 
@@ -45,6 +47,7 @@ jest.mock('@openmrs/esm-framework', () => {
   return {
     ...originalModule,
     useConfig: jest.fn(() => mockVitalsConfig),
+    useConnectivity: jest.fn(),
   };
 });
 

@@ -5,9 +5,13 @@ import { useTranslation } from 'react-i18next';
 import { Button, InlineLoading } from '@carbon/react';
 import { ChevronDown, ChevronUp, WarningFilled } from '@carbon/react/icons';
 import { formatDate, parseDate, useConfig } from '@openmrs/esm-framework';
-import { formEntrySub, launchPatientWorkspace, useVitalsConceptMetadata } from '@openmrs/esm-patient-common-lib';
+import {
+  formEntrySub,
+  launchPatientWorkspace,
+  useVisitOrOfflineVisit,
+  useVitalsConceptMetadata,
+} from '@openmrs/esm-patient-common-lib';
 import { ConfigObject } from '../../config-schema';
-import { patientVitalsBiometricsFormWorkspace } from '../../constants';
 import {
   assessValue,
   getReferenceRangesForConcept,
@@ -17,6 +21,7 @@ import {
 } from '../vitals.resource';
 import VitalsHeaderItem from './vitals-header-item.component';
 import styles from './vitals-header.scss';
+import { launchVitalsForm } from '../vitals-utils';
 
 dayjs.extend(isToday);
 
@@ -38,17 +43,14 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
   const latestVitals = vitals?.[0];
   const [showDetailsPanel, setShowDetailsPanel] = useState(false);
   const toggleDetailsPanel = () => setShowDetailsPanel(!showDetailsPanel);
+  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
 
   const launchVitalsAndBiometricsForm = React.useCallback(
     (e) => {
       e.stopPropagation();
-      if (config.vitals.useFormEngine) {
-        launchFormEntry(config.vitals.formUuid, '', config.vitals.formName);
-      } else {
-        launchPatientWorkspace(patientVitalsBiometricsFormWorkspace);
-      }
+      launchVitalsForm(currentVisit, config);
     },
-    [config.vitals],
+    [config, currentVisit],
   );
 
   if (isLoading) {
