@@ -4903,6 +4903,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ngx-translate/core@npm:^13.0.0":
+  version: 13.0.0
+  resolution: "@ngx-translate/core@npm:13.0.0"
+  dependencies:
+    tslib: ^2.0.0
+  peerDependencies:
+    "@angular/core": ">=10.0.0"
+    rxjs: ">=6.5.3"
+  checksum: ef7df7870dddc53d483b5c70093174844a5bd231568e36a18271bcaf71209bbedb66c82005d76088392df2bde1d82136fb7f79afb44975e2f7426cc8824e0288
+  languageName: node
+  linkType: hard
+
 "@ngx-translate/core@npm:^14.0.0":
   version: 14.0.0
   resolution: "@ngx-translate/core@npm:14.0.0"
@@ -5373,6 +5385,7 @@ __metadata:
     "@angular/router": ~12.2.16
     "@carbon/styles": ~1.14.0
     "@ng-select/ng-select": ^6.1.0
+    "@ngx-translate/core": ^13.0.0
     "@openmrs/ngx-formentry": next
     "@types/jasmine": ~3.6.0
     "@types/jasminewd2": ~2.0.3
@@ -5394,6 +5407,7 @@ __metadata:
     openmrs: next
     protractor: ~7.0.0
     reflect-metadata: ^0.1.13
+    rxjs: 6
     single-spa-angular: ^5.0.2
     slick-carousel: ^1.6.0
     style-loader: 2.x
@@ -22072,7 +22086,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rxjs@npm:6.6.7, rxjs@npm:^6.5.3, rxjs@npm:^6.6.0, rxjs@npm:^6.6.3":
+"rxjs@npm:6, rxjs@npm:6.6.7, rxjs@npm:^6.5.3, rxjs@npm:^6.6.0, rxjs@npm:^6.6.3":
   version: 6.6.7
   resolution: "rxjs@npm:6.6.7"
   dependencies:
