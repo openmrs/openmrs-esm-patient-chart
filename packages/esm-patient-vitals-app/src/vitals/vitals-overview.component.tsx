@@ -8,6 +8,7 @@ import {
   ErrorState,
   formEntrySub,
   launchPatientWorkspace,
+  useVisitOrOfflineVisit,
   useVitalsConceptMetadata,
   withUnit,
 } from '@openmrs/esm-patient-common-lib';
@@ -18,6 +19,7 @@ import VitalsChart from './vitals-chart.component';
 import { ConfigObject } from '../config-schema';
 import { useVitals } from './vitals.resource';
 import styles from './vitals-overview.scss';
+import { launchVitalsForm } from './vitals-utils';
 
 interface VitalsOverviewProps {
   patientUuid: string;
@@ -38,17 +40,14 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
   const displayText = t('vitalSigns', 'Vital signs');
   const headerTitle = t('vitals', 'Vitals');
   const [chartView, setChartView] = React.useState<boolean>();
+  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
 
   const { vitals, isError, isLoading, isValidating } = useVitals(patientUuid);
   const { data: conceptUnits } = useVitalsConceptMetadata();
 
   const launchVitalsBiometricsForm = React.useCallback(() => {
-    if (config.vitals.useFormEngine) {
-      launchFormEntry(config.vitals.formUuid, '', config.vitals.formName);
-    } else {
-      launchPatientWorkspace(patientVitalsBiometricsFormWorkspace);
-    }
-  }, [config.vitals]);
+    launchVitalsForm(currentVisit, config);
+  }, [config, currentVisit]);
 
   const tableHeaders = [
     { key: 'date', header: 'Date and time', isSortable: true },
