@@ -3,7 +3,7 @@ import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
 import { useTranslation } from 'react-i18next';
 import { Button, InlineLoading } from '@carbon/react';
-import { ChevronDown, ChevronUp, WarningFilled } from '@carbon/react/icons';
+import { ArrowRight, WarningFilled } from '@carbon/react/icons';
 import { formatDate, parseDate, useConfig } from '@openmrs/esm-framework';
 import {
   formEntrySub,
@@ -91,38 +91,23 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
           <div className={styles['button-container']}>
             <Button className={styles['record-vitals']} kind="ghost" size="sm" onClick={launchVitalsAndBiometricsForm}>
               {t('recordVitals', 'Record vitals')}
+              <ArrowRight
+                size={16}
+                className={styles['arrow-up-button']}
+                style={{ fill: '#0f62fe' }}
+                title={'ArrowRight'}
+              />
             </Button>
-            {showDetailsPanel ? (
-              <ChevronUp
-                size={16}
-                className={styles['collapse-button']}
-                title={'ChevronUp'}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleDetailsPanel();
-                }}
-              />
-            ) : (
-              <ChevronDown
-                size={16}
-                className={styles['expand-button']}
-                title={'ChevronDown'}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleDetailsPanel();
-                }}
-              />
-            )}
           </div>
         </div>
-        {showDetailsPanel ? (
-          <div
-            className={
-              hasAbnormalValues(latestVitals) && isNotRecordedToday
-                ? `${styles['warning-border']}`
-                : `${styles['default-border']}`
-            }
-          >
+        <div
+          className={
+            hasAbnormalValues(latestVitals) && isNotRecordedToday
+              ? `${styles['warning-border']}`
+              : `${styles['default-border']}`
+          }
+        >
+          <div className={styles['container-row']}>
             <div className={styles.row}>
               <VitalsHeaderItem
                 unitName={t('temperatureAbbreviated', 'Temp')}
@@ -190,7 +175,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
               />
             </div>
           </div>
-        ) : null}
+        </div>
       </div>
     );
   }

@@ -12,7 +12,12 @@
 }
 
 .abnormal-value {
-  background-color: rgba(0, 0, 0, 0.1);
+  border: 2px solid $danger;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: fit-content;
+  padding: 0 0.25rem 0 0.25rem;
 }
 
 .label-container {
