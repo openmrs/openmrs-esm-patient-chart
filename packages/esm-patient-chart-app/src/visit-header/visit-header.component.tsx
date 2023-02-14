@@ -53,15 +53,10 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
   };
   const name = `${patient?.name?.[0].given?.join(' ')} ${patient?.name?.[0].family}`;
   const patientUuid = `${patient?.id}`;
+  const { currentVisit } = useVisit(patientUuid);
   const info = `${parseInt(age(patient?.birthDate))}, ${getGender(patient?.gender)}`;
   const truncate = !isTablet && name.trim().length > 25;
-  const { visitQueueEntries, isLoading } = useVisitQueueEntries();
-
-  const queueEntry =
-    visitQueueEntries?.find(
-      (visitQueueEntry) =>
-        visitQueueEntry?.patientUuid == patientUuid && currentVisit?.uuid === visitQueueEntry.visitUuid,
-    ) ?? null;
+  const { queueEntry, isLoading } = useVisitQueueEntries(patientUuid, currentVisit?.uuid);
 
   const visitType = queueEntry?.visitType ?? '';
   const priority = queueEntry?.priority ?? '';
@@ -80,8 +75,6 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
   };
 
   const currentService = queueEntry ? getServiceString() : null;
-
-  const { currentVisit } = useVisit(patientUuid);
 
   const getTagType = (priority: string) => {
     switch (priority as MappedQueuePriority) {
@@ -245,7 +238,7 @@ const VisitHeader: React.FC = () => {
     toggleSideMenu,
     endVisitLabel,
     openModal,
-    currentVisit
+    currentVisit,
   ]);
 
   return <HeaderContainer render={render} />;
