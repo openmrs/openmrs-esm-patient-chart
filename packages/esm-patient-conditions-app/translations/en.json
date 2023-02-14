@@ -24,6 +24,7 @@
   "enterCondition": "Enter condition",
   "errorDeletingCondition": "Error deleting a condition",
   "inactive": "Inactive",
+  "loadingCondition": "Loading Condition",
   "noConditionsToDisplay": "No conditions to display",
   "noResultsFor": "No results for",
   "onsetDate": "Onset date",
