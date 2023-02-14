@@ -56,6 +56,5 @@
 }
 
 .conditionLabel {
-  color: $text-02;
-  font-size: 0.875rem;
+  @include type.type-style("label-02");
 }
