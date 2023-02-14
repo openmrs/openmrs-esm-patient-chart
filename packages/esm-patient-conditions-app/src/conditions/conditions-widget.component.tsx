@@ -14,6 +14,7 @@ import {
   Search,
   Stack,
   Tile,
+  FormLabel,
 } from '@carbon/react';
 import { createErrorHandler, showNotification, showToast, useLayoutType, useSession } from '@openmrs/esm-framework';
 import {
@@ -222,59 +223,71 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     <div className={styles.formContainer}>
       <Stack gap={7}>
         <FormGroup legendText={t('condition', 'Condition')}>
-          <Search
-            size="md"
-            id="conditionsSearch"
-            labelText={t('enterCondition', 'Enter condition')}
-            light={isTablet}
-            placeholder={t('searchConditions', 'Search conditions')}
-            onChange={handleSearchTermChange}
-            onClear={() => setSelectedCondition(null)}
-            disabled={context === 'editing'}
-            value={(() => {
-              if (conditionToLookup) {
-                return conditionToLookup;
-              }
-              if (selectedCondition) {
-                return selectedCondition.display;
-              }
-              return '';
-            })()}
-          />
-          <div>
-            {(() => {
-              if (!conditionToLookup || selectedCondition) return null;
-              if (isSearchingConditions)
-                return <InlineLoading className={styles.loader} description={t('searching', 'Searching') + '...'} />;
-              if (conditions && conditions.length) {
-                return (
-                  <ul className={styles.conditionsList}>
-                    {conditions?.map((condition, index) => (
-                      <li
-                        role="menuitem"
-                        className={styles.condition}
-                        key={index}
-                        onClick={() => handleConditionChange(condition)}
-                      >
-                        {condition.display}
-                      </li>
-                    ))}
-                  </ul>
-                );
-              }
-              return (
-                <>
-                  <Layer>
-                    <Tile className={styles.emptyResults}>
-                      <span>
-                        {t('noResultsFor', 'No results for')} <strong>"{conditionToLookup}"</strong>
-                      </span>
-                    </Tile>
-                  </Layer>
-                </>
-              );
-            })()}
-          </div>
+          {context === 'editing' ? (
+            !selectedCondition ? (
+              <InlineLoading description={t('loadingCondition', 'Loading Condition') + '...'} />
+            ) : (
+              <FormLabel className={styles.conditionLabel}>{selectedCondition?.display}</FormLabel>
+            )
+          ) : (
+            <>
+              <Search
+                size="md"
+                id="conditionsSearch"
+                labelText={t('enterCondition', 'Enter condition')}
+                light={isTablet}
+                placeholder={t('searchConditions', 'Search conditions')}
+                onChange={handleSearchTermChange}
+                onClear={() => setSelectedCondition(null)}
+                disabled={context === 'editing'}
+                value={(() => {
+                  if (conditionToLookup) {
+                    return conditionToLookup;
+                  }
+                  if (selectedCondition) {
+                    return selectedCondition.display;
+                  }
+                  return '';
+                })()}
+              />
+              <div>
+                {(() => {
+                  if (!conditionToLookup || selectedCondition) return null;
+                  if (isSearchingConditions)
+                    return (
+                      <InlineLoading className={styles.loader} description={t('searching', 'Searching') + '...'} />
+                    );
+                  if (conditions && conditions.length) {
+                    return (
+                      <ul className={styles.conditionsList}>
+                        {conditions?.map((condition, index) => (
+                          <li
+                            role="menuitem"
+                            className={styles.condition}
+                            key={index}
+                            onClick={() => handleConditionChange(condition)}
+                          >
+                            {condition.display}
+                          </li>
+                        ))}
+                      </ul>
+                    );
+                  }
+                  return (
+                    <>
+                      <Layer>
+                        <Tile className={styles.emptyResults}>
+                          <span>
+                            {t('noResultsFor', 'No results for')} <strong>"{conditionToLookup}"</strong>
+                          </span>
+                        </Tile>
+                      </Layer>
+                    </>
+                  );
+                })()}
+              </div>
+            </>
+          )}
         </FormGroup>
         <FormGroup legendText="">
           <DatePicker
