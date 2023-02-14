@@ -13,13 +13,13 @@ const ClinicalFormActionButton: React.FC = () => {
   const { workspaces } = useWorkspaces();
   const { launchFormsWorkspace } = useLaunchFormsWorkspace();
 
-  const isWorkspaceOpen = workspaces.find(({ name }) => name.includes('clinical-forms-workspace'));
+  const isMostActive = workspaces?.[0]?.name.includes('clinical-forms-workspace');
 
   if (layout === 'tablet')
     return (
       <Button
         kind="ghost"
-        className={`${styles.container} ${isWorkspaceOpen ? styles.active : ''}`}
+        className={`${styles.container} ${isMostActive ? styles.active : ''}`}
         tabIndex={0}
         onClick={launchFormsWorkspace}
       >
@@ -30,7 +30,7 @@ const ClinicalFormActionButton: React.FC = () => {
 
   return (
     <Button
-      className={`${styles.container} ${isWorkspaceOpen ? styles.active : ''}`}
+      className={`${styles.container} ${isMostActive ? styles.active : ''}`}
       kind="ghost"
       renderIcon={(props) => <Document size={20} {...props} />}
       hasIconOnly
@@ -38,6 +38,7 @@ const ClinicalFormActionButton: React.FC = () => {
       onClick={launchFormsWorkspace}
       tooltipAlignment="end"
       tooltipPosition="bottom"
+      size="sm"
     />
   );
 };

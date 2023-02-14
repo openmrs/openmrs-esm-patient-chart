@@ -15,7 +15,7 @@ const OrderBasketActionButton: React.FC = () => {
   const { items } = useStore(orderBasketStore);
   const { patientUuid } = usePatient();
 
-  const isActive = workspaces.find(({ name }) => name.includes('order-basket'));
+  const isMostActive = workspaces?.[0]?.name.includes('order-basket');
 
   const patientOrderItems = getOrderItems(items, patientUuid);
 
@@ -25,7 +25,7 @@ const OrderBasketActionButton: React.FC = () => {
     return (
       <Button
         kind="ghost"
-        className={`${styles.container} ${isActive ? styles.active : ''}`}
+        className={`${styles.container} ${isMostActive ? styles.active : ''}`}
         role="button"
         tabIndex={0}
         onClick={launchOrderBasket}
@@ -40,8 +40,9 @@ const OrderBasketActionButton: React.FC = () => {
 
   return (
     <Button
-      className={isActive && styles.active}
+      className={isMostActive && styles.active}
       kind="ghost"
+      size="sm"
       renderIcon={(props) => (
         <div className={styles.elementContainer}>
           <ShoppingCart size={20} {...props} />{' '}
