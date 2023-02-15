@@ -30,7 +30,7 @@
   height: calc(100vh - 6rem);
 }
 
-.formContainer { 
+.formContainer {
   margin: 1rem;
 }
 
@@ -53,4 +53,8 @@
 
 .loader {
   padding: 1rem 0.5rem;
+}
+
+.conditionLabel {
+  @include type.type-style("label-02");
 }
