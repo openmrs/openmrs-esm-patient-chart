@@ -17,13 +17,15 @@ import { ConfigResourceService } from './services/config-resource.service';
 import { LoaderComponent } from './loader/loader.component';
 import { SingleSpaPropsService } from './single-spa-props/single-spa-props.service';
 import { FormCreationService } from './form-creation/form-creation.service';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { TranslateModule, TranslateService, TranslateStore } from '@ngx-translate/core';
 
 @NgModule({
   declarations: [AppComponent, EmptyRouteComponent, FeWrapperComponent, LoaderComponent],
   imports: [
     BrowserModule,
-    TranslateModule.forRoot(),
+    TranslateModule.forRoot({
+      isolate: false,
+    }),
     FormEntryModule,
     ReactiveFormsModule,
     BrowserAnimationsModule,
@@ -39,6 +41,7 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
     ConfigResourceService,
     SingleSpaPropsService,
     TranslateService,
+    TranslateStore,
   ],
   bootstrap: [AppComponent],
 })
