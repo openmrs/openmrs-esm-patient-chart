@@ -52,17 +52,17 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   const isTablet = useLayoutType() === 'tablet';
 
   const onsetDateTime = data?.find((d) => d?.id === condition?.id)?.onsetDateTime;
+  const displayName = getFieldValue(condition?.cells, 'display');
+  const conditionStatus = getFieldValue(condition?.cells, 'clinicalStatus');
 
   const [clinicalStatus, setClinicalStatus] = useState(
-    context === 'editing' ? getFieldValue(condition?.cells, 'clinicalStatus').toLowerCase() : 'active',
+    context === 'editing' ? conditionStatus.toLowerCase() : 'active',
   );
   const [endDate, setEndDate] = useState(null);
   const [onsetDate, setOnsetDate] = useState(
     context !== 'editing' ? new Date() : context === 'editing' && onsetDateTime ? new Date(onsetDateTime) : null,
   );
-  const [conditionToLookup, setConditionToLookup] = useState<null | string>(
-    context === 'editing' ? getFieldValue(condition?.cells, 'display') : '',
-  );
+  const [conditionToLookup, setConditionToLookup] = useState<null | string>(context === 'editing' ? displayName : '');
 
   const { conditions, isSearchingConditions } = useConditionsSearch(conditionToLookup);
 
@@ -70,14 +70,14 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
 
   // Populate the selected condition when in edit mode
   useEffect(() => {
-    if (context === 'editing' && getFieldValue(condition?.cells, 'display')) {
-      setSelectedCondition(conditions?.find((c) => c.display === getFieldValue(condition?.cells, 'display')));
+    if (context === 'editing' && displayName) {
+      setSelectedCondition(conditions?.find((c) => c.display === displayName));
     }
-  }, [conditions, condition, context]);
+  }, [conditions, condition, context, displayName]);
 
   const dataHasChanged =
-    selectedCondition !== getFieldValue(condition?.cells, 'display') ||
-    clinicalStatus !== getFieldValue(condition?.cells, 'clinicalStatus') ||
+    selectedCondition !== displayName ||
+    clinicalStatus !== conditionStatus ||
     onsetDate !== new Date(getFieldValue(condition?.cells, 'onsetDateTime'));
 
   useEffect(() => {
@@ -224,11 +224,7 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
       <Stack gap={7}>
         <FormGroup legendText={t('condition', 'Condition')}>
           {context === 'editing' ? (
-            !selectedCondition ? (
-              <InlineLoading description={t('loadingCondition', 'Loading Condition') + '...'} />
-            ) : (
-              <FormLabel className={styles.conditionLabel}>{selectedCondition?.display}</FormLabel>
-            )
+            <FormLabel className={styles.conditionLabel}>{displayName}</FormLabel>
           ) : (
             <>
               <Search
