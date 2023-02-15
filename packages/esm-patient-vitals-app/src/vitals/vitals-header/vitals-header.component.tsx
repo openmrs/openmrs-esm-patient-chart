@@ -89,14 +89,14 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
             <span>{isValidating ? <InlineLoading /> : null}</span>
           </div>
           <div className={styles['button-container']}>
-            <Button className={styles['record-vitals']} kind="ghost" size="sm" onClick={launchVitalsAndBiometricsForm}>
+            <Button
+              className={`${styles['record-vitals']} ${styles['arrow-up-icon']}`}
+              kind="ghost"
+              size="sm"
+              onClick={launchVitalsAndBiometricsForm}
+            >
               {t('recordVitals', 'Record vitals')}
-              <ArrowRight
-                size={16}
-                className={styles['arrow-up-button']}
-                style={{ fill: '#0f62fe' }}
-                title={'ArrowRight'}
-              />
+              <ArrowRight size={16} className={styles['arrow-up-button']} title={'ArrowRight'} />
             </Button>
           </div>
         </div>
