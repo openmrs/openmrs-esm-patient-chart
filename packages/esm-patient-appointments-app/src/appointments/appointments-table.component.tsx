@@ -26,9 +26,15 @@ interface AppointmentTableProps {
   patientAppointments: Array<Appointment>;
   switchedView: boolean;
   setSwitchedView: (value: boolean) => void;
+  patientUuid: string;
 }
 
-const AppointmentsTable: React.FC<AppointmentTableProps> = ({ patientAppointments, switchedView, setSwitchedView }) => {
+const AppointmentsTable: React.FC<AppointmentTableProps> = ({
+  patientAppointments,
+  patientUuid,
+  switchedView,
+  setSwitchedView,
+}) => {
   const { t } = useTranslation();
   const { results: paginatedAppointments, currentPage, goTo } = usePagination(patientAppointments, pageSize);
 
@@ -95,7 +101,7 @@ const AppointmentsTable: React.FC<AppointmentTableProps> = ({ patientAppointment
                       <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                     ))}
                     <TableCell className="cds--table-column-menu">
-                      <AppointmentsActionMenu appointment={paginatedAppointments[i]} />
+                      <AppointmentsActionMenu appointment={paginatedAppointments[i]} patientUuid={patientUuid} />
                     </TableCell>
                   </TableRow>
                 ))}
