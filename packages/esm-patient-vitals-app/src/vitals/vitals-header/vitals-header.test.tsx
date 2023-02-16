@@ -74,14 +74,9 @@ describe('VitalsHeader: ', () => {
     await waitForLoadingToFinish();
 
     expect(screen.getByText(/Vitals and biometrics/i)).toBeInTheDocument();
-    expect(screen.getByText(/Last recorded/i)).toBeInTheDocument();
-    expect(screen.getByText(/19 — May — 2021/i)).toBeInTheDocument();
+    expect(screen.getByText(/19-May-2021/i)).toBeInTheDocument();
     expect(screen.getByText(/Record vitals/i)).toBeInTheDocument();
     expect(screen.getByRole('img', { name: /warning/i })).toBeInTheDocument();
-
-    const expandButton = screen.getByTitle(/ChevronDown/);
-
-    await waitFor(() => user.click(expandButton));
 
     expect(getByTextWithMarkup(/Temp\s*37\s*DEG C/i)).toBeInTheDocument();
     expect(getByTextWithMarkup(/BP\s*121 \/ 89\s*mmHg/i)).toBeInTheDocument();
@@ -94,13 +89,6 @@ describe('VitalsHeader: ', () => {
 
     expect(screen.getByRole('img', { name: /warning/i })).toBeInTheDocument();
     expect(screen.getAllByTitle(/abnormal value/i).length).toEqual(2);
-
-    const collapseButton = screen.getByTitle(/ChevronUp/);
-
-    await waitFor(() => user.click(collapseButton));
-
-    expect(screen.queryByText(/Temp/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/BP/i)).not.toBeInTheDocument();
   });
 
   it('launches the vitals form when the `record vitals` button gets clicked', async () => {
@@ -129,9 +117,6 @@ describe('VitalsHeader: ', () => {
 
     renderVitalsHeader();
     await waitForLoadingToFinish();
-    const expandButton = screen.getByTitle(/ChevronDown/);
-
-    await waitFor(() => user.click(expandButton));
 
     expect(screen.queryByTitle(/abnormal value/i)).not.toBeInTheDocument();
   });
@@ -148,9 +133,6 @@ describe('VitalsHeader: ', () => {
     renderVitalsHeader();
 
     await waitForLoadingToFinish();
-    const expandButton = screen.getByTitle(/ChevronDown/);
-
-    await waitFor(() => user.click(expandButton));
 
     expect(screen.queryByTitle(/abnormal value/i)).toBeInTheDocument();
   });
