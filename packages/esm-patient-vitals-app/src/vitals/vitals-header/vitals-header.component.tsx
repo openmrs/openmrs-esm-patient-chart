@@ -4,7 +4,7 @@ import isToday from 'dayjs/plugin/isToday';
 import { useTranslation } from 'react-i18next';
 import { Button, InlineLoading } from '@carbon/react';
 import { ArrowRight, WarningFilled } from '@carbon/react/icons';
-import { formatDate, parseDate, useConfig } from '@openmrs/esm-framework';
+import { ConfigurableLink, formatDate, parseDate, useConfig } from '@openmrs/esm-framework';
 import {
   formEntrySub,
   launchPatientWorkspace,
@@ -81,9 +81,13 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
               />
             ) : null}
             <span className={styles.heading}>{t('vitalsAndBiometrics', 'Vitals and biometrics')}</span>
-            <span className={styles['body-text']}>
-              {t('lastRecorded', 'Last recorded')}: {formatDate(parseDate(latestVitals?.date), { mode: 'wide' })}
-            </span>
+            <span className={styles['body-text']}>{formatDate(parseDate(latestVitals?.date))}</span>
+            <ConfigurableLink
+              className={styles.link}
+              to={`\${openmrsSpaBase}/patient/${patientUuid}/chart/Vitals & Biometrics`}
+            >
+              {t('vitalsHistory', 'Vitals history')}
+            </ConfigurableLink>
           </span>
           <div className={styles.backgroundDataFetchingIndicator}>
             <span>{isValidating ? <InlineLoading /> : null}</span>

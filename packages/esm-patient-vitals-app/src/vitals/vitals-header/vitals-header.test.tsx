@@ -74,8 +74,7 @@ describe('VitalsHeader: ', () => {
     await waitForLoadingToFinish();
 
     expect(screen.getByText(/Vitals and biometrics/i)).toBeInTheDocument();
-    expect(screen.getByText(/Last recorded/i)).toBeInTheDocument();
-    expect(screen.getByText(/19 — May — 2021/i)).toBeInTheDocument();
+    expect(screen.getByText(/19-May-2021/i)).toBeInTheDocument();
     expect(screen.getByText(/Record vitals/i)).toBeInTheDocument();
     expect(screen.getByRole('img', { name: /warning/i })).toBeInTheDocument();
 
