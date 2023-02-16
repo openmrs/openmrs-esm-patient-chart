@@ -9,13 +9,13 @@ import styles from './order-basket-action-button.scss';
 import { useLaunchOrderBasket } from '../utils/launchOrderBasket';
 
 const OrderBasketActionButton: React.FC = () => {
-  const { t } = useTranslation();
   const layout = useLayoutType();
+  const { t } = useTranslation();
   const { workspaces } = useWorkspaces();
   const { items } = useStore(orderBasketStore);
   const { patientUuid } = usePatient();
 
-  const isActiveWorkspace = workspaces?.[0]?.name.includes('order-basket');
+  const isActiveWorkspace = workspaces?.[0]?.name?.match(/order-basket/i);
 
   const patientOrderItems = getOrderItems(items, patientUuid);
 

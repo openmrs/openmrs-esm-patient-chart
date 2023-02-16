@@ -10,7 +10,8 @@ const VisitNoteActionButton: React.FC = () => {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const { workspaces } = useWorkspaces();
-  const isActiveWorkspace = workspaces?.[0]?.name.includes('visit-note');
+
+  const isActiveWorkspace = workspaces?.[0]?.name?.match(/visit-note/i);
 
   const handleClick = useCallback(() => launchPatientWorkspace('visit-notes-form-workspace'), []);
 
