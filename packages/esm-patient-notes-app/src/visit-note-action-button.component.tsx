@@ -10,7 +10,7 @@ const VisitNoteActionButton: React.FC = () => {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const { workspaces } = useWorkspaces();
-  const isMostActive = workspaces?.[0]?.name.includes('visit-note');
+  const isActiveWorkspace = workspaces?.[0]?.name.includes('visit-note');
 
   const handleClick = useCallback(() => launchPatientWorkspace('visit-notes-form-workspace'), []);
 
@@ -18,7 +18,7 @@ const VisitNoteActionButton: React.FC = () => {
     return (
       <Button
         kind="ghost"
-        className={`${styles.container} ${isMostActive ? styles.active : ''}`}
+        className={`${styles.container} ${isActiveWorkspace ? styles.active : ''}`}
         role="button"
         tabIndex={0}
         onClick={handleClick}
@@ -29,7 +29,7 @@ const VisitNoteActionButton: React.FC = () => {
     );
   return (
     <Button
-      className={`${styles.container} ${isMostActive && styles.active}`}
+      className={`${styles.container} ${isActiveWorkspace && styles.active}`}
       onClick={handleClick}
       hasIconOnly
       kind="ghost"
