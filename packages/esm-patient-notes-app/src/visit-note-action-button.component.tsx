@@ -15,7 +15,7 @@ const VisitNoteActionButton: React.FC = () => {
 
   const handleClick = useCallback(() => launchPatientWorkspace('visit-notes-form-workspace'), []);
 
-  if (layout === 'tablet')
+  if (layout === 'tablet') {
     return (
       <Button
         kind="ghost"
@@ -24,10 +24,12 @@ const VisitNoteActionButton: React.FC = () => {
         tabIndex={0}
         onClick={handleClick}
       >
-        <Pen size={20} />
+        <Pen size={16} />
         <span>{t('visitNote', 'Visit note')}</span>
       </Button>
     );
+  }
+
   return (
     <Button
       className={`${styles.container} ${isActiveWorkspace && styles.active}`}
@@ -36,8 +38,9 @@ const VisitNoteActionButton: React.FC = () => {
       kind="ghost"
       renderIcon={(props) => <Pen size={20} {...props} />}
       iconDescription={t('note', 'Note')}
-      tooltipAlignment="end"
-      tooltipPosition="bottom"
+      enterDelayMs={1000}
+      tooltipAlignment="center"
+      tooltipPosition="left"
       size="sm"
     />
   );

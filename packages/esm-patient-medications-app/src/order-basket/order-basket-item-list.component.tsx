@@ -43,7 +43,7 @@ export default function OrderBasketItemList({
           {isTablet ? (
             <div className={styles.orderBasketHeader}>
               <h4 className={`${styles.productiveHeading03} ${styles.text02}`}>
-                {t('orderBasketWithCount', 'Order Basket ({count})', { count: newOrderBasketItems.length })}
+                {t('orderBasketWithCount', 'Order basket ({count})', { count: newOrderBasketItems.length })}
               </h4>
             </div>
           ) : (

@@ -21,7 +21,7 @@ const OrderBasketActionButton: React.FC = () => {
 
   const { launchOrderBasket } = useLaunchOrderBasket(patientUuid);
 
-  if (layout === 'tablet')
+  if (layout === 'tablet') {
     return (
       <Button
         kind="ghost"
@@ -31,12 +31,13 @@ const OrderBasketActionButton: React.FC = () => {
         onClick={launchOrderBasket}
       >
         <div className={styles.elementContainer}>
-          <ShoppingCart size={20} />{' '}
+          <ShoppingCart size={16} />{' '}
           {patientOrderItems?.length > 0 && <Tag className={styles.countTag}>{patientOrderItems?.length}</Tag>}
         </div>
-        <span>{t('orderBasket', 'Order Basket')}</span>
+        <span>{t('orderBasket', 'Order basket')}</span>
       </Button>
     );
+  }
 
   return (
     <Button
@@ -51,8 +52,9 @@ const OrderBasketActionButton: React.FC = () => {
       )}
       hasIconOnly
       iconDescription={t('medications', 'Medications')}
-      tooltipAlignment="end"
-      tooltipPosition="bottom"
+      enterDelayMs={1000}
+      tooltipAlignment="center"
+      tooltipPosition="left"
       onClick={launchOrderBasket}
     />
   );
