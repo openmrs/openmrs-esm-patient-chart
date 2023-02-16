@@ -9,13 +9,13 @@ import styles from './order-basket-action-button.scss';
 import { useLaunchOrderBasket } from '../utils/launchOrderBasket';
 
 const OrderBasketActionButton: React.FC = () => {
-  const { t } = useTranslation();
   const layout = useLayoutType();
+  const { t } = useTranslation();
   const { workspaces } = useWorkspaces();
   const { items } = useStore(orderBasketStore);
   const { patientUuid } = usePatient();
 
-  const isActive = workspaces.find(({ name }) => name.includes('order-basket'));
+  const isActiveWorkspace = workspaces?.[0]?.name?.match(/order-basket/i);
 
   const patientOrderItems = getOrderItems(items, patientUuid);
 
@@ -25,7 +25,7 @@ const OrderBasketActionButton: React.FC = () => {
     return (
       <Button
         kind="ghost"
-        className={`${styles.container} ${isActive ? styles.active : ''}`}
+        className={`${styles.container} ${isActiveWorkspace ? styles.active : ''}`}
         role="button"
         tabIndex={0}
         onClick={launchOrderBasket}
@@ -40,8 +40,9 @@ const OrderBasketActionButton: React.FC = () => {
 
   return (
     <Button
-      className={isActive && styles.active}
+      className={isActiveWorkspace && styles.active}
       kind="ghost"
+      size="sm"
       renderIcon={(props) => (
         <div className={styles.elementContainer}>
           <ShoppingCart size={20} {...props} />{' '}

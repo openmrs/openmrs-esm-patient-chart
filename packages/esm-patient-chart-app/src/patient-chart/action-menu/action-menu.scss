@@ -1,8 +1,8 @@
 @use '@carbon/styles/scss/spacing';
 @import '~@openmrs/esm-styleguide/src/vars';
 
-$icon-button-size: 48px;
-$actionPanelOffset: 48px;
+$icon-button-size: 2.5rem;
+$actionPanelOffset: 3rem;
 
 /* Desktop */
 :global(.omrs-breakpoint-gt-tablet) {
@@ -15,7 +15,7 @@ $actionPanelOffset: 48px;
     height: 100%;
     right: 0;
     z-index: 1000;
-    width: $icon-button-size;
+    width: $actionPanelOffset;
     align-items: center;
     border-left: 1px solid $text-03;
 
@@ -29,6 +29,14 @@ $actionPanelOffset: 48px;
         height: $icon-button-size;
         justify-content: center;
         margin-top: spacing.$spacing-02;
+        margin-bottom: spacing.$spacing-02;
+        border-radius: 50%;
+      }
+      & button:hover {
+        background-color: $color-gray-30;
+      }
+      & button:focus {
+        border-color: $interactive-01;
       }
     }
   }

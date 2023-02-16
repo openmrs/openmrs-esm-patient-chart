@@ -8,18 +8,18 @@ import useLaunchFormsWorkspace from './forms/use-launch-forms-workspace';
 import styles from './clinical-form-action-button.scss';
 
 const ClinicalFormActionButton: React.FC = () => {
-  const { t } = useTranslation();
   const layout = useLayoutType();
+  const { t } = useTranslation();
   const { workspaces } = useWorkspaces();
   const { launchFormsWorkspace } = useLaunchFormsWorkspace();
 
-  const isWorkspaceOpen = workspaces.find(({ name }) => name.includes('clinical-forms-workspace'));
+  const isActiveWorkspace = workspaces?.[0]?.name?.match(/clinical-forms-workspace/i);
 
   if (layout === 'tablet')
     return (
       <Button
         kind="ghost"
-        className={`${styles.container} ${isWorkspaceOpen ? styles.active : ''}`}
+        className={`${styles.container} ${isActiveWorkspace ? styles.active : ''}`}
         tabIndex={0}
         onClick={launchFormsWorkspace}
       >
@@ -30,7 +30,7 @@ const ClinicalFormActionButton: React.FC = () => {
 
   return (
     <Button
-      className={`${styles.container} ${isWorkspaceOpen ? styles.active : ''}`}
+      className={`${styles.container} ${isActiveWorkspace ? styles.active : ''}`}
       kind="ghost"
       renderIcon={(props) => <Document size={20} {...props} />}
       hasIconOnly
@@ -38,6 +38,7 @@ const ClinicalFormActionButton: React.FC = () => {
       onClick={launchFormsWorkspace}
       tooltipAlignment="end"
       tooltipPosition="bottom"
+      size="sm"
     />
   );
 };
