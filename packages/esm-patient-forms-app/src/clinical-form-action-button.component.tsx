@@ -15,7 +15,7 @@ const ClinicalFormActionButton: React.FC = () => {
 
   const isActiveWorkspace = workspaces?.[0]?.name?.match(/clinical-forms-workspace/i);
 
-  if (layout === 'tablet')
+  if (layout === 'tablet') {
     return (
       <Button
         kind="ghost"
@@ -23,10 +23,11 @@ const ClinicalFormActionButton: React.FC = () => {
         tabIndex={0}
         onClick={launchFormsWorkspace}
       >
-        <Document size={20} />
+        <Document size={16} />
         <span>{t('clinicalForm', 'Clinical form')}</span>
       </Button>
     );
+  }
 
   return (
     <Button
@@ -36,8 +37,9 @@ const ClinicalFormActionButton: React.FC = () => {
       hasIconOnly
       iconDescription={t('form', 'Form')}
       onClick={launchFormsWorkspace}
-      tooltipAlignment="end"
-      tooltipPosition="bottom"
+      enterDelayMs={1000}
+      tooltipAlignment="center"
+      tooltipPosition="left"
       size="sm"
     />
   );

@@ -4,6 +4,12 @@
 $icon-button-size: 2.5rem;
 $actionPanelOffset: 3rem;
 
+.container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
 /* Desktop */
 :global(.omrs-breakpoint-gt-tablet) {
   .sideRail {
@@ -31,12 +37,14 @@ $actionPanelOffset: 3rem;
         margin-top: spacing.$spacing-02;
         margin-bottom: spacing.$spacing-02;
         border-radius: 50%;
-      }
-      & button:hover {
-        background-color: $color-gray-30;
-      }
-      & button:focus {
-        border-color: $interactive-01;
+
+        &:hover {
+          background-color: $color-gray-30;
+        }
+  
+        &:focus {
+          border-color: $interactive-01;
+        }
       }
     }
   }
@@ -44,15 +52,35 @@ $actionPanelOffset: 3rem;
 
 /* Tablet */
 :global(.omrs-breakpoint-lt-desktop) {
-  .extensionStyles {
-    display: flex;
-    background-color: $ui-02;
-    width: 100%;
-    position: fixed !important;
+  .sideRail {
+    border-top: 1px solid $color-gray-30;
+    position: fixed;
+    background: #ededed;
+    left: 0;
     bottom: 0;
-    height: spacing.$spacing-10;
-    border-top: spacing.$spacing-01 solid $ui-03;
-    z-index: 9000;
+    z-index: 1000;
+    width: 100%;
+    display: flex;
+    justify-content: stretch;
+  }
+  
+  .chartExtensions {
+    background-color: $ui-02;
+    flex-basis: 0.75%;
+    flex-grow: 3;
+    display: flex;
+    width: 100%;
+
+    & > div {
+      flex: 1;
+      cursor: pointer;
+    }
+  }
+
+  .nonChartExtensions {
+    flex-basis: 0.25%;
+    flex-grow: 1;
+    display: flex;
 
     & > div {
       flex: 1 1 auto;
@@ -63,4 +91,11 @@ $actionPanelOffset: 3rem;
       cursor: pointer;
     }
   }
+}
+
+.divider {
+  background-color: $text-03;
+  margin: 1rem 0;
+  height: 1px;
+  width: 1.5rem;
 }
