@@ -4,6 +4,7 @@ import dayjs from 'dayjs';
 import { Button, DataTableSkeleton, ContentSwitcher, InlineLoading, Layer, Switch, Tile } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
 import { CardHeader, EmptyDataIllustration, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { useLayoutType } from '@openmrs/esm-framework';
 import { useAppointments } from './appointments.resource';
 import AppointmentsTable from './appointments-table.component';
 import styles from './appointments-base.scss';
@@ -21,10 +22,9 @@ enum AppointmentTypes {
 
 const AppointmentsBase: React.FC<AppointmentsBaseProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
   const headerTitle = t('appointments', 'Appointments');
-
   const [switchedView, setSwitchedView] = useState(false);
-
   const [contentSwitcherValue, setContentSwitcherValue] = useState(0);
   const startDate = dayjs(new Date().toISOString()).subtract(6, 'month').toISOString();
   const {
@@ -54,7 +54,7 @@ const AppointmentsBase: React.FC<AppointmentsBaseProps> = ({ patientUuid }) => {
           ) : null}
           <div className={styles.contentSwitcherWrapper}>
             <ContentSwitcher
-              size="md"
+              size={isTablet ? 'md' : 'sm'}
               onChange={({ index }) => {
                 setContentSwitcherValue(index);
                 setSwitchedView(true);

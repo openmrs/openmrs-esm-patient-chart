@@ -64,11 +64,7 @@ const ConfigurableForms: React.FC<ConfigurableFormsProps> = ({
           </span>
         ) : null}
         <div className={styles.contextSwitcherContainer}>
-          <ContentSwitcher
-            className={isTablet ? styles.tabletContentSwitcher : styles.desktopContentSwitcher}
-            onChange={({ name }) => setSelectedFormCategoryIndex(Number(name))}
-            selectedIndex={0}
-          >
+          <ContentSwitcher onChange={({ name }) => setSelectedFormCategoryIndex(Number(name))} selectedIndex={0}>
             {formCategories?.map((form, index) => (
               <Switch name={index} text={capitalize(form)} />
             ))}

@@ -14,6 +14,12 @@ import EmptyFormView from './empty-form.component';
 import FormView from './form-view.component';
 import styles from './forms.scss';
 
+enum FormCategories {
+  ALL = 0,
+  RECOMMENDED = 1,
+  COMPLETED = 2,
+}
+
 type FormsCategory = 'All' | 'Completed' | 'Recommended';
 
 interface FormsProps {
@@ -31,7 +37,9 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
   const { htmlFormEntryForms, showRecommendedFormsTab, showConfigurableForms } = useConfig() as ConfigObject;
   const headerTitle = t('forms', 'Forms');
   const isTablet = useLayoutType() === 'tablet';
-  const [formsCategory, setFormsCategory] = useState<FormsCategory>(showRecommendedFormsTab ? 'Recommended' : 'All');
+  const [contentSwitcherValue, setContentSwitcherValue] = useState(
+    showRecommendedFormsTab ? FormCategories.RECOMMENDED : FormCategories.ALL,
+  );
   const { isValidating, data, error } = useForms(patientUuid, undefined, undefined, isOffline);
   const session = useSession();
   let formsToDisplay = isOffline
@@ -100,32 +108,22 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
             <InlineLoading />
           </span>
         ) : null}
-        <div className={styles.contextSwitcherContainer}>
+        <div className={styles.contentSwitcherContainer}>
           <ContentSwitcher
-            className={isTablet ? styles.tabletContentSwitcher : styles.desktopContentSwitcher}
-            onChange={(event) => setFormsCategory(event.name as any)}
-            selectedIndex={formsCategory}
+            onChange={({ index }) => setContentSwitcherValue(index)}
+            selectedIndex={FormCategories.ALL}
+            size={isTablet ? 'md' : 'sm'}
           >
+            <Switch name={'All'} text={t('all', 'All')} />
             <Switch name={'Recommended'} text={t('recommended', 'Recommended')} />
             <Switch name={'Completed'} text={t('completed', 'Completed')} />
-            <Switch name={'All'} text={t('all', 'All')} />
           </ContentSwitcher>
         </div>
       </CardHeader>
       <div style={{ width: '100%' }}>
-        {formsCategory === 'Completed' && (
+        {contentSwitcherValue === FormCategories.ALL && (
           <FormView
-            category={'Completed'}
-            forms={completedForms}
-            patientUuid={patientUuid}
-            patient={patient}
-            pageSize={pageSize}
-            pageUrl={pageUrl}
-            urlLabel={urlLabel}
-          />
-        )}
-        {formsCategory === 'All' && (
-          <FormView
+            category={'All'}
             forms={formsToDisplay}
             patientUuid={patientUuid}
             patient={patient}
@@ -134,10 +132,21 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
             urlLabel={urlLabel}
           />
         )}
-        {formsCategory === 'Recommended' && (
+        {contentSwitcherValue === FormCategories.RECOMMENDED && (
           <FormView
             category={'Recommended'}
             forms={recommendedForms}
+            patientUuid={patientUuid}
+            patient={patient}
+            pageSize={pageSize}
+            pageUrl={pageUrl}
+            urlLabel={urlLabel}
+          />
+        )}
+        {contentSwitcherValue === FormCategories.COMPLETED && (
+          <FormView
+            category={'Completed'}
+            forms={completedForms}
             patientUuid={patientUuid}
             patient={patient}
             pageSize={pageSize}
