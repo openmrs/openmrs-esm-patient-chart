@@ -5,7 +5,7 @@ export const configSchema = {
     _type: Type.Array,
     _elements: {
       formUuid: {
-        _type: Type.UUID,
+        _type: Type.String,
         _description: 'The UUID of the form',
       },
       formName: {
