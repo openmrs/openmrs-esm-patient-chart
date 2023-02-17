@@ -120,10 +120,3 @@
   color: $color-gray-70;
   margin: 0.5rem 0;
 }
-
-.searchInput {
-  input:focus {
-    outline: none;
-    border: spacing.$spacing-01 solid var(--omrs-color-brand-orange);
-  }
-}
