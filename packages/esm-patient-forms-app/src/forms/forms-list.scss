@@ -34,10 +34,6 @@
     padding: 0 4rem !important;
   }
 
-  input:focus {
-    outline: 1px solid colors.$orange-40;
-  }
-
   :global(.cds--search-close:focus) {
     outline: none;
     outline-offset: 0;
