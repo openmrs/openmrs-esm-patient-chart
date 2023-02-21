@@ -274,11 +274,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                       ) : null}
                     </TableExpandRow>
                     {row.isExpanded ? (
-                      <TableExpandedRow
-                        className={styles.expandedRow}
-                        style={{ paddingLeft: desktopLayout ? '3rem' : '4rem' }}
-                        colSpan={headers.length + 2}
-                      >
+                      <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 2}>
                         <>
                           <EncounterObservations observations={visits[index].obs} />
                           <Button
