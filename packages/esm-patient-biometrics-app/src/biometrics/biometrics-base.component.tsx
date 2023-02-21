@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, DataTableSkeleton, InlineLoading } from '@carbon/react';
 import { Add, ChartLineSmooth, Table } from '@carbon/react/icons';
-import { formatDatetime, parseDate, useConfig } from '@openmrs/esm-framework';
+import { formatDatetime, parseDate, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import {
   CardHeader,
   EmptyState,
@@ -39,6 +39,7 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({
   const displayText = t('biometrics', 'biometrics');
   const headerTitle = t('biometrics', 'Biometrics');
   const [chartView, setChartView] = React.useState(false);
+  const isTablet = useLayoutType() === 'tablet';
 
   const config = useConfig() as ConfigObject;
   const { bmiUnit } = config.biometrics;
@@ -88,33 +89,35 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({
             <div className={styles.toggleButtons}>
               <Button
                 className={styles.tableViewToggle}
-                size="sm"
+                size={isTablet ? 'lg' : 'md'}
                 hasIconOnly
-                kind={chartView ? 'ghost' : 'tertiary'}
+                kind={chartView ? 'tertiary' : 'ghost'}
                 renderIcon={(props) => <Table size={16} {...props} />}
                 iconDescription={t('tableView', 'Table View')}
                 onClick={() => setChartView(false)}
               />
               <Button
                 className={styles.chartViewToggle}
-                size="sm"
-                kind={chartView ? 'tertiary' : 'ghost'}
+                size={isTablet ? 'lg' : 'md'}
+                kind={chartView ? 'ghost' : 'tertiary'}
                 hasIconOnly
                 renderIcon={(props) => <ChartLineSmooth size={16} {...props} />}
                 iconDescription={t('chartView', 'Chart View')}
                 onClick={() => setChartView(true)}
               />
             </div>
-            <span className={styles.divider}>|</span>
             {showAddBiometrics && (
-              <Button
-                kind="ghost"
-                renderIcon={(props) => <Add size={16} {...props} />}
-                iconDescription="Add biometrics"
-                onClick={launchBiometricsForm}
-              >
-                {t('add', 'Add')}
-              </Button>
+              <>
+                <span className={styles.divider}>|</span>
+                <Button
+                  kind="ghost"
+                  renderIcon={(props) => <Add size={16} {...props} />}
+                  iconDescription="Add biometrics"
+                  onClick={launchBiometricsForm}
+                >
+                  {t('add', 'Add')}
+                </Button>
+              </>
             )}
           </div>
         </CardHeader>

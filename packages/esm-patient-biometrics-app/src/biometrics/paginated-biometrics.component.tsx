@@ -10,9 +10,8 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { usePagination } from '@openmrs/esm-framework';
+import { useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
-import { PatientBiometrics } from './biometrics.resource';
 import styles from './biometrics-overview.scss';
 
 interface PaginatedBiometricsProps {
@@ -31,10 +30,17 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
   tableHeaders,
 }) => {
   const { results: paginatedBiometrics, goTo, currentPage } = usePagination(tableRows, pageSize);
+  const isTablet = useLayoutType() === 'tablet';
 
   return (
     <div>
-      <DataTable rows={paginatedBiometrics} headers={tableHeaders} isSortable size="sm" useZebraStyles>
+      <DataTable
+        rows={paginatedBiometrics}
+        headers={tableHeaders}
+        isSortable
+        size={isTablet ? 'lg' : 'sm'}
+        useZebraStyles
+      >
         {({ rows, headers, getHeaderProps, getTableProps }) => (
           <TableContainer>
             <Table {...getTableProps()}>
