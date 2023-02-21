@@ -16,7 +16,7 @@ import {
   Tile,
 } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { formatDate, parseDate } from '@openmrs/esm-framework';
+import { formatDate, parseDate, useLayoutType } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { Condition, useConditions } from './conditions.resource';
 import { ConditionsActionMenu } from './conditions-action-menu.component';
@@ -27,6 +27,9 @@ function ConditionsDetailedSummary({ patient }) {
   const displayText = t('conditions', 'Conditions');
   const headerTitle = t('conditions', 'Conditions');
   const [filter, setFilter] = useState<'All' | 'Active' | 'Inactive'>('Active');
+  const layout = useLayoutType();
+  const isTablet = layout === 'tablet';
+  const isDesktop = layout === 'small-desktop' || layout === 'large-desktop';
 
   const { conditions, isError, isLoading, isValidating } = useConditions(patient.id);
 
@@ -81,7 +84,7 @@ function ConditionsDetailedSummary({ patient }) {
 
   const handleConditionStatusChange = ({ selectedItem }) => setFilter(selectedItem);
 
-  if (isLoading) return <DataTableSkeleton role="progressbar" />;
+  if (isLoading) return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
   if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
   if (conditions?.length) {
     return (
@@ -98,7 +101,7 @@ function ConditionsDetailedSummary({ patient }) {
                 type="inline"
                 items={['All', 'Active', 'Inactive']}
                 onChange={handleConditionStatusChange}
-                size="sm"
+                size={isTablet ? 'lg' : 'sm'}
               />
             </div>
             <div className={styles.divider}></div>
@@ -112,7 +115,14 @@ function ConditionsDetailedSummary({ patient }) {
             </Button>
           </div>
         </CardHeader>
-        <DataTable rows={tableRows} headers={headers} isSortable size="sm" useZebraStyles>
+        <DataTable
+          rows={tableRows}
+          headers={headers}
+          isSortable
+          size={isTablet ? 'lg' : 'sm'}
+          useZebraStyles
+          overflowMenuOnHover={isDesktop}
+        >
           {({ rows, headers, getHeaderProps, getTableProps }) => (
             <>
               <TableContainer>
