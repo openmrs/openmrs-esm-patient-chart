@@ -24,8 +24,10 @@ import {
   Tile,
 } from '@carbon/react';
 import { Edit } from '@carbon/react/icons';
+import isEmpty from 'lodash-es/isEmpty';
 import {
   formatDatetime,
+  isDesktop,
   navigate,
   parseDate,
   useLayoutType,
@@ -40,12 +42,10 @@ import {
   launchStartVisitPrompt,
   PatientChartPagination,
 } from '@openmrs/esm-patient-common-lib';
+import type { HtmlFormEntryForm } from '@openmrs/esm-patient-forms-app/src/config-schema';
 import { MappedEncounter } from '../visit-summary.component';
 import EncounterObservations from '../../encounter-observations';
 import styles from './visits-table.scss';
-import type { HtmlFormEntryForm } from '@openmrs/esm-patient-forms-app/src/config-schema';
-import isEmpty from 'lodash-es/isEmpty';
-import { launchFormEntry } from '@openmrs/esm-patient-forms-app/src/form-entry-interop';
 
 interface VisitTableProps {
   visits: Array<MappedEncounter>;
@@ -64,7 +64,7 @@ type FilterProps = {
 const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, patientUuid }) => {
   const visitCount = 20;
   const { t } = useTranslation();
-  const isTablet = useLayoutType() === 'tablet';
+  const desktopLayout = isDesktop(useLayoutType());
 
   const [htmlFormEntryFormsConfig, setHtmlFormEntryFormsConfig] = useState<Array<HtmlFormEntryForm> | undefined>();
   useEffect(() => {
@@ -167,8 +167,8 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
       filterRows={handleFilter}
       headers={tableHeaders}
       rows={tableRows}
-      overflowMenuOnHover={isTablet ? false : true}
-      size={isTablet ? 'lg' : 'xs'}
+      overflowMenuOnHover={desktopLayout}
+      size={desktopLayout ? 'sm' : 'lg'}
       useZebraStyles={visits?.length > 1 ? true : false}
     >
       {({
@@ -194,7 +194,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                     type="inline"
                     items={['All', ...encounterTypes]}
                     onChange={handleEncounterTypeChange}
-                    size="sm"
+                    size={desktopLayout ? 'sm' : 'lg'}
                   />
                 </div>
                 <TableToolbarSearch
@@ -202,7 +202,6 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                   expanded
                   onChange={onInputChange}
                   placeholder={t('searchThisList', 'Search this list')}
-                  size={isTablet ? 'lg' : 'sm'}
                 />
               </TableToolbarContent>
             </TableToolbar>
@@ -228,11 +227,17 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                       {showAllEncounters ? (
                         <TableCell className="cds--table-column-menu">
                           <Layer className={styles.layer}>
-                            <OverflowMenu data-floating-menu-container ariaLabel="Encounter table actions menu" flipped>
+                            <OverflowMenu
+                              data-floating-menu-container
+                              ariaLabel="Encounter table actions menu"
+                              size={desktopLayout ? 'sm' : 'lg'}
+                              flipped
+                            >
                               <OverflowMenuItem
                                 className={styles.menuItem}
                                 id="#editEncounter"
                                 itemText={t('editThisEncounter', 'Edit this encounter')}
+                                size={desktopLayout ? 'sm' : 'lg'}
                                 onClick={() =>
                                   launchWorkspace(
                                     visits[index].form.uuid,
@@ -246,6 +251,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                                 {t('editThisEncounter', 'Edit this encounter')}
                               </OverflowMenuItem>
                               <OverflowMenuItem
+                                size={desktopLayout ? 'sm' : 'lg'}
                                 className={styles.menuItem}
                                 id="#goToEncounter"
                                 itemText={t('goToThisEncounter', 'Go to this encounter')}
@@ -253,6 +259,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                                 {t('editThisEncounter', 'Edit this encounter')}
                               </OverflowMenuItem>
                               <OverflowMenuItem
+                                size={desktopLayout ? 'sm' : 'lg'}
                                 className={styles.menuItem}
                                 id="#editEncounter"
                                 itemText={t('deleteThisEncounter', 'Delete this encounter')}
@@ -269,7 +276,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                     {row.isExpanded ? (
                       <TableExpandedRow
                         className={styles.expandedRow}
-                        style={{ paddingLeft: isTablet ? '4rem' : '3rem' }}
+                        style={{ paddingLeft: desktopLayout ? '3rem' : '4rem' }}
                         colSpan={headers.length + 2}
                       >
                         <>
