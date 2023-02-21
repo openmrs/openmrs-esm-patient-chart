@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import { Layer, OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { showModal } from '@openmrs/esm-framework';
+import { showModal, useLayoutType } from '@openmrs/esm-framework';
 import { Appointment } from '../types';
 import styles from './appointments-action-menu.scss';
 
@@ -14,6 +14,7 @@ interface appointmentsActionMenuProps {
 
 export const AppointmentsActionMenu = ({ appointment, patientUuid }: appointmentsActionMenuProps) => {
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
 
   const launchEditAppointmentForm = useCallback(
     () =>
@@ -35,7 +36,7 @@ export const AppointmentsActionMenu = ({ appointment, patientUuid }: appointment
 
   return (
     <Layer className={styles.layer}>
-      <OverflowMenu ariaLabel="Edit or delete appointment" size="sm" flipped>
+      <OverflowMenu ariaLabel="Edit or delete appointment" size={isTablet ? 'lg' : 'sm'} flipped>
         <OverflowMenuItem
           className={styles.menuItem}
           id="editAppointment"
