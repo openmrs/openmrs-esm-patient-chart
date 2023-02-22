@@ -208,7 +208,7 @@ const FormView: React.FC<FormViewProps> = ({ category, forms, patientUuid, patie
           </DataTable>
           <PatientChartPagination
             pageNumber={currentPage}
-            totalItems={forms?.length}
+            totalItems={filteredForms?.length}
             currentItems={results.length}
             pageSize={pageSize}
             onPageNumberChange={({ page }) => goTo(page)}
