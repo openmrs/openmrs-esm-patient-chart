@@ -21,7 +21,7 @@ import {
 } from '@carbon/react';
 import { Edit } from '@carbon/react/icons';
 import { EmptyDataIllustration, PatientChartPagination, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
-import { formatDatetime, useConfig, usePagination } from '@openmrs/esm-framework';
+import { formatDatetime, useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { ConfigObject } from '../config-schema';
 import { CompletedFormInfo } from '../types';
 import { launchFormEntryOrHtmlForms } from '../form-entry-interop';
@@ -50,6 +50,7 @@ interface FilterProps {
 const FormView: React.FC<FormViewProps> = ({ category, forms, patientUuid, patient, pageSize, pageUrl, urlLabel }) => {
   const { t } = useTranslation();
   const config = useConfig() as ConfigObject;
+  const isTablet = useLayoutType() === 'tablet';
   const htmlFormEntryForms = config.htmlFormEntryForms;
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const [searchTerm, setSearchTerm] = useState('');
@@ -73,11 +74,11 @@ const FormView: React.FC<FormViewProps> = ({ category, forms, patientUuid, patie
 
   const tableHeaders: Array<DataTableHeader> = useMemo(
     () => [
+      { key: 'formName', header: t('formName', 'Form name (A-Z)') },
       {
         key: 'lastCompleted',
         header: t('lastCompleted', 'Last completed'),
       },
-      { key: 'formName', header: t('formName', 'Form name (A-Z)') },
     ],
     [t],
   );
@@ -126,7 +127,8 @@ const FormView: React.FC<FormViewProps> = ({ category, forms, patientUuid, patie
                       expanded
                       light
                       onChange={(event) => handleSearch(event.target.value)}
-                      placeholder={t('searchThisList', 'Search this list')}
+                      placeholder={t('searchForAForm', 'Search for a form')}
+                      size={isTablet ? 'md' : 'sm'}
                     />
                   </TableToolbarContent>
                 </TableToolbar>
@@ -150,25 +152,27 @@ const FormView: React.FC<FormViewProps> = ({ category, forms, patientUuid, patie
                     {rows.map((row, index) => {
                       return (
                         <TableRow key={row.id}>
-                          <TableCell>{row.cells[0].value ?? t('never', 'Never')}</TableCell>
+                          <TableCell>
+                            <label
+                              onClick={() =>
+                                launchFormEntryOrHtmlForms(
+                                  currentVisit,
+                                  row.id,
+                                  patient,
+                                  htmlFormEntryForms,
+                                  '',
+                                  results[index].form.display ?? results[index].form.name,
+                                )
+                              }
+                              role="presentation"
+                              className={styles.formName}
+                            >
+                              {row.cells[0].value}
+                            </label>
+                          </TableCell>
                           <TableCell>
                             <div className={styles.tableCell}>
-                              <label
-                                onClick={() =>
-                                  launchFormEntryOrHtmlForms(
-                                    currentVisit,
-                                    row.id,
-                                    patient,
-                                    htmlFormEntryForms,
-                                    '',
-                                    results[index].form.display ?? results[index].form.name,
-                                  )
-                                }
-                                role="presentation"
-                                className={styles.formName}
-                              >
-                                {row.cells[1].value}
-                              </label>
+                              {row.cells[1].value ?? t('never', 'Never')}
                               {row.cells[0].value && (
                                 <Edit
                                   size={20}
