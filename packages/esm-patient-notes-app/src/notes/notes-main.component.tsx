@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, DataTableSkeleton, InlineLoading } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { useVisit } from '@openmrs/esm-framework';
+import { useLayoutType, useVisit } from '@openmrs/esm-framework';
 import {
   CardHeader,
   EmptyState,
@@ -28,6 +28,8 @@ const NotesMain: React.FC<NotesOverviewProps> = ({ patientUuid, showAddNote, pag
   const displayText = t('visitNotes', 'Visit notes');
   const headerTitle = t('visitNotes', 'Visit notes');
   const { visitNotes, isError, isLoading, isValidating } = useVisitNotes(patientUuid);
+  const layout = useLayoutType();
+  const isDesktop = layout === 'large-desktop' || layout === 'small-desktop';
 
   const launchVisitNoteForm = React.useCallback(() => {
     if (currentVisit) {
@@ -40,7 +42,7 @@ const NotesMain: React.FC<NotesOverviewProps> = ({ patientUuid, showAddNote, pag
   return (
     <>
       {(() => {
-        if (isLoading) return <DataTableSkeleton role="progressbar" />;
+        if (isLoading) return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
         if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
         if (visitNotes?.length)
           return (
