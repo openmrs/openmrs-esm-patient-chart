@@ -2,16 +2,12 @@
 @use '@carbon/styles/scss/type';
 @import '~@openmrs/esm-styleguide/src/vars';
 
+.productiveHeading02 {
+  @include type.type-style("heading-compact-02");
+}
+
 .productiveHeading03 {
   @include type.type-style("heading-03");
-}
-
-.productiveHeading02 {
-  @include type.type-style("productive-heading-02");
-}
-
-.productiveHeading03 {
-  @include type.type-style("productive-heading-03");
 }
 
 .bodyLong01 {
