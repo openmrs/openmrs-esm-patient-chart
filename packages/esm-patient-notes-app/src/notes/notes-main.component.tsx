@@ -39,33 +39,33 @@ const NotesMain: React.FC<NotesOverviewProps> = ({ patientUuid, showAddNote, pag
     }
   }, [currentVisit]);
 
+  if (isLoading) {
+    return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
+  }
+  if (isError) {
+    return <ErrorState error={isError} headerTitle={headerTitle} />;
+  }
+  if (!visitNotes?.length) {
+    return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchVisitNoteForm} />;
+  }
+
   return (
-    <>
-      {(() => {
-        if (isLoading) return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
-        if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
-        if (visitNotes?.length)
-          return (
-            <div className={styles.widgetCard}>
-              <CardHeader title={headerTitle}>
-                <span>{isValidating ? <InlineLoading /> : null}</span>
-                {showAddNote && (
-                  <Button
-                    kind="ghost"
-                    renderIcon={(props) => <Add size={16} {...props} />}
-                    iconDescription="Add visit note"
-                    onClick={launchVisitNoteForm}
-                  >
-                    {t('add', 'Add')}
-                  </Button>
-                )}
-              </CardHeader>
-              <PaginatedNotes notes={visitNotes} pageSize={pageSize} urlLabel={urlLabel} pageUrl={pageUrl} />
-            </div>
-          );
-        return <EmptyState displayText={displayText} headerTitle={headerTitle} launchForm={launchVisitNoteForm} />;
-      })()}
-    </>
+    <div className={styles.widgetCard}>
+      <CardHeader title={headerTitle}>
+        <span>{isValidating ? <InlineLoading /> : null}</span>
+        {showAddNote && (
+          <Button
+            kind="ghost"
+            renderIcon={(props) => <Add size={16} {...props} />}
+            iconDescription="Add visit note"
+            onClick={launchVisitNoteForm}
+          >
+            {t('add', 'Add')}
+          </Button>
+        )}
+      </CardHeader>
+      <PaginatedNotes notes={visitNotes} pageSize={pageSize} urlLabel={urlLabel} pageUrl={pageUrl} />
+    </div>
   );
 };
 
