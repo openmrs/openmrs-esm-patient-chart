@@ -1,5 +1,6 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import debounce from 'lodash-es/debounce';
 import first from 'lodash-es/first';
 import {
   DataTable,
@@ -51,9 +52,22 @@ const FormView: React.FC<FormViewProps> = ({ category, forms, patientUuid, patie
   const config = useConfig() as ConfigObject;
   const htmlFormEntryForms = config.htmlFormEntryForms;
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredForms = useMemo(() => {
+    if (!searchTerm) {
+      return forms;
+    }
+    return forms.filter((form) => {
+      const formName = form.form.display ?? form.form.name;
+      return formName.toLowerCase().includes(searchTerm.toLowerCase());
+    });
+  }, [forms, searchTerm]);
+
+  const handleSearch = React.useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), 300), []);
 
   const { results, goTo, currentPage } = usePagination(
-    forms?.sort((a, b) => (b.lastCompleted?.getTime() ?? 0) - (a.lastCompleted?.getTime() ?? 0)),
+    filteredForms?.sort((a, b) => (b.lastCompleted?.getTime() ?? 0) - (a.lastCompleted?.getTime() ?? 0)),
     pageSize,
   );
 
@@ -82,18 +96,6 @@ const FormView: React.FC<FormViewProps> = ({ category, forms, patientUuid, patie
     [results],
   );
 
-  const handleFilter = ({ rowIds, headers, cellsById, inputValue, getCellId }: FilterProps): Array<string> => {
-    return rowIds.filter((rowId) =>
-      headers.some(({ key }) => {
-        const cellId = getCellId(rowId, key);
-        const filterableValue = cellsById[cellId].value;
-        const filterTerm = inputValue.toLowerCase();
-
-        return ('' + filterableValue).toLowerCase().includes(filterTerm);
-      }),
-    );
-  };
-
   if (!forms?.length) {
     return (
       <Layer>
@@ -114,15 +116,8 @@ const FormView: React.FC<FormViewProps> = ({ category, forms, patientUuid, patie
     <div className={styles.formContainer}>
       {forms?.length > 0 && (
         <>
-          <DataTable
-            filterRows={handleFilter}
-            headers={tableHeaders}
-            rows={tableRows}
-            size="sm"
-            isSortable
-            useZebraStyles
-          >
-            {({ rows, headers, getHeaderProps, getTableProps, onInputChange }) => (
+          <DataTable headers={tableHeaders} rows={tableRows} size="sm" isSortable useZebraStyles>
+            {({ rows, headers, getHeaderProps, getTableProps }) => (
               <TableContainer className={styles.tableContainer}>
                 <TableToolbar className={styles.tableToolbar}>
                   <TableToolbarContent>
@@ -130,7 +125,7 @@ const FormView: React.FC<FormViewProps> = ({ category, forms, patientUuid, patie
                       className={styles.searchInput}
                       expanded
                       light
-                      onChange={onInputChange}
+                      onChange={(event) => handleSearch(event.target.value)}
                       placeholder={t('searchThisList', 'Search this list')}
                     />
                   </TableToolbarContent>
