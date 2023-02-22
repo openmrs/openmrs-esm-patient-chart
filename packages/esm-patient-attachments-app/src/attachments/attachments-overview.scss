@@ -10,7 +10,7 @@
   grid-template-columns: 2fr 1fr auto auto;
   grid-gap: spacing.$spacing-05;
   align-items: center;
-  padding: spacing.$spacing-04 0 spacing.$spacing-04 spacing.$spacing-05;
+  padding-left: spacing.$spacing-05;
   background-color: $ui-background;
 }
 
@@ -24,4 +24,10 @@
 
 .btnOverrides {
   bottom: 0.7rem;
+}
+
+:global(.omrs-breakpoint-lt-desktop) {
+  .attachmentsHeader {
+    padding: spacing.$spacing-04 0 spacing.$spacing-04 spacing.$spacing-05;
+  }
 }

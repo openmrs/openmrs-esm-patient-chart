@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ContentSwitcher, Loading, Switch } from '@carbon/react';
-import { showModal, showToast, UserHasAccess } from '@openmrs/esm-framework';
+import { showModal, showToast, useLayoutType, UserHasAccess } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { createAttachment, deleteAttachmentPermanently, useAttachments } from '../attachments.resource';
 import { createGalleryEntry } from '../utils';
@@ -19,6 +19,7 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
   const attachments = useMemo(() => data.map((item) => createGalleryEntry(item)), [data]);
   const [error, setError] = useState(false);
   const [view, setView] = useState('grid');
+  const isTablet = useLayoutType() === 'tablet';
 
   const closeImagePDFPreview = useCallback(() => setAttachmentToPreview(null), [setAttachmentToPreview]);
 
@@ -109,7 +110,7 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
           <div className={styles.attachmentsHeader}>
             <h4 className={styles.productiveheading02}>{t('attachments', 'Attachments')}</h4>
             <div>{isValidating && <Loading withOverlay={false} small />}</div>
-            <ContentSwitcher onChange={(evt) => setView(`${evt.name}`)}>
+            <ContentSwitcher onChange={(evt) => setView(`${evt.name}`)} size={isTablet ? 'md' : 'sm'}>
               <Switch name="grid">
                 <Thumbnail_2 size={16} />
               </Switch>
