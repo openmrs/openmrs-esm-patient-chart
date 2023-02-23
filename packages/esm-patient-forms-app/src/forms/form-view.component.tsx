@@ -1,5 +1,6 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import debounce from 'lodash-es/debounce';
 import first from 'lodash-es/first';
 import {
   DataTable,
@@ -20,7 +21,7 @@ import {
 } from '@carbon/react';
 import { Edit } from '@carbon/react/icons';
 import { EmptyDataIllustration, PatientChartPagination, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
-import { formatDatetime, useConfig, usePagination } from '@openmrs/esm-framework';
+import { formatDatetime, useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { ConfigObject } from '../config-schema';
 import { CompletedFormInfo } from '../types';
 import { launchFormEntryOrHtmlForms } from '../form-entry-interop';
@@ -49,21 +50,35 @@ interface FilterProps {
 const FormView: React.FC<FormViewProps> = ({ category, forms, patientUuid, patient, pageSize, pageUrl, urlLabel }) => {
   const { t } = useTranslation();
   const config = useConfig() as ConfigObject;
+  const isTablet = useLayoutType() === 'tablet';
   const htmlFormEntryForms = config.htmlFormEntryForms;
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredForms = useMemo(() => {
+    if (!searchTerm) {
+      return forms;
+    }
+    return forms.filter((form) => {
+      const formName = form.form.display ?? form.form.name;
+      return formName.toLowerCase().includes(searchTerm.toLowerCase());
+    });
+  }, [forms, searchTerm]);
+
+  const handleSearch = React.useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), 300), []);
 
   const { results, goTo, currentPage } = usePagination(
-    forms?.sort((a, b) => (b.lastCompleted?.getTime() ?? 0) - (a.lastCompleted?.getTime() ?? 0)),
+    filteredForms?.sort((a, b) => (b.lastCompleted?.getTime() ?? 0) - (a.lastCompleted?.getTime() ?? 0)),
     pageSize,
   );
 
   const tableHeaders: Array<DataTableHeader> = useMemo(
     () => [
+      { key: 'formName', header: t('formName', 'Form name (A-Z)') },
       {
         key: 'lastCompleted',
         header: t('lastCompleted', 'Last completed'),
       },
-      { key: 'formName', header: t('formName', 'Form name (A-Z)') },
     ],
     [t],
   );
@@ -81,18 +96,6 @@ const FormView: React.FC<FormViewProps> = ({ category, forms, patientUuid, patie
       }),
     [results],
   );
-
-  const handleFilter = ({ rowIds, headers, cellsById, inputValue, getCellId }: FilterProps): Array<string> => {
-    return rowIds.filter((rowId) =>
-      headers.some(({ key }) => {
-        const cellId = getCellId(rowId, key);
-        const filterableValue = cellsById[cellId].value;
-        const filterTerm = inputValue.toLowerCase();
-
-        return ('' + filterableValue).toLowerCase().includes(filterTerm);
-      }),
-    );
-  };
 
   if (!forms?.length) {
     return (
@@ -114,15 +117,8 @@ const FormView: React.FC<FormViewProps> = ({ category, forms, patientUuid, patie
     <div className={styles.formContainer}>
       {forms?.length > 0 && (
         <>
-          <DataTable
-            filterRows={handleFilter}
-            headers={tableHeaders}
-            rows={tableRows}
-            size="sm"
-            isSortable
-            useZebraStyles
-          >
-            {({ rows, headers, getHeaderProps, getTableProps, onInputChange }) => (
+          <DataTable headers={tableHeaders} rows={tableRows} size="sm" isSortable useZebraStyles>
+            {({ rows, headers, getHeaderProps, getTableProps }) => (
               <TableContainer className={styles.tableContainer}>
                 <TableToolbar className={styles.tableToolbar}>
                   <TableToolbarContent>
@@ -130,8 +126,9 @@ const FormView: React.FC<FormViewProps> = ({ category, forms, patientUuid, patie
                       className={styles.searchInput}
                       expanded
                       light
-                      onChange={onInputChange}
-                      placeholder={t('searchThisList', 'Search this list')}
+                      onChange={(event) => handleSearch(event.target.value)}
+                      placeholder={t('searchForAForm', 'Search for a form')}
+                      size={isTablet ? 'md' : 'sm'}
                     />
                   </TableToolbarContent>
                 </TableToolbar>
@@ -155,25 +152,27 @@ const FormView: React.FC<FormViewProps> = ({ category, forms, patientUuid, patie
                     {rows.map((row, index) => {
                       return (
                         <TableRow key={row.id}>
-                          <TableCell>{row.cells[0].value ?? t('never', 'Never')}</TableCell>
+                          <TableCell>
+                            <label
+                              onClick={() =>
+                                launchFormEntryOrHtmlForms(
+                                  currentVisit,
+                                  row.id,
+                                  patient,
+                                  htmlFormEntryForms,
+                                  '',
+                                  results[index].form.display ?? results[index].form.name,
+                                )
+                              }
+                              role="presentation"
+                              className={styles.formName}
+                            >
+                              {row.cells[0].value}
+                            </label>
+                          </TableCell>
                           <TableCell>
                             <div className={styles.tableCell}>
-                              <label
-                                onClick={() =>
-                                  launchFormEntryOrHtmlForms(
-                                    currentVisit,
-                                    row.id,
-                                    patient,
-                                    htmlFormEntryForms,
-                                    '',
-                                    results[index].form.display ?? results[index].form.name,
-                                  )
-                                }
-                                role="presentation"
-                                className={styles.formName}
-                              >
-                                {row.cells[1].value}
-                              </label>
+                              {row.cells[1].value ?? t('never', 'Never')}
                               {row.cells[0].value && (
                                 <Edit
                                   size={20}
@@ -213,7 +212,7 @@ const FormView: React.FC<FormViewProps> = ({ category, forms, patientUuid, patie
           </DataTable>
           <PatientChartPagination
             pageNumber={currentPage}
-            totalItems={forms?.length}
+            totalItems={filteredForms?.length}
             currentItems={results.length}
             pageSize={pageSize}
             onPageNumberChange={({ page }) => goTo(page)}
