@@ -30,7 +30,9 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
   const { t } = useTranslation();
   const { htmlFormEntryForms, showRecommendedFormsTab, showConfigurableForms } = useConfig() as ConfigObject;
   const headerTitle = t('forms', 'Forms');
-  const isTablet = useLayoutType() === 'tablet';
+  const layout = useLayoutType();
+  const isTablet = layout === 'tablet';
+  const isDesktop = layout === 'small-desktop' || layout === 'large-desktop';
   const [formsCategory, setFormsCategory] = useState<FormsCategory>(showRecommendedFormsTab ? 'Recommended' : 'All');
   const { isValidating, data, error } = useForms(patientUuid, undefined, undefined, isOffline);
   const session = useSession();
@@ -81,7 +83,7 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
   }
 
   if (!formsToDisplay && !error) {
-    return <DataTableSkeleton role="progressbar" rowCount={5} />;
+    return <DataTableSkeleton role="progressbar" rowCount={5} compact={isDesktop} zebra />;
   }
 
   if (error) {
@@ -102,9 +104,9 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
         ) : null}
         <div className={styles.contextSwitcherContainer}>
           <ContentSwitcher
-            className={isTablet ? styles.tabletContentSwitcher : styles.desktopContentSwitcher}
             onChange={(event) => setFormsCategory(event.name as any)}
             selectedIndex={formsCategory}
+            size={isTablet ? 'md' : 'sm'}
           >
             <Switch name={'All'} text={t('all', 'All')} />
             <Switch name={'Recommended'} text={t('recommended', 'Recommended')} />
