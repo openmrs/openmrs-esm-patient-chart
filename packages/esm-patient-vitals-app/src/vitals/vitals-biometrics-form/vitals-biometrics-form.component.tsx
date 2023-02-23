@@ -162,6 +162,8 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     name: t('temperature', 'Temperature'),
                     type: 'number',
                     value: patientVitalAndBiometrics?.temperature || '',
+                    min: 25,
+                    max: 43,
                   },
                 ]}
                 unitSymbol={conceptUnits.get(config.concepts.temperatureUuid) ?? ''}
@@ -192,11 +194,15 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     separator: '/',
                     type: 'number',
                     value: patientVitalAndBiometrics?.systolicBloodPressure || '',
+                    min: 1,
+                    max: 250,
                   },
                   {
                     name: t('diastolic', 'diastolic'),
                     type: 'number',
                     value: patientVitalAndBiometrics?.diastolicBloodPressure || '',
+                    min: 10,
+                    max: 150,
                   },
                 ]}
                 unitSymbol={conceptUnits.get(config.concepts.systolicBloodPressureUuid) ?? ''}
@@ -228,6 +234,8 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     name: t('pulse', 'Pulse'),
                     type: 'number',
                     value: patientVitalAndBiometrics?.pulse || '',
+                    min: 1,
+                    max: 230,
                   },
                 ]}
                 unitSymbol={conceptUnits.get(config.concepts.pulseUuid) ?? ''}
@@ -252,6 +260,8 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     name: t('oxygenSaturation', 'Oxygen Saturation'),
                     type: 'number',
                     value: patientVitalAndBiometrics?.oxygenSaturation || '',
+                    min: 1,
+                    max: 100,
                   },
                 ]}
                 unitSymbol={conceptUnits.get(config.concepts.oxygenSaturationUuid) ?? ''}
@@ -279,6 +289,8 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     name: t('respirationRate', 'Respiration Rate'),
                     type: 'number',
                     value: patientVitalAndBiometrics?.respiratoryRate || '',
+                    min: 1,
+                    max: 99,
                   },
                 ]}
                 unitSymbol={conceptUnits.get(config.concepts.respiratoryRateUuid) ?? ''}
@@ -334,6 +346,8 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     name: t('weight', 'Weight'),
                     type: 'number',
                     value: patientVitalAndBiometrics?.weight || '',
+                    min: 1,
+                    max: 250,
                   },
                 ]}
                 unitSymbol={conceptUnits.get(config.concepts.weightUuid) ?? ''}
@@ -358,6 +372,7 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     name: t('height', 'Height'),
                     type: 'number',
                     value: patientVitalAndBiometrics?.height || '',
+                    min: 1,
                   },
                 ]}
                 unitSymbol={conceptUnits.get(config.concepts.heightUuid) ?? ''}

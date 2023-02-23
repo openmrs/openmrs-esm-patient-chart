@@ -14,6 +14,8 @@ interface VitalsBiometricInputProps {
     value: number | string;
     className?: string;
     invalid?: boolean;
+    min?: number;
+    max?: number;
   }>;
   unitSymbol?: string;
   textFieldWidth?: string;
@@ -61,7 +63,8 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
                   id={val.name}
                   invalid={invalid}
                   type={val.type}
-                  min={0}
+                  min={val.min}
+                  max={val.max}
                   name={val.name}
                   onChange={(e) => check(e.target.value)}
                   onInput={onInputChange}
