@@ -5,6 +5,27 @@
   background-color: $ui-02;
 }
 
+.attachmentHeaderActionItems {
+  align-items: center;
+  display: flex;
+  justify-content: end;
+
+  & :global(.cds--content-switcher) {
+    max-width: max-content;
+
+    :global(.cds--content-switcher__label) {
+      height: spacing.$spacing-05;
+    }
+  }
+
+}
+
+.divider {
+  border-left: 1px solid $ui-03;
+  height: spacing.$spacing-05;
+  margin: 0 spacing.$spacing-03 0 spacing.$spacing-05;
+}
+
 .validatingDataIcon {
   align-items: center;
   display: flex;
@@ -12,13 +33,4 @@
   justify-content: center;
 }
 
-.attachmentHeaderActionItems {
-  align-items: center;
-  display: flex;
-  justify-content: end;
 
-  & :global(.cds--content-switcher) {
-    width: auto;
-    margin-right: spacing.$spacing-05;
-  }
-}

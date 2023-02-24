@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, DataTableSkeleton, InlineLoading } from '@carbon/react';
+import { Button, DataTableSkeleton, InlineLoading, ContentSwitcher, Switch } from '@carbon/react';
 import { Add, ChartLineSmooth, Table } from '@carbon/react/icons';
 import { formatDatetime, parseDate, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import {
@@ -8,12 +8,10 @@ import {
   EmptyState,
   ErrorState,
   useVitalsConceptMetadata,
-  launchPatientWorkspace,
   withUnit,
   useVisitOrOfflineVisit,
 } from '@openmrs/esm-patient-common-lib';
 import { ConfigObject } from '../config-schema';
-import { patientVitalsBiometricsFormWorkspace } from '../constants';
 import { useBiometrics } from './biometrics.resource';
 import BiometricsChart from './biometrics-chart.component';
 import PaginatedBiometrics from './paginated-biometrics.component';
@@ -86,26 +84,14 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({
             <span>{isValidating ? <InlineLoading /> : null}</span>
           </div>
           <div className={styles.biometricsHeaderActionItems}>
-            <div className={styles.toggleButtons}>
-              <Button
-                className={styles.tableViewToggle}
-                size={isTablet ? 'lg' : 'md'}
-                hasIconOnly
-                kind={chartView ? 'tertiary' : 'ghost'}
-                renderIcon={(props) => <Table size={16} {...props} />}
-                iconDescription={t('tableView', 'Table View')}
-                onClick={() => setChartView(false)}
-              />
-              <Button
-                className={styles.chartViewToggle}
-                size={isTablet ? 'lg' : 'md'}
-                kind={chartView ? 'ghost' : 'tertiary'}
-                hasIconOnly
-                renderIcon={(props) => <ChartLineSmooth size={16} {...props} />}
-                iconDescription={t('chartView', 'Chart View')}
-                onClick={() => setChartView(true)}
-              />
-            </div>
+            <ContentSwitcher onChange={(evt) => setChartView(evt.name === 'chartView')} size={isTablet ? 'md' : 'sm'}>
+              <Switch name="tableView">
+                <Table size={16} />
+              </Switch>
+              <Switch name="chartView">
+                <ChartLineSmooth size={16} />
+              </Switch>
+            </ContentSwitcher>
             {showAddBiometrics && (
               <>
                 <span className={styles.divider}>|</span>

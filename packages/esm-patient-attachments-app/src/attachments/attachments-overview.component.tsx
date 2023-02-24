@@ -118,6 +118,7 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
                   <List size={16} />
                 </Switch>
               </ContentSwitcher>
+              <div className={styles.divider} />
               <Button kind="ghost" renderIcon={Add} iconDescription="Add attachment" onClick={showCam}>
                 {t('add', 'Add')}
               </Button>
