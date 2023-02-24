@@ -95,7 +95,7 @@ const FormView: React.FC<FormViewProps> = ({ category, forms, patientUuid, patie
           encounterUuid: formInfo?.associatedEncounters[0]?.uuid,
         };
       }),
-    [results],
+    [results, t],
   );
 
   if (!forms?.length) {
