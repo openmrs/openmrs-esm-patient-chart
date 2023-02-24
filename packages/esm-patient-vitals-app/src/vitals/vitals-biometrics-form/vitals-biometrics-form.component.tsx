@@ -47,6 +47,30 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const encounterUuid = currentVisit?.encounters?.find((enc) => enc?.form?.uuid === config.vitals.formUuid)?.uuid;
 
+  const uuids = {
+    systolicBloodPressureUuid: config.concepts.systolicBloodPressureUuid,
+    diastolicBloodPressureUuid: config.concepts.diastolicBloodPressureUuid,
+    pulseUuid: config.concepts.pulseUuid,
+    oxygenSaturationUuid: config.concepts.oxygenSaturationUuid,
+    respiratoryRateUuid: config.concepts.respiratoryRateUuid,
+    weightUuid: config.concepts.weightUuid,
+    heightUuid: config.concepts.heightUuid,
+    temperatureUuid: config.concepts.temperatureUuid,
+    midUpperArmCircumferenceUuid: config.concepts.midUpperArmCircumferenceUuid,
+  };
+
+  const concepts = {
+    systolicBloodPressure: conceptMetadata.find((c) => c.uuid === uuids.systolicBloodPressureUuid),
+    diastolicBloodPressure: conceptMetadata.find((c) => c.uuid === uuids.diastolicBloodPressureUuid),
+    pulse: conceptMetadata.find((c) => c.uuid === uuids.pulseUuid),
+    oxygenSaturation: conceptMetadata.find((c) => c.uuid === uuids.oxygenSaturationUuid),
+    respiratoryRate: conceptMetadata.find((c) => c.uuid === uuids.respiratoryRateUuid),
+    weight: conceptMetadata.find((c) => c.uuid === uuids.weightUuid),
+    height: conceptMetadata.find((c) => c.uuid === uuids.heightUuid),
+    temperature: conceptMetadata.find((c) => c.uuid === uuids.temperatureUuid),
+    midUpperArmCircumference: conceptMetadata.find((c) => c.uuid === uuids.midUpperArmCircumferenceUuid),
+  };
+
   const isBMIInNormalRange = (value: number | undefined | string) => {
     if (value === undefined || value === '') return true;
     return value >= 18.5 && value <= 24.9;
@@ -162,8 +186,8 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     name: t('temperature', 'Temperature'),
                     type: 'number',
                     value: patientVitalAndBiometrics?.temperature || '',
-                    min: 25,
-                    max: 43,
+                    min: concepts.temperature.lowAbsolute,
+                    max: concepts.temperature.hiAbsolute,
                   },
                 ]}
                 unitSymbol={conceptUnits.get(config.concepts.temperatureUuid) ?? ''}
@@ -194,15 +218,15 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     separator: '/',
                     type: 'number',
                     value: patientVitalAndBiometrics?.systolicBloodPressure || '',
-                    min: 1,
-                    max: 250,
+                    min: concepts.systolicBloodPressure.lowAbsolute,
+                    max: concepts.systolicBloodPressure.hiAbsolute,
                   },
                   {
                     name: t('diastolic', 'diastolic'),
                     type: 'number',
                     value: patientVitalAndBiometrics?.diastolicBloodPressure || '',
-                    min: 10,
-                    max: 150,
+                    min: concepts.diastolicBloodPressure.lowAbsolute,
+                    max: concepts.diastolicBloodPressure.hiAbsolute,
                   },
                 ]}
                 unitSymbol={conceptUnits.get(config.concepts.systolicBloodPressureUuid) ?? ''}
@@ -234,8 +258,8 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     name: t('pulse', 'Pulse'),
                     type: 'number',
                     value: patientVitalAndBiometrics?.pulse || '',
-                    min: 1,
-                    max: 230,
+                    min: concepts.pulse.lowAbsolute,
+                    max: concepts.pulse.hiAbsolute,
                   },
                 ]}
                 unitSymbol={conceptUnits.get(config.concepts.pulseUuid) ?? ''}
@@ -260,8 +284,8 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     name: t('oxygenSaturation', 'Oxygen Saturation'),
                     type: 'number',
                     value: patientVitalAndBiometrics?.oxygenSaturation || '',
-                    min: 1,
-                    max: 100,
+                    min: concepts.oxygenSaturation.lowAbsolute,
+                    max: concepts.oxygenSaturation.hiAbsolute,
                   },
                 ]}
                 unitSymbol={conceptUnits.get(config.concepts.oxygenSaturationUuid) ?? ''}
@@ -289,8 +313,8 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     name: t('respirationRate', 'Respiration Rate'),
                     type: 'number',
                     value: patientVitalAndBiometrics?.respiratoryRate || '',
-                    min: 1,
-                    max: 99,
+                    min: concepts.respiratoryRate.lowAbsolute,
+                    max: concepts.respiratoryRate.hiAbsolute,
                   },
                 ]}
                 unitSymbol={conceptUnits.get(config.concepts.respiratoryRateUuid) ?? ''}
@@ -346,8 +370,8 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     name: t('weight', 'Weight'),
                     type: 'number',
                     value: patientVitalAndBiometrics?.weight || '',
-                    min: 1,
-                    max: 250,
+                    min: concepts.weight.lowAbsolute,
+                    max: concepts.weight.hiAbsolute,
                   },
                 ]}
                 unitSymbol={conceptUnits.get(config.concepts.weightUuid) ?? ''}
@@ -372,7 +396,8 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     name: t('height', 'Height'),
                     type: 'number',
                     value: patientVitalAndBiometrics?.height || '',
-                    min: 1,
+                    min: concepts.height.lowAbsolute,
+                    max: concepts.height.hiAbsolute,
                   },
                 ]}
                 unitSymbol={conceptUnits.get(config.concepts.heightUuid) ?? ''}
@@ -409,6 +434,8 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     name: t('muac', 'MUAC'),
                     type: 'number',
                     value: patientVitalAndBiometrics?.midUpperArmCircumference || '',
+                    min: concepts.midUpperArmCircumference.lowAbsolute,
+                    max: concepts.midUpperArmCircumference.hiAbsolute,
                   },
                 ]}
                 unitSymbol={conceptUnits.get(config.concepts.midUpperArmCircumferenceUuid) ?? ''}
