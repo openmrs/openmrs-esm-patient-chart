@@ -106,9 +106,9 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
             onChange={(event) => setFormsCategory(event.name as any)}
             selectedIndex={formsCategory}
           >
+            <Switch name={'All'} text={t('all', 'All')} />
             <Switch name={'Recommended'} text={t('recommended', 'Recommended')} />
             <Switch name={'Completed'} text={t('completed', 'Completed')} />
-            <Switch name={'All'} text={t('all', 'All')} />
           </ContentSwitcher>
         </div>
       </CardHeader>
@@ -124,9 +124,10 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
             urlLabel={urlLabel}
           />
         )}
-        {formsCategory === 'All' && (
+        {formsCategory === 'Recommended' && (
           <FormView
-            forms={formsToDisplay}
+            category={'Recommended'}
+            forms={recommendedForms}
             patientUuid={patientUuid}
             patient={patient}
             pageSize={pageSize}
@@ -134,10 +135,9 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
             urlLabel={urlLabel}
           />
         )}
-        {formsCategory === 'Recommended' && (
+        {formsCategory === 'All' && (
           <FormView
-            category={'Recommended'}
-            forms={recommendedForms}
+            forms={formsToDisplay}
             patientUuid={patientUuid}
             patient={patient}
             pageSize={pageSize}
