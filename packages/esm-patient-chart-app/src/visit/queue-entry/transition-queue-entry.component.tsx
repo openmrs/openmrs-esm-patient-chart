@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { showModal, useVisit } from '@openmrs/esm-framework';
 import styles from './transition-queue-entry.scss';
-import { useVisitQueueEntries } from './queue.resource';
+import { useVisitQueueEntry } from './queue.resource';
 import { Button } from '@carbon/react';
 
 interface TransitionQueueEntryProps {
@@ -12,7 +12,7 @@ interface TransitionQueueEntryProps {
 const TransitionQueueEntry: React.FC<TransitionQueueEntryProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const { currentVisit, isValidating } = useVisit(patientUuid);
-  const { queueEntry, isLoading } = useVisitQueueEntries(patientUuid, currentVisit?.uuid);
+  const { queueEntry, isLoading } = useVisitQueueEntry(patientUuid, currentVisit?.uuid);
 
   const launchEditPriorityModal = useCallback(() => {
     const dispose = showModal('edit-queue-entry-status-modal', {
