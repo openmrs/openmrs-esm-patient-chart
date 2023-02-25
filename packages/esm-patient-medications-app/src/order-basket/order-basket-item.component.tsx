@@ -57,6 +57,7 @@ export default function OrderBasketItemTile({ orderBasketItem, onItemClick, onRe
             {t('refills', 'Refills').toUpperCase()} {orderBasketItem.numRefills}{' '}
             {t('quantity', 'Quantity').toUpperCase()}{' '}
             {`${orderBasketItem.pillsDispensed} ${orderBasketItem.quantityUnits?.value.toLowerCase()}`}
+            {orderBasketItem.patientInstructions && <>&mdash; {orderBasketItem.patientInstructions}</>}
           </span>
         </span>
         <br />
