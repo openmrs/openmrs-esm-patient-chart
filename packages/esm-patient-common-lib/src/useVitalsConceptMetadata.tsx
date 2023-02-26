@@ -17,11 +17,22 @@ export function useVitalsConceptMetadata() {
   const conceptUnits = conceptMetadata?.length
     ? new Map<string, string>(conceptMetadata.map((concept) => [concept.uuid, concept.units]))
     : new Map<string, string>([]);
+
+  const conceptRanges = conceptMetadata?.length
+    ? new Map<string, { lowAbsolute: number | string | null; highAbsolute: number | string | null }>(
+        conceptMetadata.map((concept) => [
+          concept.uuid,
+          { lowAbsolute: concept.lowAbsolute, highAbsolute: concept.hiAbsolute },
+        ]),
+      )
+    : new Map<string, { lowAbsolute: number | string | null; highAbsolute: number | string | null }>([]);
+
   return {
     data: conceptUnits,
     isError: error,
     isLoading,
     conceptMetadata,
+    conceptRanges,
   };
 }
 

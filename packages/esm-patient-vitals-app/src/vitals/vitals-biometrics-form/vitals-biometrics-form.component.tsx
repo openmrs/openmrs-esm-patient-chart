@@ -40,7 +40,7 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
   const { currentVisit } = useVisit(patientUuid);
   const { mutate } = useVitals(patientUuid);
   const config = useConfig() as ConfigObject;
-  const { data: conceptUnits, conceptMetadata } = useVitalsConceptMetadata();
+  const { data: conceptUnits, conceptMetadata, conceptRanges } = useVitalsConceptMetadata();
   const biometricsUnitsSymbols = config.biometrics;
   const [patientVitalAndBiometrics, setPatientVitalAndBiometrics] = useState<PatientVitalsAndBiometrics>();
   const [patientBMI, setPatientBMI] = useState<number>();
@@ -50,6 +50,18 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
   const isBMIInNormalRange = (value: number | undefined | string) => {
     if (value === undefined || value === '') return true;
     return value >= 18.5 && value <= 24.9;
+  };
+
+  const concepts = {
+    systolicBloodPressureRange: conceptRanges.get(config.concepts.systolicBloodPressureUuid),
+    diastolicBloodPressureRange: conceptRanges.get(config.concepts.diastolicBloodPressureUuid),
+    pulseRange: conceptRanges.get(config.concepts.pulseUuid),
+    oxygenSaturationRange: conceptRanges.get(config.concepts.oxygenSaturationUuid),
+    respiratoryRateRange: conceptRanges.get(config.concepts.respiratoryRateUuid),
+    weightRange: conceptRanges.get(config.concepts.weightUuid),
+    heightRange: conceptRanges.get(config.concepts.heightUuid),
+    temperatureRange: conceptRanges.get(config.concepts.temperatureUuid),
+    midUpperArmCircumferenceRange: conceptRanges.get(config.concepts.midUpperArmCircumferenceUuid),
   };
 
   const savePatientVitalsAndBiometrics = (event: SyntheticEvent) => {
@@ -162,6 +174,8 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     name: t('temperature', 'Temperature'),
                     type: 'number',
                     value: patientVitalAndBiometrics?.temperature || '',
+                    min: concepts.temperatureRange.lowAbsolute,
+                    max: concepts.temperatureRange.highAbsolute,
                   },
                 ]}
                 unitSymbol={conceptUnits.get(config.concepts.temperatureUuid) ?? ''}
@@ -192,11 +206,15 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     separator: '/',
                     type: 'number',
                     value: patientVitalAndBiometrics?.systolicBloodPressure || '',
+                    min: concepts.systolicBloodPressureRange.lowAbsolute,
+                    max: concepts.systolicBloodPressureRange.highAbsolute,
                   },
                   {
                     name: t('diastolic', 'diastolic'),
                     type: 'number',
                     value: patientVitalAndBiometrics?.diastolicBloodPressure || '',
+                    min: concepts.diastolicBloodPressureRange.lowAbsolute,
+                    max: concepts.diastolicBloodPressureRange.highAbsolute,
                   },
                 ]}
                 unitSymbol={conceptUnits.get(config.concepts.systolicBloodPressureUuid) ?? ''}
@@ -228,6 +246,8 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     name: t('pulse', 'Pulse'),
                     type: 'number',
                     value: patientVitalAndBiometrics?.pulse || '',
+                    min: concepts.pulseRange.lowAbsolute,
+                    max: concepts.pulseRange.highAbsolute,
                   },
                 ]}
                 unitSymbol={conceptUnits.get(config.concepts.pulseUuid) ?? ''}
@@ -252,6 +272,8 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     name: t('oxygenSaturation', 'Oxygen Saturation'),
                     type: 'number',
                     value: patientVitalAndBiometrics?.oxygenSaturation || '',
+                    min: concepts.oxygenSaturationRange.lowAbsolute,
+                    max: concepts.oxygenSaturationRange.highAbsolute,
                   },
                 ]}
                 unitSymbol={conceptUnits.get(config.concepts.oxygenSaturationUuid) ?? ''}
@@ -279,6 +301,8 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     name: t('respirationRate', 'Respiration Rate'),
                     type: 'number',
                     value: patientVitalAndBiometrics?.respiratoryRate || '',
+                    min: concepts.respiratoryRateRange.lowAbsolute,
+                    max: concepts.respiratoryRateRange.highAbsolute,
                   },
                 ]}
                 unitSymbol={conceptUnits.get(config.concepts.respiratoryRateUuid) ?? ''}
@@ -334,6 +358,8 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     name: t('weight', 'Weight'),
                     type: 'number',
                     value: patientVitalAndBiometrics?.weight || '',
+                    min: concepts.weightRange.lowAbsolute,
+                    max: concepts.weightRange.highAbsolute,
                   },
                 ]}
                 unitSymbol={conceptUnits.get(config.concepts.weightUuid) ?? ''}
@@ -358,6 +384,8 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     name: t('height', 'Height'),
                     type: 'number',
                     value: patientVitalAndBiometrics?.height || '',
+                    min: concepts.heightRange.lowAbsolute,
+                    max: concepts.heightRange.highAbsolute,
                   },
                 ]}
                 unitSymbol={conceptUnits.get(config.concepts.heightUuid) ?? ''}
@@ -394,6 +422,8 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     name: t('muac', 'MUAC'),
                     type: 'number',
                     value: patientVitalAndBiometrics?.midUpperArmCircumference || '',
+                    min: concepts.midUpperArmCircumferenceRange.lowAbsolute,
+                    max: concepts.midUpperArmCircumferenceRange.highAbsolute,
                   },
                 ]}
                 unitSymbol={conceptUnits.get(config.concepts.midUpperArmCircumferenceUuid) ?? ''}

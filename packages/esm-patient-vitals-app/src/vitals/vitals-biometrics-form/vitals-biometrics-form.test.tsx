@@ -21,6 +21,13 @@ const mockConceptUnits = new Map<string, string>(
   mockVitalsSignsConcept.data.results[0].setMembers.map((concept) => [concept.uuid, concept.units]),
 );
 
+const mockConceptRanges = new Map<string, { lowAbsolute: number; highAbsolute: number }>(
+  mockVitalsSignsConcept.data.results[0].setMembers.map((concept) => [
+    concept.uuid,
+    { lowAbsolute: concept.lowAbsolute, highAbsolute: concept.hiAbsolute },
+  ]),
+);
+
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
 
@@ -38,6 +45,7 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
     useVitalsConceptMetadata: jest.fn().mockImplementation(() => ({
       data: mockConceptUnits,
       conceptMetadata: mockConceptMetadata,
+      conceptRanges: mockConceptRanges,
     })),
   };
 });
