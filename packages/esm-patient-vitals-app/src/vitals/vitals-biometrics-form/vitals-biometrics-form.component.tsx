@@ -53,15 +53,15 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
   };
 
   const concepts = {
-    systolicBloodPressureRange: conceptRanges.get(config.concepts.systolicBloodPressureUuid),
+    midUpperArmCircumferenceRange: conceptRanges.get(config.concepts.midUpperArmCircumferenceUuid),
     diastolicBloodPressureRange: conceptRanges.get(config.concepts.diastolicBloodPressureUuid),
-    pulseRange: conceptRanges.get(config.concepts.pulseUuid),
+    systolicBloodPressureRange: conceptRanges.get(config.concepts.systolicBloodPressureUuid),
     oxygenSaturationRange: conceptRanges.get(config.concepts.oxygenSaturationUuid),
     respiratoryRateRange: conceptRanges.get(config.concepts.respiratoryRateUuid),
+    temperatureRange: conceptRanges.get(config.concepts.temperatureUuid),
     weightRange: conceptRanges.get(config.concepts.weightUuid),
     heightRange: conceptRanges.get(config.concepts.heightUuid),
-    temperatureRange: conceptRanges.get(config.concepts.temperatureUuid),
-    midUpperArmCircumferenceRange: conceptRanges.get(config.concepts.midUpperArmCircumferenceUuid),
+    pulseRange: conceptRanges.get(config.concepts.pulseUuid),
   };
 
   const savePatientVitalsAndBiometrics = (event: SyntheticEvent) => {
