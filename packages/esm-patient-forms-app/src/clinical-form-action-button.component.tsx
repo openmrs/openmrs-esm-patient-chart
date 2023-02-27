@@ -13,7 +13,9 @@ const ClinicalFormActionButton: React.FC = () => {
   const { workspaces } = useWorkspaces();
   const { launchFormsWorkspace } = useLaunchFormsWorkspace();
 
-  const isActiveWorkspace = workspaces?.[0]?.name?.match(/clinical-forms-workspace/i);
+  const isActiveWorkspace =
+    workspaces?.[0]?.name?.match(/clinical-forms-workspace/i) ||
+    workspaces?.[0]?.name?.match(/patient-form-entry-workspace/i);
 
   if (layout === 'tablet') {
     return (
