@@ -61,7 +61,7 @@ export function DashboardView({ dashboard, patientUuid, patient }: DashboardView
         className={styles.dashboard}
         style={{ gridTemplateColumns }}
       >
-        <Extension state={state} wrap={wrapItem} />
+        <Extension state={state}>{wrapItem}</Extension>
       </ExtensionSlot>
     </>
   );
