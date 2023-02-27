@@ -24,15 +24,24 @@ import {
   Tile,
 } from '@carbon/react';
 import { Edit } from '@carbon/react/icons';
-import { formatDatetime, parseDate, useLayoutType, usePagination } from '@openmrs/esm-framework';
-import { formEntrySub, launchPatientWorkspace, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
+import {formatDatetime, navigate, parseDate, useLayoutType, usePagination, Visit, getConfig, useConfig} from '@openmrs/esm-framework';
+import {
+  formEntrySub,
+  launchPatientWorkspace,
+  launchStartVisitPrompt,
+  PatientChartPagination
+} from '@openmrs/esm-patient-common-lib';
 import { MappedEncounter } from '../visit-summary.component';
 import EncounterObservations from '../../encounter-observations';
 import styles from './visits-table.scss';
+import {HtmlFormEntryForm} from "@openmrs/esm-patient-forms-app/src/config-schema";
+import isEmpty from "lodash-es/isEmpty";
+import {launchFormEntry} from "@openmrs/esm-patient-forms-app/src/form-entry-interop";
 
 interface VisitTableProps {
   visits: Array<MappedEncounter>;
   showAllEncounters?: boolean;
+  patientUuid: string;
 }
 
 type FilterProps = {
@@ -43,10 +52,18 @@ type FilterProps = {
   getCellId: (row, key) => string;
 };
 
-const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits }) => {
+const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, patientUuid}) => {
   const visitCount = 20;
   const { t } = useTranslation();
+  const config = useConfig();
   const isTablet = useLayoutType() === 'tablet';
+
+  const [htmlFormEntryFormsConfig, setHtmlFormEntryFormsConfig] = React.useState<null | Array<HtmlFormEntryForm>>(null);
+  React.useEffect(() => {
+    getConfig('@openmrs/esm-patient-forms-app').then((config) => {
+      setHtmlFormEntryFormsConfig(config.htmlFormEntryForms as HtmlFormEntryForm[]);
+    });
+  }, [config]);
 
   const encounterTypes = [...new Set(visits.map((encounter) => encounter.encounterType))].sort();
 
@@ -101,8 +118,15 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits }) =>
     formName?: string,
     visitTypeUuid?: string,
   ) => {
-    formEntrySub.next({ formUuid, visitUuid, encounterUuid, visitTypeUuid });
-    launchPatientWorkspace('patient-form-entry-workspace', { workspaceTitle: formName });
+    const htmlForm = htmlFormEntryFormsConfig.find((form) => form.formUuid === formUuid);
+    if (isEmpty(htmlForm)) {
+      formEntrySub.next({ formUuid, visitUuid, encounterUuid, visitTypeUuid });
+      launchPatientWorkspace('patient-form-entry-workspace', { workspaceTitle: formName });
+    } else {
+      navigate({
+        to: `\${openmrsBase}/htmlformentryui/htmlform/${htmlForm.formUiPage}.page?patientId=${patientUuid}&visitId=${visitUuid}&encounterId=${encounterUuid}&returnUrl=${window.location.href}`,
+      });
+    }
   };
 
   const tableRows = useMemo(() => {
@@ -141,15 +165,15 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits }) =>
       useZebraStyles={visits?.length > 1 ? true : false}
     >
       {({
-        rows,
-        headers,
-        getHeaderProps,
-        getRowProps,
-        getExpandHeaderProps,
-        getTableProps,
-        getToolbarProps,
-        onInputChange,
-      }) => (
+          rows,
+          headers,
+          getHeaderProps,
+          getRowProps,
+          getExpandHeaderProps,
+          getTableProps,
+          getToolbarProps,
+          onInputChange,
+        }) => (
         <>
           <TableContainer className={styles.tableContainer}>
             <TableToolbar {...getToolbarProps()}>
