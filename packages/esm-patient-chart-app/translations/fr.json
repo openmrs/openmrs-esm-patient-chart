@@ -58,6 +58,7 @@
   "markAlive": "Marquer vivant",
   "markAsAlive": "Marquer comme vivant",
   "markAsDeceased": "Êtes-vous sûr de vouloir marquer le patient comme décédé?",
+  "markDeceased": "Marquer décédé",
   "markingPatientDeceasedInfoText": "Marquer le patient comme décédé mettra fin à toute visite active pour ce patient",
   "maximize": "Maximiser",
   "medications": "Médicaments",

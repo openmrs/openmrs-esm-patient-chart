@@ -83,20 +83,27 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
   const [priority, setPriority] = useState('');
   const { priorities } = usePriorities();
   const { statuses } = useStatuses();
-  const [selectedService, setSelectedService] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState(config.defaultStatusConceptUuid);
   const [errorFetchingResources, setErrorFetchingResources] = useState<{
     blockSavingForm: boolean;
   }>(null);
-  const [selectedQueueLocation, setSelectedQueueLocation] = useState('');
-  const { services } = useServices(selectedQueueLocation);
   const { queueLocations } = useQueueLocations();
+  const [selectedQueueLocation, setSelectedQueueLocation] = useState(queueLocations[0]?.id);
+  const { services, isLoadingServices } = useServices(selectedQueueLocation);
+  const [selectedService, setSelectedService] = useState('');
+
+  useEffect(() => {
+    if (!isLoading) {
+      setSelectedService(services.length > 0 ? services[0].uuid : '');
+    }
+  }, [isLoading, isLoadingServices, services]);
 
   useEffect(() => {
     if (locations && sessionUser?.sessionLocation?.uuid) {
       setSelectedLocation(sessionUser?.sessionLocation?.uuid);
+      setVisitType(allVisitTypes?.length === 1 ? allVisitTypes[0].uuid : null);
     }
-  }, [locations, sessionUser]);
+  }, [allVisitTypes, locations, sessionUser]);
 
   const handleSubmit = useCallback(
     (event) => {

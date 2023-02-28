@@ -64,7 +64,7 @@
   .patientInfo {
     color: $color-gray-30;
     @include type.type-style('body-compact-01');
-    margin-left: spacing.$spacing-03;
+    margin: 0 spacing.$spacing-03 0;
   }
 }
 

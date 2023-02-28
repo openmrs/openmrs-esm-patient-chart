@@ -83,6 +83,7 @@ const AppointmentsBase: React.FC<AppointmentsBaseProps> = ({ patientUuid }) => {
                   patientAppointments={appointmentsData?.upcomingAppointments}
                   switchedView={switchedView}
                   setSwitchedView={setSwitchedView}
+                  patientUuid={patientUuid}
                 />
               );
             }
@@ -104,6 +105,7 @@ const AppointmentsBase: React.FC<AppointmentsBaseProps> = ({ patientUuid }) => {
                   patientAppointments={appointmentsData?.todaysAppointments}
                   switchedView={switchedView}
                   setSwitchedView={setSwitchedView}
+                  patientUuid={patientUuid}
                 />
               );
             }
@@ -129,6 +131,7 @@ const AppointmentsBase: React.FC<AppointmentsBaseProps> = ({ patientUuid }) => {
                   patientAppointments={appointmentsData?.pastAppointments}
                   switchedView={switchedView}
                   setSwitchedView={setSwitchedView}
+                  patientUuid={patientUuid}
                 />
               );
             }

@@ -20,6 +20,7 @@ import {
   useVisit,
   navigate,
   useConfig,
+  showModal,
 } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { MappedQueuePriority, useVisitQueueEntries } from '../visit/queue-entry/queue.resource';
@@ -52,15 +53,10 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
   };
   const name = `${patient?.name?.[0].given?.join(' ')} ${patient?.name?.[0].family}`;
   const patientUuid = `${patient?.id}`;
+  const { currentVisit } = useVisit(patientUuid);
   const info = `${parseInt(age(patient?.birthDate))}, ${getGender(patient?.gender)}`;
   const truncate = !isTablet && name.trim().length > 25;
-  const { visitQueueEntries, isLoading } = useVisitQueueEntries();
-
-  const queueEntry =
-    visitQueueEntries?.find(
-      (visitQueueEntry) =>
-        visitQueueEntry?.patientUuid == patientUuid && currentVisit?.uuid === visitQueueEntry.visitUuid,
-    ) ?? null;
+  const { queueEntry, isLoading } = useVisitQueueEntries(patientUuid, currentVisit?.uuid);
 
   const visitType = queueEntry?.visitType ?? '';
   const priority = queueEntry?.priority ?? '';
@@ -79,8 +75,6 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
   };
 
   const currentService = queueEntry ? getServiceString() : null;
-
-  const { currentVisit } = useVisit(patientUuid);
 
   const getTagType = (priority: string) => {
     switch (priority as MappedQueuePriority) {
@@ -136,11 +130,11 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
 const VisitHeader: React.FC = () => {
   const { t } = useTranslation();
   const { patient } = usePatient();
-  const { startVisitLabel } = useConfig();
   const { currentVisit, isValidating } = useVisit(patient?.id);
   const [showVisitHeader, setShowVisitHeader] = useState<boolean>(true);
   const [isSideMenuExpanded, setIsSideMenuExpanded] = useState(false);
   const navMenuItems = useAssignedExtensions('patient-chart-dashboard-slot').map((extension) => extension.id);
+  const { startVisitLabel, endVisitLabel } = useConfig();
 
   const launchStartVisitForm = React.useCallback(() => launchPatientWorkspace('start-visit-workspace-form'), []);
   const showHamburger = useLayoutType() !== 'large-desktop' && navMenuItems.length > 0;
@@ -158,6 +152,13 @@ const VisitHeader: React.FC = () => {
     setShowVisitHeader((prevState) => !prevState);
     localStorage.removeItem('fromPage');
   }, [originPage]);
+
+  const openModal = useCallback((patientUuid) => {
+    const dispose = showModal('end-visit-dialog', {
+      closeModal: () => dispose(),
+      patientUuid,
+    });
+  }, []);
 
   const render = useCallback(() => {
     if (!showVisitHeader) {
@@ -196,6 +197,19 @@ const VisitHeader: React.FC = () => {
                 {startVisitLabel ? startVisitLabel : t('startVisit', 'Start a visit')}
               </Button>
             )}
+            {currentVisit !== null && endVisitLabel && (
+              <>
+                <HeaderGlobalAction
+                  className={styles.headerGlobalBarButton}
+                  aria-label={endVisitLabel ?? t('endVisit', 'End a visit')}
+                  onClick={() => openModal(patient?.id)}
+                >
+                  <Button as="div" className={styles.startVisitButton}>
+                    {endVisitLabel ? endVisitLabel : <>{t('endVisit', 'End a visit')}</>}
+                  </Button>
+                </HeaderGlobalAction>
+              </>
+            )}
             <HeaderGlobalAction
               className={styles.headerGlobalBarCloseButton}
               aria-label={t('close', 'Close')}
@@ -221,6 +235,9 @@ const VisitHeader: React.FC = () => {
     startVisitLabel,
     t,
     toggleSideMenu,
+    endVisitLabel,
+    openModal,
+    currentVisit,
   ]);
 
   return <HeaderContainer render={render} />;

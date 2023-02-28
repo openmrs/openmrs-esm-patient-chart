@@ -1,12 +1,13 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSWRConfig } from 'swr';
 import { connect } from 'unistore/react';
 import { Button, ButtonSet, DataTableSkeleton, InlineNotification, ActionableNotification } from '@carbon/react';
 import { showModal, showToast, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
 import { EmptyState, ErrorState, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import { orderDrugs } from './drug-ordering';
 import { ConfigObject } from '../config-schema';
-import { createEmptyEncounter, usePatientOrders } from '../api/api';
+import { createEmptyEncounter, useOrderEncounter, usePatientOrders } from '../api/api';
 import { OrderBasketItem } from '../types/order-basket-item';
 import {
   getOrderItems,
@@ -36,11 +37,15 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
   const headerTitle = t('activeMedicationsHeaderTitle', 'active medications');
   const isTablet = useLayoutType() === 'tablet';
   const config = useConfig() as ConfigObject;
-  const { currentVisit, mutate: mutateVisit } = useVisitOrOfflineVisit(patientUuid);
+  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const session = useSession();
-  const encounterUuid = currentVisit?.encounters?.find(
-    (enc) => enc.encounterType.uuid === config?.drugOrderEncounterType,
-  )?.uuid;
+  const {
+    activeVisitRequired,
+    isLoading: isLoadingEncounterUuid,
+    encounterUuid,
+    error: errorFetchingEncounterUuid,
+    mutate: mutateEncounterUuid,
+  } = useOrderEncounter(patientUuid);
   const [creatingEncounterError, setCreatingEncounterError] = useState(false);
   const [medicationOrderFormItem, setMedicationOrderFormItem] = useState<OrderBasketItem | null>(null);
   const [isMedicationOrderFormVisible, setIsMedicationOrderFormVisible] = useState(false);
@@ -53,6 +58,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
     isLoading: isLoadingOrders,
     isValidating,
   } = usePatientOrders(patientUuid, 'ACTIVE');
+  const noCurrentVisit = activeVisitRequired && !currentVisit;
 
   const openStartVisitDialog = useCallback(() => {
     const dispose = showModal('start-visit-dialog', {
@@ -95,12 +101,12 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
       orderEncounterUuid = await createEmptyEncounter(
         patientUuid,
         config?.drugOrderEncounterType,
-        currentVisit?.uuid,
+        activeVisitRequired ? currentVisit?.uuid : null,
         session?.sessionLocation?.uuid,
         abortController,
       )
         .then((uuid) => {
-          mutateVisit();
+          mutateEncounterUuid();
           return uuid;
         })
         .catch((e) => {
@@ -155,6 +161,12 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
     );
   };
 
+  useEffect(() => {
+    if (errorFetchingEncounterUuid || createEmptyEncounter) {
+      console.error(errorFetchingEncounterUuid ?? createEmptyEncounter);
+    }
+  }, [errorFetchingEncounterUuid, creatingEncounterError]);
+
   if (isMedicationOrderFormVisible) {
     return (
       <MedicationOrderForm
@@ -204,7 +216,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
         </div>
 
         <div>
-          {creatingEncounterError && (
+          {(creatingEncounterError || errorFetchingEncounterUuid) && (
             <InlineNotification
               kind="error"
               title={t('errorCreatingAnEncounter', 'Error when creating an encounter')}
@@ -214,7 +226,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
               inline
             />
           )}
-          {!currentVisit && (
+          {noCurrentVisit && (
             <ActionableNotification
               kind="error"
               actionButtonLabel={t('startVisit', 'Start visit')}
@@ -235,7 +247,7 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
               className={styles.button}
               kind="primary"
               onClick={handleSaveClicked}
-              disabled={!patientOrderItems?.length}
+              disabled={!patientOrderItems?.length || isLoadingEncounterUuid || noCurrentVisit}
             >
               {t('signAndClose', 'Sign and close')}
             </Button>

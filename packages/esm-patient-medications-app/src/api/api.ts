@@ -1,8 +1,10 @@
 import useSWR from 'swr';
+import useSWRImmutable from 'swr/immutable';
 import { FetchResponse, openmrsFetch, useConfig, OpenmrsResource } from '@openmrs/esm-framework';
 import { OrderPost, PatientMedicationFetchResponse } from '../types/order';
 import { ConfigObject } from '../config-schema';
 import { useMemo } from 'react';
+import { useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 
 /**
  * Fast, lighweight, reusable data fetcher with built-in cache invalidation that
@@ -93,4 +95,72 @@ export function postOrder(body: OrderPost, abortController?: AbortController) {
     headers: { 'Content-Type': 'application/json' },
     body,
   });
+}
+
+export function useSystemVisitSetting() {
+  const config = useConfig() as ConfigObject;
+  const { data, isLoading, error } = useSWRImmutable<FetchResponse<{ value: 'true' | 'false' }>, Error>(
+    config?.visitEnabledSystemSettingUUID
+      ? `/ws/rest/v1/systemsetting/${config?.visitEnabledSystemSettingUUID}?v=custom:(value)`
+      : null,
+    openmrsFetch,
+  );
+
+  const results = useMemo(
+    () => ({
+      systemVisitEnabled: data?.data?.value === 'true',
+      errorFetchingSystemVisitSetting: error,
+      isLoadingSystemVisitSetting: isLoading,
+    }),
+    [data, isLoading, error],
+  );
+
+  return results;
+}
+
+export function useOrderEncounter(patientUuid): {
+  activeVisitRequired: boolean;
+  isLoading: boolean;
+  error: Error;
+  encounterUuid: string;
+  mutate: Function;
+} {
+  const { systemVisitEnabled, isLoadingSystemVisitSetting, errorFetchingSystemVisitSetting } = useSystemVisitSetting();
+
+  const [nowDateString] = new Date().toISOString().split('T');
+  const todayEncounter = useSWR<FetchResponse<{ results: Array<OpenmrsResource> }>, Error>(
+    !isLoadingSystemVisitSetting && !systemVisitEnabled && patientUuid
+      ? `/ws/rest/v1/encounter?patient=${patientUuid}&fromdate=${nowDateString}&limit=1`
+      : null,
+    openmrsFetch,
+  );
+  const visit = useVisitOrOfflineVisit(patientUuid);
+
+  const results = useMemo(() => {
+    if (isLoadingSystemVisitSetting || errorFetchingSystemVisitSetting) {
+      return {
+        activeVisitRequired: false,
+        isLoading: isLoadingSystemVisitSetting,
+        error: errorFetchingSystemVisitSetting,
+        encounterUuid: null,
+        mutate: () => {},
+      };
+    }
+    return systemVisitEnabled
+      ? {
+          activeVisitRequired: true,
+          isLoading: visit?.isLoading,
+          encounterUuid: visit?.currentVisit?.encounters?.[0]?.uuid,
+          error: visit?.error,
+          mutate: visit?.mutate,
+        }
+      : {
+          activeVisitRequired: false,
+          isLoading: todayEncounter?.isLoading,
+          encounterUuid: todayEncounter?.data?.data?.results?.[0]?.uuid,
+          error: todayEncounter?.error,
+          mutate: todayEncounter?.mutate,
+        };
+  }, [isLoadingSystemVisitSetting, errorFetchingSystemVisitSetting, visit, todayEncounter, systemVisitEnabled]);
+  return results;
 }

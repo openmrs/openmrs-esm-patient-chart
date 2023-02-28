@@ -6,7 +6,7 @@
 .header {
   background-color: $ui-03;
   top: 3rem;
-  z-index: 1000;
+  z-index: 100;
 
   a {
     @include type.type-style('heading-compact-02');

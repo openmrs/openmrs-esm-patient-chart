@@ -35,7 +35,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 0.25rem 0.5rem;
+  flex-grow: 1;
 }
 
 .loading {
@@ -51,6 +51,11 @@
 
 .warning-border {
   border-bottom: 1px solid $color-yellow-50;
+}
+
+.container-row {
+  display: flex;
+  flex-wrap: wrap;
 }
 
 .warning-icon {
@@ -70,13 +75,16 @@
   align-items: center;
 }
 
-.collapse-button, .expand-button {
-  color: $color-blue-60-2;
+.arrow-up-button {
   display: flex;
   align-items: baseline;
   justify-content: center;
   cursor: pointer;
   margin-left: 0.5rem;
+}
+
+.arrow-up-icon:not([disabled]) svg {
+  fill: $color-blue-60-2;
 }
 
 .heading {
@@ -90,6 +98,13 @@
 }
 
 .body-text {
-  @include type.type-style('body-compact-01');
+  @include type.type-style('label-01');
   color: $text-02;
+}
+
+.link {
+  @extend .body-text;
+  margin-left: 0.5rem;
+  text-decoration-line: none;
+  color: $interactive-01;
 }

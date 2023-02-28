@@ -1,6 +1,6 @@
 import { Form } from '@openmrs/ngx-formentry';
 
-interface OpenMRSResource {
+interface OpenmrsResource {
   display: string;
   uuid: string;
   links?: Array<{ rel: string; uri: string }>;
@@ -130,23 +130,34 @@ export interface FormSchema {
   auditInfo: {
     dateCreated: string;
     dateChanged: string;
-    changedBy: OpenMRSResource;
-    creator: OpenMRSResource;
+    changedBy: OpenmrsResource;
+    creator: OpenmrsResource;
   };
   build: string;
   description: string;
   display: string;
-  encounterType: OpenMRSResource;
+  encounterType: OpenmrsResource;
   formField: Array<unknown>;
   name: string;
   pages: Array<{ label: string; sections: Array<Sections> }>;
   processor: string;
   published: boolean;
-  referencedForms: Form;
+  referencedForms: Array<unknown>;
   resourceVersion: string;
   retired: boolean;
+  translations?: Record<string, string>;
   uuid: string;
   version: string;
+}
+
+export interface FormMetadataObject {
+  display: string;
+  resources: Array<{ name: string; valueReference: string }>;
+}
+
+export interface FormSchemaAndTranslations {
+  schema: FormSchema;
+  translations?: Record<string, string>;
 }
 
 interface Sections {

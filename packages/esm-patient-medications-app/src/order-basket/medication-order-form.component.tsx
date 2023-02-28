@@ -353,7 +353,27 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                 </Column>
                 <Column lg={16} md={4} sm={4}>
                   <Grid className={styles.gridRow}>
-                    <Column lg={12} md={8} sm={4} className={styles.prnTextArea}>
+                    <Column lg={6} md={8} sm={4}>
+                      <InputWrapper>
+                        <FormGroup legendText={t('prn', 'P.R.N.')}>
+                          <Checkbox
+                            id="prn"
+                            labelText={t('takeAsNeeded', 'Take as needed')}
+                            size="lg"
+                            checked={orderBasketItem.asNeeded}
+                            onChange={(e) =>
+                              setOrderBasketItem({
+                                ...orderBasketItem,
+                                asNeeded: e.target.checked,
+                                asNeededCondition: e.target.checked ? orderBasketItem?.asNeededCondition : '',
+                              })
+                            }
+                          />
+                        </FormGroup>
+                      </InputWrapper>
+                    </Column>
+
+                    <Column lg={10} md={8} sm={4}>
                       <InputWrapper>
                         <TextArea
                           labelText={t('prnReason', 'P.R.N. reason')}
@@ -367,26 +387,8 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                               asNeededCondition: e.target.value,
                             })
                           }
+                          disabled={!orderBasketItem?.asNeeded}
                         />
-                      </InputWrapper>
-                    </Column>
-
-                    <Column lg={4} md={8} sm={4} className={styles.prnCheckbox}>
-                      <InputWrapper>
-                        <FormGroup legendText={t('prn', 'P.R.N.')}>
-                          <Checkbox
-                            id="prn"
-                            labelText={t('takeAsNeeded', 'Take as needed')}
-                            size="lg"
-                            checked={orderBasketItem.asNeeded}
-                            onChange={(e) =>
-                              setOrderBasketItem({
-                                ...orderBasketItem,
-                                asNeeded: e.target.checked,
-                              })
-                            }
-                          />
-                        </FormGroup>
                       </InputWrapper>
                     </Column>
                   </Grid>

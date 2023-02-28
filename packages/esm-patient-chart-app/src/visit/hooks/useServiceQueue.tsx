@@ -33,13 +33,14 @@ interface FHIRResponse {
 export function useServices(location: string) {
   const config = useConfig() as ChartConfig;
   const apiUrl = `/ws/rest/v1/queue?location=${location}`;
-  const { data } = useSWRImmutable<{ data: { results: Array<QueueServiceInfo> } }, Error>(
+  const { data, isLoading } = useSWRImmutable<{ data: { results: Array<QueueServiceInfo> } }, Error>(
     config.showServiceQueueFields && location ? apiUrl : null,
     openmrsFetch,
   );
 
   return {
     services: data ? data?.data.results : [],
+    isLoadingServices: isLoading,
   };
 }
 

@@ -10,6 +10,7 @@ import {
   useVitalsConceptMetadata,
   launchPatientWorkspace,
   withUnit,
+  useVisitOrOfflineVisit,
 } from '@openmrs/esm-patient-common-lib';
 import { ConfigObject } from '../config-schema';
 import { patientVitalsBiometricsFormWorkspace } from '../constants';
@@ -17,6 +18,7 @@ import { useBiometrics } from './biometrics.resource';
 import BiometricsChart from './biometrics-chart.component';
 import PaginatedBiometrics from './paginated-biometrics.component';
 import styles from './biometrics-overview.scss';
+import { launchVitalsAndBiometricsForm } from '../biometrics-utils';
 
 interface BiometricsBaseProps {
   patientUuid: string;
@@ -42,10 +44,11 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({
   const { bmiUnit } = config.biometrics;
   const { biometrics, isLoading, isError, isValidating } = useBiometrics(patientUuid, config.concepts);
   const { data: conceptUnits } = useVitalsConceptMetadata();
+  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
 
   const launchBiometricsForm = React.useCallback(
-    () => launchPatientWorkspace(patientVitalsBiometricsFormWorkspace),
-    [],
+    () => launchVitalsAndBiometricsForm(currentVisit, config),
+    [config, currentVisit],
   );
 
   const tableHeaders = [

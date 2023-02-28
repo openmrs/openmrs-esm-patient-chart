@@ -40,7 +40,7 @@ const ImmunizationsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, close
     formChanged: false,
   };
   const [formState, setFormState] = useState(initialState);
-  const updateSingle = <T extends keyof ImmunizationFormState>(name: T, value: typeof formState[T]) =>
+  const updateSingle = <T extends keyof ImmunizationFormState>(name: T, value: (typeof formState)[T]) =>
     setFormState((state) => ({ ...state, [name]: value }));
 
   const { t } = useTranslation();
