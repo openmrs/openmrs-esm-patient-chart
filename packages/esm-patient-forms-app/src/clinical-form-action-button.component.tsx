@@ -17,12 +17,15 @@ const ClinicalFormActionButton: React.FC = () => {
     workspaces?.[0]?.name?.match(/clinical-forms-workspace/i) ||
     workspaces?.[0]?.name?.match(/patient-form-entry-workspace/i);
 
+  const isFormOpen = workspaces.filter((w) => w.name === 'patient-form-entry-workspace')?.length >= 1;
+
   if (layout === 'tablet') {
     return (
       <Button
         kind="ghost"
         className={`${styles.container} ${isActiveWorkspace ? styles.active : ''}`}
         tabIndex={0}
+        disabled={isFormOpen}
         onClick={launchFormsWorkspace}
       >
         <Document size={16} />
@@ -42,6 +45,7 @@ const ClinicalFormActionButton: React.FC = () => {
       enterDelayMs={1000}
       tooltipAlignment="center"
       tooltipPosition="left"
+      disabled={isFormOpen}
       size="sm"
     />
   );
