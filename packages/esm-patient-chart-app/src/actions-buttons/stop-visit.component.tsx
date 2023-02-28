@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { showModal, useConfig, useVisit } from '@openmrs/esm-framework';
-import { ChartConfig } from '../config-schema';
 
 interface StopVisitOverflowMenuItemProps {
   patientUuid: string;

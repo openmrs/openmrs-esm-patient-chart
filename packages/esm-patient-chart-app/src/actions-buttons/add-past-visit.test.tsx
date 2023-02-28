@@ -17,7 +17,7 @@ describe('AddPastVisitOverflowMenuItem', () => {
 
     render(<AddPastVisitOverflowMenuItem />);
 
-    const addPastVisitButton = screen.getByRole('menuitem', { name: /Add Past Visit/ });
+    const addPastVisitButton = screen.getByRole('menuitem', { name: /Add past visit/ });
     expect(addPastVisitButton).toBeInTheDocument();
 
     // should launch the form
