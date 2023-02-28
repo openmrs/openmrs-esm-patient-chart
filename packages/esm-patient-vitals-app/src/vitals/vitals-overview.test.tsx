@@ -47,6 +47,8 @@ jest.mock('@openmrs/esm-framework', () => {
   return {
     ...originalModule,
     useConfig: jest.fn(() => mockVitalsConfig),
+    useVisitOrOfflineVisit: jest.fn(),
+    useConnectivity: jest.fn(),
     usePagination: jest.fn().mockImplementation(() => ({
       currentPage: 1,
       goTo: () => {},

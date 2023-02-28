@@ -64,7 +64,7 @@ function setupOpenMRS() {
       },
       {
         name: 'order-basket-action-menu',
-        slot: 'action-menu-items-slot',
+        slot: 'action-menu-chart-items-slot',
         load: getAsyncLifecycle(() => import('./medications-summary/order-basket-action-button.component'), options),
         order: 0,
       },

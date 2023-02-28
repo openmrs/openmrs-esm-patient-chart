@@ -14,6 +14,7 @@ import {
   Search,
   Stack,
   Tile,
+  FormLabel,
 } from '@carbon/react';
 import { createErrorHandler, showNotification, showToast, useLayoutType, useSession } from '@openmrs/esm-framework';
 import {
@@ -51,17 +52,17 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
   const isTablet = useLayoutType() === 'tablet';
 
   const onsetDateTime = data?.find((d) => d?.id === condition?.id)?.onsetDateTime;
+  const displayName = getFieldValue(condition?.cells, 'display');
+  const conditionStatus = getFieldValue(condition?.cells, 'clinicalStatus');
 
   const [clinicalStatus, setClinicalStatus] = useState(
-    context === 'editing' ? getFieldValue(condition?.cells, 'clinicalStatus').toLowerCase() : 'active',
+    context === 'editing' ? conditionStatus.toLowerCase() : 'active',
   );
   const [endDate, setEndDate] = useState(null);
   const [onsetDate, setOnsetDate] = useState(
     context !== 'editing' ? new Date() : context === 'editing' && onsetDateTime ? new Date(onsetDateTime) : null,
   );
-  const [conditionToLookup, setConditionToLookup] = useState<null | string>(
-    context === 'editing' ? getFieldValue(condition?.cells, 'display') : '',
-  );
+  const [conditionToLookup, setConditionToLookup] = useState<null | string>(context === 'editing' ? displayName : '');
 
   const { conditions, isSearchingConditions } = useConditionsSearch(conditionToLookup);
 
@@ -69,14 +70,14 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
 
   // Populate the selected condition when in edit mode
   useEffect(() => {
-    if (context === 'editing' && getFieldValue(condition?.cells, 'display')) {
-      setSelectedCondition(conditions?.find((c) => c.display === getFieldValue(condition?.cells, 'display')));
+    if (context === 'editing' && displayName) {
+      setSelectedCondition(conditions?.find((c) => c.display === displayName));
     }
-  }, [conditions, condition, context]);
+  }, [conditions, condition, context, displayName]);
 
   const dataHasChanged =
-    selectedCondition !== getFieldValue(condition?.cells, 'display') ||
-    clinicalStatus !== getFieldValue(condition?.cells, 'clinicalStatus') ||
+    selectedCondition !== displayName ||
+    clinicalStatus !== conditionStatus ||
     onsetDate !== new Date(getFieldValue(condition?.cells, 'onsetDateTime'));
 
   useEffect(() => {
@@ -222,59 +223,67 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     <div className={styles.formContainer}>
       <Stack gap={7}>
         <FormGroup legendText={t('condition', 'Condition')}>
-          <Search
-            size="md"
-            id="conditionsSearch"
-            labelText={t('enterCondition', 'Enter condition')}
-            light={isTablet}
-            placeholder={t('searchConditions', 'Search conditions')}
-            onChange={handleSearchTermChange}
-            onClear={() => setSelectedCondition(null)}
-            disabled={context === 'editing'}
-            value={(() => {
-              if (conditionToLookup) {
-                return conditionToLookup;
-              }
-              if (selectedCondition) {
-                return selectedCondition.display;
-              }
-              return '';
-            })()}
-          />
-          <div>
-            {(() => {
-              if (!conditionToLookup || selectedCondition) return null;
-              if (isSearchingConditions)
-                return <InlineLoading className={styles.loader} description={t('searching', 'Searching') + '...'} />;
-              if (conditions && conditions.length) {
-                return (
-                  <ul className={styles.conditionsList}>
-                    {conditions?.map((condition, index) => (
-                      <li
-                        role="menuitem"
-                        className={styles.condition}
-                        key={index}
-                        onClick={() => handleConditionChange(condition)}
-                      >
-                        {condition.display}
-                      </li>
-                    ))}
-                  </ul>
-                );
-              }
-              return (
-                <>
-                  <Layer>
-                    <Tile className={styles.emptyResults}>
-                      <span>
-                        {t('noResultsFor', 'No results for')} <strong>"{conditionToLookup}"</strong>
-                      </span>
-                    </Tile>
-                  </Layer>
-                </>
-              );
-            })()}
-          </div>
+          {context === 'editing' ? (
+            <FormLabel className={styles.conditionLabel}>{displayName}</FormLabel>
+          ) : (
+            <>
+              <Search
+                size="md"
+                id="conditionsSearch"
+                labelText={t('enterCondition', 'Enter condition')}
+                light={isTablet}
+                placeholder={t('searchConditions', 'Search conditions')}
+                onChange={handleSearchTermChange}
+                onClear={() => setSelectedCondition(null)}
+                disabled={context === 'editing'}
+                value={(() => {
+                  if (conditionToLookup) {
+                    return conditionToLookup;
+                  }
+                  if (selectedCondition) {
+                    return selectedCondition.display;
+                  }
+                  return '';
+                })()}
+              />
+              <div>
+                {(() => {
+                  if (!conditionToLookup || selectedCondition) return null;
+                  if (isSearchingConditions)
+                    return (
+                      <InlineLoading className={styles.loader} description={t('searching', 'Searching') + '...'} />
+                    );
+                  if (conditions && conditions.length) {
+                    return (
+                      <ul className={styles.conditionsList}>
+                        {conditions?.map((condition, index) => (
+                          <li
+                            role="menuitem"
+                            className={styles.condition}
+                            key={index}
+                            onClick={() => handleConditionChange(condition)}
+                          >
+                            {condition.display}
+                          </li>
+                        ))}
+                      </ul>
+                    );
+                  }
+                  return (
+                    <>
+                      <Layer>
+                        <Tile className={styles.emptyResults}>
+                          <span>
+                            {t('noResultsFor', 'No results for')} <strong>"{conditionToLookup}"</strong>
+                          </span>
+                        </Tile>
+                      </Layer>
+                    </>
+                  );
+                })()}
+              </div>
+            </>
+          )}
         </FormGroup>
         <FormGroup legendText="">
           <DatePicker

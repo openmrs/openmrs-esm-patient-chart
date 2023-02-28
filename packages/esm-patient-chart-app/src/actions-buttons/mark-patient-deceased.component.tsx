@@ -13,7 +13,7 @@ const MarkPatientDeceasedOverflowMenuItem = ({ patientUuid }) => {
     !isPatientLoading &&
     !isDead && (
       <OverflowMenuItem
-        itemText={t('markDeceased', 'Mark Deceased')}
+        itemText={t('markDeceased', 'Mark deceased')}
         onClick={handleClick}
         style={{
           maxWidth: '100vw',

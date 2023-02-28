@@ -9,9 +9,10 @@ import styles from './appointments-action-menu.scss';
 
 interface appointmentsActionMenuProps {
   appointment: Appointment;
+  patientUuid: string;
 }
 
-export const AppointmentsActionMenu = ({ appointment }: appointmentsActionMenuProps) => {
+export const AppointmentsActionMenu = ({ appointment, patientUuid }: appointmentsActionMenuProps) => {
   const { t } = useTranslation();
 
   const launchEditAppointmentForm = useCallback(
@@ -28,6 +29,7 @@ export const AppointmentsActionMenu = ({ appointment }: appointmentsActionMenuPr
     const dispose = showModal('appointment-cancel-confirmation-dialog', {
       closeCancelModal: () => dispose(),
       appointmentUuid: appointment.uuid,
+      patientUuid,
     });
   };
 

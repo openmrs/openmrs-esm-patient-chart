@@ -1,5 +1,5 @@
 import React from 'react';
-import { ExtensionSlot } from '@openmrs/esm-framework';
+import { ExtensionSlot, useLayoutType } from '@openmrs/esm-framework';
 import styles from './action-menu.scss';
 
 interface ActionMenuInterface {
@@ -7,9 +7,15 @@ interface ActionMenuInterface {
 }
 
 export const ActionMenu: React.FC<ActionMenuInterface> = ({ open }) => {
+  const layout = useLayoutType();
+
   return (
     <aside className={styles.sideRail}>
-      <ExtensionSlot className={styles.extensionStyles} extensionSlotName={'action-menu-items-slot'} />
+      <div className={styles.container}>
+        <ExtensionSlot className={styles.chartExtensions} extensionSlotName={'action-menu-chart-items-slot'} />
+        {layout === 'small-desktop' || layout === 'large-desktop' ? <div className={styles.divider}></div> : null}
+        <ExtensionSlot className={styles.nonChartExtensions} extensionSlotName={'action-menu-non-chart-items-slot'} />
+      </div>
     </aside>
   );
 };

@@ -110,7 +110,7 @@ function setupOpenMRS() {
       {
         name: 'mark-patient-deceased-button',
         slot: 'patient-actions-slot',
-        load: getAsyncLifecycle(() => import('./actions-buttons/mark-patient-deceased'), {
+        load: getAsyncLifecycle(() => import('./actions-buttons/mark-patient-deceased.component'), {
           featureName: 'patient-actions-slot-deceased-button',
           moduleName,
         }),
@@ -263,6 +263,14 @@ function setupOpenMRS() {
         slot: 'patient-banner-tags-slot',
         load: getAsyncLifecycle(() => import('./patient-banner-tags/visit-attribute-tags.component'), {
           featureName: 'visit-attribute-tags',
+          moduleName,
+        }),
+      },
+      {
+        id: 'transition-queue-entry',
+        slot: 'transition-queue-entry-slot',
+        load: getAsyncLifecycle(() => import('./visit/queue-entry/transition-queue-entry.component'), {
+          featureName: 'transition-queue-entry',
           moduleName,
         }),
       },

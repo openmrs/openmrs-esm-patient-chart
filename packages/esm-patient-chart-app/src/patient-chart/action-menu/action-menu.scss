@@ -1,8 +1,14 @@
 @use '@carbon/styles/scss/spacing';
 @import '~@openmrs/esm-styleguide/src/vars';
 
-$icon-button-size: 48px;
-$actionPanelOffset: 48px;
+$icon-button-size: 2.5rem;
+$actionPanelOffset: 3rem;
+
+.container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
 
 /* Desktop */
 :global(.omrs-breakpoint-gt-tablet) {
@@ -15,7 +21,7 @@ $actionPanelOffset: 48px;
     height: 100%;
     right: 0;
     z-index: 1000;
-    width: $icon-button-size;
+    width: $actionPanelOffset;
     align-items: center;
     border-left: 1px solid $text-03;
 
@@ -29,6 +35,16 @@ $actionPanelOffset: 48px;
         height: $icon-button-size;
         justify-content: center;
         margin-top: spacing.$spacing-02;
+        margin-bottom: spacing.$spacing-02;
+        border-radius: 50%;
+
+        &:hover {
+          background-color: $color-gray-30;
+        }
+  
+        &:focus {
+          border-color: $interactive-01;
+        }
       }
     }
   }
@@ -36,15 +52,36 @@ $actionPanelOffset: 48px;
 
 /* Tablet */
 :global(.omrs-breakpoint-lt-desktop) {
-  .extensionStyles {
-    display: flex;
-    background-color: $ui-02;
-    width: 100%;
-    position: fixed !important;
+  .sideRail {
+    border-top: 1px solid $color-gray-30;
+    position: fixed;
+    background: #ededed;
+    left: 0;
     bottom: 0;
-    height: spacing.$spacing-10;
-    border-top: spacing.$spacing-01 solid $ui-03;
-    z-index: 9000;
+    z-index: 1000;
+    width: 100%;
+    display: flex;
+    justify-content: stretch;
+  }
+  
+  .chartExtensions {
+    background-color: $ui-02;
+    flex-basis: 0.75%;
+    flex-grow: 3;
+    display: flex;
+    width: 100%;
+
+    & > div {
+      flex: 1;
+      cursor: pointer;
+    }
+  }
+
+  .nonChartExtensions {
+    background-color: $ui-02;
+    flex-basis: 0.25%;
+    flex-grow: 1;
+    display: flex;
 
     & > div {
       flex: 1 1 auto;
@@ -55,4 +92,11 @@ $actionPanelOffset: 48px;
       cursor: pointer;
     }
   }
+}
+
+.divider {
+  background-color: $text-03;
+  margin: 1rem 0;
+  height: 1px;
+  width: 1.5rem;
 }

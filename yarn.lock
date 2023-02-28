@@ -4903,6 +4903,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ngx-translate/core@npm:^13.0.0":
+  version: 13.0.0
+  resolution: "@ngx-translate/core@npm:13.0.0"
+  dependencies:
+    tslib: ^2.0.0
+  peerDependencies:
+    "@angular/core": ">=10.0.0"
+    rxjs: ">=6.5.3"
+  checksum: ef7df7870dddc53d483b5c70093174844a5bd231568e36a18271bcaf71209bbedb66c82005d76088392df2bde1d82136fb7f79afb44975e2f7426cc8824e0288
+  languageName: node
+  linkType: hard
+
 "@ngx-translate/core@npm:^14.0.0":
   version: 14.0.0
   resolution: "@ngx-translate/core@npm:14.0.0"
@@ -5373,6 +5385,7 @@ __metadata:
     "@angular/router": ~12.2.16
     "@carbon/styles": ~1.14.0
     "@ng-select/ng-select": ^6.1.0
+    "@ngx-translate/core": ^13.0.0
     "@openmrs/ngx-formentry": next
     "@types/jasmine": ~3.6.0
     "@types/jasminewd2": ~2.0.3
@@ -5394,6 +5407,7 @@ __metadata:
     openmrs: next
     protractor: ~7.0.0
     reflect-metadata: ^0.1.13
+    rxjs: 6
     single-spa-angular: ^5.0.2
     slick-carousel: ^1.6.0
     style-loader: 2.x
@@ -5888,8 +5902,8 @@ __metadata:
   linkType: hard
 
 "@openmrs/ngx-formentry@npm:next":
-  version: 3.0.1-pre.112
-  resolution: "@openmrs/ngx-formentry@npm:3.0.1-pre.112"
+  version: 3.0.1-pre.124
+  resolution: "@openmrs/ngx-formentry@npm:3.0.1-pre.124"
   dependencies:
     tslib: ^2.2.0
   peerDependencies:
@@ -5902,6 +5916,7 @@ __metadata:
     "@angular/forms": ">=11.2.14 <=12.0.4"
     "@carbon/styles": ^1.11.0
     "@ng-select/ng-select": ^6.1.0
+    "@ngx-translate/core": ^13.0.0
     hammerjs: ^2.0.8
     lodash: ^4.17.4
     moment: ^2.17.1
@@ -5911,7 +5926,7 @@ __metadata:
     shelljs: ^0.7.0
     slick-carousel: ^1.6.0
     tree-model: ^1.0.5
-  checksum: 44a7f1396f879a1d898e31238ae0f9e09bb9aca38dafc6f9d0531dec2fb2dbf14bd8912dda7cdaf0c5e92fb4d79b5ebd87f4742b6b94d5e922065d732ca17e2f
+  checksum: 4c382e40afa36c545f42e3ecad1f106f0072a90b9f3564484f355d8358d75fb959aac9e69ad926e1215ad7300cb020f1d0ec730a000a80ad868988f9773dabbd
   languageName: node
   linkType: hard
 
@@ -22072,7 +22087,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rxjs@npm:6.6.7, rxjs@npm:^6.5.3, rxjs@npm:^6.6.0, rxjs@npm:^6.6.3":
+"rxjs@npm:6, rxjs@npm:6.6.7, rxjs@npm:^6.5.3, rxjs@npm:^6.6.0, rxjs@npm:^6.6.3":
   version: 6.6.7
   resolution: "rxjs@npm:6.6.7"
   dependencies:
