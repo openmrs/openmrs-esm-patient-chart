@@ -13,7 +13,6 @@ import { useSystemVisitSetting } from '../api/api';
 
 const mockedUseLayoutType = useLayoutType as jest.Mock;
 const mockUsePatient = usePatient as jest.Mock;
-
 jest.mock('../api/api', () => {
   const originalModule = jest.requireActual('../api/api');
   return {
