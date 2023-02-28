@@ -132,7 +132,6 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits }) =>
 
   return (
     <DataTable
-      data-floating-menu-container
       filterRows={handleFilter}
       headers={tableHeaders}
       rows={tableRows}
@@ -188,7 +187,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits }) =>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {rows.map((row, i) => (
+                {rows.map((row, index) => (
                   <React.Fragment key={row.id}>
                     <TableExpandRow {...getRowProps({ row })}>
                       {row.cells.map((cell) => (
@@ -196,19 +195,24 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits }) =>
                       ))}
                       {showAllEncounters ? (
                         <TableCell className="cds--table-column-menu">
-                          <Layer>
-                            <OverflowMenu ariaLabel="Actions menu" size="sm" flipped>
+                          <Layer className={styles.layer}>
+                            <OverflowMenu
+                              data-floating-menu-container
+                              ariaLabel="Encounter table actions menu"
+                              size="sm"
+                              flipped
+                            >
                               <OverflowMenuItem
                                 className={styles.menuItem}
                                 id="#editEncounter"
                                 itemText={t('editThisEncounter', 'Edit this encounter')}
                                 onClick={() =>
                                   launchWorkspace(
-                                    visits[i].form.uuid,
-                                    visits[i].visitUuid,
-                                    visits[i].id,
-                                    visits[i].form.display,
-                                    visits[i].visitTypeUuid,
+                                    visits[index].form.uuid,
+                                    visits[index].visitUuid,
+                                    visits[index].id,
+                                    visits[index].form.display,
+                                    visits[index].visitTypeUuid,
                                   )
                                 }
                               >
@@ -242,16 +246,16 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits }) =>
                         colSpan={headers.length + 2}
                       >
                         <>
-                          <EncounterObservations observations={visits[i].obs} />
+                          <EncounterObservations observations={visits[index].obs} />
                           <Button
                             kind="ghost"
                             onClick={() =>
                               launchWorkspace(
-                                visits[i].form.uuid,
-                                visits[i].visitUuid,
-                                visits[i].id,
-                                visits[i].form.display,
-                                visits[i].visitTypeUuid,
+                                visits[index].form.uuid,
+                                visits[index].visitUuid,
+                                visits[index].id,
+                                visits[index].form.display,
+                                visits[index].visitTypeUuid,
                               )
                             }
                             renderIcon={(props) => <Edit size={16} {...props} />}
