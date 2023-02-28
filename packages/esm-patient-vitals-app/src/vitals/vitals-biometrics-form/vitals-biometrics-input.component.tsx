@@ -14,8 +14,8 @@ interface VitalsBiometricInputProps {
     value: number | string;
     className?: string;
     invalid?: boolean;
-    min?: string | number;
-    max?: string | number;
+    min?: number | null;
+    max?: number | null;
   }>;
   unitSymbol?: string;
   textFieldWidth?: string;
