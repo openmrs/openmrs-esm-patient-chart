@@ -196,12 +196,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits }) =>
                       {showAllEncounters ? (
                         <TableCell className="cds--table-column-menu">
                           <Layer className={styles.layer}>
-                            <OverflowMenu
-                              data-floating-menu-container
-                              ariaLabel="Encounter table actions menu"
-                              size="sm"
-                              flipped
-                            >
+                            <OverflowMenu data-floating-menu-container ariaLabel="Encounter table actions menu" flipped>
                               <OverflowMenuItem
                                 className={styles.menuItem}
                                 id="#editEncounter"
