@@ -119,4 +119,8 @@
 
 .layer {
   height: 100%;
+
+  :global(.cds--btn--primary) {
+    background-color: unset;
+  }
 }
