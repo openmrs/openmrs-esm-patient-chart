@@ -63,18 +63,17 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
   const isTablet = useLayoutType() === 'tablet';
   const locations = useLocations();
   const sessionUser = useSession();
+  const sessionLocation = sessionUser?.sessionLocation?.uuid;
   const config = useConfig() as ChartConfig;
   const [contentSwitcherIndex, setContentSwitcherIndex] = useState(config.showRecommendedVisitTypeTab ? 0 : 1);
   const [isMissingVisitType, setIsMissingVisitType] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedLocation, setSelectedLocation] = useState('');
   const [timeFormat, setTimeFormat] = useState<amPm>(new Date().getHours() >= 12 ? 'PM' : 'AM');
   const [visitDate, setVisitDate] = useState(new Date());
   const [visitTime, setVisitTime] = useState(dayjs(new Date()).format('hh:mm'));
-  const [visitType, setVisitType] = useState<string | null>(null);
   const state = useMemo(() => ({ patientUuid }), [patientUuid]);
-  const allVisitTypes = useVisitTypes();
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
+  const allVisitTypes = useVisitTypes();
   const [enrollment, setEnrollment] = useState<PatientProgram>(activePatientEnrollment[0]);
   const { mutate } = useVisit(patientUuid);
   const [ignoreChanges, setIgnoreChanges] = useState(true);
@@ -90,20 +89,15 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
   const { queueLocations } = useQueueLocations();
   const [selectedQueueLocation, setSelectedQueueLocation] = useState(queueLocations[0]?.id);
   const { services, isLoadingServices } = useServices(selectedQueueLocation);
-  const [selectedService, setSelectedService] = useState('');
-
-  useEffect(() => {
-    if (!isLoading) {
-      setSelectedService(services.length > 0 ? services[0].uuid : '');
+  const [selectedService, setSelectedService] = useState(() => (services?.length > 0 ? services[0].uuid : ''));
+  const [selectedLocation, setSelectedLocation] = useState(() => (sessionLocation ? sessionLocation : ''));
+  const [visitType, setVisitType] = useState<string | null>(() => {
+    if (locations?.length && sessionUser?.sessionLocation?.uuid) {
+      return allVisitTypes?.length === 1 ? allVisitTypes[0].uuid : null;
     }
-  }, [isLoading, isLoadingServices, services]);
 
-  useEffect(() => {
-    if (locations && sessionUser?.sessionLocation?.uuid) {
-      setSelectedLocation(sessionUser?.sessionLocation?.uuid);
-      setVisitType(allVisitTypes?.length === 1 ? allVisitTypes[0].uuid : null);
-    }
-  }, [allVisitTypes, locations, sessionUser]);
+    return null;
+  });
 
   const handleSubmit = useCallback(
     (event) => {
@@ -249,63 +243,6 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
     promptBeforeClosing(() => true);
   };
 
-  const locationSelect = (
-    <Select
-      labelText={t('selectLocation', 'Select a location')}
-      id="location"
-      invalidText="Required"
-      value={selectedLocation}
-      onChange={(event) => setSelectedLocation(event.target.value)}
-    >
-      {locations?.length > 0 &&
-        locations.map((location) => (
-          <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
-            {location.display}
-          </SelectItem>
-        ))}
-    </Select>
-  );
-
-  const datePicker = (
-    <DatePicker
-      dateFormat="d/m/Y"
-      datePickerType="single"
-      id="visitDate"
-      style={{ paddingBottom: '1rem' }}
-      maxDate={new Date().toISOString()}
-      onChange={([date]) => setVisitDate(date)}
-      value={visitDate}
-    >
-      <DatePickerInput
-        id="visitStartDateInput"
-        labelText={t('date', 'Date')}
-        placeholder="dd/mm/yyyy"
-        style={{ width: '100%' }}
-      />
-    </DatePicker>
-  );
-
-  const timePicker = (
-    <TimePicker
-      id="visitStartTime"
-      labelText={t('time', 'Time')}
-      onChange={(event) => setVisitTime(event.target.value as amPm)}
-      pattern="^(1[0-2]|0?[1-9]):([0-5]?[0-9])$"
-      style={{ marginLeft: '0.125rem', flex: 'none' }}
-      value={visitTime}
-    >
-      <TimePickerSelect
-        id="visitStartTimeSelect"
-        onChange={(event) => setTimeFormat(event.target.value as amPm)}
-        value={timeFormat}
-        aria-label={t('time', 'Time')}
-      >
-        <SelectItem value="AM" text="AM" />
-        <SelectItem value="PM" text="PM" />
-      </TimePickerSelect>
-    </TimePicker>
-  );
-
   return (
     <Form className={styles.form} onChange={handleOnChange}>
       {errorFetchingResources && (
@@ -324,30 +261,86 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
           </Row>
         )}
         <Stack gap={1} className={styles.container}>
+          {/* Date and time of visit. Defaults to the current date and time. */}
           <section className={styles.section}>
             <div className={styles.sectionTitle}>{t('dateAndTimeOfVisit', 'Date and time of visit')}</div>
             <div className={styles.dateTimeSection}>
-              {isTablet ? <Layer>{datePicker}</Layer> : datePicker}
-              {isTablet ? <Layer>{timePicker}</Layer> : timePicker}
+              <DatePicker
+                dateFormat="d/m/Y"
+                datePickerType="single"
+                id="visitDate"
+                light={isTablet}
+                style={{ paddingBottom: '1rem' }}
+                maxDate={new Date().toISOString()}
+                onChange={([date]) => setVisitDate(date)}
+                value={visitDate}
+              >
+                <DatePickerInput
+                  id="visitStartDateInput"
+                  labelText={t('date', 'Date')}
+                  placeholder="dd/mm/yyyy"
+                  style={{ width: '100%' }}
+                />
+              </DatePicker>
+              <ResponsiveWrapper isTablet={isTablet}>
+                <TimePicker
+                  id="visitStartTime"
+                  labelText={t('time', 'Time')}
+                  onChange={(event) => setVisitTime(event.target.value as amPm)}
+                  pattern="^(1[0-2]|0?[1-9]):([0-5]?[0-9])$"
+                  style={{ marginLeft: '0.125rem', flex: 'none' }}
+                  value={visitTime}
+                >
+                  <TimePickerSelect
+                    id="visitStartTimeSelect"
+                    onChange={(event) => setTimeFormat(event.target.value as amPm)}
+                    value={timeFormat}
+                    aria-label={t('time', 'Time')}
+                  >
+                    <SelectItem value="AM" text="AM" />
+                    <SelectItem value="PM" text="PM" />
+                  </TimePickerSelect>
+                </TimePicker>
+              </ResponsiveWrapper>
             </div>
           </section>
 
+          {/* This field lets the user select a location for the visit. The location is required for the visit to be saved. Defaults to the active session location */}
           <section>
             <div className={styles.sectionTitle}>{t('visitLocation', 'Visit Location')}</div>
-            <div className={styles.selectContainer}>{isTablet ? <Layer>{locationSelect}</Layer> : locationSelect}</div>
+            <div className={styles.selectContainer}>
+              <Select
+                labelText={t('selectLocation', 'Select a location')}
+                light={isTablet}
+                id="location"
+                invalidText="Required"
+                value={selectedLocation}
+                onChange={(event) => setSelectedLocation(event.target.value)}
+              >
+                {!selectedLocation ? <SelectItem text={t('selectOption', 'Select an option')} value="" /> : null}
+                {locations?.length > 0 &&
+                  locations.map((location) => (
+                    <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
+                      {location.display}
+                    </SelectItem>
+                  ))}
+              </Select>
+            </div>
           </section>
+
+          {/* Lists available program types. This feature is dependent on the `showRecommendedVisitTypeTab` config being set
+          to true. */}
           {config.showRecommendedVisitTypeTab && (
             <section>
               <div className={styles.sectionTitle}>{t('program', 'Program')}</div>
               <FormGroup legendText={t('selectProgramType', 'Select program type')}>
                 <RadioButtonGroup
-                  defaultSelected={enrollment?.program?.uuid}
+                  defaultSelected={enrollment?.program?.uuid ?? ''}
                   orientation="vertical"
                   onChange={(uuid) =>
                     setEnrollment(activePatientEnrollment.find(({ program }) => program.uuid === uuid))
                   }
                   name="program-type-radio-group"
-                  valueSelected="default-selected"
                 >
                   {activePatientEnrollment.map(({ uuid, display, program }) => (
                     <RadioButton
@@ -362,27 +355,44 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
               </FormGroup>
             </section>
           )}
+
+          {/* Lists available visit types. The content switcher only gets shown when recommended visit types are enabled */}
           <section>
             <div className={styles.sectionTitle}>{t('visitType', 'Visit Type')}</div>
-            <ContentSwitcher
-              selectedIndex={contentSwitcherIndex}
-              onChange={({ index }) => setContentSwitcherIndex(index)}
-            >
-              <Switch name="recommended" text={t('recommended', 'Recommended')} />
-              <Switch name="all" text={t('all', 'All')} />
-            </ContentSwitcher>
-            {contentSwitcherIndex === 0 && !isLoading && (
-              <MemoizedRecommendedVisitType
-                onChange={(visitType) => {
-                  setVisitType(visitType);
-                  setIsMissingVisitType(false);
-                }}
-                patientUuid={patientUuid}
-                patientProgramEnrollment={enrollment}
-                locationUuid={selectedLocation}
-              />
-            )}
-            {contentSwitcherIndex === 1 && (
+
+            {config.showRecommendedVisitTypeTab ? (
+              <>
+                <ContentSwitcher
+                  selectedIndex={contentSwitcherIndex}
+                  onChange={({ index }) => setContentSwitcherIndex(index)}
+                >
+                  <Switch name="recommended" text={t('recommended', 'Recommended')} />
+                  <Switch name="all" text={t('all', 'All')} />
+                </ContentSwitcher>
+                {contentSwitcherIndex === 0 && !isLoading && (
+                  <MemoizedRecommendedVisitType
+                    onChange={(visitType) => {
+                      setVisitType(visitType);
+                      setIsMissingVisitType(false);
+                    }}
+                    patientUuid={patientUuid}
+                    patientProgramEnrollment={enrollment}
+                    locationUuid={selectedLocation}
+                  />
+                )}
+                {contentSwitcherIndex === 1 && (
+                  <BaseVisitType
+                    onChange={(visitType) => {
+                      setVisitType(visitType);
+                      setIsMissingVisitType(false);
+                    }}
+                    visitTypes={allVisitTypes}
+                    patientUuid={patientUuid}
+                  />
+                )}
+              </>
+            ) : (
+              // Defaults to showing all possible visit types if recommended visits are not enabled
               <BaseVisitType
                 onChange={(visitType) => {
                   setVisitType(visitType);
@@ -393,6 +403,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
               />
             )}
           </section>
+
           {isMissingVisitType && (
             <section>
               <InlineNotification
@@ -405,6 +416,8 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
               />
             </section>
           )}
+
+          {/* Visit type attribute fields. These get shown when visit attribute types are configured */}
           <section>
             <VisitAttributeTypeFields
               setVisitAttributes={setVisitAttributes}
@@ -414,6 +427,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
             />
           </section>
 
+          {/* Queue location and queue fields. These get shown when queue location and queue fields are configured */}
           {config.showServiceQueueFields && (
             <>
               <section className={styles.section}>
@@ -545,5 +559,9 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
     </Form>
   );
 };
+
+function ResponsiveWrapper({ children, isTablet }: { children: React.ReactNode; isTablet: boolean }) {
+  return isTablet ? <Layer>{children} </Layer> : <>{children}</>;
+}
 
 export default StartVisitForm;

@@ -26,7 +26,7 @@ const BaseVisitType: React.FC<BaseVisitTypeProps> = ({ onChange, visitTypes }) =
     }
   }, [searchTerm, visitTypes]);
 
-  const handleSearch = React.useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), 300), []);
+  const handleSearch = useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), 300), []);
 
   const { results, currentPage, goTo } = usePagination(searchResults, 5);
 
@@ -54,11 +54,11 @@ const BaseVisitType: React.FC<BaseVisitTypeProps> = ({ onChange, visitTypes }) =
 
           <RadioButtonGroup
             className={styles.radioButtonGroup}
-            defaultSelected={results?.length === 1 && results[0].uuid}
+            defaultSelected={results?.length === 1 ? results[0].uuid : ''}
             orientation="vertical"
             onChange={onChange}
             name="radio-button-group"
-            valueSelected={results?.length === 1 && results[0].uuid}
+            valueSelected={results?.length === 1 ? results[0].uuid : ''}
           >
             {results.map(({ uuid, display, name }) => (
               <RadioButton key={uuid} className={styles.radioButton} id={name} labelText={display} value={uuid} />
