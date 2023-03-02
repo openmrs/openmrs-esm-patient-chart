@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState, useMemo } from 'react';
+import React, { useCallback, useState, useMemo, useEffect } from 'react';
 import dayjs from 'dayjs';
 import {
   Button,
@@ -49,14 +49,7 @@ import styles from './visit-form.scss';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
 import { ChartConfig } from '../../config-schema';
 import VisitAttributeTypeFields from './visit-attribute-type.component';
-import {
-  QueueEntryPayload,
-  saveQueueEntry,
-  usePriorities,
-  useQueueLocations,
-  useServices,
-  useStatuses,
-} from '../hooks/useServiceQueue';
+import { saveQueueEntry } from '../hooks/useServiceQueue';
 
 const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace, promptBeforeClosing }) => {
   const { t } = useTranslation();
@@ -79,17 +72,9 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
   const [ignoreChanges, setIgnoreChanges] = useState(true);
   const [visitAttributes, setVisitAttributes] = useState<{ [uuid: string]: string }>({});
   const [isMissingRequiredAttributes, setIsMissingRequiredAttributes] = useState(false);
-  const [priority, setPriority] = useState('');
-  const { priorities } = usePriorities();
-  const { statuses } = useStatuses();
-  const [selectedStatus, setSelectedStatus] = useState(config.defaultStatusConceptUuid);
   const [errorFetchingResources, setErrorFetchingResources] = useState<{
     blockSavingForm: boolean;
   }>(null);
-  const { queueLocations } = useQueueLocations();
-  const [selectedQueueLocation, setSelectedQueueLocation] = useState(queueLocations[0]?.id);
-  const { services, isLoadingServices } = useServices(selectedQueueLocation);
-  const [selectedService, setSelectedService] = useState(() => (services?.length > 0 ? services[0].uuid : ''));
   const [selectedLocation, setSelectedLocation] = useState(() => (sessionLocation ? sessionLocation : ''));
   const [visitType, setVisitType] = useState<string | null>(() => {
     if (locations?.length && sessionUser?.sessionLocation?.uuid) {
@@ -98,6 +83,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
 
     return null;
   });
+  const visitQueueNumberAttributeUuid = config.visitQueueNumberAttributeUuid;
 
   const handleSubmit = useCallback(
     (event) => {
@@ -141,56 +127,48 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
           (response) => {
             if (response.status === 201) {
               if (config.showServiceQueueFields) {
-                const defaultStatus = config.defaultStatusConceptUuid;
-                const defaultPriority = config.defaultPriorityConceptUuid;
-                const queuePayload: QueueEntryPayload = {
-                  visit: {
-                    uuid: response.data.uuid,
-                  },
-                  queueEntry: {
-                    status: {
-                      uuid: selectedStatus ? selectedStatus : defaultStatus,
-                    },
-                    priority: {
-                      uuid: priority ? priority : defaultPriority,
-                    },
-                    queue: {
-                      uuid: selectedService,
-                    },
-                    patient: {
-                      uuid: patientUuid,
-                    },
-                    startedAt: toDateObjectStrict(toOmrsIsoString(new Date())),
-                  },
-                };
+                // retrieve values from queue extension
 
-                saveQueueEntry(queuePayload, abortController)
-                  .pipe(first())
-                  .subscribe(
-                    (response) => {
-                      if (response.status === 201) {
-                        mutate();
+                const queueLocation = event?.target['queueLocation']?.value;
+                const serviceUuid = event?.target['service']?.value;
+                const priority = event?.target['priority']?.value;
+                const status = event?.target['status']?.value;
+                const sortWeight = event?.target['sortWeight']?.value;
 
-                        showToast({
-                          kind: 'success',
-                          title: t('visitStarted', 'Visit started'),
-                          description: t(
-                            'queueAddedSuccessfully',
-                            `Patient has been added to the queue successfully.`,
-                            `${hours} : ${minutes}`,
-                          ),
-                        });
-                      }
-                    },
-                    (error) => {
-                      showNotification({
-                        title: t('queueEntryError', 'Error adding patient to the queue'),
-                        kind: 'error',
-                        critical: true,
-                        description: error?.message,
+                saveQueueEntry(
+                  response.data.uuid,
+                  serviceUuid,
+                  patientUuid,
+                  priority,
+                  status,
+                  sortWeight,
+                  new AbortController(),
+                  queueLocation,
+                  visitQueueNumberAttributeUuid,
+                ).then(
+                  ({ status }) => {
+                    if (status === 201) {
+                      mutate();
+                      showToast({
+                        kind: 'success',
+                        title: t('visitStarted', 'Visit started'),
+                        description: t(
+                          'queueAddedSuccessfully',
+                          `Patient has been added to the queue successfully.`,
+                          `${hours} : ${minutes}`,
+                        ),
                       });
-                    },
-                  );
+                    }
+                  },
+                  (error) => {
+                    showNotification({
+                      title: t('queueEntryError', 'Error adding patient to the queue'),
+                      kind: 'error',
+                      critical: true,
+                      description: error?.message,
+                    });
+                  },
+                );
               }
               mutate();
               closeWorkspace();
@@ -219,15 +197,11 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
     [
       closeWorkspace,
       config.visitAttributeTypes,
-      config.defaultPriorityConceptUuid,
-      config.defaultStatusConceptUuid,
       config.showServiceQueueFields,
+      visitQueueNumberAttributeUuid,
       mutate,
       patientUuid,
-      priority,
       selectedLocation,
-      selectedService,
-      selectedStatus,
       t,
       timeFormat,
       visitDate,
@@ -244,7 +218,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
   };
 
   return (
-    <Form className={styles.form} onChange={handleOnChange}>
+    <Form className={styles.form} onChange={handleOnChange} onSubmit={handleSubmit}>
       {errorFetchingResources && (
         <InlineNotification
           kind={errorFetchingResources?.blockSavingForm ? 'error' : 'warning'}
@@ -428,118 +402,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
           </section>
 
           {/* Queue location and queue fields. These get shown when queue location and queue fields are configured */}
-          {config.showServiceQueueFields && (
-            <>
-              <section className={styles.section}>
-                <div className={styles.queueSection}>
-                  <div className={styles.sectionTitle}>{t('queueLocation', 'Queue location')}</div>
-                  <Select
-                    labelText={t('selectQueueLocation', 'Select a queue location')}
-                    id="location"
-                    invalidText="Required"
-                    value={selectedQueueLocation}
-                    onChange={(event) => {
-                      setSelectedQueueLocation(event.target.value);
-                    }}
-                  >
-                    {!selectedQueueLocation ? (
-                      <SelectItem text={t('selectQueueLocation', 'Select a queue location')} value="" />
-                    ) : null}
-                    {queueLocations?.length > 0 &&
-                      queueLocations.map((location) => (
-                        <SelectItem key={location.id} text={location.name} value={location.id}>
-                          {location.name}
-                        </SelectItem>
-                      ))}
-                  </Select>
-                </div>
-
-                <div className={styles.queueSection}>
-                  <div className={styles.sectionTitle}>{t('service', 'Service')}</div>
-                  {!services?.length ? (
-                    <InlineNotification
-                      className={styles.inlineNotification}
-                      kind={'error'}
-                      lowContrast
-                      subtitle={t('configureServices', 'Please configure services to continue.')}
-                      title={t('noServicesConfigured', 'No services configured')}
-                    />
-                  ) : (
-                    <Select
-                      labelText={t('selectService', 'Select a service')}
-                      id="service"
-                      invalidText="Required"
-                      value={selectedService}
-                      onChange={(event) => setSelectedService(event.target.value)}
-                    >
-                      {!selectedService ? <SelectItem text={t('chooseService', 'Select a service')} value="" /> : null}
-                      {services?.length > 0 &&
-                        services.map((service) => (
-                          <SelectItem key={service.uuid} text={service.display} value={service.uuid}>
-                            {service.display}
-                          </SelectItem>
-                        ))}
-                    </Select>
-                  )}
-                </div>
-
-                <div className={styles.queueSection}>
-                  <div className={styles.sectionTitle}>{t('status', 'Status')}</div>
-                  {!statuses?.length ? (
-                    <InlineNotification
-                      className={styles.inlineNotification}
-                      kind={'error'}
-                      lowContrast
-                      subtitle={t('configureStatuses', 'Please configure statuses to continue.')}
-                      title={t('noStatusesConfigured', 'No statuses configured')}
-                    />
-                  ) : (
-                    <Select
-                      labelText={t('selectStatus', 'Select a status')}
-                      id="status"
-                      invalidText="Required"
-                      value={selectedStatus}
-                      onChange={(event) => setSelectedStatus(event.target.value)}
-                    >
-                      {!selectedStatus ? <SelectItem text={t('chooseStatus', 'Select a status')} value="" /> : null}
-                      {statuses?.length > 0 &&
-                        statuses.map((service) => (
-                          <SelectItem key={service.uuid} text={service.display} value={service.uuid}>
-                            {service.display}
-                          </SelectItem>
-                        ))}
-                    </Select>
-                  )}
-                </div>
-
-                <div className={styles.queueSection}>
-                  <div className={styles.sectionTitle}>{t('priority', 'Priority')}</div>
-                  {!priorities?.length ? (
-                    <InlineNotification
-                      className={styles.inlineNotification}
-                      kind={'error'}
-                      lowContrast
-                      subtitle={t('configurePriorities', 'Please configure priorities to continue.')}
-                      title={t('noPrioritiesConfigured', 'No priorities configured')}
-                    />
-                  ) : (
-                    <ContentSwitcher
-                      size="sm"
-                      selectionMode="manual"
-                      onChange={(event) => {
-                        setPriority(event.name as any);
-                      }}
-                    >
-                      {priorities?.length > 0 &&
-                        priorities.map(({ uuid, display }) => {
-                          return <Switch name={uuid} text={display} value={uuid} index={uuid} />;
-                        })}
-                    </ContentSwitcher>
-                  )}
-                </div>
-              </section>
-            </>
-          )}
+          {config.showServiceQueueFields && <ExtensionSlot extensionSlotName="add-queue-entry-slot" />}
         </Stack>
       </div>
       <ButtonSet className={isTablet ? styles.tablet : styles.desktop}>
@@ -547,7 +410,6 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
           {t('discard', 'Discard')}
         </Button>
         <Button
-          onClick={handleSubmit}
           className={styles.button}
           disabled={isSubmitting || errorFetchingResources?.blockSavingForm}
           kind="primary"
