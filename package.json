@@ -69,8 +69,5 @@
   "resolutions": {
     "sass": "^1.54.3"
   },
-  "packageManager": "yarn@3.2.2",
-  "dependencies": {
-    "@ngx-translate/core": "^14.0.0"
-  }
+  "packageManager": "yarn@3.2.2"
 }
