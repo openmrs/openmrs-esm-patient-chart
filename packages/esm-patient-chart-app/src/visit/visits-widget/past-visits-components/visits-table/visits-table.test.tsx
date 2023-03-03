@@ -1,7 +1,7 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { screen, waitFor } from '@testing-library/react';
-import { usePagination } from '@openmrs/esm-framework';
+import { getConfig, useConfig, usePagination } from '@openmrs/esm-framework';
 import { renderWithSwr } from '../../../../../../../tools/test-helpers';
 import { mockEncounters } from '../../../../../../../__mocks__/visits.mock';
 import VisitsTable from './visits-table.component';
@@ -14,6 +14,8 @@ const testProps = {
 };
 
 const mockedUsePagination = usePagination as jest.Mock;
+const mockUseConfig = useConfig as jest.Mock;
+const mockGetConfig = getConfig as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -32,6 +34,7 @@ describe('EncounterList', () => {
   it('renders an empty state when no encounters are available', () => {
     testProps.visits = [];
 
+    mockGetConfig.mockReturnValue(Promise.resolve({ htmlFormEntryForms: [] }));
     mockedUsePagination.mockImplementationOnce(() => ({
       currentPage: 1,
       goTo: () => {},
