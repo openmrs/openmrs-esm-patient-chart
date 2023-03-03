@@ -124,7 +124,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
       launchPatientWorkspace('patient-form-entry-workspace', { workspaceTitle: formName });
     } else {
       navigate({
-        to: `\${openmrsBase}/htmlformentryui/htmlform/${htmlForm.formUiPage}.page?patientId=${patientUuid}&visitId=${visitUuid}&encounterId=${encounterUuid}&returnUrl=${window.location.href}`,
+        to: `\${openmrsBase}/htmlformentryui/htmlform/${htmlForm.formUiPage}.page?patientId=${patientUuid}&visitId=${visitUuid}&encounterId=${encounterUuid}&definitionUiResource=${htmlForm.formUiResource}&returnUrl=${window.location.href}`,
       });
     }
   };
