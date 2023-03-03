@@ -24,19 +24,28 @@ import {
   Tile,
 } from '@carbon/react';
 import { Edit } from '@carbon/react/icons';
-import {formatDatetime, navigate, parseDate, useLayoutType, usePagination, Visit, getConfig, useConfig} from '@openmrs/esm-framework';
+import {
+  formatDatetime,
+  navigate,
+  parseDate,
+  useLayoutType,
+  usePagination,
+  Visit,
+  getConfig,
+  useConfig,
+} from '@openmrs/esm-framework';
 import {
   formEntrySub,
   launchPatientWorkspace,
   launchStartVisitPrompt,
-  PatientChartPagination
+  PatientChartPagination,
 } from '@openmrs/esm-patient-common-lib';
 import { MappedEncounter } from '../visit-summary.component';
 import EncounterObservations from '../../encounter-observations';
 import styles from './visits-table.scss';
-import type {HtmlFormEntryForm} from "@openmrs/esm-patient-forms-app/src/config-schema";
-import isEmpty from "lodash-es/isEmpty";
-import {launchFormEntry} from "@openmrs/esm-patient-forms-app/src/form-entry-interop";
+import type { HtmlFormEntryForm } from '@openmrs/esm-patient-forms-app/src/config-schema';
+import isEmpty from 'lodash-es/isEmpty';
+import { launchFormEntry } from '@openmrs/esm-patient-forms-app/src/form-entry-interop';
 
 interface VisitTableProps {
   visits: Array<MappedEncounter>;
@@ -52,7 +61,7 @@ type FilterProps = {
   getCellId: (row, key) => string;
 };
 
-const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, patientUuid}) => {
+const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, patientUuid }) => {
   const visitCount = 20;
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -164,15 +173,15 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
       useZebraStyles={visits?.length > 1 ? true : false}
     >
       {({
-          rows,
-          headers,
-          getHeaderProps,
-          getRowProps,
-          getExpandHeaderProps,
-          getTableProps,
-          getToolbarProps,
-          onInputChange,
-        }) => (
+        rows,
+        headers,
+        getHeaderProps,
+        getRowProps,
+        getExpandHeaderProps,
+        getTableProps,
+        getToolbarProps,
+        onInputChange,
+      }) => (
         <>
           <TableContainer className={styles.tableContainer}>
             <TableToolbar {...getToolbarProps()}>

@@ -7,7 +7,7 @@ import {
 } from '../../../../../../__mocks__/visits.mock';
 import { mockPatient } from '../../../../../../__mocks__/patient.mock';
 import VisitSummary from './visit-summary.component';
-import { getConfig } from "@openmrs/esm-framework";
+import { getConfig } from '@openmrs/esm-framework';
 
 const mockEncounter = visitOverviewDetailMockData.data.results[0].encounters.map((encounter) => encounter);
 const mockGetConfig = getConfig as jest.Mock;
