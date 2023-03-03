@@ -240,11 +240,11 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                                 size={desktopLayout ? 'sm' : 'lg'}
                                 onClick={() =>
                                   launchWorkspace(
-                                    visits[index].form.uuid,
-                                    visits[index].visitUuid,
-                                    visits[index].id,
-                                    visits[index].form.display,
-                                    visits[index].visitTypeUuid,
+                                    visits[index]?.form?.uuid,
+                                    visits[index]?.visitUuid,
+                                    visits[index]?.id,
+                                    visits[index]?.form?.display,
+                                    visits[index]?.visitTypeUuid,
                                   )
                                 }
                               >

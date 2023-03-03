@@ -95,7 +95,7 @@ const FormView: React.FC<FormViewProps> = ({ category, forms, patientUuid, patie
           encounterUuid: formInfo?.associatedEncounters[0]?.uuid,
         };
       }),
-    [results, t],
+    [results],
   );
 
   if (!forms?.length) {
@@ -137,7 +137,6 @@ const FormView: React.FC<FormViewProps> = ({ category, forms, patientUuid, patie
                       onChange={(event) => handleSearch(event.target.value)}
                       placeholder={t('searchForAForm', 'Search for a form')}
                       size={isTablet ? 'lg' : 'sm'}
-                      onChange={onInputChange}
                     />
                   </TableToolbarContent>
                 </TableToolbar>
