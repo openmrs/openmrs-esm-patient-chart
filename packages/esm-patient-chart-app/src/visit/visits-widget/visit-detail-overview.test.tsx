@@ -29,7 +29,7 @@ jest.mock('@openmrs/esm-framework', () => {
 describe('VisitDetailOverview', () => {
   it('renders an empty state view if encounters data is unavailable', async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
-    mockGetConfig.mockReturnValue(Promise.resolve({ htmlFormEntryForms: [] }));
+    mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
 
     renderVisitDetailOverview();
 
@@ -65,7 +65,7 @@ describe('VisitDetailOverview', () => {
     const user = userEvent.setup();
 
     mockOpenmrsFetch.mockReturnValueOnce(visitOverviewDetailMockData);
-    mockGetConfig.mockReturnValue(Promise.resolve({ htmlFormEntryForms: [] }));
+    mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
 
     renderVisitDetailOverview();
 

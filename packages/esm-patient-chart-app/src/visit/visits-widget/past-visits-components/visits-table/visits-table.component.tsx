@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Button,
@@ -34,7 +34,7 @@ import {
 import { MappedEncounter } from '../visit-summary.component';
 import EncounterObservations from '../../encounter-observations';
 import styles from './visits-table.scss';
-import {HtmlFormEntryForm} from "@openmrs/esm-patient-forms-app/src/config-schema";
+import type {HtmlFormEntryForm} from "@openmrs/esm-patient-forms-app/src/config-schema";
 import isEmpty from "lodash-es/isEmpty";
 import {launchFormEntry} from "@openmrs/esm-patient-forms-app/src/form-entry-interop";
 
@@ -55,15 +55,14 @@ type FilterProps = {
 const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, patientUuid}) => {
   const visitCount = 20;
   const { t } = useTranslation();
-  const config = useConfig();
   const isTablet = useLayoutType() === 'tablet';
 
-  const [htmlFormEntryFormsConfig, setHtmlFormEntryFormsConfig] = React.useState<null | Array<HtmlFormEntryForm>>(null);
-  React.useEffect(() => {
+  const [htmlFormEntryFormsConfig, setHtmlFormEntryFormsConfig] = useState<Array<HtmlFormEntryForm> | undefined>();
+  useEffect(() => {
     getConfig('@openmrs/esm-patient-forms-app').then((config) => {
       setHtmlFormEntryFormsConfig(config.htmlFormEntryForms as HtmlFormEntryForm[]);
     });
-  }, [config]);
+  });
 
   const encounterTypes = [...new Set(visits.map((encounter) => encounter.encounterType))].sort();
 
@@ -118,7 +117,7 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
     formName?: string,
     visitTypeUuid?: string,
   ) => {
-    const htmlForm = htmlFormEntryFormsConfig.find((form) => form.formUuid === formUuid);
+    const htmlForm = htmlFormEntryFormsConfig?.find((form) => form.formUuid === formUuid);
     if (isEmpty(htmlForm)) {
       formEntrySub.next({ formUuid, visitUuid, encounterUuid, visitTypeUuid });
       launchPatientWorkspace('patient-form-entry-workspace', { workspaceTitle: formName });
