@@ -12,7 +12,6 @@ import ActionMenu from './action-menu/action-menu.component';
 import Loader from '../loader/loader.component';
 import WorkspaceNotification from '../workspace/workspace-notification.component';
 import styles from './patient-chart.scss';
-import PatientBanner from '../banner/patient-banner.component';
 import { ChartConfig } from '../config-schema';
 
 const PatientChart: React.FC = () => {
@@ -47,7 +46,7 @@ const PatientChart: React.FC = () => {
           >
             <ExtensionSlot extensionSlotName="breadcrumbs-slot" />
             <aside>
-              <PatientBanner {...state} />
+              <ExtensionSlot extensionSlotName="patient-header-slot" state={state} />
               {config.showServiceQueueFields && (
                 <ExtensionSlot extensionSlotName="transition-queue-entry-slot" state={state} />
               )}

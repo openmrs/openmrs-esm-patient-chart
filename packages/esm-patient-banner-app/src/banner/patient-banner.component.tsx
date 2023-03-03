@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import capitalize from 'lodash-es/capitalize';
 import { Button, Tag } from '@carbon/react';
 import { ChevronDown, ChevronUp, OverflowMenuVertical } from '@carbon/react/icons';
-import { ExtensionSlot, age, formatDate, parseDate } from '@openmrs/esm-framework';
+import { ExtensionSlot, age, formatDate, parseDate, useConfig } from '@openmrs/esm-framework';
 import ContactDetails from '../contact-details/contact-details.component';
 import CustomOverflowMenuComponent from '../ui-components/overflow-menu.component';
 import styles from './patient-banner.scss';
@@ -57,6 +57,11 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
     setShowDropdown((value) => !value);
   }, []);
 
+  const { excludePatientIdentifierCodeTypes } = useConfig();
+  const identifiers = patient?.identifier.filter(
+    (identifier) => !excludePatientIdentifierCodeTypes.uuids.includes(identifier.type.coding[0].code),
+  );
+
   return (
     <div className={styles.container} role="banner">
       <div
@@ -104,8 +109,8 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
           </div>
           <div className={styles.row}>
             <div className={styles.identifiers}>
-              {patient?.identifier?.length
-                ? patient?.identifier.map(({ value, type }) => (
+              {identifiers.length
+                ? identifiers.map(({ value, type }) => (
                     <span className={styles.identifierTag}>
                       <Tag key={value} type="gray" title={type.text}>
                         {type.text}

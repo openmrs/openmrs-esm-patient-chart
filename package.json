@@ -5,7 +5,8 @@
     "packages/*"
   ],
   "scripts": {
-    "start": "openmrs develop --sources packages/esm-patient-chart-app/",
+    "start": "openmrs develop --sources packages/esm-patient-chart-app/ --backend https://ohri-namibia.globalhealthapp.net",
+    "start2": "openmrs develop --sources packages/esm-patient-banner-app/ --backend https://ohri-namibia.globalhealthapp.net",
     "ci:publish": "lerna publish from-package --yes",
     "ci:prepublish": "lerna publish from-package --no-git-reset --yes --dist-tag next",
     "release": "lerna version --no-git-tag-version",
