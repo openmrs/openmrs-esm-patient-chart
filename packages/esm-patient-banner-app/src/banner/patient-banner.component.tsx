@@ -59,7 +59,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
 
   const { excludePatientIdentifierCodeTypes } = useConfig();
   const identifiers = patient?.identifier.filter(
-    (identifier) => !excludePatientIdentifierCodeTypes.uuids.includes(identifier.type.coding[0].code),
+    (identifier) => !excludePatientIdentifierCodeTypes?.uuids.includes(identifier.type.coding[0].code),
   );
 
   return (
