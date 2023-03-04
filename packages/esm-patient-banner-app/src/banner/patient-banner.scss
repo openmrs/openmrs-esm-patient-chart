@@ -2,7 +2,6 @@
 @use '@carbon/styles/scss/type';
 @import '~@openmrs/esm-styleguide/src/vars';
 
-
 .container {
   border-top: 0.063rem solid $ui-03;
   border-bottom: 0.063rem solid $ui-03;
@@ -70,6 +69,10 @@
   display: flex;
   align-items: center;
   padding: spacing.$spacing-01;
+}
+
+.tag {
+  margin: 0.25rem 0.25rem 0.25rem 0rem;
 }
 
 .tooltipPadding {
