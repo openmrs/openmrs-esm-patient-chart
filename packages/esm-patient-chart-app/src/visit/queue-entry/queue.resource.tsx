@@ -70,33 +70,35 @@ interface UseVisitQueueEntries {
 }
 
 export function useVisitQueueEntry(patientUuid, visitUuid): UseVisitQueueEntries {
-  const apiUrl = `/ws/rest/v1/queue-entry?patient=${patientUuid}`
+  const apiUrl = `/ws/rest/v1/visit-queue-entry?patient=${patientUuid}`;
   const { data, error, isLoading, isValidating } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
     apiUrl,
     openmrsFetch,
   );
 
   const mapVisitQueueEntryProperties = (visitQueueEntry: VisitQueueEntry): MappedVisitQueueEntry => ({
-    id: visitQueueEntry.queue.uuid,
-    name: visitQueueEntry.queue.display,
-    patientUuid: visitQueueEntry.patient.uuid,
+    id: visitQueueEntry.uuid,
+    name: visitQueueEntry.queueEntry.queue.display,
+    patientUuid: visitQueueEntry.queueEntry.patient.uuid,
     priority:
-      visitQueueEntry.priority.display === 'Urgent'
+      visitQueueEntry.queueEntry.priority.display === 'Urgent'
         ? 'Priority'
-        : visitQueueEntry.priority.display,
-    priorityUuid: visitQueueEntry.priority.uuid,
-    service: visitQueueEntry.queue?.display,
-    status: visitQueueEntry.status.display,
-    statusUuid: visitQueueEntry.status.uuid,
+        : visitQueueEntry.queueEntry.priority.display,
+    priorityUuid: visitQueueEntry.queueEntry.priority.uuid,
+    service: visitQueueEntry.queueEntry.queue?.display,
+    status: visitQueueEntry.queueEntry.status.display,
+    statusUuid: visitQueueEntry.queueEntry.status.uuid,
     visitUuid: visitQueueEntry.visit?.uuid,
     visitType: visitQueueEntry.visit?.visitType?.display,
-    queueUuid: visitQueueEntry.queue.uuid,
-    queueEntryUuid: visitQueueEntry.uuid,
+    queueUuid: visitQueueEntry.queueEntry.queue.uuid,
+    queueEntryUuid: visitQueueEntry.queueEntry.uuid,
   });
 
-  const mappedVisitQueueEntry = data?.data?.results?.map(mapVisitQueueEntryProperties).filter(
-    (visitQueueEntry) => visitUuid !== undefined && visitUuid === visitQueueEntry.visitUuid,
-  ).shift() ?? null;
+  const mappedVisitQueueEntry =
+    data?.data?.results
+      ?.map(mapVisitQueueEntryProperties)
+      .filter((visitQueueEntry) => visitUuid !== undefined && visitUuid === visitQueueEntry.visitUuid)
+      .shift() ?? null;
 
   return {
     queueEntry: mappedVisitQueueEntry,
