@@ -266,14 +266,6 @@ function setupOpenMRS() {
           moduleName,
         }),
       },
-      {
-        id: 'transition-queue-entry',
-        slot: 'transition-queue-entry-slot',
-        load: getAsyncLifecycle(() => import('./visit/queue-entry/transition-queue-entry.component'), {
-          featureName: 'transition-queue-entry',
-          moduleName,
-        }),
-      },
     ],
   };
 }
