@@ -43,9 +43,29 @@ $openmrs-background-grey: #ededed;
   margin-bottom: spacing.$spacing-03;
 }
 
-.datePickerControl {
+.inLine {
   display: flex;
 }
+
+.rangeDatePickerControl {
+}
+
+.repeatEvery {
+}
+
+.recurringPatternType {
+  margin-top: 2rem;
+  margin-left: 0.5rem;
+}
+
+.timeDuration {
+  display: flex;
+}
+
+.duration {
+  margin-left: 0.2rem;
+}
+
 
 :global(.omrs-breakpoint-lt-desktop) .formGroup {
   flex-direction: row;

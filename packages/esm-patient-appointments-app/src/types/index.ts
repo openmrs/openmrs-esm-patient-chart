@@ -56,3 +56,15 @@ export interface AppointmentPayload {
   comments: string;
   uuid?: string;
 }
+
+export interface RecurringPattern {
+  type: 'DAY' | 'WEEK';
+  period: number;
+  endDate: Date;
+  daysOfWeek?: Array<string>; //'MONDAY' | 'TUESDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY'>;
+}
+
+export interface RecurringAppointmentsPayload {
+  appointmentRequest: AppointmentPayload;
+  recurringPattern: RecurringPattern;
+}
