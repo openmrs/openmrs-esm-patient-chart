@@ -365,10 +365,7 @@ export interface DiagnosisCreate {
   encounter: string;
   patient: string;
   diagnosis: {
-    coded?: {
-      uuid: string;
-      display?: string;
-    };
+    coded?: string;
     nonCoded?: string;
   };
   certainty: 'CONFIRMED' | 'PROVISIONAL';
