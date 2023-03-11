@@ -12,7 +12,7 @@ import {
   TableExpandRow,
   TableExpandedRow,
 } from '@carbon/react';
-import { formatDate, formatTime, parseDate, usePagination } from '@openmrs/esm-framework';
+import { formatDate, formatTime, parseDate, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import orderBy from 'lodash-es/orderBy';
@@ -28,6 +28,8 @@ interface PaginatedNotes {
 
 const PaginatedNotes: React.FC<PaginatedNotes> = ({ notes, pageSize, pageUrl, urlLabel }) => {
   const { t } = useTranslation();
+  const layout = useLayoutType();
+  const isTablet = layout === 'tablet';
 
   const [sortParams, setSortParams] = useState({ key: '', order: 'none' });
 
@@ -75,7 +77,14 @@ const PaginatedNotes: React.FC<PaginatedNotes> = ({ notes, pageSize, pageUrl, ur
 
   return (
     <>
-      <DataTable rows={tableRows} sortRow={customSortRow} headers={tableHeaders} isSortable size="sm" useZebraStyles>
+      <DataTable
+        rows={tableRows}
+        sortRow={customSortRow}
+        headers={tableHeaders}
+        isSortable
+        size={isTablet ? 'lg' : 'sm'}
+        useZebraStyles
+      >
         {({
           rows,
           headers,

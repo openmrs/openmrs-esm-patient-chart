@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layer, OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { showModal } from '@openmrs/esm-framework';
+import { showModal, useLayoutType } from '@openmrs/esm-framework';
 import { Condition } from './conditions.resource';
 import styles from './conditions-action-menu.scss';
 
@@ -12,6 +12,7 @@ interface conditionsActionMenuProps {
 
 export const ConditionsActionMenu = ({ condition }: conditionsActionMenuProps) => {
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
 
   const launchEditConditionsForm = useCallback(
     () =>
@@ -32,7 +33,7 @@ export const ConditionsActionMenu = ({ condition }: conditionsActionMenuProps) =
 
   return (
     <Layer className={styles.layer}>
-      <OverflowMenu ariaLabel="Edit or delete condition" size="sm" flipped>
+      <OverflowMenu ariaLabel="Edit or delete condition" size={isTablet ? 'lg' : 'sm'} flipped>
         <OverflowMenuItem
           className={styles.menuItem}
           id="editCondition"

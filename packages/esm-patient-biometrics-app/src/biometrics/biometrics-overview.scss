@@ -12,72 +12,21 @@
   display: flex;
   flex: 1 1 0%;
   justify-content: end;
+
+  & :global(.cds--content-switcher) {
+    max-width: max-content;
+
+    :global(.cds--content-switcher__label) {
+      height: spacing.$spacing-05;
+    }
+  }
 }
 
 .divider {
   width: 1px;
-  height: 1rem;
+  height: spacing.$spacing-05;
   color: $ui-03;
-  margin: 0rem 0.5rem;
-}
-
-.toggleButtons {
-  width: fit-content;
-  margin: 0 spacing.$spacing-03;
-  
-  button {
-    color: $interactive-01;
-    min-height: 0px;
-  
-    &:global(.cds--btn--tertiary) {
-      border-color: $interactive-01;
-    }
-  
-    &:global(.cds--tooltip__trigger:active:not([disabled])) {
-      border-color: $interactive-01;
-    }
-  
-    &:global(.cds--btn--tertiary:active) {
-      border-color: $interactive-01;
-      background-color: #edf5ff;
-      color: #edf5ff;
-    }
-  
-    &:global(.cds--btn--tertiary:focus) {
-      background-color: $interactive-01;
-      color: $ui-background;
-    }
-  
-    &:global(.cds--btn--tertiary:hover) {
-      color: $ui-background;
-      background-color: $interactive-01;
-    }
-  
-    &:global(.cds--btn--ghost) {
-      border-color: #a6c8ff;
-    }
-  
-    &:global(.cds--btn--ghost:hover) {
-      color:  #000;
-      background-color: $ui-01;
-    }
-  }
-}
-
-.tableViewToggle {
-  border-radius: spacing.$spacing-02 0 0 spacing.$spacing-02;
-
-  &:global(.cds--btn--ghost) {
-    border-right: 0;
-  }
-}
-
-.chartViewToggle {
-  border-radius: 0 spacing.$spacing-02 spacing.$spacing-02 0;
-
-  &:global(.cds--btn--ghost) {
-    border-left: 0rem;
-  }
+  margin: 0rem spacing.$spacing-03 0 spacing.$spacing-05;
 }
 
 .backgroundDataFetchingIndicator {

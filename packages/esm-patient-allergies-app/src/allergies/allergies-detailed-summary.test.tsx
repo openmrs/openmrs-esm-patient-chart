@@ -58,13 +58,13 @@ describe('AllergiesDetailedSummary: ', () => {
 
     expect(screen.getByRole('heading', { name: /allergies/i })).toBeInTheDocument();
 
-    const expectedColumnHeaders = [/allergen/i, /severity and reaction/i, /since/i, /last updated/i];
+    const expectedColumnHeaders = [/allergen/i, /severity/i, /reaction/i, /since/i, /last updated/i, /note/i];
     const expectedAllergies = [
       /ACE inhibitors unable-to-assess Anaphylaxis May 2021/i,
-      /Fish low Anaphylaxis, Angioedema, Fever, Hives Some Comments Apr 2021/i,
-      /Penicillins high Diarrhea, Cough, Musculoskeletal pain, Mental status change, Angioedema Patient allergies have been noted down/i,
-      /Morphine high Mental status change Comments Nov 2020/i,
-      /Aspirin high Mental status change Comments Nov 2020/i,
+      /Fish low Anaphylaxis, Angioedema, Fever, Hives Apr 2021 -- Some Comments/i,
+      /Penicillins high Diarrhea, Cough, Musculoskeletal pain, Mental status change, Angioedema Jan 2021 -- Patient allergies have been noted down/i,
+      /Morphine high Mental status change Nov 2020 -- Comments/i,
+      /Aspirin high Mental status change Nov 2020 -- Comments/i,
     ];
 
     expectedColumnHeaders.forEach((header) =>
