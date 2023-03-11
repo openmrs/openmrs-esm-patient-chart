@@ -21,6 +21,7 @@ import {
   navigate,
   useConfig,
   showModal,
+  ExtensionSlot,
 } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { MappedQueuePriority, useVisitQueueEntry } from '../visit/queue-entry/queue.resource';
@@ -192,6 +193,7 @@ const VisitHeader: React.FC = () => {
             <PatientInfo patient={patient} />
           </div>
           <HeaderGlobalBar>
+            <ExtensionSlot extensionSlotName="visit-header-right-slot" />
             {!hasActiveVisit && (
               <Button className={styles.startVisitButton} onClick={launchStartVisitForm} size="lg">
                 {startVisitLabel ? startVisitLabel : t('startVisit', 'Start a visit')}
