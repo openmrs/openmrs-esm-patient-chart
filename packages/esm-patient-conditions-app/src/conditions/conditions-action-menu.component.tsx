@@ -18,7 +18,7 @@ export const ConditionsActionMenu = ({ condition }: conditionsActionMenuProps) =
       launchPatientWorkspace('conditions-form-workspace', {
         workspaceTitle: t('editCondition', 'Edit a Condition'),
         condition,
-        context: 'editing',
+        formContext: 'editing',
       }),
     [condition, t],
   );
@@ -44,7 +44,7 @@ export const ConditionsActionMenu = ({ condition }: conditionsActionMenuProps) =
           id="deleteCondition"
           itemText={t('delete', 'Delete')}
           onClick={() => launchDeleteConditionDialog(condition.id)}
-          isDelete={true}
+          isDelete
           hasDivider
         />
       </OverflowMenu>

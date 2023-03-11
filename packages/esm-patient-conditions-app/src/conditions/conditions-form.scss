@@ -58,3 +58,7 @@
 .conditionLabel {
   @include type.type-style("label-02");
 }
+
+.errorContainer {
+  margin: 1rem;
+}

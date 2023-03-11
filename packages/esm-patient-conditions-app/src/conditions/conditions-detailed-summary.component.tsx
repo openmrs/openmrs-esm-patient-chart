@@ -28,7 +28,7 @@ function ConditionsDetailedSummary({ patient }) {
   const headerTitle = t('conditions', 'Conditions');
   const [filter, setFilter] = useState<'All' | 'Active' | 'Inactive'>('Active');
 
-  const { data: conditions, isError, isLoading, isValidating } = useConditions(patient.id);
+  const { conditions, isError, isLoading, isValidating } = useConditions(patient.id);
 
   const filteredConditions = useMemo(() => {
     if (!filter || filter == 'All') {
@@ -92,11 +92,11 @@ function ConditionsDetailedSummary({ patient }) {
             <div className={styles.filterContainer}>
               <Dropdown
                 id="conditionStatusFilter"
-                initialSelectedItem={t('active', 'Active')}
+                initialSelectedItem="Active"
                 label=""
                 titleText={t('show', 'Show') + ':'}
                 type="inline"
-                items={[t('all', 'All'), t('active', 'Active'), t('inactive', 'Inactive')]}
+                items={['All', 'Active', 'Inactive']}
                 onChange={handleConditionStatusChange}
                 size="sm"
               />
