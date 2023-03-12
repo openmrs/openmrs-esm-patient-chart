@@ -10,6 +10,15 @@ import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
 const mockedOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockedUseConfig = useConfig as jest.Mock;
 
+jest.mock('@openmrs/esm-framework', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-framework');
+
+  return {
+    ...originalModule,
+    userHasAccess: jest.fn().mockImplementation(() => true),
+  };
+});
+
 it('renders an empty state if there are no forms persisted on the server', async () => {
   mockedOpenmrsFetch.mockReturnValue({
     data: { results: [] },
