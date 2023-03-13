@@ -1,9 +1,10 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Accordion, AccordionItem, Checkbox, Button, Search } from '@carbon/react';
 import { TreeViewAlt, Close, Search as SearchIcon } from '@carbon/react/icons';
 import { useConfig, useLayoutType } from '@openmrs/esm-framework';
 import type { FilterNodeProps, FilterLeafProps } from './filter-types';
+import { FilterEmptyState } from '../ui-elements/resetFiltersEmptyState';
 import FilterContext from './filter-context';
 import styles from './filter-set.styles.scss';
 
@@ -24,6 +25,17 @@ const FilterSet: React.FC<FilterSetProps> = ({ hideFilterSetHeader = false }) =>
   const [searchTerm, setSearchTerm] = useState('');
   const [showSearchInput, setShowSearchInput] = useState(false);
 
+  const filteredRoots = useMemo(() => {
+    if (!searchTerm) {
+      return roots;
+    }
+    return roots?.filter(
+      (root) =>
+        root.display.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        root.flatName.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
+  }, [roots, searchTerm]);
+
   return (
     <div className={!tablet ? styles.stickyFilterSet : ''}>
       {!hideFilterSetHeader &&
@@ -31,14 +43,17 @@ const FilterSet: React.FC<FilterSetProps> = ({ hideFilterSetHeader = false }) =>
           <div className={styles.filterSetHeader}>
             <h4>{t('tree', 'Tree')}</h4>
             <div className={styles.filterSetActions}>
-              <Button
-                kind="ghost"
-                size="sm"
-                onClick={resetTree}
-                renderIcon={(props) => <TreeViewAlt size={16} {...props} />}
-              >
-                {t('resetTreeText', 'Reset tree')}
-              </Button>
+              {searchTerm ? (
+                <Button
+                  kind="ghost"
+                  size="sm"
+                  onClick={resetTree}
+                  renderIcon={(props) => <TreeViewAlt size={16} {...props} />}
+                >
+                  {t('resetTreeText', 'Reset tree')}
+                </Button>
+              ) : null}
+
               <Button kind="ghost" size="sm" renderIcon={SearchIcon} onClick={() => setShowSearchInput(true)}>
                 {t('search', 'Search')}
               </Button>
@@ -54,11 +69,15 @@ const FilterSet: React.FC<FilterSetProps> = ({ hideFilterSetHeader = false }) =>
           </div>
         ))}
       <div className={styles.filterSetContent}>
-        {roots?.map((root, index) => (
-          <div className={styles.nestedAccordion} key={`filter-node-${index}`}>
-            <FilterNode root={root} level={0} open={config.concepts[index].defaultOpen} />
-          </div>
-        ))}
+        {filteredRoots.length > 0 ? (
+          filteredRoots?.map((root, index) => (
+            <div className={styles.nestedAccordion} key={`filter-node-${index}`}>
+              <FilterNode root={root} level={0} open={config.concepts[index].defaultOpen} />
+            </div>
+          ))
+        ) : (
+          <FilterEmptyState clearFilter={() => setSearchTerm('')} />
+        )}
       </div>
     </div>
   );
