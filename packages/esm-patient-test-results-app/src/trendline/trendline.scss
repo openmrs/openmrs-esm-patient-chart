@@ -3,6 +3,13 @@
 @import "~@carbon/charts/styles.css";
 @import '~@openmrs/esm-styleguide/src/vars';
 
+.container {
+  :global(.cds--cc--area path.area) {
+    stroke: none;
+    fill: #a7f0ba;
+  }  
+}
+
 .ui-shell-header-modal-bar-default {
   height: 3rem;
   object-fit: contain;
@@ -31,10 +38,6 @@
  //  color: $text-05; // WIP
 }
 
-:global(.cds--cc--area path.area) {
-  stroke: none;
-  fill: #a7f0ba;
-}
 
 .header {
   display: grid;
