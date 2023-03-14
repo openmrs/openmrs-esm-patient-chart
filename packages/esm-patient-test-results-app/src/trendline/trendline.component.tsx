@@ -45,8 +45,7 @@ const TrendlineHeader = ({ patientUuid, title, referenceRange, isValidating, sho
       </div>
       <div className={styles.content}>
         <span className={styles.title}>{title}</span>
-        {/* FIXME: Incorrectly spelt classname. Amend to reference the correct className. */}
-        <span className={styles.referenceange}>{referenceRange}</span>
+        <span className={styles['reference-range']}>{referenceRange}</span>
       </div>
       <div>{isValidating && <InlineLoading className={styles.inlineLoader} />}</div>
     </div>
