@@ -1,4 +1,4 @@
-import { useConfig } from '@openmrs/esm-framework';
+import { useConfig, useLayoutType } from '@openmrs/esm-framework';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { ChartConfig } from '../../config-schema';
 import { useConceptAnswersForVisitAttributeType, useVisitAttributeType } from '../hooks/useVisitAttributeType';
@@ -13,6 +13,7 @@ import {
   Checkbox,
   DatePicker,
   DatePickerInput,
+  Layer,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import styles from './visit-attribute-type.scss';
@@ -102,6 +103,7 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
   } = useConceptAnswersForVisitAttributeType(data?.datatypeConfig);
   const { t } = useTranslation();
   const labelText = !required ? `${data?.display} (${t('optional', 'optional')})` : data?.display;
+  const isTablet = useLayoutType() === 'tablet';
 
   useEffect(() => {
     if (errorFetchingVisitAttributeType || errorFetchingVisitAttributeAnswers) {
@@ -110,6 +112,15 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
       }));
     }
   }, [errorFetchingVisitAttributeAnswers, errorFetchingVisitAttributeType, required, setErrorFetchingResources]);
+
+  useEffect(() => {
+    // Case: If the field's datatypeClass === ConceptDatatype, hence a Select field will be rendered.
+    // If the field is required, the first answer should be selected by default to decrease the
+    // count of clicks made by the user, and hence this useEffect is in place.
+    if (data?.datatypeClassname === 'org.openmrs.customdatatype.datatype.ConceptDatatype' && required) {
+      setVisitAttribute(answers?.[0]?.uuid);
+    }
+  }, [data?.datatypeClassname, required, answers]);
 
   const field = useMemo(() => {
     if (isLoading) {
@@ -236,6 +247,10 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
     return null;
   }
 
-  return <div className={styles.visitAttributeField}>{field}</div>;
+  return (
+    <div className={styles.visitAttributeField}>
+      <Layer level={isTablet ? 1 : 0}>{field}</Layer>
+    </div>
+  );
 };
 export default VisitAttributeTypeFields;
