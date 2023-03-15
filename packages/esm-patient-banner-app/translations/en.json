@@ -4,9 +4,13 @@
   "address": "Address",
   "contactDetails": "Contact Details",
   "deceased": "Deceased",
+  "female": "Female",
   "loading": "Loading...",
+  "male": "Male",
+  "other": "Other",
   "relationships": "Relationships",
   "showAllDetails": "Show all details",
   "showLess": "Show less",
-  "started": "Started"
+  "started": "Started",
+  "unknown": "Unknown"
 }
