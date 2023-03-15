@@ -36,7 +36,7 @@ export const configSchema = {
   },
   showRecommendedFormsTab: {
     _type: Type.Boolean,
-    _description: 'Whether to display recommended forms tab. Requires AMPATH ETL.',
+    _description: 'Whether to display recommended forms tab.',
     _default: false,
   },
   showConfigurableForms: {
