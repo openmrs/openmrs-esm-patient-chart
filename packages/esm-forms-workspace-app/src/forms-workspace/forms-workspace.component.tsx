@@ -38,15 +38,27 @@ const FormsDashboard: React.FC<FormsDashboardProps> = ({ patientUuid, patient, i
           placeholder={t('searchForAForm', 'Search for a form')}
           onChange={(event) => setSearchTerm(event.target.value)}
         />
-        {data?.map((formsSection, i) => {
-          let pageSize = undefined;
-          return (
-            <FormsList
-              {...{ patientUuid, patient, visit: currentVisit, formsSection, searchTerm, pageSize, htmlFormEntryForms }}
-              key={i}
-            />
-          );
-        })}
+        {data
+          ?.filter((s) => {
+            return s.completedFromsInfo?.length > 0;
+          })
+          .map((formsSection, i) => {
+            let pageSize = undefined;
+            return (
+              <FormsList
+                {...{
+                  patientUuid,
+                  patient,
+                  visit: currentVisit,
+                  formsSection,
+                  searchTerm,
+                  pageSize,
+                  htmlFormEntryForms,
+                }}
+                key={i}
+              />
+            );
+          })}
       </div>
     );
   }
