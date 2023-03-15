@@ -1,14 +1,12 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import isEmpty from 'lodash-es/isEmpty';
-import first from 'lodash-es/first';
 import debounce from 'lodash-es/debounce';
+import first from 'lodash-es/first';
 import {
   DataTable,
   DataTableHeader,
   DataTableRow,
   Layer,
-  Search,
   Table,
   TableBody,
   TableCell,
@@ -16,17 +14,23 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TableToolbar,
+  TableToolbarContent,
+  TableToolbarSearch,
   Tile,
 } from '@carbon/react';
 import { Edit } from '@carbon/react/icons';
 import { EmptyDataIllustration, PatientChartPagination, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
-import { isDesktop, formatDatetime, useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { formatDatetime, useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { ConfigObject } from '../config-schema';
 import { CompletedFormInfo } from '../types';
 import { launchFormEntryOrHtmlForms } from '../form-entry-interop';
 import styles from './form-view.scss';
 
+type FormsCategory = 'All' | 'Completed' | 'Recommended';
+
 interface FormViewProps {
+  category?: FormsCategory;
   forms: Array<CompletedFormInfo>;
   patientUuid: string;
   patient: fhir.Patient;
@@ -35,35 +39,46 @@ interface FormViewProps {
   urlLabel: string;
 }
 
-const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSize, pageUrl, urlLabel }) => {
+interface FilterProps {
+  rowIds: Array<string>;
+  headers: Array<Record<string, string>>;
+  cellsById: any;
+  inputValue: string;
+  getCellId: (row, key) => string;
+}
+
+const FormView: React.FC<FormViewProps> = ({ category, forms, patientUuid, patient, pageSize, pageUrl, urlLabel }) => {
   const { t } = useTranslation();
   const config = useConfig() as ConfigObject;
+  const isTablet = useLayoutType() === 'tablet';
   const htmlFormEntryForms = config.htmlFormEntryForms;
-  const layout = useLayoutType();
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
-  const [searchTerm, setSearchTerm] = useState<string>(null);
-  const [allFormInfos, setAllFormInfos] = useState<Array<CompletedFormInfo>>(forms);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredForms = useMemo(() => {
+    if (!searchTerm) {
+      return forms;
+    }
+    return forms.filter((form) => {
+      const formName = form.form.display ?? form.form.name;
+      return formName.toLowerCase().includes(searchTerm.toLowerCase());
+    });
+  }, [forms, searchTerm]);
+
+  const handleSearch = React.useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), 300), []);
+
   const { results, goTo, currentPage } = usePagination(
-    allFormInfos.sort((a, b) => (b.lastCompleted?.getTime() ?? 0) - (a.lastCompleted?.getTime() ?? 0)),
+    filteredForms?.sort((a, b) => (b.lastCompleted?.getTime() ?? 0) - (a.lastCompleted?.getTime() ?? 0)),
     pageSize,
   );
 
-  const handleSearch = useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), 300), []);
-
-  useEffect(() => {
-    const entriesToDisplay = isEmpty(searchTerm)
-      ? forms
-      : forms.filter((formInfo) => formInfo.form.name.toLowerCase().search(searchTerm?.toLowerCase()) !== -1);
-    setAllFormInfos(entriesToDisplay);
-  }, [searchTerm, forms]);
-
   const tableHeaders: Array<DataTableHeader> = useMemo(
     () => [
+      { key: 'formName', header: t('formName', 'Form name (A-Z)') },
       {
         key: 'lastCompleted',
-        header: t('lastCompleted', 'Last Completed'),
+        header: t('lastCompleted', 'Last completed'),
       },
-      { key: 'formName', header: t('formName', 'Form Name (A-Z)') },
     ],
     [t],
   );
@@ -82,70 +97,82 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
     [results],
   );
 
+  if (!forms?.length) {
+    return (
+      <Layer>
+        <Tile className={styles.tile}>
+          <EmptyDataIllustration />
+          <p className={styles.content}>
+            {t('noMatchingFormsAvailable', 'There are no {formCategory} forms to display', {
+              formCategory: category?.toLowerCase(),
+            })}
+          </p>
+          <p className={styles.helper}>{t('formSearchHint', 'Try using an alternative name or keyword')}</p>
+        </Tile>
+      </Layer>
+    );
+  }
+
   return (
     <div className={styles.formContainer}>
-      <Search
-        id="searchInput"
-        labelText=""
-        className={styles.formSearchInput}
-        placeholder={t('searchForForm', 'Search for a form')}
-        onChange={(e) => handleSearch(e.target.value)}
-      />
-      <>
-        {searchTerm?.length > 0 && allFormInfos?.length > 0 && (
-          <p className={styles.formResultsLabel}>
-            {allFormInfos.length} {t('matchesFound', 'match(es) found')}
-          </p>
-        )}
-        {allFormInfos?.length > 0 && (
-          <>
-            <DataTable
-              size={isDesktop(layout) ? 'sm' : 'lg'}
-              rows={tableRows}
-              headers={tableHeaders}
-              isSortable
-              useZebraStyles
-            >
-              {({ rows, headers, getHeaderProps, getTableProps }) => (
-                <TableContainer className={styles.tableContainer}>
-                  <Table {...getTableProps()}>
-                    <TableHead>
-                      <TableRow>
-                        {headers.map((header) => (
-                          <TableHeader
-                            className={`${styles.productiveHeading01} ${styles.text02}`}
-                            {...getHeaderProps({
-                              header,
-                              isSortable: header.isSortable,
-                            })}
-                          >
-                            {header.header?.content ?? header.header}
-                          </TableHeader>
-                        ))}
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {rows.map((row, index) => {
-                        return (
-                          <TableRow key={row.id}>
-                            <TableCell>{row.cells[0].value ?? t('never', 'Never')}</TableCell>
-                            <TableCell className={styles.tableCell}>
-                              <label
-                                onClick={() =>
-                                  launchFormEntryOrHtmlForms(
-                                    currentVisit,
-                                    row.id,
-                                    patient,
-                                    htmlFormEntryForms,
-                                    '',
-                                    results[index].form.display ?? results[index].form.name,
-                                  )
-                                }
-                                role="presentation"
-                                className={styles.formName}
-                              >
-                                {row.cells[1].value}
-                              </label>
+      {forms?.length > 0 && (
+        <>
+          <DataTable headers={tableHeaders} rows={tableRows} size="sm" isSortable useZebraStyles>
+            {({ rows, headers, getHeaderProps, getTableProps }) => (
+              <TableContainer className={styles.tableContainer}>
+                <TableToolbar className={styles.tableToolbar}>
+                  <TableToolbarContent>
+                    <TableToolbarSearch
+                      className={styles.searchInput}
+                      expanded
+                      light
+                      onChange={(event) => handleSearch(event.target.value)}
+                      placeholder={t('searchForAForm', 'Search for a form')}
+                      size={isTablet ? 'md' : 'sm'}
+                    />
+                  </TableToolbarContent>
+                </TableToolbar>
+                <Table {...getTableProps()} className={styles.table}>
+                  <TableHead>
+                    <TableRow>
+                      {headers.map((header) => (
+                        <TableHeader
+                          className={`${styles.heading} ${styles.text02}`}
+                          {...getHeaderProps({
+                            header,
+                            isSortable: header.isSortable,
+                          })}
+                        >
+                          {header.header}
+                        </TableHeader>
+                      ))}
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {rows.map((row, index) => {
+                      return (
+                        <TableRow key={row.id}>
+                          <TableCell>
+                            <label
+                              onClick={() =>
+                                launchFormEntryOrHtmlForms(
+                                  currentVisit,
+                                  row.id,
+                                  patient,
+                                  htmlFormEntryForms,
+                                  '',
+                                  results[index].form.display ?? results[index].form.name,
+                                )
+                              }
+                              role="presentation"
+                              className={styles.formName}
+                            >
+                              {row.cells[0].value}
+                            </label>
+                          </TableCell>
+                          <TableCell>
+                            <div className={styles.tableCell}>
+                              {row.cells[1].value ?? t('never', 'Never')}
                               {row.cells[0].value && (
                                 <Edit
                                   size={20}
@@ -162,38 +189,38 @@ const FormView: React.FC<FormViewProps> = ({ forms, patientUuid, patient, pageSi
                                   }
                                 />
                               )}
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              )}
-            </DataTable>
-            <PatientChartPagination
-              pageNumber={currentPage}
-              totalItems={allFormInfos.length}
-              currentItems={results.length}
-              pageSize={pageSize}
-              onPageNumberChange={({ page }) => goTo(page)}
-              dashboardLinkUrl={pageUrl}
-              dashboardLinkLabel={urlLabel}
-            />
-          </>
-        )}
-        {isEmpty(allFormInfos) ? (
-          <Layer>
-            <Tile className={styles.tile}>
-              <EmptyDataIllustration />
-              <p className={styles.content}>{t('noFormsAvailable', 'There are no matching forms to display')}</p>
-              <p className={styles.helper}>
-                {t('formSearchHint', 'Try searching for the form using an alternative name or keyword')}
-              </p>
-            </Tile>
-          </Layer>
-        ) : null}
-      </>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+                {rows.length === 0 ? (
+                  <div className={styles.tileContainer}>
+                    <Tile className={styles.tile}>
+                      <div className={styles.tileContent}>
+                        <p className={styles.content}>
+                          {t('noMatchingFormsToDisplay', 'No matching forms to display')}
+                        </p>
+                      </div>
+                    </Tile>
+                  </div>
+                ) : null}
+              </TableContainer>
+            )}
+          </DataTable>
+          <PatientChartPagination
+            pageNumber={currentPage}
+            totalItems={filteredForms?.length}
+            currentItems={results.length}
+            pageSize={pageSize}
+            onPageNumberChange={({ page }) => goTo(page)}
+            dashboardLinkUrl={pageUrl}
+            dashboardLinkLabel={urlLabel}
+          />
+        </>
+      )}
     </div>
   );
 };

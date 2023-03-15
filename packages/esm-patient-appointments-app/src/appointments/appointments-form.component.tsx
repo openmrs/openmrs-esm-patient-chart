@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSWRConfig } from 'swr';
 import dayjs from 'dayjs';
 import {
   Button,
@@ -17,28 +16,50 @@ import {
   TimePickerSelect,
   TimePicker,
 } from '@carbon/react';
-import { amPm, convertTime12to24, DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
+import { amPm, convertTime12to24 } from '@openmrs/esm-patient-common-lib';
 import { useLocations, useSession, showToast, showNotification, useLayoutType } from '@openmrs/esm-framework';
-import { appointmentsSearchUrl, createAppointment, useAppointmentService } from './appointments.resource';
-import { AppointmentPayload } from '../types';
+import { saveAppointment, useAppointments, useAppointmentService } from './appointments.resource';
+import { Appointment, AppointmentPayload } from '../types';
 import styles from './appointments-form.scss';
 
 const appointmentTypes = [{ name: 'Scheduled' }, { name: 'WalkIn' }];
 
-const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace }) => {
+interface AppointmentsFormProps {
+  appointment?: Appointment;
+  patientUuid?: string;
+  context?: string;
+  closeWorkspace: () => void;
+}
+
+const AppointmentsForm: React.FC<AppointmentsFormProps> = ({ patientUuid, closeWorkspace, appointment, context }) => {
+  const editedAppointmentTimeFormat = new Date(appointment?.startDateTime).getHours() >= 12 ? 'PM' : 'AM';
+
+  const defaultTimeFormat = appointment?.startDateTime
+    ? editedAppointmentTimeFormat
+    : new Date().getHours() >= 12
+    ? 'PM'
+    : 'AM';
+
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const { mutate } = useSWRConfig();
   const locations = useLocations();
   const session = useSession();
-  const [appointmentNote, setAppointmentNote] = useState('');
-  const [selectedAppointmentType, setSelectedAppointmentType] = useState('');
-  const [selectedService, setSelectedService] = useState('');
-  const [selectedServiceType, setSelectedServiceType] = useState('');
-  const [startDate, setStartDate] = useState(new Date());
-  const [startTime, setStartTime] = useState(dayjs(new Date()).format('hh:mm'));
-  const [timeFormat, setTimeFormat] = useState<amPm>(new Date().getHours() >= 12 ? 'PM' : 'AM');
-  const [userLocation, setUserLocation] = useState('');
+  const [appointmentNote, setAppointmentNote] = useState(appointment?.comments || '');
+  const [selectedAppointmentType, setSelectedAppointmentType] = useState(appointment?.appointmentKind || '');
+  const [selectedService, setSelectedService] = useState(appointment?.service?.name || '');
+  const [startDate, setStartDate] = useState(
+    appointment?.startDateTime ? new Date(appointment?.startDateTime) : new Date(),
+  );
+  const [startTime, setStartTime] = useState(
+    appointment?.startDateTime
+      ? dayjs(new Date(appointment?.startDateTime)).format('hh:mm')
+      : dayjs(new Date()).format('hh:mm'),
+  );
+  const [timeFormat, setTimeFormat] = useState<amPm>(defaultTimeFormat);
+  const [userLocation, setUserLocation] = useState(appointment?.location?.uuid || '');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { mutate } = useAppointments(patientUuid, new Date().toUTCString(), new AbortController());
 
   if (!userLocation && session?.sessionLocation?.uuid) {
     setUserLocation(session?.sessionLocation?.uuid);
@@ -46,16 +67,13 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
 
   const { data: services, isLoading } = useAppointmentService();
 
-  let serviceTypes;
-  if (services?.length) {
-    [{ serviceTypes }] = services;
-  }
+  // Same for creating and editing
+  const handleSaveAppointment = () => {
+    setIsSubmitting(true);
 
-  const handleSubmit = () => {
-    const serviceType = serviceTypes.find((service) => service.name === selectedServiceType);
-
-    const serviceUuid = services.find((service) => service.name === selectedService)?.uuid;
-    const serviceDuration = services.find((service) => service.name === selectedService)?.durationMins;
+    // Construct payload
+    const serviceUuid = services?.find((service) => service.name === selectedService)?.uuid;
+    const serviceDuration = services?.find((service) => service.name === selectedService)?.durationMins;
 
     const [hours, minutes] = convertTime12to24(startTime, timeFormat);
 
@@ -79,30 +97,39 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
       startDateTime: dayjs(startDatetime).format(),
       endDateTime: dayjs(endDatetime).format(),
       providerUuid: session?.currentProvider?.uuid,
-      providers: [{ uuid: session.currentProvider.uuid, comments: appointmentNote }],
+      providers: [{ uuid: session.currentProvider.uuid }],
       locationUuid: userLocation,
       patientUuid: patientUuid,
+      comments: appointmentNote,
+      uuid: context === 'editing' ? appointment.uuid : undefined,
     };
 
     const abortController = new AbortController();
-    createAppointment(appointmentPayload, abortController).then(
+    saveAppointment(appointmentPayload, abortController).then(
       ({ status }) => {
         if (status === 200) {
+          setIsSubmitting(false);
           closeWorkspace();
+          mutate();
 
           showToast({
             critical: true,
             kind: 'success',
             description: t('appointmentNowVisible', 'It is now visible on the Appointments page'),
-            title: t('appointmentScheduled', 'Appointment scheduled'),
+            title:
+              context === 'editing'
+                ? t('appointmentEdited', 'Appointment edited')
+                : t('appointmentScheduled', 'Appointment scheduled'),
           });
         }
-
-        mutate(`${appointmentsSearchUrl}`);
       },
       (error) => {
+        setIsSubmitting(false);
         showNotification({
-          title: t('appointmentFormError', 'Error scheduling appointment'),
+          title:
+            context === 'editing'
+              ? t('appointmentEditError', 'Error editing appointment')
+              : t('appointmentFormError', 'Error scheduling appointment'),
           kind: 'error',
           critical: true,
           description: error?.message,
@@ -115,13 +142,14 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
     return (
       <InlineLoading className={styles.loader} description={`${t('loading', 'Loading')} ...`} role="progressbar" />
     );
+
   return (
     <Form className={styles.formWrapper}>
       <Stack gap={4}>
         <section className={styles.formGroup}>
           <span>{t('location', 'Location')}</span>
-          {isTablet ? (
-            <Layer>
+          <div className={styles.selectContainer}>
+            <ResponsiveWrapper isTablet={isTablet}>
               <Select
                 id="location"
                 invalidText="Required"
@@ -137,24 +165,8 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
                     </SelectItem>
                   ))}
               </Select>
-            </Layer>
-          ) : (
-            <Select
-              id="location"
-              invalidText="Required"
-              labelText={t('selectLocation', 'Select a location')}
-              onChange={(event) => setUserLocation(event.target.value)}
-              value={userLocation}
-            >
-              {!userLocation ? <SelectItem text={t('chooseLocation', 'Choose a location')} value="" /> : null}
-              {locations?.length > 0 &&
-                locations.map((location) => (
-                  <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
-                    {location.display}
-                  </SelectItem>
-                ))}
-            </Select>
-          )}
+            </ResponsiveWrapper>
+          </div>
         </section>
         <section className={styles.formGroup}>
           <span>{t('dateTime', 'Date & Time')}</span>
@@ -173,29 +185,8 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
                 placeholder="dd/mm/yyyy"
               />
             </DatePicker>
-            {isTablet ? (
-              <Layer>
-                <TimePicker
-                  pattern="([\d]+:[\d]{2})"
-                  onChange={(event) => setStartTime(event.target.value)}
-                  value={startTime}
-                  style={{ marginLeft: '0.125rem', flex: 'none' }}
-                  labelText={t('time', 'Time')}
-                  id="time-picker"
-                >
-                  <TimePickerSelect
-                    id="time-picker-select-1"
-                    onChange={(event) => setTimeFormat(event.target.value as amPm)}
-                    value={timeFormat}
-                    labelText={t('time', 'Time')}
-                    aria-label={t('time', 'Time')}
-                  >
-                    <SelectItem value="AM" text="AM" />
-                    <SelectItem value="PM" text="PM" />
-                  </TimePickerSelect>
-                </TimePicker>
-              </Layer>
-            ) : (
+
+            <ResponsiveWrapper isTablet={isTablet}>
               <TimePicker
                 pattern="([\d]+:[\d]{2})"
                 onChange={(event) => setStartTime(event.target.value)}
@@ -208,81 +199,64 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
                   id="time-picker-select-1"
                   onChange={(event) => setTimeFormat(event.target.value as amPm)}
                   value={timeFormat}
-                  labelText={t('time', 'Time')}
                   aria-label={t('time', 'Time')}
                 >
                   <SelectItem value="AM" text="AM" />
                   <SelectItem value="PM" text="PM" />
                 </TimePickerSelect>
               </TimePicker>
-            )}
+            </ResponsiveWrapper>
           </div>
         </section>
         <section className={styles.formGroup}>
           <span>{t('service', 'Service')}</span>
-          <Select
-            id="service"
-            invalidText="Required"
-            labelText={t('selectService', 'Select a service')}
-            light={isTablet}
-            onChange={(event) => setSelectedService(event.target.value)}
-            value={selectedServiceType}
-          >
-            {!selectedService ? <SelectItem text={t('chooseService', 'Select service')} value="" /> : null}
-            {services?.length > 0 &&
-              services.map((service) => (
-                <SelectItem key={service.uuid} text={service.name} value={service.name}>
-                  {service.name}
-                </SelectItem>
-              ))}
-          </Select>
-        </section>
-        <section className={styles.formGroup}>
-          <span>{t('serviceType', 'Service Type')}</span>
-          <Select
-            id="serviceType"
-            invalidText="Required"
-            labelText="Select the type of service"
-            light={isTablet}
-            onChange={(event) => setSelectedServiceType(event.target.value)}
-            value={selectedServiceType}
-          >
-            {!selectedServiceType ? <SelectItem text={t('chooseService', 'Select service type')} value="" /> : null}
-            {serviceTypes?.length > 0 &&
-              serviceTypes.map((serviceType) => (
-                <SelectItem key={serviceType.uuid} text={serviceType.name} value={serviceType.name}>
-                  {serviceType.name}
-                </SelectItem>
-              ))}
-          </Select>
+          <ResponsiveWrapper isTablet={isTablet}>
+            <Select
+              id="service"
+              invalidText="Required"
+              labelText={t('selectService', 'Select a service')}
+              onChange={(event) => setSelectedService(event.target.value)}
+              value={selectedService}
+            >
+              {!selectedService ? <SelectItem text={t('chooseService', 'Select service')} value="" /> : null}
+              {services?.length > 0 &&
+                services.map((service) => (
+                  <SelectItem key={service.uuid} text={service.name} value={service.name}>
+                    {service.name}
+                  </SelectItem>
+                ))}
+            </Select>
+          </ResponsiveWrapper>
         </section>
         <section className={styles.formGroup}>
           <span>{t('appointmentType', 'Appointment Type')}</span>
-          <Select
-            disabled={!appointmentTypes?.length}
-            id="appointmentType"
-            invalidText="Required"
-            labelText={t('selectAppointmentType', 'Select the type of appointment')}
-            light={isTablet}
-            onChange={(event) => setSelectedAppointmentType(event.target.value)}
-            value={selectedAppointmentType}
-          >
-            {!selectedAppointmentType ? (
-              <SelectItem text={t('chooseAppointmentType', 'Choose appointment type')} value="" />
-            ) : null}
-            {appointmentTypes?.length > 0 &&
-              appointmentTypes.map((appointmentType, index) => (
-                <SelectItem key={index} text={appointmentType.name} value={appointmentType.name}>
-                  {appointmentType.name}
-                </SelectItem>
-              ))}
-          </Select>
+          <ResponsiveWrapper isTablet={isTablet}>
+            <Select
+              disabled={!appointmentTypes?.length}
+              id="appointmentType"
+              invalidText="Required"
+              labelText={t('selectAppointmentType', 'Select the type of appointment')}
+              onChange={(event) => setSelectedAppointmentType(event.target.value)}
+              value={selectedAppointmentType}
+            >
+              {!selectedAppointmentType ? (
+                <SelectItem text={t('chooseAppointmentType', 'Choose appointment type')} value="" />
+              ) : null}
+              {appointmentTypes?.length > 0 &&
+                appointmentTypes.map((appointmentType, index) => (
+                  <SelectItem key={index} text={appointmentType.name} value={appointmentType.name}>
+                    {appointmentType.name}
+                  </SelectItem>
+                ))}
+            </Select>
+          </ResponsiveWrapper>
         </section>
         <section className={styles.formGroup}>
           <span>{t('note', 'Note')}</span>
           <TextArea
             id="appointmentNote"
             light={isTablet}
+            value={appointmentNote}
             labelText={t('appointmentNoteLabel', 'Write an additional note')}
             placeholder={t('appointmentNotePlaceholder', 'Write any additional points here')}
             onChange={(event) => setAppointmentNote(event.target.value)}
@@ -293,12 +267,16 @@ const AppointmentsForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeW
         <Button className={styles.button} onClick={closeWorkspace} kind="secondary">
           {t('discard', 'Discard')}
         </Button>
-        <Button className={styles.button} disabled={!selectedService} onClick={handleSubmit}>
+        <Button className={styles.button} disabled={!selectedService || isSubmitting} onClick={handleSaveAppointment}>
           {t('saveAndClose', 'Save and close')}
         </Button>
       </ButtonSet>
     </Form>
   );
 };
+
+function ResponsiveWrapper({ children, isTablet }) {
+  return isTablet ? <Layer>{children}</Layer> : <div>{children}</div>;
+}
 
 export default AppointmentsForm;

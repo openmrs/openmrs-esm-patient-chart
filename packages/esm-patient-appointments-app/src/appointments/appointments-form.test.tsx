@@ -7,7 +7,7 @@ import { openmrsFetch, showNotification, showToast } from '@openmrs/esm-framewor
 import { mockSessionDataResponse } from '../../../../__mocks__/session.mock';
 import { mockAppointmentsData, mockUseAppointmentServiceData } from '../../../../__mocks__/appointments.mock';
 import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
-import { createAppointment } from './appointments.resource';
+import { saveAppointment } from './appointments.resource';
 import AppointmentForm from './appointments-form.component';
 
 const testProps = {
@@ -16,7 +16,7 @@ const testProps = {
   promptBeforeClosing: jest.fn(),
 };
 
-const mockCreateAppointment = createAppointment as jest.Mock;
+const mockCreateAppointment = saveAppointment as jest.Mock;
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockShowNotification = showNotification as jest.Mock;
 const mockShowToast = showToast as jest.Mock;
@@ -36,13 +36,13 @@ jest.mock('./appointments.resource', () => {
 
   return {
     ...originalModule,
-    createAppointment: jest.fn(),
+    saveAppointment: jest.fn(),
   };
 });
 
 describe('AppointmentForm', () => {
   it('renders the appointments form showing all the relevant fields and values', async () => {
-    mockOpenmrsFetch.mockReturnValueOnce(mockUseAppointmentServiceData);
+    mockOpenmrsFetch.mockReturnValue(mockUseAppointmentServiceData);
 
     renderAppointmentsForm();
 
@@ -51,7 +51,6 @@ describe('AppointmentForm', () => {
     expect(screen.getByLabelText(/Select a location/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Date/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Select a service/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Select the type of service/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Select the type of appointment/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/Write an additional note/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/Write any additional points here/i)).toBeInTheDocument();
@@ -72,7 +71,7 @@ describe('AppointmentForm', () => {
   it('closes the form and the workspace when the cancel button is clicked', async () => {
     const user = userEvent.setup();
 
-    mockOpenmrsFetch.mockReturnValueOnce(mockAppointmentsData);
+    mockOpenmrsFetch.mockReturnValueOnce(mockUseAppointmentServiceData);
 
     renderAppointmentsForm();
 
@@ -87,8 +86,8 @@ describe('AppointmentForm', () => {
   it('renders a success toast notification upon successfully scheduling an appointment', async () => {
     const user = userEvent.setup();
 
-    mockOpenmrsFetch.mockReturnValueOnce({ data: mockUseAppointmentServiceData });
-    mockCreateAppointment.mockResolvedValueOnce({ status: 200, statusText: 'Ok' });
+    mockOpenmrsFetch.mockReturnValue({ data: mockUseAppointmentServiceData });
+    mockCreateAppointment.mockResolvedValue({ status: 200, statusText: 'Ok' });
 
     renderAppointmentsForm();
 
@@ -99,7 +98,6 @@ describe('AppointmentForm', () => {
     const timeInput = screen.getByRole('textbox', { name: /Time/i });
     const timeFormat = screen.getByRole('combobox', { name: /Time/i });
     const serviceSelect = screen.getByRole('combobox', { name: /Select a service/i });
-    const serviceTypeSelect = screen.getByRole('combobox', { name: /Select the type of service/i });
     const appointmentTypeSelect = screen.getByRole('combobox', { name: /Select the type of appointment/i });
 
     expect(saveButton).toBeDisabled();
@@ -110,7 +108,6 @@ describe('AppointmentForm', () => {
     await waitFor(() => user.type(timeInput, '09:30'));
     await waitFor(() => user.selectOptions(timeFormat, 'AM'));
     await waitFor(() => user.selectOptions(serviceSelect, ['Outpatient']));
-    await waitFor(() => user.selectOptions(serviceTypeSelect, ['Chemotherapy']));
     await waitFor(() => user.selectOptions(appointmentTypeSelect, ['Scheduled']));
 
     expect(saveButton).not.toBeDisabled();
@@ -121,9 +118,10 @@ describe('AppointmentForm', () => {
     expect(mockCreateAppointment).toHaveBeenCalledWith(
       expect.objectContaining({
         appointmentKind: 'Scheduled',
+        comments: '',
         serviceUuid: mockUseAppointmentServiceData[0].uuid,
         providerUuid: mockSessionDataResponse.data.currentProvider.uuid,
-        providers: [{ uuid: mockSessionDataResponse.data.currentProvider.uuid, comments: '' }],
+        providers: [{ uuid: mockSessionDataResponse.data.currentProvider.uuid }],
         locationUuid: mockLocationsDataResponse.data.results[1].uuid,
         patientUuid: mockPatient.id,
       }),
@@ -164,7 +162,6 @@ describe('AppointmentForm', () => {
     const timeInput = screen.getByRole('textbox', { name: /Time/i });
     const timeFormat = screen.getByRole('combobox', { name: /Time/i });
     const serviceSelect = screen.getByRole('combobox', { name: /Select a service/i });
-    const serviceTypeSelect = screen.getByRole('combobox', { name: /Select the type of service/i });
     const appointmentTypeSelect = screen.getByRole('combobox', { name: /Select the type of appointment/i });
 
     await waitFor(() => user.clear(dateInput));
@@ -173,7 +170,6 @@ describe('AppointmentForm', () => {
     await waitFor(() => user.type(timeInput, '09:30'));
     await waitFor(() => user.selectOptions(timeFormat, 'AM'));
     await waitFor(() => user.selectOptions(serviceSelect, ['Outpatient']));
-    await waitFor(() => user.selectOptions(serviceTypeSelect, ['Chemotherapy']));
     await waitFor(() => user.selectOptions(appointmentTypeSelect, ['Scheduled']));
     await waitFor(() => user.click(saveButton));
 

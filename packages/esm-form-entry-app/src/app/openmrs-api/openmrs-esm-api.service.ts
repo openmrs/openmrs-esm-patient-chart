@@ -1,20 +1,17 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { getCurrentUser, openmrsObservableFetch } from '@openmrs/esm-framework';
+import { getCurrentUser, LoggedInUser, openmrsObservableFetch, Session } from '@openmrs/esm-framework';
 
 @Injectable()
 export class OpenmrsEsmApiService {
   constructor() {}
 
-  public getCurrentUser(): Observable<any> {
-    return getCurrentUser();
-  }
-  public openmrsFetch(url): Observable<any> {
-    return openmrsObservableFetch(url);
+  public getCurrentUser(): Observable<LoggedInUser> {
+    return getCurrentUser().pipe(map((session: Session) => session.user));
   }
 
-  public getCurrentUserLocation(): Observable<any> {
-    return this.openmrsFetch('/ws/rest/v1/session').pipe(map((resp) => resp.data));
+  public openmrsFetch(url): Observable<any> {
+    return openmrsObservableFetch(url);
   }
 }

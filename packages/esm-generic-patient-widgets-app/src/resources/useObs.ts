@@ -4,18 +4,21 @@ import { openmrsFetch, fhirBaseUrl, useConfig, FHIRResource, FHIRCode } from '@o
 export const pageSize = 100;
 
 export function useObs(patientUuid: string): UseObsResult {
-  const { data } = useConfig();
+  const { encounterTypes, data } = useConfig();
+
+  const urlEncounterTypes: string = encounterTypes.length ? `&encounter.type=${encounterTypes.toString()}` : '';
 
   const {
     data: result,
     error,
+    isLoading,
     isValidating,
   } = useSWR<{ data: ObsFetchResponse }, Error>(
     `${fhirBaseUrl}/Observation?subject:Patient=${patientUuid}&code=` +
       data.map((d) => d.concept).join(',') +
       '&_summary=data&_sort=-date' +
-      `&_count=${pageSize}
-  `,
+      `&_count=${pageSize}` +
+      urlEncounterTypes,
     openmrsFetch,
   );
 
@@ -25,6 +28,10 @@ export function useObs(patientUuid: string): UseObsResult {
         ...entry.resource,
         conceptUuid: entry.resource.code.coding.filter((c) => isUuid(c.code))[0]?.code,
       };
+
+      if (entry.resource.hasOwnProperty('valueDateTime')) {
+        observation.dataType = 'DateTime';
+      }
 
       if (entry.resource.hasOwnProperty('valueString')) {
         observation.dataType = 'Text';
@@ -44,7 +51,7 @@ export function useObs(patientUuid: string): UseObsResult {
   return {
     data: observations,
     error: error,
-    isLoading: !result && !error,
+    isLoading,
     isValidating,
   };
 }
@@ -72,6 +79,7 @@ export interface UseObsResult {
 type ObsResult = FHIRResource['resource'] & {
   conceptUuid: string;
   dataType?: string;
+  valueDateTime?: string;
 };
 
 function isUuid(input: string) {

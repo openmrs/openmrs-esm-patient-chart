@@ -68,13 +68,14 @@ describe('EncounterList', () => {
     });
 
     const expectedTableRows = [
-      /18-Jan-2022, 04:25 PM Facility Visit Admission/,
-      /03-Aug-2021, 12:47 AM Facility Visit Visit Note User One/,
-      /05-Jul-2021, 10:07 AM Facility Visit Visit Note Dennis The Doctor/,
+      /18-Jan-2022, 04:25\s+PM Facility Visit Admission/,
+      /03-Aug-2021, 12:47\s+AM Facility Visit Visit Note User One/,
+      /05-Jul-2021, 10:07\s+AM Facility Visit Consultation Dennis The Doctor/,
     ];
     expectedTableRows.forEach((row) => {
       expect(screen.getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument();
     });
+
     expect(screen.getByRole('button', { name: /previous page/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /next page/i })).toBeInTheDocument();
     expect(screen.getAllByRole('button', { name: /expand current row/i }).length).toEqual(3);
@@ -92,18 +93,16 @@ describe('EncounterList', () => {
     await waitFor(() => user.click(encounterTypeFilter));
     await waitFor(() => user.click(screen.getByRole('option', { name: /all/i })));
 
-    expect(screen.getAllByText(/visit note/i).length).toEqual(2);
-
     // filter table by typing in the searchbox
-    await waitFor(() => user.type(searchbox, 'Dennis'));
+    await waitFor(() => user.type(searchbox, 'Visit Note'));
 
-    expect(screen.getByText(/dennis/i)).toBeInTheDocument();
-    expect(screen.queryByText(/user one/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/visit note/i)).toBeInTheDocument();
+    expect(screen.queryByText(/consultation/i)).not.toBeInTheDocument();
 
     await waitFor(() => user.clear(searchbox));
-    await waitFor(() => user.type(searchbox, 'luke skywalker'));
+    await waitFor(() => user.type(searchbox, 'triage'));
 
-    expect(screen.getByText(/no patients to display/i)).toBeInTheDocument();
+    expect(screen.getByText(/no encounters to display/i)).toBeInTheDocument();
     expect(screen.getByText(/check the filters above/i)).toBeInTheDocument();
   });
 });

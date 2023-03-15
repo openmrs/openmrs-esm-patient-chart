@@ -19,7 +19,7 @@ const DeleteAttachmentConfirmation: React.FC<DeleteAttachmentConfirmationProps> 
 
   return (
     <>
-      <ModalHeader className={styles.productiveHeading03}>
+      <ModalHeader closeModal={close} className={styles.productiveHeading03}>
         {t('delete', 'Delete')} {attachment.bytesContentFamily.toLowerCase()} ?
       </ModalHeader>
       <ModalBody>

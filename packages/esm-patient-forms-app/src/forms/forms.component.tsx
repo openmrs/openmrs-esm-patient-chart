@@ -14,11 +14,7 @@ import EmptyFormView from './empty-form.component';
 import FormView from './form-view.component';
 import styles from './forms.scss';
 
-const enum FormsCategory {
-  Recommended,
-  Completed,
-  All,
-}
+type FormsCategory = 'All' | 'Completed' | 'Recommended';
 
 interface FormsProps {
   patientUuid: string;
@@ -35,9 +31,7 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
   const { htmlFormEntryForms, showRecommendedFormsTab, showConfigurableForms } = useConfig() as ConfigObject;
   const headerTitle = t('forms', 'Forms');
   const isTablet = useLayoutType() === 'tablet';
-  const [formsCategory, setFormsCategory] = useState(
-    showRecommendedFormsTab ? FormsCategory.Recommended : FormsCategory.All,
-  );
+  const [formsCategory, setFormsCategory] = useState<FormsCategory>(showRecommendedFormsTab ? 'Recommended' : 'All');
   const { isValidating, data, error } = useForms(patientUuid, undefined, undefined, isOffline);
   const session = useSession();
   let formsToDisplay = isOffline
@@ -48,6 +42,14 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
   );
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const { programConfigs } = useProgramConfig(patientUuid, showRecommendedFormsTab);
+
+  const completedForms = useMemo(
+    () =>
+      formsToDisplay?.filter(
+        ({ associatedEncounters, lastCompleted }) => associatedEncounters.length > 0 && dayjs(lastCompleted).isToday(),
+      ),
+    [formsToDisplay],
+  );
 
   const recommendedForms = useMemo(
     () =>
@@ -104,19 +106,17 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
             onChange={(event) => setFormsCategory(event.name as any)}
             selectedIndex={formsCategory}
           >
-            <Switch name={FormsCategory.Recommended} text="Recommended" />
-            <Switch name={FormsCategory.Completed} text="Completed" />
-            <Switch name={FormsCategory.All} text="All" />
+            <Switch name={'All'} text={t('all', 'All')} />
+            <Switch name={'Recommended'} text={t('recommended', 'Recommended')} />
+            <Switch name={'Completed'} text={t('completed', 'Completed')} />
           </ContentSwitcher>
         </div>
       </CardHeader>
       <div style={{ width: '100%' }}>
-        {formsCategory === FormsCategory.Completed && (
+        {formsCategory === 'Completed' && (
           <FormView
-            forms={formsToDisplay.filter(
-              ({ associatedEncounters, lastCompleted }) =>
-                associatedEncounters.length > 0 && dayjs(lastCompleted).isToday(),
-            )}
+            category={'Completed'}
+            forms={completedForms}
             patientUuid={patientUuid}
             patient={patient}
             pageSize={pageSize}
@@ -124,19 +124,20 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
             urlLabel={urlLabel}
           />
         )}
-        {formsCategory === FormsCategory.All && (
+        {formsCategory === 'Recommended' && (
+          <FormView
+            category={'Recommended'}
+            forms={recommendedForms}
+            patientUuid={patientUuid}
+            patient={patient}
+            pageSize={pageSize}
+            pageUrl={pageUrl}
+            urlLabel={urlLabel}
+          />
+        )}
+        {formsCategory === 'All' && (
           <FormView
             forms={formsToDisplay}
-            patientUuid={patientUuid}
-            patient={patient}
-            pageSize={pageSize}
-            pageUrl={pageUrl}
-            urlLabel={urlLabel}
-          />
-        )}
-        {formsCategory === FormsCategory.Recommended && (
-          <FormView
-            forms={recommendedForms}
             patientUuid={patientUuid}
             patient={patient}
             pageSize={pageSize}

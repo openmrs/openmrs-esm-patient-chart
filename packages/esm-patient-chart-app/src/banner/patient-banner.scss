@@ -60,6 +60,19 @@
 .identifiers {
   @include type.type-style("body-compact-02");
   color: $ui-04;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.identifierTag {
+  display: flex;
+  align-items: center;
+  margin-right: 0.75rem;
+
+}
+
+.tag {
+  margin: 0.25rem 0.25rem 0.25rem 0rem;
 }
 
 .tooltipPadding {

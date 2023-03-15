@@ -1,19 +1,20 @@
 import React, { SyntheticEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSWRConfig } from 'swr';
 import {
   createErrorHandler,
-  fhirBaseUrl,
   showToast,
   showNotification,
   useConfig,
   useLayoutType,
   useSession,
+  ExtensionSlot,
+  usePatient,
+  useVisit,
 } from '@openmrs/esm-framework';
 import { DefaultWorkspaceProps, useVitalsConceptMetadata } from '@openmrs/esm-patient-common-lib';
 import { Button, ButtonSet, Column, Form, Row, Stack } from '@carbon/react';
 import { calculateBMI, isInNormalRange } from './vitals-biometrics-form.utils';
-import { savePatientVitals } from '../vitals.resource';
+import { savePatientVitals, useVitals } from '../vitals.resource';
 import { ConfigObject } from '../../config-schema';
 import VitalsBiometricInput from './vitals-biometrics-input.component';
 import styles from './vitals-biometrics-form.scss';
@@ -35,67 +36,92 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
+  const patient = usePatient(patientUuid);
+  const { currentVisit } = useVisit(patientUuid);
+  const { mutate } = useVitals(patientUuid);
   const config = useConfig() as ConfigObject;
-  const { cache, mutate }: { cache: any; mutate: Function } = useSWRConfig();
-  const { data: conceptUnits, conceptMetadata } = useVitalsConceptMetadata();
+  const { data: conceptUnits, conceptMetadata, conceptRanges } = useVitalsConceptMetadata();
   const biometricsUnitsSymbols = config.biometrics;
   const [patientVitalAndBiometrics, setPatientVitalAndBiometrics] = useState<PatientVitalsAndBiometrics>();
   const [patientBMI, setPatientBMI] = useState<number>();
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const encounterUuid = currentVisit?.encounters?.find((enc) => enc?.form?.uuid === config.vitals.formUuid)?.uuid;
 
   const isBMIInNormalRange = (value: number | undefined | string) => {
     if (value === undefined || value === '') return true;
     return value >= 18.5 && value <= 24.9;
   };
 
+  const concepts = {
+    midUpperArmCircumferenceRange: conceptRanges.get(config.concepts.midUpperArmCircumferenceUuid),
+    diastolicBloodPressureRange: conceptRanges.get(config.concepts.diastolicBloodPressureUuid),
+    systolicBloodPressureRange: conceptRanges.get(config.concepts.systolicBloodPressureUuid),
+    oxygenSaturationRange: conceptRanges.get(config.concepts.oxygenSaturationUuid),
+    respiratoryRateRange: conceptRanges.get(config.concepts.respiratoryRateUuid),
+    temperatureRange: conceptRanges.get(config.concepts.temperatureUuid),
+    weightRange: conceptRanges.get(config.concepts.weightUuid),
+    heightRange: conceptRanges.get(config.concepts.heightUuid),
+    pulseRange: conceptRanges.get(config.concepts.pulseUuid),
+  };
+
   const savePatientVitalsAndBiometrics = (event: SyntheticEvent) => {
     event.preventDefault();
-    setIsSubmitting(true);
-    const ac = new AbortController();
-    savePatientVitals(
-      config.vitals.encounterTypeUuid,
-      config.vitals.formUuid,
-      config.concepts,
-      patientUuid,
-      patientVitalAndBiometrics,
-      new Date(),
-      ac,
-      session?.sessionLocation?.uuid,
-    )
-      .then((response) => {
-        if (response.status === 201) {
-          closeWorkspace();
-
-          showToast({
-            critical: true,
-            kind: 'success',
-            title: t('vitalsAndBiometricsRecorded', 'Vitals and Biometrics saved'),
-            description: t('vitalsAndBiometricsNowAvailable', 'They are now visible on the Vitals and Biometrics page'),
-          });
-
-          const apiUrlPattern = new RegExp(
-            fhirBaseUrl + '\\/Observation\\?subject\\:Patient\\=' + patientUuid + '\\&code\\=',
-          );
-
-          // Find matching keys from SWR's cache and broadcast a revalidation message to their pre-bound SWR hooks
-          Array.from(cache.keys())
-            .filter((url: string) => apiUrlPattern.test(url))
-            .forEach((url: string) => mutate(url));
-        }
-      })
-      .catch((err) => {
-        createErrorHandler();
-
+    let isFieldValid = true;
+    for (let key in patientVitalAndBiometrics) {
+      if (isInNormalRange(conceptMetadata, config.concepts[key + 'Uuid'], patientVitalAndBiometrics[key]) == false) {
+        isFieldValid = false;
         showNotification({
           title: t('vitalsAndBiometricsSaveError', 'Error saving vitals and biometrics'),
           kind: 'error',
           critical: true,
-          description: err?.message,
+          description: t('checkForValidity', 'Some of the values entered are invalid'),
         });
-      })
-      .finally(() => {
-        ac.abort();
-      });
+        break;
+      }
+    }
+    if (isFieldValid) {
+      setIsSubmitting(true);
+      const ac = new AbortController();
+      savePatientVitals(
+        config.vitals.encounterTypeUuid,
+        config.vitals.formUuid,
+        config.concepts,
+        patientUuid,
+        patientVitalAndBiometrics,
+        new Date(),
+        ac,
+        session?.sessionLocation?.uuid,
+      )
+        .then((response) => {
+          if (response.status === 201) {
+            mutate();
+            closeWorkspace();
+
+            showToast({
+              critical: true,
+              kind: 'success',
+              title: t('vitalsAndBiometricsRecorded', 'Vitals and Biometrics saved'),
+              description: t(
+                'vitalsAndBiometricsNowAvailable',
+                'They are now visible on the Vitals and Biometrics page',
+              ),
+            });
+          }
+        })
+        .catch((err) => {
+          createErrorHandler();
+
+          showNotification({
+            title: t('vitalsAndBiometricsSaveError', 'Error saving vitals and biometrics'),
+            kind: 'error',
+            critical: true,
+            description: err?.message,
+          });
+        })
+        .finally(() => {
+          ac.abort();
+        });
+    }
   };
 
   useEffect(() => {
@@ -107,6 +133,24 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
       setPatientBMI(calculatedBmi);
     }
   }, [patientVitalAndBiometrics?.weight, patientVitalAndBiometrics?.height]);
+
+  if (config.vitals.useFormEngine) {
+    return (
+      <ExtensionSlot
+        extensionSlotName="form-widget-slot"
+        state={{
+          view: 'form',
+          formUuid: config.vitals.formUuid,
+          visitUuid: currentVisit?.uuid,
+          visitTypeUuid: currentVisit?.visitType?.uuid,
+          patientUuid: patientUuid ?? null,
+          patient,
+          encounterUuid,
+          closeWorkspace,
+        }}
+      />
+    );
+  }
 
   return (
     <Form className={styles.form}>
@@ -130,6 +174,8 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     name: t('temperature', 'Temperature'),
                     type: 'number',
                     value: patientVitalAndBiometrics?.temperature || '',
+                    min: concepts.temperatureRange.lowAbsolute,
+                    max: concepts.temperatureRange.highAbsolute,
                   },
                 ]}
                 unitSymbol={conceptUnits.get(config.concepts.temperatureUuid) ?? ''}
@@ -160,11 +206,15 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     separator: '/',
                     type: 'number',
                     value: patientVitalAndBiometrics?.systolicBloodPressure || '',
+                    min: concepts.systolicBloodPressureRange.lowAbsolute,
+                    max: concepts.systolicBloodPressureRange.highAbsolute,
                   },
                   {
                     name: t('diastolic', 'diastolic'),
                     type: 'number',
                     value: patientVitalAndBiometrics?.diastolicBloodPressure || '',
+                    min: concepts.diastolicBloodPressureRange.lowAbsolute,
+                    max: concepts.diastolicBloodPressureRange.highAbsolute,
                   },
                 ]}
                 unitSymbol={conceptUnits.get(config.concepts.systolicBloodPressureUuid) ?? ''}
@@ -196,6 +246,8 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     name: t('pulse', 'Pulse'),
                     type: 'number',
                     value: patientVitalAndBiometrics?.pulse || '',
+                    min: concepts.pulseRange.lowAbsolute,
+                    max: concepts.pulseRange.highAbsolute,
                   },
                 ]}
                 unitSymbol={conceptUnits.get(config.concepts.pulseUuid) ?? ''}
@@ -220,6 +272,8 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     name: t('oxygenSaturation', 'Oxygen Saturation'),
                     type: 'number',
                     value: patientVitalAndBiometrics?.oxygenSaturation || '',
+                    min: concepts.oxygenSaturationRange.lowAbsolute,
+                    max: concepts.oxygenSaturationRange.highAbsolute,
                   },
                 ]}
                 unitSymbol={conceptUnits.get(config.concepts.oxygenSaturationUuid) ?? ''}
@@ -247,6 +301,8 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     name: t('respirationRate', 'Respiration Rate'),
                     type: 'number',
                     value: patientVitalAndBiometrics?.respiratoryRate || '',
+                    min: concepts.respiratoryRateRange.lowAbsolute,
+                    max: concepts.respiratoryRateRange.highAbsolute,
                   },
                 ]}
                 unitSymbol={conceptUnits.get(config.concepts.respiratoryRateUuid) ?? ''}
@@ -302,10 +358,16 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     name: t('weight', 'Weight'),
                     type: 'number',
                     value: patientVitalAndBiometrics?.weight || '',
+                    min: concepts.weightRange.lowAbsolute,
+                    max: concepts.weightRange.highAbsolute,
                   },
                 ]}
                 unitSymbol={conceptUnits.get(config.concepts.weightUuid) ?? ''}
-                inputIsNormal={true}
+                inputIsNormal={isInNormalRange(
+                  conceptMetadata,
+                  config.concepts['weightUuid'],
+                  patientVitalAndBiometrics?.weight,
+                )}
               />
             </Column>
             <Column className={styles.column}>
@@ -322,6 +384,8 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     name: t('height', 'Height'),
                     type: 'number',
                     value: patientVitalAndBiometrics?.height || '',
+                    min: concepts.heightRange.lowAbsolute,
+                    max: concepts.heightRange.highAbsolute,
                   },
                 ]}
                 unitSymbol={conceptUnits.get(config.concepts.heightUuid) ?? ''}
@@ -358,6 +422,8 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                     name: t('muac', 'MUAC'),
                     type: 'number',
                     value: patientVitalAndBiometrics?.midUpperArmCircumference || '',
+                    min: concepts.midUpperArmCircumferenceRange.lowAbsolute,
+                    max: concepts.midUpperArmCircumferenceRange.highAbsolute,
                   },
                 ]}
                 unitSymbol={conceptUnits.get(config.concepts.midUpperArmCircumferenceUuid) ?? ''}

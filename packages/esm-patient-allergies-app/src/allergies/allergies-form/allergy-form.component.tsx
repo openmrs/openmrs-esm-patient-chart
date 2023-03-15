@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSWRConfig } from 'swr';
 import {
   Button,
   ButtonSet,
@@ -24,7 +23,6 @@ import {
 import {
   ExtensionSlot,
   FetchResponse,
-  fhirBaseUrl,
   showNotification,
   showToast,
   useConfig,
@@ -33,6 +31,7 @@ import {
 import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import { saveAllergy, NewAllergy, useAllergensAndAllergicReactions } from './allergy-form.resource';
 import styles from './allergy-form.scss';
+import { useAllergies } from '../allergy-intolerance.resource';
 
 type AllergenType = 'FOOD' | 'DRUG' | 'ENVIRONMENT';
 
@@ -43,7 +42,6 @@ function AllergyForm({ closeWorkspace, promptBeforeClosing, patientUuid }: Defau
   const allergenTypes = [t('drug', 'Drug'), t('food', 'Food'), t('environmental', 'Environmental')];
   const severityLevels = [t('mild', 'Mild'), t('moderate', 'Moderate'), t('severe', 'Severe')];
   const patientState = useMemo(() => ({ patientUuid }), [patientUuid]);
-  const { mutate } = useSWRConfig();
   const { mildReactionUuid, severeReactionUuid, moderateReactionUuid, otherConceptUuid } = useMemo(
     () => concepts,
     [concepts],
@@ -58,6 +56,7 @@ function AllergyForm({ closeWorkspace, promptBeforeClosing, patientUuid }: Defau
   const [selectedAllergen, setSelectedAllergen] = useState('');
   const [selectedAllergenType, setSelectedAllergenType] = useState<AllergenType>('DRUG');
   const [severityOfWorstReaction, setSeverityOfWorstReaction] = useState('');
+  const { mutate } = useAllergies(patientUuid);
 
   useEffect(() => {
     promptBeforeClosing(() => {
@@ -131,6 +130,7 @@ function AllergyForm({ closeWorkspace, promptBeforeClosing, patientUuid }: Defau
         .then(
           (response: FetchResponse) => {
             if (response.status === 201) {
+              mutate();
               closeWorkspace();
 
               showToast({
@@ -139,8 +139,6 @@ function AllergyForm({ closeWorkspace, promptBeforeClosing, patientUuid }: Defau
                 title: t('allergySaved', 'Allergy saved'),
                 description: t('allergyNowVisible', 'It is now visible on the Allergies page'),
               });
-
-              mutate(`${fhirBaseUrl}/AllergyIntolerance?patient=${patientUuid}`);
             }
           },
           (err) => {

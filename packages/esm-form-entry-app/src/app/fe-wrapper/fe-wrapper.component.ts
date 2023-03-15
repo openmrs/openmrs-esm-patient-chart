@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy, OnInit } from '@angular/core';
+import { NgZone, Component, HostListener, OnDestroy, OnInit } from '@angular/core';
 import { Form } from '@openmrs/ngx-formentry';
 import { Observable, forkJoin, from, throwError, of, Subscription } from 'rxjs';
 import { catchError, concatAll, map, mergeMap, take } from 'rxjs/operators';
@@ -15,6 +15,7 @@ import { patientFormSyncItem, PatientFormSyncItemContent } from '../offline/sync
 import { SingleSpaPropsService } from '../single-spa-props/single-spa-props.service';
 import { CreateFormParams, FormCreationService } from '../form-creation/form-creation.service';
 import { ConceptService } from '../services/concept.service';
+import { TranslateService } from '@ngx-translate/core';
 
 type FormState =
   | 'initial'
@@ -53,7 +54,9 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
     private readonly patientPreviousEncounter: PatientPreviousEncounterService,
     private readonly formCreationService: FormCreationService,
     private readonly singleSpaPropsService: SingleSpaPropsService,
-    private conceptService: ConceptService,
+    private readonly conceptService: ConceptService,
+    private readonly translateService: TranslateService,
+    private readonly ngZone: NgZone,
   ) {}
 
   public ngOnInit() {
@@ -78,20 +81,26 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
         take(1),
         map((createFormParams) => from(this.formCreationService.initAndCreateForm(createFormParams))),
         concatAll(),
-        mergeMap((form) => {
+        mergeMap(async (form) => {
           const unlabeledConcepts = FormSchemaService.getUnlabeledConceptIdentifiersFromSchema(form.schema);
-          return this.conceptService
-            .searchBulkConceptsByUUID(unlabeledConcepts, this.language)
-            .pipe(map((concepts) => ({ form, concepts })));
+          return {
+            form,
+            concepts: await this.conceptService.searchConceptsByIdentifiers(unlabeledConcepts).toPromise(),
+          };
         }),
       )
       .subscribe(
         ({ form, concepts }) => {
           this.form = form;
-          this.labelMap = concepts.reduce((acc, current) => {
-            acc[current.uuid] = current.display;
-            return acc;
-          }, {});
+          if (concepts) {
+            this.labelMap = concepts.reduce((acc, current) => {
+              if (Boolean(current)) {
+                acc[current.identifier] = current.display;
+              }
+
+              return acc;
+            }, {});
+          }
           this.changeState('ready');
         },
         (err) => {
@@ -106,11 +115,16 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
   private loadAllFormDependencies(): Observable<CreateFormParams> {
     this.formUuid = this.singleSpaPropsService.getPropOrThrow('formUuid');
     const encounterOrSyncItemId = this.singleSpaPropsService.getPropOrThrow('encounterUuid');
+    const language = window.i18next?.language?.substring(0, 2) ?? '';
+    this.translateService.addLangs([language]);
+    this.translateService.use(language);
 
     return forkJoin({
-      formSchema: this.fetchCompiledFormSchema(this.formUuid).pipe(take(1)),
-      user: this.openmrsApi.getCurrentUserLocation().pipe(take(1)),
-      encounter: encounterOrSyncItemId ? this.getEncounterToEdit(encounterOrSyncItemId).pipe(take(1)) : of(null),
+      formSchema: this.fetchCompiledFormSchema(this.formUuid, language).pipe(take(1)),
+      user: this.openmrsApi.getCurrentUser().pipe(take(1)),
+      encounter: encounterOrSyncItemId
+        ? this.getEncounterToEdit(encounterOrSyncItemId).pipe(take(1))
+        : of<Encounter>(null),
     }).pipe(
       mergeMap((result) =>
         this.loadPatientPreviousEncounters(result.formSchema).pipe(
@@ -123,9 +137,8 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
     );
   }
 
-  private fetchCompiledFormSchema(uuid: string): Observable<FormSchema> {
-    const useCachedSchemas = true;
-    return this.formSchemaService.getFormSchemaByUuid(uuid, useCachedSchemas).pipe(take(1));
+  private fetchCompiledFormSchema(uuid: string, language: string): Observable<FormSchema> {
+    return this.formSchemaService.getFormSchemaByUuid(uuid, language).pipe(take(1));
   }
 
   private getEncounterToEdit(encounterOrSyncItemId: string): Observable<Encounter | undefined> {
@@ -261,20 +274,22 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
 
   @HostListener('window:ampath-form-action', ['$event'])
   onFormAction(event) {
-    const formUuid = this.singleSpaPropsService.getPropOrThrow('formUuid');
-    const patientUuid = this.singleSpaPropsService.getPropOrThrow('patientUuid');
-    if (event.detail?.formUuid === formUuid && event.detail?.patientUuid === patientUuid) {
-      switch (event.detail?.action) {
-        case 'onSubmit':
-          this.onSubmit();
-          break;
-        case 'validateForm':
-          this.validateForm();
-          break;
-        default:
-          break;
+    this.ngZone.run(() => {
+      const formUuid = this.singleSpaPropsService.getPropOrThrow('formUuid');
+      const patientUuid = this.singleSpaPropsService.getPropOrThrow('patientUuid');
+      if (event.detail?.formUuid === formUuid && event.detail?.patientUuid === patientUuid) {
+        switch (event.detail?.action) {
+          case 'onSubmit':
+            this.onSubmit();
+            break;
+          case 'validateForm':
+            this.validateForm();
+            break;
+          default:
+            break;
+        }
       }
-    }
+    });
   }
 
   private changeState(state) {

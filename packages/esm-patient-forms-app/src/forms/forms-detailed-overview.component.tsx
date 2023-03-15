@@ -17,17 +17,15 @@ const FormsDetailedOverView: React.FC<FormsProps> = ({ patientUuid, patient, isO
   const { activePatientEnrollment, isLoading } = useActivePatientEnrollment(patientUuid);
 
   return (
-    <>
-      <Forms
-        patientUuid={patientUuid}
-        patient={patient}
-        pageSize={pageSize}
-        urlLabel={urlLabel}
-        pageUrl={pageUrl}
-        isOffline={isOffline}
-        activePatientEnrollment={activePatientEnrollment}
-      />
-    </>
+    <Forms
+      patientUuid={patientUuid}
+      patient={patient}
+      pageSize={pageSize}
+      urlLabel={urlLabel}
+      pageUrl={pageUrl}
+      isOffline={isOffline}
+      activePatientEnrollment={activePatientEnrollment}
+    />
   );
 };
 

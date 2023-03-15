@@ -1,5 +1,5 @@
 import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
-import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
+import { createDashboardLink, getPatientSummaryOrder } from '@openmrs/esm-patient-common-lib';
 import { dashboardMeta } from './dashboard.meta';
 
 declare var __VERSION__: string;
@@ -26,8 +26,7 @@ function setupOpenMRS() {
     extensions: [
       {
         name: 'appointments-overview-widget',
-        slot: 'patient-chart-summary-dashboard-slot',
-        order: 8,
+        order: getPatientSummaryOrder('Appointments'),
         load: getAsyncLifecycle(() => import('./appointments/appointments-overview.component'), options),
         meta: {
           columnSpan: 4,
@@ -51,9 +50,12 @@ function setupOpenMRS() {
       {
         name: 'appointments-form-workspace',
         load: getAsyncLifecycle(() => import('./appointments/appointments-form.component'), options),
-        meta: {
-          title: 'Schedule appointment',
-        },
+      },
+      {
+        name: 'appointment-cancel-confirmation-dialog',
+        load: getAsyncLifecycle(() => import('./appointments/appointments-cancel-modal.component'), options),
+        online: true,
+        offline: false,
       },
     ],
   };

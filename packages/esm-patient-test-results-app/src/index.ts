@@ -38,17 +38,6 @@ function setupOpenMRS() {
   return {
     extensions: [
       {
-        name: 'test-results-summary-widget',
-        slot: 'patient-chart-summary-dashboard-slot',
-        order: 2,
-        load: getAsyncLifecycle(() => import('./overview/recent-overview.component'), options),
-        meta: {
-          columnSpan: 4,
-        },
-        online: true,
-        offline: true,
-      },
-      {
         name: 'test-results-summary-dashboard',
         slot: 'patient-chart-dashboard-slot',
         order: 4,
@@ -61,16 +50,6 @@ function setupOpenMRS() {
         name: 'test-results-filtered-overview',
         slot: 'test-results-filtered-overview-slot',
         load: getAsyncLifecycle(() => import('./overview/external-overview.component'), options),
-        meta: {
-          columnSpan: 4,
-        },
-        online: true,
-        offline: true,
-      },
-      {
-        name: 'test-results-timeline',
-        slots: ['patient-chart-summary-dashboard-slot', 'Test results timeline'],
-        load: getAsyncLifecycle(() => import('./timeline'), options),
         meta: {
           columnSpan: 4,
         },

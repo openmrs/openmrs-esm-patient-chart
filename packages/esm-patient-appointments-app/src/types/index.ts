@@ -50,6 +50,8 @@ export interface AppointmentPayload {
   startDateTime: string;
   endDateTime: string;
   appointmentKind: string;
-  providers: Array<{ uuid: string; comments: string; response?: string }>;
+  providers: Array<{ uuid: string; response?: string }>;
   locationUuid: string;
+  comments: string;
+  uuid?: string;
 }

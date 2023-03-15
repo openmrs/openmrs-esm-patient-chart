@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
-import { usePatient, getSynchronizationItems, useConnectivity } from '@openmrs/esm-framework';
+import { usePatient, getSynchronizationItems } from '@openmrs/esm-framework';
+import useSWR from 'swr';
 
 export const patientRegistrationSyncType = 'patient-registration';
 
@@ -8,56 +8,53 @@ export const patientRegistrationSyncType = 'patient-registration';
  * in offline mode by the patient registration module.
  */
 export function usePatientOrOfflineRegisteredPatient(patientUuid: string): ReturnType<typeof usePatient> {
-  const isOnline = useConnectivity();
   const onlinePatientState = usePatient(patientUuid);
-  const [offlinePatientState, setOfflinePatientState] = useState<{ patient?: fhir.Patient; error?: Error }>({
-    patient: undefined,
-    error: undefined,
+  const offlinePatientState = useSWR(`offlineRegisteredPatient/${patientUuid}`, async () => {
+    const offlinePatient = await getOfflineRegisteredPatientAsFhirPatient(patientUuid);
+    if (!offlinePatient) {
+      throw new Error(`No offline registered patient could be found. UUID: ${patientUuid}`);
+    }
+
+    return offlinePatient;
   });
 
-  useEffect(() => {
-    if (isOnline) {
-      setOfflinePatientState({ error: undefined, patient: undefined });
-    } else {
-      getOfflineRegisteredPatientAsFhirPatient(patientUuid)
-        .then((offlinePatient) => {
-          setOfflinePatientState({ error: undefined, patient: offlinePatient });
-        })
-        .catch((err) => {
-          if (err instanceof Error) {
-            setOfflinePatientState({ error: err, patient: undefined });
-          } else {
-            setOfflinePatientState({ error: new Error(JSON.stringify(err)), patient: undefined });
-          }
-        });
-    }
-  }, [patientUuid, isOnline]);
+  if (onlinePatientState.isLoading || (!offlinePatientState.data && !offlinePatientState.error)) {
+    return {
+      isLoading: true,
+      patient: null,
+      patientUuid,
+      error: null,
+    };
+  }
 
-  return useMemo(() => {
-    if (isOnline) {
-      if (onlinePatientState.patient && onlinePatientState.patient.hasOwnProperty('issue')) {
-        const operationOutcome = onlinePatientState.patient as fhir.OperationOutcome;
-        return {
-          ...onlinePatientState,
-          patient: undefined,
-          error: new Error(JSON.stringify(operationOutcome.issue)),
-        };
-      } else {
-        return onlinePatientState;
-      }
-    } else {
-      return {
-        isLoading: !(!!offlinePatientState.patient || !!offlinePatientState.error),
-        patient: offlinePatientState.patient,
-        patientUuid: offlinePatientState.patient?.id,
-        error: offlinePatientState.error,
-      };
-    }
-  }, [isOnline, onlinePatientState, offlinePatientState.patient, offlinePatientState.error]);
+  if (onlinePatientState.patient && !(onlinePatientState.patient as any).issue) {
+    return {
+      isLoading: false,
+      patient: onlinePatientState.patient,
+      patientUuid,
+      error: null,
+    };
+  }
+
+  if (offlinePatientState.data) {
+    return {
+      isLoading: false,
+      patient: offlinePatientState.data,
+      patientUuid,
+      error: null,
+    };
+  }
+
+  return {
+    isLoading: false,
+    patient: null,
+    patientUuid,
+    error: onlinePatientState.error ?? offlinePatientState.error,
+  };
 }
 
 async function getOfflineRegisteredPatientAsFhirPatient(patientUuid: string): Promise<fhir.Patient | undefined> {
   const patientRegistrationSyncItems = await getSynchronizationItems<any>(patientRegistrationSyncType);
-  const patientSyncItem = patientRegistrationSyncItems.find((item) => item.fhirPatient?.id === patientUuid);
+  const patientSyncItem = patientRegistrationSyncItems.find((item) => item.fhirPatient.id === patientUuid);
   return patientSyncItem.fhirPatient;
 }

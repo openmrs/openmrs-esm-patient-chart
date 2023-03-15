@@ -3,8 +3,12 @@
 @import '~@openmrs/esm-styleguide/src/vars';
 @import '../root.scss';
 
-.productiveHeading01 {
+.heading {
   @include type.type-style("heading-compact-01");
+}
+
+.text02 {
+  color: $text-02;
 }
 
 .bodyShort01 {
@@ -31,7 +35,29 @@
 }
 
 .formResultsLabel {
+  @include type.type-style('body-compact-01');
   margin: spacing.$spacing-05;
+  color: $text-02;
+}
+
+.table {
+  margin-top: 3rem;
+}
+
+.tileContainer {
+  background-color: $ui-02;
+  margin: 3rem;
+}
+
+.tile {
+  margin: auto;
+  width: fit-content;
+}
+
+.tileContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 // Desktop viewport
@@ -67,7 +93,6 @@
   cursor: pointer;
   height: spacing.$spacing-09;
   align-items: center;
-
 
   & > label {
     cursor: pointer;

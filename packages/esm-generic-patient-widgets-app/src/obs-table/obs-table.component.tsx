@@ -9,7 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { usePagination, useConfig, formatDatetime } from '@openmrs/esm-framework';
+import { usePagination, useConfig, formatDatetime, formatDate, formatTime } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { useObs } from '../resources/useObs';
 import styles from './obs-table.scss';
@@ -21,7 +21,6 @@ interface ObsTableProps {
 const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
   const config = useConfig();
   const { data: obss, error, isLoading, isValidating } = useObs(patientUuid);
-
   const uniqueDates = [...new Set(obss.map((o) => o.issued))].sort();
   const obssByDate = uniqueDates.map((date) => obss.filter((o) => o.issued === date));
 
@@ -38,7 +37,7 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
       obssByDate?.map((obss, index) => {
         const rowData = {
           id: `${index}`,
-          date: formatDatetime(new Date(obss[0].issued), { mode: 'wide' }),
+          date: formatDatetime(new Date(obss[0].effectiveDateTime), { mode: 'wide' }),
         };
 
         for (let obs of obss) {
@@ -66,12 +65,26 @@ const ObsTable: React.FC<ObsTableProps> = ({ patientUuid }) => {
             case 'Coded':
               rowData[obs.conceptUuid] = obs.valueCodeableConcept?.coding[0]?.display;
               break;
+
+            case 'DateTime':
+              if (config?.dateFormat === 'dateTime') {
+                rowData[obs.conceptUuid] = formatDatetime(new Date(obs.valueDateTime), { mode: 'standard' });
+              } else if (config?.dateFormat === 'time') {
+                rowData[obs.conceptUuid] = formatTime(new Date(obs.valueDateTime));
+              } else if (config?.dateFormat === 'date') {
+                rowData[obs.conceptUuid] = formatDate(new Date(obs.valueDateTime), { mode: 'standard' });
+              } else {
+                //maintain the default behavior
+                rowData[obs.conceptUuid] = formatDatetime(new Date(obs.valueDateTime), { mode: 'standard' });
+              }
+
+              break;
           }
         }
 
         return rowData;
       }),
-    [config.data, obssByDate],
+    [config, obssByDate],
   );
 
   const { results, goTo, currentPage } = usePagination(tableRows, config.table.pageSize);

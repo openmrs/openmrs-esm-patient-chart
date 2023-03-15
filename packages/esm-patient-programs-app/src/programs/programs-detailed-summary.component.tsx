@@ -77,7 +77,7 @@ const ProgramsDetailedSummary: React.FC<ProgramsDetailedSummaryProps> = ({ patie
       return {
         id: program.uuid,
         display: program.display,
-        location: program.location?.display,
+        location: program.location?.display ?? '--',
         dateEnrolled: formatDatetime(new Date(program.dateEnrolled)),
         status: program.dateCompleted
           ? `${t('completedOn', 'Completed On')} ${formatDate(new Date(program.dateCompleted))}`

@@ -3,11 +3,15 @@ import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
 import { useTranslation } from 'react-i18next';
 import { Button, InlineLoading } from '@carbon/react';
-import { ChevronDown, ChevronUp, WarningFilled } from '@carbon/react/icons';
-import { formatDate, parseDate, useConfig } from '@openmrs/esm-framework';
-import { launchPatientWorkspace, useVitalsConceptMetadata } from '@openmrs/esm-patient-common-lib';
+import { ArrowRight, WarningFilled } from '@carbon/react/icons';
+import { ConfigurableLink, formatDate, parseDate, useConfig } from '@openmrs/esm-framework';
+import {
+  formEntrySub,
+  launchPatientWorkspace,
+  useVisitOrOfflineVisit,
+  useVitalsConceptMetadata,
+} from '@openmrs/esm-patient-common-lib';
 import { ConfigObject } from '../../config-schema';
-import { patientVitalsBiometricsFormWorkspace } from '../../constants';
 import {
   assessValue,
   getReferenceRangesForConcept,
@@ -17,12 +21,18 @@ import {
 } from '../vitals.resource';
 import VitalsHeaderItem from './vitals-header-item.component';
 import styles from './vitals-header.scss';
+import { launchVitalsForm } from '../vitals-utils';
 
 dayjs.extend(isToday);
 
 interface VitalsHeaderProps {
   patientUuid: string;
   showRecordVitalsButton: boolean;
+}
+
+export function launchFormEntry(formUuid: string, encounterUuid?: string, formName?: string) {
+  formEntrySub.next({ formUuid, encounterUuid });
+  launchPatientWorkspace('patient-form-entry-workspace', { workspaceTitle: formName });
 }
 
 const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVitalsButton }) => {
@@ -33,11 +43,15 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
   const latestVitals = vitals?.[0];
   const [showDetailsPanel, setShowDetailsPanel] = useState(false);
   const toggleDetailsPanel = () => setShowDetailsPanel(!showDetailsPanel);
+  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
 
-  const launchVitalsAndBiometricsForm = React.useCallback((e) => {
-    e.stopPropagation();
-    launchPatientWorkspace(patientVitalsBiometricsFormWorkspace);
-  }, []);
+  const launchVitalsAndBiometricsForm = React.useCallback(
+    (e) => {
+      e.stopPropagation();
+      launchVitalsForm(currentVisit, config);
+    },
+    [config, currentVisit],
+  );
 
   if (isLoading) {
     return (
@@ -67,48 +81,37 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
               />
             ) : null}
             <span className={styles.heading}>{t('vitalsAndBiometrics', 'Vitals and biometrics')}</span>
-            <span className={styles['body-text']}>
-              {t('lastRecorded', 'Last recorded')}: {formatDate(parseDate(latestVitals?.date), { mode: 'wide' })}
-            </span>
+            <span className={styles['body-text']}>{formatDate(parseDate(latestVitals?.date))}</span>
+            <ConfigurableLink
+              className={styles.link}
+              to={`\${openmrsSpaBase}/patient/${patientUuid}/chart/Vitals & Biometrics`}
+            >
+              {t('vitalsHistory', 'Vitals history')}
+            </ConfigurableLink>
           </span>
           <div className={styles.backgroundDataFetchingIndicator}>
             <span>{isValidating ? <InlineLoading /> : null}</span>
           </div>
           <div className={styles['button-container']}>
-            <Button className={styles['record-vitals']} kind="ghost" size="sm" onClick={launchVitalsAndBiometricsForm}>
+            <Button
+              className={`${styles['record-vitals']} ${styles['arrow-up-icon']}`}
+              kind="ghost"
+              size="sm"
+              onClick={launchVitalsAndBiometricsForm}
+            >
               {t('recordVitals', 'Record vitals')}
+              <ArrowRight size={16} className={styles['arrow-up-button']} title={'ArrowRight'} />
             </Button>
-            {showDetailsPanel ? (
-              <ChevronUp
-                size={16}
-                className={styles['collapse-button']}
-                title={'ChevronUp'}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleDetailsPanel();
-                }}
-              />
-            ) : (
-              <ChevronDown
-                size={16}
-                className={styles['expand-button']}
-                title={'ChevronDown'}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  toggleDetailsPanel();
-                }}
-              />
-            )}
           </div>
         </div>
-        {showDetailsPanel ? (
-          <div
-            className={
-              hasAbnormalValues(latestVitals) && isNotRecordedToday
-                ? `${styles['warning-border']}`
-                : `${styles['default-border']}`
-            }
-          >
+        <div
+          className={
+            hasAbnormalValues(latestVitals) && isNotRecordedToday
+              ? `${styles['warning-border']}`
+              : `${styles['default-border']}`
+          }
+        >
+          <div className={styles['container-row']}>
             <div className={styles.row}>
               <VitalsHeaderItem
                 unitName={t('temperatureAbbreviated', 'Temp')}
@@ -176,7 +179,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
               />
             </div>
           </div>
-        ) : null}
+        </div>
       </div>
     );
   }

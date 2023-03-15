@@ -49,17 +49,6 @@ function setupOpenMRS() {
   return {
     extensions: [
       {
-        name: 'allergies-overview-widget',
-        slot: 'patient-chart-summary-dashboard-slot',
-        order: 9,
-        load: getAsyncLifecycle(() => import('./allergies/allergies-overview.component'), options),
-        meta: {
-          columnSpan: 4,
-        },
-        online: { showAddAllergyButton: true },
-        offline: { showAddAllergyButton: false },
-      },
-      {
         name: 'allergies-details-widget',
         slot: dashboardMeta.slot,
         load: getAsyncLifecycle(() => import('./allergies/allergies-detailed-summary.component'), options),

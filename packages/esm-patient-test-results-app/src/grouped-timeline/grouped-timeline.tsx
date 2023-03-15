@@ -2,7 +2,7 @@ import React, { useCallback, useContext, useEffect, useRef, useState } from 'rea
 import { useTranslation } from 'react-i18next';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
 import { ConfigurableLink, useLayoutType, usePatient } from '@openmrs/esm-framework';
-import { Grid, ShadowBox } from '../timeline/helpers';
+import { Grid, ShadowBox } from '../panel-timeline/helpers';
 import { makeThrottled, testResultsBasePath } from '../helpers';
 import type {
   DateHeaderGridProps,
@@ -10,7 +10,6 @@ import type {
   TimelineCellProps,
   DataRowsProps,
 } from './grouped-timeline-types';
-import { dashboardMeta } from '../dashboard.meta';
 import FilterContext from '../filter/filter-context';
 import styles from './grouped-timeline.styles.scss';
 
@@ -28,7 +27,7 @@ const PanelNameCorner: React.FC<PanelNameCornerProps> = ({ showShadow, panelName
   <TimeSlots className={`${styles.cornerGridElement} ${showShadow ? styles.shadow : ''}`}>{panelName}</TimeSlots>
 );
 
-const NewRowStartCell = ({ title, range, units, conceptUuid, shadow = false }) => {
+const NewRowStartCell = ({ title, range, units, conceptUuid, shadow = false, isString = false }) => {
   const { patientUuid } = usePatient();
 
   return (
@@ -38,12 +37,16 @@ const NewRowStartCell = ({ title, range, units, conceptUuid, shadow = false }) =
         boxShadow: shadow ? '8px 0 20px 0 rgba(0,0,0,0.15)' : undefined,
       }}
     >
-      <ConfigurableLink
-        to={`${testResultsBasePath(`/patient/${patientUuid}/chart`)}/trendline/${conceptUuid}`}
-        className={styles.trendlineLink}
-      >
-        {title}
-      </ConfigurableLink>
+      {!isString ? (
+        <ConfigurableLink
+          to={`${testResultsBasePath(`/patient/${patientUuid}/chart`)}/trendline/${conceptUuid}`}
+          className={styles.trendlineLink}
+        >
+          {title}
+        </ConfigurableLink>
+      ) : (
+        <span className={styles.trendlineLink}>{title}</span>
+      )}
       <span className={styles.rangeUnits}>
         {range} {units}
       </span>
@@ -91,7 +94,8 @@ const DataRows: React.FC<DataRowsProps> = ({ timeColumns, rowData, sortedTimes, 
     <Grid dataColumns={timeColumns.length} padding style={{ gridColumn: 'span 2' }}>
       {rowData.map((row, index) => {
         const obs = row.entries;
-        const { units = '', range = '' } = row;
+        const { units = '', range = '', obs: values } = row;
+        const isString = isNaN(parseFloat(values?.[0]?.value));
         return (
           <React.Fragment key={index}>
             <NewRowStartCell
@@ -101,6 +105,7 @@ const DataRows: React.FC<DataRowsProps> = ({ timeColumns, rowData, sortedTimes, 
                 title: row.display,
                 shadow: showShadow,
                 conceptUuid: row.conceptUuid,
+                isString,
               }}
             />
             <GridItems {...{ sortedTimes, obs, zebra: !!(index % 2) }} />
@@ -276,8 +281,8 @@ export const GroupedTimeline = () => {
   }
   if (activeTests && timelineData && loaded) {
     return (
-      <div className={styles.timelineHeader} style={{ top: tablet ? '7rem' : '6.5rem' }}>
-        <div className={styles.timelineHeader} style={{ top: tablet ? '7rem' : '6.5rem' }}>
+      <div className={styles.timelineHeader} style={{ top: '6.5rem' }}>
+        <div className={styles.timelineHeader} style={{ top: '6.5rem' }}>
           <div className={styles.dateHeaderContainer}>
             <PanelNameCorner showShadow={true} panelName={panelName} />
             <DateHeaderGrid

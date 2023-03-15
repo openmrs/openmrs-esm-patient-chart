@@ -1,5 +1,5 @@
 import { defineConfigSchema, getAsyncLifecycle, getSyncLifecycle } from '@openmrs/esm-framework';
-import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
+import { createDashboardLink, getPatientSummaryOrder } from '@openmrs/esm-patient-common-lib';
 import { configSchema } from './config-schema';
 import { dashboardMeta } from './dashboard.meta';
 
@@ -27,8 +27,7 @@ function setupOpenMRS() {
     extensions: [
       {
         name: 'programs-overview-widget',
-        slot: 'patient-chart-summary-dashboard-slot',
-        order: 0,
+        order: getPatientSummaryOrder('Programs'),
         load: getAsyncLifecycle(() => import('./programs/programs-overview.component'), options),
         meta: {
           columnSpan: 4,

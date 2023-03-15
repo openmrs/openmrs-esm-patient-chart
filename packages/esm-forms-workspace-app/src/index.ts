@@ -31,7 +31,7 @@ function setupOpenMRS() {
     extensions: [
       {
         name: 'form-action-menu-item',
-        slot: 'action-menu-items-slot',
+        slot: 'action-menu-chart-items-slot',
         load: getAsyncLifecycle(
           () => import('./clinical-form-action-button/clinical-form-action-button.component'),
           options,

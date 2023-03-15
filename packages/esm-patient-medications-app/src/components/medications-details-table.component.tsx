@@ -18,15 +18,20 @@ import {
 } from '@carbon/react';
 import { Add, User } from '@carbon/react/icons';
 import { formatDate } from '@openmrs/esm-framework';
-import { CardHeader, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { getDosage } from '../utils/get-dosage';
+import { CardHeader } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { compare } from '../utils/compare';
 import { connect } from 'unistore/react';
-import { OrderBasketStore, OrderBasketStoreActions, orderBasketStoreActions } from '../medications/order-basket-store';
+import {
+  getOrderItems,
+  OrderBasketStore,
+  OrderBasketStoreActions,
+  orderBasketStoreActions,
+} from '../medications/order-basket-store';
 import { Order } from '../types/order';
 import { OrderBasketItem } from '../types/order-basket-item';
 import styles from './medications-details-table.scss';
+import { useLaunchOrderBasket } from '../utils/launchOrderBasket';
 
 export interface ActiveMedicationsProps {
   isValidating?: boolean;
@@ -36,6 +41,7 @@ export interface ActiveMedicationsProps {
   showDiscontinueButton: boolean;
   showModifyButton: boolean;
   showReorderButton: boolean;
+  patientUuid: string;
 }
 
 const MedicationsDetailsTable = connect<
@@ -57,9 +63,11 @@ const MedicationsDetailsTable = connect<
     showAddNewButton,
     items,
     setItems,
+    patientUuid,
   }: ActiveMedicationsProps & OrderBasketStore & OrderBasketStoreActions) => {
     const { t } = useTranslation();
-    const openOrderBasket = React.useCallback(() => launchPatientWorkspace('order-basket-workspace'), []);
+    const { launchOrderBasket } = useLaunchOrderBasket(patientUuid);
+    const patientOrderItems = getOrderItems(items, patientUuid);
 
     const tableHeaders = [
       {
@@ -79,21 +87,24 @@ const MedicationsDetailsTable = connect<
     const tableRows = medications?.map((medication, id) => ({
       id: `${id}`,
       details: {
-        sortKey: medication.drug?.name,
+        sortKey: medication.drug?.display,
         content: (
           <div className={styles.medicationRecord}>
             <div>
               <p className={styles.bodyLong01}>
-                <strong>{capitalize(medication.drug?.name)}</strong> &mdash; {medication.drug?.strength.toLowerCase()}{' '}
-                &mdash; {medication.doseUnits?.display.toLowerCase()}
+                <strong>{capitalize(medication.drug?.display)}</strong>{' '}
+                {medication.drug?.strength && <>&mdash; {medication.drug?.strength.toLowerCase()}</>}{' '}
+                {medication.drug?.dosageForm?.display && (
+                  <>&mdash; {medication.drug.dosageForm.display.toLowerCase()}</>
+                )}
               </p>
               <p className={styles.bodyLong01}>
                 <span className={styles.label01}>{t('dose', 'Dose').toUpperCase()}</span>{' '}
                 <span className={styles.dosage}>
-                  {getDosage(medication.drug?.strength, medication.dose).toLowerCase()}
+                  {medication.dose} {medication.doseUnits?.display.toLowerCase()}
                 </span>{' '}
-                &mdash; {medication.route?.display.toLowerCase()} &mdash; {medication.frequency?.display.toLowerCase()}{' '}
-                &mdash;{' '}
+                {medication.route?.display && <>&mdash; {medication.route?.display.toLowerCase()}</>}{' '}
+                {medication.frequency?.display && <>&mdash; {medication.frequency?.display.toLowerCase()}</>} &mdash;{' '}
                 {!medication.duration
                   ? t('medicationIndefiniteDuration', 'Indefinite duration').toLowerCase()
                   : t('medicationDurationAndUnit', 'for {duration} {durationUnit}', {
@@ -121,14 +132,12 @@ const MedicationsDetailsTable = connect<
               {medication.quantity ? (
                 <span>
                   <span className={styles.label01}> &mdash; {t('quantity', 'Quantity').toUpperCase()}</span>{' '}
-                  {medication.quantity}
+                  {medication.quantity} {medication.quantityUnits.display}
                 </span>
               ) : null}
               {medication.dateStopped ? (
-                <span className={styles.bodyShort01}>
-                  <span className={styles.label01}>
-                    {medication.quantity ? ` — ` : ''} {t('endDate', 'End date').toUpperCase()}
-                  </span>{' '}
+                <span>
+                  <span className={styles.label01}> &mdash; {t('endDate', 'End date').toUpperCase()}</span>{' '}
                   {formatDate(new Date(medication.dateStopped))}
                 </span>
               ) : null}
@@ -140,7 +149,7 @@ const MedicationsDetailsTable = connect<
         sortKey: dayjs(medication.dateActivated).toDate(),
         content: (
           <div className={styles.startDateColumn}>
-            <span>{formatDate(new Date(medication.dateActivated))}</span>
+            <p>{formatDate(new Date(medication.dateActivated))}</p>
             <InfoTooltip orderer={medication.orderer?.person?.display ?? '--'} />
           </div>
         ),
@@ -166,7 +175,7 @@ const MedicationsDetailsTable = connect<
               kind="ghost"
               renderIcon={(props) => <Add size={16} {...props} />}
               iconDescription="Launch order basket"
-              onClick={openOrderBasket}
+              onClick={launchOrderBasket}
             >
               {t('add', 'Add')}
             </Button>
@@ -204,7 +213,9 @@ const MedicationsDetailsTable = connect<
                   {rows.map((row, rowIndex) => (
                     <TableRow className={styles.row} {...getRowProps({ row })}>
                       {row.cells.map((cell) => (
-                        <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+                        <TableCell className={styles.tableCell} key={cell.id}>
+                          {cell.value?.content ?? cell.value}
+                        </TableCell>
                       ))}
                       <TableCell className="cds--table-column-menu">
                         <OrderBasketItemActions
@@ -212,8 +223,9 @@ const MedicationsDetailsTable = connect<
                           showModifyButton={showModifyButton}
                           showReorderButton={showReorderButton}
                           medication={medications[rowIndex]}
-                          items={items}
+                          items={patientOrderItems}
                           setItems={setItems}
+                          openOrderBasket={launchOrderBasket}
                         />
                       </TableCell>
                     </TableRow>
@@ -232,13 +244,14 @@ function InfoTooltip({ orderer }) {
   return (
     <IconButton
       className={styles.tooltip}
-      align="bottom-left"
+      align="top-left"
       direction="top"
       label={orderer}
       renderIcon={(props) => <User size={16} {...props} />}
-    >
-      {orderer}
-    </IconButton>
+      iconDescription={orderer}
+      kind="ghost"
+      size="sm"
+    />
   );
 }
 
@@ -249,6 +262,7 @@ function OrderBasketItemActions({
   medication,
   items,
   setItems,
+  openOrderBasket,
 }: {
   showDiscontinueButton: boolean;
   showModifyButton: boolean;
@@ -256,6 +270,7 @@ function OrderBasketItemActions({
   medication: Order;
   items: Array<OrderBasketItem>;
   setItems: (items: Array<OrderBasketItem>) => void;
+  openOrderBasket: () => void;
 }) {
   const { t } = useTranslation();
   const alreadyInBasket = items.some((x) => x.uuid === medication.uuid);
@@ -267,24 +282,20 @@ function OrderBasketItemActions({
         previousOrder: null,
         action: 'DISCONTINUE',
         drug: medication.drug,
-        dosage: {
-          value: medication.dose,
-          default: true,
-        },
+        dosage: medication.dose,
         unit: {
-          value: medication.doseUnits.display,
-          valueCoded: medication.doseUnits.uuid,
+          value: medication.doseUnits?.display,
+          valueCoded: medication.doseUnits?.uuid,
         },
         frequency: {
-          valueCoded: medication.frequency.uuid,
+          valueCoded: medication.frequency?.uuid,
           value: medication.frequency.display,
         },
         route: {
-          valueCoded: medication.route.uuid,
-          value: medication.route.display,
+          valueCoded: medication.route?.uuid,
+          value: medication.route?.display,
         },
-        encounterUuid: medication.encounter.uuid,
-        commonMedicationName: medication.drug.name,
+        commonMedicationName: medication.drug?.display,
         isFreeTextDosage: medication.dosingType === 'org.openmrs.FreeTextDosingInstructions',
         freeTextDosage:
           medication.dosingType === 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
@@ -295,19 +306,22 @@ function OrderBasketItemActions({
         startDate: medication.dateActivated,
         duration: medication.duration,
         durationUnit: {
-          uuid: medication.durationUnits?.uuid,
-          display: medication.durationUnits?.display,
+          valueCoded: medication.durationUnits?.uuid,
+          value: medication.durationUnits?.display,
         },
         pillsDispensed: medication.quantity,
         numRefills: medication.numRefills,
         indication: medication.orderReasonNonCoded,
         orderer: medication.orderer.uuid,
         careSetting: medication.careSetting.uuid,
-        quantityUnits: medication.quantityUnits.uuid,
+        quantityUnits: {
+          value: medication.quantityUnits.display,
+          valueCoded: medication.quantityUnits.uuid,
+        },
       },
     ]);
-    launchPatientWorkspace('order-basket-workspace');
-  }, [items, setItems, medication]);
+    openOrderBasket();
+  }, [items, setItems, medication, openOrderBasket]);
 
   const handleModifyClick = useCallback(() => {
     setItems([
@@ -318,24 +332,20 @@ function OrderBasketItemActions({
         startDate: new Date(),
         action: 'REVISE',
         drug: medication.drug,
-        dosage: {
-          value: medication.dose,
-          default: true,
-        },
+        dosage: medication.dose,
         unit: {
-          value: medication.doseUnits.display,
-          valueCoded: medication.doseUnits.uuid,
+          value: medication.doseUnits?.display,
+          valueCoded: medication.doseUnits?.uuid,
         },
         frequency: {
-          valueCoded: medication.frequency.uuid,
-          value: medication.frequency.display,
+          valueCoded: medication.frequency?.uuid,
+          value: medication.frequency?.display,
         },
         route: {
-          valueCoded: medication.route.uuid,
-          value: medication.route.display,
+          valueCoded: medication.route?.uuid,
+          value: medication.route?.display,
         },
-        encounterUuid: medication.encounter.uuid,
-        commonMedicationName: medication.drug.name,
+        commonMedicationName: medication.drug?.display,
         isFreeTextDosage: medication.dosingType === 'org.openmrs.FreeTextDosingInstructions',
         freeTextDosage:
           medication.dosingType === 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
@@ -345,19 +355,22 @@ function OrderBasketItemActions({
         asNeededCondition: medication.asNeededCondition,
         duration: medication.duration,
         durationUnit: {
-          uuid: medication.durationUnits?.uuid,
-          display: medication.durationUnits?.display,
+          valueCoded: medication.durationUnits?.uuid,
+          value: medication.durationUnits?.display,
         },
         pillsDispensed: medication.quantity,
         numRefills: medication.numRefills,
         indication: medication.orderReasonNonCoded,
-        orderer: medication.orderer.uuid,
-        careSetting: medication.careSetting.uuid,
-        quantityUnits: medication.quantityUnits.uuid,
+        orderer: medication.orderer?.uuid,
+        careSetting: medication.careSetting?.uuid,
+        quantityUnits: {
+          value: medication.quantityUnits?.display,
+          valueCoded: medication.quantityUnits?.uuid,
+        },
       },
     ]);
-    launchPatientWorkspace('order-basket-workspace');
-  }, [items, setItems, medication]);
+    openOrderBasket();
+  }, [items, setItems, medication, openOrderBasket]);
 
   const handleReorderClick = useCallback(() => {
     setItems([
@@ -368,24 +381,20 @@ function OrderBasketItemActions({
         startDate: new Date(),
         action: 'RENEWED',
         drug: medication.drug,
-        dosage: {
-          value: medication.dose,
-          default: true,
-        },
+        dosage: medication.dose,
         unit: {
-          value: medication.doseUnits.display,
-          valueCoded: medication.doseUnits.uuid,
+          value: medication.doseUnits?.display,
+          valueCoded: medication.doseUnits?.uuid,
         },
         frequency: {
-          valueCoded: medication.frequency.uuid,
-          value: medication.frequency.display,
+          valueCoded: medication.frequency?.uuid,
+          value: medication.frequency?.display,
         },
         route: {
-          valueCoded: medication.route.uuid,
-          value: medication.route.display,
+          valueCoded: medication.route?.uuid,
+          value: medication.route?.display,
         },
-        encounterUuid: medication.encounter.uuid,
-        commonMedicationName: medication.drug.name,
+        commonMedicationName: medication.drug?.display,
         isFreeTextDosage: medication.dosingType === 'org.openmrs.FreeTextDosingInstructions',
         freeTextDosage:
           medication.dosingType === 'org.openmrs.FreeTextDosingInstructions' ? medication.dosingInstructions : '',
@@ -395,19 +404,22 @@ function OrderBasketItemActions({
         asNeededCondition: medication.asNeededCondition,
         duration: medication.duration,
         durationUnit: {
-          uuid: medication.durationUnits?.uuid,
-          display: medication.durationUnits?.display,
+          valueCoded: medication.durationUnits?.uuid,
+          value: medication.durationUnits?.display,
         },
         pillsDispensed: medication.quantity,
         numRefills: medication.numRefills,
         indication: medication.orderReasonNonCoded,
-        orderer: medication.orderer.uuid,
-        careSetting: medication.careSetting.uuid,
-        quantityUnits: medication.quantityUnits.uuid,
+        orderer: medication.orderer?.uuid,
+        careSetting: medication.careSetting?.uuid,
+        quantityUnits: {
+          value: medication.quantityUnits?.display,
+          valueCoded: medication.quantityUnits?.uuid,
+        },
       },
     ]);
-    launchPatientWorkspace('order-basket-workspace');
-  }, [items, setItems, medication]);
+    openOrderBasket();
+  }, [items, setItems, medication, openOrderBasket]);
 
   return (
     <OverflowMenu ariaLabel="Actions menu" selectorPrimaryFocus={'#modify'} flipped>

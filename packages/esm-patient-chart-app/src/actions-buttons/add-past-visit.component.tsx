@@ -26,7 +26,7 @@ const AddPastVisitOverflowMenuItem: React.FC<AddPastVisitOverflowMenuItemProps> 
       <button
         className="cds--overflow-menu-options__btn"
         role="menuitem"
-        title={t('addPastVisit', 'Add Past Visit')}
+        title={t('addPastVisit', 'Add past visit')}
         data-floating-menu-primary-focus
         onClick={openModal}
         style={{

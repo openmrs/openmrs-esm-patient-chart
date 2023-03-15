@@ -15,7 +15,7 @@
     <div *ngIf="formState === 'ready' || formState === 'readyWithValidationErrors' || formState === 'submitting' || formState === 'submissionError'" class="form-container">
       <div>
         <form class="cds--form no-padding" *ngIf="form" [formGroup]="form.rootNode.control">
-          <form-renderer [labelMap]="labelMap" [node]="form.rootNode"></form-renderer>
+          <ofe-form-renderer [labelMap]="labelMap" [node]="form.rootNode"></ofe-form-renderer>
         </form>
       </div>
       <div *ngIf="showDiscardSubmitButtons" class="cds-btn--set button-set">

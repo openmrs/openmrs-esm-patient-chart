@@ -6,8 +6,7 @@
 .header {
   background-color: $ui-03;
   top: 3rem;
-  border-bottom: 1px solid $text-03;
-  z-index: 1000;
+  z-index: 100;
 
   a {
     @include type.type-style('heading-compact-02');
@@ -43,11 +42,11 @@
 
 .fullWidth {
   // Subtract side rail width
-  width: calc(100% - 50px);
+  width: calc(100% - 3rem);
 }
 
 .dynamicWidth {
-  width: calc(50% - 9.6rem);
+  width: calc(50% - 9.625rem);
 }
 
 /* Desktop */
@@ -75,6 +74,13 @@
       border-style: solid;
       border-width: 0 1px 0 0;
     }
+  }
+}
+
+/* Small desktop */
+:global(.omrs-breakpoint-lt-large-desktop){
+  .dynamicWidth {
+    width: calc(50% - 1.625rem);
   }
 }
 

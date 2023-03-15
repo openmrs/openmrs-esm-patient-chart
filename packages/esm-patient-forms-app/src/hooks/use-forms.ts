@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import useSWR from 'swr';
 import { getDynamicOfflineDataEntries, openmrsFetch, useConfig } from '@openmrs/esm-framework';
-import { ListResponse, FormEncounter, EncounterWithFormRef, CompletedFormInfo } from '../types';
+import { ListResponse, Form, EncounterWithFormRef, CompletedFormInfo } from '../types';
 import { customEncounterRepresentation, formEncounterUrl, formEncounterUrlPoc } from '../constants';
 import { ConfigObject } from '../config-schema';
 
@@ -14,7 +14,7 @@ export function useFormEncounters(cachedOfflineFormsOnly = false, patientUuid: s
     : formEncounterUrlPoc;
 
   return useSWR([url, cachedOfflineFormsOnly], async () => {
-    const res = await openmrsFetch<ListResponse<FormEncounter>>(url);
+    const res = await openmrsFetch<ListResponse<Form>>(url);
     // show published forms and hide component forms
     const forms = showConfigurableForms
       ? res?.data.results
@@ -60,7 +60,7 @@ export function useForms(patientUuid: string, startDate?: Date, endDate?: Date, 
 }
 
 function mapToFormCompletedInfo(
-  allForms: Array<FormEncounter>,
+  allForms: Array<Form>,
   encounters: Array<EncounterWithFormRef>,
 ): Array<CompletedFormInfo> {
   return allForms.map((form) => {

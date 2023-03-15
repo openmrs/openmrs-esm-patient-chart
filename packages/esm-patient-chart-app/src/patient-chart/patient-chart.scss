@@ -18,6 +18,9 @@ $actionPanelExpandedOffset: $actionNavOffset+$actionPanelOffset;
   grid-column: 1;
   align-self: start;
   height: 90%;
+  width: 100%;
+  max-width: 60rem;
+  margin: 0 auto;
   padding-bottom: spacing.$spacing-10;
 }
 
@@ -29,7 +32,7 @@ $actionPanelExpandedOffset: $actionNavOffset+$actionPanelOffset;
   padding-right: spacing.$spacing-01;
 }
 
-:global(.omrs-breakpoint-gt-tablet) .chartContainer {
+:global(.omrs-breakpoint-gt-small-desktop) .chartContainer {
   margin-left: var(--omrs-sidenav-width);
 }
 

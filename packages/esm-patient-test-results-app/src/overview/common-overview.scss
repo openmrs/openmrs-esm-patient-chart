@@ -35,6 +35,11 @@
 
 .meta {
   display: flex;
+  align-items: center;
+}
+
+.tooltipContainer {
+  margin: 0 0.5rem;
 }
 
 .tooltip {

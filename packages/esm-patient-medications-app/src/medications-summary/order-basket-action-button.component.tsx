@@ -1,52 +1,61 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Tag } from '@carbon/react';
 import { ShoppingCart } from '@carbon/react/icons';
-import { useLayoutType, useStore } from '@openmrs/esm-framework';
-import { launchPatientWorkspace, useWorkspaces } from '@openmrs/esm-patient-common-lib';
-import { orderBasketStore } from '../medications/order-basket-store';
+import { useLayoutType, usePatient, useStore } from '@openmrs/esm-framework';
+import { useWorkspaces } from '@openmrs/esm-patient-common-lib';
+import { getOrderItems, orderBasketStore } from '../medications/order-basket-store';
 import styles from './order-basket-action-button.scss';
+import { useLaunchOrderBasket } from '../utils/launchOrderBasket';
 
 const OrderBasketActionButton: React.FC = () => {
-  const { t } = useTranslation();
   const layout = useLayoutType();
+  const { t } = useTranslation();
   const { workspaces } = useWorkspaces();
   const { items } = useStore(orderBasketStore);
-  const isActive = workspaces.find(({ name }) => name.includes('order-basket'));
+  const { patientUuid } = usePatient();
 
-  const launchOrdersWorkspace = useCallback(() => launchPatientWorkspace('order-basket-workspace'), []);
+  const isActiveWorkspace = workspaces?.[0]?.name?.match(/order-basket/i);
 
-  if (layout === 'tablet')
+  const patientOrderItems = getOrderItems(items, patientUuid);
+
+  const { launchOrderBasket } = useLaunchOrderBasket(patientUuid);
+
+  if (layout === 'tablet') {
     return (
       <Button
         kind="ghost"
-        className={`${styles.container} ${isActive ? styles.active : ''}`}
+        className={`${styles.container} ${isActiveWorkspace ? styles.active : ''}`}
         role="button"
         tabIndex={0}
-        onClick={launchOrdersWorkspace}
+        onClick={launchOrderBasket}
       >
         <div className={styles.elementContainer}>
-          <ShoppingCart size={20} /> {items?.length > 0 && <Tag className={styles.countTag}>{items?.length}</Tag>}
+          <ShoppingCart size={16} />{' '}
+          {patientOrderItems?.length > 0 && <Tag className={styles.countTag}>{patientOrderItems?.length}</Tag>}
         </div>
-        <span>{t('orderBasket', 'Order Basket')}</span>
+        <span>{t('orderBasket', 'Order basket')}</span>
       </Button>
     );
+  }
 
   return (
     <Button
-      className={isActive && styles.active}
+      className={isActiveWorkspace && styles.active}
       kind="ghost"
+      size="sm"
       renderIcon={(props) => (
         <div className={styles.elementContainer}>
           <ShoppingCart size={20} {...props} />{' '}
-          {items?.length > 0 && <Tag className={styles.countTag}>{items?.length}</Tag>}
+          {patientOrderItems?.length > 0 && <Tag className={styles.countTag}>{patientOrderItems?.length}</Tag>}
         </div>
       )}
       hasIconOnly
-      iconDescription={t('orders', 'Orders')}
-      tooltipAlignment="end"
-      tooltipPosition="bottom"
-      onClick={launchOrdersWorkspace}
+      iconDescription={t('medications', 'Medications')}
+      enterDelayMs={1000}
+      tooltipAlignment="center"
+      tooltipPosition="left"
+      onClick={launchOrderBasket}
     />
   );
 };
