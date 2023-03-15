@@ -14,7 +14,7 @@ export const configSchema = {
       },
       forms: {
         _type: Type.Array,
-        _description: 'Configuration of the forms.',
+        _description: 'List of forms that should be associated with this section',
         _elements: {
           name: {
             _type: Type.String,
