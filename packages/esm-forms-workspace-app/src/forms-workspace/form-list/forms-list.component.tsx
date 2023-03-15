@@ -107,7 +107,7 @@ const FormsList: React.FC<FormsListProps> = ({
       <div className={styles.formsListContainer}>
         <CardHeader title={t(formsSection.labelCode, formsSection.name)} children={undefined} />
         <div className={styles.container}>
-          <DataTable size={isDesktop(layout) ? 'sm' : 'lg'} rows={tableRows} headers={headers} isSortable>
+          <DataTable size={isDesktop(layout) ? 'sm' : 'lg'} rows={tableRows} headers={headers}>
             {({ rows, headers, getHeaderProps, getRowProps, getTableProps }) => (
               <TableContainer className={styles.tableContainer}>
                 <Table {...getTableProps()} useZebraStyles={true}>

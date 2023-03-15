@@ -1,25 +1,68 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
 @import '~@openmrs/esm-styleguide/src/vars';
+@import '../../root.scss';
 
-.formsListContainer {
+.heading {
+  @include type.type-style("heading-compact-01");
+}
+
+.text02 {
+  color: $text-02;
+}
+
+.bodyShort01 {
+  @include type.type-style("body-compact-01");
+}
+
+.bodyLong01 {
+  @include type.type-style("body-01");
+}
+
+.formContainer {
   display: flex;
   flex-direction: column;
   height: auto;
   width: 100%;
 }
 
-.formsListContainer input[type="text"] {
+.formContainer input[type="text"] {
   background-color: $ui-background;
 }
 
-.formsListContainer div:nth-of-type(2) {
+.formContainer div:nth-of-type(2) {
   padding-top: 0;
+}
+
+.formResultsLabel {
+  @include type.type-style('body-compact-01');
+  margin: spacing.$spacing-05;
+  color: $text-02;
+}
+
+.table {
+  margin-top: 3rem;
+}
+
+.tileContainer {
+  background-color: $ui-02;
+  margin: 3rem;
+}
+
+.tile {
+  margin: auto;
+  width: fit-content;
+}
+
+.tileContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 // Desktop viewport
 :global(.omrs-breakpoint-gt-tablet) {
-  .editCell {
+  .tableCell {
     display: flex;
     justify-content: space-between;
     cursor: pointer;
@@ -39,8 +82,12 @@
   }
 }
 
+.formName {
+  color: $interactive-01;
+}
+
 // Tablet viewport
-:global(.omrs-breakpoint-lt-desktop) .editCell {
+:global(.omrs-breakpoint-lt-desktop) .tableCell {
   display: flex;
   justify-content: space-between;
   cursor: pointer;
@@ -56,17 +103,20 @@
   }
 }
 
-#wide-table.cds--data-table-container {
-  max-width: 1300px !important;
-  max-height: 600px !important;
-
-  width: 800px !important;
-  height: 400px !important;
-}
-
 .tile {
   text-align: center;
-  border: 1px solid $ui-03;
-  overflow: scroll;
-  height: 95vh;
+  margin-top: 0.25rem;
+}
+
+.content {
+  @include type.type-style("heading-compact-01");
+  color: $text-02;
+  margin-top: spacing.$spacing-05;
+  margin-bottom: spacing.$spacing-03;
+}
+
+.helper {
+  @extend .bodyLong01;
+  color: $color-gray-70;
+  margin: 0.5rem 0;
 }
