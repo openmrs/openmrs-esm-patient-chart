@@ -47,7 +47,7 @@ const FormsList: React.FC<FormsListProps> = ({
   const { t } = useTranslation();
   const { orderBy } = useConfig() as ConfigObject;
   const layout = useLayoutType();
-  const [formsInfo, setFormsInfo] = useState<Array<CompletedFormInfo>>(formsSection.completedFromsInfo);
+  const [formsInfo, setFormsInfo] = useState(formsSection.completedFromsInfo);
   const orderForms = (orderBy: string, formsInfo: Array<CompletedFormInfo>): Array<CompletedFormInfo> => {
     switch (orderBy) {
       case OrderBy.Name:
