@@ -6,11 +6,12 @@ import { CardHeader, PatientChartPagination } from '@openmrs/esm-patient-common-
 import { useConfig, usePagination, Visit, formatDatetime, isDesktop, useLayoutType } from '@openmrs/esm-framework';
 import { launchFormEntryOrHtmlForms } from '../../form-entry-interop';
 import {
+  Button,
   Layer,
   Tile,
   DataTable,
+  DataTableHeader,
   DataTableRow,
-  Link,
   Table,
   TableBody,
   TableCell,
@@ -46,7 +47,7 @@ const FormsList: React.FC<FormsListProps> = ({
 }) => {
   const { t } = useTranslation();
   const { orderBy } = useConfig() as ConfigObject;
-  const layout = useLayoutType();
+  const isTablet = useLayoutType() === 'tablet';
   const [formsInfo, setFormsInfo] = useState(formsSection.completedFromsInfo);
   const orderForms = (orderBy: string, formsInfo: Array<CompletedFormInfo>): Array<CompletedFormInfo> => {
     switch (orderBy) {
@@ -65,19 +66,17 @@ const FormsList: React.FC<FormsListProps> = ({
     },
     [htmlFormEntryForms, patient, visit],
   );
-  const headers = [
-    {
-      id: 0,
-      header: t('formName', 'Form name (A-Z)'),
-      key: 'formName',
-    },
-    {
-      id: 1,
-      header: t('lastCompleted', 'Last completed'),
-      key: 'lastCompleted',
-      maxWidth: '40%',
-    },
-  ];
+
+  const tableHeaders: Array<DataTableHeader> = useMemo(
+    () => [
+      { key: 'formName', header: t('formName', 'Form name (A-Z)') },
+      {
+        key: 'lastCompleted',
+        header: t('lastCompleted', 'Last completed'),
+      },
+    ],
+    [t],
+  );
 
   useEffect(() => {
     const entriesToDisplay = isEmpty(searchTerm)
@@ -107,7 +106,13 @@ const FormsList: React.FC<FormsListProps> = ({
       <div className={styles.formsListContainer}>
         <CardHeader title={t(formsSection.labelCode, formsSection.name)} children={undefined} />
         <div className={styles.container}>
-          <DataTable size={isDesktop(layout) ? 'sm' : 'lg'} rows={tableRows} headers={headers}>
+          <DataTable
+            headers={tableHeaders}
+            rows={tableRows}
+            size={isTablet ? 'lg' : 'sm'}
+            useZebraStyles
+            overflowMenuOnHover={false}
+          >
             {({ rows, headers, getHeaderProps, getRowProps, getTableProps }) => (
               <TableContainer className={styles.tableContainer}>
                 <Table {...getTableProps()} useZebraStyles={true}>
@@ -115,7 +120,7 @@ const FormsList: React.FC<FormsListProps> = ({
                     <TableRow>
                       {headers.map((header, i) => (
                         <TableHeader
-                          className={`${styles.productiveHeading01} ${styles.text02}`}
+                          className={`${styles.heading} ${styles.text02}`}
                           {...getHeaderProps({
                             header,
                             isSortable: header.isSortable,
@@ -124,14 +129,14 @@ const FormsList: React.FC<FormsListProps> = ({
                           {header.header}
                         </TableHeader>
                       ))}
+                      <TableHeader />
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {rows.map((row, i) => (
                       <TableRow {...getRowProps({ row })} key={row.id}>
                         <TableCell key={row.cells[0].id}>
-                          <Link
-                            style={{ cursor: 'pointer' }}
+                          <label
                             onClick={() => {
                               handleFormOpen(row.id, null, tableRows[i].formName);
                             }}
@@ -139,17 +144,31 @@ const FormsList: React.FC<FormsListProps> = ({
                             className={styles.formName}
                           >
                             {tableRows[i]?.formName}
-                          </Link>
+                          </label>
                         </TableCell>
                         <TableCell className={styles.editCell}>
-                          <label>{row.cells[1].value ?? t('never', 'Never')}</label>
-                          {row.cells[1].value && (
-                            <Edit
-                              size={20}
-                              description="Edit form"
+                          <label
+                            onClick={() => {
+                              handleFormOpen(row.id, null, tableRows[i].formName);
+                            }}
+                            role="presentation"
+                            className={styles.formName}
+                          >
+                            {row.cells[1].value ?? t('never', 'Never')}
+                          </label>
+                        </TableCell>
+                        <TableCell className="cds--table-column-menu">
+                          {row.cells[0].value && (
+                            <Button
+                              hasIconOnly
+                              renderIcon={Edit}
+                              iconDescription={t('editForm', 'Edit form')}
                               onClick={() => {
                                 handleFormOpen(row.id, tableRows[i].encounterUuid, tableRows[i].formName);
                               }}
+                              size={isTablet ? 'lg' : 'sm'}
+                              kind="ghost"
+                              tooltipPosition="left"
                             />
                           )}
                         </TableCell>

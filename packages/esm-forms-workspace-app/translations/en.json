@@ -1,6 +1,7 @@
 {
   "clinicalForm": "Clinical form",
   "form": "Form",
+  "editForm": "Edit form",
   "formName": "Form name (A-Z)",
   "lastCompleted": "Last completed",
   "never": "Never",
