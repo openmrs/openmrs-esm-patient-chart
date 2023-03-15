@@ -1,9 +1,10 @@
 {
   "clinicalForm": "Clinical form",
-  "form": "Form",
   "editForm": "Edit form",
+  "form": "Form",
   "formName": "Form name (A-Z)",
   "lastCompleted": "Last completed",
   "never": "Never",
-  "noFormsAvailable": "There are no forms to display"
+  "noFormsAvailable": "There are no forms to display",
+  "searchForAForm": "Search for a form"
 }

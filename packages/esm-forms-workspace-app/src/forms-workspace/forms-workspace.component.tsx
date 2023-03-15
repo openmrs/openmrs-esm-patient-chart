@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { getConfig } from '@openmrs/esm-framework';
+import { getConfig, useLayoutType } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import styles from './forms-workspace.scss';
 import { EmptyDataIllustration, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import FormsList from './form-list/forms-list.component';
 import { useFormsToDisplay } from '../hooks/use-forms';
-import { DataTableSkeleton, Layer, Tile } from '@carbon/react';
+import { DataTableSkeleton, Layer, Tile, Search } from '@carbon/react';
 import { HtmlFormEntryForm } from '@openmrs/esm-patient-forms-app/src/config-schema';
 
 interface FormsDashboardProps {
@@ -20,6 +20,7 @@ const FormsDashboard: React.FC<FormsDashboardProps> = ({ patientUuid, patient, i
   const { isValidating, data, error } = useFormsToDisplay(patientUuid, isOffline);
   const [htmlFormEntryForms, setHtmlFormEntryForms] = React.useState<null | Array<HtmlFormEntryForm>>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const isTablet = useLayoutType() === 'tablet';
   patient = { id: patientUuid }; //TODO workaround while isn't offline ready
 
   React.useEffect(() => {
@@ -31,6 +32,12 @@ const FormsDashboard: React.FC<FormsDashboardProps> = ({ patientUuid, patient, i
   if (data) {
     return (
       <div className={styles.widgetCard}>
+        <Search
+          id="formSearch"
+          size={isTablet ? 'lg' : 'sm'}
+          placeholder={t('searchForAForm', 'Search for a form')}
+          onChange={(event) => setSearchTerm(event.target.value)}
+        />
         {data?.map((formsSection, i) => {
           let pageSize = undefined;
           return (
