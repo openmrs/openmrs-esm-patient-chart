@@ -133,7 +133,7 @@ const FormsList: React.FC<FormsListProps> = ({
                           <Link
                             style={{ cursor: 'pointer' }}
                             onClick={() => {
-                              handleFormOpen(row.id, '', tableRows[i].formName);
+                              handleFormOpen(row.id, null, tableRows[i].formName);
                             }}
                             role="presentation"
                             className={styles.formName}
