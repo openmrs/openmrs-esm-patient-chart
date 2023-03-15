@@ -369,7 +369,7 @@ export interface DiagnosisCreate {
     nonCoded?: string;
   };
   certainty: 'CONFIRMED' | 'PROVISIONAL';
-  rank: 1 | 2;
+  rank: number;
 }
 
 export interface Person {
