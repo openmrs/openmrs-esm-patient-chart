@@ -11,7 +11,7 @@ Ex. config:
 ```
 {
    "@openmrs/esm-forms-workspace-app":{
-      "orderFormsByName":"true",
+      "orderBy":"name",
       "useCurrentVisitDates":"true",
       "formsSectionsConfig":[
          {

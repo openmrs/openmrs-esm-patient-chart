@@ -21,7 +21,7 @@ import {
 } from '@carbon/react';
 import { Edit } from '@carbon/react/icons';
 import { CompletedFormInfo, FormsSection } from '../../types';
-import { ConfigObject } from '../../config-schema';
+import { ConfigObject, OrderBy } from '../../config-schema';
 import { defaultPaginationSize } from '../../constants';
 import { HtmlFormEntryForm } from '@openmrs/esm-patient-forms-app/src/config-schema';
 
@@ -45,15 +45,20 @@ const FormsList: React.FC<FormsListProps> = ({
   htmlFormEntryForms,
 }) => {
   const { t } = useTranslation();
-  const { orderFormsByName } = useConfig() as ConfigObject;
+  const { orderBy } = useConfig() as ConfigObject;
   const layout = useLayoutType();
   const [formsInfo, setFormsInfo] = useState<Array<CompletedFormInfo>>(formsSection.completedFromsInfo);
-  const { results, goTo, currentPage } = usePagination(
-    orderFormsByName
-      ? formsInfo.sort((a, b) => (b.lastCompleted?.getTime() ?? 0) - (a.lastCompleted?.getTime() ?? 0))
-      : formsInfo,
-    pageSize,
-  );
+  const orderForms = (orderBy: string, formsInfo: Array<CompletedFormInfo>): Array<CompletedFormInfo> => {
+    switch (orderBy) {
+      case OrderBy.Name:
+        return formsInfo.sort((a, b) => (a.form.display < b.form.display ? -1 : 1));
+      case OrderBy.MostRecent:
+        return formsInfo.sort((a, b) => (b.lastCompleted?.getTime() ?? 0) - (a.lastCompleted?.getTime() ?? 0));
+      default:
+        return formsInfo;
+    }
+  };
+  const { results, goTo, currentPage } = usePagination(orderForms(orderBy, formsInfo), pageSize);
   const handleFormOpen = useCallback(
     (formUuid, encounterUuid, formName) => {
       launchFormEntryOrHtmlForms(visit, formUuid, patient, htmlFormEntryForms, encounterUuid, formName);

@@ -54,10 +54,11 @@ export const configSchema = {
     _description: 'Only load encounters inside of the current visits dated.',
     _default: false,
   },
-  orderFormsByName: {
-    _type: Type.Boolean,
-    _description: 'Order the forms alphabetically.',
-    _default: true,
+  orderBy: {
+    _type: Type.String,
+    _description:
+      'Accept the values `name` that will order the forms alphabetically and `most-recent` that will order by the most recent created forms.',
+    _default: 'name',
   },
 };
 
@@ -77,5 +78,10 @@ export interface ConfigObject {
   showConfigurableForms: boolean;
   showHtmlFormEntryForms: boolean;
   useCurrentVisitDates: boolean;
-  orderFormsByName: boolean;
+  orderBy?: OrderBy;
+}
+
+export enum OrderBy {
+  Name = 'name',
+  MostRecent = 'most-recent',
 }
