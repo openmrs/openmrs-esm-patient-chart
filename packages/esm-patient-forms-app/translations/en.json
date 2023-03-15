@@ -2,6 +2,8 @@
   "all": "All",
   "checkFilters": "Check the filters above",
   "completed": "Completed",
+  "editForm": "Edit form",
+  "form": "Form",
   "formName": "Form Name (A-Z)",
   "forms": "Forms",
   "formSearchHint": "Try searching for the form using an alternative name or keyword",

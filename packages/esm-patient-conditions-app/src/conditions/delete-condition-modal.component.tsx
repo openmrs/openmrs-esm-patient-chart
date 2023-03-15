@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
+import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { showNotification, showToast } from '@openmrs/esm-framework';
-import { deletePatientCondition, useConditions } from './conditions.resource';
+import { deleteCondition, useConditions } from './conditions.resource';
 
 interface DeleteConditionModalProps {
   closeDeleteModal: () => void;
@@ -13,34 +13,35 @@ interface DeleteConditionModalProps {
 const DeleteConditionModal: React.FC<DeleteConditionModalProps> = ({ closeDeleteModal, conditionId, patientUuid }) => {
   const { t } = useTranslation();
   const { mutate } = useConditions(patientUuid);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
-  const handleSubmit = async () => {
-    setIsSubmitting(true);
+  const handleDelete = useCallback(async () => {
+    setIsDeleting(true);
 
-    deletePatientCondition(conditionId)
-      .then(({ status }) => {
-        if (status === 200) {
-          mutate();
-          closeDeleteModal();
-          showToast({
-            critical: true,
-            kind: 'success',
-            description: t('conditionDeletedSuccessfully', 'Condition deleted successfully'),
-            title: t('conditionDeleted', 'Condition Deleted'),
-          });
-        }
-      })
-      .catch((err) => {
-        console.error('Error deleting condition: ', err);
-        showNotification({
-          title: t('errorDeletingCondition', 'Error deleting condition'),
-          kind: 'error',
+    try {
+      const res = await deleteCondition(conditionId);
+
+      if (res.status === 200) {
+        mutate();
+        closeDeleteModal();
+        showToast({
           critical: true,
-          description: err?.message,
+          kind: 'success',
+          description: t('conditionDeletedSuccessfully', 'Condition deleted successfully'),
+          title: t('conditionDeleted', 'Condition Deleted'),
         });
+      }
+    } catch (error) {
+      console.error('Error deleting condition: ', error);
+
+      showNotification({
+        title: t('errorDeletingCondition', 'Error deleting condition'),
+        kind: 'error',
+        critical: true,
+        description: error?.message,
       });
-  };
+    }
+  }, [closeDeleteModal, conditionId, mutate, t]);
 
   return (
     <div>
@@ -52,8 +53,12 @@ const DeleteConditionModal: React.FC<DeleteConditionModalProps> = ({ closeDelete
         <Button kind="secondary" onClick={closeDeleteModal}>
           {t('cancel', 'Cancel')}
         </Button>
-        <Button kind="danger" onClick={handleSubmit} disabled={isSubmitting}>
-          {t('delete', 'Delete')}
+        <Button kind="danger" onClick={handleDelete} disabled={isDeleting}>
+          {isDeleting ? (
+            <InlineLoading description={t('deleting', 'Deleting') + '...'} />
+          ) : (
+            <span>{t('delete', 'Delete')}</span>
+          )}
         </Button>
       </ModalFooter>
     </div>

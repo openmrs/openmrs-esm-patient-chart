@@ -6,28 +6,12 @@
   border: 1px solid $ui-03;
 }
 
-.allergySeverity {
-  margin: 0.5rem 0rem;
-  letter-spacing: 0.063rem;
-}
-
 .allergyCriticality {
   display: flex;
   align-items: center; 
   text-transform: uppercase;
 }
 
-.bodyShort02 {
-  @include type.type-style("body-compact-02");
-}
-
-.productiveHeading02 {
-  @include type.type-style("heading-compact-02")
-}
-
-.note {
-  @include type.type-style("body-compact-02");
-  margin: 0.5rem 0rem;
-  color: $text-03;
-  max-width: 36rem;
+.allergySeverityHigh {
+  font-weight: 800;
 }

@@ -18,6 +18,7 @@ import {
   TableToolbarContent,
   TableToolbarSearch,
   Tile,
+  Button,
 } from '@carbon/react';
 import { Edit } from '@carbon/react/icons';
 import { EmptyDataIllustration, PatientChartPagination, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
@@ -117,10 +118,17 @@ const FormView: React.FC<FormViewProps> = ({ category, forms, patientUuid, patie
     <div className={styles.formContainer}>
       {forms?.length > 0 && (
         <>
-          <DataTable headers={tableHeaders} rows={tableRows} size="sm" isSortable useZebraStyles>
-            {({ rows, headers, getHeaderProps, getTableProps }) => (
+          <DataTable
+            headers={tableHeaders}
+            rows={tableRows}
+            size={isTablet ? 'lg' : 'sm'}
+            isSortable
+            useZebraStyles
+            overflowMenuOnHover={false}
+          >
+            {({ rows, headers, getHeaderProps, getTableProps, onInputChange, getToolbarProps }) => (
               <TableContainer className={styles.tableContainer}>
-                <TableToolbar className={styles.tableToolbar}>
+                <TableToolbar className={styles.tableToolbar} {...getToolbarProps()}>
                   <TableToolbarContent>
                     <TableToolbarSearch
                       className={styles.searchInput}
@@ -128,7 +136,7 @@ const FormView: React.FC<FormViewProps> = ({ category, forms, patientUuid, patie
                       light
                       onChange={(event) => handleSearch(event.target.value)}
                       placeholder={t('searchForAForm', 'Search for a form')}
-                      size={isTablet ? 'md' : 'sm'}
+                      size={isTablet ? 'lg' : 'sm'}
                     />
                   </TableToolbarContent>
                 </TableToolbar>
@@ -146,6 +154,7 @@ const FormView: React.FC<FormViewProps> = ({ category, forms, patientUuid, patie
                           {header.header}
                         </TableHeader>
                       ))}
+                      <TableHeader />
                     </TableRow>
                   </TableHead>
                   <TableBody>
@@ -171,25 +180,44 @@ const FormView: React.FC<FormViewProps> = ({ category, forms, patientUuid, patie
                             </label>
                           </TableCell>
                           <TableCell>
-                            <div className={styles.tableCell}>
-                              {row.cells[1].value ?? t('never', 'Never')}
-                              {row.cells[0].value && (
-                                <Edit
-                                  size={20}
-                                  description="Edit form"
-                                  onClick={() =>
-                                    launchFormEntryOrHtmlForms(
-                                      currentVisit,
-                                      row.id,
-                                      patient,
-                                      htmlFormEntryForms,
-                                      first(results[index].associatedEncounters)?.uuid,
-                                      results[index].form.display ?? results[index].form.name,
-                                    )
-                                  }
-                                />
-                              )}
-                            </div>
+                            <label
+                              onClick={() =>
+                                launchFormEntryOrHtmlForms(
+                                  currentVisit,
+                                  row.id,
+                                  patient,
+                                  htmlFormEntryForms,
+                                  '',
+                                  results[index].form.display ?? results[index].form.name,
+                                )
+                              }
+                              role="presentation"
+                              className={styles.formName}
+                            >
+                              {row.cells[1].value}
+                            </label>
+                          </TableCell>
+                          <TableCell className="cds--table-column-menu">
+                            {row.cells[0].value && (
+                              <Button
+                                hasIconOnly
+                                renderIcon={Edit}
+                                iconDescription={t('editForm', 'Edit form')}
+                                onClick={() =>
+                                  launchFormEntryOrHtmlForms(
+                                    currentVisit,
+                                    row.id,
+                                    patient,
+                                    htmlFormEntryForms,
+                                    first(results[index].associatedEncounters)?.uuid,
+                                    results[index].form.display ?? results[index].form.name,
+                                  )
+                                }
+                                size={isTablet ? 'lg' : 'sm'}
+                                kind="ghost"
+                                tooltipPosition="left"
+                              />
+                            )}
                           </TableCell>
                         </TableRow>
                       );

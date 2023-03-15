@@ -7,6 +7,7 @@ import { CardHeader, EmptyDataIllustration, ErrorState, launchPatientWorkspace }
 import { useAppointments } from './appointments.resource';
 import AppointmentsTable from './appointments-table.component';
 import styles from './appointments-base.scss';
+import { useLayoutType } from '@openmrs/esm-framework';
 
 interface AppointmentsBaseProps {
   basePath?: string;
@@ -22,6 +23,7 @@ enum AppointmentTypes {
 const AppointmentsBase: React.FC<AppointmentsBaseProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const headerTitle = t('appointments', 'Appointments');
+  const isTablet = useLayoutType() === 'tablet';
 
   const [switchedView, setSwitchedView] = useState(false);
 
@@ -39,7 +41,7 @@ const AppointmentsBase: React.FC<AppointmentsBaseProps> = ({ patientUuid }) => {
       workspaceTitle: t('scheduleAppointment', 'Schedule appointment'),
     });
 
-  if (isLoading) return <DataTableSkeleton role="progressbar" />;
+  if (isLoading) return <DataTableSkeleton role="progressbar" compact={!isTablet} zebra />;
   if (isError) {
     return <ErrorState headerTitle={headerTitle} error={isError} />;
   }
@@ -54,7 +56,7 @@ const AppointmentsBase: React.FC<AppointmentsBaseProps> = ({ patientUuid }) => {
           ) : null}
           <div className={styles.contentSwitcherWrapper}>
             <ContentSwitcher
-              size="md"
+              size={isTablet ? 'md' : 'sm'}
               onChange={({ index }) => {
                 setContentSwitcherValue(index);
                 setSwitchedView(true);

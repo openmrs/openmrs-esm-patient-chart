@@ -10,10 +10,6 @@
   margin-bottom: 0.5rem; 
 }
 
-:global(.cds--tooltip--definition .cds--tooltip__trigger){
-  border-bottom: none;
-}
-
 .definitionToolTip {
   & > button{
     border-bottom: none;

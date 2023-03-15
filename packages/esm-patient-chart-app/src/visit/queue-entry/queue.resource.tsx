@@ -69,19 +69,16 @@ interface UseVisitQueueEntries {
   isValidating?: boolean;
 }
 
-export function useVisitQueueEntries(patientUuid, visitUuid): UseVisitQueueEntries {
-  const { queueLocations } = useQueueLocations();
-  const queueLocationUuid = queueLocations[0]?.id;
-
-  const apiUrl = `/ws/rest/v1/visit-queue-entry?location=${queueLocationUuid}&v=full`;
+export function useVisitQueueEntry(patientUuid, visitUuid): UseVisitQueueEntries {
+  const apiUrl = `/ws/rest/v1/visit-queue-entry?patient=${patientUuid}`;
   const { data, error, isLoading, isValidating } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
     apiUrl,
     openmrsFetch,
   );
 
   const mapVisitQueueEntryProperties = (visitQueueEntry: VisitQueueEntry): MappedVisitQueueEntry => ({
-    id: visitQueueEntry.queueEntry.uuid,
-    name: visitQueueEntry.queueEntry.display,
+    id: visitQueueEntry.uuid,
+    name: visitQueueEntry.queueEntry.queue.display,
     patientUuid: visitQueueEntry.queueEntry.patient.uuid,
     priority:
       visitQueueEntry.queueEntry.priority.display === 'Urgent'
@@ -97,15 +94,14 @@ export function useVisitQueueEntries(patientUuid, visitUuid): UseVisitQueueEntri
     queueEntryUuid: visitQueueEntry.queueEntry.uuid,
   });
 
-  const visitQueues = data?.data?.results?.map(mapVisitQueueEntryProperties);
-
-  const mappedVisitQueueEntries =
-    visitQueues?.find(
-      (visitQueueEntry) => visitQueueEntry?.patientUuid == patientUuid && visitUuid === visitQueueEntry.visitUuid,
-    ) ?? null;
+  const mappedVisitQueueEntry =
+    data?.data?.results
+      ?.map(mapVisitQueueEntryProperties)
+      .filter((visitQueueEntry) => visitUuid !== undefined && visitUuid === visitQueueEntry.visitUuid)
+      .shift() ?? null;
 
   return {
-    queueEntry: mappedVisitQueueEntries,
+    queueEntry: mappedVisitQueueEntry,
     isLoading,
     isError: error,
     isValidating,

@@ -23,7 +23,15 @@ import {
   ErrorState,
   PatientChartPagination,
 } from '@openmrs/esm-patient-common-lib';
-import { ConfigObject, formatDate, formatDatetime, useConfig, usePagination } from '@openmrs/esm-framework';
+import {
+  ConfigObject,
+  formatDate,
+  formatDatetime,
+  useConfig,
+  useLayoutType,
+  usePagination,
+  isDesktop as desktopLayout,
+} from '@openmrs/esm-framework';
 import { usePrograms } from './programs.resource';
 import ProgramActionButton from './program-action-button/program-action-button.component';
 import { ConfigurableProgram } from '../types';
@@ -43,6 +51,9 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
   const urlLabel = t('seeAll', 'See all');
   const pageUrl = `\${openmrsSpaBase}/patient/${patientUuid}/chart/Programs`;
   const isConfigurable = config.customUrl ? true : false;
+  const layout = useLayoutType();
+  const isTablet = layout === 'tablet';
+  const isDesktop = desktopLayout(layout);
 
   const {
     activeEnrollments,
@@ -101,7 +112,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
     }));
   }, [isConfigurable, paginatedEnrollments, t]);
 
-  if (isLoading) return <DataTableSkeleton role="progressbar" />;
+  if (isLoading) return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
   if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
   if (isConfigurable ? configurablePrograms.length : activeEnrollments?.length) {
     return (
@@ -129,7 +140,7 @@ const ProgramsOverview: React.FC<ProgramsOverviewProps> = ({ basePath, patientUu
             title={t('fullyEnrolled', 'Enrolled in all programs')}
           />
         )}
-        <DataTable rows={tableRows} headers={tableHeaders} isSortable size="sm" useZebraStyles>
+        <DataTable rows={tableRows} headers={tableHeaders} isSortable size={isTablet ? 'lg' : 'sm'} useZebraStyles>
           {({ rows, headers, getHeaderProps, getTableProps }) => (
             <TableContainer>
               <Table {...getTableProps()}>

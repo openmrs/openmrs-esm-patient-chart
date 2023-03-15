@@ -21,9 +21,10 @@ import {
   navigate,
   useConfig,
   showModal,
+  ExtensionSlot,
 } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
-import { MappedQueuePriority, useVisitQueueEntries } from '../visit/queue-entry/queue.resource';
+import { MappedQueuePriority, useVisitQueueEntry } from '../visit/queue-entry/queue.resource';
 import { EditQueueEntry } from '../visit/queue-entry/edit-queue-entry.component';
 import VisitHeaderSideMenu from './visit-header-side-menu.component';
 import styles from './visit-header.scss';
@@ -56,7 +57,7 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
   const { currentVisit } = useVisit(patientUuid);
   const info = `${parseInt(age(patient?.birthDate))}, ${getGender(patient?.gender)}`;
   const truncate = !isTablet && name.trim().length > 25;
-  const { queueEntry, isLoading } = useVisitQueueEntries(patientUuid, currentVisit?.uuid);
+  const { queueEntry, isLoading } = useVisitQueueEntry(patientUuid, currentVisit?.uuid);
 
   const visitType = queueEntry?.visitType ?? '';
   const priority = queueEntry?.priority ?? '';
@@ -192,6 +193,7 @@ const VisitHeader: React.FC = () => {
             <PatientInfo patient={patient} />
           </div>
           <HeaderGlobalBar>
+            <ExtensionSlot extensionSlotName="visit-header-right-slot" />
             {!hasActiveVisit && (
               <Button className={styles.startVisitButton} onClick={launchStartVisitForm} size="lg">
                 {startVisitLabel ? startVisitLabel : t('startVisit', 'Start a visit')}

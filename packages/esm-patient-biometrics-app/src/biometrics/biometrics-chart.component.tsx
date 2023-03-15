@@ -59,6 +59,7 @@ const BiometricsChart: React.FC<BiometricsChartProps> = ({ patientBiometrics, co
 
   const chartOptions = React.useMemo(() => {
     return {
+      title: selectedBiometrics.title,
       axes: {
         bottom: {
           title: 'Date',

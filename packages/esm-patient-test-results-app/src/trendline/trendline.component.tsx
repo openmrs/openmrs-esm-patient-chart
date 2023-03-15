@@ -45,7 +45,7 @@ const TrendlineHeader = ({ patientUuid, title, referenceRange, isValidating, sho
       </div>
       <div className={styles.content}>
         <span className={styles.title}>{title}</span>
-        <span className={styles.referenceange}>{referenceRange}</span>
+        <span className={styles['reference-range']}>{referenceRange}</span>
       </div>
       <div>{isValidating && <InlineLoading className={styles.inlineLoader} />}</div>
     </div>
@@ -222,7 +222,7 @@ const Trendline: React.FC<TrendlineProps> = ({
   }
 
   return (
-    <>
+    <div className={styles.container}>
       {!hideTrendlineHeader && (
         <TrendlineHeader
           showBackToTimelineButton={showBackToTimelineButton}
@@ -237,7 +237,7 @@ const Trendline: React.FC<TrendlineProps> = ({
         <LineChart data={data} options={chartOptions} />
       </TrendLineBackground>
       <DrawTable {...{ tableData, tableHeaderData }} />
-    </>
+    </div>
   );
 };
 
