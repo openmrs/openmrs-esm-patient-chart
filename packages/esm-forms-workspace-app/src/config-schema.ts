@@ -58,7 +58,7 @@ export const configSchema = {
     _type: Type.String,
     _description:
       'Accept the values `name` that will order the forms alphabetically and `most-recent` that will order by the most recent created forms.',
-    _default: 'name',
+    _default: 'most-recent',
   },
 };
 
