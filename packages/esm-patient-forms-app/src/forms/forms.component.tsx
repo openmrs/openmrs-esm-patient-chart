@@ -34,7 +34,7 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
   const isTablet = layout === 'tablet';
   const isDesktop = layout === 'small-desktop' || layout === 'large-desktop';
   const [formsCategory, setFormsCategory] = useState<FormsCategory>(showRecommendedFormsTab ? 'Recommended' : 'All');
-  const { isValidating, data, error } = useForms(patientUuid, undefined, undefined, isOffline);
+  const { isValidating, data, error, mutateForms } = useForms(patientUuid, undefined, undefined, isOffline);
   const session = useSession();
   let formsToDisplay = isOffline
     ? data?.filter((formInfo) => isValidOfflineFormEncounter(formInfo.form, htmlFormEntryForms))
@@ -124,6 +124,7 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
             pageSize={pageSize}
             pageUrl={pageUrl}
             urlLabel={urlLabel}
+            mutateForms={mutateForms}
           />
         )}
         {formsCategory === 'Recommended' && (
@@ -135,6 +136,7 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
             pageSize={pageSize}
             pageUrl={pageUrl}
             urlLabel={urlLabel}
+            mutateForms={mutateForms}
           />
         )}
         {formsCategory === 'All' && (
@@ -145,6 +147,7 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
             pageSize={pageSize}
             pageUrl={pageUrl}
             urlLabel={urlLabel}
+            mutateForms={mutateForms}
           />
         )}
       </div>
