@@ -8,7 +8,11 @@ export class OpenmrsEsmApiService {
   constructor() {}
 
   public getCurrentUser(): Observable<LoggedInUser> {
-    return getCurrentUser().pipe(map((session: Session) => session.user));
+    return getCurrentUser().pipe(
+      map((session: Session) => {
+        return { ...session.user, sessionLocation: session.sessionLocation };
+      }),
+    );
   }
 
   public openmrsFetch(url): Observable<any> {
