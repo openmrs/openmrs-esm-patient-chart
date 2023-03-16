@@ -14,15 +14,16 @@ export const configSchema = {
       },
       forms: {
         _type: Type.Array,
-        _description: 'List of forms that should be associated with this section',
+        _description:
+          'List of forms that should be associated with this section, it can be used the `Form UUID` or the `Encounter Type UUID` if you have both the `Form UUID` will be used.',
         _elements: {
-          name: {
-            _type: Type.String,
-            _description: 'Name of form.',
-          },
-          uuid: {
+          formUuid: {
             _type: Type.String,
             _description: 'Uuid of the form.',
+          },
+          encounterTypeUuid: {
+            _type: Type.String,
+            _description: 'Uuid of the encounter type.',
           },
         },
       },
@@ -61,8 +62,8 @@ export interface FormsSectionConfig {
   name: string;
   labelCode: string;
   forms?: Array<{
-    name: string;
-    uuid: string;
+    formUuid?: string;
+    encounterTypeUuid?: string;
   }>;
 }
 

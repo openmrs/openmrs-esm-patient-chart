@@ -107,7 +107,9 @@ function mapToFormCompletedInfo(
   return formsSectionConfig.forms
     .map((formConfig) => {
       const form: Form = allForms.find((form) => {
-        return form.uuid === formConfig.uuid;
+        return formConfig.formUuid
+          ? form.uuid === formConfig.formUuid
+          : form.encounterType.uuid === formConfig.encounterTypeUuid;
       });
       if (form == undefined) {
         return null;
