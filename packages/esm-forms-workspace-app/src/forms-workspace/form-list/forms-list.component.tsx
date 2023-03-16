@@ -49,17 +49,18 @@ const FormsList: React.FC<FormsListProps> = ({
   const { orderBy } = useConfig() as ConfigObject;
   const isTablet = useLayoutType() === 'tablet';
   const [formsInfo, setFormsInfo] = useState(formsSection.completedFromsInfo);
-  const orderForms = (orderBy: string, formsInfo: Array<CompletedFormInfo>): Array<CompletedFormInfo> => {
+  const [formsToShow, setFormsToShow] = useState(formsSection.completedFromsInfo);
+  const orderForms = (orderBy: string, forms: Array<CompletedFormInfo>): Array<CompletedFormInfo> => {
     switch (orderBy) {
       case OrderBy.Name:
-        return formsInfo.sort((a, b) => (a.form.display < b.form.display ? -1 : 1));
+        return forms.sort((a, b) => (a.form.display < b.form.display ? -1 : 1));
       case OrderBy.MostRecent:
-        return formsInfo.sort((a, b) => (b.lastCompleted?.getTime() ?? 0) - (a.lastCompleted?.getTime() ?? 0));
+        return forms.sort((a, b) => (b.lastCompleted?.getTime() ?? 0) - (a.lastCompleted?.getTime() ?? 0));
       default:
-        return formsInfo;
+        return forms;
     }
   };
-  const { results, goTo, currentPage } = usePagination(orderForms(orderBy, formsInfo), pageSize);
+  const { results, goTo, currentPage } = usePagination(orderForms(orderBy, formsToShow), pageSize);
   const handleFormOpen = useCallback(
     (formUuid, encounterUuid, formName) => {
       launchFormEntryOrHtmlForms(visit, formUuid, patient, htmlFormEntryForms, encounterUuid, formName);
@@ -84,7 +85,7 @@ const FormsList: React.FC<FormsListProps> = ({
       : formsInfo.filter((formInfo) => {
           return formInfo.form.name.toLowerCase().search(searchTerm?.toLowerCase()) !== -1;
         });
-    setFormsInfo(entriesToDisplay);
+    setFormsToShow(entriesToDisplay);
   }, [formsInfo, searchTerm]);
 
   const tableRows: Array<DataTableRow> = useMemo(
