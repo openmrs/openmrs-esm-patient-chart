@@ -12,8 +12,8 @@ import { customEncounterRepresentation, formEncounterUrl, formEncounterUrlPoc } 
 import { ConfigObject, FormsSectionConfig } from '../config-schema';
 
 export function useForms(cachedOfflineFormsOnly = false, patientUuid: string = '') {
-  const { showConfigurableForms, customFormsUrl, showHtmlFormEntryForms } = useConfig() as ConfigObject;
-  const url = showConfigurableForms
+  const { customFormsUrl, showHtmlFormEntryForms } = useConfig() as ConfigObject;
+  const url = customFormsUrl
     ? interpolateUrl('${customFormsUrl}?${patientUuid}', { customFormsUrl: customFormsUrl, patientUuid: patientUuid })
     : showHtmlFormEntryForms
     ? formEncounterUrl
@@ -22,7 +22,7 @@ export function useForms(cachedOfflineFormsOnly = false, patientUuid: string = '
   return useSWR([url, cachedOfflineFormsOnly], async () => {
     const res = await openmrsFetch<ListResponse<Form>>(url);
     // show published forms and hide component forms
-    const forms = showConfigurableForms
+    const forms = customFormsUrl
       ? res?.data.results
       : res.data?.results?.filter((form) => form.published && !/component/i.test(form.name)) ?? [];
 

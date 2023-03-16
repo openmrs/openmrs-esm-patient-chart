@@ -39,14 +39,9 @@ export const configSchema = {
     _description: 'Whether to display recommended forms tab.',
     _default: false,
   },
-  showConfigurableForms: {
-    _type: Type.Boolean,
-    _description: 'Whether to use customURL to fetch forms, works with `customFormsUrl`',
-    _default: false,
-  },
   customFormsUrl: {
     _type: Type.String,
-    _description: 'Custom forms endpoint to fetch forms using a custom url need `showConfigurableForms`',
+    _description: 'Custom forms endpoint to fetch forms using a custom url.',
     _default: '',
   },
   useCurrentVisitDates: {
@@ -75,7 +70,6 @@ export interface ConfigObject {
   formsSectionsConfig?: Array<FormsSectionConfig>;
   showRecommendedFormsTab: boolean;
   customFormsUrl: string;
-  showConfigurableForms: boolean;
   showHtmlFormEntryForms: boolean;
   useCurrentVisitDates: boolean;
   orderBy?: OrderBy;
