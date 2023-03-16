@@ -102,37 +102,41 @@ const PanelView: React.FC<PanelViewProps> = ({ expanded, testUuid, basePath, typ
 
   return (
     <>
-      <div className={styles.leftSection}>
-        <>
-          <PanelViewHeader
-            isTablet={isTablet}
-            setSearchTerm={setSearchTerm}
-            searchTerm={searchTerm}
-            totalSearchResults={filteredPanels?.length ?? 0}
-          />
-          {!isLoading ? (
-            panels.length > 0 ? (
-              filteredPanels.length ? (
-                filteredPanels.map((panel) => (
-                  <LabSetPanel
-                    panel={panel}
-                    observations={[panel, ...panel.relatedObs]}
-                    setActivePanel={setActivePanel}
-                    activePanel={activePanel}
-                  />
-                ))
+      {!expanded ? (
+        <div className={styles.leftSection}>
+          <>
+            <PanelViewHeader
+              isTablet={isTablet}
+              setSearchTerm={setSearchTerm}
+              searchTerm={searchTerm}
+              totalSearchResults={filteredPanels?.length ?? 0}
+            />
+            {!isLoading ? (
+              panels.length > 0 ? (
+                filteredPanels.length ? (
+                  filteredPanels.map((panel) => (
+                    <LabSetPanel
+                      panel={panel}
+                      observations={[panel, ...panel.relatedObs]}
+                      setActivePanel={setActivePanel}
+                      activePanel={activePanel}
+                    />
+                  ))
+                ) : (
+                  <FilterEmptyState clearFilter={() => setSearchTerm('')} />
+                )
               ) : (
-                <FilterEmptyState clearFilter={() => setSearchTerm('')} />
+                <EmptyState displayText={t('panels', 'panels')} headerTitle={t('noPanelsFound', 'No panels found')} />
               )
             ) : (
-              <EmptyState displayText={t('panels', 'panels')} headerTitle={t('noPanelsFound', 'No panels found')} />
-            )
-          ) : (
-            <DataTableSkeleton columns={3} />
-          )}
-        </>
-      </div>
-      <div className={`${styles.headerMargin} ${styles.rightSection}`}>
+              <DataTableSkeleton columns={3} />
+            )}
+          </>
+        </div>
+      ) : null}
+      <div
+        className={`${styles.headerMargin} ${styles.rightSection}  ${expanded ? styles.fullView : styles.splitView}`}
+      >
         <div className={styles.stickySection}>
           {isLoading ? (
             <DataTableSkeleton columns={3} />
