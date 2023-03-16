@@ -4,6 +4,7 @@ import { Button, OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import { Close } from '@carbon/react/icons';
 import { Attachment } from '../attachments-types';
 import styles from './image-preview.scss';
+import { useLayoutType } from '@openmrs/esm-framework';
 
 interface AttachmentPreviewProps {
   closePreview: any;
@@ -17,6 +18,7 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
   deleteAttachment,
 }) => {
   const { t } = useTranslation();
+  const isTablet = useLayoutType() === 'tablet';
 
   useEffect(() => {
     const closePreviewOnEscape = (evt) => {
@@ -52,7 +54,7 @@ const AttachmentPreview: React.FC<AttachmentPreviewProps> = ({
           ) : null}
         </div>
         <div className={styles.overflowMenu}>
-          <OverflowMenu className={styles.overflowMenu}>
+          <OverflowMenu className={styles.overflowMenu} flipped size={isTablet ? 'lg' : 'md'}>
             <OverflowMenuItem
               hasDivider
               isDelete

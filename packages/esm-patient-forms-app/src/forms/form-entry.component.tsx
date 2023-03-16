@@ -8,7 +8,11 @@ import {
   useVisitOrOfflineVisit,
 } from '@openmrs/esm-patient-common-lib';
 
-const FormEntry: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace }) => {
+interface FormEntryComponentProps extends DefaultWorkspaceProps {
+  mutateForm: () => void;
+}
+
+const FormEntry: React.FC<FormEntryComponentProps> = ({ patientUuid, closeWorkspace, mutateForm }) => {
   const { patient } = usePatientOrOfflineRegisteredPatient(patientUuid);
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const [selectedForm, setSelectedForm] = useState<FormEntryProps>(null);
@@ -22,9 +26,23 @@ const FormEntry: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspac
       patientUuid: patientUuid ?? null,
       patient,
       encounterUuid: selectedForm?.encounterUuid ?? null,
-      closeWorkspace,
+      closeWorkspace: () => {
+        mutateForm();
+        closeWorkspace();
+      },
     }),
-    [selectedForm, currentVisit, patientUuid, patient, closeWorkspace],
+    [
+      selectedForm?.formUuid,
+      selectedForm?.visitUuid,
+      selectedForm?.visitTypeUuid,
+      selectedForm?.encounterUuid,
+      currentVisit?.uuid,
+      currentVisit?.visitType?.uuid,
+      patientUuid,
+      patient,
+      closeWorkspace,
+      mutateForm,
+    ],
   );
 
   useEffect(() => {

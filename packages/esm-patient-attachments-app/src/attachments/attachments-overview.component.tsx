@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, ContentSwitcher, Loading, Switch } from '@carbon/react';
-import { showModal, showToast, UserHasAccess } from '@openmrs/esm-framework';
-import { EmptyState } from '@openmrs/esm-patient-common-lib';
+import { showModal, showToast, useLayoutType, UserHasAccess } from '@openmrs/esm-framework';
+import { CardHeader, EmptyState } from '@openmrs/esm-patient-common-lib';
 import { createAttachment, deleteAttachmentPermanently, useAttachments } from '../attachments.resource';
 import { createGalleryEntry } from '../utils';
 import { UploadedFile, Attachment } from '../attachments-types';
@@ -19,6 +19,7 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
   const attachments = useMemo(() => data.map((item) => createGalleryEntry(item)), [data]);
   const [error, setError] = useState(false);
   const [view, setView] = useState('grid');
+  const isTablet = useLayoutType() === 'tablet';
 
   const closeImagePDFPreview = useCallback(() => setAttachmentToPreview(null), [setAttachmentToPreview]);
 
@@ -106,21 +107,23 @@ const AttachmentsOverview: React.FC<{ patientUuid: string }> = ({ patientUuid })
     <UserHasAccess privilege="View Attachments">
       <div onDragOverCapture={showCam} className={styles.overview}>
         <div id="container">
-          <div className={styles.attachmentsHeader}>
-            <h4 className={styles.productiveheading02}>{t('attachments', 'Attachments')}</h4>
-            <div>{isValidating && <Loading withOverlay={false} small />}</div>
-            <ContentSwitcher onChange={(evt) => setView(`${evt.name}`)}>
-              <Switch name="grid">
-                <Thumbnail_2 size={16} />
-              </Switch>
-              <Switch name="tabular">
-                <List size={16} />
-              </Switch>
-            </ContentSwitcher>
-            <Button kind="ghost" renderIcon={Add} iconDescription="Add attachment" onClick={showCam}>
-              {t('add', 'Add')}
-            </Button>
-          </div>
+          <CardHeader title={t('attachments', 'Attachments')}>
+            <div className={styles.validatingDataIcon}>{isValidating && <Loading withOverlay={false} small />}</div>
+            <div className={styles.attachmentHeaderActionItems}>
+              <ContentSwitcher onChange={(evt) => setView(`${evt.name}`)} size={isTablet ? 'md' : 'sm'}>
+                <Switch name="grid">
+                  <Thumbnail_2 size={16} />
+                </Switch>
+                <Switch name="tabular">
+                  <List size={16} />
+                </Switch>
+              </ContentSwitcher>
+              <div className={styles.divider} />
+              <Button kind="ghost" renderIcon={Add} iconDescription="Add attachment" onClick={showCam}>
+                {t('add', 'Add')}
+              </Button>
+            </div>
+          </CardHeader>
           {view === 'grid' ? (
             <AttachmentsGridOverview
               openAttachment={openAttachment}

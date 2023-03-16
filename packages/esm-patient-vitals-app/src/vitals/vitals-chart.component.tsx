@@ -97,6 +97,7 @@ const VitalsChart: React.FC<VitalsChartProps> = ({ patientVitals, conceptUnits, 
   }, [patientVitals, selectedVitalSign]);
 
   const chartOptions = {
+    title: selectedVitalSign.title,
     axes: {
       bottom: {
         title: 'Date',

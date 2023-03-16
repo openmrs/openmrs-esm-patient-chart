@@ -15,7 +15,7 @@ import {
   DataTableHeader,
 } from '@carbon/react';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
-import { formatDatetime, parseDate, usePagination } from '@openmrs/esm-framework';
+import { formatDatetime, parseDate, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { Appointment } from '../types';
 import { AppointmentsActionMenu } from './appointments-action-menu.component';
 import styles from './appointments-table.scss';
@@ -37,6 +37,7 @@ const AppointmentsTable: React.FC<AppointmentTableProps> = ({
 }) => {
   const { t } = useTranslation();
   const { results: paginatedAppointments, currentPage, goTo } = usePagination(patientAppointments, pageSize);
+  const isTablet = useLayoutType() === 'tablet';
 
   useEffect(() => {
     if (switchedView && currentPage !== 1) {
@@ -62,11 +63,11 @@ const AppointmentsTable: React.FC<AppointmentTableProps> = ({
         return {
           id: appointment.uuid,
           date: formatDatetime(parseDate(appointment.startDateTime), { mode: 'wide' }),
-          location: appointment?.location?.name ?? '—',
+          location: appointment?.location?.name ? appointment?.location?.name : '——',
           service: appointment.service.name,
           status: appointment.status,
-          type: appointment.appointmentKind ?? '—',
-          notes: appointment.comments ?? '—',
+          type: appointment.appointmentKind ? appointment.appointmentKind : '——',
+          notes: appointment.comments ? appointment.comments : '——',
         };
       }),
     [paginatedAppointments],
@@ -74,7 +75,7 @@ const AppointmentsTable: React.FC<AppointmentTableProps> = ({
 
   return (
     <div>
-      <DataTable rows={tableRows} headers={tableHeaders} isSortable size="sm" useZebraStyles>
+      <DataTable rows={tableRows} headers={tableHeaders} isSortable size={isTablet ? 'lg' : 'sm'} useZebraStyles>
         {({ rows, headers, getHeaderProps, getTableProps }) => (
           <TableContainer>
             <Table {...getTableProps()}>

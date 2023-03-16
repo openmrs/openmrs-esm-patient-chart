@@ -13,10 +13,14 @@
   "district": "District",
   "loading": "Loading...",
   "postalCode": "Postal code",
+  "female": "Female",
+  "male": "Male",
+  "other": "Other",
   "relationships": "Relationships",
   "showAllDetails": "Show all details",
   "showLess": "Show less",
   "started": "Started",
   "state": "State",
-  "stateProvince": "State"
+  "stateProvince": "State",
+  "unknown": "Unknown"
 }

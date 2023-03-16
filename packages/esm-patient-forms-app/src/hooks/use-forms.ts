@@ -43,6 +43,11 @@ export function useForms(patientUuid: string, startDate?: Date, endDate?: Date, 
   const encountersRes = useEncountersWithFormRef(patientUuid, startDate, endDate);
   const pastEncounters = encountersRes.data?.data?.results ?? [];
   const data = allFormsRes.data ? mapToFormCompletedInfo(allFormsRes.data, pastEncounters) : undefined;
+
+  const mutateForms = () => {
+    allFormsRes.mutate();
+    encountersRes.mutate();
+  };
   // Note:
   // `pastEncounters` is currently considered as optional (i.e. any errors are ignored) since it's only used for display
   // and doesn't change any functional flows. This makes offline mode much easier to implement since the past encounters
@@ -56,6 +61,7 @@ export function useForms(patientUuid: string, startDate?: Date, endDate?: Date, 
     error: allFormsRes.error,
     isValidating: allFormsRes.isValidating || encountersRes.isValidating,
     allForms: allFormsRes.data,
+    mutateForms,
   };
 }
 
