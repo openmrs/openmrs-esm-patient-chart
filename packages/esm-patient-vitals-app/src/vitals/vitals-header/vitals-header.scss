@@ -7,7 +7,7 @@
   justify-content: space-between;
   align-items: center;
   height: spacing.$spacing-09;
-  padding: spacing.$spacing-05;
+  margin-left: spacing.$spacing-05;
   outline: none;
   pointer-events: visibleFill;
 }
@@ -17,25 +17,32 @@
   align-items: baseline;
 }
 
-.warning-background {
-  background-color: $warning-background;
-  border-left: 3px solid $inverse-support-03;
-}
-
-.default-background {
+.background {
   background-color: $openmrs-background-grey;
-}
-
-.align-center {
-  display: flex;
-  align-items: center;
 }
 
 .row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-grow: 1;
+  margin: 0rem 1rem;
+  max-width: 100vw;
+}
+
+.default-border {
+  width: 100%;
+  border-bottom: 1px solid $ui-03;
+}
+
+:global(.omrs-breakpoint-lt-desktop) {
+  .row {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .default-border {
+    padding-bottom: 0.75rem;
+  }
 }
 
 .loading {
@@ -45,29 +52,22 @@
   min-height: spacing.$spacing-09;
 }
 
-.default-border {
-  border-bottom: 1px solid $ui-03;
-}
-
-.warning-border {
-  border-bottom: 1px solid $color-yellow-50;
-}
-
 .container-row {
   display: flex;
   flex-wrap: wrap;
 }
 
-.warning-icon {
-  display: flex;
-  align-self: center;
-  fill: $inverse-support-03;
-  margin-right: spacing.$spacing-05;
+.tag {
+  margin: 0 0.5rem;
 }
 
-.warning-icon [data-icon-path="inner-path"] {
-  fill: black;
-  opacity: 1;
+.overdueIndicator {
+  display: flex;
+  align-items: center;
+
+  svg {
+    margin-right: 0.25rem;
+  }
 }
 
 .button-container {
@@ -104,7 +104,6 @@
 
 .link {
   @extend .body-text;
-  margin-left: 0.5rem;
   text-decoration-line: none;
   color: $interactive-01;
 }

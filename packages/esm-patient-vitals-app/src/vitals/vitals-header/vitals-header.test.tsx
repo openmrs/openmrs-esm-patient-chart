@@ -73,10 +73,10 @@ describe('VitalsHeader: ', () => {
 
     await waitForLoadingToFinish();
 
-    expect(screen.getByText(/Vitals and biometrics/i)).toBeInTheDocument();
+    expect(screen.getByText(/vitals and biometrics/i)).toBeInTheDocument();
     expect(screen.getByText(/19-May-2021/i)).toBeInTheDocument();
+    expect(screen.getByText(/vitals history/i)).toBeInTheDocument();
     expect(screen.getByText(/Record vitals/i)).toBeInTheDocument();
-    expect(screen.getByRole('img', { name: /warning/i })).toBeInTheDocument();
 
     expect(getByTextWithMarkup(/Temp\s*37\s*DEG C/i)).toBeInTheDocument();
     expect(getByTextWithMarkup(/BP\s*121 \/ 89\s*mmHg/i)).toBeInTheDocument();
@@ -87,7 +87,7 @@ describe('VitalsHeader: ', () => {
     expect(getByTextWithMarkup(/BMI\s*-\s*/i)).toBeInTheDocument();
     expect(getByTextWithMarkup(/Weight\s*-\s*/i)).toBeInTheDocument();
 
-    expect(screen.getByRole('img', { name: /warning/i })).toBeInTheDocument();
+    expect(screen.getByText(/overdue/i)).toBeInTheDocument();
     expect(screen.getAllByTitle(/abnormal value/i).length).toEqual(2);
   });
 
