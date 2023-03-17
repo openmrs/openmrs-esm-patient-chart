@@ -174,8 +174,14 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
       </span>
 
       <div className={styles.container}>
-        <Button className={styles['button-text']} onClick={launchVitalsAndBiometricsForm} kind="ghost" size="sm">
+        <Button
+          className={`${styles['record-vitals']} ${styles['arrow-up-icon']}`}
+          onClick={launchVitalsAndBiometricsForm}
+          kind="ghost"
+          size="sm"
+        >
           {t('recordVitals', 'Record vitals')}
+          <ArrowRight size={16} className={styles['arrow-up-button']} title={'ArrowRight'} />
         </Button>
       </div>
     </div>
