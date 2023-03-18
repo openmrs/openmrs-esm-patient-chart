@@ -1,18 +1,18 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import LabSetPanel from './panel.component';
-import usePanelData from './usePanelData';
 import { DataTableSkeleton, Button, Search, Form } from '@carbon/react';
 import { Search as SearchIcon, Close } from '@carbon/react/icons';
-import styles from './panel-view.scss';
-import { navigate, useLayoutType } from '@openmrs/esm-framework';
-import PanelTimelineComponent from '../panel-timeline';
-import { ObsRecord } from './types';
 import { useTranslation } from 'react-i18next';
+import { navigate, useLayoutType } from '@openmrs/esm-framework';
 import { EmptyState } from '@openmrs/esm-patient-common-lib';
-import Trendline from '../trendline/trendline.component';
-import Overlay from '../tablet-overlay/tablet-overlay.component';
-import { testResultsBasePath } from '../helpers';
 import { FilterEmptyState } from '../ui-elements/resetFiltersEmptyState';
+import { ObsRecord } from './types';
+import { testResultsBasePath } from '../helpers';
+import LabSetPanel from './panel.component';
+import Overlay from '../tablet-overlay/tablet-overlay.component';
+import PanelTimelineComponent from '../panel-timeline';
+import Trendline from '../trendline/trendline.component';
+import usePanelData from './usePanelData';
+import styles from './panel-view.scss';
 
 interface PanelViewProps {
   expanded: boolean;
@@ -23,13 +23,13 @@ interface PanelViewProps {
 }
 
 const PanelView: React.FC<PanelViewProps> = ({ expanded, testUuid, basePath, type, patientUuid }) => {
+  const { t } = useTranslation();
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
-  const { panels, isLoading, groupedObservations } = usePanelData();
-  const [activePanel, setActivePanel] = useState<ObsRecord>(null);
-  const { t } = useTranslation();
   const trendlineView = testUuid && type === 'trendline';
+  const { panels, isLoading, groupedObservations } = usePanelData();
   const [searchTerm, setSearchTerm] = useState('');
+  const [activePanel, setActivePanel] = useState<ObsRecord>(null);
 
   const filteredPanels = useMemo(() => {
     if (!searchTerm) {
@@ -42,18 +42,18 @@ const PanelView: React.FC<PanelViewProps> = ({ expanded, testUuid, basePath, typ
     );
   }, [panels, searchTerm]);
 
+  const navigateBackFromTrendlineView = useCallback(() => {
+    navigate({
+      to: testResultsBasePath(`/patient/${patientUuid}/chart`),
+    });
+  }, [patientUuid]);
+
   useEffect(() => {
     // Selecting the active panel should not occur in small-desktop
     if (layout !== 'tablet' && filteredPanels) {
       setActivePanel(filteredPanels?.[0]);
     }
   }, [filteredPanels, layout]);
-
-  const navigateBackFromTrendlineView = useCallback(() => {
-    navigate({
-      to: testResultsBasePath(`/patient/${patientUuid}/chart`),
-    });
-  }, [patientUuid]);
 
   if (isTablet) {
     return (
