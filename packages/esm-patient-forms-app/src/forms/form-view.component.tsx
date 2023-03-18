@@ -79,7 +79,7 @@ const FormView: React.FC<FormViewProps> = ({
   const handleSearch = React.useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), 300), []);
 
   const { results, goTo, currentPage } = usePagination(
-    filteredForms?.sort((a, b) => (b.lastCompleted?.getTime() ?? 0) - (a.lastCompleted?.getTime() ?? 0)),
+    filteredForms?.sort((a, b) => (a.form?.display > b.form?.display ? 1 : -1)),
     pageSize,
   );
 
