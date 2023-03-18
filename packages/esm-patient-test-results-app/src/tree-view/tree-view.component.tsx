@@ -63,12 +63,12 @@ const TreeView: React.FC<TreeViewProps> = ({ patientUuid, basePath, testUuid, lo
 
   return (
     <>
-      {!tablet && (
+      {!tablet && !expanded && (
         <div className={styles.leftSection}>
           {!loading ? <FilterSet /> : <AccordionSkeleton open count={4} align="start" />}
         </div>
       )}
-      <div className={`${styles.rightSection}`}>
+      <div className={`${styles.rightSection} ${expanded ? styles.fullView : styles.splitView}`}>
         {!tablet && testUuid && type === 'trendline' ? (
           <Trendline patientUuid={patientUuid} conceptUuid={testUuid} basePath={basePath} showBackToTimelineButton />
         ) : !loading ? (
