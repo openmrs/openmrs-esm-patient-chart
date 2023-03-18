@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
 import { useTranslation } from 'react-i18next';
@@ -13,9 +13,9 @@ import {
 } from '@openmrs/esm-patient-common-lib';
 import { ConfigObject } from '../../config-schema';
 import { assessValue, getReferenceRangesForConcept, interpretBloodPressure, useVitals } from '../vitals.resource';
+import { launchVitalsForm } from '../vitals-utils';
 import VitalsHeaderItem from './vitals-header-item.component';
 import styles from './vitals-header.scss';
-import { launchVitalsForm } from '../vitals-utils';
 
 dayjs.extend(isToday);
 
@@ -39,7 +39,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
   const toggleDetailsPanel = () => setShowDetailsPanel(!showDetailsPanel);
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
 
-  const launchVitalsAndBiometricsForm = React.useCallback(
+  const launchVitalsAndBiometricsForm = useCallback(
     (e) => {
       e.stopPropagation();
       launchVitalsForm(currentVisit, config);
@@ -53,8 +53,10 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
     );
   }
 
-  if (!isLoading && latestVitals && Object.keys(latestVitals).length && conceptMetadata?.length) {
+  if (latestVitals && Object.keys(latestVitals)?.length && conceptMetadata?.length) {
+    const hasActiveVisit = Boolean(currentVisit?.uuid);
     const vitalsTakenToday = Boolean(dayjs(latestVitals?.date).isToday());
+    const vitalsOverdue = hasActiveVisit && !vitalsTakenToday;
 
     return (
       <div className={styles['background']}>
@@ -64,7 +66,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
             <span className={styles['body-text']}>
               {formatDate(parseDate(latestVitals?.date), { day: true, time: true })}
             </span>
-            {!vitalsTakenToday ? (
+            {vitalsOverdue ? (
               <div className={styles.tag}>
                 <Tag type="red">
                   <span className={styles.overdueIndicator}>
@@ -81,7 +83,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
               {t('vitalsHistory', 'Vitals history')}
             </ConfigurableLink>
           </span>
-          {isLoading ? (
+          {isValidating ? (
             <div className={styles.backgroundDataFetchingIndicator}>
               <span>{isValidating ? <InlineLoading /> : null}</span>
             </div>
@@ -98,7 +100,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
             </Button>
           </div>
         </div>
-        <div className={styles['default-border']}>
+        <div className={styles['row-container']}>
           <div className={styles.row}>
             <VitalsHeaderItem
               unitName={t('temperatureAbbreviated', 'Temp')}
