@@ -9,6 +9,15 @@ import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
 
 const mockedOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockedUseConfig = useConfig as jest.Mock;
+const mockedUserHasAccess = jest.fn();
+
+jest.mock('@openmrs/esm-framework', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-framework');
+  return {
+    ...originalModule,
+    userHasAccess: () => mockedUserHasAccess,
+  };
+});
 
 it('renders an empty state if there are no forms persisted on the server', async () => {
   mockedOpenmrsFetch.mockReturnValue({
@@ -35,6 +44,10 @@ it('renders a list of forms fetched from the server', async () => {
     showHtmlFormEntryForms: true,
     showConfigurableForms: false,
   }));
+
+  mockedUserHasAccess.mockImplementation((privilege) => {
+    return privilege === 'edit' ? false : true;
+  });
 
   renderFormsList();
 
@@ -89,7 +102,7 @@ const forms = [
       uuid: '0e8230ce-bd1d-43f5-a863-cf44344fa4b0',
       name: 'Adult Visit',
       viewPrivilege: null,
-      editPrivilege: null,
+      editPrivilege: 'edit',
     },
     version: '1.0.2',
     published: false,
@@ -111,7 +124,7 @@ const forms = [
       uuid: 'dd528487-82a5-4082-9c72-ed246bd49591',
       name: 'Consultation',
       viewPrivilege: null,
-      editPrivilege: null,
+      editPrivilege: 'edit',
     },
     version: '1',
     published: false,
@@ -133,7 +146,7 @@ const forms = [
       uuid: 'dd528487-82a5-4082-9c72-ed246bd49591',
       name: 'Consultation',
       viewPrivilege: null,
-      editPrivilege: null,
+      editPrivilege: 'edit',
     },
     version: '2',
     published: true,
