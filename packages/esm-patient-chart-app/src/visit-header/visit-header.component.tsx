@@ -214,32 +214,34 @@ const VisitHeader: React.FC = () => {
                 {startVisitLabel ? startVisitLabel : t('startAVisit', 'Start a visit')}
               </Button>
             )}
-            {/* HERE */}
-            {currentVisit !== null && endVisitLabel && (
+            {visitEnabledSystemSetting.systemVisitEnabled && (
               <>
-                <HeaderGlobalAction
-                  className={styles.headerGlobalBarButton}
-                  aria-label={endVisitLabel ?? t('endAVisit', 'End a visit')}
-                  onClick={() => openModal(patient?.id)}
-                >
-                  <Button as="div" className={styles.startVisitButton}>
-                    {endVisitLabel ? endVisitLabel : <>{t('endAVisit', 'End a visit')}</>}
-                  </Button>
-                )}
                 {currentVisit !== null && endVisitLabel && (
                   <>
                     <HeaderGlobalAction
                       className={styles.headerGlobalBarButton}
-                      aria-label={endVisitLabel ?? t('endVisit', 'End a visit')}
+                      aria-label={endVisitLabel ?? t('endAVisit', 'End a visit')}
                       onClick={() => openModal(patient?.id)}
                     >
                       <Button as="div" className={styles.startVisitButton}>
-                        {endVisitLabel ? endVisitLabel : <>{t('endVisit', 'End a visit')}</>}
+                        {endVisitLabel ? endVisitLabel : <>{t('endAVisit', 'End a visit')}</>}
                       </Button>
+                      {currentVisit !== null && endVisitLabel && (
+                        <>
+                          <HeaderGlobalAction
+                            className={styles.headerGlobalBarButton}
+                            aria-label={endVisitLabel ?? t('endVisit', 'End a visit')}
+                            onClick={() => openModal(patient?.id)}
+                          >
+                            <Button as="div" className={styles.startVisitButton}>
+                              {endVisitLabel ? endVisitLabel : <>{t('endVisit', 'End a visit')}</>}
+                            </Button>
+                          </HeaderGlobalAction>
+                        </>
+                      )}
                     </HeaderGlobalAction>
                   </>
                 )}
-                </HeaderGlobalAction>
               </>
             )}
             <HeaderGlobalAction
@@ -271,6 +273,7 @@ const VisitHeader: React.FC = () => {
     currentVisit,
     logo,
     isDeceased,
+    visitEnabledSystemSetting.systemVisitEnabled,
   ]);
 
   return <HeaderContainer render={render} />;
