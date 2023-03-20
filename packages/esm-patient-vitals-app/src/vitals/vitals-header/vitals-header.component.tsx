@@ -103,6 +103,10 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
         <div className={styles['row-container']}>
           <div className={styles.row}>
             <VitalsHeaderItem
+              interpretation={assessValue(
+                latestVitals.temperature,
+                getReferenceRangesForConcept(config.concepts.temperatureUuid, conceptMetadata),
+              )}
               unitName={t('temperatureAbbreviated', 'Temp')}
               unitSymbol={(latestVitals?.temperature && conceptUnits.get(config.concepts.temperatureUuid)) ?? ''}
               value={latestVitals?.temperature ?? '--'}
