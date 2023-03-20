@@ -16,20 +16,25 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
   const { t } = useTranslation();
   const config = useConfig() as ConfigObject;
   const { launchOrderBasket } = useLaunchOrderBasket(patientUuid);
+  const currentDate = new Date();
 
   const {
-    data: activeOrders,
-    error: activeOrdersError,
-    isLoading: isLoadingActiveOrders,
-    isValidating: isValidatingActiveOrders,
-  } = usePatientOrders(patientUuid, 'ACTIVE');
-
-  const {
-    data: pastOrders,
-    error: pastOrdersError,
-    isLoading: isLoadingPastOrders,
-    isValidating: isValidatingPastOrders,
+    data: allOrders,
+    error: error,
+    isLoading: isLoading,
+    isValidating: isValidating,
   } = usePatientOrders(patientUuid, 'any');
+
+  const pastOrders = allOrders?.filter((order) => {
+    if (order.dateStopped) {
+      return order;
+    }
+
+    if (order.autoExpireDate && order.autoExpireDate < currentDate) {
+      return order;
+    }
+  });
+  const activeOrders = allOrders?.filter((order) => !pastOrders.includes(order));
 
   return (
     <>
@@ -38,14 +43,14 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
           const displayText = t('activeMedicationsDisplayText', 'Active medications');
           const headerTitle = t('activeMedicationsHeaderTitle', 'active medications');
 
-          if (isLoadingActiveOrders) return <DataTableSkeleton role="progressbar" />;
+          if (isLoading) return <DataTableSkeleton role="progressbar" />;
 
-          if (activeOrdersError) return <ErrorState error={activeOrdersError} headerTitle={headerTitle} />;
+          if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
 
           if (activeOrders?.length) {
             return (
               <MedicationsDetailsTable
-                isValidating={isValidatingActiveOrders}
+                isValidating={isValidating}
                 title={t('activeMedicationsTableTitle', 'Active Medications')}
                 medications={activeOrders}
                 showDiscontinueButton={true}
@@ -65,14 +70,14 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
           const displayText = t('pastMedicationsDisplayText', 'Past medications');
           const headerTitle = t('pastMedicationsHeaderTitle', 'past medications');
 
-          if (isLoadingPastOrders) return <DataTableSkeleton role="progressbar" />;
+          if (isLoading) return <DataTableSkeleton role="progressbar" />;
 
-          if (pastOrdersError) return <ErrorState error={pastOrdersError} headerTitle={headerTitle} />;
+          if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
 
           if (pastOrders?.length) {
             return (
               <MedicationsDetailsTable
-                isValidating={isValidatingPastOrders}
+                isValidating={isValidating}
                 title={t('pastMedicationsTableTitle', 'Past Medications')}
                 medications={pastOrders}
                 showDiscontinueButton={true}
