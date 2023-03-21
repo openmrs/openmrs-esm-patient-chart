@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DataTableSkeleton } from '@carbon/react';
-import { useConfig } from '@openmrs/esm-framework';
+import { formatDatetime, parseDate, useConfig } from '@openmrs/esm-framework';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import MedicationsDetailsTable from '../components/medications-details-table.component';
 import { usePatientOrders } from '../api/api';
 import { ConfigObject } from '../config-schema';
 import { useLaunchOrderBasket } from '../utils/launchOrderBasket';
+import { Order } from '../types/order';
 
 export interface MedicationsSummaryProps {
   patientUuid: string;
@@ -16,7 +17,6 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
   const { t } = useTranslation();
   const config = useConfig() as ConfigObject;
   const { launchOrderBasket } = useLaunchOrderBasket(patientUuid);
-  const currentDate = new Date();
 
   const {
     data: allOrders,
@@ -25,16 +25,26 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
     isValidating: isValidating,
   } = usePatientOrders(patientUuid, 'any');
 
-  const pastOrders = allOrders?.filter((order) => {
-    if (order.dateStopped) {
-      return order;
+  const [pastOrders, activeOrders] = useMemo(() => {
+    if (!allOrders) {
+      return [[], []];
     }
+    const currentDate = parseDate(formatDatetime(new Date()));
+    const pastOrders: Order[] = [];
+    const activeOrders: Order[] = [];
 
-    if (order.autoExpireDate && order.autoExpireDate < currentDate) {
-      return order;
+    for (let i = 0; i < allOrders?.length; i++) {
+      const order = allOrders[i];
+      if (order.autoExpireDate && order.autoExpireDate < currentDate) {
+        pastOrders.push(order);
+      } else if (order.dateStopped) {
+        pastOrders.push(order);
+      } else {
+        activeOrders.push(order);
+      }
     }
-  });
-  const activeOrders = allOrders?.filter((order) => !pastOrders.includes(order));
+    return [pastOrders, activeOrders];
+  }, [allOrders]);
 
   return (
     <>
