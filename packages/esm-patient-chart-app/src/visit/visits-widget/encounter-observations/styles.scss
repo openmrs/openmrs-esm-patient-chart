@@ -1,10 +1,5 @@
 @use '@carbon/styles/scss/spacing';
 
-.encounterEmptyState {
-  text-align: center;
-  margin: 0 spacing.$spacing-05 spacing.$spacing-05 spacing.$spacing-05;
-}
-
 .observation {
   display: grid;
   grid-template-columns: 1fr 1fr;
