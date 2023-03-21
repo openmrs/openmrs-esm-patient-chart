@@ -57,6 +57,8 @@ it('renders a list of forms fetched from the server', async () => {
   expect(searchbox).toBeInTheDocument();
   expect(screen.getByRole('button', { name: /clear search input/i })).toBeInTheDocument();
   expect(screen.getByRole('table')).toBeInTheDocument();
+  expect(screen.getByRole('cell', { name: /Laboratory Tests/i })).toBeInTheDocument();
+  expect(screen.queryByText('PiusRocks')).toBe(null);
 
   const expectedColumnHeaders = [/form name \(A-Z\)/, /last completed/];
 

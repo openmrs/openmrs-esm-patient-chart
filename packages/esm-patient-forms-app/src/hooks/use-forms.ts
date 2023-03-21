@@ -67,9 +67,12 @@ export function useForms(patientUuid: string, startDate?: Date, endDate?: Date, 
   let formsToDisplay = cachedOfflineFormsOnly
     ? data?.filter((formInfo) => isValidOfflineFormEncounter(formInfo.form, htmlFormEntryForms))
     : data;
-  formsToDisplay = formsToDisplay?.filter((formInfo) =>
-    userHasAccess(formInfo?.form?.encounterType?.editPrivilege?.display, session?.user),
-  );
+
+  if (session?.user) {
+    formsToDisplay = formsToDisplay?.filter((formInfo) =>
+      userHasAccess(formInfo?.form?.encounterType?.editPrivilege?.display, session?.user),
+    );
+  }
 
   return {
     data: formsToDisplay,
