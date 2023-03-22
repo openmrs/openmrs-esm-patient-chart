@@ -90,7 +90,7 @@ function mapToFormCompletedInfo(
   return allForms.map((form) => {
     const associatedEncounters = encounters
       .filter((encounter) => encounter.form?.uuid === form?.uuid)
-      .sort((a, b) => new Date(b.encounterDatetime).getTime() - new Date(a.encounterDatetime).getTime());
+      .sort((a, b) => (a.form?.display > b.form?.display ? 1 : -1));
     const lastCompleted =
       associatedEncounters.length > 0 ? new Date(associatedEncounters?.[0].encounterDatetime) : undefined;
 

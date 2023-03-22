@@ -40,6 +40,7 @@
   .row {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: 5rem;
   }
 }
 
@@ -101,7 +102,7 @@
 }
 
 .link {
-  margin: 0 0.5rem;
+  margin-left: 0.5rem;
   @extend .body-text;
   text-decoration-line: none;
   color: $interactive-01;

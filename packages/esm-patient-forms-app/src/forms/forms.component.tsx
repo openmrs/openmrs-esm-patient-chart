@@ -15,6 +15,12 @@ import styles from './forms.scss';
 
 type FormsCategory = 'All' | 'Completed' | 'Recommended';
 
+enum ContentSwitcherIndices {
+  All = 0,
+  Recommended = 1,
+  Completed = 2,
+}
+
 interface FormsProps {
   patientUuid: string;
   patient: fhir.Patient;
@@ -39,6 +45,7 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
     error,
     mutateForms,
   } = useForms(patientUuid, undefined, undefined, isOffline);
+
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const { programConfigs } = useProgramConfig(patientUuid, showRecommendedFormsTab);
 
@@ -101,8 +108,8 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
         ) : null}
         <div className={styles.contextSwitcherContainer}>
           <ContentSwitcher
-            onChange={(event) => setFormsCategory(event.name as any)}
-            selectedIndex={formsCategory}
+            onChange={({ name }: { name: FormsCategory }) => setFormsCategory(name)}
+            selectedIndex={ContentSwitcherIndices[formsCategory]}
             size={isTablet ? 'md' : 'sm'}
           >
             <Switch name={'All'} text={t('all', 'All')} />
