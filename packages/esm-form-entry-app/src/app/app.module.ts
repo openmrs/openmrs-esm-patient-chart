@@ -3,13 +3,13 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { LOCALE_ID, NgModule } from '@angular/core'; 
 import { TranslateLoader, TranslateModule, TranslateService, TranslateStore } from '@ngx-translate/core';
 import { HttpClient } from '@angular/common/http';
+import { ReactiveFormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
 import { EmptyRouteComponent } from './empty-route/empty-route.component';
 import { FeWrapperComponent } from './fe-wrapper/fe-wrapper.component';
 import { FormEntryModule } from '@openmrs/ngx-formentry';
 
-import { ReactiveFormsModule } from '@angular/forms';
 import { OpenmrsApiModule } from './openmrs-api/openmrs-api.module';
 import { FormSchemaService } from './form-schema/form-schema.service';
 import { LocalStorageService } from './local-storage/local-storage.service';

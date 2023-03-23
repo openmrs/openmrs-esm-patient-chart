@@ -5641,6 +5641,7 @@ __metadata:
   resolution: "@openmrs/esm-patient-chart@workspace:."
   dependencies:
     "@openmrs/esm-framework": next
+    "@openmrs/ngx-formentry": next
     "@playwright/test": ^1.30.0
     "@swc/cli": ^0.1.57
     "@swc/core": ^1.2.165
