@@ -34,7 +34,7 @@ This monorepo uses [yarn](https://yarnpkg.com) and [lerna](https://github.com/le
 
 To install the dependencies, run:
 ```bash
-yarn install
+yarn
 ```
 
 To start a dev server for a specific microfrontend, run:
