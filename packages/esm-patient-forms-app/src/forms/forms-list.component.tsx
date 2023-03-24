@@ -33,15 +33,23 @@ export type FormsListProps = {
 
 const FormsList: React.FC<FormsListProps> = ({ currentVisit, htmlFormEntryForms, patient, patientUuid }) => {
   const { t } = useTranslation();
-  const { data, error } = useForms(patientUuid);
+  const { data, error, mutateForms } = useForms(patientUuid);
 
   const isTablet = useLayoutType() === 'tablet';
 
   const handleFormOpen = useCallback(
     (formUuid, encounterUuid, formName) => {
-      launchFormEntryOrHtmlForms(currentVisit, formUuid, patient, htmlFormEntryForms, encounterUuid, formName);
+      launchFormEntryOrHtmlForms(
+        currentVisit,
+        formUuid,
+        patient,
+        htmlFormEntryForms,
+        encounterUuid,
+        formName,
+        mutateForms,
+      );
     },
-    [currentVisit, htmlFormEntryForms, patient],
+    [currentVisit, htmlFormEntryForms, mutateForms, patient],
   );
 
   const tableHeaders = [
