@@ -30,7 +30,12 @@ In addition to these widgets, two other microfrontends exist that encapsulate cr
 
 Check out the developer documentation [here](http://o3-dev.docs.openmrs.org).
 
-This monorepo uses [yarn](https://yarnpkg.com) and [lerna](https://github.com/lerna/lerna). 
+This monorepo uses [yarn](https://yarnpkg.com) and [lerna](https://github.com/lerna/lerna).
+
+To install the dependencies, run:
+```bash
+yarn install
+```
 
 To start a dev server for a specific microfrontend, run:
 
