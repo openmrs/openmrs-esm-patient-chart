@@ -11,27 +11,58 @@ interface EncounterObservationsProps {
 const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observations }) => {
   const { t } = useTranslation();
 
-  const observationsList = useMemo(() => {
-    return (
-      observations &&
-      observations.map((obs: Observation) => {
-        const [question, answer] = obs.display.split(':');
+  const obsWithGroupMembers = useMemo(
+    () =>
+      observations
+        ?.filter((obs) => obs.groupMembers)
+        .map(({ groupMembers }) => ({
+          members: groupMembers,
+        })),
+    [observations],
+  );
+
+  const obsWithoutGroupMembers = useMemo(() => observations?.filter((obs) => !obs.groupMembers), [observations]);
+
+  const observationsList = useMemo(
+    () =>
+      observations?.map(({ display }) => {
+        const [question, answer] = display.split(':');
         return { question, answer };
-      })
-    );
-  }, [observations]);
+      }),
+    [observations],
+  );
 
   if (!observations) {
     return <SkeletonText />;
   }
 
-  if (observationsList?.length) {
+  if (obsWithoutGroupMembers.length) {
     return (
       <div className={styles.observation}>
-        {observationsList.map((obs, i) => (
+        {observationsList?.map(({ question, answer }, i) => (
           <React.Fragment key={i}>
-            <span className={styles.caption01}>{obs.question}: </span>
-            <span className={`${styles.bodyShort02} ${styles.text01}`}>{obs.answer}</span>
+            <span className={styles.caption01}>{question}: </span>
+            <span className={`${styles.bodyShort02} ${styles.text01}`}>{answer}</span>
+          </React.Fragment>
+        ))}
+      </div>
+    );
+  }
+
+  if (obsWithGroupMembers.length) {
+    const groupMembers = obsWithGroupMembers.flatMap(({ members }) =>
+      members.map(({ display }) => {
+        const [question, answer] = display?.split(':');
+        return { question, answer };
+      }),
+    );
+
+    return (
+      <div className={styles.observation}>
+        {groupMembers?.map(({ question, answer }, i) => (
+          <React.Fragment key={i}>
+            <span className={styles.caption01}>{question}: </span>
+            <span className={`${styles.bodyShort02} ${styles.text01}`}>{answer}</span>
           </React.Fragment>
         ))}
       </div>
@@ -39,8 +70,8 @@ const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observati
   }
 
   return (
-    <div className={styles.encounterEmptyState}>
-      <p className={styles.caption01}>{t('noObservationsFound', 'No observations found')}</p>
+    <div className={styles.observation}>
+      <p>{t('noObservationsFound', 'No observations found')}</p>
     </div>
   );
 };
