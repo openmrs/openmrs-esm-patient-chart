@@ -88,8 +88,6 @@ function ConditionsDetailedSummary({ patient }) {
       : compare(cellA.sortKey, cellB.sortKey);
   };
 
-  console.log(tableRows, '----', filteredConditions);
-
   const launchConditionsForm = useCallback(
     () => launchPatientWorkspace('conditions-form-workspace', { workspaceTitle: 'Record a Condition' }),
     [],
