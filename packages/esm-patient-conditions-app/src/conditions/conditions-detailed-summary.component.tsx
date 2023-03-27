@@ -1,6 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import dayjs from 'dayjs';
 import {
   Button,
   DataTable,
@@ -17,7 +16,7 @@ import {
   Tile,
 } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { formatDate, parseDate, useLayoutType, formatDatetime } from '@openmrs/esm-framework';
+import { formatDate, parseDate, useLayoutType } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { Condition, useConditions } from './conditions.resource';
 import { ConditionsActionMenu } from './conditions-action-menu.component';
