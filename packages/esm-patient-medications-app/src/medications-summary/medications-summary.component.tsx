@@ -26,23 +26,23 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
   } = usePatientOrders(patientUuid, 'any');
 
   const [pastOrders, activeOrders] = useMemo(() => {
-    if (!allOrders) {
-      return [[], []];
-    }
-    const currentDate = parseDate(formatDatetime(new Date()));
-    const pastOrders: Order[] = [];
-    const activeOrders: Order[] = [];
+    const currentDate = new Date();
+    const pastOrders: Array<Order> = [];
+    const activeOrders: Array<Order> = [];
 
-    for (let i = 0; i < allOrders?.length; i++) {
-      const order = allOrders[i];
-      if (order.autoExpireDate && order.autoExpireDate < currentDate) {
-        pastOrders.push(order);
-      } else if (order.dateStopped) {
-        pastOrders.push(order);
-      } else {
-        activeOrders.push(order);
+    if (allOrders) {
+      for (let i = 0; i < allOrders.length; i++) {
+        const order = allOrders[i];
+        if (order.autoExpireDate && parseDate(order.autoExpireDate) < currentDate) {
+          pastOrders.push(order);
+        } else if (order.dateStopped && parseDate(order.dateStopped) < currentDate) {
+          pastOrders.push(order);
+        } else {
+          activeOrders.push(order);
+        }
       }
     }
+
     return [pastOrders, activeOrders];
   }, [allOrders]);
 

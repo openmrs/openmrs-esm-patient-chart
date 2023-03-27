@@ -9,12 +9,12 @@ export interface Order {
   action: string;
   asNeeded: boolean;
   asNeededCondition?: string;
-  autoExpireDate: Date;
+  autoExpireDate: string;
   brandName?: string;
   careSetting: OpenmrsResource;
   commentToFulfiller: string;
-  dateActivated: Date;
-  dateStopped?: Date | null;
+  dateActivated: string;
+  dateStopped?: string | null;
   dispenseAsWritten: boolean;
   dose: number;
   doseUnits: OpenmrsResource;
