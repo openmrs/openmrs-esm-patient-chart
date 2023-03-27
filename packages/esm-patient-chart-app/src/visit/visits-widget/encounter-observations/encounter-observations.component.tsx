@@ -23,10 +23,21 @@ const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observati
 
   const obsWithoutGroupMembers = useMemo(() => observations?.filter((obs) => !obs.groupMembers), [observations]);
 
+  function splitObsDisplay(display) {
+    const colonIndex = display.indexOf(':');
+    if (colonIndex === -1) {
+      return [display, ''];
+    } else {
+      const title = display.substring(0, colonIndex).trim();
+      const text = display.substring(colonIndex + 1).trim();
+      return [title, text];
+    }
+  }
+
   const observationsList = useMemo(
     () =>
       observations?.map(({ display }) => {
-        const [question, answer] = display.split(':');
+        const [question, answer] = splitObsDisplay(display);
         return { question, answer };
       }),
     [observations],
@@ -41,7 +52,7 @@ const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observati
       <div className={styles.observation}>
         {observationsList?.map(({ question, answer }, i) => (
           <React.Fragment key={i}>
-            <span className={styles.caption01}>{question}: </span>
+            <span className={styles.caption01}>{question}</span>
             <span className={`${styles.bodyShort02} ${styles.text01}`}>{answer}</span>
           </React.Fragment>
         ))}
@@ -52,7 +63,7 @@ const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observati
   if (obsWithGroupMembers.length) {
     const groupMembers = obsWithGroupMembers.flatMap(({ members }) =>
       members.map(({ display }) => {
-        const [question, answer] = display?.split(':');
+        const [question, answer] = splitObsDisplay(display);
         return { question, answer };
       }),
     );
@@ -61,7 +72,7 @@ const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observati
       <div className={styles.observation}>
         {groupMembers?.map(({ question, answer }, i) => (
           <React.Fragment key={i}>
-            <span className={styles.caption01}>{question}: </span>
+            <span className={styles.caption01}>{question}</span>
             <span className={`${styles.bodyShort02} ${styles.text01}`}>{answer}</span>
           </React.Fragment>
         ))}
