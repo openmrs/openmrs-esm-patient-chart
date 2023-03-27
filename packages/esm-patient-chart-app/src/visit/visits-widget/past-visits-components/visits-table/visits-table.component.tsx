@@ -97,6 +97,11 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
       header: t('dateAndTime', 'Date & time'),
       key: 'datetime',
     },
+    showAllEncounters && {
+      id: 2,
+      header: t('visitType', 'Visit type'),
+      key: 'visitType',
+    },
     {
       id: 3,
       header: t('encounterType', 'Encounter type'),
@@ -108,16 +113,6 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
       key: 'provider',
     },
   ];
-
-  if (showAllEncounters) {
-    tableHeaders.push({
-      id: 2,
-      header: t('visitType', 'Visit type'),
-      key: 'visitType',
-    });
-
-    tableHeaders.sort((a, b) => (a.id > b.id ? 1 : -1));
-  }
 
   const launchWorkspace = (
     formUuid: string,

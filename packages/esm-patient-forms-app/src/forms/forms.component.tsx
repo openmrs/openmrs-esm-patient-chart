@@ -16,6 +16,12 @@ import styles from './forms.scss';
 
 type FormsCategory = 'All' | 'Completed' | 'Recommended';
 
+enum ContentSwitcherIndices {
+  All = 0,
+  Recommended = 1,
+  Completed = 2,
+}
+
 interface FormsProps {
   patientUuid: string;
   patient: fhir.Patient;
@@ -34,7 +40,7 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
   const isTablet = layout === 'tablet';
   const isDesktop = layout === 'small-desktop' || layout === 'large-desktop';
   const [formsCategory, setFormsCategory] = useState<FormsCategory>(showRecommendedFormsTab ? 'Recommended' : 'All');
-  const { isValidating, data, error } = useForms(patientUuid, undefined, undefined, isOffline);
+  const { isValidating, data, error, mutateForms } = useForms(patientUuid);
   const session = useSession();
   let formsToDisplay = isOffline
     ? data?.filter((formInfo) => isValidOfflineFormEncounter(formInfo.form, htmlFormEntryForms))
@@ -104,8 +110,8 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
         ) : null}
         <div className={styles.contextSwitcherContainer}>
           <ContentSwitcher
-            onChange={(event) => setFormsCategory(event.name as any)}
-            selectedIndex={formsCategory}
+            onChange={({ name }: { name: FormsCategory }) => setFormsCategory(name)}
+            selectedIndex={ContentSwitcherIndices[formsCategory]}
             size={isTablet ? 'md' : 'sm'}
           >
             <Switch name={'All'} text={t('all', 'All')} />
@@ -124,6 +130,7 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
             pageSize={pageSize}
             pageUrl={pageUrl}
             urlLabel={urlLabel}
+            mutateForms={mutateForms}
           />
         )}
         {formsCategory === 'Recommended' && (
@@ -135,6 +142,7 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
             pageSize={pageSize}
             pageUrl={pageUrl}
             urlLabel={urlLabel}
+            mutateForms={mutateForms}
           />
         )}
         {formsCategory === 'All' && (
@@ -145,6 +153,7 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
             pageSize={pageSize}
             pageUrl={pageUrl}
             urlLabel={urlLabel}
+            mutateForms={mutateForms}
           />
         )}
       </div>

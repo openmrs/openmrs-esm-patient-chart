@@ -38,6 +38,7 @@ interface FormViewProps {
   pageSize: number;
   pageUrl: string;
   urlLabel: string;
+  mutateForms?: () => void;
 }
 
 interface FilterProps {
@@ -48,7 +49,16 @@ interface FilterProps {
   getCellId: (row, key) => string;
 }
 
-const FormView: React.FC<FormViewProps> = ({ category, forms, patientUuid, patient, pageSize, pageUrl, urlLabel }) => {
+const FormView: React.FC<FormViewProps> = ({
+  category,
+  forms,
+  patientUuid,
+  patient,
+  pageSize,
+  pageUrl,
+  urlLabel,
+  mutateForms,
+}) => {
   const { t } = useTranslation();
   const config = useConfig() as ConfigObject;
   const isTablet = useLayoutType() === 'tablet';
@@ -69,7 +79,7 @@ const FormView: React.FC<FormViewProps> = ({ category, forms, patientUuid, patie
   const handleSearch = React.useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), 300), []);
 
   const { results, goTo, currentPage } = usePagination(
-    filteredForms?.sort((a, b) => (b.lastCompleted?.getTime() ?? 0) - (a.lastCompleted?.getTime() ?? 0)),
+    filteredForms?.sort((a, b) => (a.form?.display > b.form?.display ? 1 : -1)),
     pageSize,
   );
 
@@ -171,6 +181,7 @@ const FormView: React.FC<FormViewProps> = ({ category, forms, patientUuid, patie
                                   htmlFormEntryForms,
                                   '',
                                   results[index].form.display ?? results[index].form.name,
+                                  mutateForms,
                                 )
                               }
                               role="presentation"
@@ -189,6 +200,7 @@ const FormView: React.FC<FormViewProps> = ({ category, forms, patientUuid, patie
                                   htmlFormEntryForms,
                                   '',
                                   results[index].form.display ?? results[index].form.name,
+                                  mutateForms,
                                 )
                               }
                               role="presentation"
@@ -211,6 +223,7 @@ const FormView: React.FC<FormViewProps> = ({ category, forms, patientUuid, patie
                                     htmlFormEntryForms,
                                     first(results[index].associatedEncounters)?.uuid,
                                     results[index].form.display ?? results[index].form.name,
+                                    mutateForms,
                                   )
                                 }
                                 size={isTablet ? 'lg' : 'sm'}

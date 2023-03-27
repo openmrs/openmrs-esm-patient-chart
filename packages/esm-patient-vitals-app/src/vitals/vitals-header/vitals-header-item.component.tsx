@@ -11,11 +11,12 @@ interface VitalsHeaderItemProps {
 }
 
 const VitalsHeaderItem: React.FC<VitalsHeaderItemProps> = ({ interpretation, value, unitName, unitSymbol }) => {
+  const flaggedCritical = interpretation && interpretation.includes('critically');
   const flaggedAbnormal = interpretation && interpretation !== 'normal';
 
   return (
     <div className={styles.container}>
-      <div className={`${flaggedAbnormal ? styles['abnormal-value'] : ''}`}>
+      <div className={`${flaggedCritical && styles['critical-value']} ${flaggedAbnormal && styles['abnormal-value']}`}>
         <div className={styles['label-container']}>
           <label className={styles.label}>{unitName}</label>
           {flaggedAbnormal ? (

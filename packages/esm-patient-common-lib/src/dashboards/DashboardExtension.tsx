@@ -13,8 +13,11 @@ export const DashboardExtension = ({ title, basePath }: DashboardExtensionProps)
   const navLink = useMemo(() => decodeURIComponent(last(location.pathname.split('/'))), [location.pathname]);
 
   return (
-    <div key={title} className={title === navLink && 'active-left-nav-link'}>
-      <ConfigurableLink to={`${basePath}/${encodeURIComponent(title)}`} className={'cds--side-nav__link'}>
+    <div key={title}>
+      <ConfigurableLink
+        to={`${basePath}/${encodeURIComponent(title)}`}
+        className={`cds--side-nav__link ${title === navLink && 'active-left-nav-link'}`}
+      >
         {title}
       </ConfigurableLink>
     </div>
