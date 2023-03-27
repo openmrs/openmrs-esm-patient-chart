@@ -44,10 +44,6 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
     },
     { key: 'reaction', header: t('reaction', 'Reaction') },
     {
-      key: 'onsetDate',
-      header: t('since', 'Since'),
-    },
-    {
       key: 'lastUpdated',
       header: t('lastUpdated', 'Last updated'),
     },
@@ -74,7 +70,6 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
           </span>
         ),
       },
-      onsetDate: formatDate(parseDate(allergy.onsetDate), { day: false, time: false }) ?? '--',
       lastUpdated: allergy.lastUpdated ? formatDate(parseDate(allergy.lastUpdated), { time: false }) : '--',
       reaction: allergy.reactionManifestations?.join(', '),
       note: allergy?.note ?? '--',
