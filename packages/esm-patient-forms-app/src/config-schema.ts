@@ -87,6 +87,11 @@ export const configSchema = {
     _description: 'Order forms alphabetically.',
     _default: true,
   },
+  showOHRIFormEngine: {
+    _type: Type.Boolean,
+    _description: 'Whether to use OHRI form engine to display forms.',
+    _default: false,
+  },
 };
 
 export interface HtmlFormEntryForm {
@@ -103,4 +108,5 @@ export interface ConfigObject {
   orderFormsByName: boolean;
   showConfigurableForms: boolean;
   showHtmlFormEntryForms: boolean;
+  showOHRIFormEngine: boolean;
 }

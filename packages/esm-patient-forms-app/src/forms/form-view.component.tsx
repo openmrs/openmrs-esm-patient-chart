@@ -182,6 +182,8 @@ const FormView: React.FC<FormViewProps> = ({
                                   '',
                                   results[index].form.display ?? results[index].form.name,
                                   mutateForms,
+                                  results[index],
+                                  config.showOHRIFormEngine,
                                 )
                               }
                               role="presentation"
@@ -201,6 +203,8 @@ const FormView: React.FC<FormViewProps> = ({
                                   '',
                                   results[index].form.display ?? results[index].form.name,
                                   mutateForms,
+                                  results[index],
+                                  config.showOHRIFormEngine,
                                 )
                               }
                               role="presentation"
@@ -224,6 +228,8 @@ const FormView: React.FC<FormViewProps> = ({
                                     first(results[index].associatedEncounters)?.uuid,
                                     results[index].form.display ?? results[index].form.name,
                                     mutateForms,
+                                    results[index],
+                                    config.showOHRIFormEngine,
                                   )
                                 }
                                 size={isTablet ? 'lg' : 'sm'}

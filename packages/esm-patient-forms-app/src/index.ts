@@ -49,6 +49,12 @@ function setupOpenMRS() {
     load: getAsyncLifecycle(() => import('./forms/form-entry.component'), options),
   });
 
+  registerWorkspace({
+    name: 'patient-ohri-form-workspace',
+    title: 'OHRI Clinical Form',
+    load: getAsyncLifecycle(() => import('./ohri-forms/ohri-forms.component'), options),
+  });
+
   return {
     extensions: [
       {

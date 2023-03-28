@@ -1,0 +1,13 @@
+@use '@carbon/styles/scss/spacing';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.loading {
+  display: flex;
+  background-color: $openmrs-background-grey;
+  justify-content: center;
+  min-height: spacing.$spacing-09;
+}
+
+.error {
+    margin: spacing.$spacing-05;
+}

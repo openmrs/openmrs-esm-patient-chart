@@ -20,7 +20,7 @@ jest.mock('@openmrs/esm-framework', () => {
     ...originalModule,
     isDesktop: jest.fn(),
     showModal: jest.fn(),
-    useConfig: jest.fn(),
+    useConfig: jest.fn().mockReturnValue({ showOHRIFormEngine: false }),
     useConnectivity: jest.fn(),
     usePagination: jest.fn().mockImplementation((data) => ({
       currentPage: 1,
