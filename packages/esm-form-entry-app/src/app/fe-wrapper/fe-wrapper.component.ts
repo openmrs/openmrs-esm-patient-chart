@@ -72,6 +72,10 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
   }
 
   public launchForm() {
+    const language = window.i18next?.language?.substring(0, 2) ?? '';
+    this.translateService.addLangs([language]);
+    this.translateService.use(language);
+
     this.changeState('loading');
     this.showDiscardSubmitButtons = this.singleSpaPropsService.getProp('showDiscardSubmitButtons') ?? true;
     this.launchFormSubscription?.unsubscribe();
@@ -114,13 +118,10 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
   private loadAllFormDependencies(): Observable<CreateFormParams> {
     this.formUuid = this.singleSpaPropsService.getPropOrThrow('formUuid');
     const encounterOrSyncItemId = this.singleSpaPropsService.getPropOrThrow('encounterUuid');
-    const language = window.i18next?.language?.substring(0, 2) ?? '';
-    this.translateService.addLangs([language]);
-    this.translateService.use(language);
 
     return forkJoin({
-      formSchema: this.fetchCompiledFormSchema(this.formUuid, language).pipe(take(1)),
-      session: this.openmrsApi.getCurrentSession().pipe(take(1)),
+      formSchema: this.fetchCompiledFormSchema(this.formUuid, this.translateService.currentLang).pipe(take(1)),
+      user: this.openmrsApi.getCurrentUser().pipe(take(1)),
       encounter: encounterOrSyncItemId
         ? this.getEncounterToEdit(encounterOrSyncItemId).pipe(take(1))
         : of<Encounter>(null),

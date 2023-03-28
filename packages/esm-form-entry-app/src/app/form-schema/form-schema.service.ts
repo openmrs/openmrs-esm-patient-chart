@@ -27,7 +27,7 @@ export class FormSchemaService {
       const cachedCompiledSchema = this.getCachedCompiledSchemaByUuid(formUuid, language);
       if (cachedCompiledSchema) {
         if (cachedCompiledSchema.translations) {
-          this.translateService.setTranslation(language, cachedCompiledSchema.translations);
+          this.translateService.setTranslation(language, cachedCompiledSchema.translations, true);
         }
         return of(cachedCompiledSchema);
       }
@@ -61,7 +61,7 @@ export class FormSchemaService {
         }
 
         if (combinedFormMetadata.translations) {
-          this.translateService.setTranslation(language, combinedFormMetadata.translations);
+          this.translateService.setTranslation(language, combinedFormMetadata.translations, true);
         }
 
         return this.formSchemaCompiler.compileFormSchema(
