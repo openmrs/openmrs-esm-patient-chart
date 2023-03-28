@@ -5,7 +5,7 @@ import { FormDataSourceService } from './form-data-source.service';
 import { ProviderResourceService } from '../openmrs-api/provider-resource.service';
 import { FakeProviderResourceService } from '../openmrs-api/provider-resource.service.mock';
 import { LocationResourceService } from '../openmrs-api/location-resource.service';
-import { LocalStorageService } from '../local-storage/local-storage.service';
+import { SessionStorageService } from '../storage/session-storage.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { OpenmrsApiModule } from '../openmrs-api/openmrs-api.module';
 
@@ -14,7 +14,7 @@ describe('Service: FormDataSourceService', () => {
     TestBed.configureTestingModule({
       imports: [OpenmrsApiModule, HttpClientTestingModule],
       providers: [
-        LocalStorageService,
+        SessionStorageService,
         FormDataSourceService,
         {
           provide: ProviderResourceService,

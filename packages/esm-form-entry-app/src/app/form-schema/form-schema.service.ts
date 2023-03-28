@@ -4,7 +4,7 @@ import { concat, first, map, take, tap } from 'rxjs/operators';
 
 import { FormResourceService } from '../openmrs-api/form-resource.service';
 import { FormSchemaCompiler } from '@openmrs/ngx-formentry';
-import { LocalStorageService } from '../local-storage/local-storage.service';
+import { SessionStorageService } from '../storage/session-storage.service';
 import { FormMetadataObject, FormSchema, FormSchemaAndTranslations, Questions } from '../types';
 import { TranslateService } from '@ngx-translate/core';
 import { merge } from 'lodash-es';
@@ -13,7 +13,7 @@ import { merge } from 'lodash-es';
 export class FormSchemaService {
   constructor(
     private formsResourceService: FormResourceService,
-    private localStorage: LocalStorageService,
+    private localStorage: SessionStorageService,
     private formSchemaCompiler: FormSchemaCompiler,
     private translateService: TranslateService,
   ) {}

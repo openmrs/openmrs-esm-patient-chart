@@ -3,13 +3,13 @@ import { BehaviorSubject } from 'rxjs';
 import { FormSchemaService } from './form-schema.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FormResourceService } from '../openmrs-api/form-resource.service';
-import { LocalStorageService } from '../local-storage/local-storage.service';
+import { SessionStorageService } from '../storage/session-storage.service';
 import { FormSchemaCompiler } from '@openmrs/ngx-formentry';
 
 describe('Service: FormSchemaService', () => {
   let formSchemaService: FormSchemaService;
   let formsResourceService: FormResourceService;
-  let localStorageService: LocalStorageService;
+  let localStorageService: SessionStorageService;
 
   // mock data for formMetaData
   const formMetaData: any = {
@@ -60,12 +60,12 @@ describe('Service: FormSchemaService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [],
-      providers: [FormSchemaService, LocalStorageService, FormSchemaCompiler, FormResourceService],
+      providers: [FormSchemaService, SessionStorageService, FormSchemaCompiler, FormResourceService],
       imports: [HttpClientTestingModule],
     });
     formSchemaService = TestBed.get(FormSchemaService);
     formsResourceService = TestBed.get(FormResourceService);
-    localStorageService = TestBed.get(LocalStorageService);
+    localStorageService = TestBed.get(SessionStorageService);
   });
 
   afterEach(() => {

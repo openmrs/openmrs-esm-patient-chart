@@ -8,7 +8,7 @@ import { FetchResponse, fhirBaseUrl, FHIRResource, openmrsFetch } from '@openmrs
 import { ProviderResourceService } from '../openmrs-api/provider-resource.service';
 import { LocationResourceService } from '../openmrs-api/location-resource.service';
 import { ConceptResourceService } from '../openmrs-api/concept-resource.service';
-import { LocalStorageService } from '../local-storage/local-storage.service';
+import { SessionStorageService } from '../storage/session-storage.service';
 import type { Concept, FormSchema, Location, Observation, Provider, Questions } from '../types';
 
 @Injectable()
@@ -17,7 +17,7 @@ export class FormDataSourceService {
     private providerResourceService: ProviderResourceService,
     private locationResourceService: LocationResourceService,
     private conceptResourceService: ConceptResourceService,
-    private localStorageService: LocalStorageService,
+    private localStorageService: SessionStorageService,
   ) {}
 
   public getDataSources(formSchema: FormSchema) {

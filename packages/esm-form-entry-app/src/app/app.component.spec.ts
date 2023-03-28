@@ -6,7 +6,7 @@ import { FormEntryModule } from '@openmrs/ngx-formentry';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FormSchemaService } from './form-schema/form-schema.service';
 import { OpenmrsApiModule } from './openmrs-api/openmrs-api.module';
-import { LocalStorageService } from './local-storage/local-storage.service';
+import { SessionStorageService } from './storage/session-storage.service';
 import { FormDataSourceService } from './form-data-source/form-data-source.service';
 import { FormSubmissionService } from './form-submission/form-submission.service';
 import { FormSubmittedComponent } from './form-submitted/form-submitted.component';
@@ -16,7 +16,7 @@ describe('AppComponent', () => {
     TestBed.configureTestingModule({
       imports: [RouterTestingModule, FormEntryModule, ReactiveFormsModule, OpenmrsApiModule],
       declarations: [AppComponent, FeWrapperComponent, FormSubmittedComponent],
-      providers: [FormSchemaService, LocalStorageService, FormDataSourceService, FormSubmissionService],
+      providers: [FormSchemaService, SessionStorageService, FormDataSourceService, FormSubmissionService],
     }).compileComponents();
   }));
 

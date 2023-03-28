@@ -9,7 +9,7 @@ import { FormEntryModule } from '@openmrs/ngx-formentry';
 import { ReactiveFormsModule } from '@angular/forms';
 import { OpenmrsApiModule } from './openmrs-api/openmrs-api.module';
 import { FormSchemaService } from './form-schema/form-schema.service';
-import { LocalStorageService } from './local-storage/local-storage.service';
+import { SessionStorageService } from './storage/session-storage.service';
 import { FormDataSourceService } from './form-data-source/form-data-source.service';
 import { FormSubmissionService } from './form-submission/form-submission.service';
 import { MonthlyScheduleResourceService } from './services/monthly-scheduled-resource.service';
@@ -33,7 +33,7 @@ import { TranslateModule, TranslateService, TranslateStore } from '@ngx-translat
   ],
   providers: [
     FormSchemaService,
-    LocalStorageService,
+    SessionStorageService,
     FormDataSourceService,
     FormSubmissionService,
     FormCreationService,

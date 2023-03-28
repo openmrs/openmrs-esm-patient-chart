@@ -2,7 +2,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { TestBed } from '@angular/core/testing';
 
 import { EncounterResourceService } from './encounter-resource.service';
-import { LocalStorageService } from '../local-storage/local-storage.service';
+import { SessionStorageService } from '../storage/session-storage.service';
 import { OpenmrsApiModule } from './openmrs-api.module';
 
 describe('EncounterResourceService', () => {
@@ -10,7 +10,7 @@ describe('EncounterResourceService', () => {
   let service: EncounterResourceService;
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [LocalStorageService],
+      providers: [SessionStorageService],
       imports: [HttpClientTestingModule, OpenmrsApiModule],
     });
 

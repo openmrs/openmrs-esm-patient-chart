@@ -1,17 +1,19 @@
 import { Injectable } from '@angular/core';
 
+const storage = window.sessionStorage;
+
 @Injectable()
-export class LocalStorageService {
+export class SessionStorageService {
   public getItem(keyName: string): string {
-    return window.localStorage.getItem(keyName);
+    return storage.getItem(keyName);
   }
 
   public setItem(keyName: string, value: string): void {
-    window.localStorage.setItem(keyName, value);
+    storage.setItem(keyName, value);
   }
 
   public getObject<T = any>(keyName: string): T | null {
-    const stored = window.localStorage.getItem(keyName);
+    const stored = storage.getItem(keyName);
     try {
       return JSON.parse(stored);
     } catch (error) {
@@ -21,18 +23,14 @@ export class LocalStorageService {
   }
 
   public setObject(keyName: string, value: unknown) {
-    window.localStorage.setItem(keyName, JSON.stringify(value));
+    storage.setItem(keyName, JSON.stringify(value));
   }
 
   public remove(keyName: string): void {
-    window.localStorage.removeItem(keyName);
-  }
-
-  public clear(): void {
-    window.localStorage.clear();
+    storage.removeItem(keyName);
   }
 
   get storageLength(): number {
-    return window.localStorage.length;
+    return storage.length;
   }
 }

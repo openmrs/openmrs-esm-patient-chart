@@ -8,7 +8,7 @@ import { EncounterResourceService } from '../openmrs-api/encounter-resource.serv
 import { PersonAttribuAdapter, Form, EncounterAdapter, FormEntryModule } from '@openmrs/ngx-formentry';
 import { PersonResourceService } from '../openmrs-api/person-resource.service';
 import { FormDataSourceService } from '../form-data-source/form-data-source.service';
-import { LocalStorageService } from '../local-storage/local-storage.service';
+import { SessionStorageService } from '../storage/session-storage.service';
 
 describe('Service: FormSubmissionService', () => {
   // sample field error
@@ -79,7 +79,7 @@ describe('Service: FormSubmissionService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       declarations: [],
-      providers: [FormSubmissionService, FormDataSourceService, LocalStorageService],
+      providers: [FormSubmissionService, FormDataSourceService, SessionStorageService],
       imports: [HttpClientTestingModule, OpenmrsApiModule, FormEntryModule],
     });
   });
