@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import dayjs from 'dayjs';
 import isToday from 'dayjs/plugin/isToday';
+dayjs.extend(isToday);
 import { useTranslation } from 'react-i18next';
 import { Button, InlineLoading, Tag } from '@carbon/react';
 import { ArrowRight, Time } from '@carbon/react/icons';
@@ -10,14 +11,13 @@ import {
   launchPatientWorkspace,
   useVisitOrOfflineVisit,
   useVitalsConceptMetadata,
+  useWorkspaces,
 } from '@openmrs/esm-patient-common-lib';
 import { ConfigObject } from '../../config-schema';
 import { assessValue, getReferenceRangesForConcept, interpretBloodPressure, useVitals } from '../vitals.resource';
 import { launchVitalsForm } from '../vitals-utils';
 import VitalsHeaderItem from './vitals-header-item.component';
 import styles from './vitals-header.scss';
-
-dayjs.extend(isToday);
 
 interface VitalsHeaderProps {
   patientUuid: string;
@@ -38,6 +38,11 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
   const [showDetailsPanel, setShowDetailsPanel] = useState(false);
   const toggleDetailsPanel = () => setShowDetailsPanel(!showDetailsPanel);
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
+  const { workspaces } = useWorkspaces();
+
+  const isWorkspaceOpen = useCallback(() => {
+    return Boolean(workspaces?.length);
+  }, [workspaces]);
 
   const launchVitalsAndBiometricsForm = useCallback(
     (e) => {
@@ -100,7 +105,7 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
             </Button>
           </div>
         </div>
-        <div className={styles['row-container']}>
+        <div className={`${styles['row-container']} ${isWorkspaceOpen() && styles['workspace-open']}`}>
           <div className={styles.row}>
             <VitalsHeaderItem
               interpretation={assessValue(

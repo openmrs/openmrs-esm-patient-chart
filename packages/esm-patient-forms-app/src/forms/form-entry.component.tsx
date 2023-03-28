@@ -40,8 +40,8 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({ patientUuid, closeWorksp
       currentVisit?.visitType?.uuid,
       patientUuid,
       patient,
-      closeWorkspace,
       mutateForm,
+      closeWorkspace,
     ],
   );
 

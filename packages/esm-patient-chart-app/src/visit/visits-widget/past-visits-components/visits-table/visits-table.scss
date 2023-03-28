@@ -19,7 +19,6 @@
   &:global(.cds--data-table-container) {
     background: none !important;
   }
-
 }
 
 .filterContainer {
@@ -35,7 +34,6 @@
 .search {
   max-width: 16rem;
 }
-
 
 .menuItem {
   max-width: none;
@@ -87,4 +85,12 @@
 .helper {
   @include type.type-style('body-compact-01');
   color: $text-02;
+}
+
+.layer {
+  height: 100%;
+
+  :global(.cds--btn--primary) {
+    background-color: unset;
+  }
 }

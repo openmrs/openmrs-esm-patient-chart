@@ -24,7 +24,7 @@ export interface OrderBasketItem {
   patientInstructions: string;
   asNeeded: boolean;
   asNeededCondition: string;
-  startDate: Date;
+  startDate: Date | string;
   durationUnit: DurationUnit;
   duration: number | null;
   pillsDispensed: number;

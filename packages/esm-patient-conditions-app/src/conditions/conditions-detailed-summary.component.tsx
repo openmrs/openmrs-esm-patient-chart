@@ -20,6 +20,7 @@ import { formatDate, parseDate, useLayoutType } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { Condition, useConditions } from './conditions.resource';
 import { ConditionsActionMenu } from './conditions-action-menu.component';
+import { compare } from './utils';
 import styles from './conditions-detailed-summary.scss';
 
 function ConditionsDetailedSummary({ patient }) {
@@ -63,19 +64,28 @@ function ConditionsDetailedSummary({ patient }) {
     [t],
   );
 
-  const tableRows: Array<Condition> = useMemo(() => {
+  const tableRows = useMemo(() => {
     return filteredConditions?.map((condition) => {
       return {
         ...condition,
         id: condition.id,
         condition: condition.display,
-        onsetDateTime: condition.onsetDateTime
-          ? formatDate(parseDate(condition.onsetDateTime), { time: false, day: false })
-          : '--',
+        onsetDateTime: {
+          sortKey: condition.onsetDateTime ?? '',
+          content: condition.onsetDateTime
+            ? formatDate(parseDate(condition.onsetDateTime), { time: false, day: false })
+            : '--',
+        },
         status: condition.clinicalStatus,
       };
     });
   }, [filteredConditions]);
+
+  const sortRow = (cellA, cellB, { sortDirection, sortStates }) => {
+    return sortDirection === sortStates.DESC
+      ? compare(cellB.sortKey, cellA.sortKey)
+      : compare(cellA.sortKey, cellB.sortKey);
+  };
 
   const launchConditionsForm = useCallback(
     () => launchPatientWorkspace('conditions-form-workspace', { workspaceTitle: 'Record a Condition' }),
@@ -117,13 +127,14 @@ function ConditionsDetailedSummary({ patient }) {
         </CardHeader>
         <DataTable
           rows={tableRows}
+          sortRow={sortRow}
           headers={headers}
           isSortable
           size={isTablet ? 'lg' : 'sm'}
           useZebraStyles
           overflowMenuOnHover={isDesktop}
         >
-          {({ rows, headers, getHeaderProps, getTableProps }) => (
+          {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
             <>
               <TableContainer>
                 <Table {...getTableProps()}>
@@ -145,7 +156,7 @@ function ConditionsDetailedSummary({ patient }) {
                   </TableHead>
                   <TableBody>
                     {rows.map((row) => (
-                      <TableRow key={row.id}>
+                      <TableRow key={row.id} {...getRowProps({ row })}>
                         {row.cells.map((cell) => (
                           <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                         ))}
