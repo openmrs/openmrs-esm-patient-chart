@@ -9,6 +9,7 @@ interface ContactDetailsProps {
   address: Array<fhir.Address>;
   telecom: Array<fhir.ContactPoint>;
   patientId: string;
+  deceased: boolean | string;
 }
 
 const Address: React.FC<{ address?: fhir.Address }> = ({ address }) => {
@@ -61,7 +62,7 @@ const Address: React.FC<{ address?: fhir.Address }> = ({ address }) => {
   );
 };
 
-const Contact: React.FC<{ telecom: Array<fhir.ContactPoint>; patientUuid: string }> = ({ telecom, patientUuid }) => {
+const Contact: React.FC<{ telecom: Array<fhir.ContactPoint>; patientUuid: string; deceased?: boolean }> = ({ telecom, patientUuid }) => {
   const { t } = useTranslation();
   const value = telecom?.length ? telecom[0].value : '--';
   const { isLoading, contactAttributes } = usePatientContactAttributes(patientUuid);
@@ -115,11 +116,11 @@ const Relationships: React.FC<{ patientId: string }> = ({ patientId }) => {
   );
 };
 
-const ContactDetails: React.FC<ContactDetailsProps> = ({ address, telecom, patientId }) => {
+const ContactDetails: React.FC<ContactDetailsProps> = ({ address, telecom, patientId, deceased }) => {
   const currentAddress = address ? address.find((a) => a.use === 'home') : undefined;
 
   return (
-    <div className={styles.contactDetails}>
+    <div className={`${styles.contactDetails} ${deceased ? styles.deceased : ''}`}>
       <div className={styles.row}>
         <div className={styles.col}>
           <Address address={currentAddress} />

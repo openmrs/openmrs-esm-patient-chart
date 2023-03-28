@@ -6,6 +6,7 @@ import { ExtensionSlot, age, formatDate, parseDate, useConfig } from '@openmrs/e
 import ContactDetails from '../contact-details/contact-details.component';
 import CustomOverflowMenuComponent from '../ui-components/overflow-menu.component';
 import styles from './patient-banner.scss';
+import { useOmrsRestPatient } from '../hooks/usePatientAttributes';
 
 interface PatientBannerProps {
   patient: fhir.Patient;
@@ -38,6 +39,9 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
   const toggleContactDetails = useCallback(() => {
     setShowContactDetails((value) => !value);
   }, []);
+
+  const { person } = useOmrsRestPatient(patientUuid);
+  const isDeceased = person?.dead || patient.deceasedDateTime;
 
   const patientAvatar = (
     <div className={styles.patientAvatar} role="img">
@@ -79,7 +83,10 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
   );
 
   return (
-    <div className={styles.container} role="banner">
+    <div
+      className={`${styles.container} ${isDeceased ? styles.deceasedPatientContainer : styles.activePatientContainer}`}
+      role="banner"
+    >
       <div
         onClick={handleNavigateToPatientChart}
         tabIndex={0}
@@ -137,6 +144,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
                 : ''}
             </div>
             <Button
+              className={styles.toggleContactDetailsButton}
               kind="ghost"
               renderIcon={(props) =>
                 showContactDetails ? <ChevronUp size={16} {...props} /> : <ChevronDown size={16} {...props} />
@@ -145,13 +153,13 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
               onClick={toggleContactDetails}
               style={{ marginTop: '-0.25rem' }}
             >
-              {showContactDetails ? t('showLess', 'Show less') : t('showAllDetails', 'Show all details')}
+              {showContactDetails ? t('hideDetails', 'Hide details') : t('showDetails', 'Show details')}
             </Button>
           </div>
         </div>
       </div>
       {showContactDetails && (
-        <ContactDetails address={patient?.address ?? []} telecom={patient?.telecom ?? []} patientId={patient?.id} />
+        <ContactDetails address={patient?.address ?? []} telecom={patient?.telecom ?? []} patientId={patient?.id} deceased={isDeceased} />
       )}
     </div>
   );
