@@ -70,7 +70,7 @@ export function useForms(patientUuid: string, startDate?: Date, endDate?: Date, 
 
   if (session?.user) {
     formsToDisplay = formsToDisplay?.filter((formInfo) =>
-      userHasAccess(formInfo?.form?.encounterType?.editPrivilege?.display, session?.user),
+      userHasAccess(formInfo?.form?.encounterType?.editPrivilege?.display, session.user),
     );
   }
 
