@@ -2,13 +2,11 @@ import React from 'react';
 import dayjs from 'dayjs';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { of } from 'rxjs/internal/observable/of';
-import { throwError } from 'rxjs';
-import { showNotification, showToast } from '@openmrs/esm-framework';
+import { showToast } from '@openmrs/esm-framework';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { searchedCondition } from '../../../../__mocks__/conditions.mock';
 import { getByTextWithMarkup } from '../../../../tools/test-helpers';
-import { createPatientCondition, useConditionsSearch } from './conditions.resource';
+import { createCondition, useConditionsSearch } from './conditions.resource';
 import ConditionsForm from './conditions-form.component';
 
 jest.setTimeout(10000);
@@ -19,12 +17,11 @@ dayjs.extend(utc);
 const testProps = {
   closeWorkspace: jest.fn(),
   patientUuid: mockPatient.id,
-  promptBeforeClosing: jest.fn(),
+  formContext: 'creating' as const,
 };
 
-const mockCreatePatientCondition = createPatientCondition as jest.Mock;
+const mockCreateCondition = createCondition as jest.Mock;
 const mockUseConditionsSearch = useConditionsSearch as jest.Mock;
-const mockShowNotification = showNotification as jest.Mock;
 const mockShowToast = showToast as jest.Mock;
 
 jest.mock('lodash-es/debounce', () => jest.fn((fn) => fn));
@@ -34,20 +31,21 @@ jest.mock('@openmrs/esm-framework', () => {
 
   return {
     ...originalModule,
-    createErrorHandler: jest.fn(),
-    showNotification: jest.fn(),
     showToast: jest.fn(),
   };
 });
 
 jest.mock('./conditions.resource', () => ({
-  createPatientCondition: jest.fn(),
+  createCondition: jest.fn(),
+  editCondition: jest.fn(),
+  useConditions: jest.fn().mockImplementation(() => ({
+    mutate: jest.fn(),
+  })),
   useConditionsSearch: jest.fn().mockImplementation(() => ({
     conditions: [],
     error: null,
-    isSearchingConditions: false,
+    isSearching: false,
   })),
-  updatePatientCondition: jest.fn(),
 }));
 
 describe('Conditions Form', () => {
@@ -65,7 +63,7 @@ describe('Conditions Form', () => {
     expect(screen.getByRole('radio', { name: 'Inactive' })).not.toBeChecked();
 
     const cancelButton = screen.getByRole('button', { name: /Cancel/i });
-    const submitButton = screen.getByRole('button', { name: /Save and close/i });
+    const submitButton = screen.getByRole('button', { name: /Save & close/i });
     expect(cancelButton).toBeInTheDocument();
     expect(cancelButton).not.toBeDisabled();
     expect(submitButton).toBeInTheDocument();
@@ -129,68 +127,44 @@ describe('Conditions Form', () => {
   it('renders a success toast notification upon successfully recording a condition', async () => {
     const user = userEvent.setup();
 
-    mockCreatePatientCondition.mockReturnValueOnce(of({ status: 201, body: 'Condition created' }));
-    mockUseConditionsSearch.mockImplementation(() => ({
-      conditions: searchedCondition,
+    mockCreateCondition.mockReturnValue(Promise.resolve({ status: 201, body: 'Condition created' }));
+    mockUseConditionsSearch.mockReturnValue({
+      searchResults: searchedCondition,
       error: null,
-      isSearchingConditions: false,
-    }));
+      isSearching: false,
+    });
 
     renderConditionsForm();
 
-    const cancelButton = screen.getByRole('button', { name: /Cancel/i });
-    const submitButton = screen.getByRole('button', { name: /Save and close/i });
+    const cancelButton = screen.getByRole('button', { name: /cancel/i });
+    const submitButton = screen.getByRole('button', { name: /save & close/i });
     const activeStatusInput = screen.getByRole('radio', { name: 'Active' });
-    const conditionSearchInput = screen.getByRole('searchbox', { name: /Enter condition/i });
+    const conditionSearchInput = screen.getByRole('searchbox', { name: /enter condition/i });
     const onsetDateInput = screen.getByRole('textbox', { name: /onset date/i });
 
-    expect(cancelButton).toBeInTheDocument();
     expect(cancelButton).not.toBeDisabled();
-    expect(submitButton).toBeInTheDocument();
     expect(submitButton).toBeDisabled();
 
     await user.type(conditionSearchInput, 'Headache');
-    await user.click(screen.getByRole('menuitem', { name: /Headache/i }));
+    await user.click(screen.getByRole('menuitem', { name: /headache/i }));
     await user.type(onsetDateInput, '2020-05-05');
-    await user.click(activeStatusInput);
 
     expect(activeStatusInput).toBeChecked();
     expect(submitButton).not.toBeDisabled();
 
     await user.click(submitButton);
 
-    expect(mockCreatePatientCondition).toHaveBeenCalledTimes(1);
-    expect(mockCreatePatientCondition).toHaveBeenCalledWith(
+    expect(mockCreateCondition).toHaveBeenCalledWith(
       expect.objectContaining({
-        clinicalStatus: {
-          coding: [
-            {
-              code: 'active',
-              system: 'http://terminology.hl7.org/CodeSystem/condition-clinical',
-            },
-          ],
-        },
-        code: {
-          coding: [
-            {
-              code: '139084AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-              display: 'Headache',
-            },
-          ],
-        },
+        clinicalStatus: 'active',
+        conceptId: '139084AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        display: 'Headache',
         endDate: null,
-        recorder: {
-          reference: 'Practitioner/undefined',
-        },
-        resourceType: 'Condition',
-        subject: {
-          reference: 'Patient/' + mockPatient.id,
-        },
+        onsetDateTime: '2020-12-20T00:00:00+00:00',
+        patientId: mockPatient.id,
       }),
-      new AbortController(),
     );
 
-    expect(mockShowToast).toHaveBeenCalledTimes(1);
     expect(mockShowToast).toHaveBeenCalledWith(
       expect.objectContaining({
         critical: true,
@@ -206,9 +180,9 @@ describe('Conditions Form', () => {
 
     renderConditionsForm();
 
-    const submitButton = screen.getByRole('button', { name: /Save and close/i });
+    const submitButton = screen.getByRole('button', { name: /save & close/i });
     const activeStatusInput = screen.getByRole('radio', { name: 'Active' });
-    const conditionSearchInput = screen.getByRole('searchbox', { name: /Enter condition/i });
+    const conditionSearchInput = screen.getByRole('searchbox', { name: /enter condition/i });
     const onsetDateInput = screen.getByRole('textbox', { name: /onset date/i });
 
     const error = {
@@ -219,7 +193,7 @@ describe('Conditions Form', () => {
       },
     };
 
-    mockCreatePatientCondition.mockReturnValue(throwError(error));
+    mockCreateCondition.mockImplementation(() => Promise.reject(error));
 
     await user.type(conditionSearchInput, 'Headache');
     await user.click(screen.getByRole('menuitem', { name: /Headache/i }));
@@ -231,13 +205,7 @@ describe('Conditions Form', () => {
 
     await user.click(submitButton);
 
-    expect(mockShowNotification).toHaveBeenCalledTimes(1);
-    expect(mockShowNotification).toHaveBeenCalledWith({
-      critical: true,
-      description: 'Internal Server Error',
-      kind: 'error',
-      title: 'Error saving condition',
-    });
+    expect(screen.getByRole('alert')).toBeInTheDocument();
   });
 });
 

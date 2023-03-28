@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { usePagination } from '@openmrs/esm-framework';
+import { useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import styles from './paginated-vitals.scss';
 
@@ -24,6 +24,7 @@ interface PaginatedVitalsProps {
 
 const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({ tableRows, pageSize, pageUrl, urlLabel, tableHeaders }) => {
   const { results: paginatedVitals, goTo, currentPage } = usePagination(tableRows, pageSize);
+  const isTablet = useLayoutType() === 'tablet';
 
   const StyledTableCell = ({ interpretation, children }: { interpretation: string; children: React.ReactNode }) => {
     switch (interpretation) {
@@ -42,7 +43,7 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({ tableRows, pageSize, 
 
   return (
     <div>
-      <DataTable rows={paginatedVitals} headers={tableHeaders} isSortable size="sm" useZebraStyles>
+      <DataTable rows={paginatedVitals} headers={tableHeaders} isSortable size={isTablet ? 'lg' : 'sm'} useZebraStyles>
         {({ rows, headers, getHeaderProps, getTableProps }) => (
           <TableContainer>
             <Table {...getTableProps()} className={styles.customRow}>
@@ -64,8 +65,9 @@ const PaginatedVitals: React.FC<PaginatedVitalsProps> = ({ tableRows, pageSize, 
               <TableBody>
                 {rows.map((row) => (
                   <TableRow key={row.id}>
-                    {row.cells.map((cell, index) => {
-                      const vitalSignInterpretation = paginatedVitals[row.id][cell.id.substring(2) + 'Interpretation'];
+                    {row?.cells?.map((cell, index) => {
+                      const vitalSignInterpretation =
+                        paginatedVitals[row.id] && paginatedVitals[row.id][cell.id.substring(2) + 'Interpretation'];
 
                       return (
                         <StyledTableCell key={`styled-${index}`} interpretation={vitalSignInterpretation}>

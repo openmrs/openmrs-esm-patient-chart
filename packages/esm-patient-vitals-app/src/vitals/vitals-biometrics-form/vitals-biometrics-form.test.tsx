@@ -21,6 +21,13 @@ const mockConceptUnits = new Map<string, string>(
   mockVitalsSignsConcept.data.results[0].setMembers.map((concept) => [concept.uuid, concept.units]),
 );
 
+const mockConceptRanges = new Map<string, { lowAbsolute: number | null; highAbsolute: number | null }>(
+  mockVitalsSignsConcept.data.results[0].setMembers.map((concept) => [
+    concept.uuid,
+    { lowAbsolute: concept.lowAbsolute ?? null, highAbsolute: concept.hiAbsolute ?? null },
+  ]),
+);
+
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
 
@@ -38,12 +45,16 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
     useVitalsConceptMetadata: jest.fn().mockImplementation(() => ({
       data: mockConceptUnits,
       conceptMetadata: mockConceptMetadata,
+      conceptRanges: mockConceptRanges,
     })),
   };
 });
 
 jest.mock('../vitals.resource', () => ({
   savePatientVitals: jest.fn(),
+  useVitals: jest.fn().mockImplementation(() => ({
+    mutate: jest.fn,
+  })),
 }));
 
 describe('VitalsBiometricsForm: ', () => {

@@ -2,7 +2,6 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
 
-import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { EmptyRouteComponent } from './empty-route/empty-route.component';
 import { FeWrapperComponent } from './fe-wrapper/fe-wrapper.component';
@@ -18,10 +17,20 @@ import { ConfigResourceService } from './services/config-resource.service';
 import { LoaderComponent } from './loader/loader.component';
 import { SingleSpaPropsService } from './single-spa-props/single-spa-props.service';
 import { FormCreationService } from './form-creation/form-creation.service';
+import { TranslateModule, TranslateService, TranslateStore } from '@ngx-translate/core';
 
 @NgModule({
   declarations: [AppComponent, EmptyRouteComponent, FeWrapperComponent, LoaderComponent],
-  imports: [BrowserModule, FormEntryModule, ReactiveFormsModule, BrowserAnimationsModule, OpenmrsApiModule],
+  imports: [
+    BrowserModule,
+    TranslateModule.forRoot({
+      isolate: false,
+    }),
+    FormEntryModule,
+    ReactiveFormsModule,
+    BrowserAnimationsModule,
+    OpenmrsApiModule,
+  ],
   providers: [
     FormSchemaService,
     LocalStorageService,
@@ -31,6 +40,8 @@ import { FormCreationService } from './form-creation/form-creation.service';
     MonthlyScheduleResourceService,
     ConfigResourceService,
     SingleSpaPropsService,
+    TranslateService,
+    TranslateStore,
   ],
   bootstrap: [AppComponent],
 })

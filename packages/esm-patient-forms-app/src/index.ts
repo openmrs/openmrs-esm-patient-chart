@@ -52,21 +52,6 @@ function setupOpenMRS() {
   return {
     extensions: [
       {
-        name: 'forms-widget',
-        slot: 'patient-chart-summary-dashboard-slot',
-        order: 5,
-        load: getAsyncLifecycle(() => import('./forms/forms-summary-dashboard.component'), options),
-        meta: {
-          columnSpan: 4,
-        },
-        online: {
-          isOffline: false,
-        },
-        offline: {
-          isOffline: true,
-        },
-      },
-      {
         name: 'patient-form-dashboard',
         order: 0,
         slot: dashboardMeta.slot,
@@ -117,10 +102,21 @@ function setupOpenMRS() {
         },
       },
       {
-        name: 'clinical-form-action-menu-item',
-        slot: 'action-menu-items-slot',
+        name: 'clinical-form-action-menu',
+        slot: 'action-menu-chart-items-slot',
         load: getAsyncLifecycle(() => import('./clinical-form-action-button.component'), options),
         order: 2,
+      },
+      {
+        name: 'clinical-forms-workspace',
+        load: getAsyncLifecycle(() => import('./forms/forms-workspace.component'), options),
+        meta: {
+          title: {
+            key: 'clinicalForm',
+            default: 'Clinical form',
+          },
+          type: 'order',
+        },
       },
     ],
   };

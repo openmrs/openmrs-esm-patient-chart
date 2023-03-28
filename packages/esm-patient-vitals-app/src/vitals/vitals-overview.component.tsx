@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { DataTableSkeleton, Button, InlineLoading } from '@carbon/react';
+import { DataTableSkeleton, Button, InlineLoading, ContentSwitcher, Switch } from '@carbon/react';
 import { Add, ChartLineSmooth, Table } from '@carbon/react/icons';
 import {
   CardHeader,
@@ -8,16 +8,17 @@ import {
   ErrorState,
   formEntrySub,
   launchPatientWorkspace,
+  useVisitOrOfflineVisit,
   useVitalsConceptMetadata,
   withUnit,
 } from '@openmrs/esm-patient-common-lib';
-import { formatDate, parseDate, useConfig } from '@openmrs/esm-framework';
-import { patientVitalsBiometricsFormWorkspace } from '../constants';
+import { formatDate, parseDate, useConfig, useLayoutType } from '@openmrs/esm-framework';
 import PaginatedVitals from './paginated-vitals.component';
 import VitalsChart from './vitals-chart.component';
 import { ConfigObject } from '../config-schema';
 import { useVitals } from './vitals.resource';
 import styles from './vitals-overview.scss';
+import { launchVitalsForm } from './vitals-utils';
 
 interface VitalsOverviewProps {
   patientUuid: string;
@@ -38,36 +39,34 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
   const displayText = t('vitalSigns', 'Vital signs');
   const headerTitle = t('vitals', 'Vitals');
   const [chartView, setChartView] = React.useState<boolean>();
+  const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
+  const isTablet = useLayoutType() === 'tablet';
 
   const { vitals, isError, isLoading, isValidating } = useVitals(patientUuid);
   const { data: conceptUnits } = useVitalsConceptMetadata();
 
   const launchVitalsBiometricsForm = React.useCallback(() => {
-    if (config.vitals.useFormEngine) {
-      launchFormEntry(config.vitals.formUuid, '', config.vitals.formName);
-    } else {
-      launchPatientWorkspace(patientVitalsBiometricsFormWorkspace);
-    }
-  }, [config.vitals]);
+    launchVitalsForm(currentVisit, config);
+  }, [config, currentVisit]);
 
   const tableHeaders = [
     { key: 'date', header: 'Date and time', isSortable: true },
     {
+      key: 'temperature',
+      header: withUnit('Temp', conceptUnits.get(config.concepts.temperatureUuid) ?? ''),
+    },
+    {
       key: 'bloodPressure',
       header: withUnit('BP', conceptUnits.get(config.concepts.systolicBloodPressureUuid) ?? ''),
     },
+    { key: 'pulse', header: withUnit('Pulse', conceptUnits.get(config.concepts.pulseUuid) ?? '') },
     {
       key: 'respiratoryRate',
       header: withUnit('R. Rate', conceptUnits.get(config.concepts.respiratoryRateUuid) ?? ''),
     },
-    { key: 'pulse', header: withUnit('Pulse', conceptUnits.get(config.concepts.pulseUuid) ?? '') },
     {
       key: 'spo2',
       header: withUnit('SPO2', conceptUnits.get(config.concepts.oxygenSaturationUuid) ?? ''),
-    },
-    {
-      key: 'temperature',
-      header: withUnit('Temp', conceptUnits.get(config.concepts.temperatureUuid) ?? ''),
     },
   ];
 
@@ -91,7 +90,7 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
   return (
     <>
       {(() => {
-        if (isLoading) return <DataTableSkeleton role="progressbar" />;
+        if (isLoading) return <DataTableSkeleton role="progressbar" compact={!isTablet} zebra />;
         if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
         if (vitals?.length) {
           return (
@@ -101,36 +100,29 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
                   <span>{isValidating ? <InlineLoading /> : null}</span>
                 </div>
                 <div className={styles.vitalsHeaderActionItems}>
-                  <div className={styles.toggleButtons}>
-                    <Button
-                      className={styles.tableViewToggle}
-                      size="sm"
-                      kind={chartView ? 'ghost' : 'tertiary'}
-                      hasIconOnly
-                      renderIcon={(props) => <Table {...props} size={16} />}
-                      iconDescription={t('tableView', 'Table View')}
-                      onClick={() => setChartView(false)}
-                    />
-                    <Button
-                      className={styles.chartViewToggle}
-                      size="sm"
-                      kind={chartView ? 'tertiary' : 'ghost'}
-                      hasIconOnly
-                      renderIcon={(props) => <ChartLineSmooth {...props} size={16} />}
-                      iconDescription={t('chartView', 'Chart View')}
-                      onClick={() => setChartView(true)}
-                    />
-                  </div>
-                  <span className={styles.divider}>|</span>
+                  <ContentSwitcher
+                    onChange={(evt) => setChartView(evt.name === 'chartView')}
+                    size={isTablet ? 'md' : 'sm'}
+                  >
+                    <Switch name="tableView">
+                      <Table size={16} />
+                    </Switch>
+                    <Switch name="chartView">
+                      <ChartLineSmooth size={16} />
+                    </Switch>
+                  </ContentSwitcher>
                   {showAddVitals && (
-                    <Button
-                      kind="ghost"
-                      renderIcon={(props) => <Add {...props} size={16} />}
-                      iconDescription="Add vitals"
-                      onClick={launchVitalsBiometricsForm}
-                    >
-                      {t('add', 'Add')}
-                    </Button>
+                    <>
+                      <span className={styles.divider}>|</span>
+                      <Button
+                        kind="ghost"
+                        renderIcon={Add}
+                        iconDescription="Add vitals"
+                        onClick={launchVitalsBiometricsForm}
+                      >
+                        {t('add', 'Add')}
+                      </Button>
+                    </>
                   )}
                 </div>
               </CardHeader>

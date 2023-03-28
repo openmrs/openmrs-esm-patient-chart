@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import capitalize from 'lodash-es/capitalize';
 import { Button, Tag } from '@carbon/react';
 import { ChevronDown, ChevronUp, OverflowMenuVertical } from '@carbon/react/icons';
-import { ExtensionSlot, age, formatDate, parseDate } from '@openmrs/esm-framework';
+import { ExtensionSlot, age, formatDate, parseDate, useConfig } from '@openmrs/esm-framework';
 import ContactDetails from '../contact-details/contact-details.component';
 import CustomOverflowMenuComponent from '../ui-components/overflow-menu.component';
 import styles from './patient-banner.scss';
@@ -24,7 +24,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
   hideActionsOverflow,
 }) => {
   const { t } = useTranslation();
-  const overFlowMenuRef = React.useRef(null);
+  const overflowMenuRef = React.useRef(null);
 
   const patientActionsSlotState = React.useMemo(
     () => ({ patientUuid, onClick, onTransition }),
@@ -48,7 +48,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
 
   const handleNavigateToPatientChart = (event: MouseEvent) => {
     if (onClick) {
-      !(overFlowMenuRef?.current && overFlowMenuRef?.current.contains(event.target)) && onClick(patientUuid);
+      !(overflowMenuRef?.current && overflowMenuRef?.current.contains(event.target)) && onClick(patientUuid);
     }
   };
   const [showDropdown, setShowDropdown] = React.useState(false);
@@ -56,6 +56,26 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
     event.stopPropagation();
     setShowDropdown((value) => !value);
   }, []);
+
+  const getGender = (gender: string): string => {
+    switch (gender) {
+      case 'male':
+        return t('male', 'Male');
+      case 'female':
+        return t('female', 'Female');
+      case 'other':
+        return t('other', 'Other');
+      case 'unknown':
+        return t('unknown', 'Unknown');
+      default:
+        return gender;
+    }
+  };
+
+  const { excludePatientIdentifierCodeTypes } = useConfig();
+  const identifiers = patient?.identifier.filter(
+    (identifier) => !excludePatientIdentifierCodeTypes?.uuids.includes(identifier.type.coding[0].code),
+  );
 
   return (
     <div className={styles.container} role="banner">
@@ -77,7 +97,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
               />
             </div>
             {!hideActionsOverflow && (
-              <div ref={overFlowMenuRef}>
+              <div ref={overflowMenuRef}>
                 <CustomOverflowMenuComponent
                   menuTitle={
                     <>
@@ -99,19 +119,18 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
             )}
           </div>
           <div className={styles.demographics}>
-            <span>{capitalize(patient?.gender)}</span> &middot; <span>{age(patient?.birthDate)}</span> &middot;{' '}
+            <span>{getGender(patient.gender)}</span> &middot; <span>{age(patient.birthDate)}</span> &middot;{' '}
             <span>{formatDate(parseDate(patient?.birthDate), { mode: 'wide', time: false })}</span>
           </div>
           <div className={styles.row}>
             <div className={styles.identifiers}>
-              {patient?.identifier?.length
-                ? patient?.identifier.map(({ value, type }) => (
+              {identifiers.length
+                ? identifiers.map(({ value, type }) => (
                     <span className={styles.identifierTag}>
-                      <Tag key={value} type="gray" title={type.text}>
+                      <Tag key={value} className={styles.tag} type="gray" title={type.text}>
                         {type.text}
                       </Tag>
                       {value}
-                      &#183;
                     </span>
                   ))
                 : ''}

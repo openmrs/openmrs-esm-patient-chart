@@ -1,1 +1,26 @@
-{}
+{
+  "active": "Actif",
+  "add": "Ajouter",
+  "all": "Tout",
+  "cancel": "Annuller",
+  "checkFilters": "Vérifiez les filtres ci-dessus",
+  "condition": "Condition",
+  "conditionNowVisible": "C'est maintenant visible sur la page des conditions",
+  "conditions": "Conditions",
+  "conditionSaved": "Condition enregistrée avec succès",
+  "conditionSaveError": "Erreur en enregistrant la condition",
+  "currentStatus": "Statut actuel",
+  "dateOfOnset": "Date de début",
+  "endDate": "Date de fin",
+  "enterCondition": "Entrer une condition",
+  "inactive": "Inactif",
+  "noConditionsToDisplay": "Aucune condition à afficher",
+  "noResultsFor": "Pas de résultat pour",
+  "onsetDate": "Date de début",
+  "saveAndClose": "Sauvegarder et fermer",
+  "searchConditions": "Conditions de recherche",
+  "searching": "Recherche en cours",
+  "seeAll": "Voir tout",
+  "show": "Montrer",
+  "status": "Statut"
+}

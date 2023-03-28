@@ -3,22 +3,25 @@ import {
   launchStartVisitPrompt,
   useVisitOrOfflineVisit,
 } from '@openmrs/esm-patient-common-lib';
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
+import { useSystemVisitSetting } from '../api/api';
 
 export function useLaunchOrderBasket(patientUuid) {
+  const { systemVisitEnabled } = useSystemVisitSetting();
+
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
 
   const results = useMemo(
     () => ({
       launchOrderBasket: () => {
-        if (currentVisit) {
+        if (!systemVisitEnabled || currentVisit) {
           launchPatientWorkspace('order-basket-workspace');
         } else {
           launchStartVisitPrompt();
         }
       },
     }),
-    [currentVisit],
+    [currentVisit, systemVisitEnabled],
   );
   return results;
 }

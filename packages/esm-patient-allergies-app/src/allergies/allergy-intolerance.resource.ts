@@ -24,11 +24,14 @@ type UseAllergies = {
   isError: Error | null;
   isLoading: boolean;
   isValidating: boolean;
+  mutate: () => void;
 };
 
 export function useAllergies(patientUuid: string): UseAllergies {
-  const { data, error, isValidating } = useSWR<{ data: FHIRAllergyResponse }, Error>(
-    `${fhirBaseUrl}/AllergyIntolerance?patient=${patientUuid}`,
+  const allergiesUrl = `${fhirBaseUrl}/AllergyIntolerance?patient=${patientUuid}`;
+
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: FHIRAllergyResponse }, Error>(
+    patientUuid ? allergiesUrl : null,
     openmrsFetch,
   );
 
@@ -43,8 +46,9 @@ export function useAllergies(patientUuid: string): UseAllergies {
   return {
     allergies: data ? formattedAllergies : null,
     isError: error,
-    isLoading: !data && !error,
+    isLoading,
     isValidating,
+    mutate,
   };
 }
 

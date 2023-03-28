@@ -110,7 +110,7 @@ function setupOpenMRS() {
       {
         name: 'mark-patient-deceased-button',
         slot: 'patient-actions-slot',
-        load: getAsyncLifecycle(() => import('./actions-buttons/mark-patient-deceased'), {
+        load: getAsyncLifecycle(() => import('./actions-buttons/mark-patient-deceased.component'), {
           featureName: 'patient-actions-slot-deceased-button',
           moduleName,
         }),

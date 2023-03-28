@@ -10,10 +10,13 @@ import {
   useVisit,
   navigate,
   useConfig,
+  showModal,
 } from '@openmrs/esm-framework';
 import { mockPatient, mockPatientWithLongName } from '../../../../__mocks__/patient.mock';
 import { registerWorkspace, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import VisitHeader from './visit-header.component';
+import { getByTextWithMarkup } from '../../../../tools/test-helpers';
+import { mockCurrentVisit } from '../../../../__mocks__/visits.mock';
 
 const mockUseAssignedExtensions = useAssignedExtensions as jest.Mock;
 const mockUsePatient = usePatient as jest.Mock;
@@ -21,6 +24,7 @@ const mockUseVisit = useVisit as jest.Mock;
 const mockUseLayoutType = useLayoutType as jest.Mock;
 const mockExtensionRegistry = {};
 const mockUseConfig = useConfig as jest.Mock;
+const mockShowModal = showModal as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -38,6 +42,7 @@ jest.mock('@openmrs/esm-framework', () => {
     translateFrom: (module, key, defaultValue, options) => defaultValue,
     useOnClickOutside: jest.fn(),
     useConfig: jest.fn(),
+    showModal: jest.fn(),
   };
 });
 
@@ -54,6 +59,7 @@ describe('Visit Header', () => {
   test('should display visit header and left nav bar hamburger icon', async () => {
     const user = userEvent.setup();
     mockUseConfig.mockReturnValue({ startVisitLabel: '' });
+    mockUseConfig.mockReturnValue({ endVisitLabel: '' });
 
     registerWorkspace({ name: 'start-visit-workspace-form', title: 'Start visit', load: jest.fn() });
     mockUseAssignedExtensions.mockReturnValue([{ id: 'someId' }]);
@@ -118,7 +124,38 @@ describe('Visit Header', () => {
 
     const longNameText = screen.getByText(/^Some very long given name...$/i);
     expect(longNameText).toBeInTheDocument();
-    expect(screen.getByText(/^Some very long given name family name 20, male$/i)).toBeInTheDocument();
+    expect(getByTextWithMarkup(/Some very long given name family name\s*20, male/i)).toBeInTheDocument();
+  });
+
+  it('should be able to show configurable stop visit button and modal to stop current visit', async () => {
+    const user = userEvent.setup();
+    mockUseConfig.mockReturnValue({ endVisitLabel: 'Checkout' });
+    mockUseAssignedExtensions.mockReturnValue([{ id: 'someId' }]);
+    mockUsePatient.mockReturnValue({
+      patient: mockPatientWithLongName,
+      isLoading: false,
+      error: null,
+      patientUuid: mockPatient.id,
+    });
+    mockUseVisit.mockReturnValue({ isValidating: false, currentVisit: mockCurrentVisit });
+    mockUseLayoutType.mockReturnValue('desktop');
+
+    renderVisitHeader();
+
+    // Should be able to end a visit
+    const endVisitButton = screen.getByRole('button', { name: /Checkout/i });
+    expect(endVisitButton).toBeInTheDocument();
+
+    // should launch the form
+    await user.click(endVisitButton);
+    expect(mockShowModal).toHaveBeenCalledTimes(1);
+
+    const closeButton = screen.getByRole('button', { name: 'Close' });
+    expect(closeButton).toBeInTheDocument();
+
+    // Should close the visit-header
+    await user.click(closeButton);
+    expect(navigate).toHaveBeenCalledWith({ to: '/spa/home' });
   });
 });
 

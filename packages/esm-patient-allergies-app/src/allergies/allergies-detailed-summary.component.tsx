@@ -14,7 +14,7 @@ import {
   TableRow,
 } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { formatDate, parseDate } from '@openmrs/esm-framework';
+import { formatDate, parseDate, useLayoutType } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { useAllergies } from './allergy-intolerance.resource';
 import { patientAllergiesFormWorkspace } from '../constants';
@@ -30,6 +30,9 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
   const displayText = t('allergyIntolerances', 'allergy intolerances');
   const headerTitle = t('allergies', 'Allergies');
   const { allergies, isError, isLoading, isValidating } = useAllergies(patient.id);
+  const layout = useLayoutType();
+  const isTablet = layout === 'tablet';
+  const isDesktop = layout === 'small-desktop' || layout === 'large-desktop';
 
   const launchAllergiesForm = React.useCallback(() => launchPatientWorkspace(patientAllergiesFormWorkspace), []);
 
@@ -37,15 +40,16 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
     { key: 'display', header: t('allergen', 'Allergen') },
     {
       key: 'criticality',
-      header: t('severityandReaction', 'Severity and Reaction'),
+      header: t('severityandReaction', 'Severity'),
     },
-    {
-      key: 'recordedDate',
-      header: t('since', 'Since'),
-    },
+    { key: 'reaction', header: t('reaction', 'Reaction') },
     {
       key: 'lastUpdated',
       header: t('lastUpdated', 'Last updated'),
+    },
+    {
+      key: 'note',
+      header: t('note', 'Note'),
     },
   ];
 
@@ -54,32 +58,25 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
       ...allergy,
       criticality: {
         content: (
-          <div className={styles.allergyDetails}>
-            <p className={styles.allergyCriticality}>
-              {allergy.criticality === 'high' && (
-                <svg className="omrs-icon omrs-margin-right-4" fill="rgba(181, 7, 6, 1)" style={{ height: '1.25rem' }}>
-                  <use xlinkHref="#omrs-icon-important-notification" />
-                </svg>
-              )}
-              <span
-                className={`${styles.allergySeverity} ${
-                  allergy.criticality === 'high' ? styles.productiveHeading02 : styles.bodyShort02
-                }`}
-              >
-                {allergy.criticality}
-              </span>
-            </p>
-            <p>{allergy.reactionManifestations?.join(', ')}</p>
-            <p className={styles.note}>{allergy?.note}</p>
-          </div>
+          <span className={styles.allergyCriticality}>
+            {allergy.criticality === 'high' && (
+              <svg className="omrs-icon omrs-margin-right-4" fill="rgba(181, 7, 6, 1)" style={{ height: '1.25rem' }}>
+                <use xlinkHref="#omrs-icon-important-notification" />
+              </svg>
+            )}
+            <span className={`${allergy.criticality === 'high' && styles.allergySeverityHigh}`}>
+              {allergy.criticality}
+            </span>
+          </span>
         ),
       },
-      recordedDate: formatDate(parseDate(allergy.recordedDate), { day: false, time: false }) ?? '--',
       lastUpdated: allergy.lastUpdated ? formatDate(parseDate(allergy.lastUpdated), { time: false }) : '--',
+      reaction: allergy.reactionManifestations?.join(', '),
+      note: allergy?.note ?? '--',
     }));
   }, [allergies]);
 
-  if (isLoading) return <DataTableSkeleton role="progressbar" />;
+  if (isLoading) return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
   if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
   if (allergies?.length) {
     return (
@@ -97,7 +94,7 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
             </Button>
           )}
         </CardHeader>
-        <DataTable rows={tableRows} headers={tableHeaders} isSortable useZebraStyles>
+        <DataTable rows={tableRows} headers={tableHeaders} isSortable useZebraStyles size={isTablet ? 'lg' : 'sm'}>
           {({ rows, headers, getHeaderProps, getTableProps }) => (
             <TableContainer>
               <Table {...getTableProps()}>

@@ -41,7 +41,7 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
             {t('visitSummaries', 'Visit summaries')}
           </Tab>
           <Tab className={styles.tab} id="all-encounters-tab">
-            {t('allVisits', 'All visits')}
+            {t('allEncounters', 'All encounters')}
           </Tab>
           {showAllEncountersTab ? (
             <Tab className={styles.tab} id="all-encounters-tab">
@@ -92,7 +92,7 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
             ) : isError ? (
               <ErrorState headerTitle={t('visits', 'visits')} error={isError} />
             ) : visits?.length ? (
-              <VisitsTable visits={visitsWithEncounters} showAllEncounters />
+              <VisitsTable visits={visitsWithEncounters} showAllEncounters patientUuid={patientUuid} />
             ) : (
               <EmptyState headerTitle={t('visits', 'visits')} displayText={t('Visits', 'Visits')} />
             )}

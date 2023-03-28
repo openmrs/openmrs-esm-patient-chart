@@ -4,13 +4,13 @@ import debounce from 'lodash-es/debounce';
 import isEmpty from 'lodash-es/isEmpty';
 import { Layer, RadioButtonGroup, RadioButton, Search, StructuredListSkeleton } from '@carbon/react';
 import { EmptyState, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
-import { useLayoutType, usePagination } from '@openmrs/esm-framework';
+import { useLayoutType, usePagination, VisitType } from '@openmrs/esm-framework';
 import styles from './visit-type-overview.scss';
 
 interface BaseVisitTypeProps {
   onChange: (event) => void;
   patientUuid: string;
-  visitTypes;
+  visitTypes: Array<VisitType>;
 }
 
 const BaseVisitType: React.FC<BaseVisitTypeProps> = ({ onChange, visitTypes }) => {
@@ -26,7 +26,7 @@ const BaseVisitType: React.FC<BaseVisitTypeProps> = ({ onChange, visitTypes }) =
     }
   }, [searchTerm, visitTypes]);
 
-  const handleSearch = React.useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), 300), []);
+  const handleSearch = useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), 300), []);
 
   const { results, currentPage, goTo } = usePagination(searchResults, 5);
 
@@ -54,11 +54,11 @@ const BaseVisitType: React.FC<BaseVisitTypeProps> = ({ onChange, visitTypes }) =
 
           <RadioButtonGroup
             className={styles.radioButtonGroup}
-            defaultSelected="default-selected"
+            defaultSelected={results?.length === 1 ? results[0].uuid : ''}
             orientation="vertical"
             onChange={onChange}
             name="radio-button-group"
-            valueSelected="default-selected"
+            valueSelected={results?.length === 1 ? results[0].uuid : ''}
           >
             {results.map(({ uuid, display, name }) => (
               <RadioButton key={uuid} className={styles.radioButton} id={name} labelText={display} value={uuid} />

@@ -5,7 +5,7 @@ export const configSchema = {
     _type: Type.Array,
     _elements: {
       formUuid: {
-        _type: Type.UUID,
+        _type: Type.String,
         _description: 'The UUID of the form',
       },
       formName: {
@@ -82,6 +82,11 @@ export const configSchema = {
     _description: 'Custom forms endpoint to fetch forms using a custom url need `showConfigurableForms`',
     _default: '',
   },
+  orderFormsByName: {
+    _type: Type.Boolean,
+    _description: 'Order forms alphabetically.',
+    _default: true,
+  },
 };
 
 export interface HtmlFormEntryForm {
@@ -95,6 +100,7 @@ export interface ConfigObject {
   htmlFormEntryForms: Array<HtmlFormEntryForm>;
   showRecommendedFormsTab: boolean;
   customFormsUrl: string;
+  orderFormsByName: boolean;
   showConfigurableForms: boolean;
   showHtmlFormEntryForms: boolean;
 }

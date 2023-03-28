@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Button,
   ButtonSet,
@@ -23,26 +23,20 @@ import { useConfig, useLayoutType, usePatient, age, formatDate, parseDate } from
 import { OrderBasketItem } from '../types/order-basket-item';
 import { useOrderConfig } from '../api/order-config';
 import styles from './medication-order-form.scss';
-import { useDurationUnits } from '../api/api';
 import capitalize from 'lodash-es/capitalize';
+import { ConfigObject } from '../config-schema';
+import {
+  DosingUnit,
+  DurationUnit,
+  MedicationFrequency,
+  MedicationRoute,
+  QuantityUnit,
+} from '../api/drug-order-template';
 
 export interface MedicationOrderFormProps {
   initialOrderBasketItem: OrderBasketItem;
   onSign: (finalizedOrder: OrderBasketItem) => void;
   onCancel: () => void;
-}
-
-function addIfNotPresent(
-  optionsList: Array<{ id: string; text: string }>,
-  option: { value: any; valueCoded?: string },
-): Array<{ id: string; text: string }> {
-  let ret = optionsList || [];
-  if (!option) return ret;
-  const id = option?.valueCoded ? option?.valueCoded : `${option.value}`;
-  if (!ret.some((x) => x.id == id)) {
-    return [...ret, { id: id, text: `${option.value}` }];
-  }
-  return ret;
 }
 
 function MedicationInfoHeader({ orderBasketItem }: { orderBasketItem: OrderBasketItem }) {
@@ -85,13 +79,49 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
   const isTablet = useLayoutType() === 'tablet';
   const [orderBasketItem, setOrderBasketItem] = useState(initialOrderBasketItem);
   const template = initialOrderBasketItem.template;
-  const { orderConfigObject } = useOrderConfig();
-  const config = useConfig();
-  const {
-    isLoadingDurationUnits,
-    durationUnits,
-    error: fetchingDurationUnitsError,
-  } = useDurationUnits(config.durationUnitsConcept);
+  const { isLoading: isLoadingOrderConfig, orderConfigObject, error: errorFetchingOrderConfig } = useOrderConfig();
+  const config = useConfig() as ConfigObject;
+
+  const drugDosingUnits: Array<DosingUnit> = useMemo(
+    () =>
+      orderConfigObject?.drugDosingUnits ?? [
+        {
+          valueCoded: initialOrderBasketItem?.drug?.dosageForm?.uuid,
+          value: initialOrderBasketItem?.drug?.dosageForm?.display,
+        },
+      ],
+    [orderConfigObject, initialOrderBasketItem?.drug?.dosageForm],
+  );
+
+  const drugRoutes: Array<MedicationRoute> = useMemo(() => orderConfigObject?.drugRoutes ?? [], [orderConfigObject]);
+
+  const drugDispensingUnits: Array<QuantityUnit> = useMemo(
+    () =>
+      orderConfigObject?.drugDispensingUnits ?? [
+        {
+          valueCoded: initialOrderBasketItem?.drug?.dosageForm?.uuid,
+          value: initialOrderBasketItem?.drug?.dosageForm?.display,
+        },
+      ],
+    [orderConfigObject, initialOrderBasketItem?.drug?.dosageForm],
+  );
+
+  const durationUnits: Array<DurationUnit> = useMemo(
+    () =>
+      orderConfigObject?.durationUnits ?? [
+        {
+          valueCoded: config?.daysDurationUnit?.uuid,
+          value: config?.daysDurationUnit?.display,
+        },
+      ],
+    [orderConfigObject, config?.daysDurationUnit],
+  );
+
+  const orderFrequencies: Array<MedicationFrequency> = useMemo(
+    () => orderConfigObject?.orderFrequencies ?? [],
+    [orderConfigObject],
+  );
+
   const [showStickyMedicationHeader, setShowMedicationHeader] = useState(false);
   const { patient, isLoading: isLoadingPatientDetails } = usePatient();
   const patientName = `${patient?.name?.[0]?.given?.join(' ')} ${patient?.name?.[0].family}`;
@@ -106,64 +136,6 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
       )}
     </>
   );
-
-  const [dosingUnitOptions, setDosingUnitOptions] = useState(
-    addIfNotPresent(
-      template?.dosingInstructions?.units?.map((x) => ({
-        id: x.valueCoded,
-        text: x.value,
-      })),
-      initialOrderBasketItem.unit,
-    ),
-  );
-
-  const [frequencyOptions, setFrequencyOptions] = useState(
-    addIfNotPresent(
-      template?.dosingInstructions?.frequency?.map((x) => ({
-        id: x.valueCoded,
-        text: x.value,
-      })),
-      initialOrderBasketItem.frequency,
-    ),
-  );
-  const [routeOptions, setRouteOptions] = useState(
-    addIfNotPresent(
-      template?.dosingInstructions?.route?.map((x) => ({
-        id: x.valueCoded,
-        text: x.value,
-      })),
-      initialOrderBasketItem.route,
-    ),
-  );
-
-  useEffect(() => {
-    if (orderConfigObject) {
-      // sync frequency options with what's defined in the order config
-      const availableFrequencies = frequencyOptions.map((x) => x.id);
-      const otherFrequencyOptions = [];
-      orderConfigObject.orderFrequencies.forEach(
-        (x) => availableFrequencies.includes(x.uuid) || otherFrequencyOptions.push({ id: x.uuid, text: x.display }),
-      );
-      setFrequencyOptions([...frequencyOptions, ...otherFrequencyOptions]);
-
-      // sync dosage.unit options with what's defined in the order config
-      const availableDosingUnits = dosingUnitOptions.map((x) => x.id);
-      const otherDosingUnits = [];
-      orderConfigObject.drugDosingUnits.forEach(
-        (x) => availableDosingUnits.includes(x.uuid) || otherDosingUnits.push({ id: x.uuid, text: x.display }),
-      );
-      setDosingUnitOptions([...dosingUnitOptions, ...otherDosingUnits]);
-
-      // sync route options with what's defined in the order config
-      const availableRoutes = routeOptions.map((x) => x.id);
-      const otherRouteOptions = [];
-      orderConfigObject.drugRoutes.forEach(
-        (x) => availableRoutes.includes(x.uuid) || otherRouteOptions.push({ id: x.uuid, text: x.display }),
-      );
-      setRouteOptions([...routeOptions, ...otherRouteOptions]);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [orderConfigObject]);
 
   const observer = useRef(null);
   const medicationInfoHeaderRef = useCallback(
@@ -198,13 +170,14 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
           </span>
         </div>
       )}
+
       <Form className={styles.orderForm} onSubmit={() => onSign(orderBasketItem)} id="drugOrderForm">
-        {fetchingDurationUnitsError && (
+        {errorFetchingOrderConfig && (
           <InlineNotification
-            hideCloseButton
             kind="error"
             lowContrast
-            title={t('errorFetchingDurationUnits', 'Error occured when fetching duration units')}
+            className={styles.inlineNotification}
+            title={t('errorFetchingOrderConfig', 'Error occured when fetching Order config')}
             subtitle={t('tryReopeningTheForm', 'Please try launching the form again')}
           />
         )}
@@ -229,7 +202,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
         <section className={styles.formSection}>
           <Grid className={styles.gridRow}>
             <Column lg={12} md={6} sm={4}>
-              <h3 className={styles.sectionHeader}>{t('dosageInstructions', '1. Dosage Instructions')}</h3>
+              <h3 className={styles.sectionHeader}>{t('dosageInstructions', '1. Dosage instructions')}</h3>
             </Column>
             <Column className={styles.pullColumnContentRight} lg={4} md={2} sm={4}>
               <Toggle
@@ -252,7 +225,6 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
             <Grid className={styles.gridRow}>
               <Column md={8}>
                 <TextArea
-                  light={isTablet}
                   labelText={t('freeTextDosage', 'Free text dosage')}
                   placeholder={t('freeTextDosage', 'Free text dosage')}
                   value={orderBasketItem.freeTextDosage}
@@ -275,7 +247,6 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                       <NumberInput
                         size={isTablet ? 'lg' : 'md'}
                         id="doseSelection"
-                        light={isTablet}
                         placeholder={t('editDoseComboBoxPlaceholder', 'Dose')}
                         label={t('editDoseComboBoxTitle', 'Dose')}
                         value={orderBasketItem?.dosage ?? 0}
@@ -297,25 +268,18 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                     <ComboBox
                       size={isTablet ? 'lg' : 'md'}
                       id="dosingUnits"
-                      light={isTablet}
-                      items={dosingUnitOptions}
+                      items={drugDosingUnits}
                       placeholder={t('editDosageUnitsPlaceholder', 'Unit')}
                       titleText={t('editDosageUnitsTitle', 'Dose unit')}
-                      itemToString={(item) => item?.text}
-                      selectedItem={
-                        dosingUnitOptions?.length
-                          ? {
-                              id: orderBasketItem.unit?.valueCoded,
-                              text: orderBasketItem.unit?.value,
-                            }
-                          : null
-                      }
+                      itemToString={(item) => item?.value}
+                      selectedItem={orderBasketItem?.unit}
                       onChange={({ selectedItem }) => {
                         setOrderBasketItem({
                           ...orderBasketItem,
-                          unit: !!selectedItem?.id
-                            ? { value: selectedItem.text, valueCoded: selectedItem.id }
-                            : initialOrderBasketItem.route,
+                          unit: selectedItem,
+                          // Since the default selection for the quantity units
+                          // should be same as dosing units
+                          quantityUnits: orderBasketItem.quantityUnits ?? selectedItem,
                         });
                       }}
                       required
@@ -327,22 +291,15 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                     <ComboBox
                       size={isTablet ? 'lg' : 'md'}
                       id="editRoute"
-                      light={isTablet}
-                      items={routeOptions}
-                      selectedItem={{
-                        id: orderBasketItem.route?.valueCoded,
-                        text: orderBasketItem.route?.value,
-                      }}
-                      // @ts-ignore
+                      items={drugRoutes}
+                      selectedItem={orderBasketItem?.route}
                       placeholder={t('editRouteComboBoxTitle', 'Route')}
                       titleText={t('editRouteComboBoxTitle', 'Route')}
-                      itemToString={(item) => item?.text}
+                      itemToString={(item) => item?.value}
                       onChange={({ selectedItem }) => {
                         setOrderBasketItem({
                           ...orderBasketItem,
-                          route: !!selectedItem?.id
-                            ? { value: selectedItem.text, valueCoded: selectedItem.id }
-                            : initialOrderBasketItem.route,
+                          route: selectedItem,
                         });
                       }}
                       required
@@ -356,22 +313,15 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                     <ComboBox
                       size={isTablet ? 'lg' : 'md'}
                       id="editFrequency"
-                      light={isTablet}
-                      items={frequencyOptions}
-                      selectedItem={{
-                        id: orderBasketItem.frequency?.valueCoded,
-                        text: orderBasketItem.frequency?.value,
-                      }}
-                      // @ts-ignore
+                      items={orderFrequencies}
+                      selectedItem={orderBasketItem?.frequency}
                       placeholder={t('editFrequencyComboBoxTitle', 'Frequency')}
                       titleText={t('editFrequencyComboBoxTitle', 'Frequency')}
-                      itemToString={(item) => item?.text}
+                      itemToString={(item) => item?.value}
                       onChange={({ selectedItem }) => {
                         setOrderBasketItem({
                           ...orderBasketItem,
-                          frequency: !!selectedItem?.id
-                            ? { value: selectedItem.text, valueCoded: selectedItem.id }
-                            : initialOrderBasketItem.frequency,
+                          frequency: selectedItem,
                         });
                       }}
                       required
@@ -384,7 +334,6 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                 <Column lg={16} md={4} sm={4}>
                   <InputWrapper>
                     <TextArea
-                      light={isTablet}
                       labelText={t('patientInstructions', 'Patient instructions')}
                       placeholder={t(
                         'patientInstructionsPlaceholder',
@@ -404,26 +353,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                 </Column>
                 <Column lg={16} md={4} sm={4}>
                   <Grid className={styles.gridRow}>
-                    <Column lg={12} md={8} sm={4} className={styles.prnTextArea}>
-                      <InputWrapper>
-                        <TextArea
-                          light={isTablet}
-                          labelText={t('prnReason', 'P.R.N. reason')}
-                          placeholder={t('prnReasonPlaceholder', 'Reason to take medicine')}
-                          rows={3}
-                          maxLength={255}
-                          value={orderBasketItem.asNeededCondition}
-                          onChange={(e) =>
-                            setOrderBasketItem({
-                              ...orderBasketItem,
-                              asNeededCondition: e.target.value,
-                            })
-                          }
-                        />
-                      </InputWrapper>
-                    </Column>
-
-                    <Column lg={4} md={8} sm={4} className={styles.prnCheckbox}>
+                    <Column lg={6} md={8} sm={4}>
                       <InputWrapper>
                         <FormGroup legendText={t('prn', 'P.R.N.')}>
                           <Checkbox
@@ -435,10 +365,30 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                               setOrderBasketItem({
                                 ...orderBasketItem,
                                 asNeeded: e.target.checked,
+                                asNeededCondition: e.target.checked ? orderBasketItem?.asNeededCondition : '',
                               })
                             }
                           />
                         </FormGroup>
+                      </InputWrapper>
+                    </Column>
+
+                    <Column lg={10} md={8} sm={4}>
+                      <InputWrapper>
+                        <TextArea
+                          labelText={t('prnReason', 'P.R.N. reason')}
+                          placeholder={t('prnReasonPlaceholder', 'Reason to take medicine')}
+                          rows={3}
+                          maxLength={255}
+                          value={orderBasketItem.asNeededCondition}
+                          onChange={(e) =>
+                            setOrderBasketItem({
+                              ...orderBasketItem,
+                              asNeededCondition: e.target.value,
+                            })
+                          }
+                          disabled={!orderBasketItem?.asNeeded}
+                        />
                       </InputWrapper>
                     </Column>
                   </Grid>
@@ -454,7 +404,6 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
               <div className={styles.fullWidthDatePickerContainer}>
                 <InputWrapper>
                   <DatePicker
-                    light={isTablet}
                     datePickerType="single"
                     maxDate={new Date()}
                     value={[orderBasketItem.startDate]}
@@ -480,7 +429,6 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
                 {!isTablet ? (
                   <NumberInput
                     size="lg"
-                    light={isTablet}
                     id="durationInput"
                     label={t('duration', 'Duration')}
                     min={1}
@@ -513,40 +461,17 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
               <InputWrapper>
                 <ComboBox
                   size="lg"
-                  light={isTablet}
                   id="durationUnitPlaceholder"
                   titleText={t('durationUnit', 'Duration unit')}
-                  selectedItem={
-                    orderBasketItem.durationUnit?.uuid
-                      ? {
-                          id: orderBasketItem.durationUnit.uuid,
-                          text: orderBasketItem.durationUnit.display,
-                        }
-                      : null
-                  }
-                  items={
-                    durationUnits?.map((unit) => ({
-                      id: unit.uuid,
-                      text: unit.display,
-                    })) ?? []
-                  }
-                  itemToString={(item) => item?.text}
-                  // @ts-ignore
+                  selectedItem={orderBasketItem?.durationUnit}
+                  items={durationUnits}
+                  itemToString={(item) => item?.value}
                   placeholder={t('durationUnitPlaceholder', 'Duration Unit')}
-                  helperText={isLoadingDurationUnits && t('fetchingDurationUnits', 'Fetching duration units...')}
                   onChange={({ selectedItem }) =>
-                    !!selectedItem
-                      ? setOrderBasketItem({
-                          ...orderBasketItem,
-                          durationUnit: {
-                            uuid: selectedItem.id,
-                            display: selectedItem.text,
-                          },
-                        })
-                      : setOrderBasketItem({
-                          ...orderBasketItem,
-                          durationUnit: config.daysDurationUnit,
-                        })
+                    setOrderBasketItem({
+                      ...orderBasketItem,
+                      durationUnit: selectedItem,
+                    })
                   }
                 />
               </InputWrapper>
@@ -560,7 +485,6 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
               <InputWrapper>
                 <NumberInput
                   size="lg"
-                  light={isTablet}
                   id="quantityDispensed"
                   value={orderBasketItem.pillsDispensed}
                   label={t('quantityToDispense', 'Quantity to dispense')}
@@ -577,10 +501,29 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
             </Column>
             <Column lg={8} md={3} sm={4}>
               <InputWrapper>
+                <ComboBox
+                  size="lg"
+                  id="dispensingUnits"
+                  items={drugDispensingUnits}
+                  placeholder={t('editDispensingUnit', 'Quantity unit')}
+                  titleText={t('editDispensingUnit', 'Quantity unit')}
+                  itemToString={(item) => item?.value}
+                  selectedItem={orderBasketItem?.quantityUnits}
+                  onChange={({ selectedItem }) => {
+                    setOrderBasketItem({
+                      ...orderBasketItem,
+                      quantityUnits: selectedItem,
+                    });
+                  }}
+                  required
+                />
+              </InputWrapper>
+            </Column>
+            <Column lg={8} md={3} sm={4}>
+              <InputWrapper>
                 {!isTablet ? (
                   <NumberInput
                     size="lg"
-                    light={isTablet}
                     id="prescriptionRefills"
                     min={0}
                     label={t('prescriptionRefills', 'Prescription refills')}
@@ -635,7 +578,13 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
           <Button className={styles.button} kind="secondary" onClick={onCancel} size="xl">
             {t('discard', 'Discard')}
           </Button>
-          <Button className={styles.button} kind="primary" type="submit" size="xl">
+          <Button
+            className={styles.button}
+            kind="primary"
+            type="submit"
+            size="xl"
+            disabled={!!errorFetchingOrderConfig}
+          >
             {t('saveOrder', 'Save order')}
           </Button>
         </ButtonSet>
@@ -652,6 +601,7 @@ interface CustomNumberInputProps {
 }
 
 const CustomNumberInput: React.FC<CustomNumberInputProps> = ({ setValue, value, labelText, inputProps = {} }) => {
+  const { t } = useTranslation();
   const handleChange = (e) => {
     const val = e.target.value.replace(/[^\d]/g, '').slice(0, 2);
     setValue(val ? parseInt(val) : 0);
@@ -669,7 +619,7 @@ const CustomNumberInput: React.FC<CustomNumberInputProps> = ({ setValue, value, 
     <div className={styles.customElement}>
       <span className="cds--label">{labelText}</span>
       <div className={styles.customNumberInput}>
-        <Button hasIconOnly renderIcon={Subtract} onClick={decrement} />
+        <Button hasIconOnly renderIcon={Subtract} onClick={decrement} iconDescription={t('decrement', 'Decrement')} />
         <TextInput
           onChange={handleChange}
           value={value ? value : '--'}
@@ -677,7 +627,7 @@ const CustomNumberInput: React.FC<CustomNumberInputProps> = ({ setValue, value, 
           size="lg"
           className={styles.customInput}
         />
-        <Button hasIconOnly renderIcon={Add} onClick={increment} />
+        <Button hasIconOnly renderIcon={Add} onClick={increment} iconDescription={t('increment', 'Increment')} />
       </div>{' '}
     </div>
   );

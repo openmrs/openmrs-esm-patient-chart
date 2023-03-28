@@ -5,10 +5,10 @@ import { AppointmentPayload, AppointmentService, AppointmentsFetchResponse } fro
 import isToday from 'dayjs/plugin/isToday';
 dayjs.extend(isToday);
 
-export const appointmentsSearchUrl = `/ws/rest/v1/appointments/search`;
+const appointmentsSearchUrl = `/ws/rest/v1/appointments/search`;
 
 export function useAppointments(patientUuid: string, startDate: string, abortController: AbortController) {
-  /* 
+  /*
     SWR isn't meant to make POST requests for data fetching. This is a consequence of the API only exposing this resource via POST.
     This works but likely isn't recommended.
   */
@@ -25,34 +25,41 @@ export function useAppointments(patientUuid: string, startDate: string, abortCon
       },
     });
 
-  const { data, error, isValidating } = useSWR<AppointmentsFetchResponse, Error>(appointmentsSearchUrl, fetcher);
-
-  const appointments = data?.data?.length
-    ? data.data.sort((a, b) => (b.startDateTime > a.startDateTime ? 1 : -1))
-    : null;
-
-  const pastAppointments = appointments?.filter(({ startDateTime }) =>
-    dayjs(new Date(startDateTime).toISOString()).isBefore(new Date().setHours(0, 0, 0, 0)),
+  const { data, error, isLoading, isValidating, mutate } = useSWR<AppointmentsFetchResponse, Error>(
+    appointmentsSearchUrl,
+    fetcher,
   );
 
-  const upcomingAppointments = appointments?.filter(({ startDateTime }) =>
-    dayjs(new Date(startDateTime).toISOString()).isAfter(new Date()),
-  );
+  const appointments = data?.data?.length ? data.data : null;
 
-  const todaysAppointments = appointments?.filter(({ startDateTime }) =>
-    dayjs(new Date(startDateTime).toISOString()).isToday(),
-  );
+  const pastAppointments = appointments
+    ?.sort((a, b) => (b.startDateTime > a.startDateTime ? 1 : -1))
+    ?.filter(({ status }) => status !== 'Cancelled')
+    ?.filter(({ startDateTime }) =>
+      dayjs(new Date(startDateTime).toISOString()).isBefore(new Date().setHours(0, 0, 0, 0)),
+    );
+
+  const upcomingAppointments = appointments
+    ?.sort((a, b) => (a.startDateTime > b.startDateTime ? 1 : -1))
+    ?.filter(({ status }) => status !== 'Cancelled')
+    ?.filter(({ startDateTime }) => dayjs(new Date(startDateTime).toISOString()).isAfter(new Date()));
+
+  const todaysAppointments = appointments
+    ?.sort((a, b) => (a.startDateTime > b.startDateTime ? 1 : -1))
+    ?.filter(({ status }) => status !== 'Cancelled')
+    ?.filter(({ startDateTime }) => dayjs(new Date(startDateTime).toISOString()).isToday());
 
   return {
     data: data ? { pastAppointments, upcomingAppointments, todaysAppointments } : null,
     isError: error,
-    isLoading: !data && !error,
+    isLoading,
     isValidating,
+    mutate,
   };
 }
 
 export function useAppointmentService() {
-  const { data, error } = useSWR<{ data: Array<AppointmentService> }, Error>(
+  const { data, error, isLoading } = useSWR<{ data: Array<AppointmentService> }, Error>(
     `/ws/rest/v1/appointmentService/all/full`,
     openmrsFetch,
   );
@@ -60,11 +67,11 @@ export function useAppointmentService() {
   return {
     data: data ? data.data : null,
     isError: error,
-    isLoading: !data && !error,
+    isLoading,
   };
 }
 
-export function createAppointment(appointment: AppointmentPayload, abortController: AbortController) {
+export function saveAppointment(appointment: AppointmentPayload, abortController: AbortController) {
   return openmrsFetch(`/ws/rest/v1/appointment`, {
     method: 'POST',
     signal: abortController.signal,
@@ -87,6 +94,14 @@ export function getAppointmentService(abortController: AbortController, uuid) {
   });
 }
 
-export function getTimeSlots(abortController: AbortController) {
-  //https://openmrs-spa.org/openmrs/ws/rest/v1/appointment/all?forDate=2020-03-02T21:00:00.000Z
-}
+export const cancelAppointment = async (toStatus: string, appointmentUuid: string, ac: AbortController) => {
+  const omrsDateFormat = 'YYYY-MM-DDTHH:mm:ss.SSSZZ';
+  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const statusChangeTime = dayjs(new Date()).format(omrsDateFormat);
+  const url = `/ws/rest/v1/appointments/${appointmentUuid}/status-change`;
+  return await openmrsFetch(url, {
+    body: { toStatus, onDate: statusChangeTime, timeZone: timeZone },
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+  });
+};

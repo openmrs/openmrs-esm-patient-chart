@@ -9,9 +9,17 @@ import {
 } from '@openmrs/esm-patient-common-lib';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import OrderBasketActionButton from './order-basket-action-button.component';
+import { useSystemVisitSetting } from '../api/api';
 
 const mockedUseLayoutType = useLayoutType as jest.Mock;
 const mockUsePatient = usePatient as jest.Mock;
+jest.mock('../api/api', () => {
+  const originalModule = jest.requireActual('../api/api');
+  return {
+    ...originalModule,
+    useSystemVisitSetting: jest.fn(),
+  };
+});
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -52,6 +60,10 @@ jest.mock('../medications/order-basket-store.ts', () => {
     orderBasketStore: { items: { '8673ee4f-e2ab-4077-ba55-4980f408773e': [{ name: 'order-01', uuid: 'some-uuid' }] } },
   };
 });
+
+(useSystemVisitSetting as jest.Mock).mockImplementation(() => ({
+  systemVisitEnabled: true,
+}));
 
 describe('<OrderBasketActionButton/>', () => {
   beforeEach(() => {
@@ -101,7 +113,7 @@ describe('<OrderBasketActionButton/>', () => {
       currentVisit: null,
     }));
 
-    render(<OrderBasketActionButton />);
+    const screen = render(<OrderBasketActionButton />);
     const orderBasketButton = screen.getByRole('button', { name: /Medications/i });
     expect(orderBasketButton).toBeInTheDocument();
 

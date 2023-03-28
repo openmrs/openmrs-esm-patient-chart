@@ -1,5 +1,6 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import debounce from 'lodash-es/debounce';
 import first from 'lodash-es/first';
 import {
   DataTable,
@@ -17,10 +18,11 @@ import {
   TableToolbarContent,
   TableToolbarSearch,
   Tile,
+  Button,
 } from '@carbon/react';
 import { Edit } from '@carbon/react/icons';
 import { EmptyDataIllustration, PatientChartPagination, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
-import { formatDatetime, useConfig, usePagination } from '@openmrs/esm-framework';
+import { formatDatetime, useConfig, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { ConfigObject } from '../config-schema';
 import { CompletedFormInfo } from '../types';
 import { launchFormEntryOrHtmlForms } from '../form-entry-interop';
@@ -36,6 +38,7 @@ interface FormViewProps {
   pageSize: number;
   pageUrl: string;
   urlLabel: string;
+  mutateForms?: () => void;
 }
 
 interface FilterProps {
@@ -46,24 +49,47 @@ interface FilterProps {
   getCellId: (row, key) => string;
 }
 
-const FormView: React.FC<FormViewProps> = ({ category, forms, patientUuid, patient, pageSize, pageUrl, urlLabel }) => {
+const FormView: React.FC<FormViewProps> = ({
+  category,
+  forms,
+  patientUuid,
+  patient,
+  pageSize,
+  pageUrl,
+  urlLabel,
+  mutateForms,
+}) => {
   const { t } = useTranslation();
   const config = useConfig() as ConfigObject;
+  const isTablet = useLayoutType() === 'tablet';
   const htmlFormEntryForms = config.htmlFormEntryForms;
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const filteredForms = useMemo(() => {
+    if (!searchTerm) {
+      return forms;
+    }
+    return forms.filter((form) => {
+      const formName = form.form.display ?? form.form.name;
+      return formName.toLowerCase().includes(searchTerm.toLowerCase());
+    });
+  }, [forms, searchTerm]);
+
+  const handleSearch = React.useMemo(() => debounce((searchTerm) => setSearchTerm(searchTerm), 300), []);
 
   const { results, goTo, currentPage } = usePagination(
-    forms?.sort((a, b) => (b.lastCompleted?.getTime() ?? 0) - (a.lastCompleted?.getTime() ?? 0)),
+    filteredForms?.sort((a, b) => (a.form?.display > b.form?.display ? 1 : -1)),
     pageSize,
   );
 
   const tableHeaders: Array<DataTableHeader> = useMemo(
     () => [
+      { key: 'formName', header: t('formName', 'Form name (A-Z)') },
       {
         key: 'lastCompleted',
-        header: t('lastCompleted', 'Last Completed'),
+        header: t('lastCompleted', 'Last completed'),
       },
-      { key: 'formName', header: t('formName', 'Form Name (A-Z)') },
     ],
     [t],
   );
@@ -81,18 +107,6 @@ const FormView: React.FC<FormViewProps> = ({ category, forms, patientUuid, patie
       }),
     [results],
   );
-
-  const handleFilter = ({ rowIds, headers, cellsById, inputValue, getCellId }: FilterProps): Array<string> => {
-    return rowIds.filter((rowId) =>
-      headers.some(({ key }) => {
-        const cellId = getCellId(rowId, key);
-        const filterableValue = cellsById[cellId].value;
-        const filterTerm = inputValue.toLowerCase();
-
-        return ('' + filterableValue).toLowerCase().includes(filterTerm);
-      }),
-    );
-  };
 
   if (!forms?.length) {
     return (
@@ -115,23 +129,24 @@ const FormView: React.FC<FormViewProps> = ({ category, forms, patientUuid, patie
       {forms?.length > 0 && (
         <>
           <DataTable
-            filterRows={handleFilter}
             headers={tableHeaders}
             rows={tableRows}
-            size="sm"
+            size={isTablet ? 'lg' : 'sm'}
             isSortable
             useZebraStyles
+            overflowMenuOnHover={false}
           >
-            {({ rows, headers, getHeaderProps, getTableProps, onInputChange }) => (
+            {({ rows, headers, getHeaderProps, getTableProps, onInputChange, getToolbarProps }) => (
               <TableContainer className={styles.tableContainer}>
-                <TableToolbar className={styles.tableToolbar}>
+                <TableToolbar className={styles.tableToolbar} {...getToolbarProps()}>
                   <TableToolbarContent>
                     <TableToolbarSearch
                       className={styles.searchInput}
                       expanded
                       light
-                      onChange={onInputChange}
-                      placeholder={t('searchThisList', 'Search this list')}
+                      onChange={(event) => handleSearch(event.target.value)}
+                      placeholder={t('searchForAForm', 'Search for a form')}
+                      size={isTablet ? 'lg' : 'sm'}
                     />
                   </TableToolbarContent>
                 </TableToolbar>
@@ -149,48 +164,73 @@ const FormView: React.FC<FormViewProps> = ({ category, forms, patientUuid, patie
                           {header.header}
                         </TableHeader>
                       ))}
+                      <TableHeader />
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     {rows.map((row, index) => {
                       return (
                         <TableRow key={row.id}>
-                          <TableCell>{row.cells[0].value ?? t('never', 'Never')}</TableCell>
                           <TableCell>
-                            <div className={styles.tableCell}>
-                              <label
+                            <label
+                              onClick={() =>
+                                launchFormEntryOrHtmlForms(
+                                  currentVisit,
+                                  row.id,
+                                  patient,
+                                  htmlFormEntryForms,
+                                  '',
+                                  results[index].form.display ?? results[index].form.name,
+                                  mutateForms,
+                                )
+                              }
+                              role="presentation"
+                              className={styles.formName}
+                            >
+                              {row.cells[0].value}
+                            </label>
+                          </TableCell>
+                          <TableCell>
+                            <label
+                              onClick={() =>
+                                launchFormEntryOrHtmlForms(
+                                  currentVisit,
+                                  row.id,
+                                  patient,
+                                  htmlFormEntryForms,
+                                  '',
+                                  results[index].form.display ?? results[index].form.name,
+                                  mutateForms,
+                                )
+                              }
+                              role="presentation"
+                              className={styles.formName}
+                            >
+                              {row.cells[1].value}
+                            </label>
+                          </TableCell>
+                          <TableCell className="cds--table-column-menu">
+                            {row.cells[0].value && (
+                              <Button
+                                hasIconOnly
+                                renderIcon={Edit}
+                                iconDescription={t('editForm', 'Edit form')}
                                 onClick={() =>
                                   launchFormEntryOrHtmlForms(
                                     currentVisit,
                                     row.id,
                                     patient,
                                     htmlFormEntryForms,
-                                    '',
+                                    first(results[index].associatedEncounters)?.uuid,
                                     results[index].form.display ?? results[index].form.name,
+                                    mutateForms,
                                   )
                                 }
-                                role="presentation"
-                                className={styles.formName}
-                              >
-                                {row.cells[1].value}
-                              </label>
-                              {row.cells[0].value && (
-                                <Edit
-                                  size={20}
-                                  description="Edit form"
-                                  onClick={() =>
-                                    launchFormEntryOrHtmlForms(
-                                      currentVisit,
-                                      row.id,
-                                      patient,
-                                      htmlFormEntryForms,
-                                      first(results[index].associatedEncounters)?.uuid,
-                                      results[index].form.display ?? results[index].form.name,
-                                    )
-                                  }
-                                />
-                              )}
-                            </div>
+                                size={isTablet ? 'lg' : 'sm'}
+                                kind="ghost"
+                                tooltipPosition="left"
+                              />
+                            )}
                           </TableCell>
                         </TableRow>
                       );
@@ -213,7 +253,7 @@ const FormView: React.FC<FormViewProps> = ({ category, forms, patientUuid, patie
           </DataTable>
           <PatientChartPagination
             pageNumber={currentPage}
-            totalItems={forms?.length}
+            totalItems={filteredForms?.length}
             currentItems={results.length}
             pageSize={pageSize}
             onPageNumberChange={({ page }) => goTo(page)}

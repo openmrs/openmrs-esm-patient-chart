@@ -1,5 +1,61 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
 @import "~@openmrs/esm-styleguide/src/vars";
 
 .widgetCard {
   border: 1px solid $ui-03;
+}
+
+.divider {
+  border-left: 1px solid $ui-03;
+  height: spacing.$spacing-05;
+  margin: 0 spacing.$spacing-03;
+}
+
+.rightMostFlexContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.filterContainer {
+  :global(.cds--dropdown__wrapper--inline) {
+    gap: 0;
+  }
+
+  :global(.cds--list-box__menu-icon) {
+    height: 1rem;
+  }
+
+  :global(.cds--dropdown--inline .cds--list-box__menu) {
+    min-width: 10rem;
+  }
+}
+
+.content {
+  @include type.type-style('heading-compact-02');
+  color: $text-02;
+  margin-bottom: 0.5rem;
+}
+
+.tileContainer {
+  background-color: $ui-02;
+  border-top: 1px solid $ui-03;
+  padding: 5rem 0;
+}
+
+.tile {
+  margin: auto;
+  width: fit-content;
+}
+
+.tileContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.helper {
+  @include type.type-style('body-compact-01');
+  color: $text-02;
 }

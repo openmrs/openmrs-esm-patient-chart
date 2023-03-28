@@ -1,14 +1,9 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { screen, render, waitFor } from '@testing-library/react';
+import { screen, render } from '@testing-library/react';
 import { of } from 'rxjs/internal/observable/of';
-import { createErrorHandler, showNotification, showToast, useConfig, useSession } from '@openmrs/esm-framework';
-import {
-  fetchConceptDiagnosisByName,
-  fetchLocationByUuid,
-  fetchProviderByUuid,
-  saveVisitNote,
-} from './visit-notes.resource';
+import { showNotification, useConfig, useSession } from '@openmrs/esm-framework';
+import { fetchConceptDiagnosisByName, useLocationUuid, useProviderUuid, saveVisitNote } from './visit-notes.resource';
 import { ConfigMock } from '../../../../__mocks__/chart-widgets-config.mock';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import {
@@ -26,10 +21,9 @@ const testProps = {
   promptBeforeClosing: jest.fn(),
 };
 
-const mockCreateErrorHandler = createErrorHandler as jest.Mock;
 const mockFetchDiagnosisByName = fetchConceptDiagnosisByName as jest.Mock;
-const mockFetchLocationByUuid = fetchLocationByUuid as jest.Mock;
-const mockFetchProviderByUuid = fetchProviderByUuid as jest.Mock;
+const mockUseLocationUuid = useLocationUuid as jest.Mock;
+const mockUseProviderUuid = useProviderUuid as jest.Mock;
 const mockSaveVisitNote = saveVisitNote as jest.Mock;
 const mockShowNotification = showNotification as jest.Mock;
 const mockUseConfig = useConfig as jest.Mock;
@@ -52,9 +46,16 @@ jest.mock('@openmrs/esm-framework', () => {
 
 jest.mock('./visit-notes.resource', () => ({
   fetchConceptDiagnosisByName: jest.fn(),
-  fetchLocationByUuid: jest.fn(),
-  fetchProviderByUuid: jest.fn(),
+  useLocationUuid: jest.fn().mockImplementation(() => ({
+    data: mockFetchLocationByUuidResponse.data.uuid,
+  })),
+  useProviderUuid: jest.fn().mockImplementation(() => ({
+    data: mockFetchProviderByUuidResponse.data.uuid,
+  })),
   saveVisitNote: jest.fn(),
+  useVisitNotes: jest.fn().mockImplementation(() => ({
+    mutateVisitNotes: jest.fn(),
+  })),
 }));
 
 test('renders the visit notes form with all the relevant fields and values', () => {
@@ -63,7 +64,7 @@ test('renders the visit notes form with all the relevant fields and values', () 
   renderVisitNotesForm();
 
   expect(screen.getByRole('textbox', { name: /Visit date/i })).toBeInTheDocument();
-  expect(screen.getByRole('textbox', { name: /Write an additional note/i })).toBeInTheDocument();
+  expect(screen.getByRole('textbox', { name: /Write your notes/i })).toBeInTheDocument();
   expect(screen.getByRole('search', { name: /Enter Primary diagnoses/i })).toBeInTheDocument();
   expect(screen.getByRole('search', { name: /Enter Secondary diagnoses/i })).toBeInTheDocument();
   expect(screen.getByRole('group', { name: /Add an image to this visit/i })).toBeInTheDocument();
@@ -122,12 +123,12 @@ test('renders a success toast notification upon successfully recording a visit n
     encounterProviders: expect.arrayContaining([
       {
         encounterRole: ConfigMock.visitNoteConfig.clinicianEncounterRole,
-        provider: null,
+        provider: undefined,
       },
     ]),
     encounterType: ConfigMock.visitNoteConfig.encounterTypeUuid,
     form: ConfigMock.visitNoteConfig.formConceptUuid,
-    location: null,
+    location: undefined,
     obs: expect.arrayContaining([
       {
         concept: { display: '', uuid: '162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' },
@@ -149,7 +150,7 @@ test('renders a success toast notification upon successfully recording a visit n
 
   await userEvent.click(targetSearchResult);
 
-  const clinicalNote = screen.getByRole('textbox', { name: /Write an additional note/i });
+  const clinicalNote = screen.getByRole('textbox', { name: /Write your notes/i });
   await userEvent.clear(clinicalNote);
   await userEvent.type(clinicalNote, 'Sample clinical note');
   expect(clinicalNote).toHaveValue('Sample clinical note');
@@ -183,7 +184,7 @@ test('renders an error notification if there was a problem recording a condition
 
   await userEvent.click(targetSearchResult);
 
-  const clinicalNote = screen.getByRole('textbox', { name: /Write an additional note/i });
+  const clinicalNote = screen.getByRole('textbox', { name: /Write your notes/i });
   await userEvent.clear(clinicalNote);
   await userEvent.type(clinicalNote, 'Sample clinical note');
   expect(clinicalNote).toHaveValue('Sample clinical note');
@@ -201,8 +202,8 @@ test('renders an error notification if there was a problem recording a condition
 });
 
 function renderVisitNotesForm() {
-  mockFetchLocationByUuid.mockResolvedValue(mockFetchLocationByUuidResponse);
-  mockFetchProviderByUuid.mockResolvedValue(mockFetchProviderByUuidResponse);
+  mockUseLocationUuid.mockResolvedValue(mockFetchLocationByUuidResponse);
+  mockUseProviderUuid.mockResolvedValue(mockFetchProviderByUuidResponse);
   mockUseConfig.mockReturnValue(ConfigMock);
   mockUseSession.mockReturnValue(mockSessionDataResponse);
   render(<VisitNotesForm {...testProps} />);

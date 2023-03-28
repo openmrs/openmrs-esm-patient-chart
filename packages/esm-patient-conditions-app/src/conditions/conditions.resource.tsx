@@ -1,6 +1,5 @@
 import useSWR from 'swr';
-import { map } from 'rxjs/operators';
-import { openmrsObservableFetch, fhirBaseUrl, openmrsFetch, useConfig } from '@openmrs/esm-framework';
+import { fhirBaseUrl, openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import { FHIRCondition, FHIRConditionResponse } from '../types';
 
 export type Condition = {
@@ -11,6 +10,17 @@ export type Condition = {
   recordedDate: string;
   id: string;
 };
+
+export interface ConditionDataTableRow {
+  cells: Array<{
+    id: string;
+    value: string;
+    info: {
+      header: string;
+    };
+  }>;
+  id: string;
+}
 
 export type CodedCondition = {
   concept: {
@@ -24,9 +34,54 @@ export type CodedCondition = {
   display: string;
 };
 
+type CreatePayload = {
+  clinicalStatus: {
+    coding: [
+      {
+        system: string;
+        code: string;
+      },
+    ];
+  };
+  code: {
+    coding: [
+      {
+        code: string;
+        display: string;
+      },
+    ];
+  };
+  endDate: string;
+  onsetDateTime: string;
+  recorder: {
+    reference: string;
+  };
+  recordedDate: string;
+  resourceType: string;
+  subject: {
+    reference: string;
+  };
+};
+
+type EditPayload = CreatePayload & {
+  id: string;
+};
+
+export type FormFields = {
+  clinicalStatus: string;
+  conceptId: string;
+  display: string;
+  endDate: string;
+  onsetDateTime: string;
+  patientId: string;
+  userId: string;
+};
+
 export function useConditions(patientUuid: string) {
-  const { data, error, isValidating } = useSWR<{ data: FHIRConditionResponse }, Error>(
-    `${fhirBaseUrl}/Condition?patient=${patientUuid}&_count=100`,
+  const conditionsUrl = `${fhirBaseUrl}/Condition?patient=${patientUuid}&_count=100`;
+
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: FHIRConditionResponse }, Error>(
+    patientUuid ? conditionsUrl : null,
     openmrsFetch,
   );
 
@@ -39,10 +94,11 @@ export function useConditions(patientUuid: string) {
       : null;
 
   return {
-    data: data ? formattedConditions : null,
+    conditions: data ? formattedConditions : null,
     isError: error,
-    isLoading: !data && !error,
+    isLoading,
     isValidating,
+    mutate,
   };
 }
 
@@ -50,30 +106,24 @@ export function useConditionsSearch(conditionToLookup: string) {
   const config = useConfig();
   const conditionConceptClassUuid = config?.conditionConceptClassUuid;
 
-  const CONDITIONS_SEARCH_URL = `/ws/rest/v1/conceptsearch?conceptClasses=${conditionConceptClassUuid}&q=${conditionToLookup}`;
+  const conditionsSearchUrl = `/ws/rest/v1/conceptsearch?conceptClasses=${conditionConceptClassUuid}&q=${conditionToLookup}`;
 
-  const { data, error } = useSWR<{ data: { results: Array<CodedCondition> } }, Error>(
-    conditionToLookup ? CONDITIONS_SEARCH_URL : null,
+  const { data, error, isLoading } = useSWR<{ data: { results: Array<CodedCondition> } }, Error>(
+    conditionToLookup ? conditionsSearchUrl : null,
     openmrsFetch,
   );
 
   return {
-    conditions: data?.data?.results ?? [],
+    searchResults: data?.data?.results ?? [],
     error: error,
-    isSearchingConditions: !data && !error,
+    isSearching: isLoading,
   };
 }
 
-export function getConditionByUuid(conditionUuid: string) {
-  return openmrsObservableFetch(`${fhirBaseUrl}/Condition/${conditionUuid}`).pipe(
-    map(({ data }) => data),
-    map((data: FHIRCondition) => mapConditionProperties(data)),
-  );
-}
-
 function mapConditionProperties(condition: FHIRCondition): Condition {
+  const status = condition?.clinicalStatus?.coding[0]?.code;
   return {
-    clinicalStatus: condition?.clinicalStatus?.coding[0]?.code,
+    clinicalStatus: status ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() : '',
     conceptId: condition?.code?.coding[0]?.code,
     display: condition?.code?.coding[0]?.display,
     onsetDateTime: condition?.onsetDateTime,
@@ -82,17 +132,105 @@ function mapConditionProperties(condition: FHIRCondition): Condition {
   };
 }
 
-export function createPatientCondition(payload, abortController) {
-  return openmrsObservableFetch(`${fhirBaseUrl}/Condition`, {
+export async function createCondition(payload: FormFields) {
+  const controller = new AbortController();
+  const url = `${fhirBaseUrl}/Condition`;
+
+  const completePayload: CreatePayload = {
+    clinicalStatus: {
+      coding: [
+        {
+          system: 'http://terminology.hl7.org/CodeSystem/condition-clinical',
+          code: payload.clinicalStatus,
+        },
+      ],
+    },
+    code: {
+      coding: [
+        {
+          code: payload.conceptId,
+          display: payload.display,
+        },
+      ],
+    },
+    endDate: payload.endDate,
+    onsetDateTime: payload.onsetDateTime,
+    recorder: {
+      reference: `Practitioner/${payload.userId}`,
+    },
+    recordedDate: new Date().toISOString(),
+    resourceType: 'Condition',
+    subject: {
+      reference: `Patient/${payload.patientId}`,
+    },
+  };
+
+  const res = await openmrsFetch(url, {
     headers: {
       'Content-Type': 'application/json',
     },
     method: 'POST',
-    body: payload,
-    signal: abortController,
+    body: completePayload,
+    signal: controller.signal,
   });
+
+  return res;
 }
 
-export function updatePatientCondition(patientCondition, patientUuid, abortController) {
-  return Promise.resolve({ status: 200, body: 'Ok' });
+export async function updateCondition(conditionId, payload: FormFields) {
+  const controller = new AbortController();
+  const url = `${fhirBaseUrl}/Condition/${conditionId}`;
+
+  const completePayload: EditPayload = {
+    clinicalStatus: {
+      coding: [
+        {
+          system: 'http://terminology.hl7.org/CodeSystem/condition-clinical',
+          code: payload.clinicalStatus,
+        },
+      ],
+    },
+    code: {
+      coding: [
+        {
+          code: payload.conceptId,
+          display: payload.display,
+        },
+      ],
+    },
+    endDate: payload.endDate,
+    id: conditionId,
+    onsetDateTime: payload.onsetDateTime,
+    recorder: {
+      reference: `Practitioner/${payload.userId}`,
+    },
+    recordedDate: new Date().toISOString(),
+    resourceType: 'Condition',
+    subject: {
+      reference: `Patient/${payload.patientId}`,
+    },
+  };
+
+  const res = await openmrsFetch(url, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    method: 'PUT',
+    body: completePayload,
+    signal: controller.signal,
+  });
+
+  return res;
+}
+
+export async function deleteCondition(conditionId: string) {
+  const controller = new AbortController();
+  const url = `${fhirBaseUrl}/Condition/${conditionId}`;
+
+  const res = await openmrsFetch(url, {
+    method: 'DELETE',
+    signal: controller.signal,
+  });
+
+  return res;
 }

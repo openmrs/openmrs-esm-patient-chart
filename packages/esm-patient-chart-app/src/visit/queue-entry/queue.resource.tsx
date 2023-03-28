@@ -1,5 +1,6 @@
 import useSWR from 'swr';
-import { openmrsFetch, Visit } from '@openmrs/esm-framework';
+import { fhirBaseUrl, openmrsFetch, Visit } from '@openmrs/esm-framework';
+import { useMemo } from 'react';
 export type QueuePriority = 'Emergency' | 'Not Urgent' | 'Priority' | 'Urgent';
 export type MappedQueuePriority = Omit<QueuePriority, 'Urgent'>;
 export type QueueService = 'Clinical consultation' | 'Triage';
@@ -62,22 +63,22 @@ export interface MappedVisitQueueEntry {
 }
 
 interface UseVisitQueueEntries {
-  visitQueueEntries: Array<MappedVisitQueueEntry> | null;
+  queueEntry: MappedVisitQueueEntry | null;
   isLoading: boolean;
   isError: Error;
   isValidating?: boolean;
 }
 
-export function useVisitQueueEntries(): UseVisitQueueEntries {
-  const apiUrl = `/ws/rest/v1/visit-queue-entry?v=full`;
-  const { data, error, isValidating } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
+export function useVisitQueueEntry(patientUuid, visitUuid): UseVisitQueueEntries {
+  const apiUrl = `/ws/rest/v1/visit-queue-entry?patient=${patientUuid}`;
+  const { data, error, isLoading, isValidating } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
     apiUrl,
     openmrsFetch,
   );
 
   const mapVisitQueueEntryProperties = (visitQueueEntry: VisitQueueEntry): MappedVisitQueueEntry => ({
-    id: visitQueueEntry.queueEntry.uuid,
-    name: visitQueueEntry.queueEntry.display,
+    id: visitQueueEntry.uuid,
+    name: visitQueueEntry.queueEntry.queue.display,
     patientUuid: visitQueueEntry.queueEntry.patient.uuid,
     priority:
       visitQueueEntry.queueEntry.priority.display === 'Urgent'
@@ -93,12 +94,33 @@ export function useVisitQueueEntries(): UseVisitQueueEntries {
     queueEntryUuid: visitQueueEntry.queueEntry.uuid,
   });
 
-  const mappedVisitQueueEntries = data?.data?.results?.map(mapVisitQueueEntryProperties);
+  const mappedVisitQueueEntry =
+    data?.data?.results
+      ?.map(mapVisitQueueEntryProperties)
+      .filter((visitQueueEntry) => visitUuid !== undefined && visitUuid === visitQueueEntry.visitUuid)
+      .shift() ?? null;
 
   return {
-    visitQueueEntries: mappedVisitQueueEntries ? mappedVisitQueueEntries : null,
-    isLoading: !data && !error,
+    queueEntry: mappedVisitQueueEntry,
+    isLoading,
     isError: error,
     isValidating,
   };
+}
+
+interface FHIRResponse {
+  entry: Array<{ resource: fhir.Location }>;
+  total: number;
+  type: string;
+  resourceType: string;
+}
+export function useQueueLocations() {
+  const apiUrl = `${fhirBaseUrl}/Location?_summary=data&_tag=queue location`;
+  const { data, error } = useSWR<{ data: FHIRResponse }>(apiUrl, openmrsFetch);
+
+  const queueLocations = useMemo(
+    () => data?.data?.entry?.map((response) => response.resource) ?? [],
+    [data?.data?.entry],
+  );
+  return { queueLocations: queueLocations ? queueLocations : [], isLoading: !data && !error, error };
 }

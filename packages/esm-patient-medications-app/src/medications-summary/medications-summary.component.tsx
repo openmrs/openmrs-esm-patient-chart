@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DataTableSkeleton } from '@carbon/react';
-import { useConfig } from '@openmrs/esm-framework';
+import { formatDatetime, parseDate, useConfig } from '@openmrs/esm-framework';
 import { EmptyState, ErrorState } from '@openmrs/esm-patient-common-lib';
 import MedicationsDetailsTable from '../components/medications-details-table.component';
 import { usePatientOrders } from '../api/api';
 import { ConfigObject } from '../config-schema';
 import { useLaunchOrderBasket } from '../utils/launchOrderBasket';
+import { Order } from '../types/order';
 
 export interface MedicationsSummaryProps {
   patientUuid: string;
@@ -18,18 +19,32 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
   const { launchOrderBasket } = useLaunchOrderBasket(patientUuid);
 
   const {
-    data: activeOrders,
-    error: activeOrdersError,
-    isLoading: isLoadingActiveOrders,
-    isValidating: isValidatingActiveOrders,
-  } = usePatientOrders(patientUuid, 'ACTIVE', config.careSettingUuid);
+    data: allOrders,
+    error: error,
+    isLoading: isLoading,
+    isValidating: isValidating,
+  } = usePatientOrders(patientUuid, 'any');
 
-  const {
-    data: pastOrders,
-    error: pastOrdersError,
-    isLoading: isLoadingPastOrders,
-    isValidating: isValidatingPastOrders,
-  } = usePatientOrders(patientUuid, 'any', config.careSettingUuid);
+  const [pastOrders, activeOrders] = useMemo(() => {
+    const currentDate = new Date();
+    const pastOrders: Array<Order> = [];
+    const activeOrders: Array<Order> = [];
+
+    if (allOrders) {
+      for (let i = 0; i < allOrders.length; i++) {
+        const order = allOrders[i];
+        if (order.autoExpireDate && parseDate(order.autoExpireDate) < currentDate) {
+          pastOrders.push(order);
+        } else if (order.dateStopped && parseDate(order.dateStopped) < currentDate) {
+          pastOrders.push(order);
+        } else {
+          activeOrders.push(order);
+        }
+      }
+    }
+
+    return [pastOrders, activeOrders];
+  }, [allOrders]);
 
   return (
     <>
@@ -38,14 +53,14 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
           const displayText = t('activeMedicationsDisplayText', 'Active medications');
           const headerTitle = t('activeMedicationsHeaderTitle', 'active medications');
 
-          if (isLoadingActiveOrders) return <DataTableSkeleton role="progressbar" />;
+          if (isLoading) return <DataTableSkeleton role="progressbar" />;
 
-          if (activeOrdersError) return <ErrorState error={activeOrdersError} headerTitle={headerTitle} />;
+          if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
 
           if (activeOrders?.length) {
             return (
               <MedicationsDetailsTable
-                isValidating={isValidatingActiveOrders}
+                isValidating={isValidating}
                 title={t('activeMedicationsTableTitle', 'Active Medications')}
                 medications={activeOrders}
                 showDiscontinueButton={true}
@@ -65,14 +80,14 @@ export default function MedicationsSummary({ patientUuid }: MedicationsSummaryPr
           const displayText = t('pastMedicationsDisplayText', 'Past medications');
           const headerTitle = t('pastMedicationsHeaderTitle', 'past medications');
 
-          if (isLoadingPastOrders) return <DataTableSkeleton role="progressbar" />;
+          if (isLoading) return <DataTableSkeleton role="progressbar" />;
 
-          if (pastOrdersError) return <ErrorState error={pastOrdersError} headerTitle={headerTitle} />;
+          if (error) return <ErrorState error={error} headerTitle={headerTitle} />;
 
           if (pastOrders?.length) {
             return (
               <MedicationsDetailsTable
-                isValidating={isValidatingPastOrders}
+                isValidating={isValidating}
                 title={t('pastMedicationsTableTitle', 'Past Medications')}
                 medications={pastOrders}
                 showDiscontinueButton={true}

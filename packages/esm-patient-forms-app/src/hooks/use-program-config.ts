@@ -14,7 +14,7 @@ interface ProgramConfig {
 }
 
 export const useProgramConfig = (patientUuid: string, loadProgramConfig: boolean = false) => {
-  const { data, error } = useSWR<{ data: ProgramConfig }>(
+  const { data, error, isLoading } = useSWR<{ data: ProgramConfig }>(
     loadProgramConfig && `/etl-latest/etl/patient-program-config?patientUuid=${patientUuid}`,
     openmrsFetch,
   );

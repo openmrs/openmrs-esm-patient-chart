@@ -30,7 +30,7 @@
 /* Desktop */
 :global(.omrs-breakpoint-gt-tablet) {
   .active {
-    border: spacing.$spacing-02 solid;
+    border: spacing.$spacing-01 solid;
     @include brand-03(border-color);
     border-radius: 50%;
     background-color: $ui-02;
@@ -59,6 +59,10 @@
     & > span {
       color: $interactive-01;
       @include type.type-style("heading-compact-01");
+    }
+
+    svg {
+      fill: $interactive-01;
     }
   }
 }

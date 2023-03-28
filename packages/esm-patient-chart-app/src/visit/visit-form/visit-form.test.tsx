@@ -42,6 +42,18 @@ jest.mock('@openmrs/esm-framework', () => {
   };
 });
 
+jest.mock('@openmrs/esm-patient-common-lib', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
+
+  return {
+    ...originalModule,
+    useActivePatientEnrollment: jest.fn().mockReturnValue({
+      activePatientEnrollment: [],
+      isLoading: false,
+    }),
+  };
+});
+
 describe('Visit Form', () => {
   it('renders the Start Visit form with all the relevant fields and values', () => {
     renderVisitForm();
@@ -50,8 +62,6 @@ describe('Visit Form', () => {
     expect(screen.getByRole('textbox', { name: /Time/i })).toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: /Time/i })).toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: /Select a location/i })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: /Recommended/i })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: /All/i })).toBeInTheDocument();
     expect(screen.getByRole('radio', { name: /Outpatient Visit/ })).toBeInTheDocument();
     expect(screen.getByRole('radio', { name: /HIV Return Visit/ })).toBeInTheDocument();
     expect(screen.getByRole('option', { name: /AM/i })).toBeInTheDocument();

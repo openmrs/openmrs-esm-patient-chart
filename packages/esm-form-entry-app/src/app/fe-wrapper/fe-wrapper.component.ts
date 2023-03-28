@@ -15,6 +15,7 @@ import { patientFormSyncItem, PatientFormSyncItemContent } from '../offline/sync
 import { SingleSpaPropsService } from '../single-spa-props/single-spa-props.service';
 import { CreateFormParams, FormCreationService } from '../form-creation/form-creation.service';
 import { ConceptService } from '../services/concept.service';
+import { TranslateService } from '@ngx-translate/core';
 
 type FormState =
   | 'initial'
@@ -53,8 +54,9 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
     private readonly patientPreviousEncounter: PatientPreviousEncounterService,
     private readonly formCreationService: FormCreationService,
     private readonly singleSpaPropsService: SingleSpaPropsService,
-    private conceptService: ConceptService,
-    private ngZone: NgZone,
+    private readonly conceptService: ConceptService,
+    private readonly translateService: TranslateService,
+    private readonly ngZone: NgZone,
   ) {}
 
   public ngOnInit() {
@@ -113,11 +115,16 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
   private loadAllFormDependencies(): Observable<CreateFormParams> {
     this.formUuid = this.singleSpaPropsService.getPropOrThrow('formUuid');
     const encounterOrSyncItemId = this.singleSpaPropsService.getPropOrThrow('encounterUuid');
+    const language = window.i18next?.language?.substring(0, 2) ?? '';
+    this.translateService.addLangs([language]);
+    this.translateService.use(language);
 
     return forkJoin({
-      formSchema: this.fetchCompiledFormSchema(this.formUuid).pipe(take(1)),
-      user: this.openmrsApi.getCurrentUserLocation().pipe(take(1)),
-      encounter: encounterOrSyncItemId ? this.getEncounterToEdit(encounterOrSyncItemId).pipe(take(1)) : of(null),
+      formSchema: this.fetchCompiledFormSchema(this.formUuid, language).pipe(take(1)),
+      session: this.openmrsApi.getCurrentSession().pipe(take(1)),
+      encounter: encounterOrSyncItemId
+        ? this.getEncounterToEdit(encounterOrSyncItemId).pipe(take(1))
+        : of<Encounter>(null),
     }).pipe(
       mergeMap((result) =>
         this.loadPatientPreviousEncounters(result.formSchema).pipe(
@@ -130,9 +137,8 @@ export class FeWrapperComponent implements OnInit, OnDestroy {
     );
   }
 
-  private fetchCompiledFormSchema(uuid: string): Observable<FormSchema> {
-    const useCachedSchemas = true;
-    return this.formSchemaService.getFormSchemaByUuid(uuid, useCachedSchemas).pipe(take(1));
+  private fetchCompiledFormSchema(uuid: string, language: string): Observable<FormSchema> {
+    return this.formSchemaService.getFormSchemaByUuid(uuid, language).pipe(take(1));
   }
 
   private getEncounterToEdit(encounterOrSyncItemId: string): Observable<Encounter | undefined> {

@@ -1,15 +1,14 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import capitalize from 'lodash-es/capitalize';
 import {
   Button,
-  Tooltip,
   Header,
   HeaderContainer,
   HeaderGlobalAction,
   HeaderGlobalBar,
   HeaderMenuButton,
   Tag,
+  Tooltip,
 } from '@carbon/react';
 import { CloseFilled } from '@carbon/react/icons';
 import {
@@ -21,12 +20,14 @@ import {
   useVisit,
   navigate,
   useConfig,
+  showModal,
+  ExtensionSlot,
 } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import { MappedQueuePriority, useVisitQueueEntry } from '../visit/queue-entry/queue.resource';
+import { EditQueueEntry } from '../visit/queue-entry/edit-queue-entry.component';
 import VisitHeaderSideMenu from './visit-header-side-menu.component';
 import styles from './visit-header.scss';
-import { MappedQueuePriority, MappedVisitQueueEntry, useVisitQueueEntries } from '../visit/queue-entry/queue.resource';
-import { EditQueueEntry } from '../visit/queue-entry/edit-queue-entry.component';
 
 interface PatientInfoProps {
   patient: fhir.Patient;
@@ -53,47 +54,51 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
   };
   const name = `${patient?.name?.[0].given?.join(' ')} ${patient?.name?.[0].family}`;
   const patientUuid = `${patient?.id}`;
-  const info = `${parseInt(age(patient?.birthDate))}, ${getGender(patient?.gender)}`;
-  const tooltipText = `${name} ${info}`;
-  const truncate = !isTablet && name.trim().length > 25;
-  const { visitQueueEntries, isLoading } = useVisitQueueEntries();
-  const [currentService, setCurrentService] = useState('');
-  const [visitType, setVisitType] = useState('');
-  const [priority, setPriority] = useState<MappedQueuePriority>('');
-  const [queueEntry, setQueueEntry] = useState<MappedVisitQueueEntry>(null);
   const { currentVisit } = useVisit(patientUuid);
+  const info = `${parseInt(age(patient?.birthDate))}, ${getGender(patient?.gender)}`;
+  const truncate = !isTablet && name.trim().length > 25;
+  const { queueEntry, isLoading } = useVisitQueueEntry(patientUuid, currentVisit?.uuid);
+
+  const visitType = queueEntry?.visitType ?? '';
+  const priority = queueEntry?.priority ?? '';
+
+  const getServiceString = () => {
+    switch (queueEntry?.status?.toLowerCase()) {
+      case 'waiting':
+        return `Waiting for ${queueEntry.service}`;
+      case 'in service':
+        return `Attending ${queueEntry.service}`;
+      case 'finished service':
+        return `Finished ${queueEntry.service}`;
+      default:
+        return '';
+    }
+  };
+
+  const currentService = queueEntry ? getServiceString() : null;
 
   const getTagType = (priority: string) => {
     switch (priority as MappedQueuePriority) {
-      case 'Emergency':
+      case 'emergency':
         return 'red';
-      case 'Not Urgent':
+      case 'not urgent':
         return 'green';
       default:
         return 'gray';
     }
   };
 
-  useEffect(() => {
-    visitQueueEntries?.forEach((element) => {
-      if (element?.patientUuid == patientUuid && currentVisit?.uuid === element.visitUuid) {
-        const visitQueueEntriesStatuses = {
-          Waiting: `${element.status} for ${element.service}`,
-          'In Service': `Attending ${element.service}`,
-          'Finished Service': `Finished ${element.service}`,
-        };
-        setCurrentService(visitQueueEntriesStatuses[element.status]);
-        setVisitType(element.visitType);
-        setPriority(element.priority);
-        setQueueEntry(element);
-      }
-    });
-  }, [currentVisit?.uuid, patientUuid, visitQueueEntries]);
+  const text = (
+    <>
+      <p className={styles.tooltipPatientName}>{name}</p>
+      <p className={styles.tooltipPatientInfo}>{info}</p>
+    </>
+  );
 
   return (
     <>
       {truncate ? (
-        <Tooltip align="bottom" label={tooltipText} tabIndex={0} triggerText="Tooltip label">
+        <Tooltip align="bottom-left" width={100} label={text}>
           <button className={styles.longPatientNameBtn} type="button">
             {name.slice(0, 25) + '...'}
           </button>
@@ -112,7 +117,7 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
           <span className={styles.patientInfo}> {visitType} </span>
           <Tag
             className={priority === 'Priority' ? styles.priorityTag : styles.tag}
-            type={getTagType(priority as string)}
+            type={getTagType(priority?.toLocaleLowerCase() as string)}
           >
             {priority}
           </Tag>
@@ -126,12 +131,12 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
 const VisitHeader: React.FC = () => {
   const { t } = useTranslation();
   const { patient } = usePatient();
+  const { currentVisit, isValidating } = useVisit(patient?.id);
   const [showVisitHeader, setShowVisitHeader] = useState<boolean>(true);
   const [isSideMenuExpanded, setIsSideMenuExpanded] = useState(false);
   const navMenuItems = useAssignedExtensions('patient-chart-dashboard-slot').map((extension) => extension.id);
-  const { startVisitLabel } = useConfig();
+  const { startVisitLabel, endVisitLabel } = useConfig();
 
-  const { currentVisit, isValidating } = useVisit(patient?.id);
   const launchStartVisitForm = React.useCallback(() => launchPatientWorkspace('start-visit-workspace-form'), []);
   const showHamburger = useLayoutType() !== 'large-desktop' && navMenuItems.length > 0;
 
@@ -139,7 +144,7 @@ const VisitHeader: React.FC = () => {
   const visitNotLoaded = !isValidating && currentVisit === null;
   const toggleSideMenu = useCallback(() => setIsSideMenuExpanded((prevState) => !prevState), []);
 
-  const noActiveVisit = !isLoading && visitNotLoaded;
+  const hasActiveVisit = !isLoading && !visitNotLoaded;
 
   const originPage = localStorage.getItem('fromPage');
 
@@ -148,6 +153,13 @@ const VisitHeader: React.FC = () => {
     setShowVisitHeader((prevState) => !prevState);
     localStorage.removeItem('fromPage');
   }, [originPage]);
+
+  const openModal = useCallback((patientUuid) => {
+    const dispose = showModal('end-visit-dialog', {
+      closeModal: () => dispose(),
+      patientUuid,
+    });
+  }, []);
 
   const render = useCallback(() => {
     if (!showVisitHeader) {
@@ -181,16 +193,24 @@ const VisitHeader: React.FC = () => {
             <PatientInfo patient={patient} />
           </div>
           <HeaderGlobalBar>
-            {noActiveVisit && (
-              <HeaderGlobalAction
-                className={styles.headerGlobalBarButton}
-                aria-label={!startVisitLabel ? <>{t('startVisit', 'Start a visit')}</> : startVisitLabel}
-                onClick={launchStartVisitForm}
-              >
-                <Button as="div" className={styles.startVisitButton}>
-                  {!startVisitLabel ? <>{t('startVisit', 'Start a visit')}</> : startVisitLabel}
-                </Button>
-              </HeaderGlobalAction>
+            <ExtensionSlot extensionSlotName="visit-header-right-slot" />
+            {!hasActiveVisit && (
+              <Button className={styles.startVisitButton} onClick={launchStartVisitForm} size="lg">
+                {startVisitLabel ? startVisitLabel : t('startVisit', 'Start a visit')}
+              </Button>
+            )}
+            {currentVisit !== null && endVisitLabel && (
+              <>
+                <HeaderGlobalAction
+                  className={styles.headerGlobalBarButton}
+                  aria-label={endVisitLabel ?? t('endVisit', 'End a visit')}
+                  onClick={() => openModal(patient?.id)}
+                >
+                  <Button as="div" className={styles.startVisitButton}>
+                    {endVisitLabel ? endVisitLabel : <>{t('endVisit', 'End a visit')}</>}
+                  </Button>
+                </HeaderGlobalAction>
+              </>
             )}
             <HeaderGlobalAction
               className={styles.headerGlobalBarCloseButton}
@@ -203,20 +223,23 @@ const VisitHeader: React.FC = () => {
           <VisitHeaderSideMenu isExpanded={isSideMenuExpanded} toggleSideMenu={toggleSideMenu} />
         </Header>
       );
-    } else {
-      return null;
     }
+
+    return null;
   }, [
-    showVisitHeader,
-    patient,
-    showHamburger,
+    hasActiveVisit,
     isSideMenuExpanded,
-    noActiveVisit,
-    t,
-    startVisitLabel,
     launchStartVisitForm,
     onClosePatientChart,
+    patient,
+    showHamburger,
+    showVisitHeader,
+    startVisitLabel,
+    t,
     toggleSideMenu,
+    endVisitLabel,
+    openModal,
+    currentVisit,
   ]);
 
   return <HeaderContainer render={render} />;

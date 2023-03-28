@@ -12,7 +12,6 @@ import ActionMenu from './action-menu/action-menu.component';
 import Loader from '../loader/loader.component';
 import WorkspaceNotification from '../workspace/workspace-notification.component';
 import styles from './patient-chart.scss';
-import PatientBanner from '../banner/patient-banner.component';
 
 const PatientChart: React.FC = () => {
   const { patientUuid, view: encodedView } = useParams();
@@ -45,7 +44,7 @@ const PatientChart: React.FC = () => {
           >
             <ExtensionSlot extensionSlotName="breadcrumbs-slot" />
             <aside>
-              <PatientBanner {...state} />
+              <ExtensionSlot extensionSlotName="patient-header-slot" state={state} />
               <ExtensionSlot extensionSlotName="patient-info-slot" state={state} />
             </aside>
             <div className={styles.grid}>

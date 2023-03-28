@@ -14,16 +14,35 @@ interface ContactDetailsProps {
 const Address: React.FC<{ address?: fhir.Address }> = ({ address }) => {
   const { t } = useTranslation();
 
+  /*
+    DO NOT REMOVE THIS COMMENT UNLESS YOU UNDERSTAND WHY IT IS HERE
+
+    t('postalCode', 'Postal code')
+    t('address1', 'Address line 1')
+    t('address2', 'Address line 2')
+    t('countyDistrict', 'District')
+    t('stateProvince', 'State')
+    t('cityVillage', 'City')
+    t('country', 'Country')
+    t('countyDistrict', 'District')
+    t('state', 'State')
+    t('city', 'City')
+    t('district', 'District')
+  */
+
   return (
     <>
       <p className={styles.heading}>{t('address', 'Address')}</p>
       <ul>
         {address ? (
           <>
-            <li>{address.postalCode}</li>
-            <li>{address.city}</li>
-            <li>{address.state}</li>
-            <li>{address.country}</li>
+            {Object.entries(address)
+              .filter(([key]) => !['use', 'extension', 'id'].some((k) => k === key))
+              .map(([key, value]) => (
+                <li>
+                  {t(key)}: {value}
+                </li>
+              ))}
           </>
         ) : (
           '--'

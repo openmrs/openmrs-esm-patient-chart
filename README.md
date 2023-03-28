@@ -30,7 +30,12 @@ In addition to these widgets, two other microfrontends exist that encapsulate cr
 
 Check out the developer documentation [here](http://o3-dev.docs.openmrs.org).
 
-This monorepo uses [yarn](https://yarnpkg.com) and [lerna](https://github.com/lerna/lerna). 
+This monorepo uses [yarn](https://yarnpkg.com) and [lerna](https://github.com/lerna/lerna).
+
+To install the dependencies, run:
+```bash
+yarn
+```
 
 To start a dev server for a specific microfrontend, run:
 
@@ -90,6 +95,10 @@ A **dashboard** is a collection of widgets.
 The **workspace** is where data entry takes place. On mobile devices it covers the screen; on desktop it appears in a sidebar.
 
 The **side menu** provides access to features that do not have their own pages, such as the notifications menu.
+
+## Design Patterns
+
+For documentation about our design patterns, please visit our [design system](https://zeroheight.com/23a080e38/p/880723--introduction) documentation website.
 
 ## Configuration
 

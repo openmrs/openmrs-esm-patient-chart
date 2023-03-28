@@ -16,6 +16,12 @@ import styles from './forms.scss';
 
 type FormsCategory = 'All' | 'Completed' | 'Recommended';
 
+enum ContentSwitcherIndices {
+  All = 0,
+  Recommended = 1,
+  Completed = 2,
+}
+
 interface FormsProps {
   patientUuid: string;
   patient: fhir.Patient;
@@ -30,9 +36,11 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
   const { t } = useTranslation();
   const { htmlFormEntryForms, showRecommendedFormsTab, showConfigurableForms } = useConfig() as ConfigObject;
   const headerTitle = t('forms', 'Forms');
-  const isTablet = useLayoutType() === 'tablet';
+  const layout = useLayoutType();
+  const isTablet = layout === 'tablet';
+  const isDesktop = layout === 'small-desktop' || layout === 'large-desktop';
   const [formsCategory, setFormsCategory] = useState<FormsCategory>(showRecommendedFormsTab ? 'Recommended' : 'All');
-  const { isValidating, data, error } = useForms(patientUuid, undefined, undefined, isOffline);
+  const { isValidating, data, error, mutateForms } = useForms(patientUuid);
   const session = useSession();
   let formsToDisplay = isOffline
     ? data?.filter((formInfo) => isValidOfflineFormEncounter(formInfo.form, htmlFormEntryForms))
@@ -81,7 +89,7 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
   }
 
   if (!formsToDisplay && !error) {
-    return <DataTableSkeleton role="progressbar" rowCount={5} />;
+    return <DataTableSkeleton role="progressbar" rowCount={5} compact={isDesktop} zebra />;
   }
 
   if (error) {
@@ -102,13 +110,13 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
         ) : null}
         <div className={styles.contextSwitcherContainer}>
           <ContentSwitcher
-            className={isTablet ? styles.tabletContentSwitcher : styles.desktopContentSwitcher}
-            onChange={(event) => setFormsCategory(event.name as any)}
-            selectedIndex={formsCategory}
+            onChange={({ name }: { name: FormsCategory }) => setFormsCategory(name)}
+            selectedIndex={ContentSwitcherIndices[formsCategory]}
+            size={isTablet ? 'md' : 'sm'}
           >
+            <Switch name={'All'} text={t('all', 'All')} />
             <Switch name={'Recommended'} text={t('recommended', 'Recommended')} />
             <Switch name={'Completed'} text={t('completed', 'Completed')} />
-            <Switch name={'All'} text={t('all', 'All')} />
           </ContentSwitcher>
         </div>
       </CardHeader>
@@ -122,16 +130,7 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
             pageSize={pageSize}
             pageUrl={pageUrl}
             urlLabel={urlLabel}
-          />
-        )}
-        {formsCategory === 'All' && (
-          <FormView
-            forms={formsToDisplay}
-            patientUuid={patientUuid}
-            patient={patient}
-            pageSize={pageSize}
-            pageUrl={pageUrl}
-            urlLabel={urlLabel}
+            mutateForms={mutateForms}
           />
         )}
         {formsCategory === 'Recommended' && (
@@ -143,6 +142,18 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
             pageSize={pageSize}
             pageUrl={pageUrl}
             urlLabel={urlLabel}
+            mutateForms={mutateForms}
+          />
+        )}
+        {formsCategory === 'All' && (
+          <FormView
+            forms={formsToDisplay}
+            patientUuid={patientUuid}
+            patient={patient}
+            pageSize={pageSize}
+            pageUrl={pageUrl}
+            urlLabel={urlLabel}
+            mutateForms={mutateForms}
           />
         )}
       </div>
