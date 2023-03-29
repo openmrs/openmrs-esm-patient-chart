@@ -68,10 +68,13 @@ const FormsList: React.FC<FormsListProps> = ({
   );
   const tableHeaders: Array<DataTableHeader> = useMemo(
     () => [
-      { key: 'formName', header: t('formName', 'Form name (A-Z)') },
+      { key: 'formName', header: t('formName', 'Form name (A-Z)'), maxWidth: 70, minWidth: 50, width: 60 },
       {
         key: 'lastCompleted',
         header: t('lastCompleted', 'Last completed'),
+        maxWidth: 70,
+        minWidth: 50,
+        width: 60,
       },
     ],
     [t],
@@ -134,7 +137,7 @@ const FormsList: React.FC<FormsListProps> = ({
                   <TableBody>
                     {rows.map((row, i) => (
                       <TableRow {...getRowProps({ row })} key={row.id}>
-                        <TableCell className={styles.formNameCell}>
+                        <TableCell>
                           <label
                             onClick={() => {
                               handleFormOpen(row.id, null, tableRows[i].formName);
@@ -145,7 +148,7 @@ const FormsList: React.FC<FormsListProps> = ({
                             {tableRows[i]?.formName}
                           </label>
                         </TableCell>
-                        <TableCell className={styles.lastCompletedCell}>
+                        <TableCell>
                           {row.cells[1].value ?? (
                             <label
                               onClick={() => {
