@@ -1,0 +1,23 @@
+@use '@carbon/styles/scss/spacing';
+@use '@carbon/styles/scss/type';
+@import '~@openmrs/esm-styleguide/src/vars';
+
+.tile {
+  text-align: center;
+  border: 1px solid $ui-03;
+  overflow: scroll;
+  height: 95vh;
+}
+
+.bodyShort01 {
+  @include type.type-style("body-compact-01");
+}
+
+.container {
+  background-color: $ui-background;
+  border: 1px solid $ui-03;
+  position: relative;
+  padding: 0rem;
+  overflow: scroll;
+  height: 90vh;
+}

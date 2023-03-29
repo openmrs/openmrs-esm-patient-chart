@@ -7,3 +7,5 @@ export const formEncounterUrlPoc = `/ws/rest/v1/form?v=custom:${customFormRepres
 
 export const clinicalFormsWorkspace = 'clinical-forms-workspace';
 export const formEntryWorkspace = 'patient-form-entry-workspace';
+
+export const defaultPaginationSize = 10000;

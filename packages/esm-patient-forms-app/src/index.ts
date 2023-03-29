@@ -46,7 +46,7 @@ function setupOpenMRS() {
   registerWorkspace({
     name: 'patient-form-entry-workspace',
     title: 'Clinical Form',
-    load: getAsyncLifecycle(() => import('./forms/form-entry.component'), options),
+    load: getAsyncLifecycle(() => import('./form-entry/form-entry.component'), options),
   });
 
   return {
@@ -55,7 +55,7 @@ function setupOpenMRS() {
         name: 'patient-form-dashboard',
         order: 0,
         slot: dashboardMeta.slot,
-        load: getAsyncLifecycle(() => import('./forms/forms-detailed-overview.component'), options),
+        load: getAsyncLifecycle(() => import('./forms-detailed-overview/forms-detailed-overview.component'), options),
         online: {
           isOffline: false,
         },
@@ -99,6 +99,23 @@ function setupOpenMRS() {
         },
         offline: {
           canMarkFormsAsOffline: false,
+        },
+      },
+      {
+        name: 'clinical-form-action-menu',
+        slot: 'action-menu-chart-items-slot',
+        load: getAsyncLifecycle(() => import('./clinical-form-action-button/clinical-form-action-button.component'), options),
+        order: 2,
+      },
+      {
+        name: 'clinical-forms-workspace',
+        load: getAsyncLifecycle(() => import('./forms-workspace/forms-workspace.component'), options),
+        meta: {
+          title: {
+            key: 'clinicalForm',
+            default: 'Clinical form',
+          },
+          type: 'order',
         },
       },
     ],

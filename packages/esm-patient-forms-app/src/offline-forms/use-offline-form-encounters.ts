@@ -1,4 +1,4 @@
-import { useFormEncounters } from '../hooks/use-forms';
+import { useFormEncounters } from '../hooks/use-form-encounters';
 import { isValidOfflineFormEncounter } from './offline-form-helpers';
 import { useConfig } from '@openmrs/esm-framework';
 import { ConfigObject } from '../config-schema';
