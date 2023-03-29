@@ -4,7 +4,7 @@ import { useConfig, useLayoutType, usePatient } from '@openmrs/esm-framework';
 import { EmptyDataIllustration, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import type { HtmlFormEntryForm } from '../config-schema';
 import FormsList from './form-list/forms-list.component';
-import styles from './forms-dashboard.scss';
+import styles from './forms-workspace.scss';
 import { useTranslation } from 'react-i18next';
 import { useForms } from '../hooks/use-form-workspace';
 
