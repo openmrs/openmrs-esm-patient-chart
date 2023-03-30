@@ -8,6 +8,8 @@ import Trendline from '../trendline/trendline.component';
 import styles from '../results-viewer/results-viewer.styles.scss';
 import { useTranslation } from 'react-i18next';
 import TabletOverlay from '../tablet-overlay';
+import usePanelData from '../panel-view/usePanelData';
+import PanelTimelineComponent from '../panel-timeline';
 
 interface TreeViewProps {
   patientUuid: string;
@@ -23,7 +25,8 @@ const TreeView: React.FC<TreeViewProps> = ({ patientUuid, basePath, testUuid, lo
   const [showTreeOverlay, setShowTreeOverlay] = useState(false);
   const { t } = useTranslation();
 
-  const { timelineData, resetTree } = useContext(FilterContext);
+  const { timelineData, resetTree, someChecked } = useContext(FilterContext);
+  const { panels, isLoading: isLoadingPanelData, groupedObservations } = usePanelData();
 
   if (tablet) {
     return (
@@ -63,18 +66,26 @@ const TreeView: React.FC<TreeViewProps> = ({ patientUuid, basePath, testUuid, lo
 
   return (
     <>
-      {!tablet && !expanded && (
+      {!expanded && (
         <div className={styles.leftSection}>
           {!loading ? <FilterSet /> : <AccordionSkeleton open count={4} align="start" />}
         </div>
       )}
       <div className={`${styles.rightSection} ${expanded ? styles.fullView : styles.splitView}`}>
-        {!tablet && testUuid && type === 'trendline' ? (
+        {testUuid && type === 'trendline' ? (
           <Trendline patientUuid={patientUuid} conceptUuid={testUuid} basePath={basePath} showBackToTimelineButton />
-        ) : !loading ? (
+        ) : loading || isLoadingPanelData ? (
+          <DataTableSkeleton />
+        ) : someChecked ? (
           <GroupedTimeline />
         ) : (
-          <DataTableSkeleton />
+          // If no filter is selected from the filter view
+          // All the test results recorded for the patient needs to be shown
+          panels.map((panel) => (
+            <div className={styles.panelViewTimeline}>
+              <PanelTimelineComponent groupedObservations={groupedObservations} activePanel={panel} />
+            </div>
+          ))
         )}
       </div>
     </>
