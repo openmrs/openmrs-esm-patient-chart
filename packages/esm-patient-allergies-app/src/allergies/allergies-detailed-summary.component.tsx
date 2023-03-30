@@ -49,7 +49,7 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
     },
     {
       key: 'note',
-      header: t('note', 'Note'),
+      header: t('onsetAndComments', 'Onset and comments'),
     },
   ];
 
