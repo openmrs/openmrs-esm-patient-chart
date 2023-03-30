@@ -16,7 +16,15 @@ import {
   Tile,
 } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { formatDate, parseDate, useLayoutType, usePagination } from '@openmrs/esm-framework';
+import {
+  formatDate,
+  parseDate,
+  isDesktop as isDesktopLayout,
+  useLayoutType,
+  usePagination,
+  usePatient,
+  useConfig,
+} from '@openmrs/esm-framework';
 import {
   EmptyState,
   ErrorState,
@@ -27,24 +35,24 @@ import {
 import { ConditionsActionMenu } from './conditions-action-menu.component';
 import { useConditions } from './conditions.resource';
 import styles from './conditions-overview.scss';
+import { ConfigObject } from '../config-schema';
 
 interface ConditionsOverviewProps {
-  basePath: string;
-  patient: fhir.Patient;
+  patientUuid: string;
 }
 
-const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient }) => {
-  const conditionsCount = 5;
+const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) => {
+  const { conditionPageSize } = useConfig<ConfigObject>();
   const { t } = useTranslation();
   const displayText = t('conditions', 'Conditions');
   const headerTitle = t('conditions', 'Conditions');
   const urlLabel = t('seeAll', 'See all');
-  const pageUrl = `\${openmrsSpaBase}/patient/${patient.id}/chart/Conditions`;
+  const pageUrl = `\${openmrsSpaBase}/patient/${patientUuid}/chart/Conditions`;
   const layout = useLayoutType();
-  const isTablet = layout === 'tablet';
-  const isDesktop = layout === 'large-desktop' || layout === 'small-desktop';
+  const isDesktop = isDesktopLayout(layout);
+  const isTablet = !isDesktop;
 
-  const { conditions, isError, isLoading, isValidating } = useConditions(patient.id);
+  const { conditions, isError, isLoading, isValidating } = useConditions(patientUuid);
   const [filter, setFilter] = useState<'All' | 'Active' | 'Inactive'>('Active');
   const launchConditionsForm = useCallback(
     () => launchPatientWorkspace('conditions-form-workspace', { workspaceTitle: 'Record a Condition' }),
@@ -63,7 +71,11 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient }) => {
     return conditions;
   }, [filter, conditions]);
 
-  const { results: paginatedConditions, goTo, currentPage } = usePagination(filteredConditions ?? [], conditionsCount);
+  const {
+    results: paginatedConditions,
+    goTo,
+    currentPage,
+  } = usePagination(filteredConditions ?? [], conditionPageSize);
 
   const tableHeaders = [
     {
@@ -182,7 +194,7 @@ const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient }) => {
           currentItems={paginatedConditions.length}
           onPageNumberChange={({ page }) => goTo(page)}
           pageNumber={currentPage}
-          pageSize={conditionsCount}
+          pageSize={conditionPageSize}
           totalItems={filteredConditions.length}
           dashboardLinkUrl={pageUrl}
           dashboardLinkLabel={urlLabel}
