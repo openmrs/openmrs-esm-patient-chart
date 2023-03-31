@@ -22,7 +22,7 @@ const MedicationSummary: React.FC<MedicationSummaryProps> = ({ medications }) =>
               <React.Fragment key={i}>
                 <div className={styles.medicationContainer}>
                   <p className={styles.medicationRecord}>
-                    <strong>{capitalize(medication?.order?.drug?.name)}</strong> &mdash;{' '}
+                    <strong>{capitalize(medication?.order?.drug?.display)}</strong> &mdash;{' '}
                     {medication?.order?.drug?.strength?.toLowerCase()}
                     &mdash; {medication?.order?.doseUnits?.display?.toLowerCase()} &mdash;{' '}
                     <span>
