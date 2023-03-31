@@ -70,7 +70,7 @@ interface UseVisitQueueEntries {
 }
 
 export function useVisitQueueEntry(patientUuid, visitUuid): UseVisitQueueEntries {
-  const apiUrl = `/ws/rest/v1/queue-entry?patient=${patientUuid}`
+  const apiUrl = `/ws/rest/v1/queue-entry?patient=${patientUuid}`;
   const { data, error, isLoading, isValidating } = useSWR<{ data: { results: Array<VisitQueueEntry> } }, Error>(
     apiUrl,
     openmrsFetch,
@@ -80,10 +80,7 @@ export function useVisitQueueEntry(patientUuid, visitUuid): UseVisitQueueEntries
     id: visitQueueEntry.queue.uuid,
     name: visitQueueEntry.queue.display,
     patientUuid: visitQueueEntry.patient.uuid,
-    priority:
-      visitQueueEntry.priority.display === 'Urgent'
-        ? 'Priority'
-        : visitQueueEntry.priority.display,
+    priority: visitQueueEntry.priority.display === 'Urgent' ? 'Priority' : visitQueueEntry.priority.display,
     priorityUuid: visitQueueEntry.priority.uuid,
     service: visitQueueEntry.queue?.display,
     status: visitQueueEntry.status.display,
@@ -94,9 +91,11 @@ export function useVisitQueueEntry(patientUuid, visitUuid): UseVisitQueueEntries
     queueEntryUuid: visitQueueEntry.uuid,
   });
 
-  const mappedVisitQueueEntry = data?.data?.results?.map(mapVisitQueueEntryProperties).filter(
-    (visitQueueEntry) => visitUuid !== undefined && visitUuid === visitQueueEntry.visitUuid,
-  ).shift() ?? null;
+  const mappedVisitQueueEntry =
+    data?.data?.results
+      ?.map(mapVisitQueueEntryProperties)
+      .filter((visitQueueEntry) => visitUuid !== undefined && visitUuid === visitQueueEntry.visitUuid)
+      .shift() ?? null;
 
   return {
     queueEntry: mappedVisitQueueEntry,

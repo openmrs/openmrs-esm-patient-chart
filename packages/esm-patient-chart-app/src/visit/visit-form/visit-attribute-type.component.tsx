@@ -120,7 +120,7 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
     if (data?.datatypeClassname === 'org.openmrs.customdatatype.datatype.ConceptDatatype' && required) {
       setVisitAttribute(answers?.[0]?.uuid);
     }
-  }, [data?.datatypeClassname, required, answers]);
+  }, [data?.datatypeClassname, required, answers, setVisitAttribute]);
 
   const field = useMemo(() => {
     if (isLoading) {
