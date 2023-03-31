@@ -50,7 +50,7 @@ describe('AllergiesDetailedSummary: ', () => {
     ).toBeInTheDocument();
   });
 
-  fit("renders a detailed summary of the patient's allergic reactions and their manifestations", async () => {
+  it("renders a detailed summary of the patient's allergic reactions and their manifestations", async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: mockFhirAllergyIntoleranceResponse });
     renderAllergiesDetailedSummary();
 
