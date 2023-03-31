@@ -314,7 +314,7 @@ function AllergyForm({ closeWorkspace, promptBeforeClosing, patientUuid }: Defau
               </div>
             </section>
             <section className={styles.section}>
-              <h2 className={styles.sectionHeading}>{t('dateAndComments', 'Date and comments')}</h2>
+              <h2 className={styles.sectionHeading}>{t('onsetDateAndComments', 'Onset date and comments')}</h2>
               <div className={styles.wrapper}>
                 <TextArea
                   className={styles.textbox}

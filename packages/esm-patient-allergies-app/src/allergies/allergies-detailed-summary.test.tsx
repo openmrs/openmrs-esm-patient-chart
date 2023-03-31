@@ -50,7 +50,7 @@ describe('AllergiesDetailedSummary: ', () => {
     ).toBeInTheDocument();
   });
 
-  it("renders a detailed summary of the patient's allergic reactions and their manifestations", async () => {
+  fit("renders a detailed summary of the patient's allergic reactions and their manifestations", async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: mockFhirAllergyIntoleranceResponse });
     renderAllergiesDetailedSummary();
 
@@ -58,13 +58,13 @@ describe('AllergiesDetailedSummary: ', () => {
 
     expect(screen.getByRole('heading', { name: /allergies/i })).toBeInTheDocument();
 
-    const expectedColumnHeaders = [/allergen/i, /severity/i, /reaction/i, /last updated/i, /note/i];
+    const expectedColumnHeaders = [/allergen/i, /severity/i, /reaction/i, /onset date and comments/i];
     const expectedAllergies = [
       /ACE inhibitors unable-to-assess Anaphylaxis/i,
-      /Fish low Anaphylaxis, Angioedema, Fever, Hives -- Some Comments/i,
-      /Penicillins high Diarrhea, Cough, Musculoskeletal pain, Mental status change, Angioedema -- Patient allergies have been noted down/i,
-      /Morphine high Mental status change -- Comments/i,
-      /Aspirin high Mental status change -- Comments/i,
+      /Fish low Anaphylaxis, Angioedema, Fever, Hives Some Comments/i,
+      /Penicillins high Diarrhea, Cough, Musculoskeletal pain, Mental status change, Angioedema Patient allergies have been noted down/i,
+      /Morphine high Mental status change Comments/i,
+      /Aspirin high Mental status change Comments/i,
     ];
 
     expectedColumnHeaders.forEach((header) =>

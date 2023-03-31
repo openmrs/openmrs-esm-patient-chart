@@ -44,12 +44,8 @@ const AllergiesDetailedSummary: React.FC<AllergiesDetailedSummaryProps> = ({ pat
     },
     { key: 'reaction', header: t('reaction', 'Reaction') },
     {
-      key: 'lastUpdated',
-      header: t('lastUpdated', 'Last updated'),
-    },
-    {
       key: 'note',
-      header: t('onsetAndComments', 'Onset and comments'),
+      header: t('onsetDateAndComments', 'Onset date and comments'),
     },
   ];
 

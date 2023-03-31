@@ -20,7 +20,7 @@
   "mild": "Mild",
   "moderate": "Moderate",
   "name": "Name",
-  "onsetAndComments": "Onset and comments",
+  "onsetDateAndComments": "Onset date and comments",
   "otherNonCodedAllergen": "Other non-coded allergen",
   "otherNonCodedAllergicReaction": "Other non-coded allergic reaction",
   "reaction": "Reaction",
