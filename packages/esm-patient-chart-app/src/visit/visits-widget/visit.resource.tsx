@@ -157,6 +157,7 @@ export interface Order {
     uuid: string;
     name: string;
     strength: string;
+    display: string;
   };
   duration: number;
   durationUnits: {
