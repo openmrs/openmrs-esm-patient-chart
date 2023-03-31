@@ -15,15 +15,55 @@ export const configSchema = {
     },
     _default: [
       {
-        conceptUuid: 'ae485e65-2e3f-4297-b35e-c818bbefe894',
-        defaultOpen: true,
-      },
-      {
-        conceptUuid: '8904fa2b-6a8f-437d-89ec-6fce3cd99093',
+        conceptUuid: '21AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
         defaultOpen: false,
       },
       {
-        conceptUuid: '856AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        conceptUuid: '678AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        defaultOpen: false,
+      },
+      {
+        conceptUuid: '729AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        defaultOpen: false,
+      },
+      {
+        conceptUuid: '1132AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        defaultOpen: false,
+      },
+      {
+        conceptUuid: '857AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        defaultOpen: false,
+      },
+      {
+        conceptUuid: '790AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        defaultOpen: false,
+      },
+      {
+        conceptUuid: '1133AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        defaultOpen: false,
+      },
+      {
+        conceptUuid: '887AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        defaultOpen: false,
+      },
+      {
+        conceptUuid: '159644AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        defaultOpen: false,
+      },
+      {
+        conceptUuid: '161482AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        defaultOpen: false,
+      },
+      {
+        conceptUuid: '1134AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        defaultOpen: false,
+      },
+      {
+        conceptUuid: '1135AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        defaultOpen: false,
+      },
+      {
+        conceptUuid: '161505AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
         defaultOpen: false,
       },
     ],
