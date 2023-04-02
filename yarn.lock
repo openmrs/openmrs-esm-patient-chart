@@ -3245,6 +3245,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@hookform/resolvers@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "@hookform/resolvers@npm:3.0.0"
+  peerDependencies:
+    react-hook-form: ^7.0.0
+  checksum: 72c1282c1b847be074c5233e72f357de832eca41543bad9a2efb6279a14baa0bbbf55f0255e6d2dbcb34fbd07bb974f71e471e3cc89a138e001cf2ce5e28da76
+  languageName: node
+  linkType: hard
+
 "@humanwhocodes/config-array@npm:^0.5.0":
   version: 0.5.0
   resolution: "@humanwhocodes/config-array@npm:0.5.0"
@@ -5621,6 +5630,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@openmrs/esm-patient-chart@workspace:."
   dependencies:
+    "@hookform/resolvers": ^3.0.0
     "@openmrs/esm-framework": next
     "@swc/cli": ^0.1.57
     "@swc/core": ^1.2.165
@@ -5661,6 +5671,7 @@ __metadata:
     pretty-quick: ^2.0.2
     react: ^18.2.0
     react-dom: ^18.2.0
+    react-hook-form: ^7.43.9
     react-i18next: ^11.18.6
     react-router-dom: ^6.3.0
     rxjs: ^6.6.3
@@ -5669,6 +5680,7 @@ __metadata:
     swr: ^2.0.1
     turbo: ^1.5.5
     typescript: ^4.0.3
+    zod: ^3.21.4
   languageName: unknown
   linkType: soft
 
@@ -21238,6 +21250,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-hook-form@npm:^7.43.9":
+  version: 7.43.9
+  resolution: "react-hook-form@npm:7.43.9"
+  peerDependencies:
+    react: ^16.8.0 || ^17 || ^18
+  checksum: 65b94de625f2b7921c4e856bf0abbe142bfe06c052217bd1bcc3a842e2cc37fa3a3e03758119dc038bbcf5edb49e02c29206528b80b201f9a4d601471ef78153
+  languageName: node
+  linkType: hard
+
 "react-html5-camera-photo@npm:^1.5.4":
   version: 1.5.9
   resolution: "react-html5-camera-photo@npm:1.5.9"
@@ -26424,6 +26445,13 @@ __metadata:
   version: 0.1.0
   resolution: "yocto-queue@npm:0.1.0"
   checksum: f77b3d8d00310def622123df93d4ee654fc6a0096182af8bd60679ddcdfb3474c56c6c7190817c84a2785648cdee9d721c0154eb45698c62176c322fb46fc700
+  languageName: node
+  linkType: hard
+
+"zod@npm:^3.21.4":
+  version: 3.21.4
+  resolution: "zod@npm:3.21.4"
+  checksum: f185ba87342ff16f7a06686767c2b2a7af41110c7edf7c1974095d8db7a73792696bcb4a00853de0d2edeb34a5b2ea6a55871bc864227dace682a0a28de33e1f
   languageName: node
   linkType: hard
 
