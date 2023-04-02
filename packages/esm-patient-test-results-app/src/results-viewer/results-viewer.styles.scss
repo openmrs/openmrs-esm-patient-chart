@@ -47,11 +47,15 @@
 
 .rightSection, .rightSectionHeader {
   width: 55%;
+
+  &.fullView {
+    width: 100%;
+  }
 }
 
 .rightSectionHeader {
   display: flex;
-} 
+}
 
 .rightSection :global(.cds--skeleton) {
   width: 100%;
@@ -122,4 +126,8 @@
   svg {
     fill: $ui-01 !important;
   }
+}
+
+.panelViewTimeline {
+  margin-bottom: spacing.$spacing-07;
 }

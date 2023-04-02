@@ -1,9 +1,16 @@
 import dayjs from 'dayjs';
 import useSWR from 'swr';
-import { getDynamicOfflineDataEntries, openmrsFetch, useConfig } from '@openmrs/esm-framework';
+import {
+  getDynamicOfflineDataEntries,
+  openmrsFetch,
+  useConfig,
+  userHasAccess,
+  useSession,
+} from '@openmrs/esm-framework';
 import { ListResponse, Form, EncounterWithFormRef, CompletedFormInfo } from '../types';
 import { customEncounterRepresentation, formEncounterUrl, formEncounterUrlPoc } from '../constants';
 import { ConfigObject } from '../config-schema';
+import { isValidOfflineFormEncounter } from '../offline-forms/offline-form-helpers';
 
 export function useFormEncounters(cachedOfflineFormsOnly = false, patientUuid: string = '') {
   const { showConfigurableForms, customFormsUrl, showHtmlFormEntryForms } = useConfig() as ConfigObject;
@@ -39,10 +46,12 @@ export function useEncountersWithFormRef(
 }
 
 export function useForms(patientUuid: string, startDate?: Date, endDate?: Date, cachedOfflineFormsOnly = false) {
+  const { htmlFormEntryForms } = useConfig() as ConfigObject;
   const allFormsRes = useFormEncounters(cachedOfflineFormsOnly, patientUuid);
   const encountersRes = useEncountersWithFormRef(patientUuid, startDate, endDate);
   const pastEncounters = encountersRes.data?.data?.results ?? [];
   const data = allFormsRes.data ? mapToFormCompletedInfo(allFormsRes.data, pastEncounters) : undefined;
+  const session = useSession();
 
   const mutateForms = () => {
     allFormsRes.mutate();
@@ -55,9 +64,18 @@ export function useForms(patientUuid: string, startDate?: Date, endDate?: Date, 
   // If this ever becomes a problem for online mode (i.e. if an error should be rendered there when past encounters
   // for determining filled out forms can't be loaded) this should ideally be conditionally controlled via a flag
   // such that the current offline behavior doesn't change.
+  let formsToDisplay = cachedOfflineFormsOnly
+    ? data?.filter((formInfo) => isValidOfflineFormEncounter(formInfo.form, htmlFormEntryForms))
+    : data;
+
+  if (session?.user) {
+    formsToDisplay = formsToDisplay?.filter((formInfo) =>
+      userHasAccess(formInfo?.form?.encounterType?.editPrivilege?.display, session.user),
+    );
+  }
 
   return {
-    data,
+    data: formsToDisplay,
     error: allFormsRes.error,
     isValidating: allFormsRes.isValidating || encountersRes.isValidating,
     allForms: allFormsRes.data,
@@ -72,7 +90,7 @@ function mapToFormCompletedInfo(
   return allForms.map((form) => {
     const associatedEncounters = encounters
       .filter((encounter) => encounter.form?.uuid === form?.uuid)
-      .sort((a, b) => new Date(b.encounterDatetime).getTime() - new Date(a.encounterDatetime).getTime());
+      .sort((a, b) => (a.form?.display > b.form?.display ? 1 : -1));
     const lastCompleted =
       associatedEncounters.length > 0 ? new Date(associatedEncounters?.[0].encounterDatetime) : undefined;
 

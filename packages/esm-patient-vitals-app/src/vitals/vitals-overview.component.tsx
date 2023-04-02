@@ -52,21 +52,21 @@ const VitalsOverview: React.FC<VitalsOverviewProps> = ({ patientUuid, showAddVit
   const tableHeaders = [
     { key: 'date', header: 'Date and time', isSortable: true },
     {
+      key: 'temperature',
+      header: withUnit('Temp', conceptUnits.get(config.concepts.temperatureUuid) ?? ''),
+    },
+    {
       key: 'bloodPressure',
       header: withUnit('BP', conceptUnits.get(config.concepts.systolicBloodPressureUuid) ?? ''),
     },
+    { key: 'pulse', header: withUnit('Pulse', conceptUnits.get(config.concepts.pulseUuid) ?? '') },
     {
       key: 'respiratoryRate',
       header: withUnit('R. Rate', conceptUnits.get(config.concepts.respiratoryRateUuid) ?? ''),
     },
-    { key: 'pulse', header: withUnit('Pulse', conceptUnits.get(config.concepts.pulseUuid) ?? '') },
     {
       key: 'spo2',
       header: withUnit('SPO2', conceptUnits.get(config.concepts.oxygenSaturationUuid) ?? ''),
-    },
-    {
-      key: 'temperature',
-      header: withUnit('Temp', conceptUnits.get(config.concepts.temperatureUuid) ?? ''),
     },
   ];
 

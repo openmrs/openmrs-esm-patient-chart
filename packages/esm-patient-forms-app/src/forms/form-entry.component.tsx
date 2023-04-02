@@ -16,6 +16,7 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({ patientUuid, closeWorksp
   const { patient } = usePatientOrOfflineRegisteredPatient(patientUuid);
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const [selectedForm, setSelectedForm] = useState<FormEntryProps>(null);
+  const [showForm, setShowForm] = useState(true);
 
   const state = useMemo(
     () => ({
@@ -40,8 +41,8 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({ patientUuid, closeWorksp
       currentVisit?.visitType?.uuid,
       patientUuid,
       patient,
-      closeWorkspace,
       mutateForm,
+      closeWorkspace,
     ],
   );
 
@@ -50,9 +51,21 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({ patientUuid, closeWorksp
     return () => sub.unsubscribe();
   }, []);
 
+  // FIXME: This logic triggers a reload of the form when the formUuid changes. It's a workaround for the fact that the form doesn't reload when the formUuid changes.
+  useEffect(() => {
+    if (state.formUuid) {
+      setShowForm(false);
+      setTimeout(() => {
+        setShowForm(true);
+      });
+    }
+  }, [state.formUuid]);
+
   return (
     <div>
-      {selectedForm && patientUuid && patient && <ExtensionSlot extensionSlotName="form-widget-slot" state={state} />}
+      {showForm && selectedForm && patientUuid && patient && (
+        <ExtensionSlot extensionSlotName="form-widget-slot" state={state} />
+      )}
     </div>
   );
 };
