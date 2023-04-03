@@ -4,7 +4,13 @@
 
 .overviewCard {
   border: 1px solid $ui-03;
+  height: 8.625rem;
 
+  .heading {
+    @extend .productiveHeading01;
+    color: $text-02;
+  }
+  
   .headerContainer {
     display: flex;
     justify-content: space-between;
@@ -14,6 +20,11 @@
   .contentContainer {
     display: flex;
     justify-content: space-between;
-    margin-top: spacing.$spacing-05;
+    margin-top: spacing.$spacing-06;
+  }
+
+  .viewButton {
+    margin-top: -(spacing.$spacing-02);
+    margin-right: -(spacing.$spacing-05);
   }
 }

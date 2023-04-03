@@ -29,6 +29,7 @@ import { useDynamicFormDataEntries } from './offline-form-helpers';
 import { Form } from '../types';
 import { useValidOfflineFormEncounters } from './use-offline-form-encounters';
 import styles from './offline-forms.styles.scss';
+import { EmptyState } from '@openmrs/esm-patient-common-lib';
 
 export interface OfflineFormsProps {
   canMarkFormsAsOffline: boolean;
@@ -53,6 +54,17 @@ const OfflineForms: React.FC<OfflineFormsProps> = ({ canMarkFormsAsOffline }) =>
         formName: form.name,
         availableOffline: <OfflineFormToggle form={form} disabled={!canMarkFormsAsOffline} />,
       })) ?? [];
+
+  if (forms?.data?.length === 0) {
+    return (
+      <div className={styles.contentContainer}>
+        <EmptyState
+          displayText={t('offlineForms__lower', 'offline forms')}
+          headerTitle={t('offlineForms', 'Offline forms')}
+        />
+      </div>
+    );
+  }
 
   return (
     <>

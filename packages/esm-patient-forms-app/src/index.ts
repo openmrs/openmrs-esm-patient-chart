@@ -78,6 +78,7 @@ function setupOpenMRS() {
         load: getAsyncLifecycle(() => import('./offline-forms/offline-forms-overview-card.component'), options),
         online: true,
         offline: true,
+        order: 1,
       },
       {
         name: 'offline-tools-page-forms-link',
