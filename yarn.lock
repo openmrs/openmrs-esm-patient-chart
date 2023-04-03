@@ -5290,37 +5290,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ohri/openmrs-ohri-form-engine-lib@npm:next":
-  version: 1.0.1-pre.224
-  resolution: "@ohri/openmrs-ohri-form-engine-lib@npm:1.0.1-pre.224"
-  dependencies:
-    ace-builds: ^1.4.12
-    enzyme: ^3.11.0
-    enzyme-adapter-react-16: ^1.15.6
-    formik: ^2.2.6
-    jest-coverage-badges: ^1.0.0
-    lodash-es: ^4.17.15
-    moment: ^2.29.1
-    react-anchor-link-smooth-scroll: ^1.0.12
-    react-error-boundary: 3.1.4
-    react-markdown: ^7.1.0
-    react-scroll: ^1.8.2
-    react-test-renderer: ^16.9.0
-    react-waypoint: ^10.3.0
-    semver: ^7.3.5
-    systemjs-webpack-interop: ^2.3.2
-    yup: ^0.29.1
-  peerDependencies:
-    "@carbon/react": 1.x
-    "@openmrs/esm-framework": 4.x
-    dayjs: ^1.8.16
-    react: ^18.2.0
-    react-i18next: 11.x
-    rxjs: 6.x
-  checksum: c501868bc0134a10b4711e92dcb831433e714ad104c29c164037458d3b81e573bee75ec7007609642427b4a704492fc35b27e4d57af66c3bc975c7f16ae5051a
-  languageName: node
-  linkType: hard
-
 "@openmrs/esm-api@npm:^4.3.1-pre.632":
   version: 4.3.1-pre.632
   resolution: "@openmrs/esm-api@npm:4.3.1-pre.632"
@@ -5416,8 +5385,8 @@ __metadata:
   resolution: "@openmrs/esm-form-engine-app@workspace:packages/esm-form-engine-app"
   dependencies:
     "@carbon/react": ^1.12.0
-    "@ohri/openmrs-ohri-form-engine-lib": next
     "@openmrs/esm-patient-common-lib": ^4.3.0
+    "@openmrs/openmrs-form-engine-lib": next
     lodash-es: ^4.17.15
     react-error-boundary: ^4.0.3
     webpack: ^5.74.0
@@ -5992,6 +5961,36 @@ __metadata:
     slick-carousel: ^1.6.0
     tree-model: ^1.0.5
   checksum: a59cd72678c5812801951e739586abf7a09c7a8dfdb48d88988b73c7bc8207871a738eb178dba0723e34a90b9e3f8b90b4a1bcb06b439cd7aadf4a0d4792fc47
+  languageName: node
+  linkType: hard
+
+"@openmrs/openmrs-form-engine-lib@npm:next":
+  version: 1.0.0-pre.58
+  resolution: "@openmrs/openmrs-form-engine-lib@npm:1.0.0-pre.58"
+  dependencies:
+    ace-builds: ^1.4.12
+    enzyme: ^3.11.0
+    enzyme-adapter-react-16: ^1.15.6
+    formik: ^2.2.6
+    jest-coverage-badges: ^1.0.0
+    lodash-es: ^4.17.15
+    moment: ^2.29.1
+    react-anchor-link-smooth-scroll: ^1.0.12
+    react-markdown: ^7.1.0
+    react-scroll: ^1.8.2
+    react-test-renderer: ^16.9.0
+    react-waypoint: ^10.3.0
+    semver: ^7.3.5
+    yup: ^0.29.1
+  peerDependencies:
+    "@carbon/react": 1.x
+    "@openmrs/esm-framework": 4.x
+    dayjs: ^1.8.16
+    react: ^18.2.0
+    react-error-boundary: 4.x
+    react-i18next: 11.x
+    rxjs: 6.x
+  checksum: f5f4d1980985d6af5a208d7f5ac0ca0a9a0fbd401810d827af5ba64f6de4e460a45a8d3477be216f8a5932828fcda789c073ae26f5d6f033e4d761fa43494afe
   languageName: node
   linkType: hard
 
@@ -22288,17 +22287,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-error-boundary@npm:3.1.4":
-  version: 3.1.4
-  resolution: "react-error-boundary@npm:3.1.4"
-  dependencies:
-    "@babel/runtime": ^7.12.5
-  peerDependencies:
-    react: ">=16.13.1"
-  checksum: f36270a5d775a25c8920f854c0d91649ceea417b15b5bc51e270a959b0476647bb79abb4da3be7dd9a4597b029214e8fe43ea914a7f16fa7543c91f784977f1b
-  languageName: node
-  linkType: hard
-
 "react-error-boundary@npm:^4.0.3":
   version: 4.0.3
   resolution: "react-error-boundary@npm:4.0.3"
@@ -24991,7 +24979,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"systemjs-webpack-interop@npm:^2.3.2, systemjs-webpack-interop@npm:^2.3.7":
+"systemjs-webpack-interop@npm:^2.3.7":
   version: 2.3.7
   resolution: "systemjs-webpack-interop@npm:2.3.7"
   peerDependencies:

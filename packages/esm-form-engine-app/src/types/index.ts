@@ -1,4 +1,4 @@
-import { OpenmrsFormResource } from '@ohri/openmrs-ohri-form-engine-lib';
+import { OpenmrsFormResource } from '@openmrs/openmrs-form-engine-lib';
 import { OpenmrsResource } from '@openmrs/esm-framework';
 
 export interface Form {

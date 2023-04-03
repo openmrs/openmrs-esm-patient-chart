@@ -1,6 +1,6 @@
 import useSWR from 'swr';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { OHRIFormSchema } from '@ohri/openmrs-ohri-form-engine-lib';
+import { OHRIFormSchema } from '@openmrs/openmrs-form-engine-lib';
 
 const useSchema = (valueReferenceUuid: string) => {
   const { data, isLoading, error } = useSWR<{ data: OHRIFormSchema }>(
