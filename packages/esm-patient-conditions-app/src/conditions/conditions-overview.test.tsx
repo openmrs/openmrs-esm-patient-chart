@@ -5,12 +5,11 @@ import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { mockConditions, mockFhirConditionsResponse } from '../../../../__mocks__/conditions.mock';
-import { patientChartBasePath, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import ConditionsOverview from './conditions-overview.component';
 
 const testProps = {
-  basePath: patientChartBasePath,
-  patient: mockPatient,
+  patientUuid: mockPatient.id,
 };
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
@@ -21,6 +20,7 @@ jest.mock('@openmrs/esm-framework', () => {
 
   return {
     ...originalModule,
+    useConfig: jest.fn().mockImplementation(() => ({ conditionPageSize: 5 })),
     usePagination: jest.fn().mockImplementation(() => ({
       currentPage: 1,
       goTo: () => {},

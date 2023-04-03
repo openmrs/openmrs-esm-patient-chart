@@ -1,10 +1,9 @@
 import React, { useEffect, useMemo } from 'react';
-import { ExtensionSlot, useConfig } from '@openmrs/esm-framework';
+import { ExtensionSlot, setLeftNav, unsetLeftNav, useConfig, usePatient } from '@openmrs/esm-framework';
 import { useParams } from 'react-router-dom';
 import {
   changeWorkspaceContext,
   useAutoCreatedOfflineVisit,
-  usePatientOrOfflineRegisteredPatient,
   useWorkspaceWindowSize,
 } from '@openmrs/esm-patient-common-lib';
 import ChartReview from '../patient-chart/chart-review/chart-review.component';
@@ -12,11 +11,12 @@ import ActionMenu from './action-menu/action-menu.component';
 import Loader from '../loader/loader.component';
 import WorkspaceNotification from '../workspace/workspace-notification.component';
 import styles from './patient-chart.scss';
+import { spaBasePath } from '../constants';
 
 const PatientChart: React.FC = () => {
   const { patientUuid, view: encodedView } = useParams();
   const view = decodeURIComponent(encodedView);
-  const { isLoading: isLoadingPatient, patient } = usePatientOrOfflineRegisteredPatient(patientUuid);
+  const { isLoading: isLoadingPatient, patient } = usePatient(patientUuid);
   const { windowSize, active } = useWorkspaceWindowSize();
   const state = useMemo(() => ({ patient, patientUuid }), [patient, patientUuid]);
   const { offlineVisitTypeUuid } = useConfig();
@@ -31,32 +31,40 @@ const PatientChart: React.FC = () => {
     changeWorkspaceContext(patientUuid);
   }, [patientUuid]);
 
+  const leftNavBasePath = useMemo(() => spaBasePath.replace(':patientUuid', patientUuid), [patientUuid]);
+  useEffect(() => {
+    setLeftNav({ name: 'patient-chart-dashboard-slot', basePath: leftNavBasePath });
+    return () => unsetLeftNav('patient-chart-dashboard-slot');
+  }, [leftNavBasePath]);
+
   return (
     <main className={`omrs-main-content ${styles.chartContainer}`}>
-      {isLoadingPatient ? (
-        <Loader />
-      ) : (
-        <>
-          <div
-            className={`${styles.innerChartContainer} ${
-              windowSize.size === 'normal' && active ? styles.closeWorkspace : styles.activeWorkspace
-            }`}
-          >
-            <ExtensionSlot extensionSlotName="breadcrumbs-slot" />
-            <aside>
-              <ExtensionSlot extensionSlotName="patient-header-slot" state={state} />
-              <ExtensionSlot extensionSlotName="patient-info-slot" state={state} />
-            </aside>
-            <div className={styles.grid}>
-              <div className={styles.chartReview}>
-                <ChartReview {...state} view={view} />
-                <WorkspaceNotification />
+      <>
+        <div
+          className={`${styles.innerChartContainer} ${
+            windowSize.size === 'normal' && active ? styles.closeWorkspace : styles.activeWorkspace
+          }`}
+        >
+          <ExtensionSlot extensionSlotName="breadcrumbs-slot" />
+          {isLoadingPatient ? (
+            <Loader />
+          ) : (
+            <>
+              <aside>
+                <ExtensionSlot extensionSlotName="patient-header-slot" state={state} />
+                <ExtensionSlot extensionSlotName="patient-info-slot" state={state} />
+              </aside>
+              <div className={styles.grid}>
+                <div className={styles.chartReview}>
+                  <ChartReview {...state} view={view} />
+                  <WorkspaceNotification />
+                </div>
               </div>
-            </div>
-          </div>
-          <ActionMenu open={false} />
-        </>
-      )}
+            </>
+          )}
+        </div>
+        <ActionMenu open={false} />
+      </>
     </main>
   );
 };

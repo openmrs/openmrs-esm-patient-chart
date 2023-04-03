@@ -1,10 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ExtensionSlot } from '@openmrs/esm-framework';
+import { ExtensionSlot, usePatient } from '@openmrs/esm-framework';
 import {
   DefaultWorkspaceProps,
   FormEntryProps,
   formEntrySub,
-  usePatientOrOfflineRegisteredPatient,
   useVisitOrOfflineVisit,
 } from '@openmrs/esm-patient-common-lib';
 
@@ -13,7 +12,7 @@ interface FormEntryComponentProps extends DefaultWorkspaceProps {
 }
 
 const FormEntry: React.FC<FormEntryComponentProps> = ({ patientUuid, closeWorkspace, mutateForm }) => {
-  const { patient } = usePatientOrOfflineRegisteredPatient(patientUuid);
+  const { patient } = usePatient(patientUuid);
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const [selectedForm, setSelectedForm] = useState<FormEntryProps>(null);
   const [showForm, setShowForm] = useState(true);

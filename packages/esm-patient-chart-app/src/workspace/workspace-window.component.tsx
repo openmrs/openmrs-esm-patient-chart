@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ExtensionSlot, useBodyScrollLock, useLayoutType } from '@openmrs/esm-framework';
+import { ExtensionSlot, useBodyScrollLock, useLayoutType, usePatient } from '@openmrs/esm-framework';
 import { useWorkspaces, useWorkspaceWindowSize } from '@openmrs/esm-patient-common-lib';
 import { Button, Header, HeaderGlobalBar, HeaderName } from '@carbon/react';
 import { ArrowRight, DownToBottom, Maximize, Minimize } from '@carbon/react/icons';
@@ -13,7 +13,8 @@ interface ContextWorkspaceParams {
   patientUuid?: string;
 }
 
-const WorkspaceWindow: React.FC<ContextWorkspaceParams> = ({ patientUuid }) => {
+const WorkspaceWindow: React.FC<ContextWorkspaceParams> = () => {
+  const { patientUuid } = usePatient();
   const { t } = useTranslation();
   const layout = useLayoutType();
   const { active, workspaces } = useWorkspaces();
