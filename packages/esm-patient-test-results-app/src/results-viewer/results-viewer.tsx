@@ -42,8 +42,8 @@ const RoutedResultsViewer: React.FC<ResultsViewerProps> = ({ basePath, patientUu
 
   return (
     <EmptyState
-      headerTitle={t('testResults', 'Test Results')}
-      displayText={t('testResultsData', 'Test results data')}
+      headerTitle={t('testResults', 'Results')}
+      displayText={t('testResultsData', 'results data')}
     />
   );
 };
