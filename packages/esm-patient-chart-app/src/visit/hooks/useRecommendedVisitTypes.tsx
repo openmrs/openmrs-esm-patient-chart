@@ -18,12 +18,10 @@ export const useRecommendedVisitTypes = (
   locationUuid: string,
 ) => {
   const { visitTypeResourceUrl, showRecommendedVisitTypeTab } = useConfig() as ChartConfig;
+  const url = `${visitTypeResourceUrl}${patientUuid}/program/${programUuid}/enrollment/${enrollmentUuid}?intendedLocationUuid=${locationUuid}`;
+
   const { data, error, isLoading } = useSWR<{ data: EnrollmentVisitType }>(
-    showRecommendedVisitTypeTab &&
-      patientUuid &&
-      enrollmentUuid &&
-      programUuid &&
-      `${visitTypeResourceUrl}${patientUuid}/program/${programUuid}/enrollment/${enrollmentUuid}?intendedLocationUuid=${locationUuid}`,
+    showRecommendedVisitTypeTab && patientUuid && enrollmentUuid && programUuid ? url : null,
     openmrsFetch,
   );
 

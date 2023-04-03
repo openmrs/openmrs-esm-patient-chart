@@ -92,7 +92,7 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
             ) : isError ? (
               <ErrorState headerTitle={t('visits', 'visits')} error={isError} />
             ) : visits?.length ? (
-              <VisitsTable visits={visitsWithEncounters} showAllEncounters />
+              <VisitsTable visits={visitsWithEncounters} showAllEncounters patientUuid={patientUuid} />
             ) : (
               <EmptyState headerTitle={t('visits', 'visits')} displayText={t('Visits', 'Visits')} />
             )}

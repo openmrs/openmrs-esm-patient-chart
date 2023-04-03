@@ -11,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
+import { useLayoutType } from '@openmrs/esm-framework';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Attachment } from '../attachments-types';
@@ -30,6 +31,9 @@ const AttachmentsTableOverview: React.FC<AttachmentsTableOverviewProps> = ({
   openAttachment,
 }) => {
   const { t } = useTranslation();
+  const layout = useLayoutType();
+  const isTablet = layout === 'tablet';
+  const isDesktop = layout === 'small-desktop' || layout === 'large-desktop';
 
   const rows = useMemo(
     () =>
@@ -70,14 +74,14 @@ const AttachmentsTableOverview: React.FC<AttachmentsTableOverviewProps> = ({
   if (isLoading) {
     return (
       <div className={styles.attachmentTable}>
-        <DataTableSkeleton className={styles.dataTableSkeleton} />
+        <DataTableSkeleton className={styles.dataTableSkeleton} compact={isDesktop} zebra />
       </div>
     );
   }
 
   return (
     <TableContainer>
-      <DataTable rows={rows} headers={headers} size="sm">
+      <DataTable rows={rows} headers={headers} size={isTablet ? 'lg' : 'sm'} overflowMenuOnHover={isDesktop}>
         {({ rows, headers, getHeaderProps, getTableProps }) => (
           <Table {...getTableProps()} useZebraStyles>
             <TableHead>
@@ -101,8 +105,8 @@ const AttachmentsTableOverview: React.FC<AttachmentsTableOverviewProps> = ({
                   {row.cells.map((cell) => (
                     <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                   ))}
-                  <TableCell>
-                    <OverflowMenu size="sm" flipped>
+                  <TableCell className="cds--table-column-menu">
+                    <OverflowMenu size={isTablet ? 'lg' : 'sm'} flipped>
                       <OverflowMenuItem
                         itemText={t('delete', 'Delete')}
                         isDelete

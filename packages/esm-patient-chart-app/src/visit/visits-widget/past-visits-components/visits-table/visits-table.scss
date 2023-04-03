@@ -6,31 +6,18 @@
 .tableContainer {
   padding: 0;
 
-  :global(.cds--data-table-content) {
-    border: 1px solid $ui-03;
-    border-bottom: none;
-    overflow: visible;
-  }
-
   :global(.cds--data-table-header) {
     padding: 0;
   }
 
   :global(.cds--table-toolbar) {
     position: relative;
-    height: 2rem;
     overflow: visible;
     top: 0;
   }
 
   &:global(.cds--data-table-container) {
     background: none !important;
-  }
-
-  :global(.cds--toolbar-content),
-  :global(.cds--toolbar-search-container-expandable) {
-    height: 2rem;
-    margin-bottom: 0.25rem;
   }
 }
 
@@ -48,16 +35,13 @@
   max-width: 16rem;
 }
 
-.tableHeader > :global(.cds--table-header-label) {
-  @include type.type-style('productive-heading-01');
-  color: $text-02;
-}
-
 .menuItem {
   max-width: none;
 }
 
 .expandedRow {
+  padding-left: 3.5rem;
+
   > td {
     padding: inherit !important;
 
@@ -103,16 +87,10 @@
   color: $text-02;
 }
 
-/* Desktop */
-:global(.omrs-breakpoint-gt-tablet) {
-  :global(.cds--table-toolbar) {
-    min-height: 2rem;
-  }
-}
+.layer {
+  height: 100%;
 
-/* Mobile */
-:global(.omrs-breakpoint-lt-desktop) {
-  :global(.cds--table-toolbar) {
-    min-height: 2.5rem;
+  :global(.cds--btn--primary) {
+    background-color: unset;
   }
 }

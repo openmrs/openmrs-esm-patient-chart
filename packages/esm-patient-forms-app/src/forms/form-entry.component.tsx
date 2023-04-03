@@ -8,10 +8,15 @@ import {
   useVisitOrOfflineVisit,
 } from '@openmrs/esm-patient-common-lib';
 
-const FormEntry: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace }) => {
+interface FormEntryComponentProps extends DefaultWorkspaceProps {
+  mutateForm: () => void;
+}
+
+const FormEntry: React.FC<FormEntryComponentProps> = ({ patientUuid, closeWorkspace, mutateForm }) => {
   const { patient } = usePatientOrOfflineRegisteredPatient(patientUuid);
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const [selectedForm, setSelectedForm] = useState<FormEntryProps>(null);
+  const [showForm, setShowForm] = useState(true);
 
   const state = useMemo(
     () => ({
@@ -22,9 +27,23 @@ const FormEntry: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspac
       patientUuid: patientUuid ?? null,
       patient,
       encounterUuid: selectedForm?.encounterUuid ?? null,
-      closeWorkspace,
+      closeWorkspace: () => {
+        mutateForm();
+        closeWorkspace();
+      },
     }),
-    [selectedForm, currentVisit, patientUuid, patient, closeWorkspace],
+    [
+      selectedForm?.formUuid,
+      selectedForm?.visitUuid,
+      selectedForm?.visitTypeUuid,
+      selectedForm?.encounterUuid,
+      currentVisit?.uuid,
+      currentVisit?.visitType?.uuid,
+      patientUuid,
+      patient,
+      mutateForm,
+      closeWorkspace,
+    ],
   );
 
   useEffect(() => {
@@ -32,9 +51,21 @@ const FormEntry: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspac
     return () => sub.unsubscribe();
   }, []);
 
+  // FIXME: This logic triggers a reload of the form when the formUuid changes. It's a workaround for the fact that the form doesn't reload when the formUuid changes.
+  useEffect(() => {
+    if (state.formUuid) {
+      setShowForm(false);
+      setTimeout(() => {
+        setShowForm(true);
+      });
+    }
+  }, [state.formUuid]);
+
   return (
     <div>
-      {selectedForm && patientUuid && patient && <ExtensionSlot extensionSlotName="form-widget-slot" state={state} />}
+      {showForm && selectedForm && patientUuid && patient && (
+        <ExtensionSlot extensionSlotName="form-widget-slot" state={state} />
+      )}
     </div>
   );
 };

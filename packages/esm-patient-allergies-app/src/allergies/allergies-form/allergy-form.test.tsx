@@ -75,8 +75,7 @@ describe('AllergyForm ', () => {
     expect(screen.getByRole('radio', { name: /moderate/i })).toBeInTheDocument();
     expect(screen.getByRole('radio', { name: /severe/i })).toBeInTheDocument();
     expect(screen.getByRole('checkbox', { name: /anaemia/i })).toBeInTheDocument();
-    expect(screen.getByRole('textbox', { name: /date of first onset/i })).toBeInTheDocument();
-    expect(screen.getByRole('textbox', { name: /comments/i })).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: /date of onset and comments/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /discard/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /save and close/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /save and close/i })).toBeDisabled();

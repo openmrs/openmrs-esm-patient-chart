@@ -1,7 +1,7 @@
 import React from 'react';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch, getConfig } from '@openmrs/esm-framework';
 import { renderWithSwr, waitForLoadingToFinish } from '../../../../../tools/test-helpers';
 import { visitOverviewDetailMockData } from '../../../../../__mocks__/visits.mock';
 import { mockPatient } from '../../../../../__mocks__/patient.mock';
@@ -12,6 +12,7 @@ const testProps = {
 };
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
+const mockGetConfig = getConfig as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -28,6 +29,7 @@ jest.mock('@openmrs/esm-framework', () => {
 describe('VisitDetailOverview', () => {
   it('renders an empty state view if encounters data is unavailable', async () => {
     mockOpenmrsFetch.mockReturnValueOnce({ data: { results: [] } });
+    mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
 
     renderVisitDetailOverview();
 
@@ -63,6 +65,7 @@ describe('VisitDetailOverview', () => {
     const user = userEvent.setup();
 
     mockOpenmrsFetch.mockReturnValueOnce(visitOverviewDetailMockData);
+    mockGetConfig.mockResolvedValue({ htmlFormEntryForms: [] });
 
     renderVisitDetailOverview();
 

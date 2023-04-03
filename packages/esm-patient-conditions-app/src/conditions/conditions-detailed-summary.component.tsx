@@ -16,10 +16,11 @@ import {
   Tile,
 } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
-import { formatDate, parseDate } from '@openmrs/esm-framework';
+import { formatDate, parseDate, useLayoutType } from '@openmrs/esm-framework';
 import { CardHeader, EmptyState, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { Condition, useConditions } from './conditions.resource';
 import { ConditionsActionMenu } from './conditions-action-menu.component';
+import { compare } from './utils';
 import styles from './conditions-detailed-summary.scss';
 
 function ConditionsDetailedSummary({ patient }) {
@@ -27,8 +28,11 @@ function ConditionsDetailedSummary({ patient }) {
   const displayText = t('conditions', 'Conditions');
   const headerTitle = t('conditions', 'Conditions');
   const [filter, setFilter] = useState<'All' | 'Active' | 'Inactive'>('Active');
+  const layout = useLayoutType();
+  const isTablet = layout === 'tablet';
+  const isDesktop = layout === 'small-desktop' || layout === 'large-desktop';
 
-  const { data: conditions, isError, isLoading, isValidating } = useConditions(patient.id);
+  const { conditions, isError, isLoading, isValidating } = useConditions(patient.id);
 
   const filteredConditions = useMemo(() => {
     if (!filter || filter == 'All') {
@@ -60,19 +64,28 @@ function ConditionsDetailedSummary({ patient }) {
     [t],
   );
 
-  const tableRows: Array<Condition> = useMemo(() => {
+  const tableRows = useMemo(() => {
     return filteredConditions?.map((condition) => {
       return {
         ...condition,
         id: condition.id,
         condition: condition.display,
-        onsetDateTime: condition.onsetDateTime
-          ? formatDate(parseDate(condition.onsetDateTime), { time: false, day: false })
-          : '--',
+        onsetDateTime: {
+          sortKey: condition.onsetDateTime ?? '',
+          content: condition.onsetDateTime
+            ? formatDate(parseDate(condition.onsetDateTime), { time: false, day: false })
+            : '--',
+        },
         status: condition.clinicalStatus,
       };
     });
   }, [filteredConditions]);
+
+  const sortRow = (cellA, cellB, { sortDirection, sortStates }) => {
+    return sortDirection === sortStates.DESC
+      ? compare(cellB.sortKey, cellA.sortKey)
+      : compare(cellA.sortKey, cellB.sortKey);
+  };
 
   const launchConditionsForm = useCallback(
     () => launchPatientWorkspace('conditions-form-workspace', { workspaceTitle: 'Record a Condition' }),
@@ -81,7 +94,7 @@ function ConditionsDetailedSummary({ patient }) {
 
   const handleConditionStatusChange = ({ selectedItem }) => setFilter(selectedItem);
 
-  if (isLoading) return <DataTableSkeleton role="progressbar" />;
+  if (isLoading) return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
   if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
   if (conditions?.length) {
     return (
@@ -92,13 +105,13 @@ function ConditionsDetailedSummary({ patient }) {
             <div className={styles.filterContainer}>
               <Dropdown
                 id="conditionStatusFilter"
-                initialSelectedItem={t('active', 'Active')}
+                initialSelectedItem="Active"
                 label=""
                 titleText={t('show', 'Show') + ':'}
                 type="inline"
-                items={[t('all', 'All'), t('active', 'Active'), t('inactive', 'Inactive')]}
+                items={['All', 'Active', 'Inactive']}
                 onChange={handleConditionStatusChange}
-                size="sm"
+                size={isTablet ? 'lg' : 'sm'}
               />
             </div>
             <div className={styles.divider}></div>
@@ -112,8 +125,16 @@ function ConditionsDetailedSummary({ patient }) {
             </Button>
           </div>
         </CardHeader>
-        <DataTable rows={tableRows} headers={headers} isSortable size="sm" useZebraStyles>
-          {({ rows, headers, getHeaderProps, getTableProps }) => (
+        <DataTable
+          rows={tableRows}
+          sortRow={sortRow}
+          headers={headers}
+          isSortable
+          size={isTablet ? 'lg' : 'sm'}
+          useZebraStyles
+          overflowMenuOnHover={isDesktop}
+        >
+          {({ rows, headers, getHeaderProps, getTableProps, getRowProps }) => (
             <>
               <TableContainer>
                 <Table {...getTableProps()}>
@@ -135,7 +156,7 @@ function ConditionsDetailedSummary({ patient }) {
                   </TableHead>
                   <TableBody>
                     {rows.map((row) => (
-                      <TableRow key={row.id}>
+                      <TableRow key={row.id} {...getRowProps({ row })}>
                         {row.cells.map((cell) => (
                           <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
                         ))}

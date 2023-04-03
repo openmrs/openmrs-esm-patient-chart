@@ -21,12 +21,12 @@ export const EditQueueEntry: React.FC<EditQueueEntryProps> = ({ queueEntry }) =>
 
   return (
     <Button
-      kind="tertiary"
       className={styles.editStatusBtn}
       onClick={launchEditPriorityModal}
-      iconDescription={t('editQueueEntryStatusTooltip', 'Edit')}
-      hasIconOnly
+      iconDescription={t('movePatientToNextService', 'Move patient to next service')}
       renderIcon={(props) => <Edit className={styles.editStatusIcon} size={16} {...props} />}
-    />
+    >
+      {t('movePatientToNextService', 'Move patient to next service')}
+    </Button>
   );
 };

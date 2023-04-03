@@ -3,13 +3,7 @@ import { openmrsFetch, OpenmrsResource, Visit } from '@openmrs/esm-framework';
 
 export function useVisits(patientUuid: string) {
   const customRepresentation =
-    'custom:(uuid,encounters:(uuid,diagnoses:(uuid,display,rank,diagnosis),form:(uuid,display),encounterDatetime,' +
-    'orders:full,' +
-    'obs:(uuid,concept:(uuid,display,conceptClass:(uuid,display)),' +
-    'display,groupMembers:(uuid,concept:(uuid,display),' +
-    'value:(uuid,display)),value),encounterType:(uuid,display),' +
-    'encounterProviders:(uuid,display,encounterRole:(uuid,display),' +
-    'provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime,stopDatetime,patient';
+    'custom:(uuid,encounters:(uuid,diagnoses:(uuid,display,rank,diagnosis),form:(uuid,display),encounterDatetime,orders:full,obs:full,encounterType:(uuid,display),encounterProviders:(uuid,display,encounterRole:(uuid,display),provider:(uuid,person:(uuid,display)))),visitType:(uuid,name,display),startDatetime,stopDatetime,patient';
 
   const { data, error, isLoading, isValidating } = useSWR<{ data: { results: Array<Visit> } }, Error>(
     `/ws/rest/v1/visit?patient=${patientUuid}&v=${customRepresentation}`,
@@ -142,6 +136,7 @@ export interface Observation {
       uuid: string;
       display: string;
     };
+    display: string;
   }>;
   value: any;
   obsDatetime?: string;
@@ -162,6 +157,7 @@ export interface Order {
     uuid: string;
     name: string;
     strength: string;
+    display: string;
   };
   duration: number;
   durationUnits: {

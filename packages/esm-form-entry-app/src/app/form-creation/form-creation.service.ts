@@ -6,7 +6,7 @@ import { ConfigResourceService } from '../services/config-resource.service';
 import { MonthlyScheduleResourceService } from '../services/monthly-scheduled-resource.service';
 import { SingleSpaPropsService } from '../single-spa-props/single-spa-props.service';
 import { Encounter, FormSchema } from '../types';
-import { LoggedInUser } from '@openmrs/esm-framework';
+import { Session } from '@openmrs/esm-framework';
 import { isFunction } from 'lodash-es';
 
 /**
@@ -20,7 +20,7 @@ export interface CreateFormParams {
   /**
    * The currently signed-in user.
    */
-  user: LoggedInUser;
+  session: Session;
   /**
    * An optional encounter.
    * If provided, this encounter will be edited by the form.
@@ -115,7 +115,7 @@ export class FormCreationService {
     this.dataSources.registerDataSource('rawPrevEnc', createFormParams.previousEncounter, false);
     const rawPrevObs = await dataSources.recentObs(patient.id);
     this.dataSources.registerDataSource('rawPrevObs', rawPrevObs, false);
-    this.dataSources.registerDataSource('userLocation', createFormParams.user.sessionLocation);
+    this.dataSources.registerDataSource('userLocation', createFormParams.session.sessionLocation);
 
     // TODO monthlySchedule should be converted to a "standard" configurableDataSource
     const config = this.configResourceService.getConfig();
@@ -233,7 +233,7 @@ export class FormCreationService {
   }
 
   private setDefaultValues(form: Form, createFormParams: CreateFormParams) {
-    const { user } = createFormParams;
+    const { session } = createFormParams;
 
     // Encounter date and time.
     const currentDate = moment().format();
@@ -244,28 +244,28 @@ export class FormCreationService {
 
     // User location.
     const encounterLocation = form.searchNodeByQuestionId('location', 'encounterLocation');
-    if (encounterLocation.length > 0 && user?.sessionLocation) {
-      encounterLocation[0].control.setValue(user.sessionLocation.uuid);
+    if (encounterLocation.length > 0 && session?.sessionLocation) {
+      encounterLocation[0].control.setValue(session.sessionLocation.uuid);
     }
 
     // Provider.
     const encounterProvider = form.searchNodeByQuestionId('provider', 'encounterProvider');
-    if (encounterProvider.length > 0 && user?.currentProvider) {
-      encounterProvider[0].control.setValue(user.currentProvider.uuid);
+    if (encounterProvider.length > 0 && session?.currentProvider) {
+      encounterProvider[0].control.setValue(session.currentProvider.uuid);
     }
   }
 
   private setUpPayloadProcessingInformation(form: Form, createFormParams: CreateFormParams) {
-    const { user, formSchema, encounter } = createFormParams;
+    const { session, formSchema, encounter } = createFormParams;
     const patientUuid = this.singleSpaPropsService.getPropOrThrow('patientUuid');
     const visitUuid = this.singleSpaPropsService.getPropOrThrow('visitUuid');
 
     try {
-      if (user) {
+      if (session) {
         form.valueProcessingInfo.personUuid = patientUuid;
         form.valueProcessingInfo.patientUuid = patientUuid;
         form.valueProcessingInfo.formUuid = formSchema.uuid;
-        form.valueProcessingInfo.providerUuid = user.currentProvider?.uuid;
+        form.valueProcessingInfo.providerUuid = session.currentProvider?.uuid;
 
         if (formSchema.encounterType) {
           form.valueProcessingInfo.encounterTypeUuid = formSchema.encounterType.uuid;
