@@ -1,7 +1,7 @@
 @use '@carbon/styles/scss/colors';
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '~@openmrs/esm-styleguide/src/vars';
 
 .topNavHeader {
   top: var(--omrs-offline-banner-height);
@@ -36,7 +36,7 @@
   }
 
   :global(.cds--popover--bottom .cds--popover-content) {
-    text-align: center
+    text-align: center;
   }
 
   .patientName {
@@ -52,7 +52,7 @@
 
   .tooltipPatientName {
     @include type.type-style('productive-heading-01');
-    color:$ui-02;
+    color: $ui-02;
   }
 
   .longPatientNameBtn {
@@ -70,8 +70,8 @@
 
 .tooltipPatientInfo {
   @include type.type-style('body-short-01');
-  color:$color-gray-30;
-  margin-top:spacing.$spacing-03;
+  color: $color-gray-30;
+  margin-top: spacing.$spacing-03;
 }
 
 .tooltip :global(.cds--tooltip__trigger.cds--tooltip__trigger--definition) {
