@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   DataTable,
   DataTableRow,
@@ -29,8 +29,39 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
   urlLabel,
   tableHeaders,
 }) => {
-  const { results: paginatedBiometrics, goTo, currentPage } = usePagination(tableRows, pageSize);
+  const [sort, setSort] = useState({ column: null, direction: null });
+  const [sortedTableRows, setSortedTableRows] = useState(tableRows);
+  const { results: paginatedBiometrics, goTo, currentPage } = usePagination(sortedTableRows, pageSize);
   const isTablet = useLayoutType() === 'tablet';
+
+  const getHeaderProps = (header) => ({
+    onClick: () => {
+      if (!header.isSortable) {
+        return;
+      }
+
+      let direction = 'ascending';
+
+      if (sort.column === header.key && sort.direction === 'ascending') {
+        direction = 'descending';
+      }
+
+      const sortedRows = sortedTableRows.sort((a, b) => {
+        if (a.cells[header.key].value > b.cells[header.key].value) {
+          return direction === 'ascending' ? 1 : -1;
+        }
+
+        if (a.cells[header.key].value < b.cells[header.key].value) {
+          return direction === 'ascending' ? -1 : 1;
+        }
+
+        return 0;
+      });
+
+      setSortedTableRows(sortedRows);
+      setSort({ column: header.key, direction });
+    },
+  });
 
   return (
     <div>
@@ -41,7 +72,7 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
         size={isTablet ? 'lg' : 'sm'}
         useZebraStyles
       >
-        {({ rows, headers, getHeaderProps, getTableProps }) => (
+        {({ rows, headers, getTableProps }) => (
           <TableContainer>
             <Table {...getTableProps()}>
               <TableHead>
@@ -52,9 +83,10 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
                       {...getHeaderProps({
                         header,
                         isSortable: header.isSortable,
+                        key: header.key,
                       })}
                     >
-                      {header.header?.content ?? header.header}
+                      {header.header}
                     </TableHeader>
                   ))}
                 </TableRow>
@@ -63,7 +95,7 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
                 {rows.map((row) => (
                   <TableRow key={row.id}>
                     {row.cells.map((cell) => (
-                      <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+                      <TableCell key={cell.id}>{cell.value}</TableCell>
                     ))}
                   </TableRow>
                 ))}
