@@ -2,6 +2,7 @@ import { navigate, Visit } from '@openmrs/esm-framework';
 import { HtmlFormEntryForm } from './config-schema';
 import isEmpty from 'lodash-es/isEmpty';
 import { formEntrySub, launchPatientWorkspace, launchStartVisitPrompt } from '@openmrs/esm-patient-common-lib';
+import { launchFormEntry } from '@openmrs/esm-form-entry';
 
 export function launchFormEntryOrHtmlForms(
   currentVisit: Visit | undefined,
@@ -11,6 +12,7 @@ export function launchFormEntryOrHtmlForms(
   encounterUuid?: string,
   formName?: string,
   mutateForms?: () => void,
+  openmrsBase?: string, // Added parameter for openmrsBase
 ) {
   if (currentVisit) {
     const htmlForm = htmlFormEntryForms.find((form) => form.formUuid === formUuid);
@@ -18,7 +20,7 @@ export function launchFormEntryOrHtmlForms(
       launchFormEntry(formUuid, patient.id, encounterUuid, formName, mutateForms);
     } else {
       navigate({
-        to: `\${openmrsBase}/htmlformentryui/htmlform/${htmlForm.formUiPage}.page?patientId=${patient.id}&visitId=${currentVisit.uuid}&definitionUiResource=${htmlForm.formUiResource}&returnUrl=${window.location.href}`,
+        to: `${openmrsBase}/htmlformentryui/htmlform/${htmlForm.formUiPage}.page?patientId=${patient.id}&visitId=${currentVisit.uuid}&definitionUiResource=${htmlForm.formUiResource}&returnUrl=${window.location.href}`,
       });
     }
   } else {
