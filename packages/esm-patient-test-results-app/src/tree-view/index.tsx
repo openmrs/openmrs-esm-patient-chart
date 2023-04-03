@@ -30,12 +30,7 @@ const TreeViewWrapper: React.FC<TreeViewWrapperProps> = (props) => {
     );
   }
 
-  return (
-    <EmptyState
-      headerTitle={t('testResults', 'Results')}
-      displayText={t('testResultsData', 'results data')}
-    />
-  );
+  return <EmptyState headerTitle={t('testResults', 'Results')} displayText={t('testResultsData', 'results data')} />;
 };
 
 export default TreeViewWrapper;
