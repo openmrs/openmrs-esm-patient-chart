@@ -66,8 +66,8 @@ describe('PatientBanner: ', () => {
 
     await waitFor(() => user.click(imgAvatar));
 
-    expect(mockNavigateTo).toHaveBeenCalled();
     expect(mockNavigateTo).toHaveBeenCalledWith(patientBannerSeachPageProps.patientUuid);
+    mockNavigateTo.mockClear();
 
     const showContactDetailsBtn = screen.getByRole('button', {
       name: /^Show all details$/i,

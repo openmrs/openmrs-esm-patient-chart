@@ -22,7 +22,6 @@ import {
   isDesktop as isDesktopLayout,
   useLayoutType,
   usePagination,
-  usePatient,
   useConfig,
 } from '@openmrs/esm-framework';
 import {
