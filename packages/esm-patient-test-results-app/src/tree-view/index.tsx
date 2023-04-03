@@ -32,8 +32,8 @@ const TreeViewWrapper: React.FC<TreeViewWrapperProps> = (props) => {
 
   return (
     <EmptyState
-      headerTitle={t('testResults', 'Test Results')}
-      displayText={t('testResultsData', 'Test results data')}
+      headerTitle={t('testResults', 'Results')}
+      displayText={t('testResultsData', 'results data')}
     />
   );
 };
