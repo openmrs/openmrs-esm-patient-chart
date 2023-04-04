@@ -1,6 +1,6 @@
-@use '@carbon/styles/scss/spacing';
-@use '@carbon/styles/scss/type';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '../../../../../node_modules/@carbon/styles/scss/spacing';
+@use '../../../../../node_modules/@carbon/styles/scss/type/index';
+@import '../../../../../node_modules/@openmrs/esm-styleguide/src/vars';
 
 .productiveHeading02 {
   color: $color-gray-70;

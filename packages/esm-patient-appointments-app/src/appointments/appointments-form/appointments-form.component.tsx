@@ -4,7 +4,6 @@ import dayjs from 'dayjs';
 import {
   Button,
   ButtonSet,
-  Checkbox,
   DatePickerInput,
   DatePicker,
   Form,
@@ -29,9 +28,9 @@ import {
   saveRecurringAppointments,
   useAppointments,
   useAppointmentService,
-} from './appointments.resource';
-import { Appointment, AppointmentPayload, RecurringPattern } from '../types';
-import { dateFormat, datePickerFormat, datePickerPlaceHolder, weekDays } from '../constants';
+} from './../appointments.resource';
+import { dateFormat, datePickerFormat, datePickerPlaceHolder, weekDays } from '../../constants';
+import { Appointment, AppointmentPayload, RecurringPattern } from '../../types';
 import styles from './appointments-form.scss';
 
 const appointmentTypes = [{ name: 'Scheduled' }, { name: 'WalkIn' }];
