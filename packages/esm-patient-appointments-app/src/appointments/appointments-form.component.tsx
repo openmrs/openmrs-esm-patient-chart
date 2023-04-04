@@ -4,6 +4,7 @@ import dayjs from 'dayjs';
 import {
   Button,
   ButtonSet,
+  Checkbox,
   DatePickerInput,
   DatePicker,
   Form,
@@ -19,6 +20,7 @@ import {
   TextArea,
   TimePickerSelect,
   TimePicker,
+  Toggle,
 } from '@carbon/react';
 import { useLocations, useSession, showToast, showNotification, useLayoutType } from '@openmrs/esm-framework';
 import { amPm, convertTime12to24 } from '@openmrs/esm-patient-common-lib';
@@ -50,13 +52,11 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
   closeWorkspace,
 }) => {
   const editedAppointmentTimeFormat = new Date(appointment?.startDateTime).getHours() >= 12 ? 'PM' : 'AM';
-
   const defaultTimeFormat = appointment?.startDateTime
     ? editedAppointmentTimeFormat
     : new Date().getHours() >= 12
     ? 'PM'
     : 'AM';
-
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
   const locations = useLocations();
@@ -65,7 +65,11 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
   const [appointmentNote, setAppointmentNote] = useState(appointment?.comments || '');
   const [selectedAppointmentType, setSelectedAppointmentType] = useState(appointment?.appointmentKind || '');
   const [selectedService, setSelectedService] = useState(appointment?.service?.name || '');
-  const [startDate, setStartDate] = useState(
+  const [isRecurringAppointment, setIsRecurringAppointment] = useState<boolean>(false);
+  const [startDate, setStartDate] = useState<Date>(
+    appointment?.startDateTime ? new Date(appointment?.startDateTime) : new Date(),
+  );
+  const [startDateText, setStartDateText] = useState<string>(
     appointment?.startDateTime
       ? dayjs(new Date(appointment.startDateTime)).format(dateFormat)
       : dayjs(new Date()).format(dateFormat),
@@ -83,7 +87,22 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
   const [recurringPatternType, setRecurringPatternType] = useState(recurringPattern?.type || 'DAY');
   const [recurringPatternPeriod, setRecurringPatternPeriod] = useState(recurringPattern?.period || 1);
   const [recurringPatternDaysOfWeek, setRecurringPatternDaysOfWeek] = useState(recurringPattern?.daysOfWeek || []);
-  const [recurringPatternEndDate, setRecurringPatternEndDate] = useState(
+  const [selectedDaysOfWeekText, setSelectedDaysOfWeekText] = useState(() => {
+    if (recurringPatternDaysOfWeek?.length < 1) {
+      return t('daysOfWeek', 'Days of the week');
+    } else {
+      return weekDays
+        .filter((weekDay) => recurringPatternDaysOfWeek.includes(weekDay.id))
+        .map((weekDay) => {
+          return weekDay.label;
+        })
+        .join(', ');
+    }
+  });
+  const [recurringPatternEndDate, setRecurringPatternEndDate] = useState<Date>(
+    recurringPattern?.endDate ? new Date(recurringPattern?.endDate) : null,
+  );
+  const [recurringPatternEndDateText, setRecurringPatternEndDateText] = useState<string>(
     recurringPattern?.endDate ? dayjs(new Date(recurringPattern.endDate)).format(dateFormat) : '',
   );
 
@@ -94,23 +113,29 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
     setUserLocation(session?.sessionLocation?.uuid);
   }
 
-  const isScheduledType = (): boolean => {
-    return selectedAppointmentType == 'Scheduled';
-  };
-
   const isRecurringPatternTypeWeek = (): boolean => {
     return recurringPatternType == 'WEEK';
   };
 
   const handleMultiselectChange = (e) => {
-    {
-      setRecurringPatternDaysOfWeek(
-        e.selectedItems.map((s) => {
-          return s.id;
-        }),
-      );
-    }
+    setSelectedDaysOfWeekText(() => {
+      if (e?.selectedItems?.length < 1) {
+        return t('daysOfWeek', 'Days of the week');
+      } else {
+        return e.selectedItems
+          .map((weekDay) => {
+            return weekDay.label;
+          })
+          .join(', ');
+      }
+    });
+    setRecurringPatternDaysOfWeek(
+      e.selectedItems.map((s) => {
+        return s.id;
+      }),
+    );
   };
+
   const handleServiceChange = (value) => {
     {
       setSelectedService(value);
@@ -132,7 +157,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
     };
 
     const abortController = new AbortController();
-    (isScheduledType()
+    (isRecurringAppointment
       ? saveRecurringAppointments(recurringAppointmentPayload, abortController)
       : saveAppointment(appointmentPayload, abortController)
     ).then(
@@ -183,7 +208,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
   const constructAppointmentPayload = (): AppointmentPayload => {
     const serviceUuid = services?.find((service) => service.name === selectedService)?.uuid;
     const [hours, minutes] = convertTime12to24(startTime, timeFormat);
-    const startDatetime = createDate(startDate, hours, minutes);
+    const startDatetime = startDate.setHours(hours, minutes);
     const endDatetime = dayjs(startDatetime).add(duration, 'minutes').toDate();
 
     return {
@@ -201,18 +226,15 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
   };
 
   const constructRecurringPattern = (): RecurringPattern => {
-    const endDate = createDate(startDate, 23, 59);
+    const [hours, minutes] = [23, 59];
+    const endDate = recurringPatternEndDate.setHours(hours, minutes);
 
     return {
       type: recurringPatternType,
       period: recurringPatternPeriod,
-      endDate: endDate,
+      endDate: dayjs(endDate).format(),
       daysOfWeek: recurringPatternDaysOfWeek,
     };
-  };
-
-  const createDate = (date: string, hours, minutes): Date => {
-    return new Date(dayjs(date).year(), dayjs(date).month(), dayjs(date).date(), hours, minutes);
   };
 
   if (isLoading)
@@ -334,96 +356,122 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
           </ResponsiveWrapper>
         </section>
 
-        {isScheduledType() ? (
-          <section className={styles.formGroup}>
-            <span>{t('scheduledDateTime', 'Scheduled Date & Time')}</span>
-            <div className={styles.rangeDatePickerControl}>
-              <DatePicker datePickerType="range" light={isTablet} dateFormat={datePickerFormat}>
-                <DatePickerInput
-                  id="startDatePickerInput"
-                  labelText={t('startDate', 'Start date')}
-                  style={{ width: '100%' }}
-                  placeholder={datePickerPlaceHolder}
-                  value={startDate}
-                  onChange={([startDate]) => setStartDate(startDate)}
-                />
-                <DatePickerInput
-                  id="endDatePickerInput"
-                  labelText={t('endDate', 'End date')}
-                  style={{ width: '100%' }}
-                  placeholder={datePickerPlaceHolder}
-                  value={recurringPatternEndDate}
-                  onChange={([endDate]) => setRecurringPatternEndDate(endDate)}
-                />
-              </DatePicker>
-
-              <div className={styles.inLine}>
-                <ResponsiveWrapper isTablet={isTablet}>
-                  <NumberInput
-                    id="repeatNumber"
-                    min={1}
-                    max={356}
-                    label={t('repeatEvery', 'Repeat every')}
-                    invalidText={t('invalidNumber', 'Number is not valid')}
-                    size="md"
-                    value={recurringPatternPeriod}
-                    onChange={(e, { value }) => {
-                      setRecurringPatternPeriod(value);
-                    }}
-                  />
-                </ResponsiveWrapper>
-                <ResponsiveWrapper isTablet={isTablet}>
-                  <RadioButtonGroup
-                    name="radio-button-group"
-                    className={styles.recurringPatternType}
-                    valueSelected={recurringPatternType}
-                    onChange={(type) => setRecurringPatternType(type)}
-                  >
-                    <RadioButton labelText={t('day', 'Day')} value="DAY" id="radioDay" />
-                    <RadioButton labelText={t('week', 'Week')} value="WEEK" id="radioWeek" />
-                  </RadioButtonGroup>
-                </ResponsiveWrapper>
+        <section className={styles.formGroup}>
+          <fieldset>
+            <Toggle
+              className={styles.toggleLabel}
+              labelA={t('recurringAppointment', 'Recurring appointment')}
+              labelB={t('recurringAppointment', 'Recurring appointment')}
+              id="recurringToggled"
+              onClick={() => setIsRecurringAppointment(!isRecurringAppointment)}
+            />
+          </fieldset>
+          {isRecurringAppointment ? (
+            <>
+              <span>{t('dateTime', 'Date & Time')}</span>
+              <div className={styles.rangeDatePickerControl}>
+                <div className={styles.inLine}>
+                  <ResponsiveWrapper isTablet={isTablet}>
+                    <DatePicker
+                      datePickerType="range"
+                      light={isTablet}
+                      dateFormat={datePickerFormat}
+                      onChange={([startDate, endDate]) => {
+                        setStartDateText(dayjs(new Date(startDate)).format(dateFormat));
+                        setStartDate(new Date(startDate));
+                        setRecurringPatternEndDateText(dayjs(new Date(endDate)).format(dateFormat));
+                        setRecurringPatternEndDate(new Date(endDate));
+                      }}
+                    >
+                      <DatePickerInput
+                        id="startDatePickerInput"
+                        labelText={t('startDate', 'Start date')}
+                        style={{ width: '100%' }}
+                        value={startDateText}
+                      />
+                      <DatePickerInput
+                        id="endDatePickerInput"
+                        labelText={t('endDate', 'End date')}
+                        style={{ width: '100%' }}
+                        placeholder={datePickerPlaceHolder}
+                        value={recurringPatternEndDateText}
+                      />
+                    </DatePicker>
+                  </ResponsiveWrapper>
+                  {timeDurationLayout()}
+                </div>
+                <div className={styles.inLine}>
+                  <ResponsiveWrapper isTablet={isTablet}>
+                    <NumberInput
+                      id="repeatNumber"
+                      min={1}
+                      max={356}
+                      label={t('repeatEvery', 'Repeat every')}
+                      invalidText={t('invalidNumber', 'Number is not valid')}
+                      size="md"
+                      value={recurringPatternPeriod}
+                      onChange={(e, { value }) => {
+                        setRecurringPatternPeriod(value);
+                      }}
+                    />
+                  </ResponsiveWrapper>
+                  <ResponsiveWrapper isTablet={isTablet}>
+                    <RadioButtonGroup
+                      name="radio-button-group"
+                      className={styles.recurringPatternType}
+                      valueSelected={recurringPatternType}
+                      onChange={(type) => setRecurringPatternType(type)}
+                    >
+                      <RadioButton labelText={t('day', 'Day')} value="DAY" id="radioDay" />
+                      <RadioButton labelText={t('week', 'Week')} value="WEEK" id="radioWeek" />
+                    </RadioButtonGroup>
+                  </ResponsiveWrapper>
+                </div>
                 {isRecurringPatternTypeWeek() && (
-                  <MultiSelect
-                    label={t('daysOfWeek', 'Days of the week')}
-                    id="daysOfWeek"
-                    items={weekDays}
-                    itemToString={(item) => (item ? t(item.labelCode, item.label) : '')}
-                    selectionFeedback="top-after-reopen"
-                    initialSelectedItems={weekDays.filter((i) => {
-                      return recurringPatternDaysOfWeek.includes(i.id);
-                    })}
-                    onChange={(e) => handleMultiselectChange(e)}
-                  />
+                  <div>
+                    <MultiSelect
+                      label={selectedDaysOfWeekText}
+                      id="daysOfWeek"
+                      items={weekDays}
+                      itemToString={(item) => (item ? t(item.labelCode, item.label) : '')}
+                      selectionFeedback="top-after-reopen"
+                      sortItems={(items) => {
+                        return items.sort((a, b) => a.order > b.order);
+                      }}
+                      initialSelectedItems={weekDays.filter((i) => {
+                        return recurringPatternDaysOfWeek.includes(i.id);
+                      })}
+                      onChange={(e) => handleMultiselectChange(e)}
+                    />
+                  </div>
                 )}
               </div>
-              {timeDurationLayout()}
-            </div>
-          </section>
-        ) : (
-          <section className={styles.formGroup}>
-            <span>{t('dateTime', 'Date & Time')}</span>
-            <div className={styles.inLine}>
-              <ResponsiveWrapper isTablet={isTablet}>
-                <DatePicker
-                  datePickerType="single"
-                  dateFormat={datePickerFormat}
-                  light={isTablet}
-                  value={startDate}
-                  onChange={([date]) => setStartDate(date)}
-                >
-                  <DatePickerInput
-                    id="datePickerInput"
-                    labelText={t('date', 'Date')}
-                    style={{ width: '100%' }}
-                    placeholder={datePickerPlaceHolder}
-                  />
-                </DatePicker>
-              </ResponsiveWrapper>
-              {timeDurationLayout()}
-            </div>
-          </section>
-        )}
+            </>
+          ) : (
+            <>
+              <span>{t('dateTime', 'Date & Time')}</span>
+              <div className={styles.inLine}>
+                <ResponsiveWrapper isTablet={isTablet}>
+                  <DatePicker
+                    datePickerType="single"
+                    dateFormat={datePickerFormat}
+                    light={isTablet}
+                    value={startDate}
+                    onChange={([date]) => setStartDate(date)}
+                  >
+                    <DatePickerInput
+                      id="datePickerInput"
+                      labelText={t('date', 'Date')}
+                      style={{ width: '100%' }}
+                      placeholder={datePickerPlaceHolder}
+                    />
+                  </DatePicker>
+                </ResponsiveWrapper>
+                {timeDurationLayout()}
+              </div>
+            </>
+          )}
+        </section>
         <section className={styles.formGroup}>
           <span>{t('note', 'Note')}</span>
           <TextArea

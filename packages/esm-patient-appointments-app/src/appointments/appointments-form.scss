@@ -43,6 +43,15 @@ $openmrs-background-grey: #ededed;
   margin-bottom: spacing.$spacing-03;
 }
 
+.formGroup checkbox {
+  @extend .productiveHeading02;
+  margin-bottom: spacing.$spacing-03;
+}
+
+.toggleLabel span {
+  margin-bottom: 0;
+}
+
 .inLine {
   display: flex;
 }

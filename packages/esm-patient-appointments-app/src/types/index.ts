@@ -60,7 +60,7 @@ export interface AppointmentPayload {
 export interface RecurringPattern {
   type: 'DAY' | 'WEEK';
   period: number;
-  endDate: Date;
+  endDate: string;
   daysOfWeek?: Array<string>; //'MONDAY' | 'TUESDAY' | 'TUESDAY' | 'WEDNESDAY' | 'THURSDAY' | 'FRIDAY' | 'SATURDAY' | 'SUNDAY'>;
 }
 
