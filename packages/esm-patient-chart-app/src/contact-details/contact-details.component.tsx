@@ -33,21 +33,19 @@ const Address: React.FC<{ address?: fhir.Address }> = ({ address }) => {
   return (
     <>
       <p className={styles.heading}>{t('address', 'Address')}</p>
-      <ul>
-        {address ? (
-          <>
-            {Object.entries(address)
-              .filter(([key]) => !['use', 'extension', 'id'].some((k) => k === key))
-              .map(([key, value]) => (
-                <li>
-                  {t(key)}: {value}
-                </li>
-              ))}
-          </>
-        ) : (
-          '--'
-        )}
-      </ul>
+      {address ? (
+        <ul>
+          {Object.entries(address)
+            .filter(([key]) => !['use', 'extension', 'id'].some((k) => k === key))
+            .map(([key, value]) => (
+              <li>
+                {t(key)}: {value}
+              </li>
+            ))}
+        </ul>
+      ) : (
+        <p>--</p>
+      )}
     </>
   );
 };
@@ -60,18 +58,24 @@ const Contact: React.FC<{ telecom: Array<fhir.ContactPoint>; patientUuid: string
   return (
     <>
       <p className={styles.heading}>{t('contactDetails', 'Contact Details')}</p>
-      <ul>
-        <li>{value}</li>
-        {isLoading ? (
-          <InlineLoading description={t('loading', 'Loading...')} />
-        ) : (
-          contactAttributes?.map(({ attributeType, value, uuid }) => (
-            <li key={uuid}>
-              {attributeType.display} : {value}
-            </li>
-          ))
-        )}
-      </ul>
+      {(() => {
+        if (isLoading) return <InlineLoading description="Loading..." role="progressbar" />;
+
+        if (contactAttributes?.length) {
+          return (
+            <ul>
+              <li>{value}</li>
+              {contactAttributes?.map(({ attributeType, value, uuid }) => (
+                <li key={uuid}>
+                  {attributeType.display} : {value}
+                </li>
+              ))}
+            </ul>
+          );
+        }
+
+        return <p>--</p>;
+      })()}
     </>
   );
 };

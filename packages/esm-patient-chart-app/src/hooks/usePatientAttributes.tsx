@@ -3,7 +3,6 @@ import useSWR from 'swr';
 
 import { openmrsFetch, useConfig } from '@openmrs/esm-framework';
 import useSWRImmutable from 'swr/immutable';
-import { ConfigObject } from '../config-schema';
 import { Patient, PersonFetchResponse } from '../types';
 
 const customRepresentation =
@@ -35,7 +34,7 @@ export const usePatientAttributes = (patientUuid: string) => {
  * @returns Object containing `contactAttribute` {@link Attribute} loading status
  */
 export const usePatientContactAttributes = (patientUuid: string) => {
-  const { contactAttributeType } = useConfig() as ConfigObject;
+  const { contactAttributeType } = useConfig();
   const { attributes, isLoading } = usePatientAttributes(patientUuid);
   const contactAttributes = attributes?.filter(({ attributeType }) =>
     contactAttributeType?.some((uuid) => attributeType?.uuid === uuid),

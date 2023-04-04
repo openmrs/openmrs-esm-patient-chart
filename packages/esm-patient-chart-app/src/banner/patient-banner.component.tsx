@@ -1,4 +1,4 @@
-import React, { MouseEvent, useCallback, useState } from 'react';
+import React, { MouseEvent, useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Tag } from '@carbon/react';
 import { ChevronDown, ChevronUp, OverflowMenuVertical } from '@carbon/react/icons';
@@ -24,17 +24,17 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
 }) => {
   const { excludePatientIdentifierCodeTypes } = useConfig();
   const { t } = useTranslation();
-  const overflowMenuRef = React.useRef(null);
+  const overflowMenuRef = useRef(null);
 
-  const patientActionsSlotState = React.useMemo(
+  const patientActionsSlotState = useMemo(
     () => ({ patientUuid, onClick, onTransition }),
     [patientUuid, onClick, onTransition],
   );
 
   const patientName = `${patient?.name?.[0]?.given?.join(' ')} ${patient?.name?.[0].family}`;
-  const patientPhotoSlotState = React.useMemo(() => ({ patientUuid, patientName }), [patientUuid, patientName]);
+  const patientPhotoSlotState = useMemo(() => ({ patientUuid, patientName }), [patientUuid, patientName]);
 
-  const [showContactDetails, setShowContactDetails] = React.useState(false);
+  const [showContactDetails, setShowContactDetails] = useState(false);
   const toggleContactDetails = useCallback(() => {
     setShowContactDetails((value) => !value);
   }, []);
