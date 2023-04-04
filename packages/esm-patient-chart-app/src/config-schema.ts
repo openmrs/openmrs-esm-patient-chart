@@ -94,6 +94,10 @@ export const esmPatientChartSchema = {
     _description: 'The UUID of the visit attribute that contains the visit queue number.',
     _default: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
   },
+  vitalsEncounterUuid: {
+    _type: Type.UUID,
+    _default: '67a71486-1a54-468f-ac3e-7091a9a79584',
+  },
 };
 
 export interface ChartConfig {
@@ -107,6 +111,7 @@ export interface ChartConfig {
   }>;
   showServiceQueueFields: boolean;
   visitQueueNumberAttributeUuid: string;
+  vitalsEncounterUuid: string;
 }
 
 export const configSchema = {

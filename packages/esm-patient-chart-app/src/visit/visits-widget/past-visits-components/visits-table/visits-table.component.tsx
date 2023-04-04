@@ -46,6 +46,7 @@ import type { HtmlFormEntryForm } from '@openmrs/esm-patient-forms-app/src/confi
 import { MappedEncounter } from '../visit-summary.component';
 import EncounterObservations from '../../encounter-observations';
 import styles from './visits-table.scss';
+import { ChartConfig } from '../../../../config-schema';
 
 interface VisitTableProps {
   visits: Array<MappedEncounter>;
@@ -63,6 +64,7 @@ type FilterProps = {
 
 const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, patientUuid }) => {
   const visitCount = 20;
+  const config = useConfig() as ChartConfig;
   const { t } = useTranslation();
   const desktopLayout = isDesktop(useLayoutType());
 
@@ -242,27 +244,21 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                                     visits[index]?.visitTypeUuid,
                                   )
                                 }
-                              >
-                                {t('editThisEncounter', 'Edit this encounter')}
-                              </OverflowMenuItem>
+                              />
                               <OverflowMenuItem
                                 size={desktopLayout ? 'sm' : 'lg'}
                                 className={styles.menuItem}
                                 id="#goToEncounter"
                                 itemText={t('goToThisEncounter', 'Go to this encounter')}
-                              >
-                                {t('editThisEncounter', 'Edit this encounter')}
-                              </OverflowMenuItem>
+                              />
                               <OverflowMenuItem
                                 size={desktopLayout ? 'sm' : 'lg'}
                                 className={styles.menuItem}
-                                id="#editEncounter"
+                                id="#deleteEncounter"
                                 itemText={t('deleteThisEncounter', 'Delete this encounter')}
                                 hasDivider
                                 isDelete
-                              >
-                                itemText={t('deleteThisEncounter', 'Delete this encounter')}
-                              </OverflowMenuItem>
+                              />
                             </OverflowMenu>
                           </Layer>
                         </TableCell>
