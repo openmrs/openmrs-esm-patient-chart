@@ -226,12 +226,12 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
 
   const constructRecurringPattern = (): RecurringPattern => {
     const [hours, minutes] = [23, 59];
-    const endDate = recurringPatternEndDate.setHours(hours, minutes);
+    const endDate = recurringPatternEndDate?.setHours(hours, minutes);
 
     return {
       type: recurringPatternType,
       period: recurringPatternPeriod,
-      endDate: dayjs(endDate).format(),
+      endDate: endDate ? dayjs(endDate).format() : null,
       daysOfWeek: recurringPatternDaysOfWeek,
     };
   };

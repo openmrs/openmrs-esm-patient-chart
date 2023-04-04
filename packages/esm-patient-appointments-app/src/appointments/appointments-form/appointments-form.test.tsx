@@ -31,8 +31,8 @@ jest.mock('@openmrs/esm-framework', () => {
   };
 });
 
-jest.mock('./appointments.resource', () => {
-  const originalModule = jest.requireActual('./appointments.resource');
+jest.mock('../appointments.resource', () => {
+  const originalModule = jest.requireActual('../appointments.resource');
 
   return {
     ...originalModule,
