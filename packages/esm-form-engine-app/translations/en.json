@@ -1,1 +1,5 @@
-{}
+{
+  "error": "Error loading form",
+  "errorLoadingForm": "An error occurred while loading the form",
+  "loading": "Loading"
+}

@@ -1,7 +1,7 @@
 import React from 'react';
 import useForm from '../hooks/useForm';
 import useSchema from '../hooks/useSchema';
-import { OHRIForm } from '@ohri/openmrs-ohri-form-engine-lib';
+import { OHRIForm } from '@openmrs/openmrs-form-engine-lib';
 import { InlineNotification, InlineLoading } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import styles from './form-renderer.scss';
