@@ -20,7 +20,6 @@ export interface DashboardConfig {
   title: string;
   columns: number;
   hideDashboardTitle: boolean;
-  
 }
 
 interface DashboardViewProps {
