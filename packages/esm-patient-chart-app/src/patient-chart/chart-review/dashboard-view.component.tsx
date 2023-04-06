@@ -19,6 +19,8 @@ export interface DashboardConfig {
   slot: string;
   title: string;
   columns: number;
+  hideDashboardTitle: boolean;
+  
 }
 
 interface DashboardViewProps {
@@ -54,7 +56,7 @@ export function DashboardView({ dashboard, patientUuid, patient }: DashboardView
   return (
     <>
       <ExtensionSlot state={state} extensionSlotName="top-of-all-patient-dashboards-slot" />
-      {dashboard.title && <h1 className={styles.dashboardTitle}>{dashboard.title}</h1>}
+      {!dashboard.hideDashboardTitle && dashboard.title && <h1 className={styles.dashboardTitle}>{dashboard.title}</h1>}
       <ExtensionSlot
         key={dashboard.slot}
         extensionSlotName={dashboard.slot}
