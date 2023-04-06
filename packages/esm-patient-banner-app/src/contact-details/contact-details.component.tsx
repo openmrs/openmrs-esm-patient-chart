@@ -14,6 +14,7 @@ interface ContactDetailsProps {
 const Address: React.FC<{ address?: fhir.Address }> = ({ address }) => {
   const { t } = useTranslation();
 
+  const getAddressKey = (url) => url.split('#')[1];
   /*
     DO NOT REMOVE THIS COMMENT UNLESS YOU UNDERSTAND WHY IT IS HERE
 
@@ -37,12 +38,20 @@ const Address: React.FC<{ address?: fhir.Address }> = ({ address }) => {
         {address ? (
           <>
             {Object.entries(address)
-              .filter(([key]) => !['use', 'extension', 'id'].some((k) => k === key))
-              .map(([key, value]) => (
-                <li>
-                  {t(key)}: {value}
-                </li>
-              ))}
+              .filter(([key]) => !['use', 'id'].some((k) => k === key))
+              .map(([key, value]) =>
+                key === 'extension' ? (
+                  address?.extension[0]?.extension.map((add, i) => (
+                    <li>
+                      {t(getAddressKey(add.url))}: {add.valueString}
+                    </li>
+                  ))
+                ) : (
+                  <li>
+                    {t(key)}: {value}
+                  </li>
+                ),
+              )}
           </>
         ) : (
           '--'
