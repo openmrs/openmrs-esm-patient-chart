@@ -22,8 +22,6 @@ jest.mock('@openmrs/esm-framework', () => {
       return {
         notesConceptUuids: ['162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', 'some-uuid2'],
         visitDiagnosisConceptUuid: '159947AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-        problemListConceptUuid: '1284AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-        diagnosisOrderConceptUuid: '159946AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
       };
     }),
   };
