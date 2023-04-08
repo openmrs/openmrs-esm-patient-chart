@@ -1,19 +1,22 @@
 import React from 'react';
-import { InlineLoading } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
+import { InlineLoading } from '@carbon/react';
 import { OHRIForm } from '@openmrs/openmrs-form-engine-lib';
-import FormError from './form-error.component';
+
 import useForm from '../hooks/useForm';
 import useSchema from '../hooks/useSchema';
+import FormError from './form-error.component';
+
 import styles from './form-renderer.scss';
 
 interface FormRendererProps {
   formUuid: string;
   patientUuid: string;
   closeWorkspace: () => void;
+  encounterUuid?: string;
 }
 
-const FormRenderer: React.FC<FormRendererProps> = ({ formUuid, patientUuid, closeWorkspace }) => {
+const FormRenderer: React.FC<FormRendererProps> = ({ formUuid, patientUuid, closeWorkspace, encounterUuid }) => {
   const { t } = useTranslation();
   const { form, formLoadError } = useForm(formUuid);
 
@@ -33,7 +36,17 @@ const FormRenderer: React.FC<FormRendererProps> = ({ formUuid, patientUuid, clos
   }
 
   return (
-    <>{schema && <OHRIForm patientUUID={patientUuid} formJson={schema} mode="enter" handleClose={closeWorkspace} />}</>
+    <>
+      {schema && (
+        <OHRIForm
+          encounterUUID={encounterUuid}
+          patientUUID={patientUuid}
+          formJson={schema}
+          handleClose={closeWorkspace}
+          onSubmit={() => closeWorkspace()}
+        />
+      )}
+    </>
   );
 };
 
