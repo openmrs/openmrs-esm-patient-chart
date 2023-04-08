@@ -30,6 +30,10 @@ const BaseVisitType: React.FC<BaseVisitTypeProps> = ({ onChange, visitTypes }) =
 
   const { results, currentPage, goTo } = usePagination(searchResults, 5);
 
+  if (results?.length === 1) {
+    onChange(results[0].uuid);
+  }
+
   return (
     <div className={`${styles.visitTypeOverviewWrapper} ${isTablet ? styles.tablet : styles.desktop}`}>
       {visitTypes.length ? (
@@ -40,7 +44,6 @@ const BaseVisitType: React.FC<BaseVisitTypeProps> = ({ onChange, visitTypes }) =
                 onChange={(event) => handleSearch(event.target.value)}
                 placeholder={t('searchForAVisitType', 'Search for a visit type')}
                 labelText=""
-                light={isTablet}
               />
             </Layer>
           ) : (
@@ -48,7 +51,6 @@ const BaseVisitType: React.FC<BaseVisitTypeProps> = ({ onChange, visitTypes }) =
               onChange={(event) => handleSearch(event.target.value)}
               placeholder={t('searchForAVisitType', 'Search for a visit type')}
               labelText=""
-              light={isTablet}
             />
           )}
 

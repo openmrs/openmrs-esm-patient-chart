@@ -76,13 +76,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
     blockSavingForm: boolean;
   }>(null);
   const [selectedLocation, setSelectedLocation] = useState(() => (sessionLocation ? sessionLocation : ''));
-  const [visitType, setVisitType] = useState<string | null>(() => {
-    if (locations?.length && sessionUser?.sessionLocation?.uuid) {
-      return allVisitTypes?.length === 1 ? allVisitTypes[0].uuid : null;
-    }
-
-    return null;
-  });
+  const [visitType, setVisitType] = useState<string | null>(null);
   const visitQueueNumberAttributeUuid = config.visitQueueNumberAttributeUuid;
 
   const handleSubmit = useCallback(
