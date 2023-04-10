@@ -113,7 +113,7 @@
   "visits": "visits",
   "Visits": "Visits",
   "visitStarted": "Visit started",
-  "visitStartedSuccessfully": "",
+  "visitStartedSuccessfully": "{visit} started successfully",
   "visitSummaries": "Visit summaries",
   "visitType": "Visit type",
   "workspaceModalText": "Launching a new form in the workspace could cause you to lose unsaved work on the {formName} form.",
