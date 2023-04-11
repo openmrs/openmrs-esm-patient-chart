@@ -1,8 +1,8 @@
 import React from 'react';
 import { Button } from '@carbon/react';
-import styles from './form-error.scss';
 import { useTranslation } from 'react-i18next';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
+import styles from './form-error.scss';
 
 interface FormErrorProps {
   closeWorkspace: () => void;
