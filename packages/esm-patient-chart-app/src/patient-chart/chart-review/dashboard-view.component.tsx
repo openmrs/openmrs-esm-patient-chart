@@ -19,7 +19,7 @@ export interface DashboardConfig {
   slot: string;
   title: string;
   columns: number;
-  hideDashboardTitle: boolean;
+  hideDashboardTitle?: boolean;
 }
 
 interface DashboardViewProps {
