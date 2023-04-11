@@ -315,7 +315,7 @@ export class FormDataSourceService {
         case 'unknown':
           return 'U';
         default:
-          return 'M';
+          return 'U';
       }
     };
     model['birthdate'] = new Date(patient?.birthDate);
