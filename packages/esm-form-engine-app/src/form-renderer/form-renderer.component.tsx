@@ -15,11 +15,12 @@ interface FormRendererProps {
 
 const FormRenderer: React.FC<FormRendererProps> = ({ formUuid, patientUuid, closeWorkspace }) => {
   const { t } = useTranslation();
-  const { form, isLoading: formLoading, error: formError } = useForm(formUuid);
-  const valueReferenceUuid = form?.resources.find((resource) => resource.name === 'JSON schema')?.valueReference;
-  const { schema, isLoading: schemaLoading, error: schemaError } = useSchema(valueReferenceUuid);
+  const { form, formLoadError } = useForm(formUuid);
 
-  if (schemaLoading) {
+  const valueReferenceUuid = form?.resources.find((resource) => resource.name === 'JSON schema')?.valueReference;
+  const { schema, isLoadingSchema, schemaLoadError } = useSchema(valueReferenceUuid);
+
+  if (isLoadingSchema) {
     return (
       <div className={styles.loaderContainer}>
         <InlineLoading className={styles.loading} description={`${t('loading', 'Loading')} ...`} />
@@ -27,12 +28,9 @@ const FormRenderer: React.FC<FormRendererProps> = ({ formUuid, patientUuid, clos
     );
   }
 
-  if (formError || schemaError) {
+  if (formLoadError || schemaLoadError) {
     return <FormError closeWorkspace={closeWorkspace} />;
   }
-
-  console.log('form: ', form);
-  console.log('schema: ', schema);
 
   return (
     <>{schema && <OHRIForm patientUUID={patientUuid} formJson={schema} mode="enter" handleClose={closeWorkspace} />}</>

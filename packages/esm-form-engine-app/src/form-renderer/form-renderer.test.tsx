@@ -35,16 +35,17 @@ describe('FormRenderer', () => {
   });
 
   test('renders FormError component when there is an error', () => {
-    (useForm as jest.Mock).mockReturnValue({ form: null, isLoading: false, error: 'Error message' });
-    (useSchema as jest.Mock).mockReturnValue({ schema: null, isLoading: false, error: null });
+    (useForm as jest.Mock).mockReturnValue({ form: null, isLoadingForm: false, formLoadError: 'Error message' });
+    (useSchema as jest.Mock).mockReturnValue({ schema: null, isLoadingSchema: false, schemaLoadError: null });
 
     render(<FormRenderer {...defaultProps} />);
+
     expect(screen.getByText('There was an error with this form')).toBeInTheDocument();
   });
 
   test('renders InlineLoading component when loading', () => {
-    (useForm as jest.Mock).mockReturnValue({ form: null, isLoading: true, error: null });
-    (useSchema as jest.Mock).mockReturnValue({ schema: null, isLoading: true, error: null });
+    (useForm as jest.Mock).mockReturnValue({ form: null, isLoadingForm: true, formLoadError: null });
+    (useSchema as jest.Mock).mockReturnValue({ schema: null, isLoadingSchema: true, schemaLoadError: null });
 
     const { getByText } = render(<FormRenderer {...defaultProps} />);
     expect(getByText('Loading ...')).toBeInTheDocument();
