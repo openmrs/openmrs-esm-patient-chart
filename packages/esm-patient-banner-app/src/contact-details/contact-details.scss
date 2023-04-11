@@ -14,8 +14,8 @@
 }
 
 .deceased {
-.contactDetails, .heading, .row, .row > .col {
-  color: $ui-02;
+  .contactDetails, .heading, .row, .row > .col {
+    color: $ui-02;
   }
 }
 
@@ -49,5 +49,3 @@
 .relationship div {
   flex: 1 1;
 }
-
-

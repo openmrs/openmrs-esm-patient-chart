@@ -14,7 +14,7 @@ const ConfirmMarkAsDeceasedDialog: React.FC<ConfirmationDialogProps> = ({ closeD
   return (
     <div>
       <ModalHeader closeModal={closeDialog} title={t('confirmDeceased', 'Confirm Deceased')} />
-      <ModalBody>{t('markAsDeceased', 'Are you sure, you want to mark patient as deceased?')}</ModalBody>
+      <ModalBody>{t('markAsDeceased', 'Are you sure you want to mark patient as deceased?')}</ModalBody>
       <ModalFooter>
         <Button kind="secondary" onClick={closeDialog}>
           {t('no', 'No')}

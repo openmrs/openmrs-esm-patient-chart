@@ -62,7 +62,10 @@ const Address: React.FC<{ address?: fhir.Address }> = ({ address }) => {
   );
 };
 
-const Contact: React.FC<{ telecom: Array<fhir.ContactPoint>; patientUuid: string; deceased?: boolean }> = ({ telecom, patientUuid }) => {
+const Contact: React.FC<{ telecom: Array<fhir.ContactPoint>; patientUuid: string; deceased?: boolean }> = ({
+  telecom,
+  patientUuid,
+}) => {
   const { t } = useTranslation();
   const value = telecom?.length ? telecom[0].value : '--';
   const { isLoading, contactAttributes } = usePatientContactAttributes(patientUuid);
