@@ -6,7 +6,7 @@
   "deceased": "Décédé",
   "loading": "En cours de chargement",
   "relationships": "Relations",
-  "showAllDetails": "Afficher tous les détails",
-  "showLess": "Montrer moins",
+  "showDetails": "Afficher les détails",
+  "hideDetails": "Cacher les détails",
   "started": "A commencé"
 }
