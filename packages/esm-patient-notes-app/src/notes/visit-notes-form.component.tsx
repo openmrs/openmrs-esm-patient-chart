@@ -61,6 +61,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
   const [searchSecondaryResults, setSearchSecondaryResults] = useState<null | Array<Concept>>(null);
   const [combinedDiagnoses, setCombinedDiagnoses] = useState<Array<Diagnosis>>([]);
   const [visitDateTime, setVisitDateTime] = useState(new Date());
+  const [rows, setRows] = useState<number>();
 
   const { mutateVisitNotes } = useVisitNotes(patientUuid);
   const locationUuid = session?.sessionLocation?.uuid;
@@ -440,9 +441,15 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
             <TextArea
               id="additionalNote"
               light={isTablet}
+              rows={rows}
               labelText={t('clinicalNoteLabel', 'Write your notes')}
               placeholder={t('clinicalNotePlaceholder', 'Write any notes here')}
-              onChange={(event) => setClinicalNote(event.currentTarget.value)}
+              onChange={(event) => {
+                setClinicalNote(event.currentTarget.value);
+                const textareaLineHeight = 24; // This is the default line height for Carbon's TextArea component
+                const newRows = Math.ceil(event.target.scrollHeight / textareaLineHeight);
+                setRows(newRows);
+              }}
             />
           </Column>
         </Row>
