@@ -2,9 +2,10 @@ import React from 'react';
 import useForm from '../hooks/useForm';
 import useSchema from '../hooks/useSchema';
 import { OHRIForm } from '@openmrs/openmrs-form-engine-lib';
-import { InlineNotification, InlineLoading } from '@carbon/react';
+import { InlineLoading } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import styles from './form-renderer.scss';
+import FormError from './form-error.component';
 
 interface FormRendererProps {
   formUuid: string;
@@ -19,18 +20,7 @@ const FormRenderer: React.FC<FormRendererProps> = ({ formUuid, patientUuid, clos
   const { schema, isLoading: schemaLoading, error: schemaError } = useSchema(valueReferenceUuid);
 
   if (formError || schemaError) {
-    return (
-      <InlineNotification
-        kind="error"
-        lowContrast
-        iconDescription={(error: any) =>
-          error?.response?.data?.error?.message ? error.response.data.error.message : error
-        }
-        title={t('error', 'Error loading form')}
-        subtitle={t('errorLoadingForm', 'An error occurred while loading the form')}
-        onClose={closeWorkspace}
-      />
-    );
+    return <FormError closeWorkspace={closeWorkspace} />;
   }
 
   if (schemaLoading) {

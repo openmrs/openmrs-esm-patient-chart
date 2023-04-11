@@ -20,7 +20,7 @@ interface UseVisitNotes {
 
 export function useVisitNotes(patientUuid: string): UseVisitNotes {
   const {
-    visitNoteConfig: { encounterNoteTextConceptUuid, problemListConceptUuid, visitDiagnosesConceptUuid },
+    visitNoteConfig: { encounterNoteTextConceptUuid, visitDiagnosesConceptUuid },
   } = useConfig();
 
   const customRepresentation =

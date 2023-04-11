@@ -206,7 +206,7 @@ const VisitNotesForm: React.FC<DefaultWorkspaceProps> = ({ closeWorkspace, patie
 
           showToast({
             critical: true,
-            description: t('visitNoteNowVisible', 'It is now visible on the Encounters     page'),
+            description: t('visitNoteNowVisible', 'It is now visible on the Encounters page'),
             kind: 'success',
             title: t('visitNoteSaved', 'Visit note saved'),
           });
