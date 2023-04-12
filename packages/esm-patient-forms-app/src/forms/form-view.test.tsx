@@ -80,6 +80,7 @@ describe('FormView', () => {
       formUuid: '0a9fc16e-4c00-4842-a1e4-e4bafeb6e226',
       mutateForm: undefined,
       encounterUuid: '',
+      visit: mockCurrentVisit,
     });
   });
 });

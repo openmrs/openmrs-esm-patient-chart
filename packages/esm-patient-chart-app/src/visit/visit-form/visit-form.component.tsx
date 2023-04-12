@@ -285,14 +285,12 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
                 id="location"
                 invalidText="Required"
                 value={selectedLocation}
+                defaultValue={selectedLocation}
                 onChange={(event) => setSelectedLocation(event.target.value)}
               >
                 {!selectedLocation ? <SelectItem text={t('selectOption', 'Select an option')} value="" /> : null}
                 {!isEmpty(defaultFacility) && !loadingDefaultFacility ? (
-                  <SelectItem
-                    key={defaultFacility?.uuid}
-                    text={defaultFacility?.display}
-                    value={defaultFacility?.uuid}>
+                  <SelectItem key={defaultFacility?.uuid} text={defaultFacility?.display} value={defaultFacility?.uuid}>
                     {defaultFacility?.display}
                   </SelectItem>
                 ) : locations?.length > 0 ? (

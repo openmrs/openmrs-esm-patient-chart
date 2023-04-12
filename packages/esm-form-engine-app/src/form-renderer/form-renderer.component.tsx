@@ -8,15 +8,17 @@ import useSchema from '../hooks/useSchema';
 import FormError from './form-error.component';
 
 import styles from './form-renderer.scss';
+import { Visit } from '@openmrs/esm-framework';
 
 interface FormRendererProps {
   formUuid: string;
   patientUuid: string;
+  visit?: Visit;
   closeWorkspace: () => void;
   encounterUuid?: string;
 }
 
-const FormRenderer: React.FC<FormRendererProps> = ({ formUuid, patientUuid, closeWorkspace, encounterUuid }) => {
+const FormRenderer: React.FC<FormRendererProps> = ({ formUuid, patientUuid, visit, closeWorkspace, encounterUuid }) => {
   const { t } = useTranslation();
   const { form, formLoadError } = useForm(formUuid);
 
@@ -41,6 +43,7 @@ const FormRenderer: React.FC<FormRendererProps> = ({ formUuid, patientUuid, clos
         <OHRIForm
           encounterUUID={encounterUuid}
           patientUUID={patientUuid}
+          visit={visit}
           formJson={schema}
           handleClose={closeWorkspace}
           onSubmit={() => closeWorkspace()}

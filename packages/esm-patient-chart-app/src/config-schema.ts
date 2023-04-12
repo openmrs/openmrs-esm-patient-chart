@@ -90,7 +90,7 @@ export const esmPatientChartSchema = {
     _type: Type.String,
     _default: '',
     _description: 'Custom URL to load default facility if it is not in the session',
-  }
+  },
 };
 
 export interface ChartConfig {
