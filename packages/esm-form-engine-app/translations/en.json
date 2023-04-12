@@ -4,5 +4,9 @@
   "loading": "Loading",
   "or": "or",
   "thisList": "this list",
-  "tryAgainMessage": "Try opening another form from"
+  "tryAgainMessage": "Try opening another form from",
+  "emptyIcon": "Empty icon",
+  "errorLoadingForm": "An error occurred while loading the form",
+  "errorLoadingFormMessage": "An error occurred while loading the form",
+  "missingJSONSchema": "The specified form is missing JSON schema"
 }

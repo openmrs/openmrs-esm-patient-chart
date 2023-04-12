@@ -34,5 +34,10 @@ export function launchFormEntry(
   mutateForm?: () => void,
 ) {
   formEntrySub.next({ formUuid, encounterUuid });
-  launchPatientWorkspace('patient-form-entry-workspace', { workspaceTitle: formName, mutateForm, formUuid });
+  launchPatientWorkspace('patient-form-entry-workspace', {
+    workspaceTitle: formName,
+    mutateForm,
+    formUuid,
+    encounterUuid,
+  });
 }

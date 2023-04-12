@@ -1,8 +1,9 @@
+@use '@carbon/colors';
 @use '@carbon/styles/scss/spacing';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/styles/scss/type';
 
 .loaderContainer {
-  height: 100vh;   
+  height: 100vh;
 }
 
 .loading {

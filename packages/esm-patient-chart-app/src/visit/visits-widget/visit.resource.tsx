@@ -9,7 +9,6 @@ export function useVisits(patientUuid: string) {
     `/ws/rest/v1/visit?patient=${patientUuid}&v=${customRepresentation}`,
     openmrsFetch,
   );
-
   return {
     visits: data ? data?.data?.results : null,
     isError: error,
