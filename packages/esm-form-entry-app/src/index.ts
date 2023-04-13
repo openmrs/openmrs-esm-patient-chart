@@ -4,7 +4,7 @@ import 'reflect-metadata';
 import { defineConfigSchema, messageOmrsServiceWorker } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 import { setupDynamicOfflineFormDataHandler, setupStaticDataOfflinePrecaching } from './app/offline/caching';
-
+ 
 declare var __VERSION__: string;
 // __VERSION__ is replaced by Webpack with the version from package.json
 const version = __VERSION__; 
