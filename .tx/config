@@ -1,6 +1,5 @@
 [main] 
-host = https://www.transifex.com
- 
+host = https://www.transifex.com 
 
 [openmrs-esm-patient-chart.esm-form-entry-app]
 file_filter = packages/esm-form-entry-app/translations/<lang>.json
