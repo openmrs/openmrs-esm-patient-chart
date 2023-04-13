@@ -50,6 +50,8 @@ import { ChartConfig } from '../../config-schema';
 import VisitAttributeTypeFields from './visit-attribute-type.component';
 import { saveQueueEntry } from '../hooks/useServiceQueue';
 import styles from './visit-form.scss';
+import { useDefaultLoginLocation } from '../hooks/useDefaultLocation';
+import isEmpty from 'lodash-es/isEmpty';
 
 const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace, promptBeforeClosing }) => {
   const { t } = useTranslation();
@@ -78,6 +80,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
   const [selectedLocation, setSelectedLocation] = useState(() => (sessionLocation ? sessionLocation : ''));
   const [visitType, setVisitType] = useState<string | null>(null);
   const visitQueueNumberAttributeUuid = config.visitQueueNumberAttributeUuid;
+  const { defaultFacility, isLoading: loadingDefaultFacility } = useDefaultLoginLocation();
 
   const handleSubmit = useCallback(
     (event) => {
@@ -285,12 +288,20 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
                 onChange={(event) => setSelectedLocation(event.target.value)}
               >
                 {!selectedLocation ? <SelectItem text={t('selectOption', 'Select an option')} value="" /> : null}
-                {locations?.length > 0 &&
+                {!isEmpty(defaultFacility) && !loadingDefaultFacility ? (
+                  <SelectItem
+                    key={defaultFacility?.uuid}
+                    text={defaultFacility?.display}
+                    value={defaultFacility?.uuid}>
+                    {defaultFacility?.display}
+                  </SelectItem>
+                ) : locations?.length > 0 ? (
                   locations.map((location) => (
                     <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
                       {location.display}
                     </SelectItem>
-                  ))}
+                  ))
+                ) : null}
               </Select>
             </div>
           </section>
