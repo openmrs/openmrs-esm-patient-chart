@@ -86,6 +86,11 @@ export const esmPatientChartSchema = {
     _description: 'The UUID of the visit attribute that contains the visit queue number.',
     _default: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
   },
+  defaultFacilityUrl: {
+    _type: Type.String,
+    _default: '',
+    _description: 'Custom URL to load default facility if it is not in the session',
+  }
 };
 
 export interface ChartConfig {
@@ -99,6 +104,7 @@ export interface ChartConfig {
   }>;
   showServiceQueueFields: boolean;
   visitQueueNumberAttributeUuid: string;
+  defaultFacilityUrl: string;
 }
 
 export const configSchema = {
