@@ -1,6 +1,6 @@
 import 'systemjs-webpack-interop/resource-query-public-path?systemjsModuleName=@openmrs/esm-form-entry-app';
 import 'zone.js/dist/zone';
-import 'reflect-metadata';
+import 'reflect-metadata'; 
 import { defineConfigSchema, messageOmrsServiceWorker } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 import { setupDynamicOfflineFormDataHandler, setupStaticDataOfflinePrecaching } from './app/offline/caching';
