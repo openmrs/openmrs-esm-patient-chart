@@ -108,15 +108,6 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
         <div className={`${styles['row-container']} ${isWorkspaceOpen() && styles['workspace-open']}`}>
           <div className={styles.row}>
             <VitalsHeaderItem
-              interpretation={assessValue(
-                latestVitals.temperature,
-                getReferenceRangesForConcept(config.concepts.temperatureUuid, conceptMetadata),
-              )}
-              unitName={t('temperatureAbbreviated', 'Temp')}
-              unitSymbol={(latestVitals?.temperature && conceptUnits.get(config.concepts.temperatureUuid)) ?? ''}
-              value={latestVitals?.temperature ?? '--'}
-            />
-            <VitalsHeaderItem
               interpretation={interpretBloodPressure(
                 latestVitals?.systolic,
                 latestVitals?.diastolic,
@@ -155,6 +146,15 @@ const VitalsHeader: React.FC<VitalsHeaderProps> = ({ patientUuid, showRecordVita
               unitName={t('spo2', 'SpO2')}
               unitSymbol={(latestVitals?.spo2 && conceptUnits.get(config.concepts.oxygenSaturationUuid)) ?? ''}
               value={latestVitals?.spo2 ?? '--'}
+            />
+            <VitalsHeaderItem
+              interpretation={assessValue(
+                latestVitals.temperature,
+                getReferenceRangesForConcept(config.concepts.temperatureUuid, conceptMetadata),
+              )}
+              unitName={t('temperatureAbbreviated', 'Temp')}
+              unitSymbol={(latestVitals?.temperature && conceptUnits.get(config.concepts.temperatureUuid)) ?? ''}
+              value={latestVitals?.temperature ?? '--'}
             />
             <VitalsHeaderItem
               unitName={t('weight', 'Weight')}
