@@ -112,20 +112,6 @@ export interface Order {
   };
 }
 
-export interface Diagnosis {
-  uuid: string;
-  display: string;
-  diagnosis: {
-    coded?: {
-      uuid: string;
-      display?: string;
-    };
-    nonCoded?: string;
-  };
-  certainty: string;
-  rank: number;
-}
-
 export interface FormSchema {
   auditInfo: {
     dateCreated: string;
@@ -284,7 +270,6 @@ export interface Encounter {
   };
   obs: Array<Observation>;
   orders: Array<Order>;
-  diagnoses: Array<Diagnosis>;
 }
 
 /** https://rest.openmrs.org/?shell#create-an-encounter */
@@ -297,7 +282,6 @@ export interface EncounterCreate {
   encounterProviders?: Array<ProviderCreate>;
   obs?: Array<ObsCreate>;
   orders?: Array<OrderCreate>;
-  diagnoses?: Array<DiagnosisCreate>;
   form?: string;
   visit?: string;
 }
@@ -358,18 +342,6 @@ export interface OrderCreate {
   dateActivated?: Date | string;
   dateStopped?: Date | string;
   // TODO: Fill as required.
-}
-
-export interface DiagnosisCreate {
-  uuid?: string;
-  encounter: string;
-  patient: string;
-  diagnosis: {
-    coded?: string;
-    nonCoded?: string;
-  };
-  certainty: 'CONFIRMED' | 'PROVISIONAL';
-  rank: number;
 }
 
 export interface Person {
