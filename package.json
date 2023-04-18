@@ -69,7 +69,8 @@
     "webpack-dev-server": "^4.10.1"
   },
   "resolutions": {
-    "sass": "^1.54.3"
+    "sass": "^1.54.3",
+    "@openmrs/openmrs-form-engine-lib": "portal:/Users/dkibet/openmrs/openmrs-form-engine-lib"
   },
   "packageManager": "yarn@3.2.2"
 }
