@@ -356,6 +356,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
         </section>
 
         <section className={styles.formGroup}>
+          <span>{t('dateTime', 'Date & Time')}</span>
           <fieldset>
             <Toggle
               className={styles.toggleLabel}
@@ -367,7 +368,6 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
           </fieldset>
           {isRecurringAppointment ? (
             <>
-              <span>{t('dateTime', 'Date & Time')}</span>
               <div className={styles.rangeDatePickerControl}>
                 <div className={styles.inLine}>
                   <ResponsiveWrapper isTablet={isTablet}>
@@ -448,7 +448,6 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({
             </>
           ) : (
             <>
-              <span>{t('dateTime', 'Date & Time')}</span>
               <div className={styles.inLine}>
                 <ResponsiveWrapper isTablet={isTablet}>
                   <DatePicker
