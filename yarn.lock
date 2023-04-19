@@ -5385,7 +5385,7 @@ __metadata:
   resolution: "@openmrs/esm-form-engine-app@workspace:packages/esm-form-engine-app"
   dependencies:
     "@carbon/react": ^1.12.0
-    "@openmrs/esm-patient-common-lib": ^4.3.0
+    "@openmrs/esm-patient-common-lib": next
     "@openmrs/openmrs-form-engine-lib": next
     lodash-es: ^4.17.15
     react-error-boundary: ^4.0.3
@@ -5716,6 +5716,21 @@ __metadata:
     single-spa: 5.x
   languageName: unknown
   linkType: soft
+
+"@openmrs/esm-patient-common-lib@npm:next":
+  version: 4.3.1-pre.1375
+  resolution: "@openmrs/esm-patient-common-lib@npm:4.3.1-pre.1375"
+  dependencies:
+    "@carbon/react": ^1.12.0
+    lodash-es: ^4.17.15
+    uuid: ^8.3.2
+  peerDependencies:
+    "@openmrs/esm-framework": 4.x
+    react: 18.x
+    single-spa: 5.x
+  checksum: 9bfa75e572887790bf6041e424cb427e96d1f5ea01def307d93015d049d678e7bad5b30a3fc8f49173b7962df9a932142945daf1b2844341bde25b999a472536
+  languageName: node
+  linkType: hard
 
 "@openmrs/esm-patient-conditions-app@workspace:packages/esm-patient-conditions-app":
   version: 0.0.0-use.local
