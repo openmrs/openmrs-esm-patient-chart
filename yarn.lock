@@ -5965,8 +5965,8 @@ __metadata:
   linkType: hard
 
 "@openmrs/openmrs-form-engine-lib@npm:next":
-  version: 1.0.0-pre.58
-  resolution: "@openmrs/openmrs-form-engine-lib@npm:1.0.0-pre.58"
+  version: 1.0.0-pre.124
+  resolution: "@openmrs/openmrs-form-engine-lib@npm:1.0.0-pre.124"
   dependencies:
     ace-builds: ^1.4.12
     enzyme: ^3.11.0
@@ -5976,6 +5976,7 @@ __metadata:
     lodash-es: ^4.17.15
     moment: ^2.29.1
     react-anchor-link-smooth-scroll: ^1.0.12
+    react-error-boundary: ^4.0.3
     react-markdown: ^7.1.0
     react-scroll: ^1.8.2
     react-test-renderer: ^16.9.0
@@ -5987,10 +5988,9 @@ __metadata:
     "@openmrs/esm-framework": 4.x
     dayjs: ^1.8.16
     react: ^18.2.0
-    react-error-boundary: 4.x
     react-i18next: 11.x
     rxjs: 6.x
-  checksum: f5f4d1980985d6af5a208d7f5ac0ca0a9a0fbd401810d827af5ba64f6de4e460a45a8d3477be216f8a5932828fcda789c073ae26f5d6f033e4d761fa43494afe
+  checksum: d7e7288ebd06339ebb9ea88fc9a7e272a7947eaeb5bae05deb1a5232ed68481346230ebab3099cfc4982177dbdba88834303d7d964349e52b744349bcc788e9e
   languageName: node
   linkType: hard
 
