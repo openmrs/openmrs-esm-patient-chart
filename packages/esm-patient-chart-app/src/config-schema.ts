@@ -91,6 +91,11 @@ export const esmPatientChartSchema = {
     _default: '',
     _description: 'Custom URL to load default facility if it is not in the session',
   },
+  showUpcomingAppointments: {
+    _type: Type.Boolean,
+    _description: 'Whether start visit form should display upcoming appointments',
+    _default: false,
+  },
 };
 
 export interface ChartConfig {
@@ -105,6 +110,7 @@ export interface ChartConfig {
   showServiceQueueFields: boolean;
   visitQueueNumberAttributeUuid: string;
   defaultFacilityUrl: string;
+  showUpcomingAppointments: boolean;
 }
 
 export const configSchema = {
