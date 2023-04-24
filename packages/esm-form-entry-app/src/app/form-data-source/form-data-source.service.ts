@@ -38,6 +38,10 @@ export class FormDataSourceService {
         resolveSelectedValue: this.resolveConcept.bind(this),
         searchOptions: this.findProblem.bind(this),
       },
+      diagnoses: {
+        resolveSelectedValue: this.resolveConcept.bind(this),
+        searchOptions: this.findDiagnoses.bind(this),
+      },
       conceptAnswers: this.getWhoStagingCriteriaDataSource(),
       recentObs: this.getMostRecentObsDataSource(formSchema),
     };
@@ -281,6 +285,19 @@ export class FormDataSourceService {
         ),
       );
   }
+  public findDiagnoses(searchText) {
+    const allowedConceptClasses = ['8d4918b0-c2cc-11de-8d13-0010c6dffd0f'];
+
+    return this.conceptResourceService
+      .searchConcept(searchText)
+      .pipe(
+        map((concepts) =>
+          concepts
+            .filter((concept) => concept.conceptClass && allowedConceptClasses.includes(concept.conceptClass.uuid))
+            .map(this.mapConcept),
+        ),
+      );
+  }
 
   public mapConcept(concept?: Concept) {
     return (
@@ -303,7 +320,21 @@ export class FormDataSourceService {
 
   public getPatientObject(patient): object {
     const model: object = {};
-    model['sex'] = patient?.gender === 'male' ? 'M' : 'F';
+    const gender = patient?.gender;
+    model['sex'] = (gender) => {
+      switch (gender) {
+        case 'male':
+          return 'M';
+        case 'female':
+          return 'F';
+        case 'other':
+          return 'O';
+        case 'unknown':
+          return 'U';
+        default:
+          return 'U';
+      }
+    };
     model['birthdate'] = new Date(patient?.birthDate);
     model['age'] = this.calculateAge(patient?.birthDate);
 

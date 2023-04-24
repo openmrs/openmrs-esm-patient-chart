@@ -26,7 +26,7 @@ const DeceasedPatientBannerTag: React.FC<DeceasedPatientBannerTagProps> = ({ pat
           </div>
         }
       >
-        <Tag type="red">{t('deceased', 'Deceased')}</Tag>
+        <Tag className={styles.tagOverride}>{t('deceased', 'Deceased')}</Tag>
       </DefinitionTooltip>
     )
   );

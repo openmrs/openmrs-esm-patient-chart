@@ -138,7 +138,7 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
             invalid={required && isMissingRequiredAttributes && !visitAttributes[uuid]}
             invalidText={t('fieldRequired', 'This field is required')}
           >
-            <SelectItem text={t('selectAnOption', 'Select an option')} value={null} disabled={required} />
+            <SelectItem text={t('selectAnOption', 'Select an option')} value={null} />
             {answers.map((ans, indx) => (
               <SelectItem key={indx} text={ans.display} value={ans.uuid} />
             ))}

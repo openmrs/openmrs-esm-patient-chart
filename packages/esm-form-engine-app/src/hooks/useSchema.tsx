@@ -1,13 +1,12 @@
 import useSWR from 'swr';
 import { openmrsFetch } from '@openmrs/esm-framework';
-import { OHRIFormSchema } from '@ohri/openmrs-ohri-form-engine-lib';
+import { OHRIFormSchema } from '@openmrs/openmrs-form-engine-lib';
 
 const useSchema = (valueReferenceUuid: string) => {
-  const { data, isLoading, error } = useSWR<{ data: OHRIFormSchema }>(
-    valueReferenceUuid ? `/ws/rest/v1/clobdata/${valueReferenceUuid}` : null,
-    openmrsFetch,
-  );
-  return { schema: data?.data, isLoading, error };
+  const url = `/ws/rest/v1/clobdata/${valueReferenceUuid}`;
+  const { data, isLoading, error } = useSWR<{ data: OHRIFormSchema }>(valueReferenceUuid ? url : null, openmrsFetch);
+
+  return { schema: data?.data, isLoadingSchema: isLoading, schemaLoadError: error };
 };
 
 export default useSchema;

@@ -1,9 +1,14 @@
+@use '@carbon/colors';
 @use '@carbon/styles/scss/spacing';
-@import '~@openmrs/esm-styleguide/src/vars';
+@use '@carbon/styles/scss/type';
+
+.loaderContainer {
+  height: 100vh;
+}
 
 .loading {
-    display: flex;
-    background-color: $openmrs-background-grey;
-    justify-content: center;
-    min-height: spacing.$spacing-09;
-  }
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50%;
+}

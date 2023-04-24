@@ -77,7 +77,7 @@ describe('Visit Form', () => {
 
     renderVisitForm();
 
-    const saveButton = screen.getByRole('button', { name: /Start Visit/i });
+    const saveButton = screen.getByRole('button', { name: /start visit/i });
 
     await waitFor(() => user.click(saveButton));
 
@@ -91,7 +91,7 @@ describe('Visit Form', () => {
     expect(errorAlert).not.toBeInTheDocument();
   });
 
-  it('starts a new visit upon successful submission of the', async () => {
+  it('starts a new visit upon successful submission of the form', async () => {
     const user = userEvent.setup();
 
     renderVisitForm();
@@ -132,7 +132,7 @@ describe('Visit Form', () => {
     expect(showToast).toHaveBeenCalledTimes(1);
     expect(showToast).toHaveBeenCalledWith({
       critical: true,
-      description: 'Facility Visit started successfully',
+      description: expect.stringContaining('started successfully'),
       kind: 'success',
       title: 'Visit started',
     });

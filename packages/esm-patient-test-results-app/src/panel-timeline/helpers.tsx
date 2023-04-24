@@ -21,7 +21,7 @@ export const parseTime: (sortedTimes: Array<string>) => ParsedTimeType = (sorted
   sortedTimes.forEach((datetime) => {
     const parsedDate = parseDate(datetime);
     const year = parsedDate.getFullYear().toString();
-    const date = formatDate(parsedDate, { mode: 'wide', year: false });
+    const date = formatDate(parsedDate, { mode: 'wide', year: false, time: false });
     const time = formatTime(parsedDate);
 
     const yearColumn = yearColumns.find(({ year: innerYear }) => year === innerYear);

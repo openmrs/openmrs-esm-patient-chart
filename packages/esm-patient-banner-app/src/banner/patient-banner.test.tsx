@@ -30,7 +30,7 @@ describe('PatientBanner: ', () => {
     expect(screen.getByText(/100732HE/i)).toBeInTheDocument();
     expect(screen.getByText(/OpenMRS ID/i)).toBeInTheDocument();
     expect(screen.getByText(/Old Identification Number/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /^Show all details$/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /^Show details$/i })).toBeInTheDocument();
   });
 
   it("can toggle between showing or hiding the patient's contact details", async () => {
@@ -39,19 +39,19 @@ describe('PatientBanner: ', () => {
     renderPatientBanner();
 
     const showContactDetailsBtn = screen.getByRole('button', {
-      name: /^Show all details$/i,
+      name: /^Show details$/i,
     });
 
     await waitFor(() => user.click(showContactDetailsBtn));
 
-    const showLessBtn = screen.getByRole('button', {
-      name: /^Show less$/i,
+    const hideDetailsBtn = screen.getByRole('button', {
+      name: /^Hide details$/i,
     });
-    expect(showLessBtn).toBeInTheDocument();
+    expect(hideDetailsBtn).toBeInTheDocument();
     expect(screen.getByText('Address')).toBeInTheDocument();
     expect(screen.getByText(/Contact Details/i)).toBeInTheDocument();
 
-    await waitFor(() => user.click(showLessBtn));
+    await waitFor(() => user.click(hideDetailsBtn));
 
     expect(showContactDetailsBtn).toBeInTheDocument();
   });
@@ -66,21 +66,21 @@ describe('PatientBanner: ', () => {
 
     await waitFor(() => user.click(imgAvatar));
 
-    expect(mockNavigateTo).toHaveBeenCalled();
     expect(mockNavigateTo).toHaveBeenCalledWith(patientBannerSeachPageProps.patientUuid);
+    mockNavigateTo.mockClear();
 
     const showContactDetailsBtn = screen.getByRole('button', {
-      name: /^Show all details$/i,
+      name: /^Show details$/i,
     });
 
     await waitFor(() => user.click(showContactDetailsBtn));
 
     expect(mockNavigateTo).toHaveBeenCalledTimes(1);
 
-    const showLessBtn = screen.getByRole('button', {
-      name: /^Show less$/i,
+    const hideDetailsBtn = screen.getByRole('button', {
+      name: /^Hide details$/i,
     });
-    expect(showLessBtn).toBeInTheDocument();
+    expect(hideDetailsBtn).toBeInTheDocument();
     expect(screen.getByText('Address')).toBeInTheDocument();
     expect(screen.getByText(/Contact Details/i)).toBeInTheDocument();
   });
