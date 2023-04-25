@@ -52,6 +52,7 @@ import { saveQueueEntry } from '../hooks/useServiceQueue';
 import styles from './visit-form.scss';
 import { useDefaultLoginLocation } from '../hooks/useDefaultLocation';
 import isEmpty from 'lodash-es/isEmpty';
+import { AppointmentPayload, saveAppointment } from '../hooks/useUpcomingAppointments';
 
 const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace, promptBeforeClosing }) => {
   const { t } = useTranslation();
@@ -79,6 +80,8 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
   }>(null);
   const [selectedLocation, setSelectedLocation] = useState(() => (sessionLocation ? sessionLocation : ''));
   const [visitType, setVisitType] = useState<string | null>(null);
+  const [upcomingAppointment, setUpcomingAppointment] = useState(null);
+  const upcomingAppointmentState = useMemo(() => ({ patientUuid, setUpcomingAppointment }), [patientUuid]);
   const visitQueueNumberAttributeUuid = config.visitQueueNumberAttributeUuid;
   const { defaultFacility, isLoading: loadingDefaultFacility } = useDefaultLoginLocation();
 
@@ -90,7 +93,6 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
         setIsMissingRequiredAttributes(true);
         return;
       }
-
       if (!visitType) {
         setIsMissingVisitType(true);
         return;
@@ -167,6 +169,39 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
                   },
                 );
               }
+              if (config.showUpcomingAppointments && upcomingAppointment) {
+                const appointmentPayload: AppointmentPayload = {
+                  appointmentKind: upcomingAppointment?.appointmentKind,
+                  serviceUuid: upcomingAppointment?.service.uuid,
+                  startDateTime: upcomingAppointment?.startDateTime,
+                  endDateTime: upcomingAppointment?.endDateTime,
+                  locationUuid: selectedLocation,
+                  patientUuid: patientUuid,
+                  uuid: upcomingAppointment?.uuid,
+                  visitDate: dayjs(visitDate).format(),
+                };
+                saveAppointment(appointmentPayload, abortController).then(
+                  ({ status }) => {
+                    if (status === 201) {
+                      mutate();
+                      showToast({
+                        critical: true,
+                        kind: 'success',
+                        description: t('appointmentUpdate', 'Upcoming appointment updated successfully'),
+                        title: t('appointmentEdited', 'Appointment edited'),
+                      });
+                    }
+                  },
+                  (error) => {
+                    showNotification({
+                      title: t('updateError', 'Error updating upcoming appointment'),
+                      kind: 'error',
+                      critical: true,
+                      description: error?.message,
+                    });
+                  },
+                );
+              }
               mutate();
               closeWorkspace();
 
@@ -194,9 +229,11 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
       closeWorkspace,
       config.visitAttributeTypes,
       config.showServiceQueueFields,
+      config.showUpcomingAppointments,
       visitQueueNumberAttributeUuid,
       mutate,
       patientUuid,
+      upcomingAppointment,
       selectedLocation,
       t,
       timeFormat,
@@ -274,6 +311,11 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
               </ResponsiveWrapper>
             </div>
           </section>
+
+          {/* Upcoming appointments. This get shown when upcoming appointments are configured */}
+          {config.showUpcomingAppointments && (
+            <ExtensionSlot state={upcomingAppointmentState} extensionSlotName="upcoming-appointment-slot" />
+          )}
 
           {/* This field lets the user select a location for the visit. The location is required for the visit to be saved. Defaults to the active session location */}
           <section>

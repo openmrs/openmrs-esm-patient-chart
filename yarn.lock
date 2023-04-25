@@ -5936,8 +5936,8 @@ __metadata:
   linkType: hard
 
 "@openmrs/ngx-formentry@npm:next":
-  version: 3.0.1-pre.156
-  resolution: "@openmrs/ngx-formentry@npm:3.0.1-pre.156"
+  version: 3.0.1-pre.174
+  resolution: "@openmrs/ngx-formentry@npm:3.0.1-pre.174"
   dependencies:
     tslib: ^2.2.0
   peerDependencies:
@@ -5960,13 +5960,13 @@ __metadata:
     shelljs: ^0.7.0
     slick-carousel: ^1.6.0
     tree-model: ^1.0.5
-  checksum: a59cd72678c5812801951e739586abf7a09c7a8dfdb48d88988b73c7bc8207871a738eb178dba0723e34a90b9e3f8b90b4a1bcb06b439cd7aadf4a0d4792fc47
+  checksum: a5c68d7f17e72e241e9996b0a113b43b0fc77521ef950fd6ececeaac86747a2cb253d7b18f60f101374966fd515b53f26a6ce12623899e5c157f338d5dc7aa4a
   languageName: node
   linkType: hard
 
 "@openmrs/openmrs-form-engine-lib@npm:next":
-  version: 1.0.0-pre.58
-  resolution: "@openmrs/openmrs-form-engine-lib@npm:1.0.0-pre.58"
+  version: 1.0.0-pre.145
+  resolution: "@openmrs/openmrs-form-engine-lib@npm:1.0.0-pre.145"
   dependencies:
     ace-builds: ^1.4.12
     enzyme: ^3.11.0
@@ -5976,6 +5976,7 @@ __metadata:
     lodash-es: ^4.17.15
     moment: ^2.29.1
     react-anchor-link-smooth-scroll: ^1.0.12
+    react-error-boundary: ^4.0.3
     react-markdown: ^7.1.0
     react-scroll: ^1.8.2
     react-test-renderer: ^16.9.0
@@ -5987,10 +5988,9 @@ __metadata:
     "@openmrs/esm-framework": 4.x
     dayjs: ^1.8.16
     react: ^18.2.0
-    react-error-boundary: 4.x
     react-i18next: 11.x
     rxjs: 6.x
-  checksum: f5f4d1980985d6af5a208d7f5ac0ca0a9a0fbd401810d827af5ba64f6de4e460a45a8d3477be216f8a5932828fcda789c073ae26f5d6f033e4d761fa43494afe
+  checksum: d73d56918be958865689f49248908186ad49026afda2356eaa9fa2693ba1ff7124f50a618a2b8347d144da8da7e6021242b3048f0d9ca16bb68043cc7c5811c9
   languageName: node
   linkType: hard
 

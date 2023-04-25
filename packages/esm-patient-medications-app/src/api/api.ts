@@ -99,7 +99,7 @@ export function postOrder(body: OrderPost, abortController?: AbortController) {
 
 export function useSystemVisitSetting() {
   const { data, isLoading, error } = useSWRImmutable<FetchResponse<{ value: 'true' | 'false' }>, Error>(
-    `/ws/rest/v1/systemsetting/visit.enabled?v=custom:(value)`,
+    `/ws/rest/v1/systemsetting/visits.enabled?v=custom:(value)`,
     openmrsFetch,
   );
 
