@@ -19,6 +19,7 @@ import {
   Switch,
   TimePicker,
   TimePickerSelect,
+  ComboBox,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { first } from 'rxjs/operators';
@@ -36,6 +37,7 @@ import {
   useVisitTypes,
   useConfig,
   useVisit,
+  Location,
 } from '@openmrs/esm-framework';
 import {
   amPm,
@@ -52,6 +54,7 @@ import { saveQueueEntry } from '../hooks/useServiceQueue';
 import styles from './visit-form.scss';
 import { useDefaultLoginLocation } from '../hooks/useDefaultLocation';
 import isEmpty from 'lodash-es/isEmpty';
+import LocationSelector from './location-selection.component';
 
 const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace, promptBeforeClosing }) => {
   const { t } = useTranslation();
@@ -276,35 +279,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
           </section>
 
           {/* This field lets the user select a location for the visit. The location is required for the visit to be saved. Defaults to the active session location */}
-          <section>
-            <div className={styles.sectionTitle}>{t('visitLocation', 'Visit Location')}</div>
-            <div className={styles.selectContainer}>
-              <Select
-                labelText={t('selectLocation', 'Select a location')}
-                light={isTablet}
-                id="location"
-                invalidText="Required"
-                value={selectedLocation}
-                onChange={(event) => setSelectedLocation(event.target.value)}
-              >
-                {!selectedLocation ? <SelectItem text={t('selectOption', 'Select an option')} value="" /> : null}
-                {!isEmpty(defaultFacility) && !loadingDefaultFacility ? (
-                  <SelectItem
-                    key={defaultFacility?.uuid}
-                    text={defaultFacility?.display}
-                    value={defaultFacility?.uuid}>
-                    {defaultFacility?.display}
-                  </SelectItem>
-                ) : locations?.length > 0 ? (
-                  locations.map((location) => (
-                    <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
-                      {location.display}
-                    </SelectItem>
-                  ))
-                ) : null}
-              </Select>
-            </div>
-          </section>
+          <LocationSelector selectedLocation={selectedLocation} setSelectedLocation={setSelectedLocation} />
 
           {/* Lists available program types. This feature is dependent on the `showRecommendedVisitTypeTab` config being set
           to true. */}
