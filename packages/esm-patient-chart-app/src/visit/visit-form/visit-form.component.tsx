@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useMemo, useEffect } from 'react';
+import React, { useCallback, useState, useMemo } from 'react';
 import dayjs from 'dayjs';
 import {
   Button,
@@ -13,13 +13,11 @@ import {
   RadioButton,
   RadioButtonGroup,
   Row,
-  Select,
   SelectItem,
   Stack,
   Switch,
   TimePicker,
   TimePickerSelect,
-  ComboBox,
 } from '@carbon/react';
 import { useTranslation } from 'react-i18next';
 import { first } from 'rxjs/operators';
@@ -37,7 +35,6 @@ import {
   useVisitTypes,
   useConfig,
   useVisit,
-  Location,
 } from '@openmrs/esm-framework';
 import {
   amPm,
@@ -53,7 +50,6 @@ import VisitAttributeTypeFields from './visit-attribute-type.component';
 import { saveQueueEntry } from '../hooks/useServiceQueue';
 import styles from './visit-form.scss';
 import { useDefaultLoginLocation } from '../hooks/useDefaultLocation';
-import isEmpty from 'lodash-es/isEmpty';
 import LocationSelector from './location-selection.component';
 
 const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace, promptBeforeClosing }) => {
