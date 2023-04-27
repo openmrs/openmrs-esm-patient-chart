@@ -320,21 +320,13 @@ export class FormDataSourceService {
 
   public getPatientObject(patient): object {
     const model: object = {};
-    const gender = patient?.gender;
-    model['sex'] = (gender) => {
-      switch (gender) {
-        case 'male':
-          return 'M';
-        case 'female':
-          return 'F';
-        case 'other':
-          return 'O';
-        case 'unknown':
-          return 'U';
-        default:
-          return 'U';
-      }
+    const genderMap = {
+      male: 'M',
+      female: 'F',
+      other: 'O',
+      unknown: 'U',
     };
+    model['sex'] = genderMap[patient?.gender] || 'U';
     model['birthdate'] = new Date(patient?.birthDate);
     model['age'] = this.calculateAge(patient?.birthDate);
 
