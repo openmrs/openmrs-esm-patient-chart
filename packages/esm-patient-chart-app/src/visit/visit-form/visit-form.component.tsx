@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useMemo } from 'react';
+import React, { useCallback, useState, useMemo, useEffect } from 'react';
 import dayjs from 'dayjs';
 import {
   Button,
@@ -48,7 +48,6 @@ import { ChartConfig } from '../../config-schema';
 import VisitAttributeTypeFields from './visit-attribute-type.component';
 import { saveQueueEntry } from '../hooks/useServiceQueue';
 import styles from './visit-form.scss';
-import { useDefaultLoginLocation } from '../hooks/useDefaultLocation';
 import LocationSelector from './location-selection.component';
 import { AppointmentPayload, saveAppointment } from '../hooks/useUpcomingAppointments';
 import { useLocations } from '../hooks/useLocations';
@@ -82,7 +81,6 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
   const [upcomingAppointment, setUpcomingAppointment] = useState(null);
   const upcomingAppointmentState = useMemo(() => ({ patientUuid, setUpcomingAppointment }), [patientUuid]);
   const visitQueueNumberAttributeUuid = config.visitQueueNumberAttributeUuid;
-  const { defaultFacility, isLoading: loadingDefaultFacility } = useDefaultLoginLocation();
 
   const handleSubmit = useCallback(
     (event) => {
@@ -249,6 +247,14 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
     promptBeforeClosing(() => true);
   };
 
+  useEffect(() => {
+    if (errorFetchingLocations) {
+      setErrorFetchingResources((prev) => ({
+        blockSavingForm: prev?.blockSavingForm || false,
+      }));
+    }
+  }, [errorFetchingLocations]);
+
   return (
     <Form className={styles.form} onChange={handleOnChange} onSubmit={handleSubmit}>
       {errorFetchingResources && (
@@ -258,14 +264,6 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
           className={styles.inlineNotification}
           title={t('partOfFormDidntLoad', 'Part of the form did not load')}
           subtitle={t('refreshToTryAgain', 'Please refresh to try again')}
-        />
-      )}
-      {errorFetchingLocations && (
-        <InlineNotification
-          kind="error"
-          lowContrast
-          className={styles.inlineNotification}
-          title={t('ErrorFetchingLocations', 'Error occurred when fetching locations')}
         />
       )}
       <div>

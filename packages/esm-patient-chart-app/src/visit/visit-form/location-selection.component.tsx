@@ -47,14 +47,6 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({ selectedLocation, s
           itemToString={(loc: Location) => loc?.display}
           onInputChange={(loc) => handleSearch(loc)}
         />
-        {error && (
-          <InlineNotification
-            kind="error"
-            lowContrast
-            className={styles.inlineNotification}
-            title={t('ErrorFetchingLocations', 'Error occurred when fetching locations')}
-          />
-        )}
       </div>
     </section>
   );
