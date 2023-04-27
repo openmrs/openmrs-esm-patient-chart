@@ -25,7 +25,6 @@ import {
   saveVisit,
   showNotification,
   showToast,
-  useLocations,
   useSession,
   ExtensionSlot,
   NewVisitPayload,
@@ -52,12 +51,13 @@ import styles from './visit-form.scss';
 import { useDefaultLoginLocation } from '../hooks/useDefaultLocation';
 import LocationSelector from './location-selection.component';
 import { AppointmentPayload, saveAppointment } from '../hooks/useUpcomingAppointments';
+import { useLocations } from '../hooks/useLocations';
 
 const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace, promptBeforeClosing }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const locations = useLocations();
   const sessionUser = useSession();
+  const { error: errorFetchingLocations } = useLocations();
   const sessionLocation = sessionUser?.sessionLocation?.uuid;
   const config = useConfig() as ChartConfig;
   const [contentSwitcherIndex, setContentSwitcherIndex] = useState(config.showRecommendedVisitTypeTab ? 0 : 1);
@@ -258,6 +258,14 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
           className={styles.inlineNotification}
           title={t('partOfFormDidntLoad', 'Part of the form did not load')}
           subtitle={t('refreshToTryAgain', 'Please refresh to try again')}
+        />
+      )}
+      {errorFetchingLocations && (
+        <InlineNotification
+          kind="error"
+          lowContrast
+          className={styles.inlineNotification}
+          title={t('ErrorFetchingLocations', 'Error occurred when fetching locations')}
         />
       )}
       <div>
