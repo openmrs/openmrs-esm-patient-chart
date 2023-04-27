@@ -1,5 +1,6 @@
 import React from 'react';
 import { Type, useConfig } from '@openmrs/esm-framework';
+import { BrowserRouter } from 'react-router-dom';
 import { DashboardExtension } from '@openmrs/esm-patient-common-lib';
 
 export const genericDashboardConfigSchema = {
@@ -34,5 +35,9 @@ interface GenericDashboardProps {
 
 export default function GenericDashboard({ basePath }: GenericDashboardProps) {
   const config = useConfig() as GenericDashboardConfig;
-  return <DashboardExtension title={config.title} basePath={basePath} />;
+  return (
+    <BrowserRouter>
+      <DashboardExtension title={config.title} basePath={basePath} />
+    </BrowserRouter>
+  );
 }
