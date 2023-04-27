@@ -14,7 +14,8 @@
     "postinstall": "husky install",
     "test": "cross-env TZ=UTC jest --config jest.config.json --verbose false --passWithNoTests",
     "test-watch": "cross-env TZ=UTC jest --watch --config jest.config.json",
-    "coverage": "yarn test --coverage"
+    "coverage": "yarn test --coverage",
+    "ci:bump-form-engine-lib": "yarn up @openmrs/openmrs-form-engine-lib@next"
   },
   "devDependencies": {
     "@openmrs/esm-framework": "next",

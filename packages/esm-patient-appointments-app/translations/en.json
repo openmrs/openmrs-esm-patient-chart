@@ -1,4 +1,5 @@
 {
+  "action": "Action",
   "add": "Add",
   "appointmentCancelError": "Error cancelling appointment",
   "appointmentCancelled": "Appointment cancelled",
@@ -11,6 +12,7 @@
   "appointmentNowVisible": "It is now visible on the Appointments page",
   "appointments": "Appointments",
   "appointmentScheduled": "Appointment scheduled",
+  "appointmentToFulfill": "Select appointment(s) to fulfill",
   "appointmentType": "Appointment type",
   "cancel": "Cancel",
   "cancelAppointment": "Cancel appointment",
@@ -41,5 +43,5 @@
   "time": "Time",
   "today": "Today",
   "type": "Type",
-  "upcoming": "Upcoming"
+  "upcomingAppointments": "Upcoming Appointments"
 }

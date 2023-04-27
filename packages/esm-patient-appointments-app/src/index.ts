@@ -57,6 +57,11 @@ function setupOpenMRS() {
         online: true,
         offline: false,
       },
+      {
+        id: 'upcoming-appointment-widget',
+        slot: 'upcoming-appointment-slot',
+        load: getAsyncLifecycle(() => import('./appointments/upcoming-appointments-card.component'), options),
+      },
     ],
   };
 }
