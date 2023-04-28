@@ -32,7 +32,7 @@ const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal
         (response) => {
           if (response.status === 200) {
             if (queueEntry) {
-              removeQueuedPatient(queueEntry.queueUuid, queueEntry.queueEntryUuid, abortController)
+              removeQueuedPatient(queueEntry.queueUuid, queueEntry.queueEntryUuid, abortController);
             }
             mutate();
             closeModal();

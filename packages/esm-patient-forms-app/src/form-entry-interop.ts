@@ -12,6 +12,16 @@ export function launchFormEntryOrHtmlForms(
   formName?: string,
   mutateForms?: () => void,
 ) {
+  const visitData = {
+    currentVisit: currentVisit || {},
+    formUuid,
+    patient,
+    htmlFormEntryForms,
+    encounterUuid,
+    formName,
+    mutateForms,
+  };
+  localStorage.setItem('visit-form', JSON.stringify(visitData));
   if (currentVisit) {
     const htmlForm = htmlFormEntryForms.find((form) => form.formUuid === formUuid);
     if (isEmpty(htmlForm)) {

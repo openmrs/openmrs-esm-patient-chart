@@ -51,6 +51,7 @@ import styles from './visit-form.scss';
 import LocationSelector from './location-selection.component';
 import { AppointmentPayload, saveAppointment } from '../hooks/useUpcomingAppointments';
 import { useLocations } from '../hooks/useLocations';
+import { launchFormEntryOrHtmlForms } from '../../../../esm-patient-forms-app/src/form-entry-interop';
 
 const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace, promptBeforeClosing }) => {
   const { t } = useTranslation();
@@ -85,6 +86,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
   const handleSubmit = useCallback(
     (event) => {
       event.preventDefault();
+      const getVisitFormData = JSON.parse(localStorage.getItem('visit-form'));
 
       if (config.visitAttributeTypes?.find(({ uuid, required }) => required && !visitAttributes[uuid])) {
         setIsMissingRequiredAttributes(true);
@@ -121,10 +123,10 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
         .pipe(first())
         .subscribe(
           (response) => {
+            getVisitFormData.currentVisit = response.data;
+            localStorage.setItem('visit-form', JSON.stringify(getVisitFormData));
             if (response.status === 201) {
               if (config.showServiceQueueFields) {
-                // retrieve values from queue extension
-
                 const queueLocation = event?.target['queueLocation']?.value;
                 const serviceUuid = event?.target['service']?.value;
                 const priority = event?.target['priority']?.value;
@@ -201,6 +203,17 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
               }
               mutate();
               closeWorkspace();
+              const { currentVisit, formUuid, patient, htmlFormEntryForms, encounterUuid, formName, mutateForms } =
+                getVisitFormData;
+              launchFormEntryOrHtmlForms(
+                currentVisit,
+                formUuid,
+                patient,
+                htmlFormEntryForms,
+                encounterUuid,
+                formName,
+                mutateForms,
+              );
 
               showToast({
                 critical: true,
@@ -210,6 +223,8 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
                 }),
                 title: t('visitStarted', 'Visit started'),
               });
+
+              localStorage.removeItem('visit-form');
             }
           },
           (error) => {
