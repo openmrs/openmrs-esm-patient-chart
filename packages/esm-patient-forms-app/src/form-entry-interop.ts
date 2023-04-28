@@ -13,7 +13,7 @@ export function launchFormEntryOrHtmlForms(
   mutateForms?: () => void,
 ) {
   const visitData = {
-    currentVisit: currentVisit || {},
+    currentVisit: {},
     formUuid,
     patient,
     htmlFormEntryForms,
@@ -21,7 +21,7 @@ export function launchFormEntryOrHtmlForms(
     formName,
     mutateForms,
   };
-  localStorage.setItem('visit-form', JSON.stringify(visitData));
+
   if (currentVisit) {
     const htmlForm = htmlFormEntryForms.find((form) => form.formUuid === formUuid);
     if (isEmpty(htmlForm)) {
@@ -32,6 +32,7 @@ export function launchFormEntryOrHtmlForms(
       });
     }
   } else {
+    localStorage.setItem('visit-form', JSON.stringify(visitData));
     launchStartVisitPrompt();
   }
 }

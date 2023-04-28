@@ -86,7 +86,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
   const handleSubmit = useCallback(
     (event) => {
       event.preventDefault();
-      const getVisitFormData = JSON.parse(localStorage.getItem('visit-form'));
+      const getVisitFormData = JSON.parse(localStorage.getItem('visit-form')) || {};
 
       if (config.visitAttributeTypes?.find(({ uuid, required }) => required && !visitAttributes[uuid])) {
         setIsMissingRequiredAttributes(true);
@@ -205,16 +205,17 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
               closeWorkspace();
               const { currentVisit, formUuid, patient, htmlFormEntryForms, encounterUuid, formName, mutateForms } =
                 getVisitFormData;
-              launchFormEntryOrHtmlForms(
-                currentVisit,
-                formUuid,
-                patient,
-                htmlFormEntryForms,
-                encounterUuid,
-                formName,
-                mutateForms,
-              );
-
+              if (formUuid) {
+                launchFormEntryOrHtmlForms(
+                  currentVisit,
+                  formUuid,
+                  patient,
+                  htmlFormEntryForms,
+                  encounterUuid,
+                  formName,
+                  mutateForms,
+                );
+              }
               showToast({
                 critical: true,
                 kind: 'success',

@@ -26,7 +26,7 @@ const StartVisitOverflowMenuItem: React.FC<StartVisitOverflowMenuItemProps> = ({
           }}
         >
           <span className="cds--overflow-menu-options__option-content">
-            {!startVisitLabel ? <>{t('startVisit', 'Start visit')}</> : startVisitLabel}
+            {startVisitLabel ? <>{t('startVisit', 'Start visit')}</> : startVisitLabel}
           </span>
         </button>
       </li>
