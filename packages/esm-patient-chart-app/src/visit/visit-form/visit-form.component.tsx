@@ -13,7 +13,6 @@ import {
   RadioButton,
   RadioButtonGroup,
   Row,
-  Select,
   SelectItem,
   Stack,
   Switch,
@@ -26,7 +25,6 @@ import {
   saveVisit,
   showNotification,
   showToast,
-  useLocations,
   useSession,
   ExtensionSlot,
   NewVisitPayload,
@@ -50,15 +48,15 @@ import { ChartConfig } from '../../config-schema';
 import VisitAttributeTypeFields from './visit-attribute-type.component';
 import { saveQueueEntry } from '../hooks/useServiceQueue';
 import styles from './visit-form.scss';
-import { useDefaultLoginLocation } from '../hooks/useDefaultLocation';
-import isEmpty from 'lodash-es/isEmpty';
+import LocationSelector from './location-selection.component';
 import { AppointmentPayload, saveAppointment } from '../hooks/useUpcomingAppointments';
+import { useLocations } from '../hooks/useLocations';
 
 const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace, promptBeforeClosing }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const locations = useLocations();
   const sessionUser = useSession();
+  const { error: errorFetchingLocations } = useLocations();
   const sessionLocation = sessionUser?.sessionLocation?.uuid;
   const config = useConfig() as ChartConfig;
   const [contentSwitcherIndex, setContentSwitcherIndex] = useState(config.showRecommendedVisitTypeTab ? 0 : 1);
@@ -83,7 +81,6 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
   const [upcomingAppointment, setUpcomingAppointment] = useState(null);
   const upcomingAppointmentState = useMemo(() => ({ patientUuid, setUpcomingAppointment }), [patientUuid]);
   const visitQueueNumberAttributeUuid = config.visitQueueNumberAttributeUuid;
-  const { defaultFacility, isLoading: loadingDefaultFacility } = useDefaultLoginLocation();
 
   const handleSubmit = useCallback(
     (event) => {
@@ -250,6 +247,14 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
     promptBeforeClosing(() => true);
   };
 
+  useEffect(() => {
+    if (errorFetchingLocations) {
+      setErrorFetchingResources((prev) => ({
+        blockSavingForm: prev?.blockSavingForm || false,
+      }));
+    }
+  }, [errorFetchingLocations]);
+
   return (
     <Form className={styles.form} onChange={handleOnChange} onSubmit={handleSubmit}>
       {errorFetchingResources && (
@@ -318,33 +323,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
           )}
 
           {/* This field lets the user select a location for the visit. The location is required for the visit to be saved. Defaults to the active session location */}
-          <section>
-            <div className={styles.sectionTitle}>{t('visitLocation', 'Visit Location')}</div>
-            <div className={styles.selectContainer}>
-              <Select
-                labelText={t('selectLocation', 'Select a location')}
-                light={isTablet}
-                id="location"
-                invalidText="Required"
-                value={selectedLocation}
-                defaultValue={selectedLocation}
-                onChange={(event) => setSelectedLocation(event.target.value)}
-              >
-                {!selectedLocation ? <SelectItem text={t('selectOption', 'Select an option')} value="" /> : null}
-                {!isEmpty(defaultFacility) && !loadingDefaultFacility ? (
-                  <SelectItem key={defaultFacility?.uuid} text={defaultFacility?.display} value={defaultFacility?.uuid}>
-                    {defaultFacility?.display}
-                  </SelectItem>
-                ) : locations?.length > 0 ? (
-                  locations.map((location) => (
-                    <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
-                      {location.display}
-                    </SelectItem>
-                  ))
-                ) : null}
-              </Select>
-            </div>
-          </section>
+          <LocationSelector selectedLocation={selectedLocation} setSelectedLocation={setSelectedLocation} />
 
           {/* Lists available program types. This feature is dependent on the `showRecommendedVisitTypeTab` config being set
           to true. */}

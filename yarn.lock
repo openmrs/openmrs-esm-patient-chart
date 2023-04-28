@@ -5965,16 +5965,16 @@ __metadata:
   linkType: hard
 
 "@openmrs/openmrs-form-engine-lib@npm:next":
-  version: 1.0.0-pre.145
-  resolution: "@openmrs/openmrs-form-engine-lib@npm:1.0.0-pre.145"
+  version: 1.0.0-pre.187
+  resolution: "@openmrs/openmrs-form-engine-lib@npm:1.0.0-pre.187"
   dependencies:
     ace-builds: ^1.4.12
+    dayjs: 1.x
     enzyme: ^3.11.0
     enzyme-adapter-react-16: ^1.15.6
     formik: ^2.2.6
     jest-coverage-badges: ^1.0.0
     lodash-es: ^4.17.15
-    moment: ^2.29.1
     react-anchor-link-smooth-scroll: ^1.0.12
     react-error-boundary: ^4.0.3
     react-markdown: ^7.1.0
@@ -5986,11 +5986,10 @@ __metadata:
   peerDependencies:
     "@carbon/react": 1.x
     "@openmrs/esm-framework": 4.x
-    dayjs: ^1.8.16
     react: ^18.2.0
     react-i18next: 11.x
     rxjs: 6.x
-  checksum: d73d56918be958865689f49248908186ad49026afda2356eaa9fa2693ba1ff7124f50a618a2b8347d144da8da7e6021242b3048f0d9ca16bb68043cc7c5811c9
+  checksum: 700fdb998a87a8fe2e726b3d581609f0eb641e3897fe523359270ce362eb566b57eb0fc7c40fd0ab1c016d1e9a06d2567a1521f75736e704466b00204e90cf4a
   languageName: node
   linkType: hard
 
@@ -11462,6 +11461,13 @@ __metadata:
   version: 3.0.3
   resolution: "dateformat@npm:3.0.3"
   checksum: ca4911148abb09887bd9bdcd632c399b06f3ecad709a18eb594d289a1031982f441e08e281db77ffebcb2cbcbfa1ac578a7cbfbf8743f41009aa5adc1846ed34
+  languageName: node
+  linkType: hard
+
+"dayjs@npm:1.x":
+  version: 1.11.7
+  resolution: "dayjs@npm:1.11.7"
+  checksum: 5003a7c1dd9ed51385beb658231c3548700b82d3548c0cfbe549d85f2d08e90e972510282b7506941452c58d32136d6362f009c77ca55381a09c704e9f177ebb
   languageName: node
   linkType: hard
 
@@ -19022,7 +19028,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"moment@npm:^2.17.1, moment@npm:^2.29.1":
+"moment@npm:^2.17.1":
   version: 2.29.4
   resolution: "moment@npm:2.29.4"
   checksum: 0ec3f9c2bcba38dc2451b1daed5daded747f17610b92427bebe1d08d48d8b7bdd8d9197500b072d14e326dd0ccf3e326b9e3d07c5895d3d49e39b6803b76e80e

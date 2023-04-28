@@ -31,8 +31,8 @@ jest.mock('@openmrs/esm-framework', () => {
     },
     saveVisit: jest.fn(),
     toOmrsIsoString: jest.fn(),
+    useLocations: jest.fn(),
     toDateObjectStrict: jest.fn(),
-    useLocations: jest.fn().mockImplementation(() => mockLocations),
     useVisitTypes: jest.fn().mockImplementation(() => mockVisitTypes),
     usePagination: jest.fn().mockImplementation(() => ({
       results: mockVisitTypes,
@@ -54,22 +54,51 @@ jest.mock('@openmrs/esm-patient-common-lib', () => {
   };
 });
 
+jest.mock('../hooks/useDefaultLocation', () => {
+  const requireActual = jest.requireActual('../hooks/useDefaultLocation');
+
+  return {
+    ...requireActual,
+    useDefaultLoginLocation: jest.fn(() => ({
+      defaultFacility: null,
+      isLoading: false,
+    })),
+  };
+});
+
+jest.mock('../hooks/useLocations', () => {
+  const requireActual = jest.requireActual('../hooks/useLocations');
+  return {
+    ...requireActual,
+    useLocations: jest.fn(() => ({
+      locations: mockLocations,
+      isLoading: false,
+      error: null,
+    })),
+  };
+});
+
 describe('Visit Form', () => {
-  it('renders the Start Visit form with all the relevant fields and values', () => {
+  it('renders the Start Visit form with all the relevant fields and values', async () => {
     renderVisitForm();
 
     expect(screen.getByRole('textbox', { name: /Date/i })).toBeInTheDocument();
     expect(screen.getByRole('textbox', { name: /Time/i })).toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: /Time/i })).toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: /Select a location/i })).toBeInTheDocument();
-    expect(screen.getByRole('radio', { name: /Outpatient Visit/ })).toBeInTheDocument();
     expect(screen.getByRole('radio', { name: /HIV Return Visit/ })).toBeInTheDocument();
     expect(screen.getByRole('option', { name: /AM/i })).toBeInTheDocument();
     expect(screen.getByRole('option', { name: /PM/i })).toBeInTheDocument();
-    expect(screen.getByRole('option', { name: /Mosoriot/i })).toBeInTheDocument();
-    expect(screen.getByRole('option', { name: /Inpatient Ward/i })).toBeInTheDocument();
+
     expect(screen.getByRole('button', { name: /Start Visit/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Discard/i })).toBeInTheDocument();
+
+    // Testing the location picker
+    const combobox = screen.getByRole('combobox', { name: /Select a location/i });
+    expect(screen.getByText(/Outpatient Visit/i)).toBeInTheDocument();
+    await waitFor(() => userEvent.click(combobox));
+    expect(screen.getByText(/Mosoriot/i)).toBeInTheDocument();
+    expect(screen.getByText(/Inpatient Ward/i)).toBeInTheDocument();
   });
 
   it('renders an error message when a visit type has not been selected', async () => {
@@ -102,9 +131,9 @@ describe('Visit Form', () => {
     await waitFor(() => user.click(screen.getByLabelText(/Outpatient visit/i)));
 
     // Set location
-    const locationOptions = screen.getByRole('combobox', { name: /Select a location/i });
-
-    await waitFor(() => user.selectOptions(locationOptions, 'b1a8b05e-3542-4037-bbd3-998ee9c40574'));
+    const locationPicker = screen.getByRole('combobox', { name: /Select a location/i });
+    await waitFor(() => userEvent.click(locationPicker));
+    await waitFor(() => user.click(screen.getByText('Inpatient Ward')));
 
     mockSaveVisit.mockReturnValueOnce(
       of({
