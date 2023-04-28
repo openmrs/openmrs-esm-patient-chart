@@ -95,7 +95,7 @@ export const esmPatientChartSchema = {
     _type: Type.Boolean,
     _description: 'Whether start visit form should display upcoming appointments',
     _default: false,
-  },
+  }
 };
 
 export interface ChartConfig {
