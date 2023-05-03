@@ -63,7 +63,7 @@ const UploadingStatusComponent: React.FC<UploadingStatusComponentProps> = () => 
       <ModalHeader
         closeModal={closeModal}
         className={styles.productiveHeading03}
-        title={t('addAttachment', 'Add Attachment')}
+        title={t('addAttachment_title', 'Add Attachment')}
       />
       <ModalBody>
         <p className="cds--label-description">

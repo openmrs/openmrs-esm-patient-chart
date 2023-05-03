@@ -126,7 +126,7 @@ const CameraMediaUploadTabs = () => {
 
   return (
     <div className={styles.cameraSection}>
-      <ModalHeader closeModal={closeModal} title={t('addAttachment', 'Add Attachment')} />
+      <ModalHeader closeModal={closeModal} title={t('addAttachment_title', 'Add Attachment')} />
       <ModalBody className={styles.modalBody}>
         <Tabs className={styles.tabs}>
           <TabList aria-label="Attachments-upload-section">

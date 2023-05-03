@@ -71,7 +71,11 @@ const CancelVisitDialog: React.FC<CancelVisitDialogProps> = ({ patientUuid, clos
           {t('cancel', 'Cancel')}
         </Button>
         <Button disabled={submitting} kind="danger" onClick={cancelActiveVisit}>
-          {submitting ? <InlineLoading description={t('loading', 'Loading...')} /> : t('cancelVisit', 'Cancel visit')}
+          {submitting ? (
+            <InlineLoading description={`${t('loading', 'Loading')} ...`} />
+          ) : (
+            t('cancelVisit', 'Cancel visit')
+          )}
         </Button>
       </ModalFooter>
     </div>

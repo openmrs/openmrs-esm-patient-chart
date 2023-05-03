@@ -94,7 +94,10 @@ const AppointmentsBase: React.FC<AppointmentsBaseProps> = ({ patientUuid }) => {
                 <Tile className={styles.tile}>
                   <EmptyDataIllustration />
                   <p className={styles.content}>
-                    {t('noUpcomingAppointments', 'There are no upcoming appointments to display for this patient')}
+                    {t(
+                      'noUpcomingAppointmentsForPatient',
+                      'There are no upcoming appointments to display for this patient',
+                    )}
                   </p>
                 </Tile>
               </Layer>

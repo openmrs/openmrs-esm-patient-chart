@@ -355,7 +355,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
 
           {/* Lists available visit types. The content switcher only gets shown when recommended visit types are enabled */}
           <section>
-            <div className={styles.sectionTitle}>{t('visitType', 'Visit Type')}</div>
+            <div className={styles.sectionTitle}>{t('visitType_title', 'Visit Type')}</div>
 
             {config.showRecommendedVisitTypeTab ? (
               <>

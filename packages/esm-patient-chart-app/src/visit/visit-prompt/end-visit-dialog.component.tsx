@@ -77,7 +77,7 @@ const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal
           {t('cancel', 'Cancel')}
         </Button>
         <Button kind="danger" onClick={endCurrentVisit}>
-          {t('endVisit', 'End Visit')}
+          {t('endVisit_title', 'End Visit')}
         </Button>
       </ModalFooter>
     </div>

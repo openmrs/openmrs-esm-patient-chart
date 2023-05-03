@@ -30,7 +30,7 @@ export default function OrderBasketItemList({
         <Layer>
           <Tile className={isTablet ? `${styles.tabletTile}` : `${styles.desktopTile}`}>
             <div className={isTablet ? styles.tabletHeading : styles.desktopHeading}>
-              <h4>{t('orderBasket', 'Order Basket')}</h4>
+              <h4>{t('orderBasket_title', 'Order Basket')}</h4>
             </div>
             <p className={styles.content}>{t('emptyOrderBasket', 'Your basket is empty')}</p>
             <p className={styles.actionText}>{t('searchForAnOrder', 'Search for an order above')}</p>

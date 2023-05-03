@@ -54,7 +54,7 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
         <TabPanels>
           <TabPanel>
             {isLoading ? (
-              <InlineLoading description={t('loading', 'Loading...')} role="progressbar" />
+              <InlineLoading description={`${t('loading', 'Loading')} ...`} role="progressbar" />
             ) : isError ? (
               <ErrorState headerTitle={t('visits', 'visits')} error={isError} />
             ) : visits?.length ? (
@@ -88,7 +88,7 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
           </TabPanel>
           <TabPanel>
             {isLoading ? (
-              <InlineLoading description={t('loading', 'Loading...')} role="progressbar" />
+              <InlineLoading description={`${t('loading', 'Loading')} ...`} role="progressbar" />
             ) : isError ? (
               <ErrorState headerTitle={t('visits', 'visits')} error={isError} />
             ) : visits?.length ? (
