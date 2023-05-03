@@ -201,18 +201,18 @@ const VisitHeader: React.FC = () => {
             <ExtensionSlot extensionSlotName="visit-header-right-slot" />
             {!hasActiveVisit && (
               <Button className={styles.startVisitButton} onClick={launchStartVisitForm} size="lg">
-                {startVisitLabel ? startVisitLabel : t('startVisit', 'Start a visit')}
+                {startVisitLabel ? startVisitLabel : t('startAVisit', 'Start a visit')}
               </Button>
             )}
             {currentVisit !== null && endVisitLabel && (
               <>
                 <HeaderGlobalAction
                   className={styles.headerGlobalBarButton}
-                  aria-label={endVisitLabel ?? t('endVisit', 'End a visit')}
+                  aria-label={endVisitLabel ?? t('endAVisit', 'End a visit')}
                   onClick={() => openModal(patient?.id)}
                 >
                   <Button as="div" className={styles.startVisitButton}>
-                    {endVisitLabel ? endVisitLabel : <>{t('endVisit', 'End a visit')}</>}
+                    {endVisitLabel ? endVisitLabel : <>{t('endAVisit', 'End a visit')}</>}
                   </Button>
                 </HeaderGlobalAction>
               </>

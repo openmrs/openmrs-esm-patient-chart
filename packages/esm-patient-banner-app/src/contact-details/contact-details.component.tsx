@@ -76,7 +76,7 @@ const Contact: React.FC<{ telecom: Array<fhir.ContactPoint>; patientUuid: string
       <ul>
         <li>{value}</li>
         {isLoading ? (
-          <InlineLoading description={t('loading', 'Loading...')} />
+          <InlineLoading description={`${t('loading', 'Loading')} ...`} />
         ) : (
           contactAttributes?.map(({ attributeType, value, uuid }) => (
             <li key={uuid}>

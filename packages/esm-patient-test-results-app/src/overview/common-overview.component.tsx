@@ -64,7 +64,9 @@ const CommonOverview: React.FC<CommonOverviewProps> = ({
   }, [patientUuid]);
 
   if (!overviewData.length)
-    return <EmptyState headerTitle={t('testResults', 'Test Results')} displayText={t('testResults', 'test results')} />;
+    return (
+      <EmptyState headerTitle={t('testResults_title', 'Test Results')} displayText={t('testResults', 'test results')} />
+    );
 
   return (
     <>
