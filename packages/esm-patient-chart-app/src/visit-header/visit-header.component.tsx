@@ -166,6 +166,9 @@ const VisitHeader: React.FC = () => {
     });
   }, []);
 
+  const isDeceased = Boolean(patient?.deceasedDateTime);
+  const deceased = (!isDeceased && currentVisit) || (!isDeceased && !currentVisit)
+ 
   const render = useCallback(() => {
     if (!showVisitHeader) {
       return null;
@@ -205,7 +208,7 @@ const VisitHeader: React.FC = () => {
           </div>
           <HeaderGlobalBar>
             <ExtensionSlot extensionSlotName="visit-header-right-slot" />
-            {!hasActiveVisit && (
+            {!hasActiveVisit && deceased && (
               <Button className={styles.startVisitButton} onClick={launchStartVisitForm} size="lg">
                 {startVisitLabel ? startVisitLabel : t('startAVisit', 'Start a visit')}
               </Button>
