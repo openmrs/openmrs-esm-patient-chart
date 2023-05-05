@@ -78,9 +78,10 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
     }
   };
 
-  const identifiers = patient?.identifier?.filter(
-    (identifier) => !excludePatientIdentifierCodeTypes?.uuids.includes(identifier.type.coding[0].code),
-  );
+  const identifiers =
+    patient?.identifier?.filter(
+      (identifier) => !excludePatientIdentifierCodeTypes?.uuids.includes(identifier.type.coding[0].code),
+    ) ?? [];
 
   return (
     <div
@@ -133,7 +134,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
           </div>
           <div className={styles.row}>
             <div className={styles.identifiers}>
-              {identifiers.length
+              {identifiers?.length
                 ? identifiers.map(({ value, type }) => (
                     <span key={value} className={styles.identifierTag}>
                       <Tag className={styles.tag} type="gray" title={type.text}>
