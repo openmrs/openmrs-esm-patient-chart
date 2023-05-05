@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { Button, Tag } from '@carbon/react';
 import { ChevronDown, ChevronUp, OverflowMenuVertical } from '@carbon/react/icons';
 import { ExtensionSlot, age, formatDate, parseDate, useConfig } from '@openmrs/esm-framework';
-import { useOmrsRestPatient } from '../hooks/usePatientAttributes';
 import ContactDetails from '../contact-details/contact-details.component';
 import CustomOverflowMenuComponent from '../ui-components/overflow-menu.component';
 import styles from './patient-banner.scss';
@@ -40,8 +39,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
     setShowContactDetails((value) => !value);
   }, []);
 
-  const { person } = useOmrsRestPatient(patientUuid);
-  const isDeceased = Boolean(person?.dead || patient.deceasedDateTime);
+  const isDeceased = Boolean(patient?.deceasedDateTime);
 
   const patientAvatar = (
     <div className={styles.patientAvatar} role="img">
@@ -130,7 +128,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
           </div>
           <div className={styles.demographics}>
             <span>{getGender(patient.gender)}</span> &middot; <span>{age(patient.birthDate)}</span> &middot;{' '}
-            <span>{formatDate(parseDate(patient?.birthDate), { mode: 'wide', time: false })}</span>
+            <span>{formatDate(parseDate(patient.birthDate), { mode: 'wide', time: false })}</span>
           </div>
           <div className={styles.row}>
             <div className={styles.identifiers}>
