@@ -1,14 +1,17 @@
 import React from 'react';
 import { screen, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useConfig, useVisit } from '@openmrs/esm-framework';
+import { useConfig, usePatient, useVisit } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import StartVisitOverflowMenuItem from './start-visit.component';
+import { mockPatient } from '../../../../__mocks__/patient.mock';
 
+const mockUsePatient = usePatient as jest.Mock;
 const mockUseVisit = useVisit as jest.Mock;
 const mockUseConfig = useConfig as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => ({
+  usePatient: jest.fn(),
   useVisit: jest.fn(),
   getGlobalStore: jest.fn(),
   createGlobalStore: jest.fn(),
@@ -30,6 +33,7 @@ describe('StartVisitOverflowMenuItem', () => {
     const user = userEvent.setup();
     mockUseConfig.mockReturnValue({ startVisitLabel: '' });
     mockUseVisit.mockReturnValue({ currentVisit: null });
+    mockUsePatient.mockReturnValue({ patient: mockPatient });
 
     render(<StartVisitOverflowMenuItem patientUuid="some-patient-uuid" />);
 
@@ -40,5 +44,16 @@ describe('StartVisitOverflowMenuItem', () => {
 
     expect(launchPatientWorkspace).toHaveBeenCalledTimes(1);
     expect(launchPatientWorkspace).toHaveBeenCalledWith('start-visit-workspace-form');
+  });
+
+  it('should not show start visit button for deceased patient', () => {
+    mockUseConfig.mockReturnValue({ startVisitLabel: '' });
+    mockUseVisit.mockReturnValue({ currentVisit: null });
+    mockUsePatient.mockReturnValue({ patient: { ...mockPatient, deceasedDateTime: '2023-05-07T10:20:30Z' } });
+
+    render(<StartVisitOverflowMenuItem patientUuid="some-patient-uuid" />);
+
+    const startVisitButton = screen.queryByRole('menuitem', { name: /Start visit/ });
+    expect(startVisitButton).not.toBeInTheDocument();
   });
 });

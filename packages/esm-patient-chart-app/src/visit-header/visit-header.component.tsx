@@ -167,7 +167,7 @@ const VisitHeader: React.FC = () => {
   }, []);
 
   const isDeceased = Boolean(patient?.deceasedDateTime);
-  const deceased = (!isDeceased && currentVisit) || (!isDeceased && !currentVisit)
+  const deceased = (!isDeceased && currentVisit) || (!isDeceased && !currentVisit);
  
   const render = useCallback(() => {
     if (!showVisitHeader) {
