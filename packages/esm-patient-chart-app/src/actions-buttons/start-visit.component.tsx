@@ -13,12 +13,12 @@ const StartVisitOverflowMenuItem: React.FC<StartVisitOverflowMenuItemProps> = ({
   const { patient } = usePatient(patientUuid);
   const handleClick = React.useCallback(() => launchPatientWorkspace('start-visit-workspace-form'), []);
   const { startVisitLabel } = useConfig();
-  
-  const isDeceased = Boolean(patient?.deceasedDateTime);
-  const deceased = (!isDeceased && currentVisit);
 
+  const isDeceased = Boolean(patient?.deceasedDateTime);
+ 
   return (
-    deceased && (
+    !currentVisit &&
+    !isDeceased && (
       <li className="cds--overflow-menu-options__option">
         <button
           className="cds--overflow-menu-options__btn"
