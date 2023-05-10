@@ -33,7 +33,7 @@ const UpcomingAppointmentsCard: React.FC<UpcomingAppointmentsProps> = ({ patient
     isValidating,
   } = useAppointments(patientUuid, startDate, new AbortController());
   const appointments = appointmentsData?.todaysAppointments.concat(appointmentsData?.upcomingAppointments);
-  const upcomingAppointment = appointments?.filter(({ visitDate }) => visitDate === null);
+  const upcomingAppointment = appointments?.filter(({ dateHonored }) => dateHonored === null);
   if (isError) {
     return <ErrorState headerTitle={headerTitle} error={isError} />;
   }
