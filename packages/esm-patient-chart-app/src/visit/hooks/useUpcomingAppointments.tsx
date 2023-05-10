@@ -14,7 +14,7 @@ export interface AppointmentPayload {
   appointmentNumber?: string;
   uuid?: string;
   providerUuid?: string | OpenmrsResource;
-  visitDate?: string;
+  dateHonored?: string;
 }
 
 export function saveAppointment(appointment: AppointmentPayload, abortController: AbortController) {

@@ -17,7 +17,7 @@ export interface Appointment {
   service: AppointmentService;
   startDateTime: number | any;
   status: string;
-  visitDate: Date | number;
+  dateHonored: Date | number;
   uuid: string;
 }
 

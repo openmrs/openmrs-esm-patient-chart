@@ -175,7 +175,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
                   locationUuid: selectedLocation,
                   patientUuid: patientUuid,
                   uuid: upcomingAppointment?.uuid,
-                  visitDate: dayjs(visitDate).format(),
+                  dateHonored: dayjs(visitDate).format(),
                 };
                 saveAppointment(appointmentPayload, abortController).then(
                   ({ status }) => {
