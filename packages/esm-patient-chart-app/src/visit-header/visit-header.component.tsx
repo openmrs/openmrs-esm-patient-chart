@@ -250,6 +250,7 @@ const VisitHeader: React.FC = () => {
     endVisitLabel,
     openModal,
     currentVisit,
+    logo,
   ]);
 
   return <HeaderContainer render={render} />;

@@ -131,6 +131,7 @@ export interface ChartConfig {
   logo: {
     src: string;
     alt: string;
+    name: string;
   };
 }
 
