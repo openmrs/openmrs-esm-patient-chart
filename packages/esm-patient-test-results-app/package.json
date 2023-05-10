@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-test-results-app",
-  "version": "4.4.0",
+  "version": "4.5.0",
   "license": "MPL-2.0",
   "description": "Patient test results microfrontend for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-patient-test-results-app.js",
