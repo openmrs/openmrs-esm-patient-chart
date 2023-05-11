@@ -260,7 +260,15 @@ export interface Concept {
   display: string;
 }
 
+export interface Visit {
+  display?: string,
+  startDatetime: string,
+  stopDatetime?: string,
+  uuid: string,
+}
+
 export interface Encounter {
+  visit: Visit;
   uuid: string;
   encounterDatetime: string;
   encounterProviders: Array<{

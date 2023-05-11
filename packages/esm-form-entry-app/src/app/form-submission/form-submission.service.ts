@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { forkJoin, Observable, of, from } from 'rxjs';
-import { catchError, mergeMap } from 'rxjs/operators';
+import { catchError, flatMap, map, mapTo, mergeMap, switchMap, take } from 'rxjs/operators';
 import { EncounterAdapter, PersonAttribuAdapter, Form } from '@openmrs/ngx-formentry';
 import { NodeBase } from '@openmrs/ngx-formentry/form-entry/form-factory/form-node';
 import { EncounterResourceService } from '../openmrs-api/encounter-resource.service';
@@ -19,6 +19,7 @@ import cloneDeep from 'lodash-es/cloneDeep';
 import { mutateEncounterCreateToPartialEncounter } from '../offline/syncItemMutation';
 import { SingleSpaPropsService } from '../single-spa-props/single-spa-props.service';
 import { v4 } from 'uuid';
+import { VisitResourceService } from '../openmrs-api/visit-resource.service';
 
 /**
  * The result of submitting a form via the {@link FormSubmissionService.submitPayload} function.
@@ -36,6 +37,7 @@ export class FormSubmissionService {
     private readonly personResourceService: PersonResourceService,
     private readonly formDataSourceService: FormDataSourceService,
     private readonly singleSpaPropsService: SingleSpaPropsService,
+    private readonly visitResourceService: VisitResourceService,
   ) {}
 
   public submitPayload(form: Form): Observable<FormSubmissionResult> {
@@ -115,12 +117,8 @@ export class FormSubmissionService {
     });
   }
 
-  private submitEncounter(encounterCreate: EncounterCreate): Observable<Encounter | undefined> {
-    if (!encounterCreate) {
-      return of(undefined);
-    }
-
-    if (encounterCreate.uuid) {
+  private updateOrSaveEncounter(encounterCreate: any, existingEncounter?: any): Observable<any> {
+    if (existingEncounter) {
       return this.encounterResourceService
         .updateEncounter(encounterCreate.uuid, encounterCreate)
         .pipe(catchError((res) => this.throwUserFriendlyError(res)));
@@ -128,6 +126,47 @@ export class FormSubmissionService {
       return this.encounterResourceService
         .saveEncounter(encounterCreate)
         .pipe(catchError((res) => this.throwUserFriendlyError(res)));
+    }
+  }
+
+  private confirmVisitDateAdjustment() {
+    return confirm(
+      'The encounter date falls outside the designated visit date range. Would you like to modify the visit date to accommodate the new encounter date?',
+    );
+  }
+
+  private submitEncounter(encounterCreate: EncounterCreate): Observable<any | undefined> {
+    if (!encounterCreate) {
+      return of(undefined);
+    }
+
+    if (encounterCreate.uuid) {
+      return this.encounterResourceService.getEncounterByUuid(encounterCreate.uuid).pipe(
+        take(1),
+        mergeMap((encounter) => {
+          if (
+            new Date(encounterCreate.encounterDatetime) < new Date(encounter.visit.startDatetime) &&
+            this.confirmVisitDateAdjustment()
+          ) {
+            encounter.visit.startDatetime = encounterCreate.encounterDatetime;
+            return this.visitResourceService.updateVisit(encounter.visit.uuid, encounter.visit).pipe(mapTo(encounter));
+          } else if (
+            encounter.visit.stopDatetime &&
+            new Date(encounterCreate.encounterDatetime) > new Date(encounter.visit.stopDatetime) &&
+            this.confirmVisitDateAdjustment()
+          ) {
+            encounter.visit.stopDatetime = encounterCreate.encounterDatetime;
+            return this.visitResourceService.updateVisit(encounter.visit.uuid, encounter.visit).pipe(mapTo(encounter));
+          } else {
+            return of(encounter);
+          }
+        }),
+        mergeMap((encounter) => {
+          return this.updateOrSaveEncounter(encounterCreate, encounter);
+        }),
+      );
+    } else {
+      return this.updateOrSaveEncounter(encounterCreate);
     }
   }
 
