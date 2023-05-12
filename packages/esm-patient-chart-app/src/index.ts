@@ -34,16 +34,16 @@ function setupOpenMRS() {
   registerBreadcrumbs([
     {
       path: spaBasePath,
-      title: () => t('patientBreadcrumb', 'Patient'),
+      title: () => Promise.resolve(t('patientBreadcrumb', 'Patient')),
       parent: `${window.spaBase}/home`,
     },
     {
       path: `${spaBasePath}/:view`,
-      title: ([_, key]) => t(`${decodeURIComponent(key)}Dashboard`, `${decodeURIComponent(key)} dashboard`),
+      title: ([_, key]) => Promise.resolve(t(`${decodeURIComponent(key)}Dashboard`, `${decodeURIComponent(key)} dashboard`)),
       parent: spaBasePath,
     },
   ]);
-
+  
   return {
     pages: [
       {
