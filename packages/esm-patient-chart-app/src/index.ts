@@ -6,6 +6,7 @@ import {
   defineExtensionConfigSchema,
 } from '@openmrs/esm-framework';
 import { createDashboardLink } from '@openmrs/esm-patient-common-lib';
+import i18next from 'i18next';
 import { esmPatientChartSchema } from './config-schema';
 import { moduleName, spaBasePath } from './constants';
 import { summaryDashboardMeta, encountersDashboardMeta } from './dashboard.meta';
@@ -29,15 +30,16 @@ function setupOpenMRS() {
   defineExtensionConfigSchema('nav-group', genericNavGroupConfigSchema);
   defineExtensionConfigSchema('dashboard', genericDashboardConfigSchema);
 
+  const t = i18next.getFixedT(null, moduleName);
   registerBreadcrumbs([
     {
       path: spaBasePath,
-      title: 'Patient',
+      title: () => t('patientBreadcrumb', 'Patient'),
       parent: `${window.spaBase}/home`,
     },
     {
       path: `${spaBasePath}/:view`,
-      title: ([_, key]) => `${decodeURIComponent(key)} dashboard`,
+      title: ([_, key]) => t(`${decodeURIComponent(key)}Dashboard`, `${decodeURIComponent(key)} dashboard`),
       parent: spaBasePath,
     },
   ]);
