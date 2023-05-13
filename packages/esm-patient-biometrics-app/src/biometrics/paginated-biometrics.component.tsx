@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   DataTable,
   DataTableRow,
@@ -14,6 +14,7 @@ import { usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { PatientBiometrics } from './biometrics.resource';
 import styles from './biometrics-overview.scss';
+import { orderBy } from 'lodash-es';
 
 interface PaginatedBiometricsProps {
   tableRows: Array<DataTableRow>;
@@ -30,11 +31,39 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
   urlLabel,
   tableHeaders,
 }) => {
-  const { results: paginatedBiometrics, goTo, currentPage } = usePagination(tableRows, pageSize);
+  const [sortParams, setSortParams] = useState({ key: '', order: 'none' });
+
+  const sortDate = (myArray, order) =>
+    order === 'ASC'
+      ? orderBy(myArray, [(obj) => new Date(obj.encounterDate).getTime()], ['desc'])
+      : orderBy(myArray, [(obj) => new Date(obj.encounterDate).getTime()], ['asc']);
+
+  const { key, order } = sortParams;
+
+  const sortedData =
+    key === 'encounterDate'
+      ? sortDate(tableRows, order)
+      : order === 'DESC'
+      ? orderBy(tableRows, [key], ['desc'])
+      : orderBy(tableRows, [key], ['asc']);
+
+  function customSortRow(noteA, noteB, { sortDirection, sortStates, ...props }) {
+    const { key } = props;
+    setSortParams({ key, order: sortDirection });
+  }
+
+  const { results: paginatedBiometrics, goTo, currentPage } = usePagination(sortedData, pageSize);
 
   return (
     <div>
-      <DataTable rows={paginatedBiometrics} headers={tableHeaders} isSortable size="sm" useZebraStyles>
+      <DataTable
+        rows={paginatedBiometrics}
+        sortRow={customSortRow}
+        headers={tableHeaders}
+        isSortable
+        size="sm"
+        useZebraStyles
+      >
         {({ rows, headers, getHeaderProps, getTableProps }) => (
           <TableContainer>
             <Table {...getTableProps()}>
