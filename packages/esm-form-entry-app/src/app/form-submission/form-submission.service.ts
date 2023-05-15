@@ -140,29 +140,31 @@ export class FormSubmissionService {
       return of(undefined);
     }
 
+    const visitUuid = this.singleSpaPropsService.getPropOrThrow('visitUuid');
+
     if (encounterCreate.uuid) {
-      return this.encounterResourceService.getEncounterByUuid(encounterCreate.uuid).pipe(
+      return this.visitResourceService.getVisitByUuid(visitUuid).pipe(
         take(1),
-        mergeMap((encounter) => {
+        mergeMap((visit) => {
           if (
-            new Date(encounterCreate.encounterDatetime) < new Date(encounter.visit.startDatetime) &&
+            new Date(encounterCreate.encounterDatetime) < new Date(visit.startDatetime) &&
             this.confirmVisitDateAdjustment()
           ) {
-            encounter.visit.startDatetime = encounterCreate.encounterDatetime;
-            return this.visitResourceService.updateVisit(encounter.visit.uuid, encounter.visit).pipe(mapTo(encounter));
+            visit.startDatetime = encounterCreate.encounterDatetime;
+            return this.visitResourceService.updateVisit(visit.uuid, visit).pipe(mapTo(encounterCreate));
           } else if (
-            encounter.visit.stopDatetime &&
-            new Date(encounterCreate.encounterDatetime) > new Date(encounter.visit.stopDatetime) &&
+            visit.stopDatetime &&
+            new Date(encounterCreate.encounterDatetime) > new Date(visit.stopDatetime) &&
             this.confirmVisitDateAdjustment()
           ) {
-            encounter.visit.stopDatetime = encounterCreate.encounterDatetime;
-            return this.visitResourceService.updateVisit(encounter.visit.uuid, encounter.visit).pipe(mapTo(encounter));
+            visit.stopDatetime = encounterCreate.encounterDatetime;
+            return this.visitResourceService.updateVisit(visit.uuid, visit).pipe(mapTo(encounterCreate));
           } else {
-            return of(encounter);
+            return of(encounterCreate);
           }
         }),
         mergeMap((encounter) => {
-          return this.updateOrSaveEncounter(encounterCreate, encounter);
+          return this.updateOrSaveEncounter(encounterCreate, encounterCreate);
         }),
       );
     } else {
