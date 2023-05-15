@@ -1,5 +1,6 @@
 {
   "activeFormWarning": "There is an active form open in the workspace",
+  "activeMedications": "Active Medications",
   "addAPastVisit": "Add a past visit",
   "addPastVisit": "Add past visit",
   "addPastVisitText": "You can add a new past visit or update an old one. Choose from one of the options below to continue.",
@@ -16,6 +17,7 @@
   "causeOfDeath_title": "Cause of Death",
   "checkFilters": "Check the filters above",
   "close": "Close",
+  "Conditions": "Conditions",
   "confirm": "Confirm",
   "confirmDeceased": "Confirm Deceased",
   "confirmMarkAsAlive": "Are you sure, you want to mark patient as alive?",
@@ -89,6 +91,7 @@
   "partOfFormDidntLoad": "Part of the form did not load",
   "pastVisitErrorText": "Past Visit Error",
   "pastVisits": "Past Visits",
+  "patientSumary": "Patient Summary",
   "program": "Program",
   "provider": "Provider",
   "quantity": "Quantity",
@@ -117,6 +120,7 @@
   "startVisitError": "Error starting current visit",
   "successfullyDeleted": "successfully deleted",
   "tests": "Tests",
+  "testResults": "Test Results",
   "time": "Time",
   "type": "Type",
   "unknown": "Unknown",
@@ -133,6 +137,8 @@
   "visitSummaries": "Visit summaries",
   "visitType": "Visit type",
   "visitType_title": "Visit Type",
+  "vitals": "Vitals",
+  "biometrics": "Biometrics",
   "workspaceModalText": "Launching a new form in the workspace could cause you to lose unsaved work on the {formName} form.",
   "yes": "Yes"
 }

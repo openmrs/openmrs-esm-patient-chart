@@ -1,6 +1,7 @@
 {
   "actions": "Actions",
   "activeFormWarning": "Il y a un formulaire actif ouvert dans l'espace de travail",
+  "activeMedications": "Médicaments actifs",
   "addPastVisit": "Ajouter une visite passée",
   "addPastVisitText": "Vous pouvez ajouter une nouvelle visite passée ou mettre à jour une ancienne. Choisissez parmi l'une des options ci-dessous pour continuer.",
   "address": "Adresse",
@@ -16,6 +17,7 @@
   "chooseService": "Sélectionnez un service",
   "chooseStatus": "Sélectionnez un statut",
   "close": "Fermer",
+  "Conditions": "Conditions",
   "configurePriorities": "Veuillez configurer les priorités pour continuer.",
   "configureServices": "Veuillez configurer les services pour continuer.",
   "configureStatuses": "Veuillez configurer les statuts pour continuer.",
@@ -85,7 +87,7 @@
   "other": "Autre",
   "pastVisitErrorText": "Erreur de visite passée",
   "pastVisits": "Visites passées",
-  "patient summary":"résumé du patient",
+  "patientSummary":"résumé du patient",
   "priority": "Priorité",
   "program": "Programme",
   "provider": "Fournisseur",
@@ -133,6 +135,8 @@
   "visitStartedSuccessfully": "",
   "visitSummaries": "Résumés de la visite",
   "visitType": "Type de visite",
+  "vitals": "signes vitaux",
+  "biometrics": "biométrie",
   "workspaceModalText": "Le lancement d'un nouveau formulaire dans l'espace de travail pourrait vous faire perdre du travail non sauvegardé sur le formulaire {FormName}.",
   "yes": "Oui"
 }
