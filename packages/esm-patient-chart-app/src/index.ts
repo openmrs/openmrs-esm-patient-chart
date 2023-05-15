@@ -38,7 +38,7 @@ function setupOpenMRS() {
     {
       path: `${spaBasePath}/:view`,
       title: ([_, key]) =>
-        Promise.resolve(window.i18next.t(`${decodeURIComponent(key)} Dashboard`, { ns: moduleName })),
+        Promise.resolve(window.i18next.t(`${decodeURIComponent(key)} Dashboard`, { ns: moduleName, defaultValue: 'Default Value' })),
       parent: spaBasePath,
     },
   ]);
