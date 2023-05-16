@@ -117,8 +117,8 @@ export class FormSubmissionService {
     });
   }
 
-  private updateOrSaveEncounter(encounterCreate: any, existingEncounter?: any): Observable<any> {
-    if (existingEncounter) {
+  private updateOrSaveEncounter(encounterCreate: EncounterCreate): Observable<Encounter | undefined> {
+    if (encounterCreate.uuid) {
       return this.encounterResourceService
         .updateEncounter(encounterCreate.uuid, encounterCreate)
         .pipe(catchError((res) => this.throwUserFriendlyError(res)));
@@ -130,12 +130,13 @@ export class FormSubmissionService {
   }
 
   private confirmVisitDateAdjustment() {
+    // TODO: Add translations once ngx-translate is in place
     return confirm(
       'The encounter date falls outside the designated visit date range. Would you like to modify the visit date to accommodate the new encounter date?',
     );
   }
 
-  private submitEncounter(encounterCreate: EncounterCreate): Observable<any | undefined> {
+  private submitEncounter(encounterCreate: EncounterCreate): Observable<Encounter | undefined> {
     if (!encounterCreate) {
       return of(undefined);
     }
@@ -143,7 +144,7 @@ export class FormSubmissionService {
     const visitUuid = this.singleSpaPropsService.getPropOrThrow('visitUuid');
 
     if (encounterCreate.uuid) {
-      return this.visitResourceService.getVisitByUuid(visitUuid).pipe(
+      return this.visitResourceService.getVisitStartStopTime(visitUuid).pipe(
         take(1),
         mergeMap((visit) => {
           if (
@@ -164,7 +165,7 @@ export class FormSubmissionService {
           }
         }),
         mergeMap((encounter) => {
-          return this.updateOrSaveEncounter(encounterCreate, encounterCreate);
+          return this.updateOrSaveEncounter(encounterCreate);
         }),
       );
     } else {

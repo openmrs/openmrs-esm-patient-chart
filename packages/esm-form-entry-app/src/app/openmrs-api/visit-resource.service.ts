@@ -3,7 +3,7 @@ import { HttpParams, HttpClient, HttpHeaders } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 import { WindowRef } from '../window-ref';
-import { Encounter, Person, PersonUpdate } from '../types';
+import {Encounter, Person, PersonUpdate, Visit} from '../types';
 
 @Injectable()
 export class VisitResourceService {
@@ -15,12 +15,12 @@ export class VisitResourceService {
     return this.windowRef.openmrsRestBase + 'visit';
   }
 
-  public getVisitByUuid(uuid: string, v: string = null): Observable<any> {
+  public getVisitStartStopTime(uuid: string, v: string = null): Observable<any> {
     let url = this.getUrl();
-    url += '/' + uuid;
+    url += '/' + uuid + '?v=custom:(uuid,startDatetime,stopDatetime)&includeInactive=false';
 
     const params: HttpParams = new HttpParams().set('v', v && v.length > 0 ? v : this.v);
-    return this.http.get<Person>(url, { params });
+    return this.http.get<Visit>(url, { params });
   }
 
   public updateVisit(uuid: string, payload: any): Observable<any> {
@@ -31,6 +31,6 @@ export class VisitResourceService {
     let url = this.getUrl();
     url += '/' + uuid;
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.post<Encounter>(url, JSON.stringify(payload), { headers });
+    return this.http.post<Visit>(url, JSON.stringify(payload), { headers });
   }
 }
