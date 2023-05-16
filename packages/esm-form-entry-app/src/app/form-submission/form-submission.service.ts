@@ -142,37 +142,30 @@ export class FormSubmissionService {
     }
 
     const visitUuid = this.singleSpaPropsService.getPropOrThrow('visitUuid');
-    const visitStartDatetime = this.singleSpaPropsService.getPropOrThrow('visitStartDatetime');
+    const visitStartDatetime = this.singleSpaPropsService.getProp('visitStartDatetime');
     const visitStopDatetime = this.singleSpaPropsService.getProp('visitStopDatetime');
 
     if (encounterCreate.uuid) {
-      return this.visitResourceService.getVisitStartStopTime(visitUuid).pipe(
-        take(1),
-        mergeMap((visit) => {
-          if (
-            new Date(encounterCreate.encounterDatetime) < new Date(visit.startDatetime) &&
-            this.confirmVisitDateAdjustment()
-          ) {
-            visit.startDatetime = encounterCreate.encounterDatetime;
-            return this.visitResourceService.updateVisit(visit.uuid, visit).pipe(mapTo(encounterCreate));
-          } else if (
-            visit.stopDatetime &&
-            new Date(encounterCreate.encounterDatetime) > new Date(visit.stopDatetime) &&
-            this.confirmVisitDateAdjustment()
-          ) {
-            visit.stopDatetime = encounterCreate.encounterDatetime;
-            return this.visitResourceService.updateVisit(visit.uuid, visit).pipe(mapTo(encounterCreate));
-          } else {
-            return of(encounterCreate);
-          }
-        }),
-        mergeMap((encounter) => {
-          return this.updateOrSaveEncounter(encounterCreate);
-        }),
-      );
-    } else {
-      return this.updateOrSaveEncounter(encounterCreate);
+      if (
+        visitStartDatetime &&
+        new Date(encounterCreate.encounterDatetime) < new Date(visitStartDatetime) &&
+        this.confirmVisitDateAdjustment()
+      ) {
+        return this.visitResourceService
+          .updateVisitDates(visitUuid, encounterCreate.encounterDatetime, visitStopDatetime)
+          .pipe(switchMap(() => this.updateOrSaveEncounter(encounterCreate)));
+      } else if (
+        visitStopDatetime &&
+        new Date(encounterCreate.encounterDatetime) > new Date(visitStopDatetime) &&
+        this.confirmVisitDateAdjustment()
+      ) {
+        return this.visitResourceService
+          .updateVisitDates(visitUuid, visitStartDatetime, encounterCreate.encounterDatetime)
+          .pipe(switchMap(() => this.updateOrSaveEncounter(encounterCreate)));
+      }
     }
+
+    return this.updateOrSaveEncounter(encounterCreate);
   }
 
   private submitPersonUpdate(personUpdate: PersonUpdate): Observable<Person | undefined> {

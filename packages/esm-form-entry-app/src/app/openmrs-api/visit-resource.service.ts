@@ -3,7 +3,7 @@ import { HttpParams, HttpClient, HttpHeaders } from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 import { WindowRef } from '../window-ref';
-import {Encounter, Person, PersonUpdate, Visit} from '../types';
+import { Visit } from '../types';
 
 @Injectable()
 export class VisitResourceService {
@@ -42,6 +42,10 @@ export class VisitResourceService {
     let url = this.getUrl();
     url += '/' + uuid;
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.post<Visit>(url, JSON.stringify({"uuid":uuid,"startDatetime":startDatetime,"stopDatetime":stopDatetime}), { headers });
+    return this.http.post<Visit>(
+      url,
+      JSON.stringify({ uuid: uuid, startDatetime: startDatetime, stopDatetime: stopDatetime }),
+      { headers },
+    );
   }
 }
