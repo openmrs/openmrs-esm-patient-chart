@@ -33,4 +33,15 @@ export class VisitResourceService {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     return this.http.post<Visit>(url, JSON.stringify(payload), { headers });
   }
+
+  public updateVisitDates(uuid: string, startDatetime: string, stopDatetime: string): Observable<any> {
+    if (!startDatetime && !stopDatetime) {
+      return null;
+    }
+
+    let url = this.getUrl();
+    url += '/' + uuid;
+    const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
+    return this.http.post<Visit>(url, JSON.stringify({"uuid":uuid,"startDatetime":startDatetime,"stopDatetime":stopDatetime}), { headers });
+  }
 }

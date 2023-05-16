@@ -142,6 +142,8 @@ export class FormSubmissionService {
     }
 
     const visitUuid = this.singleSpaPropsService.getPropOrThrow('visitUuid');
+    const visitStartDatetime = this.singleSpaPropsService.getPropOrThrow('visitStartDatetime');
+    const visitStopDatetime = this.singleSpaPropsService.getProp('visitStopDatetime');
 
     if (encounterCreate.uuid) {
       return this.visitResourceService.getVisitStartStopTime(visitUuid).pipe(

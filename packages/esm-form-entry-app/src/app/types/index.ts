@@ -268,7 +268,6 @@ export interface Visit {
 }
 
 export interface Encounter {
-  visit: Visit;
   uuid: string;
   encounterDatetime: string;
   encounterProviders: Array<{
@@ -285,6 +284,7 @@ export interface Encounter {
         display: string;
       };
     };
+    visit: Visit;
   }>;
   encounterType: {
     uuid: string;
