@@ -32,13 +32,13 @@ function setupOpenMRS() {
   registerBreadcrumbs([
     {
       path: spaBasePath,
-      title: () => Promise.resolve(window.i18next.t('Patient_title', { defaultValue: 'Patient', ns: moduleName })),
+      title: () => Promise.resolve(window.i18next.t('patientBreadcrumb', { defaultValue: 'Patient', ns: moduleName })),
       parent: `${window.spaBase}/home`,
     },
     {
       path: `${spaBasePath}/:view`,
       title: ([_, key]) =>
-        Promise.resolve(window.i18next.t(`${decodeURIComponent(key)} Dashboard`, { ns: moduleName, defaultValue: 'Default Value' })),
+        Promise.resolve(window.i18next.t(`${decodeURIComponent(key)} Dashboard`, { ns: moduleName, defaultValue: `${decodeURIComponent(key)} Dashboard` })),
       parent: spaBasePath,
     },
   ]);
