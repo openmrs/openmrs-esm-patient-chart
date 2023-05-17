@@ -284,12 +284,12 @@ export interface Encounter {
         display: string;
       };
     };
-    visit: Visit;
   }>;
   encounterType: {
     uuid: string;
     display: string;
   };
+  visit?: Visit;
   obs: Array<Observation>;
   orders: Array<Order>;
   diagnoses: Array<Diagnosis>;
