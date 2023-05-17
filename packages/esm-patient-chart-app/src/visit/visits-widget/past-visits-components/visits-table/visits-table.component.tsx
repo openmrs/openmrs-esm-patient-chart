@@ -298,30 +298,34 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                       <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 2}>
                         <>
                           <EncounterObservations observations={visits[index].obs} />
-                          <Button
-                            kind="ghost"
-                            onClick={() =>
-                              launchWorkspace(
-                                visits[index].form.uuid,
-                                visits[index].visitUuid,
-                                visits[index].id,
-                                visits[index].form.display,
-                                visits[index].visitTypeUuid,
-                              )
-                            }
-                            renderIcon={(props) => <Edit size={16} {...props} />}
-                            style={{ marginLeft: '-1rem', marginTop: '0.5rem' }}
-                          >
-                            {t('editEncounter', 'Edit encounter')}
-                          </Button>
-                          <Button
-                            kind="danger--ghost"
-                            onClick={() => handleDeleteEncounter(visits[index].id, visits[index].form.display)}
-                            renderIcon={(props) => <TrashCan size={16} {...props} />}
-                            style={{ marginLeft: '-1rem', marginTop: '0.5rem' }}
-                          >
-                            {t('deleteThisEncounter', 'Delete this encounter')}
-                          </Button>
+                          {visits[index]?.form?.uuid && (
+                            <Button
+                              kind="ghost"
+                              onClick={() =>
+                                launchWorkspace(
+                                  visits[index].form.uuid,
+                                  visits[index].visitUuid,
+                                  visits[index].id,
+                                  visits[index].form.display,
+                                  visits[index].visitTypeUuid,
+                                )
+                              }
+                              renderIcon={(props) => <Edit size={16} {...props} />}
+                              style={{ marginLeft: '-1rem', marginTop: '0.5rem' }}
+                            >
+                              {t('editEncounter', 'Edit encounter')}
+                            </Button>
+                          )}
+                          {visits[index]?.form?.display && (
+                            <Button
+                              kind="danger--ghost"
+                              onClick={() => handleDeleteEncounter(visits[index].id, visits[index].form.display)}
+                              renderIcon={(props) => <TrashCan size={16} {...props} />}
+                              style={{ marginLeft: '-1rem', marginTop: '0.5rem' }}
+                            >
+                              {t('deleteThisEncounter', 'Delete this encounter')}
+                            </Button>
+                          )}
                         </>
                       </TableExpandedRow>
                     ) : (
