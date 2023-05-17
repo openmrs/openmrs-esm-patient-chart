@@ -10,7 +10,6 @@ import {
 } from '@openmrs/esm-framework';
 import { useEffect, useState } from 'react';
 import { v4 as uuid } from 'uuid';
-import { patientRegistrationSyncType } from './patient';
 
 /**
  * The identifier of a visit in the sync queue.
@@ -31,7 +30,6 @@ export interface OfflineVisit extends NewVisitPayload {
  */
 export function useVisitOrOfflineVisit(patientUuid: string) {
   const isOnline = useConnectivity();
-  const [visit, setVisit] = useState<ReturnType<typeof useVisit> | undefined>();
 
   const onlineVisit = useVisit(patientUuid);
   const offlineVisit = useOfflineVisit(patientUuid);
@@ -101,7 +99,9 @@ export async function createOfflineVisitForPatient(
   location: string,
   offlineVisitTypeUuid: string,
 ) {
-  const patientRegistrationSyncItems = await getSynchronizationItems<any>(patientRegistrationSyncType);
+  const patientRegistrationSyncItems = await getSynchronizationItems<{ fhirPatient: fhir.Patient }>(
+    'patient-registration',
+  );
   const isVisitForOfflineRegisteredPatient = patientRegistrationSyncItems.some(
     (item) => item.fhirPatient.id === patientUuid,
   );
@@ -121,7 +121,7 @@ export async function createOfflineVisitForPatient(
     dependencies: isVisitForOfflineRegisteredPatient
       ? [
           {
-            type: patientRegistrationSyncType,
+            type: 'patient-registration',
             id: patientUuid,
           },
         ]

@@ -13,7 +13,6 @@ import {
   RadioButton,
   RadioButtonGroup,
   Row,
-  Select,
   SelectItem,
   Stack,
   Switch,
@@ -26,7 +25,6 @@ import {
   saveVisit,
   showNotification,
   showToast,
-  useLocations,
   useSession,
   ExtensionSlot,
   NewVisitPayload,
@@ -45,17 +43,20 @@ import {
   PatientProgram,
 } from '@openmrs/esm-patient-common-lib';
 import BaseVisitType from './base-visit-type.component';
-import styles from './visit-form.scss';
 import { MemoizedRecommendedVisitType } from './recommended-visit-type.component';
 import { ChartConfig } from '../../config-schema';
 import VisitAttributeTypeFields from './visit-attribute-type.component';
 import { saveQueueEntry } from '../hooks/useServiceQueue';
+import styles from './visit-form.scss';
+import LocationSelector from './location-selection.component';
+import { AppointmentPayload, saveAppointment } from '../hooks/useUpcomingAppointments';
+import { useLocations } from '../hooks/useLocations';
 
 const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWorkspace, promptBeforeClosing }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
-  const locations = useLocations();
   const sessionUser = useSession();
+  const { error: errorFetchingLocations } = useLocations();
   const sessionLocation = sessionUser?.sessionLocation?.uuid;
   const config = useConfig() as ChartConfig;
   const [contentSwitcherIndex, setContentSwitcherIndex] = useState(config.showRecommendedVisitTypeTab ? 0 : 1);
@@ -76,13 +77,9 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
     blockSavingForm: boolean;
   }>(null);
   const [selectedLocation, setSelectedLocation] = useState(() => (sessionLocation ? sessionLocation : ''));
-  const [visitType, setVisitType] = useState<string | null>(() => {
-    if (locations?.length && sessionUser?.sessionLocation?.uuid) {
-      return allVisitTypes?.length === 1 ? allVisitTypes[0].uuid : null;
-    }
-
-    return null;
-  });
+  const [visitType, setVisitType] = useState<string | null>(null);
+  const [upcomingAppointment, setUpcomingAppointment] = useState(null);
+  const upcomingAppointmentState = useMemo(() => ({ patientUuid, setUpcomingAppointment }), [patientUuid]);
   const visitQueueNumberAttributeUuid = config.visitQueueNumberAttributeUuid;
 
   const handleSubmit = useCallback(
@@ -93,7 +90,6 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
         setIsMissingRequiredAttributes(true);
         return;
       }
-
       if (!visitType) {
         setIsMissingVisitType(true);
         return;
@@ -170,16 +166,48 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
                   },
                 );
               }
+              if (config.showUpcomingAppointments && upcomingAppointment) {
+                const appointmentPayload: AppointmentPayload = {
+                  appointmentKind: upcomingAppointment?.appointmentKind,
+                  serviceUuid: upcomingAppointment?.service.uuid,
+                  startDateTime: upcomingAppointment?.startDateTime,
+                  endDateTime: upcomingAppointment?.endDateTime,
+                  locationUuid: selectedLocation,
+                  patientUuid: patientUuid,
+                  uuid: upcomingAppointment?.uuid,
+                  dateHonored: dayjs(visitDate).format(),
+                };
+                saveAppointment(appointmentPayload, abortController).then(
+                  ({ status }) => {
+                    if (status === 201) {
+                      mutate();
+                      showToast({
+                        critical: true,
+                        kind: 'success',
+                        description: t('appointmentUpdate', 'Upcoming appointment updated successfully'),
+                        title: t('appointmentEdited', 'Appointment edited'),
+                      });
+                    }
+                  },
+                  (error) => {
+                    showNotification({
+                      title: t('updateError', 'Error updating upcoming appointment'),
+                      kind: 'error',
+                      critical: true,
+                      description: error?.message,
+                    });
+                  },
+                );
+              }
               mutate();
               closeWorkspace();
 
               showToast({
                 critical: true,
                 kind: 'success',
-                description: t(
-                  'visitStartedSuccessfully',
-                  `${response?.data?.visitType?.display} started successfully`,
-                ),
+                description: t('visitStartedSuccessfully', '{visit} started successfully', {
+                  visit: response?.data?.visitType?.display ?? `Visit`,
+                }),
                 title: t('visitStarted', 'Visit started'),
               });
             }
@@ -198,9 +226,11 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
       closeWorkspace,
       config.visitAttributeTypes,
       config.showServiceQueueFields,
+      config.showUpcomingAppointments,
       visitQueueNumberAttributeUuid,
       mutate,
       patientUuid,
+      upcomingAppointment,
       selectedLocation,
       t,
       timeFormat,
@@ -216,6 +246,14 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
     setIgnoreChanges((prevState) => !prevState);
     promptBeforeClosing(() => true);
   };
+
+  useEffect(() => {
+    if (errorFetchingLocations) {
+      setErrorFetchingResources((prev) => ({
+        blockSavingForm: prev?.blockSavingForm || false,
+      }));
+    }
+  }, [errorFetchingLocations]);
 
   return (
     <Form className={styles.form} onChange={handleOnChange} onSubmit={handleSubmit}>
@@ -279,28 +317,13 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
             </div>
           </section>
 
+          {/* Upcoming appointments. This get shown when upcoming appointments are configured */}
+          {config.showUpcomingAppointments && (
+            <ExtensionSlot state={upcomingAppointmentState} extensionSlotName="upcoming-appointment-slot" />
+          )}
+
           {/* This field lets the user select a location for the visit. The location is required for the visit to be saved. Defaults to the active session location */}
-          <section>
-            <div className={styles.sectionTitle}>{t('visitLocation', 'Visit Location')}</div>
-            <div className={styles.selectContainer}>
-              <Select
-                labelText={t('selectLocation', 'Select a location')}
-                light={isTablet}
-                id="location"
-                invalidText="Required"
-                value={selectedLocation}
-                onChange={(event) => setSelectedLocation(event.target.value)}
-              >
-                {!selectedLocation ? <SelectItem text={t('selectOption', 'Select an option')} value="" /> : null}
-                {locations?.length > 0 &&
-                  locations.map((location) => (
-                    <SelectItem key={location.uuid} text={location.display} value={location.uuid}>
-                      {location.display}
-                    </SelectItem>
-                  ))}
-              </Select>
-            </div>
-          </section>
+          <LocationSelector selectedLocation={selectedLocation} setSelectedLocation={setSelectedLocation} />
 
           {/* Lists available program types. This feature is dependent on the `showRecommendedVisitTypeTab` config being set
           to true. */}
@@ -332,7 +355,7 @@ const StartVisitForm: React.FC<DefaultWorkspaceProps> = ({ patientUuid, closeWor
 
           {/* Lists available visit types. The content switcher only gets shown when recommended visit types are enabled */}
           <section>
-            <div className={styles.sectionTitle}>{t('visitType', 'Visit Type')}</div>
+            <div className={styles.sectionTitle}>{t('visitType_title', 'Visit Type')}</div>
 
             {config.showRecommendedVisitTypeTab ? (
               <>

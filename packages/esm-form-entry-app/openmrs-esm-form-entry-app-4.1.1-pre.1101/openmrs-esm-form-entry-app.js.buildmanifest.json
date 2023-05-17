@@ -1,0 +1,115 @@
+{
+  "chunks": [
+    {
+      "rendered": true,
+      "initial": true,
+      "entry": true,
+      "recorded": false,
+      "size": 5188233,
+      "sizes": {
+        "javascript": 5181504,
+        "runtime": 6729
+      },
+      "names": [
+        "main"
+      ],
+      "idHints": [],
+      "runtime": [
+        "main"
+      ],
+      "files": [
+        "openmrs-esm-form-entry-app.js"
+      ],
+      "auxiliaryFiles": [],
+      "hash": "8b25e79c13ce9010bef9",
+      "childrenByOrder": {}
+    },
+    {
+      "rendered": true,
+      "initial": false,
+      "entry": false,
+      "recorded": false,
+      "size": 12,
+      "sizes": {
+        "javascript": 12
+      },
+      "names": [],
+      "idHints": [],
+      "runtime": [
+        "main"
+      ],
+      "files": [
+        "574.a78c7d55ae3ded7efd21.js"
+      ],
+      "auxiliaryFiles": [],
+      "hash": "a78c7d55ae3ded7efd21",
+      "childrenByOrder": {}
+    },
+    {
+      "rendered": true,
+      "initial": false,
+      "entry": false,
+      "recorded": false,
+      "size": 93898,
+      "sizes": {
+        "javascript": 93898
+      },
+      "names": [],
+      "idHints": [],
+      "runtime": [
+        "main"
+      ],
+      "files": [
+        "744.93a56f165abb0ab6994e.js"
+      ],
+      "auxiliaryFiles": [],
+      "hash": "93a56f165abb0ab6994e",
+      "childrenByOrder": {}
+    },
+    {
+      "rendered": true,
+      "initial": false,
+      "entry": false,
+      "recorded": false,
+      "reason": "split chunk (cache group: defaultVendors)",
+      "size": 273326,
+      "sizes": {
+        "javascript": 273326
+      },
+      "names": [],
+      "idHints": [
+        "vendors"
+      ],
+      "runtime": [
+        "main"
+      ],
+      "files": [
+        "805.50f313c63dad6f65d9d5.js"
+      ],
+      "auxiliaryFiles": [],
+      "hash": "50f313c63dad6f65d9d5",
+      "childrenByOrder": {}
+    },
+    {
+      "rendered": true,
+      "initial": false,
+      "entry": false,
+      "recorded": false,
+      "size": 12,
+      "sizes": {
+        "javascript": 12
+      },
+      "names": [],
+      "idHints": [],
+      "runtime": [
+        "main"
+      ],
+      "files": [
+        "807.ad2681da0d002e075ec7.js"
+      ],
+      "auxiliaryFiles": [],
+      "hash": "ad2681da0d002e075ec7",
+      "childrenByOrder": {}
+    }
+  ]
+}

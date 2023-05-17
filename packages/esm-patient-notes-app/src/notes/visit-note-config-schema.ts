@@ -21,14 +21,6 @@ export default {
     _type: Type.ConceptUuid,
     _default: 'c75f120a-04ec-11e3-8780-2b40bef9a44b',
   },
-  problemListConceptUuid: {
-    _default: '1284AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    _type: Type.ConceptUuid,
-  },
-  diagnosisOrderConceptUuid: {
-    _default: '159946AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    _type: Type.ConceptUuid,
-  },
 };
 
 export interface VisitNoteConfigObject {

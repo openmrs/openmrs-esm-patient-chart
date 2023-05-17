@@ -45,21 +45,3 @@ export const usePatientContactAttributes = (patientUuid: string) => {
     isLoading,
   };
 };
-
-export function useOmrsRestPatient(patientUuid: string) {
-  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: PersonFetchResponse }, Error>(
-    `/ws/rest/v1/patient/${patientUuid}`,
-    openmrsFetch,
-  );
-  const result = useMemo(() => {
-    return {
-      person: data?.data?.person ?? null,
-      personError: error,
-      isPersonLoading: isLoading,
-      isPersonError: error,
-      isPersonValidating: isValidating,
-      mutate,
-    };
-  }, [data, error, isLoading, isValidating, mutate]);
-  return result;
-}

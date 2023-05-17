@@ -101,6 +101,7 @@ const LabSetPanel: React.FC<LabSetPanelProps> = ({ panel, observations, activePa
           <p className={styles.subtitleText}>
             {formatDate(date, {
               mode: 'wide',
+              time: false, // Exclude time since we are displaying it on the next line
             })}{' '}
             &bull; {`${date.getUTCHours()}:${date.getUTCMinutes()}`}
           </p>

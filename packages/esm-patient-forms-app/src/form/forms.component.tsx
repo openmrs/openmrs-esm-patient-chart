@@ -4,8 +4,7 @@ import dayjs from 'dayjs';
 import 'dayjs/plugin/isToday';
 import { ContentSwitcher, Switch, DataTableSkeleton, InlineLoading } from '@carbon/react';
 import { CardHeader, ErrorState, PatientProgram, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
-import { useConfig, useLayoutType, useSession, userHasAccess } from '@openmrs/esm-framework';
-import { isValidOfflineFormEncounter } from '../offline-forms/offline-form-helpers';
+import { useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { useProgramConfig } from '../hooks/use-program-config';
 import { useForm } from '../hooks/use-form';
 import { ConfigObject } from '../config-schema';
@@ -34,21 +33,19 @@ interface FormsProps {
 
 const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, urlLabel, isOffline }) => {
   const { t } = useTranslation();
-  const { htmlFormEntryForms, showRecommendedFormsTab, customFormsUrl } = useConfig() as ConfigObject;
+  const { showRecommendedFormsTab, customFormsUrl } = useConfig() as ConfigObject;
   const headerTitle = t('forms', 'Forms');
   const layout = useLayoutType();
   const isTablet = layout === 'tablet';
   const isDesktop = layout === 'small-desktop' || layout === 'large-desktop';
   const [formsCategory, setFormsCategory] = useState<FormsCategory>(showRecommendedFormsTab ? 'Recommended' : 'All');
-  const { isValidating, data, error, mutateForms } = useForm(patientUuid);
-  const session = useSession();
-  const showConfigurableForms = customFormsUrl ? true : false;
-  let formsToDisplay = isOffline
-    ? data?.filter((formInfo) => isValidOfflineFormEncounter(formInfo.form, htmlFormEntryForms))
-    : data;
-  formsToDisplay = formsToDisplay?.filter((formInfo) =>
-    userHasAccess(formInfo?.form?.encounterType?.editPrivilege?.display, session?.user),
-  );
+  const {
+    isValidating,
+    data: formsToDisplay,
+    error,
+    mutateForms,
+  } = useForm(patientUuid, undefined, undefined, isOffline);
+
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const { programConfigs } = useProgramConfig(patientUuid, showRecommendedFormsTab);
 
@@ -73,7 +70,7 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
     [currentVisit?.visitType.uuid, formsToDisplay, programConfigs],
   );
 
-  if (showConfigurableForms) {
+  if (customFormsUrl) {
     return (
       <ConfigurableForms
         formsToDisplay={formsToDisplay}

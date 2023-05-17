@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-biometrics-app",
-  "version": "4.2.1",
+  "version": "4.5.0",
   "license": "MPL-2.0",
   "description": "Patient biometrics microfrontend for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-patient-biometrics-app.js",
@@ -13,7 +13,8 @@
     "build": "webpack --mode production",
     "analyze": "webpack --mode=production --env analyze=true",
     "lint": "eslint src --ext tsx,ts --fix --max-warnings=0",
-    "typescript": "tsc"
+    "typescript": "tsc",
+    "extract-translations": "i18next 'src/**/*.component.tsx' --config ../../tools/i18next-parser.config.js"
   },
   "browserslist": [
     "extends browserslist-config-openmrs"
@@ -35,7 +36,7 @@
   "dependencies": {
     "@carbon/charts-react": "^1.5.2",
     "@carbon/react": "^1.12.0",
-    "@openmrs/esm-patient-common-lib": "^4.2.1",
+    "@openmrs/esm-patient-common-lib": "^4.4.0",
     "d3": "^7.6.1",
     "lodash-es": "^4.17.15"
   },

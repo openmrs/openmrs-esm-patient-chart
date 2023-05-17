@@ -13,6 +13,12 @@
   color: $text-02;
 }
 
+.deceased {
+  .contactDetails, .heading, .row, .row > .col {
+    color: $ui-02;
+  }
+}
+
 .row {
   @include type.type-style("body-compact-01");
   display: flex;
@@ -43,5 +49,3 @@
 .relationship div {
   flex: 1 1;
 }
-
-

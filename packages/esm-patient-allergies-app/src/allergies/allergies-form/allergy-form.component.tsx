@@ -207,7 +207,7 @@ function AllergyForm({ closeWorkspace, promptBeforeClosing, patientUuid }: Defau
                 </TabList>
                 <TabPanels>
                   {isLoading ? (
-                    <InlineLoading style={{ margin: '1rem' }} description={t('loading', 'Loading...')} />
+                    <InlineLoading style={{ margin: '1rem' }} description={`${t('loading', 'Loading')} ...`} />
                   ) : (
                     allergenTypes.map((allergenType, index) => {
                       const allergenCategory = allergenType.toLowerCase() + 'Allergens';
@@ -254,7 +254,7 @@ function AllergyForm({ closeWorkspace, promptBeforeClosing, patientUuid }: Defau
               <h2 className={styles.midSectionHeading}>{t('selectReactions', 'Select the reactions')}</h2>
               <div className={isTablet ? styles.checkboxContainer : undefined} style={{ margin: '1rem' }}>
                 {isLoading ? (
-                  <InlineLoading description={t('loading', 'Loading...')} />
+                  <InlineLoading description={`${t('loading', 'Loading')} ...`} />
                 ) : (
                   allergensAndAllergicReactions?.allergicReactions?.map((reaction, index) => (
                     <Checkbox
@@ -314,24 +314,7 @@ function AllergyForm({ closeWorkspace, promptBeforeClosing, patientUuid }: Defau
               </div>
             </section>
             <section className={styles.section}>
-              <h2 className={styles.sectionHeading}>{t('dateAndComments', 'Date and comments')}</h2>
-              <div className={styles.wrapper}>
-                <DatePicker
-                  id="onsetDate"
-                  dateFormat="d/m/Y"
-                  datePickerType="single"
-                  light={!isTablet}
-                  maxDate={new Date().toISOString()}
-                  onChange={([date]) => setOnsetDate(date)}
-                  value={onsetDate}
-                >
-                  <DatePickerInput
-                    id="onsetDateInput"
-                    placeholder="dd/mm/yyyy"
-                    labelText={t('dateOfFirstOnset', 'Date of first onset')}
-                  />
-                </DatePicker>
-              </div>
+              <h2 className={styles.sectionHeading}>{t('onsetDateAndComments', 'Onset date and comments')}</h2>
               <div className={styles.wrapper}>
                 <TextArea
                   className={styles.textbox}
@@ -339,7 +322,7 @@ function AllergyForm({ closeWorkspace, promptBeforeClosing, patientUuid }: Defau
                   light={!isTablet}
                   id="comments"
                   invalidText={t('invalidComment', 'Invalid comment, try again')}
-                  labelText={t('comments', 'Comments')}
+                  labelText={t('dateOfOnsetAndComments', 'Date of onset and comments')}
                   onChange={(event) => setComment(event.target.value)}
                   placeholder={t('typeAdditionalComments', 'Type any additional comments here')}
                   rows={4}

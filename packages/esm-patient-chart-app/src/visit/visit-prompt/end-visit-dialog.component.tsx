@@ -4,6 +4,8 @@ import { Button, ModalBody, ModalFooter, ModalHeader } from '@carbon/react';
 import { parseDate, showNotification, showToast, updateVisit, useVisit } from '@openmrs/esm-framework';
 import { first } from 'rxjs/operators';
 import styles from './end-visit-dialog.scss';
+import { useVisitQueueEntry } from '../queue-entry/queue.resource';
+import { removeQueuedPatient } from '../hooks/useServiceQueue';
 
 interface EndVisitDialogProps {
   patientUuid: string;
@@ -13,6 +15,7 @@ interface EndVisitDialogProps {
 const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal }) => {
   const { t } = useTranslation();
   const { currentVisit, mutate } = useVisit(patientUuid);
+  const { queueEntry } = useVisitQueueEntry(patientUuid, currentVisit?.uuid);
 
   const endCurrentVisit = () => {
     const endVisitPayload = {
@@ -28,6 +31,9 @@ const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal
       .subscribe(
         (response) => {
           if (response.status === 200) {
+            if (queueEntry) {
+              removeQueuedPatient(queueEntry.queueUuid, queueEntry.queueEntryUuid, abortController);
+            }
             mutate();
             closeModal();
 
@@ -71,7 +77,7 @@ const EndVisitDialog: React.FC<EndVisitDialogProps> = ({ patientUuid, closeModal
           {t('cancel', 'Cancel')}
         </Button>
         <Button kind="danger" onClick={endCurrentVisit}>
-          {t('endVisit', 'End Visit')}
+          {t('endVisit_title', 'End Visit')}
         </Button>
       </ModalFooter>
     </div>

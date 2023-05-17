@@ -1,5 +1,5 @@
 import { messageOmrsServiceWorker, saveVisit, setupOfflineSync, usePatient } from '@openmrs/esm-framework';
-import { OfflineVisit, patientRegistrationSyncType, visitSyncType } from '@openmrs/esm-patient-common-lib';
+import { OfflineVisit, visitSyncType } from '@openmrs/esm-patient-common-lib';
 
 export function setupCacheableRoutes() {
   messageOmrsServiceWorker({
@@ -17,7 +17,7 @@ export function setupCacheableRoutes() {
  * Sets up the offline synchronization for offline visits.
  */
 export function setupOfflineVisitsSync() {
-  setupOfflineSync<OfflineVisit>(visitSyncType, [patientRegistrationSyncType], async (visit, options) => {
+  setupOfflineSync<OfflineVisit>(visitSyncType, ['patient-registration'], async (visit, options) => {
     const visitPayload = {
       ...visit,
       stopDatetime: new Date(),

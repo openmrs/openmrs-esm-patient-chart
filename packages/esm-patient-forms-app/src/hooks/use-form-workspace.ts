@@ -1,12 +1,15 @@
-import { useConfig, useVisit } from '@openmrs/esm-framework';
+import { useConfig, userHasAccess, useSession, useVisit } from '@openmrs/esm-framework';
 import { Form, EncounterWithFormRef, CompletedFormInfo, FormsSection } from '../types';
 import { ConfigObject, FormsSectionConfig } from '../config-schema';
 import { useEncounters, useFormEncounters } from './use-form-encounters';
+import { isValidOfflineFormEncounter } from '../offline-forms/offline-form-helpers';
 
 export function useForms(patientUuid: string, cachedOfflineFormsOnly = false) {
-  const { formsSectionsConfig, useCurrentVisitDates } = useConfig() as ConfigObject;
+  const { formsSectionsConfig, useCurrentVisitDates, htmlFormEntryForms } = useConfig() as ConfigObject;
   const visits = useVisit(patientUuid);
+  const session = useSession();
   const allFormsRes = useFormEncounters(cachedOfflineFormsOnly, patientUuid);
+  const filteredForms = filterForms(allFormsRes.data, cachedOfflineFormsOnly, htmlFormEntryForms, session);
   let startDate: Date;
   let stopDate: Date;
 
@@ -22,9 +25,7 @@ export function useForms(patientUuid: string, cachedOfflineFormsOnly = false) {
   const encountersRes = useEncounters(patientUuid, startDate, stopDate);
 
   const pastEncounters = encountersRes.data?.data?.results ?? [];
-  const data = allFormsRes.data
-    ? mapToFormsSectionInfo(formsSectionsConfig, allFormsRes.data, pastEncounters)
-    : undefined;
+  const data = filteredForms ? mapToFormsSectionInfo(formsSectionsConfig, filteredForms, pastEncounters) : undefined;
 
   const mutateForms = () => {
     allFormsRes.mutate();
@@ -45,6 +46,19 @@ export function useForms(patientUuid: string, cachedOfflineFormsOnly = false) {
     allForms: allFormsRes.data,
     mutateForms,
   };
+}
+
+function filterForms(forms: Array<Form>, cachedOfflineFormsOnly: boolean, htmlFormEntryForms, session): Array<Form> {
+  let formsToDisplay = cachedOfflineFormsOnly
+    ? forms?.filter((formInfo) => isValidOfflineFormEncounter(formInfo, htmlFormEntryForms))
+    : forms;
+
+  if (session?.user) {
+    formsToDisplay = formsToDisplay?.filter((formInfo) =>
+      userHasAccess(formInfo?.encounterType?.editPrivilege?.display, session.user),
+    );
+  }
+  return formsToDisplay;
 }
 
 function mapToFormsSectionInfo(

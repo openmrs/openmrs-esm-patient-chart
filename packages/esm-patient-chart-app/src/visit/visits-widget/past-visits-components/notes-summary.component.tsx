@@ -11,7 +11,7 @@ const NotesSummary: React.FC<NotesSummaryProps> = ({ notes }) => {
   const { t } = useTranslation();
 
   return (
-    <React.Fragment>
+    <>
       {notes.length ? (
         notes.map((note: Note, i) => (
           <div className={styles.notesContainer} key={i}>
@@ -25,7 +25,7 @@ const NotesSummary: React.FC<NotesSummaryProps> = ({ notes }) => {
       ) : (
         <p className={`${styles.bodyLong01} ${styles.text02}`}>{t('noNotesFound', 'No notes found')}</p>
       )}
-    </React.Fragment>
+    </>
   );
 };
 

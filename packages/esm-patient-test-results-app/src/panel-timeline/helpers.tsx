@@ -11,8 +11,6 @@ function getPatientUuidFromUrl(): string {
   return match && match[1];
 }
 
-const patientUuid = getPatientUuidFromUrl();
-
 export const parseTime: (sortedTimes: Array<string>) => ParsedTimeType = (sortedTimes) => {
   const yearColumns: Array<{ year: string; size: number }> = [],
     dayColumns: Array<{ year: string; day: string; size: number }> = [],
@@ -21,7 +19,7 @@ export const parseTime: (sortedTimes: Array<string>) => ParsedTimeType = (sorted
   sortedTimes.forEach((datetime) => {
     const parsedDate = parseDate(datetime);
     const year = parsedDate.getFullYear().toString();
-    const date = formatDate(parsedDate, { mode: 'wide', year: false });
+    const date = formatDate(parsedDate, { mode: 'wide', year: false, time: false });
     const time = formatTime(parsedDate);
 
     const yearColumn = yearColumns.find(({ year: innerYear }) => year === innerYear);
@@ -117,6 +115,7 @@ export const TimelineCell: React.FC<{
 };
 
 export const RowStartCell = ({ title, range, units, shadow = false, testUuid, isString = false }) => {
+  const patientUuid = getPatientUuidFromUrl();
   return (
     <div
       className={styles['row-start-cell']}

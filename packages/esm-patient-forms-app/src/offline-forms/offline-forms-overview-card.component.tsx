@@ -14,8 +14,9 @@ const OfflineFormsOverviewCard: React.FC = () => {
     <Layer>
       <Tile className={styles.overviewCard}>
         <div className={styles.headerContainer}>
-          <h3 className={styles.productiveHeading01}>Forms</h3>
+          <h3 className={styles.heading}>{t('forms', 'Forms')}</h3>
           <Button
+            className={styles.viewButton}
             kind="ghost"
             renderIcon={(props) => <ArrowRight size={16} {...props} />}
             size="sm"

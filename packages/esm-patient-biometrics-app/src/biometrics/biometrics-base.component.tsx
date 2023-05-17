@@ -34,7 +34,7 @@ const BiometricsBase: React.FC<BiometricsBaseProps> = ({
   pageUrl,
 }) => {
   const { t } = useTranslation();
-  const displayText = t('biometrics', 'biometrics');
+  const displayText = t('biometrics_lower', 'biometrics');
   const headerTitle = t('biometrics', 'Biometrics');
   const [chartView, setChartView] = React.useState(false);
   const isTablet = useLayoutType() === 'tablet';

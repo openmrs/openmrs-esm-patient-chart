@@ -1,10 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ExtensionSlot } from '@openmrs/esm-framework';
+import { ExtensionSlot, usePatient } from '@openmrs/esm-framework';
 import {
   DefaultWorkspaceProps,
   FormEntryProps,
   formEntrySub,
-  usePatientOrOfflineRegisteredPatient,
   useVisitOrOfflineVisit,
 } from '@openmrs/esm-patient-common-lib';
 
@@ -13,9 +12,10 @@ interface FormEntryComponentProps extends DefaultWorkspaceProps {
 }
 
 const FormEntry: React.FC<FormEntryComponentProps> = ({ patientUuid, closeWorkspace, mutateForm }) => {
-  const { patient } = usePatientOrOfflineRegisteredPatient(patientUuid);
+  const { patient } = usePatient(patientUuid);
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const [selectedForm, setSelectedForm] = useState<FormEntryProps>(null);
+  const [showForm, setShowForm] = useState(true);
 
   const state = useMemo(
     () => ({
@@ -27,7 +27,7 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({ patientUuid, closeWorksp
       patient,
       encounterUuid: selectedForm?.encounterUuid ?? null,
       closeWorkspace: () => {
-        mutateForm();
+        typeof mutateForm === 'function' && mutateForm();
         closeWorkspace();
       },
     }),
@@ -50,9 +50,21 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({ patientUuid, closeWorksp
     return () => sub.unsubscribe();
   }, []);
 
+  // FIXME: This logic triggers a reload of the form when the formUuid changes. It's a workaround for the fact that the form doesn't reload when the formUuid changes.
+  useEffect(() => {
+    if (state.formUuid) {
+      setShowForm(false);
+      setTimeout(() => {
+        setShowForm(true);
+      });
+    }
+  }, [state.formUuid]);
+
   return (
     <div>
-      {selectedForm && patientUuid && patient && <ExtensionSlot extensionSlotName="form-widget-slot" state={state} />}
+      {showForm && selectedForm && patientUuid && patient && (
+        <ExtensionSlot extensionSlotName="form-widget-slot" state={state} />
+      )}
     </div>
   );
 };

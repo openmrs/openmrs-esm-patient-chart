@@ -38,31 +38,35 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
   const isTablet = useLayoutType() === 'tablet';
 
   // Render translated gender
-  const getGender = (gender) => {
-    switch (gender) {
-      case 'male':
-        return t('male', 'Male');
-      case 'female':
-        return t('female', 'Female');
-      case 'other':
-        return t('other', 'Other');
-      case 'unknown':
-        return t('unknown', 'Unknown');
-      default:
-        return gender;
-    }
-  };
+  const getGender = useCallback(
+    (gender) => {
+      switch (gender) {
+        case 'male':
+          return t('male', 'Male');
+        case 'female':
+          return t('female', 'Female');
+        case 'other':
+          return t('other', 'Other');
+        case 'unknown':
+          return t('unknown', 'Unknown');
+        default:
+          return gender;
+      }
+    },
+    [t],
+  );
+
   const name = `${patient?.name?.[0].given?.join(' ')} ${patient?.name?.[0].family}`;
   const patientUuid = `${patient?.id}`;
   const { currentVisit } = useVisit(patientUuid);
   const info = `${parseInt(age(patient?.birthDate))}, ${getGender(patient?.gender)}`;
   const truncate = !isTablet && name.trim().length > 25;
-  const { queueEntry, isLoading } = useVisitQueueEntry(patientUuid, currentVisit?.uuid);
+  const { queueEntry } = useVisitQueueEntry(patientUuid, currentVisit?.uuid);
 
   const visitType = queueEntry?.visitType ?? '';
   const priority = queueEntry?.priority ?? '';
 
-  const getServiceString = () => {
+  const getServiceString = useCallback(() => {
     switch (queueEntry?.status?.toLowerCase()) {
       case 'waiting':
         return `Waiting for ${queueEntry.service}`;
@@ -73,9 +77,7 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
       default:
         return '';
     }
-  };
-
-  const currentService = queueEntry ? getServiceString() : null;
+  }, [queueEntry]);
 
   const getTagType = (priority: string) => {
     switch (priority as MappedQueuePriority) {
@@ -112,12 +114,12 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
       {queueEntry ? (
         <>
           <div className={styles.navDivider} />
-          <span className={styles.patientInfo}> {currentService} </span>
+          <span className={styles.patientInfo}>{getServiceString()}</span>
           <div className={styles.navDivider} />
-          <span className={styles.patientInfo}> {visitType} </span>
+          <span className={styles.patientInfo}>{visitType}</span>
           <Tag
             className={priority === 'Priority' ? styles.priorityTag : styles.tag}
-            type={getTagType(priority?.toLocaleLowerCase() as string)}
+            type={getTagType(priority?.toLocaleLowerCase('en'))}
           >
             {priority}
           </Tag>
@@ -128,16 +130,19 @@ const PatientInfo: React.FC<PatientInfoProps> = ({ patient }) => {
   );
 };
 
+function launchStartVisitForm() {
+  launchPatientWorkspace('start-visit-workspace-form');
+}
+
 const VisitHeader: React.FC = () => {
   const { t } = useTranslation();
   const { patient } = usePatient();
   const { currentVisit, isValidating } = useVisit(patient?.id);
-  const [showVisitHeader, setShowVisitHeader] = useState<boolean>(true);
+  const [showVisitHeader, setShowVisitHeader] = useState(true);
   const [isSideMenuExpanded, setIsSideMenuExpanded] = useState(false);
   const navMenuItems = useAssignedExtensions('patient-chart-dashboard-slot').map((extension) => extension.id);
-  const { startVisitLabel, endVisitLabel } = useConfig();
+  const { startVisitLabel, endVisitLabel, logo } = useConfig();
 
-  const launchStartVisitForm = React.useCallback(() => launchPatientWorkspace('start-visit-workspace-form'), []);
   const showHamburger = useLayoutType() !== 'large-desktop' && navMenuItems.length > 0;
 
   const isLoading = isValidating && currentVisit === null;
@@ -146,13 +151,13 @@ const VisitHeader: React.FC = () => {
 
   const hasActiveVisit = !isLoading && !visitNotLoaded;
 
-  const originPage = localStorage.getItem('fromPage');
-
   const onClosePatientChart = useCallback(() => {
-    originPage ? navigate({ to: `${window.spaBase}/${originPage}` }) : navigate({ to: `${window.spaBase}/home` });
-    setShowVisitHeader((prevState) => !prevState);
+    const originPage = localStorage.getItem('fromPage');
     localStorage.removeItem('fromPage');
-  }, [originPage]);
+
+    setShowVisitHeader((prevState) => !prevState);
+    originPage ? navigate({ to: `${window.spaBase}/${originPage}` }) : navigate({ to: `${window.spaBase}/home` });
+  }, []);
 
   const openModal = useCallback((patientUuid) => {
     const dispose = showModal('end-visit-dialog', {
@@ -183,9 +188,15 @@ const VisitHeader: React.FC = () => {
           )}
           <ConfigurableLink className={styles.navLogo} to="${openmrsSpaBase}/home">
             <div className={styles.divider}>
-              <svg role="img" width={110} height={40}>
-                <use xlinkHref="#omrs-logo-white"></use>
-              </svg>
+              {logo?.src ? (
+                <img className={styles.logo} src={logo.src} alt={logo.alt} width={110} height={40} />
+              ) : logo?.name ? (
+                logo.name
+              ) : (
+                <svg role="img" width={110} height={40}>
+                  <use xlinkHref="#omrs-logo-white"></use>
+                </svg>
+              )}
             </div>
           </ConfigurableLink>
           <div className={styles.navDivider} />
@@ -196,18 +207,18 @@ const VisitHeader: React.FC = () => {
             <ExtensionSlot extensionSlotName="visit-header-right-slot" />
             {!hasActiveVisit && (
               <Button className={styles.startVisitButton} onClick={launchStartVisitForm} size="lg">
-                {startVisitLabel ? startVisitLabel : t('startVisit', 'Start a visit')}
+                {startVisitLabel ? startVisitLabel : t('startAVisit', 'Start a visit')}
               </Button>
             )}
             {currentVisit !== null && endVisitLabel && (
               <>
                 <HeaderGlobalAction
                   className={styles.headerGlobalBarButton}
-                  aria-label={endVisitLabel ?? t('endVisit', 'End a visit')}
+                  aria-label={endVisitLabel ?? t('endAVisit', 'End a visit')}
                   onClick={() => openModal(patient?.id)}
                 >
                   <Button as="div" className={styles.startVisitButton}>
-                    {endVisitLabel ? endVisitLabel : <>{t('endVisit', 'End a visit')}</>}
+                    {endVisitLabel ? endVisitLabel : <>{t('endAVisit', 'End a visit')}</>}
                   </Button>
                 </HeaderGlobalAction>
               </>
@@ -229,7 +240,6 @@ const VisitHeader: React.FC = () => {
   }, [
     hasActiveVisit,
     isSideMenuExpanded,
-    launchStartVisitForm,
     onClosePatientChart,
     patient,
     showHamburger,
@@ -240,6 +250,7 @@ const VisitHeader: React.FC = () => {
     endVisitLabel,
     openModal,
     currentVisit,
+    logo,
   ]);
 
   return <HeaderContainer render={render} />;

@@ -135,7 +135,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid, vi
             {t('medications', 'Medications')}
           </Tab>
           <Tab className={styles.tab} id="encounters-tab" disabled={encounters.length <= 0 && config.disableEmptyTabs}>
-            {t('encounters', 'Encounters')}
+            {t('encounters_title', 'Encounters')}
           </Tab>
         </TabList>
         <TabPanels>

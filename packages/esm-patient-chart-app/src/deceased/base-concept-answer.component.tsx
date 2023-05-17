@@ -72,7 +72,7 @@ const BaseConceptAnswer: React.FC<BaseConceptAnswerProps> = ({ onChange, isPatie
         </>
       ) : (
         <EmptyState
-          displayText={t('causeOfDeath', 'Cause of Death')}
+          displayText={t('causeOfDeath_title', 'Cause of Death')}
           headerTitle={t('causeOfDeath', 'Cause of death')}
         />
       )}

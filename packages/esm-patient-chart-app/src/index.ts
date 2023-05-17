@@ -266,6 +266,18 @@ function setupOpenMRS() {
           moduleName,
         }),
       },
+      {
+        name: 'delete-encounter-modal',
+        load: getAsyncLifecycle(
+          () => import('./visit/visits-widget/past-visits-components/delete-encounter-modal.component'),
+          {
+            featureName: 'delete-encounter-modal',
+            moduleName,
+          },
+        ),
+        online: true,
+        offline: true,
+      },
     ],
   };
 }

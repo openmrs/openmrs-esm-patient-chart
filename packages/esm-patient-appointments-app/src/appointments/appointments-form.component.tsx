@@ -229,7 +229,7 @@ const AppointmentsForm: React.FC<AppointmentsFormProps> = ({ patientUuid, closeW
           </ResponsiveWrapper>
         </section>
         <section className={styles.formGroup}>
-          <span>{t('appointmentType', 'Appointment Type')}</span>
+          <span>{t('appointmentType_title', 'Appointment Type')}</span>
           <ResponsiveWrapper isTablet={isTablet}>
             <Select
               disabled={!appointmentTypes?.length}

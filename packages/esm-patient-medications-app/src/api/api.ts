@@ -98,17 +98,14 @@ export function postOrder(body: OrderPost, abortController?: AbortController) {
 }
 
 export function useSystemVisitSetting() {
-  const config = useConfig() as ConfigObject;
   const { data, isLoading, error } = useSWRImmutable<FetchResponse<{ value: 'true' | 'false' }>, Error>(
-    config?.visitEnabledSystemSettingUUID
-      ? `/ws/rest/v1/systemsetting/${config?.visitEnabledSystemSettingUUID}?v=custom:(value)`
-      : null,
+    `/ws/rest/v1/systemsetting/visits.enabled?v=custom:(value)`,
     openmrsFetch,
   );
 
   const results = useMemo(
     () => ({
-      systemVisitEnabled: data?.data?.value === 'true',
+      systemVisitEnabled: (data?.data?.value ?? 'true').toLowerCase() === 'true',
       errorFetchingSystemVisitSetting: error,
       isLoadingSystemVisitSetting: isLoading,
     }),
