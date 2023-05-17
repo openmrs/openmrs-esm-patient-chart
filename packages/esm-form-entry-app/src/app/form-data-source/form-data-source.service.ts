@@ -18,7 +18,7 @@ export class FormDataSourceService {
     private locationResourceService: LocationResourceService,
     private conceptResourceService: ConceptResourceService,
     private localStorageService: LocalStorageService,
-  ) { }
+  ) {}
 
   public getDataSources(formSchema: FormSchema) {
     return {
@@ -189,38 +189,38 @@ export class FormDataSourceService {
     ).then((response: FetchResponse<{ entry: Array<FHIRResource> }>) =>
       response.ok
         ? // The output of this reduce() call is intended to be an object similar to an OpenMRS REST Encounter
-        // This allows it to be consumed by the historical data source
-        response.data.entry?.reduce<{ obs: Array<Partial<Observation>> }>(
-          (acc, entry) => {
-            if (entry.resource && entry.resource.resourceType === 'Observation' && entry.resource.code) {
-              const code = entry.resource.code.coding.find((c) => !Boolean(c.system))?.code;
-              let value: string | number | { uuid: string };
-              if (typeof entry.resource.valueString !== 'undefined' && entry.resource.valueString !== null) {
-                value = entry.resource.valueString;
-              } else if (
-                typeof entry.resource.valueQuantity?.value !== 'undefined' &&
-                entry.resource.valueQuantity?.value !== null
-              ) {
-                value = entry.resource.valueQuantity.value;
-              } else {
-                const coding = entry.resource.valueCodeableConcept?.coding?.find((c) => !Boolean(c.system))?.code;
-                if (typeof coding !== 'undefined' && coding !== null) {
-                  value = { uuid: coding };
+          // This allows it to be consumed by the historical data source
+          response.data.entry?.reduce<{ obs: Array<Partial<Observation>> }>(
+            (acc, entry) => {
+              if (entry.resource && entry.resource.resourceType === 'Observation' && entry.resource.code) {
+                const code = entry.resource.code.coding.find((c) => !Boolean(c.system))?.code;
+                let value: string | number | { uuid: string };
+                if (typeof entry.resource.valueString !== 'undefined' && entry.resource.valueString !== null) {
+                  value = entry.resource.valueString;
+                } else if (
+                  typeof entry.resource.valueQuantity?.value !== 'undefined' &&
+                  entry.resource.valueQuantity?.value !== null
+                ) {
+                  value = entry.resource.valueQuantity.value;
+                } else {
+                  const coding = entry.resource.valueCodeableConcept?.coding?.find((c) => !Boolean(c.system))?.code;
+                  if (typeof coding !== 'undefined' && coding !== null) {
+                    value = { uuid: coding };
+                  }
+                }
+
+                if (typeof code !== 'undefined' && code !== null && typeof value !== 'undefined') {
+                  acc.obs.push({
+                    concept: { uuid: code, display: null, conceptClass: null },
+                    value,
+                  });
                 }
               }
 
-              if (typeof code !== 'undefined' && code !== null && typeof value !== 'undefined') {
-                acc.obs.push({
-                  concept: { uuid: code, display: null, conceptClass: null },
-                  value,
-                });
-              }
-            }
-
-            return acc;
-          },
-          { obs: [] },
-        )
+              return acc;
+            },
+            { obs: [] },
+          )
         : { obs: [] },
     );
   }
