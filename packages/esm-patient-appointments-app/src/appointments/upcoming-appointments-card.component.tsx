@@ -1,5 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import isEmpty from 'lodash-es/isEmpty';
+
 import {
   Checkbox,
   InlineLoading,
@@ -32,8 +34,14 @@ const UpcomingAppointmentsCard: React.FC<UpcomingAppointmentsProps> = ({ patient
     isLoading,
     isValidating,
   } = useAppointments(patientUuid, startDate, new AbortController());
-  const appointments = appointmentsData?.todaysAppointments.concat(appointmentsData?.upcomingAppointments);
-  const upcomingAppointment = appointments?.filter(({ dateHonored }) => dateHonored === null);
+  const todaysAppointments = appointmentsData?.todaysAppointments?.length ? appointmentsData?.todaysAppointments : [];
+  const futureAppointments = appointmentsData?.upcomingAppointments?.length
+    ? appointmentsData?.upcomingAppointments
+    : [];
+  const appointments = todaysAppointments.concat(futureAppointments);
+  const upcomingAppointment = !isEmpty(appointments)
+    ? appointments?.filter(({ dateHonored }) => dateHonored === null)
+    : [];
   if (isError) {
     return <ErrorState headerTitle={headerTitle} error={isError} />;
   }
