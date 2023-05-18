@@ -207,7 +207,7 @@ const VisitHeader: React.FC = () => {
           </div>
           <HeaderGlobalBar>
             <ExtensionSlot extensionSlotName="visit-header-right-slot" />
-            {!currentVisit && !isDeceased && (
+            {!hasActiveVisit && !isDeceased && (
               <Button className={styles.startVisitButton} onClick={launchStartVisitForm} size="lg">
                 {startVisitLabel ? startVisitLabel : t('startAVisit', 'Start a visit')}
               </Button>
@@ -240,19 +240,20 @@ const VisitHeader: React.FC = () => {
 
     return null;
   }, [
-    showVisitHeader,
+    hasActiveVisit,
+    isSideMenuExpanded,
+    onClosePatientChart,
     patient,
     showHamburger,
-    isSideMenuExpanded,
-    isDeceased,
+    showVisitHeader,
     startVisitLabel,
     t,
-    currentVisit,
-    endVisitLabel,
-    onClosePatientChart,
     toggleSideMenu,
+    endVisitLabel,
     openModal,
+    currentVisit,
     logo,
+    isDeceased,
   ]);
 
   return <HeaderContainer render={render} />;
