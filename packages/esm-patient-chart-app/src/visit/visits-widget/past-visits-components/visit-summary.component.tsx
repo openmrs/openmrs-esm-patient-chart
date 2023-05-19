@@ -20,6 +20,8 @@ interface VisitSummaryProps {
   patientUuid: string;
   visitUuid: string;
   visitTypeUuid: string;
+  visitStartDatetime?: string;
+  visitStopDatetime?: string;
 }
 
 export interface MappedEncounter {
@@ -31,9 +33,11 @@ export interface MappedEncounter {
   provider: string;
   visitUuid: string;
   visitTypeUuid: string;
+  visitStartDatetime?: string;
+  visitStopDatetime?: string;
 }
 
-const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid, visitUuid, visitTypeUuid }) => {
+const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid, visitUuid, visitTypeUuid, visitStartDatetime, visitStopDatetime }) => {
   const config = useConfig();
   const { t } = useTranslation();
   const layout = useLayoutType();
@@ -150,7 +154,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid, vi
           </TabPanel>
           <TabPanel>
             <VisitsTable
-              visits={mapEncounters(encounters, visitUuid, visitTypeUuid)}
+              visits={mapEncounters(encounters, visitUuid, visitTypeUuid, visitStartDatetime, visitStopDatetime)}
               showAllEncounters={false}
               patientUuid={patientUuid}
             />
@@ -163,7 +167,7 @@ const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid, vi
 
 export default VisitSummary;
 
-export function mapEncounters(encounters, visitUuid, visitTypeUuid) {
+export function mapEncounters(encounters, visitUuid, visitTypeUuid, visitStartDatetime, visitStopDatetime) {
   return encounters?.map((encounter) => ({
     id: encounter?.uuid,
     datetime: encounter?.encounterDatetime,
@@ -172,6 +176,8 @@ export function mapEncounters(encounters, visitUuid, visitTypeUuid) {
     obs: encounter?.obs,
     visitUuid: visitUuid,
     visitTypeUuid: visitTypeUuid,
+    visitStartDatetime: visitStartDatetime,
+    visitStopDatetime: visitStopDatetime,
     provider:
       encounter?.encounterProviders?.length > 0 ? encounter.encounterProviders[0].provider?.person?.display : '--',
   }));

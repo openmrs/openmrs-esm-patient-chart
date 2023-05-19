@@ -116,10 +116,12 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
     encounterUuid?: string,
     formName?: string,
     visitTypeUuid?: string,
+    visitStartDatetime?: string,
+    visitStopDatetime?: string,
   ) => {
     const htmlForm = htmlFormEntryFormsConfig?.find((form) => form.formUuid === formUuid);
     if (isEmpty(htmlForm)) {
-      formEntrySub.next({ formUuid, visitUuid, encounterUuid, visitTypeUuid });
+      formEntrySub.next({ formUuid, visitUuid, encounterUuid, visitTypeUuid, visitStartDatetime, visitStopDatetime });
       launchPatientWorkspace('patient-form-entry-workspace', { workspaceTitle: formName, formUuid, encounterUuid });
     } else {
       navigate({
@@ -265,6 +267,8 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                                     visits[index]?.id,
                                     visits[index]?.form?.display,
                                     visits[index]?.visitTypeUuid,
+                                    visits[index]?.visitStartDatetime,
+                                    visits[index]?.visitStopDatetime,
                                   )
                                 }
                               >
@@ -308,6 +312,8 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                                   visits[index].id,
                                   visits[index].form.display,
                                   visits[index].visitTypeUuid,
+                                  visits[index]?.visitStartDatetime,
+                                  visits[index]?.visitStopDatetime,
                                 )
                               }
                               renderIcon={(props) => <Edit size={16} {...props} />}

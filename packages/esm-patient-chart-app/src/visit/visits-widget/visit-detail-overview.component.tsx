@@ -79,6 +79,8 @@ function VisitDetailOverviewComponent({ patientUuid }: VisitOverviewComponentPro
                     patientUuid={patientUuid}
                     visitUuid={visit.uuid}
                     visitTypeUuid={visit.visitType.uuid}
+                    visitStartDatetime={visit.startDatetime}
+                    visitStopDatetime={visit.stopDatetime}
                   />
                 </div>
               ))
