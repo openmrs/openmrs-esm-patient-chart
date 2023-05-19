@@ -261,10 +261,9 @@ export interface Concept {
 }
 
 export interface Visit {
-  display?: string,
+  uuid: string,
   startDatetime: string,
   stopDatetime?: string,
-  uuid: string,
 }
 
 export interface Encounter {
