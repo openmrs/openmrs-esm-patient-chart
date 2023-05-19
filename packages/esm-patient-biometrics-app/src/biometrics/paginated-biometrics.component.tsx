@@ -13,7 +13,7 @@ import {
 import { useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import styles from './biometrics-overview.scss';
-import { orderBy } from 'lodash-es';
+import orderBy from 'lodash-es/orderBy';
 
 interface PaginatedBiometricsProps {
   tableRows: Array<DataTableRow>;
