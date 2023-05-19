@@ -46,7 +46,7 @@ export function useBiometrics(patientUuid: string, concepts: Record<string, stri
       }
       return url;
     },
-    [pageSize, patientUuid, concepts],
+    [patientUuid, concepts],
   );
 
   const { data, isValidating, setSize, error, size } = useSwrInfinite<
