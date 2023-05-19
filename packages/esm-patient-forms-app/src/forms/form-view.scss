@@ -3,8 +3,12 @@
 @import '~@openmrs/esm-styleguide/src/vars';
 @import '../root.scss';
 
-.productiveHeading01 {
+.heading {
   @include type.type-style("heading-compact-01");
+}
+
+.text02 {
+  color: $text-02;
 }
 
 .bodyShort01 {
@@ -22,8 +26,8 @@
   width: 100%;
 }
 
-.formContainer input[type="text"] {
-  background-color: $ui-background;
+.tableContainer :global(.cds--table-toolbar) {
+  position: relative !important;
 }
 
 .formContainer div:nth-of-type(2) {
@@ -31,51 +35,30 @@
 }
 
 .formResultsLabel {
+  @include type.type-style('body-compact-01');
   margin: spacing.$spacing-05;
+  color: $text-02;
 }
 
-// Desktop viewport
-:global(.omrs-breakpoint-gt-tablet) {
-  .tableCell {
-    display: flex;
-    justify-content: space-between;
-    cursor: pointer;
-    align-items: center;
+.tileContainer {
+  background-color: $ui-02;
+  margin: 3rem;
+}
 
-    & > svg {
-      visibility: hidden;
-    }
+.tile {
+  margin: auto;
+  width: fit-content;
+}
 
-    & > label {
-      cursor: pointer;
-    }
-
-    &:hover > svg {
-      visibility: visible;
-    }
-  }
+.tileContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .formName {
   color: $interactive-01;
-}
-
-// Tablet viewport
-:global(.omrs-breakpoint-lt-desktop) .tableCell {
-  display: flex;
-  justify-content: space-between;
   cursor: pointer;
-  height: spacing.$spacing-09;
-  align-items: center;
-
-
-  & > label {
-    cursor: pointer;
-  }
-
-  &:global(.cds--data-table tr) {
-    height: spacing.$spacing-09;
-  }
 }
 
 .tile {

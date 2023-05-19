@@ -48,3 +48,7 @@
   align-items: center;
   min-height: 100vh;
 }
+
+.inlineNotification, .actionNotification {
+  max-width: unset !important;
+}

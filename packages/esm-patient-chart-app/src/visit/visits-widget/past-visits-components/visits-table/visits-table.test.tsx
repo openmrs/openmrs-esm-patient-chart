@@ -1,7 +1,7 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import { screen, waitFor } from '@testing-library/react';
-import { usePagination } from '@openmrs/esm-framework';
+import { screen, waitFor, within } from '@testing-library/react';
+import { getConfig, useConfig, usePagination, showModal } from '@openmrs/esm-framework';
 import { renderWithSwr } from '../../../../../../../tools/test-helpers';
 import { mockEncounters } from '../../../../../../../__mocks__/visits.mock';
 import VisitsTable from './visits-table.component';
@@ -14,6 +14,9 @@ const testProps = {
 };
 
 const mockedUsePagination = usePagination as jest.Mock;
+const mockShowModal = showModal as jest.Mock;
+const mockUseConfig = useConfig as jest.Mock;
+const mockGetConfig = getConfig as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -32,6 +35,7 @@ describe('EncounterList', () => {
   it('renders an empty state when no encounters are available', () => {
     testProps.visits = [];
 
+    mockGetConfig.mockReturnValue(Promise.resolve({ htmlFormEntryForms: [] }));
     mockedUsePagination.mockImplementationOnce(() => ({
       currentPage: 1,
       goTo: () => {},
@@ -68,13 +72,14 @@ describe('EncounterList', () => {
     });
 
     const expectedTableRows = [
-      /18-Jan-2022, 04:25 PM Facility Visit Admission/,
-      /03-Aug-2021, 12:47 AM Facility Visit Visit Note User One/,
-      /05-Jul-2021, 10:07 AM Facility Visit Visit Note Dennis The Doctor/,
+      /18-Jan-2022, 04:25\s+PM Facility Visit Admission/,
+      /03-Aug-2021, 12:47\s+AM Facility Visit Visit Note User One/,
+      /05-Jul-2021, 10:07\s+AM Facility Visit Consultation Dennis The Doctor/,
     ];
     expectedTableRows.forEach((row) => {
       expect(screen.getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument();
     });
+
     expect(screen.getByRole('button', { name: /previous page/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /next page/i })).toBeInTheDocument();
     expect(screen.getAllByRole('button', { name: /expand current row/i }).length).toEqual(3);
@@ -92,19 +97,45 @@ describe('EncounterList', () => {
     await waitFor(() => user.click(encounterTypeFilter));
     await waitFor(() => user.click(screen.getByRole('option', { name: /all/i })));
 
-    expect(screen.getAllByText(/visit note/i).length).toEqual(2);
-
     // filter table by typing in the searchbox
-    await waitFor(() => user.type(searchbox, 'Dennis'));
+    await waitFor(() => user.type(searchbox, 'Visit Note'));
 
-    expect(screen.getByText(/dennis/i)).toBeInTheDocument();
-    expect(screen.queryByText(/user one/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/visit note/i)).toBeInTheDocument();
+    expect(screen.queryByText(/consultation/i)).not.toBeInTheDocument();
 
     await waitFor(() => user.clear(searchbox));
-    await waitFor(() => user.type(searchbox, 'luke skywalker'));
+    await waitFor(() => user.type(searchbox, 'triage'));
 
-    expect(screen.getByText(/no patients to display/i)).toBeInTheDocument();
+    expect(screen.getByText(/no encounters to display/i)).toBeInTheDocument();
     expect(screen.getByText(/check the filters above/i)).toBeInTheDocument();
+  });
+});
+
+describe('Delete Encounter', () => {
+  it('delete a patient encounter', async () => {
+    const user = userEvent.setup();
+
+    testProps.visits = mockEncounters;
+
+    mockedUsePagination.mockImplementationOnce(() => ({
+      currentPage: 1,
+      goTo: () => {},
+      results: mockEncounters,
+    }));
+
+    renderVisitsTable();
+
+    const table = screen.getByRole('table');
+
+    // expect(screen.getAllByRole('button', { name: /expand current row/i }).length).toEqual(3);
+    const expandEncounterButton = screen.getAllByRole('button', { name: /expand current row/i });
+
+    await waitFor(() => user.click(expandEncounterButton[0]));
+    expect(screen.getByRole('button', { name: /Delete this encounter/i })).toBeInTheDocument();
+
+    const deleteButton = screen.getByRole('button', { name: /Delete/i });
+
+    await waitFor(() => user.click(deleteButton));
   });
 });
 

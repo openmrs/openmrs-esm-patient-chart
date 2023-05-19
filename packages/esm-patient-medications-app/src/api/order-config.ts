@@ -1,5 +1,7 @@
 import { openmrsFetch } from '@openmrs/esm-framework';
-import useSWR from 'swr';
+import { useMemo } from 'react';
+import useSWRImmutable from 'swr/immutable';
+import { DosingUnit, DurationUnit, MedicationFrequency, MedicationRoute, QuantityUnit } from './drug-order-template';
 
 export interface CommonConfigProps {
   uuid: string;
@@ -14,15 +16,51 @@ export interface OrderConfig {
   orderFrequencies: Array<CommonConfigProps>;
 }
 
-export function useOrderConfig() {
-  const { data, error, isValidating } = useSWR<{ data: OrderConfig }, Error>(
+export function useOrderConfig(): {
+  isLoading: boolean;
+  error: Error;
+  orderConfigObject: {
+    drugRoutes: Array<MedicationRoute>;
+    drugDosingUnits: Array<DosingUnit>;
+    drugDispensingUnits: Array<QuantityUnit>;
+    durationUnits: Array<DurationUnit>;
+    orderFrequencies: Array<MedicationFrequency>;
+  };
+} {
+  const { data, error, isLoading, isValidating } = useSWRImmutable<{ data: OrderConfig }, Error>(
     `/ws/rest/v1/orderentryconfig`,
     openmrsFetch,
   );
-  return {
-    orderConfigObject: data ? data.data : null,
-    isLoading: !data && !error,
-    isError: error,
-    isValidating,
-  };
+
+  const results = useMemo(
+    () => ({
+      orderConfigObject: {
+        drugRoutes: data?.data?.drugRoutes?.map(({ uuid, display }) => ({
+          valueCoded: uuid,
+          value: display,
+        })),
+        drugDosingUnits: data?.data?.drugDosingUnits?.map(({ uuid, display }) => ({
+          valueCoded: uuid,
+          value: display,
+        })),
+        drugDispensingUnits: data?.data?.drugDispensingUnits?.map(({ uuid, display }) => ({
+          valueCoded: uuid,
+          value: display,
+        })),
+        durationUnits: data?.data?.durationUnits?.map(({ uuid, display }) => ({
+          valueCoded: uuid,
+          value: display,
+        })),
+        orderFrequencies: data?.data?.orderFrequencies?.map(({ uuid, display }) => ({
+          valueCoded: uuid,
+          value: display,
+        })),
+      },
+      isLoading,
+      error,
+    }),
+    [data, error, isLoading],
+  );
+
+  return results;
 }

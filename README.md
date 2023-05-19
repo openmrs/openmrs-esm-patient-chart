@@ -30,7 +30,12 @@ In addition to these widgets, two other microfrontends exist that encapsulate cr
 
 Check out the developer documentation [here](http://o3-dev.docs.openmrs.org).
 
-This monorepo uses [yarn](https://yarnpkg.com) and [lerna](https://github.com/lerna/lerna). 
+This monorepo uses [yarn](https://yarnpkg.com) and [lerna](https://github.com/lerna/lerna).
+
+To install the dependencies, run:
+```bash
+yarn
+```
 
 To start a dev server for a specific microfrontend, run:
 
@@ -40,13 +45,6 @@ yarn start --sources 'packages/esm-patient-<insert-package-name>-app'
 
 This command uses the [openmrs](https://www.npmjs.com/package/openmrs) tooling to fire up a dev server running `esm-patient-chart` as well as the specified microfrontend.
 
-To start a dev server running all the packages, run:
-
-```bash
-yarn start-all
-```
-
-Note that this is very resource-intensive. 
 
 There are two approaches for working on multiple microfrontends simultaneously.
 
@@ -57,6 +55,21 @@ yarn start --sources 'packages/esm-patient-biometrics-app' --sources 'packages/e
 ```
 
 Alternatively, you could run `yarn serve` from within the individual packages and then use [import map overrides](http://o3-dev.docs.openmrs.org/#/getting_started/setup?id=import-map-overrides).
+
+## Troubleshooting
+
+If you notice that your local version of the application is not working or that there's a mismatch between what you see locally versus what's in [dev3](https://dev3.openmrs.org/openmrs/spa), you likely have outdated versions of core libraries. To update core libraries, run the following commands:
+
+```bash
+# Upgrade core libraries
+yarn up openmrs @openmrs/esm-framework
+
+# Reset version specifiers to `next`. Don't commit actual version numbers.
+git checkout package.json
+
+# Run `yarn` to recreate the lockfile
+yarn
+```
 
 ## Layout
 
@@ -82,6 +95,10 @@ A **dashboard** is a collection of widgets.
 The **workspace** is where data entry takes place. On mobile devices it covers the screen; on desktop it appears in a sidebar.
 
 The **side menu** provides access to features that do not have their own pages, such as the notifications menu.
+
+## Design Patterns
+
+For documentation about our design patterns, please visit our [design system](https://zeroheight.com/23a080e38/p/880723--introduction) documentation website.
 
 ## Configuration
 

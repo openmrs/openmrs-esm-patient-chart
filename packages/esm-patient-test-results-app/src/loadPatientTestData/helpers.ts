@@ -152,28 +152,32 @@ export function exist(...args: any[]): boolean {
 
 export const assessValue =
   (meta: ObsMetaInfo) =>
-  (value: number): OBSERVATION_INTERPRETATION => {
-    if (exist(meta.hiAbsolute) && value > meta.hiAbsolute) {
+  (value: string): OBSERVATION_INTERPRETATION => {
+    if (isNaN(parseFloat(value))) {
+      return 'NORMAL';
+    }
+    const numericValue = parseFloat(value);
+    if (exist(meta.hiAbsolute) && numericValue > meta.hiAbsolute) {
       return 'OFF_SCALE_HIGH';
     }
 
-    if (exist(meta.hiCritical) && value > meta.hiCritical) {
+    if (exist(meta.hiCritical) && numericValue > meta.hiCritical) {
       return 'CRITICALLY_HIGH';
     }
 
-    if (exist(meta.hiNormal) && value > meta.hiNormal) {
+    if (exist(meta.hiNormal) && numericValue > meta.hiNormal) {
       return 'HIGH';
     }
 
-    if (exist(meta.lowAbsolute) && value < meta.lowAbsolute) {
+    if (exist(meta.lowAbsolute) && numericValue < meta.lowAbsolute) {
       return 'OFF_SCALE_LOW';
     }
 
-    if (exist(meta.lowCritical) && value < meta.lowCritical) {
+    if (exist(meta.lowCritical) && numericValue < meta.lowCritical) {
       return 'CRITICALLY_LOW';
     }
 
-    if (exist(meta.lowNormal) && value < meta.lowNormal) {
+    if (exist(meta.lowNormal) && numericValue < meta.lowNormal) {
       return 'LOW';
     }
 

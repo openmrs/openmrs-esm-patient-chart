@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   DataTable,
   Table,
@@ -12,9 +12,10 @@ import {
   TableExpandRow,
   TableExpandedRow,
 } from '@carbon/react';
-import { formatDate, formatTime, parseDate, usePagination } from '@openmrs/esm-framework';
+import { formatDate, formatTime, parseDate, useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
+import orderBy from 'lodash-es/orderBy';
 import { PatientNote } from '../types';
 import styles from './notes-overview.scss';
 
@@ -27,7 +28,10 @@ interface PaginatedNotes {
 
 const PaginatedNotes: React.FC<PaginatedNotes> = ({ notes, pageSize, pageUrl, urlLabel }) => {
   const { t } = useTranslation();
-  const { results: paginatedNotes, goTo, currentPage } = usePagination(notes, pageSize);
+  const layout = useLayoutType();
+  const isTablet = layout === 'tablet';
+
+  const [sortParams, setSortParams] = useState({ key: '', order: 'none' });
 
   const tableHeaders = [
     {
@@ -40,26 +44,61 @@ const PaginatedNotes: React.FC<PaginatedNotes> = ({ notes, pageSize, pageUrl, ur
     },
   ];
 
+  const sortDate = (myArray, order) =>
+    order === 'ASC'
+      ? orderBy(myArray, [(obj) => new Date(obj.encounterDate).getTime()], ['desc'])
+      : orderBy(myArray, [(obj) => new Date(obj.encounterDate).getTime()], ['asc']);
+
+  const { key, order } = sortParams;
+
+  const sortedData =
+    key === 'encounterDate'
+      ? sortDate(notes, order)
+      : order === 'DESC'
+      ? orderBy(notes, [key], ['desc'])
+      : orderBy(notes, [key], ['asc']);
+
+  function customSortRow(noteA, noteB, { sortDirection, sortStates, ...props }) {
+    const { key } = props;
+    setSortParams({ key, order: sortDirection });
+  }
+
+  const { results: paginatedNotes, goTo, currentPage } = usePagination(sortedData, pageSize);
   const tableRows = React.useMemo(
     () =>
       paginatedNotes?.map((note) => ({
         ...note,
         id: `${note.id}`,
         encounterDate: formatDate(parseDate(note.encounterDate), { mode: 'wide' }),
-        diagnoses: note.diagnoses,
+        diagnoses: note.diagnoses ? note.diagnoses : '--',
       })),
     [paginatedNotes],
   );
 
   return (
     <>
-      <DataTable rows={tableRows} headers={tableHeaders} isSortable size="sm" useZebraStyles>
-        {({ rows, headers, getTableProps, getTableContainerProps, getHeaderProps, getRowProps }) => (
+      <DataTable
+        rows={tableRows}
+        sortRow={customSortRow}
+        headers={tableHeaders}
+        isSortable
+        size={isTablet ? 'lg' : 'sm'}
+        useZebraStyles
+      >
+        {({
+          rows,
+          headers,
+          getExpandHeaderProps,
+          getTableProps,
+          getTableContainerProps,
+          getHeaderProps,
+          getRowProps,
+        }) => (
           <TableContainer {...getTableContainerProps}>
             <Table {...getTableProps()}>
               <TableHead>
                 <TableRow>
-                  <TableExpandHeader />
+                  <TableExpandHeader enableToggle {...getExpandHeaderProps()} />
                   {headers.map((header, i) => (
                     <TableHeader
                       key={i}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { attach, openmrsFetch } from '@openmrs/esm-framework';
+import { openmrsFetch } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { mockFhirConditionsResponse } from '../../../../__mocks__/conditions.mock';
@@ -67,7 +67,7 @@ it("renders a detailed summary of the patient's conditions when present", async 
   expect(screen.getByRole('heading', { name: /conditions/i })).toBeInTheDocument();
   expect(screen.getByRole('button', { name: /add/i })).toBeInTheDocument();
 
-  const expectedColumnHeaders = [/condition/, /since/, /status/];
+  const expectedColumnHeaders = [/condition/, /date of onset/, /status/];
   expectedColumnHeaders.forEach((header) => {
     expect(screen.getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument();
   });
@@ -76,7 +76,7 @@ it("renders a detailed summary of the patient's conditions when present", async 
   expectedTableRows.forEach((row) => {
     expect(screen.getByRole('row', { name: new RegExp(row, 'i') })).toBeInTheDocument();
   });
-  expect(screen.getAllByRole('row').length).toEqual(9);
+  expect(screen.getAllByRole('row').length).toEqual(8);
 });
 
 it('clicking the Add button or Record Conditions link launches the conditions form', async () => {
@@ -93,7 +93,9 @@ it('clicking the Add button or Record Conditions link launches the conditions fo
   await waitFor(() => user.click(recordConditionsLink));
 
   expect(launchPatientWorkspace).toHaveBeenCalledTimes(1);
-  expect(launchPatientWorkspace).toHaveBeenCalledWith('conditions-form-workspace');
+  expect(launchPatientWorkspace).toHaveBeenCalledWith('conditions-form-workspace', {
+    workspaceTitle: 'Record a Condition',
+  });
 });
 
 function renderConditionsDetailedSummary() {

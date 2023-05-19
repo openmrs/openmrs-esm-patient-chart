@@ -1,11 +1,12 @@
 import {
   DosingUnit,
-  MedicationDosage,
+  DurationUnit,
   MedicationFrequency,
   MedicationRoute,
   OrderTemplate,
+  QuantityUnit,
 } from '../api/drug-order-template';
-import { OpenmrsResource } from './openmrs-resource';
+import { OpenmrsResource } from '@openmrs/esm-framework';
 import { Drug } from './order';
 
 export interface OrderBasketItem {
@@ -14,18 +15,17 @@ export interface OrderBasketItem {
   drug: Drug;
   unit: DosingUnit;
   commonMedicationName: string;
-  dosage: MedicationDosage;
+  dosage: number;
   frequency: MedicationFrequency;
   route: MedicationRoute;
-  encounterUuid: string;
   orderer: string;
   careSetting: string;
-  quantityUnits: string;
+  quantityUnits: QuantityUnit;
   patientInstructions: string;
   asNeeded: boolean;
   asNeededCondition: string;
-  startDate: Date;
-  durationUnit: OpenmrsResource;
+  startDate: Date | string;
+  durationUnit: DurationUnit;
   duration: number | null;
   pillsDispensed: number;
   numRefills: number;

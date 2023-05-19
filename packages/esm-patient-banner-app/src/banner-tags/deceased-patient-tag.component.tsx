@@ -9,19 +9,23 @@ interface DeceasedPatientBannerTagProps {
 }
 const DeceasedPatientBannerTag: React.FC<DeceasedPatientBannerTagProps> = ({ patient }) => {
   const { t } = useTranslation();
-  return patient.deceasedDateTime ? (
-    <DefinitionTooltip
-      align="bottom-left"
-      definition={
-        <div role="tooltip" className={styles.tooltipPadding}>
-          <h6 style={{ marginBottom: '0.5rem' }}>{t('deceased', 'Deceased')}</h6>
-          <span>{formatDatetime(parseDate(patient.deceasedDateTime))}</span>
-        </div>
-      }
-    >
-      <Tag type="red">{t('deceased', 'Deceased')}</Tag>
-    </DefinitionTooltip>
-  ) : null;
+  const isDeceased = Boolean(patient?.deceasedDateTime);
+
+  return (
+    isDeceased && (
+      <DefinitionTooltip
+        align="bottom-left"
+        definition={
+          <div role="tooltip" className={styles.tooltipPadding}>
+            <h6 style={{ marginBottom: '0.5rem' }}>{t('deceased', 'Deceased')}</h6>
+            <span>{formatDatetime(parseDate(patient?.deceasedDateTime))}</span>
+          </div>
+        }
+      >
+        <Tag className={styles.tagOverride}>{t('deceased', 'Deceased')}</Tag>
+      </DefinitionTooltip>
+    )
+  );
 };
 
 export default DeceasedPatientBannerTag;

@@ -45,7 +45,7 @@ const StartVisitDialog: React.FC<StartVisitDialogProps> = ({
   }, [closeModal, patientUuid, launchPatientChart]);
 
   const modalHeaderText =
-    visitType === 'past' ? t('addPastVisit', 'Add a past visit') : t('noActiveVisit', 'No active visit');
+    visitType === 'past' ? t('addAPastVisit', 'Add a past visit') : t('noActiveVisit', 'No active visit');
 
   const modalBodyText =
     visitType === 'past'

@@ -1,15 +1,20 @@
-import { forkJoin, Observable } from 'rxjs';
+import { forkJoin, of } from 'rxjs';
+import { map, mergeMap } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { WindowRef } from '../window-ref';
-import { ListResult } from '../types';
-import { map } from 'rxjs/operators';
+
+interface ConceptReferencesResult {
+  [key: string]: ConceptMetadata;
+}
 
 interface ConceptMetadata {
-  uuid: string;
+  identifier: string;
   display: string;
 }
+
+const chunkSize = 100;
 
 @Injectable()
 export class ConceptService {
@@ -19,50 +24,49 @@ export class ConceptService {
 
   constructor(private http: HttpClient, private windowRef: WindowRef) {}
 
-  public getUrl(): string {
-    return this.windowRef.openmrsRestBase + 'concept';
-  }
+  public searchConceptsByIdentifiers(conceptIdentifiers: Array<string>) {
+    return of(ConceptService.getConceptReferenceUrls(conceptIdentifiers))
+      .pipe(
+        mergeMap((referenceUrl) =>
+          forkJoin(
+            referenceUrl.map((url) =>
+              this.http
+                .get<ConceptReferencesResult>(this.windowRef.openmrsRestBase + url, {
+                  headers: this.headers,
+                })
+                .pipe(
+                  map((result) =>
+                    Object.entries(result).reduce((acc, reference) => {
+                      acc.push({
+                        identifier: reference[0],
+                        display: reference[1].display,
+                      });
 
-  public searchConceptByUUID(conceptUUID: string, lang: string): Observable<any> {
-    return this.http.get(this.getUrl() + `/${conceptUUID}?v=full&lang=${lang}`, {
-      headers: this.headers,
-    });
-  }
-
-  public searchBulkConceptsByUUID(conceptUuids: Array<string>, lang: string): Observable<Array<ConceptMetadata>> {
-    const observablesArray = [];
-    const relativeConceptLabelUrls = ConceptService.getRelativeConceptLabelUrls(conceptUuids, lang);
-
-    for (const relativeConceptLabelUrl of relativeConceptLabelUrls) {
-      observablesArray.push(
-        this.http
-          .get<ListResult<ConceptMetadata>>(this.windowRef.openmrsRestBase + relativeConceptLabelUrl, {
-            headers: this.headers,
-          })
-          .pipe(
-            map((r) => {
-              return r.results;
-            }),
+                      return acc;
+                    }, [] as Array<ConceptMetadata>),
+                  ),
+                )
+                .toPromise(),
+            ),
           ),
-      );
-    }
-
-    return forkJoin(observablesArray).pipe(
-      map((response) => {
-        return response.flat() as Array<ConceptMetadata>;
-      }),
-    );
+        ),
+      )
+      .pipe(map((r) => r.flat()));
   }
 
   /**
-   * Partitions the given concept UUIDs into relative URLs pointing to the concept
+   * Partitions the given concept identifiers into relative URLs pointing to the concept
    * bulk fetching endpoint.
-   * @param conceptUuids The concept UUIDs to be partitioned into bulk fetching URLs.
+   * @param conceptIdentifiers The concept identifiers to be chunked
    */
-  public static getRelativeConceptLabelUrls(conceptUuids: Array<string>, lang: string) {
-    const chunkSize = 100;
-    return [...new Set(conceptUuids)]
-      .reduceRight((acc, _, __, array) => [...acc, array.splice(0, chunkSize)], [])
-      .map((uuidPartition) => `concept?references=${uuidPartition.join(',')}`);
+  public static getConceptReferenceUrls(conceptIdentifiers: Array<string>) {
+    const accumulator = [];
+    for (let i = 0; i < conceptIdentifiers.length; i += chunkSize) {
+      accumulator.push(conceptIdentifiers.slice(i, i + chunkSize));
+    }
+
+    return accumulator.map(
+      (partition) => `conceptreferences?references=${partition.join(',')}&v=custom:(uuid,display)`,
+    );
   }
 }

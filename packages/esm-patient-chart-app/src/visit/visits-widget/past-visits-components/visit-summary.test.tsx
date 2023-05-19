@@ -7,8 +7,10 @@ import {
 } from '../../../../../../__mocks__/visits.mock';
 import { mockPatient } from '../../../../../../__mocks__/patient.mock';
 import VisitSummary from './visit-summary.component';
+import { getConfig } from '@openmrs/esm-framework';
 
 const mockEncounter = visitOverviewDetailMockData.data.results[0].encounters.map((encounter) => encounter);
+const mockGetConfig = getConfig as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -20,8 +22,6 @@ jest.mock('@openmrs/esm-framework', () => {
       return {
         notesConceptUuids: ['162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', 'some-uuid2'],
         visitDiagnosisConceptUuid: '159947AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-        problemListConceptUuid: '1284AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-        diagnosisOrderConceptUuid: '159946AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
       };
     }),
   };
@@ -30,6 +30,7 @@ jest.mock('@openmrs/esm-framework', () => {
 describe('VisitSummary', () => {
   it('should display empty state for notes, test and medication summary', async () => {
     const user = userEvent.setup();
+    mockGetConfig.mockReturnValue(Promise.resolve({ htmlFormEntryForms: [] }));
 
     renderVisitSummary();
 

@@ -1,4 +1,4 @@
-import { defineConfigSchema, getAsyncLifecycle } from '@openmrs/esm-framework';
+import { defineConfigSchema, defineExtensionConfigSchema, getAsyncLifecycle } from '@openmrs/esm-framework';
 import { configSchema } from './config-schema';
 
 declare var __VERSION__: string;
@@ -19,7 +19,7 @@ function setupOpenMRS() {
     moduleName,
   };
 
-  defineConfigSchema(moduleName, configSchema);
+  defineExtensionConfigSchema(moduleName, configSchema);
 
   return {
     extensions: [

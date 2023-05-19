@@ -71,3 +71,13 @@
     flex-direction: column;
   }
 }
+
+.inlineNotification {
+  width: 100%;
+  max-width: unset;
+  padding: '0rem';
+}
+
+.queueSection {
+  margin-top: spacing.$spacing-04;
+}

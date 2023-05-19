@@ -26,13 +26,13 @@ enum TickRotations {
 
 const TrendLineBackground = ({ ...props }) => <div {...props} className={styles.background} />;
 
-const TrendlineHeader = ({ basePath, title, referenceRange, isValidating, showBackToTimelineButton }) => {
+const TrendlineHeader = ({ patientUuid, title, referenceRange, isValidating, showBackToTimelineButton }) => {
   const { t } = useTranslation();
   return (
     <div className={styles.header}>
       <div className={styles.backButton}>
         {showBackToTimelineButton && (
-          <ConfigurableLink to={testResultsBasePath(basePath)}>
+          <ConfigurableLink to={testResultsBasePath(`/patient/${patientUuid}/chart`)}>
             <Button
               kind="ghost"
               renderIcon={(props) => <ArrowLeft {...props} size={24} />}
@@ -45,7 +45,7 @@ const TrendlineHeader = ({ basePath, title, referenceRange, isValidating, showBa
       </div>
       <div className={styles.content}>
         <span className={styles.title}>{title}</span>
-        <span className={styles.referenceange}>{referenceRange}</span>
+        <span className={styles['reference-range']}>{referenceRange}</span>
       </div>
       <div>{isValidating && <InlineLoading className={styles.inlineLoader} />}</div>
     </div>
@@ -132,7 +132,7 @@ const Trendline: React.FC<TrendlineProps> = ({
 
     data.push({
       date: new Date(Date.parse(obs.obsDatetime)),
-      value: obs.value,
+      value: parseFloat(obs.value),
       group: chartTitle,
       ...range,
     });
@@ -142,7 +142,7 @@ const Trendline: React.FC<TrendlineProps> = ({
       date: formatDate(parseDate(obs.obsDatetime)),
       time: formatTime(parseDate(obs.obsDatetime)),
       value: {
-        value: obs.value,
+        value: parseFloat(obs.value),
         interpretation: obs.interpretation,
       },
     });
@@ -222,12 +222,12 @@ const Trendline: React.FC<TrendlineProps> = ({
   }
 
   return (
-    <>
+    <div className={styles.container}>
       {!hideTrendlineHeader && (
         <TrendlineHeader
           showBackToTimelineButton={showBackToTimelineButton}
           isValidating={isValidating}
-          basePath={basePath}
+          patientUuid={patientUuid}
           title={dataset}
           referenceRange={referenceRange}
         />
@@ -237,7 +237,7 @@ const Trendline: React.FC<TrendlineProps> = ({
         <LineChart data={data} options={chartOptions} />
       </TrendLineBackground>
       <DrawTable {...{ tableData, tableHeaderData }} />
-    </>
+    </div>
   );
 };
 

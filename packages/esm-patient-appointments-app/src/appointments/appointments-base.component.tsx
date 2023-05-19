@@ -7,6 +7,7 @@ import { CardHeader, EmptyDataIllustration, ErrorState, launchPatientWorkspace }
 import { useAppointments } from './appointments.resource';
 import AppointmentsTable from './appointments-table.component';
 import styles from './appointments-base.scss';
+import { useLayoutType } from '@openmrs/esm-framework';
 
 interface AppointmentsBaseProps {
   basePath?: string;
@@ -15,12 +16,16 @@ interface AppointmentsBaseProps {
 
 enum AppointmentTypes {
   UPCOMING = 0,
-  PAST = 1,
+  TODAY = 1,
+  PAST = 2,
 }
 
 const AppointmentsBase: React.FC<AppointmentsBaseProps> = ({ patientUuid }) => {
   const { t } = useTranslation();
   const headerTitle = t('appointments', 'Appointments');
+  const isTablet = useLayoutType() === 'tablet';
+
+  const [switchedView, setSwitchedView] = useState(false);
 
   const [contentSwitcherValue, setContentSwitcherValue] = useState(0);
   const startDate = dayjs(new Date().toISOString()).subtract(6, 'month').toISOString();
@@ -31,9 +36,12 @@ const AppointmentsBase: React.FC<AppointmentsBaseProps> = ({ patientUuid }) => {
     isValidating,
   } = useAppointments(patientUuid, startDate, new AbortController());
 
-  const launchAppointmentsForm = () => launchPatientWorkspace('appointments-form-workspace');
+  const launchAppointmentsForm = () =>
+    launchPatientWorkspace('appointments-form-workspace', {
+      workspaceTitle: t('scheduleAppointment', 'Schedule appointment'),
+    });
 
-  if (isLoading) return <DataTableSkeleton role="progressbar" />;
+  if (isLoading) return <DataTableSkeleton role="progressbar" compact={!isTablet} zebra />;
   if (isError) {
     return <ErrorState headerTitle={headerTitle} error={isError} />;
   }
@@ -47,8 +55,15 @@ const AppointmentsBase: React.FC<AppointmentsBaseProps> = ({ patientUuid }) => {
             </span>
           ) : null}
           <div className={styles.contentSwitcherWrapper}>
-            <ContentSwitcher size="md" onChange={({ index }) => setContentSwitcherValue(index)}>
+            <ContentSwitcher
+              size={isTablet ? 'md' : 'sm'}
+              onChange={({ index }) => {
+                setContentSwitcherValue(index);
+                setSwitchedView(true);
+              }}
+            >
               <Switch name={'upcoming'} text={t('upcoming', 'Upcoming')} />
+              <Switch name={'today'} text={t('today', 'Today')} />
               <Switch name={'past'} text={t('past', 'Past')} />
             </ContentSwitcher>
             <div className={styles.divider}></div>
@@ -65,22 +80,65 @@ const AppointmentsBase: React.FC<AppointmentsBaseProps> = ({ patientUuid }) => {
         {(() => {
           if (contentSwitcherValue === AppointmentTypes.UPCOMING) {
             if (appointmentsData.upcomingAppointments?.length) {
-              return <AppointmentsTable patientAppointments={appointmentsData?.upcomingAppointments} />;
+              return (
+                <AppointmentsTable
+                  patientAppointments={appointmentsData?.upcomingAppointments}
+                  switchedView={switchedView}
+                  setSwitchedView={setSwitchedView}
+                  patientUuid={patientUuid}
+                />
+              );
             }
             return (
               <Layer>
                 <Tile className={styles.tile}>
                   <EmptyDataIllustration />
                   <p className={styles.content}>
-                    {t('noUpcomingAppointments', 'There are no upcoming appointments to display for this patient')}
+                    {t(
+                      'noUpcomingAppointmentsForPatient',
+                      'There are no upcoming appointments to display for this patient',
+                    )}
                   </p>
                 </Tile>
               </Layer>
             );
           }
+          if (contentSwitcherValue === AppointmentTypes.TODAY) {
+            if (appointmentsData.todaysAppointments?.length) {
+              return (
+                <AppointmentsTable
+                  patientAppointments={appointmentsData?.todaysAppointments}
+                  switchedView={switchedView}
+                  setSwitchedView={setSwitchedView}
+                  patientUuid={patientUuid}
+                />
+              );
+            }
+            return (
+              <Layer>
+                <Tile className={styles.tile}>
+                  <EmptyDataIllustration />
+                  <p className={styles.content}>
+                    {t(
+                      'noCurrentAppointments',
+                      'There are no appointments scheduled for today to display for this patient',
+                    )}
+                  </p>
+                </Tile>
+              </Layer>
+            );
+          }
+
           if (contentSwitcherValue === AppointmentTypes.PAST) {
             if (appointmentsData.pastAppointments?.length) {
-              return <AppointmentsTable patientAppointments={appointmentsData?.pastAppointments} />;
+              return (
+                <AppointmentsTable
+                  patientAppointments={appointmentsData?.pastAppointments}
+                  switchedView={switchedView}
+                  setSwitchedView={setSwitchedView}
+                  patientUuid={patientUuid}
+                />
+              );
             }
             return (
               <Layer>

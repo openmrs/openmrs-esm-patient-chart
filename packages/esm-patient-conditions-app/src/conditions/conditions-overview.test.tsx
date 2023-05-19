@@ -5,12 +5,11 @@ import { mockPatient } from '../../../../__mocks__/patient.mock';
 import { openmrsFetch, usePagination } from '@openmrs/esm-framework';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { mockConditions, mockFhirConditionsResponse } from '../../../../__mocks__/conditions.mock';
-import { patientChartBasePath, renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
+import { renderWithSwr, waitForLoadingToFinish } from '../../../../tools/test-helpers';
 import ConditionsOverview from './conditions-overview.component';
 
 const testProps = {
-  basePath: patientChartBasePath,
-  patient: mockPatient,
+  patientUuid: mockPatient.id,
 };
 
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
@@ -21,6 +20,7 @@ jest.mock('@openmrs/esm-framework', () => {
 
   return {
     ...originalModule,
+    useConfig: jest.fn().mockImplementation(() => ({ conditionPageSize: 5 })),
     usePagination: jest.fn().mockImplementation(() => ({
       currentPage: 1,
       goTo: () => {},
@@ -91,7 +91,7 @@ describe('ConditionsOverview: ', () => {
     expect(screen.getByRole('heading', { name: /conditions/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /add/i })).toBeInTheDocument();
 
-    const expectedColumnHeaders = [/active conditions/, /since/];
+    const expectedColumnHeaders = [/condition/, /date of onset/, /status/];
     expectedColumnHeaders.forEach((header) => {
       expect(screen.getByRole('columnheader', { name: new RegExp(header, 'i') })).toBeInTheDocument();
     });
@@ -102,7 +102,7 @@ describe('ConditionsOverview: ', () => {
     });
 
     expect(screen.getAllByRole('row').length).toEqual(6);
-    expect(screen.getByText(/1–5 of 8 items/i)).toBeInTheDocument();
+    expect(screen.getByText(/1–5 of 7 items/i)).toBeInTheDocument();
 
     const nextPageButton = screen.getByRole('button', { name: /next page/i });
 
@@ -125,7 +125,9 @@ describe('ConditionsOverview: ', () => {
     await waitFor(() => user.click(recordConditionsLink));
 
     expect(launchPatientWorkspace).toHaveBeenCalledTimes(1);
-    expect(launchPatientWorkspace).toHaveBeenCalledWith('conditions-form-workspace');
+    expect(launchPatientWorkspace).toHaveBeenCalledWith('conditions-form-workspace', {
+      workspaceTitle: 'Record a Condition',
+    });
   });
 });
 

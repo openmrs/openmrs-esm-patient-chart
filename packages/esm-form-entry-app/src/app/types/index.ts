@@ -1,6 +1,6 @@
 import { Form } from '@openmrs/ngx-formentry';
 
-interface OpenMRSResource {
+interface OpenmrsResource {
   display: string;
   uuid: string;
   links?: Array<{ rel: string; uri: string }>;
@@ -112,27 +112,52 @@ export interface Order {
   };
 }
 
+export interface Diagnosis {
+  uuid: string;
+  display: string;
+  diagnosis: {
+    coded?: {
+      uuid: string;
+      display?: string;
+    };
+    nonCoded?: string;
+  };
+  certainty: string;
+  rank: number;
+}
+
 export interface FormSchema {
   auditInfo: {
     dateCreated: string;
     dateChanged: string;
-    changedBy: OpenMRSResource;
-    creator: OpenMRSResource;
+    changedBy: OpenmrsResource;
+    creator: OpenmrsResource;
   };
   build: string;
   description: string;
   display: string;
-  encounterType: OpenMRSResource;
+  encounterType: OpenmrsResource;
   formField: Array<unknown>;
   name: string;
   pages: Array<{ label: string; sections: Array<Sections> }>;
   processor: string;
   published: boolean;
-  referencedForms: Form;
+  referencedForms: Array<unknown>;
   resourceVersion: string;
   retired: boolean;
+  translations?: Record<string, string>;
   uuid: string;
   version: string;
+}
+
+export interface FormMetadataObject {
+  display: string;
+  resources: Array<{ name: string; valueReference: string }>;
+}
+
+export interface FormSchemaAndTranslations {
+  schema: FormSchema;
+  translations?: Record<string, string>;
 }
 
 interface Sections {
@@ -157,6 +182,7 @@ interface QuestionOptions {
   rendering: string;
   concept?: string;
   answers?: Array<QuestionOptionsAnswer>;
+  useMostRecentValue: boolean | 'true';
 }
 
 interface QuestionOptionsAnswer {
@@ -258,6 +284,7 @@ export interface Encounter {
   };
   obs: Array<Observation>;
   orders: Array<Order>;
+  diagnoses: Array<Diagnosis>;
 }
 
 /** https://rest.openmrs.org/?shell#create-an-encounter */
@@ -270,6 +297,7 @@ export interface EncounterCreate {
   encounterProviders?: Array<ProviderCreate>;
   obs?: Array<ObsCreate>;
   orders?: Array<OrderCreate>;
+  diagnoses?: Array<DiagnosisCreate>;
   form?: string;
   visit?: string;
 }
@@ -330,6 +358,18 @@ export interface OrderCreate {
   dateActivated?: Date | string;
   dateStopped?: Date | string;
   // TODO: Fill as required.
+}
+
+export interface DiagnosisCreate {
+  uuid?: string;
+  encounter: string;
+  patient: string;
+  diagnosis: {
+    coded?: string;
+    nonCoded?: string;
+  };
+  certainty: 'CONFIRMED' | 'PROVISIONAL';
+  rank: number;
 }
 
 export interface Person {

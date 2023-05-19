@@ -64,7 +64,9 @@ const CommonOverview: React.FC<CommonOverviewProps> = ({
   }, [patientUuid]);
 
   if (!overviewData.length)
-    return <EmptyState headerTitle={t('testResults', 'Test Results')} displayText={t('testResults', 'test results')} />;
+    return (
+      <EmptyState headerTitle={t('testResults_title', 'Test Results')} displayText={t('testResults', 'test results')} />
+    );
 
   return (
     <>
@@ -147,7 +149,7 @@ const Separator = ({ ...props }) => <div {...props} className={styles.separator}
 const InfoTooltip = ({ effectiveDateTime, issuedDateTime }) => {
   const { t } = useTranslation();
   return (
-    <Toggletip align="bottom">
+    <Toggletip align="bottom" className={styles.tooltipContainer}>
       <ToggletipButton label="Additional information">
         <Information />
       </ToggletipButton>

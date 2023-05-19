@@ -10,32 +10,38 @@ const VisitNoteActionButton: React.FC = () => {
   const { t } = useTranslation();
   const layout = useLayoutType();
   const { workspaces } = useWorkspaces();
-  const isActive = workspaces.find(({ name }) => name.includes('visit-note'));
+
+  const isActiveWorkspace = workspaces?.[0]?.name?.match(/visit-note/i);
+
   const handleClick = useCallback(() => launchPatientWorkspace('visit-notes-form-workspace'), []);
 
-  if (layout === 'tablet')
+  if (layout === 'tablet') {
     return (
       <Button
         kind="ghost"
-        className={`${styles.container} ${isActive ? styles.active : ''}`}
+        className={`${styles.container} ${isActiveWorkspace ? styles.active : ''}`}
         role="button"
         tabIndex={0}
         onClick={handleClick}
       >
-        <Pen size={20} />
+        <Pen size={16} />
         <span>{t('visitNote', 'Visit note')}</span>
       </Button>
     );
+  }
+
   return (
     <Button
-      className={`${styles.container} ${isActive && styles.active}`}
+      className={`${styles.container} ${isActiveWorkspace && styles.active}`}
       onClick={handleClick}
       hasIconOnly
       kind="ghost"
       renderIcon={(props) => <Pen size={20} {...props} />}
       iconDescription={t('note', 'Note')}
-      tooltipAlignment="end"
-      tooltipPosition="bottom"
+      enterDelayMs={1000}
+      tooltipAlignment="center"
+      tooltipPosition="left"
+      size="sm"
     />
   );
 };

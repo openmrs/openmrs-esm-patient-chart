@@ -19,14 +19,17 @@ const DeleteAttachmentConfirmation: React.FC<DeleteAttachmentConfirmationProps> 
 
   return (
     <>
-      <ModalHeader className={styles.productiveHeading03}>
+      <ModalHeader closeModal={close} className={styles.productiveHeading03}>
         {t('delete', 'Delete')} {attachment.bytesContentFamily.toLowerCase()} ?
       </ModalHeader>
       <ModalBody>
         <p className={styles.bodyLong01}>
           {t(
             'deleteAttachmentConfirmationText',
-            `Are you sure you want to delete this ${attachment.bytesContentFamily.toLowerCase()}? This action can't be undone.`,
+            `Are you sure you want to delete this {attachmentType}? This action can't be undone.`,
+            {
+              attachmentType: attachment.bytesContentFamily.toLowerCase(),
+            },
           )}
         </p>
       </ModalBody>

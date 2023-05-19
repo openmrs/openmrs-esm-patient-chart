@@ -1,19 +1,29 @@
-import React from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+  Button,
   DataTable,
   DataTableSkeleton,
-  Button,
+  Dropdown,
   InlineLoading,
   Table,
+  TableBody,
   TableCell,
   TableContainer,
-  TableBody,
   TableHead,
   TableHeader,
   TableRow,
+  Tile,
 } from '@carbon/react';
-import { formatDate, parseDate, usePagination } from '@openmrs/esm-framework';
+import { Add } from '@carbon/react/icons';
+import {
+  formatDate,
+  parseDate,
+  isDesktop as isDesktopLayout,
+  useLayoutType,
+  usePagination,
+  useConfig,
+} from '@openmrs/esm-framework';
 import {
   EmptyState,
   ErrorState,
@@ -21,99 +31,170 @@ import {
   launchPatientWorkspace,
   CardHeader,
 } from '@openmrs/esm-patient-common-lib';
-import { Add } from '@carbon/react/icons';
+import { ConditionsActionMenu } from './conditions-action-menu.component';
 import { useConditions } from './conditions.resource';
 import styles from './conditions-overview.scss';
+import { ConfigObject } from '../config-schema';
 
 interface ConditionsOverviewProps {
-  basePath: string;
-  patient: fhir.Patient;
+  patientUuid: string;
 }
 
-const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patient, basePath }) => {
-  const conditionsCount = 5;
+const ConditionsOverview: React.FC<ConditionsOverviewProps> = ({ patientUuid }) => {
+  const { conditionPageSize } = useConfig<ConfigObject>();
   const { t } = useTranslation();
   const displayText = t('conditions', 'Conditions');
   const headerTitle = t('conditions', 'Conditions');
   const urlLabel = t('seeAll', 'See all');
-  const pageUrl = `\${openmrsSpaBase}/patient/${patient.id}/chart/Conditions`;
+  const pageUrl = `\${openmrsSpaBase}/patient/${patientUuid}/chart/Conditions`;
+  const layout = useLayoutType();
+  const isDesktop = isDesktopLayout(layout);
+  const isTablet = !isDesktop;
 
-  const { data: conditions, isError, isLoading, isValidating } = useConditions(patient.id);
-  const { results: paginatedConditions, goTo, currentPage } = usePagination(conditions ?? [], conditionsCount);
+  const { conditions, isError, isLoading, isValidating } = useConditions(patientUuid);
+  const [filter, setFilter] = useState<'All' | 'Active' | 'Inactive'>('Active');
+  const launchConditionsForm = useCallback(
+    () => launchPatientWorkspace('conditions-form-workspace', { workspaceTitle: 'Record a Condition' }),
+    [],
+  );
 
-  const launchConditionsForm = React.useCallback(() => launchPatientWorkspace('conditions-form-workspace'), []);
+  const filteredConditions = useMemo(() => {
+    if (!filter || filter == 'All') {
+      return conditions;
+    }
+
+    if (filter) {
+      return conditions?.filter((condition) => condition.clinicalStatus === filter);
+    }
+
+    return conditions;
+  }, [filter, conditions]);
+
+  const {
+    results: paginatedConditions,
+    goTo,
+    currentPage,
+  } = usePagination(filteredConditions ?? [], conditionPageSize);
+
   const tableHeaders = [
     {
       key: 'display',
-      header: t('activeConditions', 'Active Conditions'),
+      header: t('condition', 'Condition'),
     },
     {
       key: 'onsetDateTime',
-      header: t('since', 'Since'),
+      header: t('dateOfOnset', 'Date of onset'),
+    },
+    {
+      key: 'clinicalStatus',
+      header: t('status', 'Status'),
     },
   ];
 
-  const tableRows = React.useMemo(() => {
+  const tableRows = useMemo(() => {
     return paginatedConditions?.map((condition) => ({
       ...condition,
-      onsetDateTime: formatDate(parseDate(condition.onsetDateTime), { time: false, day: false }),
+      onsetDateTime: condition.onsetDateTime
+        ? formatDate(parseDate(condition.onsetDateTime), { time: false, day: false })
+        : '--',
     }));
   }, [paginatedConditions]);
 
-  if (isLoading) return <DataTableSkeleton role="progressbar" />;
+  const handleConditionStatusChange = ({ selectedItem }) => setFilter(selectedItem);
+
+  if (isLoading) return <DataTableSkeleton role="progressbar" compact={isDesktop} zebra />;
   if (isError) return <ErrorState error={isError} headerTitle={headerTitle} />;
   if (conditions?.length) {
     return (
       <div className={styles.widgetCard}>
         <CardHeader title={headerTitle}>
           <span>{isValidating ? <InlineLoading /> : null}</span>
-          <Button
-            kind="ghost"
-            renderIcon={(props) => <Add size={16} {...props} />}
-            iconDescription="Add conditions"
-            onClick={launchConditionsForm}
-          >
-            {t('add', 'Add')}
-          </Button>
+          <div className={styles.rightMostFlexContainer}>
+            <div className={styles.filterContainer}>
+              <Dropdown
+                id="conditionStatusFilter"
+                initialSelectedItem={'Active'}
+                label=""
+                titleText={t('show', 'Show') + ':'}
+                type="inline"
+                items={['All', 'Active', 'Inactive']}
+                onChange={handleConditionStatusChange}
+                size={isTablet ? 'lg' : 'sm'}
+              />
+            </div>
+            <div className={styles.divider}></div>
+            <Button
+              kind="ghost"
+              renderIcon={(props) => <Add size={16} {...props} />}
+              iconDescription="Add conditions"
+              onClick={launchConditionsForm}
+            >
+              {t('add', 'Add')}
+            </Button>
+          </div>
         </CardHeader>
-        <DataTable rows={tableRows} headers={tableHeaders} isSortable size="sm" useZebraStyles>
+        <DataTable
+          rows={tableRows}
+          headers={tableHeaders}
+          isSortable
+          size={isTablet ? 'lg' : 'sm'}
+          useZebraStyles
+          overflowMenuOnHover={isDesktop}
+        >
           {({ rows, headers, getHeaderProps, getTableProps }) => (
-            <TableContainer>
-              <Table {...getTableProps()}>
-                <TableHead>
-                  <TableRow>
-                    {headers.map((header) => (
-                      <TableHeader
-                        className={`${styles.productiveHeading01} ${styles.text02}`}
-                        {...getHeaderProps({
-                          header,
-                          isSortable: header.isSortable,
-                        })}
-                      >
-                        {header.header?.content ?? header.header}
-                      </TableHeader>
-                    ))}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {rows.map((row) => (
-                    <TableRow key={row.id}>
-                      {row.cells.map((cell) => (
-                        <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+            <>
+              <TableContainer>
+                <Table {...getTableProps()}>
+                  <TableHead>
+                    <TableRow>
+                      {headers.map((header) => (
+                        <TableHeader
+                          className={`${styles.productiveHeading01} ${styles.text02}`}
+                          {...getHeaderProps({
+                            header,
+                            isSortable: header.isSortable,
+                          })}
+                        >
+                          {header.header?.content ?? header.header}
+                        </TableHeader>
                       ))}
+                      <TableHeader />
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
+                  </TableHead>
+                  <TableBody>
+                    {rows.map((row) => (
+                      <TableRow key={row.id}>
+                        {row.cells.map((cell) => (
+                          <TableCell key={cell.id}>{cell.value?.content ?? cell.value}</TableCell>
+                        ))}
+                        <TableCell className="cds--table-column-menu">
+                          <ConditionsActionMenu condition={row} />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+
+              {rows.length === 0 ? (
+                <div className={styles.tileContainer}>
+                  <Tile className={styles.tile}>
+                    <div className={styles.tileContent}>
+                      <p className={styles.content}>{t('noConditionsToDisplay', 'No conditions to display')}</p>
+                      <p className={styles.helper}>{t('checkFilters', 'Check the filters above')}</p>
+                    </div>
+                  </Tile>
+                </div>
+              ) : null}
+            </>
           )}
         </DataTable>
         <PatientChartPagination
           currentItems={paginatedConditions.length}
           onPageNumberChange={({ page }) => goTo(page)}
           pageNumber={currentPage}
-          pageSize={conditionsCount}
-          totalItems={conditions.length}
+          pageSize={conditionPageSize}
+          totalItems={filteredConditions.length}
           dashboardLinkUrl={pageUrl}
           dashboardLinkLabel={urlLabel}
         />

@@ -5,8 +5,6 @@ import {
   EncountersFetchResponse,
   RESTPatientNote,
   PatientNote,
-  Location,
-  Provider,
   VisitNotePayload,
   DiagnosisPayload,
   Concept,
@@ -17,11 +15,12 @@ interface UseVisitNotes {
   isError: Error;
   isLoading: boolean;
   isValidating?: boolean;
+  mutateVisitNotes: () => void;
 }
 
 export function useVisitNotes(patientUuid: string): UseVisitNotes {
   const {
-    visitNoteConfig: { encounterNoteTextConceptUuid, problemListConceptUuid, visitDiagnosesConceptUuid },
+    visitNoteConfig: { encounterNoteTextConceptUuid, visitDiagnosesConceptUuid },
   } = useConfig();
 
   const customRepresentation =
@@ -30,9 +29,9 @@ export function useVisitNotes(patientUuid: string): UseVisitNotes {
     'encounterRole:(uuid,display),' +
     'provider:(uuid,person:(uuid,display))),' +
     'diagnoses';
-
   const encountersApiUrl = `/ws/rest/v1/encounter?patient=${patientUuid}&obs=${visitDiagnosesConceptUuid}&v=${customRepresentation}`;
-  const { data, error, isValidating } = useSWR<{ data: EncountersFetchResponse }, Error>(
+
+  const { data, error, isLoading, isValidating, mutate } = useSWR<{ data: EncountersFetchResponse }, Error>(
     encountersApiUrl,
     openmrsFetch,
   );
@@ -51,26 +50,17 @@ export function useVisitNotes(patientUuid: string): UseVisitNotes {
     encounterProviderRole: note?.encounterProviders[0]?.encounterRole?.display,
   });
 
-  const formattedVisitNotes = data?.data?.results?.map(mapNoteProperties);
+  const formattedVisitNotes = data?.data?.results
+    ?.map(mapNoteProperties)
+    ?.sort((noteA, noteB) => new Date(noteB.encounterDate).getTime() - new Date(noteA.encounterDate).getTime());
 
   return {
     visitNotes: data ? formattedVisitNotes : null,
     isError: error,
-    isLoading: !data && !error,
+    isLoading,
     isValidating,
+    mutateVisitNotes: mutate,
   };
-}
-
-export function fetchLocationByUuid(abortController: AbortController, locationUuid: string) {
-  return openmrsFetch<Location>(`/ws/rest/v1/location/${locationUuid}`, {
-    signal: abortController.signal,
-  });
-}
-
-export function fetchProviderByUuid(abortController: AbortController, providerUuid: string) {
-  return openmrsFetch<Provider>(`/ws/rest/v1/provider/${providerUuid}`, {
-    signal: abortController.signal,
-  });
 }
 
 export function fetchConceptDiagnosisByName(searchTerm: string) {
@@ -89,6 +79,7 @@ export function saveVisitNote(abortController: AbortController, payload: VisitNo
     signal: abortController.signal,
   });
 }
+
 export function savePatientDiagnosis(abortController: AbortController, payload: DiagnosisPayload) {
   return openmrsFetch(`/ws/rest/v1/patientdiagnoses`, {
     headers: {

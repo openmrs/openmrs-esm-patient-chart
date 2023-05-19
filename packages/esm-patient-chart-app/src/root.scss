@@ -11,12 +11,15 @@
   &>nav {
     overflow-y: scroll;
     padding-bottom: 3rem;
-    scrollbar-width: none; 
+    scrollbar-width: none;
   }
 
   ::-webkit-scrollbar {
     width: 0px;
     background-color: transparent
+  }
+  :global(.cds--side-nav__overlay-active) {
+    background-color: transparent;
   }
 }
 
@@ -54,4 +57,8 @@
 
 .text02 {
   color: $text-02;
+}
+
+.label01 {
+  @include type.type-style("label-01")
 }

@@ -3,6 +3,8 @@ import { Button, InlineLoading, ModalBody, ModalFooter, ModalHeader } from '@car
 import { useVisit, openmrsFetch, showToast, showNotification } from '@openmrs/esm-framework';
 import { useTranslation } from 'react-i18next';
 import styles from './cancel-visit-dialog.scss';
+import { useVisitQueueEntry } from '../queue-entry/queue.resource';
+import { removeQueuedPatient } from '../hooks/useServiceQueue';
 
 interface CancelVisitDialogProps {
   patientUuid: string;
@@ -13,6 +15,7 @@ const CancelVisitDialog: React.FC<CancelVisitDialogProps> = ({ patientUuid, clos
   const { t } = useTranslation();
   const { currentVisit, mutate } = useVisit(patientUuid);
   const [submitting, setSubmitting] = useState(false);
+  const visitQueryEntry = useVisitQueueEntry(patientUuid, currentVisit?.uuid);
 
   const cancelActiveVisit = useCallback(() => {
     // TO DO expand updateVisit function in esm-api to support this request
@@ -25,14 +28,19 @@ const CancelVisitDialog: React.FC<CancelVisitDialogProps> = ({ patientUuid, clos
       body: { voided: true },
     }).then(
       () => {
+        const queueEntry = visitQueryEntry?.queueEntry;
         mutate();
+        closeModal();
+        setSubmitting(false);
+        if (queueEntry) {
+          removeQueuedPatient(queueEntry.queueUuid, queueEntry.queueEntryUuid, new AbortController());
+        }
+
         showToast({
           title: t('cancelVisit', 'Cancel visit'),
           kind: 'success',
           description: t('visitCanceled', 'Canceled active visit successfully'),
         });
-        closeModal();
-        setSubmitting(false);
       },
       (error) => {
         showNotification({
@@ -44,7 +52,7 @@ const CancelVisitDialog: React.FC<CancelVisitDialogProps> = ({ patientUuid, clos
         setSubmitting(false);
       },
     );
-  }, [closeModal, currentVisit.uuid, mutate, t]);
+  }, [closeModal, currentVisit.uuid, mutate, t, visitQueryEntry?.queueEntry]);
 
   return (
     <div>
@@ -63,7 +71,11 @@ const CancelVisitDialog: React.FC<CancelVisitDialogProps> = ({ patientUuid, clos
           {t('cancel', 'Cancel')}
         </Button>
         <Button disabled={submitting} kind="danger" onClick={cancelActiveVisit}>
-          {submitting ? <InlineLoading description={t('loading', 'Loading...')} /> : t('cancelVisit', 'Cancel visit')}
+          {submitting ? (
+            <InlineLoading description={`${t('loading', 'Loading')} ...`} />
+          ) : (
+            t('cancelVisit', 'Cancel visit')
+          )}
         </Button>
       </ModalFooter>
     </div>

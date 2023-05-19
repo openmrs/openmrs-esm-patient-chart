@@ -9,10 +9,28 @@ interface ContactDetailsProps {
   address: Array<fhir.Address>;
   telecom: Array<fhir.ContactPoint>;
   patientId: string;
+  deceased: boolean | string;
 }
 
 const Address: React.FC<{ address?: fhir.Address }> = ({ address }) => {
   const { t } = useTranslation();
+
+  const getAddressKey = (url) => url.split('#')[1];
+  /*
+    DO NOT REMOVE THIS COMMENT UNLESS YOU UNDERSTAND WHY IT IS HERE
+
+    t('postalCode', 'Postal code')
+    t('address1', 'Address line 1')
+    t('address2', 'Address line 2')
+    t('countyDistrict', 'District')
+    t('stateProvince', 'State')
+    t('cityVillage', 'City')
+    t('country', 'Country')
+    t('countyDistrict', 'District')
+    t('state', 'State')
+    t('city', 'City')
+    t('district', 'District')
+  */
 
   return (
     <>
@@ -20,10 +38,21 @@ const Address: React.FC<{ address?: fhir.Address }> = ({ address }) => {
       <ul>
         {address ? (
           <>
-            <li>{address.postalCode}</li>
-            <li>{address.city}</li>
-            <li>{address.state}</li>
-            <li>{address.country}</li>
+            {Object.entries(address)
+              .filter(([key]) => !['use', 'id'].some((k) => k === key))
+              .map(([key, value]) =>
+                key === 'extension' ? (
+                  address?.extension[0]?.extension.map((add, i) => (
+                    <li>
+                      {t(getAddressKey(add.url))}: {add.valueString}
+                    </li>
+                  ))
+                ) : (
+                  <li>
+                    {t(key)}: {value}
+                  </li>
+                ),
+              )}
           </>
         ) : (
           '--'
@@ -33,7 +62,10 @@ const Address: React.FC<{ address?: fhir.Address }> = ({ address }) => {
   );
 };
 
-const Contact: React.FC<{ telecom: Array<fhir.ContactPoint>; patientUuid: string }> = ({ telecom, patientUuid }) => {
+const Contact: React.FC<{ telecom: Array<fhir.ContactPoint>; patientUuid: string; deceased?: boolean }> = ({
+  telecom,
+  patientUuid,
+}) => {
   const { t } = useTranslation();
   const value = telecom?.length ? telecom[0].value : '--';
   const { isLoading, contactAttributes } = usePatientContactAttributes(patientUuid);
@@ -44,7 +76,7 @@ const Contact: React.FC<{ telecom: Array<fhir.ContactPoint>; patientUuid: string
       <ul>
         <li>{value}</li>
         {isLoading ? (
-          <InlineLoading description={t('loading', 'Loading...')} />
+          <InlineLoading description={`${t('loading', 'Loading')} ...`} />
         ) : (
           contactAttributes?.map(({ attributeType, value, uuid }) => (
             <li key={uuid}>
@@ -87,11 +119,11 @@ const Relationships: React.FC<{ patientId: string }> = ({ patientId }) => {
   );
 };
 
-const ContactDetails: React.FC<ContactDetailsProps> = ({ address, telecom, patientId }) => {
+const ContactDetails: React.FC<ContactDetailsProps> = ({ address, telecom, patientId, deceased }) => {
   const currentAddress = address ? address.find((a) => a.use === 'home') : undefined;
 
   return (
-    <div className={styles.contactDetails}>
+    <div className={`${styles.contactDetails} ${deceased ? styles.deceased : ''}`}>
       <div className={styles.row}>
         <div className={styles.col}>
           <Address address={currentAddress} />

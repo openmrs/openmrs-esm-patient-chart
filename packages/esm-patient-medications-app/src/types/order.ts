@@ -1,4 +1,4 @@
-import { OpenmrsResource } from './openmrs-resource';
+import { OpenmrsResource } from '@openmrs/esm-framework';
 
 export interface PatientMedicationFetchResponse {
   results: Array<Order>;
@@ -9,12 +9,12 @@ export interface Order {
   action: string;
   asNeeded: boolean;
   asNeededCondition?: string;
-  autoExpireDate: Date;
+  autoExpireDate: string;
   brandName?: string;
   careSetting: OpenmrsResource;
   commentToFulfiller: string;
-  dateActivated: Date;
-  dateStopped?: Date | null;
+  dateActivated: string;
+  dateStopped?: string | null;
   dispenseAsWritten: boolean;
   dose: number;
   doseUnits: OpenmrsResource;
@@ -57,10 +57,10 @@ export interface Order {
 
 export interface Drug {
   uuid: string;
-  name: string;
   strength: string;
   concept: OpenmrsResource;
   dosageForm: OpenmrsResource;
+  display: string;
 }
 
 export interface OrderPost {

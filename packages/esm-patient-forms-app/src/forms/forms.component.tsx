@@ -4,8 +4,7 @@ import dayjs from 'dayjs';
 import 'dayjs/plugin/isToday';
 import { ContentSwitcher, Switch, DataTableSkeleton, InlineLoading } from '@carbon/react';
 import { CardHeader, ErrorState, PatientProgram, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
-import { useConfig, useLayoutType, useSession, userHasAccess } from '@openmrs/esm-framework';
-import { isValidOfflineFormEncounter } from '../offline-forms/offline-form-helpers';
+import { useConfig, useLayoutType } from '@openmrs/esm-framework';
 import { useProgramConfig } from '../hooks/use-program-config';
 import { useForms } from '../hooks/use-forms';
 import { ConfigObject } from '../config-schema';
@@ -14,10 +13,12 @@ import EmptyFormView from './empty-form.component';
 import FormView from './form-view.component';
 import styles from './forms.scss';
 
-const enum FormsCategory {
-  Recommended,
-  Completed,
-  All,
+type FormsCategory = 'All' | 'Completed' | 'Recommended';
+
+enum ContentSwitcherIndices {
+  All = 0,
+  Recommended = 1,
+  Completed = 2,
 }
 
 interface FormsProps {
@@ -32,22 +33,29 @@ interface FormsProps {
 
 const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, urlLabel, isOffline }) => {
   const { t } = useTranslation();
-  const { htmlFormEntryForms, showRecommendedFormsTab, showConfigurableForms } = useConfig() as ConfigObject;
+  const { showRecommendedFormsTab, showConfigurableForms } = useConfig() as ConfigObject;
   const headerTitle = t('forms', 'Forms');
-  const isTablet = useLayoutType() === 'tablet';
-  const [formsCategory, setFormsCategory] = useState(
-    showRecommendedFormsTab ? FormsCategory.Recommended : FormsCategory.All,
-  );
-  const { isValidating, data, error } = useForms(patientUuid, undefined, undefined, isOffline);
-  const session = useSession();
-  let formsToDisplay = isOffline
-    ? data?.filter((formInfo) => isValidOfflineFormEncounter(formInfo.form, htmlFormEntryForms))
-    : data;
-  formsToDisplay = formsToDisplay?.filter((formInfo) =>
-    userHasAccess(formInfo?.form?.encounterType?.editPrivilege?.display, session?.user),
-  );
+  const layout = useLayoutType();
+  const isTablet = layout === 'tablet';
+  const isDesktop = layout === 'small-desktop' || layout === 'large-desktop';
+  const [formsCategory, setFormsCategory] = useState<FormsCategory>(showRecommendedFormsTab ? 'Recommended' : 'All');
+  const {
+    isValidating,
+    data: formsToDisplay,
+    error,
+    mutateForms,
+  } = useForms(patientUuid, undefined, undefined, isOffline);
+
   const { currentVisit } = useVisitOrOfflineVisit(patientUuid);
   const { programConfigs } = useProgramConfig(patientUuid, showRecommendedFormsTab);
+
+  const completedForms = useMemo(
+    () =>
+      formsToDisplay?.filter(
+        ({ associatedEncounters, lastCompleted }) => associatedEncounters.length > 0 && dayjs(lastCompleted).isToday(),
+      ),
+    [formsToDisplay],
+  );
 
   const recommendedForms = useMemo(
     () =>
@@ -79,7 +87,7 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
   }
 
   if (!formsToDisplay && !error) {
-    return <DataTableSkeleton role="progressbar" rowCount={5} />;
+    return <DataTableSkeleton role="progressbar" rowCount={5} compact={isDesktop} zebra />;
   }
 
   if (error) {
@@ -100,31 +108,42 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
         ) : null}
         <div className={styles.contextSwitcherContainer}>
           <ContentSwitcher
-            className={isTablet ? styles.tabletContentSwitcher : styles.desktopContentSwitcher}
-            onChange={(event) => setFormsCategory(event.name as any)}
-            selectedIndex={formsCategory}
+            onChange={({ name }: { name: FormsCategory }) => setFormsCategory(name)}
+            selectedIndex={ContentSwitcherIndices[formsCategory]}
+            size={isTablet ? 'md' : 'sm'}
           >
-            <Switch name={FormsCategory.Recommended} text="Recommended" />
-            <Switch name={FormsCategory.Completed} text="Completed" />
-            <Switch name={FormsCategory.All} text="All" />
+            <Switch name={'All'} text={t('all', 'All')} />
+            <Switch name={'Recommended'} text={t('recommended', 'Recommended')} />
+            <Switch name={'Completed'} text={t('completed', 'Completed')} />
           </ContentSwitcher>
         </div>
       </CardHeader>
       <div style={{ width: '100%' }}>
-        {formsCategory === FormsCategory.Completed && (
+        {formsCategory === 'Completed' && (
           <FormView
-            forms={formsToDisplay.filter(
-              ({ associatedEncounters, lastCompleted }) =>
-                associatedEncounters.length > 0 && dayjs(lastCompleted).isToday(),
-            )}
+            category={'Completed'}
+            forms={completedForms}
             patientUuid={patientUuid}
             patient={patient}
             pageSize={pageSize}
             pageUrl={pageUrl}
             urlLabel={urlLabel}
+            mutateForms={mutateForms}
           />
         )}
-        {formsCategory === FormsCategory.All && (
+        {formsCategory === 'Recommended' && (
+          <FormView
+            category={'Recommended'}
+            forms={recommendedForms}
+            patientUuid={patientUuid}
+            patient={patient}
+            pageSize={pageSize}
+            pageUrl={pageUrl}
+            urlLabel={urlLabel}
+            mutateForms={mutateForms}
+          />
+        )}
+        {formsCategory === 'All' && (
           <FormView
             forms={formsToDisplay}
             patientUuid={patientUuid}
@@ -132,16 +151,7 @@ const Forms: React.FC<FormsProps> = ({ patientUuid, patient, pageSize, pageUrl, 
             pageSize={pageSize}
             pageUrl={pageUrl}
             urlLabel={urlLabel}
-          />
-        )}
-        {formsCategory === FormsCategory.Recommended && (
-          <FormView
-            forms={recommendedForms}
-            patientUuid={patientUuid}
-            patient={patient}
-            pageSize={pageSize}
-            pageUrl={pageUrl}
-            urlLabel={urlLabel}
+            mutateForms={mutateForms}
           />
         )}
       </div>

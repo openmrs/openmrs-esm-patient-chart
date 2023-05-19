@@ -1,1 +1,26 @@
-{}
+{
+  "all": "Tout",
+  "clinicalForm": "Formulaire clinique",
+  "completed": "Complété",
+  "form": "Formulaire",
+  "formName": "Nom du formulaire (A-Z)",
+  "forms": "Formulaires",
+  "formSearchHint": "Essayez de chercher le formulaire à l'aide d'un autre nom ou mot-clé",
+  "goToSummary": "Aller à la vue d'ensemble",
+  "homeOverviewCardView": "Voir",
+  "lastCompleted": "Dernière mise à jour",
+  "never": "Jamais",
+  "noFormsAvailable": "Il n'y a pas de formulaires à afficher pour ce patient",
+  "noMatchingFormsAvailable": "Il n'y a pas de formulaires {FormCategory} à afficher",
+  "noMatchingFormsToDisplay": "Pas de formulaires correspondants à afficher",
+  "offlineFormsOverviewCardAvailableOffline": "Disponible sans connexion internet",
+  "offlineFormsTableFormAvailableOffline": "Pas de connexion internet",
+  "offlineFormsTableFormNameHeader": "Nom du formulaire",
+  "offlineFormsTitle": "Formulaires disponibles sans connexion internet",
+  "offlinePatientsTableSearchLabel": "Chercher dans cette liste",
+  "offlinePatientsTableSearchPlaceholder": "Chercher dans cette liste",
+  "offlineToggle": "Basculer en mode sans connexion internet",
+  "recommended": "Recommandé",
+  "searchThisList": "Chercher dans cette liste",
+  "seeAll": "Voir tout"
+}

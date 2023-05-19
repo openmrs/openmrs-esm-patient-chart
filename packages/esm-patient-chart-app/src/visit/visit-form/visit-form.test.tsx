@@ -31,8 +31,8 @@ jest.mock('@openmrs/esm-framework', () => {
     },
     saveVisit: jest.fn(),
     toOmrsIsoString: jest.fn(),
+    useLocations: jest.fn(),
     toDateObjectStrict: jest.fn(),
-    useLocations: jest.fn().mockImplementation(() => mockLocations),
     useVisitTypes: jest.fn().mockImplementation(() => mockVisitTypes),
     usePagination: jest.fn().mockImplementation(() => ({
       results: mockVisitTypes,
@@ -42,24 +42,63 @@ jest.mock('@openmrs/esm-framework', () => {
   };
 });
 
+jest.mock('@openmrs/esm-patient-common-lib', () => {
+  const originalModule = jest.requireActual('@openmrs/esm-patient-common-lib');
+
+  return {
+    ...originalModule,
+    useActivePatientEnrollment: jest.fn().mockReturnValue({
+      activePatientEnrollment: [],
+      isLoading: false,
+    }),
+  };
+});
+
+jest.mock('../hooks/useDefaultLocation', () => {
+  const requireActual = jest.requireActual('../hooks/useDefaultLocation');
+
+  return {
+    ...requireActual,
+    useDefaultLoginLocation: jest.fn(() => ({
+      defaultFacility: null,
+      isLoading: false,
+    })),
+  };
+});
+
+jest.mock('../hooks/useLocations', () => {
+  const requireActual = jest.requireActual('../hooks/useLocations');
+  return {
+    ...requireActual,
+    useLocations: jest.fn(() => ({
+      locations: mockLocations,
+      isLoading: false,
+      error: null,
+    })),
+  };
+});
+
 describe('Visit Form', () => {
-  it('renders the Start Visit form with all the relevant fields and values', () => {
+  it('renders the Start Visit form with all the relevant fields and values', async () => {
     renderVisitForm();
 
     expect(screen.getByRole('textbox', { name: /Date/i })).toBeInTheDocument();
     expect(screen.getByRole('textbox', { name: /Time/i })).toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: /Time/i })).toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: /Select a location/i })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: /Recommended/i })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: /All/i })).toBeInTheDocument();
-    expect(screen.getByRole('radio', { name: /Outpatient Visit/ })).toBeInTheDocument();
     expect(screen.getByRole('radio', { name: /HIV Return Visit/ })).toBeInTheDocument();
     expect(screen.getByRole('option', { name: /AM/i })).toBeInTheDocument();
     expect(screen.getByRole('option', { name: /PM/i })).toBeInTheDocument();
-    expect(screen.getByRole('option', { name: /Mosoriot/i })).toBeInTheDocument();
-    expect(screen.getByRole('option', { name: /Inpatient Ward/i })).toBeInTheDocument();
+
     expect(screen.getByRole('button', { name: /Start Visit/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Discard/i })).toBeInTheDocument();
+
+    // Testing the location picker
+    const combobox = screen.getByRole('combobox', { name: /Select a location/i });
+    expect(screen.getByText(/Outpatient Visit/i)).toBeInTheDocument();
+    await waitFor(() => userEvent.click(combobox));
+    expect(screen.getByText(/Mosoriot/i)).toBeInTheDocument();
+    expect(screen.getByText(/Inpatient Ward/i)).toBeInTheDocument();
   });
 
   it('renders an error message when a visit type has not been selected', async () => {
@@ -67,7 +106,7 @@ describe('Visit Form', () => {
 
     renderVisitForm();
 
-    const saveButton = screen.getByRole('button', { name: /Start Visit/i });
+    const saveButton = screen.getByRole('button', { name: /start visit/i });
 
     await waitFor(() => user.click(saveButton));
 
@@ -81,7 +120,7 @@ describe('Visit Form', () => {
     expect(errorAlert).not.toBeInTheDocument();
   });
 
-  it('starts a new visit upon successful submission of the', async () => {
+  it('starts a new visit upon successful submission of the form', async () => {
     const user = userEvent.setup();
 
     renderVisitForm();
@@ -92,9 +131,9 @@ describe('Visit Form', () => {
     await waitFor(() => user.click(screen.getByLabelText(/Outpatient visit/i)));
 
     // Set location
-    const locationOptions = screen.getByRole('combobox', { name: /Select a location/i });
-
-    await waitFor(() => user.selectOptions(locationOptions, 'b1a8b05e-3542-4037-bbd3-998ee9c40574'));
+    const locationPicker = screen.getByRole('combobox', { name: /Select a location/i });
+    await waitFor(() => userEvent.click(locationPicker));
+    await waitFor(() => user.click(screen.getByText('Inpatient Ward')));
 
     mockSaveVisit.mockReturnValueOnce(
       of({
@@ -122,7 +161,7 @@ describe('Visit Form', () => {
     expect(showToast).toHaveBeenCalledTimes(1);
     expect(showToast).toHaveBeenCalledWith({
       critical: true,
-      description: 'Facility Visit started successfully',
+      description: expect.stringContaining('started successfully'),
       kind: 'success',
       title: 'Visit started',
     });

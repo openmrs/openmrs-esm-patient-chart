@@ -10,9 +10,8 @@ import {
   TableHeader,
   TableRow,
 } from '@carbon/react';
-import { usePagination } from '@openmrs/esm-framework';
+import { useLayoutType, usePagination } from '@openmrs/esm-framework';
 import { PatientChartPagination } from '@openmrs/esm-patient-common-lib';
-import { PatientBiometrics } from './biometrics.resource';
 import styles from './biometrics-overview.scss';
 import { orderBy } from 'lodash-es';
 
@@ -47,12 +46,13 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
       ? orderBy(tableRows, [key], ['desc'])
       : orderBy(tableRows, [key], ['asc']);
 
-  function customSortRow(noteA, noteB, { sortDirection, sortStates, ...props }) {
+  function customSortRow(biometricA, biometricB, { sortDirection, sortStates, ...props }) {
     const { key } = props;
     setSortParams({ key, order: sortDirection });
   }
 
   const { results: paginatedBiometrics, goTo, currentPage } = usePagination(sortedData, pageSize);
+  const isTablet = useLayoutType() === 'tablet';
 
   return (
     <div>
@@ -61,7 +61,7 @@ const PaginatedBiometrics: React.FC<PaginatedBiometricsProps> = ({
         sortRow={customSortRow}
         headers={tableHeaders}
         isSortable
-        size="sm"
+        size={isTablet ? 'lg' : 'sm'}
         useZebraStyles
       >
         {({ rows, headers, getHeaderProps, getTableProps }) => (

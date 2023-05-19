@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSWRConfig } from 'swr';
 import {
   Button,
   ButtonSet,
@@ -24,7 +23,6 @@ import {
 import {
   ExtensionSlot,
   FetchResponse,
-  fhirBaseUrl,
   showNotification,
   showToast,
   useConfig,
@@ -33,6 +31,7 @@ import {
 import { DefaultWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import { saveAllergy, NewAllergy, useAllergensAndAllergicReactions } from './allergy-form.resource';
 import styles from './allergy-form.scss';
+import { useAllergies } from '../allergy-intolerance.resource';
 
 type AllergenType = 'FOOD' | 'DRUG' | 'ENVIRONMENT';
 
@@ -43,7 +42,6 @@ function AllergyForm({ closeWorkspace, promptBeforeClosing, patientUuid }: Defau
   const allergenTypes = [t('drug', 'Drug'), t('food', 'Food'), t('environmental', 'Environmental')];
   const severityLevels = [t('mild', 'Mild'), t('moderate', 'Moderate'), t('severe', 'Severe')];
   const patientState = useMemo(() => ({ patientUuid }), [patientUuid]);
-  const { mutate } = useSWRConfig();
   const { mildReactionUuid, severeReactionUuid, moderateReactionUuid, otherConceptUuid } = useMemo(
     () => concepts,
     [concepts],
@@ -58,6 +56,7 @@ function AllergyForm({ closeWorkspace, promptBeforeClosing, patientUuid }: Defau
   const [selectedAllergen, setSelectedAllergen] = useState('');
   const [selectedAllergenType, setSelectedAllergenType] = useState<AllergenType>('DRUG');
   const [severityOfWorstReaction, setSeverityOfWorstReaction] = useState('');
+  const { mutate } = useAllergies(patientUuid);
 
   useEffect(() => {
     promptBeforeClosing(() => {
@@ -131,6 +130,7 @@ function AllergyForm({ closeWorkspace, promptBeforeClosing, patientUuid }: Defau
         .then(
           (response: FetchResponse) => {
             if (response.status === 201) {
+              mutate();
               closeWorkspace();
 
               showToast({
@@ -139,8 +139,6 @@ function AllergyForm({ closeWorkspace, promptBeforeClosing, patientUuid }: Defau
                 title: t('allergySaved', 'Allergy saved'),
                 description: t('allergyNowVisible', 'It is now visible on the Allergies page'),
               });
-
-              mutate(`${fhirBaseUrl}/AllergyIntolerance?patient=${patientUuid}`);
             }
           },
           (err) => {
@@ -209,7 +207,7 @@ function AllergyForm({ closeWorkspace, promptBeforeClosing, patientUuid }: Defau
                 </TabList>
                 <TabPanels>
                   {isLoading ? (
-                    <InlineLoading style={{ margin: '1rem' }} description={t('loading', 'Loading...')} />
+                    <InlineLoading style={{ margin: '1rem' }} description={`${t('loading', 'Loading')} ...`} />
                   ) : (
                     allergenTypes.map((allergenType, index) => {
                       const allergenCategory = allergenType.toLowerCase() + 'Allergens';
@@ -256,7 +254,7 @@ function AllergyForm({ closeWorkspace, promptBeforeClosing, patientUuid }: Defau
               <h2 className={styles.midSectionHeading}>{t('selectReactions', 'Select the reactions')}</h2>
               <div className={isTablet ? styles.checkboxContainer : undefined} style={{ margin: '1rem' }}>
                 {isLoading ? (
-                  <InlineLoading description={t('loading', 'Loading...')} />
+                  <InlineLoading description={`${t('loading', 'Loading')} ...`} />
                 ) : (
                   allergensAndAllergicReactions?.allergicReactions?.map((reaction, index) => (
                     <Checkbox
@@ -316,24 +314,7 @@ function AllergyForm({ closeWorkspace, promptBeforeClosing, patientUuid }: Defau
               </div>
             </section>
             <section className={styles.section}>
-              <h2 className={styles.sectionHeading}>{t('dateAndComments', 'Date and comments')}</h2>
-              <div className={styles.wrapper}>
-                <DatePicker
-                  id="onsetDate"
-                  dateFormat="d/m/Y"
-                  datePickerType="single"
-                  light={!isTablet}
-                  maxDate={new Date().toISOString()}
-                  onChange={([date]) => setOnsetDate(date)}
-                  value={onsetDate}
-                >
-                  <DatePickerInput
-                    id="onsetDateInput"
-                    placeholder="dd/mm/yyyy"
-                    labelText={t('dateOfFirstOnset', 'Date of first onset')}
-                  />
-                </DatePicker>
-              </div>
+              <h2 className={styles.sectionHeading}>{t('onsetDateAndComments', 'Onset date and comments')}</h2>
               <div className={styles.wrapper}>
                 <TextArea
                   className={styles.textbox}
@@ -341,7 +322,7 @@ function AllergyForm({ closeWorkspace, promptBeforeClosing, patientUuid }: Defau
                   light={!isTablet}
                   id="comments"
                   invalidText={t('invalidComment', 'Invalid comment, try again')}
-                  labelText={t('comments', 'Comments')}
+                  labelText={t('dateOfOnsetAndComments', 'Date of onset and comments')}
                   onChange={(event) => setComment(event.target.value)}
                   placeholder={t('typeAdditionalComments', 'Type any additional comments here')}
                   rows={4}

@@ -1,25 +1,33 @@
-import { ReducerAction, ReducerState, ReducerActionType } from './filter-types';
+import { ReducerAction, ReducerState, ReducerActionType, TreeParents, TreeNode, LowestNode } from './filter-types';
 
 export const getName = (prefix, name) => {
   return prefix ? `${prefix}-${name}` : name;
 };
 
-const computeParents = (prefix, node) => {
-  var parents = {};
-  var leaves = [];
-  var tests = [];
-  var lowestParents = [];
+const computeParents = (
+  prefix: string,
+  node: TreeNode,
+): {
+  parents: TreeParents;
+  leaves: Array<string>;
+  tests: Array<[string, TreeNode]>;
+  lowestParents: Array<LowestNode>;
+} => {
+  let parents: TreeParents = {};
+  const leaves: Array<string> = [];
+  const tests: Array<[string, TreeNode]> = [];
+  const lowestParents: Array<LowestNode> = [];
   if (node?.subSets?.length && node.subSets[0].obs) {
     // lowest parent
-    let activeLeaves = [];
+    const activeLeaves: Array<string> = [];
     node.subSets.forEach((leaf) => {
       if (leaf.hasData) {
         activeLeaves.push(leaf.flatName);
       }
     });
-    let activeTests = [];
+    const activeTests: Array<[string, TreeNode]> = [];
     node.subSets.forEach((leaf) => {
-      if (leaf.obs.length) {
+      if (Array.isArray(leaf?.obs) && leaf.obs.length > 0) {
         activeTests.push([leaf.flatName, leaf]);
       }
     });
@@ -47,10 +55,10 @@ const computeParents = (prefix, node) => {
 function reducer(state: ReducerState, action: ReducerAction): ReducerState {
   switch (action.type) {
     case ReducerActionType.INITIALIZE:
-      let parents = {},
-        leaves = [],
-        tests = [],
-        lowestParents = [];
+      let parents: TreeParents = {},
+        leaves: Array<string> = [],
+        tests: Array<[string, TreeNode]> = [],
+        lowestParents: Array<LowestNode> = [];
       action.trees?.forEach((tree) => {
         // if anyone knows a shorthand for this i'm stoked to learn it :)
         const {
@@ -82,7 +90,7 @@ function reducer(state: ReducerState, action: ReducerAction): ReducerState {
       };
     case ReducerActionType.UDPATEPARENT:
       const affectedLeaves = state.parents[action.name];
-      let checkboxes = JSON.parse(JSON.stringify(state.checkboxes));
+      const checkboxes = JSON.parse(JSON.stringify(state.checkboxes));
       const allChecked = affectedLeaves.every((leaf) => checkboxes[leaf]);
       affectedLeaves.forEach((leaf) => (checkboxes[leaf] = !allChecked));
       return {

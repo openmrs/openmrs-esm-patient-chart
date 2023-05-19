@@ -1,163 +1,139 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import 'dayjs/plugin/utc';
-import debounce from 'lodash-es/debounce';
 import { BehaviorSubject } from 'rxjs';
-import { useSWRConfig } from 'swr';
 import {
   DatePicker,
   DatePickerInput,
   FormGroup,
+  FormLabel,
+  InlineLoading,
   Layer,
   RadioButton,
   RadioButtonGroup,
   Search,
-  SearchSkeleton,
   Stack,
   Tile,
 } from '@carbon/react';
+import { showToast, useLayoutType, useSession } from '@openmrs/esm-framework';
 import {
-  createErrorHandler,
-  fhirBaseUrl,
-  showNotification,
-  showToast,
-  useLayoutType,
-  useSession,
-} from '@openmrs/esm-framework';
-import { createPatientCondition, searchConditionConcepts, CodedCondition } from './conditions.resource';
+  CodedCondition,
+  ConditionDataTableRow,
+  createCondition,
+  FormFields,
+  updateCondition,
+  useConditions,
+  useConditionsSearch,
+} from './conditions.resource';
 import styles from './conditions-form.scss';
 
 interface ConditionsWidgetProps {
-  patientUuid: string;
   closeWorkspace?: () => void;
+  conditionToEdit?: ConditionDataTableRow;
+  formContext?: 'creating' | 'editing';
+  patientUuid: string;
   setHasSubmissibleValue?: (value: boolean) => void;
+  setErrorCreating?: (error: Error) => void;
+  setErrorUpdating?: (error: Error) => void;
   submissionNotifier: BehaviorSubject<{ isSubmitting: boolean }>;
 }
 
 const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
-  patientUuid,
   closeWorkspace,
+  conditionToEdit,
+  formContext,
+  patientUuid,
   setHasSubmissibleValue,
+  setErrorCreating: setErrorCreating,
+  setErrorUpdating: setErrorUpdating,
   submissionNotifier,
 }) => {
-  const searchTimeoutInMs = 500;
   const { t } = useTranslation();
+  const { conditions, mutate } = useConditions(patientUuid);
+  const editing = formContext === 'editing';
   const isTablet = useLayoutType() === 'tablet';
   const session = useSession();
-  const { mutate } = useSWRConfig();
-  const [clinicalStatus, setClinicalStatus] = React.useState('active');
-  const [endDate, setEndDate] = React.useState(null);
-  const [onsetDate, setOnsetDate] = React.useState(new Date());
-  const [isSearching, setIsSearching] = React.useState(false);
-  const [searchTerm, setSearchTerm] = React.useState<null | string>('');
-  const [searchResults, setSearchResults] = React.useState<null | Array<CodedCondition>>(null);
-  const [selectedCondition, setSelectedCondition] = React.useState(null);
+
+  const matchingCondition = conditions?.find((condition) => condition?.id === conditionToEdit?.id);
+
+  const getFieldValue = (
+    tableCells: Array<{
+      info: {
+        header: string;
+      };
+      value: string;
+    }>,
+    fieldName,
+  ): string => tableCells?.find((cell) => cell?.info?.header === fieldName)?.value;
+
+  const displayName = getFieldValue(conditionToEdit?.cells, 'display');
+  const editableClinicalStatus = getFieldValue(conditionToEdit?.cells, 'clinicalStatus');
+
+  const [clinicalStatus, setClinicalStatus] = useState(editing ? editableClinicalStatus?.toLowerCase() : 'active');
+  const [conditionToLookup, setConditionToLookup] = useState<string>(null);
+  const [endDate, setEndDate] = useState<string>(null);
+  const [onsetDate, setOnsetDate] = useState<Date>(
+    editing ? (matchingCondition?.onsetDateTime ? new Date(matchingCondition?.onsetDateTime) : null) : null,
+  );
+  const [selectedCondition, setSelectedCondition] = useState<CodedCondition>(null);
+  const { searchResults, isSearching } = useConditionsSearch(conditionToLookup);
+
+  const formTouched =
+    clinicalStatus !== editableClinicalStatus || onsetDate !== new Date(matchingCondition?.onsetDateTime);
 
   useEffect(() => {
-    if (setHasSubmissibleValue) {
+    if (editing) {
+      if (formTouched) {
+        setHasSubmissibleValue(true);
+      } else {
+        setHasSubmissibleValue(false);
+      }
+    } else if (!editing) {
       setHasSubmissibleValue(!!selectedCondition);
     }
-  }, [selectedCondition, setHasSubmissibleValue]);
+  }, [formTouched, editing, selectedCondition, setHasSubmissibleValue]);
 
-  const handleSearchChange = (event) => {
-    setSelectedCondition(null);
-    setIsSearching(true);
-    const query = event.target.value;
-    setSearchTerm(query);
-    if (query) {
-      debouncedSearch(query);
-    }
-  };
+  const handleSearchTermChange = (event) => setConditionToLookup(event.target.value);
 
-  const debouncedSearch = React.useMemo(
-    () =>
-      debounce((searchTerm) => {
-        if (searchTerm) {
-          const sub = searchConditionConcepts(searchTerm).subscribe(
-            (searchResults: Array<CodedCondition>) => {
-              setSearchResults(searchResults);
-              setIsSearching(false);
-            },
-            () => createErrorHandler(),
-          );
-          return () => {
-            sub.unsubscribe();
-          };
-        }
-      }, searchTimeoutInMs),
-    [],
-  );
-
-  const handleConditionChange = React.useCallback((selectedCondition: CodedCondition) => {
+  const handleConditionChange = useCallback((selectedCondition: CodedCondition) => {
     setSelectedCondition(selectedCondition);
-    setSearchTerm('');
+    setConditionToLookup('');
   }, []);
 
-  const handleSubmit = React.useCallback(() => {
+  const handleCreate = useCallback(async () => {
     if (!selectedCondition) {
       return;
     }
 
-    const payload = {
-      resourceType: 'Condition',
-      clinicalStatus: {
-        coding: [
-          {
-            system: 'http://terminology.hl7.org/CodeSystem/condition-clinical',
-            code: clinicalStatus,
-          },
-        ],
-      },
-      code: {
-        coding: [
-          {
-            code: selectedCondition?.concept?.uuid,
-            display: selectedCondition?.concept?.display,
-          },
-        ],
-      },
+    const payload: FormFields = {
+      clinicalStatus: clinicalStatus,
+      conceptId: selectedCondition?.concept?.uuid,
+      display: selectedCondition?.concept?.display,
       endDate: endDate ? dayjs(endDate).format() : null,
       onsetDateTime: onsetDate ? dayjs(onsetDate).format() : null,
-      subject: {
-        reference: `Patient/${patientUuid}`,
-      },
-      recorder: {
-        reference: `Practitioner/${session?.user?.uuid}`,
-      },
-      recordedDate: new Date().toISOString(),
+      patientId: patientUuid,
+      userId: session?.user?.uuid,
     };
 
-    const abortController = new AbortController();
-    const sub = createPatientCondition(payload, abortController).subscribe(
-      (response) => {
-        if (response.status === 201) {
-          closeWorkspace?.();
+    try {
+      const res = await createCondition(payload);
 
-          showToast({
-            critical: true,
-            kind: 'success',
-            description: t('conditionNowVisible', 'It is now visible on the Conditions page'),
-            title: t('conditionSaved', 'Condition saved'),
-          });
+      if (res.status === 201) {
+        mutate();
 
-          mutate(`${fhirBaseUrl}/Condition?patient=${patientUuid}`);
-        }
-      },
-      (err) => {
-        createErrorHandler();
-
-        showNotification({
-          title: t('conditionSaveError', 'Error saving condition'),
-          kind: 'error',
+        showToast({
           critical: true,
-          description: err?.message,
+          kind: 'success',
+          description: t('conditionNowVisible', 'It is now visible on the Conditions page'),
+          title: t('conditionSaved', 'Condition saved'),
         });
-      },
-    );
-    return () => {
-      sub.unsubscribe();
-    };
+
+        closeWorkspace?.();
+      }
+    } catch (error) {
+      setErrorCreating(error);
+    }
   }, [
     clinicalStatus,
     closeWorkspace,
@@ -167,110 +143,150 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
     patientUuid,
     selectedCondition,
     session?.user?.uuid,
+    setErrorCreating,
+    t,
+  ]);
+
+  const handleUpdate = useCallback(async () => {
+    if (!formTouched) return;
+
+    const payload: FormFields = {
+      clinicalStatus: formTouched ? clinicalStatus : editableClinicalStatus,
+      conceptId: matchingCondition?.conceptId,
+      display: displayName,
+      endDate: endDate ? dayjs(endDate).format() : null,
+      onsetDateTime: onsetDate ? dayjs(onsetDate).format() : null,
+      patientId: patientUuid,
+      userId: session?.user?.uuid,
+    };
+
+    try {
+      const res = await updateCondition(conditionToEdit?.id, payload);
+
+      if (res.status === 200) {
+        mutate();
+
+        showToast({
+          critical: true,
+          kind: 'success',
+          description: t('conditionNowVisible', 'It is now visible on the Conditions page'),
+          title: t('conditionUpdated', 'Condition updated'),
+        });
+
+        closeWorkspace();
+      }
+    } catch (error) {
+      setErrorUpdating(error);
+    }
+  }, [
+    clinicalStatus,
+    closeWorkspace,
+    conditionToEdit?.id,
+    displayName,
+    editableClinicalStatus,
+    endDate,
+    formTouched,
+    matchingCondition?.conceptId,
+    mutate,
+    onsetDate,
+    patientUuid,
+    session?.user?.uuid,
+    setErrorUpdating,
     t,
   ]);
 
   useEffect(() => {
-    const subscription = submissionNotifier?.subscribe(({ isSubmitting }) => {
+    const subscription = submissionNotifier.subscribe(({ isSubmitting }) => {
       if (isSubmitting) {
-        handleSubmit();
+        editing ? handleUpdate() : handleCreate();
       }
     });
-    return () => {
-      subscription?.unsubscribe();
-    };
-  }, [handleSubmit, submissionNotifier]);
+
+    return () => subscription?.unsubscribe();
+  }, [handleCreate, handleUpdate, editing, submissionNotifier]);
 
   return (
     <div className={styles.formContainer}>
       <Stack gap={7}>
         <FormGroup legendText={t('condition', 'Condition')}>
-          {isTablet ? (
-            <Layer>
+          {editing ? (
+            <FormLabel className={styles.conditionLabel}>{displayName}</FormLabel>
+          ) : (
+            <>
               <Search
-                size="lg"
+                size="md"
                 id="conditionsSearch"
                 labelText={t('enterCondition', 'Enter condition')}
+                light={isTablet}
                 placeholder={t('searchConditions', 'Search conditions')}
-                onChange={handleSearchChange}
+                onChange={handleSearchTermChange}
+                onClear={() => setSelectedCondition(null)}
+                disabled={editing}
                 value={(() => {
-                  if (searchTerm) {
-                    return searchTerm;
+                  if (editing) {
+                    return displayName;
                   }
-                  if (selectedCondition && !isSearching) {
+                  if (conditionToLookup) {
+                    return conditionToLookup;
+                  }
+                  if (selectedCondition) {
                     return selectedCondition.display;
                   }
                   return '';
                 })()}
               />
-            </Layer>
-          ) : (
-            <Search
-              size="lg"
-              id="conditionsSearch"
-              labelText={t('enterCondition', 'Enter condition')}
-              placeholder={t('searchConditions', 'Search conditions')}
-              onChange={handleSearchChange}
-              value={(() => {
-                if (searchTerm) {
-                  return searchTerm;
+              {(() => {
+                if (!conditionToLookup || selectedCondition) return null;
+                if (isSearching)
+                  return <InlineLoading className={styles.loader} description={t('searching', 'Searching') + '...'} />;
+                if (searchResults && searchResults.length) {
+                  return (
+                    <ul className={styles.conditionsList}>
+                      {searchResults?.map((searchResult, index) => (
+                        <li
+                          role="menuitem"
+                          className={styles.condition}
+                          key={index}
+                          onClick={() => handleConditionChange(searchResult)}
+                        >
+                          {searchResult.display}
+                        </li>
+                      ))}
+                    </ul>
+                  );
                 }
-                if (selectedCondition && !isSearching) {
-                  return selectedCondition.display;
-                }
-                return '';
-              })()}
-            />
-          )}
-          <div>
-            {(() => {
-              if (!searchTerm || selectedCondition) return null;
-              if (isSearching) return <SearchSkeleton role="progressbar" />;
-              if (searchResults && searchResults.length) {
                 return (
-                  <ul className={styles.conditionsList}>
-                    {searchResults.map((condition, index) => (
-                      <li
-                        role="menuitem"
-                        className={styles.condition}
-                        key={index}
-                        onClick={() => handleConditionChange(condition)}
-                      >
-                        {condition.display}
-                      </li>
-                    ))}
-                  </ul>
+                  <Layer>
+                    <Tile className={styles.emptyResults}>
+                      <span>
+                        {t('noResultsFor', 'No results for')} <strong>"{conditionToLookup}"</strong>
+                      </span>
+                    </Tile>
+                  </Layer>
                 );
-              }
-              return (
-                <Tile light={isTablet} className={styles.emptyResults}>
-                  <span>
-                    {t('noResultsFor', 'No results for')} <strong>"{searchTerm}"</strong>
-                  </span>
-                </Tile>
-              );
-            })()}
-          </div>
+              })()}
+            </>
+          )}
         </FormGroup>
-        <FormGroup legendText={t('onsetDate', 'Onset date')}>
+        <FormGroup legendText="">
           <DatePicker
             id="onsetDate"
             datePickerType="single"
             dateFormat="d/m/Y"
+            light={isTablet}
             maxDate={new Date().toISOString()}
             placeholder="dd/mm/yyyy"
             onChange={([date]) => setOnsetDate(date)}
             value={onsetDate}
-            light={isTablet}
           >
-            <DatePickerInput id="onsetDateInput" labelText="" />
+            <DatePickerInput id="onsetDateInput" labelText={t('onsetDate', 'Onset date')} />
           </DatePicker>
         </FormGroup>
         <FormGroup legendText={t('currentStatus', 'Current status')}>
           <RadioButtonGroup
-            defaultSelected="active"
+            defaultSelected={clinicalStatus}
             name="clinicalStatus"
-            valueSelected="active"
+            valueSelected={clinicalStatus}
             orientation="vertical"
             onChange={(status) => setClinicalStatus(status.toString())}
           >
@@ -283,12 +299,12 @@ const ConditionsWidget: React.FC<ConditionsWidgetProps> = ({
             id="endDate"
             datePickerType="single"
             dateFormat="d/m/Y"
+            light={isTablet}
             minDate={new Date(onsetDate).toISOString()}
             maxDate={dayjs().utc().format()}
             placeholder="dd/mm/yyyy"
             onChange={([date]) => setEndDate(date)}
             value={endDate}
-            light={isTablet}
           >
             <DatePickerInput id="endDateInput" labelText={t('endDate', 'End date')} />
           </DatePicker>

@@ -1,11 +1,13 @@
 import { Injectable } from '@angular/core';
-import { ReplaySubject, Observable, Subject, of, forkJoin } from 'rxjs';
+import { ReplaySubject, Observable, Subject, of, forkJoin, zip, from } from 'rxjs';
 import { concat, first, map, take, tap } from 'rxjs/operators';
 
 import { FormResourceService } from '../openmrs-api/form-resource.service';
 import { FormSchemaCompiler } from '@openmrs/ngx-formentry';
 import { LocalStorageService } from '../local-storage/local-storage.service';
-import { FormSchema, Questions } from '../types';
+import { FormMetadataObject, FormSchema, FormSchemaAndTranslations, Questions } from '../types';
+import { TranslateService } from '@ngx-translate/core';
+import { merge } from 'lodash-es';
 
 @Injectable()
 export class FormSchemaService {
@@ -13,47 +15,78 @@ export class FormSchemaService {
     private formsResourceService: FormResourceService,
     private localStorage: LocalStorageService,
     private formSchemaCompiler: FormSchemaCompiler,
+    private translateService: TranslateService,
   ) {}
 
-  public getFormSchemaByUuid(formUuid: string, cached: boolean = true): Observable<FormSchema> {
-    const cachedCompiledSchema = this.getCachedCompiledSchemaByUuid(formUuid);
-    if (cachedCompiledSchema && cached) {
-      return of(cachedCompiledSchema);
+  public getFormSchemaByUuid(
+    formUuid: string,
+    language: string = 'en',
+    cached: boolean = true,
+  ): Observable<FormSchema> {
+    if (cached) {
+      const cachedCompiledSchema = this.getCachedCompiledSchemaByUuid(formUuid, language);
+      if (cachedCompiledSchema) {
+        if (cachedCompiledSchema.translations) {
+          this.translateService.setTranslation(language, cachedCompiledSchema.translations);
+        }
+        return of(cachedCompiledSchema);
+      }
     }
 
     return forkJoin({
-      unCompiledSchema: this.getFormSchemaByUuidFromServer(formUuid).pipe(take(1)),
+      unCompiledSchema: this.getFormSchemaByUuidFromServer(formUuid, language).pipe(take(1)),
       formMetadataObject: this.formsResourceService.getFormMetaDataByUuid(formUuid).pipe(take(1)),
     }).pipe(
       map(({ unCompiledSchema, formMetadataObject }) => {
-        const formSchema: any = unCompiledSchema.form;
-        const referencedComponents: any = unCompiledSchema.referencedComponents;
+        const formSchema = unCompiledSchema.form;
+        const referencedComponents = unCompiledSchema.referencedComponents;
 
-        formMetadataObject.pages = formSchema.pages || [];
-        formMetadataObject.referencedForms = formSchema.referencedForms || [];
-        formMetadataObject.processor = formSchema.processor;
+        const combinedFormMetadata = {
+          ...formMetadataObject,
+          pages: formSchema.pages || [],
+          referencedForms: formSchema.referencedForms || [],
+          processor: formSchema.processor,
+          translations: {},
+        };
+
+        if (combinedFormMetadata.referencedForms.length > 0) {
+          // use all translations from referenced forms, with the main form
+          // "winning" any duplicates
+          combinedFormMetadata.translations = merge(
+            combinedFormMetadata.referencedForms.reduce(merge, {}),
+            formSchema.translations ?? {},
+          );
+        } else {
+          combinedFormMetadata.translations = formSchema.translations ?? {};
+        }
+
+        if (combinedFormMetadata.translations) {
+          this.translateService.setTranslation(language, combinedFormMetadata.translations);
+        }
 
         return this.formSchemaCompiler.compileFormSchema(
-          formMetadataObject,
+          combinedFormMetadata,
           referencedComponents,
         ) as unknown as FormSchema;
       }),
-      tap((compiledSchema) => this.cacheCompiledSchemaByUuid(formUuid, compiledSchema)),
+      tap((compiledSchema) => this.cacheCompiledSchema(formUuid, language, compiledSchema)),
     );
   }
 
-  private getCachedCompiledSchemaByUuid(formUuid: string): any {
-    return this.localStorage.getObject(formUuid);
+  private getCachedCompiledSchemaByUuid(formUuid: string, language: string) {
+    return this.localStorage.getObject(`form_${formUuid}_${language}`);
   }
 
-  private cacheCompiledSchemaByUuid(formUuid, schema): void {
-    this.localStorage.setObject(formUuid, schema);
+  private cacheCompiledSchema(formUuid: string, language: string, schema: unknown) {
+    this.localStorage.setObject(`form_${formUuid}_${language}`, schema);
   }
 
-  private getFormSchemaByUuidFromServer(formUuid: string) {
+  private getFormSchemaByUuidFromServer(formUuid: string, language: string) {
     const formSchema: ReplaySubject<any> = new ReplaySubject(1);
-    this.fetchFormSchemaUsingFormMetadata(formUuid).subscribe(
-      (schema: any) => {
+    this.fetchFormSchemaUsingFormMetadata(formUuid, language).subscribe(
+      ({ schema, translations }) => {
+        schema.translations = translations;
+
         // check whether whether formSchema has references b4 hitting getFormSchemaWithReferences
         if (schema.referencedForms && schema.referencedForms.length > 0) {
           this.getFormSchemaWithReferences(schema).subscribe(
@@ -98,13 +131,13 @@ export class FormSchemaService {
     return formSchemaWithReferences;
   }
 
-  private fetchFormSchemaReferences(formSchema: any): Observable<any> {
+  private fetchFormSchemaReferences(formSchema: FormSchema): Observable<any> {
     // first create the observableBatch/ArrayOfRequests
-    const observableBatch: Array<Observable<any>> = [];
-    const referencedForms: Array<any> = formSchema.referencedForms;
+    const observableBatch: Array<Observable<FormSchemaAndTranslations>> = [];
+    const referencedForms = formSchema.referencedForms;
     if (Array.isArray(referencedForms) && referencedForms.length > 0) {
       const referencedUuids: Array<string> = this.getFormUuidArray(referencedForms);
-      referencedUuids.forEach((referencedUuid: any, key) => {
+      referencedUuids.forEach((referencedUuid: any) => {
         observableBatch.push(this.fetchFormSchemaUsingFormMetadata(referencedUuid));
       });
     }
@@ -139,28 +172,62 @@ export class FormSchemaService {
     }).pipe(first());
   }
 
-  private fetchFormSchemaUsingFormMetadata(formUuid: string): Observable<any> {
-    return Observable.create((observer: Subject<any>) => {
+  private fetchFormSchemaUsingFormMetadata(
+    formUuid: string,
+    language: string = 'en',
+  ): Observable<FormSchemaAndTranslations> {
+    return Observable.create((observer: Subject<FormSchemaAndTranslations>) => {
       return this.formsResourceService.getFormMetaDataByUuid(formUuid).subscribe(
-        (formMetadataObject: any) => {
+        (formMetadataObject: FormMetadataObject) => {
           if (formMetadataObject.resources.length > 0) {
             const { resources } = formMetadataObject;
-            const valueReferenceUuid = resources?.find(({ name }) => name === 'JSON schema').valueReference;
-            if (valueReferenceUuid) {
-              this.formsResourceService.getFormClobDataByUuid(valueReferenceUuid).subscribe(
-                (clobData: any) => {
-                  observer.next(clobData);
+            const schemaUuid = resources?.find(({ name }) => name === 'JSON schema')?.valueReference;
+            const translationsUuid = resources?.find(({ name }) =>
+              name.endsWith(`_translations_${language}`),
+            )?.valueReference;
+
+            const formSchema = new ReplaySubject<FormSchema>(1);
+            if (schemaUuid) {
+              this.formsResourceService.getFormClobDataByUuid(schemaUuid).subscribe(
+                (clobData) => {
+                  formSchema.next(clobData);
                 },
                 (err) => {
-                  console.error(err);
-                  observer.error(err);
+                  console.error(`Error while loading form ${formUuid}`, err);
+                  formSchema.error(err);
                 },
               );
             } else {
-              observer.next([]);
+              formSchema.next();
             }
+
+            const formTranslations = new ReplaySubject<Record<string, string>>(1);
+            if (translationsUuid) {
+              this.formsResourceService.getFormClobDataByUuid(translationsUuid).subscribe(
+                (clobData) => {
+                  formTranslations.next(clobData?.translations ?? {});
+                },
+                (err) => {
+                  console.error(`Error while loading translations for ${formUuid} in ${language}`, err);
+                  formTranslations.error(err);
+                },
+              );
+            } else {
+              formTranslations.next({});
+            }
+
+            zip(from(formSchema), from(formTranslations))
+              .pipe(
+                map(([schema, translations]) => ({
+                  schema,
+                  translations,
+                })),
+              )
+              .subscribe((value) => observer.next(value));
           } else {
-            observer.error(formMetadataObject.display + ':This formMetadataObject has no resource');
+            observer.error(
+              `${formMetadataObject.display}: The form ${formUuid} does not have any associated resources.`,
+            );
           }
         },
         (err) => {
@@ -183,16 +250,16 @@ export class FormSchemaService {
     const results = new Set<string>();
     const walkQuestions = (questions: Array<Questions>) => {
       for (const question of questions) {
-        if (typeof question.concept === 'string') {
+        if (!question.label && typeof question.concept === 'string') {
           results.add(question.concept);
         }
 
-        if (typeof question.questionOptions?.concept === 'string') {
+        if (!question.label && typeof question.questionOptions?.concept === 'string') {
           results.add(question.questionOptions.concept);
         }
 
         for (const answer of question.questionOptions?.answers ?? []) {
-          if (typeof answer.concept === 'string') {
+          if (!answer.label && typeof answer.concept === 'string') {
             results.add(answer.concept);
           }
         }

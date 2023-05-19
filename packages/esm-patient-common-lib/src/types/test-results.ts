@@ -15,7 +15,7 @@ export interface ObsRecord {
 
 export interface ObsMetaInfo {
   [_: string]: any;
-  assessValue?: (value: number) => OBSERVATION_INTERPRETATION;
+  assessValue?: (value: string) => OBSERVATION_INTERPRETATION;
 }
 
 export interface ConceptRecord {

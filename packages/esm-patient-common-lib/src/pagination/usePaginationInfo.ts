@@ -5,7 +5,11 @@ export function usePaginationInfo(pageSize: number, totalItems: number, pageNumb
   const { t } = useTranslation();
 
   const pageSizes = useMemo(() => {
-    const numberOfPages = Math.ceil(totalItems / pageSize);
+    let numberOfPages = Math.ceil(totalItems / pageSize);
+    if (isNaN(numberOfPages)) {
+      numberOfPages = 0;
+    }
+
     return [...Array(numberOfPages).keys()].map((x) => {
       return (x + 1) * pageSize;
     });

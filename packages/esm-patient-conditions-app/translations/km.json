@@ -1,0 +1,20 @@
+{
+  "activeConditions": "លក្ខខណ្ឌសកម្ម",
+  "add": "បន្ថែម",
+  "cancel": "បោះបង់",
+  "condition": "លក្ខខណ្ឌ",
+  "conditionNowVisible": "ឥឡូវនេះវាអាចមើលឃើញនៅលើទំព័រលក្ខខណ្ឌ",
+  "conditions": "លក្ខខណ្ឌទាំងអស់ (ច្រើន)",
+  "conditionSaved": "ស្ថានភាពត្រូវបានរក្សាទុកដោយជោគជ័យ",
+  "conditionSaveError": "កំហុសក្នុងការរក្សាទុកលក្ខខណ្ឌ",
+  "currentStatus": "ស្ថានភាព​បច្ចុប្បន្ន",
+  "endDate": "កាលបរិច្ឆេទបញ្ចប់",
+  "enterCondition": "បញ្ចូលលក្ខខណ្ឌ",
+  "noResultsFor": "គ្មានលទ្ធផលសម្រាប់",
+  "onsetDate": "កាលបរិច្ឆេទចាប់ផ្តើម",
+  "saveAndClose": "រក្សាទុក និងបិទ",
+  "searchConditions": "លក្ខខណ្ឌស្វែងរក",
+  "seeAll": "ឃើញ​ទាំងអស់",
+  "since": "ចាប់តាំងពី",
+  "status": "ស្ថានភាព"
+}

@@ -58,6 +58,7 @@ const ChartReview: React.FC<ChartReviewProps> = ({ patientUuid, patient, view })
         to={makePath(defaultDashboard, {
           patientUuid,
         })}
+        replace
       />
     );
   } else {

@@ -3,7 +3,13 @@ export const mockForms = [
     form: {
       uuid: '0a9fc16e-4c00-4842-a1e4-e4bafeb6e226',
       name: 'POC COVID 19 Assessment Form v1.1',
-      encounterType: { uuid: '466d6707-8429-4e61-b5a0-d63444f5ad35', name: 'COVIDSCREENING' },
+      display: 'POC COVID 19 Assessment Form v1.1',
+      encounterType: {
+        uuid: '466d6707-8429-4e61-b5a0-d63444f5ad35',
+        name: 'COVIDSCREENING',
+        viewPrivilege: null,
+        editPrivilege: null,
+      },
       version: '1.1',
       published: true,
       retired: false,
@@ -20,11 +26,21 @@ export const mockForms = [
       {
         uuid: '30726a13-ac53-4b51-a1cb-91c410a70960',
         encounterDatetime: '2022-04-08T09:21:48.000+0300',
-        encounterType: { uuid: '466d6707-8429-4e61-b5a0-d63444f5ad35', name: 'COVIDSCREENING' },
+        encounterType: {
+          uuid: '466d6707-8429-4e61-b5a0-d63444f5ad35',
+          name: 'COVIDSCREENING',
+          viewPrivilege: null,
+          editPrivilege: null,
+        },
         form: {
           uuid: '0a9fc16e-4c00-4842-a1e4-e4bafeb6e226',
           name: 'AMPATH POC COVID 19 Assessment Form v1.1',
-          encounterType: { uuid: '466d6707-8429-4e61-b5a0-d63444f5ad35', name: 'COVIDSCREENING' },
+          encounterType: {
+            uuid: '466d6707-8429-4e61-b5a0-d63444f5ad35',
+            name: 'COVIDSCREENING',
+            viewPrivilege: null,
+            editPrivilege: null,
+          },
           version: '1.1',
           published: true,
           retired: false,
