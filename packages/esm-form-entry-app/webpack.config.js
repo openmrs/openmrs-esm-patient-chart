@@ -4,7 +4,7 @@ const { StatsWriterPlugin } = require('webpack-stats-plugin');
 
 const path = require('path');
 const { basename, dirname, resolve } = path;
-const { name, version, browser, main } = require('./package.json');
+const { name, version, browser, main, peerDependencies } = require('./package.json');
 const filename = basename(browser || main);
 const root = process.cwd();
 const outDir = dirname(browser || main);
@@ -52,24 +52,16 @@ module.exports = {
       exposes: {
         './start': srcFile,
       },
-      shared: {
-        '@openmrs/esm-framework': {
+      shared: [...Object.keys(peerDependencies), '@openmrs/esm-framework/src/internal'].reduce((obj, depName) => {
+        obj[depName] = {
+          requiredVersion: peerDependencies[depName] ?? false,
           singleton: true,
-          eager: true,
-          requiredVersion: 'auto',
-          import: '@openmrs/esm-framework',
-          shareKey: '@openmrs/esm-framework',
+          import: depName,
+          shareKey: depName,
           shareScope: 'default',
-        },
-        '@openmrs/esm-framework/src/internal': {
-          singleton: true,
-          eager: true,
-          requiredVersion: 'auto',
-          import: '@openmrs/esm-framework/src/internal',
-          shareKey: '@openmrs/esm-framework/src/internal',
-          shareScope: 'default',
-        },
-      },
+        };
+        return obj;
+      }, {}),
     }),
     new StatsWriterPlugin({
       filename: `${filename}.buildmanifest.json`,
