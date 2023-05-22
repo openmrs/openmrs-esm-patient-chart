@@ -29,15 +29,25 @@ function setupOpenMRS() {
   defineExtensionConfigSchema('nav-group', genericNavGroupConfigSchema);
   defineExtensionConfigSchema('dashboard', genericDashboardConfigSchema);
 
+  /**
+   * t('patientBreadcrumb', 'Patient')
+   * t'('Patient Summary Dashboard')
+   */
   registerBreadcrumbs([
     {
       path: spaBasePath,
-      title: 'Patient',
+      title: () => Promise.resolve(window.i18next.t('patientBreadcrumb', { defaultValue: 'Patient', ns: moduleName })),
       parent: `${window.spaBase}/home`,
     },
     {
       path: `${spaBasePath}/:view`,
-      title: ([_, key]) => `${decodeURIComponent(key)} dashboard`,
+      title: ([_, key]) =>
+        Promise.resolve(
+          window.i18next.t(`${decodeURIComponent(key)} Dashboard`, {
+            ns: moduleName,
+            defaultValue: key,
+          }),
+        ),
       parent: spaBasePath,
     },
   ]);
