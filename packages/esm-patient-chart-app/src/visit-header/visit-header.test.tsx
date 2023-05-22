@@ -106,7 +106,8 @@ describe('Visit Header', () => {
 
     // Should close the visit-header
     await user.click(closeButton);
-    expect(navigate).toHaveBeenCalledWith({ to: '/spa/home' });
+    const currentUrl = window.location;
+    expect(currentUrl).not.toContain('/chart/');
   });
 
   test('should display a truncated name when the patient name is very long', async () => {
@@ -155,7 +156,8 @@ describe('Visit Header', () => {
 
     // Should close the visit-header
     await user.click(closeButton);
-    expect(navigate).toHaveBeenCalledWith({ to: '/spa/home' });
+    const currentUrl = window.location;
+    expect(currentUrl).not.toContain('/chart/');
   });
 });
 

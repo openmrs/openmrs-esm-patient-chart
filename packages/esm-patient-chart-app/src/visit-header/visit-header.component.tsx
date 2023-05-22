@@ -151,13 +151,9 @@ const VisitHeader: React.FC = () => {
 
   const hasActiveVisit = !isLoading && !visitNotLoaded;
 
-  const onClosePatientChart = useCallback(() => {
-    const originPage = localStorage.getItem('fromPage');
-    localStorage.removeItem('fromPage');
-
-    setShowVisitHeader((prevState) => !prevState);
-    originPage ? navigate({ to: `${window.spaBase}/${originPage}` }) : navigate({ to: `${window.spaBase}/home` });
-  }, []);
+  const onClosePatientChart = () => {
+    window.history.back();
+  };
 
   const openModal = useCallback((patientUuid) => {
     const dispose = showModal('end-visit-dialog', {
@@ -240,7 +236,6 @@ const VisitHeader: React.FC = () => {
   }, [
     hasActiveVisit,
     isSideMenuExpanded,
-    onClosePatientChart,
     patient,
     showHamburger,
     showVisitHeader,
