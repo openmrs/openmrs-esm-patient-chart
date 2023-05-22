@@ -67,8 +67,7 @@
   "peerDependencies": {
     "@openmrs/esm-framework": "4.x",
     "rxjs": "6.x",
-    "single-spa": "5.x",
-    "systemjs": "6.x"
+    "single-spa": "5.x"
   },
   "devDependencies": {
     "@angular-architects/module-federation": "^12.5.0",
@@ -78,7 +77,6 @@
     "@angular/language-service": "~12.2.16",
     "@angular/localize": "~12.2.16",
     "@openmrs/esm-framework": "next",
-    "@types/fhir": "^0.0.31",
     "@types/jasmine": "~3.6.0",
     "@types/jasminewd2": "~2.0.3",
     "@types/webpack-env": "^1.17.0",

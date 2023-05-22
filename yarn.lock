@@ -5417,7 +5417,6 @@ __metadata:
     "@ngx-translate/core": ^13.0.0
     "@openmrs/esm-framework": next
     "@openmrs/ngx-formentry": next
-    "@types/fhir": ^0.0.31
     "@types/jasmine": ~3.6.0
     "@types/jasminewd2": ~2.0.3
     "@types/webpack-env": ^1.17.0
@@ -5452,7 +5451,6 @@ __metadata:
     "@openmrs/esm-framework": 4.x
     rxjs: 6.x
     single-spa: 5.x
-    systemjs: 6.x
   languageName: unknown
   linkType: soft
 
@@ -6607,7 +6605,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/fhir@npm:0.0.31, @types/fhir@npm:^0.0.31":
+"@types/fhir@npm:0.0.31":
   version: 0.0.31
   resolution: "@types/fhir@npm:0.0.31"
   checksum: 523744e7582da9a6bf2cd8dcb4ef1558c0257c955fd22dee87d6b7bbc4464eb60bd4942e29ff02358dc2c5661c87bc72d5c754b0ef9bf48aaa13d5d91ec0aa1c
