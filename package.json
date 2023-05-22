@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "@openmrs/esm-framework": "next",
+    "@playwright/test": "^1.30.0",
     "@swc/cli": "^0.1.57",
     "@swc/core": "^1.2.165",
     "@swc/jest": "^0.2.21",
@@ -40,6 +41,7 @@
     "css-loader": "^6.6.0",
     "d3-selection": "^3.0.0",
     "dayjs": "^1.8.36",
+    "dotenv": "^16.0.3",
     "eslint": "^7.20.0",
     "eslint-config-prettier": "^8.2.0",
     "eslint-config-ts-react-important-stuff": "^3.0.0",
