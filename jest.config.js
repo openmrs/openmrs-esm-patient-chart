@@ -1,7 +1,7 @@
 /**
  * @returns {Promise<import('jest').Config>}
  */
-module.export = {
+module.exports = {
   transform: {
     '^.+\\.(j|t)sx?$': '@swc/jest',
   },
