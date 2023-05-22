@@ -3,8 +3,10 @@
   "compilerOptions": {
     "baseUrl": "./",
     "outDir": "./dist/out-tsc",
+    "allowSyntheticDefaultImports": true,
     "sourceMap": true,
-    "declaration": false,
+    "jsx": "react",
+    "declaration": true,
     "downlevelIteration": true,
     "experimentalDecorators": true,
     "module": "esnext",
@@ -13,10 +15,10 @@
     "target": "es2015",
     "types": [
       "node",
-      "webpack-env"
+      "webpack-env",
     ],
     "lib": [
-      "es2018",
+      "es2015",
       "dom"
     ],
     "skipLibCheck": true
@@ -25,5 +27,5 @@
     "disableTypeScriptVersionCheck": true,
     "fullTemplateTypeCheck": true,
     "strictInjectionParameters": true
-  }
+  },
 }
