@@ -27,6 +27,11 @@ module.exports = {
   entry: resolve(__dirname, 'src/index.ts'),
   target: 'web',
   devtool: mode === production ? 'hidden-nosources-source-map' : 'eval-source-map',
+  devServer: {
+    contentBase: path.join(__dirname, 'dist'),
+    compress: true,
+    port: 4200,
+  },
   output: {
     publicPath: 'auto',
     path: resolve(root, outDir),
