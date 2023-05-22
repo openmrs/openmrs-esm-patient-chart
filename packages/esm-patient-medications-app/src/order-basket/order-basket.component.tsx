@@ -1,37 +1,30 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSWRConfig } from 'swr';
-import { connect } from 'unistore/react';
 import { Button, ButtonSet, DataTableSkeleton, InlineNotification, ActionableNotification } from '@carbon/react';
-import { showModal, showToast, useConfig, useLayoutType, useSession } from '@openmrs/esm-framework';
+import { showModal, showToast, useConfig, useLayoutType, useSession, useStore } from '@openmrs/esm-framework';
 import { EmptyState, ErrorState, useVisitOrOfflineVisit } from '@openmrs/esm-patient-common-lib';
 import { orderDrugs } from './drug-ordering';
 import { ConfigObject } from '../config-schema';
 import { createEmptyEncounter, useOrderEncounter, usePatientOrders } from '../api/api';
 import { OrderBasketItem } from '../types/order-basket-item';
-import {
-  getOrderItems,
-  OrderBasketStore,
-  OrderBasketStoreActions,
-  orderBasketStoreActions,
-} from '../medications/order-basket-store';
+import { getOrderItems, orderBasketStore } from '../medications/order-basket-store';
 import MedicationOrderForm from './medication-order-form.component';
 import MedicationsDetailsTable from '../components/medications-details-table.component';
 import OrderBasketItemList from './order-basket-item-list.component';
 import OrderBasketSearch from './order-basket-search/drug-search.component';
 import styles from './order-basket.scss';
-
 export interface OrderBasketProps {
   closeWorkspace(): void;
   patientUuid: string;
 }
 
-const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBasketStore, {}>(
-  'items',
-  orderBasketStoreActions,
-)(({ patientUuid, items, closeWorkspace, setItems }: OrderBasketProps & OrderBasketStore & OrderBasketStoreActions) => {
-  const patientOrderItems = getOrderItems(items, patientUuid);
+const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }) => {
   const { t } = useTranslation();
+
+  const store = useStore(orderBasketStore);
+  const setItems = useCallback((items) => orderBasketStore.setState((state) => (state.items = items)), []);
+  const patientOrderItems = useMemo(() => getOrderItems(store.items, patientUuid), [store, patientUuid]);
+
   const { mutateOrders } = usePatientOrders(patientUuid, 'ACTIVE');
   const displayText = t('activeMedicationsDisplayText', 'Active medications');
   const headerTitle = t('activeMedicationsHeaderTitle', 'active medications');
@@ -256,6 +249,6 @@ const OrderBasket = connect<OrderBasketProps, OrderBasketStoreActions, OrderBask
       </div>
     </>
   );
-});
+};
 
 export default OrderBasket;

@@ -37,7 +37,14 @@ export interface MappedEncounter {
   visitStopDatetime?: string;
 }
 
-const VisitSummary: React.FC<VisitSummaryProps> = ({ encounters, patientUuid, visitUuid, visitTypeUuid, visitStartDatetime, visitStopDatetime }) => {
+const VisitSummary: React.FC<VisitSummaryProps> = ({
+  encounters,
+  patientUuid,
+  visitUuid,
+  visitTypeUuid,
+  visitStartDatetime,
+  visitStopDatetime,
+}) => {
   const config = useConfig();
   const { t } = useTranslation();
   const layout = useLayoutType();
