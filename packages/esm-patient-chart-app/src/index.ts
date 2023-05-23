@@ -30,10 +30,23 @@ function setupOpenMRS() {
   defineExtensionConfigSchema('dashboard', genericDashboardConfigSchema);
 
   /**
-   * t('patientBreadcrumb', 'Patient')
-   * t'('Patient Summary Dashboard')
+   * This comment tells i18n to still keep the following translation keys (DO NOT DELETE THESE):
+   * 
+   * t('patientBreadcrumb')
+   * t("Patient Summary dashboard")
+   * t("Allergies dashboard")
+   * t("Appointments dashboard")
+   * t("Vitals & Biometrics dashboard")
+   * t("Medications dashboard")
+   * t("Visits dashboard")
+   * t("Conditions dashboard")
+   * t("Attachments dashboard")
+   * t("Programs dashboard")
+   * t("Offline Actions dashboard")
+   * t("Forms & Notes dashboard")
+   * t("Test Results dashboard")
    */
-  registerBreadcrumbs([
+   registerBreadcrumbs([
     {
       path: spaBasePath,
       title: () => Promise.resolve(window.i18next.t('patientBreadcrumb', { defaultValue: 'Patient', ns: moduleName })),
@@ -43,9 +56,9 @@ function setupOpenMRS() {
       path: `${spaBasePath}/:view`,
       title: ([_, key]) =>
         Promise.resolve(
-          window.i18next.t(`${decodeURIComponent(key)} Dashboard`, {
+          window.i18next.t(`${decodeURIComponent(key)} dashboard`, {
             ns: moduleName,
-            defaultValue: key,
+            defaultValue: `${decodeURIComponent(key)} dashboard`,
           }),
         ),
       parent: spaBasePath,
