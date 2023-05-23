@@ -50,6 +50,28 @@
 background-color: $ui-01;
 }
 
+.textInputContainer {
+  &:global(.red) {
+    background-color: red;
+
+    input {
+      background-color: red;
+    }
+  }
+  &:global(.green) {
+    background-color: green;
+
+    input {
+      background-color: green;
+    }
+  }
+  &:global(.yellow) {
+    background-color: yellow;
+     input {
+      background-color: yellow;
+     }
+  }
+}
 .textarea {
   border: none;
   @extend .bodyLong01;

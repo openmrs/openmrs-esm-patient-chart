@@ -20,3 +20,13 @@ export function isInNormalRange(conceptMetadata: Array<ConceptMetadata>, concept
     ? Number(value) >= Number(concept.lowAbsolute) && Number(value) <= Number(concept.hiAbsolute)
     : true;
 }
+
+//convert age into an integer (whole number)
+export function extractNumbers(str) {
+  const regex = /\d+/g;
+  const match = str.match(regex);
+  if (!match) {
+    return null;
+  }
+  return parseInt(match[0], 10);
+}
