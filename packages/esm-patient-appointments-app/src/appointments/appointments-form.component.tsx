@@ -16,8 +16,8 @@ import {
   TimePickerSelect,
   TimePicker,
 } from '@carbon/react';
-import { amPm, convertTime12to24 } from '@openmrs/esm-patient-common-lib';
 import { useLocations, useSession, showToast, showNotification, useLayoutType } from '@openmrs/esm-framework';
+import { amPm, convertTime12to24 } from '@openmrs/esm-patient-common-lib';
 import { saveAppointment, useAppointments, useAppointmentService } from './appointments.resource';
 import { Appointment, AppointmentPayload } from '../types';
 import styles from './appointments-form.scss';

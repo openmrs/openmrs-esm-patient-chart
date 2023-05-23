@@ -8,7 +8,6 @@ import { FormSubmissionService } from '../form-submission/form-submission.servic
 import { EncounterResourceService } from '../openmrs-api/encounter-resource.service';
 import { Encounter, FormSchema, Order } from '../types';
 import { showToast, showNotification, getSynchronizationItems, createGlobalStore } from '@openmrs/esm-framework';
-import type { Unsubscribe } from 'unistore';
 import { PatientPreviousEncounterService } from '../openmrs-api/patient-previous-encounter.service';
 
 import { patientFormSyncItem, PatientFormSyncItemContent } from '../offline/sync';
@@ -36,7 +35,7 @@ const store = createGlobalStore<Record<string, FormState>>('ampath-form-state', 
 })
 export class FeWrapperComponent implements OnInit, OnDestroy {
   private launchFormSubscription?: Subscription;
-  private unsubscribeStore: Unsubscribe | undefined;
+  private unsubscribeStore: () => void | undefined;
 
   public formUuid: string;
   public form: Form;
