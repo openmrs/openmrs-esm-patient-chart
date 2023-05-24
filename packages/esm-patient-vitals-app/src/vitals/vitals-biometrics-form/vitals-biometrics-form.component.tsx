@@ -47,6 +47,7 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
   const [patientBMI, setPatientBMI] = useState<number>();
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const encounterUuid = currentVisit?.encounters?.find((enc) => enc?.form?.uuid === config.vitals.formUuid)?.uuid;
+  const useMuacColorStatus = config.vitals.useMuacColors;
   const [colorCode, setColorcode] = useState(undefined);
 
   const isBMIInNormalRange = (value: number | undefined | string) => {
@@ -467,6 +468,7 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
             <Column className={styles.column}>
               <VitalsBiometricInput
                 title={t('muac', 'MUAC')}
+                useMuacColors={useMuacColorStatus}
                 colorCode={colorCode}
                 onInputChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                   setPatientVitalAndBiometrics({

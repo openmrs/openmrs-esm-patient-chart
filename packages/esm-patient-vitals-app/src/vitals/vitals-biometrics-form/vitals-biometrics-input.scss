@@ -52,23 +52,23 @@ background-color: $ui-01;
 
 .textInputContainer {
   &:global(.red) {
-    background-color: red;
+    background-color: #ffd7d9;
 
     input {
-      background-color: red;
+      background-color: #ffd7d9;
     }
   }
   &:global(.green) {
-    background-color: green;
+    background-color: #defbe6;
 
     input {
-      background-color: green;
+      background-color: #defbe6;
     }
   }
   &:global(.yellow) {
-    background-color: yellow;
+    background-color: #fff8a1;
      input {
-      background-color: yellow;
+      background-color: #fff8a1;
      }
   }
 }

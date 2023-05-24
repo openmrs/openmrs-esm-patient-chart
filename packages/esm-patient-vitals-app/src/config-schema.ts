@@ -63,6 +63,11 @@ export const configSchema = {
       _type: Type.String,
       _default: 'Vitals',
     },
+    useMuacColors: {
+      _type: Type.Boolean,
+      _default: true,
+      _description: 'Whether to show/use MUAC color codes. If set to true, the input will show status colors.',
+    },
   },
   biometrics: biometricsConfigSchema,
 };
@@ -84,6 +89,7 @@ export interface ConfigObject {
     encounterTypeUuid: string;
     formUuid: string;
     formName: string;
+    useMuacColors: boolean;
   };
   biometrics: BiometricsConfigObject;
 }
