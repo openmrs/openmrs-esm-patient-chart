@@ -49,7 +49,7 @@ function setupOpenMRS() {
       },
       {
         name: 'appointments-form-workspace',
-        load: getAsyncLifecycle(() => import('./appointments/appointments-form.component'), options),
+        load: getAsyncLifecycle(() => import('./appointments/appointments-form/appointments-form.component'), options),
       },
       {
         name: 'appointment-cancel-confirmation-dialog',
