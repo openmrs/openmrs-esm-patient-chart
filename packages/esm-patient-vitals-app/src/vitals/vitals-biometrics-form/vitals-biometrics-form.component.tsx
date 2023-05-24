@@ -389,7 +389,11 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
                   },
                 ]}
                 unitSymbol={conceptUnits.get(config.concepts.heightUuid) ?? ''}
-                inputIsNormal={true}
+                inputIsNormal={isInNormalRange(
+                  conceptMetadata,
+                  config.concepts['heightUuid'],
+                  patientVitalAndBiometrics?.height,
+                )}
               />
             </Column>
             <Column className={styles.column}>
