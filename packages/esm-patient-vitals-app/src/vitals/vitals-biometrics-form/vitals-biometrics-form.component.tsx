@@ -14,7 +14,7 @@ import {
 } from '@openmrs/esm-framework';
 import { DefaultWorkspaceProps, useVitalsConceptMetadata } from '@openmrs/esm-patient-common-lib';
 import { Button, ButtonSet, Column, Form, Row, Stack } from '@carbon/react';
-import { calculateBMI, isInNormalRange, extractNumbers } from './vitals-biometrics-form.utils';
+import { calculateBMI, isInNormalRange, extractNumbers, getColorCode } from './vitals-biometrics-form.utils';
 import { savePatientVitals, useVitals } from '../vitals.resource';
 import { ConfigObject } from '../../config-schema';
 import VitalsBiometricInput from './vitals-biometrics-input.component';
@@ -55,57 +55,11 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
     return value >= 18.5 && value <= 24.9;
   };
 
-  function getColorCode(age, muac) {
-    let color = '';
-    switch (true) {
-      // children 5 years and below with a muac equal to 14
-      case age <= 5 && muac <= 11.5 && muac > 0:
-        setColorcode('red');
-        break;
-      case age < 5 && muac > 11.5 && muac < 12.5:
-        setColorcode('yellow');
-        break;
-      case age < 5 && muac > 12.5:
-        setColorcode('green');
-        break;
-      // above 5 but less than 10
-      case age > 5 && age < 10 && muac <= 13.5 && muac > 0:
-        setColorcode('red');
-        break;
-      case age > 5 && age < 10 && muac > 13.5 && muac < 14.5:
-        setColorcode('yellow');
-        break;
-      case age > 5 && age < 10 && muac > 14.5:
-        setColorcode('green');
-        break;
-      //above 10 but less than 18
-      case age > 10 && age < 18 && muac <= 16.5 && muac > 0:
-        setColorcode('red');
-        break;
-      case age > 10 && age < 18 && muac > 16.5 && muac < 19.0:
-        setColorcode('yellow');
-        break;
-      case age > 10 && age < 18 && muac > 19.0:
-        setColorcode('green');
-        break;
-      // above 18
-      case age > 18 && muac <= 19.5 && muac > 0:
-        setColorcode('red');
-        break;
-      case age > 18 && muac > 19.0 && muac < 22.0:
-        setColorcode('yellow');
-        break;
-      case age > 18 && muac > 22.0:
-        setColorcode('green');
-        break;
-    }
-    return color;
-  }
-
   useEffect(() => {
     getColorCode(
       extractNumbers(age(patient.patient?.birthDate)),
       parseInt(patientVitalAndBiometrics?.midUpperArmCircumference),
+      setColorcode,
     );
   }, [patient.patient?.birthDate, patientVitalAndBiometrics?.midUpperArmCircumference]);
 
