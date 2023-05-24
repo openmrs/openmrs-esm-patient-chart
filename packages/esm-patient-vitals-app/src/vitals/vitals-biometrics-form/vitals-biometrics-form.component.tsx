@@ -48,7 +48,7 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const encounterUuid = currentVisit?.encounters?.find((enc) => enc?.form?.uuid === config.vitals.formUuid)?.uuid;
   const useMuacColorStatus = config.vitals.useMuacColors;
-  const [colorCode, setColorcode] = useState(undefined);
+  const [colorCode, setColorCode] = useState('');
 
   const isBMIInNormalRange = (value: number | undefined | string) => {
     if (value === undefined || value === '') return true;
@@ -59,7 +59,7 @@ const VitalsAndBiometricForms: React.FC<DefaultWorkspaceProps> = ({ patientUuid,
     getColorCode(
       extractNumbers(age(patient.patient?.birthDate)),
       parseInt(patientVitalAndBiometrics?.midUpperArmCircumference),
-      setColorcode,
+      setColorCode,
     );
   }, [patient.patient?.birthDate, patientVitalAndBiometrics?.midUpperArmCircumference]);
 

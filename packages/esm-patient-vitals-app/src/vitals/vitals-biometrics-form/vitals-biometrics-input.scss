@@ -1,5 +1,6 @@
 @use '@carbon/styles/scss/spacing';
 @use '@carbon/styles/scss/type';
+@use '@carbon/styles/scss/colors';
 @import '~@openmrs/esm-styleguide/src/vars';
 
 .label01 {
@@ -52,23 +53,23 @@ background-color: $ui-01;
 
 .textInputContainer {
   &:global(.red) {
-    background-color: #ffd7d9;
+    background-color: colors.$red-20;
 
     input {
-      background-color: #ffd7d9;
+      background-color: colors.$red-20;
     }
   }
   &:global(.green) {
-    background-color: #defbe6;
+    background-color: colors.$green-20;
 
     input {
-      background-color: #defbe6;
+      background-color: colors.$green-20;
     }
   }
   &:global(.yellow) {
-    background-color: #fff8a1;
+    background-color: colors.$yellow-10;
      input {
-      background-color: #fff8a1;
+      background-color: colors.$yellow-10;
      }
   }
 }
