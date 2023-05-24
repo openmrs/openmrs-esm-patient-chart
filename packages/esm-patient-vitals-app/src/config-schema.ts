@@ -65,7 +65,7 @@ export const configSchema = {
     },
     useMuacColors: {
       _type: Type.Boolean,
-      _default: true,
+      _default: false,
       _description: 'Whether to show/use MUAC color codes. If set to true, the input will show status colors.',
     },
   },
