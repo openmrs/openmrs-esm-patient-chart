@@ -1,9 +1,10 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Accordion, AccordionItem, Checkbox, Button, Search } from '@carbon/react';
 import { TreeViewAlt, Close, Search as SearchIcon } from '@carbon/react/icons';
 import { useConfig, useLayoutType } from '@openmrs/esm-framework';
 import type { FilterNodeProps, FilterLeafProps } from './filter-types';
+import { FilterEmptyState } from '../ui-elements/resetFiltersEmptyState';
 import FilterContext from './filter-context';
 import styles from './filter-set.styles.scss';
 
@@ -15,6 +16,20 @@ interface FilterSetProps {
   hideFilterSetHeader?: boolean;
 }
 
+function filterTreeNode(inputValue, treeNode) {
+  // If the tree node's display value contains the user input, or any of its children's display contains the user input, return true
+  if (
+    treeNode &&
+    (treeNode.display.toLowerCase().includes(inputValue.toLowerCase()) ||
+      (treeNode.subSets && treeNode.subSets.some((child) => filterTreeNode(inputValue, child))))
+  ) {
+    return true;
+  }
+
+  // Otherwise, return false
+  return false;
+}
+
 const FilterSet: React.FC<FilterSetProps> = ({ hideFilterSetHeader = false }) => {
   const { roots } = useContext(FilterContext);
   const config = useConfig();
@@ -22,7 +37,21 @@ const FilterSet: React.FC<FilterSetProps> = ({ hideFilterSetHeader = false }) =>
   const { t } = useTranslation();
   const { resetTree } = useContext(FilterContext);
   const [searchTerm, setSearchTerm] = useState('');
+  const [treeDataFiltered, setTreeDataFiltered] = useState(roots);
   const [showSearchInput, setShowSearchInput] = useState(false);
+
+  const handleInputChange = useCallback(
+    (e) => {
+      setSearchTerm(searchTerm);
+      const filteredData = roots.filter((node) => filterTreeNode(searchTerm, node));
+      setTreeDataFiltered(filteredData);
+    },
+    [roots, searchTerm],
+  );
+
+  useEffect(() => {
+    handleInputChange(searchTerm);
+  }, [searchTerm, handleInputChange]);
 
   return (
     <div className={!tablet ? styles.stickyFilterSet : ''}>
@@ -39,6 +68,7 @@ const FilterSet: React.FC<FilterSetProps> = ({ hideFilterSetHeader = false }) =>
               >
                 {t('resetTreeText', 'Reset tree')}
               </Button>
+
               <Button kind="ghost" size="sm" renderIcon={SearchIcon} onClick={() => setShowSearchInput(true)}>
                 {t('search', 'Search')}
               </Button>
@@ -54,11 +84,15 @@ const FilterSet: React.FC<FilterSetProps> = ({ hideFilterSetHeader = false }) =>
           </div>
         ))}
       <div className={styles.filterSetContent}>
-        {roots?.map((root, index) => (
-          <div className={styles.nestedAccordion} key={`filter-node-${index}`}>
-            <FilterNode root={root} level={0} open={config.concepts[index].defaultOpen} />
-          </div>
-        ))}
+        {treeDataFiltered?.length > 0 ? (
+          treeDataFiltered?.map((root, index) => (
+            <div className={styles.nestedAccordion} key={`filter-node-${index}`}>
+              <FilterNode root={root} level={0} open={config.concepts[index].defaultOpen} />
+            </div>
+          ))
+        ) : (
+          <FilterEmptyState clearFilter={() => setSearchTerm('')} />
+        )}
       </div>
     </div>
   );
