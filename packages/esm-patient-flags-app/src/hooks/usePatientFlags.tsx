@@ -42,7 +42,7 @@ export function useCurrentPath(): string {
     setPath(winPath);
   };
   useEffect(() => {
-    window.addEventListener('popstate', listenToPopstate);
+    window.addEventListener('single-spa:route-event', listenToPopstate);
     return () => {
       window.removeEventListener('popstate', listenToPopstate);
     };
