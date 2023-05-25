@@ -14,15 +14,11 @@ const PatientFlagsTag: React.FC<PatientFlagsTagProps> = ({ patientUuid }) => {
   const [shouldShowTag, setShouldShowTag] = useState(false);
   const { flags, isLoadingFlags, flagLoadingError } = useFlagsFromPatient(patientUuid);
 
-  console.log('showing the required flag numbers');
-
   useEffect(() => {
     if (path.includes('Summary')) {
       setShouldShowTag(false);
-      console.log('showing the required flag numbers is set to: ', shouldShowTag);
     } else {
       setShouldShowTag(true);
-      console.log('showing the required flag numbers is set to: ', shouldShowTag);
     }
   }, [path, shouldShowTag]);
 
