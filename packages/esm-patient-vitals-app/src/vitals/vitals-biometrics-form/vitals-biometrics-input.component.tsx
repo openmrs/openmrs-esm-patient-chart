@@ -6,6 +6,8 @@ import styles from './vitals-biometrics-input.scss';
 
 interface VitalsBiometricInputProps {
   title: string;
+  colorCode?: string;
+  useMuacColors?: boolean;
   onInputChange(evnt): void;
   textFields: Array<{
     name: string;
@@ -35,6 +37,8 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
   placeholder,
   disabled,
   inputIsNormal,
+  colorCode,
+  useMuacColors,
 }) => {
   const { t } = useTranslation();
   const isTablet = useLayoutType() === 'tablet';
@@ -48,7 +52,9 @@ const VitalsBiometricInput: React.FC<VitalsBiometricInputProps> = ({
     <div className={styles.inputContainer} style={{ width: textFieldWidth }}>
       <p className={styles.vitalsBiometricInputLabel01}>{title}</p>
       <div
-        className={`${styles.textInputContainer} ${disabled && styles.disableInput} ${!inputIsNormal && styles.danger}`}
+        className={`${styles.textInputContainer} ${disabled && styles.disableInput} ${
+          !inputIsNormal && styles.danger
+        } ${useMuacColors ? colorCode : undefined}`}
         style={{ ...textFieldStyles }}
       >
         <div className={styles.centerDiv}>
