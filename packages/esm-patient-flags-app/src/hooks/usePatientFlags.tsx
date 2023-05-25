@@ -37,14 +37,14 @@ export function useFlagsFromPatient(patientUuid: string) {
 
 export function useCurrentPath(): string {
   const [path, setPath] = useState(window.location.pathname);
-  const listenToRouteEvent = () => {
+  const listenToRoutingEvent = () => {
     const winPath = window.location.pathname;
     setPath(winPath);
   };
   useEffect(() => {
-    window.addEventListener('single-spa:route-event', listenToRouteEvent);
+    window.addEventListener('single-spa:routing-event', listenToRoutingEvent);
     return () => {
-      window.removeEventListener('single-spa:route-event', listenToRouteEvent);
+      window.removeEventListener('single-spa:routing-event', listenToRoutingEvent);
     };
   }, []);
   return path;
