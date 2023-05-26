@@ -64,7 +64,7 @@ const FormEntry: React.FC<FormEntryComponentProps> = ({ patientUuid, closeWorksp
         setShowForm(true);
       });
     }
-  }, [state.formUuid]);
+  }, [state]);
 
   return (
     <div>
