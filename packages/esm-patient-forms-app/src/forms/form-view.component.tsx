@@ -198,7 +198,7 @@ const FormView: React.FC<FormViewProps> = ({
                                   row.id,
                                   patient,
                                   htmlFormEntryForms,
-                                  '',
+                                  first(results[index].associatedEncounters)?.uuid,
                                   results[index].form.display ?? results[index].form.name,
                                   mutateForms,
                                 )
