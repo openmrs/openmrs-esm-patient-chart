@@ -31,7 +31,7 @@ function setupOpenMRS() {
 
   /**
    * This comment tells i18n to still keep the following translation keys (DO NOT DELETE THESE):
-   * 
+   *
    * t('patientBreadcrumb')
    * t("Patient Summary dashboard")
    * t("Allergies dashboard")
@@ -46,7 +46,7 @@ function setupOpenMRS() {
    * t("Forms & Notes dashboard")
    * t("Test Results dashboard")
    */
-   registerBreadcrumbs([
+  registerBreadcrumbs([
     {
       path: spaBasePath,
       title: () => Promise.resolve(window.i18next.t('patientBreadcrumb', { defaultValue: 'Patient', ns: moduleName })),
