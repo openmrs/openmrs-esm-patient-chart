@@ -39,32 +39,38 @@ const PatientChart: React.FC = () => {
 
   return (
     <main className={`omrs-main-content ${styles.chartContainer}`}>
-      <>
-        <div
-          className={`${styles.innerChartContainer} ${
-            windowSize.size === 'normal' && active ? styles.closeWorkspace : styles.activeWorkspace
-          }`}
-        >
-          <ExtensionSlot extensionSlotName="breadcrumbs-slot" />
-          {isLoadingPatient ? (
-            <Loader />
-          ) : (
-            <>
-              <aside>
-                <ExtensionSlot extensionSlotName="patient-header-slot" state={state} />
-                <ExtensionSlot extensionSlotName="patient-info-slot" state={state} />
-              </aside>
-              <div className={styles.grid}>
-                <div className={styles.chartReview}>
-                  <ChartReview {...state} view={view} />
-                  <WorkspaceNotification />
+      {isLoadingPatient ? (
+        <Loader />
+      ) : (
+        <>
+          <div
+            className={`${styles.innerChartContainer} ${
+              windowSize.size === 'normal' && active ? styles.closeWorkspace : styles.activeWorkspace
+            }`}
+          >
+            <ExtensionSlot extensionSlotName="breadcrumbs-slot" />
+            {isLoadingPatient ? (
+              <Loader />
+            ) : (
+              <>
+                <aside>
+                  <ExtensionSlot extensionSlotName="patient-header-slot" state={state} />
+                  <ExtensionSlot extensionSlotName="what-is-new-bar-slot" state={state} />
+                  <ExtensionSlot extensionSlotName="patient-info-slot" state={state} />
+                </aside>
+                <div className={styles.grid}>
+                  <div className={styles.chartReview}>
+                    <ChartReview {...state} view={view} />
+                    <WorkspaceNotification />
+                  </div>
                 </div>
-              </div>
-            </>
-          )}
-        </div>
-        <ActionMenu open={false} />
-      </>
+              </>
+            )}
+          </div>
+          <ActionMenu open={false} />
+        </>
+      )}
+      ;
     </main>
   );
 };
