@@ -1,9 +1,9 @@
 import { Page } from '@playwright/test';
 
-export class HomePage{
+export class HomePage {
   constructor(readonly page: Page) {}
 
-  async goto() {
+  async goto(uuid: string) {
     await this.page.goto('home');
   }
 }
