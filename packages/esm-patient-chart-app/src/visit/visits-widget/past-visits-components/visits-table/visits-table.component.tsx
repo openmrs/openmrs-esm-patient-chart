@@ -318,7 +318,6 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                                 );
                               }}
                               renderIcon={(props) => <Edit size={16} {...props} />}
-                              style={{ marginLeft: '-1rem', marginTop: '0.5rem' }}
                             >
                               {t('editThisEncounter', 'Edit this encounter')}
                             </Button>
@@ -328,7 +327,6 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                               kind="danger--ghost"
                               onClick={() => handleDeleteEncounter(visits[index].id, visits[index].form.display)}
                               renderIcon={(props) => <TrashCan size={16} {...props} />}
-                              style={{ marginLeft: '-1rem', marginTop: '0.5rem' }}
                             >
                               {t('deleteThisEncounter', 'Delete this encounter')}
                             </Button>
