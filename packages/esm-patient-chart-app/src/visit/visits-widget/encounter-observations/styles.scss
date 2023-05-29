@@ -4,7 +4,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-gap: spacing.$spacing-03;
-  margin: spacing.$spacing-05 spacing.$spacing-05 0 0;
+  margin: spacing.$spacing-05 spacing.$spacing-05 spacing.$spacing-05 0;
 }
 
 .observation > span {
@@ -13,8 +13,4 @@
 
 .parentConcept {
   font-weight: bold;
-}
-
-.childConcept {
-  padding-left: 0.8rem;
 }
