@@ -7,7 +7,7 @@ import { orderDrugs } from './drug-ordering';
 import { ConfigObject } from '../config-schema';
 import { createEmptyEncounter, useOrderEncounter, usePatientOrders } from '../api/api';
 import { OrderBasketItem } from '../types/order-basket-item';
-import { getOrderItems, orderBasketStore } from '../medications/order-basket-store';
+import { getOrderItems, orderBasketStore, orderBasketStoreActions } from '../medications/order-basket-store';
 import MedicationOrderForm from './medication-order-form.component';
 import MedicationsDetailsTable from '../components/medications-details-table.component';
 import OrderBasketItemList from './order-basket-item-list.component';
@@ -22,7 +22,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }
   const { t } = useTranslation();
 
   const store = useStore(orderBasketStore);
-  const setItems = useCallback((items) => orderBasketStore.setState((state) => (state.items = items)), []);
+  const setItems = useCallback((items: OrderBasketItem[]) => orderBasketStoreActions.setOrderBasketItems(items), []);
   const patientOrderItems = useMemo(() => getOrderItems(store.items, patientUuid), [store, patientUuid]);
 
   const { mutateOrders } = usePatientOrders(patientUuid, 'ACTIVE');
@@ -145,13 +145,11 @@ const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }
 
   const openMedicationOrderFormForUpdatingExistingOrder = (existingOrderIndex: number) => {
     const order = patientOrderItems[existingOrderIndex];
-    openMedicationOrderForm(order, (finalizedOrder) =>
-      setItems(() => {
-        const newOrders = [...patientOrderItems];
-        newOrders[existingOrderIndex] = finalizedOrder;
-        return newOrders;
-      }),
-    );
+    openMedicationOrderForm(order, (finalizedOrder) => {
+      const newOrders = [...patientOrderItems];
+      newOrders[existingOrderIndex] = finalizedOrder;
+      setItems(newOrders);
+    });
   };
 
   useEffect(() => {

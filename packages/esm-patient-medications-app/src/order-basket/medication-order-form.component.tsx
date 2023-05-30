@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { FormEventHandler, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Button,
   ButtonSet,
@@ -81,6 +81,11 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
   const template = initialOrderBasketItem.template;
   const { isLoading: isLoadingOrderConfig, orderConfigObject, error: errorFetchingOrderConfig } = useOrderConfig();
   const config = useConfig() as ConfigObject;
+
+  const handleFormSubmission = (e) => {
+    e.preventDefault();
+    onSign(orderBasketItem);
+  };
 
   const drugDosingUnits: Array<DosingUnit> = useMemo(
     () =>
@@ -171,7 +176,7 @@ export default function MedicationOrderForm({ initialOrderBasketItem, onSign, on
         </div>
       )}
 
-      <Form className={styles.orderForm} onSubmit={() => onSign(orderBasketItem)} id="drugOrderForm">
+      <Form className={styles.orderForm} onSubmit={handleFormSubmission} id="drugOrderForm">
         {errorFetchingOrderConfig && (
           <InlineNotification
             kind="error"
