@@ -35,7 +35,7 @@ const EncounterObservations: React.FC<EncounterObservationsProps> = ({ observati
                 <span />
                 {obs.groupMembers.map((member) => (
                   <React.Fragment key={index}>
-                    <span>{member.concept.display}</span>
+                    <span className={styles.childConcept}>{member.concept.display}</span>
                     <span>{getAnswerFromDisplay(member.display)}</span>
                   </React.Fragment>
                 ))}
