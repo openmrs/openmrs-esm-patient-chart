@@ -7,12 +7,12 @@ function getPatientUuidFromUrl(): string {
 }
 export interface OrderBasketStore {
   items: {
-    [patientUuid: string]: [];
+    [patientUuid: string]: Array<OrderBasketItem>;
   };
 }
 
 export interface OrderBasketStoreActions {
-  setItems: (value: Array<OrderBasketItem> | (() => Array<OrderBasketItem>)) => void;
+  setOrderBasketItems: (value: Array<OrderBasketItem> | (() => Array<OrderBasketItem>)) => void;
 }
 
 export const orderBasketStore = createGlobalStore<OrderBasketStore>('drug-order-basket', {
@@ -20,7 +20,10 @@ export const orderBasketStore = createGlobalStore<OrderBasketStore>('drug-order-
 });
 
 export const orderBasketStoreActions = {
-  setItems(store: OrderBasketStore, value: Array<OrderBasketItem> | (() => Array<OrderBasketItem>)) {
+  setOrderBasketItems(
+    store: OrderBasketStore,
+    value: Array<OrderBasketItem> | (() => Array<OrderBasketItem>),
+  ): OrderBasketStore {
     const patientUuid = getPatientUuidFromUrl();
     return {
       items: {
