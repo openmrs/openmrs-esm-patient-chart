@@ -20,17 +20,14 @@ export const orderBasketStore = createGlobalStore<OrderBasketStore>('drug-order-
 });
 
 export const orderBasketStoreActions = {
-  setOrderBasketItems(
-    store: OrderBasketStore,
-    value: Array<OrderBasketItem> | (() => Array<OrderBasketItem>),
-  ): OrderBasketStore {
+  setOrderBasketItems(value: Array<OrderBasketItem> | (() => Array<OrderBasketItem>)) {
     const patientUuid = getPatientUuidFromUrl();
-    return {
+    orderBasketStore.setState((state) => ({
       items: {
-        ...store.items,
+        ...state.items,
         [patientUuid]: typeof value === 'function' ? value() : value,
       },
-    };
+    }));
   },
 };
 

@@ -22,11 +22,7 @@ const OrderBasket: React.FC<OrderBasketProps> = ({ patientUuid, closeWorkspace }
   const { t } = useTranslation();
 
   const store = useStore(orderBasketStore);
-  const setItems = useCallback(
-    (items: OrderBasketItem[]) =>
-      orderBasketStore.setState((state) => orderBasketStoreActions.setOrderBasketItems(state, items)),
-    [orderBasketStore.setState],
-  );
+  const setItems = useCallback((items: OrderBasketItem[]) => orderBasketStoreActions.setOrderBasketItems(items), []);
   const patientOrderItems = useMemo(() => getOrderItems(store.items, patientUuid), [store, patientUuid]);
 
   const { mutateOrders } = usePatientOrders(patientUuid, 'ACTIVE');

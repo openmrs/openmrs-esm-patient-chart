@@ -21,7 +21,7 @@ import { formatDate } from '@openmrs/esm-framework';
 import { CardHeader } from '@openmrs/esm-patient-common-lib';
 import { useTranslation } from 'react-i18next';
 import { compare } from '../utils/compare';
-import { getOrderItems, orderBasketStore } from '../medications/order-basket-store';
+import { getOrderItems, orderBasketStore, orderBasketStoreActions } from '../medications/order-basket-store';
 import { Order } from '../types/order';
 import { OrderBasketItem } from '../types/order-basket-item';
 import styles from './medications-details-table.scss';
@@ -53,7 +53,7 @@ const MedicationsDetailsTable: React.FC<ActiveMedicationsProps> = ({
   const { launchOrderBasket } = useLaunchOrderBasket(patientUuid);
 
   const store = useStore(orderBasketStore);
-  const setItems = useCallback((items) => orderBasketStore.setState((state) => (state.items = items)), []);
+  const setItems = useCallback((items) => orderBasketStoreActions.setOrderBasketItems(items), []);
   const patientOrderItems = useMemo(() => getOrderItems(store.items, patientUuid), [store, patientUuid]);
 
   const tableHeaders = [
