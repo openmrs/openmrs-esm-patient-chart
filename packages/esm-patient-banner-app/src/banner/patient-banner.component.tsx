@@ -39,6 +39,8 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
     setShowContactDetails((value) => !value);
   }, []);
 
+  const isDeceased = Boolean(patient?.deceasedDateTime);
+
   const patientAvatar = (
     <div className={styles.patientAvatar} role="img">
       <ExtensionSlot extensionSlotName="patient-photo-slot" state={patientPhotoSlotState} />
@@ -74,12 +76,16 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
     }
   };
 
-  const identifiers = patient?.identifier?.filter(
-    (identifier) => !excludePatientIdentifierCodeTypes?.uuids.includes(identifier.type.coding[0].code),
-  );
+  const identifiers =
+    patient?.identifier?.filter(
+      (identifier) => !excludePatientIdentifierCodeTypes?.uuids.includes(identifier.type.coding[0].code),
+    ) ?? [];
 
   return (
-    <div className={styles.container} role="banner">
+    <div
+      className={`${styles.container} ${isDeceased ? styles.deceasedPatientContainer : styles.activePatientContainer}`}
+      role="banner"
+    >
       <div
         onClick={handleNavigateToPatientChart}
         tabIndex={0}
@@ -98,12 +104,13 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
               />
             </div>
             {!hideActionsOverflow && (
-              <div ref={overflowMenuRef}>
+              <div className={styles.overflowMenuContainer} ref={overflowMenuRef}>
                 <CustomOverflowMenuComponent
+                  deceased={isDeceased}
                   menuTitle={
                     <>
                       <span className={styles.actionsButtonText}>{t('actions', 'Actions')}</span>{' '}
-                      <OverflowMenuVertical size={16} style={{ marginLeft: '0.5rem' }} />
+                      <OverflowMenuVertical size={16} style={{ marginLeft: '0.5rem', fill: '#78A9FF' }} />
                     </>
                   }
                   dropDownMenu={showDropdown}
@@ -121,14 +128,14 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
           </div>
           <div className={styles.demographics}>
             <span>{getGender(patient.gender)}</span> &middot; <span>{age(patient.birthDate)}</span> &middot;{' '}
-            <span>{formatDate(parseDate(patient?.birthDate), { mode: 'wide', time: false })}</span>
+            <span>{formatDate(parseDate(patient.birthDate), { mode: 'wide', time: false })}</span>
           </div>
           <div className={styles.row}>
             <div className={styles.identifiers}>
-              {identifiers.length
+              {identifiers?.length
                 ? identifiers.map(({ value, type }) => (
-                    <span className={styles.identifierTag}>
-                      <Tag key={value} className={styles.tag} type="gray" title={type.text}>
+                    <span key={value} className={styles.identifierTag}>
+                      <Tag className={styles.tag} type="gray" title={type.text}>
                         {type.text}
                       </Tag>
                       {value}
@@ -137,6 +144,7 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
                 : ''}
             </div>
             <Button
+              className={styles.toggleContactDetailsButton}
               kind="ghost"
               renderIcon={(props) =>
                 showContactDetails ? <ChevronUp size={16} {...props} /> : <ChevronDown size={16} {...props} />
@@ -145,13 +153,18 @@ const PatientBanner: React.FC<PatientBannerProps> = ({
               onClick={toggleContactDetails}
               style={{ marginTop: '-0.25rem' }}
             >
-              {showContactDetails ? t('showLess', 'Show less') : t('showAllDetails', 'Show all details')}
+              {showContactDetails ? t('hideDetails', 'Hide details') : t('showDetails', 'Show details')}
             </Button>
           </div>
         </div>
       </div>
       {showContactDetails && (
-        <ContactDetails address={patient?.address ?? []} telecom={patient?.telecom ?? []} patientId={patient?.id} />
+        <ContactDetails
+          address={patient?.address ?? []}
+          telecom={patient?.telecom ?? []}
+          patientId={patient?.id}
+          deceased={isDeceased}
+        />
       )}
     </div>
   );

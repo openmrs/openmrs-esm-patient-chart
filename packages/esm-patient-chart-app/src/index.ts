@@ -29,15 +29,38 @@ function setupOpenMRS() {
   defineExtensionConfigSchema('nav-group', genericNavGroupConfigSchema);
   defineExtensionConfigSchema('dashboard', genericDashboardConfigSchema);
 
+  /**
+   * This comment tells i18n to still keep the following translation keys (DO NOT DELETE THESE):
+   *
+   * t('patientBreadcrumb')
+   * t("Patient Summary dashboard")
+   * t("Allergies dashboard")
+   * t("Appointments dashboard")
+   * t("Vitals & Biometrics dashboard")
+   * t("Medications dashboard")
+   * t("Visits dashboard")
+   * t("Conditions dashboard")
+   * t("Attachments dashboard")
+   * t("Programs dashboard")
+   * t("Offline Actions dashboard")
+   * t("Forms & Notes dashboard")
+   * t("Test Results dashboard")
+   */
   registerBreadcrumbs([
     {
       path: spaBasePath,
-      title: 'Patient',
+      title: () => Promise.resolve(window.i18next.t('patientBreadcrumb', { defaultValue: 'Patient', ns: moduleName })),
       parent: `${window.spaBase}/home`,
     },
     {
       path: `${spaBasePath}/:view`,
-      title: ([_, key]) => `${decodeURIComponent(key)} dashboard`,
+      title: ([_, key]) =>
+        Promise.resolve(
+          window.i18next.t(`${decodeURIComponent(key)} dashboard`, {
+            ns: moduleName,
+            defaultValue: `${decodeURIComponent(key)} dashboard`,
+          }),
+        ),
       parent: spaBasePath,
     },
   ]);
@@ -265,6 +288,18 @@ function setupOpenMRS() {
           featureName: 'visit-attribute-tags',
           moduleName,
         }),
+      },
+      {
+        name: 'delete-encounter-modal',
+        load: getAsyncLifecycle(
+          () => import('./visit/visits-widget/past-visits-components/delete-encounter-modal.component'),
+          {
+            featureName: 'delete-encounter-modal',
+            moduleName,
+          },
+        ),
+        online: true,
+        offline: true,
       },
     ],
   };

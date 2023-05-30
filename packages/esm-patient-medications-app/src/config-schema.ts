@@ -34,11 +34,6 @@ export const configSchema = {
     _description: "UUID for the 'Drug' order type to fetch medications",
     _default: '131168f4-15f5-102d-96e4-000c29c2a5d7',
   },
-  visitEnabledSystemSettingUUID: {
-    _type: Type.UUID,
-    _description: "UUID for the system setting's property 'visit.enabled'",
-    _default: '9c594c46-482d-48b3-9643-05641111fc9f',
-  },
 };
 
 export interface ConfigObject {

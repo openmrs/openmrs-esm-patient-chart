@@ -5,14 +5,6 @@ export const esmPatientChartSchema = {
     _default: '159947AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
     _type: Type.ConceptUuid,
   },
-  problemListConceptUuid: {
-    _default: '1284AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    _type: Type.ConceptUuid,
-  },
-  diagnosisOrderConceptUuid: {
-    _default: '159946AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-    _type: Type.ConceptUuid,
-  },
   notesConceptUuids: {
     _type: Type.Array,
     _default: ['162169AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'],
@@ -94,6 +86,33 @@ export const esmPatientChartSchema = {
     _description: 'The UUID of the visit attribute that contains the visit queue number.',
     _default: 'c61ce16f-272a-41e7-9924-4c555d0932c5',
   },
+  defaultFacilityUrl: {
+    _type: Type.String,
+    _default: '',
+    _description: 'Custom URL to load default facility if it is not in the session',
+  },
+  showUpcomingAppointments: {
+    _type: Type.Boolean,
+    _description: 'Whether start visit form should display upcoming appointments',
+    _default: false,
+  },
+  logo: {
+    src: {
+      _type: Type.String,
+      _default: null,
+      _description: 'A path or URL to an image. Defaults to the OpenMRS SVG sprite.',
+    },
+    alt: {
+      _type: Type.String,
+      _default: 'Logo',
+      _description: 'Alt text, shown on hover',
+    },
+    name: {
+      _type: Type.String,
+      _default: null,
+      _description: 'The organization name displayed when image is absent',
+    },
+  },
 };
 
 export interface ChartConfig {
@@ -107,6 +126,13 @@ export interface ChartConfig {
   }>;
   showServiceQueueFields: boolean;
   visitQueueNumberAttributeUuid: string;
+  defaultFacilityUrl: string;
+  showUpcomingAppointments: boolean;
+  logo: {
+    src: string;
+    alt: string;
+    name: string;
+  };
 }
 
 export const configSchema = {

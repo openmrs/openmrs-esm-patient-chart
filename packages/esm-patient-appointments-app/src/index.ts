@@ -49,13 +49,18 @@ function setupOpenMRS() {
       },
       {
         name: 'appointments-form-workspace',
-        load: getAsyncLifecycle(() => import('./appointments/appointments-form.component'), options),
+        load: getAsyncLifecycle(() => import('./appointments/appointments-form/appointments-form.component'), options),
       },
       {
         name: 'appointment-cancel-confirmation-dialog',
         load: getAsyncLifecycle(() => import('./appointments/appointments-cancel-modal.component'), options),
         online: true,
         offline: false,
+      },
+      {
+        id: 'upcoming-appointment-widget',
+        slot: 'upcoming-appointment-slot',
+        load: getAsyncLifecycle(() => import('./appointments/upcoming-appointments-card.component'), options),
       },
     ],
   };

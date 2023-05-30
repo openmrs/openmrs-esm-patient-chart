@@ -1,3 +1,5 @@
+@use '@carbon/colors';
+
 .tooltipPadding {
   padding: 0.25rem;
 }
@@ -6,6 +8,7 @@
   font-size: 80%;
 }
 
-:global(.cds--tooltip--definition .cds--tooltip__trigger){
-  border-bottom: none;
+.tagOverride {
+  background-color: #6B1A18;
+  color: colors.$gray-20;
 }

@@ -11,6 +11,8 @@ export type SingleSpaProps = AppProps & {
   visitTypeUuid?: string;
   encounterUuid?: string;
   visitUuid?: string;
+  visitStartDatetime: string;
+  visitStopDatetime: string;
   view: string;
   closeWorkspace: () => void;
   patient: any;

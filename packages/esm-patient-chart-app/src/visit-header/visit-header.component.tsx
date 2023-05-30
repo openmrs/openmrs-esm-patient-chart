@@ -141,7 +141,7 @@ const VisitHeader: React.FC = () => {
   const [showVisitHeader, setShowVisitHeader] = useState(true);
   const [isSideMenuExpanded, setIsSideMenuExpanded] = useState(false);
   const navMenuItems = useAssignedExtensions('patient-chart-dashboard-slot').map((extension) => extension.id);
-  const { startVisitLabel, endVisitLabel } = useConfig();
+  const { startVisitLabel, endVisitLabel, logo } = useConfig();
 
   const showHamburger = useLayoutType() !== 'large-desktop' && navMenuItems.length > 0;
 
@@ -166,6 +166,8 @@ const VisitHeader: React.FC = () => {
     });
   }, []);
 
+  const isDeceased = Boolean(patient?.deceasedDateTime);
+
   const render = useCallback(() => {
     if (!showVisitHeader) {
       return null;
@@ -188,9 +190,15 @@ const VisitHeader: React.FC = () => {
           )}
           <ConfigurableLink className={styles.navLogo} to="${openmrsSpaBase}/home">
             <div className={styles.divider}>
-              <svg role="img" width={110} height={40}>
-                <use xlinkHref="#omrs-logo-white"></use>
-              </svg>
+              {logo?.src ? (
+                <img className={styles.logo} src={logo.src} alt={logo.alt} width={110} height={40} />
+              ) : logo?.name ? (
+                logo.name
+              ) : (
+                <svg role="img" width={110} height={40}>
+                  <use xlinkHref="#omrs-logo-white"></use>
+                </svg>
+              )}
             </div>
           </ConfigurableLink>
           <div className={styles.navDivider} />
@@ -199,20 +207,20 @@ const VisitHeader: React.FC = () => {
           </div>
           <HeaderGlobalBar>
             <ExtensionSlot extensionSlotName="visit-header-right-slot" />
-            {!hasActiveVisit && (
+            {!hasActiveVisit && !isDeceased && (
               <Button className={styles.startVisitButton} onClick={launchStartVisitForm} size="lg">
-                {startVisitLabel ? startVisitLabel : t('startVisit', 'Start a visit')}
+                {startVisitLabel ? startVisitLabel : t('startAVisit', 'Start a visit')}
               </Button>
             )}
             {currentVisit !== null && endVisitLabel && (
               <>
                 <HeaderGlobalAction
                   className={styles.headerGlobalBarButton}
-                  aria-label={endVisitLabel ?? t('endVisit', 'End a visit')}
+                  aria-label={endVisitLabel ?? t('endAVisit', 'End a visit')}
                   onClick={() => openModal(patient?.id)}
                 >
                   <Button as="div" className={styles.startVisitButton}>
-                    {endVisitLabel ? endVisitLabel : <>{t('endVisit', 'End a visit')}</>}
+                    {endVisitLabel ? endVisitLabel : <>{t('endAVisit', 'End a visit')}</>}
                   </Button>
                 </HeaderGlobalAction>
               </>
@@ -244,6 +252,8 @@ const VisitHeader: React.FC = () => {
     endVisitLabel,
     openModal,
     currentVisit,
+    logo,
+    isDeceased,
   ]);
 
   return <HeaderContainer render={render} />;

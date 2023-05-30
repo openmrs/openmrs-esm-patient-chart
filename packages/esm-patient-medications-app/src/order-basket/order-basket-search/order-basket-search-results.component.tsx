@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { Button, ClickableTile, Tile, SkeletonText, InlineNotification, ButtonSkeleton } from '@carbon/react';
 import { ShoppingCart } from '@carbon/react/icons';
 import { useTranslation } from 'react-i18next';
-import { useConfig, useLayoutType } from '@openmrs/esm-framework';
+import { useConfig, useLayoutType, UserHasAccess } from '@openmrs/esm-framework';
 import { OrderBasketItem } from '../../types/order-basket-item';
 import { ConfigObject } from '../../config-schema';
 import styles from './order-basket-search-results.scss';
@@ -136,22 +136,24 @@ const DrugSearchResultItem: React.FC<DrugSearchResultItemProps> = ({ drug, onSea
                 {drug?.strength && <>&mdash; {drug?.strength.toLowerCase()}</>}{' '}
                 {drug?.dosageForm?.display && <>&mdash; {drug?.dosageForm?.display.toLowerCase()}</>}
               </p>
-              {fetchingDrugOrderTemplatesError ? (
-                <p>
-                  <span className={styles.errorLabel}>
-                    {t('errorFetchingDrugOrderTemplates', 'Error fetching drug order templates')}
-                  </span>
-                </p>
-              ) : (
-                <p>
-                  {orderItem?.frequency?.value && (
-                    <span className={styles.label01}>{orderItem?.frequency?.value.toLowerCase()}</span>
-                  )}
-                  {orderItem?.route?.value && (
-                    <span className={styles.label01}>&mdash; {orderItem?.route?.value.toLowerCase()}</span>
-                  )}
-                </p>
-              )}
+              <UserHasAccess privilege="Manage OrderTemplates">
+                {fetchingDrugOrderTemplatesError ? (
+                  <p>
+                    <span className={styles.errorLabel}>
+                      {t('errorFetchingDrugOrderTemplates', 'Error fetching drug order templates')}
+                    </span>
+                  </p>
+                ) : (
+                  <p>
+                    {orderItem?.frequency?.value && (
+                      <span className={styles.label01}>{orderItem?.frequency?.value.toLowerCase()}</span>
+                    )}
+                    {orderItem?.route?.value && (
+                      <span className={styles.label01}>&mdash; {orderItem?.route?.value.toLowerCase()}</span>
+                    )}
+                  </p>
+                )}
+              </UserHasAccess>
             </div>
             <Button
               className={styles.addToBasketButton}

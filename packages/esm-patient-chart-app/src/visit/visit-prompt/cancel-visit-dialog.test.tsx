@@ -3,14 +3,19 @@ import { screen, render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useVisit, openmrsFetch, showNotification, showToast } from '@openmrs/esm-framework';
 import { mockCurrentVisit } from '../../../../../__mocks__/visits.mock';
+import { mockVisitQueueEntries } from '../../../../../__mocks__/visitQueueEntry.mock';
 import { mockPatient } from '../../../../../__mocks__/patient.mock';
 import CancelVisitDialog from './cancel-visit-dialog.component';
+import { useVisitQueueEntry } from '../queue-entry/queue.resource';
+import { removeQueuedPatient } from '../hooks/useServiceQueue';
 
 const mockUseVisit = useVisit as jest.Mock;
 const mockOpenmrsFetch = openmrsFetch as jest.Mock;
 const mockShowNotification = showNotification as jest.Mock;
 const mockShowToast = showToast as jest.Mock;
 const mockCloseModal = jest.fn();
+const mockUseVisitQueueEntry = useVisitQueueEntry as jest.Mock;
+const mockRemoveQueuedPatient = removeQueuedPatient as jest.Mock;
 
 jest.mock('@openmrs/esm-framework', () => {
   const originalModule = jest.requireActual('@openmrs/esm-framework');
@@ -22,12 +27,37 @@ jest.mock('@openmrs/esm-framework', () => {
   };
 });
 
+jest.mock('../queue-entry/queue.resource', () => {
+  const originalModule = jest.requireActual('../queue-entry/queue.resource');
+
+  return {
+    ...originalModule,
+    useVisitQueueEntry: jest.fn(),
+  };
+});
+
+jest.mock('../hooks/useServiceQueue', () => {
+  const originalModule = jest.requireActual('../hooks/useServiceQueue');
+
+  return {
+    ...originalModule,
+    removeQueuedPatient: jest.fn(),
+  };
+});
+
 describe('Cancel visit', () => {
   it('cancels an active visit and voids all associated encounters', async () => {
     const user = userEvent.setup();
 
     mockUseVisit.mockReturnValue({ currentVisit: mockCurrentVisit, mutate: jest.fn() });
     mockOpenmrsFetch.mockResolvedValueOnce({ status: 200 });
+    mockUseVisitQueueEntry.mockReturnValueOnce({
+      queueEntry: mockVisitQueueEntries,
+      isLoading: false,
+      error: false,
+      isValidating: false,
+    });
+    mockRemoveQueuedPatient.mockResolvedValue({ status: 200 });
 
     renderCancelVisitDialog();
 
@@ -56,6 +86,8 @@ describe('Cancel visit', () => {
 
     mockUseVisit.mockReturnValue({ currentVisit: mockCurrentVisit, mutate: jest.fn() });
     mockOpenmrsFetch.mockRejectedValueOnce({ message: 'Internal server error', status: 500 });
+    mockUseVisitQueueEntry.mockReturnValueOnce({ queueEntry: {}, isLoading: false, error: true, isValidating: false });
+    mockRemoveQueuedPatient.mockResolvedValue({ status: 200 });
 
     renderCancelVisitDialog();
 

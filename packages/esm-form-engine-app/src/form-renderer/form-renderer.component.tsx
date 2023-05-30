@@ -1,44 +1,55 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { InlineLoading } from '@carbon/react';
+import { OHRIForm } from '@openmrs/openmrs-form-engine-lib';
+
 import useForm from '../hooks/useForm';
 import useSchema from '../hooks/useSchema';
-import { OHRIForm } from '@ohri/openmrs-ohri-form-engine-lib';
-import { InlineNotification, InlineLoading } from '@carbon/react';
-import { useTranslation } from 'react-i18next';
+import FormError from './form-error.component';
+
 import styles from './form-renderer.scss';
+import { Visit } from '@openmrs/esm-framework';
 
 interface FormRendererProps {
   formUuid: string;
   patientUuid: string;
+  visit?: Visit;
   closeWorkspace: () => void;
+  encounterUuid?: string;
 }
 
-const FormRenderer: React.FC<FormRendererProps> = ({ formUuid, patientUuid, closeWorkspace }) => {
+const FormRenderer: React.FC<FormRendererProps> = ({ formUuid, patientUuid, visit, closeWorkspace, encounterUuid }) => {
   const { t } = useTranslation();
-  const { form, isLoading: formLoading, error: formError } = useForm(formUuid);
-  const valueReferenceUuid = form?.resources.find((resource) => resource.name === 'JSON schema')?.valueReference;
-  const { schema, isLoading: schemaLoading, error: schemaError } = useSchema(valueReferenceUuid);
+  const { form, formLoadError } = useForm(formUuid);
 
-  if (formError || schemaError) {
+  const valueReferenceUuid = form?.resources.find((resource) => resource.name === 'JSON schema')?.valueReference;
+  const { schema, isLoadingSchema, schemaLoadError } = useSchema(valueReferenceUuid);
+
+  if (isLoadingSchema) {
     return (
-      <InlineNotification
-        kind="error"
-        lowContrast
-        iconDescription={(error: any) =>
-          error?.response?.data?.error?.message ? error.response.data.error.message : error
-        }
-        title={t('error', 'Error loading form')}
-        subtitle={t('errorLoadingForm', 'An error occurred while loading the form')}
-        onClose={closeWorkspace}
-      />
+      <div className={styles.loaderContainer}>
+        <InlineLoading className={styles.loading} description={`${t('loading', 'Loading')} ...`} />
+      </div>
     );
   }
 
-  if (schemaLoading) {
-    return <InlineLoading className={styles.loading} description={`${t('loading', 'Loading')} ...`} />;
+  if (formLoadError || schemaLoadError) {
+    return <FormError closeWorkspace={closeWorkspace} />;
   }
 
   return (
-    <>{schema && <OHRIForm patientUUID={patientUuid} formJson={schema} mode="enter" handleClose={closeWorkspace} />}</>
+    <>
+      {schema && (
+        <OHRIForm
+          encounterUUID={encounterUuid}
+          patientUUID={patientUuid}
+          visit={visit}
+          formJson={schema}
+          handleClose={closeWorkspace}
+          onSubmit={() => closeWorkspace()}
+        />
+      )}
+    </>
   );
 };
 

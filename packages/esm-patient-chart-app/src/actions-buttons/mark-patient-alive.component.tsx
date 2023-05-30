@@ -25,7 +25,7 @@ const MarkPatientAliveOverflowMenuItem: React.FC<MarkPatientAliveOverflowMenuIte
     !isPatientLoading &&
     isDead && (
       <OverflowMenuItem
-        itemText={t('markAlive', 'Mark Alive')}
+        itemText={t('markAlive', 'Mark alive')}
         onClick={openModal}
         style={{
           maxWidth: '100vw',

@@ -23,28 +23,24 @@ import {
   TableToolbarSearch,
   Tile,
 } from '@carbon/react';
-import { Edit } from '@carbon/react/icons';
-import isEmpty from 'lodash-es/isEmpty';
+import { Edit, TrashCan } from '@carbon/react/icons';
 import {
   formatDatetime,
+  getConfig,
   isDesktop,
   navigate,
   parseDate,
+  showModal,
+  showToast,
   useLayoutType,
   usePagination,
-  Visit,
-  getConfig,
-  useConfig,
 } from '@openmrs/esm-framework';
-import {
-  formEntrySub,
-  launchPatientWorkspace,
-  launchStartVisitPrompt,
-  PatientChartPagination,
-} from '@openmrs/esm-patient-common-lib';
+import { formEntrySub, launchPatientWorkspace, PatientChartPagination } from '@openmrs/esm-patient-common-lib';
+import isEmpty from 'lodash-es/isEmpty';
 import type { HtmlFormEntryForm } from '@openmrs/esm-patient-forms-app/src/config-schema';
 import { MappedEncounter } from '../visit-summary.component';
 import EncounterObservations from '../../encounter-observations';
+import { deleteEncounter } from './visits-table.resource';
 import styles from './visits-table.scss';
 
 interface VisitTableProps {
@@ -120,11 +116,13 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
     encounterUuid?: string,
     formName?: string,
     visitTypeUuid?: string,
+    visitStartDatetime?: string,
+    visitStopDatetime?: string,
   ) => {
     const htmlForm = htmlFormEntryFormsConfig?.find((form) => form.formUuid === formUuid);
     if (isEmpty(htmlForm)) {
-      formEntrySub.next({ formUuid, visitUuid, encounterUuid, visitTypeUuid });
-      launchPatientWorkspace('patient-form-entry-workspace', { workspaceTitle: formName });
+      formEntrySub.next({ formUuid, visitUuid, encounterUuid, visitTypeUuid, visitStartDatetime, visitStopDatetime });
+      launchPatientWorkspace('patient-form-entry-workspace', { workspaceTitle: formName, formUuid, encounterUuid });
     } else {
       navigate({
         to: `\${openmrsBase}/htmlformentryui/htmlform/${htmlForm.formUiPage}.page?patientId=${patientUuid}&visitId=${visitUuid}&encounterId=${encounterUuid}&definitionUiResource=${htmlForm.formUiResource}&returnUrl=${window.location.href}`,
@@ -140,6 +138,35 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
   }, [paginatedVisits]);
 
   const handleEncounterTypeChange = ({ selectedItem }) => setFilter(selectedItem);
+
+  const handleDeleteEncounter = React.useCallback(
+    (encounterUuid: string, encounterTypeName?: string) => {
+      const close = showModal('delete-encounter-modal', {
+        close: () => close(),
+        encounterTypeName: encounterTypeName || '',
+        onConfirmation: () => {
+          const abortController = new AbortController();
+          deleteEncounter(encounterUuid, abortController)
+            .then(() => {
+              showToast({
+                title: t('encounterDeleted', 'Encounter deleted'),
+                description: `Encounter ${t('successfullyDeleted', 'successfully deleted')}`,
+                kind: 'success',
+              });
+            })
+            .catch((error) => {
+              showToast({
+                title: t('error', 'Error'),
+                description: `Encounter ${t('failedDeleting', "couldn't be deleted")}`,
+                kind: 'error',
+              });
+            });
+          close();
+        },
+      });
+    },
+    [t],
+  );
 
   const handleFilter = ({ rowIds, headers, cellsById, inputValue, getCellId }: FilterProps): Array<string> => {
     return rowIds.filter((rowId) =>
@@ -175,6 +202,10 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
         getTableProps,
         getToolbarProps,
         onInputChange,
+      }: {
+        rows: Array<typeof tableRows[0] & { isExpanded: boolean; cells: Array<{ id: string; value: string }> }>;
+        headers: typeof tableHeaders;
+        [key: string]: any;
       }) => (
         <>
           <TableContainer className={styles.tableContainer}>
@@ -230,34 +261,34 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                             >
                               <OverflowMenuItem
                                 className={styles.menuItem}
-                                id="#editEncounter"
                                 itemText={t('editThisEncounter', 'Edit this encounter')}
                                 size={desktopLayout ? 'sm' : 'lg'}
-                                onClick={() =>
+                                onClick={() => {
                                   launchWorkspace(
                                     visits[index]?.form?.uuid,
                                     visits[index]?.visitUuid,
                                     visits[index]?.id,
                                     visits[index]?.form?.display,
                                     visits[index]?.visitTypeUuid,
-                                  )
-                                }
+                                    visits[index]?.visitStartDatetime,
+                                    visits[index]?.visitStopDatetime,
+                                  );
+                                }}
                               >
                                 {t('editThisEncounter', 'Edit this encounter')}
                               </OverflowMenuItem>
                               <OverflowMenuItem
                                 size={desktopLayout ? 'sm' : 'lg'}
                                 className={styles.menuItem}
-                                id="#goToEncounter"
                                 itemText={t('goToThisEncounter', 'Go to this encounter')}
                               >
-                                {t('editThisEncounter', 'Edit this encounter')}
+                                {t('goToThisEncounter', 'Go to this encounter')}
                               </OverflowMenuItem>
                               <OverflowMenuItem
                                 size={desktopLayout ? 'sm' : 'lg'}
                                 className={styles.menuItem}
-                                id="#editEncounter"
                                 itemText={t('deleteThisEncounter', 'Delete this encounter')}
+                                onClick={() => handleDeleteEncounter(visits[index].id, visits[index].form.display)}
                                 hasDivider
                                 isDelete
                               >
@@ -272,22 +303,34 @@ const VisitTable: React.FC<VisitTableProps> = ({ showAllEncounters, visits, pati
                       <TableExpandedRow className={styles.expandedRow} colSpan={headers.length + 2}>
                         <>
                           <EncounterObservations observations={visits[index].obs} />
-                          <Button
-                            kind="ghost"
-                            onClick={() =>
-                              launchWorkspace(
-                                visits[index].form.uuid,
-                                visits[index].visitUuid,
-                                visits[index].id,
-                                visits[index].form.display,
-                                visits[index].visitTypeUuid,
-                              )
-                            }
-                            renderIcon={(props) => <Edit size={16} {...props} />}
-                            style={{ marginLeft: '-1rem', marginTop: '0.5rem' }}
-                          >
-                            {t('editEncounter', 'Edit encounter')}
-                          </Button>
+                          {visits[index]?.form?.uuid && (
+                            <Button
+                              kind="ghost"
+                              onClick={() => {
+                                launchWorkspace(
+                                  visits[index].form.uuid,
+                                  visits[index].visitUuid,
+                                  visits[index].id,
+                                  visits[index].form.display,
+                                  visits[index].visitTypeUuid,
+                                  visits[index]?.visitStartDatetime,
+                                  visits[index]?.visitStopDatetime,
+                                );
+                              }}
+                              renderIcon={(props) => <Edit size={16} {...props} />}
+                            >
+                              {t('editThisEncounter', 'Edit this encounter')}
+                            </Button>
+                          )}
+                          {visits[index]?.form?.display && (
+                            <Button
+                              kind="danger--ghost"
+                              onClick={() => handleDeleteEncounter(visits[index].id, visits[index].form.display)}
+                              renderIcon={(props) => <TrashCan size={16} {...props} />}
+                            >
+                              {t('deleteThisEncounter', 'Delete this encounter')}
+                            </Button>
+                          )}
                         </>
                       </TableExpandedRow>
                     ) : (

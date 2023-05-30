@@ -3,11 +3,11 @@ import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import { Button, DataTableSkeleton, ContentSwitcher, InlineLoading, Layer, Switch, Tile } from '@carbon/react';
 import { Add } from '@carbon/react/icons';
+import { useLayoutType } from '@openmrs/esm-framework';
 import { CardHeader, EmptyDataIllustration, ErrorState, launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { useAppointments } from './appointments.resource';
 import AppointmentsTable from './appointments-table.component';
 import styles from './appointments-base.scss';
-import { useLayoutType } from '@openmrs/esm-framework';
 
 interface AppointmentsBaseProps {
   basePath?: string;
@@ -94,7 +94,10 @@ const AppointmentsBase: React.FC<AppointmentsBaseProps> = ({ patientUuid }) => {
                 <Tile className={styles.tile}>
                   <EmptyDataIllustration />
                   <p className={styles.content}>
-                    {t('noUpcomingAppointments', 'There are no upcoming appointments to display for this patient')}
+                    {t(
+                      'noUpcomingAppointmentsForPatient',
+                      'There are no upcoming appointments to display for this patient',
+                    )}
                   </p>
                 </Tile>
               </Layer>

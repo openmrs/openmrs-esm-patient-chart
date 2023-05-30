@@ -1,6 +1,6 @@
 {
   "name": "@openmrs/esm-patient-appointments-app",
-  "version": "4.3.0",
+  "version": "4.5.0",
   "license": "MPL-2.0",
   "description": "Patient appointments microfrontend for the OpenMRS SPA",
   "browser": "dist/openmrs-esm-patient-appointments-app.js",

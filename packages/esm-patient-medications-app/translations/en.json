@@ -49,6 +49,7 @@
   "orderActionRenewed": "Renew",
   "orderActionRevised": "Modify",
   "orderBasket": "Order basket",
+  "orderBasket_title": "Order Basket",
   "orderBasketWithCount_one": "Order basket ({count})",
   "orderBasketWithCount_other": "Order basket ({count})",
   "orderCompleted": "Order placed",

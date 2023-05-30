@@ -61,3 +61,16 @@ export async function generateVisitQueueNumber(
     },
   );
 }
+
+export function removeQueuedPatient(queueUuid: string, queueEntryUuid: string, abortController: AbortController) {
+  return openmrsFetch(`/ws/rest/v1/queue/${queueUuid}/entry/${queueEntryUuid}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: {
+      endedAt: toDateObjectStrict(toOmrsIsoString(new Date())),
+    },
+    signal: abortController.signal,
+  });
+}

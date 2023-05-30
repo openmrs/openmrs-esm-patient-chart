@@ -23,6 +23,10 @@
 
 .startVisitButton {
   @include brand-03(background-color);
+
+  &:hover {
+    background-color: colors.$teal-90;
+  }
 }
 
 .patientDetails {

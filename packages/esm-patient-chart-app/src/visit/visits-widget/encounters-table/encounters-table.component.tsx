@@ -168,7 +168,7 @@ const EncountersTableLifecycle = ({ patientUuid }) => {
   const { encounters, error, isLoading } = useEncounters(patientUuid);
 
   if (isLoading) {
-    return <InlineLoading description={t('loading', 'Loading...')} role="progressbar" />;
+    return <InlineLoading description={`${t('loading', 'Loading')} ...`} role="progressbar" />;
   }
 
   if (error) {

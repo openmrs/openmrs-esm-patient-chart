@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Layer, OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import { launchPatientWorkspace } from '@openmrs/esm-patient-common-lib';
 import { showModal, useLayoutType } from '@openmrs/esm-framework';
-import { Appointment } from '../types';
+import type { Appointment } from '../types';
 import styles from './appointments-action-menu.scss';
 
 interface appointmentsActionMenuProps {
