@@ -28,7 +28,7 @@ import { MappedQueuePriority, useVisitQueueEntry } from '../visit/queue-entry/qu
 import { EditQueueEntry } from '../visit/queue-entry/edit-queue-entry.component';
 import VisitHeaderSideMenu from './visit-header-side-menu.component';
 import styles from './visit-header.scss';
-import { useVisitEnabledSystemSetting } from '../visit/visit.resource';
+import { useSystemVisitSetting } from '../visit/visit.resource';
 
 interface PatientInfoProps {
   patient: fhir.Patient;
@@ -143,7 +143,7 @@ const VisitHeader: React.FC = () => {
   const [isSideMenuExpanded, setIsSideMenuExpanded] = useState(false);
   const navMenuItems = useAssignedExtensions('patient-chart-dashboard-slot').map((extension) => extension.id);
   const { startVisitLabel, endVisitLabel, logo } = useConfig();
-  const visitEnabledSystemSetting = useVisitEnabledSystemSetting();
+  const { systemVisitEnabled } = useSystemVisitSetting();
 
   const showHamburger = useLayoutType() !== 'large-desktop' && navMenuItems.length > 0;
 
@@ -208,14 +208,14 @@ const VisitHeader: React.FC = () => {
             <PatientInfo patient={patient} />
           </div>
           <HeaderGlobalBar>
-            <ExtensionSlot extensionSlotName="visit-header-right-slot" />
-            {!hasActiveVisit && !isDeceased && (
-              <Button className={styles.startVisitButton} onClick={launchStartVisitForm} size="lg">
-                {startVisitLabel ? startVisitLabel : t('startAVisit', 'Start a visit')}
-              </Button>
-            )}
-            {visitEnabledSystemSetting.systemVisitEnabled && (
+            {systemVisitEnabled && (
               <>
+                <ExtensionSlot extensionSlotName="visit-header-right-slot" />
+                {!hasActiveVisit && (
+                  <Button className={styles.startVisitButton} onClick={launchStartVisitForm} size="lg">
+                    {startVisitLabel ? startVisitLabel : t('startAVisit', 'Start a visit')}
+                  </Button>
+                )}
                 {currentVisit !== null && endVisitLabel && (
                   <>
                     <HeaderGlobalAction
@@ -226,19 +226,6 @@ const VisitHeader: React.FC = () => {
                       <Button as="div" className={styles.startVisitButton}>
                         {endVisitLabel ? endVisitLabel : <>{t('endAVisit', 'End a visit')}</>}
                       </Button>
-                      {currentVisit !== null && endVisitLabel && (
-                        <>
-                          <HeaderGlobalAction
-                            className={styles.headerGlobalBarButton}
-                            aria-label={endVisitLabel ?? t('endVisit', 'End a visit')}
-                            onClick={() => openModal(patient?.id)}
-                          >
-                            <Button as="div" className={styles.startVisitButton}>
-                              {endVisitLabel ? endVisitLabel : <>{t('endVisit', 'End a visit')}</>}
-                            </Button>
-                          </HeaderGlobalAction>
-                        </>
-                      )}
                     </HeaderGlobalAction>
                   </>
                 )}
@@ -272,8 +259,7 @@ const VisitHeader: React.FC = () => {
     openModal,
     currentVisit,
     logo,
-    isDeceased,
-    visitEnabledSystemSetting.systemVisitEnabled,
+    systemVisitEnabled,
   ]);
 
   return <HeaderContainer render={render} />;
