@@ -18,31 +18,6 @@ import { LoaderComponent } from './loader/loader.component';
 import { SingleSpaPropsService } from './single-spa-props/single-spa-props.service';
 import { FormCreationService } from './form-creation/form-creation.service';
 import { TranslateModule, TranslateService, TranslateStore } from '@ngx-translate/core';
-import { Encounter, FormSchema } from './types';
-import { Session } from '@openmrs/esm-framework';
-
-export interface CreateFormParams {
-  /**
-   * The form schema to be used.
-   */
-  formSchema: FormSchema;
-  /**
-   * The currently signed-in user.
-   */
-  session: Session;
-  /**
-   * An optional encounter.
-   * If provided, this encounter will be edited by the form.
-   * This can be an offline encounter form the sync queue which hasn't been synchronized yet.
-   */
-  encounter?: Encounter;
-  /**
-   * A previous encounter for displaying previously entered data.
-   */
-  previousEncounter?: Encounter;
-}
-
-let session: CreateFormParams = null;
 
 @NgModule({
   declarations: [AppComponent, EmptyRouteComponent, FeWrapperComponent, LoaderComponent],
