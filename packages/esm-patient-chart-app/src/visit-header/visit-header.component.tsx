@@ -211,11 +211,12 @@ const VisitHeader: React.FC = () => {
             {systemVisitEnabled && (
               <>
                 <ExtensionSlot extensionSlotName="visit-header-right-slot" />
-                {!hasActiveVisit && (
-                  <Button className={styles.startVisitButton} onClick={launchStartVisitForm} size="lg">
-                    {startVisitLabel ? startVisitLabel : t('startAVisit', 'Start a visit')}
-                  </Button>
-                )}
+                {!hasActiveVisit &&
+                  !isDeceased && (
+                    <Button className={styles.startVisitButton} onClick={launchStartVisitForm} size="lg">
+                      {startVisitLabel ? startVisitLabel : t('startAVisit', 'Start a visit')}
+                    </Button>
+                  )}
                 {currentVisit !== null && endVisitLabel && (
                   <>
                     <HeaderGlobalAction
@@ -259,6 +260,7 @@ const VisitHeader: React.FC = () => {
     openModal,
     currentVisit,
     logo,
+    isDeceased,
     systemVisitEnabled,
   ]);
 
