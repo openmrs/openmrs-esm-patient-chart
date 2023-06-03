@@ -5,17 +5,18 @@
     "packages/*"
   ],
   "scripts": {
-    "start": "openmrs develop",
+    "start": "openmrs develop --sources packages/esm-patient-chart-app/",
     "ci:publish": "lerna publish from-package --yes",
     "ci:prepublish": "lerna publish from-package --no-git-reset --yes --dist-tag next",
     "release": "lerna version --no-git-tag-version",
-    "verify": "turbo run lint && turbo run typescript",
-    "prettier": "prettier --config prettier.config.js --write \"packages/**/*.{ts,tsx,css,scss}\" \"e2e/**/*.ts\"",
-    "test": "cross-env TZ=UTC jest --config jest.config.json --verbose false --passWithNoTests",
-    "test-watch": "cross-env TZ=UTC jest --watch --config jest.config.json",
-    "test-e2e": "playwright test",
-    "coverage": "yarn test --coverage",
+    "verify": "turbo run lint && turbo run typescript && yarn run test",
+    "prettier": "prettier --config prettier.config.js --write \"packages/**/*.{ts,tsx}\"",
     "postinstall": "husky install",
+    "test": "cross-env TZ=UTC jest --config jest.config.js --verbose false --passWithNoTests",
+    "test-watch": "cross-env TZ=UTC jest --watch --config jest.config.js",
+    "coverage": "yarn test --coverage",
+    "ci:bump-form-engine-lib": "yarn up @openmrs/openmrs-form-engine-lib@next",
+    "test-e2e": "playwright test"
   },
   "devDependencies": {
     "@openmrs/esm-framework": "next",
