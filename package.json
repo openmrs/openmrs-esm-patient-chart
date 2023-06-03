@@ -12,7 +12,7 @@
     "verify": "turbo run lint && turbo run typescript && yarn run test",
     "prettier": "prettier --config prettier.config.js --write \"packages/**/*.{ts,tsx}\"",
     "postinstall": "husky install",
-    "test": "cross-env TZ=UTC jest --config jest.config.js --verbose false --passWithNoTests",
+    "test": "cross-env TZ=UTC jest --config jest.config.json --verbose false --passWithNoTests",
     "test-watch": "cross-env TZ=UTC jest --watch --config jest.config.js",
     "coverage": "yarn test --coverage",
     "ci:bump-form-engine-lib": "yarn up @openmrs/openmrs-form-engine-lib@next",
