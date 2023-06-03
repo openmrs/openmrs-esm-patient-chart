@@ -13,7 +13,7 @@
     "prettier": "prettier --config prettier.config.js --write \"packages/**/*.{ts,tsx}\"",
     "postinstall": "husky install",
     "test": "cross-env TZ=UTC jest --config jest.config.json --verbose false --passWithNoTests",
-    "test-watch": "cross-env TZ=UTC jest --watch --config jest.config.js",
+    "test-watch": "cross-env TZ=UTC jest --watch --config jest.config.json",
     "coverage": "yarn test --coverage",
     "ci:bump-form-engine-lib": "yarn up @openmrs/openmrs-form-engine-lib@next",
     "test-e2e": "playwright test"
