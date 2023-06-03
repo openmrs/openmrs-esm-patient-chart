@@ -1,9 +1,9 @@
 import { Page } from '@playwright/test';
 
-export class HomePage {
+export class PatientAllergiesPage {
   constructor(readonly page: Page) {}
 
   async goto(uuid: string) {
-    await this.page.goto('home');
+    await this.page.goto('/openmrs/spa/patient/' + uuid + '/chart/Allergies');
   }
 }

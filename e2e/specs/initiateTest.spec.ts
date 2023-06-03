@@ -1,5 +1,5 @@
 import { test } from '../core';
-import { HomePage } from '../pages';
+import { PatientAllergiesPage } from '../pages';
 import { expect } from '@playwright/test';
 import { deletePatient, generateRandomPatient, getPatient, Patient } from '../commands';
 
@@ -7,9 +7,9 @@ let patient: Patient;
 test.beforeEach(async ({ api }) => {
   patient = await generateRandomPatient(api);
 });
-test('should be able to see the active visits', async ({ page }) => {
-  const homePage = new HomePage(page);
-  await homePage.goto(patient.uuid);
+test('Should initiate a test', async ({ page }) => {
+  const patientAllergiesPage = new PatientAllergiesPage(page);
+  await patientAllergiesPage.goto(patient.uuid);
   await expect(page).toHaveTitle('OpenMRS');
 });
 
